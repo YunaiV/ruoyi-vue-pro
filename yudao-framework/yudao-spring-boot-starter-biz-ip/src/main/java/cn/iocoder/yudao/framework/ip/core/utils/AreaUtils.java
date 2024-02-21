@@ -4,6 +4,7 @@ import cn.hutool.core.io.resource.ResourceUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.text.csv.CsvRow;
 import cn.hutool.core.text.csv.CsvUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
 import cn.iocoder.yudao.framework.ip.core.Area;
 import cn.iocoder.yudao.framework.ip.core.enums.AreaTypeEnum;
@@ -75,6 +76,32 @@ public class AreaUtils {
     }
 
     /**
+     * 获取所有节点的全路径名称如：河南省/石家庄市/新华区
+     *
+     * @param areas 地区树
+     * @return 所有节点的全路径名称
+     */
+    public static List<String> getAllAreaNodePaths(List<Area> areas) {
+        return convertList(areas, AreaUtils::buildTreePath);
+    }
+
+    // TODO @puhui999: 展开树再构建全路径
+    private static String buildTreePath(Area node) {
+        if (node.getParent() == null || Area.ID_CHINA.equals(node.getParent().getId())) { // 忽略中国
+            // 已经是根节点，直接返回节点名称
+            return node.getName();
+        } else {
+            // 递归拼接上级节点的名称
+            Area parent = getArea(node.getParent().getId());
+            if (parent != null) {
+                String parentPath = buildTreePath(parent);
+                return parentPath + "/" + node.getName();
+            }
+        }
+        return StrUtil.EMPTY;
+    }
+
+    /**
      * 格式化区域
      *
      * @param id 区域编号
@@ -88,13 +115,13 @@ public class AreaUtils {
      * 格式化区域
      *
      * 例如说：
-     *      1. id = “静安区”时：上海 上海市 静安区
-     *      2. id = “上海市”时：上海 上海市
-     *      3. id = “上海”时：上海
-     *      4. id = “美国”时：美国
+     * 1. id = “静安区”时：上海 上海市 静安区
+     * 2. id = “上海市”时：上海 上海市
+     * 3. id = “上海”时：上海
+     * 4. id = “美国”时：美国
      * 当区域在中国时，默认不显示中国
      *
-     * @param id 区域编号
+     * @param id        区域编号
      * @param separator 分隔符
      * @return 格式化后的区域
      */

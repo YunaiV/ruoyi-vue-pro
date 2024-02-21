@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.crm.controller.admin.customer;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.map.MapUtil;
+import cn.iocoder.yudao.framework.common.core.KeyValue;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
@@ -10,6 +11,7 @@ import cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils;
 import cn.iocoder.yudao.framework.common.util.number.NumberUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
+import cn.iocoder.yudao.framework.ip.core.Area;
 import cn.iocoder.yudao.framework.ip.core.utils.AreaUtils;
 import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
 import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.customer.*;
@@ -19,6 +21,7 @@ import cn.iocoder.yudao.module.crm.service.customer.CrmCustomerPoolConfigService
 import cn.iocoder.yudao.module.crm.service.customer.CrmCustomerService;
 import cn.iocoder.yudao.module.system.api.dept.DeptApi;
 import cn.iocoder.yudao.module.system.api.dept.dto.DeptRespDTO;
+import cn.iocoder.yudao.module.system.api.dict.DictDataApi;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import io.swagger.v3.oas.annotations.Operation;
@@ -34,9 +37,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Stream;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
@@ -44,6 +45,7 @@ import static cn.iocoder.yudao.framework.common.pojo.PageParam.PAGE_SIZE_NONE;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
 import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.EXPORT;
 import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
+import static cn.iocoder.yudao.module.crm.enums.DictTypeConstants.*;
 import static java.util.Collections.singletonList;
 
 @Tag(name = "管理后台 - CRM 客户")
@@ -61,6 +63,8 @@ public class CrmCustomerController {
     private DeptApi deptApi;
     @Resource
     private AdminUserApi adminUserApi;
+    @Resource
+    private DictDataApi dictDataApi;
 
     @PostMapping("/create")
     @Operation(summary = "创建客户")
@@ -258,7 +262,7 @@ public class CrmCustomerController {
                         .areaId(null).detailAddress("").remark("").build()
         );
         // 输出
-        ExcelUtils.write(response, "客户导入模板.xls", "客户列表", CrmCustomerImportExcelVO.class, list);
+        ExcelUtils.write(response, "客户导入模板.xls", "客户列表", CrmCustomerImportExcelVO.class, list, builderSelectMap());
     }
 
     @PostMapping("/import")
@@ -312,6 +316,25 @@ public class CrmCustomerController {
     public CommonResult<Boolean> distributeCustomer(@Valid @RequestBody CrmCustomerDistributeReqVO distributeReqVO) {
         customerService.receiveCustomer(distributeReqVO.getIds(), distributeReqVO.getOwnerUserId(), Boolean.FALSE);
         return success(true);
+    }
+
+    private List<KeyValue<Integer, List<String>>> builderSelectMap() {
+        List<KeyValue<Integer, List<String>>> selectMap = new ArrayList<>();
+        // 获取地区下拉数据
+        Area area = AreaUtils.getArea(Area.ID_CHINA);
+        selectMap.add(new KeyValue<>(6, AreaUtils.getAllAreaNodePaths(area.getChildren())));
+        // 获取客户所属行业
+        List<String> customerIndustries = dictDataApi.getDictDataLabelList(CRM_CUSTOMER_INDUSTRY);
+        selectMap.add(new KeyValue<>(8, customerIndustries));
+        // 获取客户等级
+        List<String> customerLevels = dictDataApi.getDictDataLabelList(CRM_CUSTOMER_LEVEL);
+        selectMap.add(new KeyValue<>(9, customerLevels));
+        // 获取客户来源
+        List<String> customerSources = dictDataApi.getDictDataLabelList(CRM_CUSTOMER_SOURCE);
+        selectMap.add(new KeyValue<>(10, customerSources));
+        // 升序不然创建下拉会报错
+        selectMap.sort(Comparator.comparing(item -> item.getValue().size()));
+        return selectMap;
     }
 
 }
