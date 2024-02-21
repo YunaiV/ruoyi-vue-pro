@@ -184,7 +184,7 @@ public class CrmContactServiceImpl implements CrmContactService {
 
         // 2.1 数据权限转移
         permissionService.transferPermission(new CrmPermissionTransferReqBO(userId, CrmBizTypeEnum.CRM_CONTACT.getType(),
-                        reqVO.getId(), reqVO.getNewOwnerUserId(), reqVO.getOldOwnerPermissionLevel()));
+                reqVO.getId(), reqVO.getNewOwnerUserId(), reqVO.getOldOwnerPermissionLevel()));
         // 2.2 设置新的负责人
         contactMapper.updateById(new CrmContactDO().setId(reqVO.getId()).setOwnerUserId(reqVO.getNewOwnerUserId()));
 
@@ -193,9 +193,31 @@ public class CrmContactServiceImpl implements CrmContactService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
+    @CrmPermission(bizType = CrmBizTypeEnum.CRM_CUSTOMER, bizId = "#customerId", level = CrmPermissionLevelEnum.OWNER)
     public void updateOwnerUserIdByCustomerId(Long customerId, Long ownerUserId) {
-        contactMapper.updateOwnerUserIdByCustomerId(customerId, ownerUserId);
-        // TODO @puhui999：操作日志、数据权限；
+        // 1. 校验存在
+        List<CrmContactDO> contacts = contactMapper.selectListByCustomerId(customerId);
+        if (CollUtil.isEmpty(contacts)) {
+            return;
+        }
+        int count = contactMapper.updateOwnerUserIdByCustomerId(customerId, ownerUserId);
+        if (count == 0) {
+            throw exception(CONTACT_UPDATE_OWNER_USER_FAIL);
+        }
+
+        // 2. 记录操作日志
+        for (CrmContactDO contact : contacts) {
+            receiveContactLog(contact, ownerUserId);
+        }
+    }
+
+    @LogRecord(type = CRM_CONTACT_TYPE, subType = CRM_CONTACT_UPDATE_OWNER_USER_SUB_TYPE, bizNo = "{{#contact.id}",
+            success = CRM_CONTACT_UPDATE_OWNER_USER_SUCCESS)
+    public void receiveContactLog(CrmContactDO contact, Long ownerUserId) {
+        // 记录操作日志上下文
+        LogRecordContext.putVariable("contact", contact);
+        LogRecordContext.putVariable("ownerUserId", ownerUserId);
     }
 
     @Override

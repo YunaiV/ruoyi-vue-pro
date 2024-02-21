@@ -100,10 +100,8 @@ public class CrmBusinessServiceImpl implements CrmBusinessService {
             businessProducts.forEach(item -> item.setBusinessId(business.getId()));
             businessProductMapper.insertBatch(businessProducts);
         }
-
-        // TODO @puhui999：在联系人的详情页，如果直接【新建商机】，则需要关联下。这里要搞个 CrmContactBusinessDO 表
-        createContactBusiness(business.getId(), createReqVO.getContactId());
-
+        // 在联系人的详情页，如果直接【新建商机】，则需要关联下。
+        contactBusinessService.createContactBusiness(createReqVO.getContactId(), business.getId());
         // 3. 创建数据权限
         // 设置当前操作的人为负责人
         permissionService.createPermission(new CrmPermissionCreateReqBO().setBizType(CrmBizTypeEnum.CRM_BUSINESS.getType())
@@ -112,17 +110,6 @@ public class CrmBusinessServiceImpl implements CrmBusinessService {
         // 4. 记录操作日志上下文
         LogRecordContext.putVariable("business", business);
         return business.getId();
-    }
-
-    // TODO @lzxhqs：CrmContactBusinessService 调用这个；这样逻辑才能收敛哈；
-    private void createContactBusiness(Long businessId, Long contactId) {
-        if  (contactId == null) {
-            return;
-        }
-        CrmContactBusinessDO contactBusiness = new CrmContactBusinessDO();
-        contactBusiness.setBusinessId(businessId);
-        contactBusiness.setContactId(contactId);
-        contactBusinessService.insert(contactBusiness);
     }
 
     @Override

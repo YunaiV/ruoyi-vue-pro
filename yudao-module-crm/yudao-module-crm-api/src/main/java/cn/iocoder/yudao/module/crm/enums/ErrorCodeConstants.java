@@ -26,6 +26,7 @@ public interface ErrorCodeConstants {
     ErrorCode CONTACT_NOT_EXISTS = new ErrorCode(1_020_003_000, "联系人不存在");
     ErrorCode CONTACT_BUSINESS_LINK_NOT_EXISTS = new ErrorCode(1_020_003_001, "联系人商机关联不存在");
     ErrorCode CONTACT_DELETE_FAIL_CONTRACT_LINK_EXISTS = new ErrorCode(1_020_003_002, "联系人已关联合同，不能删除");
+    ErrorCode CONTACT_UPDATE_OWNER_USER_FAIL = new ErrorCode(1_020_003_003, "更新联系人负责人失败");
 
     // ========== 回款 1-020-004-000 ==========
     ErrorCode RECEIVABLE_NOT_EXISTS = new ErrorCode(1_020_004_000, "回款不存在");

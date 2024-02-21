@@ -5,7 +5,7 @@ import cn.iocoder.yudao.module.crm.controller.admin.contact.vo.CrmContactBusines
 import cn.iocoder.yudao.module.crm.dal.dataobject.business.CrmBusinessDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.contact.CrmContactBusinessDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.contact.CrmContactDO;
-import cn.iocoder.yudao.module.crm.dal.mysql.contactbusinesslink.CrmContactBusinessMapper;
+import cn.iocoder.yudao.module.crm.dal.mysql.contact.CrmContactBusinessMapper;
 import cn.iocoder.yudao.module.crm.enums.common.CrmBizTypeEnum;
 import cn.iocoder.yudao.module.crm.enums.permission.CrmPermissionLevelEnum;
 import cn.iocoder.yudao.module.crm.framework.permission.core.annotations.CrmPermission;
@@ -40,6 +40,22 @@ public class CrmContactBusinessServiceImpl implements CrmContactBusinessService 
     @Resource
     @Lazy // 延迟加载，为了解决延迟加载
     private CrmContactService contactService;
+
+    @Override
+    public void createContactBusiness(Long contactId, Long businessId) {
+        // 校验存在
+        CrmContactDO contact = contactService.getContact(contactId);
+        if (contact == null) {
+            throw exception(CONTACT_NOT_EXISTS);
+        }
+        CrmBusinessDO business = businessService.getBusiness(businessId);
+        if (business == null) {
+            throw exception(BUSINESS_NOT_EXISTS);
+        }
+
+        // 插入
+        contactBusinessMapper.insert(new CrmContactBusinessDO(null, contactId, businessId));
+    }
 
     @Override
     @CrmPermission(bizType = CrmBizTypeEnum.CRM_CONTACT, bizId = "#createReqVO.contactId", level = CrmPermissionLevelEnum.WRITE)
@@ -89,11 +105,6 @@ public class CrmContactBusinessServiceImpl implements CrmContactBusinessService 
     @CrmPermission(bizType = CrmBizTypeEnum.CRM_CONTACT, bizId = "#contactId", level = CrmPermissionLevelEnum.READ)
     public List<CrmContactBusinessDO> getContactBusinessListByContactId(Long contactId) {
         return contactBusinessMapper.selectListByContactId(contactId);
-    }
-
-    @Override
-    public void insert(CrmContactBusinessDO contactBusiness) {
-        contactBusinessMapper.insert(contactBusiness);
     }
 
 }

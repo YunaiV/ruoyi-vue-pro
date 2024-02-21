@@ -55,6 +55,7 @@ public interface CrmContactService {
 
     /**
      * 更新指定客户的联系人的负责人
+     * 数据权限基于 【客户】
      *
      * @param customerId  客户编号
      * @param ownerUserId 用户编号
@@ -64,8 +65,8 @@ public interface CrmContactService {
     /**
      * 更新联系人相关跟进信息
      *
-     * @param id 编号
-     * @param contactNextTime 下次联系时间
+     * @param id                 编号
+     * @param contactNextTime    下次联系时间
      * @param contactLastContent 最后联系内容
      */
     void updateContactFollowUp(Long id, LocalDateTime contactNextTime, String contactLastContent);
@@ -73,8 +74,8 @@ public interface CrmContactService {
     /**
      * 更新联系人相关跟进信息
      *
-     * @param ids 编号数组
-     * @param contactNextTime 下次联系时间
+     * @param ids                编号数组
+     * @param contactNextTime    下次联系时间
      * @param contactLastContent 最后联系内容
      */
     void updateContactFollowUpBatch(Collection<Long> ids, LocalDateTime contactNextTime, String contactLastContent);

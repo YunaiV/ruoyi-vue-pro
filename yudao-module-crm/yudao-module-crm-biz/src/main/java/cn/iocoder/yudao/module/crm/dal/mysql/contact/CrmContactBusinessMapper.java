@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.crm.dal.mysql.contactbusinesslink;
+package cn.iocoder.yudao.module.crm.dal.mysql.contact;
 
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.module.crm.dal.dataobject.contact.CrmContactBusinessDO;
@@ -9,7 +9,7 @@ import java.util.Collection;
 import java.util.List;
 
 /**
- * CRM 联系人与商机的关联 Mapper
+ * CRM 联系人商机关联 Mapper
  *
  * @author 芋道源码
  */

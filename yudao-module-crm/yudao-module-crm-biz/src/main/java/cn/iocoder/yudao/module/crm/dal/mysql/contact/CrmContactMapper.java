@@ -65,4 +65,8 @@ public interface CrmContactMapper extends BaseMapperX<CrmContactDO> {
         return selectJoinList(CrmContactDO.class, query);
     }
 
+    default List<CrmContactDO> selectListByCustomerId(Long customerId) {
+        return selectList(CrmContactDO::getCustomerId, customerId);
+    }
+
 }
