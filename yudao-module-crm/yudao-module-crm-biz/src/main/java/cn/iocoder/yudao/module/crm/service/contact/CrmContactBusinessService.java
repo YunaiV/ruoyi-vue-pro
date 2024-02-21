@@ -14,6 +14,15 @@ import java.util.List;
 public interface CrmContactBusinessService {
 
     /**
+     * 创建联系人人商机关联
+     *
+     * @param contactId  联系人编号
+     * @param businessId 商机编号
+     */
+    void createContactBusiness(Long contactId, Long businessId);
+
+
+    /**
      * 创建联系人与商机的关联
      *
      * @param createReqVO 创建信息
@@ -41,12 +50,5 @@ public interface CrmContactBusinessService {
      * @return 联系人商机关联
      */
     List<CrmContactBusinessDO> getContactBusinessListByContactId(Long contactId);
-
-    /**
-     * 新增联系人与商机的关联
-     *
-     * @param contactBusiness 新增联系人与商机的对象
-     */
-    void insert(CrmContactBusinessDO contactBusiness);
 
 }

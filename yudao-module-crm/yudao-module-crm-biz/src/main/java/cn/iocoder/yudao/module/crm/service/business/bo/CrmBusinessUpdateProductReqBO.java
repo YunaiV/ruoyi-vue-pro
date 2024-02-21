@@ -25,13 +25,13 @@ public class CrmBusinessUpdateProductReqBO {
 
     // TODO @芋艿：再想想
     @NotEmpty(message = "产品列表不能为空")
-    private List<CrmBusinessProductItem> productItems;
+    private List<Item> items;
 
     @Schema(description = "产品列表")
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class CrmBusinessProductItem {
+    public static class Item {
 
         @Schema(description = "产品编号", example = "20529")
         @NotNull(message = "产品编号不能为空")

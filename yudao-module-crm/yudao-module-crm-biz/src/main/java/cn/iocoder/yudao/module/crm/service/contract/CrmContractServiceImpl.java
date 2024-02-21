@@ -104,7 +104,7 @@ public class CrmContractServiceImpl implements CrmContractService {
             // 如果存在合同关联了商机则更新商机商品关联
             if (contract.getBusinessId() != null) {
                 businessService.updateBusinessProduct(new CrmBusinessUpdateProductReqBO().setId(contract.getBusinessId())
-                        .setProductItems(BeanUtils.toBean(createReqVO.getProductItems(), CrmBusinessUpdateProductReqBO.CrmBusinessProductItem.class)));
+                        .setItems(BeanUtils.toBean(createReqVO.getProductItems(), CrmBusinessUpdateProductReqBO.Item.class)));
             }
         }
 

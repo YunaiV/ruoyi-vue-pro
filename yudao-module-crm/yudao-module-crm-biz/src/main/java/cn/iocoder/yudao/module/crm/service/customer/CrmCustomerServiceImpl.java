@@ -412,7 +412,7 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
         return count;
     }
 
-    @Transactional // 需要 protected 修饰，因为需要在事务中调用
+    @Transactional(rollbackFor = Exception.class) // 需要 protected 修饰，因为需要在事务中调用
     protected void putCustomerPool(CrmCustomerDO customer) {
         // 1. 设置负责人为 NULL
         int updateOwnerUserIncr = customerMapper.updateOwnerUserIdById(customer.getId(), null);

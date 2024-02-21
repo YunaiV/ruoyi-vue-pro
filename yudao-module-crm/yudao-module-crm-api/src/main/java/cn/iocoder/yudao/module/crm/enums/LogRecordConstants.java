@@ -77,6 +77,8 @@ public interface LogRecordConstants {
     String CRM_CONTACT_TRANSFER_SUCCESS = "将联系人【{{#contact.name}}】的负责人从【{getAdminUserById{#contact.ownerUserId}}】变更为了【{getAdminUserById{#reqVO.newOwnerUserId}}】";
     String CRM_CONTACT_FOLLOW_UP_SUB_TYPE = "联系人跟进";
     String CRM_CONTACT_FOLLOW_UP_SUCCESS = "联系人跟进【{{#contactName}}】";
+    String CRM_CONTACT_UPDATE_OWNER_USER_SUB_TYPE = "更新联系人负责人";
+    String CRM_CONTACT_UPDATE_OWNER_USER_SUCCESS = "将联系人【{{#contact.name}}】的负责人从【{getAdminUserById{#contact.ownerUserId}}】变更为了【{getAdminUserById{#ownerUserId}}】";
 
     // ======================= CRM_BUSINESS 商机 =======================
 

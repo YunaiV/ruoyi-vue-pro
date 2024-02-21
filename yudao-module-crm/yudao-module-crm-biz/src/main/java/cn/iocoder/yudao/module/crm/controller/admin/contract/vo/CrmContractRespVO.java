@@ -130,14 +130,13 @@ public class CrmContractRespVO {
     private Integer auditStatus;
 
     @Schema(description = "产品列表")
-    private List<CrmContractProductItemRespVO> productItems;
+    private List<Item> items;
 
-    // TODO @puhui999：可以直接叫 Item
     @Schema(description = "产品列表")
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class CrmContractProductItemRespVO {
+    public static class Item {
 
         @Schema(description = "产品编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "20529")
         private Long id;
