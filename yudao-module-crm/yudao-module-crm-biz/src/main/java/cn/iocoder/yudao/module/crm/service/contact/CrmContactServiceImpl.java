@@ -225,7 +225,7 @@ public class CrmContactServiceImpl implements CrmContactService {
             success = CRM_CONTACT_FOLLOW_UP_SUCCESS)
     @CrmPermission(bizType = CrmBizTypeEnum.CRM_CONTACT, bizId = "#id", level = CrmPermissionLevelEnum.WRITE)
     public void updateContactFollowUp(Long id, LocalDateTime contactNextTime, String contactLastContent) {
-        // 1.1 校验存在
+        // 1. 校验存在
         CrmContactDO contact = validateContactExists(id);
 
         // 2. 更新联系人的跟进信息
@@ -238,9 +238,8 @@ public class CrmContactServiceImpl implements CrmContactService {
 
     @Override
     @CrmPermission(bizType = CrmBizTypeEnum.CRM_CONTACT, bizId = "#ids", level = CrmPermissionLevelEnum.WRITE)
-    public void updateContactFollowUpBatch(Collection<Long> ids, LocalDateTime contactNextTime, String contactLastContent) {
-        contactMapper.updateBatch(convertList(ids, id -> new CrmContactDO().setId(id).setContactLastTime(LocalDateTime.now())
-                .setContactNextTime(contactNextTime).setContactLastContent(contactLastContent)));
+    public void updateContactContactNextTime(Collection<Long> ids, LocalDateTime contactNextTime) {
+        contactMapper.updateBatch(convertList(ids, id -> new CrmContactDO().setId(id).setContactNextTime(contactNextTime)));
     }
 
     //======================= 查询相关 =======================

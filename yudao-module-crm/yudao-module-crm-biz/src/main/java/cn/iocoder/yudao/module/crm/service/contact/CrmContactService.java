@@ -72,13 +72,12 @@ public interface CrmContactService {
     void updateContactFollowUp(Long id, LocalDateTime contactNextTime, String contactLastContent);
 
     /**
-     * 更新联系人相关跟进信息
+     * 更新联系人的下次联系时间
      *
      * @param ids                编号数组
      * @param contactNextTime    下次联系时间
-     * @param contactLastContent 最后联系内容
      */
-    void updateContactFollowUpBatch(Collection<Long> ids, LocalDateTime contactNextTime, String contactLastContent);
+    void updateContactContactNextTime(Collection<Long> ids, LocalDateTime contactNextTime);
 
     /**
      * 获得联系人

@@ -26,11 +26,9 @@ import org.springframework.validation.annotation.Validated;
 
 import java.time.LocalDateTime;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
 import static cn.iocoder.yudao.module.crm.enums.ErrorCodeConstants.FOLLOW_UP_RECORD_DELETE_DENIED;
 import static cn.iocoder.yudao.module.crm.enums.ErrorCodeConstants.FOLLOW_UP_RECORD_NOT_EXISTS;
 
@@ -77,7 +75,7 @@ public class CrmFollowUpRecordServiceImpl implements CrmFollowUpRecordService {
                 .setContactLastTime(LocalDateTime.now())
                 .setContactNextTime(record.getNextTime()).setContactLastContent(record.getContent());
         if (ObjUtil.equal(CrmBizTypeEnum.CRM_BUSINESS.getType(), record.getBizType())) { // 更新商机跟进信息
-            businessService.updateBusinessFollowUpBatch(Collections.singletonList(updateFollowUpReqBO));
+            businessService.updateBusinessFollowUp(record.getBizId(), record.getNextTime(), record.getContent());
         }
         if (ObjUtil.equal(CrmBizTypeEnum.CRM_CLUE.getType(), record.getBizType())) { // 更新线索跟进信息
             clueService.updateClueFollowUp(record.getBizId(), record.getNextTime(), record.getContent());
@@ -92,14 +90,13 @@ public class CrmFollowUpRecordServiceImpl implements CrmFollowUpRecordService {
             customerService.updateCustomerFollowUp(record.getBizId(), record.getNextTime(), record.getContent());
         }
 
-        // 3.1 更新 contactIds 对应的记录，不更新 lastTime 和 lastContent
+        // 3.1 更新 contactIds 对应的记录，只更新 nextTime
         if (CollUtil.isNotEmpty(createReqVO.getContactIds())) {
-            contactService.updateContactFollowUpBatch(createReqVO.getContactIds(), null, null);
+            contactService.updateContactContactNextTime(createReqVO.getContactIds(), createReqVO.getNextTime());
         }
-        // 3.2 需要更新 businessIds 对应的记录，不更新 lastTime 和 lastContent
+        // 3.2 需要更新 businessIds 对应的记录，只更新 nextTime
         if (CollUtil.isNotEmpty(createReqVO.getBusinessIds())) {
-            businessService.updateBusinessFollowUpBatch(convertList(createReqVO.getBusinessIds(),
-                    businessId -> updateFollowUpReqBO.setBizId(businessId).setContactLastTime(null).setContactLastContent(null)));
+            businessService.updateBusinessContactNextTime(createReqVO.getBusinessIds(), createReqVO.getNextTime());
         }
         return record.getId();
     }

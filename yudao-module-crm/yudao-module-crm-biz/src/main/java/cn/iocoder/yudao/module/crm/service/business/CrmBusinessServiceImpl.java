@@ -22,7 +22,6 @@ import cn.iocoder.yudao.module.crm.service.contact.CrmContactBusinessService;
 import cn.iocoder.yudao.module.crm.service.contact.CrmContactService;
 import cn.iocoder.yudao.module.crm.service.contract.CrmContractService;
 import cn.iocoder.yudao.module.crm.service.customer.CrmCustomerService;
-import cn.iocoder.yudao.module.crm.service.followup.bo.CrmUpdateFollowUpReqBO;
 import cn.iocoder.yudao.module.crm.service.permission.CrmPermissionService;
 import cn.iocoder.yudao.module.crm.service.permission.bo.CrmPermissionCreateReqBO;
 import cn.iocoder.yudao.module.crm.service.product.CrmProductService;
@@ -37,12 +36,13 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
-import static cn.iocoder.yudao.module.crm.enums.ErrorCodeConstants.BUSINESS_CONTRACT_EXISTS;
+import static cn.iocoder.yudao.module.crm.enums.ErrorCodeConstants.BUSINESS_DELETE_FAIL_CONTRACT_EXISTS;
 import static cn.iocoder.yudao.module.crm.enums.ErrorCodeConstants.BUSINESS_NOT_EXISTS;
 import static cn.iocoder.yudao.module.crm.enums.LogRecordConstants.*;
 
@@ -139,6 +139,28 @@ public class CrmBusinessServiceImpl implements CrmBusinessService {
         LogRecordContext.putVariable("businessName", oldBusiness.getName());
     }
 
+    @Override
+    @LogRecord(type = CRM_BUSINESS_TYPE, subType = CRM_BUSINESS_FOLLOW_UP_SUB_TYPE, bizNo = "{{#id}",
+            success = CRM_BUSINESS_FOLLOW_UP_SUCCESS)
+    @CrmPermission(bizType = CrmBizTypeEnum.CRM_BUSINESS, bizId = "#id", level = CrmPermissionLevelEnum.WRITE)
+    public void updateBusinessFollowUp(Long id, LocalDateTime contactNextTime, String contactLastContent) {
+        // 1. 校验存在
+        CrmBusinessDO business = validateBusinessExists(id);
+
+        // 2. 更新联系人的跟进信息
+        businessMapper.updateById(new CrmBusinessDO().setId(id).setFollowUpStatus(true).setContactNextTime(contactNextTime)
+                .setContactLastTime(LocalDateTime.now()));
+
+        // 3. 记录操作日志上下文
+        LogRecordContext.putVariable("businessName", business.getName());
+    }
+
+    @Override
+    @CrmPermission(bizType = CrmBizTypeEnum.CRM_BUSINESS, bizId = "#ids", level = CrmPermissionLevelEnum.WRITE)
+    public void updateBusinessContactNextTime(Collection<Long> ids, LocalDateTime contactNextTime) {
+        businessMapper.updateBatch(convertList(ids, id -> new CrmBusinessDO().setId(id).setContactNextTime(contactNextTime)));
+    }
+
     private void updateBusinessProduct(Long id, List<CrmBusinessProductDO> newList) {
         List<CrmBusinessProductDO> oldList = businessProductMapper.selectListByBusinessId(id);
         List<List<CrmBusinessProductDO>> diffList = diffList(oldList, newList, // id 不同，就认为是不同的记录
@@ -190,19 +212,14 @@ public class CrmBusinessServiceImpl implements CrmBusinessService {
     }
 
     @Override
-    public void updateBusinessFollowUpBatch(List<CrmUpdateFollowUpReqBO> updateFollowUpReqBOList) {
-        businessMapper.updateBatch(CrmBusinessConvert.INSTANCE.convertList(updateFollowUpReqBOList));
-    }
-
-    @Override
     @Transactional(rollbackFor = Exception.class)
     @LogRecord(type = CRM_BUSINESS_TYPE, subType = CRM_BUSINESS_DELETE_SUB_TYPE, bizNo = "{{#id}}",
             success = CRM_BUSINESS_DELETE_SUCCESS)
     @CrmPermission(bizType = CrmBizTypeEnum.CRM_BUSINESS, bizId = "#id", level = CrmPermissionLevelEnum.OWNER)
     public void deleteBusiness(Long id) {
-        // 校验存在
+        // 1.1 校验存在
         CrmBusinessDO business = validateBusinessExists(id);
-        // TODO @商机待定：需要校验有没关联合同。CrmContractDO 的 businessId 字段
+        // 1.2 校验是否关联合同
         validateContractExists(id);
 
         // 删除
@@ -222,7 +239,7 @@ public class CrmBusinessServiceImpl implements CrmBusinessService {
      */
     private void validateContractExists(Long businessId) {
         if (contractService.getContractCountByBusinessId(businessId) > 0) {
-            throw exception(BUSINESS_CONTRACT_EXISTS);
+            throw exception(BUSINESS_DELETE_FAIL_CONTRACT_EXISTS);
         }
     }
 
