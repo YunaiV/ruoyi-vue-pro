@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.crm.service.business;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.crm.controller.admin.business.vo.status.CrmBusinessStatusPageReqVO;
@@ -13,6 +14,7 @@ import org.springframework.validation.annotation.Validated;
 import jakarta.annotation.Resource;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
@@ -80,6 +82,9 @@ public class CrmBusinessStatusServiceImpl implements CrmBusinessStatusService {
 
     @Override
     public List<CrmBusinessStatusDO> getBusinessStatusList(Collection<Long> ids) {
+        if (CollUtil.isEmpty(ids)) {
+            return Collections.emptyList();
+        }
         return businessStatusMapper.selectBatchIds(ids);
     }
 

@@ -5,11 +5,13 @@ import cn.iocoder.yudao.module.crm.controller.admin.business.vo.status.CrmBusine
 import cn.iocoder.yudao.module.crm.controller.admin.business.vo.status.CrmBusinessStatusQueryVO;
 import cn.iocoder.yudao.module.crm.controller.admin.business.vo.status.CrmBusinessStatusSaveReqVO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.business.CrmBusinessStatusDO;
-
 import jakarta.validation.Valid;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
+
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
 
 /**
  * 商机状态 Service 接口
@@ -73,5 +75,15 @@ public interface CrmBusinessStatusService {
      * @return 商机状态列表
      */
     List<CrmBusinessStatusDO> getBusinessStatusList(Collection<Long> ids);
+
+    /**
+     * 获得商机状态 Map
+     *
+     * @param ids 编号数组
+     * @return 商机状态 Map
+     */
+    default Map<Long, CrmBusinessStatusDO> getBusinessStatusMap(Collection<Long> ids) {
+        return convertMap(getBusinessStatusList(ids), CrmBusinessStatusDO::getId);
+    }
 
 }

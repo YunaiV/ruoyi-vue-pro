@@ -9,6 +9,9 @@ import jakarta.validation.Valid;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
+
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
 
 /**
  * 商机状态类型 Service 接口
@@ -71,5 +74,15 @@ public interface CrmBusinessStatusTypeService {
      * @return 商机状态类型列表
      */
     List<CrmBusinessStatusTypeDO> getBusinessStatusTypeList(Collection<Long> ids);
+
+    /**
+     * 获得商机状态类型 Map
+     *
+     * @param ids 编号数组
+     * @return 商机状态类型 Map
+     */
+    default Map<Long, CrmBusinessStatusTypeDO> getBusinessStatusTypeMap(Collection<Long> ids) {
+        return convertMap(getBusinessStatusTypeList(ids), CrmBusinessStatusTypeDO::getId);
+    }
 
 }

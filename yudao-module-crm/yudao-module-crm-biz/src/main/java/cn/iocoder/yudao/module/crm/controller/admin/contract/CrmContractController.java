@@ -179,7 +179,7 @@ public class CrmContractController {
         if (contractList.size() == 1) {
             List<CrmContractProductDO> contractProductList = contractService.getContractProductListByContractId(contractList.get(0).getId());
             contractProductMap = convertMap(contractProductList, CrmContractProductDO::getProductId);
-            productList = productService.getProductListByIds(convertSet(contractProductList, CrmContractProductDO::getProductId));
+            productList = productService.getProductList(convertSet(contractProductList, CrmContractProductDO::getProductId));
         }
         return CrmContractConvert.INSTANCE.convertList(contractList, userMap, customerList, contactMap, businessMap, contractProductMap, productList);
     }

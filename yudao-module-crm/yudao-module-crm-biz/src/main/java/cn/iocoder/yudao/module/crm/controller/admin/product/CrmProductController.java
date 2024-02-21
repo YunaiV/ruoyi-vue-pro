@@ -1,16 +1,17 @@
 package cn.iocoder.yudao.module.crm.controller.admin.product;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.common.util.collection.SetUtils;
+import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
+import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
 import cn.iocoder.yudao.module.crm.controller.admin.product.vo.product.CrmProductPageReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.product.vo.product.CrmProductRespVO;
 import cn.iocoder.yudao.module.crm.controller.admin.product.vo.product.CrmProductSaveReqVO;
-import cn.iocoder.yudao.module.crm.convert.product.CrmProductConvert;
 import cn.iocoder.yudao.module.crm.dal.dataobject.product.CrmProductCategoryDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.product.CrmProductDO;
 import cn.iocoder.yudao.module.crm.service.product.CrmProductCategoryService;
@@ -34,10 +35,9 @@ import java.util.Map;
 import java.util.stream.Stream;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
-import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
-import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSetByFlatMap;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
 import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.EXPORT;
-import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
+import static java.util.Collections.singletonList;
 
 @Tag(name = "管理后台 - CRM 产品")
 @RestController
@@ -49,6 +49,7 @@ public class CrmProductController {
     private CrmProductService productService;
     @Resource
     private CrmProductCategoryService productCategoryService;
+
     @Resource
     private AdminUserApi adminUserApi;
 
@@ -82,21 +83,30 @@ public class CrmProductController {
     @PreAuthorize("@ss.hasPermission('crm:product:query')")
     public CommonResult<CrmProductRespVO> getProduct(@RequestParam("id") Long id) {
         CrmProductDO product = productService.getProduct(id);
+        return success(buildProductDetail(product));
+    }
+
+    private CrmProductRespVO buildProductDetail(CrmProductDO product) {
         if (product == null) {
-            return success(null);
+            return null;
         }
-        Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(
-                SetUtils.asSet(Long.valueOf(product.getCreator()), product.getOwnerUserId()));
-        CrmProductCategoryDO category = productCategoryService.getProductCategory(product.getCategoryId());
-        return success(CrmProductConvert.INSTANCE.convert(product, userMap, category));
+        return buildProductDetailList(singletonList(product)).get(0);
+    }
+
+    @GetMapping("/simple-list")
+    @Operation(summary = "获得产品精简列表", description = "只包含被开启的产品，主要用于前端的下拉选项")
+    public CommonResult<List<CrmProductRespVO>> getProductSimpleList() {
+        List<CrmProductDO> list = productService.getProductListByStatus(CommonStatusEnum.ENABLE.getStatus());
+        return success(convertList(list, product -> new CrmProductRespVO().setId(product.getId()).setName(product.getName())
+                .setUnit(product.getUnit()).setNo(product.getNo()).setPrice(product.getPrice())));
     }
 
     @GetMapping("/page")
     @Operation(summary = "获得产品分页")
     @PreAuthorize("@ss.hasPermission('crm:product:query')")
     public CommonResult<PageResult<CrmProductRespVO>> getProductPage(@Valid CrmProductPageReqVO pageVO) {
-        PageResult<CrmProductDO> pageResult = productService.getProductPage(pageVO, getLoginUserId());
-        return success(new PageResult<>(getProductDetailList(pageResult.getList()), pageResult.getTotal()));
+        PageResult<CrmProductDO> pageResult = productService.getProductPage(pageVO);
+        return success(new PageResult<>(buildProductDetailList(pageResult.getList()), pageResult.getTotal()));
     }
 
     @GetMapping("/export-excel")
@@ -106,21 +116,30 @@ public class CrmProductController {
     public void exportProductExcel(@Valid CrmProductPageReqVO exportReqVO,
                                    HttpServletResponse response) throws IOException {
         exportReqVO.setPageSize(PageParam.PAGE_SIZE_NONE);
-        List<CrmProductDO> list = productService.getProductPage(exportReqVO, getLoginUserId()).getList();
+        List<CrmProductDO> list = productService.getProductPage(exportReqVO).getList();
         // 导出 Excel
         ExcelUtils.write(response, "产品.xls", "数据", CrmProductRespVO.class,
-                getProductDetailList(list));
+                buildProductDetailList(list));
     }
 
-    private List<CrmProductRespVO> getProductDetailList(List<CrmProductDO> list) {
+    private List<CrmProductRespVO> buildProductDetailList(List<CrmProductDO> list) {
         if (CollUtil.isEmpty(list)) {
             return Collections.emptyList();
         }
+        // 1.1 获得用户信息
         Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(
                 convertSetByFlatMap(list, user -> Stream.of(Long.valueOf(user.getCreator()), user.getOwnerUserId())));
-        List<CrmProductCategoryDO> productCategoryList = productCategoryService.getProductCategoryList(
+        // 1.2 获得分类信息
+        Map<Long, CrmProductCategoryDO> categoryMap = productCategoryService.getProductCategoryMap(
                 convertSet(list, CrmProductDO::getCategoryId));
-        return CrmProductConvert.INSTANCE.convertList(list, userMap, productCategoryList);
+        // 2. 拼接数据
+        return BeanUtils.toBean(list, CrmProductRespVO.class, productVO -> {
+            // 2.1 设置用户信息
+            MapUtils.findAndThen(userMap, productVO.getOwnerUserId(), user -> productVO.setOwnerUserName(user.getNickname()));
+            MapUtils.findAndThen(userMap, Long.valueOf(productVO.getCreator()), user -> productVO.setCreatorName(user.getNickname()));
+            // 2.2 设置分类名称
+            MapUtils.findAndThen(categoryMap, productVO.getCategoryId(), category -> productVO.setCategoryName(category.getName()));
+        });
     }
 
 }

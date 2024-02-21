@@ -11,7 +11,7 @@ import lombok.*;
 import java.time.LocalDateTime;
 
 /**
- * 线索 DO
+ * CRM 线索 DO
  *
  * @author Wanwan
  */

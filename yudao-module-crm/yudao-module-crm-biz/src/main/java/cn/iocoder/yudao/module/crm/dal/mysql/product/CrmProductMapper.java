@@ -5,9 +5,9 @@ import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.MPJLambdaWrapperX;
 import cn.iocoder.yudao.module.crm.controller.admin.product.vo.product.CrmProductPageReqVO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.product.CrmProductDO;
-import cn.iocoder.yudao.module.crm.enums.common.CrmBizTypeEnum;
-import cn.iocoder.yudao.module.crm.util.CrmQueryWrapperUtils;
 import org.apache.ibatis.annotations.Mapper;
+
+import java.util.List;
 
 /**
  * CRM 产品 Mapper
@@ -17,21 +17,23 @@ import org.apache.ibatis.annotations.Mapper;
 @Mapper
 public interface CrmProductMapper extends BaseMapperX<CrmProductDO> {
 
-    default PageResult<CrmProductDO> selectPage(CrmProductPageReqVO reqVO, Long userId) {
-        MPJLambdaWrapperX<CrmProductDO> query = new MPJLambdaWrapperX<>();
-        // 拼接数据权限的查询条件
-        CrmQueryWrapperUtils.appendPermissionCondition(query, CrmBizTypeEnum.CRM_PRODUCT.getType(),
-                CrmProductDO::getId, userId, null, Boolean.FALSE);
-        // 拼接自身的查询条件
-        query.selectAll(CrmProductDO.class)
+    default PageResult<CrmProductDO> selectPage(CrmProductPageReqVO reqVO) {
+        return selectPage(reqVO, new MPJLambdaWrapperX<CrmProductDO>()
                 .likeIfPresent(CrmProductDO::getName, reqVO.getName())
                 .eqIfPresent(CrmProductDO::getStatus, reqVO.getStatus())
-                .orderByDesc(CrmProductDO::getId);
-        return selectJoinPage(reqVO, CrmProductDO.class, query);
+                .orderByDesc(CrmProductDO::getId));
     }
 
     default CrmProductDO selectByNo(String no) {
         return selectOne(CrmProductDO::getNo, no);
+    }
+
+    default Long selectCountByCategoryId(Long categoryId) {
+        return selectCount(CrmProductDO::getCategoryId, categoryId);
+    }
+
+    default List<CrmProductDO> selectListByStatus(Integer status) {
+        return selectList(CrmProductDO::getStatus, status);
     }
 
 }

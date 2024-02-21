@@ -184,7 +184,8 @@ public class CrmContractServiceImpl implements CrmContractService {
             return BeanUtils.toBean(product, CrmContractProductDO.class)
                     .setId(null).setProductId(productItem.getId()).setContractId(contractId)
                     .setCount(productItem.getCount()).setDiscountPercent(productItem.getDiscountPercent())
-                    .setTotalPrice(MoneyUtils.calculator(product.getPrice(), productItem.getCount(), productItem.getDiscountPercent()));
+                    // TODO 芋艿：这里临时注释掉
+                    .setTotalPrice(MoneyUtils.calculator(null, productItem.getCount(), productItem.getDiscountPercent()));
         });
     }
 
