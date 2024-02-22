@@ -50,7 +50,7 @@ public class MenuController {
 
     @DeleteMapping("/delete")
     @Operation(summary = "删除菜单")
-    @Parameter(name = "id", description = "角色编号", required= true, example = "1024")
+    @Parameter(name = "id", description = "菜单编号", required= true, example = "1024")
     @PreAuthorize("@ss.hasPermission('system:menu:delete')")
     public CommonResult<Boolean> deleteMenu(@RequestParam("id") Long id) {
         menuService.deleteMenu(id);
