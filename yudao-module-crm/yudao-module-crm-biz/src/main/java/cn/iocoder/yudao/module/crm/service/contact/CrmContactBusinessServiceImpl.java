@@ -42,22 +42,6 @@ public class CrmContactBusinessServiceImpl implements CrmContactBusinessService 
     private CrmContactService contactService;
 
     @Override
-    public void createContactBusiness(Long contactId, Long businessId) {
-        // 校验存在
-        CrmContactDO contact = contactService.getContact(contactId);
-        if (contact == null) {
-            throw exception(CONTACT_NOT_EXISTS);
-        }
-        CrmBusinessDO business = businessService.getBusiness(businessId);
-        if (business == null) {
-            throw exception(BUSINESS_NOT_EXISTS);
-        }
-
-        // 插入
-        contactBusinessMapper.insert(new CrmContactBusinessDO(null, contactId, businessId));
-    }
-
-    @Override
     @CrmPermission(bizType = CrmBizTypeEnum.CRM_CONTACT, bizId = "#createReqVO.contactId", level = CrmPermissionLevelEnum.WRITE)
     public void createContactBusinessList(CrmContactBusinessReqVO createReqVO) {
         CrmContactDO contact = contactService.getContact(createReqVO.getContactId());
@@ -105,6 +89,12 @@ public class CrmContactBusinessServiceImpl implements CrmContactBusinessService 
     @CrmPermission(bizType = CrmBizTypeEnum.CRM_CONTACT, bizId = "#contactId", level = CrmPermissionLevelEnum.READ)
     public List<CrmContactBusinessDO> getContactBusinessListByContactId(Long contactId) {
         return contactBusinessMapper.selectListByContactId(contactId);
+    }
+
+    @Override
+    @CrmPermission(bizType = CrmBizTypeEnum.CRM_BUSINESS, bizId = "#businessId", level = CrmPermissionLevelEnum.READ)
+    public List<CrmContactBusinessDO> getContactBusinessListByBusinessId(Long businessId) {
+        return contactBusinessMapper.selectListByBusinessId(businessId);
     }
 
 }

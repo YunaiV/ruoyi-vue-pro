@@ -139,6 +139,14 @@ public class CrmContactController {
         return success(new PageResult<>(buildContactDetailList(pageResult.getList()), pageResult.getTotal()));
     }
 
+    @GetMapping("/page-by-business")
+    @Operation(summary = "获得联系人分页，基于指定商机")
+    public CommonResult<PageResult<CrmContactRespVO>> getContactPageByBusiness(@Valid CrmContactPageReqVO pageVO) {
+        Assert.notNull(pageVO.getBusinessId(), "商机编号不能为空");
+        PageResult<CrmContactDO> pageResult = contactService.getContactPageByBusinessId(pageVO);
+        return success(new PageResult<>(buildContactDetailList(pageResult.getList()), pageResult.getTotal()));
+    }
+
     @GetMapping("/export-excel")
     @Operation(summary = "导出联系人 Excel")
     @PreAuthorize("@ss.hasPermission('crm:contact:export')")

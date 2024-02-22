@@ -8,7 +8,7 @@ import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.crm.controller.admin.business.vo.business.CrmBusinessPageReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.business.vo.business.CrmBusinessSaveReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.business.vo.business.CrmBusinessTransferReqVO;
-import cn.iocoder.yudao.module.crm.convert.business.CrmBusinessConvert;
+import cn.iocoder.yudao.module.crm.controller.admin.contact.vo.CrmContactBusinessReqVO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.business.CrmBusinessDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.business.CrmBusinessProductDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.contact.CrmContactBusinessDO;
@@ -22,9 +22,9 @@ import cn.iocoder.yudao.module.crm.service.contact.CrmContactBusinessService;
 import cn.iocoder.yudao.module.crm.service.contact.CrmContactService;
 import cn.iocoder.yudao.module.crm.service.contract.CrmContractService;
 import cn.iocoder.yudao.module.crm.service.customer.CrmCustomerService;
-import cn.iocoder.yudao.module.crm.service.followup.bo.CrmUpdateFollowUpReqBO;
 import cn.iocoder.yudao.module.crm.service.permission.CrmPermissionService;
 import cn.iocoder.yudao.module.crm.service.permission.bo.CrmPermissionCreateReqBO;
+import cn.iocoder.yudao.module.crm.service.permission.bo.CrmPermissionTransferReqBO;
 import cn.iocoder.yudao.module.crm.service.product.CrmProductService;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import com.mzt.logapi.context.LogRecordContext;
@@ -37,12 +37,14 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
-import static cn.iocoder.yudao.module.crm.enums.ErrorCodeConstants.BUSINESS_CONTRACT_EXISTS;
+import static cn.iocoder.yudao.module.crm.enums.ErrorCodeConstants.BUSINESS_DELETE_FAIL_CONTRACT_EXISTS;
 import static cn.iocoder.yudao.module.crm.enums.ErrorCodeConstants.BUSINESS_NOT_EXISTS;
 import static cn.iocoder.yudao.module.crm.enums.LogRecordConstants.*;
 
@@ -100,14 +102,19 @@ public class CrmBusinessServiceImpl implements CrmBusinessService {
             businessProducts.forEach(item -> item.setBusinessId(business.getId()));
             businessProductMapper.insertBatch(businessProducts);
         }
-        // 在联系人的详情页，如果直接【新建商机】，则需要关联下。
-        contactBusinessService.createContactBusiness(createReqVO.getContactId(), business.getId());
+
         // 3. 创建数据权限
         // 设置当前操作的人为负责人
         permissionService.createPermission(new CrmPermissionCreateReqBO().setBizType(CrmBizTypeEnum.CRM_BUSINESS.getType())
                 .setBizId(business.getId()).setUserId(userId).setLevel(CrmPermissionLevelEnum.OWNER.getLevel()));
 
-        // 4. 记录操作日志上下文
+        // 4. 在联系人的详情页，如果直接【新建商机】，则需要关联下
+        if (createReqVO.getContactId() != null) {
+            contactBusinessService.createContactBusinessList(new CrmContactBusinessReqVO().setContactId(createReqVO.getContactId())
+                    .setBusinessIds(Collections.singletonList(business.getId())));
+        }
+
+        // 5. 记录操作日志上下文
         LogRecordContext.putVariable("business", business);
         return business.getId();
     }
@@ -137,6 +144,28 @@ public class CrmBusinessServiceImpl implements CrmBusinessService {
         // 3. 记录操作日志上下文
         LogRecordContext.putVariable(DiffParseFunction.OLD_OBJECT, BeanUtils.toBean(oldBusiness, CrmBusinessSaveReqVO.class));
         LogRecordContext.putVariable("businessName", oldBusiness.getName());
+    }
+
+    @Override
+    @LogRecord(type = CRM_BUSINESS_TYPE, subType = CRM_BUSINESS_FOLLOW_UP_SUB_TYPE, bizNo = "{{#id}",
+            success = CRM_BUSINESS_FOLLOW_UP_SUCCESS)
+    @CrmPermission(bizType = CrmBizTypeEnum.CRM_BUSINESS, bizId = "#id", level = CrmPermissionLevelEnum.WRITE)
+    public void updateBusinessFollowUp(Long id, LocalDateTime contactNextTime, String contactLastContent) {
+        // 1. 校验存在
+        CrmBusinessDO business = validateBusinessExists(id);
+
+        // 2. 更新联系人的跟进信息
+        businessMapper.updateById(new CrmBusinessDO().setId(id).setFollowUpStatus(true).setContactNextTime(contactNextTime)
+                .setContactLastTime(LocalDateTime.now()));
+
+        // 3. 记录操作日志上下文
+        LogRecordContext.putVariable("businessName", business.getName());
+    }
+
+    @Override
+    @CrmPermission(bizType = CrmBizTypeEnum.CRM_BUSINESS, bizId = "#ids", level = CrmPermissionLevelEnum.WRITE)
+    public void updateBusinessContactNextTime(Collection<Long> ids, LocalDateTime contactNextTime) {
+        businessMapper.updateBatch(convertList(ids, id -> new CrmBusinessDO().setId(id).setContactNextTime(contactNextTime)));
     }
 
     private void updateBusinessProduct(Long id, List<CrmBusinessProductDO> newList) {
@@ -190,19 +219,14 @@ public class CrmBusinessServiceImpl implements CrmBusinessService {
     }
 
     @Override
-    public void updateBusinessFollowUpBatch(List<CrmUpdateFollowUpReqBO> updateFollowUpReqBOList) {
-        businessMapper.updateBatch(CrmBusinessConvert.INSTANCE.convertList(updateFollowUpReqBOList));
-    }
-
-    @Override
     @Transactional(rollbackFor = Exception.class)
     @LogRecord(type = CRM_BUSINESS_TYPE, subType = CRM_BUSINESS_DELETE_SUB_TYPE, bizNo = "{{#id}}",
             success = CRM_BUSINESS_DELETE_SUCCESS)
     @CrmPermission(bizType = CrmBizTypeEnum.CRM_BUSINESS, bizId = "#id", level = CrmPermissionLevelEnum.OWNER)
     public void deleteBusiness(Long id) {
-        // 校验存在
+        // 1.1 校验存在
         CrmBusinessDO business = validateBusinessExists(id);
-        // TODO @商机待定：需要校验有没关联合同。CrmContractDO 的 businessId 字段
+        // 1.2 校验是否关联合同
         validateContractExists(id);
 
         // 删除
@@ -222,7 +246,7 @@ public class CrmBusinessServiceImpl implements CrmBusinessService {
      */
     private void validateContractExists(Long businessId) {
         if (contractService.getContractCountByBusinessId(businessId) > 0) {
-            throw exception(BUSINESS_CONTRACT_EXISTS);
+            throw exception(BUSINESS_DELETE_FAIL_CONTRACT_EXISTS);
         }
     }
 
@@ -245,8 +269,8 @@ public class CrmBusinessServiceImpl implements CrmBusinessService {
         CrmBusinessDO business = validateBusinessExists(reqVO.getId());
 
         // 2.1 数据权限转移
-        permissionService.transferPermission(
-                CrmBusinessConvert.INSTANCE.convert(reqVO, userId).setBizType(CrmBizTypeEnum.CRM_BUSINESS.getType()));
+        permissionService.transferPermission(new CrmPermissionTransferReqBO(userId, CrmBizTypeEnum.CRM_BUSINESS.getType(),
+                reqVO.getNewOwnerUserId(), reqVO.getId(), CrmPermissionLevelEnum.OWNER.getLevel()));
         // 2.2 设置新的负责人
         businessMapper.updateOwnerUserIdById(reqVO.getId(), reqVO.getNewOwnerUserId());
 

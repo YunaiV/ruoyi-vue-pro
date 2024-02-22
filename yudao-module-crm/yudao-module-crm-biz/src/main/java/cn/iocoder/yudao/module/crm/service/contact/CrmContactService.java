@@ -4,6 +4,7 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.crm.controller.admin.contact.vo.CrmContactPageReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.contact.vo.CrmContactSaveReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.contact.vo.CrmContactTransferReqVO;
+import cn.iocoder.yudao.module.crm.dal.dataobject.business.CrmBusinessDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.contact.CrmContactDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerDO;
 import jakarta.validation.Valid;
@@ -72,13 +73,12 @@ public interface CrmContactService {
     void updateContactFollowUp(Long id, LocalDateTime contactNextTime, String contactLastContent);
 
     /**
-     * 更新联系人相关跟进信息
+     * 更新联系人的下次联系时间
      *
      * @param ids                编号数组
      * @param contactNextTime    下次联系时间
-     * @param contactLastContent 最后联系内容
      */
-    void updateContactFollowUpBatch(Collection<Long> ids, LocalDateTime contactNextTime, String contactLastContent);
+    void updateContactContactNextTime(Collection<Long> ids, LocalDateTime contactNextTime);
 
     /**
      * 获得联系人
@@ -150,6 +150,16 @@ public interface CrmContactService {
      * @return 联系人分页
      */
     PageResult<CrmContactDO> getContactPageByCustomerId(CrmContactPageReqVO pageVO);
+
+    /**
+     * 获得联系人分页
+     *
+     * 数据权限：基于 {@link CrmBusinessDO}
+     *
+     * @param pageVO 分页查询
+     * @return 联系人分页
+     */
+    PageResult<CrmContactDO> getContactPageByBusinessId(CrmContactPageReqVO pageVO);
 
     /**
      * 获取关联客户的联系人数量

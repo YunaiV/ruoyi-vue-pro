@@ -20,7 +20,7 @@ public interface ErrorCodeConstants {
 
     // ========== 商机管理 1-020-002-000 ==========
     ErrorCode BUSINESS_NOT_EXISTS = new ErrorCode(1_020_002_000, "商机不存在");
-    ErrorCode BUSINESS_CONTRACT_EXISTS = new ErrorCode(1_020_002_001, "商机已关联合同，不能删除");
+    ErrorCode BUSINESS_DELETE_FAIL_CONTRACT_EXISTS = new ErrorCode(1_020_002_001, "商机已关联合同，不能删除");
 
     // ========== 联系人管理 1-020-003-000 ==========
     ErrorCode CONTACT_NOT_EXISTS = new ErrorCode(1_020_003_000, "联系人不存在");

@@ -31,4 +31,8 @@ public interface CrmContactBusinessMapper extends BaseMapperX<CrmContactBusiness
         return selectList(CrmContactBusinessDO::getContactId, contactId);
     }
 
+    default List<CrmContactBusinessDO> selectListByBusinessId(Long businessId) {
+        return selectList(CrmContactBusinessDO::getBusinessId, businessId);
+    }
+
 }

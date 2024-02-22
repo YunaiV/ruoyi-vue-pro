@@ -65,7 +65,7 @@ public class CrmBusinessRespVO {
     private String statusName;
 
     @Schema
-    @ExcelProperty("1赢单2输单3无效")
+    @ExcelProperty("结束状态")
     private Integer endStatus;
 
     @ExcelProperty("结束时的备注")

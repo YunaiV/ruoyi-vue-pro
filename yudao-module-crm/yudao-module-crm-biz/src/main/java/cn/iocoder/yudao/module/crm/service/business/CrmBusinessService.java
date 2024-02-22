@@ -9,9 +9,9 @@ import cn.iocoder.yudao.module.crm.dal.dataobject.business.CrmBusinessProductDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.contact.CrmContactDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerDO;
 import cn.iocoder.yudao.module.crm.service.business.bo.CrmBusinessUpdateProductReqBO;
-import cn.iocoder.yudao.module.crm.service.followup.bo.CrmUpdateFollowUpReqBO;
 import jakarta.validation.Valid;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 
@@ -41,9 +41,19 @@ public interface CrmBusinessService {
     /**
      * 更新商机相关跟进信息
      *
-     * @param updateFollowUpReqBOList 跟进信息
+     * @param id 编号
+     * @param contactNextTime 下次联系时间
+     * @param contactLastContent 最后联系内容
      */
-    void updateBusinessFollowUpBatch(List<CrmUpdateFollowUpReqBO> updateFollowUpReqBOList);
+    void updateBusinessFollowUp(Long id, LocalDateTime contactNextTime, String contactLastContent);
+
+    /**
+     * 更新商机的下次联系时间
+     *
+     * @param ids 编号数组
+     * @param contactNextTime 下次联系时间
+     */
+    void updateBusinessContactNextTime(Collection<Long> ids, LocalDateTime contactNextTime);
 
     /**
      * 删除商机
