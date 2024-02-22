@@ -100,7 +100,7 @@ public class CrmContractSaveReqVO {
 
         @Schema(description = "合同价格", requiredMode = Schema.RequiredMode.REQUIRED, example = "123.00")
         @NotNull(message = "合同价格不能为空")
-        private BigDecimal businessPrice;
+        private BigDecimal contractPrice;
 
         @Schema(description = "产品数量", requiredMode = Schema.RequiredMode.REQUIRED, example = "8911")
         @NotNull(message = "产品数量不能为空")

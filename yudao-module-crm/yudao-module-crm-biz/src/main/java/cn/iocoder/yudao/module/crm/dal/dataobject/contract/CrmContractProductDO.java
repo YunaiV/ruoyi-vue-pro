@@ -44,7 +44,7 @@ public class CrmContractProductDO extends BaseDO {
     /**
      * 产品单价，单位：元
      */
-    private Integer productPrice;
+    private BigDecimal productPrice;
     /**
      * 合同价格, 单位：分
      */
@@ -58,6 +58,6 @@ public class CrmContractProductDO extends BaseDO {
      *
      * totalPrice = businessPrice * count
      */
-    private Integer totalPrice;
+    private BigDecimal totalPrice;
 
 }

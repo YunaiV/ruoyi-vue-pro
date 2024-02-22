@@ -135,7 +135,6 @@ public class CrmBusinessController {
         return success(BeanUtils.toBean(businessService.getBusinessList(ids, getLoginUserId()), CrmBusinessRespVO.class));
     }
 
-    // TODO 芋艿：处理下
     @GetMapping("/simple-all-list")
     @Operation(summary = "获得联系人的精简列表")
     @PreAuthorize("@ss.hasPermission('crm:contact:query')")
@@ -144,7 +143,8 @@ public class CrmBusinessController {
         reqVO.setPageSize(PAGE_SIZE_NONE); // 不分页
         PageResult<CrmBusinessDO> pageResult = businessService.getBusinessPage(reqVO, getLoginUserId());
         return success(convertList(pageResult.getList(), business -> // 只返回 id、name 字段
-                new CrmBusinessRespVO().setId(business.getId()).setName(business.getName())));
+                new CrmBusinessRespVO().setId(business.getId()).setName(business.getName())
+                        .setCustomerId(business.getCustomerId())));
     }
 
     @GetMapping("/page")

@@ -19,7 +19,6 @@ import cn.iocoder.yudao.module.crm.dal.mysql.business.CrmBusinessProductMapper;
 import cn.iocoder.yudao.module.crm.enums.common.CrmBizTypeEnum;
 import cn.iocoder.yudao.module.crm.enums.permission.CrmPermissionLevelEnum;
 import cn.iocoder.yudao.module.crm.framework.permission.core.annotations.CrmPermission;
-import cn.iocoder.yudao.module.crm.service.business.bo.CrmBusinessUpdateProductReqBO;
 import cn.iocoder.yudao.module.crm.service.contact.CrmContactBusinessService;
 import cn.iocoder.yudao.module.crm.service.contact.CrmContactService;
 import cn.iocoder.yudao.module.crm.service.contract.CrmContractService;
@@ -91,10 +90,10 @@ public class CrmBusinessServiceImpl implements CrmBusinessService {
         // 1.1 校验产品项的有效性
         List<CrmBusinessProductDO> businessProducts = validateBusinessProducts(createReqVO.getProducts());
         // 1.2 校验关联字段
-        validateBusinessForCreate(createReqVO);
+        validateRelationDataExists(createReqVO);
 
         // 2.1 插入商机
-        CrmBusinessDO business = BeanUtils.toBean(createReqVO, CrmBusinessDO.class).setOwnerUserId(userId);
+        CrmBusinessDO business = BeanUtils.toBean(createReqVO, CrmBusinessDO.class);
         business.setStatusId(businessStatusService.getBusinessStatusListByTypeId(createReqVO.getStatusTypeId()).get(0).getId()); // 默认状态
         calculateTotalPrice(business, businessProducts);
         businessMapper.insert(business);
@@ -105,9 +104,9 @@ public class CrmBusinessServiceImpl implements CrmBusinessService {
         }
 
         // 3. 创建数据权限
-        // 设置当前操作的人为负责人
-        permissionService.createPermission(new CrmPermissionCreateReqBO().setBizType(CrmBizTypeEnum.CRM_BUSINESS.getType())
-                .setBizId(business.getId()).setUserId(userId).setLevel(CrmPermissionLevelEnum.OWNER.getLevel()));
+        permissionService.createPermission(new CrmPermissionCreateReqBO().setUserId(business.getOwnerUserId())
+                .setBizType(CrmBizTypeEnum.CRM_BUSINESS.getType()).setBizId(business.getId())
+                .setLevel(CrmPermissionLevelEnum.OWNER.getLevel()));
 
         // 4. 在联系人的详情页，如果直接【新建商机】，则需要关联下
         if (createReqVO.getContactId() != null) {
@@ -132,7 +131,7 @@ public class CrmBusinessServiceImpl implements CrmBusinessService {
         // 1.2 校验产品项的有效性
         List<CrmBusinessProductDO> businessProducts = validateBusinessProducts(updateReqVO.getProducts());
         // 1.3 校验关联字段
-        validateBusinessForCreate(updateReqVO);
+        validateRelationDataExists(updateReqVO);
 
         // 2.1 更新商机
         CrmBusinessDO updateObj = BeanUtils.toBean(updateReqVO, CrmBusinessDO.class);
@@ -184,7 +183,7 @@ public class CrmBusinessServiceImpl implements CrmBusinessService {
         }
     }
 
-    private void validateBusinessForCreate(CrmBusinessSaveReqVO saveReqVO) {
+    private void validateRelationDataExists(CrmBusinessSaveReqVO saveReqVO) {
         // 校验商机状态
         if (saveReqVO.getStatusTypeId() != null) {
             businessStatusService.validateBusinessStatusType(saveReqVO.getStatusTypeId());
@@ -207,9 +206,8 @@ public class CrmBusinessServiceImpl implements CrmBusinessService {
         // 1. 校验产品存在
          productService.validProductList(convertSet(list, CrmBusinessSaveReqVO.Product::getProductId));
         // 2. 转化为 CrmBusinessProductDO 列表
-        return convertList(list, o -> BeanUtils.toBean(o, CrmBusinessProductDO.class, item -> {
-            item.setTotalPrice(MoneyUtils.priceMultiply(item.getBusinessPrice(), item.getCount()));
-        }));
+        return convertList(list, o -> BeanUtils.toBean(o, CrmBusinessProductDO.class,
+                item -> item.setTotalPrice(MoneyUtils.priceMultiply(item.getBusinessPrice(), item.getCount()))));
     }
 
     private void calculateTotalPrice(CrmBusinessDO business, List<CrmBusinessProductDO> businessProducts) {
@@ -217,7 +215,6 @@ public class CrmBusinessServiceImpl implements CrmBusinessService {
         BigDecimal discountPrice = MoneyUtils.priceMultiplyPercent(business.getTotalProductPrice(), business.getDiscountPercent());
         business.setTotalPrice(business.getTotalProductPrice().subtract(discountPrice));
     }
-
 
     @Override
     @LogRecord(type = CRM_BUSINESS_TYPE, subType = CRM_BUSINESS_UPDATE_STATUS_SUB_TYPE, bizNo = "{{#reqVO.id}}",
@@ -312,20 +309,17 @@ public class CrmBusinessServiceImpl implements CrmBusinessService {
         LogRecordContext.putVariable("business", business);
     }
 
-    @Override
-    public void updateBusinessProduct(CrmBusinessUpdateProductReqBO updateProductReqBO) {
-        // 更新商机关联商品 TODO yunai
-//        List<CrmBusinessProductDO> productList = buildBusinessProductList(
-//                BeanUtils.toBean(updateProductReqBO.getProductItems(), CrmBusinessSaveReqVO.Product.class), updateProductReqBO.getId());
-//        updateBusinessProduct(productList, updateProductReqBO.getId());
-    }
-
     //======================= 查询相关 =======================
 
     @Override
     @CrmPermission(bizType = CrmBizTypeEnum.CRM_BUSINESS, bizId = "#id", level = CrmPermissionLevelEnum.READ)
     public CrmBusinessDO getBusiness(Long id) {
         return businessMapper.selectById(id);
+    }
+
+    @Override
+    public CrmBusinessDO validateBusiness(Long id) {
+        return validateBusinessExists(id);
     }
 
     @Override

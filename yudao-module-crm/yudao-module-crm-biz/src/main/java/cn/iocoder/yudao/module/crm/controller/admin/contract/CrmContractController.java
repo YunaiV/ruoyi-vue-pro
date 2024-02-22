@@ -16,7 +16,9 @@ import cn.iocoder.yudao.module.crm.controller.admin.contract.vo.CrmContractTrans
 import cn.iocoder.yudao.module.crm.dal.dataobject.business.CrmBusinessDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.contact.CrmContactDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.contract.CrmContractDO;
+import cn.iocoder.yudao.module.crm.dal.dataobject.contract.CrmContractProductDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerDO;
+import cn.iocoder.yudao.module.crm.dal.dataobject.product.CrmProductDO;
 import cn.iocoder.yudao.module.crm.service.business.CrmBusinessService;
 import cn.iocoder.yudao.module.crm.service.contact.CrmContactService;
 import cn.iocoder.yudao.module.crm.service.contract.CrmContractService;
@@ -108,13 +110,16 @@ public class CrmContractController {
         if (contract == null) {
             return null;
         }
-//        List<CrmProductDO> productList = null;
-//        if (contractList.size() == 1) {
-//            List<CrmContractProductDO> contractProductList = contractService.getContractProductListByContractId(contractList.get(0).getId());
-//            contractProductMap = convertMap(contractProductList, CrmContractProductDO::getProductId);
-//            productList = productService.getProductList(convertSet(contractProductList, CrmContractProductDO::getProductId));
-//        }
-        return buildContractDetailList(singletonList(contract)).get(0);
+        CrmContractRespVO contractVO = buildContractDetailList(singletonList(contract)).get(0);
+        // 拼接产品项
+        List<CrmContractProductDO> businessProducts = contractService.getContractProductListByContractId(contractVO.getId());
+        Map<Long, CrmProductDO> productMap = productService.getProductMap(
+                convertSet(businessProducts, CrmContractProductDO::getProductId));
+        contractVO.setProducts(BeanUtils.toBean(businessProducts, CrmContractRespVO.Product.class, businessProductVO ->
+                MapUtils.findAndThen(productMap, businessProductVO.getProductId(),
+                        product -> businessProductVO.setProductName(product.getName())
+                                .setProductNo(product.getNo()).setProductUnit(product.getUnit()))));
+        return contractVO;
     }
 
     @GetMapping("/page")

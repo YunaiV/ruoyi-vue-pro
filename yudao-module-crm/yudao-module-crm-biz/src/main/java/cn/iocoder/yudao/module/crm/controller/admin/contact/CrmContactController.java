@@ -120,7 +120,8 @@ public class CrmContactController {
     public CommonResult<List<CrmContactRespVO>> getSimpleContactList() {
         List<CrmContactDO> list = contactService.getContactList(getLoginUserId());
         return success(convertList(list, contact -> // 只返回 id、name 字段
-                new CrmContactRespVO().setId(contact.getId()).setName(contact.getName())));
+                new CrmContactRespVO().setId(contact.getId()).setName(contact.getName())
+                        .setCustomerId(contact.getCustomerId())));
     }
 
     @GetMapping("/page")

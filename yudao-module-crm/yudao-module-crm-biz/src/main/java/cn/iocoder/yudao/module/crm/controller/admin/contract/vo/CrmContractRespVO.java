@@ -121,13 +121,13 @@ public class CrmContractRespVO {
     private LocalDateTime updateTime;
 
     @Schema(description = "产品列表")
-    private List<Item> products;
+    private List<Product> products;
 
     @Schema(description = "产品列表")
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class Item {
+    public static class Product {
 
         @Schema(description = "编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "888")
         private Long id;
@@ -145,7 +145,7 @@ public class CrmContractRespVO {
         private BigDecimal productPrice;
 
         @Schema(description = "合同价格", requiredMode = Schema.RequiredMode.REQUIRED, example = "123.00")
-        private BigDecimal businessPrice;
+        private BigDecimal contractPrice;
 
         @Schema(description = "产品数量", requiredMode = Schema.RequiredMode.REQUIRED, example = "8911")
         private BigDecimal count;
