@@ -37,7 +37,10 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Stream;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
@@ -332,8 +335,6 @@ public class CrmCustomerController {
         // 获取客户来源
         List<String> customerSources = dictDataApi.getDictDataLabelList(CRM_CUSTOMER_SOURCE);
         selectMap.add(new KeyValue<>(10, customerSources));
-        // 升序不然创建下拉会报错
-        selectMap.sort(Comparator.comparing(item -> item.getValue().size()));
         return selectMap;
     }
 

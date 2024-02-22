@@ -9,6 +9,7 @@ import org.apache.poi.hssf.usermodel.HSSFDataValidation;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddressList;
 
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -18,12 +19,13 @@ import java.util.List;
  */
 public class SelectSheetWriteHandler implements SheetWriteHandler {
 
-    private List<KeyValue<Integer, List<String>>> selectMap;
+    private final List<KeyValue<Integer, List<String>>> selectMap;
 
-    private final char[] alphabet = new char[]{'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L',
+    private static final char[] ALPHABET = new char[]{'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L',
             'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'};
 
     public SelectSheetWriteHandler(List<KeyValue<Integer, List<String>>> selectMap) {
+        selectMap.sort(Comparator.comparing(item -> item.getValue().size())); // 升序不然创建下拉会报错
         this.selectMap = selectMap;
     }
 
@@ -86,17 +88,17 @@ public class SelectSheetWriteHandler implements SheetWriteHandler {
      */
     private String getExcelColumn(int num) {
         String column = "";
-        int len = alphabet.length - 1;
+        int len = ALPHABET.length - 1;
         int first = num / len;
         int second = num % len;
         if (num <= len) {
-            column = alphabet[num] + "";
+            column = ALPHABET[num] + "";
         } else {
-            column = alphabet[first - 1] + "";
+            column = ALPHABET[first - 1] + "";
             if (second == 0) {
-                column = column + alphabet[len] + "";
+                column = column + ALPHABET[len] + "";
             } else {
-                column = column + alphabet[second - 1] + "";
+                column = column + ALPHABET[second - 1] + "";
             }
         }
         return column;
