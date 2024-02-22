@@ -53,7 +53,7 @@ public class CrmBusinessSaveReqVO {
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
     private LocalDateTime dealTime;
 
-    @Schema(description = "整单折扣")
+    @Schema(description = "整单折扣", requiredMode = Schema.RequiredMode.REQUIRED, example = "55.00")
     @DiffLogField(name = "整单折扣")
     @NotNull(message = "整单折扣不能为空")
     private BigDecimal discountPercent;
@@ -82,8 +82,8 @@ public class CrmBusinessSaveReqVO {
         @NotNull(message = "产品单价不能为空")
         private BigDecimal productPrice;
 
-        @Schema(description = "合同价格", requiredMode = Schema.RequiredMode.REQUIRED, example = "123.00")
-        @NotNull(message = "合同价格不能为空")
+        @Schema(description = "商机价格", requiredMode = Schema.RequiredMode.REQUIRED, example = "123.00")
+        @NotNull(message = "商机价格不能为空")
         private BigDecimal businessPrice;
 
         @Schema(description = "产品数量", requiredMode = Schema.RequiredMode.REQUIRED, example = "8911")

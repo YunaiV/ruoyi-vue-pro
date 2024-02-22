@@ -5,7 +5,6 @@ import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.ObjUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.common.util.number.MoneyUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
 import cn.iocoder.yudao.module.bpm.api.listener.dto.BpmResultListenerRespDTO;
@@ -15,7 +14,6 @@ import cn.iocoder.yudao.module.bpm.enums.task.BpmProcessInstanceResultEnum;
 import cn.iocoder.yudao.module.crm.controller.admin.contract.vo.CrmContractPageReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.contract.vo.CrmContractSaveReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.contract.vo.CrmContractTransferReqVO;
-import cn.iocoder.yudao.module.crm.convert.contract.CrmContractConvert;
 import cn.iocoder.yudao.module.crm.dal.dataobject.contract.CrmContractDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.contract.CrmContractProductDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.product.CrmProductDO;
@@ -31,6 +29,7 @@ import cn.iocoder.yudao.module.crm.service.customer.CrmCustomerService;
 import cn.iocoder.yudao.module.crm.service.followup.bo.CrmUpdateFollowUpReqBO;
 import cn.iocoder.yudao.module.crm.service.permission.CrmPermissionService;
 import cn.iocoder.yudao.module.crm.service.permission.bo.CrmPermissionCreateReqBO;
+import cn.iocoder.yudao.module.crm.service.permission.bo.CrmPermissionTransferReqBO;
 import cn.iocoder.yudao.module.crm.service.product.CrmProductService;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import com.mzt.logapi.context.LogRecordContext;
@@ -95,16 +94,16 @@ public class CrmContractServiceImpl implements CrmContractService {
         CrmContractDO contract = BeanUtils.toBean(createReqVO, CrmContractDO.class).setId(null);
         contractMapper.insert(contract);
         // 1.2 插入合同关联商品
-        if (CollUtil.isNotEmpty(createReqVO.getProductItems())) { // 如果有的话
+        if (CollUtil.isNotEmpty(createReqVO.getProducts())) { // 如果有的话
             List<CrmContractProductDO> productList = convertContractProductList(createReqVO, contract.getId());
             contractProductMapper.insertBatch(productList);
-            // 更新合同商品总金额
-            contractMapper.updateById(new CrmContractDO().setId(contract.getId()).setProductPrice(
-                    getSumValue(productList, CrmContractProductDO::getTotalPrice, Integer::sum)));
+            // 更新合同商品总金额 TODO 芋艿
+//            contractMapper.updateById(new CrmContractDO().setId(contract.getId()).setTotalProductPrice(
+//                    getSumValue(productList, CrmContractProductDO::getTotalPrice, Integer::sum)));
             // 如果存在合同关联了商机则更新商机商品关联
             if (contract.getBusinessId() != null) {
                 businessService.updateBusinessProduct(new CrmBusinessUpdateProductReqBO().setId(contract.getBusinessId())
-                        .setItems(BeanUtils.toBean(createReqVO.getProductItems(), CrmBusinessUpdateProductReqBO.Item.class)));
+                        .setItems(BeanUtils.toBean(createReqVO.getProducts(), CrmBusinessUpdateProductReqBO.Item.class)));
             }
         }
 
@@ -146,7 +145,7 @@ public class CrmContractServiceImpl implements CrmContractService {
     }
 
     private void updateContractProduct(CrmContractSaveReqVO updateReqVO, Long contractId) {
-        if (CollUtil.isEmpty(updateReqVO.getProductItems())) {
+        if (CollUtil.isEmpty(updateReqVO.getProducts())) {
             return;
         }
         List<CrmContractProductDO> newProductList = convertContractProductList(updateReqVO, contractId);
@@ -173,20 +172,22 @@ public class CrmContractServiceImpl implements CrmContractService {
 
     private List<CrmContractProductDO> convertContractProductList(CrmContractSaveReqVO reqVO, Long contractId) {
         // 校验商品存在
-        Set<Long> productIds = convertSet(reqVO.getProductItems(), CrmContractSaveReqVO.CrmContractProductItem::getId);
+        Set<Long> productIds = convertSet(reqVO.getProducts(), CrmContractSaveReqVO.Product::getProductId);
         List<CrmProductDO> productList = productService.getProductList(productIds);
         if (CollUtil.isEmpty(productIds) || productList.size() != productIds.size()) {
             throw exception(PRODUCT_NOT_EXISTS);
         }
         Map<Long, CrmProductDO> productMap = convertMap(productList, CrmProductDO::getId);
-        return convertList(reqVO.getProductItems(), productItem -> {
-            CrmProductDO product = productMap.get(productItem.getId());
-            return BeanUtils.toBean(product, CrmContractProductDO.class)
-                    .setId(null).setProductId(productItem.getId()).setContractId(contractId)
-                    .setCount(productItem.getCount()).setDiscountPercent(productItem.getDiscountPercent())
-                    // TODO 芋艿：这里临时注释掉
-                    .setTotalPrice(MoneyUtils.calculator(null, productItem.getCount(), productItem.getDiscountPercent()));
-        });
+        // TODO 芋艿
+        return null;
+//        return convertList(reqVO.getProducts(), productItem -> {
+//            CrmProductDO product = productMap.get(productItem.getId());
+//            return BeanUtils.toBean(product, CrmContractProductDO.class)
+//                    .setId(null).setProductId(productItem.getId()).setContractId(contractId)
+//                    .setCount(productItem.getCount()).setDiscountPercent(productItem.getDiscountPercent())
+//                    // TODO 芋艿：这里临时注释掉
+//                    .setTotalPrice(MoneyUtils.calculator(null, productItem.getCount(), productItem.getDiscountPercent()));
+//        });
     }
 
     /**
@@ -245,8 +246,8 @@ public class CrmContractServiceImpl implements CrmContractService {
         CrmContractDO contract = validateContractExists(reqVO.getId());
 
         // 2.1 数据权限转移
-        crmPermissionService.transferPermission(
-                CrmContractConvert.INSTANCE.convert(reqVO, userId).setBizType(CrmBizTypeEnum.CRM_CONTRACT.getType()));
+        crmPermissionService.transferPermission(new CrmPermissionTransferReqBO(userId, CrmBizTypeEnum.CRM_CONTRACT.getType(),
+                reqVO.getId(), reqVO.getNewOwnerUserId(), reqVO.getOldOwnerPermissionLevel()));
         // 2.2 设置负责人
         contractMapper.updateOwnerUserIdById(reqVO.getId(), reqVO.getNewOwnerUserId());
 

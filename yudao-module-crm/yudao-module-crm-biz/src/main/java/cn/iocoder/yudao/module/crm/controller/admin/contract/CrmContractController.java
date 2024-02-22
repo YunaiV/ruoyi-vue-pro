@@ -4,6 +4,7 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Assert;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
 import cn.iocoder.yudao.framework.common.util.number.NumberUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
@@ -12,18 +13,17 @@ import cn.iocoder.yudao.module.crm.controller.admin.contract.vo.CrmContractPageR
 import cn.iocoder.yudao.module.crm.controller.admin.contract.vo.CrmContractRespVO;
 import cn.iocoder.yudao.module.crm.controller.admin.contract.vo.CrmContractSaveReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.contract.vo.CrmContractTransferReqVO;
-import cn.iocoder.yudao.module.crm.convert.contract.CrmContractConvert;
 import cn.iocoder.yudao.module.crm.dal.dataobject.business.CrmBusinessDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.contact.CrmContactDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.contract.CrmContractDO;
-import cn.iocoder.yudao.module.crm.dal.dataobject.contract.CrmContractProductDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerDO;
-import cn.iocoder.yudao.module.crm.dal.dataobject.product.CrmProductDO;
 import cn.iocoder.yudao.module.crm.service.business.CrmBusinessService;
 import cn.iocoder.yudao.module.crm.service.contact.CrmContactService;
 import cn.iocoder.yudao.module.crm.service.contract.CrmContractService;
 import cn.iocoder.yudao.module.crm.service.customer.CrmCustomerService;
 import cn.iocoder.yudao.module.crm.service.product.CrmProductService;
+import cn.iocoder.yudao.module.system.api.dept.DeptApi;
+import cn.iocoder.yudao.module.system.api.dept.dto.DeptRespDTO;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import io.swagger.v3.oas.annotations.Operation;
@@ -44,6 +44,7 @@ import java.util.stream.Stream;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
+import static cn.iocoder.yudao.framework.common.util.collection.MapUtils.findAndThen;
 import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.EXPORT;
 import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
 import static java.util.Collections.singletonList;
@@ -64,8 +65,11 @@ public class CrmContractController {
     private CrmBusinessService businessService;
     @Resource
     private CrmProductService productService;
+
     @Resource
     private AdminUserApi adminUserApi;
+    @Resource
+    private DeptApi deptApi;
 
     @PostMapping("/create")
     @Operation(summary = "创建合同")
@@ -96,15 +100,21 @@ public class CrmContractController {
     @Parameter(name = "id", description = "编号", required = true, example = "1024")
     @PreAuthorize("@ss.hasPermission('crm:contract:query')")
     public CommonResult<CrmContractRespVO> getContract(@RequestParam("id") Long id) {
-        // 1. 查询合同
         CrmContractDO contract = contractService.getContract(id);
-        if (contract == null) {
-            return success(null);
-        }
+        return success(buildContractDetail(contract));
+    }
 
-        // 2. 拼接合同信息
-        List<CrmContractRespVO> respVOList = buildContractDetailList(singletonList(contract));
-        return success(respVOList.get(0));
+    private CrmContractRespVO buildContractDetail(CrmContractDO contract) {
+        if (contract == null) {
+            return null;
+        }
+//        List<CrmProductDO> productList = null;
+//        if (contractList.size() == 1) {
+//            List<CrmContractProductDO> contractProductList = contractService.getContractProductListByContractId(contractList.get(0).getId());
+//            contractProductMap = convertMap(contractProductList, CrmContractProductDO::getProductId);
+//            productList = productService.getProductList(convertSet(contractProductList, CrmContractProductDO::getProductId));
+//        }
+        return buildContractDetailList(singletonList(contract)).get(0);
     }
 
     @GetMapping("/page")
@@ -161,27 +171,35 @@ public class CrmContractController {
         if (CollUtil.isEmpty(contractList)) {
             return Collections.emptyList();
         }
-        // 1. 获取客户列表
-        List<CrmCustomerDO> customerList = customerService.getCustomerList(
+        // 1.1 获取客户列表
+        Map<Long, CrmCustomerDO> customerMap = customerService.getCustomerMap(
                 convertSet(contractList, CrmContractDO::getCustomerId));
-        // 2. 获取创建人、负责人列表
+        // 1.2 获取创建人、负责人列表
         Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(convertListByFlatMap(contractList,
                 contact -> Stream.of(NumberUtils.parseLong(contact.getCreator()), contact.getOwnerUserId())));
-        // 3. 获取联系人
+        Map<Long, DeptRespDTO> deptMap = deptApi.getDeptMap(convertSet(userMap.values(), AdminUserRespDTO::getDeptId));
+        // 1.3 获取联系人
         Map<Long, CrmContactDO> contactMap = convertMap(contactService.getContactList(convertSet(contractList,
-                CrmContractDO::getContactId)), CrmContactDO::getId);
-        // 4. 获取商机
+                CrmContractDO::getSignContactId)), CrmContactDO::getId);
+        // 1.4 获取商机
         Map<Long, CrmBusinessDO> businessMap = convertMap(businessService.getBusinessList(convertSet(contractList,
                 CrmContractDO::getBusinessId)), CrmBusinessDO::getId);
-        // 5. 获取合同关联的商品
-        Map<Long, CrmContractProductDO> contractProductMap = null;
-        List<CrmProductDO> productList = null;
-        if (contractList.size() == 1) {
-            List<CrmContractProductDO> contractProductList = contractService.getContractProductListByContractId(contractList.get(0).getId());
-            contractProductMap = convertMap(contractProductList, CrmContractProductDO::getProductId);
-            productList = productService.getProductList(convertSet(contractProductList, CrmContractProductDO::getProductId));
-        }
-        return CrmContractConvert.INSTANCE.convertList(contractList, userMap, customerList, contactMap, businessMap, contractProductMap, productList);
+        // 2. 拼接数据
+        return BeanUtils.toBean(contractList, CrmContractRespVO.class, contractVO -> {
+            // 2.1 设置客户信息
+            findAndThen(customerMap, contractVO.getCustomerId(), customer -> contractVO.setCustomerName(customer.getName()));
+            // 2.2 设置用户信息
+            findAndThen(userMap, Long.parseLong(contractVO.getCreator()), user -> contractVO.setCreatorName(user.getNickname()));
+            MapUtils.findAndThen(userMap, contractVO.getOwnerUserId(), user -> {
+                contractVO.setOwnerUserName(user.getNickname());
+                MapUtils.findAndThen(deptMap, user.getDeptId(), dept -> contractVO.setOwnerUserDeptName(dept.getName()));
+            });
+            findAndThen(userMap, contractVO.getSignUserId(), user -> contractVO.setSignUserName(user.getNickname()));
+            // 2.3 设置联系人信息
+            findAndThen(contactMap, contractVO.getSignContactId(), contact -> contractVO.setSignContactName(contact.getName()));
+            // 2.4 设置商机信息
+            findAndThen(businessMap, contractVO.getBusinessId(), business -> contractVO.setBusinessName(business.getName()));
+        });
     }
 
     @GetMapping("/check-contract-count")

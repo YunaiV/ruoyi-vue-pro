@@ -141,7 +141,6 @@ public class CrmBusinessServiceImpl implements CrmBusinessService {
         // 2.2 更新商机关联商品
         updateBusinessProduct(updateObj.getId(), businessProducts);
 
-        // TODO @商机待定：如果状态发生变化，插入商机状态变更记录表
         // 3. 记录操作日志上下文
         LogRecordContext.putVariable(DiffParseFunction.OLD_OBJECT, BeanUtils.toBean(oldBusiness, CrmBusinessSaveReqVO.class));
         LogRecordContext.putVariable("businessName", oldBusiness.getName());
@@ -264,7 +263,7 @@ public class CrmBusinessServiceImpl implements CrmBusinessService {
         // 1.2 校验是否关联合同
         validateContractExists(id);
 
-        // 删除
+        // 删除商机
         businessMapper.deleteById(id);
         // 删除数据权限
         permissionService.deletePermission(CrmBizTypeEnum.CRM_BUSINESS.getType(), id);
