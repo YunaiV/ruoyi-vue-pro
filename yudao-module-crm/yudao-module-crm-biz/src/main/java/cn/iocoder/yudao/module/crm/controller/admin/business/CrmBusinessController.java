@@ -8,10 +8,7 @@ import cn.iocoder.yudao.framework.common.util.number.NumberUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
-import cn.iocoder.yudao.module.crm.controller.admin.business.vo.business.CrmBusinessPageReqVO;
-import cn.iocoder.yudao.module.crm.controller.admin.business.vo.business.CrmBusinessRespVO;
-import cn.iocoder.yudao.module.crm.controller.admin.business.vo.business.CrmBusinessSaveReqVO;
-import cn.iocoder.yudao.module.crm.controller.admin.business.vo.business.CrmBusinessTransferReqVO;
+import cn.iocoder.yudao.module.crm.controller.admin.business.vo.business.*;
 import cn.iocoder.yudao.module.crm.dal.dataobject.business.CrmBusinessDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.business.CrmBusinessProductDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.business.CrmBusinessStatusDO;
@@ -87,6 +84,14 @@ public class CrmBusinessController {
         return success(true);
     }
 
+    @PutMapping("/update-status")
+    @Operation(summary = "更新商机状态")
+    @PreAuthorize("@ss.hasPermission('crm:business:update')")
+    public CommonResult<Boolean> updateBusinessStatus(@Valid @RequestBody CrmBusinessUpdateStatusReqVO updateStatusReqVO) {
+        businessService.updateBusinessStatus(updateStatusReqVO);
+        return success(true);
+    }
+
     @DeleteMapping("/delete")
     @Operation(summary = "删除商机")
     @Parameter(name = "id", description = "编号", required = true)
@@ -116,7 +121,8 @@ public class CrmBusinessController {
                 convertSet(businessProducts, CrmBusinessProductDO::getProductId));
         businessVO.setProducts(BeanUtils.toBean(businessProducts, CrmBusinessRespVO.Product.class, businessProductVO ->
                 MapUtils.findAndThen(productMap, businessProductVO.getProductId(),
-                        product -> businessProductVO.setProductNo(product.getNo()).setProductUnit(product.getUnit()))));
+                        product -> businessProductVO.setProductName(product.getName())
+                                .setProductNo(product.getNo()).setProductUnit(product.getUnit()))));
         return businessVO;
     }
 
@@ -209,7 +215,8 @@ public class CrmBusinessController {
             });
             // 2.3 设置商机状态
             MapUtils.findAndThen(statusTypeMap, businessVO.getStatusTypeId(), statusType -> businessVO.setStatusTypeName(statusType.getName()));
-            MapUtils.findAndThen(statusMap, businessVO.getStatusId(), status -> businessVO.setStatusName(status.getName()));
+            MapUtils.findAndThen(statusMap, businessVO.getStatusId(), status -> businessVO.setStatusName(
+                    businessService.getBusinessStatusName(businessVO.getEndStatus(), status)));
         });
     }
 

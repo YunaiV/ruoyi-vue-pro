@@ -2,7 +2,7 @@ package cn.iocoder.yudao.module.crm.dal.dataobject.business;
 
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerDO;
-import cn.iocoder.yudao.module.crm.enums.business.CrmBizEndStatus;
+import cn.iocoder.yudao.module.crm.enums.business.CrmBusinessEndStatusEnum;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -77,7 +77,7 @@ public class CrmBusinessDO extends BaseDO {
     /**
      * 结束状态
      *
-     * 枚举 {@link CrmBizEndStatus}
+     * 枚举 {@link CrmBusinessEndStatusEnum}
      */
     private Integer endStatus;
     /**

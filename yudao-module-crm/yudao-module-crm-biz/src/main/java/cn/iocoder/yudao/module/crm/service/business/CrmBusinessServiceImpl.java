@@ -8,9 +8,11 @@ import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.crm.controller.admin.business.vo.business.CrmBusinessPageReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.business.vo.business.CrmBusinessSaveReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.business.vo.business.CrmBusinessTransferReqVO;
+import cn.iocoder.yudao.module.crm.controller.admin.business.vo.business.CrmBusinessUpdateStatusReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.contact.vo.CrmContactBusinessReqVO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.business.CrmBusinessDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.business.CrmBusinessProductDO;
+import cn.iocoder.yudao.module.crm.dal.dataobject.business.CrmBusinessStatusDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.contact.CrmContactBusinessDO;
 import cn.iocoder.yudao.module.crm.dal.mysql.business.CrmBusinessMapper;
 import cn.iocoder.yudao.module.crm.dal.mysql.business.CrmBusinessProductMapper;
@@ -44,8 +46,7 @@ import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
-import static cn.iocoder.yudao.module.crm.enums.ErrorCodeConstants.BUSINESS_DELETE_FAIL_CONTRACT_EXISTS;
-import static cn.iocoder.yudao.module.crm.enums.ErrorCodeConstants.BUSINESS_NOT_EXISTS;
+import static cn.iocoder.yudao.module.crm.enums.ErrorCodeConstants.*;
 import static cn.iocoder.yudao.module.crm.enums.LogRecordConstants.*;
 
 /**
@@ -216,6 +217,40 @@ public class CrmBusinessServiceImpl implements CrmBusinessService {
         business.setTotalProductPrice(getSumValue(businessProducts, CrmBusinessProductDO::getTotalPrice, BigDecimal::add, BigDecimal.ZERO));
         BigDecimal discountPrice = MoneyUtils.priceMultiplyPercent(business.getTotalProductPrice(), business.getDiscountPercent());
         business.setTotalPrice(business.getTotalProductPrice().subtract(discountPrice));
+    }
+
+
+    @Override
+    @LogRecord(type = CRM_BUSINESS_TYPE, subType = CRM_BUSINESS_UPDATE_STATUS_SUB_TYPE, bizNo = "{{#reqVO.id}}",
+            success = CRM_BUSINESS_UPDATE_STATUS_SUCCESS)
+    @CrmPermission(bizType = CrmBizTypeEnum.CRM_BUSINESS, bizId = "#reqVO.id", level = CrmPermissionLevelEnum.WRITE)
+    public void updateBusinessStatus(CrmBusinessUpdateStatusReqVO reqVO) {
+        // 1.1 校验存在
+        CrmBusinessDO business = validateBusinessExists(reqVO.getId());
+        // 1.2 校验商机未结束
+        if (business.getEndStatus() != null) {
+            throw exception(BUSINESS_UPDATE_STATUS_FAIL_END_STATUS);
+        }
+        // 1.3 校验商机状态
+        CrmBusinessStatusDO status = null;
+        if (reqVO.getStatusId() != null) {
+            status = businessStatusService.validateBusinessStatus(business.getStatusTypeId(), reqVO.getStatusId());
+        }
+        // 1.4 校验是不是状态没变更
+        if ((reqVO.getStatusId() != null && reqVO.getStatusId().equals(business.getStatusId()))
+            || (reqVO.getEndStatus() != null && reqVO.getEndStatus().equals(business.getEndStatus()))) {
+            throw exception(BUSINESS_UPDATE_STATUS_FAIL_STATUS_EQUALS);
+        }
+
+        // 2. 更新商机状态
+        businessMapper.updateById(new CrmBusinessDO().setId(reqVO.getId()).setStatusId(reqVO.getStatusId())
+                .setEndStatus(reqVO.getEndStatus()));
+
+        // 3. 记录操作日志上下文
+        LogRecordContext.putVariable("businessName", business.getName());
+        LogRecordContext.putVariable("oldStatusName", getBusinessStatusName(business.getEndStatus(),
+                businessStatusService.getBusinessStatus(business.getStatusId())));
+        LogRecordContext.putVariable("newStatusName", getBusinessStatusName(reqVO.getEndStatus(), status));
     }
 
     @Override

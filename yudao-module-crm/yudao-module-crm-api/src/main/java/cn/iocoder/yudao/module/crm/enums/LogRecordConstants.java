@@ -93,6 +93,9 @@ public interface LogRecordConstants {
     String CRM_BUSINESS_TRANSFER_SUCCESS = "将商机【{{#business.name}}】的负责人从【{getAdminUserById{#business.ownerUserId}}】变更为了【{getAdminUserById{#reqVO.newOwnerUserId}}】";
     String CRM_BUSINESS_FOLLOW_UP_SUB_TYPE = "商机跟进";
     String CRM_BUSINESS_FOLLOW_UP_SUCCESS = "商机跟进【{{#businessName}}】";
+    String CRM_BUSINESS_UPDATE_STATUS_SUB_TYPE = "更新商机状态";
+    String CRM_BUSINESS_UPDATE_STATUS_SUCCESS = "更新了商机【{{#businessName}}】的状态从【{{#oldStatusName}}】变更为了【{{#newStatusName}}】";
+//    String CRM_BUSINESS_UPDATE_STATUS_SUCCESS = "阿巴阿巴";
 
     // ======================= CRM_CONTRACT 合同 =======================
 

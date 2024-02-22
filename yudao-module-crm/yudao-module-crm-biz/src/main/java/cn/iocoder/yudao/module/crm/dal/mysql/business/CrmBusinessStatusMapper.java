@@ -22,4 +22,9 @@ public interface CrmBusinessStatusMapper extends BaseMapperX<CrmBusinessStatusDO
         return selectList(CrmBusinessStatusDO::getTypeId, typeId);
     }
 
+    default CrmBusinessStatusDO selectByTypeIdAndId(Long statusTypeId, Long statusId) {
+        return selectOne(CrmBusinessStatusDO::getTypeId, statusTypeId,
+                CrmBusinessStatusDO::getId, statusId);
+    }
+
 }
