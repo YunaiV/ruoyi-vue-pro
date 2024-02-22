@@ -8,6 +8,7 @@ import cn.iocoder.yudao.module.crm.controller.admin.contact.vo.CrmContactBusines
 import cn.iocoder.yudao.module.crm.controller.admin.contact.vo.CrmContactPageReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.contact.vo.CrmContactSaveReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.contact.vo.CrmContactTransferReqVO;
+import cn.iocoder.yudao.module.crm.dal.dataobject.contact.CrmContactBusinessDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.contact.CrmContactDO;
 import cn.iocoder.yudao.module.crm.dal.mysql.contact.CrmContactMapper;
 import cn.iocoder.yudao.module.crm.enums.common.CrmBizTypeEnum;
@@ -36,6 +37,7 @@ import java.util.List;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.pojo.PageParam.PAGE_SIZE_NONE;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 import static cn.iocoder.yudao.module.crm.enums.ErrorCodeConstants.*;
 import static cn.iocoder.yudao.module.crm.enums.LogRecordConstants.*;
 import static java.util.Collections.singletonList;
@@ -287,6 +289,16 @@ public class CrmContactServiceImpl implements CrmContactService {
     @CrmPermission(bizType = CrmBizTypeEnum.CRM_CUSTOMER, bizId = "#pageVO.customerId", level = CrmPermissionLevelEnum.READ)
     public PageResult<CrmContactDO> getContactPageByCustomerId(CrmContactPageReqVO pageVO) {
         return contactMapper.selectPageByCustomerId(pageVO);
+    }
+
+    @Override
+    @CrmPermission(bizType = CrmBizTypeEnum.CRM_BUSINESS, bizId = "#pageVO.businessId", level = CrmPermissionLevelEnum.READ)
+    public PageResult<CrmContactDO> getContactPageByBusinessId(CrmContactPageReqVO pageVO) {
+        List<CrmContactBusinessDO> contactBusinessList = contactBusinessService.getContactBusinessListByBusinessId(pageVO.getBusinessId());
+        if (CollUtil.isEmpty(contactBusinessList)) {
+            return PageResult.empty();
+        }
+        return contactMapper.selectPageByBusinessId(pageVO, convertSet(contactBusinessList, CrmContactBusinessDO::getContactId));
     }
 
     @Override

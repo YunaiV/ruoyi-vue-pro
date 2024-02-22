@@ -8,7 +8,7 @@ import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.crm.controller.admin.business.vo.business.CrmBusinessPageReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.business.vo.business.CrmBusinessSaveReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.business.vo.business.CrmBusinessTransferReqVO;
-import cn.iocoder.yudao.module.crm.convert.business.CrmBusinessConvert;
+import cn.iocoder.yudao.module.crm.controller.admin.contact.vo.CrmContactBusinessReqVO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.business.CrmBusinessDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.business.CrmBusinessProductDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.contact.CrmContactBusinessDO;
@@ -24,6 +24,7 @@ import cn.iocoder.yudao.module.crm.service.contract.CrmContractService;
 import cn.iocoder.yudao.module.crm.service.customer.CrmCustomerService;
 import cn.iocoder.yudao.module.crm.service.permission.CrmPermissionService;
 import cn.iocoder.yudao.module.crm.service.permission.bo.CrmPermissionCreateReqBO;
+import cn.iocoder.yudao.module.crm.service.permission.bo.CrmPermissionTransferReqBO;
 import cn.iocoder.yudao.module.crm.service.product.CrmProductService;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import com.mzt.logapi.context.LogRecordContext;
@@ -38,6 +39,7 @@ import org.springframework.validation.annotation.Validated;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
@@ -100,14 +102,19 @@ public class CrmBusinessServiceImpl implements CrmBusinessService {
             businessProducts.forEach(item -> item.setBusinessId(business.getId()));
             businessProductMapper.insertBatch(businessProducts);
         }
-        // 在联系人的详情页，如果直接【新建商机】，则需要关联下。
-        contactBusinessService.createContactBusiness(createReqVO.getContactId(), business.getId());
+
         // 3. 创建数据权限
         // 设置当前操作的人为负责人
         permissionService.createPermission(new CrmPermissionCreateReqBO().setBizType(CrmBizTypeEnum.CRM_BUSINESS.getType())
                 .setBizId(business.getId()).setUserId(userId).setLevel(CrmPermissionLevelEnum.OWNER.getLevel()));
 
-        // 4. 记录操作日志上下文
+        // 4. 在联系人的详情页，如果直接【新建商机】，则需要关联下
+        if (createReqVO.getContactId() != null) {
+            contactBusinessService.createContactBusinessList(new CrmContactBusinessReqVO().setContactId(createReqVO.getContactId())
+                    .setBusinessIds(Collections.singletonList(business.getId())));
+        }
+
+        // 5. 记录操作日志上下文
         LogRecordContext.putVariable("business", business);
         return business.getId();
     }
@@ -262,8 +269,8 @@ public class CrmBusinessServiceImpl implements CrmBusinessService {
         CrmBusinessDO business = validateBusinessExists(reqVO.getId());
 
         // 2.1 数据权限转移
-        permissionService.transferPermission(
-                CrmBusinessConvert.INSTANCE.convert(reqVO, userId).setBizType(CrmBizTypeEnum.CRM_BUSINESS.getType()));
+        permissionService.transferPermission(new CrmPermissionTransferReqBO(userId, CrmBizTypeEnum.CRM_BUSINESS.getType(),
+                reqVO.getNewOwnerUserId(), reqVO.getId(), CrmPermissionLevelEnum.OWNER.getLevel()));
         // 2.2 设置新的负责人
         businessMapper.updateOwnerUserIdById(reqVO.getId(), reqVO.getNewOwnerUserId());
 

@@ -40,6 +40,18 @@ public interface CrmContactMapper extends BaseMapperX<CrmContactDO> {
                 .orderByDesc(CrmContactDO::getId));
     }
 
+    default PageResult<CrmContactDO> selectPageByBusinessId(CrmContactPageReqVO pageVO, Collection<Long> ids) {
+        return selectPage(pageVO, new LambdaQueryWrapperX<CrmContactDO>()
+                .in(CrmContactDO::getId, ids) // 指定联系人编号
+                .likeIfPresent(CrmContactDO::getName, pageVO.getName())
+                .eqIfPresent(CrmContactDO::getMobile, pageVO.getMobile())
+                .eqIfPresent(CrmContactDO::getTelephone, pageVO.getTelephone())
+                .eqIfPresent(CrmContactDO::getEmail, pageVO.getEmail())
+                .eqIfPresent(CrmContactDO::getQq, pageVO.getQq())
+                .eqIfPresent(CrmContactDO::getWechat, pageVO.getWechat())
+                .orderByDesc(CrmContactDO::getId));
+    }
+
     default PageResult<CrmContactDO> selectPage(CrmContactPageReqVO pageReqVO, Long userId) {
         MPJLambdaWrapperX<CrmContactDO> query = new MPJLambdaWrapperX<>();
         // 拼接数据权限的查询条件
