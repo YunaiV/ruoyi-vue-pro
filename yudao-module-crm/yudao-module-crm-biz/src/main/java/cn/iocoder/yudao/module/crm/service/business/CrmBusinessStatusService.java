@@ -116,4 +116,20 @@ public interface CrmBusinessStatusService {
         return convertMap(getBusinessStatusList(ids), CrmBusinessStatusDO::getId);
     }
 
+    /**
+     * 获得商机状态
+     *
+     * @param id 编号
+     * @return 商机状态
+     */
+    CrmBusinessStatusDO getBusinessStatus(Long id);
+
+    /**
+     * 校验商机状态
+     *
+     * @param statusTypeId 商机状态组编号
+     * @param statusId     商机状态编号
+     */
+    CrmBusinessStatusDO validateBusinessStatus(Long statusTypeId, Long statusId);
+
 }

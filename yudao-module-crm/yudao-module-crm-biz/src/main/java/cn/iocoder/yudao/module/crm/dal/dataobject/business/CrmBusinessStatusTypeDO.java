@@ -11,7 +11,9 @@ import lombok.*;
 import java.util.List;
 
 /**
- * 商机状态组 DO
+ * CRM 商机状态组 DO
+ *
+ * 注意，它是个配置表
  *
  * @author ljlleo
  */

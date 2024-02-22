@@ -10,7 +10,7 @@ import lombok.*;
 import java.math.BigDecimal;
 
 /**
- * 商机产品关联表 DO
+ * CRM 商机产品关联表 DO
  *
  * CrmBusinessDO : CrmBusinessProductDO = 1 : N
  *

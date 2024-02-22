@@ -6,7 +6,9 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
 
 /**
- * 商机状态 DO
+ * CRM 商机状态 DO
+ *
+ * 注意，它是个配置表
  *
  * @author ljlleo
  */

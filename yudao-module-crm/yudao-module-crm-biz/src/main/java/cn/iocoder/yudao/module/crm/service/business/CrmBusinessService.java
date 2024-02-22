@@ -4,10 +4,13 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.crm.controller.admin.business.vo.business.CrmBusinessPageReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.business.vo.business.CrmBusinessSaveReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.business.vo.business.CrmBusinessTransferReqVO;
+import cn.iocoder.yudao.module.crm.controller.admin.business.vo.business.CrmBusinessUpdateStatusReqVO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.business.CrmBusinessDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.business.CrmBusinessProductDO;
+import cn.iocoder.yudao.module.crm.dal.dataobject.business.CrmBusinessStatusDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.contact.CrmContactDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerDO;
+import cn.iocoder.yudao.module.crm.enums.business.CrmBusinessEndStatusEnum;
 import cn.iocoder.yudao.module.crm.service.business.bo.CrmBusinessUpdateProductReqBO;
 import jakarta.validation.Valid;
 
@@ -54,6 +57,13 @@ public interface CrmBusinessService {
      * @param contactNextTime 下次联系时间
      */
     void updateBusinessContactNextTime(Collection<Long> ids, LocalDateTime contactNextTime);
+
+    /**
+     * 更新商机的状态
+     *
+     * @param reqVO 更新请求
+     */
+    void updateBusinessStatus(CrmBusinessUpdateStatusReqVO reqVO);
 
     /**
      * 删除商机
@@ -155,5 +165,19 @@ public interface CrmBusinessService {
      * @return 数量
      */
     Long getBusinessCountByStatusTypeId(Long statusTypeId);
+
+    /**
+     * 获得商机状态名称
+     *
+     * @param endStatus 结束状态
+     * @param status    商机状态
+     * @return 商机状态名称
+     */
+    default String getBusinessStatusName(Integer endStatus, CrmBusinessStatusDO status) {
+        if (endStatus != null) {
+            return CrmBusinessEndStatusEnum.fromStatus(endStatus).getName();
+        }
+        return status.getName();
+    }
 
 }

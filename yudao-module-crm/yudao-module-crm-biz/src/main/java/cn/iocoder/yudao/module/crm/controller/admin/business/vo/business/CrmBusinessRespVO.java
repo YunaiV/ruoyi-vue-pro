@@ -134,7 +134,7 @@ public class CrmBusinessRespVO {
         private BigDecimal businessPrice;
 
         @Schema(description = "产品数量", requiredMode = Schema.RequiredMode.REQUIRED, example = "8911")
-        private Integer count;
+        private BigDecimal count;
 
         @Schema(description = "总计价格", requiredMode = Schema.RequiredMode.REQUIRED, example = "123.00")
         private BigDecimal totalPrice;

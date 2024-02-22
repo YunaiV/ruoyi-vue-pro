@@ -178,4 +178,18 @@ public class CrmBusinessStatusServiceImpl implements CrmBusinessStatusService {
         return businessStatusMapper.selectBatchIds(ids);
     }
 
+    @Override
+    public CrmBusinessStatusDO getBusinessStatus(Long id) {
+        return businessStatusMapper.selectById(id);
+    }
+
+    @Override
+    public CrmBusinessStatusDO validateBusinessStatus(Long statusTypeId, Long statusId) {
+        CrmBusinessStatusDO status = businessStatusMapper.selectByTypeIdAndId(statusTypeId, statusId);
+        if (status == null) {
+            throw exception(BUSINESS_STATUS_NOT_EXISTS);
+        }
+        return status;
+    }
+
 }
