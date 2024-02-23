@@ -13,11 +13,12 @@ import cn.iocoder.yudao.module.crm.enums.common.CrmAuditStatusEnum;
  */
 public class CrmAuditStatusUtils {
 
+    /**
+     * 流程审批状态转换
+     *
+     * @param event 业务流程实例的结果
+     */
     public static void convertAuditStatus(BpmResultListenerRespDTO event) {
-        // 判断下状态是否符合预期
-        if (!isEndResult(event.getResult())) {
-            return;
-        }
         // 状态转换
         if (ObjUtil.equal(event.getResult(), BpmProcessInstanceResultEnum.APPROVE.getResult())) {
             event.setResult(CrmAuditStatusEnum.APPROVE.getStatus());

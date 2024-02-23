@@ -43,6 +43,7 @@ import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionU
 import static cn.iocoder.yudao.module.crm.enums.ErrorCodeConstants.*;
 import static cn.iocoder.yudao.module.crm.enums.LogRecordConstants.*;
 import static cn.iocoder.yudao.module.crm.util.CrmAuditStatusUtils.convertAuditStatus;
+import static cn.iocoder.yudao.module.crm.util.CrmAuditStatusUtils.isEndResult;
 
 /**
  * CRM 回款 Service 实现类
@@ -142,6 +143,10 @@ public class CrmReceivableServiceImpl implements CrmReceivableService {
 
     @Override
     public void updateReceivableAuditStatus(BpmResultListenerRespDTO event) {
+        // 判断下状态是否符合预期
+        if (!isEndResult(event.getResult())) {
+            return;
+        }
         convertAuditStatus(event);
         // 更新回款审批状态
         receivableMapper.updateById(new CrmReceivableDO().setId(Long.parseLong(event.getBusinessKey()))
