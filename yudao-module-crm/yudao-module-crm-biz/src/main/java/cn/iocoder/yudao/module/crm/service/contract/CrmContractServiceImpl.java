@@ -8,7 +8,6 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.number.MoneyUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
-import cn.iocoder.yudao.module.bpm.api.listener.dto.BpmResultListenerRespDTO;
 import cn.iocoder.yudao.module.bpm.api.task.BpmProcessInstanceApi;
 import cn.iocoder.yudao.module.bpm.api.task.dto.BpmProcessInstanceCreateReqDTO;
 import cn.iocoder.yudao.module.bpm.enums.task.BpmProcessInstanceResultEnum;
@@ -35,6 +34,7 @@ import com.mzt.logapi.context.LogRecordContext;
 import com.mzt.logapi.service.impl.DiffParseFunction;
 import com.mzt.logapi.starter.annotation.LogRecord;
 import jakarta.annotation.Resource;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
@@ -56,6 +56,7 @@ import static cn.iocoder.yudao.module.crm.enums.LogRecordConstants.*;
  */
 @Service
 @Validated
+@Slf4j
 public class CrmContractServiceImpl implements CrmContractService {
 
     /**
@@ -129,7 +130,7 @@ public class CrmContractServiceImpl implements CrmContractService {
         // 1.2 只有草稿、审批中，可以编辑；
         if (!ObjectUtils.equalsAny(contract.getAuditStatus(), CrmAuditStatusEnum.DRAFT.getStatus(),
                 CrmAuditStatusEnum.PROCESS.getStatus())) {
-            throw exception(CONTRACT_UPDATE_FAIL_EDITING_PROHIBITED);
+            throw exception(CONTRACT_UPDATE_FAIL_NOT_DRAFT);
         }
         // 1.3 校验产品项的有效性
         List<CrmContractProductDO> contractProducts = validateContractProducts(updateReqVO.getProducts());
@@ -291,35 +292,22 @@ public class CrmContractServiceImpl implements CrmContractService {
     }
 
     @Override
-    public void updateContractAuditStatus(BpmResultListenerRespDTO event) {
-        // 判断下状态是否符合预期
-        if (!isEndResult(event.getResult())) {
-            return;
+    public void updateContractAuditStatus(Long id, Integer bpmResult) {
+        // 1.1 校验合同是否存在
+        CrmContractDO contract = validateContractExists(id);
+        // 1.2 只有审批中，可以更新审批结果
+        if (ObjUtil.notEqual(contract.getAuditStatus(), CrmAuditStatusEnum.PROCESS.getStatus())) {
+            log.error("[updateContractAuditStatus][contract({}) 不处于审批中，无法更新审批结果({})]",
+                    contract.getId(), bpmResult);
+            throw exception(CONTRACT_UPDATE_AUDIT_STATUS_FAIL_NOT_PROCESS);
         }
-        // 状态转换
-        if (ObjUtil.equal(event.getResult(), BpmProcessInstanceResultEnum.APPROVE.getResult())) {
-            event.setResult(CrmAuditStatusEnum.APPROVE.getStatus());
-        }
-        if (ObjUtil.equal(event.getResult(), BpmProcessInstanceResultEnum.REJECT.getResult())) {
-            event.setResult(CrmAuditStatusEnum.REJECT.getStatus());
-        }
-        if (ObjUtil.equal(event.getResult(), BpmProcessInstanceResultEnum.CANCEL.getResult())) {
-            event.setResult(CrmAuditStatusEnum.CANCEL.getStatus());
-        }
-        // 更新合同状态
-        contractMapper.updateById(new CrmContractDO().setId(Long.parseLong(event.getBusinessKey()))
-                .setAuditStatus(event.getResult()));
-    }
 
-    /**
-     * 判断该结果是否处于 End 最终结果
-     *
-     * @param result 结果
-     * @return 是否
-     */
-    public static boolean isEndResult(Integer result) {
-        return ObjectUtils.equalsAny(result, BpmProcessInstanceResultEnum.APPROVE.getResult(),
-                BpmProcessInstanceResultEnum.REJECT.getResult(), BpmProcessInstanceResultEnum.CANCEL.getResult());
+        // 2. 更新合同审批结果
+        Integer auditStatus = BpmProcessInstanceResultEnum.APPROVE.getResult().equals(bpmResult) ? CrmAuditStatusEnum.APPROVE.getStatus()
+                : BpmProcessInstanceResultEnum.REJECT.getResult().equals(bpmResult) ? CrmAuditStatusEnum.REJECT.getStatus()
+                : BpmProcessInstanceResultEnum.CANCEL.getResult();
+        Assert.notNull(auditStatus, "BPM 审批结果({}) 转换失败", bpmResult);
+        contractMapper.updateById(new CrmContractDO().setId(id).setAuditStatus(auditStatus));
     }
 
     //======================= 查询相关 =======================

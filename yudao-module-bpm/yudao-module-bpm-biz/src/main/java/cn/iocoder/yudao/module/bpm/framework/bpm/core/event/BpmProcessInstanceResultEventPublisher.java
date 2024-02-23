@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.bpm.framework.bpm.core.event;
 
+import cn.iocoder.yudao.module.bpm.event.BpmProcessInstanceResultEvent;
 import lombok.AllArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.validation.annotation.Validated;

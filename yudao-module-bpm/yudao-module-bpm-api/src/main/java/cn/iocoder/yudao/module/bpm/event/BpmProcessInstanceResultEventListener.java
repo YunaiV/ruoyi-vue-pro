@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.bpm.framework.bpm.core.event;
+package cn.iocoder.yudao.module.bpm.event;
 
 import cn.hutool.core.util.StrUtil;
 import org.springframework.context.ApplicationListener;

@@ -1,10 +1,8 @@
-package cn.iocoder.yudao.module.bpm.framework.bpm.core.event;
-
-import cn.iocoder.yudao.module.bpm.dal.dataobject.task.BpmProcessInstanceExtDO;
-import lombok.Data;
-import org.springframework.context.ApplicationEvent;
+package cn.iocoder.yudao.module.bpm.event;
 
 import jakarta.validation.constraints.NotNull;
+import lombok.Data;
+import org.springframework.context.ApplicationEvent;
 
 /**
  * 流程实例的结果发生变化的 Event
