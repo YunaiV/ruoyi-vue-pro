@@ -171,7 +171,9 @@ public class DictDataServiceImpl implements DictDataService {
 
     @Override
     public List<DictDataDO> getDictDataListByDictType(String dictType) {
-        return dictDataMapper.selectList(DictDataDO::getDictType, dictType);
+        List<DictDataDO> list = dictDataMapper.selectList(DictDataDO::getDictType, dictType);
+        list.sort(Comparator.comparing(DictDataDO::getSort));
+        return list;
     }
 
 }

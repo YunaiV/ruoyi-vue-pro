@@ -28,7 +28,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -56,7 +55,6 @@ public class CrmReceivablePlanController {
     @Resource
     private CrmReceivableService receivableService;
     @Resource
-    @Lazy
     private CrmContractService contractService;
     @Resource
     private CrmCustomerService customerService;

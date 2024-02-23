@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.crm.controller.admin.receivable.vo.receivable;
 
 import cn.iocoder.yudao.framework.common.validation.InEnum;
-import cn.iocoder.yudao.module.crm.enums.receivable.CrmReturnTypeEnum;
+import cn.iocoder.yudao.module.crm.enums.receivable.CrmReceivableReturnTypeEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
@@ -23,7 +23,7 @@ public class CrmReceivableSaveReqVO {
     private Long planId; // 不是通过回款计划创建的回款没有回款计划编号
 
     @Schema(description = "回款方式", example = "2")
-    @InEnum(CrmReturnTypeEnum.class)
+    @InEnum(CrmReceivableReturnTypeEnum.class)
     private Integer returnType;
 
     @Schema(description = "回款金额", requiredMode = Schema.RequiredMode.REQUIRED, example = "9000")

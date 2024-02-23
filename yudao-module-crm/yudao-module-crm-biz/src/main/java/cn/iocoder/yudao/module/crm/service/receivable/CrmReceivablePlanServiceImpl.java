@@ -23,7 +23,7 @@ import com.mzt.logapi.context.LogRecordContext;
 import com.mzt.logapi.service.impl.DiffParseFunction;
 import com.mzt.logapi.starter.annotation.LogRecord;
 import jakarta.annotation.Resource;
-import org.hibernate.validator.internal.util.stereotypes.Lazy;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
@@ -57,6 +57,7 @@ public class CrmReceivablePlanServiceImpl implements CrmReceivablePlanService {
     private CrmCustomerService customerService;
     @Resource
     private CrmPermissionService permissionService;
+
     @Resource
     private AdminUserApi adminUserApi;
 
@@ -72,15 +73,16 @@ public class CrmReceivablePlanServiceImpl implements CrmReceivablePlanService {
         int period = (int) (count + 1);
         createReqVO.setPeriod(createReqVO.getPeriod() != period ? period : createReqVO.getPeriod()); // 如果期数不对则纠正
 
-        // 2.1 插入
+        // 2. 插入还款计划
         CrmReceivablePlanDO receivablePlan = BeanUtils.toBean(createReqVO, CrmReceivablePlanDO.class).setId(null).setFinishStatus(false);
         receivablePlanMapper.insert(receivablePlan);
-        // 2.2 创建数据权限
+
+        // 3. 创建数据权限
         permissionService.createPermission(new CrmPermissionCreateReqBO().setUserId(createReqVO.getOwnerUserId())
                 .setBizType(CrmBizTypeEnum.CRM_RECEIVABLE_PLAN.getType()).setBizId(receivablePlan.getId())
                 .setLevel(CrmPermissionLevelEnum.OWNER.getLevel()));
 
-        // 3. 记录操作日志上下文
+        // 4. 记录操作日志上下文
         LogRecordContext.putVariable("receivablePlan", receivablePlan);
         return receivablePlan.getId();
     }

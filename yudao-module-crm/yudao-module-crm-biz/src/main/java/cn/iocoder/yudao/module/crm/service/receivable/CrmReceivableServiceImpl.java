@@ -31,6 +31,7 @@ import com.mzt.logapi.service.impl.DiffParseFunction;
 import com.mzt.logapi.starter.annotation.LogRecord;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
@@ -66,10 +67,12 @@ public class CrmReceivableServiceImpl implements CrmReceivableService {
     private CrmContractService contractService;
     @Resource
     private CrmCustomerService customerService;
-    @Resource
+//    @Resource
+    @Lazy // 延迟加载，避免循环依赖
     private CrmReceivablePlanService receivablePlanService;
     @Resource
     private CrmPermissionService permissionService;
+
     @Resource
     private AdminUserApi adminUserApi;
     @Resource

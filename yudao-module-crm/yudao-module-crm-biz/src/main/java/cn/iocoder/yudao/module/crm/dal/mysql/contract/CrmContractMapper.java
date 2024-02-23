@@ -11,7 +11,6 @@ import cn.iocoder.yudao.module.crm.enums.common.CrmAuditStatusEnum;
 import cn.iocoder.yudao.module.crm.enums.common.CrmBizTypeEnum;
 import cn.iocoder.yudao.module.crm.enums.common.CrmSceneTypeEnum;
 import cn.iocoder.yudao.module.crm.util.CrmQueryWrapperUtils;
-import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.time.LocalDateTime;
@@ -26,10 +25,8 @@ import java.util.List;
 @Mapper
 public interface CrmContractMapper extends BaseMapperX<CrmContractDO> {
 
-    default int updateOwnerUserIdById(Long id, Long ownerUserId) {
-        return update(new LambdaUpdateWrapper<CrmContractDO>()
-                .eq(CrmContractDO::getId, id)
-                .set(CrmContractDO::getOwnerUserId, ownerUserId));
+    default CrmContractDO selectByNo(String no) {
+        return selectOne(CrmContractDO::getNo, no);
     }
 
     default PageResult<CrmContractDO> selectPageByCustomerId(CrmContractPageReqVO pageReqVO) {

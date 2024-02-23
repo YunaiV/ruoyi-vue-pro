@@ -4,7 +4,6 @@ import cn.hutool.core.io.resource.ResourceUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.text.csv.CsvRow;
 import cn.hutool.core.text.csv.CsvUtil;
-import cn.hutool.core.util.ObjUtil;
 import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
 import cn.iocoder.yudao.framework.ip.core.Area;
 import cn.iocoder.yudao.framework.ip.core.enums.AreaTypeEnum;
@@ -72,26 +71,25 @@ public class AreaUtils {
      * @param id 区域编号
      * @return 区域
      */
-    public static Area getArea(Integer id) {
+    public static Area parseArea(Integer id) {
         return areas.get(id);
     }
 
     /**
      * 获得指定区域对应的编号
      *
-     * @param path 区域编号
-     * @return 编号
+     * @param pathStr 区域路径，例如说：河南省/石家庄市/新华区
+     * @return 区域
      */
-    public static Area getArea(String path) {
-        String[] paths = path.split("/");
+    public static Area parseArea(String pathStr) {
+        String[] paths = pathStr.split("/");
         Area area = null;
-        for (int i = 0; i < paths.length; i++) {
-            final int finalI = i;
+        for (String path : paths) {
             if (area == null) {
-                area = findFirst(convertList(areas.values(), a -> a), item -> ObjUtil.equal(paths[finalI], item.getName()));
-                continue;
+                area = findFirst(areas.values(), item -> item.getName().equals(path));
+            } else {
+                area = findFirst(area.getChildren(), item -> item.getName().equals(path));
             }
-            area = findFirst(area.getChildren(), item -> ObjUtil.equal(paths[finalI], item.getName()));
         }
         return area;
     }
@@ -102,9 +100,9 @@ public class AreaUtils {
      * @param areas 地区树
      * @return 所有节点的全路径名称
      */
-    public static List<String> getAllAreaNodePaths(List<Area> areas) {
+    public static List<String> getAreaNodePathList(List<Area> areas) {
         List<String> paths = new ArrayList<>();
-        areas.forEach(area -> traverse(area, "", paths));
+        areas.forEach(area -> getAreaNodePathList(area, "", paths));
         return paths;
     }
 
@@ -113,9 +111,9 @@ public class AreaUtils {
      *
      * @param node  父节点
      * @param path  全路径名称
-     * @param paths 全路径名称列表
+     * @param paths 全路径名称列表，省份/城市/地区
      */
-    private static void traverse(Area node, String path, List<String> paths) {
+    private static void getAreaNodePathList(Area node, String path, List<String> paths) {
         if (node == null) {
             return;
         }
@@ -124,7 +122,7 @@ public class AreaUtils {
         paths.add(currentPath);
         // 递归遍历子节点
         for (Area child : node.getChildren()) {
-            traverse(child, currentPath, paths);
+            getAreaNodePathList(child, currentPath, paths);
         }
     }
 
@@ -195,7 +193,7 @@ public class AreaUtils {
      */
     public static Integer getParentIdByType(Integer id, @NonNull AreaTypeEnum type) {
         for (int i = 0; i < Byte.MAX_VALUE; i++) {
-            Area area = AreaUtils.getArea(id);
+            Area area = AreaUtils.parseArea(id);
             if (area == null) {
                 return null;
             }

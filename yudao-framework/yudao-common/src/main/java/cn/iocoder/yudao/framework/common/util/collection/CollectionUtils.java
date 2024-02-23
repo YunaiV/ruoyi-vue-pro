@@ -257,11 +257,11 @@ public class CollectionUtils {
         return !CollectionUtil.isEmpty(from) ? from.get(0) : null;
     }
 
-    public static <T> T findFirst(List<T> from, Predicate<T> predicate) {
+    public static <T> T findFirst(Collection<T> from, Predicate<T> predicate) {
         return findFirst(from, predicate, Function.identity());
     }
 
-    public static <T, U> U findFirst(List<T> from, Predicate<T> predicate, Function<T, U> func) {
+    public static <T, U> U findFirst(Collection<T> from, Predicate<T> predicate, Function<T, U> func) {
         if (CollUtil.isEmpty(from)) {
             return null;
         }

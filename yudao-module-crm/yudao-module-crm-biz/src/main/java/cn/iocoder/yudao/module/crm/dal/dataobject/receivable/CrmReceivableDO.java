@@ -4,7 +4,7 @@ import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.contract.CrmContractDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerDO;
 import cn.iocoder.yudao.module.crm.enums.common.CrmAuditStatusEnum;
-import cn.iocoder.yudao.module.crm.enums.receivable.CrmReturnTypeEnum;
+import cn.iocoder.yudao.module.crm.enums.receivable.CrmReceivableReturnTypeEnum;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -60,7 +60,7 @@ public class CrmReceivableDO extends BaseDO {
      */
     private LocalDateTime returnTime;
     /**
-     * 回款方式,关联枚举{@link CrmReturnTypeEnum}
+     * 回款方式,关联枚举{@link CrmReceivableReturnTypeEnum}
      */
     private Integer returnType;
     /**

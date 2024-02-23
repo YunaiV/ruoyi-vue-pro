@@ -107,7 +107,6 @@ public class CrmReceivableController {
         return success(buildReceivableDetailPage(pageResult));
     }
 
-    // TODO 芋艿：后面在优化导出
     @GetMapping("/export-excel")
     @Operation(summary = "导出回款 Excel")
     @PreAuthorize("@ss.hasPermission('crm:receivable:export')")

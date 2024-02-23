@@ -17,6 +17,7 @@ import cn.iocoder.yudao.module.crm.dal.dataobject.contract.CrmContractDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.contract.CrmContractProductDO;
 import cn.iocoder.yudao.module.crm.dal.mysql.contract.CrmContractMapper;
 import cn.iocoder.yudao.module.crm.dal.mysql.contract.CrmContractProductMapper;
+import cn.iocoder.yudao.module.crm.dal.redis.no.CrmNoRedisDAO;
 import cn.iocoder.yudao.module.crm.enums.common.CrmAuditStatusEnum;
 import cn.iocoder.yudao.module.crm.enums.common.CrmBizTypeEnum;
 import cn.iocoder.yudao.module.crm.enums.permission.CrmPermissionLevelEnum;
@@ -70,6 +71,9 @@ public class CrmContractServiceImpl implements CrmContractService {
     private CrmContractProductMapper contractProductMapper;
 
     @Resource
+    private CrmNoRedisDAO noRedisDAO;
+
+    @Resource
     private CrmPermissionService crmPermissionService;
     @Resource
     private CrmProductService productService;
@@ -94,11 +98,14 @@ public class CrmContractServiceImpl implements CrmContractService {
         List<CrmContractProductDO> contractProducts = validateContractProducts(createReqVO.getProducts());
         // 1.2 校验关联字段
         validateRelationDataExists(createReqVO);
-        // TODO 芋艿：生成 no
+        // 1.3 生成序号
+        String no = noRedisDAO.generate(CrmNoRedisDAO.CONTRACT_NO_PREFIX);
+        if (contractMapper.selectByNo(no) != null) {
+            throw exception(CONTRACT_NO_EXISTS);
+        }
 
         // 2.1 插入合同
-        CrmContractDO contract = BeanUtils.toBean(createReqVO, CrmContractDO.class);
-        contract.setNo(System.currentTimeMillis() + ""); // TODO
+        CrmContractDO contract = BeanUtils.toBean(createReqVO, CrmContractDO.class).setNo(no);
         calculateTotalPrice(contract, contractProducts);
         contractMapper.insert(contract);
         // 2.2 插入合同关联商品
@@ -247,7 +254,7 @@ public class CrmContractServiceImpl implements CrmContractService {
         crmPermissionService.transferPermission(new CrmPermissionTransferReqBO(userId, CrmBizTypeEnum.CRM_CONTRACT.getType(),
                 reqVO.getId(), reqVO.getNewOwnerUserId(), reqVO.getOldOwnerPermissionLevel()));
         // 2.2 设置负责人
-        contractMapper.updateOwnerUserIdById(reqVO.getId(), reqVO.getNewOwnerUserId());
+        contractMapper.updateById(new CrmContractDO().setId(reqVO.getId()).setOwnerUserId(reqVO.getNewOwnerUserId()));
 
         // 3. 记录转移日志
         LogRecordContext.putVariable("contract", contract);

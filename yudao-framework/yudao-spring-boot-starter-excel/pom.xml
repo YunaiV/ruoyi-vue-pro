@@ -49,7 +49,7 @@
         <dependency>
             <groupId>cn.iocoder.boot</groupId>
             <artifactId>yudao-spring-boot-starter-biz-ip</artifactId>
-            <scope>provided</scope> <!-- 设置为 provided，只有 ExcelUtils 使用 -->
+            <optional>true</optional> <!-- 设置为 optional，只有在 AreaConvert 的时候使用 -->
         </dependency>
     </dependencies>
 

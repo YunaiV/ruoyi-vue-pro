@@ -33,7 +33,7 @@ public class AreaConvert implements Converter<Object> {
                                     GlobalConfiguration globalConfiguration) {
         // 解析地区编号
         String label = readCellData.getStringValue();
-        Area area = AreaUtils.getArea(label);
+        Area area = AreaUtils.parseArea(label);
         if (area == null) {
             log.error("[convertToJavaData][label({}) 解析不掉]", label);
             return null;
