@@ -58,7 +58,7 @@ public class CrmContractRespVO {
 
     @Schema(description = "工作流编号", example = "1043")
     @ExcelProperty("工作流编号")
-    private Long processInstanceId;
+    private String processInstanceId;
 
     @Schema(description = "审批状态", requiredMode = Schema.RequiredMode.REQUIRED, example = "0")
     @ExcelProperty("审批状态")

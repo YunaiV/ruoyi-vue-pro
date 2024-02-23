@@ -8,9 +8,9 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.number.MoneyUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
-import cn.iocoder.yudao.module.bpm.api.listener.dto.BpmResultListenerRespDTO;
 import cn.iocoder.yudao.module.bpm.api.task.BpmProcessInstanceApi;
 import cn.iocoder.yudao.module.bpm.api.task.dto.BpmProcessInstanceCreateReqDTO;
+import cn.iocoder.yudao.module.bpm.enums.task.BpmProcessInstanceResultEnum;
 import cn.iocoder.yudao.module.crm.controller.admin.contract.vo.CrmContractPageReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.contract.vo.CrmContractSaveReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.contract.vo.CrmContractTransferReqVO;
@@ -34,6 +34,7 @@ import com.mzt.logapi.context.LogRecordContext;
 import com.mzt.logapi.service.impl.DiffParseFunction;
 import com.mzt.logapi.starter.annotation.LogRecord;
 import jakarta.annotation.Resource;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
@@ -47,8 +48,6 @@ import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionU
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
 import static cn.iocoder.yudao.module.crm.enums.ErrorCodeConstants.*;
 import static cn.iocoder.yudao.module.crm.enums.LogRecordConstants.*;
-import static cn.iocoder.yudao.module.crm.util.CrmAuditStatusUtils.convertAuditStatus;
-import static cn.iocoder.yudao.module.crm.util.CrmAuditStatusUtils.isEndResult;
 
 /**
  * CRM 合同 Service 实现类
@@ -57,6 +56,7 @@ import static cn.iocoder.yudao.module.crm.util.CrmAuditStatusUtils.isEndResult;
  */
 @Service
 @Validated
+@Slf4j
 public class CrmContractServiceImpl implements CrmContractService {
 
     /**
@@ -130,7 +130,7 @@ public class CrmContractServiceImpl implements CrmContractService {
         // 1.2 只有草稿、审批中，可以编辑；
         if (!ObjectUtils.equalsAny(contract.getAuditStatus(), CrmAuditStatusEnum.DRAFT.getStatus(),
                 CrmAuditStatusEnum.PROCESS.getStatus())) {
-            throw exception(CONTRACT_UPDATE_FAIL_EDITING_PROHIBITED);
+            throw exception(CONTRACT_UPDATE_FAIL_NOT_DRAFT);
         }
         // 1.3 校验产品项的有效性
         List<CrmContractProductDO> contractProducts = validateContractProducts(updateReqVO.getProducts());
@@ -292,15 +292,22 @@ public class CrmContractServiceImpl implements CrmContractService {
     }
 
     @Override
-    public void updateContractAuditStatus(BpmResultListenerRespDTO event) {
-        // 判断下状态是否符合预期
-        if (!isEndResult(event.getResult())) {
-            return;
+    public void updateContractAuditStatus(Long id, Integer bpmResult) {
+        // 1.1 校验合同是否存在
+        CrmContractDO contract = validateContractExists(id);
+        // 1.2 只有审批中，可以更新审批结果
+        if (ObjUtil.notEqual(contract.getAuditStatus(), CrmAuditStatusEnum.PROCESS.getStatus())) {
+            log.error("[updateContractAuditStatus][contract({}) 不处于审批中，无法更新审批结果({})]",
+                    contract.getId(), bpmResult);
+            throw exception(CONTRACT_UPDATE_AUDIT_STATUS_FAIL_NOT_PROCESS);
         }
-        convertAuditStatus(event);
-        // 更新合同状态
-        contractMapper.updateById(new CrmContractDO().setId(Long.parseLong(event.getBusinessKey()))
-                .setAuditStatus(event.getResult()));
+
+        // 2. 更新合同审批结果
+        Integer auditStatus = BpmProcessInstanceResultEnum.APPROVE.getResult().equals(bpmResult) ? CrmAuditStatusEnum.APPROVE.getStatus()
+                : BpmProcessInstanceResultEnum.REJECT.getResult().equals(bpmResult) ? CrmAuditStatusEnum.REJECT.getStatus()
+                : BpmProcessInstanceResultEnum.CANCEL.getResult();
+        Assert.notNull(auditStatus, "BPM 审批结果({}) 转换失败", bpmResult);
+        contractMapper.updateById(new CrmContractDO().setId(id).setAuditStatus(auditStatus));
     }
 
     //======================= 查询相关 =======================

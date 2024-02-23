@@ -1,7 +1,6 @@
 package cn.iocoder.yudao.module.crm.service.contract;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.bpm.api.listener.dto.BpmResultListenerRespDTO;
 import cn.iocoder.yudao.module.crm.controller.admin.contract.vo.CrmContractPageReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.contract.vo.CrmContractSaveReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.contract.vo.CrmContractTransferReqVO;
@@ -72,9 +71,10 @@ public interface CrmContractService {
     /**
      * 更新合同流程审批结果
      *
-     * @param event 审批结果
+     * @param id 合同编号
+     * @param bpmResult BPM 审批结果
      */
-    void updateContractAuditStatus(BpmResultListenerRespDTO event);
+    void updateContractAuditStatus(Long id, Integer bpmResult);
 
     /**
      * 获得合同
