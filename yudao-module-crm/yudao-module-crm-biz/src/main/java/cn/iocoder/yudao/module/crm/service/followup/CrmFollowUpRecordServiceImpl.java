@@ -17,14 +17,12 @@ import cn.iocoder.yudao.module.crm.service.contact.CrmContactService;
 import cn.iocoder.yudao.module.crm.service.contract.CrmContractService;
 import cn.iocoder.yudao.module.crm.service.customer.CrmCustomerService;
 import cn.iocoder.yudao.module.crm.service.followup.bo.CrmFollowUpCreateReqBO;
-import cn.iocoder.yudao.module.crm.service.followup.bo.CrmUpdateFollowUpReqBO;
 import cn.iocoder.yudao.module.crm.service.permission.CrmPermissionService;
 import jakarta.annotation.Resource;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
-import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 
@@ -71,9 +69,6 @@ public class CrmFollowUpRecordServiceImpl implements CrmFollowUpRecordService {
         crmFollowUpRecordMapper.insert(record);
 
         // 2. 更新 bizId 对应的记录
-        CrmUpdateFollowUpReqBO updateFollowUpReqBO = new CrmUpdateFollowUpReqBO().setBizId(record.getBizId())
-                .setContactLastTime(LocalDateTime.now())
-                .setContactNextTime(record.getNextTime()).setContactLastContent(record.getContent());
         if (ObjUtil.equal(CrmBizTypeEnum.CRM_BUSINESS.getType(), record.getBizType())) { // 更新商机跟进信息
             businessService.updateBusinessFollowUp(record.getBizId(), record.getNextTime(), record.getContent());
         }
@@ -84,7 +79,7 @@ public class CrmFollowUpRecordServiceImpl implements CrmFollowUpRecordService {
             contactService.updateContactFollowUp(record.getBizId(), record.getNextTime(), record.getContent());
         }
         if (ObjUtil.equal(CrmBizTypeEnum.CRM_CONTRACT.getType(), record.getBizType())) { // 更新合同跟进信息
-            contractService.updateContractFollowUp(updateFollowUpReqBO);
+            contractService.updateContractFollowUp(record.getBizId(), record.getNextTime(), record.getContent());
         }
         if (ObjUtil.equal(CrmBizTypeEnum.CRM_CUSTOMER.getType(), record.getBizType())) { // 更新客户跟进信息
             customerService.updateCustomerFollowUp(record.getBizId(), record.getNextTime(), record.getContent());

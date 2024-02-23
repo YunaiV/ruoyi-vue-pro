@@ -95,7 +95,6 @@ public interface LogRecordConstants {
     String CRM_BUSINESS_FOLLOW_UP_SUCCESS = "商机跟进【{{#businessName}}】";
     String CRM_BUSINESS_UPDATE_STATUS_SUB_TYPE = "更新商机状态";
     String CRM_BUSINESS_UPDATE_STATUS_SUCCESS = "更新了商机【{{#businessName}}】的状态从【{{#oldStatusName}}】变更为了【{{#newStatusName}}】";
-//    String CRM_BUSINESS_UPDATE_STATUS_SUCCESS = "阿巴阿巴";
 
     // ======================= CRM_CONTRACT 合同 =======================
 
@@ -110,6 +109,8 @@ public interface LogRecordConstants {
     String CRM_CONTRACT_TRANSFER_SUCCESS = "将合同【{{#contract.name}}】的负责人从【{getAdminUserById{#contract.ownerUserId}}】变更为了【{getAdminUserById{#reqVO.newOwnerUserId}}】";
     String CRM_CONTRACT_SUBMIT_SUB_TYPE = "提交合同审批";
     String CRM_CONTRACT_SUBMIT_SUCCESS = "提交合同【{{#contractName}}】审批成功";
+    String CRM_CONTRACT_FOLLOW_UP_SUB_TYPE = "合同跟进";
+    String CRM_CONTRACT_FOLLOW_UP_SUCCESS = "合同跟进【{{#contractName}}】";
 
     // ======================= CRM_PRODUCT 产品 =======================
 

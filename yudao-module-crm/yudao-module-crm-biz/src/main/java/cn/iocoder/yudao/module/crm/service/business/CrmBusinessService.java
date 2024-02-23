@@ -11,7 +11,6 @@ import cn.iocoder.yudao.module.crm.dal.dataobject.business.CrmBusinessStatusDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.contact.CrmContactDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerDO;
 import cn.iocoder.yudao.module.crm.enums.business.CrmBusinessEndStatusEnum;
-import cn.iocoder.yudao.module.crm.service.business.bo.CrmBusinessUpdateProductReqBO;
 import jakarta.validation.Valid;
 
 import java.time.LocalDateTime;
@@ -81,19 +80,20 @@ public interface CrmBusinessService {
     void transferBusiness(CrmBusinessTransferReqVO reqVO, Long userId);
 
     /**
-     * 更新商机关联商品
-     *
-     * @param updateProductReqBO 请求
-     */
-    void updateBusinessProduct(CrmBusinessUpdateProductReqBO updateProductReqBO);
-
-    /**
      * 获得商机
      *
      * @param id 编号
      * @return 商机
      */
     CrmBusinessDO getBusiness(Long id);
+
+    /**
+     * 校验商机是否有效
+     *
+     * @param id 编号
+     * @return 商机
+     */
+    CrmBusinessDO validateBusiness(Long id);
 
     /**
      * 获得商机列表

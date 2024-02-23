@@ -50,7 +50,7 @@ public class CrmBusinessProductDO extends BaseDO {
      */
     private BigDecimal productPrice;
     /**
-     * 合同价格, 单位：元
+     * 商机价格, 单位：元
      */
     private BigDecimal businessPrice;
     /**

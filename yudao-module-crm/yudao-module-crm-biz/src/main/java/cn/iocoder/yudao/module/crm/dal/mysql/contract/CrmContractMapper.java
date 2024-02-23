@@ -81,7 +81,7 @@ public interface CrmContractMapper extends BaseMapperX<CrmContractDO> {
     }
 
     default Long selectCountByContactId(Long contactId) {
-        return selectCount(CrmContractDO::getContactId, contactId);
+        return selectCount(CrmContractDO::getSignContactId, contactId);
     }
 
     default Long selectCountByBusinessId(Long businessId) {
