@@ -1,9 +1,8 @@
 package cn.iocoder.yudao.module.crm.service.receivable;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.crm.controller.admin.receivable.vo.plan.CrmReceivablePlanCreateReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.receivable.vo.plan.CrmReceivablePlanPageReqVO;
-import cn.iocoder.yudao.module.crm.controller.admin.receivable.vo.plan.CrmReceivablePlanUpdateReqVO;
+import cn.iocoder.yudao.module.crm.controller.admin.receivable.vo.plan.CrmReceivablePlanSaveReqVO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.receivable.CrmReceivablePlanDO;
 import jakarta.validation.Valid;
@@ -24,14 +23,14 @@ public interface CrmReceivablePlanService {
      * @param createReqVO 创建信息
      * @return 编号
      */
-    Long createReceivablePlan(@Valid CrmReceivablePlanCreateReqVO createReqVO, Long userId);
+    Long createReceivablePlan(@Valid CrmReceivablePlanSaveReqVO createReqVO);
 
     /**
      * 更新回款计划
      *
      * @param updateReqVO 更新信息
      */
-    void updateReceivablePlan(@Valid CrmReceivablePlanUpdateReqVO updateReqVO);
+    void updateReceivablePlan(@Valid CrmReceivablePlanSaveReqVO updateReqVO);
 
     /**
      * 删除回款计划
@@ -84,4 +83,5 @@ public interface CrmReceivablePlanService {
      * @return 提醒数量
      */
     Long getRemindReceivablePlanCount(Long userId);
+
 }
