@@ -66,7 +66,7 @@ public class CrmReceivablePlanServiceImpl implements CrmReceivablePlanService {
             success = CRM_RECEIVABLE_PLAN_CREATE_SUCCESS)
     public Long createReceivablePlan(CrmReceivablePlanSaveReqVO createReqVO) {
         // 1.1 校验关联数据是否存在
-        checkReceivablePlan(createReqVO);
+        validateRelationDataExists(createReqVO);
         // 1.2 查验关联合同回款数量
         Long count = receivableService.getReceivableCountByContractId(createReqVO.getContractId());
         int period = (int) (count + 1);
@@ -92,7 +92,7 @@ public class CrmReceivablePlanServiceImpl implements CrmReceivablePlanService {
     @CrmPermission(bizType = CrmBizTypeEnum.CRM_RECEIVABLE_PLAN, bizId = "#updateReqVO.id", level = CrmPermissionLevelEnum.WRITE)
     public void updateReceivablePlan(CrmReceivablePlanSaveReqVO updateReqVO) {
         // 1. 校验存在
-        checkReceivablePlan(updateReqVO);
+        validateRelationDataExists(updateReqVO);
         CrmReceivablePlanDO oldReceivablePlan = validateReceivablePlanExists(updateReqVO.getId());
         if (Objects.nonNull(oldReceivablePlan.getReceivableId())) { // 如果已经有对应的还款，则不允许编辑；
             throw exception(RECEIVABLE_PLAN_UPDATE_FAIL, "已经有对应的还款");
@@ -107,7 +107,15 @@ public class CrmReceivablePlanServiceImpl implements CrmReceivablePlanService {
         LogRecordContext.putVariable("receivablePlan", oldReceivablePlan);
     }
 
-    private void checkReceivablePlan(CrmReceivablePlanSaveReqVO reqVO) {
+    @Override
+    public void updateReceivableId(Long id, Long receivableId) {
+        // 校验存在
+        validateReceivablePlanExists(id);
+        // 更新回款计划
+        receivablePlanMapper.updateById(new CrmReceivablePlanDO().setReceivableId(receivableId).setFinishStatus(true));
+    }
+
+    private void validateRelationDataExists(CrmReceivablePlanSaveReqVO reqVO) {
         adminUserApi.validateUser(reqVO.getOwnerUserId()); // 校验负责人存在
         CrmContractDO contract = contractService.getContract(reqVO.getContractId());
         if (ObjectUtil.isNull(contract)) { // 合同不存在

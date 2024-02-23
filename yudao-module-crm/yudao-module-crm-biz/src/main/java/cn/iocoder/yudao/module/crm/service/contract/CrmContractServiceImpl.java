@@ -11,7 +11,6 @@ import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
 import cn.iocoder.yudao.module.bpm.api.listener.dto.BpmResultListenerRespDTO;
 import cn.iocoder.yudao.module.bpm.api.task.BpmProcessInstanceApi;
 import cn.iocoder.yudao.module.bpm.api.task.dto.BpmProcessInstanceCreateReqDTO;
-import cn.iocoder.yudao.module.bpm.enums.task.BpmProcessInstanceResultEnum;
 import cn.iocoder.yudao.module.crm.controller.admin.contract.vo.CrmContractPageReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.contract.vo.CrmContractSaveReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.contract.vo.CrmContractTransferReqVO;
@@ -50,6 +49,7 @@ import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionU
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
 import static cn.iocoder.yudao.module.crm.enums.ErrorCodeConstants.*;
 import static cn.iocoder.yudao.module.crm.enums.LogRecordConstants.*;
+import static cn.iocoder.yudao.module.crm.util.CrmAuditStatusUtils.convertAuditStatus;
 import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.USER_NOT_EXISTS;
 
 /**
@@ -284,34 +284,10 @@ public class CrmContractServiceImpl implements CrmContractService {
 
     @Override
     public void updateContractAuditStatus(BpmResultListenerRespDTO event) {
-        // 判断下状态是否符合预期
-        if (!isEndResult(event.getResult())) {
-            return;
-        }
-        // 状态转换
-        if (ObjUtil.equal(event.getResult(), BpmProcessInstanceResultEnum.APPROVE.getResult())) {
-            event.setResult(CrmAuditStatusEnum.APPROVE.getStatus());
-        }
-        if (ObjUtil.equal(event.getResult(), BpmProcessInstanceResultEnum.REJECT.getResult())) {
-            event.setResult(CrmAuditStatusEnum.REJECT.getStatus());
-        }
-        if (ObjUtil.equal(event.getResult(), BpmProcessInstanceResultEnum.CANCEL.getResult())) {
-            event.setResult(CrmAuditStatusEnum.CANCEL.getStatus());
-        }
+        convertAuditStatus(event);
         // 更新合同状态
         contractMapper.updateById(new CrmContractDO().setId(Long.parseLong(event.getBusinessKey()))
                 .setAuditStatus(event.getResult()));
-    }
-
-    /**
-     * 判断该结果是否处于 End 最终结果
-     *
-     * @param result 结果
-     * @return 是否
-     */
-    public static boolean isEndResult(Integer result) {
-        return ObjectUtils.equalsAny(result, BpmProcessInstanceResultEnum.APPROVE.getResult(),
-                BpmProcessInstanceResultEnum.REJECT.getResult(), BpmProcessInstanceResultEnum.CANCEL.getResult());
     }
 
     //======================= 查询相关 =======================

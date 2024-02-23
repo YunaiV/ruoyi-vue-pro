@@ -1,9 +1,9 @@
 package cn.iocoder.yudao.module.crm.service.receivable;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.crm.controller.admin.receivable.vo.receivable.CrmReceivableCreateReqVO;
+import cn.iocoder.yudao.module.bpm.api.listener.dto.BpmResultListenerRespDTO;
 import cn.iocoder.yudao.module.crm.controller.admin.receivable.vo.receivable.CrmReceivablePageReqVO;
-import cn.iocoder.yudao.module.crm.controller.admin.receivable.vo.receivable.CrmReceivableUpdateReqVO;
+import cn.iocoder.yudao.module.crm.controller.admin.receivable.vo.receivable.CrmReceivableSaveReqVO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.receivable.CrmReceivableDO;
 import jakarta.validation.Valid;
@@ -22,17 +22,23 @@ public interface CrmReceivableService {
      * 创建回款
      *
      * @param createReqVO 创建信息
-     * @param userId      用户编号
      * @return 编号
      */
-    Long createReceivable(@Valid CrmReceivableCreateReqVO createReqVO, Long userId);
+    Long createReceivable(@Valid CrmReceivableSaveReqVO createReqVO);
 
     /**
      * 更新回款
      *
      * @param updateReqVO 更新信息
      */
-    void updateReceivable(@Valid CrmReceivableUpdateReqVO updateReqVO);
+    void updateReceivable(@Valid CrmReceivableSaveReqVO updateReqVO);
+
+    /**
+     * 更新回款流程审批结果
+     *
+     * @param event 审批结果
+     */
+    void updateReceivableAuditStatus(BpmResultListenerRespDTO event);
 
     /**
      * 删除回款
@@ -40,6 +46,14 @@ public interface CrmReceivableService {
      * @param id 编号
      */
     void deleteReceivable(Long id);
+
+    /**
+     * 发起回款审批流程
+     *
+     * @param id     回款编号
+     * @param userId 用户编号
+     */
+    void submitReceivable(Long id, Long userId);
 
     /**
      * 获得回款

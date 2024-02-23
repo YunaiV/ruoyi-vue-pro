@@ -2,14 +2,17 @@ package cn.iocoder.yudao.module.crm.service.receivable;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.ListUtil;
+import cn.hutool.core.lang.Assert;
+import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.ObjectUtil;
-import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
-import cn.iocoder.yudao.module.crm.controller.admin.receivable.vo.receivable.CrmReceivableCreateReqVO;
+import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
+import cn.iocoder.yudao.module.bpm.api.listener.dto.BpmResultListenerRespDTO;
+import cn.iocoder.yudao.module.bpm.api.task.BpmProcessInstanceApi;
+import cn.iocoder.yudao.module.bpm.api.task.dto.BpmProcessInstanceCreateReqDTO;
 import cn.iocoder.yudao.module.crm.controller.admin.receivable.vo.receivable.CrmReceivablePageReqVO;
-import cn.iocoder.yudao.module.crm.controller.admin.receivable.vo.receivable.CrmReceivableUpdateReqVO;
-import cn.iocoder.yudao.module.crm.convert.receivable.CrmReceivableConvert;
+import cn.iocoder.yudao.module.crm.controller.admin.receivable.vo.receivable.CrmReceivableSaveReqVO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.contract.CrmContractDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.receivable.CrmReceivableDO;
@@ -23,19 +26,23 @@ import cn.iocoder.yudao.module.crm.service.contract.CrmContractService;
 import cn.iocoder.yudao.module.crm.service.customer.CrmCustomerService;
 import cn.iocoder.yudao.module.crm.service.permission.CrmPermissionService;
 import cn.iocoder.yudao.module.crm.service.permission.bo.CrmPermissionCreateReqBO;
+import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import com.mzt.logapi.context.LogRecordContext;
 import com.mzt.logapi.service.impl.DiffParseFunction;
 import com.mzt.logapi.starter.annotation.LogRecord;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.crm.enums.ErrorCodeConstants.*;
 import static cn.iocoder.yudao.module.crm.enums.LogRecordConstants.*;
+import static cn.iocoder.yudao.module.crm.util.CrmAuditStatusUtils.convertAuditStatus;
 
 /**
  * CRM 回款 Service 实现类
@@ -45,6 +52,11 @@ import static cn.iocoder.yudao.module.crm.enums.LogRecordConstants.*;
 @Service
 @Validated
 public class CrmReceivableServiceImpl implements CrmReceivableService {
+
+    /**
+     * BPM 回款审批流程标识
+     */
+    public static final String RECEIVABLE_APPROVE = "receivable-approve";
 
     @Resource
     private CrmReceivableMapper receivableMapper;
@@ -57,51 +69,47 @@ public class CrmReceivableServiceImpl implements CrmReceivableService {
     private CrmReceivablePlanService receivablePlanService;
     @Resource
     private CrmPermissionService permissionService;
+    @Resource
+    private AdminUserApi adminUserApi;
+    @Resource
+    private BpmProcessInstanceApi bpmProcessInstanceApi;
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     @LogRecord(type = CRM_RECEIVABLE_TYPE, subType = CRM_RECEIVABLE_CREATE_SUB_TYPE, bizNo = "{{#receivable.id}}",
             success = CRM_RECEIVABLE_CREATE_SUCCESS)
-    public Long createReceivable(CrmReceivableCreateReqVO createReqVO, Long userId) {
-        // 插入还款
-        CrmReceivableDO receivable = CrmReceivableConvert.INSTANCE.convert(createReqVO);
-        if (ObjectUtil.isNull(receivable.getAuditStatus())) {
-            receivable.setAuditStatus(CommonStatusEnum.ENABLE.getStatus());
-        }
-        receivable.setAuditStatus(CrmAuditStatusEnum.DRAFT.getStatus());
-
-        // TODO @liuhongfeng：一般来说，逻辑的写法，是要先检查，后操作 db；所以，你这个 check 应该放到  CrmReceivableDO receivable 之前；
-        checkReceivable(receivable);
-
+    public Long createReceivable(CrmReceivableSaveReqVO createReqVO) {
+        // 1. 校验关联数据存在
+        validateRelationDataExists(createReqVO);
+        // 2. 插入还款
+        CrmReceivableDO receivable = BeanUtils.toBean(createReqVO, CrmReceivableDO.class).setAuditStatus(CrmAuditStatusEnum.DRAFT.getStatus());
         receivableMapper.insert(receivable);
         // 3. 创建数据权限
         permissionService.createPermission(new CrmPermissionCreateReqBO().setBizType(CrmBizTypeEnum.CRM_RECEIVABLE.getType())
-                .setBizId(receivable.getId()).setUserId(userId).setLevel(CrmPermissionLevelEnum.OWNER.getLevel())); // 设置当前操作的人为负责人
-        // TODO @liuhongfeng：需要更新关联的 plan
-
-        // 4. 记录操作日志上下文
+                .setBizId(receivable.getId()).setUserId(createReqVO.getOwnerUserId()).setLevel(CrmPermissionLevelEnum.OWNER.getLevel())); // 设置当前操作的人为负责人
+        // 4. 更新关联的回款计划
+        if (Objects.nonNull(createReqVO.getPlanId())) {
+            receivablePlanService.updateReceivableId(receivable.getPlanId(), receivable.getId());
+        }
+        // 5. 记录操作日志上下文
         LogRecordContext.putVariable("receivable", receivable);
         return receivable.getId();
     }
 
-    // TODO @liuhongfeng：这里的括号要注意排版；
-    private void checkReceivable(CrmReceivableDO receivable) {
-        // TODO @liuhongfeng：校验 no 的唯一性
-        // TODO @liuhongfeng：这个放在参数校验合适
-        if (ObjectUtil.isNull(receivable.getContractId())) {
-            throw exception(CONTRACT_NOT_EXISTS);
-        }
-
-        CrmContractDO contract = contractService.getContract(receivable.getContractId());
+    private void validateRelationDataExists(CrmReceivableSaveReqVO reqVO) {
+        adminUserApi.validateUser(reqVO.getOwnerUserId()); // 校验负责人存在
+        CrmContractDO contract = contractService.getContract(reqVO.getContractId());
         if (ObjectUtil.isNull(contract)) {
             throw exception(CONTRACT_NOT_EXISTS);
         }
-
-        CrmCustomerDO customer = customerService.getCustomer(receivable.getCustomerId());
+        CrmCustomerDO customer = customerService.getCustomer(reqVO.getCustomerId());
         if (ObjectUtil.isNull(customer)) {
             throw exception(CUSTOMER_NOT_EXISTS);
         }
-
-        CrmReceivablePlanDO receivablePlan = receivablePlanService.getReceivablePlan(receivable.getPlanId());
+        if (Objects.isNull(reqVO.getPlanId())) { // 没有回款计划编号则不校验
+            return;
+        }
+        CrmReceivablePlanDO receivablePlan = receivablePlanService.getReceivablePlan(reqVO.getPlanId());
         if (ObjectUtil.isNull(receivablePlan)) {
             throw exception(RECEIVABLE_PLAN_NOT_EXISTS);
         }
@@ -109,44 +117,82 @@ public class CrmReceivableServiceImpl implements CrmReceivableService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     @LogRecord(type = CRM_RECEIVABLE_TYPE, subType = CRM_RECEIVABLE_UPDATE_SUB_TYPE, bizNo = "{{#updateReqVO.id}}",
             success = CRM_RECEIVABLE_UPDATE_SUCCESS)
     @CrmPermission(bizType = CrmBizTypeEnum.CRM_RECEIVABLE, bizId = "#updateReqVO.id", level = CrmPermissionLevelEnum.WRITE)
-    public void updateReceivable(CrmReceivableUpdateReqVO updateReqVO) {
-        // 校验存在
-        CrmReceivableDO oldReceivable = validateReceivableExists(updateReqVO.getId());
-        // TODO @liuhongfeng：只有在草稿、审核中，可以提交修改
+    public void updateReceivable(CrmReceivableSaveReqVO updateReqVO) {
+        Assert.notNull(updateReqVO.getId(), "回款编号不能为空");
+        // 1.1 校验存在
+        CrmReceivableDO receivable = validateReceivableExists(updateReqVO.getId());
+        // 1.2 只有草稿、审批中，可以编辑；
+        if (!ObjectUtils.equalsAny(receivable.getAuditStatus(), CrmAuditStatusEnum.DRAFT.getStatus(),
+                CrmAuditStatusEnum.PROCESS.getStatus())) {
+            throw exception(RECEIVABLE_UPDATE_FAIL_EDITING_PROHIBITED);
+        }
 
-        // 更新还款
-        CrmReceivableDO updateObj = CrmReceivableConvert.INSTANCE.convert(updateReqVO);
+        // 2. 更新还款
+        CrmReceivableDO updateObj = BeanUtils.toBean(updateReqVO, CrmReceivableDO.class);
         receivableMapper.updateById(updateObj);
 
-        // TODO @liuhongfeng：需要更新关联的 plan
         // 3. 记录操作日志上下文
-        LogRecordContext.putVariable(DiffParseFunction.OLD_OBJECT, BeanUtils.toBean(oldReceivable, CrmReceivableUpdateReqVO.class));
-        LogRecordContext.putVariable("receivable", oldReceivable);
+        LogRecordContext.putVariable(DiffParseFunction.OLD_OBJECT, BeanUtils.toBean(receivable, CrmReceivableSaveReqVO.class));
+        LogRecordContext.putVariable("receivable", receivable);
     }
 
-    // TODO @liuhongfeng：缺一个取消合同的接口；只有草稿、审批中可以取消；CrmAuditStatusEnum
+    @Override
+    public void updateReceivableAuditStatus(BpmResultListenerRespDTO event) {
+        convertAuditStatus(event);
+        // 更新回款审批状态
+        receivableMapper.updateById(new CrmReceivableDO().setId(Long.parseLong(event.getBusinessKey()))
+                .setAuditStatus(event.getResult()));
+    }
 
-    // TODO @liuhongfeng：缺一个发起审批的接口；只有草稿可以发起审批；CrmAuditStatusEnum
+    // TODO @liuhongfeng：缺一个取消回款的接口；只有草稿、审批中可以取消；CrmAuditStatusEnum
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     @LogRecord(type = CRM_RECEIVABLE_TYPE, subType = CRM_RECEIVABLE_DELETE_SUB_TYPE, bizNo = "{{#id}}",
             success = CRM_RECEIVABLE_DELETE_SUCCESS)
     @CrmPermission(bizType = CrmBizTypeEnum.CRM_RECEIVABLE, bizId = "#id", level = CrmPermissionLevelEnum.OWNER)
     public void deleteReceivable(Long id) {
-        // TODO @liuhongfeng：如果被 CrmReceivablePlanDO 所使用，则不允许删除
         // 校验存在
         CrmReceivableDO receivable = validateReceivableExists(id);
+        // 如果被 CrmReceivablePlanDO 所使用，则不允许删除
+        if (Objects.nonNull(receivable.getPlanId()) && receivablePlanService.getReceivablePlan(receivable.getPlanId()) != null) {
+            throw exception(RECEIVABLE_DELETE_FAIL);
+        }
         // 删除
         receivableMapper.deleteById(id);
 
         // 删除数据权限
-        permissionService.deletePermission(CrmBizTypeEnum.CRM_CUSTOMER.getType(), id);
+        permissionService.deletePermission(CrmBizTypeEnum.CRM_RECEIVABLE.getType(), id);
 
         // 记录操作日志上下文
         LogRecordContext.putVariable("receivable", receivable);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    @LogRecord(type = CRM_RECEIVABLE_TYPE, subType = CRM_RECEIVABLE_SUBMIT_SUB_TYPE, bizNo = "{{#id}}",
+            success = CRM_RECEIVABLE_SUBMIT_SUCCESS)
+    public void submitReceivable(Long id, Long userId) {
+        // 1. 校验回款是否在审批
+        CrmReceivableDO receivable = validateReceivableExists(id);
+        if (ObjUtil.notEqual(receivable.getAuditStatus(), CrmAuditStatusEnum.DRAFT.getStatus())) {
+            throw exception(RECEIVABLE_SUBMIT_FAIL_NOT_DRAFT);
+        }
+
+        // 2. 创建回款审批流程实例
+        String processInstanceId = bpmProcessInstanceApi.createProcessInstance(userId, new BpmProcessInstanceCreateReqDTO()
+                .setProcessDefinitionKey(RECEIVABLE_APPROVE).setBusinessKey(String.valueOf(id)));
+
+        // 3. 更新回款工作流编号
+        receivableMapper.updateById(new CrmReceivableDO().setId(id).setProcessInstanceId(processInstanceId)
+                .setAuditStatus(CrmAuditStatusEnum.PROCESS.getStatus()));
+
+        // 4. 记录日志
+        LogRecordContext.putVariable("receivableNo", receivable.getNo());
     }
 
     private CrmReceivableDO validateReceivableExists(Long id) {

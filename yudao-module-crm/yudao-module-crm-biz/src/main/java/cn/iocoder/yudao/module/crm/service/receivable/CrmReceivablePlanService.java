@@ -33,6 +33,14 @@ public interface CrmReceivablePlanService {
     void updateReceivablePlan(@Valid CrmReceivablePlanSaveReqVO updateReqVO);
 
     /**
+     * 更新回款计划关联的回款编号
+     *
+     * @param id           编号
+     * @param receivableId 回款编号
+     */
+    void updateReceivableId(Long id, Long receivableId);
+
+    /**
      * 删除回款计划
      *
      * @param id 编号

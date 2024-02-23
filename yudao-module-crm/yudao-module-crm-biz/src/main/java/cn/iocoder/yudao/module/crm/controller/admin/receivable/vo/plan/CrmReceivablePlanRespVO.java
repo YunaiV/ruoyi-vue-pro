@@ -3,40 +3,41 @@ package cn.iocoder.yudao.module.crm.controller.admin.receivable.vo.plan;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Schema(description = "管理后台 - CRM 回款计划 Response VO")
 @Data
 public class CrmReceivablePlanRespVO {
 
-    @Schema(description = "ID", requiredMode = Schema.RequiredMode.REQUIRED, example = "25153")
+    @Schema(description = "编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "2")
     private Long id;
 
-    @Schema(description = "期数", example = "1")
-    private Integer period;
-
-    @Schema(description = "回款计划编号", example = "19852")
+    @Schema(description = "回款编号", example = "19852")
     private Long receivableId;
 
-    @Schema(description = "计划回款金额", example = "29675")
-    private Integer price;
+    @Schema(description = "期数", requiredMode = Schema.RequiredMode.REQUIRED, example = "2")
+    private Integer period;
 
-    @Schema(description = "计划回款日期")
+    @Schema(description = "计划回款金额", requiredMode = Schema.RequiredMode.REQUIRED, example = "9000")
+    private BigDecimal price;
+
+    @Schema(description = "计划回款日期", requiredMode = Schema.RequiredMode.REQUIRED, example = "2024-02-02")
     private LocalDateTime returnTime;
 
-    @Schema(description = "提前几天提醒")
+    @Schema(description = "提前几天提醒", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     private Integer remindDays;
 
-    @Schema(description = "提醒日期")
+    @Schema(description = "提醒日期", requiredMode = Schema.RequiredMode.REQUIRED, example = "2024-02-02")
     private LocalDateTime remindTime;
 
-    @Schema(description = "客户名称", example = "18026")
+    @Schema(description = "客户编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "2")
     private Long customerId;
 
-    @Schema(description = "合同编号", example = "3473")
+    @Schema(description = "合同编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "2")
     private Long contractId;
 
-    @Schema(description = "负责人编号", example = "17828")
+    @Schema(description = "负责人编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "2")
     private Long ownerUserId;
 
     @Schema(description = "显示顺序")
