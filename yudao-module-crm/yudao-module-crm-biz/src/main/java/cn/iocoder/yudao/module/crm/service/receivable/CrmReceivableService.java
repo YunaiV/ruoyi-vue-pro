@@ -1,7 +1,6 @@
 package cn.iocoder.yudao.module.crm.service.receivable;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.bpm.api.listener.dto.BpmResultListenerRespDTO;
 import cn.iocoder.yudao.module.crm.controller.admin.receivable.vo.receivable.CrmReceivablePageReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.receivable.vo.receivable.CrmReceivableSaveReqVO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerDO;
@@ -36,9 +35,10 @@ public interface CrmReceivableService {
     /**
      * 更新回款流程审批结果
      *
-     * @param event 审批结果
+     * @param id        回款编号
+     * @param bpmResult BPM 审批结果
      */
-    void updateReceivableAuditStatus(BpmResultListenerRespDTO event);
+    void updateReceivableAuditStatus(Long id, Integer bpmResult);
 
     /**
      * 删除回款

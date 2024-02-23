@@ -1,13 +1,11 @@
 package cn.iocoder.yudao.module.crm.service.receivable.listener;
 
-import cn.iocoder.yudao.module.bpm.api.listener.BpmResultListenerApi;
-import cn.iocoder.yudao.module.bpm.api.listener.dto.BpmResultListenerRespDTO;
+import cn.iocoder.yudao.module.bpm.event.BpmProcessInstanceResultEvent;
+import cn.iocoder.yudao.module.bpm.event.BpmProcessInstanceResultEventListener;
 import cn.iocoder.yudao.module.crm.service.receivable.CrmReceivableService;
 import cn.iocoder.yudao.module.crm.service.receivable.CrmReceivableServiceImpl;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Component;
-
-// TODO @芋艿：后续改成支持 RPC
 
 /**
  * 回款审批的结果的监听器实现类
@@ -15,7 +13,7 @@ import org.springframework.stereotype.Component;
  * @author HUIHUI
  */
 @Component
-public class CrmReceivableResultListener implements BpmResultListenerApi {
+public class CrmReceivableResultListener extends BpmProcessInstanceResultEventListener {
 
     @Resource
     private CrmReceivableService receivableService;
@@ -26,8 +24,8 @@ public class CrmReceivableResultListener implements BpmResultListenerApi {
     }
 
     @Override
-    public void onEvent(BpmResultListenerRespDTO event) {
-        receivableService.updateReceivableAuditStatus(event);
+    public void onEvent(BpmProcessInstanceResultEvent event) {
+        receivableService.updateReceivableAuditStatus(Long.parseLong(event.getBusinessKey()), event.getResult());
     }
 
 }

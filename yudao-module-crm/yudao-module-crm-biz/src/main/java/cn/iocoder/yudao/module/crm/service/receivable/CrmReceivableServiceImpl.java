@@ -8,7 +8,6 @@ import cn.hutool.core.util.ObjectUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
-import cn.iocoder.yudao.module.bpm.api.listener.dto.BpmResultListenerRespDTO;
 import cn.iocoder.yudao.module.bpm.api.task.BpmProcessInstanceApi;
 import cn.iocoder.yudao.module.bpm.api.task.dto.BpmProcessInstanceCreateReqDTO;
 import cn.iocoder.yudao.module.crm.controller.admin.receivable.vo.receivable.CrmReceivablePageReqVO;
@@ -31,6 +30,7 @@ import com.mzt.logapi.context.LogRecordContext;
 import com.mzt.logapi.service.impl.DiffParseFunction;
 import com.mzt.logapi.starter.annotation.LogRecord;
 import jakarta.annotation.Resource;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
@@ -42,8 +42,7 @@ import java.util.Objects;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.crm.enums.ErrorCodeConstants.*;
 import static cn.iocoder.yudao.module.crm.enums.LogRecordConstants.*;
-import static cn.iocoder.yudao.module.crm.util.CrmAuditStatusUtils.convertAuditStatus;
-import static cn.iocoder.yudao.module.crm.util.CrmAuditStatusUtils.isEndResult;
+import static cn.iocoder.yudao.module.crm.util.CrmAuditStatusUtils.convertBpmResultToAuditStatus;
 
 /**
  * CRM 回款 Service 实现类
@@ -52,6 +51,7 @@ import static cn.iocoder.yudao.module.crm.util.CrmAuditStatusUtils.isEndResult;
  */
 @Service
 @Validated
+@Slf4j
 public class CrmReceivableServiceImpl implements CrmReceivableService {
 
     /**
@@ -142,15 +142,19 @@ public class CrmReceivableServiceImpl implements CrmReceivableService {
     }
 
     @Override
-    public void updateReceivableAuditStatus(BpmResultListenerRespDTO event) {
-        // 判断下状态是否符合预期
-        if (!isEndResult(event.getResult())) {
-            return;
+    public void updateReceivableAuditStatus(Long id, Integer bpmResult) {
+        // 1.1 校验存在
+        CrmReceivableDO receivable = validateReceivableExists(id);
+        // 1.2 只有审批中，可以更新审批结果
+        if (ObjUtil.notEqual(receivable.getAuditStatus(), CrmAuditStatusEnum.PROCESS.getStatus())) {
+            log.error("[updateReceivableAuditStatus][receivable({}) 不处于审批中，无法更新审批结果({})]",
+                    receivable.getId(), bpmResult);
+            throw exception(RECEIVABLE_UPDATE_AUDIT_STATUS_FAIL_NOT_PROCESS);
         }
-        convertAuditStatus(event);
-        // 更新回款审批状态
-        receivableMapper.updateById(new CrmReceivableDO().setId(Long.parseLong(event.getBusinessKey()))
-                .setAuditStatus(event.getResult()));
+
+        // 2. 更新回款审批状态
+        Integer auditStatus = convertBpmResultToAuditStatus(bpmResult);
+        receivableMapper.updateById(new CrmReceivableDO().setId(id).setAuditStatus(auditStatus));
     }
 
     // TODO @liuhongfeng：缺一个取消回款的接口；只有草稿、审批中可以取消；CrmAuditStatusEnum
