@@ -8,9 +8,9 @@ import cn.iocoder.yudao.module.crm.controller.admin.contract.vo.CrmContractTrans
 import cn.iocoder.yudao.module.crm.dal.dataobject.contract.CrmContractDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.contract.CrmContractProductDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerDO;
-import cn.iocoder.yudao.module.crm.service.followup.bo.CrmUpdateFollowUpReqBO;
 import jakarta.validation.Valid;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 
@@ -55,9 +55,11 @@ public interface CrmContractService {
     /**
      * 更新合同相关的更进信息
      *
-     * @param contractUpdateFollowUpReqBO 信息
+     * @param id               合同编号
+     * @param contactNextTime  下次联系时间
+     * @param contactLastContent 最后联系内容
      */
-    void updateContractFollowUp(CrmUpdateFollowUpReqBO contractUpdateFollowUpReqBO);
+    void updateContractFollowUp(Long id, LocalDateTime contactNextTime, String contactLastContent);
 
     /**
      * 发起合同审批流程
