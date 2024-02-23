@@ -4,6 +4,7 @@ import cn.hutool.core.io.resource.ResourceUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.text.csv.CsvRow;
 import cn.hutool.core.text.csv.CsvUtil;
+import cn.hutool.core.util.ObjUtil;
 import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
 import cn.iocoder.yudao.framework.ip.core.Area;
 import cn.iocoder.yudao.framework.ip.core.enums.AreaTypeEnum;
@@ -17,6 +18,7 @@ import java.util.Map;
 import java.util.function.Function;
 
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.findFirst;
 
 /**
  * 区域工具类
@@ -75,6 +77,58 @@ public class AreaUtils {
     }
 
     /**
+     * 获得指定区域对应的编号
+     *
+     * @param path 区域编号
+     * @return 编号
+     */
+    public static Area getArea(String path) {
+        String[] paths = path.split("/");
+        Area area = null;
+        for (int i = 0; i < paths.length; i++) {
+            final int finalI = i;
+            if (area == null) {
+                area = findFirst(convertList(areas.values(), a -> a), item -> ObjUtil.equal(paths[finalI], item.getName()));
+                continue;
+            }
+            area = findFirst(area.getChildren(), item -> ObjUtil.equal(paths[finalI], item.getName()));
+        }
+        return area;
+    }
+
+    /**
+     * 获取所有节点的全路径名称如：河南省/石家庄市/新华区
+     *
+     * @param areas 地区树
+     * @return 所有节点的全路径名称
+     */
+    public static List<String> getAllAreaNodePaths(List<Area> areas) {
+        List<String> paths = new ArrayList<>();
+        areas.forEach(area -> traverse(area, "", paths));
+        return paths;
+    }
+
+    /**
+     * 构建一棵树的所有节点的全路径名称，并将其存储为 "祖先/父级/子级" 的形式
+     *
+     * @param node  父节点
+     * @param path  全路径名称
+     * @param paths 全路径名称列表
+     */
+    private static void traverse(Area node, String path, List<String> paths) {
+        if (node == null) {
+            return;
+        }
+        // 构建当前节点的路径
+        String currentPath = path.isEmpty() ? node.getName() : path + "/" + node.getName();
+        paths.add(currentPath);
+        // 递归遍历子节点
+        for (Area child : node.getChildren()) {
+            traverse(child, currentPath, paths);
+        }
+    }
+
+    /**
      * 格式化区域
      *
      * @param id 区域编号
@@ -88,13 +142,13 @@ public class AreaUtils {
      * 格式化区域
      *
      * 例如说：
-     *      1. id = “静安区”时：上海 上海市 静安区
-     *      2. id = “上海市”时：上海 上海市
-     *      3. id = “上海”时：上海
-     *      4. id = “美国”时：美国
+     * 1. id = “静安区”时：上海 上海市 静安区
+     * 2. id = “上海市”时：上海 上海市
+     * 3. id = “上海”时：上海
+     * 4. id = “美国”时：美国
      * 当区域在中国时，默认不显示中国
      *
-     * @param id 区域编号
+     * @param id        区域编号
      * @param separator 分隔符
      * @return 格式化后的区域
      */

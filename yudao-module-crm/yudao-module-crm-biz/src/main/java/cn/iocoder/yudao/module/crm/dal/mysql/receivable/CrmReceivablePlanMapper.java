@@ -10,7 +10,6 @@ import cn.iocoder.yudao.module.crm.dal.dataobject.receivable.CrmReceivablePlanDO
 import cn.iocoder.yudao.module.crm.enums.common.CrmBizTypeEnum;
 import cn.iocoder.yudao.module.crm.enums.common.CrmSceneTypeEnum;
 import cn.iocoder.yudao.module.crm.util.CrmQueryWrapperUtils;
-import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.time.LocalDateTime;
@@ -24,12 +23,6 @@ import java.util.List;
  */
 @Mapper
 public interface CrmReceivablePlanMapper extends BaseMapperX<CrmReceivablePlanDO> {
-
-    default int updateOwnerUserIdById(Long id, Long ownerUserId) {
-        return update(new LambdaUpdateWrapper<CrmReceivablePlanDO>()
-                .eq(CrmReceivablePlanDO::getId, id)
-                .set(CrmReceivablePlanDO::getOwnerUserId, ownerUserId));
-    }
 
     default PageResult<CrmReceivablePlanDO> selectPageByCustomerId(CrmReceivablePlanPageReqVO reqVO) {
         return selectPage(reqVO, new LambdaQueryWrapperX<CrmReceivablePlanDO>()

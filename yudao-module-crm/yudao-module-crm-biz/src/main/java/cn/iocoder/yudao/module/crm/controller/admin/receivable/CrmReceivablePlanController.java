@@ -5,12 +5,12 @@ import cn.hutool.core.lang.Assert;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.number.NumberUtils;
+import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
-import cn.iocoder.yudao.module.crm.controller.admin.receivable.vo.plan.CrmReceivablePlanCreateReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.receivable.vo.plan.CrmReceivablePlanPageReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.receivable.vo.plan.CrmReceivablePlanRespVO;
-import cn.iocoder.yudao.module.crm.controller.admin.receivable.vo.plan.CrmReceivablePlanUpdateReqVO;
+import cn.iocoder.yudao.module.crm.controller.admin.receivable.vo.plan.CrmReceivablePlanSaveReqVO;
 import cn.iocoder.yudao.module.crm.convert.receivable.CrmReceivablePlanConvert;
 import cn.iocoder.yudao.module.crm.dal.dataobject.contract.CrmContractDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerDO;
@@ -67,14 +67,14 @@ public class CrmReceivablePlanController {
     @PostMapping("/create")
     @Operation(summary = "创建回款计划")
     @PreAuthorize("@ss.hasPermission('crm:receivable-plan:create')")
-    public CommonResult<Long> createReceivablePlan(@Valid @RequestBody CrmReceivablePlanCreateReqVO createReqVO) {
-        return success(receivablePlanService.createReceivablePlan(createReqVO, getLoginUserId()));
+    public CommonResult<Long> createReceivablePlan(@Valid @RequestBody CrmReceivablePlanSaveReqVO createReqVO) {
+        return success(receivablePlanService.createReceivablePlan(createReqVO));
     }
 
     @PutMapping("/update")
     @Operation(summary = "更新回款计划")
     @PreAuthorize("@ss.hasPermission('crm:receivable-plan:update')")
-    public CommonResult<Boolean> updateReceivablePlan(@Valid @RequestBody CrmReceivablePlanUpdateReqVO updateReqVO) {
+    public CommonResult<Boolean> updateReceivablePlan(@Valid @RequestBody CrmReceivablePlanSaveReqVO updateReqVO) {
         receivablePlanService.updateReceivablePlan(updateReqVO);
         return success(true);
     }
@@ -94,7 +94,7 @@ public class CrmReceivablePlanController {
     @PreAuthorize("@ss.hasPermission('crm:receivable-plan:query')")
     public CommonResult<CrmReceivablePlanRespVO> getReceivablePlan(@RequestParam("id") Long id) {
         CrmReceivablePlanDO receivablePlan = receivablePlanService.getReceivablePlan(id);
-        return success(CrmReceivablePlanConvert.INSTANCE.convert(receivablePlan));
+        return success(BeanUtils.toBean(receivablePlan, CrmReceivablePlanRespVO.class));
     }
 
     @GetMapping("/page")

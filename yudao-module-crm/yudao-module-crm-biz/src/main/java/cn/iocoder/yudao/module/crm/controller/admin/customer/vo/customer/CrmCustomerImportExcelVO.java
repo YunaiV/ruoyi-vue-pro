@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.crm.controller.admin.customer.vo.customer;
 
 import cn.iocoder.yudao.framework.excel.core.annotations.DictFormat;
+import cn.iocoder.yudao.framework.excel.core.convert.AreaConvert;
 import cn.iocoder.yudao.framework.excel.core.convert.DictConvert;
 import com.alibaba.excel.annotation.ExcelProperty;
 import lombok.AllArgsConstructor;
@@ -39,14 +40,12 @@ public class CrmCustomerImportExcelVO {
     @ExcelProperty("邮箱")
     private String email;
 
-    // TODO @puhui999：需要选择省市区，需要研究下，怎么搞合理点；
-    @ExcelProperty("地区编号")
+    @ExcelProperty(value = "地区", converter = AreaConvert.class)
     private Integer areaId;
 
     @ExcelProperty("详细地址")
     private String detailAddress;
 
-    // TODO @puhui999：industryId、level、source 字段，可以研究下怎么搞下拉框
     @ExcelProperty(value = "所属行业", converter = DictConvert.class)
     @DictFormat(CRM_CUSTOMER_INDUSTRY)
     private Integer industryId;

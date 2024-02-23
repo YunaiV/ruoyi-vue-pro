@@ -5,12 +5,12 @@ import cn.hutool.core.lang.Assert;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.number.NumberUtils;
+import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
-import cn.iocoder.yudao.module.crm.controller.admin.receivable.vo.receivable.CrmReceivableCreateReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.receivable.vo.receivable.CrmReceivablePageReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.receivable.vo.receivable.CrmReceivableRespVO;
-import cn.iocoder.yudao.module.crm.controller.admin.receivable.vo.receivable.CrmReceivableUpdateReqVO;
+import cn.iocoder.yudao.module.crm.controller.admin.receivable.vo.receivable.CrmReceivableSaveReqVO;
 import cn.iocoder.yudao.module.crm.convert.receivable.CrmReceivableConvert;
 import cn.iocoder.yudao.module.crm.dal.dataobject.contract.CrmContractDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerDO;
@@ -61,14 +61,14 @@ public class CrmReceivableController {
     @PostMapping("/create")
     @Operation(summary = "创建回款")
     @PreAuthorize("@ss.hasPermission('crm:receivable:create')")
-    public CommonResult<Long> createReceivable(@Valid @RequestBody CrmReceivableCreateReqVO createReqVO) {
-        return success(receivableService.createReceivable(createReqVO, getLoginUserId()));
+    public CommonResult<Long> createReceivable(@Valid @RequestBody CrmReceivableSaveReqVO createReqVO) {
+        return success(receivableService.createReceivable(createReqVO));
     }
 
     @PutMapping("/update")
     @Operation(summary = "更新回款")
     @PreAuthorize("@ss.hasPermission('crm:receivable:update')")
-    public CommonResult<Boolean> updateReceivable(@Valid @RequestBody CrmReceivableUpdateReqVO updateReqVO) {
+    public CommonResult<Boolean> updateReceivable(@Valid @RequestBody CrmReceivableSaveReqVO updateReqVO) {
         receivableService.updateReceivable(updateReqVO);
         return success(true);
     }
@@ -88,7 +88,7 @@ public class CrmReceivableController {
     @PreAuthorize("@ss.hasPermission('crm:receivable:query')")
     public CommonResult<CrmReceivableRespVO> getReceivable(@RequestParam("id") Long id) {
         CrmReceivableDO receivable = receivableService.getReceivable(id);
-        return success(CrmReceivableConvert.INSTANCE.convert(receivable));
+        return success(BeanUtils.toBean(receivable, CrmReceivableRespVO.class));
     }
 
     @GetMapping("/page")
@@ -150,6 +150,14 @@ public class CrmReceivableController {
     @PreAuthorize("@ss.hasPermission('crm:receivable:query')")
     public CommonResult<Long> getCheckReceivablesCount() {
         return success(receivableService.getCheckReceivablesCount(getLoginUserId()));
+    }
+
+    @PutMapping("/submit")
+    @Operation(summary = "提交回款审批")
+    @PreAuthorize("@ss.hasPermission('crm:receivable:submit')")
+    public CommonResult<Boolean> submitContract(@RequestParam("id") Long id) {
+        receivableService.submitReceivable(id, getLoginUserId());
+        return success(true);
     }
 
 }

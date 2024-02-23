@@ -13,7 +13,7 @@ public interface ErrorCodeConstants {
     ErrorCode CONTRACT_NOT_EXISTS = new ErrorCode(1_020_000_000, "合同不存在");
     ErrorCode CONTRACT_UPDATE_FAIL_NOT_DRAFT = new ErrorCode(1_020_000_001, "合同更新失败，原因：合同不是草稿状态");
     ErrorCode CONTRACT_SUBMIT_FAIL_NOT_DRAFT = new ErrorCode(1_020_000_002, "合同提交审核失败，原因：合同没处在未提交状态");
-    ErrorCode CONTRACT_UPDATE_AUDIT_STATUS_FAIL_NOT_PROCESS = new ErrorCode(1_020_000_003, "更新合同审核状态失败，原因：合同不是处理中状态");
+    ErrorCode CONTRACT_UPDATE_AUDIT_STATUS_FAIL_NOT_PROCESS = new ErrorCode(1_020_000_003, "更新合同审核状态失败，原因：合同不是审核中状态");
 
     // ========== 线索管理 1-020-001-000 ==========
     ErrorCode CLUE_NOT_EXISTS = new ErrorCode(1_020_001_000, "线索不存在");
@@ -33,9 +33,14 @@ public interface ErrorCodeConstants {
 
     // ========== 回款 1-020-004-000 ==========
     ErrorCode RECEIVABLE_NOT_EXISTS = new ErrorCode(1_020_004_000, "回款不存在");
+    ErrorCode RECEIVABLE_UPDATE_FAIL_EDITING_PROHIBITED = new ErrorCode(1_020_004_001, "更新回款失败，原因：禁止编辑");
+    ErrorCode RECEIVABLE_DELETE_FAIL = new ErrorCode(1_020_004_002, "删除回款失败，原因： 被回款计划所使用，不允许删除");
+    ErrorCode RECEIVABLE_SUBMIT_FAIL_NOT_DRAFT = new ErrorCode(1_020_004_003, "回款提交审核失败，原因：回款没处在未提交状态");
+    ErrorCode RECEIVABLE_UPDATE_AUDIT_STATUS_FAIL_NOT_PROCESS = new ErrorCode(1_020_004_004, "更新回款审核状态失败，原因：回款不是审核中状态");
 
-    // ========== 合同管理 1-020-005-000 ==========
+    // ========== 回款计划 1-020-005-000 ==========
     ErrorCode RECEIVABLE_PLAN_NOT_EXISTS = new ErrorCode(1_020_005_000, "回款计划不存在");
+    ErrorCode RECEIVABLE_PLAN_UPDATE_FAIL = new ErrorCode(1_020_006_000, "更想回款计划失败，原因：{}");
 
     // ========== 客户管理 1_020_006_000 ==========
     ErrorCode CUSTOMER_NOT_EXISTS = new ErrorCode(1_020_006_000, "客户不存在");

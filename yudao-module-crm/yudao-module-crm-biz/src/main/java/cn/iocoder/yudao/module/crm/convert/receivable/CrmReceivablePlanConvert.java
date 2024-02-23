@@ -2,9 +2,7 @@ package cn.iocoder.yudao.module.crm.convert.receivable;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
-import cn.iocoder.yudao.module.crm.controller.admin.receivable.vo.plan.CrmReceivablePlanCreateReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.receivable.vo.plan.CrmReceivablePlanRespVO;
-import cn.iocoder.yudao.module.crm.controller.admin.receivable.vo.plan.CrmReceivablePlanUpdateReqVO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.contract.CrmContractDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.receivable.CrmReceivableDO;
@@ -28,12 +26,6 @@ import static cn.iocoder.yudao.framework.common.util.collection.MapUtils.findAnd
 public interface CrmReceivablePlanConvert {
 
     CrmReceivablePlanConvert INSTANCE = Mappers.getMapper(CrmReceivablePlanConvert.class);
-
-    CrmReceivablePlanDO convert(CrmReceivablePlanCreateReqVO bean);
-
-    CrmReceivablePlanDO convert(CrmReceivablePlanUpdateReqVO bean);
-
-    CrmReceivablePlanRespVO convert(CrmReceivablePlanDO bean);
 
     default PageResult<CrmReceivablePlanRespVO> convertPage(PageResult<CrmReceivablePlanDO> pageResult, Map<Long, AdminUserRespDTO> userMap,
                                                             List<CrmCustomerDO> customerList, List<CrmContractDO> contractList,

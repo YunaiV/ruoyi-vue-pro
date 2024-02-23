@@ -1,11 +1,15 @@
 package cn.iocoder.yudao.module.crm.dal.dataobject.receivable;
 
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import cn.iocoder.yudao.module.crm.dal.dataobject.contract.CrmContractDO;
+import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerDO;
+import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 /**
@@ -24,7 +28,7 @@ import java.time.LocalDateTime;
 public class CrmReceivablePlanDO extends BaseDO {
 
     /**
-     * ID
+     * 编号
      */
     @TableId
     private Long id;
@@ -33,19 +37,13 @@ public class CrmReceivablePlanDO extends BaseDO {
      */
     private Integer period;
     /**
-     * 回款ID
-     *
-     * TODO @liuhongfeng：少关联实体；
+     * 回款编号，关联 {@link CrmReceivableDO#getId()}
      */
     private Long receivableId;
     /**
-     * 完成状态
+     * 计划回款金额，单位：元
      */
-    private Boolean finishStatus;
-    /**
-     * 计划回款金额，单位：分
-     */
-    private Integer price;
+    private BigDecimal price;
     /**
      * 计划回款日期
      */
@@ -59,21 +57,15 @@ public class CrmReceivablePlanDO extends BaseDO {
      */
     private LocalDateTime remindTime;
     /**
-     * 客户 ID
-     *
-     * TODO @liuhongfeng：少关联实体；
+     * 客户编号，关联 {@link CrmCustomerDO#getId()}
      */
     private Long customerId;
     /**
-     * 合同 ID
-     *
-     * TODO @liuhongfeng：少关联实体；
+     * 合同编号，关联 {@link CrmContractDO#getId()}
      */
     private Long contractId;
     /**
-     * 负责人 ID
-     *
-     * TODO @liuhongfeng：少关联实体；
+     * 负责人编号，关联 {@link AdminUserRespDTO#getId()}
      */
     private Long ownerUserId;
     /**
@@ -84,5 +76,10 @@ public class CrmReceivablePlanDO extends BaseDO {
      * 备注
      */
     private String remark;
+
+    /**
+     * 完成状态
+     */
+    private Boolean finishStatus;
 
 }

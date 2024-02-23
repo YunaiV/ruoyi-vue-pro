@@ -46,6 +46,11 @@
             <groupId>com.alibaba</groupId>
             <artifactId>easyexcel</artifactId>
         </dependency>
+        <dependency>
+            <groupId>cn.iocoder.boot</groupId>
+            <artifactId>yudao-spring-boot-starter-biz-ip</artifactId>
+            <scope>provided</scope> <!-- 设置为 provided，只有 ExcelUtils 使用 -->
+        </dependency>
     </dependencies>
 
 </project>
