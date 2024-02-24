@@ -138,6 +138,14 @@ public class CrmContractController {
         return success(BeanUtils.toBean(pageResult, CrmContractRespVO.class).setList(buildContractDetailList(pageResult.getList())));
     }
 
+    @GetMapping("/page-by-business")
+    @Operation(summary = "获得合同分页，基于指定商机")
+    public CommonResult<PageResult<CrmContractRespVO>> getContractPageByBusiness(@Valid CrmContractPageReqVO pageVO) {
+        Assert.notNull(pageVO.getBusinessId(), "商机编号不能为空");
+        PageResult<CrmContractDO> pageResult = contractService.getContractPageByBusinessId(pageVO);
+        return success(BeanUtils.toBean(pageResult, CrmContractRespVO.class).setList(buildContractDetailList(pageResult.getList())));
+    }
+
     @GetMapping("/export-excel")
     @Operation(summary = "导出合同 Excel")
     @PreAuthorize("@ss.hasPermission('crm:contract:export')")

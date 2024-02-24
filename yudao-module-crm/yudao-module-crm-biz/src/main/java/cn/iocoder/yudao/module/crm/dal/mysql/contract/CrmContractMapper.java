@@ -39,6 +39,16 @@ public interface CrmContractMapper extends BaseMapperX<CrmContractDO> {
                 .orderByDesc(CrmContractDO::getId));
     }
 
+    default PageResult<CrmContractDO> selectPageByBusinessId(CrmContractPageReqVO pageReqVO) {
+        return selectPage(pageReqVO, new LambdaQueryWrapperX<CrmContractDO>()
+                .eq(CrmContractDO::getBusinessId, pageReqVO.getBusinessId())
+                .likeIfPresent(CrmContractDO::getNo, pageReqVO.getNo())
+                .likeIfPresent(CrmContractDO::getName, pageReqVO.getName())
+                .eqIfPresent(CrmContractDO::getCustomerId, pageReqVO.getCustomerId())
+                .eqIfPresent(CrmContractDO::getBusinessId, pageReqVO.getBusinessId())
+                .orderByDesc(CrmContractDO::getId));
+    }
+
     default PageResult<CrmContractDO> selectPage(CrmContractPageReqVO pageReqVO, Long userId) {
         MPJLambdaWrapperX<CrmContractDO> query = new MPJLambdaWrapperX<>();
         // 拼接数据权限的查询条件

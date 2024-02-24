@@ -342,6 +342,12 @@ public class CrmContractServiceImpl implements CrmContractService {
     }
 
     @Override
+    @CrmPermission(bizType = CrmBizTypeEnum.CRM_BUSINESS, bizId = "#pageReqVO.businessId", level = CrmPermissionLevelEnum.READ)
+    public PageResult<CrmContractDO> getContractPageByBusinessId(CrmContractPageReqVO pageReqVO) {
+        return contractMapper.selectPageByBusinessId(pageReqVO);
+    }
+
+    @Override
     public Long getContractCountByContactId(Long contactId) {
         return contractMapper.selectCountByContactId(contactId);
     }
