@@ -241,9 +241,9 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
     @Transactional(rollbackFor = Exception.class)
     @LogRecord(type = CRM_CUSTOMER_TYPE, subType = CRM_CUSTOMER_CREATE_SUB_TYPE, bizNo = "{{#customer.id}}",
             success = CRM_CUSTOMER_CREATE_SUCCESS)
-    public Long createCustomer(CrmCustomerCreateReqBO customerCreateReq, Long userId) {
+    public Long createCustomer(CrmCustomerCreateReqBO createReqBO, Long userId) {
         // 1. 插入客户
-        CrmCustomerDO customer = BeanUtils.toBean(customerCreateReq, CrmCustomerDO.class).setOwnerUserId(userId);
+        CrmCustomerDO customer = initCustomer(createReqBO, userId);
         customerMapper.insert(customer);
 
         // 2. 创建数据权限
@@ -422,12 +422,14 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
         if (updateOwnerUserIncr == 0) {
             throw exception(CUSTOMER_UPDATE_OWNER_USER_FAIL);
         }
-        // 2. 删除负责人数据权限
+
+        // 2. 联系人的负责人，也要设置为 null。因为：因为领取后，负责人也要关联过来，这块和 receiveCustomer 是对应的
+        contactService.updateOwnerUserIdByCustomerId(customer.getId(), null);
+
+        // 3. 删除负责人数据权限
+        // 注意：需要放在 contactService 后面，不然【客户】数据权限已经被删除，无法操作！
         permissionService.deletePermission(CrmBizTypeEnum.CRM_CUSTOMER.getType(), customer.getId(),
                 CrmPermissionLevelEnum.OWNER.getLevel());
-
-        // 3. 联系人的负责人，也要设置为 null。因为：因为领取后，负责人也要关联过来，这块和 receiveCustomer 是对应的
-        contactService.updateOwnerUserIdByCustomerId(customer.getId(), null);
     }
 
     @LogRecord(type = CRM_CUSTOMER_TYPE, subType = CRM_CUSTOMER_RECEIVE_SUB_TYPE, bizNo = "{{#customer.id}}",

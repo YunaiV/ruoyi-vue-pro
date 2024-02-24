@@ -9,7 +9,7 @@ import cn.iocoder.yudao.module.crm.controller.admin.receivable.vo.plan.CrmReceiv
 import cn.iocoder.yudao.module.crm.dal.dataobject.receivable.CrmReceivablePlanDO;
 import cn.iocoder.yudao.module.crm.enums.common.CrmBizTypeEnum;
 import cn.iocoder.yudao.module.crm.enums.common.CrmSceneTypeEnum;
-import cn.iocoder.yudao.module.crm.util.CrmQueryWrapperUtils;
+import cn.iocoder.yudao.module.crm.util.CrmPermissionUtils;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.time.LocalDateTime;
@@ -34,7 +34,7 @@ public interface CrmReceivablePlanMapper extends BaseMapperX<CrmReceivablePlanDO
     default PageResult<CrmReceivablePlanDO> selectPage(CrmReceivablePlanPageReqVO pageReqVO, Long userId) {
         MPJLambdaWrapperX<CrmReceivablePlanDO> query = new MPJLambdaWrapperX<>();
         // 拼接数据权限的查询条件
-        CrmQueryWrapperUtils.appendPermissionCondition(query, CrmBizTypeEnum.CRM_RECEIVABLE_PLAN.getType(),
+        CrmPermissionUtils.appendPermissionCondition(query, CrmBizTypeEnum.CRM_RECEIVABLE_PLAN.getType(),
                 CrmReceivablePlanDO::getId, userId, pageReqVO.getSceneType(), Boolean.FALSE);
         // 拼接自身的查询条件
         query.selectAll(CrmReceivablePlanDO.class)
@@ -64,7 +64,7 @@ public interface CrmReceivablePlanMapper extends BaseMapperX<CrmReceivablePlanDO
     default List<CrmReceivablePlanDO> selectBatchIds(Collection<Long> ids, Long userId) {
         MPJLambdaWrapperX<CrmReceivablePlanDO> query = new MPJLambdaWrapperX<>();
         // 拼接数据权限的查询条件
-        CrmQueryWrapperUtils.appendPermissionCondition(query, CrmBizTypeEnum.CRM_RECEIVABLE_PLAN.getType(), ids, userId);
+        CrmPermissionUtils.appendPermissionCondition(query, CrmBizTypeEnum.CRM_RECEIVABLE_PLAN.getType(), ids, userId);
         // 拼接自身的查询条件
         query.selectAll(CrmReceivablePlanDO.class).in(CrmReceivablePlanDO::getId, ids).orderByDesc(CrmReceivablePlanDO::getId);
         return selectJoinList(CrmReceivablePlanDO.class, query);
@@ -73,7 +73,7 @@ public interface CrmReceivablePlanMapper extends BaseMapperX<CrmReceivablePlanDO
     default Long selectRemindReceivablePlanCount(Long userId) {
         MPJLambdaWrapperX<CrmReceivablePlanDO> query = new MPJLambdaWrapperX<>();
         // 我负责的 + 非公海
-        CrmQueryWrapperUtils.appendPermissionCondition(query, CrmBizTypeEnum.CRM_RECEIVABLE_PLAN.getType(),
+        CrmPermissionUtils.appendPermissionCondition(query, CrmBizTypeEnum.CRM_RECEIVABLE_PLAN.getType(),
                 CrmReceivablePlanDO::getId, userId, CrmSceneTypeEnum.OWNER.getType(), Boolean.FALSE);
         // TODO: @dhb52 需要配置 提前提醒天数
         int REMIND_DAYS = 20;

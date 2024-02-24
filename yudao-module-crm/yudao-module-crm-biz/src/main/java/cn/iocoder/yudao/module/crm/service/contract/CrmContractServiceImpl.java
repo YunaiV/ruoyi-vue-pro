@@ -63,7 +63,7 @@ public class CrmContractServiceImpl implements CrmContractService {
     /**
      * BPM 合同审批流程标识
      */
-    public static final String CONTRACT_APPROVE = "contract-approve";
+    public static final String BPM_PROCESS_DEFINITION_KEY = "crm-contract-audit";
 
     @Resource
     private CrmContractMapper contractMapper;
@@ -288,7 +288,7 @@ public class CrmContractServiceImpl implements CrmContractService {
 
         // 2. 创建合同审批流程实例
         String processInstanceId = bpmProcessInstanceApi.createProcessInstance(userId, new BpmProcessInstanceCreateReqDTO()
-                .setProcessDefinitionKey(CONTRACT_APPROVE).setBusinessKey(String.valueOf(id)));
+                .setProcessDefinitionKey(BPM_PROCESS_DEFINITION_KEY).setBusinessKey(String.valueOf(id)));
 
         // 3. 更新合同工作流编号
         contractMapper.updateById(new CrmContractDO().setId(id).setProcessInstanceId(processInstanceId)
