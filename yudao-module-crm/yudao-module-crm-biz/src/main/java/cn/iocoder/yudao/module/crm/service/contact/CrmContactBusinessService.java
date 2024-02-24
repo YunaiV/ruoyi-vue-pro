@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.crm.service.contact;
 
+import cn.iocoder.yudao.module.crm.controller.admin.contact.vo.CrmContactBusiness2ReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.contact.vo.CrmContactBusinessReqVO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.contact.CrmContactBusinessDO;
 import jakarta.validation.Valid;
@@ -14,18 +15,32 @@ import java.util.List;
 public interface CrmContactBusinessService {
 
     /**
-     * 创建联系人与商机的关联
+     * 创建联系人与商机的关联【通过联系人，关联商机】
      *
      * @param createReqVO 创建信息
      */
     void createContactBusinessList(@Valid CrmContactBusinessReqVO createReqVO);
 
     /**
-     * 删除联系人与商机的关联
+     * 创建联系人与商机的关联【通过商机，关联联系人】
+     *
+     * @param createReqVO 创建信息
+     */
+    void createContactBusinessList2(@Valid CrmContactBusiness2ReqVO createReqVO);
+
+    /**
+     * 删除联系人与商机的关联【通过联系人，取关商机】
      *
      * @param deleteReqVO 删除信息
      */
     void deleteContactBusinessList(@Valid CrmContactBusinessReqVO deleteReqVO);
+
+    /**
+     * 删除联系人与商机的关联【通过商机，取关联系人】
+     *
+     * @param deleteReqVO 删除信息
+     */
+    void deleteContactBusinessList2(@Valid CrmContactBusiness2ReqVO deleteReqVO);
 
     /**
      * 删除联系人与商机的关联，基于联系人编号

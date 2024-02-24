@@ -27,6 +27,12 @@ public interface CrmContactBusinessMapper extends BaseMapperX<CrmContactBusiness
                 .in(CrmContactBusinessDO::getBusinessId, businessIds));
     }
 
+    default void deleteByBusinessIdAndContactId(Long businessId, List<Long> contactIds) {
+        delete(new LambdaQueryWrapper<CrmContactBusinessDO>()
+                .eq(CrmContactBusinessDO::getBusinessId, businessId)
+                .in(CrmContactBusinessDO::getContactId, contactIds));
+    }
+
     default List<CrmContactBusinessDO> selectListByContactId(Long contactId) {
         return selectList(CrmContactBusinessDO::getContactId, contactId);
     }

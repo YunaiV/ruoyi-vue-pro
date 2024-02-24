@@ -7,7 +7,7 @@ import lombok.Data;
 
 import java.util.List;
 
-@Schema(description = "管理后台 - CRM 联系人商机 Request VO") // 用于关联，取消关联的操作
+@Schema(description = "管理后台 - CRM 联系人商机 Request VO") // 【联系人关联商机】用于关联，取消关联的操作
 @Data
 public class CrmContactBusinessReqVO {
 

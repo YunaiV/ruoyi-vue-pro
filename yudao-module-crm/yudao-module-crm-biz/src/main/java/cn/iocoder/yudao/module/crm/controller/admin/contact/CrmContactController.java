@@ -199,11 +199,28 @@ public class CrmContactController {
         return success(true);
     }
 
+
+    @PostMapping("/create-business-list2")
+    @Operation(summary = "创建联系人与商机的关联")
+    @PreAuthorize("@ss.hasPermission('crm:contact:create-business')")
+    public CommonResult<Boolean> createContactBusinessList2(@Valid @RequestBody CrmContactBusiness2ReqVO createReqVO) {
+        contactBusinessLinkService.createContactBusinessList2(createReqVO);
+        return success(true);
+    }
+
     @DeleteMapping("/delete-business-list")
     @Operation(summary = "删除联系人与联系人的关联")
     @PreAuthorize("@ss.hasPermission('crm:contact:delete-business')")
     public CommonResult<Boolean> deleteContactBusinessList(@Valid @RequestBody CrmContactBusinessReqVO deleteReqVO) {
         contactBusinessLinkService.deleteContactBusinessList(deleteReqVO);
+        return success(true);
+    }
+
+    @DeleteMapping("/delete-business-list2")
+    @Operation(summary = "删除联系人与联系人的关联")
+    @PreAuthorize("@ss.hasPermission('crm:contact:delete-business')")
+    public CommonResult<Boolean> deleteContactBusinessList(@Valid @RequestBody CrmContactBusiness2ReqVO deleteReqVO) {
+        contactBusinessLinkService.deleteContactBusinessList2(deleteReqVO);
         return success(true);
     }
 
