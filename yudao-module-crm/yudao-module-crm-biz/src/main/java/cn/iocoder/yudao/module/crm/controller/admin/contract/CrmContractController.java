@@ -215,18 +215,18 @@ public class CrmContractController {
         });
     }
 
-    @GetMapping("/check-contract-count")
+    @GetMapping("/audit-count")
     @Operation(summary = "获得待审核合同数量")
     @PreAuthorize("@ss.hasPermission('crm:contract:query')")
-    public CommonResult<Long> getCheckContractCount() {
-        return success(contractService.getCheckContractCount(getLoginUserId()));
+    public CommonResult<Long> getAuditContractCount() {
+        return success(contractService.getAuditContractCount(getLoginUserId()));
     }
 
-    @GetMapping("/end-contract-count")
-    @Operation(summary = "获得即将到期的合同数量")
+    @GetMapping("/remind-count")
+    @Operation(summary = "获得即将到期（提醒）的合同数量")
     @PreAuthorize("@ss.hasPermission('crm:contract:query')")
-    public CommonResult<Long> getEndContractCount() {
-        return success(contractService.getEndContractCount(getLoginUserId()));
+    public CommonResult<Long> getRemindContractCount() {
+        return success(contractService.getRemindContractCount(getLoginUserId()));
     }
 
 }

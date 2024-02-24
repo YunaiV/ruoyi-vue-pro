@@ -6,6 +6,7 @@ import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.MPJLambdaWrapperX;
 import cn.iocoder.yudao.module.crm.controller.admin.contract.vo.contract.CrmContractPageReqVO;
+import cn.iocoder.yudao.module.crm.dal.dataobject.contract.CrmContractConfigDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.contract.CrmContractDO;
 import cn.iocoder.yudao.module.crm.enums.common.CrmAuditStatusEnum;
 import cn.iocoder.yudao.module.crm.enums.common.CrmBizTypeEnum;
@@ -49,7 +50,7 @@ public interface CrmContractMapper extends BaseMapperX<CrmContractDO> {
                 .orderByDesc(CrmContractDO::getId));
     }
 
-    default PageResult<CrmContractDO> selectPage(CrmContractPageReqVO pageReqVO, Long userId) {
+    default PageResult<CrmContractDO> selectPage(CrmContractPageReqVO pageReqVO, Long userId, CrmContractConfigDO config) {
         MPJLambdaWrapperX<CrmContractDO> query = new MPJLambdaWrapperX<>();
         // 拼接数据权限的查询条件
         CrmPermissionUtils.appendPermissionCondition(query, CrmBizTypeEnum.CRM_CONTRACT.getType(),
@@ -67,10 +68,8 @@ public interface CrmContractMapper extends BaseMapperX<CrmContractDO> {
         LocalDateTime beginOfToday = LocalDateTimeUtil.beginOfDay(LocalDateTime.now());
         LocalDateTime endOfToday = LocalDateTimeUtil.endOfDay(LocalDateTime.now());
         if (CrmContractPageReqVO.EXPIRY_TYPE_ABOUT_TO_EXPIRE.equals(pageReqVO.getExpiryType())) { // 即将到期
-            // TODO: @芋艿 需要配置 提前提醒天数
-            int REMIND_DAYS = 20;
             query.eq(CrmContractDO::getAuditStatus, CrmAuditStatusEnum.APPROVE.getStatus())
-                    .between(CrmContractDO::getEndTime, beginOfToday, endOfToday.plusDays(REMIND_DAYS));
+                    .between(CrmContractDO::getEndTime, beginOfToday, endOfToday.plusDays(config.getNotifyDays()));
         } else if (CrmContractPageReqVO.EXPIRY_TYPE_EXPIRED.equals(pageReqVO.getExpiryType())) { // 已到期
             query.eq(CrmContractDO::getAuditStatus, CrmAuditStatusEnum.APPROVE.getStatus())
                     .lt(CrmContractDO::getEndTime, endOfToday);
@@ -95,17 +94,17 @@ public interface CrmContractMapper extends BaseMapperX<CrmContractDO> {
         return selectCount(CrmContractDO::getBusinessId, businessId);
     }
 
-    default Long selectCheckContractCount(Long userId) {
+    default Long selectCountByAudit(Long userId) {
         MPJLambdaWrapperX<CrmContractDO> query = new MPJLambdaWrapperX<>();
         // 我负责的 + 非公海
         CrmPermissionUtils.appendPermissionCondition(query, CrmBizTypeEnum.CRM_CONTRACT.getType(),
                 CrmContractDO::getId, userId, CrmSceneTypeEnum.OWNER.getType(), Boolean.FALSE);
-        // 未提交 or 审核不通过
-        query.in(CrmContractDO::getAuditStatus, CrmAuditStatusEnum.DRAFT.getStatus(), CrmAuditStatusEnum.REJECT.getStatus());
+        // 未审核
+        query.eq(CrmContractDO::getAuditStatus, CrmAuditStatusEnum.PROCESS.getStatus());
         return selectCount(query);
     }
 
-    default Long selectEndContractCount(Long userId) {
+    default Long selectCountByRemind(Long userId, CrmContractConfigDO config) {
         MPJLambdaWrapperX<CrmContractDO> query = new MPJLambdaWrapperX<>();
         // 我负责的 + 非公海
         CrmPermissionUtils.appendPermissionCondition(query, CrmBizTypeEnum.CRM_CONTRACT.getType(),
@@ -113,10 +112,8 @@ public interface CrmContractMapper extends BaseMapperX<CrmContractDO> {
         // 即将到期
         LocalDateTime beginOfToday = LocalDateTimeUtil.beginOfDay(LocalDateTime.now());
         LocalDateTime endOfToday = LocalDateTimeUtil.endOfDay(LocalDateTime.now());
-        // TODO: @dhb52 需要配置 提前提醒天数
-        int REMIND_DAYS = 20;
-        query.eq(CrmContractDO::getAuditStatus, CrmAuditStatusEnum.APPROVE.getStatus())
-                .between(CrmContractDO::getEndTime, beginOfToday, endOfToday.plusDays(REMIND_DAYS));
+        query.eq(CrmContractDO::getAuditStatus, CrmAuditStatusEnum.APPROVE.getStatus()) // 必须审批通过！
+                .between(CrmContractDO::getEndTime, beginOfToday, endOfToday.plusDays(config.getNotifyDays()));
         return selectCount(query);
     }
 

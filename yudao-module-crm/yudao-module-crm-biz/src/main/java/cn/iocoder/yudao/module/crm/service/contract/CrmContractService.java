@@ -162,14 +162,14 @@ public interface CrmContractService {
      * @param userId 用户编号
      * @return 提醒数量
      */
-    Long getCheckContractCount(Long userId);
+    Long getAuditContractCount(Long userId);
 
     /**
-     * 获得即将到期的合同数量
+     * 获得即将到期（提醒）的合同数量
      *
      * @param userId 用户编号
      * @return 提醒数量
      */
-    Long getEndContractCount(Long userId);
+    Long getRemindContractCount(Long userId);
 
 }
