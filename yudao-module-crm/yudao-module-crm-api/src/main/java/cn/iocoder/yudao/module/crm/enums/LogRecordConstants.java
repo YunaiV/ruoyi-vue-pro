@@ -96,6 +96,12 @@ public interface LogRecordConstants {
     String CRM_BUSINESS_UPDATE_STATUS_SUB_TYPE = "更新商机状态";
     String CRM_BUSINESS_UPDATE_STATUS_SUCCESS = "更新了商机【{{#businessName}}】的状态从【{{#oldStatusName}}】变更为了【{{#newStatusName}}】";
 
+    // ======================= CRM_CONTRACT_CONFIG 合同配置 =======================
+
+    String CRM_CONTRACT_CONFIG_TYPE = "CRM 合同配置";
+    String CRM_CONTRACT_CONFIG_SUB_TYPE = "{{#isPoolConfigUpdate ? '更新合同配置' : '创建合同配置'}}";
+    String CRM_CONTRACT_CONFIG_SUCCESS = "{{#isPoolConfigUpdate ? '更新了合同配置' : '创建了合同配置'}}";
+
     // ======================= CRM_CONTRACT 合同 =======================
 
     String CRM_CONTRACT_TYPE = "CRM 合同";

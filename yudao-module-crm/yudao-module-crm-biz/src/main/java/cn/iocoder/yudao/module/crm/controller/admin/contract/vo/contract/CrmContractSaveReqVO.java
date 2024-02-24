@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.crm.controller.admin.contract.vo;
+package cn.iocoder.yudao.module.crm.controller.admin.contract.vo.contract;
 
 import cn.iocoder.yudao.module.crm.framework.operatelog.core.CrmBusinessParseFunction;
 import cn.iocoder.yudao.module.crm.framework.operatelog.core.CrmContactParseFunction;
