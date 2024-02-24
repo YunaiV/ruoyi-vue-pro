@@ -10,6 +10,8 @@ import java.util.Arrays;
 /**
  * CRM 数据权限级别枚举
  *
+ * OWNER > WRITE > READ
+ *
  * @author HUIHUI
  */
 @Getter
@@ -17,8 +19,8 @@ import java.util.Arrays;
 public enum CrmPermissionLevelEnum implements IntArrayValuable {
 
     OWNER(1, "负责人"),
-    READ(2, "读"),
-    WRITE(3, "写");
+    READ(2, "只读"),
+    WRITE(3, "读写");
 
     public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(CrmPermissionLevelEnum::getLevel).toArray();
 

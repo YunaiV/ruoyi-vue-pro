@@ -7,7 +7,7 @@ import cn.iocoder.yudao.framework.mybatis.core.query.MPJLambdaWrapperX;
 import cn.iocoder.yudao.module.crm.controller.admin.contact.vo.CrmContactPageReqVO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.contact.CrmContactDO;
 import cn.iocoder.yudao.module.crm.enums.common.CrmBizTypeEnum;
-import cn.iocoder.yudao.module.crm.util.CrmQueryWrapperUtils;
+import cn.iocoder.yudao.module.crm.util.CrmPermissionUtils;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import org.apache.ibatis.annotations.Mapper;
 
@@ -55,7 +55,7 @@ public interface CrmContactMapper extends BaseMapperX<CrmContactDO> {
     default PageResult<CrmContactDO> selectPage(CrmContactPageReqVO pageReqVO, Long userId) {
         MPJLambdaWrapperX<CrmContactDO> query = new MPJLambdaWrapperX<>();
         // 拼接数据权限的查询条件
-        CrmQueryWrapperUtils.appendPermissionCondition(query, CrmBizTypeEnum.CRM_CONTACT.getType(),
+        CrmPermissionUtils.appendPermissionCondition(query, CrmBizTypeEnum.CRM_CONTACT.getType(),
                 CrmContactDO::getId, userId, pageReqVO.getSceneType(), Boolean.FALSE);
         // 拼接自身的查询条件
         query.selectAll(CrmContactDO.class)
@@ -72,7 +72,7 @@ public interface CrmContactMapper extends BaseMapperX<CrmContactDO> {
     default List<CrmContactDO> selectBatchIds(Collection<Long> ids, Long ownerUserId) {
         MPJLambdaWrapperX<CrmContactDO> query = new MPJLambdaWrapperX<>();
         // 拼接数据权限的查询条件
-        CrmQueryWrapperUtils.appendPermissionCondition(query, CrmBizTypeEnum.CRM_CONTACT.getType(), ids, ownerUserId);
+        CrmPermissionUtils.appendPermissionCondition(query, CrmBizTypeEnum.CRM_CONTACT.getType(), ids, ownerUserId);
         query.selectAll(CrmContactDO.class).in(CrmContactDO::getId, ids).orderByDesc(CrmContactDO::getId);
         return selectJoinList(CrmContactDO.class, query);
     }

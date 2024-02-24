@@ -7,7 +7,7 @@ import cn.iocoder.yudao.module.crm.controller.admin.clue.vo.CrmCluePageReqVO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.clue.CrmClueDO;
 import cn.iocoder.yudao.module.crm.enums.common.CrmBizTypeEnum;
 import cn.iocoder.yudao.module.crm.enums.common.CrmSceneTypeEnum;
-import cn.iocoder.yudao.module.crm.util.CrmQueryWrapperUtils;
+import cn.iocoder.yudao.module.crm.util.CrmPermissionUtils;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.Collection;
@@ -24,7 +24,7 @@ public interface CrmClueMapper extends BaseMapperX<CrmClueDO> {
     default PageResult<CrmClueDO> selectPage(CrmCluePageReqVO pageReqVO, Long userId) {
         MPJLambdaWrapperX<CrmClueDO> query = new MPJLambdaWrapperX<>();
         // 拼接数据权限的查询条件
-        CrmQueryWrapperUtils.appendPermissionCondition(query, CrmBizTypeEnum.CRM_CLUE.getType(),
+        CrmPermissionUtils.appendPermissionCondition(query, CrmBizTypeEnum.CRM_CLUE.getType(),
                 CrmClueDO::getId, userId, pageReqVO.getSceneType(), pageReqVO.getPool());
         // 拼接自身的查询条件
         query.selectAll(CrmClueDO.class)
@@ -43,7 +43,7 @@ public interface CrmClueMapper extends BaseMapperX<CrmClueDO> {
     default List<CrmClueDO> selectBatchIds(Collection<Long> ids, Long userId) {
         MPJLambdaWrapperX<CrmClueDO> query = new MPJLambdaWrapperX<>();
         // 拼接数据权限的查询条件
-        CrmQueryWrapperUtils.appendPermissionCondition(query, CrmBizTypeEnum.CRM_CLUE.getType(), ids, userId);
+        CrmPermissionUtils.appendPermissionCondition(query, CrmBizTypeEnum.CRM_CLUE.getType(), ids, userId);
         query.selectAll(CrmClueDO.class).in(CrmClueDO::getId, ids).orderByDesc(CrmClueDO::getId);
         // 拼接自身的查询条件
         return selectJoinList(CrmClueDO.class, query);
@@ -52,7 +52,7 @@ public interface CrmClueMapper extends BaseMapperX<CrmClueDO> {
     default Long selectCountByFollow(Long userId) {
         MPJLambdaWrapperX<CrmClueDO> query = new MPJLambdaWrapperX<>();
         // 我负责的 + 非公海
-        CrmQueryWrapperUtils.appendPermissionCondition(query, CrmBizTypeEnum.CRM_CLUE.getType(),
+        CrmPermissionUtils.appendPermissionCondition(query, CrmBizTypeEnum.CRM_CLUE.getType(),
                 CrmClueDO::getId, userId, CrmSceneTypeEnum.OWNER.getType(), Boolean.FALSE);
         // 未跟进 + 未转化
         query.eq(CrmClueDO::getFollowUpStatus, false)

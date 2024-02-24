@@ -7,9 +7,10 @@ import cn.iocoder.yudao.module.crm.dal.dataobject.permission.CrmPermissionDO;
 import cn.iocoder.yudao.module.crm.enums.common.CrmBizTypeEnum;
 import cn.iocoder.yudao.module.crm.enums.common.CrmSceneTypeEnum;
 import cn.iocoder.yudao.module.crm.enums.permission.CrmPermissionLevelEnum;
-import cn.iocoder.yudao.module.crm.framework.permission.core.util.CrmPermissionUtils;
+import cn.iocoder.yudao.module.system.api.permission.PermissionApi;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
+import cn.iocoder.yudao.module.system.enums.permission.RoleCodeEnum;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.github.yulichang.autoconfigure.MybatisPlusJoinProperties;
 import com.github.yulichang.wrapper.MPJLambdaWrapper;
@@ -18,13 +19,24 @@ import java.util.Collection;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
+import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
 
 /**
- * CRM 查询工具类
+ * 数据权限工具类
  *
  * @author HUIHUI
  */
-public class CrmQueryWrapperUtils {
+public class CrmPermissionUtils {
+
+    /**
+     * 校验用户是否是 CRM 管理员
+     *
+     * @return 是/否
+     */
+    public static boolean isCrmAdmin() {
+        PermissionApi permissionApi = SpringUtil.getBean(PermissionApi.class);
+        return permissionApi.hasAnyRoles(getLoginUserId(), RoleCodeEnum.CRM_ADMIN.getCode());
+    }
 
     /**
      * 构造 CRM 数据类型数据分页查询条件
@@ -38,7 +50,8 @@ public class CrmQueryWrapperUtils {
      */
     public static <T extends MPJLambdaWrapper<?>, S> void appendPermissionCondition(T query, Integer bizType, SFunction<S, ?> bizId,
                                                                                     Long userId, Integer sceneType, Boolean pool) {
-        final String ownerUserIdField = SingletonManager.getMybatisPlusJoinProperties().getTableAlias() + ".owner_user_id";
+        MybatisPlusJoinProperties mybatisPlusJoinProperties = SpringUtil.getBean(MybatisPlusJoinProperties.class);
+        final String ownerUserIdField = mybatisPlusJoinProperties.getTableAlias() + ".owner_user_id";
         // 1. 构建数据权限连表条件
         if (!CrmPermissionUtils.isCrmAdmin() && ObjUtil.notEqual(pool, Boolean.TRUE)) { // 管理员，公海不需要数据权限
             query.innerJoin(CrmPermissionDO.class, on -> on.eq(CrmPermissionDO::getBizType, bizType)
@@ -56,7 +69,8 @@ public class CrmQueryWrapperUtils {
         }
         // 2.3 场景三：下属负责的数据
         if (CrmSceneTypeEnum.isSubordinate(sceneType)) {
-            List<AdminUserRespDTO> subordinateUsers = SingletonManager.getAdminUserApi().getUserListBySubordinate(userId);
+            AdminUserApi adminUserApi = SpringUtil.getBean(AdminUserApi.class);
+            List<AdminUserRespDTO> subordinateUsers = adminUserApi.getUserListBySubordinate(userId);
             if (CollUtil.isEmpty(subordinateUsers)) {
                 query.eq(ownerUserIdField, -1); // 不返回任何结果
             } else {
@@ -81,33 +95,12 @@ public class CrmQueryWrapperUtils {
      * @param userId  用户编号
      */
     public static <T extends MPJLambdaWrapper<?>> void appendPermissionCondition(T query, Integer bizType, Collection<Long> bizIds, Long userId) {
-        if (CrmPermissionUtils.isCrmAdmin()) {// 管理员不需要数据权限
+        if (isCrmAdmin()) {// 管理员不需要数据权限
             return;
         }
         query.innerJoin(CrmPermissionDO.class, on ->
                 on.eq(CrmPermissionDO::getBizType, bizType).in(CrmPermissionDO::getBizId, bizIds)
                         .eq(CollUtil.isNotEmpty(bizIds), CrmPermissionDO::getUserId, userId));
-    }
-
-    /**
-     * 静态内部类实现单例获取
-     *
-     * @author HUIHUI
-     */
-    private static class SingletonManager {
-
-        private static final AdminUserApi ADMIN_USER_API = SpringUtil.getBean(AdminUserApi.class);
-
-        private static final MybatisPlusJoinProperties MYBATIS_PLUS_JOIN_PROPERTIES = SpringUtil.getBean(MybatisPlusJoinProperties.class);
-
-        public static AdminUserApi getAdminUserApi() {
-            return ADMIN_USER_API;
-        }
-
-        public static MybatisPlusJoinProperties getMybatisPlusJoinProperties() {
-            return MYBATIS_PLUS_JOIN_PROPERTIES;
-        }
-
     }
 
 }

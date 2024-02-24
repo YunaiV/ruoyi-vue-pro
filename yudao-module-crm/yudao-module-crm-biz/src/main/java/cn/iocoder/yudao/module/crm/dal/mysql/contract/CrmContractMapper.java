@@ -10,7 +10,7 @@ import cn.iocoder.yudao.module.crm.dal.dataobject.contract.CrmContractDO;
 import cn.iocoder.yudao.module.crm.enums.common.CrmAuditStatusEnum;
 import cn.iocoder.yudao.module.crm.enums.common.CrmBizTypeEnum;
 import cn.iocoder.yudao.module.crm.enums.common.CrmSceneTypeEnum;
-import cn.iocoder.yudao.module.crm.util.CrmQueryWrapperUtils;
+import cn.iocoder.yudao.module.crm.util.CrmPermissionUtils;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.time.LocalDateTime;
@@ -42,7 +42,7 @@ public interface CrmContractMapper extends BaseMapperX<CrmContractDO> {
     default PageResult<CrmContractDO> selectPage(CrmContractPageReqVO pageReqVO, Long userId) {
         MPJLambdaWrapperX<CrmContractDO> query = new MPJLambdaWrapperX<>();
         // 拼接数据权限的查询条件
-        CrmQueryWrapperUtils.appendPermissionCondition(query, CrmBizTypeEnum.CRM_CONTRACT.getType(),
+        CrmPermissionUtils.appendPermissionCondition(query, CrmBizTypeEnum.CRM_CONTRACT.getType(),
                 CrmContractDO::getId, userId, pageReqVO.getSceneType(), Boolean.FALSE);
         // 拼接自身的查询条件
         query.selectAll(CrmContractDO.class)
@@ -71,7 +71,7 @@ public interface CrmContractMapper extends BaseMapperX<CrmContractDO> {
     default List<CrmContractDO> selectBatchIds(Collection<Long> ids, Long userId) {
         MPJLambdaWrapperX<CrmContractDO> query = new MPJLambdaWrapperX<>();
         // 构建数据权限连表条件
-        CrmQueryWrapperUtils.appendPermissionCondition(query, CrmBizTypeEnum.CRM_CONTRACT.getType(), ids, userId);
+        CrmPermissionUtils.appendPermissionCondition(query, CrmBizTypeEnum.CRM_CONTRACT.getType(), ids, userId);
         // 拼接自身的查询条件
         query.selectAll(CrmContractDO.class).in(CrmContractDO::getId, ids).orderByDesc(CrmContractDO::getId);
         return selectJoinList(CrmContractDO.class, query);
@@ -88,7 +88,7 @@ public interface CrmContractMapper extends BaseMapperX<CrmContractDO> {
     default Long selectCheckContractCount(Long userId) {
         MPJLambdaWrapperX<CrmContractDO> query = new MPJLambdaWrapperX<>();
         // 我负责的 + 非公海
-        CrmQueryWrapperUtils.appendPermissionCondition(query, CrmBizTypeEnum.CRM_CONTRACT.getType(),
+        CrmPermissionUtils.appendPermissionCondition(query, CrmBizTypeEnum.CRM_CONTRACT.getType(),
                 CrmContractDO::getId, userId, CrmSceneTypeEnum.OWNER.getType(), Boolean.FALSE);
         // 未提交 or 审核不通过
         query.in(CrmContractDO::getAuditStatus, CrmAuditStatusEnum.DRAFT.getStatus(), CrmAuditStatusEnum.REJECT.getStatus());
@@ -98,7 +98,7 @@ public interface CrmContractMapper extends BaseMapperX<CrmContractDO> {
     default Long selectEndContractCount(Long userId) {
         MPJLambdaWrapperX<CrmContractDO> query = new MPJLambdaWrapperX<>();
         // 我负责的 + 非公海
-        CrmQueryWrapperUtils.appendPermissionCondition(query, CrmBizTypeEnum.CRM_CONTRACT.getType(),
+        CrmPermissionUtils.appendPermissionCondition(query, CrmBizTypeEnum.CRM_CONTRACT.getType(),
                 CrmContractDO::getId, userId, CrmSceneTypeEnum.OWNER.getType(), Boolean.FALSE);
         // 即将到期
         LocalDateTime beginOfToday = LocalDateTimeUtil.beginOfDay(LocalDateTime.now());

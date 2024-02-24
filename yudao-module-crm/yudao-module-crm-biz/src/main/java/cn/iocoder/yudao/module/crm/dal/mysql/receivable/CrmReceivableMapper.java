@@ -10,8 +10,7 @@ import cn.iocoder.yudao.module.crm.dal.dataobject.receivable.CrmReceivableDO;
 import cn.iocoder.yudao.module.crm.enums.common.CrmAuditStatusEnum;
 import cn.iocoder.yudao.module.crm.enums.common.CrmBizTypeEnum;
 import cn.iocoder.yudao.module.crm.enums.common.CrmSceneTypeEnum;
-import cn.iocoder.yudao.module.crm.util.CrmQueryWrapperUtils;
-import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import cn.iocoder.yudao.module.crm.util.CrmPermissionUtils;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.Collection;
@@ -25,12 +24,6 @@ import java.util.List;
 @Mapper
 public interface CrmReceivableMapper extends BaseMapperX<CrmReceivableDO> {
 
-    default int updateOwnerUserIdById(Long id, Long ownerUserId) {
-        return update(new LambdaUpdateWrapper<CrmReceivableDO>()
-                .eq(CrmReceivableDO::getId, id)
-                .set(CrmReceivableDO::getOwnerUserId, ownerUserId));
-    }
-
     default PageResult<CrmReceivableDO> selectPageByCustomerId(CrmReceivablePageReqVO reqVO) {
         return selectPage(reqVO, new LambdaQueryWrapperX<CrmReceivableDO>()
                 .eq(CrmReceivableDO::getCustomerId, reqVO.getCustomerId()) // 必须传递
@@ -42,7 +35,7 @@ public interface CrmReceivableMapper extends BaseMapperX<CrmReceivableDO> {
     default PageResult<CrmReceivableDO> selectPage(CrmReceivablePageReqVO pageReqVO, Long userId) {
         MPJLambdaWrapperX<CrmReceivableDO> query = new MPJLambdaWrapperX<>();
         // 拼接数据权限的查询条件
-        CrmQueryWrapperUtils.appendPermissionCondition(query, CrmBizTypeEnum.CRM_RECEIVABLE.getType(),
+        CrmPermissionUtils.appendPermissionCondition(query, CrmBizTypeEnum.CRM_RECEIVABLE.getType(),
                 CrmReceivableDO::getId, userId, pageReqVO.getSceneType(), Boolean.FALSE);
         // 拼接自身的查询条件
         query.selectAll(CrmReceivableDO.class)
@@ -56,7 +49,7 @@ public interface CrmReceivableMapper extends BaseMapperX<CrmReceivableDO> {
     default List<CrmReceivableDO> selectBatchIds(Collection<Long> ids, Long userId) {
         MPJLambdaWrapperX<CrmReceivableDO> query = new MPJLambdaWrapperX<>();
         // 拼接数据权限的查询条件
-        CrmQueryWrapperUtils.appendPermissionCondition(query, CrmBizTypeEnum.CRM_RECEIVABLE.getType(), ids, userId);
+        CrmPermissionUtils.appendPermissionCondition(query, CrmBizTypeEnum.CRM_RECEIVABLE.getType(), ids, userId);
         // 拼接自身的查询条件
         query.selectAll(CrmReceivableDO.class).in(CrmReceivableDO::getId, ids).orderByDesc(CrmReceivableDO::getId);
         return selectJoinList(CrmReceivableDO.class, query);
@@ -65,7 +58,7 @@ public interface CrmReceivableMapper extends BaseMapperX<CrmReceivableDO> {
     default Long selectCheckReceivablesCount(Long userId) {
         MPJLambdaWrapperX<CrmReceivableDO> query = new MPJLambdaWrapperX<>();
         // 我负责的 + 非公海
-        CrmQueryWrapperUtils.appendPermissionCondition(query, CrmBizTypeEnum.CRM_RECEIVABLE.getType(),
+        CrmPermissionUtils.appendPermissionCondition(query, CrmBizTypeEnum.CRM_RECEIVABLE.getType(),
                 CrmReceivableDO::getId, userId, CrmSceneTypeEnum.OWNER.getType(), Boolean.FALSE);
         // 未提交 or 审核不通过
         query.in(CrmContractDO::getAuditStatus, CrmAuditStatusEnum.DRAFT.getStatus(), CrmAuditStatusEnum.REJECT.getStatus());
