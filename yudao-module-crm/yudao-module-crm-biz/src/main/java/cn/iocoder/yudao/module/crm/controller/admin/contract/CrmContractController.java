@@ -187,8 +187,8 @@ public class CrmContractController {
         Map<Long, CrmContactDO> contactMap = convertMap(contactService.getContactList(convertSet(contractList,
                 CrmContractDO::getSignContactId)), CrmContactDO::getId);
         // 1.4 获取商机
-        Map<Long, CrmBusinessDO> businessMap = convertMap(businessService.getBusinessList(convertSet(contractList,
-                CrmContractDO::getBusinessId)), CrmBusinessDO::getId);
+        Map<Long, CrmBusinessDO> businessMap = businessService.getBusinessMap(
+                convertSet(contractList, CrmContractDO::getBusinessId));
         // 2. 拼接数据
         return BeanUtils.toBean(contractList, CrmContractRespVO.class, contractVO -> {
             // 2.1 设置客户信息

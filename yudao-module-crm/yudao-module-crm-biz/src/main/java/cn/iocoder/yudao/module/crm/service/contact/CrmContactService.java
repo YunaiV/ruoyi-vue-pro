@@ -98,15 +98,6 @@ public interface CrmContactService {
     /**
      * 获得联系人列表
      *
-     * @param ids    编号
-     * @param userId 用户编号
-     * @return 联系人列表
-     */
-    List<CrmContactDO> getContactListByIds(Collection<Long> ids, Long userId);
-
-    /**
-     * 获得联系人列表
-     *
      * @param ids 编号
      * @return 联系人列表
      */

@@ -105,15 +105,6 @@ public class CrmContactController {
         return buildContactDetailList(singletonList(contact)).get(0);
     }
 
-    @GetMapping("/list-by-ids")
-    @Operation(summary = "获得联系人列表")
-    @Parameter(name = "ids", description = "编号", required = true, example = "[1024]")
-    @PreAuthorize("@ss.hasPermission('crm:contact:query')")
-    public CommonResult<List<CrmContactRespVO>> getContactListByIds(@RequestParam("ids") List<Long> ids) {
-        List<CrmContactDO> list = contactService.getContactListByIds(ids, getLoginUserId());
-        return success(BeanUtils.toBean(list, CrmContactRespVO.class));
-    }
-
     @GetMapping("/simple-all-list")
     @Operation(summary = "获得联系人的精简列表")
     @PreAuthorize("@ss.hasPermission('crm:contact:query')")

@@ -69,6 +69,9 @@ public class CrmFollowUpRecordServiceImpl implements CrmFollowUpRecordService {
         crmFollowUpRecordMapper.insert(record);
 
         // 2. 更新 bizId 对应的记录
+        if (ObjUtil.equal(CrmBizTypeEnum.CRM_CUSTOMER.getType(), record.getBizType())) { // 更新客户跟进信息
+            customerService.updateCustomerFollowUp(record.getBizId(), record.getNextTime(), record.getContent());
+        }
         if (ObjUtil.equal(CrmBizTypeEnum.CRM_BUSINESS.getType(), record.getBizType())) { // 更新商机跟进信息
             businessService.updateBusinessFollowUp(record.getBizId(), record.getNextTime(), record.getContent());
         }
@@ -80,9 +83,6 @@ public class CrmFollowUpRecordServiceImpl implements CrmFollowUpRecordService {
         }
         if (ObjUtil.equal(CrmBizTypeEnum.CRM_CONTRACT.getType(), record.getBizType())) { // 更新合同跟进信息
             contractService.updateContractFollowUp(record.getBizId(), record.getNextTime(), record.getContent());
-        }
-        if (ObjUtil.equal(CrmBizTypeEnum.CRM_CUSTOMER.getType(), record.getBizType())) { // 更新客户跟进信息
-            customerService.updateCustomerFollowUp(record.getBizId(), record.getNextTime(), record.getContent());
         }
 
         // 3.1 更新 contactIds 对应的记录，只更新 nextTime
