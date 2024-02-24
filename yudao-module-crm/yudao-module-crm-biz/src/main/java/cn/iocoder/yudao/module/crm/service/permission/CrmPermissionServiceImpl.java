@@ -2,16 +2,16 @@ package cn.iocoder.yudao.module.crm.service.permission;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjUtil;
+import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.crm.controller.admin.permission.vo.CrmPermissionUpdateReqVO;
-import cn.iocoder.yudao.module.crm.convert.permission.CrmPermissionConvert;
 import cn.iocoder.yudao.module.crm.dal.dataobject.permission.CrmPermissionDO;
 import cn.iocoder.yudao.module.crm.dal.mysql.permission.CrmPermissionMapper;
 import cn.iocoder.yudao.module.crm.enums.common.CrmBizTypeEnum;
 import cn.iocoder.yudao.module.crm.enums.permission.CrmPermissionLevelEnum;
-import cn.iocoder.yudao.module.crm.util.CrmPermissionUtils;
 import cn.iocoder.yudao.module.crm.service.permission.bo.CrmPermissionCreateReqBO;
 import cn.iocoder.yudao.module.crm.service.permission.bo.CrmPermissionTransferReqBO;
+import cn.iocoder.yudao.module.crm.util.CrmPermissionUtils;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
@@ -74,8 +74,9 @@ public class CrmPermissionServiceImpl implements CrmPermissionService {
         // 1. 校验存在
         validatePermissionExists(updateReqVO.getIds());
         // 2. 更新
-        List<CrmPermissionDO> updateDO = CrmPermissionConvert.INSTANCE.convertList(updateReqVO);
-        permissionMapper.updateBatch(updateDO);
+        List<CrmPermissionDO> updateList = CollectionUtils.convertList(updateReqVO.getIds(),
+                id -> new CrmPermissionDO().setId(id).setLevel(updateReqVO.getLevel()));
+        permissionMapper.updateBatch(updateList);
     }
 
     private void validatePermissionExists(Collection<Long> ids) {

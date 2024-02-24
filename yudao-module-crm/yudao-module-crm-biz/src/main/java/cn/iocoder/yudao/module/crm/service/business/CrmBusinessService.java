@@ -16,6 +16,9 @@ import jakarta.validation.Valid;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
+
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
 
 /**
  * 商机 Service 接口
@@ -101,15 +104,17 @@ public interface CrmBusinessService {
      * @param ids 编号
      * @return 商机列表
      */
-    List<CrmBusinessDO> getBusinessList(Collection<Long> ids, Long userId);
+    List<CrmBusinessDO> getBusinessList(Collection<Long> ids);
 
     /**
-     * 获得商机列表
+     * 获得商机 Map
      *
      * @param ids 编号
-     * @return 商机列表
+     * @return 商机 Map
      */
-    List<CrmBusinessDO> getBusinessList(Collection<Long> ids);
+    default Map<Long, CrmBusinessDO> getBusinessMap(Collection<Long> ids) {
+        return convertMap(getBusinessList(ids), CrmBusinessDO::getId);
+    }
 
     /**
      * 获得指定商机编号的产品列表

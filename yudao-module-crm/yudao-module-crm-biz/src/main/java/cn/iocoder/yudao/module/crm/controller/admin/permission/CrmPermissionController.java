@@ -3,11 +3,11 @@ package cn.iocoder.yudao.module.crm.controller.admin.permission;
 import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
+import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.crm.controller.admin.permission.vo.CrmPermissionCreateReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.permission.vo.CrmPermissionRespVO;
 import cn.iocoder.yudao.module.crm.controller.admin.permission.vo.CrmPermissionUpdateReqVO;
-import cn.iocoder.yudao.module.crm.convert.permission.CrmPermissionConvert;
 import cn.iocoder.yudao.module.crm.dal.dataobject.permission.CrmPermissionDO;
 import cn.iocoder.yudao.module.crm.enums.permission.CrmPermissionLevelEnum;
 import cn.iocoder.yudao.module.crm.framework.permission.core.annotations.CrmPermission;
@@ -19,6 +19,7 @@ import cn.iocoder.yudao.module.system.api.dept.dto.DeptRespDTO;
 import cn.iocoder.yudao.module.system.api.dept.dto.PostRespDTO;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
+import com.google.common.collect.Multimaps;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
@@ -29,11 +30,16 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Stream;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSetByFlatMap;
+import static cn.iocoder.yudao.framework.common.util.collection.MapUtils.findAndThen;
 import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
 
 @Tag(name = "管理后台 - CRM 数据权限")
@@ -98,18 +104,32 @@ public class CrmPermissionController {
     @PreAuthorize("@ss.hasPermission('crm:permission:query')")
     public CommonResult<List<CrmPermissionRespVO>> getPermissionList(@RequestParam("bizType") Integer bizType,
                                                                      @RequestParam("bizId") Long bizId) {
-        List<CrmPermissionDO> permission = permissionService.getPermissionListByBiz(bizType, bizId);
-        if (CollUtil.isEmpty(permission)) {
+        List<CrmPermissionDO> permissions = permissionService.getPermissionListByBiz(bizType, bizId);
+        if (CollUtil.isEmpty(permissions)) {
             return success(Collections.emptyList());
         }
 
+        // 查询相关数据
+        Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(
+                convertSet(permissions, CrmPermissionDO::getUserId));
+        Map<Long, DeptRespDTO> deptMap = deptApi.getDeptMap(convertSet(userMap.values(), AdminUserRespDTO::getDeptId));
+        Map<Long, PostRespDTO> postMap = postApi.getPostMap(
+                convertSetByFlatMap(userMap.values(), AdminUserRespDTO::getPostIds,
+                        item -> item != null ? item.stream() : Stream.empty()));
         // 拼接数据
-        List<AdminUserRespDTO> userList = adminUserApi.getUserList(convertSet(permission, CrmPermissionDO::getUserId));
-        Map<Long, DeptRespDTO> deptMap = deptApi.getDeptMap(convertSet(userList, AdminUserRespDTO::getDeptId));
-        Set<Long> postIds = CollectionUtils.convertSetByFlatMap(userList, AdminUserRespDTO::getPostIds,
-                item -> item != null ? item.stream() : Stream.empty());
-        Map<Long, PostRespDTO> postMap = postApi.getPostMap(postIds);
-        return success(CrmPermissionConvert.INSTANCE.convert(permission, userList, deptMap, postMap));
+        return success(CollectionUtils.convertList(BeanUtils.toBean(permissions, CrmPermissionRespVO.class), item -> {
+            findAndThen(userMap, item.getUserId(), user -> {
+                item.setNickname(user.getNickname());
+                findAndThen(deptMap, user.getDeptId(), deptRespDTO -> item.setDeptName(deptRespDTO.getName()));
+                if (CollUtil.isEmpty(user.getPostIds())) {
+                    item.setPostNames(Collections.emptySet());
+                    return;
+                }
+                List<PostRespDTO> postList = MapUtils.getList(Multimaps.forMap(postMap), user.getPostIds());
+                item.setPostNames(CollectionUtils.convertSet(postList, PostRespDTO::getName));
+            });
+            return item;
+        }));
     }
 
 }

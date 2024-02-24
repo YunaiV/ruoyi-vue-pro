@@ -323,14 +323,6 @@ public class CrmBusinessServiceImpl implements CrmBusinessService {
     }
 
     @Override
-    public List<CrmBusinessDO> getBusinessList(Collection<Long> ids, Long userId) {
-        if (CollUtil.isEmpty(ids)) {
-            return ListUtil.empty();
-        }
-        return businessMapper.selectBatchIds(ids, userId);
-    }
-
-    @Override
     public List<CrmBusinessDO> getBusinessList(Collection<Long> ids) {
         if (CollUtil.isEmpty(ids)) {
             return ListUtil.empty();

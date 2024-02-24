@@ -23,9 +23,20 @@ import java.util.stream.Collectors;
  */
 public class SelectSheetWriteHandler implements SheetWriteHandler {
 
+    /**
+     * 数据起始行从 0 开始
+     *
+     * 约定：本项目第一行有标题所以从 1 开始如果您的 Excel 有多行标题请自行更改
+     */
+    public static final int FIRST_ROW = 1;
+    /**
+     * 下拉列需要创建下拉框的行数，默认两千行如需更多请自行调整
+     */
+    public static final int LAST_ROW = 2000;
+
     private static final String DICT_SHEET_NAME = "字典sheet";
-    public static final int FIRST_ROW = 1; // 数据起始行从 0 开始，本项目第一行有标题所以从 1 开始如果您的 Excel 有多行标题请自行更改
-    public static final int LAST_ROW = 2000; // 下拉列需要创建下拉框的行数，默认两千行如需更多请自行调整
+
+    // TODO @puhui999：Map<ExcelColumn, List<String>> 可以么？之前用 keyvalue 的原因，返回给前端，无法用 linkedhashmap，默认 key 会乱序
     private final List<KeyValue<ExcelColumn, List<String>>> selectMap;
 
     public SelectSheetWriteHandler(List<KeyValue<ExcelColumn, List<String>>> selectMap) {
@@ -48,32 +59,32 @@ public class SelectSheetWriteHandler implements SheetWriteHandler {
             return;
         }
 
-        // 1.1 获取相应操作对象
+        // 1. 获取相应操作对象
         DataValidationHelper helper = writeSheetHolder.getSheet().getDataValidationHelper(); // 需要设置下拉框的 sheet 页的数据验证助手
         Workbook workbook = writeWorkbookHolder.getWorkbook(); // 获得工作簿
 
-        // 1.2 创建数据字典的 sheet 页
+        // 2. 创建数据字典的 sheet 页
         Sheet dictSheet = workbook.createSheet(DICT_SHEET_NAME);
         for (KeyValue<ExcelColumn, List<String>> keyValue : selectMap) {
-            int rowLen = keyValue.getValue().size();
-            // 设置字典 sheet 页的值 每一列一个字典项
-            for (int i = 0; i < rowLen; i++) {
+            int rowLength = keyValue.getValue().size();
+            // 2.1 设置字典 sheet 页的值 每一列一个字典项
+            for (int i = 0; i < rowLength; i++) {
                 Row row = dictSheet.getRow(i);
                 if (row == null) {
                     row = dictSheet.createRow(i);
                 }
                 row.createCell(keyValue.getKey().getColNum()).setCellValue(keyValue.getValue().get(i));
             }
-            // 1.3 设置单元格下拉选择
-            setColSelect(writeSheetHolder, workbook, helper, keyValue);
+            // 2.2 设置单元格下拉选择
+            setColumnSelect(writeSheetHolder, workbook, helper, keyValue);
         }
     }
 
     /**
      * 设置单元格下拉选择
      */
-    private static void setColSelect(WriteSheetHolder writeSheetHolder, Workbook workbook, DataValidationHelper helper,
-                                     KeyValue<ExcelColumn, List<String>> keyValue) {
+    private static void setColumnSelect(WriteSheetHolder writeSheetHolder, Workbook workbook, DataValidationHelper helper,
+                                        KeyValue<ExcelColumn, List<String>> keyValue) {
         // 1.1 创建可被其他单元格引用的名称
         Name name = workbook.createName();
         String excelColumn = keyValue.getKey().name();
@@ -81,6 +92,7 @@ public class SelectSheetWriteHandler implements SheetWriteHandler {
         String refers = DICT_SHEET_NAME + "!$" + excelColumn + "$1:$" + excelColumn + "$" + keyValue.getValue().size();
         name.setNameName("dict" + keyValue.getKey()); // 设置名称的名字
         name.setRefersToFormula(refers); // 设置公式
+
         // 2.1 设置约束
         DataValidationConstraint constraint = helper.createFormulaListConstraint("dict" + keyValue.getKey()); // 设置引用约束
         // 设置下拉单元格的首行、末行、首列、末列

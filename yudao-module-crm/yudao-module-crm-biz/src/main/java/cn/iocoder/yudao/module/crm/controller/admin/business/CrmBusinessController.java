@@ -126,15 +126,6 @@ public class CrmBusinessController {
         return businessVO;
     }
 
-    // TODO 芋艿：处理下
-    @GetMapping("/list-by-ids")
-    @Operation(summary = "获得商机列表")
-    @Parameter(name = "ids", description = "编号", required = true, example = "[1024]")
-    @PreAuthorize("@ss.hasPermission('crm:business:query')")
-    public CommonResult<List<CrmBusinessRespVO>> getContactListByIds(@RequestParam("ids") List<Long> ids) {
-        return success(BeanUtils.toBean(businessService.getBusinessList(ids, getLoginUserId()), CrmBusinessRespVO.class));
-    }
-
     @GetMapping("/simple-all-list")
     @Operation(summary = "获得联系人的精简列表")
     @PreAuthorize("@ss.hasPermission('crm:contact:query')")

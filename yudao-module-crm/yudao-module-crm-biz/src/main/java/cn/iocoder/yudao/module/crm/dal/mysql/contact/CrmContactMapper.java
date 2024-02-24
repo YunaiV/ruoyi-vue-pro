@@ -69,14 +69,6 @@ public interface CrmContactMapper extends BaseMapperX<CrmContactDO> {
         return selectJoinPage(pageReqVO, CrmContactDO.class, query);
     }
 
-    default List<CrmContactDO> selectBatchIds(Collection<Long> ids, Long ownerUserId) {
-        MPJLambdaWrapperX<CrmContactDO> query = new MPJLambdaWrapperX<>();
-        // 拼接数据权限的查询条件
-        CrmPermissionUtils.appendPermissionCondition(query, CrmBizTypeEnum.CRM_CONTACT.getType(), ids, ownerUserId);
-        query.selectAll(CrmContactDO.class).in(CrmContactDO::getId, ids).orderByDesc(CrmContactDO::getId);
-        return selectJoinList(CrmContactDO.class, query);
-    }
-
     default List<CrmContactDO> selectListByCustomerId(Long customerId) {
         return selectList(CrmContactDO::getCustomerId, customerId);
     }

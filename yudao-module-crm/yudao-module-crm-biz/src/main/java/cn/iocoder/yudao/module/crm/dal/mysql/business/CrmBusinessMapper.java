@@ -12,7 +12,6 @@ import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.Collection;
-import java.util.List;
 
 /**
  * 商机 Mapper
@@ -52,15 +51,6 @@ public interface CrmBusinessMapper extends BaseMapperX<CrmBusinessDO> {
                 .likeIfPresent(CrmBusinessDO::getName, pageReqVO.getName())
                 .orderByDesc(CrmBusinessDO::getId);
         return selectJoinPage(pageReqVO, CrmBusinessDO.class, query);
-    }
-
-    default List<CrmBusinessDO> selectBatchIds(Collection<Long> ids, Long userId) {
-        MPJLambdaWrapperX<CrmBusinessDO> query = new MPJLambdaWrapperX<>();
-        // 拼接数据权限的查询条件
-        CrmPermissionUtils.appendPermissionCondition(query, CrmBizTypeEnum.CRM_BUSINESS.getType(), ids, userId);
-        // 拼接自身的查询条件
-        query.selectAll(CrmBusinessDO.class).in(CrmBusinessDO::getId, ids).orderByDesc(CrmBusinessDO::getId);
-        return selectJoinList(CrmBusinessDO.class, query);
     }
 
     default Long selectCountByStatusTypeId(Long statusTypeId) {

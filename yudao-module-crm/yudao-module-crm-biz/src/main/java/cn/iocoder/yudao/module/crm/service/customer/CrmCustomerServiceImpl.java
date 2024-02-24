@@ -258,11 +258,13 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
     @Override
     public CrmCustomerImportRespVO importCustomerList(List<CrmCustomerImportExcelVO> importCustomers,
                                                       CrmCustomerImportReqVO importReqVO) {
+        // 校验非空
+        importCustomers = filterList(importCustomers, item -> Objects.nonNull(item.getName()));
         if (CollUtil.isEmpty(importCustomers)) {
             throw exception(CUSTOMER_IMPORT_LIST_IS_EMPTY);
         }
-        // 因为有下拉所以需要过滤掉空行
-        importCustomers = filterList(importCustomers, item -> Objects.nonNull(item.getName()));
+
+        // 逐条处理
         CrmCustomerImportRespVO respVO = CrmCustomerImportRespVO.builder().createCustomerNames(new ArrayList<>())
                 .updateCustomerNames(new ArrayList<>()).failureCustomerNames(new LinkedHashMap<>()).build();
         importCustomers.forEach(importCustomer -> {

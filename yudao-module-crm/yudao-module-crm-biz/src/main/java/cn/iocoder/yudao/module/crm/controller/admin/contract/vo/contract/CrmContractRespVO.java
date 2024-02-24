@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.crm.controller.admin.contract.vo;
+package cn.iocoder.yudao.module.crm.controller.admin.contract.vo.contract;
 
 import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
 import com.alibaba.excel.annotation.ExcelProperty;

@@ -1,9 +1,10 @@
 package cn.iocoder.yudao.module.crm.service.contract;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.crm.controller.admin.contract.vo.CrmContractPageReqVO;
-import cn.iocoder.yudao.module.crm.controller.admin.contract.vo.CrmContractSaveReqVO;
-import cn.iocoder.yudao.module.crm.controller.admin.contract.vo.CrmContractTransferReqVO;
+import cn.iocoder.yudao.module.crm.controller.admin.contract.vo.contract.CrmContractPageReqVO;
+import cn.iocoder.yudao.module.crm.controller.admin.contract.vo.contract.CrmContractSaveReqVO;
+import cn.iocoder.yudao.module.crm.controller.admin.contract.vo.contract.CrmContractTransferReqVO;
+import cn.iocoder.yudao.module.crm.dal.dataobject.business.CrmBusinessDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.contract.CrmContractDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.contract.CrmContractProductDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerDO;
@@ -109,9 +110,19 @@ public interface CrmContractService {
      * 数据权限：基于 {@link CrmCustomerDO} 读取
      *
      * @param pageReqVO 分页查询
-     * @return 联系人分页
+     * @return 合同分页
      */
     PageResult<CrmContractDO> getContractPageByCustomerId(CrmContractPageReqVO pageReqVO);
+
+    /**
+     * 获得合同分页，基于指定商机
+     *
+     * 数据权限：基于 {@link CrmBusinessDO} 读取
+     *
+     * @param pageReqVO 分页查询
+     * @return 合同分页
+     */
+    PageResult<CrmContractDO> getContractPageByBusinessId(CrmContractPageReqVO pageReqVO);
 
     /**
      * 查询属于某个联系人的合同数量
@@ -151,14 +162,14 @@ public interface CrmContractService {
      * @param userId 用户编号
      * @return 提醒数量
      */
-    Long getCheckContractCount(Long userId);
+    Long getAuditContractCount(Long userId);
 
     /**
-     * 获得即将到期的合同数量
+     * 获得即将到期（提醒）的合同数量
      *
      * @param userId 用户编号
      * @return 提醒数量
      */
-    Long getEndContractCount(Long userId);
+    Long getRemindContractCount(Long userId);
 
 }

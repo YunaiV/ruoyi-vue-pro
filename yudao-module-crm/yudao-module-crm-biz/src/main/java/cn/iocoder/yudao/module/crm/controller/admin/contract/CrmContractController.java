@@ -9,10 +9,10 @@ import cn.iocoder.yudao.framework.common.util.number.NumberUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
-import cn.iocoder.yudao.module.crm.controller.admin.contract.vo.CrmContractPageReqVO;
-import cn.iocoder.yudao.module.crm.controller.admin.contract.vo.CrmContractRespVO;
-import cn.iocoder.yudao.module.crm.controller.admin.contract.vo.CrmContractSaveReqVO;
-import cn.iocoder.yudao.module.crm.controller.admin.contract.vo.CrmContractTransferReqVO;
+import cn.iocoder.yudao.module.crm.controller.admin.contract.vo.contract.CrmContractPageReqVO;
+import cn.iocoder.yudao.module.crm.controller.admin.contract.vo.contract.CrmContractRespVO;
+import cn.iocoder.yudao.module.crm.controller.admin.contract.vo.contract.CrmContractSaveReqVO;
+import cn.iocoder.yudao.module.crm.controller.admin.contract.vo.contract.CrmContractTransferReqVO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.business.CrmBusinessDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.contact.CrmContactDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.contract.CrmContractDO;
@@ -138,6 +138,14 @@ public class CrmContractController {
         return success(BeanUtils.toBean(pageResult, CrmContractRespVO.class).setList(buildContractDetailList(pageResult.getList())));
     }
 
+    @GetMapping("/page-by-business")
+    @Operation(summary = "获得合同分页，基于指定商机")
+    public CommonResult<PageResult<CrmContractRespVO>> getContractPageByBusiness(@Valid CrmContractPageReqVO pageVO) {
+        Assert.notNull(pageVO.getBusinessId(), "商机编号不能为空");
+        PageResult<CrmContractDO> pageResult = contractService.getContractPageByBusinessId(pageVO);
+        return success(BeanUtils.toBean(pageResult, CrmContractRespVO.class).setList(buildContractDetailList(pageResult.getList())));
+    }
+
     @GetMapping("/export-excel")
     @Operation(summary = "导出合同 Excel")
     @PreAuthorize("@ss.hasPermission('crm:contract:export')")
@@ -187,8 +195,8 @@ public class CrmContractController {
         Map<Long, CrmContactDO> contactMap = convertMap(contactService.getContactList(convertSet(contractList,
                 CrmContractDO::getSignContactId)), CrmContactDO::getId);
         // 1.4 获取商机
-        Map<Long, CrmBusinessDO> businessMap = convertMap(businessService.getBusinessList(convertSet(contractList,
-                CrmContractDO::getBusinessId)), CrmBusinessDO::getId);
+        Map<Long, CrmBusinessDO> businessMap = businessService.getBusinessMap(
+                convertSet(contractList, CrmContractDO::getBusinessId));
         // 2. 拼接数据
         return BeanUtils.toBean(contractList, CrmContractRespVO.class, contractVO -> {
             // 2.1 设置客户信息
@@ -207,18 +215,18 @@ public class CrmContractController {
         });
     }
 
-    @GetMapping("/check-contract-count")
+    @GetMapping("/audit-count")
     @Operation(summary = "获得待审核合同数量")
     @PreAuthorize("@ss.hasPermission('crm:contract:query')")
-    public CommonResult<Long> getCheckContractCount() {
-        return success(contractService.getCheckContractCount(getLoginUserId()));
+    public CommonResult<Long> getAuditContractCount() {
+        return success(contractService.getAuditContractCount(getLoginUserId()));
     }
 
-    @GetMapping("/end-contract-count")
-    @Operation(summary = "获得即将到期的合同数量")
+    @GetMapping("/remind-count")
+    @Operation(summary = "获得即将到期（提醒）的合同数量")
     @PreAuthorize("@ss.hasPermission('crm:contract:query')")
-    public CommonResult<Long> getEndContractCount() {
-        return success(contractService.getEndContractCount(getLoginUserId()));
+    public CommonResult<Long> getRemindContractCount() {
+        return success(contractService.getRemindContractCount(getLoginUserId()));
     }
 
     @GetMapping("/list-all-simple-by-customer")

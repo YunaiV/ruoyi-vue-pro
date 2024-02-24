@@ -10,9 +10,10 @@ import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
 import cn.iocoder.yudao.module.bpm.api.task.BpmProcessInstanceApi;
 import cn.iocoder.yudao.module.bpm.api.task.dto.BpmProcessInstanceCreateReqDTO;
-import cn.iocoder.yudao.module.crm.controller.admin.contract.vo.CrmContractPageReqVO;
-import cn.iocoder.yudao.module.crm.controller.admin.contract.vo.CrmContractSaveReqVO;
-import cn.iocoder.yudao.module.crm.controller.admin.contract.vo.CrmContractTransferReqVO;
+import cn.iocoder.yudao.module.crm.controller.admin.contract.vo.contract.CrmContractPageReqVO;
+import cn.iocoder.yudao.module.crm.controller.admin.contract.vo.contract.CrmContractSaveReqVO;
+import cn.iocoder.yudao.module.crm.controller.admin.contract.vo.contract.CrmContractTransferReqVO;
+import cn.iocoder.yudao.module.crm.dal.dataobject.contract.CrmContractConfigDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.contract.CrmContractDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.contract.CrmContractProductDO;
 import cn.iocoder.yudao.module.crm.dal.mysql.contract.CrmContractMapper;
@@ -83,6 +84,8 @@ public class CrmContractServiceImpl implements CrmContractService {
     private CrmBusinessService businessService;
     @Resource
     private CrmContactService contactService;
+    @Resource
+    private CrmContractConfigService contractConfigService;
 
     @Resource
     private AdminUserApi adminUserApi;
@@ -171,8 +174,6 @@ public class CrmContractServiceImpl implements CrmContractService {
             contractProductMapper.deleteBatchIds(convertSet(diffList.get(2), CrmContractProductDO::getId));
         }
     }
-
-    // TODO @合同待定：缺一个取消合同的接口；只有草稿、审批中可以取消；CrmAuditStatusEnum
 
     /**
      * 校验关联数据是否存在
@@ -314,7 +315,7 @@ public class CrmContractServiceImpl implements CrmContractService {
         contractMapper.updateById(new CrmContractDO().setId(id).setAuditStatus(auditStatus));
     }
 
-    //======================= 查询相关 =======================
+    // ======================= 查询相关 =======================
 
     @Override
     @CrmPermission(bizType = CrmBizTypeEnum.CRM_CONTRACT, bizId = "#id", level = CrmPermissionLevelEnum.READ)
@@ -332,13 +333,28 @@ public class CrmContractServiceImpl implements CrmContractService {
 
     @Override
     public PageResult<CrmContractDO> getContractPage(CrmContractPageReqVO pageReqVO, Long userId) {
-        return contractMapper.selectPage(pageReqVO, userId);
+        // 1. 即将到期，需要查询合同配置
+        CrmContractConfigDO config = null;
+        if (CrmContractPageReqVO.EXPIRY_TYPE_ABOUT_TO_EXPIRE.equals(pageReqVO.getExpiryType())) {
+            config = contractConfigService.getContractConfig();
+            if (config != null && Boolean.FALSE.equals(config.getNotifyEnabled())) {
+                config = null;
+            }
+        }
+        // 2. 查询分页
+        return contractMapper.selectPage(pageReqVO, userId, config);
     }
 
     @Override
     @CrmPermission(bizType = CrmBizTypeEnum.CRM_CUSTOMER, bizId = "#pageReqVO.customerId", level = CrmPermissionLevelEnum.READ)
     public PageResult<CrmContractDO> getContractPageByCustomerId(CrmContractPageReqVO pageReqVO) {
         return contractMapper.selectPageByCustomerId(pageReqVO);
+    }
+
+    @Override
+    @CrmPermission(bizType = CrmBizTypeEnum.CRM_BUSINESS, bizId = "#pageReqVO.businessId", level = CrmPermissionLevelEnum.READ)
+    public PageResult<CrmContractDO> getContractPageByBusinessId(CrmContractPageReqVO pageReqVO) {
+        return contractMapper.selectPageByBusinessId(pageReqVO);
     }
 
     @Override
@@ -361,16 +377,18 @@ public class CrmContractServiceImpl implements CrmContractService {
         return contractProductMapper.selectListByContractId(contactId);
     }
 
-    // TODO @合同待定：需要新增一个 ContractConfigDO 表，合同配置，重点是到期提醒；
-
     @Override
-    public Long getCheckContractCount(Long userId) {
-        return contractMapper.selectCheckContractCount(userId);
+    public Long getAuditContractCount(Long userId) {
+        return contractMapper.selectCountByAudit(userId);
     }
 
     @Override
-    public Long getEndContractCount(Long userId) {
-        return contractMapper.selectEndContractCount(userId);
+    public Long getRemindContractCount(Long userId) {
+        CrmContractConfigDO config = contractConfigService.getContractConfig();
+        if (config == null || Boolean.FALSE.equals(config.getNotifyEnabled())) {
+            return 0L;
+        }
+        return contractMapper.selectCountByRemind(userId, config);
     }
 
 }

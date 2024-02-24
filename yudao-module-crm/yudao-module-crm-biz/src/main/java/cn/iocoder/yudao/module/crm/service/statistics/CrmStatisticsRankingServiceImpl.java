@@ -1,10 +1,10 @@
-package cn.iocoder.yudao.module.crm.service.bi;
+package cn.iocoder.yudao.module.crm.service.statistics;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
-import cn.iocoder.yudao.module.crm.controller.admin.bi.vo.CrmBiRanKRespVO;
-import cn.iocoder.yudao.module.crm.controller.admin.bi.vo.CrmBiRankReqVO;
-import cn.iocoder.yudao.module.crm.dal.mysql.bi.CrmBiRankingMapper;
+import cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.CrmStatisticsRanKRespVO;
+import cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.CrmStatisticsRankReqVO;
+import cn.iocoder.yudao.module.crm.dal.mysql.statistics.CrmStatisticsRankingMapper;
 import cn.iocoder.yudao.module.system.api.dept.DeptApi;
 import cn.iocoder.yudao.module.system.api.dept.dto.DeptRespDTO;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
@@ -23,16 +23,16 @@ import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 
 /**
- * CRM BI 排行榜 Service 实现类
+ * CRM 排行榜统计 Service 实现类
  *
  * @author anhaohao
  */
 @Service
 @Validated
-public class CrmBiRankingServiceImpl implements CrmBiRankingService {
+public class CrmStatisticsRankingServiceImpl implements CrmStatisticsRankingService {
 
     @Resource
-    private CrmBiRankingMapper biRankingMapper;
+    private CrmStatisticsRankingMapper rankMapper;
 
     @Resource
     private AdminUserApi adminUserApi;
@@ -40,43 +40,43 @@ public class CrmBiRankingServiceImpl implements CrmBiRankingService {
     private DeptApi deptApi;
 
     @Override
-    public List<CrmBiRanKRespVO> getContractPriceRank(CrmBiRankReqVO rankReqVO) {
-        return getRank(rankReqVO, biRankingMapper::selectContractPriceRank);
+    public List<CrmStatisticsRanKRespVO> getContractPriceRank(CrmStatisticsRankReqVO rankReqVO) {
+        return getRank(rankReqVO, rankMapper::selectContractPriceRank);
     }
 
     @Override
-    public List<CrmBiRanKRespVO> getReceivablePriceRank(CrmBiRankReqVO rankReqVO) {
-        return getRank(rankReqVO, biRankingMapper::selectReceivablePriceRank);
+    public List<CrmStatisticsRanKRespVO> getReceivablePriceRank(CrmStatisticsRankReqVO rankReqVO) {
+        return getRank(rankReqVO, rankMapper::selectReceivablePriceRank);
     }
 
     @Override
-    public List<CrmBiRanKRespVO> getContractCountRank(CrmBiRankReqVO rankReqVO) {
-        return getRank(rankReqVO, biRankingMapper::selectContractCountRank);
+    public List<CrmStatisticsRanKRespVO> getContractCountRank(CrmStatisticsRankReqVO rankReqVO) {
+        return getRank(rankReqVO, rankMapper::selectContractCountRank);
     }
 
     @Override
-    public List<CrmBiRanKRespVO> getProductSalesRank(CrmBiRankReqVO rankReqVO) {
-        return getRank(rankReqVO, biRankingMapper::selectProductSalesRank);
+    public List<CrmStatisticsRanKRespVO> getProductSalesRank(CrmStatisticsRankReqVO rankReqVO) {
+        return getRank(rankReqVO, rankMapper::selectProductSalesRank);
     }
 
     @Override
-    public List<CrmBiRanKRespVO> getCustomerCountRank(CrmBiRankReqVO rankReqVO) {
-        return getRank(rankReqVO, biRankingMapper::selectCustomerCountRank);
+    public List<CrmStatisticsRanKRespVO> getCustomerCountRank(CrmStatisticsRankReqVO rankReqVO) {
+        return getRank(rankReqVO, rankMapper::selectCustomerCountRank);
     }
 
     @Override
-    public List<CrmBiRanKRespVO> getContactsCountRank(CrmBiRankReqVO rankReqVO) {
-        return getRank(rankReqVO, biRankingMapper::selectContactsCountRank);
+    public List<CrmStatisticsRanKRespVO> getContactsCountRank(CrmStatisticsRankReqVO rankReqVO) {
+        return getRank(rankReqVO, rankMapper::selectContactsCountRank);
     }
 
     @Override
-    public List<CrmBiRanKRespVO> getFollowCountRank(CrmBiRankReqVO rankReqVO) {
-        return getRank(rankReqVO, biRankingMapper::selectFollowCountRank);
+    public List<CrmStatisticsRanKRespVO> getFollowCountRank(CrmStatisticsRankReqVO rankReqVO) {
+        return getRank(rankReqVO, rankMapper::selectFollowCountRank);
     }
 
     @Override
-    public List<CrmBiRanKRespVO> getFollowCustomerCountRank(CrmBiRankReqVO rankReqVO) {
-        return getRank(rankReqVO, biRankingMapper::selectFollowCustomerCountRank);
+    public List<CrmStatisticsRanKRespVO> getFollowCustomerCountRank(CrmStatisticsRankReqVO rankReqVO) {
+        return getRank(rankReqVO, rankMapper::selectFollowCustomerCountRank);
     }
 
     /**
@@ -86,18 +86,18 @@ public class CrmBiRankingServiceImpl implements CrmBiRankingService {
      * @param rankFunction 排行榜方法
      * @return 排行版数据
      */
-    private List<CrmBiRanKRespVO> getRank(CrmBiRankReqVO rankReqVO, Function<CrmBiRankReqVO, List<CrmBiRanKRespVO>> rankFunction) {
+    private List<CrmStatisticsRanKRespVO> getRank(CrmStatisticsRankReqVO rankReqVO, Function<CrmStatisticsRankReqVO, List<CrmStatisticsRanKRespVO>> rankFunction) {
         // 1. 获得用户编号数组
         rankReqVO.setUserIds(getUserIds(rankReqVO.getDeptId()));
         if (CollUtil.isEmpty(rankReqVO.getUserIds())) {
             return Collections.emptyList();
         }
         // 2. 获得排行数据
-        List<CrmBiRanKRespVO> ranks = rankFunction.apply(rankReqVO);
+        List<CrmStatisticsRanKRespVO> ranks = rankFunction.apply(rankReqVO);
         if (CollUtil.isEmpty(ranks)) {
             return Collections.emptyList();
         }
-        ranks.sort(Comparator.comparing(CrmBiRanKRespVO::getCount).reversed());
+        ranks.sort(Comparator.comparing(CrmStatisticsRanKRespVO::getCount).reversed());
         // 3. 拼接用户信息
         appendUserInfo(ranks);
         return ranks;
@@ -108,8 +108,8 @@ public class CrmBiRankingServiceImpl implements CrmBiRankingService {
      *
      * @param ranks 排行榜数据
      */
-    private void appendUserInfo(List<CrmBiRanKRespVO> ranks) {
-        Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(convertSet(ranks, CrmBiRanKRespVO::getOwnerUserId));
+    private void appendUserInfo(List<CrmStatisticsRanKRespVO> ranks) {
+        Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(convertSet(ranks, CrmStatisticsRanKRespVO::getOwnerUserId));
         Map<Long, DeptRespDTO> deptMap = deptApi.getDeptMap(convertSet(userMap.values(), AdminUserRespDTO::getDeptId));
         ranks.forEach(rank -> MapUtils.findAndThen(userMap, rank.getOwnerUserId(), user -> {
             rank.setNickname(user.getNickname());
