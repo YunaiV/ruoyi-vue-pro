@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.framework.excel.core.util;
 
 import cn.iocoder.yudao.framework.common.core.KeyValue;
+import cn.iocoder.yudao.framework.excel.core.enums.ExcelColumn;
 import cn.iocoder.yudao.framework.excel.core.handler.SelectSheetWriteHandler;
 import com.alibaba.excel.EasyExcel;
 import com.alibaba.excel.converters.longconverter.LongStringConverter;
@@ -44,11 +45,11 @@ public class ExcelUtils {
      * @param sheetName Excel sheet 名
      * @param head      Excel head 头
      * @param data      数据列表哦
-     * @param selectMap 下拉选择数据 Map
+     * @param selectMap 下拉选择数据 Map<下拉所对应的列表名，下拉数据>
      * @throws IOException 写入失败的情况
      */
     public static <T> void write(HttpServletResponse response, String filename, String sheetName,
-                                 Class<T> head, List<T> data, List<KeyValue<Integer, List<String>>> selectMap) throws IOException {
+                                 Class<T> head, List<T> data, List<KeyValue<ExcelColumn, List<String>>> selectMap) throws IOException {
         // 输出 Excel
         EasyExcel.write(response.getOutputStream(), head)
                 .autoCloseStream(false) // 不要自动关闭，交给 Servlet 自己处理
