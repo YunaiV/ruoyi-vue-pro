@@ -71,10 +71,10 @@ public class CrmReceivablePlanServiceImpl implements CrmReceivablePlanService {
         // 1.2 查验关联合同回款数量
         Long count = receivableService.getReceivableCountByContractId(createReqVO.getContractId());
         int period = (int) (count + 1);
-        createReqVO.setPeriod(createReqVO.getPeriod() != period ? period : createReqVO.getPeriod()); // 如果期数不对则纠正
 
         // 2. 插入还款计划
-        CrmReceivablePlanDO receivablePlan = BeanUtils.toBean(createReqVO, CrmReceivablePlanDO.class).setId(null).setFinishStatus(false);
+        CrmReceivablePlanDO receivablePlan = BeanUtils.toBean(createReqVO, CrmReceivablePlanDO.class)
+                .setPeriod(period).setFinishStatus(false);
         receivablePlanMapper.insert(receivablePlan);
 
         // 3. 创建数据权限

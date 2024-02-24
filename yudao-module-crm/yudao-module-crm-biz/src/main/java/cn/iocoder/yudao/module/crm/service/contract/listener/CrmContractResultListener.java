@@ -20,7 +20,7 @@ public class CrmContractResultListener extends BpmProcessInstanceResultEventList
 
     @Override
     public String getProcessDefinitionKey() {
-        return CrmContractServiceImpl.CONTRACT_APPROVE;
+        return CrmContractServiceImpl.BPM_PROCESS_DEFINITION_KEY;
     }
 
     @Override
