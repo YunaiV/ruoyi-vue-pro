@@ -1,12 +1,12 @@
-package cn.iocoder.yudao.module.crm.controller.admin.bi.vo;
+package cn.iocoder.yudao.module.crm.controller.admin.statistics.vo;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 
-@Schema(description = "管理后台 - CRM BI 排行榜 Response VO")
+@Schema(description = "管理后台 - CRM BI 排行榜统计 Response VO")
 @Data
-public class CrmBiRanKRespVO {
+public class CrmStatisticsRanKRespVO {
 
     @Schema(description = "负责人编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     private Long ownerUserId;

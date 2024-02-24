@@ -1,9 +1,9 @@
-package cn.iocoder.yudao.module.crm.controller.admin.bi;
+package cn.iocoder.yudao.module.crm.controller.admin.statistics;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
-import cn.iocoder.yudao.module.crm.controller.admin.bi.vo.CrmBiRanKRespVO;
-import cn.iocoder.yudao.module.crm.controller.admin.bi.vo.CrmBiRankReqVO;
-import cn.iocoder.yudao.module.crm.service.bi.CrmBiRankingService;
+import cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.CrmStatisticsRanKRespVO;
+import cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.CrmStatisticsRankReqVO;
+import cn.iocoder.yudao.module.crm.service.statistics.CrmStatisticsRankingService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
@@ -19,68 +19,68 @@ import java.util.List;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
 
-@Tag(name = "管理后台 - CRM BI 排行榜")
+@Tag(name = "管理后台 - CRM 排行榜统计")
 @RestController
-@RequestMapping("/crm/bi-rank")
+@RequestMapping("/crm/statistics-rank")
 @Validated
-public class CrmBiRankController {
+public class CrmStatisticsRankController {
 
     @Resource
-    private CrmBiRankingService rankingService;
+    private CrmStatisticsRankingService rankingService;
 
     @GetMapping("/get-contract-price-rank")
     @Operation(summary = "获得合同金额排行榜")
-    @PreAuthorize("@ss.hasPermission('crm:bi-rank:query')")
-    public CommonResult<List<CrmBiRanKRespVO>> getContractPriceRank(@Valid CrmBiRankReqVO rankingReqVO) {
+    @PreAuthorize("@ss.hasPermission('crm:statistics-rank:query')")
+    public CommonResult<List<CrmStatisticsRanKRespVO>> getContractPriceRank(@Valid CrmStatisticsRankReqVO rankingReqVO) {
         return success(rankingService.getContractPriceRank(rankingReqVO));
     }
 
     @GetMapping("/get-receivable-price-rank")
     @Operation(summary = "获得回款金额排行榜")
-    @PreAuthorize("@ss.hasPermission('crm:bi-rank:query')")
-    public CommonResult<List<CrmBiRanKRespVO>> getReceivablePriceRank(@Valid CrmBiRankReqVO rankingReqVO) {
+    @PreAuthorize("@ss.hasPermission('crm:statistics-rank:query')")
+    public CommonResult<List<CrmStatisticsRanKRespVO>> getReceivablePriceRank(@Valid CrmStatisticsRankReqVO rankingReqVO) {
         return success(rankingService.getReceivablePriceRank(rankingReqVO));
     }
 
     @GetMapping("/get-contract-count-rank")
     @Operation(summary = "获得签约合同数量排行榜")
-    @PreAuthorize("@ss.hasPermission('crm:bi-rank:query')")
-    public CommonResult<List<CrmBiRanKRespVO>> getContractCountRank(@Valid CrmBiRankReqVO rankingReqVO) {
+    @PreAuthorize("@ss.hasPermission('crm:statistics-rank:query')")
+    public CommonResult<List<CrmStatisticsRanKRespVO>> getContractCountRank(@Valid CrmStatisticsRankReqVO rankingReqVO) {
         return success(rankingService.getContractCountRank(rankingReqVO));
     }
 
     @GetMapping("/get-product-sales-rank")
     @Operation(summary = "获得产品销量排行榜")
-    @PreAuthorize("@ss.hasPermission('crm:bi-rank:query')")
-    public CommonResult<List<CrmBiRanKRespVO>> getProductSalesRank(@Valid CrmBiRankReqVO rankingReqVO) {
+    @PreAuthorize("@ss.hasPermission('crm:statistics-rank:query')")
+    public CommonResult<List<CrmStatisticsRanKRespVO>> getProductSalesRank(@Valid CrmStatisticsRankReqVO rankingReqVO) {
         return success(rankingService.getProductSalesRank(rankingReqVO));
     }
 
     @GetMapping("/get-customer-count-rank")
     @Operation(summary = "获得新增客户数排行榜")
-    @PreAuthorize("@ss.hasPermission('crm:bi-rank:query')")
-    public CommonResult<List<CrmBiRanKRespVO>> getCustomerCountRank(@Valid CrmBiRankReqVO rankingReqVO) {
+    @PreAuthorize("@ss.hasPermission('crm:statistics-rank:query')")
+    public CommonResult<List<CrmStatisticsRanKRespVO>> getCustomerCountRank(@Valid CrmStatisticsRankReqVO rankingReqVO) {
         return success(rankingService.getCustomerCountRank(rankingReqVO));
     }
 
     @GetMapping("/get-contacts-count-rank")
     @Operation(summary = "获得新增联系人数排行榜")
-    @PreAuthorize("@ss.hasPermission('crm:bi-rank:query')")
-    public CommonResult<List<CrmBiRanKRespVO>> getContactsCountRank(@Valid CrmBiRankReqVO rankingReqVO) {
+    @PreAuthorize("@ss.hasPermission('crm:statistics-rank:query')")
+    public CommonResult<List<CrmStatisticsRanKRespVO>> getContactsCountRank(@Valid CrmStatisticsRankReqVO rankingReqVO) {
         return success(rankingService.getContactsCountRank(rankingReqVO));
     }
 
     @GetMapping("/get-follow-count-rank")
     @Operation(summary = "获得跟进次数排行榜")
-    @PreAuthorize("@ss.hasPermission('crm:bi-rank:query')")
-    public CommonResult<List<CrmBiRanKRespVO>> getFollowCountRank(@Valid CrmBiRankReqVO rankingReqVO) {
+    @PreAuthorize("@ss.hasPermission('crm:statistics-rank:query')")
+    public CommonResult<List<CrmStatisticsRanKRespVO>> getFollowCountRank(@Valid CrmStatisticsRankReqVO rankingReqVO) {
         return success(rankingService.getFollowCountRank(rankingReqVO));
     }
 
     @GetMapping("/get-follow-customer-count-rank")
     @Operation(summary = "获得跟进客户数排行榜")
-    @PreAuthorize("@ss.hasPermission('crm:bi-rank:query')")
-    public CommonResult<List<CrmBiRanKRespVO>> getFollowCustomerCountRank(@Valid CrmBiRankReqVO rankingReqVO) {
+    @PreAuthorize("@ss.hasPermission('crm:statistics-rank:query')")
+    public CommonResult<List<CrmStatisticsRanKRespVO>> getFollowCustomerCountRank(@Valid CrmStatisticsRankReqVO rankingReqVO) {
         return success(rankingService.getFollowCustomerCountRank(rankingReqVO));
     }
 

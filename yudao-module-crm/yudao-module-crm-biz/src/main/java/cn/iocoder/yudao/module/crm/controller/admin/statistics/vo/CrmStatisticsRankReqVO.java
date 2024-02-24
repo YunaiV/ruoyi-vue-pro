@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.crm.controller.admin.bi.vo;
+package cn.iocoder.yudao.module.crm.controller.admin.statistics.vo;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotEmpty;
@@ -11,9 +11,9 @@ import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
-@Schema(description = "管理后台 - CRM BI 排行榜 Request VO")
+@Schema(description = "管理后台 - CRM 排行榜统计 Request VO")
 @Data
-public class CrmBiRankReqVO {
+public class CrmStatisticsRankReqVO {
 
     @Schema(description = "部门 id", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     @NotNull(message = "部门 id 不能为空")
