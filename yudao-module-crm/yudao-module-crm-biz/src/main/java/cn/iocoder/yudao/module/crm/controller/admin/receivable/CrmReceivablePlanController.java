@@ -24,6 +24,7 @@ import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletResponse;
@@ -157,6 +158,20 @@ public class CrmReceivablePlanController {
     @PreAuthorize("@ss.hasPermission('crm:receivable-plan:query')")
     public CommonResult<Long> getRemindReceivablesCount() {
         return success(receivablePlanService.getRemindReceivablePlanCount(getLoginUserId()));
+    }
+
+    @GetMapping("/list-all-simple-by-customer")
+    @Operation(summary = "获得回款计划精简列表", description = "获得回款计划精简列表，主要用于前端的下拉选项")
+    @Parameters({
+            @Parameter(name = "customerId", description = "客户编号", required = true),
+            @Parameter(name = "contractId", description = "合同编号", required = true)
+    })
+    @PreAuthorize("@ss.hasPermission('crm:receivable-plan:query')")
+    public CommonResult<List<CrmReceivablePlanRespVO>> getListAllSimpleByCustomer(@RequestParam("customerId") Long customerId,
+                                                                                  @RequestParam("contractId") Long contractId) {
+        PageResult<CrmReceivablePlanDO> result = receivablePlanService.getReceivablePlanPageByCustomerId(
+                new CrmReceivablePlanPageReqVO().setCustomerId(customerId).setContractId(contractId));
+        return success(BeanUtils.toBean(result.getList(), CrmReceivablePlanRespVO.class));
     }
 
 }

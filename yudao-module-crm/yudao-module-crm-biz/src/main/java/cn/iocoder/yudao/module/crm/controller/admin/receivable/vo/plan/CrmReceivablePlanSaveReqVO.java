@@ -37,6 +37,10 @@ public class CrmReceivablePlanSaveReqVO {
     @NotNull(message = "计划回款金额不能为空")
     private BigDecimal price;
 
+    @Schema(description = "提醒日期", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
+    @NotNull(message = "提醒日期不能为空")
+    private LocalDateTime remindTime;
+
     @Schema(description = "提前几天提醒", example = "1")
     private Integer remindDays;
 

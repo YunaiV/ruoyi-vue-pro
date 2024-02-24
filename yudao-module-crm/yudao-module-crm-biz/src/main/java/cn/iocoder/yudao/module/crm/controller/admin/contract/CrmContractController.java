@@ -221,4 +221,13 @@ public class CrmContractController {
         return success(contractService.getEndContractCount(getLoginUserId()));
     }
 
+    @GetMapping("/list-all-simple-by-customer")
+    @Operation(summary = "获得合同精简列表", description = "只包含有读权限的客户的合同，主要用于前端的下拉选项")
+    @Parameter(name = "customerId", description = "客户编号", required = true)
+    @PreAuthorize("@ss.hasPermission('crm:contract:query')")
+    public CommonResult<List<CrmContractRespVO>> getListAllSimpleByCustomer(@RequestParam("customerId") Long customerId) {
+        PageResult<CrmContractDO> result = contractService.getContractPageByCustomerId(new CrmContractPageReqVO().setCustomerId(customerId));
+        return success(BeanUtils.toBean(result.getList(), CrmContractRespVO.class));
+    }
+
 }

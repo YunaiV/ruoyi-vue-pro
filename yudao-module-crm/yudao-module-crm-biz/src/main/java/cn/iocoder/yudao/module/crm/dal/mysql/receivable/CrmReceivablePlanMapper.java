@@ -3,9 +3,9 @@ package cn.iocoder.yudao.module.crm.dal.mysql.receivable;
 import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
-import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.MPJLambdaWrapperX;
 import cn.iocoder.yudao.module.crm.controller.admin.receivable.vo.plan.CrmReceivablePlanPageReqVO;
+import cn.iocoder.yudao.module.crm.dal.dataobject.contract.CrmContractDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.receivable.CrmReceivablePlanDO;
 import cn.iocoder.yudao.module.crm.enums.common.CrmBizTypeEnum;
 import cn.iocoder.yudao.module.crm.enums.common.CrmSceneTypeEnum;
@@ -15,6 +15,7 @@ import org.apache.ibatis.annotations.Mapper;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * 回款计划 Mapper
@@ -25,10 +26,15 @@ import java.util.List;
 public interface CrmReceivablePlanMapper extends BaseMapperX<CrmReceivablePlanDO> {
 
     default PageResult<CrmReceivablePlanDO> selectPageByCustomerId(CrmReceivablePlanPageReqVO reqVO) {
-        return selectPage(reqVO, new LambdaQueryWrapperX<CrmReceivablePlanDO>()
-                .eq(CrmReceivablePlanDO::getCustomerId, reqVO.getCustomerId()) // 必须传递
+        MPJLambdaWrapperX<CrmReceivablePlanDO> query = new MPJLambdaWrapperX<>();
+        if (Objects.nonNull(reqVO.getContractNo())) { // 根据合同编号检索
+            query.innerJoin(CrmContractDO.class, on -> on.like(CrmContractDO::getNo, reqVO.getContractNo())
+                    .eq(CrmContractDO::getId, CrmReceivablePlanDO::getContractId));
+        }
+        query.eq(CrmReceivablePlanDO::getCustomerId, reqVO.getCustomerId()) // 必须传递
                 .eqIfPresent(CrmReceivablePlanDO::getContractId, reqVO.getContractId())
-                .orderByDesc(CrmReceivablePlanDO::getId));
+                .orderByDesc(CrmReceivablePlanDO::getPeriod);
+        return selectJoinPage(reqVO, CrmReceivablePlanDO.class, query);
     }
 
     default PageResult<CrmReceivablePlanDO> selectPage(CrmReceivablePlanPageReqVO pageReqVO, Long userId) {
@@ -40,7 +46,12 @@ public interface CrmReceivablePlanMapper extends BaseMapperX<CrmReceivablePlanDO
         query.selectAll(CrmReceivablePlanDO.class)
                 .eqIfPresent(CrmReceivablePlanDO::getCustomerId, pageReqVO.getCustomerId())
                 .eqIfPresent(CrmReceivablePlanDO::getContractId, pageReqVO.getContractId())
-                .orderByDesc(CrmReceivablePlanDO::getId);
+                .orderByDesc(CrmReceivablePlanDO::getPeriod);
+
+        if (Objects.nonNull(pageReqVO.getContractNo())) { // 根据合同编号检索
+            query.innerJoin(CrmContractDO.class, on -> on.like(CrmContractDO::getNo, pageReqVO.getContractNo())
+                    .eq(CrmContractDO::getId, CrmReceivablePlanDO::getContractId));
+        }
 
         // Backlog: 回款提醒类型
         // TODO: @dhb52 需要配置 提前提醒天数
@@ -55,7 +66,8 @@ public interface CrmReceivablePlanMapper extends BaseMapperX<CrmReceivablePlanDO
                     .lt(CrmReceivablePlanDO::getReturnTime, endOfToday);
         } else if (CrmReceivablePlanPageReqVO.REMIND_TYPE_RECEIVED.equals(pageReqVO.getRemindType())) { // 已回款
             query.isNotNull(CrmReceivablePlanDO::getReceivableId)
-                    .between(CrmReceivablePlanDO::getReturnTime, beginOfToday, endOfToday.plusDays(REMIND_DAYS));;
+                    .between(CrmReceivablePlanDO::getReturnTime, beginOfToday, endOfToday.plusDays(REMIND_DAYS));
+            ;
         }
 
         return selectJoinPage(pageReqVO, CrmReceivablePlanDO.class, query);

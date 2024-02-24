@@ -68,10 +68,6 @@ public class CrmReceivableDO extends BaseDO {
      */
     private BigDecimal price;
     /**
-     * 显示顺序
-     */
-    private Integer sort;
-    /**
      * 备注
      */
     private String remark;
