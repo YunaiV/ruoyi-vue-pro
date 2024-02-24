@@ -67,7 +67,7 @@ public class CrmReceivableServiceImpl implements CrmReceivableService {
     private CrmContractService contractService;
     @Resource
     private CrmCustomerService customerService;
-//    @Resource
+    @Resource
     @Lazy // 延迟加载，避免循环依赖
     private CrmReceivablePlanService receivablePlanService;
     @Resource

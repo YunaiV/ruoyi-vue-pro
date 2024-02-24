@@ -10,6 +10,7 @@ import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
 import cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils;
 import cn.iocoder.yudao.framework.common.util.number.NumberUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
+import cn.iocoder.yudao.framework.excel.core.enums.ExcelColumn;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.yudao.framework.ip.core.Area;
 import cn.iocoder.yudao.framework.ip.core.utils.AreaUtils;
@@ -268,21 +269,21 @@ public class CrmCustomerController {
         ExcelUtils.write(response, "客户导入模板.xls", "客户列表", CrmCustomerImportExcelVO.class, list, builderSelectMap());
     }
 
-    private List<KeyValue<Integer, List<String>>> builderSelectMap() {
-        List<KeyValue<Integer, List<String>>> selectMap = new ArrayList<>();
+    private List<KeyValue<ExcelColumn, List<String>>> builderSelectMap() {
+        List<KeyValue<ExcelColumn, List<String>>> selectMap = new ArrayList<>();
         // 获取地区下拉数据
         // TODO @puhui999：嘿嘿，这里改成省份、城市、区域，三个选项，难度大么？
         Area area = AreaUtils.parseArea(Area.ID_CHINA);
-        selectMap.add(new KeyValue<>(6, AreaUtils.getAreaNodePathList(area.getChildren())));
+        selectMap.add(new KeyValue<>(ExcelColumn.G, AreaUtils.getAreaNodePathList(area.getChildren())));
         // 获取客户所属行业
         List<String> customerIndustries = dictDataApi.getDictDataLabelList(CRM_CUSTOMER_INDUSTRY);
-        selectMap.add(new KeyValue<>(8, customerIndustries));
+        selectMap.add(new KeyValue<>(ExcelColumn.I, customerIndustries));
         // 获取客户等级
         List<String> customerLevels = dictDataApi.getDictDataLabelList(CRM_CUSTOMER_LEVEL);
-        selectMap.add(new KeyValue<>(9, customerLevels));
+        selectMap.add(new KeyValue<>(ExcelColumn.J, customerLevels));
         // 获取客户来源
         List<String> customerSources = dictDataApi.getDictDataLabelList(CRM_CUSTOMER_SOURCE);
-        selectMap.add(new KeyValue<>(10, customerSources));
+        selectMap.add(new KeyValue<>(ExcelColumn.K, customerSources));
         return selectMap;
     }
 

@@ -33,19 +33,19 @@ public interface ErrorCodeConstants {
     ErrorCode FILE_IS_EMPTY = new ErrorCode(1_001_003_002, "文件为空");
 
     // ========== 代码生成器 1-001-004-000 ==========
-    ErrorCode CODEGEN_TABLE_EXISTS = new ErrorCode(1_003_001_000, "表定义已经存在");
-    ErrorCode CODEGEN_IMPORT_TABLE_NULL = new ErrorCode(1_003_001_001, "导入的表不存在");
-    ErrorCode CODEGEN_IMPORT_COLUMNS_NULL = new ErrorCode(1_003_001_002, "导入的字段不存在");
-    ErrorCode CODEGEN_TABLE_NOT_EXISTS = new ErrorCode(1_003_001_004, "表定义不存在");
-    ErrorCode CODEGEN_COLUMN_NOT_EXISTS = new ErrorCode(1_003_001_005, "字段义不存在");
-    ErrorCode CODEGEN_SYNC_COLUMNS_NULL = new ErrorCode(1_003_001_006, "同步的字段不存在");
-    ErrorCode CODEGEN_SYNC_NONE_CHANGE = new ErrorCode(1_003_001_007, "同步失败，不存在改变");
-    ErrorCode CODEGEN_TABLE_INFO_TABLE_COMMENT_IS_NULL = new ErrorCode(1_003_001_008, "数据库的表注释未填写");
-    ErrorCode CODEGEN_TABLE_INFO_COLUMN_COMMENT_IS_NULL = new ErrorCode(1_003_001_009, "数据库的表字段({})注释未填写");
-    ErrorCode CODEGEN_MASTER_TABLE_NOT_EXISTS = new ErrorCode(1_003_001_010, "主表(id={})定义不存在，请检查");
-    ErrorCode CODEGEN_SUB_COLUMN_NOT_EXISTS = new ErrorCode(1_003_001_011, "子表的字段(id={})不存在，请检查");
-    ErrorCode CODEGEN_MASTER_GENERATION_FAIL_NO_SUB_TABLE = new ErrorCode(1_003_001_012, "主表生成代码失败，原因：它没有子表");
-    ErrorCode CODEGEN_MASTER_GENERATION_FAIL_NO_SUB_COLUMN = new ErrorCode(1_003_001_013, "主表生成代码失败，原因：它的子表({})没有字段");
+    ErrorCode CODEGEN_TABLE_EXISTS = new ErrorCode(1_001_004_002, "表定义已经存在");
+    ErrorCode CODEGEN_IMPORT_TABLE_NULL = new ErrorCode(1_001_004_001, "导入的表不存在");
+    ErrorCode CODEGEN_IMPORT_COLUMNS_NULL = new ErrorCode(1_001_004_002, "导入的字段不存在");
+    ErrorCode CODEGEN_TABLE_NOT_EXISTS = new ErrorCode(1_001_004_004, "表定义不存在");
+    ErrorCode CODEGEN_COLUMN_NOT_EXISTS = new ErrorCode(1_001_004_005, "字段义不存在");
+    ErrorCode CODEGEN_SYNC_COLUMNS_NULL = new ErrorCode(1_001_004_006, "同步的字段不存在");
+    ErrorCode CODEGEN_SYNC_NONE_CHANGE = new ErrorCode(1_001_004_007, "同步失败，不存在改变");
+    ErrorCode CODEGEN_TABLE_INFO_TABLE_COMMENT_IS_NULL = new ErrorCode(1_001_004_008, "数据库的表注释未填写");
+    ErrorCode CODEGEN_TABLE_INFO_COLUMN_COMMENT_IS_NULL = new ErrorCode(1_001_004_009, "数据库的表字段({})注释未填写");
+    ErrorCode CODEGEN_MASTER_TABLE_NOT_EXISTS = new ErrorCode(1_001_004_010, "主表(id={})定义不存在，请检查");
+    ErrorCode CODEGEN_SUB_COLUMN_NOT_EXISTS = new ErrorCode(1_001_004_011, "子表的字段(id={})不存在，请检查");
+    ErrorCode CODEGEN_MASTER_GENERATION_FAIL_NO_SUB_TABLE = new ErrorCode(1_001_004_012, "主表生成代码失败，原因：它没有子表");
+    ErrorCode CODEGEN_MASTER_GENERATION_FAIL_NO_SUB_COLUMN = new ErrorCode(1_001_004_013, "主表生成代码失败，原因：它的子表({})没有字段");
 
     // ========== 文件配置 1-001-006-000 ==========
     ErrorCode FILE_CONFIG_NOT_EXISTS = new ErrorCode(1_001_006_000, "文件配置不存在");
