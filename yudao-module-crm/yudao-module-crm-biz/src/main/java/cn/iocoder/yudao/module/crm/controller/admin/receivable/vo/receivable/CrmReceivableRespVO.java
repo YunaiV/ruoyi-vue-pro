@@ -1,5 +1,7 @@
 package cn.iocoder.yudao.module.crm.controller.admin.receivable.vo.receivable;
 
+import cn.iocoder.yudao.module.crm.controller.admin.contract.vo.contract.CrmContractRespVO;
+import com.alibaba.excel.annotation.ExcelProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
@@ -31,12 +33,23 @@ public class CrmReceivableRespVO {
 
     @Schema(description = "客户编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "2")
     private Long customerId;
+    @Schema(description = "客户名字", requiredMode = Schema.RequiredMode.REQUIRED, example = "test")
+    private String customerName;
 
     @Schema(description = "合同编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "2")
     private Long contractId;
+    @Schema(description = "合同信息")
+    private CrmContractRespVO contract;
 
-    @Schema(description = "负责人编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "2")
+    @Schema(description = "负责人的用户编号", example = "25682")
+    @ExcelProperty("负责人的用户编号")
     private Long ownerUserId;
+    @Schema(description = "负责人名字", example = "25682")
+    @ExcelProperty("负责人名字")
+    private String ownerUserName;
+    @Schema(description = "负责人部门")
+    @ExcelProperty("负责人部门")
+    private String ownerUserDeptName;
 
     @Schema(description = "备注", example = "备注")
     private String remark;
@@ -44,21 +57,11 @@ public class CrmReceivableRespVO {
     @Schema(description = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED)
     private LocalDateTime createTime;
 
-    @Schema(description = "客户名字", requiredMode = Schema.RequiredMode.REQUIRED, example = "test")
-    private String customerName;
-
     @Schema(description = "审批状态", requiredMode = Schema.RequiredMode.REQUIRED, example = "0")
     private Integer auditStatus;
 
-    @Schema(description = "合同编号", example = "Q110")
-    private String contractNo;
-
-    @Schema(description = "负责人", example = "test")
-    private String ownerUserName;
-
     @Schema(description = "创建人", example = "25682")
     private String creator;
-
     @Schema(description = "创建人名字", example = "test")
     private String creatorName;
 
