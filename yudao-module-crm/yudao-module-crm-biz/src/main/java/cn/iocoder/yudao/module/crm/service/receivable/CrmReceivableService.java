@@ -7,6 +7,7 @@ import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.receivable.CrmReceivableDO;
 import jakarta.validation.Valid;
 
+import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -112,5 +113,13 @@ public interface CrmReceivableService {
      * @return 提醒数量
      */
     Long getCheckReceivablesCount(Long userId);
+
+    /**
+     * 获得合同已回款金额 Map
+     *
+     * @param contractIds 合同编号
+     * @return 回款金额 Map
+     */
+    Map<Long, BigDecimal> getReceivablePriceMapByContractId(Collection<Long> contractIds);
 
 }

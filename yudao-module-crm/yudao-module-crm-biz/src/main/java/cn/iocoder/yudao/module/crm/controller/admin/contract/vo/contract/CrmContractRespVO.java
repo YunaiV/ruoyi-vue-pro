@@ -88,6 +88,10 @@ public class CrmContractRespVO {
     @ExcelProperty("合同金额")
     private BigDecimal totalPrice;
 
+    @Schema(description = "已回款金额", example = "5617")
+    @ExcelProperty("已回款金额")
+    private BigDecimal totalReceivablePrice;
+
     @Schema(description = "客户签约人编号", example = "18546")
     private Long signContactId;
     @Schema(description = "客户签约人", example = "小豆")

@@ -35,8 +35,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
+import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.crm.enums.ErrorCodeConstants.*;
@@ -256,6 +258,11 @@ public class CrmReceivableServiceImpl implements CrmReceivableService {
     @Override
     public Long getCheckReceivablesCount(Long userId) {
         return receivableMapper.selectCheckReceivablesCount(userId);
+    }
+
+    @Override
+    public Map<Long, BigDecimal> getReceivablePriceMapByContractId(Collection<Long> contractIds) {
+        return receivableMapper.selectReceivablePriceMapByContractId(contractIds);
     }
 
 }

@@ -25,6 +25,7 @@ import cn.iocoder.yudao.module.crm.service.contact.CrmContactService;
 import cn.iocoder.yudao.module.crm.service.contract.CrmContractService;
 import cn.iocoder.yudao.module.crm.service.customer.CrmCustomerService;
 import cn.iocoder.yudao.module.crm.service.product.CrmProductService;
+import cn.iocoder.yudao.module.crm.service.receivable.CrmReceivableService;
 import cn.iocoder.yudao.module.system.api.dept.DeptApi;
 import cn.iocoder.yudao.module.system.api.dept.dto.DeptRespDTO;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
@@ -40,6 +41,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -68,6 +70,8 @@ public class CrmContractController {
     private CrmBusinessService businessService;
     @Resource
     private CrmProductService productService;
+    @Resource
+    private CrmReceivableService receivableService;
 
     @Resource
     private AdminUserApi adminUserApi;
@@ -192,6 +196,9 @@ public class CrmContractController {
         // 1.4 获取商机
         Map<Long, CrmBusinessDO> businessMap = businessService.getBusinessMap(
                 convertSet(contractList, CrmContractDO::getBusinessId));
+        // 1.5 获得已回款金额
+        Map<Long, BigDecimal> receivablePriceMap = receivableService.getReceivablePriceMapByContractId(
+                convertSet(contractList, CrmContractDO::getId));
         // 2. 拼接数据
         return BeanUtils.toBean(contractList, CrmContractRespVO.class, contractVO -> {
             // 2.1 设置客户信息
@@ -207,6 +214,8 @@ public class CrmContractController {
             findAndThen(contactMap, contractVO.getSignContactId(), contact -> contractVO.setSignContactName(contact.getName()));
             // 2.4 设置商机信息
             findAndThen(businessMap, contractVO.getBusinessId(), business -> contractVO.setBusinessName(business.getName()));
+            // 2.5 设置已回款金额
+            contractVO.setTotalReceivablePrice(receivablePriceMap.getOrDefault(contractVO.getId(), BigDecimal.ZERO));
         });
     }
 
@@ -232,9 +241,16 @@ public class CrmContractController {
         CrmContractPageReqVO pageReqVO = new CrmContractPageReqVO().setCustomerId(customerId);
         pageReqVO.setPageSize(PageParam.PAGE_SIZE_NONE); // 不分页
         PageResult<CrmContractDO> pageResult = contractService.getContractPageByCustomerId(pageReqVO);
+        if (CollUtil.isEmpty(pageResult.getList())) {
+            return success(Collections.emptyList());
+        }
+        // 拼接数据
+        Map<Long, BigDecimal> receivablePriceMap = receivableService.getReceivablePriceMapByContractId(
+                convertSet(pageResult.getList(), CrmContractDO::getId));
         return success(convertList(pageResult.getList(), contract -> new CrmContractRespVO() // 只返回 id、name 等精简字段
                 .setId(contract.getId()).setName(contract.getName()).setAuditStatus(contract.getAuditStatus())
-                .setTotalPrice(contract.getTotalPrice()))); // TODO @芋艿：未回款金额
+                .setTotalPrice(contract.getTotalPrice())
+                .setTotalReceivablePrice(receivablePriceMap.getOrDefault(contract.getId(), BigDecimal.ZERO))));
     }
 
 }
