@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.crm.controller.admin.contract;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Assert;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
+import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
 import cn.iocoder.yudao.framework.common.util.number.NumberUtils;
@@ -229,14 +230,16 @@ public class CrmContractController {
         return success(contractService.getRemindContractCount(getLoginUserId()));
     }
 
-    // TODO @芋艿：需要看下；
-    @GetMapping("/list-all-simple-by-customer")
-    @Operation(summary = "获得合同精简列表", description = "只包含有读权限的客户的合同，主要用于前端的下拉选项")
+    @GetMapping("/simple-list")
+    @Operation(summary = "获得合同精简列表", description = "只包含的合同，主要用于前端的下拉选项")
     @Parameter(name = "customerId", description = "客户编号", required = true)
     @PreAuthorize("@ss.hasPermission('crm:contract:query')")
-    public CommonResult<List<CrmContractRespVO>> getListAllSimpleByCustomer(@RequestParam("customerId") Long customerId) {
-        PageResult<CrmContractDO> result = contractService.getContractPageByCustomerId(new CrmContractPageReqVO().setCustomerId(customerId));
-        return success(BeanUtils.toBean(result.getList(), CrmContractRespVO.class));
+    public CommonResult<List<CrmContractRespVO>> getContractSimpleList(@RequestParam("customerId") Long customerId) {
+        CrmContractPageReqVO pageReqVO = new CrmContractPageReqVO().setCustomerId(customerId);
+        pageReqVO.setPageSize(PageParam.PAGE_SIZE_NONE); // 不分页
+        PageResult<CrmContractDO> pageResult = contractService.getContractPageByCustomerId(pageReqVO);
+        return success(convertList(pageResult.getList(), contract -> new CrmContractRespVO() // 只返回 id、name 等精简字段
+                .setId(contract.getId()).setName(contract.getName())));
     }
 
 }

@@ -89,6 +89,14 @@ public interface CrmContractService {
     CrmContractDO getContract(Long id);
 
     /**
+     * 校验合同是否合法
+     *
+     * @param id 编号
+     * @return 合同
+     */
+    CrmContractDO validateContract(Long id);
+
+    /**
      * 获得合同列表
      *
      * @param ids 编号

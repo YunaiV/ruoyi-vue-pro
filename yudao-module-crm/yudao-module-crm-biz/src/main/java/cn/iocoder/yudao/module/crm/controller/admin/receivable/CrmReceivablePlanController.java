@@ -41,8 +41,7 @@ import java.util.stream.Stream;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.common.pojo.PageParam.PAGE_SIZE_NONE;
-import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertListByFlatMap;
-import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
 import static cn.iocoder.yudao.framework.common.util.collection.MapUtils.findAndThen;
 import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.EXPORT;
 import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
@@ -95,7 +94,14 @@ public class CrmReceivablePlanController {
     @PreAuthorize("@ss.hasPermission('crm:receivable-plan:query')")
     public CommonResult<CrmReceivablePlanRespVO> getReceivablePlan(@RequestParam("id") Long id) {
         CrmReceivablePlanDO receivablePlan = receivablePlanService.getReceivablePlan(id);
-        return success(BeanUtils.toBean(receivablePlan, CrmReceivablePlanRespVO.class));
+        return success(buildReceivablePlanDetail(receivablePlan));
+    }
+
+    private CrmReceivablePlanRespVO buildReceivablePlanDetail(CrmReceivablePlanDO receivablePlan) {
+        if (receivablePlan == null) {
+            return null;
+        }
+        return buildReceivableDetailList(Collections.singletonList(receivablePlan)).get(0);
     }
 
     @GetMapping("/page")

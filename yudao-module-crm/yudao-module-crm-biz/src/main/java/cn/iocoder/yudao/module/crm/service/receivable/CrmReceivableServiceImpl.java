@@ -245,6 +245,7 @@ public class CrmReceivableServiceImpl implements CrmReceivableService {
         return receivableMapper.selectCheckReceivablesCount(userId);
     }
 
+    // TODO @芋艿：不确定这个方法还要不要；
     @Override
     public Long getReceivableCountByContractId(Long contractId) {
         return receivableMapper.selectCount(CrmReceivableDO::getContractId, contractId);

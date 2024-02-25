@@ -25,6 +25,13 @@ import java.util.Objects;
 @Mapper
 public interface CrmReceivablePlanMapper extends BaseMapperX<CrmReceivablePlanDO> {
 
+    default CrmReceivablePlanDO selectMaxPeriodByContractId(Long contractId) {
+        return selectOne(new MPJLambdaWrapperX<CrmReceivablePlanDO>()
+                .eq(CrmReceivablePlanDO::getContractId, contractId)
+                .orderByDesc(CrmReceivablePlanDO::getPeriod)
+                .last("LIMIT 1"));
+    }
+
     default PageResult<CrmReceivablePlanDO> selectPageByCustomerId(CrmReceivablePlanPageReqVO reqVO) {
         MPJLambdaWrapperX<CrmReceivablePlanDO> query = new MPJLambdaWrapperX<>();
         if (Objects.nonNull(reqVO.getContractNo())) { // 根据合同编号检索
@@ -90,6 +97,9 @@ public interface CrmReceivablePlanMapper extends BaseMapperX<CrmReceivablePlanDO
         LocalDateTime endOfToday = LocalDateTimeUtil.endOfDay(LocalDateTime.now());
         query.isNull(CrmReceivablePlanDO::getReceivableId)
                 .between(CrmReceivablePlanDO::getReturnTime, beginOfToday, endOfToday.plusDays(REMIND_DAYS));
+        // TODO return_time 小于现在；
+        // TODO 未还款
+        // TODO remind_time 大于现在；
         return selectCount(query);
     }
 
