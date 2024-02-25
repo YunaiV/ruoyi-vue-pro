@@ -11,7 +11,7 @@ import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
 import cn.iocoder.yudao.module.crm.controller.admin.receivable.vo.plan.CrmReceivablePlanPageReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.receivable.vo.plan.CrmReceivablePlanRespVO;
 import cn.iocoder.yudao.module.crm.controller.admin.receivable.vo.plan.CrmReceivablePlanSaveReqVO;
-import cn.iocoder.yudao.module.crm.convert.receivable.CrmReceivablePlanConvert;
+import cn.iocoder.yudao.module.crm.controller.admin.receivable.vo.receivable.CrmReceivableRespVO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.contract.CrmContractDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.receivable.CrmReceivableDO;
@@ -34,6 +34,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
@@ -42,6 +43,7 @@ import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.common.pojo.PageParam.PAGE_SIZE_NONE;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertListByFlatMap;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
+import static cn.iocoder.yudao.framework.common.util.collection.MapUtils.findAndThen;
 import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.EXPORT;
 import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
 
@@ -101,7 +103,7 @@ public class CrmReceivablePlanController {
     @PreAuthorize("@ss.hasPermission('crm:receivable-plan:query')")
     public CommonResult<PageResult<CrmReceivablePlanRespVO>> getReceivablePlanPage(@Valid CrmReceivablePlanPageReqVO pageReqVO) {
         PageResult<CrmReceivablePlanDO> pageResult = receivablePlanService.getReceivablePlanPage(pageReqVO, getLoginUserId());
-        return success(convertDetailReceivablePlanPage(pageResult));
+        return success(new PageResult<>(buildReceivableDetailList(pageResult.getList()), pageResult.getTotal()));
     }
 
     @GetMapping("/page-by-customer")
@@ -109,10 +111,9 @@ public class CrmReceivablePlanController {
     public CommonResult<PageResult<CrmReceivablePlanRespVO>> getReceivablePlanPageByCustomer(@Valid CrmReceivablePlanPageReqVO pageReqVO) {
         Assert.notNull(pageReqVO.getCustomerId(), "客户编号不能为空");
         PageResult<CrmReceivablePlanDO> pageResult = receivablePlanService.getReceivablePlanPageByCustomerId(pageReqVO);
-        return success(convertDetailReceivablePlanPage(pageResult));
+        return success(new PageResult<>(buildReceivableDetailList(pageResult.getList()), pageResult.getTotal()));
     }
 
-    // TODO 芋艿：后面在优化导出
     @GetMapping("/export-excel")
     @Operation(summary = "导出回款计划 Excel")
     @PreAuthorize("@ss.hasPermission('crm:receivable-plan:export')")
@@ -120,38 +121,41 @@ public class CrmReceivablePlanController {
     public void exportReceivablePlanExcel(@Valid CrmReceivablePlanPageReqVO exportReqVO,
                                           HttpServletResponse response) throws IOException {
         exportReqVO.setPageSize(PAGE_SIZE_NONE);
-        PageResult<CrmReceivablePlanDO> pageResult = receivablePlanService.getReceivablePlanPage(exportReqVO, getLoginUserId());
+        List<CrmReceivablePlanDO> list = receivablePlanService.getReceivablePlanPage(exportReqVO, getLoginUserId()).getList();
         // 导出 Excel
         ExcelUtils.write(response, "回款计划.xls", "数据", CrmReceivablePlanRespVO.class,
-                convertDetailReceivablePlanPage(pageResult).getList());
+                buildReceivableDetailList(list));
     }
 
-    /**
-     * 构建详细的回款计划分页结果
-     *
-     * @param pageResult 简单的回款计划分页结果
-     * @return 详细的回款计划分页结果
-     */
-    private PageResult<CrmReceivablePlanRespVO> convertDetailReceivablePlanPage(PageResult<CrmReceivablePlanDO> pageResult) {
-        List<CrmReceivablePlanDO> receivablePlanList = pageResult.getList();
+    private List<CrmReceivablePlanRespVO> buildReceivableDetailList(List<CrmReceivablePlanDO> receivablePlanList) {
         if (CollUtil.isEmpty(receivablePlanList)) {
-            return PageResult.empty(pageResult.getTotal());
+            return Collections.emptyList();
         }
-        // 1. 获取客户列表
-        List<CrmCustomerDO> customerList = customerService.getCustomerList(
+        // 1.1 获取客户 Map
+        Map<Long, CrmCustomerDO> customerMap = customerService.getCustomerMap(
                 convertSet(receivablePlanList, CrmReceivablePlanDO::getCustomerId));
-        // 2. 获取创建人、负责人列表
+        // 1.2 获取创建人、负责人列表
         Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(convertListByFlatMap(receivablePlanList,
                 contact -> Stream.of(NumberUtils.parseLong(contact.getCreator()), contact.getOwnerUserId())));
-        // 3. 获得合同列表
-        List<CrmContractDO> contractList = contractService.getContractList(
+        // 1.3 获得合同 Map
+        Map<Long, CrmContractDO> contractMap = contractService.getContractMap(
                 convertSet(receivablePlanList, CrmReceivablePlanDO::getContractId));
-        // 4. 获得还款列表
-        List<CrmReceivableDO> receivableList = receivableService.getReceivableList(
+        // 1.4 获得还款 Map
+        Map<Long, CrmReceivableDO> receivableMap = receivableService.getReceivableMap(
                 convertSet(receivablePlanList, CrmReceivablePlanDO::getReceivableId));
-        return CrmReceivablePlanConvert.INSTANCE.convertPage(pageResult, userMap, customerList, contractList, receivableList);
+        // 2. 拼接数据
+        return BeanUtils.toBean(receivablePlanList, CrmReceivablePlanRespVO.class, (receivablePlanVO) -> {
+            // 2.1 拼接客户信息
+            findAndThen(customerMap, receivablePlanVO.getCustomerId(), customer -> receivablePlanVO.setCustomerName(customer.getName()));
+            // 2.2 拼接用户信息
+            findAndThen(userMap, receivablePlanVO.getOwnerUserId(), user -> receivablePlanVO.setOwnerUserName(user.getNickname()));
+            findAndThen(userMap, Long.parseLong(receivablePlanVO.getCreator()), user -> receivablePlanVO.setCreatorName(user.getNickname()));
+            // 2.3 拼接合同信息
+            findAndThen(contractMap, receivablePlanVO.getContractId(), contract -> receivablePlanVO.setContractNo(contract.getNo()));
+            // 2.4 拼接回款信息
+            receivablePlanVO.setReceivable(BeanUtils.toBean(receivableMap.get(receivablePlanVO.getReceivableId()), CrmReceivableRespVO.class));
+        });
     }
-
 
     @GetMapping("/remind-receivable-plan-count")
     @Operation(summary = "获得待回款提醒数量")
@@ -160,6 +164,7 @@ public class CrmReceivablePlanController {
         return success(receivablePlanService.getRemindReceivablePlanCount(getLoginUserId()));
     }
 
+    // TODO @芋艿：需要看下；
     @GetMapping("/list-all-simple-by-customer")
     @Operation(summary = "获得回款计划精简列表", description = "获得回款计划精简列表，主要用于前端的下拉选项")
     @Parameters({

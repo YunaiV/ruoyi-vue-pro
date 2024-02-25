@@ -9,6 +9,9 @@ import jakarta.validation.Valid;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
+
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
 
 /**
  * CRM 回款 Service 接口
@@ -70,6 +73,16 @@ public interface CrmReceivableService {
      * @return 回款列表
      */
     List<CrmReceivableDO> getReceivableList(Collection<Long> ids);
+
+    /**
+     * 获得回款 Map
+     *
+     * @param ids 编号
+     * @return 回款 Map
+     */
+    default Map<Long, CrmReceivableDO> getReceivableMap(Collection<Long> ids) {
+        return convertMap(getReceivableList(ids), CrmReceivableDO::getId);
+    }
 
     /**
      * 获得回款分页

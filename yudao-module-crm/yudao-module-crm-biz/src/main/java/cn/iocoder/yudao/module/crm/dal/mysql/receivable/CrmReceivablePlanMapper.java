@@ -47,7 +47,6 @@ public interface CrmReceivablePlanMapper extends BaseMapperX<CrmReceivablePlanDO
                 .eqIfPresent(CrmReceivablePlanDO::getCustomerId, pageReqVO.getCustomerId())
                 .eqIfPresent(CrmReceivablePlanDO::getContractId, pageReqVO.getContractId())
                 .orderByDesc(CrmReceivablePlanDO::getPeriod);
-
         if (Objects.nonNull(pageReqVO.getContractNo())) { // 根据合同编号检索
             query.innerJoin(CrmContractDO.class, on -> on.like(CrmContractDO::getNo, pageReqVO.getContractNo())
                     .eq(CrmContractDO::getId, CrmReceivablePlanDO::getContractId));
@@ -67,9 +66,7 @@ public interface CrmReceivablePlanMapper extends BaseMapperX<CrmReceivablePlanDO
         } else if (CrmReceivablePlanPageReqVO.REMIND_TYPE_RECEIVED.equals(pageReqVO.getRemindType())) { // 已回款
             query.isNotNull(CrmReceivablePlanDO::getReceivableId)
                     .between(CrmReceivablePlanDO::getReturnTime, beginOfToday, endOfToday.plusDays(REMIND_DAYS));
-            ;
         }
-
         return selectJoinPage(pageReqVO, CrmReceivablePlanDO.class, query);
     }
 

@@ -13,6 +13,9 @@ import jakarta.validation.Valid;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
+
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
 
 /**
  * CRM 合同 Service 接口
@@ -92,6 +95,16 @@ public interface CrmContractService {
      * @return 合同列表
      */
     List<CrmContractDO> getContractList(Collection<Long> ids);
+
+    /**
+     * 获得合同 Map
+     *
+     * @param ids 编号
+     * @return 合同 Map
+     */
+    default Map<Long, CrmContractDO> getContractMap(Collection<Long> ids) {
+        return convertMap(getContractList(ids), CrmContractDO::getId);
+    }
 
     /**
      * 获得合同分页

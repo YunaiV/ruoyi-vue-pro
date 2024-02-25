@@ -61,7 +61,7 @@ public class CrmReceivablePlanDO extends BaseDO {
      */
     private LocalDateTime returnTime;
     /**
-     * 回款类型
+     * 计划回款类型
      *
      * 枚举 {@link CrmReceivableReturnTypeEnum}
      */
