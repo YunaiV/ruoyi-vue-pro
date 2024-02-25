@@ -48,9 +48,6 @@ public class CrmReceivablePlanRespVO {
     @Schema(description = "回款信息")
     private CrmReceivableRespVO receivable;
 
-    @Schema(description = "完成状态", requiredMode = Schema.RequiredMode.REQUIRED, example = "true")
-    private Boolean finishStatus;
-
     @Schema(description = "提前几天提醒", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     private Integer remindDays;
 

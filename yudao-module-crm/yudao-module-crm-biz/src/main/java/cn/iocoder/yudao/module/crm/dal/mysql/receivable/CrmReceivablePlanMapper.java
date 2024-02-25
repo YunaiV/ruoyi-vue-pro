@@ -98,7 +98,7 @@ public interface CrmReceivablePlanMapper extends BaseMapperX<CrmReceivablePlanDO
         query.isNull(CrmReceivablePlanDO::getReceivableId)
                 .between(CrmReceivablePlanDO::getReturnTime, beginOfToday, endOfToday.plusDays(REMIND_DAYS));
         // TODO return_time 小于现在；
-        // TODO 未还款
+        // TODO 未回款
         // TODO remind_time 大于现在；
         return selectCount(query);
     }

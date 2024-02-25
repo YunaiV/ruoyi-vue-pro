@@ -16,11 +16,19 @@ public class CrmReceivableSaveReqVO {
     @Schema(description = "编号", example = "25787")
     private Long id;
 
-    @Schema(description = "回款编号", example = "31177")
-    private String no;
+    @Schema(description = "负责人编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "2")
+    @NotNull(message = "负责人编号不能为空")
+    private Long ownerUserId;
 
-    @Schema(description = "回款计划编号", example = "1024")
-    private Long planId; // 不是通过回款计划创建的回款没有回款计划编号
+    @Schema(description = "客户编号", example = "2")
+    private Long customerId; // 该字段不通过前端传递，而是 contractId 查询出来设置进去
+
+    @Schema(description = "合同编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "2")
+    @NotNull(message = "合同编号不能为空")
+    private Long contractId;
+
+    @Schema(description = "回款计划编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
+    private Long planId;
 
     @Schema(description = "回款方式", example = "2")
     @InEnum(CrmReceivableReturnTypeEnum.class)
@@ -30,21 +38,9 @@ public class CrmReceivableSaveReqVO {
     @NotNull(message = "回款金额不能为空")
     private BigDecimal price;
 
-    @Schema(description = "计划回款日期", requiredMode = Schema.RequiredMode.REQUIRED, example = "2024-02-02")
-    @NotNull(message = "计划回款日期不能为空")
+    @Schema(description = "回款日期", requiredMode = Schema.RequiredMode.REQUIRED, example = "2024-02-02")
+    @NotNull(message = "回款日期不能为空")
     private LocalDateTime returnTime;
-
-    @Schema(description = "客户编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "2")
-    @NotNull(message = "客户编号不能为空")
-    private Long customerId;
-
-    @Schema(description = "合同编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "2")
-    @NotNull(message = "合同编号不能为空")
-    private Long contractId;
-
-    @Schema(description = "负责人编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "2")
-    @NotNull(message = "负责人编号不能为空")
-    private Long ownerUserId;
 
     @Schema(description = "备注", example = "备注")
     private String remark;

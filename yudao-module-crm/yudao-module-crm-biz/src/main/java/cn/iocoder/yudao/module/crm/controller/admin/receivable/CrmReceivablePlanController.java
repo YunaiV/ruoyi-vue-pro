@@ -146,7 +146,7 @@ public class CrmReceivablePlanController {
         // 1.3 获得合同 Map
         Map<Long, CrmContractDO> contractMap = contractService.getContractMap(
                 convertSet(receivablePlanList, CrmReceivablePlanDO::getContractId));
-        // 1.4 获得还款 Map
+        // 1.4 获得回款 Map
         Map<Long, CrmReceivableDO> receivableMap = receivableService.getReceivableMap(
                 convertSet(receivablePlanList, CrmReceivablePlanDO::getReceivableId));
         // 2. 拼接数据
@@ -170,19 +170,21 @@ public class CrmReceivablePlanController {
         return success(receivablePlanService.getRemindReceivablePlanCount(getLoginUserId()));
     }
 
-    // TODO @芋艿：需要看下；
-    @GetMapping("/list-all-simple-by-customer")
+    @GetMapping("/simple-list")
     @Operation(summary = "获得回款计划精简列表", description = "获得回款计划精简列表，主要用于前端的下拉选项")
     @Parameters({
             @Parameter(name = "customerId", description = "客户编号", required = true),
             @Parameter(name = "contractId", description = "合同编号", required = true)
     })
     @PreAuthorize("@ss.hasPermission('crm:receivable-plan:query')")
-    public CommonResult<List<CrmReceivablePlanRespVO>> getListAllSimpleByCustomer(@RequestParam("customerId") Long customerId,
-                                                                                  @RequestParam("contractId") Long contractId) {
-        PageResult<CrmReceivablePlanDO> result = receivablePlanService.getReceivablePlanPageByCustomerId(
-                new CrmReceivablePlanPageReqVO().setCustomerId(customerId).setContractId(contractId));
-        return success(BeanUtils.toBean(result.getList(), CrmReceivablePlanRespVO.class));
+    public CommonResult<List<CrmReceivablePlanRespVO>> getReceivablePlanSimpleList(@RequestParam("customerId") Long customerId,
+                                                                                   @RequestParam("contractId") Long contractId) {
+        CrmReceivablePlanPageReqVO pageReqVO = new CrmReceivablePlanPageReqVO().setCustomerId(customerId).setContractId(contractId);
+        pageReqVO.setPageNo(PAGE_SIZE_NONE);
+        PageResult<CrmReceivablePlanDO> pageResult = receivablePlanService.getReceivablePlanPageByCustomerId(pageReqVO);
+        return success(convertList(pageResult.getList(), receivablePlan -> new CrmReceivablePlanRespVO() // 只返回 id、period 等信息
+                .setId(receivablePlan.getId()).setPeriod(receivablePlan.getPeriod()).setReceivableId(receivablePlan.getReceivableId())
+                .setPrice(receivablePlan.getPrice()).setReturnType(receivablePlan.getReturnType())));
     }
 
 }

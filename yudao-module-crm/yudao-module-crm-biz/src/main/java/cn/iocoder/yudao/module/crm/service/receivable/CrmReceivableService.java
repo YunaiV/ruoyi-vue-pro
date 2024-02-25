@@ -113,12 +113,4 @@ public interface CrmReceivableService {
      */
     Long getCheckReceivablesCount(Long userId);
 
-    /**
-     * 根据合同编号，获取合同关联的回款数量
-     *
-     * @param contractId 合同编号
-     * @return 数量
-     */
-    Long getReceivableCountByContractId(Long contractId);
-
 }

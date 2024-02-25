@@ -25,7 +25,7 @@ public class CrmNoRedisDAO {
     public static final String CONTRACT_NO_PREFIX = "HT";
 
     /**
-     * 还款 {@link cn.iocoder.yudao.module.crm.dal.dataobject.receivable.CrmReceivablePlanDO}
+     * 回款 {@link cn.iocoder.yudao.module.crm.dal.dataobject.receivable.CrmReceivablePlanDO}
      */
     public static final String RECEIVABLE_PREFIX = "HK";
 

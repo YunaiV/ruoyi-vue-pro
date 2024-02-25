@@ -158,7 +158,6 @@ public class CrmReceivableController {
         });
     }
 
-
     @GetMapping("/check-receivables-count")
     @Operation(summary = "获得待审核回款数量")
     @PreAuthorize("@ss.hasPermission('crm:receivable:query')")

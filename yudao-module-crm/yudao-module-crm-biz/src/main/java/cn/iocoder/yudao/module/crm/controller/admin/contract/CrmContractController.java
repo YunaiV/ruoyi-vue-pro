@@ -175,12 +175,6 @@ public class CrmContractController {
         return success(true);
     }
 
-    /**
-     * 构建详细的合同结果
-     *
-     * @param contractList 原始合同信息
-     * @return 细的合同结果
-     */
     private List<CrmContractRespVO> buildContractDetailList(List<CrmContractDO> contractList) {
         if (CollUtil.isEmpty(contractList)) {
             return Collections.emptyList();
@@ -239,7 +233,8 @@ public class CrmContractController {
         pageReqVO.setPageSize(PageParam.PAGE_SIZE_NONE); // 不分页
         PageResult<CrmContractDO> pageResult = contractService.getContractPageByCustomerId(pageReqVO);
         return success(convertList(pageResult.getList(), contract -> new CrmContractRespVO() // 只返回 id、name 等精简字段
-                .setId(contract.getId()).setName(contract.getName())));
+                .setId(contract.getId()).setName(contract.getName()).setAuditStatus(contract.getAuditStatus())
+                .setTotalPrice(contract.getTotalPrice()))); // TODO @芋艿：未回款金额
     }
 
 }

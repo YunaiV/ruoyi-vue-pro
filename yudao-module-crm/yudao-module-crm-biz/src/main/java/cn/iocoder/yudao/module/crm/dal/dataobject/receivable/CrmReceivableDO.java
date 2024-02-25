@@ -39,15 +39,21 @@ public class CrmReceivableDO extends BaseDO {
      */
     private String no;
     /**
-     * 回款计划编号,关联 {@link CrmReceivablePlanDO#getId()}
+     * 回款计划编号
+     *
+     * 关联 {@link CrmReceivablePlanDO#getId()}，非必须
      */
     private Long planId;
     /**
-     * 客户编号，关联 {@link CrmCustomerDO#getId()}
+     * 客户编号
+     *
+     * 关联 {@link CrmCustomerDO#getId()}
      */
     private Long customerId;
     /**
-     * 合同编号，关联 {@link CrmContractDO#getId()}
+     * 合同编号
+     *
+     * 关联 {@link CrmContractDO#getId()}
      */
     private Long contractId;
     /**

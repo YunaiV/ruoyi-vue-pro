@@ -54,11 +54,14 @@ public class CrmReceivableRespVO {
     @Schema(description = "备注", example = "备注")
     private String remark;
 
+    @Schema(description = "审批状态", requiredMode = Schema.RequiredMode.REQUIRED, example = "0")
+    private Integer auditStatus;
+
     @Schema(description = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED)
     private LocalDateTime createTime;
 
-    @Schema(description = "审批状态", requiredMode = Schema.RequiredMode.REQUIRED, example = "0")
-    private Integer auditStatus;
+    @Schema(description = "更新时间", requiredMode = Schema.RequiredMode.REQUIRED)
+    private LocalDateTime updateTime;
 
     @Schema(description = "创建人", example = "25682")
     private String creator;

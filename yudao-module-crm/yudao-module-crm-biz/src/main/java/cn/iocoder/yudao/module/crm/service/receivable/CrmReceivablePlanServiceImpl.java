@@ -65,7 +65,7 @@ public class CrmReceivablePlanServiceImpl implements CrmReceivablePlanService {
         // 1. 校验关联数据是否存在
         validateRelationDataExists(createReqVO);
 
-        // 2. 插入还款计划
+        // 2. 插入回款计划
         CrmReceivablePlanDO maxPeriodReceivablePlan = receivablePlanMapper.selectMaxPeriodByContractId(createReqVO.getContractId());
         int period = maxPeriodReceivablePlan == null ? 1 : maxPeriodReceivablePlan.getPeriod() + 1;
         CrmReceivablePlanDO receivablePlan = BeanUtils.toBean(createReqVO, CrmReceivablePlanDO.class).setPeriod(period);
@@ -95,12 +95,12 @@ public class CrmReceivablePlanServiceImpl implements CrmReceivablePlanService {
         validateRelationDataExists(updateReqVO);
         // 1.2 校验关联数据是否存在
         CrmReceivablePlanDO oldReceivablePlan = validateReceivablePlanExists(updateReqVO.getId());
-        // 1.3 如果已经有对应的还款，则不允许编辑
+        // 1.3 如果已经有对应的回款，则不允许编辑
         if (Objects.nonNull(oldReceivablePlan.getReceivableId())) {
             throw exception(RECEIVABLE_PLAN_UPDATE_FAIL);
         }
 
-        // 2. 更新还款计划
+        // 2. 更新回款计划
         CrmReceivablePlanDO updateObj = BeanUtils.toBean(updateReqVO, CrmReceivablePlanDO.class);
         if (updateReqVO.getReturnTime() != null && updateReqVO.getRemindDays() != null) {
             updateObj.setRemindTime(updateReqVO.getReturnTime().minusDays(updateReqVO.getRemindDays()));
@@ -124,13 +124,12 @@ public class CrmReceivablePlanServiceImpl implements CrmReceivablePlanService {
         }
     }
 
-    // TODO @芋艿：优化下这个方法的命名
     @Override
-    public void updateReceivableId(Long id, Long receivableId) {
+    public void updateReceivablePlanReceivableId(Long id, Long receivableId) {
         // 校验存在
         validateReceivablePlanExists(id);
         // 更新回款计划
-        receivablePlanMapper.updateById(new CrmReceivablePlanDO().setReceivableId(receivableId).setFinishStatus(true));
+        receivablePlanMapper.updateById(new CrmReceivablePlanDO().setId(id).setReceivableId(receivableId));
     }
 
     @Override

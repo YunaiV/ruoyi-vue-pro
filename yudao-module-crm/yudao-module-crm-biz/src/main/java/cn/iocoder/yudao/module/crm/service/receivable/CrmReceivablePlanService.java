@@ -38,7 +38,7 @@ public interface CrmReceivablePlanService {
      * @param id           编号
      * @param receivableId 回款编号
      */
-    void updateReceivableId(Long id, Long receivableId);
+    void updateReceivablePlanReceivableId(Long id, Long receivableId);
 
     /**
      * 删除回款计划

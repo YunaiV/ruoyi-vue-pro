@@ -24,6 +24,10 @@ import java.util.List;
 @Mapper
 public interface CrmReceivableMapper extends BaseMapperX<CrmReceivableDO> {
 
+    default CrmReceivableDO selectByNo(String no) {
+        return selectOne(CrmReceivableDO::getNo, no);
+    }
+
     default PageResult<CrmReceivableDO> selectPageByCustomerId(CrmReceivablePageReqVO reqVO) {
         return selectPage(reqVO, new LambdaQueryWrapperX<CrmReceivableDO>()
                 .eq(CrmReceivableDO::getCustomerId, reqVO.getCustomerId()) // 必须传递

@@ -75,10 +75,6 @@ public class CrmReceivablePlanDO extends BaseDO {
      * 回款编号，关联 {@link CrmReceivableDO#getId()}
      */
     private Long receivableId;
-    /**
-     * 完成状态
-     */
-    private Boolean finishStatus;
 
     /**
      * 提前几天提醒
