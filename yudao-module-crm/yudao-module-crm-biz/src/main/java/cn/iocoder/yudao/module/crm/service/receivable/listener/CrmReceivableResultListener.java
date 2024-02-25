@@ -20,7 +20,7 @@ public class CrmReceivableResultListener extends BpmProcessInstanceResultEventLi
 
     @Override
     public String getProcessDefinitionKey() {
-        return CrmReceivableServiceImpl.RECEIVABLE_APPROVE;
+        return CrmReceivableServiceImpl.BPM_PROCESS_DEFINITION_KEY;
     }
 
     @Override

@@ -6,10 +6,10 @@ import lombok.Data;
 
 import java.time.LocalDateTime;
 
-@Schema(description = "管理后台 - CRM 跟进 Response VO")
+@Schema(description = "管理后台 - CRM 操作日志 Response VO")
 @Data
 @ExcelIgnoreUnannotated
-public class CrmOperateLogV2RespVO {
+public class CrmOperateLogRespVO {
 
     @Schema(description = "编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "13563")
     private Long id;

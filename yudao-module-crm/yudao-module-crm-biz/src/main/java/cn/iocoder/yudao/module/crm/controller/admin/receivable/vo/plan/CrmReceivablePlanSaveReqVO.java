@@ -14,9 +14,8 @@ public class CrmReceivablePlanSaveReqVO {
     @Schema(description = "编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "2")
     private Long id;
 
-    @Schema(description = "客户编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "2")
-    @NotNull(message = "客户编号不能为空")
-    private Long customerId;
+    @Schema(description = "客户编号", hidden = true, example = "2")
+    private Long customerId; // 该字段不通过前端传递，而是 contractId 查询出来设置进去
 
     @Schema(description = "合同编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "2")
     @NotNull(message = "合同编号不能为空")
@@ -36,10 +35,6 @@ public class CrmReceivablePlanSaveReqVO {
     @Schema(description = "计划回款金额", requiredMode = Schema.RequiredMode.REQUIRED, example = "9000")
     @NotNull(message = "计划回款金额不能为空")
     private BigDecimal price;
-
-    @Schema(description = "提醒日期", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
-    @NotNull(message = "提醒日期不能为空")
-    private LocalDateTime remindTime;
 
     @Schema(description = "提前几天提醒", example = "1")
     private Integer remindDays;

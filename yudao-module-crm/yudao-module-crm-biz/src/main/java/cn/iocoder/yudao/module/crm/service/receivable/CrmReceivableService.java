@@ -7,8 +7,12 @@ import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.receivable.CrmReceivableDO;
 import jakarta.validation.Valid;
 
+import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
+
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
 
 /**
  * CRM 回款 Service 接口
@@ -72,6 +76,16 @@ public interface CrmReceivableService {
     List<CrmReceivableDO> getReceivableList(Collection<Long> ids);
 
     /**
+     * 获得回款 Map
+     *
+     * @param ids 编号
+     * @return 回款 Map
+     */
+    default Map<Long, CrmReceivableDO> getReceivableMap(Collection<Long> ids) {
+        return convertMap(getReceivableList(ids), CrmReceivableDO::getId);
+    }
+
+    /**
      * 获得回款分页
      *
      * 数据权限：基于 {@link CrmReceivableDO} 读取
@@ -101,11 +115,11 @@ public interface CrmReceivableService {
     Long getCheckReceivablesCount(Long userId);
 
     /**
-     * 根据合同编号，获取合同关联的回款数量
+     * 获得合同已回款金额 Map
      *
-     * @param contractId 合同编号
-     * @return 数量
+     * @param contractIds 合同编号
+     * @return 回款金额 Map
      */
-    Long getReceivableCountByContractId(Long contractId);
+    Map<Long, BigDecimal> getReceivablePriceMapByContractId(Collection<Long> contractIds);
 
 }

@@ -324,6 +324,11 @@ public class CrmContractServiceImpl implements CrmContractService {
     }
 
     @Override
+    public CrmContractDO validateContract(Long id) {
+        return validateContractExists(id);
+    }
+
+    @Override
     public List<CrmContractDO> getContractList(Collection<Long> ids) {
         if (CollUtil.isEmpty(ids)) {
             return ListUtil.empty();
