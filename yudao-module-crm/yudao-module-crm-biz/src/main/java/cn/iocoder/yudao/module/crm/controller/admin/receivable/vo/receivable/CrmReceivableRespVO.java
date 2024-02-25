@@ -51,11 +51,15 @@ public class CrmReceivableRespVO {
     @ExcelProperty("负责人部门")
     private String ownerUserDeptName;
 
-    @Schema(description = "备注", example = "备注")
-    private String remark;
+    @Schema(description = "工作流编号", example = "1043")
+    @ExcelProperty("工作流编号")
+    private String processInstanceId;
 
     @Schema(description = "审批状态", requiredMode = Schema.RequiredMode.REQUIRED, example = "0")
     private Integer auditStatus;
+
+    @Schema(description = "备注", example = "备注")
+    private String remark;
 
     @Schema(description = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED)
     private LocalDateTime createTime;

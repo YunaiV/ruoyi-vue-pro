@@ -41,8 +41,7 @@ import java.util.stream.Stream;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.common.pojo.PageParam.PAGE_SIZE_NONE;
-import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertListByFlatMap;
-import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
 import static cn.iocoder.yudao.framework.common.util.collection.MapUtils.findAndThen;
 import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.EXPORT;
 import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
@@ -95,7 +94,14 @@ public class CrmReceivableController {
     @PreAuthorize("@ss.hasPermission('crm:receivable:query')")
     public CommonResult<CrmReceivableRespVO> getReceivable(@RequestParam("id") Long id) {
         CrmReceivableDO receivable = receivableService.getReceivable(id);
-        return success(BeanUtils.toBean(receivable, CrmReceivableRespVO.class));
+        return success(buildReceivableDetail(receivable));
+    }
+
+    private CrmReceivableRespVO buildReceivableDetail(CrmReceivableDO receivable) {
+        if (receivable == null) {
+            return null;
+        }
+        return buildReceivableDetailList(Collections.singletonList(receivable)).get(0);
     }
 
     @GetMapping("/page")

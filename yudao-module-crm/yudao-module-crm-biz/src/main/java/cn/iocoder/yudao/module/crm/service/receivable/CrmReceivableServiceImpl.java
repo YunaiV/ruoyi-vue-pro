@@ -37,7 +37,6 @@ import org.springframework.validation.annotation.Validated;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Objects;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.crm.enums.ErrorCodeConstants.*;
@@ -54,11 +53,10 @@ import static cn.iocoder.yudao.module.crm.util.CrmAuditStatusUtils.convertBpmRes
 @Slf4j
 public class CrmReceivableServiceImpl implements CrmReceivableService {
 
-    // TODO @芋艿：改个名字
     /**
-     * BPM 回款审批流程标识
+     * BPM 合同审批流程标识
      */
-    public static final String RECEIVABLE_APPROVE = "receivable-approve";
+    public static final String BPM_PROCESS_DEFINITION_KEY = "crm-receivable-audit";
 
     @Resource
     private CrmReceivableMapper receivableMapper;
@@ -79,6 +77,7 @@ public class CrmReceivableServiceImpl implements CrmReceivableService {
     @Resource
     private BpmProcessInstanceApi bpmProcessInstanceApi;
 
+    // TODO @puhui999：操作日志没记录上
     @Override
     @Transactional(rollbackFor = Exception.class)
     @LogRecord(type = CRM_RECEIVABLE_TYPE, subType = CRM_RECEIVABLE_CREATE_SUB_TYPE, bizNo = "{{#receivable.id}}",
@@ -134,6 +133,7 @@ public class CrmReceivableServiceImpl implements CrmReceivableService {
         }
     }
 
+    // TODO @puhui999：操作日志没记录上
     @Override
     @Transactional(rollbackFor = Exception.class)
     @LogRecord(type = CRM_RECEIVABLE_TYPE, subType = CRM_RECEIVABLE_UPDATE_SUB_TYPE, bizNo = "{{#updateReqVO.id}}",
@@ -184,7 +184,7 @@ public class CrmReceivableServiceImpl implements CrmReceivableService {
         // 1.1 校验存在
         CrmReceivableDO receivable = validateReceivableExists(id);
         // 1.2 如果被 CrmReceivablePlanDO 所使用，则不允许删除
-        if (Objects.nonNull(receivable.getPlanId()) && receivablePlanService.getReceivablePlan(receivable.getPlanId()) != null) {
+        if (receivable.getPlanId() != null && receivablePlanService.getReceivablePlan(receivable.getPlanId()) != null) {
             throw exception(RECEIVABLE_DELETE_FAIL);
         }
 
@@ -210,7 +210,7 @@ public class CrmReceivableServiceImpl implements CrmReceivableService {
 
         // 2. 创建回款审批流程实例
         String processInstanceId = bpmProcessInstanceApi.createProcessInstance(userId, new BpmProcessInstanceCreateReqDTO()
-                .setProcessDefinitionKey(RECEIVABLE_APPROVE).setBusinessKey(String.valueOf(id)));
+                .setProcessDefinitionKey(BPM_PROCESS_DEFINITION_KEY).setBusinessKey(String.valueOf(id)));
 
         // 3. 更新回款工作流编号
         receivableMapper.updateById(new CrmReceivableDO().setId(id).setProcessInstanceId(processInstanceId)
