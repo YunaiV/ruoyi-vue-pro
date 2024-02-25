@@ -46,9 +46,6 @@ public class CrmReceivableSaveReqVO {
     @NotNull(message = "负责人编号不能为空")
     private Long ownerUserId;
 
-    @Schema(description = "显示顺序")
-    private Integer sort;
-
     @Schema(description = "备注", example = "备注")
     private String remark;
 

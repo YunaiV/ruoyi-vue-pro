@@ -28,6 +28,7 @@ public interface CrmReceivableMapper extends BaseMapperX<CrmReceivableDO> {
         return selectPage(reqVO, new LambdaQueryWrapperX<CrmReceivableDO>()
                 .eq(CrmReceivableDO::getCustomerId, reqVO.getCustomerId()) // 必须传递
                 .eqIfPresent(CrmReceivableDO::getNo, reqVO.getNo())
+                .eqIfPresent(CrmReceivableDO::getContractId, reqVO.getContractId())
                 .eqIfPresent(CrmReceivableDO::getPlanId, reqVO.getPlanId())
                 .orderByDesc(CrmReceivableDO::getId));
     }
@@ -41,6 +42,7 @@ public interface CrmReceivableMapper extends BaseMapperX<CrmReceivableDO> {
         query.selectAll(CrmReceivableDO.class)
                 .eqIfPresent(CrmReceivableDO::getNo, pageReqVO.getNo())
                 .eqIfPresent(CrmReceivableDO::getPlanId, pageReqVO.getPlanId())
+                .eqIfPresent(CrmReceivableDO::getContractId, pageReqVO.getContractId())
                 .eqIfPresent(CrmReceivableDO::getAuditStatus, pageReqVO.getAuditStatus())
                 .orderByDesc(CrmReceivableDO::getId);
         return selectJoinPage(pageReqVO, CrmReceivableDO.class, query);

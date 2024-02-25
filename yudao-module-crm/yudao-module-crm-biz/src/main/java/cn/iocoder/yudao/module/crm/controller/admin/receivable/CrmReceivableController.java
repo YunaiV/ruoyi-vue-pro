@@ -153,7 +153,7 @@ public class CrmReceivableController {
 
     @PutMapping("/submit")
     @Operation(summary = "提交回款审批")
-    @PreAuthorize("@ss.hasPermission('crm:receivable:submit')")
+    @PreAuthorize("@ss.hasPermission('crm:receivable:update')")
     public CommonResult<Boolean> submitContract(@RequestParam("id") Long id) {
         receivableService.submitReceivable(id, getLoginUserId());
         return success(true);

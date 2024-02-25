@@ -38,9 +38,6 @@ public class CrmReceivableRespVO {
     @Schema(description = "负责人编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "2")
     private Long ownerUserId;
 
-    @Schema(description = "显示顺序")
-    private Integer sort;
-
     @Schema(description = "备注", example = "备注")
     private String remark;
 
