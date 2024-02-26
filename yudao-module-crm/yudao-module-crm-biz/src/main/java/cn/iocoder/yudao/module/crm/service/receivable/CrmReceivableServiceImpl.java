@@ -6,6 +6,7 @@ import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
 import cn.iocoder.yudao.module.bpm.api.task.BpmProcessInstanceApi;
@@ -36,6 +37,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import java.math.BigDecimal;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -85,18 +87,21 @@ public class CrmReceivableServiceImpl implements CrmReceivableService {
     @LogRecord(type = CRM_RECEIVABLE_TYPE, subType = CRM_RECEIVABLE_CREATE_SUB_TYPE, bizNo = "{{#receivable.id}}",
             success = CRM_RECEIVABLE_CREATE_SUCCESS)
     public Long createReceivable(CrmReceivableSaveReqVO createReqVO) {
-        // 1.1 校验关联数据存在
+        // 1.1 校验可回款金额超过上限
+        validateReceivablePriceExceedsLimit(createReqVO);
+        // 1.2 校验关联数据存在
         validateRelationDataExists(createReqVO);
-        // 1.2 生成回款编号
+        // 1.3 生成回款编号
         String no = noRedisDAO.generate(CrmNoRedisDAO.RECEIVABLE_PREFIX);
         if (receivableMapper.selectByNo(no) != null) {
             throw exception(RECEIVABLE_NO_EXISTS);
         }
 
-        // 2. 插入回款
+        // 2.1 插入回款
         CrmReceivableDO receivable = BeanUtils.toBean(createReqVO, CrmReceivableDO.class)
                 .setNo(no).setAuditStatus(CrmAuditStatusEnum.DRAFT.getStatus());
         receivableMapper.insert(receivable);
+        // 2.2
 
         // 3. 创建数据权限
         permissionService.createPermission(new CrmPermissionCreateReqBO().setBizType(CrmBizTypeEnum.CRM_RECEIVABLE.getType())
@@ -111,6 +116,22 @@ public class CrmReceivableServiceImpl implements CrmReceivableService {
         // 5. 记录操作日志上下文
         LogRecordContext.putVariable("receivable", receivable);
         return receivable.getId();
+    }
+
+    private void validateReceivablePriceExceedsLimit(CrmReceivableSaveReqVO reqVO) {
+        // 1. 计算剩余可退款金额，不包括 reqVO 自身
+        CrmContractDO contract = contractService.validateContract(reqVO.getContractId());
+        List<CrmReceivableDO> receivables = receivableMapper.selectListByContractIdAndStatus(reqVO.getContractId(),
+                Arrays.asList(CrmAuditStatusEnum.APPROVE.getStatus(), CrmAuditStatusEnum.PROCESS.getStatus()));
+        if (reqVO.getId() != null) {
+            receivables.removeIf(receivable -> ObjectUtil.equal(receivable.getId(), reqVO.getId()));
+        }
+        BigDecimal notReceivablePrice = contract.getTotalPrice().subtract(
+                CollectionUtils.getSumValue(receivables, CrmReceivableDO::getPrice, BigDecimal::add, BigDecimal.ZERO));
+        // 2. 校验金额是否超过
+        if (reqVO.getPrice().compareTo(notReceivablePrice) > 0) {
+            throw exception(RECEIVABLE_CREATE_FAIL_PRICE_EXCEEDS_LIMIT, notReceivablePrice);
+        }
     }
 
     private void validateRelationDataExists(CrmReceivableSaveReqVO reqVO) {
@@ -144,9 +165,11 @@ public class CrmReceivableServiceImpl implements CrmReceivableService {
     public void updateReceivable(CrmReceivableSaveReqVO updateReqVO) {
         Assert.notNull(updateReqVO.getId(), "回款编号不能为空");
         updateReqVO.setOwnerUserId(null).setCustomerId(null).setContractId(null).setPlanId(null); // 不允许修改的字段
-        // 1.1 校验存在
+        // 1.1 校验可回款金额超过上限
+        validateReceivablePriceExceedsLimit(updateReqVO);
+        // 1.2 校验存在
         CrmReceivableDO receivable = validateReceivableExists(updateReqVO.getId());
-        // 1.2 只有草稿、审批中，可以编辑；
+        // 1.3 只有草稿、审批中，可以编辑；
         if (!ObjectUtils.equalsAny(receivable.getAuditStatus(), CrmAuditStatusEnum.DRAFT.getStatus(),
                 CrmAuditStatusEnum.PROCESS.getStatus())) {
             throw exception(RECEIVABLE_UPDATE_FAIL_EDITING_PROHIBITED);
@@ -189,6 +212,7 @@ public class CrmReceivableServiceImpl implements CrmReceivableService {
         if (receivable.getPlanId() != null && receivablePlanService.getReceivablePlan(receivable.getPlanId()) != null) {
             throw exception(RECEIVABLE_DELETE_FAIL);
         }
+        // TODO @芋艿：审批通过时，不允许删除；
 
         // 2. 删除
         receivableMapper.deleteById(id);
