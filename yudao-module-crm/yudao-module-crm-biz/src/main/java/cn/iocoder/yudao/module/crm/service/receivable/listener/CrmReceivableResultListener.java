@@ -4,8 +4,9 @@ import cn.iocoder.yudao.module.bpm.event.BpmProcessInstanceResultEvent;
 import cn.iocoder.yudao.module.bpm.event.BpmProcessInstanceResultEventListener;
 import cn.iocoder.yudao.module.crm.service.receivable.CrmReceivableService;
 import cn.iocoder.yudao.module.crm.service.receivable.CrmReceivableServiceImpl;
-import jakarta.annotation.Resource;
 import org.springframework.stereotype.Component;
+
+import javax.annotation.Resource;
 
 /**
  * 回款审批的结果的监听器实现类

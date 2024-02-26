@@ -6,10 +6,10 @@ import cn.iocoder.yudao.module.crm.dal.dataobject.contract.CrmContractConfigDO;
 import cn.iocoder.yudao.module.crm.dal.mysql.contract.CrmContractConfigMapper;
 import com.mzt.logapi.context.LogRecordContext;
 import com.mzt.logapi.starter.annotation.LogRecord;
-import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
+import javax.annotation.Resource;
 import java.util.Objects;
 
 import static cn.iocoder.yudao.module.crm.enums.LogRecordConstants.*;

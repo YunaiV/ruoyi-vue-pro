@@ -3,10 +3,10 @@ package cn.iocoder.yudao.module.crm.dal.redis.no;
 import cn.hutool.core.date.DatePattern;
 import cn.hutool.core.date.DateUtil;
 import cn.iocoder.yudao.module.crm.dal.redis.RedisKeyConstants;
-import jakarta.annotation.Resource;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Repository;
 
+import javax.annotation.Resource;
 import java.time.Duration;
 import java.time.LocalDateTime;
 
