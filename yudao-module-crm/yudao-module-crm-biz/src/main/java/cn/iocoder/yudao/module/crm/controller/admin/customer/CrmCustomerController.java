@@ -128,7 +128,6 @@ public class CrmCustomerController {
     @Operation(summary = "获得客户分页")
     @PreAuthorize("@ss.hasPermission('crm:customer:query')")
     public CommonResult<PageResult<CrmCustomerRespVO>> getCustomerPage(@Valid CrmCustomerPageReqVO pageVO) {
-        customerService.autoPutCustomerPool();
         // 1. 查询客户分页
         PageResult<CrmCustomerDO> pageResult = customerService.getCustomerPage(pageVO, getLoginUserId());
         if (CollUtil.isEmpty(pageResult.getList())) {
