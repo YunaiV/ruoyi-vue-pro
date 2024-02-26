@@ -1,7 +1,9 @@
 package cn.iocoder.yudao.module.crm.controller.admin.followup.vo;
 
 import cn.iocoder.yudao.framework.excel.core.annotations.DictFormat;
+import cn.iocoder.yudao.module.crm.controller.admin.business.vo.business.CrmBusinessRespVO;
 import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
+import com.alibaba.excel.annotation.ExcelProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
@@ -36,18 +38,25 @@ public class CrmFollowUpRecordRespVO {
 
     @Schema(description = "关联的商机编号数组")
     private List<Long> businessIds;
-    @Schema(description = "关联的商机名称数组")
-    private List<String> businessNames;
+    @Schema(description = "关联的商机数组")
+    private List<CrmBusinessRespVO> businesses;
 
     @Schema(description = "关联的联系人编号数组")
     private List<Long> contactIds;
     @Schema(description = "关联的联系人名称数组")
-    private List<String> contactNames;
+    private List<CrmBusinessRespVO> contacts;
 
     @Schema(description = "图片")
     private List<String> picUrls;
     @Schema(description = "附件")
     private List<String> fileUrls;
+
+    @Schema(description = "创建人", example = "1024")
+    @ExcelProperty("创建人")
+    private String creator;
+    @Schema(description = "创建人名字", example = "芋道源码")
+    @ExcelProperty("创建人名字")
+    private String creatorName;
 
     @Schema(description = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED)
     private LocalDateTime createTime;

@@ -8,6 +8,8 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
 
+import java.math.BigDecimal;
+
 /**
  * CRM 产品 DO
  *
@@ -43,9 +45,9 @@ public class CrmProductDO extends BaseDO {
      */
     private Integer unit;
     /**
-     * 价格，单位：分
+     * 价格，单位：元
      */
-    private Integer price;
+    private BigDecimal price;
     /**
      * 状态
      *

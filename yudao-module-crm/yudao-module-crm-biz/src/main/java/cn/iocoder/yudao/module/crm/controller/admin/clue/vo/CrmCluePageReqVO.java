@@ -17,6 +17,9 @@ public class CrmCluePageReqVO extends PageParam {
     @Schema(description = "线索名称", example = "线索xxx")
     private String name;
 
+    @Schema(description = "转化状态", example = "2048")
+    private Boolean transformStatus;
+
     @Schema(description = "电话", example = "18000000000")
     private String telephone;
 
@@ -38,5 +41,8 @@ public class CrmCluePageReqVO extends PageParam {
 
     @Schema(description = "客户来源", example = "1")
     private Integer source;
+
+    @Schema(description = "跟进状态", example = "true")
+    private Boolean followUpStatus;
 
 }

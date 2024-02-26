@@ -164,7 +164,7 @@ public class ErpPurchaseInServiceImpl implements ErpPurchaseInService {
             throw exception(approve ? PURCHASE_IN_APPROVE_FAIL : PURCHASE_IN_PROCESS_FAIL);
         }
         // 1.3 校验已付款
-        if (approve && purchaseIn.getPaymentPrice().compareTo(BigDecimal.ZERO) > 0) {
+        if (!approve && purchaseIn.getPaymentPrice().compareTo(BigDecimal.ZERO) > 0) {
             throw exception(PURCHASE_IN_PROCESS_FAIL_EXISTS_PAYMENT);
         }
 

@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 
 
 /**
- * 订单序号的 Redis DAO
+ * Erp 订单序号的 Redis DAO
  *
  * @author HUIHUI
  */

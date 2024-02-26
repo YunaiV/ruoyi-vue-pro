@@ -16,12 +16,10 @@ import java.time.LocalDateTime;
 @SuppressWarnings("rawtypes")
 public interface ApiAccessLogStatisticsMapper extends BaseMapperX {
 
-    // TODO 芋艿：已经 review
     Integer selectIpCountByUserTypeAndCreateTimeBetween(@Param("userType") Integer userType,
                                                         @Param("beginTime") LocalDateTime beginTime,
                                                         @Param("endTime") LocalDateTime endTime);
 
-    // TODO 芋艿：已经 review
     Integer selectUserCountByUserTypeAndCreateTimeBetween(@Param("userType") Integer userType,
                                                           @Param("beginTime") LocalDateTime beginTime,
                                                           @Param("endTime") LocalDateTime endTime);

@@ -3,10 +3,13 @@ package cn.iocoder.yudao.module.crm.service.product;
 import cn.iocoder.yudao.module.crm.controller.admin.product.vo.category.CrmProductCategoryCreateReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.product.vo.category.CrmProductCategoryListReqVO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.product.CrmProductCategoryDO;
+import jakarta.validation.Valid;
 
-import javax.validation.Valid;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
+
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
 
 /**
  * CRM 产品分类 Service 接口
@@ -60,5 +63,15 @@ public interface CrmProductCategoryService {
      * @return 产品分类列表
      */
     List<CrmProductCategoryDO> getProductCategoryList(Collection<Long> ids);
+
+    /**
+     * 获得产品分类 Map
+     *
+     * @param ids 编号数组
+     * @return 产品分类 Map
+     */
+    default Map<Long, CrmProductCategoryDO> getProductCategoryMap(Collection<Long> ids) {
+        return convertMap(getProductCategoryList(ids), CrmProductCategoryDO::getId);
+    }
 
 }

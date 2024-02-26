@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.bpm.service.oa.listener;
 
-import cn.iocoder.yudao.module.bpm.framework.bpm.core.event.BpmProcessInstanceResultEvent;
-import cn.iocoder.yudao.module.bpm.framework.bpm.core.event.BpmProcessInstanceResultEventListener;
+import cn.iocoder.yudao.module.bpm.event.BpmProcessInstanceResultEvent;
+import cn.iocoder.yudao.module.bpm.event.BpmProcessInstanceResultEventListener;
 import cn.iocoder.yudao.module.bpm.service.oa.BpmOALeaveService;
 import cn.iocoder.yudao.module.bpm.service.oa.BpmOALeaveServiceImpl;
 import org.springframework.stereotype.Component;

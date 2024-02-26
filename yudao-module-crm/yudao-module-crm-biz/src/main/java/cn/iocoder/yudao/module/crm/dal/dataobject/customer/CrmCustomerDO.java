@@ -9,8 +9,6 @@ import lombok.*;
 
 import java.time.LocalDateTime;
 
-// TODO 芋艿：调整下字段
-
 /**
  * CRM 客户 DO
  *
@@ -35,10 +33,35 @@ public class CrmCustomerDO extends BaseDO {
      * 客户名称
      */
     private String name;
+
     /**
      * 跟进状态
      */
     private Boolean followUpStatus;
+    /**
+     * 最后跟进时间
+     */
+    private LocalDateTime contactLastTime;
+    /**
+     * 最后跟进内容
+     */
+    private String contactLastContent;
+    /**
+     * 下次联系时间
+     */
+    private LocalDateTime contactNextTime;
+
+    /**
+     * 负责人的用户编号
+     *
+     * 关联 AdminUserDO 的 id 字段
+     */
+    private Long ownerUserId;
+    /**
+     * 成为负责人的时间
+     */
+    private LocalDateTime ownerTime;
+
     /**
      * 锁定状态
      */
@@ -47,6 +70,37 @@ public class CrmCustomerDO extends BaseDO {
      * 成交状态
      */
     private Boolean dealStatus;
+
+    /**
+     * 手机
+     */
+    private String mobile;
+    /**
+     * 电话
+     */
+    private String telephone;
+    /**
+     * QQ
+     */
+    private String qq;
+    /**
+     * wechat
+     */
+    private String wechat;
+    /**
+     * email
+     */
+    private String email;
+    /**
+     * 所在地
+     *
+     * 关联 {@link cn.iocoder.yudao.framework.ip.core.Area#getId()} 字段
+     */
+    private Integer areaId;
+    /**
+     * 详细地址
+     */
+    private String detailAddress;
     /**
      * 所属行业
      *
@@ -66,70 +120,8 @@ public class CrmCustomerDO extends BaseDO {
      */
     private Integer source;
     /**
-     * 手机
-     */
-    private String mobile;
-    /**
-     * 电话
-     */
-    private String telephone;
-    /**
-     * 网址
-     */
-    private String website;
-    /**
-     * QQ
-     */
-    private String qq;
-    /**
-     * wechat
-     */
-    private String wechat;
-    /**
-     * email
-     */
-    private String email;
-    /**
-     * 客户描述
-     */
-    private String description;
-    /**
      * 备注
      */
     private String remark;
-    /**
-     * 负责人的用户编号
-     *
-     * 关联 AdminUserDO 的 id 字段
-     */
-    private Long ownerUserId;
-    /**
-     * 所在地
-     *
-     * 关联 {@link cn.iocoder.yudao.framework.ip.core.Area#getId()} 字段
-     */
-    private Integer areaId;
-    /**
-     * 详细地址
-     */
-    private String detailAddress;
-
-    /**
-     * 最后接收时间
-     */
-    private LocalDateTime receiveTime;
-    /**
-     * 最后跟进时间
-     */
-    private LocalDateTime contactLastTime;
-
-    /**
-     * 最后跟进内容
-     */
-    private String contactLastContent;
-    /**
-     * 下次联系时间
-     */
-    private LocalDateTime contactNextTime;
 
 }

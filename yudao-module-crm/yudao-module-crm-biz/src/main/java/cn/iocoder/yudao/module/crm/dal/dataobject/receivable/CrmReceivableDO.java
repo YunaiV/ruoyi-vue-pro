@@ -2,11 +2,16 @@ package cn.iocoder.yudao.module.crm.dal.dataobject.receivable;
 
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.contract.CrmContractDO;
+import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerDO;
+import cn.iocoder.yudao.module.crm.enums.common.CrmAuditStatusEnum;
+import cn.iocoder.yudao.module.crm.enums.receivable.CrmReceivableReturnTypeEnum;
+import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 /**
@@ -33,64 +38,57 @@ public class CrmReceivableDO extends BaseDO {
      * 回款编号
      */
     private String no;
-    // TODO @liuhongfeng：“对应实体”，参考别的模块，关联 {@link TableField.MetaInfo#getJdbcType()}
     /**
-     * 回款计划
+     * 回款计划编号
      *
-     * TODO @liuhongfeng：这个字段什么时候更新，也可以写下
-     *
-     * 对应实体 {@link CrmReceivablePlanDO}
+     * 关联 {@link CrmReceivablePlanDO#getId()}，非必须
      */
     private Long planId;
     /**
-     * 客户 ID
+     * 客户编号
      *
-     * 对应实体 {@link cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerDO}
+     * 关联 {@link CrmCustomerDO#getId()}
      */
     private Long customerId;
     /**
-     * 合同 ID
+     * 合同编号
      *
-     * 对应实体 {@link CrmContractDO}
+     * 关联 {@link CrmContractDO#getId()}
      */
     private Long contractId;
     /**
-     * 工作流编号
-     *
-     * TODO @liuhongfeng：这个字段，后续要写下关联的实体哈
+     * 负责人编号，关联 {@link AdminUserRespDTO#getId()}
      */
-    private Long processInstanceId;
+    private Long ownerUserId;
+
     /**
      * 回款日期
      */
     private LocalDateTime returnTime;
-    // TODO @liuhongfeng：少个枚举
     /**
-     * 回款方式
+     * 回款方式,关联枚举{@link CrmReceivableReturnTypeEnum}
      */
     private Integer returnType;
     /**
-     * 回款金额
+     * 计划回款金额，单位：元
      */
-    private Integer price;
-    // TODO @liuhongfeng：少关联实体；
-    /**
-     * 负责人
-     */
-    private Long ownerUserId;
-    /**
-     * 显示顺序
-     */
-    private Integer sort;
-    /**
-     * 审核状态
-     *
-     * 枚举 {@link cn.iocoder.yudao.module.crm.enums.common.CrmAuditStatusEnum}
-     */
-    private Integer auditStatus;
+    private BigDecimal price;
     /**
      * 备注
      */
     private String remark;
+
+    /**
+     * 工作流编号
+     *
+     * 关联 ProcessInstance 的 id 属性
+     */
+    private String processInstanceId;
+    /**
+     * 审批状态
+     *
+     * 枚举 {@link CrmAuditStatusEnum}
+     */
+    private Integer auditStatus;
 
 }

@@ -172,7 +172,7 @@ public class ErpSaleReturnServiceImpl implements ErpSaleReturnService {
             throw exception(approve ? SALE_RETURN_APPROVE_FAIL : SALE_RETURN_PROCESS_FAIL);
         }
         // 1.3 校验已退款
-        if (approve && saleReturn.getRefundPrice().compareTo(BigDecimal.ZERO) > 0) {
+        if (!approve && saleReturn.getRefundPrice().compareTo(BigDecimal.ZERO) > 0) {
             throw exception(SALE_RETURN_PROCESS_FAIL_EXISTS_REFUND);
         }
 

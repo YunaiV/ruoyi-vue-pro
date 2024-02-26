@@ -30,8 +30,10 @@ public class CrmReceivablePlanPageReqVO extends PageParam {
     @Schema(description = "客户编号", example = "18026")
     private Long customerId;
 
-    // TODO @芋艿：这个搜的应该是合同编号 no
-    @Schema(description = "合同名称", example = "3473")
+    @Schema(description = "合同编号", example = "H3473")
+    private String contractNo;
+
+    @Schema(description = "合同编号", example = "3473")
     private Long contractId;
 
     @Schema(description = "场景类型", example = "1")

@@ -4,9 +4,10 @@ import cn.iocoder.yudao.module.crm.framework.operatelog.core.CrmProductStatusPar
 import cn.iocoder.yudao.module.crm.framework.operatelog.core.CrmProductUnitParseFunction;
 import com.mzt.logapi.starter.annotation.DiffLogField;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
-import javax.validation.constraints.NotNull;
+import java.math.BigDecimal;
 
 @Schema(description = "管理后台 - CRM 产品创建/修改 Request VO")
 @Data
@@ -29,10 +30,10 @@ public class CrmProductSaveReqVO {
     @DiffLogField(name = "单位", function = CrmProductUnitParseFunction.NAME)
     private Integer unit;
 
-    @Schema(description = "价格, 单位：分", requiredMode = Schema.RequiredMode.REQUIRED, example = "8911")
+    @Schema(description = "价格", requiredMode = Schema.RequiredMode.REQUIRED, example = "8911")
     @NotNull(message = "价格不能为空")
     @DiffLogField(name = "价格")
-    private Long price;
+    private BigDecimal price;
 
     @Schema(description = "状态", requiredMode = Schema.RequiredMode.REQUIRED, example = "上架")
     @NotNull(message = "状态不能为空")

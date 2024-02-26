@@ -26,26 +26,16 @@ public class CrmCustomerPoolConfigServiceImpl implements CrmCustomerPoolConfigSe
     @Resource
     private CrmCustomerPoolConfigMapper customerPoolConfigMapper;
 
-    /**
-     * 获得客户公海配置
-     *
-     * @return 客户公海配置
-     */
     @Override
     public CrmCustomerPoolConfigDO getCustomerPoolConfig() {
         return customerPoolConfigMapper.selectOne();
     }
 
-    /**
-     * 保存客户公海配置
-     *
-     * @param saveReqVO 更新信息
-     */
     @Override
     @LogRecord(type = CRM_CUSTOMER_POOL_CONFIG_TYPE, subType = CRM_CUSTOMER_POOL_CONFIG_SUB_TYPE, bizNo = "{{#poolConfigId}}",
             success = CRM_CUSTOMER_POOL_CONFIG_SUCCESS)
     public void saveCustomerPoolConfig(CrmCustomerPoolConfigSaveReqVO saveReqVO) {
-        // 存在，则进行更新
+        // 1. 存在，则进行更新
         CrmCustomerPoolConfigDO dbConfig = getCustomerPoolConfig();
         CrmCustomerPoolConfigDO poolConfig = BeanUtils.toBean(saveReqVO, CrmCustomerPoolConfigDO.class);
         if (Objects.nonNull(dbConfig)) {
@@ -55,7 +45,8 @@ public class CrmCustomerPoolConfigServiceImpl implements CrmCustomerPoolConfigSe
             LogRecordContext.putVariable("poolConfigId", poolConfig.getId());
             return;
         }
-        // 不存在，则进行插入
+
+        // 2. 不存在，则进行插入
         customerPoolConfigMapper.insert(poolConfig);
         // 记录操作日志上下文
         LogRecordContext.putVariable("isPoolConfigUpdate", Boolean.FALSE);

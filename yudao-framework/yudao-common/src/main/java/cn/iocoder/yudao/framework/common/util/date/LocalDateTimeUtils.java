@@ -132,4 +132,40 @@ public class LocalDateTimeUtils {
         return LocalDateTimeUtil.between(dateTime, LocalDateTime.now(), ChronoUnit.DAYS);
     }
 
+    /**
+     * 获取今天的开始时间
+     *
+     * @return 今天
+     */
+    public static LocalDateTime getToday() {
+        return LocalDateTimeUtil.beginOfDay(LocalDateTime.now());
+    }
+
+    /**
+     * 获取昨天的开始时间
+     *
+     * @return 昨天
+     */
+    public static LocalDateTime getYesterday() {
+        return LocalDateTimeUtil.beginOfDay(LocalDateTime.now().minusDays(1));
+    }
+
+    /**
+     * 获取本月的开始时间
+     *
+     * @return 本月
+     */
+    public static LocalDateTime getMonth() {
+        return beginOfMonth(LocalDateTime.now());
+    }
+
+    /**
+     * 获取本年的开始时间
+     *
+     * @return 本年
+     */
+    public static LocalDateTime getYear() {
+        return LocalDateTime.now().with(TemporalAdjusters.firstDayOfYear()).with(LocalTime.MIN);
+    }
+
 }

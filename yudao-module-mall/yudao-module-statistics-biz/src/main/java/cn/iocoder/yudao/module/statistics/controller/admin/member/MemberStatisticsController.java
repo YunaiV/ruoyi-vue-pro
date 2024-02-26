@@ -39,7 +39,6 @@ public class MemberStatisticsController {
     @Resource
     private ApiAccessLogStatisticsService apiAccessLogStatisticsService;
 
-    // TODO 芋艿：已经 review
     @GetMapping("/summary")
     @Operation(summary = "获得会员统计（实时统计）")
     @PreAuthorize("@ss.hasPermission('statistics:member:query')")
@@ -47,7 +46,6 @@ public class MemberStatisticsController {
         return success(memberStatisticsService.getMemberSummary());
     }
 
-    // TODO 芋艿：已经 review
     @GetMapping("/analyse")
     @Operation(summary = "获得会员分析数据")
     @PreAuthorize("@ss.hasPermission('statistics:member:query')")
@@ -76,7 +74,6 @@ public class MemberStatisticsController {
         return success(MemberStatisticsConvert.INSTANCE.convert(visitUserCount, orderUserCount, payUserCount, atv, comparisonData));
     }
 
-    // TODO 芋艿：已经 review
     @GetMapping("/area-statistics-list")
     @Operation(summary = "按照省份，获得会员统计列表")
     @PreAuthorize("@ss.hasPermission('statistics:member:query')")
@@ -84,7 +81,6 @@ public class MemberStatisticsController {
         return success(memberStatisticsService.getMemberAreaStatisticsList());
     }
 
-    // TODO 芋艿：已经 review
     @GetMapping("/sex-statistics-list")
     @Operation(summary = "按照性别，获得会员统计列表")
     @PreAuthorize("@ss.hasPermission('statistics:member:query')")
@@ -92,7 +88,6 @@ public class MemberStatisticsController {
         return success(memberStatisticsService.getMemberSexStatisticsList());
     }
 
-    // TODO 芋艿：已经 review
     @GetMapping("/terminal-statistics-list")
     @Operation(summary = "按照终端，获得会员统计列表")
     @PreAuthorize("@ss.hasPermission('statistics:member:query')")
@@ -100,7 +95,6 @@ public class MemberStatisticsController {
         return success(memberStatisticsService.getMemberTerminalStatisticsList());
     }
 
-    // TODO 芋艿：已经 review
     // TODO @疯狂：要注意 date 的排序；
     @GetMapping("/user-count-comparison")
     @Operation(summary = "获得用户数量对照")
@@ -109,7 +103,6 @@ public class MemberStatisticsController {
         return success(memberStatisticsService.getUserCountComparison());
     }
 
-    // TODO 芋艿：已经 review
     @GetMapping("/register-count-list")
     @Operation(summary = "获得会员注册数量列表")
     @PreAuthorize("@ss.hasPermission('statistics:member:query')")
