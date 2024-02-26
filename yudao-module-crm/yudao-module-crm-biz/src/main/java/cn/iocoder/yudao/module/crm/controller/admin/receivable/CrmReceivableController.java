@@ -164,19 +164,19 @@ public class CrmReceivableController {
         });
     }
 
-    @GetMapping("/check-receivables-count")
-    @Operation(summary = "获得待审核回款数量")
-    @PreAuthorize("@ss.hasPermission('crm:receivable:query')")
-    public CommonResult<Long> getCheckReceivablesCount() {
-        return success(receivableService.getCheckReceivablesCount(getLoginUserId()));
-    }
-
     @PutMapping("/submit")
     @Operation(summary = "提交回款审批")
     @PreAuthorize("@ss.hasPermission('crm:receivable:update')")
     public CommonResult<Boolean> submitContract(@RequestParam("id") Long id) {
         receivableService.submitReceivable(id, getLoginUserId());
         return success(true);
+    }
+
+    @GetMapping("/audit-count")
+    @Operation(summary = "获得待审核回款数量")
+    @PreAuthorize("@ss.hasPermission('crm:receivable:query')")
+    public CommonResult<Long> getAuditReceivableCount() {
+        return success(receivableService.getAuditReceivableCount(getLoginUserId()));
     }
 
 }

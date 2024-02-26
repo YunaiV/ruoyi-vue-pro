@@ -222,7 +222,7 @@ public class CrmContractServiceImpl implements CrmContractService {
             success = CRM_CONTRACT_DELETE_SUCCESS)
     @CrmPermission(bizType = CrmBizTypeEnum.CRM_CONTRACT, bizId = "#id", level = CrmPermissionLevelEnum.OWNER)
     public void deleteContract(Long id) {
-        // TODO @合同待定：如果被 CrmReceivableDO 所使用，则不允许删除
+        // TODO @puhui999：如果被 CrmReceivableDO 所使用，则不允许删除
         // 校验存在
         CrmContractDO contract = validateContractExists(id);
         // 删除

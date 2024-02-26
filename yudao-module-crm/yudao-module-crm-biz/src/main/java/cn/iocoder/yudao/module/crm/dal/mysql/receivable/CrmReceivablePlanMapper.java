@@ -60,19 +60,16 @@ public interface CrmReceivablePlanMapper extends BaseMapperX<CrmReceivablePlanDO
         }
 
         // Backlog: 回款提醒类型
-        // TODO: @dhb52 需要配置 提前提醒天数
-        int REMIND_DAYS = 20;
         LocalDateTime beginOfToday = LocalDateTimeUtil.beginOfDay(LocalDateTime.now());
-        LocalDateTime endOfToday = LocalDateTimeUtil.endOfDay(LocalDateTime.now());
         if (CrmReceivablePlanPageReqVO.REMIND_TYPE_NEEDED.equals(pageReqVO.getRemindType())) { // 待回款
-            query.isNull(CrmReceivablePlanDO::getReceivableId)
-                    .between(CrmReceivablePlanDO::getReturnTime, beginOfToday, endOfToday.plusDays(REMIND_DAYS));
+            query.isNull(CrmReceivablePlanDO::getReceivableId) // 未回款
+                    .lt(CrmReceivablePlanDO::getReturnTime, beginOfToday) // 已逾期
+                    .lt(CrmReceivablePlanDO::getRemindTime, beginOfToday); // 今天开始提醒
         } else if (CrmReceivablePlanPageReqVO.REMIND_TYPE_EXPIRED.equals(pageReqVO.getRemindType())) {  // 已逾期
-            query.isNull(CrmReceivablePlanDO::getReceivableId)
-                    .lt(CrmReceivablePlanDO::getReturnTime, endOfToday);
+            query.isNull(CrmReceivablePlanDO::getReceivableId) // 未回款
+                    .ge(CrmReceivablePlanDO::getReturnTime, beginOfToday); // 已逾期
         } else if (CrmReceivablePlanPageReqVO.REMIND_TYPE_RECEIVED.equals(pageReqVO.getRemindType())) { // 已回款
-            query.isNotNull(CrmReceivablePlanDO::getReceivableId)
-                    .between(CrmReceivablePlanDO::getReturnTime, beginOfToday, endOfToday.plusDays(REMIND_DAYS));
+            query.isNotNull(CrmReceivablePlanDO::getReceivableId);
         }
         return selectJoinPage(pageReqVO, CrmReceivablePlanDO.class, query);
     }
@@ -86,20 +83,16 @@ public interface CrmReceivablePlanMapper extends BaseMapperX<CrmReceivablePlanDO
         return selectJoinList(CrmReceivablePlanDO.class, query);
     }
 
-    default Long selectRemindReceivablePlanCount(Long userId) {
+    default Long selectReceivablePlanCountByRemind(Long userId) {
         MPJLambdaWrapperX<CrmReceivablePlanDO> query = new MPJLambdaWrapperX<>();
         // 我负责的 + 非公海
         CrmPermissionUtils.appendPermissionCondition(query, CrmBizTypeEnum.CRM_RECEIVABLE_PLAN.getType(),
                 CrmReceivablePlanDO::getId, userId, CrmSceneTypeEnum.OWNER.getType(), Boolean.FALSE);
-        // TODO: @dhb52 需要配置 提前提醒天数
-        int REMIND_DAYS = 20;
+        // 未回款 + 已逾期 + 今天开始提醒
         LocalDateTime beginOfToday = LocalDateTimeUtil.beginOfDay(LocalDateTime.now());
-        LocalDateTime endOfToday = LocalDateTimeUtil.endOfDay(LocalDateTime.now());
-        query.isNull(CrmReceivablePlanDO::getReceivableId)
-                .between(CrmReceivablePlanDO::getReturnTime, beginOfToday, endOfToday.plusDays(REMIND_DAYS));
-        // TODO return_time 小于现在；
-        // TODO 未回款
-        // TODO remind_time 大于现在；
+        query.isNull(CrmReceivablePlanDO::getReceivableId) // 未回款
+                .lt(CrmReceivablePlanDO::getReturnTime, beginOfToday) // 已逾期
+                .lt(CrmReceivablePlanDO::getRemindTime, beginOfToday); // 今天开始提醒
         return selectCount(query);
     }
 

@@ -110,9 +110,9 @@ public interface CrmReceivableService {
      * 获得待审核回款数量
      *
      * @param userId 用户编号
-     * @return 提醒数量
+     * @return 待审批数量
      */
-    Long getCheckReceivablesCount(Long userId);
+    Long getAuditReceivableCount(Long userId);
 
     /**
      * 获得合同已回款金额 Map

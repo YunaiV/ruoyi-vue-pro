@@ -212,7 +212,7 @@ public class CrmReceivableServiceImpl implements CrmReceivableService {
         if (receivable.getPlanId() != null && receivablePlanService.getReceivablePlan(receivable.getPlanId()) != null) {
             throw exception(RECEIVABLE_DELETE_FAIL);
         }
-        // TODO @芋艿：审批通过时，不允许删除；
+        // TODO @puhui999：审批通过时，不允许删除；
 
         // 2. 删除
         receivableMapper.deleteById(id);
@@ -280,8 +280,8 @@ public class CrmReceivableServiceImpl implements CrmReceivableService {
     }
 
     @Override
-    public Long getCheckReceivablesCount(Long userId) {
-        return receivableMapper.selectCheckReceivablesCount(userId);
+    public Long getAuditReceivableCount(Long userId) {
+        return receivableMapper.selectCountByAudit(userId);
     }
 
     @Override
