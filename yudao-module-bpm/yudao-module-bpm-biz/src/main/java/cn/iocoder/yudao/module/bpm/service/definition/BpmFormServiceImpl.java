@@ -13,6 +13,8 @@ import cn.iocoder.yudao.module.bpm.enums.ErrorCodeConstants;
 import cn.iocoder.yudao.module.bpm.enums.definition.BpmModelFormTypeEnum;
 import cn.iocoder.yudao.module.bpm.service.definition.dto.BpmFormFieldRespDTO;
 import cn.iocoder.yudao.module.bpm.service.definition.dto.BpmModelMetaInfoRespDTO;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONPath;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
@@ -49,6 +51,10 @@ public class BpmFormServiceImpl implements BpmFormService {
         this.checkFields(updateReqVO.getFields());
         // 校验存在
         this.validateFormExists(updateReqVO.getId());
+
+        //修改上传控件属性
+        updateReqVO.setFields(this.updateUploadField(updateReqVO.getFields()));
+
         // 更新
         BpmFormDO updateObj = BpmFormConvert.INSTANCE.convert(updateReqVO);
         formMapper.updateById(updateObj);
@@ -127,6 +133,31 @@ public class BpmFormServiceImpl implements BpmFormService {
             // 如果存在，则报错
             throw exception(ErrorCodeConstants.FORM_FIELD_REPEAT, oldLabel, fieldDTO.getLabel(), fieldDTO.getVModel());
         }
+    }
+
+    /**
+     * 给upload类型的文件上传控件添加一个回调函数，修改预览文件地址
+     *
+     * @param fields 控件列表
+     * @return 更新后的列表
+     */
+    private List<String> updateUploadField(List<String> fields) {
+        List<String> newFields = new ArrayList<>();
+        for (String field : fields) {
+            Object typeObj = JSONPath.read(field, "$.type");
+            if (typeObj != null) {
+                if ("upload".equals(typeObj.toString())) {
+                    Object json = JSONPath.read(field, "$");
+
+                    String function = "function(res, file) {file.url=res.data;}";
+                    JSONPath.set(json, "$.props.onSuccess", function);
+
+                    field = JSON.toJSONString(json);
+                }
+            }
+            newFields.add(field);
+        }
+        return newFields;
     }
 
 }
