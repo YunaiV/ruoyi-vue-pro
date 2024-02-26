@@ -319,7 +319,13 @@ public class GlobalExceptionHandler {
             return CommonResult.error(NOT_IMPLEMENTED.getCode(),
                     "[ERP 系统 yudao-module-erp - 表结构未导入][参考 https://doc.iocoder.cn/erp/build/ 开启]");
         }
-        // 6. 支付平台
+        // 6. CRM 系统
+        if (message.contains("crm_")) {
+            log.error("[CRM 系统 yudao-module-crm - 表结构未导入][参考 https://doc.iocoder.cn/crm/build/ 开启]");
+            return CommonResult.error(NOT_IMPLEMENTED.getCode(),
+                    "[CRM 系统 yudao-module-crm - 表结构未导入][参考 https://doc.iocoder.cn/crm/build/ 开启]");
+        }
+        // 7. 支付平台
         if (message.contains("pay_")) {
             log.error("[支付模块 yudao-module-pay - 表结构未导入][参考 https://doc.iocoder.cn/pay/build/ 开启]");
             return CommonResult.error(NOT_IMPLEMENTED.getCode(),
