@@ -170,7 +170,7 @@ public class CrmPermissionServiceImpl implements CrmPermissionService {
             throw exception(CRM_PERMISSION_DELETE_FAIL);
         }
         // 校验操作人是否为负责人
-        CrmPermissionDO permission = permissionMapper.selectByBizIdAndUserId(permissions.getFirst().getBizId(), userId);
+        CrmPermissionDO permission = permissionMapper.selectByBizIdAndUserId(permissions.get(0).getBizId(), userId);
         if (permission == null) {
             throw exception(CRM_PERMISSION_DELETE_DENIED);
         }
