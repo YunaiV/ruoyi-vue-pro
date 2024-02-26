@@ -24,6 +24,9 @@ public class CrmReceivablePageReqVO extends PageParam {
     @Schema(description = "客户编号", example = "4963")
     private Long customerId;
 
+    @Schema(description = "合同编号", example = "4963")
+    private Long contractId;
+
     @Schema(description = "场景类型", example = "1")
     @InEnum(CrmSceneTypeEnum.class)
     private Integer sceneType; // 场景类型，为 null 时则表示全部

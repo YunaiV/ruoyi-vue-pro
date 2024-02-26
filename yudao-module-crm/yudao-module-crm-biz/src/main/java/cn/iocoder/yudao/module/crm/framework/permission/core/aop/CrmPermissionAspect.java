@@ -9,7 +9,7 @@ import cn.iocoder.yudao.module.crm.dal.dataobject.permission.CrmPermissionDO;
 import cn.iocoder.yudao.module.crm.enums.common.CrmBizTypeEnum;
 import cn.iocoder.yudao.module.crm.enums.permission.CrmPermissionLevelEnum;
 import cn.iocoder.yudao.module.crm.framework.permission.core.annotations.CrmPermission;
-import cn.iocoder.yudao.module.crm.framework.permission.core.util.CrmPermissionUtils;
+import cn.iocoder.yudao.module.crm.util.CrmPermissionUtils;
 import cn.iocoder.yudao.module.crm.service.permission.CrmPermissionService;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;

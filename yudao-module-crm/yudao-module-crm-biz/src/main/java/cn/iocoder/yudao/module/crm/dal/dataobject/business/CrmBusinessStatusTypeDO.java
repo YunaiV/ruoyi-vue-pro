@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.module.crm.dal.dataobject.business;
 
-import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.framework.mybatis.core.type.LongListTypeHandler;
 import com.baomidou.mybatisplus.annotation.KeySequence;
@@ -12,7 +11,9 @@ import lombok.*;
 import java.util.List;
 
 /**
- * 商机状态类型 DO
+ * CRM 商机状态组 DO
+ *
+ * 注意，它是个配置表
  *
  * @author ljlleo
  */
@@ -35,17 +36,11 @@ public class CrmBusinessStatusTypeDO extends BaseDO {
      * 状态类型名
      */
     private String name;
+
     /**
      * 使用的部门编号
      */
     @TableField(typeHandler = LongListTypeHandler.class)
     private List<Long> deptIds;
-    /**
-     * 开启状态
-     *
-     * TODO 改成 Integer，关联 CommonStatus
-     * 枚举 {@link CommonStatusEnum}
-     */
-    private Boolean status;
 
 }

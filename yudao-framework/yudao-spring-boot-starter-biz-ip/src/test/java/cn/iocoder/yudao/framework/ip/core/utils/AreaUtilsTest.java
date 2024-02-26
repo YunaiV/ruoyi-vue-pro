@@ -17,7 +17,7 @@ public class AreaUtilsTest {
     @Test
     public void testGetArea() {
         // 调用：北京
-        Area area = AreaUtils.getArea(110100);
+        Area area = AreaUtils.parseArea(110100);
         // 断言
         assertEquals(area.getId(), 110100);
         assertEquals(area.getName(), "北京市");

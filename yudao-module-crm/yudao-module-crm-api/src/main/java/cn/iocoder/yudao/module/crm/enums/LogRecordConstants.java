@@ -8,19 +8,21 @@ package cn.iocoder.yudao.module.crm.enums;
  */
 public interface LogRecordConstants {
 
-    // ======================= CRM_LEADS 线索 =======================
+    // ======================= CRM_CLUE 线索 =======================
 
-    String CRM_LEADS_TYPE = "CRM 线索";
-    String CRM_LEADS_CREATE_SUB_TYPE = "创建线索";
-    String CRM_LEADS_CREATE_SUCCESS = "创建了线索{{#clue.name}}";
-    String CRM_LEADS_UPDATE_SUB_TYPE = "更新线索";
-    String CRM_LEADS_UPDATE_SUCCESS = "更新了线索【{{#clueName}}】: {_DIFF{#updateReq}}";
-    String CRM_LEADS_DELETE_SUB_TYPE = "删除线索";
-    String CRM_LEADS_DELETE_SUCCESS = "删除了线索【{{#clueName}}】";
-    String CRM_LEADS_TRANSFER_SUB_TYPE = "转移线索";
-    String CRM_LEADS_TRANSFER_SUCCESS = "将线索【{{#clue.name}}】的负责人从【{getAdminUserById{#clue.ownerUserId}}】变更为了【{getAdminUserById{#reqVO.newOwnerUserId}}】";
-    String CRM_LEADS_TRANSLATE_SUB_TYPE = "线索转化为客户";
-    String CRM_LEADS_TRANSLATE_SUCCESS = "将线索【{{#clue.name}}】转化为客户";
+    String CRM_CLUE_TYPE = "CRM 线索";
+    String CRM_CLUE_CREATE_SUB_TYPE = "创建线索";
+    String CRM_CLUE_CREATE_SUCCESS = "创建了线索{{#clue.name}}";
+    String CRM_CLUE_UPDATE_SUB_TYPE = "更新线索";
+    String CRM_CLUE_UPDATE_SUCCESS = "更新了线索【{{#clueName}}】: {_DIFF{#updateReq}}";
+    String CRM_CLUE_DELETE_SUB_TYPE = "删除线索";
+    String CRM_CLUE_DELETE_SUCCESS = "删除了线索【{{#clueName}}】";
+    String CRM_CLUE_TRANSFER_SUB_TYPE = "转移线索";
+    String CRM_CLUE_TRANSFER_SUCCESS = "将线索【{{#clue.name}}】的负责人从【{getAdminUserById{#clue.ownerUserId}}】变更为了【{getAdminUserById{#reqVO.newOwnerUserId}}】";
+    String CRM_CLUE_TRANSLATE_SUB_TYPE = "线索转化为客户";
+    String CRM_CLUE_TRANSLATE_SUCCESS = "将线索【{{#clueName}}】转化为客户";
+    String CRM_CLUE_FOLLOW_UP_SUB_TYPE = "线索跟进";
+    String CRM_CLUE_FOLLOW_UP_SUCCESS = "线索跟进【{{#clueName}}】";
 
     // ======================= CRM_CUSTOMER 客户 =======================
 
@@ -41,6 +43,10 @@ public interface LogRecordConstants {
     String CRM_CUSTOMER_RECEIVE_SUCCESS = "{{#ownerUserName != null ? '将客户【' + #customer.name + '】分配给【' + #ownerUserName + '】' : '领取客户【' + #customer.name + '】'}}";
     String CRM_CUSTOMER_IMPORT_SUB_TYPE = "{{#isUpdate ? '导入并更新客户' : '导入客户'}}";
     String CRM_CUSTOMER_IMPORT_SUCCESS = "{{#isUpdate ? '导入并更新了客户【'+ #customer.name +'】' : '导入了客户【'+ #customer.name +'】'}}";
+    String CRM_CUSTOMER_UPDATE_DEAL_STATUS_SUB_TYPE = "更新客户成交状态";
+    String CRM_CUSTOMER_UPDATE_DEAL_STATUS_SUCCESS = "更新了客户【{{#customerName}}】的成交状态为【{{#dealStatus ? '已成交' : '未成交'}}】";
+    String CRM_CUSTOMER_FOLLOW_UP_SUB_TYPE = "客户跟进";
+    String CRM_CUSTOMER_FOLLOW_UP_SUCCESS = "客户跟进【{{#customerName}}】";
 
     // ======================= CRM_CUSTOMER_LIMIT_CONFIG 客户限制配置 =======================
 
@@ -69,6 +75,10 @@ public interface LogRecordConstants {
     String CRM_CONTACT_DELETE_SUCCESS = "删除了联系人【{{#contactName}}】";
     String CRM_CONTACT_TRANSFER_SUB_TYPE = "转移联系人";
     String CRM_CONTACT_TRANSFER_SUCCESS = "将联系人【{{#contact.name}}】的负责人从【{getAdminUserById{#contact.ownerUserId}}】变更为了【{getAdminUserById{#reqVO.newOwnerUserId}}】";
+    String CRM_CONTACT_FOLLOW_UP_SUB_TYPE = "联系人跟进";
+    String CRM_CONTACT_FOLLOW_UP_SUCCESS = "联系人跟进【{{#contactName}}】";
+    String CRM_CONTACT_UPDATE_OWNER_USER_SUB_TYPE = "更新联系人负责人";
+    String CRM_CONTACT_UPDATE_OWNER_USER_SUCCESS = "将联系人【{{#contact.name}}】的负责人从【{getAdminUserById{#contact.ownerUserId}}】变更为了【{getAdminUserById{#ownerUserId}}】";
 
     // ======================= CRM_BUSINESS 商机 =======================
 
@@ -81,6 +91,16 @@ public interface LogRecordConstants {
     String CRM_BUSINESS_DELETE_SUCCESS = "删除了商机【{{#businessName}}】";
     String CRM_BUSINESS_TRANSFER_SUB_TYPE = "转移商机";
     String CRM_BUSINESS_TRANSFER_SUCCESS = "将商机【{{#business.name}}】的负责人从【{getAdminUserById{#business.ownerUserId}}】变更为了【{getAdminUserById{#reqVO.newOwnerUserId}}】";
+    String CRM_BUSINESS_FOLLOW_UP_SUB_TYPE = "商机跟进";
+    String CRM_BUSINESS_FOLLOW_UP_SUCCESS = "商机跟进【{{#businessName}}】";
+    String CRM_BUSINESS_UPDATE_STATUS_SUB_TYPE = "更新商机状态";
+    String CRM_BUSINESS_UPDATE_STATUS_SUCCESS = "更新了商机【{{#businessName}}】的状态从【{{#oldStatusName}}】变更为了【{{#newStatusName}}】";
+
+    // ======================= CRM_CONTRACT_CONFIG 合同配置 =======================
+
+    String CRM_CONTRACT_CONFIG_TYPE = "CRM 合同配置";
+    String CRM_CONTRACT_CONFIG_SUB_TYPE = "{{#isPoolConfigUpdate ? '更新合同配置' : '创建合同配置'}}";
+    String CRM_CONTRACT_CONFIG_SUCCESS = "{{#isPoolConfigUpdate ? '更新了合同配置' : '创建了合同配置'}}";
 
     // ======================= CRM_CONTRACT 合同 =======================
 
@@ -95,6 +115,8 @@ public interface LogRecordConstants {
     String CRM_CONTRACT_TRANSFER_SUCCESS = "将合同【{{#contract.name}}】的负责人从【{getAdminUserById{#contract.ownerUserId}}】变更为了【{getAdminUserById{#reqVO.newOwnerUserId}}】";
     String CRM_CONTRACT_SUBMIT_SUB_TYPE = "提交合同审批";
     String CRM_CONTRACT_SUBMIT_SUCCESS = "提交合同【{{#contractName}}】审批成功";
+    String CRM_CONTRACT_FOLLOW_UP_SUB_TYPE = "合同跟进";
+    String CRM_CONTRACT_FOLLOW_UP_SUCCESS = "合同跟进【{{#contractName}}】";
 
     // ======================= CRM_PRODUCT 产品 =======================
 
@@ -125,6 +147,8 @@ public interface LogRecordConstants {
     String CRM_RECEIVABLE_UPDATE_SUCCESS = "更新了合同【{getContractById{#receivable.contractId}}】的第【{{#receivable.period}}】期回款: {_DIFF{#updateReqVO}}";
     String CRM_RECEIVABLE_DELETE_SUB_TYPE = "删除回款";
     String CRM_RECEIVABLE_DELETE_SUCCESS = "删除了合同【{getContractById{#receivable.contractId}}】的第【{{#receivable.period}}】期回款";
+    String CRM_RECEIVABLE_SUBMIT_SUB_TYPE = "提交回款审批";
+    String CRM_RECEIVABLE_SUBMIT_SUCCESS = "提交编号为【{{#receivableNo}}】的回款审批成功";
 
     // ======================= CRM_RECEIVABLE_PLAN 回款计划 =======================
 

@@ -7,8 +7,12 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
 
+import java.math.BigDecimal;
+
 /**
- * 商机产品关联表 DO
+ * CRM 商机产品关联表 DO
+ *
+ * CrmBusinessDO : CrmBusinessProductDO = 1 : N
  *
  * @author lzxhqs
  */
@@ -40,24 +44,24 @@ public class CrmBusinessProductDO extends BaseDO {
      */
     private Long productId;
     /**
-     * 产品单价
+     * 产品单价，单位：元
+     *
+     * 冗余 {@link CrmProductDO#getPrice()}
      */
-    private Integer price;
+    private BigDecimal productPrice;
     /**
-     * 销售价格, 单位：分
+     * 商机价格, 单位：元
      */
-    private Integer salesPrice;
+    private BigDecimal businessPrice;
     /**
      * 数量
      */
-    private Integer count;
+    private BigDecimal count;
     /**
-     * 折扣
+     * 总计价格，单位：元
+     *
+     * totalPrice = businessPrice * count
      */
-    private Integer discountPercent;
-    /**
-     * 总计价格（折扣后价格）
-     */
-    private Integer totalPrice;
+    private BigDecimal totalPrice;
 
 }

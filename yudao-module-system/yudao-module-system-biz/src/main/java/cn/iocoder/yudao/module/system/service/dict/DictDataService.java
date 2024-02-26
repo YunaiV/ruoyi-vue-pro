@@ -99,4 +99,12 @@ public interface DictDataService {
      */
     DictDataDO parseDictData(String dictType, String label);
 
+    /**
+     * 获得指定数据类型的字典数据列表
+     *
+     * @param dictType 字典类型
+     * @return 字典数据列表
+     */
+    List<DictDataDO> getDictDataListByDictType(String dictType);
+
 }

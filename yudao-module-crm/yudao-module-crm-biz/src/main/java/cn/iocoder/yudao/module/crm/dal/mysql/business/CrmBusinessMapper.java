@@ -7,12 +7,11 @@ import cn.iocoder.yudao.framework.mybatis.core.query.MPJLambdaWrapperX;
 import cn.iocoder.yudao.module.crm.controller.admin.business.vo.business.CrmBusinessPageReqVO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.business.CrmBusinessDO;
 import cn.iocoder.yudao.module.crm.enums.common.CrmBizTypeEnum;
-import cn.iocoder.yudao.module.crm.util.CrmQueryWrapperUtils;
+import cn.iocoder.yudao.module.crm.util.CrmPermissionUtils;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.Collection;
-import java.util.List;
 
 /**
  * 商机 Mapper
@@ -45,7 +44,7 @@ public interface CrmBusinessMapper extends BaseMapperX<CrmBusinessDO> {
     default PageResult<CrmBusinessDO> selectPage(CrmBusinessPageReqVO pageReqVO, Long userId) {
         MPJLambdaWrapperX<CrmBusinessDO> query = new MPJLambdaWrapperX<>();
         // 拼接数据权限的查询条件
-        CrmQueryWrapperUtils.appendPermissionCondition(query, CrmBizTypeEnum.CRM_BUSINESS.getType(),
+        CrmPermissionUtils.appendPermissionCondition(query, CrmBizTypeEnum.CRM_BUSINESS.getType(),
                 CrmBusinessDO::getId, userId, pageReqVO.getSceneType(), Boolean.FALSE);
         // 拼接自身的查询条件
         query.selectAll(CrmBusinessDO.class)
@@ -54,13 +53,8 @@ public interface CrmBusinessMapper extends BaseMapperX<CrmBusinessDO> {
         return selectJoinPage(pageReqVO, CrmBusinessDO.class, query);
     }
 
-    default List<CrmBusinessDO> selectBatchIds(Collection<Long> ids, Long userId) {
-        MPJLambdaWrapperX<CrmBusinessDO> query = new MPJLambdaWrapperX<>();
-        // 拼接数据权限的查询条件
-        CrmQueryWrapperUtils.appendPermissionCondition(query, CrmBizTypeEnum.CRM_BUSINESS.getType(), ids, userId);
-        // 拼接自身的查询条件
-        query.selectAll(CrmBusinessDO.class).in(CrmBusinessDO::getId, ids).orderByDesc(CrmBusinessDO::getId);
-        return selectJoinList(CrmBusinessDO.class, query);
+    default Long selectCountByStatusTypeId(Long statusTypeId) {
+        return selectCount(CrmBusinessDO::getStatusTypeId, statusTypeId);
     }
 
 }

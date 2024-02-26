@@ -1,15 +1,17 @@
 package cn.iocoder.yudao.module.crm.service.business;
 
+import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.crm.controller.admin.business.vo.status.CrmBusinessStatusPageReqVO;
-import cn.iocoder.yudao.module.crm.controller.admin.business.vo.status.CrmBusinessStatusQueryVO;
 import cn.iocoder.yudao.module.crm.controller.admin.business.vo.status.CrmBusinessStatusSaveReqVO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.business.CrmBusinessStatusDO;
-
+import cn.iocoder.yudao.module.crm.dal.dataobject.business.CrmBusinessStatusTypeDO;
 import jakarta.validation.Valid;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
+
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
 
 /**
  * 商机状态 Service 接口
@@ -38,7 +40,81 @@ public interface CrmBusinessStatusService {
      *
      * @param id 编号
      */
-    void deleteBusinessStatus(Long id);
+    void deleteBusinessStatusType(Long id);
+
+    /**
+     * 获得商机状态组
+     *
+     * @param id 编号
+     * @return 商机状态组
+     */
+    CrmBusinessStatusTypeDO getBusinessStatusType(Long id);
+
+    /**
+     * 校验商机状态组
+     *
+     * @param id 编号
+     */
+    void validateBusinessStatusType(Long id);
+
+    /**
+     * 获得商机状态组列表
+     *
+     * @return 商机状态组列表
+     */
+    List<CrmBusinessStatusTypeDO> getBusinessStatusTypeList();
+
+    /**
+     * 获得商机状态组分页
+     *
+     * @param pageReqVO 分页查询
+     * @return 商机状态组分页
+     */
+    PageResult<CrmBusinessStatusTypeDO> getBusinessStatusTypePage(PageParam pageReqVO);
+
+    /**
+     * 获得商机状态组列表
+     *
+     * @param ids 编号数组
+     * @return 商机状态组列表
+     */
+    List<CrmBusinessStatusTypeDO> getBusinessStatusTypeList(Collection<Long> ids);
+
+    /**
+     * 获得商机状态组 Map
+     *
+     * @param ids 编号数组
+     * @return 商机状态组 Map
+     */
+    default Map<Long, CrmBusinessStatusTypeDO> getBusinessStatusTypeMap(Collection<Long> ids) {
+        return convertMap(getBusinessStatusTypeList(ids), CrmBusinessStatusTypeDO::getId);
+    }
+
+    /**
+     * 获得指定类型的商机状态列表
+     *
+     * @param typeId 商机状态组编号
+     * @return 商机状态列表
+     */
+    List<CrmBusinessStatusDO> getBusinessStatusListByTypeId(Long typeId);
+
+    /**
+     * 获得商机状态列表
+     *
+     * @param ids 编号数组
+     * @return 商机状态列表
+     */
+    List<CrmBusinessStatusDO> getBusinessStatusList(Collection<Long> ids);
+
+    /**
+     * 获得商机状态 Map
+     *
+     * @param ids 编号数组
+     * @return 商机状态 Map
+     */
+    default Map<Long, CrmBusinessStatusDO> getBusinessStatusMap(Collection<Long> ids) {
+        return convertMap(getBusinessStatusList(ids), CrmBusinessStatusDO::getId);
+    }
 
     /**
      * 获得商机状态
@@ -49,29 +125,11 @@ public interface CrmBusinessStatusService {
     CrmBusinessStatusDO getBusinessStatus(Long id);
 
     /**
-     * 获得商机状态分页
+     * 校验商机状态
      *
-     * @param pageReqVO 分页查询
-     * @return 商机状态分页
+     * @param statusTypeId 商机状态组编号
+     * @param statusId     商机状态编号
      */
-    PageResult<CrmBusinessStatusDO> getBusinessStatusPage(CrmBusinessStatusPageReqVO pageReqVO);
-
-    // TODO @ljlleo 常用的 ids 之类的查询，可以封装单独的方法，不用走类似 QueryVO，用起来更方便。
-    // TODO @ljlleo 方法名用 getBusinessStatusList
-    /**
-     * 获得商机状态分页
-     *
-     * @param queryVO 查询参数
-     * @return 商机状态分页
-     */
-    List<CrmBusinessStatusDO> selectList(CrmBusinessStatusQueryVO queryVO);
-
-    /**
-     * 获得商机状态列表
-     *
-     * @param ids 编号数组
-     * @return 商机状态列表
-     */
-    List<CrmBusinessStatusDO> getBusinessStatusList(Collection<Long> ids);
+    CrmBusinessStatusDO validateBusinessStatus(Long statusTypeId, Long statusId);
 
 }

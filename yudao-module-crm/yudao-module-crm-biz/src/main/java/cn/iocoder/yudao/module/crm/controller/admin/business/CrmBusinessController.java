@@ -3,22 +3,26 @@ package cn.iocoder.yudao.module.crm.controller.admin.business;
 import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
+import cn.iocoder.yudao.framework.common.util.number.NumberUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
-import cn.iocoder.yudao.module.crm.controller.admin.business.vo.business.CrmBusinessPageReqVO;
-import cn.iocoder.yudao.module.crm.controller.admin.business.vo.business.CrmBusinessRespVO;
-import cn.iocoder.yudao.module.crm.controller.admin.business.vo.business.CrmBusinessSaveReqVO;
-import cn.iocoder.yudao.module.crm.controller.admin.business.vo.business.CrmBusinessTransferReqVO;
-import cn.iocoder.yudao.module.crm.convert.business.CrmBusinessConvert;
+import cn.iocoder.yudao.module.crm.controller.admin.business.vo.business.*;
 import cn.iocoder.yudao.module.crm.dal.dataobject.business.CrmBusinessDO;
+import cn.iocoder.yudao.module.crm.dal.dataobject.business.CrmBusinessProductDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.business.CrmBusinessStatusDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.business.CrmBusinessStatusTypeDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerDO;
+import cn.iocoder.yudao.module.crm.dal.dataobject.product.CrmProductDO;
 import cn.iocoder.yudao.module.crm.service.business.CrmBusinessService;
 import cn.iocoder.yudao.module.crm.service.business.CrmBusinessStatusService;
-import cn.iocoder.yudao.module.crm.service.business.CrmBusinessStatusTypeService;
 import cn.iocoder.yudao.module.crm.service.customer.CrmCustomerService;
+import cn.iocoder.yudao.module.crm.service.product.CrmProductService;
+import cn.iocoder.yudao.module.system.api.dept.DeptApi;
+import cn.iocoder.yudao.module.system.api.dept.dto.DeptRespDTO;
+import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
+import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -30,13 +34,15 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Stream;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.common.pojo.PageParam.PAGE_SIZE_NONE;
-import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
-import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
 import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.EXPORT;
 import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
 import static cn.iocoder.yudao.module.crm.enums.ErrorCodeConstants.CUSTOMER_NOT_EXISTS;
@@ -52,9 +58,16 @@ public class CrmBusinessController {
     @Resource
     private CrmCustomerService customerService;
     @Resource
-    private CrmBusinessStatusTypeService businessStatusTypeService;
+    private CrmBusinessStatusService businessStatusTypeService;
     @Resource
     private CrmBusinessStatusService businessStatusService;
+    @Resource
+    private CrmProductService productService;
+
+    @Resource
+    private AdminUserApi adminUserApi;
+    @Resource
+    private DeptApi deptApi;
 
     @PostMapping("/create")
     @Operation(summary = "创建商机")
@@ -68,6 +81,14 @@ public class CrmBusinessController {
     @PreAuthorize("@ss.hasPermission('crm:business:update')")
     public CommonResult<Boolean> updateBusiness(@Valid @RequestBody CrmBusinessSaveReqVO updateReqVO) {
         businessService.updateBusiness(updateReqVO);
+        return success(true);
+    }
+
+    @PutMapping("/update-status")
+    @Operation(summary = "更新商机状态")
+    @PreAuthorize("@ss.hasPermission('crm:business:update')")
+    public CommonResult<Boolean> updateBusinessStatus(@Valid @RequestBody CrmBusinessUpdateStatusReqVO updateStatusReqVO) {
+        businessService.updateBusinessStatus(updateStatusReqVO);
         return success(true);
     }
 
@@ -86,15 +107,23 @@ public class CrmBusinessController {
     @PreAuthorize("@ss.hasPermission('crm:business:query')")
     public CommonResult<CrmBusinessRespVO> getBusiness(@RequestParam("id") Long id) {
         CrmBusinessDO business = businessService.getBusiness(id);
-        return success(BeanUtils.toBean(business, CrmBusinessRespVO.class));
+        return success(buildBusinessDetail(business));
     }
 
-    @GetMapping("/list-by-ids")
-    @Operation(summary = "获得商机列表")
-    @Parameter(name = "ids", description = "编号", required = true, example = "[1024]")
-    @PreAuthorize("@ss.hasPermission('crm:business:query')")
-    public CommonResult<List<CrmBusinessRespVO>> getContactListByIds(@RequestParam("ids") List<Long> ids) {
-        return success(BeanUtils.toBean(businessService.getBusinessList(ids, getLoginUserId()), CrmBusinessRespVO.class));
+    private CrmBusinessRespVO buildBusinessDetail(CrmBusinessDO business) {
+        if (business == null) {
+            return null;
+        }
+        CrmBusinessRespVO businessVO = buildBusinessDetailList(Collections.singletonList(business)).get(0);
+        // 拼接产品项
+        List<CrmBusinessProductDO> businessProducts = businessService.getBusinessProductListByBusinessId(businessVO.getId());
+        Map<Long, CrmProductDO> productMap = productService.getProductMap(
+                convertSet(businessProducts, CrmBusinessProductDO::getProductId));
+        businessVO.setProducts(BeanUtils.toBean(businessProducts, CrmBusinessRespVO.Product.class, businessProductVO ->
+                MapUtils.findAndThen(productMap, businessProductVO.getProductId(),
+                        product -> businessProductVO.setProductName(product.getName())
+                                .setProductNo(product.getNo()).setProductUnit(product.getUnit()))));
+        return businessVO;
     }
 
     @GetMapping("/simple-all-list")
@@ -105,7 +134,8 @@ public class CrmBusinessController {
         reqVO.setPageSize(PAGE_SIZE_NONE); // 不分页
         PageResult<CrmBusinessDO> pageResult = businessService.getBusinessPage(reqVO, getLoginUserId());
         return success(convertList(pageResult.getList(), business -> // 只返回 id、name 字段
-                new CrmBusinessRespVO().setId(business.getId()).setName(business.getName())));
+                new CrmBusinessRespVO().setId(business.getId()).setName(business.getName())
+                        .setCustomerId(business.getCustomerId())));
     }
 
     @GetMapping("/page")
@@ -113,7 +143,7 @@ public class CrmBusinessController {
     @PreAuthorize("@ss.hasPermission('crm:business:query')")
     public CommonResult<PageResult<CrmBusinessRespVO>> getBusinessPage(@Valid CrmBusinessPageReqVO pageVO) {
         PageResult<CrmBusinessDO> pageResult = businessService.getBusinessPage(pageVO, getLoginUserId());
-        return success(buildBusinessDetailPageResult(pageResult));
+        return success(new PageResult<>(buildBusinessDetailList(pageResult.getList()), pageResult.getTotal()));
     }
 
     @GetMapping("/page-by-customer")
@@ -123,7 +153,7 @@ public class CrmBusinessController {
             throw exception(CUSTOMER_NOT_EXISTS);
         }
         PageResult<CrmBusinessDO> pageResult = businessService.getBusinessPageByCustomerId(pageReqVO);
-        return success(buildBusinessDetailPageResult(pageResult));
+        return success(new PageResult<>(buildBusinessDetailList(pageResult.getList()), pageResult.getTotal()));
     }
 
     @GetMapping("/page-by-contact")
@@ -131,7 +161,7 @@ public class CrmBusinessController {
     @PreAuthorize("@ss.hasPermission('crm:business:query')")
     public CommonResult<PageResult<CrmBusinessRespVO>> getBusinessContactPage(@Valid CrmBusinessPageReqVO pageReqVO) {
         PageResult<CrmBusinessDO> pageResult = businessService.getBusinessPageByContact(pageReqVO);
-        return success(buildBusinessDetailPageResult(pageResult));
+        return success(new PageResult<>(buildBusinessDetailList(pageResult.getList()), pageResult.getTotal()));
     }
 
     @GetMapping("/export-excel")
@@ -141,29 +171,44 @@ public class CrmBusinessController {
     public void exportBusinessExcel(@Valid CrmBusinessPageReqVO exportReqVO,
                                     HttpServletResponse response) throws IOException {
         exportReqVO.setPageSize(PAGE_SIZE_NONE);
-        PageResult<CrmBusinessDO> pageResult = businessService.getBusinessPage(exportReqVO, getLoginUserId());
+        List<CrmBusinessDO> list = businessService.getBusinessPage(exportReqVO, getLoginUserId()).getList();
         // 导出 Excel
         ExcelUtils.write(response, "商机.xls", "数据", CrmBusinessRespVO.class,
-                buildBusinessDetailPageResult(pageResult).getList());
+                buildBusinessDetailList(list));
     }
 
-    /**
-     * 构建详细的商机分页结果
-     *
-     * @param pageResult 简单的商机分页结果
-     * @return 详细的商机分页结果
-     */
-    private PageResult<CrmBusinessRespVO> buildBusinessDetailPageResult(PageResult<CrmBusinessDO> pageResult) {
-        if (CollUtil.isEmpty(pageResult.getList())) {
-            return PageResult.empty(pageResult.getTotal());
+    private List<CrmBusinessRespVO> buildBusinessDetailList(List<CrmBusinessDO> list) {
+        if (CollUtil.isEmpty(list)) {
+            return Collections.emptyList();
         }
-        List<CrmBusinessStatusTypeDO> statusTypeList = businessStatusTypeService.getBusinessStatusTypeList(
-                convertSet(pageResult.getList(), CrmBusinessDO::getStatusTypeId));
-        List<CrmBusinessStatusDO> statusList = businessStatusService.getBusinessStatusList(
-                convertSet(pageResult.getList(), CrmBusinessDO::getStatusId));
-        List<CrmCustomerDO> customerList = customerService.getCustomerList(
-                convertSet(pageResult.getList(), CrmBusinessDO::getCustomerId));
-        return CrmBusinessConvert.INSTANCE.convertPage(pageResult, customerList, statusTypeList, statusList);
+        // 1.1 获取客户列表
+        Map<Long, CrmCustomerDO> customerMap = customerService.getCustomerMap(
+                convertSet(list, CrmBusinessDO::getCustomerId));
+        // 1.2 获取创建人、负责人列表
+        Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(convertListByFlatMap(list,
+                contact -> Stream.of(NumberUtils.parseLong(contact.getCreator()), contact.getOwnerUserId())));
+        Map<Long, DeptRespDTO> deptMap = deptApi.getDeptMap(convertSet(userMap.values(), AdminUserRespDTO::getDeptId));
+        // 1.3 获得商机状态组
+        Map<Long, CrmBusinessStatusTypeDO> statusTypeMap = businessStatusTypeService.getBusinessStatusTypeMap(
+                convertSet(list, CrmBusinessDO::getStatusTypeId));
+        Map<Long, CrmBusinessStatusDO> statusMap = businessStatusService.getBusinessStatusMap(
+                convertSet(list, CrmBusinessDO::getStatusId));
+        // 2. 拼接数据
+        return BeanUtils.toBean(list, CrmBusinessRespVO.class, businessVO -> {
+            // 2.1 设置客户名称
+            MapUtils.findAndThen(customerMap, businessVO.getCustomerId(), customer -> businessVO.setCustomerName(customer.getName()));
+            // 2.2 设置创建人、负责人名称
+            MapUtils.findAndThen(userMap, NumberUtils.parseLong(businessVO.getCreator()),
+                    user -> businessVO.setCreatorName(user.getNickname()));
+            MapUtils.findAndThen(userMap, businessVO.getOwnerUserId(), user -> {
+                businessVO.setOwnerUserName(user.getNickname());
+                MapUtils.findAndThen(deptMap, user.getDeptId(), dept -> businessVO.setOwnerUserDeptName(dept.getName()));
+            });
+            // 2.3 设置商机状态
+            MapUtils.findAndThen(statusTypeMap, businessVO.getStatusTypeId(), statusType -> businessVO.setStatusTypeName(statusType.getName()));
+            MapUtils.findAndThen(statusMap, businessVO.getStatusId(), status -> businessVO.setStatusName(
+                    businessService.getBusinessStatusName(businessVO.getEndStatus(), status)));
+        });
     }
 
     @PutMapping("/transfer")

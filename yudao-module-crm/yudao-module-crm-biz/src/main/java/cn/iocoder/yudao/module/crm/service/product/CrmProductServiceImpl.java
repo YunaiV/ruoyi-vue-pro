@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.crm.service.product;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.collection.ListUtil;
+import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.crm.controller.admin.product.vo.product.CrmProductPageReqVO;
@@ -15,7 +15,6 @@ import cn.iocoder.yudao.module.crm.framework.permission.core.annotations.CrmPerm
 import cn.iocoder.yudao.module.crm.service.permission.CrmPermissionService;
 import cn.iocoder.yudao.module.crm.service.permission.bo.CrmPermissionCreateReqBO;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.mzt.logapi.context.LogRecordContext;
 import com.mzt.logapi.service.impl.DiffParseFunction;
 import com.mzt.logapi.starter.annotation.LogRecord;
@@ -27,8 +26,10 @@ import org.springframework.validation.annotation.Validated;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
 import static cn.iocoder.yudao.module.crm.enums.ErrorCodeConstants.*;
 import static cn.iocoder.yudao.module.crm.enums.LogRecordConstants.*;
 
@@ -138,25 +139,41 @@ public class CrmProductServiceImpl implements CrmProductService {
     }
 
     @Override
-    public List<CrmProductDO> getProductList(Collection<Long> ids) {
+    public PageResult<CrmProductDO> getProductPage(CrmProductPageReqVO pageReqVO) {
+        return productMapper.selectPage(pageReqVO);
+    }
+
+    @Override
+    public Long getProductByCategoryId(Long categoryId) {
+        return productMapper.selectCountByCategoryId(categoryId);
+    }
+
+    @Override
+    public List<CrmProductDO> getProductListByStatus(Integer status) {
+        return productMapper.selectListByStatus(status);
+    }
+
+    @Override
+    public List<CrmProductDO> validProductList(Collection<Long> ids) {
         if (CollUtil.isEmpty(ids)) {
-            return ListUtil.empty();
+            return Collections.emptyList();
         }
-        return productMapper.selectBatchIds(ids);
+        List<CrmProductDO> list = productMapper.selectBatchIds(ids);
+        Map<Long, CrmProductDO> productMap = convertMap(list, CrmProductDO::getId);
+        for (Long id : ids) {
+            CrmProductDO product = productMap.get(id);
+            if (productMap.get(id) == null) {
+                throw exception(PRODUCT_NOT_EXISTS);
+            }
+            if (CommonStatusEnum.isDisable(product.getStatus())) {
+                throw exception(PRODUCT_NOT_ENABLE, product.getName());
+            }
+        }
+        return list;
     }
 
     @Override
-    public PageResult<CrmProductDO> getProductPage(CrmProductPageReqVO pageReqVO, Long userId) {
-        return productMapper.selectPage(pageReqVO, userId);
-    }
-
-    @Override
-    public CrmProductDO getProductByCategoryId(Long categoryId) {
-        return productMapper.selectOne(new LambdaQueryWrapper<CrmProductDO>().eq(CrmProductDO::getCategoryId, categoryId));
-    }
-
-    @Override
-    public List<CrmProductDO> getProductListByIds(Collection<Long> ids) {
+    public List<CrmProductDO> getProductList(Collection<Long> ids) {
         if (CollUtil.isEmpty(ids)) {
             return Collections.emptyList();
         }

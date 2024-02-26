@@ -1,15 +1,19 @@
 package cn.iocoder.yudao.module.crm.dal.dataobject.receivable;
 
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import cn.iocoder.yudao.module.crm.dal.dataobject.contract.CrmContractDO;
+import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerDO;
+import cn.iocoder.yudao.module.crm.enums.receivable.CrmReceivableReturnTypeEnum;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 /**
- * 回款计划 DO
+ * CRM 回款计划 DO
  *
  * @author 芋道源码
  */
@@ -24,7 +28,7 @@ import java.time.LocalDateTime;
 public class CrmReceivablePlanDO extends BaseDO {
 
     /**
-     * ID
+     * 编号
      */
     @TableId
     private Long id;
@@ -33,23 +37,45 @@ public class CrmReceivablePlanDO extends BaseDO {
      */
     private Integer period;
     /**
-     * 回款ID
+     * 客户编号
      *
-     * TODO @liuhongfeng：少关联实体；
+     * 关联 {@link CrmCustomerDO#getId()}
      */
-    private Long receivableId;
+    private Long customerId;
     /**
-     * 完成状态
+     * 合同编号
+     *
+     * 关联 {@link CrmContractDO#getId()}
      */
-    private Boolean finishStatus;
+    private Long contractId;
+
     /**
-     * 计划回款金额，单位：分
+     * 负责人编号
+     *
+     * 关联 AdminUserDO 的 id 字段
      */
-    private Integer price;
+    private Long ownerUserId;
+
     /**
      * 计划回款日期
      */
     private LocalDateTime returnTime;
+    /**
+     * 计划回款类型
+     *
+     * 枚举 {@link CrmReceivableReturnTypeEnum}
+     */
+    private Integer returnType;
+    /**
+     * 计划回款金额，单位：元
+     */
+    private BigDecimal price;
+
+    /**
+     * 回款编号，关联 {@link CrmReceivableDO#getId()}
+     */
+    private Long receivableId;
+
     /**
      * 提前几天提醒
      */
@@ -58,28 +84,6 @@ public class CrmReceivablePlanDO extends BaseDO {
      * 提醒日期
      */
     private LocalDateTime remindTime;
-    /**
-     * 客户 ID
-     *
-     * TODO @liuhongfeng：少关联实体；
-     */
-    private Long customerId;
-    /**
-     * 合同 ID
-     *
-     * TODO @liuhongfeng：少关联实体；
-     */
-    private Long contractId;
-    /**
-     * 负责人 ID
-     *
-     * TODO @liuhongfeng：少关联实体；
-     */
-    private Long ownerUserId;
-    /**
-     * 显示顺序
-     */
-    private Integer sort;
     /**
      * 备注
      */

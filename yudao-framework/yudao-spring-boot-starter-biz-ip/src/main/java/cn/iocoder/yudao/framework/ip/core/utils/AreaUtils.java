@@ -17,6 +17,7 @@ import java.util.Map;
 import java.util.function.Function;
 
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.findFirst;
 
 /**
  * 区域工具类
@@ -70,8 +71,59 @@ public class AreaUtils {
      * @param id 区域编号
      * @return 区域
      */
-    public static Area getArea(Integer id) {
+    public static Area parseArea(Integer id) {
         return areas.get(id);
+    }
+
+    /**
+     * 获得指定区域对应的编号
+     *
+     * @param pathStr 区域路径，例如说：河南省/石家庄市/新华区
+     * @return 区域
+     */
+    public static Area parseArea(String pathStr) {
+        String[] paths = pathStr.split("/");
+        Area area = null;
+        for (String path : paths) {
+            if (area == null) {
+                area = findFirst(areas.values(), item -> item.getName().equals(path));
+            } else {
+                area = findFirst(area.getChildren(), item -> item.getName().equals(path));
+            }
+        }
+        return area;
+    }
+
+    /**
+     * 获取所有节点的全路径名称如：河南省/石家庄市/新华区
+     *
+     * @param areas 地区树
+     * @return 所有节点的全路径名称
+     */
+    public static List<String> getAreaNodePathList(List<Area> areas) {
+        List<String> paths = new ArrayList<>();
+        areas.forEach(area -> getAreaNodePathList(area, "", paths));
+        return paths;
+    }
+
+    /**
+     * 构建一棵树的所有节点的全路径名称，并将其存储为 "祖先/父级/子级" 的形式
+     *
+     * @param node  父节点
+     * @param path  全路径名称
+     * @param paths 全路径名称列表，省份/城市/地区
+     */
+    private static void getAreaNodePathList(Area node, String path, List<String> paths) {
+        if (node == null) {
+            return;
+        }
+        // 构建当前节点的路径
+        String currentPath = path.isEmpty() ? node.getName() : path + "/" + node.getName();
+        paths.add(currentPath);
+        // 递归遍历子节点
+        for (Area child : node.getChildren()) {
+            getAreaNodePathList(child, currentPath, paths);
+        }
     }
 
     /**
@@ -88,13 +140,13 @@ public class AreaUtils {
      * 格式化区域
      *
      * 例如说：
-     *      1. id = “静安区”时：上海 上海市 静安区
-     *      2. id = “上海市”时：上海 上海市
-     *      3. id = “上海”时：上海
-     *      4. id = “美国”时：美国
+     * 1. id = “静安区”时：上海 上海市 静安区
+     * 2. id = “上海市”时：上海 上海市
+     * 3. id = “上海”时：上海
+     * 4. id = “美国”时：美国
      * 当区域在中国时，默认不显示中国
      *
-     * @param id 区域编号
+     * @param id        区域编号
      * @param separator 分隔符
      * @return 格式化后的区域
      */
@@ -141,7 +193,7 @@ public class AreaUtils {
      */
     public static Integer getParentIdByType(Integer id, @NonNull AreaTypeEnum type) {
         for (int i = 0; i < Byte.MAX_VALUE; i++) {
-            Area area = AreaUtils.getArea(id);
+            Area area = AreaUtils.parseArea(id);
             if (area == null) {
                 return null;
             }

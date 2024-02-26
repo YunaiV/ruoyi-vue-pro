@@ -8,6 +8,7 @@ import com.alibaba.excel.annotation.ExcelProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Schema(description = "管理后台 - CRM 产品 Response VO")
@@ -34,7 +35,7 @@ public class CrmProductRespVO {
 
     @Schema(description = "价格, 单位：分", requiredMode = Schema.RequiredMode.REQUIRED, example = "8911")
     @ExcelProperty("价格，单位：分")
-    private Long price;
+    private BigDecimal price;
 
     @Schema(description = "状态", requiredMode = Schema.RequiredMode.REQUIRED, example = "上架")
     @ExcelProperty(value = "单位", converter = DictConvert.class)

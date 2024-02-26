@@ -1,0 +1,9 @@
+### 合同金额排行榜
+GET {{baseUrl}}/crm/statistics-rank/get-contract-price-rank?deptId=100&times[0]=2022-12-12 00:00:00&times[1]=2024-12-12 23:59:59
+Authorization: Bearer {{token}}
+tenant-id: {{adminTenentId}}
+
+### 回款金额排行榜
+GET {{baseUrl}}/crm/statistics-rank/get-receivable-price-rank?deptId=100&times[0]=2022-12-12 00:00:00&times[1]=2024-12-12 23:59:59
+Authorization: Bearer {{token}}
+tenant-id: {{adminTenentId}}

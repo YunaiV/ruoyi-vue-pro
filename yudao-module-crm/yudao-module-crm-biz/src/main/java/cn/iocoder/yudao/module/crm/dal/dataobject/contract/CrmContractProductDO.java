@@ -7,8 +7,10 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
 
+import java.math.BigDecimal;
+
 /**
- * 合同产品关联表 DO
+ * CRM 合同产品关联表 DO
  *
  * @author HUIHUI
  */
@@ -28,38 +30,34 @@ public class CrmContractProductDO extends BaseDO {
     @TableId
     private Long id;
     /**
-     * 产品编号
-     *
-     * 关联 {@link CrmProductDO#getId()}
-     */
-    private Long productId;
-    /**
      * 合同编号
      *
      * 关联 {@link CrmContractDO#getId()}
      */
     private Long contractId;
     /**
-     * 产品单价
+     * 产品编号
+     *
+     * 关联 {@link CrmProductDO#getId()}
      */
-    private Integer price;
+    private Long productId;
     /**
-     * 销售价格, 单位：分
+     * 产品单价，单位：元
      */
-    private Integer salesPrice;
+    private BigDecimal productPrice;
+    /**
+     * 合同价格, 单位：元
+     */
+    private BigDecimal contractPrice;
     /**
      * 数量
      */
-    private Integer count;
+    private BigDecimal count;
     /**
-     * 折扣
-     */
-    private Integer discountPercent;
-    /**
-     * 总计价格（折扣后价格）
+     * 总计价格，单位：元
      *
-     * TODO @puhui999：可以写下计算公式哈；
+     * totalPrice = businessPrice * count
      */
-    private Integer totalPrice;
+    private BigDecimal totalPrice;
 
 }

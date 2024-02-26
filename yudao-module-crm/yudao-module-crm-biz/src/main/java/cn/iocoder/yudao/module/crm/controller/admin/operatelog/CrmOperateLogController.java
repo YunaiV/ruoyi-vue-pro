@@ -4,7 +4,7 @@ import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.crm.controller.admin.operatelog.vo.CrmOperateLogPageReqVO;
-import cn.iocoder.yudao.module.crm.controller.admin.operatelog.vo.CrmOperateLogV2RespVO;
+import cn.iocoder.yudao.module.crm.controller.admin.operatelog.vo.CrmOperateLogRespVO;
 import cn.iocoder.yudao.module.crm.enums.LogRecordConstants;
 import cn.iocoder.yudao.module.crm.enums.common.CrmBizTypeEnum;
 import cn.iocoder.yudao.module.system.api.logger.OperateLogApi;
@@ -41,7 +41,7 @@ public class CrmOperateLogController {
     private static final Map<Integer, String> BIZ_TYPE_MAP = new HashMap<>();
 
     static {
-        BIZ_TYPE_MAP.put(CrmBizTypeEnum.CRM_LEADS.getType(), CRM_LEADS_TYPE);
+        BIZ_TYPE_MAP.put(CrmBizTypeEnum.CRM_CLUE.getType(), CRM_CLUE_TYPE);
         BIZ_TYPE_MAP.put(CrmBizTypeEnum.CRM_CUSTOMER.getType(), CRM_CUSTOMER_TYPE);
         BIZ_TYPE_MAP.put(CrmBizTypeEnum.CRM_CONTACT.getType(), CRM_CONTACT_TYPE);
         BIZ_TYPE_MAP.put(CrmBizTypeEnum.CRM_BUSINESS.getType(), CRM_BUSINESS_TYPE);
@@ -54,11 +54,11 @@ public class CrmOperateLogController {
     @GetMapping("/page")
     @Operation(summary = "获得操作日志")
     @PreAuthorize("@ss.hasPermission('crm:operate-log:query')")
-    public CommonResult<PageResult<CrmOperateLogV2RespVO>> getCustomerOperateLog(@Valid CrmOperateLogPageReqVO pageReqVO) {
+    public CommonResult<PageResult<CrmOperateLogRespVO>> getCustomerOperateLog(@Valid CrmOperateLogPageReqVO pageReqVO) {
         OperateLogV2PageReqDTO reqDTO = new OperateLogV2PageReqDTO();
         reqDTO.setPageSize(PAGE_SIZE_NONE); // 默认不分页，需要分页需注释
         reqDTO.setBizType(BIZ_TYPE_MAP.get(pageReqVO.getBizType())).setBizId(pageReqVO.getBizId());
-        return success(BeanUtils.toBean(operateLogApi.getOperateLogPage(reqDTO), CrmOperateLogV2RespVO.class));
+        return success(BeanUtils.toBean(operateLogApi.getOperateLogPage(reqDTO), CrmOperateLogRespVO.class));
     }
 
 }

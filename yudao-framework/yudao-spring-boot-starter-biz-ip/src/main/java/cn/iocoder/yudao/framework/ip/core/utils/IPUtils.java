@@ -72,7 +72,7 @@ public class IPUtils {
      * @return 地区
      */
     public static Area getArea(String ip) {
-        return AreaUtils.getArea(getAreaId(ip));
+        return AreaUtils.parseArea(getAreaId(ip));
     }
 
     /**
@@ -82,6 +82,6 @@ public class IPUtils {
      * @return 地区
      */
     public static Area getArea(long ip) {
-        return AreaUtils.getArea(getAreaId(ip));
+        return AreaUtils.parseArea(getAreaId(ip));
     }
 }

@@ -1,18 +1,21 @@
 package cn.iocoder.yudao.module.crm.service.contract;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.bpm.api.listener.dto.BpmResultListenerRespDTO;
-import cn.iocoder.yudao.module.crm.controller.admin.contract.vo.CrmContractPageReqVO;
-import cn.iocoder.yudao.module.crm.controller.admin.contract.vo.CrmContractSaveReqVO;
-import cn.iocoder.yudao.module.crm.controller.admin.contract.vo.CrmContractTransferReqVO;
+import cn.iocoder.yudao.module.crm.controller.admin.contract.vo.contract.CrmContractPageReqVO;
+import cn.iocoder.yudao.module.crm.controller.admin.contract.vo.contract.CrmContractSaveReqVO;
+import cn.iocoder.yudao.module.crm.controller.admin.contract.vo.contract.CrmContractTransferReqVO;
+import cn.iocoder.yudao.module.crm.dal.dataobject.business.CrmBusinessDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.contract.CrmContractDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.contract.CrmContractProductDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerDO;
-import cn.iocoder.yudao.module.crm.service.followup.bo.CrmUpdateFollowUpReqBO;
 import jakarta.validation.Valid;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
+
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
 
 /**
  * CRM 合同 Service 接口
@@ -55,9 +58,11 @@ public interface CrmContractService {
     /**
      * 更新合同相关的更进信息
      *
-     * @param contractUpdateFollowUpReqBO 信息
+     * @param id               合同编号
+     * @param contactNextTime  下次联系时间
+     * @param contactLastContent 最后联系内容
      */
-    void updateContractFollowUp(CrmUpdateFollowUpReqBO contractUpdateFollowUpReqBO);
+    void updateContractFollowUp(Long id, LocalDateTime contactNextTime, String contactLastContent);
 
     /**
      * 发起合同审批流程
@@ -70,9 +75,10 @@ public interface CrmContractService {
     /**
      * 更新合同流程审批结果
      *
-     * @param event 审批结果
+     * @param id 合同编号
+     * @param bpmResult BPM 审批结果
      */
-    void updateContractAuditStatus(BpmResultListenerRespDTO event);
+    void updateContractAuditStatus(Long id, Integer bpmResult);
 
     /**
      * 获得合同
@@ -83,12 +89,30 @@ public interface CrmContractService {
     CrmContractDO getContract(Long id);
 
     /**
+     * 校验合同是否合法
+     *
+     * @param id 编号
+     * @return 合同
+     */
+    CrmContractDO validateContract(Long id);
+
+    /**
      * 获得合同列表
      *
      * @param ids 编号
      * @return 合同列表
      */
     List<CrmContractDO> getContractList(Collection<Long> ids);
+
+    /**
+     * 获得合同 Map
+     *
+     * @param ids 编号
+     * @return 合同 Map
+     */
+    default Map<Long, CrmContractDO> getContractMap(Collection<Long> ids) {
+        return convertMap(getContractList(ids), CrmContractDO::getId);
+    }
 
     /**
      * 获得合同分页
@@ -107,9 +131,19 @@ public interface CrmContractService {
      * 数据权限：基于 {@link CrmCustomerDO} 读取
      *
      * @param pageReqVO 分页查询
-     * @return 联系人分页
+     * @return 合同分页
      */
     PageResult<CrmContractDO> getContractPageByCustomerId(CrmContractPageReqVO pageReqVO);
+
+    /**
+     * 获得合同分页，基于指定商机
+     *
+     * 数据权限：基于 {@link CrmBusinessDO} 读取
+     *
+     * @param pageReqVO 分页查询
+     * @return 合同分页
+     */
+    PageResult<CrmContractDO> getContractPageByBusinessId(CrmContractPageReqVO pageReqVO);
 
     /**
      * 查询属于某个联系人的合同数量
@@ -128,7 +162,7 @@ public interface CrmContractService {
     Long getContractCountByCustomerId(Long customerId);
 
     /**
-     * 根据商机ID获取关联客户的合同数量
+     * 根据商机编号，获取关联客户的合同数量
      *
      * @param businessId 商机编号
      * @return 数量
@@ -136,11 +170,27 @@ public interface CrmContractService {
     Long getContractCountByBusinessId(Long businessId);
 
     /**
-     * 获取合同商品列表
+     * 根据合同编号，获得合同的产品列表
      *
      * @param contactId 合同编号
-     * @return 合同商品列表
+     * @return 产品列表
      */
     List<CrmContractProductDO> getContractProductListByContractId(Long contactId);
+
+    /**
+     * 获得待审核合同数量
+     *
+     * @param userId 用户编号
+     * @return 提醒数量
+     */
+    Long getAuditContractCount(Long userId);
+
+    /**
+     * 获得即将到期（提醒）的合同数量
+     *
+     * @param userId 用户编号
+     * @return 提醒数量
+     */
+    Long getRemindContractCount(Long userId);
 
 }
