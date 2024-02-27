@@ -68,14 +68,20 @@ public interface CrmReceivableMapper extends BaseMapperX<CrmReceivableDO> {
         return selectJoinList(CrmReceivableDO.class, query);
     }
 
-    default Long selectCheckReceivablesCount(Long userId) {
+    default Long selectCountByAudit(Long userId) {
         MPJLambdaWrapperX<CrmReceivableDO> query = new MPJLambdaWrapperX<>();
         // 我负责的 + 非公海
         CrmPermissionUtils.appendPermissionCondition(query, CrmBizTypeEnum.CRM_RECEIVABLE.getType(),
                 CrmReceivableDO::getId, userId, CrmSceneTypeEnum.OWNER.getType(), Boolean.FALSE);
-        // 未提交 or 审核不通过
-        query.in(CrmContractDO::getAuditStatus, CrmAuditStatusEnum.DRAFT.getStatus(), CrmAuditStatusEnum.REJECT.getStatus());
+        // 未审核
+        query.eq(CrmContractDO::getAuditStatus, CrmAuditStatusEnum.PROCESS.getStatus());
         return selectCount(query);
+    }
+
+    default List<CrmReceivableDO> selectListByContractIdAndStatus(Long contractId, Collection<Integer> auditStatuses) {
+        return selectList(new LambdaQueryWrapperX<CrmReceivableDO>()
+                .eq(CrmReceivableDO::getContractId, contractId)
+                .in(CrmReceivableDO::getAuditStatus, auditStatuses));
     }
 
     default Map<Long, BigDecimal> selectReceivablePriceMapByContractId(Collection<Long> contractIds) {
@@ -85,7 +91,8 @@ public interface CrmReceivableMapper extends BaseMapperX<CrmReceivableDO> {
         // SQL sum 查询
         List<Map<String, Object>> result = selectMaps(new QueryWrapper<CrmReceivableDO>()
                 .select("contract_id, SUM(price) AS total_price")
-                .eq("audit_status", CrmAuditStatusEnum.APPROVE.getStatus())
+                .in("audit_status", CrmAuditStatusEnum.DRAFT.getStatus(), // 草稿 + 审批中 + 审批通过
+                        CrmAuditStatusEnum.PROCESS, CrmAuditStatusEnum.APPROVE.getStatus())
                 .groupBy("contract_id")
                 .in("contract_id", contractIds));
         // 获得金额

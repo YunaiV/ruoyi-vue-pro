@@ -90,6 +90,6 @@ public interface CrmReceivablePlanService {
      * @param userId 用户编号
      * @return 提醒数量
      */
-    Long getRemindReceivablePlanCount(Long userId);
+    Long getReceivablePlanRemindCount(Long userId);
 
 }

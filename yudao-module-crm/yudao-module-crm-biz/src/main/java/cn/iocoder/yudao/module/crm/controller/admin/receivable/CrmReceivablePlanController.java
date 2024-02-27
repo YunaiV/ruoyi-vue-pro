@@ -163,13 +163,6 @@ public class CrmReceivablePlanController {
         });
     }
 
-    @GetMapping("/remind-receivable-plan-count")
-    @Operation(summary = "获得待回款提醒数量")
-    @PreAuthorize("@ss.hasPermission('crm:receivable-plan:query')")
-    public CommonResult<Long> getRemindReceivablesCount() {
-        return success(receivablePlanService.getRemindReceivablePlanCount(getLoginUserId()));
-    }
-
     @GetMapping("/simple-list")
     @Operation(summary = "获得回款计划精简列表", description = "获得回款计划精简列表，主要用于前端的下拉选项")
     @Parameters({
@@ -185,6 +178,13 @@ public class CrmReceivablePlanController {
         return success(convertList(pageResult.getList(), receivablePlan -> new CrmReceivablePlanRespVO() // 只返回 id、period 等信息
                 .setId(receivablePlan.getId()).setPeriod(receivablePlan.getPeriod()).setReceivableId(receivablePlan.getReceivableId())
                 .setPrice(receivablePlan.getPrice()).setReturnType(receivablePlan.getReturnType())));
+    }
+
+    @GetMapping("/remind-count")
+    @Operation(summary = "获得待回款提醒数量")
+    @PreAuthorize("@ss.hasPermission('crm:receivable-plan:query')")
+    public CommonResult<Long> getReceivablePlanRemindCount() {
+        return success(receivablePlanService.getReceivablePlanRemindCount(getLoginUserId()));
     }
 
 }
