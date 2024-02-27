@@ -71,7 +71,7 @@ public class AreaUtils {
      * @param id 区域编号
      * @return 区域
      */
-    public static Area parseArea(Integer id) {
+    public static Area getArea(Integer id) {
         return areas.get(id);
     }
 
@@ -193,7 +193,7 @@ public class AreaUtils {
      */
     public static Integer getParentIdByType(Integer id, @NonNull AreaTypeEnum type) {
         for (int i = 0; i < Byte.MAX_VALUE; i++) {
-            Area area = AreaUtils.parseArea(id);
+            Area area = AreaUtils.getArea(id);
             if (area == null) {
                 return null;
             }

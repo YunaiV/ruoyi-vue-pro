@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.erp.controller.admin.stock.vo;
+package cn.iocoder.yudao.module.erp.controller.admin.stock.vo.warehouse;
 
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.validation.InEnum;
