@@ -8,7 +8,6 @@ import com.alibaba.excel.annotation.ExcelProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
-import javax.validation.constraints.NotBlank;
 import java.time.LocalDateTime;
 import java.util.Set;
 
@@ -25,7 +24,7 @@ public class RoleRespVO {
     @ExcelProperty("角色名称")
     private String name;
 
-    @NotBlank(message = "角色标志不能为空")
+    @Schema(description = "角色标志", requiredMode = Schema.RequiredMode.REQUIRED, example = "ADMIN")
     @ExcelProperty("角色标志")
     private String code;
 

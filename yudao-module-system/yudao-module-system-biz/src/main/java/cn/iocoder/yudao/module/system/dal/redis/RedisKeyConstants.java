@@ -36,7 +36,7 @@ public interface RedisKeyConstants {
     /**
      * 拥有指定菜单的角色编号的缓存
      * <p>
-     * KEY 格式：user_role_ids:{menuId}
+     * KEY 格式：menu_role_ids:{menuId}
      * VALUE 数据类型：String 角色编号集合
      */
     String MENU_ROLE_ID_LIST = "menu_role_ids";
@@ -52,7 +52,7 @@ public interface RedisKeyConstants {
     /**
      * OAuth2 客户端的缓存
      * <p>
-     * KEY 格式：user:{id}
+     * KEY 格式：oauth_client:{id}
      * VALUE 数据类型：String 客户端信息
      */
     String OAUTH_CLIENT = "oauth_client";
@@ -78,7 +78,7 @@ public interface RedisKeyConstants {
     /**
      * 邮件账号的缓存
      * <p>
-     * KEY 格式：sms_template:{id}
+     * KEY 格式：mail_account:{id}
      * VALUE 数据格式：String 账号信息
      */
     String MAIL_ACCOUNT = "mail_account";
