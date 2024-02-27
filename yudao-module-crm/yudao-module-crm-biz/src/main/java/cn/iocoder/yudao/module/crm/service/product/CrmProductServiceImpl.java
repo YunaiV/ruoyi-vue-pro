@@ -1,7 +1,6 @@
 package cn.iocoder.yudao.module.crm.service.product;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.crm.controller.admin.product.vo.product.CrmProductPageReqVO;
@@ -11,6 +10,7 @@ import cn.iocoder.yudao.module.crm.dal.dataobject.product.CrmProductDO;
 import cn.iocoder.yudao.module.crm.dal.mysql.product.CrmProductMapper;
 import cn.iocoder.yudao.module.crm.enums.common.CrmBizTypeEnum;
 import cn.iocoder.yudao.module.crm.enums.permission.CrmPermissionLevelEnum;
+import cn.iocoder.yudao.module.crm.enums.product.CrmProductStatusEnum;
 import cn.iocoder.yudao.module.crm.framework.permission.core.annotations.CrmPermission;
 import cn.iocoder.yudao.module.crm.service.permission.CrmPermissionService;
 import cn.iocoder.yudao.module.crm.service.permission.bo.CrmPermissionCreateReqBO;
@@ -165,7 +165,7 @@ public class CrmProductServiceImpl implements CrmProductService {
             if (productMap.get(id) == null) {
                 throw exception(PRODUCT_NOT_EXISTS);
             }
-            if (CommonStatusEnum.isDisable(product.getStatus())) {
+            if (CrmProductStatusEnum.isDisable(product.getStatus())) {
                 throw exception(PRODUCT_NOT_ENABLE, product.getName());
             }
         }

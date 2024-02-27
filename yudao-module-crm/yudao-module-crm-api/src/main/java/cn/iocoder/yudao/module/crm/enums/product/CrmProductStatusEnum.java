@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.crm.enums.product;
 
+import cn.hutool.core.util.ObjUtil;
 import cn.iocoder.yudao.framework.common.core.IntArrayValuable;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -33,6 +34,14 @@ public enum CrmProductStatusEnum implements IntArrayValuable {
     @Override
     public int[] array() {
         return ARRAYS;
+    }
+
+    public static boolean isEnable(Integer status) {
+        return ObjUtil.equal(ENABLE.status, status);
+    }
+
+    public static boolean isDisable(Integer status) {
+        return ObjUtil.equal(DISABLE.status, status);
     }
 
 }
