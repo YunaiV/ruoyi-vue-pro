@@ -164,9 +164,9 @@ public class CrmReceivableServiceImpl implements CrmReceivableService {
     @CrmPermission(bizType = CrmBizTypeEnum.CRM_RECEIVABLE, bizId = "#updateReqVO.id", level = CrmPermissionLevelEnum.WRITE)
     public void updateReceivable(CrmReceivableSaveReqVO updateReqVO) {
         Assert.notNull(updateReqVO.getId(), "回款编号不能为空");
-        updateReqVO.setOwnerUserId(null).setCustomerId(null).setContractId(null).setPlanId(null); // 不允许修改的字段
         // 1.1 校验可回款金额超过上限
         validateReceivablePriceExceedsLimit(updateReqVO);
+        updateReqVO.setOwnerUserId(null).setCustomerId(null).setContractId(null).setPlanId(null); // 不允许修改的字段
         // 1.2 校验存在
         CrmReceivableDO receivable = validateReceivableExists(updateReqVO.getId());
         // 1.3 只有草稿、审批中，可以编辑；
