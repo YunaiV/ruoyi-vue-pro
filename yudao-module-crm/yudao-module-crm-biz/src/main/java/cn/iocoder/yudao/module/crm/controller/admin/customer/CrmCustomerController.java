@@ -272,7 +272,7 @@ public class CrmCustomerController {
         List<KeyValue<ExcelColumn, List<String>>> selectMap = new ArrayList<>();
         // 获取地区下拉数据
         // TODO @puhui999：嘿嘿，这里改成省份、城市、区域，三个选项，难度大么？
-        Area area = AreaUtils.parseArea(Area.ID_CHINA);
+        Area area = AreaUtils.getArea(Area.ID_CHINA);
         selectMap.add(new KeyValue<>(ExcelColumn.G, AreaUtils.getAreaNodePathList(area.getChildren())));
         // 获取客户所属行业
         List<String> customerIndustries = dictDataApi.getDictDataLabelList(CRM_CUSTOMER_INDUSTRY);
