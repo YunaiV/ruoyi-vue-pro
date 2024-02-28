@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.framework.dict.core.util;
 
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
+import cn.iocoder.yudao.framework.dict.util.DictFrameworkUtils;
 import cn.iocoder.yudao.framework.test.core.ut.BaseMockitoUnitTest;
 import cn.iocoder.yudao.module.system.api.dict.DictDataApi;
 import cn.iocoder.yudao.module.system.api.dict.dto.DictDataRespDTO;
@@ -31,6 +32,7 @@ public class DictFrameworkUtilsTest extends BaseMockitoUnitTest {
         DictDataRespDTO dataRespDTO = randomPojo(DictDataRespDTO.class, o -> o.setStatus(CommonStatusEnum.ENABLE.getStatus()));
         // mock 方法
         when(dictDataApi.getDictData(dataRespDTO.getDictType(), dataRespDTO.getValue())).thenReturn(dataRespDTO);
+
         // 断言返回值
         assertEquals(dataRespDTO.getLabel(), DictFrameworkUtils.getDictDataLabel(dataRespDTO.getDictType(), dataRespDTO.getValue()));
     }
@@ -41,6 +43,7 @@ public class DictFrameworkUtilsTest extends BaseMockitoUnitTest {
         DictDataRespDTO resp = randomPojo(DictDataRespDTO.class, o -> o.setStatus(CommonStatusEnum.ENABLE.getStatus()));
         // mock 方法
         when(dictDataApi.parseDictData(resp.getDictType(), resp.getLabel())).thenReturn(resp);
+
         // 断言返回值
         assertEquals(resp.getValue(), DictFrameworkUtils.parseDictDataValue(resp.getDictType(), resp.getLabel()));
     }
