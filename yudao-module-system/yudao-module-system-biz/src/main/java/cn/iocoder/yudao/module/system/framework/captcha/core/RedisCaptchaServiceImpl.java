@@ -1,11 +1,9 @@
-package cn.iocoder.yudao.framework.captcha.core.service;
+package cn.iocoder.yudao.module.system.framework.captcha.core;
 
 import com.xingyuv.captcha.service.CaptchaCacheService;
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.springframework.data.redis.core.StringRedisTemplate;
 
-import jakarta.annotation.Resource;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -13,20 +11,14 @@ import java.util.concurrent.TimeUnit;
  *
  * @author 星语
  */
-@NoArgsConstructor // 保证 aj-captcha 的 SPI 创建
-@AllArgsConstructor
+@Setter
 public class RedisCaptchaServiceImpl implements CaptchaCacheService {
 
-    @Resource // 保证 aj-captcha 的 SPI 创建时的注入
     private StringRedisTemplate stringRedisTemplate;
 
     @Override
     public String type() {
         return "redis";
-    }
-
-    public void setStringRedisTemplate(StringRedisTemplate stringRedisTemplate) {
-        this.stringRedisTemplate = stringRedisTemplate;
     }
 
     @Override
