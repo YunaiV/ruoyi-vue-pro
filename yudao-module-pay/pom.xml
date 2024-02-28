@@ -13,6 +13,7 @@
     <modules>
         <module>yudao-module-pay-api</module>
         <module>yudao-module-pay-biz</module>
+        <module>yudao-spring-boot-starter-biz-pay</module>
     </modules>
 
     <name>${project.artifactId}</name>
@@ -20,6 +21,5 @@
         pay 模块，我们放支付业务，提供业务的支付能力。
         例如说：商户、应用、支付、退款等等
     </description>
-
 
 </project>
