@@ -11,6 +11,7 @@
     <modules>
         <module>yudao-module-bpm-api</module>
         <module>yudao-module-bpm-biz</module>
+        <module>yudao-spring-boot-starter-flowable</module>
     </modules>
     <artifactId>yudao-module-bpm</artifactId>
     <packaging>pom</packaging>
