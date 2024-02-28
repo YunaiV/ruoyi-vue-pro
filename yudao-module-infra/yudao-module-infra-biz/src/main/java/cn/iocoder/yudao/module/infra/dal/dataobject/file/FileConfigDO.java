@@ -67,7 +67,7 @@ public class FileConfigDO extends BaseDO {
 
         @Override
         protected Object parse(String json) {
-            FileClientConfig config = JsonUtils.parseObjectQuietly(json, new TypeReference<>() {});
+            FileClientConfig config = JsonUtils.parseObjectQuietly(json, new TypeReference<FileClientConfig>() {});
             if (config != null) {
                 return config;
             }
