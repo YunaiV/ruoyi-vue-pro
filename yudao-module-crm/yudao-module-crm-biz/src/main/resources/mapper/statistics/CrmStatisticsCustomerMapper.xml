@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.iocoder.yudao.module.crm.dal.mysql.statistics.CrmStatisticsCustomerMapper">
+
+
+    <select id="selectCustomerCountGroupbyDate"
+            resultType="cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.customer.CrmStatisticsCustomerCountVO">
+        SELECT
+            count(*) AS count,
+            DATE_FORMAT( create_time, #{sqlDateFormat,javaType=java.lang.String} ) AS category
+        FROM
+            crm_customer
+        WHERE
+            deleted = 0
+          AND owner_user_id  IN
+                <foreach collection="userIds" item="userId" open="(" close=")" separator=",">
+                    #{userId}
+                </foreach>
+          AND create_time BETWEEN #{times[0],javaType=java.time.LocalDateTime} AND
+                #{times[1],javaType=java.time.LocalDateTime}
+        GROUP BY
+            DATE_FORMAT( create_time, #{sqlDateFormat,javaType=java.lang.String} )
+    </select>
+
+    <select id="selectDealCustomerCountGroupbyDate"
+            resultType="cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.customer.CrmStatisticsCustomerCountVO">
+        SELECT
+            count( DISTINCT a.id ) AS count,
+            DATE_FORMAT( b.order_date, #{sqlDateFormat,javaType=java.lang.String} ) AS category
+        FROM
+            crm_customer AS a
+                LEFT JOIN crm_contract AS b ON b.customer_id = a.id
+        WHERE
+            a.deleted = 0 AND b.deleted = 0
+          AND b.audit_status = 20
+          AND a.owner_user_id IN
+                <foreach collection="userIds" item="userId" open="(" close=")" separator=",">
+                    #{userId}
+                </foreach>
+          AND b.create_time BETWEEN #{times[0],javaType=java.time.LocalDateTime} AND
+                #{times[1],javaType=java.time.LocalDateTime}
+        GROUP BY
+            DATE_FORMAT( b.order_date, #{sqlDateFormat,javaType=java.lang.String} )
+    </select>
+
+</mapper>
