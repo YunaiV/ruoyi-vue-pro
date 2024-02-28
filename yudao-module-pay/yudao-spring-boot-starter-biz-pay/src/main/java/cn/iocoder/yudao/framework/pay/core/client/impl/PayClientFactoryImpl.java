@@ -44,6 +44,7 @@ public class PayClientFactoryImpl implements PayClientFactory {
         clientClass.put(WX_APP, WxAppPayClient.class);
         clientClass.put(WX_BAR, WxBarPayClient.class);
         clientClass.put(WX_NATIVE, WxNativePayClient.class);
+        clientClass.put(WX_WAP, WxWapPayClient.class);
         // 支付包支付客户端
         clientClass.put(ALIPAY_WAP, AlipayWapPayClient.class);
         clientClass.put(ALIPAY_QR, AlipayQrPayClient.class);
