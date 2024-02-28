@@ -122,4 +122,12 @@ public interface CrmReceivableService {
      */
     Map<Long, BigDecimal> getReceivablePriceMapByContractId(Collection<Long> contractIds);
 
+    /**
+     * 更具合同编号查询回款列表
+     *
+     * @param contractId 合同编号
+     * @return 回款
+     */
+    List<CrmReceivableDO> getReceivableByContractId(Long contractId);
+
 }

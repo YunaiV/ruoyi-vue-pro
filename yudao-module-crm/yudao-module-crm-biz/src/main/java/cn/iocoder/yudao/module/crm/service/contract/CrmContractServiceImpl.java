@@ -30,12 +30,14 @@ import cn.iocoder.yudao.module.crm.service.permission.CrmPermissionService;
 import cn.iocoder.yudao.module.crm.service.permission.bo.CrmPermissionCreateReqBO;
 import cn.iocoder.yudao.module.crm.service.permission.bo.CrmPermissionTransferReqBO;
 import cn.iocoder.yudao.module.crm.service.product.CrmProductService;
+import cn.iocoder.yudao.module.crm.service.receivable.CrmReceivableService;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import com.mzt.logapi.context.LogRecordContext;
 import com.mzt.logapi.service.impl.DiffParseFunction;
 import com.mzt.logapi.starter.annotation.LogRecord;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
@@ -86,7 +88,9 @@ public class CrmContractServiceImpl implements CrmContractService {
     private CrmContactService contactService;
     @Resource
     private CrmContractConfigService contractConfigService;
-
+    @Resource
+    @Lazy // 延迟加载，避免循环依赖
+    private CrmReceivableService receivableService;
     @Resource
     private AdminUserApi adminUserApi;
     @Resource
@@ -222,9 +226,12 @@ public class CrmContractServiceImpl implements CrmContractService {
             success = CRM_CONTRACT_DELETE_SUCCESS)
     @CrmPermission(bizType = CrmBizTypeEnum.CRM_CONTRACT, bizId = "#id", level = CrmPermissionLevelEnum.OWNER)
     public void deleteContract(Long id) {
-        // TODO @puhui999：如果被 CrmReceivableDO 所使用，则不允许删除
         // 校验存在
         CrmContractDO contract = validateContractExists(id);
+        // 如果被 CrmReceivableDO 所使用，则不允许删除
+        if (CollUtil.isNotEmpty(receivableService.getReceivableByContractId(contract.getId()))) {
+            throw exception(CONTRACT_DELETE_FAIL);
+        }
         // 删除
         contractMapper.deleteById(id);
         // 删除数据权限

@@ -15,6 +15,7 @@ public interface ErrorCodeConstants {
     ErrorCode CONTRACT_SUBMIT_FAIL_NOT_DRAFT = new ErrorCode(1_020_000_002, "合同提交审核失败，原因：合同没处在未提交状态");
     ErrorCode CONTRACT_UPDATE_AUDIT_STATUS_FAIL_NOT_PROCESS = new ErrorCode(1_020_000_003, "更新合同审核状态失败，原因：合同不是审核中状态");
     ErrorCode CONTRACT_NO_EXISTS = new ErrorCode(1_020_000_004, "生成合同序列号重复，请重试");
+    ErrorCode CONTRACT_DELETE_FAIL = new ErrorCode(1_020_000_005, "删除合同失败，原因：有被回款所使用");
 
     // ========== 线索管理 1-020-001-000 ==========
     ErrorCode CLUE_NOT_EXISTS = new ErrorCode(1_020_001_000, "线索不存在");
@@ -40,6 +41,7 @@ public interface ErrorCodeConstants {
     ErrorCode RECEIVABLE_NO_EXISTS = new ErrorCode(1_020_004_005, "生成回款序列号重复，请重试");
     ErrorCode RECEIVABLE_CREATE_FAIL_CONTRACT_NOT_APPROVE = new ErrorCode(1_020_004_006, "创建回款失败，原因：合同不是审核通过状态");
     ErrorCode RECEIVABLE_CREATE_FAIL_PRICE_EXCEEDS_LIMIT = new ErrorCode(1_020_004_007, "创建回款失败，原因：回款金额超出合同金额，目前剩余可退：{} 元");
+    ErrorCode RECEIVABLE_DELETE_FAIL_IS_APPROVE = new ErrorCode(1_020_004_008, "删除回款失败，原因：回款审批已通过");
 
     // ========== 回款计划 1-020-005-000 ==========
     ErrorCode RECEIVABLE_PLAN_NOT_EXISTS = new ErrorCode(1_020_005_000, "回款计划不存在");
