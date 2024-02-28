@@ -63,10 +63,12 @@
             <groupId>cn.iocoder.boot</groupId>
             <artifactId>yudao-spring-boot-starter-test</artifactId>
         </dependency>
+
         <!-- 工作流相关 -->
         <dependency>
             <groupId>cn.iocoder.boot</groupId>
             <artifactId>yudao-spring-boot-starter-flowable</artifactId>
+            <version>${revision}</version>
         </dependency>
     </dependencies>
 </project>
