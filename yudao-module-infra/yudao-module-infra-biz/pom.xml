@@ -117,8 +117,21 @@
 
         <!-- 三方云服务相关 -->
         <dependency>
-            <groupId>cn.iocoder.boot</groupId>
-            <artifactId>yudao-spring-boot-starter-file</artifactId>
+            <groupId>commons-net</groupId>
+            <artifactId>commons-net</artifactId> <!-- 文件客户端：解决 ftp 连接 -->
+        </dependency>
+        <dependency>
+            <groupId>com.jcraft</groupId>
+            <artifactId>jsch</artifactId> <!-- 文件客户端：解决 sftp 连接 -->
+        </dependency>
+        <dependency>
+            <groupId>io.minio</groupId>
+            <artifactId>minio</artifactId> <!-- 文件客户端：解决阿里云、腾讯云、minio 等 S3 连接 -->
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.tika</groupId>
+            <artifactId>tika-core</artifactId> <!-- 文件客户端：文件类型的识别 -->
         </dependency>
 
     </dependencies>

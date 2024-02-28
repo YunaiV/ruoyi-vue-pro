@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.infra.controller.admin.file.vo.config;
 
-import cn.iocoder.yudao.framework.file.core.client.FileClientConfig;
+import cn.iocoder.yudao.module.infra.framework.file.core.client.FileClientConfig;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 

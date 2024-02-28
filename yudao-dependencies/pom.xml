@@ -567,11 +567,6 @@
                 <version>${okhttp3.version}</version>
             </dependency>
             <dependency>
-                <groupId>cn.iocoder.boot</groupId>
-                <artifactId>yudao-spring-boot-starter-file</artifactId>
-                <version>${revision}</version>
-            </dependency>
-            <dependency>
                 <groupId>io.minio</groupId>
                 <artifactId>minio</artifactId>
                 <version>${minio.version}</version>

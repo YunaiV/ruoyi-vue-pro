@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.infra.dal.dataobject.file;
 
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import cn.iocoder.yudao.module.infra.framework.file.core.client.db.DBFileClient;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -10,7 +11,7 @@ import lombok.*;
 /**
  * 文件内容表
  *
- * 专门用于存储 {@link cn.iocoder.yudao.framework.file.core.client.db.DBFileClient} 的文件内容
+ * 专门用于存储 {@link DBFileClient} 的文件内容
  *
  * @author 芋道源码
  */

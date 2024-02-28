@@ -3,7 +3,7 @@ package cn.iocoder.yudao.module.infra.service.file;
 import cn.hutool.core.io.resource.ResourceUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
-import cn.iocoder.yudao.framework.file.core.client.FileClient;
+import cn.iocoder.yudao.module.infra.framework.file.core.client.FileClient;
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
 import cn.iocoder.yudao.framework.test.core.util.AssertUtils;
 import cn.iocoder.yudao.module.infra.controller.admin.file.vo.file.FilePageReqVO;
