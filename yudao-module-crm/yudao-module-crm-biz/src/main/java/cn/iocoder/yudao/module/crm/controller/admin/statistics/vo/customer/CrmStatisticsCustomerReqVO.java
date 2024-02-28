@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.customer;
 
+import cn.iocoder.yudao.module.crm.enums.common.CrmBizTypeEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -43,5 +44,11 @@ public class CrmStatisticsCustomerReqVO {
      */
     @Schema(description = "Group By 日期格式", requiredMode = Schema.RequiredMode.NOT_REQUIRED, example = "%Y%m")
     private String sqlDateFormat;
+
+    /**
+     * 数据类型 {@link CrmBizTypeEnum}
+     */
+    @Schema(description = "数据类型", requiredMode = Schema.RequiredMode.NOT_REQUIRED, example = "2")
+    private Integer bizType;
 
 }

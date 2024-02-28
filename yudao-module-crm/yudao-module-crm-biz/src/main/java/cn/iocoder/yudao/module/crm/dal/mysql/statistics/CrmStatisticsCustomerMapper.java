@@ -18,4 +18,8 @@ public interface CrmStatisticsCustomerMapper {
 
     List<CrmStatisticsCustomerCountVO> selectDealCustomerCountGroupbyDate(CrmStatisticsCustomerReqVO reqVO);
 
+    List<CrmStatisticsCustomerCountVO> selectRecordCountGroupbyDate(CrmStatisticsCustomerReqVO reqVO);
+
+    List<CrmStatisticsCustomerCountVO> selectDistinctRecordCountGroupbyDate(CrmStatisticsCustomerReqVO reqVO);
+
 }

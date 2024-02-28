@@ -6,6 +6,7 @@ import cn.hutool.core.util.ObjUtil;
 import cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.customer.CrmStatisticsCustomerReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.customer.CrmStatisticsCustomerCountVO;
 import cn.iocoder.yudao.module.crm.dal.mysql.statistics.CrmStatisticsCustomerMapper;
+import cn.iocoder.yudao.module.crm.enums.common.CrmBizTypeEnum;
 import cn.iocoder.yudao.module.system.api.dept.DeptApi;
 import cn.iocoder.yudao.module.system.api.dept.dto.DeptRespDTO;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
@@ -47,6 +48,18 @@ public class CrmStatisticsCustomerServiceImpl implements CrmStatisticsCustomerSe
     @Override
     public List<CrmStatisticsCustomerCountVO> getDealTotalCustomerCount(CrmStatisticsCustomerReqVO reqVO) {
         return getStat(reqVO, customerMapper::selectDealCustomerCountGroupbyDate);
+    }
+
+    @Override
+    public List<CrmStatisticsCustomerCountVO> getRecordCount(CrmStatisticsCustomerReqVO reqVO) {
+        reqVO.setBizType(CrmBizTypeEnum.CRM_CUSTOMER.getType());
+        return getStat(reqVO, customerMapper::selectRecordCountGroupbyDate);
+    }
+
+    @Override
+    public List<CrmStatisticsCustomerCountVO> getDistinctRecordCount(CrmStatisticsCustomerReqVO reqVO) {
+        reqVO.setBizType(CrmBizTypeEnum.CRM_CUSTOMER.getType());
+        return getStat(reqVO, customerMapper::selectDistinctRecordCountGroupbyDate);
     }
 
     /**

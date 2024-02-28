@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.crm.service.statistics;
 
-import cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.customer.CrmStatisticsCustomerReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.customer.CrmStatisticsCustomerCountVO;
+import cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.customer.CrmStatisticsCustomerReqVO;
 
 import java.util.List;
 
@@ -27,5 +27,22 @@ public interface CrmStatisticsCustomerService {
      * @return 成交客户数量统计
      */
     List<CrmStatisticsCustomerCountVO> getDealTotalCustomerCount(CrmStatisticsCustomerReqVO reqVO);
+
+
+    /**
+     * 获取客户跟进次数
+     *
+     * @param reqVO 请求参数
+     * @return 客户跟进次数
+     */
+    List<CrmStatisticsCustomerCountVO> getRecordCount(CrmStatisticsCustomerReqVO reqVO);
+
+    /**
+     * 获取已跟进客户数
+     *
+     * @param reqVO 请求参数
+     * @return 已跟进客户数
+     */
+    List<CrmStatisticsCustomerCountVO> getDistinctRecordCount(CrmStatisticsCustomerReqVO reqVO);
 
 }

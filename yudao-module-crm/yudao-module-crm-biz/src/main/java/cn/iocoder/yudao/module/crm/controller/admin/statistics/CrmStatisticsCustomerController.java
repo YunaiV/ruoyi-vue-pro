@@ -41,4 +41,18 @@ public class CrmStatisticsCustomerController {
         return success(customerService.getDealTotalCustomerCount(reqVO));
     }
 
+    @GetMapping("/get-record-count")
+    @Operation(summary = "获取客户跟进次数")
+    @PreAuthorize("@ss.hasPermission('crm:statistics-customer:query')")
+    public CommonResult<List<CrmStatisticsCustomerCountVO>> getRecordCount(@Valid CrmStatisticsCustomerReqVO reqVO) {
+        return success(customerService.getRecordCount(reqVO));
+    }
+
+    @GetMapping("/get-distinct-record-count")
+    @Operation(summary = "获取已跟进客户数")
+    @PreAuthorize("@ss.hasPermission('crm:statistics-customer:query')")
+    public CommonResult<List<CrmStatisticsCustomerCountVO>> getDistinctRecordCount(@Valid CrmStatisticsCustomerReqVO reqVO) {
+        return success(customerService.getDistinctRecordCount(reqVO));
+    }
+
 }

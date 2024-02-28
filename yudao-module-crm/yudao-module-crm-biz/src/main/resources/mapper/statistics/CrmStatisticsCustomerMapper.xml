@@ -43,4 +43,41 @@
             DATE_FORMAT( b.order_date, #{sqlDateFormat,javaType=java.lang.String} )
     </select>
 
+    <select id="selectRecordCountGroupbyDate"
+            resultType="cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.customer.CrmStatisticsCustomerCountVO">
+        SELECT
+            DATE_FORMAT( create_time, #{sqlDateFormat,javaType=java.lang.String} ) AS category,
+            count(*) AS count
+          FROM
+            crm_follow_up_record
+         WHERE
+            creator IN
+                <foreach collection="userIds" item="userId" open="(" close=")" separator=",">
+                    #{userId}
+                </foreach>
+          AND create_time BETWEEN #{times[0],javaType=java.time.LocalDateTime} AND
+                #{times[1],javaType=java.time.LocalDateTime}
+          AND biz_type = #{bizType,javaType=java.lang.Integer}
+        GROUP BY
+            DATE_FORMAT (create_time, #{sqlDateFormat,javaType=java.lang.String} )
+    </select>
+
+    <select id="selectDistinctRecordCountGroupbyDate"
+            resultType="cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.customer.CrmStatisticsCustomerCountVO">
+        SELECT
+            DATE_FORMAT( create_time, #{sqlDateFormat,javaType=java.lang.String} ) AS category,
+            count(DISTINCT biz_id) AS count
+          FROM
+            crm_follow_up_record
+         WHERE
+            creator IN
+                <foreach collection="userIds" item="userId" open="(" close=")" separator=",">
+                    #{userId}
+                </foreach>
+          AND create_time BETWEEN #{times[0],javaType=java.time.LocalDateTime} AND
+                #{times[1],javaType=java.time.LocalDateTime}
+          AND biz_type = #{bizType,javaType=java.lang.Integer}
+        GROUP BY DATE_FORMAT (create_time, #{sqlDateFormat,javaType=java.lang.String} )
+    </select>
+
 </mapper>
