@@ -2,9 +2,9 @@ package cn.iocoder.yudao.module.crm.service.statistics;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
-import cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.CrmStatisticsRanKRespVO;
-import cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.CrmStatisticsRankReqVO;
-import cn.iocoder.yudao.module.crm.dal.mysql.statistics.CrmStatisticsRankingMapper;
+import cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.rank.CrmStatisticsRankReqVO;
+import cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.rank.CrmStatisticsRankRespVO;
+import cn.iocoder.yudao.module.crm.dal.mysql.statistics.CrmStatisticsRankMapper;
 import cn.iocoder.yudao.module.system.api.dept.DeptApi;
 import cn.iocoder.yudao.module.system.api.dept.dto.DeptRespDTO;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
@@ -23,16 +23,16 @@ import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 
 /**
- * CRM 排行榜统计 Service 实现类
+ * CRM 数据统计 排行榜统计 Service 实现类
  *
  * @author anhaohao
  */
 @Service
 @Validated
-public class CrmStatisticsRankingServiceImpl implements CrmStatisticsRankingService {
+public class CrmStatisticsRankServiceImpl implements CrmStatisticsRankService {
 
     @Resource
-    private CrmStatisticsRankingMapper rankMapper;
+    private CrmStatisticsRankMapper rankMapper;
 
     @Resource
     private AdminUserApi adminUserApi;
@@ -40,64 +40,64 @@ public class CrmStatisticsRankingServiceImpl implements CrmStatisticsRankingServ
     private DeptApi deptApi;
 
     @Override
-    public List<CrmStatisticsRanKRespVO> getContractPriceRank(CrmStatisticsRankReqVO rankReqVO) {
+    public List<CrmStatisticsRankRespVO> getContractPriceRank(CrmStatisticsRankReqVO rankReqVO) {
         return getRank(rankReqVO, rankMapper::selectContractPriceRank);
     }
 
     @Override
-    public List<CrmStatisticsRanKRespVO> getReceivablePriceRank(CrmStatisticsRankReqVO rankReqVO) {
+    public List<CrmStatisticsRankRespVO> getReceivablePriceRank(CrmStatisticsRankReqVO rankReqVO) {
         return getRank(rankReqVO, rankMapper::selectReceivablePriceRank);
     }
 
     @Override
-    public List<CrmStatisticsRanKRespVO> getContractCountRank(CrmStatisticsRankReqVO rankReqVO) {
+    public List<CrmStatisticsRankRespVO> getContractCountRank(CrmStatisticsRankReqVO rankReqVO) {
         return getRank(rankReqVO, rankMapper::selectContractCountRank);
     }
 
     @Override
-    public List<CrmStatisticsRanKRespVO> getProductSalesRank(CrmStatisticsRankReqVO rankReqVO) {
+    public List<CrmStatisticsRankRespVO> getProductSalesRank(CrmStatisticsRankReqVO rankReqVO) {
         return getRank(rankReqVO, rankMapper::selectProductSalesRank);
     }
 
     @Override
-    public List<CrmStatisticsRanKRespVO> getCustomerCountRank(CrmStatisticsRankReqVO rankReqVO) {
+    public List<CrmStatisticsRankRespVO> getCustomerCountRank(CrmStatisticsRankReqVO rankReqVO) {
         return getRank(rankReqVO, rankMapper::selectCustomerCountRank);
     }
 
     @Override
-    public List<CrmStatisticsRanKRespVO> getContactsCountRank(CrmStatisticsRankReqVO rankReqVO) {
+    public List<CrmStatisticsRankRespVO> getContactsCountRank(CrmStatisticsRankReqVO rankReqVO) {
         return getRank(rankReqVO, rankMapper::selectContactsCountRank);
     }
 
     @Override
-    public List<CrmStatisticsRanKRespVO> getFollowCountRank(CrmStatisticsRankReqVO rankReqVO) {
+    public List<CrmStatisticsRankRespVO> getFollowCountRank(CrmStatisticsRankReqVO rankReqVO) {
         return getRank(rankReqVO, rankMapper::selectFollowCountRank);
     }
 
     @Override
-    public List<CrmStatisticsRanKRespVO> getFollowCustomerCountRank(CrmStatisticsRankReqVO rankReqVO) {
+    public List<CrmStatisticsRankRespVO> getFollowCustomerCountRank(CrmStatisticsRankReqVO rankReqVO) {
         return getRank(rankReqVO, rankMapper::selectFollowCustomerCountRank);
     }
 
     /**
      * 获得排行版数据
      *
-     * @param rankReqVO  参数
+     * @param rankReqVO    参数
      * @param rankFunction 排行榜方法
      * @return 排行版数据
      */
-    private List<CrmStatisticsRanKRespVO> getRank(CrmStatisticsRankReqVO rankReqVO, Function<CrmStatisticsRankReqVO, List<CrmStatisticsRanKRespVO>> rankFunction) {
+    private List<CrmStatisticsRankRespVO> getRank(CrmStatisticsRankReqVO rankReqVO, Function<CrmStatisticsRankReqVO, List<CrmStatisticsRankRespVO>> rankFunction) {
         // 1. 获得用户编号数组
         rankReqVO.setUserIds(getUserIds(rankReqVO.getDeptId()));
         if (CollUtil.isEmpty(rankReqVO.getUserIds())) {
             return Collections.emptyList();
         }
         // 2. 获得排行数据
-        List<CrmStatisticsRanKRespVO> ranks = rankFunction.apply(rankReqVO);
+        List<CrmStatisticsRankRespVO> ranks = rankFunction.apply(rankReqVO);
         if (CollUtil.isEmpty(ranks)) {
             return Collections.emptyList();
         }
-        ranks.sort(Comparator.comparing(CrmStatisticsRanKRespVO::getCount).reversed());
+        ranks.sort(Comparator.comparing(CrmStatisticsRankRespVO::getCount).reversed());
         // 3. 拼接用户信息
         appendUserInfo(ranks);
         return ranks;
@@ -108,8 +108,8 @@ public class CrmStatisticsRankingServiceImpl implements CrmStatisticsRankingServ
      *
      * @param ranks 排行榜数据
      */
-    private void appendUserInfo(List<CrmStatisticsRanKRespVO> ranks) {
-        Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(convertSet(ranks, CrmStatisticsRanKRespVO::getOwnerUserId));
+    private void appendUserInfo(List<CrmStatisticsRankRespVO> ranks) {
+        Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(convertSet(ranks, CrmStatisticsRankRespVO::getOwnerUserId));
         Map<Long, DeptRespDTO> deptMap = deptApi.getDeptMap(convertSet(userMap.values(), AdminUserRespDTO::getDeptId));
         ranks.forEach(rank -> MapUtils.findAndThen(userMap, rank.getOwnerUserId(), user -> {
             rank.setNickname(user.getNickname());
