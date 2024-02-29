@@ -22,4 +22,8 @@ public interface CrmStatisticsCustomerMapper {
 
     List<CrmStatisticsCustomerCountVO> selectDistinctRecordCountGroupbyDate(CrmStatisticsCustomerReqVO reqVO);
 
+    List<CrmStatisticsCustomerCountVO> selectRecordCountGroupbyType(CrmStatisticsCustomerReqVO reqVO);
+
+    List<CrmStatisticsCustomerCountVO> selectCustomerCycleGroupbyDate(CrmStatisticsCustomerReqVO reqVO);
+
 }

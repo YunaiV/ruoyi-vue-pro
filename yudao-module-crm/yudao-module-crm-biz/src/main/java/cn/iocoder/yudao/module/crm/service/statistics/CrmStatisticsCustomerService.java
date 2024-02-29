@@ -45,4 +45,20 @@ public interface CrmStatisticsCustomerService {
      */
     List<CrmStatisticsCustomerCountVO> getDistinctRecordCount(CrmStatisticsCustomerReqVO reqVO);
 
+    /**
+     * 获取客户跟进方式统计数
+     *
+     * @param reqVO 请求参数
+     * @return 客户跟进方式统计数
+     */
+    List<CrmStatisticsCustomerCountVO> getRecordTypeCount(CrmStatisticsCustomerReqVO reqVO);
+
+    /**
+     * 获取客户成交周期
+     *
+     * @param reqVO 请求参数
+     * @return 客户成交周期
+     */
+    List<CrmStatisticsCustomerCountVO> getCustomerCycle(CrmStatisticsCustomerReqVO reqVO);
+
 }

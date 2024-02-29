@@ -23,6 +23,12 @@ public class CrmStatisticsCustomerCountVO {
      * 2. 个数：签约合同排行、产品销量排行、产品销量排行、新增客户数排行、新增联系人排行、跟进次数排行、跟进客户数排行
      */
     @Schema(description = "数量", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
-    private Integer count;
+    private Integer count = 0;
+
+    /**
+     * 成交周期(天)
+     */
+    @Schema(description = "成交周期", requiredMode = Schema.RequiredMode.REQUIRED, example = "1.0")
+    private Double cycle = 0.0;
 
 }
