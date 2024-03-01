@@ -245,7 +245,7 @@ public class AfterSaleServiceImpl implements AfterSaleService {
     @AfterSaleLog(operateType = AfterSaleOperateTypeEnum.MEMBER_DELIVERY)
     public void deliveryAfterSale(Long userId, AppAfterSaleDeliveryReqVO deliveryReqVO) {
         // 校验售后单存在，并状态未退货
-        AfterSaleDO afterSale = tradeAfterSaleMapper.selectById(deliveryReqVO.getId());
+        AfterSaleDO afterSale = tradeAfterSaleMapper.selectByIdAndUserId(deliveryReqVO.getId(), userId);
         if (afterSale == null) {
             throw exception(AFTER_SALE_NOT_FOUND);
         }

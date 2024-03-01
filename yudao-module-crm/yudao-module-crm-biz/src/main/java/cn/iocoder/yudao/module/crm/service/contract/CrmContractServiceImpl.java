@@ -3,7 +3,6 @@ package cn.iocoder.yudao.module.crm.service.contract;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.lang.Assert;
-import cn.hutool.core.lang.Validator;
 import cn.hutool.core.util.ObjUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.number.MoneyUtils;
@@ -346,8 +345,8 @@ public class CrmContractServiceImpl implements CrmContractService {
             if (config != null && Boolean.FALSE.equals(config.getNotifyEnabled())) {
                 config = null;
             }
-            if(Validator.isNull(config)){
-                return new PageResult<>();
+            if (config == null) {
+                return PageResult.empty();
             }
         }
         // 2. 查询分页
