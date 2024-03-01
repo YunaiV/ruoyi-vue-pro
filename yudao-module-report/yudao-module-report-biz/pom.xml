@@ -77,6 +77,16 @@
         <dependency>
             <groupId>com.bstek.ureport</groupId>
             <artifactId>ureport2-console</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.apache.poi</groupId>
+                    <artifactId>poi</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.poi</groupId>
+                    <artifactId>poi-ooxml</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>
