@@ -34,7 +34,7 @@ public class RedisController {
         Properties info = stringRedisTemplate.execute((RedisCallback<Properties>) RedisServerCommands::info);
         Long dbSize = stringRedisTemplate.execute(RedisServerCommands::dbSize);
         Properties commandStats = stringRedisTemplate.execute((
-                RedisCallback<Properties>) connection -> connection.info("commandstats"));
+                RedisCallback<Properties>) connection -> connection.serverCommands().info("commandstats"));
         assert commandStats != null; // 断言，避免警告
         // 拼接结果返回
         return success(RedisConvert.INSTANCE.build(info, dbSize, commandStats));
