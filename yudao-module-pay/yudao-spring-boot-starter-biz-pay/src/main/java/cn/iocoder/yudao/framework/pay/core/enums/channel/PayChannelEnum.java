@@ -17,6 +17,7 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum PayChannelEnum {
 
+    WX_WAP("wx_wap", "微信 Wap 网站支付", WxPayClientConfig.class), // H5网页
     WX_PUB("wx_pub", "微信 JSAPI 支付", WxPayClientConfig.class), // 公众号网页
     WX_LITE("wx_lite", "微信小程序支付", WxPayClientConfig.class),
     WX_APP("wx_app", "微信 App 支付", WxPayClientConfig.class),
