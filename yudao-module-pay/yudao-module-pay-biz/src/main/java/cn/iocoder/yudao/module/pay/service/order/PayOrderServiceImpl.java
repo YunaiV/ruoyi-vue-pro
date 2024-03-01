@@ -477,6 +477,14 @@ public class PayOrderServiceImpl implements PayOrderService {
                 return false;
             }
             PayOrderRespDTO respDTO = payClient.getOrder(orderExtension.getNo());
+            // 如果查询到订单不存在，PayClient 返回的状态为关闭。但此时不能关闭订单。存在以下一种场景：
+            //  拉起渠道支付后，短时间内用户未及时完成支付，但是该订单同步定时任务恰巧自动触发了，主动查询结果为订单不存在。
+            //  当用户支付成功之后，该订单状态在渠道的回调中无法从已关闭改为已支付，造成重大影响。
+            // 考虑此定时任务是异常场景的兜底操作，因此这里不做变更，优先以回调为准。
+            // 让订单自动随着支付渠道那边一起等到过期，确保渠道先过期关闭支付入口，而后通过订单过期定时任务关闭自己的订单。
+            if (PayOrderStatusRespEnum.isClosed(respDTO.getStatus())) {
+                return false;
+            }
             // 1.2 回调支付结果
             notifyOrder(orderExtension.getChannelId(), respDTO);
 

@@ -1,7 +1,6 @@
 package cn.iocoder.yudao.module.crm.controller.admin.product;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
@@ -14,6 +13,7 @@ import cn.iocoder.yudao.module.crm.controller.admin.product.vo.product.CrmProduc
 import cn.iocoder.yudao.module.crm.controller.admin.product.vo.product.CrmProductSaveReqVO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.product.CrmProductCategoryDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.product.CrmProductDO;
+import cn.iocoder.yudao.module.crm.enums.product.CrmProductStatusEnum;
 import cn.iocoder.yudao.module.crm.service.product.CrmProductCategoryService;
 import cn.iocoder.yudao.module.crm.service.product.CrmProductService;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
@@ -96,7 +96,7 @@ public class CrmProductController {
     @GetMapping("/simple-list")
     @Operation(summary = "获得产品精简列表", description = "只包含被开启的产品，主要用于前端的下拉选项")
     public CommonResult<List<CrmProductRespVO>> getProductSimpleList() {
-        List<CrmProductDO> list = productService.getProductListByStatus(CommonStatusEnum.ENABLE.getStatus());
+        List<CrmProductDO> list = productService.getProductListByStatus(CrmProductStatusEnum.ENABLE.getStatus());
         return success(convertList(list, product -> new CrmProductRespVO().setId(product.getId()).setName(product.getName())
                 .setUnit(product.getUnit()).setNo(product.getNo()).setPrice(product.getPrice())));
     }

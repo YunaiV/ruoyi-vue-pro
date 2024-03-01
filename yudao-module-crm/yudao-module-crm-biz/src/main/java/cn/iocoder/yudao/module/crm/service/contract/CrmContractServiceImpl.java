@@ -345,6 +345,9 @@ public class CrmContractServiceImpl implements CrmContractService {
             if (config != null && Boolean.FALSE.equals(config.getNotifyEnabled())) {
                 config = null;
             }
+            if (config == null) {
+                return PageResult.empty();
+            }
         }
         // 2. 查询分页
         return contractMapper.selectPage(pageReqVO, userId, config);
