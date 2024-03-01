@@ -49,12 +49,12 @@ import cn.iocoder.yudao.module.trade.service.price.TradePriceService;
 import cn.iocoder.yudao.module.trade.service.price.bo.TradePriceCalculateReqBO;
 import cn.iocoder.yudao.module.trade.service.price.bo.TradePriceCalculateRespBO;
 import cn.iocoder.yudao.module.trade.service.price.calculator.TradePriceCalculatorHelper;
+import jakarta.annotation.Resource;
+import jakarta.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.annotation.Resource;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -361,7 +361,7 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
 
         // 3. 记录订单日志
         TradeOrderLogUtils.setOrderInfo(order.getId(), order.getStatus(), TradeOrderStatusEnum.DELIVERED.getStatus(),
-                MapUtil.<String, Object>builder().put("deliveryName", express != null ? express.getName() : "")
+                MapUtil.<String, Object>builder().put("expressName", express != null ? express.getName() : "")
                         .put("logisticsNo", express != null ? deliveryReqVO.getLogisticsNo() : "").build());
 
         // 4. 发送站内信

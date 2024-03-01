@@ -449,7 +449,7 @@ public class PayOrderServiceImpl implements PayOrderService {
     @Override
     public int syncOrder(LocalDateTime minCreateTime) {
         // 1. 查询指定创建时间前的待支付订单
-        List<PayOrderExtensionDO> orderExtensions = orderExtensionMapper.selectListByStatusAndCreateTimeLe(
+        List<PayOrderExtensionDO> orderExtensions = orderExtensionMapper.selectListByStatusAndCreateTimeGe(
                 PayOrderStatusEnum.WAITING.getStatus(), minCreateTime);
         if (CollUtil.isEmpty(orderExtensions)) {
             return 0;
