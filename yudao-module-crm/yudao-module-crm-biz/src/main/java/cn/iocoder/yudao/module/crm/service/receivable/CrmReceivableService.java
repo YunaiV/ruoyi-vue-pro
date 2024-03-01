@@ -122,6 +122,7 @@ public interface CrmReceivableService {
      */
     Map<Long, BigDecimal> getReceivablePriceMapByContractId(Collection<Long> contractIds);
 
+    // TODO @puhui999：这个搞成根据数量判断，会更好一点哈；
     /**
      * 更具合同编号查询回款列表
      *

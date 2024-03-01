@@ -224,12 +224,13 @@ public class CrmReceivableServiceImpl implements CrmReceivableService {
         if (ObjUtil.equal(receivable.getAuditStatus(), CrmAuditStatusEnum.APPROVE.getStatus())) {
             throw exception(RECEIVABLE_DELETE_FAIL_IS_APPROVE);
         }
-        // 2. 删除
+
+        // 2.1 删除回款
         receivableMapper.deleteById(id);
-        // 3. 删除数据权限
+        // 2.2 删除数据权限
         permissionService.deletePermission(CrmBizTypeEnum.CRM_RECEIVABLE.getType(), id);
 
-        // 4. 记录操作日志上下文
+        // 3. 记录操作日志上下文
         LogRecordContext.putVariable("receivable", receivable);
         LogRecordContext.putVariable("period", getReceivablePeriod(receivable.getPlanId()));
     }

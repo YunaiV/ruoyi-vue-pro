@@ -3,6 +3,7 @@ package cn.iocoder.yudao.framework.excel.core.handler;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.extra.spring.SpringUtil;
+import cn.hutool.poi.excel.ExcelUtil;
 import cn.iocoder.yudao.framework.common.core.KeyValue;
 import cn.iocoder.yudao.framework.excel.core.annotations.ExcelColumnSelect;
 import cn.iocoder.yudao.framework.excel.core.service.ExcelColumnSelectDataService;
@@ -27,7 +28,9 @@ import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.
  */
 public class SelectSheetWriteHandler implements SheetWriteHandler {
 
+    // TODO @puhui999：注释哈；
     private static final List<String> ALPHABET = getExcelColumnNameList();
+
     private static final List<ExcelColumnSelectDataService> EXCEL_COLUMN_SELECT_DATA_SERVICES = new ArrayList<>();
 
     /**
@@ -43,6 +46,7 @@ public class SelectSheetWriteHandler implements SheetWriteHandler {
 
     private static final String DICT_SHEET_NAME = "字典sheet";
 
+    // TODO @puhui999：这个 selectMap 可以改成 Map<Integer, List<String>>，然后在 afterSheetCreate 里面进行排序。这样整体的理解成本会更简单
     private final List<KeyValue<Integer, List<String>>> selectMap = new ArrayList<>(); // 使用 List + KeyValue 组合方便排序
 
     public SelectSheetWriteHandler(Class<?> head) {
@@ -51,11 +55,14 @@ public class SelectSheetWriteHandler implements SheetWriteHandler {
         if (MapUtil.isEmpty(beansMap)) {
             return;
         }
+        // TODO @puhui999：static 是共享。如果并发情况下，会不会存在问题？         其实 EXCEL_COLUMN_SELECT_DATA_SERVICES 不用全局声明，直接 按照 ExcelColumnSelect 去拿下就好了；
         if (CollUtil.isEmpty(EXCEL_COLUMN_SELECT_DATA_SERVICES) || EXCEL_COLUMN_SELECT_DATA_SERVICES.size() != beansMap.values().size()) {
             EXCEL_COLUMN_SELECT_DATA_SERVICES.clear();
             EXCEL_COLUMN_SELECT_DATA_SERVICES.addAll(convertList(beansMap.values(), b -> b));
         }
+
         // 解析下拉数据
+        // TODO @puhui999：感觉可以 head 循环 field，如果有 ExcelColumnSelect 则进行处理；而 ExcelProperty 可能是非必须的
         Map<String, Field> excelPropertyFields = getFieldsWithAnnotation(head, ExcelProperty.class);
         Map<String, Field> excelColumnSelectFields = getFieldsWithAnnotation(head, ExcelColumnSelect.class);
         int colIndex = 0;
@@ -157,6 +164,7 @@ public class SelectSheetWriteHandler implements SheetWriteHandler {
 
 
     private static List<String> getExcelColumnNameList() {
+        // TODO @puhui999：是不是可以使用 ExcelUtil.indexToColName() 替代
         ArrayList<String> strings = new ArrayList<>();
         for (int i = 1; i <= 52; i++) { // 生成 52 列名称，需要更多请重写此方法
             if (i <= 26) {
