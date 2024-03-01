@@ -94,7 +94,7 @@ public class CrmFollowUpRecordController {
             record.setBusinesses(new ArrayList<>()).setContacts(new ArrayList<>());
             record.getContactIds().forEach(id -> MapUtils.findAndThen(contactMap, id, contact ->
                     record.getContacts().add(new CrmBusinessRespVO().setId(contact.getId()).setName(contact.getName()))));
-            record.getContactIds().forEach(id -> MapUtils.findAndThen(businessMap, id, business ->
+            record.getBusinessIds().forEach(id -> MapUtils.findAndThen(businessMap, id, business ->
                     record.getBusinesses().add(new CrmBusinessRespVO().setId(business.getId()).setName(business.getName()))));
             // 2.2 设置用户信息
             MapUtils.findAndThen(userMap, Long.valueOf(record.getCreator()), user -> record.setCreatorName(user.getNickname()));
