@@ -18,6 +18,7 @@ import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
+// TODO @dhb52：数据统计 员工客户分析，改成“客户统计”
 @Tag(name = "管理后台 - CRM 数据统计 员工客户分析")
 @RestController
 @RequestMapping("/crm/statistics-customer")
@@ -26,6 +27,10 @@ public class CrmStatisticsCustomerController {
 
     @Resource
     private CrmStatisticsCustomerService customerService;
+
+    // TODO @dhb52：建议 getCustomerCount 和 getDealTotalCustomerCount 搞成一个接口；
+    // 1. 数量接口：【方法：getCustomerSummaryByDate】，VO：CrmStatisticsCustomerSummaryByDateRespVO，然后里面是 time、customerCreateCount customerDealCount
+    // 2. 按人统计：【方法：getCustomerSummaryByUser】，VO：CrmStatisticsCustomerSummaryByOwnerRespVO，然后里面是 ownerUserId、ownerUserName、customerCreateCount customerDealCount、contractPrice、receivablePrice；客户成交率、未回款金额、回款完成率，交给前端计算；
 
     @GetMapping("/get-total-customer-count")
     @Operation(summary = "获得新建客户数量")

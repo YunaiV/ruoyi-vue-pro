@@ -4,7 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 
-@Schema(description = "管理后台 - CRM 数据统计 排行榜统计 Response VO")
+@Schema(description = "管理后台 - CRM 排行榜统计 Response VO")
 @Data
 public class CrmStatisticsRankRespVO {
 

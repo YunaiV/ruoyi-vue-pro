@@ -19,7 +19,7 @@ import java.util.List;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
 
-@Tag(name = "管理后台 - CRM 数据统计 排行榜统计")
+@Tag(name = "管理后台 - CRM 排行榜统计")
 @RestController
 @RequestMapping("/crm/statistics-rank")
 @Validated

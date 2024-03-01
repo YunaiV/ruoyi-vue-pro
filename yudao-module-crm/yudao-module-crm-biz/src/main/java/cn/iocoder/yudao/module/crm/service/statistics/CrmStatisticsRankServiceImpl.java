@@ -23,7 +23,7 @@ import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 
 /**
- * CRM 数据统计 排行榜统计 Service 实现类
+ * CRM 排行榜统计 Service 实现类
  *
  * @author anhaohao
  */

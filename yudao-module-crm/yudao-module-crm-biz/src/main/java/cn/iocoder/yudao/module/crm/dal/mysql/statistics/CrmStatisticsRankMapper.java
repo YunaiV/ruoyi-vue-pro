@@ -7,7 +7,7 @@ import org.apache.ibatis.annotations.Mapper;
 import java.util.List;
 
 /**
- * CRM 数据统计 排行榜统计 Mapper
+ * CRM 排行榜统计 Mapper
  *
  * @author anhaohao
  */

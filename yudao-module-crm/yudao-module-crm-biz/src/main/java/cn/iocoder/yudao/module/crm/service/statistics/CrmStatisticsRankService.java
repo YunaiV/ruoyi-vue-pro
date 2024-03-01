@@ -7,7 +7,7 @@ import cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.rank.CrmStatis
 import java.util.List;
 
 /**
- * CRM 数据统计 排行榜统计 Service 接口
+ * CRM 排行榜统计 Service 接口
  *
  * @author anhaohao
  */
