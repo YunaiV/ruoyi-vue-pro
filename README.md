@@ -4,7 +4,7 @@
  <img src="https://img.shields.io/github/license/YunaiV/ruoyi-vue-pro"/>
 </p>
 
-**严肃声明：现在、未来都不会有商业版本，所有代码全部开源!！**
+**严肃声明：现在、未来都不会有商业版本，所有代码全部开源!(部分数据库仍需要进入知识星球付费获取)，也是为了项目能够不断维护下去，感谢理解！**
 
 **「我喜欢写代码，乐此不疲」**  
 **「我喜欢做开源，以此为乐」**
@@ -23,7 +23,7 @@
 
 ## 🐯 平台简介
 
-**芋道**，以开发者为中心，打造中国第一流的快速开发平台，全部开源，个人与企业可 100% 免费使用。
+**芋道**，以开发者为中心，打造中国第一流的快速开发平台，全部开源，个人与企业可 80% 免费使用(所有业务层代码已完全开源，但剩余20%需要知识星球付费获取数据库文件即可使用)。
 
 > 有任何问题，或者想要的功能，可以在 _Issues_ 中提给艿艿。
 >
@@ -76,7 +76,7 @@
 
 ### ⬅️ 完整版
 
-【完整版】包括系统功能、基础设施、会员中心、数据报表、工作流程、商城系统、微信公众号、CRM 等功能
+【完整版】包括系统功能、基础设施、会员中心、数据报表、工作流程、商城系统、微信公众号、CRM 等功能，完整版本需要进入知识星球获取，详情请查看文档。
 
 * JDK 8 + Spring Boot 2.7.18 版本：<https://gitee.com/zhijiantianya/ruoyi-vue-pro> 的 `master` 分支
 * JDK 21 + Spring Boot 3.2.0 版本：<https://gitee.com/zhijiantianya/ruoyi-vue-pro> 的 `master-jdk21` 分支
@@ -98,7 +98,7 @@
 
 **为什么推荐使用本项目？**
 
-① 本项目采用比 Apache 2.0 更宽松的 [MIT License](https://gitee.com/zhijiantianya/ruoyi-vue-pro/blob/master/LICENSE) 开源协议，个人与企业可 100% 免费使用，不用保留类作者、Copyright 信息。
+① 本项目采用比 Apache 2.0 更宽松的 [MIT License](https://gitee.com/zhijiantianya/ruoyi-vue-pro/blob/master/LICENSE) 开源协议，个人与企业可 80% 免费使用，不用保留类作者、Copyright 信息。
 
 ② 代码全部开源，不会像其他项目一样，只开源部分代码，让你无法了解整个项目的架构设计。[国产开源项目对比](https://www.yuque.com/xiatian-bsgny/lm0ec1/wqf8mn)
 
