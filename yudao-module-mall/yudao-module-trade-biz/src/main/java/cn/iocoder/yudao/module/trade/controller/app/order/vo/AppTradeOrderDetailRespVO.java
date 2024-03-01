@@ -1,12 +1,10 @@
 package cn.iocoder.yudao.module.trade.controller.app.order.vo;
 
 import cn.iocoder.yudao.module.trade.controller.app.order.vo.item.AppTradeOrderItemRespVO;
-import cn.iocoder.yudao.module.trade.enums.order.TradeOrderRefundStatusEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.List;
 
 @Schema(description = "用户 App - 订单交易的明细 Response VO")
@@ -138,6 +136,9 @@ public class AppTradeOrderDetailRespVO {
 
     @Schema(description = "积分抵扣的金额", requiredMode = Schema.RequiredMode.REQUIRED, example = "100")
     private Integer pointPrice;
+
+    @Schema(description = "VIP 减免金额", requiredMode = Schema.RequiredMode.REQUIRED, example = "888")
+    private Integer vipPrice;
 
     /**
      * 订单项数组
