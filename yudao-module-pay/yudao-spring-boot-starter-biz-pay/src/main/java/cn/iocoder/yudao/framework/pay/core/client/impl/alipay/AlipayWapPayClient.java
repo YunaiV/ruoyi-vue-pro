@@ -45,6 +45,7 @@ public class AlipayWapPayClient extends AbstractAlipayPayClient {
         request.setNotifyUrl(reqDTO.getNotifyUrl());
         request.setReturnUrl(reqDTO.getReturnUrl());
         model.setQuitUrl(reqDTO.getReturnUrl());
+        model.setTimeExpire(formatTime(reqDTO.getExpireTime()));
 
         // 2.1 执行请求
         AlipayTradeWapPayResponse response = client.pageExecute(request, Method.GET.name());
