@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.framework.dict.config;
 
-import cn.iocoder.yudao.framework.dict.util.DictFrameworkUtils;
+import cn.iocoder.yudao.framework.dict.core.DictFrameworkUtils;
 import cn.iocoder.yudao.module.system.api.dict.DictDataApi;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.context.annotation.Bean;

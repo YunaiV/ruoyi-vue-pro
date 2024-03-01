@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.framework.dict.util;
+package cn.iocoder.yudao.framework.dict.core;
 
 import cn.hutool.core.util.ObjectUtil;
 import cn.iocoder.yudao.framework.common.core.KeyValue;
