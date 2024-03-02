@@ -2,15 +2,19 @@ package cn.iocoder.yudao.framework.excel.core.handler;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.map.MapUtil;
+import cn.hutool.core.util.ObjUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.spring.SpringUtil;
 import cn.hutool.poi.excel.ExcelUtil;
 import cn.iocoder.yudao.framework.common.core.KeyValue;
+import cn.iocoder.yudao.framework.dict.core.DictFrameworkUtils;
 import cn.iocoder.yudao.framework.excel.core.annotations.ExcelColumnSelect;
-import cn.iocoder.yudao.framework.excel.core.service.ExcelColumnSelectDataService;
+import cn.iocoder.yudao.framework.excel.core.function.ExcelColumnSelectFunction;
 import com.alibaba.excel.annotation.ExcelProperty;
 import com.alibaba.excel.write.handler.SheetWriteHandler;
 import com.alibaba.excel.write.metadata.holder.WriteSheetHolder;
 import com.alibaba.excel.write.metadata.holder.WriteWorkbookHolder;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.hssf.usermodel.HSSFDataValidation;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddressList;
@@ -26,12 +30,8 @@ import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.
  *
  * @author HUIHUI
  */
+@Slf4j
 public class SelectSheetWriteHandler implements SheetWriteHandler {
-
-    // TODO @puhui999：注释哈；
-    private static final List<String> ALPHABET = getExcelColumnNameList();
-
-    private static final List<ExcelColumnSelectDataService> EXCEL_COLUMN_SELECT_DATA_SERVICES = new ArrayList<>();
 
     /**
      * 数据起始行从 0 开始
@@ -46,34 +46,35 @@ public class SelectSheetWriteHandler implements SheetWriteHandler {
 
     private static final String DICT_SHEET_NAME = "字典sheet";
 
-    // TODO @puhui999：这个 selectMap 可以改成 Map<Integer, List<String>>，然后在 afterSheetCreate 里面进行排序。这样整体的理解成本会更简单
-    private final List<KeyValue<Integer, List<String>>> selectMap = new ArrayList<>(); // 使用 List + KeyValue 组合方便排序
+    /**
+     * key: 列 value: 下拉数据源
+     */
+    private final Map<Integer, List<String>> selectMap = new HashMap<>();
 
     public SelectSheetWriteHandler(Class<?> head) {
         // 加载下拉数据获取接口
-        Map<String, ExcelColumnSelectDataService> beansMap = SpringUtil.getBeanFactory().getBeansOfType(ExcelColumnSelectDataService.class);
+        Map<String, ExcelColumnSelectFunction> beansMap = SpringUtil.getBeanFactory().getBeansOfType(ExcelColumnSelectFunction.class);
         if (MapUtil.isEmpty(beansMap)) {
             return;
         }
-        // TODO @puhui999：static 是共享。如果并发情况下，会不会存在问题？         其实 EXCEL_COLUMN_SELECT_DATA_SERVICES 不用全局声明，直接 按照 ExcelColumnSelect 去拿下就好了；
-        if (CollUtil.isEmpty(EXCEL_COLUMN_SELECT_DATA_SERVICES) || EXCEL_COLUMN_SELECT_DATA_SERVICES.size() != beansMap.values().size()) {
-            EXCEL_COLUMN_SELECT_DATA_SERVICES.clear();
-            EXCEL_COLUMN_SELECT_DATA_SERVICES.addAll(convertList(beansMap.values(), b -> b));
-        }
 
         // 解析下拉数据
-        // TODO @puhui999：感觉可以 head 循环 field，如果有 ExcelColumnSelect 则进行处理；而 ExcelProperty 可能是非必须的
+        // TODO @puhui999：感觉可以 head 循环 field，如果有 ExcelColumnSelect 则进行处理；而 ExcelProperty 可能是非必须的。回答：主要是用于定位到列索引
         Map<String, Field> excelPropertyFields = getFieldsWithAnnotation(head, ExcelProperty.class);
         Map<String, Field> excelColumnSelectFields = getFieldsWithAnnotation(head, ExcelColumnSelect.class);
         int colIndex = 0;
         for (String fieldName : excelPropertyFields.keySet()) {
             Field field = excelColumnSelectFields.get(fieldName);
             if (field != null) {
+                // ExcelProperty 有一个自定义列索引的属性 index 兼容这个字段
+                int index = field.getAnnotation(ExcelProperty.class).index();
+                if (index != -1) {
+                    colIndex = index;
+                }
                 getSelectDataList(colIndex, field);
             }
             colIndex++;
         }
-        selectMap.sort(Comparator.comparing(item -> item.getValue().size())); // 升序不然创建下拉会报错
     }
 
     /**
@@ -83,12 +84,25 @@ public class SelectSheetWriteHandler implements SheetWriteHandler {
      * @param field    字段
      */
     private void getSelectDataList(int colIndex, Field field) {
-        EXCEL_COLUMN_SELECT_DATA_SERVICES.forEach(selectDataService -> {
-            List<String> stringList = selectDataService.handle(field.getAnnotation(ExcelColumnSelect.class).value());
-            if (CollUtil.isEmpty(stringList)) {
+        // 获得下拉注解信息
+        ExcelColumnSelect columnSelect = field.getAnnotation(ExcelColumnSelect.class);
+        String dictType = columnSelect.dictType();
+        if (StrUtil.isNotEmpty(dictType)) { // 情况一： 字典数据 （默认）
+            selectMap.put(colIndex, DictFrameworkUtils.getDictDataLabelList(dictType));
+            return;
+        }
+        String functionName = columnSelect.functionName();
+        if (StrUtil.isEmpty(functionName)) { // 情况二： 获取自定义数据
+            log.warn("[getSelectDataList]解析下拉数据失败,参数信息 dictType[{}] functionName[{}]", dictType, functionName);
+            return;
+        }
+        // 获得所有的下拉数据源获取方法
+        Map<String, ExcelColumnSelectFunction> functionMap = SpringUtil.getApplicationContext().getBeansOfType(ExcelColumnSelectFunction.class);
+        functionMap.values().forEach(func -> {
+            if (ObjUtil.notEqual(func.getName(), functionName)) {
                 return;
             }
-            selectMap.add(new KeyValue<>(colIndex, stringList));
+            selectMap.put(colIndex, func.getOptions());
         });
     }
 
@@ -101,10 +115,11 @@ public class SelectSheetWriteHandler implements SheetWriteHandler {
         // 1. 获取相应操作对象
         DataValidationHelper helper = writeSheetHolder.getSheet().getDataValidationHelper(); // 需要设置下拉框的 sheet 页的数据验证助手
         Workbook workbook = writeWorkbookHolder.getWorkbook(); // 获得工作簿
-
+        List<KeyValue<Integer, List<String>>> keyValues = convertList(selectMap.entrySet(), entry -> new KeyValue<>(entry.getKey(), entry.getValue()));
+        keyValues.sort(Comparator.comparing(item -> item.getValue().size())); // 升序不然创建下拉会报错
         // 2. 创建数据字典的 sheet 页
         Sheet dictSheet = workbook.createSheet(DICT_SHEET_NAME);
-        for (KeyValue<Integer, List<String>> keyValue : selectMap) {
+        for (KeyValue<Integer, List<String>> keyValue : keyValues) {
             int rowLength = keyValue.getValue().size();
             // 2.1 设置字典 sheet 页的值 每一列一个字典项
             for (int i = 0; i < rowLength; i++) {
@@ -126,7 +141,7 @@ public class SelectSheetWriteHandler implements SheetWriteHandler {
                                         KeyValue<Integer, List<String>> keyValue) {
         // 1.1 创建可被其他单元格引用的名称
         Name name = workbook.createName();
-        String excelColumn = ALPHABET.get(keyValue.getKey());
+        String excelColumn = ExcelUtil.indexToColName(keyValue.getKey());
         // 1.2 下拉框数据来源 eg:字典sheet!$B1:$B2
         String refers = DICT_SHEET_NAME + "!$" + excelColumn + "$1:$" + excelColumn + "$" + keyValue.getValue().size();
         name.setNameName("dict" + keyValue.getKey()); // 设置名称的名字
@@ -160,20 +175,6 @@ public class SelectSheetWriteHandler implements SheetWriteHandler {
             }
         }
         return annotatedFields;
-    }
-
-
-    private static List<String> getExcelColumnNameList() {
-        // TODO @puhui999：是不是可以使用 ExcelUtil.indexToColName() 替代
-        ArrayList<String> strings = new ArrayList<>();
-        for (int i = 1; i <= 52; i++) { // 生成 52 列名称，需要更多请重写此方法
-            if (i <= 26) {
-                strings.add(String.valueOf((char) ('A' + i - 1))); // 使用 ASCII 码值转字母
-            } else {
-                strings.add(String.valueOf((char) ('A' + (i - 1) / 26 - 1)) + (char) ('A' + (i - 1) % 26));
-            }
-        }
-        return strings;
     }
 
 }

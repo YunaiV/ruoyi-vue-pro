@@ -229,7 +229,7 @@ public class CrmContractServiceImpl implements CrmContractService {
         // 1.1 校验存在
         CrmContractDO contract = validateContractExists(id);
         // 1.2 如果被 CrmReceivableDO 所使用，则不允许删除
-        if (CollUtil.isNotEmpty(receivableService.getReceivableByContractId(contract.getId()))) {
+        if (receivableService.getReceivableByContractId(contract.getId()) != 0) {
             throw exception(CONTRACT_DELETE_FAIL);
         }
 
