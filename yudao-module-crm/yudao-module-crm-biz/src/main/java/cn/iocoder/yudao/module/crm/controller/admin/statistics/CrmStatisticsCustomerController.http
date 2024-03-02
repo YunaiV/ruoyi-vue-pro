@@ -1,0 +1,39 @@
+### 新建客户总量分析(按日)
+GET {{baseUrl}}/crm/statistics-customer/get-total-customer-count?deptId=100&times[0]=2024-12-01 00:00:00&times[1]=2024-12-12 23:59:59
+Authorization: Bearer {{token}}
+tenant-id: {{adminTenentId}}
+
+### 新建客户总量分析(按月)
+GET {{baseUrl}}/crm/statistics-customer/get-total-customer-count?deptId=100&times[0]=2023-01-01 00:00:00&times[1]=2024-12-12 23:59:59
+Authorization: Bearer {{token}}
+tenant-id: {{adminTenentId}}
+
+### 成交客户总量分析(按日)
+GET {{baseUrl}}/crm/statistics-customer/get-deal-total-customer-count?deptId=100&times[0]=2024-12-01 00:00:00&times[1]=2024-12-12 23:59:59
+Authorization: Bearer {{token}}
+tenant-id: {{adminTenentId}}
+
+### 成交客户总量分析(按月)
+GET {{baseUrl}}/crm/statistics-customer/get-deal-total-customer-count?deptId=100&times[0]=2023-01-01 00:00:00&times[1]=2024-12-12 23:59:59
+Authorization: Bearer {{token}}
+tenant-id: {{adminTenentId}}
+
+### 获取客户跟进次数(按日)
+GET {{baseUrl}}/crm/statistics-customer/get-record-count?deptId=100&times[0]=2024-12-01 00:00:00&times[1]=2024-12-12 23:59:59
+Authorization: Bearer {{token}}
+tenant-id: {{adminTenentId}}
+
+### 获取客户跟进次数(按月)
+GET {{baseUrl}}/crm/statistics-customer/get-record-count?deptId=100&times[0]=2023-01-01 00:00:00&times[1]=2024-12-12 23:59:59
+Authorization: Bearer {{token}}
+tenant-id: {{adminTenentId}}
+
+### 获取已跟进客户数(按日)
+GET {{baseUrl}}/crm/statistics-customer/get-distinct-record-count?deptId=100&times[0]=2024-12-01 00:00:00&times[1]=2024-12-12 23:59:59
+Authorization: Bearer {{token}}
+tenant-id: {{adminTenentId}}
+
+### 获取已跟进客户数(按月)
+GET {{baseUrl}}/crm/statistics-customer/get-distinct-record-count?deptId=100&times[0]=2023-01-01 00:00:00&times[1]=2024-12-12 23:59:59
+Authorization: Bearer {{token}}
+tenant-id: {{adminTenentId}}

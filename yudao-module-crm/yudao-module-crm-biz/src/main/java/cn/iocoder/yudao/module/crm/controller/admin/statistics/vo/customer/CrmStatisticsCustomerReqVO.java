@@ -1,5 +1,6 @@
-package cn.iocoder.yudao.module.crm.controller.admin.statistics.vo;
+package cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.customer;
 
+import cn.iocoder.yudao.module.crm.enums.common.CrmBizTypeEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -11,17 +12,23 @@ import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
-@Schema(description = "管理后台 - CRM 排行榜统计 Request VO")
+@Schema(description = "管理后台 - CRM 数据统计 员工客户分析 Request VO")
 @Data
-public class CrmStatisticsRankReqVO {
+public class CrmStatisticsCustomerReqVO {
 
     @Schema(description = "部门 id", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     @NotNull(message = "部门 id 不能为空")
     private Long deptId;
 
     /**
+     * 负责人用户 id, 当用户为空, 则计算部门下用户
+     */
+    @Schema(description = "负责人用户 id", requiredMode = Schema.RequiredMode.NOT_REQUIRED, example = "1")
+    private Long userId;
+
+    /**
      * userIds 目前不用前端传递，目前是方便后端通过 deptId 读取编号后，设置回来
-     *
+     * <p>
      * 后续，可能会支持选择部分用户进行查询
      */
     @Schema(description = "负责人用户 id 集合", requiredMode = Schema.RequiredMode.NOT_REQUIRED, example = "2")
@@ -31,5 +38,17 @@ public class CrmStatisticsRankReqVO {
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
     @NotEmpty(message = "时间范围不能为空")
     private LocalDateTime[] times;
+
+    /**
+     * group by DATE_FORMAT(field, #{dateFormat})
+     */
+    @Schema(description = "Group By 日期格式", requiredMode = Schema.RequiredMode.NOT_REQUIRED, example = "%Y%m")
+    private String sqlDateFormat;
+
+    /**
+     * 数据类型 {@link CrmBizTypeEnum}
+     */
+    @Schema(description = "数据类型", requiredMode = Schema.RequiredMode.NOT_REQUIRED, example = "2")
+    private Integer bizType;
 
 }
