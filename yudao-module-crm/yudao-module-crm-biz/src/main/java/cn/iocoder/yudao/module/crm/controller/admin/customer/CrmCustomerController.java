@@ -62,8 +62,6 @@ public class CrmCustomerController {
     private DeptApi deptApi;
     @Resource
     private AdminUserApi adminUserApi;
-    @Resource
-    private DictDataApi dictDataApi;
 
     @PostMapping("/create")
     @Operation(summary = "创建客户")

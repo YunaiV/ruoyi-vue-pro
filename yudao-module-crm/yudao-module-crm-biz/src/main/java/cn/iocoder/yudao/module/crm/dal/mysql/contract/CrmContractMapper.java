@@ -117,4 +117,10 @@ public interface CrmContractMapper extends BaseMapperX<CrmContractDO> {
         return selectCount(query);
     }
 
+    default List<CrmContractDO> selectListByCustomerIdOwnerUserId(Long customerId, Long ownerUserId) {
+        return selectList(new LambdaQueryWrapperX<CrmContractDO>()
+                .eq(CrmContractDO::getCustomerId, customerId)
+                .eq(CrmContractDO::getOwnerUserId, ownerUserId));
+    }
+
 }

@@ -58,8 +58,8 @@ public interface CrmContractService {
     /**
      * 更新合同相关的更进信息
      *
-     * @param id               合同编号
-     * @param contactNextTime  下次联系时间
+     * @param id                 合同编号
+     * @param contactNextTime    下次联系时间
      * @param contactLastContent 最后联系内容
      */
     void updateContractFollowUp(Long id, LocalDateTime contactNextTime, String contactLastContent);
@@ -75,7 +75,7 @@ public interface CrmContractService {
     /**
      * 更新合同流程审批结果
      *
-     * @param id 合同编号
+     * @param id        合同编号
      * @param bpmResult BPM 审批结果
      */
     void updateContractAuditStatus(Long id, Integer bpmResult);
@@ -192,5 +192,14 @@ public interface CrmContractService {
      * @return 提醒数量
      */
     Long getRemindContractCount(Long userId);
+
+    /**
+     * 获得合同列表
+     *
+     * @param customerId  客户编号
+     * @param ownerUserId 负责人编号
+     * @return 合同列表
+     */
+    List<CrmContractDO> getContractListByCustomerIdOwnerUserId(Long customerId, Long ownerUserId);
 
 }
