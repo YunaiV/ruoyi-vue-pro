@@ -50,7 +50,7 @@ services:
         --spring.datasource.dynamic.datasource.slave.url=${SLAVE_DATASOURCE_URL:-jdbc:mysql://yudao-mysql:3306/ruoyi-vue-pro?useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true&nullCatalogMeansCurrent=true}
         --spring.datasource.dynamic.datasource.slave.username=${SLAVE_DATASOURCE_USERNAME:-root}
         --spring.datasource.dynamic.datasource.slave.password=${SLAVE_DATASOURCE_PASSWORD:-123456}
-        --spring.redis.host=${REDIS_HOST:-yudao-redis}
+        --spring.data.redis.host=${REDIS_HOST:-yudao-redis}
     depends_on:
       - mysql
       - redis
