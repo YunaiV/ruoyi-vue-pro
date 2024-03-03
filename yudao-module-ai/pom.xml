@@ -13,7 +13,7 @@
 
     <modules>
         <module>yudao-module-ai-api</module>
-        <module>/yudao-module-ai-biz</module>
+        <module>yudao-module-ai-biz</module>
     </modules>
 
     <properties>
@@ -23,11 +23,6 @@
     </properties>
 
     <dependencies>
-        <!-- 增加 openai -->
-        <dependency>
-            <groupId>org.springframework.ai</groupId>
-            <artifactId>spring-ai-openai-spring-boot-starter</artifactId>
-        </dependency>
     </dependencies>
 
 </project>
