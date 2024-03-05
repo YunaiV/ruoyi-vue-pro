@@ -142,7 +142,7 @@ public class CrmCustomerController {
             return java.util.Collections.emptyList();
         }
         // 1.1 获取创建人、负责人列表
-        Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(convertListByFlatMap(list,
+        Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(convertSetByFlatMap(list,
                 contact -> Stream.of(NumberUtils.parseLong(contact.getCreator()), contact.getOwnerUserId())));
         Map<Long, DeptRespDTO> deptMap = deptApi.getDeptMap(convertSet(userMap.values(), AdminUserRespDTO::getDeptId));
         // 1.2 获取距离进入公海的时间

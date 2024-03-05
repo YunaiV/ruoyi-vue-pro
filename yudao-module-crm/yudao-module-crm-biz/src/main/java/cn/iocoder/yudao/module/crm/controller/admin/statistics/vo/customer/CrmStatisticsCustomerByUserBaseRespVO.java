@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.customer;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
@@ -10,6 +11,7 @@ import lombok.Data;
 public class CrmStatisticsCustomerByUserBaseRespVO {
 
     @Schema(description = "负责人ID", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
+    @JsonIgnore
     private Long ownerUserId;
 
     @Schema(description = "负责人", requiredMode = Schema.RequiredMode.REQUIRED, example = "芋道源码")

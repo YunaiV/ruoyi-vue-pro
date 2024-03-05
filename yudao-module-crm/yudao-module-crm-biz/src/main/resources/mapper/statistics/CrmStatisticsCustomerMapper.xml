@@ -180,8 +180,10 @@
         SELECT
         a.`name` AS customer_name,
         b.`name` AS contract_name,
-        b.total_price AS contract_price,
+        b.total_price,
         IFNULL( c.price, 0 ) AS receivable_price,
+        a.industry_id,
+        a.source,
         a.owner_user_id,
         a.creator AS creator_user_id,
         a.create_time,

@@ -16,9 +16,9 @@ public class CrmStatisticsCustomerSummaryByUserRespVO extends CrmStatisticsCusto
     private Integer customerDealCount = 0;
 
     @Schema(description = "合同总金额", requiredMode = Schema.RequiredMode.REQUIRED, example = "100.00")
-    private BigDecimal contractPrice = BigDecimal.valueOf(0);
+    private BigDecimal contractPrice = BigDecimal.ZERO;
 
     @Schema(description = "回款金额", requiredMode = Schema.RequiredMode.REQUIRED, example = "100.00")
-    private BigDecimal receivablePrice = BigDecimal.valueOf(0);
+    private BigDecimal receivablePrice = BigDecimal.ZERO;
 
 }
