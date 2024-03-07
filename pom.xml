@@ -12,12 +12,19 @@
         <module>yudao-framework</module>
         <!-- Server 主项目 -->
         <module>yudao-server</module>
-        <!--  各种 module 拓展 -->
-        <module>yudao-module-member</module>
-        <module>yudao-module-bpm</module>
+        <!-- 各种 module 拓展 -->
         <module>yudao-module-system</module>
         <module>yudao-module-infra</module>
-        <module>yudao-module-pay</module>
+<!--        <module>yudao-module-member</module>-->
+<!--        <module>yudao-module-bpm</module>-->
+<!--        <module>yudao-module-report</module>-->
+<!--        <module>yudao-module-mp</module>-->
+<!--        <module>yudao-module-pay</module>-->
+<!--        <module>yudao-module-mall</module>-->
+<!--        <module>yudao-module-crm</module>-->
+<!--        <module>yudao-module-erp</module>-->
+        <!-- 示例项目 -->
+<!--        <module>yudao-example</module>-->
     </modules>
 
     <name>${project.artifactId}</name>
@@ -25,16 +32,18 @@
     <url>https://github.com/YunaiV/ruoyi-vue-pro</url>
 
     <properties>
-        <revision>1.6.1-snapshot</revision>
+        <revision>2.0.1-jdk8-snapshot</revision>
         <!-- Maven 相关 -->
         <java.version>1.8</java.version>
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
         <maven-surefire-plugin.version>3.0.0-M5</maven-surefire-plugin.version>
-        <maven-compiler-plugin.version>3.8.0</maven-compiler-plugin.version>
+        <maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
+        <flatten-maven-plugin.version>1.5.0</flatten-maven-plugin.version>
         <!-- 看看咋放到 bom 里 -->
-        <lombok.version>1.18.20</lombok.version>
-        <mapstruct.version>1.4.1.Final</mapstruct.version>
+        <lombok.version>1.18.30</lombok.version>
+        <spring.boot.version>2.7.18</spring.boot.version>
+        <mapstruct.version>1.5.5.Final</mapstruct.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
@@ -60,13 +69,19 @@
                     <artifactId>maven-surefire-plugin</artifactId>
                     <version>${maven-surefire-plugin.version}</version>
                 </plugin>
-                <!-- maven-compiler-plugin 插件，解决 Lombok + MapStruct 组合 -->
+                <!-- maven-compiler-plugin 插件，解决 spring-boot-configuration-processor + Lombok + MapStruct 组合 -->
+                <!-- https://stackoverflow.com/questions/33483697/re-run-spring-boot-configuration-annotation-processor-to-update-generated-metada -->
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
                     <version>${maven-compiler-plugin.version}</version>
                     <configuration>
                         <annotationProcessorPaths>
+                            <path>
+                                <groupId>org.springframework.boot</groupId>
+                                <artifactId>spring-boot-configuration-processor</artifactId>
+                                <version>${spring.boot.version}</version>
+                            </path>
                             <path>
                                 <groupId>org.projectlombok</groupId>
                                 <artifactId>lombok</artifactId>
@@ -80,12 +95,50 @@
                         </annotationProcessorPaths>
                     </configuration>
                 </plugin>
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>flatten-maven-plugin</artifactId>
+                </plugin>
             </plugins>
         </pluginManagement>
+
+        <plugins>
+            <!-- 统一 revision 版本 -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>flatten-maven-plugin</artifactId>
+                <version>${flatten-maven-plugin.version}</version>
+                <configuration>
+                    <flattenMode>resolveCiFriendliesOnly</flattenMode>
+                    <updatePomFile>true</updatePomFile>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>flatten</goal>
+                        </goals>
+                        <id>flatten</id>
+                        <phase>process-resources</phase>
+                    </execution>
+                    <execution>
+                        <goals>
+                            <goal>clean</goal>
+                        </goals>
+                        <id>flatten.clean</id>
+                        <phase>clean</phase>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
     </build>
 
-    <!-- 使用 aliyun 的 Maven 源，提升下载速度 -->
+    <!-- 使用 huawei / aliyun 的 Maven 源，提升下载速度 -->
     <repositories>
+        <repository>
+            <id>huaweicloud</id>
+            <name>huawei</name>
+            <url>https://mirrors.huaweicloud.com/repository/maven/</url>
+        </repository>
         <repository>
             <id>aliyunmaven</id>
             <name>aliyun</name>

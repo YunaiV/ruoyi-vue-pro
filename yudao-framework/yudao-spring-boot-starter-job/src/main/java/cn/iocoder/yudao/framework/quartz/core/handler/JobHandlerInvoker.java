@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.framework.quartz.core.handler;
 
+import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.thread.ThreadUtil;
 import cn.iocoder.yudao.framework.quartz.core.enums.JobDataKeyEnum;
@@ -13,10 +14,10 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 
 import javax.annotation.Resource;
-import java.util.Date;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 
 import static cn.hutool.core.exceptions.ExceptionUtil.getRootCauseMessage;
-import static cn.iocoder.yudao.framework.common.util.date.DateUtils.diff;
 
 /**
  * 基础 Job 调用者，负责调用 {@link JobHandler#execute(String)} 执行任务
@@ -46,7 +47,7 @@ public class JobHandlerInvoker extends QuartzJobBean {
 
         // 第二步，执行任务
         Long jobLogId = null;
-        Date startTime = new Date();
+        LocalDateTime startTime = LocalDateTime.now();
         String data = null;
         Throwable exception = null;
         try {
@@ -73,9 +74,9 @@ public class JobHandlerInvoker extends QuartzJobBean {
         return jobHandler.execute(jobHandlerParam);
     }
 
-    private void updateJobLogResultAsync(Long jobLogId, Date startTime, String data, Throwable exception,
+    private void updateJobLogResultAsync(Long jobLogId, LocalDateTime startTime, String data, Throwable exception,
                                          JobExecutionContext executionContext) {
-        Date endTime = new Date();
+        LocalDateTime endTime = LocalDateTime.now();
         // 处理是否成功
         boolean success = exception == null;
         if (!success) {
@@ -83,7 +84,7 @@ public class JobHandlerInvoker extends QuartzJobBean {
         }
         // 更新日志
         try {
-            jobLogFrameworkService.updateJobLogResultAsync(jobLogId, endTime, (int) diff(endTime, startTime), success, data);
+            jobLogFrameworkService.updateJobLogResultAsync(jobLogId, endTime, (int) LocalDateTimeUtil.between(startTime, endTime).toMillis(), success, data);
         } catch (Exception ex) {
             log.error("[executeInternal][Job({}) logId({}) 记录执行日志失败({}/{})]",
                     executionContext.getJobDetail().getKey(), jobLogId, success, data);

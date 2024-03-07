@@ -1,0 +1,340 @@
+<template>
+  <div class="app-container">
+    <!-- 搜索工作栏 -->
+    <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch" label-width="68px">
+#foreach($column in $columns)
+#if ($column.listOperation)
+    #set ($dictType=$column.dictType)
+    #set ($javaField = $column.javaField)
+    #set ($AttrName=$column.javaField.substring(0,1).toUpperCase() + ${column.javaField.substring(1)})
+    #set ($comment=$column.columnComment)
+#if ($column.htmlType == "input")
+      <el-form-item label="${comment}" prop="${javaField}">
+        <el-input v-model="queryParams.${javaField}" placeholder="请输入${comment}" clearable @keyup.enter.native="handleQuery"/>
+      </el-form-item>
+#elseif ($column.htmlType == "select" || $column.htmlType == "radio")
+      <el-form-item label="${comment}" prop="${javaField}">
+        <el-select v-model="queryParams.${javaField}" placeholder="请选择${comment}" clearable size="small">
+    #if ("" != $dictType)## 设置了 dictType 数据字典的情况
+          <el-option v-for="dict in this.getDictDatas(DICT_TYPE.$dictType.toUpperCase())"
+                       :key="dict.value" :label="dict.label" :value="dict.value"/>
+    #else## 未设置 dictType 数据字典的情况
+          <el-option label="请选择字典生成" value="" />
+    #end
+        </el-select>
+      </el-form-item>
+#elseif($column.htmlType == "datetime")
+    #if ($column.listOperationCondition != "BETWEEN")## 非范围
+      <el-form-item label="${comment}" prop="${javaField}">
+        <el-date-picker clearable v-model="queryParams.${javaField}" type="date" value-format="yyyy-MM-dd" placeholder="选择${comment}" />
+      </el-form-item>
+    #else## 范围
+      <el-form-item label="${comment}" prop="${javaField}">
+        <el-date-picker v-model="queryParams.${javaField}" style="width: 240px" value-format="yyyy-MM-dd HH:mm:ss" type="daterange"
+                        range-separator="-" start-placeholder="开始日期" end-placeholder="结束日期" :default-time="['00:00:00', '23:59:59']" />
+      </el-form-item>
+    #end
+#end
+#end
+#end
+      <el-form-item>
+        <el-button type="primary" icon="el-icon-search" @click="handleQuery">搜索</el-button>
+        <el-button icon="el-icon-refresh" @click="resetQuery">重置</el-button>
+      </el-form-item>
+    </el-form>
+
+    <!-- 操作工具栏 -->
+    <el-row :gutter="10" class="mb8">
+      <el-col :span="1.5">
+        <el-button type="primary" plain icon="el-icon-plus" size="mini" @click="openForm(undefined)"
+                   v-hasPermi="['${permissionPrefix}:create']">新增</el-button>
+      </el-col>
+      <el-col :span="1.5">
+        <el-button type="warning" plain icon="el-icon-download" size="mini" @click="handleExport" :loading="exportLoading"
+                   v-hasPermi="['${permissionPrefix}:export']">导出</el-button>
+      </el-col>
+        ## 特殊：树表专属逻辑
+        #if ( $table.templateType == 2 )
+          <el-col :span="1.5">
+            <el-button type="danger" plain icon="el-icon-sort" size="mini" @click="toggleExpandAll">
+              展开/折叠
+            </el-button>
+          </el-col>
+        #end
+      <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
+    </el-row>
+
+      ## 特殊：主子表专属逻辑
+      #if ( $table.templateType == 11 && $subTables && $subTables.size() > 0 )
+      <el-table
+        v-loading="loading"
+        :data="list"
+        :stripe="true"
+        :highlight-current-row="true"
+        :show-overflow-tooltip="true"
+        @current-change="handleCurrentChange"
+      >
+          ## 特殊：树表专属逻辑
+      #elseif ( $table.templateType == 2 )
+      <el-table
+        v-loading="loading"
+        :data="list"
+        :stripe="true"
+        :show-overflow-tooltip="true"
+        v-if="refreshTable"
+        row-key="id"
+        :default-expand-all="isExpandAll"
+        :tree-props="{children: 'children', hasChildren: 'hasChildren'}"
+      >
+      #else
+      <el-table v-loading="loading" :data="list" :stripe="true" :show-overflow-tooltip="true">
+      #end
+      ## 特殊：主子表专属逻辑
+      #if ( $table.templateType == 12 && $subTables && $subTables.size() > 0 )
+        <!-- 子表的列表 -->
+        <el-table-column type="expand">
+          <template #default="scope">
+            <el-tabs value="$subClassNameVars.get(0)">
+                #foreach ($subTable in $subTables)
+                    #set ($index = $foreach.count - 1)
+                    #set ($subClassNameVar = $subClassNameVars.get($index))
+                    #set ($subSimpleClassName = $subSimpleClassNames.get($index))
+                    #set ($subJoinColumn_strikeCase = $subJoinColumn_strikeCases.get($index))
+                  <el-tab-pane label="${subTable.classComment}" name="$subClassNameVar">
+                    <${subSimpleClassName}List :${subJoinColumn_strikeCase}="scope.row.id" />
+                  </el-tab-pane>
+                #end
+            </el-tabs>
+          </template>
+        </el-table-column>
+      #end
+#foreach($column in $columns)
+#if ($column.listOperationResult)
+    #set ($dictType=$column.dictType)
+    #set ($javaField = $column.javaField)
+    #set ($AttrName=$column.javaField.substring(0,1).toUpperCase() + ${column.javaField.substring(1)})
+    #set ($comment=$column.columnComment)
+#if ($column.javaType == "LocalDateTime")## 时间类型
+      <el-table-column label="${comment}" align="center" prop="${javaField}" width="180">
+        <template v-slot="scope">
+          <span>{{ parseTime(scope.row.${javaField}) }}</span>
+        </template>
+      </el-table-column>
+#elseif("" != $column.dictType)## 数据字典
+      <el-table-column label="${comment}" align="center" prop="${javaField}">
+        <template v-slot="scope">
+          <dict-tag :type="DICT_TYPE.$dictType.toUpperCase()" :value="scope.row.${column.javaField}" />
+        </template>
+      </el-table-column>
+#else
+      <el-table-column label="${comment}" align="center" prop="${javaField}" />
+#end
+#end
+#end
+      <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
+        <template v-slot="scope">
+          <el-button size="mini" type="text" icon="el-icon-edit" @click="openForm(scope.row.${primaryColumn.javaField})"
+                     v-hasPermi="['${permissionPrefix}:update']">修改</el-button>
+          <el-button size="mini" type="text" icon="el-icon-delete" @click="handleDelete(scope.row)"
+                     v-hasPermi="['${permissionPrefix}:delete']">删除</el-button>
+        </template>
+      </el-table-column>
+    </el-table>
+## 特殊：树表专属逻辑（树不需要分页）
+#if ( $table.templateType != 2 )
+    <!-- 分页组件 -->
+    <pagination v-show="total > 0" :total="total" :page.sync="queryParams.pageNo" :limit.sync="queryParams.pageSize"
+                @pagination="getList"/>
+#end
+    <!-- 对话框(添加 / 修改) -->
+    <${simpleClassName}Form ref="formRef" @success="getList" />
+  ## 特殊：主子表专属逻辑
+  #if ( $table.templateType == 11 && $subTables && $subTables.size() > 0 )
+    <!-- 子表的列表 -->
+      <el-tabs v-model="subTabsName">
+          #foreach ($subTable in $subTables)
+              #set ($index = $foreach.count - 1)
+              #set ($subClassNameVar = $subClassNameVars.get($index))
+              #set ($subSimpleClassName = $subSimpleClassNames.get($index))
+              #set ($subJoinColumn_strikeCase = $subJoinColumn_strikeCases.get($index))
+            <el-tab-pane label="${subTable.classComment}" name="$subClassNameVar">
+              <${subSimpleClassName}List v-if="currentRow.id" :${subJoinColumn_strikeCase}="currentRow.id" />
+            </el-tab-pane>
+          #end
+      </el-tabs>
+  #end
+  </div>
+</template>
+
+<script>
+import * as ${simpleClassName}Api from '@/api/${table.moduleName}/${table.businessName}';
+import ${simpleClassName}Form from './${simpleClassName}Form.vue';
+#if ($hasImageUploadColumn)
+import ImageUpload from '@/components/ImageUpload';
+#end
+#if ($hasFileUploadColumn)
+import FileUpload from '@/components/FileUpload';
+#end
+#if ($hasEditorColumn)
+import Editor from '@/components/Editor';
+#end
+## 特殊：主子表专属逻辑
+#if ( $table.templateType != 10 )
+#if ( $subTables && $subTables.size() > 0 )
+    #foreach ($subSimpleClassName in $subSimpleClassNames)
+    import ${subSimpleClassName}List from './components/${subSimpleClassName}List.vue';
+    #end
+#end
+#end
+export default {
+  name: "${simpleClassName}",
+  components: {
+          ${simpleClassName}Form,
+## 特殊：主子表专属逻辑
+#if ( $table.templateType != 10 )
+#if ( $subTables && $subTables.size() > 0 )
+      #foreach ($subSimpleClassName in $subSimpleClassNames)
+          ${subSimpleClassName}List,
+      #end
+#end
+#end
+#if ($hasImageUploadColumn)
+    ImageUpload,
+#end
+#if ($hasFileUploadColumn)
+    FileUpload,
+#end
+#if ($hasEditorColumn)
+    Editor,
+#end
+  },
+  data() {
+    return {
+      // 遮罩层
+      loading: true,
+      // 导出遮罩层
+      exportLoading: false,
+      // 显示搜索条件
+      showSearch: true,
+      ## 特殊：树表专属逻辑（树不需要分页接口）
+      #if ( $table.templateType != 2 )
+        // 总条数
+        total: 0,
+      #end
+      // ${table.classComment}列表
+      list: [],
+      // 是否展开，默认全部展开
+      isExpandAll: true,
+      // 重新渲染表格状态
+      refreshTable: true,
+      // 选中行
+      currentRow: {},
+      // 查询参数
+      queryParams: {
+        ## 特殊：树表专属逻辑（树不需要分页接口）
+        #if ( $table.templateType != 2 )
+            pageNo: 1,
+            pageSize: 10,
+        #end
+        #foreach ($column in $columns)
+        #if ($column.listOperation)
+        #if ($column.listOperationCondition != 'BETWEEN')
+        $column.javaField: null,
+        #end
+        #if ($column.htmlType == "datetime" && $column.listOperationCondition == "BETWEEN")
+        $column.javaField: [],
+        #end
+        #end
+        #end
+      },
+        ## 特殊：主子表专属逻辑-erp
+        #if ( $table.templateType == 11)
+            #if ( $subTables && $subTables.size() > 0 )
+              /** 子表的列表 */
+              subTabsName: '$subClassNameVars.get(0)'
+            #end
+        #end
+    };
+  },
+  created() {
+    this.getList();
+  },
+  methods: {
+    /** 查询列表 */
+    async getList() {
+      try {
+      this.loading = true;
+      ## 特殊：树表专属逻辑（树不需要分页接口）
+      #if ( $table.templateType == 2 )
+       const res = await ${simpleClassName}Api.get${simpleClassName}List(this.queryParams);
+       this.list = this.handleTree(res.data, 'id', '${treeParentColumn.javaField}');
+      #else
+        const res = await ${simpleClassName}Api.get${simpleClassName}Page(this.queryParams);
+        this.list = res.data.list;
+        this.total = res.data.total;
+      #end
+      } finally {
+        this.loading = false;
+      }
+    },
+    /** 搜索按钮操作 */
+    handleQuery() {
+      this.queryParams.pageNo = 1;
+      this.getList();
+    },
+    /** 重置按钮操作 */
+    resetQuery() {
+      this.resetForm("queryForm");
+      this.handleQuery();
+    },
+    /** 添加/修改操作 */
+    openForm(id) {
+      this.#[[$]]#refs["formRef"].open(id);
+    },
+    /** 删除按钮操作 */
+    async handleDelete(row) {
+      const ${primaryColumn.javaField} = row.${primaryColumn.javaField};
+      await this.#[[$modal]]#.confirm('是否确认删除${table.classComment}编号为"' + ${primaryColumn.javaField} + '"的数据项?')
+      try {
+       await ${simpleClassName}Api.delete${simpleClassName}(${primaryColumn.javaField});
+       await this.getList();
+       this.#[[$modal]]#.msgSuccess("删除成功");
+      } catch {}
+    },
+    /** 导出按钮操作 */
+    async handleExport() {
+      await this.#[[$modal]]#.confirm('是否确认导出所有${table.classComment}数据项?');
+      try {
+        this.exportLoading = true;
+        const res = await ${simpleClassName}Api.export${simpleClassName}Excel(this.queryParams);
+        this.#[[$]]#download.excel(res, '${table.classComment}.xls');
+      } catch {
+      } finally {
+        this.exportLoading = false;
+      }
+    },
+      ## 特殊：主子表专属逻辑
+      #if ( $table.templateType == 11 )
+        /** 选中行操作 */
+        handleCurrentChange(row) {
+         this.currentRow = row;
+        #if ( $subTables && $subTables.size() > 0 )
+          /** 子表的列表 */
+          this.subTabsName = '$subClassNameVars.get(0)';
+        #end
+        },
+      #end
+      ## 特殊：树表专属逻辑
+      #if ( $table.templateType == 2 )
+        /** 展开/折叠操作 */
+        toggleExpandAll() {
+          this.refreshTable = false
+          this.isExpandAll = !this.isExpandAll
+          this.$nextTick(function () {
+            this.refreshTable = true
+          })
+        }
+      #end
+  }
+};
+</script>

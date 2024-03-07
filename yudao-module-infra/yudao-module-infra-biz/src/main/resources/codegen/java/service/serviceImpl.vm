@@ -1,0 +1,350 @@
+package ${basePackage}.module.${table.moduleName}.service.${table.businessName};
+
+import org.springframework.stereotype.Service;
+import ${jakartaPackage}.annotation.Resource;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.*;
+import ${basePackage}.module.${table.moduleName}.controller.${sceneEnum.basePackage}.${table.businessName}.vo.*;
+import ${basePackage}.module.${table.moduleName}.dal.dataobject.${table.businessName}.${table.className}DO;
+## 特殊：主子表专属逻辑
+#foreach ($subTable in $subTables)
+import ${basePackage}.module.${subTable.moduleName}.dal.dataobject.${subTable.businessName}.${subTable.className}DO;
+#end
+import ${PageResultClassName};
+import ${PageParamClassName};
+import ${BeanUtils};
+
+import ${basePackage}.module.${table.moduleName}.dal.mysql.${table.businessName}.${table.className}Mapper;
+## 特殊：主子表专属逻辑
+#foreach ($subTable in $subTables)
+#set ($index = $foreach.count - 1)
+import ${basePackage}.module.${subTable.moduleName}.dal.mysql.${subTable.businessName}.${subTable.className}Mapper;
+#end
+
+import static ${ServiceExceptionUtilClassName}.exception;
+import static ${basePackage}.module.${table.moduleName}.enums.ErrorCodeConstants.*;
+
+/**
+ * ${table.classComment} Service 实现类
+ *
+ * @author ${table.author}
+ */
+@Service
+@Validated
+public class ${table.className}ServiceImpl implements ${table.className}Service {
+
+    @Resource
+    private ${table.className}Mapper ${classNameVar}Mapper;
+## 特殊：主子表专属逻辑
+#foreach ($subTable in $subTables)
+#set ($index = $foreach.count - 1)
+    @Resource
+    private ${subTable.className}Mapper ${subClassNameVars.get($index)}Mapper;
+#end
+
+    @Override
+## 特殊：主子表专属逻辑（非 ERP 模式）
+#if ( $subTables && $subTables.size() > 0 && $table.templateType != 11 )
+    @Transactional(rollbackFor = Exception.class)
+#end
+    public ${primaryColumn.javaType} create${simpleClassName}(${sceneEnum.prefixClass}${table.className}SaveReqVO createReqVO) {
+## 特殊：树表专属逻辑
+#if ( $table.templateType == 2 )
+#set ($TreeParentJavaField = $treeParentColumn.javaField.substring(0,1).toUpperCase() + ${treeParentColumn.javaField.substring(1)})##首字母大写
+#set ($TreeNameJavaField = $treeNameColumn.javaField.substring(0,1).toUpperCase() + ${treeNameColumn.javaField.substring(1)})##首字母大写
+        // 校验${treeParentColumn.columnComment}的有效性
+        validateParent${simpleClassName}(null, createReqVO.get${TreeParentJavaField}());
+        // 校验${treeNameColumn.columnComment}的唯一性
+        validate${simpleClassName}${TreeNameJavaField}Unique(null, createReqVO.get${TreeParentJavaField}(), createReqVO.get${TreeNameJavaField}());
+
+#end
+        // 插入
+        ${table.className}DO ${classNameVar} = BeanUtils.toBean(createReqVO, ${table.className}DO.class);
+        ${classNameVar}Mapper.insert(${classNameVar});
+## 特殊：主子表专属逻辑（非 ERP 模式）
+#if ( $subTables && $subTables.size() > 0 && $table.templateType != 11 )
+
+        // 插入子表
+#foreach ($subTable in $subTables)
+#set ($index = $foreach.count - 1)
+#set ($subSimpleClassName = $subSimpleClassNames.get($index))
+#set ($subJoinColumn = $subJoinColumns.get($index))##当前 join 字段
+#set ($SubJoinColumnName = $subJoinColumn.javaField.substring(0,1).toUpperCase() + ${subJoinColumn.javaField.substring(1)})##首字母大写
+    #if ( $subTable.subJoinMany)
+        create${subSimpleClassName}List(${classNameVar}.getId(), createReqVO.get${subSimpleClassNames.get($index)}s());
+    #else
+        create${subSimpleClassName}(${classNameVar}.getId(), createReqVO.get${subSimpleClassNames.get($index)}());
+    #end
+#end
+#end
+        // 返回
+        return ${classNameVar}.getId();
+    }
+
+    @Override
+## 特殊：主子表专属逻辑（非 ERP 模式）
+#if ( $subTables && $subTables.size() > 0 && $table.templateType != 11 )
+    @Transactional(rollbackFor = Exception.class)
+#end
+    public void update${simpleClassName}(${sceneEnum.prefixClass}${table.className}SaveReqVO updateReqVO) {
+        // 校验存在
+        validate${simpleClassName}Exists(updateReqVO.getId());
+## 特殊：树表专属逻辑
+#if ( $table.templateType == 2 )
+#set ($TreeParentJavaField = $treeParentColumn.javaField.substring(0,1).toUpperCase() + ${treeParentColumn.javaField.substring(1)})##首字母大写
+#set ($TreeNameJavaField = $treeNameColumn.javaField.substring(0,1).toUpperCase() + ${treeNameColumn.javaField.substring(1)})##首字母大写
+        // 校验${treeParentColumn.columnComment}的有效性
+        validateParent${simpleClassName}(updateReqVO.getId(), updateReqVO.get${TreeParentJavaField}());
+        // 校验${treeNameColumn.columnComment}的唯一性
+        validate${simpleClassName}${TreeNameJavaField}Unique(updateReqVO.getId(), updateReqVO.get${TreeParentJavaField}(), updateReqVO.get${TreeNameJavaField}());
+
+#end
+        // 更新
+        ${table.className}DO updateObj = BeanUtils.toBean(updateReqVO, ${table.className}DO.class);
+        ${classNameVar}Mapper.updateById(updateObj);
+## 特殊：主子表专属逻辑（非 ERP 模式）
+#if ( $subTables && $subTables.size() > 0 && $table.templateType != 11)
+
+        // 更新子表
+#foreach ($subTable in $subTables)
+#set ($index = $foreach.count - 1)
+#set ($subSimpleClassName = $subSimpleClassNames.get($index))
+#set ($subJoinColumn = $subJoinColumns.get($index))##当前 join 字段
+#set ($SubJoinColumnName = $subJoinColumn.javaField.substring(0,1).toUpperCase() + ${subJoinColumn.javaField.substring(1)})##首字母大写
+    #if ( $subTable.subJoinMany)
+        update${subSimpleClassName}List(updateReqVO.getId(), updateReqVO.get${subSimpleClassNames.get($index)}s());
+    #else
+        update${subSimpleClassName}(updateReqVO.getId(), updateReqVO.get${subSimpleClassNames.get($index)}());
+    #end
+#end
+#end
+    }
+
+    @Override
+## 特殊：主子表专属逻辑
+#if ( $subTables && $subTables.size() > 0)
+    @Transactional(rollbackFor = Exception.class)
+#end
+    public void delete${simpleClassName}(${primaryColumn.javaType} id) {
+        // 校验存在
+        validate${simpleClassName}Exists(id);
+## 特殊：树表专属逻辑
+#if ( $table.templateType == 2 )
+#set ($ParentJavaField = $treeParentColumn.javaField.substring(0,1).toUpperCase() + ${treeParentColumn.javaField.substring(1)})##首字母大写
+        // 校验是否有子${table.classComment}
+        if (${classNameVar}Mapper.selectCountBy${ParentJavaField}(id) > 0) {
+            throw exception(${simpleClassName_underlineCase.toUpperCase()}_EXITS_CHILDREN);
+        }
+#end
+        // 删除
+        ${classNameVar}Mapper.deleteById(id);
+## 特殊：主子表专属逻辑
+#if ( $subTables && $subTables.size() > 0)
+
+        // 删除子表
+#foreach ($subTable in $subTables)
+#set ($index = $foreach.count - 1)
+#set ($subSimpleClassName = $subSimpleClassNames.get($index))
+#set ($subJoinColumn = $subJoinColumns.get($index))##当前 join 字段
+#set ($SubJoinColumnName = $subJoinColumn.javaField.substring(0,1).toUpperCase() + ${subJoinColumn.javaField.substring(1)})##首字母大写
+        delete${subSimpleClassName}By${SubJoinColumnName}(id);
+#end
+#end
+    }
+
+    private void validate${simpleClassName}Exists(${primaryColumn.javaType} id) {
+        if (${classNameVar}Mapper.selectById(id) == null) {
+            throw exception(${simpleClassName_underlineCase.toUpperCase()}_NOT_EXISTS);
+        }
+    }
+
+## 特殊：树表专属逻辑
+#if ( $table.templateType == 2 )
+#set ($TreeParentJavaField = $treeParentColumn.javaField.substring(0,1).toUpperCase() + ${treeParentColumn.javaField.substring(1)})##首字母大写
+#set ($TreeNameJavaField = $treeNameColumn.javaField.substring(0,1).toUpperCase() + ${treeNameColumn.javaField.substring(1)})##首字母大写
+    private void validateParent${simpleClassName}(Long id, Long ${treeParentColumn.javaField}) {
+        if (${treeParentColumn.javaField} == null || ${simpleClassName}DO.${treeParentColumn_javaField_underlineCase.toUpperCase()}_ROOT.equals(${treeParentColumn.javaField})) {
+            return;
+        }
+        // 1. 不能设置自己为父${table.classComment}
+        if (Objects.equals(id, ${treeParentColumn.javaField})) {
+            throw exception(${simpleClassName_underlineCase.toUpperCase()}_PARENT_ERROR);
+        }
+        // 2. 父${table.classComment}不存在
+        ${simpleClassName}DO parent${simpleClassName} = ${classNameVar}Mapper.selectById(${treeParentColumn.javaField});
+        if (parent${simpleClassName} == null) {
+            throw exception(${simpleClassName_underlineCase.toUpperCase()}_PARENT_NOT_EXITS);
+        }
+        // 3. 递归校验父${table.classComment}，如果父${table.classComment}是自己的子${table.classComment}，则报错，避免形成环路
+        if (id == null) { // id 为空，说明新增，不需要考虑环路
+            return;
+        }
+        for (int i = 0; i < Short.MAX_VALUE; i++) {
+            // 3.1 校验环路
+            ${treeParentColumn.javaField} = parent${simpleClassName}.get${TreeParentJavaField}();
+            if (Objects.equals(id, ${treeParentColumn.javaField})) {
+                throw exception(${simpleClassName_underlineCase.toUpperCase()}_PARENT_IS_CHILD);
+            }
+            // 3.2 继续递归下一级父${table.classComment}
+            if (${treeParentColumn.javaField} == null || ${simpleClassName}DO.${treeParentColumn_javaField_underlineCase.toUpperCase()}_ROOT.equals(${treeParentColumn.javaField})) {
+                break;
+            }
+            parent${simpleClassName} = ${classNameVar}Mapper.selectById(${treeParentColumn.javaField});
+            if (parent${simpleClassName} == null) {
+                break;
+            }
+        }
+    }
+
+    private void validate${simpleClassName}${TreeNameJavaField}Unique(Long id, Long ${treeParentColumn.javaField}, String ${treeNameColumn.javaField}) {
+        ${simpleClassName}DO ${classNameVar} = ${classNameVar}Mapper.selectBy${TreeParentJavaField}And${TreeNameJavaField}(${treeParentColumn.javaField}, ${treeNameColumn.javaField});
+        if (${classNameVar} == null) {
+            return;
+        }
+        // 如果 id 为空，说明不用比较是否为相同 id 的${table.classComment}
+        if (id == null) {
+            throw exception(${simpleClassName_underlineCase.toUpperCase()}_${treeNameColumn_javaField_underlineCase.toUpperCase()}_DUPLICATE);
+        }
+        if (!Objects.equals(${classNameVar}.getId(), id)) {
+            throw exception(${simpleClassName_underlineCase.toUpperCase()}_${treeNameColumn_javaField_underlineCase.toUpperCase()}_DUPLICATE);
+        }
+    }
+
+#end
+    @Override
+    public ${table.className}DO get${simpleClassName}(${primaryColumn.javaType} id) {
+        return ${classNameVar}Mapper.selectById(id);
+    }
+
+## 特殊：树表专属逻辑（树不需要分页接口）
+#if ( $table.templateType != 2 )
+    @Override
+    public PageResult<${table.className}DO> get${simpleClassName}Page(${sceneEnum.prefixClass}${table.className}PageReqVO pageReqVO) {
+        return ${classNameVar}Mapper.selectPage(pageReqVO);
+    }
+#else
+    @Override
+    public List<${table.className}DO> get${simpleClassName}List(${sceneEnum.prefixClass}${table.className}ListReqVO listReqVO) {
+        return ${classNameVar}Mapper.selectList(listReqVO);
+    }
+#end
+
+## 特殊：主子表专属逻辑
+#foreach ($subTable in $subTables)
+#set ($index = $foreach.count - 1)
+#set ($subSimpleClassName = $subSimpleClassNames.get($index))
+#set ($simpleClassNameUnderlineCase = $simpleClassNameUnderlineCases.get($index))
+#set ($subPrimaryColumn = $subPrimaryColumns.get($index))##当前 primary 字段
+#set ($subJoinColumn = $subJoinColumns.get($index))##当前 join 字段
+#set ($SubJoinColumnName = $subJoinColumn.javaField.substring(0,1).toUpperCase() + ${subJoinColumn.javaField.substring(1)})##首字母大写
+#set ($subClassNameVar = $subClassNameVars.get($index))
+    // ==================== 子表（$subTable.classComment） ====================
+
+## 情况一：MASTER_ERP 时，需要分查询页子表
+#if ( $table.templateType == 11 )
+    @Override
+    public PageResult<${subTable.className}DO> get${subSimpleClassName}Page(PageParam pageReqVO, ${subJoinColumn.javaType} ${subJoinColumn.javaField}) {
+        return ${subClassNameVars.get($index)}Mapper.selectPage(pageReqVO, ${subJoinColumn.javaField});
+    }
+
+## 情况二：非 MASTER_ERP 时，需要列表查询子表
+#else
+    #if ( $subTable.subJoinMany )
+    @Override
+    public List<${subTable.className}DO> get${subSimpleClassName}ListBy${SubJoinColumnName}(${subJoinColumn.javaType} ${subJoinColumn.javaField}) {
+        return ${subClassNameVars.get($index)}Mapper.selectListBy${SubJoinColumnName}(${subJoinColumn.javaField});
+    }
+
+    #else
+    @Override
+    public ${subTable.className}DO get${subSimpleClassName}By${SubJoinColumnName}(${subJoinColumn.javaType} ${subJoinColumn.javaField}) {
+        return ${subClassNameVars.get($index)}Mapper.selectBy${SubJoinColumnName}(${subJoinColumn.javaField});
+    }
+
+    #end
+#end
+## 情况一：MASTER_ERP 时，支持单个的新增、修改、删除操作
+#if ( $table.templateType == 11 )
+    @Override
+    public ${subPrimaryColumn.javaType} create${subSimpleClassName}(${subTable.className}DO ${subClassNameVar}) {
+## 特殊：一对一时，需要保证只有一条，不能重复插入
+#if ( !$subTable.subJoinMany)
+        // 校验是否已经存在
+        if (${subClassNameVars.get($index)}Mapper.selectBy${SubJoinColumnName}(${subClassNameVar}.get${SubJoinColumnName}()) != null) {
+            throw exception(${simpleClassNameUnderlineCase.toUpperCase()}_EXISTS);
+        }
+        // 插入
+#end
+        ${subClassNameVars.get($index)}Mapper.insert(${subClassNameVar});
+        return ${subClassNameVar}.getId();
+    }
+
+    @Override
+    public void update${subSimpleClassName}(${subTable.className}DO ${subClassNameVar}) {
+        // 校验存在
+        validate${subSimpleClassName}Exists(${subClassNameVar}.getId());
+        // 更新
+        ${subClassNameVars.get($index)}Mapper.updateById(${subClassNameVar});
+    }
+
+    @Override
+    public void delete${subSimpleClassName}(${subPrimaryColumn.javaType} id) {
+        // 校验存在
+        validate${subSimpleClassName}Exists(id);
+        // 删除
+        ${subClassNameVars.get($index)}Mapper.deleteById(id);
+    }
+
+    @Override
+    public ${subTable.className}DO get${subSimpleClassName}(${subPrimaryColumn.javaType} id) {
+        return ${subClassNameVars.get($index)}Mapper.selectById(id);
+    }
+
+    private void validate${subSimpleClassName}Exists(${subPrimaryColumn.javaType} id) {
+        if (${subClassNameVar}Mapper.selectById(id) == null) {
+            throw exception(${simpleClassNameUnderlineCase.toUpperCase()}_NOT_EXISTS);
+        }
+    }
+
+## 情况二：非 MASTER_ERP 时，支持批量的新增、修改操作
+#else
+    #if ( $subTable.subJoinMany)
+    private void create${subSimpleClassName}List(${primaryColumn.javaType} ${subJoinColumn.javaField}, List<${subTable.className}DO> list) {
+        list.forEach(o -> o.set$SubJoinColumnName(${subJoinColumn.javaField}));
+        ${subClassNameVars.get($index)}Mapper.insertBatch(list);
+    }
+
+    private void update${subSimpleClassName}List(${primaryColumn.javaType} ${subJoinColumn.javaField}, List<${subTable.className}DO> list) {
+        delete${subSimpleClassName}By${SubJoinColumnName}(${subJoinColumn.javaField});
+		list.forEach(o -> o.setId(null).setUpdater(null).setUpdateTime(null)); // 解决更新情况下：1）id 冲突；2）updateTime 不更新
+        create${subSimpleClassName}List(${subJoinColumn.javaField}, list);
+    }
+
+    #else
+    private void create${subSimpleClassName}(${primaryColumn.javaType} ${subJoinColumn.javaField}, ${subTable.className}DO ${subClassNameVar}) {
+        if (${subClassNameVar} == null) {
+            return;
+        }
+        ${subClassNameVar}.set$SubJoinColumnName(${subJoinColumn.javaField});
+        ${subClassNameVars.get($index)}Mapper.insert(${subClassNameVar});
+    }
+
+    private void update${subSimpleClassName}(${primaryColumn.javaType} ${subJoinColumn.javaField}, ${subTable.className}DO ${subClassNameVar}) {
+        if (${subClassNameVar} == null) {
+			return;
+        }
+        ${subClassNameVar}.set$SubJoinColumnName(${subJoinColumn.javaField});
+        ${subClassNameVar}.setUpdater(null).setUpdateTime(null); // 解决更新情况下：updateTime 不更新
+        ${subClassNameVars.get($index)}Mapper.insertOrUpdate(${subClassNameVar});
+    }
+
+    #end
+#end
+    private void delete${subSimpleClassName}By${SubJoinColumnName}(${primaryColumn.javaType} ${subJoinColumn.javaField}) {
+        ${subClassNameVars.get($index)}Mapper.deleteBy${SubJoinColumnName}(${subJoinColumn.javaField});
+    }
+
+#end
+}

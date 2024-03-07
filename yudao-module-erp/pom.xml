@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <groupId>cn.iocoder.boot</groupId>
+        <artifactId>yudao</artifactId>
+        <version>${revision}</version>
+    </parent>
+    <modules>
+        <module>yudao-module-erp-api</module>
+        <module>yudao-module-erp-biz</module>
+    </modules>
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>yudao-module-erp</artifactId>
+    <packaging>pom</packaging>
+
+    <name>${project.artifactId}</name>
+    <description>
+        erp 包下，企业资源管理（Enterprise Resource Planning）。
+        例如说：采购、销售、库存、财务、产品等等
+    </description>
+
+</project>

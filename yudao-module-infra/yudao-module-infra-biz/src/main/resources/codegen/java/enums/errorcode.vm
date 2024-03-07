@@ -1,0 +1,22 @@
+// TODO 待办：请将下面的错误码复制到 yudao-module-${table.moduleName}-api 模块的 ErrorCodeConstants 类中。注意，请给“TODO 补充编号”设置一个错误码编号！！！
+// ========== ${table.classComment} TODO 补充编号 ==========
+ErrorCode ${simpleClassName_underlineCase.toUpperCase()}_NOT_EXISTS = new ErrorCode(TODO 补充编号, "${table.classComment}不存在");
+## 特殊：树表专属逻辑
+#if ( $table.templateType == 2 )
+ErrorCode ${simpleClassName_underlineCase.toUpperCase()}_EXITS_CHILDREN = new ErrorCode(TODO 补充编号, "存在存在子${table.classComment}，无法删除");
+ErrorCode ${simpleClassName_underlineCase.toUpperCase()}_PARENT_NOT_EXITS = new ErrorCode(TODO 补充编号,"父级${table.classComment}不存在");
+ErrorCode ${simpleClassName_underlineCase.toUpperCase()}_PARENT_ERROR = new ErrorCode(TODO 补充编号, "不能设置自己为父${table.classComment}");
+ErrorCode ${simpleClassName_underlineCase.toUpperCase()}_${treeNameColumn_javaField_underlineCase.toUpperCase()}_DUPLICATE = new ErrorCode(TODO 补充编号, "已经存在该${treeNameColumn.columnComment}的${table.classComment}");
+ErrorCode ${simpleClassName_underlineCase.toUpperCase()}_PARENT_IS_CHILD = new ErrorCode(TODO 补充编号, "不能设置自己的子${table.className}为父${table.className}");
+#end
+## 特殊：主子表专属逻辑
+#if ( $table.templateType == 11 )## 特殊：ERP 情况
+#foreach ($subTable in $subTables)
+#set ($index = $foreach.count - 1)
+#set ($simpleClassNameUnderlineCase = $simpleClassNameUnderlineCases.get($index))
+ErrorCode ${simpleClassNameUnderlineCase.toUpperCase()}_NOT_EXISTS = new ErrorCode(TODO 补充编号, "${subTable.classComment}不存在");
+#if ( !$subTable.subJoinMany )
+ErrorCode ${simpleClassNameUnderlineCase.toUpperCase()}_EXISTS = new ErrorCode(TODO 补充编号, "${subTable.classComment}已存在");
+#end
+#end
+#end

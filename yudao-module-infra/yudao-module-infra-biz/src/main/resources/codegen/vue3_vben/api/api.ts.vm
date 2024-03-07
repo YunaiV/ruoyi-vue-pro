@@ -1,0 +1,32 @@
+import { defHttp } from '@/utils/http/axios'
+#set ($baseURL = "/${table.moduleName}/${simpleClassName_strikeCase}")
+
+// 查询${table.classComment}列表
+export function get${simpleClassName}Page(params) {
+  return defHttp.get({ url: '${baseURL}/page', params })
+}
+
+// 查询${table.classComment}详情
+export function get${simpleClassName}(id: number) {
+  return defHttp.get({ url: `${baseURL}/get?id=${id}` })
+}
+
+// 新增${table.classComment}
+export function create${simpleClassName}(data) {
+  return defHttp.post({ url: '${baseURL}/create', data })
+}
+
+// 修改${table.classComment}
+export function update${simpleClassName}(data) {
+  return defHttp.put({ url: '${baseURL}/update', data })
+}
+
+// 删除${table.classComment}
+export function delete${simpleClassName}(id: number) {
+  return defHttp.delete({ url: `${baseURL}/delete?id=${id}` })
+}
+
+// 导出${table.classComment} Excel
+export function export${simpleClassName}(params) {
+  return defHttp.download({ url: '${baseURL}/export-excel', params }, '${table.classComment}.xls')
+}

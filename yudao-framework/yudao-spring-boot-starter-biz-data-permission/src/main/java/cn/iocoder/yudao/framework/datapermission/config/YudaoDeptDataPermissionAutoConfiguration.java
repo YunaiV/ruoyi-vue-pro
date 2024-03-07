@@ -1,13 +1,13 @@
 package cn.iocoder.yudao.framework.datapermission.config;
 
-import cn.iocoder.yudao.framework.datapermission.core.dept.rule.DeptDataPermissionRule;
-import cn.iocoder.yudao.framework.datapermission.core.dept.rule.DeptDataPermissionRuleCustomizer;
-import cn.iocoder.yudao.framework.datapermission.core.dept.service.DeptDataPermissionFrameworkService;
+import cn.iocoder.yudao.framework.datapermission.core.rule.dept.DeptDataPermissionRule;
+import cn.iocoder.yudao.framework.datapermission.core.rule.dept.DeptDataPermissionRuleCustomizer;
 import cn.iocoder.yudao.framework.security.core.LoginUser;
+import cn.iocoder.yudao.module.system.api.permission.PermissionApi;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 
 import java.util.List;
 
@@ -16,16 +16,16 @@ import java.util.List;
  *
  * @author 芋道源码
  */
-@Configuration
+@AutoConfiguration
 @ConditionalOnClass(LoginUser.class)
-@ConditionalOnBean(value = {DeptDataPermissionFrameworkService.class, DeptDataPermissionRuleCustomizer.class})
+@ConditionalOnBean(value = {PermissionApi.class, DeptDataPermissionRuleCustomizer.class})
 public class YudaoDeptDataPermissionAutoConfiguration {
 
     @Bean
-    public DeptDataPermissionRule deptDataPermissionRule(DeptDataPermissionFrameworkService service,
+    public DeptDataPermissionRule deptDataPermissionRule(PermissionApi permissionApi,
                                                          List<DeptDataPermissionRuleCustomizer> customizers) {
         // 创建 DeptDataPermissionRule 对象
-        DeptDataPermissionRule rule = new DeptDataPermissionRule(service);
+        DeptDataPermissionRule rule = new DeptDataPermissionRule(permissionApi);
         // 补全表配置
         customizers.forEach(customizer -> customizer.customize(rule));
         return rule;

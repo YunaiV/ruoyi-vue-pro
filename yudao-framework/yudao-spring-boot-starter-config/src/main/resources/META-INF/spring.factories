@@ -1,2 +1,0 @@
-org.springframework.boot.env.EnvironmentPostProcessor=\
-    cn.iocoder.yudao.framework.apollo.spring.boot.ApolloApplicationContextInitializer

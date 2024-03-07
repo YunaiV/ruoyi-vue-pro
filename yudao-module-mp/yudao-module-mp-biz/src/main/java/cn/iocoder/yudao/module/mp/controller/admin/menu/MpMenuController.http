@@ -1,0 +1,50 @@
+### 请求 /mp/menu/save 接口 => 成功
+POST {{baseUrl}}/mp/menu/save
+Content-Type: application/json
+Authorization: Bearer {{token}}
+tenant-id: {{adminTenentId}}
+
+{
+  "accountId": "1",
+  "menus": [
+    {
+      "type":"click",
+      "name":"今日歌曲",
+      "menuKey":"V1001_TODAY_MUSIC"
+    },
+    {
+      "name":"搜索",
+      "type":"view",
+      "url":"https://www.soso.com/"
+    },
+    {
+      "name": "父按钮",
+      "children": [
+        {
+          "type":"click",
+          "name":"归去来兮",
+          "menuKey":"MUSIC"
+        },
+        {
+          "name":"不说",
+          "type":"view",
+          "url":"https://www.soso.com/"
+        }]
+    }]
+}
+
+### 请求 /mp/menu/save 接口 => 成功（清空）
+POST {{baseUrl}}/mp/menu/save
+Content-Type: application/json
+Authorization: Bearer {{token}}
+tenant-id: {{adminTenentId}}
+
+{
+  "accountId": "1",
+  "menus": []
+}
+
+### 请求 /mp/menu/list 接口 => 成功
+GET {{baseUrl}}/mp/menu/list?accountId=1
+Authorization: Bearer {{token}}
+tenant-id: {{adminTenentId}}

@@ -59,8 +59,8 @@
         </dependency>
 
         <dependency>
-            <groupId>io.swagger</groupId>
-            <artifactId>swagger-annotations</artifactId>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-ui</artifactId>
             <scope>provided</scope> <!-- 设置为 provided，主要是 PageParam 使用到 -->
         </dependency>
 
@@ -105,6 +105,11 @@
             <artifactId>jackson-core</artifactId>
             <scope>provided</scope> <!-- 设置为 provided，只有工具类需要使用到 -->
         </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.datatype</groupId>
+            <artifactId>jackson-datatype-jsr310</artifactId>
+            <scope>provided</scope> <!-- 设置为 provided，只有工具类需要使用到 -->
+        </dependency>
 
         <dependency>
             <groupId>org.slf4j</groupId>
@@ -128,6 +133,12 @@
             <artifactId>transmittable-thread-local</artifactId>
         </dependency>
 
+        <!-- Test 测试相关 -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
 </project>

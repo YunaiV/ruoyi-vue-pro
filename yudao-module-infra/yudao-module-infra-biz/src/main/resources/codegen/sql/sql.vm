@@ -1,0 +1,28 @@
+-- 菜单 SQL
+INSERT INTO system_menu(
+    name, permission, type, sort, parent_id,
+    path, icon, component, status, component_name
+)
+VALUES (
+    '${table.classComment}管理', '', 2, 0, ${table.parentMenuId},
+    '${simpleClassName_strikeCase}', '', '${table.moduleName}/${table.businessName}/index', 0, '${table.className}'
+);
+
+-- 按钮父菜单ID
+-- 暂时只支持 MySQL。如果你是 Oracle、PostgreSQL、SQLServer 的话，需要手动修改 @parentId 的部分的代码
+SELECT @parentId := LAST_INSERT_ID();
+
+-- 按钮 SQL
+#set ($functionNames = ['查询', '创建', '更新', '删除', '导出'])
+#set ($functionOps = ['query', 'create', 'update', 'delete', 'export'])
+#foreach ($functionName in $functionNames)
+#set ($index = $foreach.count - 1)
+INSERT INTO system_menu(
+    name, permission, type, sort, parent_id,
+    path, icon, component, status
+)
+VALUES (
+    '${table.classComment}${functionName}', '${permissionPrefix}:${functionOps.get($index)}', 3, $foreach.count, @parentId,
+    '', '', '', 0
+);
+#end

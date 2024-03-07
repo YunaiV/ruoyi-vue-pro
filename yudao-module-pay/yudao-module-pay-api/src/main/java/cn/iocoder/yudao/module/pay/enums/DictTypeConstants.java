@@ -7,11 +7,12 @@ package cn.iocoder.yudao.module.pay.enums;
  */
 public interface DictTypeConstants {
 
-    String ORDER_STATUS = "pay_order_status"; // 支付-订单-订单状态
-    String ORDER_NOTIFY_STATUS = "pay_order_notify_status"; // 支付-订单-订单回调商户状态
+    String CHANNEL_CODE = "pay_channel_code"; // 支付渠道编码
 
-    String ORDER_REFUND_STATUS = "pay_order_refund_status"; // 支付-订单-订单退款状态
-    String REFUND_ORDER_STATUS = "pay_refund_order_status"; // 支付-退款订单-退款状态
-    String REFUND_ORDER_TYPE = "pay_refund_order_type"; // 支付-退款订单-退款类别
+    String ORDER_STATUS = "pay_order_status"; // 支付渠道
+
+    String REFUND_STATUS = "pay_order_status"; // 退款状态
+
+    String NOTIFY_STATUS = "pay_notify_status"; // 回调状态
 
 }

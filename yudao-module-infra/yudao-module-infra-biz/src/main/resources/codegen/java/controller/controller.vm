@@ -1,0 +1,233 @@
+package ${basePackage}.module.${table.moduleName}.controller.${sceneEnum.basePackage}.${table.businessName};
+
+import org.springframework.web.bind.annotation.*;
+import ${jakartaPackage}.annotation.Resource;
+import org.springframework.validation.annotation.Validated;
+#if ($sceneEnum.scene == 1)import org.springframework.security.access.prepost.PreAuthorize;#end
+
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Operation;
+
+import ${jakartaPackage}.validation.constraints.*;
+import ${jakartaPackage}.validation.*;
+import ${jakartaPackage}.servlet.http.*;
+import java.util.*;
+import java.io.IOException;
+
+import ${PageParamClassName};
+import ${PageResultClassName};
+import ${CommonResultClassName};
+import ${BeanUtils};
+import static ${CommonResultClassName}.success;
+
+import ${ExcelUtilsClassName};
+
+import ${OperateLogClassName};
+import static ${OperateTypeEnumClassName}.*;
+
+import ${basePackage}.module.${table.moduleName}.controller.${sceneEnum.basePackage}.${table.businessName}.vo.*;
+import ${basePackage}.module.${table.moduleName}.dal.dataobject.${table.businessName}.${table.className}DO;
+## 特殊：主子表专属逻辑
+#foreach ($subTable in $subTables)
+import ${basePackage}.module.${subTable.moduleName}.dal.dataobject.${subTable.businessName}.${subTable.className}DO;
+#end
+import ${basePackage}.module.${table.moduleName}.service.${table.businessName}.${table.className}Service;
+
+@Tag(name = "${sceneEnum.name} - ${table.classComment}")
+@RestController
+##二级的 businessName 暂时不算在 HTTP 路径上，可以根据需要写
+@RequestMapping("/${table.moduleName}/${simpleClassName_strikeCase}")
+@Validated
+public class ${sceneEnum.prefixClass}${table.className}Controller {
+
+    @Resource
+    private ${table.className}Service ${classNameVar}Service;
+
+    @PostMapping("/create")
+    @Operation(summary = "创建${table.classComment}")
+#if ($sceneEnum.scene == 1)
+    @PreAuthorize("@ss.hasPermission('${permissionPrefix}:create')")
+#end
+    public CommonResult<${primaryColumn.javaType}> create${simpleClassName}(@Valid @RequestBody ${sceneEnum.prefixClass}${table.className}SaveReqVO createReqVO) {
+        return success(${classNameVar}Service.create${simpleClassName}(createReqVO));
+    }
+
+    @PutMapping("/update")
+    @Operation(summary = "更新${table.classComment}")
+#if ($sceneEnum.scene == 1)
+    @PreAuthorize("@ss.hasPermission('${permissionPrefix}:update')")
+#end
+    public CommonResult<Boolean> update${simpleClassName}(@Valid @RequestBody ${sceneEnum.prefixClass}${table.className}SaveReqVO updateReqVO) {
+        ${classNameVar}Service.update${simpleClassName}(updateReqVO);
+        return success(true);
+    }
+
+    @DeleteMapping("/delete")
+    @Operation(summary = "删除${table.classComment}")
+    @Parameter(name = "id", description = "编号", required = true)
+#if ($sceneEnum.scene == 1)
+    @PreAuthorize("@ss.hasPermission('${permissionPrefix}:delete')")
+#end
+    public CommonResult<Boolean> delete${simpleClassName}(@RequestParam("id") ${primaryColumn.javaType} id) {
+        ${classNameVar}Service.delete${simpleClassName}(id);
+        return success(true);
+    }
+
+    @GetMapping("/get")
+    @Operation(summary = "获得${table.classComment}")
+    @Parameter(name = "id", description = "编号", required = true, example = "1024")
+#if ($sceneEnum.scene == 1)
+    @PreAuthorize("@ss.hasPermission('${permissionPrefix}:query')")
+#end
+    public CommonResult<${sceneEnum.prefixClass}${table.className}RespVO> get${simpleClassName}(@RequestParam("id") ${primaryColumn.javaType} id) {
+        ${table.className}DO ${classNameVar} = ${classNameVar}Service.get${simpleClassName}(id);
+        return success(BeanUtils.toBean(${classNameVar}, ${sceneEnum.prefixClass}${table.className}RespVO.class));
+    }
+
+#if ( $table.templateType != 2 )
+    @GetMapping("/page")
+    @Operation(summary = "获得${table.classComment}分页")
+#if ($sceneEnum.scene == 1)
+    @PreAuthorize("@ss.hasPermission('${permissionPrefix}:query')")
+#end
+    public CommonResult<PageResult<${sceneEnum.prefixClass}${table.className}RespVO>> get${simpleClassName}Page(@Valid ${sceneEnum.prefixClass}${table.className}PageReqVO pageReqVO) {
+        PageResult<${table.className}DO> pageResult = ${classNameVar}Service.get${simpleClassName}Page(pageReqVO);
+        return success(BeanUtils.toBean(pageResult, ${sceneEnum.prefixClass}${table.className}RespVO.class));
+    }
+
+## 特殊：树表专属逻辑（树不需要分页接口）
+#else
+    @GetMapping("/list")
+    @Operation(summary = "获得${table.classComment}列表")
+#if ($sceneEnum.scene == 1)
+    @PreAuthorize("@ss.hasPermission('${permissionPrefix}:query')")
+#end
+    public CommonResult<List<${sceneEnum.prefixClass}${table.className}RespVO>> get${simpleClassName}List(@Valid ${sceneEnum.prefixClass}${table.className}ListReqVO listReqVO) {
+        List<${table.className}DO> list = ${classNameVar}Service.get${simpleClassName}List(listReqVO);
+        return success(BeanUtils.toBean(list, ${sceneEnum.prefixClass}${table.className}RespVO.class));
+    }
+
+#end
+    @GetMapping("/export-excel")
+    @Operation(summary = "导出${table.classComment} Excel")
+#if ($sceneEnum.scene == 1)
+    @PreAuthorize("@ss.hasPermission('${permissionPrefix}:export')")
+#end
+    @OperateLog(type = EXPORT)
+#if ( $table.templateType != 2 )
+    public void export${simpleClassName}Excel(@Valid ${sceneEnum.prefixClass}${table.className}PageReqVO pageReqVO,
+              HttpServletResponse response) throws IOException {
+        pageReqVO.setPageSize(PageParam.PAGE_SIZE_NONE);
+        List<${table.className}DO> list = ${classNameVar}Service.get${simpleClassName}Page(pageReqVO).getList();
+        // 导出 Excel
+        ExcelUtils.write(response, "${table.classComment}.xls", "数据", ${table.className}RespVO.class,
+                        BeanUtils.toBean(list, ${table.className}RespVO.class));
+    }
+## 特殊：树表专属逻辑（树不需要分页接口）
+#else
+    public void export${simpleClassName}Excel(@Valid ${sceneEnum.prefixClass}${table.className}ListReqVO listReqVO,
+              HttpServletResponse response) throws IOException {
+        List<${table.className}DO> list = ${classNameVar}Service.get${simpleClassName}List(listReqVO);
+        // 导出 Excel
+        ExcelUtils.write(response, "${table.classComment}.xls", "数据", ${table.className}RespVO.class,
+                        BeanUtils.toBean(list, ${table.className}RespVO.class));
+    }
+#end
+
+## 特殊：主子表专属逻辑
+#foreach ($subTable in $subTables)
+#set ($index = $foreach.count - 1)
+#set ($subSimpleClassName = $subSimpleClassNames.get($index))
+#set ($subPrimaryColumn = $subPrimaryColumns.get($index))##当前 primary 字段
+#set ($subJoinColumn = $subJoinColumns.get($index))##当前 join 字段
+#set ($SubJoinColumnName = $subJoinColumn.javaField.substring(0,1).toUpperCase() + ${subJoinColumn.javaField.substring(1)})##首字母大写
+#set ($subSimpleClassName_strikeCase = $subSimpleClassName_strikeCases.get($index))
+#set ($subJoinColumn_strikeCase = $subJoinColumn_strikeCases.get($index))
+#set ($subClassNameVar = $subClassNameVars.get($index))
+    // ==================== 子表（$subTable.classComment） ====================
+
+## 情况一：MASTER_ERP 时，需要分查询页子表
+#if ( $table.templateType == 11 )
+    @GetMapping("/${subSimpleClassName_strikeCase}/page")
+    @Operation(summary = "获得${subTable.classComment}分页")
+    @Parameter(name = "${subJoinColumn.javaField}", description = "${subJoinColumn.columnComment}")
+#if ($sceneEnum.scene == 1)
+    @PreAuthorize("@ss.hasPermission('${permissionPrefix}:query')")
+#end
+    public CommonResult<PageResult<${subTable.className}DO>> get${subSimpleClassName}Page(PageParam pageReqVO,
+                                                                                        @RequestParam("${subJoinColumn.javaField}") ${subJoinColumn.javaType} ${subJoinColumn.javaField}) {
+        return success(${classNameVar}Service.get${subSimpleClassName}Page(pageReqVO, ${subJoinColumn.javaField}));
+    }
+
+## 情况二：非 MASTER_ERP 时，需要列表查询子表
+#else
+    #if ( $subTable.subJoinMany )
+    @GetMapping("/${subSimpleClassName_strikeCase}/list-by-${subJoinColumn_strikeCase}")
+    @Operation(summary = "获得${subTable.classComment}列表")
+    @Parameter(name = "${subJoinColumn.javaField}", description = "${subJoinColumn.columnComment}")
+#if ($sceneEnum.scene == 1)
+    @PreAuthorize("@ss.hasPermission('${permissionPrefix}:query')")
+#end
+    public CommonResult<List<${subTable.className}DO>> get${subSimpleClassName}ListBy${SubJoinColumnName}(@RequestParam("${subJoinColumn.javaField}") ${subJoinColumn.javaType} ${subJoinColumn.javaField}) {
+        return success(${classNameVar}Service.get${subSimpleClassName}ListBy${SubJoinColumnName}(${subJoinColumn.javaField}));
+    }
+
+    #else
+    @GetMapping("/${subSimpleClassName_strikeCase}/get-by-${subJoinColumn_strikeCase}")
+    @Operation(summary = "获得${subTable.classComment}")
+    @Parameter(name = "${subJoinColumn.javaField}", description = "${subJoinColumn.columnComment}")
+#if ($sceneEnum.scene == 1)
+    @PreAuthorize("@ss.hasPermission('${permissionPrefix}:query')")
+#end
+    public CommonResult<${subTable.className}DO> get${subSimpleClassName}By${SubJoinColumnName}(@RequestParam("${subJoinColumn.javaField}") ${subJoinColumn.javaType} ${subJoinColumn.javaField}) {
+        return success(${classNameVar}Service.get${subSimpleClassName}By${SubJoinColumnName}(${subJoinColumn.javaField}));
+    }
+
+    #end
+#end
+## 特殊：MASTER_ERP 时，支持单个的新增、修改、删除操作
+#if ( $table.templateType == 11 )
+    @PostMapping("/${subSimpleClassName_strikeCase}/create")
+    @Operation(summary = "创建${subTable.classComment}")
+#if ($sceneEnum.scene == 1)
+    @PreAuthorize("@ss.hasPermission('${permissionPrefix}:create')")
+#end
+    public CommonResult<${subPrimaryColumn.javaType}> create${subSimpleClassName}(@Valid @RequestBody ${subTable.className}DO ${subClassNameVar}) {
+        return success(${classNameVar}Service.create${subSimpleClassName}(${subClassNameVar}));
+    }
+
+    @PutMapping("/${subSimpleClassName_strikeCase}/update")
+    @Operation(summary = "更新${subTable.classComment}")
+#if ($sceneEnum.scene == 1)
+    @PreAuthorize("@ss.hasPermission('${permissionPrefix}:update')")
+#end
+    public CommonResult<Boolean> update${subSimpleClassName}(@Valid @RequestBody ${subTable.className}DO ${subClassNameVar}) {
+        ${classNameVar}Service.update${subSimpleClassName}(${subClassNameVar});
+        return success(true);
+    }
+
+    @DeleteMapping("/${subSimpleClassName_strikeCase}/delete")
+    @Parameter(name = "id", description = "编号", required = true)
+    @Operation(summary = "删除${subTable.classComment}")
+#if ($sceneEnum.scene == 1)
+    @PreAuthorize("@ss.hasPermission('${permissionPrefix}:delete')")
+#end
+    public CommonResult<Boolean> delete${subSimpleClassName}(@RequestParam("id") ${subPrimaryColumn.javaType} id) {
+        ${classNameVar}Service.delete${subSimpleClassName}(id);
+        return success(true);
+    }
+
+	@GetMapping("/${subSimpleClassName_strikeCase}/get")
+	@Operation(summary = "获得${subTable.classComment}")
+	@Parameter(name = "id", description = "编号", required = true)
+#if ($sceneEnum.scene == 1)
+    @PreAuthorize("@ss.hasPermission('${permissionPrefix}:query')")
+#end
+	public CommonResult<${subTable.className}DO> get${subSimpleClassName}(@RequestParam("id") ${subPrimaryColumn.javaType} id) {
+	    return success(${classNameVar}Service.get${subSimpleClassName}(id));
+	}
+
+#end
+#end
+}

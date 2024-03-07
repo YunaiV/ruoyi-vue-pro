@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <groupId>cn.iocoder.boot</groupId>
+        <artifactId>yudao</artifactId>
+        <version>${revision}</version>
+    </parent>
+    <modules>
+        <module>yudao-module-crm-api</module>
+        <module>yudao-module-crm-biz</module>
+    </modules>
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>yudao-module-crm</artifactId>
+    <packaging>pom</packaging>
+
+    <name>${project.artifactId}</name>
+    <description>
+        crm 包下，客户关系管理（Customer Relationship Management）。
+        例如说：客户、联系人、商机、合同、回款等等
+    </description>
+
+</project>

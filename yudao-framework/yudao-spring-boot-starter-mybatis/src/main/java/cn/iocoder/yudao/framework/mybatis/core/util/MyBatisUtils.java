@@ -4,6 +4,7 @@ import cn.hutool.core.collection.CollectionUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.SortingField;
 import com.baomidou.mybatisplus.core.metadata.OrderItem;
+import com.baomidou.mybatisplus.core.toolkit.StringPool;
 import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.InnerInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -44,8 +45,8 @@ public class MyBatisUtils {
      * 由于 MybatisPlusInterceptor 不支持添加拦截器，所以只能全量设置
      *
      * @param interceptor 链
-     * @param inner 拦截器
-     * @param index 位置
+     * @param inner       拦截器
+     * @param index       位置
      */
     public static void addInterceptor(MybatisPlusInterceptor interceptor, InnerInterceptor inner, int index) {
         List<InnerInterceptor> inners = new ArrayList<>(interceptor.getInterceptors());
@@ -72,13 +73,16 @@ public class MyBatisUtils {
     /**
      * 构建 Column 对象
      *
-     * @param tableName 表名
+     * @param tableName  表名
      * @param tableAlias 别名
-     * @param column 字段名
+     * @param column     字段名
      * @return Column 对象
      */
     public static Column buildColumn(String tableName, Alias tableAlias, String column) {
-        return new Column(tableAlias != null ? tableAlias.getName() + "." + column : column);
+        if (tableAlias != null) {
+            tableName = tableAlias.getName();
+        }
+        return new Column(tableName + StringPool.DOT + column);
     }
 
 }

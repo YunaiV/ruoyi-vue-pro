@@ -12,7 +12,7 @@
     <packaging>jar</packaging>
 
     <name>${project.artifactId}</name>
-    <description>消息队列，基于 Redis Pub/Sub 实现广播消费，基于 Stream 实现集群消费</description>
+    <description>消息队列，支持 Redis、RocketMQ、RabbitMQ、Kafka 四种</description>
     <url>https://github.com/YunaiV/ruoyi-vue-pro</url>
 
     <dependencies>
@@ -20,6 +20,23 @@
         <dependency>
             <groupId>cn.iocoder.boot</groupId>
             <artifactId>yudao-spring-boot-starter-redis</artifactId>
+        </dependency>
+
+        <!-- 消息队列相关 -->
+        <dependency>
+            <groupId>org.springframework.kafka</groupId>
+            <artifactId>spring-kafka</artifactId>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.amqp</groupId>
+            <artifactId>spring-rabbit</artifactId>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.rocketmq</groupId>
+            <artifactId>rocketmq-spring-boot-starter</artifactId>
+            <optional>true</optional>
         </dependency>
     </dependencies>
 

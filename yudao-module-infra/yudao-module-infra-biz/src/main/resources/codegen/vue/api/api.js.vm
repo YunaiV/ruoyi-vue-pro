@@ -1,0 +1,141 @@
+import request from '@/utils/request'
+#set ($baseURL = "/${table.moduleName}/${simpleClassName_strikeCase}")
+
+// 创建${table.classComment}
+export function create${simpleClassName}(data) {
+  return request({
+    url: '${baseURL}/create',
+    method: 'post',
+    data: data
+  })
+}
+
+// 更新${table.classComment}
+export function update${simpleClassName}(data) {
+  return request({
+    url: '${baseURL}/update',
+    method: 'put',
+    data: data
+  })
+}
+
+// 删除${table.classComment}
+export function delete${simpleClassName}(id) {
+  return request({
+    url: '${baseURL}/delete?id=' + id,
+    method: 'delete'
+  })
+}
+
+// 获得${table.classComment}
+export function get${simpleClassName}(id) {
+  return request({
+    url: '${baseURL}/get?id=' + id,
+    method: 'get'
+  })
+}
+
+#if ( $table.templateType != 2 )
+// 获得${table.classComment}分页
+export function get${simpleClassName}Page(params) {
+  return request({
+    url: '${baseURL}/page',
+    method: 'get',
+    params
+  })
+}
+#else
+// 获得${table.classComment}列表
+export function get${simpleClassName}List(params) {
+  return request({
+    url: '${baseURL}/list',
+    method: 'get',
+    params
+  })
+}
+#end
+// 导出${table.classComment} Excel
+export function export${simpleClassName}Excel(params) {
+  return request({
+    url: '${baseURL}/export-excel',
+    method: 'get',
+    params,
+    responseType: 'blob'
+  })
+}
+## 特殊：主子表专属逻辑
+#foreach ($subTable in $subTables)
+  #set ($index = $foreach.count - 1)
+  #set ($subSimpleClassName = $subSimpleClassNames.get($index))
+  #set ($subPrimaryColumn = $subPrimaryColumns.get($index))##当前 primary 字段
+  #set ($subJoinColumn = $subJoinColumns.get($index))##当前 join 字段
+  #set ($SubJoinColumnName = $subJoinColumn.javaField.substring(0,1).toUpperCase() + ${subJoinColumn.javaField.substring(1)})##首字母大写
+  #set ($subSimpleClassName_strikeCase = $subSimpleClassName_strikeCases.get($index))
+  #set ($subJoinColumn_strikeCase = $subJoinColumn_strikeCases.get($index))
+  #set ($subClassNameVar = $subClassNameVars.get($index))
+
+// ==================== 子表（$subTable.classComment） ====================
+  ## 情况一：MASTER_ERP 时，需要分查询页子表
+  #if ($table.templateType == 11)
+  // 获得${subTable.classComment}分页
+  export function get${subSimpleClassName}Page(params) {
+    return request({
+      url: '${baseURL}/${subSimpleClassName_strikeCase}/page',
+      method: 'get',
+      params
+    })
+  }
+    ## 情况二：非 MASTER_ERP 时，需要列表查询子表
+  #else
+    #if ($subTable.subJoinMany)
+    // 获得${subTable.classComment}列表
+    export function get${subSimpleClassName}ListBy${SubJoinColumnName}(${subJoinColumn.javaField}) {
+      return request({
+        url: '${baseURL}/${subSimpleClassName_strikeCase}/list-by-${subJoinColumn_strikeCase}?${subJoinColumn.javaField}=' + ${subJoinColumn.javaField},
+        method: 'get'
+      })
+    }
+    #else
+    // 获得${subTable.classComment}
+    export function get${subSimpleClassName}By${SubJoinColumnName}(${subJoinColumn.javaField}) {
+      return request({
+        url: '${baseURL}/${subSimpleClassName_strikeCase}/get-by-${subJoinColumn_strikeCase}?${subJoinColumn.javaField}=' + ${subJoinColumn.javaField},
+        method: 'get'
+      })
+    }
+    #end
+  #end
+  ## 特殊：MASTER_ERP 时，支持单个的新增、修改、删除操作
+  #if ($table.templateType == 11)
+  // 新增${subTable.classComment}
+  export function create${subSimpleClassName}(data) {
+    return request({
+      url: '${baseURL}/${subSimpleClassName_strikeCase}/create',
+      method: 'post',
+      data
+    })
+  }
+  // 修改${subTable.classComment}
+  export function update${subSimpleClassName}(data) {
+    return request({
+      url: '${baseURL}/${subSimpleClassName_strikeCase}/update',
+      method: 'post',
+      data
+    })
+  }
+  // 删除${subTable.classComment}
+  export function delete${subSimpleClassName}(id) {
+    return request({
+      url: '${baseURL}/${subSimpleClassName_strikeCase}/delete?id=' + id,
+      method: 'delete'
+    })
+  }
+  // 获得${subTable.classComment}
+  export function get${subSimpleClassName}(id) {
+    return request({
+      url: '${baseURL}/${subSimpleClassName_strikeCase}/get?id=' + id,
+      method: 'get'
+    })
+  }
+  #end
+#end

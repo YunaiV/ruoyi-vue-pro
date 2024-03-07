@@ -58,6 +58,12 @@
             <artifactId>apm-toolkit-opentracing</artifactId>
         </dependency>
 
+        <!-- Micrometer 对 Prometheus 的支持 -->
+        <dependency>
+            <groupId>io.micrometer</groupId>
+            <artifactId>micrometer-registry-prometheus</artifactId>
+        </dependency>
+
         <dependency>
             <groupId>de.codecentric</groupId>
             <artifactId>spring-boot-admin-starter-client</artifactId> <!-- 实现 Spring Boot Admin Server 服务端 -->

@@ -8,6 +8,8 @@
 target/
 !.mvn/wrapper/maven-wrapper.jar
 
+.flattened-pom.xml
+
 ######################################################################
 # IDE
 
@@ -45,3 +47,7 @@ nbdist/
 
 ### JRebel ###
 rebel.xml
+
+application-my.yaml
+
+/yudao-ui-app/unpackage/

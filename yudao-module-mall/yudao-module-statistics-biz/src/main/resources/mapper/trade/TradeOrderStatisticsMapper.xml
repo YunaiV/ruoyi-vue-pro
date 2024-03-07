@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.iocoder.yudao.module.statistics.dal.mysql.trade.TradeOrderStatisticsMapper">
+
+    <select id="selectSummaryListByAreaId"
+            resultType="cn.iocoder.yudao.module.statistics.service.member.bo.MemberAreaStatisticsRespBO">
+        SELECT receiver_area_id                                AS areaId,
+               (SELECT COUNT(DISTINCT s.user_id)
+                FROM trade_order AS s
+                WHERE s.receiver_area_id = m.receiver_area_id) AS orderCreateUserCount,
+               (SELECT COUNT(DISTINCT s.user_id)
+                FROM trade_order AS s
+                WHERE s.receiver_area_id = m.receiver_area_id
+                  AND s.pay_status = TRUE
+                  AND s.deleted = FALSE)                       AS orderPayUserCount,
+               (SELECT SUM(s.pay_price)
+                FROM trade_order AS s
+                WHERE s.receiver_area_id = m.receiver_area_id
+                  AND s.pay_status = TRUE
+                  AND s.deleted = FALSE)                       AS orderPayPrice
+        FROM trade_order m
+        WHERE deleted = FALSE
+        GROUP BY receiver_area_id
+    </select>
+
+    <select id="selectUserCountByCreateTimeBetween" resultType="java.lang.Integer">
+        SELECT COUNT(DISTINCT (user_id))
+        FROM trade_order
+        WHERE deleted = FALSE
+          AND create_time BETWEEN #{beginTime} AND #{endTime}
+    </select>
+
+    <select id="selectUserCountByPayTimeBetween" resultType="java.lang.Integer">
+        SELECT COUNT(DISTINCT (user_id))
+        FROM trade_order
+        WHERE pay_time BETWEEN #{beginTime} AND #{endTime}
+          AND pay_status = TRUE
+          AND deleted = FALSE
+    </select>
+
+    <select id="selectCountByCreateTimeBetween" resultType="java.lang.Integer">
+        SELECT COUNT(1)
+        FROM trade_order
+        WHERE create_time BETWEEN #{beginTime} AND #{endTime}
+          AND deleted = FALSE
+    </select>
+
+    <select id="selectCountByPayTimeBetween" resultType="java.lang.Integer">
+        SELECT COUNT(1)
+        FROM trade_order
+        WHERE pay_status = TRUE
+          AND create_time BETWEEN #{beginTime} AND #{endTime}
+          AND deleted = FALSE
+    </select>
+
+    <select id="selectSummaryPriceByPayTimeBetween" resultType="java.lang.Integer">
+        SELECT SUM(pay_price)
+        FROM trade_order AS s
+        WHERE s.pay_status = TRUE
+          AND deleted = FALSE
+          AND create_time BETWEEN #{beginTime} AND #{endTime}
+    </select>
+
+    <select id="selectListByPayTimeBetweenAndGroupByDay"
+            resultType="cn.iocoder.yudao.module.statistics.controller.admin.trade.vo.TradeOrderTrendRespVO">
+        SELECT DATE_FORMAT(pay_time, '%Y-%m-%d') AS date,
+               COUNT(1)                          AS orderPayCount,
+               SUM(pay_price)                    AS orderPayPrice
+        FROM trade_order
+        WHERE pay_status = TRUE
+          AND create_time BETWEEN #{beginTime} AND #{endTime}
+          AND deleted = FALSE
+        GROUP BY date
+    </select>
+
+    <select id="selectListByPayTimeBetweenAndGroupByMonth"
+            resultType="cn.iocoder.yudao.module.statistics.controller.admin.trade.vo.TradeOrderTrendRespVO">
+        SELECT DATE_FORMAT(pay_time, '%Y-%m') AS date,
+               COUNT(1)                       AS orderPayCount,
+               SUM(pay_price)                 AS orderPayPrice
+        FROM trade_order
+        WHERE pay_status = TRUE
+          AND create_time BETWEEN #{beginTime} AND #{endTime}
+          AND deleted = FALSE
+        GROUP BY date
+    </select>
+
+    <select id="selectCountByStatusAndDeliveryType" resultType="java.lang.Long">
+        SELECT COUNT(1)
+        FROM trade_order
+        WHERE status = #{status}
+          ANd delivery_type = #{deliveryType}
+          AND deleted = FALSE
+    </select>
+
+    <select id="selectPaySummaryByStatusAndPayTimeBetween"
+            resultType="cn.iocoder.yudao.module.statistics.controller.admin.trade.vo.TradeOrderSummaryRespVO">
+        SELECT IFNULL(SUM(pay_price), 0) AS orderPayPrice,
+               COUNT(1)                  AS orderPayCount
+        FROM trade_order
+        WHERE status = #{status}
+          AND pay_time BETWEEN #{beginTime} AND #{endTime}
+          AND deleted = FALSE
+    </select>
+
+</mapper>

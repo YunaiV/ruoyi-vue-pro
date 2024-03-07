@@ -4,18 +4,20 @@ import cn.iocoder.yudao.framework.apilog.core.service.ApiErrorLogFrameworkServic
 import cn.iocoder.yudao.framework.common.enums.WebFilterOrderEnum;
 import cn.iocoder.yudao.framework.web.core.filter.CacheRequestBodyFilter;
 import cn.iocoder.yudao.framework.web.core.filter.DemoFilter;
-import cn.iocoder.yudao.framework.web.core.filter.XssFilter;
 import cn.iocoder.yudao.framework.web.core.handler.GlobalExceptionHandler;
 import cn.iocoder.yudao.framework.web.core.handler.GlobalResponseBodyHandler;
+import cn.iocoder.yudao.framework.web.core.util.WebFrameworkUtils;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.autoconfigure.web.client.RestTemplateAutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.util.AntPathMatcher;
-import org.springframework.util.PathMatcher;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
@@ -25,8 +27,8 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import javax.annotation.Resource;
 import javax.servlet.Filter;
 
-@Configuration
-@EnableConfigurationProperties({WebProperties.class, XssProperties.class})
+@AutoConfiguration
+@EnableConfigurationProperties(WebProperties.class)
 public class YudaoWebAutoConfiguration implements WebMvcConfigurer {
 
     @Resource
@@ -47,7 +49,7 @@ public class YudaoWebAutoConfiguration implements WebMvcConfigurer {
      * 设置 API 前缀，仅仅匹配 controller 包下的
      *
      * @param configurer 配置
-     * @param api API 配置
+     * @param api        API 配置
      */
     private void configurePathMatch(PathMatchConfigurer configurer, WebProperties.Api api) {
         AntPathMatcher antPathMatcher = new AntPathMatcher(".");
@@ -63,6 +65,13 @@ public class YudaoWebAutoConfiguration implements WebMvcConfigurer {
     @Bean
     public GlobalResponseBodyHandler globalResponseBodyHandler() {
         return new GlobalResponseBodyHandler();
+    }
+
+    @Bean
+    @SuppressWarnings("InstantiationOfUtilityClass")
+    public WebFrameworkUtils webFrameworkUtils(WebProperties webProperties) {
+        // 由于 WebFrameworkUtils 需要使用到 webProperties 属性，所以注册为一个 Bean
+        return new WebFrameworkUtils(webProperties);
     }
 
     // ========== Filter 相关 ==========
@@ -93,14 +102,6 @@ public class YudaoWebAutoConfiguration implements WebMvcConfigurer {
     }
 
     /**
-     * 创建 XssFilter Bean，解决 Xss 安全问题
-     */
-    @Bean
-    public FilterRegistrationBean<XssFilter> xssFilter(XssProperties properties, PathMatcher pathMatcher) {
-        return createFilterBean(new XssFilter(properties, pathMatcher), WebFilterOrderEnum.XSS_FILTER);
-    }
-
-    /**
      * 创建 DemoFilter Bean，演示模式
      */
     @Bean
@@ -109,10 +110,19 @@ public class YudaoWebAutoConfiguration implements WebMvcConfigurer {
         return createFilterBean(new DemoFilter(), WebFilterOrderEnum.DEMO_FILTER);
     }
 
-    private static <T extends Filter> FilterRegistrationBean<T> createFilterBean(T filter, Integer order) {
+    public static <T extends Filter> FilterRegistrationBean<T> createFilterBean(T filter, Integer order) {
         FilterRegistrationBean<T> bean = new FilterRegistrationBean<>(filter);
         bean.setOrder(order);
         return bean;
     }
 
+    /**
+     * 创建 RestTemplate 实例
+     *
+     * @param restTemplateBuilder {@link RestTemplateAutoConfiguration#restTemplateBuilder}
+     */
+    @Bean
+    public RestTemplate restTemplate(RestTemplateBuilder restTemplateBuilder) {
+        return restTemplateBuilder.build();
+    }
 }

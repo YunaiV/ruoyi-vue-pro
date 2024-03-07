@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.iocoder.yudao.module.statistics.dal.mysql.member.MemberStatisticsMapper">
+
+    <select id="selectSummaryListByAreaId"
+            resultType="cn.iocoder.yudao.module.statistics.service.member.bo.MemberAreaStatisticsRespBO">
+        SELECT area_id, COUNT(1) AS userCount
+        FROM member_user
+        WHERE deleted = FALSE
+        GROUP BY area_id
+    </select>
+
+    <select id="selectSummaryListBySex"
+            resultType="cn.iocoder.yudao.module.statistics.controller.admin.member.vo.MemberSexStatisticsRespVO">
+        SELECT sex, COUNT(1) AS userCount
+        FROM member_user
+        WHERE deleted = FALSE
+        GROUP BY sex
+    </select>
+
+    <select id="selectSummaryListByRegisterTerminal"
+                         resultType="cn.iocoder.yudao.module.statistics.controller.admin.member.vo.MemberTerminalStatisticsRespVO">
+        SELECT register_terminal as terminal, COUNT(1) AS userCount
+        FROM member_user
+        WHERE deleted = FALSE
+        GROUP BY register_terminal
+    </select>
+
+    <select id="selectUserCount" resultType="java.lang.Integer">
+        SELECT COUNT(1)
+        FROM member_user
+        WHERE deleted = FALSE
+        <if test="beginTime != null">
+            AND create_time >= #{beginTime}
+        </if>
+        <if test="endTime != null">
+            AND create_time &lt;= #{endTime}
+        </if>
+    </select>
+
+    <select id="selectListByCreateTimeBetween"
+            resultType="cn.iocoder.yudao.module.statistics.controller.admin.member.vo.MemberRegisterCountRespVO">
+        SELECT DATE_FORMAT(create_time, '%Y-%m-%d') AS date,
+               count(1)                             AS count
+        FROM member_user
+        WHERE create_time BETWEEN #{beginTime} AND #{endTime}
+          AND deleted = FALSE
+        GROUP BY date
+    </select>
+
+</mapper>

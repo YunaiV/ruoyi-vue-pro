@@ -1,0 +1,42 @@
+### /role/create 成功
+POST {{baseUrl}}/system/role/create
+Authorization: Bearer {{token}}
+Content-Type: application/json
+tenant-id: {{adminTenentId}}
+
+{
+  "name": "测试角色",
+  "code": "test",
+  "sort": 0
+}
+
+### /role/update 成功
+POST {{baseUrl}}/system/role/update
+Authorization: Bearer {{token}}
+Content-Type: application/json
+tenant-id: {{adminTenentId}}
+
+{
+  "id": 100,
+  "name": "测试角色",
+  "code": "test",
+  "sort": 10
+}
+### /resource/delete 成功
+POST {{baseUrl}}/system/role/delete
+Content-Type: application/x-www-form-urlencoded
+Authorization: Bearer {{token}}
+tenant-id: {{adminTenentId}}
+
+roleId=14
+
+### /role/get 成功
+GET {{baseUrl}}/system/role/get?id=100
+Content-Type: application/x-www-form-urlencoded
+Authorization: Bearer {{token}}
+tenant-id: {{adminTenentId}}
+
+### /role/page 成功
+GET {{baseUrl}}/system/role/page?pageNo=1&pageSize=10
+Authorization: Bearer {{token}}
+tenant-id: {{adminTenentId}}

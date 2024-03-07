@@ -1,0 +1,33 @@
+### 请求 /mp/message/page 接口 => 成功
+GET {{baseUrl}}/mp/message/page?accountId=1&pageNo=1&pageSize=10
+Content-Type: application/json
+Authorization: Bearer {{token}}
+tenant-id: {{adminTenentId}}
+
+### 请求 /mp/message/send 接口 => 成功（文本）
+POST {{baseUrl}}/mp/message/send
+Content-Type: application/json
+Authorization: Bearer {{token}}
+tenant-id: {{adminTenentId}}
+
+{
+  "userId": 3,
+  "type": "text",
+  "content": "测试消息"
+}
+
+### 请求 /mp/message/send 接口 => 成功（音乐）
+POST {{baseUrl}}/mp/message/send
+Content-Type: application/json
+Authorization: Bearer {{token}}
+tenant-id: {{adminTenentId}}
+
+{
+  "userId": 3,
+  "type": "music",
+  "title": "测试音乐标题",
+  "description": "测试音乐内容",
+  "musicUrl": "https://www.iocoder.cn/xx.mp3",
+  "hqMusicUrl": "https://www.iocoder.cn/xx_high.mp3",
+  "thumbMediaId": "s98Iveeg9vDVFwa9q0u8-zSfdKe3xIzAm7wCrFE4WKGPIo4d9qAhtC-n6qvnyWyH"
+}

@@ -1,2 +1,2 @@
-org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-  cn.iocoder.yudao.framework.tenant.config.YudaoTenantAutoConfiguration
+org.springframework.boot.env.EnvironmentPostProcessor=\
+  cn.iocoder.yudao.framework.tenant.core.mq.kafka.TenantKafkaEnvironmentPostProcessor

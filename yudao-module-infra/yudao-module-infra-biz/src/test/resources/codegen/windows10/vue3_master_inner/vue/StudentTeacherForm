@@ -1,0 +1,122 @@
+<template>
+  <el-form
+    ref="formRef"
+    :model="formData"
+    :rules="formRules"
+    label-width="100px"
+    v-loading="formLoading"
+  >
+     <el-form-item label="名字" prop="name">
+      <el-input v-model="formData.name" placeholder="请输入名字" />
+    </el-form-item>
+    <el-form-item label="简介" prop="description">
+      <el-input v-model="formData.description" type="textarea" placeholder="请输入简介" />
+    </el-form-item>
+    <el-form-item label="出生日期" prop="birthday">
+      <el-date-picker
+        v-model="formData.birthday"
+        type="date"
+        value-format="x"
+        placeholder="选择出生日期"
+      />
+    </el-form-item>
+    <el-form-item label="性别" prop="sex">
+      <el-select v-model="formData.sex" placeholder="请选择性别">
+        <el-option
+          v-for="dict in getIntDictOptions(DICT_TYPE.SYSTEM_USER_SEX)"
+          :key="dict.value"
+          :label="dict.label"
+          :value="dict.value"
+        />
+      </el-select>
+    </el-form-item>
+    <el-form-item label="是否有效" prop="enabled">
+      <el-radio-group v-model="formData.enabled">
+        <el-radio
+          v-for="dict in getBoolDictOptions(DICT_TYPE.INFRA_BOOLEAN_STRING)"
+          :key="dict.value"
+          :label="dict.value"
+          >
+          {{ dict.label }}
+        </el-radio>
+      </el-radio-group>
+    </el-form-item>
+    <el-form-item label="头像" prop="avatar">
+      <UploadImg v-model="formData.avatar" />
+    </el-form-item>
+    <el-form-item label="附件" prop="video">
+      <UploadFile v-model="formData.video" />
+    </el-form-item>
+    <el-form-item label="备注" prop="memo">
+      <Editor v-model="formData.memo" height="150px" />
+    </el-form-item>
+  </el-form>
+</template>
+<script setup lang="ts">
+import { getIntDictOptions, getBoolDictOptions, DICT_TYPE } from '@/utils/dict'
+import * as StudentApi from '@/api/infra/demo'
+
+const props = defineProps<{
+  studentId: undefined // 学生编号（主表的关联字段）
+}>()
+const formLoading = ref(false) // 表单的加载中
+const formData = ref([])
+const formRules = reactive({
+  studentId: [{ required: true, message: '学生编号不能为空', trigger: 'blur' }],
+  name: [{ required: true, message: '名字不能为空', trigger: 'blur' }],
+  description: [{ required: true, message: '简介不能为空', trigger: 'blur' }],
+  birthday: [{ required: true, message: '出生日期不能为空', trigger: 'blur' }],
+  sex: [{ required: true, message: '性别不能为空', trigger: 'change' }],
+  enabled: [{ required: true, message: '是否有效不能为空', trigger: 'blur' }],
+  avatar: [{ required: true, message: '头像不能为空', trigger: 'blur' }],
+  memo: [{ required: true, message: '备注不能为空', trigger: 'blur' }],
+})
+const formRef = ref() // 表单 Ref
+
+/** 监听主表的关联字段的变化，加载对应的子表数据 */
+watch(
+  () => props.studentId,
+  async (val) => {
+    // 1. 重置表单
+    formData.value = {
+      id: undefined,
+      studentId: undefined,
+      name: undefined,
+      description: undefined,
+      birthday: undefined,
+      sex: undefined,
+      enabled: undefined,
+      avatar: undefined,
+      video: undefined,
+      memo: undefined,
+    }
+    // 2. val 非空，则加载数据
+    if (!val) {
+      return;
+    }
+    try {
+      formLoading.value = true
+      const data = await StudentApi.getStudentTeacherByStudentId(val)
+      if (!data) {
+        return
+      }
+      formData.value = data
+    } finally {
+      formLoading.value = false
+    }
+  },
+  { immediate: true }
+)
+
+/** 表单校验 */
+const validate = () => {
+  return formRef.value.validate()
+}
+
+/** 表单值 */
+const getData = () => {
+  return formData.value
+}
+
+defineExpose({ validate, getData })
+</script>

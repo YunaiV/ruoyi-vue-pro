@@ -28,8 +28,6 @@ import java.util.Objects;
  * 2. 如果请求未带租户的编号，检查是否是忽略的 URL，否则也不允许访问。
  * 3. 校验租户是合法，例如说被禁用、到期
  *
- * 校验用户访问的租户，是否是其所在的租户，
- *
  * @author 芋道源码
  */
 @Slf4j
@@ -75,13 +73,13 @@ public class TenantSecurityWebFilter extends ApiRequestFilter {
             }
         }
 
-        //检查是否是忽略的 URL, 如果是则允许访问
+        // 如果非允许忽略租户的 URL，则校验租户是否合法
         if (!isIgnoreUrl(request)) {
             // 2. 如果请求未带租户的编号，不允许访问。
             if (tenantId == null) {
                 log.error("[doFilterInternal][URL({}/{}) 未传递租户编号]", request.getRequestURI(), request.getMethod());
                 ServletUtils.writeJSON(response, CommonResult.error(GlobalErrorCodeConstants.BAD_REQUEST.getCode(),
-                        "租户的请求未传递，请进行排查"));
+                        "请求的租户标识未传递，请进行排查"));
                 return;
             }
             // 3. 校验租户是合法，例如说被禁用、到期
@@ -91,6 +89,10 @@ public class TenantSecurityWebFilter extends ApiRequestFilter {
                 CommonResult<?> result = globalExceptionHandler.allExceptionHandler(request, ex);
                 ServletUtils.writeJSON(response, result);
                 return;
+            }
+        } else { // 如果是允许忽略租户的 URL，若未传递租户编号，则默认忽略租户编号，避免报错
+            if (tenantId == null) {
+                TenantContextHolder.setIgnore(true);
             }
         }
 

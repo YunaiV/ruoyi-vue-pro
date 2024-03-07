@@ -4,7 +4,6 @@ import cn.iocoder.yudao.framework.common.validation.Mobile;
 import lombok.Data;
 
 import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
 import java.util.Map;
 
 /**
@@ -18,7 +17,6 @@ public class SmsSendSingleToUserReqDTO {
     /**
      * 用户编号
      */
-    @NotNull(message = "用户编号不能为空")
     private Long userId;
     /**
      * 手机号

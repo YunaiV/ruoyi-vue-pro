@@ -1,0 +1,181 @@
+#set ($subTable = $subTables.get($subIndex))##当前表
+#set ($subColumns = $subColumnsList.get($subIndex))##当前字段数组
+#set ($subJoinColumn = $subJoinColumns.get($subIndex))##当前 join 字段
+#set ($subSimpleClassName = $subSimpleClassNames.get($subIndex))
+#set ($subJoinColumn = $subJoinColumns.get($subIndex))##当前 join 字段
+#set ($SubJoinColumnName = $subJoinColumn.javaField.substring(0,1).toUpperCase() + ${subJoinColumn.javaField.substring(1)})##首字母大写
+<template>
+  <!-- 列表 -->
+  <ContentWrap>
+#if ($table.templateType == 11)
+    <el-button
+      type="primary"
+      plain
+      @click="openForm('create')"
+      v-hasPermi="['${permissionPrefix}:create']"
+    >
+      <Icon icon="ep:plus" class="mr-5px" /> 新增
+    </el-button>
+#end
+    <el-table v-loading="loading" :data="list" :stripe="true" :show-overflow-tooltip="true">
+      #foreach($column in $subColumns)
+      #if ($column.listOperationResult)
+        #set ($dictType=$column.dictType)
+        #set ($javaField = $column.javaField)
+        #set ($AttrName=$column.javaField.substring(0,1).toUpperCase() + ${column.javaField.substring(1)})
+        #set ($comment=$column.columnComment)
+        #if ( $column.id == $subJoinColumn.id) ## 特殊：忽略主子表的 join 字段，不用填写
+        #elseif ($column.javaType == "LocalDateTime")## 时间类型
+      <el-table-column
+        label="${comment}"
+        align="center"
+        prop="${javaField}"
+        :formatter="dateFormatter"
+        width="180px"
+      />
+        #elseif($column.dictType && "" != $column.dictType)## 数据字典
+      <el-table-column label="${comment}" align="center" prop="${javaField}">
+        <template #default="scope">
+          <dict-tag :type="DICT_TYPE.$dictType.toUpperCase()" :value="scope.row.${column.javaField}" />
+        </template>
+      </el-table-column>
+        #else
+      <el-table-column label="${comment}" align="center" prop="${javaField}" />
+        #end
+      #end
+    #end
+    #if ($table.templateType == 11)
+      <el-table-column label="操作" align="center">
+        <template #default="scope">
+          <el-button
+            link
+            type="primary"
+            @click="openForm('update', scope.row.id)"
+            v-hasPermi="['${permissionPrefix}:update']"
+          >
+            编辑
+          </el-button>
+          <el-button
+            link
+            type="danger"
+            @click="handleDelete(scope.row.id)"
+            v-hasPermi="['${permissionPrefix}:delete']"
+          >
+            删除
+          </el-button>
+        </template>
+      </el-table-column>
+    #end
+    </el-table>
+    #if ($table.templateType == 11)
+    <!-- 分页 -->
+    <Pagination
+      :total="total"
+      v-model:page="queryParams.pageNo"
+      v-model:limit="queryParams.pageSize"
+      @pagination="getList"
+    />
+    #end
+  </ContentWrap>
+#if ($table.templateType == 11)
+    <!-- 表单弹窗：添加/修改 -->
+    <${subSimpleClassName}Form ref="formRef" @success="getList" />
+#end
+</template>
+<script setup lang="ts">
+import { getIntDictOptions, getStrDictOptions, getBoolDictOptions, DICT_TYPE } from '@/utils/dict'
+import { dateFormatter } from '@/utils/formatTime'
+import { ${simpleClassName}Api } from '@/api/${table.moduleName}/${table.businessName}'
+#if ($table.templateType == 11)
+import ${subSimpleClassName}Form from './${subSimpleClassName}Form.vue'
+#end
+
+const { t } = useI18n() // 国际化
+const message = useMessage() // 消息弹窗
+
+const props = defineProps<{
+  ${subJoinColumn.javaField}: undefined // ${subJoinColumn.columnComment}（主表的关联字段）
+}>()
+const loading = ref(false) // 列表的加载中
+const list = ref([]) // 列表的数据
+#if ($table.templateType == 11)
+const total = ref(0) // 列表的总页数
+const queryParams = reactive({
+  pageNo: 1,
+  pageSize: 10,
+  ${subJoinColumn.javaField}: undefined
+})
+
+/** 监听主表的关联字段的变化，加载对应的子表数据 */
+watch(
+  () => props.${subJoinColumn.javaField},
+  (val) => {
+    queryParams.${subJoinColumn.javaField} = val
+    handleQuery()
+  },
+  { immediate: false }
+)
+#end
+
+/** 查询列表 */
+const getList = async () => {
+  loading.value = true
+  try {
+#if ($table.templateType == 11)
+    const data = await ${simpleClassName}Api.get${subSimpleClassName}Page(queryParams)
+    list.value = data.list
+    total.value = data.total
+#else
+  #if ( $subTable.subJoinMany )
+    list.value = await ${simpleClassName}Api.get${subSimpleClassName}ListBy${SubJoinColumnName}(props.${subJoinColumn.javaField})
+  #else
+    const data = await ${simpleClassName}Api.get${subSimpleClassName}By${SubJoinColumnName}(props.${subJoinColumn.javaField})
+    if (!data) {
+      return
+    }
+    list.value.push(data)
+  #end
+#end
+  } finally {
+    loading.value = false
+  }
+}
+
+/** 搜索按钮操作 */
+const handleQuery = () => {
+  queryParams.pageNo = 1
+  getList()
+}
+#if ($table.templateType == 11)
+
+/** 添加/修改操作 */
+const formRef = ref()
+const openForm = (type: string, id?: number) => {
+  if (!props.${subJoinColumn.javaField}) {
+    message.error('请选择一个${table.classComment}')
+    return
+  }
+  formRef.value.open(type, id, props.${subJoinColumn.javaField})
+}
+
+/** 删除按钮操作 */
+const handleDelete = async (id: number) => {
+  try {
+    // 删除的二次确认
+    await message.delConfirm()
+    // 发起删除
+    await ${simpleClassName}Api.delete${subSimpleClassName}(id)
+    message.success(t('common.delSuccess'))
+    // 刷新列表
+    await getList()
+  } catch {}
+}
+#end
+#if ($table.templateType != 11)
+
+/** 初始化 **/
+onMounted(() => {
+  getList()
+})
+#end
+</script>

@@ -1,0 +1,28 @@
+package cn.iocoder.yudao.module.infra.dal.mysql.demo;
+
+import java.util.*;
+
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.pojo.PageParam;
+import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
+import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
+import cn.iocoder.yudao.module.infra.dal.dataobject.demo.InfraStudentContactDO;
+import org.apache.ibatis.annotations.Mapper;
+
+/**
+ * 学生联系人 Mapper
+ *
+ * @author 芋道源码
+ */
+@Mapper
+public interface InfraStudentContactMapper extends BaseMapperX<InfraStudentContactDO> {
+
+    default List<InfraStudentContactDO> selectListByStudentId(Long studentId) {
+        return selectList(InfraStudentContactDO::getStudentId, studentId);
+    }
+
+    default int deleteByStudentId(Long studentId) {
+        return delete(InfraStudentContactDO::getStudentId, studentId);
+    }
+
+}
