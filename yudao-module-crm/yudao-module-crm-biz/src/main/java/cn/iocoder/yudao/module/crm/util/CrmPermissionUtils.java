@@ -103,4 +103,15 @@ public class CrmPermissionUtils {
                         .eq(CollUtil.isNotEmpty(bizIds), CrmPermissionDO::getUserId, userId));
     }
 
+    /**
+     * 给手机号脱敏
+     * @param telephone
+     * @return
+     */
+    public static String hideTelephone(String telephone) {
+        if (telephone == null) {
+            return null;
+        }
+        return telephone.replaceAll("(\\d{3})\\d{4}(\\d{4})", "$1****$2");
+    }
 }

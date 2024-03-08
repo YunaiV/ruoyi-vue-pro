@@ -37,7 +37,12 @@ public interface CrmClueMapper extends BaseMapperX<CrmClueDO> {
                 .eqIfPresent(CrmClueDO::getSource, pageReqVO.getSource())
                 .eqIfPresent(CrmClueDO::getFollowUpStatus, pageReqVO.getFollowUpStatus())
                 .orderByDesc(CrmClueDO::getId);
-        return selectJoinPage(pageReqVO, CrmClueDO.class, query);
+        PageResult<CrmClueDO> crmClueDOPageResult =  selectJoinPage(pageReqVO, CrmClueDO.class, query);
+        crmClueDOPageResult.getList().forEach(clue -> {
+            clue.setMobile(CrmPermissionUtils.hideTelephone(clue.getMobile()));
+            clue.setTelephone(CrmPermissionUtils.hideTelephone(clue.getTelephone()));
+        });
+        return crmClueDOPageResult;
     }
 
     default List<CrmClueDO> selectBatchIds(Collection<Long> ids, Long userId) {
