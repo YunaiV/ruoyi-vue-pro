@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.iocoder.yudao.module.crm.dal.mysql.statistics.CrmStatisticsStaffPerformanceMapper">
+
+
+    <select id="selectContractCountStaffPerformance"
+            resultType="cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.CrmStatisticsStaffPerformanceRespVO">
+        SELECT COUNT(1) AS count, DATE_FORMAT(order_date,'%Y-%m') AS orderDate
+        FROM crm_contract
+        WHERE deleted = 0
+        AND audit_status = 20
+        AND DATE_FORMAT(order_date,'%Y') in (#{year},#{year}-1)
+        GROUP BY DATE_FORMAT(order_date,'%Y-%m')
+    </select>
+    <select id="selectContractPriceStaffPerformance"
+            resultType="cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.CrmStatisticsStaffPerformanceRespVO">
+        SELECT IFNULL(SUM(total_price), 0) AS count, DATE_FORMAT(order_date,'%Y-%m') AS orderDate
+        FROM crm_contract
+        WHERE deleted = 0
+        AND audit_status = 20
+        AND DATE_FORMAT(order_date,'%Y') in (#{year},#{year}-1)
+        GROUP BY DATE_FORMAT(order_date,'%Y-%m')
+    </select>
+
+    <select id="selectReceivablePriceStaffPerformance"
+            resultType="cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.CrmStatisticsStaffPerformanceRespVO">
+        SELECT IFNULL(SUM(price), 0) AS count, DATE_FORMAT(return_time,'%Y-%m') AS orderDate
+        FROM crm_receivable
+        WHERE deleted = 0
+        AND audit_status = 20
+        AND DATE_FORMAT(return_time,'%Y') in (#{year},#{year}-1)
+        GROUP BY DATE_FORMAT(return_time,'%Y-%m')
+    </select>
+
+
+</mapper>
