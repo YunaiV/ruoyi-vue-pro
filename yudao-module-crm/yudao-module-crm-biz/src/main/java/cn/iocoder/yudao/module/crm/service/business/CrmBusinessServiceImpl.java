@@ -2,7 +2,6 @@ package cn.iocoder.yudao.module.crm.service.business;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.ListUtil;
-import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.number.MoneyUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
@@ -24,7 +23,6 @@ import cn.iocoder.yudao.module.crm.service.contact.CrmContactBusinessService;
 import cn.iocoder.yudao.module.crm.service.contact.CrmContactService;
 import cn.iocoder.yudao.module.crm.service.contract.CrmContractService;
 import cn.iocoder.yudao.module.crm.service.customer.CrmCustomerService;
-import cn.iocoder.yudao.module.crm.service.customer.CrmCustomerServiceImpl;
 import cn.iocoder.yudao.module.crm.service.permission.CrmPermissionService;
 import cn.iocoder.yudao.module.crm.service.permission.bo.CrmPermissionCreateReqBO;
 import cn.iocoder.yudao.module.crm.service.permission.bo.CrmPermissionTransferReqBO;
@@ -90,7 +88,7 @@ public class CrmBusinessServiceImpl implements CrmBusinessService {
             success = CRM_BUSINESS_CREATE_SUCCESS)
     public Long createBusiness(CrmBusinessSaveReqVO createReqVO, Long userId) {
         // 1.1 校验产品项的有效性
-        List<CrmBusinessProductDO> businessProducts = validateBusinessProducts(createReqVO.getProducts());
+        List<CrmBusinessProductDO> businessProducts = validateBusinessProducts(createReqVO.getBusinessProducts());
         // 1.2 校验关联字段
         validateRelationDataExists(createReqVO);
 
@@ -131,7 +129,7 @@ public class CrmBusinessServiceImpl implements CrmBusinessService {
         // 1.1 校验存在
         CrmBusinessDO oldBusiness = validateBusinessExists(updateReqVO.getId());
         // 1.2 校验产品项的有效性
-        List<CrmBusinessProductDO> businessProducts = validateBusinessProducts(updateReqVO.getProducts());
+        List<CrmBusinessProductDO> businessProducts = validateBusinessProducts(updateReqVO.getBusinessProducts());
         // 1.3 校验关联字段
         validateRelationDataExists(updateReqVO);
 
@@ -204,9 +202,9 @@ public class CrmBusinessServiceImpl implements CrmBusinessService {
         }
     }
 
-    private List<CrmBusinessProductDO> validateBusinessProducts(List<CrmBusinessSaveReqVO.Product> list) {
+    private List<CrmBusinessProductDO> validateBusinessProducts(List<CrmBusinessSaveReqVO.BusinessProduct> list) {
         // 1. 校验产品存在
-        productService.validProductList(convertSet(list, CrmBusinessSaveReqVO.Product::getProductId));
+        productService.validProductList(convertSet(list, CrmBusinessSaveReqVO.BusinessProduct::getProductId));
         // 2. 转化为 CrmBusinessProductDO 列表
         return convertList(list, o -> BeanUtils.toBean(o, CrmBusinessProductDO.class,
                 item -> item.setTotalPrice(MoneyUtils.priceMultiply(item.getBusinessPrice(), item.getCount()))));
