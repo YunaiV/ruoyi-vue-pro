@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.crm.controller.admin.permission;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
@@ -56,61 +57,18 @@ public class CrmPermissionController {
     @Resource
     private CrmPermissionService permissionService;
     @Resource
-    private CrmContactService contactService;
-    @Resource
-    private CrmBusinessService businessService;
-    @Resource
-    private CrmContractService contractService;
-    @Resource
     private AdminUserApi adminUserApi;
     @Resource
     private DeptApi deptApi;
     @Resource
     private PostApi postApi;
 
-    // TODO @puhui999：是不是还是叫 create 好点哈。
     @PostMapping("/create")
     @Operation(summary = "创建数据权限")
-    @Transactional(rollbackFor = Exception.class)
     @PreAuthorize("@ss.hasPermission('crm:permission:create')")
-    @CrmPermission(bizTypeValue = "#reqVO.bizType", bizId = "#reqVO.bizId", level = CrmPermissionLevelEnum.OWNER)
-    public CommonResult<Boolean> savePermission(@Valid @RequestBody CrmPermissionSaveReqVO reqVO) {
-        permissionService.createPermission(BeanUtils.toBean(reqVO, CrmPermissionCreateReqBO.class));
-        // 处理【同时添加至】的权限
-        if (CollUtil.isNotEmpty(reqVO.getToBizTypes())) {
-            createBizTypePermissions(reqVO);
-        }
+    public CommonResult<Boolean> create(@Valid @RequestBody CrmPermissionSaveReqVO reqVO) {
+        permissionService.createPermission(reqVO, getLoginUserId());
         return success(true);
-    }
-
-    private void createBizTypePermissions(CrmPermissionSaveReqVO reqVO) {
-        List<CrmPermissionCreateReqBO> createPermissions = new ArrayList<>();
-        // TODO @puhui999：需要考虑，被添加人，是不是应该有对应的权限了；
-        if (reqVO.getToBizTypes().contains(CrmBizTypeEnum.CRM_CONTACT.getType())) {
-            List<CrmContactDO> contactList = contactService.getContactListByCustomerIdOwnerUserId(reqVO.getBizId(), getLoginUserId());
-            contactList.forEach(item -> {
-                createPermissions.add(new CrmPermissionCreateReqBO().setBizType(CrmBizTypeEnum.CRM_CONTACT.getType())
-                        .setBizId(item.getId()).setUserId(reqVO.getUserId()).setLevel(reqVO.getLevel()));
-            });
-        }
-        if (reqVO.getToBizTypes().contains(CrmBizTypeEnum.CRM_BUSINESS.getType())) {
-            List<CrmBusinessDO> businessList = businessService.getBusinessListByCustomerIdOwnerUserId(reqVO.getBizId(), getLoginUserId());
-            businessList.forEach(item -> {
-                createPermissions.add(new CrmPermissionCreateReqBO().setBizType(CrmBizTypeEnum.CRM_BUSINESS.getType())
-                        .setBizId(item.getId()).setUserId(reqVO.getUserId()).setLevel(reqVO.getLevel()));
-            });
-        }
-        if (reqVO.getToBizTypes().contains(CrmBizTypeEnum.CRM_CONTRACT.getType())) {
-            List<CrmContractDO> contractList = contractService.getContractListByCustomerIdOwnerUserId(reqVO.getBizId(), getLoginUserId());
-            contractList.forEach(item -> {
-                createPermissions.add(new CrmPermissionCreateReqBO().setBizType(CrmBizTypeEnum.CRM_CONTRACT.getType())
-                        .setBizId(item.getId()).setUserId(reqVO.getUserId()).setLevel(reqVO.getLevel()));
-            });
-        }
-        if (CollUtil.isEmpty(createPermissions)) {
-            return;
-        }
-        permissionService.createPermissionBatch(createPermissions);
     }
 
     @PutMapping("/update")

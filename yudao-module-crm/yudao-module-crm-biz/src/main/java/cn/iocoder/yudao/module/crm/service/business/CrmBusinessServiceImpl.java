@@ -2,7 +2,6 @@ package cn.iocoder.yudao.module.crm.service.business;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.ListUtil;
-import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.number.MoneyUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
@@ -24,7 +23,6 @@ import cn.iocoder.yudao.module.crm.service.contact.CrmContactBusinessService;
 import cn.iocoder.yudao.module.crm.service.contact.CrmContactService;
 import cn.iocoder.yudao.module.crm.service.contract.CrmContractService;
 import cn.iocoder.yudao.module.crm.service.customer.CrmCustomerService;
-import cn.iocoder.yudao.module.crm.service.customer.CrmCustomerServiceImpl;
 import cn.iocoder.yudao.module.crm.service.permission.CrmPermissionService;
 import cn.iocoder.yudao.module.crm.service.permission.bo.CrmPermissionCreateReqBO;
 import cn.iocoder.yudao.module.crm.service.permission.bo.CrmPermissionTransferReqBO;
@@ -90,7 +88,7 @@ public class CrmBusinessServiceImpl implements CrmBusinessService {
             success = CRM_BUSINESS_CREATE_SUCCESS)
     public Long createBusiness(CrmBusinessSaveReqVO createReqVO, Long userId) {
         // 1.1 校验产品项的有效性
-        List<CrmBusinessProductDO> businessProducts = validateBusinessProducts(createReqVO.getProducts());
+        List<CrmBusinessProductDO> businessProducts = validateBusinessProducts(createReqVO.getBusinessProducts());
         // 1.2 校验关联字段
         validateRelationDataExists(createReqVO);
 
@@ -131,7 +129,7 @@ public class CrmBusinessServiceImpl implements CrmBusinessService {
         // 1.1 校验存在
         CrmBusinessDO oldBusiness = validateBusinessExists(updateReqVO.getId());
         // 1.2 校验产品项的有效性
-        List<CrmBusinessProductDO> businessProducts = validateBusinessProducts(updateReqVO.getProducts());
+        List<CrmBusinessProductDO> businessProducts = validateBusinessProducts(updateReqVO.getBusinessProducts());
         // 1.3 校验关联字段
         validateRelationDataExists(updateReqVO);
 
@@ -204,9 +202,9 @@ public class CrmBusinessServiceImpl implements CrmBusinessService {
         }
     }
 
-    private List<CrmBusinessProductDO> validateBusinessProducts(List<CrmBusinessSaveReqVO.Product> list) {
+    private List<CrmBusinessProductDO> validateBusinessProducts(List<CrmBusinessSaveReqVO.BusinessProduct> list) {
         // 1. 校验产品存在
-        productService.validProductList(convertSet(list, CrmBusinessSaveReqVO.Product::getProductId));
+        productService.validProductList(convertSet(list, CrmBusinessSaveReqVO.BusinessProduct::getProductId));
         // 2. 转化为 CrmBusinessProductDO 列表
         return convertList(list, o -> BeanUtils.toBean(o, CrmBusinessProductDO.class,
                 item -> item.setTotalPrice(MoneyUtils.priceMultiply(item.getBusinessPrice(), item.getCount()))));
@@ -294,18 +292,18 @@ public class CrmBusinessServiceImpl implements CrmBusinessService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    @LogRecord(type = CRM_BUSINESS_TYPE, subType = CRM_BUSINESS_TRANSFER_SUB_TYPE, bizNo = "{{#reqVO.bizId}}",
+    @LogRecord(type = CRM_BUSINESS_TYPE, subType = CRM_BUSINESS_TRANSFER_SUB_TYPE, bizNo = "{{#reqVO.id}}",
             success = CRM_BUSINESS_TRANSFER_SUCCESS)
-    @CrmPermission(bizType = CrmBizTypeEnum.CRM_BUSINESS, bizId = "#reqVO.bizId", level = CrmPermissionLevelEnum.OWNER)
+    @CrmPermission(bizType = CrmBizTypeEnum.CRM_BUSINESS, bizId = "#reqVO.id", level = CrmPermissionLevelEnum.OWNER)
     public void transferBusiness(CrmBusinessTransferReqVO reqVO, Long userId) {
         // 1 校验商机是否存在
-        CrmBusinessDO business = validateBusinessExists(reqVO.getBizId());
+        CrmBusinessDO business = validateBusinessExists(reqVO.getId());
 
         // 2.1 数据权限转移
         permissionService.transferPermission(new CrmPermissionTransferReqBO(userId, CrmBizTypeEnum.CRM_BUSINESS.getType(),
-                reqVO.getBizId(), reqVO.getNewOwnerUserId(), CrmPermissionLevelEnum.OWNER.getLevel()));
+                reqVO.getId(), reqVO.getNewOwnerUserId(), reqVO.getOldOwnerPermissionLevel()));
         // 2.2 设置新的负责人
-        businessMapper.updateOwnerUserIdById(reqVO.getBizId(), reqVO.getNewOwnerUserId());
+        businessMapper.updateOwnerUserIdById(reqVO.getId(), reqVO.getNewOwnerUserId());
 
         // 记录操作日志上下文
         LogRecordContext.putVariable("business", business);

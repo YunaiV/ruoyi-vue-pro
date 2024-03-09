@@ -199,19 +199,19 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    @LogRecord(type = CRM_CUSTOMER_TYPE, subType = CRM_CUSTOMER_TRANSFER_SUB_TYPE, bizNo = "{{#reqVO.bizId}}",
+    @LogRecord(type = CRM_CUSTOMER_TYPE, subType = CRM_CUSTOMER_TRANSFER_SUB_TYPE, bizNo = "{{#reqVO.id}}",
             success = CRM_CUSTOMER_TRANSFER_SUCCESS)
-    @CrmPermission(bizType = CrmBizTypeEnum.CRM_CUSTOMER, bizId = "#reqVO.bizId", level = CrmPermissionLevelEnum.OWNER)
+    @CrmPermission(bizType = CrmBizTypeEnum.CRM_CUSTOMER, bizId = "#reqVO.id", level = CrmPermissionLevelEnum.OWNER)
     public void transferCustomer(CrmCustomerTransferReqVO reqVO, Long userId) {
         // 1.1 校验客户是否存在
-        CrmCustomerDO customer = validateCustomerExists(reqVO.getBizId());
+        CrmCustomerDO customer = validateCustomerExists(reqVO.getId());
         // 1.2 校验拥有客户是否到达上限
         validateCustomerExceedOwnerLimit(reqVO.getNewOwnerUserId(), 1);
         // 2.1 数据权限转移
         permissionService.transferPermission(new CrmPermissionTransferReqBO(userId, CrmBizTypeEnum.CRM_CUSTOMER.getType(),
-                reqVO.getBizId(), reqVO.getNewOwnerUserId(), reqVO.getOldOwnerPermissionLevel()));
+                reqVO.getId(), reqVO.getNewOwnerUserId(), reqVO.getOldOwnerPermissionLevel()));
         // 2.2 转移后重新设置负责人
-        customerMapper.updateById(new CrmCustomerDO().setId(reqVO.getBizId())
+        customerMapper.updateById(new CrmCustomerDO().setId(reqVO.getId())
                 .setOwnerUserId(reqVO.getNewOwnerUserId()).setOwnerTime(LocalDateTime.now()));
 
         // 2.3 同时转移
@@ -231,21 +231,21 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
      */
     private void transfer(CrmCustomerTransferReqVO reqVO, Long userId) {
         if (reqVO.getToBizTypes().contains(CrmBizTypeEnum.CRM_CONTACT.getType())) {
-            List<CrmContactDO> contactList = contactService.getContactListByCustomerIdOwnerUserId(reqVO.getBizId(), userId);
+            List<CrmContactDO> contactList = contactService.getContactListByCustomerIdOwnerUserId(reqVO.getId(), userId);
             contactList.forEach(item -> {
                 contactService.transferContact(new CrmContactTransferReqVO(item.getId(), reqVO.getNewOwnerUserId(),
                         reqVO.getOldOwnerPermissionLevel()), userId);
             });
         }
         if (reqVO.getToBizTypes().contains(CrmBizTypeEnum.CRM_BUSINESS.getType())) {
-            List<CrmBusinessDO> businessList = businessService.getBusinessListByCustomerIdOwnerUserId(reqVO.getBizId(), userId);
+            List<CrmBusinessDO> businessList = businessService.getBusinessListByCustomerIdOwnerUserId(reqVO.getId(), userId);
             businessList.forEach(item -> {
                 businessService.transferBusiness(new CrmBusinessTransferReqVO(item.getId(), reqVO.getNewOwnerUserId(),
                         reqVO.getOldOwnerPermissionLevel()), userId);
             });
         }
         if (reqVO.getToBizTypes().contains(CrmBizTypeEnum.CRM_CONTRACT.getType())) {
-            List<CrmContractDO> contractList = contractService.getContractListByCustomerIdOwnerUserId(reqVO.getBizId(), userId);
+            List<CrmContractDO> contractList = contractService.getContractListByCustomerIdOwnerUserId(reqVO.getId(), userId);
             contractList.forEach(item -> {
                 contractService.transferContract(new CrmContractTransferReqVO(item.getId(), reqVO.getNewOwnerUserId(),
                         reqVO.getOldOwnerPermissionLevel()), userId);

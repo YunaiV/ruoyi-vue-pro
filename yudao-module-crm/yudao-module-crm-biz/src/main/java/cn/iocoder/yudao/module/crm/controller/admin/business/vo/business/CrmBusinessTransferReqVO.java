@@ -13,10 +13,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class CrmBusinessTransferReqVO {
 
-    // TODO @puhui999：这里最好还是用 id 哈，主要还是在 Business 业务里
     @Schema(description = "商机编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "10430")
     @NotNull(message = "商机编号不能为空")
-    private Long bizId;
+    private Long id;
 
     /**
      * 新负责人的用户编号

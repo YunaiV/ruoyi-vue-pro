@@ -8,9 +8,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 /**
- * Excel 所属地区列下拉数据源获取接口实现类
- *
- * // TODO @puhui999：类名叫：地区下拉框数据源的 {@link ExcelColumnSelectFunction} 实现类，这样看起来会更简洁一点哈
+ * 地区下拉框数据源的 {@link ExcelColumnSelectFunction} 实现类
  *
  * @author HUIHUI
  */
