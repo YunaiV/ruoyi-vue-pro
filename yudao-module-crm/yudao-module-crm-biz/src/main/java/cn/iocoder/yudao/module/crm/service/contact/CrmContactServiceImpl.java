@@ -2,7 +2,6 @@ package cn.iocoder.yudao.module.crm.service.contact;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.ListUtil;
-import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.crm.controller.admin.contact.vo.CrmContactBusinessReqVO;
@@ -18,7 +17,6 @@ import cn.iocoder.yudao.module.crm.framework.permission.core.annotations.CrmPerm
 import cn.iocoder.yudao.module.crm.service.business.CrmBusinessService;
 import cn.iocoder.yudao.module.crm.service.contract.CrmContractService;
 import cn.iocoder.yudao.module.crm.service.customer.CrmCustomerService;
-import cn.iocoder.yudao.module.crm.service.customer.CrmCustomerServiceImpl;
 import cn.iocoder.yudao.module.crm.service.permission.CrmPermissionService;
 import cn.iocoder.yudao.module.crm.service.permission.bo.CrmPermissionCreateReqBO;
 import cn.iocoder.yudao.module.crm.service.permission.bo.CrmPermissionTransferReqBO;
@@ -179,18 +177,18 @@ public class CrmContactServiceImpl implements CrmContactService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    @LogRecord(type = CRM_CONTACT_TYPE, subType = CRM_CONTACT_TRANSFER_SUB_TYPE, bizNo = "{{#reqVO.bizId}}",
+    @LogRecord(type = CRM_CONTACT_TYPE, subType = CRM_CONTACT_TRANSFER_SUB_TYPE, bizNo = "{{#reqVO.id}}",
             success = CRM_CONTACT_TRANSFER_SUCCESS)
-    @CrmPermission(bizType = CrmBizTypeEnum.CRM_CONTACT, bizId = "#reqVO.bizId", level = CrmPermissionLevelEnum.OWNER)
+    @CrmPermission(bizType = CrmBizTypeEnum.CRM_CONTACT, bizId = "#reqVO.id", level = CrmPermissionLevelEnum.OWNER)
     public void transferContact(CrmContactTransferReqVO reqVO, Long userId) {
         // 1 校验联系人是否存在
-        CrmContactDO contact = validateContactExists(reqVO.getBizId());
+        CrmContactDO contact = validateContactExists(reqVO.getId());
 
         // 2.1 数据权限转移
         permissionService.transferPermission(new CrmPermissionTransferReqBO(userId, CrmBizTypeEnum.CRM_CONTACT.getType(),
-                reqVO.getBizId(), reqVO.getNewOwnerUserId(), reqVO.getOldOwnerPermissionLevel()));
+                reqVO.getId(), reqVO.getNewOwnerUserId(), reqVO.getOldOwnerPermissionLevel()));
         // 2.2 设置新的负责人
-        contactMapper.updateById(new CrmContactDO().setId(reqVO.getBizId()).setOwnerUserId(reqVO.getNewOwnerUserId()));
+        contactMapper.updateById(new CrmContactDO().setId(reqVO.getId()).setOwnerUserId(reqVO.getNewOwnerUserId()));
 
         // 3. 记录转移日志
         LogRecordContext.putVariable("contact", contact);

@@ -13,7 +13,7 @@ public class CrmCustomerTransferReqVO {
 
     @Schema(description = "客户编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "10430")
     @NotNull(message = "客户编号不能为空")
-    private Long bizId;
+    private Long id;
 
     /**
      * 新负责人的用户编号

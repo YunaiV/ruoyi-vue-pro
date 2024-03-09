@@ -17,7 +17,7 @@ public class CrmContractTransferReqVO {
 
     @Schema(description = "合同编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "10430")
     @NotNull(message = "联系人编号不能为空")
-    private Long bizId;
+    private Long id;
 
     @Schema(description = "新负责人的用户编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "10430")
     @NotNull(message = "新负责人的用户编号不能为空")

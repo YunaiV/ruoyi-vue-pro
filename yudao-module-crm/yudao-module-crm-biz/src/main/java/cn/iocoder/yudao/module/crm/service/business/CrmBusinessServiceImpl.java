@@ -292,18 +292,18 @@ public class CrmBusinessServiceImpl implements CrmBusinessService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    @LogRecord(type = CRM_BUSINESS_TYPE, subType = CRM_BUSINESS_TRANSFER_SUB_TYPE, bizNo = "{{#reqVO.bizId}}",
+    @LogRecord(type = CRM_BUSINESS_TYPE, subType = CRM_BUSINESS_TRANSFER_SUB_TYPE, bizNo = "{{#reqVO.id}}",
             success = CRM_BUSINESS_TRANSFER_SUCCESS)
-    @CrmPermission(bizType = CrmBizTypeEnum.CRM_BUSINESS, bizId = "#reqVO.bizId", level = CrmPermissionLevelEnum.OWNER)
+    @CrmPermission(bizType = CrmBizTypeEnum.CRM_BUSINESS, bizId = "#reqVO.id", level = CrmPermissionLevelEnum.OWNER)
     public void transferBusiness(CrmBusinessTransferReqVO reqVO, Long userId) {
         // 1 校验商机是否存在
-        CrmBusinessDO business = validateBusinessExists(reqVO.getBizId());
+        CrmBusinessDO business = validateBusinessExists(reqVO.getId());
 
         // 2.1 数据权限转移
         permissionService.transferPermission(new CrmPermissionTransferReqBO(userId, CrmBizTypeEnum.CRM_BUSINESS.getType(),
-                reqVO.getBizId(), reqVO.getNewOwnerUserId(), CrmPermissionLevelEnum.OWNER.getLevel()));
+                reqVO.getId(), reqVO.getNewOwnerUserId(), reqVO.getOldOwnerPermissionLevel()));
         // 2.2 设置新的负责人
-        businessMapper.updateOwnerUserIdById(reqVO.getBizId(), reqVO.getNewOwnerUserId());
+        businessMapper.updateOwnerUserIdById(reqVO.getId(), reqVO.getNewOwnerUserId());
 
         // 记录操作日志上下文
         LogRecordContext.putVariable("business", business);

@@ -60,32 +60,17 @@ public class SelectSheetWriteHandler implements SheetWriteHandler {
         }
 
         // 解析下拉数据
-        Map<String, Field> excelPropertyFields = getFieldsWithAnnotation(head, ExcelProperty.class);
-        Map<String, Field> excelColumnSelectFields = getFieldsWithAnnotation(head, ExcelColumnSelect.class);
         int colIndex = 0;
-        for (String fieldName : excelPropertyFields.keySet()) {
-            Field field = excelColumnSelectFields.get(fieldName);
-            if (field != null) {
-                // ExcelProperty 有一个自定义列索引的属性 index 兼容这个字段
-                int index = field.getAnnotation(ExcelProperty.class).index();
-                if (index != -1) {
-                    colIndex = index;
+        for (Field field : head.getDeclaredFields()) {
+            if (field.isAnnotationPresent(ExcelColumnSelect.class)) {
+                ExcelProperty excelProperty = field.getAnnotation(ExcelProperty.class);
+                if (excelProperty != null && excelProperty.index() != -1) {
+                    colIndex = excelProperty.index();
                 }
-                buildSelectDataList(colIndex, field);
+                getSelectDataList(colIndex, field);
             }
             colIndex++;
         }
-        // TODO @puhui999：感觉可以 head 循环 field，如果有 ExcelColumnSelect 则进行处理；而 ExcelProperty 可能是非必须的。回答：主要是用于定位到列索引；补充：可以看看下面这样写？
-//        for (Field field : head.getDeclaredFields()) {
-//            if (field.isAnnotationPresent(ExcelColumnSelect.class)) {
-//                ExcelProperty excelProperty = field.getAnnotation(ExcelProperty.class);
-//                if (excelProperty != null) {
-//                    colIndex = excelProperty.index();
-//                }
-//                getSelectDataList(colIndex, field);
-//            }
-//            colIndex++;
-//        }
     }
 
     /**
@@ -94,7 +79,7 @@ public class SelectSheetWriteHandler implements SheetWriteHandler {
      * @param colIndex 列索引
      * @param field    字段
      */
-    private void buildSelectDataList(int colIndex, Field field) {
+    private void getSelectDataList(int colIndex, Field field) {
         ExcelColumnSelect columnSelect = field.getAnnotation(ExcelColumnSelect.class);
         String dictType = columnSelect.dictType();
         String functionName = columnSelect.functionName();
@@ -172,17 +157,6 @@ public class SelectSheetWriteHandler implements SheetWriteHandler {
         validation.createErrorBox("提示", "此值不存在于下拉选择中！");
         // 2.3 添加下拉框约束
         writeSheetHolder.getSheet().addValidationData(validation);
-    }
-
-    public static Map<String, Field> getFieldsWithAnnotation(Class<?> clazz, Class<? extends Annotation> annotationClass) {
-        Map<String, Field> annotatedFields = new LinkedHashMap<>();
-        Field[] fields = clazz.getDeclaredFields();
-        for (Field field : fields) {
-            if (field.isAnnotationPresent(annotationClass)) {
-                annotatedFields.put(field.getName(), field);
-            }
-        }
-        return annotatedFields;
     }
 
 }

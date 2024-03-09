@@ -252,18 +252,18 @@ public class CrmContractServiceImpl implements CrmContractService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    @LogRecord(type = CRM_CONTRACT_TYPE, subType = CRM_CONTRACT_TRANSFER_SUB_TYPE, bizNo = "{{#reqVO.bizId}}",
+    @LogRecord(type = CRM_CONTRACT_TYPE, subType = CRM_CONTRACT_TRANSFER_SUB_TYPE, bizNo = "{{#reqVO.id}}",
             success = CRM_CONTRACT_TRANSFER_SUCCESS)
-    @CrmPermission(bizType = CrmBizTypeEnum.CRM_CONTRACT, bizId = "#reqVO.bizId", level = CrmPermissionLevelEnum.OWNER)
+    @CrmPermission(bizType = CrmBizTypeEnum.CRM_CONTRACT, bizId = "#reqVO.id", level = CrmPermissionLevelEnum.OWNER)
     public void transferContract(CrmContractTransferReqVO reqVO, Long userId) {
         // 1. 校验合同是否存在
-        CrmContractDO contract = validateContractExists(reqVO.getBizId());
+        CrmContractDO contract = validateContractExists(reqVO.getId());
 
         // 2.1 数据权限转移
         crmPermissionService.transferPermission(new CrmPermissionTransferReqBO(userId, CrmBizTypeEnum.CRM_CONTRACT.getType(),
-                reqVO.getBizId(), reqVO.getNewOwnerUserId(), reqVO.getOldOwnerPermissionLevel()));
+                reqVO.getId(), reqVO.getNewOwnerUserId(), reqVO.getOldOwnerPermissionLevel()));
         // 2.2 设置负责人
-        contractMapper.updateById(new CrmContractDO().setId(reqVO.getBizId()).setOwnerUserId(reqVO.getNewOwnerUserId()));
+        contractMapper.updateById(new CrmContractDO().setId(reqVO.getId()).setOwnerUserId(reqVO.getNewOwnerUserId()));
 
         // 3. 记录转移日志
         LogRecordContext.putVariable("contract", contract);
