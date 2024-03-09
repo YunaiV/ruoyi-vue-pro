@@ -626,6 +626,16 @@
                 <groupId>com.bstek.ureport</groupId>
                 <artifactId>ureport2-console</artifactId>
                 <version>${ureport2.version}</version>
+                <exclusions>
+                    <exclusion><!-- 包冲突 积木报表 导出Excel报错 -->
+                        <groupId>org.apache.poi</groupId>
+                        <artifactId>poi</artifactId>
+                    </exclusion>
+                    <exclusion><!-- 包冲突 积木报表 导出Excel报错 -->
+                        <groupId>org.apache.poi</groupId>
+                        <artifactId>poi-ooxml</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
 
         </dependencies>
