@@ -123,11 +123,11 @@ public interface CrmReceivableService {
     Map<Long, BigDecimal> getReceivablePriceMapByContractId(Collection<Long> contractIds);
 
     /**
-     * 更具合同编号查询回款列表
+     * 根据合同编号查询回款数量
      *
      * @param contractId 合同编号
-     * @return 回款
+     * @return 回款数量
      */
-    Long getReceivableByContractId(Long contractId);
+    Long getReceivableCountByContractId(Long contractId);
 
 }

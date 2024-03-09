@@ -74,6 +74,7 @@ public interface CrmContactMapper extends BaseMapperX<CrmContactDO> {
     }
 
     default List<CrmContactDO> selectListByCustomerIdOwnerUserId(Long customerId, Long ownerUserId) {
+        // TODO @puhui999：父类有 selectList，查询 2 个字段的简化方法哈，可以用下
         return selectList(new LambdaQueryWrapperX<CrmContactDO>()
                 .eq(CrmContactDO::getCustomerId, customerId)
                 .eq(CrmContactDO::getOwnerUserId, ownerUserId));

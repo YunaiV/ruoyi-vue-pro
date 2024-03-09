@@ -13,8 +13,6 @@ import lombok.extern.slf4j.Slf4j;
 import java.time.Duration;
 import java.util.List;
 
-import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
-
 /**
  * 字典工具类
  *
@@ -27,6 +25,7 @@ public class DictFrameworkUtils {
 
     private static final DictDataRespDTO DICT_DATA_NULL = new DictDataRespDTO();
 
+    // TODO @puhui999：GET_DICT_DATA_CACHE、GET_DICT_DATA_LIST_CACHE、PARSE_DICT_DATA_CACHE 这 3 个缓存是有点重叠，可以思考下，有没可能减少 1 个。微信讨论好私聊，再具体改哈
     /**
      * 针对 {@link #getDictDataLabel(String, String)} 的缓存
      */

@@ -33,7 +33,8 @@ public class CrmPermissionSaveReqVO {
     private Integer level;
 
     /**
-     * 添加客户团队成员时，需要额外有【联系人】【商机】【合同】的 checkbox 选择
+     * 添加客户团队成员时，需要额外有【联系人】【商机】【合同】的 checkbox 选择。
+     * 选中时，同时添加对应的权限
      */
     @Schema(description = "同时添加", requiredMode = Schema.RequiredMode.REQUIRED, example = "10430")
     private List<Integer> toBizTypes;

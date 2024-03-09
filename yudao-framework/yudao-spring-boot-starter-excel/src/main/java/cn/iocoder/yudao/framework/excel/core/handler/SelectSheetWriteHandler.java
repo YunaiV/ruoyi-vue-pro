@@ -1,8 +1,9 @@
 package cn.iocoder.yudao.framework.excel.core.handler;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.lang.Assert;
 import cn.hutool.core.map.MapUtil;
-import cn.hutool.core.util.ObjUtil;
+import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.spring.SpringUtil;
 import cn.hutool.poi.excel.ExcelUtil;
@@ -59,7 +60,6 @@ public class SelectSheetWriteHandler implements SheetWriteHandler {
         }
 
         // 解析下拉数据
-        // TODO @puhui999：感觉可以 head 循环 field，如果有 ExcelColumnSelect 则进行处理；而 ExcelProperty 可能是非必须的。回答：主要是用于定位到列索引
         Map<String, Field> excelPropertyFields = getFieldsWithAnnotation(head, ExcelProperty.class);
         Map<String, Field> excelColumnSelectFields = getFieldsWithAnnotation(head, ExcelColumnSelect.class);
         int colIndex = 0;
@@ -71,39 +71,47 @@ public class SelectSheetWriteHandler implements SheetWriteHandler {
                 if (index != -1) {
                     colIndex = index;
                 }
-                getSelectDataList(colIndex, field);
+                buildSelectDataList(colIndex, field);
             }
             colIndex++;
         }
+        // TODO @puhui999：感觉可以 head 循环 field，如果有 ExcelColumnSelect 则进行处理；而 ExcelProperty 可能是非必须的。回答：主要是用于定位到列索引；补充：可以看看下面这样写？
+//        for (Field field : head.getDeclaredFields()) {
+//            if (field.isAnnotationPresent(ExcelColumnSelect.class)) {
+//                ExcelProperty excelProperty = field.getAnnotation(ExcelProperty.class);
+//                if (excelProperty != null) {
+//                    colIndex = excelProperty.index();
+//                }
+//                getSelectDataList(colIndex, field);
+//            }
+//            colIndex++;
+//        }
     }
 
     /**
-     * 获得下拉数据
+     * 获得下拉数据，并添加到 {@link #selectMap} 中
      *
      * @param colIndex 列索引
      * @param field    字段
      */
-    private void getSelectDataList(int colIndex, Field field) {
-        // 获得下拉注解信息
+    private void buildSelectDataList(int colIndex, Field field) {
         ExcelColumnSelect columnSelect = field.getAnnotation(ExcelColumnSelect.class);
         String dictType = columnSelect.dictType();
+        String functionName = columnSelect.functionName();
+        Assert.isTrue(ObjectUtil.isNotEmpty(dictType) || ObjectUtil.isNotEmpty(functionName),
+                "Field({}) 的 @ExcelColumnSelect 注解，dictType 和 functionName 不能同时为空", field.getName());
+
+        // 情况一：使用 dictType 获得下拉数据
         if (StrUtil.isNotEmpty(dictType)) { // 情况一： 字典数据 （默认）
             selectMap.put(colIndex, DictFrameworkUtils.getDictDataLabelList(dictType));
             return;
         }
-        String functionName = columnSelect.functionName();
-        if (StrUtil.isEmpty(functionName)) { // 情况二： 获取自定义数据
-            log.warn("[getSelectDataList]解析下拉数据失败,参数信息 dictType[{}] functionName[{}]", dictType, functionName);
-            return;
-        }
-        // 获得所有的下拉数据源获取方法
+
+        // 情况二：使用 functionName 获得下拉数据
         Map<String, ExcelColumnSelectFunction> functionMap = SpringUtil.getApplicationContext().getBeansOfType(ExcelColumnSelectFunction.class);
-        functionMap.values().forEach(func -> {
-            if (ObjUtil.notEqual(func.getName(), functionName)) {
-                return;
-            }
-            selectMap.put(colIndex, func.getOptions());
-        });
+        ExcelColumnSelectFunction function = CollUtil.findOne(functionMap.values(), item -> item.getName().equals(functionName));
+        Assert.notNull(function, "未找到对应的 function({})", functionName);
+        selectMap.put(colIndex, function.getOptions());
     }
 
     @Override
@@ -121,7 +129,7 @@ public class SelectSheetWriteHandler implements SheetWriteHandler {
         Sheet dictSheet = workbook.createSheet(DICT_SHEET_NAME);
         for (KeyValue<Integer, List<String>> keyValue : keyValues) {
             int rowLength = keyValue.getValue().size();
-            // 2.1 设置字典 sheet 页的值 每一列一个字典项
+            // 2.1 设置字典 sheet 页的值，每一列一个字典项
             for (int i = 0; i < rowLength; i++) {
                 Row row = dictSheet.getRow(i);
                 if (row == null) {

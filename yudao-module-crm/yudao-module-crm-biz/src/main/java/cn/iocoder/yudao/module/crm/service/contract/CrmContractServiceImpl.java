@@ -4,7 +4,6 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.ObjUtil;
-import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.number.MoneyUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
@@ -27,7 +26,6 @@ import cn.iocoder.yudao.module.crm.framework.permission.core.annotations.CrmPerm
 import cn.iocoder.yudao.module.crm.service.business.CrmBusinessService;
 import cn.iocoder.yudao.module.crm.service.contact.CrmContactService;
 import cn.iocoder.yudao.module.crm.service.customer.CrmCustomerService;
-import cn.iocoder.yudao.module.crm.service.customer.CrmCustomerServiceImpl;
 import cn.iocoder.yudao.module.crm.service.permission.CrmPermissionService;
 import cn.iocoder.yudao.module.crm.service.permission.bo.CrmPermissionCreateReqBO;
 import cn.iocoder.yudao.module.crm.service.permission.bo.CrmPermissionTransferReqBO;
@@ -231,7 +229,7 @@ public class CrmContractServiceImpl implements CrmContractService {
         // 1.1 校验存在
         CrmContractDO contract = validateContractExists(id);
         // 1.2 如果被 CrmReceivableDO 所使用，则不允许删除
-        if (receivableService.getReceivableByContractId(contract.getId()) != 0) {
+        if (receivableService.getReceivableCountByContractId(contract.getId()) > 0) {
             throw exception(CONTRACT_DELETE_FAIL);
         }
 

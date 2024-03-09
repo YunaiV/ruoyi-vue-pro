@@ -68,22 +68,24 @@ public class CrmPermissionController {
     @Resource
     private PostApi postApi;
 
+    // TODO @puhui999：是不是还是叫 create 好点哈。
     @PostMapping("/create")
     @Operation(summary = "创建数据权限")
     @Transactional(rollbackFor = Exception.class)
     @PreAuthorize("@ss.hasPermission('crm:permission:create')")
     @CrmPermission(bizTypeValue = "#reqVO.bizType", bizId = "#reqVO.bizId", level = CrmPermissionLevelEnum.OWNER)
-    public CommonResult<Boolean> addPermission(@Valid @RequestBody CrmPermissionSaveReqVO reqVO) {
+    public CommonResult<Boolean> savePermission(@Valid @RequestBody CrmPermissionSaveReqVO reqVO) {
         permissionService.createPermission(BeanUtils.toBean(reqVO, CrmPermissionCreateReqBO.class));
+        // 处理【同时添加至】的权限
         if (CollUtil.isNotEmpty(reqVO.getToBizTypes())) {
             createBizTypePermissions(reqVO);
         }
         return success(true);
     }
 
-
     private void createBizTypePermissions(CrmPermissionSaveReqVO reqVO) {
         List<CrmPermissionCreateReqBO> createPermissions = new ArrayList<>();
+        // TODO @puhui999：需要考虑，被添加人，是不是应该有对应的权限了；
         if (reqVO.getToBizTypes().contains(CrmBizTypeEnum.CRM_CONTACT.getType())) {
             List<CrmContactDO> contactList = contactService.getContactListByCustomerIdOwnerUserId(reqVO.getBizId(), getLoginUserId());
             contactList.forEach(item -> {

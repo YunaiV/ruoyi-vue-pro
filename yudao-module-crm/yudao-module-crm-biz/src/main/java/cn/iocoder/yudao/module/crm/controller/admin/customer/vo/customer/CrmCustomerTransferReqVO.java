@@ -31,7 +31,7 @@ public class CrmCustomerTransferReqVO {
     private Integer oldOwnerPermissionLevel;
 
     /**
-     * 转移客户时，需要额外有【联系人】【商机】【合同】的 checkbox 选择
+     * 转移客户时，需要额外有【联系人】【商机】【合同】的 checkbox 选择。选中时，也一起转移
      */
     @Schema(description = "同时转移", requiredMode = Schema.RequiredMode.REQUIRED, example = "10430")
     private List<Integer> toBizTypes;

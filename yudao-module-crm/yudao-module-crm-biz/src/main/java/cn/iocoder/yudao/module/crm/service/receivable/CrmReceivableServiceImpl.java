@@ -302,8 +302,8 @@ public class CrmReceivableServiceImpl implements CrmReceivableService {
     }
 
     @Override
-    public Long getReceivableByContractId(Long contractId) {
-        return receivableMapper.selectCount(CrmReceivableDO::getContractId, contractId);
+    public Long getReceivableCountByContractId(Long contractId) {
+        return receivableMapper.selectCountByContractId(contractId);
     }
 
 }

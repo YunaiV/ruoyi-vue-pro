@@ -4,7 +4,7 @@ import cn.iocoder.yudao.framework.excel.core.annotations.DictFormat;
 import cn.iocoder.yudao.framework.excel.core.annotations.ExcelColumnSelect;
 import cn.iocoder.yudao.framework.excel.core.convert.AreaConvert;
 import cn.iocoder.yudao.framework.excel.core.convert.DictConvert;
-import cn.iocoder.yudao.module.crm.framework.excel.core.AreaExcelColumnSelectFunctionImpl;
+import cn.iocoder.yudao.module.crm.framework.excel.core.AreaExcelColumnSelectFunction;
 import com.alibaba.excel.annotation.ExcelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -43,7 +43,7 @@ public class CrmCustomerImportExcelVO {
     private String email;
 
     @ExcelProperty(value = "地区", converter = AreaConvert.class)
-    @ExcelColumnSelect(functionName = AreaExcelColumnSelectFunctionImpl.NAME)
+    @ExcelColumnSelect(functionName = AreaExcelColumnSelectFunction.NAME)
     private Integer areaId;
 
     @ExcelProperty("详细地址")
