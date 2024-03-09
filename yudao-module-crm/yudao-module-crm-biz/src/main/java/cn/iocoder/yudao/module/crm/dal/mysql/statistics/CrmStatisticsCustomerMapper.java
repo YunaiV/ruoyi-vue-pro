@@ -13,17 +13,18 @@ import java.util.List;
 @Mapper
 public interface CrmStatisticsCustomerMapper {
 
-    List<CrmStatisticsCustomerSummaryByDateRespVO> selectCustomerCreateCountGroupbyDate(CrmStatisticsCustomerReqVO reqVO);
+    // TODO @dhb52：拼写，GroupBy。一般 idea 如果出现绿色的警告，可能是单词拼写错误，建议是要修改的哈；
+    List<CrmStatisticsCustomerSummaryByDateRespVO> selectCustomerCreateCountGroupbyDate(CrmStatisticsCustomerReqVO reqVO); // 已经 review
 
-    List<CrmStatisticsCustomerSummaryByDateRespVO> selectCustomerDealCountGroupbyDate(CrmStatisticsCustomerReqVO reqVO);
+    List<CrmStatisticsCustomerSummaryByDateRespVO> selectCustomerDealCountGroupbyDate(CrmStatisticsCustomerReqVO reqVO); // 已经 review
 
-    List<CrmStatisticsCustomerSummaryByUserRespVO> selectCustomerCreateCountGroupbyUser(CrmStatisticsCustomerReqVO reqVO);
+    List<CrmStatisticsCustomerSummaryByUserRespVO> selectCustomerCreateCountGroupbyUser(CrmStatisticsCustomerReqVO reqVO); // 已经 review
 
-    List<CrmStatisticsCustomerSummaryByUserRespVO> selectCustomerDealCountGroupbyUser(CrmStatisticsCustomerReqVO crmStatisticsCustomerReqVO);
+    List<CrmStatisticsCustomerSummaryByUserRespVO> selectCustomerDealCountGroupbyUser(CrmStatisticsCustomerReqVO crmStatisticsCustomerReqVO); // 已经 review
 
-    List<CrmStatisticsCustomerSummaryByUserRespVO> selectContractPriceGroupbyUser(CrmStatisticsCustomerReqVO crmStatisticsCustomerReqVO);
+    List<CrmStatisticsCustomerSummaryByUserRespVO> selectContractPriceGroupbyUser(CrmStatisticsCustomerReqVO crmStatisticsCustomerReqVO); // 已经 review
 
-    List<CrmStatisticsCustomerSummaryByUserRespVO> selectReceivablePriceGroupbyUser(CrmStatisticsCustomerReqVO crmStatisticsCustomerReqVO);
+    List<CrmStatisticsCustomerSummaryByUserRespVO> selectReceivablePriceGroupbyUser(CrmStatisticsCustomerReqVO crmStatisticsCustomerReqVO);  // 已经 review
 
     List<CrmStatisticsFollowupSummaryByDateRespVO> selectFollowupRecordCountGroupbyDate(CrmStatisticsCustomerReqVO reqVO);
 

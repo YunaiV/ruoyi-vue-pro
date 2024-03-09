@@ -55,7 +55,6 @@ public class CrmStatisticsCustomerServiceImpl implements CrmStatisticsCustomerSe
     @Resource
     private DictDataApi dictDataApi;
 
-
     @Override
     public List<CrmStatisticsCustomerSummaryByDateRespVO> getCustomerSummaryByDate(CrmStatisticsCustomerReqVO reqVO) {
         // 1. 获得用户编号数组
@@ -66,14 +65,17 @@ public class CrmStatisticsCustomerServiceImpl implements CrmStatisticsCustomerSe
         reqVO.setUserIds(userIds);
 
         // 2. 获取分项统计数据
+        // TODO @dhb52：如果是 list 变量，要么 List 要么 s 后缀
         reqVO.setSqlDateFormat(getSqlDateFormat(reqVO.getTimes()[0], reqVO.getTimes()[1]));
         final List<CrmStatisticsCustomerSummaryByDateRespVO> customerCreateCount = customerMapper.selectCustomerCreateCountGroupbyDate(reqVO);
         final List<CrmStatisticsCustomerSummaryByDateRespVO> customerDealCount = customerMapper.selectCustomerDealCountGroupbyDate(reqVO);
 
         // 3. 获取时间序列
+        // TODO @dhb52：3 和 4 其实做的是一类事情，所以可以考虑 3.1 获取时间序列、3.2 合并统计数据 这样注释；然后中间就不空行了；就是说，一般空行的目的，是让逻辑分片，看着整体性更好，但是不能让逻辑感觉碎碎的；
         final List<String> times = generateTimeSeries(reqVO.getTimes()[0], reqVO.getTimes()[1]);
 
         // 4. 合并统计数据
+        // TODO @dhb52：这个是不是要 add 到 respVoList 里？或者还可以 convertList(times, time -> new CrmStatisticsCustomerDealCycleByDateRespVO()...)
         List<CrmStatisticsCustomerSummaryByDateRespVO> respVoList = new ArrayList<>(times.size());
         final Map<String, Integer> customerCreateCountMap = convertMap(customerCreateCount,
             CrmStatisticsCustomerSummaryByDateRespVO::getTime,
@@ -86,7 +88,6 @@ public class CrmStatisticsCustomerServiceImpl implements CrmStatisticsCustomerSe
                 .setCustomerCreateCount(customerCreateCountMap.getOrDefault(time, 0))
                 .setCustomerDealCount(customerDealCountMap.getOrDefault(time, 0))
         ));
-
         return respVoList;
     }
 
@@ -131,7 +132,6 @@ public class CrmStatisticsCustomerServiceImpl implements CrmStatisticsCustomerSe
 
         // 4. 拼接用户信息
         appendUserInfo(respVoList);
-
         return respVoList;
     }
 
@@ -202,7 +202,6 @@ public class CrmStatisticsCustomerServiceImpl implements CrmStatisticsCustomerSe
 
         // 4. 拼接用户信息
         appendUserInfo(respVoList);
-
         return respVoList;
     }
 
@@ -290,7 +289,6 @@ public class CrmStatisticsCustomerServiceImpl implements CrmStatisticsCustomerSe
             new CrmStatisticsCustomerDealCycleByDateRespVO().setTime(time)
                 .setCustomerDealCycle(customerDealCycleMap.getOrDefault(time, 0D))
         ));
-
         return respVoList;
     }
 
@@ -337,9 +335,8 @@ public class CrmStatisticsCustomerServiceImpl implements CrmStatisticsCustomerSe
      */
     private <T extends CrmStatisticsCustomerByUserBaseRespVO> void appendUserInfo(List<T> respVoList) {
         Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(convertSet(respVoList,
-            CrmStatisticsCustomerByUserBaseRespVO::getOwnerUserId));
-        respVoList.forEach(vo -> MapUtils.findAndThen(userMap,
-            vo.getOwnerUserId(), user -> vo.setOwnerUserName(user.getNickname())));
+                CrmStatisticsCustomerByUserBaseRespVO::getOwnerUserId));
+        respVoList.forEach(vo -> MapUtils.findAndThen(userMap, vo.getOwnerUserId(), user -> vo.setOwnerUserName(user.getNickname())));
     }
 
     /**
@@ -349,16 +346,17 @@ public class CrmStatisticsCustomerServiceImpl implements CrmStatisticsCustomerSe
      * @return 用户编号数组
      */
     private List<Long> getUserIds(CrmStatisticsCustomerReqVO reqVO) {
+        // 情况一：选中某个用户
         if (ObjUtil.isNotNull(reqVO.getUserId())) {
             return List.of(reqVO.getUserId());
-        } else {
-            // 1. 获得部门列表
-            final Long deptId = reqVO.getDeptId();
-            List<Long> deptIds = convertList(deptApi.getChildDeptList(deptId), DeptRespDTO::getId);
-            deptIds.add(deptId);
-            // 2. 获得用户编号
-            return convertList(adminUserApi.getUserListByDeptIds(deptIds), AdminUserRespDTO::getId);
         }
+        // 情况二：选中某个部门
+        // 2.1 获得部门列表
+        final Long deptId = reqVO.getDeptId();
+        List<Long> deptIds = convertList(deptApi.getChildDeptList(deptId), DeptRespDTO::getId);
+        deptIds.add(deptId);
+        // 2.2 获得用户编号
+        return convertList(adminUserApi.getUserListByDeptIds(deptIds), AdminUserRespDTO::getId);
     }
 
 
@@ -380,6 +378,7 @@ public class CrmStatisticsCustomerServiceImpl implements CrmStatisticsCustomerSe
      * @param endTime   结束时间
      * @return 时间序列
      */
+    // TODO @dhb52：可以抽象到 DateUtils 里，开始时间、结束时间，事件间隔，然后返回这个哈；
     private List<String> generateTimeSeries(LocalDateTime startTime, LocalDateTime endTime) {
         boolean byMonth = queryByMonth(startTime, endTime);
         List<String> times = CollUtil.newArrayList();

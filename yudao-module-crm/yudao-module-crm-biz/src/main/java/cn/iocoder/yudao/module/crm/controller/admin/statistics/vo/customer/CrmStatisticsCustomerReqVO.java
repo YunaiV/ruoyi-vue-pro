@@ -12,7 +12,7 @@ import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
-@Schema(description = "管理后台 - CRM 数据统计 员工客户分析 Request VO")
+@Schema(description = "管理后台 - CRM 数据统计的员工客户分析 Request VO")
 @Data
 public class CrmStatisticsCustomerReqVO {
 
@@ -39,12 +39,16 @@ public class CrmStatisticsCustomerReqVO {
     @NotEmpty(message = "时间范围不能为空")
     private LocalDateTime[] times;
 
+    // TODO @dhb52：这个时间间隔，建议前端传递；例如说：字段叫 interval，枚举有天、周、月、季度、年。因为一般分析类的系统，都是交给用户选择筛选时间间隔，而我们这里是默认根据日期选项，默认对应的 interval 而已
+    // 然后实现上，可以在 common 包的 enums 加个 DateIntervalEnum，里面一个是 interval 字段，枚举过去，然后有个 pattern 字段，用于格式化时间格式；
+    // 这样的话，可以通过 interval 获取到 pattern，然后前端就可以根据 pattern 格式化时间，计算还是交给数据库
     /**
      * group by DATE_FORMAT(field, #{dateFormat})
      */
     @Schema(description = "Group By 日期格式", requiredMode = Schema.RequiredMode.NOT_REQUIRED, example = "%Y%m")
     private String sqlDateFormat;
 
+    // TODO @dhb52：这个字段，目前是不是没啥用呀？
     /**
      * 数据类型 {@link CrmBizTypeEnum}
      */

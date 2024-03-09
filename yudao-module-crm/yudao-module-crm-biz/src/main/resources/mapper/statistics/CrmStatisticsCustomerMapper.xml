@@ -2,11 +2,14 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="cn.iocoder.yudao.module.crm.dal.mysql.statistics.CrmStatisticsCustomerMapper">
 
+    <!-- TODO @dhb52：数据库的关键字，进行大写。例如说，COUNT -->
+
     <select id="selectCustomerCreateCountGroupbyDate"
             resultType="cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.customer.CrmStatisticsCustomerSummaryByDateRespVO">
         SELECT
+        <!-- TODO @dhb52：下面这个，缩进一个 tab；这样可读性更好哈 -->
         DATE_FORMAT( create_time, #{sqlDateFormat} ) AS time,
-        count(*) AS customerCreateCount
+        COUNT(*) AS customerCreateCount
         FROM crm_customer
         WHERE deleted = 0
         AND owner_user_id IN
@@ -14,6 +17,7 @@
             #{userId}
         </foreach>
         AND create_time BETWEEN #{times[0],javaType=java.time.LocalDateTime} AND
+        <!-- TODO @dhb52：这可以考虑不换行，直接跟在后面的 AND，更连贯哈； -->
         #{times[1],javaType=java.time.LocalDateTime}
         GROUP BY time
     </select>
@@ -21,6 +25,8 @@
     <select id="selectCustomerDealCountGroupbyDate"
             resultType="cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.customer.CrmStatisticsCustomerSummaryByDateRespVO">
         SELECT
+        <!-- TODO @dhb52：下面这个，缩进一个 tab；这样可读性更好哈 -->
+        <!-- TODO @dhb52：表变量最好不要用 a、b；可以用 customer 和 constract；虽然长一点，但是一眼看的清楚哈 -->
         DATE_FORMAT( b.order_date, #{sqlDateFormat} ) AS time,
         count( DISTINCT a.id ) AS customerDealCount
         FROM crm_customer AS a
@@ -31,11 +37,13 @@
         <foreach collection="userIds" item="userId" open="(" close=")" separator=",">
             #{userId}
         </foreach>
+        <!-- TODO @dhb52：这个应该是 order_date 的范围哈；貌似如果改成这样，不需要查询 customer 表，只要 contract 表就 ok 拉 -->
         AND b.create_time BETWEEN #{times[0],javaType=java.time.LocalDateTime} AND
         #{times[1],javaType=java.time.LocalDateTime}
         GROUP BY time
     </select>
 
+    <!-- TODO @dhb52：根据上面建议，进行优化 -->
     <select id="selectCustomerCreateCountGroupbyUser"
             resultType="cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.customer.CrmStatisticsCustomerSummaryByUserRespVO">
         SELECT owner_user_id, COUNT(1) AS customer_create_count
@@ -50,6 +58,7 @@
         GROUP BY owner_user_id
     </select>
 
+    <!-- TODO @dhb52：根据上面建议，进行优化 -->
     <select id="selectCustomerDealCountGroupbyUser"
             resultType="cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.customer.CrmStatisticsCustomerSummaryByUserRespVO">
         SELECT a.owner_user_id, count( DISTINCT a.id ) AS customer_deal_count
@@ -66,6 +75,7 @@
         GROUP BY a.owner_user_id
     </select>
 
+    <!-- TODO @dhb52：根据上面建议，进行优化 -->
     <select id="selectContractPriceGroupbyUser"
             resultType="cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.customer.CrmStatisticsCustomerSummaryByUserRespVO">
         SELECT owner_user_id, IFNULL(SUM(total_price), 0) AS contract_price
@@ -82,6 +92,7 @@
     </select>
 
 
+    <!-- TODO @dhb52：根据上面建议，进行优化 -->
     <select id="selectReceivablePriceGroupbyUser"
             resultType="cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.customer.CrmStatisticsCustomerSummaryByUserRespVO">
         SELECT owner_user_id,

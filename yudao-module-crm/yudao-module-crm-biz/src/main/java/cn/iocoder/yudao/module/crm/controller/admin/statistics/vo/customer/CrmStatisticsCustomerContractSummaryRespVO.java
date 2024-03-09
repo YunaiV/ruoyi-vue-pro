@@ -5,13 +5,13 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
-import org.springframework.format.annotation.DateTimeFormat;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-import static cn.iocoder.yudao.framework.common.util.date.DateUtils.*;
+import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY;
+import static cn.iocoder.yudao.framework.common.util.date.DateUtils.TIME_ZONE_DEFAULT;
 
 @Schema(description = "管理后台 - CRM 客户转化率分析 VO")
 @Data
@@ -43,14 +43,14 @@ public class CrmStatisticsCustomerContractSummaryRespVO {
     @Schema(description = "客户来源", requiredMode = Schema.RequiredMode.REQUIRED, example = "外呼")
     private String sourceName;
 
-    @Schema(description = "负责人ID", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
+    @Schema(description = "负责人编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     @JsonIgnore
     private Long ownerUserId;
 
     @Schema(description = "负责人", requiredMode = Schema.RequiredMode.REQUIRED, example = "芋道源码")
     private String ownerUserName;
 
-    @Schema(description = "创建人ID", requiredMode = Schema.RequiredMode.REQUIRED, example = "2")
+    @Schema(description = "创建人编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "2")
     @JsonIgnore
     private String creatorUserId;
 
