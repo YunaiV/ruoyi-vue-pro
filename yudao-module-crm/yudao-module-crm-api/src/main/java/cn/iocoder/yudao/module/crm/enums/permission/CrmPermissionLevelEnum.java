@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.crm.enums.permission;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjUtil;
 import cn.iocoder.yudao.framework.common.core.IntArrayValuable;
 import lombok.AllArgsConstructor;
@@ -48,6 +49,12 @@ public enum CrmPermissionLevelEnum implements IntArrayValuable {
 
     public static boolean isWrite(Integer level) {
         return ObjUtil.equal(WRITE.level, level);
+    }
+
+    public static String getNameByLevel(Integer level) {
+        CrmPermissionLevelEnum typeEnum = CollUtil.findOne(CollUtil.newArrayList(CrmPermissionLevelEnum.values()),
+                item -> ObjUtil.equal(item.level, level));
+        return typeEnum == null ? null : typeEnum.getName();
     }
 
 }
