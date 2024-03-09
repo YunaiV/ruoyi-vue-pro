@@ -1,64 +1,80 @@
 package cn.iocoder.yudao.module.crm.service.statistics;
 
-import cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.customer.CrmStatisticsCustomerCountVO;
-import cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.customer.CrmStatisticsCustomerReqVO;
+import cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.customer.*;
 
 import java.util.List;
 
 /**
- * CRM 数据统计 员工客户分析 Service 接口
+ * CRM 客户分析 Service 接口
  *
  * @author dhb52
  */
 public interface CrmStatisticsCustomerService {
 
     /**
-     * 获取新建客户数量
+     * 总量分析(按日期)
      *
      * @param reqVO 请求参数
-     * @return 新建客户数量统计
+     * @return 统计数据
      */
-    List<CrmStatisticsCustomerCountVO> getTotalCustomerCount(CrmStatisticsCustomerReqVO reqVO);
+    List<CrmStatisticsCustomerSummaryByDateRespVO> getCustomerSummaryByDate(CrmStatisticsCustomerReqVO reqVO);
 
     /**
-     * 获取成交客户数量
+     * 总量分析(按用户)
      *
      * @param reqVO 请求参数
-     * @return 成交客户数量统计
+     * @return 统计数据
      */
-    List<CrmStatisticsCustomerCountVO> getDealTotalCustomerCount(CrmStatisticsCustomerReqVO reqVO);
+    List<CrmStatisticsCustomerSummaryByUserRespVO> getCustomerSummaryByUser(CrmStatisticsCustomerReqVO reqVO);
 
 
     /**
-     * 获取客户跟进次数
+     * 跟进次数分析(按日期)
      *
      * @param reqVO 请求参数
-     * @return 客户跟进次数
+     * @return 统计数据
      */
-    List<CrmStatisticsCustomerCountVO> getRecordCount(CrmStatisticsCustomerReqVO reqVO);
+    List<CrmStatisticsFollowupSummaryByDateRespVO> getFollowupSummaryByDate(CrmStatisticsCustomerReqVO reqVO);
 
     /**
-     * 获取已跟进客户数
+     * 跟进次数分析(按用户)
      *
      * @param reqVO 请求参数
-     * @return 已跟进客户数
+     * @return 统计数据
      */
-    List<CrmStatisticsCustomerCountVO> getDistinctRecordCount(CrmStatisticsCustomerReqVO reqVO);
+    List<CrmStatisticsFollowupSummaryByUserRespVO> getFollowupSummaryByUser(CrmStatisticsCustomerReqVO reqVO);
 
     /**
-     * 获取客户跟进方式统计数
+     * 客户跟进次数分析(按类型)
      *
      * @param reqVO 请求参数
-     * @return 客户跟进方式统计数
+     * @return 统计数据
      */
-    List<CrmStatisticsCustomerCountVO> getRecordTypeCount(CrmStatisticsCustomerReqVO reqVO);
+    List<CrmStatisticsFollowupSummaryByTypeRespVO> getFollowupSummaryByType(CrmStatisticsCustomerReqVO reqVO);
+
 
     /**
-     * 获取客户成交周期
+     * 获取合同摘要信息(客户转化率页面)
      *
      * @param reqVO 请求参数
-     * @return 客户成交周期
+     * @return 合同摘要列表
      */
-    List<CrmStatisticsCustomerCountVO> getCustomerCycle(CrmStatisticsCustomerReqVO reqVO);
+    List<CrmStatisticsCustomerContractSummaryRespVO> getContractSummary(CrmStatisticsCustomerReqVO reqVO);
+
+    /**
+     * 客户成交周期(按日期)
+     *
+     * @param reqVO 请求参数
+     * @return 统计数据
+     */
+    List<CrmStatisticsCustomerDealCycleByDateRespVO> getCustomerDealCycleByDate(CrmStatisticsCustomerReqVO reqVO);
+
+    /**
+     * 客户成交周期(按用户)
+     *
+     * @param reqVO 请求参数
+     * @return 统计数据
+     */
+    List<CrmStatisticsCustomerDealCycleByUserRespVO> getCustomerDealCycleByUser(CrmStatisticsCustomerReqVO reqVO);
 
 }
