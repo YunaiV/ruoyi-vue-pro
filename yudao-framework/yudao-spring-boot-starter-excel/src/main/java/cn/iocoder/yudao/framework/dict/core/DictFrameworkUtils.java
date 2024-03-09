@@ -11,6 +11,9 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
 import java.time.Duration;
+import java.util.List;
+
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
 
 /**
  * 字典工具类
@@ -34,6 +37,20 @@ public class DictFrameworkUtils {
                 @Override
                 public DictDataRespDTO load(KeyValue<String, String> key) {
                     return ObjectUtil.defaultIfNull(dictDataApi.getDictData(key.getKey(), key.getValue()), DICT_DATA_NULL);
+                }
+
+            });
+
+    /**
+     * 针对 {@link #getDictDataLabelList(String)} 的缓存
+     */
+    private static final LoadingCache<String, List<String>> GET_DICT_DATA_LIST_CACHE = CacheUtils.buildAsyncReloadingCache(
+            Duration.ofMinutes(1L), // 过期时间 1 分钟
+            new CacheLoader<String, List<String>>() {
+
+                @Override
+                public List<String> load(String dictType) {
+                    return dictDataApi.getDictDataLabelList(dictType);
                 }
 
             });
@@ -65,6 +82,11 @@ public class DictFrameworkUtils {
     @SneakyThrows
     public static String getDictDataLabel(String dictType, String value) {
         return GET_DICT_DATA_CACHE.get(new KeyValue<>(dictType, value)).getLabel();
+    }
+
+    @SneakyThrows
+    public static List<String> getDictDataLabelList(String dictType) {
+        return GET_DICT_DATA_LIST_CACHE.get(dictType);
     }
 
     @SneakyThrows

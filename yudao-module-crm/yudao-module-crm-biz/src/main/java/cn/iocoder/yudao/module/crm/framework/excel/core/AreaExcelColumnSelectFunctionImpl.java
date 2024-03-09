@@ -1,6 +1,6 @@
-package cn.iocoder.yudao.module.crm.framework.excel.service;
+package cn.iocoder.yudao.module.crm.framework.excel.core;
 
-import cn.iocoder.yudao.framework.excel.core.service.ExcelColumnSelectDataService;
+import cn.iocoder.yudao.framework.excel.core.function.ExcelColumnSelectFunction;
 import cn.iocoder.yudao.framework.ip.core.Area;
 import cn.iocoder.yudao.framework.ip.core.utils.AreaUtils;
 import org.springframework.stereotype.Service;
@@ -13,17 +13,17 @@ import java.util.List;
  * @author HUIHUI
  */
 @Service
-public class AreaExcelColumnSelectDataServiceImpl implements ExcelColumnSelectDataService {
+public class AreaExcelColumnSelectFunctionImpl implements ExcelColumnSelectFunction {
 
-    public static final String FUNCTION_NAME = "getCrmAreaNameList"; // 防止和别的模块重名
+    public static final String NAME = "getCrmAreaNameList"; // 防止和别的模块重名
 
     @Override
-    public String getFunctionName() {
-        return FUNCTION_NAME;
+    public String getName() {
+        return NAME;
     }
 
     @Override
-    public List<String> getSelectDataList() {
+    public List<String> getOptions() {
         // 获取地区下拉数据
         // TODO @puhui999：嘿嘿，这里改成省份、城市、区域，三个选项，难度大么？
         Area area = AreaUtils.getArea(Area.ID_CHINA);

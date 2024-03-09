@@ -5,12 +5,19 @@ import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
-import cn.iocoder.yudao.module.crm.controller.admin.permission.vo.CrmPermissionCreateReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.permission.vo.CrmPermissionRespVO;
+import cn.iocoder.yudao.module.crm.controller.admin.permission.vo.CrmPermissionSaveReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.permission.vo.CrmPermissionUpdateReqVO;
+import cn.iocoder.yudao.module.crm.dal.dataobject.business.CrmBusinessDO;
+import cn.iocoder.yudao.module.crm.dal.dataobject.contact.CrmContactDO;
+import cn.iocoder.yudao.module.crm.dal.dataobject.contract.CrmContractDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.permission.CrmPermissionDO;
+import cn.iocoder.yudao.module.crm.enums.common.CrmBizTypeEnum;
 import cn.iocoder.yudao.module.crm.enums.permission.CrmPermissionLevelEnum;
 import cn.iocoder.yudao.module.crm.framework.permission.core.annotations.CrmPermission;
+import cn.iocoder.yudao.module.crm.service.business.CrmBusinessService;
+import cn.iocoder.yudao.module.crm.service.contact.CrmContactService;
+import cn.iocoder.yudao.module.crm.service.contract.CrmContractService;
 import cn.iocoder.yudao.module.crm.service.permission.CrmPermissionService;
 import cn.iocoder.yudao.module.crm.service.permission.bo.CrmPermissionCreateReqBO;
 import cn.iocoder.yudao.module.system.api.dept.DeptApi;
@@ -27,13 +34,11 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Stream;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
@@ -50,7 +55,12 @@ public class CrmPermissionController {
 
     @Resource
     private CrmPermissionService permissionService;
-
+    @Resource
+    private CrmContactService contactService;
+    @Resource
+    private CrmBusinessService businessService;
+    @Resource
+    private CrmContractService contractService;
     @Resource
     private AdminUserApi adminUserApi;
     @Resource
@@ -60,11 +70,45 @@ public class CrmPermissionController {
 
     @PostMapping("/create")
     @Operation(summary = "创建数据权限")
+    @Transactional(rollbackFor = Exception.class)
     @PreAuthorize("@ss.hasPermission('crm:permission:create')")
     @CrmPermission(bizTypeValue = "#reqVO.bizType", bizId = "#reqVO.bizId", level = CrmPermissionLevelEnum.OWNER)
-    public CommonResult<Boolean> addPermission(@Valid @RequestBody CrmPermissionCreateReqVO reqVO) {
+    public CommonResult<Boolean> addPermission(@Valid @RequestBody CrmPermissionSaveReqVO reqVO) {
         permissionService.createPermission(BeanUtils.toBean(reqVO, CrmPermissionCreateReqBO.class));
+        if (CollUtil.isNotEmpty(reqVO.getToBizTypes())) {
+            createBizTypePermissions(reqVO);
+        }
         return success(true);
+    }
+
+
+    private void createBizTypePermissions(CrmPermissionSaveReqVO reqVO) {
+        List<CrmPermissionCreateReqBO> createPermissions = new ArrayList<>();
+        if (reqVO.getToBizTypes().contains(CrmBizTypeEnum.CRM_CONTACT.getType())) {
+            List<CrmContactDO> contactList = contactService.getContactListByCustomerIdOwnerUserId(reqVO.getBizId(), getLoginUserId());
+            contactList.forEach(item -> {
+                createPermissions.add(new CrmPermissionCreateReqBO().setBizType(CrmBizTypeEnum.CRM_CONTACT.getType())
+                        .setBizId(item.getId()).setUserId(reqVO.getUserId()).setLevel(reqVO.getLevel()));
+            });
+        }
+        if (reqVO.getToBizTypes().contains(CrmBizTypeEnum.CRM_BUSINESS.getType())) {
+            List<CrmBusinessDO> businessList = businessService.getBusinessListByCustomerIdOwnerUserId(reqVO.getBizId(), getLoginUserId());
+            businessList.forEach(item -> {
+                createPermissions.add(new CrmPermissionCreateReqBO().setBizType(CrmBizTypeEnum.CRM_BUSINESS.getType())
+                        .setBizId(item.getId()).setUserId(reqVO.getUserId()).setLevel(reqVO.getLevel()));
+            });
+        }
+        if (reqVO.getToBizTypes().contains(CrmBizTypeEnum.CRM_CONTRACT.getType())) {
+            List<CrmContractDO> contractList = contractService.getContractListByCustomerIdOwnerUserId(reqVO.getBizId(), getLoginUserId());
+            contractList.forEach(item -> {
+                createPermissions.add(new CrmPermissionCreateReqBO().setBizType(CrmBizTypeEnum.CRM_CONTRACT.getType())
+                        .setBizId(item.getId()).setUserId(reqVO.getUserId()).setLevel(reqVO.getLevel()));
+            });
+        }
+        if (CollUtil.isEmpty(createPermissions)) {
+            return;
+        }
+        permissionService.createPermissionBatch(createPermissions);
     }
 
     @PutMapping("/update")

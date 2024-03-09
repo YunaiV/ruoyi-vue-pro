@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.crm.service.business;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.ListUtil;
+import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.number.MoneyUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
@@ -23,6 +24,7 @@ import cn.iocoder.yudao.module.crm.service.contact.CrmContactBusinessService;
 import cn.iocoder.yudao.module.crm.service.contact.CrmContactService;
 import cn.iocoder.yudao.module.crm.service.contract.CrmContractService;
 import cn.iocoder.yudao.module.crm.service.customer.CrmCustomerService;
+import cn.iocoder.yudao.module.crm.service.customer.CrmCustomerServiceImpl;
 import cn.iocoder.yudao.module.crm.service.permission.CrmPermissionService;
 import cn.iocoder.yudao.module.crm.service.permission.bo.CrmPermissionCreateReqBO;
 import cn.iocoder.yudao.module.crm.service.permission.bo.CrmPermissionTransferReqBO;
@@ -204,7 +206,7 @@ public class CrmBusinessServiceImpl implements CrmBusinessService {
 
     private List<CrmBusinessProductDO> validateBusinessProducts(List<CrmBusinessSaveReqVO.Product> list) {
         // 1. 校验产品存在
-         productService.validProductList(convertSet(list, CrmBusinessSaveReqVO.Product::getProductId));
+        productService.validProductList(convertSet(list, CrmBusinessSaveReqVO.Product::getProductId));
         // 2. 转化为 CrmBusinessProductDO 列表
         return convertList(list, o -> BeanUtils.toBean(o, CrmBusinessProductDO.class,
                 item -> item.setTotalPrice(MoneyUtils.priceMultiply(item.getBusinessPrice(), item.getCount()))));
@@ -234,7 +236,7 @@ public class CrmBusinessServiceImpl implements CrmBusinessService {
         }
         // 1.4 校验是不是状态没变更
         if ((reqVO.getStatusId() != null && reqVO.getStatusId().equals(business.getStatusId()))
-            || (reqVO.getEndStatus() != null && reqVO.getEndStatus().equals(business.getEndStatus()))) {
+                || (reqVO.getEndStatus() != null && reqVO.getEndStatus().equals(business.getEndStatus()))) {
             throw exception(BUSINESS_UPDATE_STATUS_FAIL_STATUS_EQUALS);
         }
 
@@ -292,18 +294,18 @@ public class CrmBusinessServiceImpl implements CrmBusinessService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    @LogRecord(type = CRM_BUSINESS_TYPE, subType = CRM_BUSINESS_TRANSFER_SUB_TYPE, bizNo = "{{#reqVO.id}}",
+    @LogRecord(type = CRM_BUSINESS_TYPE, subType = CRM_BUSINESS_TRANSFER_SUB_TYPE, bizNo = "{{#reqVO.bizId}}",
             success = CRM_BUSINESS_TRANSFER_SUCCESS)
-    @CrmPermission(bizType = CrmBizTypeEnum.CRM_BUSINESS, bizId = "#reqVO.id", level = CrmPermissionLevelEnum.OWNER)
+    @CrmPermission(bizType = CrmBizTypeEnum.CRM_BUSINESS, bizId = "#reqVO.bizId", level = CrmPermissionLevelEnum.OWNER)
     public void transferBusiness(CrmBusinessTransferReqVO reqVO, Long userId) {
         // 1 校验商机是否存在
-        CrmBusinessDO business = validateBusinessExists(reqVO.getId());
+        CrmBusinessDO business = validateBusinessExists(reqVO.getBizId());
 
         // 2.1 数据权限转移
         permissionService.transferPermission(new CrmPermissionTransferReqBO(userId, CrmBizTypeEnum.CRM_BUSINESS.getType(),
-                reqVO.getNewOwnerUserId(), reqVO.getId(), CrmPermissionLevelEnum.OWNER.getLevel()));
+                reqVO.getBizId(), reqVO.getNewOwnerUserId(), CrmPermissionLevelEnum.OWNER.getLevel()));
         // 2.2 设置新的负责人
-        businessMapper.updateOwnerUserIdById(reqVO.getId(), reqVO.getNewOwnerUserId());
+        businessMapper.updateOwnerUserIdById(reqVO.getBizId(), reqVO.getNewOwnerUserId());
 
         // 记录操作日志上下文
         LogRecordContext.putVariable("business", business);
@@ -368,6 +370,11 @@ public class CrmBusinessServiceImpl implements CrmBusinessService {
     @Override
     public Long getBusinessCountByStatusTypeId(Long statusTypeId) {
         return businessMapper.selectCountByStatusTypeId(statusTypeId);
+    }
+
+    @Override
+    public List<CrmBusinessDO> getBusinessListByCustomerIdOwnerUserId(Long customerId, Long ownerUserId) {
+        return businessMapper.selectListByCustomerIdOwnerUserId(customerId, ownerUserId);
     }
 
 }

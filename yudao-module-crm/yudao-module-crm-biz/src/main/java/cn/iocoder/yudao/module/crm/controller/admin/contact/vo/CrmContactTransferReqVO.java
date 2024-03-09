@@ -2,17 +2,21 @@ package cn.iocoder.yudao.module.crm.controller.admin.contact.vo;
 
 import cn.iocoder.yudao.module.crm.enums.permission.CrmPermissionLevelEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import jakarta.validation.constraints.NotNull;
+import lombok.NoArgsConstructor;
 
 @Schema(description = "管理后台 - CRM 联系人转移 Request VO")
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class CrmContactTransferReqVO {
 
     @Schema(description = "联系人编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "10430")
     @NotNull(message = "联系人编号不能为空")
-    private Long id;
+    private Long bizId;
 
     /**
      * 新负责人的用户编号
