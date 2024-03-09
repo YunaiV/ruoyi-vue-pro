@@ -63,17 +63,17 @@ public class CrmPermissionServiceImpl implements CrmPermissionService {
     @Transactional(rollbackFor = Exception.class)
     @CrmPermission(bizTypeValue = "#reqVO.bizType", bizId = "#reqVO.bizId", level = CrmPermissionLevelEnum.OWNER)
     public void createPermission(CrmPermissionSaveReqVO reqVO, Long userId) {
-        // 创建数据权限
+        // 1. 创建数据权限
         createPermission0(BeanUtils.toBean(reqVO, CrmPermissionCreateReqBO.class));
 
-        // 处理【同时添加至】的权限
+        // 2. 处理【同时添加至】的权限
         if (CollUtil.isEmpty(reqVO.getToBizTypes())) {
             return;
         }
         List<CrmPermissionCreateReqBO> createPermissions = new ArrayList<>();
-        createContactPermissions(reqVO, userId, createPermissions);
-        createBusinessPermissions(reqVO, userId, createPermissions);
-        createContractPermissions(reqVO, userId, createPermissions);
+        buildContactPermissions(reqVO, userId, createPermissions);
+        buildBusinessPermissions(reqVO, userId, createPermissions);
+        buildContractPermissions(reqVO, userId, createPermissions);
         if (CollUtil.isEmpty(createPermissions)) {
             return;
         }
@@ -87,18 +87,15 @@ public class CrmPermissionServiceImpl implements CrmPermissionService {
      * @param userId            操作人
      * @param createPermissions 待添加权限列表
      */
-    private void createContactPermissions(CrmPermissionSaveReqVO reqVO, Long userId, List<CrmPermissionCreateReqBO> createPermissions) {
+    private void buildContactPermissions(CrmPermissionSaveReqVO reqVO, Long userId, List<CrmPermissionCreateReqBO> createPermissions) {
         // 1. 校验是否被同时添加
         Integer type = CrmBizTypeEnum.CRM_CONTACT.getType();
         if (!reqVO.getToBizTypes().contains(type)) {
             return;
         }
-
-        // 2.1 添加数据权限
+        // 2. 添加数据权限
         List<CrmContactDO> contactList = contactService.getContactListByCustomerIdOwnerUserId(reqVO.getBizId(), userId);
-        contactList.forEach(item -> {
-            createBizTypePermissions(reqVO, type, item.getId(), item.getName(), createPermissions);
-        });
+        contactList.forEach(item -> createBizTypePermissions(reqVO, type, item.getId(), item.getName(), createPermissions));
     }
 
     /**
@@ -108,18 +105,15 @@ public class CrmPermissionServiceImpl implements CrmPermissionService {
      * @param userId            操作人
      * @param createPermissions 待添加权限列表
      */
-    private void createBusinessPermissions(CrmPermissionSaveReqVO reqVO, Long userId, List<CrmPermissionCreateReqBO> createPermissions) {
+    private void buildBusinessPermissions(CrmPermissionSaveReqVO reqVO, Long userId, List<CrmPermissionCreateReqBO> createPermissions) {
         // 1. 校验是否被同时添加
         Integer type = CrmBizTypeEnum.CRM_BUSINESS.getType();
         if (!reqVO.getToBizTypes().contains(type)) {
             return;
         }
-
-        // 2.1 添加数据权限
+        // 2. 添加数据权限
         List<CrmBusinessDO> businessList = businessService.getBusinessListByCustomerIdOwnerUserId(reqVO.getBizId(), userId);
-        businessList.forEach(item -> {
-            createBizTypePermissions(reqVO, type, item.getId(), item.getName(), createPermissions);
-        });
+        businessList.forEach(item -> createBizTypePermissions(reqVO, type, item.getId(), item.getName(), createPermissions));
     }
 
     /**
@@ -129,18 +123,15 @@ public class CrmPermissionServiceImpl implements CrmPermissionService {
      * @param userId            操作人
      * @param createPermissions 待添加权限列表
      */
-    private void createContractPermissions(CrmPermissionSaveReqVO reqVO, Long userId, List<CrmPermissionCreateReqBO> createPermissions) {
+    private void buildContractPermissions(CrmPermissionSaveReqVO reqVO, Long userId, List<CrmPermissionCreateReqBO> createPermissions) {
         // 1. 校验是否被同时添加
         Integer type = CrmBizTypeEnum.CRM_CONTRACT.getType();
         if (!reqVO.getToBizTypes().contains(type)) {
             return;
         }
-
-        // 2.1 添加数据权限
+        // 2. 添加数据权限
         List<CrmContractDO> contractList = contractService.getContractListByCustomerIdOwnerUserId(reqVO.getBizId(), userId);
-        contractList.forEach(item -> {
-            createBizTypePermissions(reqVO, type, item.getId(), item.getName(), createPermissions);
-        });
+        contractList.forEach(item -> createBizTypePermissions(reqVO, type, item.getId(), item.getName(), createPermissions));
     }
 
     private void createBizTypePermissions(CrmPermissionSaveReqVO reqVO, Integer type, Long bizId, String name,
@@ -167,8 +158,7 @@ public class CrmPermissionServiceImpl implements CrmPermissionService {
         validatePermissionNotExists(Collections.singletonList(createReqBO));
         // 1. 校验用户是否存在
         adminUserApi.validateUserList(Collections.singletonList(createReqBO.getUserId()));
-
-        // 2. 创建
+        // 2. 插入权限
         CrmPermissionDO permission = BeanUtils.toBean(createReqBO, CrmPermissionDO.class);
         permissionMapper.insert(permission);
         return permission.getId();

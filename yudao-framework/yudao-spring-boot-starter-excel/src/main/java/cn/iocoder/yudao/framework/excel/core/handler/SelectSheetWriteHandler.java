@@ -20,9 +20,11 @@ import org.apache.poi.hssf.usermodel.HSSFDataValidation;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddressList;
 
-import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
-import java.util.*;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
 
@@ -110,6 +112,7 @@ public class SelectSheetWriteHandler implements SheetWriteHandler {
         Workbook workbook = writeWorkbookHolder.getWorkbook(); // 获得工作簿
         List<KeyValue<Integer, List<String>>> keyValues = convertList(selectMap.entrySet(), entry -> new KeyValue<>(entry.getKey(), entry.getValue()));
         keyValues.sort(Comparator.comparing(item -> item.getValue().size())); // 升序不然创建下拉会报错
+
         // 2. 创建数据字典的 sheet 页
         Sheet dictSheet = workbook.createSheet(DICT_SHEET_NAME);
         for (KeyValue<Integer, List<String>> keyValue : keyValues) {
