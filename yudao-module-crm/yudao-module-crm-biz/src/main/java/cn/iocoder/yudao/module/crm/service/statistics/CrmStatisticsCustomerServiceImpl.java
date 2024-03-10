@@ -1,8 +1,11 @@
 package cn.iocoder.yudao.module.crm.service.statistics;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.date.DateTime;
+import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.hutool.core.util.ObjUtil;
+import cn.iocoder.yudao.framework.common.enums.DateIntervalEnum;
 import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
 import cn.iocoder.yudao.framework.common.util.number.NumberUtils;
 import cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.customer.*;
@@ -24,8 +27,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
+import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
 import static cn.iocoder.yudao.module.crm.enums.DictTypeConstants.*;
+import static cn.iocoder.yudao.module.crm.enums.ErrorCodeConstants.STATISTICS_CUSTOMER_TIMES_NOT_SET;
 
 /**
  * CRM 客户分析 Service 实现类
@@ -63,7 +68,7 @@ public class CrmStatisticsCustomerServiceImpl implements CrmStatisticsCustomerSe
         reqVO.setUserIds(userIds);
 
         // 2. 获取分项统计数据
-        reqVO.setSqlDateFormat(getSqlDateFormat(reqVO.getTimes()[0], reqVO.getTimes()[1]));
+        initParams(reqVO);
         List<CrmStatisticsCustomerSummaryByDateRespVO> customerCreateCountVoList = customerMapper.selectCustomerCreateCountGroupByDate(reqVO);
         List<CrmStatisticsCustomerSummaryByDateRespVO> customerDealCountVoList = customerMapper.selectCustomerDealCountGroupByDate(reqVO);
 
@@ -94,6 +99,7 @@ public class CrmStatisticsCustomerServiceImpl implements CrmStatisticsCustomerSe
         reqVO.setUserIds(userIds);
 
         // 2. 获取分项统计数据
+        initParams(reqVO);
         List<CrmStatisticsCustomerSummaryByUserRespVO> customerCreateCount = customerMapper.selectCustomerCreateCountGroupByUser(reqVO);
         List<CrmStatisticsCustomerSummaryByUserRespVO> customerDealCount = customerMapper.selectCustomerDealCountGroupByUser(reqVO);
         List<CrmStatisticsCustomerSummaryByUserRespVO> contractPrice = customerMapper.selectContractPriceGroupByUser(reqVO);
@@ -139,7 +145,7 @@ public class CrmStatisticsCustomerServiceImpl implements CrmStatisticsCustomerSe
         reqVO.setUserIds(userIds);
 
         // 2. 获取分项统计数据
-        reqVO.setSqlDateFormat(getSqlDateFormat(reqVO.getTimes()[0], reqVO.getTimes()[1]));
+        initParams(reqVO);
         List<CrmStatisticsFollowupSummaryByDateRespVO> followupRecordCount = customerMapper.selectFollowupRecordCountGroupByDate(reqVO);
         List<CrmStatisticsFollowupSummaryByDateRespVO> followupCustomerCount = customerMapper.selectFollowupCustomerCountGroupByDate(reqVO);
 
@@ -170,6 +176,7 @@ public class CrmStatisticsCustomerServiceImpl implements CrmStatisticsCustomerSe
         reqVO.setUserIds(userIds);
 
         // 2. 获取分项统计数据
+        initParams(reqVO);
         List<CrmStatisticsFollowupSummaryByUserRespVO> followupRecordCount = customerMapper.selectFollowupRecordCountGroupByUser(reqVO);
         List<CrmStatisticsFollowupSummaryByUserRespVO> followupCustomerCount = customerMapper.selectFollowupCustomerCountGroupByUser(reqVO);
 
@@ -204,6 +211,7 @@ public class CrmStatisticsCustomerServiceImpl implements CrmStatisticsCustomerSe
         reqVO.setUserIds(userIds);
 
         // 2. 获得排行数据
+        initParams(reqVO);
         List<CrmStatisticsFollowupSummaryByTypeRespVO> respVoList = customerMapper.selectFollowupRecordCountGroupByType(reqVO);
 
         // 3. 获取字典数据
@@ -227,6 +235,7 @@ public class CrmStatisticsCustomerServiceImpl implements CrmStatisticsCustomerSe
         reqVO.setUserIds(userIds);
 
         // 2. 获取统计数据
+        initParams(reqVO);
         List<CrmStatisticsCustomerContractSummaryRespVO> respVoList = customerMapper.selectContractSummary(reqVO);
 
         // 3. 设置 创建人、负责人、行业、来源
@@ -261,7 +270,7 @@ public class CrmStatisticsCustomerServiceImpl implements CrmStatisticsCustomerSe
         reqVO.setUserIds(userIds);
 
         // 2. 获取分项统计数据
-        reqVO.setSqlDateFormat(getSqlDateFormat(reqVO.getTimes()[0], reqVO.getTimes()[1]));
+        initParams(reqVO);
         List<CrmStatisticsCustomerDealCycleByDateRespVO> customerDealCycle = customerMapper.selectCustomerDealCycleGroupByDate(reqVO);
 
         // 3. 合并统计数据
@@ -287,6 +296,7 @@ public class CrmStatisticsCustomerServiceImpl implements CrmStatisticsCustomerSe
         reqVO.setUserIds(userIds);
 
         // 2. 获取分项统计数据
+        initParams(reqVO);
         List<CrmStatisticsCustomerDealCycleByUserRespVO> customerDealCycle = customerMapper.selectCustomerDealCycleGroupByUser(reqVO);
         List<CrmStatisticsCustomerSummaryByUserRespVO> customerDealCount = customerMapper.selectCustomerDealCountGroupByUser(reqVO);
 
@@ -363,7 +373,6 @@ public class CrmStatisticsCustomerServiceImpl implements CrmStatisticsCustomerSe
      * @param endTime   结束时间
      * @return 时间序列
      */
-    // TODO @dhb52：可以抽象到 DateUtils 里，开始时间、结束时间，事件间隔，然后返回这个哈；
     private List<String> generateTimeSeries(LocalDateTime startTime, LocalDateTime endTime) {
         boolean byMonth = queryByMonth(startTime, endTime);
         List<String> times = CollUtil.newArrayList();
@@ -389,4 +398,62 @@ public class CrmStatisticsCustomerServiceImpl implements CrmStatisticsCustomerSe
         return queryByMonth(startTime, endTime) ? SQL_DATE_FORMAT_BY_MONTH : SQL_DATE_FORMAT_BY_DAY;
     }
 
+    private void initParams(CrmStatisticsCustomerReqVO reqVO) {
+        final Integer intervalType = reqVO.getIntervalType();
+
+        // 1. 自定义时间间隔，必须输入起始日期-结束日期
+        if (DateIntervalEnum.CUSTOMER.getType().equals(intervalType)) {
+            if (ObjUtil.isEmpty(reqVO.getTimes()) || reqVO.getTimes().length != 2) {
+                throw exception(STATISTICS_CUSTOMER_TIMES_NOT_SET);
+            }
+            // 设置 mapper sqlDateFormat 参数
+            reqVO.setSqlDateFormat(getSqlDateFormat(reqVO.getTimes()[0], reqVO.getTimes()[1]));
+            // 自定义日期无需计算日期参数
+            return;
+        }
+
+        // 2. 根据时间区间类型计算时间段区间日期
+        DateTime beginDate = null;
+        DateTime endDate = null;
+        if (DateIntervalEnum.TODAY.getType().equals(intervalType)) {
+            beginDate = DateUtil.beginOfDay(DateUtil.date());
+            endDate = DateUtil.endOfDay(DateUtil.date());
+        } else if (DateIntervalEnum.YESTERDAY.getType().equals(intervalType)) {
+            beginDate = DateUtil.offsetDay(DateUtil.date(), -1);
+            endDate = DateUtil.offsetDay(DateUtil.date(), -1);
+        } else if (DateIntervalEnum.THIS_WEEK.getType().equals(intervalType)) {
+            beginDate = DateUtil.beginOfWeek(DateUtil.date());
+            endDate = DateUtil.endOfWeek(DateUtil.date());
+        } else if (DateIntervalEnum.LAST_WEEK.getType().equals(intervalType)) {
+            beginDate = DateUtil.beginOfWeek(DateUtil.offsetWeek(DateUtil.date(), -1));
+            endDate = DateUtil.endOfWeek(DateUtil.offsetWeek(DateUtil.date(), -1));
+        } else if (DateIntervalEnum.THIS_MONTH.getType().equals(intervalType)) {
+            beginDate = DateUtil.beginOfMonth(DateUtil.date());
+            endDate = DateUtil.endOfMonth(DateUtil.date());
+        } else if (DateIntervalEnum.LAST_MONTH.getType().equals(intervalType)) {
+            beginDate = DateUtil.beginOfMonth(DateUtil.offsetMonth(DateUtil.date(), -1));
+            endDate = DateUtil.endOfMonth(DateUtil.offsetMonth(DateUtil.date(), -1));
+        } else if (DateIntervalEnum.THIS_QUARTER.getType().equals(intervalType)) {
+            beginDate = DateUtil.beginOfQuarter(DateUtil.date());
+            endDate = DateUtil.endOfQuarter(DateUtil.date());
+        } else if (DateIntervalEnum.LAST_QUARTER.getType().equals(intervalType)) {
+            beginDate = DateUtil.beginOfQuarter(DateUtil.offsetMonth(DateUtil.date(), -3));
+            endDate = DateUtil.endOfQuarter(DateUtil.offsetMonth(DateUtil.date(), -3));
+        } else if (DateIntervalEnum.THIS_YEAR.getType().equals(intervalType)) {
+            beginDate = DateUtil.beginOfYear(DateUtil.date());
+            endDate = DateUtil.endOfYear(DateUtil.date());
+        } else if (DateIntervalEnum.LAST_YEAR.getType().equals(intervalType)) {
+            beginDate = DateUtil.beginOfYear(DateUtil.offsetMonth(DateUtil.date(), -12));
+            endDate = DateUtil.endOfYear(DateUtil.offsetMonth(DateUtil.date(), -12));
+        }
+
+        // 3. 计算开始、结束日期时间，并设置reqVo
+        LocalDateTime[] times = new LocalDateTime[2];
+        times[0] = LocalDateTimeUtil.beginOfDay(LocalDateTimeUtil.of(beginDate));
+        times[1] = LocalDateTimeUtil.endOfDay(LocalDateTimeUtil.of(endDate));
+        // 3.1 设置 mapper 时间区间 参数
+        reqVO.setTimes(times);
+        // 3.2 设置 mapper sqlDateFormat 参数
+        reqVO.setSqlDateFormat(getSqlDateFormat(times[0], times[1]));
+    }
 }
