@@ -22,6 +22,7 @@ import cn.iocoder.yudao.module.crm.service.followup.bo.CrmFollowUpCreateReqBO;
 import cn.iocoder.yudao.module.crm.service.permission.CrmPermissionService;
 import cn.iocoder.yudao.module.crm.service.permission.bo.CrmPermissionCreateReqBO;
 import cn.iocoder.yudao.module.crm.service.permission.bo.CrmPermissionTransferReqBO;
+import cn.iocoder.yudao.module.crm.util.CrmPermissionUtils;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import com.mzt.logapi.context.LogRecordContext;
 import com.mzt.logapi.service.impl.DiffParseFunction;
@@ -62,6 +63,8 @@ public class CrmClueServiceImpl implements CrmClueService {
     private CrmPermissionService crmPermissionService;
     @Resource
     private CrmFollowUpRecordService followUpRecordService;
+    @Resource
+    private CrmClueConfigService crmClueConfigService;
 
     @Resource
     private AdminUserApi adminUserApi;
@@ -228,9 +231,19 @@ public class CrmClueServiceImpl implements CrmClueService {
         return clueMapper.selectBatchIds(ids, userId);
     }
 
+
     @Override
     public PageResult<CrmClueDO> getCluePage(CrmCluePageReqVO pageReqVO, Long userId) {
-        return clueMapper.selectPage(pageReqVO, userId);
+
+        PageResult<CrmClueDO> pageResult = clueMapper.selectPage(pageReqVO, userId);
+        // 隐藏手机号
+        if (crmClueConfigService.getCrmClueConfig().getHidphoneEnabled()) {
+            pageResult.getList().forEach(clue -> {
+                clue.setMobile(CrmPermissionUtils.hideTelephone(clue.getMobile()));
+                clue.setTelephone(CrmPermissionUtils.hideTelephone(clue.getTelephone()));
+            });
+        }
+        return pageResult;
     }
 
     @Override

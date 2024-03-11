@@ -10,6 +10,7 @@ import cn.iocoder.yudao.module.crm.enums.common.CrmSceneTypeEnum;
 import cn.iocoder.yudao.module.crm.util.CrmPermissionUtils;
 import org.apache.ibatis.annotations.Mapper;
 
+import javax.annotation.Resource;
 import java.util.Collection;
 import java.util.List;
 
@@ -38,10 +39,6 @@ public interface CrmClueMapper extends BaseMapperX<CrmClueDO> {
                 .eqIfPresent(CrmClueDO::getFollowUpStatus, pageReqVO.getFollowUpStatus())
                 .orderByDesc(CrmClueDO::getId);
         PageResult<CrmClueDO> crmClueDOPageResult =  selectJoinPage(pageReqVO, CrmClueDO.class, query);
-        crmClueDOPageResult.getList().forEach(clue -> {
-            clue.setMobile(CrmPermissionUtils.hideTelephone(clue.getMobile()));
-            clue.setTelephone(CrmPermissionUtils.hideTelephone(clue.getTelephone()));
-        });
         return crmClueDOPageResult;
     }
 

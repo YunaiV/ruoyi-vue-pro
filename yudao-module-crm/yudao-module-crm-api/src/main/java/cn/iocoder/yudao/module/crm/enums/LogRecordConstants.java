@@ -24,6 +24,11 @@ public interface LogRecordConstants {
     String CRM_CLUE_FOLLOW_UP_SUB_TYPE = "线索跟进";
     String CRM_CLUE_FOLLOW_UP_SUCCESS = "线索跟进【{{#clueName}}】";
 
+    // ======================= CRM_CLUE_CONFIG 线索规则 =======================
+    String CRM_CLUE_CONFIG_TYPE = "CRM 线索规则";
+    String CRM_CLUE_CONFIG_SUB_TYPE = "{{#isClueConfigUpdate? '更新线索规则' : '创建线索规则'}}";
+    String CRM_CLUE_CONFIG_SUCCESS = "{{#isClueConfigUpdate? '成功更新线索规则' : '成功创建线索规则'}}";
+
     // ======================= CRM_CUSTOMER 客户 =======================
 
     String CRM_CUSTOMER_TYPE = "CRM 客户";
