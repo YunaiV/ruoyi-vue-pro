@@ -29,7 +29,6 @@ public class AuthMenuRespVO {
     private String path;
 
     @Schema(description = "访问路由的默认传递参数，仅菜单类型为菜单时，才需要传`", example = "{\"id\": 1, \"name\": \"ry\"}")
-    @Size(max = 200, message = "路由参数不能超过255个字符")
     private String query;
 
     @Schema(description = "组件路径,仅菜单类型为菜单时，才需要传", example = "system/post/index")
