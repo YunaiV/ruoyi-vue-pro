@@ -1,12 +1,12 @@
 package cn.iocoder.yudao.module.bpm.service.definition;
 
-import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.common.util.object.PageUtils;
 import cn.iocoder.yudao.framework.common.util.validation.ValidationUtils;
+import cn.iocoder.yudao.framework.flowable.core.util.BpmnModelUtils;
 import cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.*;
 import cn.iocoder.yudao.module.bpm.convert.definition.BpmModelConvert;
@@ -17,10 +17,8 @@ import cn.iocoder.yudao.module.bpm.service.definition.dto.BpmProcessDefinitionCr
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
-import org.flowable.bpmn.converter.BpmnXMLConverter;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.common.engine.impl.db.SuspensionState;
-import org.flowable.common.engine.impl.util.io.BytesStreamSource;
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.repository.Model;
@@ -168,15 +166,13 @@ public class BpmModelServiceImpl implements BpmModelService {
         // 1.3 校验表单已配
         BpmFormDO form = checkFormConfig(model.getMetaInfo());
         // 1.4 校验任务分配规则已配置
-        taskAssignRuleService.checkTaskAssignRuleAllConfig(id);
+        taskAssignRuleService.checkTaskAssignRuleAllConfig(bpmnBytes);
 
         // 1.5 校验模型是否发生修改。如果未修改，则不允许创建
-        BpmProcessDefinitionCreateReqDTO definitionCreateReqDTO = BpmModelConvert.INSTANCE.convert2(model, form).setBpmnBytes(bpmnBytes);
+        BpmProcessDefinitionCreateReqDTO definitionCreateReqDTO = BpmModelConvert.INSTANCE.convert2(model, form)
+                .setBpmnBytes(bpmnBytes);
         if (processDefinitionService.isProcessDefinitionEquals(definitionCreateReqDTO)) { // 流程定义的信息相等
-            ProcessDefinition oldProcessDefinition = processDefinitionService.getProcessDefinitionByDeploymentId(model.getDeploymentId());
-            if (oldProcessDefinition != null && taskAssignRuleService.isTaskAssignRulesEquals(model.getId(), oldProcessDefinition.getId())) {
-                throw exception(MODEL_DEPLOY_FAIL_TASK_INFO_EQUALS);
-            }
+            throw exception(MODEL_DEPLOY_FAIL_TASK_INFO_EQUALS);
         }
 
         // 2.1 创建流程定义
@@ -189,11 +185,7 @@ public class BpmModelServiceImpl implements BpmModelService {
         ProcessDefinition definition = processDefinitionService.getProcessDefinition(definitionId);
         model.setDeploymentId(definition.getDeploymentId());
         repositoryService.saveModel(model);
-
-        // 2.4 复制任务分配规则
-        taskAssignRuleService.copyTaskAssignRules(id, definition.getId());
     }
-
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -229,11 +221,7 @@ public class BpmModelServiceImpl implements BpmModelService {
     @Override
     public BpmnModel getBpmnModel(String id) {
         byte[] bpmnBytes = repositoryService.getModelEditorSource(id);
-        if (ArrayUtil.isEmpty(bpmnBytes)) {
-            return null;
-        }
-        BpmnXMLConverter converter = new BpmnXMLConverter();
-        return converter.convertToBpmnModel(new BytesStreamSource(bpmnBytes), true, true);
+        return BpmnModelUtils.getBpmnModel(bpmnBytes);
     }
 
     @Override

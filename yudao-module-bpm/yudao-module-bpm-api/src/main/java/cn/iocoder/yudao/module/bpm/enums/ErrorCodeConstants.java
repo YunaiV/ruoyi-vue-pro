@@ -27,7 +27,7 @@ public interface ErrorCodeConstants {
     ErrorCode MODEL_KEY_VALID = new ErrorCode(1_009_002_002, "流程标识格式不正确，需要以字母或下划线开头，后接任意字母、数字、中划线、下划线、句点！");
     ErrorCode MODEL_DEPLOY_FAIL_FORM_NOT_CONFIG = new ErrorCode(1_009_002_003, "部署流程失败，原因：流程表单未配置，请点击【修改流程】按钮进行配置");
     ErrorCode MODEL_DEPLOY_FAIL_TASK_ASSIGN_RULE_NOT_CONFIG = new ErrorCode(1_009_002_004, "部署流程失败，" +
-            "原因：用户任务({})未配置分配规则，请点击【修改流程】按钮进行配置");
+            "原因：用户任务({})未配置审批人，请点击【流程设计】按钮，选择该它的【任务（审批人）】进行配置");
     ErrorCode MODEL_DEPLOY_FAIL_TASK_INFO_EQUALS = new ErrorCode(1_009_003_005, "流程定义部署失败，原因：信息未发生变化");
 
     // ========== 流程定义 1-009-003-000 ==========

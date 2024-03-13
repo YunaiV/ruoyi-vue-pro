@@ -23,7 +23,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.flowable.bpmn.converter.BpmnXMLConverter;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.common.engine.impl.db.SuspensionState;
-import org.flowable.common.engine.impl.util.io.BytesStreamSource;
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.repository.ProcessDefinition;
@@ -124,6 +123,7 @@ public class BpmProcessDefinitionServiceImpl implements BpmProcessDefinitionServ
                 .key(createReqDTO.getKey()).name(createReqDTO.getName()).category(createReqDTO.getCategory())
                 .addBytes(createReqDTO.getKey() + BpmnModelConstants.BPMN_FILE_SUFFIX, createReqDTO.getBpmnBytes())
                 .tenantId(TenantContextHolder.getTenantIdStr())
+                .disableSchemaValidation() // 禁用 XML Schema 验证，因为有自定义的属性
                 .deploy();
 
         // 设置 ProcessDefinition 的 category 分类
@@ -197,7 +197,7 @@ public class BpmProcessDefinitionServiceImpl implements BpmProcessDefinitionServ
             return false;
         }
         // 校验 BPMN XML 信息
-        BpmnModel newModel = buildBpmnModel(createReqDTO.getBpmnBytes());
+        BpmnModel newModel = BpmnModelUtils.getBpmnModel(createReqDTO.getBpmnBytes());
         BpmnModel oldModel = getBpmnModel(oldProcessDefinition.getId());
         // 对比字节变化
         if (!BpmnModelUtils.equals(oldModel, newModel)) {
@@ -205,18 +205,6 @@ public class BpmProcessDefinitionServiceImpl implements BpmProcessDefinitionServ
         }
         // 最终发现都一致，则返回 true
         return true;
-    }
-
-    /**
-     * 构建对应的 BPMN Model
-     *
-     * @param bpmnBytes 原始的 BPMN XML 字节数组
-     * @return BPMN Model
-     */
-    private  BpmnModel buildBpmnModel(byte[] bpmnBytes) {
-        // 转换成 BpmnModel 对象
-        BpmnXMLConverter converter = new BpmnXMLConverter();
-        return converter.convertToBpmnModel(new BytesStreamSource(bpmnBytes), true, true);
     }
 
     @Override

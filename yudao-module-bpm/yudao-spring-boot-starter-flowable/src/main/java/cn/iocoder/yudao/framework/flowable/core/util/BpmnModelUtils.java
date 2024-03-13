@@ -1,9 +1,11 @@
 package cn.iocoder.yudao.framework.flowable.core.util;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.ArrayUtil;
 import org.flowable.bpmn.converter.BpmnXMLConverter;
 import org.flowable.bpmn.model.Process;
 import org.flowable.bpmn.model.*;
+import org.flowable.common.engine.impl.util.io.BytesStreamSource;
 
 import java.util.*;
 
@@ -89,6 +91,15 @@ public class BpmnModelUtils {
         }
         BpmnXMLConverter converter = new BpmnXMLConverter();
         return converter.convertToXML(model);
+    }
+
+    public static BpmnModel getBpmnModel(byte[] bpmnBytes) {
+        if (ArrayUtil.isEmpty(bpmnBytes)) {
+            return null;
+        }
+        BpmnXMLConverter converter = new BpmnXMLConverter();
+        // 补充说明：由于在 Flowable 中自定义了属性，所以 validateSchema 传递 false
+        return converter.convertToBpmnModel(new BytesStreamSource(bpmnBytes), false, false);
     }
 
     // ========== 遍历相关的方法 ==========
