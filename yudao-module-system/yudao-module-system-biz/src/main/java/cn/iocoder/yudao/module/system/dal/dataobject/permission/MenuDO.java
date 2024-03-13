@@ -66,6 +66,10 @@ public class MenuDO extends BaseDO {
      */
     private String path;
     /**
+     * 路由参数
+     */
+    private String query;
+    /**
      * 菜单图标
      */
     private String icon;
