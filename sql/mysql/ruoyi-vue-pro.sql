@@ -2307,7 +2307,7 @@ INSERT INTO `system_menu` (`id`, `name`, `permission`, `type`, `sort`, `parent_i
 COMMIT;
 
 ALTER TABLE `system_menu`
-    ADD COLUMN `query` VARCHAR(200) NOT NULL DEFAULT '' AFTER `path`;
+    ADD COLUMN `query` VARCHAR(200) COMMENT '路由参数' NOT NULL DEFAULT '' AFTER `path`;
 -- ----------------------------
 -- Table structure for system_notice
 -- ----------------------------
