@@ -3793,7 +3793,7 @@ CREATE TABLE "system_menu"
 )
 ;
 
-ALTER TABLE system_menu
+ALTER TABLE "system_menu"
     ADD COLUMN query VARCHAR(200) COLLATE "pg_catalog"."default";
 
 COMMENT
