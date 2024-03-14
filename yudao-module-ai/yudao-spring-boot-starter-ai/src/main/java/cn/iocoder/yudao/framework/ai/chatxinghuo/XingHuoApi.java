@@ -132,8 +132,6 @@ public class XingHuoApi {
         } catch (NoSuchAlgorithmException | InvalidKeyException e) {
             throw new RuntimeException(e);
         }
-        System.err.println(authUrl);
-        System.err.println(JSONUtil.toJsonPrettyStr(request));
         // wss 请求的 URI
         URI uri = URI.create(authUrl);
         // 发起 wss 请求并处理响应
