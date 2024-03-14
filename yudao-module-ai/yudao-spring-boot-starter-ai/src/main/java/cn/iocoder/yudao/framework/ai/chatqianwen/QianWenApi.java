@@ -57,8 +57,10 @@ public class QianWenApi {
     public ResponseEntity<CompletionsResponse> chatCompletionEntity(ChatRequestMessage message) {
         // 创建request
         CompletionsRequest request = new CompletionsRequest()
+                // 设置 appid
                 .setAppId(appId)
                 .setMessages(List.of(message))
+                // 返回choice message结果
                 .setParameters(new CompletionsRequest.Parameter().setResultFormat("message"));
         //
         CompletionsResponse response = client.completions(request);
@@ -74,8 +76,10 @@ public class QianWenApi {
     public Flux<CompletionsResponse> chatCompletionStream(ChatRequestMessage message) {
         return client.streamCompletions(
                 new CompletionsRequest()
+                        // 设置 appid
                         .setAppId(appId)
                         .setMessages(List.of(message))
+                        //开启增量输出模式，后面输出不会包含已经输出的内容
                         .setParameters(new CompletionsRequest.Parameter().setIncrementalOutput(true))
         );
     }
