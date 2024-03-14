@@ -1,41 +1,30 @@
-package cn.iocoder.yudao.module.bpm.framework.flowable.core.behavior.script.impl;
+package cn.iocoder.yudao.module.bpm.framework.flowable.core.candidate.expression;
 
 import cn.iocoder.yudao.framework.common.util.collection.SetUtils;
 import cn.iocoder.yudao.framework.common.util.number.NumberUtils;
-import cn.iocoder.yudao.module.bpm.enums.definition.BpmTaskRuleScriptEnum;
-import cn.iocoder.yudao.module.bpm.framework.flowable.core.behavior.script.BpmTaskAssignScript;
 import cn.iocoder.yudao.module.bpm.service.task.BpmProcessInstanceService;
+import jakarta.annotation.Resource;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.runtime.ProcessInstance;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
-import jakarta.annotation.Resource;
 import java.util.Set;
 
 /**
- * 分配给发起人审批的 Script 实现类
+ * 分配给发起人审批的 Expression 流程表达式
  *
  * @author 芋道源码
  */
-@Deprecated
 @Component
-public class BpmTaskAssignStartUserScript implements BpmTaskAssignScript {
+public class BpmTaskAssignStartUserExpression {
 
     @Resource
-    @Lazy // 解决循环依赖
     private BpmProcessInstanceService bpmProcessInstanceService;
 
-    @Override
-    public Set<Long> calculateTaskCandidateUsers(DelegateExecution execution) {
+    public Set<Long> calculateUsers(DelegateExecution execution) {
         ProcessInstance processInstance = bpmProcessInstanceService.getProcessInstance(execution.getProcessInstanceId());
         Long startUserId = NumberUtils.parseLong(processInstance.getStartUserId());
         return SetUtils.asSet(startUserId);
-    }
-
-    @Override
-    public BpmTaskRuleScriptEnum getEnum() {
-        return BpmTaskRuleScriptEnum.START_USER;
     }
 
 }

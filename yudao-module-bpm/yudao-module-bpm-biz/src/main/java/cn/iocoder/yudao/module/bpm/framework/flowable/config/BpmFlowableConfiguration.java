@@ -2,13 +2,17 @@ package cn.iocoder.yudao.module.bpm.framework.flowable.config;
 
 import cn.hutool.core.collection.ListUtil;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.behavior.BpmActivityBehaviorFactory;
-import cn.iocoder.yudao.module.bpm.service.definition.BpmTaskAssignRuleService;
+import cn.iocoder.yudao.module.bpm.framework.flowable.core.candidate.BpmTaskCandidateInvoker;
+import cn.iocoder.yudao.module.bpm.framework.flowable.core.candidate.BpmTaskCandidateStrategy;
+import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import org.flowable.common.engine.api.delegate.event.FlowableEventListener;
 import org.flowable.spring.SpringProcessEngineConfiguration;
 import org.flowable.spring.boot.EngineConfigurationConfigurer;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
+import java.util.List;
 
 /**
  * BPM 模块的 Flowable 配置类
@@ -36,11 +40,20 @@ public class BpmFlowableConfiguration {
         };
     }
 
+    // =========== 审批人相关的 Bean ==========
+
     @Bean
-    public BpmActivityBehaviorFactory bpmActivityBehaviorFactory(BpmTaskAssignRuleService taskRuleService) {
+    public BpmActivityBehaviorFactory bpmActivityBehaviorFactory(BpmTaskCandidateInvoker bpmTaskCandidateInvoker) {
         BpmActivityBehaviorFactory bpmActivityBehaviorFactory = new BpmActivityBehaviorFactory();
-        bpmActivityBehaviorFactory.setBpmTaskRuleService(taskRuleService);
+        bpmActivityBehaviorFactory.setTaskCandidateInvoker(bpmTaskCandidateInvoker);
         return bpmActivityBehaviorFactory;
+    }
+
+    @Bean
+    @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection") // adminUserApi 可以注入成功
+    public BpmTaskCandidateInvoker bpmTaskCandidateInvoker(List<BpmTaskCandidateStrategy> strategyList,
+                                                           AdminUserApi adminUserApi) {
+        return new BpmTaskCandidateInvoker(strategyList, adminUserApi);
     }
 
 }

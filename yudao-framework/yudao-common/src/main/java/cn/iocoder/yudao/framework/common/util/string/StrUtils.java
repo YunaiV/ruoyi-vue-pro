@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.framework.common.util.string;
 
+import cn.hutool.core.text.StrPool;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.StrUtil;
 
@@ -44,6 +45,10 @@ public class StrUtils {
     public static List<Long> splitToLong(String value, CharSequence separator) {
         long[] longs = StrUtil.splitToLong(value, separator);
         return Arrays.stream(longs).boxed().collect(Collectors.toList());
+    }
+
+    public static Set<Long> splitToLongSet(String value) {
+        return splitToLongSet(value, StrPool.COMMA);
     }
 
     public static Set<Long> splitToLongSet(String value, CharSequence separator) {

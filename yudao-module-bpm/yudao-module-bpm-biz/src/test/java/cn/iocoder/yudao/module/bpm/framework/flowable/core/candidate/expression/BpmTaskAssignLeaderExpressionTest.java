@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.bpm.framework.flowable.core.behavior.script.impl;
+package cn.iocoder.yudao.module.bpm.framework.flowable.core.candidate.expression;
 
 import cn.iocoder.yudao.framework.test.core.ut.BaseMockitoUnitTest;
 import cn.iocoder.yudao.module.bpm.service.task.BpmProcessInstanceService;
@@ -21,10 +21,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
-public class BpmTaskAssignLeaderX2ScriptTest extends BaseMockitoUnitTest {
+public class BpmTaskAssignLeaderExpressionTest extends BaseMockitoUnitTest {
 
     @InjectMocks
-    private BpmTaskAssignLeaderX2Script script;
+    private BpmTaskAssignLeaderExpression expression;
 
     @Mock
     private AdminUserApi adminUserApi;
@@ -34,7 +34,7 @@ public class BpmTaskAssignLeaderX2ScriptTest extends BaseMockitoUnitTest {
     private BpmProcessInstanceService bpmProcessInstanceService;
 
     @Test
-    public void testCalculateTaskCandidateUsers_noDept() {
+    public void testCalculateUsers_noDept() {
         // 准备参数
         DelegateExecution execution = mockDelegateExecution(1L);
         // mock 方法(startUser)
@@ -44,13 +44,13 @@ public class BpmTaskAssignLeaderX2ScriptTest extends BaseMockitoUnitTest {
         when(deptApi.getDept(eq(10L))).thenReturn(null);
 
         // 调用
-        Set<Long> result = script.calculateTaskCandidateUsers(execution);
+        Set<Long> result = expression.calculateUsers(execution, 1);
         // 断言
         assertEquals(0, result.size());
     }
 
     @Test
-    public void testCalculateTaskCandidateUsers_noParentDept() {
+    public void testCalculateUsers_noParentDept() {
         // 准备参数
         DelegateExecution execution = mockDelegateExecution(1L);
         // mock 方法(startUser)
@@ -63,13 +63,13 @@ public class BpmTaskAssignLeaderX2ScriptTest extends BaseMockitoUnitTest {
         when(deptApi.getDept(eq(100L))).thenReturn(null);
 
         // 调用
-        Set<Long> result = script.calculateTaskCandidateUsers(execution);
+        Set<Long> result = expression.calculateUsers(execution, 2);
         // 断言
         assertEquals(asSet(20L), result);
     }
 
     @Test
-    public void testCalculateTaskCandidateUsers_existParentDept() {
+    public void testCalculateUsers_existParentDept() {
         // 准备参数
         DelegateExecution execution = mockDelegateExecution(1L);
         // mock 方法(startUser)
@@ -84,7 +84,7 @@ public class BpmTaskAssignLeaderX2ScriptTest extends BaseMockitoUnitTest {
         when(deptApi.getDept(eq(100L))).thenReturn(parentDept);
 
         // 调用
-        Set<Long> result = script.calculateTaskCandidateUsers(execution);
+        Set<Long> result = expression.calculateUsers(execution, 2);
         // 断言
         assertEquals(asSet(200L), result);
     }

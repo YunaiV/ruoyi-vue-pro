@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.bpm.framework.flowable.core.behavior;
 
 import cn.iocoder.yudao.framework.flowable.core.util.FlowableUtils;
-import cn.iocoder.yudao.module.bpm.service.definition.BpmTaskAssignRuleService;
+import cn.iocoder.yudao.module.bpm.framework.flowable.core.candidate.BpmTaskCandidateInvoker;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.flowable.bpmn.model.Activity;
@@ -23,7 +23,7 @@ import java.util.Set;
 public class BpmParallelMultiInstanceBehavior extends ParallelMultiInstanceBehavior {
 
     @Setter
-    private BpmTaskAssignRuleService bpmTaskRuleService;
+    private BpmTaskCandidateInvoker taskCandidateInvoker;
 
     public BpmParallelMultiInstanceBehavior(Activity activity,
                                             AbstractBpmnActivityBehavior innerActivityBehavior) {
@@ -50,7 +50,7 @@ public class BpmParallelMultiInstanceBehavior extends ParallelMultiInstanceBehav
         super.collectionElementVariable = FlowableUtils.formatCollectionElementVariable(execution.getCurrentActivityId());
 
         // 第二步，获取任务的所有处理人
-        Set<Long> assigneeUserIds = bpmTaskRuleService.calculateTaskCandidateUsers(execution);
+        Set<Long> assigneeUserIds = taskCandidateInvoker.calculateUsers(execution);
         execution.setVariable(super.collectionVariable, assigneeUserIds);
         return assigneeUserIds.size();
     }

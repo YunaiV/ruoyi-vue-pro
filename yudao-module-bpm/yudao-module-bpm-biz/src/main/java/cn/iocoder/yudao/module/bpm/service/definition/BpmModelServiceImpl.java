@@ -12,6 +12,7 @@ import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.*;
 import cn.iocoder.yudao.module.bpm.convert.definition.BpmModelConvert;
 import cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmFormDO;
 import cn.iocoder.yudao.module.bpm.enums.definition.BpmModelFormTypeEnum;
+import cn.iocoder.yudao.module.bpm.framework.flowable.core.candidate.BpmTaskCandidateInvoker;
 import cn.iocoder.yudao.module.bpm.service.definition.dto.BpmModelMetaInfoRespDTO;
 import cn.iocoder.yudao.module.bpm.service.definition.dto.BpmProcessDefinitionCreateReqDTO;
 import jakarta.annotation.Resource;
@@ -54,8 +55,9 @@ public class BpmModelServiceImpl implements BpmModelService {
     private BpmProcessDefinitionService processDefinitionService;
     @Resource
     private BpmFormService bpmFormService;
+
     @Resource
-    private BpmTaskAssignRuleService taskAssignRuleService;
+    private BpmTaskCandidateInvoker taskCandidateInvoker;
 
     @Override
     public PageResult<BpmModelPageItemRespVO> getModelPage(BpmModelPageReqVO pageVO) {
@@ -166,7 +168,7 @@ public class BpmModelServiceImpl implements BpmModelService {
         // 1.3 校验表单已配
         BpmFormDO form = checkFormConfig(model.getMetaInfo());
         // 1.4 校验任务分配规则已配置
-        taskAssignRuleService.checkTaskAssignRuleAllConfig(bpmnBytes);
+        taskCandidateInvoker.validateBpmnConfig(bpmnBytes);
 
         // 1.5 校验模型是否发生修改。如果未修改，则不允许创建
         BpmProcessDefinitionCreateReqDTO definitionCreateReqDTO = BpmModelConvert.INSTANCE.convert2(model, form)
