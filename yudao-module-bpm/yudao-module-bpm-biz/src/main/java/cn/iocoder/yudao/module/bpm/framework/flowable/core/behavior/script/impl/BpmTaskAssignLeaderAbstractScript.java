@@ -24,6 +24,7 @@ import static java.util.Collections.emptySet;
  *
  * @author 芋道源码
  */
+@Deprecated
 public abstract class BpmTaskAssignLeaderAbstractScript implements BpmTaskAssignScript {
 
     @Resource

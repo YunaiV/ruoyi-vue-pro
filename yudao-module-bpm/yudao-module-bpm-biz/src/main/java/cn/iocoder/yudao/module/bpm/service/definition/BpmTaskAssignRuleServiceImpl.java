@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.bpm.service.definition;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
@@ -10,6 +11,7 @@ import cn.iocoder.yudao.framework.common.util.string.StrUtils;
 import cn.iocoder.yudao.framework.datapermission.core.annotation.DataPermission;
 import cn.iocoder.yudao.framework.flowable.core.enums.BpmnModelConstants;
 import cn.iocoder.yudao.framework.flowable.core.util.BpmnModelUtils;
+import cn.iocoder.yudao.framework.flowable.core.util.FlowableUtils;
 import cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmUserGroupDO;
 import cn.iocoder.yudao.module.bpm.enums.DictTypeConstants;
 import cn.iocoder.yudao.module.bpm.enums.definition.BpmTaskAssignRuleTypeEnum;
@@ -26,6 +28,7 @@ import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import com.google.common.annotations.VisibleForTesting;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.dromara.hutool.core.convert.Convert;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.UserTask;
@@ -56,6 +59,9 @@ public class BpmTaskAssignRuleServiceImpl implements BpmTaskAssignRuleService {
     @Resource
     @Lazy // 解决循环依赖
     private BpmProcessInstanceService processInstanceService;
+
+//    @Resource
+//    private ExpressionManager expressionManager;
 
     @Resource
     private RoleApi roleApi;
@@ -93,6 +99,10 @@ public class BpmTaskAssignRuleServiceImpl implements BpmTaskAssignRuleService {
             if (type == null || StrUtil.isBlank(options)) {
                 throw exception(MODEL_DEPLOY_FAIL_TASK_ASSIGN_RULE_NOT_CONFIG, userTask.getName());
             }
+            // TODO 芋艿：校验 options
+            if (ObjectUtil.equal(type, BpmTaskAssignRuleTypeEnum.EXPRESS.getType())) {
+                return;
+            }
             validTaskAssignRuleOptions(type, StrUtils.splitToLong(options, ","));
         });
     }
@@ -117,6 +127,14 @@ public class BpmTaskAssignRuleServiceImpl implements BpmTaskAssignRuleService {
         }
     }
 
+    public Long test(DelegateExecution execution) {
+        return 1L;
+    }
+
+    public Long test2(DelegateExecution execution, Long id) {
+        return id;
+    }
+
     @Override
     @DataPermission(enable = false) // 忽略数据权限，不然分配会存在问题
     public Set<Long> calculateTaskCandidateUsers(DelegateExecution execution) {
@@ -137,7 +155,11 @@ public class BpmTaskAssignRuleServiceImpl implements BpmTaskAssignRuleService {
         // TODO 芋艿：assignType/assignOptions/, 枚举
         FlowElement flowElement = execution.getCurrentFlowElement();
         Integer type = NumberUtils.parseInt(flowElement.getAttributeValue(BpmnModelConstants.NAMESPACE, "assignType"));
-        Set<Long> options = StrUtils.splitToLongSet(flowElement.getAttributeValue(BpmnModelConstants.NAMESPACE, "assignOptions"), ",");
+        String optionStr = flowElement.getAttributeValue(BpmnModelConstants.NAMESPACE, "assignOptions");
+        Set<Long> options = null;
+        if (ObjectUtil.notEqual(BpmTaskAssignRuleTypeEnum.EXPRESS.getType(), type)) {
+            options = StrUtils.splitToLongSet(optionStr, ",");
+        }
 
         // 计算审批人
         Set<Long> assigneeUserIds = null;
@@ -155,6 +177,9 @@ public class BpmTaskAssignRuleServiceImpl implements BpmTaskAssignRuleService {
             assigneeUserIds = calculateTaskCandidateUsersByUserGroup(options);
         } else if (Objects.equals(BpmTaskAssignRuleTypeEnum.SCRIPT.getType(), type)) {
             assigneeUserIds = calculateTaskCandidateUsersByScript(execution, options);
+        } else if (Objects.equals(BpmTaskAssignRuleTypeEnum.EXPRESS.getType(), type)) {
+           Object result = FlowableUtils.getExpressionValue(execution, optionStr);
+           assigneeUserIds = Convert.toSet(Long.class, result);
         }
 
         // 移除被禁用的用户

@@ -11,6 +11,7 @@ import java.util.Set;
  *
  * @author 芋道源码
  */
+@Deprecated
 @Component
 public class BpmTaskAssignLeaderX2Script extends BpmTaskAssignLeaderAbstractScript {
 

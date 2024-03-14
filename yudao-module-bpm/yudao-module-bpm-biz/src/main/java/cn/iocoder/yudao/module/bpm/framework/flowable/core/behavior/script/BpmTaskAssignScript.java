@@ -14,6 +14,7 @@ import java.util.Set;
  *
  * @author 芋道源码
  */
+@Deprecated
 public interface BpmTaskAssignScript {
 
     /**
@@ -30,5 +31,6 @@ public interface BpmTaskAssignScript {
      * @return 枚举值
      */
     BpmTaskRuleScriptEnum getEnum();
+
 }
 

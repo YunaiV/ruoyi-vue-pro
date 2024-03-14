@@ -18,6 +18,7 @@ import java.util.Set;
  *
  * @author 芋道源码
  */
+@Deprecated
 @Component
 public class BpmTaskAssignStartUserScript implements BpmTaskAssignScript {
 

@@ -14,9 +14,4 @@ public interface BpmnModelConstants {
      */
     String NAMESPACE = "http://flowable.org/bpmn";
 
-    /**
-     * 自定义属性 dataType
-     */
-    String PROCESS_CUSTOM_DATA_TYPE = "dataType";
-
 }

@@ -171,9 +171,10 @@ public class BpmModelServiceImpl implements BpmModelService {
         // 1.5 校验模型是否发生修改。如果未修改，则不允许创建
         BpmProcessDefinitionCreateReqDTO definitionCreateReqDTO = BpmModelConvert.INSTANCE.convert2(model, form)
                 .setBpmnBytes(bpmnBytes);
-        if (processDefinitionService.isProcessDefinitionEquals(definitionCreateReqDTO)) { // 流程定义的信息相等
-            throw exception(MODEL_DEPLOY_FAIL_TASK_INFO_EQUALS);
-        }
+        // TODO @芋艿：这里比较可能有点问题
+//        if (processDefinitionService.isProcessDefinitionEquals(definitionCreateReqDTO)) { // 流程定义的信息相等
+//            throw exception(MODEL_DEPLOY_FAIL_TASK_INFO_EQUALS);
+//        }
 
         // 2.1 创建流程定义
         String definitionId = processDefinitionService.createProcessDefinition(definitionCreateReqDTO);

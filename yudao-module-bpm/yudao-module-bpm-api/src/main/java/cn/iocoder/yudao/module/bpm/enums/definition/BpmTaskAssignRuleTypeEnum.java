@@ -18,7 +18,9 @@ public enum BpmTaskAssignRuleTypeEnum {
     POST(22, "岗位"),
     USER(30, "用户"),
     USER_GROUP(40, "用户组"),
+    @Deprecated
     SCRIPT(50, "自定义脚本"), // 例如说，发起人所在部门的领导、发起人所在部门的领导的领导
+    EXPRESS(60, "流程表达式"), // 表达式 ExpressionManager
     ;
 
     /**
