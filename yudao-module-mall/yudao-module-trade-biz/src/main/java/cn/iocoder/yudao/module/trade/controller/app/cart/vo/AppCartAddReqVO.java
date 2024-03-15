@@ -15,6 +15,7 @@ public class AppCartAddReqVO {
 
     @Schema(description = "新增商品数量", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     @NotNull(message = "数量不能为空")
+    @Min(value = 1, message = "商品数量必须大于等于1")
     private Integer count;
 
 }
