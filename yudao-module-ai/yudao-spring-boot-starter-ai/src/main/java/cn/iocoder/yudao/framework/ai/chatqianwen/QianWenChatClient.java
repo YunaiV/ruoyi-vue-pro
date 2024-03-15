@@ -5,13 +5,7 @@ import cn.iocoder.yudao.framework.ai.chat.ChatResponse;
 import cn.iocoder.yudao.framework.ai.chat.Generation;
 import cn.iocoder.yudao.framework.ai.chat.StreamingChatClient;
 import cn.iocoder.yudao.framework.ai.chat.prompt.Prompt;
-import cn.iocoder.yudao.framework.ai.chatqianwen.api.QianWenChatCompletionMessage;
-import cn.iocoder.yudao.framework.ai.chatqianwen.api.QianWenChatCompletionRequest;
-import cn.iocoder.yudao.framework.ai.chatyiyan.api.YiYanChatCompletion;
-import cn.iocoder.yudao.framework.ai.chatyiyan.api.YiYanChatCompletionRequest;
 import cn.iocoder.yudao.framework.ai.chatyiyan.exception.YiYanApiException;
-import cn.iocoder.yudao.framework.ai.model.function.AbstractFunctionCallSupport;
-import cn.iocoder.yudao.framework.ai.model.function.FunctionCallbackContext;
 import com.aliyun.broadscope.bailian.sdk.models.ChatRequestMessage;
 import com.aliyun.broadscope.bailian.sdk.models.ChatUserMessage;
 import com.aliyun.broadscope.bailian.sdk.models.CompletionsResponse;
@@ -36,13 +30,11 @@ import java.util.stream.Collectors;
  * time: 2024/3/13 21:06
  */
 @Slf4j
-public class QianWenChatClient extends AbstractFunctionCallSupport<QianWenChatCompletionMessage, ChatRequestMessage, ResponseEntity<CompletionsResponse>>
-        implements ChatClient, StreamingChatClient {
+public class QianWenChatClient  implements ChatClient, StreamingChatClient {
 
     private QianWenApi qianWenApi;
 
     public QianWenChatClient(QianWenApi qianWenApi) {
-        super(null);
         this.qianWenApi = qianWenApi;
     }
 
@@ -61,10 +53,6 @@ public class QianWenChatClient extends AbstractFunctionCallSupport<QianWenChatCo
             })
             .build();
 
-    public QianWenChatClient(FunctionCallbackContext functionCallbackContext) {
-        super(functionCallbackContext);
-    }
-
     @Override
     public ChatResponse call(Prompt prompt) {
         return this.retryTemplate.execute(ctx -> {
@@ -72,7 +60,7 @@ public class QianWenChatClient extends AbstractFunctionCallSupport<QianWenChatCo
             // 创建 request 请求，stream模式需要供应商支持
             ChatRequestMessage request = this.createRequest(prompt, false);
             // 调用 callWithFunctionSupport 发送请求
-            ResponseEntity<CompletionsResponse> responseEntity = this.callWithFunctionSupport(request);
+            ResponseEntity<CompletionsResponse> responseEntity = qianWenApi.chatCompletionEntity(request);
             // 获取结果封装 chatCompletion
             CompletionsResponse response = responseEntity.getBody();
             if (!response.isSuccess()) {
@@ -99,30 +87,5 @@ public class QianWenChatClient extends AbstractFunctionCallSupport<QianWenChatCo
         return response.map(res -> {
             return new ChatResponse(List.of(new Generation(res.getData().getText())));
         });
-    }
-
-    @Override
-    protected QianWenChatCompletionRequest doCreateToolResponseRequest(ChatRequestMessage previousRequest, QianWenChatCompletionMessage responseMessage, List<QianWenChatCompletionMessage> conversationHistory) {
-        return null;
-    }
-
-    @Override
-    protected List<QianWenChatCompletionMessage> doGetUserMessages(ChatRequestMessage request) {
-        return null;
-    }
-
-    @Override
-    protected QianWenChatCompletionMessage doGetToolResponseMessage(ResponseEntity<CompletionsResponse> response) {
-        return null;
-    }
-
-    @Override
-    protected ResponseEntity<CompletionsResponse> doChatCompletion(ChatRequestMessage request) {
-        return qianWenApi.chatCompletionEntity(request);
-    }
-
-    @Override
-    protected boolean isToolFunctionCall(ResponseEntity<CompletionsResponse> response) {
-        return false;
     }
 }

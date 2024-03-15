@@ -29,11 +29,16 @@ public abstract class AbstractFunctionCallSupport<Msg, Req, Resp> {
 	protected final static boolean IS_RUNTIME_CALL = true;
 
 	/**
+	 * 函数回调寄存器用于按名称解析函数回调。
+	 *
 	 * The function callback register is used to resolve the function callbacks by name.
 	 */
 	protected final Map<String, FunctionCallback> functionCallbackRegister = new ConcurrentHashMap<>();
 
 	/**
+	 * 函数回调上下文用于按名称解析函数回调来自Spring上下文。
+	 * 它是可选的，通常与Spring一起使用自动配置。
+	 *
 	 * The function callback context is used to resolve the function callbacks by name
 	 * from the Spring context. It is optional and usually used with Spring
 	 * auto-configuration.

@@ -78,6 +78,8 @@ public class QianWenApi {
                 new CompletionsRequest()
                         // 设置 appid
                         .setAppId(appId)
+                        // 开启 stream
+                        .setStream(true)
                         .setMessages(List.of(message))
                         //开启增量输出模式，后面输出不会包含已经输出的内容
                         .setParameters(new CompletionsRequest.Parameter().setIncrementalOutput(true))

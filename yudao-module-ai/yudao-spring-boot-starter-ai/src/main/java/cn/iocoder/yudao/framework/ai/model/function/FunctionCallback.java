@@ -17,6 +17,13 @@
 package cn.iocoder.yudao.framework.ai.model.function;
 
 /**
+ *
+ * 表示模型函数调用处理程序。实现已向注册对触发函数调用的提示进行建模和调用。
+ *
+ * https://blog.csdn.net/weixin_37546425/article/details/136402740
+ *
+ * https://www.163.com/dy/article/ICE2S20P05119NPR.html
+ *
  * Represents a model function call handler. Implementations are registered with the
  * Models and called on prompts that trigger the function call.
  *

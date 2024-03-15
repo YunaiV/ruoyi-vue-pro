@@ -6,10 +6,8 @@ import cn.iocoder.yudao.framework.ai.chat.Generation;
 import cn.iocoder.yudao.framework.ai.chat.StreamingChatClient;
 import cn.iocoder.yudao.framework.ai.chat.prompt.Prompt;
 import cn.iocoder.yudao.framework.ai.chatxinghuo.api.XingHuoChatCompletion;
-import cn.iocoder.yudao.framework.ai.chatxinghuo.api.XingHuoChatCompletionMessage;
 import cn.iocoder.yudao.framework.ai.chatxinghuo.api.XingHuoChatCompletionRequest;
 import cn.iocoder.yudao.framework.ai.chatxinghuo.exception.XingHuoApiException;
-import cn.iocoder.yudao.framework.ai.model.function.AbstractFunctionCallSupport;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.retry.RetryCallback;
@@ -29,8 +27,7 @@ import java.util.stream.Collectors;
  * time: 2024/3/11 10:19
  */
 @Slf4j
-public class XingHuoChatClient extends AbstractFunctionCallSupport<XingHuoChatCompletionMessage, XingHuoChatCompletionRequest, ResponseEntity<XingHuoChatCompletion>>
-        implements ChatClient, StreamingChatClient {
+public class XingHuoChatClient implements ChatClient, StreamingChatClient {
 
     private XingHuoApi xingHuoApi;
 
@@ -52,7 +49,6 @@ public class XingHuoChatClient extends AbstractFunctionCallSupport<XingHuoChatCo
             .build();
 
     public XingHuoChatClient(XingHuoApi xingHuoApi) {
-        super(null);
         this.xingHuoApi = xingHuoApi;
     }
 
@@ -64,7 +60,7 @@ public class XingHuoChatClient extends AbstractFunctionCallSupport<XingHuoChatCo
             // 创建 request 请求，stream模式需要供应商支持
             XingHuoChatCompletionRequest request = this.createRequest(prompt, false);
             // 调用 callWithFunctionSupport 发送请求
-            ResponseEntity<XingHuoChatCompletion> response = this.callWithFunctionSupport(request);
+            ResponseEntity<XingHuoChatCompletion> response = xingHuoApi.chatCompletionEntity(request);
             // 获取结果封装 ChatResponse
             return new ChatResponse(List.of(new Generation(response.getBody().getPayload().getChoices().getText().get(0).getContent())));
         });
@@ -101,30 +97,5 @@ public class XingHuoChatClient extends AbstractFunctionCallSupport<XingHuoChatCo
                     .map(item -> item.getContent()).collect(Collectors.joining());
             return new ChatResponse(List.of(new Generation(content)));
         });
-    }
-
-    @Override
-    protected XingHuoChatCompletionRequest doCreateToolResponseRequest(XingHuoChatCompletionRequest previousRequest, XingHuoChatCompletionMessage responseMessage, List<XingHuoChatCompletionMessage> conversationHistory) {
-        return null;
-    }
-
-    @Override
-    protected List<XingHuoChatCompletionMessage> doGetUserMessages(XingHuoChatCompletionRequest request) {
-        return null;
-    }
-
-    @Override
-    protected XingHuoChatCompletionMessage doGetToolResponseMessage(ResponseEntity<XingHuoChatCompletion> response) {
-        return null;
-    }
-
-    @Override
-    protected ResponseEntity<XingHuoChatCompletion> doChatCompletion(XingHuoChatCompletionRequest request) {
-        return xingHuoApi.chatCompletionEntity(request);
-    }
-
-    @Override
-    protected boolean isToolFunctionCall(ResponseEntity<XingHuoChatCompletion> response) {
-        return false;
     }
 }

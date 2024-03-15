@@ -7,13 +7,9 @@ import cn.iocoder.yudao.framework.ai.chat.StreamingChatClient;
 import cn.iocoder.yudao.framework.ai.chat.messages.Message;
 import cn.iocoder.yudao.framework.ai.chat.prompt.Prompt;
 import cn.iocoder.yudao.framework.ai.chatyiyan.api.YiYanChatCompletion;
-import cn.iocoder.yudao.framework.ai.chatyiyan.api.YiYanChatCompletionMessage;
 import cn.iocoder.yudao.framework.ai.chatyiyan.api.YiYanChatCompletionRequest;
 import cn.iocoder.yudao.framework.ai.chatyiyan.exception.YiYanApiException;
-import cn.iocoder.yudao.framework.ai.model.function.AbstractFunctionCallSupport;
-import cn.iocoder.yudao.framework.ai.model.function.FunctionCallbackContext;
 import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.http.ResponseEntity;
 import org.springframework.retry.RetryCallback;
 import org.springframework.retry.RetryContext;
@@ -32,14 +28,11 @@ import java.util.List;
  * time: 2024/3/8 19:11
  */
 @Slf4j
-public class YiYanChatClient
-        extends AbstractFunctionCallSupport<YiYanChatCompletionMessage, YiYanChatCompletionRequest, ResponseEntity<YiYanChatCompletion>>
-        implements ChatClient, StreamingChatClient {
+public class YiYanChatClient implements ChatClient, StreamingChatClient {
 
     private YiYanApi yiYanApi;
 
     public YiYanChatClient(YiYanApi yiYanApi) {
-        super(new FunctionCallbackContext());
         this.yiYanApi = yiYanApi;
     }
 
@@ -70,7 +63,7 @@ public class YiYanChatClient
             // 创建 request 请求，stream模式需要供应商支持
             YiYanChatCompletionRequest request = this.createRequest(prompt, false);
             // 调用 callWithFunctionSupport 发送请求
-            ResponseEntity<YiYanChatCompletion> response = this.callWithFunctionSupport(request);
+            ResponseEntity<YiYanChatCompletion> response = yiYanApi.chatCompletionEntity(request);
             // 获取结果封装 ChatResponse
             YiYanChatCompletion chatCompletion = response.getBody();
             return new ChatResponse(List.of(new Generation(chatCompletion.getResult())));
@@ -98,40 +91,6 @@ public class YiYanChatClient
         YiYanChatCompletionRequest request = this.createRequest(prompt, true);
         // 调用 callWithFunctionSupport 发送请求
         Flux<YiYanChatCompletion> response = this.yiYanApi.chatCompletionStream(request);
-//        response.subscribe(new Consumer<YiYanChatCompletion>() {
-//            @Override
-//            public void accept(YiYanChatCompletion chatCompletion) {
-//                // {"id":"as-p0nfjuuasg","object":"chat.completion","created":1710033402,"sentence_id":0,"is_end":false,"is_truncated":false,"result":"编程语","need_clear_history":false,"finish_reason":"normal","usage":{"prompt_tokens":5,"completion_tokens":0,"total_tokens":5}}
-//                System.err.println(chatCompletion);
-//            }
-//        });
-        return response.map(res -> {
-            return new ChatResponse(List.of(new Generation(res.getResult())));
-        });
-    }
-
-    @Override
-    protected YiYanChatCompletionRequest doCreateToolResponseRequest(YiYanChatCompletionRequest previousRequest, YiYanChatCompletionMessage responseMessage, List<YiYanChatCompletionMessage> conversationHistory) {
-        return null;
-    }
-
-    @Override
-    protected List<YiYanChatCompletionMessage> doGetUserMessages(YiYanChatCompletionRequest request) {
-        return null;
-    }
-
-    @Override
-    protected YiYanChatCompletionMessage doGetToolResponseMessage(ResponseEntity<YiYanChatCompletion> response) {
-        return null;
-    }
-
-    @Override
-    protected ResponseEntity<YiYanChatCompletion> doChatCompletion(YiYanChatCompletionRequest request) {
-        return yiYanApi.chatCompletionEntity(request);
-    }
-
-    @Override
-    protected boolean isToolFunctionCall(ResponseEntity<YiYanChatCompletion> response) {
-        return false;
+        return response.map(res -> new ChatResponse(List.of(new Generation(res.getResult()))));
     }
 }
