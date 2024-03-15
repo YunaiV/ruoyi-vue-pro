@@ -6,6 +6,7 @@ import org.flowable.bpmn.model.Activity;
 import org.flowable.bpmn.model.UserTask;
 import org.flowable.engine.impl.bpmn.behavior.AbstractBpmnActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.ParallelMultiInstanceBehavior;
+import org.flowable.engine.impl.bpmn.behavior.SequentialMultiInstanceBehavior;
 import org.flowable.engine.impl.bpmn.behavior.UserTaskActivityBehavior;
 import org.flowable.engine.impl.bpmn.parser.factory.DefaultActivityBehaviorFactory;
 
@@ -28,11 +29,16 @@ public class BpmActivityBehaviorFactory extends DefaultActivityBehaviorFactory {
 
     @Override
     public ParallelMultiInstanceBehavior createParallelMultiInstanceBehavior(Activity activity,
-                                                                             AbstractBpmnActivityBehavior innerActivityBehavior) {
-        return new BpmParallelMultiInstanceBehavior(activity, innerActivityBehavior)
+                                                                             AbstractBpmnActivityBehavior behavior) {
+        return new BpmParallelMultiInstanceBehavior(activity, behavior)
                 .setTaskCandidateInvoker(taskCandidateInvoker);
     }
 
-    // TODO @ke：SequentialMultiInstanceBehavior 这个抽空也可以看看
+    @Override
+    public SequentialMultiInstanceBehavior createSequentialMultiInstanceBehavior(Activity activity,
+                                                                                 AbstractBpmnActivityBehavior behavior) {
+        return new BpmSequentialMultiInstanceBehavior(activity, behavior)
+                .setTaskCandidateInvoker(taskCandidateInvoker);
+    }
 
 }
