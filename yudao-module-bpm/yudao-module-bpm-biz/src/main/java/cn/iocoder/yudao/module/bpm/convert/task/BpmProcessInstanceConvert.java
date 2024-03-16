@@ -1,13 +1,15 @@
 package cn.iocoder.yudao.module.bpm.convert.task;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
 import cn.iocoder.yudao.framework.common.util.date.DateUtils;
 import cn.iocoder.yudao.framework.common.util.number.NumberUtils;
+import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.instance.BpmProcessInstancePageItemRespVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.instance.BpmProcessInstanceRespVO;
 import cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmProcessDefinitionExtDO;
-import cn.iocoder.yudao.module.bpm.dal.dataobject.task.BpmProcessInstanceExtDO;
 import cn.iocoder.yudao.module.bpm.event.BpmProcessInstanceResultEvent;
+import cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmConstants;
 import cn.iocoder.yudao.module.bpm.service.message.dto.BpmMessageSendWhenProcessInstanceApproveReqDTO;
 import cn.iocoder.yudao.module.bpm.service.message.dto.BpmMessageSendWhenProcessInstanceRejectReqDTO;
 import cn.iocoder.yudao.module.system.api.dept.dto.DeptRespDTO;
@@ -34,25 +36,26 @@ public interface BpmProcessInstanceConvert {
 
     BpmProcessInstanceConvert INSTANCE = Mappers.getMapper(BpmProcessInstanceConvert.class);
 
-    default PageResult<BpmProcessInstancePageItemRespVO> convertPage(PageResult<BpmProcessInstanceExtDO> page,
+    default PageResult<BpmProcessInstancePageItemRespVO> convertPage(PageResult<HistoricProcessInstance> pageResult,
+                                                                     Map<String, ProcessDefinition> processDefinitionMap,
                                                                      Map<String, List<Task>> taskMap) {
-        List<BpmProcessInstancePageItemRespVO> list = convertList(page.getList());
-        list.forEach(respVO -> respVO.setTasks(convertList2(taskMap.get(respVO.getId()))));
-        return new PageResult<>(list, page.getTotal());
+        PageResult<BpmProcessInstancePageItemRespVO> vpPageResult = BeanUtils.toBean(pageResult, BpmProcessInstancePageItemRespVO.class);
+        for (int i = 0; i < pageResult.getList().size(); i++) {
+            BpmProcessInstancePageItemRespVO respVO = vpPageResult.getList().get(i);
+            respVO.setStatus((Integer) pageResult.getList().get(i).getProcessVariables().get(BpmConstants.PROCESS_INSTANCE_VARIABLE_STATUS));
+            MapUtils.findAndThen(processDefinitionMap, respVO.getProcessDefinitionId(),
+                    processDefinition -> respVO.setCategory(processDefinition.getCategory()));
+            respVO.setTasks(BeanUtils.toBean(taskMap.get(respVO.getId()), BpmProcessInstancePageItemRespVO.Task.class));
+        }
+        return vpPageResult;
     }
 
-    List<BpmProcessInstancePageItemRespVO> convertList(List<BpmProcessInstanceExtDO> list);
-
-    @Mapping(source = "processInstanceId", target = "id")
-    BpmProcessInstancePageItemRespVO convert(BpmProcessInstanceExtDO bean);
-
-    List<BpmProcessInstancePageItemRespVO.Task> convertList2(List<Task> tasks);
-
-    default BpmProcessInstanceRespVO convert2(HistoricProcessInstance processInstance, BpmProcessInstanceExtDO processInstanceExt,
+    default BpmProcessInstanceRespVO convert2(HistoricProcessInstance processInstance,
                                               ProcessDefinition processDefinition, BpmProcessDefinitionExtDO processDefinitionExt,
                                               String bpmnXml, AdminUserRespDTO startUser, DeptRespDTO dept) {
         BpmProcessInstanceRespVO respVO = convert2(processInstance);
-        copyTo(processInstanceExt, respVO);
+        respVO.setStatus((Integer) processInstance.getProcessVariables().get(BpmConstants.PROCESS_INSTANCE_VARIABLE_STATUS));
+        respVO.setFormVariables(processInstance.getProcessVariables()); // TODO 芋艿：真的这么搞么？？？formVariable 要不要换个 key 之类的
         // definition
         respVO.setProcessDefinition(convert2(processDefinition));
         copyTo(processDefinitionExt, respVO.getProcessDefinition());
@@ -68,9 +71,6 @@ public interface BpmProcessInstanceConvert {
     }
 
     BpmProcessInstanceRespVO convert2(HistoricProcessInstance bean);
-
-    @Mapping(source = "from.id", target = "to.id", ignore = true)
-    void copyTo(BpmProcessInstanceExtDO from, @MappingTarget BpmProcessInstanceRespVO to);
 
     BpmProcessInstanceRespVO.ProcessDefinition convert2(ProcessDefinition bean);
 
@@ -88,6 +88,7 @@ public interface BpmProcessInstanceConvert {
         return event;
     }
 
+    // TODO @芋艿：需要改下 key！
     default BpmProcessInstanceResultEvent convert(Object source, ProcessInstance instance, Integer result) {
         BpmProcessInstanceResultEvent event = new BpmProcessInstanceResultEvent(source);
         event.setId(instance.getId());

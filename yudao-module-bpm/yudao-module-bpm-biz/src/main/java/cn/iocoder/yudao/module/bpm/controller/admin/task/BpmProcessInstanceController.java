@@ -1,19 +1,31 @@
 package cn.iocoder.yudao.module.bpm.controller.admin.task;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.instance.*;
+import cn.iocoder.yudao.module.bpm.convert.task.BpmProcessInstanceConvert;
+import cn.iocoder.yudao.module.bpm.service.definition.BpmProcessDefinitionService;
 import cn.iocoder.yudao.module.bpm.service.task.BpmProcessInstanceService;
+import cn.iocoder.yudao.module.bpm.service.task.BpmTaskService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
+import org.flowable.engine.history.HistoricProcessInstance;
+import org.flowable.engine.repository.ProcessDefinition;
+import org.flowable.task.api.Task;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+import java.util.Map;
+
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
 
 @Tag(name = "管理后台 - 流程实例") // 流程实例，通过流程定义创建的一次“申请”
@@ -24,13 +36,27 @@ public class BpmProcessInstanceController {
 
     @Resource
     private BpmProcessInstanceService processInstanceService;
+    @Resource
+    private BpmTaskService taskService;
+    @Resource
+    private BpmProcessDefinitionService processDefinitionService;
 
     @GetMapping("/my-page")
     @Operation(summary = "获得我的实例分页列表", description = "在【我的流程】菜单中，进行调用")
     @PreAuthorize("@ss.hasPermission('bpm:process-instance:query')")
     public CommonResult<PageResult<BpmProcessInstancePageItemRespVO>> getMyProcessInstancePage(
             @Valid BpmProcessInstanceMyPageReqVO pageReqVO) {
-        return success(processInstanceService.getMyProcessInstancePage(getLoginUserId(), pageReqVO));
+        PageResult<HistoricProcessInstance> pageResult = processInstanceService.getMyProcessInstancePage(getLoginUserId(), pageReqVO);
+        if (CollUtil.isEmpty(pageResult.getList())) {
+            return success(PageResult.empty(pageResult.getTotal()));
+        }
+
+        // 拼接返回
+        Map<String, List<Task>> taskMap = taskService.getTaskMapByProcessInstanceIds(
+                convertList(pageResult.getList(), HistoricProcessInstance::getId));
+        Map<String, ProcessDefinition> processDefinitionMap = processDefinitionService.getProcessDefinitionMap(
+                convertSet(pageResult.getList(), HistoricProcessInstance::getProcessDefinitionId));
+        return success(BpmProcessInstanceConvert.INSTANCE.convertPage(pageResult, processDefinitionMap, taskMap));
     }
 
     @PostMapping("/create")

@@ -1,7 +1,9 @@
 package cn.iocoder.yudao.module.bpm.framework.flowable.core.enums;
 
 /**
- * 流程常量信息
+ * BPMN XML 常量信息
+ *
+ * @author 芋道源码
  */
 public interface BpmnModelConstants {
 

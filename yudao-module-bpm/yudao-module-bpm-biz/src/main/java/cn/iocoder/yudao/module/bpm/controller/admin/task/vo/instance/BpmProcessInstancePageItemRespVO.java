@@ -23,13 +23,10 @@ public class BpmProcessInstancePageItemRespVO {
     private String category;
 
     @Schema(description = "流程实例的状态-参见 bpm_process_instance_status", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
-    private Integer status;
-
-    @Schema(description = "流程实例的结果-参见 bpm_process_instance_result", requiredMode = Schema.RequiredMode.REQUIRED, example = "2")
-    private Integer result;
+    private Integer status; // 参见 BpmProcessInstanceStatusEnum 枚举
 
     @Schema(description = "提交时间", requiredMode = Schema.RequiredMode.REQUIRED)
-    private LocalDateTime createTime;
+    private LocalDateTime startTime;
 
     @Schema(description = "结束时间", requiredMode = Schema.RequiredMode.REQUIRED)
     private LocalDateTime endTime;

@@ -4,18 +4,17 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 /**
- * 流程实例 ProcessInstance 的状态
+ * 流程实例的状态
  *
  * @author 芋道源码
  */
+@Deprecated
 @Getter
 @AllArgsConstructor
-public enum BpmProcessInstanceStatusEnum {
+public enum BpmProcessInstanceStatusOldEnum {
 
     RUNNING(1, "进行中"),
-    APPROVE(2, "通过"),
-    REJECT(3, "不通过"),
-    CANCEL(4, "已取消");
+    FINISH(2, "已完成");
 
     /**
      * 状态

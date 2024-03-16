@@ -1,21 +1,23 @@
 package cn.iocoder.yudao.module.bpm.service.definition;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.process.BpmProcessDefinitionListReqVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.process.BpmProcessDefinitionPageItemRespVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.process.BpmProcessDefinitionPageReqVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.process.BpmProcessDefinitionRespVO;
 import cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmProcessDefinitionExtDO;
 import cn.iocoder.yudao.module.bpm.service.definition.dto.BpmProcessDefinitionCreateReqDTO;
+import jakarta.validation.Valid;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.repository.ProcessDefinition;
 
-import jakarta.validation.Valid;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
+
 /**
  * Flowable流程定义接口
  *
@@ -90,14 +92,16 @@ public interface BpmProcessDefinitionService {
     ProcessDefinition getProcessDefinition(String id);
 
     /**
-     * 获得编号对应的 ProcessDefinition
+     * 获得 ids 对应的 ProcessDefinition 数组
      *
-     * 相比 {@link #getProcessDefinition(String)} 方法，category 的取值是正确
-     *
-     * @param id 编号
-     * @return 流程定义
+     * @param ids 编号的数组
+     * @return 流程定义的数组
      */
-    ProcessDefinition getProcessDefinition2(String id);
+    List<ProcessDefinition> getProcessDefinitionList(Set<String> ids);
+
+    default Map<String, ProcessDefinition> getProcessDefinitionMap(Set<String> ids) {
+        return convertMap(getProcessDefinitionList(ids), ProcessDefinition::getId);
+    }
 
     /**
      * 获得 deploymentId 对应的 ProcessDefinition
@@ -130,7 +134,7 @@ public interface BpmProcessDefinitionService {
      * @return 流程部署 Map
      */
     default Map<String, Deployment> getDeploymentMap(Set<String> ids) {
-        return CollectionUtils.convertMap(getDeployments(ids), Deployment::getId);
+        return convertMap(getDeployments(ids), Deployment::getId);
     }
 
     /**

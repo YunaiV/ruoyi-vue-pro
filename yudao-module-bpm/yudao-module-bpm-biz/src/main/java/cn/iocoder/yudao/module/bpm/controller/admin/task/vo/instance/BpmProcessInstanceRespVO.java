@@ -20,8 +20,8 @@ public class BpmProcessInstanceRespVO {
     @Schema(description = "流程分类-参见 bpm_model_category 数据字典", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     private String category;
 
-    @Schema(description = "流程实例的状态-参见 bpm_process_instance_status", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
-    private Integer status;
+    @Schema(description = "流程实例的状态", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
+    private Integer status; // 参见 BpmProcessInstanceStatusEnum 枚举
 
     @Schema(description = "流程实例的结果-参见 bpm_process_instance_result", requiredMode = Schema.RequiredMode.REQUIRED, example = "2")
     private Integer result;
