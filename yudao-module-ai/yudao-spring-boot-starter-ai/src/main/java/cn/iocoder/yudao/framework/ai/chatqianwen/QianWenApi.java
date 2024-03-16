@@ -2,15 +2,12 @@ package cn.iocoder.yudao.framework.ai.chatqianwen;
 
 import com.aliyun.broadscope.bailian.sdk.AccessTokenClient;
 import com.aliyun.broadscope.bailian.sdk.ApplicationClient;
-import com.aliyun.broadscope.bailian.sdk.models.ChatRequestMessage;
 import com.aliyun.broadscope.bailian.sdk.models.CompletionsRequest;
 import com.aliyun.broadscope.bailian.sdk.models.CompletionsResponse;
 import lombok.Getter;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import reactor.core.publisher.Flux;
-
-import java.util.List;
 
 /**
  * 阿里 通义千问
@@ -35,11 +32,10 @@ public class QianWenApi {
     private String token;
     private ApplicationClient client;
 
-    public QianWenApi(String accessKeyId, String accessKeySecret, String agentKey, String appId, String endpoint) {
+    public QianWenApi(String accessKeyId, String accessKeySecret, String agentKey, String endpoint) {
         this.accessKeyId = accessKeyId;
         this.accessKeySecret = accessKeySecret;
         this.agentKey = agentKey;
-        this.appId = appId;
 
         if (endpoint != null) {
             this.endpoint = endpoint;
@@ -54,35 +50,14 @@ public class QianWenApi {
                 .build();
     }
 
-    public ResponseEntity<CompletionsResponse> chatCompletionEntity(ChatRequestMessage message) {
-        // 创建request
-        CompletionsRequest request = new CompletionsRequest()
-                // 设置 appid
-                .setAppId(appId)
-                .setMessages(List.of(message))
-                // 返回choice message结果
-                .setParameters(new CompletionsRequest.Parameter().setResultFormat("message"));
-        //
+    public ResponseEntity<CompletionsResponse> chatCompletionEntity(CompletionsRequest request) {
+        // 发送请求
         CompletionsResponse response = client.completions(request);
-        int httpCode = 200;
-        if (!response.isSuccess()) {
-            System.out.printf("failed to create completion, requestId: %s, code: %s, message: %s\n",
-                    response.getRequestId(), response.getCode(), response.getMessage());
-            httpCode = 500;
-        }
-        return new ResponseEntity<>(response, HttpStatusCode.valueOf(httpCode));
+        // 阿里云的这个 http code 随便设置，外面判断是否成功用的 CompletionsResponse.isSuccess
+        return new ResponseEntity<>(response, HttpStatusCode.valueOf(200));
     }
 
-    public Flux<CompletionsResponse> chatCompletionStream(ChatRequestMessage message) {
-        return client.streamCompletions(
-                new CompletionsRequest()
-                        // 设置 appid
-                        .setAppId(appId)
-                        // 开启 stream
-                        .setStream(true)
-                        .setMessages(List.of(message))
-                        //开启增量输出模式，后面输出不会包含已经输出的内容
-                        .setParameters(new CompletionsRequest.Parameter().setIncrementalOutput(true))
-        );
+    public Flux<CompletionsResponse> chatCompletionStream(CompletionsRequest request) {
+        return client.streamCompletions(request);
     }
 }

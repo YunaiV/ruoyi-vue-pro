@@ -1,14 +1,13 @@
 package cn.iocoder.yudao.framework.ai.chatqianwen;
 
-import cn.iocoder.yudao.framework.ai.chat.ChatClient;
-import cn.iocoder.yudao.framework.ai.chat.ChatResponse;
-import cn.iocoder.yudao.framework.ai.chat.Generation;
-import cn.iocoder.yudao.framework.ai.chat.StreamingChatClient;
+import cn.hutool.core.util.IdUtil;
+import cn.hutool.json.JSONUtil;
+import cn.iocoder.yudao.framework.ai.chat.*;
+import cn.iocoder.yudao.framework.ai.chat.messages.MessageType;
+import cn.iocoder.yudao.framework.ai.chat.prompt.ChatOptions;
 import cn.iocoder.yudao.framework.ai.chat.prompt.Prompt;
 import cn.iocoder.yudao.framework.ai.chatyiyan.exception.YiYanApiException;
-import com.aliyun.broadscope.bailian.sdk.models.ChatRequestMessage;
-import com.aliyun.broadscope.bailian.sdk.models.ChatUserMessage;
-import com.aliyun.broadscope.bailian.sdk.models.CompletionsResponse;
+import com.aliyun.broadscope.bailian.sdk.models.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.retry.RetryCallback;
@@ -19,6 +18,7 @@ import reactor.core.publisher.Flux;
 
 import java.time.Duration;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -34,8 +34,15 @@ public class QianWenChatClient  implements ChatClient, StreamingChatClient {
 
     private QianWenApi qianWenApi;
 
+    private ChatOptions chatOptions;
+
     public QianWenChatClient(QianWenApi qianWenApi) {
         this.qianWenApi = qianWenApi;
+    }
+
+    public QianWenChatClient(QianWenApi qianWenApi, ChatOptions chatOptions) {
+        this.qianWenApi = qianWenApi;
+        this.chatOptions = chatOptions;
     }
 
     public final RetryTemplate retryTemplate = RetryTemplate.builder()
@@ -58,7 +65,7 @@ public class QianWenChatClient  implements ChatClient, StreamingChatClient {
         return this.retryTemplate.execute(ctx -> {
             // ctx 会有重试的信息
             // 创建 request 请求，stream模式需要供应商支持
-            ChatRequestMessage request = this.createRequest(prompt, false);
+            CompletionsRequest request = this.createRequest(prompt, false);
             // 调用 callWithFunctionSupport 发送请求
             ResponseEntity<CompletionsResponse> responseEntity = qianWenApi.chatCompletionEntity(request);
             // 获取结果封装 chatCompletion
@@ -67,21 +74,69 @@ public class QianWenChatClient  implements ChatClient, StreamingChatClient {
                 return new ChatResponse(List.of(new Generation(String.format("failed to create completion, requestId: %s, code: %s, message: %s\n",
                         response.getRequestId(), response.getCode(), response.getMessage()))));
             }
-            List<Generation> generations = response.getData().getChoices().stream()
-                    .map(item -> new Generation(item.getMessage().getContent())).collect(Collectors.toList());
-            return new ChatResponse(generations);
+            // 转换为 Generation 返回
+            return new ChatResponse(List.of(new Generation(response.getData().getText())));
         });
     }
 
-    private ChatRequestMessage createRequest(Prompt prompt, boolean b) {
-        return new ChatUserMessage(prompt.getContents());
+    private CompletionsRequest createRequest(Prompt prompt, boolean stream) {
+        // 两个都为null 则没有配置文件
+        if (chatOptions == null && prompt.getOptions() == null) {
+            throw new ChatException("ChatOptions 未配置参数!");
+        }
+        // 优先使用 Prompt 里面的 ChatOptions
+        ChatOptions options = chatOptions;
+        if (prompt.getOptions() != null) {
+            options = (ChatOptions) prompt.getOptions();
+        }
+        QianWenOptions qianWenOptions = (QianWenOptions) options;
+        // 需要额外处理
+        if (!stream) {
+            // 如果不需要 stream 输出，那么需要将这个设置为false，不然只会输出最后几个文字
+            if (qianWenOptions.getParameters() == null) {
+                qianWenOptions.setParameters(new CompletionsRequest.Parameter().setIncrementalOutput(false));
+            } else {
+                qianWenOptions.getParameters().setIncrementalOutput(false);
+            }
+        } else {
+            // 如果不需要 stream 输出，设置为true这样不会输出累加内容
+            if (qianWenOptions.getParameters() == null) {
+                qianWenOptions.setParameters(new CompletionsRequest.Parameter().setIncrementalOutput(true));
+            } else {
+                qianWenOptions.getParameters().setIncrementalOutput(true);
+            }
+        }
+
+        // 创建request
+        return new CompletionsRequest()
+                // 请求唯一标识，请确保RequestId不重复。
+                .setRequestId(IdUtil.getSnowflakeNextIdStr())
+                // 设置 appid
+                .setAppId(qianWenOptions.getAppId())
+                .setMessages(prompt.getInstructions().stream().map(m -> {
+                    // 转换成 千问 对于的请求message
+                    if (MessageType.USER == m.getMessageType()) {
+                        return new ChatUserMessage(m.getContent());
+                    } else if (MessageType.SYSTEM == m.getMessageType()) {
+                        return new ChatSystemMessage(m.getContent());
+                    } else if (MessageType.ASSISTANT == m.getMessageType()) {
+                        return new ChatAssistantMessage(m.getContent());
+                    }
+                    throw new ChatException(String.format("存在不能适配的消息! %s", JSONUtil.toJsonPrettyStr(m)));
+                }).collect(Collectors.toList()))
+                // 返回choice message结果
+                .setParameters(qianWenOptions.getParameters())
+                // 设置 ChatOptions 里面公共的参数
+                .setTopP(options.getTopP() == null ? null : options.getTopP().doubleValue())
+                // 设置输出方式
+                .setStream(stream);
     }
 
     @Override
     public Flux<ChatResponse> stream(Prompt prompt) {
         // ctx 会有重试的信息
         // 创建 request 请求，stream模式需要供应商支持
-        ChatRequestMessage request = this.createRequest(prompt, true);
+        CompletionsRequest request = this.createRequest(prompt, true);
         // 调用 callWithFunctionSupport 发送请求
         Flux<CompletionsResponse> response = this.qianWenApi.chatCompletionStream(request);
         return response.map(res -> {

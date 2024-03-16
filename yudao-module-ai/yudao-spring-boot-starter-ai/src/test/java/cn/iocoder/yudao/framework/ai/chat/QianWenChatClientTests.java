@@ -3,6 +3,8 @@ package cn.iocoder.yudao.framework.ai.chat;
 import cn.iocoder.yudao.framework.ai.chat.prompt.Prompt;
 import cn.iocoder.yudao.framework.ai.chatqianwen.QianWenApi;
 import cn.iocoder.yudao.framework.ai.chatqianwen.QianWenChatClient;
+import cn.iocoder.yudao.framework.ai.chatqianwen.QianWenOptions;
+import com.aliyun.broadscope.bailian.sdk.models.CompletionsRequest;
 import org.junit.Before;
 import org.junit.Test;
 import reactor.core.publisher.Flux;
@@ -24,10 +26,13 @@ public class QianWenChatClientTests {
                 "",
                 "",
                 "",
-                "",
                 null
         );
-        qianWenChatClient = new QianWenChatClient(qianWenApi);
+        qianWenChatClient = new QianWenChatClient(
+                qianWenApi,
+                new QianWenOptions()
+                        .setAppId("5f14955f201a44eb8dbe0c57250a32ce")
+        );
     }
 
     @Test
