@@ -34,15 +34,15 @@ public class QianWenChatClient  implements ChatClient, StreamingChatClient {
 
     private QianWenApi qianWenApi;
 
-    private ChatOptions chatOptions;
+    private QianWenOptions qianWenOptions;
 
     public QianWenChatClient(QianWenApi qianWenApi) {
         this.qianWenApi = qianWenApi;
     }
 
-    public QianWenChatClient(QianWenApi qianWenApi, ChatOptions chatOptions) {
+    public QianWenChatClient(QianWenApi qianWenApi, QianWenOptions qianWenOptions) {
         this.qianWenApi = qianWenApi;
-        this.chatOptions = chatOptions;
+        this.qianWenOptions = qianWenOptions;
     }
 
     public final RetryTemplate retryTemplate = RetryTemplate.builder()
@@ -81,11 +81,11 @@ public class QianWenChatClient  implements ChatClient, StreamingChatClient {
 
     private CompletionsRequest createRequest(Prompt prompt, boolean stream) {
         // 两个都为null 则没有配置文件
-        if (chatOptions == null && prompt.getOptions() == null) {
+        if (qianWenOptions == null && prompt.getOptions() == null) {
             throw new ChatException("ChatOptions 未配置参数!");
         }
         // 优先使用 Prompt 里面的 ChatOptions
-        ChatOptions options = chatOptions;
+        ChatOptions options = qianWenOptions;
         if (prompt.getOptions() != null) {
             options = (ChatOptions) prompt.getOptions();
         }
