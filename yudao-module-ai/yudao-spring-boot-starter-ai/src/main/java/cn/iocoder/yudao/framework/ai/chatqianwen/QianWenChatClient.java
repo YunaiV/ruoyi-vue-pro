@@ -6,6 +6,7 @@ import cn.iocoder.yudao.framework.ai.chat.*;
 import cn.iocoder.yudao.framework.ai.chat.messages.MessageType;
 import cn.iocoder.yudao.framework.ai.chat.prompt.ChatOptions;
 import cn.iocoder.yudao.framework.ai.chat.prompt.Prompt;
+import cn.iocoder.yudao.framework.ai.chatyiyan.YiYanOptions;
 import cn.iocoder.yudao.framework.ai.chatyiyan.exception.YiYanApiException;
 import com.aliyun.broadscope.bailian.sdk.models.*;
 import lombok.extern.slf4j.Slf4j;
@@ -88,6 +89,10 @@ public class QianWenChatClient  implements ChatClient, StreamingChatClient {
         ChatOptions options = qianWenOptions;
         if (prompt.getOptions() != null) {
             options = (ChatOptions) prompt.getOptions();
+        }
+        // Prompt 里面是一个 ChatOptions，用户可以随意传入，这里做一下判断
+        if (!(options instanceof QianWenOptions)) {
+            throw new ChatException("Prompt 传入的不是 QianWenOptions!");
         }
         QianWenOptions qianWenOptions = (QianWenOptions) options;
         // 需要额外处理
