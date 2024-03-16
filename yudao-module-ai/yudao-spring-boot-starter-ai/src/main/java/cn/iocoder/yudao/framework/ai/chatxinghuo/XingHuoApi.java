@@ -39,22 +39,20 @@ public class XingHuoApi {
     private String appKey;
     private String secretKey;
     private WebClient webClient;
-    private XingHuoChatModel useChatModel;
     // 创建 WebSocketClient 实例
     private ReactorNettyWebSocketClient socketClient = new ReactorNettyWebSocketClient();
 
-    public XingHuoApi(String appId, String appKey, String secretKey, XingHuoChatModel useChatModel) {
+    public XingHuoApi(String appId, String appKey, String secretKey) {
         this.appId = appId;
         this.appKey = appKey;
         this.secretKey = secretKey;
-        this.useChatModel = useChatModel;
-
     }
 
-    public ResponseEntity<XingHuoChatCompletion> chatCompletionEntity(XingHuoChatCompletionRequest request) {
+    public ResponseEntity<XingHuoChatCompletion> chatCompletionEntity(XingHuoChatCompletionRequest request, XingHuoChatModel xingHuoChatModel) {
         String authUrl;
         try {
-            authUrl = getAuthorizationUrl("spark-api.xf-yun.com", useChatModel.getUri());
+//            XingHuoChatModel useChatModel;
+            authUrl = getAuthorizationUrl("spark-api.xf-yun.com", xingHuoChatModel.getUri());
         } catch (NoSuchAlgorithmException | InvalidKeyException e) {
             throw new RuntimeException(e);
         }
@@ -125,10 +123,10 @@ public class XingHuoApi {
         return "wss://" + host + path + "?" + toParams;
     }
 
-    public Flux<XingHuoChatCompletion> chatCompletionStream(XingHuoChatCompletionRequest request) {
+    public Flux<XingHuoChatCompletion> chatCompletionStream(XingHuoChatCompletionRequest request, XingHuoChatModel xingHuoChatModel) {
         String authUrl;
         try {
-            authUrl = getAuthorizationUrl("spark-api.xf-yun.com", useChatModel.getUri());
+            authUrl = getAuthorizationUrl("spark-api.xf-yun.com", xingHuoChatModel.getUri());
         } catch (NoSuchAlgorithmException | InvalidKeyException e) {
             throw new RuntimeException(e);
         }

@@ -23,9 +23,9 @@ public class QianWenChatClientTests {
     @Before
     public void setup() {
         QianWenApi qianWenApi = new QianWenApi(
-                "LTAI5tNTVhXW4fLKUjMrr98z",
-                "ZJ0JQeyjzxxm5CfeTV6k1wNE9UsvZP",
-                "f0c1088824594f589c8f10567ccd929f_p_efm",
+                "",
+                "",
+                "",
                 null
         );
         qianWenChatClient = new QianWenChatClient(

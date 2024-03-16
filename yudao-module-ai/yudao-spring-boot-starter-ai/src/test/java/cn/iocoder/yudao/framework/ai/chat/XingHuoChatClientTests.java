@@ -4,6 +4,7 @@ import cn.iocoder.yudao.framework.ai.chat.prompt.Prompt;
 import cn.iocoder.yudao.framework.ai.chatxinghuo.XingHuoApi;
 import cn.iocoder.yudao.framework.ai.chatxinghuo.XingHuoChatClient;
 import cn.iocoder.yudao.framework.ai.chatxinghuo.XingHuoChatModel;
+import cn.iocoder.yudao.framework.ai.chatxinghuo.XingHuoOptions;
 import org.junit.Before;
 import org.junit.Test;
 import reactor.core.publisher.Flux;
@@ -28,9 +29,9 @@ public class XingHuoChatClientTests {
                 new XingHuoApi(
                         "13c8cca6",
                         "cb6415c19d6162cda07b47316fcb0416",
-                        "Y2JiYTIxZjA3MDMxMjNjZjQzYzVmNzdh",
-                        XingHuoChatModel.XING_HUO_3_5
-                )
+                        "Y2JiYTIxZjA3MDMxMjNjZjQzYzVmNzdh"
+                ),
+                new XingHuoOptions().setDomain(XingHuoChatModel.XING_HUO_3_5)
         );
     }
 

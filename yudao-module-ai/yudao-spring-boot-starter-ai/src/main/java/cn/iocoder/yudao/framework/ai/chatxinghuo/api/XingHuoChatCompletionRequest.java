@@ -45,9 +45,24 @@ public class XingHuoChatCompletionRequest {
              * generalv3.5指向V3.5版本;
              * 注意：不同的取值对应的url也不一样！
              */
-            private String domain = "general";
-            private Double temperature = 0.5;
-            private Integer max_tokens = 2048;
+            private String domain = "generalv3.5";
+            /**
+             * 取值范围 (0，1] ，默认值0.5
+             */
+            private Float temperature;
+            /**
+             * V1.5取值为[1,4096]
+             * V2.0、V3.0和V3.5取值为[1,8192]，默认为2048。
+             */
+            private Integer max_tokens;
+            /**
+             * 取值为[1，6],默认为4
+             */
+            private Integer top_k;
+            /**
+             * 	需要保障用户下的唯一性，用于关联用户会话
+             */
+            private String chat_id;
         }
     }
 

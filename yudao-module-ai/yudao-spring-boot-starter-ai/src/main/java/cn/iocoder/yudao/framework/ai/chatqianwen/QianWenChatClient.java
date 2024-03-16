@@ -6,7 +6,6 @@ import cn.iocoder.yudao.framework.ai.chat.*;
 import cn.iocoder.yudao.framework.ai.chat.messages.MessageType;
 import cn.iocoder.yudao.framework.ai.chat.prompt.ChatOptions;
 import cn.iocoder.yudao.framework.ai.chat.prompt.Prompt;
-import cn.iocoder.yudao.framework.ai.chatyiyan.YiYanOptions;
 import cn.iocoder.yudao.framework.ai.chatyiyan.exception.YiYanApiException;
 import com.aliyun.broadscope.bailian.sdk.models.*;
 import lombok.extern.slf4j.Slf4j;
@@ -19,7 +18,6 @@ import reactor.core.publisher.Flux;
 
 import java.time.Duration;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
