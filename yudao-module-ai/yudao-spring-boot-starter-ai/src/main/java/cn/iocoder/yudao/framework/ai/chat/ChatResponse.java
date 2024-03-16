@@ -19,6 +19,8 @@ import cn.iocoder.yudao.framework.ai.chat.metadata.ChatResponseMetadata;
 import cn.iocoder.yudao.framework.ai.model.ModelResponse;
 import org.springframework.util.CollectionUtils;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -54,7 +56,8 @@ public class ChatResponse implements ModelResponse<Generation> {
 	 */
 	public ChatResponse(List<Generation> generations, ChatResponseMetadata chatResponseMetadata) {
 		this.chatResponseMetadata = chatResponseMetadata;
-		this.generations = List.copyOf(generations);
+//		this.generations = List.copyOf(generations);
+		this.generations = Collections.unmodifiableList(generations);
 	}
 
 	/**
@@ -98,8 +101,12 @@ public class ChatResponse implements ModelResponse<Generation> {
 	public boolean equals(Object o) {
 		if (this == o)
 			return true;
-		if (!(o instanceof ChatResponse that))
+//		if (!(o instanceof ChatResponse that))
+//			return false;
+		if (!(o instanceof ChatResponse)) {
 			return false;
+		}
+		ChatResponse that = (ChatResponse) o;
 		return Objects.equals(chatResponseMetadata, that.chatResponseMetadata)
 				&& Objects.equals(generations, that.generations);
 	}

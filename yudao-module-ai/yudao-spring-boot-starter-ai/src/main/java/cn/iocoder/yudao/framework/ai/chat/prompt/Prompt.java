@@ -16,6 +16,7 @@
 
 package cn.iocoder.yudao.framework.ai.chat.prompt;
 
+import cn.iocoder.yudao.framework.ai.chat.ChatResponse;
 import cn.iocoder.yudao.framework.ai.chat.messages.Message;
 import cn.iocoder.yudao.framework.ai.chat.messages.UserMessage;
 import cn.iocoder.yudao.framework.ai.model.ModelOptions;
@@ -86,8 +87,12 @@ public class Prompt implements ModelRequest<List<Message>> {
 	public boolean equals(Object o) {
 		if (this == o)
 			return true;
-		if (!(o instanceof Prompt prompt))
+//		if (!(o instanceof Prompt prompt))
+//			return false;
+		if (!(o instanceof Prompt)) {
 			return false;
+		}
+		Prompt prompt = (Prompt) o;
 		return Objects.equals(this.messages, prompt.messages) && Objects.equals(this.modelOptions, prompt.modelOptions);
 	}
 

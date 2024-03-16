@@ -153,13 +153,18 @@ public class BeanOutputParser<T> implements OutputParser<T> {
 	 */
 	@Override
 	public String getFormat() {
-		String template = """
-				Your response should be in JSON format.
-				Do not include any explanations, only provide a RFC8259 compliant JSON response following this format without deviation.
-				Do not include markdown code blocks in your response.
-				Here is the JSON Schema instance your output must adhere to:
-				```%s```
-				""";
+//		String template = """
+//				Your response should be in JSON format.
+//				Do not include any explanations, only provide a RFC8259 compliant JSON response following this format without deviation.
+//				Do not include markdown code blocks in your response.
+//				Here is the JSON Schema instance your output must adhere to:
+//				```%s```
+//				""";
+		String template = "Your response should be in JSON format.\n" +
+				"\t\t\t\tDo not include any explanations, only provide a RFC8259 compliant JSON response following this format without deviation.\n" +
+				"\t\t\t\tDo not include markdown code blocks in your response.\n" +
+				"\t\t\t\tHere is the JSON Schema instance your output must adhere to:\n" +
+				"\t\t\t\t```%s```";
 		return String.format(template, this.jsonSchema);
 	}
 

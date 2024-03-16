@@ -46,11 +46,14 @@ public class MapOutputParser extends AbstractMessageConverterOutputParser<Map<St
 
 	@Override
 	public String getFormat() {
-		String raw = """
-				Your response should be in JSON format.
-				The data structure for the JSON should match this Java class: %s
-				Do not include any explanations, only provide a RFC8259 compliant JSON response following this format without deviation.
-				 """;
+//		String raw = """
+//				Your response should be in JSON format.
+//				The data structure for the JSON should match this Java class: %s
+//				Do not include any explanations, only provide a RFC8259 compliant JSON response following this format without deviation.
+//				 """;
+		String raw = "Your response should be in JSON format.\n" +
+				"\t\t\t\tThe data structure for the JSON should match this Java class: %s\n" +
+				"\t\t\t\tDo not include any explanations, only provide a RFC8259 compliant JSON response following this format without deviation.";
 		return String.format(raw, "java.util.HashMap");
 	}
 
