@@ -4,12 +4,12 @@ import cn.iocoder.yudao.framework.ai.chat.prompt.Prompt;
 import cn.iocoder.yudao.framework.ai.chatyiyan.YiYanApi;
 import cn.iocoder.yudao.framework.ai.chatyiyan.YiYanChatClient;
 import cn.iocoder.yudao.framework.ai.chatyiyan.YiYanChatModel;
+import cn.iocoder.yudao.framework.ai.chatyiyan.YiYanOptions;
 import org.junit.Before;
 import org.junit.Test;
 import reactor.core.publisher.Flux;
 
 import java.util.Scanner;
-import java.util.function.Consumer;
 
 /**
  * chat 文心一言
@@ -29,7 +29,7 @@ public class YiYanChatTests {
                 YiYanChatModel.ERNIE4_3_5_8K,
                 86400
         );
-        yiYanChatClient = new YiYanChatClient(yiYanApi);
+        yiYanChatClient = new YiYanChatClient(yiYanApi, new YiYanOptions().setMax_output_tokens(2048));
     }
 
     @Test
@@ -41,12 +41,7 @@ public class YiYanChatTests {
     @Test
     public void streamTest() {
         Flux<ChatResponse> fluxResponse = yiYanChatClient.stream(new Prompt("用java帮我写一个快排算法？"));
-        fluxResponse.subscribe(new Consumer<ChatResponse>() {
-            @Override
-            public void accept(ChatResponse chatResponse) {
-                System.err.print(chatResponse.getResult().getOutput().getContent());
-            }
-        });
+        fluxResponse.subscribe(chatResponse -> System.err.print(chatResponse.getResult().getOutput().getContent()));
         // 阻止退出
         Scanner scanner = new Scanner(System.in);
         scanner.nextLine();

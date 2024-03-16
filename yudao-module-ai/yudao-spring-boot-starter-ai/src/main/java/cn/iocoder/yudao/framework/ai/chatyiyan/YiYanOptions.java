@@ -1,36 +1,32 @@
-package cn.iocoder.yudao.framework.ai.chatyiyan.api;
+package cn.iocoder.yudao.framework.ai.chatyiyan;
 
+import cn.iocoder.yudao.framework.ai.chat.prompt.ChatOptions;
+import cn.iocoder.yudao.framework.ai.chatyiyan.api.YiYanChatCompletionRequest;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
+import lombok.experimental.Accessors;
 
 import java.util.List;
 
 /**
- * 一言 Completion req
+ * 百度 问心一言
  *
- *  百度千帆文档：https://cloud.baidu.com/doc/WENXINWORKSHOP/s/jlil56u11
+ * 文档地址：https://cloud.baidu.com/doc/WENXINWORKSHOP/s/clntwmv7t
  *
  * author: fansili
- * time: 2024/3/9 10:34
+ * time: 2024/3/16 19:33
  */
 @Data
-public class YiYanChatCompletionRequest {
+@Accessors(chain = true)
+public class YiYanOptions implements ChatOptions {
 
-    public YiYanChatCompletionRequest(List<Message> messages) {
-        this.messages = messages;
-    }
-
-    /**
-     * 聊天上下文信息。
-     * 必填：是
-     */
-    private List<Message> messages;
     /**
      * 一个可触发函数的描述列表，说明：
      * （1）支持的function数量无限制
      * （2）长度限制，最后一个message的content长度（即此轮对话的问题）、functions和system字段总内容不能超过20480 个字符，且不能超过5120 tokens
      * 必填：否
      */
-    private List<Function> functions;
+    private List<YiYanChatCompletionRequest.Function> functions;
     /**
      * 说明：
      * （1）较高的数值会使输出更加随机，而较低的数值会使其更加集中和确定
@@ -111,68 +107,38 @@ public class YiYanChatCompletionRequest {
      */
     private String tool_choice;
 
+    //
+    // 以下兼容 spring-ai ChatOptions 暂时没有其他地方用到
 
-    @Data
-    public static class Message {
-        private String role;
-
-        private String content;
+    @Override
+    public Float getTemperature() {
+        return this.temperature;
     }
 
-    @Data
-    public static class ToolChoice {
-        /**
-         * 	指定工具类型，function
-         * 	必填: 是
-         */
-        private String type;
-        /**
-         * 指定要使用的函数
-         * 必填: 是
-         */
-        private Function function;
-        /**
-         * 指定要使用的函数名
-         * 必填: 是
-         */
-        private String name;
+    @Override
+    public void setTemperature(Float temperature) {
+        this.temperature = temperature;
     }
 
-    @Data
-    public static class Function {
-        /**
-         * 函数名
-         * 必填: 是
-         */
-        private String name;
-        /**
-         * 函数描述
-         * 必填: 是
-         */
-        private String description;
-        /**
-         * 函数请求参数，说明：
-         * （1）JSON Schema 格式，参考JSON Schema描述
-         * （2）如果函数没有请求参数，parameters值格式如下：
-         * {"type": "object","properties": {}}
-         * 必填: 是
-         */
-        private String parameters;
-        /**
-         * 函数响应参数，JSON Schema 格式，参考JSON Schema描述
-         * 必填: 否
-         */
-        private String responses;
-        /**
-         * function调用的一些历史示例，说明：
-         * （1）可以提供正例（正常触发）和反例（无需触发）的example
-         * ·正例：从历史请求数据中获取
-         * ·反例：
-         *        当role = user，不会触发请求的query
-         *        当role = assistant，有固定的格式。function_call的name为空，arguments是空对象:"{}"，thought可以填固定的:"我不需要调用任何工具"
-         * （2）兼容之前的 List(example) 格式
-         */
-        private String examples;
+    @Override
+    public Float getTopP() {
+        return top_p;
     }
 
+    @Override
+    public void setTopP(Float topP) {
+        this.top_p = topP;
+    }
+
+    // 百度么有 topK
+
+    @Override
+    public Integer getTopK() {
+        return null;
+    }
+
+    @Override
+    public void setTopK(Integer topK) {
+
+    }
 }

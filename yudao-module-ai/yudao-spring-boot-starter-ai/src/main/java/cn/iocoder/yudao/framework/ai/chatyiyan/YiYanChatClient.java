@@ -1,10 +1,8 @@
 package cn.iocoder.yudao.framework.ai.chatyiyan;
 
-import cn.iocoder.yudao.framework.ai.chat.ChatClient;
-import cn.iocoder.yudao.framework.ai.chat.ChatResponse;
-import cn.iocoder.yudao.framework.ai.chat.Generation;
-import cn.iocoder.yudao.framework.ai.chat.StreamingChatClient;
-import cn.iocoder.yudao.framework.ai.chat.messages.Message;
+import cn.hutool.core.bean.BeanUtil;
+import cn.iocoder.yudao.framework.ai.chat.*;
+import cn.iocoder.yudao.framework.ai.chat.prompt.ChatOptions;
 import cn.iocoder.yudao.framework.ai.chat.prompt.Prompt;
 import cn.iocoder.yudao.framework.ai.chatyiyan.api.YiYanChatCompletion;
 import cn.iocoder.yudao.framework.ai.chatyiyan.api.YiYanChatCompletionRequest;
@@ -18,7 +16,6 @@ import org.springframework.retry.support.RetryTemplate;
 import reactor.core.publisher.Flux;
 
 import java.time.Duration;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -32,8 +29,15 @@ public class YiYanChatClient implements ChatClient, StreamingChatClient {
 
     private YiYanApi yiYanApi;
 
+    private YiYanOptions yiYanOptions;
+
     public YiYanChatClient(YiYanApi yiYanApi) {
         this.yiYanApi = yiYanApi;
+    }
+
+    public YiYanChatClient(YiYanApi yiYanApi, YiYanOptions yiYanOptions) {
+        this.yiYanApi = yiYanApi;
+        this.yiYanOptions = yiYanOptions;
     }
 
     public final RetryTemplate retryTemplate = RetryTemplate.builder()
@@ -70,20 +74,6 @@ public class YiYanChatClient implements ChatClient, StreamingChatClient {
         });
     }
 
-    private YiYanChatCompletionRequest createRequest(Prompt prompt, boolean stream) {
-        List<YiYanChatCompletionRequest.Message> messages = new ArrayList<>();
-        List<Message> instructions = prompt.getInstructions();
-        for (Message instruction : instructions) {
-            YiYanChatCompletionRequest.Message message = new YiYanChatCompletionRequest.Message();
-            message.setContent(instruction.getContent());
-            message.setRole(instruction.getMessageType().getValue());
-            messages.add(message);
-        }
-        YiYanChatCompletionRequest request = new YiYanChatCompletionRequest(messages);
-        request.setStream(stream);
-        return request;
-    }
-
     @Override
     public Flux<ChatResponse> stream(Prompt prompt) {
         // ctx 会有重试的信息
@@ -92,5 +82,36 @@ public class YiYanChatClient implements ChatClient, StreamingChatClient {
         // 调用 callWithFunctionSupport 发送请求
         Flux<YiYanChatCompletion> response = this.yiYanApi.chatCompletionStream(request);
         return response.map(res -> new ChatResponse(List.of(new Generation(res.getResult()))));
+    }
+
+    private YiYanChatCompletionRequest createRequest(Prompt prompt, boolean stream) {
+        // 两个都为null 则没有配置文件
+        if (yiYanOptions == null && prompt.getOptions() == null) {
+            throw new ChatException("ChatOptions 未配置参数!");
+        }
+        // 优先使用 Prompt 里面的 ChatOptions
+        ChatOptions options = yiYanOptions;
+        if (prompt.getOptions() != null) {
+            options = (ChatOptions) prompt.getOptions();
+        }
+        // Prompt 里面是一个 ChatOptions，用户可以随意传入，这里做一下判断
+        if (!(options instanceof YiYanOptions)) {
+            throw new ChatException("Prompt 传入的不是 YiYanOptions!");
+        }
+        // 转换 YiYanOptions
+        YiYanOptions qianWenOptions = (YiYanOptions) options;
+        // 创建 request
+        List<YiYanChatCompletionRequest.Message> messageList = prompt.getInstructions().stream().map(
+                msg -> new YiYanChatCompletionRequest.Message()
+                        .setRole(msg.getMessageType().getValue())
+                        .setContent(msg.getContent())
+        ).toList();
+        YiYanChatCompletionRequest request = new YiYanChatCompletionRequest(messageList);
+        // 复制 qianWenOptions 属性取 request（这里 options 属性和 request 基本保持一致）
+        // top: 由于遵循 spring-ai规范，支持在构建client的时候传入默认的 chatOptions
+        BeanUtil.copyProperties(qianWenOptions, request);
+        // 设置 stream
+        request.setStream(stream);
+        return request;
     }
 }
