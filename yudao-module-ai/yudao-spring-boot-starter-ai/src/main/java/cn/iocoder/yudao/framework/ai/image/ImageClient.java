@@ -24,9 +24,9 @@ public interface ImageClient extends ModelClient<ImagePrompt, ImageResponse> {
 
 	/**
 	 * 跟 chat一样
-	 * @param request the request object to be sent to the AI model
+	 * @param imagePrompt the request object to be sent to the AI model
 	 * @return
 	 */
-	ImageResponse call(ImagePrompt request);
+	ImageResponse call(ImagePrompt imagePrompt);
 
 }

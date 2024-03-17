@@ -49,7 +49,8 @@ public class ImagePrompt implements ModelRequest<List<ImageMessage>> {
 	}
 
 	public ImagePrompt(String instructions) {
-		this(new ImageMessage(instructions), ImageOptionsBuilder.builder().build());
+//		this(new ImageMessage(instructions), ImageOptionsBuilder.builder().build());
+		this(new ImageMessage(instructions), null);
 	}
 
 	@Override
