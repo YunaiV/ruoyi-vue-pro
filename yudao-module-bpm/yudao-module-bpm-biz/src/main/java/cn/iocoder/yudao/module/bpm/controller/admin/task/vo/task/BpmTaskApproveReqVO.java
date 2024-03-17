@@ -1,9 +1,10 @@
 package cn.iocoder.yudao.module.bpm.controller.admin.task.vo.task;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotEmpty;
 import lombok.Data;
 
-import jakarta.validation.constraints.NotEmpty;
+import java.util.Collection;
 
 @Schema(description = "管理后台 - 通过流程任务的 Request VO")
 @Data
@@ -16,5 +17,8 @@ public class BpmTaskApproveReqVO {
     @Schema(description = "审批意见", requiredMode = Schema.RequiredMode.REQUIRED, example = "不错不错！")
     @NotEmpty(message = "审批意见不能为空")
     private String reason;
+
+    @Schema(description = "抄送的用户编号数组", requiredMode = Schema.RequiredMode.REQUIRED, example = "1,2")
+    private Collection<Long> copyUserIds;
 
 }

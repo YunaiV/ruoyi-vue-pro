@@ -29,7 +29,7 @@ public class BpmProcessInstanceCopyDO extends BaseDO {
     /**
      * 发起人 Id
      *
-     * 关联 system_users 的 id 属性
+     * 冗余 ProcessInstance 的 startUserId 字段
      */
     private Long startUserId;
     /**
@@ -44,6 +44,12 @@ public class BpmProcessInstanceCopyDO extends BaseDO {
      * 关联 ProcessInstance 的 id 属性
      */
     private String processInstanceId;
+    /**
+     * 流程分类
+     *
+     * 冗余 ProcessInstance 的 category 字段
+     */
+    private String category;
 
     /**
      * 任务主键
@@ -51,7 +57,6 @@ public class BpmProcessInstanceCopyDO extends BaseDO {
      * 关联 Task 的 id 属性
      */
     private String taskId;
-
     /**
      * 任务名称
      *
@@ -60,22 +65,10 @@ public class BpmProcessInstanceCopyDO extends BaseDO {
     private String taskName;
 
     /**
-     * 用户编号
+     * 用户编号（被抄送的用户编号）
      *
      * 关联 system_users 的 id 属性
      */
     private Long userId;
-
-    /**
-     * 抄送原因
-     */
-    private String reason;
-
-    /**
-     * 流程分类
-     *
-     * 冗余 ProcessInstance 的 category 字段
-     */
-    private String category;
 
 }

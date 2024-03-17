@@ -15,13 +15,10 @@ import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public class BpmProcessInstanceCopyMyPageReqVO extends PageParam {
+public class BpmProcessInstanceCopyPageReqVO extends PageParam {
 
     @Schema(description = "流程名称", example = "芋道")
     private String processInstanceName;
-
-    @Schema(description = "流程编号", example = "123456768")
-    private String processInstanceId;
 
     @Schema(description = "创建时间")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)

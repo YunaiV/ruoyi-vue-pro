@@ -68,9 +68,13 @@ public class BpmTaskServiceImpl implements BpmTaskService {
     private HistoryService historyService;
     @Resource
     private RuntimeService runtimeService;
+    @Resource
+    private ManagementService managementService;
 
     @Resource
     private BpmProcessInstanceService processInstanceService;
+    @Resource
+    private BpmProcessInstanceCopyService processInstanceCopyService;
     @Resource
     private BpmModelService bpmModelService;
     @Resource
@@ -79,12 +83,12 @@ public class BpmTaskServiceImpl implements BpmTaskService {
     @Resource
     private AdminUserApi adminUserApi;
 
-    @Resource
-    private ManagementService managementService;
-
     @Override
     public PageResult<Task> getTodoTaskPage(Long userId, BpmTaskPageReqVO pageVO) {
-        TaskQuery taskQuery = taskService.createTaskQuery().taskAssignee(String.valueOf(userId)) // 分配给自己
+        TaskQuery taskQuery = taskService.createTaskQuery()
+                .taskAssignee(String.valueOf(userId)) // 分配给自己
+                .active()
+                .includeProcessVariables()
                 .orderByTaskCreateTime().desc(); // 创建时间倒序
         if (StrUtil.isNotBlank(pageVO.getName())) {
             taskQuery.taskNameLike("%" + pageVO.getName() + "%");
@@ -103,9 +107,10 @@ public class BpmTaskServiceImpl implements BpmTaskService {
 
     @Override
     public PageResult<HistoricTaskInstance> getDoneTaskPage(Long userId, BpmTaskPageReqVO pageVO) {
-        HistoricTaskInstanceQuery taskQuery = historyService.createHistoricTaskInstanceQuery().finished() // 已完成
-                .includeTaskLocalVariables()
+        HistoricTaskInstanceQuery taskQuery = historyService.createHistoricTaskInstanceQuery()
+                .finished() // 已完成
                 .taskAssignee(String.valueOf(userId)) // 分配给自己
+                .includeTaskLocalVariables()
                 .orderByHistoricTaskInstanceEndTime().desc(); // 审批时间倒序
         if (StrUtil.isNotBlank(pageVO.getName())) {
             taskQuery.taskNameLike("%" + pageVO.getName() + "%");
@@ -155,30 +160,34 @@ public class BpmTaskServiceImpl implements BpmTaskService {
             throw exception(PROCESS_INSTANCE_NOT_EXISTS);
         }
 
+        // 2. 抄送用户
+        if (CollUtil.isNotEmpty(reqVO.getCopyUserIds())) {
+            processInstanceCopyService.createProcessInstanceCopy(reqVO.getCopyUserIds(), reqVO.getId());
+        }
+
         // 情况一：被委派的任务，不调用 complete 去完成任务
         if (DelegationState.PENDING.equals(task.getDelegationState())) {
             approveDelegateTask(reqVO, task);
             return;
         }
 
-        // 情况二：后加签的任务
+        // 情况二：审批有【后】加签的任务
         if (BpmTaskAddSignTypeEnum.AFTER.getType().equals(task.getScopeType())) {
-            // 后加签处理
             approveAfterSignTask(task, reqVO);
             return;
         }
 
-        // 情况三：自己审批的任务，调用 complete 去完成任务
-        // 完成任务，审批通过
+        // 情况三：审批普通的任务。大多数情况下，都是这样
+        // 更新流程任务 status 为审批通过
         updateTaskStatus(task.getId(), BpmProcessInstanceResultEnum.APPROVE.getResult());
+        // 添加评论
+        taskService.addComment(task.getId(), task.getProcessInstanceId(),
+                BpmCommentTypeEnum.APPROVE.getType(), reqVO.getReason());
+        // 调用 BPM complete 去完成任务
         taskService.complete(task.getId(), instance.getProcessVariables());
-//        // 更新任务拓展表为通过
-//        taskExtMapper.updateByTaskId(
-//                new BpmTaskExtDO().setTaskId(task.getId()).setResult(BpmProcessInstanceResultEnum.APPROVE.getResult())
-//                        .setReason(reqVO.getReason()));
+
         // 处理加签任务
-//        handleParentTask(task);
-        handleParentTaskNew(task.getParentTaskId());
+        handleParentTaskIfSign(task.getParentTaskId());
     }
 
     /**
@@ -209,8 +218,15 @@ public class BpmTaskServiceImpl implements BpmTaskService {
 //                new BpmTaskExtDO().setResult(BpmProcessInstanceResultEnum.PROCESS.getResult()));
     }
 
-    // TODO 芋艿：名字
-    private void handleParentTaskNew(String parentTaskId) {
+    /**
+     * 如果父任务是有前后【加签】的任务，如果它【加签】出来的子任务都被处理，需要处理父任务：
+     *
+     * 1. 如果是【向前】加签，则需要重新激活父任务，让它可以被审批
+     * 2. 如果是【向后】加签，则需要完成父任务，让它完成审批
+     *
+     * @param parentTaskId 父任务编号
+     */
+    private void handleParentTaskIfSign(String parentTaskId) {
         if (StrUtil.isBlank(parentTaskId)) {
             return;
         }
@@ -227,7 +243,9 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         }
 
         // 2. 子任务已处理完成，清空 scopeType 字段，修改 parentTask 信息，方便后续可以继续向前后向后加签
-        clearTaskScopeTypeAndSave(parentTask);
+        TaskEntityImpl parentTaskImpl = (TaskEntityImpl) parentTask;
+        parentTaskImpl.setScopeType(null);
+        taskService.saveTask(parentTaskImpl);
 
         // 3.1 情况一：处理向【向前】加签
         if (BpmTaskAddSignTypeEnum.BEFORE.getType().equals(scopeType)) {
@@ -243,18 +261,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         }
 
         // 4. 递归处理父任务
-        handleParentTaskNew(parentTask.getParentTaskId());
-    }
-
-    /**
-     * 清空 scopeType 字段，用于任务没有子任务时使用该方法，方便任务可以再次被不同的方式加签
-     *
-     * @param task 需要被清空的任务
-     */
-    private void clearTaskScopeTypeAndSave(Task task) {
-        TaskEntityImpl taskImpl = (TaskEntityImpl) task;
-        taskImpl.setScopeType(null);
-        taskService.saveTask(task);
+        handleParentTaskIfSign(parentTask.getParentTaskId());
     }
 
     /**
@@ -797,7 +804,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
                 BpmCommentTypeEnum.SUB_SIGN.getType().toString(), comment);
 
         // 4. 处理当前任务的父任务
-        handleParentTaskNew(task.getParentTaskId());
+        handleParentTaskIfSign(task.getParentTaskId());
     }
 
     /**
