@@ -1,21 +1,43 @@
 package cn.iocoder.yudao.module.bpm.controller.admin.task;
 
+import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
+import cn.iocoder.yudao.framework.common.util.number.NumberUtils;
+import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
+import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.instance.BpmProcessInstanceRespVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.task.*;
+import cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmConstants;
+import cn.iocoder.yudao.module.bpm.service.task.BpmProcessInstanceService;
 import cn.iocoder.yudao.module.bpm.service.task.BpmTaskService;
+import cn.iocoder.yudao.module.system.api.dept.DeptApi;
+import cn.iocoder.yudao.module.system.api.dept.dto.DeptRespDTO;
+import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
+import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.annotation.Resource;
+import jakarta.validation.Valid;
+import org.flowable.bpmn.model.UserTask;
+import org.flowable.engine.history.HistoricProcessInstance;
+import org.flowable.engine.runtime.ProcessInstance;
+import org.flowable.task.api.Task;
+import org.flowable.task.api.history.HistoricTaskInstance;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import jakarta.annotation.Resource;
-import jakarta.validation.Valid;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Stream;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
 import static cn.iocoder.yudao.framework.web.core.util.WebFrameworkUtils.getLoginUserId;
 
 @Tag(name = "管理后台 - 流程任务实例")
@@ -26,28 +48,103 @@ public class BpmTaskController {
 
     @Resource
     private BpmTaskService taskService;
+    @Resource
+    private BpmProcessInstanceService processInstanceService;
+
+    @Resource
+    private AdminUserApi adminUserApi;
+    @Resource
+    private DeptApi deptApi;
 
     @GetMapping("todo-page")
     @Operation(summary = "获取 Todo 待办任务分页")
     @PreAuthorize("@ss.hasPermission('bpm:task:query')")
-    public CommonResult<PageResult<BpmTaskTodoPageItemRespVO>> getTodoTaskPage(@Valid BpmTaskTodoPageReqVO pageVO) {
-        return success(taskService.getTodoTaskPage(getLoginUserId(), pageVO));
+    public CommonResult<PageResult<BpmTaskRespVO>> getTodoTaskPage(@Valid BpmTaskPageReqVO pageVO) {
+        PageResult<Task> pageResult = taskService.getTodoTaskPage(getLoginUserId(), pageVO);
+        // 拼接数据
+        Map<String, ProcessInstance> processInstanceMap = processInstanceService.getProcessInstanceMap(
+                convertSet(pageResult.getList(), Task::getProcessInstanceId));
+        Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(
+                convertSet(processInstanceMap.values(), instance -> Long.valueOf(instance.getStartUserId())));
+        return success(BeanUtils.toBean(pageResult, BpmTaskRespVO.class, taskVO -> {
+            ProcessInstance processInstance = processInstanceMap.get(taskVO.getProcessInstanceId());
+            if (processInstance == null) {
+                return;
+            }
+            AdminUserRespDTO startUser = userMap.get(NumberUtils.parseLong(processInstance.getStartUserId()));
+            taskVO.setProcessInstance(BeanUtils.toBean(processInstance, BpmTaskRespVO.ProcessInstance.class,
+                    processInstanceVO -> processInstanceVO.setStartUser(BeanUtils.toBean(startUser, BpmProcessInstanceRespVO.User.class))));
+        }));
     }
 
     @GetMapping("done-page")
     @Operation(summary = "获取 Done 已办任务分页")
     @PreAuthorize("@ss.hasPermission('bpm:task:query')")
-    public CommonResult<PageResult<BpmTaskDonePageItemRespVO>> getDoneTaskPage(@Valid BpmTaskDonePageReqVO pageVO) {
-        return success(taskService.getDoneTaskPage(getLoginUserId(), pageVO));
+    public CommonResult<PageResult<BpmTaskRespVO>> getDoneTaskPage(@Valid BpmTaskPageReqVO pageVO) {
+        PageResult<HistoricTaskInstance> pageResult = taskService.getDoneTaskPage(getLoginUserId(), pageVO);
+        // 拼接数据
+        Map<String, HistoricProcessInstance> processInstanceMap = processInstanceService.getHistoricProcessInstanceMap(
+                convertSet(pageResult.getList(), HistoricTaskInstance::getProcessInstanceId));
+        Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(
+                convertSet(processInstanceMap.values(), instance -> Long.valueOf(instance.getStartUserId())));
+        return success(BeanUtils.toBean(pageResult, BpmTaskRespVO.class, taskVO -> {
+            HistoricProcessInstance processInstance = processInstanceMap.get(taskVO.getProcessInstanceId());
+            if (processInstance == null) {
+                return;
+            }
+            AdminUserRespDTO startUser = userMap.get(NumberUtils.parseLong(processInstance.getStartUserId()));
+            taskVO.setProcessInstance(BeanUtils.toBean(processInstance, BpmTaskRespVO.ProcessInstance.class,
+                    processInstanceVO -> processInstanceVO.setStartUser(BeanUtils.toBean(startUser, BpmProcessInstanceRespVO.User.class))));
+        }));
     }
 
+    // TODO @芋艿：怎么优化下
     @GetMapping("/list-by-process-instance-id")
     @Operation(summary = "获得指定流程实例的任务列表", description = "包括完成的、未完成的")
     @Parameter(name = "processInstanceId", description = "流程实例的编号", required = true)
     @PreAuthorize("@ss.hasPermission('bpm:task:query')")
     public CommonResult<List<BpmTaskRespVO>> getTaskListByProcessInstanceId(
             @RequestParam("processInstanceId") String processInstanceId) {
-        return success(taskService.getTaskListByProcessInstanceId(processInstanceId));
+        List<HistoricTaskInstance> taskList = taskService.getTaskListByProcessInstanceId(processInstanceId);
+        if (CollUtil.isEmpty(taskList)) {
+            return success(Collections.emptyList());
+        }
+
+        // 拼接数据
+        HistoricProcessInstance processInstance = processInstanceService.getHistoricProcessInstance(processInstanceId);
+        // 获得 User 和 Dept Map
+        Set<Long> userIds = convertSet(taskList, task -> NumberUtils.parseLong(task.getAssignee()));
+        userIds.add(NumberUtils.parseLong(processInstance.getStartUserId()));
+        Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(userIds);
+        Map<Long, DeptRespDTO> deptMap = deptApi.getDeptMap(
+                convertSet(userMap.values(), AdminUserRespDTO::getDeptId));
+        List<BpmTaskRespVO> taskVOList = CollectionUtils.convertList(taskList, task -> {
+            BpmTaskRespVO taskVO = BeanUtils.toBean(task, BpmTaskRespVO.class);
+            taskVO.setStatus((Integer) task.getTaskLocalVariables().get(BpmConstants.TASK_VARIABLE_STATUS));
+            // 流程实例
+            AdminUserRespDTO startUser = userMap.get(NumberUtils.parseLong(processInstance.getStartUserId()));
+            taskVO.setProcessInstance(BeanUtils.toBean(processInstance, BpmTaskRespVO.ProcessInstance.class,
+                    processInstanceVO -> processInstanceVO.setStartUser(BeanUtils.toBean(startUser, BpmProcessInstanceRespVO.User.class))));
+            // 用户信息
+            AdminUserRespDTO assignUser = userMap.get(NumberUtils.parseLong(task.getAssignee()));
+            if (assignUser != null) {
+                taskVO.setAssigneeUser(BeanUtils.toBean(assignUser, BpmProcessInstanceRespVO.User.class));
+                DeptRespDTO dept = deptMap.get(assignUser.getDeptId());
+                if (dept != null) {
+                    taskVO.getAssigneeUser().setDeptName(dept.getName());
+                }
+            }
+            return taskVO;
+        });
+
+        // 拼接父子关系
+        Map<String, List<BpmTaskRespVO>> childrenTaskMap = convertMultiMap(
+                filterList(taskVOList, r -> StrUtil.isNotEmpty(r.getParentTaskId())),
+                BpmTaskRespVO::getParentTaskId);
+        for (BpmTaskRespVO taskVO : taskVOList) {
+            taskVO.setChildren(childrenTaskMap.get(taskVO.getId()));
+        }
+        return success(filterList(taskVOList, r -> StrUtil.isEmpty(r.getParentTaskId())));
     }
 
     @PutMapping("/approve")
@@ -74,12 +171,14 @@ public class BpmTaskController {
         return success(true);
     }
 
-    @GetMapping("/return-list")
+    @GetMapping("/list-by-return")
     @Operation(summary = "获取所有可回退的节点", description = "用于【流程详情】的【回退】按钮")
     @Parameter(name = "taskId", description = "当前任务ID", required = true)
     @PreAuthorize("@ss.hasPermission('bpm:task:update')")
-    public CommonResult<List<BpmTaskSimpleRespVO>> getReturnList(@RequestParam("taskId") String taskId) {
-        return success(taskService.getReturnTaskList(taskId));
+    public CommonResult<List<BpmTaskRespVO>> getTaskListByReturn(@RequestParam("id") String id) {
+        List<UserTask> userTaskList = taskService.getUserTaskListByReturn(id);
+        return success(convertList(userTaskList, userTask -> // 只返回 id 和 name
+                new BpmTaskRespVO().setName(userTask.getName()).setTaskDefinitionKey(userTask.getId())));
     }
 
     @PutMapping("/return")
@@ -114,12 +213,23 @@ public class BpmTaskController {
         return success(true);
     }
 
-    @GetMapping("children-list")
-    @Operation(summary = "获取能被减签的任务")
-    @Parameter(name = "parentId", description = "父级任务 ID", required = true)
-    @PreAuthorize("@ss.hasPermission('bpm:task:update')")
-    public CommonResult<List<BpmTaskSubSignRespVO>> getChildrenTaskList(@RequestParam("parentId") String parentId) {
-        return success(taskService.getChildrenTaskList(parentId));
+    // TODO 芋艿：待测试
+    @GetMapping("list-by-parent-task-id")
+    @Operation(summary = "获得指定父级任务的子任务列表") // 目前用于，减签的时候，获得子任务列表
+    @Parameter(name = "parentTaskId", description = "父级任务编号", required = true)
+    @PreAuthorize("@ss.hasPermission('bpm:task:query')")
+    public CommonResult<List<BpmTaskRespVO>> getTaskListByParentTaskId(@RequestParam("parentTaskId") String parentTaskId) {
+        List<Task> taskList = taskService.getTaskListByParentTaskId(parentTaskId);
+        if (CollUtil.isEmpty(taskList)) {
+            return success(Collections.emptyList());
+        }
+        // 拼接数据
+        Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(
+                convertSetByFlatMap(taskList, user -> Stream.of(Long.valueOf(user.getAssignee()), Long.valueOf(user.getOwner()))));
+        return success(convertList(taskList, task -> BeanUtils.toBean(task, BpmTaskRespVO.class, taskVO -> {
+            taskVO.setAssigneeUser(BeanUtils.toBean(userMap.get(NumberUtils.parseLong(task.getAssignee())), BpmProcessInstanceRespVO.User.class));
+            taskVO.setOwnerUser(BeanUtils.toBean(userMap.get(NumberUtils.parseLong(task.getOwner())), BpmProcessInstanceRespVO.User.class));
+        })));
     }
 
 }

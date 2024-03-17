@@ -10,13 +10,11 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;
 
-import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
-
-@Schema(description = "管理后台 - 流程任务的 TODO 待办的分页 Request VO")
+@Schema(description = "管理后台 - 流程任务的的分页 Request VO") // 待办、已办，都使用该分页
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public class BpmTaskTodoPageReqVO extends PageParam {
+public class BpmTaskPageReqVO extends PageParam {
 
     @Schema(description = "流程任务名", example = "芋道")
     private String name;

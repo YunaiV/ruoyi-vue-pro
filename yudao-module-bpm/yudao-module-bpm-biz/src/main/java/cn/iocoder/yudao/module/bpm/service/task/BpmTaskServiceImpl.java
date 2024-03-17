@@ -13,15 +13,12 @@ import cn.iocoder.yudao.framework.flowable.core.util.BpmnModelUtils;
 import cn.iocoder.yudao.framework.web.core.util.WebFrameworkUtils;
 import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.task.*;
 import cn.iocoder.yudao.module.bpm.convert.task.BpmTaskConvert;
-import cn.iocoder.yudao.module.bpm.dal.mysql.task.BpmTaskExtMapper;
 import cn.iocoder.yudao.module.bpm.enums.task.BpmCommentTypeEnum;
 import cn.iocoder.yudao.module.bpm.enums.task.BpmProcessInstanceResultEnum;
 import cn.iocoder.yudao.module.bpm.enums.task.BpmTaskAddSignTypeEnum;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmConstants;
 import cn.iocoder.yudao.module.bpm.service.definition.BpmModelService;
 import cn.iocoder.yudao.module.bpm.service.message.BpmMessageService;
-import cn.iocoder.yudao.module.system.api.dept.DeptApi;
-import cn.iocoder.yudao.module.system.api.dept.dto.DeptRespDTO;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import jakarta.annotation.Resource;
@@ -34,7 +31,6 @@ import org.flowable.engine.HistoryService;
 import org.flowable.engine.ManagementService;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.TaskService;
-import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.task.api.DelegationState;
 import org.flowable.task.api.Task;
@@ -50,10 +46,10 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
 import org.springframework.util.Assert;
 
 import java.util.*;
-import java.util.stream.Stream;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
 import static cn.iocoder.yudao.module.bpm.enums.ErrorCodeConstants.*;
 
 /**
@@ -82,49 +78,31 @@ public class BpmTaskServiceImpl implements BpmTaskService {
 
     @Resource
     private AdminUserApi adminUserApi;
-    @Resource
-    private DeptApi deptApi;
-
-    @Resource
-    private BpmTaskExtMapper taskExtMapper;
 
     @Resource
     private ManagementService managementService;
 
     @Override
-    public PageResult<BpmTaskTodoPageItemRespVO> getTodoTaskPage(Long userId, BpmTaskTodoPageReqVO pageVO) {
-        // 查询待办任务
+    public PageResult<Task> getTodoTaskPage(Long userId, BpmTaskPageReqVO pageVO) {
         TaskQuery taskQuery = taskService.createTaskQuery().taskAssignee(String.valueOf(userId)) // 分配给自己
                 .orderByTaskCreateTime().desc(); // 创建时间倒序
         if (StrUtil.isNotBlank(pageVO.getName())) {
             taskQuery.taskNameLike("%" + pageVO.getName() + "%");
         }
-        if (ArrayUtil.get(pageVO.getCreateTime(), 0) != null) {
+        if (ArrayUtil.isNotEmpty(pageVO.getCreateTime())) {
             taskQuery.taskCreatedAfter(DateUtils.of(pageVO.getCreateTime()[0]));
+            taskQuery.taskCreatedAfter(DateUtils.of(pageVO.getCreateTime()[1]));
         }
-        if (ArrayUtil.get(pageVO.getCreateTime(), 1) != null) {
-            taskQuery.taskCreatedBefore(DateUtils.of(pageVO.getCreateTime()[1]));
+        long count = taskQuery.count();
+        if (count == 0) {
+            return PageResult.empty();
         }
-        // 执行查询
         List<Task> tasks = taskQuery.listPage(PageUtils.getStart(pageVO), pageVO.getPageSize());
-        if (CollUtil.isEmpty(tasks)) {
-            return PageResult.empty(taskQuery.count());
-        }
-
-        // 获得 ProcessInstance Map
-        Map<String, ProcessInstance> processInstanceMap = processInstanceService.getProcessInstanceMap(
-                convertSet(tasks, Task::getProcessInstanceId));
-        // 获得 User Map
-        Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(
-                convertSet(processInstanceMap.values(), instance -> Long.valueOf(instance.getStartUserId())));
-        // 拼接结果
-        return new PageResult<>(BpmTaskConvert.INSTANCE.convertList1(tasks, processInstanceMap, userMap),
-                taskQuery.count());
+        return new PageResult<>(tasks, count);
     }
 
     @Override
-    public PageResult<BpmTaskDonePageItemRespVO> getDoneTaskPage(Long userId, BpmTaskDonePageReqVO pageVO) {
-        // 查询已办任务
+    public PageResult<HistoricTaskInstance> getDoneTaskPage(Long userId, BpmTaskPageReqVO pageVO) {
         HistoricTaskInstanceQuery taskQuery = historyService.createHistoricTaskInstanceQuery().finished() // 已完成
                 .includeTaskLocalVariables()
                 .taskAssignee(String.valueOf(userId)) // 分配给自己
@@ -132,29 +110,17 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         if (StrUtil.isNotBlank(pageVO.getName())) {
             taskQuery.taskNameLike("%" + pageVO.getName() + "%");
         }
-        // TODO @芋艿：传参风格，统一
-        if (pageVO.getBeginCreateTime() != null) {
-            taskQuery.taskCreatedAfter(DateUtils.of(pageVO.getBeginCreateTime()));
-        }
-        if (pageVO.getEndCreateTime() != null) {
-            taskQuery.taskCreatedBefore(DateUtils.of(pageVO.getEndCreateTime()));
+        if (ArrayUtil.isNotEmpty(pageVO.getCreateTime())) {
+            taskQuery.taskCreatedAfter(DateUtils.of(pageVO.getCreateTime()[0]));
+            taskQuery.taskCreatedAfter(DateUtils.of(pageVO.getCreateTime()[1]));
         }
         // 执行查询
-        List<HistoricTaskInstance> tasks = taskQuery.listPage(PageUtils.getStart(pageVO), pageVO.getPageSize());
-        if (CollUtil.isEmpty(tasks)) {
-            return PageResult.empty(taskQuery.count());
+        long count = taskQuery.count();
+        if (count == 0) {
+            return PageResult.empty();
         }
-
-        // 获得 ProcessInstance Map
-        Map<String, HistoricProcessInstance> historicProcessInstanceMap = processInstanceService.getHistoricProcessInstanceMap(
-                convertSet(tasks, HistoricTaskInstance::getProcessInstanceId));
-        // 获得 User Map
-        Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(
-                convertSet(historicProcessInstanceMap.values(), instance -> Long.valueOf(instance.getStartUserId())));
-        // 拼接结果
-        return new PageResult<>(
-                BpmTaskConvert.INSTANCE.convertList2(tasks, historicProcessInstanceMap, userMap),
-                taskQuery.count());
+        List<HistoricTaskInstance> tasks = taskQuery.listPage(PageUtils.getStart(pageVO), pageVO.getPageSize());
+        return new PageResult<>(tasks, count);
     }
 
     @Override
@@ -166,8 +132,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
     }
 
     @Override
-    public List<BpmTaskRespVO> getTaskListByProcessInstanceId(String processInstanceId) {
-        // 获得任务列表
+    public List<HistoricTaskInstance> getTaskListByProcessInstanceId(String processInstanceId) {
         List<HistoricTaskInstance> tasks = historyService.createHistoricTaskInstanceQuery()
                 .includeTaskLocalVariables()
                 .processInstanceId(processInstanceId)
@@ -176,19 +141,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         if (CollUtil.isEmpty(tasks)) {
             return Collections.emptyList();
         }
-
-        // 获得 ProcessInstance Map
-        HistoricProcessInstance processInstance = processInstanceService.getHistoricProcessInstance(processInstanceId);
-        // 获得 User Map
-        Set<Long> userIds = convertSet(tasks, task -> NumberUtils.parseLong(task.getAssignee()));
-        userIds.add(NumberUtils.parseLong(processInstance.getStartUserId()));
-        Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(userIds);
-        // 获得 Dept Map
-        Map<Long, DeptRespDTO> deptMap = deptApi.getDeptMap(convertSet(userMap.values(), AdminUserRespDTO::getDeptId));
-
-        // 拼接数据
-        List<BpmTaskRespVO> result = BpmTaskConvert.INSTANCE.convertList3(tasks, processInstance, userMap, deptMap);
-        return BpmTaskConvert.INSTANCE.convertChildrenList(result);
+        return tasks;
     }
 
     @Override
@@ -531,10 +484,10 @@ public class BpmTaskServiceImpl implements BpmTaskService {
     }
 
     @Override
-    public List<BpmTaskSimpleRespVO> getReturnTaskList(String taskId) {
-        // 1. 校验当前任务 task 存在
-        Task task = validateTaskExist(taskId);
-        // 根据流程定义获取流程模型信息
+    public List<UserTask> getUserTaskListByReturn(String id) {
+        // 1.1 校验当前任务 task 存在
+        Task task = validateTaskExist(id);
+        // 1.2 根据流程定义获取流程模型信息
         BpmnModel bpmnModel = bpmModelService.getBpmnModelByDefinitionId(task.getProcessDefinitionId());
         FlowElement source = BpmnModelUtils.getFlowElementById(bpmnModel, task.getTaskDefinitionKey());
         if (source == null) {
@@ -548,7 +501,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         }
         // 2.2 过滤：只有串行可到达的节点，才可以回退。类似非串行、子流程无法退回
         previousUserList.removeIf(userTask -> !BpmnModelUtils.isSequentialReachable(source, userTask, null));
-        return BpmTaskConvert.INSTANCE.convertList(previousUserList);
+        return previousUserList;
     }
 
     @Override
@@ -560,7 +513,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
             throw exception(TASK_IS_PENDING);
         }
         // 1.2 校验源头和目标节点的关系，并返回目标元素
-        FlowElement targetElement = validateTargetTaskCanReturn(task.getTaskDefinitionKey(), reqVO.getTargetDefinitionKey(), task.getProcessDefinitionId());
+        FlowElement targetElement = validateTargetTaskCanReturn(task.getTaskDefinitionKey(), reqVO.getTargetTaskDefinitionKey(), task.getProcessDefinitionId());
 
         // 3. 更新任务扩展表 TODO 芋艿：需要提前搞
         updateTaskStatus(task.getId(), BpmProcessInstanceResultEnum.BACK.getResult());
@@ -635,7 +588,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         runtimeService.createChangeActivityStateBuilder()
                 .processInstanceId(currentTask.getProcessInstanceId())
                 .moveActivityIdsToSingleActivityId(returnTaskKeyList, // 当前要跳转的节点列表( 1 或多)
-                        reqVO.getTargetDefinitionKey()) // targetKey 跳转到的节点(1)
+                        reqVO.getTargetTaskDefinitionKey()) // targetKey 跳转到的节点(1)
                 .changeState();
     }
 
@@ -877,6 +830,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         return StrUtil.equalsAny(scopeType,BpmTaskAddSignTypeEnum.BEFORE.getType(),scopeType, BpmTaskAddSignTypeEnum.AFTER.getType());
     }
 
+//    TODO @海：BpmProcessInstanceResultEnum.CAN_SUB_SIGN_STATUS_LIST) 应该作为条件，mapper 不要有业务
     /**
      * 获取所有要被取消的删除的任务 ID 集合
      *
@@ -918,40 +872,15 @@ public class BpmTaskServiceImpl implements BpmTaskService {
      * @return 所有子任务的 ID 集合
      */
     private List<String> getChildrenTaskIdList(String parentTaskId) {
-        return convertList(getChildrenTaskList0(parentTaskId), Task::getId);
+        return convertList(getTaskListByParentTaskId(parentTaskId), Task::getId);
     }
 
-    /**
-     * 获取指定父级任务的所有子任务 ID 集合
-     *
-     * @param parentTaskId 父任务 ID
-     * @return 所有子任务的 ID 集合
-     */
-    private List<Task> getChildrenTaskList0(String parentTaskId) {
+    @Override
+    public List<Task> getTaskListByParentTaskId(String parentTaskId) {
         String tableName = managementService.getTableName(TaskEntity.class);
         // taskService.createTaskQuery() 没有 parentId 参数，所以写 sql 查询
         String sql = "select ID_,OWNER_,ASSIGNEE_ from " + tableName + " where PARENT_TASK_ID_=#{parentTaskId}";
         return taskService.createNativeTaskQuery().sql(sql).parameter("parentTaskId", parentTaskId).list();
-    }
-
-
-    @Override
-    public List<BpmTaskSubSignRespVO> getChildrenTaskList(String parentId) {
-        // 1. 只查询进行中的任务 后加签的任务，可能不存在 assignee，所以还需要查询 owner
-        List<Task> taskList = getChildrenTaskList0(parentId);
-        if (CollUtil.isEmpty(taskList)) {
-            return Collections.emptyList();
-        }
-
-        // 2.1 将 owner 和 assignee 统一到一个集合中
-        List<Long> userIds = convertListByFlatMap(taskList, control ->
-                Stream.of(NumberUtils.parseLong(control.getAssignee()), NumberUtils.parseLong(control.getOwner()))
-                        .filter(Objects::nonNull)); // TODO 芋艿：这里可能可以优化下
-        // 2.2 组装数据
-        Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(userIds);
-//        List<BpmTaskExtDO> taskExtList = taskExtMapper.selectProcessListByTaskIds(childrenTaskIdList);
-//        Map<String, Task> idTaskMap = convertMap(taskList, TaskInfo::getId);
-        return BpmTaskConvert.INSTANCE.convertList(taskList, userMap);
     }
 
     @Override
