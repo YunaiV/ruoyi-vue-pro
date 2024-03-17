@@ -22,6 +22,11 @@ import cn.iocoder.yudao.framework.ai.model.ModelClient;
 @FunctionalInterface
 public interface ImageClient extends ModelClient<ImagePrompt, ImageResponse> {
 
+	/**
+	 * 跟 chat一样
+	 * @param request the request object to be sent to the AI model
+	 * @return
+	 */
 	ImageResponse call(ImagePrompt request);
 
 }

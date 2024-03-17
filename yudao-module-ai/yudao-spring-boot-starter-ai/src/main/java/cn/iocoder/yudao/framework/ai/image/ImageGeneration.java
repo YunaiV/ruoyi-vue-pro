@@ -21,6 +21,7 @@ import cn.iocoder.yudao.framework.ai.model.ModelResult;
 
 public class ImageGeneration implements ModelResult<Image> {
 
+	// metadata 信息为空现在
 	private ImageGenerationMetadata imageGenerationMetadata;
 
 	private Image image;

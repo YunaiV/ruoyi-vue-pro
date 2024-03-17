@@ -21,11 +21,15 @@ import java.util.Objects;
 public class Image {
 
 	/**
+	 * 可以访问图像的URL。
+	 *
 	 * The URL where the image can be accessed.
 	 */
 	private String url;
 
 	/**
+	 * Base64编码的图像字符串。
+	 *
 	 * Base64 encoded image string.
 	 */
 	private String b64Json;
