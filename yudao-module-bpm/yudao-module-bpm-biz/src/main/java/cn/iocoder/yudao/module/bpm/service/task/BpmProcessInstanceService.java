@@ -1,9 +1,11 @@
 package cn.iocoder.yudao.module.bpm.service.task;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.module.bpm.api.task.dto.BpmProcessInstanceCreateReqDTO;
-import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.instance.*;
+import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.instance.BpmProcessInstanceCancelReqVO;
+import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.instance.BpmProcessInstanceCreateReqVO;
+import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.instance.BpmProcessInstanceMyPageReqVO;
+import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.instance.BpmProcessInstanceRespVO;
 import jakarta.validation.Valid;
 import org.flowable.engine.delegate.event.FlowableCancelledEvent;
 import org.flowable.engine.history.HistoricProcessInstance;
@@ -12,6 +14,8 @@ import org.flowable.engine.runtime.ProcessInstance;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
 
 /**
  * 流程实例 Service 接口
@@ -43,7 +47,7 @@ public interface BpmProcessInstanceService {
      * @return 流程实例列表 Map
      */
     default Map<String, ProcessInstance> getProcessInstanceMap(Set<String> ids) {
-        return CollectionUtils.convertMap(getProcessInstances(ids), ProcessInstance::getProcessInstanceId);
+        return convertMap(getProcessInstances(ids), ProcessInstance::getProcessInstanceId);
     }
 
     /**
@@ -53,7 +57,7 @@ public interface BpmProcessInstanceService {
      * @return 对应的映射关系
      */
     default Map<String, String> getProcessInstanceNameMap(Set<String> ids) {
-        return CollectionUtils.convertMap(getProcessInstances(ids),
+        return convertMap(getProcessInstances(ids),
                 ProcessInstance::getProcessInstanceId, ProcessInstance::getName);
     }
 
@@ -80,7 +84,7 @@ public interface BpmProcessInstanceService {
      * @return 历史的流程实例列表 Map
      */
     default Map<String, HistoricProcessInstance> getHistoricProcessInstanceMap(Set<String> ids) {
-        return CollectionUtils.convertMap(getHistoricProcessInstances(ids), HistoricProcessInstance::getId);
+        return convertMap(getHistoricProcessInstances(ids), HistoricProcessInstance::getId);
     }
 
     /**

@@ -16,4 +16,11 @@ public class BpmConstants {
      */
     public static final String PROCESS_INSTANCE_VARIABLE_STATUS = "PROCESS_STATUS";
 
+    /**
+     * 任务的变量 - 状态
+     *
+     * @see org.flowable.task.api.Task#getTaskLocalVariables()
+     */
+    public static final String TASK_VARIABLE_STATUS = "TASK_STATUS";
+
 }

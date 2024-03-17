@@ -2,7 +2,6 @@ package cn.iocoder.yudao.module.bpm.framework.flowable.core.listener;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.iocoder.yudao.module.bpm.dal.dataobject.task.BpmTaskExtDO;
 import cn.iocoder.yudao.module.bpm.service.task.BpmActivityService;
 import cn.iocoder.yudao.module.bpm.service.task.BpmTaskService;
 import com.google.common.collect.ImmutableSet;
@@ -21,7 +20,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * 监听 {@link org.flowable.task.api.Task} 的开始与完成，创建与更新对应的 {@link BpmTaskExtDO} 记录
+ * 监听 {@link org.flowable.task.api.Task} 的开始与完成
  *
  * @author jason
  */

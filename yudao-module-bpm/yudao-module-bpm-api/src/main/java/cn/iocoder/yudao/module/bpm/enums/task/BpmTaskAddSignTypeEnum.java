@@ -17,15 +17,11 @@ public enum BpmTaskAddSignTypeEnum {
     /**
      * 向后加签，需要后置任务全部审批完，才会通过原审批人节点
      */
-    AFTER("after", "向后加签"),
-    /**
-     * 创建后置加签时的过度状态，用于控制向后加签生成的任务状态
-     */
-    AFTER_CHILDREN_TASK("afterChildrenTask", "向后加签生成的子任务");
+    AFTER("after", "向后加签");
 
     private final String type;
 
-    private final String desc;
+    private final String desc; // TODO 芋艿：desc
 
     public static String formatDesc(String type) {
         for (BpmTaskAddSignTypeEnum value : values()) {
@@ -37,4 +33,3 @@ public enum BpmTaskAddSignTypeEnum {
     }
 
 }
-    

@@ -20,6 +20,7 @@ import java.time.LocalDateTime;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
+@Deprecated
 public class BpmTaskExtDO extends BaseDO {
 
     /**
@@ -61,6 +62,7 @@ public class BpmTaskExtDO extends BaseDO {
     /**
      * 审批建议
      */
+    @Deprecated
     private String reason;
     /**
      * 任务的结束时间

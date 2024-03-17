@@ -48,7 +48,7 @@ public class BpmOALeaveServiceImpl implements BpmOALeaveService {
         // 插入 OA 请假单
         long day = LocalDateTimeUtil.between(createReqVO.getStartTime(), createReqVO.getEndTime()).toDays();
         BpmOALeaveDO leave = BpmOALeaveConvert.INSTANCE.convert(createReqVO).setUserId(userId).setDay(day)
-                .setResult(BpmProcessInstanceResultEnum.PROCESS.getResult());
+                .setResult(BpmProcessInstanceResultEnum.RUNNING.getResult());
         leaveMapper.insert(leave);
 
         // 发起 BPM 流程

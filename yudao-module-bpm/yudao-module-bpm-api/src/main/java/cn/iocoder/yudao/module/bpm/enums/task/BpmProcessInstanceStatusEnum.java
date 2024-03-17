@@ -12,9 +12,9 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum BpmProcessInstanceStatusEnum {
 
-    RUNNING(1, "进行中"),
-    APPROVE(2, "通过"),
-    REJECT(3, "不通过"),
+    RUNNING(1, "审批中"),
+    APPROVE(2, "审批通过"),
+    REJECT(3, "审批不通过"),
     CANCEL(4, "已取消");
 
     /**

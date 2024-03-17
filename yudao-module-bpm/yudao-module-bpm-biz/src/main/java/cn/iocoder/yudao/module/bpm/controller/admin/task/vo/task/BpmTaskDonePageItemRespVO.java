@@ -18,8 +18,9 @@ public class BpmTaskDonePageItemRespVO extends BpmTaskTodoPageItemRespVO {
     @Schema(description = "持续时间", requiredMode = Schema.RequiredMode.REQUIRED, example = "1000")
     private Long durationInMillis;
 
-    @Schema(description = "任务结果-参见 bpm_process_instance_result", requiredMode = Schema.RequiredMode.REQUIRED, example = "2")
-    private Integer result;
+    @Schema(description = "任务状态", requiredMode = Schema.RequiredMode.REQUIRED, example = "2")
+    private Integer status; // 参见 BpmProcessInstanceResultEnum 枚举
+
     @Schema(description = "审批建议", requiredMode = Schema.RequiredMode.REQUIRED, example = "不请假了！")
     private String reason;
 
