@@ -27,7 +27,10 @@ public class BpmTaskRespVO {
     private Long durationInMillis;
 
     @Schema(description = "任务状态", requiredMode = Schema.RequiredMode.REQUIRED, example = "2")
-    private Integer status; // 参见 BpmProcessInstanceResultEnum 枚举
+    private Integer status; // 参见 BpmTaskStatusEnum 枚举
+
+    @Schema(description = "审批理由", requiredMode = Schema.RequiredMode.REQUIRED, example = "2")
+    private String reason;
 
     /**
      * 负责人的用户信息

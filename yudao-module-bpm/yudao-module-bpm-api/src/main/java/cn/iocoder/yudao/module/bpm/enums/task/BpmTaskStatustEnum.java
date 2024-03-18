@@ -5,13 +5,13 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 /**
- * 流程实例的结果
+ * 流程任务 Task 的状态枚举
  *
  * @author jason
  */
 @Getter
 @AllArgsConstructor
-public enum BpmProcessInstanceResultEnum {
+public enum BpmTaskStatustEnum {
 
     RUNNING(1, "审批中"),
     APPROVE(2, "审批通过"),
@@ -43,28 +43,28 @@ public enum BpmProcessInstanceResultEnum {
 //    WAIT_BEFORE_TASK(9, "处理中【待前置任务完成】");
 
     /**
-     * 结果
+     * 状态
      * <p>
-     * 如果新增时，注意 {@link #isEndResult(Integer)} 是否需要变更
+     * 如果新增时，注意 {@link #isEndStatus(Integer)} 是否需要变更
      */
-    private final Integer result;
+    private final Integer status;
     /**
-     * 描述
+     * 名字
      */
-    private final String desc;
+    private final String name;
 
     /**
-     * 判断该结果是否已经处于 End 最终结果
+     * 判断该状态是否已经处于 End 最终状态
      * <p>
-     * 主要用于一些结果更新的逻辑，如果已经是最终结果，就不再进行更新
+     * 主要用于一些状态更新的逻辑，如果已经是最终状态，就不再进行更新
      *
-     * @param result 结果
+     * @param status 状态
      * @return 是否
      */
-    public static boolean isEndResult(Integer result) {
-        return ObjectUtils.equalsAny(result,
-                APPROVE.getResult(), REJECT.getResult(), CANCEL.getResult(),
-                BACK.getResult(), APPROVING.getResult());
+    public static boolean isEndStatus(Integer status) {
+        return ObjectUtils.equalsAny(status,
+                APPROVE.getStatus(), REJECT.getStatus(), CANCEL.getStatus(),
+                BACK.getStatus(), APPROVING.getStatus());
     }
 
 }

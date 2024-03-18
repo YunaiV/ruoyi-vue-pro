@@ -57,6 +57,7 @@ public interface BpmTaskConvert {
         List<BpmTaskRespVO> taskVOList = CollectionUtils.convertList(pageResult.getList(), task -> {
             BpmTaskRespVO taskVO = BeanUtils.toBean(task, BpmTaskRespVO.class);
             taskVO.setStatus((Integer) task.getTaskLocalVariables().get(BpmConstants.TASK_VARIABLE_STATUS));
+            taskVO.setReason((String) task.getTaskLocalVariables().get(BpmConstants.TASK_VARIABLE_REASON));
             // 流程实例
             HistoricProcessInstance processInstance = processInstanceMap.get(taskVO.getProcessInstanceId());
             if (processInstance != null) {
@@ -76,6 +77,7 @@ public interface BpmTaskConvert {
         List<BpmTaskRespVO> taskVOList = CollectionUtils.convertList(taskList, task -> {
             BpmTaskRespVO taskVO = BeanUtils.toBean(task, BpmTaskRespVO.class);
             taskVO.setStatus((Integer) task.getTaskLocalVariables().get(BpmConstants.TASK_VARIABLE_STATUS));
+            taskVO.setReason((String) task.getTaskLocalVariables().get(BpmConstants.TASK_VARIABLE_REASON));
             // 流程实例
             AdminUserRespDTO startUser = userMap.get(NumberUtils.parseLong(processInstance.getStartUserId()));
             taskVO.setProcessInstance(BeanUtils.toBean(processInstance, BpmTaskRespVO.ProcessInstance.class,

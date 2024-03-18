@@ -22,5 +22,13 @@ public class BpmConstants {
      * @see org.flowable.task.api.Task#getTaskLocalVariables()
      */
     public static final String TASK_VARIABLE_STATUS = "TASK_STATUS";
+    /**
+     * 任务的变量 - 理由
+     *
+     * 例如说：审批通过、不通过的理由
+     *
+     * @see org.flowable.task.api.Task#getTaskLocalVariables()
+     */
+    public static final String TASK_VARIABLE_REASON = "TASK_REASON";
 
 }

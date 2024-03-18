@@ -55,7 +55,7 @@ public class BpmnModelUtils {
     /**
      * 获得 BPMN 流程中，指定的元素们
      *
-     * @param model
+     * @param model 模型
      * @param clazz 指定元素。例如说，{@link UserTask}、{@link Gateway} 等等
      * @return 元素们
      */
