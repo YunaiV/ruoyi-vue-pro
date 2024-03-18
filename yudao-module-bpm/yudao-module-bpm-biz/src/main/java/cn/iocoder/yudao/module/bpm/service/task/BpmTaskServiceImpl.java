@@ -179,7 +179,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
 
         // 情况三：审批普通的任务。大多数情况下，都是这样
         // 3.1 更新 task 状态、原因
-        updateTaskStatus(task.getId(), BpmTaskStatustEnum.APPROVE.getStatus());
+        updateTaskStatusAndReason(task.getId(), BpmTaskStatustEnum.APPROVE.getStatus(), reqVO.getReason());
         // 3.2 添加评论
         taskService.addComment(task.getId(), task.getProcessInstanceId(),
                 BpmCommentTypeEnum.APPROVE.getType(), reqVO.getReason());
@@ -315,19 +315,6 @@ public class BpmTaskServiceImpl implements BpmTaskService {
 //        taskExtMapper.updateByTaskId(
 //                new BpmTaskExtDO().setTaskId(task.getId()).setResult(BpmProcessInstanceResultEnum.REJECT.getResult())
 //                        .setEndTime(LocalDateTime.now()).setReason(reqVO.getReason()));
-    }
-
-    @Override
-    public void updateTaskAssignee(Long userId, BpmTaskUpdateAssigneeReqVO reqVO) {
-        // 校验任务存在
-        Task task = validateTask(userId, reqVO.getId());
-        // 更新负责人
-        updateTaskAssignee(task.getId(), reqVO.getAssigneeUserId());
-    }
-
-    @Override
-    public void updateTaskAssignee(String id, Long userId) {
-        taskService.setAssignee(id, String.valueOf(userId));
     }
 
     /**
@@ -599,41 +586,54 @@ public class BpmTaskServiceImpl implements BpmTaskService {
     public void delegateTask(Long userId, BpmTaskDelegateReqVO reqVO) {
         String taskId = reqVO.getId();
         // 1.1 校验任务
-        Task task = validateTaskCanDelegate(userId, reqVO);
+        Task task = validateTask(userId, reqVO.getId());
+        if (task.getAssignee().equals(reqVO.getDelegateUserId().toString())) { // 校验当前审批人和被委派人不是同一人
+            throw exception(TASK_DELEGATE_FAIL_USER_REPEAT);
+        }
         // 1.2 校验目标用户存在
         AdminUserRespDTO delegateUser = adminUserApi.getUser(reqVO.getDelegateUserId());
         if (delegateUser == null) {
             throw exception(TASK_DELEGATE_FAIL_USER_NOT_EXISTS);
         }
 
-        // 2. 添加审批意见
+        // 2. 添加委托意见
         AdminUserRespDTO currentUser = adminUserApi.getUser(userId);
         taskService.addComment(taskId, task.getProcessInstanceId(), BpmCommentTypeEnum.DELEGATE_START.getType(),
                 BpmCommentTypeEnum.DELEGATE_START.formatComment(currentUser.getNickname(), delegateUser.getNickname(), reqVO.getReason()));
 
         // 3.1 设置任务所有人 (owner) 为原任务的处理人 (assignee)
         taskService.setOwner(taskId, task.getAssignee());
-        // 3.2 执行委派，将任务委派给 receiveId
+        // 3.2 执行委派，将任务委派给 delegateUser
         taskService.delegateTask(taskId, reqVO.getDelegateUserId().toString());
-        // 3.3 更新 task 状态 + 原因
-        updateTaskStatusAndReason(taskId, BpmTaskStatustEnum.DELEGATE.getStatus(), reqVO.getReason());
+        // 3.3 更新 task 状态。
+        // 为什么不更新原因？因为原因目前主要给审批通过、不通过时使用
+        updateTaskStatus(taskId, BpmTaskStatustEnum.DELEGATE.getStatus());
     }
 
-    /**
-     * 校验任务委派参数
-     *
-     * @param userId 用户编号
-     * @param reqVO  任务编号，接收人ID
-     * @return 当前任务信息
-     */
-    private Task validateTaskCanDelegate(Long userId, BpmTaskDelegateReqVO reqVO) {
-        // 校验任务
+    @Override
+    public void transferTask(Long userId, BpmTaskTransferReqVO reqVO) {
+        String taskId = reqVO.getId();
+        // 1.1 校验任务
         Task task = validateTask(userId, reqVO.getId());
-        // 校验当前审批人和被委派人不是同一人
-        if (task.getAssignee().equals(reqVO.getDelegateUserId().toString())) {
-            throw exception(TASK_DELEGATE_FAIL_USER_REPEAT);
+        if (task.getAssignee().equals(reqVO.getAssigneeUserId().toString())) { // 校验当前审批人和被转派人不是同一人
+            throw exception(TASK_TRANSFER_FAIL_USER_REPEAT);
         }
-        return task;
+        // 1.2 校验目标用户存在
+        AdminUserRespDTO assigneeUser = adminUserApi.getUser(reqVO.getAssigneeUserId());
+        if (assigneeUser == null) {
+            throw exception(TASK_TRANSFER_FAIL_USER_NOT_EXISTS);
+        }
+
+        // 2. 添加委托意见
+        AdminUserRespDTO currentUser = adminUserApi.getUser(userId);
+        taskService.addComment(taskId, task.getProcessInstanceId(), BpmCommentTypeEnum.TRANSFER.getType(),
+                BpmCommentTypeEnum.TRANSFER.formatComment(currentUser.getNickname(), assigneeUser.getNickname(), reqVO.getReason()));
+
+        // 3.1 设置任务所有人 (owner) 为原任务的处理人 (assignee)
+        taskService.setOwner(taskId, task.getAssignee());
+        // 3.2 执行转派（审批人），将任务转派给 assigneeUser
+        // 委托（ delegate）和转派（transfer）的差别，就在这块的调用！！！！
+        taskService.setAssignee(taskId, reqVO.getAssigneeUserId().toString());
     }
 
     @Override

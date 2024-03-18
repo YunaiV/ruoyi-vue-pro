@@ -118,14 +118,6 @@ public class BpmTaskController {
         return success(true);
     }
 
-    @PutMapping("/update-assignee")
-    @Operation(summary = "更新任务的负责人", description = "用于【流程详情】的【转派】按钮")
-    @PreAuthorize("@ss.hasPermission('bpm:task:update')")
-    public CommonResult<Boolean> updateTaskAssignee(@Valid @RequestBody BpmTaskUpdateAssigneeReqVO reqVO) {
-        taskService.updateTaskAssignee(getLoginUserId(), reqVO);
-        return success(true);
-    }
-
     @GetMapping("/list-by-return")
     @Operation(summary = "获取所有可回退的节点", description = "用于【流程详情】的【回退】按钮")
     @Parameter(name = "taskId", description = "当前任务ID", required = true)
@@ -145,10 +137,18 @@ public class BpmTaskController {
     }
 
     @PutMapping("/delegate")
-    @Operation(summary = "委派任务", description = "用于【流程详情】的【委派】按钮。和向前【加签】有点像，唯一区别是【委托】没有单独创立任务")
+    @Operation(summary = "委派任务", description = "用于【流程详情】的【委派】按钮")
     @PreAuthorize("@ss.hasPermission('bpm:task:update')")
     public CommonResult<Boolean> delegateTask(@Valid @RequestBody BpmTaskDelegateReqVO reqVO) {
         taskService.delegateTask(getLoginUserId(), reqVO);
+        return success(true);
+    }
+
+    @PutMapping("/transfer")
+    @Operation(summary = "转派任务", description = "用于【流程详情】的【转派】按钮")
+    @PreAuthorize("@ss.hasPermission('bpm:task:update')")
+    public CommonResult<Boolean> transferTask(@Valid @RequestBody BpmTaskTransferReqVO reqVO) {
+        taskService.transferTask(getLoginUserId(), reqVO);
         return success(true);
     }
 

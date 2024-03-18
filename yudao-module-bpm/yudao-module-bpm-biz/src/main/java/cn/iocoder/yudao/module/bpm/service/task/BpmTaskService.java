@@ -87,15 +87,7 @@ public interface BpmTaskService {
      * @param userId 用户编号
      * @param reqVO  分配请求
      */
-    void updateTaskAssignee(Long userId, BpmTaskUpdateAssigneeReqVO reqVO);
-
-    /**
-     * 将流程任务分配给指定用户
-     *
-     * @param id     流程任务编号
-     * @param userId 用户编号
-     */
-    void updateTaskAssignee(String id, Long userId);
+    void transferTask(Long userId, BpmTaskTransferReqVO reqVO);
 
     /**
      * 创建 Task 拓展记录

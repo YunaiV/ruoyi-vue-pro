@@ -53,7 +53,9 @@ public interface ErrorCodeConstants {
     ErrorCode TASK_ADD_SIGN_USER_NOT_EXIST = new ErrorCode(1_009_005_009, "任务加签：选择的用户不存在");
     ErrorCode TASK_ADD_SIGN_TYPE_ERROR = new ErrorCode(1_009_005_010, "任务加签：当前任务已经{}，不能{}");
     ErrorCode TASK_ADD_SIGN_USER_REPEAT = new ErrorCode(1_009_005_011, "任务加签失败，加签人与现有审批人[{}]重复");
-    ErrorCode TASK_SUB_SIGN_NO_PARENT = new ErrorCode(1_009_005_011, "任务减签失败，被减签的任务必须是通过加签生成的任务");
+    ErrorCode TASK_SUB_SIGN_NO_PARENT = new ErrorCode(1_009_005_012, "任务减签失败，被减签的任务必须是通过加签生成的任务");
+    ErrorCode TASK_TRANSFER_FAIL_USER_REPEAT = new ErrorCode(1_009_005_013, "任务转办失败，转办人和当前审批人为同一人");
+    ErrorCode TASK_TRANSFER_FAIL_USER_NOT_EXISTS = new ErrorCode(1_009_005_014, "任务转办失败，转办人不存在");
 
     // ========== 流程任务分配规则 1-009-006-000 TODO 芋艿：这里要改下 ==========
     ErrorCode TASK_CREATE_FAIL_NO_CANDIDATE_USER = new ErrorCode(1_009_006_003, "操作失败，原因：找不到任务的审批人！");
