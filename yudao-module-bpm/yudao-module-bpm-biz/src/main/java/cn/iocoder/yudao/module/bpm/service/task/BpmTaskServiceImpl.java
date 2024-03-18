@@ -285,21 +285,16 @@ public class BpmTaskServiceImpl implements BpmTaskService {
     private void approveDelegateTask(BpmTaskApproveReqVO reqVO, Task task) {
         // 1. 添加审批意见
         AdminUserRespDTO currentUser = adminUserApi.getUser(WebFrameworkUtils.getLoginUserId());
-        AdminUserRespDTO sourceApproveUser = adminUserApi.getUser(NumberUtils.parseLong(task.getOwner()));
-        Assert.notNull(sourceApproveUser, "委派任务找不到原审批人，需要检查数据");
-        String comment = StrUtil.format("[{}]完成委派任务，任务重新回到[{}]手中，审批意见为:{}", currentUser.getNickname(),
-                sourceApproveUser.getNickname(), reqVO.getReason());
-        taskService.addComment(reqVO.getId(), task.getProcessInstanceId(),
-                BpmCommentTypeEnum.DELEGATE.getType().toString(), comment);
+        AdminUserRespDTO ownerUser = adminUserApi.getUser(NumberUtils.parseLong(task.getOwner())); // 发起委托的用户
+        Assert.notNull(ownerUser, "委派任务找不到原审批人，需要检查数据");
+        taskService.addComment(reqVO.getId(), task.getProcessInstanceId(), BpmCommentTypeEnum.DELEGATE_END.getType(),
+                BpmCommentTypeEnum.DELEGATE_END.formatComment(currentUser.getNickname(), ownerUser.getNickname(), reqVO.getReason()));
 
         // 2.1 调用 resolveTask 完成任务。
         // 底层调用 TaskHelper.changeTaskAssignee(task, task.getOwner())：将 owner 设置为 assignee
         taskService.resolveTask(task.getId());
-        // 2.2 更新任务拓展表为【处理中】
-//        taskExtMapper.updateByTaskId(
-//                new BpmTaskExtDO().setTaskId(task.getId()).setResult(BpmProcessInstanceResultEnum.RUNNING.getResult())
-//                        .setReason(reqVO.getReason()));
-        updateTaskStatus(task.getId(), BpmTaskStatustEnum.RUNNING.getStatus());
+        // 2.2 更新 task 状态 + 原因
+        updateTaskStatusAndReason(task.getId(), BpmTaskStatustEnum.RUNNING.getStatus(), reqVO.getReason());
     }
 
     @Override
@@ -352,8 +347,8 @@ public class BpmTaskServiceImpl implements BpmTaskService {
      * @param status 状态
      * @param reason 理由（审批通过、审批不通过的理由）
      */
-    private void updateTaskStatus(String id, Integer status, String reason) {
-        taskService.setVariableLocal(id, BpmConstants.TASK_VARIABLE_STATUS, status);
+    private void updateTaskStatusAndReason(String id, Integer status, String reason) {
+        updateTaskStatus(id, status);
         taskService.setVariableLocal(id, BpmConstants.TASK_VARIABLE_REASON, reason);
     }
 
@@ -585,10 +580,10 @@ public class BpmTaskServiceImpl implements BpmTaskService {
                 return;
             }
             // 2.1 添加评论
-            taskService.addComment(task.getId(), currentTask.getProcessInstanceId(),
-                    BpmCommentTypeEnum.BACK.getType(), reqVO.getReason());
+            taskService.addComment(task.getId(), currentTask.getProcessInstanceId(), BpmCommentTypeEnum.BACK.getType(),
+                    BpmCommentTypeEnum.BACK.formatComment(reqVO.getReason()));
             // 2.2 更新 task 状态 + 原因
-            updateTaskStatus(task.getId(), BpmTaskStatustEnum.BACK.getStatus(), reqVO.getReason());
+            updateTaskStatusAndReason(task.getId(), BpmTaskStatustEnum.RETURN.getStatus(), reqVO.getReason());
         });
 
         // 3. 执行驳回
@@ -602,6 +597,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void delegateTask(Long userId, BpmTaskDelegateReqVO reqVO) {
+        String taskId = reqVO.getId();
         // 1.1 校验任务
         Task task = validateTaskCanDelegate(userId, reqVO);
         // 1.2 校验目标用户存在
@@ -612,21 +608,15 @@ public class BpmTaskServiceImpl implements BpmTaskService {
 
         // 2. 添加审批意见
         AdminUserRespDTO currentUser = adminUserApi.getUser(userId);
-        String comment = StrUtil.format("[{}]将任务委派给[{}]，委派理由为:{}", currentUser.getNickname(),
-                delegateUser.getNickname(), reqVO.getReason());
-        String taskId = reqVO.getId();
-        taskService.addComment(taskId, task.getProcessInstanceId(),
-                BpmCommentTypeEnum.DELEGATE.getType().toString(), comment);
+        taskService.addComment(taskId, task.getProcessInstanceId(), BpmCommentTypeEnum.DELEGATE_START.getType(),
+                BpmCommentTypeEnum.DELEGATE_START.formatComment(currentUser.getNickname(), delegateUser.getNickname(), reqVO.getReason()));
 
         // 3.1 设置任务所有人 (owner) 为原任务的处理人 (assignee)
         taskService.setOwner(taskId, task.getAssignee());
         // 3.2 执行委派，将任务委派给 receiveId
         taskService.delegateTask(taskId, reqVO.getDelegateUserId().toString());
-        // 3.3 更新任务拓展表为【委派】
-//        taskExtMapper.updateByTaskId(
-//                new BpmTaskExtDO().setTaskId(task.getId()).setResult(BpmProcessInstanceResultEnum.DELEGATE.getResult())
-//                        .setReason(reqVO.getReason()));
-        updateTaskStatus(taskId, BpmTaskStatustEnum.DELEGATE.getStatus());
+        // 3.3 更新 task 状态 + 原因
+        updateTaskStatusAndReason(taskId, BpmTaskStatustEnum.DELEGATE.getStatus(), reqVO.getReason());
     }
 
     /**

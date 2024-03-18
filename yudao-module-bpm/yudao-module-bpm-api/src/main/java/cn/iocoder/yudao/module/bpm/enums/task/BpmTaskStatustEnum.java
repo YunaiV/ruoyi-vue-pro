@@ -18,9 +18,7 @@ public enum BpmTaskStatustEnum {
     REJECT(3, "审批不通过"),
     CANCEL(4, "已取消"),
 
-    // ========== 流程任务独有的状态 ==========
-
-    BACK(5, "已驳回"), // 退回
+    RETURN(5, "已退回"),
     DELEGATE(6, "委派中"),
 
     /**
@@ -64,7 +62,7 @@ public enum BpmTaskStatustEnum {
     public static boolean isEndStatus(Integer status) {
         return ObjectUtils.equalsAny(status,
                 APPROVE.getStatus(), REJECT.getStatus(), CANCEL.getStatus(),
-                BACK.getStatus(), APPROVING.getStatus());
+                RETURN.getStatus(), APPROVING.getStatus());
     }
 
 }
