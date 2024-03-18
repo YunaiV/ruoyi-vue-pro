@@ -4,8 +4,6 @@ import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.number.NumberUtils;
-import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
-import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.instance.BpmProcessInstanceRespVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.task.*;
 import cn.iocoder.yudao.module.bpm.convert.task.BpmTaskConvert;
 import cn.iocoder.yudao.module.bpm.service.task.BpmProcessInstanceService;
@@ -94,7 +92,8 @@ public class BpmTaskController {
         // 拼接数据
         HistoricProcessInstance processInstance = processInstanceService.getHistoricProcessInstance(processInstanceId);
         // 获得 User 和 Dept Map
-        Set<Long> userIds = convertSet(taskList, task -> NumberUtils.parseLong(task.getAssignee()));
+        Set<Long> userIds = convertSetByFlatMap(taskList, task ->
+                Stream.of(NumberUtils.parseLong(task.getAssignee()), NumberUtils.parseLong(task.getOwner())));
         userIds.add(NumberUtils.parseLong(processInstance.getStartUserId()));
         Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(userIds);
         Map<Long, DeptRespDTO> deptMap = deptApi.getDeptMap(
@@ -155,7 +154,7 @@ public class BpmTaskController {
     @PutMapping("/create-sign")
     @Operation(summary = "加签", description = "before 前加签，after 后加签")
     @PreAuthorize("@ss.hasPermission('bpm:task:update')")
-    public CommonResult<Boolean> createSignTask(@Valid @RequestBody BpmTaskAddSignReqVO reqVO) {
+    public CommonResult<Boolean> createSignTask(@Valid @RequestBody BpmTaskSignCreateReqVO reqVO) {
         taskService.createSignTask(getLoginUserId(), reqVO);
         return success(true);
     }
@@ -163,13 +162,12 @@ public class BpmTaskController {
     @DeleteMapping("/delete-sign")
     @Operation(summary = "减签")
     @PreAuthorize("@ss.hasPermission('bpm:task:update')")
-    public CommonResult<Boolean> deleteSignTask(@Valid @RequestBody BpmTaskSubSignReqVO reqVO) {
+    public CommonResult<Boolean> deleteSignTask(@Valid @RequestBody BpmTaskSignDeleteReqVO reqVO) {
         taskService.deleteSignTask(getLoginUserId(), reqVO);
         return success(true);
     }
 
-    // TODO 芋艿：待测试
-    @GetMapping("list-by-parent-task-id")
+    @GetMapping("/list-by-parent-task-id")
     @Operation(summary = "获得指定父级任务的子任务列表") // 目前用于，减签的时候，获得子任务列表
     @Parameter(name = "parentTaskId", description = "父级任务编号", required = true)
     @PreAuthorize("@ss.hasPermission('bpm:task:query')")
@@ -179,12 +177,11 @@ public class BpmTaskController {
             return success(Collections.emptyList());
         }
         // 拼接数据
-        Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(
-                convertSetByFlatMap(taskList, user -> Stream.of(Long.valueOf(user.getAssignee()), Long.valueOf(user.getOwner()))));
-        return success(convertList(taskList, task -> BeanUtils.toBean(task, BpmTaskRespVO.class, taskVO -> {
-            taskVO.setAssigneeUser(BeanUtils.toBean(userMap.get(NumberUtils.parseLong(task.getAssignee())), BpmProcessInstanceRespVO.User.class));
-            taskVO.setOwnerUser(BeanUtils.toBean(userMap.get(NumberUtils.parseLong(task.getOwner())), BpmProcessInstanceRespVO.User.class));
-        })));
+        Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(convertSetByFlatMap(taskList,
+                user -> Stream.of(NumberUtils.parseLong(user.getAssignee()), NumberUtils.parseLong(user.getOwner()))));
+        Map<Long, DeptRespDTO> deptMap = deptApi.getDeptMap(
+                convertSet(userMap.values(), AdminUserRespDTO::getDeptId));
+        return success(BpmTaskConvert.INSTANCE.buildTaskListByParentTaskId(taskList, userMap, deptMap));
     }
 
 }

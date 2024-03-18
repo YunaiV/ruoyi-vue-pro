@@ -5,16 +5,16 @@ import lombok.Data;
 
 import jakarta.validation.constraints.NotEmpty;
 
-// TODO @海洋：类名，应该是 delete 哈
-@Schema(description = "管理后台 - 减签流程任务的 Request VO")
+@Schema(description = "管理后台 - 加签任务的删除（减签） Request VO")
 @Data
-public class BpmTaskSubSignReqVO {
+public class BpmTaskSignDeleteReqVO {
 
-    @Schema(description = "被减签的任务 ID")
+    @Schema(description = "被减签的任务编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     @NotEmpty(message = "任务编号不能为空")
     private String id;
 
-    @Schema(description = "加签原因")
+    @Schema(description = "加签原因", requiredMode = Schema.RequiredMode.REQUIRED, example = "需要减签")
     @NotEmpty(message = "加签原因不能为空")
     private String reason;
+
 }

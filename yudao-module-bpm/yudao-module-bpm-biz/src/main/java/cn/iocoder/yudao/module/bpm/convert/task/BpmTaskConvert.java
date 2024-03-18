@@ -24,8 +24,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMultiMap;
-import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.filterList;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
 
 /**
  * Bpm 任务 Convert
@@ -91,6 +90,14 @@ public interface BpmTaskConvert {
                     taskVO.getAssigneeUser().setDeptName(dept.getName());
                 }
             }
+            AdminUserRespDTO ownerUser = userMap.get(NumberUtils.parseLong(task.getOwner()));
+            if (ownerUser != null) {
+                taskVO.setOwnerUser(BeanUtils.toBean(ownerUser, BpmProcessInstanceRespVO.User.class));
+                DeptRespDTO dept = deptMap.get(ownerUser.getDeptId());
+                if (dept != null) {
+                    taskVO.getOwnerUser().setDeptName(dept.getName());
+                }
+            }
             return taskVO;
         });
 
@@ -104,6 +111,29 @@ public interface BpmTaskConvert {
         return filterList(taskVOList, r -> StrUtil.isEmpty(r.getParentTaskId()));
     }
 
+    default List<BpmTaskRespVO> buildTaskListByParentTaskId(List<Task> taskList,
+                                                            Map<Long, AdminUserRespDTO> userMap,
+                                                            Map<Long, DeptRespDTO> deptMap) {
+        return convertList(taskList, task -> BeanUtils.toBean(task, BpmTaskRespVO.class, taskVO -> {
+            AdminUserRespDTO assignUser = userMap.get(NumberUtils.parseLong(task.getAssignee()));
+            if (assignUser != null) {
+                taskVO.setAssigneeUser(BeanUtils.toBean(assignUser, BpmProcessInstanceRespVO.User.class));
+                DeptRespDTO dept = deptMap.get(assignUser.getDeptId());
+                if (dept != null) {
+                    taskVO.getAssigneeUser().setDeptName(dept.getName());
+                }
+            }
+            AdminUserRespDTO ownerUser = userMap.get(NumberUtils.parseLong(task.getOwner()));
+            if (ownerUser != null) {
+                taskVO.setOwnerUser(BeanUtils.toBean(ownerUser, BpmProcessInstanceRespVO.User.class));
+                DeptRespDTO dept = deptMap.get(ownerUser.getDeptId());
+                if (dept != null) {
+                    taskVO.getOwnerUser().setDeptName(dept.getName());
+                }
+            }
+        }));
+    }
+
     default BpmMessageSendWhenTaskCreatedReqDTO convert(ProcessInstance processInstance, AdminUserRespDTO startUser,
                                                         Task task) {
         BpmMessageSendWhenTaskCreatedReqDTO reqDTO = new BpmMessageSendWhenTaskCreatedReqDTO();
@@ -114,22 +144,28 @@ public interface BpmTaskConvert {
         return reqDTO;
     }
 
-    //此处不用 mapstruct 映射，因为 TaskEntityImpl 还有很多其他属性，这里我们只设置我们需要的
-    //使用 mapstruct 会将里面嵌套的各个属性值都设置进去，会出现意想不到的问题
-    default TaskEntityImpl convert(TaskEntityImpl task,TaskEntityImpl parentTask){
-        task.setCategory(parentTask.getCategory());
-        task.setDescription(parentTask.getDescription());
-        task.setTenantId(parentTask.getTenantId());
-        task.setName(parentTask.getName());
-        task.setParentTaskId(parentTask.getId());
-        task.setProcessDefinitionId(parentTask.getProcessDefinitionId());
-        task.setProcessInstanceId(parentTask.getProcessInstanceId());
-//        task.setExecutionId(parentTask.getExecutionId()); // TODO 芋艿：新加的，不太确定；尴尬，不加时，子任务不通过会失败（报错）；加了，子任务审批通过会失败（报错）
-        task.setTaskDefinitionKey(parentTask.getTaskDefinitionKey());
-        task.setTaskDefinitionId(parentTask.getTaskDefinitionId());
-        task.setPriority(parentTask.getPriority());
-        task.setCreateTime(new Date());
-        return task;
+    /**
+     * 将父任务的属性，拷贝到子任务（加签任务）
+     *
+     * 为什么不使用 mapstruct 映射？因为 TaskEntityImpl 还有很多其他属性，这里我们只设置我们需要的。
+     * 使用 mapstruct 会将里面嵌套的各个属性值都设置进去，会出现意想不到的问题。
+     *
+     * @param parentTask 父任务
+     * @param childTask 加签任务
+     */
+    default void copyTo(TaskEntityImpl parentTask, TaskEntityImpl childTask) {
+        childTask.setName(parentTask.getName());
+        childTask.setDescription(parentTask.getDescription());
+        childTask.setCategory(parentTask.getCategory());
+        childTask.setParentTaskId(parentTask.getId());
+        childTask.setProcessDefinitionId(parentTask.getProcessDefinitionId());
+        childTask.setProcessInstanceId(parentTask.getProcessInstanceId());
+//        childTask.setExecutionId(parentTask.getExecutionId()); // TODO 芋艿：新加的，不太确定；尴尬，不加时，子任务不通过会失败（报错）；加了，子任务审批通过会失败（报错）
+        childTask.setTaskDefinitionKey(parentTask.getTaskDefinitionKey());
+        childTask.setTaskDefinitionId(parentTask.getTaskDefinitionId());
+        childTask.setPriority(parentTask.getPriority());
+        childTask.setCreateTime(new Date());
+        childTask.setTenantId(parentTask.getTenantId());
     }
 
 }

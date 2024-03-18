@@ -1,14 +1,17 @@
 package cn.iocoder.yudao.module.bpm.enums.task;
 
+import cn.hutool.core.util.ArrayUtil;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 /**
- * 流程任务 -- 加签类型枚举类型
+ * 流程任务的加签类型枚举
+ *
+ * @author kehaiyou
  */
 @Getter
 @AllArgsConstructor
-public enum BpmTaskAddSignTypeEnum {
+public enum BpmTaskSignTypeEnum {
 
     /**
      * 向前加签，需要前置任务审批完成，才回到原审批人
@@ -19,17 +22,26 @@ public enum BpmTaskAddSignTypeEnum {
      */
     AFTER("after", "向后加签");
 
+    /**
+     * 类型
+     */
     private final String type;
+    /**
+     * 名字
+     */
+    private final String name;
 
-    private final String desc; // TODO 芋艿：desc
-
-    public static String formatDesc(String type) {
-        for (BpmTaskAddSignTypeEnum value : values()) {
+    public static String nameOfType(String type) {
+        for (BpmTaskSignTypeEnum value : values()) {
             if (value.type.equals(type)) {
-                return value.desc;
+                return value.name;
             }
         }
         return null;
+    }
+
+    public static BpmTaskSignTypeEnum of(String type) {
+        return ArrayUtil.firstMatch(value -> value.getType().equals(type), values());
     }
 
 }
