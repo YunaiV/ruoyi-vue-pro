@@ -90,25 +90,18 @@ public interface BpmTaskService {
     void transferTask(Long userId, BpmTaskTransferReqVO reqVO);
 
     /**
-     * 创建 Task 拓展记录
+     * 更新 Task 状态，在创建时
      *
      * @param task 任务实体
      */
-    void createTaskExt(Task task);
+    void updateTaskStatusWhenCreated(Task task);
 
     /**
-     * 更新 Task 拓展记录为完成
-     *
-     * @param task 任务实体
-     */
-    void updateTaskExtComplete(Task task);
-
-    /**
-     * 更新 Task 拓展记录为已取消
+     * 更新 Task 状态，在取消时
      *
      * @param taskId 任务的编号
      */
-    void updateTaskExtCancel(String taskId);
+    void updateTaskStatusWhenCanceled(String taskId);
 
     /**
      * 更新 Task 拓展记录，并发送通知
@@ -117,6 +110,12 @@ public interface BpmTaskService {
      */
     void updateTaskExtAssign(Task task);
 
+    /**
+     * 获取任务
+     *
+     * @param id 任务编号
+     * @return 任务
+     */
     Task getTask(String id);
 
     /**

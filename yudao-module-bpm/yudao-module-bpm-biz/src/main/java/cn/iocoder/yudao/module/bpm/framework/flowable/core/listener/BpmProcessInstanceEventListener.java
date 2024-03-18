@@ -36,12 +36,12 @@ public class BpmProcessInstanceEventListener extends AbstractFlowableEngineEvent
 
     @Override
     protected void processCancelled(FlowableCancelledEvent event) {
-        processInstanceService.updateProcessInstanceExtCancel(event);
+        processInstanceService.updateProcessInstanceWhenCancel(event);
     }
 
     @Override
     protected void processCompleted(FlowableEngineEntityEvent event) {
-        processInstanceService.updateProcessInstanceExtComplete((ProcessInstance)event.getEntity());
+        processInstanceService.updateProcessInstanceWhenApprove((ProcessInstance)event.getEntity());
     }
 
 }

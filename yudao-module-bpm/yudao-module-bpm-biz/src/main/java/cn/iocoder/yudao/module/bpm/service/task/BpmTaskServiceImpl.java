@@ -13,9 +13,7 @@ import cn.iocoder.yudao.framework.flowable.core.util.BpmnModelUtils;
 import cn.iocoder.yudao.framework.web.core.util.WebFrameworkUtils;
 import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.task.*;
 import cn.iocoder.yudao.module.bpm.convert.task.BpmTaskConvert;
-import cn.iocoder.yudao.module.bpm.enums.task.BpmCommentTypeEnum;
-import cn.iocoder.yudao.module.bpm.enums.task.BpmTaskStatustEnum;
-import cn.iocoder.yudao.module.bpm.enums.task.BpmTaskAddSignTypeEnum;
+import cn.iocoder.yudao.module.bpm.enums.task.*;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmConstants;
 import cn.iocoder.yudao.module.bpm.service.definition.BpmModelService;
 import cn.iocoder.yudao.module.bpm.service.message.BpmMessageService;
@@ -181,8 +179,8 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         // 3.1 更新 task 状态、原因
         updateTaskStatusAndReason(task.getId(), BpmTaskStatustEnum.APPROVE.getStatus(), reqVO.getReason());
         // 3.2 添加评论
-        taskService.addComment(task.getId(), task.getProcessInstanceId(),
-                BpmCommentTypeEnum.APPROVE.getType(), reqVO.getReason());
+        taskService.addComment(task.getId(), task.getProcessInstanceId(), BpmCommentTypeEnum.APPROVE.getType(),
+                BpmCommentTypeEnum.APPROVE.formatComment(reqVO.getReason()));
         // 3.3 调用 BPM complete 去完成任务
         taskService.complete(task.getId(), instance.getProcessVariables());
 
@@ -300,21 +298,22 @@ public class BpmTaskServiceImpl implements BpmTaskService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void rejectTask(Long userId, @Valid BpmTaskRejectReqVO reqVO) {
+        // 1.1 校验任务存在
         Task task = validateTask(userId, reqVO.getId());
-        // 校验流程实例存在
+        // 1.2 校验流程实例存在
         ProcessInstance instance = processInstanceService.getProcessInstance(task.getProcessInstanceId());
         if (instance == null) {
             throw exception(PROCESS_INSTANCE_NOT_EXISTS);
         }
 
-        // 更新流程实例为不通过
-        updateTaskStatus(task.getId(), BpmTaskStatustEnum.REJECT.getStatus());
-        processInstanceService.updateProcessInstanceExtReject(instance.getProcessInstanceId(), reqVO.getReason());
+        // 2.1 更新流程实例为不通过
+        updateTaskStatusAndReason(task.getId(), BpmTaskStatustEnum.REJECT.getStatus(), reqVO.getReason());
+        // 2.2 添加评论
+        taskService.addComment(task.getId(), task.getProcessInstanceId(), BpmCommentTypeEnum.REJECT.getType(),
+                BpmCommentTypeEnum.REJECT.formatComment(reqVO.getReason()));
 
-//        // 更新任务拓展表为不通过
-//        taskExtMapper.updateByTaskId(
-//                new BpmTaskExtDO().setTaskId(task.getId()).setResult(BpmProcessInstanceResultEnum.REJECT.getResult())
-//                        .setEndTime(LocalDateTime.now()).setReason(reqVO.getReason()));
+        // 3. 更新流程实例，审批不通过！
+        processInstanceService.updateProcessInstanceReject(instance.getProcessInstanceId(), reqVO.getReason());
     }
 
     /**
@@ -354,112 +353,49 @@ public class BpmTaskServiceImpl implements BpmTaskService {
     }
 
     @Override
-    public void createTaskExt(Task task) {
-//        BpmTaskExtDO taskExtDO = BpmTaskConvert.INSTANCE.convert2TaskExt(task)
-//                .setResult(BpmProcessInstanceResultEnum.PROCESS.getResult());
-//        // 向后加签生成的任务，状态不能为进行中，需要等前面父任务完成
-//        if (BpmTaskAddSignTypeEnum.AFTER_CHILDREN_TASK.getType().equals(task.getScopeType())) {
-//            taskExtDO.setResult(BpmProcessInstanceResultEnum.WAIT_BEFORE_TASK.getResult());
-//        }
-//        taskExtMapper.insert(taskExtDO);
-//        Integer status = (Integer) task.getTaskLocalVariables().get(BpmConstants.TASK_VARIABLE_STATUS);
-//        if (status != null) {
-//            return;
-//        }
-//
-//        status = BpmProcessInstanceResultEnum.RUNNING.getResult();
-        // 向后加签生成的任务，状态不能为进行中，需要等前面父任务完成
-//        if (BpmTaskAddSignTypeEnum.AFTER_CHILDREN_TASK.getType().equals(task.getScopeType())) {
-//            status = BpmProcessInstanceResultEnum.WAIT_BEFORE_TASK.getResult();
-//        }
+    public void updateTaskStatusWhenCreated(Task task) {
+        Integer status = (Integer) task.getTaskLocalVariables().get(BpmConstants.TASK_VARIABLE_STATUS);
+        if (status != null) {
+            log.error("[updateTaskStatusWhenCreated][taskId({}) 已经有状态({})]", task.getId(), status);
+            return;
+        }
         updateTaskStatus(task.getId(), BpmTaskStatustEnum.RUNNING.getStatus());
     }
 
     @Override
-    public void updateTaskExtComplete(Task task) {
-//        BpmTaskExtDO taskExtDO = BpmTaskConvert.INSTANCE.convert2TaskExt(task)
-//                .setResult(BpmProcessInstanceResultEnum.APPROVE.getResult()) // 不设置也问题不大，因为 Complete 一般是审核通过，已经设置
-//                .setEndTime(LocalDateTime.now());
-//        taskExtMapper.updateByTaskId(taskExtDO);
-
-        updateTaskStatus(task.getId(), BpmTaskStatustEnum.APPROVE.getStatus());
-    }
-
-    @Override
-    public void updateTaskExtCancel(String taskId) {
+    public void updateTaskStatusWhenCanceled(String taskId) {
         Task task = getTask(taskId);
-        // 可能只是活动，不是任务，所以查询不到
+        // 1. 可能只是活动，不是任务，所以查询不到
         if (task == null) {
-            log.error("[updateTaskExtCancel][taskId({}) 任务不存在]", taskId);
+            log.error("[updateTaskStatusWhenCanceled][taskId({}) 任务不存在]", taskId);
             return;
         }
 
+        // 2. 更新 task 状态 + 原因
         Integer status = (Integer) task.getTaskLocalVariables().get(BpmConstants.TASK_VARIABLE_STATUS);
         if (BpmTaskStatustEnum.isEndStatus(status)) {
-            log.error("[updateTaskExtCancel][taskId({}) 处于结果({})，无需进行更新]", taskId, status);
+            log.error("[updateTaskStatusWhenCanceled][taskId({}) 处于结果({})，无需进行更新]", taskId, status);
             return;
         }
-        updateTaskStatus(taskId, BpmTaskStatustEnum.CANCEL.getStatus());
-
-        if (true) {
-            return;
-        }
-
-        // 需要在事务提交后，才进行查询。不然查询不到历史的原因
-        TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
-
-            @Override
-            public void afterCommit() {
-                // 可能只是活动，不是任务，所以查询不到
-                HistoricTaskInstance task = getHistoricTask(taskId);
-                if (task == null) {
-                    return;
-                }
-
-//                // 如果任务拓展表已经是完成的状态，则跳过
-//                BpmTaskExtDO taskExt = taskExtMapper.selectByTaskId(taskId);
-//                if (taskExt == null) {
-//                    log.error("[updateTaskExtCancel][taskId({}) 查找不到对应的记录，可能存在问题]", taskId);
-//                    return;
-//                }
-//                // 如果已经是最终的结果，则跳过
-//                if (BpmProcessInstanceResultEnum.isEndResult(taskExt.getResult())) {
-//                    log.error("[updateTaskExtCancel][taskId({}) 处于结果({})，无需进行更新]", taskId, taskExt.getResult());
-//                    return;
-//                }
-                Integer status = (Integer) task.getTaskLocalVariables().get(BpmConstants.TASK_VARIABLE_STATUS);
-                if (BpmTaskStatustEnum.isEndStatus(status)) {
-                    log.error("[updateTaskExtCancel][taskId({}) 处于结果({})，无需进行更新]", taskId, status);
-                    return;
-                }
-
-                // 更新任务
-//                taskExtMapper.updateById(new BpmTaskExtDO().setId(taskExt.getId()).setResult(BpmProcessInstanceResultEnum.CANCEL.getResult())
-//                        .setEndTime(LocalDateTime.now()).setReason(BpmProcessInstanceDeleteReasonEnum.translateReason(task.getDeleteReason())));
-                updateTaskStatus(taskId, BpmTaskStatustEnum.CANCEL.getStatus());
-            }
-
-        });
+        updateTaskStatusAndReason(taskId, BpmTaskStatustEnum.CANCEL.getStatus(), BpmDeleteReasonEnum.CANCEL_SYSTEM.getReason());
+        // 补充说明：由于 Task 被删除成 HistoricTask 后，无法通过 taskService.addComment 添加理由，所以无法存储具体的取消理由
     }
 
     @Override
     public void updateTaskExtAssign(Task task) {
-//        BpmTaskExtDO taskExtDO =
-//                new BpmTaskExtDO().setAssigneeUserId(NumberUtils.parseLong(task.getAssignee())).setTaskId(task.getId());
-//        taskExtMapper.updateByTaskId(taskExtDO);
-
         // 发送通知。在事务提交时，批量执行操作，所以直接查询会无法查询到 ProcessInstance，所以这里是通过监听事务的提交来实现。
         TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+
             @Override
             public void afterCommit() {
                 if (StrUtil.isNotEmpty(task.getAssignee())) {
-                    ProcessInstance processInstance =
-                            processInstanceService.getProcessInstance(task.getProcessInstanceId());
-                    AdminUserRespDTO startUser = adminUserApi.getUser(Long.valueOf(processInstance.getStartUserId()));
-                    messageService.sendMessageWhenTaskAssigned(
-                            BpmTaskConvert.INSTANCE.convert(processInstance, startUser, task));
+                    return;
                 }
+                ProcessInstance processInstance = processInstanceService.getProcessInstance(task.getProcessInstanceId());
+                AdminUserRespDTO startUser = adminUserApi.getUser(Long.valueOf(processInstance.getStartUserId()));
+                messageService.sendMessageWhenTaskAssigned(BpmTaskConvert.INSTANCE.convert(processInstance, startUser, task));
             }
+
         });
     }
 
@@ -567,8 +503,8 @@ public class BpmTaskServiceImpl implements BpmTaskService {
                 return;
             }
             // 2.1 添加评论
-            taskService.addComment(task.getId(), currentTask.getProcessInstanceId(), BpmCommentTypeEnum.BACK.getType(),
-                    BpmCommentTypeEnum.BACK.formatComment(reqVO.getReason()));
+            taskService.addComment(task.getId(), currentTask.getProcessInstanceId(), BpmCommentTypeEnum.RETURN.getType(),
+                    BpmCommentTypeEnum.RETURN.formatComment(reqVO.getReason()));
             // 2.2 更新 task 状态 + 原因
             updateTaskStatusAndReason(task.getId(), BpmTaskStatustEnum.RETURN.getStatus(), reqVO.getReason());
         });

@@ -136,14 +136,14 @@ public interface BpmProcessInstanceService {
      *
      * @param event 流程取消事件
      */
-    void updateProcessInstanceExtCancel(FlowableCancelledEvent event);
+    void updateProcessInstanceWhenCancel(FlowableCancelledEvent event);
 
     /**
      * 更新 ProcessInstance 拓展记录为完成
      *
      * @param instance 流程任务
      */
-    void updateProcessInstanceExtComplete(ProcessInstance instance);
+    void updateProcessInstanceWhenApprove(ProcessInstance instance);
 
     /**
      * 更新 ProcessInstance 拓展记录为不通过
@@ -151,7 +151,7 @@ public interface BpmProcessInstanceService {
      * @param id     流程编号
      * @param reason 理由。例如说，审批不通过时，需要传递该值
      */
-    void updateProcessInstanceExtReject(String id, String reason);
+    void updateProcessInstanceReject(String id, String reason);
 
     // TODO @hai：改成 getProcessInstanceAssigneesByTaskDefinitionKey(String id, String taskDefinitionKey)
     /**

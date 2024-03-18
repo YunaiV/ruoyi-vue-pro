@@ -31,7 +31,6 @@ public class BpmTaskEventListener extends AbstractFlowableEngineEventListener {
     @Resource
     @Lazy // 解决循环依赖
     private BpmTaskService taskService;
-
     @Resource
     @Lazy // 解决循环依赖
     private BpmActivityService activityService;
@@ -39,7 +38,7 @@ public class BpmTaskEventListener extends AbstractFlowableEngineEventListener {
     public static final Set<FlowableEngineEventType> TASK_EVENTS = ImmutableSet.<FlowableEngineEventType>builder()
             .add(FlowableEngineEventType.TASK_CREATED)
             .add(FlowableEngineEventType.TASK_ASSIGNED)
-            .add(FlowableEngineEventType.TASK_COMPLETED)
+//            .add(FlowableEngineEventType.TASK_COMPLETED) // 由于审批通过时，已经记录了 task 的 status 为通过，所以不需要监听了。
             .add(FlowableEngineEventType.ACTIVITY_CANCELLED)
             .build();
 
@@ -49,12 +48,7 @@ public class BpmTaskEventListener extends AbstractFlowableEngineEventListener {
 
     @Override
     protected void taskCreated(FlowableEngineEntityEvent event) {
-        taskService.createTaskExt((Task) event.getEntity());
-    }
-
-    @Override
-    protected void taskCompleted(FlowableEngineEntityEvent event) {
-        taskService.updateTaskExtComplete((Task)event.getEntity());
+        taskService.updateTaskStatusWhenCreated((Task) event.getEntity());
     }
 
     @Override
@@ -74,7 +68,7 @@ public class BpmTaskEventListener extends AbstractFlowableEngineEventListener {
             if (StrUtil.isEmpty(activity.getTaskId())) {
                 return;
             }
-            taskService.updateTaskExtCancel(activity.getTaskId());
+            taskService.updateTaskStatusWhenCanceled(activity.getTaskId());
         });
     }
 
