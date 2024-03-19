@@ -6,6 +6,7 @@ import lombok.Data;
 import java.time.LocalDateTime;
 import java.util.List;
 
+// TODO @芋艿：是不是要融合？
 @Schema(description = "管理后台 - 流程实例的分页 Item Response VO")
 @Data
 public class BpmProcessInstancePageItemRespVO {
@@ -19,10 +20,12 @@ public class BpmProcessInstancePageItemRespVO {
     @Schema(description = "流程定义的编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "2048")
     private String processDefinitionId;
 
-    @Schema(description = "流程分类-参见 bpm_model_category 数据字典", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
+    @Schema(description = "流程分类", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     private String category;
+    @Schema(description = "流程分类名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "请假")
+    private String categoryName;
 
-    @Schema(description = "流程实例的状态-参见 bpm_process_instance_status", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
+    @Schema(description = "流程实例的状态", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     private Integer status; // 参见 BpmProcessInstanceStatusEnum 枚举
 
     @Schema(description = "提交时间", requiredMode = Schema.RequiredMode.REQUIRED)

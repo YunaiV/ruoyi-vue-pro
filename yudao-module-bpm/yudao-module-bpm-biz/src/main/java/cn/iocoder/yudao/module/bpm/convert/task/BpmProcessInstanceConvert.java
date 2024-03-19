@@ -7,7 +7,8 @@ import cn.iocoder.yudao.framework.common.util.number.NumberUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.instance.BpmProcessInstancePageItemRespVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.instance.BpmProcessInstanceRespVO;
-import cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmProcessDefinitionExtDO;
+import cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmCategoryDO;
+import cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmProcessDefinitionInfoDO;
 import cn.iocoder.yudao.module.bpm.event.BpmProcessInstanceResultEvent;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmConstants;
 import cn.iocoder.yudao.module.bpm.service.message.dto.BpmMessageSendWhenProcessInstanceApproveReqDTO;
@@ -38,6 +39,7 @@ public interface BpmProcessInstanceConvert {
 
     default PageResult<BpmProcessInstancePageItemRespVO> convertPage(PageResult<HistoricProcessInstance> pageResult,
                                                                      Map<String, ProcessDefinition> processDefinitionMap,
+                                                                     Map<String, BpmCategoryDO> categoryMap,
                                                                      Map<String, List<Task>> taskMap) {
         PageResult<BpmProcessInstancePageItemRespVO> vpPageResult = BeanUtils.toBean(pageResult, BpmProcessInstancePageItemRespVO.class);
         for (int i = 0; i < pageResult.getList().size(); i++) {
@@ -45,13 +47,14 @@ public interface BpmProcessInstanceConvert {
             respVO.setStatus((Integer) pageResult.getList().get(i).getProcessVariables().get(BpmConstants.PROCESS_INSTANCE_VARIABLE_STATUS));
             MapUtils.findAndThen(processDefinitionMap, respVO.getProcessDefinitionId(),
                     processDefinition -> respVO.setCategory(processDefinition.getCategory()));
+            MapUtils.findAndThen(categoryMap, respVO.getCategory(), category -> respVO.setCategoryName(category.getName()));
             respVO.setTasks(BeanUtils.toBean(taskMap.get(respVO.getId()), BpmProcessInstancePageItemRespVO.Task.class));
         }
         return vpPageResult;
     }
 
     default BpmProcessInstanceRespVO convert2(HistoricProcessInstance processInstance,
-                                              ProcessDefinition processDefinition, BpmProcessDefinitionExtDO processDefinitionExt,
+                                              ProcessDefinition processDefinition, BpmProcessDefinitionInfoDO processDefinitionExt,
                                               String bpmnXml, AdminUserRespDTO startUser, DeptRespDTO dept) {
         BpmProcessInstanceRespVO respVO = convert2(processInstance);
         respVO.setStatus((Integer) processInstance.getProcessVariables().get(BpmConstants.PROCESS_INSTANCE_VARIABLE_STATUS));
@@ -75,7 +78,7 @@ public interface BpmProcessInstanceConvert {
     BpmProcessInstanceRespVO.ProcessDefinition convert2(ProcessDefinition bean);
 
     @Mapping(source = "from.id", target = "to.id", ignore = true)
-    void copyTo(BpmProcessDefinitionExtDO from, @MappingTarget BpmProcessInstanceRespVO.ProcessDefinition to);
+    void copyTo(BpmProcessDefinitionInfoDO from, @MappingTarget BpmProcessInstanceRespVO.ProcessDefinition to);
 
     BpmProcessInstanceRespVO.User convert2(AdminUserRespDTO bean);
 

@@ -5,6 +5,8 @@ import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.instance.*;
 import cn.iocoder.yudao.module.bpm.convert.task.BpmProcessInstanceConvert;
+import cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmCategoryDO;
+import cn.iocoder.yudao.module.bpm.service.definition.BpmCategoryService;
 import cn.iocoder.yudao.module.bpm.service.definition.BpmProcessDefinitionService;
 import cn.iocoder.yudao.module.bpm.service.task.BpmProcessInstanceService;
 import cn.iocoder.yudao.module.bpm.service.task.BpmTaskService;
@@ -40,6 +42,8 @@ public class BpmProcessInstanceController {
     private BpmTaskService taskService;
     @Resource
     private BpmProcessDefinitionService processDefinitionService;
+    @Resource
+    private BpmCategoryService categoryService;
 
     @GetMapping("/my-page")
     @Operation(summary = "获得我的实例分页列表", description = "在【我的流程】菜单中，进行调用")
@@ -56,7 +60,9 @@ public class BpmProcessInstanceController {
                 convertList(pageResult.getList(), HistoricProcessInstance::getId));
         Map<String, ProcessDefinition> processDefinitionMap = processDefinitionService.getProcessDefinitionMap(
                 convertSet(pageResult.getList(), HistoricProcessInstance::getProcessDefinitionId));
-        return success(BpmProcessInstanceConvert.INSTANCE.convertPage(pageResult, processDefinitionMap, taskMap));
+        Map<String, BpmCategoryDO> categoryMap = categoryService.getCategoryMap(
+                convertSet(processDefinitionMap.values(), ProcessDefinition::getCategory));
+        return success(BpmProcessInstanceConvert.INSTANCE.convertPage(pageResult, processDefinitionMap, categoryMap, taskMap));
     }
 
     @PostMapping("/create")

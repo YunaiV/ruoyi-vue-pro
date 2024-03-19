@@ -11,19 +11,19 @@ import lombok.*;
 import java.util.List;
 
 /**
- * Bpm 流程定义的拓展表
- * 主要解决 Activiti {@link ProcessDefinition} 不支持拓展字段，所以新建拓展表
+ * Bpm 流程定义的拓信息
+ * 主要解决 Flowable {@link org.flowable.engine.repository.ProcessDefinition} 不支持拓展字段，所以新建该表
  *
  * @author 芋道源码
  */
-@TableName(value = "bpm_process_definition_ext", autoResultMap = true)
+@TableName(value = "bpm_process_definition_info", autoResultMap = true)
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class BpmProcessDefinitionExtDO extends BaseDO {
+public class BpmProcessDefinitionInfoDO extends BaseDO {
 
     /**
      * 编号
@@ -85,6 +85,5 @@ public class BpmProcessDefinitionExtDO extends BaseDO {
      * 在表单类型为 {@link BpmModelFormTypeEnum#CUSTOM} 时
      */
     private String formCustomViewPath;
-
 
 }

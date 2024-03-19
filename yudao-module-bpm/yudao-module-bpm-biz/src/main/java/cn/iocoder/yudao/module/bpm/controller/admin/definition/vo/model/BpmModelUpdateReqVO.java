@@ -19,7 +19,7 @@ public class BpmModelUpdateReqVO {
     @Schema(description = "流程描述", example = "我是描述")
     private String description;
 
-    @Schema(description = "流程分类-参见 bpm_model_category 数据字典", example = "1")
+    @Schema(description = "流程分类", example = "1")
     private String category;
 
     @Schema(description = "BPMN XML", requiredMode = Schema.RequiredMode.REQUIRED)

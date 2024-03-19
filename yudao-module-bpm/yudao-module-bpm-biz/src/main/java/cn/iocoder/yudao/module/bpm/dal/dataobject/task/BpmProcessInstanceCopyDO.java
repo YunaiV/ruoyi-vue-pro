@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.bpm.dal.dataobject.cc;
+package cn.iocoder.yudao.module.bpm.dal.dataobject.task;
 
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import com.baomidou.mybatisplus.annotation.TableId;

@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.bpm.service.definition;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Assert;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
@@ -80,6 +81,9 @@ public class BpmFormServiceImpl implements BpmFormService {
 
     @Override
     public List<BpmFormDO> getFormList(Collection<Long> ids) {
+        if (CollUtil.isEmpty(ids)) {
+            return Collections.emptyList();
+        }
         return formMapper.selectBatchIds(ids);
     }
 
@@ -88,7 +92,7 @@ public class BpmFormServiceImpl implements BpmFormService {
         return formMapper.selectPage(pageReqVO);
     }
 
-
+    // TODO @芋艿：这里没搞完！
     @Override
     public BpmFormDO checkFormConfig(String configStr) {
         BpmModelMetaInfoRespDTO metaInfo = JsonUtils.parseObject(configStr, BpmModelMetaInfoRespDTO.class);

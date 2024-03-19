@@ -8,7 +8,7 @@ import cn.iocoder.yudao.framework.common.util.date.DateUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.cc.BpmProcessInstanceCopyRespVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.instance.BpmProcessInstanceCopyPageReqVO;
-import cn.iocoder.yudao.module.bpm.dal.dataobject.cc.BpmProcessInstanceCopyDO;
+import cn.iocoder.yudao.module.bpm.dal.dataobject.task.BpmProcessInstanceCopyDO;
 import cn.iocoder.yudao.module.bpm.service.task.BpmProcessInstanceCopyService;
 import cn.iocoder.yudao.module.bpm.service.task.BpmProcessInstanceService;
 import cn.iocoder.yudao.module.bpm.service.task.BpmTaskService;
@@ -44,7 +44,7 @@ public class BpmProcessInstanceCopyController {
     @Resource
     private BpmProcessInstanceService processInstanceService;
     @Resource
-    private BpmTaskService bpmTaskService;
+    private BpmTaskService taskService;
 
     @Resource
     private AdminUserApi adminUserApi;
@@ -61,7 +61,7 @@ public class BpmProcessInstanceCopyController {
         }
 
         // 拼接返回
-        Map<String, String> taskNameMap = bpmTaskService.getTaskNameByTaskIds(
+        Map<String, String> taskNameMap = taskService.getTaskNameByTaskIds(
                 convertSet(pageResult.getList(), BpmProcessInstanceCopyDO::getTaskId));
         Map<String, HistoricProcessInstance> processInstanceMap = processInstanceService.getHistoricProcessInstanceMap(
                 convertSet(pageResult.getList(), BpmProcessInstanceCopyDO::getProcessInstanceId));

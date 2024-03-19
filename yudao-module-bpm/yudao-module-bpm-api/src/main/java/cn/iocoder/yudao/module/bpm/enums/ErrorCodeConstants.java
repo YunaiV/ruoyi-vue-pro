@@ -65,7 +65,12 @@ public interface ErrorCodeConstants {
     ErrorCode FORM_FIELD_REPEAT = new ErrorCode(1_009_010_001, "表单项({}) 和 ({}) 使用了相同的字段名({})");
 
     // ========== 用户组模块 1-009-011-000 ==========
-    ErrorCode USER_GROUP_NOT_EXISTS = new ErrorCode(1_009_011_000, "用户组不存在");
-    ErrorCode USER_GROUP_IS_DISABLE = new ErrorCode(1_009_011_001, "名字为【{}】的用户组已被禁用");
+    ErrorCode USER_GROUP_NOT_EXISTS = new ErrorCode(1_009_011_000, "用户分组不存在");
+    ErrorCode USER_GROUP_IS_DISABLE = new ErrorCode(1_009_011_001, "名字为【{}】的用户分组已被禁用");
+
+    // ========== 用户组模块 1-009-012-000 ==========
+    ErrorCode CATEGORY_NOT_EXISTS = new ErrorCode(1_009_012_000, "流程分类不存在");
+    ErrorCode CATEGORY_NAME_DUPLICATE = new ErrorCode(1_009_012_001, "流程分类名字【{}】重复");
+    ErrorCode CATEGORY_CODE_DUPLICATE = new ErrorCode(1_009_012_002, "流程分类编码【{}】重复");
 
 }

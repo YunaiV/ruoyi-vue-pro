@@ -40,7 +40,6 @@ public class BpmProcessDefinitionCreateReqDTO {
     private String description;
     /**
      * 流程分类
-     * 参见 bpm_model_category 数据字典
      */
     @NotEmpty(message = "流程分类不能为空")
     private String category;

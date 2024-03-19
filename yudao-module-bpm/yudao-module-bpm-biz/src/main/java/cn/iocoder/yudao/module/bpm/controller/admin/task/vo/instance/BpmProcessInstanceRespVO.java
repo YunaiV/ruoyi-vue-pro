@@ -17,14 +17,11 @@ public class BpmProcessInstanceRespVO {
     @Schema(description = "流程名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "芋道")
     private String name;
 
-    @Schema(description = "流程分类-参见 bpm_model_category 数据字典", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
+    @Schema(description = "流程分类", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     private String category;
 
     @Schema(description = "流程实例的状态", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     private Integer status; // 参见 BpmProcessInstanceStatusEnum 枚举
-
-    @Schema(description = "流程实例的结果-参见 bpm_process_instance_result", requiredMode = Schema.RequiredMode.REQUIRED, example = "2")
-    private Integer result;
 
     @Schema(description = "提交时间", requiredMode = Schema.RequiredMode.REQUIRED)
     private LocalDateTime createTime;
