@@ -47,6 +47,6 @@ public class BpmUserGroupDO extends BaseDO {
      * 成员用户编号数组
      */
     @TableField(typeHandler = JsonLongSetTypeHandler.class)
-    private Set<Long> memberUserIds;
+    private Set<Long> userIds;
 
 }

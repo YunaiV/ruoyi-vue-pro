@@ -5,7 +5,7 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
 import cn.iocoder.yudao.framework.test.core.util.AssertUtils;
 import cn.iocoder.yudao.framework.test.core.util.RandomUtils;
-import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.group.BpmUserGroupCreateReqVO;
+import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.group.BpmUserGroupSaveReqVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.group.BpmUserGroupPageReqVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.group.BpmUserGroupUpdateReqVO;
 import cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmUserGroupDO;
@@ -39,7 +39,7 @@ public class BpmUserGroupServiceTest extends BaseDbUnitTest {
     @Test
     public void testCreateUserGroup_success() {
         // 准备参数
-        BpmUserGroupCreateReqVO reqVO = RandomUtils.randomPojo(BpmUserGroupCreateReqVO.class);
+        BpmUserGroupSaveReqVO reqVO = RandomUtils.randomPojo(BpmUserGroupSaveReqVO.class);
 
         // 调用
         Long userGroupId = userGroupService.createUserGroup(reqVO);

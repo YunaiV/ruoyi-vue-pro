@@ -1,9 +1,8 @@
 package cn.iocoder.yudao.module.bpm.service.definition;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.group.BpmUserGroupCreateReqVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.group.BpmUserGroupPageReqVO;
-import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.group.BpmUserGroupUpdateReqVO;
+import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.group.BpmUserGroupSaveReqVO;
 import cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmUserGroupDO;
 import jakarta.validation.Valid;
 
@@ -23,14 +22,14 @@ public interface BpmUserGroupService {
      * @param createReqVO 创建信息
      * @return 编号
      */
-    Long createUserGroup(@Valid BpmUserGroupCreateReqVO createReqVO);
+    Long createUserGroup(@Valid BpmUserGroupSaveReqVO createReqVO);
 
     /**
      * 更新用户组
      *
      * @param updateReqVO 更新信息
      */
-    void updateUserGroup(@Valid BpmUserGroupUpdateReqVO updateReqVO);
+    void updateUserGroup(@Valid BpmUserGroupSaveReqVO updateReqVO);
 
     /**
      * 删除用户组

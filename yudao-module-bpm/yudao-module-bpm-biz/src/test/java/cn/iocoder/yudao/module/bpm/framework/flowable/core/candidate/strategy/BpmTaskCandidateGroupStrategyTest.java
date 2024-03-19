@@ -29,8 +29,8 @@ public class BpmTaskCandidateGroupStrategyTest extends BaseMockitoUnitTest {
         // 准备参数
         String param = "1,2";
         // mock 方法
-        BpmUserGroupDO userGroup1 = randomPojo(BpmUserGroupDO.class, o -> o.setMemberUserIds(asSet(11L, 12L)));
-        BpmUserGroupDO userGroup2 = randomPojo(BpmUserGroupDO.class, o -> o.setMemberUserIds(asSet(21L, 22L)));
+        BpmUserGroupDO userGroup1 = randomPojo(BpmUserGroupDO.class, o -> o.setUserIds(asSet(11L, 12L)));
+        BpmUserGroupDO userGroup2 = randomPojo(BpmUserGroupDO.class, o -> o.setUserIds(asSet(21L, 22L)));
         when(userGroupService.getUserGroupList(eq(asSet(1L, 2L)))).thenReturn(Arrays.asList(userGroup1, userGroup2));
 
         // 调用

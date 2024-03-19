@@ -41,7 +41,7 @@ public class BpmTaskCandidateGroupStrategy implements BpmTaskCandidateStrategy {
     public Set<Long> calculateUsers(DelegateExecution execution, String param) {
         Set<Long> groupIds = StrUtils.splitToLongSet(param);
         List<BpmUserGroupDO> groups = userGroupService.getUserGroupList(groupIds);
-        return convertSetByFlatMap(groups, BpmUserGroupDO::getMemberUserIds, Collection::stream);
+        return convertSetByFlatMap(groups, BpmUserGroupDO::getUserIds, Collection::stream);
     }
 
 }
