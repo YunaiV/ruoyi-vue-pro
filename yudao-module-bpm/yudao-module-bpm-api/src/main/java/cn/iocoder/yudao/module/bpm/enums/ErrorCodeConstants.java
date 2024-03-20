@@ -10,16 +10,9 @@ import cn.iocoder.yudao.framework.common.exception.ErrorCode;
 public interface ErrorCodeConstants {
 
     // ==========  通用流程处理 模块 1-009-000-000 ==========
-    ErrorCode HIGHLIGHT_IMG_ERROR = new ErrorCode(1_009_000_002, "获取高亮流程图异常");
 
     // ========== OA 流程模块 1-009-001-000 ==========
     ErrorCode OA_LEAVE_NOT_EXISTS = new ErrorCode(1_009_001_001, "请假申请不存在");
-    ErrorCode OA_PM_POST_NOT_EXISTS = new ErrorCode(1_009_001_002, "项目经理岗位未设置");
-    ErrorCode OA_DEPART_PM_POST_NOT_EXISTS = new ErrorCode(1_009_001_009, "部门的项目经理不存在");
-    ErrorCode OA_BM_POST_NOT_EXISTS = new ErrorCode(1_009_001_004, "部门经理岗位未设置");
-    ErrorCode OA_DEPART_BM_POST_NOT_EXISTS = new ErrorCode(1_009_001_005, "部门的部门经理不存在");
-    ErrorCode OA_HR_POST_NOT_EXISTS = new ErrorCode(1_009_001_006, "HR岗位未设置");
-    ErrorCode OA_DAY_LEAVE_ERROR = new ErrorCode(1_009_001_007, "请假天数必须>=1");
 
     // ========== 流程模型 1-009-002-000 ==========
     ErrorCode MODEL_KEY_EXISTS = new ErrorCode(1_009_002_000, "已经存在流程标识为【{}】的流程");
@@ -28,7 +21,8 @@ public interface ErrorCodeConstants {
     ErrorCode MODEL_DEPLOY_FAIL_FORM_NOT_CONFIG = new ErrorCode(1_009_002_003, "部署流程失败，原因：流程表单未配置，请点击【修改流程】按钮进行配置");
     ErrorCode MODEL_DEPLOY_FAIL_TASK_CANDIDATE_NOT_CONFIG = new ErrorCode(1_009_002_004, "部署流程失败，" +
             "原因：用户任务({})未配置审批人，请点击【流程设计】按钮，选择该它的【任务（审批人）】进行配置");
-    ErrorCode MODEL_DEPLOY_FAIL_TASK_INFO_EQUALS = new ErrorCode(1_009_003_005, "流程定义部署失败，原因：信息未发生变化");
+    ErrorCode MODEL_DEPLOY_FAIL_BPMN_START_EVENT_NOT_EXISTS = new ErrorCode(1_009_002_005, "部署流程失败，原因：BPMN 流程图中，没有开始事件");
+    ErrorCode MODEL_DEPLOY_FAIL_BPMN_USER_TASK_NAME_NOT_EXISTS = new ErrorCode(1_009_002_006, "部署流程失败，原因：BPMN 流程图中，用户任务({})的名字不存在");
 
     // ========== 流程定义 1-009-003-000 ==========
     ErrorCode PROCESS_DEFINITION_KEY_NOT_MATCH = new ErrorCode(1_009_003_000, "流程定义的标识期望是({})，当前是({})，请修改 BPMN 流程图");

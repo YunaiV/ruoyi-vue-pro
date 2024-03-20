@@ -3,22 +3,23 @@ package cn.iocoder.yudao.module.bpm.service.definition;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.common.util.object.PageUtils;
 import cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.process.BpmProcessDefinitionPageReqVO;
-import cn.iocoder.yudao.module.bpm.convert.definition.BpmProcessDefinitionConvert;
+import cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmFormDO;
 import cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmProcessDefinitionInfoDO;
 import cn.iocoder.yudao.module.bpm.dal.mysql.definition.BpmProcessDefinitionInfoMapper;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnModelConstants;
-import cn.iocoder.yudao.module.bpm.service.definition.dto.BpmProcessDefinitionCreateReqDTO;
+import cn.iocoder.yudao.module.bpm.service.definition.dto.BpmModelMetaInfoRespDTO;
 import jakarta.annotation.Resource;
-import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.flowable.bpmn.converter.BpmnXMLConverter;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.common.engine.impl.db.SuspensionState;
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.repository.Deployment;
+import org.flowable.engine.repository.Model;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.repository.ProcessDefinitionQuery;
 import org.springframework.stereotype.Service;
@@ -103,11 +104,12 @@ public class BpmProcessDefinitionServiceImpl implements BpmProcessDefinitionServ
     }
 
     @Override
-    public String createProcessDefinition(@Valid BpmProcessDefinitionCreateReqDTO createReqDTO) {
+    public String createProcessDefinition(Model model, BpmModelMetaInfoRespDTO modelMetaInfo,
+                                          byte[] bpmnBytes, BpmFormDO form) {
         // 创建 Deployment 部署
         Deployment deploy = repositoryService.createDeployment()
-                .key(createReqDTO.getKey()).name(createReqDTO.getName()).category(createReqDTO.getCategory())
-                .addBytes(createReqDTO.getKey() + BpmnModelConstants.BPMN_FILE_SUFFIX, createReqDTO.getBpmnBytes())
+                .key(model.getKey()).name(model.getName()).category(model.getCategory())
+                .addBytes(model.getKey() + BpmnModelConstants.BPMN_FILE_SUFFIX, bpmnBytes)
                 .tenantId(TenantContextHolder.getTenantIdStr())
                 .disableSchemaValidation() // 禁用 XML Schema 验证，因为有自定义的属性
                 .deploy();
@@ -115,20 +117,23 @@ public class BpmProcessDefinitionServiceImpl implements BpmProcessDefinitionServ
         // 设置 ProcessDefinition 的 category 分类
         ProcessDefinition definition = repositoryService.createProcessDefinitionQuery()
                 .deploymentId(deploy.getId()).singleResult();
-        repositoryService.setProcessDefinitionCategory(definition.getId(), createReqDTO.getCategory());
+        repositoryService.setProcessDefinitionCategory(definition.getId(), model.getCategory());
         // 注意 1，ProcessDefinition 的 key 和 name 是通过 BPMN 中的 <bpmn2:process /> 的 id 和 name 决定
         // 注意 2，目前该项目的设计上，需要保证 Model、Deployment、ProcessDefinition 使用相同的 key，保证关联性。
         //          否则，会导致 ProcessDefinition 的分页无法查询到。
-        if (!Objects.equals(definition.getKey(), createReqDTO.getKey())) {
-            throw exception(PROCESS_DEFINITION_KEY_NOT_MATCH, createReqDTO.getKey(), definition.getKey());
+        if (!Objects.equals(definition.getKey(), model.getKey())) {
+            throw exception(PROCESS_DEFINITION_KEY_NOT_MATCH, model.getKey(), definition.getKey());
         }
-        if (!Objects.equals(definition.getName(), createReqDTO.getName())) {
-            throw exception(PROCESS_DEFINITION_NAME_NOT_MATCH, createReqDTO.getName(), definition.getName());
+        if (!Objects.equals(definition.getName(), model.getName())) {
+            throw exception(PROCESS_DEFINITION_NAME_NOT_MATCH, model.getName(), definition.getName());
         }
 
         // 插入拓展表
-        BpmProcessDefinitionInfoDO definitionDO = BpmProcessDefinitionConvert.INSTANCE.convert2(createReqDTO)
-                .setProcessDefinitionId(definition.getId());
+        BpmProcessDefinitionInfoDO definitionDO = BeanUtils.toBean(modelMetaInfo, BpmProcessDefinitionInfoDO.class)
+                .setModelId(model.getId()).setProcessDefinitionId(definition.getId());
+        if (form != null) {
+            definitionDO.setFormFields(form.getFields()).setFormConf(form.getConf());
+        }
         processDefinitionMapper.insert(definitionDO);
         return definition.getId();
     }

@@ -2,10 +2,11 @@ package cn.iocoder.yudao.module.bpm.service.definition;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.process.BpmProcessDefinitionPageReqVO;
+import cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmFormDO;
 import cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmProcessDefinitionInfoDO;
-import cn.iocoder.yudao.module.bpm.service.definition.dto.BpmProcessDefinitionCreateReqDTO;
-import jakarta.validation.Valid;
+import cn.iocoder.yudao.module.bpm.service.definition.dto.BpmModelMetaInfoRespDTO;
 import org.flowable.engine.repository.Deployment;
+import org.flowable.engine.repository.Model;
 import org.flowable.engine.repository.ProcessDefinition;
 
 import java.util.Collection;
@@ -41,12 +42,15 @@ public interface BpmProcessDefinitionService {
     List<ProcessDefinition> getProcessDefinitionListBySuspensionState(Integer suspensionState);
 
     /**
-     * 创建流程定义
+     * 基于流程模型，创建流程定义
      *
-     * @param createReqDTO 创建信息
+     * @param model 流程模型
+     * @param modelMetaInfo 流程模型元信息
+     * @param bpmnBytes BPMN XML 字节数组
+     * @param form 表单
      * @return 流程编号
      */
-    String createProcessDefinition(@Valid BpmProcessDefinitionCreateReqDTO createReqDTO);
+    String createProcessDefinition(Model model, BpmModelMetaInfoRespDTO modelMetaInfo, byte[] bpmnBytes, BpmFormDO form);
 
     /**
      * 更新流程定义状态

@@ -11,17 +11,14 @@ import cn.iocoder.yudao.module.bpm.convert.definition.BpmFormConvert;
 import cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmFormDO;
 import cn.iocoder.yudao.module.bpm.dal.mysql.definition.BpmFormMapper;
 import cn.iocoder.yudao.module.bpm.enums.ErrorCodeConstants;
-import cn.iocoder.yudao.module.bpm.enums.definition.BpmModelFormTypeEnum;
 import cn.iocoder.yudao.module.bpm.service.definition.dto.BpmFormFieldRespDTO;
-import cn.iocoder.yudao.module.bpm.service.definition.dto.BpmModelMetaInfoRespDTO;
+import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
-import jakarta.annotation.Resource;
 import java.util.*;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.module.bpm.enums.ErrorCodeConstants.*;
 
 /**
  * 动态表单 Service 实现类
@@ -90,24 +87,6 @@ public class BpmFormServiceImpl implements BpmFormService {
     @Override
     public PageResult<BpmFormDO> getFormPage(BpmFormPageReqVO pageReqVO) {
         return formMapper.selectPage(pageReqVO);
-    }
-
-    // TODO @芋艿：这里没搞完！
-    @Override
-    public BpmFormDO checkFormConfig(String configStr) {
-        BpmModelMetaInfoRespDTO metaInfo = JsonUtils.parseObject(configStr, BpmModelMetaInfoRespDTO.class);
-        if (metaInfo == null || metaInfo.getFormType() == null) {
-            throw exception(MODEL_DEPLOY_FAIL_FORM_NOT_CONFIG);
-        }
-        // 校验表单存在
-        if (Objects.equals(metaInfo.getFormType(), BpmModelFormTypeEnum.NORMAL.getType())) {
-            BpmFormDO form = getForm(metaInfo.getFormId());
-            if (form == null) {
-                throw exception(FORM_NOT_EXISTS);
-            }
-            return form;
-        }
-        return null;
     }
 
     /**

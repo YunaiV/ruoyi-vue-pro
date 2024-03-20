@@ -104,7 +104,7 @@ public class BpmTaskController {
                 convertSet(userMap.values(), AdminUserRespDTO::getDeptId));
         // 获得 Form Map
         Map<Long, BpmFormDO> formMap = formService.getFormMap(
-                convertSet(taskList, task -> Long.parseLong(task.getFormKey())));
+                convertSet(taskList, task -> NumberUtils.parseLong(task.getFormKey())));
         return success(BpmTaskConvert.INSTANCE.buildTaskListByProcessInstanceId(taskList, processInstance,
                 formMap, userMap, deptMap));
     }

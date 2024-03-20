@@ -7,6 +7,8 @@ import lombok.Data;
  * BPM 流程 MetaInfo Response DTO
  * 主要用于 { Model#setMetaInfo(String)} 的存储
  *
+ * 最终，它的字段和 {@link cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmProcessDefinitionInfoDO} 是一致的
+ *
  * @author 芋道源码
  */
 @Data

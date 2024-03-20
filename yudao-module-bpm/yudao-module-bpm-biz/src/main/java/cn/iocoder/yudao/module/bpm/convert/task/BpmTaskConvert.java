@@ -80,7 +80,7 @@ public interface BpmTaskConvert {
             taskVO.setProcessInstance(BeanUtils.toBean(processInstance, BpmTaskRespVO.ProcessInstance.class));
             taskVO.getProcessInstance().setStartUser(BeanUtils.toBean(startUser, BpmProcessInstanceRespVO.User.class));
             // 表单信息
-            BpmFormDO form = MapUtil.get(formMap, Long.parseLong(task.getFormKey()), BpmFormDO.class);
+            BpmFormDO form = MapUtil.get(formMap, NumberUtils.parseLong(task.getFormKey()), BpmFormDO.class);
             if (form != null) {
                 taskVO.setFormId(form.getId()).setFormName(form.getName()).setFormConf(form.getConf())
                         .setFormFields(form.getFields()).setFormVariables(FlowableUtils.getTaskFormVariable(task));

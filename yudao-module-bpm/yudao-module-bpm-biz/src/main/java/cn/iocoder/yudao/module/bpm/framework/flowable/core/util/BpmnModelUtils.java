@@ -71,26 +71,15 @@ public class BpmnModelUtils {
         return result;
     }
 
-    /**
-     * 比较 两个bpmnModel 是否相同
-     * @param oldModel  老的bpmn model
-     * @param newModel 新的bpmn model
-     */
-    public static boolean equals(BpmnModel oldModel, BpmnModel newModel) {
-        // 由于 BpmnModel 未提供 equals 方法，所以只能转成字节数组，进行比较
-        return Arrays.equals(getBpmnBytes(oldModel), getBpmnBytes(newModel));
-    }
-
-    /**
-     * 把 bpmnModel 转换成 byte[]
-     * @param model  bpmnModel
-     */
-    public static byte[] getBpmnBytes(BpmnModel model) {
-        if (model == null) {
-            return new byte[0];
+    public static StartEvent getStartEvent(BpmnModel model) {
+        Process process = model.getMainProcess();
+        // 从 initialFlowElement 找
+        FlowElement startElement = process.getInitialFlowElement();
+        if (startElement instanceof StartEvent) {
+            return (StartEvent) startElement;
         }
-        BpmnXMLConverter converter = new BpmnXMLConverter();
-        return converter.convertToXML(model);
+        // 从 flowElementList 找
+        return (StartEvent) CollUtil.findOne(process.getFlowElements(), flowElement -> flowElement instanceof StartEvent);
     }
 
     public static BpmnModel getBpmnModel(byte[] bpmnBytes) {
