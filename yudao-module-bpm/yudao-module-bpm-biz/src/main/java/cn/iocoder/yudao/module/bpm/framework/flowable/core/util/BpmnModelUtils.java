@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.framework.flowable.core.util;
+package cn.iocoder.yudao.module.bpm.framework.flowable.core.util;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ArrayUtil;

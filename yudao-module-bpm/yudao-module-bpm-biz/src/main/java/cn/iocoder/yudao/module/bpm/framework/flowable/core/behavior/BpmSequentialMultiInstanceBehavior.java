@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.bpm.framework.flowable.core.behavior;
 
-import cn.iocoder.yudao.framework.flowable.core.util.FlowableUtils;
+import cn.iocoder.yudao.module.bpm.framework.flowable.core.util.FlowableUtils;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.candidate.BpmTaskCandidateInvoker;
 import lombok.Setter;
 import org.flowable.bpmn.model.Activity;
@@ -37,9 +37,9 @@ public class BpmSequentialMultiInstanceBehavior extends SequentialMultiInstanceB
         // 第一步，设置 collectionVariable 和 CollectionVariable
         // 从  execution.getVariable() 读取所有任务处理人的 key
         super.collectionExpression = null; // collectionExpression 和 collectionVariable 是互斥的
-        super.collectionVariable = FlowableUtils.formatCollectionVariable(execution.getCurrentActivityId());
+        super.collectionVariable = FlowableUtils.formatExecutionCollectionVariable(execution.getCurrentActivityId());
         // 从 execution.getVariable() 读取当前所有任务处理的人的 key
-        super.collectionElementVariable = FlowableUtils.formatCollectionElementVariable(execution.getCurrentActivityId());
+        super.collectionElementVariable = FlowableUtils.formatExecutionCollectionElementVariable(execution.getCurrentActivityId());
 
         // 第二步，获取任务的所有处理人
         Set<Long> assigneeUserIds = new LinkedHashSet<>(taskCandidateInvoker.calculateUsers(execution)); // 保证有序！！！

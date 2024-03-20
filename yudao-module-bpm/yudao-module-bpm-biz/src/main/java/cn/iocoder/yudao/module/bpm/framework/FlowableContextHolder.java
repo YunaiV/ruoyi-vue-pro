@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.framework.flowable.core.context;
+package cn.iocoder.yudao.module.bpm.framework;
 
 import cn.hutool.core.collection.CollUtil;
 import com.alibaba.ttl.TransmittableThreadLocal;
@@ -10,6 +10,7 @@ import java.util.Map;
 /**
  * 工作流--用户用到的上下文相关信息
  */
+@Deprecated // TODO 芋艿：找个方式，去掉这个上下文
 public class FlowableContextHolder {
 
     private static final ThreadLocal<Map<String, List<Long>>> ASSIGNEE = new TransmittableThreadLocal<>();

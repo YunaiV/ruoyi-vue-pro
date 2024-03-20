@@ -1,16 +1,17 @@
-package cn.iocoder.yudao.framework.flowable.core.web;
+package cn.iocoder.yudao.module.bpm.framework.web.core;
 
-import cn.iocoder.yudao.framework.flowable.core.util.FlowableUtils;
 import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
-import org.springframework.web.filter.OncePerRequestFilter;
-
+import cn.iocoder.yudao.module.bpm.framework.flowable.core.util.FlowableUtils;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.web.filter.OncePerRequestFilter;
+
 import java.io.IOException;
+
 /**
- * flowable Web 过滤器，将 userId 设置到 {@link org.flowable.common.engine.impl.identity.Authentication} 中
+ * Flowable Web 过滤器，将 userId 设置到 {@link org.flowable.common.engine.impl.identity.Authentication} 中
  *
  * @author jason
  */
