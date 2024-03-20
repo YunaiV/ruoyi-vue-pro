@@ -5,14 +5,13 @@ import lombok.Data;
 import org.springframework.context.ApplicationEvent;
 
 /**
- * 流程实例的结果发生变化的 Event
- * 定位：由于额外增加了 {@link BpmProcessInstanceExtDO#getResult()} 结果，所以增加该事件
+ * 流程实例的状态（结果）发生变化的 Event
  *
  * @author 芋道源码
  */
 @SuppressWarnings("ALL")
 @Data
-public class BpmProcessInstanceResultEvent extends ApplicationEvent {
+public class BpmProcessInstanceStatusEvent extends ApplicationEvent {
 
     /**
      * 流程实例的编号
@@ -27,15 +26,15 @@ public class BpmProcessInstanceResultEvent extends ApplicationEvent {
     /**
      * 流程实例的结果
      */
-    @NotNull(message = "流程实例的结果不能为空")
-    private Integer result;
+    @NotNull(message = "流程实例的状态不能为空")
+    private Integer status;
     /**
      * 流程实例对应的业务标识
      * 例如说，请假
      */
     private String businessKey;
 
-    public BpmProcessInstanceResultEvent(Object source) {
+    public BpmProcessInstanceStatusEvent(Object source) {
         super(source);
     }
 

@@ -3,7 +3,7 @@ CREATE TABLE IF NOT EXISTS "bpm_user_group" (
     "name" varchar(63) NOT NULL,
     "description" varchar(255) NOT NULL,
     "status" tinyint NOT NULL,
-    "member_user_ids" varchar(255) NOT NULL,
+    "user_ids" varchar(255) NOT NULL,
     "creator" varchar(64) DEFAULT '',
     "create_time" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updater" varchar(64) DEFAULT '',

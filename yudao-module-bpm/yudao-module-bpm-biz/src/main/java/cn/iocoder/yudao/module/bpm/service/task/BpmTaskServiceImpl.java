@@ -187,8 +187,12 @@ public class BpmTaskServiceImpl implements BpmTaskService {
                 BpmCommentTypeEnum.APPROVE.formatComment(reqVO.getReason()));
         // 3.3 调用 BPM complete 去完成任务
         // 其中，variables 是存储动态表单到 local 任务级别。过滤一下，避免 ProcessInstance 系统级的变量被占用
-        Map<String, Object> variables = FlowableUtils.filterTaskFormVariable(reqVO.getVariables());
-        taskService.complete(task.getId(), variables, true);
+        if (CollUtil.isNotEmpty(reqVO.getVariables())) {
+            Map<String, Object> variables = FlowableUtils.filterTaskFormVariable(reqVO.getVariables());
+            taskService.complete(task.getId(), variables, true);
+        } else {
+            taskService.complete(task.getId());
+        }
 
         // 【加签专属】处理加签任务
         handleParentTaskIfSign(task.getParentTaskId());

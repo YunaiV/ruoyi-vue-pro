@@ -5,7 +5,6 @@ import cn.iocoder.yudao.module.bpm.api.task.dto.BpmProcessInstanceCreateReqDTO;
 import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.instance.BpmProcessInstanceCancelReqVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.instance.BpmProcessInstanceCreateReqVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.instance.BpmProcessInstanceMyPageReqVO;
-import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.instance.BpmProcessInstanceRespVO;
 import jakarta.validation.Valid;
 import org.flowable.engine.delegate.event.FlowableCancelledEvent;
 import org.flowable.engine.history.HistoricProcessInstance;
@@ -114,14 +113,6 @@ public interface BpmProcessInstanceService {
      * @return 实例的编号
      */
     String createProcessInstance(Long userId, @Valid BpmProcessInstanceCreateReqDTO createReqDTO);
-
-    /**
-     * 获得流程实例 VO 信息
-     *
-     * @param id 流程实例的编号
-     * @return 流程实例
-     */
-    BpmProcessInstanceRespVO getProcessInstanceVO(String id);
 
     /**
      * 取消流程实例

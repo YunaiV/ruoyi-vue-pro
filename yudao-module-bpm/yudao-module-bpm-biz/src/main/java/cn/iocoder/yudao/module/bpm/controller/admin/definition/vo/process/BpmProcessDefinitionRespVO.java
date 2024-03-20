@@ -50,7 +50,10 @@ public class BpmProcessDefinitionRespVO {
     @Schema(description = "中断状态-参见 SuspensionState 枚举", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     private Integer suspensionState;
 
-    @Schema(description = "部署时间", requiredMode = Schema.RequiredMode.REQUIRED)
-    private LocalDateTime deploymentTime; // 需要从对应的 Deployment 读取
+    @Schema(description = "部署时间")
+    private LocalDateTime deploymentTime; // 需要从对应的 Deployment 读取，非必须返回
+
+    @Schema(description = "BPMN XML")
+    private String bpmnXml; // 需要从对应的 BpmnModel 读取，非必须返回
 
 }

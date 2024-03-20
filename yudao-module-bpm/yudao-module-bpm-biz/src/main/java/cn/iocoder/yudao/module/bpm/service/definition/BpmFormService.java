@@ -2,9 +2,8 @@ package cn.iocoder.yudao.module.bpm.service.definition;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
-import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.form.BpmFormCreateReqVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.form.BpmFormPageReqVO;
-import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.form.BpmFormUpdateReqVO;
+import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.form.BpmFormSaveReqVO;
 import cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmFormDO;
 import jakarta.validation.Valid;
 
@@ -26,14 +25,14 @@ public interface BpmFormService {
      * @param createReqVO 创建信息
      * @return 编号
      */
-    Long createForm(@Valid BpmFormCreateReqVO createReqVO);
+    Long createForm(@Valid BpmFormSaveReqVO createReqVO);
 
     /**
      * 更新动态表单
      *
      * @param updateReqVO 更新信息
      */
-    void updateForm(@Valid BpmFormUpdateReqVO updateReqVO);
+    void updateForm(@Valid BpmFormSaveReqVO updateReqVO);
 
     /**
      * 删除动态表单

@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.crm.service.receivable.listener;
 
-import cn.iocoder.yudao.module.bpm.event.BpmProcessInstanceResultEvent;
-import cn.iocoder.yudao.module.bpm.event.BpmProcessInstanceResultEventListener;
+import cn.iocoder.yudao.module.bpm.event.BpmProcessInstanceStatusEvent;
+import cn.iocoder.yudao.module.bpm.event.BpmProcessInstanceStatusEventListener;
 import cn.iocoder.yudao.module.crm.service.receivable.CrmReceivableService;
 import cn.iocoder.yudao.module.crm.service.receivable.CrmReceivableServiceImpl;
 import jakarta.annotation.Resource;
@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
  * @author HUIHUI
  */
 @Component
-public class CrmReceivableResultListener extends BpmProcessInstanceResultEventListener {
+public class CrmReceivableStatusListener extends BpmProcessInstanceStatusEventListener {
 
     @Resource
     private CrmReceivableService receivableService;
@@ -24,8 +24,8 @@ public class CrmReceivableResultListener extends BpmProcessInstanceResultEventLi
     }
 
     @Override
-    public void onEvent(BpmProcessInstanceResultEvent event) {
-        receivableService.updateReceivableAuditStatus(Long.parseLong(event.getBusinessKey()), event.getResult());
+    public void onEvent(BpmProcessInstanceStatusEvent event) {
+        receivableService.updateReceivableAuditStatus(Long.parseLong(event.getBusinessKey()), event.getStatus());
     }
 
 }

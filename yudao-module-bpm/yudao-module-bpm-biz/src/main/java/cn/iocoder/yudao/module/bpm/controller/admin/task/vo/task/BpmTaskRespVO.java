@@ -42,9 +42,6 @@ public class BpmTaskRespVO {
      */
     private BpmProcessInstanceRespVO.User assigneeUser;
 
-    // TODO @芋艿：这个 key 有点问题，应该是 taskDefinitionId
-    @Schema(description = "任务定义的标识", requiredMode = Schema.RequiredMode.REQUIRED, example = "user-001")
-    private String definitionKey;
     @Schema(description = "任务定义的标识", requiredMode = Schema.RequiredMode.REQUIRED, example = "Activity_one")
     private String taskDefinitionKey;
 

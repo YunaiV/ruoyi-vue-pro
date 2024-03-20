@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.bpm.service.oa.listener;
 
-import cn.iocoder.yudao.module.bpm.event.BpmProcessInstanceResultEvent;
-import cn.iocoder.yudao.module.bpm.event.BpmProcessInstanceResultEventListener;
+import cn.iocoder.yudao.module.bpm.event.BpmProcessInstanceStatusEvent;
+import cn.iocoder.yudao.module.bpm.event.BpmProcessInstanceStatusEventListener;
 import cn.iocoder.yudao.module.bpm.service.oa.BpmOALeaveService;
 import cn.iocoder.yudao.module.bpm.service.oa.BpmOALeaveServiceImpl;
 import org.springframework.stereotype.Component;
@@ -14,7 +14,7 @@ import jakarta.annotation.Resource;
  * @author 芋道源码
  */
 @Component
-public class BpmOALeaveResultListener extends BpmProcessInstanceResultEventListener {
+public class BpmOALeaveStatusListener extends BpmProcessInstanceStatusEventListener {
 
     @Resource
     private BpmOALeaveService leaveService;
@@ -25,8 +25,8 @@ public class BpmOALeaveResultListener extends BpmProcessInstanceResultEventListe
     }
 
     @Override
-    protected void onEvent(BpmProcessInstanceResultEvent event) {
-        leaveService.updateLeaveResult(Long.parseLong(event.getBusinessKey()), event.getResult());
+    protected void onEvent(BpmProcessInstanceStatusEvent event) {
+        leaveService.updateLeaveStatus(Long.parseLong(event.getBusinessKey()), event.getStatus());
     }
 
 }

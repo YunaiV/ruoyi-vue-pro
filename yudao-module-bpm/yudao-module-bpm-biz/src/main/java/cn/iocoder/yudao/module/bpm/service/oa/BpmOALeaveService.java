@@ -29,9 +29,9 @@ public interface BpmOALeaveService {
      * 更新请假申请的状态
      *
      * @param id 编号
-     * @param result 结果
+     * @param status 结果
      */
-    void updateLeaveResult(Long id, Integer result);
+    void updateLeaveStatus(Long id, Integer status);
 
     /**
      * 获得请假申请

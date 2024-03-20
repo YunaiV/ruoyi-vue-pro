@@ -57,12 +57,12 @@ public class BpmOALeaveDO extends BaseDO {
      */
     private Long day;
     /**
-     * 请假的结果
+     * 审批结果
      *
      * 枚举 {@link BpmTaskStatustEnum}
-     * 考虑到简单，所以直接复用了 BpmProcessInstanceResultEnum 枚举，也可以自己定义一个枚举哈
+     * 考虑到简单，所以直接复用了 BpmProcessInstanceStatusEnum 枚举，也可以自己定义一个枚举哈
      */
-    private Integer result;
+    private Integer status;
 
     /**
      * 对应的流程编号

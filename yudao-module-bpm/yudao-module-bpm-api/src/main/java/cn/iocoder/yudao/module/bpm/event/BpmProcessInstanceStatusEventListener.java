@@ -4,15 +4,15 @@ import cn.hutool.core.util.StrUtil;
 import org.springframework.context.ApplicationListener;
 
 /**
- * {@link BpmProcessInstanceResultEvent} 的监听器
+ * {@link BpmProcessInstanceStatusEvent} 的监听器
  *
  * @author 芋道源码
  */
-public abstract class BpmProcessInstanceResultEventListener
-        implements ApplicationListener<BpmProcessInstanceResultEvent> {
+public abstract class BpmProcessInstanceStatusEventListener
+        implements ApplicationListener<BpmProcessInstanceStatusEvent> {
 
     @Override
-    public final void onApplicationEvent(BpmProcessInstanceResultEvent event) {
+    public final void onApplicationEvent(BpmProcessInstanceStatusEvent event) {
         if (!StrUtil.equals(event.getProcessDefinitionKey(), getProcessDefinitionKey())) {
             return;
         }
@@ -29,6 +29,6 @@ public abstract class BpmProcessInstanceResultEventListener
      *
      * @param event 事件
      */
-    protected abstract void onEvent(BpmProcessInstanceResultEvent event);
+    protected abstract void onEvent(BpmProcessInstanceStatusEvent event);
 
 }

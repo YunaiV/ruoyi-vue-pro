@@ -87,7 +87,7 @@ public class BpmModelServiceImpl implements BpmModelService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public String createModel(@Valid BpmModelCreateReqVO createReqVO, String bpmnXml) {
-        if (!ValidationUtils.isXmlNCName(createReqVO.getName())) {
+        if (!ValidationUtils.isXmlNCName(createReqVO.getKey())) {
             throw exception(MODEL_KEY_VALID);
         }
         // 校验流程标识已经存在

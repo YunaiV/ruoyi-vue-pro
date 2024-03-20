@@ -4,7 +4,7 @@ import cn.hutool.core.util.RandomUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
-import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.form.BpmFormCreateReqVO;
+import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.form.BpmFormSaveReqVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.form.BpmFormPageReqVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.form.BpmFormUpdateReqVO;
 import cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmFormDO;
@@ -43,7 +43,7 @@ public class BpmFormServiceTest extends BaseDbUnitTest {
     @Test
     public void testCreateForm_success() {
         // 准备参数
-        BpmFormCreateReqVO reqVO = randomPojo(BpmFormCreateReqVO.class, o -> {
+        BpmFormSaveReqVO reqVO = randomPojo(BpmFormSaveReqVO.class, o -> {
             o.setConf("{}");
             o.setFields(randomFields());
         });

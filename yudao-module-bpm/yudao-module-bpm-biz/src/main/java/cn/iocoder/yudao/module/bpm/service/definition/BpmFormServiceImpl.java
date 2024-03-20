@@ -4,10 +4,9 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Assert;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
-import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.form.BpmFormCreateReqVO;
+import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.form.BpmFormPageReqVO;
-import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.form.BpmFormUpdateReqVO;
-import cn.iocoder.yudao.module.bpm.convert.definition.BpmFormConvert;
+import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.form.BpmFormSaveReqVO;
 import cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmFormDO;
 import cn.iocoder.yudao.module.bpm.dal.mysql.definition.BpmFormMapper;
 import cn.iocoder.yudao.module.bpm.enums.ErrorCodeConstants;
@@ -33,22 +32,22 @@ public class BpmFormServiceImpl implements BpmFormService {
     private BpmFormMapper formMapper;
 
     @Override
-    public Long createForm(BpmFormCreateReqVO createReqVO) {
-        this.checkFields(createReqVO.getFields());
+    public Long createForm(BpmFormSaveReqVO createReqVO) {
+        this.vadateFields(createReqVO.getFields());
         // 插入
-        BpmFormDO form = BpmFormConvert.INSTANCE.convert(createReqVO);
+        BpmFormDO form = BeanUtils.toBean(createReqVO, BpmFormDO.class);
         formMapper.insert(form);
         // 返回
         return form.getId();
     }
 
     @Override
-    public void updateForm(BpmFormUpdateReqVO updateReqVO) {
-        this.checkFields(updateReqVO.getFields());
+    public void updateForm(BpmFormSaveReqVO updateReqVO) {
+        vadateFields(updateReqVO.getFields());
         // 校验存在
-        this.validateFormExists(updateReqVO.getId());
+        validateFormExists(updateReqVO.getId());
         // 更新
-        BpmFormDO updateObj = BpmFormConvert.INSTANCE.convert(updateReqVO);
+        BpmFormDO updateObj = BeanUtils.toBean(updateReqVO, BpmFormDO.class);
         formMapper.updateById(updateObj);
     }
 
@@ -94,7 +93,7 @@ public class BpmFormServiceImpl implements BpmFormService {
      *
      * @param fields field 数组
      */
-    private void checkFields(List<String> fields) {
+    private void vadateFields(List<String> fields) {
         if (true) { // TODO 芋艿：兼容 Vue3 工作流：因为采用了新的表单设计器，所以暂时不校验
             return;
         }

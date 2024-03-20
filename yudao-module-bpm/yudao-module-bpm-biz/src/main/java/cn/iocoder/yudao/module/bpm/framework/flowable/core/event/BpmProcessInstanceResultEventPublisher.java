@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.bpm.framework.flowable.core.event;
 
-import cn.iocoder.yudao.module.bpm.event.BpmProcessInstanceResultEvent;
+import cn.iocoder.yudao.module.bpm.event.BpmProcessInstanceStatusEvent;
 import lombok.AllArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.validation.annotation.Validated;
@@ -8,7 +8,7 @@ import org.springframework.validation.annotation.Validated;
 import jakarta.validation.Valid;
 
 /**
- * {@link BpmProcessInstanceResultEvent} 的生产者
+ * {@link BpmProcessInstanceStatusEvent} 的生产者
  *
  * @author 芋道源码
  */
@@ -18,7 +18,7 @@ public class BpmProcessInstanceResultEventPublisher {
 
     private final ApplicationEventPublisher publisher;
 
-    public void sendProcessInstanceResultEvent(@Valid BpmProcessInstanceResultEvent event) {
+    public void sendProcessInstanceResultEvent(@Valid BpmProcessInstanceStatusEvent event) {
         publisher.publishEvent(event);
     }
 

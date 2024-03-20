@@ -3,13 +3,19 @@ package cn.iocoder.yudao.module.bpm.controller.admin.task;
 import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.number.NumberUtils;
 import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.instance.*;
 import cn.iocoder.yudao.module.bpm.convert.task.BpmProcessInstanceConvert;
 import cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmCategoryDO;
+import cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmProcessDefinitionInfoDO;
 import cn.iocoder.yudao.module.bpm.service.definition.BpmCategoryService;
 import cn.iocoder.yudao.module.bpm.service.definition.BpmProcessDefinitionService;
 import cn.iocoder.yudao.module.bpm.service.task.BpmProcessInstanceService;
 import cn.iocoder.yudao.module.bpm.service.task.BpmTaskService;
+import cn.iocoder.yudao.module.system.api.dept.DeptApi;
+import cn.iocoder.yudao.module.system.api.dept.dto.DeptRespDTO;
+import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
+import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -45,10 +51,15 @@ public class BpmProcessInstanceController {
     @Resource
     private BpmCategoryService categoryService;
 
+    @Resource
+    private AdminUserApi adminUserApi;
+    @Resource
+    private DeptApi deptApi;
+
     @GetMapping("/my-page")
     @Operation(summary = "获得我的实例分页列表", description = "在【我的流程】菜单中，进行调用")
     @PreAuthorize("@ss.hasPermission('bpm:process-instance:query')")
-    public CommonResult<PageResult<BpmProcessInstancePageItemRespVO>> getMyProcessInstancePage(
+    public CommonResult<PageResult<BpmProcessInstanceRespVO>> getMyProcessInstancePage(
             @Valid BpmProcessInstanceMyPageReqVO pageReqVO) {
         PageResult<HistoricProcessInstance> pageResult = processInstanceService.getMyProcessInstancePage(getLoginUserId(), pageReqVO);
         if (CollUtil.isEmpty(pageResult.getList())) {
@@ -62,7 +73,8 @@ public class BpmProcessInstanceController {
                 convertSet(pageResult.getList(), HistoricProcessInstance::getProcessDefinitionId));
         Map<String, BpmCategoryDO> categoryMap = categoryService.getCategoryMap(
                 convertSet(processDefinitionMap.values(), ProcessDefinition::getCategory));
-        return success(BpmProcessInstanceConvert.INSTANCE.convertPage(pageResult, processDefinitionMap, categoryMap, taskMap));
+        return success(BpmProcessInstanceConvert.INSTANCE.buildMyProcessInstancePage(pageResult,
+                processDefinitionMap, categoryMap, taskMap));
     }
 
     @PostMapping("/create")
@@ -77,7 +89,24 @@ public class BpmProcessInstanceController {
     @Parameter(name = "id", description = "流程实例的编号", required = true)
     @PreAuthorize("@ss.hasPermission('bpm:process-instance:query')")
     public CommonResult<BpmProcessInstanceRespVO> getProcessInstance(@RequestParam("id") String id) {
-        return success(processInstanceService.getProcessInstanceVO(id));
+        HistoricProcessInstance processInstance = processInstanceService.getHistoricProcessInstance(id);
+        if (processInstance == null) {
+            return success(null);
+        }
+
+        // 拼接返回
+        ProcessDefinition processDefinition = processDefinitionService.getProcessDefinition(
+                processInstance.getProcessDefinitionId());
+        BpmProcessDefinitionInfoDO processDefinitionInfo = processDefinitionService.getProcessDefinitionInfo(
+                processInstance.getProcessDefinitionId());
+        String bpmnXml = processDefinitionService.getProcessDefinitionBpmnXML(processInstance.getProcessDefinitionId());
+        AdminUserRespDTO startUser = adminUserApi.getUser(NumberUtils.parseLong(processInstance.getStartUserId()));
+        DeptRespDTO dept = null;
+        if (startUser != null) {
+            dept = deptApi.getDept(startUser.getDeptId());
+        }
+        return success(BpmProcessInstanceConvert.INSTANCE.buildProcessInstance(processInstance,
+                processDefinition, processDefinitionInfo, bpmnXml, startUser, dept));
     }
 
     @DeleteMapping("/cancel")

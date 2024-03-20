@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.crm.service.contract.listener;
 
-import cn.iocoder.yudao.module.bpm.event.BpmProcessInstanceResultEvent;
-import cn.iocoder.yudao.module.bpm.event.BpmProcessInstanceResultEventListener;
+import cn.iocoder.yudao.module.bpm.event.BpmProcessInstanceStatusEvent;
+import cn.iocoder.yudao.module.bpm.event.BpmProcessInstanceStatusEventListener;
 import cn.iocoder.yudao.module.crm.service.contract.CrmContractService;
 import cn.iocoder.yudao.module.crm.service.contract.CrmContractServiceImpl;
 import jakarta.annotation.Resource;
@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
  * @author HUIHUI
  */
 @Component
-public class CrmContractResultListener extends BpmProcessInstanceResultEventListener {
+public class CrmContractStatusListener extends BpmProcessInstanceStatusEventListener {
 
     @Resource
     private CrmContractService contractService;
@@ -24,8 +24,8 @@ public class CrmContractResultListener extends BpmProcessInstanceResultEventList
     }
 
     @Override
-    protected void onEvent(BpmProcessInstanceResultEvent event) {
-        contractService.updateContractAuditStatus(Long.parseLong(event.getBusinessKey()), event.getResult());
+    protected void onEvent(BpmProcessInstanceStatusEvent event) {
+        contractService.updateContractAuditStatus(Long.parseLong(event.getBusinessKey()), event.getStatus());
     }
 
 }

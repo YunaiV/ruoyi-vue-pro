@@ -6,10 +6,10 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.number.NumberUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
-import cn.iocoder.yudao.module.bpm.framework.flowable.core.util.FlowableUtils;
 import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.instance.BpmProcessInstanceRespVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.task.BpmTaskRespVO;
 import cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmFormDO;
+import cn.iocoder.yudao.module.bpm.framework.flowable.core.util.FlowableUtils;
 import cn.iocoder.yudao.module.bpm.service.message.dto.BpmMessageSendWhenTaskCreatedReqDTO;
 import cn.iocoder.yudao.module.system.api.dept.dto.DeptRespDTO;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
@@ -18,6 +18,7 @@ import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.history.HistoricTaskInstance;
 import org.flowable.task.service.impl.persistence.entity.TaskEntityImpl;
+import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
 import java.util.Date;
@@ -32,6 +33,7 @@ import static cn.iocoder.yudao.framework.common.util.collection.MapUtils.findAnd
  *
  * @author 芋道源码
  */
+@Mapper
 public interface BpmTaskConvert {
 
     BpmTaskConvert INSTANCE = Mappers.getMapper(BpmTaskConvert.class);
