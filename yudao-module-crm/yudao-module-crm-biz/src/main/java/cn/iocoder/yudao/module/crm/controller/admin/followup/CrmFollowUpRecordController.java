@@ -73,6 +73,7 @@ public class CrmFollowUpRecordController {
     public CommonResult<CrmFollowUpRecordRespVO> getFollowUpRecord(@RequestParam("id") Long id) {
         CrmFollowUpRecordDO followUpRecord = followUpRecordService.getFollowUpRecord(id);
         return success(BeanUtils.toBean(followUpRecord, CrmFollowUpRecordRespVO.class));
+
     }
 
     @GetMapping("/page")

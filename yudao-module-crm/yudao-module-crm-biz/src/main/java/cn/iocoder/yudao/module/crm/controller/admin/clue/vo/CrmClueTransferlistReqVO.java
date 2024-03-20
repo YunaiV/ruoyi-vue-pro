@@ -10,11 +10,11 @@ import java.util.List;
 
 @Schema(description = "管理后台 - 线索转移 Request VO")
 @Data
-public class CrmClueTransferReqVO {
+public class CrmClueTransferlistReqVO {
 
-    @Schema(description = "线索编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "10430")
+    @Schema(description = "线索编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "[10430,10445]")
     @NotNull(message = "线索编号不能为空")
-    private Long id;
+    private List<Long> ids;
 
     @Schema(description = "新负责人的用户编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "10430")
     @NotNull(message = "新负责人的用户编号不能为空")

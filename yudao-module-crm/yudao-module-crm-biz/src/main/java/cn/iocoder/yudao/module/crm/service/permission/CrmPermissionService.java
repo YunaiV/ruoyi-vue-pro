@@ -47,6 +47,12 @@ public interface CrmPermissionService {
      * @param crmPermissionTransferReqBO 数据权限转移请求
      */
     void transferPermission(@Valid CrmPermissionTransferReqBO crmPermissionTransferReqBO);
+    /**
+     * 数据权限批量转移
+     *
+     * @param crmPermissionTransferReqBOs 数据权限批量转移请求
+     */
+    void transforPermissionBatch(@Valid List<CrmPermissionTransferReqBO> crmPermissionTransferReqBOs);
 
     /**
      * 删除数据权限

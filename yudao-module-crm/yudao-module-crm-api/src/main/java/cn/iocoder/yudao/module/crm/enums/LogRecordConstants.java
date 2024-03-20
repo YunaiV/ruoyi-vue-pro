@@ -18,7 +18,9 @@ public interface LogRecordConstants {
     String CRM_CLUE_DELETE_SUB_TYPE = "删除线索";
     String CRM_CLUE_DELETE_SUCCESS = "删除了线索【{{#clueName}}】";
     String CRM_CLUE_TRANSFER_SUB_TYPE = "转移线索";
+    String CRM_CLUE_TRANSFER_SUB_BATCH_TYPE = "批量转移线索";
     String CRM_CLUE_TRANSFER_SUCCESS = "将线索【{{#clue.name}}】的负责人从【{getAdminUserById{#clue.ownerUserId}}】变更为了【{getAdminUserById{#reqVO.newOwnerUserId}}】";
+    String CRM_CLUE_TRANSFER_BATCH_SUCCESS = "将线索【{{#reqVO.ids.toString()}}】的负责人从【{getAdminUserById{#userId}}】变更为了【{getAdminUserById{#reqVO.getNewOwnerUserId()}}】";
     String CRM_CLUE_TRANSLATE_SUB_TYPE = "线索转化为客户";
     String CRM_CLUE_TRANSLATE_SUCCESS = "将线索【{{#clueName}}】转化为客户";
     String CRM_CLUE_FOLLOW_UP_SUB_TYPE = "线索跟进";

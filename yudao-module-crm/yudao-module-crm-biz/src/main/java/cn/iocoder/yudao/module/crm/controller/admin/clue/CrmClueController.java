@@ -9,10 +9,7 @@ import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.yudao.framework.ip.core.utils.AreaUtils;
 import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
-import cn.iocoder.yudao.module.crm.controller.admin.clue.vo.CrmCluePageReqVO;
-import cn.iocoder.yudao.module.crm.controller.admin.clue.vo.CrmClueRespVO;
-import cn.iocoder.yudao.module.crm.controller.admin.clue.vo.CrmClueSaveReqVO;
-import cn.iocoder.yudao.module.crm.controller.admin.clue.vo.CrmClueTransferReqVO;
+import cn.iocoder.yudao.module.crm.controller.admin.clue.vo.*;
 import cn.iocoder.yudao.module.crm.dal.dataobject.clue.CrmClueDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerDO;
 import cn.iocoder.yudao.module.crm.service.clue.CrmClueService;
@@ -151,6 +148,14 @@ public class CrmClueController {
     @PreAuthorize("@ss.hasPermission('crm:clue:update')")
     public CommonResult<Boolean> transferClue(@Valid @RequestBody CrmClueTransferReqVO reqVO) {
         clueService.transferClue(reqVO, getLoginUserId());
+        return success(true);
+    }
+
+    @PutMapping("/transferlist")
+    @Operation(summary = "批量线索转移")
+    @PreAuthorize("@ss.hasPermission('crm:clue:update')")
+    public CommonResult<Boolean> transferClues(@RequestBody CrmClueTransferlistReqVO reqVO) {
+        clueService.transferClues(reqVO, getLoginUserId());
         return success(true);
     }
 

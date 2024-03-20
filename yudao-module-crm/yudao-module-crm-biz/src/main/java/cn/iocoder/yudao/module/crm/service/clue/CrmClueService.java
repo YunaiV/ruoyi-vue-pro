@@ -4,6 +4,7 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.crm.controller.admin.clue.vo.CrmCluePageReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.clue.vo.CrmClueSaveReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.clue.vo.CrmClueTransferReqVO;
+import cn.iocoder.yudao.module.crm.controller.admin.clue.vo.CrmClueTransferlistReqVO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.clue.CrmClueDO;
 
 import javax.validation.Valid;
@@ -81,6 +82,14 @@ public interface CrmClueService {
      * @param userId 用户编号
      */
     void transferClue(CrmClueTransferReqVO reqVO, Long userId);
+
+    /**
+     * 线索批量转移
+     *
+     * @param reqVO  请求
+     * @param userId 用户编号
+     */
+    void transferClues(CrmClueTransferlistReqVO reqVO, Long userId);
 
     /**
      * 线索转化为客户

@@ -8,6 +8,7 @@ import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.crm.controller.admin.clue.vo.CrmCluePageReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.clue.vo.CrmClueSaveReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.clue.vo.CrmClueTransferReqVO;
+import cn.iocoder.yudao.module.crm.controller.admin.clue.vo.CrmClueTransferlistReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.customer.CrmCustomerSaveReqVO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.clue.CrmClueDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.followup.CrmFollowUpRecordDO;
@@ -33,6 +34,7 @@ import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
@@ -41,6 +43,7 @@ import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionU
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.singleton;
 import static cn.iocoder.yudao.module.crm.enums.ErrorCodeConstants.CLUE_NOT_EXISTS;
+import static cn.iocoder.yudao.module.crm.enums.ErrorCodeConstants.CLUE_HAS_NOT_EXISTS;
 import static cn.iocoder.yudao.module.crm.enums.ErrorCodeConstants.CLUE_TRANSFORM_FAIL_ALREADY;
 import static cn.iocoder.yudao.module.crm.enums.LogRecordConstants.*;
 import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.USER_NOT_EXISTS;
@@ -181,6 +184,33 @@ public class CrmClueServiceImpl implements CrmClueService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
+    @LogRecord(type = CRM_CLUE_TYPE, subType = CRM_CLUE_TRANSFER_SUB_BATCH_TYPE, bizNo = "0",
+            success = CRM_CLUE_TRANSFER_BATCH_SUCCESS)
+    @CrmPermission(bizType = CrmBizTypeEnum.CRM_CLUE, bizId = "#reqVO.ids", level = CrmPermissionLevelEnum.OWNER)
+    public void transferClues(CrmClueTransferlistReqVO reqVO, Long userId) {
+        // 1. 校验线索是否存在
+        List<CrmClueDO> clues = validateCluesExists(reqVO.getIds());
+
+        //2.1 数据权限转移
+        List<CrmPermissionTransferReqBO> transferReqBOList = new ArrayList<>();
+        clues.forEach(clue -> {
+            transferReqBOList.add(new CrmPermissionTransferReqBO(userId, CrmBizTypeEnum.CRM_CLUE.getType(),
+                    clue.getId(), reqVO.getNewOwnerUserId(), reqVO.getOldOwnerPermissionLevel()));
+        });
+        crmPermissionService.transforPermissionBatch(transferReqBOList);
+
+        // 2.2 设置新的负责人
+        clues.forEach(clue -> {
+            clue.setOwnerUserId(reqVO.getNewOwnerUserId());
+        });
+        clueMapper.updateBatch(clues);
+        // 3. 记录转移日志
+        LogRecordContext.putVariable("clues", clues.toString());
+//        reqVOS.forEach(reqVO -> transferClue(reqVO, userId));
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
     @LogRecord(type = CRM_CLUE_TYPE, subType = CRM_CLUE_TRANSLATE_SUB_TYPE, bizNo = "{{#id}}",
             success = CRM_CLUE_TRANSLATE_SUCCESS)
     @CrmPermission(bizType = CrmBizTypeEnum.CRM_CLUE, bizId = "#id", level = CrmPermissionLevelEnum.OWNER)
@@ -215,6 +245,14 @@ public class CrmClueServiceImpl implements CrmClueService {
             throw exception(CLUE_NOT_EXISTS);
         }
         return crmClueDO;
+    }
+
+    private List<CrmClueDO> validateCluesExists(Collection<Long> ids) {
+        List<CrmClueDO> crmClueDOs = clueMapper.selectBatchIds(ids);
+        if (CollUtil.isEmpty(crmClueDOs) || crmClueDOs.size() != ids.size()) {
+            throw exception(CLUE_HAS_NOT_EXISTS);
+        }
+        return crmClueDOs;
     }
 
     @Override
