@@ -15,7 +15,7 @@ public class BpmProcessInstanceCreateReqVO {
     @NotEmpty(message = "流程定义编号不能为空")
     private String processDefinitionId;
 
-    @Schema(description = "变量实例")
+    @Schema(description = "变量实例（动态表单）")
     private Map<String, Object> variables;
 
     // TODO @hai：assignees 复数

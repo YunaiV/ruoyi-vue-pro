@@ -20,7 +20,7 @@ public class BpmProcessInstanceCreateReqDTO {
     @NotEmpty(message = "流程定义的标识不能为空")
     private String processDefinitionKey;
     /**
-     * 变量实例
+     * 变量实例（动态表单）
      */
     private Map<String, Object> variables;
 

@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotEmpty;
 import lombok.Data;
 
 import java.util.Collection;
+import java.util.Map;
 
 @Schema(description = "管理后台 - 通过流程任务的 Request VO")
 @Data
@@ -20,5 +21,8 @@ public class BpmTaskApproveReqVO {
 
     @Schema(description = "抄送的用户编号数组", requiredMode = Schema.RequiredMode.REQUIRED, example = "1,2")
     private Collection<Long> copyUserIds;
+
+    @Schema(description = "变量实例（动态表单）", requiredMode = Schema.RequiredMode.REQUIRED)
+    private Map<String, Object> variables;
 
 }

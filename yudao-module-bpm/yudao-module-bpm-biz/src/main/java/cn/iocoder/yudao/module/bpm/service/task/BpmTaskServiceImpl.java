@@ -10,6 +10,7 @@ import cn.iocoder.yudao.framework.common.util.date.DateUtils;
 import cn.iocoder.yudao.framework.common.util.number.NumberUtils;
 import cn.iocoder.yudao.framework.common.util.object.PageUtils;
 import cn.iocoder.yudao.framework.flowable.core.util.BpmnModelUtils;
+import cn.iocoder.yudao.framework.flowable.core.util.FlowableUtils;
 import cn.iocoder.yudao.framework.web.core.util.WebFrameworkUtils;
 import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.task.*;
 import cn.iocoder.yudao.module.bpm.convert.task.BpmTaskConvert;
@@ -185,7 +186,9 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         taskService.addComment(task.getId(), task.getProcessInstanceId(), BpmCommentTypeEnum.APPROVE.getType(),
                 BpmCommentTypeEnum.APPROVE.formatComment(reqVO.getReason()));
         // 3.3 调用 BPM complete 去完成任务
-        taskService.complete(task.getId(), instance.getProcessVariables());
+        // 其中，variables 是存储动态表单到 local 任务级别。过滤一下，避免 ProcessInstance 系统级的变量被占用
+        Map<String, Object> variables = FlowableUtils.filterTaskFormVariable(reqVO.getVariables());
+        taskService.complete(task.getId(), variables, true);
 
         // 【加签专属】处理加签任务
         handleParentTaskIfSign(task.getParentTaskId());

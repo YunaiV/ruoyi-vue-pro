@@ -6,6 +6,7 @@ import lombok.Data;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 @Schema(description = "管理后台 - 流程任务 Response VO")
 @Data
@@ -49,7 +50,6 @@ public class BpmTaskRespVO {
 
     @Schema(description = "所属流程实例编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "8888")
     private String processInstanceId;
-
     /**
      * 所属流程实例
      */
@@ -57,9 +57,19 @@ public class BpmTaskRespVO {
 
     @Schema(description = "父任务编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     private String parentTaskId;
-
     @Schema(description = "子任务列表（由加签生成）", requiredMode = Schema.RequiredMode.REQUIRED, example = "childrenTask")
     private List<BpmTaskRespVO> children;
+
+    @Schema(description = "表单编号", example = "1024")
+    private Long formId;
+    @Schema(description = "表单名字", example = "请假表单")
+    private String formName;
+    @Schema(description = "表单的配置-JSON 字符串")
+    private String formConf;
+    @Schema(description = "表单项的数组")
+    private List<String> formFields;
+    @Schema(description = "提交的表单值", requiredMode = Schema.RequiredMode.REQUIRED)
+    private Map<String, Object> formVariables;
 
     @Data
     @Schema(description = "流程实例")

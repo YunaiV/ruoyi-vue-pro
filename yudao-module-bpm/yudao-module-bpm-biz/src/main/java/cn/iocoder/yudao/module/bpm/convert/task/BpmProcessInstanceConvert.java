@@ -2,15 +2,14 @@ package cn.iocoder.yudao.module.bpm.convert.task;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
-import cn.iocoder.yudao.framework.common.util.date.DateUtils;
 import cn.iocoder.yudao.framework.common.util.number.NumberUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
+import cn.iocoder.yudao.framework.flowable.core.util.FlowableUtils;
 import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.instance.BpmProcessInstancePageItemRespVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.instance.BpmProcessInstanceRespVO;
 import cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmCategoryDO;
 import cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmProcessDefinitionInfoDO;
 import cn.iocoder.yudao.module.bpm.event.BpmProcessInstanceResultEvent;
-import cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmConstants;
 import cn.iocoder.yudao.module.bpm.service.message.dto.BpmMessageSendWhenProcessInstanceApproveReqDTO;
 import cn.iocoder.yudao.module.bpm.service.message.dto.BpmMessageSendWhenProcessInstanceRejectReqDTO;
 import cn.iocoder.yudao.module.system.api.dept.dto.DeptRespDTO;
@@ -19,7 +18,6 @@ import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.task.api.Task;
-import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.factory.Mappers;
@@ -32,7 +30,6 @@ import java.util.Map;
  *
  * @author 芋道源码
  */
-@Mapper(uses = DateUtils.class)
 public interface BpmProcessInstanceConvert {
 
     BpmProcessInstanceConvert INSTANCE = Mappers.getMapper(BpmProcessInstanceConvert.class);
@@ -44,7 +41,7 @@ public interface BpmProcessInstanceConvert {
         PageResult<BpmProcessInstancePageItemRespVO> vpPageResult = BeanUtils.toBean(pageResult, BpmProcessInstancePageItemRespVO.class);
         for (int i = 0; i < pageResult.getList().size(); i++) {
             BpmProcessInstancePageItemRespVO respVO = vpPageResult.getList().get(i);
-            respVO.setStatus((Integer) pageResult.getList().get(i).getProcessVariables().get(BpmConstants.PROCESS_INSTANCE_VARIABLE_STATUS));
+            respVO.setStatus(FlowableUtils.getProcessInstanceStatus(pageResult.getList().get(i)));
             MapUtils.findAndThen(processDefinitionMap, respVO.getProcessDefinitionId(),
                     processDefinition -> respVO.setCategory(processDefinition.getCategory()));
             MapUtils.findAndThen(categoryMap, respVO.getCategory(), category -> respVO.setCategoryName(category.getName()));
@@ -57,8 +54,8 @@ public interface BpmProcessInstanceConvert {
                                               ProcessDefinition processDefinition, BpmProcessDefinitionInfoDO processDefinitionExt,
                                               String bpmnXml, AdminUserRespDTO startUser, DeptRespDTO dept) {
         BpmProcessInstanceRespVO respVO = convert2(processInstance);
-        respVO.setStatus((Integer) processInstance.getProcessVariables().get(BpmConstants.PROCESS_INSTANCE_VARIABLE_STATUS));
-        respVO.setFormVariables(processInstance.getProcessVariables()); // TODO 芋艿：真的这么搞么？？？formVariable 要不要换个 key 之类的
+        respVO.setStatus(FlowableUtils.getProcessInstanceStatus(processInstance));
+        respVO.setFormVariables(FlowableUtils.filterProcessInstanceFormVariable(processInstance.getProcessVariables()));
         // definition
         respVO.setProcessDefinition(convert2(processDefinition));
         copyTo(processDefinitionExt, respVO.getProcessDefinition());

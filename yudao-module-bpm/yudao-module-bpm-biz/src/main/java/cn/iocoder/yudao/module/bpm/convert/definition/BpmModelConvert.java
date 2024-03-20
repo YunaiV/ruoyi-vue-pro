@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.bpm.convert.definition;
 
+import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
@@ -56,7 +57,9 @@ public interface BpmModelConvert {
                                      byte[] bpmnBytes) {
         BpmModelMetaInfoRespDTO metaInfo = JsonUtils.parseObject(model.getMetaInfo(), BpmModelMetaInfoRespDTO.class);
         BpmModelRespVO modelVO = buildModel0(model, metaInfo, null, null, null, null);
-        modelVO.setBpmnXml(new String(bpmnBytes));
+        if (ArrayUtil.isNotEmpty(bpmnBytes)) {
+            modelVO.setBpmnXml(new String(bpmnBytes));
+        }
         return modelVO;
     }
 

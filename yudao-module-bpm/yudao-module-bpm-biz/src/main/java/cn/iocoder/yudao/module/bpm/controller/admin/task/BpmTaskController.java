@@ -6,6 +6,8 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.number.NumberUtils;
 import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.task.*;
 import cn.iocoder.yudao.module.bpm.convert.task.BpmTaskConvert;
+import cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmFormDO;
+import cn.iocoder.yudao.module.bpm.service.definition.BpmFormService;
 import cn.iocoder.yudao.module.bpm.service.task.BpmProcessInstanceService;
 import cn.iocoder.yudao.module.bpm.service.task.BpmTaskService;
 import cn.iocoder.yudao.module.system.api.dept.DeptApi;
@@ -46,6 +48,8 @@ public class BpmTaskController {
     private BpmTaskService taskService;
     @Resource
     private BpmProcessInstanceService processInstanceService;
+    @Resource
+    private BpmFormService formService;
 
     @Resource
     private AdminUserApi adminUserApi;
@@ -98,7 +102,11 @@ public class BpmTaskController {
         Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(userIds);
         Map<Long, DeptRespDTO> deptMap = deptApi.getDeptMap(
                 convertSet(userMap.values(), AdminUserRespDTO::getDeptId));
-        return success(BpmTaskConvert.INSTANCE.buildTaskListByProcessInstanceId(taskList, processInstance, userMap, deptMap));
+        // 获得 Form Map
+        Map<Long, BpmFormDO> formMap = formService.getFormMap(
+                convertSet(taskList, task -> Long.parseLong(task.getFormKey())));
+        return success(BpmTaskConvert.INSTANCE.buildTaskListByProcessInstanceId(taskList, processInstance,
+                formMap, userMap, deptMap));
     }
 
     @PutMapping("/approve")
