@@ -41,7 +41,9 @@ public interface LogRecordConstants {
     String CRM_CUSTOMER_DELETE_SUB_TYPE = "删除客户";
     String CRM_CUSTOMER_DELETE_SUCCESS = "删除了客户【{{#customerName}}】";
     String CRM_CUSTOMER_TRANSFER_SUB_TYPE = "转移客户";
+    String CRM_CUSTOMER_TRANSFER_SUB_BATCH_TYPE = "批量转移客户";
     String CRM_CUSTOMER_TRANSFER_SUCCESS = "将客户【{{#customer.name}}】的负责人从【{getAdminUserById{#customer.ownerUserId}}】变更为了【{getAdminUserById{#reqVO.newOwnerUserId}}】";
+    String CRM_CUSTOMER_TRANSFER_BATCH_SUCCESS = "将客户【{{#reqVO.ids.toString()}}】的负责人从【{getAdminUserById{#userId}}】变更为了【{getAdminUserById{#reqVO.getNewOwnerUserId()}}】";
     String CRM_CUSTOMER_LOCK_SUB_TYPE = "{{#customer.lockStatus ? '解锁客户' : '锁定客户'}}";
     String CRM_CUSTOMER_LOCK_SUCCESS = "{{#customer.lockStatus ? '将客户【' + #customer.name + '】解锁' : '将客户【' + #customer.name + '】锁定'}}";
     String CRM_CUSTOMER_POOL_SUB_TYPE = "客户放入公海";
