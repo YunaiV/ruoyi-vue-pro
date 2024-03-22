@@ -4,7 +4,10 @@ import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.number.NumberUtils;
-import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.instance.*;
+import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.instance.BpmProcessInstanceCancelReqVO;
+import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.instance.BpmProcessInstanceCreateReqVO;
+import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.instance.BpmProcessInstancePageReqVO;
+import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.instance.BpmProcessInstanceRespVO;
 import cn.iocoder.yudao.module.bpm.convert.task.BpmProcessInstanceConvert;
 import cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmCategoryDO;
 import cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmProcessDefinitionInfoDO;
@@ -59,9 +62,10 @@ public class BpmProcessInstanceController {
     @GetMapping("/my-page")
     @Operation(summary = "获得我的实例分页列表", description = "在【我的流程】菜单中，进行调用")
     @PreAuthorize("@ss.hasPermission('bpm:process-instance:query')")
-    public CommonResult<PageResult<BpmProcessInstanceRespVO>> getMyProcessInstancePage(
-            @Valid BpmProcessInstanceMyPageReqVO pageReqVO) {
-        PageResult<HistoricProcessInstance> pageResult = processInstanceService.getMyProcessInstancePage(getLoginUserId(), pageReqVO);
+    public CommonResult<PageResult<BpmProcessInstanceRespVO>> getProcessInstanceMyPage(
+            @Valid BpmProcessInstancePageReqVO pageReqVO) {
+        PageResult<HistoricProcessInstance> pageResult = processInstanceService.getProcessInstancePage(
+                getLoginUserId(), pageReqVO);
         if (CollUtil.isEmpty(pageResult.getList())) {
             return success(PageResult.empty(pageResult.getTotal()));
         }
@@ -73,8 +77,35 @@ public class BpmProcessInstanceController {
                 convertSet(pageResult.getList(), HistoricProcessInstance::getProcessDefinitionId));
         Map<String, BpmCategoryDO> categoryMap = categoryService.getCategoryMap(
                 convertSet(processDefinitionMap.values(), ProcessDefinition::getCategory));
-        return success(BpmProcessInstanceConvert.INSTANCE.buildMyProcessInstancePage(pageResult,
-                processDefinitionMap, categoryMap, taskMap));
+        return success(BpmProcessInstanceConvert.INSTANCE.buildProcessInstancePage(pageResult,
+                processDefinitionMap, categoryMap, taskMap, null, null));
+    }
+
+    @GetMapping("/manager-page")
+    @Operation(summary = "获得管理流程实例的分页列表", description = "在【流程实例】菜单中，进行调用")
+    @PreAuthorize("@ss.hasPermission('bpm:process-instance:manager-query')")
+    public CommonResult<PageResult<BpmProcessInstanceRespVO>> getProcessInstanceManagerPage(
+            @Valid BpmProcessInstancePageReqVO pageReqVO) {
+        PageResult<HistoricProcessInstance> pageResult = processInstanceService.getProcessInstancePage(
+                null, pageReqVO);
+        if (CollUtil.isEmpty(pageResult.getList())) {
+            return success(PageResult.empty(pageResult.getTotal()));
+        }
+
+        // 拼接返回
+        Map<String, List<Task>> taskMap = taskService.getTaskMapByProcessInstanceIds(
+                convertList(pageResult.getList(), HistoricProcessInstance::getId));
+        Map<String, ProcessDefinition> processDefinitionMap = processDefinitionService.getProcessDefinitionMap(
+                convertSet(pageResult.getList(), HistoricProcessInstance::getProcessDefinitionId));
+        Map<String, BpmCategoryDO> categoryMap = categoryService.getCategoryMap(
+                convertSet(processDefinitionMap.values(), ProcessDefinition::getCategory));
+        // 发起人信息
+        Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(
+                convertSet(pageResult.getList(), processInstance -> NumberUtils.parseLong(processInstance.getStartUserId())));
+        Map<Long, DeptRespDTO> deptMap = deptApi.getDeptMap(
+                convertSet(userMap.values(), AdminUserRespDTO::getDeptId));
+        return success(BpmProcessInstanceConvert.INSTANCE.buildProcessInstancePage(pageResult,
+                processDefinitionMap, categoryMap, taskMap, userMap, deptMap));
     }
 
     @PostMapping("/create")
@@ -109,11 +140,21 @@ public class BpmProcessInstanceController {
                 processDefinition, processDefinitionInfo, bpmnXml, startUser, dept));
     }
 
-    @DeleteMapping("/cancel")
-    @Operation(summary = "取消流程实例", description = "撤回发起的流程")
+    @DeleteMapping("/cancel-by-start-user")
+    @Operation(summary = "用户取消流程实例", description = "取消发起的流程")
     @PreAuthorize("@ss.hasPermission('bpm:process-instance:cancel')")
-    public CommonResult<Boolean> cancelProcessInstance(@Valid @RequestBody BpmProcessInstanceCancelReqVO cancelReqVO) {
-        processInstanceService.cancelProcessInstance(getLoginUserId(), cancelReqVO);
+    public CommonResult<Boolean> cancelProcessInstanceByStartUser(
+            @Valid @RequestBody BpmProcessInstanceCancelReqVO cancelReqVO) {
+        processInstanceService.cancelProcessInstanceByStartUser(getLoginUserId(), cancelReqVO);
+        return success(true);
+    }
+
+    @DeleteMapping("/cancel-by-admin")
+    @Operation(summary = "管理员取消流程实例", description = "管理员撤回流程")
+    @PreAuthorize("@ss.hasPermission('bpm:process-instance:cancel-by-admin')")
+    public CommonResult<Boolean> cancelProcessInstanceByManager(
+            @Valid @RequestBody BpmProcessInstanceCancelReqVO cancelReqVO) {
+        processInstanceService.cancelProcessInstanceByAdmin(getLoginUserId(), cancelReqVO);
         return success(true);
     }
 

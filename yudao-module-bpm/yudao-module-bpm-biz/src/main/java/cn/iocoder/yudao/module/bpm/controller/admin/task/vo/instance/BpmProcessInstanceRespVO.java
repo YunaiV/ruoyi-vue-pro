@@ -26,11 +26,14 @@ public class BpmProcessInstanceRespVO {
     @Schema(description = "流程实例的状态", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     private Integer status; // 参见 BpmProcessInstanceStatusEnum 枚举
 
-    @Schema(description = "提交时间", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "发起时间", requiredMode = Schema.RequiredMode.REQUIRED)
     private LocalDateTime startTime;
 
     @Schema(description = "结束时间", requiredMode = Schema.RequiredMode.REQUIRED)
     private LocalDateTime endTime;
+
+    @Schema(description = "持续时间", example = "1000")
+    private Long durationInMillis;
 
     @Schema(description = "提交的表单值", requiredMode = Schema.RequiredMode.REQUIRED)
     private Map<String, Object> formVariables;

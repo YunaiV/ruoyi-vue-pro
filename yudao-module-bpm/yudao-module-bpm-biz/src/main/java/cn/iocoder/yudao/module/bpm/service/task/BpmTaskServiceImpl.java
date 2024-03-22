@@ -375,7 +375,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
             log.error("[updateTaskStatusWhenCanceled][taskId({}) 处于结果({})，无需进行更新]", taskId, status);
             return;
         }
-        updateTaskStatusAndReason(taskId, BpmTaskStatustEnum.CANCEL.getStatus(), BpmDeleteReasonEnum.CANCEL_SYSTEM.getReason());
+        updateTaskStatusAndReason(taskId, BpmTaskStatustEnum.CANCEL.getStatus(), BpmDeleteReasonEnum.CANCEL_BY_SYSTEM.getReason());
         // 补充说明：由于 Task 被删除成 HistoricTask 后，无法通过 taskService.addComment 添加理由，所以无法存储具体的取消理由
     }
 

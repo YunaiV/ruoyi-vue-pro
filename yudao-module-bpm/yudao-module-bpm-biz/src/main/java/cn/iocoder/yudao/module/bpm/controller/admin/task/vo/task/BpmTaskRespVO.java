@@ -24,7 +24,7 @@ public class BpmTaskRespVO {
     @Schema(description = "结束时间", requiredMode = Schema.RequiredMode.REQUIRED)
     private LocalDateTime endTime;
 
-    @Schema(description = "持续时间", requiredMode = Schema.RequiredMode.REQUIRED, example = "1000")
+    @Schema(description = "持续时间", example = "1000")
     private Long durationInMillis;
 
     @Schema(description = "任务状态", requiredMode = Schema.RequiredMode.REQUIRED, example = "2")

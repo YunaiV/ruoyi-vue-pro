@@ -4,7 +4,7 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.bpm.api.task.dto.BpmProcessInstanceCreateReqDTO;
 import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.instance.BpmProcessInstanceCancelReqVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.instance.BpmProcessInstanceCreateReqVO;
-import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.instance.BpmProcessInstanceMyPageReqVO;
+import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.instance.BpmProcessInstancePageReqVO;
 import jakarta.validation.Valid;
 import org.flowable.engine.delegate.event.FlowableCancelledEvent;
 import org.flowable.engine.history.HistoricProcessInstance;
@@ -93,8 +93,8 @@ public interface BpmProcessInstanceService {
      * @param pageReqVO 分页请求
      * @return 流程实例的分页
      */
-    PageResult<HistoricProcessInstance> getMyProcessInstancePage(Long userId,
-                                                                 @Valid BpmProcessInstanceMyPageReqVO pageReqVO);
+    PageResult<HistoricProcessInstance> getProcessInstancePage(Long userId,
+                                                               @Valid BpmProcessInstancePageReqVO pageReqVO);
 
     /**
      * 创建流程实例（提供给前端）
@@ -115,12 +115,20 @@ public interface BpmProcessInstanceService {
     String createProcessInstance(Long userId, @Valid BpmProcessInstanceCreateReqDTO createReqDTO);
 
     /**
-     * 取消流程实例
+     * 发起人取消流程实例
      *
      * @param userId      用户编号
      * @param cancelReqVO 取消信息
      */
-    void cancelProcessInstance(Long userId, @Valid BpmProcessInstanceCancelReqVO cancelReqVO);
+    void cancelProcessInstanceByStartUser(Long userId, @Valid BpmProcessInstanceCancelReqVO cancelReqVO);
+
+    /**
+     * 管理员取消流程实例
+     *
+     * @param userId           用户编号
+     * @param cancelReqVO 取消信息
+     */
+    void cancelProcessInstanceByAdmin(Long userId, BpmProcessInstanceCancelReqVO cancelReqVO);
 
     /**
      * 更新 ProcessInstance 拓展记录为取消

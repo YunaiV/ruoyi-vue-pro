@@ -4,7 +4,7 @@ import cn.hutool.core.collection.ListUtil;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.behavior.BpmActivityBehaviorFactory;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.candidate.BpmTaskCandidateInvoker;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.candidate.BpmTaskCandidateStrategy;
-import cn.iocoder.yudao.module.bpm.framework.flowable.core.event.BpmProcessInstanceResultEventPublisher;
+import cn.iocoder.yudao.module.bpm.framework.flowable.core.event.BpmProcessInstanceEventPublisher;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import org.flowable.common.engine.api.delegate.event.FlowableEventListener;
 import org.flowable.spring.SpringProcessEngineConfiguration;
@@ -84,8 +84,8 @@ public class BpmFlowableConfiguration {
     // =========== 自己拓展的 Bean ==========
 
     @Bean
-    public BpmProcessInstanceResultEventPublisher processInstanceResultEventPublisher(ApplicationEventPublisher publisher) {
-        return new BpmProcessInstanceResultEventPublisher(publisher);
+    public BpmProcessInstanceEventPublisher processInstanceEventPublisher(ApplicationEventPublisher publisher) {
+        return new BpmProcessInstanceEventPublisher(publisher);
     }
 
 }

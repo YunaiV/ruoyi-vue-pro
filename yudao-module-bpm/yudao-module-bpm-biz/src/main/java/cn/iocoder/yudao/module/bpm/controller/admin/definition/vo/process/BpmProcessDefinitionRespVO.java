@@ -3,8 +3,6 @@ package cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.process;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
-import jakarta.validation.constraints.NotEmpty;
-
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -19,8 +17,10 @@ public class BpmProcessDefinitionRespVO {
     private Integer version;
 
     @Schema(description = "流程名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "芋道")
-    @NotEmpty(message = "流程名称不能为空")
     private String name;
+
+    @Schema(description = "流程标识", requiredMode = Schema.RequiredMode.REQUIRED, example = "yudao")
+    private String key;
 
     @Schema(description = "流程描述", example = "我是描述")
     private String description;

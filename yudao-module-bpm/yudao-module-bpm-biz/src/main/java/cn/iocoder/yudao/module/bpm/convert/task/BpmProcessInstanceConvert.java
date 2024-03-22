@@ -36,10 +36,12 @@ public interface BpmProcessInstanceConvert {
 
     BpmProcessInstanceConvert INSTANCE = Mappers.getMapper(BpmProcessInstanceConvert.class);
 
-    default PageResult<BpmProcessInstanceRespVO> buildMyProcessInstancePage(PageResult<HistoricProcessInstance> pageResult,
-                                                                            Map<String, ProcessDefinition> processDefinitionMap,
-                                                                            Map<String, BpmCategoryDO> categoryMap,
-                                                                            Map<String, List<Task>> taskMap) {
+    default PageResult<BpmProcessInstanceRespVO> buildProcessInstancePage(PageResult<HistoricProcessInstance> pageResult,
+                                                                          Map<String, ProcessDefinition> processDefinitionMap,
+                                                                          Map<String, BpmCategoryDO> categoryMap,
+                                                                          Map<String, List<Task>> taskMap,
+                                                                          Map<Long, AdminUserRespDTO> userMap,
+                                                                          Map<Long, DeptRespDTO> deptMap) {
         PageResult<BpmProcessInstanceRespVO> vpPageResult = BeanUtils.toBean(pageResult, BpmProcessInstanceRespVO.class);
         for (int i = 0; i < pageResult.getList().size(); i++) {
             BpmProcessInstanceRespVO respVO = vpPageResult.getList().get(i);
@@ -48,6 +50,10 @@ public interface BpmProcessInstanceConvert {
                     processDefinition -> respVO.setCategory(processDefinition.getCategory()));
             MapUtils.findAndThen(categoryMap, respVO.getCategory(), category -> respVO.setCategoryName(category.getName()));
             respVO.setTasks(BeanUtils.toBean(taskMap.get(respVO.getId()), BpmProcessInstanceRespVO.Task.class));
+            // user
+            AdminUserRespDTO startUser = userMap.get(NumberUtils.parseLong(pageResult.getList().get(i).getStartUserId()));
+            respVO.setStartUser(BeanUtils.toBean(startUser, BpmProcessInstanceRespVO.User.class));
+            MapUtils.findAndThen(deptMap, startUser.getDeptId(), dept -> respVO.getStartUser().setDeptName(dept.getName()));
         }
         return vpPageResult;
     }

@@ -14,7 +14,7 @@ import jakarta.validation.Valid;
  */
 @AllArgsConstructor
 @Validated
-public class BpmProcessInstanceResultEventPublisher {
+public class BpmProcessInstanceEventPublisher {
 
     private final ApplicationEventPublisher publisher;
 
