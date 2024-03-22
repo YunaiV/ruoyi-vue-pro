@@ -59,8 +59,12 @@ public class BpmTaskController {
     @GetMapping("todo-page")
     @Operation(summary = "获取 Todo 待办任务分页")
     @PreAuthorize("@ss.hasPermission('bpm:task:query')")
-    public CommonResult<PageResult<BpmTaskRespVO>> getTodoTaskPage(@Valid BpmTaskPageReqVO pageVO) {
-        PageResult<Task> pageResult = taskService.getTodoTaskPage(getLoginUserId(), pageVO);
+    public CommonResult<PageResult<BpmTaskRespVO>> getTaskTodoPage(@Valid BpmTaskPageReqVO pageVO) {
+        PageResult<Task> pageResult = taskService.getTaskTodoPage(getLoginUserId(), pageVO);
+        if (CollUtil.isEmpty(pageResult.getList())) {
+            return success(PageResult.empty());
+        }
+
         // 拼接数据
         Map<String, ProcessInstance> processInstanceMap = processInstanceService.getProcessInstanceMap(
                 convertSet(pageResult.getList(), Task::getProcessInstanceId));
@@ -72,14 +76,39 @@ public class BpmTaskController {
     @GetMapping("done-page")
     @Operation(summary = "获取 Done 已办任务分页")
     @PreAuthorize("@ss.hasPermission('bpm:task:query')")
-    public CommonResult<PageResult<BpmTaskRespVO>> getDoneTaskPage(@Valid BpmTaskPageReqVO pageVO) {
-        PageResult<HistoricTaskInstance> pageResult = taskService.getDoneTaskPage(getLoginUserId(), pageVO);
+    public CommonResult<PageResult<BpmTaskRespVO>> getTaskDonePage(@Valid BpmTaskPageReqVO pageVO) {
+        PageResult<HistoricTaskInstance> pageResult = taskService.getTaskDonePage(getLoginUserId(), pageVO);
+        if (CollUtil.isEmpty(pageResult.getList())) {
+            return success(PageResult.empty());
+        }
+
         // 拼接数据
         Map<String, HistoricProcessInstance> processInstanceMap = processInstanceService.getHistoricProcessInstanceMap(
                 convertSet(pageResult.getList(), HistoricTaskInstance::getProcessInstanceId));
         Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(
                 convertSet(processInstanceMap.values(), instance -> Long.valueOf(instance.getStartUserId())));
-        return success(BpmTaskConvert.INSTANCE.buildDoneTaskPage(pageResult, processInstanceMap, userMap));
+        return success(BpmTaskConvert.INSTANCE.buildTaskPage(pageResult, processInstanceMap, userMap, null));
+    }
+
+    @GetMapping("manager-page")
+    @Operation(summary = "获取全部任务的分页", description = "用于【流程任务】菜单")
+    @PreAuthorize("@ss.hasPermission('bpm:task:mananger-query')")
+    public CommonResult<PageResult<BpmTaskRespVO>> getDoneTaskPage(@Valid BpmTaskPageReqVO pageVO) {
+        PageResult<HistoricTaskInstance> pageResult = taskService.getTaskPage(getLoginUserId(), pageVO);
+        if (CollUtil.isEmpty(pageResult.getList())) {
+            return success(PageResult.empty());
+        }
+
+        // 拼接数据
+        Map<String, HistoricProcessInstance> processInstanceMap = processInstanceService.getHistoricProcessInstanceMap(
+                convertSet(pageResult.getList(), HistoricTaskInstance::getProcessInstanceId));
+        // 获得 User 和 Dept Map
+        Set<Long> userIds = convertSet(processInstanceMap.values(), instance -> Long.valueOf(instance.getStartUserId()));
+        userIds.addAll(convertSet(pageResult.getList(), task -> NumberUtils.parseLong(task.getAssignee())));
+        Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(userIds);
+        Map<Long, DeptRespDTO> deptMap = deptApi.getDeptMap(
+                convertSet(userMap.values(), AdminUserRespDTO::getDeptId));
+        return success(BpmTaskConvert.INSTANCE.buildTaskPage(pageResult, processInstanceMap, userMap, deptMap));
     }
 
     @GetMapping("/list-by-process-instance-id")

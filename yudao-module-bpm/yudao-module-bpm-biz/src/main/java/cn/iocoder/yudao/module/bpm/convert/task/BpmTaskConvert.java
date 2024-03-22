@@ -52,12 +52,19 @@ public interface BpmTaskConvert {
         });
     }
 
-    default PageResult<BpmTaskRespVO> buildDoneTaskPage(PageResult<HistoricTaskInstance> pageResult,
-                                                        Map<String, HistoricProcessInstance> processInstanceMap,
-                                                        Map<Long, AdminUserRespDTO> userMap) {
+    default PageResult<BpmTaskRespVO> buildTaskPage(PageResult<HistoricTaskInstance> pageResult,
+                                                    Map<String, HistoricProcessInstance> processInstanceMap,
+                                                    Map<Long, AdminUserRespDTO> userMap,
+                                                    Map<Long, DeptRespDTO> deptMap) {
         List<BpmTaskRespVO> taskVOList = CollectionUtils.convertList(pageResult.getList(), task -> {
             BpmTaskRespVO taskVO = BeanUtils.toBean(task, BpmTaskRespVO.class);
             taskVO.setStatus(FlowableUtils.getTaskStatus(task)).setReason(FlowableUtils.getTaskReason(task));
+            // 用户信息
+            AdminUserRespDTO assignUser = userMap.get(NumberUtils.parseLong(task.getAssignee()));
+            if (assignUser != null) {
+                taskVO.setAssigneeUser(BeanUtils.toBean(assignUser, BpmProcessInstanceRespVO.User.class));
+                findAndThen(deptMap, assignUser.getDeptId(), dept -> taskVO.getAssigneeUser().setDeptName(dept.getName()));
+            }
             // 流程实例
             HistoricProcessInstance processInstance = processInstanceMap.get(taskVO.getProcessInstanceId());
             if (processInstance != null) {

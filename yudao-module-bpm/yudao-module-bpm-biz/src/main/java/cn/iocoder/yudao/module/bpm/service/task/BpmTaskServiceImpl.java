@@ -86,7 +86,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
     private AdminUserApi adminUserApi;
 
     @Override
-    public PageResult<Task> getTodoTaskPage(Long userId, BpmTaskPageReqVO pageVO) {
+    public PageResult<Task> getTaskTodoPage(Long userId, BpmTaskPageReqVO pageVO) {
         TaskQuery taskQuery = taskService.createTaskQuery()
                 .taskAssignee(String.valueOf(userId)) // 分配给自己
                 .active()
@@ -108,10 +108,31 @@ public class BpmTaskServiceImpl implements BpmTaskService {
     }
 
     @Override
-    public PageResult<HistoricTaskInstance> getDoneTaskPage(Long userId, BpmTaskPageReqVO pageVO) {
+    public PageResult<HistoricTaskInstance> getTaskDonePage(Long userId, BpmTaskPageReqVO pageVO) {
         HistoricTaskInstanceQuery taskQuery = historyService.createHistoricTaskInstanceQuery()
                 .finished() // 已完成
                 .taskAssignee(String.valueOf(userId)) // 分配给自己
+                .includeTaskLocalVariables()
+                .orderByHistoricTaskInstanceEndTime().desc(); // 审批时间倒序
+        if (StrUtil.isNotBlank(pageVO.getName())) {
+            taskQuery.taskNameLike("%" + pageVO.getName() + "%");
+        }
+        if (ArrayUtil.isNotEmpty(pageVO.getCreateTime())) {
+            taskQuery.taskCreatedAfter(DateUtils.of(pageVO.getCreateTime()[0]));
+            taskQuery.taskCreatedAfter(DateUtils.of(pageVO.getCreateTime()[1]));
+        }
+        // 执行查询
+        long count = taskQuery.count();
+        if (count == 0) {
+            return PageResult.empty();
+        }
+        List<HistoricTaskInstance> tasks = taskQuery.listPage(PageUtils.getStart(pageVO), pageVO.getPageSize());
+        return new PageResult<>(tasks, count);
+    }
+
+    @Override
+    public PageResult<HistoricTaskInstance> getTaskPage(Long userId, BpmTaskPageReqVO pageVO) {
+        HistoricTaskInstanceQuery taskQuery = historyService.createHistoricTaskInstanceQuery()
                 .includeTaskLocalVariables()
                 .orderByHistoricTaskInstanceEndTime().desc(); // 审批时间倒序
         if (StrUtil.isNotBlank(pageVO.getName())) {

@@ -27,7 +27,7 @@ public interface BpmTaskService {
      * @param pageReqVO 分页请求
      * @return 流程任务分页
      */
-    PageResult<Task> getTodoTaskPage(Long userId, BpmTaskPageReqVO pageReqVO);
+    PageResult<Task> getTaskTodoPage(Long userId, BpmTaskPageReqVO pageReqVO);
 
     /**
      * 获得已办的流程任务分页
@@ -36,7 +36,16 @@ public interface BpmTaskService {
      * @param pageReqVO 分页请求
      * @return 流程任务分页
      */
-    PageResult<HistoricTaskInstance> getDoneTaskPage(Long userId, BpmTaskPageReqVO pageReqVO);
+    PageResult<HistoricTaskInstance> getTaskDonePage(Long userId, BpmTaskPageReqVO pageReqVO);
+
+    /**
+     * 获得全部的流程任务分页
+     *
+     * @param userId    用户编号
+     * @param pageReqVO 分页请求
+     * @return 流程任务分页
+     */
+    PageResult<HistoricTaskInstance> getTaskPage(Long userId, BpmTaskPageReqVO pageReqVO);
 
     /**
      * 获得流程任务 Map
