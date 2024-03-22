@@ -19,10 +19,10 @@ import java.util.Set;
 public class BpmTaskAssignStartUserExpression {
 
     @Resource
-    private BpmProcessInstanceService bpmProcessInstanceService;
+    private BpmProcessInstanceService processInstanceService;
 
     public Set<Long> calculateUsers(DelegateExecution execution) {
-        ProcessInstance processInstance = bpmProcessInstanceService.getProcessInstance(execution.getProcessInstanceId());
+        ProcessInstance processInstance = processInstanceService.getProcessInstance(execution.getProcessInstanceId());
         Long startUserId = NumberUtils.parseLong(processInstance.getStartUserId());
         return SetUtils.asSet(startUserId);
     }

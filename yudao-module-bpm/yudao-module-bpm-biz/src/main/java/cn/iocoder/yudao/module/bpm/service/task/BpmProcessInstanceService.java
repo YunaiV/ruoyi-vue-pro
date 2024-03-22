@@ -50,17 +50,6 @@ public interface BpmProcessInstanceService {
     }
 
     /**
-     * 获得流程实例名字 Map
-     *
-     * @param ids 流程实例的编号集合
-     * @return 对应的映射关系
-     */
-    default Map<String, String> getProcessInstanceNameMap(Set<String> ids) {
-        return convertMap(getProcessInstances(ids),
-                ProcessInstance::getProcessInstanceId, ProcessInstance::getName);
-    }
-
-    /**
      * 获得历史的流程实例
      *
      * @param id 流程实例的编号
@@ -151,15 +140,5 @@ public interface BpmProcessInstanceService {
      * @param reason 理由。例如说，审批不通过时，需要传递该值
      */
     void updateProcessInstanceReject(String id, String reason);
-
-    // TODO @hai：改成 getProcessInstanceAssigneesByTaskDefinitionKey(String id, String taskDefinitionKey)
-    /**
-     * 获取流程实例中，取出指定流程任务提前指定的审批人
-     *
-     * @param processInstanceId 流程实例的编号
-     * @param taskDefinitionKey 流程任务定义的 key
-     * @return 审批人集合
-     */
-    List<Long> getAssigneeByProcessInstanceIdAndTaskDefinitionKey(String processInstanceId, String taskDefinitionKey);
 
 }

@@ -12,6 +12,7 @@ import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.task.api.TaskInfo;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -79,7 +80,7 @@ public class FlowableUtils {
      * @param processInstance 流程实例
      * @return 表单
      */
-    public static Map<String, Object> getProcessInstanceFormVariable(ProcessInstance processInstance) {
+    public static Map<String, Object> getProcessInstanceFormVariable(HistoricProcessInstance processInstance) {
         Map<String, Object> formVariables = new HashMap<>(processInstance.getProcessVariables());
         filterProcessInstanceFormVariable(formVariables);
         return formVariables;
@@ -96,6 +97,18 @@ public class FlowableUtils {
     public static Map<String, Object> filterProcessInstanceFormVariable(Map<String, Object> processVariables) {
         processVariables.remove(BpmConstants.PROCESS_INSTANCE_VARIABLE_STATUS);
         return processVariables;
+    }
+
+    /**
+     * 获得流程实例的发起用户选择的审批人 Map
+     *
+     * @param processInstance 流程实例
+     * @return 发起用户选择的审批人 Map
+     */
+    @SuppressWarnings("unchecked")
+    public static Map<String, List<Long>> getStartUserSelectAssignees(ProcessInstance processInstance) {
+        return (Map<String, List<Long>>) processInstance.getProcessVariables().get(
+                BpmConstants.PROCESS_INSTANCE_VARIABLE_START_USER_SELECT_ASSIGNEES);
     }
 
     // ========== Task 相关的工具方法 ==========

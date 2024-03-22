@@ -33,7 +33,7 @@ public class BpmFormServiceImpl implements BpmFormService {
 
     @Override
     public Long createForm(BpmFormSaveReqVO createReqVO) {
-        this.vadateFields(createReqVO.getFields());
+        this.validateFields(createReqVO.getFields());
         // 插入
         BpmFormDO form = BeanUtils.toBean(createReqVO, BpmFormDO.class);
         formMapper.insert(form);
@@ -43,7 +43,7 @@ public class BpmFormServiceImpl implements BpmFormService {
 
     @Override
     public void updateForm(BpmFormSaveReqVO updateReqVO) {
-        vadateFields(updateReqVO.getFields());
+        validateFields(updateReqVO.getFields());
         // 校验存在
         validateFormExists(updateReqVO.getId());
         // 更新
@@ -93,7 +93,7 @@ public class BpmFormServiceImpl implements BpmFormService {
      *
      * @param fields field 数组
      */
-    private void vadateFields(List<String> fields) {
+    private void validateFields(List<String> fields) {
         if (true) { // TODO 芋艿：兼容 Vue3 工作流：因为采用了新的表单设计器，所以暂时不校验
             return;
         }

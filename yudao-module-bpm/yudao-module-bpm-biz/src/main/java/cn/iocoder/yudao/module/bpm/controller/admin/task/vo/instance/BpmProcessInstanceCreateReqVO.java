@@ -18,8 +18,7 @@ public class BpmProcessInstanceCreateReqVO {
     @Schema(description = "变量实例（动态表单）")
     private Map<String, Object> variables;
 
-    // TODO @hai：assignees 复数
-    @Schema(description = "提前指派的审批人", requiredMode = Schema.RequiredMode.REQUIRED, example = "{taskKey1: [1, 2]}")
-    private Map<String, List<Long>> assignee;
+    @Schema(description = "发起人自选审批人 Map", example = "{taskKey1: [1, 2]}")
+    private Map<String, List<Long>> startUserSelectAssignees;
 
 }

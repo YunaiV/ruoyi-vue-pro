@@ -4,12 +4,14 @@ import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.hutool.core.map.MapUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
-import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.process.BpmProcessDefinitionRespVO;
 import cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmCategoryDO;
 import cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmFormDO;
 import cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmProcessDefinitionInfoDO;
+import cn.iocoder.yudao.module.bpm.framework.flowable.core.util.BpmnModelUtils;
+import org.flowable.bpmn.model.BpmnModel;
+import org.flowable.bpmn.model.UserTask;
 import org.flowable.common.engine.impl.db.SuspensionState;
 import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.repository.ProcessDefinition;
@@ -47,25 +49,48 @@ public interface BpmProcessDefinitionConvert {
                                                                         Map<Long, BpmFormDO> formMap,
                                                                         Map<String, BpmCategoryDO> categoryMap) {
         return CollectionUtils.convertList(list, definition -> {
-            BpmProcessDefinitionRespVO respVO = BeanUtils.toBean(definition, BpmProcessDefinitionRespVO.class);
-            respVO.setSuspensionState(definition.isSuspended() ? SuspensionState.SUSPENDED.getStateCode() : SuspensionState.ACTIVE.getStateCode());
-            // Deployment
-            MapUtils.findAndThen(deploymentMap, definition.getDeploymentId(),
-                    deployment -> respVO.setDeploymentTime(LocalDateTimeUtil.of(deployment.getDeploymentTime())));
-            // BpmProcessDefinitionInfoDO
+            Deployment deployment = MapUtil.get(deploymentMap, definition.getDeploymentId(), Deployment.class);
             BpmProcessDefinitionInfoDO processDefinitionInfo = MapUtil.get(processDefinitionInfoMap, definition.getId(), BpmProcessDefinitionInfoDO.class);
+            BpmFormDO form = null;
             if (processDefinitionInfo != null) {
-                copyTo(processDefinitionInfo, respVO);
-                // Form
-                BpmFormDO form = MapUtil.get(formMap, processDefinitionInfo.getFormId(), BpmFormDO.class);
-                if (form != null) {
-                    respVO.setFormName(form.getName());
-                }
+                form = MapUtil.get(formMap, processDefinitionInfo.getFormId(), BpmFormDO.class);
             }
-            // Category
-            MapUtils.findAndThen(categoryMap, definition.getCategory(), category -> respVO.setCategoryName(category.getName()));
-            return respVO;
+            BpmCategoryDO category = MapUtil.get(categoryMap, definition.getCategory(), BpmCategoryDO.class);
+            return buildProcessDefinition(definition, deployment, processDefinitionInfo, form, category, null, null);
         });
+    }
+
+    default BpmProcessDefinitionRespVO buildProcessDefinition(ProcessDefinition definition,
+                                                              Deployment deployment,
+                                                              BpmProcessDefinitionInfoDO processDefinitionInfo,
+                                                              BpmFormDO form,
+                                                              BpmCategoryDO category,
+                                                              BpmnModel bpmnModel,
+                                                              List<UserTask> startUserSelectUserTaskList) {
+        BpmProcessDefinitionRespVO respVO = BeanUtils.toBean(definition, BpmProcessDefinitionRespVO.class);
+        respVO.setSuspensionState(definition.isSuspended() ? SuspensionState.SUSPENDED.getStateCode() : SuspensionState.ACTIVE.getStateCode());
+        // Deployment
+        if (deployment != null) {
+            respVO.setDeploymentTime(LocalDateTimeUtil.of(deployment.getDeploymentTime()));
+        }
+        // BpmProcessDefinitionInfoDO
+        if (processDefinitionInfo != null) {
+            copyTo(processDefinitionInfo, respVO);
+            // Form
+            if (form != null) {
+                respVO.setFormName(form.getName());
+            }
+        }
+        // Category
+        if (category != null) {
+            respVO.setCategoryName(category.getName());
+        }
+        // BpmnModel
+        if (bpmnModel != null) {
+            respVO.setBpmnXml(BpmnModelUtils.getBpmnXml(bpmnModel));
+            respVO.setStartUserSelectTasks(BeanUtils.toBean(startUserSelectUserTaskList, BpmProcessDefinitionRespVO.UserTask.class));
+        }
+        return respVO;
     }
 
     @Mapping(source = "from.id", target = "to.id", ignore = true)

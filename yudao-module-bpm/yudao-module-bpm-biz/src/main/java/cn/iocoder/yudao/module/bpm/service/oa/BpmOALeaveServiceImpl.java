@@ -56,7 +56,8 @@ public class BpmOALeaveServiceImpl implements BpmOALeaveService {
         processInstanceVariables.put("day", day);
         String processInstanceId = processInstanceApi.createProcessInstance(userId,
                 new BpmProcessInstanceCreateReqDTO().setProcessDefinitionKey(PROCESS_KEY)
-                        .setVariables(processInstanceVariables).setBusinessKey(String.valueOf(leave.getId())));
+                        .setVariables(processInstanceVariables).setBusinessKey(String.valueOf(leave.getId()))
+                        .setStartUserSelectAssignees(createReqVO.getStartUserSelectAssignees()));
 
         // 将工作流的编号，更新到 OA 请假单中
         leaveMapper.updateById(new BpmOALeaveDO().setId(leave.getId()).setProcessInstanceId(processInstanceId));

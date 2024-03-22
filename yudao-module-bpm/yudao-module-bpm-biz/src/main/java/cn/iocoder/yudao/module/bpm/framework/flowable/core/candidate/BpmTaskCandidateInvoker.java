@@ -4,16 +4,13 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
-import cn.iocoder.yudao.framework.common.util.number.NumberUtils;
-import cn.iocoder.yudao.module.bpm.framework.flowable.core.util.BpmnModelUtils;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmTaskCandidateStrategyEnum;
-import cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnModelConstants;
+import cn.iocoder.yudao.module.bpm.framework.flowable.core.util.BpmnModelUtils;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import com.google.common.annotations.VisibleForTesting;
 import lombok.extern.slf4j.Slf4j;
 import org.flowable.bpmn.model.BpmnModel;
-import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.UserTask;
 import org.flowable.engine.delegate.DelegateExecution;
 
@@ -60,9 +57,13 @@ public class BpmTaskCandidateInvoker {
         // 遍历所有的 UserTask，校验审批人配置
         userTaskList.forEach(userTask -> {
             // 1. 非空校验
-            Integer strategy = parseCandidateStrategy(userTask);
-            String param = parseCandidateParam(userTask);
-            if (strategy == null || StrUtil.isBlank(param)) {
+            Integer strategy = BpmnModelUtils.parseCandidateStrategy(userTask);
+            String param = BpmnModelUtils.parseCandidateParam(userTask);
+            if (strategy == null) {
+                throw exception(MODEL_DEPLOY_FAIL_TASK_CANDIDATE_NOT_CONFIG, userTask.getName());
+            }
+            BpmTaskCandidateStrategy candidateStrategy = getCandidateStrategy(strategy);
+            if (candidateStrategy.isParamRequired() && StrUtil.isBlank(param)) {
                 throw exception(MODEL_DEPLOY_FAIL_TASK_CANDIDATE_NOT_CONFIG, userTask.getName());
             }
             // 2. 具体策略校验
@@ -77,16 +78,8 @@ public class BpmTaskCandidateInvoker {
      * @return 用户编号集合
      */
     public Set<Long> calculateUsers(DelegateExecution execution) {
-        // TODO 芋艿：这里需要重构
-//        // 1. 先从提前选好的审批人中获取
-//        List<Long> assignee = processInstanceService.getAssigneeByProcessInstanceIdAndTaskDefinitionKey(
-//                execution.getProcessInstanceId(), execution.getCurrentActivityId());
-//        if (CollUtil.isNotEmpty(assignee)) {
-//            // TODO @hai：new HashSet 即可
-//            return convertSet(assignee, Function.identity());
-//        }
-        Integer strategy = parseCandidateStrategy(execution.getCurrentFlowElement());
-        String param = parseCandidateParam(execution.getCurrentFlowElement());
+        Integer strategy = BpmnModelUtils.parseCandidateStrategy(execution.getCurrentFlowElement());
+        String param = BpmnModelUtils.parseCandidateParam(execution.getCurrentFlowElement());
         // 1.1 计算任务的候选人
         Set<Long> userIds = getCandidateStrategy(strategy).calculateUsers(execution, param);
         // 1.2 移除被禁用的用户
@@ -111,16 +104,6 @@ public class BpmTaskCandidateInvoker {
             AdminUserRespDTO user = userMap.get(id);
             return user == null || !CommonStatusEnum.ENABLE.getStatus().equals(user.getStatus());
         });
-    }
-
-    private static Integer parseCandidateStrategy(FlowElement userTask) {
-        return NumberUtils.parseInt(userTask.getAttributeValue(
-                BpmnModelConstants.NAMESPACE, BpmnModelConstants.USER_TASK_CANDIDATE_STRATEGY));
-    }
-
-    private static String parseCandidateParam(FlowElement userTask) {
-        return userTask.getAttributeValue(
-                BpmnModelConstants.NAMESPACE, BpmnModelConstants.USER_TASK_CANDIDATE_PARAM);
     }
 
     private BpmTaskCandidateStrategy getCandidateStrategy(Integer strategy) {

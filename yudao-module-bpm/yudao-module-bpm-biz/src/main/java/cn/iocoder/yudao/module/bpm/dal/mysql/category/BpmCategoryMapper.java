@@ -21,7 +21,7 @@ public interface BpmCategoryMapper extends BaseMapperX<BpmCategoryDO> {
     default PageResult<BpmCategoryDO> selectPage(BpmCategoryPageReqVO reqVO) {
         return selectPage(reqVO, new LambdaQueryWrapperX<BpmCategoryDO>()
                 .likeIfPresent(BpmCategoryDO::getName, reqVO.getName())
-                .eqIfPresent(BpmCategoryDO::getCode, reqVO.getCode())
+                .likeIfPresent(BpmCategoryDO::getCode, reqVO.getCode())
                 .eqIfPresent(BpmCategoryDO::getStatus, reqVO.getStatus())
                 .betweenIfPresent(BpmCategoryDO::getCreateTime, reqVO.getCreateTime())
                 .orderByAsc(BpmCategoryDO::getSort));

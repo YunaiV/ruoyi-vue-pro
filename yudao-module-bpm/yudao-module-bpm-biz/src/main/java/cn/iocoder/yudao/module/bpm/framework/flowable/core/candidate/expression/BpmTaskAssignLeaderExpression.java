@@ -32,12 +32,12 @@ public class BpmTaskAssignLeaderExpression {
     private DeptApi deptApi;
 
     @Resource
-    private BpmProcessInstanceService bpmProcessInstanceService;
+    private BpmProcessInstanceService processInstanceService;
 
     protected Set<Long> calculateUsers(DelegateExecution execution, int level) {
         Assert.isTrue(level > 0, "level 必须大于 0");
         // 获得发起人
-        ProcessInstance processInstance = bpmProcessInstanceService.getProcessInstance(execution.getProcessInstanceId());
+        ProcessInstance processInstance = processInstanceService.getProcessInstance(execution.getProcessInstanceId());
         Long startUserId = NumberUtils.parseLong(processInstance.getStartUserId());
         // 获得对应 leve 的部门
         DeptRespDTO dept = null;

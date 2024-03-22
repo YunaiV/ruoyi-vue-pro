@@ -7,6 +7,8 @@ import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Map;
 
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
@@ -29,6 +31,9 @@ public class BpmOALeaveCreateReqVO {
 
     @Schema(description = "原因", requiredMode = Schema.RequiredMode.REQUIRED, example = "阅读芋道源码")
     private String reason;
+
+    @Schema(description = "发起人自选审批人 Map", example = "{taskKey1: [1, 2]}")
+    private Map<String, List<Long>> startUserSelectAssignees;
 
     @AssertTrue(message = "结束时间，需要在开始时间之后")
     public boolean isEndTimeValid() {

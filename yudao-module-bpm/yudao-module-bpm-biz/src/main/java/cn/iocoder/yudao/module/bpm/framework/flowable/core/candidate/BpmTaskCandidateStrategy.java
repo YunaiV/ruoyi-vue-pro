@@ -36,4 +36,13 @@ public interface BpmTaskCandidateStrategy {
      */
     Set<Long> calculateUsers(DelegateExecution execution, String param);
 
+    /**
+     * 是否一定要输入参数
+     *
+     * @return 是否
+     */
+    default boolean isParamRequired() {
+        return true;
+    }
+
 }

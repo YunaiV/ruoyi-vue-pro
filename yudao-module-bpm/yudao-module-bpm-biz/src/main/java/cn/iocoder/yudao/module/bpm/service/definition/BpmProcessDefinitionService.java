@@ -5,6 +5,7 @@ import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.process.BpmPro
 import cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmFormDO;
 import cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmProcessDefinitionInfoDO;
 import cn.iocoder.yudao.module.bpm.service.definition.dto.BpmModelMetaInfoRespDTO;
+import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.repository.Model;
 import org.flowable.engine.repository.ProcessDefinition;
@@ -61,12 +62,12 @@ public interface BpmProcessDefinitionService {
     void updateProcessDefinitionState(String id, Integer state);
 
     /**
-     * 获得流程定义对应的 BPMN XML
+     * 获得流程定义对应的 BPMN
      *
      * @param id 流程定义编号
-     * @return BPMN XML
+     * @return BPMN
      */
-    String getProcessDefinitionBpmnXML(String id);
+    BpmnModel getProcessDefinitionBpmnModel(String id);
 
     /**
      * 获得流程定义的信息
@@ -89,9 +90,9 @@ public interface BpmProcessDefinitionService {
     }
 
     /**
-     * 获得编号对应的 ProcessDefinition
+     * 获得流程定义编号对应的 ProcessDefinition
      *
-     * @param id 编号
+     * @param id 流程定义编号
      * @return 流程定义
      */
     ProcessDefinition getProcessDefinition(String id);
@@ -139,7 +140,7 @@ public interface BpmProcessDefinitionService {
      * @return 流程部署 Map
      */
     default Map<String, Deployment> getDeploymentMap(Set<String> ids) {
-        return convertMap(getDeployments(ids), Deployment::getId);
+        return convertMap(getDeploymentList(ids), Deployment::getId);
     }
 
     /**
@@ -148,7 +149,7 @@ public interface BpmProcessDefinitionService {
      * @param ids 部署编号的数组
      * @return 流程部署的数组
      */
-    List<Deployment> getDeployments(Set<String> ids);
+    List<Deployment> getDeploymentList(Set<String> ids);
 
     /**
      * 获得 id 对应的 Deployment

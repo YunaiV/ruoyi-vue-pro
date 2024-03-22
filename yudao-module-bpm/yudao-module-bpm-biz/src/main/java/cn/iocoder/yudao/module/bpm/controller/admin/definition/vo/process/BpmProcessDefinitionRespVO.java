@@ -48,12 +48,27 @@ public class BpmProcessDefinitionRespVO {
     private String formCustomViewPath;
 
     @Schema(description = "中断状态-参见 SuspensionState 枚举", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
-    private Integer suspensionState;
+    private Integer suspensionState; // 参见 SuspensionState 枚举
 
     @Schema(description = "部署时间")
     private LocalDateTime deploymentTime; // 需要从对应的 Deployment 读取，非必须返回
 
     @Schema(description = "BPMN XML")
     private String bpmnXml; // 需要从对应的 BpmnModel 读取，非必须返回
+
+    @Schema(description = "发起用户需要选择审批人的任务数组")
+    private List<UserTask> startUserSelectTasks; // 需要从对应的 BpmnModel 读取，非必须返回
+
+    @Schema(description = "BPMN UserTask 用户任务")
+    @Data
+    public static class UserTask {
+
+        @Schema(description = "任务标识", requiredMode = Schema.RequiredMode.REQUIRED, example = "sudo")
+        private String id;
+
+        @Schema(description = "任务名", requiredMode = Schema.RequiredMode.REQUIRED, example = "王五")
+        private String name;
+
+    }
 
 }

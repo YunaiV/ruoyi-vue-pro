@@ -2,6 +2,8 @@ package cn.iocoder.yudao.module.bpm.framework.flowable.core.util;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ArrayUtil;
+import cn.iocoder.yudao.framework.common.util.number.NumberUtils;
+import cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnModelConstants;
 import org.flowable.bpmn.converter.BpmnXMLConverter;
 import org.flowable.bpmn.model.Process;
 import org.flowable.bpmn.model.*;
@@ -13,6 +15,16 @@ import java.util.*;
  * 流程模型转操作工具类
  */
 public class BpmnModelUtils {
+
+    public static Integer parseCandidateStrategy(FlowElement userTask) {
+        return NumberUtils.parseInt(userTask.getAttributeValue(
+                BpmnModelConstants.NAMESPACE, BpmnModelConstants.USER_TASK_CANDIDATE_STRATEGY));
+    }
+
+    public static String parseCandidateParam(FlowElement userTask) {
+        return userTask.getAttributeValue(
+                BpmnModelConstants.NAMESPACE, BpmnModelConstants.USER_TASK_CANDIDATE_PARAM);
+    }
 
     /**
      * 根据节点，获取入口连线
@@ -89,6 +101,14 @@ public class BpmnModelUtils {
         BpmnXMLConverter converter = new BpmnXMLConverter();
         // 补充说明：由于在 Flowable 中自定义了属性，所以 validateSchema 传递 false
         return converter.convertToBpmnModel(new BytesStreamSource(bpmnBytes), false, false);
+    }
+
+    public static String getBpmnXml(BpmnModel model) {
+        if (model == null) {
+            return null;
+        }
+        BpmnXMLConverter converter = new BpmnXMLConverter();
+        return new String(converter.convertToXML(model));
     }
 
     // ========== 遍历相关的方法 ==========

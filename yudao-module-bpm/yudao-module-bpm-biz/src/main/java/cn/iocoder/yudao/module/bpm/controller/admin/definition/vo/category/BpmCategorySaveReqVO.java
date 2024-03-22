@@ -18,6 +18,9 @@ public class BpmCategorySaveReqVO {
     @NotEmpty(message = "分类名不能为空")
     private String name;
 
+    @Schema(description = "分类描述", example = "你猜")
+    private String description;
+
     @Schema(description = "分类标志", requiredMode = Schema.RequiredMode.REQUIRED, example = "OA")
     @NotEmpty(message = "分类标志不能为空")
     private String code;

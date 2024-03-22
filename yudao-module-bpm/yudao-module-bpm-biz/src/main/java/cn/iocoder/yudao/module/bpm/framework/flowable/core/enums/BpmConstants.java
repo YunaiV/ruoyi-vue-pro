@@ -15,6 +15,12 @@ public class BpmConstants {
      * @see ProcessInstance#getProcessVariables()
      */
     public static final String PROCESS_INSTANCE_VARIABLE_STATUS = "PROCESS_STATUS";
+    /**
+     * 流程实例的变量 - 发起用户选择的审批人 Map
+     *
+     * @see ProcessInstance#getProcessVariables()
+     */
+    public static final String PROCESS_INSTANCE_VARIABLE_START_USER_SELECT_ASSIGNEES = "PROCESS_START_USER_SELECT_ASSIGNEES";
 
     /**
      * 任务的变量 - 状态

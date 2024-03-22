@@ -30,8 +30,9 @@ public class BpmTaskAssignLeaderExpressionTest extends BaseMockitoUnitTest {
     private AdminUserApi adminUserApi;
     @Mock
     private DeptApi deptApi;
+
     @Mock
-    private BpmProcessInstanceService bpmProcessInstanceService;
+    private BpmProcessInstanceService processInstanceService;
 
     @Test
     public void testCalculateUsers_noDept() {
@@ -96,7 +97,7 @@ public class BpmTaskAssignLeaderExpressionTest extends BaseMockitoUnitTest {
         // mock 返回 startUserId
         ExecutionEntityImpl processInstance = new ExecutionEntityImpl();
         processInstance.setStartUserId(String.valueOf(startUserId));
-        when(bpmProcessInstanceService.getProcessInstance(eq(execution.getProcessInstanceId())))
+        when(processInstanceService.getProcessInstance(eq(execution.getProcessInstanceId())))
                 .thenReturn(processInstance);
         return execution;
     }
