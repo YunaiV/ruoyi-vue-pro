@@ -34,7 +34,7 @@ public class BpmTaskAssignLeaderExpression {
     @Resource
     private BpmProcessInstanceService processInstanceService;
 
-    protected Set<Long> calculateUsers(DelegateExecution execution, int level) {
+    public Set<Long> calculateUsers(DelegateExecution execution, int level) {
         Assert.isTrue(level > 0, "level 必须大于 0");
         // 获得发起人
         ProcessInstance processInstance = processInstanceService.getProcessInstance(execution.getProcessInstanceId());

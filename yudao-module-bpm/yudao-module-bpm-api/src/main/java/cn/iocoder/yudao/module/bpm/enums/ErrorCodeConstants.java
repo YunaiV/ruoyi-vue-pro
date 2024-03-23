@@ -72,4 +72,7 @@ public interface ErrorCodeConstants {
     ErrorCode PROCESS_LISTENER_CLASS_IMPLEMENTS_ERROR = new ErrorCode(1_009_013_002, "流程监听器类({})没有实现接口({})");
     ErrorCode PROCESS_LISTENER_EXPRESSION_INVALID = new ErrorCode(1_009_013_003, "流程监听器表达式({})不合法");
 
+    // ========== BPM 流程表达式 1-009-014-000 ==========
+    ErrorCode PROCESS_EXPRESSION_NOT_EXISTS = new ErrorCode(1_009_014_000, "流程表达式不存在");
+
 }
