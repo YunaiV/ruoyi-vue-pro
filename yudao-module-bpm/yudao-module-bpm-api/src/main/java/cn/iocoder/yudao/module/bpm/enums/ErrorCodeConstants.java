@@ -66,4 +66,10 @@ public interface ErrorCodeConstants {
     ErrorCode CATEGORY_NAME_DUPLICATE = new ErrorCode(1_009_012_001, "流程分类名字【{}】重复");
     ErrorCode CATEGORY_CODE_DUPLICATE = new ErrorCode(1_009_012_002, "流程分类编码【{}】重复");
 
+    // ========== BPM 流程监听器 1-009-013-000 ==========
+    ErrorCode PROCESS_LISTENER_NOT_EXISTS = new ErrorCode(1_009_013_000, "流程监听器不存在");
+    ErrorCode PROCESS_LISTENER_CLASS_NOT_FOUND = new ErrorCode(1_009_013_001, "流程监听器类({})不存在");
+    ErrorCode PROCESS_LISTENER_CLASS_IMPLEMENTS_ERROR = new ErrorCode(1_009_013_002, "流程监听器类({})没有实现接口({})");
+    ErrorCode PROCESS_LISTENER_EXPRESSION_INVALID = new ErrorCode(1_009_013_003, "流程监听器表达式({})不合法");
+
 }

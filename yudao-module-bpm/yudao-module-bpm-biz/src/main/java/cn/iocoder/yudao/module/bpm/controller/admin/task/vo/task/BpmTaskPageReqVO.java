@@ -12,8 +12,6 @@ import java.time.LocalDateTime;
 
 @Schema(description = "管理后台 - 流程任务的的分页 Request VO") // 待办、已办，都使用该分页
 @Data
-@EqualsAndHashCode(callSuper = true)
-@ToString(callSuper = true)
 public class BpmTaskPageReqVO extends PageParam {
 
     @Schema(description = "流程任务名", example = "芋道")

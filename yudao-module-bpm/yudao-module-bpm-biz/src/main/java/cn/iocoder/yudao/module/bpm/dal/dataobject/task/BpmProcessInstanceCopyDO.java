@@ -13,8 +13,6 @@ import lombok.*;
  */
 @TableName(value = "bpm_process_instance_copy", autoResultMap = true)
 @Data
-@EqualsAndHashCode(callSuper = true)
-@ToString(callSuper = true)
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor

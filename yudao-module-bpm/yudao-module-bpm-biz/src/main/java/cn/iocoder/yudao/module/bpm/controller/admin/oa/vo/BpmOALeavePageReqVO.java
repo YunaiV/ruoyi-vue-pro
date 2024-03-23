@@ -13,8 +13,6 @@ import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_
 
 @Schema(description = "管理后台 - 请假申请分页 Request VO")
 @Data
-@EqualsAndHashCode(callSuper = true)
-@ToString(callSuper = true)
 public class BpmOALeavePageReqVO extends PageParam {
 
     @Schema(description = "状态", example = "1")

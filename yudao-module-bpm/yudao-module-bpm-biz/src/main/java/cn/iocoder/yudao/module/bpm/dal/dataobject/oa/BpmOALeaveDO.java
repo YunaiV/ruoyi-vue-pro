@@ -18,8 +18,6 @@ import java.time.LocalDateTime;
  */
 @TableName("bpm_oa_leave")
 @Data
-@EqualsAndHashCode(callSuper = true)
-@ToString(callSuper = true)
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
