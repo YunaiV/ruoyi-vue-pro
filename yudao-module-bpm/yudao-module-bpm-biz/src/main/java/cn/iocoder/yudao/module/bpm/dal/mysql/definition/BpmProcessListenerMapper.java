@@ -20,6 +20,7 @@ public interface BpmProcessListenerMapper extends BaseMapperX<BpmProcessListener
                 .likeIfPresent(BpmProcessListenerDO::getName, reqVO.getName())
                 .eqIfPresent(BpmProcessListenerDO::getType, reqVO.getType())
                 .eqIfPresent(BpmProcessListenerDO::getEvent, reqVO.getEvent())
+                .eqIfPresent(BpmProcessListenerDO::getStatus, reqVO.getStatus())
                 .orderByDesc(BpmProcessListenerDO::getId));
     }
 

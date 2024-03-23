@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @Slf4j
-public class DemoDelegateClassExecutionListener implements TaskListener {
+public class DemoDelegateClassTaskListener implements TaskListener {
 
     @Override
     public void notify(DelegateTask delegateTask) {
