@@ -2,6 +2,7 @@ package cn.iocoder.yudao.framework.ai.imageopenai;
 
 import cn.iocoder.yudao.framework.ai.image.ImageOptions;
 import lombok.Data;
+import lombok.Getter;
 import lombok.experimental.Accessors;
 
 /**
@@ -46,6 +47,21 @@ public class OpenAiImageOptions implements ImageOptions {
     // 可选字段
     // 代表您的终端用户的唯一标识符，有助于OpenAI监控并检测滥用行为。了解更多信息请参考官方文档。
     private String endUserId;
+
+    @Getter
+    public enum ResponseFormatEnum {
+
+        URL("url"),
+        BASE64("b64_json"),
+
+        ;
+
+        ResponseFormatEnum(String value) {
+            this.value = value;
+        }
+
+        private String value;
+    }
 
     //
     // 适配 spring ai

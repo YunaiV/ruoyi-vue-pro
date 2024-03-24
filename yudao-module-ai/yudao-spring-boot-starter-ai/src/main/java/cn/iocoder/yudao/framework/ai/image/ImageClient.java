@@ -19,7 +19,6 @@ package cn.iocoder.yudao.framework.ai.image;
 
 import cn.iocoder.yudao.framework.ai.model.ModelClient;
 
-@FunctionalInterface
 public interface ImageClient extends ModelClient<ImagePrompt, ImageResponse> {
 
 	/**

@@ -23,6 +23,7 @@ public class OpenAiImageResponse {
     public static class Item {
 
         private String url;
+        private String b64_json;
 
     }
 }
