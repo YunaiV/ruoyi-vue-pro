@@ -6,6 +6,9 @@ import cn.hutool.core.util.ObjUtil;
 import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
 import cn.iocoder.yudao.framework.common.util.number.NumberUtils;
 import cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.customer.*;
+import cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.customer.analyze.CrmStatisticCustomerIndustryRespVO;
+import cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.customer.analyze.CrmStatisticCustomerLevelRespVO;
+import cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.customer.analyze.CrmStatisticCustomerSourceRespVO;
 import cn.iocoder.yudao.module.crm.dal.mysql.statistics.CrmStatisticsCustomerMapper;
 import cn.iocoder.yudao.module.crm.enums.common.CrmBizTypeEnum;
 import cn.iocoder.yudao.module.system.api.dept.DeptApi;
@@ -78,15 +81,15 @@ public class CrmStatisticsCustomerServiceImpl implements CrmStatisticsCustomerSe
         // TODO @dhb52：这个是不是要 add 到 respVoList 里？或者还可以 convertList(times, time -> new CrmStatisticsCustomerDealCycleByDateRespVO()...)
         List<CrmStatisticsCustomerSummaryByDateRespVO> respVoList = new ArrayList<>(times.size());
         final Map<String, Integer> customerCreateCountMap = convertMap(customerCreateCount,
-            CrmStatisticsCustomerSummaryByDateRespVO::getTime,
-            CrmStatisticsCustomerSummaryByDateRespVO::getCustomerCreateCount);
+                CrmStatisticsCustomerSummaryByDateRespVO::getTime,
+                CrmStatisticsCustomerSummaryByDateRespVO::getCustomerCreateCount);
         final Map<String, Integer> customerDealCountMap = convertMap(customerDealCount,
-            CrmStatisticsCustomerSummaryByDateRespVO::getTime,
-            CrmStatisticsCustomerSummaryByDateRespVO::getCustomerDealCount);
+                CrmStatisticsCustomerSummaryByDateRespVO::getTime,
+                CrmStatisticsCustomerSummaryByDateRespVO::getCustomerDealCount);
         times.forEach(time -> respVoList.add(
-            new CrmStatisticsCustomerSummaryByDateRespVO().setTime(time)
-                .setCustomerCreateCount(customerCreateCountMap.getOrDefault(time, 0))
-                .setCustomerDealCount(customerDealCountMap.getOrDefault(time, 0))
+                new CrmStatisticsCustomerSummaryByDateRespVO().setTime(time)
+                        .setCustomerCreateCount(customerCreateCountMap.getOrDefault(time, 0))
+                        .setCustomerDealCount(customerDealCountMap.getOrDefault(time, 0))
         ));
         return respVoList;
     }
@@ -108,25 +111,25 @@ public class CrmStatisticsCustomerServiceImpl implements CrmStatisticsCustomerSe
 
         // 3. 合并统计数据
         final Map<Long, Integer> customerCreateCountMap = convertMap(customerCreateCount,
-            CrmStatisticsCustomerSummaryByUserRespVO::getOwnerUserId,
-            CrmStatisticsCustomerSummaryByUserRespVO::getCustomerCreateCount);
+                CrmStatisticsCustomerSummaryByUserRespVO::getOwnerUserId,
+                CrmStatisticsCustomerSummaryByUserRespVO::getCustomerCreateCount);
         final Map<Long, Integer> customerDealCountMap = convertMap(customerDealCount,
-            CrmStatisticsCustomerSummaryByUserRespVO::getOwnerUserId,
-            CrmStatisticsCustomerSummaryByUserRespVO::getCustomerDealCount);
+                CrmStatisticsCustomerSummaryByUserRespVO::getOwnerUserId,
+                CrmStatisticsCustomerSummaryByUserRespVO::getCustomerDealCount);
         final Map<Long, BigDecimal> contractPriceMap = convertMap(contractPrice,
-            CrmStatisticsCustomerSummaryByUserRespVO::getOwnerUserId,
-            CrmStatisticsCustomerSummaryByUserRespVO::getContractPrice);
+                CrmStatisticsCustomerSummaryByUserRespVO::getOwnerUserId,
+                CrmStatisticsCustomerSummaryByUserRespVO::getContractPrice);
         final Map<Long, BigDecimal> receivablePriceMap = convertMap(receivablePrice,
-            CrmStatisticsCustomerSummaryByUserRespVO::getOwnerUserId,
-            CrmStatisticsCustomerSummaryByUserRespVO::getReceivablePrice);
+                CrmStatisticsCustomerSummaryByUserRespVO::getOwnerUserId,
+                CrmStatisticsCustomerSummaryByUserRespVO::getReceivablePrice);
         List<CrmStatisticsCustomerSummaryByUserRespVO> respVoList = new ArrayList<>(userIds.size());
         userIds.forEach(userId -> {
             final CrmStatisticsCustomerSummaryByUserRespVO vo = new CrmStatisticsCustomerSummaryByUserRespVO();
             vo.setOwnerUserId(userId);
             vo.setCustomerCreateCount(customerCreateCountMap.getOrDefault(userId, 0))
-                .setCustomerDealCount(customerDealCountMap.getOrDefault(userId, 0))
-                .setContractPrice(contractPriceMap.getOrDefault(userId, BigDecimal.ZERO))
-                .setReceivablePrice(receivablePriceMap.getOrDefault(userId, BigDecimal.ZERO));
+                    .setCustomerDealCount(customerDealCountMap.getOrDefault(userId, 0))
+                    .setContractPrice(contractPriceMap.getOrDefault(userId, BigDecimal.ZERO))
+                    .setReceivablePrice(receivablePriceMap.getOrDefault(userId, BigDecimal.ZERO));
             respVoList.add(vo);
         });
 
@@ -156,15 +159,15 @@ public class CrmStatisticsCustomerServiceImpl implements CrmStatisticsCustomerSe
         // 4. 合并统计数据
         List<CrmStatisticsFollowupSummaryByDateRespVO> respVoList = new ArrayList<>(times.size());
         final Map<String, Integer> followupRecordCountMap = convertMap(followupRecordCount,
-            CrmStatisticsFollowupSummaryByDateRespVO::getTime,
-            CrmStatisticsFollowupSummaryByDateRespVO::getFollowupRecordCount);
+                CrmStatisticsFollowupSummaryByDateRespVO::getTime,
+                CrmStatisticsFollowupSummaryByDateRespVO::getFollowupRecordCount);
         final Map<String, Integer> followupCustomerCountMap = convertMap(followupCustomerCount,
-            CrmStatisticsFollowupSummaryByDateRespVO::getTime,
-            CrmStatisticsFollowupSummaryByDateRespVO::getFollowupCustomerCount);
+                CrmStatisticsFollowupSummaryByDateRespVO::getTime,
+                CrmStatisticsFollowupSummaryByDateRespVO::getFollowupCustomerCount);
         times.forEach(time -> respVoList.add(
-            new CrmStatisticsFollowupSummaryByDateRespVO().setTime(time)
-                .setFollowupRecordCount(followupRecordCountMap.getOrDefault(time, 0))
-                .setFollowupCustomerCount(followupCustomerCountMap.getOrDefault(time, 0))
+                new CrmStatisticsFollowupSummaryByDateRespVO().setTime(time)
+                        .setFollowupRecordCount(followupRecordCountMap.getOrDefault(time, 0))
+                        .setFollowupCustomerCount(followupCustomerCountMap.getOrDefault(time, 0))
         ));
 
         return respVoList;
@@ -186,16 +189,16 @@ public class CrmStatisticsCustomerServiceImpl implements CrmStatisticsCustomerSe
 
         // 3. 合并统计数据
         final Map<Long, Integer> followupRecordCountMap = convertMap(followupRecordCount,
-            CrmStatisticsFollowupSummaryByUserRespVO::getOwnerUserId,
-            CrmStatisticsFollowupSummaryByUserRespVO::getFollowupRecordCount);
+                CrmStatisticsFollowupSummaryByUserRespVO::getOwnerUserId,
+                CrmStatisticsFollowupSummaryByUserRespVO::getFollowupRecordCount);
         final Map<Long, Integer> followupCustomerCountMap = convertMap(followupCustomerCount,
-            CrmStatisticsFollowupSummaryByUserRespVO::getOwnerUserId,
-            CrmStatisticsFollowupSummaryByUserRespVO::getFollowupCustomerCount);
+                CrmStatisticsFollowupSummaryByUserRespVO::getOwnerUserId,
+                CrmStatisticsFollowupSummaryByUserRespVO::getFollowupCustomerCount);
         List<CrmStatisticsFollowupSummaryByUserRespVO> respVoList = new ArrayList<>(userIds.size());
         userIds.forEach(userId -> {
             final CrmStatisticsFollowupSummaryByUserRespVO vo = new CrmStatisticsFollowupSummaryByUserRespVO()
-                .setFollowupRecordCount(followupRecordCountMap.getOrDefault(userId, 0))
-                .setFollowupCustomerCount(followupCustomerCountMap.getOrDefault(userId, 0));
+                    .setFollowupRecordCount(followupRecordCountMap.getOrDefault(userId, 0))
+                    .setFollowupCustomerCount(followupCustomerCountMap.getOrDefault(userId, 0));
             vo.setOwnerUserId(userId);
             respVoList.add(vo);
         });
@@ -221,7 +224,7 @@ public class CrmStatisticsCustomerServiceImpl implements CrmStatisticsCustomerSe
         // 3. 获取字典数据
         List<DictDataRespDTO> followUpTypes = dictDataApi.getDictDataList(CRM_FOLLOW_UP_TYPE);
         final Map<String, String> followUpTypeMap = convertMap(followUpTypes,
-            DictDataRespDTO::getValue, DictDataRespDTO::getLabel);
+                DictDataRespDTO::getValue, DictDataRespDTO::getLabel);
         respVoList.forEach(vo -> {
             vo.setFollowupType(followUpTypeMap.get(vo.getFollowupType()));
         });
@@ -244,19 +247,19 @@ public class CrmStatisticsCustomerServiceImpl implements CrmStatisticsCustomerSe
         // 3. 设置 创建人、负责人、行业、来源
         // 获取客户所属行业
         Map<String, String> industryMap = convertMap(dictDataApi.getDictDataList(CRM_CUSTOMER_INDUSTRY),
-            DictDataRespDTO::getValue, DictDataRespDTO::getLabel);
+                DictDataRespDTO::getValue, DictDataRespDTO::getLabel);
         // 获取客户来源
         Map<String, String> sourceMap = convertMap(dictDataApi.getDictDataList(CRM_CUSTOMER_SOURCE),
-            DictDataRespDTO::getValue, DictDataRespDTO::getLabel);
+                DictDataRespDTO::getValue, DictDataRespDTO::getLabel);
         // 获取创建人、负责人列表
         Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(convertSetByFlatMap(respVoList,
-            vo -> Stream.of(NumberUtils.parseLong(vo.getCreatorUserId()), vo.getOwnerUserId())));
+                vo -> Stream.of(NumberUtils.parseLong(vo.getCreatorUserId()), vo.getOwnerUserId())));
 
         respVoList.forEach(vo -> {
             MapUtils.findAndThen(industryMap, vo.getIndustryId(), vo::setIndustryName);
             MapUtils.findAndThen(sourceMap, vo.getSource(), vo::setSourceName);
             MapUtils.findAndThen(userMap, NumberUtils.parseLong(vo.getCreatorUserId()),
-                user -> vo.setCreatorUserName(user.getNickname()));
+                    user -> vo.setCreatorUserName(user.getNickname()));
             MapUtils.findAndThen(userMap, vo.getOwnerUserId(), user -> vo.setOwnerUserName(user.getNickname()));
         });
 
@@ -283,11 +286,11 @@ public class CrmStatisticsCustomerServiceImpl implements CrmStatisticsCustomerSe
         // 4. 合并统计数据
         List<CrmStatisticsCustomerDealCycleByDateRespVO> respVoList = new ArrayList<>(times.size());
         final Map<String, Double> customerDealCycleMap = convertMap(customerDealCycle,
-            CrmStatisticsCustomerDealCycleByDateRespVO::getTime,
-            CrmStatisticsCustomerDealCycleByDateRespVO::getCustomerDealCycle);
+                CrmStatisticsCustomerDealCycleByDateRespVO::getTime,
+                CrmStatisticsCustomerDealCycleByDateRespVO::getCustomerDealCycle);
         times.forEach(time -> respVoList.add(
-            new CrmStatisticsCustomerDealCycleByDateRespVO().setTime(time)
-                .setCustomerDealCycle(customerDealCycleMap.getOrDefault(time, 0D))
+                new CrmStatisticsCustomerDealCycleByDateRespVO().setTime(time)
+                        .setCustomerDealCycle(customerDealCycleMap.getOrDefault(time, 0D))
         ));
         return respVoList;
     }
@@ -308,16 +311,16 @@ public class CrmStatisticsCustomerServiceImpl implements CrmStatisticsCustomerSe
 
         // 3. 合并统计数据
         final Map<Long, Double> customerDealCycleMap = convertMap(customerDealCycle,
-            CrmStatisticsCustomerDealCycleByUserRespVO::getOwnerUserId,
-            CrmStatisticsCustomerDealCycleByUserRespVO::getCustomerDealCycle);
+                CrmStatisticsCustomerDealCycleByUserRespVO::getOwnerUserId,
+                CrmStatisticsCustomerDealCycleByUserRespVO::getCustomerDealCycle);
         final Map<Long, Integer> customerDealCountMap = convertMap(customerDealCount,
-            CrmStatisticsCustomerSummaryByUserRespVO::getOwnerUserId,
-            CrmStatisticsCustomerSummaryByUserRespVO::getCustomerDealCount);
+                CrmStatisticsCustomerSummaryByUserRespVO::getOwnerUserId,
+                CrmStatisticsCustomerSummaryByUserRespVO::getCustomerDealCount);
         List<CrmStatisticsCustomerDealCycleByUserRespVO> respVoList = new ArrayList<>(userIds.size());
         userIds.forEach(userId -> {
             final CrmStatisticsCustomerDealCycleByUserRespVO vo = new CrmStatisticsCustomerDealCycleByUserRespVO()
-                .setCustomerDealCycle(customerDealCycleMap.getOrDefault(userId, 0.0))
-                .setCustomerDealCount(customerDealCountMap.getOrDefault(userId, 0));
+                    .setCustomerDealCycle(customerDealCycleMap.getOrDefault(userId, 0.0))
+                    .setCustomerDealCount(customerDealCountMap.getOrDefault(userId, 0));
             vo.setOwnerUserId(userId);
             respVoList.add(vo);
         });
@@ -326,6 +329,75 @@ public class CrmStatisticsCustomerServiceImpl implements CrmStatisticsCustomerSe
         appendUserInfo(respVoList);
 
         return respVoList;
+    }
+
+    @Override
+    public List<CrmStatisticCustomerIndustryRespVO> getCustomerIndustry(CrmStatisticsCustomerReqVO reqVO) {
+        // 1. 获得用户编号数组
+        List<Long> userIds = getUserIds(reqVO);
+        if (CollUtil.isEmpty(userIds)) {
+            return Collections.emptyList();
+        }
+        reqVO.setUserIds(userIds);
+        // 2. 获取客户行业统计数据
+        List<CrmStatisticCustomerIndustryRespVO> industryRespVOList = customerMapper.selectCustomerIndustryListGroupbyIndustryId(reqVO);
+        if (CollUtil.isEmpty(industryRespVOList)) {
+            return Collections.emptyList();
+        }
+
+        return convertList(industryRespVOList, item -> {
+            if (ObjUtil.isNull(item.getIndustryId())) {
+                return item;
+            }
+            item.setIndustryName(dictDataApi.getDictDataLabel(CRM_CUSTOMER_INDUSTRY, item.getIndustryId()));
+            return item;
+        });
+    }
+
+    @Override
+    public List<CrmStatisticCustomerSourceRespVO> getCustomerSource(CrmStatisticsCustomerReqVO reqVO) {
+        // 1. 获得用户编号数组
+        List<Long> userIds = getUserIds(reqVO);
+        if (CollUtil.isEmpty(userIds)) {
+            return Collections.emptyList();
+        }
+        reqVO.setUserIds(userIds);
+        // 2. 获取客户行业统计数据
+        List<CrmStatisticCustomerSourceRespVO> sourceRespVOList = customerMapper.selectCustomerSourceListGroupbySource(reqVO);
+        if (CollUtil.isEmpty(sourceRespVOList)) {
+            return Collections.emptyList();
+        }
+
+        return convertList(sourceRespVOList, item -> {
+            if (ObjUtil.isNull(item.getSource())) {
+                return item;
+            }
+            item.setSourceName(dictDataApi.getDictDataLabel(CRM_CUSTOMER_SOURCE, item.getSource()));
+            return item;
+        });
+    }
+
+    @Override
+    public List<CrmStatisticCustomerLevelRespVO> getCustomerLevel(CrmStatisticsCustomerReqVO reqVO) {
+        // 1. 获得用户编号数组
+        List<Long> userIds = getUserIds(reqVO);
+        if (CollUtil.isEmpty(userIds)) {
+            return Collections.emptyList();
+        }
+        reqVO.setUserIds(userIds);
+        // 2. 获取客户行业统计数据
+        List<CrmStatisticCustomerLevelRespVO> levelRespVOList = customerMapper.selectCustomerLevelListGroupbyLevel(reqVO);
+        if (CollUtil.isEmpty(levelRespVOList)) {
+            return Collections.emptyList();
+        }
+
+        return convertList(levelRespVOList, item -> {
+            if (ObjUtil.isNull(item.getLevel())) {
+                return item;
+            }
+            item.setLevelName(dictDataApi.getDictDataLabel(CRM_CUSTOMER_LEVEL, item.getLevel()));
+            return item;
+        });
     }
 
     /**

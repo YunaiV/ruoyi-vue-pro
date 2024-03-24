@@ -1,6 +1,9 @@
 package cn.iocoder.yudao.module.crm.dal.mysql.statistics;
 
 import cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.customer.*;
+import cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.customer.analyze.CrmStatisticCustomerIndustryRespVO;
+import cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.customer.analyze.CrmStatisticCustomerLevelRespVO;
+import cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.customer.analyze.CrmStatisticCustomerSourceRespVO;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
@@ -41,5 +44,11 @@ public interface CrmStatisticsCustomerMapper {
     List<CrmStatisticsCustomerDealCycleByDateRespVO> selectCustomerDealCycleGroupbyDate(CrmStatisticsCustomerReqVO reqVO);
 
     List<CrmStatisticsCustomerDealCycleByUserRespVO> selectCustomerDealCycleGroupbyUser(CrmStatisticsCustomerReqVO reqVO);
+
+    List<CrmStatisticCustomerIndustryRespVO> selectCustomerIndustryListGroupbyIndustryId(CrmStatisticsCustomerReqVO reqVO);
+
+    List<CrmStatisticCustomerSourceRespVO> selectCustomerSourceListGroupbySource(CrmStatisticsCustomerReqVO reqVO);
+
+    List<CrmStatisticCustomerLevelRespVO> selectCustomerLevelListGroupbyLevel(CrmStatisticsCustomerReqVO reqVO);
 
 }
