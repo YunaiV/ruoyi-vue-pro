@@ -22,6 +22,9 @@ public class BpmProcessDefinitionRespVO {
     @Schema(description = "流程标识", requiredMode = Schema.RequiredMode.REQUIRED, example = "yudao")
     private String key;
 
+    @Schema(description = "流程图标", requiredMode = Schema.RequiredMode.REQUIRED, example = "https://www.iocoder.cn/yudao.jpg")
+    private String icon;
+
     @Schema(description = "流程描述", example = "我是描述")
     private String description;
 

@@ -19,6 +19,9 @@ public class BpmModelRespVO {
     @Schema(description = "流程名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "芋道")
     private String name;
 
+    @Schema(description = "流程图标", example = "https://www.iocoder.cn/yudao.jpg")
+    private String icon;
+
     @Schema(description = "流程描述", example = "我是描述")
     private String description;
 
@@ -30,17 +33,15 @@ public class BpmModelRespVO {
     @Schema(description = "表单类型-参见 bpm_model_form_type 数据字典", example = "1")
     private Integer formType;
 
-    @Schema(description = "表单编号-在表单类型为 {@link BpmModelFormTypeEnum#CUSTOM} 时，必须非空", example = "1024")
-    private Long formId;
+    @Schema(description = "表单编号", example = "1024")
+    private Long formId; // 在表单类型为 {@link BpmModelFormTypeEnum#CUSTOM} 时，必须非空
     @Schema(description = "表单名字", example = "请假表单")
     private String formName;
 
-    @Schema(description = "自定义表单的提交路径，使用 Vue 的路由地址-在表单类型为 {@link BpmModelFormTypeEnum#CUSTOM} 时，必须非空",
-            example = "/bpm/oa/leave/create")
-    private String formCustomCreatePath;
-    @Schema(description = "自定义表单的查看路径，使用 Vue 的路由地址-在表单类型为 {@link BpmModelFormTypeEnum#CUSTOM} 时，必须非空",
-            example = "/bpm/oa/leave/view")
-    private String formCustomViewPath;
+    @Schema(description = "自定义表单的提交路径", example = "/bpm/oa/leave/create")
+    private String formCustomCreatePath; // 使用 Vue 的路由地址-在表单类型为 {@link BpmModelFormTypeEnum#CUSTOM} 时，必须非空
+    @Schema(description = "自定义表单的查看路径", example = "/bpm/oa/leave/view")
+    private String formCustomViewPath; // ，使用 Vue 的路由地址-在表单类型为 {@link BpmModelFormTypeEnum#CUSTOM} 时，必须非空
 
     @Schema(description = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED)
     private LocalDateTime createTime;

@@ -40,6 +40,11 @@ public class BpmProcessDefinitionInfoDO extends BaseDO {
      * 关联 Model 的 id 属性
      */
     private String modelId;
+
+    /**
+     * 图标
+     */
+    private String icon;
     /**
      * 描述
      */

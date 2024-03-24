@@ -15,9 +15,14 @@ import lombok.Data;
 public class BpmModelMetaInfoRespDTO {
 
     /**
+     * 流程图标
+     */
+    private String icon;
+    /**
      * 流程描述
      */
     private String description;
+
     /**
      * 表单类型
      */

@@ -33,7 +33,6 @@ public interface BpmProcessDefinitionConvert {
 
     BpmProcessDefinitionConvert INSTANCE = Mappers.getMapper(BpmProcessDefinitionConvert.class);
 
-
     default PageResult<BpmProcessDefinitionRespVO> buildProcessDefinitionPage(PageResult<ProcessDefinition> page,
                                                                               Map<String, Deployment> deploymentMap,
                                                                               Map<String, BpmProcessDefinitionInfoDO> processDefinitionInfoMap,

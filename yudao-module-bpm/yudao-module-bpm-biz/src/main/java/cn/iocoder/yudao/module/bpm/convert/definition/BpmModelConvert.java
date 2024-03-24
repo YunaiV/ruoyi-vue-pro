@@ -71,7 +71,7 @@ public interface BpmModelConvert {
             modelRespVO.setFormType(metaInfo.getFormType()).setFormId(metaInfo.getFormId())
                     .setFormCustomCreatePath(metaInfo.getFormCustomCreatePath())
                     .setFormCustomViewPath(metaInfo.getFormCustomViewPath());
-            modelRespVO.setDescription(metaInfo.getDescription());
+            modelRespVO.setIcon(metaInfo.getIcon()).setDescription(metaInfo.getDescription());
         }
         if (form != null) {
             modelRespVO.setFormId(form.getId()).setFormName(form.getName());
@@ -95,24 +95,29 @@ public interface BpmModelConvert {
     default void copyToCreateModel(Model model, BpmModelCreateReqVO bean) {
         model.setName(bean.getName());
         model.setKey(bean.getKey());
-        model.setMetaInfo(buildMetaInfoStr(null, bean.getDescription(), null, null,
-                null, null));
+        model.setMetaInfo(buildMetaInfoStr(null,
+                null, bean.getDescription(),
+                null, null, null, null));
     }
 
     default void copyToUpdateModel(Model model, BpmModelUpdateReqVO bean) {
         model.setName(bean.getName());
         model.setCategory(bean.getCategory());
         model.setMetaInfo(buildMetaInfoStr(buildMetaInfo(model),
-                bean.getDescription(), bean.getFormType(), bean.getFormId(),
-                bean.getFormCustomCreatePath(), bean.getFormCustomViewPath()));
+                bean.getIcon(), bean.getDescription(),
+                bean.getFormType(), bean.getFormId(), bean.getFormCustomCreatePath(), bean.getFormCustomViewPath()));
     }
 
-    default String buildMetaInfoStr(BpmModelMetaInfoRespDTO metaInfo, String description, Integer formType,
-                                    Long formId, String formCustomCreatePath, String formCustomViewPath) {
+    default String buildMetaInfoStr(BpmModelMetaInfoRespDTO metaInfo,
+                                    String icon, String description,
+                                    Integer formType, Long formId, String formCustomCreatePath, String formCustomViewPath) {
         if (metaInfo == null) {
             metaInfo = new BpmModelMetaInfoRespDTO();
         }
         // 只有非空，才进行设置，避免更新时的覆盖
+        if (StrUtil.isNotEmpty(icon)) {
+            metaInfo.setIcon(icon);
+        }
         if (StrUtil.isNotEmpty(description)) {
             metaInfo.setDescription(description);
         }
