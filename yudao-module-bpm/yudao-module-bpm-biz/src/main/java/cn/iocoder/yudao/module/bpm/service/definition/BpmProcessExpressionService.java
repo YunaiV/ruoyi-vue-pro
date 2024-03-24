@@ -1,10 +1,11 @@
 package cn.iocoder.yudao.module.bpm.service.definition;
 
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.expression.BpmProcessExpressionPageReqVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.expression.BpmProcessExpressionSaveReqVO;
-import jakarta.validation.*;
 import cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmProcessExpressionDO;
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
+
+import javax.validation.Valid;
 
 /**
  * BPM 流程表达式 Service 接口

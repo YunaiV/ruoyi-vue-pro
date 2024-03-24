@@ -1,8 +1,9 @@
 package cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.form;
-import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.*;
 
-import jakarta.validation.constraints.NotNull;
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Data;
+
+import javax.validation.constraints.NotNull;
 import java.util.List;
 
 @Schema(description = "管理后台 - 动态表单创建/更新 Request VO")

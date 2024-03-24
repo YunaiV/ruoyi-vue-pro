@@ -8,10 +8,10 @@ import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.group.BpmUserG
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.group.BpmUserGroupSaveReqVO;
 import cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmUserGroupDO;
 import cn.iocoder.yudao.module.bpm.dal.mysql.definition.BpmUserGroupMapper;
-import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
+import javax.annotation.Resource;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;

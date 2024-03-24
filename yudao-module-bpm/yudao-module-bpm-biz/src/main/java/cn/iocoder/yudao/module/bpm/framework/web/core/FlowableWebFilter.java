@@ -2,12 +2,12 @@ package cn.iocoder.yudao.module.bpm.framework.web.core;
 
 import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.util.FlowableUtils;
-import jakarta.servlet.FilterChain;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import javax.servlet.FilterChain;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 /**
@@ -33,4 +33,5 @@ public class FlowableWebFilter extends OncePerRequestFilter {
             FlowableUtils.clearAuthenticatedUserId();
         }
     }
+
 }
