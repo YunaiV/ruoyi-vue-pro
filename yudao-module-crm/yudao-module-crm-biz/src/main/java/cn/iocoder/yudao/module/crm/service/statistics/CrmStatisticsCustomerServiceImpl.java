@@ -5,7 +5,11 @@ import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.hutool.core.util.ObjUtil;
 import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
 import cn.iocoder.yudao.framework.common.util.number.NumberUtils;
+import cn.iocoder.yudao.framework.ip.core.Area;
+import cn.iocoder.yudao.framework.ip.core.enums.AreaTypeEnum;
+import cn.iocoder.yudao.framework.ip.core.utils.AreaUtils;
 import cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.customer.*;
+import cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.customer.analyze.CrmStatisticCustomerAreaRespVO;
 import cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.customer.analyze.CrmStatisticCustomerIndustryRespVO;
 import cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.customer.analyze.CrmStatisticCustomerLevelRespVO;
 import cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.customer.analyze.CrmStatisticCustomerSourceRespVO;
@@ -30,6 +34,7 @@ import java.util.Map;
 import java.util.stream.Stream;
 
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
+import static cn.iocoder.yudao.framework.common.util.collection.MapUtils.findAndThen;
 import static cn.iocoder.yudao.module.crm.enums.DictTypeConstants.*;
 
 /**
@@ -256,11 +261,11 @@ public class CrmStatisticsCustomerServiceImpl implements CrmStatisticsCustomerSe
                 vo -> Stream.of(NumberUtils.parseLong(vo.getCreatorUserId()), vo.getOwnerUserId())));
 
         respVoList.forEach(vo -> {
-            MapUtils.findAndThen(industryMap, vo.getIndustryId(), vo::setIndustryName);
-            MapUtils.findAndThen(sourceMap, vo.getSource(), vo::setSourceName);
-            MapUtils.findAndThen(userMap, NumberUtils.parseLong(vo.getCreatorUserId()),
+            findAndThen(industryMap, vo.getIndustryId(), vo::setIndustryName);
+            findAndThen(sourceMap, vo.getSource(), vo::setSourceName);
+            findAndThen(userMap, NumberUtils.parseLong(vo.getCreatorUserId()),
                     user -> vo.setCreatorUserName(user.getNickname()));
-            MapUtils.findAndThen(userMap, vo.getOwnerUserId(), user -> vo.setOwnerUserName(user.getNickname()));
+            findAndThen(userMap, vo.getOwnerUserId(), user -> vo.setOwnerUserName(user.getNickname()));
         });
 
         return respVoList;
@@ -400,6 +405,35 @@ public class CrmStatisticsCustomerServiceImpl implements CrmStatisticsCustomerSe
         });
     }
 
+    @Override
+    public List<CrmStatisticCustomerAreaRespVO> getCustomerArea(CrmStatisticsCustomerReqVO reqVO) {
+        // 1. 获得用户编号数组
+        List<Long> userIds = getUserIds(reqVO);
+        if (CollUtil.isEmpty(userIds)) {
+            return Collections.emptyList();
+        }
+        reqVO.setUserIds(userIds);
+        // 2. 获取客户地区统计数据
+        List<CrmStatisticCustomerAreaRespVO> list = customerMapper.selectSummaryListByAreaId(reqVO);
+        if (CollUtil.isEmpty(list)) {
+            return Collections.emptyList();
+        }
+
+        // 拼接数据
+        List<Area> areaList = AreaUtils.getByType(AreaTypeEnum.PROVINCE, area -> area);
+        areaList.add(new Area().setId(null).setName("未知"));
+        Map<Integer, Area> areaMap = convertMap(areaList, Area::getId);
+        List<CrmStatisticCustomerAreaRespVO> customerAreaRespVOList = convertList(list, item -> {
+            Integer parentId = AreaUtils.getParentIdByType(item.getAreaId(), AreaTypeEnum.PROVINCE);
+            if (parentId == null) {
+                return item;
+            }
+            findAndThen(areaMap, parentId, area -> item.setAreaId(parentId).setAreaName(area.getName()));
+            return item;
+        });
+        return customerAreaRespVOList;
+    }
+
     /**
      * 拼接用户信息（昵称）
      *
@@ -408,7 +442,7 @@ public class CrmStatisticsCustomerServiceImpl implements CrmStatisticsCustomerSe
     private <T extends CrmStatisticsCustomerByUserBaseRespVO> void appendUserInfo(List<T> respVoList) {
         Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(convertSet(respVoList,
                 CrmStatisticsCustomerByUserBaseRespVO::getOwnerUserId));
-        respVoList.forEach(vo -> MapUtils.findAndThen(userMap, vo.getOwnerUserId(), user -> vo.setOwnerUserName(user.getNickname())));
+        respVoList.forEach(vo -> findAndThen(userMap, vo.getOwnerUserId(), user -> vo.setOwnerUserName(user.getNickname())));
     }
 
     /**

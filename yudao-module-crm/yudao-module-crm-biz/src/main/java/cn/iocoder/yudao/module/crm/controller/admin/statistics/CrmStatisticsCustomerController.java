@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.crm.controller.admin.statistics;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.customer.*;
+import cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.customer.analyze.CrmStatisticCustomerAreaRespVO;
 import cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.customer.analyze.CrmStatisticCustomerIndustryRespVO;
 import cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.customer.analyze.CrmStatisticCustomerLevelRespVO;
 import cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.customer.analyze.CrmStatisticCustomerSourceRespVO;
@@ -104,6 +105,13 @@ public class CrmStatisticsCustomerController {
     @PreAuthorize("@ss.hasPermission('crm:statistics-customer:query')")
     public CommonResult<List<CrmStatisticCustomerLevelRespVO>> getCustomerLevel(@Valid CrmStatisticsCustomerReqVO reqVO) {
         return success(customerService.getCustomerLevel(reqVO));
+    }
+
+    @GetMapping("/get-customer-area-summary")
+    @Operation(summary = "获取客户地区统计数据")
+    @PreAuthorize("@ss.hasPermission('crm:statistics-customer:query')")
+    public CommonResult<List<CrmStatisticCustomerAreaRespVO>> getCustomerArea(@Valid CrmStatisticsCustomerReqVO reqVO) {
+        return success(customerService.getCustomerArea(reqVO));
     }
 
 }

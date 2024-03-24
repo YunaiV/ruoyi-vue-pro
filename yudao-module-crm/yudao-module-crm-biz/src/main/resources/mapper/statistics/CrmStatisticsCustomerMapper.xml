@@ -312,5 +312,26 @@
         GROUP BY
             level;
     </select>
+    <select id="selectSummaryListByAreaId"
+            resultType="cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.customer.analyze.CrmStatisticCustomerAreaRespVO">
+        SELECT
+            area_id,
+            COUNT(*) AS customerCount,
+            SUM(deal_status) AS dealCount,
+            ROUND(COUNT(*) / (SELECT COUNT(*) FROM crm_customer WHERE deleted = 0) * 100, 2) AS areaPortion,
+            ROUND(SUM(deal_status) / NULLIF(COUNT(*), 0) * 100, 2) AS dealPortion
+        FROM
+            crm_customer
+        WHERE
+            deleted = 0 AND area_id IS NOT NULL
+        AND owner_user_id IN
+        <foreach collection="userIds" item="userId" open="(" close=")" separator=",">
+            #{userId}
+        </foreach>
+        AND create_time BETWEEN #{times[0],javaType=java.time.LocalDateTime} AND
+        #{times[1],javaType=java.time.LocalDateTime}
+        GROUP BY
+            area_id;
+    </select>
 
 </mapper>
