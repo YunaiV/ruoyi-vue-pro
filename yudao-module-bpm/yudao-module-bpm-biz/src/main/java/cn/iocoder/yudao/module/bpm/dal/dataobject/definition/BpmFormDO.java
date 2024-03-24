@@ -10,15 +10,13 @@ import lombok.*;
 import java.util.List;
 
 /**
- * 工作流的表单定义
+ * BPM 工作流的表单定义
  * 用于工作流的申请表单，需要动态配置的场景
  *
  * @author 芋道源码
  */
 @TableName(value = "bpm_form", autoResultMap = true)
 @Data
-@EqualsAndHashCode(callSuper = true)
-@ToString(callSuper = true)
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
