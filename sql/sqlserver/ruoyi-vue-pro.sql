@@ -6391,6 +6391,11 @@ GO
 ALTER TABLE [dbo].[system_menu] SET (LOCK_ESCALATION = TABLE)
 GO
 
+ALTER TABLE [dbo].[system_menu]
+    ADD [query] nvarchar(200) COLLATE SQL_Latin1_General_CP1_CI_AS NULL AFTER [path];
+GO
+
+
 EXEC sp_addextendedproperty
 'MS_Description', N'菜单ID',
 'SCHEMA', N'dbo',

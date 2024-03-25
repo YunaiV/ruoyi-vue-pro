@@ -196,12 +196,13 @@ public class MenuServiceImpl implements MenuService {
      * @param menu 菜单
      */
     private void initMenuProperty(MenuDO menu) {
-        // 菜单为按钮类型时，无需 component、icon、path 属性，进行置空
+        // 菜单为按钮类型时，无需 component、icon、path、query属性，进行置空
         if (MenuTypeEnum.BUTTON.getType().equals(menu.getType())) {
             menu.setComponent("");
             menu.setComponentName("");
             menu.setIcon("");
             menu.setPath("");
+            menu.setQuery("");
         }
     }
 

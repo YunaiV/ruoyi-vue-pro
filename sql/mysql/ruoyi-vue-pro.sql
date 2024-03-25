@@ -2335,6 +2335,8 @@ INSERT INTO `system_menu` (`id`, `name`, `permission`, `type`, `sort`, `parent_i
 INSERT INTO `system_menu` (`id`, `name`, `permission`, `type`, `sort`, `parent_id`, `path`, `icon`, `component`, `component_name`, `status`, `visible`, `keep_alive`, `always_show`, `creator`, `create_time`, `updater`, `update_time`, `deleted`) VALUES (2735, '流程表达式删除', 'bpm:process-expression:delete', 3, 4, 2731, '', '', '', NULL, 0, b'1', b'1', b'1', '', '2024-03-09 22:35:08', '', '2024-03-09 22:35:08', b'0');
 COMMIT;
 
+ALTER TABLE `system_menu`
+    ADD COLUMN `query` VARCHAR(200) COMMENT '路由参数' NOT NULL DEFAULT '' AFTER `path`;
 -- ----------------------------
 -- Table structure for system_notice
 -- ----------------------------

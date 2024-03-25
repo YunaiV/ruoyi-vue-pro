@@ -43,6 +43,10 @@ public class MenuRespVO {
     @Size(max = 200, message = "路由地址不能超过200个字符")
     private String path;
 
+    @Schema(description = "访问路由的默认传递参数，仅菜单类型为菜单时，才需要传`", example = "{\"id\": 1, \"name\": \"ry\"}")
+    @Size(max = 200, message = "路由参数不能超过200个字符")
+    private String query;
+
     @Schema(description = "菜单图标,仅菜单类型为菜单或者目录时，才需要传", example = "/menu/list")
     private String icon;
 

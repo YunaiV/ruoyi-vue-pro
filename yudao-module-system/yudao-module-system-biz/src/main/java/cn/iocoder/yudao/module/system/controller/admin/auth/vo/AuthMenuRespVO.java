@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.validation.constraints.Size;
 import java.util.List;
 
 @Schema(description = "管理后台 - 登录用户的菜单信息 Response VO")
@@ -26,6 +27,9 @@ public class AuthMenuRespVO {
 
     @Schema(description = "路由地址,仅菜单类型为菜单或者目录时，才需要传", example = "post")
     private String path;
+
+    @Schema(description = "访问路由的默认传递参数，仅菜单类型为菜单时，才需要传`", example = "{\"id\": 1, \"name\": \"ry\"}")
+    private String query;
 
     @Schema(description = "组件路径,仅菜单类型为菜单时，才需要传", example = "system/post/index")
     private String component;

@@ -3792,6 +3792,10 @@ CREATE TABLE "system_menu"
     "always_show"    bool                                        NOT NULL DEFAULT false
 )
 ;
+
+ALTER TABLE "system_menu"
+    ADD COLUMN query VARCHAR(200) COLLATE "pg_catalog"."default";
+
 COMMENT
 ON COLUMN "system_menu"."id" IS '菜单ID';
 COMMENT
