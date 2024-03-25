@@ -53,11 +53,12 @@ public class CrmPermissionUtils {
         MybatisPlusJoinProperties mybatisPlusJoinProperties = SpringUtil.getBean(MybatisPlusJoinProperties.class);
         final String ownerUserIdField = mybatisPlusJoinProperties.getTableAlias() + ".owner_user_id";
         // 1. 构建数据权限连表条件
-        if (!CrmPermissionUtils.isCrmAdmin() && ObjUtil.notEqual(pool, Boolean.TRUE)) { // 管理员，公海不需要数据权限
+        //这行无意义的代码会导致CRM管理员查看我参与的合同时，没有关联权限表导致识别不到user_id字段出错
+        //if (!CrmPermissionUtils.isCrmAdmin() && ObjUtil.notEqual(pool, Boolean.TRUE)) { // 管理员，公海不需要数据权限 
             query.innerJoin(CrmPermissionDO.class, on -> on.eq(CrmPermissionDO::getBizType, bizType)
                     .eq(CrmPermissionDO::getBizId, bizId) // 只能使用 SFunction 如果传 id 解析出来的 sql 不对
-                    .eq(CrmPermissionDO::getUserId, userId));
-        }
+                    );
+        //}
         // 2.1 场景一：我负责的数据
         if (CrmSceneTypeEnum.isOwner(sceneType)) {
             query.eq(ownerUserIdField, userId);
@@ -65,7 +66,8 @@ public class CrmPermissionUtils {
         // 2.2 场景二：我参与的数据
         if (CrmSceneTypeEnum.isInvolved(sceneType)) {
             query.ne(ownerUserIdField, userId)
-                    .in(CrmPermissionDO::getLevel, CrmPermissionLevelEnum.READ.getLevel(), CrmPermissionLevelEnum.WRITE.getLevel());
+                 .eq(CrmPermissionDO::getUserId, userId)
+                 .in(CrmPermissionDO::getLevel, CrmPermissionLevelEnum.READ.getLevel(), CrmPermissionLevelEnum.WRITE.getLevel());
         }
         // 2.3 场景三：下属负责的数据
         if (CrmSceneTypeEnum.isSubordinate(sceneType)) {

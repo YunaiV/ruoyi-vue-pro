@@ -62,6 +62,7 @@ public interface CrmContractMapper extends BaseMapperX<CrmContractDO> {
                 .eqIfPresent(CrmContractDO::getCustomerId, pageReqVO.getCustomerId())
                 .eqIfPresent(CrmContractDO::getBusinessId, pageReqVO.getBusinessId())
                 .eqIfPresent(CrmContractDO::getAuditStatus, pageReqVO.getAuditStatus())
+                .distinct()//去重 防止同一合同组内转移时表连接的重复数据
                 .orderByDesc(CrmContractDO::getId);
 
         // Backlog: 即将到期的合同
