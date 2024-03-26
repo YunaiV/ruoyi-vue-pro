@@ -11,7 +11,7 @@ import lombok.Getter;
  */
 @Getter
 @AllArgsConstructor
-public enum BpmTaskStatustEnum {
+public enum BpmTaskStatusEnum {
 
     RUNNING(1, "审批中"),
     APPROVE(2, "审批通过"),

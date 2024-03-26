@@ -17,7 +17,7 @@ import cn.iocoder.yudao.module.bpm.convert.task.BpmTaskConvert;
 import cn.iocoder.yudao.module.bpm.enums.task.BpmCommentTypeEnum;
 import cn.iocoder.yudao.module.bpm.enums.task.BpmDeleteReasonEnum;
 import cn.iocoder.yudao.module.bpm.enums.task.BpmTaskSignTypeEnum;
-import cn.iocoder.yudao.module.bpm.enums.task.BpmTaskStatustEnum;
+import cn.iocoder.yudao.module.bpm.enums.task.BpmTaskStatusEnum;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmConstants;
 import cn.iocoder.yudao.module.bpm.service.definition.BpmModelService;
 import cn.iocoder.yudao.module.bpm.service.message.BpmMessageService;
@@ -202,7 +202,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
 
         // 情况三：审批普通的任务。大多数情况下，都是这样
         // 3.1 更新 task 状态、原因
-        updateTaskStatusAndReason(task.getId(), BpmTaskStatustEnum.APPROVE.getStatus(), reqVO.getReason());
+        updateTaskStatusAndReason(task.getId(), BpmTaskStatusEnum.APPROVE.getStatus(), reqVO.getReason());
         // 3.2 添加评论
         taskService.addComment(task.getId(), task.getProcessInstanceId(), BpmCommentTypeEnum.APPROVE.getType(),
                 BpmCommentTypeEnum.APPROVE.formatComment(reqVO.getReason()));
@@ -230,14 +230,14 @@ public class BpmTaskServiceImpl implements BpmTaskService {
      */
     private void approveAfterSignTask(Task task, BpmTaskApproveReqVO reqVO) {
         // 更新父 task 状态 + 原因
-        updateTaskStatusAndReason(task.getId(), BpmTaskStatustEnum.APPROVING.getStatus(), reqVO.getReason());
+        updateTaskStatusAndReason(task.getId(), BpmTaskStatusEnum.APPROVING.getStatus(), reqVO.getReason());
 
         // 2. 激活子任务
         List<Task> childrenTaskList = getTaskListByParentTaskId(task.getId());
         for (Task childrenTask : childrenTaskList) {
             taskService.resolveTask(childrenTask.getId());
             // 更新子 task 状态
-            updateTaskStatus(childrenTask.getId(), BpmTaskStatustEnum.RUNNING.getStatus());
+            updateTaskStatus(childrenTask.getId(), BpmTaskStatusEnum.RUNNING.getStatus());
         }
     }
 
@@ -261,7 +261,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         // 1.2 只处理加签的父任务
         Task parentTask = validateTaskExist(parentTaskId);
         String scopeType = parentTask.getScopeType();
-        if (BpmTaskSignTypeEnum.of(scopeType) == null){
+        if (BpmTaskSignTypeEnum.of(scopeType) == null) {
             return;
         }
 
@@ -275,17 +275,17 @@ public class BpmTaskServiceImpl implements BpmTaskService {
             // 3.1.1 owner 重新赋值给父任务的 assignee，这样它就可以被审批
             taskService.resolveTask(parentTaskId);
             // 3.1.2 更新流程任务 status
-            updateTaskStatus(parentTaskId, BpmTaskStatustEnum.RUNNING.getStatus());
+            updateTaskStatus(parentTaskId, BpmTaskStatusEnum.RUNNING.getStatus());
         // 3.2 情况二：处理向【向后】加签
         } else if (BpmTaskSignTypeEnum.AFTER.getType().equals(scopeType)) {
             // 只有 parentTask 处于 APPROVING 的情况下，才可以继续 complete 完成
             // 否则，一个未审批的 parentTask 任务，在加签出来的任务都被减签的情况下，就直接完成审批，这样会存在问题
             Integer status = (Integer) parentTask.getTaskLocalVariables().get(BpmConstants.TASK_VARIABLE_STATUS);
-            if (ObjectUtil.notEqual(status, BpmTaskStatustEnum.APPROVING.getStatus())) {
+            if (ObjectUtil.notEqual(status, BpmTaskStatusEnum.APPROVING.getStatus())) {
                 return;
             }
             // 3.2.2 完成自己（因为它已经没有子任务，所以也可以完成）
-            updateTaskStatus(parentTaskId, BpmTaskStatustEnum.APPROVE.getStatus());
+            updateTaskStatus(parentTaskId, BpmTaskStatusEnum.APPROVE.getStatus());
             taskService.complete(parentTaskId);
         }
 
@@ -311,7 +311,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         // 底层调用 TaskHelper.changeTaskAssignee(task, task.getOwner())：将 owner 设置为 assignee
         taskService.resolveTask(task.getId());
         // 2.2 更新 task 状态 + 原因
-        updateTaskStatusAndReason(task.getId(), BpmTaskStatustEnum.RUNNING.getStatus(), reqVO.getReason());
+        updateTaskStatusAndReason(task.getId(), BpmTaskStatusEnum.RUNNING.getStatus(), reqVO.getReason());
     }
 
     @Override
@@ -326,7 +326,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         }
 
         // 2.1 更新流程实例为不通过
-        updateTaskStatusAndReason(task.getId(), BpmTaskStatustEnum.REJECT.getStatus(), reqVO.getReason());
+        updateTaskStatusAndReason(task.getId(), BpmTaskStatusEnum.REJECT.getStatus(), reqVO.getReason());
         // 2.2 添加评论
         taskService.addComment(task.getId(), task.getProcessInstanceId(), BpmCommentTypeEnum.REJECT.getType(),
                 BpmCommentTypeEnum.REJECT.formatComment(reqVO.getReason()));
@@ -378,7 +378,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
             log.error("[updateTaskStatusWhenCreated][taskId({}) 已经有状态({})]", task.getId(), status);
             return;
         }
-        updateTaskStatus(task.getId(), BpmTaskStatustEnum.RUNNING.getStatus());
+        updateTaskStatus(task.getId(), BpmTaskStatusEnum.RUNNING.getStatus());
     }
 
     @Override
@@ -392,11 +392,11 @@ public class BpmTaskServiceImpl implements BpmTaskService {
 
         // 2. 更新 task 状态 + 原因
         Integer status = (Integer) task.getTaskLocalVariables().get(BpmConstants.TASK_VARIABLE_STATUS);
-        if (BpmTaskStatustEnum.isEndStatus(status)) {
+        if (BpmTaskStatusEnum.isEndStatus(status)) {
             log.error("[updateTaskStatusWhenCanceled][taskId({}) 处于结果({})，无需进行更新]", taskId, status);
             return;
         }
-        updateTaskStatusAndReason(taskId, BpmTaskStatustEnum.CANCEL.getStatus(), BpmDeleteReasonEnum.CANCEL_BY_SYSTEM.getReason());
+        updateTaskStatusAndReason(taskId, BpmTaskStatusEnum.CANCEL.getStatus(), BpmDeleteReasonEnum.CANCEL_BY_SYSTEM.getReason());
         // 补充说明：由于 Task 被删除成 HistoricTask 后，无法通过 taskService.addComment 添加理由，所以无法存储具体的取消理由
     }
 
@@ -525,7 +525,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
             taskService.addComment(task.getId(), currentTask.getProcessInstanceId(), BpmCommentTypeEnum.RETURN.getType(),
                     BpmCommentTypeEnum.RETURN.formatComment(reqVO.getReason()));
             // 2.2 更新 task 状态 + 原因
-            updateTaskStatusAndReason(task.getId(), BpmTaskStatustEnum.RETURN.getStatus(), reqVO.getReason());
+            updateTaskStatusAndReason(task.getId(), BpmTaskStatusEnum.RETURN.getStatus(), reqVO.getReason());
         });
 
         // 3. 执行驳回
@@ -562,7 +562,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         taskService.delegateTask(taskId, reqVO.getDelegateUserId().toString());
         // 3.3 更新 task 状态。
         // 为什么不更新原因？因为原因目前主要给审批通过、不通过时使用
-        updateTaskStatus(taskId, BpmTaskStatustEnum.DELEGATE.getStatus());
+        updateTaskStatus(taskId, BpmTaskStatusEnum.DELEGATE.getStatus());
     }
 
     @Override
@@ -616,7 +616,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         taskService.saveTask(taskEntity);
         // 2.6 更新 task 状态为 WAIT，只有在向前加签的时候
         if (reqVO.getType().equals(BpmTaskSignTypeEnum.BEFORE.getType())) {
-            updateTaskStatus(taskEntity.getId(), BpmTaskStatustEnum.WAIT.getStatus());
+            updateTaskStatus(taskEntity.getId(), BpmTaskStatusEnum.WAIT.getStatus());
         }
 
         // 3. 创建加签任务
@@ -703,7 +703,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
 
         // 3. 向后前签，设置子任务的状态为 WAIT，因为需要等父任务审批完
         if (BpmTaskSignTypeEnum.AFTER.getType().equals(parentTask.getScopeType())) {
-            updateTaskStatus(task.getId(), BpmTaskStatustEnum.WAIT.getStatus());
+            updateTaskStatus(task.getId(), BpmTaskStatusEnum.WAIT.getStatus());
         }
     }
 
@@ -727,7 +727,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         childTaskList.add(task);
         // 2.2 更新子任务为已取消
         String cancelReason = StrUtil.format("任务被取消，原因：由于[{}]操作[减签]，", cancelUser.getNickname());
-        childTaskList.forEach(childTask -> updateTaskStatusAndReason(childTask.getId(), BpmTaskStatustEnum.CANCEL.getStatus(), cancelReason));
+        childTaskList.forEach(childTask -> updateTaskStatusAndReason(childTask.getId(), BpmTaskStatusEnum.CANCEL.getStatus(), cancelReason));
         // 2.2 删除任务和所有子任务
         taskService.deleteTasks(convertList(childTaskList, Task::getId));
 
