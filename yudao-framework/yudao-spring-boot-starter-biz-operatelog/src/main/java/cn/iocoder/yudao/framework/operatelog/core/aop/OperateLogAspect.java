@@ -32,9 +32,12 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Array;
+import java.lang.reflect.Field;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import static cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants.INTERNAL_SERVER_ERROR;
@@ -366,10 +369,20 @@ public class OperateLogAspect {
             return isIgnoreArgs(((Map<?, ?>) object).values());
         }
         // obj
+        //获取object中的所有属性的类型
+        Field[] fields = object.getClass().getDeclaredFields();
+        AtomicReference<Boolean> subIgnore = new AtomicReference<>(false);
+        Arrays.stream(fields).collect(Collectors.toList()).forEach(field -> {
+            if (subIgnore.get()) {
+                return;
+            }
+            subIgnore.set(field.getType().isAssignableFrom(MultipartFile.class));
+        });
         return object instanceof MultipartFile
                 || object instanceof HttpServletRequest
                 || object instanceof HttpServletResponse
-                || object instanceof BindingResult;
+                || object instanceof BindingResult
+                || subIgnore.get();
     }
 
 }
