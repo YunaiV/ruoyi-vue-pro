@@ -162,7 +162,7 @@
 | 🚀  | 应用管理  | 管理 SSO 单点登录的应用，支持多种 OAuth2 授权方式 |
 | 🚀  | 地区管理  | 展示省份、城市、区镇等城市信息，支持 IP 对应城市      |
 
-![功能图](/img/common/system-feature.png)
+![功能图](/.image/common/system-feature.png)
 
 ### 工作流程
 
@@ -176,7 +176,7 @@
 | 🚀  | 已办任务  | 查看自己【已】审批的工作任务，未来会支持回退操作               |
 | 🚀  | OA 请假 | 作为业务自定义接入工作流的使用示例，只需创建请求对应的工作流程，即可进行审批 |
 
-![功能图](/img/common/bpm-feature.png)
+![功能图](/.image/common/bpm-feature.png)
 
 ### 支付系统
 
@@ -213,7 +213,7 @@
 | 🚀  | 日志服务      | 轻量级日志中心，查看远程服务器的日志                           |
 | 🚀  | 单元测试      | 基于 JUnit + Mockito 实现单元测试，保证功能的正确性、代码的质量等    |
 
-![功能图](/img/common/infra-feature.png)
+![功能图](/.image/common/infra-feature.png)
 
 ### 数据报表
 
