@@ -46,6 +46,15 @@ public interface BpmModelService {
      */
     byte[] getModelBpmnXML(String id);
 
+
+    /**
+     * 保存流程模型的 BPMN XML
+     *
+     * @param id 编号
+     * @param bpmnXml BPMN XML
+     */
+    void saveModelBpmnXml(String id, String bpmnXml);
+
     /**
      * 修改流程模型
      *

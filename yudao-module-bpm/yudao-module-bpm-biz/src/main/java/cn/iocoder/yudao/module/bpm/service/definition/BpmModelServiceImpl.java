@@ -103,7 +103,7 @@ public class BpmModelServiceImpl implements BpmModelService {
         // 保存流程定义
         repositoryService.saveModel(model);
         // 保存 BPMN XML
-        saveModelBpmnXml(model, bpmnXml);
+        saveModelBpmnXml(model.getId(), bpmnXml);
         return model.getId();
     }
 
@@ -121,7 +121,7 @@ public class BpmModelServiceImpl implements BpmModelService {
         // 更新模型
         repositoryService.saveModel(model);
         // 更新 BPMN XML
-        saveModelBpmnXml(model, updateReqVO.getBpmnXml());
+        saveModelBpmnXml(model.getId(), updateReqVO.getBpmnXml());
     }
 
     @Override
@@ -236,11 +236,12 @@ public class BpmModelServiceImpl implements BpmModelService {
         }
     }
 
-    private void saveModelBpmnXml(Model model, String bpmnXml) {
+    @Override
+    public void saveModelBpmnXml(String id, String bpmnXml) {
         if (StrUtil.isEmpty(bpmnXml)) {
             return;
         }
-        repositoryService.addModelEditorSource(model.getId(), StrUtil.utf8Bytes(bpmnXml));
+        repositoryService.addModelEditorSource(id, StrUtil.utf8Bytes(bpmnXml));
     }
 
     /**

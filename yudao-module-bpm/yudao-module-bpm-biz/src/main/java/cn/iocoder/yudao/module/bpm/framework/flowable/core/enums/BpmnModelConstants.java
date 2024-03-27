@@ -23,4 +23,14 @@ public interface BpmnModelConstants {
      */
     String USER_TASK_CANDIDATE_PARAM = "candidateParam";
 
+    /**
+     * BPMN Start Event 节点 Id, 用于后端生成 Start Event 节点
+     */
+    String START_EVENT_ID = "StartEvent_1";
+
+    /**
+     * BPMN End Event 节点 Id， 用于后端生成 End Event 节点
+     */
+    String END_EVENT_ID = "EndEvent_1";
+
 }

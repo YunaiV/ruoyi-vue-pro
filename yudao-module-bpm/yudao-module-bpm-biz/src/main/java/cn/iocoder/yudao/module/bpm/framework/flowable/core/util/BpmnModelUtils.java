@@ -1,15 +1,25 @@
 package cn.iocoder.yudao.module.bpm.framework.flowable.core.util;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.lang.Assert;
+import cn.hutool.core.lang.TypeReference;
+import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.ArrayUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.util.number.NumberUtils;
+import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.simple.BpmSimpleModelNodeVO;
+import cn.iocoder.yudao.module.bpm.enums.definition.BpmSimpleModelNodeType;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnModelConstants;
+import org.flowable.bpmn.BpmnAutoLayout;
 import org.flowable.bpmn.converter.BpmnXMLConverter;
 import org.flowable.bpmn.model.Process;
 import org.flowable.bpmn.model.*;
 import org.flowable.common.engine.impl.util.io.BytesStreamSource;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * 流程模型转操作工具类
@@ -324,6 +334,150 @@ public class BpmnModelUtils {
             userTaskList = iteratorFindChildUserTasks(sequenceFlow.getTargetFlowElement(), runTaskKeyList, hasSequenceFlow, userTaskList);
         }
         return userTaskList;
+    }
+
+    /**
+     * 仿钉钉流程设计模型数据结构(json) 转换成 Bpmn Model (待完善）
+     * @param processId  流程标识
+     * @param processName 流程名称
+     * @param simpleModelNode 仿钉钉流程设计模型数据结构
+     * @return Bpmn Model
+     */
+    public static BpmnModel convertSimpleModelToBpmnModel(String processId, String processName,BpmSimpleModelNodeVO simpleModelNode) {
+        BpmnModel bpmnModel = new BpmnModel();
+        Process mainProcess = new Process();
+        mainProcess.setId(processId);
+        mainProcess.setName(processName);
+        mainProcess.setExecutable(Boolean.TRUE);
+        bpmnModel.addProcess(mainProcess);
+        // 目前前端传进来的节点。 没有 start event 节点 和 end event 节点。
+        // 在最前面加上 start event node
+        BpmSimpleModelNodeVO startEventNode = new BpmSimpleModelNodeVO();
+        startEventNode.setId(BpmnModelConstants.START_EVENT_ID);
+        startEventNode.setName("开始");
+        startEventNode.setType(BpmSimpleModelNodeType.START_NODE.getType());
+        startEventNode.setChildNode(simpleModelNode);
+        // 添加 FlowNode
+        addBpmnFlowNode(mainProcess, startEventNode);
+        // 单独添加 end event 节点
+        addBpmnEndEventNode(mainProcess);
+        // 添加节点之间的连线 Sequence Flow
+        addBpmnSequenceFlow(mainProcess, startEventNode);
+        // 自动布局
+        new BpmnAutoLayout(bpmnModel).execute();
+
+        return bpmnModel;
+    }
+
+    private static void addBpmnSequenceFlow(Process mainProcess, BpmSimpleModelNodeVO node) {
+        // 节点为 null 退出
+        if (node == null) {
+            return;
+        }
+        BpmSimpleModelNodeVO childNode = node.getChildNode();
+        // 如果后续节点为 null. 添加与结束节点的连线
+        if (childNode == null) {
+            addBpmnSequenceFlowElement(mainProcess, node.getId(),BpmnModelConstants.END_EVENT_ID, null);
+            return;
+        }
+        BpmSimpleModelNodeType nodeType = BpmSimpleModelNodeType.valueOf(node.getType());
+        Assert.notNull(nodeType, "模型节点类型不支持");
+        switch(nodeType){
+            case START_NODE :
+            case START_USER_NODE :
+            case APPROVE_USER_NODE :
+                addBpmnSequenceFlowElement(mainProcess, node.getId(), childNode.getId(), null);
+                break;
+            default : {
+                // TODO 其它节点类型的实现
+            }
+        }
+        // 递归调用后续节点
+        addBpmnSequenceFlow(mainProcess, childNode);
+    }
+
+    private static void addBpmnSequenceFlowElement(Process mainProcess,  String sourceId,  String targetId, String conditionExpression) {
+        SequenceFlow sequenceFlow = new SequenceFlow(sourceId, targetId);
+        if (StrUtil.isNotEmpty(conditionExpression)) {
+            sequenceFlow.setConditionExpression(conditionExpression);
+        }
+        mainProcess.addFlowElement(sequenceFlow);
+
+    }
+
+    private static void addBpmnFlowNode(Process mainProcess, BpmSimpleModelNodeVO simpleModelNode) {
+        // 节点为 null 退出
+        if (simpleModelNode == null) {
+            return;
+        }
+        BpmSimpleModelNodeType nodeType = BpmSimpleModelNodeType.valueOf(simpleModelNode.getType());
+        Assert.notNull(nodeType, "模型节点类型不支持");
+        switch(nodeType){
+            case START_NODE :
+                addBpmnStartEventNode(mainProcess, simpleModelNode);
+                break;
+            case START_USER_NODE :
+            case APPROVE_USER_NODE :
+                addBpmnUserTaskEventNode(mainProcess, simpleModelNode);
+                break;
+            default : {
+                // TODO 其它节点类型的实现
+            }
+        }
+
+        // 如果不是网关类型的接口， 并且chileNode为空退出
+        if (!BpmSimpleModelNodeType.isGatewayNode(simpleModelNode.getType()) && simpleModelNode.getChildNode() == null) {
+            return;
+        }
+
+        // 如果是网关类型接口. 递归添加条件节点
+        if (BpmSimpleModelNodeType.isGatewayNode(simpleModelNode.getType()) && ArrayUtil.isNotEmpty(simpleModelNode.getConditionNodes())) {
+            for (BpmSimpleModelNodeVO node : simpleModelNode.getConditionNodes()) {
+                addBpmnFlowNode(mainProcess, node);
+            }
+        }
+
+        // chileNode不为空，递归添加子节点
+        if (simpleModelNode.getChildNode() != null) {
+            addBpmnFlowNode(mainProcess, simpleModelNode.getChildNode());
+        }
+    }
+
+    private static void addBpmnEndEventNode(Process mainProcess) {
+        EndEvent endEvent = new EndEvent();
+        endEvent.setId(BpmnModelConstants.END_EVENT_ID);
+        endEvent.setName("结束");
+        mainProcess.addFlowElement(endEvent);
+    }
+
+    private static void addBpmnUserTaskEventNode(Process mainProcess, BpmSimpleModelNodeVO node) {
+        UserTask userTask = new UserTask();
+        userTask.setId(node.getId());
+        userTask.setName(node.getName());
+        Integer candidateStrategy =  MapUtil.getInt(node.getAttributes(),BpmnModelConstants.USER_TASK_CANDIDATE_STRATEGY);
+        List<Integer> candidateParam = MapUtil.get(node.getAttributes(), BpmnModelConstants.USER_TASK_CANDIDATE_PARAM, new TypeReference<>() {});
+        // 添加自定义属性
+        addExtensionAttribute(userTask, BpmnModelConstants.NAMESPACE, BpmnModelConstants.USER_TASK_CANDIDATE_STRATEGY,
+                candidateStrategy == null ? null : String.valueOf(candidateStrategy));
+        addExtensionAttribute(userTask, BpmnModelConstants.NAMESPACE, BpmnModelConstants.USER_TASK_CANDIDATE_PARAM,
+                CollUtil.join(candidateParam, ","));
+        mainProcess.addFlowElement(userTask);
+    }
+
+    private static void addExtensionAttribute(FlowElement element, String namespace, String name,  String value) {
+        if (value == null) {
+            return;
+        }
+        ExtensionAttribute extensionAttribute = new ExtensionAttribute(name, value);
+        extensionAttribute.setNamespace(namespace);
+        element.addAttribute(extensionAttribute);
+    }
+
+    private static void addBpmnStartEventNode(Process mainProcess, BpmSimpleModelNodeVO node) {
+        StartEvent startEvent = new StartEvent();
+        startEvent.setId(node.getId());
+        startEvent.setName(node.getName());
+        mainProcess.addFlowElement(startEvent);
     }
 
 }
