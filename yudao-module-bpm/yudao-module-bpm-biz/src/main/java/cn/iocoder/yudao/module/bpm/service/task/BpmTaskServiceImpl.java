@@ -728,7 +728,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         // 2.2 更新子任务为已取消
         String cancelReason = StrUtil.format("任务被取消，原因：由于[{}]操作[减签]，", cancelUser.getNickname());
         childTaskList.forEach(childTask -> updateTaskStatusAndReason(childTask.getId(), BpmTaskStatusEnum.CANCEL.getStatus(), cancelReason));
-        // 2.2 删除任务和所有子任务
+        // 2.3 删除任务和所有子任务
         taskService.deleteTasks(convertList(childTaskList, Task::getId));
 
         // 3. 记录日志到父任务中。先记录日志是因为，通过 handleParentTask 方法之后，任务可能被完成了，并且不存在了，会报异常，所以先记录
