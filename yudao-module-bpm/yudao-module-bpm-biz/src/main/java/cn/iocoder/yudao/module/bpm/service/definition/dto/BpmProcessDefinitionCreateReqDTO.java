@@ -1,15 +1,11 @@
 package cn.iocoder.yudao.module.bpm.service.definition.dto;
 
-import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.module.bpm.enums.definition.BpmModelFormTypeEnum;
 import lombok.Data;
 
-import javax.validation.constraints.AssertTrue;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.util.List;
-import java.util.Objects;
 
 /**
  * 流程定义创建 Request DTO
@@ -40,7 +36,6 @@ public class BpmProcessDefinitionCreateReqDTO {
     private String description;
     /**
      * 流程分类
-     * 参见 bpm_model_category 数据字典
      */
     @NotEmpty(message = "流程分类不能为空")
     private String category;
@@ -82,23 +77,5 @@ public class BpmProcessDefinitionCreateReqDTO {
      * 在表单类型为 {@link BpmModelFormTypeEnum#CUSTOM} 时
      */
     private String formCustomViewPath;
-
-    @AssertTrue(message = "流程表单信息不全")
-    public boolean isNormalFormTypeValid() {
-        // 如果非业务表单，则直接通过
-        if (!Objects.equals(formType, BpmModelFormTypeEnum.NORMAL.getType())) {
-            return true;
-        }
-        return formId != null && StrUtil.isNotEmpty(formConf) && CollUtil.isNotEmpty(formFields);
-    }
-
-    @AssertTrue(message = "业务表单信息不全")
-    public boolean isNormalCustomTypeValid() {
-        // 如果非业务表单，则直接通过
-        if (!Objects.equals(formType, BpmModelFormTypeEnum.CUSTOM.getType())) {
-            return true;
-        }
-        return StrUtil.isNotEmpty(formCustomCreatePath) && StrUtil.isNotEmpty(formCustomViewPath);
-    }
 
 }

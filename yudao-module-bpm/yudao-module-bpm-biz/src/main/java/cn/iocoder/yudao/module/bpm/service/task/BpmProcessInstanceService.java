@@ -1,9 +1,10 @@
 package cn.iocoder.yudao.module.bpm.service.task;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.module.bpm.api.task.dto.BpmProcessInstanceCreateReqDTO;
-import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.instance.*;
+import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.instance.BpmProcessInstanceCancelReqVO;
+import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.instance.BpmProcessInstanceCreateReqVO;
+import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.instance.BpmProcessInstancePageReqVO;
 import org.flowable.engine.delegate.event.FlowableCancelledEvent;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.runtime.ProcessInstance;
@@ -12,6 +13,8 @@ import javax.validation.Valid;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
 
 /**
  * 流程实例 Service 接口
@@ -43,63 +46,8 @@ public interface BpmProcessInstanceService {
      * @return 流程实例列表 Map
      */
     default Map<String, ProcessInstance> getProcessInstanceMap(Set<String> ids) {
-        return CollectionUtils.convertMap(getProcessInstances(ids), ProcessInstance::getProcessInstanceId);
+        return convertMap(getProcessInstances(ids), ProcessInstance::getProcessInstanceId);
     }
-
-    /**
-     * 获得流程实例名字 Map
-     *
-     * @param ids 流程实例的编号集合
-     * @return 对应的映射关系
-     */
-    default Map<String, String> getProcessInstanceNameMap(Set<String> ids) {
-        return CollectionUtils.convertMap(getProcessInstances(ids),
-                ProcessInstance::getProcessInstanceId, ProcessInstance::getName);
-    }
-
-    /**
-     * 获得流程实例的分页
-     *
-     * @param userId    用户编号
-     * @param pageReqVO 分页请求
-     * @return 流程实例的分页
-     */
-    PageResult<BpmProcessInstancePageItemRespVO> getMyProcessInstancePage(Long userId,
-                                                                          @Valid BpmProcessInstanceMyPageReqVO pageReqVO);
-
-    /**
-     * 创建流程实例（提供给前端）
-     *
-     * @param userId      用户编号
-     * @param createReqVO 创建信息
-     * @return 实例的编号
-     */
-    String createProcessInstance(Long userId, @Valid BpmProcessInstanceCreateReqVO createReqVO);
-
-    /**
-     * 创建流程实例（提供给内部）
-     *
-     * @param userId       用户编号
-     * @param createReqDTO 创建信息
-     * @return 实例的编号
-     */
-    String createProcessInstance(Long userId, @Valid BpmProcessInstanceCreateReqDTO createReqDTO);
-
-    /**
-     * 获得流程实例 VO 信息
-     *
-     * @param id 流程实例的编号
-     * @return 流程实例
-     */
-    BpmProcessInstanceRespVO getProcessInstanceVO(String id);
-
-    /**
-     * 取消流程实例
-     *
-     * @param userId      用户编号
-     * @param cancelReqVO 取消信息
-     */
-    void cancelProcessInstance(Long userId, @Valid BpmProcessInstanceCancelReqVO cancelReqVO);
 
     /**
      * 获得历史的流程实例
@@ -124,29 +72,66 @@ public interface BpmProcessInstanceService {
      * @return 历史的流程实例列表 Map
      */
     default Map<String, HistoricProcessInstance> getHistoricProcessInstanceMap(Set<String> ids) {
-        return CollectionUtils.convertMap(getHistoricProcessInstances(ids), HistoricProcessInstance::getId);
+        return convertMap(getHistoricProcessInstances(ids), HistoricProcessInstance::getId);
     }
 
     /**
-     * 创建 ProcessInstance 拓展记录
+     * 获得流程实例的分页
      *
-     * @param instance 流程任务
+     * @param userId    用户编号
+     * @param pageReqVO 分页请求
+     * @return 流程实例的分页
      */
-    void createProcessInstanceExt(ProcessInstance instance);
+    PageResult<HistoricProcessInstance> getProcessInstancePage(Long userId,
+                                                               @Valid BpmProcessInstancePageReqVO pageReqVO);
+
+    /**
+     * 创建流程实例（提供给前端）
+     *
+     * @param userId      用户编号
+     * @param createReqVO 创建信息
+     * @return 实例的编号
+     */
+    String createProcessInstance(Long userId, @Valid BpmProcessInstanceCreateReqVO createReqVO);
+
+    /**
+     * 创建流程实例（提供给内部）
+     *
+     * @param userId       用户编号
+     * @param createReqDTO 创建信息
+     * @return 实例的编号
+     */
+    String createProcessInstance(Long userId, @Valid BpmProcessInstanceCreateReqDTO createReqDTO);
+
+    /**
+     * 发起人取消流程实例
+     *
+     * @param userId      用户编号
+     * @param cancelReqVO 取消信息
+     */
+    void cancelProcessInstanceByStartUser(Long userId, @Valid BpmProcessInstanceCancelReqVO cancelReqVO);
+
+    /**
+     * 管理员取消流程实例
+     *
+     * @param userId           用户编号
+     * @param cancelReqVO 取消信息
+     */
+    void cancelProcessInstanceByAdmin(Long userId, BpmProcessInstanceCancelReqVO cancelReqVO);
 
     /**
      * 更新 ProcessInstance 拓展记录为取消
      *
      * @param event 流程取消事件
      */
-    void updateProcessInstanceExtCancel(FlowableCancelledEvent event);
+    void updateProcessInstanceWhenCancel(FlowableCancelledEvent event);
 
     /**
      * 更新 ProcessInstance 拓展记录为完成
      *
      * @param instance 流程任务
      */
-    void updateProcessInstanceExtComplete(ProcessInstance instance);
+    void updateProcessInstanceWhenApprove(ProcessInstance instance);
 
     /**
      * 更新 ProcessInstance 拓展记录为不通过
@@ -154,16 +139,6 @@ public interface BpmProcessInstanceService {
      * @param id     流程编号
      * @param reason 理由。例如说，审批不通过时，需要传递该值
      */
-    void updateProcessInstanceExtReject(String id, String reason);
-
-    // TODO @hai：改成 getProcessInstanceAssigneesByTaskDefinitionKey(String id, String taskDefinitionKey)
-    /**
-     * 获取流程实例中，取出指定流程任务提前指定的审批人
-     *
-     * @param processInstanceId 流程实例的编号
-     * @param taskDefinitionKey 流程任务定义的 key
-     * @return 审批人集合
-     */
-    List<Long> getAssigneeByProcessInstanceIdAndTaskDefinitionKey(String processInstanceId, String taskDefinitionKey);
+    void updateProcessInstanceReject(String id, String reason);
 
 }

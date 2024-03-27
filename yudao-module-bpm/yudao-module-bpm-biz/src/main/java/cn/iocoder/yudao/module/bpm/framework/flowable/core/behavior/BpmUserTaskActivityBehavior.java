@@ -3,7 +3,7 @@ package cn.iocoder.yudao.module.bpm.framework.flowable.core.behavior;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.RandomUtil;
-import cn.iocoder.yudao.module.bpm.service.definition.BpmTaskAssignRuleService;
+import cn.iocoder.yudao.module.bpm.framework.flowable.core.candidate.BpmTaskCandidateInvoker;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.flowable.bpmn.model.UserTask;
@@ -29,7 +29,7 @@ import java.util.Set;
 public class BpmUserTaskActivityBehavior extends UserTaskActivityBehavior {
 
     @Setter
-    private BpmTaskAssignRuleService bpmTaskRuleService;
+    private BpmTaskCandidateInvoker taskCandidateInvoker;
 
     public BpmUserTaskActivityBehavior(UserTask userTask) {
         super(userTask);
@@ -47,14 +47,15 @@ public class BpmUserTaskActivityBehavior extends UserTaskActivityBehavior {
     }
 
     private Long calculateTaskCandidateUsers(DelegateExecution execution) {
-        // 情况一，如果是多实例的任务，例如说会签、或签等情况，则从 Variable 中获取。它的任务处理人在 BpmParallelMultiInstanceBehavior 中已经被分配了
+        // 情况一，如果是多实例的任务，例如说会签、或签等情况，则从 Variable 中获取。
+        // 顺序审批可见 BpmSequentialMultiInstanceBehavior，并发审批可见 BpmSequentialMultiInstanceBehavior
         if (super.multiInstanceActivityBehavior != null) {
             return execution.getVariable(super.multiInstanceActivityBehavior.getCollectionElementVariable(), Long.class);
         }
 
         // 情况二，如果非多实例的任务，则计算任务处理人
         // 第一步，先计算可处理该任务的处理人们
-        Set<Long> candidateUserIds = bpmTaskRuleService.calculateTaskCandidateUsers(execution);
+        Set<Long> candidateUserIds = taskCandidateInvoker.calculateUsers(execution);
         // 第二步，后随机选择一个任务的处理人
         // 疑问：为什么一定要选择一个任务处理人？
         // 解答：项目对 bpm 的任务是责任到人，所以每个任务有且仅有一个处理人。

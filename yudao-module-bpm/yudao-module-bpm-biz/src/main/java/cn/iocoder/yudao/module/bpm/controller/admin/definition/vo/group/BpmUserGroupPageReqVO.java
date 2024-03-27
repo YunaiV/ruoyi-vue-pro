@@ -12,9 +12,10 @@ import java.time.LocalDateTime;
 
 @Schema(description = "管理后台 - 用户组分页 Request VO")
 @Data
-@EqualsAndHashCode(callSuper = true)
-@ToString(callSuper = true)
 public class BpmUserGroupPageReqVO extends PageParam {
+
+    @Schema(description = "编号", example = "1024")
+    private Long id;
 
     @Schema(description = "组名", example = "芋道")
     private String name;

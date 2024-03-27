@@ -35,7 +35,7 @@ public class BannerApplicationRunner implements ApplicationRunner {
                 System.out.println("[报表模块 yudao-module-report - 已禁用][参考 https://doc.iocoder.cn/report/ 开启]");
             }
             // 工作流
-            if (isNotPresent("cn.iocoder.yudao.framework.flowable.config.YudaoFlowableConfiguration")) {
+            if (isNotPresent("cn.iocoder.yudao.module.bpm.framework.flowable.config.BpmFlowableConfiguration")) {
                 System.out.println("[工作流模块 yudao-module-bpm - 已禁用][参考 https://doc.iocoder.cn/bpm/ 开启]");
             }
             // 商城系统

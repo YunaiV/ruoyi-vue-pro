@@ -99,7 +99,7 @@ public class AuthController {
         // 1.1 获得用户信息
         AdminUserDO user = userService.getUser(getLoginUserId());
         if (user == null) {
-            return null;
+            return success(null);
         }
 
         // 1.2 获得角色列表
