@@ -21,6 +21,6 @@ public class CrmCustomerImportReqVO {
     private Boolean updateSupport;
 
     @Schema(description = "负责人", example = "1")
-    private Long ownerUserId; // 为 null 则客户进入公海
+    private Long ownerUserId; // 为 null 则客户负责人为当前用户
 
 }
