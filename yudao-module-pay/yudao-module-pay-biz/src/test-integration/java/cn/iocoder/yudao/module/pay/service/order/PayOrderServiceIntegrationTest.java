@@ -11,7 +11,7 @@ import cn.iocoder.yudao.framework.pay.core.enums.PayChannelEnum;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
 
-import jakarta.annotation.Resource;
+import javax.annotation.Resource;
 import java.time.Duration;
 
 @Import({PayOrderServiceImpl.class, PayAppServiceImpl.class,

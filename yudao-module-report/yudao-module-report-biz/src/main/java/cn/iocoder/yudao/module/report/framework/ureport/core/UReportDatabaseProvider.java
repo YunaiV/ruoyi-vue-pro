@@ -15,7 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import jakarta.annotation.Resource;
+import javax.annotation.Resource;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.Collections;
@@ -29,7 +29,7 @@ import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.
  * @author 赤焰
  */
 // TODO @赤焰：这个 bean 的注解，交给 UReportConfiguration 搞
-//@Component
+@Component
 @Slf4j
 @Setter
 public class UReportDatabaseProvider implements ReportProvider {

@@ -39,7 +39,7 @@ import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.validation.annotation.Validated;
 
-import jakarta.annotation.Resource;
+import javax.annotation.Resource;
 import java.time.LocalDateTime;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
@@ -383,7 +383,7 @@ public class AfterSaleServiceImpl implements AfterSaleService {
     @AfterSaleLog(operateType = AfterSaleOperateTypeEnum.MEMBER_CANCEL)
     public void cancelAfterSale(Long userId, Long id) {
         // 校验售后单的状态，并状态待退款
-        AfterSaleDO afterSale = tradeAfterSaleMapper.selectById(id);
+        AfterSaleDO afterSale = tradeAfterSaleMapper.selectByIdAndUserId(id, userId);
         if (afterSale == null) {
             throw exception(AFTER_SALE_NOT_FOUND);
         }

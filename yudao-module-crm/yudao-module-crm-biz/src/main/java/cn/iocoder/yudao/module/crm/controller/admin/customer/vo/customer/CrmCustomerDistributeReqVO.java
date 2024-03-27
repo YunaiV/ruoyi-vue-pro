@@ -1,10 +1,10 @@
 package cn.iocoder.yudao.module.crm.controller.admin.customer.vo.customer;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import java.util.List;
 
 @Schema(description = "管理后台 - CRM 客户分配公海给对应负责人 Request VO")

@@ -9,7 +9,7 @@ import cn.iocoder.yudao.module.infra.websocket.message.DemoSendMessage;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.WebSocketSession;
 
-import jakarta.annotation.Resource;
+import javax.annotation.Resource;
 
 /**
  * WebSocket 示例：单发消息

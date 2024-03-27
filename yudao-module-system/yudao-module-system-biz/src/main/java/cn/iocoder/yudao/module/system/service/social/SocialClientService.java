@@ -9,7 +9,7 @@ import cn.iocoder.yudao.module.system.enums.social.SocialTypeEnum;
 import com.xingyuv.jushauth.model.AuthUser;
 import me.chanjar.weixin.common.bean.WxJsapiSignature;
 
-import jakarta.validation.Valid;
+import javax.validation.Valid;
 
 /**
  * 社交应用 Service 接口

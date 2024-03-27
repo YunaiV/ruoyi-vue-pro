@@ -1,8 +1,9 @@
 package cn.iocoder.yudao.module.bpm.event;
 
-import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import org.springframework.context.ApplicationEvent;
+
+import javax.validation.constraints.NotNull;
 
 /**
  * 流程实例的状态（结果）发生变化的 Event

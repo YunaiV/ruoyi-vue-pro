@@ -1,9 +1,10 @@
 package cn.iocoder.yudao.module.system.api.logger.dto;
 
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
 import lombok.Data;
+
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 
 /**
  * 系统操作日志 Create Request DTO

@@ -30,18 +30,19 @@ import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import com.mzt.logapi.context.LogRecordContext;
 import com.mzt.logapi.service.impl.DiffParseFunction;
 import com.mzt.logapi.starter.annotation.LogRecord;
-import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
+import javax.annotation.Resource;
 import java.time.LocalDateTime;
 import java.util.*;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.filterList;
+import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
 import static cn.iocoder.yudao.module.crm.enums.ErrorCodeConstants.*;
 import static cn.iocoder.yudao.module.crm.enums.LogRecordConstants.*;
 import static cn.iocoder.yudao.module.crm.enums.customer.CrmCustomerLimitConfigTypeEnum.CUSTOMER_LOCK_LIMIT;
@@ -111,7 +112,7 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
      * @return 客户信息 DO
      */
     private static CrmCustomerDO initCustomer(Object customer, Long ownerUserId) {
-        return BeanUtils.toBean(customer, CrmCustomerDO.class).setOwnerUserId(ownerUserId)
+        return BeanUtils.toBean(customer, CrmCustomerDO.class).setOwnerUserId(ownerUserId==null?getLoginUserId():ownerUserId)
                 .setOwnerTime(LocalDateTime.now());
     }
 
@@ -283,10 +284,8 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
                 customerMapper.insert(customer);
                 respVO.getCreateCustomerNames().add(importCustomer.getName());
                 // 1.2 创建数据权限
-                if (importReqVO.getOwnerUserId() != null) {
-                    permissionService.createPermission(new CrmPermissionCreateReqBO().setBizType(CrmBizTypeEnum.CRM_CUSTOMER.getType())
-                            .setBizId(customer.getId()).setUserId(importReqVO.getOwnerUserId()).setLevel(CrmPermissionLevelEnum.OWNER.getLevel()));
-                }
+                permissionService.createPermission(new CrmPermissionCreateReqBO().setBizType(CrmBizTypeEnum.CRM_CUSTOMER.getType())
+                        .setBizId(customer.getId()).setUserId(importReqVO.getOwnerUserId() == null?getLoginUserId():importReqVO.getOwnerUserId()).setLevel(CrmPermissionLevelEnum.OWNER.getLevel()));
                 // 1.3 记录操作日志
                 getSelf().importCustomerLog(customer, false);
                 return;

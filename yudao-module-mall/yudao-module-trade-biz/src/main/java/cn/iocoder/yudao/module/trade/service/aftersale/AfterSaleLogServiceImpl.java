@@ -7,7 +7,7 @@ import cn.iocoder.yudao.module.trade.service.aftersale.bo.AfterSaleLogCreateReqB
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
-import jakarta.annotation.Resource;
+import javax.annotation.Resource;
 import java.util.List;
 
 /**

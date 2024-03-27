@@ -8,7 +8,7 @@ import cn.iocoder.yudao.module.pay.dal.dataobject.wallet.PayWalletTransactionDO;
 import cn.iocoder.yudao.module.pay.enums.wallet.PayWalletBizTypeEnum;
 import cn.iocoder.yudao.module.pay.service.wallet.bo.WalletTransactionCreateReqBO;
 
-import jakarta.validation.Valid;
+import javax.validation.Valid;
 
 import java.time.LocalDateTime;
 

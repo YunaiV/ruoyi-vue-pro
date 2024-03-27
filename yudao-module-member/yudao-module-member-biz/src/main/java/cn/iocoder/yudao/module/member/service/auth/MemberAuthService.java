@@ -2,7 +2,7 @@ package cn.iocoder.yudao.module.member.service.auth;
 
 import cn.iocoder.yudao.module.member.controller.app.auth.vo.*;
 
-import jakarta.validation.Valid;
+import javax.validation.Valid;
 
 /**
  * 会员的认证 Service 接口

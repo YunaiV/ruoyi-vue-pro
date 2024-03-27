@@ -6,9 +6,9 @@ import cn.iocoder.yudao.module.product.controller.admin.spu.vo.ProductSpuSaveReq
 import cn.iocoder.yudao.module.product.controller.admin.spu.vo.ProductSpuUpdateStatusReqVO;
 import cn.iocoder.yudao.module.product.controller.app.spu.vo.AppProductSpuPageReqVO;
 import cn.iocoder.yudao.module.product.dal.dataobject.spu.ProductSpuDO;
-import jakarta.validation.Valid;
 import org.springframework.scheduling.annotation.Async;
 
+import javax.validation.Valid;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;

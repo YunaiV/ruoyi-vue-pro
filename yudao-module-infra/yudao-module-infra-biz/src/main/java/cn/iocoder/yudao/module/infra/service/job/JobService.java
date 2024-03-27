@@ -6,7 +6,7 @@ import cn.iocoder.yudao.module.infra.controller.admin.job.vo.job.JobSaveReqVO;
 import cn.iocoder.yudao.module.infra.dal.dataobject.job.JobDO;
 import org.quartz.SchedulerException;
 
-import jakarta.validation.Valid;
+import javax.validation.Valid;
 
 /**
  * 定时任务 Service 接口

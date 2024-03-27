@@ -7,11 +7,11 @@ import cn.iocoder.yudao.module.erp.controller.admin.product.vo.unit.ErpProductUn
 import cn.iocoder.yudao.module.erp.dal.dataobject.product.ErpProductUnitDO;
 import cn.iocoder.yudao.module.erp.dal.mysql.product.ErpProductUnitMapper;
 import com.google.common.annotations.VisibleForTesting;
-import jakarta.annotation.Resource;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
+import javax.annotation.Resource;
 import java.util.Collection;
 import java.util.List;
 

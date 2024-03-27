@@ -5,8 +5,8 @@ import cn.iocoder.yudao.framework.common.util.validation.ValidationUtils;
 import cn.iocoder.yudao.framework.pay.core.client.PayClientConfig;
 import lombok.Data;
 
-import jakarta.validation.Validator;
-import jakarta.validation.constraints.NotBlank;
+import javax.validation.Validator;
+import javax.validation.constraints.NotBlank;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 

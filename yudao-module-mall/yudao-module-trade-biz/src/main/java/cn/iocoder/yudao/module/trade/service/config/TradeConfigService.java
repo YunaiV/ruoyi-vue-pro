@@ -3,7 +3,7 @@ package cn.iocoder.yudao.module.trade.service.config;
 import cn.iocoder.yudao.module.trade.controller.admin.config.vo.TradeConfigSaveReqVO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.config.TradeConfigDO;
 
-import jakarta.validation.Valid;
+import javax.validation.Valid;
 
 /**
  * 交易中心配置 Service 接口

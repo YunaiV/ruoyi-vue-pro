@@ -3,7 +3,7 @@ package cn.iocoder.yudao.framework.pay.core.client.impl;
 import cn.iocoder.yudao.framework.pay.core.client.PayClientConfig;
 import lombok.Data;
 
-import jakarta.validation.Validator;
+import javax.validation.Validator;
 
 /**
  * 无需任何配置 PayClientConfig 实现类

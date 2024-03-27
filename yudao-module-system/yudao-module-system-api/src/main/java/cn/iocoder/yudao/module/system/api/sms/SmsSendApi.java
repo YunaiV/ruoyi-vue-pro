@@ -2,7 +2,7 @@ package cn.iocoder.yudao.module.system.api.sms;
 
 import cn.iocoder.yudao.module.system.api.sms.dto.send.SmsSendSingleToUserReqDTO;
 
-import jakarta.validation.Valid;
+import javax.validation.Valid;
 
 /**
  * 短信发送 API 接口

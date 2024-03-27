@@ -5,9 +5,9 @@ import cn.iocoder.yudao.module.crm.enums.common.CrmBizTypeEnum;
 import cn.iocoder.yudao.module.crm.enums.permission.CrmPermissionLevelEnum;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-
-import jakarta.validation.constraints.NotNull;
 import lombok.NoArgsConstructor;
+
+import javax.validation.constraints.NotNull;
 
 /**
  * 数据权限转移 Request BO

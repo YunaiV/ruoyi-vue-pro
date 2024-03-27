@@ -8,7 +8,7 @@ import cn.iocoder.yudao.module.member.dal.mysql.signin.MemberSignInConfigMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
-import jakarta.annotation.Resource;
+import javax.annotation.Resource;
 import java.util.Comparator;
 import java.util.List;
 

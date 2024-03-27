@@ -1,10 +1,11 @@
 package cn.iocoder.yudao.module.crm.controller.admin.customer.vo.customer;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Data;
 import org.springframework.web.multipart.MultipartFile;
+
+import javax.validation.constraints.NotNull;
 
 @Schema(description = "管理后台 - 客户导入 Request VO")
 @Data
@@ -20,6 +21,6 @@ public class CrmCustomerImportReqVO {
     private Boolean updateSupport;
 
     @Schema(description = "负责人", example = "1")
-    private Long ownerUserId; // 为 null 则客户进入公海
+    private Long ownerUserId; // 为 null 则客户负责人为当前用户
 
 }

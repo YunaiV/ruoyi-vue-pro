@@ -12,7 +12,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.redis.core.RedisTemplate;
 
-import jakarta.annotation.Resource;
+import javax.annotation.Resource;
 import java.util.concurrent.TimeUnit;
 
 public class RedisStreamTest  {

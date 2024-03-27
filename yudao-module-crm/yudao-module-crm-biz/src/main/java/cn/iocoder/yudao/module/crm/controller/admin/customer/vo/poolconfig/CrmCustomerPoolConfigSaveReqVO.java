@@ -4,10 +4,10 @@ import cn.hutool.core.util.BooleanUtil;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.mzt.logapi.starter.annotation.DiffLogField;
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.AssertTrue;
-import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
+import javax.validation.constraints.AssertTrue;
+import javax.validation.constraints.NotNull;
 import java.util.Objects;
 
 @Schema(description = "管理后台 - CRM 客户公海配置的创建/更新 Request VO")

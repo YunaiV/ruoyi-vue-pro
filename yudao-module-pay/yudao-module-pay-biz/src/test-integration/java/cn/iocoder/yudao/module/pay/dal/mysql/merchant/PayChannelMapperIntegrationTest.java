@@ -9,7 +9,7 @@ import cn.iocoder.yudao.framework.pay.core.enums.PayChannelEnum;
 import cn.iocoder.yudao.module.pay.test.BaseDbIntegrationTest;
 import org.junit.jupiter.api.Test;
 
-import jakarta.annotation.Resource;
+import javax.annotation.Resource;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.List;

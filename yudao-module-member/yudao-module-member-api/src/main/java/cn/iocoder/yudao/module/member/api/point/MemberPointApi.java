@@ -2,7 +2,7 @@ package cn.iocoder.yudao.module.member.api.point;
 
 import cn.iocoder.yudao.module.member.enums.point.MemberPointBizTypeEnum;
 
-import jakarta.validation.constraints.Min;
+import javax.validation.constraints.Min;
 
 /**
  * 用户积分的 API 接口
