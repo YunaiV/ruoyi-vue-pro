@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.crm.util;
 
 import cn.hutool.core.lang.Assert;
-import cn.iocoder.yudao.module.bpm.enums.task.BpmProcessInstanceResultEnum;
+import cn.iocoder.yudao.module.bpm.enums.task.BpmTaskStatusEnum;
 import cn.iocoder.yudao.module.crm.enums.common.CrmAuditStatusEnum;
 
 /**
@@ -17,9 +17,9 @@ public class CrmAuditStatusUtils {
      * @param bpmResult BPM 审批结果
      */
     public static Integer convertBpmResultToAuditStatus(Integer bpmResult) {
-        Integer auditStatus = BpmProcessInstanceResultEnum.APPROVE.getResult().equals(bpmResult) ? CrmAuditStatusEnum.APPROVE.getStatus()
-                : BpmProcessInstanceResultEnum.REJECT.getResult().equals(bpmResult) ? CrmAuditStatusEnum.REJECT.getStatus()
-                : BpmProcessInstanceResultEnum.CANCEL.getResult().equals(bpmResult) ? BpmProcessInstanceResultEnum.CANCEL.getResult() : null;
+        Integer auditStatus = BpmTaskStatusEnum.APPROVE.getStatus().equals(bpmResult) ? CrmAuditStatusEnum.APPROVE.getStatus()
+                : BpmTaskStatusEnum.REJECT.getStatus().equals(bpmResult) ? CrmAuditStatusEnum.REJECT.getStatus()
+                : BpmTaskStatusEnum.CANCEL.getStatus().equals(bpmResult) ? BpmTaskStatusEnum.CANCEL.getStatus() : null;
         Assert.notNull(auditStatus, "BPM 审批结果({}) 转换失败", bpmResult);
         return auditStatus;
     }

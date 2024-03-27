@@ -1,13 +1,13 @@
 package cn.iocoder.yudao.module.bpm.service.definition;
 
-import java.util.*;
-import javax.validation.*;
-
-import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.group.BpmUserGroupCreateReqVO;
-import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.group.BpmUserGroupPageReqVO;
-import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.group.BpmUserGroupUpdateReqVO;
-import cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmUserGroupDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.group.BpmUserGroupPageReqVO;
+import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.group.BpmUserGroupSaveReqVO;
+import cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmUserGroupDO;
+
+import javax.validation.Valid;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * 用户组 Service 接口
@@ -22,14 +22,14 @@ public interface BpmUserGroupService {
      * @param createReqVO 创建信息
      * @return 编号
      */
-    Long createUserGroup(@Valid BpmUserGroupCreateReqVO createReqVO);
+    Long createUserGroup(@Valid BpmUserGroupSaveReqVO createReqVO);
 
     /**
      * 更新用户组
      *
      * @param updateReqVO 更新信息
      */
-    void updateUserGroup(@Valid BpmUserGroupUpdateReqVO updateReqVO);
+    void updateUserGroup(@Valid BpmUserGroupSaveReqVO updateReqVO);
 
     /**
      * 删除用户组
@@ -77,6 +77,6 @@ public interface BpmUserGroupService {
      *
      * @param ids 用户组编号数组
      */
-    void validUserGroups(Set<Long> ids);
+    void validUserGroups(Collection<Long> ids);
 
 }

@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.bpm.dal.dataobject.oa;
 
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
-import cn.iocoder.yudao.module.bpm.enums.task.BpmProcessInstanceResultEnum;
+import cn.iocoder.yudao.module.bpm.enums.task.BpmTaskStatusEnum;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
@@ -18,8 +18,6 @@ import java.time.LocalDateTime;
  */
 @TableName("bpm_oa_leave")
 @Data
-@EqualsAndHashCode(callSuper = true)
-@ToString(callSuper = true)
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -57,12 +55,12 @@ public class BpmOALeaveDO extends BaseDO {
      */
     private Long day;
     /**
-     * 请假的结果
+     * 审批结果
      *
-     * 枚举 {@link BpmProcessInstanceResultEnum}
-     * 考虑到简单，所以直接复用了 BpmProcessInstanceResultEnum 枚举，也可以自己定义一个枚举哈
+     * 枚举 {@link BpmTaskStatusEnum}
+     * 考虑到简单，所以直接复用了 BpmProcessInstanceStatusEnum 枚举，也可以自己定义一个枚举哈
      */
-    private Integer result;
+    private Integer status;
 
     /**
      * 对应的流程编号

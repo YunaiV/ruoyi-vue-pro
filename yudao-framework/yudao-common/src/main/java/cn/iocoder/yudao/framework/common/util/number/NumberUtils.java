@@ -16,6 +16,10 @@ public class NumberUtils {
         return StrUtil.isNotEmpty(str) ? Long.valueOf(str) : null;
     }
 
+    public static Integer parseInt(String str) {
+        return StrUtil.isNotEmpty(str) ? Integer.valueOf(str) : null;
+    }
+
     /**
      * 通过经纬度获取地球上两点之间的距离
      *
