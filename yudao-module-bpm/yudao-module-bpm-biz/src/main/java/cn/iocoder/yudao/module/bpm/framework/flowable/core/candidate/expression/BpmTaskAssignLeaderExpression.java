@@ -34,6 +34,13 @@ public class BpmTaskAssignLeaderExpression {
     @Resource
     private BpmProcessInstanceService processInstanceService;
 
+    /**
+     * 计算审批的候选人
+     *
+     * @param execution 流程执行实体
+     * @param level 指定级别
+     * @return 指定级别的领导
+     */
     public Set<Long> calculateUsers(DelegateExecution execution, int level) {
         Assert.isTrue(level > 0, "level 必须大于 0");
         // 获得发起人
