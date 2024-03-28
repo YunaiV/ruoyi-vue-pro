@@ -55,6 +55,11 @@ public class CrmCustomerCreateReqBO {
     private Integer source;
 
     /**
+     * 渠道名称
+     */
+    private String channelName;
+
+    /**
      * 手机
      */
     @Mobile

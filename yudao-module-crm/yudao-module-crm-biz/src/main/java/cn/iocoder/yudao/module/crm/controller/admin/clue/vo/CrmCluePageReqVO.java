@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.crm.controller.admin.clue.vo;
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.validation.InEnum;
 import cn.iocoder.yudao.module.crm.enums.common.CrmSceneTypeEnum;
+import com.mzt.logapi.starter.annotation.DiffLogField;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -41,6 +42,10 @@ public class CrmCluePageReqVO extends PageParam {
 
     @Schema(description = "客户来源", example = "1")
     private Integer source;
+
+    @Schema(description = "渠道名称", example = "百度广告")
+    @DiffLogField(name = "渠道名称")
+    private String channelName;
 
     @Schema(description = "跟进状态", example = "true")
     private Boolean followUpStatus;

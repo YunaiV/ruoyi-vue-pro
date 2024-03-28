@@ -9,6 +9,7 @@ import cn.iocoder.yudao.module.crm.framework.operatelog.core.CrmCustomerIndustry
 import cn.iocoder.yudao.module.crm.framework.operatelog.core.CrmCustomerLevelParseFunction;
 import cn.iocoder.yudao.module.crm.framework.operatelog.core.CrmCustomerSourceParseFunction;
 import cn.iocoder.yudao.module.crm.framework.operatelog.core.SysAreaParseFunction;
+import com.alibaba.excel.annotation.ExcelProperty;
 import com.mzt.logapi.starter.annotation.DiffLogField;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
@@ -91,6 +92,10 @@ public class CrmCustomerSaveReqVO {
     @Schema(description = "客户来源", example = "3")
     @DiffLogField(name = "客户来源", function = CrmCustomerSourceParseFunction.NAME)
     private Integer source;
+
+    @Schema(description = "渠道名称", example = "抖音广告")
+    @ExcelProperty("渠道名称")
+    private String channelName;
 
     @Schema(description = "备注", example = "随便")
     @DiffLogField(name = "备注")

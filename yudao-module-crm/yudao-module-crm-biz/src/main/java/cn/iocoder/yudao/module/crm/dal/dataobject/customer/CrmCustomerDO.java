@@ -120,6 +120,10 @@ public class CrmCustomerDO extends BaseDO {
      */
     private Integer source;
     /**
+     * 渠道名称
+     */
+    private String channelName;
+    /**
      * 备注
      */
     private String remark;

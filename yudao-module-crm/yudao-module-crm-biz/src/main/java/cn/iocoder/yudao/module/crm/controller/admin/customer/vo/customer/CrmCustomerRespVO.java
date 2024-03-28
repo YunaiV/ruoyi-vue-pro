@@ -105,6 +105,10 @@ public class CrmCustomerRespVO {
     @DictFormat(cn.iocoder.yudao.module.crm.enums.DictTypeConstants.CRM_CUSTOMER_SOURCE)
     private Integer source;
 
+    @Schema(description = "渠道名称", example = "抖音广告")
+    @ExcelProperty("渠道名称")
+    private String channelName;
+
     @Schema(description = "负责人的用户编号", example = "25682")
     @ExcelProperty("备注")
     private String remark;

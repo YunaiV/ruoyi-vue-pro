@@ -4,6 +4,8 @@ import cn.iocoder.yudao.framework.excel.core.annotations.DictFormat;
 import cn.iocoder.yudao.framework.excel.core.convert.AreaConvert;
 import cn.iocoder.yudao.framework.excel.core.convert.DictConvert;
 import com.alibaba.excel.annotation.ExcelProperty;
+import com.mzt.logapi.starter.annotation.DiffLogField;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -57,6 +59,9 @@ public class CrmCustomerImportExcelVO {
     @ExcelProperty(value = "客户来源", converter = DictConvert.class)
     @DictFormat(CRM_CUSTOMER_SOURCE)
     private Integer source;
+
+    @ExcelProperty(value = "渠道名称")
+    private String channelName;
 
     @ExcelProperty("备注")
     private String remark;

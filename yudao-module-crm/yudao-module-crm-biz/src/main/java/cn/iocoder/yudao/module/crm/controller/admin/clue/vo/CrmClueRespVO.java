@@ -5,6 +5,7 @@ import cn.iocoder.yudao.framework.excel.core.convert.DictConvert;
 import cn.iocoder.yudao.module.infra.enums.DictTypeConstants;
 import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
 import com.alibaba.excel.annotation.ExcelProperty;
+import com.mzt.logapi.starter.annotation.DiffLogField;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.ToString;
@@ -106,6 +107,10 @@ public class CrmClueRespVO {
     @ExcelProperty(value = "客户来源", converter = DictConvert.class)
     @DictFormat(cn.iocoder.yudao.module.crm.enums.DictTypeConstants.CRM_CUSTOMER_SOURCE)
     private Integer source;
+
+    @Schema(description = "渠道名称", example = "百度广告")
+    @DiffLogField(name = "渠道名称")
+    private String channelName;
 
     @Schema(description = "备注", example = "随便")
     @ExcelProperty("备注")

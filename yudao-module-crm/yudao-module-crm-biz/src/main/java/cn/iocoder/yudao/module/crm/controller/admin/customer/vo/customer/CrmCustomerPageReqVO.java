@@ -42,6 +42,9 @@ public class CrmCustomerPageReqVO extends PageParam {
     @Schema(description = "客户来源", example = "1")
     private Integer source;
 
+    @Schema(description = "渠道名称", example = "抖音广告")
+    private String channelName;
+
     @Schema(description = "场景类型", example = "1")
     @InEnum(CrmSceneTypeEnum.class)
     private Integer sceneType; // 场景类型，为 null 时则表示全部
