@@ -5,9 +5,8 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
 import cn.iocoder.yudao.framework.test.core.util.AssertUtils;
 import cn.iocoder.yudao.framework.test.core.util.RandomUtils;
-import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.group.BpmUserGroupCreateReqVO;
+import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.group.BpmUserGroupSaveReqVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.group.BpmUserGroupPageReqVO;
-import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.group.BpmUserGroupUpdateReqVO;
 import cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmUserGroupDO;
 import cn.iocoder.yudao.module.bpm.dal.mysql.definition.BpmUserGroupMapper;
 import org.junit.jupiter.api.Assertions;
@@ -39,7 +38,7 @@ public class BpmUserGroupServiceTest extends BaseDbUnitTest {
     @Test
     public void testCreateUserGroup_success() {
         // 准备参数
-        BpmUserGroupCreateReqVO reqVO = RandomUtils.randomPojo(BpmUserGroupCreateReqVO.class);
+        BpmUserGroupSaveReqVO reqVO = RandomUtils.randomPojo(BpmUserGroupSaveReqVO.class);
 
         // 调用
         Long userGroupId = userGroupService.createUserGroup(reqVO);
@@ -56,7 +55,7 @@ public class BpmUserGroupServiceTest extends BaseDbUnitTest {
         BpmUserGroupDO dbUserGroup = RandomUtils.randomPojo(BpmUserGroupDO.class);
         userGroupMapper.insert(dbUserGroup);// @Sql: 先插入出一条存在的数据
         // 准备参数
-        BpmUserGroupUpdateReqVO reqVO = RandomUtils.randomPojo(BpmUserGroupUpdateReqVO.class, o -> {
+        BpmUserGroupSaveReqVO reqVO = RandomUtils.randomPojo(BpmUserGroupSaveReqVO.class, o -> {
             o.setId(dbUserGroup.getId()); // 设置更新的 ID
         });
 
@@ -70,7 +69,7 @@ public class BpmUserGroupServiceTest extends BaseDbUnitTest {
     @Test
     public void testUpdateUserGroup_notExists() {
         // 准备参数
-        BpmUserGroupUpdateReqVO reqVO = RandomUtils.randomPojo(BpmUserGroupUpdateReqVO.class);
+        BpmUserGroupSaveReqVO reqVO = RandomUtils.randomPojo(BpmUserGroupSaveReqVO.class);
 
         // 调用, 并断言异常
         AssertUtils.assertServiceException(() -> userGroupService.updateUserGroup(reqVO), USER_GROUP_NOT_EXISTS);

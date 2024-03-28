@@ -4,9 +4,8 @@ import cn.hutool.core.util.RandomUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
-import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.form.BpmFormCreateReqVO;
+import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.form.BpmFormSaveReqVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.form.BpmFormPageReqVO;
-import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.form.BpmFormUpdateReqVO;
 import cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmFormDO;
 import cn.iocoder.yudao.module.bpm.dal.mysql.definition.BpmFormMapper;
 import cn.iocoder.yudao.module.bpm.service.definition.dto.BpmFormFieldRespDTO;
@@ -43,7 +42,7 @@ public class BpmFormServiceTest extends BaseDbUnitTest {
     @Test
     public void testCreateForm_success() {
         // 准备参数
-        BpmFormCreateReqVO reqVO = randomPojo(BpmFormCreateReqVO.class, o -> {
+        BpmFormSaveReqVO reqVO = randomPojo(BpmFormSaveReqVO.class, o -> {
             o.setConf("{}");
             o.setFields(randomFields());
         });
@@ -66,7 +65,7 @@ public class BpmFormServiceTest extends BaseDbUnitTest {
         });
         formMapper.insert(dbForm);// @Sql: 先插入出一条存在的数据
         // 准备参数
-        BpmFormUpdateReqVO reqVO = randomPojo(BpmFormUpdateReqVO.class, o -> {
+        BpmFormSaveReqVO reqVO = randomPojo(BpmFormSaveReqVO.class, o -> {
             o.setId(dbForm.getId()); // 设置更新的 ID
             o.setConf("{'yudao': 'yuanma'}");
             o.setFields(randomFields());
@@ -82,7 +81,7 @@ public class BpmFormServiceTest extends BaseDbUnitTest {
     @Test
     public void testUpdateForm_notExists() {
         // 准备参数
-        BpmFormUpdateReqVO reqVO = randomPojo(BpmFormUpdateReqVO.class, o -> {
+        BpmFormSaveReqVO reqVO = randomPojo(BpmFormSaveReqVO.class, o -> {
             o.setConf("{'yudao': 'yuanma'}");
             o.setFields(randomFields());
         });

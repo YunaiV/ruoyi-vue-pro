@@ -19,7 +19,7 @@ public interface BpmOALeaveMapper extends BaseMapperX<BpmOALeaveDO> {
     default PageResult<BpmOALeaveDO> selectPage(Long userId, BpmOALeavePageReqVO reqVO) {
         return selectPage(reqVO, new LambdaQueryWrapperX<BpmOALeaveDO>()
                 .eqIfPresent(BpmOALeaveDO::getUserId, userId)
-                .eqIfPresent(BpmOALeaveDO::getResult, reqVO.getResult())
+                .eqIfPresent(BpmOALeaveDO::getStatus, reqVO.getStatus())
                 .eqIfPresent(BpmOALeaveDO::getType, reqVO.getType())
                 .likeIfPresent(BpmOALeaveDO::getReason, reqVO.getReason())
                 .betweenIfPresent(BpmOALeaveDO::getCreateTime, reqVO.getCreateTime())
