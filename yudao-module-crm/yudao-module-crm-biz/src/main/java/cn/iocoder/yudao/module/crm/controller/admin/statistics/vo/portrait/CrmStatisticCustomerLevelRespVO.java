@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.customer.analyze;
+package cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.portrait;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;

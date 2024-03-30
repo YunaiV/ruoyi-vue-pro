@@ -45,12 +45,4 @@ public class CrmStatisticsCustomerReqVO {
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
     private LocalDateTime[] times;
 
-    /**
-     * group by DATE_FORMAT(field, #{dateFormat})
-     * 非前端传递, 由Service计算后传递给Mapper的参数
-     */
-    @Deprecated
-    @Schema(description = "Group By 日期格式", hidden = true, example = "%Y%m")
-    private String sqlDateFormat;
-
 }

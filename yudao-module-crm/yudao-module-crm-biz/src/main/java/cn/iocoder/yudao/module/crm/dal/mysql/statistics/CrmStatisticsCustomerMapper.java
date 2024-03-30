@@ -1,16 +1,12 @@
 package cn.iocoder.yudao.module.crm.dal.mysql.statistics;
 
 import cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.customer.*;
-import cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.customer.analyze.CrmStatisticCustomerAreaRespVO;
-import cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.customer.analyze.CrmStatisticCustomerIndustryRespVO;
-import cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.customer.analyze.CrmStatisticCustomerLevelRespVO;
-import cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.customer.analyze.CrmStatisticCustomerSourceRespVO;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
 
 /**
- * CRM 数据统计 员工客户分析 Mapper
+ * CRM 数据统计 Mapper
  *
  * @author dhb52
  */
@@ -44,13 +40,5 @@ public interface CrmStatisticsCustomerMapper {
     List<CrmStatisticsCustomerDealCycleByDateRespVO> selectCustomerDealCycleGroupByDate(CrmStatisticsCustomerReqVO reqVO);
 
     List<CrmStatisticsCustomerDealCycleByUserRespVO> selectCustomerDealCycleGroupByUser(CrmStatisticsCustomerReqVO reqVO);
-
-    List<CrmStatisticCustomerIndustryRespVO> selectCustomerIndustryListGroupbyIndustryId(CrmStatisticsCustomerReqVO reqVO);
-
-    List<CrmStatisticCustomerSourceRespVO> selectCustomerSourceListGroupbySource(CrmStatisticsCustomerReqVO reqVO);
-
-    List<CrmStatisticCustomerLevelRespVO> selectCustomerLevelListGroupbyLevel(CrmStatisticsCustomerReqVO reqVO);
-
-    List<CrmStatisticCustomerAreaRespVO> selectSummaryListByAreaId(CrmStatisticsCustomerReqVO reqVO);
 
 }

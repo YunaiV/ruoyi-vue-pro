@@ -4,14 +4,7 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjUtil;
 import cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils;
 import cn.iocoder.yudao.framework.common.util.number.NumberUtils;
-import cn.iocoder.yudao.framework.ip.core.Area;
-import cn.iocoder.yudao.framework.ip.core.enums.AreaTypeEnum;
-import cn.iocoder.yudao.framework.ip.core.utils.AreaUtils;
 import cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.customer.*;
-import cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.customer.analyze.CrmStatisticCustomerAreaRespVO;
-import cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.customer.analyze.CrmStatisticCustomerIndustryRespVO;
-import cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.customer.analyze.CrmStatisticCustomerLevelRespVO;
-import cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.customer.analyze.CrmStatisticCustomerSourceRespVO;
 import cn.iocoder.yudao.module.crm.dal.mysql.statistics.CrmStatisticsCustomerMapper;
 import cn.iocoder.yudao.module.system.api.dept.DeptApi;
 import cn.iocoder.yudao.module.system.api.dept.dto.DeptRespDTO;
@@ -30,8 +23,6 @@ import java.util.stream.Stream;
 
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
 import static cn.iocoder.yudao.framework.common.util.collection.MapUtils.findAndThen;
-import static cn.iocoder.yudao.framework.common.util.collection.MapUtils.findAndThen;
-import static cn.iocoder.yudao.module.crm.enums.DictTypeConstants.*;
 
 /**
  * CRM 客户分析 Service 实现类
@@ -243,104 +234,6 @@ public class CrmStatisticsCustomerServiceImpl implements CrmStatisticsCustomerSe
         // 3.2 拼接用户信息
         appendUserInfo(summaryList);
         return summaryList;
-    }
-
-    @Override
-    public List<CrmStatisticCustomerIndustryRespVO> getCustomerIndustry(CrmStatisticsCustomerReqVO reqVO) {
-        // 1. 获得用户编号数组
-        List<Long> userIds = getUserIds(reqVO);
-        if (CollUtil.isEmpty(userIds)) {
-            return Collections.emptyList();
-        }
-        reqVO.setUserIds(userIds);
-        // 2. 获取客户行业统计数据
-        List<CrmStatisticCustomerIndustryRespVO> industryRespVOList = customerMapper.selectCustomerIndustryListGroupbyIndustryId(reqVO);
-        if (CollUtil.isEmpty(industryRespVOList)) {
-            return Collections.emptyList();
-        }
-
-        return convertList(industryRespVOList, item -> {
-            if (ObjUtil.isNull(item.getIndustryId())) {
-                return item;
-            }
-            item.setIndustryName(dictDataApi.getDictDataLabel(CRM_CUSTOMER_INDUSTRY, item.getIndustryId()));
-            return item;
-        });
-    }
-
-    @Override
-    public List<CrmStatisticCustomerSourceRespVO> getCustomerSource(CrmStatisticsCustomerReqVO reqVO) {
-        // 1. 获得用户编号数组
-        List<Long> userIds = getUserIds(reqVO);
-        if (CollUtil.isEmpty(userIds)) {
-            return Collections.emptyList();
-        }
-        reqVO.setUserIds(userIds);
-        // 2. 获取客户行业统计数据
-        List<CrmStatisticCustomerSourceRespVO> sourceRespVOList = customerMapper.selectCustomerSourceListGroupbySource(reqVO);
-        if (CollUtil.isEmpty(sourceRespVOList)) {
-            return Collections.emptyList();
-        }
-
-        return convertList(sourceRespVOList, item -> {
-            if (ObjUtil.isNull(item.getSource())) {
-                return item;
-            }
-            item.setSourceName(dictDataApi.getDictDataLabel(CRM_CUSTOMER_SOURCE, item.getSource()));
-            return item;
-        });
-    }
-
-    @Override
-    public List<CrmStatisticCustomerLevelRespVO> getCustomerLevel(CrmStatisticsCustomerReqVO reqVO) {
-        // 1. 获得用户编号数组
-        List<Long> userIds = getUserIds(reqVO);
-        if (CollUtil.isEmpty(userIds)) {
-            return Collections.emptyList();
-        }
-        reqVO.setUserIds(userIds);
-        // 2. 获取客户行业统计数据
-        List<CrmStatisticCustomerLevelRespVO> levelRespVOList = customerMapper.selectCustomerLevelListGroupbyLevel(reqVO);
-        if (CollUtil.isEmpty(levelRespVOList)) {
-            return Collections.emptyList();
-        }
-
-        return convertList(levelRespVOList, item -> {
-            if (ObjUtil.isNull(item.getLevel())) {
-                return item;
-            }
-            item.setLevelName(dictDataApi.getDictDataLabel(CRM_CUSTOMER_LEVEL, item.getLevel()));
-            return item;
-        });
-    }
-
-    @Override
-    public List<CrmStatisticCustomerAreaRespVO> getCustomerArea(CrmStatisticsCustomerReqVO reqVO) {
-        // 1. 获得用户编号数组
-        List<Long> userIds = getUserIds(reqVO);
-        if (CollUtil.isEmpty(userIds)) {
-            return Collections.emptyList();
-        }
-        reqVO.setUserIds(userIds);
-        // 2. 获取客户地区统计数据
-        List<CrmStatisticCustomerAreaRespVO> list = customerMapper.selectSummaryListByAreaId(reqVO);
-        if (CollUtil.isEmpty(list)) {
-            return Collections.emptyList();
-        }
-
-        // 拼接数据
-        List<Area> areaList = AreaUtils.getByType(AreaTypeEnum.PROVINCE, area -> area);
-        areaList.add(new Area().setId(null).setName("未知"));
-        Map<Integer, Area> areaMap = convertMap(areaList, Area::getId);
-        List<CrmStatisticCustomerAreaRespVO> customerAreaRespVOList = convertList(list, item -> {
-            Integer parentId = AreaUtils.getParentIdByType(item.getAreaId(), AreaTypeEnum.PROVINCE);
-            if (parentId == null) {
-                return item;
-            }
-            findAndThen(areaMap, parentId, area -> item.setAreaId(parentId).setAreaName(area.getName()));
-            return item;
-        });
-        return customerAreaRespVOList;
     }
 
     /**
