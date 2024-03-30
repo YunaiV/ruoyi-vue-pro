@@ -1,5 +1,7 @@
 package cn.iocoder.yudao.module.system.api.dict;
 
+import cn.hutool.core.util.ObjUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.module.system.api.dict.dto.DictDataRespDTO;
 
 import java.util.Collection;
@@ -32,6 +34,21 @@ public interface DictDataApi {
      * @return 字典数据
      */
     DictDataRespDTO getDictData(String type, String value);
+
+    /**
+     * 获得指定的字典标签，从缓存中
+     *
+     * @param type  字典类型
+     * @param value 字典数据值
+     * @return 字典标签
+     */
+    default String getDictDataLabel(String type, Integer value) {
+        DictDataRespDTO dictData = getDictData(type, String.valueOf(value));
+        if (ObjUtil.isNull(dictData)) {
+            return StrUtil.EMPTY;
+        }
+        return dictData.getLabel();
+    }
 
     /**
      * 解析获得指定的字典数据，从缓存中
