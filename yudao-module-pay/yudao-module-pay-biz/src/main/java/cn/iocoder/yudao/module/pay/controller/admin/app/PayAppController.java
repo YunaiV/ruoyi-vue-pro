@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.pay.controller.admin.app;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
@@ -89,9 +90,10 @@ public class PayAppController {
             return success(PageResult.empty());
         }
 
-        // 得到所有的应用编号，查出所有的渠道
-        Collection<Long> appIds = convertList(pageResult.getList(), PayAppDO::getId);
-        List<PayChannelDO> channels = channelService.getChannelListByAppIds(appIds);
+        // 得到所有的应用编号，查出所有的渠道，并移除未启用的渠道
+        List<PayChannelDO> channels = channelService.getChannelListByAppIds(
+                convertList(pageResult.getList(), PayAppDO::getId));
+        channels.removeIf(channel -> !CommonStatusEnum.ENABLE.getStatus().equals(channel.getStatus()));
 
         // 拼接后返回
         return success(PayAppConvert.INSTANCE.convertPage(pageResult, channels));
