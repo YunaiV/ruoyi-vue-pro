@@ -12,8 +12,7 @@
             <foreach collection="userIds" item="userId" open="(" close=")" separator=",">
                 #{userId}
             </foreach>
-        AND order_date between #{times[0],javaType=java.time.LocalDateTime} and
-            #{times[1],javaType=java.time.LocalDateTime}
+        AND order_date between #{times[0],javaType=java.time.LocalDateTime} and #{times[1],javaType=java.time.LocalDateTime}
         GROUP BY owner_user_id
     </select>
 
@@ -27,8 +26,7 @@
             <foreach collection="userIds" item="userId" open="(" close=")" separator=",">
                 #{userId}
             </foreach>
-        AND return_time between #{times[0],javaType=java.time.LocalDateTime} and
-            #{times[1],javaType=java.time.LocalDateTime}
+        AND return_time between #{times[0],javaType=java.time.LocalDateTime} and #{times[1],javaType=java.time.LocalDateTime}
         GROUP BY owner_user_id
     </select>
 
@@ -42,25 +40,23 @@
             <foreach collection="userIds" item="userId" open="(" close=")" separator=",">
                 #{userId}
             </foreach>
-        AND order_date between #{times[0],javaType=java.time.LocalDateTime} and
-            #{times[1],javaType=java.time.LocalDateTime}
+        AND order_date between #{times[0],javaType=java.time.LocalDateTime} and #{times[1],javaType=java.time.LocalDateTime}
         GROUP BY owner_user_id
     </select>
 
-    <!-- TODO 待定 这里是否需要关联 crm_contract_product 表，计算销售额 -->
     <select id="selectProductSalesRank"
             resultType="cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.rank.CrmStatisticsRankRespVO">
-        SELECT COUNT(1) AS count, owner_user_id
-        FROM crm_contract
-        WHERE deleted = 0
-        AND audit_status = 20
-        AND owner_user_id in
+        SELECT COUNT(product.count) AS count, contract.owner_user_id
+        FROM crm_contract_product product
+        INNER JOIN crm_contract contract ON product.contract_id = contract.id
+        WHERE contract.deleted = 0 AND contract.deleted = 0
+        AND contract.audit_status = ${@cn.iocoder.yudao.module.crm.enums.common.CrmAuditStatusEnum@APPROVE.status}
+        AND contract.owner_user_id in
             <foreach collection="userIds" item="userId" open="(" close=")" separator=",">
                 #{userId}
             </foreach>
-        AND order_date between #{times[0],javaType=java.time.LocalDateTime} and
-            #{times[1],javaType=java.time.LocalDateTime}
-        GROUP BY owner_user_id
+        AND contract.order_date between #{times[0],javaType=java.time.LocalDateTime} and #{times[1],javaType=java.time.LocalDateTime}
+        GROUP BY contract.owner_user_id
     </select>
 
     <select id="selectCustomerCountRank"
@@ -72,8 +68,7 @@
             <foreach collection="userIds" item="userId" open="(" close=")" separator=",">
                 #{userId}
             </foreach>
-        AND create_time between #{times[0],javaType=java.time.LocalDateTime} and
-            #{times[1],javaType=java.time.LocalDateTime}
+        AND create_time between #{times[0],javaType=java.time.LocalDateTime} and #{times[1],javaType=java.time.LocalDateTime}
         GROUP BY owner_user_id
     </select>
 
@@ -86,8 +81,7 @@
             <foreach collection="userIds" item="userId" open="(" close=")" separator=",">
                 #{userId}
             </foreach>
-        AND create_time between #{times[0],javaType=java.time.LocalDateTime} and
-            #{times[1],javaType=java.time.LocalDateTime}
+        AND create_time between #{times[0],javaType=java.time.LocalDateTime} and #{times[1],javaType=java.time.LocalDateTime}
         GROUP BY owner_user_id
     </select>
 
@@ -102,8 +96,7 @@
             <foreach collection="userIds" item="userId" open="(" close=")" separator=",">
                 #{userId}
             </foreach>
-        AND cfur.create_time between #{times[0],javaType=java.time.LocalDateTime} and
-            #{times[1],javaType=java.time.LocalDateTime}
+        AND cfur.create_time between #{times[0],javaType=java.time.LocalDateTime} and #{times[1],javaType=java.time.LocalDateTime}
         GROUP BY cc.owner_user_id
     </select>
 
@@ -118,8 +111,7 @@
             <foreach collection="userIds" item="userId" open="(" close=")" separator=",">
                 #{userId}
             </foreach>
-        AND cfur.create_time between #{times[0],javaType=java.time.LocalDateTime} and
-            #{times[1],javaType=java.time.LocalDateTime}
+        AND cfur.create_time between #{times[0],javaType=java.time.LocalDateTime} and #{times[1],javaType=java.time.LocalDateTime}
         GROUP BY cc.owner_user_id
     </select>
 
