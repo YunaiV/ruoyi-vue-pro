@@ -125,7 +125,7 @@ public interface ErrorCodeConstants {
 
     ErrorCode SOCIAL_CLIENT_WEIXIN_MINI_APP_PHONE_CODE_ERROR = new ErrorCode(1_002_018_200, "获得手机号失败");
     ErrorCode SOCIAL_CLIENT_NOT_EXISTS = new ErrorCode(1_002_018_201, "社交客户端不存在");
-    ErrorCode SOCIAL_CLIENT_UNIQUE = new ErrorCode(1_002_018_201, "社交客户端已存在配置");
+    ErrorCode SOCIAL_CLIENT_UNIQUE = new ErrorCode(1_002_018_202, "社交客户端已存在配置");
 
     // ========== 系统敏感词 1-002-019-000 =========
     ErrorCode SENSITIVE_WORD_NOT_EXISTS = new ErrorCode(1_002_019_000, "系统敏感词在所有标签中都不存在");

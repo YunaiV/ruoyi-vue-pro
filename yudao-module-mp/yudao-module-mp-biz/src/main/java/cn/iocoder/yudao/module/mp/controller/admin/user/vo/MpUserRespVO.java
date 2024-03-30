@@ -4,7 +4,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.List;
 
 @Schema(description = "管理后台 - 公众号粉丝 Response VO")
@@ -16,6 +15,9 @@ public class MpUserRespVO  {
 
     @Schema(description = "公众号粉丝标识", requiredMode = Schema.RequiredMode.REQUIRED, example = "o6_bmjrPTlm6_2sgVt7hMZOPfL2M")
     private String openid;
+
+    @Schema(description = "微信生态唯一标识", requiredMode = Schema.RequiredMode.REQUIRED, example = "o6_bmjrPTlm6_2sgVt7hMZOPfL2M")
+    private String unionId;
 
     @Schema(description = "关注状态 参见 CommonStatusEnum 枚举", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     private Integer subscribeStatus;
