@@ -17,6 +17,7 @@ public class CrmStatisticsRankRespVO {
     @Schema(description = "部门名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     private String deptName;
 
+    // TODO @芋艿：需要改下，金额是 bigdecimal
     /**
      * 数量是个特别“抽象”的概念，在不同排行下，代表不同含义
      * <p>

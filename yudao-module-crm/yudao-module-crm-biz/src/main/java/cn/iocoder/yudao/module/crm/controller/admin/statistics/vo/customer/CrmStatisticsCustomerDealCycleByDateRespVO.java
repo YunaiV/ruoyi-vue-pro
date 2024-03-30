@@ -11,6 +11,6 @@ public class CrmStatisticsCustomerDealCycleByDateRespVO {
     private String time;
 
     @Schema(description = "成交周期", requiredMode = Schema.RequiredMode.REQUIRED, example = "1.0")
-    private Double customerDealCycle = 0.0;
+    private Double customerDealCycle;
 
 }

@@ -13,32 +13,32 @@ import java.util.List;
 @Mapper
 public interface CrmStatisticsCustomerMapper {
 
-    List<CrmStatisticsCustomerSummaryByDateRespVO> selectCustomerCreateCountGroupByDate(CrmStatisticsCustomerReqVO reqVO); // 已经 review
+    List<CrmStatisticsCustomerSummaryByDateRespVO> selectCustomerCreateCountGroupByDate(CrmStatisticsCustomerReqVO reqVO);
 
-    List<CrmStatisticsCustomerSummaryByDateRespVO> selectCustomerDealCountGroupByDate(CrmStatisticsCustomerReqVO reqVO); // 已经 review
+    List<CrmStatisticsCustomerSummaryByDateRespVO> selectCustomerDealCountGroupByDate(CrmStatisticsCustomerReqVO reqVO);
 
-    List<CrmStatisticsCustomerSummaryByUserRespVO> selectCustomerCreateCountGroupByUser(CrmStatisticsCustomerReqVO reqVO); // 已经 review
+    List<CrmStatisticsCustomerSummaryByUserRespVO> selectCustomerCreateCountGroupByUser(CrmStatisticsCustomerReqVO reqVO);
 
-    List<CrmStatisticsCustomerSummaryByUserRespVO> selectCustomerDealCountGroupByUser(CrmStatisticsCustomerReqVO crmStatisticsCustomerReqVO); // 已经 review
+    List<CrmStatisticsCustomerSummaryByUserRespVO> selectCustomerDealCountGroupByUser(CrmStatisticsCustomerReqVO reqVO);
 
-    List<CrmStatisticsCustomerSummaryByUserRespVO> selectContractPriceGroupByUser(CrmStatisticsCustomerReqVO crmStatisticsCustomerReqVO); // 已经 review
+    List<CrmStatisticsCustomerSummaryByUserRespVO> selectContractPriceGroupByUser(CrmStatisticsCustomerReqVO reqVO);
 
-    List<CrmStatisticsCustomerSummaryByUserRespVO> selectReceivablePriceGroupByUser(CrmStatisticsCustomerReqVO crmStatisticsCustomerReqVO);  // 已经 review
+    List<CrmStatisticsCustomerSummaryByUserRespVO> selectReceivablePriceGroupByUser(CrmStatisticsCustomerReqVO reqVO);
 
-    List<CrmStatisticsFollowupSummaryByDateRespVO> selectFollowupRecordCountGroupByDate(CrmStatisticsCustomerReqVO reqVO);
+    List<CrmStatisticsFollowUpSummaryByDateRespVO> selectFollowUpRecordCountGroupByDate(CrmStatisticsCustomerReqVO reqVO);
 
-    List<CrmStatisticsFollowupSummaryByDateRespVO> selectFollowupCustomerCountGroupByDate(CrmStatisticsCustomerReqVO reqVO);
+    List<CrmStatisticsFollowUpSummaryByDateRespVO> selectFollowUpCustomerCountGroupByDate(CrmStatisticsCustomerReqVO reqVO);
 
-    List<CrmStatisticsFollowupSummaryByUserRespVO> selectFollowupRecordCountGroupByUser(CrmStatisticsCustomerReqVO reqVO);
+    List<CrmStatisticsFollowUpSummaryByUserRespVO> selectFollowUpRecordCountGroupByUser(CrmStatisticsCustomerReqVO reqVO);
 
-    List<CrmStatisticsFollowupSummaryByUserRespVO> selectFollowupCustomerCountGroupByUser(CrmStatisticsCustomerReqVO reqVO);
+    List<CrmStatisticsFollowUpSummaryByUserRespVO> selectFollowUpCustomerCountGroupByUser(CrmStatisticsCustomerReqVO reqVO);
 
     List<CrmStatisticsCustomerContractSummaryRespVO> selectContractSummary(CrmStatisticsCustomerReqVO reqVO);
 
-    List<CrmStatisticsFollowupSummaryByTypeRespVO> selectFollowupRecordCountGroupByType(CrmStatisticsCustomerReqVO reqVO);
+    List<CrmStatisticsFollowUpSummaryByTypeRespVO> selectFollowUpRecordCountGroupByType(CrmStatisticsCustomerReqVO reqVO);
 
     List<CrmStatisticsCustomerDealCycleByDateRespVO> selectCustomerDealCycleGroupByDate(CrmStatisticsCustomerReqVO reqVO);
 
-    List<CrmStatisticsCustomerDealCycleByUserRespVO> selectCustomerDealCycleGroupByUser(CrmStatisticsCustomerReqVO reqVO);
+    List<CrmStatisticsCustomerDealCycleByUserRespVO> selectCustomerDealCycleGroupByUser(CrmStatisticsCustomerReqVO reqVO); // TODO
 
 }

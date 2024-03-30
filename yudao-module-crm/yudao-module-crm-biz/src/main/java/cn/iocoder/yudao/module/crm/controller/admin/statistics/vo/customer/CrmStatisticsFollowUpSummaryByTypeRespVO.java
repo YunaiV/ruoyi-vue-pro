@@ -6,12 +6,12 @@ import lombok.Data;
 
 @Schema(description = "管理后台 - CRM 跟进次数分析(按类型) VO")
 @Data
-public class CrmStatisticsFollowupSummaryByTypeRespVO {
+public class CrmStatisticsFollowUpSummaryByTypeRespVO {
 
     @Schema(description = "跟进类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
-    private String followupType;
+    private Integer followUpType;
 
     @Schema(description = "跟进次数", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
-    private Integer followupRecordCount = 0;
+    private Integer followUpRecordCount;
 
 }

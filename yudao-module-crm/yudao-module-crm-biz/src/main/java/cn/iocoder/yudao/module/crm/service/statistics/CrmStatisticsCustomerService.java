@@ -27,14 +27,13 @@ public interface CrmStatisticsCustomerService {
      */
     List<CrmStatisticsCustomerSummaryByUserRespVO> getCustomerSummaryByUser(CrmStatisticsCustomerReqVO reqVO);
 
-
     /**
      * 跟进次数分析(按日期)
      *
      * @param reqVO 请求参数
      * @return 统计数据
      */
-    List<CrmStatisticsFollowupSummaryByDateRespVO> getFollowupSummaryByDate(CrmStatisticsCustomerReqVO reqVO);
+    List<CrmStatisticsFollowUpSummaryByDateRespVO> getFollowUpSummaryByDate(CrmStatisticsCustomerReqVO reqVO);
 
     /**
      * 跟进次数分析(按用户)
@@ -42,7 +41,7 @@ public interface CrmStatisticsCustomerService {
      * @param reqVO 请求参数
      * @return 统计数据
      */
-    List<CrmStatisticsFollowupSummaryByUserRespVO> getFollowupSummaryByUser(CrmStatisticsCustomerReqVO reqVO);
+    List<CrmStatisticsFollowUpSummaryByUserRespVO> getFollowUpSummaryByUser(CrmStatisticsCustomerReqVO reqVO);
 
     /**
      * 客户跟进次数分析(按类型)
@@ -50,8 +49,7 @@ public interface CrmStatisticsCustomerService {
      * @param reqVO 请求参数
      * @return 统计数据
      */
-    List<CrmStatisticsFollowupSummaryByTypeRespVO> getFollowupSummaryByType(CrmStatisticsCustomerReqVO reqVO);
-
+    List<CrmStatisticsFollowUpSummaryByTypeRespVO> getFollowUpSummaryByType(CrmStatisticsCustomerReqVO reqVO);
 
     /**
      * 获取合同摘要信息(客户转化率页面)

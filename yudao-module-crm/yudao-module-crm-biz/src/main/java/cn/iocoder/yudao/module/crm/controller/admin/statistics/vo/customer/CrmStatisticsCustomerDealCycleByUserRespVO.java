@@ -8,9 +8,9 @@ import lombok.Data;
 public class CrmStatisticsCustomerDealCycleByUserRespVO extends CrmStatisticsCustomerByUserBaseRespVO {
 
     @Schema(description = "成交周期", requiredMode = Schema.RequiredMode.REQUIRED, example = "1.0")
-    private Double customerDealCycle = 0.0;
+    private Double customerDealCycle;
 
     @Schema(description = "成交客户数", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
-    private Integer customerDealCount = 0;
+    private Integer customerDealCount;
 
 }

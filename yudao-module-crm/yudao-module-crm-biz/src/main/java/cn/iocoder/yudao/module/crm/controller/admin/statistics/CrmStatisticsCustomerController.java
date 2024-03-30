@@ -40,25 +40,25 @@ public class CrmStatisticsCustomerController {
         return success(customerService.getCustomerSummaryByUser(reqVO));
     }
 
-    @GetMapping("/get-followup-summary-by-date")
+    @GetMapping("/get-follow-up-summary-by-date")
     @Operation(summary = "获取客户跟进次数分析(按日期)")
     @PreAuthorize("@ss.hasPermission('crm:statistics-customer:query')")
-    public CommonResult<List<CrmStatisticsFollowupSummaryByDateRespVO>> getFollowupSummaryByDate(@Valid CrmStatisticsCustomerReqVO reqVO) {
-        return success(customerService.getFollowupSummaryByDate(reqVO));
+    public CommonResult<List<CrmStatisticsFollowUpSummaryByDateRespVO>> getFollowupSummaryByDate(@Valid CrmStatisticsCustomerReqVO reqVO) {
+        return success(customerService.getFollowUpSummaryByDate(reqVO));
     }
 
-    @GetMapping("/get-followup-summary-by-user")
+    @GetMapping("/get-follow-up-summary-by-user")
     @Operation(summary = "获取客户跟进次数分析(按用户)")
     @PreAuthorize("@ss.hasPermission('crm:statistics-customer:query')")
-    public CommonResult<List<CrmStatisticsFollowupSummaryByUserRespVO>> getFollowupSummaryByUser(@Valid CrmStatisticsCustomerReqVO reqVO) {
-        return success(customerService.getFollowupSummaryByUser(reqVO));
+    public CommonResult<List<CrmStatisticsFollowUpSummaryByUserRespVO>> getFollowUpSummaryByUser(@Valid CrmStatisticsCustomerReqVO reqVO) {
+        return success(customerService.getFollowUpSummaryByUser(reqVO));
     }
 
-    @GetMapping("/get-followup-summary-by-type")
+    @GetMapping("/get-follow-up-summary-by-type")
     @Operation(summary = "获取客户跟进次数分析(按类型)")
     @PreAuthorize("@ss.hasPermission('crm:statistics-customer:query')")
-    public CommonResult<List<CrmStatisticsFollowupSummaryByTypeRespVO>> getFollowupSummaryByType(@Valid CrmStatisticsCustomerReqVO reqVO) {
-        return success(customerService.getFollowupSummaryByType(reqVO));
+    public CommonResult<List<CrmStatisticsFollowUpSummaryByTypeRespVO>> getFollowUpSummaryByType(@Valid CrmStatisticsCustomerReqVO reqVO) {
+        return success(customerService.getFollowUpSummaryByType(reqVO));
     }
 
     @GetMapping("/get-contract-summary")

@@ -1,17 +1,11 @@
 package cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.customer;
 
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-
-import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY;
-import static cn.iocoder.yudao.framework.common.util.date.DateUtils.TIME_ZONE_DEFAULT;
 
 @Schema(description = "管理后台 - CRM 客户转化率分析 VO")
 @Data
@@ -29,31 +23,19 @@ public class CrmStatisticsCustomerContractSummaryRespVO {
     @Schema(description = "回款金额", requiredMode = Schema.RequiredMode.REQUIRED, example = "1200.00")
     private BigDecimal receivablePrice;
 
-    @Schema(description = "客户行业ID", requiredMode = Schema.RequiredMode.REQUIRED, example = "2")
-    @JsonIgnore
-    private String industryId;
+    @Schema(description = "客户行业编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "2")
+    private Integer industryId;
 
-    @Schema(description = "客户行业", requiredMode = Schema.RequiredMode.REQUIRED, example = "金融")
-    private String industryName;
-
-    @Schema(description = "客户来源ID", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
-    @JsonIgnore
-    private String source;
-
-    @Schema(description = "客户来源", requiredMode = Schema.RequiredMode.REQUIRED, example = "外呼")
-    private String sourceName;
+    @Schema(description = "客户来源编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
+    private Integer source;
 
     @Schema(description = "负责人编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
-    @JsonIgnore
     private Long ownerUserId;
-
     @Schema(description = "负责人", requiredMode = Schema.RequiredMode.REQUIRED, example = "芋道源码")
     private String ownerUserName;
 
     @Schema(description = "创建人编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "2")
-    @JsonIgnore
-    private String creatorUserId;
-
+    private String creator;
     @Schema(description = "创建人", requiredMode = Schema.RequiredMode.REQUIRED, example = "源码")
     private String creatorUserName;
 
@@ -61,7 +43,6 @@ public class CrmStatisticsCustomerContractSummaryRespVO {
     private LocalDateTime createTime;
 
     @Schema(description = "下单日期", requiredMode = Schema.RequiredMode.REQUIRED, example = "2024-02-02 00:00:00")
-    @JsonFormat(pattern = FORMAT_YEAR_MONTH_DAY, timezone = TIME_ZONE_DEFAULT)
-    private LocalDate orderDate;
+    private LocalDateTime orderDate;
 
 }

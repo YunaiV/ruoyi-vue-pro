@@ -1,6 +1,6 @@
 # == 1. 客户总量分析 ==
 ### 1.1 客户总量分析(按日)
-GET {{baseUrl}}/crm/statistics-customer/get-customer-summary-by-date?deptId=100&intervalType=11&times[0]=2024-01-01 00:00:00&times[1]=2024-01-29 23:59:59
+GET {{baseUrl}}/crm/statistics-customer/get-customer-summary-by-date?deptId=100&interval=1&times[0]=2024-01-01 00:00:00&times[1]=2024-01-29 23:59:59
 Authorization: Bearer {{token}}
 tenant-id: {{adminTenentId}}
 

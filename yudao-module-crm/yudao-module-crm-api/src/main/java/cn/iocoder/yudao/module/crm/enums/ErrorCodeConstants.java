@@ -104,6 +104,5 @@ public interface ErrorCodeConstants {
     ErrorCode FOLLOW_UP_RECORD_DELETE_DENIED = new ErrorCode(1_020_013_001, "删除跟进记录失败，原因：没有权限");
 
     // ========== 数据统计 1_020_014_000 ==========
-    ErrorCode STATISTICS_CUSTOMER_TIMES_NOT_SET = new ErrorCode(1_020_014_000, "自定义时间间隔，必须输入时间区间");
 
 }

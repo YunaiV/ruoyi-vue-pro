@@ -11,9 +11,9 @@ public class CrmStatisticsCustomerSummaryByDateRespVO {
     private String time;
 
     @Schema(description = "新建客户数", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
-    private Integer customerCreateCount = 0;
+    private Integer customerCreateCount;
 
     @Schema(description = "成交客户数", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
-    private Integer customerDealCount = 0;
+    private Integer customerDealCount;
 
 }
