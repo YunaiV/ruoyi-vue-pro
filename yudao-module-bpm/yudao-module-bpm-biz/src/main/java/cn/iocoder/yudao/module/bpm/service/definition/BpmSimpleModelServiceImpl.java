@@ -32,6 +32,7 @@ import static cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnMode
 @Service
 @Validated
 public class BpmSimpleModelServiceImpl implements BpmSimpleModelService {
+
     @Resource
     private BpmModelService bpmModelService;
 
@@ -48,7 +49,7 @@ public class BpmSimpleModelServiceImpl implements BpmSimpleModelService {
 //            bpmModelService.saveModelBpmnXml(model.getId(), BpmnModelUtils.getBpmnXml(bpmnModel));
 //            return Boolean.TRUE;
 //        } else {
-//            // TODO BPMN XML 已经存在。如何修改 ??
+//            // TODO BPMN XML 已经存在。如何修改 ?? TODO add by 芋艿：感觉一个流程，只能二选一，要么 bpmn、要么 simple
 //            return Boolean.FALSE;
 //        }
         // 暂时直接修改
@@ -66,9 +67,9 @@ public class BpmSimpleModelServiceImpl implements BpmSimpleModelService {
         byte[] bpmnBytes = bpmModelService.getModelBpmnXML(modelId);
         BpmnModel bpmnModel = BpmnModelUtils.getBpmnModel(bpmnBytes);
         return convertBpmnModelToSimpleModel(bpmnModel);
-
     }
 
+    // TODO @jason：一般要支持这个么？感觉 bpmn 转 json 支持会不会太复杂。可以优先级低一点，做下调研~
     /**
      * Bpmn Model 转换成 仿钉钉流程设计模型数据结构(json) 待完善
      *
@@ -89,7 +90,6 @@ public class BpmSimpleModelServiceImpl implements BpmSimpleModelService {
         rootNode.setName(startEvent.getName());
         recursiveBuildSimpleModelNode(startEvent, rootNode);
         return rootNode;
-
     }
 
     private void recursiveBuildSimpleModelNode(FlowNode currentFlowNode, BpmSimpleModelNodeVO currentSimpleModeNode) {
@@ -112,7 +112,6 @@ public class BpmSimpleModelServiceImpl implements BpmSimpleModelService {
         }
         // TODO 其它节点类型待实现
     }
-
 
     private BpmSimpleModelNodeVO convertUserTaskToSimpleModelNode(UserTask userTask) {
         BpmSimpleModelNodeVO simpleModelNodeVO = new BpmSimpleModelNodeVO();

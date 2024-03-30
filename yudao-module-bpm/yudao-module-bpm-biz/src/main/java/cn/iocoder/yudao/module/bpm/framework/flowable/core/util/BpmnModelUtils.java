@@ -335,6 +335,8 @@ public class BpmnModelUtils {
         return userTaskList;
     }
 
+    // ========== TODO 芋艿：这里得捉摸下； ==========
+
     /**
      * 仿钉钉流程设计模型数据结构(json) 转换成 Bpmn Model (待完善）
      *
@@ -359,7 +361,6 @@ public class BpmnModelUtils {
         addBpmnSequenceFlow(mainProcess, simpleModelNode);
         // 自动布局
         new BpmnAutoLayout(bpmnModel).execute();
-
         return bpmnModel;
     }
 
@@ -396,7 +397,6 @@ public class BpmnModelUtils {
             sequenceFlow.setConditionExpression(conditionExpression);
         }
         mainProcess.addFlowElement(sequenceFlow);
-
     }
 
     private static void addBpmnFlowNode(Process mainProcess, BpmSimpleModelNodeVO simpleModelNode) {

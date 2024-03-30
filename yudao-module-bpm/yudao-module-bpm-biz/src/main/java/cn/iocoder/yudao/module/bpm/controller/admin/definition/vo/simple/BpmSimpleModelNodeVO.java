@@ -16,7 +16,7 @@ public class BpmSimpleModelNodeVO {
 
     @Schema(description = "模型节点编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "StartEvent_1")
     @NotEmpty(message = "模型节点编号不能为空")
-    private String  id;
+    private String id;
 
     @Schema(description = "模型节点类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     @NotNull(message = "模型节点类型不能为空")
@@ -33,5 +33,6 @@ public class BpmSimpleModelNodeVO {
     private List<BpmSimpleModelNodeVO> conditionNodes;
 
     @Schema(description = "节点的属性")
-    private Map<String, Object>  attributes;
+    private Map<String, Object> attributes;
+
 }

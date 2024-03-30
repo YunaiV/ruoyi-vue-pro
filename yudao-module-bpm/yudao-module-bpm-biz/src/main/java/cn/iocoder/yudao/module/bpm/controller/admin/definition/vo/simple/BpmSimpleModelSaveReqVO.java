@@ -6,6 +6,7 @@ import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
+// TODO @芋艿：或许挪到 model 里的 simple 包
 @Schema(description = "管理后台 - 仿钉钉流程设计模型的新增/修改 Request VO")
 @Data
 public class BpmSimpleModelSaveReqVO {
@@ -18,4 +19,5 @@ public class BpmSimpleModelSaveReqVO {
     @NotNull(message = "仿钉钉流程设计模型对象不能为空")
     @Valid
     private BpmSimpleModelNodeVO simpleModelBody;
+
 }

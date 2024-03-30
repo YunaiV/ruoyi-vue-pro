@@ -13,14 +13,17 @@ public interface BpmSimpleModelService {
 
     /**
      * 保存仿钉钉流程设计模型
+     *
      * @param reqVO 请求信息
      */
     Boolean saveSimpleModel(@Valid  BpmSimpleModelSaveReqVO reqVO);
 
     /**
      * 获取仿钉钉流程设计模型结构
+     *
      * @param modelId 流程模型编号
      * @return 仿钉钉流程设计模型结构
      */
     BpmSimpleModelNodeVO getSimpleModel(String modelId);
+
 }
