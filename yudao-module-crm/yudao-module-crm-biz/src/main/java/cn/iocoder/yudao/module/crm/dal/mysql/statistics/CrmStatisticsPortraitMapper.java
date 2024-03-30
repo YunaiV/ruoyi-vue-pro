@@ -12,10 +12,12 @@ import java.util.List;
 /**
  * CRM 数据画像 Mapper
  *
- * @author dhb52
+ * @author HUIHUI
  */
 @Mapper
 public interface CrmStatisticsPortraitMapper {
+
+    // TODO @puuhui999：GroupBy
 
     List<CrmStatisticCustomerIndustryRespVO> selectCustomerIndustryListGroupbyIndustryId(CrmStatisticsCustomerReqVO reqVO);
 

@@ -7,8 +7,9 @@ import lombok.Data;
 @Data
 public class CrmStatisticCustomerLevelRespVO {
 
-    @Schema(description = "客户级别ID", requiredMode = Schema.RequiredMode.REQUIRED, example = "2")
+    @Schema(description = "客户级别编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "2")
     private Integer level;
+    // TODO @puhui999：这个前端字典翻译哈
     @Schema(description = "客户级别名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "2")
     private String levelName;
 
@@ -17,6 +18,8 @@ public class CrmStatisticCustomerLevelRespVO {
 
     @Schema(description = "成交个数", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     private Integer dealCount;
+
+    // TODO @puhui999：下面两个的计算，交给前端。后端只返回数据即可。
 
     @Schema(description = "级别占比(%)", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     private Double levelPortion;

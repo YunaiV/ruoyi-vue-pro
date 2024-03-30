@@ -18,6 +18,8 @@ public class CrmStatisticCustomerAreaRespVO {
     @Schema(description = "成交个数", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     private Integer dealCount;
 
+    // TODO @puhui999：下面两个的计算，交给前端。后端只返回数据即可。
+
     @Schema(description = "省份占比(%)", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     private Double areaPortion;
 

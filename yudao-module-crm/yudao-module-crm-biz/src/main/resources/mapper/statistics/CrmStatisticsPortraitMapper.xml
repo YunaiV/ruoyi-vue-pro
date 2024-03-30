@@ -2,6 +2,8 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="cn.iocoder.yudao.module.crm.dal.mysql.statistics.CrmStatisticsPortraitMapper">
 
+    <!-- TODO @puhui999：参考 CrmStatisticsCustomerMapper.xml 优化下 SQL 的排版；sql 结尾不用 ; ；XML 之间有空行； -->
+
     <select id="selectCustomerIndustryListGroupbyIndustryId"
             resultType="cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.portrait.CrmStatisticCustomerIndustryRespVO">
         SELECT

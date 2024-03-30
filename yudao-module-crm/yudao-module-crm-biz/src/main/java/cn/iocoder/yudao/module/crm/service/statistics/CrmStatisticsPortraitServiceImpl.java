@@ -28,6 +28,7 @@ import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.
 import static cn.iocoder.yudao.framework.common.util.collection.MapUtils.findAndThen;
 import static cn.iocoder.yudao.module.crm.enums.DictTypeConstants.*;
 
+// TODO @puhui999：参考 CrmStatisticsCustomerServiceImpl 代码风格，优化下这个类哈；包括命名、空行、注释等；
 /**
  * CRM 客户画像 Service 实现类
  *
@@ -47,7 +48,37 @@ public class CrmStatisticsPortraitServiceImpl implements CrmStatisticsPortraitSe
     private DictDataApi dictDataApi;
 
     @Override
-    public List<CrmStatisticCustomerIndustryRespVO> getCustomerIndustry(CrmStatisticsCustomerReqVO reqVO) {
+    public List<CrmStatisticCustomerAreaRespVO> getCustomerAreaSummary(CrmStatisticsCustomerReqVO reqVO) {
+        // 1. 获得用户编号数组
+        List<Long> userIds = getUserIds(reqVO);
+        if (CollUtil.isEmpty(userIds)) {
+            return Collections.emptyList();
+        }
+        reqVO.setUserIds(userIds);
+        // 2. 获取客户地区统计数据
+        List<CrmStatisticCustomerAreaRespVO> list = portraitMapper.selectSummaryListByAreaId(reqVO);
+        if (CollUtil.isEmpty(list)) {
+            return Collections.emptyList();
+        }
+
+        // 拼接数据
+        List<Area> areaList = AreaUtils.getByType(AreaTypeEnum.PROVINCE, area -> area);
+        areaList.add(new Area().setId(null).setName("未知"));
+        Map<Integer, Area> areaMap = convertMap(areaList, Area::getId);
+        List<CrmStatisticCustomerAreaRespVO> customerAreaRespVOList = convertList(list, item -> {
+            Integer parentId = AreaUtils.getParentIdByType(item.getAreaId(), AreaTypeEnum.PROVINCE);
+            // TODO @puhui999：找不到，可以归到未知哈；
+            if (parentId == null) {
+                return item;
+            }
+            findAndThen(areaMap, parentId, area -> item.setAreaId(parentId).setAreaName(area.getName()));
+            return item;
+        });
+        return customerAreaRespVOList;
+    }
+
+    @Override
+    public List<CrmStatisticCustomerIndustryRespVO> getCustomerIndustrySummary(CrmStatisticsCustomerReqVO reqVO) {
         // 1. 获得用户编号数组
         List<Long> userIds = getUserIds(reqVO);
         if (CollUtil.isEmpty(userIds)) {
@@ -70,13 +101,14 @@ public class CrmStatisticsPortraitServiceImpl implements CrmStatisticsPortraitSe
     }
 
     @Override
-    public List<CrmStatisticCustomerSourceRespVO> getCustomerSource(CrmStatisticsCustomerReqVO reqVO) {
+    public List<CrmStatisticCustomerSourceRespVO> getCustomerSourceSummary(CrmStatisticsCustomerReqVO reqVO) {
         // 1. 获得用户编号数组
         List<Long> userIds = getUserIds(reqVO);
         if (CollUtil.isEmpty(userIds)) {
             return Collections.emptyList();
         }
         reqVO.setUserIds(userIds);
+
         // 2. 获取客户行业统计数据
         List<CrmStatisticCustomerSourceRespVO> sourceRespVOList = portraitMapper.selectCustomerSourceListGroupbySource(reqVO);
         if (CollUtil.isEmpty(sourceRespVOList)) {
@@ -93,7 +125,7 @@ public class CrmStatisticsPortraitServiceImpl implements CrmStatisticsPortraitSe
     }
 
     @Override
-    public List<CrmStatisticCustomerLevelRespVO> getCustomerLevel(CrmStatisticsCustomerReqVO reqVO) {
+    public List<CrmStatisticCustomerLevelRespVO> getCustomerLevelSummary(CrmStatisticsCustomerReqVO reqVO) {
         // 1. 获得用户编号数组
         List<Long> userIds = getUserIds(reqVO);
         if (CollUtil.isEmpty(userIds)) {
@@ -113,35 +145,6 @@ public class CrmStatisticsPortraitServiceImpl implements CrmStatisticsPortraitSe
             item.setLevelName(dictDataApi.getDictDataLabel(CRM_CUSTOMER_LEVEL, item.getLevel()));
             return item;
         });
-    }
-
-    @Override
-    public List<CrmStatisticCustomerAreaRespVO> getCustomerArea(CrmStatisticsCustomerReqVO reqVO) {
-        // 1. 获得用户编号数组
-        List<Long> userIds = getUserIds(reqVO);
-        if (CollUtil.isEmpty(userIds)) {
-            return Collections.emptyList();
-        }
-        reqVO.setUserIds(userIds);
-        // 2. 获取客户地区统计数据
-        List<CrmStatisticCustomerAreaRespVO> list = portraitMapper.selectSummaryListByAreaId(reqVO);
-        if (CollUtil.isEmpty(list)) {
-            return Collections.emptyList();
-        }
-
-        // 拼接数据
-        List<Area> areaList = AreaUtils.getByType(AreaTypeEnum.PROVINCE, area -> area);
-        areaList.add(new Area().setId(null).setName("未知"));
-        Map<Integer, Area> areaMap = convertMap(areaList, Area::getId);
-        List<CrmStatisticCustomerAreaRespVO> customerAreaRespVOList = convertList(list, item -> {
-            Integer parentId = AreaUtils.getParentIdByType(item.getAreaId(), AreaTypeEnum.PROVINCE);
-            if (parentId == null) {
-                return item;
-            }
-            findAndThen(areaMap, parentId, area -> item.setAreaId(parentId).setAreaName(area.getName()));
-            return item;
-        });
-        return customerAreaRespVOList;
     }
 
     /**
