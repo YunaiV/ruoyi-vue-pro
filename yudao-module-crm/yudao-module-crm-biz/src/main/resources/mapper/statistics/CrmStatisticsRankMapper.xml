@@ -7,11 +7,11 @@
         SELECT IFNULL(SUM(total_price), 0) AS count, owner_user_id
         FROM crm_contract
         WHERE deleted = 0
-        AND audit_status = 20
+        AND audit_status = ${@cn.iocoder.yudao.module.crm.enums.common.CrmAuditStatusEnum@APPROVE.status}
         and owner_user_id in
-        <foreach collection="userIds" item="userId" open="(" close=")" separator=",">
-            #{userId}
-        </foreach>
+            <foreach collection="userIds" item="userId" open="(" close=")" separator=",">
+                #{userId}
+            </foreach>
         AND order_date between #{times[0],javaType=java.time.LocalDateTime} and
             #{times[1],javaType=java.time.LocalDateTime}
         GROUP BY owner_user_id
@@ -22,11 +22,11 @@
         SELECT IFNULL(SUM(price), 0) AS count, owner_user_id
         FROM crm_receivable
         WHERE deleted = 0
-        AND audit_status = 20
+        AND audit_status = ${@cn.iocoder.yudao.module.crm.enums.common.CrmAuditStatusEnum@APPROVE.status}
         AND owner_user_id in
-        <foreach collection="userIds" item="userId" open="(" close=")" separator=",">
-            #{userId}
-        </foreach>
+            <foreach collection="userIds" item="userId" open="(" close=")" separator=",">
+                #{userId}
+            </foreach>
         AND return_time between #{times[0],javaType=java.time.LocalDateTime} and
             #{times[1],javaType=java.time.LocalDateTime}
         GROUP BY owner_user_id
@@ -37,11 +37,11 @@
         SELECT COUNT(1) AS count, owner_user_id
         FROM crm_contract
         WHERE deleted = 0
-        AND audit_status = 20
+        AND audit_status = ${@cn.iocoder.yudao.module.crm.enums.common.CrmAuditStatusEnum@APPROVE.status}
         AND owner_user_id in
-        <foreach collection="userIds" item="userId" open="(" close=")" separator=",">
-            #{userId}
-        </foreach>
+            <foreach collection="userIds" item="userId" open="(" close=")" separator=",">
+                #{userId}
+            </foreach>
         AND order_date between #{times[0],javaType=java.time.LocalDateTime} and
             #{times[1],javaType=java.time.LocalDateTime}
         GROUP BY owner_user_id
@@ -55,9 +55,9 @@
         WHERE deleted = 0
         AND audit_status = 20
         AND owner_user_id in
-        <foreach collection="userIds" item="userId" open="(" close=")" separator=",">
-            #{userId}
-        </foreach>
+            <foreach collection="userIds" item="userId" open="(" close=")" separator=",">
+                #{userId}
+            </foreach>
         AND order_date between #{times[0],javaType=java.time.LocalDateTime} and
             #{times[1],javaType=java.time.LocalDateTime}
         GROUP BY owner_user_id
@@ -69,9 +69,9 @@
         FROM crm_customer
         WHERE deleted = 0
         AND owner_user_id in
-        <foreach collection="userIds" item="userId" open="(" close=")" separator=",">
-            #{userId}
-        </foreach>
+            <foreach collection="userIds" item="userId" open="(" close=")" separator=",">
+                #{userId}
+            </foreach>
         AND create_time between #{times[0],javaType=java.time.LocalDateTime} and
             #{times[1],javaType=java.time.LocalDateTime}
         GROUP BY owner_user_id
@@ -83,9 +83,9 @@
         FROM crm_contact
         WHERE deleted = 0
         AND owner_user_id in
-        <foreach collection="userIds" item="userId" open="(" close=")" separator=",">
-            #{userId}
-        </foreach>
+            <foreach collection="userIds" item="userId" open="(" close=")" separator=",">
+                #{userId}
+            </foreach>
         AND create_time between #{times[0],javaType=java.time.LocalDateTime} and
             #{times[1],javaType=java.time.LocalDateTime}
         GROUP BY owner_user_id
@@ -99,9 +99,9 @@
         WHERE cfur.deleted = 0
         AND cc.deleted = 0
         AND cc.owner_user_id in
-        <foreach collection="userIds" item="userId" open="(" close=")" separator=",">
-            #{userId}
-        </foreach>
+            <foreach collection="userIds" item="userId" open="(" close=")" separator=",">
+                #{userId}
+            </foreach>
         AND cfur.create_time between #{times[0],javaType=java.time.LocalDateTime} and
             #{times[1],javaType=java.time.LocalDateTime}
         GROUP BY cc.owner_user_id
@@ -115,9 +115,9 @@
         WHERE cfur.deleted = 0
         AND cc.deleted = 0
         AND cc.owner_user_id in
-        <foreach collection="userIds" item="userId" open="(" close=")" separator=",">
-            #{userId}
-        </foreach>
+            <foreach collection="userIds" item="userId" open="(" close=")" separator=",">
+                #{userId}
+            </foreach>
         AND cfur.create_time between #{times[0],javaType=java.time.LocalDateTime} and
             #{times[1],javaType=java.time.LocalDateTime}
         GROUP BY cc.owner_user_id

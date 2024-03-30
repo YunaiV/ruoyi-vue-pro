@@ -52,15 +52,17 @@ public interface CrmStatisticsCustomerService {
     List<CrmStatisticsFollowUpSummaryByTypeRespVO> getFollowUpSummaryByType(CrmStatisticsCustomerReqVO reqVO);
 
     /**
-     * 获取合同摘要信息(客户转化率页面)
+     * 获取客户的首次合同、回款信息列表，用于【客户转化率】页面
      *
      * @param reqVO 请求参数
-     * @return 合同摘要列表
+     * @return 客户的首次合同、回款信息列表
      */
     List<CrmStatisticsCustomerContractSummaryRespVO> getContractSummary(CrmStatisticsCustomerReqVO reqVO);
 
     /**
      * 客户成交周期(按日期)
+     *
+     * 成交的定义：客户 customer 在创建出来，到合同 contract 第一次成交的时间差
      *
      * @param reqVO 请求参数
      * @return 统计数据

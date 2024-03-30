@@ -24,7 +24,7 @@
             COUNT( DISTINCT customer_id ) AS customerDealCount
         FROM crm_contract
         WHERE deleted = 0
-        AND audit_status = 20
+        AND audit_status = ${@cn.iocoder.yudao.module.crm.enums.common.CrmAuditStatusEnum@APPROVE.status}
         AND owner_user_id IN
             <foreach collection="userIds" item="userId" open="(" close=")" separator=",">
                 #{userId}
@@ -56,7 +56,7 @@
         FROM crm_customer AS customer
         LEFT JOIN crm_contract AS contract ON contract.customer_id = customer.id
         WHERE customer.deleted = 0 AND contract.deleted = 0
-        AND contract.audit_status = 20
+        AND contract.audit_status = ${@cn.iocoder.yudao.module.crm.enums.common.CrmAuditStatusEnum@APPROVE.status}
         AND customer.owner_user_id IN
             <foreach collection="userIds" item="userId" open="(" close=")" separator=",">
                 #{userId}
@@ -72,7 +72,7 @@
             IFNULL(SUM(total_price), 0) AS contract_price
         FROM crm_contract
         WHERE deleted = 0
-        AND audit_status = 20
+        AND audit_status = ${@cn.iocoder.yudao.module.crm.enums.common.CrmAuditStatusEnum@APPROVE.status}
         AND owner_user_id in
             <foreach collection="userIds" item="userId" open="(" close=")" separator=",">
                 #{userId}
@@ -88,7 +88,7 @@
             IFNULL(SUM(price), 0) AS receivable_price
         FROM crm_receivable
         WHERE deleted = 0
-        AND audit_status = 20
+        AND audit_status = ${@cn.iocoder.yudao.module.crm.enums.common.CrmAuditStatusEnum@APPROVE.status}
         AND owner_user_id IN
             <foreach collection="userIds" item="userId" open="(" close=")" separator=",">
                 #{userId}
@@ -175,28 +175,24 @@
     <select id="selectContractSummary"
             resultType="cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.customer.CrmStatisticsCustomerContractSummaryRespVO">
         SELECT
-            customer.name AS customer_name,
-            contract.name AS contract_name,
-            contract.total_price,
-            IFNULL( receivable.price, 0 ) AS receivable_price,
-            customer.industry_id,
-            customer.source,
-            customer.owner_user_id,
-            customer.creator,
+            customer.name AS customer_name, customer.industry_id, customer.source, customer.owner_user_id, customer.creator,
             customer.create_time,
-            contract.order_date
+            contract.name AS contract_name, contract.total_price, contract.order_date,
+            IFNULL( receivable.price, 0 ) AS receivable_price
         FROM crm_customer AS customer
         INNER JOIN crm_contract AS contract ON customer.id = contract.customer_id
         LEFT JOIN crm_receivable AS receivable ON contract.id = receivable.contract_id
         WHERE customer.deleted = 0 AND contract.deleted = 0 AND receivable.deleted = 0
-        AND contract.audit_status = 20
+        AND contract.audit_status = ${@cn.iocoder.yudao.module.crm.enums.common.CrmAuditStatusEnum@APPROVE.status}
         AND customer.owner_user_id IN
             <foreach collection="userIds" item="userId" open="(" close=")" separator=",">
                 #{userId}
             </foreach>
+        <!-- TODO @dhb52：应该是客户的创建时间；因为它的定位，是知道这个时间范围内创建的客户，是否下合同了（转化）； -->
         AND contract.create_time BETWEEN #{times[0],javaType=java.time.LocalDateTime} AND #{times[1],javaType=java.time.LocalDateTime}
     </select>
 
+    <!-- TIMESTAMPDIFF 用于求差值；AVG 求平均；TRUNCATE 去掉小数点、只保留整数 -->
     <select id="selectCustomerDealCycleGroupByDate"
             resultType="cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.customer.CrmStatisticsCustomerDealCycleByDateRespVO">
         SELECT
@@ -205,11 +201,12 @@
         FROM crm_customer AS customer
         LEFT JOIN crm_contract AS contract ON contract.customer_id = customer.id
         WHERE customer.deleted = 0 AND contract.deleted = 0
-        AND contract.audit_status = 20
+        AND contract.audit_status = ${@cn.iocoder.yudao.module.crm.enums.common.CrmAuditStatusEnum@APPROVE.status}
         AND customer.owner_user_id IN
             <foreach collection="userIds" item="userId" open="(" close=")" separator=",">
                 #{userId}
             </foreach>
+        <!-- TODO @dhb52：应该是客户的创建时间； -->
         AND contract.create_time BETWEEN #{times[0],javaType=java.time.LocalDateTime} AND #{times[1],javaType=java.time.LocalDateTime}
         GROUP BY time
     </select>
@@ -222,11 +219,12 @@
         FROM crm_customer AS customer
         LEFT JOIN crm_contract AS contract ON contract.customer_id = customer.id
         WHERE customer.deleted = 0 AND contract.deleted = 0
-        AND contract.audit_status = 20
+        AND contract.audit_status = ${@cn.iocoder.yudao.module.crm.enums.common.CrmAuditStatusEnum@APPROVE.status}
         AND customer.owner_user_id IN
             <foreach collection="userIds" item="userId" open="(" close=")" separator=",">
                 #{userId}
             </foreach>
+        <!-- TODO @dhb52：应该是客户的创建时间； -->
         AND contract.create_time BETWEEN #{times[0],javaType=java.time.LocalDateTime} AND #{times[1],javaType=java.time.LocalDateTime}
         GROUP BY customer.owner_user_id
     </select>

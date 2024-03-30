@@ -61,8 +61,10 @@ public class CrmStatisticsCustomerController {
         return success(customerService.getFollowUpSummaryByType(reqVO));
     }
 
+    // TODO @dhb52：【客户转化率】里，应该少了一个接口，给上面图标的；
+
     @GetMapping("/get-contract-summary")
-    @Operation(summary = "获取合同摘要信息(客户转化率页面)")
+    @Operation(summary = "获取客户的首次合同、回款信息列表", description = "用于【客户转化率】页面")
     @PreAuthorize("@ss.hasPermission('crm:statistics-customer:query')")
     public CommonResult<List<CrmStatisticsCustomerContractSummaryRespVO>> getContractSummary(@Valid CrmStatisticsCustomerReqVO reqVO) {
         return success(customerService.getContractSummary(reqVO));
@@ -81,5 +83,7 @@ public class CrmStatisticsCustomerController {
     public CommonResult<List<CrmStatisticsCustomerDealCycleByUserRespVO>> getCustomerDealCycleByUser(@Valid CrmStatisticsCustomerReqVO reqVO) {
         return success(customerService.getCustomerDealCycleByUser(reqVO));
     }
+
+    // TODO dhb52：【成交周期分析】里，有按照员工（已实现）、地区（未实现）、产品（未实现），需要在看看哈；可以把 CustomerDealCycle 拆成 3 个 tab，员工客户成交周期分析、地区客户成交周期分析、产品客户成交周期分析；
 
 }
