@@ -75,7 +75,6 @@
         <jimureport.version>1.6.6-beta2</jimureport.version>
         <xercesImpl.version>2.12.2</xercesImpl.version>
         <weixin-java.version>4.6.0</weixin-java.version>
-        <ureport2.version>2.2.9</ureport2.version>
     </properties>
 
     <dependencyManagement>
@@ -619,13 +618,6 @@
                 <groupId>xerces</groupId>
                 <artifactId>xercesImpl</artifactId>
                 <version>${xercesImpl.version}</version>
-            </dependency>
-
-            <!-- UReport2 报表-->
-            <dependency>
-                <groupId>com.bstek.ureport</groupId>
-                <artifactId>ureport2-console</artifactId>
-                <version>${ureport2.version}</version>
             </dependency>
 
         </dependencies>

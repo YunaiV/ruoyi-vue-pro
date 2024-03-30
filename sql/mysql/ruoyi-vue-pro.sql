@@ -11,7 +11,7 @@
  Target Server Version : 80200 (8.2.0)
  File Encoding         : 65001
 
- Date: 24/03/2024 10:40:51
+ Date: 30/03/2024 20:42:06
 */
 
 SET NAMES utf8mb4;
@@ -385,7 +385,7 @@ CREATE TABLE `infra_api_error_log`  (
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 16372 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '系统异常日志';
+) ENGINE = InnoDB AUTO_INCREMENT = 16429 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '系统异常日志';
 
 -- ----------------------------
 -- Records of infra_api_error_log
@@ -690,7 +690,7 @@ CREATE TABLE `infra_file`  (
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 1294 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '文件表';
+) ENGINE = InnoDB AUTO_INCREMENT = 1301 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '文件表';
 
 -- ----------------------------
 -- Records of infra_file
@@ -846,7 +846,7 @@ BEGIN;
 INSERT INTO `system_dept` (`id`, `name`, `parent_id`, `sort`, `leader_user_id`, `phone`, `email`, `status`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (100, '芋道源码', 0, 0, 1, '15888888888', 'ry@qq.com', 0, 'admin', '2021-01-05 17:03:47', '1', '2023-11-14 23:30:36', b'0', 1);
 INSERT INTO `system_dept` (`id`, `name`, `parent_id`, `sort`, `leader_user_id`, `phone`, `email`, `status`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (101, '深圳总公司', 100, 1, 104, '15888888888', 'ry@qq.com', 0, 'admin', '2021-01-05 17:03:47', '1', '2023-12-02 09:53:35', b'0', 1);
 INSERT INTO `system_dept` (`id`, `name`, `parent_id`, `sort`, `leader_user_id`, `phone`, `email`, `status`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (102, '长沙分公司', 100, 2, NULL, '15888888888', 'ry@qq.com', 0, 'admin', '2021-01-05 17:03:47', '', '2021-12-15 05:01:40', b'0', 1);
-INSERT INTO `system_dept` (`id`, `name`, `parent_id`, `sort`, `leader_user_id`, `phone`, `email`, `status`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (103, '研发部门', 101, 1, 104, '15888888888', 'ry@qq.com', 0, 'admin', '2021-01-05 17:03:47', '103', '2022-01-14 01:04:14', b'0', 1);
+INSERT INTO `system_dept` (`id`, `name`, `parent_id`, `sort`, `leader_user_id`, `phone`, `email`, `status`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (103, '研发部门', 101, 1, 104, '15888888888', 'ry@qq.com', 0, 'admin', '2021-01-05 17:03:47', '1', '2024-03-24 20:56:04', b'0', 1);
 INSERT INTO `system_dept` (`id`, `name`, `parent_id`, `sort`, `leader_user_id`, `phone`, `email`, `status`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (104, '市场部门', 101, 2, NULL, '15888888888', 'ry@qq.com', 0, 'admin', '2021-01-05 17:03:47', '', '2021-12-15 05:01:38', b'0', 1);
 INSERT INTO `system_dept` (`id`, `name`, `parent_id`, `sort`, `leader_user_id`, `phone`, `email`, `status`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (105, '测试部门', 101, 3, NULL, '15888888888', 'ry@qq.com', 0, 'admin', '2021-01-05 17:03:47', '1', '2022-05-16 20:25:15', b'0', 1);
 INSERT INTO `system_dept` (`id`, `name`, `parent_id`, `sort`, `leader_user_id`, `phone`, `email`, `status`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (106, '财务部门', 101, 4, 103, '15888888888', 'ry@qq.com', 0, 'admin', '2021-01-05 17:03:47', '103', '2022-01-15 21:32:22', b'0', 1);
@@ -879,7 +879,7 @@ CREATE TABLE `system_dict_data`  (
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 1529 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '字典数据表';
+) ENGINE = InnoDB AUTO_INCREMENT = 1534 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '字典数据表';
 
 -- ----------------------------
 -- Records of system_dict_data
@@ -1253,6 +1253,11 @@ INSERT INTO `system_dict_data` (`id`, `sort`, `label`, `value`, `dict_type`, `st
 INSERT INTO `system_dict_data` (`id`, `sort`, `label`, `value`, `dict_type`, `status`, `color_type`, `css_class`, `remark`, `creator`, `create_time`, `updater`, `update_time`, `deleted`) VALUES (1526, 1, 'Java 类', 'class', 'bpm_process_listener_value_type', 0, 'primary', '', '', '1', '2024-03-23 15:08:45', '1', '2024-03-23 19:14:32', b'0');
 INSERT INTO `system_dict_data` (`id`, `sort`, `label`, `value`, `dict_type`, `status`, `color_type`, `css_class`, `remark`, `creator`, `create_time`, `updater`, `update_time`, `deleted`) VALUES (1527, 2, '表达式', 'expression', 'bpm_process_listener_value_type', 0, 'success', '', '', '1', '2024-03-23 15:09:06', '1', '2024-03-23 19:14:38', b'0');
 INSERT INTO `system_dict_data` (`id`, `sort`, `label`, `value`, `dict_type`, `status`, `color_type`, `css_class`, `remark`, `creator`, `create_time`, `updater`, `update_time`, `deleted`) VALUES (1528, 3, '代理表达式', 'delegateExpression', 'bpm_process_listener_value_type', 0, 'info', '', '', '1', '2024-03-23 15:11:23', '1', '2024-03-23 19:14:41', b'0');
+INSERT INTO `system_dict_data` (`id`, `sort`, `label`, `value`, `dict_type`, `status`, `color_type`, `css_class`, `remark`, `creator`, `create_time`, `updater`, `update_time`, `deleted`) VALUES (1529, 1, '天', '1', 'date_interval', 0, '', '', '', '1', '2024-03-29 22:50:26', '1', '2024-03-29 22:50:26', b'0');
+INSERT INTO `system_dict_data` (`id`, `sort`, `label`, `value`, `dict_type`, `status`, `color_type`, `css_class`, `remark`, `creator`, `create_time`, `updater`, `update_time`, `deleted`) VALUES (1530, 2, '周', '2', 'date_interval', 0, '', '', '', '1', '2024-03-29 22:50:36', '1', '2024-03-29 22:50:36', b'0');
+INSERT INTO `system_dict_data` (`id`, `sort`, `label`, `value`, `dict_type`, `status`, `color_type`, `css_class`, `remark`, `creator`, `create_time`, `updater`, `update_time`, `deleted`) VALUES (1531, 3, '月', '3', 'date_interval', 0, '', '', '', '1', '2024-03-29 22:50:46', '1', '2024-03-29 22:50:54', b'0');
+INSERT INTO `system_dict_data` (`id`, `sort`, `label`, `value`, `dict_type`, `status`, `color_type`, `css_class`, `remark`, `creator`, `create_time`, `updater`, `update_time`, `deleted`) VALUES (1532, 4, '季度', '4', 'date_interval', 0, '', '', '', '1', '2024-03-29 22:51:01', '1', '2024-03-29 22:51:01', b'0');
+INSERT INTO `system_dict_data` (`id`, `sort`, `label`, `value`, `dict_type`, `status`, `color_type`, `css_class`, `remark`, `creator`, `create_time`, `updater`, `update_time`, `deleted`) VALUES (1533, 5, '年', '5', 'date_interval', 0, '', '', '', '1', '2024-03-29 22:51:07', '1', '2024-03-29 22:51:07', b'0');
 COMMIT;
 
 -- ----------------------------
@@ -1273,7 +1278,7 @@ CREATE TABLE `system_dict_type`  (
   `deleted_time` datetime NULL DEFAULT NULL COMMENT '删除时间',
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `dict_type`(`type` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 616 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '字典类型表';
+) ENGINE = InnoDB AUTO_INCREMENT = 617 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '字典类型表';
 
 -- ----------------------------
 -- Records of system_dict_type
@@ -1362,6 +1367,7 @@ INSERT INTO `system_dict_type` (`id`, `name`, `type`, `status`, `remark`, `creat
 INSERT INTO `system_dict_type` (`id`, `name`, `type`, `status`, `remark`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `deleted_time`) VALUES (612, 'ERP 审批状态', 'erp_audit_status', 0, '', '1', '2024-02-06 00:00:07', '1', '2024-02-06 00:00:07', b'0', '1970-01-01 00:00:00');
 INSERT INTO `system_dict_type` (`id`, `name`, `type`, `status`, `remark`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `deleted_time`) VALUES (613, 'BPM 监听器类型', 'bpm_process_listener_type', 0, '', '1', '2024-03-23 12:52:24', '1', '2024-03-09 15:54:28', b'0', '1970-01-01 00:00:00');
 INSERT INTO `system_dict_type` (`id`, `name`, `type`, `status`, `remark`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `deleted_time`) VALUES (615, 'BPM 监听器值类型', 'bpm_process_listener_value_type', 0, '', '1', '2024-03-23 13:00:31', '1', '2024-03-23 13:00:31', b'0', '1970-01-01 00:00:00');
+INSERT INTO `system_dict_type` (`id`, `name`, `type`, `status`, `remark`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `deleted_time`) VALUES (616, '时间间隔', 'date_interval', 0, '', '1', '2024-03-29 22:50:09', '1', '2024-03-29 22:50:09', b'0', '1970-01-01 00:00:00');
 COMMIT;
 
 -- ----------------------------
@@ -1410,7 +1416,7 @@ CREATE TABLE `system_login_log`  (
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 3031 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '系统访问记录';
+) ENGINE = InnoDB AUTO_INCREMENT = 3054 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '系统访问记录';
 
 -- ----------------------------
 -- Records of system_login_log
@@ -2135,12 +2141,6 @@ INSERT INTO `system_menu` (`id`, `name`, `permission`, `type`, `sort`, `parent_i
 INSERT INTO `system_menu` (`id`, `name`, `permission`, `type`, `sort`, `parent_id`, `path`, `icon`, `component`, `component_name`, `status`, `visible`, `keep_alive`, `always_show`, `creator`, `create_time`, `updater`, `update_time`, `deleted`) VALUES (2534, '产品分类创建', 'crm:product-category:create', 3, 2, 2532, '', '', '', '', 0, b'1', b'1', b'1', '1', '2023-12-06 12:53:41', '1', '2023-12-06 12:53:41', b'0');
 INSERT INTO `system_menu` (`id`, `name`, `permission`, `type`, `sort`, `parent_id`, `path`, `icon`, `component`, `component_name`, `status`, `visible`, `keep_alive`, `always_show`, `creator`, `create_time`, `updater`, `update_time`, `deleted`) VALUES (2535, '产品分类更新', 'crm:product-category:update', 3, 3, 2532, '', '', '', '', 0, b'1', b'1', b'1', '1', '2023-12-06 12:53:59', '1', '2023-12-06 12:53:59', b'0');
 INSERT INTO `system_menu` (`id`, `name`, `permission`, `type`, `sort`, `parent_id`, `path`, `icon`, `component`, `component_name`, `status`, `visible`, `keep_alive`, `always_show`, `creator`, `create_time`, `updater`, `update_time`, `deleted`) VALUES (2536, '产品分类删除', 'crm:product-category:delete', 3, 4, 2532, '', '', '', '', 0, b'1', b'1', b'1', '1', '2023-12-06 12:54:14', '1', '2023-12-06 12:54:14', b'0');
-INSERT INTO `system_menu` (`id`, `name`, `permission`, `type`, `sort`, `parent_id`, `path`, `icon`, `component`, `component_name`, `status`, `visible`, `keep_alive`, `always_show`, `creator`, `create_time`, `updater`, `update_time`, `deleted`) VALUES (2537, 'UReport2 报表', '', 2, 3, 1281, 'ureport-data', 'fa:line-chart', 'report/ureport/index', 'UReportData', 0, b'1', b'1', b'1', '', '2023-12-06 12:55:55', '1', '2024-02-29 12:35:02', b'0');
-INSERT INTO `system_menu` (`id`, `name`, `permission`, `type`, `sort`, `parent_id`, `path`, `icon`, `component`, `component_name`, `status`, `visible`, `keep_alive`, `always_show`, `creator`, `create_time`, `updater`, `update_time`, `deleted`) VALUES (2538, 'Ureport2报表查询', 'report:ureport-data:query', 3, 1, 2537, '', '', '', NULL, 0, b'1', b'1', b'1', '', '2023-12-06 12:55:55', '', '2023-12-06 12:55:55', b'0');
-INSERT INTO `system_menu` (`id`, `name`, `permission`, `type`, `sort`, `parent_id`, `path`, `icon`, `component`, `component_name`, `status`, `visible`, `keep_alive`, `always_show`, `creator`, `create_time`, `updater`, `update_time`, `deleted`) VALUES (2539, 'Ureport2报表创建', 'report:ureport-data:create', 3, 2, 2537, '', '', '', NULL, 0, b'1', b'1', b'1', '', '2023-12-06 12:55:55', '', '2023-12-06 12:55:55', b'0');
-INSERT INTO `system_menu` (`id`, `name`, `permission`, `type`, `sort`, `parent_id`, `path`, `icon`, `component`, `component_name`, `status`, `visible`, `keep_alive`, `always_show`, `creator`, `create_time`, `updater`, `update_time`, `deleted`) VALUES (2540, 'Ureport2报表更新', 'report:ureport-data:update', 3, 3, 2537, '', '', '', NULL, 0, b'1', b'1', b'1', '', '2023-12-06 12:55:55', '', '2023-12-06 12:55:55', b'0');
-INSERT INTO `system_menu` (`id`, `name`, `permission`, `type`, `sort`, `parent_id`, `path`, `icon`, `component`, `component_name`, `status`, `visible`, `keep_alive`, `always_show`, `creator`, `create_time`, `updater`, `update_time`, `deleted`) VALUES (2541, 'Ureport2报表删除', 'report:ureport-data:delete', 3, 4, 2537, '', '', '', NULL, 0, b'1', b'1', b'1', '', '2023-12-06 12:55:55', '', '2023-12-06 12:55:55', b'0');
-INSERT INTO `system_menu` (`id`, `name`, `permission`, `type`, `sort`, `parent_id`, `path`, `icon`, `component`, `component_name`, `status`, `visible`, `keep_alive`, `always_show`, `creator`, `create_time`, `updater`, `update_time`, `deleted`) VALUES (2542, 'Ureport2报表导出', 'report:ureport-data:export', 3, 5, 2537, '', '', '', NULL, 0, b'1', b'1', b'1', '', '2023-12-06 12:55:55', '', '2023-12-06 12:55:55', b'0');
 INSERT INTO `system_menu` (`id`, `name`, `permission`, `type`, `sort`, `parent_id`, `path`, `icon`, `component`, `component_name`, `status`, `visible`, `keep_alive`, `always_show`, `creator`, `create_time`, `updater`, `update_time`, `deleted`) VALUES (2543, '关联商机', 'crm:contact:create-business', 3, 10, 2416, '', '', '', '', 0, b'1', b'1', b'1', '1', '2024-01-02 17:28:25', '1', '2024-01-02 17:28:25', b'0');
 INSERT INTO `system_menu` (`id`, `name`, `permission`, `type`, `sort`, `parent_id`, `path`, `icon`, `component`, `component_name`, `status`, `visible`, `keep_alive`, `always_show`, `creator`, `create_time`, `updater`, `update_time`, `deleted`) VALUES (2544, '取关商机', 'crm:contact:delete-business', 3, 11, 2416, '', '', '', '', 0, b'1', b'1', b'1', '1', '2024-01-02 17:28:43', '1', '2024-01-02 17:28:51', b'0');
 INSERT INTO `system_menu` (`id`, `name`, `permission`, `type`, `sort`, `parent_id`, `path`, `icon`, `component`, `component_name`, `status`, `visible`, `keep_alive`, `always_show`, `creator`, `create_time`, `updater`, `update_time`, `deleted`) VALUES (2545, '商品统计', '', 2, 3, 2358, 'product', 'fa:product-hunt', 'mall/statistics/product/index', 'ProductStatistics', 0, b'1', b'1', b'1', '', '2023-12-15 18:54:28', '1', '2024-02-26 20:41:52', b'0');
@@ -2453,7 +2453,7 @@ CREATE TABLE `system_oauth2_access_token`  (
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `idx_access_token`(`access_token` ASC) USING BTREE,
   INDEX `idx_refresh_token`(`refresh_token` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 6042 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = 'OAuth2 访问令牌';
+) ENGINE = InnoDB AUTO_INCREMENT = 6332 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = 'OAuth2 访问令牌';
 
 -- ----------------------------
 -- Records of system_oauth2_access_token
@@ -2575,7 +2575,7 @@ CREATE TABLE `system_oauth2_refresh_token`  (
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 1415 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = 'OAuth2 刷新令牌';
+) ENGINE = InnoDB AUTO_INCREMENT = 1430 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = 'OAuth2 刷新令牌';
 
 -- ----------------------------
 -- Records of system_oauth2_refresh_token
@@ -2615,7 +2615,7 @@ CREATE TABLE `system_operate_log`  (
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 11782 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '操作日志记录';
+) ENGINE = InnoDB AUTO_INCREMENT = 11964 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '操作日志记录';
 
 -- ----------------------------
 -- Records of system_operate_log
@@ -2648,7 +2648,7 @@ CREATE TABLE `system_operate_log_v2`  (
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 9018 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '操作日志记录 V2 版本';
+) ENGINE = InnoDB AUTO_INCREMENT = 9019 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '操作日志记录 V2 版本';
 
 -- ----------------------------
 -- Records of system_operate_log_v2
@@ -2674,7 +2674,7 @@ CREATE TABLE `system_post`  (
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 5 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '岗位信息表';
+) ENGINE = InnoDB AUTO_INCREMENT = 6 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '岗位信息表';
 
 -- ----------------------------
 -- Records of system_post
@@ -2683,6 +2683,7 @@ BEGIN;
 INSERT INTO `system_post` (`id`, `code`, `name`, `sort`, `status`, `remark`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (1, 'ceo', '董事长', 1, 0, '', 'admin', '2021-01-06 17:03:48', '1', '2023-02-11 15:19:04', b'0', 1);
 INSERT INTO `system_post` (`id`, `code`, `name`, `sort`, `status`, `remark`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (2, 'se', '项目经理', 2, 0, '', 'admin', '2021-01-05 17:03:48', '1', '2023-11-15 09:18:20', b'0', 1);
 INSERT INTO `system_post` (`id`, `code`, `name`, `sort`, `status`, `remark`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4, 'user', '普通员工', 4, 0, '111', 'admin', '2021-01-05 17:03:48', '1', '2023-12-02 10:04:37', b'0', 1);
+INSERT INTO `system_post` (`id`, `code`, `name`, `sort`, `status`, `remark`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (5, 'HR', '人力资源', 5, 0, '', '1', '2024-03-24 20:45:40', '1', '2024-03-24 20:45:40', b'0', 1);
 COMMIT;
 
 -- ----------------------------
@@ -2706,7 +2707,7 @@ CREATE TABLE `system_role`  (
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 144 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '角色信息表';
+) ENGINE = InnoDB AUTO_INCREMENT = 145 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '角色信息表';
 
 -- ----------------------------
 -- Records of system_role
@@ -2715,7 +2716,7 @@ BEGIN;
 INSERT INTO `system_role` (`id`, `name`, `code`, `sort`, `data_scope`, `data_scope_dept_ids`, `status`, `type`, `remark`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (1, '超级管理员', 'super_admin', 1, 1, '', 0, 1, '超级管理员', 'admin', '2021-01-05 17:03:48', '', '2022-02-22 05:08:21', b'0', 1);
 INSERT INTO `system_role` (`id`, `name`, `code`, `sort`, `data_scope`, `data_scope_dept_ids`, `status`, `type`, `remark`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (2, '普通角色', 'common', 2, 2, '', 0, 1, '普通角色', 'admin', '2021-01-05 17:03:48', '', '2022-02-22 05:08:20', b'0', 1);
 INSERT INTO `system_role` (`id`, `name`, `code`, `sort`, `data_scope`, `data_scope_dept_ids`, `status`, `type`, `remark`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (3, 'CRM 管理员', 'crm_admin', 2, 1, '', 0, 1, 'CRM 专属角色', '1', '2024-02-24 10:51:13', '1', '2024-02-24 02:51:32', b'0', 1);
-INSERT INTO `system_role` (`id`, `name`, `code`, `sort`, `data_scope`, `data_scope_dept_ids`, `status`, `type`, `remark`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (101, '测试账号', 'test', 0, 2, '[]', 0, 2, '我想测试', '', '2021-01-06 13:49:35', '1', '2023-12-07 08:41:16', b'0', 1);
+INSERT INTO `system_role` (`id`, `name`, `code`, `sort`, `data_scope`, `data_scope_dept_ids`, `status`, `type`, `remark`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (101, '测试账号', 'test', 0, 1, '[]', 0, 2, '我想测试', '', '2021-01-06 13:49:35', '1', '2024-03-24 22:22:45', b'0', 1);
 INSERT INTO `system_role` (`id`, `name`, `code`, `sort`, `data_scope`, `data_scope_dept_ids`, `status`, `type`, `remark`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (109, '租户管理员', 'tenant_admin', 0, 1, '', 0, 1, '系统自动生成', '1', '2022-02-22 00:56:14', '1', '2022-02-22 00:56:14', b'0', 121);
 INSERT INTO `system_role` (`id`, `name`, `code`, `sort`, `data_scope`, `data_scope_dept_ids`, `status`, `type`, `remark`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (110, '测试角色', 'test', 0, 1, '[]', 0, 2, '嘿嘿', '110', '2022-02-23 00:14:34', '110', '2022-02-23 13:14:58', b'0', 121);
 INSERT INTO `system_role` (`id`, `name`, `code`, `sort`, `data_scope`, `data_scope_dept_ids`, `status`, `type`, `remark`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (111, '租户管理员', 'tenant_admin', 0, 1, '', 0, 1, '系统自动生成', '1', '2022-03-07 21:37:58', '1', '2022-03-07 21:37:58', b'0', 122);
@@ -2731,6 +2732,7 @@ INSERT INTO `system_role` (`id`, `name`, `code`, `sort`, `data_scope`, `data_sco
 INSERT INTO `system_role` (`id`, `name`, `code`, `sort`, `data_scope`, `data_scope_dept_ids`, `status`, `type`, `remark`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (140, '租户管理员', 'tenant_admin', 0, 1, '', 0, 1, '系统自动生成', '1', '2023-12-02 23:35:05', '1', '2023-12-02 23:35:05', b'0', 151);
 INSERT INTO `system_role` (`id`, `name`, `code`, `sort`, `data_scope`, `data_scope_dept_ids`, `status`, `type`, `remark`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (141, '租户管理员', 'tenant_admin', 0, 1, '', 0, 1, '系统自动生成', '1', '2023-12-30 11:43:17', '1', '2023-12-30 11:43:17', b'0', 152);
 INSERT INTO `system_role` (`id`, `name`, `code`, `sort`, `data_scope`, `data_scope_dept_ids`, `status`, `type`, `remark`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (143, '租户管理员', 'tenant_admin', 0, 1, '', 0, 1, '系统自动生成', '1', '2024-02-27 21:58:25', '1', '2024-02-27 21:58:25', b'0', 153);
+INSERT INTO `system_role` (`id`, `name`, `code`, `sort`, `data_scope`, `data_scope_dept_ids`, `status`, `type`, `remark`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (144, '租户管理员', 'tenant_admin', 0, 1, '', 0, 1, '系统自动生成', '1', '2024-03-30 17:52:59', '1', '2024-03-30 17:52:59', b'0', 154);
 COMMIT;
 
 -- ----------------------------
@@ -2748,7 +2750,7 @@ CREATE TABLE `system_role_menu`  (
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 4042 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '角色和菜单关联表';
+) ENGINE = InnoDB AUTO_INCREMENT = 4517 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '角色和菜单关联表';
 
 -- ----------------------------
 -- Records of system_role_menu
@@ -4518,12 +4520,6 @@ INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_t
 INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (3845, 1, 2534, '1', '2024-01-02 17:35:25', '1', '2024-01-02 17:35:25', b'0', 1);
 INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (3846, 1, 2535, '1', '2024-01-02 17:35:25', '1', '2024-01-02 17:35:25', b'0', 1);
 INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (3847, 1, 2536, '1', '2024-01-02 17:35:25', '1', '2024-01-02 17:35:25', b'0', 1);
-INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (3848, 1, 2537, '1', '2024-01-02 17:35:25', '1', '2024-01-02 17:35:25', b'0', 1);
-INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (3849, 1, 2538, '1', '2024-01-02 17:35:25', '1', '2024-01-02 17:35:25', b'0', 1);
-INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (3850, 1, 2539, '1', '2024-01-02 17:35:25', '1', '2024-01-02 17:35:25', b'0', 1);
-INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (3851, 1, 2540, '1', '2024-01-02 17:35:25', '1', '2024-01-02 17:35:25', b'0', 1);
-INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (3852, 1, 2541, '1', '2024-01-02 17:35:25', '1', '2024-01-02 17:35:25', b'0', 1);
-INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (3853, 1, 2542, '1', '2024-01-02 17:35:25', '1', '2024-01-02 17:35:25', b'0', 1);
 INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (3854, 1, 2543, '1', '2024-01-02 17:35:25', '1', '2024-01-02 17:35:25', b'0', 1);
 INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (3855, 1, 2544, '1', '2024-01-02 17:35:25', '1', '2024-01-02 17:35:25', b'0', 1);
 INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (3856, 1, 2000, '1', '2024-01-02 17:35:25', '1', '2024-01-02 17:35:25', b'0', 1);
@@ -4712,6 +4708,481 @@ INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_t
 INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4039, 143, 1018, '1', '2024-02-27 21:58:25', '1', '2024-02-27 21:58:25', b'0', 153);
 INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4040, 143, 1019, '1', '2024-02-27 21:58:25', '1', '2024-02-27 21:58:25', b'0', 153);
 INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4041, 143, 1020, '1', '2024-02-27 21:58:25', '1', '2024-02-27 21:58:25', b'0', 153);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4042, 144, 1, '1', '2024-03-30 17:52:59', '1', '2024-03-30 17:52:59', b'0', 154);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4043, 144, 2, '1', '2024-03-30 17:52:59', '1', '2024-03-30 17:52:59', b'0', 154);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4044, 144, 1031, '1', '2024-03-30 17:52:59', '1', '2024-03-30 17:52:59', b'0', 154);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4045, 144, 1032, '1', '2024-03-30 17:52:59', '1', '2024-03-30 17:52:59', b'0', 154);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4046, 144, 1033, '1', '2024-03-30 17:52:59', '1', '2024-03-30 17:52:59', b'0', 154);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4047, 144, 1034, '1', '2024-03-30 17:52:59', '1', '2024-03-30 17:52:59', b'0', 154);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4048, 144, 1035, '1', '2024-03-30 17:52:59', '1', '2024-03-30 17:52:59', b'0', 154);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4049, 144, 1036, '1', '2024-03-30 17:52:59', '1', '2024-03-30 17:52:59', b'0', 154);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4050, 144, 1037, '1', '2024-03-30 17:52:59', '1', '2024-03-30 17:52:59', b'0', 154);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4051, 144, 1038, '1', '2024-03-30 17:52:59', '1', '2024-03-30 17:52:59', b'0', 154);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4052, 144, 1039, '1', '2024-03-30 17:52:59', '1', '2024-03-30 17:52:59', b'0', 154);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4053, 144, 1050, '1', '2024-03-30 17:52:59', '1', '2024-03-30 17:52:59', b'0', 154);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4054, 144, 1051, '1', '2024-03-30 17:52:59', '1', '2024-03-30 17:52:59', b'0', 154);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4055, 144, 1052, '1', '2024-03-30 17:52:59', '1', '2024-03-30 17:52:59', b'0', 154);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4056, 144, 1053, '1', '2024-03-30 17:52:59', '1', '2024-03-30 17:52:59', b'0', 154);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4057, 144, 1054, '1', '2024-03-30 17:52:59', '1', '2024-03-30 17:52:59', b'0', 154);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4058, 144, 1056, '1', '2024-03-30 17:52:59', '1', '2024-03-30 17:52:59', b'0', 154);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4059, 144, 1057, '1', '2024-03-30 17:52:59', '1', '2024-03-30 17:52:59', b'0', 154);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4060, 144, 1058, '1', '2024-03-30 17:52:59', '1', '2024-03-30 17:52:59', b'0', 154);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4061, 144, 1059, '1', '2024-03-30 17:52:59', '1', '2024-03-30 17:52:59', b'0', 154);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4062, 144, 1060, '1', '2024-03-30 17:52:59', '1', '2024-03-30 17:52:59', b'0', 154);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4063, 144, 1063, '1', '2024-03-30 17:52:59', '1', '2024-03-30 17:52:59', b'0', 154);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4064, 144, 1064, '1', '2024-03-30 17:52:59', '1', '2024-03-30 17:52:59', b'0', 154);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4065, 144, 1065, '1', '2024-03-30 17:52:59', '1', '2024-03-30 17:52:59', b'0', 154);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4066, 144, 1066, '1', '2024-03-30 17:52:59', '1', '2024-03-30 17:52:59', b'0', 154);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4067, 144, 1067, '1', '2024-03-30 17:52:59', '1', '2024-03-30 17:52:59', b'0', 154);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4068, 144, 1070, '1', '2024-03-30 17:52:59', '1', '2024-03-30 17:52:59', b'0', 154);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4069, 144, 1075, '1', '2024-03-30 17:52:59', '1', '2024-03-30 17:52:59', b'0', 154);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4070, 144, 1076, '1', '2024-03-30 17:52:59', '1', '2024-03-30 17:52:59', b'0', 154);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4071, 144, 1077, '1', '2024-03-30 17:52:59', '1', '2024-03-30 17:52:59', b'0', 154);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4072, 144, 1078, '1', '2024-03-30 17:52:59', '1', '2024-03-30 17:52:59', b'0', 154);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4073, 144, 1082, '1', '2024-03-30 17:52:59', '1', '2024-03-30 17:52:59', b'0', 154);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4074, 144, 1083, '1', '2024-03-30 17:52:59', '1', '2024-03-30 17:52:59', b'0', 154);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4075, 144, 1084, '1', '2024-03-30 17:52:59', '1', '2024-03-30 17:52:59', b'0', 154);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4076, 144, 1085, '1', '2024-03-30 17:52:59', '1', '2024-03-30 17:52:59', b'0', 154);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4077, 144, 1086, '1', '2024-03-30 17:52:59', '1', '2024-03-30 17:52:59', b'0', 154);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4078, 144, 1087, '1', '2024-03-30 17:52:59', '1', '2024-03-30 17:52:59', b'0', 154);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4079, 144, 1088, '1', '2024-03-30 17:52:59', '1', '2024-03-30 17:52:59', b'0', 154);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4080, 144, 1089, '1', '2024-03-30 17:52:59', '1', '2024-03-30 17:52:59', b'0', 154);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4081, 144, 1090, '1', '2024-03-30 17:52:59', '1', '2024-03-30 17:52:59', b'0', 154);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4082, 144, 1091, '1', '2024-03-30 17:52:59', '1', '2024-03-30 17:52:59', b'0', 154);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4083, 144, 1092, '1', '2024-03-30 17:52:59', '1', '2024-03-30 17:52:59', b'0', 154);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4084, 144, 100, '1', '2024-03-30 17:52:59', '1', '2024-03-30 17:52:59', b'0', 154);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4085, 144, 101, '1', '2024-03-30 17:52:59', '1', '2024-03-30 17:52:59', b'0', 154);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4086, 144, 102, '1', '2024-03-30 17:52:59', '1', '2024-03-30 17:52:59', b'0', 154);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4087, 144, 103, '1', '2024-03-30 17:52:59', '1', '2024-03-30 17:52:59', b'0', 154);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4088, 144, 106, '1', '2024-03-30 17:52:59', '1', '2024-03-30 17:52:59', b'0', 154);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4089, 144, 107, '1', '2024-03-30 17:52:59', '1', '2024-03-30 17:52:59', b'0', 154);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4090, 144, 110, '1', '2024-03-30 17:52:59', '1', '2024-03-30 17:52:59', b'0', 154);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4091, 144, 111, '1', '2024-03-30 17:52:59', '1', '2024-03-30 17:52:59', b'0', 154);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4092, 144, 112, '1', '2024-03-30 17:52:59', '1', '2024-03-30 17:52:59', b'0', 154);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4093, 144, 113, '1', '2024-03-30 17:52:59', '1', '2024-03-30 17:52:59', b'0', 154);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4094, 144, 1138, '1', '2024-03-30 17:52:59', '1', '2024-03-30 17:52:59', b'0', 154);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4095, 144, 114, '1', '2024-03-30 17:52:59', '1', '2024-03-30 17:52:59', b'0', 154);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4096, 144, 1139, '1', '2024-03-30 17:52:59', '1', '2024-03-30 17:52:59', b'0', 154);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4097, 144, 115, '1', '2024-03-30 17:52:59', '1', '2024-03-30 17:52:59', b'0', 154);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4098, 144, 1140, '1', '2024-03-30 17:52:59', '1', '2024-03-30 17:52:59', b'0', 154);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4099, 144, 116, '1', '2024-03-30 17:52:59', '1', '2024-03-30 17:52:59', b'0', 154);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4100, 144, 1141, '1', '2024-03-30 17:52:59', '1', '2024-03-30 17:52:59', b'0', 154);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4101, 144, 1142, '1', '2024-03-30 17:52:59', '1', '2024-03-30 17:52:59', b'0', 154);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4102, 144, 1143, '1', '2024-03-30 17:52:59', '1', '2024-03-30 17:52:59', b'0', 154);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4103, 144, 2472, '1', '2024-03-30 17:52:59', '1', '2024-03-30 17:52:59', b'0', 154);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4104, 144, 2478, '1', '2024-03-30 17:52:59', '1', '2024-03-30 17:52:59', b'0', 154);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4105, 144, 2479, '1', '2024-03-30 17:52:59', '1', '2024-03-30 17:52:59', b'0', 154);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4106, 144, 2480, '1', '2024-03-30 17:52:59', '1', '2024-03-30 17:52:59', b'0', 154);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4107, 144, 2481, '1', '2024-03-30 17:52:59', '1', '2024-03-30 17:52:59', b'0', 154);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4108, 144, 2482, '1', '2024-03-30 17:52:59', '1', '2024-03-30 17:52:59', b'0', 154);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4109, 144, 2483, '1', '2024-03-30 17:52:59', '1', '2024-03-30 17:52:59', b'0', 154);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4110, 144, 2484, '1', '2024-03-30 17:52:59', '1', '2024-03-30 17:52:59', b'0', 154);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4111, 144, 2485, '1', '2024-03-30 17:52:59', '1', '2024-03-30 17:52:59', b'0', 154);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4112, 144, 2486, '1', '2024-03-30 17:52:59', '1', '2024-03-30 17:52:59', b'0', 154);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4113, 144, 2487, '1', '2024-03-30 17:52:59', '1', '2024-03-30 17:52:59', b'0', 154);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4114, 144, 2488, '1', '2024-03-30 17:52:59', '1', '2024-03-30 17:52:59', b'0', 154);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4115, 144, 2489, '1', '2024-03-30 17:52:59', '1', '2024-03-30 17:52:59', b'0', 154);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4116, 144, 2490, '1', '2024-03-30 17:52:59', '1', '2024-03-30 17:52:59', b'0', 154);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4117, 144, 2491, '1', '2024-03-30 17:52:59', '1', '2024-03-30 17:52:59', b'0', 154);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4118, 144, 2492, '1', '2024-03-30 17:52:59', '1', '2024-03-30 17:52:59', b'0', 154);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4119, 144, 2493, '1', '2024-03-30 17:52:59', '1', '2024-03-30 17:52:59', b'0', 154);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4120, 144, 2494, '1', '2024-03-30 17:52:59', '1', '2024-03-30 17:52:59', b'0', 154);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4121, 144, 2495, '1', '2024-03-30 17:52:59', '1', '2024-03-30 17:52:59', b'0', 154);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4122, 144, 2497, '1', '2024-03-30 17:52:59', '1', '2024-03-30 17:52:59', b'0', 154);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4123, 144, 1224, '1', '2024-03-30 17:52:59', '1', '2024-03-30 17:52:59', b'0', 154);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4124, 144, 1225, '1', '2024-03-30 17:52:59', '1', '2024-03-30 17:52:59', b'0', 154);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4125, 144, 1226, '1', '2024-03-30 17:52:59', '1', '2024-03-30 17:52:59', b'0', 154);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4126, 144, 1227, '1', '2024-03-30 17:52:59', '1', '2024-03-30 17:52:59', b'0', 154);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4127, 144, 1228, '1', '2024-03-30 17:52:59', '1', '2024-03-30 17:52:59', b'0', 154);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4128, 144, 1229, '1', '2024-03-30 17:52:59', '1', '2024-03-30 17:52:59', b'0', 154);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4129, 144, 1237, '1', '2024-03-30 17:52:59', '1', '2024-03-30 17:52:59', b'0', 154);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4130, 144, 1238, '1', '2024-03-30 17:52:59', '1', '2024-03-30 17:52:59', b'0', 154);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4131, 144, 1239, '1', '2024-03-30 17:52:59', '1', '2024-03-30 17:52:59', b'0', 154);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4132, 144, 1240, '1', '2024-03-30 17:52:59', '1', '2024-03-30 17:52:59', b'0', 154);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4133, 144, 1241, '1', '2024-03-30 17:52:59', '1', '2024-03-30 17:52:59', b'0', 154);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4134, 144, 1242, '1', '2024-03-30 17:52:59', '1', '2024-03-30 17:52:59', b'0', 154);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4135, 144, 1243, '1', '2024-03-30 17:52:59', '1', '2024-03-30 17:52:59', b'0', 154);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4136, 144, 2525, '1', '2024-03-30 17:52:59', '1', '2024-03-30 17:52:59', b'0', 154);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4137, 144, 1255, '1', '2024-03-30 17:52:59', '1', '2024-03-30 17:52:59', b'0', 154);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4138, 144, 1256, '1', '2024-03-30 17:52:59', '1', '2024-03-30 17:52:59', b'0', 154);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4139, 144, 1001, '1', '2024-03-30 17:52:59', '1', '2024-03-30 17:52:59', b'0', 154);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4140, 144, 1257, '1', '2024-03-30 17:52:59', '1', '2024-03-30 17:52:59', b'0', 154);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4141, 144, 1002, '1', '2024-03-30 17:52:59', '1', '2024-03-30 17:52:59', b'0', 154);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4142, 144, 1258, '1', '2024-03-30 17:52:59', '1', '2024-03-30 17:52:59', b'0', 154);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4143, 144, 1003, '1', '2024-03-30 17:52:59', '1', '2024-03-30 17:52:59', b'0', 154);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4144, 144, 1259, '1', '2024-03-30 17:52:59', '1', '2024-03-30 17:52:59', b'0', 154);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4145, 144, 1004, '1', '2024-03-30 17:52:59', '1', '2024-03-30 17:52:59', b'0', 154);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4146, 144, 1260, '1', '2024-03-30 17:52:59', '1', '2024-03-30 17:52:59', b'0', 154);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4147, 144, 1005, '1', '2024-03-30 17:52:59', '1', '2024-03-30 17:52:59', b'0', 154);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4148, 144, 1006, '1', '2024-03-30 17:52:59', '1', '2024-03-30 17:52:59', b'0', 154);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4149, 144, 1007, '1', '2024-03-30 17:52:59', '1', '2024-03-30 17:52:59', b'0', 154);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4150, 144, 1008, '1', '2024-03-30 17:52:59', '1', '2024-03-30 17:52:59', b'0', 154);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4151, 144, 1009, '1', '2024-03-30 17:52:59', '1', '2024-03-30 17:52:59', b'0', 154);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4152, 144, 1010, '1', '2024-03-30 17:52:59', '1', '2024-03-30 17:52:59', b'0', 154);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4153, 144, 1011, '1', '2024-03-30 17:52:59', '1', '2024-03-30 17:52:59', b'0', 154);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4154, 144, 1012, '1', '2024-03-30 17:52:59', '1', '2024-03-30 17:52:59', b'0', 154);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4155, 144, 1013, '1', '2024-03-30 17:52:59', '1', '2024-03-30 17:52:59', b'0', 154);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4156, 144, 1014, '1', '2024-03-30 17:52:59', '1', '2024-03-30 17:52:59', b'0', 154);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4157, 144, 1015, '1', '2024-03-30 17:52:59', '1', '2024-03-30 17:52:59', b'0', 154);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4158, 144, 1016, '1', '2024-03-30 17:52:59', '1', '2024-03-30 17:52:59', b'0', 154);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4159, 144, 1017, '1', '2024-03-30 17:52:59', '1', '2024-03-30 17:52:59', b'0', 154);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4160, 144, 1018, '1', '2024-03-30 17:52:59', '1', '2024-03-30 17:52:59', b'0', 154);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4161, 144, 1019, '1', '2024-03-30 17:52:59', '1', '2024-03-30 17:52:59', b'0', 154);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4162, 144, 1020, '1', '2024-03-30 17:52:59', '1', '2024-03-30 17:52:59', b'0', 154);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4163, 109, 5, '1', '2024-03-30 17:53:17', '1', '2024-03-30 17:53:17', b'0', 121);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4164, 109, 1118, '1', '2024-03-30 17:53:17', '1', '2024-03-30 17:53:17', b'0', 121);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4165, 109, 1119, '1', '2024-03-30 17:53:17', '1', '2024-03-30 17:53:17', b'0', 121);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4166, 109, 1120, '1', '2024-03-30 17:53:17', '1', '2024-03-30 17:53:17', b'0', 121);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4167, 109, 2713, '1', '2024-03-30 17:53:17', '1', '2024-03-30 17:53:17', b'0', 121);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4168, 109, 2714, '1', '2024-03-30 17:53:17', '1', '2024-03-30 17:53:17', b'0', 121);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4169, 109, 2715, '1', '2024-03-30 17:53:17', '1', '2024-03-30 17:53:17', b'0', 121);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4170, 109, 2716, '1', '2024-03-30 17:53:17', '1', '2024-03-30 17:53:17', b'0', 121);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4171, 109, 2717, '1', '2024-03-30 17:53:17', '1', '2024-03-30 17:53:17', b'0', 121);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4172, 109, 2718, '1', '2024-03-30 17:53:17', '1', '2024-03-30 17:53:17', b'0', 121);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4173, 109, 2720, '1', '2024-03-30 17:53:17', '1', '2024-03-30 17:53:17', b'0', 121);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4174, 109, 1185, '1', '2024-03-30 17:53:17', '1', '2024-03-30 17:53:17', b'0', 121);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4175, 109, 2721, '1', '2024-03-30 17:53:17', '1', '2024-03-30 17:53:17', b'0', 121);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4176, 109, 1186, '1', '2024-03-30 17:53:17', '1', '2024-03-30 17:53:17', b'0', 121);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4177, 109, 2722, '1', '2024-03-30 17:53:17', '1', '2024-03-30 17:53:17', b'0', 121);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4178, 109, 1187, '1', '2024-03-30 17:53:17', '1', '2024-03-30 17:53:17', b'0', 121);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4179, 109, 2723, '1', '2024-03-30 17:53:17', '1', '2024-03-30 17:53:17', b'0', 121);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4180, 109, 1188, '1', '2024-03-30 17:53:17', '1', '2024-03-30 17:53:17', b'0', 121);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4181, 109, 2724, '1', '2024-03-30 17:53:17', '1', '2024-03-30 17:53:17', b'0', 121);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4182, 109, 1189, '1', '2024-03-30 17:53:17', '1', '2024-03-30 17:53:17', b'0', 121);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4183, 109, 2725, '1', '2024-03-30 17:53:17', '1', '2024-03-30 17:53:17', b'0', 121);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4184, 109, 1190, '1', '2024-03-30 17:53:17', '1', '2024-03-30 17:53:17', b'0', 121);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4185, 109, 2726, '1', '2024-03-30 17:53:17', '1', '2024-03-30 17:53:17', b'0', 121);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4186, 109, 1191, '1', '2024-03-30 17:53:17', '1', '2024-03-30 17:53:17', b'0', 121);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4187, 109, 2727, '1', '2024-03-30 17:53:17', '1', '2024-03-30 17:53:17', b'0', 121);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4188, 109, 1192, '1', '2024-03-30 17:53:17', '1', '2024-03-30 17:53:17', b'0', 121);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4189, 109, 2728, '1', '2024-03-30 17:53:17', '1', '2024-03-30 17:53:17', b'0', 121);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4190, 109, 1193, '1', '2024-03-30 17:53:17', '1', '2024-03-30 17:53:17', b'0', 121);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4191, 109, 2729, '1', '2024-03-30 17:53:17', '1', '2024-03-30 17:53:17', b'0', 121);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4192, 109, 1194, '1', '2024-03-30 17:53:17', '1', '2024-03-30 17:53:17', b'0', 121);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4193, 109, 2730, '1', '2024-03-30 17:53:17', '1', '2024-03-30 17:53:17', b'0', 121);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4194, 109, 1195, '1', '2024-03-30 17:53:17', '1', '2024-03-30 17:53:17', b'0', 121);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4195, 109, 2731, '1', '2024-03-30 17:53:17', '1', '2024-03-30 17:53:17', b'0', 121);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4196, 109, 1196, '1', '2024-03-30 17:53:17', '1', '2024-03-30 17:53:17', b'0', 121);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4197, 109, 2732, '1', '2024-03-30 17:53:17', '1', '2024-03-30 17:53:17', b'0', 121);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4198, 109, 1197, '1', '2024-03-30 17:53:17', '1', '2024-03-30 17:53:17', b'0', 121);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4199, 109, 2733, '1', '2024-03-30 17:53:17', '1', '2024-03-30 17:53:17', b'0', 121);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4200, 109, 1198, '1', '2024-03-30 17:53:17', '1', '2024-03-30 17:53:17', b'0', 121);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4201, 109, 2734, '1', '2024-03-30 17:53:17', '1', '2024-03-30 17:53:17', b'0', 121);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4202, 109, 1199, '1', '2024-03-30 17:53:17', '1', '2024-03-30 17:53:17', b'0', 121);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4203, 109, 2735, '1', '2024-03-30 17:53:17', '1', '2024-03-30 17:53:17', b'0', 121);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4204, 109, 1200, '1', '2024-03-30 17:53:17', '1', '2024-03-30 17:53:17', b'0', 121);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4205, 109, 1201, '1', '2024-03-30 17:53:17', '1', '2024-03-30 17:53:17', b'0', 121);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4206, 109, 1202, '1', '2024-03-30 17:53:17', '1', '2024-03-30 17:53:17', b'0', 121);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4207, 109, 1207, '1', '2024-03-30 17:53:17', '1', '2024-03-30 17:53:17', b'0', 121);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4208, 109, 1208, '1', '2024-03-30 17:53:17', '1', '2024-03-30 17:53:17', b'0', 121);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4209, 109, 1209, '1', '2024-03-30 17:53:17', '1', '2024-03-30 17:53:17', b'0', 121);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4210, 109, 1210, '1', '2024-03-30 17:53:17', '1', '2024-03-30 17:53:17', b'0', 121);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4211, 109, 1211, '1', '2024-03-30 17:53:17', '1', '2024-03-30 17:53:17', b'0', 121);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4212, 109, 1212, '1', '2024-03-30 17:53:17', '1', '2024-03-30 17:53:17', b'0', 121);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4213, 109, 1213, '1', '2024-03-30 17:53:17', '1', '2024-03-30 17:53:17', b'0', 121);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4214, 109, 1215, '1', '2024-03-30 17:53:17', '1', '2024-03-30 17:53:17', b'0', 121);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4215, 109, 1216, '1', '2024-03-30 17:53:17', '1', '2024-03-30 17:53:17', b'0', 121);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4216, 109, 1217, '1', '2024-03-30 17:53:17', '1', '2024-03-30 17:53:17', b'0', 121);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4217, 109, 1218, '1', '2024-03-30 17:53:17', '1', '2024-03-30 17:53:17', b'0', 121);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4218, 109, 1219, '1', '2024-03-30 17:53:17', '1', '2024-03-30 17:53:17', b'0', 121);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4219, 109, 1220, '1', '2024-03-30 17:53:17', '1', '2024-03-30 17:53:17', b'0', 121);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4220, 109, 1221, '1', '2024-03-30 17:53:17', '1', '2024-03-30 17:53:17', b'0', 121);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4221, 109, 1222, '1', '2024-03-30 17:53:17', '1', '2024-03-30 17:53:17', b'0', 121);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4222, 111, 5, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 122);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4223, 111, 1118, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 122);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4224, 111, 1119, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 122);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4225, 111, 1120, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 122);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4226, 111, 2713, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 122);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4227, 111, 2714, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 122);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4228, 111, 2715, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 122);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4229, 111, 2716, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 122);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4230, 111, 2717, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 122);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4231, 111, 2718, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 122);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4232, 111, 2720, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 122);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4233, 111, 1185, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 122);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4234, 111, 2721, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 122);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4235, 111, 1186, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 122);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4236, 111, 2722, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 122);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4237, 111, 1187, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 122);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4238, 111, 2723, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 122);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4239, 111, 1188, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 122);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4240, 111, 2724, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 122);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4241, 111, 1189, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 122);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4242, 111, 2725, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 122);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4243, 111, 1190, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 122);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4244, 111, 2726, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 122);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4245, 111, 1191, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 122);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4246, 111, 2727, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 122);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4247, 111, 1192, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 122);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4248, 111, 2728, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 122);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4249, 111, 1193, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 122);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4250, 111, 2729, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 122);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4251, 111, 1194, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 122);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4252, 111, 2730, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 122);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4253, 111, 1195, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 122);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4254, 111, 2731, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 122);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4255, 111, 1196, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 122);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4256, 111, 2732, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 122);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4257, 111, 1197, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 122);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4258, 111, 2733, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 122);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4259, 111, 1198, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 122);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4260, 111, 2734, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 122);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4261, 111, 1199, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 122);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4262, 111, 2735, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 122);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4263, 111, 1200, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 122);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4264, 111, 1201, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 122);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4265, 111, 1202, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 122);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4266, 111, 1207, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 122);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4267, 111, 1208, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 122);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4268, 111, 1209, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 122);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4269, 111, 1210, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 122);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4270, 111, 1211, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 122);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4271, 111, 1212, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 122);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4272, 111, 1213, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 122);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4273, 111, 1215, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 122);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4274, 111, 1216, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 122);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4275, 111, 1217, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 122);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4276, 111, 1218, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 122);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4277, 111, 1219, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 122);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4278, 111, 1220, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 122);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4279, 111, 1221, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 122);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4280, 111, 1222, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 122);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4281, 140, 5, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 151);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4282, 140, 1118, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 151);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4283, 140, 1119, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 151);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4284, 140, 1120, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 151);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4285, 140, 2713, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 151);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4286, 140, 2714, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 151);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4287, 140, 2715, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 151);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4288, 140, 2716, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 151);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4289, 140, 2717, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 151);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4290, 140, 2718, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 151);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4291, 140, 2720, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 151);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4292, 140, 1185, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 151);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4293, 140, 2721, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 151);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4294, 140, 1186, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 151);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4295, 140, 2722, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 151);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4296, 140, 1187, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 151);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4297, 140, 2723, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 151);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4298, 140, 1188, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 151);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4299, 140, 2724, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 151);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4300, 140, 1189, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 151);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4301, 140, 2725, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 151);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4302, 140, 1190, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 151);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4303, 140, 2726, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 151);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4304, 140, 1191, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 151);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4305, 140, 2727, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 151);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4306, 140, 1192, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 151);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4307, 140, 2728, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 151);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4308, 140, 1193, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 151);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4309, 140, 2729, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 151);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4310, 140, 1194, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 151);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4311, 140, 2730, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 151);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4312, 140, 1195, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 151);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4313, 140, 2731, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 151);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4314, 140, 1196, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 151);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4315, 140, 2732, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 151);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4316, 140, 1197, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 151);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4317, 140, 2733, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 151);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4318, 140, 1198, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 151);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4319, 140, 2734, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 151);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4320, 140, 1199, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 151);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4321, 140, 2735, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 151);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4322, 140, 1200, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 151);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4323, 140, 1201, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 151);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4324, 140, 1202, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 151);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4325, 140, 1207, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 151);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4326, 140, 1208, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 151);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4327, 140, 1209, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 151);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4328, 140, 1210, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 151);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4329, 140, 1211, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 151);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4330, 140, 1212, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 151);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4331, 140, 1213, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 151);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4332, 140, 1215, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 151);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4333, 140, 1216, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 151);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4334, 140, 1217, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 151);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4335, 140, 1218, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 151);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4336, 140, 1219, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 151);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4337, 140, 1220, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 151);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4338, 140, 1221, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 151);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4339, 140, 1222, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 151);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4340, 141, 5, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 152);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4341, 141, 1118, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 152);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4342, 141, 1119, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 152);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4343, 141, 1120, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 152);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4344, 141, 2713, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 152);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4345, 141, 2714, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 152);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4346, 141, 2715, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 152);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4347, 141, 2716, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 152);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4348, 141, 2717, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 152);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4349, 141, 2718, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 152);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4350, 141, 2720, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 152);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4351, 141, 1185, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 152);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4352, 141, 2721, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 152);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4353, 141, 1186, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 152);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4354, 141, 2722, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 152);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4355, 141, 1187, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 152);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4356, 141, 2723, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 152);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4357, 141, 1188, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 152);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4358, 141, 2724, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 152);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4359, 141, 1189, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 152);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4360, 141, 2725, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 152);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4361, 141, 1190, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 152);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4362, 141, 2726, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 152);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4363, 141, 1191, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 152);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4364, 141, 2727, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 152);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4365, 141, 1192, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 152);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4366, 141, 2728, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 152);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4367, 141, 1193, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 152);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4368, 141, 2729, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 152);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4369, 141, 1194, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 152);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4370, 141, 2730, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 152);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4371, 141, 1195, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 152);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4372, 141, 2731, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 152);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4373, 141, 1196, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 152);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4374, 141, 2732, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 152);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4375, 141, 1197, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 152);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4376, 141, 2733, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 152);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4377, 141, 1198, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 152);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4378, 141, 2734, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 152);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4379, 141, 1199, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 152);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4380, 141, 2735, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 152);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4381, 141, 1200, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 152);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4382, 141, 1201, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 152);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4383, 141, 1202, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 152);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4384, 141, 1207, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 152);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4385, 141, 1208, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 152);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4386, 141, 1209, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 152);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4387, 141, 1210, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 152);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4388, 141, 1211, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 152);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4389, 141, 1212, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 152);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4390, 141, 1213, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 152);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4391, 141, 1215, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 152);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4392, 141, 1216, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 152);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4393, 141, 1217, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 152);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4394, 141, 1218, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 152);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4395, 141, 1219, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 152);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4396, 141, 1220, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 152);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4397, 141, 1221, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 152);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4398, 141, 1222, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 152);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4399, 143, 5, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 153);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4400, 143, 1118, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 153);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4401, 143, 1119, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 153);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4402, 143, 1120, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 153);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4403, 143, 2713, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 153);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4404, 143, 2714, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 153);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4405, 143, 2715, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 153);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4406, 143, 2716, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 153);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4407, 143, 2717, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 153);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4408, 143, 2718, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 153);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4409, 143, 2720, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 153);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4410, 143, 1185, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 153);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4411, 143, 2721, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 153);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4412, 143, 1186, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 153);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4413, 143, 2722, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 153);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4414, 143, 1187, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 153);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4415, 143, 2723, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 153);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4416, 143, 1188, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 153);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4417, 143, 2724, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 153);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4418, 143, 1189, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 153);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4419, 143, 2725, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 153);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4420, 143, 1190, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 153);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4421, 143, 2726, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 153);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4422, 143, 1191, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 153);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4423, 143, 2727, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 153);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4424, 143, 1192, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 153);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4425, 143, 2728, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 153);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4426, 143, 1193, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 153);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4427, 143, 2729, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 153);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4428, 143, 1194, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 153);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4429, 143, 2730, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 153);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4430, 143, 1195, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 153);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4431, 143, 2731, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 153);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4432, 143, 1196, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 153);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4433, 143, 2732, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 153);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4434, 143, 1197, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 153);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4435, 143, 2733, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 153);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4436, 143, 1198, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 153);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4437, 143, 2734, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 153);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4438, 143, 1199, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 153);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4439, 143, 2735, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 153);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4440, 143, 1200, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 153);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4441, 143, 1201, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 153);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4442, 143, 1202, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 153);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4443, 143, 1207, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 153);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4444, 143, 1208, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 153);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4445, 143, 1209, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 153);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4446, 143, 1210, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 153);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4447, 143, 1211, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 153);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4448, 143, 1212, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 153);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4449, 143, 1213, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 153);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4450, 143, 1215, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 153);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4451, 143, 1216, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 153);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4452, 143, 1217, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 153);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4453, 143, 1218, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 153);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4454, 143, 1219, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 153);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4455, 143, 1220, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 153);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4456, 143, 1221, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 153);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4457, 143, 1222, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 153);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4458, 144, 5, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 154);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4459, 144, 1118, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 154);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4460, 144, 1119, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 154);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4461, 144, 1120, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 154);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4462, 144, 2713, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 154);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4463, 144, 2714, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 154);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4464, 144, 2715, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 154);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4465, 144, 2716, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 154);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4466, 144, 2717, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 154);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4467, 144, 2718, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 154);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4468, 144, 2720, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 154);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4469, 144, 1185, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 154);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4470, 144, 2721, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 154);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4471, 144, 1186, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 154);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4472, 144, 2722, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 154);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4473, 144, 1187, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 154);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4474, 144, 2723, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 154);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4475, 144, 1188, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 154);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4476, 144, 2724, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 154);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4477, 144, 1189, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 154);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4478, 144, 2725, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 154);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4479, 144, 1190, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 154);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4480, 144, 2726, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 154);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4481, 144, 1191, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 154);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4482, 144, 2727, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 154);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4483, 144, 1192, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 154);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4484, 144, 2728, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 154);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4485, 144, 1193, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 154);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4486, 144, 2729, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 154);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4487, 144, 1194, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 154);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4488, 144, 2730, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 154);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4489, 144, 1195, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 154);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4490, 144, 2731, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 154);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4491, 144, 1196, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 154);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4492, 144, 2732, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 154);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4493, 144, 1197, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 154);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4494, 144, 2733, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 154);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4495, 144, 1198, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 154);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4496, 144, 2734, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 154);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4497, 144, 1199, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 154);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4498, 144, 2735, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 154);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4499, 144, 1200, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 154);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4500, 144, 1201, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 154);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4501, 144, 1202, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 154);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4502, 144, 1207, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 154);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4503, 144, 1208, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 154);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4504, 144, 1209, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 154);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4505, 144, 1210, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 154);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4506, 144, 1211, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 154);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4507, 144, 1212, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 154);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4508, 144, 1213, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 154);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4509, 144, 1215, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 154);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4510, 144, 1216, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 154);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4511, 144, 1217, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 154);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4512, 144, 1218, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 154);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4513, 144, 1219, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 154);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4514, 144, 1220, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 154);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4515, 144, 1221, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 154);
+INSERT INTO `system_role_menu` (`id`, `role_id`, `menu_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (4516, 144, 1222, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', b'0', 154);
 COMMIT;
 
 -- ----------------------------
@@ -4793,7 +5264,7 @@ CREATE TABLE `system_sms_code`  (
   `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `idx_mobile`(`mobile` ASC) USING BTREE COMMENT '手机号'
-) ENGINE = InnoDB AUTO_INCREMENT = 613 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '手机验证码';
+) ENGINE = InnoDB AUTO_INCREMENT = 614 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '手机验证码';
 
 -- ----------------------------
 -- Records of system_sms_code
@@ -4834,7 +5305,7 @@ CREATE TABLE `system_sms_log`  (
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 911 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '短信日志';
+) ENGINE = InnoDB AUTO_INCREMENT = 946 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '短信日志';
 
 -- ----------------------------
 -- Records of system_sms_log
@@ -4992,7 +5463,7 @@ CREATE TABLE `system_tenant`  (
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 154 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '租户表';
+) ENGINE = InnoDB AUTO_INCREMENT = 155 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '租户表';
 
 -- ----------------------------
 -- Records of system_tenant
@@ -5004,6 +5475,7 @@ INSERT INTO `system_tenant` (`id`, `name`, `contact_user_id`, `contact_name`, `c
 INSERT INTO `system_tenant` (`id`, `name`, `contact_user_id`, `contact_name`, `contact_mobile`, `status`, `website`, `package_id`, `expire_time`, `account_count`, `creator`, `create_time`, `updater`, `update_time`, `deleted`) VALUES (151, '大租户', 126, '土豆大', NULL, 0, 'https://tudou.iocoder.cn', 111, '2023-12-08 00:00:00', 10, '1', '2023-12-02 23:35:05', '1', '2023-12-08 23:39:56', b'0');
 INSERT INTO `system_tenant` (`id`, `name`, `contact_user_id`, `contact_name`, `contact_mobile`, `status`, `website`, `package_id`, `expire_time`, `account_count`, `creator`, `create_time`, `updater`, `update_time`, `deleted`) VALUES (152, '新租户', 127, '土豆', NULL, 0, 'http://xx.iocoder.cn', 111, '2025-12-31 00:00:00', 50, '1', '2023-12-30 11:43:17', '1', '2023-12-30 11:43:17', b'0');
 INSERT INTO `system_tenant` (`id`, `name`, `contact_user_id`, `contact_name`, `contact_mobile`, `status`, `website`, `package_id`, `expire_time`, `account_count`, `creator`, `create_time`, `updater`, `update_time`, `deleted`) VALUES (153, '小明的租户', 128, 'xiaoming', '15601691301', 0, 'xiaoming.iocoder.cn', 111, '2025-12-01 00:00:00', 100, '1', '2024-02-27 21:58:25', '1', '2024-02-28 22:53:54', b'0');
+INSERT INTO `system_tenant` (`id`, `name`, `contact_user_id`, `contact_name`, `contact_mobile`, `status`, `website`, `package_id`, `expire_time`, `account_count`, `creator`, `create_time`, `updater`, `update_time`, `deleted`) VALUES (154, 'hh', 129, 'hh', NULL, 0, 'http://hh.iocoder.cn', 111, '2024-04-30 00:00:00', 123, '1', '2024-03-30 17:52:59', '1', '2024-03-30 17:52:59', b'0');
 COMMIT;
 
 -- ----------------------------
@@ -5028,7 +5500,7 @@ CREATE TABLE `system_tenant_package`  (
 -- Records of system_tenant_package
 -- ----------------------------
 BEGIN;
-INSERT INTO `system_tenant_package` (`id`, `name`, `status`, `remark`, `menu_ids`, `creator`, `create_time`, `updater`, `update_time`, `deleted`) VALUES (111, '普通套餐', 0, '小功能', '[1,2,1031,1032,1033,1034,1035,1036,1037,1038,1039,1050,1051,1052,1053,1054,1056,1057,1058,1059,1060,1063,1064,1065,1066,1067,1070,1075,1076,1077,1078,1082,1083,1084,1085,1086,1087,1088,1089,1090,1091,1092,100,101,102,103,106,107,110,111,112,113,1138,114,1139,115,1140,116,1141,1142,1143,2472,2478,2479,2480,2481,2482,2483,2484,2485,2486,2487,2488,2489,2490,2491,2492,2493,2494,2495,2497,1224,1225,1226,1227,1228,1229,1237,1238,1239,1240,1241,1242,1243,2525,1255,1256,1001,1257,1002,1258,1003,1259,1004,1260,1005,1006,1007,1008,1009,1010,1011,1012,1013,1014,1015,1016,1017,1018,1019,1020]', '1', '2022-02-22 00:54:00', '1', '2023-12-30 11:42:36', b'0');
+INSERT INTO `system_tenant_package` (`id`, `name`, `status`, `remark`, `menu_ids`, `creator`, `create_time`, `updater`, `update_time`, `deleted`) VALUES (111, '普通套餐', 0, '小功能', '[1,2,5,1031,1032,1033,1034,1035,1036,1037,1038,1039,1050,1051,1052,1053,1054,1056,1057,1058,1059,1060,1063,1064,1065,1066,1067,1070,1075,1076,1077,1078,1082,1083,1084,1085,1086,1087,1088,1089,1090,1091,1092,1118,1119,1120,100,101,102,103,106,107,110,111,112,113,1138,114,1139,115,1140,116,1141,1142,1143,2713,2714,2715,2716,2717,2718,2720,1185,2721,1186,2722,1187,2723,1188,2724,1189,2725,1190,2726,1191,2727,2472,1192,2728,1193,2729,1194,2730,1195,2731,1196,2732,1197,2733,2478,1198,2734,2479,1199,2735,2480,1200,2481,1201,2482,1202,2483,2484,2485,2486,2487,1207,2488,1208,2489,1209,2490,1210,2491,1211,2492,1212,2493,1213,2494,2495,1215,1216,2497,1217,1218,1219,1220,1221,1222,1224,1225,1226,1227,1228,1229,1237,1238,1239,1240,1241,1242,1243,2525,1255,1256,1001,1257,1002,1258,1003,1259,1004,1260,1005,1006,1007,1008,1009,1010,1011,1012,1013,1014,1015,1016,1017,1018,1019,1020]', '1', '2022-02-22 00:54:00', '1', '2024-03-30 17:53:17', b'0');
 COMMIT;
 
 -- ----------------------------
@@ -5046,7 +5518,7 @@ CREATE TABLE `system_user_post`  (
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 119 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '用户岗位表';
+) ENGINE = InnoDB AUTO_INCREMENT = 120 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '用户岗位表';
 
 -- ----------------------------
 -- Records of system_user_post
@@ -5057,7 +5529,7 @@ INSERT INTO `system_user_post` (`id`, `user_id`, `post_id`, `creator`, `create_t
 INSERT INTO `system_user_post` (`id`, `user_id`, `post_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (115, 104, 1, '1', '2022-05-16 19:36:28', '1', '2022-05-16 19:36:28', b'0', 1);
 INSERT INTO `system_user_post` (`id`, `user_id`, `post_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (116, 117, 2, '1', '2022-07-09 17:40:26', '1', '2022-07-09 17:40:26', b'0', 1);
 INSERT INTO `system_user_post` (`id`, `user_id`, `post_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (117, 118, 1, '1', '2022-07-09 17:44:44', '1', '2022-07-09 17:44:44', b'0', 1);
-INSERT INTO `system_user_post` (`id`, `user_id`, `post_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (118, 114, 1, '1', '2024-03-15 19:48:11', '1', '2024-03-15 19:48:11', b'0', 1);
+INSERT INTO `system_user_post` (`id`, `user_id`, `post_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (119, 114, 5, '1', '2024-03-24 20:45:51', '1', '2024-03-24 20:45:51', b'0', 1);
 COMMIT;
 
 -- ----------------------------
@@ -5075,7 +5547,7 @@ CREATE TABLE `system_user_role`  (
   `deleted` bit(1) NULL DEFAULT b'0' COMMENT '是否删除',
   `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 37 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '用户和角色关联表';
+) ENGINE = InnoDB AUTO_INCREMENT = 40 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '用户和角色关联表';
 
 -- ----------------------------
 -- Records of system_user_role
@@ -5093,7 +5565,6 @@ INSERT INTO `system_user_role` (`id`, `user_id`, `role_id`, `creator`, `create_t
 INSERT INTO `system_user_role` (`id`, `user_id`, `role_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (14, 110, 109, '1', '2022-02-22 00:56:14', '1', '2022-02-22 00:56:14', b'0', 121);
 INSERT INTO `system_user_role` (`id`, `user_id`, `role_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (15, 111, 110, '110', '2022-02-23 13:14:38', '110', '2022-02-23 13:14:38', b'0', 121);
 INSERT INTO `system_user_role` (`id`, `user_id`, `role_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (16, 113, 111, '1', '2022-03-07 21:37:58', '1', '2022-03-07 21:37:58', b'0', 122);
-INSERT INTO `system_user_role` (`id`, `user_id`, `role_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (17, 114, 101, '1', '2022-03-19 21:51:13', '1', '2022-03-19 21:51:13', b'0', 1);
 INSERT INTO `system_user_role` (`id`, `user_id`, `role_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (18, 1, 2, '1', '2022-05-12 20:39:29', '1', '2022-05-12 20:39:29', b'0', 1);
 INSERT INTO `system_user_role` (`id`, `user_id`, `role_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (19, 116, 113, '1', '2022-05-17 10:07:10', '1', '2022-05-17 10:07:10', b'0', 124);
 INSERT INTO `system_user_role` (`id`, `user_id`, `role_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (20, 104, 101, '1', '2022-05-28 15:43:57', '1', '2022-05-28 15:43:57', b'0', 1);
@@ -5111,6 +5582,8 @@ INSERT INTO `system_user_role` (`id`, `user_id`, `role_id`, `creator`, `create_t
 INSERT INTO `system_user_role` (`id`, `user_id`, `role_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (34, 128, 143, '1', '2024-02-27 21:58:25', '1', '2024-02-27 21:58:25', b'0', 153);
 INSERT INTO `system_user_role` (`id`, `user_id`, `role_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (35, 112, 1, '1', '2024-03-15 20:00:24', '1', '2024-03-15 20:00:24', b'0', 1);
 INSERT INTO `system_user_role` (`id`, `user_id`, `role_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (36, 118, 1, '1', '2024-03-17 09:12:08', '1', '2024-03-17 09:12:08', b'0', 1);
+INSERT INTO `system_user_role` (`id`, `user_id`, `role_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (38, 114, 101, '1', '2024-03-24 22:23:03', '1', '2024-03-24 22:23:03', b'0', 1);
+INSERT INTO `system_user_role` (`id`, `user_id`, `role_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (39, 129, 144, '1', '2024-03-30 17:52:59', '1', '2024-03-30 17:52:59', b'0', 154);
 COMMIT;
 
 -- ----------------------------
@@ -5140,16 +5613,16 @@ CREATE TABLE `system_users`  (
   `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `idx_username`(`username` ASC, `update_time` ASC, `tenant_id` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 129 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '用户信息表';
+) ENGINE = InnoDB AUTO_INCREMENT = 130 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '用户信息表';
 
 -- ----------------------------
 -- Records of system_users
 -- ----------------------------
 BEGIN;
-INSERT INTO `system_users` (`id`, `username`, `password`, `nickname`, `remark`, `dept_id`, `post_ids`, `email`, `mobile`, `sex`, `avatar`, `status`, `login_ip`, `login_date`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (1, 'admin', '$2a$10$mRMIYLDtRHlf6.9ipiqH1.Z.bh/R9dO9d5iHiGYPigi6r5KOoR2Wm', '芋道源码', '管理员', 103, '[1]', 'aoteman@126.com', '18818260277', 2, 'http://test.yudao.iocoder.cn/96c787a2ce88bf6d0ce3cd8b6cf5314e80e7703cd41bf4af8cd2e2909dbd6b6d.png', 0, '0:0:0:0:0:0:0:1', '2024-03-15 19:32:26', 'admin', '2021-01-05 17:03:47', NULL, '2024-03-15 19:32:26', b'0', 1);
+INSERT INTO `system_users` (`id`, `username`, `password`, `nickname`, `remark`, `dept_id`, `post_ids`, `email`, `mobile`, `sex`, `avatar`, `status`, `login_ip`, `login_date`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (1, 'admin', '$2a$10$mRMIYLDtRHlf6.9ipiqH1.Z.bh/R9dO9d5iHiGYPigi6r5KOoR2Wm', '芋道源码', '管理员', 103, '[1]', 'aoteman@126.com', '18818260277', 2, 'http://test.yudao.iocoder.cn/96c787a2ce88bf6d0ce3cd8b6cf5314e80e7703cd41bf4af8cd2e2909dbd6b6d.png', 0, '0:0:0:0:0:0:0:1', '2024-03-30 17:18:34', 'admin', '2021-01-05 17:03:47', NULL, '2024-03-30 17:18:34', b'0', 1);
 INSERT INTO `system_users` (`id`, `username`, `password`, `nickname`, `remark`, `dept_id`, `post_ids`, `email`, `mobile`, `sex`, `avatar`, `status`, `login_ip`, `login_date`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (100, 'yudao', '$2a$10$11U48RhyJ5pSBYWSn12AD./ld671.ycSzJHbyrtpeoMeYiw31eo8a', '芋道', '不要吓我', 104, '[1]', 'yudao@iocoder.cn', '15601691300', 1, '', 1, '127.0.0.1', '2022-07-09 23:03:33', '', '2021-01-07 09:07:17', NULL, '2022-07-09 23:03:33', b'0', 1);
 INSERT INTO `system_users` (`id`, `username`, `password`, `nickname`, `remark`, `dept_id`, `post_ids`, `email`, `mobile`, `sex`, `avatar`, `status`, `login_ip`, `login_date`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (103, 'yuanma', '$2a$10$YMpimV4T6BtDhIaA8jSW.u8UTGBeGhc/qwXP4oxoMr4mOw9.qttt6', '源码', NULL, 106, NULL, 'yuanma@iocoder.cn', '15601701300', 0, '', 0, '0:0:0:0:0:0:0:1', '2024-03-18 21:09:04', '', '2021-01-13 23:50:35', NULL, '2024-03-18 21:09:04', b'0', 1);
-INSERT INTO `system_users` (`id`, `username`, `password`, `nickname`, `remark`, `dept_id`, `post_ids`, `email`, `mobile`, `sex`, `avatar`, `status`, `login_ip`, `login_date`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (104, 'test', '$2a$04$osUERr6VErPvY3mGUh40Teb06H2pJiFuGaWFLRku82pdU713WTGFS', '测试号', NULL, 107, '[1,2]', '111@qq.com', '15601691200', 1, '', 0, '0:0:0:0:0:0:0:1', '2024-02-29 22:40:00', '', '2021-01-21 02:13:53', NULL, '2024-02-29 22:40:00', b'0', 1);
+INSERT INTO `system_users` (`id`, `username`, `password`, `nickname`, `remark`, `dept_id`, `post_ids`, `email`, `mobile`, `sex`, `avatar`, `status`, `login_ip`, `login_date`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (104, 'test', '$2a$04$KhExCYl7lx6eWWZYKsibKOZ8IBJRyuNuCcEOLQ11RYhJKgHmlSwK.', '测试号', NULL, 107, '[1,2]', '111@qq.com', '15601691200', 1, '', 0, '0:0:0:0:0:0:0:1', '2024-03-26 07:11:35', '', '2021-01-21 02:13:53', NULL, '2024-03-26 07:11:35', b'0', 1);
 INSERT INTO `system_users` (`id`, `username`, `password`, `nickname`, `remark`, `dept_id`, `post_ids`, `email`, `mobile`, `sex`, `avatar`, `status`, `login_ip`, `login_date`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (107, 'admin107', '$2a$10$dYOOBKMO93v/.ReCqzyFg.o67Tqk.bbc2bhrpyBGkIw9aypCtr2pm', '芋艿', NULL, NULL, NULL, '', '15601691300', 0, '', 0, '', NULL, '1', '2022-02-20 22:59:33', '1', '2022-02-27 08:26:51', b'0', 118);
 INSERT INTO `system_users` (`id`, `username`, `password`, `nickname`, `remark`, `dept_id`, `post_ids`, `email`, `mobile`, `sex`, `avatar`, `status`, `login_ip`, `login_date`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (108, 'admin108', '$2a$10$y6mfvKoNYL1GXWak8nYwVOH.kCWqjactkzdoIDgiKl93WN3Ejg.Lu', '芋艿', NULL, NULL, NULL, '', '15601691300', 0, '', 0, '', NULL, '1', '2022-02-20 23:00:50', '1', '2022-02-27 08:26:53', b'0', 119);
 INSERT INTO `system_users` (`id`, `username`, `password`, `nickname`, `remark`, `dept_id`, `post_ids`, `email`, `mobile`, `sex`, `avatar`, `status`, `login_ip`, `login_date`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (109, 'admin109', '$2a$10$JAqvH0tEc0I7dfDVBI7zyuB4E3j.uH6daIjV53.vUS6PknFkDJkuK', '芋艿', NULL, NULL, NULL, '', '15601691300', 0, '', 0, '', NULL, '1', '2022-02-20 23:11:50', '1', '2022-02-27 08:26:56', b'0', 120);
@@ -5157,7 +5630,7 @@ INSERT INTO `system_users` (`id`, `username`, `password`, `nickname`, `remark`, 
 INSERT INTO `system_users` (`id`, `username`, `password`, `nickname`, `remark`, `dept_id`, `post_ids`, `email`, `mobile`, `sex`, `avatar`, `status`, `login_ip`, `login_date`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (111, 'test', '$2a$10$mRMIYLDtRHlf6.9ipiqH1.Z.bh/R9dO9d5iHiGYPigi6r5KOoR2Wm', '测试用户', NULL, NULL, '[]', '', '', 0, '', 0, '0:0:0:0:0:0:0:1', '2023-12-30 11:42:17', '110', '2022-02-23 13:14:33', NULL, '2023-12-30 11:42:17', b'0', 121);
 INSERT INTO `system_users` (`id`, `username`, `password`, `nickname`, `remark`, `dept_id`, `post_ids`, `email`, `mobile`, `sex`, `avatar`, `status`, `login_ip`, `login_date`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (112, 'newobject', '$2a$04$dB0z8Q819fJWz0hbaLe6B.VfHCjYgWx6LFfET5lyz3JwcqlyCkQ4C', '新对象', NULL, 100, '[]', '', '15601691235', 1, '', 0, '0:0:0:0:0:0:0:1', '2024-03-16 23:11:38', '1', '2022-02-23 19:08:03', NULL, '2024-03-16 23:11:38', b'0', 1);
 INSERT INTO `system_users` (`id`, `username`, `password`, `nickname`, `remark`, `dept_id`, `post_ids`, `email`, `mobile`, `sex`, `avatar`, `status`, `login_ip`, `login_date`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (113, 'aoteman', '$2a$10$0acJOIk2D25/oC87nyclE..0lzeu9DtQ/n3geP4fkun/zIVRhHJIO', '芋道', NULL, NULL, NULL, '', '15601691300', 0, '', 0, '127.0.0.1', '2022-03-19 18:38:51', '1', '2022-03-07 21:37:58', NULL, '2022-03-19 18:38:51', b'0', 122);
-INSERT INTO `system_users` (`id`, `username`, `password`, `nickname`, `remark`, `dept_id`, `post_ids`, `email`, `mobile`, `sex`, `avatar`, `status`, `login_ip`, `login_date`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (114, 'hrmgr', '$2a$10$TR4eybBioGRhBmDBWkqWLO6NIh3mzYa8KBKDDB5woiGYFVlRAi.fu', 'hr 小姐姐', NULL, NULL, '[1]', '', '15601691236', 1, '', 0, '127.0.0.1', '2022-03-19 22:15:43', '1', '2022-03-19 21:50:58', '1', '2024-03-15 19:48:11', b'0', 1);
+INSERT INTO `system_users` (`id`, `username`, `password`, `nickname`, `remark`, `dept_id`, `post_ids`, `email`, `mobile`, `sex`, `avatar`, `status`, `login_ip`, `login_date`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (114, 'hrmgr', '$2a$10$TR4eybBioGRhBmDBWkqWLO6NIh3mzYa8KBKDDB5woiGYFVlRAi.fu', 'hr 小姐姐', NULL, NULL, '[5]', '', '15601691236', 1, '', 0, '0:0:0:0:0:0:0:1', '2024-03-24 22:21:05', '1', '2022-03-19 21:50:58', NULL, '2024-03-24 22:21:05', b'0', 1);
 INSERT INTO `system_users` (`id`, `username`, `password`, `nickname`, `remark`, `dept_id`, `post_ids`, `email`, `mobile`, `sex`, `avatar`, `status`, `login_ip`, `login_date`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (115, 'aotemane', '$2a$10$/WCwGHu1eq0wOVDd/u8HweJ0gJCHyLS6T7ndCqI8UXZAQom1etk2e', '1', '11', 101, '[]', '', '15601691238', 1, '', 0, '', NULL, '1', '2022-04-30 02:55:43', '1', '2024-03-15 19:48:22', b'0', 1);
 INSERT INTO `system_users` (`id`, `username`, `password`, `nickname`, `remark`, `dept_id`, `post_ids`, `email`, `mobile`, `sex`, `avatar`, `status`, `login_ip`, `login_date`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (116, '15601691302', '$2a$10$L5C4S0U6adBWMvFv1Wwl4.DI/NwYS3WIfLj5Q.Naqr5II8CmqsDZ6', '小豆', NULL, NULL, NULL, '', '', 0, '', 0, '', NULL, '1', '2022-05-17 10:07:10', '1', '2022-05-17 10:07:10', b'0', 124);
 INSERT INTO `system_users` (`id`, `username`, `password`, `nickname`, `remark`, `dept_id`, `post_ids`, `email`, `mobile`, `sex`, `avatar`, `status`, `login_ip`, `login_date`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (117, 'admin123', '$2a$10$WI8Gg/lpZQIrOEZMHqka7OdFaD4Nx.B/qY8ZGTTUKrOJwaHFqibaC', '测试号', '1111', 100, '[2]', '', '15601691234', 1, '', 0, '', NULL, '1', '2022-07-09 17:40:26', '1', '2022-07-09 17:40:26', b'0', 1);
@@ -5165,6 +5638,7 @@ INSERT INTO `system_users` (`id`, `username`, `password`, `nickname`, `remark`, 
 INSERT INTO `system_users` (`id`, `username`, `password`, `nickname`, `remark`, `dept_id`, `post_ids`, `email`, `mobile`, `sex`, `avatar`, `status`, `login_ip`, `login_date`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (126, 'tudou123', '$2a$04$lecJZ/CqgknEp7mDV2d4ou0beyj1GbM3.nVEZe//8WgQpR.JBgnAu', '土豆', NULL, NULL, NULL, '', '', 0, '', 0, '', NULL, '1', '2023-12-02 23:35:05', '1', '2023-12-02 23:35:05', b'0', 151);
 INSERT INTO `system_users` (`id`, `username`, `password`, `nickname`, `remark`, `dept_id`, `post_ids`, `email`, `mobile`, `sex`, `avatar`, `status`, `login_ip`, `login_date`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (127, 'admin2024', '$2a$04$cHdZ7N6AUKysa2XTUG/J/egYtAzdwtpnNpcMVHDrupt1dyn4teOku', '土豆', NULL, NULL, NULL, '', '', 0, '', 0, '0:0:0:0:0:0:0:1', '2023-12-30 11:43:28', '1', '2023-12-30 11:43:17', NULL, '2023-12-30 11:43:28', b'0', 152);
 INSERT INTO `system_users` (`id`, `username`, `password`, `nickname`, `remark`, `dept_id`, `post_ids`, `email`, `mobile`, `sex`, `avatar`, `status`, `login_ip`, `login_date`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (128, 'xiaoming', '$2a$04$BRinw4an9PBGvx6K7GLNre6rWU0.1HMYHkQCN6Oir74zNFKkNKRzm', 'xiaoming', NULL, NULL, NULL, '', '15601691301', 0, '', 0, '0:0:0:0:0:0:0:1', '2024-02-29 23:48:33', '1', '2024-02-27 21:58:25', NULL, '2024-02-29 23:48:33', b'0', 153);
+INSERT INTO `system_users` (`id`, `username`, `password`, `nickname`, `remark`, `dept_id`, `post_ids`, `email`, `mobile`, `sex`, `avatar`, `status`, `login_ip`, `login_date`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`) VALUES (129, 'hh123456', '$2a$04$8mHJM7n03bcNjtaw.IlfV.l38ikWWFJQ7NR1rHywavN7v2UyoDjwq', 'hh', NULL, NULL, NULL, '', '', 0, '', 0, '0:0:0:0:0:0:0:1', '2024-03-30 17:53:24', '1', '2024-03-30 17:52:59', NULL, '2024-03-30 17:53:24', b'0', 154);
 COMMIT;
 
 SET FOREIGN_KEY_CHECKS = 1;
