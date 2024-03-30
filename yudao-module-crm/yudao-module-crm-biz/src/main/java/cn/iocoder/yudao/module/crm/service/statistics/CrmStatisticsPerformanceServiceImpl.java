@@ -36,9 +36,12 @@ public class CrmStatisticsPerformanceServiceImpl implements CrmStatisticsPerform
     @Resource
     private DeptApi deptApi;
 
-
     @Override
     public List<CrmStatisticsPerformanceRespVO> getContractCountPerformance(CrmStatisticsPerformanceReqVO performanceReqVO) {
+        // TODO @scholar：我们可以换个思路实现，减少数据库的计算量；
+        // 比如说，2024 年的合同数据，是不是 2022-12 到 2024-12-31，每个月的统计呢？
+        // 理解之后，我们可以数据 group by 年-月，20222-12 到 2024-12-31 的，然后内存在聚合出 CrmStatisticsPerformanceRespVO 这样
+        // 这样，我们就可以减少数据库的计算量，提升性能；同时 SQL 也会很简单，开发者理解起来也简单哈；
         return getPerformance(performanceReqVO, performanceMapper::selectContractCountPerformance);
     }
 

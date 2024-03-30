@@ -29,21 +29,21 @@ public class CrmStatisticsPerformanceController {
     private CrmStatisticsPerformanceService performanceService;
 
     @GetMapping("/get-contract-count-performance")
-    @Operation(summary = "员工业绩-签约合同数量")
+    @Operation(summary = "合同数量统计", description = "用于【合同数量分析】页面")
     @PreAuthorize("@ss.hasPermission('crm:statistics-performance:query')")
     public CommonResult<List<CrmStatisticsPerformanceRespVO>> getContractCountPerformance(@Valid CrmStatisticsPerformanceReqVO performanceReqVO) {
         return success(performanceService.getContractCountPerformance(performanceReqVO));
     }
 
     @GetMapping("/get-contract-price-performance")
-    @Operation(summary = "员工业绩-获得合同金额")
+    @Operation(summary = "合同金额统计")
     @PreAuthorize("@ss.hasPermission('crm:statistics-performance:query')")
     public CommonResult<List<CrmStatisticsPerformanceRespVO>> getContractPriceStaffPerformance(@Valid CrmStatisticsPerformanceReqVO performanceReqVO) {
         return success(performanceService.getContractPricePerformance(performanceReqVO));
     }
 
     @GetMapping("/get-receivable-price-performance")
-    @Operation(summary = "员工业绩-获得回款金额")
+    @Operation(summary = "回款金额统计")
     @PreAuthorize("@ss.hasPermission('crm:statistics-performance:query')")
     public CommonResult<List<CrmStatisticsPerformanceRespVO>> getReceivablePriceStaffPerformance(@Valid CrmStatisticsPerformanceReqVO performanceReqVO) {
         return success(performanceService.getReceivablePricePerformance(performanceReqVO));
