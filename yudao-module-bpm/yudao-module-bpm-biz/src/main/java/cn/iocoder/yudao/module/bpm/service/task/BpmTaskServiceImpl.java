@@ -134,6 +134,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
     public PageResult<HistoricTaskInstance> getTaskPage(Long userId, BpmTaskPageReqVO pageVO) {
         HistoricTaskInstanceQuery taskQuery = historyService.createHistoricTaskInstanceQuery()
                 .includeTaskLocalVariables()
+                .taskTenantId(FlowableUtils.getTenantId())
                 .orderByHistoricTaskInstanceEndTime().desc(); // 审批时间倒序
         if (StrUtil.isNotBlank(pageVO.getName())) {
             taskQuery.taskNameLike("%" + pageVO.getName() + "%");
