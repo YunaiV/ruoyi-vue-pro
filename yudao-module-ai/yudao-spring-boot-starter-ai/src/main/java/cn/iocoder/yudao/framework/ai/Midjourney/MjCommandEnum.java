@@ -3,7 +3,7 @@ package cn.iocoder.yudao.framework.ai.Midjourney;
 import lombok.Getter;
 
 /**
- * MJ 命令类型
+ * MJ 命令
  */
 @Getter
 public enum MjCommandEnum {
