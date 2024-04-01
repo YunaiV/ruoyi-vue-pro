@@ -1,15 +1,13 @@
 package cn.iocoder.yudao.framework.ai.imageopenai;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.codec.Base64;
+import cn.hutool.http.HttpUtil;
 import cn.iocoder.yudao.framework.ai.chat.ChatException;
 import cn.iocoder.yudao.framework.ai.chatyiyan.exception.YiYanApiException;
-import cn.iocoder.yudao.framework.ai.image.ImageClient;
-import cn.iocoder.yudao.framework.ai.image.ImageOptions;
-import cn.iocoder.yudao.framework.ai.image.ImagePrompt;
-import cn.iocoder.yudao.framework.ai.image.ImageResponse;
+import cn.iocoder.yudao.framework.ai.image.*;
 import cn.iocoder.yudao.framework.ai.imageopenai.api.OpenAiImageRequest;
 import cn.iocoder.yudao.framework.ai.imageopenai.api.OpenAiImageResponse;
-import jdk.jfr.Frequency;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.retry.RetryCallback;
 import org.springframework.retry.RetryContext;
@@ -74,9 +72,15 @@ public class OpenAiImageClient implements ImageClient {
             // 创建请求
             OpenAiImageRequest request = new OpenAiImageRequest();
             BeanUtil.copyProperties(openAiImageOptions, request);
+            request.setPrompt(imagePrompt.getInstructions().get(0).getText());
             // 发送请求
             OpenAiImageResponse response = openAiImageApi.createImage(request);
-            return null;
+            return new ImageResponse(response.getData().stream().map(res -> {
+                byte[] bytes = HttpUtil.downloadBytes(res.getUrl());
+                String base64 = Base64.encode(bytes);
+                return new ImageGeneration(new Image(res.getUrl(), base64));
+            }).toList());
         });
     }
+
 }
