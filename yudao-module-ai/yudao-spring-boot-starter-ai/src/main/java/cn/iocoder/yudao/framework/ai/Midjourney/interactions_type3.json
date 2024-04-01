@@ -1,0 +1,14 @@
+{
+  "type": 3,
+  "nonce": "1224397626158350336",
+  "guild_id": "1224337694918971392",
+  "channel_id": "1224337694918971396",
+  "message_flags": 64,
+  "message_id": "1224397599197368330",
+  "application_id": "936929561302675456",
+  "session_id": "0d9ae3c799f2fb55ff435df5e6deb121",
+  "data": {
+    "component_type": 2,
+    "custom_id": "MJ::ModMsg::Ack::2744093999977583880"
+  }
+}
