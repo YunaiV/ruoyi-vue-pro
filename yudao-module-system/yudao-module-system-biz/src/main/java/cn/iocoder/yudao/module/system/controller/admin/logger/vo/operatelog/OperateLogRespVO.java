@@ -2,20 +2,24 @@ package cn.iocoder.yudao.module.system.controller.admin.logger.vo.operatelog;
 
 import cn.iocoder.yudao.framework.excel.core.annotations.DictFormat;
 import cn.iocoder.yudao.framework.excel.core.convert.DictConvert;
+import cn.iocoder.yudao.module.system.dal.dataobject.user.AdminUserDO;
 import cn.iocoder.yudao.module.system.enums.DictTypeConstants;
 import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
 import com.alibaba.excel.annotation.ExcelProperty;
+import com.fhs.core.trans.anno.Trans;
+import com.fhs.core.trans.constant.TransType;
+import com.fhs.core.trans.vo.VO;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotEmpty;
 import lombok.Data;
 
-import jakarta.validation.constraints.NotEmpty;
 import java.time.LocalDateTime;
 import java.util.Map;
 
 @Schema(description = "管理后台 - 操作日志 Response VO")
 @Data
 @ExcelIgnoreUnannotated
-public class OperateLogRespVO {
+public class OperateLogRespVO implements VO {
 
     @Schema(description = "日志编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     @ExcelProperty("日志编号")
@@ -25,6 +29,7 @@ public class OperateLogRespVO {
     private String traceId;
 
     @Schema(description = "用户编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
+    @Trans(type = TransType.SIMPLE, target = AdminUserDO.class, fields = "nickname", ref = "userNickname")
     private Long userId;
 
     @Schema(description = "用户昵称", requiredMode = Schema.RequiredMode.REQUIRED, example = "芋艿")

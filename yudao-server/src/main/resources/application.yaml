@@ -91,6 +91,12 @@ spring:
     redis:
       repositories:
         enabled: false # 项目未使用到 Spring Data Redis 的 Repository，所以直接禁用，保证启动速度
+
+# VO 转换（数据翻译）相关
+easy-trans:
+  is-enable-global: true # 启用全局翻译（拦截所有 SpringMVC ResponseBody 进行自动翻译 )。如果对于性能要求很高可关闭此配置，或通过 @IgnoreTrans 忽略某个接口
+  is-enable-cloud: false # 禁用 TransType.RPC 微服务模式
+
 --- #################### 验证码相关配置 ####################
 
 aj:
