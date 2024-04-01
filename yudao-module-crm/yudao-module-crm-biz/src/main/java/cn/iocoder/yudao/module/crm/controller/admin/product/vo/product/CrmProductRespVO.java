@@ -2,9 +2,13 @@ package cn.iocoder.yudao.module.crm.controller.admin.product.vo.product;
 
 import cn.iocoder.yudao.framework.excel.core.annotations.DictFormat;
 import cn.iocoder.yudao.framework.excel.core.convert.DictConvert;
+import cn.iocoder.yudao.module.crm.dal.dataobject.product.CrmProductCategoryDO;
 import cn.iocoder.yudao.module.crm.enums.DictTypeConstants;
 import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
 import com.alibaba.excel.annotation.ExcelProperty;
+import com.fhs.core.trans.anno.Trans;
+import com.fhs.core.trans.constant.TransType;
+import com.fhs.core.trans.vo.VO;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
@@ -14,7 +18,7 @@ import java.time.LocalDateTime;
 @Schema(description = "管理后台 - CRM 产品 Response VO")
 @Data
 @ExcelIgnoreUnannotated
-public class CrmProductRespVO {
+public class CrmProductRespVO implements VO {
 
     @Schema(description = "产品编号", example = "20529")
     @ExcelProperty("产品编号")
@@ -43,6 +47,7 @@ public class CrmProductRespVO {
     private Integer status;
 
     @Schema(description = "产品分类编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "2")
+    @Trans(type = TransType.SIMPLE, target = CrmProductCategoryDO.class, fields = "name", ref = "categoryName")
     private Long categoryId;
     @Schema(description = "产品分类名字", requiredMode = Schema.RequiredMode.REQUIRED, example = "衣服")
     @ExcelProperty("产品分类")
@@ -53,12 +58,16 @@ public class CrmProductRespVO {
     private String description;
 
     @Schema(description = "负责人的用户编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "31926")
+    @Trans(type = TransType.RPC, targetClassName = "cn.iocoder.yudao.module.system.dal.dataobject.user.AdminUserDO",
+            fields = "nickname", ref = "ownerUserName")
     private Long ownerUserId;
     @Schema(description = "负责人的用户昵称", requiredMode = Schema.RequiredMode.REQUIRED, example = "芋道源码")
     @ExcelProperty("负责人")
     private String ownerUserName;
 
     @Schema(description = "创建人编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
+    @Trans(type = TransType.RPC, targetClassName = "cn.iocoder.yudao.module.system.dal.dataobject.user.AdminUserDO",
+            fields = "nickname", ref = "creatorName")
     private String creator;
     @Schema(description = "创建人名字", requiredMode = Schema.RequiredMode.REQUIRED, example = "芋道源码")
     @ExcelProperty("创建人")
