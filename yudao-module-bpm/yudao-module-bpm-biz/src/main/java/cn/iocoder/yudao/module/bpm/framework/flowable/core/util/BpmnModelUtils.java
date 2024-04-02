@@ -358,43 +358,71 @@ public class BpmnModelUtils {
         // 单独添加 end event 节点
         addBpmnEndEventNode(mainProcess);
         // 添加节点之间的连线 Sequence Flow
-        addBpmnSequenceFlow(mainProcess, simpleModelNode);
+        addBpmnSequenceFlow(mainProcess, simpleModelNode, BpmnModelConstants.END_EVENT_ID);
         // 自动布局
         new BpmnAutoLayout(bpmnModel).execute();
         return bpmnModel;
     }
 
-    private static void addBpmnSequenceFlow(Process mainProcess, BpmSimpleModelNodeVO node) {
+    private static void addBpmnSequenceFlow(Process mainProcess, BpmSimpleModelNodeVO node, String endId) {
         // 节点为 null 退出
         if (node == null || node.getId() == null) {
             return;
         }
         BpmSimpleModelNodeVO childNode = node.getChildNode();
-        // 如果后续节点为 null. 添加与结束节点的连线
-        if (childNode == null || childNode.getId() == null) {
-            addBpmnSequenceFlowElement(mainProcess, node.getId(), BpmnModelConstants.END_EVENT_ID, null);
+        // 如果不是网关节点、且后续节点为 null. 添加与结束节点的连线
+        if (!BpmSimpleModelNodeType.isGatewayNode(node.getType()) && (childNode == null || childNode.getId() == null)) {
+            addBpmnSequenceFlowElement(mainProcess, node.getId(), endId, null, null);
             return;
         }
         BpmSimpleModelNodeType nodeType = BpmSimpleModelNodeType.valueOf(node.getType());
         Assert.notNull(nodeType, "模型节点类型不支持");
         switch (nodeType) {
-            case START_NODE:
-            case START_USER_NODE:
-            case APPROVE_USER_NODE:
-                addBpmnSequenceFlowElement(mainProcess, node.getId(), childNode.getId(), null);
+            case START_EVENT_NODE:
+            case APPROVE_USER_NODE: {
+                addBpmnSequenceFlowElement(mainProcess, node.getId(), childNode.getId(), null, null);
+                // 递归调用后续节点
+                addBpmnSequenceFlow(mainProcess, childNode,endId);
                 break;
+            }
+            case EXCLUSIVE_GATEWAY_NODE: {
+                String gateWayEndId = ( childNode == null || childNode.getId() == null ) ? BpmnModelConstants.END_EVENT_ID : childNode.getId();
+                List<BpmSimpleModelNodeVO> conditionNodes = node.getConditionNodes();
+                Assert.notEmpty(conditionNodes, "网关节点的条件节点不能为空");
+                for (int i = 0; i < conditionNodes.size(); i++) {
+                    BpmSimpleModelNodeVO item = conditionNodes.get(i);
+                    BpmSimpleModelNodeVO nextNodeOnCondition = getNextNodeOnCondition(item);
+                    if (nextNodeOnCondition != null && nextNodeOnCondition.getId() != null) {
+                        addBpmnSequenceFlowElement(mainProcess, node.getId(), nextNodeOnCondition.getId(),
+                                String.format("%s_SequenceFlow_%d", node.getId(), i+1), null);
+                        addBpmnSequenceFlow(mainProcess, nextNodeOnCondition, gateWayEndId);
+                    } else {
+                        addBpmnSequenceFlowElement(mainProcess, node.getId(), gateWayEndId,
+                                String.format("%s_SequenceFlow_%d", node.getId(), i+1), null);
+                    }
+                }
+                // 递归调用后续节点
+                addBpmnSequenceFlow(mainProcess, childNode, endId);
+                break;
+            }
             default: {
                 // TODO 其它节点类型的实现
             }
         }
-        // 递归调用后续节点
-        addBpmnSequenceFlow(mainProcess, childNode);
+
     }
 
-    private static void addBpmnSequenceFlowElement(Process mainProcess, String sourceId, String targetId, String conditionExpression) {
+    private static BpmSimpleModelNodeVO getNextNodeOnCondition(BpmSimpleModelNodeVO conditionNode) {
+        return conditionNode.getChildNode();
+    }
+
+    private static void addBpmnSequenceFlowElement(Process mainProcess, String sourceId, String targetId, String seqFlowId, String conditionExpression) {
         SequenceFlow sequenceFlow = new SequenceFlow(sourceId, targetId);
         if (StrUtil.isNotEmpty(conditionExpression)) {
             sequenceFlow.setConditionExpression(conditionExpression);
+        }
+        if (StrUtil.isNotEmpty(seqFlowId)) {
+            sequenceFlow.setId(seqFlowId);
         }
         mainProcess.addFlowElement(sequenceFlow);
     }
@@ -407,12 +435,14 @@ public class BpmnModelUtils {
         BpmSimpleModelNodeType nodeType = BpmSimpleModelNodeType.valueOf(simpleModelNode.getType());
         Assert.notNull(nodeType, "模型节点类型不支持");
         switch (nodeType) {
-            case START_NODE:
+            case START_EVENT_NODE:
                 addBpmnStartEventNode(mainProcess, simpleModelNode);
                 break;
-            case START_USER_NODE:
             case APPROVE_USER_NODE:
                 addBpmnUserTaskEventNode(mainProcess, simpleModelNode);
+                break;
+            case EXCLUSIVE_GATEWAY_NODE:
+                addBpmnExclusiveGatewayNode(mainProcess, simpleModelNode);
                 break;
             default: {
                 // TODO 其它节点类型的实现
@@ -427,7 +457,7 @@ public class BpmnModelUtils {
         // 如果是网关类型接口. 递归添加条件节点
         if (BpmSimpleModelNodeType.isGatewayNode(simpleModelNode.getType()) && ArrayUtil.isNotEmpty(simpleModelNode.getConditionNodes())) {
             for (BpmSimpleModelNodeVO node : simpleModelNode.getConditionNodes()) {
-                addBpmnFlowNode(mainProcess, node);
+                addBpmnFlowNode(mainProcess, node.getChildNode());
             }
         }
 
@@ -435,6 +465,15 @@ public class BpmnModelUtils {
         if (simpleModelNode.getChildNode() != null) {
             addBpmnFlowNode(mainProcess, simpleModelNode.getChildNode());
         }
+    }
+
+    private static void addBpmnExclusiveGatewayNode(Process mainProcess, BpmSimpleModelNodeVO node) {
+        Assert.notEmpty(node.getConditionNodes(), "网关节点的条件节点不能为空");
+        ExclusiveGateway exclusiveGateway = new ExclusiveGateway();
+        exclusiveGateway.setId(node.getId());
+        // 条件节点的最后一个条件为 网关的 default sequence flow
+        exclusiveGateway.setDefaultFlow(String.format("%s_SequenceFlow_%d", node.getId(), node.getConditionNodes().size()));
+        mainProcess.addFlowElement(exclusiveGateway);
     }
 
     private static void addBpmnEndEventNode(Process mainProcess) {

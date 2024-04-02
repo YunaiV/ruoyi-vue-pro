@@ -18,8 +18,7 @@ import java.util.Objects;
 public enum BpmSimpleModelNodeType implements IntArrayValuable {
 
     // TODO @jaosn：-1、0、1、4、-2 是前端已经定义好的么？感觉未来可以考虑搞成和 BPMN 尽量一致的单词哈；类似 usertask 用户审批；
-    START_NODE(-1, "开始节点"),
-    START_USER_NODE(0, "发起人结点"),
+    START_EVENT_NODE(0, "开始节点"),
     APPROVE_USER_NODE (1, "审批人节点"),
     EXCLUSIVE_GATEWAY_NODE(4, "排他网关"),
     END_NODE(-2, "结束节点");

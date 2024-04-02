@@ -20,7 +20,7 @@ import java.util.Map;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.bpm.enums.ErrorCodeConstants.CONVERT_TO_SIMPLE_MODEL_NOT_SUPPORT;
 import static cn.iocoder.yudao.module.bpm.enums.ErrorCodeConstants.MODEL_NOT_EXISTS;
-import static cn.iocoder.yudao.module.bpm.enums.definition.BpmSimpleModelNodeType.START_NODE;
+import static cn.iocoder.yudao.module.bpm.enums.definition.BpmSimpleModelNodeType.START_EVENT_NODE;
 import static cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnModelConstants.USER_TASK_CANDIDATE_PARAM;
 import static cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnModelConstants.USER_TASK_CANDIDATE_STRATEGY;
 
@@ -85,7 +85,7 @@ public class BpmSimpleModelServiceImpl implements BpmSimpleModelService {
             return null;
         }
         BpmSimpleModelNodeVO rootNode = new BpmSimpleModelNodeVO();
-        rootNode.setType(START_NODE.getType());
+        rootNode.setType(START_EVENT_NODE.getType());
         rootNode.setId(startEvent.getId());
         rootNode.setName(startEvent.getName());
         recursiveBuildSimpleModelNode(startEvent, rootNode);
@@ -129,7 +129,7 @@ public class BpmSimpleModelServiceImpl implements BpmSimpleModelService {
 
     private List<SequenceFlow> validateCanConvertSimpleNode(BpmSimpleModelNodeType nodeType, FlowNode currentFlowNode) {
         switch (nodeType) {
-            case START_NODE:
+            case START_EVENT_NODE:
             case APPROVE_USER_NODE: {
                 List<SequenceFlow> outgoingFlows = currentFlowNode.getOutgoingFlows();
                 if (CollUtil.isNotEmpty(outgoingFlows) && outgoingFlows.size() > 1) {
