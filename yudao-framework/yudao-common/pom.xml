@@ -137,6 +137,11 @@
             <artifactId>transmittable-thread-local</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>com.fhs-opensource</groupId> <!-- VO 数据翻译 -->
+            <artifactId>easy-trans-anno</artifactId> <!-- 默认引入的原因，方便 xxx-module-api 包使用 -->
+        </dependency>
+
         <!-- Test 测试相关 -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
