@@ -8,7 +8,6 @@ import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.util.http.HttpUtils;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
-import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
 import cn.iocoder.yudao.module.system.controller.admin.oauth2.vo.open.OAuth2OpenAccessTokenRespVO;
 import cn.iocoder.yudao.module.system.controller.admin.oauth2.vo.open.OAuth2OpenAuthorizeInfoRespVO;
 import cn.iocoder.yudao.module.system.controller.admin.oauth2.vo.open.OAuth2OpenCheckTokenRespVO;
@@ -95,7 +94,6 @@ public class OAuth2OpenController {
             @Parameter(name = "scope", example = "user_info"),
             @Parameter(name = "refresh_token", example = "123424233"),
     })
-    @OperateLog(enable = false) // 避免 Post 请求被记录操作日志
     public CommonResult<OAuth2OpenAccessTokenRespVO> postAccessToken(HttpServletRequest request,
                                                                      @RequestParam("grant_type") String grantType,
                                                                      @RequestParam(value = "code", required = false) String code, // 授权码模式
@@ -146,7 +144,6 @@ public class OAuth2OpenController {
     @PermitAll
     @Operation(summary = "删除访问令牌")
     @Parameter(name = "token", required = true, description = "访问令牌", example = "biu")
-    @OperateLog(enable = false) // 避免 Post 请求被记录操作日志
     public CommonResult<Boolean> revokeToken(HttpServletRequest request,
                                              @RequestParam("token") String token) {
         // 校验客户端
@@ -165,7 +162,6 @@ public class OAuth2OpenController {
     @PermitAll
     @Operation(summary = "校验访问令牌")
     @Parameter(name = "token", required = true, description = "访问令牌", example = "biu")
-    @OperateLog(enable = false) // 避免 Post 请求被记录操作日志
     public CommonResult<OAuth2OpenCheckTokenRespVO> checkToken(HttpServletRequest request,
                                                                @RequestParam("token") String token) {
         // 校验客户端
@@ -216,7 +212,6 @@ public class OAuth2OpenController {
             @Parameter(name = "auto_approve", required = true, description = "用户是否接受", example = "true"),
             @Parameter(name = "state", example = "1")
     })
-    @OperateLog(enable = false) // 避免 Post 请求被记录操作日志
     public CommonResult<String> approveOrDeny(@RequestParam("response_type") String responseType,
                                               @RequestParam("client_id") String clientId,
                                               @RequestParam(value = "scope", required = false) String scope,

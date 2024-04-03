@@ -1,10 +1,10 @@
 package cn.iocoder.yudao.module.trade.controller.admin.delivery;
 
+import cn.iocoder.yudao.framework.apilog.core.annotations.ApiAccessLog;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
-import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
 import cn.iocoder.yudao.module.trade.controller.admin.delivery.vo.express.*;
 import cn.iocoder.yudao.module.trade.convert.delivery.DeliveryExpressConvert;
 import cn.iocoder.yudao.module.trade.dal.dataobject.delivery.DeliveryExpressDO;
@@ -12,18 +12,18 @@ import cn.iocoder.yudao.module.trade.service.delivery.DeliveryExpressService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.annotation.Resource;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import javax.annotation.Resource;
-import javax.servlet.http.HttpServletResponse;
-import javax.validation.Valid;
 import java.io.IOException;
 import java.util.List;
 
+import static cn.iocoder.yudao.framework.apilog.core.enums.OperateTypeEnum.EXPORT;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
-import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.EXPORT;
 
 @Tag(name = "管理后台 - 快递公司")
 @RestController
@@ -85,7 +85,7 @@ public class DeliveryExpressController {
     @GetMapping("/export-excel")
     @Operation(summary = "导出快递公司 Excel")
     @PreAuthorize("@ss.hasPermission('trade:delivery:express:export')")
-    @OperateLog(type = EXPORT)
+    @ApiAccessLog(operateType = EXPORT)
     public void exportDeliveryExpressExcel(@Valid DeliveryExpressExportReqVO exportReqVO,
               HttpServletResponse response) throws IOException {
         List<DeliveryExpressDO> list = deliveryExpressService.getDeliveryExpressList(exportReqVO);

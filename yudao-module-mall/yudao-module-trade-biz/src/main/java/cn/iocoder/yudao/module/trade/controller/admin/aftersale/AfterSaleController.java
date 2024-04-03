@@ -3,7 +3,6 @@ package cn.iocoder.yudao.module.trade.controller.admin.aftersale;
 import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
 import cn.iocoder.yudao.module.member.api.user.MemberUserApi;
 import cn.iocoder.yudao.module.member.api.user.dto.MemberUserRespDTO;
 import cn.iocoder.yudao.module.pay.api.notify.dto.PayRefundNotifyReqDTO;
@@ -135,7 +134,6 @@ public class AfterSaleController {
     @PostMapping("/update-refunded")
     @Operation(summary = "更新售后订单为已退款") // 由 pay-module 支付服务，进行回调，可见 PayNotifyJob
     @PermitAll // 无需登录，安全由 PayDemoOrderService 内部校验实现
-    @OperateLog(enable = false) // 禁用操作日志，因为没有操作人
     public CommonResult<Boolean> updateAfterRefund(@RequestBody PayRefundNotifyReqDTO notifyReqDTO) {
         // 目前业务逻辑，不需要做任何事情
         // 当然，退款会有小概率会失败的情况，可以监控失败状态，进行告警

@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
  * @author HUIHUI
  */
 @Data
-public class OperateLogV2RespDTO implements VO {
+public class OperateLogRespDTO implements VO {
 
     /**
      * 日志编号
