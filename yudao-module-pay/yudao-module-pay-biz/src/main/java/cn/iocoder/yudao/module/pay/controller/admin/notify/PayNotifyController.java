@@ -3,7 +3,6 @@ package cn.iocoder.yudao.module.pay.controller.admin.notify;
 import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
 import cn.iocoder.yudao.framework.pay.core.client.PayClient;
 import cn.iocoder.yudao.framework.pay.core.client.dto.order.PayOrderRespDTO;
 import cn.iocoder.yudao.framework.pay.core.client.dto.refund.PayRefundRespDTO;
@@ -59,7 +58,6 @@ public class PayNotifyController {
     @PostMapping(value = "/order/{channelId}")
     @Operation(summary = "支付渠道的统一【支付】回调")
     @PermitAll
-    @OperateLog(enable = false) // 回调地址，无需记录操作日志
     public String notifyOrder(@PathVariable("channelId") Long channelId,
                               @RequestParam(required = false) Map<String, String> params,
                               @RequestBody(required = false) String body) {
@@ -80,7 +78,6 @@ public class PayNotifyController {
     @PostMapping(value = "/refund/{channelId}")
     @Operation(summary = "支付渠道的统一【退款】回调")
     @PermitAll
-    @OperateLog(enable = false) // 回调地址，无需记录操作日志
     public String notifyRefund(@PathVariable("channelId") Long channelId,
                               @RequestParam(required = false) Map<String, String> params,
                               @RequestBody(required = false) String body) {
