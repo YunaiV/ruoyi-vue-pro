@@ -23,9 +23,9 @@ import java.util.Map;
 @Slf4j
 public class ApiAccessLogInterceptor implements HandlerInterceptor {
 
-    public static String ATTRIBUTE_HANDLER_METHOD = "HANDLER_METHOD";
+    public static final String ATTRIBUTE_HANDLER_METHOD = "HANDLER_METHOD";
 
-    private static String ATTRIBUTE_STOP_WATCH = "ApiAccessLogInterceptor.StopWatch";
+    private static final String ATTRIBUTE_STOP_WATCH = "ApiAccessLogInterceptor.StopWatch";
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
