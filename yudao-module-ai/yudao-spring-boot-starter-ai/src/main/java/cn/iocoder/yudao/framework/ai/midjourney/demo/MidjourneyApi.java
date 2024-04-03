@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.framework.ai.midjourney;
+package cn.iocoder.yudao.framework.ai.midjourney.demo;
 
 /**
  * 文档: https://www.xiubbs.com/t-401-1-1.html

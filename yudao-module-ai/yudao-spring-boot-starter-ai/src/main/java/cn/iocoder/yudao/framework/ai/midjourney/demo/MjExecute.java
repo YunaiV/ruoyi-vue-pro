@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.framework.ai.midjourney;
+package cn.iocoder.yudao.framework.ai.midjourney.demo;
 
 /**
  * mj 命令

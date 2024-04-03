@@ -1,8 +1,8 @@
-package cn.iocoder.yudao.framework.ai.midjourney.wss;
+package cn.iocoder.yudao.framework.ai.midjourney.demo.wss;
 
-import cn.iocoder.yudao.framework.ai.midjourney.jad.DiscordAccount;
-import cn.iocoder.yudao.framework.ai.midjourney.wss.user.SpringUserWebSocketStarter;
-import cn.iocoder.yudao.framework.ai.midjourney.wss.user.UserMessageListener;
+import cn.iocoder.yudao.framework.ai.midjourney.demo.jad.DiscordAccount;
+import cn.iocoder.yudao.framework.ai.midjourney.demo.wss.user.SpringUserWebSocketStarter;
+import cn.iocoder.yudao.framework.ai.midjourney.demo.wss.user.UserMessageListener;
 
 import java.util.Scanner;
 

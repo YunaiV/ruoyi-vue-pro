@@ -1,13 +1,13 @@
-package cn.iocoder.yudao.framework.ai.midjourney.wss.user;
+package cn.iocoder.yudao.framework.ai.midjourney.demo.wss.user;
 
 
 import cn.hutool.core.exceptions.ValidateException;
 import cn.hutool.core.text.CharSequenceUtil;
 import cn.hutool.core.thread.ThreadUtil;
-import cn.iocoder.yudao.framework.ai.midjourney.jad.DiscordAccount;
-import cn.iocoder.yudao.framework.ai.midjourney.wss.AsyncLockUtils;
-import cn.iocoder.yudao.framework.ai.midjourney.wss.ReturnCode;
-import cn.iocoder.yudao.framework.ai.midjourney.wss.WebSocketStarter;
+import cn.iocoder.yudao.framework.ai.midjourney.demo.jad.DiscordAccount;
+import cn.iocoder.yudao.framework.ai.midjourney.demo.wss.AsyncLockUtils;
+import cn.iocoder.yudao.framework.ai.midjourney.demo.wss.ReturnCode;
+import cn.iocoder.yudao.framework.ai.midjourney.demo.wss.WebSocketStarter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.tomcat.websocket.Constants;
 import org.jetbrains.annotations.NotNull;

@@ -1,9 +1,9 @@
-package cn.iocoder.yudao.framework.ai.midjourney.wss;
+package cn.iocoder.yudao.framework.ai.midjourney.demo.wss;
 
 import cn.hutool.cache.CacheUtil;
 import cn.hutool.cache.impl.TimedCache;
 import cn.hutool.core.thread.ThreadUtil;
-import cn.iocoder.yudao.framework.ai.midjourney.jad.DomainObject;
+import cn.iocoder.yudao.framework.ai.midjourney.demo.jad.DomainObject;
 import lombok.experimental.UtilityClass;
 
 import java.time.Duration;

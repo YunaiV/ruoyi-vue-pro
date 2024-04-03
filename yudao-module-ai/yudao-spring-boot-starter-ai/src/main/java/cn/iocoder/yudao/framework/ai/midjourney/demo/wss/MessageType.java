@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.framework.ai.midjourney.wss;
+package cn.iocoder.yudao.framework.ai.midjourney.demo.wss;
 
 
 public enum MessageType {

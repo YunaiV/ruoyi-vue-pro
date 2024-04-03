@@ -1,11 +1,11 @@
-package cn.iocoder.yudao.framework.ai.midjourney.wss.user;
+package cn.iocoder.yudao.framework.ai.midjourney.demo.wss.user;
 
 import cn.hutool.core.text.CharSequenceUtil;
 import cn.hutool.core.thread.ThreadUtil;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.http.useragent.UserAgent;
 import cn.hutool.http.useragent.UserAgentUtil;
-import cn.iocoder.yudao.framework.ai.midjourney.jad.DiscordAccount;
+import cn.iocoder.yudao.framework.ai.midjourney.demo.jad.DiscordAccount;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.utils.data.DataArray;

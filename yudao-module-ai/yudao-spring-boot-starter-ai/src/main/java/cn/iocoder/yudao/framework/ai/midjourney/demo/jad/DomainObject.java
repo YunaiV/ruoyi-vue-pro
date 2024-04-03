@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.framework.ai.midjourney.jad;
+package cn.iocoder.yudao.framework.ai.midjourney.demo.jad;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnore;

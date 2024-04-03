@@ -1,9 +1,8 @@
-package cn.iocoder.yudao.framework.ai.midjourney.wss.user;
+package cn.iocoder.yudao.framework.ai.midjourney.demo.wss.user;
 
 
 import cn.hutool.core.thread.ThreadUtil;
-import cn.iocoder.yudao.framework.ai.midjourney.wss.MessageType;
-import com.alibaba.fastjson.JSON;
+import cn.iocoder.yudao.framework.ai.midjourney.demo.wss.MessageType;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.utils.data.DataObject;
 

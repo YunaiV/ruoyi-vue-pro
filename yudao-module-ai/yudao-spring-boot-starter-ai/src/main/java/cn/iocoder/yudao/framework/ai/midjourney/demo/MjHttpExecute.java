@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.framework.ai.midjourney;
+package cn.iocoder.yudao.framework.ai.midjourney.demo;
 
 import cn.hutool.core.io.FileUtil;
 import org.springframework.http.HttpEntity;

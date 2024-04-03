@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.framework.ai.midjourney.wss;
+package cn.iocoder.yudao.framework.ai.midjourney.demo.wss;
 
 import cn.hutool.core.text.CharSequenceUtil;
 import lombok.RequiredArgsConstructor;
