@@ -9,12 +9,12 @@ import lombok.Data;
  * @author HUIHUI
  */
 @Data
-public class OperateLogV2PageReqDTO extends PageParam {
+public class OperateLogPageReqDTO extends PageParam {
 
     /**
      * 模块类型
      */
-    private String bizType;
+    private String type;
     /**
      * 模块数据编号
      */

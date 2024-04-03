@@ -23,7 +23,7 @@ import static ${CommonResultClassName}.success;
 
 import ${ExcelUtilsClassName};
 
-import ${OperateLogClassName};
+import ${ApiAccessLogClassName};
 import static ${OperateTypeEnumClassName}.*;
 
 import ${basePackage}.module.${table.moduleName}.controller.${sceneEnum.basePackage}.${table.businessName}.vo.*;
@@ -114,7 +114,7 @@ public class ${sceneEnum.prefixClass}${table.className}Controller {
 #if ($sceneEnum.scene == 1)
     @PreAuthorize("@ss.hasPermission('${permissionPrefix}:export')")
 #end
-    @OperateLog(type = EXPORT)
+    @ApiAccessLog(operateType = EXPORT)
 #if ( $table.templateType != 2 )
     public void export${simpleClassName}Excel(@Valid ${sceneEnum.prefixClass}${table.className}PageReqVO pageReqVO,
               HttpServletResponse response) throws IOException {

@@ -8,7 +8,7 @@ import cn.iocoder.yudao.module.crm.controller.admin.operatelog.vo.CrmOperateLogR
 import cn.iocoder.yudao.module.crm.enums.LogRecordConstants;
 import cn.iocoder.yudao.module.crm.enums.common.CrmBizTypeEnum;
 import cn.iocoder.yudao.module.system.api.logger.OperateLogApi;
-import cn.iocoder.yudao.module.system.api.logger.dto.OperateLogV2PageReqDTO;
+import cn.iocoder.yudao.module.system.api.logger.dto.OperateLogPageReqDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
@@ -55,9 +55,9 @@ public class CrmOperateLogController {
     @Operation(summary = "获得操作日志")
     @PreAuthorize("@ss.hasPermission('crm:operate-log:query')")
     public CommonResult<PageResult<CrmOperateLogRespVO>> getCustomerOperateLog(@Valid CrmOperateLogPageReqVO pageReqVO) {
-        OperateLogV2PageReqDTO reqDTO = new OperateLogV2PageReqDTO();
+        OperateLogPageReqDTO reqDTO = new OperateLogPageReqDTO();
         reqDTO.setPageSize(PAGE_SIZE_NONE); // 默认不分页，需要分页需注释
-        reqDTO.setBizType(BIZ_TYPE_MAP.get(pageReqVO.getBizType())).setBizId(pageReqVO.getBizId());
+        reqDTO.setType(BIZ_TYPE_MAP.get(pageReqVO.getBizType())).setBizId(pageReqVO.getBizId());
         return success(BeanUtils.toBean(operateLogApi.getOperateLogPage(reqDTO), CrmOperateLogRespVO.class));
     }
 

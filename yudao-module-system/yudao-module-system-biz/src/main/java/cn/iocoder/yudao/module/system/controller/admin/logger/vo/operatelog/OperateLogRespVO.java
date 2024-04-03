@@ -1,9 +1,6 @@
 package cn.iocoder.yudao.module.system.controller.admin.logger.vo.operatelog;
 
-import cn.iocoder.yudao.framework.excel.core.annotations.DictFormat;
-import cn.iocoder.yudao.framework.excel.core.convert.DictConvert;
 import cn.iocoder.yudao.module.system.dal.dataobject.user.AdminUserDO;
-import cn.iocoder.yudao.module.system.enums.DictTypeConstants;
 import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
 import com.alibaba.excel.annotation.ExcelProperty;
 import com.fhs.core.trans.anno.Trans;
@@ -14,7 +11,6 @@ import jakarta.validation.constraints.NotEmpty;
 import lombok.Data;
 
 import java.time.LocalDateTime;
-import java.util.Map;
 
 @Schema(description = "管理后台 - 操作日志 Response VO")
 @Data
@@ -29,31 +25,29 @@ public class OperateLogRespVO implements VO {
     private String traceId;
 
     @Schema(description = "用户编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
-    @Trans(type = TransType.SIMPLE, target = AdminUserDO.class, fields = "nickname", ref = "userNickname")
+    @Trans(type = TransType.SIMPLE, target = AdminUserDO.class, fields = "nickname", ref = "userName")
     private Long userId;
-
     @Schema(description = "用户昵称", requiredMode = Schema.RequiredMode.REQUIRED, example = "芋艿")
     @ExcelProperty("操作人")
-    private String userNickname;
+    private String userName;
 
-    @Schema(description = "操作模块", requiredMode = Schema.RequiredMode.REQUIRED, example = "订单")
-    @ExcelProperty("操作模块")
-    private String module;
+    @Schema(description = "操作模块类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "订单")
+    @ExcelProperty("操作模块类型")
+    private String type;
 
     @Schema(description = "操作名", requiredMode = Schema.RequiredMode.REQUIRED, example = "创建订单")
     @ExcelProperty("操作名")
-    private String name;
+    private String subType;
 
-    @Schema(description = "操作分类，参见 OperateLogTypeEnum 枚举类", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
-    @ExcelProperty(value = "操作类型", converter = DictConvert.class)
-    @DictFormat(DictTypeConstants.OPERATE_TYPE)
-    private Integer type;
+    @Schema(description = "操作模块业务编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
+    @ExcelProperty("操作模块业务编号")
+    private Long bizId;
 
     @Schema(description = "操作明细", example = "修改编号为 1 的用户信息，将性别从男改成女，将姓名从芋道改成源码。")
-    private String content;
+    private String action;
 
     @Schema(description = "拓展字段", example = "{'orderId': 1}")
-    private Map<String, Object> exts;
+    private String extra;
 
     @Schema(description = "请求方法名", requiredMode = Schema.RequiredMode.REQUIRED, example = "GET")
     @NotEmpty(message = "请求方法名不能为空")
@@ -68,28 +62,7 @@ public class OperateLogRespVO implements VO {
     @Schema(description = "浏览器 UserAgent", requiredMode = Schema.RequiredMode.REQUIRED, example = "Mozilla/5.0")
     private String userAgent;
 
-    @Schema(description = "Java 方法名", requiredMode = Schema.RequiredMode.REQUIRED, example = "cn.iocoder.yudao.adminserver.UserController.save(...)")
-    private String javaMethod;
-
-    @Schema(description = "Java 方法的参数")
-    private String javaMethodArgs;
-
-    @Schema(description = "开始时间", requiredMode = Schema.RequiredMode.REQUIRED)
-    @ExcelProperty("操作日志")
-    private LocalDateTime startTime;
-
-    @Schema(description = "执行时长，单位：毫秒", requiredMode = Schema.RequiredMode.REQUIRED)
-    @ExcelProperty("执行时长")
-    private Integer duration;
-
-    @Schema(description = "结果码", requiredMode = Schema.RequiredMode.REQUIRED)
-    @ExcelProperty(value = "结果码")
-    private Integer resultCode;
-
-    @Schema(description = "结果提示")
-    private String resultMsg;
-
-    @Schema(description = "结果数据")
-    private String resultData;
+    @Schema(description = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED)
+    private LocalDateTime createTime;
 
 }
