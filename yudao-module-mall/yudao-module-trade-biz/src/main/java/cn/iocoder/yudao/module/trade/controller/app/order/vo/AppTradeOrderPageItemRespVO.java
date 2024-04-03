@@ -50,4 +50,9 @@ public class AppTradeOrderPageItemRespVO {
      */
     private List<AppTradeOrderItemRespVO> items;
 
+    // ========== 营销基本信息 ==========
+
+    @Schema(description = "拼团记录编号", example = "100")
+    private Long combinationRecordId;
+
 }

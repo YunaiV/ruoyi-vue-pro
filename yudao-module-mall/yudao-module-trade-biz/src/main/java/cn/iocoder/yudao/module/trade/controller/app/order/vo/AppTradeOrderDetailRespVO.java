@@ -140,6 +140,9 @@ public class AppTradeOrderDetailRespVO {
     @Schema(description = "VIP 减免金额", requiredMode = Schema.RequiredMode.REQUIRED, example = "888")
     private Integer vipPrice;
 
+    @Schema(description = "拼团记录编号", example = "100")
+    private Long combinationRecordId;
+
     /**
      * 订单项数组
      */
