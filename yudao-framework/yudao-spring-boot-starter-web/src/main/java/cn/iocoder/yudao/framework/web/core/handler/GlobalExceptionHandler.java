@@ -3,7 +3,6 @@ package cn.iocoder.yudao.framework.web.core.handler;
 import cn.hutool.core.exceptions.ExceptionUtil;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.iocoder.yudao.framework.apilog.core.service.ApiErrorLog;
 import cn.iocoder.yudao.framework.apilog.core.service.ApiErrorLogFrameworkService;
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
@@ -11,6 +10,7 @@ import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.common.util.monitor.TracerUtils;
 import cn.iocoder.yudao.framework.common.util.servlet.ServletUtils;
 import cn.iocoder.yudao.framework.web.core.util.WebFrameworkUtils;
+import cn.iocoder.yudao.module.infra.api.logger.dto.ApiErrorLogCreateReqDTO;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -46,6 +46,7 @@ import static cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeC
 @Slf4j
 public class GlobalExceptionHandler {
 
+    @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
     private final String applicationName;
 
     private final ApiErrorLogFrameworkService apiErrorLogFrameworkService;
@@ -237,10 +238,10 @@ public class GlobalExceptionHandler {
 
     private void createExceptionLog(HttpServletRequest req, Throwable e) {
         // 插入错误日志
-        ApiErrorLog errorLog = new ApiErrorLog();
+        ApiErrorLogCreateReqDTO errorLog = new ApiErrorLogCreateReqDTO();
         try {
             // 初始化 errorLog
-            initExceptionLog(errorLog, req, e);
+            buildExceptionLog(errorLog, req, e);
             // 执行插入 errorLog
             apiErrorLogFrameworkService.createApiErrorLog(errorLog);
         } catch (Throwable th) {
@@ -248,7 +249,7 @@ public class GlobalExceptionHandler {
         }
     }
 
-    private void initExceptionLog(ApiErrorLog errorLog, HttpServletRequest request, Throwable e) {
+    private void buildExceptionLog(ApiErrorLogCreateReqDTO errorLog, HttpServletRequest request, Throwable e) {
         // 处理用户信息
         errorLog.setUserId(WebFrameworkUtils.getLoginUserId(request));
         errorLog.setUserType(WebFrameworkUtils.getLoginUserType(request));

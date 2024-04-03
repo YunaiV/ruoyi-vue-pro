@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.framework.apilog.core.service;
 
-import cn.hutool.core.bean.BeanUtil;
 import cn.iocoder.yudao.module.infra.api.logger.ApiErrorLogApi;
 import cn.iocoder.yudao.module.infra.api.logger.dto.ApiErrorLogCreateReqDTO;
 import lombok.RequiredArgsConstructor;
@@ -20,8 +19,7 @@ public class ApiErrorLogFrameworkServiceImpl implements ApiErrorLogFrameworkServ
 
     @Override
     @Async
-    public void createApiErrorLog(ApiErrorLog apiErrorLog) {
-        ApiErrorLogCreateReqDTO reqDTO = BeanUtil.copyProperties(apiErrorLog, ApiErrorLogCreateReqDTO.class);
+    public void createApiErrorLog(ApiErrorLogCreateReqDTO reqDTO) {
         apiErrorLogApi.createApiErrorLog(reqDTO);
     }
 

@@ -44,8 +44,11 @@ public class ApiAccessLogCreateReqDTO {
     /**
      * 请求参数
      */
-    @NotNull(message = "请求参数不能为空")
     private String requestParams;
+    /**
+     * 响应结果
+     */
+    private String responseBody;
     /**
      * 用户 IP
      */
@@ -56,6 +59,21 @@ public class ApiAccessLogCreateReqDTO {
      */
     @NotNull(message = "User-Agent 不能为空")
     private String userAgent;
+
+    /**
+     * 操作模块
+     */
+    private String operateModule;
+    /**
+     * 操作名
+     */
+    private String operateName;
+    /**
+     * 操作分类
+     *
+     * 枚举，参见 OperateTypeEnum 类
+     */
+    private Integer operateType;
 
     /**
      * 开始请求时间
