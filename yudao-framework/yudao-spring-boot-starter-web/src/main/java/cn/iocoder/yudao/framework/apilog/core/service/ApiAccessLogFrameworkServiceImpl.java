@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.framework.apilog.core.service;
 
-import cn.hutool.core.bean.BeanUtil;
 import cn.iocoder.yudao.module.infra.api.logger.ApiAccessLogApi;
 import cn.iocoder.yudao.module.infra.api.logger.dto.ApiAccessLogCreateReqDTO;
 import lombok.RequiredArgsConstructor;
@@ -20,8 +19,7 @@ public class ApiAccessLogFrameworkServiceImpl implements ApiAccessLogFrameworkSe
 
     @Override
     @Async
-    public void createApiAccessLog(ApiAccessLog apiAccessLog) {
-        ApiAccessLogCreateReqDTO reqDTO = BeanUtil.copyProperties(apiAccessLog, ApiAccessLogCreateReqDTO.class);
+    public void createApiAccessLog(ApiAccessLogCreateReqDTO reqDTO) {
         apiAccessLogApi.createApiAccessLog(reqDTO);
     }
 

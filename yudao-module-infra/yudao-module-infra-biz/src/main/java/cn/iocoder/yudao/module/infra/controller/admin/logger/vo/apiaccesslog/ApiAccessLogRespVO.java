@@ -48,6 +48,10 @@ public class ApiAccessLogRespVO {
     @ExcelProperty("请求参数")
     private String requestParams;
 
+    @Schema(description = "响应结果")
+    @ExcelProperty("响应结果")
+    private String responseBody;
+
     @Schema(description = "用户 IP", requiredMode = Schema.RequiredMode.REQUIRED, example = "127.0.0.1")
     @ExcelProperty("用户 IP")
     private String userIp;
@@ -55,6 +59,19 @@ public class ApiAccessLogRespVO {
     @Schema(description = "浏览器 UA", requiredMode = Schema.RequiredMode.REQUIRED, example = "Mozilla/5.0")
     @ExcelProperty("浏览器 UA")
     private String userAgent;
+
+    @Schema(description = "操作模块", requiredMode = Schema.RequiredMode.REQUIRED, example = "商品模块")
+    @ExcelProperty("操作模块")
+    private String operateModule;
+
+    @Schema(description = "操作名", requiredMode = Schema.RequiredMode.REQUIRED, example = "创建商品")
+    @ExcelProperty("操作名")
+    private String operateName;
+
+    @Schema(description = "操作分类", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
+    @ExcelProperty(value = "操作分类", converter = DictConvert.class)
+    @DictFormat(DictTypeConstants.OPERATE_TYPE)
+    private Integer operateType;
 
     @Schema(description = "开始请求时间", requiredMode = Schema.RequiredMode.REQUIRED)
     @ExcelProperty("开始请求时间")
