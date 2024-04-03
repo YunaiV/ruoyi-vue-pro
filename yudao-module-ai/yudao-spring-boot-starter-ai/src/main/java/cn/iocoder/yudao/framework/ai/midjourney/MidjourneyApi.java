@@ -1,9 +1,11 @@
-package cn.iocoder.yudao.framework.ai.Midjourney;
+package cn.iocoder.yudao.framework.ai.midjourney;
 
 /**
  * 文档: https://www.xiubbs.com/t-401-1-1.html
  *
  * https://github.com/novicezk/midjourney-proxy/blob/main/README_CN.md
+ *
+ * discord4j、https://github.com/discord-jda/JDA
  *
  */
 public class MidjourneyApi {

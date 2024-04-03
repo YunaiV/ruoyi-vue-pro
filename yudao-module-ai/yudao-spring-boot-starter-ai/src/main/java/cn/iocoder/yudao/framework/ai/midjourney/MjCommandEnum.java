@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.framework.ai.Midjourney;
+package cn.iocoder.yudao.framework.ai.midjourney;
 
 import lombok.Getter;
 
