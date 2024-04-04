@@ -47,10 +47,12 @@ public class MjImagineInteractions implements MjInteractions {
         String requestBody = MjClient.setParams(requestTemplate, requestParams);
         // 发送请求
         String res = MjClient.post(url, midjourneyConfig.getToken(), requestBody);
-        //
-        System.err.println(res);
-        log.info(res);
         // 这个 res 只要不返回值，就是成功!
-        return StrUtil.isBlank(res);
+        boolean isSuccess = StrUtil.isBlank(res);
+        if (isSuccess) {
+            return true;
+        }
+        log.error("请求失败! 请求参数：{} 返回结果! {}", requestBody, res);
+        return isSuccess;
     }
 }
