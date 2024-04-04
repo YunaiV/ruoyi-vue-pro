@@ -1,5 +1,7 @@
 package cn.iocoder.yudao.framework.ai.midjourney.demo;
 
+import cn.iocoder.yudao.framework.ai.midjourney.MidjourneyInteractionsEnum;
+
 /**
  * mj 命令
  */
@@ -12,6 +14,6 @@ public interface MjExecute {
      * @param prompt
      * @return
      */
-    boolean execute(MjCommandEnum mjCommand, String prompt);
+    boolean execute(MidjourneyInteractionsEnum mjCommand, String prompt);
 
 }

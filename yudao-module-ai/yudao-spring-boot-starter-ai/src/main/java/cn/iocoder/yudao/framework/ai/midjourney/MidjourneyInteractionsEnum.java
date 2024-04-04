@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.framework.ai.midjourney.demo;
+package cn.iocoder.yudao.framework.ai.midjourney;
 
 import lombok.Getter;
 
@@ -6,7 +6,7 @@ import lombok.Getter;
  * MJ 命令
  */
 @Getter
-public enum MjCommandEnum {
+public enum MidjourneyInteractionsEnum {
 
     IMAGINE("imagine", "生成图片"),
     DESCRIBE("describe", "生成描述"),
@@ -17,7 +17,7 @@ public enum MjCommandEnum {
 
     ;
 
-    MjCommandEnum(String value, String message) {
+    MidjourneyInteractionsEnum(String value, String message) {
         this.value =value;
         this.message =message;
     }
