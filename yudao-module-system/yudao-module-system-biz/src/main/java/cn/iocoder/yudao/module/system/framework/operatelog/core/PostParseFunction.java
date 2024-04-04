@@ -2,27 +2,26 @@ package cn.iocoder.yudao.module.system.framework.operatelog.core;
 
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.util.StrUtil;
-import cn.iocoder.yudao.module.system.dal.dataobject.dept.DeptDO;
-import cn.iocoder.yudao.module.system.service.dept.DeptService;
+import cn.iocoder.yudao.module.system.dal.dataobject.dept.PostDO;
+import cn.iocoder.yudao.module.system.service.dept.PostService;
 import com.mzt.logapi.service.IParseFunction;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.Resource;
-
 /**
- * 部门名字的 {@link IParseFunction} 实现类
+ * 岗位名字的 {@link IParseFunction} 实现类
  *
  * @author HUIHUI
  */
 @Slf4j
 @Component
-public class DeptParseFunction implements IParseFunction {
+public class PostParseFunction implements IParseFunction {
 
-    public static final String NAME = "getDeptById";
+    public static final String NAME = "getPostById";
 
     @Resource
-    private DeptService deptService;
+    private PostService postService;
 
     @Override
     public String functionName() {
@@ -35,13 +34,13 @@ public class DeptParseFunction implements IParseFunction {
             return "";
         }
 
-        // 获取部门信息
-        DeptDO dept = deptService.getDept(Convert.toLong(value));
-        if (dept == null) {
-            log.warn("[apply][获取部门{{}}为空", value);
+        // 获取岗位信息
+        PostDO post = postService.getPost(Convert.toLong(value));
+        if (post == null) {
+            log.warn("[apply][获取岗位{{}}为空", value);
             return "";
         }
-        return dept.getName();
+        return post.getName();
     }
 
 }

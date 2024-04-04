@@ -52,14 +52,6 @@ public class RoleController {
         return success(true);
     }
 
-    @PutMapping("/update-status")
-    @Operation(summary = "修改角色状态")
-    @PreAuthorize("@ss.hasPermission('system:role:update')")
-    public CommonResult<Boolean> updateRoleStatus(@Valid @RequestBody RoleUpdateStatusReqVO reqVO) {
-        roleService.updateRoleStatus(reqVO.getId(), reqVO.getStatus());
-        return success(true);
-    }
-
     @DeleteMapping("/delete")
     @Operation(summary = "删除角色")
     @Parameter(name = "id", description = "角色编号", required = true, example = "1024")
@@ -87,10 +79,10 @@ public class RoleController {
 
     @GetMapping({"/list-all-simple", "/simple-list"})
     @Operation(summary = "获取角色精简信息列表", description = "只包含被开启的角色，主要用于前端的下拉选项")
-    public CommonResult<List<RoleSimpleRespVO>> getSimpleRoleList() {
+    public CommonResult<List<RoleRespVO>> getSimpleRoleList() {
         List<RoleDO> list = roleService.getRoleListByStatus(singleton(CommonStatusEnum.ENABLE.getStatus()));
         list.sort(Comparator.comparing(RoleDO::getSort));
-        return success(BeanUtils.toBean(list, RoleSimpleRespVO.class));
+        return success(BeanUtils.toBean(list, RoleRespVO.class));
     }
 
     @GetMapping("/export-excel")
