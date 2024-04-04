@@ -7,8 +7,6 @@ package cn.iocoder.yudao.module.infra.enums;
  */
 public interface DictTypeConstants {
 
-    String REDIS_TIMEOUT_TYPE = "infra_redis_timeout_type"; // Redis 超时类型
-
     String JOB_STATUS = "infra_job_status"; // 定时任务状态的枚举
     String JOB_LOG_STATUS = "infra_job_log_status"; // 定时任务日志状态的枚举
 
@@ -16,5 +14,7 @@ public interface DictTypeConstants {
 
     String CONFIG_TYPE = "infra_config_type"; // 参数配置类型
     String BOOLEAN_STRING = "infra_boolean_string"; // Boolean 是否类型
+
+    String OPERATE_TYPE = "infra_operate_type"; // 操作类型
 
 }
