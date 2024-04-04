@@ -1,0 +1,21 @@
+{
+  "type": 2,
+  "guild_id": "$guild_id",
+  "channel_id": "$channel_id",
+  "application_id": "936929561302675456",
+  "session_id": "$session_id",
+  "nonce": "$nonce",
+  "data": {
+    "version": "1166847114203123795",
+    "id": "938956540159881230",
+    "name": "imagine",
+    "type": 1,
+    "options": [
+      {
+        "type": 3,
+        "name": "prompt",
+        "value": "$prompt"
+      }
+    ]
+  }
+}
