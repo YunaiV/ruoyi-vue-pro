@@ -1,13 +1,12 @@
-package cn.iocoder.yudao.framework.ai.midjourney.demo.wss.user;
+package cn.iocoder.yudao.framework.ai.midjourney.webSocket;
 
 
-import cn.hutool.core.exceptions.ValidateException;
 import cn.hutool.core.text.CharSequenceUtil;
 import cn.hutool.core.thread.ThreadUtil;
-import cn.iocoder.yudao.framework.ai.midjourney.demo.jad.DiscordAccount;
-import cn.iocoder.yudao.framework.ai.midjourney.demo.wss.AsyncLockUtils;
-import cn.iocoder.yudao.framework.ai.midjourney.demo.wss.ReturnCode;
-import cn.iocoder.yudao.framework.ai.midjourney.demo.wss.WebSocketStarter;
+import cn.iocoder.yudao.framework.ai.midjourney.MidjourneyConfig;
+import cn.iocoder.yudao.framework.ai.midjourney.constants.MjNotifyCode;
+import cn.iocoder.yudao.framework.ai.midjourney.webSocket.handler.MjWebSocketHandler;
+import cn.iocoder.yudao.framework.ai.midjourney.webSocket.listener.MjMessageListener;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.tomcat.websocket.Constants;
 import org.jetbrains.annotations.NotNull;
@@ -19,15 +18,14 @@ import org.springframework.web.socket.client.standard.StandardWebSocketClient;
 
 import java.io.IOException;
 import java.net.URI;
-import java.time.Duration;
 import java.util.concurrent.TimeoutException;
 
 @Slf4j
-public class SpringUserWebSocketStarter implements WebSocketStarter {
+public class MjWebSocketStarter implements WebSocketStarter {
 	private static final int CONNECT_RETRY_LIMIT = 5;
 
-	private final DiscordAccount account;
-	private final UserMessageListener userMessageListener;
+	private final MidjourneyConfig midjourneyConfig;
+	private final MjMessageListener userMessageListener;
 	private final String wssServer;
 	private final String resumeWss;
 
@@ -36,10 +34,10 @@ public class SpringUserWebSocketStarter implements WebSocketStarter {
 	private WebSocketSession webSocketSession = null;
 	private ResumeData resumeData = null;
 
-	public SpringUserWebSocketStarter(String wssServer, String resumeWss, DiscordAccount account, UserMessageListener userMessageListener) {
+	public MjWebSocketStarter(String wssServer, String resumeWss, MidjourneyConfig midjourneyConfig, MjMessageListener userMessageListener) {
 		this.wssServer = wssServer;
 		this.resumeWss = resumeWss;
-		this.account = account;
+		this.midjourneyConfig = midjourneyConfig;
 		this.userMessageListener = userMessageListener;
 	}
 
@@ -55,8 +53,8 @@ public class SpringUserWebSocketStarter implements WebSocketStarter {
 		headers.add("Cache-Control", "no-cache");
 		headers.add("Pragma", "no-cache");
 		headers.add("Sec-Websocket-Extensions", "permessage-deflate; client_max_window_bits");
-		headers.add("User-Agent", this.account.getUserAgent());
-		var handler = new SpringWebSocketHandler(this.account, this.userMessageListener, this::onSocketSuccess, this::onSocketFailure);
+		headers.add("User-Agent", this.midjourneyConfig.getUserAage());
+		var handler = new MjWebSocketHandler(this.midjourneyConfig, this.userMessageListener, this::onSocketSuccess, this::onSocketFailure);
 		String gatewayUrl;
 		if (reconnect) {
 			gatewayUrl = getGatewayServer(this.resumeData.resumeGatewayUrl()) + "/?encoding=json&v=9&compress=zlib-stream";
@@ -72,12 +70,12 @@ public class SpringUserWebSocketStarter implements WebSocketStarter {
 		socketSessionFuture.addCallback(new ListenableFutureCallback<>() {
 			@Override
 			public void onFailure(@NotNull Throwable e) {
-				onSocketFailure(SpringWebSocketHandler.CLOSE_CODE_EXCEPTION, e.getMessage());
+				onSocketFailure(MjWebSocketHandler.CLOSE_CODE_EXCEPTION, e.getMessage());
 			}
 
 			@Override
 			public void onSuccess(WebSocketSession session) {
-				SpringUserWebSocketStarter.this.webSocketSession = session;
+				MjWebSocketStarter.this.webSocketSession = session;
 			}
 		});
 	}
@@ -85,7 +83,7 @@ public class SpringUserWebSocketStarter implements WebSocketStarter {
 	private void onSocketSuccess(String sessionId, Object sequence, String resumeGatewayUrl) {
 		this.resumeData = new ResumeData(sessionId, sequence, resumeGatewayUrl);
 		this.running = true;
-		notifyWssLock(ReturnCode.SUCCESS, "");
+		notifyWssLock(MjNotifyCode.SUCCESS, "");
 	}
 
 	private void onSocketFailure(int code, String reason) {
@@ -99,13 +97,12 @@ public class SpringUserWebSocketStarter implements WebSocketStarter {
 		}
 		this.running = false;
 		if (code >= 4000) {
-			log.warn("[wss-{}] Can't reconnect! Account disabled. Closed by {}({}).", this.account.getDisplay(), code, reason);
-			disableAccount();
+			log.warn("[wss-{}] Can't reconnect! Account disabled. Closed by {}({}).", this.midjourneyConfig.getChannelId(), code, reason);
 		} else if (code == 2001) {
-			log.warn("[wss-{}] Closed by {}({}). Try reconnect...", this.account.getDisplay(), code, reason);
+			log.warn("[wss-{}] Closed by {}({}). Try reconnect...", this.midjourneyConfig.getChannelId(), code, reason);
 			tryReconnect();
 		} else {
-			log.warn("[wss-{}] Closed by {}({}). Try new connection...", this.account.getDisplay(), code, reason);
+			log.warn("[wss-{}] Closed by {}({}). Try new connection...", this.midjourneyConfig.getChannelId(), code, reason);
 			tryNewConnect();
 		}
 	}
@@ -117,7 +114,7 @@ public class SpringUserWebSocketStarter implements WebSocketStarter {
 			if (e instanceof TimeoutException) {
 				closeSocketSessionWhenIsOpen();
 			}
-			log.warn("[wss-{}] Reconnect fail: {}, Try new connection...", this.account.getDisplay(), e.getMessage());
+			log.warn("[wss-{}] Reconnect fail: {}, Try new connection...", this.midjourneyConfig.getChannelId(), e.getMessage());
 			ThreadUtil.sleep(1000);
 			tryNewConnect();
 		}
@@ -132,39 +129,19 @@ public class SpringUserWebSocketStarter implements WebSocketStarter {
 				if (e instanceof TimeoutException) {
 					closeSocketSessionWhenIsOpen();
 				}
-				log.warn("[wss-{}] New connect fail ({}): {}", this.account.getDisplay(), i, e.getMessage());
+				log.warn("[wss-{}] New connect fail ({}): {}", this.midjourneyConfig.getChannelId(), i, e.getMessage());
 				ThreadUtil.sleep(5000);
 			}
 		}
-		log.error("[wss-{}] Account disabled", this.account.getDisplay());
-		disableAccount();
+		log.error("[wss-{}] Account disabled", this.midjourneyConfig.getChannelId());
 	}
 
 	public void tryStart(boolean reconnect) throws Exception {
 		start(reconnect);
-		AsyncLockUtils.LockObject lock = AsyncLockUtils.waitForLock("wss:" + this.account.getId(), Duration.ofSeconds(20));
-		int code = lock.getProperty("code", Integer.class, 0);
-		if (code == ReturnCode.SUCCESS) {
-			log.debug("[wss-{}] {} success.", this.account.getDisplay(), reconnect ? "Reconnect" : "New connect");
-			return;
-		}
-		throw new ValidateException(lock.getProperty("description", String.class));
 	}
 
 	private void notifyWssLock(int code, String reason) {
-		AsyncLockUtils.LockObject lock = AsyncLockUtils.getLock("wss:" + this.account.getId());
-		if (lock != null) {
-			lock.setProperty("code", code);
-			lock.setProperty("description", reason);
-			lock.awake();
-		}
-	}
-
-	private void disableAccount() {
-		if (Boolean.FALSE.equals(this.account.isEnable())) {
-			return;
-		}
-		this.account.setEnable(false);
+		System.err.println("notifyWssLock: " + code + " - " + reason);
 	}
 
 	private void closeSocketSessionWhenIsOpen() {

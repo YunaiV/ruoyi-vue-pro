@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.framework.ai.midjourney.interactions;
 
-import cn.iocoder.yudao.framework.ai.midjourney.MidjourneyInteractionsEnum;
+import cn.iocoder.yudao.framework.ai.midjourney.constants.MjInteractionsEnum;
 
 import java.util.List;
 
@@ -12,7 +12,7 @@ import java.util.List;
  */
 public interface MjInteractions {
 
-    List<MidjourneyInteractionsEnum> supperInteractions();
+    List<MjInteractionsEnum> supperInteractions();
 
     Boolean execute(String prompt);
 }

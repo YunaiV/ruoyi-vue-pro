@@ -1,7 +1,7 @@
-package cn.iocoder.yudao.framework.ai.midjourney.demo.wss;
+package cn.iocoder.yudao.framework.ai.midjourney.constants;
 
 
-public enum MessageType {
+public enum MjMessageTypeEnum {
 	/**
 	 * 创建.
 	 */
@@ -15,7 +15,7 @@ public enum MessageType {
 	 */
 	DELETE;
 
-	public static MessageType of(String type) {
+	public static MjMessageTypeEnum of(String type) {
 		return switch (type) {
 			case "MESSAGE_CREATE" -> CREATE;
 			case "MESSAGE_UPDATE" -> UPDATE;

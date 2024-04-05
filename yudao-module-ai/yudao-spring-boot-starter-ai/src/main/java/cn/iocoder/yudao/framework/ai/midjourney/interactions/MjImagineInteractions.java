@@ -3,7 +3,7 @@ package cn.iocoder.yudao.framework.ai.midjourney.interactions;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.ai.midjourney.MidjourneyConfig;
-import cn.iocoder.yudao.framework.ai.midjourney.MidjourneyInteractionsEnum;
+import cn.iocoder.yudao.framework.ai.midjourney.constants.MjInteractionsEnum;
 import com.google.common.collect.Maps;
 import lombok.extern.slf4j.Slf4j;
 
@@ -27,7 +27,7 @@ public class MjImagineInteractions implements MjInteractions {
     }
 
     @Override
-    public List<MidjourneyInteractionsEnum> supperInteractions() {
+    public List<MjInteractionsEnum> supperInteractions() {
         return null;
     }
 

@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.framework.ai.midjourney.demo.wss.user;
+package cn.iocoder.yudao.framework.ai.midjourney.webSocket;
 
 
 public interface SuccessCallback {

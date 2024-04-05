@@ -1,9 +1,9 @@
-package cn.iocoder.yudao.framework.ai.midjourney.demo.wss;
+package cn.iocoder.yudao.framework.ai.midjourney.constants;
 
 import lombok.experimental.UtilityClass;
 
 @UtilityClass
-public final class ReturnCode {
+public final class MjNotifyCode {
 	/**
 	 * 成功.
 	 */

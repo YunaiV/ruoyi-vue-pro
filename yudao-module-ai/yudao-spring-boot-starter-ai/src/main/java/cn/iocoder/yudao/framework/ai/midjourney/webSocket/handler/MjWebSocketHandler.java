@@ -1,11 +1,14 @@
-package cn.iocoder.yudao.framework.ai.midjourney.demo.wss.user;
+package cn.iocoder.yudao.framework.ai.midjourney.webSocket.handler;
 
 import cn.hutool.core.text.CharSequenceUtil;
 import cn.hutool.core.thread.ThreadUtil;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.http.useragent.UserAgent;
 import cn.hutool.http.useragent.UserAgentUtil;
-import cn.iocoder.yudao.framework.ai.midjourney.demo.jad.DiscordAccount;
+import cn.iocoder.yudao.framework.ai.midjourney.MidjourneyConfig;
+import cn.iocoder.yudao.framework.ai.midjourney.webSocket.FailureCallback;
+import cn.iocoder.yudao.framework.ai.midjourney.webSocket.SuccessCallback;
+import cn.iocoder.yudao.framework.ai.midjourney.webSocket.listener.MjMessageListener;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.utils.data.DataArray;
@@ -26,13 +29,13 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 @Slf4j
-public class SpringWebSocketHandler implements WebSocketHandler {
+public class MjWebSocketHandler implements WebSocketHandler {
 	public static final int CLOSE_CODE_RECONNECT = 2001;
 	public static final int CLOSE_CODE_INVALIDATE = 1009;
 	public static final int CLOSE_CODE_EXCEPTION = 1011;
 
-	private final DiscordAccount account;
-	private final UserMessageListener userMessageListener;
+	private final MidjourneyConfig midjourneyConfig;
+	private final MjMessageListener userMessageListener;
 	private final SuccessCallback successCallback;
 	private final FailureCallback failureCallback;
 
@@ -54,8 +57,11 @@ public class SpringWebSocketHandler implements WebSocketHandler {
 
 	private final Decompressor decompressor = new ZlibDecompressor(2048);
 
-	public SpringWebSocketHandler(DiscordAccount account, UserMessageListener userMessageListener, SuccessCallback successCallback, FailureCallback failureCallback) {
-		this.account = account;
+	public MjWebSocketHandler(MidjourneyConfig account,
+							  MjMessageListener userMessageListener,
+							  SuccessCallback successCallback,
+							  FailureCallback failureCallback) {
+		this.midjourneyConfig = account;
 		this.userMessageListener = userMessageListener;
 		this.successCallback = successCallback;
 		this.failureCallback = failureCallback;
@@ -70,7 +76,7 @@ public class SpringWebSocketHandler implements WebSocketHandler {
 
 	@Override
 	public void handleTransportError(@NotNull WebSocketSession session, @NotNull Throwable e) throws Exception {
-		log.error("[wss-{}] Transport error", this.account.getDisplay(), e);
+		log.error("[wss-{}] Transport error", this.midjourneyConfig.getChannelId(), e);
 		onFailure(CLOSE_CODE_EXCEPTION, "transport error");
 	}
 
@@ -108,7 +114,7 @@ public class SpringWebSocketHandler implements WebSocketHandler {
 			case WebSocketCode.RECONNECT -> onFailure(CLOSE_CODE_RECONNECT, "receive server reconnect");
 			case WebSocketCode.INVALIDATE_SESSION -> onFailure(CLOSE_CODE_INVALIDATE, "receive session invalid");
 			case WebSocketCode.DISPATCH -> handleDispatch(data);
-			default -> log.debug("[wss-{}] Receive unknown code: {}.", account.getDisplay(), data);
+			default -> log.debug("[wss-{}] Receive unknown code: {}.", midjourneyConfig.getChannelId(), data);
 		}
 	}
 
@@ -129,7 +135,7 @@ public class SpringWebSocketHandler implements WebSocketHandler {
 			try {
 				this.userMessageListener.onMessage(raw);
 			} catch (Exception e) {
-				log.error("[wss-{}] Handle message error", this.account.getDisplay(), e);
+				log.error("[wss-{}] Handle message error", this.midjourneyConfig.getChannelId(), e);
 			}
 		}
 	}
@@ -160,7 +166,7 @@ public class SpringWebSocketHandler implements WebSocketHandler {
 		if (CharSequenceUtil.isBlank(this.sessionId)) {
 			sendMessage(session, WebSocketCode.IDENTIFY, this.authData);
 		} else {
-			var data = DataObject.empty().put("token", this.account.getUserToken())
+			var data = DataObject.empty().put("token", this.midjourneyConfig.getToken())
 					.put("session_id", this.sessionId).put("seq", this.sequence);
 			sendMessage(session, WebSocketCode.RESUME, data);
 		}
@@ -171,7 +177,7 @@ public class SpringWebSocketHandler implements WebSocketHandler {
 		try {
 			session.sendMessage(new TextMessage(data.toString()));
 		} catch (IOException e) {
-			log.error("[wss-{}] Send message error", this.account.getDisplay(), e);
+			log.error("[wss-{}] Send message error", this.midjourneyConfig.getChannelId(), e);
 			onFailure(CLOSE_CODE_EXCEPTION, "send message error");
 		}
 	}
@@ -201,10 +207,10 @@ public class SpringWebSocketHandler implements WebSocketHandler {
 	}
 
 	private DataObject createAuthData() {
-		UserAgent userAgent = UserAgentUtil.parse(this.account.getUserAgent());
+		UserAgent userAgent = UserAgentUtil.parse(this.midjourneyConfig.getUserAage());
 		DataObject connectionProperties = DataObject.empty()
 				.put("browser", userAgent.getBrowser().getName())
-				.put("browser_user_agent", this.account.getUserAgent())
+				.put("browser_user_agent", this.midjourneyConfig.getUserAage())
 				.put("browser_version", userAgent.getVersion())
 				.put("client_build_number", 222963)
 				.put("client_event_source", null)
@@ -235,6 +241,6 @@ public class SpringWebSocketHandler implements WebSocketHandler {
 				.put("compress", false)
 				.put("presence", presence)
 				.put("properties", connectionProperties)
-				.put("token", this.account.getUserToken());
+				.put("token", this.midjourneyConfig.getToken());
 	}
 }
