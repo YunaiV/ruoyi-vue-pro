@@ -3,6 +3,8 @@ package cn.iocoder.yudao.module.bpm.service.definition;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.map.MapUtil;
+import cn.hutool.core.util.StrUtil;
+import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.simple.BpmSimpleModelNodeVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.simple.BpmSimpleModelSaveReqVO;
 import cn.iocoder.yudao.module.bpm.enums.definition.BpmSimpleModelNodeType;
@@ -52,9 +54,12 @@ public class BpmSimpleModelServiceImpl implements BpmSimpleModelService {
 //            // TODO BPMN XML 已经存在。如何修改 ?? TODO add by 芋艿：感觉一个流程，只能二选一，要么 bpmn、要么 simple
 //            return Boolean.FALSE;
 //        }
-        // 暂时直接修改
+        // 1. JSON 转换成 bpmnModel
         BpmnModel bpmnModel = BpmnModelUtils.convertSimpleModelToBpmnModel(model.getKey(), model.getName(), reqVO.getSimpleModelBody());
-        bpmModelService.saveModelBpmnXml(model.getId(), BpmnModelUtils.getBpmnXml(bpmnModel));
+        // 2.1 保存 Bpmn XML
+        bpmModelService.saveModelBpmnXml(model.getId(), StrUtil.utf8Bytes(BpmnModelUtils.getBpmnXml(bpmnModel)));
+        // 2.2 保存 JSON 数据
+        bpmModelService.saveModelSimpleJson(model.getId(), JsonUtils.toJsonByte(reqVO.getSimpleModelBody()));
         return Boolean.TRUE;
     }
 
@@ -64,12 +69,14 @@ public class BpmSimpleModelServiceImpl implements BpmSimpleModelService {
         if (model == null) {
             throw exception(MODEL_NOT_EXISTS);
         }
-        byte[] bpmnBytes = bpmModelService.getModelBpmnXML(modelId);
-        BpmnModel bpmnModel = BpmnModelUtils.getBpmnModel(bpmnBytes);
-        return convertBpmnModelToSimpleModel(bpmnModel);
+        // 暂时不用 bpmn 转 json， 有点复杂,
+        // 通过 ACT_RE_MODEL 表 EDITOR_SOURCE_EXTRA_VALUE_ID_  获取 仿钉钉快搭模型的JSON 数据
+        byte[] jsonBytes = bpmModelService.getModelSimpleJson(model.getId());
+        return JsonUtils.parseObject(jsonBytes, BpmSimpleModelNodeVO.class);
     }
 
     // TODO @jason：一般要支持这个么？感觉 bpmn 转 json 支持会不会太复杂。可以优先级低一点，做下调研~
+
     /**
      * Bpmn Model 转换成 仿钉钉流程设计模型数据结构(json) 待完善
      *

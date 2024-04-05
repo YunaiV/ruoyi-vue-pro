@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.simple;
 
 import cn.iocoder.yudao.framework.common.validation.InEnum;
 import cn.iocoder.yudao.module.bpm.enums.definition.BpmSimpleModelNodeType;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -12,6 +13,7 @@ import java.util.Map;
 
 @Schema(description = "管理后台 - 仿钉钉流程设计模型节点 VO")
 @Data
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class BpmSimpleModelNodeVO {
 
     @Schema(description = "模型节点编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "StartEvent_1")
