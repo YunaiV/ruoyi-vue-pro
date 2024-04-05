@@ -2,8 +2,8 @@ package cn.iocoder.yudao.framework.ai.image;
 
 import cn.hutool.core.io.FileUtil;
 import cn.iocoder.yudao.framework.ai.midjourney.MidjourneyConfig;
-import cn.iocoder.yudao.framework.ai.midjourney.demo.wss.user.MjMessageListener;
-import cn.iocoder.yudao.framework.ai.midjourney.demo.wss.user.MjWebSocketStarter;
+import cn.iocoder.yudao.framework.ai.midjourney.webSocket.listener.MjMessageListener;
+import cn.iocoder.yudao.framework.ai.midjourney.webSocket.MjWebSocketStarter;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -23,13 +23,13 @@ public class MjWebSocketTests {
 
     @Before
     public void setup() {
-        String token =  "OTcwNDc3NzQxMjUyMTY5NzI4.GJcVxa.VrzMii8dsHOJAPZn4Mw8GuEo7_nIUJij9JIHD4";
+        String token =  "OTcyNzIxMzA0ODkxNDUzNDUw.G_vMOz.BO_Q0sXAD80u5ZKIHPNYDTRX_FgeKL3cKFc53I";
         Map<String, String> requestTemplates = new HashMap<>();
         List<File> files = FileUtil.loopFiles("/Users/fansili/projects/github/ruoyi-vue-pro/yudao-module-ai/yudao-spring-boot-starter-ai/src/main/resources/http-body");
         for (File file : files) {
             requestTemplates.put(file.getName().replace(".json", ""), FileUtil.readUtf8String(file));
         }
-        this.midjourneyConfig = new MidjourneyConfig(token, "1225414986084388926", "1225414986587832385", requestTemplates);
+        this.midjourneyConfig = new MidjourneyConfig(token, "1225608134878302329", "1225608134878302332", requestTemplates);
     }
 
     @Test

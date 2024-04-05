@@ -3,6 +3,7 @@ package cn.iocoder.yudao.framework.ai.image;
 import cn.hutool.core.io.FileUtil;
 import cn.iocoder.yudao.framework.ai.midjourney.MidjourneyConfig;
 import cn.iocoder.yudao.framework.ai.midjourney.interactions.MjImagineInteractions;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.io.File;
@@ -18,16 +19,20 @@ import java.util.Map;
  */
 public class MjTests {
 
-    @Test
-    public void mjImage() {
-        String token =  "NTY5MDY4NDAxNzEyOTU1Mzky.G4-Fu0.MzD-7ll-ElbXTTgDPHF-WS_UyhMAfbKN3WyyBc";
+    private MidjourneyConfig midjourneyConfig;
+    @Before
+    public void setup() {
+        String token =  "OTcwNDc3NzQxMjUyMTY5NzI4.GJcVxa.VrzMii8dsHOJAPZn4Mw8GuEo7_nIUJij9JIHD4";
         Map<String, String> requestTemplates = new HashMap<>();
         List<File> files = FileUtil.loopFiles("/Users/fansili/projects/github/ruoyi-vue-pro/yudao-module-ai/yudao-spring-boot-starter-ai/src/main/resources/http-body");
         for (File file : files) {
             requestTemplates.put(file.getName().replace(".json", ""), FileUtil.readUtf8String(file));
         }
-        MidjourneyConfig midjourneyConfig = new MidjourneyConfig(
-                token, "1221445697157468200", "1221445862962630706", requestTemplates);
+        this.midjourneyConfig = new MidjourneyConfig(token, "1225414986084388926", "1225414986587832385", requestTemplates);
+    }
+
+    @Test
+    public void mjImage() {
         MjImagineInteractions mjImagineInteractions = new MjImagineInteractions(midjourneyConfig);
         mjImagineInteractions.execute("童话里应该是什么样子？");
     }
