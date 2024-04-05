@@ -30,16 +30,41 @@ import java.util.concurrent.TimeUnit;
 
 @Slf4j
 public class MjWebSocketHandler implements WebSocketHandler {
+	/**
+	 * close 错误码：重连
+	 */
 	public static final int CLOSE_CODE_RECONNECT = 2001;
+	/**
+	 * close 错误码：无效、作废
+	 */
 	public static final int CLOSE_CODE_INVALIDATE = 1009;
+	/**
+	 * close 错误码：异常
+	 */
 	public static final int CLOSE_CODE_EXCEPTION = 1011;
-
+	/**
+	 * mj配置文件
+	 */
 	private final MidjourneyConfig midjourneyConfig;
+	/**
+	 * mj 消息监听
+	 */
 	private final MjMessageListener userMessageListener;
+	/**
+	 * 成功回调
+	 */
 	private final SuccessCallback successCallback;
+	/**
+	 * 失败回调
+	 */
 	private final FailureCallback failureCallback;
-
+	/**
+	 * 心跳执行器
+	 */
 	private final ScheduledExecutorService heartExecutor;
+	/**
+	 * auth数据
+	 */
 	private final DataObject authData;
 
 	@Setter
@@ -55,6 +80,9 @@ public class MjWebSocketHandler implements WebSocketHandler {
 	private Future<?> heartbeatInterval;
 	private Future<?> heartbeatTimeout;
 
+	/**
+	 * 处理 message 消息的 Decompressor
+	 */
 	private final Decompressor decompressor = new ZlibDecompressor(2048);
 
 	public MjWebSocketHandler(MidjourneyConfig account,
@@ -77,11 +105,13 @@ public class MjWebSocketHandler implements WebSocketHandler {
 	@Override
 	public void handleTransportError(@NotNull WebSocketSession session, @NotNull Throwable e) throws Exception {
 		log.error("[wss-{}] Transport error", this.midjourneyConfig.getChannelId(), e);
+		// 通知链接异常
 		onFailure(CLOSE_CODE_EXCEPTION, "transport error");
 	}
 
 	@Override
 	public void afterConnectionClosed(@NotNull WebSocketSession session, @NotNull CloseStatus closeStatus) throws Exception {
+		// 链接关闭
 		onFailure(closeStatus.getCode(), closeStatus.getReason());
 	}
 
@@ -92,13 +122,18 @@ public class MjWebSocketHandler implements WebSocketHandler {
 
 	@Override
 	public void handleMessage(@NotNull WebSocketSession session, WebSocketMessage<?> message) throws Exception {
+		// 获取 message 消息
 		ByteBuffer buffer = (ByteBuffer) message.getPayload();
+		// 解析 message
 		byte[] decompressed = decompressor.decompress(buffer.array());
 		if (decompressed == null) {
 			return;
 		}
+		// 转换 json
 		String json = new String(decompressed, StandardCharsets.UTF_8);
+		// 转换 jda 自带的 dataObject(和json object 差不多)
 		DataObject data = DataObject.fromJson(json);
+		// 获取消息类型
 		int opCode = data.getInt("op");
 		switch (opCode) {
 			case WebSocketCode.HEARTBEAT -> handleHeartbeat(session);
