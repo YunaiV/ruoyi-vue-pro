@@ -20,8 +20,10 @@ public enum BpmSimpleModelNodeType implements IntArrayValuable {
     // TODO @jaosn：-1、0、1、4、-2 是前端已经定义好的么？感觉未来可以考虑搞成和 BPMN 尽量一致的单词哈；类似 usertask 用户审批；
     START_EVENT_NODE(0, "开始节点"),
     APPROVE_USER_NODE (1, "审批人节点"),
+    // 抄送人节点、对应 BPMN 的 ScriptTask. 使用ScriptTask 原因。好像 ServiceTask 自定义属性不能写入 XML
+    SCRIPT_TASK_NODE(2, "抄送人节点"),
     EXCLUSIVE_GATEWAY_NODE(4, "排他网关"),
-    END_NODE(-2, "结束节点");
+    END_EVENT_NODE(-2, "结束节点");
 
     public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(BpmSimpleModelNodeType::getType).toArray();
 

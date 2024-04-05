@@ -185,7 +185,8 @@ public class BpmTaskServiceImpl implements BpmTaskService {
 
         // 2. 抄送用户
         if (CollUtil.isNotEmpty(reqVO.getCopyUserIds())) {
-            processInstanceCopyService.createProcessInstanceCopy(reqVO.getCopyUserIds(), reqVO.getId());
+            processInstanceCopyService.createProcessInstanceCopy(reqVO.getCopyUserIds(), instance.getProcessInstanceId(),
+                    reqVO.getId(), task.getName());
         }
 
         // 情况一：被委派的任务，不调用 complete 去完成任务
