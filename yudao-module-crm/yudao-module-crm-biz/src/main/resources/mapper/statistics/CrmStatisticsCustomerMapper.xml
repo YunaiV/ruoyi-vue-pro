@@ -18,17 +18,18 @@
 
     <select id="selectCustomerDealCountGroupByDate"
             resultType="cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.customer.CrmStatisticsCustomerSummaryByDateRespVO">
-        SELECT DATE_FORMAT(order_date, '%Y-%m-%d') AS time,
-               COUNT(DISTINCT customer_id) AS customerDealCount
-          FROM crm_contract
-         WHERE deleted = 0
-           AND audit_status = ${@cn.iocoder.yudao.module.crm.enums.common.CrmAuditStatusEnum@APPROVE.status}
-           AND owner_user_id IN
+        SELECT DATE_FORMAT(customer.create_time, '%Y-%m-%d') AS time,
+               COUNT(DISTINCT customer.id) AS customer_deal_count
+          FROM crm_customer AS customer
+                LEFT JOIN crm_contract AS contract ON contract.customer_id = customer.id
+         WHERE customer.deleted = 0 AND contract.deleted = 0
+           AND contract.audit_status = ${@cn.iocoder.yudao.module.crm.enums.common.CrmAuditStatusEnum@APPROVE.status}
+           AND customer.owner_user_id IN
                 <foreach collection="userIds" item="userId" open="(" close=")" separator=",">
                     #{userId}
                 </foreach>
-          AND create_time BETWEEN #{times[0],javaType=java.time.LocalDateTime} AND #{times[1],javaType=java.time.LocalDateTime}
-        GROUP BY time
+           AND contract.create_time BETWEEN #{times[0],javaType=java.time.LocalDateTime} AND #{times[1],javaType=java.time.LocalDateTime}
+         GROUP BY time
     </select>
 
     <select id="selectCustomerCreateCountGroupByUser"
