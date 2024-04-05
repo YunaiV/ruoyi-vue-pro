@@ -91,6 +91,12 @@ spring:
     redis:
       repositories:
         enabled: false # 项目未使用到 Spring Data Redis 的 Repository，所以直接禁用，保证启动速度
+
+# VO 转换（数据翻译）相关
+easy-trans:
+  is-enable-global: true # 启用全局翻译（拦截所有 SpringMVC ResponseBody 进行自动翻译 )。如果对于性能要求很高可关闭此配置，或通过 @IgnoreTrans 忽略某个接口
+  is-enable-cloud: false # 禁用 TransType.RPC 微服务模式
+
 --- #################### 验证码相关配置 ####################
 
 aj:
@@ -194,7 +200,6 @@ yudao:
       - /admin-api/system/sms/callback/* # 短信回调接口，无法带上租户编号
       - /admin-api/pay/notify/** # 支付回调通知，不携带租户编号
       - /jmreport/* # 积木报表，无法携带租户编号
-      - /ureport/* # UReport 报表，无法携带租户编号
       - /admin-api/mp/open/** # 微信公众号开放平台，微信回调接口，无法携带租户编号
     ignore-tables:
       - system_tenant
@@ -233,7 +238,6 @@ yudao:
       - jimu_report_link
       - jimu_report_map
       - jimu_report_share
-      - report_ureport_data
       - rep_demo_dxtj
       - rep_demo_employee
       - rep_demo_gongsi
@@ -267,9 +271,3 @@ debug: false
 jeecg:
   jmreport:
     saas-mode: tenant
-
-# UReport 配置
-ureport:
-  provider:
-    database:
-        disabled: false

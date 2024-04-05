@@ -5,7 +5,6 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.common.util.object.PageUtils;
 import cn.iocoder.yudao.framework.common.util.validation.ValidationUtils;
-import cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.BpmModelCreateReqVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.BpmModelPageReqVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.BpmModelUpdateReqVO;
@@ -14,6 +13,7 @@ import cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmFormDO;
 import cn.iocoder.yudao.module.bpm.enums.definition.BpmModelFormTypeEnum;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.candidate.BpmTaskCandidateInvoker;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.util.BpmnModelUtils;
+import cn.iocoder.yudao.module.bpm.framework.flowable.core.util.FlowableUtils;
 import cn.iocoder.yudao.module.bpm.service.definition.dto.BpmModelMetaInfoRespDTO;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
@@ -78,7 +78,7 @@ public class BpmModelServiceImpl implements BpmModelService {
             return PageResult.empty(count);
         }
         List<Model> models = modelQuery
-                .modelTenantId(TenantContextHolder.getTenantIdStr())
+                .modelTenantId(FlowableUtils.getTenantId())
                 .orderByCreateTime().desc()
                 .listPage(PageUtils.getStart(pageVO), pageVO.getPageSize());
         return new PageResult<>(models, count);
@@ -99,7 +99,7 @@ public class BpmModelServiceImpl implements BpmModelService {
         // 创建流程定义
         Model model = repositoryService.newModel();
         BpmModelConvert.INSTANCE.copyToCreateModel(model, createReqVO);
-        model.setTenantId(TenantContextHolder.getTenantIdStr());
+        model.setTenantId(FlowableUtils.getTenantId());
         // 保存流程定义
         repositoryService.saveModel(model);
         // 保存 BPMN XML

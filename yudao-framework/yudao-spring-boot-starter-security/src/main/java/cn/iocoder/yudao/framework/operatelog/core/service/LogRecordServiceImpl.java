@@ -5,7 +5,7 @@ import cn.iocoder.yudao.framework.common.util.servlet.ServletUtils;
 import cn.iocoder.yudao.framework.security.core.LoginUser;
 import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
 import cn.iocoder.yudao.module.system.api.logger.OperateLogApi;
-import cn.iocoder.yudao.module.system.api.logger.dto.OperateLogV2CreateReqDTO;
+import cn.iocoder.yudao.module.system.api.logger.dto.OperateLogCreateReqDTO;
 import com.mzt.logapi.beans.LogRecord;
 import com.mzt.logapi.service.ILogRecordService;
 import jakarta.annotation.Resource;
@@ -30,7 +30,7 @@ public class LogRecordServiceImpl implements ILogRecordService {
     @Override
     public void record(LogRecord logRecord) {
         // 1. 补全通用字段
-        OperateLogV2CreateReqDTO reqDTO = new OperateLogV2CreateReqDTO();
+        OperateLogCreateReqDTO reqDTO = new OperateLogCreateReqDTO();
         reqDTO.setTraceId(TracerUtils.getTraceId());
         // 补充用户信息
         fillUserFields(reqDTO);
@@ -40,12 +40,10 @@ public class LogRecordServiceImpl implements ILogRecordService {
         fillRequestFields(reqDTO);
 
         // 2. 异步记录日志
-        operateLogApi.createOperateLogV2(reqDTO);
-        // TODO 测试结束删除或搞个开关
-        log.info("操作日志 ===> {}", reqDTO);
+        operateLogApi.createOperateLog(reqDTO);
     }
 
-    private static void fillUserFields(OperateLogV2CreateReqDTO reqDTO) {
+    private static void fillUserFields(OperateLogCreateReqDTO reqDTO) {
         // 使用 SecurityFrameworkUtils。因为要考虑，rpc、mq、job，它其实不是 web；
         LoginUser loginUser = SecurityFrameworkUtils.getLoginUser();
         if (loginUser == null) {
@@ -55,7 +53,7 @@ public class LogRecordServiceImpl implements ILogRecordService {
         reqDTO.setUserType(loginUser.getUserType());
     }
 
-    public static void fillModuleFields(OperateLogV2CreateReqDTO reqDTO, LogRecord logRecord) {
+    public static void fillModuleFields(OperateLogCreateReqDTO reqDTO, LogRecord logRecord) {
         reqDTO.setType(logRecord.getType()); // 大模块类型，例如：CRM 客户
         reqDTO.setSubType(logRecord.getSubType());// 操作名称，例如：转移客户
         reqDTO.setBizId(Long.parseLong(logRecord.getBizNo())); // 业务编号，例如：客户编号
@@ -63,7 +61,7 @@ public class LogRecordServiceImpl implements ILogRecordService {
         reqDTO.setExtra(logRecord.getExtra()); // 拓展字段，有些复杂的业务，需要记录一些字段 ( JSON 格式 )，例如说，记录订单编号，{ orderId: "1"}
     }
 
-    private static void fillRequestFields(OperateLogV2CreateReqDTO reqDTO) {
+    private static void fillRequestFields(OperateLogCreateReqDTO reqDTO) {
         // 获得 Request 对象
         HttpServletRequest request = ServletUtils.getRequest();
         if (request == null) {

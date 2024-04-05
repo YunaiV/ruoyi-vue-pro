@@ -1,10 +1,12 @@
 package cn.iocoder.yudao.module.bpm.framework.flowable.core.util;
 
+import cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmConstants;
 import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.common.engine.api.variable.VariableContainer;
 import org.flowable.common.engine.impl.el.ExpressionManager;
 import org.flowable.common.engine.impl.identity.Authentication;
+import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.util.CommandContextUtil;
@@ -30,6 +32,11 @@ public class FlowableUtils {
 
     public static void clearAuthenticatedUserId() {
         Authentication.setAuthenticatedUserId(null);
+    }
+
+    public static String getTenantId() {
+        Long tenantId = TenantContextHolder.getTenantId();
+        return tenantId != null ? String.valueOf(tenantId) : ProcessEngineConfiguration.NO_TENANT_ID;
     }
 
     // ========== Execution 相关的工具方法 ==========
