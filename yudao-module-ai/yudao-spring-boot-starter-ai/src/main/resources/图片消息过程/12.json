@@ -1,0 +1,145 @@
+{
+  "mention_everyone": false,
+  "pinned": false,
+  "components": [
+    {
+      "components": [
+        {
+          "custom_id": "MJ::JOB::upsample::1::8f23f288-6028-468b-8056-1e4adef73985",
+          "style": 2,
+          "label": "U1",
+          "type": 2
+        },
+        {
+          "custom_id": "MJ::JOB::upsample::2::8f23f288-6028-468b-8056-1e4adef73985",
+          "style": 2,
+          "label": "U2",
+          "type": 2
+        },
+        {
+          "custom_id": "MJ::JOB::upsample::3::8f23f288-6028-468b-8056-1e4adef73985",
+          "style": 2,
+          "label": "U3",
+          "type": 2
+        },
+        {
+          "custom_id": "MJ::JOB::upsample::4::8f23f288-6028-468b-8056-1e4adef73985",
+          "style": 2,
+          "label": "U4",
+          "type": 2
+        },
+        {
+          "emoji": {
+            "name": "🔄"
+          },
+          "custom_id": "MJ::JOB::reroll::0::8f23f288-6028-468b-8056-1e4adef73985::SOLO",
+          "style": 2,
+          "type": 2
+        }
+      ],
+      "type": 1
+    },
+    {
+      "components": [
+        {
+          "custom_id": "MJ::JOB::variation::1::8f23f288-6028-468b-8056-1e4adef73985",
+          "style": 2,
+          "label": "V1",
+          "type": 2
+        },
+        {
+          "custom_id": "MJ::JOB::variation::2::8f23f288-6028-468b-8056-1e4adef73985",
+          "style": 2,
+          "label": "V2",
+          "type": 2
+        },
+        {
+          "custom_id": "MJ::JOB::variation::3::8f23f288-6028-468b-8056-1e4adef73985",
+          "style": 2,
+          "label": "V3",
+          "type": 2
+        },
+        {
+          "custom_id": "MJ::JOB::variation::4::8f23f288-6028-468b-8056-1e4adef73985",
+          "style": 2,
+          "label": "V4",
+          "type": 2
+        }
+      ],
+      "type": 1
+    }
+  ],
+  "attachments": [
+    {
+      "filename": "jverbalu4990__8f23f288-6028-468b-8056-1e4adef73985.png",
+      "size": 7092878,
+      "content_type": "image/png",
+      "width": 2048,
+      "placeholder_version": 1,
+      "proxy_url": "https://media.discordapp.net/attachments/1225608134878302332/1225630861899333652/jverbalu4990__8f23f288-6028-468b-8056-1e4adef73985.png?ex=6621d4b0&is=660f5fb0&hm=658c7766ac3df7e484ccf2e1a30b0afc266ec38e5b2da6c95f12cb7f9c204886&",
+      "placeholder": "YRgODwJvpY1XlXl2h0iYh4iIePkQqgkB",
+      "id": "1225630861899333652",
+      "url": "https://cdn.discordapp.com/attachments/1225608134878302332/1225630861899333652/jverbalu4990__8f23f288-6028-468b-8056-1e4adef73985.png?ex=6621d4b0&is=660f5fb0&hm=658c7766ac3df7e484ccf2e1a30b0afc266ec38e5b2da6c95f12cb7f9c204886&",
+      "height": 2048
+    }
+  ],
+  "author": {
+    "global_name": null,
+    "bot": true,
+    "avatar_decoration_data": null,
+    "public_flags": 589824,
+    "id": "936929561302675456",
+    "avatar": "f6ce562a6b4979c4b1cbc5b436d3be76",
+    "username": "Midjourney Bot",
+    "discriminator": "9282"
+  },
+  "flags": 0,
+  "type": 0,
+  "mention_roles": [],
+  "edited_timestamp": null,
+  "content": "**南极应该是什么样子？ --v 6.0 --style raw** - <@972721304891453450> (fast, stealth)",
+  "tts": false,
+  "referenced_message": null,
+  "mentions": [
+    {
+      "global_name": "JVerbalu",
+      "avatar_decoration_data": null,
+      "member": {
+        "premium_since": null,
+        "nick": null,
+        "joined_at": "2024-04-05T00:49:10.062000+00:00",
+        "communication_disabled_until": null,
+        "roles": [],
+        "pending": false,
+        "flags": 0,
+        "deaf": false,
+        "mute": false,
+        "avatar": null
+      },
+      "public_flags": 0,
+      "id": "972721304891453450",
+      "avatar": "3646118d04fd12dfd301c4fd17afd801",
+      "username": "jverbalu4990",
+      "discriminator": "0"
+    }
+  ],
+  "member": {
+    "premium_since": null,
+    "nick": null,
+    "joined_at": "2024-04-05T00:49:35.840941+00:00",
+    "communication_disabled_until": null,
+    "roles": [
+      "1225608242688819214"
+    ],
+    "pending": false,
+    "flags": 0,
+    "deaf": false,
+    "mute": false,
+    "avatar": null
+  },
+  "guild_id": "1225608134878302329",
+  "id": "1225630862393999442",
+  "embeds": [],
+  "channel_id": "1225608134878302332",
+  "timestamp": "2024-04-05T02:19:28.715000+00:00"
+}

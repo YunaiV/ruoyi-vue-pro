@@ -1,0 +1,41 @@
+{
+  "mention_everyone": false,
+  "pinned": false,
+  "components": [],
+  "attachments": [],
+  "author": {
+    "global_name": "JVerbalu",
+    "avatar_decoration_data": null,
+    "public_flags": 0,
+    "id": "972721304891453450",
+    "avatar": "3646118d04fd12dfd301c4fd17afd801",
+    "username": "jverbalu4990",
+    "discriminator": "0"
+  },
+  "flags": 0,
+  "type": 0,
+  "mention_roles": [],
+  "nonce": "1225630680067604480",
+  "edited_timestamp": null,
+  "content": "南极应该是什么样子？",
+  "tts": false,
+  "referenced_message": null,
+  "mentions": [],
+  "member": {
+    "premium_since": null,
+    "nick": null,
+    "joined_at": "2024-04-05T00:49:10.062000+00:00",
+    "communication_disabled_until": null,
+    "roles": [],
+    "pending": false,
+    "flags": 0,
+    "deaf": false,
+    "mute": false,
+    "avatar": null
+  },
+  "guild_id": "1225608134878302329",
+  "id": "1225630681556586556",
+  "embeds": [],
+  "channel_id": "1225608134878302332",
+  "timestamp": "2024-04-05T02:18:45.600000+00:00"
+}
