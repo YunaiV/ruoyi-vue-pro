@@ -40,21 +40,22 @@ public class CrmStatisticsPortraitServiceImpl implements CrmStatisticsPortraitSe
 
     @Override
     public List<CrmStatisticCustomerAreaRespVO> getCustomerSummaryByArea(CrmStatisticsPortraitReqVO reqVO) {
-        // 1.1 获得用户编号数组
+        // 1. 获得用户编号数组
         List<Long> userIds = getUserIds(reqVO);
         if (CollUtil.isEmpty(userIds)) {
             return Collections.emptyList();
         }
         reqVO.setUserIds(userIds);
-        // 1.2 获取客户地区统计数据
+
+        // 2. 获取客户地区统计数据
         List<CrmStatisticCustomerAreaRespVO> list = portraitMapper.selectSummaryListGroupByAreaId(reqVO);
         if (CollUtil.isEmpty(list)) {
             return Collections.emptyList();
         }
 
-        // 2. 拼接数据
+        // 3. 拼接数据
         List<Area> areaList = AreaUtils.getByType(AreaTypeEnum.PROVINCE, area -> area);
-        areaList.add(new Area().setId(null).setName("未知"));
+        areaList.add(new Area().setId(null).setName("未知")); // TODO @puhui999：是不是 65 find 的逻辑改下；不用 findAndThen，直接从 areaMap 拿；拿到就设置，不拿到就设置 null 和 未知；这样，58 本行可以删除掉完事了；这样代码更简单和一致
         Map<Integer, Area> areaMap = convertMap(areaList, Area::getId);
         return convertList(list, item -> {
             Integer parentId = AreaUtils.getParentIdByType(item.getAreaId(), AreaTypeEnum.PROVINCE);
@@ -76,11 +77,7 @@ public class CrmStatisticsPortraitServiceImpl implements CrmStatisticsPortraitSe
         reqVO.setUserIds(userIds);
 
         // 2. 获取客户行业统计数据
-        List<CrmStatisticCustomerIndustryRespVO> industryRespVOList = portraitMapper.selectCustomerIndustryListGroupByIndustryId(reqVO);
-        if (CollUtil.isEmpty(industryRespVOList)) {
-            return Collections.emptyList();
-        }
-        return industryRespVOList;
+        return portraitMapper.selectCustomerIndustryListGroupByIndustryId(reqVO);
     }
 
     @Override
@@ -93,11 +90,7 @@ public class CrmStatisticsPortraitServiceImpl implements CrmStatisticsPortraitSe
         reqVO.setUserIds(userIds);
 
         // 2. 获取客户行业统计数据
-        List<CrmStatisticCustomerSourceRespVO> sourceRespVOList = portraitMapper.selectCustomerSourceListGroupBySource(reqVO);
-        if (CollUtil.isEmpty(sourceRespVOList)) {
-            return Collections.emptyList();
-        }
-        return sourceRespVOList;
+        return portraitMapper.selectCustomerSourceListGroupBySource(reqVO);
     }
 
     @Override
@@ -110,11 +103,7 @@ public class CrmStatisticsPortraitServiceImpl implements CrmStatisticsPortraitSe
         reqVO.setUserIds(userIds);
 
         // 2. 获取客户级别统计数据
-        List<CrmStatisticCustomerLevelRespVO> levelRespVOList = portraitMapper.selectCustomerLevelListGroupByLevel(reqVO);
-        if (CollUtil.isEmpty(levelRespVOList)) {
-            return Collections.emptyList();
-        }
-        return levelRespVOList;
+        return portraitMapper.selectCustomerLevelListGroupByLevel(reqVO);
     }
 
     /**
