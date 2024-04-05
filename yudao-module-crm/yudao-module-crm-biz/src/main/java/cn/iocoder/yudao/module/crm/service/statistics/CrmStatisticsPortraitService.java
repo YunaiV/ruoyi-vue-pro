@@ -1,10 +1,6 @@
 package cn.iocoder.yudao.module.crm.service.statistics;
 
-import cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.customer.CrmStatisticsCustomerReqVO;
-import cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.portrait.CrmStatisticCustomerAreaRespVO;
-import cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.portrait.CrmStatisticCustomerIndustryRespVO;
-import cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.portrait.CrmStatisticCustomerLevelRespVO;
-import cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.portrait.CrmStatisticCustomerSourceRespVO;
+import cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.portrait.*;
 
 import java.util.List;
 
@@ -21,7 +17,7 @@ public interface CrmStatisticsPortraitService {
      * @param reqVO 请求参数
      * @return 统计数据
      */
-    List<CrmStatisticCustomerAreaRespVO> getCustomerAreaSummary(CrmStatisticsCustomerReqVO reqVO);
+    List<CrmStatisticCustomerAreaRespVO> getCustomerSummaryByArea(CrmStatisticsPortraitReqVO reqVO);
 
     /**
      * 获取客户行业统计数据
@@ -29,7 +25,7 @@ public interface CrmStatisticsPortraitService {
      * @param reqVO 请求参数
      * @return 统计数据
      */
-    List<CrmStatisticCustomerIndustryRespVO> getCustomerIndustrySummary(CrmStatisticsCustomerReqVO reqVO);
+    List<CrmStatisticCustomerIndustryRespVO> getCustomerSummaryByIndustry(CrmStatisticsPortraitReqVO reqVO);
 
     /**
      * 获取客户级别统计数据
@@ -37,7 +33,7 @@ public interface CrmStatisticsPortraitService {
      * @param reqVO 请求参数
      * @return 统计数据
      */
-    List<CrmStatisticCustomerLevelRespVO> getCustomerLevelSummary(CrmStatisticsCustomerReqVO reqVO);
+    List<CrmStatisticCustomerLevelRespVO> getCustomerSummaryByLevel(CrmStatisticsPortraitReqVO reqVO);
 
     /**
      * 获取客户来源统计数据
@@ -45,6 +41,6 @@ public interface CrmStatisticsPortraitService {
      * @param reqVO 请求参数
      * @return 统计数据
      */
-    List<CrmStatisticCustomerSourceRespVO> getCustomerSourceSummary(CrmStatisticsCustomerReqVO reqVO);
+    List<CrmStatisticCustomerSourceRespVO> getCustomerSummaryBySource(CrmStatisticsPortraitReqVO reqVO);
 
 }

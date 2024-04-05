@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.crm.controller.admin.statistics;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
-import cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.customer.CrmStatisticsCustomerReqVO;
+import cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.portrait.CrmStatisticsPortraitReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.portrait.CrmStatisticCustomerAreaRespVO;
 import cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.portrait.CrmStatisticCustomerIndustryRespVO;
 import cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.portrait.CrmStatisticCustomerLevelRespVO;
@@ -30,34 +30,32 @@ public class CrmStatisticsPortraitController {
     @Resource
     private CrmStatisticsPortraitService statisticsPortraitService;
 
-    // TODO @puhui999：搞个属于自己的 CrmStatisticsCustomerReqVO 类哈
-
     @GetMapping("/get-customer-area-summary")
     @Operation(summary = "获取客户地区统计数据", description = "用于【城市分布分析】页面")
     @PreAuthorize("@ss.hasPermission('crm:statistics-portrait:query')")
-    public CommonResult<List<CrmStatisticCustomerAreaRespVO>> getCustomerAreaSummary(@Valid CrmStatisticsCustomerReqVO reqVO) {
-        return success(statisticsPortraitService.getCustomerAreaSummary(reqVO));
+    public CommonResult<List<CrmStatisticCustomerAreaRespVO>> getCustomerAreaSummary(@Valid CrmStatisticsPortraitReqVO reqVO) {
+        return success(statisticsPortraitService.getCustomerSummaryByArea(reqVO));
     }
 
     @GetMapping("/get-customer-industry-summary")
     @Operation(summary = "获取客户行业统计数据", description = "用于【客户行业分析】页面")
     @PreAuthorize("@ss.hasPermission('crm:statistics-portrait:query')")
-    public CommonResult<List<CrmStatisticCustomerIndustryRespVO>> getCustomerIndustrySummary(@Valid CrmStatisticsCustomerReqVO reqVO) {
-        return success(statisticsPortraitService.getCustomerIndustrySummary(reqVO));
+    public CommonResult<List<CrmStatisticCustomerIndustryRespVO>> getCustomerIndustrySummary(@Valid CrmStatisticsPortraitReqVO reqVO) {
+        return success(statisticsPortraitService.getCustomerSummaryByIndustry(reqVO));
     }
 
     @GetMapping("/get-customer-level-summary")
     @Operation(summary = "获取客户级别统计数据", description = "用于【客户级别分析】页面")
     @PreAuthorize("@ss.hasPermission('crm:statistics-portrait:query')")
-    public CommonResult<List<CrmStatisticCustomerLevelRespVO>> getCustomerLevelSummary(@Valid CrmStatisticsCustomerReqVO reqVO) {
-        return success(statisticsPortraitService.getCustomerLevelSummary(reqVO));
+    public CommonResult<List<CrmStatisticCustomerLevelRespVO>> getCustomerLevelSummary(@Valid CrmStatisticsPortraitReqVO reqVO) {
+        return success(statisticsPortraitService.getCustomerSummaryByLevel(reqVO));
     }
 
     @GetMapping("/get-customer-source-summary")
     @Operation(summary = "获取客户来源统计数据", description = "用于【客户来源分析】页面")
     @PreAuthorize("@ss.hasPermission('crm:statistics-portrait:query')")
-    public CommonResult<List<CrmStatisticCustomerSourceRespVO>> getCustomerSourceSummary(@Valid CrmStatisticsCustomerReqVO reqVO) {
-        return success(statisticsPortraitService.getCustomerSourceSummary(reqVO));
+    public CommonResult<List<CrmStatisticCustomerSourceRespVO>> getCustomerSourceSummary(@Valid CrmStatisticsPortraitReqVO reqVO) {
+        return success(statisticsPortraitService.getCustomerSummaryBySource(reqVO));
     }
 
 }

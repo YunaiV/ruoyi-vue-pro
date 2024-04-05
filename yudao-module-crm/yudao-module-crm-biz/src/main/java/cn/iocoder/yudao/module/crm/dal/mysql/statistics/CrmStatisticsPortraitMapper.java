@@ -1,10 +1,6 @@
 package cn.iocoder.yudao.module.crm.dal.mysql.statistics;
 
-import cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.customer.*;
-import cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.portrait.CrmStatisticCustomerAreaRespVO;
-import cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.portrait.CrmStatisticCustomerIndustryRespVO;
-import cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.portrait.CrmStatisticCustomerLevelRespVO;
-import cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.portrait.CrmStatisticCustomerSourceRespVO;
+import cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.portrait.*;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
@@ -17,14 +13,12 @@ import java.util.List;
 @Mapper
 public interface CrmStatisticsPortraitMapper {
 
-    // TODO @puuhui999：GroupBy
+    List<CrmStatisticCustomerAreaRespVO> selectSummaryListGroupByAreaId(CrmStatisticsPortraitReqVO reqVO);
 
-    List<CrmStatisticCustomerIndustryRespVO> selectCustomerIndustryListGroupbyIndustryId(CrmStatisticsCustomerReqVO reqVO);
+    List<CrmStatisticCustomerIndustryRespVO> selectCustomerIndustryListGroupByIndustryId(CrmStatisticsPortraitReqVO reqVO);
 
-    List<CrmStatisticCustomerSourceRespVO> selectCustomerSourceListGroupbySource(CrmStatisticsCustomerReqVO reqVO);
+    List<CrmStatisticCustomerSourceRespVO> selectCustomerSourceListGroupBySource(CrmStatisticsPortraitReqVO reqVO);
 
-    List<CrmStatisticCustomerLevelRespVO> selectCustomerLevelListGroupbyLevel(CrmStatisticsCustomerReqVO reqVO);
-
-    List<CrmStatisticCustomerAreaRespVO> selectSummaryListByAreaId(CrmStatisticsCustomerReqVO reqVO);
+    List<CrmStatisticCustomerLevelRespVO> selectCustomerLevelListGroupByLevel(CrmStatisticsPortraitReqVO reqVO);
 
 }
