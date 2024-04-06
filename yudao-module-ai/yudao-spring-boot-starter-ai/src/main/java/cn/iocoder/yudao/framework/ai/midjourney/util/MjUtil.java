@@ -7,6 +7,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
+ * mj util
+ *
  * author: fansili
  * time: 2024/4/6 19:00
  */
@@ -55,14 +57,6 @@ public class MjUtil {
         mjContent.setPrompt(prompt);
         // tip：contentArray
         return mjContent;
-    }
-
-    public static void main(String[] args) {
-        String content1 = "**南极应该是什么样子？ --v 6.0 --style raw** - <@972721304891453450> (32%) (fast, stealth)";
-        String content2 = "**南极应该是什么样子？ --v 6.0 --style raw** - <@972721304891453450> (fast, stealth)";
-
-        System.err.println(parseContent(content1));;
-        System.err.println(parseContent(content2));;
     }
 
 }
