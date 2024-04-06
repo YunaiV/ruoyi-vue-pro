@@ -188,6 +188,60 @@ public class CrmStatisticsCustomerServiceImpl implements CrmStatisticsCustomerSe
     }
 
     @Override
+    public List<CrmStatisticsPoolSummaryByDateRespVO> getPoolSummaryByDate(CrmStatisticsCustomerReqVO reqVO) {
+        // 1. 获得用户编号数组
+        reqVO.setUserIds(getUserIds(reqVO));
+        if (CollUtil.isEmpty(reqVO.getUserIds())) {
+            return Collections.emptyList();
+        }
+
+        // 2. 按天统计，获取分项统计数据
+        List<CrmStatisticsPoolSummaryByDateRespVO> customerPutCountList = customerMapper.selectPoolCustomerPutCountByDate(reqVO);
+        List<CrmStatisticsPoolSummaryByDateRespVO> customerTakeCountList = customerMapper.selectPoolCustomerTakeCountByDate(reqVO);
+
+        // 3. 按照日期间隔，合并数据
+        List<LocalDateTime[]> timeRanges = LocalDateTimeUtils.getDateRangeList(reqVO.getTimes()[0], reqVO.getTimes()[1], reqVO.getInterval());
+        return convertList(timeRanges, times -> {
+            Integer customerPutCount = customerPutCountList.stream()
+                .filter(vo -> LocalDateTimeUtils.isBetween(times[0], times[1], vo.getTime()))
+                .mapToInt(CrmStatisticsPoolSummaryByDateRespVO::getCustomerPutCount).sum();
+            Integer customerTakeCount = customerTakeCountList.stream()
+                .filter(vo -> LocalDateTimeUtils.isBetween(times[0], times[1], vo.getTime()))
+                .mapToInt(CrmStatisticsPoolSummaryByDateRespVO::getCustomerTakeCount).sum();
+            return new CrmStatisticsPoolSummaryByDateRespVO()
+                .setTime(LocalDateTimeUtils.formatDateRange(times[0], times[1], reqVO.getInterval()))
+                .setCustomerPutCount(customerPutCount).setCustomerTakeCount(customerTakeCount);
+        });
+    }
+
+    @Override
+    public List<CrmStatisticsPoolSummaryByUserRespVO> getPoolSummaryByUser(CrmStatisticsCustomerReqVO reqVO) {
+        // 1. 获得用户编号数组
+        reqVO.setUserIds(getUserIds(reqVO));
+        if (CollUtil.isEmpty(reqVO.getUserIds())) {
+            return Collections.emptyList();
+        }
+
+        // 2. 按用户统计，获取分项统计数据
+        List<CrmStatisticsPoolSummaryByUserRespVO> customerPutCountList = customerMapper.selectPoolCustomerPutCountByUser(reqVO);
+        List<CrmStatisticsPoolSummaryByUserRespVO> customerTakeCountList = customerMapper.selectPoolCustomerTakeCountByUser(reqVO);
+
+        // 3.1 按照用户，合并统计数据
+        List<CrmStatisticsPoolSummaryByUserRespVO> summaryList = convertList(reqVO.getUserIds(), userId -> {
+            Integer customerPutCount = customerPutCountList.stream().filter(vo -> userId.equals(vo.getOwnerUserId()))
+                .mapToInt(CrmStatisticsPoolSummaryByUserRespVO::getCustomerPutCount).sum();
+            Integer customerTakeCount = customerTakeCountList.stream().filter(vo -> userId.equals(vo.getOwnerUserId()))
+                .mapToInt(CrmStatisticsPoolSummaryByUserRespVO::getCustomerTakeCount).sum();
+            return (CrmStatisticsPoolSummaryByUserRespVO) new CrmStatisticsPoolSummaryByUserRespVO()
+                .setCustomerPutCount(customerPutCount).setCustomerTakeCount(customerTakeCount)
+                .setOwnerUserId(userId);
+        });
+        // 3.2 拼接用户信息
+        appendUserInfo(summaryList);
+        return summaryList;
+    }
+
+    @Override
     public List<CrmStatisticsCustomerDealCycleByDateRespVO> getCustomerDealCycleByDate(CrmStatisticsCustomerReqVO reqVO) {
         // 1. 获得用户编号数组
         reqVO.setUserIds(getUserIds(reqVO));
