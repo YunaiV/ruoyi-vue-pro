@@ -3,8 +3,8 @@ package cn.iocoder.yudao.framework.ai.openAiImage;
 import cn.iocoder.yudao.framework.ai.imageopenai.OpenAiImageApi;
 import cn.iocoder.yudao.framework.ai.imageopenai.OpenAiImageClient;
 import cn.iocoder.yudao.framework.ai.imageopenai.OpenAiImageOptions;
-import cn.iocoder.yudao.framework.ai.mj.ImagePrompt;
-import cn.iocoder.yudao.framework.ai.mj.ImageResponse;
+import cn.iocoder.yudao.framework.ai.image.ImagePrompt;
+import cn.iocoder.yudao.framework.ai.image.ImageResponse;
 import org.junit.Before;
 import org.junit.Test;
 
