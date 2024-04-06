@@ -32,8 +32,7 @@ public class MjClient {
         // 封装请求体和头部信息
         HttpEntity<String> requestEntity = new HttpEntity<>(body, headers);
         // 发送请求
-        String result = restTemplate.postForObject(url, requestEntity, String.class);
-        return result;
+        return restTemplate.postForObject(url, requestEntity, String.class);
     }
 
 

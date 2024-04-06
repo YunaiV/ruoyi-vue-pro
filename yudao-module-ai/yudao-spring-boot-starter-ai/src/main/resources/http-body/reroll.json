@@ -1,0 +1,14 @@
+{
+  "type": 3,
+  "guild_id": "$guild_id",
+  "channel_id": "$channel_id",
+  "message_id": "$message_id",
+  "application_id": "936929561302675456",
+  "session_id": "$session_id",
+  "nonce": "$nonce",
+  "message_flags": 0,
+  "data": {
+    "component_type": 2,
+    "custom_id": "$custom_id"
+  }
+}

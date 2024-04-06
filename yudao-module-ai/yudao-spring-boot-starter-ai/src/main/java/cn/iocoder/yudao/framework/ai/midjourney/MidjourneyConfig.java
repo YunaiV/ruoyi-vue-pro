@@ -4,6 +4,7 @@ import lombok.Data;
 import lombok.experimental.Accessors;
 
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * Midjourney 配置
@@ -14,16 +15,6 @@ import java.util.Map;
 @Data
 @Accessors(chain = true)
 public class MidjourneyConfig {
-
-    public MidjourneyConfig(String token, String guildId, String channelId, Map<String, String> requestTemplates) {
-        this.token = token;
-        this.guildId = guildId;
-        this.channelId = channelId;
-        this.serverUrl = serverUrl;
-        this.apiInteractions = apiInteractions;
-        this.userAage = userAage;
-        this.requestTemplates = requestTemplates;
-    }
 
     /**
      * token信息
@@ -64,4 +55,23 @@ public class MidjourneyConfig {
 
 
     private Map<String, String> requestTemplates;
+
+    //
+    //
+
+    private String sessionId;
+
+    public MidjourneyConfig(String token, String guildId, String channelId, Map<String, String> requestTemplates) {
+        this.token = token;
+        this.guildId = guildId;
+        this.channelId = channelId;
+        this.serverUrl = serverUrl;
+        this.apiInteractions = apiInteractions;
+        this.userAage = userAage;
+        this.requestTemplates = requestTemplates;
+
+        // 生成 session id
+        sessionId = UUID.randomUUID().toString().replaceAll("-", "");
+    }
+
 }

@@ -17,6 +17,7 @@ public class MjMessage {
 	 * 现在已知：
 	 * 0：我们发送的消息，和指令
 	 * 20: mj生成图片发送过程中
+	 * 19: 选择了某一张图片后的通知
 	 */
 	private Integer type;
 	/**
