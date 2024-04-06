@@ -25,10 +25,10 @@ public class MjUtil {
         if (CharSequenceUtil.isBlank(content)) {
             return null;
         }
-        if (!content.contains("raw**")) {
+        if (!content.contains("<@")) {
             return mjContent.setPrompt(content);
         }
-        int rawIndex = content.indexOf("raw**") + 5;
+        int rawIndex = content.indexOf("<@") - 3;
         String prompt = content.substring(0, rawIndex).trim();
         String contentTail = content.substring(rawIndex).trim();
         // 检查是否存在进度条
