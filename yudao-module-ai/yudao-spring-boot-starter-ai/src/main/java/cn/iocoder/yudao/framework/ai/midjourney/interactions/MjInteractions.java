@@ -40,7 +40,7 @@ public class MjInteractions {
         // 设置参数
         String requestBody = MjClient.setParams(requestTemplate, requestParams);
         // 发送请求
-        String res = MjClient.post(url, midjourneyConfig.getToken(), requestBody);
+        String res = MjClient.post(url, midjourneyConfig, requestBody);
         // 这个 res 只要不返回值，就是成功!
         boolean isSuccess = StrUtil.isBlank(res);
         if (isSuccess) {
@@ -64,7 +64,7 @@ public class MjInteractions {
         // 设置参数
         String requestBody = MjClient.setParams(requestTemplate, requestParams);
         // 发送请求
-        String res = MjClient.post(url, midjourneyConfig.getToken(), requestBody);
+        String res = MjClient.post(url, midjourneyConfig, requestBody);
         // 这个 res 只要不返回值，就是成功!
         boolean isSuccess = StrUtil.isBlank(res);
         if (isSuccess) {
