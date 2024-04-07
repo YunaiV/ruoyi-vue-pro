@@ -385,12 +385,14 @@ public class BpmnModelUtils {
         switch (nodeType) {
             case START_EVENT_NODE:
             case APPROVE_USER_NODE:
-            case SCRIPT_TASK_NODE: {
+            case SCRIPT_TASK_NODE:
+            case PARALLEL_GATEWAY_JOIN_NODE:{
                 addBpmnSequenceFlowElement(mainProcess, node.getId(), childNode.getId(), null, null);
                 // 递归调用后续节点
                 addBpmnSequenceFlow(mainProcess, childNode, endId);
                 break;
             }
+            case PARALLEL_GATEWAY_FORK_NODE:
             case EXCLUSIVE_GATEWAY_NODE: {
                 String gateWayEndId = (childNode == null || childNode.getId() == null) ? BpmnModelConstants.END_EVENT_ID : childNode.getId();
                 List<BpmSimpleModelNodeVO> conditionNodes = node.getConditionNodes();
@@ -449,6 +451,10 @@ public class BpmnModelUtils {
             case EXCLUSIVE_GATEWAY_NODE:
                 addBpmnExclusiveGatewayNode(mainProcess, simpleModelNode);
                 break;
+            case PARALLEL_GATEWAY_FORK_NODE:
+            case PARALLEL_GATEWAY_JOIN_NODE:
+                addBpmnParallelGatewayNode(mainProcess, simpleModelNode);
+                break;
             default: {
                 // TODO 其它节点类型的实现
             }
@@ -470,6 +476,12 @@ public class BpmnModelUtils {
         if (simpleModelNode.getChildNode() != null) {
             addBpmnFlowNode(mainProcess, simpleModelNode.getChildNode());
         }
+    }
+
+    private static void addBpmnParallelGatewayNode(Process mainProcess, BpmSimpleModelNodeVO node) {
+        ParallelGateway parallelGateway = new ParallelGateway();
+        parallelGateway.setId(node.getId());
+        mainProcess.addFlowElement(parallelGateway);
     }
 
     private static void addBpmnScriptTaSskNode(Process mainProcess, BpmSimpleModelNodeVO node) {
