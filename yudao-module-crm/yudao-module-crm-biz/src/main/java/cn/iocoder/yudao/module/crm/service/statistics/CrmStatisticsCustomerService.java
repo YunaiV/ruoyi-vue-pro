@@ -55,9 +55,25 @@ public interface CrmStatisticsCustomerService {
      * 获取客户的首次合同、回款信息列表，用于【客户转化率】页面
      *
      * @param reqVO 请求参数
-     * @return 客户的首次合同、回款信息列表
+     * @return 统计数据
      */
     List<CrmStatisticsCustomerContractSummaryRespVO> getContractSummary(CrmStatisticsCustomerReqVO reqVO);
+
+    /**
+     * 公海客户分析(按日期)
+     *
+     * @param reqVO 请求参数
+     * @return 统计数据
+     */
+    List<CrmStatisticsPoolSummaryByDateRespVO> getPoolSummaryByDate(CrmStatisticsCustomerReqVO reqVO);
+
+    /**
+     * 公海客户分析(按用户)
+     *
+     * @param reqVO 请求参数
+     * @return 统计数据
+     */
+    List<CrmStatisticsPoolSummaryByUserRespVO> getPoolSummaryByUser(CrmStatisticsCustomerReqVO reqVO);
 
     /**
      * 客户成交周期(按日期)

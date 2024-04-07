@@ -61,13 +61,25 @@ public class CrmStatisticsCustomerController {
         return success(customerService.getFollowUpSummaryByType(reqVO));
     }
 
-    // TODO @dhb52：【客户转化率】里，应该少了一个接口，给上面图标的；
-
     @GetMapping("/get-contract-summary")
     @Operation(summary = "获取客户的首次合同、回款信息列表", description = "用于【客户转化率】页面")
     @PreAuthorize("@ss.hasPermission('crm:statistics-customer:query')")
     public CommonResult<List<CrmStatisticsCustomerContractSummaryRespVO>> getContractSummary(@Valid CrmStatisticsCustomerReqVO reqVO) {
         return success(customerService.getContractSummary(reqVO));
+    }
+
+    @GetMapping("/get-pool-summary-by-date")
+    @Operation(summary = "获取客户成交周期(按日期)")
+    @PreAuthorize("@ss.hasPermission('crm:statistics-customer:query')")
+    public CommonResult<List<CrmStatisticsPoolSummaryByDateRespVO>> getPoolSummaryByDate(@Valid CrmStatisticsCustomerReqVO reqVO) {
+        return success(customerService.getPoolSummaryByDate(reqVO));
+    }
+
+    @GetMapping("/get-pool-summary-by-user")
+    @Operation(summary = "获取客户成交周期(按用户)")
+    @PreAuthorize("@ss.hasPermission('crm:statistics-customer:query')")
+    public CommonResult<List<CrmStatisticsPoolSummaryByUserRespVO>> getPoolSummaryByUser(@Valid CrmStatisticsCustomerReqVO reqVO) {
+        return success(customerService.getPoolSummaryByUser(reqVO));
     }
 
     @GetMapping("/get-customer-deal-cycle-by-date")

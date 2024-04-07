@@ -249,8 +249,11 @@ public class LocalDateTimeUtils {
                 break;
             case DateIntervalEnum.QUARTER:
                 while (startTime.isBefore(endTime)) {
-                    LocalDateTime quarterEnd = startTime.withMonth(getQuarterOfYear(startTime) * 3 + 1)
-                            .withDayOfMonth(1).minusNanos(1);
+                    int quarterOfYear = getQuarterOfYear(startTime);
+                    LocalDateTime quarterEnd =
+                        quarterOfYear == 4
+                        ? startTime.with(TemporalAdjusters.lastDayOfYear()).plusDays(1).minusNanos(1)
+                        : startTime.withMonth(quarterOfYear * 3 + 1).withDayOfMonth(1).minusNanos(1);
                     timeRanges.add(new LocalDateTime[]{startTime, quarterEnd});
                     startTime = quarterEnd.plusNanos(1);
                 }
