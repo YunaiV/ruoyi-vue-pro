@@ -25,6 +25,8 @@ public enum BpmSimpleModelNodeType implements IntArrayValuable {
     EXCLUSIVE_GATEWAY_NODE(4, "排他网关"),
     PARALLEL_GATEWAY_FORK_NODE(5, "并行网关分叉节点"),
     PARALLEL_GATEWAY_JOIN_NODE(6, "并行网关聚合节点"),
+    INCLUSIVE_GATEWAY_FORK_NODE(7, "包容网关分叉节点"),
+    INCLUSIVE_GATEWAY_JOIN_NODE(8, "包容网关聚合节点"),
     END_EVENT_NODE(-2, "结束节点");
 
     public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(BpmSimpleModelNodeType::getType).toArray();
@@ -33,9 +35,8 @@ public enum BpmSimpleModelNodeType implements IntArrayValuable {
     private final String name;
 
     public static boolean isGatewayNode(Integer type) {
-        // TODO 后续增加并行网关的支持
-        return Objects.equals(EXCLUSIVE_GATEWAY_NODE.getType(), type)
-                || Objects.equals(PARALLEL_GATEWAY_FORK_NODE.getType(), type);
+        return Objects.equals(EXCLUSIVE_GATEWAY_NODE.getType(), type) || Objects.equals(PARALLEL_GATEWAY_FORK_NODE.getType(), type)
+                || Objects.equals(INCLUSIVE_GATEWAY_FORK_NODE.getType(), type) ;
     }
 
     public static BpmSimpleModelNodeType valueOf(Integer type) {
