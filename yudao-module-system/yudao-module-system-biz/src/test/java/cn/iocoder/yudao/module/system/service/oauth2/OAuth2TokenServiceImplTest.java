@@ -1,7 +1,6 @@
 package cn.iocoder.yudao.module.system.service.oauth2;
 
 import cn.hutool.core.date.LocalDateTimeUtil;
-import cn.hutool.core.util.RandomUtil;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.exception.ErrorCode;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
@@ -12,15 +11,17 @@ import cn.iocoder.yudao.module.system.controller.admin.oauth2.vo.token.OAuth2Acc
 import cn.iocoder.yudao.module.system.dal.dataobject.oauth2.OAuth2AccessTokenDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.oauth2.OAuth2ClientDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.oauth2.OAuth2RefreshTokenDO;
+import cn.iocoder.yudao.module.system.dal.dataobject.user.AdminUserDO;
 import cn.iocoder.yudao.module.system.dal.mysql.oauth2.OAuth2AccessTokenMapper;
 import cn.iocoder.yudao.module.system.dal.mysql.oauth2.OAuth2RefreshTokenMapper;
 import cn.iocoder.yudao.module.system.dal.redis.oauth2.OAuth2AccessTokenRedisDAO;
+import cn.iocoder.yudao.module.system.service.user.AdminUserService;
+import jakarta.annotation.Resource;
 import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 
-import jakarta.annotation.Resource;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -53,19 +54,24 @@ public class OAuth2TokenServiceImplTest extends BaseDbAndRedisUnitTest {
 
     @MockBean
     private OAuth2ClientService oauth2ClientService;
+    @MockBean
+    private AdminUserService adminUserService;
 
     @Test
     public void testCreateAccessToken() {
         TenantContextHolder.setTenantId(0L);
         // 准备参数
         Long userId = randomLongId();
-        Integer userType = RandomUtil.randomEle(UserTypeEnum.values()).getValue();
+        Integer userType = UserTypeEnum.ADMIN.getValue();
         String clientId = randomString();
         List<String> scopes = Lists.newArrayList("read", "write");
         // mock 方法
         OAuth2ClientDO clientDO = randomPojo(OAuth2ClientDO.class).setClientId(clientId)
                 .setAccessTokenValiditySeconds(30).setRefreshTokenValiditySeconds(60);
         when(oauth2ClientService.validOAuthClientFromCache(eq(clientId))).thenReturn(clientDO);
+        // mock 数据（用户）
+        AdminUserDO user = randomPojo(AdminUserDO.class);
+        when(adminUserService.getUser(userId)).thenReturn(user);
 
         // 调用
         OAuth2AccessTokenDO accessTokenDO = oauth2TokenService.createAccessToken(userId, userType, clientId, scopes);
@@ -74,6 +80,9 @@ public class OAuth2TokenServiceImplTest extends BaseDbAndRedisUnitTest {
         assertPojoEquals(accessTokenDO, dbAccessTokenDO, "createTime", "updateTime", "deleted");
         assertEquals(userId, accessTokenDO.getUserId());
         assertEquals(userType, accessTokenDO.getUserType());
+        assertEquals(2, accessTokenDO.getUserInfo().size());
+        assertEquals(user.getNickname(), accessTokenDO.getUserInfo().get("nickname"));
+        assertEquals(user.getDeptId().toString(), accessTokenDO.getUserInfo().get("deptId"));
         assertEquals(clientId, accessTokenDO.getClientId());
         assertEquals(scopes, accessTokenDO.getScopes());
         assertFalse(DateUtils.isExpired(accessTokenDO.getExpiresTime()));
@@ -149,12 +158,17 @@ public class OAuth2TokenServiceImplTest extends BaseDbAndRedisUnitTest {
         // mock 数据（访问令牌）
         OAuth2RefreshTokenDO refreshTokenDO = randomPojo(OAuth2RefreshTokenDO.class)
                 .setRefreshToken(refreshToken).setClientId(clientId)
-                .setExpiresTime(LocalDateTime.now().plusDays(1));
+                .setExpiresTime(LocalDateTime.now().plusDays(1))
+                .setUserType(UserTypeEnum.ADMIN.getValue());
         oauth2RefreshTokenMapper.insert(refreshTokenDO);
         // mock 数据（访问令牌）
-        OAuth2AccessTokenDO accessTokenDO = randomPojo(OAuth2AccessTokenDO.class).setRefreshToken(refreshToken);
+        OAuth2AccessTokenDO accessTokenDO = randomPojo(OAuth2AccessTokenDO.class).setRefreshToken(refreshToken)
+                .setUserType(refreshTokenDO.getUserType());
         oauth2AccessTokenMapper.insert(accessTokenDO);
         oauth2AccessTokenRedisDAO.set(accessTokenDO);
+        // mock 数据（用户）
+        AdminUserDO user = randomPojo(AdminUserDO.class);
+        when(adminUserService.getUser(refreshTokenDO.getUserId())).thenReturn(user);
 
         // 调用
         OAuth2AccessTokenDO newAccessTokenDO = oauth2TokenService.refreshAccessToken(refreshToken, clientId);
