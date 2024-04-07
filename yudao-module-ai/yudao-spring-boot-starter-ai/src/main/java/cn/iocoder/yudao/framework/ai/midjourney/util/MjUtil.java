@@ -21,8 +21,10 @@ public class MjUtil {
 
 
     public static MjMessage.Content parseContent(String content) {
+        // 有三种格式。
+        // 南极应该是什么样子？
         // "**南极应该是什么样子？ --v 6.0 --style raw** - <@972721304891453450> (32%) (fast, stealth)",
-        //  "**南极应该是什么样子？ --v 6.0 --style raw** - <@972721304891453450> (fast, stealth)"
+        // "**南极应该是什么样子？ --v 6.0 --style raw** - <@972721304891453450> (fast, stealth)"
         MjMessage.Content mjContent = new MjMessage.Content();
         if (CharSequenceUtil.isBlank(content)) {
             return null;
