@@ -138,7 +138,6 @@ public interface CrmStatisticsCustomerMapper {
         return voList;
     }
 
-
     /**
      * 公海领取客户数(按日期)
      *

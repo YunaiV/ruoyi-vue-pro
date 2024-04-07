@@ -9,7 +9,6 @@ GET {{baseUrl}}/crm/statistics-customer/get-customer-summary-by-user?deptId=100&
 Authorization: Bearer {{token}}
 tenant-id: {{adminTenentId}}
 
-
 # == 2. 客户跟进次数分析 ==
 ### 2.1 客户跟进次数分析(按日期)
 GET {{baseUrl}}/crm/statistics-customer/get-follow-up-summary-by-date?deptId=100&interval=2&times[0]=2024-01-01 00:00:00&times[1]=2024-01-29 23:59:59
@@ -21,13 +20,11 @@ GET {{baseUrl}}/crm/statistics-customer/get-follow-up-summary-by-user?deptId=100
 Authorization: Bearer {{token}}
 tenant-id: {{adminTenentId}}
 
-
 # == 3. 客户跟进方式分析 ==
 ### 3.1 客户跟进方式分析
 GET {{baseUrl}}/crm/statistics-customer/get-follow-up-summary-by-type?deptId=100&interval=2&times[0]=2023-01-01 00:00:00&times[1]=2024-12-12 23:59:59
 Authorization: Bearer {{token}}
 tenant-id: {{adminTenentId}}
-
 
 # == 4. 客户成交周期 ==
 ### 4.1 合同摘要信息(客户转化率页面)

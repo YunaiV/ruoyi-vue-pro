@@ -16,6 +16,7 @@
          GROUP BY time
     </select>
 
+    <!-- TODO 芋艿：应该不用过滤时间 -->
     <select id="selectCustomerDealCountGroupByDate"
             resultType="cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.customer.CrmStatisticsCustomerSummaryByDateRespVO">
         SELECT DATE_FORMAT(customer.create_time, '%Y-%m-%d') AS time,

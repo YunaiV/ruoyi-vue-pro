@@ -69,14 +69,14 @@ public class CrmStatisticsCustomerController {
     }
 
     @GetMapping("/get-pool-summary-by-date")
-    @Operation(summary = "获取客户成交周期(按日期)")
+    @Operation(summary = "获取公海客户分析(按日期)")
     @PreAuthorize("@ss.hasPermission('crm:statistics-customer:query')")
     public CommonResult<List<CrmStatisticsPoolSummaryByDateRespVO>> getPoolSummaryByDate(@Valid CrmStatisticsCustomerReqVO reqVO) {
         return success(customerService.getPoolSummaryByDate(reqVO));
     }
 
     @GetMapping("/get-pool-summary-by-user")
-    @Operation(summary = "获取客户成交周期(按用户)")
+    @Operation(summary = "获取公海客户分析(按用户)")
     @PreAuthorize("@ss.hasPermission('crm:statistics-customer:query')")
     public CommonResult<List<CrmStatisticsPoolSummaryByUserRespVO>> getPoolSummaryByUser(@Valid CrmStatisticsCustomerReqVO reqVO) {
         return success(customerService.getPoolSummaryByUser(reqVO));
