@@ -80,23 +80,6 @@ public class RoleServiceImplTest extends BaseDbUnitTest {
     }
 
     @Test
-    public void testUpdateRoleStatus() {
-        // mock 数据
-        RoleDO roleDO = randomPojo(RoleDO.class, o -> o.setStatus(CommonStatusEnum.ENABLE.getStatus())
-                .setType(RoleTypeEnum.CUSTOM.getType()));
-        roleMapper.insert(roleDO);
-
-        // 准备参数
-        Long roleId = roleDO.getId();
-
-        // 调用
-        roleService.updateRoleStatus(roleId, CommonStatusEnum.DISABLE.getStatus());
-        // 断言
-        RoleDO dbRoleDO = roleMapper.selectById(roleId);
-        assertEquals(CommonStatusEnum.DISABLE.getStatus(), dbRoleDO.getStatus());
-    }
-
-    @Test
     public void testUpdateRoleDataScope() {
         // mock 数据
         RoleDO roleDO = randomPojo(RoleDO.class, o -> o.setType(RoleTypeEnum.CUSTOM.getType()));

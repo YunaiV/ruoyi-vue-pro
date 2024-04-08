@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.bpm.dal.dataobject.oa;
 
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
-import cn.iocoder.yudao.module.bpm.enums.task.BpmTaskStatustEnum;
+import cn.iocoder.yudao.module.bpm.enums.task.BpmTaskStatusEnum;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
@@ -57,7 +57,7 @@ public class BpmOALeaveDO extends BaseDO {
     /**
      * 审批结果
      *
-     * 枚举 {@link BpmTaskStatustEnum}
+     * 枚举 {@link BpmTaskStatusEnum}
      * 考虑到简单，所以直接复用了 BpmProcessInstanceStatusEnum 枚举，也可以自己定义一个枚举哈
      */
     private Integer status;

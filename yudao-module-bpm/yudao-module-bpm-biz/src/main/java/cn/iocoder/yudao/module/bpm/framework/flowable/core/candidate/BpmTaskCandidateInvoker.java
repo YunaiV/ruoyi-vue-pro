@@ -4,6 +4,7 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
+import cn.iocoder.yudao.framework.datapermission.core.annotation.DataPermission;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmTaskCandidateStrategyEnum;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.util.BpmnModelUtils;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
@@ -77,6 +78,7 @@ public class BpmTaskCandidateInvoker {
      * @param execution 执行任务
      * @return 用户编号集合
      */
+    @DataPermission(enable = false) // 忽略数据权限，避免因为过滤，导致找不到候选人
     public Set<Long> calculateUsers(DelegateExecution execution) {
         Integer strategy = BpmnModelUtils.parseCandidateStrategy(execution.getCurrentFlowElement());
         String param = BpmnModelUtils.parseCandidateParam(execution.getCurrentFlowElement());

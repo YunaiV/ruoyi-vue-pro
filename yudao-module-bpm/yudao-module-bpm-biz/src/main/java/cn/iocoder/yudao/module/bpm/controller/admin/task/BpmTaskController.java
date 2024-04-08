@@ -93,7 +93,7 @@ public class BpmTaskController {
     @GetMapping("manager-page")
     @Operation(summary = "获取全部任务的分页", description = "用于【流程任务】菜单")
     @PreAuthorize("@ss.hasPermission('bpm:task:mananger-query')")
-    public CommonResult<PageResult<BpmTaskRespVO>> getDoneTaskPage(@Valid BpmTaskPageReqVO pageVO) {
+    public CommonResult<PageResult<BpmTaskRespVO>> getTaskManagerPage(@Valid BpmTaskPageReqVO pageVO) {
         PageResult<HistoricTaskInstance> pageResult = taskService.getTaskPage(getLoginUserId(), pageVO);
         if (CollUtil.isEmpty(pageResult.getList())) {
             return success(PageResult.empty());

@@ -73,4 +73,9 @@ public interface CrmContactMapper extends BaseMapperX<CrmContactDO> {
         return selectList(CrmContactDO::getCustomerId, customerId);
     }
 
+    default List<CrmContactDO> selectListByCustomerIdOwnerUserId(Long customerId, Long ownerUserId) {
+        return selectList(CrmContactDO::getCustomerId, customerId,
+                CrmContactDO::getOwnerUserId, ownerUserId);
+    }
+
 }

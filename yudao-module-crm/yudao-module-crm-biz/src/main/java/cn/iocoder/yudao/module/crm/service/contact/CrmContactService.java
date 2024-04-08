@@ -75,8 +75,8 @@ public interface CrmContactService {
     /**
      * 更新联系人的下次联系时间
      *
-     * @param ids                编号数组
-     * @param contactNextTime    下次联系时间
+     * @param ids             编号数组
+     * @param contactNextTime 下次联系时间
      */
     void updateContactContactNextTime(Collection<Long> ids, LocalDateTime contactNextTime);
 
@@ -159,5 +159,14 @@ public interface CrmContactService {
      * @return 数量
      */
     Long getContactCountByCustomerId(Long customerId);
+
+    /**
+     * 获得联系人列表
+     *
+     * @param customerId  客户编号
+     * @param ownerUserId 负责人编号
+     * @return 联系人列表
+     */
+    List<CrmContactDO> getContactListByCustomerIdOwnerUserId(Long customerId, Long ownerUserId);
 
 }
