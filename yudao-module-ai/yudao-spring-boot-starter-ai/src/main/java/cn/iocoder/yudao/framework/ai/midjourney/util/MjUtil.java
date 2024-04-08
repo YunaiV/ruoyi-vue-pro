@@ -3,6 +3,7 @@ package cn.iocoder.yudao.framework.ai.midjourney.util;
 import cn.hutool.core.text.CharSequenceUtil;
 import cn.iocoder.yudao.framework.ai.midjourney.MjMessage;
 
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -19,7 +20,12 @@ public class MjUtil {
     public static final String CONTENT_REGEX = ".*?\\*\\*(.*?)\\*\\*.+<@\\d+> \\((.*?)\\)";
     public static final String CONTENT_PROGRESS_REGEX =  "\\(([^)]*)\\)";
 
-
+    /**
+     * 解析 content 参数
+     *
+     * @param content
+     * @return
+     */
     public static MjMessage.Content parseContent(String content) {
         // 有三种格式。
         // 南极应该是什么样子？
@@ -61,4 +67,17 @@ public class MjUtil {
         return mjContent;
     }
 
+    /**
+     * 设置 params
+     *
+     * @param requestTemplate
+     * @param requestParams
+     * @return
+     */
+    public static String parseTemplate(String requestTemplate, Map<String, String> requestParams) {
+        for (Map.Entry<String, String> entry : requestParams.entrySet()) {
+            requestTemplate = requestTemplate.replace("$".concat(entry.getKey()), entry.getValue());
+        }
+        return requestTemplate;
+    }
 }
