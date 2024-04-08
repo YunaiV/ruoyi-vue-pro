@@ -26,6 +26,7 @@ import static cn.iocoder.yudao.module.bpm.enums.definition.BpmSimpleModelNodeTyp
 import static cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnModelConstants.USER_TASK_CANDIDATE_PARAM;
 import static cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnModelConstants.USER_TASK_CANDIDATE_STRATEGY;
 
+// TODO @jason：这块可以讨论下，是不是合并成一个 BpmnModelServiceImpl
 /**
  * 仿钉钉流程设计 Service 实现类
  *

@@ -340,7 +340,7 @@ public class BpmnModelUtils {
         return userTaskList;
     }
 
-    // ========== TODO 芋艿：这里得捉摸下； ==========
+    // ========== TODO @jason：单独出一个 SimpleModelUtils；定位上，它是 BPMN 的精简模式 ==========
 
     /**
      * 仿钉钉流程设计模型数据结构(json) 转换成 Bpmn Model (待完善）
@@ -382,6 +382,7 @@ public class BpmnModelUtils {
         }
         BpmSimpleModelNodeType nodeType = BpmSimpleModelNodeType.valueOf(node.getType());
         Assert.notNull(nodeType, "模型节点类型不支持");
+        // TODO @jason：建议是，addXXX 都改成 buildXXX，构建出一个什么；然后返回之后，让这个方法添加到自己的结果里；
         switch (nodeType) {
             case START_EVENT_NODE:
             case APPROVE_USER_NODE:
@@ -488,9 +489,11 @@ public class BpmnModelUtils {
         ScriptTask scriptTask = new ScriptTask();
         scriptTask.setId(node.getId());
         scriptTask.setName(node.getName());
+        // TODO @jason：建议使用 ServiceTask，通过 executionListeners 实现；
         scriptTask.setScriptFormat(ScriptingEngines.DEFAULT_SCRIPTING_LANGUAGE);
         scriptTask.setScript(BPMN_SIMPLE_COPY_EXECUTION_SCRIPT);
         // 添加自定义属性
+        // TODO @jason：可以使用 ServiceTask 搞 ExtensionAttribute 么？
         addExtensionAttributes(node, scriptTask);
         mainProcess.addFlowElement(scriptTask);
     }
