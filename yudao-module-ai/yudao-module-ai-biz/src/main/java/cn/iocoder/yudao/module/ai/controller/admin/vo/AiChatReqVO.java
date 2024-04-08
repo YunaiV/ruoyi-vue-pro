@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
+// TODO @fansili 1）swagger 注释不太对；2）有了 swagger 注释，就不用类注释了
 /**
  * ai 聊天 req
  *

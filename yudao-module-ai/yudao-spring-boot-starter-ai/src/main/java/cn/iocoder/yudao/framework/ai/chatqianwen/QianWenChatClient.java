@@ -29,7 +29,7 @@ import java.util.stream.Collectors;
  * time: 2024/3/13 21:06
  */
 @Slf4j
-public class QianWenChatClient  implements ChatClient, StreamingChatClient {
+public class QianWenChatClient implements ChatClient, StreamingChatClient {
 
     private QianWenApi qianWenApi;
 
@@ -44,6 +44,7 @@ public class QianWenChatClient  implements ChatClient, StreamingChatClient {
         this.qianWenOptions = qianWenOptions;
     }
 
+    // TODO @fansili：看看咋公用出来，允许传入类似异常之类的参数；
     public final RetryTemplate retryTemplate = RetryTemplate.builder()
             // 最大重试次数 10
             .maxAttempts(10)

@@ -26,6 +26,7 @@ import reactor.core.publisher.Flux;
 import java.util.Scanner;
 import java.util.function.Consumer;
 
+// TODO @fansili：有了 swagger 注释，就不用类注释了
 /**
  * AI模块
  *
