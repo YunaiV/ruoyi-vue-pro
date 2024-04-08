@@ -42,13 +42,19 @@ public class MidjourneyConfig {
      * 发送命令
      */
     private String apiInteractions = "api/v9/interactions";
-
+    /**
+     * 附件
+     */
+    private String apiAttachments = "/api/v9/channels/%s/attachments";
+    /**
+     * 文件上传
+     */
+    private String apiAttachmentsUpload = "https://discord-attachments-uploads-prd.storage.googleapis.com/";
 
     //
     // 浏览器配置
 
     private String userAage = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36";
-
 
     //
     // 请求 json 文件
@@ -65,9 +71,6 @@ public class MidjourneyConfig {
         this.token = token;
         this.guildId = guildId;
         this.channelId = channelId;
-        this.serverUrl = serverUrl;
-        this.apiInteractions = apiInteractions;
-        this.userAage = userAage;
         this.requestTemplates = requestTemplates;
 
         // 生成 session id

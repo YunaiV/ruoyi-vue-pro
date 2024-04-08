@@ -3,9 +3,14 @@ package cn.iocoder.yudao.framework.ai.mj;
 import cn.hutool.core.io.FileUtil;
 import cn.iocoder.yudao.framework.ai.midjourney.MidjourneyConfig;
 import cn.iocoder.yudao.framework.ai.midjourney.interactions.MjInteractions;
+import cn.iocoder.yudao.framework.ai.midjourney.vo.Attachments;
+import cn.iocoder.yudao.framework.ai.midjourney.vo.Describe;
 import cn.iocoder.yudao.framework.ai.midjourney.vo.ReRoll;
+import cn.iocoder.yudao.framework.ai.midjourney.vo.UploadAttachmentsRes;
+import com.alibaba.fastjson.JSON;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.core.io.FileSystemResource;
 
 import java.io.File;
 import java.util.HashMap;
@@ -45,5 +50,24 @@ public class MjInteractionsTests {
         mjImagineInteractions.reRoll(new ReRoll()
                 .setMessageId("1226165117448753243")
                 .setCustomId("MJ::JOB::upsample::3::2aeefbef-43e2-4057-bcf1-43b5f39ab6f7"));
+    }
+
+    @Test
+    public void uploadAttachmentsTest() {
+        MjInteractions mjImagineInteractions = new MjInteractions(midjourneyConfig);
+        UploadAttachmentsRes res = mjImagineInteractions.uploadAttachments(
+                new Attachments().setFileSystemResource(
+                        new FileSystemResource(new File("/Users/fansili/Downloads/DSC01402.JPG")))
+        );
+        System.err.println(JSON.toJSONString(res));
+    }
+
+    @Test
+    public void describeTest() {
+        MjInteractions mjImagineInteractions = new MjInteractions(midjourneyConfig);
+        mjImagineInteractions.describe(new Describe()
+                .setFileName("DSC01402.JPG")
+                .setFinalFileName("16826931-2873-45ec-8cfb-0ad81f1a075f/DSC01402.JPG")
+        );
     }
 }
