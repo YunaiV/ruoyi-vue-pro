@@ -387,14 +387,16 @@ public class BpmnModelUtils {
             case START_EVENT_NODE:
             case APPROVE_USER_NODE:
             case SCRIPT_TASK_NODE:
-            case PARALLEL_GATEWAY_JOIN_NODE:{
+            case PARALLEL_GATEWAY_JOIN_NODE:
+            case INCLUSIVE_GATEWAY_JOIN_NODE:{
                 addBpmnSequenceFlowElement(mainProcess, node.getId(), childNode.getId(), null, null);
                 // 递归调用后续节点
                 addBpmnSequenceFlow(mainProcess, childNode, endId);
                 break;
             }
             case PARALLEL_GATEWAY_FORK_NODE:
-            case EXCLUSIVE_GATEWAY_NODE: {
+            case EXCLUSIVE_GATEWAY_NODE:
+            case INCLUSIVE_GATEWAY_FORK_NODE:{
                 String gateWayEndId = (childNode == null || childNode.getId() == null) ? BpmnModelConstants.END_EVENT_ID : childNode.getId();
                 List<BpmSimpleModelNodeVO> conditionNodes = node.getConditionNodes();
                 Assert.notEmpty(conditionNodes, "网关节点的条件节点不能为空");
@@ -456,6 +458,12 @@ public class BpmnModelUtils {
             case PARALLEL_GATEWAY_JOIN_NODE:
                 addBpmnParallelGatewayNode(mainProcess, simpleModelNode);
                 break;
+            case INCLUSIVE_GATEWAY_FORK_NODE:
+                addBpmnInclusiveGatewayNode(mainProcess, simpleModelNode, Boolean.TRUE);
+                break;
+            case INCLUSIVE_GATEWAY_JOIN_NODE:
+                addBpmnInclusiveGatewayNode(mainProcess, simpleModelNode, Boolean.FALSE);
+                break;
             default: {
                 // TODO 其它节点类型的实现
             }
@@ -510,9 +518,20 @@ public class BpmnModelUtils {
         Assert.notEmpty(node.getConditionNodes(), "网关节点的条件节点不能为空");
         ExclusiveGateway exclusiveGateway = new ExclusiveGateway();
         exclusiveGateway.setId(node.getId());
-        // 条件节点的最后一个条件为 网关的 default sequence flow
+        // 网关的最后一个条件为 网关的 default sequence flow
         exclusiveGateway.setDefaultFlow(String.format("%s_SequenceFlow_%d", node.getId(), node.getConditionNodes().size()));
         mainProcess.addFlowElement(exclusiveGateway);
+    }
+
+    private static void addBpmnInclusiveGatewayNode(Process mainProcess, BpmSimpleModelNodeVO node, Boolean isFork) {
+        InclusiveGateway inclusiveGateway = new InclusiveGateway();
+        inclusiveGateway.setId(node.getId());
+        if (isFork) {
+            Assert.notEmpty(node.getConditionNodes(), "网关节点的条件节点不能为空");
+            // 网关的最后一个条件为 网关的 default sequence flow
+            inclusiveGateway.setDefaultFlow(String.format("%s_SequenceFlow_%d", node.getId(), node.getConditionNodes().size()));
+        }
+        mainProcess.addFlowElement(inclusiveGateway);
     }
 
     private static void addBpmnEndEventNode(Process mainProcess) {
