@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.crm.dal.mysql.callcenter;
 
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
+import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.module.crm.dal.dataobject.callcenter.CrmCallcenterConfigDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.callcenter.CrmCallcenterUserDO;
 import org.apache.ibatis.annotations.Mapper;
@@ -14,7 +15,7 @@ import org.apache.ibatis.annotations.Mapper;
 public interface CrmCallcenterConfigMapper extends BaseMapperX<CrmCallcenterConfigDO> {
 
     default CrmCallcenterConfigDO selectByManufactoryId(Long manufactoryId) {
-        return selectOne("manufactory_id", manufactoryId);
+        return selectOne(new LambdaQueryWrapperX<CrmCallcenterConfigDO>().eq(CrmCallcenterConfigDO::getManufacturerId,manufactoryId).last("LIMIT 1"));
     }
 
 

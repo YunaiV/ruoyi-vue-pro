@@ -13,11 +13,13 @@ import org.springframework.http.*;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
 import javax.annotation.Resource;
+import javax.validation.Valid;
 import javax.validation.constraints.Null;
 import java.math.BigInteger;
 import java.security.MessageDigest;
@@ -41,32 +43,32 @@ public class CrmCallCenterController {
     @Resource
     private CrmCallCenterService crmCallCenterService;
 
-    @PostMapping("/call")
-    @Operation(summary = "打电话外呼")
-    @PreAuthorize("@ss.hasPermission('crm:callcenter:call')")
-    public CommonResult<Boolean> call()  {
-        List<String> callerNoList = new ArrayList<>();
-        callerNoList.add("13269727237");
-        Map<String,Object> param = new HashMap<>();
-        param.put("calledNo","17701305311");
-        param.put("callerId","00004");
-        param.put("ts",String.valueOf(System.currentTimeMillis() / 1000));
-        param.put("callerNos",callerNoList);
-        param.put("type","TYC");
-        //管理员ID
-        String s = param + "a5c2096f3d8be59d58ccee2136b00948";
-        String sign = MD5.stringToMD5(s);
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType((MediaType.parseMediaType("application/json;charset=UTF-8")));
-        headers.add("api_key", "4967620847861813");
-        headers.add("sign", sign);
-        HttpEntity<String> requestEntity = new HttpEntity<>(param.toString(),headers);
-        ResponseEntity<String> responseEntity = restTemplate.exchange("https://api.51lianlian.cn/api/call/bind", HttpMethod.POST, requestEntity, String.class);
-        System.out.println("responseEntity------->"+responseEntity);
-        return success(true);
-
-    }
+//    @PostMapping("/call")
+//    @Operation(summary = "打电话外呼")
+//    @PreAuthorize("@ss.hasPermission('crm:callcenter:call')")
+//    public CommonResult<Boolean> call()  {
+//        List<String> callerNoList = new ArrayList<>();
+//        callerNoList.add("13269727237");
+//        Map<String,Object> param = new HashMap<>();
+//        param.put("calledNo","17701305311");
+//        param.put("callerId","00004");
+//        param.put("ts",String.valueOf(System.currentTimeMillis() / 1000));
+//        param.put("callerNos",callerNoList);
+//        param.put("type","TYC");
+//        //管理员ID
+//        String s = param + "a5c2096f3d8be59d58ccee2136b00948";
+//        String sign = MD5.stringToMD5(s);
+//
+//        HttpHeaders headers = new HttpHeaders();
+//        headers.setContentType((MediaType.parseMediaType("application/json;charset=UTF-8")));
+//        headers.add("api_key", "4967620847861813");
+//        headers.add("sign", sign);
+//        HttpEntity<String> requestEntity = new HttpEntity<>(param.toString(),headers);
+//        ResponseEntity<String> responseEntity = restTemplate.exchange("https://api.51lianlian.cn/api/call/bind", HttpMethod.POST, requestEntity, String.class);
+//        System.out.println("responseEntity------->"+responseEntity);
+//        return success(true);
+//
+//    }
 
     private HttpHeaders getHeaders(String partnerId) {
         //云客接口部分用管理员ID外呼接口需要使用UserId
@@ -101,10 +103,11 @@ public class CrmCallCenterController {
         return success(true);
     }
 
-    @PostMapping("/callyunke")
+    @PostMapping("/call")
     @Operation(summary = "打电话外呼")
     @PreAuthorize("@ss.hasPermission('crm:callcenter:call')")
-    public CommonResult<ResponseEntity<String>> callyunke(CrmCallcenterCallReqVO callReqVO){
+    public CommonResult<ResponseEntity<String>> call(@Valid  @RequestBody CrmCallcenterCallReqVO callReqVO){
+        System.out.println("callReqVO------->"+callReqVO);
         return crmCallCenterService.call(callReqVO,getLoginUserId());
     }
 }

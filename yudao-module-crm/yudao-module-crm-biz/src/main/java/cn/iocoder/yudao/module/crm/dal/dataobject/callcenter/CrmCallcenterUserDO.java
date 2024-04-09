@@ -53,6 +53,6 @@ public class CrmCallcenterUserDO extends BaseDO {
     /**
      * 连连外呼系统的用户电话号码
      */
-    private String lianlianCallcenterphone;
+    private String lianlianCallcenterPhone;
 
 }

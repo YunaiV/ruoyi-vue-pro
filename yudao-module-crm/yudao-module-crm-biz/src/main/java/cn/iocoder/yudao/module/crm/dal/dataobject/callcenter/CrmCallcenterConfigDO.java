@@ -37,16 +37,16 @@ public class CrmCallcenterConfigDO extends BaseDO {
     /**
      * 管理员ID（有些厂商把这个当做密钥使用，如云客）
      */
-    private String admincode;
+    private String adminCode;
 
     /**
      * secreKey 密钥
      */
-    private String secreKey;
+    private String secretKey;
     /**
      * 厂商ID
      */
-    private Long manufacturerId;
+    private Integer manufacturerId;
     /**
      * 厂商是否启动
      */
