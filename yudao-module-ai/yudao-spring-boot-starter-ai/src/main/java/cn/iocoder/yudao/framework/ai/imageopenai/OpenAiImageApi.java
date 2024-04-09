@@ -4,6 +4,7 @@ import cn.hutool.json.JSONUtil;
 import cn.iocoder.yudao.framework.ai.imageopenai.api.OpenAiImageRequest;
 import cn.iocoder.yudao.framework.ai.imageopenai.api.OpenAiImageResponse;
 import cn.iocoder.yudao.framework.ai.util.JacksonUtil;
+import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import io.netty.channel.ChannelOption;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpEntity;
@@ -55,7 +56,7 @@ public class OpenAiImageApi {
         httpPost.setURI(URI.create(DEFAULT_BASE_URL.concat("/v1/images/generations")));
         httpPost.setHeader("Content-Type", "application/json");
         httpPost.setHeader("Authorization", "Bearer " + apiKey);
-        httpPost.setEntity(new StringEntity(JacksonUtil.toJson(request), "UTF-8"));
+        httpPost.setEntity(new StringEntity(JsonUtils.toJsonString(request), "UTF-8"));
 
         CloseableHttpResponse response= null;
         try {

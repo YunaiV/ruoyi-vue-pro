@@ -3,7 +3,7 @@ package cn.iocoder.yudao.framework.ai.midjourney.constants;
 import lombok.experimental.UtilityClass;
 
 @UtilityClass
-public final class MjNotifyCode {
+public final class MidjourneyNotifyCode {
 	/**
 	 * 成功.
 	 */

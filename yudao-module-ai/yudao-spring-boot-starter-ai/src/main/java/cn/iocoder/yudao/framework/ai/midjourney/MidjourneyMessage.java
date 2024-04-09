@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.framework.ai.midjourney;
 
+import cn.iocoder.yudao.framework.ai.midjourney.constants.MidjourneyGennerateStatusEnum;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
@@ -7,7 +8,7 @@ import java.util.List;
 
 @Data
 @Accessors(chain = true)
-public class MjMessage {
+public class MidjourneyMessage {
 
 	/**
 	 * id是一个重要的字段，在同时生成多个的时候，可以区分生成信息
@@ -41,7 +42,7 @@ public class MjMessage {
 	 * 1、等待
 	 * 2、进行中
 	 * 3、完成
-	 * {@link cn.iocoder.yudao.framework.ai.midjourney.constants.MjGennerateStatusEnum}
+	 * {@link MidjourneyGennerateStatusEnum}
 	 */
 	private String generateStatus;
 

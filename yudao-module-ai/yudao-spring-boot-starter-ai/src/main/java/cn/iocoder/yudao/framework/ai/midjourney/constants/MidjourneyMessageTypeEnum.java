@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.framework.ai.midjourney.constants;
 
 
-public enum MjMessageTypeEnum {
+public enum MidjourneyMessageTypeEnum {
 	/**
 	 * 创建.
 	 */
@@ -15,7 +15,7 @@ public enum MjMessageTypeEnum {
 	 */
 	DELETE;
 
-	public static MjMessageTypeEnum of(String type) {
+	public static MidjourneyMessageTypeEnum of(String type) {
 		return switch (type) {
 			case "MESSAGE_CREATE" -> CREATE;
 			case "MESSAGE_UPDATE" -> UPDATE;

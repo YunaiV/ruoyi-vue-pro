@@ -3,8 +3,8 @@ package cn.iocoder.yudao.framework.ai.midjourney.interactions;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.ai.midjourney.MidjourneyConfig;
-import cn.iocoder.yudao.framework.ai.midjourney.constants.MjConstants;
-import cn.iocoder.yudao.framework.ai.midjourney.util.MjUtil;
+import cn.iocoder.yudao.framework.ai.midjourney.constants.MidjourneyConstants;
+import cn.iocoder.yudao.framework.ai.midjourney.util.MidjourneyUtil;
 import cn.iocoder.yudao.framework.ai.midjourney.vo.Attachments;
 import cn.iocoder.yudao.framework.ai.midjourney.vo.Describe;
 import cn.iocoder.yudao.framework.ai.midjourney.vo.ReRoll;
@@ -32,15 +32,17 @@ import java.util.HashMap;
  * time: 2024/4/3 17:36
  */
 @Slf4j
-public class MjInteractions {
+public class MidjourneyInteractions {
+
+    // TODO done @fansili：静态变量，放在最前面哈；
+    private static final String HEADER_REFERER = "https://discord.com/channels/%s/%s";
 
     private final String url;
     private final MidjourneyConfig midjourneyConfig;
     private final RestTemplate restTemplate = new RestTemplate(); // TODO @fansili：优先级低：后续搞到统一的管理
-    // TODO @fansili：静态变量，放在最前面哈；
-    private static final String HEADER_REFERER = "https://discord.com/channels/%s/%s";
 
-    public MjInteractions(MidjourneyConfig midjourneyConfig) {
+
+    public MidjourneyInteractions(MidjourneyConfig midjourneyConfig) {
         this.midjourneyConfig = midjourneyConfig;
         this.url = midjourneyConfig.getServerUrl().concat(midjourneyConfig.getApiInteractions());
     }
@@ -57,7 +59,7 @@ public class MjInteractions {
         requestParams.put("nonce", String.valueOf(IdUtil.getSnowflakeNextId())); // TODO @fansili：建议用 uuid 之类的；nextId 跨进程未必合适哈；
         requestParams.put("prompt", prompt);
         // 解析 template 参数占位符
-        String requestBody = MjUtil.parseTemplate(requestTemplate, requestParams);
+        String requestBody = MidjourneyUtil.parseTemplate(requestTemplate, requestParams);
         // 获取 header
         HttpHeaders httpHeaders = getHttpHeaders();
         // 发送请求
@@ -65,14 +67,14 @@ public class MjInteractions {
         String res = restTemplate.postForObject(url, requestEntity, String.class);
         // 这个 res 只要不返回值，就是成功!
         // TODO @fansili：可以直接 if (StrUtil.isBlank(res))
-        boolean isSuccess = StrUtil.isBlank(res);
-        if (isSuccess) {
+        if (StrUtil.isBlank(res)) {
             return true;
+        } else {
+            log.error("请求失败! 请求参数：{} 返回结果! {}", requestBody, res);
+            return false;
         }
-        log.error("请求失败! 请求参数：{} 返回结果! {}", requestBody, res);
-        return isSuccess;
     }
-    // TODO @fansili：方法和方法之间，空一行哈；
+    // TODO done @fansili：方法和方法之间，空一行哈；
 
 
     public Boolean reRoll(ReRoll reRoll) {
@@ -89,7 +91,7 @@ public class MjInteractions {
         // 获取 header
         HttpHeaders httpHeaders = getHttpHeaders();
         // 设置参数
-        String requestBody = MjUtil.parseTemplate(requestTemplate, requestParams);
+        String requestBody = MidjourneyUtil.parseTemplate(requestTemplate, requestParams);
         // 发送请求
         HttpEntity<String> requestEntity = new HttpEntity<>(requestBody, httpHeaders);
         String res = restTemplate.postForObject(url, requestEntity, String.class);
@@ -123,7 +125,7 @@ public class MjInteractions {
         httpHeaders.setContentType(MediaType.APPLICATION_JSON);
         httpHeaders.set("Authorization", midjourneyConfig.getToken());
         httpHeaders.set("User-Agent", midjourneyConfig.getUserAage());
-        httpHeaders.set("Cookie", MjConstants.HTTP_COOKIE);
+        httpHeaders.set("Cookie", MidjourneyConstants.HTTP_COOKIE);
         httpHeaders.set("Referer", String.format(HEADER_REFERER, midjourneyConfig.getGuildId(), midjourneyConfig.getChannelId()));
         // 创建HttpEntity对象，包含表单数据和头部信息
         HttpEntity<MultiValueMap<String, Object>> multiValueMapHttpEntity = new HttpEntity<>(multipartRequest, httpHeaders);
@@ -132,16 +134,13 @@ public class MjInteractions {
         String response = restTemplate.postForObject(midjourneyConfig.getServerUrl().concat(uri), multiValueMapHttpEntity, String.class);
         UploadAttachmentsRes uploadAttachmentsRes = JSON.parseObject(response, UploadAttachmentsRes.class);
 
-
         //
         // 上传文件
         String uploadUrl = uploadAttachmentsRes.getAttachments().getFirst().getUploadUrl();
-        String uploadAttachmentsUrl = midjourneyConfig.getApiAttachmentsUpload().concat(uploadUrl);
         httpHeaders.setContentType(MediaType.MULTIPART_FORM_DATA);
         HttpEntity<FileSystemResource> fileSystemResourceHttpEntity = new HttpEntity<>(attachments.getFileSystemResource(), httpHeaders);
         ResponseEntity<String> exchange = restTemplate.exchange(uploadUrl, HttpMethod.PUT, fileSystemResourceHttpEntity, String.class);
         String uploadRes = exchange.getBody();
-
         return uploadAttachmentsRes;
     }
 
@@ -161,9 +160,9 @@ public class MjInteractions {
         httpHeaders.setContentType(MediaType.MULTIPART_FORM_DATA); // 设置内容类型为JSON
         httpHeaders.set("Authorization", midjourneyConfig.getToken());
         httpHeaders.set("User-Agent", midjourneyConfig.getUserAage());
-        httpHeaders.set("Cookie", MjConstants.HTTP_COOKIE);
+        httpHeaders.set("Cookie", MidjourneyConstants.HTTP_COOKIE);
         httpHeaders.set("Referer", String.format(HEADER_REFERER, midjourneyConfig.getGuildId(), midjourneyConfig.getChannelId()));
-        String requestBody = MjUtil.parseTemplate(requestTemplate, requestParams);
+        String requestBody = MidjourneyUtil.parseTemplate(requestTemplate, requestParams);
         // 创建表单数据
         MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
         formData.add("payload_json", requestBody);
@@ -185,7 +184,7 @@ public class MjInteractions {
         httpHeaders.setContentType(MediaType.APPLICATION_JSON); // 设置内容类型为JSON
         httpHeaders.set("Authorization", midjourneyConfig.getToken());
         httpHeaders.set("User-Agent", midjourneyConfig.getUserAage());
-        httpHeaders.set("Cookie", MjConstants.HTTP_COOKIE);
+        httpHeaders.set("Cookie", MidjourneyConstants.HTTP_COOKIE);
         httpHeaders.set("Referer", String.format(HEADER_REFERER, midjourneyConfig.getGuildId(), midjourneyConfig.getChannelId()));
         return httpHeaders;
     }

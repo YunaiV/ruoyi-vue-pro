@@ -1,8 +1,7 @@
-package cn.iocoder.yudao.framework.ai.mj;
+package cn.iocoder.yudao.framework.ai.midjourney;
 
 import cn.hutool.core.io.FileUtil;
-import cn.iocoder.yudao.framework.ai.midjourney.MidjourneyConfig;
-import cn.iocoder.yudao.framework.ai.midjourney.interactions.MjInteractions;
+import cn.iocoder.yudao.framework.ai.midjourney.interactions.MidjourneyInteractions;
 import cn.iocoder.yudao.framework.ai.midjourney.vo.Attachments;
 import cn.iocoder.yudao.framework.ai.midjourney.vo.Describe;
 import cn.iocoder.yudao.framework.ai.midjourney.vo.ReRoll;
@@ -23,7 +22,7 @@ import java.util.Map;
  * author: fansili
  * time: 2024/4/4 18:59
  */
-public class MjInteractionsTests {
+public class MidjourneyInteractionsTests {
 
     private MidjourneyConfig midjourneyConfig;
     @Before
@@ -39,14 +38,14 @@ public class MjInteractionsTests {
 
     @Test
     public void mjImageTest() {
-        MjInteractions mjImagineInteractions = new MjInteractions(midjourneyConfig);
+        MidjourneyInteractions mjImagineInteractions = new MidjourneyInteractions(midjourneyConfig);
         mjImagineInteractions.imagine("童话里应该是什么样子？");
     }
 
 
     @Test
     public void reRollTest() {
-        MjInteractions mjImagineInteractions = new MjInteractions(midjourneyConfig);
+        MidjourneyInteractions mjImagineInteractions = new MidjourneyInteractions(midjourneyConfig);
         mjImagineInteractions.reRoll(new ReRoll()
                 .setMessageId("1226165117448753243")
                 .setCustomId("MJ::JOB::upsample::3::2aeefbef-43e2-4057-bcf1-43b5f39ab6f7"));
@@ -54,7 +53,7 @@ public class MjInteractionsTests {
 
     @Test
     public void uploadAttachmentsTest() {
-        MjInteractions mjImagineInteractions = new MjInteractions(midjourneyConfig);
+        MidjourneyInteractions mjImagineInteractions = new MidjourneyInteractions(midjourneyConfig);
         UploadAttachmentsRes res = mjImagineInteractions.uploadAttachments(
                 new Attachments().setFileSystemResource(
                         new FileSystemResource(new File("/Users/fansili/Downloads/DSC01402.JPG")))
@@ -64,7 +63,7 @@ public class MjInteractionsTests {
 
     @Test
     public void describeTest() {
-        MjInteractions mjImagineInteractions = new MjInteractions(midjourneyConfig);
+        MidjourneyInteractions mjImagineInteractions = new MidjourneyInteractions(midjourneyConfig);
         mjImagineInteractions.describe(new Describe()
                 .setFileName("DSC01402.JPG")
                 .setFinalFileName("16826931-2873-45ec-8cfb-0ad81f1a075f/DSC01402.JPG")

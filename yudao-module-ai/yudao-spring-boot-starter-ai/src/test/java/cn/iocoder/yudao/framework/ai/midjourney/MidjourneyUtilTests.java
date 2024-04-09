@@ -1,6 +1,6 @@
-package cn.iocoder.yudao.framework.ai.mj;
+package cn.iocoder.yudao.framework.ai.midjourney;
 
-import cn.iocoder.yudao.framework.ai.midjourney.util.MjUtil;
+import cn.iocoder.yudao.framework.ai.midjourney.util.MidjourneyUtil;
 import org.junit.Test;
 
 /**
@@ -9,14 +9,14 @@ import org.junit.Test;
  * author: fansili
  * time: 2024/4/6 21:57
  */
-public class MjUtilTests {
+public class MidjourneyUtilTests {
 
     @Test
     public void parseContentTest() {
         String content1 = "**南极应该是什么样子？ --v 6.0 --style raw** - <@972721304891453450> (32%) (fast, stealth)";
         String content2 = "**南极应该是什么样子？ --v 6.0 --style raw** - <@972721304891453450> (fast, stealth)";
 
-        System.err.println(MjUtil.parseContent(content1));
-        System.err.println(MjUtil.parseContent(content2));
+        System.err.println(MidjourneyUtil.parseContent(content1));
+        System.err.println(MidjourneyUtil.parseContent(content2));
     }
 }

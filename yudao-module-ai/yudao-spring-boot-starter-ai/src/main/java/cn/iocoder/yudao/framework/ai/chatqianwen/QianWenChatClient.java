@@ -6,6 +6,7 @@ import cn.iocoder.yudao.framework.ai.chat.*;
 import cn.iocoder.yudao.framework.ai.chat.messages.MessageType;
 import cn.iocoder.yudao.framework.ai.chat.prompt.ChatOptions;
 import cn.iocoder.yudao.framework.ai.chat.prompt.Prompt;
+import cn.iocoder.yudao.framework.ai.chatqianwen.api.QianWenApi;
 import cn.iocoder.yudao.framework.ai.chatyiyan.exception.YiYanApiException;
 import com.aliyun.broadscope.bailian.sdk.models.*;
 import lombok.extern.slf4j.Slf4j;

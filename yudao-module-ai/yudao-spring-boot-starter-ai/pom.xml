@@ -149,6 +149,10 @@
 <!--                </exclusion>-->
 <!--            </exclusions>-->
         </dependency>
+        <dependency>
+            <groupId>cn.iocoder.boot</groupId>
+            <artifactId>yudao-common</artifactId>
+        </dependency>
     </dependencies>
 
 </project>

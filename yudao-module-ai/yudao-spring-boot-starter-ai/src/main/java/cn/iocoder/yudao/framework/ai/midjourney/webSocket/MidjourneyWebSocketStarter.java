@@ -4,9 +4,9 @@ package cn.iocoder.yudao.framework.ai.midjourney.webSocket;
 import cn.hutool.core.text.CharSequenceUtil;
 import cn.hutool.core.thread.ThreadUtil;
 import cn.iocoder.yudao.framework.ai.midjourney.MidjourneyConfig;
-import cn.iocoder.yudao.framework.ai.midjourney.constants.MjNotifyCode;
-import cn.iocoder.yudao.framework.ai.midjourney.webSocket.handler.MjWebSocketHandler;
-import cn.iocoder.yudao.framework.ai.midjourney.webSocket.listener.MjMessageListener;
+import cn.iocoder.yudao.framework.ai.midjourney.constants.MidjourneyNotifyCode;
+import cn.iocoder.yudao.framework.ai.midjourney.webSocket.handler.MidjourneyWebSocketHandler;
+import cn.iocoder.yudao.framework.ai.midjourney.webSocket.listener.MidjourneyMessageListener;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.tomcat.websocket.Constants;
@@ -20,11 +20,10 @@ import org.springframework.web.socket.client.standard.StandardWebSocketClient;
 
 import java.io.IOException;
 import java.net.URI;
-import java.util.concurrent.TimeoutException;
 
 // TODO @fansili：mj 这块 websocket 有点小复杂，虽然代码量 400 多行；感觉可以考虑，有没第三方 sdk，通过它透明接入 mj
 @Slf4j
-public class MjWebSocketStarter implements WebSocketStarter {
+public class MidjourneyWebSocketStarter implements WebSocketStarter {
 	/**
 	 * 链接重试次数
 	 */
@@ -36,7 +35,7 @@ public class MjWebSocketStarter implements WebSocketStarter {
 	/**
 	 * mj 监听(所有message 都会 callback到这里)
 	 */
-	private final MjMessageListener userMessageListener;
+	private final MidjourneyMessageListener userMessageListener;
 	/**
 	 * wss 服务器
 	 */
@@ -58,10 +57,10 @@ public class MjWebSocketStarter implements WebSocketStarter {
 	 */
 	private WebSocketSession webSocketSession = null;
 
-	public MjWebSocketStarter(String wssServer,
-							  String resumeWss,
-							  MidjourneyConfig midjourneyConfig,
-							  MjMessageListener userMessageListener) {
+	public MidjourneyWebSocketStarter(String wssServer,
+									  String resumeWss,
+									  MidjourneyConfig midjourneyConfig,
+									  MidjourneyMessageListener userMessageListener) {
 		this.wssServer = wssServer;
 		this.resumeWss = resumeWss;
 		this.midjourneyConfig = midjourneyConfig;
@@ -83,7 +82,7 @@ public class MjWebSocketStarter implements WebSocketStarter {
 		headers.add("Sec-Websocket-Extensions", "permessage-deflate; client_max_window_bits");
 		headers.add("User-Agent", this.midjourneyConfig.getUserAage());
 		// 创建 mjHeader
-		MjWebSocketHandler mjWebSocketHandler = new MjWebSocketHandler(
+		MidjourneyWebSocketHandler mjWebSocketHandler = new MidjourneyWebSocketHandler(
 				this.midjourneyConfig, this.userMessageListener, this::onSocketSuccess, this::onSocketFailure);
 		//
 		String gatewayUrl;
@@ -105,12 +104,12 @@ public class MjWebSocketStarter implements WebSocketStarter {
 		socketSessionFuture.addCallback(new ListenableFutureCallback<>() {
 			@Override
 			public void onFailure(@NotNull Throwable e) {
-				onSocketFailure(MjWebSocketHandler.CLOSE_CODE_EXCEPTION, e.getMessage());
+				onSocketFailure(MidjourneyWebSocketHandler.CLOSE_CODE_EXCEPTION, e.getMessage());
 			}
 
 			@Override
 			public void onSuccess(WebSocketSession session) {
-				MjWebSocketStarter.this.webSocketSession = session;
+				MidjourneyWebSocketStarter.this.webSocketSession = session;
 			}
 		});
 	}
@@ -118,7 +117,7 @@ public class MjWebSocketStarter implements WebSocketStarter {
 	private void onSocketSuccess(String sessionId, Object sequence, String resumeGatewayUrl) {
 		this.resumeData = new ResumeData(sessionId, sequence, resumeGatewayUrl);
 		this.running = true;
-		notifyWssLock(MjNotifyCode.SUCCESS, "");
+		notifyWssLock(MidjourneyNotifyCode.SUCCESS, "");
 	}
 
 	private void onSocketFailure(int code, String reason) {

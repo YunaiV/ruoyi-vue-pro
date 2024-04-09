@@ -1,9 +1,8 @@
-package cn.iocoder.yudao.framework.ai.mj;
+package cn.iocoder.yudao.framework.ai.midjourney;
 
 import cn.hutool.core.io.FileUtil;
-import cn.iocoder.yudao.framework.ai.midjourney.MidjourneyConfig;
-import cn.iocoder.yudao.framework.ai.midjourney.webSocket.listener.MjMessageListener;
-import cn.iocoder.yudao.framework.ai.midjourney.webSocket.MjWebSocketStarter;
+import cn.iocoder.yudao.framework.ai.midjourney.webSocket.listener.MidjourneyMessageListener;
+import cn.iocoder.yudao.framework.ai.midjourney.webSocket.MidjourneyWebSocketStarter;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -17,7 +16,7 @@ import java.util.Scanner;
  * author: fansili
  * time: 2024/4/3 16:40
  */
-public class MjWebSocketTests {
+public class MidjourneyWebSocketTests {
 
     private MidjourneyConfig midjourneyConfig;
 
@@ -35,8 +34,8 @@ public class MjWebSocketTests {
     @Test
     public void startSocketTest() {
         String wssUrl = "wss://gateway.discord.gg";
-        var messageListener = new MjMessageListener(midjourneyConfig);
-        var webSocketStarter = new MjWebSocketStarter(wssUrl, null, midjourneyConfig, messageListener);
+        var messageListener = new MidjourneyMessageListener(midjourneyConfig);
+        var webSocketStarter = new MidjourneyWebSocketStarter(wssUrl, null, midjourneyConfig, messageListener);
 
         try {
             webSocketStarter.start();

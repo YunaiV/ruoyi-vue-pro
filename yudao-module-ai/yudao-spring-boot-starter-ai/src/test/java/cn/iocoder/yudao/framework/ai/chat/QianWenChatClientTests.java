@@ -1,10 +1,9 @@
 package cn.iocoder.yudao.framework.ai.chat;
 
 import cn.iocoder.yudao.framework.ai.chat.prompt.Prompt;
-import cn.iocoder.yudao.framework.ai.chatqianwen.QianWenApi;
+import cn.iocoder.yudao.framework.ai.chatqianwen.api.QianWenApi;
 import cn.iocoder.yudao.framework.ai.chatqianwen.QianWenChatClient;
 import cn.iocoder.yudao.framework.ai.chatqianwen.QianWenOptions;
-import com.aliyun.broadscope.bailian.sdk.models.CompletionsRequest;
 import org.junit.Before;
 import org.junit.Test;
 import reactor.core.publisher.Flux;

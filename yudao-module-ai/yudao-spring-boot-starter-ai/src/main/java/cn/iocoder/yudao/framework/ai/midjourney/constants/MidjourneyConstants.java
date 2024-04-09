@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.framework.ai.midjourney.constants;
 
-public final class MjConstants {
+public final class MidjourneyConstants {
 
 	/**
 	 * 消息 - 编号
