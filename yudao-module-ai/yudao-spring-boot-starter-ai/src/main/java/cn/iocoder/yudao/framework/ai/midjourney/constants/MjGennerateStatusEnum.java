@@ -2,6 +2,7 @@ package cn.iocoder.yudao.framework.ai.midjourney.constants;
 
 import lombok.Getter;
 
+// TODO @fansili：1）Mj 缩写，还是搞成全称。。虽然长一点，但是感觉会相对清晰一些哈；2）lombok 相关的注解，可以用用哈；3）value 改 status；
 /**
  * mj 生成状态
  *

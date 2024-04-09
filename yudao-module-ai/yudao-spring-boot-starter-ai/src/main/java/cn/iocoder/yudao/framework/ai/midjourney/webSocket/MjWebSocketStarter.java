@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.concurrent.TimeoutException;
 
+// TODO @fansili：mj 这块 websocket 有点小复杂，虽然代码量 400 多行；感觉可以考虑，有没第三方 sdk，通过它透明接入 mj
 @Slf4j
 public class MjWebSocketStarter implements WebSocketStarter {
 	/**

@@ -2,6 +2,8 @@
  * author: fansili
  * time: 2024/3/12 20:29
  *
+ * TODO @fansili：包的想法，需要重点看看
+ *
  * 1. org.springframework.ai：包括 chat、image、model、parser、util 部分
  *
  * 2. yudao.framework.models

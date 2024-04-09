@@ -629,6 +629,7 @@
                 <version>${ureport2.version}</version>
             </dependency>
 
+            <!-- TODO @fansili:看看怎么可以不依赖这个 bom 文件 -->
             <!-- 添加ai模块 -->
             <dependency>
                 <groupId>org.springframework.ai</groupId>

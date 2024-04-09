@@ -24,6 +24,7 @@ import org.springframework.web.client.RestTemplate;
 import java.io.IOException;
 import java.util.HashMap;
 
+// TODO @fansili：按照 spring ai 的封装习惯，这个类是不是 MidjourneyApi
 /**
  * 图片生成
  *
@@ -33,12 +34,11 @@ import java.util.HashMap;
 @Slf4j
 public class MjInteractions {
 
-
     private final String url;
     private final MidjourneyConfig midjourneyConfig;
-    private final RestTemplate restTemplate = new RestTemplate();
+    private final RestTemplate restTemplate = new RestTemplate(); // TODO @fansili：优先级低：后续搞到统一的管理
+    // TODO @fansili：静态变量，放在最前面哈；
     private static final String HEADER_REFERER = "https://discord.com/channels/%s/%s";
-
 
     public MjInteractions(MidjourneyConfig midjourneyConfig) {
         this.midjourneyConfig = midjourneyConfig;
@@ -50,10 +50,11 @@ public class MjInteractions {
         String requestTemplate = midjourneyConfig.getRequestTemplates().get("imagine");
         // 设置参数
         HashMap<String, String> requestParams = Maps.newHashMap();
+        // TODO @fansili：感觉参数的组装，可以搞成一个公用的方法；就是 config + 入参的感觉；
         requestParams.put("guild_id", midjourneyConfig.getGuildId());
         requestParams.put("channel_id", midjourneyConfig.getChannelId());
         requestParams.put("session_id", midjourneyConfig.getSessionId());
-        requestParams.put("nonce", String.valueOf(IdUtil.getSnowflakeNextId()));
+        requestParams.put("nonce", String.valueOf(IdUtil.getSnowflakeNextId())); // TODO @fansili：建议用 uuid 之类的；nextId 跨进程未必合适哈；
         requestParams.put("prompt", prompt);
         // 解析 template 参数占位符
         String requestBody = MjUtil.parseTemplate(requestTemplate, requestParams);
@@ -63,6 +64,7 @@ public class MjInteractions {
         HttpEntity<String> requestEntity = new HttpEntity<>(requestBody, httpHeaders);
         String res = restTemplate.postForObject(url, requestEntity, String.class);
         // 这个 res 只要不返回值，就是成功!
+        // TODO @fansili：可以直接 if (StrUtil.isBlank(res))
         boolean isSuccess = StrUtil.isBlank(res);
         if (isSuccess) {
             return true;
@@ -70,7 +72,7 @@ public class MjInteractions {
         log.error("请求失败! 请求参数：{} 返回结果! {}", requestBody, res);
         return isSuccess;
     }
-
+    // TODO @fansili：方法和方法之间，空一行哈；
 
 
     public Boolean reRoll(ReRoll reRoll) {
@@ -100,12 +102,13 @@ public class MjInteractions {
         return isSuccess;
     }
 
-
+    // TODO @fansili：搞成私有方法，可能会好点；
     public UploadAttachmentsRes uploadAttachments(Attachments attachments) {
         // file
         JSONObject fileObj = new JSONObject();
         fileObj.put("id", "0");
         fileObj.put("filename", attachments.getFileSystemResource().getFilename());
+        // TODO @fansili：这块用 lombok 哪个异常处理，简化下代码；
         try {
             fileObj.put("file_size", attachments.getFileSystemResource().contentLength());
         } catch (IOException e) {
@@ -116,6 +119,7 @@ public class MjInteractions {
         multipartRequest.put("files", Lists.newArrayList(fileObj));
         // 设置header值
         HttpHeaders httpHeaders = new HttpHeaders();
+        // TODO @fansili：通用的 header 构建，抽一个方法哈；
         httpHeaders.setContentType(MediaType.APPLICATION_JSON);
         httpHeaders.set("Authorization", midjourneyConfig.getToken());
         httpHeaders.set("User-Agent", midjourneyConfig.getUserAage());
@@ -185,4 +189,5 @@ public class MjInteractions {
         httpHeaders.set("Referer", String.format(HEADER_REFERER, midjourneyConfig.getGuildId(), midjourneyConfig.getChannelId()));
         return httpHeaders;
     }
+
 }
