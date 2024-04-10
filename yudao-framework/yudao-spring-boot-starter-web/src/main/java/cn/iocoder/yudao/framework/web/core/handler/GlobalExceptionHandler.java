@@ -182,14 +182,6 @@ public class GlobalExceptionHandler {
     }
 
     /**
-     * 处理 Resilience4j 限流抛出的异常
-     */
-    public CommonResult<?> requestNotPermittedExceptionHandler(HttpServletRequest req, Throwable ex) {
-        log.warn("[requestNotPermittedExceptionHandler][url({}) 访问过于频繁]", req.getRequestURL(), ex);
-        return CommonResult.error(TOO_MANY_REQUESTS);
-    }
-
-    /**
      * 处理 Spring Security 权限不足的异常
      *
      * 来源是，使用 @PreAuthorize 注解，AOP 进行权限拦截
@@ -223,12 +215,7 @@ public class GlobalExceptionHandler {
             return tableNotExistsResult;
         }
 
-        // 情况二：部分特殊的库的处理
-        if (Objects.equals("io.github.resilience4j.ratelimiter.RequestNotPermitted", ex.getClass().getName())) {
-            return requestNotPermittedExceptionHandler(req, ex);
-        }
-
-        // 情况三：处理异常
+        // 情况二：处理异常
         log.error("[defaultExceptionHandler]", ex);
         // 插入异常日志
         this.createExceptionLog(req, ex);
