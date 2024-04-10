@@ -63,11 +63,11 @@ public class MidjourneyMessageListener {
 
     private void convertGenerateStatus(MidjourneyMessage mjMessage) {
         if (mjMessage.getType() == 20 && mjMessage.getContent().getStatus().contains("Waiting")) {
-            mjMessage.setGenerateStatus(MidjourneyGennerateStatusEnum.WAITING.getValue());
+            mjMessage.setGenerateStatus(MidjourneyGennerateStatusEnum.WAITING.getStatus());
         } else if (mjMessage.getType() == 20 && !StrUtil.isBlank(mjMessage.getContent().getProgress())) {
-            mjMessage.setGenerateStatus(MidjourneyGennerateStatusEnum.IN_PROGRESS.getValue());
+            mjMessage.setGenerateStatus(MidjourneyGennerateStatusEnum.IN_PROGRESS.getStatus());
         } else if (mjMessage.getType() == 0 && !CollUtil.isEmpty(mjMessage.getComponents())) {
-            mjMessage.setGenerateStatus(MidjourneyGennerateStatusEnum.COMPLETED.getValue());
+            mjMessage.setGenerateStatus(MidjourneyGennerateStatusEnum.COMPLETED.getStatus());
         }
     }
 
