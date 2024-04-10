@@ -2,9 +2,9 @@ package cn.iocoder.yudao.framework.jackson.config;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
-import cn.iocoder.yudao.framework.jackson.core.databind.LocalDateTimeDeserializer;
-import cn.iocoder.yudao.framework.jackson.core.databind.LocalDateTimeSerializer;
 import cn.iocoder.yudao.framework.jackson.core.databind.NumberSerializer;
+import cn.iocoder.yudao.framework.jackson.core.databind.TimestampLocalDateTimeDeserializer;
+import cn.iocoder.yudao.framework.jackson.core.databind.TimestampLocalDateTimeSerializer;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
@@ -37,13 +37,13 @@ public class YudaoJacksonAutoConfiguration {
                 .addDeserializer(LocalDate.class, LocalDateDeserializer.INSTANCE)
                 .addSerializer(LocalTime.class, LocalTimeSerializer.INSTANCE)
                 .addDeserializer(LocalTime.class, LocalTimeDeserializer.INSTANCE)
-                // 新增 LocalDateTime 序列化、反序列化规则
-                .addSerializer(LocalDateTime.class, LocalDateTimeSerializer.INSTANCE)
-                .addDeserializer(LocalDateTime.class, LocalDateTimeDeserializer.INSTANCE);
+                // 新增 LocalDateTime 序列化、反序列化规则，使用 Long 时间戳
+                .addSerializer(LocalDateTime.class, TimestampLocalDateTimeSerializer.INSTANCE)
+                .addDeserializer(LocalDateTime.class, TimestampLocalDateTimeDeserializer.INSTANCE);
         // 1.2 注册到 objectMapper
         objectMappers.forEach(objectMapper -> objectMapper.registerModule(simpleModule));
 
-        // 2. 设置 objectMapper 到 JsonUtils {
+        // 2. 设置 objectMapper 到 JsonUtils
         JsonUtils.init(CollUtil.getFirst(objectMappers));
         log.info("[init][初始化 JsonUtils 成功]");
         return new JsonUtils();
