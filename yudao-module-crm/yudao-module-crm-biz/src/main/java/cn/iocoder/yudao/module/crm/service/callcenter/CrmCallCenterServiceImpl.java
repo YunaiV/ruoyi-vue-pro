@@ -1,8 +1,10 @@
 package cn.iocoder.yudao.module.crm.service.callcenter;
 
+import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 
+import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.module.crm.controller.admin.callcenter.vo.CrmCallcenterCallReqVO;
 
 import cn.iocoder.yudao.module.crm.dal.dataobject.callcenter.CrmCallcenterConfigDO;
@@ -13,6 +15,8 @@ import cn.iocoder.yudao.module.crm.dal.mysql.clue.CrmClueMapper;
 import cn.iocoder.yudao.module.crm.dal.mysql.customer.CrmCustomerMapper;
 import cn.iocoder.yudao.module.crm.enums.callcenter.CrmCallCenterCallTypeEnum;
 import cn.iocoder.yudao.module.crm.enums.callcenter.CrmCallCenterManufacturerTypeEnum;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import io.netty.handler.codec.json.JsonObjectDecoder;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
@@ -86,7 +90,7 @@ public class CrmCallCenterServiceImpl implements CrmCallCenterService {
 
         CrmCallcenterUserDO userDO = callcenterUserMapper.selectOne("user_id",userId);
         System.out.println("userDO------->"+userDO);
-        if (configDO == null) throw exception(CRM_CALLCENTER_USER_NOT_EXISTS);
+        if (userDO == null) throw exception(CRM_CALLCENTER_USER_NOT_EXISTS);
 
         String callphone = null;
         if(callReqVO.getCallType() == CrmCallCenterCallTypeEnum.CUSTOMER.getType())
@@ -122,9 +126,16 @@ public class CrmCallCenterServiceImpl implements CrmCallCenterService {
             HttpEntity<String> requestEntity = new HttpEntity<>(param.toString(),headers);
             ResponseEntity<String> responseEntity = restTemplate.exchange("https://api.51lianlian.cn/api/call/bind", HttpMethod.POST, requestEntity, String.class);
             System.out.println("response------->"+responseEntity);
+            JSONObject jsonObject = JSONUtil.parseObj(responseEntity.getBody());
+            if(jsonObject.get("success") != "true") throw exception(CRM_CALLCENTER_CALL_FAIL);
             return success(responseEntity);
         }
-        return null;
+        throw exception(CRM_CALLCENTER_MANUFA_NOT_EXISTS);
+    }
+
+    @Override
+    public CrmCallcenterUserDO getCallCenterUser(String phone) {
+        return callcenterUserMapper.selectOne(new LambdaQueryWrapperX<CrmCallcenterUserDO>().eq(CrmCallcenterUserDO::getLianlianCallcenterPhone,phone));
     }
 
 }

@@ -4,6 +4,8 @@ import cn.hutool.http.HttpResource;
 import cn.hutool.json.JSONUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.module.crm.controller.admin.callcenter.vo.CrmCallcenterCallReqVO;
+import cn.iocoder.yudao.module.crm.dal.dataobject.callcenter.CrmCallcenterUserDO;
+import cn.iocoder.yudao.module.crm.dal.mysql.callcenter.CrmCallcenterUserMapper;
 import cn.iocoder.yudao.module.crm.service.callcenter.CrmCallCenterService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -94,12 +96,23 @@ public class CrmCallCenterController {
     @PostMapping("/entryphone")
     @Operation(summary = "获取呼叫中心用户信息通过手机号码")
     @PreAuthorize("@ss.hasPermission('crm:callcenter:user')")
-    public CommonResult<Boolean> getCallCenterUserByPhone()  {
+    public CommonResult<Boolean> getCallCenterUserByPhone(@RequestBody String phone)  {
         Map<String,Object> param = new HashMap<>();
-        param.put("phone","13439550083");
+        param.put("phone",phone);
         HttpEntity<String> requestEntity = new HttpEntity<>(JSONUtil.toJsonStr(param),getHeaders(null));
         ResponseEntity<String> responseEntity = restTemplate.exchange("https://phone.yunkecn.com/open/user/getUserByPhone", HttpMethod.POST, requestEntity, String.class);
         System.out.println("responseEntity------->"+responseEntity);
+
+        Map<String,Object> param2 = new HashMap<>();
+        param2.put("phone",phone);
+        param2.put("userId","129");
+//        CrmCallcenterUserDO crmCallcenterUserDO = crmCallCenterService.getCallCenterUser(phone);
+//        param2.put("userId",crmCallcenterUserDO.getYunkeCallcenterUserId());
+
+        HttpEntity<String> requestEntity2 = new HttpEntity<>(JSONUtil.toJsonStr(param2),getHeaders(null));
+        ResponseEntity<String> responseEntity2 = restTemplate.exchange("https://phone.yunkecn.com/open/user/phonePass", HttpMethod.POST, requestEntity2, String.class);
+        System.out.println("responseEntity------->"+responseEntity2);
+
         return success(true);
     }
 

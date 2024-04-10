@@ -106,5 +106,7 @@ public interface ErrorCodeConstants {
     ErrorCode CRM_CALLCENTER_USER_NOT_EXISTS = new ErrorCode(1_020_014_000, "呼叫中心用户不存在");
     ErrorCode CRM_CALLCENTER_CONFIG_NOT_EXISTS = new ErrorCode(1_020_014_001, "呼叫中心配制不存在");
     ErrorCode CRM_CALLCENTER_CALLPHONE_NOT_EXISTS = new ErrorCode(1_020_014_002, "呼叫中心呼叫的电话号码为空或不存在");
+    ErrorCode CRM_CALLCENTER_MANUFA_NOT_EXISTS = new ErrorCode(1_020_014_002, "呼叫中心制造商不存在");
+    ErrorCode CRM_CALLCENTER_CALL_FAIL = new ErrorCode(1_020_014_002, "呼叫失败");
 
 }

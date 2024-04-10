@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.crm.service.callcenter;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.module.crm.controller.admin.callcenter.vo.CrmCallcenterCallReqVO;
+import cn.iocoder.yudao.module.crm.dal.dataobject.callcenter.CrmCallcenterUserDO;
 import org.springframework.http.ResponseEntity;
 
 
@@ -21,5 +22,7 @@ public interface CrmCallCenterService {
      * @return
      */
     CommonResult<ResponseEntity<String>> call(CrmCallcenterCallReqVO callReqVO, Long userId);
+
+    CrmCallcenterUserDO getCallCenterUser(String phone);
 
 }
