@@ -628,16 +628,6 @@
                 <artifactId>ureport2-console</artifactId>
                 <version>${ureport2.version}</version>
             </dependency>
-
-            <!-- TODO @fansili:看看怎么可以不依赖这个 bom 文件 -->
-            <!-- 添加ai模块 -->
-            <dependency>
-                <groupId>org.springframework.ai</groupId>
-                <artifactId>spring-ai-bom</artifactId>
-                <version>${spring-ai-bom.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
         </dependencies>
     </dependencyManagement>
 
