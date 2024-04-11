@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.framework.apilog.core.annotations;
+package cn.iocoder.yudao.framework.apilog.core.annotation;
 
 import cn.iocoder.yudao.framework.apilog.core.enums.OperateTypeEnum;
 

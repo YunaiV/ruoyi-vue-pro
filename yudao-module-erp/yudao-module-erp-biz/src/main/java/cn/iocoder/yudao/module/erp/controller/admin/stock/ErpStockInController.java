@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.erp.controller.admin.stock;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.iocoder.yudao.framework.apilog.core.annotations.ApiAccessLog;
+import cn.iocoder.yudao.framework.apilog.core.annotation.ApiAccessLog;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
