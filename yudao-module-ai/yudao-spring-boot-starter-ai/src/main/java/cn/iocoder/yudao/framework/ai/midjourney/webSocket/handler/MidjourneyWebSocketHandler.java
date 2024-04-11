@@ -8,7 +8,7 @@ import cn.hutool.http.useragent.UserAgentUtil;
 import cn.iocoder.yudao.framework.ai.midjourney.MidjourneyConfig;
 import cn.iocoder.yudao.framework.ai.midjourney.webSocket.FailureCallback;
 import cn.iocoder.yudao.framework.ai.midjourney.webSocket.SuccessCallback;
-import cn.iocoder.yudao.framework.ai.midjourney.webSocket.listener.MjMessageListener;
+import cn.iocoder.yudao.framework.ai.midjourney.webSocket.listener.MidjourneyMessageListener;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.utils.data.DataArray;
@@ -29,7 +29,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 @Slf4j
-public class MjWebSocketHandler implements WebSocketHandler {
+public class MidjourneyWebSocketHandler implements WebSocketHandler {
 	/**
 	 * close 错误码：重连
 	 */
@@ -49,7 +49,7 @@ public class MjWebSocketHandler implements WebSocketHandler {
 	/**
 	 * mj 消息监听
 	 */
-	private final MjMessageListener userMessageListener;
+	private final MidjourneyMessageListener userMessageListener;
 	/**
 	 * 成功回调
 	 */
@@ -85,10 +85,10 @@ public class MjWebSocketHandler implements WebSocketHandler {
 	 */
 	private final Decompressor decompressor = new ZlibDecompressor(2048);
 
-	public MjWebSocketHandler(MidjourneyConfig account,
-							  MjMessageListener userMessageListener,
-							  SuccessCallback successCallback,
-							  FailureCallback failureCallback) {
+	public MidjourneyWebSocketHandler(MidjourneyConfig account,
+									  MidjourneyMessageListener userMessageListener,
+									  SuccessCallback successCallback,
+									  FailureCallback failureCallback) {
 		this.midjourneyConfig = account;
 		this.userMessageListener = userMessageListener;
 		this.successCallback = successCallback;

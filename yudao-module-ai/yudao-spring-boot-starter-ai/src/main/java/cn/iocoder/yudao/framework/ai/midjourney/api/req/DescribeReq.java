@@ -1,9 +1,7 @@
-package cn.iocoder.yudao.framework.ai.midjourney.vo;
+package cn.iocoder.yudao.framework.ai.midjourney.api.req;
 
 import lombok.Data;
 import lombok.experimental.Accessors;
-
-import java.io.File;
 
 /**
  * describe
@@ -13,7 +11,7 @@ import java.io.File;
  */
 @Data
 @Accessors(chain = true)
-public class Describe {
+public class DescribeReq {
 
     /**
      * 文件名字

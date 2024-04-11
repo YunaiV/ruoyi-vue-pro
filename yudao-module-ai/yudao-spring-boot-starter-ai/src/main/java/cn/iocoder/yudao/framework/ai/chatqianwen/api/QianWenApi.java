@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.framework.ai.chatqianwen;
+package cn.iocoder.yudao.framework.ai.chatqianwen.api;
 
 import com.aliyun.broadscope.bailian.sdk.AccessTokenClient;
 import com.aliyun.broadscope.bailian.sdk.ApplicationClient;
@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import reactor.core.publisher.Flux;
 
+// TODO done @fansili：是不是挪到 api 包里？按照 spring ai 的结构；根目录只放 client 和 options
 /**
  * 阿里 通义千问
  *

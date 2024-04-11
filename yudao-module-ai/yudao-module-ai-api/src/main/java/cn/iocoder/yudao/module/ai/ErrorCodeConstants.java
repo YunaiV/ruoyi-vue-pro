@@ -11,6 +11,7 @@ public interface ErrorCodeConstants {
 
     // ========== 模块 ai 错误码区间 [1-022-000-000 ~ 1-023-000-000) ==========
 
+    // TODO @fansili：1）类注释不太对；2）中英文之间，有个空格；例如说 AI 模型
     ErrorCode AI_MODULE_NOT_SUPPORTED = new ErrorCode(1_022_000_000, "AI模型暂不支持!");
 
 }

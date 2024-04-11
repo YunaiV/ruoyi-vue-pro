@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.framework.ai.midjourney.vo;
+package cn.iocoder.yudao.framework.ai.midjourney.api.res;
 
 import lombok.Data;
 import lombok.experimental.Accessors;

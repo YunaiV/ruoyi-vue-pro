@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.framework.ai.midjourney.vo;
+package cn.iocoder.yudao.framework.ai.midjourney.api.req;
 
 import lombok.Data;
 import lombok.experimental.Accessors;
@@ -9,7 +9,7 @@ import lombok.experimental.Accessors;
  */
 @Data
 @Accessors(chain = true)
-public class ReRoll {
+public class ReRollReq {
 
     /**
      * socket 消息里面收到的 messageId

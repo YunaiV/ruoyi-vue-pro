@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.framework.ai.midjourney.vo;
+package cn.iocoder.yudao.framework.ai.midjourney.api.req;
 
 import lombok.Data;
 import lombok.experimental.Accessors;
@@ -12,7 +12,7 @@ import org.springframework.core.io.FileSystemResource;
  */
 @Data
 @Accessors(chain = true)
-public class Attachments {
+public class AttachmentsReq {
 
     /**
      * 创建文件系统资源对象

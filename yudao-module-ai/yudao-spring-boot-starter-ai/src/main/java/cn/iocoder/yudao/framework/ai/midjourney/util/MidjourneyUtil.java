@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.framework.ai.midjourney.util;
 
 import cn.hutool.core.text.CharSequenceUtil;
-import cn.iocoder.yudao.framework.ai.midjourney.MjMessage;
+import cn.iocoder.yudao.framework.ai.midjourney.MidjourneyMessage;
 
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -13,7 +13,7 @@ import java.util.regex.Pattern;
  * author: fansili
  * time: 2024/4/6 19:00
  */
-public class MjUtil {
+public class MidjourneyUtil {
     /**
      * content正则匹配prompt和进度.
      */
@@ -26,12 +26,12 @@ public class MjUtil {
      * @param content
      * @return
      */
-    public static MjMessage.Content parseContent(String content) {
+    public static MidjourneyMessage.Content parseContent(String content) {
         // 有三种格式。
         // 南极应该是什么样子？
         // "**南极应该是什么样子？ --v 6.0 --style raw** - <@972721304891453450> (32%) (fast, stealth)",
         // "**南极应该是什么样子？ --v 6.0 --style raw** - <@972721304891453450> (fast, stealth)"
-        MjMessage.Content mjContent = new MjMessage.Content();
+        MidjourneyMessage.Content mjContent = new MidjourneyMessage.Content();
         if (CharSequenceUtil.isBlank(content)) {
             return null;
         }

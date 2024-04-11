@@ -6,6 +6,7 @@ import cn.iocoder.yudao.framework.ai.chat.*;
 import cn.iocoder.yudao.framework.ai.chat.messages.MessageType;
 import cn.iocoder.yudao.framework.ai.chat.prompt.ChatOptions;
 import cn.iocoder.yudao.framework.ai.chat.prompt.Prompt;
+import cn.iocoder.yudao.framework.ai.chatqianwen.api.QianWenApi;
 import cn.iocoder.yudao.framework.ai.chatyiyan.exception.YiYanApiException;
 import com.aliyun.broadscope.bailian.sdk.models.*;
 import lombok.extern.slf4j.Slf4j;
@@ -29,7 +30,7 @@ import java.util.stream.Collectors;
  * time: 2024/3/13 21:06
  */
 @Slf4j
-public class QianWenChatClient  implements ChatClient, StreamingChatClient {
+public class QianWenChatClient implements ChatClient, StreamingChatClient {
 
     private QianWenApi qianWenApi;
 
@@ -44,6 +45,7 @@ public class QianWenChatClient  implements ChatClient, StreamingChatClient {
         this.qianWenOptions = qianWenOptions;
     }
 
+    // TODO @fansili：看看咋公用出来，允许传入类似异常之类的参数；
     public final RetryTemplate retryTemplate = RetryTemplate.builder()
             // 最大重试次数 10
             .maxAttempts(10)

@@ -4,7 +4,7 @@ import cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.module.ai.ErrorCodeConstants;
 import cn.iocoder.yudao.module.ai.controller.admin.vo.AiChatReqVO;
-import cn.iocoder.yudao.module.ai.enums.AiModelEnum;
+import cn.iocoder.yudao.module.ai.enums.OpenAiModelEnum;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
@@ -13,7 +13,6 @@ import org.springframework.ai.chat.ChatClient;
 import org.springframework.ai.chat.ChatResponse;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.openai.OpenAiChatClient;
-import org.springframework.ai.openai.api.OpenAiApi;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.validation.annotation.Validated;
@@ -23,15 +22,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Flux;
 
-import java.util.Scanner;
 import java.util.function.Consumer;
 
-/**
- * AI模块
- *
- * author: fansili
- * time: 2024/3/3 20:28
- */
+// TODO done @fansili：有了 swagger 注释，就不用类注释了
 @Tag(name = "AI模块")
 @RestController
 @RequestMapping("/ai-api")
@@ -47,7 +40,7 @@ public class ChatController {
         ChatClient chatClient = getChatClient(reqVO.getAiModel());
         String res;
         try {
-            res = chatClient.call(reqVO.getInputText());
+            res = chatClient.call(reqVO.getPrompt());
         } catch (Exception e) {
             res = e.getMessage();
         }
@@ -58,33 +51,14 @@ public class ChatController {
     @Operation(summary = "对话聊天chatStream", description = "简单的ai聊天")
     public CommonResult chatStream(HttpServletResponse response, @RequestBody @Validated AiChatReqVO reqVO) throws InterruptedException {
         OpenAiChatClient chatClient = applicationContext.getBean(OpenAiChatClient.class);
-        Flux<ChatResponse> chatResponse = chatClient.stream(new Prompt(reqVO.getInputText()));
+        Flux<ChatResponse> chatResponse = chatClient.stream(new Prompt(reqVO.getPrompt()));
         chatResponse.subscribe(new Consumer<ChatResponse>() {
             @Override
             public void accept(ChatResponse chatResponse) {
                 System.err.println(chatResponse.getResults().get(0).getOutput().getContent());
             }
         });
-        return CommonResult.success("1");
-    }
-
-    public static void main(String[] args) {
-        OpenAiChatClient openAiChatClient = new OpenAiChatClient(new OpenAiApi("openkey"));
-        Flux<ChatResponse> responseFlux = openAiChatClient.stream(new Prompt("最好的编程语言!"));
-        long now = System.currentTimeMillis();
-        responseFlux.subscribe(new Consumer<ChatResponse>() {
-            @Override
-            public void accept(ChatResponse chatResponse) {
-                if (chatResponse.getResults().get(0).getOutput() == null) {
-                    return;
-                }
-                System.err.println(chatResponse.getResults().get(0).getOutput().getContent());
-            }
-        });
-
-        // 阻止退出
-        Scanner scanner = new Scanner(System.in);
-        scanner.nextLine();
+        return CommonResult.success(null);
     }
 
     /**
@@ -93,8 +67,8 @@ public class ChatController {
      * @param aiModelEnum
      * @return
      */
-    private ChatClient getChatClient(AiModelEnum aiModelEnum) {
-        if (AiModelEnum.OPEN_AI_GPT_3_5 == aiModelEnum) {
+    private ChatClient getChatClient(OpenAiModelEnum aiModelEnum) {
+        if (OpenAiModelEnum.OPEN_AI_GPT_3_5 == aiModelEnum) {
             return applicationContext.getBean(OpenAiChatClient.class);
         }
         // AI模型暂不支持
