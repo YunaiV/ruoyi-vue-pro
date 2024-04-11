@@ -207,9 +207,7 @@
 | 🚀  | Java 监控   | 基于 Spring Boot Admin 实现 Java 应用的监控           |
 | 🚀  | 链路追踪      | 接入 SkyWalking 组件，实现链路追踪                      |
 | 🚀  | 日志中心      | 接入 SkyWalking 组件，实现日志中心                      |
-| 🚀  | 分布式锁      | 基于 Redis 实现分布式锁，满足并发场景                       |
-| 🚀  | 幂等组件      | 基于 Redis 实现幂等组件，解决重复请求问题                     |
-| 🚀  | 服务保障      | 基于 Resilience4j 实现服务的稳定性，包括限流、熔断等功能          |
+| 🚀  | 服务保障      | 基于 Redis 实现分布式锁、幂等、限流功能，满足高并发场景              |
 | 🚀  | 日志服务      | 轻量级日志中心，查看远程服务器的日志                           |
 | 🚀  | 单元测试      | 基于 JUnit + Mockito 实现单元测试，保证功能的正确性、代码的质量等    |
 
@@ -304,7 +302,6 @@
 | [Flowable](https://github.com/flowable/flowable-engine)                                     | 工作流引擎            | 7.0.0          | [文档](https://doc.iocoder.cn/bpm/)                              |
 | [Quartz](https://github.com/quartz-scheduler)                                               | 任务调度组件           | 2.3.2          | [文档](http://www.iocoder.cn/Spring-Boot/Job/?yudao)             |
 | [Springdoc](https://springdoc.org/)                                                         | Swagger 文档       | 2.2.0          | [文档](http://www.iocoder.cn/Spring-Boot/Swagger/?yudao)         |
-| [Resilience4j](https://github.com/resilience4j/resilience4j)                                | 服务保障组件           | 2.1.0          | [文档](http://www.iocoder.cn/Spring-Boot/Resilience4j/?yudao)    |
 | [SkyWalking](https://skywalking.apache.org/)                                                | 分布式应用追踪系统        | 9.0.0          | [文档](http://www.iocoder.cn/Spring-Boot/SkyWalking/?yudao)      |
 | [Spring Boot Admin](https://github.com/codecentric/spring-boot-admin)                       | Spring Boot 监控平台 | 3.1.8          | [文档](http://www.iocoder.cn/Spring-Boot/Admin/?yudao)           |
 | [Jackson](https://github.com/FasterXML/jackson)                                             | JSON 工具库         | 2.15.3         |                                                                |
