@@ -37,7 +37,7 @@ public class IdempotentAspect {
     }
 
     @Around(value = "@annotation(idempotent)")
-    public Object beforePointCut(ProceedingJoinPoint joinPoint, Idempotent idempotent) throws Throwable {
+    public Object aroundPointCut(ProceedingJoinPoint joinPoint, Idempotent idempotent) throws Throwable {
         // 获得 IdempotentKeyResolver
         IdempotentKeyResolver keyResolver = keyResolvers.get(idempotent.keyResolver());
         Assert.notNull(keyResolver, "找不到对应的 IdempotentKeyResolver");
@@ -48,7 +48,7 @@ public class IdempotentAspect {
         boolean success = idempotentRedisDAO.setIfAbsent(key, idempotent.timeout(), idempotent.timeUnit());
         // 锁定失败，抛出异常
         if (!success) {
-            log.info("[beforePointCut][方法({}) 参数({}) 存在重复请求]", joinPoint.getSignature().toString(), joinPoint.getArgs());
+            log.info("[aroundPointCut][方法({}) 参数({}) 存在重复请求]", joinPoint.getSignature().toString(), joinPoint.getArgs());
             throw new ServiceException(GlobalErrorCodeConstants.REPEATED_REQUESTS.getCode(), idempotent.message());
         }
 

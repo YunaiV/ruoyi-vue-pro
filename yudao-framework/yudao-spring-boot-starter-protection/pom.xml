@@ -20,7 +20,7 @@
         <dependency>
             <groupId>cn.iocoder.boot</groupId>
             <artifactId>yudao-spring-boot-starter-web</artifactId>
-            <scope>provided</scope> <!-- 设置为 provided，只有 OncePerRequestFilter 使用到 -->
+            <scope>provided</scope> <!-- 设置为 provided，只有限流、幂等使用到 -->
         </dependency>
 
         <!-- DB 相关 -->
