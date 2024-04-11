@@ -9,7 +9,8 @@ import org.springframework.stereotype.Service;
 import java.util.Set;
 
 /**
- * 仿钉钉快搭各个节点 Service TODO @jason：注释要有空行哈；
+ * 仿钉钉快搭各个节点 Service
+ *
  * @author jason
  */
 @Service
@@ -21,7 +22,8 @@ public class BpmSimpleNodeService {
     private BpmProcessInstanceCopyService processInstanceCopyService;
 
     /**
-     * 仿钉钉快搭抄送 TODO @jason：注释要有空行哈；
+     * 仿钉钉快搭抄送
+     *
      * @param execution 执行的任务(ScriptTask)
      */
     public Boolean copy(DelegateExecution execution) {

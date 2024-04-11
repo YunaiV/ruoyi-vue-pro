@@ -47,7 +47,7 @@ public class BpmProcessInstanceCopyServiceImpl implements BpmProcessInstanceCopy
     // TODO @芋艿：这里多加了一个 name；
     @Override
     public void createProcessInstanceCopy(Collection<Long> userIds, String processInstanceId, String taskId, String taskName) {
-        // 1.1 校验任务存在 暂时去掉这个校验. 因为任务可能仿钉钉快搭的抄送节点(ScriptTask) TODO jason：抄送节点，会没有来源的 taskId 么？
+        // 1.1 校验任务存在 暂时去掉这个校验. 因为任务可能仿钉钉快搭的抄送节点(ScriptTask) TODO jason：抄送节点，会没有来源的 taskId 么？ @芋艿 是否校验一下 传递进来的 id 不为空就行
 //        Task task = taskService.getTask(taskId);
 //        if (ObjectUtil.isNull(task)) {
 //            throw exception(ErrorCodeConstants.TASK_NOT_EXISTS);

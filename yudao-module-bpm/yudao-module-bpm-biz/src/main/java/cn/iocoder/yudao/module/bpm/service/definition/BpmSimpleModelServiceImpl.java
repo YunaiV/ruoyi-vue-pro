@@ -10,6 +10,7 @@ import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.simple.BpmSimp
 import cn.iocoder.yudao.module.bpm.enums.definition.BpmSimpleModelNodeType;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnModelConstants;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.util.BpmnModelUtils;
+import cn.iocoder.yudao.module.bpm.framework.flowable.core.util.SimpleModelUtils;
 import jakarta.annotation.Resource;
 import org.flowable.bpmn.model.*;
 import org.flowable.engine.repository.Model;
@@ -22,7 +23,7 @@ import java.util.Map;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.bpm.enums.ErrorCodeConstants.CONVERT_TO_SIMPLE_MODEL_NOT_SUPPORT;
 import static cn.iocoder.yudao.module.bpm.enums.ErrorCodeConstants.MODEL_NOT_EXISTS;
-import static cn.iocoder.yudao.module.bpm.enums.definition.BpmSimpleModelNodeType.START_EVENT_NODE;
+import static cn.iocoder.yudao.module.bpm.enums.definition.BpmSimpleModelNodeType.START_EVENT;
 import static cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnModelConstants.USER_TASK_CANDIDATE_PARAM;
 import static cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnModelConstants.USER_TASK_CANDIDATE_STRATEGY;
 
@@ -56,7 +57,7 @@ public class BpmSimpleModelServiceImpl implements BpmSimpleModelService {
 //            return Boolean.FALSE;
 //        }
         // 1. JSON 转换成 bpmnModel
-        BpmnModel bpmnModel = BpmnModelUtils.convertSimpleModelToBpmnModel(model.getKey(), model.getName(), reqVO.getSimpleModelBody());
+        BpmnModel bpmnModel = SimpleModelUtils.convertSimpleModelToBpmnModel(model.getKey(), model.getName(), reqVO.getSimpleModelBody());
         // 2.1 保存 Bpmn XML
         bpmModelService.saveModelBpmnXml(model.getId(), StrUtil.utf8Bytes(BpmnModelUtils.getBpmnXml(bpmnModel)));
         // 2.2 保存 JSON 数据
@@ -93,7 +94,7 @@ public class BpmSimpleModelServiceImpl implements BpmSimpleModelService {
             return null;
         }
         BpmSimpleModelNodeVO rootNode = new BpmSimpleModelNodeVO();
-        rootNode.setType(START_EVENT_NODE.getType());
+        rootNode.setType(START_EVENT.getType());
         rootNode.setId(startEvent.getId());
         rootNode.setName(startEvent.getName());
         recursiveBuildSimpleModelNode(startEvent, rootNode);
@@ -105,10 +106,10 @@ public class BpmSimpleModelServiceImpl implements BpmSimpleModelService {
         Assert.notNull(nodeType, "节点类型不支持");
         // 校验节点是否支持转仿钉钉的流程模型
         List<SequenceFlow> outgoingFlows = validateCanConvertSimpleNode(nodeType, currentFlowNode);
-        if (CollUtil.isEmpty(outgoingFlows) || outgoingFlows.get(0).getTargetFlowElement() == null) {
+        if (CollUtil.isEmpty(outgoingFlows) || CollUtil.getFirst(outgoingFlows).getTargetFlowElement() == null) {
             return;
         }
-        FlowElement targetElement = outgoingFlows.get(0).getTargetFlowElement();
+        FlowElement targetElement = CollUtil.getFirst(outgoingFlows).getTargetFlowElement();
         // 如果是 EndEvent 直接退出
         if (targetElement instanceof EndEvent) {
             return;
@@ -123,7 +124,7 @@ public class BpmSimpleModelServiceImpl implements BpmSimpleModelService {
 
     private BpmSimpleModelNodeVO convertUserTaskToSimpleModelNode(UserTask userTask) {
         BpmSimpleModelNodeVO simpleModelNodeVO = new BpmSimpleModelNodeVO();
-        simpleModelNodeVO.setType(BpmSimpleModelNodeType.APPROVE_USER_NODE.getType());
+        simpleModelNodeVO.setType(BpmSimpleModelNodeType.USER_TASK.getType());
         simpleModelNodeVO.setName(userTask.getName());
         simpleModelNodeVO.setId(userTask.getId());
         Map<String, Object> attributes = MapUtil.newHashMap();
@@ -137,13 +138,13 @@ public class BpmSimpleModelServiceImpl implements BpmSimpleModelService {
 
     private List<SequenceFlow> validateCanConvertSimpleNode(BpmSimpleModelNodeType nodeType, FlowNode currentFlowNode) {
         switch (nodeType) {
-            case START_EVENT_NODE:
-            case APPROVE_USER_NODE: {
+            case START_EVENT:
+            case USER_TASK: {
                 List<SequenceFlow> outgoingFlows = currentFlowNode.getOutgoingFlows();
                 if (CollUtil.isNotEmpty(outgoingFlows) && outgoingFlows.size() > 1) {
                     throw exception(CONVERT_TO_SIMPLE_MODEL_NOT_SUPPORT);
                 }
-                validIsSupportFlowNode(outgoingFlows.get(0).getTargetFlowElement());
+                validIsSupportFlowNode(CollUtil.getFirst(outgoingFlows).getTargetFlowElement());
                 return outgoingFlows;
             }
             default: {

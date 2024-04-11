@@ -1,43 +1,41 @@
 package cn.iocoder.yudao.module.bpm.framework.flowable.core.util;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.lang.Assert;
-import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.ArrayUtil;
-import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.util.number.NumberUtils;
-import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.simple.BpmSimpleModelNodeVO;
-import cn.iocoder.yudao.module.bpm.enums.definition.BpmSimpleModelNodeType;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnModelConstants;
-import org.flowable.bpmn.BpmnAutoLayout;
 import org.flowable.bpmn.converter.BpmnXMLConverter;
 import org.flowable.bpmn.model.Process;
 import org.flowable.bpmn.model.*;
-import org.flowable.common.engine.impl.scripting.ScriptingEngines;
 import org.flowable.common.engine.impl.util.io.BytesStreamSource;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
-import static org.flowable.bpmn.constants.BpmnXMLConstants.*;
+import java.util.*;
 
 /**
  * 流程模型转操作工具类
  */
 public class BpmnModelUtils {
 
-    public static final String BPMN_SIMPLE_COPY_EXECUTION_SCRIPT = "#{bpmSimpleNodeService.copy(execution)}";
-
     public static Integer parseCandidateStrategy(FlowElement userTask) {
-        return NumberUtils.parseInt(userTask.getAttributeValue(
+        Integer candidateStrategy = NumberUtils.parseInt(userTask.getAttributeValue(
                 BpmnModelConstants.NAMESPACE, BpmnModelConstants.USER_TASK_CANDIDATE_STRATEGY));
+        // @芋艿 尝试从 ExtensionElement 取. 后续相关扩展是否都可以 存 extensionElement。 如表单权限。 按钮权限
+        if (candidateStrategy == null) {
+            ExtensionElement element = CollUtil.getFirst(userTask.getExtensionElements().get(BpmnModelConstants.USER_TASK_CANDIDATE_STRATEGY));
+            candidateStrategy = NumberUtils.parseInt(Optional.ofNullable(element).map(ExtensionElement::getElementText).orElse(null));
+
+        }
+        return candidateStrategy;
     }
 
     public static String parseCandidateParam(FlowElement userTask) {
-        return userTask.getAttributeValue(
+        String candidateParam =  userTask.getAttributeValue(
                 BpmnModelConstants.NAMESPACE, BpmnModelConstants.USER_TASK_CANDIDATE_PARAM);
+        if (candidateParam == null) {
+            ExtensionElement element = CollUtil.getFirst(userTask.getExtensionElements().get(BpmnModelConstants.USER_TASK_CANDIDATE_PARAM));
+            candidateParam = Optional.ofNullable(element).map(ExtensionElement::getElementText).orElse(null);
+        }
+        return candidateParam;
     }
 
     /**
@@ -339,231 +337,4 @@ public class BpmnModelUtils {
         }
         return userTaskList;
     }
-
-    // ========== TODO @jason：单独出一个 SimpleModelUtils；定位上，它是 BPMN 的精简模式 ==========
-
-    /**
-     * 仿钉钉流程设计模型数据结构(json) 转换成 Bpmn Model (待完善）
-     *
-     * @param processId       流程标识
-     * @param processName     流程名称
-     * @param simpleModelNode 仿钉钉流程设计模型数据结构
-     * @return Bpmn Model
-     */
-    public static BpmnModel convertSimpleModelToBpmnModel(String processId, String processName, BpmSimpleModelNodeVO simpleModelNode) {
-        BpmnModel bpmnModel = new BpmnModel();
-        Process mainProcess = new Process();
-        mainProcess.setId(processId);
-        mainProcess.setName(processName);
-        mainProcess.setExecutable(Boolean.TRUE);
-        bpmnModel.addProcess(mainProcess);
-        // 前端模型数据结构。 有 start event 节点. 没有 end event 节点。
-        // 添加 FlowNode
-        addBpmnFlowNode(mainProcess, simpleModelNode);
-        // 单独添加 end event 节点
-        addBpmnEndEventNode(mainProcess);
-        // 添加节点之间的连线 Sequence Flow
-        addBpmnSequenceFlow(mainProcess, simpleModelNode, BpmnModelConstants.END_EVENT_ID);
-        // 自动布局
-        new BpmnAutoLayout(bpmnModel).execute();
-        return bpmnModel;
-    }
-
-    private static void addBpmnSequenceFlow(Process mainProcess, BpmSimpleModelNodeVO node, String endId) {
-        // 节点为 null 退出
-        if (node == null || node.getId() == null) {
-            return;
-        }
-        BpmSimpleModelNodeVO childNode = node.getChildNode();
-        // 如果不是网关节点、且后续节点为 null. 添加与结束节点的连线
-        if (!BpmSimpleModelNodeType.isGatewayNode(node.getType()) && (childNode == null || childNode.getId() == null)) {
-            addBpmnSequenceFlowElement(mainProcess, node.getId(), endId, null, null);
-            return;
-        }
-        BpmSimpleModelNodeType nodeType = BpmSimpleModelNodeType.valueOf(node.getType());
-        Assert.notNull(nodeType, "模型节点类型不支持");
-        // TODO @jason：建议是，addXXX 都改成 buildXXX，构建出一个什么；然后返回之后，让这个方法添加到自己的结果里；
-        switch (nodeType) {
-            case START_EVENT_NODE:
-            case APPROVE_USER_NODE:
-            case SCRIPT_TASK_NODE:
-            case PARALLEL_GATEWAY_JOIN_NODE:
-            case INCLUSIVE_GATEWAY_JOIN_NODE:{
-                addBpmnSequenceFlowElement(mainProcess, node.getId(), childNode.getId(), null, null);
-                // 递归调用后续节点
-                addBpmnSequenceFlow(mainProcess, childNode, endId);
-                break;
-            }
-            case PARALLEL_GATEWAY_FORK_NODE:
-            case EXCLUSIVE_GATEWAY_NODE:
-            case INCLUSIVE_GATEWAY_FORK_NODE:{
-                String gateWayEndId = (childNode == null || childNode.getId() == null) ? BpmnModelConstants.END_EVENT_ID : childNode.getId();
-                List<BpmSimpleModelNodeVO> conditionNodes = node.getConditionNodes();
-                Assert.notEmpty(conditionNodes, "网关节点的条件节点不能为空");
-                for (int i = 0; i < conditionNodes.size(); i++) {
-                    BpmSimpleModelNodeVO item = conditionNodes.get(i);
-                    BpmSimpleModelNodeVO nextNodeOnCondition = item.getChildNode();
-                    if (nextNodeOnCondition != null && nextNodeOnCondition.getId() != null) {
-                        addBpmnSequenceFlowElement(mainProcess, node.getId(), nextNodeOnCondition.getId(),
-                                String.format("%s_SequenceFlow_%d", node.getId(), i + 1), null);
-                        addBpmnSequenceFlow(mainProcess, nextNodeOnCondition, gateWayEndId);
-                    } else {
-                        addBpmnSequenceFlowElement(mainProcess, node.getId(), gateWayEndId,
-                                String.format("%s_SequenceFlow_%d", node.getId(), i + 1), null);
-                    }
-                }
-                // 递归调用后续节点
-                addBpmnSequenceFlow(mainProcess, childNode, endId);
-                break;
-            }
-            default: {
-                // TODO 其它节点类型的实现
-            }
-        }
-
-    }
-
-    private static void addBpmnSequenceFlowElement(Process mainProcess, String sourceId, String targetId, String seqFlowId, String conditionExpression) {
-        SequenceFlow sequenceFlow = new SequenceFlow(sourceId, targetId);
-        if (StrUtil.isNotEmpty(conditionExpression)) {
-            sequenceFlow.setConditionExpression(conditionExpression);
-        }
-        if (StrUtil.isNotEmpty(seqFlowId)) {
-            sequenceFlow.setId(seqFlowId);
-        }
-        mainProcess.addFlowElement(sequenceFlow);
-    }
-
-    private static void addBpmnFlowNode(Process mainProcess, BpmSimpleModelNodeVO simpleModelNode) {
-        // 节点为 null 退出
-        if (simpleModelNode == null || simpleModelNode.getId() == null) {
-            return;
-        }
-        BpmSimpleModelNodeType nodeType = BpmSimpleModelNodeType.valueOf(simpleModelNode.getType());
-        Assert.notNull(nodeType, "模型节点类型不支持");
-        switch (nodeType) {
-            case START_EVENT_NODE:
-                addBpmnStartEventNode(mainProcess, simpleModelNode);
-                break;
-            case APPROVE_USER_NODE:
-                addBpmnUserTaskNode(mainProcess, simpleModelNode);
-                break;
-            case SCRIPT_TASK_NODE:
-                addBpmnScriptTaSskNode(mainProcess, simpleModelNode);
-                break;
-            case EXCLUSIVE_GATEWAY_NODE:
-                addBpmnExclusiveGatewayNode(mainProcess, simpleModelNode);
-                break;
-            case PARALLEL_GATEWAY_FORK_NODE:
-            case PARALLEL_GATEWAY_JOIN_NODE:
-                addBpmnParallelGatewayNode(mainProcess, simpleModelNode);
-                break;
-            case INCLUSIVE_GATEWAY_FORK_NODE:
-                addBpmnInclusiveGatewayNode(mainProcess, simpleModelNode, Boolean.TRUE);
-                break;
-            case INCLUSIVE_GATEWAY_JOIN_NODE:
-                addBpmnInclusiveGatewayNode(mainProcess, simpleModelNode, Boolean.FALSE);
-                break;
-            default: {
-                // TODO 其它节点类型的实现
-            }
-        }
-
-        // 如果不是网关类型的接口， 并且chileNode为空退出
-        if (!BpmSimpleModelNodeType.isGatewayNode(simpleModelNode.getType()) && simpleModelNode.getChildNode() == null) {
-            return;
-        }
-
-        // 如果是网关类型接口. 递归添加条件节点
-        if (BpmSimpleModelNodeType.isGatewayNode(simpleModelNode.getType()) && ArrayUtil.isNotEmpty(simpleModelNode.getConditionNodes())) {
-            for (BpmSimpleModelNodeVO node : simpleModelNode.getConditionNodes()) {
-                addBpmnFlowNode(mainProcess, node.getChildNode());
-            }
-        }
-
-        // chileNode不为空，递归添加子节点
-        if (simpleModelNode.getChildNode() != null) {
-            addBpmnFlowNode(mainProcess, simpleModelNode.getChildNode());
-        }
-    }
-
-    private static void addBpmnParallelGatewayNode(Process mainProcess, BpmSimpleModelNodeVO node) {
-        ParallelGateway parallelGateway = new ParallelGateway();
-        parallelGateway.setId(node.getId());
-        mainProcess.addFlowElement(parallelGateway);
-    }
-
-    private static void addBpmnScriptTaSskNode(Process mainProcess, BpmSimpleModelNodeVO node) {
-        ScriptTask scriptTask = new ScriptTask();
-        scriptTask.setId(node.getId());
-        scriptTask.setName(node.getName());
-        // TODO @jason：建议使用 ServiceTask，通过 executionListeners 实现；
-        scriptTask.setScriptFormat(ScriptingEngines.DEFAULT_SCRIPTING_LANGUAGE);
-        scriptTask.setScript(BPMN_SIMPLE_COPY_EXECUTION_SCRIPT);
-        // 添加自定义属性
-        // TODO @jason：可以使用 ServiceTask 搞 ExtensionAttribute 么？
-        addExtensionAttributes(node, scriptTask);
-        mainProcess.addFlowElement(scriptTask);
-    }
-
-    private static void addExtensionAttributes(BpmSimpleModelNodeVO node, FlowElement flowElement) {
-        Integer candidateStrategy = MapUtil.getInt(node.getAttributes(), BpmnModelConstants.USER_TASK_CANDIDATE_STRATEGY);
-        addExtensionAttributes(flowElement, BpmnModelConstants.NAMESPACE, BpmnModelConstants.USER_TASK_CANDIDATE_STRATEGY,
-                candidateStrategy == null ? null : String.valueOf(candidateStrategy));
-        addExtensionAttributes(flowElement, BpmnModelConstants.NAMESPACE, BpmnModelConstants.USER_TASK_CANDIDATE_PARAM,
-                MapUtil.getStr(node.getAttributes(), BpmnModelConstants.USER_TASK_CANDIDATE_PARAM));
-    }
-
-    private static void addBpmnExclusiveGatewayNode(Process mainProcess, BpmSimpleModelNodeVO node) {
-        Assert.notEmpty(node.getConditionNodes(), "网关节点的条件节点不能为空");
-        ExclusiveGateway exclusiveGateway = new ExclusiveGateway();
-        exclusiveGateway.setId(node.getId());
-        // 网关的最后一个条件为 网关的 default sequence flow
-        exclusiveGateway.setDefaultFlow(String.format("%s_SequenceFlow_%d", node.getId(), node.getConditionNodes().size()));
-        mainProcess.addFlowElement(exclusiveGateway);
-    }
-
-    private static void addBpmnInclusiveGatewayNode(Process mainProcess, BpmSimpleModelNodeVO node, Boolean isFork) {
-        InclusiveGateway inclusiveGateway = new InclusiveGateway();
-        inclusiveGateway.setId(node.getId());
-        if (isFork) {
-            Assert.notEmpty(node.getConditionNodes(), "网关节点的条件节点不能为空");
-            // 网关的最后一个条件为 网关的 default sequence flow
-            inclusiveGateway.setDefaultFlow(String.format("%s_SequenceFlow_%d", node.getId(), node.getConditionNodes().size()));
-        }
-        mainProcess.addFlowElement(inclusiveGateway);
-    }
-
-    private static void addBpmnEndEventNode(Process mainProcess) {
-        EndEvent endEvent = new EndEvent();
-        endEvent.setId(BpmnModelConstants.END_EVENT_ID);
-        endEvent.setName("结束");
-        mainProcess.addFlowElement(endEvent);
-    }
-
-    private static void addBpmnUserTaskNode(Process mainProcess, BpmSimpleModelNodeVO node) {
-        UserTask userTask = new UserTask();
-        userTask.setId(node.getId());
-        userTask.setName(node.getName());
-        addExtensionAttributes(node, userTask);
-        mainProcess.addFlowElement(userTask);
-    }
-
-    private static void addExtensionAttributes(FlowElement element, String namespace, String name, String value) {
-        if (value == null) {
-            return;
-        }
-        ExtensionAttribute extensionAttribute = new ExtensionAttribute(name, value);
-        extensionAttribute.setNamespace(namespace);
-        extensionAttribute.setNamespacePrefix(FLOWABLE_EXTENSIONS_PREFIX);
-        element.addAttribute(extensionAttribute);
-    }
-
-    private static void addBpmnStartEventNode(Process mainProcess, BpmSimpleModelNodeVO node) {
-        StartEvent startEvent = new StartEvent();
-        startEvent.setId(node.getId());
-        startEvent.setName(node.getName());
-        mainProcess.addFlowElement(startEvent);
-    }
-
 }
