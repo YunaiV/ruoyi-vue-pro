@@ -53,6 +53,7 @@ public interface CrmStatisticsCustomerMapper {
 
     /**
      * 合同总金额(按用户)
+     *
      * @return 统计数据@return 统计数据@param reqVO 请求参数
      * @return 统计数据
      */
@@ -190,5 +191,21 @@ public interface CrmStatisticsCustomerMapper {
      * @return 统计数据
      */
     List<CrmStatisticsCustomerDealCycleByUserRespVO> selectCustomerDealCycleGroupByUser(CrmStatisticsCustomerReqVO reqVO);
+
+    /**
+     * 客户成交周期(按区域)
+     *
+     * @param reqVO 请求参数
+     * @return 统计数据
+     */
+    List<CrmStatisticsCustomerDealCycleByAreaRespVO> selectCustomerDealCycleGroupByAreaId(CrmStatisticsCustomerReqVO reqVO);
+
+    /**
+     * 客户成交周期(按产品)
+     *
+     * @param reqVO 请求参数
+     * @return 统计数据
+     */
+    List<CrmStatisticsCustomerDealCycleByProductRespVO> selectCustomerDealCycleGroupByProductId(CrmStatisticsCustomerReqVO reqVO);
 
 }

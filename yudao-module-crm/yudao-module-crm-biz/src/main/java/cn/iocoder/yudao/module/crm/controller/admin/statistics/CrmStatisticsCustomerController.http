@@ -53,3 +53,13 @@ tenant-id: {{adminTenentId}}
 GET {{baseUrl}}/crm/statistics-customer/get-customer-deal-cycle-by-user?deptId=100&times[0]=2023-01-01 00:00:00&times[1]=2024-12-12 23:59:59
 Authorization: Bearer {{token}}
 tenant-id: {{adminTenentId}}
+
+### 6.3 获取客户成交周期(按区域)
+GET {{baseUrl}}/crm/statistics-customer/get-customer-deal-cycle-by-area?deptId=100&times[0]=2023-01-01 00:00:00&times[1]=2024-12-12 23:59:59
+Authorization: Bearer {{token}}
+tenant-id: {{adminTenentId}}
+
+### 6.4 获取客户成交周期(按产品)
+GET {{baseUrl}}/crm/statistics-customer/get-customer-deal-cycle-by-product?deptId=100&times[0]=2023-01-01 00:00:00&times[1]=2024-12-12 23:59:59
+Authorization: Bearer {{token}}
+tenant-id: {{adminTenentId}}
