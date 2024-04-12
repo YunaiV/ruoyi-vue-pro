@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.module.bpm.service.definition;
 
-import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
@@ -104,7 +103,7 @@ public class BpmModelServiceImpl implements BpmModelService {
         // 保存流程定义
         repositoryService.saveModel(model);
         // 保存 BPMN XML
-        saveModelBpmnXml(model.getId(), StrUtil.utf8Bytes(bpmnXml));
+        saveModelBpmnXml(model, bpmnXml);
         return model.getId();
     }
 
@@ -122,7 +121,7 @@ public class BpmModelServiceImpl implements BpmModelService {
         // 更新模型
         repositoryService.saveModel(model);
         // 更新 BPMN XML
-        saveModelBpmnXml(model.getId(), StrUtil.utf8Bytes(updateReqVO.getBpmnXml()));
+        saveModelBpmnXml(model, updateReqVO.getBpmnXml());
     }
 
     @Override
@@ -237,25 +236,11 @@ public class BpmModelServiceImpl implements BpmModelService {
         }
     }
 
-    @Override
-    public void saveModelBpmnXml(String id,  byte[] xmlBytes) {
-        if (ArrayUtil.isEmpty(xmlBytes)) {
+    private void saveModelBpmnXml(Model model, String bpmnXml) {
+        if (StrUtil.isEmpty(bpmnXml)) {
             return;
         }
-        repositoryService.addModelEditorSource(id, xmlBytes);
-    }
-
-    @Override
-    public byte[] getModelSimpleJson(String id) {
-        return repositoryService.getModelEditorSourceExtra(id);
-    }
-
-    @Override
-    public void saveModelSimpleJson(String id, byte[] jsonBytes) {
-        if (ArrayUtil.isEmpty(jsonBytes)) {
-            return;
-        }
-        repositoryService.addModelEditorSourceExtra(id, jsonBytes);
+        repositoryService.addModelEditorSource(model.getId(), StrUtil.utf8Bytes(bpmnXml));
     }
 
     /**

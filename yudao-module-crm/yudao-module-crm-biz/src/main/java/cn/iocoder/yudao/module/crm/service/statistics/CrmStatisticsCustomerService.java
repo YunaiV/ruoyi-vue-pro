@@ -77,7 +77,7 @@ public interface CrmStatisticsCustomerService {
 
     /**
      * 客户成交周期(按日期)
-     * <p>
+     *
      * 成交周期的定义：客户 customer 在创建出来，到合同 contract 第一次成交的时间差
      *
      * @param reqVO 请求参数
@@ -92,21 +92,5 @@ public interface CrmStatisticsCustomerService {
      * @return 统计数据
      */
     List<CrmStatisticsCustomerDealCycleByUserRespVO> getCustomerDealCycleByUser(CrmStatisticsCustomerReqVO reqVO);
-
-    /**
-     * 客户成交周期(按区域)
-     *
-     * @param reqVO 请求参数
-     * @return 统计数据
-     */
-    List<CrmStatisticsCustomerDealCycleByAreaRespVO> getCustomerDealCycleByArea(CrmStatisticsCustomerReqVO reqVO);
-
-    /**
-     * 客户成交周期(按产品)
-     *
-     * @param reqVO 请求参数
-     * @return 统计数据
-     */
-    List<CrmStatisticsCustomerDealCycleByProductRespVO> getCustomerDealCycleByProduct(CrmStatisticsCustomerReqVO reqVO);
 
 }
