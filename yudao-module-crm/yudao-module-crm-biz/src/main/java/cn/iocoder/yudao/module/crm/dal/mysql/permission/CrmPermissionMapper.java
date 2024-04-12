@@ -53,9 +53,11 @@ public interface CrmPermissionMapper extends BaseMapperX<CrmPermissionDO> {
                 CrmPermissionDO::getUserId, userId);
     }
 
-    default CrmPermissionDO selectByBizIdAndUserId(Long bizId, Long userId) {
-        return selectOne(CrmPermissionDO::getBizId, bizId,
-                CrmPermissionDO::getUserId, userId);
+    default CrmPermissionDO selectByBizAndUserId(Integer bizType, Long bizId, Long userId) {
+        return selectOne(new LambdaQueryWrapperX<CrmPermissionDO>()
+                .eq(CrmPermissionDO::getBizType, bizType)
+                .eq(CrmPermissionDO::getBizId, bizId)
+                .eq(CrmPermissionDO::getUserId, userId));
     }
 
     default int deletePermission(Integer bizType, Long bizId) {

@@ -37,10 +37,7 @@ import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.crm.enums.ErrorCodeConstants.*;
@@ -81,7 +78,6 @@ public class CrmReceivableServiceImpl implements CrmReceivableService {
     @Resource
     private BpmProcessInstanceApi bpmProcessInstanceApi;
 
-    // TODO @puhui999：操作日志没记录上
     @Override
     @Transactional(rollbackFor = Exception.class)
     @LogRecord(type = CRM_RECEIVABLE_TYPE, subType = CRM_RECEIVABLE_CREATE_SUB_TYPE, bizNo = "{{#receivable.id}}",
@@ -115,6 +111,7 @@ public class CrmReceivableServiceImpl implements CrmReceivableService {
 
         // 5. 记录操作日志上下文
         LogRecordContext.putVariable("receivable", receivable);
+        LogRecordContext.putVariable("period", getReceivablePeriod(receivable.getPlanId()));
         return receivable.getId();
     }
 
@@ -156,7 +153,6 @@ public class CrmReceivableServiceImpl implements CrmReceivableService {
         }
     }
 
-    // TODO @puhui999：操作日志没记录上
     @Override
     @Transactional(rollbackFor = Exception.class)
     @LogRecord(type = CRM_RECEIVABLE_TYPE, subType = CRM_RECEIVABLE_UPDATE_SUB_TYPE, bizNo = "{{#updateReqVO.id}}",
@@ -164,11 +160,14 @@ public class CrmReceivableServiceImpl implements CrmReceivableService {
     @CrmPermission(bizType = CrmBizTypeEnum.CRM_RECEIVABLE, bizId = "#updateReqVO.id", level = CrmPermissionLevelEnum.WRITE)
     public void updateReceivable(CrmReceivableSaveReqVO updateReqVO) {
         Assert.notNull(updateReqVO.getId(), "回款编号不能为空");
-        // 1.1 校验可回款金额超过上限
-        validateReceivablePriceExceedsLimit(updateReqVO);
         updateReqVO.setOwnerUserId(null).setCustomerId(null).setContractId(null).setPlanId(null); // 不允许修改的字段
-        // 1.2 校验存在
+        // 1.1 校验存在
         CrmReceivableDO receivable = validateReceivableExists(updateReqVO.getId());
+        updateReqVO.setOwnerUserId(receivable.getOwnerUserId()).setCustomerId(receivable.getCustomerId())
+                .setContractId(receivable.getContractId()).setPlanId(receivable.getPlanId()); // 设置已存在的值
+        // 1.2 校验可回款金额超过上限
+        validateReceivablePriceExceedsLimit(updateReqVO);
+
         // 1.3 只有草稿、审批中，可以编辑；
         if (!ObjectUtils.equalsAny(receivable.getAuditStatus(), CrmAuditStatusEnum.DRAFT.getStatus(),
                 CrmAuditStatusEnum.PROCESS.getStatus())) {
@@ -180,8 +179,17 @@ public class CrmReceivableServiceImpl implements CrmReceivableService {
         receivableMapper.updateById(updateObj);
 
         // 3. 记录操作日志上下文
-        LogRecordContext.putVariable(DiffParseFunction.OLD_OBJECT, BeanUtils.toBean(receivable, CrmReceivableSaveReqVO.class));
         LogRecordContext.putVariable("receivable", receivable);
+        LogRecordContext.putVariable("period", getReceivablePeriod(receivable.getPlanId()));
+        LogRecordContext.putVariable(DiffParseFunction.OLD_OBJECT, BeanUtils.toBean(receivable, CrmReceivableSaveReqVO.class));
+    }
+
+    private Integer getReceivablePeriod(Long planId) {
+        if (Objects.isNull(planId)) {
+            return null;
+        }
+        CrmReceivablePlanDO receivablePlan = receivablePlanService.getReceivablePlan(planId);
+        return receivablePlan.getPeriod();
     }
 
     @Override
@@ -212,15 +220,19 @@ public class CrmReceivableServiceImpl implements CrmReceivableService {
         if (receivable.getPlanId() != null && receivablePlanService.getReceivablePlan(receivable.getPlanId()) != null) {
             throw exception(RECEIVABLE_DELETE_FAIL);
         }
-        // TODO @puhui999：审批通过时，不允许删除；
+        // 1.3 审批通过时，不允许删除
+        if (ObjUtil.equal(receivable.getAuditStatus(), CrmAuditStatusEnum.APPROVE.getStatus())) {
+            throw exception(RECEIVABLE_DELETE_FAIL_IS_APPROVE);
+        }
 
-        // 2. 删除
+        // 2.1 删除回款
         receivableMapper.deleteById(id);
-        // 3. 删除数据权限
+        // 2.2 删除数据权限
         permissionService.deletePermission(CrmBizTypeEnum.CRM_RECEIVABLE.getType(), id);
 
-        // 4. 记录操作日志上下文
+        // 3. 记录操作日志上下文
         LogRecordContext.putVariable("receivable", receivable);
+        LogRecordContext.putVariable("period", getReceivablePeriod(receivable.getPlanId()));
     }
 
     @Override
@@ -287,6 +299,11 @@ public class CrmReceivableServiceImpl implements CrmReceivableService {
     @Override
     public Map<Long, BigDecimal> getReceivablePriceMapByContractId(Collection<Long> contractIds) {
         return receivableMapper.selectReceivablePriceMapByContractId(contractIds);
+    }
+
+    @Override
+    public Long getReceivableCountByContractId(Long contractId) {
+        return receivableMapper.selectCountByContractId(contractId);
     }
 
 }

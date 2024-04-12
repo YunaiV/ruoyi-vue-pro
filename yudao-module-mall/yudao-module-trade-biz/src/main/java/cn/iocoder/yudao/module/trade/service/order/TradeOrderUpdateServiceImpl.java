@@ -624,7 +624,7 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
             throw exception(ORDER_UPDATE_PRICE_FAIL_ALREADY);
         }
         // 1.3 支付价格不能为 0
-        int newPayPrice = order.getPayPrice() + order.getAdjustPrice();
+        int newPayPrice = order.getPayPrice() + reqVO.getAdjustPrice();
         if (newPayPrice <= 0) {
             throw exception(ORDER_UPDATE_PRICE_FAIL_PRICE_ERROR);
         }
@@ -635,12 +635,14 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
 
         // 3. 更新 TradeOrderItem，需要做 adjustPrice 的分摊
         List<TradeOrderItemDO> orderOrderItems = tradeOrderItemMapper.selectListByOrderId(order.getId());
-        List<Integer> dividePrices = TradePriceCalculatorHelper.dividePrice2(orderOrderItems, newPayPrice);
+        List<Integer> dividePrices = TradePriceCalculatorHelper.dividePrice2(orderOrderItems, reqVO.getAdjustPrice());
         List<TradeOrderItemDO> updateItems = new ArrayList<>();
         for (int i = 0; i < orderOrderItems.size(); i++) {
             TradeOrderItemDO item = orderOrderItems.get(i);
+            // TODO puhui999: 已有分摊记录的情况下价格是否会不对，也就是说之前订单项 1 分摊了 10 块这次是 -100
+            // 那么 setPayPrice 是否改为 (item.getPayPrice()-item.getAdjustPrice()) + dividePrices.get(i) 先减掉原来的价格再加上调价。经过验证可行，修改后订单价格增减都能正确分摊
             updateItems.add(new TradeOrderItemDO().setId(item.getId()).setAdjustPrice(dividePrices.get(i))
-                    .setPayPrice(item.getPayPrice() + dividePrices.get(i)));
+                    .setPayPrice((item.getPayPrice() - item.getAdjustPrice()) + dividePrices.get(i)));
         }
         tradeOrderItemMapper.updateBatch(updateItems);
 

@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.crm.controller.admin.statistics.vo;
+package cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.rank;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
@@ -21,7 +21,7 @@ public class CrmStatisticsRankReqVO {
 
     /**
      * userIds 目前不用前端传递，目前是方便后端通过 deptId 读取编号后，设置回来
-     *
+     * <p>
      * 后续，可能会支持选择部分用户进行查询
      */
     @Schema(description = "负责人用户 id 集合", requiredMode = Schema.RequiredMode.NOT_REQUIRED, example = "2")
