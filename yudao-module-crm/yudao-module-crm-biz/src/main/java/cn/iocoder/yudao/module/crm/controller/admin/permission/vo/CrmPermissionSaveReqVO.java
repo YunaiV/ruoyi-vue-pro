@@ -8,14 +8,11 @@ import lombok.Data;
 
 import jakarta.validation.constraints.NotNull;
 
-/**
- * 数据权限 Base VO，提供给添加、修改、详细的子 VO 使用
- * 如果子 VO 存在差异的字段，请不要添加到这里，影响 Swagger 文档生成
- *
- * @author HUIHUI
- */
+import java.util.List;
+
+@Schema(description = "管理后台 - CRM 数据权限创建/更新 Request VO")
 @Data
-public class CrmPermissionBaseVO {
+public class CrmPermissionSaveReqVO {
 
     @Schema(description = "用户编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "123456")
     @NotNull(message = "用户编号不能为空")
@@ -34,5 +31,12 @@ public class CrmPermissionBaseVO {
     @InEnum(CrmPermissionLevelEnum.class)
     @NotNull(message = "权限级别不能为空")
     private Integer level;
+
+    /**
+     * 添加客户团队成员时，需要额外有【联系人】【商机】【合同】的 checkbox 选择。
+     * 选中时，同时添加对应的权限
+     */
+    @Schema(description = "同时添加", requiredMode = Schema.RequiredMode.REQUIRED, example = "10430")
+    private List<Integer> toBizTypes;
 
 }

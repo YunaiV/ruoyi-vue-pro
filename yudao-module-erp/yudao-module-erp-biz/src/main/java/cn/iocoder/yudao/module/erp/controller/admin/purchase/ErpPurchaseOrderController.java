@@ -61,14 +61,14 @@ public class ErpPurchaseOrderController {
 
     @PostMapping("/create")
     @Operation(summary = "创建采购订单")
-    @PreAuthorize("@ss.hasPermission('erp:purchase-create:create')")
+    @PreAuthorize("@ss.hasPermission('erp:purchase-order:create')")
     public CommonResult<Long> createPurchaseOrder(@Valid @RequestBody ErpPurchaseOrderSaveReqVO createReqVO) {
         return success(purchaseOrderService.createPurchaseOrder(createReqVO));
     }
 
     @PutMapping("/update")
     @Operation(summary = "更新采购订单")
-    @PreAuthorize("@ss.hasPermission('erp:purchase-create:update')")
+    @PreAuthorize("@ss.hasPermission('erp:purchase-order:update')")
     public CommonResult<Boolean> updatePurchaseOrder(@Valid @RequestBody ErpPurchaseOrderSaveReqVO updateReqVO) {
         purchaseOrderService.updatePurchaseOrder(updateReqVO);
         return success(true);
@@ -76,7 +76,7 @@ public class ErpPurchaseOrderController {
 
     @PutMapping("/update-status")
     @Operation(summary = "更新采购订单的状态")
-    @PreAuthorize("@ss.hasPermission('erp:purchase-create:update-status')")
+    @PreAuthorize("@ss.hasPermission('erp:purchase-order:update-status')")
     public CommonResult<Boolean> updatePurchaseOrderStatus(@RequestParam("id") Long id,
                                                       @RequestParam("status") Integer status) {
         purchaseOrderService.updatePurchaseOrderStatus(id, status);
@@ -86,7 +86,7 @@ public class ErpPurchaseOrderController {
     @DeleteMapping("/delete")
     @Operation(summary = "删除采购订单")
     @Parameter(name = "ids", description = "编号数组", required = true)
-    @PreAuthorize("@ss.hasPermission('erp:purchase-create:delete')")
+    @PreAuthorize("@ss.hasPermission('erp:purchase-order:delete')")
     public CommonResult<Boolean> deletePurchaseOrder(@RequestParam("ids") List<Long> ids) {
         purchaseOrderService.deletePurchaseOrder(ids);
         return success(true);
@@ -95,7 +95,7 @@ public class ErpPurchaseOrderController {
     @GetMapping("/get")
     @Operation(summary = "获得采购订单")
     @Parameter(name = "id", description = "编号", required = true, example = "1024")
-    @PreAuthorize("@ss.hasPermission('erp:purchase-create:query')")
+    @PreAuthorize("@ss.hasPermission('erp:purchase-order:query')")
     public CommonResult<ErpPurchaseOrderRespVO> getPurchaseOrder(@RequestParam("id") Long id) {
         ErpPurchaseOrderDO purchaseOrder = purchaseOrderService.getPurchaseOrder(id);
         if (purchaseOrder == null) {
@@ -115,7 +115,7 @@ public class ErpPurchaseOrderController {
 
     @GetMapping("/page")
     @Operation(summary = "获得采购订单分页")
-    @PreAuthorize("@ss.hasPermission('erp:purchase-create:query')")
+    @PreAuthorize("@ss.hasPermission('erp:purchase-order:query')")
     public CommonResult<PageResult<ErpPurchaseOrderRespVO>> getPurchaseOrderPage(@Valid ErpPurchaseOrderPageReqVO pageReqVO) {
         PageResult<ErpPurchaseOrderDO> pageResult = purchaseOrderService.getPurchaseOrderPage(pageReqVO);
         return success(buildPurchaseOrderVOPageResult(pageResult));
@@ -123,7 +123,7 @@ public class ErpPurchaseOrderController {
 
     @GetMapping("/export-excel")
     @Operation(summary = "导出采购订单 Excel")
-    @PreAuthorize("@ss.hasPermission('erp:purchase-create:export')")
+    @PreAuthorize("@ss.hasPermission('erp:purchase-order:export')")
     @ApiAccessLog(operateType = EXPORT)
     public void exportPurchaseOrderExcel(@Valid ErpPurchaseOrderPageReqVO pageReqVO,
                                     HttpServletResponse response) throws IOException {

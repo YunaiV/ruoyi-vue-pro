@@ -1,8 +1,8 @@
 package cn.iocoder.yudao.module.crm.service.statistics;
 
 
-import cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.CrmStatisticsRanKRespVO;
-import cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.CrmStatisticsRankReqVO;
+import cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.rank.CrmStatisticsRankRespVO;
+import cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.rank.CrmStatisticsRankReqVO;
 
 import java.util.List;
 
@@ -11,7 +11,7 @@ import java.util.List;
  *
  * @author anhaohao
  */
-public interface CrmStatisticsRankingService {
+public interface CrmStatisticsRankService {
 
     /**
      * 获得合同金额排行榜
@@ -19,7 +19,7 @@ public interface CrmStatisticsRankingService {
      * @param rankReqVO 排行参数
      * @return 合同金额排行榜
      */
-    List<CrmStatisticsRanKRespVO> getContractPriceRank(CrmStatisticsRankReqVO rankReqVO);
+    List<CrmStatisticsRankRespVO> getContractPriceRank(CrmStatisticsRankReqVO rankReqVO);
 
     /**
      * 获得回款金额排行榜
@@ -27,7 +27,7 @@ public interface CrmStatisticsRankingService {
      * @param rankReqVO 排行参数
      * @return 回款金额排行榜
      */
-    List<CrmStatisticsRanKRespVO> getReceivablePriceRank(CrmStatisticsRankReqVO rankReqVO);
+    List<CrmStatisticsRankRespVO> getReceivablePriceRank(CrmStatisticsRankReqVO rankReqVO);
 
     /**
      * 获得签约合同数量排行榜
@@ -35,7 +35,7 @@ public interface CrmStatisticsRankingService {
      * @param rankReqVO 排行参数
      * @return 签约合同数量排行榜
      */
-    List<CrmStatisticsRanKRespVO> getContractCountRank(CrmStatisticsRankReqVO rankReqVO);
+    List<CrmStatisticsRankRespVO> getContractCountRank(CrmStatisticsRankReqVO rankReqVO);
 
     /**
      * 获得产品销量排行榜
@@ -43,7 +43,7 @@ public interface CrmStatisticsRankingService {
      * @param rankReqVO 排行参数
      * @return 产品销量排行榜
      */
-    List<CrmStatisticsRanKRespVO> getProductSalesRank(CrmStatisticsRankReqVO rankReqVO);
+    List<CrmStatisticsRankRespVO> getProductSalesRank(CrmStatisticsRankReqVO rankReqVO);
 
     /**
      * 获得新增客户数排行榜
@@ -51,7 +51,7 @@ public interface CrmStatisticsRankingService {
      * @param rankReqVO 排行参数
      * @return 新增客户数排行榜
      */
-    List<CrmStatisticsRanKRespVO> getCustomerCountRank(CrmStatisticsRankReqVO rankReqVO);
+    List<CrmStatisticsRankRespVO> getCustomerCountRank(CrmStatisticsRankReqVO rankReqVO);
 
     /**
      * 获得联系人数量排行榜
@@ -59,7 +59,7 @@ public interface CrmStatisticsRankingService {
      * @param rankReqVO 排行参数
      * @return 联系人数量排行榜
      */
-    List<CrmStatisticsRanKRespVO> getContactsCountRank(CrmStatisticsRankReqVO rankReqVO);
+    List<CrmStatisticsRankRespVO> getContactsCountRank(CrmStatisticsRankReqVO rankReqVO);
 
     /**
      * 获得跟进次数排行榜
@@ -67,7 +67,7 @@ public interface CrmStatisticsRankingService {
      * @param rankReqVO 排行参数
      * @return 跟进次数排行榜
      */
-    List<CrmStatisticsRanKRespVO> getFollowCountRank(CrmStatisticsRankReqVO rankReqVO);
+    List<CrmStatisticsRankRespVO> getFollowCountRank(CrmStatisticsRankReqVO rankReqVO);
 
     /**
      * 获得跟进客户数排行榜
@@ -75,6 +75,6 @@ public interface CrmStatisticsRankingService {
      * @param rankReqVO 排行参数
      * @return 跟进客户数排行榜
      */
-    List<CrmStatisticsRanKRespVO> getFollowCustomerCountRank(CrmStatisticsRankReqVO rankReqVO);
+    List<CrmStatisticsRankRespVO> getFollowCustomerCountRank(CrmStatisticsRankReqVO rankReqVO);
 
 }

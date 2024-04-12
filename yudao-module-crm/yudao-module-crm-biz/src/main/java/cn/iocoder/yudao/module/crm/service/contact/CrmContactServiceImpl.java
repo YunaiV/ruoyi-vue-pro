@@ -298,4 +298,9 @@ public class CrmContactServiceImpl implements CrmContactService {
         return contactMapper.selectCount(CrmContactDO::getCustomerId, customerId);
     }
 
+    @Override
+    public List<CrmContactDO> getContactListByCustomerIdOwnerUserId(Long customerId, Long ownerUserId) {
+        return contactMapper.selectListByCustomerIdOwnerUserId(customerId, ownerUserId);
+    }
+
 }

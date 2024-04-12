@@ -16,7 +16,7 @@ import org.springframework.context.annotation.Primary;
 @EnableLogRecord(tenant = "") // 貌似用不上 tenant 这玩意给个空好啦
 @AutoConfiguration
 @Slf4j
-public class YudaoOperateLogV2Configuration {
+public class YudaoOperateLogConfiguration {
 
     @Bean
     @Primary
