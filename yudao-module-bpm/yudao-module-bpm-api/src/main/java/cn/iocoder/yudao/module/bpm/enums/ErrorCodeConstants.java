@@ -75,4 +75,8 @@ public interface ErrorCodeConstants {
     // ========== BPM 流程表达式 1-009-014-000 ==========
     ErrorCode PROCESS_EXPRESSION_NOT_EXISTS = new ErrorCode(1_009_014_000, "流程表达式不存在");
 
+    // ========== BPM 仿钉钉流程设计器 1-009-015-000 ==========
+    // TODO @芋艿：这个错误码，需要关注下
+    ErrorCode CONVERT_TO_SIMPLE_MODEL_NOT_SUPPORT = new ErrorCode(1_009_015_000, "该流程模型不支持仿钉钉设计流程");
+
 }

@@ -46,6 +46,30 @@ public interface BpmModelService {
      */
     byte[] getModelBpmnXML(String id);
 
+
+    /**
+     * 保存流程模型的 BPMN XML
+     *
+     * @param id 编号
+     * @param xmlBytes BPMN XML bytes
+     */
+    // TODO @芋艿：可能要关注下；
+    void saveModelBpmnXml(String id, byte[] xmlBytes);
+
+    /**
+     * 获得仿钉钉快搭模型的 JSON 数据
+     * @param id 编号
+     * @return JSON bytes
+     */
+    byte[] getModelSimpleJson(String id);
+
+    /**
+     * 保存仿钉钉快搭模型的 JSON 数据
+     * @param id 编号
+     * @param jsonBytes JSON bytes
+     */
+    void saveModelSimpleJson(String id, byte[] jsonBytes);
+
     /**
      * 修改流程模型
      *
