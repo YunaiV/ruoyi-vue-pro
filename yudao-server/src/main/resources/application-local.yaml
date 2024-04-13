@@ -54,7 +54,7 @@ spring:
           #          url: jdbc:sqlserver://127.0.0.1:1433;DatabaseName=${spring.datasource.dynamic.datasource.master.name} # SQLServer 连接的示例
           #          url: jdbc:dm://10.211.55.4:5236?schema=RUOYI_VUE_PRO # DM 连接的示例
           username: root
-          password: 123456
+          password: root
         #          username: sa
         #          password: JSm:g(*%lU4ZAkz06cd52KqT3)i1?H7W
         #          username: SYSDBA # DM 连接的示例
@@ -68,7 +68,7 @@ spring:
           #          url: jdbc:oracle:thin:@127.0.0.1:1521:xe # Oracle 连接的示例
           #          url: jdbc:sqlserver://127.0.0.1:1433;DatabaseName=${spring.datasource.dynamic.datasource.slave.name} # SQLServer 连接的示例
           username: root
-          password: 123456
+          password: root
   #          username: sa
   #          password: JSm:g(*%lU4ZAkz06cd52KqT3)i1?H7W
 
@@ -196,12 +196,12 @@ debug: false
 --- #################### 微信公众号、小程序相关配置 ####################
 wx:
   mp: # 公众号配置（必填），参见 https://github.com/Wechat-Group/WxJava/blob/develop/spring-boot-starters/wx-java-mp-spring-boot-starter/README.md 文档
-#    app-id: wx041349c6f39b268b # 测试号（牛希尧提供的）
-#    secret: 5abee519483bc9f8cb37ce280e814bd0
+    #    app-id: wx041349c6f39b268b # 测试号（牛希尧提供的）
+    #    secret: 5abee519483bc9f8cb37ce280e814bd0
     app-id: wx5b23ba7a5589ecbb # 测试号（自己的）
     secret: 2a7b3b20c537e52e74afd395eb85f61f
-#    app-id: wxa69ab825b163be19 # 测试号（Kongdy 提供的）
-#    secret: bd4f9fab889591b62aeac0d7b8d8b4a0
+    #    app-id: wxa69ab825b163be19 # 测试号（Kongdy 提供的）
+    #    secret: bd4f9fab889591b62aeac0d7b8d8b4a0
     # 存储配置，解决 AccessToken 的跨节点的共享
     config-storage:
       type: RedisTemplate # 采用 RedisTemplate 操作 Redis，会自动从 Spring 中获取
@@ -212,8 +212,8 @@ wx:
     #    secret: 333ae72f41552af1e998fe1f54e1584a
     appid: wx63c280fe3248a3e7 # wenhualian的接口测试号
     secret: 6f270509224a7ae1296bbf1c8cb97aed
-#    appid: wxc4598c446f8a9cb3 # 测试号（Kongdy 提供的）
-#    secret: 4a1a04e07f6a4a0751b39c3064a92c8b
+    #    appid: wxc4598c446f8a9cb3 # 测试号（Kongdy 提供的）
+    #    secret: 4a1a04e07f6a4a0751b39c3064a92c8b
     config-storage:
       type: RedisTemplate # 采用 RedisTemplate 操作 Redis，会自动从 Spring 中获取
       key-prefix: wa # Redis Key 的前缀
@@ -223,6 +223,25 @@ wx:
 
 # 芋道配置项，设置当前项目所有自定义的配置
 yudao:
+  ai:
+    temperature: 1
+    topP: 1
+    topK: 1
+    qianWen:
+      endpoint: bailian.cn-beijing.aliyuncs.com
+      accessKeyId: LTAI5tNTVhXW4fLKUjMrr98z
+      accessKeySecret: ZJ0JQeyjzxxm5CfeTV6k1wNE9UsvZP
+      agentKey: f0c1088824594f589c8f10567ccd929f_p_efm
+    xingHuo:
+      appId: 13c8cca6
+      appKey: cb6415c19d6162cda07b47316fcb0416
+      secretKey: Y2JiYTIxZjA3MDMxMjNjZjQzYzVmNzdh
+      chatModel: XING_HUO_3_5
+    yiYan:
+      appKey: x0cuLZ7XsaTCU08vuJWO87Lg
+      secretKey: R9mYF9dl9KASgi5RUq0FQt3wRisSnOcK
+      refreshTokenSecondTime: 86400
+      chatModel: ERNIE4_3_5_8K
   captcha:
     enable: false # 本地环境，暂时关闭图片验证码，方便登录等接口的测试；
   security:
@@ -235,6 +254,7 @@ yudao:
   pay:
     order-notify-url: http://yunai.natapp1.cc/admin-api/pay/notify/order # 支付渠道的【支付】回调地址
     refund-notify-url: http://yunai.natapp1.cc/admin-api/pay/notify/refund # 支付渠道的【退款】回调地址
+
   access-log: # 访问日志的配置项
     enable: false
   error-code: # 错误码相关配置项
@@ -267,7 +287,6 @@ justauth:
     type: REDIS
     prefix: 'social_auth_state:' # 缓存前缀，目前只对 Redis 缓存生效，默认 JUSTAUTH::STATE::
     timeout: 24h # 超时时长，目前只对 Redis 缓存生效，默认 3 分钟
-
 # TODO 赤焰：这个配置的目的是？
 #ureport配置
 #ureport:
