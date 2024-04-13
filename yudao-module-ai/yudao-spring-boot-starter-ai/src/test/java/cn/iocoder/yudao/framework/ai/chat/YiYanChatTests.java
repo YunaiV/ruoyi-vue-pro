@@ -1,10 +1,10 @@
 package cn.iocoder.yudao.framework.ai.chat;
 
 import cn.iocoder.yudao.framework.ai.chat.prompt.Prompt;
-import cn.iocoder.yudao.framework.ai.chatyiyan.YiYanApi;
 import cn.iocoder.yudao.framework.ai.chatyiyan.YiYanChatClient;
 import cn.iocoder.yudao.framework.ai.chatyiyan.YiYanChatModel;
 import cn.iocoder.yudao.framework.ai.chatyiyan.YiYanOptions;
+import cn.iocoder.yudao.framework.ai.chatyiyan.api.YiYanApi;
 import org.junit.Before;
 import org.junit.Test;
 import reactor.core.publisher.Flux;
