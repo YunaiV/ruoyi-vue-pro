@@ -19,9 +19,11 @@ import org.apache.ibatis.annotations.Mapper;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
+import javax.management.ObjectName;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 /**
  * 客户 Mapper
@@ -184,6 +186,12 @@ public interface CrmCustomerMapper extends BaseMapperX<CrmCustomerDO> {
         // 未跟进
         query.eq(CrmClueDO::getFollowUpStatus, false);
         return selectCount(query);
+    }
+
+    default Long selectCountByOwnerUserIds(Collection<Long> ownerUserIds, LocalDateTime[] times){
+        return selectCount(new LambdaQueryWrapperX<CrmCustomerDO>()
+                .in(CrmCustomerDO::getOwnerUserId, ownerUserIds)
+                .betweenIfPresent(CrmCustomerDO::getCreateTime, times));
     }
 
 }
