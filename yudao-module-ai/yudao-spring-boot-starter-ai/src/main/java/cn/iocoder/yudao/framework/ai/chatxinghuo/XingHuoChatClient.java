@@ -5,6 +5,7 @@ import cn.hutool.core.exceptions.ExceptionUtil;
 import cn.iocoder.yudao.framework.ai.chat.*;
 import cn.iocoder.yudao.framework.ai.chat.prompt.ChatOptions;
 import cn.iocoder.yudao.framework.ai.chat.prompt.Prompt;
+import cn.iocoder.yudao.framework.ai.chatxinghuo.api.XingHuoApi;
 import cn.iocoder.yudao.framework.ai.chatxinghuo.api.XingHuoChatCompletion;
 import cn.iocoder.yudao.framework.ai.chatxinghuo.api.XingHuoChatCompletionRequest;
 import lombok.extern.slf4j.Slf4j;
@@ -69,7 +70,7 @@ public class XingHuoChatClient implements ChatClient, StreamingChatClient {
             // 创建 request 请求，stream模式需要供应商支持
             XingHuoChatCompletionRequest request = this.createRequest(prompt, chatOptions);
             // 调用 callWithFunctionSupport 发送请求
-            ResponseEntity<XingHuoChatCompletion> response = xingHuoApi.chatCompletionEntity(request, chatOptions.getDomain());
+            ResponseEntity<XingHuoChatCompletion> response = xingHuoApi.chatCompletionEntity(request, chatOptions.getChatModel());
             // 获取结果封装 ChatResponse
             return new ChatResponse(List.of(new Generation(response.getBody().getPayload().getChoices().getText().get(0).getContent())));
         });
@@ -82,7 +83,7 @@ public class XingHuoChatClient implements ChatClient, StreamingChatClient {
         // 创建 request 请求，stream模式需要供应商支持
         XingHuoChatCompletionRequest request = this.createRequest(prompt, chatOptions);
         // 发送请求
-        Flux<XingHuoChatCompletion> response = this.xingHuoApi.chatCompletionStream(request, chatOptions.getDomain());
+        Flux<XingHuoChatCompletion> response = this.xingHuoApi.chatCompletionStream(request, chatOptions.getChatModel());
         return response.map(res -> {
             String content = res.getPayload().getChoices().getText().stream()
                     .map(item -> item.getContent()).collect(Collectors.joining());
@@ -113,7 +114,7 @@ public class XingHuoChatClient implements ChatClient, StreamingChatClient {
         // 创建 params
         XingHuoChatCompletionRequest.Parameter.Chat chatParameter = new XingHuoChatCompletionRequest.Parameter.Chat();
         BeanUtil.copyProperties(xingHuoOptions, chatParameter);
-        chatParameter.setDomain(xingHuoOptions.getDomain().getValue());
+        chatParameter.setDomain(xingHuoOptions.getChatModel().getValue());
         XingHuoChatCompletionRequest.Parameter parameter = new XingHuoChatCompletionRequest.Parameter().setChat(chatParameter);
         // 创建 payload text 信息
         XingHuoChatCompletionRequest.Payload.Message.Text text = new XingHuoChatCompletionRequest.Payload.Message.Text();

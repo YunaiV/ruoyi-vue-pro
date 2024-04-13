@@ -1,10 +1,10 @@
 package cn.iocoder.yudao.framework.ai.chat;
 
 import cn.iocoder.yudao.framework.ai.chat.prompt.Prompt;
-import cn.iocoder.yudao.framework.ai.chatxinghuo.XingHuoApi;
 import cn.iocoder.yudao.framework.ai.chatxinghuo.XingHuoChatClient;
 import cn.iocoder.yudao.framework.ai.chatxinghuo.XingHuoChatModel;
 import cn.iocoder.yudao.framework.ai.chatxinghuo.XingHuoOptions;
+import cn.iocoder.yudao.framework.ai.chatxinghuo.api.XingHuoApi;
 import org.junit.Before;
 import org.junit.Test;
 import reactor.core.publisher.Flux;
@@ -31,7 +31,7 @@ public class XingHuoChatClientTests {
                         "cb6415c19d6162cda07b47316fcb0416",
                         "Y2JiYTIxZjA3MDMxMjNjZjQzYzVmNzdh"
                 ),
-                new XingHuoOptions().setDomain(XingHuoChatModel.XING_HUO_3_5)
+                new XingHuoOptions().setChatModel(XingHuoChatModel.XING_HUO_3_5)
         );
     }
 

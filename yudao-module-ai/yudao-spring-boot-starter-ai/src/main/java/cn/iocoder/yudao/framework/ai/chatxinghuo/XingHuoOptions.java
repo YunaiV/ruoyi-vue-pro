@@ -24,7 +24,7 @@ public class XingHuoOptions implements ChatOptions {
      * generalv3.5指向V3.5版本;
      * 注意：不同的取值对应的url也不一样！
      */
-    private XingHuoChatModel domain = XingHuoChatModel.XING_HUO_3_5;
+    private XingHuoChatModel chatModel = XingHuoChatModel.XING_HUO_3_5;
     /**
      * 取值范围 (0，1] ，默认值0.5
      */
