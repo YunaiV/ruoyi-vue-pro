@@ -1,10 +1,14 @@
 package cn.iocoder.yudao.framework.ai.config;
 
+import cn.iocoder.yudao.framework.ai.AiPlatformEnum;
 import cn.iocoder.yudao.framework.ai.chatxinghuo.XingHuoChatModel;
 import cn.iocoder.yudao.framework.ai.chatyiyan.YiYanChatModel;
 import lombok.Data;
 import lombok.experimental.Accessors;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * ai 自动配置
@@ -15,15 +19,17 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  */
 @Data
 @ConfigurationProperties(prefix = "yudao.ai")
-public class YudaoAiProperties {
+public class YudaoAiProperties extends LinkedHashMap<String, Map<String, Object>> {
 
-    private QianWenProperties qianWen;
-    private XingHuoProperties xingHuo;
-    private YiYanProperties yiYan;
+//    private QianWenProperties qianWen;
+//    private XingHuoProperties xingHuo;
+//    private YiYanProperties yiYan;
 
     @Data
     @Accessors(chain = true)
     public static class ChatProperties {
+
+        private AiPlatformEnum aiPlatform;
 
         private Float temperature;
 
@@ -48,9 +54,14 @@ public class YudaoAiProperties {
          */
         private String accessKeySecret;
         /**
-         * 阿里云：agentKey(相当于应用id)
+         * 阿里云：agentKey
          */
         private String agentKey;
+        /**
+         * 阿里云：agentKey(相当于应用id)
+         */
+        private String appId;
+
     }
 
     @Data

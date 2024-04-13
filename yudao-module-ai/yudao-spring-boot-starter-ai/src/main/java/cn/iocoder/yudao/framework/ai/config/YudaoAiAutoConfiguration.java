@@ -1,11 +1,29 @@
 package cn.iocoder.yudao.framework.ai.config;
 
+import cn.hutool.core.bean.BeanUtil;
+import cn.iocoder.yudao.framework.ai.AiPlatformEnum;
+import cn.iocoder.yudao.framework.ai.chatqianwen.QianWenChatClient;
+import cn.iocoder.yudao.framework.ai.chatqianwen.QianWenOptions;
+import cn.iocoder.yudao.framework.ai.chatqianwen.api.QianWenApi;
 import cn.iocoder.yudao.framework.ai.chatxinghuo.XingHuoChatClient;
 import cn.iocoder.yudao.framework.ai.chatxinghuo.XingHuoOptions;
 import cn.iocoder.yudao.framework.ai.chatxinghuo.api.XingHuoApi;
+import cn.iocoder.yudao.framework.ai.chatyiyan.YiYanChatClient;
+import cn.iocoder.yudao.framework.ai.chatyiyan.YiYanOptions;
+import cn.iocoder.yudao.framework.ai.chatyiyan.api.YiYanApi;
+import cn.iocoder.yudao.framework.ai.exception.AiException;
+import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.support.GenericApplicationContext;
+
+import java.util.Map;
 
 /**
  * ai 自动配置
@@ -18,15 +36,118 @@ import org.springframework.context.annotation.Bean;
 @EnableConfigurationProperties(YudaoAiProperties.class)
 public class YudaoAiAutoConfiguration {
 
+    // TODO @芋艿：我看sharding jdbc 差不多这么玩的
     @Bean
-    public XingHuoChatClient xingHuoChatClient(YudaoAiProperties yudaoAiProperties) {
-        return new XingHuoChatClient(
-                new XingHuoApi(
-                        yudaoAiProperties.getXingHuo().getAppId(),
-                        yudaoAiProperties.getXingHuo().getAppKey(),
-                        yudaoAiProperties.getXingHuo().getSecretKey()
-                ),
-                new XingHuoOptions().setChatModel(yudaoAiProperties.getXingHuo().getChatModel())
-        );
+    @ConditionalOnMissingBean(value = InitChatClient.class)
+    public InitChatClient initChatClient(YudaoAiProperties yudaoAiProperties) {
+        return new InitChatClient(yudaoAiProperties);
+    }
+
+    public static class InitChatClient implements InitializingBean, ApplicationContextAware {
+
+        private GenericApplicationContext applicationContext;
+        private YudaoAiProperties yudaoAiProperties;
+
+        public InitChatClient(YudaoAiProperties yudaoAiProperties) {
+            this.yudaoAiProperties = yudaoAiProperties;
+        }
+
+        @Override
+        public void afterPropertiesSet() throws Exception {
+            for (Map.Entry<String, Map<String, Object>> properties : yudaoAiProperties.entrySet()) {
+                String beanName = properties.getKey();
+                Map<String, Object> aiPlatformMap = properties.getValue();
+
+                // 检查平台类型是否正确
+                String aiPlatform = String.valueOf(aiPlatformMap.get("aiPlatform"));
+                if (!AiPlatformEnum.mapValues.containsKey(aiPlatform)) {
+                    throw new AiException("AI平台名称错误! 可以参考 AiPlatformEnum 类!");
+                }
+                // 获取平台类型
+                AiPlatformEnum aiPlatformEnum = AiPlatformEnum.mapValues.get(aiPlatform);
+                // 获取 chat properties
+                YudaoAiProperties.ChatProperties chatProperties = getChatProperties(aiPlatformEnum, aiPlatformMap);
+                // 创建客户端
+                registerChatClient(applicationContext, chatProperties, beanName);
+//                applicationContext.refresh();
+
+
+            }
+
+            System.err.println(applicationContext.getBean("qianWen"));
+            System.err.println(applicationContext.getBean("yiYan"));
+        }
+
+        @Override
+        public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+            this.applicationContext = (GenericApplicationContext) applicationContext;
+        }
+    }
+
+    private static void registerChatClient(GenericApplicationContext applicationContext, YudaoAiProperties.ChatProperties chatProperties, String beanName) {
+        ConfigurableListableBeanFactory beanFactory = applicationContext.getBeanFactory();
+        Object wrapperBean = null;
+        if (AiPlatformEnum.XING_HUO == chatProperties.getAiPlatform()) {
+            YudaoAiProperties.XingHuoProperties xingHuoProperties = (YudaoAiProperties.XingHuoProperties) chatProperties;
+            wrapperBean = beanFactory.initializeBean(
+                    new XingHuoChatClient(
+                            new XingHuoApi(
+                                    xingHuoProperties.getAppId(),
+                                    xingHuoProperties.getAppKey(),
+                                    xingHuoProperties.getSecretKey()
+                            ),
+                            new XingHuoOptions().setChatModel(xingHuoProperties.getChatModel())
+                    ),
+                    beanName
+            );
+        } else if (AiPlatformEnum.QIAN_WEN == chatProperties.getAiPlatform()) {
+            YudaoAiProperties.QianWenProperties qianWenProperties = (YudaoAiProperties.QianWenProperties) chatProperties;
+            wrapperBean = beanFactory.initializeBean(new QianWenChatClient(
+                            new QianWenApi(
+                                    qianWenProperties.getAccessKeyId(),
+                                    qianWenProperties.getAccessKeySecret(),
+                                    qianWenProperties.getAgentKey(),
+                                    qianWenProperties.getEndpoint()
+                            ),
+                            new QianWenOptions()
+                                    .setAppId(qianWenProperties.getAppId())
+                    ),
+                    beanName
+            );
+        } else if (AiPlatformEnum.YI_YAN == chatProperties.getAiPlatform()) {
+            YudaoAiProperties.YiYanProperties yiYanProperties = (YudaoAiProperties.YiYanProperties) chatProperties;
+
+            wrapperBean = beanFactory.initializeBean(new YiYanChatClient(
+                            new YiYanApi(
+                                    yiYanProperties.getAppKey(),
+                                    yiYanProperties.getSecretKey(),
+                                    yiYanProperties.getChatModel(),
+                                    yiYanProperties.getRefreshTokenSecondTime()
+                            ),
+                            new YiYanOptions().setMax_output_tokens(2048)),
+                    beanName
+            );
+        }
+        if (wrapperBean != null) {
+            beanFactory.registerSingleton(beanName, wrapperBean);
+        }
+    }
+
+
+    private static YudaoAiProperties.ChatProperties getChatProperties(AiPlatformEnum aiPlatformEnum, Map<String, Object> aiPlatformMap) {
+        if (AiPlatformEnum.XING_HUO == aiPlatformEnum) {
+            YudaoAiProperties.XingHuoProperties xingHuoProperties = new YudaoAiProperties.XingHuoProperties();
+            BeanUtil.fillBeanWithMap(aiPlatformMap, xingHuoProperties, true);
+            return xingHuoProperties;
+        } else if (AiPlatformEnum.YI_YAN == aiPlatformEnum) {
+            YudaoAiProperties.YiYanProperties yiYanProperties = new YudaoAiProperties.YiYanProperties();
+            BeanUtil.fillBeanWithMap(aiPlatformMap, yiYanProperties, true);
+            return yiYanProperties;
+        } else if (AiPlatformEnum.QIAN_WEN == aiPlatformEnum) {
+            YudaoAiProperties.QianWenProperties qianWenProperties = new YudaoAiProperties.QianWenProperties();
+            BeanUtil.fillBeanWithMap(aiPlatformMap, qianWenProperties, true);
+            return qianWenProperties;
+        }
+        throw new AiException("不支持的Ai类型!");
     }
 }
