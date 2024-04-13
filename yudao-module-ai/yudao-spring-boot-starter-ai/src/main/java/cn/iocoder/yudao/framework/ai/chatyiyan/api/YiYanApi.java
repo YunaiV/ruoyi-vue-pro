@@ -1,5 +1,6 @@
-package cn.iocoder.yudao.framework.ai.chatyiyan;
+package cn.iocoder.yudao.framework.ai.chatyiyan.api;
 
+import cn.iocoder.yudao.framework.ai.chatyiyan.YiYanChatModel;
 import cn.iocoder.yudao.framework.ai.chatyiyan.api.YiYanAuthRes;
 import cn.iocoder.yudao.framework.ai.chatyiyan.api.YiYanChatCompletion;
 import cn.iocoder.yudao.framework.ai.chatyiyan.api.YiYanChatCompletionRequest;

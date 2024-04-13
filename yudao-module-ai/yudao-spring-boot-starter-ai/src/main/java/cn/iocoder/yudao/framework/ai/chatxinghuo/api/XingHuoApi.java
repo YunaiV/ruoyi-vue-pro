@@ -1,7 +1,8 @@
-package cn.iocoder.yudao.framework.ai.chatxinghuo;
+package cn.iocoder.yudao.framework.ai.chatxinghuo.api;
 
 import cn.hutool.http.HttpUtil;
 import cn.hutool.json.JSONUtil;
+import cn.iocoder.yudao.framework.ai.chatxinghuo.XingHuoChatModel;
 import cn.iocoder.yudao.framework.ai.chatxinghuo.api.XingHuoChatCompletion;
 import cn.iocoder.yudao.framework.ai.chatxinghuo.api.XingHuoChatCompletionRequest;
 import lombok.Data;
