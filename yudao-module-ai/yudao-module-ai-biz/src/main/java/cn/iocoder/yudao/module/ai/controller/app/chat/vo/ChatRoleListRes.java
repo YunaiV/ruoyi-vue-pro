@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.ai.controller.app.vo;
+package cn.iocoder.yudao.module.ai.controller.app.chat.vo;
 
 import lombok.Data;
 import lombok.experimental.Accessors;
