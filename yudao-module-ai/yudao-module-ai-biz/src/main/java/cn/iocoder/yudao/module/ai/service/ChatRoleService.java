@@ -2,7 +2,6 @@ package cn.iocoder.yudao.module.ai.service;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.module.ai.controller.app.chat.vo.*;
-import cn.iocoder.yudao.module.ai.controller.app.vo.*;
 
 /**
  * chat 角色
