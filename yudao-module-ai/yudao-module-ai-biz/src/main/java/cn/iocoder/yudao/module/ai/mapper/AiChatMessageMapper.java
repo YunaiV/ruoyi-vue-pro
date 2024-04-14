@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.ai.mapper;
 
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
-import cn.iocoder.yudao.module.ai.dataobject.AiChatMessage;
+import cn.iocoder.yudao.module.ai.dataobject.AiChatMessageDO;
 import org.apache.ibatis.annotations.Mapper;
 import org.springframework.stereotype.Repository;
 
@@ -13,5 +13,5 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 @Mapper
-public interface AiChatMessageMapper extends BaseMapperX<AiChatMessage> {
+public interface AiChatMessageMapper extends BaseMapperX<AiChatMessageDO> {
 }

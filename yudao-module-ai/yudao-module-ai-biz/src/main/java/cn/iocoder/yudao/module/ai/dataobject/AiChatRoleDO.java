@@ -12,7 +12,7 @@ import lombok.experimental.Accessors;
  */
 @Data
 @Accessors(chain = true)
-public class AiChatRole extends BaseDO {
+public class AiChatRoleDO extends BaseDO {
     /**
      * 编号，表示聊天角色在数据库中的唯一标识符
      */

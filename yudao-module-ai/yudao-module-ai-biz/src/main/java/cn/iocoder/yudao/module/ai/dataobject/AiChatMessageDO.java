@@ -13,7 +13,7 @@ import java.util.Date;
  */
 @Data
 @Accessors(chain = true)
-public class AiChatMessage {
+public class AiChatMessageDO {
 
     /**
      * 编号，作为每条聊天记录的唯一标识符
