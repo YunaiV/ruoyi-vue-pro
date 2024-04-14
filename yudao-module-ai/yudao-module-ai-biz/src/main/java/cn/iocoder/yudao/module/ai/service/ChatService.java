@@ -26,7 +26,6 @@ public interface ChatService {
      * chat stream
      *
      * @param req
-     * @param clientNameEnum
      * @return
      */
     Flux<ChatResponse> chatStream(ChatReq req);
