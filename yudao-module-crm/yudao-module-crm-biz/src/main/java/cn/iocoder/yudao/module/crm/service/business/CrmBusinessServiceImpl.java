@@ -391,4 +391,18 @@ public class CrmBusinessServiceImpl implements CrmBusinessService {
         return businessMapper.selectListByOwnerUserIdsAndEndStatusNotNull(convertSet(ownerUserIds), times);
     }
 
+    @Override
+    public List<CrmBusinessDO> getBusinessListByOwnerUserIdsAndDate(List<Long> ownerUserIds, LocalDateTime[] times) {
+        if (CollUtil.isEmpty(ownerUserIds)) {
+            return Collections.emptyList();
+        }
+
+        return businessMapper.selectListByOwnerUserIdsAndDate(convertSet(ownerUserIds), times);
+    }
+
+    @Override
+    public PageResult<CrmBusinessDO> getBusinessPageByDate(List<Long> ownerUserIds, LocalDateTime[] times, Integer pageNo, Integer pageSize) {
+        return businessMapper.selectPage(ownerUserIds, times, pageNo, pageSize);
+    }
+
 }

@@ -2,8 +2,11 @@ package cn.iocoder.yudao.module.crm.service.statistics;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjUtil;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils;
 import cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.funnel.CrmStatisticBusinessEndStatusRespVO;
 import cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.funnel.CrmStatisticFunnelRespVO;
+import cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.funnel.CrmStatisticsBusinessSummaryByDateRespVO;
 import cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.funnel.CrmStatisticsFunnelReqVO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.business.CrmBusinessDO;
 import cn.iocoder.yudao.module.crm.dal.mysql.statistics.CrmStatisticsFunnelMapper;
@@ -18,10 +21,15 @@ import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
+import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY;
 
 /**
  * CRM 销售漏斗分析 Service 实现类
@@ -63,14 +71,13 @@ public class CrmStatisticsFunnelServiceImpl implements CrmStatisticsFunnelServic
     @Override
     public List<CrmStatisticBusinessEndStatusRespVO> getBusinessEndStatusSummary(CrmStatisticsFunnelReqVO reqVO) {
         // 1. 获得用户编号数组
-        List<Long> userIds = getUserIds(reqVO);
-        if (CollUtil.isEmpty(userIds)) {
-            return null;
+        reqVO.setUserIds(getUserIds(reqVO));
+        if (CollUtil.isEmpty(reqVO.getUserIds())) {
+            return Collections.emptyList();
         }
-        reqVO.setUserIds(userIds);
 
         // 2.1 获得用户负责的商机
-        List<CrmBusinessDO> businessList = businessService.getBusinessListByOwnerUserIdsAndEndStatusNotNull(userIds, reqVO.getTimes());
+        List<CrmBusinessDO> businessList = businessService.getBusinessListByOwnerUserIdsAndEndStatusNotNull(reqVO.getUserIds(), reqVO.getTimes());
         // 2.2 统计各阶段数据
         Map<Integer, List<CrmBusinessDO>> businessMap = convertMultiMap(businessList, CrmBusinessDO::getEndStatus);
         return convertList(CrmBusinessEndStatusEnum.values(), endStatusEnum -> {
@@ -81,6 +88,48 @@ public class CrmStatisticsFunnelServiceImpl implements CrmStatisticsFunnelServic
             return new CrmStatisticBusinessEndStatusRespVO(endStatusEnum.getStatus(), (long) list.size(),
                     getSumValue(list, CrmBusinessDO::getTotalPrice, BigDecimal::add));
         });
+    }
+
+    @Override
+    public List<CrmStatisticsBusinessSummaryByDateRespVO> getBusinessSummaryByDate(CrmStatisticsFunnelReqVO reqVO) {
+        // 1. 获得用户编号数组
+        reqVO.setUserIds(getUserIds(reqVO));
+        if (CollUtil.isEmpty(reqVO.getUserIds())) {
+            return Collections.emptyList();
+        }
+
+        // 2. 按天统计，获取分项统计数据
+        List<CrmStatisticsBusinessSummaryByDateRespVO> businessCreateCountList = funnelMapper.selectBusinessCreateCountGroupByDate(reqVO);
+        List<CrmBusinessDO> businessList = businessService.getBusinessListByOwnerUserIdsAndDate(reqVO.getUserIds(), reqVO.getTimes());
+        Map<String, BigDecimal> businessDealCountMap = businessList.stream().collect(Collectors.groupingBy(business ->
+                        business.getCreateTime().format(DateTimeFormatter.ofPattern(FORMAT_YEAR_MONTH_DAY)),
+                Collectors.reducing(BigDecimal.ZERO, CrmBusinessDO::getTotalPrice, BigDecimal::add)));
+
+        // 3. 按照日期间隔，合并数据
+        List<LocalDateTime[]> timeRanges = LocalDateTimeUtils.getDateRangeList(reqVO.getTimes()[0], reqVO.getTimes()[1], reqVO.getInterval());
+        return convertList(timeRanges, times -> {
+            Integer businessCreateCount = businessCreateCountList.stream()
+                    .filter(vo -> LocalDateTimeUtils.isBetween(times[0], times[1], vo.getTime()))
+                    .mapToInt(CrmStatisticsBusinessSummaryByDateRespVO::getBusinessCreateCount).sum();
+            BigDecimal businessDealCount = businessDealCountMap.entrySet().stream()
+                    .filter(vo -> LocalDateTimeUtils.isBetween(times[0], times[1], vo.getKey()))
+                    .map(Map.Entry::getValue)
+                    .reduce(BigDecimal.ZERO, BigDecimal::add);
+            return new CrmStatisticsBusinessSummaryByDateRespVO()
+                    .setTime(LocalDateTimeUtils.formatDateRange(times[0], times[1], reqVO.getInterval()))
+                    .setBusinessCreateCount(businessCreateCount).setBusinessDealCount(businessDealCount);
+        });
+    }
+
+    @Override
+    public PageResult<CrmBusinessDO> getBusinessPageByDate(CrmStatisticsFunnelReqVO pageVO) {
+        // 1. 获得用户编号数组
+        pageVO.setUserIds(getUserIds(pageVO));
+        if (CollUtil.isEmpty(pageVO.getUserIds())) {
+            return PageResult.empty();
+        }
+
+        return businessService.getBusinessPageByDate(pageVO.getUserIds(), pageVO.getTimes(), pageVO.getPageNo(), pageVO.getPageSize());
     }
 
     /**

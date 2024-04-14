@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.crm.dal.mysql.business;
 
+import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
@@ -14,7 +15,6 @@ import org.apache.ibatis.annotations.Mapper;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 
 /**
  * 商机 Mapper
@@ -73,11 +73,23 @@ public interface CrmBusinessMapper extends BaseMapperX<CrmBusinessDO> {
                 .betweenIfPresent(CrmBusinessDO::getCreateTime, times));
     }
 
-    default List<CrmBusinessDO> selectListByOwnerUserIdsAndEndStatusNotNull(Collection<Long> ownerUserIds, LocalDateTime[] times){
+    default List<CrmBusinessDO> selectListByOwnerUserIdsAndEndStatusNotNull(Collection<Long> ownerUserIds, LocalDateTime[] times) {
         return selectList(new LambdaQueryWrapperX<CrmBusinessDO>()
                 .in(CrmBusinessDO::getOwnerUserId, ownerUserIds)
                 .betweenIfPresent(CrmBusinessDO::getCreateTime, times)
                 .isNotNull(CrmBusinessDO::getEndStatus));
+    }
+
+    default List<CrmBusinessDO> selectListByOwnerUserIdsAndDate(Collection<Long> ownerUserIds, LocalDateTime[] times) {
+        return selectList(new LambdaQueryWrapperX<CrmBusinessDO>()
+                .in(CrmBusinessDO::getOwnerUserId, ownerUserIds)
+                .betweenIfPresent(CrmBusinessDO::getCreateTime, times));
+    }
+
+    default PageResult<CrmBusinessDO> selectPage(Collection<Long> ownerUserIds, LocalDateTime[] times, Integer pageNo, Integer pageSize) {
+        return selectPage(new PageParam().setPageNo(pageNo).setPageSize(pageSize), new LambdaQueryWrapperX<CrmBusinessDO>()
+                .in(CrmBusinessDO::getOwnerUserId, ownerUserIds)
+                .betweenIfPresent(CrmBusinessDO::getCreateTime, times));
     }
 
 }

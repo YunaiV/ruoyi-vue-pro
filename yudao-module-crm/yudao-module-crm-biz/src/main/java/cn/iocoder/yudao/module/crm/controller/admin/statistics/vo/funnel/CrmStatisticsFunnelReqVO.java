@@ -1,8 +1,13 @@
 package cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.funnel;
 
+import cn.iocoder.yudao.framework.common.enums.DateIntervalEnum;
+import cn.iocoder.yudao.framework.common.pojo.PageParam;
+import cn.iocoder.yudao.framework.common.validation.InEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;
@@ -12,7 +17,9 @@ import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_
 
 @Schema(description = "管理后台 - CRM 销售漏斗 Request VO")
 @Data
-public class CrmStatisticsFunnelReqVO {
+@EqualsAndHashCode(callSuper = true)
+@ToString(callSuper = true)
+public class CrmStatisticsFunnelReqVO extends PageParam {
 
     @Schema(description = "部门 id", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     @NotNull(message = "部门 id 不能为空")
@@ -30,6 +37,10 @@ public class CrmStatisticsFunnelReqVO {
      */
     @Schema(description = "负责人用户 id 集合", hidden = true, example = "2")
     private List<Long> userIds;
+
+    @Schema(description = "时间间隔类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
+    @InEnum(value = DateIntervalEnum.class, message = "时间间隔类型，必须是 {value}")
+    private Integer interval;
 
     /**
      * 前端如果选择自定义时间, 那么前端传递起始-终止时间, 如果选择其他时间间隔类型, 则由后台计算起始-终止时间
