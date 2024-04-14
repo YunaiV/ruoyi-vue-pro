@@ -3,14 +3,12 @@ package cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.funnel;
 import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
 import com.alibaba.excel.annotation.ExcelProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.List;
 
+// TODO @puhui999：是不是可以删除哈？
 @Schema(description = "管理后台 - CRM 商机 Response VO")
 @Data
 @ExcelIgnoreUnannotated

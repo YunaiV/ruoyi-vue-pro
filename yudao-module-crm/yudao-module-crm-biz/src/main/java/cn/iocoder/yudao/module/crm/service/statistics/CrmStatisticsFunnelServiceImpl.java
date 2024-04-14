@@ -51,6 +51,7 @@ public class CrmStatisticsFunnelServiceImpl implements CrmStatisticsFunnelServic
     @Resource
     private DeptApi deptApi;
 
+    // TODO @puhui999：貌似想了下，可能还是得按照；；；
     @Override
     public CrmStatisticFunnelRespVO getFunnelSummary(CrmStatisticsFunnelReqVO reqVO) {
         // 1. 获得用户编号数组
@@ -76,6 +77,7 @@ public class CrmStatisticsFunnelServiceImpl implements CrmStatisticsFunnelServic
             return Collections.emptyList();
         }
 
+        // TODO @puhui999：这个可以优化下，通过统计 sql，不通过内存计算；
         // 2.1 获得用户负责的商机
         List<CrmBusinessDO> businessList = businessService.getBusinessListByOwnerUserIdsAndEndStatusNotNull(reqVO.getUserIds(), reqVO.getTimes());
         // 2.2 统计各阶段数据
@@ -99,6 +101,7 @@ public class CrmStatisticsFunnelServiceImpl implements CrmStatisticsFunnelServic
         }
 
         // 2. 按天统计，获取分项统计数据
+        // TODO @puhui999：可以这个统计，返回的时候，就把数量、金额一起统计好；
         List<CrmStatisticsBusinessSummaryByDateRespVO> businessCreateCountList = funnelMapper.selectBusinessCreateCountGroupByDate(reqVO);
         List<CrmBusinessDO> businessList = businessService.getBusinessListByOwnerUserIdsAndDate(reqVO.getUserIds(), reqVO.getTimes());
         Map<String, BigDecimal> businessDealCountMap = businessList.stream().collect(Collectors.groupingBy(business ->
@@ -128,7 +131,7 @@ public class CrmStatisticsFunnelServiceImpl implements CrmStatisticsFunnelServic
         if (CollUtil.isEmpty(pageVO.getUserIds())) {
             return PageResult.empty();
         }
-
+        // 2. 执行查询
         return businessService.getBusinessPageByDate(pageVO.getUserIds(), pageVO.getTimes(), pageVO.getPageNo(), pageVO.getPageSize());
     }
 

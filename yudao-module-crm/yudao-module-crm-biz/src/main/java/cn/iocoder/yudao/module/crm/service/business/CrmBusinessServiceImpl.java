@@ -383,6 +383,7 @@ public class CrmBusinessServiceImpl implements CrmBusinessService {
         return businessMapper.selectCountByOwnerUserIdsAndEndStatus(convertSet(ownerUserIds), times, endStatus);
     }
 
+    // TODO @puhui999：这个可以优化下，通过统计 sql，不通过内存计算；
     @Override
     public List<CrmBusinessDO> getBusinessListByOwnerUserIdsAndEndStatusNotNull(List<Long> ownerUserIds, LocalDateTime[] times) {
         if (CollUtil.isEmpty(ownerUserIds)) {
@@ -391,6 +392,7 @@ public class CrmBusinessServiceImpl implements CrmBusinessService {
         return businessMapper.selectListByOwnerUserIdsAndEndStatusNotNull(convertSet(ownerUserIds), times);
     }
 
+    // TODO @puhui999：这个可以优化下，通过统计 sql，不通过内存计算；
     @Override
     public List<CrmBusinessDO> getBusinessListByOwnerUserIdsAndDate(List<Long> ownerUserIds, LocalDateTime[] times) {
         if (CollUtil.isEmpty(ownerUserIds)) {

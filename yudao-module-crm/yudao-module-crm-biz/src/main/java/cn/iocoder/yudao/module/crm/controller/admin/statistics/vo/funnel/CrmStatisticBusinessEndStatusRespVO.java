@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 
+// TODO @puhui999：改成 CrmStatisticsBusinessSummaryByEndStatusRespVO，按照结束状态
 @Schema(description = "管理后台 - CRM 商机结束状态统计 Response VO")
 @NoArgsConstructor
 @AllArgsConstructor

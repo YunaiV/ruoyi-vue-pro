@@ -19,11 +19,9 @@ import org.apache.ibatis.annotations.Mapper;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
-import javax.management.ObjectName;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 
 /**
  * 客户 Mapper
@@ -188,6 +186,7 @@ public interface CrmCustomerMapper extends BaseMapperX<CrmCustomerDO> {
         return selectCount(query);
     }
 
+    // TODO @puhui999：这个可以优化下，通过统计 sql，不通过内存计算；
     default Long selectCountByOwnerUserIds(Collection<Long> ownerUserIds, LocalDateTime[] times){
         return selectCount(new LambdaQueryWrapperX<CrmCustomerDO>()
                 .in(CrmCustomerDO::getOwnerUserId, ownerUserIds)

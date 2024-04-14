@@ -15,6 +15,7 @@ public class CrmStatisticsBusinessSummaryByDateRespVO {
     @Schema(description = "新增商机数量", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     private Integer businessCreateCount;
 
+    // TODO @puhui999：是不是金额哈，不是数量
     @Schema(description = "新增商机金额", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     private BigDecimal businessDealCount;
 

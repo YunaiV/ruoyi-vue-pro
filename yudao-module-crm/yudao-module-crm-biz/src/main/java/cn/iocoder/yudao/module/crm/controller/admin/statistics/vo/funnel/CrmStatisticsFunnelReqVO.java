@@ -17,6 +17,7 @@ import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_
 
 @Schema(description = "管理后台 - CRM 销售漏斗 Request VO")
 @Data
+// TODO @puhui999：不用写 EqualsAndHashCode、ToString，已经全局 lombok 啦
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 public class CrmStatisticsFunnelReqVO extends PageParam {
@@ -42,6 +43,7 @@ public class CrmStatisticsFunnelReqVO extends PageParam {
     @InEnum(value = DateIntervalEnum.class, message = "时间间隔类型，必须是 {value}")
     private Integer interval;
 
+    // TODO @puhui999：这个全部前端传递哈；参考 CrmStatisticsCustomerReqVO
     /**
      * 前端如果选择自定义时间, 那么前端传递起始-终止时间, 如果选择其他时间间隔类型, 则由后台计算起始-终止时间
      * 并作为参数传递给Mapper

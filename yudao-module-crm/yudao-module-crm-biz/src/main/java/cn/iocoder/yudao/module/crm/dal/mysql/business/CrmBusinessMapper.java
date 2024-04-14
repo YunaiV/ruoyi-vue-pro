@@ -73,6 +73,7 @@ public interface CrmBusinessMapper extends BaseMapperX<CrmBusinessDO> {
                 .betweenIfPresent(CrmBusinessDO::getCreateTime, times));
     }
 
+    // TODO @puhui999：这个可以优化下，通过统计 sql，不通过内存计算；
     default List<CrmBusinessDO> selectListByOwnerUserIdsAndEndStatusNotNull(Collection<Long> ownerUserIds, LocalDateTime[] times) {
         return selectList(new LambdaQueryWrapperX<CrmBusinessDO>()
                 .in(CrmBusinessDO::getOwnerUserId, ownerUserIds)
@@ -80,6 +81,7 @@ public interface CrmBusinessMapper extends BaseMapperX<CrmBusinessDO> {
                 .isNotNull(CrmBusinessDO::getEndStatus));
     }
 
+    // TODO @puhui999：这个可以优化下，通过统计 sql，不通过内存计算；
     default List<CrmBusinessDO> selectListByOwnerUserIdsAndDate(Collection<Long> ownerUserIds, LocalDateTime[] times) {
         return selectList(new LambdaQueryWrapperX<CrmBusinessDO>()
                 .in(CrmBusinessDO::getOwnerUserId, ownerUserIds)

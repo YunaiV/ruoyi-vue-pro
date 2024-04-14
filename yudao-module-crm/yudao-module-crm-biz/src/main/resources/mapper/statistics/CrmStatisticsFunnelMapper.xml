@@ -4,15 +4,16 @@
 
     <select id="selectBusinessCreateCountGroupByDate"
             resultType="cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.funnel.CrmStatisticsBusinessSummaryByDateRespVO">
-        SELECT DATE_FORMAT(create_time, '%Y-%m-%d') AS time, COUNT(*) AS businessCreateCount
+        SELECT
+            DATE_FORMAT(create_time, '%Y-%m-%d') AS time,
+            COUNT(*) AS businessCreateCount
         FROM crm_business
         WHERE deleted = 0
         AND owner_user_id IN
-        <foreach collection="userIds" item="userId" open="(" close=")" separator=",">
-            #{userId}
-        </foreach>
-        AND create_time BETWEEN #{times[0],javaType=java.time.LocalDateTime} AND
-        #{times[1],javaType=java.time.LocalDateTime}
+            <foreach collection="userIds" item="userId" open="(" close=")" separator=",">
+                #{userId}
+            </foreach>
+        AND create_time BETWEEN #{times[0],javaType=java.time.LocalDateTime} AND #{times[1],javaType=java.time.LocalDateTime}
         GROUP BY time
     </select>
 
