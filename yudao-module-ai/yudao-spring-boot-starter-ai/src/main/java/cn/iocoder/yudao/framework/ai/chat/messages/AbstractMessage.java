@@ -59,7 +59,7 @@ public abstract class AbstractMessage implements Message {
 	}
 
 	protected AbstractMessage(MessageType messageType, String textContent, List<MediaData> mediaData,
-			Map<String, Object> messageProperties) {
+							  Map<String, Object> messageProperties) {
 
 		Assert.notNull(messageType, "Message type must not be null");
 		Assert.notNull(textContent, "Content must not be null");

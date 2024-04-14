@@ -23,12 +23,12 @@ public class AiChatMessageDO {
     /**
      * 聊天ID，关联到特定的会话或对话
      */
-    private Long chatId;
+    private Long chatConversationId;
 
     /**
      * 角色ID，用于标识发送消息的用户或系统的身份
      */
-    private String userId;
+    private Long userId;
 
     /**
      * 消息具体内容，存储用户的发言或者系统响应的文字信息
@@ -38,7 +38,7 @@ public class AiChatMessageDO {
     /**
      * 消息类型，枚举值可能包括'system'(系统消息)、'user'(用户消息)和'assistant'(助手消息)
      */
-    private Double messageType;
+    private String messageType;
 
     /**
      * 在生成消息时采用的Top-K采样大小，
