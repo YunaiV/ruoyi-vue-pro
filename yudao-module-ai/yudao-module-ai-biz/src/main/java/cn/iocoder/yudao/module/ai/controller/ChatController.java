@@ -2,20 +2,20 @@ package cn.iocoder.yudao.module.ai.controller;
 
 import cn.hutool.core.exceptions.ExceptionUtil;
 import cn.iocoder.yudao.framework.ai.chat.ChatResponse;
-import cn.iocoder.yudao.framework.ai.chat.prompt.Prompt;
 import cn.iocoder.yudao.framework.ai.config.AiClient;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
-import cn.iocoder.yudao.module.ai.enums.AiClientNameEnum;
 import cn.iocoder.yudao.module.ai.service.ChatService;
+import cn.iocoder.yudao.module.ai.vo.ChatReq;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import reactor.core.publisher.Flux;
@@ -43,17 +43,16 @@ public class ChatController {
 
     @Operation(summary = "聊天-chat", description = "这个一般等待时间比较久，需要全部完成才会返回!")
     @GetMapping("/chat")
-    public CommonResult<String> chat(@RequestParam("prompt") String prompt) {
-        ChatResponse callRes = aiClient.call(new Prompt(prompt), AiClientNameEnum.QIAN_WEN.getName());
-        return CommonResult.success(callRes.getResult().getOutput().getContent());
+    public CommonResult<String> chat(@Validated @ModelAttribute ChatReq req) {
+        return CommonResult.success(chatService.chat(req));
     }
 
     // TODO @芋艿：调用这个方法异常，Unable to handle the Spring Security Exception because the response is already committed.
     @Operation(summary = "聊天-stream", description = "这里跟通义千问一样采用的是 Server-Sent Events (SSE) 通讯模式")
     @GetMapping(value = "/chatStream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public SseEmitter chatStream(@RequestParam("prompt") String prompt) {
+    public SseEmitter chatStream(@Validated @ModelAttribute ChatReq req) {
         Utf8SseEmitter sseEmitter = new Utf8SseEmitter();
-        Flux<ChatResponse> streamResponse = aiClient.stream(new Prompt(prompt), AiClientNameEnum.QIAN_WEN.getName());
+        Flux<ChatResponse> streamResponse = chatService.chatStream(req);
         streamResponse.subscribe(
                 new Consumer<ChatResponse>() {
                     @Override

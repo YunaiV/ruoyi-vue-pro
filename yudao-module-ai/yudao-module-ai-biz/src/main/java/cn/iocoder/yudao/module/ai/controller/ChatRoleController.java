@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/chat-role")
 @AllArgsConstructor
-public class AiChatRoleController {
+public class ChatRoleController {
 
     private final ChatRoleService chatRoleService;
 

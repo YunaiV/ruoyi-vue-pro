@@ -25,4 +25,13 @@ public enum AiClientNameEnum {
     private String name;
 
     private String message;
+
+    public static AiClientNameEnum valueOfName(String name) {
+        for (AiClientNameEnum nameEnum : AiClientNameEnum.values()) {
+            if (nameEnum.getName().equals(name)) {
+                return nameEnum;
+            }
+        }
+        throw new IllegalArgumentException("Invalid MessageType value: " + name);
+    }
 }
