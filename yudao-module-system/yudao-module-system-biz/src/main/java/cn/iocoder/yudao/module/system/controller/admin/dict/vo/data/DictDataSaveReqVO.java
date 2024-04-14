@@ -16,7 +16,7 @@ public class DictDataSaveReqVO {
     @Schema(description = "字典数据编号", example = "1024")
     private Long id;
 
-    @Schema(description = "显示顺序不能为空", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
+    @Schema(description = "显示顺序", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     @NotNull(message = "显示顺序不能为空")
     private Integer sort;
 
