@@ -243,7 +243,7 @@ yudao:
       appKey: cb6415c19d6162cda07b47316fcb0416
       secretKey: Y2JiYTIxZjA3MDMxMjNjZjQzYzVmNzdh
       chatModel: XING_HUO_3_5
-    yiYan:
+    yiYan3_5_8k:
       aiPlatform: YI_YAN
       temperature: 1
       topP: 1

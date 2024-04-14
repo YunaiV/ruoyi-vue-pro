@@ -17,7 +17,7 @@ import lombok.Getter;
 public enum AiClientNameEnum {
 
     QIAN_WEN("qianWen", "千问模型!"),
-    YI_YAN("yiYan", "一言模型!"),
+    YI_YAN_3_5_8K("yiYan3_5_8k", "文心一言(3.5-8k)"),
     XING_HUO("xingHuo", "星火模型!"),
 
     ;
