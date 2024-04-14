@@ -16,14 +16,14 @@ tenant-id: 1
 }
 
 ### chat call
-GET {{baseUrl}}/ai/chat?prompt=中国怎么样
+GET {{baseUrl}}/ai/chat?prompt=中国怎么样&modal=qianWen
 tenant-id: 1
 Authorization: {{token}}
 
 
 
 ### chat call
-GET {{baseUrl}}/ai/chatStream?prompt=苹果是什么颜色?
+GET {{baseUrl}}/ai/chatStream?prompt=苹果是什么颜色?&modal=yiYan3_5_8k
 tenant-id: 1
 Authorization: {{token}}
 
