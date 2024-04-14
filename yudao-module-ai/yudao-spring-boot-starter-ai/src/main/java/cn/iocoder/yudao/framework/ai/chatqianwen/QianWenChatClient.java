@@ -36,6 +36,8 @@ public class QianWenChatClient implements ChatClient, StreamingChatClient {
 
     private QianWenOptions qianWenOptions;
 
+
+    public QianWenChatClient() {}
     public QianWenChatClient(QianWenApi qianWenApi) {
         this.qianWenApi = qianWenApi;
     }
