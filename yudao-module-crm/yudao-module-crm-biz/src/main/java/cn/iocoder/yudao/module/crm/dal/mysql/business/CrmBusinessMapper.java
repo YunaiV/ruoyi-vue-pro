@@ -1,17 +1,18 @@
 package cn.iocoder.yudao.module.crm.dal.mysql.business;
 
+import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.MPJLambdaWrapperX;
 import cn.iocoder.yudao.module.crm.controller.admin.business.vo.business.CrmBusinessPageReqVO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.business.CrmBusinessDO;
-import cn.iocoder.yudao.module.crm.dal.dataobject.contract.CrmContractDO;
 import cn.iocoder.yudao.module.crm.enums.common.CrmBizTypeEnum;
 import cn.iocoder.yudao.module.crm.util.CrmPermissionUtils;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import org.apache.ibatis.annotations.Mapper;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 
@@ -59,10 +60,36 @@ public interface CrmBusinessMapper extends BaseMapperX<CrmBusinessDO> {
         return selectCount(CrmBusinessDO::getStatusTypeId, statusTypeId);
     }
 
-    default List<CrmBusinessDO> selectListByCustomerIdOwnerUserId(Long customerId, Long ownerUserId){
+    default List<CrmBusinessDO> selectListByCustomerIdOwnerUserId(Long customerId, Long ownerUserId) {
         return selectList(new LambdaQueryWrapperX<CrmBusinessDO>()
                 .eq(CrmBusinessDO::getCustomerId, customerId)
                 .eq(CrmBusinessDO::getOwnerUserId, ownerUserId));
+    }
+
+    default Long selectCountByOwnerUserIdsAndEndStatus(Collection<Long> ownerUserIds, LocalDateTime[] times, Integer endStatus) {
+        return selectCount(new LambdaQueryWrapperX<CrmBusinessDO>()
+                .in(CrmBusinessDO::getOwnerUserId, ownerUserIds)
+                .eqIfPresent(CrmBusinessDO::getEndStatus, endStatus)
+                .betweenIfPresent(CrmBusinessDO::getCreateTime, times));
+    }
+
+    default List<CrmBusinessDO> selectListByOwnerUserIdsAndEndStatusNotNull(Collection<Long> ownerUserIds, LocalDateTime[] times) {
+        return selectList(new LambdaQueryWrapperX<CrmBusinessDO>()
+                .in(CrmBusinessDO::getOwnerUserId, ownerUserIds)
+                .betweenIfPresent(CrmBusinessDO::getCreateTime, times)
+                .isNotNull(CrmBusinessDO::getEndStatus));
+    }
+
+    default List<CrmBusinessDO> selectListByOwnerUserIdsAndDate(Collection<Long> ownerUserIds, LocalDateTime[] times) {
+        return selectList(new LambdaQueryWrapperX<CrmBusinessDO>()
+                .in(CrmBusinessDO::getOwnerUserId, ownerUserIds)
+                .betweenIfPresent(CrmBusinessDO::getCreateTime, times));
+    }
+
+    default PageResult<CrmBusinessDO> selectPage(Collection<Long> ownerUserIds, LocalDateTime[] times, Integer pageNo, Integer pageSize) {
+        return selectPage(new PageParam().setPageNo(pageNo).setPageSize(pageSize), new LambdaQueryWrapperX<CrmBusinessDO>()
+                .in(CrmBusinessDO::getOwnerUserId, ownerUserIds)
+                .betweenIfPresent(CrmBusinessDO::getCreateTime, times));
     }
 
 }

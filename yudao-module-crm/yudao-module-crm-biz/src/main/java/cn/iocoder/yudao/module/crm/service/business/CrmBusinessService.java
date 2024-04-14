@@ -194,4 +194,42 @@ public interface CrmBusinessService {
      */
     List<CrmBusinessDO> getBusinessListByCustomerIdOwnerUserId(Long customerId, Long ownerUserId);
 
+    /**
+     * 获得商机数
+     *
+     * @param ownerUserIds 负责人编号
+     * @param times        时间范围
+     * @param endStatus    商机结束状态
+     * @return 商机数
+     */
+    Long getBusinessCountByOwnerUserIdsAndEndStatus(List<Long> ownerUserIds, LocalDateTime[] times, Integer endStatus);
+
+    /**
+     * 获得商机列表【数据统计】
+     *
+     * @param ownerUserIds 负责人编号
+     * @param times        时间范围
+     * @return 商机列表
+     */
+    List<CrmBusinessDO> getBusinessListByOwnerUserIdsAndEndStatusNotNull(List<Long> ownerUserIds, LocalDateTime[] times);
+
+    /**
+     * 获得商机列表【数据统计】
+     *
+     * @param ownerUserIds 负责人编号
+     * @param times        时间范围
+     * @return 商机列表
+     */
+    List<CrmBusinessDO> getBusinessListByOwnerUserIdsAndDate(List<Long> ownerUserIds, LocalDateTime[] times);
+
+    /**
+     * 商机分页【数据统计】
+     * @param ownerUserIds 负责人编号
+     * @param times        时间范围
+     * @param pageNo       页码
+     * @param pageSize     数量
+     * @return 商机分页
+     */
+    PageResult<CrmBusinessDO> getBusinessPageByDate(List<Long> ownerUserIds, LocalDateTime[] times, Integer pageNo, Integer pageSize);
+
 }
