@@ -5,6 +5,8 @@ import cn.iocoder.yudao.framework.ai.chat.ChatResponse;
 import cn.iocoder.yudao.framework.ai.chat.prompt.Prompt;
 import cn.iocoder.yudao.framework.ai.config.AiClient;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
+import cn.iocoder.yudao.module.ai.enums.AiClientNameEnum;
+import cn.iocoder.yudao.module.ai.service.ChatService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
@@ -22,6 +24,8 @@ import java.io.IOException;
 import java.util.function.Consumer;
 
 /**
+ * ia 模块
+ *
  * @author fansili
  * @time 2024/4/13 17:44
  * @since 1.0
@@ -35,11 +39,12 @@ public class ChatController {
 
     @Autowired
     private AiClient aiClient;
+    private final ChatService chatService;
 
     @Operation(summary = "聊天-chat", description = "这个一般等待时间比较久，需要全部完成才会返回!")
     @GetMapping("/chat")
     public CommonResult<String> chat(@RequestParam("prompt") String prompt) {
-        ChatResponse callRes = aiClient.call(new Prompt(prompt), "qianWen");
+        ChatResponse callRes = aiClient.call(new Prompt(prompt), AiClientNameEnum.QIAN_WEN.getName());
         return CommonResult.success(callRes.getResult().getOutput().getContent());
     }
 
@@ -48,7 +53,7 @@ public class ChatController {
     @GetMapping(value = "/chatStream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public SseEmitter chatStream(@RequestParam("prompt") String prompt) {
         Utf8SseEmitter sseEmitter = new Utf8SseEmitter();
-        Flux<ChatResponse> streamResponse = aiClient.stream(new Prompt(prompt), "qianWen");
+        Flux<ChatResponse> streamResponse = aiClient.stream(new Prompt(prompt), AiClientNameEnum.QIAN_WEN.getName());
         streamResponse.subscribe(
                 new Consumer<ChatResponse>() {
                     @Override
