@@ -1,6 +1,8 @@
 package cn.iocoder.yudao.module.bpm.framework.flowable.core.util;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Assert;
+import cn.hutool.core.lang.TypeReference;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.StrUtil;
@@ -8,11 +10,13 @@ import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.simple.BpmSimp
 import cn.iocoder.yudao.module.bpm.enums.definition.BpmSimpleModelNodeType;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnModelConstants;
 import org.flowable.bpmn.BpmnAutoLayout;
-import org.flowable.bpmn.model.*;
 import org.flowable.bpmn.model.Process;
+import org.flowable.bpmn.model.*;
 
 import java.util.List;
+import java.util.Map;
 
+import static cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.SimpleModelConstants.FIELDS_PERMISSION;
 import static org.flowable.bpmn.constants.BpmnXMLConstants.FLOWABLE_EXTENSIONS_NAMESPACE;
 import static org.flowable.bpmn.constants.BpmnXMLConstants.FLOWABLE_EXTENSIONS_PREFIX;
 
@@ -71,7 +75,7 @@ public class SimpleModelUtils {
             case USER_TASK:
             case COPY_TASK:
             case PARALLEL_GATEWAY_JOIN:
-            case INCLUSIVE_GATEWAY_JOIN:{
+            case INCLUSIVE_GATEWAY_JOIN: {
                 SequenceFlow sequenceFlow = buildBpmnSequenceFlow(node.getId(), childNode.getId(), null, null);
                 mainProcess.addFlowElement(sequenceFlow);
                 // 递归调用后续节点
@@ -80,7 +84,7 @@ public class SimpleModelUtils {
             }
             case PARALLEL_GATEWAY_FORK:
             case EXCLUSIVE_GATEWAY:
-            case INCLUSIVE_GATEWAY_FORK:{
+            case INCLUSIVE_GATEWAY_FORK: {
                 String sequenceFlowTargetId = (childNode == null || childNode.getId() == null) ? BpmnModelConstants.END_EVENT_ID : childNode.getId();
                 List<BpmSimpleModelNodeVO> conditionNodes = node.getConditionNodes();
                 Assert.notEmpty(conditionNodes, "网关节点的条件节点不能为空");
@@ -202,15 +206,20 @@ public class SimpleModelUtils {
         serviceTask.setName(node.getName());
         // TODO @jason：建议使用 ServiceTask，通过 executionListeners 实现；
         // @芋艿 ServiceTask 就可以了吧。 不需要 executionListeners
-        addExtensionElement(node, serviceTask);
+        addCandidateElements(node, serviceTask);
+
         return serviceTask;
     }
 
-    private static void addExtensionElement(BpmSimpleModelNodeVO node, FlowElement flowElement) {
+
+    /**
+     * 给节点添加候选人元素
+     */
+    private static void addCandidateElements(BpmSimpleModelNodeVO node, FlowElement flowElement) {
         Integer candidateStrategy = MapUtil.getInt(node.getAttributes(), BpmnModelConstants.USER_TASK_CANDIDATE_STRATEGY);
-        addExtensionElement(flowElement, FLOWABLE_EXTENSIONS_NAMESPACE, BpmnModelConstants.USER_TASK_CANDIDATE_STRATEGY,
+        addExtensionElement(flowElement, BpmnModelConstants.USER_TASK_CANDIDATE_STRATEGY,
                 candidateStrategy == null ? null : String.valueOf(candidateStrategy));
-        addExtensionElement(flowElement, FLOWABLE_EXTENSIONS_NAMESPACE, BpmnModelConstants.USER_TASK_CANDIDATE_PARAM,
+        addExtensionElement(flowElement, BpmnModelConstants.USER_TASK_CANDIDATE_PARAM,
                 MapUtil.getStr(node.getAttributes(), BpmnModelConstants.USER_TASK_CANDIDATE_PARAM));
     }
 
@@ -245,16 +254,48 @@ public class SimpleModelUtils {
         UserTask userTask = new UserTask();
         userTask.setId(node.getId());
         userTask.setName(node.getName());
-        addExtensionElement(node, userTask);
+        // TODO 暂时测试，后面去掉
+        userTask.setFormKey("24");
+        // 添加候选人元素
+        addCandidateElements(node, userTask);
+        // 添加表单字段权限属性元素
+        addFormFieldsPermission(node, userTask);
         return userTask;
     }
 
-    private static void addExtensionElement(FlowElement element, String namespace, String name, String value) {
+    /**
+     * 给节点添加表单字段权限元素
+     */
+    private static void addFormFieldsPermission(BpmSimpleModelNodeVO node, FlowElement flowElement) {
+        List<Map<String, String>> fieldsPermissions = MapUtil.get(node.getAttributes(),
+                FIELDS_PERMISSION, new TypeReference<>() {});
+        if (CollUtil.isNotEmpty(fieldsPermissions)) {
+            fieldsPermissions.forEach(item -> addExtensionElement(flowElement, FIELDS_PERMISSION, item));
+        }
+    }
+
+    private static void addExtensionElement(FlowElement element, String name, Map<String, String> attributes) {
+        if (attributes == null) {
+            return;
+        }
+        ExtensionElement extensionElement = new ExtensionElement();
+        extensionElement.setNamespace(FLOWABLE_EXTENSIONS_NAMESPACE);
+        extensionElement.setNamespacePrefix(FLOWABLE_EXTENSIONS_PREFIX);
+        extensionElement.setName(name);
+        attributes.forEach((key, value) -> {
+            ExtensionAttribute extensionAttribute = new ExtensionAttribute(key, value);
+            extensionAttribute.setNamespace(FLOWABLE_EXTENSIONS_NAMESPACE);
+            extensionElement.addAttribute(extensionAttribute);
+        });
+        element.addExtensionElement(extensionElement);
+    }
+
+    private static void addExtensionElement(FlowElement element, String name, String value) {
         if (value == null) {
             return;
         }
         ExtensionElement extensionElement = new ExtensionElement();
-        extensionElement.setNamespace(namespace);
+        extensionElement.setNamespace(FLOWABLE_EXTENSIONS_NAMESPACE);
         extensionElement.setNamespacePrefix(FLOWABLE_EXTENSIONS_PREFIX);
         extensionElement.setElementText(value);
         extensionElement.setName(name);

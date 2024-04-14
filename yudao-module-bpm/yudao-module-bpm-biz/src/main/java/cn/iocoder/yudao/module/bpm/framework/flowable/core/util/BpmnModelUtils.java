@@ -1,15 +1,21 @@
 package cn.iocoder.yudao.module.bpm.framework.flowable.core.util;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.ArrayUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.util.number.NumberUtils;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnModelConstants;
+import cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.SimpleModelConstants;
 import org.flowable.bpmn.converter.BpmnXMLConverter;
 import org.flowable.bpmn.model.Process;
 import org.flowable.bpmn.model.*;
 import org.flowable.common.engine.impl.util.io.BytesStreamSource;
 
 import java.util.*;
+
+import static cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.SimpleModelConstants.FIELD_ATTRIBUTE;
+import static org.flowable.bpmn.constants.BpmnXMLConstants.FLOWABLE_EXTENSIONS_NAMESPACE;
 
 /**
  * 流程模型转操作工具类
@@ -36,6 +42,23 @@ public class BpmnModelUtils {
             candidateParam = Optional.ofNullable(element).map(ExtensionElement::getElementText).orElse(null);
         }
         return candidateParam;
+    }
+
+    public static Map<String,Integer> parseFormFieldsPermission(BpmnModel bpmnModel, String flowElementId) {
+        FlowElement flowElement = getFlowElementById(bpmnModel, flowElementId);
+        if (flowElement == null) {
+            return null;
+        }
+        final HashMap<String, Integer> fieldsPermission = MapUtil.newHashMap();
+        List<ExtensionElement> extensionElements = flowElement.getExtensionElements().get(SimpleModelConstants.FIELDS_PERMISSION);
+        extensionElements.forEach(el -> {
+            String field = el.getAttributeValue(FLOWABLE_EXTENSIONS_NAMESPACE, FIELD_ATTRIBUTE);
+            String permission = el.getAttributeValue(FLOWABLE_EXTENSIONS_NAMESPACE, SimpleModelConstants.PERMISSION_ATTRIBUTE);
+            if (StrUtil.isNotEmpty(field) && StrUtil.isNotEmpty(permission)) {
+                fieldsPermission.put(field, Integer.parseInt(permission));
+            }
+        });
+        return fieldsPermission;
     }
 
     /**

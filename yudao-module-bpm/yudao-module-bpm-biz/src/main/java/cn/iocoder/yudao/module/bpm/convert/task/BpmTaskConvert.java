@@ -13,6 +13,7 @@ import cn.iocoder.yudao.module.bpm.framework.flowable.core.util.FlowableUtils;
 import cn.iocoder.yudao.module.bpm.service.message.dto.BpmMessageSendWhenTaskCreatedReqDTO;
 import cn.iocoder.yudao.module.system.api.dept.dto.DeptRespDTO;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
+import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.task.api.Task;
@@ -81,7 +82,8 @@ public interface BpmTaskConvert {
                                                                  HistoricProcessInstance processInstance,
                                                                  Map<Long, BpmFormDO> formMap,
                                                                  Map<Long, AdminUserRespDTO> userMap,
-                                                                 Map<Long, DeptRespDTO> deptMap) {
+                                                                 Map<Long, DeptRespDTO> deptMap,
+                                                                 BpmnModel bpmnModel) {
         List<BpmTaskRespVO> taskVOList = CollectionUtils.convertList(taskList, task -> {
             BpmTaskRespVO taskVO = BeanUtils.toBean(task, BpmTaskRespVO.class);
             taskVO.setStatus(FlowableUtils.getTaskStatus(task)).setReason(FlowableUtils.getTaskReason(task));
@@ -92,6 +94,10 @@ public interface BpmTaskConvert {
             // 表单信息
             BpmFormDO form = MapUtil.get(formMap, NumberUtils.parseLong(task.getFormKey()), BpmFormDO.class);
             if (form != null) {
+                // 测试一下权限处理
+//                List<String> afterChangedFields = BpmnFormUtils.changeCreateFormFiledPermissionRule(form.getFields(),
+//                        BpmnModelUtils.parseFormFieldsPermission(bpmnModel, task.getTaskDefinitionKey()));
+
                 taskVO.setFormId(form.getId()).setFormName(form.getName()).setFormConf(form.getConf())
                         .setFormFields(form.getFields()).setFormVariables(FlowableUtils.getTaskFormVariable(task));
             }
