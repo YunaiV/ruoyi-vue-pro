@@ -16,23 +16,16 @@ tenant-id: 1
 }
 
 ### chat call
-POST {{baseUrl}}/admin-api/ai/chat?prompt=中国怎么样
+GET {{baseUrl}}/ai/chat?prompt=中国怎么样
 tenant-id: 1
 Authorization: {{token}}
+
 
 
 ### chat call
-POST {{baseUrl}}/ai-api/chat
+GET {{baseUrl}}/ai/chatStream?prompt=苹果是什么颜色?
 tenant-id: 1
 Authorization: {{token}}
-
-
-### chat call
-GET {{baseUrl}}/chat-role/list
-tenant-id: 1
-Authorization: {{token}}
-
-
 
 
 

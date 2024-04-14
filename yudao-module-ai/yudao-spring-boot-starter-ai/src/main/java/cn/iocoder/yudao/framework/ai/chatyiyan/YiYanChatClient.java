@@ -82,6 +82,12 @@ public class YiYanChatClient implements ChatClient, StreamingChatClient {
         YiYanChatCompletionRequest request = this.createRequest(prompt, true);
         // 调用 callWithFunctionSupport 发送请求
         Flux<YiYanChatCompletion> response = this.yiYanApi.chatCompletionStream(request);
+        response.doOnComplete(new Runnable() {
+            @Override
+            public void run() {
+                String a = ";";
+            }
+        });
         return response.map(res -> new ChatResponse(List.of(new Generation(res.getResult()))));
     }
 

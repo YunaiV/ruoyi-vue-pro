@@ -1,8 +1,8 @@
-package cn.iocoder.yudao.module.ai.controller.app.chat;
+package cn.iocoder.yudao.module.ai.controller;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
-import cn.iocoder.yudao.module.ai.controller.app.chat.vo.*;
 import cn.iocoder.yudao.module.ai.service.ChatRoleService;
+import cn.iocoder.yudao.module.ai.vo.*;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.AllArgsConstructor;
 import org.springframework.validation.annotation.Validated;

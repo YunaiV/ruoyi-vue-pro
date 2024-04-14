@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.ai.controller.admin.chat.vo;
+package cn.iocoder.yudao.module.ai.vo;
 
 import cn.iocoder.yudao.module.ai.enums.OpenAiModelEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
