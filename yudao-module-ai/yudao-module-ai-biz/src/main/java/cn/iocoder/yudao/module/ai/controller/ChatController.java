@@ -5,6 +5,7 @@ import cn.iocoder.yudao.framework.ai.chat.ChatResponse;
 import cn.iocoder.yudao.framework.ai.chat.prompt.Prompt;
 import cn.iocoder.yudao.framework.ai.config.AiClient;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -32,11 +33,10 @@ import java.util.function.Consumer;
 @AllArgsConstructor
 public class ChatController {
 
-
-
     @Autowired
     private AiClient aiClient;
 
+    @Operation(summary = "聊天-chat", description = "这个一般等待时间比较久，需要全部完成才会返回!")
     @GetMapping("/chat")
     public CommonResult<String> chat(@RequestParam("prompt") String prompt) {
         ChatResponse callRes = aiClient.call(new Prompt(prompt), "qianWen");
@@ -44,6 +44,7 @@ public class ChatController {
     }
 
     // TODO @芋艿：调用这个方法异常，Unable to handle the Spring Security Exception because the response is already committed.
+    @Operation(summary = "聊天-stream", description = "这里跟通义千问一样采用的是 Server-Sent Events (SSE) 通讯模式")
     @GetMapping(value = "/chatStream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public SseEmitter chatStream(@RequestParam("prompt") String prompt) {
         Utf8SseEmitter sseEmitter = new Utf8SseEmitter();
