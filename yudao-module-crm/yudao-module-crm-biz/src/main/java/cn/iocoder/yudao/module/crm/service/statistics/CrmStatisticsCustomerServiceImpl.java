@@ -310,8 +310,7 @@ public class CrmStatisticsCustomerServiceImpl implements CrmStatisticsCustomerSe
         }
 
         // 3. 拼接数据
-        Map<Integer, Area> areaMap = convertMap(AreaUtils.getByType(AreaTypeEnum.PROVINCE, Function.identity()),
-                                                Area::getId);
+        Map<Integer, Area> areaMap = convertMap(AreaUtils.getByType(AreaTypeEnum.PROVINCE, Function.identity()), Area::getId);
         return convertList(dealCycleByAreaList, vo -> {
             if (vo.getAreaId() != null) {
                 Integer parentId = AreaUtils.getParentIdByType(vo.getAreaId(), AreaTypeEnum.PROVINCE);
@@ -331,12 +330,8 @@ public class CrmStatisticsCustomerServiceImpl implements CrmStatisticsCustomerSe
         reqVO.setUserIds(userIds);
 
         // 2. 获取客户产品统计数据
-        List<CrmStatisticsCustomerDealCycleByProductRespVO> dealCycleByProductList = customerMapper.selectCustomerDealCycleGroupByProductId(reqVO);
-        if (CollUtil.isEmpty(dealCycleByProductList)) {
-            return Collections.emptyList();
-        }
-
-        return dealCycleByProductList;
+        // TODO @dhb52：未读取产品名
+        return customerMapper.selectCustomerDealCycleGroupByProductId(reqVO);
     }
 
     /**
