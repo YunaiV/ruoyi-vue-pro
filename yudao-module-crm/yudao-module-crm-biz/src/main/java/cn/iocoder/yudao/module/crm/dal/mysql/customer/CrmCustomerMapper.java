@@ -186,11 +186,4 @@ public interface CrmCustomerMapper extends BaseMapperX<CrmCustomerDO> {
         return selectCount(query);
     }
 
-    // TODO @puhui999：这个可以优化下，通过统计 sql，不通过内存计算；
-    default Long selectCountByOwnerUserIds(Collection<Long> ownerUserIds, LocalDateTime[] times){
-        return selectCount(new LambdaQueryWrapperX<CrmCustomerDO>()
-                .in(CrmCustomerDO::getOwnerUserId, ownerUserIds)
-                .betweenIfPresent(CrmCustomerDO::getCreateTime, times));
-    }
-
 }

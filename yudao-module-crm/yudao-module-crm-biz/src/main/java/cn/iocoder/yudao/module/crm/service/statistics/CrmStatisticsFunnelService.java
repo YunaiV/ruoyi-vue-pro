@@ -1,8 +1,8 @@
 package cn.iocoder.yudao.module.crm.service.statistics;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.funnel.CrmStatisticBusinessEndStatusRespVO;
-import cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.funnel.CrmStatisticFunnelRespVO;
+import cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.funnel.CrmStatisticsBusinessSummaryByEndStatusRespVO;
+import cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.funnel.CrmStatisticFunnelSummaryRespVO;
 import cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.funnel.CrmStatisticsBusinessSummaryByDateRespVO;
 import cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.funnel.CrmStatisticsFunnelReqVO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.business.CrmBusinessDO;
@@ -22,7 +22,7 @@ public interface CrmStatisticsFunnelService {
      * @param reqVO 请求
      * @return 销售漏斗数据
      */
-    CrmStatisticFunnelRespVO getFunnelSummary(CrmStatisticsFunnelReqVO reqVO);
+    CrmStatisticFunnelSummaryRespVO getFunnelSummary(CrmStatisticsFunnelReqVO reqVO);
 
     /**
      * 获得商机结束状态统计
@@ -30,7 +30,7 @@ public interface CrmStatisticsFunnelService {
      * @param reqVO 请求
      * @return 商机结束状态统计
      */
-    List<CrmStatisticBusinessEndStatusRespVO> getBusinessEndStatusSummary(CrmStatisticsFunnelReqVO reqVO);
+    List<CrmStatisticsBusinessSummaryByEndStatusRespVO> getBusinessSummaryByEndStatus(CrmStatisticsFunnelReqVO reqVO);
 
     /**
      * 获取新增商机分析(按日期)

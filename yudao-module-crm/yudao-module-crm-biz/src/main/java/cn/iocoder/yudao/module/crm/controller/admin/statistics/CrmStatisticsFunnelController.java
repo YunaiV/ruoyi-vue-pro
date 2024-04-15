@@ -5,8 +5,8 @@ import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.crm.controller.admin.business.CrmBusinessController;
 import cn.iocoder.yudao.module.crm.controller.admin.business.vo.business.CrmBusinessRespVO;
-import cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.funnel.CrmStatisticBusinessEndStatusRespVO;
-import cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.funnel.CrmStatisticFunnelRespVO;
+import cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.funnel.CrmStatisticsBusinessSummaryByEndStatusRespVO;
+import cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.funnel.CrmStatisticFunnelSummaryRespVO;
 import cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.funnel.CrmStatisticsBusinessSummaryByDateRespVO;
 import cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.funnel.CrmStatisticsFunnelReqVO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.business.CrmBusinessDO;
@@ -31,37 +31,35 @@ import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 @Validated
 public class CrmStatisticsFunnelController {
 
-    // TODO @puhui999：crmStatisticsFunnelService 改成 funnelService 更好点哈
     @Resource
-    private CrmStatisticsFunnelService crmStatisticsFunnelService;
+    private CrmStatisticsFunnelService funnelService;
 
     @GetMapping("/get-funnel-summary")
     @Operation(summary = "获取销售漏斗统计数据", description = "用于【销售漏斗】页面的【销售漏斗分析】")
     @PreAuthorize("@ss.hasPermission('crm:statistics-funnel:query')")
-    public CommonResult<CrmStatisticFunnelRespVO> getFunnelSummary(@Valid CrmStatisticsFunnelReqVO reqVO) {
-        return success(crmStatisticsFunnelService.getFunnelSummary(reqVO));
+    public CommonResult<CrmStatisticFunnelSummaryRespVO> getFunnelSummary(@Valid CrmStatisticsFunnelReqVO reqVO) {
+        return success(funnelService.getFunnelSummary(reqVO));
     }
 
-    // TODO @puhui：这个接口，应该是 getBusinessSummaryByEndStatus？这样更统一哈；
-    @GetMapping("/get-business-end-status-summary")
+    @GetMapping("/get-business-summary-by-end-status")
     @Operation(summary = "获取商机结束状态统计", description = "用于【销售漏斗】页面的【销售漏斗分析】")
     @PreAuthorize("@ss.hasPermission('crm:statistics-funnel:query')")
-    public CommonResult<List<CrmStatisticBusinessEndStatusRespVO>> getBusinessEndStatusSummary(@Valid CrmStatisticsFunnelReqVO reqVO) {
-        return success(crmStatisticsFunnelService.getBusinessEndStatusSummary(reqVO));
+    public CommonResult<List<CrmStatisticsBusinessSummaryByEndStatusRespVO>> getBusinessSummaryByEndStatus(@Valid CrmStatisticsFunnelReqVO reqVO) {
+        return success(funnelService.getBusinessSummaryByEndStatus(reqVO));
     }
 
     @GetMapping("/get-business-summary-by-date")
     @Operation(summary = "获取新增商机分析(按日期)", description = "用于【销售漏斗】页面")
     @PreAuthorize("@ss.hasPermission('crm:statistics-funnel:query')")
     public CommonResult<List<CrmStatisticsBusinessSummaryByDateRespVO>> getBusinessSummaryByDate(@Valid CrmStatisticsFunnelReqVO reqVO) {
-        return success(crmStatisticsFunnelService.getBusinessSummaryByDate(reqVO));
+        return success(funnelService.getBusinessSummaryByDate(reqVO));
     }
 
     @GetMapping("/get-business-page-by-date")
     @Operation(summary = "获得商机分页(按日期)", description = "用于【销售漏斗】页面的【新增商机分析】")
     @PreAuthorize("@ss.hasPermission('crm:business:query')")
     public CommonResult<PageResult<CrmBusinessRespVO>> getBusinessPageByDate(@Valid CrmStatisticsFunnelReqVO pageVO) {
-        PageResult<CrmBusinessDO> pageResult = crmStatisticsFunnelService.getBusinessPageByDate(pageVO);
+        PageResult<CrmBusinessDO> pageResult = funnelService.getBusinessPageByDate(pageVO);
         return success(new PageResult<>(buildBusinessDetailList(pageResult.getList()), pageResult.getTotal()));
     }
 

@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.portrait;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -31,12 +32,9 @@ public class CrmStatisticsPortraitReqVO {
     @Schema(description = "负责人用户 id 集合", hidden = true, example = "2")
     private List<Long> userIds;
 
-    /**
-     * 前端如果选择自定义时间, 那么前端传递起始-终止时间, 如果选择其他时间间隔类型, 则由后台计算起始-终止时间
-     * 并作为参数传递给Mapper
-     */
     @Schema(description = "时间范围", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
+    @Size(min = 2, max = 2, message = "请选择时间范围")
     private LocalDateTime[] times;
 
 }

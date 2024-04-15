@@ -5,9 +5,8 @@ import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.validation.InEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;
@@ -17,9 +16,6 @@ import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_
 
 @Schema(description = "管理后台 - CRM 销售漏斗 Request VO")
 @Data
-// TODO @puhui999：不用写 EqualsAndHashCode、ToString，已经全局 lombok 啦
-@EqualsAndHashCode(callSuper = true)
-@ToString(callSuper = true)
 public class CrmStatisticsFunnelReqVO extends PageParam {
 
     @Schema(description = "部门 id", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
@@ -43,13 +39,9 @@ public class CrmStatisticsFunnelReqVO extends PageParam {
     @InEnum(value = DateIntervalEnum.class, message = "时间间隔类型，必须是 {value}")
     private Integer interval;
 
-    // TODO @puhui999：这个全部前端传递哈；参考 CrmStatisticsCustomerReqVO
-    /**
-     * 前端如果选择自定义时间, 那么前端传递起始-终止时间, 如果选择其他时间间隔类型, 则由后台计算起始-终止时间
-     * 并作为参数传递给Mapper
-     */
     @Schema(description = "时间范围", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
+    @Size(min = 2, max = 2, message = "请选择时间范围")
     private LocalDateTime[] times;
 
 }

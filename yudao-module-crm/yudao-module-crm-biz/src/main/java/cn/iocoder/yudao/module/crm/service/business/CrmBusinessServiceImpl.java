@@ -10,6 +10,7 @@ import cn.iocoder.yudao.module.crm.controller.admin.business.vo.business.CrmBusi
 import cn.iocoder.yudao.module.crm.controller.admin.business.vo.business.CrmBusinessTransferReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.business.vo.business.CrmBusinessUpdateStatusReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.contact.vo.CrmContactBusinessReqVO;
+import cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.funnel.CrmStatisticsFunnelReqVO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.business.CrmBusinessDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.business.CrmBusinessProductDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.business.CrmBusinessStatusDO;
@@ -376,35 +377,8 @@ public class CrmBusinessServiceImpl implements CrmBusinessService {
     }
 
     @Override
-    public Long getBusinessCountByOwnerUserIdsAndEndStatus(List<Long> ownerUserIds, LocalDateTime[] times, Integer endStatus) {
-        if (CollUtil.isEmpty(ownerUserIds)) {
-            return 0L;
-        }
-        return businessMapper.selectCountByOwnerUserIdsAndEndStatus(convertSet(ownerUserIds), times, endStatus);
-    }
-
-    // TODO @puhui999：这个可以优化下，通过统计 sql，不通过内存计算；
-    @Override
-    public List<CrmBusinessDO> getBusinessListByOwnerUserIdsAndEndStatusNotNull(List<Long> ownerUserIds, LocalDateTime[] times) {
-        if (CollUtil.isEmpty(ownerUserIds)) {
-            return Collections.emptyList();
-        }
-        return businessMapper.selectListByOwnerUserIdsAndEndStatusNotNull(convertSet(ownerUserIds), times);
-    }
-
-    // TODO @puhui999：这个可以优化下，通过统计 sql，不通过内存计算；
-    @Override
-    public List<CrmBusinessDO> getBusinessListByOwnerUserIdsAndDate(List<Long> ownerUserIds, LocalDateTime[] times) {
-        if (CollUtil.isEmpty(ownerUserIds)) {
-            return Collections.emptyList();
-        }
-
-        return businessMapper.selectListByOwnerUserIdsAndDate(convertSet(ownerUserIds), times);
-    }
-
-    @Override
-    public PageResult<CrmBusinessDO> getBusinessPageByDate(List<Long> ownerUserIds, LocalDateTime[] times, Integer pageNo, Integer pageSize) {
-        return businessMapper.selectPage(ownerUserIds, times, pageNo, pageSize);
+    public PageResult<CrmBusinessDO> getBusinessPageByDate(CrmStatisticsFunnelReqVO pageVO) {
+        return businessMapper.selectPage(pageVO);
     }
 
 }
