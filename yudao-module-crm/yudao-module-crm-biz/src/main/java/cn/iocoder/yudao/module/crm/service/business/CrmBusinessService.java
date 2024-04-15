@@ -46,8 +46,8 @@ public interface CrmBusinessService {
     /**
      * 更新商机相关跟进信息
      *
-     * @param id 编号
-     * @param contactNextTime 下次联系时间
+     * @param id                 编号
+     * @param contactNextTime    下次联系时间
      * @param contactLastContent 最后联系内容
      */
     void updateBusinessFollowUp(Long id, LocalDateTime contactNextTime, String contactLastContent);
@@ -55,7 +55,7 @@ public interface CrmBusinessService {
     /**
      * 更新商机的下次联系时间
      *
-     * @param ids 编号数组
+     * @param ids             编号数组
      * @param contactNextTime 下次联系时间
      */
     void updateBusinessContactNextTime(Collection<Long> ids, LocalDateTime contactNextTime);
@@ -184,5 +184,14 @@ public interface CrmBusinessService {
         }
         return status.getName();
     }
+
+    /**
+     * 获得商机列表
+     *
+     * @param customerId  客户编号
+     * @param ownerUserId 负责人编号
+     * @return 商机列表
+     */
+    List<CrmBusinessDO> getBusinessListByCustomerIdOwnerUserId(Long customerId, Long ownerUserId);
 
 }

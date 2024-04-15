@@ -5,14 +5,13 @@ import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
-import cn.iocoder.yudao.module.crm.controller.admin.permission.vo.CrmPermissionCreateReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.permission.vo.CrmPermissionRespVO;
+import cn.iocoder.yudao.module.crm.controller.admin.permission.vo.CrmPermissionSaveReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.permission.vo.CrmPermissionUpdateReqVO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.permission.CrmPermissionDO;
 import cn.iocoder.yudao.module.crm.enums.permission.CrmPermissionLevelEnum;
 import cn.iocoder.yudao.module.crm.framework.permission.core.annotations.CrmPermission;
 import cn.iocoder.yudao.module.crm.service.permission.CrmPermissionService;
-import cn.iocoder.yudao.module.crm.service.permission.bo.CrmPermissionCreateReqBO;
 import cn.iocoder.yudao.module.system.api.dept.DeptApi;
 import cn.iocoder.yudao.module.system.api.dept.PostApi;
 import cn.iocoder.yudao.module.system.api.dept.dto.DeptRespDTO;
@@ -50,7 +49,6 @@ public class CrmPermissionController {
 
     @Resource
     private CrmPermissionService permissionService;
-
     @Resource
     private AdminUserApi adminUserApi;
     @Resource
@@ -61,9 +59,8 @@ public class CrmPermissionController {
     @PostMapping("/create")
     @Operation(summary = "创建数据权限")
     @PreAuthorize("@ss.hasPermission('crm:permission:create')")
-    @CrmPermission(bizTypeValue = "#reqVO.bizType", bizId = "#reqVO.bizId", level = CrmPermissionLevelEnum.OWNER)
-    public CommonResult<Boolean> addPermission(@Valid @RequestBody CrmPermissionCreateReqVO reqVO) {
-        permissionService.createPermission(BeanUtils.toBean(reqVO, CrmPermissionCreateReqBO.class));
+    public CommonResult<Boolean> create(@Valid @RequestBody CrmPermissionSaveReqVO reqVO) {
+        permissionService.createPermission(reqVO, getLoginUserId());
         return success(true);
     }
 

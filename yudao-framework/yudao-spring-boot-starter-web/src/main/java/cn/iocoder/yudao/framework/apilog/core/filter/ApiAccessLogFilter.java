@@ -7,7 +7,7 @@ import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.BooleanUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.iocoder.yudao.framework.apilog.core.annotations.ApiAccessLog;
+import cn.iocoder.yudao.framework.apilog.core.annotation.ApiAccessLog;
 import cn.iocoder.yudao.framework.apilog.core.enums.OperateTypeEnum;
 import cn.iocoder.yudao.framework.apilog.core.service.ApiAccessLogFrameworkService;
 import cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants;

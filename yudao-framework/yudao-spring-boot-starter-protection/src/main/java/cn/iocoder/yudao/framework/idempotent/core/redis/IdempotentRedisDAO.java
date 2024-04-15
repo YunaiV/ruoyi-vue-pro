@@ -29,6 +29,11 @@ public class IdempotentRedisDAO {
         return redisTemplate.opsForValue().setIfAbsent(redisKey, "", timeout, timeUnit);
     }
 
+    public void delete(String key) {
+        String redisKey = formatKey(key);
+        redisTemplate.delete(redisKey);
+    }
+
     private static String formatKey(String key) {
         return String.format(IDEMPOTENT, key);
     }

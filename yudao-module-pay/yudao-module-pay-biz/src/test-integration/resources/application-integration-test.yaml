@@ -70,16 +70,6 @@ mybatis-plus:
 
 # Lock4j 配置项（单元测试，禁用 Lock4j）
 
-# Resilience4j 配置项
-resilience4j:
-  ratelimiter:
-    instances:
-      backendA:
-        limit-for-period: 1 # 每个周期内，允许的请求数。默认为 50
-        limit-refresh-period: 60s # 每个周期的时长，单位：微秒。默认为 500
-        timeout-duration: 1s # 被限流时，阻塞等待的时长，单位：微秒。默认为 5s
-        register-health-indicator: true # 是否注册到健康监测
-
 --- #################### 监控相关配置 ####################
 
 --- #################### 芋道相关配置 ####################

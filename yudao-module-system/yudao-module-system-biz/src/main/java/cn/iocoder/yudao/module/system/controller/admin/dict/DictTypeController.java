@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.system.controller.admin.dict;
 
-import cn.iocoder.yudao.framework.apilog.core.annotations.ApiAccessLog;
+import cn.iocoder.yudao.framework.apilog.core.annotation.ApiAccessLog;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;

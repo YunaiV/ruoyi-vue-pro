@@ -35,7 +35,6 @@
         <rocketmq-spring.version>2.2.3</rocketmq-spring.version>
         <!-- 服务保障相关 -->
         <lock4j.version>2.2.7</lock4j.version>
-        <resilience4j.version>1.7.1</resilience4j.version>
         <!-- 监控相关 -->
         <skywalking.version>8.12.0</skywalking.version>
         <spring-boot-admin.version>2.7.15</spring-boot-admin.version>
@@ -275,17 +274,6 @@
                         <groupId>org.redisson</groupId>
                     </exclusion>
                 </exclusions>
-            </dependency>
-
-            <dependency>
-                <groupId>io.github.resilience4j</groupId>
-                <artifactId>resilience4j-ratelimiter</artifactId>
-                <version>${resilience4j.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>io.github.resilience4j</groupId>
-                <artifactId>resilience4j-spring-boot2</artifactId>
-                <version>${resilience4j.version}</version>
             </dependency>
 
             <!-- 监控相关 -->
