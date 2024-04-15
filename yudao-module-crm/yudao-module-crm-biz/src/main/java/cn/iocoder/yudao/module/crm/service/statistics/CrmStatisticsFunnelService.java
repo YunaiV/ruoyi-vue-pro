@@ -1,10 +1,7 @@
 package cn.iocoder.yudao.module.crm.service.statistics;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.funnel.CrmStatisticsBusinessSummaryByEndStatusRespVO;
-import cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.funnel.CrmStatisticFunnelSummaryRespVO;
-import cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.funnel.CrmStatisticsBusinessSummaryByDateRespVO;
-import cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.funnel.CrmStatisticsFunnelReqVO;
+import cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.funnel.*;
 import cn.iocoder.yudao.module.crm.dal.dataobject.business.CrmBusinessDO;
 
 import java.util.List;
@@ -39,6 +36,14 @@ public interface CrmStatisticsFunnelService {
      * @return 新增商机分析
      */
     List<CrmStatisticsBusinessSummaryByDateRespVO> getBusinessSummaryByDate(CrmStatisticsFunnelReqVO reqVO);
+
+    /**
+     * 获得商机转化率分析(按日期)
+     *
+     * @param reqVO 请求
+     * @return 商机转化率分析
+     */
+    List<CrmStatisticsBusinessInversionRateSummaryByDateRespVO> getBusinessInversionRateSummaryByDate(CrmStatisticsFunnelReqVO reqVO);
 
     /**
      * 获得商机分页(按日期)

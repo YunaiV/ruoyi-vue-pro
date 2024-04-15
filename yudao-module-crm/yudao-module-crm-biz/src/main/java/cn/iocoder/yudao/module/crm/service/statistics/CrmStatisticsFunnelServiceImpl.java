@@ -4,10 +4,7 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils;
-import cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.funnel.CrmStatisticFunnelSummaryRespVO;
-import cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.funnel.CrmStatisticsBusinessSummaryByDateRespVO;
-import cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.funnel.CrmStatisticsBusinessSummaryByEndStatusRespVO;
-import cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.funnel.CrmStatisticsFunnelReqVO;
+import cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.funnel.*;
 import cn.iocoder.yudao.module.crm.dal.dataobject.business.CrmBusinessDO;
 import cn.iocoder.yudao.module.crm.dal.mysql.statistics.CrmStatisticsFunnelMapper;
 import cn.iocoder.yudao.module.crm.enums.business.CrmBusinessEndStatusEnum;
@@ -85,9 +82,9 @@ public class CrmStatisticsFunnelServiceImpl implements CrmStatisticsFunnelServic
         // 3. 按照日期间隔，合并数据
         List<LocalDateTime[]> timeRanges = LocalDateTimeUtils.getDateRangeList(reqVO.getTimes()[0], reqVO.getTimes()[1], reqVO.getInterval());
         return convertList(timeRanges, times -> {
-            Integer businessCreateCount = businessSummaryList.stream()
+            Long businessCreateCount = businessSummaryList.stream()
                     .filter(vo -> LocalDateTimeUtils.isBetween(times[0], times[1], vo.getTime()))
-                    .mapToInt(CrmStatisticsBusinessSummaryByDateRespVO::getBusinessCreateCount).sum();
+                    .mapToLong(CrmStatisticsBusinessSummaryByDateRespVO::getBusinessCreateCount).sum();
             BigDecimal businessDealCount = businessSummaryList.stream()
                     .filter(vo -> LocalDateTimeUtils.isBetween(times[0], times[1], vo.getTime()))
                     .map(CrmStatisticsBusinessSummaryByDateRespVO::getTotalPrice)
@@ -95,6 +92,31 @@ public class CrmStatisticsFunnelServiceImpl implements CrmStatisticsFunnelServic
             return new CrmStatisticsBusinessSummaryByDateRespVO()
                     .setTime(LocalDateTimeUtils.formatDateRange(times[0], times[1], reqVO.getInterval()))
                     .setBusinessCreateCount(businessCreateCount).setTotalPrice(businessDealCount);
+        });
+    }
+
+    @Override
+    public List<CrmStatisticsBusinessInversionRateSummaryByDateRespVO> getBusinessInversionRateSummaryByDate(CrmStatisticsFunnelReqVO reqVO) {
+        // 1. 获得用户编号数组
+        reqVO.setUserIds(getUserIds(reqVO));
+        if (CollUtil.isEmpty(reqVO.getUserIds())) {
+            return Collections.emptyList();
+        }
+
+        // 2. 按天统计，获取分项统计数据
+        List<CrmStatisticsBusinessInversionRateSummaryByDateRespVO> businessSummaryList = funnelMapper.selectBusinessInversionRateSummaryByDate(reqVO);
+        // 3. 按照日期间隔，合并数据
+        List<LocalDateTime[]> timeRanges = LocalDateTimeUtils.getDateRangeList(reqVO.getTimes()[0], reqVO.getTimes()[1], reqVO.getInterval());
+        return convertList(timeRanges, times -> {
+            Long businessCount = businessSummaryList.stream()
+                    .filter(vo -> LocalDateTimeUtils.isBetween(times[0], times[1], vo.getTime()))
+                    .mapToLong(CrmStatisticsBusinessInversionRateSummaryByDateRespVO::getBusinessCount).sum();
+            Long businessWinCount = businessSummaryList.stream()
+                    .filter(vo -> LocalDateTimeUtils.isBetween(times[0], times[1], vo.getTime()))
+                    .mapToLong(CrmStatisticsBusinessInversionRateSummaryByDateRespVO::getBusinessWinCount).sum();
+            return new CrmStatisticsBusinessInversionRateSummaryByDateRespVO()
+                    .setTime(LocalDateTimeUtils.formatDateRange(times[0], times[1], reqVO.getInterval()))
+                    .setBusinessCount(businessCount).setBusinessWinCount(businessWinCount);
         });
     }
 

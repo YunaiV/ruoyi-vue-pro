@@ -5,10 +5,7 @@ import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.crm.controller.admin.business.CrmBusinessController;
 import cn.iocoder.yudao.module.crm.controller.admin.business.vo.business.CrmBusinessRespVO;
-import cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.funnel.CrmStatisticsBusinessSummaryByEndStatusRespVO;
-import cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.funnel.CrmStatisticFunnelSummaryRespVO;
-import cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.funnel.CrmStatisticsBusinessSummaryByDateRespVO;
-import cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.funnel.CrmStatisticsFunnelReqVO;
+import cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.funnel.*;
 import cn.iocoder.yudao.module.crm.dal.dataobject.business.CrmBusinessDO;
 import cn.iocoder.yudao.module.crm.service.statistics.CrmStatisticsFunnelService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -53,6 +50,13 @@ public class CrmStatisticsFunnelController {
     @PreAuthorize("@ss.hasPermission('crm:statistics-funnel:query')")
     public CommonResult<List<CrmStatisticsBusinessSummaryByDateRespVO>> getBusinessSummaryByDate(@Valid CrmStatisticsFunnelReqVO reqVO) {
         return success(funnelService.getBusinessSummaryByDate(reqVO));
+    }
+
+    @GetMapping("/get-business-inversion-rate-summary-by-date")
+    @Operation(summary = "获取商机转化率分析(按日期)", description = "用于【销售漏斗】页面")
+    @PreAuthorize("@ss.hasPermission('crm:statistics-funnel:query')")
+    public CommonResult<List<CrmStatisticsBusinessInversionRateSummaryByDateRespVO>> getBusinessInversionRateSummaryByDate(@Valid CrmStatisticsFunnelReqVO reqVO) {
+        return success(funnelService.getBusinessInversionRateSummaryByDate(reqVO));
     }
 
     @GetMapping("/get-business-page-by-date")

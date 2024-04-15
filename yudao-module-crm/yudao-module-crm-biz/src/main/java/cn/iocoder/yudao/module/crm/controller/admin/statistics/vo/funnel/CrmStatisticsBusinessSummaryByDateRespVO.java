@@ -13,7 +13,7 @@ public class CrmStatisticsBusinessSummaryByDateRespVO {
     private String time;
 
     @Schema(description = "新增商机数量", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
-    private Integer businessCreateCount;
+    private Long businessCreateCount;
 
     @Schema(description = "新增商机金额", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     private BigDecimal totalPrice;

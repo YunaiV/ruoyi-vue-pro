@@ -60,4 +60,21 @@
         GROUP BY time
     </select>
 
+    <select id="selectBusinessInversionRateSummaryByDate"
+            resultType="cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.funnel.CrmStatisticsBusinessInversionRateSummaryByDateRespVO">
+        SELECT
+        DATE_FORMAT(create_time, '%Y-%m-%d') AS time,
+        COUNT(*) AS businessCount,
+        SUM(IF(end_status = 1, 1, 0)) AS businessWinCount
+        FROM crm_business
+        WHERE deleted = 0
+        AND owner_user_id IN
+        <foreach collection="userIds" item="userId" open="(" close=")" separator=",">
+            #{userId}
+        </foreach>
+        AND create_time BETWEEN #{times[0],javaType=java.time.LocalDateTime} AND
+        #{times[1],javaType=java.time.LocalDateTime}
+        GROUP BY time
+    </select>
+
 </mapper>
