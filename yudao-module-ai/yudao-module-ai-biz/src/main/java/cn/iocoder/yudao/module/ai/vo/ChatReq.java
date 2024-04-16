@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.module.ai.vo;
 
-import cn.iocoder.yudao.module.ai.enums.AiClientNameEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -18,14 +17,25 @@ import lombok.experimental.Accessors;
 @Accessors(chain = true)
 public class ChatReq {
 
+    @Schema(description = "chat角色模板")
+    private Long chatRoleId;
+
+    @Schema(description = "对话Id")
+    private Long conversationId;
+
+    @Schema(description = "对话类型(new、continue)，如果是new会创建一个新的对话，continue就会继续对话!")
+    @NotNull(message = "对话类型，不能为空!")
+    private String conversationType;
 
     @NotNull(message = "提示词不能为空!")
-    @Size(max = 3000, message = "提示词最大3000个字符!")
+    @Size(max = 5000, message = "提示词最大5000个字符!")
     @Schema(description = "填入固定值，1 issues, 2 pr")
     private String prompt;
 
-    @Schema(description = "chat角色模板")
-    private Long chatRoleId;
+    @Schema(description = "ai模型(查看 AiClientNameEnum)")
+    @NotNull(message = "模型不能为空!")
+    @Size(max = 30, message = "模型字符最大30个字符!")
+    private String modal;
 
     @Schema(description = "用于控制随机性和多样性的温度参数")
     private Double temperature;
@@ -38,15 +48,4 @@ public class ChatReq {
     @Schema(description = "在生成消息时采用的Top-K采样大小，表示模型生成回复时考虑的候选项集合的大小")
     private Double topK;
 
-    @Schema(description = "ai模型(查看 AiClientNameEnum)")
-    @NotNull(message = "模型不能为空!")
-    @Size(max = 30, message = "模型字符最大30个字符!")
-    private String modal;
-
-    @Schema(description = "对话类型(new、continue)")
-    @NotNull(message = "对话类型，不能为空!")
-    private String conversationType;
-
-    @Schema(description = "对话Id")
-    private Long conversationId;
 }
