@@ -45,9 +45,9 @@ public class ChatConversationServiceImpl implements ChatConversationService {
         insertConversation.setUserId(loginUserId);
         insertConversation.setChatRoleId(null);
         insertConversation.setChatRoleName(null);
-        insertConversation.setChatTitle(null);
+        insertConversation.setTitle(null);
         insertConversation.setChatCount(0);
-        insertConversation.setChatType(req.getChatType());
+        insertConversation.setType(req.getChatType());
         aiChatConversationMapper.insert(insertConversation);
         // 转换 res
         return ChatConversationConvert.INSTANCE.covnertChatConversationRes(latestConversation);

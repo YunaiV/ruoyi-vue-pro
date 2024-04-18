@@ -141,9 +141,9 @@ public class ChatServiceImpl implements ChatService {
                 .setUserId(loginUserId)
                 .setChatRoleId(req.getChatRoleId())
                 .setChatRoleName(chatRoleName)
-                .setChatType(chatTypeEnum.getType())
+                .setType(chatTypeEnum.getType())
                 .setChatCount(1)
-                .setChatTitle(req.getPrompt().substring(0, 20) + "...");
+                .setTitle(req.getPrompt().substring(0, 20) + "...");
         aiChatConversationMapper.insert(insertChatConversation);
         return insertChatConversation;
     }

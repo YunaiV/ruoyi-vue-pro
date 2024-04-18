@@ -53,7 +53,7 @@ public interface AiChatConversationMapper extends BaseMapperX<AiChatConversation
         LambdaQueryWrapper<AiChatConversationDO> queryWrapper
                 = new LambdaQueryWrapper<AiChatConversationDO>().eq(AiChatConversationDO::getUserId, loginUserId);
         if (!StrUtil.isBlank(search)) {
-            queryWrapper.like(AiChatConversationDO::getChatTitle, search);
+            queryWrapper.like(AiChatConversationDO::getTitle, search);
         }
         queryWrapper.orderByDesc(AiChatConversationDO::getId);
         return selectPage(new PageParam().setPageNo(1).setPageSize(100), queryWrapper).getList();

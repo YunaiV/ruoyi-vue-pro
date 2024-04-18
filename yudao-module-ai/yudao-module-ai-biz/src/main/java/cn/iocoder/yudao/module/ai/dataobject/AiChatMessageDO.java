@@ -1,9 +1,9 @@
 package cn.iocoder.yudao.module.ai.dataobject;
 
+import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 import lombok.experimental.Accessors;
-
-import java.util.Date;
 
 /**
  * ai 聊天 message
@@ -13,7 +13,8 @@ import java.util.Date;
  */
 @Data
 @Accessors(chain = true)
-public class AiChatMessageDO {
+@TableName("ai_chat_message")
+public class AiChatMessageDO extends BaseDO {
 
     /**
      * 编号，作为每条聊天记录的唯一标识符
@@ -58,23 +59,4 @@ public class AiChatMessageDO {
      */
     private Double temperature;
 
-    /**
-     * 创建该记录的操作员ID
-     */
-    private Long createdBy;
-
-    /**
-     * 记录创建的时间戳
-     */
-    private Date createdTime;
-
-    /**
-     * 最后更新该记录的操作员ID
-     */
-    private Long updatedBy;
-
-    /**
-     * 记录最后更新的时间戳
-     */
-    private Date updatedTime;
 }
