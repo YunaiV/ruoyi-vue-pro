@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.bpm.service.util;
+package cn.iocoder.yudao.module.bpm.framework.flowable.core.util;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Assert;
@@ -13,9 +13,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import static cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.SimpleModelConstants.FIELD_ATTRIBUTE;
+import static cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnModelConstants.FORM_FIELD_PERMISSION_ELEMENT_FIELD_ATTRIBUTE;
 
-// TODO @jason：这个类，挪到 framework 那的 util 包下哈；
+
 /**
  *  Bpmn 流程表单相关工具方法
  *
@@ -39,23 +39,23 @@ public class BpmnFormUtils {
         List<String> afterChangedFields = new ArrayList<>(fields.size());
         fields.forEach( f-> {
             Map<String, Object> fieldMap = JsonUtils.parseObject(f, new TypeReference<>() {});
-            String field = ObjUtil.defaultIfNull(fieldMap.get(FIELD_ATTRIBUTE), Object::toString, "");
+            String field = ObjUtil.defaultIfNull(fieldMap.get(FORM_FIELD_PERMISSION_ELEMENT_FIELD_ATTRIBUTE), Object::toString, "");
             if (StrUtil.isEmpty(field) || !fieldsPermission.containsKey(field)) {
                 afterChangedFields.add(f);
                 return;
             }
             BpmFieldPermissionEnum fieldPermission = BpmFieldPermissionEnum.valueOf(fieldsPermission.get(field));
             Assert.notNull(fieldPermission, "字段权限不匹配");
-            if (BpmFieldPermissionEnum.HIDE == fieldPermission) {
+            if (BpmFieldPermissionEnum.NONE == fieldPermission) {
                 fieldMap.put(CREATE_FORM_DISPLAY_ATTRIBUTE, Boolean.FALSE);
-            } else if (BpmFieldPermissionEnum.EDITABLE == fieldPermission){
+            } else if (BpmFieldPermissionEnum.WRITE == fieldPermission){
                 Map<String, Object> props =  MapUtil.get(fieldMap, "props", new cn.hutool.core.lang.TypeReference<>() {});
                 if (props == null) {
                     props = MapUtil.newHashMap();
                     fieldMap.put("props", props);
                 }
                 props.put(CREATE_FORM_DISABLED_ATTRIBUTE, Boolean.FALSE);
-            } else if (BpmFieldPermissionEnum.READONLY == fieldPermission) {
+            } else if (BpmFieldPermissionEnum.READ == fieldPermission) {
                 Map<String, Object> props =  MapUtil.get(fieldMap, "props", new cn.hutool.core.lang.TypeReference<>() {});
                 if (props == null) {
                     props = MapUtil.newHashMap();

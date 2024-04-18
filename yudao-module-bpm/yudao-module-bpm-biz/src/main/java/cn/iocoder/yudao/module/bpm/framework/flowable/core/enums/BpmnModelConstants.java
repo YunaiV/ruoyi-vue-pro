@@ -28,6 +28,21 @@ public interface BpmnModelConstants {
      */
     String USER_TASK_CANDIDATE_PARAM = "candidateParam";
 
+    /**
+     * BPMN ExtensionElement 流程表单字段权限元素, 用于标记字段权限
+     */
+    String FORM_FIELD_PERMISSION_ELEMENT = "fieldsPermission";
+
+    /**
+     * BPMN ExtensionElement Attribute, 用于标记表单字段
+     */
+    String FORM_FIELD_PERMISSION_ELEMENT_FIELD_ATTRIBUTE = "field";
+
+    /**
+     * BPMN ExtensionElement Attribute, 用于标记表单权限
+     */
+    String FORM_FIELD_PERMISSION_ELEMENT_PERMISSION_ATTRIBUTE = "permission";
+
     // TODO @芋艿：这里后面得关注下；
     /**
      * BPMN End Event 节点 Id， 用于后端生成 End Event 节点

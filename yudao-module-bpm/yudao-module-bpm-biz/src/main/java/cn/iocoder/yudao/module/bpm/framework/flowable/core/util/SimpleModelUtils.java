@@ -16,7 +16,7 @@ import org.flowable.bpmn.model.*;
 import java.util.List;
 import java.util.Map;
 
-import static cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.SimpleModelConstants.FIELDS_PERMISSION;
+import static cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnModelConstants.FORM_FIELD_PERMISSION_ELEMENT;
 import static org.flowable.bpmn.constants.BpmnXMLConstants.FLOWABLE_EXTENSIONS_NAMESPACE;
 import static org.flowable.bpmn.constants.BpmnXMLConstants.FLOWABLE_EXTENSIONS_PREFIX;
 
@@ -267,9 +267,9 @@ public class SimpleModelUtils {
      */
     private static void addFormFieldsPermission(BpmSimpleModelNodeVO node, FlowElement flowElement) {
         List<Map<String, String>> fieldsPermissions = MapUtil.get(node.getAttributes(),
-                FIELDS_PERMISSION, new TypeReference<>() {});
+                FORM_FIELD_PERMISSION_ELEMENT, new TypeReference<>() {});
         if (CollUtil.isNotEmpty(fieldsPermissions)) {
-            fieldsPermissions.forEach(item -> addExtensionElement(flowElement, FIELDS_PERMISSION, item));
+            fieldsPermissions.forEach(item -> addExtensionElement(flowElement, FORM_FIELD_PERMISSION_ELEMENT, item));
         }
     }
 

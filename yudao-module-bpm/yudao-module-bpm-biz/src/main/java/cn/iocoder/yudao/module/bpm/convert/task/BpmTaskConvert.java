@@ -96,6 +96,7 @@ public interface BpmTaskConvert {
             if (form != null) {
                 // 测试一下权限处理
                 // TODO @jason：这里是不是还没实现完哈？
+                // TODO @芋艿 测试了一下。 暂时注释掉。  前端不知道要怎样改， 可能需要讨论一下如何改
 //                List<String> afterChangedFields = BpmnFormUtils.changeCreateFormFiledPermissionRule(form.getFields(),
 //                        BpmnModelUtils.parseFormFieldsPermission(bpmnModel, task.getTaskDefinitionKey()));
 

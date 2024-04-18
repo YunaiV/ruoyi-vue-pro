@@ -6,7 +6,6 @@ import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.util.number.NumberUtils;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnModelConstants;
-import cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.SimpleModelConstants;
 import org.flowable.bpmn.converter.BpmnXMLConverter;
 import org.flowable.bpmn.model.Process;
 import org.flowable.bpmn.model.*;
@@ -14,7 +13,7 @@ import org.flowable.common.engine.impl.util.io.BytesStreamSource;
 
 import java.util.*;
 
-import static cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.SimpleModelConstants.FIELD_ATTRIBUTE;
+import static cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnModelConstants.*;
 import static org.flowable.bpmn.constants.BpmnXMLConstants.FLOWABLE_EXTENSIONS_NAMESPACE;
 
 /**
@@ -28,15 +27,13 @@ public class BpmnModelUtils {
         // TODO @芋艿 尝试从 ExtensionElement 取. 后续相关扩展是否都可以 存 extensionElement。 如表单权限。 按钮权限
         if (candidateStrategy == null) {
             ExtensionElement element = CollUtil.getFirst(userTask.getExtensionElements().get(BpmnModelConstants.USER_TASK_CANDIDATE_STRATEGY));
-            // TODO @jason：改成下面这样，是不是看着更简洁哈
-//            candidateStrategy = element != null ? NumberUtils.parseInt(element.getElementText()) : null;
             candidateStrategy = NumberUtils.parseInt(Optional.ofNullable(element).map(ExtensionElement::getElementText).orElse(null));
         }
         return candidateStrategy;
     }
 
     public static String parseCandidateParam(FlowElement userTask) {
-        String candidateParam =  userTask.getAttributeValue(
+        String candidateParam = userTask.getAttributeValue(
                 BpmnModelConstants.NAMESPACE, BpmnModelConstants.USER_TASK_CANDIDATE_PARAM);
         if (candidateParam == null) {
             ExtensionElement element = CollUtil.getFirst(userTask.getExtensionElements().get(BpmnModelConstants.USER_TASK_CANDIDATE_PARAM));
@@ -45,17 +42,17 @@ public class BpmnModelUtils {
         return candidateParam;
     }
 
-    // TODO @jason：貌似这个没地方调用？？？
+    // TODO @jason：貌似这个没地方调用？？？  @芋艿 在 BpmTaskConvert里面。暂时注释掉了。
     public static Map<String, Integer> parseFormFieldsPermission(BpmnModel bpmnModel, String flowElementId) {
         FlowElement flowElement = getFlowElementById(bpmnModel, flowElementId);
         if (flowElement == null) {
             return null;
         }
         Map<String, Integer> fieldsPermission = MapUtil.newHashMap();
-        List<ExtensionElement> extensionElements = flowElement.getExtensionElements().get(SimpleModelConstants.FIELDS_PERMISSION);
+        List<ExtensionElement> extensionElements = flowElement.getExtensionElements().get(FORM_FIELD_PERMISSION_ELEMENT);
         extensionElements.forEach(element -> {
-            String field = element.getAttributeValue(FLOWABLE_EXTENSIONS_NAMESPACE, FIELD_ATTRIBUTE);
-            String permission = element.getAttributeValue(FLOWABLE_EXTENSIONS_NAMESPACE, SimpleModelConstants.PERMISSION_ATTRIBUTE);
+            String field = element.getAttributeValue(FLOWABLE_EXTENSIONS_NAMESPACE, FORM_FIELD_PERMISSION_ELEMENT_FIELD_ATTRIBUTE);
+            String permission = element.getAttributeValue(FLOWABLE_EXTENSIONS_NAMESPACE, FORM_FIELD_PERMISSION_ELEMENT_PERMISSION_ATTRIBUTE);
             if (StrUtil.isNotEmpty(field) && StrUtil.isNotEmpty(permission)) {
                 fieldsPermission.put(field, Integer.parseInt(permission));
             }
