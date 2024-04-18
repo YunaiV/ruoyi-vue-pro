@@ -13,7 +13,6 @@ import cn.iocoder.yudao.module.ai.dataobject.AiChatConversationDO;
 import cn.iocoder.yudao.module.ai.dataobject.AiChatMessageDO;
 import cn.iocoder.yudao.module.ai.dataobject.AiChatRoleDO;
 import cn.iocoder.yudao.module.ai.enums.AiClientNameEnum;
-import cn.iocoder.yudao.module.ai.enums.ChatConversationTypeEnum;
 import cn.iocoder.yudao.module.ai.enums.ChatTypeEnum;
 import cn.iocoder.yudao.module.ai.mapper.AiChatConversationMapper;
 import cn.iocoder.yudao.module.ai.mapper.AiChatMessageMapper;
@@ -119,21 +118,6 @@ public class ChatServiceImpl implements ChatService {
 
         // chat count 先+1
         aiChatConversationMapper.updateIncrChatCount(req.getConversationId());
-    }
-
-    private AiChatConversationDO getChatConversationNoExistToCreate(ChatReq req, ChatConversationTypeEnum chatConversationTypeEnum, Long loginUserId) {
-        AiChatConversationDO aiChatConversationDO;
-        if (ChatConversationTypeEnum.NEW == chatConversationTypeEnum) {
-            // 创建一个新的对话
-            aiChatConversationDO = createNewChatConversation(req, loginUserId);
-        } else {
-            // 继续对话
-            if (req.getConversationId() == null) {
-                throw new ServerException(ErrorCodeConstants.AI_CHAT_CONTINUE_CONVERSATION_ID_NOT_NULL);
-            }
-            aiChatConversationDO = aiChatConversationMapper.selectById(req.getConversationId());
-        }
-        return aiChatConversationDO;
     }
 
     private AiChatConversationDO createNewChatConversation(ChatReq req, Long loginUserId) {
