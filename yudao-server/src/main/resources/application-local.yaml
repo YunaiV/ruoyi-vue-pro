@@ -271,6 +271,8 @@ yudao:
     enable: false
   demo: false # 关闭演示模式
   tencent-lbs-key: TVDBZ-TDILD-4ON4B-PFDZA-RNLKH-VVF6E # QQ 地图的密钥 https://lbs.qq.com/service/staticV2/staticGuide/staticDoc
+  tenant:
+    enable: false
 
 justauth:
   enabled: true
