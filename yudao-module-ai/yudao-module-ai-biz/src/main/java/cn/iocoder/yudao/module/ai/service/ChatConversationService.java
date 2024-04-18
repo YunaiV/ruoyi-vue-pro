@@ -1,7 +1,6 @@
 package cn.iocoder.yudao.module.ai.service;
 
 import cn.iocoder.yudao.module.ai.vo.ChatConversationCreateReq;
-import cn.iocoder.yudao.module.ai.vo.ChatConversationCreateRes;
 import cn.iocoder.yudao.module.ai.vo.ChatConversationListReq;
 import cn.iocoder.yudao.module.ai.vo.ChatConversationRes;
 

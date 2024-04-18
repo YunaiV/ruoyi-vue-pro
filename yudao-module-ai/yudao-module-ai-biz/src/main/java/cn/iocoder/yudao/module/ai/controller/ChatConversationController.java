@@ -3,7 +3,6 @@ package cn.iocoder.yudao.module.ai.controller;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.module.ai.service.ChatConversationService;
 import cn.iocoder.yudao.module.ai.vo.ChatConversationCreateReq;
-import cn.iocoder.yudao.module.ai.vo.ChatConversationCreateRes;
 import cn.iocoder.yudao.module.ai.vo.ChatConversationListReq;
 import cn.iocoder.yudao.module.ai.vo.ChatConversationRes;
 import io.swagger.v3.oas.annotations.Operation;
