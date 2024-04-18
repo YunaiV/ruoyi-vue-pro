@@ -243,14 +243,17 @@
 
     <select id="selectCustomerDealCycleGroupByProductId"
             resultType="cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.customer.CrmStatisticsCustomerDealCycleByProductRespVO">
-        SELECT (SELECT name FROM crm_product WHERE id = product.id)                                         AS product_name,
+        SELECT product.name                                                                                 AS product_name,
                IFNULL(TRUNCATE(AVG(TIMESTAMPDIFF(DAY, customer.create_time, contract.order_date)), 1), 0)   AS customer_deal_cycle,
                COUNT(DISTINCT customer.id)                                                                  AS customer_deal_count
           FROM crm_customer AS customer
                 LEFT JOIN crm_contract AS contract ON customer.id = contract.customer_id
-                LEFT JOIN crm_contract_product AS product ON product.contract_id = contract.id
+                LEFT JOIN crm_contract_product AS contract_product ON contract_product.contract_id = contract.id
+                LEFT JOIN crm_product AS product ON contract_product.product_id = product.id
          WHERE customer.deleted = 0
            AND contract.deleted = 0
+           AND contract_product.deleted = 0
+           AND product.deleted = 0
            AND contract.audit_status = ${@cn.iocoder.yudao.module.crm.enums.common.CrmAuditStatusEnum@APPROVE.status}
            AND customer.owner_user_id IN
                  <foreach collection="userIds" item="userId" open="(" close=")" separator=",">
