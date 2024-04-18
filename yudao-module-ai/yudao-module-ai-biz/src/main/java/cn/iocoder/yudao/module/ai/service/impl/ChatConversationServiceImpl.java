@@ -1,6 +1,8 @@
 package cn.iocoder.yudao.module.ai.service.impl;
 
+import cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil;
 import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
+import cn.iocoder.yudao.module.ai.ErrorCodeConstants;
 import cn.iocoder.yudao.module.ai.convert.ChatConversationConvert;
 import cn.iocoder.yudao.module.ai.dataobject.AiChatConversationDO;
 import cn.iocoder.yudao.module.ai.mapper.AiChatConversationMapper;
@@ -54,6 +56,9 @@ public class ChatConversationServiceImpl implements ChatConversationService {
     @Override
     public ChatConversationRes getConversation(Long id) {
         AiChatConversationDO aiChatConversationDO = aiChatConversationMapper.selectById(id);
+        if (aiChatConversationDO == null) {
+            throw ServiceExceptionUtil.exception(ErrorCodeConstants.AI_CHAT_CONTINUE_NOT_EXIST);
+        }
         return ChatConversationConvert.INSTANCE.covnertChatConversationRes(aiChatConversationDO);
     }
 
