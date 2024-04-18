@@ -17,25 +17,22 @@ import lombok.experimental.Accessors;
 @Accessors(chain = true)
 public class ChatReq {
 
-    @Schema(description = "chat角色模板")
-    private Long chatRoleId;
+    @Schema(description = "ai模型(查看 AiClientNameEnum)")
+    @NotNull(message = "模型不能为空!")
+    @Size(max = 30, message = "模型字符最大30个字符!")
+    private String modal;
 
     @Schema(description = "对话Id")
+    @NotNull(message = "对话id不能为空")
     private Long conversationId;
 
-    @Schema(description = "对话类型(new、continue)，如果是new会创建一个新的对话，continue就会继续对话!")
-    @NotNull(message = "对话类型，不能为空!")
-    private String conversationType;
+    @Schema(description = "chat角色模板")
+    private Long chatRoleId;
 
     @NotNull(message = "提示词不能为空!")
     @Size(max = 5000, message = "提示词最大5000个字符!")
     @Schema(description = "填入固定值，1 issues, 2 pr")
     private String prompt;
-
-    @Schema(description = "ai模型(查看 AiClientNameEnum)")
-    @NotNull(message = "模型不能为空!")
-    @Size(max = 30, message = "模型字符最大30个字符!")
-    private String modal;
 
     @Schema(description = "用于控制随机性和多样性的温度参数")
     private Double temperature;
