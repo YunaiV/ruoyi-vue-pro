@@ -651,14 +651,6 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
         }
     }
 
-    @Override
-    public Long getCustomerCountByOwnerUserIds(List<Long> ownerUserIds, LocalDateTime[] times) {
-        if (CollUtil.isEmpty(ownerUserIds)) {
-            return 0L;
-        }
-        return customerMapper.selectCountByOwnerUserIds(convertSet(ownerUserIds), times);
-    }
-
     /**
      * 获得自身的代理对象，解决 AOP 生效问题
      *

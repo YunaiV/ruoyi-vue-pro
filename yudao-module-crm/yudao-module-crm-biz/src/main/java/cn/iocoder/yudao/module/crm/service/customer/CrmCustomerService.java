@@ -195,13 +195,4 @@ public interface CrmCustomerService {
      */
     int autoPutCustomerPool();
 
-    /**
-     * 获得客户数
-     *
-     * @param ownerUserIds 负责人编号
-     * @param times        时间范围
-     * @return 客户数
-     */
-    Long getCustomerCountByOwnerUserIds(List<Long> ownerUserIds, LocalDateTime[] times);
-
 }
