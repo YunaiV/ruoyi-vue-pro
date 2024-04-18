@@ -1,6 +1,5 @@
 
-
-### 登录
+### 登录 详细使用  https://www.jetbrains.com/help/idea/testing-restful-web-services.html、https://www.cnblogs.com/crazymakercircle/p/14317222.html
 
 POST {{baseUrl}}/admin-api/system/auth/login
 Content-Type: application/json
@@ -15,10 +14,15 @@ tenant-id: 1
     "socialCodeValid": true
 }
 
+
+> {%
+    client.log(`Today is ${$isoTimestamp}`)
+%}
+
 ### chat call
 GET {{baseUrl}}/ai/chat?modal=qianWen&conversationId=111&prompt=中国好看吗？
 tenant-id: 1
-Authorization: {{token}}
+Authorization: {{xtoken}}
 
 
 
