@@ -95,6 +95,7 @@ public interface BpmTaskConvert {
             BpmFormDO form = MapUtil.get(formMap, NumberUtils.parseLong(task.getFormKey()), BpmFormDO.class);
             if (form != null) {
                 // 测试一下权限处理
+                // TODO @jason：这里是不是还没实现完哈？
 //                List<String> afterChangedFields = BpmnFormUtils.changeCreateFormFiledPermissionRule(form.getFields(),
 //                        BpmnModelUtils.parseFormFieldsPermission(bpmnModel, task.getTaskDefinitionKey()));
 

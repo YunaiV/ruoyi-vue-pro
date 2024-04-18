@@ -141,7 +141,7 @@ public class BpmTaskController {
         // 获得 BpmnModel
         BpmnModel bpmnModel = bpmProcessDefinitionService.getProcessDefinitionBpmnModel(processInstance.getProcessDefinitionId());
         return success(BpmTaskConvert.INSTANCE.buildTaskListByProcessInstanceId(taskList, processInstance,
-                formMap, userMap, deptMap,bpmnModel));
+                formMap, userMap, deptMap, bpmnModel));
     }
 
     @PutMapping("/approve")

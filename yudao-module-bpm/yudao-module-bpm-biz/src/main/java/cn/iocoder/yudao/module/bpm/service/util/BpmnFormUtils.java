@@ -15,12 +15,14 @@ import java.util.Map;
 
 import static cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.SimpleModelConstants.FIELD_ATTRIBUTE;
 
+// TODO @jason：这个类，挪到 framework 那的 util 包下哈；
 /**
  *  Bpmn 流程表单相关工具方法
  *
  * @author jason
  */
 public class BpmnFormUtils {
+
     private static final String CREATE_FORM_DISPLAY_ATTRIBUTE = "display";
     private static final String CREATE_FORM_DISABLED_ATTRIBUTE = "disabled";
 
@@ -65,4 +67,5 @@ public class BpmnFormUtils {
         });
         return afterChangedFields;
     }
+
 }

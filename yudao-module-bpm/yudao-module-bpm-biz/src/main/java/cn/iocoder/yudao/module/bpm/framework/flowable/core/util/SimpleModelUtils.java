@@ -207,7 +207,6 @@ public class SimpleModelUtils {
         // TODO @jason：建议使用 ServiceTask，通过 executionListeners 实现；
         // @芋艿 ServiceTask 就可以了吧。 不需要 executionListeners
         addCandidateElements(node, serviceTask);
-
         return serviceTask;
     }
 

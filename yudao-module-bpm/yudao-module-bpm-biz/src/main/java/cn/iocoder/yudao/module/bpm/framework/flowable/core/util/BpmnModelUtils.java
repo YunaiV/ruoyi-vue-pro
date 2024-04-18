@@ -25,11 +25,12 @@ public class BpmnModelUtils {
     public static Integer parseCandidateStrategy(FlowElement userTask) {
         Integer candidateStrategy = NumberUtils.parseInt(userTask.getAttributeValue(
                 BpmnModelConstants.NAMESPACE, BpmnModelConstants.USER_TASK_CANDIDATE_STRATEGY));
-        // @芋艿 尝试从 ExtensionElement 取. 后续相关扩展是否都可以 存 extensionElement。 如表单权限。 按钮权限
+        // TODO @芋艿 尝试从 ExtensionElement 取. 后续相关扩展是否都可以 存 extensionElement。 如表单权限。 按钮权限
         if (candidateStrategy == null) {
             ExtensionElement element = CollUtil.getFirst(userTask.getExtensionElements().get(BpmnModelConstants.USER_TASK_CANDIDATE_STRATEGY));
+            // TODO @jason：改成下面这样，是不是看着更简洁哈
+//            candidateStrategy = element != null ? NumberUtils.parseInt(element.getElementText()) : null;
             candidateStrategy = NumberUtils.parseInt(Optional.ofNullable(element).map(ExtensionElement::getElementText).orElse(null));
-
         }
         return candidateStrategy;
     }
@@ -44,16 +45,17 @@ public class BpmnModelUtils {
         return candidateParam;
     }
 
-    public static Map<String,Integer> parseFormFieldsPermission(BpmnModel bpmnModel, String flowElementId) {
+    // TODO @jason：貌似这个没地方调用？？？
+    public static Map<String, Integer> parseFormFieldsPermission(BpmnModel bpmnModel, String flowElementId) {
         FlowElement flowElement = getFlowElementById(bpmnModel, flowElementId);
         if (flowElement == null) {
             return null;
         }
-        final HashMap<String, Integer> fieldsPermission = MapUtil.newHashMap();
+        Map<String, Integer> fieldsPermission = MapUtil.newHashMap();
         List<ExtensionElement> extensionElements = flowElement.getExtensionElements().get(SimpleModelConstants.FIELDS_PERMISSION);
-        extensionElements.forEach(el -> {
-            String field = el.getAttributeValue(FLOWABLE_EXTENSIONS_NAMESPACE, FIELD_ATTRIBUTE);
-            String permission = el.getAttributeValue(FLOWABLE_EXTENSIONS_NAMESPACE, SimpleModelConstants.PERMISSION_ATTRIBUTE);
+        extensionElements.forEach(element -> {
+            String field = element.getAttributeValue(FLOWABLE_EXTENSIONS_NAMESPACE, FIELD_ATTRIBUTE);
+            String permission = element.getAttributeValue(FLOWABLE_EXTENSIONS_NAMESPACE, SimpleModelConstants.PERMISSION_ATTRIBUTE);
             if (StrUtil.isNotEmpty(field) && StrUtil.isNotEmpty(permission)) {
                 fieldsPermission.put(field, Integer.parseInt(permission));
             }

@@ -38,6 +38,7 @@ public enum BpmSimpleModelNodeType implements IntArrayValuable {
 
     /**
      * 判断是否为分支节点
+     *
      * @param type 节点类型
      */
     public static boolean isBranchNode(Integer type) {
