@@ -1,9 +1,7 @@
 package cn.iocoder.yudao.module.ai.service;
 
-import cn.iocoder.yudao.framework.ai.chat.ChatResponse;
-import cn.iocoder.yudao.module.ai.enums.AiClientNameEnum;
+import cn.iocoder.yudao.module.ai.controller.Utf8SseEmitter;
 import cn.iocoder.yudao.module.ai.vo.ChatReq;
-import reactor.core.publisher.Flux;
 
 /**
  * 聊天 chat
@@ -26,7 +24,8 @@ public interface ChatService {
      * chat stream
      *
      * @param req
+     * @param sseEmitter
      * @return
      */
-    Flux<ChatResponse> chatStream(ChatReq req);
+    void chatStream(ChatReq req, Utf8SseEmitter sseEmitter);
 }

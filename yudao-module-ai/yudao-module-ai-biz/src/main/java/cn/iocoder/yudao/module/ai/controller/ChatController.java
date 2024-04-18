@@ -2,7 +2,6 @@ package cn.iocoder.yudao.module.ai.controller;
 
 import cn.hutool.core.exceptions.ExceptionUtil;
 import cn.iocoder.yudao.framework.ai.chat.ChatResponse;
-import cn.iocoder.yudao.framework.ai.config.AiClient;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.module.ai.service.ChatService;
 import cn.iocoder.yudao.module.ai.vo.ChatReq;
@@ -38,7 +37,6 @@ import java.util.function.Consumer;
 public class ChatController {
 
     @Autowired
-    private AiClient aiClient;
     private final ChatService chatService;
 
     @Operation(summary = "聊天-chat", description = "这个一般等待时间比较久，需要全部完成才会返回!")
@@ -52,30 +50,7 @@ public class ChatController {
     @GetMapping(value = "/chatStream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public SseEmitter chatStream(@Validated @ModelAttribute ChatReq req) {
         Utf8SseEmitter sseEmitter = new Utf8SseEmitter();
-        Flux<ChatResponse> streamResponse = chatService.chatStream(req);
-        streamResponse.subscribe(
-                new Consumer<ChatResponse>() {
-                    @Override
-                    public void accept(ChatResponse chatResponse) {
-                        String content = chatResponse.getResults().get(0).getOutput().getContent();
-                        try {
-                            sseEmitter.send(content, MediaType.APPLICATION_JSON);
-                        } catch (IOException e) {
-                            log.error("发送异常{}", ExceptionUtil.getMessage(e));
-                            // 如果不是因为关闭而抛出异常，则重新连接
-                            sseEmitter.completeWithError(e);
-                        }
-                    }
-                },
-                error -> {
-                    //
-                    log.error("subscribe错误 {}", ExceptionUtil.getMessage(error));
-                },
-                () -> {
-                    log.info("发送完成!");
-                    sseEmitter.complete();
-                }
-        );
+        chatService.chatStream(req, sseEmitter);
         return sseEmitter;
     }
 }
