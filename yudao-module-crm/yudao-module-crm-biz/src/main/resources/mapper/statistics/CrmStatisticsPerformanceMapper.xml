@@ -5,27 +5,8 @@
     <select id="selectContractCountPerformance"
             resultType="cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.performance.CrmStatisticsPerformanceRespVO">
         SELECT
-        t.time as time,
-        COALESCE(t.currentMonthCount,0) as currentMonthCount,
-        COALESCE(y.lastMonthCount,0) as lastMonthCount,
-        COALESCE(z.lastYearCount,0) as lastYearCount
-        FROM
-        (SELECT
-        COUNT(1) AS currentMonthCount,
-        DATE_FORMAT(order_date, '%Y-%m') AS time
-        FROM	crm_contract
-        WHERE deleted = 0
-        AND audit_status = 20
-        AND owner_user_id in
-        <foreach collection="userIds" item="userId" open="(" close=")" separator=",">
-            #{userId}
-        </foreach>
-        AND DATE_FORMAT(order_date, '%Y') = DATE_FORMAT(#{times[0],javaType=java.time.LocalDateTime},'%Y')
-        GROUP BY time)t
-        LEFT JOIN
-        (SELECT
-        COUNT(1) AS lastMonthCount,
-        DATE_FORMAT(DATE_ADD(order_date,INTERVAL 1 MONTH), '%Y-%m') AS time
+        DATE_FORMAT(order_date, '%Y%m') AS time,
+        COUNT(1) AS currentMonthCount
         FROM	crm_contract
         WHERE deleted = 0
         AND audit_status = 20
@@ -35,45 +16,14 @@
         </foreach>
         AND (DATE_FORMAT(order_date, '%Y') = DATE_FORMAT(#{times[0],javaType=java.time.LocalDateTime},'%Y')
         or DATE_FORMAT(order_date, '%Y') = DATE_FORMAT(#{times[0],javaType=java.time.LocalDateTime},'%Y')-1)
-        GROUP BY time)y ON t.time = y.time
-        LEFT JOIN
-        (SELECT
-        COUNT(1) AS lastYearCount,
-        DATE_FORMAT(DATE_ADD(order_date,INTERVAL 1 YEAR), '%Y-%m') AS time
-        FROM	crm_contract
-        WHERE deleted = 0
-        AND audit_status = 20
-        AND owner_user_id in
-        <foreach collection="userIds" item="userId" open="(" close=")" separator=",">
-            #{userId}
-        </foreach>
-        AND DATE_FORMAT(order_date, '%Y') = DATE_FORMAT(#{times[0],javaType=java.time.LocalDateTime},'%Y')-1
-        GROUP BY time)z ON t.time = z.time
+        GROUP BY time
     </select>
+
     <select id="selectContractPricePerformance"
             resultType="cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.performance.CrmStatisticsPerformanceRespVO">
         SELECT
-        t.time as time,
-        COALESCE(t.currentMonthCount,0) as currentMonthCount,
-        COALESCE(y.lastMonthCount,0) as lastMonthCount,
-        COALESCE(z.lastYearCount,0) as lastYearCount
-        FROM
-        (SELECT
-        IFNULL(SUM(total_price), 0) AS currentMonthCount,
-        DATE_FORMAT(order_date, '%Y-%m') AS time
-        FROM	crm_contract
-        WHERE deleted = 0
-        AND audit_status = 20
-        AND owner_user_id in
-        <foreach collection="userIds" item="userId" open="(" close=")" separator=",">
-            #{userId}
-        </foreach>
-        AND DATE_FORMAT(order_date, '%Y') = DATE_FORMAT(#{times[0],javaType=java.time.LocalDateTime},'%Y')
-        GROUP BY time)t
-        LEFT JOIN
-        (SELECT
-        IFNULL(SUM(total_price), 0) AS lastMonthCount,
-        DATE_FORMAT(DATE_ADD(order_date,INTERVAL 1 MONTH), '%Y-%m') AS time
+        DATE_FORMAT(order_date, '%Y%m') AS time,
+        IFNULL(SUM(total_price), 0) AS currentMonthCount
         FROM	crm_contract
         WHERE deleted = 0
         AND audit_status = 20
@@ -83,46 +33,14 @@
         </foreach>
         AND (DATE_FORMAT(order_date, '%Y') = DATE_FORMAT(#{times[0],javaType=java.time.LocalDateTime},'%Y')
         or DATE_FORMAT(order_date, '%Y') = DATE_FORMAT(#{times[0],javaType=java.time.LocalDateTime},'%Y')-1)
-        GROUP BY time)y ON t.time = y.time
-        LEFT JOIN
-        (SELECT
-        IFNULL(SUM(total_price), 0) AS lastYearCount,
-        DATE_FORMAT(DATE_ADD(order_date,INTERVAL 1 YEAR), '%Y-%m') AS time
-        FROM	crm_contract
-        WHERE deleted = 0
-        AND audit_status = 20
-        AND owner_user_id in
-        <foreach collection="userIds" item="userId" open="(" close=")" separator=",">
-            #{userId}
-        </foreach>
-        AND DATE_FORMAT(order_date, '%Y') = DATE_FORMAT(#{times[0],javaType=java.time.LocalDateTime},'%Y')-1
-        GROUP BY time)z ON t.time = z.time
+        GROUP BY time
     </select>
 
     <select id="selectReceivablePricePerformance"
             resultType="cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.performance.CrmStatisticsPerformanceRespVO">
         SELECT
-        t.time as time,
-        COALESCE(t.currentMonthCount,0) as currentMonthCount,
-        COALESCE(y.lastMonthCount,0) as lastMonthCount,
-        COALESCE(z.lastYearCount,0) as lastYearCount
-        FROM
-        (SELECT
-        IFNULL(SUM(price), 0) AS currentMonthCount,
-        DATE_FORMAT(return_time, '%Y-%m') AS time
-        FROM	crm_receivable
-        WHERE deleted = 0
-        AND audit_status = 20
-        AND owner_user_id in
-        <foreach collection="userIds" item="userId" open="(" close=")" separator=",">
-            #{userId}
-        </foreach>
-        AND DATE_FORMAT(return_time, '%Y') = DATE_FORMAT(#{times[0],javaType=java.time.LocalDateTime},'%Y')
-        GROUP BY time)t
-        LEFT JOIN
-        (SELECT
-        IFNULL(SUM(price), 0) AS lastMonthCount,
-        DATE_FORMAT(DATE_ADD(return_time,INTERVAL 1 MONTH), '%Y-%m') AS time
+        DATE_FORMAT(return_time, '%Y%m') AS time,
+        IFNULL(SUM(price), 0) AS currentMonthCount
         FROM	crm_receivable
         WHERE deleted = 0
         AND audit_status = 20
@@ -132,21 +50,7 @@
         </foreach>
         AND (DATE_FORMAT(return_time, '%Y') = DATE_FORMAT(#{times[0],javaType=java.time.LocalDateTime},'%Y')
         or DATE_FORMAT(return_time, '%Y') = DATE_FORMAT(#{times[0],javaType=java.time.LocalDateTime},'%Y')-1)
-        GROUP BY time)y ON t.time = y.time
-        LEFT JOIN
-        (SELECT
-        IFNULL(SUM(price), 0) AS lastYearCount,
-        DATE_FORMAT(DATE_ADD(return_time,INTERVAL 1 YEAR), '%Y-%m') AS time
-        FROM	crm_receivable
-        WHERE deleted = 0
-        AND audit_status = 20
-        AND owner_user_id in
-        <foreach collection="userIds" item="userId" open="(" close=")" separator=",">
-            #{userId}
-        </foreach>
-        AND DATE_FORMAT(return_time, '%Y') = DATE_FORMAT(#{times[0],javaType=java.time.LocalDateTime},'%Y')-1
-        GROUP BY time)z ON t.time = z.time
+        GROUP BY time
     </select>
-
 
 </mapper>
