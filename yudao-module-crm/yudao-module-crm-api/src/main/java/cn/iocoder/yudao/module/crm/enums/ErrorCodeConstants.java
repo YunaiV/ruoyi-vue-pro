@@ -102,11 +102,10 @@ public interface ErrorCodeConstants {
     ErrorCode FOLLOW_UP_RECORD_NOT_EXISTS = new ErrorCode(1_020_013_000, "跟进记录不存在");
     ErrorCode FOLLOW_UP_RECORD_DELETE_DENIED = new ErrorCode(1_020_013_001, "删除跟进记录失败，原因：没有权限");
 
-    // ========== 跟进记录 1_020_014_000 ==========
+    // ========== 呼叫中心 1_020_014_000 ==========
     ErrorCode CRM_CALLCENTER_USER_NOT_EXISTS = new ErrorCode(1_020_014_000, "呼叫中心用户不存在");
     ErrorCode CRM_CALLCENTER_CONFIG_NOT_EXISTS = new ErrorCode(1_020_014_001, "呼叫中心配制不存在");
     ErrorCode CRM_CALLCENTER_CALLPHONE_NOT_EXISTS = new ErrorCode(1_020_014_002, "呼叫中心呼叫的电话号码为空或不存在");
     ErrorCode CRM_CALLCENTER_MANUFA_NOT_EXISTS = new ErrorCode(1_020_014_002, "呼叫中心制造商不存在");
     ErrorCode CRM_CALLCENTER_CALL_FAIL = new ErrorCode(1_020_014_002, "呼叫失败");
-
 }
