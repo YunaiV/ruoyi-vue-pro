@@ -4,7 +4,7 @@ import cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil;
 import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
 import cn.iocoder.yudao.module.ai.ErrorCodeConstants;
 import cn.iocoder.yudao.module.ai.convert.ChatConversationConvert;
-import cn.iocoder.yudao.module.ai.dataobject.AiChatConversationDO;
+import cn.iocoder.yudao.module.ai.dal.dataobject.AiChatConversationDO;
 import cn.iocoder.yudao.module.ai.mapper.AiChatConversationMapper;
 import cn.iocoder.yudao.module.ai.service.ChatConversationService;
 import cn.iocoder.yudao.module.ai.vo.ChatConversationCreateReq;
@@ -50,7 +50,7 @@ public class ChatConversationServiceImpl implements ChatConversationService {
         insertConversation.setType(req.getChatType());
         aiChatConversationMapper.insert(insertConversation);
         // 转换 res
-        return ChatConversationConvert.INSTANCE.covnertChatConversationRes(latestConversation);
+        return ChatConversationConvert.INSTANCE.covnertChatConversationRes(insertConversation);
     }
 
     @Override
