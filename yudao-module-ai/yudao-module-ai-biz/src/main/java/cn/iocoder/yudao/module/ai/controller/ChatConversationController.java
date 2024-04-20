@@ -37,20 +37,20 @@ public class ChatConversationController {
     }
 
     @Operation(summary = "获取 - 获取对话")
-    @GetMapping("/getConversation")
-    public CommonResult<ChatConversationRes> getConversation(@RequestParam("id") Long id) {
+    @GetMapping("/{id}")
+    public CommonResult<ChatConversationRes> getConversation(@PathVariable("id") Long id) {
         return CommonResult.success(chatConversationService.getConversation(id));
     }
 
     @Operation(summary = "获取 - 获取对话list")
-    @GetMapping("/listConversation")
+    @GetMapping("/list")
     public CommonResult<List<ChatConversationRes>> listConversation(@ModelAttribute @Validated ChatConversationListReq req) {
         return CommonResult.success(chatConversationService.listConversation(req));
     }
 
     @Operation(summary = "删除")
-    @DeleteMapping("/listConversation")
-    public CommonResult<Void> delete(@RequestParam("id") Long id) {
+    @DeleteMapping("/{id}")
+    public CommonResult<Void> delete(@PathVariable("id") Long id) {
         chatConversationService.delete(id);
         return CommonResult.success(null);
     }
