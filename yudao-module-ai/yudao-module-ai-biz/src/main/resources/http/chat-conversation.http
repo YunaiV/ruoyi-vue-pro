@@ -1,36 +1,22 @@
 
 ### 登录 详细使用  https://www.jetbrains.com/help/idea/testing-restful-web-services.html、https://www.cnblogs.com/crazymakercircle/p/14317222.html
 
-POST {{baseUrl}}/admin-api/system/auth/login
+### 对话 - 创建对话
+POST {{baseUrl}}/ai/chat/conversation/create
 Content-Type: application/json
-tenant-id: 1
+Authorization: {{token}}
 
 {
-    "username": "admin",
-    "password": "123456",
-    "captchaVerification": "PfcH6mgr8tpXuMWFjvW6YVaqrswIuwmWI5dsVZSg7sGpWtDCUbHuDEXl3cFB1+VvCC/rAkSwK8Fad52FSuncVg==",
-    "socialCode": "1024",
-    "socialState": "9b2ffbc1-7425-4155-9894-9d5c08541d62",
-    "socialCodeValid": true
+  "chatType": "userChat"
 }
 
 
-> {%
-    client.log(`Today is ${$isoTimestamp}`)
-%}
-
-### chat call
-GET {{baseUrl}}/ai/chat?modal=qianWen&conversationId=111&prompt=中国好看吗？
-tenant-id: 1
-Authorization: {{xtoken}}
-
-
-
-### chat call
-GET {{baseUrl}}/ai/chatStream?prompt=苹果是什么颜色?&modal=yiYan3_5_8k
-tenant-id: 1
+### 对话 - id获取
+GET {{baseUrl}}/ai/chat/conversation/1781604279872581644
 Authorization: {{token}}
 
 
-
+### 对话 - id获取
+DELETE {{baseUrl}}/ai/chat/conversation/1781604279872581644
+Authorization: {{token}}
 
