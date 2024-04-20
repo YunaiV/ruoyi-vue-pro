@@ -1,6 +1,8 @@
-package cn.iocoder.yudao.module.ai.dataobject;
+package cn.iocoder.yudao.module.ai.dal.dataobject;
 
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
@@ -16,6 +18,7 @@ public class AiChatRoleDO extends BaseDO {
     /**
      * 编号，表示聊天角色在数据库中的唯一标识符
      */
+    @TableId(type = IdType.AUTO)
     private Long id;
 
     /**

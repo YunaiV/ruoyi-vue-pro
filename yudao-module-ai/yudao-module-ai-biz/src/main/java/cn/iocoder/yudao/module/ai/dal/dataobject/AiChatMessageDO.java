@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.ai.dataobject;
+package cn.iocoder.yudao.module.ai.dal.dataobject;
 
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import com.baomidou.mybatisplus.annotation.TableName;
