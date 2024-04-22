@@ -127,6 +127,12 @@
             <groupId>com.xingyuv</groupId>
             <artifactId>spring-boot-starter-captcha-plus</artifactId> <!-- 验证码，一般用于登录使用 -->
         </dependency>
+
+        <dependency>
+            <groupId>org.dromara.hutool</groupId>
+            <artifactId>hutool-extra</artifactId> <!-- 邮件 -->
+        </dependency>
+
     </dependencies>
 
 </project>

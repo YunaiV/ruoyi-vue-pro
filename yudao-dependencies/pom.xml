@@ -443,7 +443,7 @@
             </dependency>
             <dependency>
                 <groupId>org.dromara.hutool</groupId>
-                <artifactId>hutool-all</artifactId>
+                <artifactId>hutool-extra</artifactId>
                 <version>${hutool-6.version}</version>
             </dependency>
 
