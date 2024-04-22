@@ -16,7 +16,6 @@ DELETE FROM "system_sms_channel";
 DELETE FROM "system_sms_template";
 DELETE FROM "system_sms_log";
 DELETE FROM "system_sms_code";
-DELETE FROM "system_error_code";
 DELETE FROM "system_social_client";
 DELETE FROM "system_social_user";
 DELETE FROM "system_social_user_bind";
