@@ -19,7 +19,7 @@ public class DictDataRespVO {
     @ExcelProperty("字典编码")
     private Long id;
 
-    @Schema(description = "显示顺序不能为空", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
+    @Schema(description = "显示顺序", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     @ExcelProperty("字典排序")
     private Integer sort;
 
