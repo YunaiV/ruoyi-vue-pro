@@ -6,6 +6,7 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
 import java.util.List;
+import java.util.Map;
 
 @Schema(description = "可排序的分页参数")
 @Data
@@ -16,4 +17,6 @@ public class SortablePageParam extends PageParam {
     @Schema(description = "排序字段")
     private List<SortingField> sortingFields;
 
+    @Schema(description = "排序字段映射", hidden = true)
+    private Map<String, String> sortingFieldMap;
 }

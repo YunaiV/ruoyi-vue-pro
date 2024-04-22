@@ -2,6 +2,7 @@ package cn.iocoder.yudao.framework.mybatis.core.util;
 
 import cn.hutool.core.collection.CollectionUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
+import cn.iocoder.yudao.framework.common.pojo.SortablePageParam;
 import cn.iocoder.yudao.framework.common.pojo.SortingField;
 import com.baomidou.mybatisplus.core.metadata.OrderItem;
 import com.baomidou.mybatisplus.core.toolkit.StringPool;
@@ -15,6 +16,7 @@ import net.sf.jsqlparser.schema.Table;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -33,9 +35,20 @@ public class MyBatisUtils {
         Page<T> page = new Page<>(pageParam.getPageNo(), pageParam.getPageSize());
         // 排序字段
         if (!CollectionUtil.isEmpty(sortingFields)) {
-            page.addOrder(sortingFields.stream().map(sortingField -> SortingField.ORDER_ASC.equals(sortingField.getOrder()) ?
-                    OrderItem.asc(sortingField.getField()) : OrderItem.desc(sortingField.getField()))
-                    .collect(Collectors.toList()));
+            if (pageParam instanceof SortablePageParam) {
+                SortablePageParam sortablePageParam = (SortablePageParam) pageParam;
+                List<OrderItem> orderItems = sortingFields.stream().map(sortingField -> {
+                    Map<String, String> sortingFieldMap = sortablePageParam.getSortingFieldMap();
+                    String field;
+                    if (sortingFieldMap != null && sortingFieldMap.get(sortingField.getField()) != null) {
+                        field = sortingFieldMap.get(sortingField.getField());
+                    } else {
+                        field = sortingField.getField();
+                    }
+                    return SortingField.ORDER_ASC.equals(sortingField.getOrder()) ? OrderItem.asc(field) : OrderItem.desc(field);
+                }).collect(Collectors.toList());
+                page.addOrder(orderItems);
+            }
         }
         return page;
     }
