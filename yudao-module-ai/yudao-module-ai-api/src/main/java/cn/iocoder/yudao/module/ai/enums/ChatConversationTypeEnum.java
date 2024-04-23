@@ -15,8 +15,9 @@ import lombok.Getter;
 @Getter
 public enum ChatConversationTypeEnum {
 
-    NEW("new", "新建对话"),
-    CONTINUE("continue", "继续对话"),
+    // roleChat、userChat
+    ROLE_CHAT("roleChat", "角色对话"),
+    USER_CHAT("userChat", "用户对话"),
 
     ;
 

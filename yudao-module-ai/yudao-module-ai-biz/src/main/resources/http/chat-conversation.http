@@ -16,7 +16,12 @@ GET {{baseUrl}}/ai/chat/conversation/1781604279872581644
 Authorization: {{token}}
 
 
-### 对话 - id获取
+### 对话 - list
+GET {{baseUrl}}/ai/chat/conversation/list
+Authorization: {{token}}
+
+
+### 对话 - 删除
 DELETE {{baseUrl}}/ai/chat/conversation/1781604279872581644
 Authorization: {{token}}
 

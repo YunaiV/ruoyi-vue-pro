@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.ai.service;
 
-import cn.iocoder.yudao.module.ai.vo.ChatConversationCreateReq;
+import cn.iocoder.yudao.module.ai.vo.ChatConversationCreateRoleReq;
+import cn.iocoder.yudao.module.ai.vo.ChatConversationCreateUserReq;
 import cn.iocoder.yudao.module.ai.vo.ChatConversationListReq;
 import cn.iocoder.yudao.module.ai.vo.ChatConversationRes;
 
@@ -15,12 +16,21 @@ import java.util.List;
 public interface ChatConversationService {
 
     /**
-     * 对话 - 创建
+     * 对话 - 创建普通对话
      *
      * @param req
      * @return
      */
-    ChatConversationRes create(ChatConversationCreateReq req);
+    ChatConversationRes createConversation(ChatConversationCreateUserReq req);
+
+    /**
+     * 对话 - 创建role对话
+     *
+     * @param req
+     * @return
+     */
+    ChatConversationRes createRoleConversation(ChatConversationCreateRoleReq req);
+
 
     /**
      * 获取 - 对话
@@ -44,4 +54,5 @@ public interface ChatConversationService {
      * @param id
      */
     void delete(Long id);
+
 }

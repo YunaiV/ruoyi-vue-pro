@@ -24,7 +24,11 @@ import java.util.List;
 @Mapper
 public interface AiChatConversationMapper extends BaseMapperX<AiChatConversationDO> {
 
-
+    /**
+     * 更新 - chat count
+     *
+     * @param id
+     */
     @Update("update ai_chat_conversation set chat_count = chat_count + 1 where id = #{id}")
     void updateIncrChatCount(@Param("id") Long id);
 

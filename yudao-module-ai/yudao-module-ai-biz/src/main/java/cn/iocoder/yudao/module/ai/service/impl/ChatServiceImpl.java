@@ -5,15 +5,10 @@ import cn.iocoder.yudao.framework.ai.chat.ChatResponse;
 import cn.iocoder.yudao.framework.ai.chat.messages.MessageType;
 import cn.iocoder.yudao.framework.ai.chat.prompt.Prompt;
 import cn.iocoder.yudao.framework.ai.config.AiClient;
-import cn.iocoder.yudao.framework.common.exception.ServerException;
 import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
-import cn.iocoder.yudao.module.ai.ErrorCodeConstants;
 import cn.iocoder.yudao.module.ai.controller.Utf8SseEmitter;
-import cn.iocoder.yudao.module.ai.dal.dataobject.AiChatConversationDO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.AiChatMessageDO;
-import cn.iocoder.yudao.module.ai.dal.dataobject.AiChatRoleDO;
 import cn.iocoder.yudao.module.ai.enums.AiClientNameEnum;
-import cn.iocoder.yudao.module.ai.enums.ChatTypeEnum;
 import cn.iocoder.yudao.module.ai.mapper.AiChatConversationMapper;
 import cn.iocoder.yudao.module.ai.mapper.AiChatMessageMapper;
 import cn.iocoder.yudao.module.ai.mapper.AiChatRoleMapper;
@@ -49,7 +44,6 @@ public class ChatServiceImpl implements ChatService {
     private final AiChatConversationMapper aiChatConversationMapper;
     private final ChatConversationService chatConversationService;
 
-
     /**
      * chat
      *
@@ -64,7 +58,7 @@ public class ChatServiceImpl implements ChatService {
         // 获取对话信息
         ChatConversationRes conversationRes = chatConversationService.getConversation(req.getConversationId());
         // 保存 chat message
-        saveChatMessage(req, conversationRes.getId(), loginUserId);
+        saveChatMessage(req, conversationRes, loginUserId);
         String content = null;
         try {
             // 创建 chat 需要的 Prompt
@@ -75,16 +69,19 @@ public class ChatServiceImpl implements ChatService {
             // 发送 call 调用
             ChatResponse call = aiClient.call(prompt, clientNameEnum.getName());
             content = call.getResult().getOutput().getContent();
+            // 更新 conversation
+
         } catch (Exception e) {
             content = ExceptionUtil.getMessage(e);
         } finally {
             // 保存 chat message
-            saveSystemChatMessage(req, conversationRes.getId(), loginUserId, content);
+            saveSystemChatMessage(req, conversationRes, loginUserId, content);
         }
         return content;
     }
 
-    private void saveChatMessage(ChatReq req, Long chatConversationId, Long loginUserId) {
+    private void saveChatMessage(ChatReq req, ChatConversationRes conversationRes, Long loginUserId) {
+        Long chatConversationId = conversationRes.getId();
         // 增加 chat message 记录
         aiChatMessageMapper.insert(
                 new AiChatMessageDO()
@@ -97,12 +94,12 @@ public class ChatServiceImpl implements ChatService {
                         .setTopP(req.getTopP())
                         .setTemperature(req.getTemperature())
         );
-
         // chat count 先+1
         aiChatConversationMapper.updateIncrChatCount(req.getConversationId());
     }
 
-    public void saveSystemChatMessage(ChatReq req, Long chatConversationId, Long loginUserId, String systemPrompts) {
+    public void saveSystemChatMessage(ChatReq req, ChatConversationRes conversationRes, Long loginUserId, String systemPrompts) {
+        Long chatConversationId = conversationRes.getId();
         // 增加 chat message 记录
         aiChatMessageMapper.insert(
                 new AiChatMessageDO()
@@ -118,34 +115,6 @@ public class ChatServiceImpl implements ChatService {
 
         // chat count 先+1
         aiChatConversationMapper.updateIncrChatCount(req.getConversationId());
-    }
-
-    private AiChatConversationDO createNewChatConversation(ChatReq req, Long loginUserId) {
-        // 获取 chat 角色
-        String chatRoleName = null;
-        ChatTypeEnum chatTypeEnum = null;
-        Long chatRoleId = req.getChatRoleId();
-        if (req.getChatRoleId() != null) {
-            AiChatRoleDO aiChatRoleDO = aiChatRoleMapper.selectById(chatRoleId);
-            if (aiChatRoleDO == null) {
-                throw new ServerException(ErrorCodeConstants.AI_CHAT_ROLE_NOT_EXISTENT);
-            }
-            chatTypeEnum = ChatTypeEnum.ROLE_CHAT;
-            chatRoleName = aiChatRoleDO.getRoleName();
-        } else {
-            chatTypeEnum = ChatTypeEnum.USER_CHAT;
-        }
-        //
-        AiChatConversationDO insertChatConversation = new AiChatConversationDO()
-                .setId(null)
-                .setUserId(loginUserId)
-                .setChatRoleId(req.getChatRoleId())
-                .setChatRoleName(chatRoleName)
-                .setType(chatTypeEnum.getType())
-                .setChatCount(1)
-                .setTitle(req.getPrompt().substring(0, 20) + "...");
-        aiChatConversationMapper.insert(insertChatConversation);
-        return insertChatConversation;
     }
 
     /**
@@ -168,7 +137,7 @@ public class ChatServiceImpl implements ChatService {
         req.setTopP(req.getTopP());
         req.setTemperature(req.getTemperature());
         // 保存 chat message
-        saveChatMessage(req, conversationRes.getId(), loginUserId);
+        saveChatMessage(req, conversationRes, loginUserId);
         Flux<ChatResponse> streamResponse = aiClient.stream(prompt, clientNameEnum.getName());
 
         StringBuffer contentBuffer = new StringBuffer();
@@ -195,7 +164,7 @@ public class ChatServiceImpl implements ChatService {
                     log.info("发送完成!");
                     sseEmitter.complete();
                     // 保存 chat message
-                    saveSystemChatMessage(req, conversationRes.getId(), loginUserId, contentBuffer.toString());
+                    saveSystemChatMessage(req, conversationRes, loginUserId, contentBuffer.toString());
                 }
         );
     }

@@ -2,7 +2,8 @@ package cn.iocoder.yudao.module.ai.controller;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.module.ai.service.ChatConversationService;
-import cn.iocoder.yudao.module.ai.vo.ChatConversationCreateReq;
+import cn.iocoder.yudao.module.ai.vo.ChatConversationCreateRoleReq;
+import cn.iocoder.yudao.module.ai.vo.ChatConversationCreateUserReq;
 import cn.iocoder.yudao.module.ai.vo.ChatConversationListReq;
 import cn.iocoder.yudao.module.ai.vo.ChatConversationRes;
 import io.swagger.v3.oas.annotations.Operation;
@@ -30,10 +31,16 @@ public class ChatConversationController {
 
     private final ChatConversationService chatConversationService;
 
-    @Operation(summary = "创建 - 对话")
-    @PostMapping("/create")
-    public CommonResult<ChatConversationRes> create(@RequestBody @Validated ChatConversationCreateReq req) {
-        return CommonResult.success(chatConversationService.create(req));
+    @Operation(summary = "创建 - 对话普通对话")
+    @PostMapping("/createConversation")
+    public CommonResult<ChatConversationRes> createConversation(@RequestBody @Validated ChatConversationCreateUserReq req) {
+        return CommonResult.success(chatConversationService.createConversation(req));
+    }
+
+    @Operation(summary = "创建 - 对话角色对话")
+    @PostMapping("/createRoleConversation")
+    public CommonResult<ChatConversationRes> createRoleConversation(@RequestBody @Validated ChatConversationCreateRoleReq req) {
+        return CommonResult.success(chatConversationService.createRoleConversation(req));
     }
 
     @Operation(summary = "获取 - 获取对话")

@@ -14,10 +14,13 @@ import lombok.experimental.Accessors;
  */
 @Data
 @Accessors(chain = true)
-public class ChatConversationCreateReq {
+public class ChatConversationCreateRoleReq {
 
-    @Schema(description = "对话类型(roleChat、userChat)")
-    @NotNull(message = "聊天类型不能为空!")
-    private String chatType;
+    @Schema(description = "chat角色Id")
+    @NotNull(message = "聊天角色id不能为空!")
+    private Long chatRoleId;
 
+    @Schema(description = "标题(有程序自动生成)")
+    @NotNull(message = "标题不能为空!")
+    private String title;
 }
