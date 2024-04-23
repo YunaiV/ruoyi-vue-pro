@@ -40,7 +40,7 @@ public class CrmStatisticsPerformanceServiceImpl implements CrmStatisticsPerform
 
     @Override
     public List<CrmStatisticsPerformanceRespVO> getContractCountPerformance(CrmStatisticsPerformanceReqVO performanceReqVO) {
-        // TODO @scholar：我们可以换个思路实现，减少数据库的计算量；
+        // TODO @scholar：可以把下面这个注释，你理解后，重新整理下，写到 getPerformance 里；
         // 比如说，2024 年的合同数据，是不是 2022-12 到 2024-12-31，每个月的统计呢？
         // 理解之后，我们可以数据 group by 年-月，20222-12 到 2024-12-31 的，然后内存在聚合出 CrmStatisticsPerformanceRespVO 这样
         // 这样，我们就可以减少数据库的计算量，提升性能；同时 SQL 也会很简单，开发者理解起来也简单哈；
@@ -57,6 +57,7 @@ public class CrmStatisticsPerformanceServiceImpl implements CrmStatisticsPerform
         return getPerformance(performanceReqVO, performanceMapper::selectReceivablePricePerformance);
     }
 
+    // TODO @scholar：代码注释，应该有 3 个变量哈；
     /**
      * 获得员工业绩数据
      *
@@ -64,9 +65,11 @@ public class CrmStatisticsPerformanceServiceImpl implements CrmStatisticsPerform
      * @param performanceFunction 员工业绩统计方法
      * @return 员工业绩数据
      */
+    // TODO @scholar：下面一行的变量，超过一行了，阅读不美观；可以考虑每一行一个变量；
     private List<CrmStatisticsPerformanceRespVO> getPerformance(CrmStatisticsPerformanceReqVO performanceReqVO, Function<CrmStatisticsPerformanceReqVO,
             List<CrmStatisticsPerformanceRespVO>> performanceFunction) {
 
+        // TODO @scholar：没使用到的变量，建议删除；
         List<CrmStatisticsPerformanceRespVO> performanceRespVOList;
 
         // 1. 获得用户编号数组
@@ -75,10 +78,15 @@ public class CrmStatisticsPerformanceServiceImpl implements CrmStatisticsPerform
             return Collections.emptyList();
         }
         performanceReqVO.setUserIds(userIds);
+        // TODO @scholar：1. 和 2. 之间，可以考虑换一行；保证每一块逻辑的间隔；
         // 2. 获得业绩数据
+        // TODO @scholar：复数变量，建议使用 s 或者 list 结果；这里用 performanceList  好列；
         List<CrmStatisticsPerformanceRespVO> performance = performanceFunction.apply(performanceReqVO);
 
         // 获取查询的年份
+        // TODO @scholar：逻辑可以简化一下；
+        // TODO 1）把 performance 转换成 map；key 是 time，value 是 count
+        // TODO 2）当前年，遍历 1-12 月份，去 map 拿到 count；接着月份 -1，去 map 拿 count；再年份 -1，拿 count
         String currentYear = LocalDateTimeUtil.format(performanceReqVO.getTimes()[0],"yyyy");
 
         // 构造查询当年和前一年，每年12个月的年月组合
