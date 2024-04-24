@@ -1,7 +1,10 @@
 package cn.iocoder.yudao.module.ai.service;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.ai.vo.*;
+
+import java.util.List;
 
 /**
  * chat 角色
@@ -17,7 +20,7 @@ public interface ChatRoleService {
      * @param req
      * @return
      */
-    CommonResult<ChatRoleListRes> list(ChatRoleListReq req);
+    PageResult<ChatRoleListRes> list(ChatRoleListReq req);
 
     /**
      * chat角色 - 添加

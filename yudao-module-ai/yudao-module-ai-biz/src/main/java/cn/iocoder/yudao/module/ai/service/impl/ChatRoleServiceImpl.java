@@ -1,11 +1,18 @@
 package cn.iocoder.yudao.module.ai.service.impl;
 
-import cn.iocoder.yudao.framework.common.pojo.CommonResult;
+import cn.hutool.core.util.StrUtil;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
+import cn.iocoder.yudao.module.ai.convert.ChatRoleConvert;
+import cn.iocoder.yudao.module.ai.dal.dataobject.AiChatRoleDO;
+import cn.iocoder.yudao.module.ai.mapper.AiChatRoleMapper;
 import cn.iocoder.yudao.module.ai.service.ChatRoleService;
 import cn.iocoder.yudao.module.ai.vo.*;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 /**
  * chat 角色
@@ -18,10 +25,25 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class ChatRoleServiceImpl implements ChatRoleService {
 
+    private final AiChatRoleMapper aiChatRoleMapper;
 
     @Override
-    public CommonResult<ChatRoleListRes> list(ChatRoleListReq req) {
-        return null;
+    public PageResult<ChatRoleListRes> list(ChatRoleListReq req) {
+        // 查询条件
+        LambdaQueryWrapperX<AiChatRoleDO> queryWrapperX = new LambdaQueryWrapperX<>();
+        // search 查询
+        if (!StrUtil.isBlank(req.getSearch())) {
+            queryWrapperX.eq(AiChatRoleDO::getRoleName, req.getSearch());
+        }
+        // 默认排序id desc
+        queryWrapperX.orderByDesc(AiChatRoleDO::getId);
+        //
+        PageResult<AiChatRoleDO> aiChatRoleDOPageResult = aiChatRoleMapper.selectPage(req, queryWrapperX);
+        Long total = aiChatRoleDOPageResult.getTotal();
+        List<AiChatRoleDO> roleList = aiChatRoleDOPageResult.getList();
+        // 换货res
+        List<ChatRoleListRes> chatRoleListResList = ChatRoleConvert.INSTANCE.convertChatRoleListRes(roleList);
+        return new PageResult<>(chatRoleListResList, total);
     }
 
     @Override
