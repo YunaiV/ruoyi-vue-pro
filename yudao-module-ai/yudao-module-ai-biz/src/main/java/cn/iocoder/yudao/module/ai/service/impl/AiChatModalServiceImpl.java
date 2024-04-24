@@ -36,6 +36,8 @@ public class AiChatModalServiceImpl implements AiChatModalService {
     @Override
     public PageResult<AiChatModalListRes> list(AiChatModalListReq req) {
         LambdaQueryWrapperX<AiChatModalDO> queryWrapperX = new LambdaQueryWrapperX<>();
+        // 查询的都是未禁用的模型
+        queryWrapperX.eq(AiChatModalDO::getDisable, AiChatModalDisableEnum.NO.getValue());
         // search
         if (!StrUtil.isBlank(req.getSearch())) {
             queryWrapperX.like(AiChatModalDO::getModelName, req.getSearch().trim());
