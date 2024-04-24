@@ -16,11 +16,6 @@ import lombok.experimental.Accessors;
 @Accessors(chain = true)
 public class ChatRoleUpdateReq extends PageParam {
 
-
-    @NotNull
-    @Schema(description = "编号")
-    private Long id;
-
     @NotNull
     @Schema(description = "模型编号，关联到角色使用的特定模型")
     private String modelId;

@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.ai.dal.dataobject;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
@@ -14,6 +15,7 @@ import lombok.experimental.Accessors;
  */
 @Data
 @Accessors(chain = true)
+@TableName("ai_chat_role")
 public class AiChatRoleDO extends BaseDO {
     /**
      * 编号，表示聊天角色在数据库中的唯一标识符
@@ -52,7 +54,7 @@ public class AiChatRoleDO extends BaseDO {
     private String classify;
 
     /**
-     * 发布状态，0表示仅自己可见，1表示公开，2表示禁用
+     * 发布状态，private 表示仅自己可见，public表示公开，disable表示禁用
      */
     private String visibility;
 

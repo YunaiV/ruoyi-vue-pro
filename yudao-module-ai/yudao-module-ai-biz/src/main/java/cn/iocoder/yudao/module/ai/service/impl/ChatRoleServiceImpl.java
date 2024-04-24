@@ -67,15 +67,16 @@ public class ChatRoleServiceImpl implements ChatRoleService {
     }
 
     @Override
-    public void update(ChatRoleUpdateReq req) {
+    public void update(Long id, ChatRoleUpdateReq req) {
         // 转换enum，并校验enum
         ChatRoleClassifyEnum.valueOfClassify(req.getClassify());
         ChatRoleVisibilityEnum.valueOfType(req.getVisibility());
         ChatRoleSourceEnum.valueOfType(req.getRoleSource());
         // 检查角色是否存在
-        validateChatRoleExists(req.getId());
+        validateChatRoleExists(id);
         // 转换do
         AiChatRoleDO updateChatRole = ChatRoleConvert.INSTANCE.convertAiChatRoleDO(req);
+        updateChatRole.setId(id);
         aiChatRoleMapper.updateById(updateChatRole);
     }
 

@@ -33,9 +33,10 @@ public interface ChatRoleService {
     /**
      * chat角色 - 修改
      *
+     * @param id
      * @param req
      */
-    void update(ChatRoleUpdateReq req);
+    void update(Long id, ChatRoleUpdateReq req);
 
 
     /**
