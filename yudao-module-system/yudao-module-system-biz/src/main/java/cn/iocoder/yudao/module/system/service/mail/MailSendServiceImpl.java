@@ -1,6 +1,8 @@
 package cn.iocoder.yudao.module.system.service.mail;
 
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.extra.mail.MailAccount;
+import cn.hutool.extra.mail.MailUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.module.system.dal.dataobject.mail.MailAccountDO;
@@ -11,12 +13,11 @@ import cn.iocoder.yudao.module.system.mq.producer.mail.MailProducer;
 import cn.iocoder.yudao.module.system.service.member.MemberService;
 import cn.iocoder.yudao.module.system.service.user.AdminUserService;
 import com.google.common.annotations.VisibleForTesting;
-import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
-import org.dromara.hutool.extra.mail.*;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
+import javax.annotation.Resource;
 import java.util.Map;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
@@ -119,7 +120,7 @@ public class MailSendServiceImpl implements MailSendService {
     private MailAccount buildMailAccount(MailAccountDO account, String nickname) {
         String from = StrUtil.isNotEmpty(nickname) ? nickname + " <" + account.getMail() + ">" : account.getMail();
         return new MailAccount().setFrom(from).setAuth(true)
-                .setUser(account.getUsername()).setPass(account.getPassword().toCharArray())
+                .setUser(account.getUsername()).setPass(account.getPassword())
                 .setHost(account.getHost()).setPort(account.getPort())
                 .setSslEnable(account.getSslEnable()).setStarttlsEnable(account.getStarttlsEnable());
     }
