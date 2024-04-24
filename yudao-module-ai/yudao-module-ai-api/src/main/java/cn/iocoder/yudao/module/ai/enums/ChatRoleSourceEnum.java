@@ -23,4 +23,14 @@ public enum ChatRoleSourceEnum {
     private String type;
 
     private String name;
+
+
+    public static ChatRoleSourceEnum valueOfType(String type) {
+        for (ChatRoleSourceEnum itemEnum : ChatRoleSourceEnum.values()) {
+            if (itemEnum.getType().equals(type)) {
+                return itemEnum;
+            }
+        }
+        throw new IllegalArgumentException("Invalid MessageType value: " + type);
+    }
 }

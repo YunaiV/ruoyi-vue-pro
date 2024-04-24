@@ -22,4 +22,15 @@ public enum ChatRoleVisibilityEnum {
     private String type;
 
     private String name;
+
+
+    public static ChatRoleVisibilityEnum valueOfType(String type) {
+        for (ChatRoleVisibilityEnum itemEnum : ChatRoleVisibilityEnum.values()) {
+            if (itemEnum.getType().equals(type)) {
+                return itemEnum;
+            }
+        }
+        throw new IllegalArgumentException("Invalid MessageType value: " + type);
+    }
+
 }
