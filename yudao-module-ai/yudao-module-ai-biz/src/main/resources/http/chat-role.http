@@ -49,3 +49,10 @@ Authorization: {{token}}
 }
 
 
+
+### chat update
+DELETE {{baseUrl}}/ai/chat/role/1
+Content-Type: application/json
+Authorization: {{token}}
+
+

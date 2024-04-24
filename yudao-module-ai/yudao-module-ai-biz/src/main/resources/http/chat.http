@@ -16,15 +16,13 @@ tenant-id: 1
 }
 
 ### chat call
-GET {{baseUrl}}/ai/chat?modal=qianWen&conversationId=111&prompt=中国好看吗？
-tenant-id: 1
+GET {{baseUrl}}/ai/chat?modal=qianWen&conversationId=1781604279872581644&prompt=中国好看吗？
 Authorization: {{token}}
 
 
 
 ### chat call
-GET {{baseUrl}}/ai/chatStream?prompt=苹果是什么颜色?&modal=yiYan3_5_8k
-tenant-id: 1
+GET {{baseUrl}}/ai/chatStream?conversationId=1781604279872581644&prompt=苹果是什么颜色?&modal=yiYan3_5_8k
 Authorization: {{token}}
 
 
