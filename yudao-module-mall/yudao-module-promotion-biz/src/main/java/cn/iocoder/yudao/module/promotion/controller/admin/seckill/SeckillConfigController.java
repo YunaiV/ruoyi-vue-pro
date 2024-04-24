@@ -46,7 +46,7 @@ public class SeckillConfigController {
 
     @PutMapping("/update-status")
     @Operation(summary = "修改时段配置状态")
-    @PreAuthorize("@ss.hasPermission('system:seckill-config:update')")
+    @PreAuthorize("@ss.hasPermission('promotion:seckill-config:update')")
     public CommonResult<Boolean> updateSeckillConfigStatus(@Valid @RequestBody SeckillConfigUpdateStatusReqVo reqVO) {
         seckillConfigService.updateSeckillConfigStatus(reqVO.getId(), reqVO.getStatus());
         return success(true);

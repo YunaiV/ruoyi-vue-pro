@@ -57,7 +57,7 @@ public class MailTemplateController {
     @GetMapping("/get")
     @Operation(summary = "获得邮件模版")
     @Parameter(name = "id", description = "编号", required = true, example = "1024")
-    @PreAuthorize("@ss.hasPermission('system:mail-template:get')")
+    @PreAuthorize("@ss.hasPermission('system:mail-template:query')")
     public CommonResult<MailTemplateRespVO> getMailTemplate(@RequestParam("id") Long id) {
         MailTemplateDO template = mailTempleService.getMailTemplate(id);
         return success(BeanUtils.toBean(template, MailTemplateRespVO.class));
