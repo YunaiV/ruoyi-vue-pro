@@ -104,6 +104,45 @@ public class CrmCallcenterUserController {
         });
     }
 
+    @GetMapping("/bingding-user")
+    @Operation(summary = "获得用户与呼叫中心用户绑定关系分页")
+    @PreAuthorize("@ss.hasPermission('crm:callcenter:user')")
+    public CommonResult<PageResult<CrmCallcenterUserRespVO>> getListCallcenterUser() {
+        PageResult<AdminUserRespDTO> userPage = adminUserApi.getUserPage();
+        List<CrmCallcenterUserDO> list = callcenterUserService.getList();
+        Map<String,CrmCallcenterUserDO> map = new HashMap<>();
+        for (CrmCallcenterUserDO crmCallcenterUserDO : list) {
+            map.put(crmCallcenterUserDO.getUserId().toString(),crmCallcenterUserDO);
+        }
+        PageResult<CrmCallcenterUserRespVO> pageResult = new PageResult<>();
+        pageResult.setList(new ArrayList<>());
+        //构建返回结果
+        userPage.getList().forEach(adminUserRespDTO -> {
+            CrmCallcenterUserRespVO crmCallcenterUserRespVO = new CrmCallcenterUserRespVO();
+            crmCallcenterUserRespVO.setUserId(adminUserRespDTO.getId());
+            crmCallcenterUserRespVO.setNickName(adminUserRespDTO.getNickname());
+            CrmCallcenterUserDO crmCallcenterUserDO = map.get(adminUserRespDTO.getId().toString());
+            if (crmCallcenterUserDO != null) {
+                crmCallcenterUserRespVO.setId(crmCallcenterUserDO.getId());
+                crmCallcenterUserRespVO.setYunkeCallcenterUserId(crmCallcenterUserDO.getYunkeCallcenterUserId());
+                crmCallcenterUserRespVO.setYunkeCallcenterPhone(crmCallcenterUserDO.getYunkeCallcenterPhone());
+                crmCallcenterUserRespVO.setCreateTime(crmCallcenterUserDO.getCreateTime());
+                pageResult.getList().add(crmCallcenterUserRespVO);
+            } else {
+                CrmCallcenterUserSaveReqVO newCrmCallcenterUserDo = new CrmCallcenterUserSaveReqVO();
+                newCrmCallcenterUserDo.setUserId(adminUserRespDTO.getId());
+                Long userid = callcenterUserService.createCallcenterUser(newCrmCallcenterUserDo);
+                CrmCallcenterUserDO ccu = callcenterUserService.getCallcenterUser(userid);
+                if (ccu != null){
+                    crmCallcenterUserRespVO.setId(ccu.getId());
+                    crmCallcenterUserRespVO.setUserId(ccu.getUserId());
+                    pageResult.getList().add(crmCallcenterUserRespVO);
+                }
+            }
+        });
+        return success(pageResult);
+    }
+
     @GetMapping("/export-excel")
     @Operation(summary = "导出用户与呼叫中心用户绑定关系 Excel")
     @PreAuthorize("@ss.hasPermission('crm:callcenter:user-export')")

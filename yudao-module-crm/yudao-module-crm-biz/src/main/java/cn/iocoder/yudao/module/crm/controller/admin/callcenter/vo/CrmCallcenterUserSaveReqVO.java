@@ -12,9 +12,6 @@ public class CrmCallcenterUserSaveReqVO {
     @Schema(description = "主建", requiredMode = Schema.RequiredMode.REQUIRED, example = "30755")
     private Long id;
 
-    @Schema(description = "用户名称", example = "2642")
-    private String nickName;
-
     @Schema(description = "用户id", example = "2642")
     private Long userId;
 

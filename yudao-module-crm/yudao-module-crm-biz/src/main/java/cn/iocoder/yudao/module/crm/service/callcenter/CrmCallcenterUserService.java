@@ -2,9 +2,12 @@ package cn.iocoder.yudao.module.crm.service.callcenter;
 
 import javax.validation.*;
 import cn.iocoder.yudao.module.crm.controller.admin.callcenter.vo.CrmCallcenterUserPageReqVO;
+import cn.iocoder.yudao.module.crm.controller.admin.callcenter.vo.CrmCallcenterUserRespVO;
 import cn.iocoder.yudao.module.crm.controller.admin.callcenter.vo.CrmCallcenterUserSaveReqVO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.callcenter.CrmCallcenterUserDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+
+import java.util.List;
 
 /**
  * 用户与呼叫中心用户绑定关系 Service 接口
@@ -50,5 +53,12 @@ public interface CrmCallcenterUserService {
      * @return 用户与呼叫中心用户绑定关系分页
      */
     PageResult<CrmCallcenterUserDO> getCallcenterUserPage(CrmCallcenterUserPageReqVO pageReqVO);
+
+
+    /**
+     *  获取未绑定的用户列表
+     *  @return 反绑定用户清单
+     */
+    List<CrmCallcenterUserDO> getList();
 
 }

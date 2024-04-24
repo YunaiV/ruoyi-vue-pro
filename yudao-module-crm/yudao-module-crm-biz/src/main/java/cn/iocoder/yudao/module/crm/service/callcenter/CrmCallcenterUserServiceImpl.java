@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.crm.service.callcenter;
 
 import cn.iocoder.yudao.module.crm.controller.admin.callcenter.vo.CrmCallcenterUserPageReqVO;
+import cn.iocoder.yudao.module.crm.controller.admin.callcenter.vo.CrmCallcenterUserRespVO;
 import cn.iocoder.yudao.module.crm.controller.admin.callcenter.vo.CrmCallcenterUserSaveReqVO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.callcenter.CrmCallcenterUserDO;
 import cn.iocoder.yudao.module.crm.dal.mysql.callcenter.CrmCallcenterUserMapper;
@@ -10,6 +11,8 @@ import org.springframework.validation.annotation.Validated;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 
+
+import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.crm.enums.ErrorCodeConstants.CRM_CALLCENTER_USER_NOT_EXISTS;
@@ -66,6 +69,11 @@ public class CrmCallcenterUserServiceImpl implements CrmCallcenterUserService {
     @Override
     public PageResult<CrmCallcenterUserDO> getCallcenterUserPage(CrmCallcenterUserPageReqVO pageReqVO) {
         return callcenterUserMapper.selectPage(pageReqVO);
+    }
+
+    @Override
+    public List<CrmCallcenterUserDO> getList() {
+        return callcenterUserMapper.selectList();
     }
 
 }

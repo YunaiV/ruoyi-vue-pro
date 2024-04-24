@@ -2,8 +2,10 @@ package cn.iocoder.yudao.module.system.api.user;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjUtil;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
+import cn.iocoder.yudao.module.system.controller.admin.user.vo.user.UserPageReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.dept.DeptDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.user.AdminUserDO;
 import cn.iocoder.yudao.module.system.service.dept.DeptService;
@@ -86,6 +88,12 @@ public class AdminUserApiImpl implements AdminUserApi {
     @Override
     public void validateUserList(Collection<Long> ids) {
         userService.validateUserList(ids);
+    }
+
+    @Override
+    public PageResult<AdminUserRespDTO> getUserPage(){
+        PageResult<AdminUserDO> userPage = userService.getUserPage(new UserPageReqVO());
+        return new PageResult<>(BeanUtils.toBean(userPage.getList(),AdminUserRespDTO.class),userPage.getTotal());
     }
 
 }

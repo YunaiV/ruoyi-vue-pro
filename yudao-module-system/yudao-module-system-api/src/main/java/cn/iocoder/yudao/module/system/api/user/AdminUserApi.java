@@ -1,7 +1,9 @@
 package cn.iocoder.yudao.module.system.api.user;
 
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
+
 
 import java.util.Collection;
 import java.util.Collections;
@@ -85,5 +87,12 @@ public interface AdminUserApi {
      * @param ids 用户编号数组
      */
     void validateUserList(Collection<Long> ids);
+
+    /**
+     * 获得用户分页列表
+     *
+     * @return 分页列表
+     */
+    PageResult<AdminUserRespDTO> getUserPage();
 
 }
