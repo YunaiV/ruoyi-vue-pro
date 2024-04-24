@@ -520,6 +520,7 @@ CREATE TABLE IF NOT EXISTS "system_mail_account" (
     "host" varchar NOT NULL,
     "port" int NOT NULL,
     "ssl_enable" bit NOT NULL,
+    "starttls_enable" bit NOT NULL,
     "creator" varchar DEFAULT '',
     "create_time" datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updater" varchar DEFAULT '',

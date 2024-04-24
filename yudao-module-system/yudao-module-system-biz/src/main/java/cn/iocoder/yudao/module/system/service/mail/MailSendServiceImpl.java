@@ -120,7 +120,8 @@ public class MailSendServiceImpl implements MailSendService {
         String from = StrUtil.isNotEmpty(nickname) ? nickname + " <" + account.getMail() + ">" : account.getMail();
         return new MailAccount().setFrom(from).setAuth(true)
                 .setUser(account.getUsername()).setPass(account.getPassword().toCharArray())
-                .setHost(account.getHost()).setPort(account.getPort()).setSslEnable(account.getSslEnable());
+                .setHost(account.getHost()).setPort(account.getPort())
+                .setSslEnable(account.getSslEnable()).setStarttlsEnable(account.getStarttlsEnable());
     }
 
     @VisibleForTesting
