@@ -3,8 +3,12 @@ package cn.iocoder.yudao.module.ai.service.impl;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
+import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
 import cn.iocoder.yudao.module.ai.convert.ChatRoleConvert;
 import cn.iocoder.yudao.module.ai.dal.dataobject.AiChatRoleDO;
+import cn.iocoder.yudao.module.ai.enums.ChatRoleClassifyEnum;
+import cn.iocoder.yudao.module.ai.enums.ChatRoleSourceEnum;
+import cn.iocoder.yudao.module.ai.enums.ChatRoleVisibilityEnum;
 import cn.iocoder.yudao.module.ai.mapper.AiChatRoleMapper;
 import cn.iocoder.yudao.module.ai.service.ChatRoleService;
 import cn.iocoder.yudao.module.ai.vo.*;
@@ -47,8 +51,17 @@ public class ChatRoleServiceImpl implements ChatRoleService {
     }
 
     @Override
-    public ChatRoleListRes add(ChatRoleAddReq req) {
-        return null;
+    public void add(ChatRoleAddReq req) {
+        // 转换enum，并校验enum
+        ChatRoleClassifyEnum.valueOfClassify(req.getClassify());
+        ChatRoleVisibilityEnum.valueOfType(req.getVisibility());
+        ChatRoleSourceEnum.valueOfType(req.getRoleSource());
+        // 转换do
+        AiChatRoleDO insertAiChatRoleDO = ChatRoleConvert.INSTANCE.convertAiChatRoleDO(req);
+        insertAiChatRoleDO.setUserId(SecurityFrameworkUtils.getLoginUserId());
+        insertAiChatRoleDO.setUseCount(0);
+        // 保存
+        aiChatRoleMapper.insert(insertAiChatRoleDO);
     }
 
     @Override

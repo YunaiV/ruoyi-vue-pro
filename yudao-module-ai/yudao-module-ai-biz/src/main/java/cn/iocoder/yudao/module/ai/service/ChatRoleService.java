@@ -28,7 +28,7 @@ public interface ChatRoleService {
      * @param req
      * @return
      */
-    ChatRoleListRes add(ChatRoleAddReq req);
+    void add(ChatRoleAddReq req);
 
     /**
      * chat角色 - 修改
