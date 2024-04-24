@@ -22,7 +22,7 @@ import java.util.List;
  * @time 2024/4/13 17:44
  * @since 1.0
  */
-@Tag(name = "A2聊天-对话")
+@Tag(name = "A2-聊天-对话")
 @RestController
 @RequestMapping("/ai/chat/conversation")
 @Slf4j

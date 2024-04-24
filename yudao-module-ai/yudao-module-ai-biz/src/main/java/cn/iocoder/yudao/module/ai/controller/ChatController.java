@@ -29,7 +29,7 @@ import java.util.function.Consumer;
  * @time 2024/4/13 17:44
  * @since 1.0
  */
-@Tag(name = "AI模块")
+@Tag(name = "A1-AI聊天")
 @RestController
 @RequestMapping("/ai")
 @Slf4j
