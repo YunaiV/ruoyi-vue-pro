@@ -95,7 +95,10 @@ public class ChatRoleServiceImpl implements ChatRoleService {
 
     @Override
     public void delete(Long chatRoleId) {
-
+        // 检查角色是否存在
+        validateChatRoleExists(chatRoleId);
+        // 删除
+        aiChatRoleMapper.deleteById(chatRoleId);
     }
 
     private AiChatRoleDO validateChatRoleExists(Long id) {
@@ -105,5 +108,4 @@ public class ChatRoleServiceImpl implements ChatRoleService {
         }
         return aiChatRoleDO;
     }
-
 }
