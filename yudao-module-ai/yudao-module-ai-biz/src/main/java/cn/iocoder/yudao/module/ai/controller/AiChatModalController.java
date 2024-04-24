@@ -51,5 +51,12 @@ public class AiChatModalController {
         return CommonResult.success(null);
     }
 
+    @Operation(summary = "ai模型 - 修改")
+    @PostMapping("/modal/{id}")
+    public CommonResult update(@PathVariable  Long id,
+                               @RequestBody @Validated AiChatModalAddReq req) {
+        aiChatModalService.update(id, req);
+        return CommonResult.success(null);
+    }
 
 }

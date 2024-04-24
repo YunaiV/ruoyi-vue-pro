@@ -17,4 +17,6 @@ public interface AiChatModalService {
     PageResult<AiChatModalListRes> list(AiChatModalListReq req);
 
     void add(AiChatModalAddReq req);
+
+    void update(Long id, AiChatModalAddReq req);
 }

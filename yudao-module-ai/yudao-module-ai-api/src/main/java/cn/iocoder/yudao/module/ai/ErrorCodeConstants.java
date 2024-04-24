@@ -28,4 +28,7 @@ public interface ErrorCodeConstants {
 
 
 
+    ErrorCode AI_MODAL_NOT_EXIST = new ErrorCode(1_022_000_060, "ai模型不存在!");
+
+
 }

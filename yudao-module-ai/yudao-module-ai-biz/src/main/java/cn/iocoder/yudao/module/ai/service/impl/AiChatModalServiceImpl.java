@@ -1,8 +1,10 @@
 package cn.iocoder.yudao.module.ai.service.impl;
 
 import cn.hutool.core.util.StrUtil;
+import cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
+import cn.iocoder.yudao.module.ai.ErrorCodeConstants;
 import cn.iocoder.yudao.module.ai.convert.ChatModalConvert;
 import cn.iocoder.yudao.module.ai.dal.dataobject.AiChatModalDO;
 import cn.iocoder.yudao.module.ai.enums.AiChatModalDisableEnum;
@@ -55,5 +57,23 @@ public class AiChatModalServiceImpl implements AiChatModalService {
         insertChatModalDO.setDisable(AiChatModalDisableEnum.NO.getValue());
         // 保存数据库
         aiChatModalMapper.insert(insertChatModalDO);
+    }
+
+    @Override
+    public void update(Long id, AiChatModalAddReq req) {
+        // 校验模型是否存在
+        validateChatModalExists(id);
+        // 转换 updateChatModalDO
+        AiChatModalDO updateChatModalDO = ChatModalConvert.INSTANCE.convertAiChatModalDO(req);
+        updateChatModalDO.setId(id);
+        // 更新数据库
+        aiChatModalMapper.updateById(updateChatModalDO);
+    }
+
+    private void validateChatModalExists(Long id) {
+        AiChatModalDO aiChatModalDO = aiChatModalMapper.selectById(id);
+        if (aiChatModalDO == null) {
+            throw ServiceExceptionUtil.exception(ErrorCodeConstants.AI_MODAL_NOT_EXIST);
+        }
     }
 }
