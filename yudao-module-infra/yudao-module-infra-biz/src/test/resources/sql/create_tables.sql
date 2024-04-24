@@ -196,7 +196,6 @@ CREATE TABLE IF NOT EXISTS "infra_codegen_column" (
     "column_comment" varchar(500) NOT NULL,
     "nullable" tinyint not null,
     "primary_key" tinyint not null,
-    "auto_increment" varchar(5) not null,
     "ordinal_position" int not null,
     "java_type" varchar(32) NOT NULL,
     "java_field" varchar(64) NOT NULL,

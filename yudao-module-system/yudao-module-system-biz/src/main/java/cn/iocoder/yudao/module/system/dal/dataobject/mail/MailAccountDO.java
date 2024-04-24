@@ -49,5 +49,9 @@ public class MailAccountDO extends BaseDO {
      * 是否开启 SSL
      */
     private Boolean sslEnable;
+    /**
+     * 是否开启 STARTTLS
+     */
+    private Boolean starttlsEnable;
 
 }

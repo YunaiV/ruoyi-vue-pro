@@ -1957,7 +1957,6 @@ CREATE TABLE [dbo].[infra_codegen_column] (
   [column_comment] nvarchar(500) COLLATE SQL_Latin1_General_CP1_CI_AS  NOT NULL,
   [nullable] varchar(1) COLLATE SQL_Latin1_General_CP1_CI_AS  NOT NULL,
   [primary_key] varchar(1) COLLATE SQL_Latin1_General_CP1_CI_AS  NOT NULL,
-  [auto_increment] nchar(1) COLLATE SQL_Latin1_General_CP1_CI_AS  NOT NULL,
   [ordinal_position] int  NOT NULL,
   [java_type] nvarchar(32) COLLATE SQL_Latin1_General_CP1_CI_AS  NOT NULL,
   [java_field] nvarchar(64) COLLATE SQL_Latin1_General_CP1_CI_AS  NOT NULL,
@@ -2027,13 +2026,6 @@ EXEC sp_addextendedproperty
 'SCHEMA', N'dbo',
 'TABLE', N'infra_codegen_column',
 'COLUMN', N'primary_key'
-GO
-
-EXEC sp_addextendedproperty
-'MS_Description', N'是否自增',
-'SCHEMA', N'dbo',
-'TABLE', N'infra_codegen_column',
-'COLUMN', N'auto_increment'
 GO
 
 EXEC sp_addextendedproperty

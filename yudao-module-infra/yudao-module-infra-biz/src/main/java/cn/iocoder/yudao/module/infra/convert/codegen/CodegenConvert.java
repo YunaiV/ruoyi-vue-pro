@@ -41,7 +41,6 @@ public interface CodegenConvert {
             @Mapping(source = "comment", target = "columnComment"),
             @Mapping(source = "metaInfo.nullable", target = "nullable"),
             @Mapping(source = "keyFlag", target = "primaryKey"),
-            @Mapping(source = "keyIdentityFlag", target = "autoIncrement"),
             @Mapping(source = "columnType.type", target = "javaType"),
             @Mapping(source = "propertyName", target = "javaField"),
     })
