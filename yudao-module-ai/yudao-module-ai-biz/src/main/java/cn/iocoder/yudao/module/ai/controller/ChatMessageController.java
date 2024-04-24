@@ -34,7 +34,7 @@ public class ChatMessageController {
         return chatMessageService.list(req);
     }
 
-    @Operation(summary = "聊天记录", description = "查询个人的聊天记录")
+    @Operation(summary = "聊天记录 - 删除", description = "删除记录")
     @DeleteMapping("/{chatConversationId}/{id}")
     public CommonResult delete(@PathVariable("chatConversationId") Long chatConversationId,
                                @PathVariable("id") Long id) {

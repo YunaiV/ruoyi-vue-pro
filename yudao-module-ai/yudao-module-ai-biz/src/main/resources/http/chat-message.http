@@ -1,0 +1,10 @@
+
+
+### message list
+GET {{baseUrl}}/ai/chat/message/list?chatConversationId=1781604279872581644
+Authorization: {{token}}
+
+
+### message delete
+DELETE {{baseUrl}}/ai/chat/message/1781604279872581644/8
+Authorization: {{token}}
