@@ -5,6 +5,7 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.module.ai.convert.ChatModalConvert;
 import cn.iocoder.yudao.module.ai.dal.dataobject.AiChatModalDO;
+import cn.iocoder.yudao.module.ai.enums.AiChatModalDisableEnum;
 import cn.iocoder.yudao.module.ai.mapper.AiChatModalMapper;
 import cn.iocoder.yudao.module.ai.service.AiChatModalService;
 import cn.iocoder.yudao.module.ai.vo.AiChatModalAddReq;
@@ -48,6 +49,11 @@ public class AiChatModalServiceImpl implements AiChatModalService {
 
     @Override
     public void add(AiChatModalAddReq req) {
-
+        // 转换 do
+        AiChatModalDO insertChatModalDO = ChatModalConvert.INSTANCE.convertAiChatModalDO(req);
+        //
+        insertChatModalDO.setDisable(AiChatModalDisableEnum.NO.getValue());
+        // 保存数据库
+        aiChatModalMapper.insert(insertChatModalDO);
     }
 }

@@ -36,10 +36,6 @@ public class AiChatModalDO extends BaseDO {
      */
     private String modelConfig;
     /**
-     * 模型图片
-     */
-    private String modelImage;
-    /**
      * 禁用 0、正常 1、禁用
      */
     private Integer disable;

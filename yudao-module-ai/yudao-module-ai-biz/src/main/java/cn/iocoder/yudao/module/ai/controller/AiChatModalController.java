@@ -44,7 +44,7 @@ public class AiChatModalController {
     }
 
     @Operation(summary = "ai模型 - 模型照片上传")
-    @PutMapping("/modal/{id}/updateImage")
+    @PostMapping("/modal/{id}/updateImage")
     public CommonResult updateImage(@PathVariable("id") Long id,
                                     MultipartFile file) {
         // todo yunai 文件上传这里放哪里

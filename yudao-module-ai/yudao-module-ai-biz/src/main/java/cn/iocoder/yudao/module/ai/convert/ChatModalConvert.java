@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.ai.convert;
 
 import cn.iocoder.yudao.module.ai.dal.dataobject.AiChatModalDO;
+import cn.iocoder.yudao.module.ai.vo.AiChatModalAddReq;
 import cn.iocoder.yudao.module.ai.vo.AiChatModalListRes;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
@@ -19,6 +20,19 @@ public interface ChatModalConvert {
 
     ChatModalConvert INSTANCE = Mappers.getMapper(ChatModalConvert.class);
 
-
+    /**
+     * 转换 - AiChatModalListRes
+     *
+     * @param list
+     * @return
+     */
     List<AiChatModalListRes> convertAiChatModalListRes(List<AiChatModalDO> list);
+
+    /**
+     * 转换  - AiChatModalDO
+     *
+     * @param req
+     * @return
+     */
+    AiChatModalDO convertAiChatModalDO(AiChatModalAddReq req);
 }
