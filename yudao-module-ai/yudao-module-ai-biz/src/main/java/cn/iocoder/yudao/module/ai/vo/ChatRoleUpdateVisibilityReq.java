@@ -17,10 +17,6 @@ import lombok.experimental.Accessors;
 public class ChatRoleUpdateVisibilityReq extends PageParam {
 
     @NotNull
-    @Schema(description = "编号")
-    private Long id;
-
-    @NotNull
     @Schema(description = "发布状态，0表示仅自己可见，1表示公开，2表示禁用")
     private String visibility;
 }

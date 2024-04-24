@@ -42,9 +42,10 @@ public interface ChatRoleService {
     /**
      * chat角色 - 修改可见性
      *
+     * @param id
      * @param req
      */
-    void updateVisibility(ChatRoleUpdateVisibilityReq req);
+    void updateVisibility(Long id, ChatRoleUpdateVisibilityReq req);
 
     /**
      * chat角色 - 删除

@@ -48,16 +48,17 @@ public class ChatRoleController {
     }
 
     @Operation(summary = "chat角色 - 修改可见性")
-    @PostMapping("/role/update-visibility")
-    public CommonResult<Void> updateVisibility(@Validated @RequestBody ChatRoleUpdateVisibilityReq req) {
-        chatRoleService.updateVisibility(req);
+    @PostMapping("/role/{id}/update-visibility")
+    public CommonResult<Void> updateVisibility(@PathVariable("id") Long id,
+                                               @Validated @RequestBody ChatRoleUpdateVisibilityReq req) {
+        chatRoleService.updateVisibility(id, req);
         return CommonResult.success(null);
     }
 
-    @Operation(summary = "chat角色 - 修改可见性")
-    @DeleteMapping("/role")
-    public CommonResult<Void> delete(@RequestParam("chatRoleId") Long chatRoleId) {
-        chatRoleService.delete(chatRoleId);
+    @Operation(summary = "chat角色 - 删除")
+    @DeleteMapping("/role/{id}")
+    public CommonResult<Void> delete(@PathVariable("id") Long id) {
+        chatRoleService.delete(id);
         return CommonResult.success(null);
     }
 }
