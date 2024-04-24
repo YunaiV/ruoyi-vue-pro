@@ -32,6 +32,13 @@
             <version>${revision}</version>
         </dependency>
 
+        <!-- 微信小程序模块 -->
+        <dependency>
+            <groupId>cn.iocoder.boot</groupId>
+            <artifactId>yudao-module-weapp-biz</artifactId>
+            <version>${revision}</version>
+        </dependency>
+
         <!-- 会员中心。默认注释，保证编译速度 -->
 <!--        <dependency>-->
 <!--            <groupId>cn.iocoder.boot</groupId>-->
@@ -59,11 +66,11 @@
 <!--        </dependency>-->
 
         <!-- 微信公众号模块。默认注释，保证编译速度 -->
-<!--        <dependency>-->
-<!--            <groupId>cn.iocoder.boot</groupId>-->
-<!--            <artifactId>yudao-module-mp-biz</artifactId>-->
-<!--            <version>${revision}</version>-->
-<!--        </dependency>-->
+        <dependency>
+            <groupId>cn.iocoder.boot</groupId>
+            <artifactId>yudao-module-mp-biz</artifactId>
+            <version>${revision}</version>
+        </dependency>
 
         <!-- 商城相关模块。默认注释，保证编译速度-->
 <!--        <dependency>-->

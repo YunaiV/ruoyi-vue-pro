@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.system.enums;
+package cn.iocoder.yudao.module.weapp.enums;
 
 import cn.iocoder.yudao.framework.common.exception.ErrorCode;
 
