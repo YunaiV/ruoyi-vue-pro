@@ -73,22 +73,37 @@ public class ChatRoleServiceImpl implements ChatRoleService {
         ChatRoleVisibilityEnum.valueOfType(req.getVisibility());
         ChatRoleSourceEnum.valueOfType(req.getRoleSource());
         // 检查角色是否存在
-        AiChatRoleDO aiChatRoleDO = aiChatRoleMapper.selectById(req.getId());
-        if (aiChatRoleDO == null) {
-            throw ServiceExceptionUtil.exception(ErrorCodeConstants.AI_CHAT_ROLE_NOT_EXIST);
-        }
+        validateChatRoleExists(req.getId());
         // 转换do
         AiChatRoleDO updateChatRole = ChatRoleConvert.INSTANCE.convertAiChatRoleDO(req);
         aiChatRoleMapper.updateById(updateChatRole);
     }
 
+
     @Override
     public void updateVisibility(ChatRoleUpdateVisibilityReq req) {
-
+        // 转换enum，并校验enum
+        ChatRoleVisibilityEnum.valueOfType(req.getVisibility());
+        // 检查角色是否存在
+        validateChatRoleExists(req.getId());
+        // 更新
+        aiChatRoleMapper.updateById(new AiChatRoleDO()
+                .setId(req.getId())
+                .setVisibility(req.getVisibility())
+        );
     }
 
     @Override
     public void delete(Long chatRoleId) {
 
     }
+
+    private AiChatRoleDO validateChatRoleExists(Long id) {
+        AiChatRoleDO aiChatRoleDO = aiChatRoleMapper.selectById(id);
+        if (aiChatRoleDO == null) {
+            throw ServiceExceptionUtil.exception(ErrorCodeConstants.AI_CHAT_ROLE_NOT_EXIST);
+        }
+        return aiChatRoleDO;
+    }
+
 }
