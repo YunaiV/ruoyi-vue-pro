@@ -1225,7 +1225,6 @@ CREATE TABLE "infra_codegen_column"
     "column_comment"           varchar(500) COLLATE "pg_catalog"."default" NOT NULL,
     "nullable"                 bool                                        NOT NULL,
     "primary_key"              bool                                        NOT NULL,
-    "auto_increment"           bool                                        NOT NULL,
     "ordinal_position"         int4                                        NOT NULL,
     "java_type"                varchar(32) COLLATE "pg_catalog"."default"  NOT NULL,
     "java_field"               varchar(64) COLLATE "pg_catalog"."default"  NOT NULL,
@@ -1258,8 +1257,6 @@ COMMENT
 ON COLUMN "infra_codegen_column"."nullable" IS '是否允许为空';
 COMMENT
 ON COLUMN "infra_codegen_column"."primary_key" IS '是否主键';
-COMMENT
-ON COLUMN "infra_codegen_column"."auto_increment" IS '是否自增';
 COMMENT
 ON COLUMN "infra_codegen_column"."ordinal_position" IS '排序';
 COMMENT

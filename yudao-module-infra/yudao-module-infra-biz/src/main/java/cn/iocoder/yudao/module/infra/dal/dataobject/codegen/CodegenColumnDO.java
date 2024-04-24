@@ -68,12 +68,6 @@ public class CodegenColumnDO extends BaseDO {
      */
     private Boolean primaryKey;
     /**
-     * 是否自增
-     *
-     * 关联 {@link TableField#isKeyIdentityFlag()}
-     */
-    private Boolean autoIncrement;
-    /**
      * 排序
      */
     private Integer ordinalPosition;
