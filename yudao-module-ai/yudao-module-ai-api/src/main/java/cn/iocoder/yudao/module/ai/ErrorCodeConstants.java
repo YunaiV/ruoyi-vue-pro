@@ -22,6 +22,7 @@ public interface ErrorCodeConstants {
 
 
     ErrorCode AI_CHAT_CONTINUE_NOT_EXIST = new ErrorCode(1_022_000_020, "chat对话不存在!");;
+    ErrorCode AI_CHAT_ROLE_NOT_EXIST = new ErrorCode(1_022_000_020, "chatRole不存在!");;
 
 
 

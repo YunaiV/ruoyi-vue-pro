@@ -1,9 +1,11 @@
 package cn.iocoder.yudao.module.ai.service.impl;
 
 import cn.hutool.core.util.StrUtil;
+import cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
+import cn.iocoder.yudao.module.ai.ErrorCodeConstants;
 import cn.iocoder.yudao.module.ai.convert.ChatRoleConvert;
 import cn.iocoder.yudao.module.ai.dal.dataobject.AiChatRoleDO;
 import cn.iocoder.yudao.module.ai.enums.ChatRoleClassifyEnum;
@@ -66,7 +68,18 @@ public class ChatRoleServiceImpl implements ChatRoleService {
 
     @Override
     public void update(ChatRoleUpdateReq req) {
-
+        // 转换enum，并校验enum
+        ChatRoleClassifyEnum.valueOfClassify(req.getClassify());
+        ChatRoleVisibilityEnum.valueOfType(req.getVisibility());
+        ChatRoleSourceEnum.valueOfType(req.getRoleSource());
+        // 检查角色是否存在
+        AiChatRoleDO aiChatRoleDO = aiChatRoleMapper.selectById(req.getId());
+        if (aiChatRoleDO == null) {
+            throw ServiceExceptionUtil.exception(ErrorCodeConstants.AI_CHAT_ROLE_NOT_EXIST);
+        }
+        // 转换do
+        AiChatRoleDO updateChatRole = ChatRoleConvert.INSTANCE.convertAiChatRoleDO(req);
+        aiChatRoleMapper.updateById(updateChatRole);
     }
 
     @Override

@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.ai.convert;
 import cn.iocoder.yudao.module.ai.dal.dataobject.AiChatRoleDO;
 import cn.iocoder.yudao.module.ai.vo.ChatRoleAddReq;
 import cn.iocoder.yudao.module.ai.vo.ChatRoleListRes;
+import cn.iocoder.yudao.module.ai.vo.ChatRoleUpdateReq;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
@@ -35,4 +36,12 @@ public interface ChatRoleConvert {
      * @return
      */
     AiChatRoleDO convertAiChatRoleDO(ChatRoleAddReq req);
+
+    /**
+     * 转换 - AiChatRoleDO
+     *
+     * @param req
+     * @return
+     */
+    AiChatRoleDO convertAiChatRoleDO(ChatRoleUpdateReq req);
 }
