@@ -2,9 +2,12 @@ package cn.iocoder.yudao.module.ai.service.impl;
 
 import cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
 import cn.iocoder.yudao.module.ai.ErrorCodeConstants;
+import cn.iocoder.yudao.module.ai.convert.ChatMessageConvert;
 import cn.iocoder.yudao.module.ai.dal.dataobject.AiChatConversationDO;
+import cn.iocoder.yudao.module.ai.dal.dataobject.AiChatMessageDO;
 import cn.iocoder.yudao.module.ai.mapper.AiChatConversationMapper;
 import cn.iocoder.yudao.module.ai.mapper.AiChatMessageMapper;
 import cn.iocoder.yudao.module.ai.service.ChatMessageService;
@@ -13,6 +16,8 @@ import cn.iocoder.yudao.module.ai.vo.ChatMessageReq;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 /**
  * chat message
@@ -31,7 +36,15 @@ public class ChatMessageServiceImpl implements ChatMessageService {
 
     @Override
     public PageResult<ChatMessageListRes> list(ChatMessageReq req) {
-        return null;
+        // 查询
+        LambdaQueryWrapperX<AiChatMessageDO> queryWrapperX = new LambdaQueryWrapperX<>();
+        queryWrapperX.eq(AiChatMessageDO::getChatConversationId, req.getChatConversationId());
+        // 默认排序
+        queryWrapperX.orderByDesc(AiChatMessageDO::getId);
+        PageResult<AiChatMessageDO> pageResult = aiChatMessageMapper.selectPage(req, queryWrapperX);
+        // 转换 res
+        List<ChatMessageListRes> messageListResList = ChatMessageConvert.INSTANCE.convert(pageResult.getList());
+        return new PageResult(messageListResList, pageResult.getTotal());
     }
 
     @Override

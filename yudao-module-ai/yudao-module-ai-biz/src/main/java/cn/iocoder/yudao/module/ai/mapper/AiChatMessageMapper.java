@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.ai.mapper;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.module.ai.dal.dataobject.AiChatMessageDO;
+import cn.iocoder.yudao.module.ai.vo.ChatMessageReq;
 import org.apache.ibatis.annotations.Mapper;
 import org.springframework.stereotype.Repository;
 
@@ -28,4 +29,5 @@ public interface AiChatMessageMapper extends BaseMapperX<AiChatMessageDO> {
                 .eq(AiChatMessageDO::getId, id)
         );
     }
+
 }
