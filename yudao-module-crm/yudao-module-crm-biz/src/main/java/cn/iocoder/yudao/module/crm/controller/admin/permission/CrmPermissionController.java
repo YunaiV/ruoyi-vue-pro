@@ -1,7 +1,6 @@
 package cn.iocoder.yudao.module.crm.controller.admin.permission;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
@@ -9,18 +8,10 @@ import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.crm.controller.admin.permission.vo.CrmPermissionRespVO;
 import cn.iocoder.yudao.module.crm.controller.admin.permission.vo.CrmPermissionSaveReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.permission.vo.CrmPermissionUpdateReqVO;
-import cn.iocoder.yudao.module.crm.dal.dataobject.business.CrmBusinessDO;
-import cn.iocoder.yudao.module.crm.dal.dataobject.contact.CrmContactDO;
-import cn.iocoder.yudao.module.crm.dal.dataobject.contract.CrmContractDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.permission.CrmPermissionDO;
-import cn.iocoder.yudao.module.crm.enums.common.CrmBizTypeEnum;
 import cn.iocoder.yudao.module.crm.enums.permission.CrmPermissionLevelEnum;
 import cn.iocoder.yudao.module.crm.framework.permission.core.annotations.CrmPermission;
-import cn.iocoder.yudao.module.crm.service.business.CrmBusinessService;
-import cn.iocoder.yudao.module.crm.service.contact.CrmContactService;
-import cn.iocoder.yudao.module.crm.service.contract.CrmContractService;
 import cn.iocoder.yudao.module.crm.service.permission.CrmPermissionService;
-import cn.iocoder.yudao.module.crm.service.permission.bo.CrmPermissionCreateReqBO;
 import cn.iocoder.yudao.module.system.api.dept.DeptApi;
 import cn.iocoder.yudao.module.system.api.dept.PostApi;
 import cn.iocoder.yudao.module.system.api.dept.dto.DeptRespDTO;
@@ -34,12 +25,13 @@ import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Stream;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
@@ -65,7 +57,6 @@ public class CrmPermissionController {
 
     @PostMapping("/create")
     @Operation(summary = "创建数据权限")
-    @PreAuthorize("@ss.hasPermission('crm:permission:create')")
     public CommonResult<Boolean> create(@Valid @RequestBody CrmPermissionSaveReqVO reqVO) {
         permissionService.createPermission(reqVO, getLoginUserId());
         return success(true);
@@ -73,7 +64,6 @@ public class CrmPermissionController {
 
     @PutMapping("/update")
     @Operation(summary = "编辑数据权限")
-    @PreAuthorize("@ss.hasPermission('crm:permission:update')")
     @CrmPermission(bizTypeValue = "#updateReqVO.bizType", bizId = "#updateReqVO.bizId"
             , level = CrmPermissionLevelEnum.OWNER)
     public CommonResult<Boolean> updatePermission(@Valid @RequestBody CrmPermissionUpdateReqVO updateReqVO) {
@@ -84,7 +74,6 @@ public class CrmPermissionController {
     @DeleteMapping("/delete")
     @Operation(summary = "删除数据权限")
     @Parameter(name = "ids", description = "数据权限编号", required = true, example = "1024")
-    @PreAuthorize("@ss.hasPermission('crm:permission:delete')")
     public CommonResult<Boolean> deletePermission(@RequestParam("ids") Collection<Long> ids) {
         permissionService.deletePermissionBatch(ids, getLoginUserId());
         return success(true);
@@ -93,7 +82,6 @@ public class CrmPermissionController {
     @DeleteMapping("/delete-self")
     @Operation(summary = "删除自己的数据权限")
     @Parameter(name = "id", description = "数据权限编号", required = true, example = "1024")
-    @PreAuthorize("@ss.hasPermission('crm:permission:delete')")
     public CommonResult<Boolean> deleteSelfPermission(@RequestParam("id") Long id) {
         permissionService.deleteSelfPermission(id, getLoginUserId());
         return success(true);
@@ -105,7 +93,6 @@ public class CrmPermissionController {
             @Parameter(name = "bizType", description = "CRM 类型", required = true, example = "2"),
             @Parameter(name = "bizId", description = "CRM 类型数据编号", required = true, example = "1024")
     })
-    @PreAuthorize("@ss.hasPermission('crm:permission:query')")
     public CommonResult<List<CrmPermissionRespVO>> getPermissionList(@RequestParam("bizType") Integer bizType,
                                                                      @RequestParam("bizId") Long bizId) {
         List<CrmPermissionDO> permissions = permissionService.getPermissionListByBiz(bizType, bizId);
