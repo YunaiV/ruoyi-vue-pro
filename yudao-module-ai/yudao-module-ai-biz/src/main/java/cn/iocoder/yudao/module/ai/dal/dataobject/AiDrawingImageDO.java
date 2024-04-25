@@ -18,7 +18,7 @@ import lombok.experimental.Accessors;
 @Data
 @Accessors(chain = true)
 @TableName("ai_drawing_image")
-public class AiDrawingImage extends BaseDO {
+public class AiDrawingImageDO extends BaseDO {
 
     @TableId(type = IdType.AUTO)
     private Long id;

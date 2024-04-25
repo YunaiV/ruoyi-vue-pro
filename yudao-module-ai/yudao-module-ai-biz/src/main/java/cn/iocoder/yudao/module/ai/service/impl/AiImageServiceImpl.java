@@ -1,6 +1,8 @@
 package cn.iocoder.yudao.module.ai.service.impl;
 
+import cn.iocoder.yudao.module.ai.controller.Utf8SseEmitter;
 import cn.iocoder.yudao.module.ai.service.AiImageService;
+import cn.iocoder.yudao.module.ai.vo.AiImageDallDrawingReq;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -18,5 +20,8 @@ import org.springframework.stereotype.Service;
 public class AiImageServiceImpl implements AiImageService {
 
 
+    @Override
+    public void dallDrawing(AiImageDallDrawingReq req, Utf8SseEmitter sseEmitter) {
 
+    }
 }
