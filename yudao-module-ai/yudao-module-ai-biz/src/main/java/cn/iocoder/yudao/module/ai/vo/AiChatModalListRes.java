@@ -13,4 +13,29 @@ import lombok.experimental.Accessors;
 @Data
 @Accessors(chain = true)
 public class AiChatModalListRes {
+    /**
+     * 编号
+     */
+    private Long id;
+    /**
+     * 模型名字
+     */
+    private Long modelName;
+    /**
+     * 模型类型(qianwen、yiyan、xinghuo、openai)
+     */
+    private String modelType;
+    /**
+     * 模型照片
+     */
+    private String modalImage;
+    /**
+     * 模型配置JSON
+     */
+    private String modelConfig;
+    /**
+     * 禁用 0、正常 1、禁用
+     */
+    private Integer disable;
+
 }

@@ -14,9 +14,26 @@ import cn.iocoder.yudao.module.ai.vo.AiChatModalListRes;
  */
 public interface AiChatModalService {
 
+    /**
+     * ai modal - 列表
+     *
+     * @param req
+     * @return
+     */
     PageResult<AiChatModalListRes> list(AiChatModalListReq req);
 
+    /**
+     * ai modal - 添加
+     *
+     * @param req
+     */
     void add(AiChatModalAddReq req);
 
+    /**
+     * ai modal - 更新
+     *
+     * @param id
+     * @param req
+     */
     void update(Long id, AiChatModalAddReq req);
 }
