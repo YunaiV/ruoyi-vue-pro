@@ -37,5 +37,8 @@ public class AiChatModalDO extends BaseDO {
      * 禁用 0、正常 1、禁用
      */
     private Integer disable;
-
+    /**
+     * modal 配置(json)
+     */
+    private String config;
 }
