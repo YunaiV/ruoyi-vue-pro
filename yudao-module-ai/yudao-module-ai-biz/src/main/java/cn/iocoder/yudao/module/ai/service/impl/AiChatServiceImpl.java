@@ -1,14 +1,16 @@
 package cn.iocoder.yudao.module.ai.service.impl;
 
 import cn.hutool.core.exceptions.ExceptionUtil;
+import cn.iocoder.yudao.framework.ai.AiPlatformEnum;
+import cn.iocoder.yudao.framework.ai.chat.ChatClient;
 import cn.iocoder.yudao.framework.ai.chat.ChatResponse;
+import cn.iocoder.yudao.framework.ai.chat.StreamingChatClient;
 import cn.iocoder.yudao.framework.ai.chat.messages.MessageType;
 import cn.iocoder.yudao.framework.ai.chat.prompt.Prompt;
-import cn.iocoder.yudao.framework.ai.config.AiClient;
 import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
+import cn.iocoder.yudao.module.ai.config.AiChatClientFactory;
 import cn.iocoder.yudao.module.ai.controller.Utf8SseEmitter;
 import cn.iocoder.yudao.module.ai.dal.dataobject.AiChatMessageDO;
-import cn.iocoder.yudao.module.ai.enums.AiClientNameEnum;
 import cn.iocoder.yudao.module.ai.mapper.AiChatConversationMapper;
 import cn.iocoder.yudao.module.ai.mapper.AiChatMessageMapper;
 import cn.iocoder.yudao.module.ai.mapper.AiChatRoleMapper;
@@ -38,7 +40,7 @@ import java.util.function.Consumer;
 @AllArgsConstructor
 public class AiChatServiceImpl implements AiChatService {
 
-    private final AiClient aiClient;
+    private final AiChatClientFactory aiChatClientFactory;
     private final AiChatRoleMapper aiChatRoleMapper;
     private final AiChatMessageMapper aiChatMessageMapper;
     private final AiChatConversationMapper aiChatConversationMapper;
@@ -54,7 +56,7 @@ public class AiChatServiceImpl implements AiChatService {
     public String chat(AiChatReq req) {
         Long loginUserId = SecurityFrameworkUtils.getLoginUserId();
         // 获取 client 类型
-        AiClientNameEnum clientNameEnum = AiClientNameEnum.valueOfName(req.getModal());
+        AiPlatformEnum platformEnum = AiPlatformEnum.valueOfPlatform(req.getModal());
         // 获取对话信息
         AiChatConversationRes conversationRes = chatConversationService.getConversation(req.getConversationId());
         // 保存 chat message
@@ -67,7 +69,8 @@ public class AiChatServiceImpl implements AiChatService {
             req.setTopP(req.getTopP());
             req.setTemperature(req.getTemperature());
             // 发送 call 调用
-            ChatResponse call = aiClient.call(prompt, clientNameEnum.getName());
+            ChatClient chatClient = aiChatClientFactory.getChatClient(platformEnum);
+            ChatResponse call = chatClient.call(prompt);
             content = call.getResult().getOutput().getContent();
             // 更新 conversation
 
@@ -128,7 +131,7 @@ public class AiChatServiceImpl implements AiChatService {
     public void chatStream(AiChatReq req, Utf8SseEmitter sseEmitter) {
         Long loginUserId = SecurityFrameworkUtils.getLoginUserId();
         // 获取 client 类型
-        AiClientNameEnum clientNameEnum = AiClientNameEnum.valueOfName(req.getModal());
+        AiPlatformEnum platformEnum = AiPlatformEnum.valueOfPlatform(req.getModal());
         // 获取对话信息
         AiChatConversationRes conversationRes = chatConversationService.getConversation(req.getConversationId());
         // 创建 chat 需要的 Prompt
@@ -138,7 +141,8 @@ public class AiChatServiceImpl implements AiChatService {
         req.setTemperature(req.getTemperature());
         // 保存 chat message
         saveChatMessage(req, conversationRes, loginUserId);
-        Flux<ChatResponse> streamResponse = aiClient.stream(prompt, clientNameEnum.getName());
+        StreamingChatClient streamingChatClient = aiChatClientFactory.getStreamingChatClient(platformEnum);
+        Flux<ChatResponse> streamResponse = streamingChatClient.stream(prompt);
 
         StringBuffer contentBuffer = new StringBuffer();
         streamResponse.subscribe(

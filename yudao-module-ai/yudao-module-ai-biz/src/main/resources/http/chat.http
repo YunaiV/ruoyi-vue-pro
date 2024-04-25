@@ -16,7 +16,7 @@ tenant-id: 1
 }
 
 ### chat call
-GET {{baseUrl}}/ai/chat?modal=qianWen&conversationId=1781604279872581644&prompt=中国好看吗？
+GET {{baseUrl}}/ai/chat?modal=qianwen&conversationId=1781604279872581644&prompt=中国好看吗？
 Authorization: {{token}}
 
 

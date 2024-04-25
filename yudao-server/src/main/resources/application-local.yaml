@@ -224,7 +224,9 @@ wx:
 # 芋道配置项，设置当前项目所有自定义的配置
 yudao:
   ai:
-    qianWen:
+    initSource: yaml
+    qianwen:
+      enable: true
       aiPlatform: QIAN_WEN
       temperature: 1
       topP: 1
@@ -234,7 +236,8 @@ yudao:
       accessKeySecret: ZJ0JQeyjzxxm5CfeTV6k1wNE9UsvZP
       agentKey: f0c1088824594f589c8f10567ccd929f_p_efm
       appId: 5f14955f201a44eb8dbe0c57250a32ce
-    xingHuo:
+    xinghuo:
+      enable: true
       aiPlatform: XING_HUO
       temperature: 1
       topP: 1
@@ -243,7 +246,8 @@ yudao:
       appKey: cb6415c19d6162cda07b47316fcb0416
       secretKey: Y2JiYTIxZjA3MDMxMjNjZjQzYzVmNzdh
       chatModel: XING_HUO_3_5
-    yiYan3_5_8k:
+    yiyan:
+      enable: true
       aiPlatform: YI_YAN
       temperature: 1
       topP: 1
@@ -252,6 +256,7 @@ yudao:
       secretKey: R9mYF9dl9KASgi5RUq0FQt3wRisSnOcK
       refreshTokenSecondTime: 86400
       chatModel: ERNIE4_3_5_8K
+
   captcha:
     enable: false # 本地环境，暂时关闭图片验证码，方便登录等接口的测试；
   security:

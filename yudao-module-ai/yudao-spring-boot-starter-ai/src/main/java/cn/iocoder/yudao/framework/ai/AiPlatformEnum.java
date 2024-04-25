@@ -3,10 +3,6 @@ package cn.iocoder.yudao.framework.ai;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
-import java.util.Arrays;
-import java.util.Map;
-import java.util.stream.Collectors;
-
 /**
  * 讯飞星火 模型
  *
@@ -24,15 +20,22 @@ import java.util.stream.Collectors;
 public enum AiPlatformEnum {
 
 
-    YI_YAN("yiyan"),
-    QIAN_WEN("qianwen"),
-    XING_HUO("xinghuo"),
+    YI_YAN("yiyan", "一言"),
+    QIAN_WEN("qianwen", "千问"),
+    XING_HUO("xinghuo", "星火"),
 
     ;
 
-    public static final Map<String, AiPlatformEnum> mapValues
-            = Arrays.stream(values()).collect(Collectors.toMap(AiPlatformEnum::name, o -> o));
+    private String platform;
+    private String name;
 
-    private String value;
+    public static AiPlatformEnum valueOfPlatform(String platform) {
+        for (AiPlatformEnum itemEnum : AiPlatformEnum.values()) {
+            if (itemEnum.getPlatform().equals(platform)) {
+                return itemEnum;
+            }
+        }
+        throw new IllegalArgumentException("Invalid MessageType value: " + platform);
+    }
 
 }
