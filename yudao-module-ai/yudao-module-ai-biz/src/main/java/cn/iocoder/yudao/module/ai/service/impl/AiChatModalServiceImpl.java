@@ -5,7 +5,7 @@ import cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.module.ai.ErrorCodeConstants;
-import cn.iocoder.yudao.module.ai.convert.ChatModalConvert;
+import cn.iocoder.yudao.module.ai.convert.AiChatModalConvert;
 import cn.iocoder.yudao.module.ai.dal.dataobject.AiChatModalDO;
 import cn.iocoder.yudao.module.ai.enums.AiChatModalDisableEnum;
 import cn.iocoder.yudao.module.ai.mapper.AiChatModalMapper;
@@ -47,14 +47,14 @@ public class AiChatModalServiceImpl implements AiChatModalService {
         // 查询
         PageResult<AiChatModalDO> aiChatModalDOPageResult = aiChatModalMapper.selectPage(req, queryWrapperX);
         // 转换 res
-        List<AiChatModalListRes> resList = ChatModalConvert.INSTANCE.convertAiChatModalListRes(aiChatModalDOPageResult.getList());
+        List<AiChatModalListRes> resList = AiChatModalConvert.INSTANCE.convertAiChatModalListRes(aiChatModalDOPageResult.getList());
         return new PageResult<>(resList, aiChatModalDOPageResult.getTotal());
     }
 
     @Override
     public void add(AiChatModalAddReq req) {
         // 转换 do
-        AiChatModalDO insertChatModalDO = ChatModalConvert.INSTANCE.convertAiChatModalDO(req);
+        AiChatModalDO insertChatModalDO = AiChatModalConvert.INSTANCE.convertAiChatModalDO(req);
         //
         insertChatModalDO.setDisable(AiChatModalDisableEnum.NO.getValue());
         // 保存数据库
@@ -66,7 +66,7 @@ public class AiChatModalServiceImpl implements AiChatModalService {
         // 校验模型是否存在
         validateChatModalExists(id);
         // 转换 updateChatModalDO
-        AiChatModalDO updateChatModalDO = ChatModalConvert.INSTANCE.convertAiChatModalDO(req);
+        AiChatModalDO updateChatModalDO = AiChatModalConvert.INSTANCE.convertAiChatModalDO(req);
         updateChatModalDO.setId(id);
         // 更新数据库
         aiChatModalMapper.updateById(updateChatModalDO);

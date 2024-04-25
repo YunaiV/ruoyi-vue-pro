@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.ai.vo;
 
-import cn.iocoder.yudao.module.ai.enums.OpenAiModelEnum;
+import cn.iocoder.yudao.module.ai.enums.AiOpenAiModelEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
@@ -16,6 +16,6 @@ public class AiChatReqVO {
 
     @Schema(description = "AI模型", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "AI模型不能为空")
-    private OpenAiModelEnum aiModel;
+    private AiOpenAiModelEnum aiModel;
 
 }
