@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.ai.dal.dataobject;
 
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
@@ -13,6 +14,7 @@ import lombok.experimental.Accessors;
  */
 @Data
 @Accessors(chain = true)
+@TableName("ai_chat_modal")
 public class AiChatModalDO extends BaseDO {
 
     /**
@@ -31,10 +33,6 @@ public class AiChatModalDO extends BaseDO {
      * 模型照片
      */
     private String modalImage;
-    /**
-     * 模型配置JSON
-     */
-    private String modelConfig;
     /**
      * 禁用 0、正常 1、禁用
      */

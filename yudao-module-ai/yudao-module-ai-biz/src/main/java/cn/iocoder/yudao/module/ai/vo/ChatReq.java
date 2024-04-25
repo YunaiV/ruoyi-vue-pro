@@ -19,7 +19,7 @@ public class ChatReq {
 
     @Schema(description = "ai模型(查看 AiClientNameEnum)")
     @NotNull(message = "模型不能为空!")
-    @Size(max = 30, message = "模型字符最大30个字符!")
+    @Size(max = 30, message = "模型字符最大 30个字符!")
     private String modal;
 
     @Schema(description = "对话Id")
