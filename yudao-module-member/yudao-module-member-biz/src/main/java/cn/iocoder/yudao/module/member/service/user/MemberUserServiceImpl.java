@@ -3,7 +3,10 @@ package cn.iocoder.yudao.module.member.service.user;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.lang.Assert;
-import cn.hutool.core.util.*;
+import cn.hutool.core.util.IdUtil;
+import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.util.RandomUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
@@ -22,15 +25,16 @@ import cn.iocoder.yudao.module.system.api.social.SocialClientApi;
 import cn.iocoder.yudao.module.system.api.social.dto.SocialWxPhoneNumberInfoRespDTO;
 import cn.iocoder.yudao.module.system.enums.sms.SmsSceneEnum;
 import com.google.common.annotations.VisibleForTesting;
+import jakarta.annotation.Resource;
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.lang.Nullable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
-import jakarta.annotation.Resource;
-import jakarta.validation.Valid;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
@@ -77,25 +81,31 @@ public class MemberUserServiceImpl implements MemberUserService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public MemberUserDO createUserIfAbsent(String mobile, String registerIp, Integer terminal) {
+        return createUserIfAbsent(mobile, null, registerIp, terminal);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public MemberUserDO createUserIfAbsent(String mobile, String password, String registerIp, Integer terminal) {
         // 用户已经存在
         MemberUserDO user = memberUserMapper.selectByMobile(mobile);
         if (user != null) {
             return user;
         }
         // 用户不存在，则进行创建
-        return createUser(mobile, null, null, registerIp, terminal);
+        return createUser(mobile, password, null, null, registerIp, terminal);
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public MemberUserDO createUser(String nickname, String avtar, String registerIp, Integer terminal) {
-        return createUser(null, nickname, avtar, registerIp, terminal);
+        return createUser(null, null, nickname, avtar, registerIp, terminal);
     }
 
-    private MemberUserDO createUser(String mobile, String nickname, String avtar,
+    private MemberUserDO createUser(String mobile, @Nullable String password, String nickname, String avtar,
                                     String registerIp, Integer terminal) {
         // 生成密码
-        String password = IdUtil.fastSimpleUUID();
+        if (password == null) password = IdUtil.fastSimpleUUID();
         // 插入用户
         MemberUserDO user = new MemberUserDO();
         user.setMobile(mobile);

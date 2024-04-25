@@ -9,6 +9,8 @@ import cn.iocoder.yudao.module.member.controller.app.user.vo.*;
 import cn.iocoder.yudao.module.member.dal.dataobject.user.MemberUserDO;
 
 import jakarta.validation.Valid;
+import org.springframework.lang.Nullable;
+
 import java.util.Collection;
 import java.util.List;
 
@@ -45,6 +47,18 @@ public interface MemberUserService {
      * @return 用户对象
      */
     MemberUserDO createUserIfAbsent(@Mobile String mobile, String registerIp, Integer terminal);
+
+    /**
+     * 基于手机号创建用户。
+     * 如果用户已经存在，则直接进行返回
+     *
+     * @param mobile     手机号
+     * @param password   初始密码
+     * @param registerIp 注册 IP
+     * @param terminal   终端 {@link TerminalEnum}
+     * @return 用户对象
+     */
+    MemberUserDO createUserIfAbsent(@Mobile String mobile, @Nullable String password, String registerIp, Integer terminal);
 
     /**
      * 创建用户
@@ -102,7 +116,7 @@ public interface MemberUserService {
      * 【会员】修改手机，基于微信小程序的授权码
      *
      * @param userId 用户编号
-     * @param reqVO 请求信息
+     * @param reqVO  请求信息
      */
     void updateUserMobileByWeixin(Long userId, AppMemberUserUpdateMobileByWeixinReqVO reqVO);
 
