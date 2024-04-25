@@ -36,4 +36,12 @@ public interface AiChatModalService {
      * @param req
      */
     void update(Long id, AiChatModalAddReq req);
+
+    /**
+     * ai modal - 删除
+     *
+     * @param id
+     */
+    void delete(Long id);
+
 }

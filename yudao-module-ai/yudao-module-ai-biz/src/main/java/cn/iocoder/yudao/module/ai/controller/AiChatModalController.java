@@ -59,4 +59,10 @@ public class AiChatModalController {
         return CommonResult.success(null);
     }
 
+    @Operation(summary = "ai模型 - 删除")
+    @DeleteMapping("/modal/{id}")
+    public CommonResult delete(@PathVariable  Long id) {
+        aiChatModalService.delete(id);
+        return CommonResult.success(null);
+    }
 }

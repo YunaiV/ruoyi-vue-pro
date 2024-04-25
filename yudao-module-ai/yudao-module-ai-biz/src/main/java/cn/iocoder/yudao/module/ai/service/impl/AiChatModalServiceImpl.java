@@ -72,6 +72,14 @@ public class AiChatModalServiceImpl implements AiChatModalService {
         aiChatModalMapper.updateById(updateChatModalDO);
     }
 
+    @Override
+    public void delete(Long id) {
+        // 检查 modal 是否存在
+        validateChatModalExists(id);
+        // 删除 delete
+        aiChatModalMapper.deleteById(id);
+    }
+
     private void validateChatModalExists(Long id) {
         AiChatModalDO aiChatModalDO = aiChatModalMapper.selectById(id);
         if (aiChatModalDO == null) {
