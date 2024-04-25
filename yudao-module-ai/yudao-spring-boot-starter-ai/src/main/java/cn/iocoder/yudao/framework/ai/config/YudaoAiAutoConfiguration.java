@@ -12,15 +12,10 @@ import cn.iocoder.yudao.framework.ai.chatyiyan.YiYanChatClient;
 import cn.iocoder.yudao.framework.ai.chatyiyan.YiYanOptions;
 import cn.iocoder.yudao.framework.ai.chatyiyan.api.YiYanApi;
 import cn.iocoder.yudao.framework.ai.exception.AiException;
-import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.support.GenericApplicationContext;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -63,29 +58,6 @@ public class YudaoAiAutoConfiguration {
             chatMap.put(beanName, chatClient);
         }
         return chatMap;
-    }
-
-    public static class InitChatClient implements InitializingBean, ApplicationContextAware {
-
-        private GenericApplicationContext applicationContext;
-        private YudaoAiProperties yudaoAiProperties;
-
-        public InitChatClient(YudaoAiProperties yudaoAiProperties) {
-            this.yudaoAiProperties = yudaoAiProperties;
-        }
-
-        @Override
-        public void afterPropertiesSet() {
-
-
-            System.err.println(applicationContext.getBean("qianWen"));
-            System.err.println(applicationContext.getBean("yiYan"));
-        }
-
-        @Override
-        public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-            this.applicationContext = (GenericApplicationContext) applicationContext;
-        }
     }
 
     private static Object createChatClient(YudaoAiProperties.ChatProperties chatProperties) {
