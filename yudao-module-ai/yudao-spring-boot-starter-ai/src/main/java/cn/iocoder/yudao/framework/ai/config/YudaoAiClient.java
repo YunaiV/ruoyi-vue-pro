@@ -16,7 +16,7 @@ import java.util.Map;
  * @time 2024/4/14 10:27
  * @since 1.0
  */
-public class YudaoAiClient implements AiClient{
+public class YudaoAiClient implements AiClient {
 
     protected Map<String, Object> chatClientMap;
 
