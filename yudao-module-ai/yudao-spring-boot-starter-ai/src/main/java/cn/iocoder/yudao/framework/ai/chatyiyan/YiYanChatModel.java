@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.framework.ai.chatyiyan;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 /**
@@ -11,6 +12,7 @@ import lombok.Getter;
  * time: 2024/3/9 12:01
  */
 @Getter
+@AllArgsConstructor
 public enum YiYanChatModel {
 
     ERNIE4_0("ERNIE 4.0", "/rpc/2.0/ai_custom/v1/wenxinworkshop/chat/completions_pro"),
@@ -22,11 +24,6 @@ public enum YiYanChatModel {
     ERNIE4_3_5_4K_0205("ERNIE-3.5-4K-0205", "/rpc/2.0/ai_custom/v1/wenxinworkshop/chat/ernie-3.5-4k-0205"),
 
     ;
-
-    YiYanChatModel(String value, String uri) {
-        this.value = value;
-        this.uri = uri;
-    }
 
     private String value;
 
