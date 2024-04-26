@@ -18,11 +18,6 @@ import java.util.List;
 @Accessors
 public class QianWenOptions implements ChatOptions {
 
-    private String appId;
-    /**
-     * 是否流式输出, 默认为否。
-     */
-    private Boolean stream;
     /**
      * 用户与模型的对话历史
      */

@@ -42,26 +42,15 @@ public class YudaoAiProperties {
     @Data
     @Accessors(chain = true)
     public static class QianWenProperties extends ChatProperties {
+
         /**
-         * 阿里云：服务器接入点
+         * api key
          */
-        private String endpoint = "bailian.cn-beijing.aliyuncs.com";
+        private String apiKey;
         /**
-         * 阿里云：权限 accessKeyId
+         * model
          */
-        private String accessKeyId;
-        /**
-         * 阿里云：权限 accessKeySecret
-         */
-        private String accessKeySecret;
-        /**
-         * 阿里云：agentKey
-         */
-        private String agentKey;
-        /**
-         * 阿里云：agentKey(相当于应用id)
-         */
-        private String appId;
+        private YiYanChatModel model;
 
     }
 
@@ -93,5 +82,7 @@ public class YudaoAiProperties {
          * token 刷新时间(默认 86400 = 24小时)
          */
         private int refreshTokenSecondTime = 86400;
+
+        private YiYanChatModel model;
     }
 }

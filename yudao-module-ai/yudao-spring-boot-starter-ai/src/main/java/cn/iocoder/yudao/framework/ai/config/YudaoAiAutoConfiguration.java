@@ -44,13 +44,16 @@ public class YudaoAiAutoConfiguration {
     @ConditionalOnProperty(value = "yudao.ai.qianwen.enable", havingValue = "true")
     public QianWenChatClient qianWenChatClient(YudaoAiProperties yudaoAiProperties) {
         YudaoAiProperties.QianWenProperties qianWenProperties = yudaoAiProperties.getQianwen();
+        QianWenOptions qianWenOptions = new QianWenOptions();
+        qianWenOptions.setTopK(qianWenProperties.getTopK());
+        qianWenOptions.setTopP(qianWenProperties.getTopP());
+        qianWenOptions.setTemperature(qianWenProperties.getTemperature());
         return new QianWenChatClient(
                 new QianWenApi(
-                        qianWenProperties.getAgentKey(),
+                        qianWenProperties.getApiKey(),
                         QianWenChatModal.QWEN_72B_CHAT
                 ),
-                new QianWenOptions()
-                        .setAppId(qianWenProperties.getAppId())
+                qianWenOptions
         );
     }
 
