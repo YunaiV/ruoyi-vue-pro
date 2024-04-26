@@ -8,16 +8,18 @@ import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
 import cn.iocoder.yudao.module.system.dal.dataobject.oauth2.OAuth2ApproveDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.oauth2.OAuth2ClientDO;
 import cn.iocoder.yudao.module.system.dal.mysql.oauth2.OAuth2ApproveMapper;
+import jakarta.annotation.Resource;
 import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 
-import jakarta.annotation.Resource;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
-import java.util.*;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 import static cn.hutool.core.util.RandomUtil.*;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEquals;
@@ -199,8 +201,10 @@ public class OAuth2ApproveServiceImplTest extends BaseDbUnitTest {
         Integer userType = UserTypeEnum.ADMIN.getValue();
         String clientId = randomString();
         // mock 数据
+        LocalDateTime localDateTime = LocalDateTimeUtil.offset(LocalDateTime.now(), 1L, ChronoUnit.DAYS)
+                .withNano(0);
         OAuth2ApproveDO approve = randomPojo(OAuth2ApproveDO.class).setUserId(userId)
-                .setUserType(userType).setClientId(clientId).setExpiresTime(LocalDateTimeUtil.offset(LocalDateTime.now(), 1L, ChronoUnit.DAYS));
+                .setUserType(userType).setClientId(clientId).setExpiresTime(localDateTime);
         oauth2ApproveMapper.insert(approve); // 未过期
         oauth2ApproveMapper.insert(ObjectUtil.clone(approve).setId(null)
                 .setExpiresTime(LocalDateTimeUtil.offset(LocalDateTime.now(), -1L, ChronoUnit.DAYS))); // 已过期

@@ -6,11 +6,11 @@ import cn.iocoder.yudao.framework.common.util.date.DateUtils;
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
 import cn.iocoder.yudao.module.system.dal.dataobject.oauth2.OAuth2CodeDO;
 import cn.iocoder.yudao.module.system.dal.mysql.oauth2.OAuth2CodeMapper;
+import jakarta.annotation.Resource;
 import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
 
-import jakarta.annotation.Resource;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -50,7 +50,7 @@ class OAuth2CodeServiceImplTest extends BaseDbUnitTest {
                 scopes, redirectUri, state);
         // 断言
         OAuth2CodeDO dbCodeDO = oauth2CodeMapper.selectByCode(codeDO.getCode());
-        assertPojoEquals(codeDO, dbCodeDO, "createTime", "updateTime", "deleted");
+        assertPojoEquals(codeDO, dbCodeDO, "createTime", "updateTime", "deleted", "expiresTime");
         assertEquals(userId, codeDO.getUserId());
         assertEquals(userType, codeDO.getUserType());
         assertEquals(clientId, codeDO.getClientId());
@@ -86,8 +86,9 @@ class OAuth2CodeServiceImplTest extends BaseDbUnitTest {
         // 准备参数
         String code = "test_code";
         // mock 数据
+        LocalDateTime expiresTime = LocalDateTime.now().plusDays(1).withNano(0);
         OAuth2CodeDO codeDO = randomPojo(OAuth2CodeDO.class).setCode(code)
-                .setExpiresTime(LocalDateTime.now().plusDays(1));
+                .setExpiresTime(expiresTime);
         oauth2CodeMapper.insert(codeDO);
 
         // 调用
