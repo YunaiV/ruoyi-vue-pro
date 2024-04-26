@@ -1,7 +1,6 @@
 package cn.iocoder.yudao.framework.ai.chatqianwen;
 
 import cn.iocoder.yudao.framework.ai.chat.prompt.ChatOptions;
-import com.aliyun.broadscope.bailian.sdk.models.CompletionsRequest;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
@@ -34,22 +33,18 @@ public class QianWenOptions implements ChatOptions {
      * 默认值为0.8。注意，取值不要大于等于1
      */
     private Float topP;
-    /**
-     * 模型参数设置。
-     */
-    private CompletionsRequest.Parameter parameters = new CompletionsRequest.Parameter();
 
     //
     // 适配 ChatOptions
 
     @Override
     public Float getTemperature() {
-        return Float.parseFloat(this.parameters.getTemperature().toString());
+        return null;
     }
 
     @Override
     public void setTemperature(Float temperature) {
-        this.parameters.setTemperature(Double.valueOf(temperature.toString()));
+
     }
 
     @Override
@@ -59,12 +54,12 @@ public class QianWenOptions implements ChatOptions {
 
     @Override
     public Integer getTopK() {
-        return this.parameters.getTopK();
+        return null;
     }
 
     @Override
     public void setTopK(Integer topK) {
-        this.parameters.setTopK(topK);
+
     }
 
     @Data

@@ -2,13 +2,13 @@ package cn.iocoder.yudao.framework.ai.midjourney.api;
 
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.ai.midjourney.MidjourneyConfig;
-import cn.iocoder.yudao.framework.ai.midjourney.util.MidjourneyUtil;
 import cn.iocoder.yudao.framework.ai.midjourney.api.req.AttachmentsReq;
 import cn.iocoder.yudao.framework.ai.midjourney.api.req.DescribeReq;
 import cn.iocoder.yudao.framework.ai.midjourney.api.req.ReRollReq;
 import cn.iocoder.yudao.framework.ai.midjourney.api.res.UploadAttachmentsRes;
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
+import cn.iocoder.yudao.framework.ai.midjourney.util.MidjourneyUtil;
+import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.JSONObject;
 import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.FileSystemResource;

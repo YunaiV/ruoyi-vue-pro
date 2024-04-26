@@ -22,13 +22,23 @@ public class AiChatModalDO extends BaseDO {
      */
     private Long id;
     /**
-     * 模型名字
+     * 模型key
      */
-    private Long modelName;
+    private String modelKey;
     /**
-     * 模型类型(qianwen、yiyan、xinghuo、openai)
+     * 模型类型 参考：{@link cn.iocoder.yudao.framework.ai.AiPlatformEnum}
+     */
+    private String modelPlatform;
+    /**
+     * 模型类型
+     * {@link cn.iocoder.yudao.framework.ai.chatyiyan.YiYanChatModel}
+     * {@link cn.iocoder.yudao.framework.ai.chatxinghuo.XingHuoChatModel}
      */
     private String modelType;
+    /**
+     * 模型名字
+     */
+    private String modelName;
     /**
      * 模型照片
      */

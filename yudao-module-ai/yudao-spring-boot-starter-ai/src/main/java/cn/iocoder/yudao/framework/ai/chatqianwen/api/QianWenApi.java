@@ -1,64 +1,63 @@
 package cn.iocoder.yudao.framework.ai.chatqianwen.api;
 
-import com.aliyun.broadscope.bailian.sdk.AccessTokenClient;
-import com.aliyun.broadscope.bailian.sdk.ApplicationClient;
-import com.aliyun.broadscope.bailian.sdk.models.CompletionsRequest;
-import com.aliyun.broadscope.bailian.sdk.models.CompletionsResponse;
+import cn.iocoder.yudao.framework.ai.chatqianwen.QianWenChatModal;
+import cn.iocoder.yudao.framework.ai.exception.AiException;
+import com.alibaba.dashscope.aigc.generation.Generation;
+import com.alibaba.dashscope.aigc.generation.GenerationResult;
+import com.alibaba.dashscope.common.Message;
+import com.alibaba.dashscope.common.Role;
+import com.alibaba.dashscope.exception.InputRequiredException;
+import com.alibaba.dashscope.exception.NoApiKeyException;
+import io.reactivex.Flowable;
 import lombok.Getter;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
-import reactor.core.publisher.Flux;
 
 // TODO done @fansili：是不是挪到 api 包里？按照 spring ai 的结构；根目录只放 client 和 options
+
 /**
  * 阿里 通义千问
- *
- * https://www.aliyun.com/search?k=%E9%80%9A%E4%B9%89%E5%A4%A7%E6%A8%A1%E5%9E%8B&scene=all
- *
+ * <p>
  * author: fansili
  * time: 2024/3/13 21:09
  */
 @Getter
 public class QianWenApi {
 
-    /**
-     * accessKeyId、accessKeySecret、agentKey、appId 获取方式如下链接
-     * https://help.aliyun.com/document_detail/2587494.html?spm=a2c4g.2587492.0.0.53f33c566sXskp
-     */
-    private String accessKeyId;
-    private String accessKeySecret;
-    private String agentKey;
-    private String appId;
-    private String endpoint = "bailian.cn-beijing.aliyuncs.com";
-    private String token;
-    private ApplicationClient client;
+    // api key 获取地址：https://bailian.console.aliyun.com/?spm=5176.28197581.0.0.38db29a4G3GcVb&apiKey=1#/api-key
+    private String apiKey = "sk-Zsd81gZYg7";
+    private Generation gen = new Generation();
+    private QianWenChatModal qianWenChatModal;
 
-    public QianWenApi(String accessKeyId, String accessKeySecret, String agentKey, String endpoint) {
-        this.accessKeyId = accessKeyId;
-        this.accessKeySecret = accessKeySecret;
-        this.agentKey = agentKey;
+    public QianWenApi(String apiKey, QianWenChatModal qianWenChatModal) {
+        this.apiKey = apiKey;
+        this.qianWenChatModal = qianWenChatModal;
+    }
 
-        if (endpoint != null) {
-            this.endpoint = endpoint;
+    public ResponseEntity<GenerationResult> chatCompletionEntity(QianWenChatCompletionRequest request) {
+        Message userMsg = Message.builder().role(Role.USER.getValue()).content("用萝卜、土豆、茄子做饭，给我个菜谱").build();
+
+        GenerationResult call;
+        try {
+            call = gen.call(request);
+        } catch (NoApiKeyException e) {
+            throw new AiException("没有找到apiKey！" + e.getMessage());
+        } catch (InputRequiredException e) {
+            throw new AiException("chat缺少必填字段！" + e.getMessage());
         }
-
-        // 获取token
-        AccessTokenClient accessTokenClient = new AccessTokenClient(accessKeyId, accessKeySecret, agentKey);
-        token = accessTokenClient.getToken();
-        // 构建client
-        client = ApplicationClient.builder()
-                .token(token)
-                .build();
-    }
-
-    public ResponseEntity<CompletionsResponse> chatCompletionEntity(CompletionsRequest request) {
-        // 发送请求
-        CompletionsResponse response = client.completions(request);
         // 阿里云的这个 http code 随便设置，外面判断是否成功用的 CompletionsResponse.isSuccess
-        return new ResponseEntity<>(response, HttpStatusCode.valueOf(200));
+        return new ResponseEntity<>(call, HttpStatusCode.valueOf(200));
     }
 
-    public Flux<CompletionsResponse> chatCompletionStream(CompletionsRequest request) {
-        return client.streamCompletions(request);
+    public Flowable<GenerationResult> chatCompletionStream(QianWenChatCompletionRequest request) {
+        Flowable<GenerationResult> resultFlowable;
+        try {
+            resultFlowable = gen.streamCall(request);
+        } catch (NoApiKeyException e) {
+            throw new AiException("没有找到apiKey！" + e.getMessage());
+        } catch (InputRequiredException e) {
+            throw new AiException("chat缺少必填字段！" + e.getMessage());
+        }
+        return resultFlowable;
     }
 }

@@ -20,7 +20,7 @@ public class AiChatModalListRes {
     /**
      * 模型名字
      */
-    private Long modelName;
+    private String modelName;
     /**
      * 模型类型(qianwen、yiyan、xinghuo、openai)
      */

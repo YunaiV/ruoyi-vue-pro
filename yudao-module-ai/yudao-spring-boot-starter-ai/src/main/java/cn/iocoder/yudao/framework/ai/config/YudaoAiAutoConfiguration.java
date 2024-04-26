@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.framework.ai.config;
 
 import cn.iocoder.yudao.framework.ai.chatqianwen.QianWenChatClient;
+import cn.iocoder.yudao.framework.ai.chatqianwen.QianWenChatModal;
 import cn.iocoder.yudao.framework.ai.chatqianwen.QianWenOptions;
 import cn.iocoder.yudao.framework.ai.chatqianwen.api.QianWenApi;
 import cn.iocoder.yudao.framework.ai.chatxinghuo.XingHuoChatClient;
@@ -45,10 +46,8 @@ public class YudaoAiAutoConfiguration {
         YudaoAiProperties.QianWenProperties qianWenProperties = yudaoAiProperties.getQianwen();
         return new QianWenChatClient(
                 new QianWenApi(
-                        qianWenProperties.getAccessKeyId(),
-                        qianWenProperties.getAccessKeySecret(),
                         qianWenProperties.getAgentKey(),
-                        qianWenProperties.getEndpoint()
+                        QianWenChatModal.QWEN_72B_CHAT
                 ),
                 new QianWenOptions()
                         .setAppId(qianWenProperties.getAppId())

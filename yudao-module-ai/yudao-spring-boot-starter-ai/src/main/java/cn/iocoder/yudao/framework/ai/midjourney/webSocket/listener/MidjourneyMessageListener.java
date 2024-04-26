@@ -11,7 +11,7 @@ import cn.iocoder.yudao.framework.ai.midjourney.constants.MidjourneyConstants;
 import cn.iocoder.yudao.framework.ai.midjourney.constants.MidjourneyGennerateStatusEnum;
 import cn.iocoder.yudao.framework.ai.midjourney.constants.MidjourneyMessageTypeEnum;
 import cn.iocoder.yudao.framework.ai.midjourney.util.MidjourneyUtil;
-import com.alibaba.fastjson.JSON;
+import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.utils.data.DataObject;
 
@@ -45,13 +45,13 @@ public class MidjourneyMessageListener {
         // 转换 components
         if (!data.getArray(MidjourneyConstants.MSG_COMPONENTS).isEmpty()) {
             String componentsJson = StrUtil.str(data.getArray(MidjourneyConstants.MSG_COMPONENTS).toJson(), "UTF-8");
-            List<MidjourneyMessage.ComponentType> components = JSON.parseArray(componentsJson, MidjourneyMessage.ComponentType.class);
+            List<MidjourneyMessage.ComponentType> components = JsonUtils.parseArray(componentsJson, MidjourneyMessage.ComponentType.class);
             mjMessage.setComponents(components);
         }
         // 转换附件
         if (!data.getArray(MidjourneyConstants.MSG_ATTACHMENTS).isEmpty()) {
             String attachmentsJson = StrUtil.str(data.getArray(MidjourneyConstants.MSG_ATTACHMENTS).toJson(), "UTF-8");
-            List<MidjourneyMessage.Attachment> attachments = JSON.parseArray(attachmentsJson, MidjourneyMessage.Attachment.class);
+            List<MidjourneyMessage.Attachment> attachments = JsonUtils.parseArray(attachmentsJson, MidjourneyMessage.Attachment.class);
             mjMessage.setAttachments(attachments);
         }
         // 转换状态

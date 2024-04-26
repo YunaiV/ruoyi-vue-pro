@@ -7,6 +7,7 @@ import lombok.Getter;
  * 千问 chat 模型
  *
  * 模型地址：https://help.aliyun.com/document_detail/2712576.html
+ * 模型介绍：https://help.aliyun.com/document_detail/2666503.html?spm=a2c4g.2701795.0.0.26eb34dfKzcWN4
  *
  * @author fansili
  * @time 2024/4/26 10:15
@@ -16,18 +17,22 @@ import lombok.Getter;
 @Getter
 public enum QianWenChatModal {
 
-    qwen_turbo("通义千问超大规模语言模型", "qwen-turbo"),
-    qwen_plus("通义千问超大规模语言模型增强版", "qwen-plus"),
-    qwen_max("通义千问千亿级别超大规模语言模型", "qwen-max"),
-    qwen_max_0403("通义千问千亿级别超大规模语言模型-0403", "qwen-max-0403"),
-    qwen_max_0107("通义千问千亿级别超大规模语言模型-0107", "qwen-max-0107"),
-    qwen_max_1201("通义千问千亿级别超大规模语言模型-1201", "qwen-max-1201"),
-    qwen_max_longcontext("通义千问千亿级别超大规模语言模型-28k tokens", "qwen-max-longcontext"),
+    // 千问付费模型
+    QWEN_TURBO("通义千问超大规模语言模型", "qwen-turbo"),
+    QWEN_PLUS("通义千问超大规模语言模型增强版", "qwen-plus"),
+    QWEN_MAX("通义千问千亿级别超大规模语言模型", "qwen-max"),
+    QWEN_MAX_0403("通义千问千亿级别超大规模语言模型-0403", "qwen-max-0403"),
+    QWEN_MAX_0107("通义千问千亿级别超大规模语言模型-0107", "qwen-max-0107"),
+    QWEN_MAX_1201("通义千问千亿级别超大规模语言模型-1201", "qwen-max-1201"),
+    QWEN_MAX_LONGCONTEXT("通义千问千亿级别超大规模语言模型-28k tokens", "qwen-max-longcontext"),
+
+    // 开源模型
+    // https://help.aliyun.com/document_detail/2666503.html?spm=a2c4g.2701795.0.0.26eb34dfKzcWN4
+    QWEN_72B_CHAT("通义千问1.5对外开源的72B规模参数量的经过人类指令对齐的chat模型", "qwen-72b-chat"),
 
     ;
 
     private String name;
 
     private String value;
-
 }

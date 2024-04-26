@@ -1,0 +1,19 @@
+
+
+### chat call
+GET {{baseUrl}}/ai/chat/modal/list
+Authorization: {{token}}
+
+
+
+### chat call
+PUT {{baseUrl}}/ai/chat/modal
+Content-Type: application/json
+Authorization: {{token}}
+
+{
+  "modelName": "小红书Ai写作大模型",
+  "modelType": "yiyan",
+  "modalImage": "",
+  "modelConfig": ""
+}
