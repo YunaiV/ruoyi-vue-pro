@@ -20,7 +20,7 @@ import static cn.iocoder.yudao.module.weapp.enums.ErrorCodeConstants.*;
 /**
  * 小程序清单 Service 实现类
  *
- * @author 芋道源码
+ * @author jingjianqian
  */
 @Service
 @Validated
@@ -30,7 +30,7 @@ public class AppsListServiceImpl implements AppsListService {
     private AppsListMapper appsListMapper;
 
     @Override
-    public Integer createAppsList(AppsListSaveReqVO createReqVO) {
+    public Long createAppsList(AppsListSaveReqVO createReqVO) {
         // 插入
         AppsListDO appsList = BeanUtils.toBean(createReqVO, AppsListDO.class);
         appsListMapper.insert(appsList);
@@ -48,21 +48,21 @@ public class AppsListServiceImpl implements AppsListService {
     }
 
     @Override
-    public void deleteAppsList(Integer id) {
+    public void deleteAppsList(Long id) {
         // 校验存在
         validateAppsListExists(id);
         // 删除
         appsListMapper.deleteById(id);
     }
 
-    private void validateAppsListExists(Integer id) {
+    private void validateAppsListExists(Long id) {
         if (appsListMapper.selectById(id) == null) {
             throw exception(APPS_LIST_NOT_EXISTS);
         }
     }
 
     @Override
-    public AppsListDO getAppsList(Integer id) {
+    public AppsListDO getAppsList(Long id) {
         return appsListMapper.selectById(id);
     }
 

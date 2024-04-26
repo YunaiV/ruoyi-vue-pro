@@ -10,7 +10,7 @@ import cn.iocoder.yudao.framework.common.pojo.PageParam;
 /**
  * 小程序清单 Service 接口
  *
- * @author 芋道源码
+ * @author jingjianqian
  */
 public interface AppsListService {
 
@@ -20,7 +20,7 @@ public interface AppsListService {
      * @param createReqVO 创建信息
      * @return 编号
      */
-    Integer createAppsList(@Valid AppsListSaveReqVO createReqVO);
+    Long createAppsList(@Valid AppsListSaveReqVO createReqVO);
 
     /**
      * 更新小程序清单
@@ -34,7 +34,7 @@ public interface AppsListService {
      *
      * @param id 编号
      */
-    void deleteAppsList(Integer id);
+    void deleteAppsList(Long id);
 
     /**
      * 获得小程序清单
@@ -42,7 +42,7 @@ public interface AppsListService {
      * @param id 编号
      * @return 小程序清单
      */
-    AppsListDO getAppsList(Integer id);
+    AppsListDO getAppsList(Long id);
 
     /**
      * 获得小程序清单分页

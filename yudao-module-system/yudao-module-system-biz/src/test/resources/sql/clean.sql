@@ -33,3 +33,5 @@ DELETE FROM "system_mail_template";
 DELETE FROM "system_mail_log";
 DELETE FROM "system_notify_template";
 DELETE FROM "system_notify_message";
+-- 将该删表 SQL 语句，添加到 yudao-module-weapp-biz 模块的 test/resources/sql/clean.sql 文件里
+DELETE FROM "weapp_apps_list";

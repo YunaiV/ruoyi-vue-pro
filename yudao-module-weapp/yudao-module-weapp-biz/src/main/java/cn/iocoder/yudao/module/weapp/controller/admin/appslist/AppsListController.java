@@ -41,7 +41,7 @@ public class AppsListController {
     @PostMapping("/create")
     @Operation(summary = "创建小程序清单")
     @PreAuthorize("@ss.hasPermission('weapp:apps-list:create')")
-    public CommonResult<Integer> createAppsList(@Valid @RequestBody AppsListSaveReqVO createReqVO) {
+    public CommonResult<Long> createAppsList(@Valid @RequestBody AppsListSaveReqVO createReqVO) {
         return success(appsListService.createAppsList(createReqVO));
     }
 
@@ -57,7 +57,7 @@ public class AppsListController {
     @Operation(summary = "删除小程序清单")
     @Parameter(name = "id", description = "编号", required = true)
     @PreAuthorize("@ss.hasPermission('weapp:apps-list:delete')")
-    public CommonResult<Boolean> deleteAppsList(@RequestParam("id") Integer id) {
+    public CommonResult<Boolean> deleteAppsList(@RequestParam("id") Long id) {
         appsListService.deleteAppsList(id);
         return success(true);
     }
@@ -66,7 +66,7 @@ public class AppsListController {
     @Operation(summary = "获得小程序清单")
     @Parameter(name = "id", description = "编号", required = true, example = "1024")
     @PreAuthorize("@ss.hasPermission('weapp:apps-list:query')")
-    public CommonResult<AppsListRespVO> getAppsList(@RequestParam("id") Integer id) {
+    public CommonResult<AppsListRespVO> getAppsList(@RequestParam("id") Long id) {
         AppsListDO appsList = appsListService.getAppsList(id);
         return success(BeanUtils.toBean(appsList, AppsListRespVO.class));
     }

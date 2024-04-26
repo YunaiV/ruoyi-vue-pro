@@ -12,7 +12,7 @@ import cn.iocoder.yudao.module.weapp.controller.admin.appslist.vo.*;
 /**
  * 小程序清单 Mapper
  *
- * @author 芋道源码
+ * @author jingjianqian
  */
 @Mapper
 public interface AppsListMapper extends BaseMapperX<AppsListDO> {
@@ -22,11 +22,9 @@ public interface AppsListMapper extends BaseMapperX<AppsListDO> {
                 .likeIfPresent(AppsListDO::getWeappName, reqVO.getWeappName())
                 .eqIfPresent(AppsListDO::getWeappOpenid, reqVO.getWeappOpenid())
                 .eqIfPresent(AppsListDO::getClassId, reqVO.getClassId())
-                .eqIfPresent(AppsListDO::getDescription, reqVO.getDescription())
                 .eqIfPresent(AppsListDO::getLogoImg, reqVO.getLogoImg())
                 .eqIfPresent(AppsListDO::getStatus, reqVO.getStatus())
-                .eqIfPresent(AppsListDO::getUpdatedBy, reqVO.getUpdatedBy())
-                .betweenIfPresent(AppsListDO::getUpdatedTime, reqVO.getUpdatedTime())
+                .eqIfPresent(AppsListDO::getDescription, reqVO.getDescription())
                 .orderByDesc(AppsListDO::getId));
     }
 
