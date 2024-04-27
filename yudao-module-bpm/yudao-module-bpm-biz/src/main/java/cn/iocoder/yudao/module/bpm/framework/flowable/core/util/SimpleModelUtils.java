@@ -7,8 +7,10 @@ import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.simple.BpmSimpleModelNodeVO;
+import cn.iocoder.yudao.module.bpm.enums.definition.BpmApproveMethodEnum;
 import cn.iocoder.yudao.module.bpm.enums.definition.BpmSimpleModelNodeType;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnModelConstants;
+import cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.SimpleModelConstants;
 import org.flowable.bpmn.BpmnAutoLayout;
 import org.flowable.bpmn.model.Process;
 import org.flowable.bpmn.model.*;
@@ -16,6 +18,7 @@ import org.flowable.bpmn.model.*;
 import java.util.List;
 import java.util.Map;
 
+import static cn.iocoder.yudao.module.bpm.enums.definition.BpmSimpleModelNodeType.END_EVENT;
 import static cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnModelConstants.FORM_FIELD_PERMISSION_ELEMENT;
 import static org.flowable.bpmn.constants.BpmnXMLConstants.FLOWABLE_EXTENSIONS_NAMESPACE;
 import static org.flowable.bpmn.constants.BpmnXMLConstants.FLOWABLE_EXTENSIONS_PREFIX;
@@ -28,6 +31,16 @@ import static org.flowable.bpmn.constants.BpmnXMLConstants.FLOWABLE_EXTENSIONS_P
 public class SimpleModelUtils {
 
     public static final String BPMN_SIMPLE_COPY_EXECUTION_SCRIPT = "#{bpmSimpleNodeService.copy(execution)}";
+
+    /**
+     * 所有审批人同意的表达式
+     */
+    public static final String ALL_APPROVE_COMPLETE_EXPRESSION = "${ nrOfCompletedInstances >= 0 }";
+
+    /**
+     * 任一一名审批人同意的表达式
+     */
+    public static final String ANY_OF_APPROVE_COMPLETE_EXPRESSION = "${ nrOfCompletedInstances >= nrOfInstances }";
 
     /**
      * 仿钉钉流程设计模型数据结构(json) 转换成 Bpmn Model (待完善）
@@ -47,10 +60,15 @@ public class SimpleModelUtils {
         // 前端模型数据结构。 有 start event 节点. 没有 end event 节点。
         // 从 SimpleModel 构建 FlowNode 并添加到 Main Process
         buildAndAddBpmnFlowNode(simpleModelNode, mainProcess);
-        // 单独构建 end event 节点
-        buildAndAddBpmnEndEvent(mainProcess);
+        // 找到 end event
+        EndEvent endEvent = (EndEvent) CollUtil.findOne(mainProcess.getFlowElements(), item -> item instanceof EndEvent);
+        if (endEvent == null) {
+            // 暂时为了兼容 单独构建 end event 节点
+            endEvent = buildAndAddBpmnEndEvent(mainProcess);
+        }
+
         // 构建并添加节点之间的连线 Sequence Flow
-        buildAndAddBpmnSequenceFlow(mainProcess, simpleModelNode, BpmnModelConstants.END_EVENT_ID);
+        buildAndAddBpmnSequenceFlow(mainProcess, simpleModelNode, endEvent.getId());
         // 自动布局
         new BpmnAutoLayout(bpmnModel).execute();
         return bpmnModel;
@@ -58,7 +76,7 @@ public class SimpleModelUtils {
 
     private static void buildAndAddBpmnSequenceFlow(Process mainProcess, BpmSimpleModelNodeVO node, String targetId) {
         // 节点为 null 退出
-        if (node == null || node.getId() == null) {
+        if (node == null || node.getId() == null || END_EVENT.getType().equals(node.getType())) {
             return;
         }
         BpmSimpleModelNodeVO childNode = node.getChildNode();
@@ -169,6 +187,11 @@ public class SimpleModelUtils {
                 mainProcess.addFlowElement(inclusiveGateway);
                 break;
             }
+            case END_EVENT: {
+                EndEvent endEvent = buildBpmnEndEvent(simpleModelNode);
+                mainProcess.addFlowElement(endEvent);
+                break;
+            }
             default: {
                 // TODO 其它节点类型的实现
             }
@@ -242,24 +265,50 @@ public class SimpleModelUtils {
         return inclusiveGateway;
     }
 
-    private static void buildAndAddBpmnEndEvent(Process mainProcess) {
+    private static EndEvent buildAndAddBpmnEndEvent(Process mainProcess) {
         EndEvent endEvent = new EndEvent();
         endEvent.setId(BpmnModelConstants.END_EVENT_ID);
         endEvent.setName("结束");
         mainProcess.addFlowElement(endEvent);
+        return endEvent;
     }
 
     private static UserTask buildBpmnUserTask(BpmSimpleModelNodeVO node) {
         UserTask userTask = new UserTask();
         userTask.setId(node.getId());
         userTask.setName(node.getName());
-        // TODO 暂时测试，后面去掉
-        userTask.setFormKey("24");
         // 添加候选人元素
         addCandidateElements(node, userTask);
         // 添加表单字段权限属性元素
         addFormFieldsPermission(node, userTask);
+        // 处理多实例
+        processMultiInstanceLoopCharacteristics(node, userTask);
         return userTask;
+    }
+
+    private static void processMultiInstanceLoopCharacteristics(BpmSimpleModelNodeVO node, UserTask userTask) {
+        Integer approveMethod = MapUtil.getInt(node.getAttributes(), SimpleModelConstants.APPROVE_METHOD_ATTRIBUTE);
+        BpmApproveMethodEnum bpmApproveMethodEnum = BpmApproveMethodEnum.valueOf(approveMethod);
+        if (bpmApproveMethodEnum == null || bpmApproveMethodEnum == BpmApproveMethodEnum.SINGLE_PERSON_APPROVE) {
+            return;
+        }
+        MultiInstanceLoopCharacteristics multiInstanceCharacteristics = new MultiInstanceLoopCharacteristics();
+        //  设置 collectionVariable。本系统用不到。会在 仅仅为了校验。
+        multiInstanceCharacteristics.setInputDataItem("${coll_userList}");
+        if (bpmApproveMethodEnum == BpmApproveMethodEnum.ALL_APPROVE) {
+            multiInstanceCharacteristics.setCompletionCondition(ALL_APPROVE_COMPLETE_EXPRESSION);
+            multiInstanceCharacteristics.setSequential(false);
+        } else if (bpmApproveMethodEnum == BpmApproveMethodEnum.ANY_OF_APPROVE) {
+            multiInstanceCharacteristics.setCompletionCondition(ANY_OF_APPROVE_COMPLETE_EXPRESSION);
+            multiInstanceCharacteristics.setSequential(false);
+            userTask.setLoopCharacteristics(multiInstanceCharacteristics);
+        } else if (bpmApproveMethodEnum == BpmApproveMethodEnum.SEQUENTIAL_APPROVE) {
+            multiInstanceCharacteristics.setCompletionCondition(ALL_APPROVE_COMPLETE_EXPRESSION);
+            multiInstanceCharacteristics.setSequential(true);
+            multiInstanceCharacteristics.setLoopCardinality("1");
+            userTask.setLoopCharacteristics(multiInstanceCharacteristics);
+        }
+        userTask.setLoopCharacteristics(multiInstanceCharacteristics);
     }
 
     /**
@@ -267,7 +316,8 @@ public class SimpleModelUtils {
      */
     private static void addFormFieldsPermission(BpmSimpleModelNodeVO node, FlowElement flowElement) {
         List<Map<String, String>> fieldsPermissions = MapUtil.get(node.getAttributes(),
-                FORM_FIELD_PERMISSION_ELEMENT, new TypeReference<>() {});
+                FORM_FIELD_PERMISSION_ELEMENT, new TypeReference<>() {
+                });
         if (CollUtil.isNotEmpty(fieldsPermissions)) {
             fieldsPermissions.forEach(item -> addExtensionElement(flowElement, FORM_FIELD_PERMISSION_ELEMENT, item));
         }
@@ -306,5 +356,12 @@ public class SimpleModelUtils {
         startEvent.setId(node.getId());
         startEvent.setName(node.getName());
         return startEvent;
+    }
+
+    private static EndEvent buildBpmnEndEvent(BpmSimpleModelNodeVO node) {
+        EndEvent endEvent = new EndEvent();
+        endEvent.setId(node.getId());
+        endEvent.setName(node.getName());
+        return endEvent;
     }
 }

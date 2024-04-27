@@ -28,6 +28,9 @@ public class BpmSimpleModelNodeVO {
     @Schema(description = "模型节点名称", example = "领导审批")
     private String name;
 
+    @Schema(description = "节点展示内容", example = "指定成员: 芋道源码")
+    private String showText;
+
     @Schema(description = "孩子节点")
     private BpmSimpleModelNodeVO childNode;
 

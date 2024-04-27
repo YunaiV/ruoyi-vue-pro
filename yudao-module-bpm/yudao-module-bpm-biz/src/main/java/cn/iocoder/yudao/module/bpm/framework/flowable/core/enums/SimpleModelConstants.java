@@ -7,4 +7,8 @@ package cn.iocoder.yudao.module.bpm.framework.flowable.core.enums;
  */
 public interface SimpleModelConstants {
 
+    /**
+     * 审批方式属性
+     */
+    String APPROVE_METHOD_ATTRIBUTE = "approveMethod";
 }
