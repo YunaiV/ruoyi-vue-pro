@@ -6,7 +6,7 @@ import lombok.experimental.Accessors;
 
 /**
  * 讯飞星火
- *
+ * <p>
  * author: fansili
  * time: 2024/3/16 20:29
  */
@@ -16,7 +16,7 @@ public class XingHuoOptions implements ChatOptions {
 
     /**
      * https://www.xfyun.cn/doc/spark/Web.html#_1-%E6%8E%A5%E5%8F%A3%E8%AF%B4%E6%98%8E
-     *
+     * <p>
      * 指定访问的领域:
      * general指向V1.5版本;
      * generalv2指向V2版本;
@@ -33,25 +33,25 @@ public class XingHuoOptions implements ChatOptions {
      * V1.5取值为[1,4096]
      * V2.0、V3.0和V3.5取值为[1,8192]，默认为2048。
      */
-    private Integer max_tokens;
+    private Integer maxTokens;
     /**
      * 取值为[1，6],默认为4
      */
-    private Integer top_k;
+    private Integer topK;
     /**
-     * 	需要保障用户下的唯一性，用于关联用户会话
+     * 需要保障用户下的唯一性，用于关联用户会话
      */
-    private String chat_id;
+    private String chatId;
 
 
     @Override
     public Float getTemperature() {
-        return null;
+        return this.temperature;
     }
 
     @Override
     public void setTemperature(Float temperature) {
-
+        this.temperature = temperature;
     }
 
     @Override
@@ -66,11 +66,11 @@ public class XingHuoOptions implements ChatOptions {
 
     @Override
     public Integer getTopK() {
-        return null;
+        return this.topK;
     }
 
     @Override
     public void setTopK(Integer topK) {
-
+        this.topK = topK;
     }
 }
