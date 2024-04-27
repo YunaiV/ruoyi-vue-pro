@@ -2,6 +2,8 @@ package cn.iocoder.yudao.framework.ai.chatyiyan;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.iocoder.yudao.framework.ai.chat.*;
+import cn.iocoder.yudao.framework.ai.chat.messages.Message;
+import cn.iocoder.yudao.framework.ai.chat.messages.MessageType;
 import cn.iocoder.yudao.framework.ai.chat.prompt.ChatOptions;
 import cn.iocoder.yudao.framework.ai.chat.prompt.Prompt;
 import cn.iocoder.yudao.framework.ai.chatyiyan.api.YiYanApi;
@@ -9,6 +11,7 @@ import cn.iocoder.yudao.framework.ai.chatyiyan.api.YiYanChatCompletion;
 import cn.iocoder.yudao.framework.ai.chatyiyan.api.YiYanChatCompletionRequest;
 import cn.iocoder.yudao.framework.ai.chatyiyan.exception.YiYanApiException;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.http.ResponseEntity;
 import org.springframework.retry.RetryCallback;
 import org.springframework.retry.RetryContext;
@@ -18,10 +21,11 @@ import reactor.core.publisher.Flux;
 
 import java.time.Duration;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * 文心一言
- *
+ * <p>
  * author: fansili
  * time: 2024/3/8 19:11
  */
@@ -52,7 +56,9 @@ public class YiYanChatClient implements ChatClient, StreamingChatClient {
                 public <T extends Object, E extends Throwable> void onError(RetryContext context,
                                                                             RetryCallback<T, E> callback, Throwable throwable) {
                     log.warn("重试异常:" + context.getRetryCount(), throwable);
-                };
+                }
+
+                ;
             })
             .build();
 
@@ -92,6 +98,42 @@ public class YiYanChatClient implements ChatClient, StreamingChatClient {
     }
 
     private YiYanChatCompletionRequest createRequest(Prompt prompt, boolean stream) {
+        // 获取配置
+        YiYanOptions useOptions = getYiYanOptions(prompt);
+        // 创建 request
+
+        // tip: 百度的 system 不在 message 里面
+        // tip：百度的 message 只有 user 和 assistant
+        // https://cloud.baidu.com/doc/WENXINWORKSHOP/s/clntwmv7t
+
+        // 获取 user 和 assistant
+        List<YiYanChatCompletionRequest.Message> messageList = prompt.getInstructions().stream()
+                // 过滤 system
+                .filter(msg -> MessageType.SYSTEM != msg.getMessageType())
+                .map(msg -> new YiYanChatCompletionRequest.Message()
+                        .setRole(msg.getMessageType().getValue())
+                        .setContent(msg.getContent())
+                ).toList();
+        // 获取 system
+        String systemPrompt = prompt.getInstructions().stream()
+                .filter(msg -> MessageType.SYSTEM == msg.getMessageType())
+                .map(Message::getContent)
+                .collect(Collectors.joining());
+
+        YiYanChatCompletionRequest request = new YiYanChatCompletionRequest(messageList);
+        // 复制 qianWenOptions 属性取 request（这里 options 属性和 request 基本保持一致）
+        // top: 由于遵循 spring-ai规范，支持在构建client的时候传入默认的 chatOptions
+        BeanUtil.copyProperties(useOptions, request);
+        request.setTop_p(useOptions.getTopP());
+        request.setMax_output_tokens(useOptions.getMaxOutputTokens());
+        request.setTemperature(useOptions.getTemperature());
+        request.setSystem(systemPrompt);
+        // 设置 stream
+        request.setStream(stream);
+        return request;
+    }
+
+    private @NotNull YiYanOptions getYiYanOptions(Prompt prompt) {
         // 两个都为null 则没有配置文件
         if (yiYanOptions == null && prompt.getOptions() == null) {
             throw new ChatException("ChatOptions 未配置参数!");
@@ -106,19 +148,7 @@ public class YiYanChatClient implements ChatClient, StreamingChatClient {
             throw new ChatException("Prompt 传入的不是 YiYanOptions!");
         }
         // 转换 YiYanOptions
-        YiYanOptions qianWenOptions = (YiYanOptions) options;
-        // 创建 request
-        List<YiYanChatCompletionRequest.Message> messageList = prompt.getInstructions().stream().map(
-                msg -> new YiYanChatCompletionRequest.Message()
-                        .setRole(msg.getMessageType().getValue())
-                        .setContent(msg.getContent())
-        ).toList();
-        YiYanChatCompletionRequest request = new YiYanChatCompletionRequest(messageList);
-        // 复制 qianWenOptions 属性取 request（这里 options 属性和 request 基本保持一致）
-        // top: 由于遵循 spring-ai规范，支持在构建client的时候传入默认的 chatOptions
-        BeanUtil.copyProperties(qianWenOptions, request);
-        // 设置 stream
-        request.setStream(stream);
-        return request;
+        YiYanOptions useOptions = (YiYanOptions) options;
+        return useOptions;
     }
 }

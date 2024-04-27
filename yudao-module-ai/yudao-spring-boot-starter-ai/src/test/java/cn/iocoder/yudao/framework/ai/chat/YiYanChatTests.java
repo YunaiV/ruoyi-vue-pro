@@ -1,5 +1,8 @@
 package cn.iocoder.yudao.framework.ai.chat;
 
+import cn.iocoder.yudao.framework.ai.chat.messages.Message;
+import cn.iocoder.yudao.framework.ai.chat.messages.SystemMessage;
+import cn.iocoder.yudao.framework.ai.chat.messages.UserMessage;
 import cn.iocoder.yudao.framework.ai.chat.prompt.Prompt;
 import cn.iocoder.yudao.framework.ai.chatyiyan.YiYanChatClient;
 import cn.iocoder.yudao.framework.ai.chatyiyan.YiYanChatModel;
@@ -9,11 +12,13 @@ import org.junit.Before;
 import org.junit.Test;
 import reactor.core.publisher.Flux;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 /**
  * chat 文心一言
- *
+ * <p>
  * author: fansili
  * time: 2024/3/12 20:59
  */
@@ -29,18 +34,36 @@ public class YiYanChatTests {
                 YiYanChatModel.ERNIE4_3_5_8K,
                 86400
         );
-        yiYanChatClient = new YiYanChatClient(yiYanApi, new YiYanOptions().setMax_output_tokens(2048));
+        YiYanOptions yiYanOptions = new YiYanOptions();
+        yiYanOptions.setMaxOutputTokens(2048);
+        yiYanOptions.setTopP(0.6f);
+        yiYanOptions.setTemperature(0.85f);
+        yiYanChatClient = new YiYanChatClient(
+                yiYanApi,
+                yiYanOptions
+        );
     }
 
     @Test
     public void callTest() {
-        ChatResponse call = yiYanChatClient.call(new Prompt("什么编程语言最好？"));
+
+        // tip: 百度的message 有特殊规则(最后一个message为当前请求的信息，前面的message为历史对话信息)
+        // tip: 地址 https://cloud.baidu.com/doc/WENXINWORKSHOP/s/jlil56u11
+        List<Message> messages = new ArrayList<>();
+        messages.add(new SystemMessage("你是一个优质的文言文作者，用文言文描述着各城市的人文风景，所有问题都采用文言文回答。"));
+        messages.add(new UserMessage("长沙怎么样？"));
+
+        ChatResponse call = yiYanChatClient.call(new Prompt(messages));
         System.err.println(call.getResult());
     }
 
     @Test
     public void streamTest() {
-        Flux<ChatResponse> fluxResponse = yiYanChatClient.stream(new Prompt("用java帮我写一个快排算法？"));
+        List<Message> messages = new ArrayList<>();
+        messages.add(new SystemMessage("你是一个优质的文言文作者，用文言文描述着各城市的人文风景，所有问题都采用文言文回答。"));
+        messages.add(new UserMessage("长沙怎么样？"));
+
+        Flux<ChatResponse> fluxResponse = yiYanChatClient.stream(new Prompt(messages));
         fluxResponse.subscribe(chatResponse -> System.err.print(chatResponse.getResult().getOutput().getContent()));
         // 阻止退出
         Scanner scanner = new Scanner(System.in);

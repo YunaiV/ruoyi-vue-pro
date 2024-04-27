@@ -2,7 +2,6 @@ package cn.iocoder.yudao.framework.ai.chatyiyan;
 
 import cn.iocoder.yudao.framework.ai.chat.prompt.ChatOptions;
 import cn.iocoder.yudao.framework.ai.chatyiyan.api.YiYanChatCompletionRequest;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
@@ -40,7 +39,7 @@ public class YiYanOptions implements ChatOptions {
      * （2）默认0.8，取值范围 [0, 1.0]
      * 必填：否
      */
-    private Float top_p;
+    private Float topP;
     /**
      * 通过对已生成的token增加惩罚，减少重复生成的现象。说明：
      * （1）值越大表示惩罚越大
@@ -84,7 +83,7 @@ public class YiYanOptions implements ChatOptions {
      * 指定模型最大输出token数，范围[2, 2048]
      * 必填：否
      */
-    private Integer max_output_tokens;
+    private Integer maxOutputTokens;
     /**
      * 指定响应内容的格式，说明：
      * （1）可选值：
@@ -122,12 +121,12 @@ public class YiYanOptions implements ChatOptions {
 
     @Override
     public Float getTopP() {
-        return top_p;
+        return topP;
     }
 
     @Override
     public void setTopP(Float topP) {
-        this.top_p = topP;
+        this.topP = topP;
     }
 
     // 百度么有 topK
@@ -139,6 +138,5 @@ public class YiYanOptions implements ChatOptions {
 
     @Override
     public void setTopK(Integer topK) {
-
     }
 }
