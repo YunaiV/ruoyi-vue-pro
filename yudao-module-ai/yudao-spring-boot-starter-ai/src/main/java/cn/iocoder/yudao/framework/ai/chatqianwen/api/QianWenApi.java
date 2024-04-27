@@ -4,6 +4,7 @@ import cn.iocoder.yudao.framework.ai.chatqianwen.QianWenChatModal;
 import cn.iocoder.yudao.framework.ai.exception.AiException;
 import com.alibaba.dashscope.aigc.generation.Generation;
 import com.alibaba.dashscope.aigc.generation.GenerationResult;
+import com.alibaba.dashscope.aigc.generation.models.QwenParam;
 import com.alibaba.dashscope.common.Message;
 import com.alibaba.dashscope.common.Role;
 import com.alibaba.dashscope.exception.InputRequiredException;
@@ -34,9 +35,7 @@ public class QianWenApi {
         this.qianWenChatModal = qianWenChatModal;
     }
 
-    public ResponseEntity<GenerationResult> chatCompletionEntity(QianWenChatCompletionRequest request) {
-        Message userMsg = Message.builder().role(Role.USER.getValue()).content("用萝卜、土豆、茄子做饭，给我个菜谱").build();
-
+    public ResponseEntity<GenerationResult> chatCompletionEntity(QwenParam request) {
         GenerationResult call;
         try {
             call = gen.call(request);
@@ -49,7 +48,7 @@ public class QianWenApi {
         return new ResponseEntity<>(call, HttpStatusCode.valueOf(200));
     }
 
-    public Flowable<GenerationResult> chatCompletionStream(QianWenChatCompletionRequest request) {
+    public Flowable<GenerationResult> chatCompletionStream(QwenParam request) {
         Flowable<GenerationResult> resultFlowable;
         try {
             resultFlowable = gen.streamCall(request);

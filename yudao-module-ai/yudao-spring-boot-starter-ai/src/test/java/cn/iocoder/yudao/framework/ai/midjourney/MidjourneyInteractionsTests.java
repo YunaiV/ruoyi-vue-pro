@@ -6,7 +6,7 @@ import cn.iocoder.yudao.framework.ai.midjourney.api.req.AttachmentsReq;
 import cn.iocoder.yudao.framework.ai.midjourney.api.req.DescribeReq;
 import cn.iocoder.yudao.framework.ai.midjourney.api.req.ReRollReq;
 import cn.iocoder.yudao.framework.ai.midjourney.api.res.UploadAttachmentsRes;
-import com.alibaba.fastjson.JSON;
+import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.core.io.FileSystemResource;
@@ -58,7 +58,7 @@ public class MidjourneyInteractionsTests {
                 new AttachmentsReq().setFileSystemResource(
                         new FileSystemResource(new File("/Users/fansili/Downloads/DSC01402.JPG")))
         );
-        System.err.println(JSON.toJSONString(res));
+        System.err.println(JsonUtils.toJsonString(res));
     }
 
     @Test

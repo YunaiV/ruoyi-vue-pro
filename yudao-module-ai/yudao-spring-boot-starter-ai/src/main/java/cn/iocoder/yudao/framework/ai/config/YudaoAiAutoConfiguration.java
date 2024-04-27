@@ -47,6 +47,7 @@ public class YudaoAiAutoConfiguration {
         QianWenOptions qianWenOptions = new QianWenOptions();
         qianWenOptions.setTopK(qianWenProperties.getTopK());
         qianWenOptions.setTopP(qianWenProperties.getTopP());
+        qianWenOptions.setMaxTokens(qianWenProperties.getMaxTokens());
         qianWenOptions.setTemperature(qianWenProperties.getTemperature());
         return new QianWenChatClient(
                 new QianWenApi(

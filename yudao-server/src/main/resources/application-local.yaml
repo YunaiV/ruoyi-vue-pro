@@ -228,14 +228,11 @@ yudao:
     qianwen:
       enable: true
       aiPlatform: QIAN_WEN
-      temperature: 1
-      topP: 1
-      topK: 1
-      endpoint: bailian.cn-beijing.aliyuncs.com
-      accessKeyId: LTAI5tNTVhXW4fLKUjMrr98z
-      accessKeySecret: ZJ0JQeyjzxxm5CfeTV6k1wNE9UsvZP
-      agentKey: f0c1088824594f589c8f10567ccd929f_p_efm
-      appId: 5f14955f201a44eb8dbe0c57250a32ce
+      temperature: 0.85
+      topP: 0.8
+      topK: 0
+      api-key: sk-Zsd81gZYg7
+      max-tokens: 1500
     xinghuo:
       enable: true
       aiPlatform: XING_HUO

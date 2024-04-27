@@ -48,6 +48,10 @@ public class YudaoAiProperties {
          */
         private String apiKey;
         /**
+         * 用于限制模型生成token的数量，max_tokens设置的是生成上限，并不表示一定会生成这么多的token数量
+         */
+        private Integer maxTokens;
+        /**
          * model
          */
         private YiYanChatModel model;
