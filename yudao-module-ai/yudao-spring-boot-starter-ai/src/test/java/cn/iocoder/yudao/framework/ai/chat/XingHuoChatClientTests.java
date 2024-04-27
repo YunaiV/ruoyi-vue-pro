@@ -1,5 +1,8 @@
 package cn.iocoder.yudao.framework.ai.chat;
 
+import cn.iocoder.yudao.framework.ai.chat.messages.Message;
+import cn.iocoder.yudao.framework.ai.chat.messages.SystemMessage;
+import cn.iocoder.yudao.framework.ai.chat.messages.UserMessage;
 import cn.iocoder.yudao.framework.ai.chat.prompt.Prompt;
 import cn.iocoder.yudao.framework.ai.chatxinghuo.XingHuoChatClient;
 import cn.iocoder.yudao.framework.ai.chatxinghuo.XingHuoChatModel;
@@ -9,6 +12,8 @@ import org.junit.Before;
 import org.junit.Test;
 import reactor.core.publisher.Flux;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 import java.util.function.Consumer;
 
@@ -37,13 +42,21 @@ public class XingHuoChatClientTests {
 
     @Test
     public void callTest() {
-        ChatResponse call = xingHuoChatClient.call(new Prompt("java和go那个性能更好!"));
+        List<Message> messages = new ArrayList<>();
+        messages.add(new SystemMessage("你是一个优质的文言文作者，用文言文描述着各城市的人文风景。"));
+        messages.add(new UserMessage("长沙怎么样？"));
+
+        ChatResponse call = xingHuoChatClient.call(new Prompt(messages));
         System.err.println(call.getResult());
     }
 
     @Test
     public void streamTest() {
-        Flux<ChatResponse> stream = xingHuoChatClient.stream(new Prompt("java和go那个性能更好!"));
+        List<Message> messages = new ArrayList<>();
+        messages.add(new SystemMessage("你是一个优质的文言文作者，用文言文描述着各城市的人文风景。"));
+        messages.add(new UserMessage("长沙怎么样？"));
+
+        Flux<ChatResponse> stream = xingHuoChatClient.stream(new Prompt(messages));
         stream.subscribe(new Consumer<ChatResponse>() {
             @Override
             public void accept(ChatResponse chatResponse) {

@@ -117,12 +117,15 @@ public class XingHuoChatClient implements ChatClient, StreamingChatClient {
         chatParameter.setDomain(xingHuoOptions.getChatModel().getValue());
         XingHuoChatCompletionRequest.Parameter parameter = new XingHuoChatCompletionRequest.Parameter().setChat(chatParameter);
         // 创建 payload text 信息
-        XingHuoChatCompletionRequest.Payload.Message.Text text = new XingHuoChatCompletionRequest.Payload.Message.Text();
-        text.setRole(XingHuoChatCompletionRequest.Payload.Message.Text.Role.USER.getName());
-        text.setContent(prompt.getContents());
+        List<XingHuoChatCompletionRequest.Payload.Message.Text> texts = prompt.getInstructions().stream().map(message -> {
+            XingHuoChatCompletionRequest.Payload.Message.Text text = new XingHuoChatCompletionRequest.Payload.Message.Text();
+            text.setContent(message.getContent());
+            text.setRole(message.getMessageType().getValue());
+            return text;
+        }).collect(Collectors.toList());
         // 创建 payload
         XingHuoChatCompletionRequest.Payload payload = new XingHuoChatCompletionRequest.Payload()
-                .setMessage(new XingHuoChatCompletionRequest.Payload.Message().setText(List.of(text)));
+                .setMessage(new XingHuoChatCompletionRequest.Payload.Message().setText(texts));
         // 创建 request
         return new XingHuoChatCompletionRequest()
                 .setHeader(header)
