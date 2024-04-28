@@ -9,6 +9,7 @@ import cn.iocoder.yudao.framework.ai.image.*;
 import cn.iocoder.yudao.framework.ai.imageopenai.api.OpenAiImageRequest;
 import cn.iocoder.yudao.framework.ai.imageopenai.api.OpenAiImageResponse;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.retry.RetryCallback;
 import org.springframework.retry.RetryContext;
 import org.springframework.retry.RetryListener;
@@ -58,21 +59,14 @@ public class OpenAiImageClient implements ImageClient {
     @Override
     public ImageResponse call(ImagePrompt imagePrompt) {
         return this.retryTemplate.execute(ctx -> {
-            // 检查是否配置了 OpenAiImageOptions
-            if (defaultImageOptions == null && imagePrompt.getOptions() == null) {
-                throw new ChatException("OpenAiImageOptions 未配置参数!");
-            }
-            // 优先使用 request 中的 ImageOptions
-            ImageOptions useImageOptions = imagePrompt.getOptions() == null ? defaultImageOptions : imagePrompt.getOptions();
-            if (!(useImageOptions instanceof OpenAiImageOptions)) {
-                throw new ChatException("配置信息不正确，传入的必须是 OpenAiImageOptions!");
-            }
-            // 转换 OpenAiImageOptions
-            OpenAiImageOptions openAiImageOptions = (OpenAiImageOptions) useImageOptions;
+            OpenAiImageOptions openAiImageOptions = getOpenAiImageOptions(imagePrompt);
             // 创建请求
             OpenAiImageRequest request = new OpenAiImageRequest();
             BeanUtil.copyProperties(openAiImageOptions, request);
             request.setPrompt(imagePrompt.getInstructions().get(0).getText());
+            request.setModel(openAiImageOptions.getModel());
+            request.setStyle(openAiImageOptions.getStyle().getStyle());
+            request.setSize(openAiImageOptions.getSize());
             // 发送请求
             OpenAiImageResponse response = openAiImageApi.createImage(request);
             return new ImageResponse(response.getData().stream().map(res -> {
@@ -81,6 +75,21 @@ public class OpenAiImageClient implements ImageClient {
                 return new ImageGeneration(new Image(res.getUrl(), base64));
             }).toList());
         });
+    }
+
+    private @NotNull OpenAiImageOptions getOpenAiImageOptions(ImagePrompt imagePrompt) {
+        // 检查是否配置了 OpenAiImageOptions
+        if (defaultImageOptions == null && imagePrompt.getOptions() == null) {
+            throw new ChatException("OpenAiImageOptions 未配置参数!");
+        }
+        // 优先使用 request 中的 ImageOptions
+        ImageOptions useImageOptions = imagePrompt.getOptions() == null ? defaultImageOptions : imagePrompt.getOptions();
+        if (!(useImageOptions instanceof OpenAiImageOptions)) {
+            throw new ChatException("配置信息不正确，传入的必须是 OpenAiImageOptions!");
+        }
+        // 转换 OpenAiImageOptions
+        OpenAiImageOptions openAiImageOptions = (OpenAiImageOptions) useImageOptions;
+        return openAiImageOptions;
     }
 
 }
