@@ -41,5 +41,8 @@ public class AiImageDO extends BaseDO {
     @Schema(description = "绘画图片地址")
     private String drawingImageUrl;
 
+    @Schema(description = "绘画错误信息")
+    private String drawingError;
+
 }
 
