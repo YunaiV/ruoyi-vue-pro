@@ -1,0 +1,5 @@
+
+### chat call
+GET {{baseUrl}}/ai/image/dallDrawing?modal=dall-e-2&size=256x256&prompt=中国长城
+Authorization: {{token}}
+
