@@ -7,6 +7,7 @@ package cn.iocoder.yudao.module.bpm.framework.flowable.core.enums;
  */
 public interface SimpleModelConstants {
 
+    // TODO @芋艿：审批方式的名字，可能要看下；
     /**
      * 审批方式属性
      */
