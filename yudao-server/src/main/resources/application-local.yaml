@@ -255,6 +255,11 @@ yudao:
       secretKey: R9mYF9dl9KASgi5RUq0FQt3wRisSnOcK
       refreshTokenSecondTime: 86400
       chatModel: ERNIE4_3_5_8K
+    openAiImage:
+      enable: true
+      api-key: ${OPEN_AI_KEY}
+      model: dall_e_2
+      style: vivid
 
   captcha:
     enable: false # 本地环境，暂时关闭图片验证码，方便登录等接口的测试；
