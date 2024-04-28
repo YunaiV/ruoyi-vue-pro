@@ -5199,7 +5199,7 @@ COMMIT;
 DROP TABLE IF EXISTS `system_sms_template`;
 CREATE TABLE `system_sms_template`  (
   `id` bigint NOT NULL AUTO_INCREMENT COMMENT '编号',
-  `type` tinyint NOT NULL COMMENT '短信签名',
+  `type` tinyint NOT NULL COMMENT '模板类型. 1: 验证码, 2: 通知, 3: 营销',
   `status` tinyint NOT NULL COMMENT '开启状态',
   `code` varchar(63) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '模板编码',
   `name` varchar(63) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '模板名称',
