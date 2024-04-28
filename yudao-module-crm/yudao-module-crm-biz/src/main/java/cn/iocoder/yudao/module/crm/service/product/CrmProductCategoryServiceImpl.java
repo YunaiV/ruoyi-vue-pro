@@ -110,10 +110,10 @@ public class CrmProductCategoryServiceImpl implements CrmProductCategoryService 
         validateProductCategoryExists(id);
         // 1.2 校验是否还有子分类
         if (productCategoryMapper.selectCountByParentId(id) > 0) {
-            throw exception(product_CATEGORY_EXISTS_CHILDREN);
+            throw exception(PRODUCT_CATEGORY_EXISTS_CHILDREN);
         }
         // 1.3 校验是否被产品使用
-        if (crmProductService.getProductByCategoryId(id) !=null) {
+        if (crmProductService.getProductByCategoryId(id) > 0) {
             throw exception(PRODUCT_CATEGORY_USED);
         }
         // 2. 删除
