@@ -36,7 +36,7 @@ public class OpenAiImageClientTests {
 
     @Test
     public void callTest() {
-        ImageResponse call = openAiImageClient.call(new ImagePrompt("我和我的小狗，一起在北极和企鹅玩排球。"));
+        ImageResponse call = openAiImageClient.call(new ImagePrompt("中国长城!"));
         System.err.println("url: " + call.getResult().getOutput().getUrl());
         System.err.println("base64: " + call.getResult().getOutput().getB64Json());
 
