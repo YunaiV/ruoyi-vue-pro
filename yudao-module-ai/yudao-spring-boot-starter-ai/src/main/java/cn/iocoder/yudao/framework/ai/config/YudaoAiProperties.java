@@ -4,6 +4,7 @@ import cn.iocoder.yudao.framework.ai.AiPlatformEnum;
 import cn.iocoder.yudao.framework.ai.chatxinghuo.XingHuoChatModel;
 import cn.iocoder.yudao.framework.ai.chatyiyan.YiYanChatModel;
 import cn.iocoder.yudao.framework.ai.imageopenai.OpenAiImageModelEnum;
+import cn.iocoder.yudao.framework.ai.imageopenai.OpenAiImageStyleEnum;
 import lombok.Data;
 import lombok.experimental.Accessors;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -101,5 +102,9 @@ public class YudaoAiProperties {
          * 模型
          */
         private OpenAiImageModelEnum model = OpenAiImageModelEnum.DALL_E_2;
+        /**
+         * 风格
+         */
+        private OpenAiImageStyleEnum style = OpenAiImageStyleEnum.VIVID;
     }
 }
