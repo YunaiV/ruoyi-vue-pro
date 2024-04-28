@@ -100,6 +100,7 @@ public class YudaoAiAutoConfiguration {
                 new OpenAiImageOptions()
                         .setModel(openAiImageProperties.getModel())
                         .setResponseFormat(OpenAiImageOptions.ResponseFormatEnum.URL.getValue())
+                        .setStyle(openAiImageProperties.getStyle())
         );
     }
 }
