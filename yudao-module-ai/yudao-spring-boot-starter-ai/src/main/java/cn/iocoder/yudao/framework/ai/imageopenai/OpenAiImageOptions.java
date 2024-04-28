@@ -22,7 +22,7 @@ public class OpenAiImageOptions implements ImageOptions {
 
     // 可选字段，默认为dall-e-2
     // 指定用于生成图像的模型名称。
-    private String model = "dall-e-2";
+    private OpenAiImageModelEnum model = OpenAiImageModelEnum.DALL_E_2;
 
     // 可选字段，默认为1
     // 生成图像的数量，必须在1到10之间。对于dall-e-3模型，目前仅支持n=1。
@@ -38,7 +38,7 @@ public class OpenAiImageOptions implements ImageOptions {
 
     // 可选字段，默认为1024x1024
     // 生成图像的尺寸大小。对于dall-e-2模型，尺寸可为256x256, 512x512, 或 1024x1024。对于dall-e-3模型，尺寸可为1024x1024, 1792x1024, 或 1024x1792。
-    private String imageSize = "1024x1024";
+    private String size = "1024x1024";
 
     // 可选字段，默认为vivid
     // 图像生成的风格。可为vivid（生动）或natural（自然）。vivid会使模型偏向生成超现实和戏剧性的图像，而natural则会让模型产出更自然、不那么超现实的图像。该参数仅对dall-e-3模型有效。
@@ -73,7 +73,7 @@ public class OpenAiImageOptions implements ImageOptions {
 
     @Override
     public String getModel() {
-        return this.model;
+        return this.model.getModel();
     }
 
     @Override
