@@ -38,14 +38,14 @@ public class AiChatModalController {
 
     @Operation(summary = "ai模型 - 添加")
     @PutMapping("/modal")
-    public CommonResult add(@RequestBody @Validated AiChatModalAddReq req) {
+    public CommonResult<Void> add(@RequestBody @Validated AiChatModalAddReq req) {
         aiChatModalService.add(req);
         return CommonResult.success(null);
     }
 
     @Operation(summary = "ai模型 - 模型照片上传")
     @PostMapping("/modal/{id}/updateImage")
-    public CommonResult updateImage(@PathVariable("id") Long id,
+    public CommonResult<Void> updateImage(@PathVariable("id") Long id,
                                     MultipartFile file) {
         // todo yunai 文件上传这里放哪里
         return CommonResult.success(null);
@@ -53,7 +53,7 @@ public class AiChatModalController {
 
     @Operation(summary = "ai模型 - 修改")
     @PostMapping("/modal/{id}")
-    public CommonResult update(@PathVariable  Long id,
+    public CommonResult<Void> update(@PathVariable  Long id,
                                @RequestBody @Validated AiChatModalAddReq req) {
         aiChatModalService.update(id, req);
         return CommonResult.success(null);
@@ -61,7 +61,7 @@ public class AiChatModalController {
 
     @Operation(summary = "ai模型 - 删除")
     @DeleteMapping("/modal/{id}")
-    public CommonResult delete(@PathVariable  Long id) {
+    public CommonResult<Void> delete(@PathVariable  Long id) {
         aiChatModalService.delete(id);
         return CommonResult.success(null);
     }
