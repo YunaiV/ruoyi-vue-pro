@@ -43,7 +43,7 @@ public class OpenAiImageRequest {
     // 可选字段，默认为1024x1024
     // 生成图像的尺寸大小。对于dall-e-2模型，尺寸可为256x256, 512x512, 或 1024x1024。对于dall-e-3模型，尺寸可为1024x1024, 1792x1024, 或 1024x1792。
     @JsonProperty("size")
-    private String imageSize = "1024x1024";
+    private String size = "1024x1024";
 
     // 可选字段，默认为vivid
     // 图像生成的风格。可为vivid（生动）或natural（自然）。vivid会使模型偏向生成超现实和戏剧性的图像，而natural则会让模型产出更自然、不那么超现实的图像。该参数仅对dall-e-3模型有效。
@@ -53,6 +53,6 @@ public class OpenAiImageRequest {
     // 可选字段
     // 代表您的终端用户的唯一标识符，有助于OpenAI监控并检测滥用行为。了解更多信息请参考官方文档。
     @JsonProperty("user")
-    private String endUserId;
+    private String endUserId = "UID123123";
 
 }
