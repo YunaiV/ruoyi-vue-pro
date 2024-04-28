@@ -1,0 +1,18 @@
+
+
+### 登录
+
+POST {{baseUrl}}/admin-api/system/auth/login
+Content-Type: application/json
+tenant-id: 1
+
+{
+    "username": "admin",
+    "password": "123456",
+    "captchaVerification": "PfcH6mgr8tpXuMWFjvW6YVaqrswIuwmWI5dsVZSg7sGpWtDCUbHuDEXl3cFB1+VvCC/rAkSwK8Fad52FSuncVg==",
+    "socialCode": "1024",
+    "socialState": "9b2ffbc1-7425-4155-9894-9d5c08541d62",
+    "socialCodeValid": true
+}
+
+
