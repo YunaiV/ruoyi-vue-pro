@@ -2,9 +2,11 @@ package cn.iocoder.yudao.framework.ai.imageopenai;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.codec.Base64;
+import cn.hutool.core.util.StrUtil;
 import cn.hutool.http.HttpUtil;
 import cn.iocoder.yudao.framework.ai.chat.ChatException;
 import cn.iocoder.yudao.framework.ai.chatyiyan.exception.YiYanApiException;
+import cn.iocoder.yudao.framework.ai.exception.AiException;
 import cn.iocoder.yudao.framework.ai.image.*;
 import cn.iocoder.yudao.framework.ai.imageopenai.api.OpenAiImageRequest;
 import cn.iocoder.yudao.framework.ai.imageopenai.api.OpenAiImageResponse;
@@ -69,6 +71,10 @@ public class OpenAiImageClient implements ImageClient {
             request.setSize(openAiImageOptions.getSize());
             // 发送请求
             OpenAiImageResponse response = openAiImageApi.createImage(request);
+            if (response.getError() != null && !StrUtil.isBlank(response.getError().getMessage())) {
+                // code 错误没有编码，就先根据 message 来进行判断
+                throw new AiException("openAi 图片生成失败! " + response.getError().getMessage());
+            }
             return new ImageResponse(response.getData().stream().map(res -> {
                 byte[] bytes = HttpUtil.downloadBytes(res.getUrl());
                 String base64 = Base64.encode(bytes);

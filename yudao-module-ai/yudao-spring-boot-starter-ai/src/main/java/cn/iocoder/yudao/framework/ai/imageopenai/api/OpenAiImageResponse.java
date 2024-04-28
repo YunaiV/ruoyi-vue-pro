@@ -17,6 +17,7 @@ public class OpenAiImageResponse {
 
     private long created;
     private List<Item> data;
+    private Error error;
 
     @Data
     @Accessors(chain = true)
@@ -25,5 +26,14 @@ public class OpenAiImageResponse {
         private String url;
         private String b64_json;
 
+    }
+
+    @Data
+    @Accessors(chain = true)
+    public static class Error {
+        private String code;
+        private String message;
+        private String param;
+        private String type;
     }
 }
