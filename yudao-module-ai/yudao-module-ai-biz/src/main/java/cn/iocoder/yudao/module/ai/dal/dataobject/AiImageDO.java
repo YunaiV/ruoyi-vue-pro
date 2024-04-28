@@ -17,14 +17,23 @@ import lombok.experimental.Accessors;
  */
 @Data
 @Accessors(chain = true)
-@TableName("ai_drawing_image")
-public class AiDrawingImageDO extends BaseDO {
+@TableName("ai_image")
+public class AiImageDO extends BaseDO {
 
     @TableId(type = IdType.AUTO)
     private Long id;
 
+    @Schema(description = "用户id")
+    private Long userId;
+
     @Schema(description = "提示词")
     private String prompt;
+
+    @Schema(description = "模型")
+    private String modal;
+
+    @Schema(description = "生成图像的尺寸大小。对于dall-e-2模型，尺寸可为256x256, 512x512, 或 1024x1024。对于dall-e-3模型，尺寸可为1024x1024, 1792x1024, 或 1024x1792。")
+    private String size;
 
     @Schema(description = "绘画状态：提交、排队、绘画中、绘画完成、绘画失败")
     private String drawingStatus;

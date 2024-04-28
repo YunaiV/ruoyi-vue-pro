@@ -34,6 +34,6 @@ public class AiImageController {
     public SseEmitter dallDrawing(@Validated @ModelAttribute AiImageDallDrawingReq req) {
         Utf8SseEmitter sseEmitter = new Utf8SseEmitter();
         aiImageService.dallDrawing(req, sseEmitter);
-        return null;
+        return sseEmitter;
     }
 }
