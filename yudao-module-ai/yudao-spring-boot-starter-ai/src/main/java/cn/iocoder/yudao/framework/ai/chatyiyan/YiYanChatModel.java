@@ -25,8 +25,16 @@ public enum YiYanChatModel {
 
     ;
 
-    private String value;
+    private String model;
 
     private String uri;
 
+    public static YiYanChatModel valueOfModel(String model) {
+        for (YiYanChatModel itemEnum : YiYanChatModel.values()) {
+            if (itemEnum.getModel().equals(model)) {
+                return itemEnum;
+            }
+        }
+        throw new IllegalArgumentException("Invalid MessageType value: " + model);
+    }
 }

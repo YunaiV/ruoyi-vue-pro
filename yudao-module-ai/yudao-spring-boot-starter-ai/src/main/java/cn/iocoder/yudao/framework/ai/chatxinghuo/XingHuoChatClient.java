@@ -114,7 +114,7 @@ public class XingHuoChatClient implements ChatClient, StreamingChatClient {
         // 创建 params
         XingHuoChatCompletionRequest.Parameter.Chat chatParameter = new XingHuoChatCompletionRequest.Parameter.Chat();
         BeanUtil.copyProperties(xingHuoOptions, chatParameter);
-        chatParameter.setDomain(xingHuoOptions.getChatModel().getValue());
+        chatParameter.setDomain(xingHuoOptions.getChatModel().getModel());
         XingHuoChatCompletionRequest.Parameter parameter = new XingHuoChatCompletionRequest.Parameter().setChat(chatParameter);
         // 创建 payload text 信息
         List<XingHuoChatCompletionRequest.Payload.Message.Text> texts = prompt.getInstructions().stream().map(message -> {

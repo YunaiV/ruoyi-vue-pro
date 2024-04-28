@@ -10,6 +10,9 @@ import cn.iocoder.yudao.framework.ai.chatxinghuo.api.XingHuoApi;
 import cn.iocoder.yudao.framework.ai.chatyiyan.YiYanChatClient;
 import cn.iocoder.yudao.framework.ai.chatyiyan.YiYanOptions;
 import cn.iocoder.yudao.framework.ai.chatyiyan.api.YiYanApi;
+import cn.iocoder.yudao.framework.ai.imageopenai.OpenAiImageApi;
+import cn.iocoder.yudao.framework.ai.imageopenai.OpenAiImageClient;
+import cn.iocoder.yudao.framework.ai.imageopenai.OpenAiImageOptions;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -32,7 +35,7 @@ public class YudaoAiAutoConfiguration {
         YudaoAiProperties.XingHuoProperties xingHuoProperties = yudaoAiProperties.getXinghuo();
         // 转换配置
         XingHuoOptions xingHuoOptions = new XingHuoOptions();
-        xingHuoOptions.setChatModel(xingHuoProperties.getChatModel());
+        xingHuoOptions.setChatModel(xingHuoProperties.getModel());
         xingHuoOptions.setTopK(xingHuoProperties.getTopK());
         xingHuoOptions.setTemperature(xingHuoProperties.getTemperature());
         xingHuoOptions.setMaxTokens(xingHuoProperties.getMaxTokens());
@@ -79,10 +82,24 @@ public class YudaoAiAutoConfiguration {
                 new YiYanApi(
                         yiYanProperties.getAppKey(),
                         yiYanProperties.getSecretKey(),
-                        yiYanProperties.getChatModel(),
+                        yiYanProperties.getModel(),
                         yiYanProperties.getRefreshTokenSecondTime()
                 ),
                 yiYanOptions
+        );
+    }
+
+
+    @Bean
+    @ConditionalOnProperty(value = "yudao.ai.openAiImage.enable", havingValue = "true")
+    public OpenAiImageClient openAiImageClient(YudaoAiProperties yudaoAiProperties) {
+        YudaoAiProperties.OpenAiImageProperties openAiImageProperties = yudaoAiProperties.getOpenAiImage();
+        // 创建 client
+        return new OpenAiImageClient(
+                new OpenAiImageApi(openAiImageProperties.getApiKey()),
+                new OpenAiImageOptions()
+                        .setModel(openAiImageProperties.getModel())
+                        .setResponseFormat(OpenAiImageOptions.ResponseFormatEnum.URL.getValue())
         );
     }
 }

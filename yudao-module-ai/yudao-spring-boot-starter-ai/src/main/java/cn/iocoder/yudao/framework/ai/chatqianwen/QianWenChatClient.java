@@ -100,7 +100,7 @@ public class QianWenChatClient implements ChatClient, StreamingChatClient {
             messageList.add(message);
         });
         return QwenParam.builder()
-                .model(qianWenApi.getQianWenChatModal().getValue())
+                .model(qianWenApi.getQianWenChatModal().getModel())
                 .prompt(prompt.getContents())
                 .messages(messageList)
                 .maxTokens(chatOptions.getMaxTokens())

@@ -30,15 +30,24 @@ public enum XingHuoChatModel {
 
     ;
 
-    XingHuoChatModel(String name, String value, String uri) {
+    XingHuoChatModel(String name, String model, String uri) {
         this.name = name;
-        this.value = value;
+        this.model = model;
         this.uri = uri;
     }
 
     private String name;
 
-    private String value;
+    private String model;
 
     private String uri;
+
+    public static XingHuoChatModel valueOfModel(String model) {
+        for (XingHuoChatModel itemEnum : XingHuoChatModel.values()) {
+            if (itemEnum.getModel().equals(model)) {
+                return itemEnum;
+            }
+        }
+        throw new IllegalArgumentException("Invalid MessageType value: " + model);
+    }
 }

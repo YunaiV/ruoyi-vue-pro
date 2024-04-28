@@ -34,5 +34,14 @@ public enum QianWenChatModal {
 
     private String name;
 
-    private String value;
+    private String model;
+
+    public static QianWenChatModal valueOfModel(String model) {
+        for (QianWenChatModal itemEnum : QianWenChatModal.values()) {
+            if (itemEnum.getModel().equals(model)) {
+                return itemEnum;
+            }
+        }
+        throw new IllegalArgumentException("Invalid MessageType value: " + model);
+    }
 }

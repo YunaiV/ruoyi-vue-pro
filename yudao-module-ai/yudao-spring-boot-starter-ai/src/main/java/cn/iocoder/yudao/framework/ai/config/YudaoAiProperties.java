@@ -3,6 +3,7 @@ package cn.iocoder.yudao.framework.ai.config;
 import cn.iocoder.yudao.framework.ai.AiPlatformEnum;
 import cn.iocoder.yudao.framework.ai.chatxinghuo.XingHuoChatModel;
 import cn.iocoder.yudao.framework.ai.chatyiyan.YiYanChatModel;
+import cn.iocoder.yudao.framework.ai.imageopenai.OpenAiImageModelEnum;
 import lombok.Data;
 import lombok.experimental.Accessors;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -23,6 +24,7 @@ public class YudaoAiProperties {
     private QianWenProperties qianwen;
     private XingHuoProperties xinghuo;
     private YiYanProperties yiyan;
+    private OpenAiImageProperties openAiImage;
 
     @Data
     @Accessors(chain = true)
@@ -64,7 +66,7 @@ public class YudaoAiProperties {
         private String appId;
         private String appKey;
         private String secretKey;
-        private XingHuoChatModel chatModel;
+        private XingHuoChatModel model;
     }
 
     @Data
@@ -81,12 +83,23 @@ public class YudaoAiProperties {
         /**
          * 模型
          */
-        private YiYanChatModel chatModel = YiYanChatModel.ERNIE4_3_5_8K;
+        private YiYanChatModel model = YiYanChatModel.ERNIE4_3_5_8K;
         /**
          * token 刷新时间(默认 86400 = 24小时)
          */
         private int refreshTokenSecondTime = 86400;
+    }
 
-        private YiYanChatModel model;
+    @Data
+    @Accessors(chain = true)
+    public static class OpenAiImageProperties {
+        /**
+         * api key
+         */
+        private String apiKey;
+        /**
+         * 模型
+         */
+        private OpenAiImageModelEnum model = OpenAiImageModelEnum.DALL_E_2;
     }
 }
