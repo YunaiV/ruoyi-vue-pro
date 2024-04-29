@@ -262,9 +262,9 @@ yudao:
       style: vivid
     midjourney:
       enable: true
-      token: OTcyNzIxMzA0ODkxNDUzNDUw.G_vMOz.BO_Q0sXAD80u5ZKIHPNYDTRX_FgeKL3cKFc53I
-      guild-id: 1225608134878302329
-      channel-id: 1225608134878302332
+      token: OTc1MzcyNDg1OTcxMzEyNzAw.G2iiSo.OqW9vToC5dokiyb1QOWnCwRPsYpOjLyNcf9--M
+      guild-id: 1234355413420347402
+      channel-id: 1234380679576424448
   captcha:
     enable: false # 本地环境，暂时关闭图片验证码，方便登录等接口的测试；
   security:
