@@ -2,6 +2,8 @@ package cn.iocoder.yudao.module.ai.service;
 
 import cn.iocoder.yudao.module.ai.controller.Utf8SseEmitter;
 import cn.iocoder.yudao.module.ai.vo.AiImageDallDrawingReq;
+import cn.iocoder.yudao.module.ai.vo.AiImageMidjourneyReq;
+import cn.iocoder.yudao.module.ai.vo.AiImageMidjourneyRes;
 
 /**
  * ai 作图
@@ -19,4 +21,12 @@ public interface AiImageService {
      * @param sseEmitter
      */
     void dallDrawing(AiImageDallDrawingReq req, Utf8SseEmitter sseEmitter);
+
+    /**
+     * midjourney 图片生成
+     *
+     * @param req
+     * @return
+     */
+    AiImageMidjourneyRes midjourney(AiImageMidjourneyReq req);
 }
