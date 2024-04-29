@@ -56,6 +56,7 @@ public class MidjourneyWebSocketStarter implements WebSocketStarter {
 	 * 链接成功的 session
 	 */
 	private WebSocketSession webSocketSession = null;
+	private WssNotify wssNotify = null;
 
 	public MidjourneyWebSocketStarter(String wssServer,
 									  String resumeWss,
@@ -68,7 +69,8 @@ public class MidjourneyWebSocketStarter implements WebSocketStarter {
 	}
 
 	@Override
-	public void start() {
+	public void start(WssNotify wssNotify) {
+		this.wssNotify = wssNotify;
 		start(false);
 	}
 
@@ -178,6 +180,9 @@ public class MidjourneyWebSocketStarter implements WebSocketStarter {
 
 	private void notifyWssLock(int code, String reason) {
 		System.err.println("notifyWssLock: " + code + " - " + reason);
+		if (wssNotify != null) {
+			wssNotify.notify(code, reason);
+		}
 	}
 
 	/**
