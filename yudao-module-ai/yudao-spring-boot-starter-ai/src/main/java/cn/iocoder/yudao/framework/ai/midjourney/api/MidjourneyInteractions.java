@@ -73,7 +73,7 @@ public abstract class MidjourneyInteractions {
      */
     protected HashMap<String, String> getDefaultParams() {
         HashMap<String, String> requestParams = Maps.newHashMap();
-        // TODO @fansili：感觉参数的组装，可以搞成一个公用的方法；就是 config + 入参的感觉；
+        // TODO done @fansili：感觉参数的组装，可以搞成一个公用的方法；就是 config + 入参的感觉；
         requestParams.put("guild_id", midjourneyConfig.getGuildId());
         requestParams.put("channel_id", midjourneyConfig.getChannelId());
         requestParams.put("session_id", midjourneyConfig.getSessionId());
