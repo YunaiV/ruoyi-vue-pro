@@ -1,0 +1,165 @@
+{
+  "op": 0,
+  "s": 1861,
+  "t": "MESSAGE_UPDATE",
+  "d": {
+    "mention_everyone": false,
+    "pinned": false,
+    "components": [
+      {
+        "components": [
+          {
+            "custom_id": "MJ::JOB::upsample::1::a58fcee9-ec89-4471-aff3-088615fc78f2",
+            "style": 2,
+            "label": "U1",
+            "type": 2
+          },
+          {
+            "custom_id": "MJ::JOB::upsample::2::a58fcee9-ec89-4471-aff3-088615fc78f2",
+            "style": 2,
+            "label": "U2",
+            "type": 2
+          },
+          {
+            "custom_id": "MJ::JOB::upsample::3::a58fcee9-ec89-4471-aff3-088615fc78f2",
+            "style": 2,
+            "label": "U3",
+            "type": 2
+          },
+          {
+            "custom_id": "MJ::JOB::upsample::4::a58fcee9-ec89-4471-aff3-088615fc78f2",
+            "style": 2,
+            "label": "U4",
+            "type": 2
+          },
+          {
+            "emoji": {
+              "name": "🔄"
+            },
+            "custom_id": "MJ::JOB::reroll::0::a58fcee9-ec89-4471-aff3-088615fc78f2::SOLO",
+            "style": 1,
+            "type": 2
+          }
+        ],
+        "type": 1
+      },
+      {
+        "components": [
+          {
+            "custom_id": "MJ::JOB::variation::1::a58fcee9-ec89-4471-aff3-088615fc78f2",
+            "style": 2,
+            "label": "V1",
+            "type": 2
+          },
+          {
+            "custom_id": "MJ::JOB::variation::2::a58fcee9-ec89-4471-aff3-088615fc78f2",
+            "style": 2,
+            "label": "V2",
+            "type": 2
+          },
+          {
+            "custom_id": "MJ::JOB::variation::3::a58fcee9-ec89-4471-aff3-088615fc78f2",
+            "style": 2,
+            "label": "V3",
+            "type": 2
+          },
+          {
+            "custom_id": "MJ::JOB::variation::4::a58fcee9-ec89-4471-aff3-088615fc78f2",
+            "style": 2,
+            "label": "V4",
+            "type": 2
+          }
+        ],
+        "type": 1
+      }
+    ],
+    "attachments": [
+      {
+        "filename": "andrakosq9211_A_girl_from_China_creator_of_ancient_Chinese_clot_a58fcee9-ec89-4471-aff3-088615fc78f2.png",
+        "size": 8558317,
+        "content_type": "image/png",
+        "width": 2688,
+        "placeholder_version": 1,
+        "proxy_url": "https://media.discordapp.net/attachments/1234380679576424448/1234506591949291592/andrakosq9211_A_girl_from_China_creator_of_ancient_Chinese_clot_a58fcee9-ec89-4471-aff3-088615fc78f2.png?ex=6630fb5b&is=662fa9db&hm=ce38fbb4da6acca7a545fadf53f1bfaa3096e04fe68d24750104a2e66719f84d&",
+        "placeholder": "YAgGBYBYFZeDa5eHegdnZ/3Erv7s",
+        "id": "1234506591949291592",
+        "url": "https://cdn.discordapp.com/attachments/1234380679576424448/1234506591949291592/andrakosq9211_A_girl_from_China_creator_of_ancient_Chinese_clot_a58fcee9-ec89-4471-aff3-088615fc78f2.png?ex=6630fb5b&is=662fa9db&hm=ce38fbb4da6acca7a545fadf53f1bfaa3096e04fe68d24750104a2e66719f84d&",
+        "height": 1792
+      }
+    ],
+    "author": {
+      "global_name": null,
+      "bot": true,
+      "avatar_decoration_data": null,
+      "clan": null,
+      "public_flags": 589824,
+      "id": "936929561302675456",
+      "avatar": "f6ce562a6b4979c4b1cbc5b436d3be76",
+      "username": "Midjourney Bot",
+      "discriminator": "9282"
+    },
+    "flags": 0,
+    "type": 19,
+    "mention_roles": [],
+    "edited_timestamp": "2024-04-29T14:16:39.564000+00:00",
+    "content": "**A girl from China, creator of ancient Chinese clothing, dances on the square --v 6.0 --ar 3:2** - Variations (Strong) by <@975372485971312700> (relaxed)",
+    "tts": false,
+    "mentions": [
+      {
+        "global_name": "禁止挂软件刷图，逮到删服务器，踢设备，永久拉黑！！！",
+        "avatar_decoration_data": null,
+        "member": {
+          "premium_since": null,
+          "nick": null,
+          "joined_at": "2024-04-29T04:07:43.807000+00:00",
+          "communication_disabled_until": null,
+          "roles": [],
+          "pending": false,
+          "flags": 0,
+          "deaf": false,
+          "mute": false,
+          "avatar": null
+        },
+        "clan": null,
+        "public_flags": 0,
+        "id": "975372485971312700",
+        "avatar": "90ab939feddeaea32e23d066ce66d0e6",
+        "username": "andrakosq9211",
+        "discriminator": "0"
+      }
+    ],
+    "member": {
+      "premium_since": null,
+      "nick": null,
+      "joined_at": "2024-04-29T04:09:06.489349+00:00",
+      "communication_disabled_until": null,
+      "roles": [
+        "1234355760184561747"
+      ],
+      "pending": false,
+      "flags": 0,
+      "deaf": false,
+      "mute": false,
+      "avatar": null
+    },
+    "guild_id": "1234355413420347402",
+    "position": 0,
+    "message_reference": {
+      "guild_id": "1234355413420347402",
+      "message_id": "1234503859578081381",
+      "type": 0,
+      "channel_id": "1234380679576424448"
+    },
+    "id": "1234506592565596251",
+    "embeds": [
+      {
+        "color": 16711680,
+        "description": "Hey <@975372485971312700>\nYour job queue is full. Please wait for a job to finish first, then resubmit this one.\n*[Please check the bottom of the channel for more information.](https://discord.com/channels/1234355413420347402/1234380679576424448/1234508653562826822)*",
+        "type": "rich",
+        "url": "https://discord.com/channels/1234355413420347402/1234380679576424448/1234508653562826822"
+      }
+    ],
+    "channel_id": "1234380679576424448",
+    "timestamp": "2024-04-29T14:08:27.691000+00:00"
+  }
+}
