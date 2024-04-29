@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.framework.ai.midjourney;
 
 import cn.hutool.core.io.FileUtil;
+import cn.iocoder.yudao.framework.ai.midjourney.webSocket.WssNotify;
 import cn.iocoder.yudao.framework.ai.midjourney.webSocket.listener.MidjourneyMessageListener;
 import cn.iocoder.yudao.framework.ai.midjourney.webSocket.MidjourneyWebSocketStarter;
 import org.junit.Before;
@@ -38,7 +39,12 @@ public class MidjourneyWebSocketTests {
         var webSocketStarter = new MidjourneyWebSocketStarter(wssUrl, null, midjourneyConfig, messageListener);
 
         try {
-            webSocketStarter.start();
+            webSocketStarter.start(new WssNotify() {
+                @Override
+                public void notify(int code, String message) {
+
+                }
+            });
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
