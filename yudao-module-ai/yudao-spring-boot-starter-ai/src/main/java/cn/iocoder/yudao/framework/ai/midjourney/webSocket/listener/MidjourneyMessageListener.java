@@ -4,13 +4,13 @@ package cn.iocoder.yudao.framework.ai.midjourney.webSocket.listener;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.text.CharSequenceUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.hutool.json.JSONUtil;
 import cn.iocoder.yudao.framework.ai.midjourney.MidjourneyConfig;
 import cn.iocoder.yudao.framework.ai.midjourney.MidjourneyMessage;
 import cn.iocoder.yudao.framework.ai.midjourney.constants.MidjourneyConstants;
 import cn.iocoder.yudao.framework.ai.midjourney.constants.MidjourneyGennerateStatusEnum;
 import cn.iocoder.yudao.framework.ai.midjourney.constants.MidjourneyMessageTypeEnum;
 import cn.iocoder.yudao.framework.ai.midjourney.util.MidjourneyUtil;
+import cn.iocoder.yudao.framework.ai.midjourney.webSocket.MidjourneyMessageHandler;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.utils.data.DataObject;
@@ -21,9 +21,16 @@ import java.util.List;
 public class MidjourneyMessageListener {
 
     private MidjourneyConfig midjourneyConfig;
+    private MidjourneyMessageHandler midjourneyMessageHandler = null;
 
     public MidjourneyMessageListener(MidjourneyConfig midjourneyConfig) {
         this.midjourneyConfig = midjourneyConfig;
+    }
+
+    public MidjourneyMessageListener(MidjourneyConfig midjourneyConfig,
+                                     MidjourneyMessageHandler midjourneyMessageHandler) {
+        this.midjourneyConfig = midjourneyConfig;
+        this.midjourneyMessageHandler = midjourneyMessageHandler;
     }
 
     public void onMessage(DataObject raw) {
@@ -35,7 +42,6 @@ public class MidjourneyMessageListener {
         if (ignoreAndLogMessage(data, messageType)) {
             return;
         }
-
         // 转换几个重要的信息
         MidjourneyMessage mjMessage = new MidjourneyMessage();
         mjMessage.setId(data.getString(MidjourneyConstants.MSG_ID));
@@ -56,9 +62,10 @@ public class MidjourneyMessageListener {
         }
         // 转换状态
         convertGenerateStatus(mjMessage);
-        //
-        log.info("message 信息 {}", JSONUtil.toJsonPrettyStr(mjMessage));
-        System.err.println(JSONUtil.toJsonPrettyStr(mjMessage));
+        // message handler 调用
+        if (midjourneyMessageHandler != null) {
+            midjourneyMessageHandler.messageHandler(mjMessage);
+        }
     }
 
     private void convertGenerateStatus(MidjourneyMessage mjMessage) {
