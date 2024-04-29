@@ -1,0 +1,84 @@
+{
+  "op": 0,
+  "s": 1112,
+  "t": "MESSAGE_UPDATE",
+  "d": {
+    "mention_everyone": false,
+    "pinned": false,
+    "components": [
+      {
+        "components": [
+          {
+            "custom_id": "MJ::CancelJob::ByJobid::a58fcee9-ec89-4471-aff3-088615fc78f2",
+            "style": 4,
+            "label": "Cancel Job",
+            "type": 2
+          }
+        ],
+        "type": 1
+      }
+    ],
+    "attachments": [],
+    "interaction_metadata": {
+      "user_id": "975372485971312700",
+      "interacted_message_id": "1234503859578081381",
+      "authorizing_integration_owners": {
+        "0": "1234355413420347402"
+      },
+      "id": "1234506142236020767",
+      "type": 3,
+      "user": {
+        "global_name": "禁止挂软件刷图，逮到删服务器，踢设备，永久拉黑！！！",
+        "avatar_decoration_data": null,
+        "clan": null,
+        "public_flags": 0,
+        "id": "975372485971312700",
+        "avatar": "90ab939feddeaea32e23d066ce66d0e6",
+        "username": "andrakosq9211",
+        "discriminator": "0"
+      }
+    },
+    "author": {
+      "global_name": null,
+      "bot": true,
+      "avatar_decoration_data": null,
+      "clan": null,
+      "public_flags": 589824,
+      "id": "936929561302675456",
+      "avatar": "f6ce562a6b4979c4b1cbc5b436d3be76",
+      "username": "Midjourney Bot",
+      "discriminator": "9282"
+    },
+    "flags": 64,
+    "type": 19,
+    "mention_roles": [],
+    "application_id": "936929561302675456",
+    "edited_timestamp": "2024-04-29T14:06:46.866376+00:00",
+    "content": "**A girl from China, creator of ancient Chinese clothing, dances on the square --v 6.0 --ar 3:2** - Variations (Strong) by <@975372485971312700> (0%) (relaxed)",
+    "tts": false,
+    "webhook_id": "936929561302675456",
+    "mentions": [
+      {
+        "global_name": "禁止挂软件刷图，逮到删服务器，踢设备，永久拉黑！！！",
+        "avatar_decoration_data": null,
+        "clan": null,
+        "public_flags": 0,
+        "id": "975372485971312700",
+        "avatar": "90ab939feddeaea32e23d066ce66d0e6",
+        "username": "andrakosq9211",
+        "discriminator": "0"
+      }
+    ],
+    "position": 0,
+    "message_reference": {
+      "guild_id": "1234355413420347402",
+      "message_id": "1234503859578081381",
+      "type": 0,
+      "channel_id": "1234380679576424448"
+    },
+    "id": "1234506143943102605",
+    "embeds": [],
+    "channel_id": "1234380679576424448",
+    "timestamp": "2024-04-29T14:06:40.731000+00:00"
+  }
+}
