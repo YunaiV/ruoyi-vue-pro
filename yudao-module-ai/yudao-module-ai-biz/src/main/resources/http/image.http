@@ -1,5 +1,24 @@
 
-### chat call
-GET {{baseUrl}}/ai/image/dallDrawing?modal=dall-e-2&size=256x256&prompt=中国长城
+### chat dallDrawing
+
+POST {{baseUrl}}/ai/image/dallDrawing
+Content-Type: application/json
 Authorization: {{token}}
 
+{
+  "modal": "dall-e-3",
+  "size": "1024x1024",
+  "style": "vivid",
+  "prompt": "中国长城"
+}
+
+
+### chat midjourney
+
+POST {{baseUrl}}/ai/image/midjourney
+Content-Type: application/json
+Authorization: {{token}}
+
+{
+  "prompt": "Mona Lisa, eating on a seat under a tree, wearing white clothes, smiling at the sky"
+}
