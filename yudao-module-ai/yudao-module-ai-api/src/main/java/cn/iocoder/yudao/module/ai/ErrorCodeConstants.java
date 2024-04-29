@@ -24,11 +24,11 @@ public interface ErrorCodeConstants {
     ErrorCode AI_CHAT_CONTINUE_NOT_EXIST = new ErrorCode(1_022_000_020, "chat对话不存在!");
     ErrorCode AI_CHAT_CONVERSATION_NOT_YOURS = new ErrorCode(1_022_000_021, "这条chat对话不是你的!");
 
-    ErrorCode AI_CHAT_ROLE_NOT_EXIST = new ErrorCode(1_022_000_040, "chatRole不存在!");
+    ErrorCode AI_MIDJOURNEY_IMAGINE_FAIL = new ErrorCode(1_022_000_040, "midjourney imagine 操作失败!");
 
+    ErrorCode AI_CHAT_ROLE_NOT_EXIST = new ErrorCode(1_022_000_060, "chatRole不存在!");
 
-
-    ErrorCode AI_MODAL_NOT_EXIST = new ErrorCode(1_022_000_060, "ai模型不存在!");
+    ErrorCode AI_MODAL_NOT_EXIST = new ErrorCode(1_022_000_080, "ai模型不存在!");
 
 
 }
