@@ -5100,7 +5100,7 @@ CREATE TABLE `system_sms_channel`  (
   `id` bigint NOT NULL AUTO_INCREMENT COMMENT '编号',
   `signature` varchar(12) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '短信签名',
   `code` varchar(63) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '渠道编码',
-  `status` tinyint NOT NULL COMMENT '开启状态',
+  `status` tinyint NOT NULL COMMENT '开启状态. 0: 启用, 1: 禁用',
   `remark` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT '备注',
   `api_key` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '短信 API 的账号',
   `api_secret` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT '短信 API 的秘钥',
@@ -5199,8 +5199,8 @@ COMMIT;
 DROP TABLE IF EXISTS `system_sms_template`;
 CREATE TABLE `system_sms_template`  (
   `id` bigint NOT NULL AUTO_INCREMENT COMMENT '编号',
-  `type` tinyint NOT NULL COMMENT '短信签名',
-  `status` tinyint NOT NULL COMMENT '开启状态',
+  `type` tinyint NOT NULL COMMENT '模板类型. 1: 验证码, 2: 通知, 3: 营销',
+  `status` tinyint NOT NULL COMMENT '开启状态. 0: 启用, 1: 禁用',
   `code` varchar(63) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '模板编码',
   `name` varchar(63) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '模板名称',
   `content` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '模板内容',
