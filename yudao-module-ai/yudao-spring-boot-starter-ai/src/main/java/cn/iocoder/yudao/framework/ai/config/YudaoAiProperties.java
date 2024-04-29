@@ -26,6 +26,7 @@ public class YudaoAiProperties {
     private XingHuoProperties xinghuo;
     private YiYanProperties yiyan;
     private OpenAiImageProperties openAiImage;
+    private MidjourneyProperties midjourney;
 
     @Data
     @Accessors(chain = true)
@@ -94,6 +95,8 @@ public class YudaoAiProperties {
     @Data
     @Accessors(chain = true)
     public static class OpenAiImageProperties {
+        private boolean enable = false;
+
         /**
          * api key
          */
@@ -106,5 +109,28 @@ public class YudaoAiProperties {
          * 风格
          */
         private OpenAiImageStyleEnum style = OpenAiImageStyleEnum.VIVID;
+    }
+
+    @Data
+    @Accessors(chain = true)
+    public static class MidjourneyProperties {
+        private boolean enable = false;
+
+        /**
+         * socket 链接地址
+         */
+        private String wssUrl = "wss://gateway.discord.gg";
+        /**
+         * token
+         */
+        private String token;
+        /**
+         * 服务id
+         */
+        private String guildId;
+        /**
+         * 频道id
+         */
+        private String channelId;
     }
 }

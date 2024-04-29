@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.framework.ai.config;
 
+import cn.hutool.core.io.IoUtil;
 import cn.iocoder.yudao.framework.ai.chatqianwen.QianWenChatClient;
 import cn.iocoder.yudao.framework.ai.chatqianwen.QianWenChatModal;
 import cn.iocoder.yudao.framework.ai.chatqianwen.QianWenOptions;
@@ -13,10 +14,21 @@ import cn.iocoder.yudao.framework.ai.chatyiyan.api.YiYanApi;
 import cn.iocoder.yudao.framework.ai.imageopenai.OpenAiImageApi;
 import cn.iocoder.yudao.framework.ai.imageopenai.OpenAiImageClient;
 import cn.iocoder.yudao.framework.ai.imageopenai.OpenAiImageOptions;
+import cn.iocoder.yudao.framework.ai.midjourney.MidjourneyConfig;
+import cn.iocoder.yudao.framework.ai.midjourney.api.MidjourneyInteractionsApi;
+import cn.iocoder.yudao.framework.ai.midjourney.webSocket.MidjourneyWebSocketStarter;
+import cn.iocoder.yudao.framework.ai.midjourney.webSocket.listener.MidjourneyMessageListener;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
+import org.springframework.core.io.Resource;
+
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * ai 自动配置
@@ -102,5 +114,46 @@ public class YudaoAiAutoConfiguration {
                         .setResponseFormat(OpenAiImageOptions.ResponseFormatEnum.URL.getValue())
                         .setStyle(openAiImageProperties.getStyle())
         );
+    }
+
+    @Bean
+    @ConditionalOnProperty(value = "yudao.ai.midjourney.enable", havingValue = "true")
+    public MidjourneyWebSocketStarter midjourneyWebSocketStarter(ApplicationContext applicationContext, YudaoAiProperties yudaoAiProperties) {
+        // 获取 midjourneyProperties
+        YudaoAiProperties.MidjourneyProperties midjourneyProperties = yudaoAiProperties.getMidjourney();
+        // 获取 midjourneyConfig
+        MidjourneyConfig midjourneyConfig = getMidjourneyConfig(applicationContext, midjourneyProperties);
+        // 创建 socket messageListener
+        MidjourneyMessageListener messageListener = new MidjourneyMessageListener(midjourneyConfig);
+        // 创建 MidjourneyWebSocketStarter
+        return new MidjourneyWebSocketStarter(midjourneyProperties.getWssUrl(), null, midjourneyConfig, messageListener);
+    }
+
+    @Bean
+    @ConditionalOnProperty(value = "yudao.ai.midjourney.enable", havingValue = "true")
+    public MidjourneyInteractionsApi midjourneyInteractionsApi(ApplicationContext applicationContext, YudaoAiProperties yudaoAiProperties) {
+        // 获取 midjourneyConfig
+        MidjourneyConfig midjourneyConfig = getMidjourneyConfig(applicationContext, yudaoAiProperties.getMidjourney());
+        // 创建 MidjourneyInteractionsApi
+        return new MidjourneyInteractionsApi(midjourneyConfig);
+    }
+
+
+    private static @NotNull MidjourneyConfig getMidjourneyConfig(ApplicationContext applicationContext,
+                                                                 YudaoAiProperties.MidjourneyProperties midjourneyProperties) {
+        Map<String, String> requestTemplates = new HashMap<>();
+        try {
+            Resource[] resources = applicationContext.getResources("classpath:http-body/*.json");
+            for (var resource : resources) {
+                String filename = resource.getFilename();
+                String params = IoUtil.readUtf8(resource.getInputStream());
+                requestTemplates.put(filename.substring(0, filename.length() - 5), params);
+            }
+        } catch (IOException e) {
+            throw new IllegalArgumentException("Midjourney json模板初始化出错! " + e.getMessage());
+        }
+        // 创建 midjourneyConfig
+        return new MidjourneyConfig(midjourneyProperties.getToken(),
+                midjourneyProperties.getGuildId(), midjourneyProperties.getChannelId(), requestTemplates);
     }
 }
