@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.framework.ai.midjourney;
 
 import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.util.IdUtil;
 import cn.iocoder.yudao.framework.ai.midjourney.api.MidjourneyInteractionsApi;
 import cn.iocoder.yudao.framework.ai.midjourney.api.req.AttachmentsReq;
 import cn.iocoder.yudao.framework.ai.midjourney.api.req.DescribeReq;
@@ -39,7 +40,7 @@ public class MidjourneyInteractionsTests {
     @Test
     public void mjImageTest() {
         MidjourneyInteractionsApi mjImagineInteractions = new MidjourneyInteractionsApi(midjourneyConfig);
-        mjImagineInteractions.imagine("童话里应该是什么样子？");
+        mjImagineInteractions.imagine(IdUtil.getSnowflakeNextId(), "童话里应该是什么样子？");
     }
 
 
