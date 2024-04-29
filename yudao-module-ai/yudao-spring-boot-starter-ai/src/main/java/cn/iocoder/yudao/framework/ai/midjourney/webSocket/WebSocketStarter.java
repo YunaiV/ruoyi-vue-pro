@@ -3,6 +3,6 @@ package cn.iocoder.yudao.framework.ai.midjourney.webSocket;
 
 public interface WebSocketStarter {
 
-	void start() throws Exception;
+	void start(WssNotify wssNotify) throws Exception;
 
 }
