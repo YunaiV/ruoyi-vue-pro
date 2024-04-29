@@ -5,9 +5,11 @@ import cn.hutool.core.lang.Assert;
 import cn.hutool.core.lang.TypeReference;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.ArrayUtil;
+import cn.hutool.core.util.BooleanUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.simple.BpmSimpleModelNodeVO;
 import cn.iocoder.yudao.module.bpm.enums.definition.BpmApproveMethodEnum;
+import cn.iocoder.yudao.module.bpm.enums.definition.BpmSimpleModeConditionType;
 import cn.iocoder.yudao.module.bpm.enums.definition.BpmSimpleModelNodeType;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnModelConstants;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.SimpleModelConstants;
@@ -20,6 +22,7 @@ import java.util.Map;
 
 import static cn.iocoder.yudao.module.bpm.enums.definition.BpmSimpleModelNodeType.END_EVENT;
 import static cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnModelConstants.FORM_FIELD_PERMISSION_ELEMENT;
+import static cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.SimpleModelConstants.*;
 import static org.flowable.bpmn.constants.BpmnXMLConstants.FLOWABLE_EXTENSIONS_NAMESPACE;
 import static org.flowable.bpmn.constants.BpmnXMLConstants.FLOWABLE_EXTENSIONS_PREFIX;
 
@@ -57,16 +60,15 @@ public class SimpleModelUtils {
         mainProcess.setName(processName);
         mainProcess.setExecutable(Boolean.TRUE);
         bpmnModel.addProcess(mainProcess);
-        // 前端模型数据结构。 有 start event 节点. 没有 end event 节点。
+        // 前端模型数据结构。
         // 从 SimpleModel 构建 FlowNode 并添加到 Main Process
         buildAndAddBpmnFlowNode(simpleModelNode, mainProcess);
         // 找到 end event
         EndEvent endEvent = (EndEvent) CollUtil.findOne(mainProcess.getFlowElements(), item -> item instanceof EndEvent);
         if (endEvent == null) {
-            // 暂时为了兼容 单独构建 end event 节点
+            // TODO 暂时为了兼容 单独构建 end event 节点. 后面去掉
             endEvent = buildAndAddBpmnEndEvent(mainProcess);
         }
-
         // 构建并添加节点之间的连线 Sequence Flow
         buildAndAddBpmnSequenceFlow(mainProcess, simpleModelNode, endEvent.getId());
         // 自动布局
@@ -75,14 +77,14 @@ public class SimpleModelUtils {
     }
 
     private static void buildAndAddBpmnSequenceFlow(Process mainProcess, BpmSimpleModelNodeVO node, String targetId) {
-        // 节点为 null 退出
+        // 节点为 null 或者 为END_EVENT 退出
         if (node == null || node.getId() == null || END_EVENT.getType().equals(node.getType())) {
             return;
         }
         BpmSimpleModelNodeVO childNode = node.getChildNode();
-        // 如果不是网关节点、且后续节点为 null. 添加与结束节点的连线
+        // 如果是网关分支节点. 后续节点可能为 null。但不是 END_EVENT 节点
         if (!BpmSimpleModelNodeType.isBranchNode(node.getType()) && (childNode == null || childNode.getId() == null)) {
-            SequenceFlow sequenceFlow = buildBpmnSequenceFlow(node.getId(), targetId, null, null);
+            SequenceFlow sequenceFlow = buildBpmnSequenceFlow(node.getId(), targetId, null, null, null);
             mainProcess.addFlowElement(sequenceFlow);
             return;
         }
@@ -94,7 +96,7 @@ public class SimpleModelUtils {
             case COPY_TASK:
             case PARALLEL_GATEWAY_JOIN:
             case INCLUSIVE_GATEWAY_JOIN: {
-                SequenceFlow sequenceFlow = buildBpmnSequenceFlow(node.getId(), childNode.getId(), null, null);
+                SequenceFlow sequenceFlow = buildBpmnSequenceFlow(node.getId(), childNode.getId(), null, null, null);
                 mainProcess.addFlowElement(sequenceFlow);
                 // 递归调用后续节点
                 buildAndAddBpmnSequenceFlow(mainProcess, childNode, targetId);
@@ -103,21 +105,21 @@ public class SimpleModelUtils {
             case PARALLEL_GATEWAY_FORK:
             case EXCLUSIVE_GATEWAY:
             case INCLUSIVE_GATEWAY_FORK: {
-                String sequenceFlowTargetId = (childNode == null || childNode.getId() == null) ? BpmnModelConstants.END_EVENT_ID : childNode.getId();
+                String sequenceFlowTargetId = (childNode == null || childNode.getId() == null) ? targetId : childNode.getId();
                 List<BpmSimpleModelNodeVO> conditionNodes = node.getConditionNodes();
                 Assert.notEmpty(conditionNodes, "网关节点的条件节点不能为空");
-                for (int i = 0; i < conditionNodes.size(); i++) {
-                    BpmSimpleModelNodeVO item = conditionNodes.get(i);
+                for (BpmSimpleModelNodeVO item : conditionNodes) {
+                    String conditionExpression = buildConditionExpression(item);
                     BpmSimpleModelNodeVO nextNodeOnCondition = item.getChildNode();
                     if (nextNodeOnCondition != null && nextNodeOnCondition.getId() != null) {
                         SequenceFlow sequenceFlow = buildBpmnSequenceFlow(node.getId(), nextNodeOnCondition.getId(),
-                                String.format("%s_SequenceFlow_%d", node.getId(), i + 1), null);
+                                item.getId(), item.getName(), conditionExpression);
                         mainProcess.addFlowElement(sequenceFlow);
                         // 递归调用后续节点
                         buildAndAddBpmnSequenceFlow(mainProcess, nextNodeOnCondition, sequenceFlowTargetId);
                     } else {
                         SequenceFlow sequenceFlow = buildBpmnSequenceFlow(node.getId(), sequenceFlowTargetId,
-                                String.format("%s_SequenceFlow_%d", node.getId(), i + 1), null);
+                                item.getId(), item.getName(), conditionExpression);
                         mainProcess.addFlowElement(sequenceFlow);
                     }
                 }
@@ -132,13 +134,33 @@ public class SimpleModelUtils {
 
     }
 
-    private static SequenceFlow buildBpmnSequenceFlow(String sourceId, String targetId, String seqFlowId, String conditionExpression) {
+    /**
+     * 构造条件表达式
+     *
+     * @param conditionNode 条件节点
+     */
+    private static String buildConditionExpression(BpmSimpleModelNodeVO conditionNode) {
+        Integer conditionType = MapUtil.getInt(conditionNode.getAttributes(), CONDITION_TYPE_ATTRIBUTE);
+        BpmSimpleModeConditionType conditionTypeEnum = BpmSimpleModeConditionType.valueOf(conditionType);
+        String conditionExpression = null;
+        if (conditionTypeEnum == BpmSimpleModeConditionType.CUSTOM_EXPRESSION) {
+            conditionExpression = MapUtil.getStr(conditionNode.getAttributes(), CONDITION_EXPRESSION_ATTRIBUTE);
+        }
+        // TODO 待增加其它类型
+        return conditionExpression;
+
+    }
+
+    private static SequenceFlow buildBpmnSequenceFlow(String sourceId, String targetId, String seqFlowId, String seqName, String conditionExpression) {
         SequenceFlow sequenceFlow = new SequenceFlow(sourceId, targetId);
         if (StrUtil.isNotEmpty(conditionExpression)) {
             sequenceFlow.setConditionExpression(conditionExpression);
         }
         if (StrUtil.isNotEmpty(seqFlowId)) {
             sequenceFlow.setId(seqFlowId);
+        }
+        if (StrUtil.isNotEmpty(seqName)) {
+            sequenceFlow.setName(seqName);
         }
         return sequenceFlow;
     }
@@ -249,8 +271,12 @@ public class SimpleModelUtils {
         Assert.notEmpty(node.getConditionNodes(), "网关节点的条件节点不能为空");
         ExclusiveGateway exclusiveGateway = new ExclusiveGateway();
         exclusiveGateway.setId(node.getId());
-        // 网关的最后一个条件为 网关的 default sequence flow
-        exclusiveGateway.setDefaultFlow(String.format("%s_SequenceFlow_%d", node.getId(), node.getConditionNodes().size()));
+        // 寻找默认的序列流
+        BpmSimpleModelNodeVO defaultSeqFlow = CollUtil.findOne(node.getConditionNodes(),
+                item -> BooleanUtil.isTrue(MapUtil.getBool(item.getAttributes(), DEFAULT_FLOW_ATTRIBUTE)));
+        if (defaultSeqFlow != null) {
+            exclusiveGateway.setDefaultFlow(defaultSeqFlow.getId());
+        }
         return exclusiveGateway;
     }
 

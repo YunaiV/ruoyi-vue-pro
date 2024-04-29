@@ -12,4 +12,19 @@ public interface SimpleModelConstants {
      * 审批方式属性
      */
     String APPROVE_METHOD_ATTRIBUTE = "approveMethod";
+
+    /**
+     * 网关节点默认序列流属性
+     */
+    String DEFAULT_FLOW_ATTRIBUTE = "defaultFlow";
+
+    /**
+     * 条件节点的条件类型属性
+     */
+    String CONDITION_TYPE_ATTRIBUTE = "conditionType";
+
+    /**
+     * 条件节点条件表达式属性
+     */
+    String CONDITION_EXPRESSION_ATTRIBUTE = "conditionExpression";
 }
