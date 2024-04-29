@@ -31,6 +31,7 @@ public class MidjourneyUtil {
         // 南极应该是什么样子？
         // "**南极应该是什么样子？ --v 6.0 --style raw** - <@972721304891453450> (32%) (fast, stealth)",
         // "**南极应该是什么样子？ --v 6.0 --style raw** - <@972721304891453450> (fast, stealth)"
+        // Upscaling image #3 with **A girl from China, creator of ancient Chinese clothing, dances on the square** - <@975372485971312700> (Waiting to start)
         MidjourneyMessage.Content mjContent = new MidjourneyMessage.Content();
         if (CharSequenceUtil.isBlank(content)) {
             return null;
