@@ -28,5 +28,5 @@ public interface AiImageService {
      * @param req
      * @return
      */
-    AiImageMidjourneyRes midjourney(AiImageMidjourneyReq req);
+    void midjourney(AiImageMidjourneyReq req);
 }

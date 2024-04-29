@@ -95,18 +95,15 @@ public class AiImageServiceImpl implements AiImageService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public AiImageMidjourneyRes midjourney(AiImageMidjourneyReq req) {
+    public void midjourney(AiImageMidjourneyReq req) {
         // 保存数据库
-        doSave(req.getPrompt(), null, "midjoureny",
+        AiImageDO aiImageDO = doSave(req.getPrompt(), null, "midjoureny",
                 null, AiChatDrawingStatusEnum.SUBMIT, null);
         // 提交 midjourney 任务
-        Boolean imagine = midjourneyInteractionsApi.imagine(req.getPrompt());
+        Boolean imagine = midjourneyInteractionsApi.imagine(aiImageDO.getId(), req.getPrompt());
         if (!imagine) {
             throw ServiceExceptionUtil.exception(ErrorCodeConstants.AI_MIDJOURNEY_IMAGINE_FAIL);
         }
-        //
-
-        return null;
     }
 
     private static void sendSseEmitter(Utf8SseEmitter sseEmitter, Object object) {
@@ -120,7 +117,7 @@ public class AiImageServiceImpl implements AiImageService {
         }
     }
 
-    private void doSave(String prompt,
+    private AiImageDO doSave(String prompt,
                         String size,
                         String model,
                         String imageUrl,
@@ -138,5 +135,6 @@ public class AiImageServiceImpl implements AiImageService {
         aiImageDO.setDrawingStatus(drawingStatusEnum.getStatus());
         aiImageDO.setDrawingError(drawingError);
         aiImageMapper.insert(aiImageDO);
+        return aiImageDO;
     }
 }

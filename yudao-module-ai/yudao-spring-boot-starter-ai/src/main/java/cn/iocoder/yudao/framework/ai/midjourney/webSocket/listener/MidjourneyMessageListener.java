@@ -42,12 +42,14 @@ public class MidjourneyMessageListener {
         if (ignoreAndLogMessage(data, messageType)) {
             return;
         }
+        log.info("socket message: {}", raw);
         // 转换几个重要的信息
         MidjourneyMessage mjMessage = new MidjourneyMessage();
-        mjMessage.setId(data.getString(MidjourneyConstants.MSG_ID));
+        mjMessage.setId(getString(data, MidjourneyConstants.MSG_ID, ""));
+        mjMessage.setNonce(getString(data, MidjourneyConstants.MSG_NONCE, ""));
         mjMessage.setType(data.getInt(MidjourneyConstants.MSG_TYPE));
         mjMessage.setRawData(StrUtil.str(raw.toJson(), "UTF-8"));
-		mjMessage.setContent(MidjourneyUtil.parseContent(data.getString(MidjourneyConstants.MSG_CONTENT)));
+        mjMessage.setContent(MidjourneyUtil.parseContent(data.getString(MidjourneyConstants.MSG_CONTENT)));
         // 转换 components
         if (!data.getArray(MidjourneyConstants.MSG_COMPONENTS).isEmpty()) {
             String componentsJson = StrUtil.str(data.getArray(MidjourneyConstants.MSG_COMPONENTS).toJson(), "UTF-8");
@@ -60,6 +62,12 @@ public class MidjourneyMessageListener {
             List<MidjourneyMessage.Attachment> attachments = JsonUtils.parseArray(attachmentsJson, MidjourneyMessage.Attachment.class);
             mjMessage.setAttachments(attachments);
         }
+        // 转换 embeds 提示信息
+        if (!data.getArray(MidjourneyConstants.MSG_EMBEDS).isEmpty()) {
+            String embedJson = StrUtil.str(data.getArray(MidjourneyConstants.MSG_EMBEDS).toJson(), "UTF-8");
+            List<MidjourneyMessage.Embed> embeds = JsonUtils.parseArray(embedJson, MidjourneyMessage.Embed.class);
+            mjMessage.setEmbeds(embeds);
+        }
         // 转换状态
         convertGenerateStatus(mjMessage);
         // message handler 调用
@@ -68,7 +76,20 @@ public class MidjourneyMessageListener {
         }
     }
 
+    private String getString(DataObject data, String key, String defaultValue) {
+        if (!data.hasKey(key)) {
+            return defaultValue;
+        }
+        return data.getString(key);
+    }
+
     private void convertGenerateStatus(MidjourneyMessage mjMessage) {
+        //
+        // tip：提示、警告、异常 content是没有内容的
+        // tip: 一般错误信息在 Embeds 只要 Embeds有值，content就没信息。
+        if (CollUtil.isNotEmpty(mjMessage.getEmbeds())) {
+            return;
+        }
         if (mjMessage.getType() == 20 && mjMessage.getContent().getStatus().contains("Waiting")) {
             mjMessage.setGenerateStatus(MidjourneyGennerateStatusEnum.WAITING.getStatus());
         } else if (mjMessage.getType() == 20 && !StrUtil.isBlank(mjMessage.getContent().getProgress())) {

@@ -7,6 +7,10 @@ public final class MidjourneyConstants {
 	 */
 	public static final String MSG_ID = "id";
 	/**
+	 * 用于区分操作唯一性
+	 */
+	public static final String MSG_NONCE = "nonce";
+	/**
 	 * 消息 - 类型
 	 * 现在已知：
 	 * 0：我们发送的消息，和指令
@@ -32,6 +36,10 @@ public final class MidjourneyConstants {
 	 * 附件(生成中比较模糊的图片)
 	 */
 	public static final String MSG_ATTACHMENTS = "attachments";
+	/**
+	 * 一般用于提示
+	 */
+	public static final String MSG_EMBEDS = "embeds";
 
 
 	//

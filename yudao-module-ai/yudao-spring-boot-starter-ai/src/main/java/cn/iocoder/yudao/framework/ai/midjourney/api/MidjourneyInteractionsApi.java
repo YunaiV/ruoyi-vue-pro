@@ -38,11 +38,13 @@ public class MidjourneyInteractionsApi extends MidjourneyInteractions {
         this.url = midjourneyConfig.getServerUrl().concat(midjourneyConfig.getApiInteractions());
     }
 
-    public Boolean imagine(String prompt) {
+    public Boolean imagine(Long id, String prompt) {
+        String nonce = String.valueOf(id);
         // 获取请求模板
         String requestTemplate = midjourneyConfig.getRequestTemplates().get("imagine");
         // 设置参数
         HashMap<String, String> requestParams = getDefaultParams();
+        requestParams.put("nonce", nonce);
         requestParams.put("prompt", prompt);
         // 解析 template 参数占位符
         String requestBody = MidjourneyUtil.parseTemplate(requestTemplate, requestParams);

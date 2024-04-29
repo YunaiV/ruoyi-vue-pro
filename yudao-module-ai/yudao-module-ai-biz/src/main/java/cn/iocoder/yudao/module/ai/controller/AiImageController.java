@@ -4,7 +4,6 @@ import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.module.ai.service.AiImageService;
 import cn.iocoder.yudao.module.ai.vo.AiImageDallDrawingReq;
 import cn.iocoder.yudao.module.ai.vo.AiImageMidjourneyReq;
-import cn.iocoder.yudao.module.ai.vo.AiImageMidjourneyRes;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
@@ -42,7 +41,8 @@ public class AiImageController {
 
     @Operation(summary = "midjourney", description = "midjourney图片绘画流程：1、提交任务 2、获取完成的任务 3、选择对应功能 4、获取最终结果")
     @PostMapping("/midjourney")
-    public CommonResult<AiImageMidjourneyRes> midjourney(@Validated @RequestBody AiImageMidjourneyReq req) {
-        return CommonResult.success(aiImageService.midjourney(req));
+    public CommonResult<Void> midjourney(@Validated @RequestBody AiImageMidjourneyReq req) {
+        aiImageService.midjourney(req);
+        return CommonResult.success(null);
     }
 }

@@ -15,6 +15,10 @@ public class MidjourneyMessage {
 	 */
 	private String id;
 	/**
+	 * 提交id(nonce 可能会不存在，系统提示的时候，这个为空)
+	 */
+	private String nonce;
+	/**
 	 * 现在已知：
 	 * 0：我们发送的消息，和指令
 	 * 20: mj生成图片发送过程中
@@ -45,6 +49,14 @@ public class MidjourneyMessage {
 	 * {@link MidjourneyGennerateStatusEnum}
 	 */
 	private String generateStatus;
+	/**
+	 * 一般用于提示信息
+	 * - 错误
+	 * - 并发队列满了
+	 * - 账号违规了、敏感词
+	 * - 账号被封
+	 */
+	private List<Embed> embeds;
 
 	@Data
 	@Accessors(chain = true)
@@ -122,5 +134,40 @@ public class MidjourneyMessage {
 		private String prompt;
 		private String progress;
 		private String status;
+	}
+
+	/**
+	 * embed 用于警告、提示、错误
+	 */
+	@Data
+	@Accessors(chain = true)
+	public static class Embed {
+
+		// 内容扫描版本号
+		private int contentScanVersion;
+
+		// 颜色值，这里用Java的Color类来表示，注意实际使用中可能需要自定义方法来从int转换为Color对象
+		private String color;
+
+		// 页脚信息，包含文本
+		private Footer footer;
+
+		// 描述信息
+		private String description;
+
+		// 消息类型，这里是富文本类型(这个区分不同提示类型)
+		private String type;
+
+		// 标题
+		private String title;
+
+		// Footer类，作为嵌套类存在，用来表示footer部分的JSON对象
+		@Data
+		@Accessors(chain = true)
+		public static class Footer {
+			// 页脚文本
+			private String text;
+		}
+
 	}
 }
