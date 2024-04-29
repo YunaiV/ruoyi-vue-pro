@@ -1,0 +1,94 @@
+{
+  "op": 0,
+  "s": 34,
+  "t": "MESSAGE_CREATE",
+  "d": {
+    "mention_everyone": false,
+    "pinned": false,
+    "components": [
+      {
+        "components": [
+          {
+            "custom_id": "MJ::Job::Retry::64a7ec94-9607-492e-99ac-8550a4e7faf2",
+            "style": 2,
+            "label": "Resubmit",
+            "type": 2
+          }
+        ],
+        "type": 1
+      }
+    ],
+    "attachments": [],
+    "interaction_metadata": {
+      "user_id": "976067621160108072",
+      "name": "imagine",
+      "authorizing_integration_owners": {
+        "0": "1234483730148626542"
+      },
+      "id": "1234491017005105172",
+      "type": 2,
+      "user": {
+        "global_name": "Sequoiab",
+        "avatar_decoration_data": null,
+        "clan": null,
+        "public_flags": 0,
+        "id": "976067621160108072",
+        "avatar": "2ef47ed59695ff8bcdc2254f5189b70c",
+        "username": "sequoiab2281",
+        "discriminator": "0"
+      }
+    },
+    "author": {
+      "global_name": null,
+      "bot": true,
+      "avatar_decoration_data": null,
+      "clan": null,
+      "public_flags": 589824,
+      "id": "936929561302675456",
+      "avatar": "f6ce562a6b4979c4b1cbc5b436d3be76",
+      "username": "Midjourney Bot",
+      "discriminator": "9282"
+    },
+    "flags": 64,
+    "type": 20,
+    "mention_roles": [],
+    "nonce": "1234491015356743680",
+    "application_id": "936929561302675456",
+    "edited_timestamp": null,
+    "content": "",
+    "tts": false,
+    "webhook_id": "936929561302675456",
+    "mentions": [],
+    "interaction": {
+      "name": "imagine",
+      "id": "1234491017005105172",
+      "type": 2,
+      "user": {
+        "global_name": "Sequoiab",
+        "avatar_decoration_data": null,
+        "clan": null,
+        "public_flags": 0,
+        "id": "976067621160108072",
+        "avatar": "2ef47ed59695ff8bcdc2254f5189b70c",
+        "username": "sequoiab2281",
+        "discriminator": "0"
+      }
+    },
+    "position": 0,
+    "id": "1234491019211575376",
+    "embeds": [
+      {
+        "content_scan_version": 0,
+        "color": 16711680,
+        "footer": {
+          "text": "/imagine Doctor Strange vs. Ultraman --v 6"
+        },
+        "description": "Your job queue is full. Please wait for a job to finish first, then resubmit this one.",
+        "type": "rich",
+        "title": "Queue full"
+      }
+    ],
+    "channel_id": "1234490728575533057",
+    "timestamp": "2024-04-29T13:06:34.714000+00:00"
+  }
+}
