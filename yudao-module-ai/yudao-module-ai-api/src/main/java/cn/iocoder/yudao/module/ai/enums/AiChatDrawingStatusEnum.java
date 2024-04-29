@@ -15,6 +15,8 @@ import lombok.Getter;
 public enum AiChatDrawingStatusEnum {
 
     SUBMIT("submit", "提交任务"),
+    WAITING("waiting", "等待"),
+    IN_PROGRESS("in_progress", "进行中"),
     COMPLETE("complete", "完成"),
     FAIL("fail", "失败"),
 
