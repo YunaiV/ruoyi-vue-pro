@@ -38,8 +38,8 @@ services:
         volumes:
             - postgres:/var/lib/postgresql/data
             # 注入初始化脚本
-            - ./postgresql/quartz.sql:/docker-entrypoint-initdb.d/quartz.sql:ro
-            - ./postgresql/ruoyi-vue-pro.sql:/docker-entrypoint-initdb.d/ruoyi-vue-pro.sql:ro
+            - ../postgresql/quartz.sql:/docker-entrypoint-initdb.d/quartz.sql:ro
+            - ../postgresql/ruoyi-vue-pro.sql:/docker-entrypoint-initdb.d/ruoyi-vue-pro.sql:ro
 
     oracle:
         image: gvenzl/oracle-xe:18-slim-faststart
@@ -49,10 +49,10 @@ services:
         ports:
             - "1521:1521"
         volumes:
-            - ./oracle/ruoyi-vue-pro.sql:/tmp/schema.sql:ro
+            - ../oracle/ruoyi-vue-pro.sql:/tmp/schema.sql:ro
             # 创建app用户: ROOT/123456@//localhost/XEPDB1
-            - ./_docker/oracle/1_create_user.sql:/docker-entrypoint-initdb.d/1_create_user.sql:ro
-            - ./_docker/oracle/2_create_schema.sh:/docker-entrypoint-initdb.d/2_create_schema.sh:ro
+            - ./oracle/1_create_user.sql:/docker-entrypoint-initdb.d/1_create_user.sql:ro
+            - ./oracle/2_create_schema.sh:/docker-entrypoint-initdb.d/2_create_schema.sh:ro
 
     sqlserver:
         image: mcr.microsoft.com/mssql/server:2017-latest
@@ -65,6 +65,6 @@ services:
             - "1433:1433"
         volumes:
             - sqlserver:/var/opt/mssql
-            - ./sqlserver/ruoyi-vue-pro.sql:/tmp/schema.sql:ro
+            - ../sqlserver/ruoyi-vue-pro.sql:/tmp/schema.sql:ro
             # docker compose exec sqlserver bash /tmp/create_schema.sh
-            - ./_docker/sqlserver/create_schema.sh:/tmp/create_schema.sh:ro
+            - ./sqlserver/create_schema.sh:/tmp/create_schema.sh:ro
