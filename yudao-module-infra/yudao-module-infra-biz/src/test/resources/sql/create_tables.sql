@@ -24,9 +24,9 @@ CREATE TABLE IF NOT EXISTS "infra_file_config" (
     "master" bit(1) NOT NULL,
     "config" varchar(4096) NOT NULL,
     "creator" varchar(64) DEFAULT '',
-    "create_time" datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "create_time" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updater" varchar(64) DEFAULT '',
-    "update_time" datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    "update_time" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     "deleted" bit NOT NULL DEFAULT FALSE,
     PRIMARY KEY ("id")
 ) COMMENT '文件配置表';
@@ -59,9 +59,9 @@ CREATE TABLE IF NOT EXISTS "infra_job" (
     "retry_interval" int(11) NOT NULL DEFAULT '0' COMMENT '重试间隔',
     "monitor_timeout" int(11) NOT NULL DEFAULT '0' COMMENT '监控超时时间',
     "creator" varchar(64) DEFAULT '' COMMENT '创建者',
-    "create_time" datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    "create_time" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     "updater" varchar(64) DEFAULT '' COMMENT '更新者',
-    "update_time" datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    "update_time" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
     "deleted" bit NOT NULL DEFAULT FALSE COMMENT '是否删除',
     PRIMARY KEY ("id")
 ) COMMENT='定时任务表';
@@ -72,15 +72,15 @@ CREATE TABLE IF NOT EXISTS "infra_job_log" (
     "handler_name" varchar(64) NOT NULL COMMENT '处理器的名字',
     "handler_param" varchar(255) DEFAULT NULL COMMENT '处理器的参数',
     "execute_index" tinyint(4) NOT NULL DEFAULT '1' COMMENT '第几次执行',
-    "begin_time" datetime NOT NULL COMMENT '开始执行时间',
-    "end_time" datetime DEFAULT NULL COMMENT '结束执行时间',
+    "begin_time" timestamp NOT NULL COMMENT '开始执行时间',
+    "end_time" timestamp DEFAULT NULL COMMENT '结束执行时间',
     "duration" int(11) DEFAULT NULL COMMENT '执行时长',
     "status" tinyint(4) NOT NULL COMMENT '任务状态',
     "result" varchar(4000) DEFAULT '' COMMENT '结果数据',
     "creator" varchar(64) DEFAULT '' COMMENT '创建者',
-    "create_time" datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    "create_time" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     "updater" varchar(64) DEFAULT '' COMMENT '更新者',
-    "update_time" datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    "update_time" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
     "deleted" bit(1) NOT NULL DEFAULT FALSE COMMENT '是否删除',
     PRIMARY KEY ("id")
 )COMMENT='定时任务日志表';
@@ -97,9 +97,9 @@ CREATE TABLE IF NOT EXISTS "infra_api_access_log" (
     "response_body" varchar(8000) not null default '',
     "user_ip" varchar(50) not null,
     "user_agent" varchar(512) not null,
-    `operate_module`           varchar(50)   NOT NULL,
-    `operate_name`             varchar(50)   NOT NULL,
-    `operate_type`     bigint(4)     NOT NULL DEFAULT '0',
+    `operate_module` varchar(50) NOT NULL,
+    `operate_name` varchar(50) NOT NULL,
+    `operate_type` bigint(4) NOT NULL DEFAULT '0',
     "begin_time" timestamp not null,
     "end_time" timestamp not null,
     "duration" integer not null,
@@ -153,9 +153,9 @@ CREATE TABLE IF NOT EXISTS "infra_data_source_config" (
     "username" varchar(255) NOT NULL,
     "password" varchar(255) NOT NULL,
     "creator" varchar(64) DEFAULT '',
-    "create_time" datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "create_time" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updater" varchar(64) DEFAULT '',
-    "update_time" datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    "update_time" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     "deleted" bit NOT NULL DEFAULT FALSE,
     PRIMARY KEY ("id")
 ) COMMENT '数据源配置表';
@@ -181,9 +181,9 @@ CREATE TABLE IF NOT EXISTS "infra_codegen_table" (
     "tree_parent_column_id" bigint not null,
     "tree_name_column_id" bigint not null,
     "creator" varchar(64) DEFAULT '',
-    "create_time" datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "create_time" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updater" varchar(64) DEFAULT '',
-    "update_time" datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    "update_time" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     "deleted" bit NOT NULL DEFAULT FALSE,
     PRIMARY KEY ("id")
 ) COMMENT '代码生成表定义表';
@@ -208,9 +208,9 @@ CREATE TABLE IF NOT EXISTS "infra_codegen_column" (
     "list_operation_result" bit not null,
     "html_type" varchar(32) NOT NULL,
     "creator" varchar(64) DEFAULT '',
-    "create_time" datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "create_time" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updater" varchar(64) DEFAULT '',
-    "update_time" datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    "update_time" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     "deleted" bit NOT NULL DEFAULT FALSE,
     PRIMARY KEY ("id")
 ) COMMENT '代码生成表字段定义表';
