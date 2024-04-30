@@ -23,8 +23,6 @@
 <!--        <module>yudao-module-mall</module>-->
 <!--        <module>yudao-module-crm</module>-->
 <!--        <module>yudao-module-erp</module>-->
-        <!-- 示例项目 -->
-<!--        <module>yudao-example</module>-->
     </modules>
 
     <name>${project.artifactId}</name>
