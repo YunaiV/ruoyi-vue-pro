@@ -49,12 +49,15 @@ public class DatabaseTableServiceImpl implements DatabaseTableService {
         // 使用 MyBatis Plus Generator 解析表结构
         DataSourceConfig dataSourceConfig = new DataSourceConfig.Builder(config.getUrl(), config.getUsername(),
                 config.getPassword()).build();
-        StrategyConfig.Builder strategyConfig = new StrategyConfig.Builder();
+        StrategyConfig.Builder strategyConfig = new StrategyConfig.Builder().enableSkipView(); // 忽略视图，业务上一般用不到
         if (StrUtil.isNotEmpty(name)) {
             strategyConfig.addInclude(name);
         } else {
-            // 移除工作流和定时任务前缀的表名 // TODO 未来做成可配置
+            // 移除工作流和定时任务前缀的表名
             strategyConfig.addExclude("ACT_[\\S\\s]+|QRTZ_[\\S\\s]+|FLW_[\\S\\s]+");
+            // 移除 ORACLE 相关的系统表
+            strategyConfig.addExclude("IMPDP_[\\S\\s]+|ALL_[\\S\\s]+|HS_[\\S\\\\s]+");
+            strategyConfig.addExclude("[\\S\\s]+\\$[\\S\\s]+|[\\S\\s]+\\$"); // 表里不能有 $，一般有都是系统的表
         }
 
         GlobalConfig globalConfig = new GlobalConfig.Builder().dateType(DateType.TIME_PACK).build(); // 只使用 LocalDateTime 类型，不使用 LocalDate
