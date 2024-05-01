@@ -177,7 +177,7 @@ public class CrmBusinessController {
                 buildBusinessDetailList(list));
     }
 
-    private List<CrmBusinessRespVO> buildBusinessDetailList(List<CrmBusinessDO> list) {
+    public List<CrmBusinessRespVO> buildBusinessDetailList(List<CrmBusinessDO> list) {
         if (CollUtil.isEmpty(list)) {
             return Collections.emptyList();
         }
