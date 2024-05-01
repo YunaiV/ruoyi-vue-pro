@@ -227,27 +227,27 @@ public class LocalDateTimeUtils {
         // 2. 循环，生成时间范围
         List<LocalDateTime[]> timeRanges = new ArrayList<>();
         switch (intervalEnum) {
-            case DateIntervalEnum.DAY:
+            case DAY:
                 while (startTime.isBefore(endTime)) {
                     timeRanges.add(new LocalDateTime[]{startTime, startTime.plusDays(1).minusNanos(1)});
                     startTime = startTime.plusDays(1);
                 }
                 break;
-            case DateIntervalEnum.WEEK:
+            case WEEK:
                 while (startTime.isBefore(endTime)) {
                     LocalDateTime endOfWeek = startTime.with(DayOfWeek.SUNDAY).plusDays(1).minusNanos(1);
                     timeRanges.add(new LocalDateTime[]{startTime, endOfWeek});
                     startTime = endOfWeek.plusNanos(1);
                 }
                 break;
-            case DateIntervalEnum.MONTH:
+            case MONTH:
                 while (startTime.isBefore(endTime)) {
                     LocalDateTime endOfMonth = startTime.with(TemporalAdjusters.lastDayOfMonth()).plusDays(1).minusNanos(1);
                     timeRanges.add(new LocalDateTime[]{startTime, endOfMonth});
                     startTime = endOfMonth.plusNanos(1);
                 }
                 break;
-            case DateIntervalEnum.QUARTER:
+            case QUARTER:
                 while (startTime.isBefore(endTime)) {
                     int quarterOfYear = getQuarterOfYear(startTime);
                     LocalDateTime quarterEnd = quarterOfYear == 4
@@ -257,7 +257,7 @@ public class LocalDateTimeUtils {
                     startTime = quarterEnd.plusNanos(1);
                 }
                 break;
-            case DateIntervalEnum.YEAR:
+            case YEAR:
                 while (startTime.isBefore(endTime)) {
                     LocalDateTime endOfYear = startTime.with(TemporalAdjusters.lastDayOfYear()).plusDays(1).minusNanos(1);
                     timeRanges.add(new LocalDateTime[]{startTime, endOfYear});
@@ -290,16 +290,16 @@ public class LocalDateTimeUtils {
 
         // 2. 循环，生成时间范围
         switch (intervalEnum) {
-            case DateIntervalEnum.DAY:
+            case DAY:
                 return LocalDateTimeUtil.format(startTime, DatePattern.NORM_DATE_PATTERN);
-            case DateIntervalEnum.WEEK:
+            case WEEK:
                 return LocalDateTimeUtil.format(startTime, DatePattern.NORM_DATE_PATTERN)
                         + StrUtil.format("(第 {} 周)", LocalDateTimeUtil.weekOfYear(startTime));
-            case DateIntervalEnum.MONTH:
+            case MONTH:
                 return LocalDateTimeUtil.format(startTime, DatePattern.NORM_MONTH_PATTERN);
-            case DateIntervalEnum.QUARTER:
+            case QUARTER:
                 return StrUtil.format("{}-Q{}", startTime.getYear(), getQuarterOfYear(startTime));
-            case DateIntervalEnum.YEAR:
+            case YEAR:
                 return LocalDateTimeUtil.format(startTime, DatePattern.NORM_YEAR_PATTERN);
             default:
                 throw new IllegalArgumentException("Invalid interval: " + interval);

@@ -23,8 +23,6 @@
 <!--        <module>yudao-module-mall</module>-->
 <!--        <module>yudao-module-crm</module>-->
 <!--        <module>yudao-module-erp</module>-->
-        <!-- 示例项目 -->
-<!--        <module>yudao-example</module>-->
     </modules>
 
     <name>${project.artifactId}</name>
@@ -34,7 +32,7 @@
     <properties>
         <revision>2.0.1-snapshot</revision>
         <!-- Maven 相关 -->
-        <java.version>21</java.version>
+        <java.version>17</java.version>
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
         <maven-surefire-plugin.version>3.2.2</maven-surefire-plugin.version>
