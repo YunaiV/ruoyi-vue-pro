@@ -1,0 +1,8 @@
+# 忽略python虚拟环境
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
