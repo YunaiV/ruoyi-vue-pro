@@ -245,7 +245,7 @@ public class TradePriceCalculatorHelper {
      * @return 分摊金额数组，和传入的 orderItems 一一对应
      */
     public static List<Integer> dividePrice2(List<TradeOrderItemDO> items, Integer price) {
-        Integer total = getSumValue(items, TradeOrderItemDO::getPrice, Integer::sum);
+        Integer total = getSumValue(items, TradeOrderItemDO::getPayPrice, Integer::sum);
         assert total != null;
         // 遍历每一个，进行分摊
         List<Integer> prices = new ArrayList<>(items.size());
@@ -254,15 +254,11 @@ public class TradePriceCalculatorHelper {
             TradeOrderItemDO orderItem = items.get(i);
             int partPrice;
             if (i < items.size() - 1) { // 减一的原因，是因为拆分时，如果按照比例，可能会出现.所以最后一个，使用反减
-                // partPrice = (int) (price * (1.0D * orderItem.getPayPrice() / total));
-                // pr fix:  改为了使用订单原价来计算比例
                 partPrice = (int) (price * (1.0D * orderItem.getPrice() / total));
                 remainPrice -= partPrice;
             } else {
                 partPrice = remainPrice;
             }
-            // TODO puhui999: 如果是减价的情况这里过不了
-            // Assert.isTrue(partPrice >= 0, "分摊金额必须大于等于 0");
             prices.add(partPrice);
         }
         return prices;

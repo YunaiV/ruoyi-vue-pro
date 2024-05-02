@@ -88,7 +88,7 @@ public class DeliveryExpressTemplateServiceImpl implements DeliveryExpressTempla
         List<DeliveryExpressTemplateFreeDO> oldList = expressTemplateFreeMapper.selectListByTemplateId(templateId);
         List<DeliveryExpressTemplateFreeDO> newList = INSTANCE.convertTemplateFreeList(templateId, frees);
         List<List<DeliveryExpressTemplateFreeDO>> diffList = CollectionUtils.diffList(oldList, newList,
-                (oldVal, newVal) -> ObjectUtil.equal(oldVal.getId(), newVal.getTemplateId()));
+                (oldVal, newVal) -> ObjectUtil.equal(oldVal.getId(), newVal.getId()));
 
         // 第二步，批量添加、修改、删除
         if (CollUtil.isNotEmpty(diffList.get(0))) {

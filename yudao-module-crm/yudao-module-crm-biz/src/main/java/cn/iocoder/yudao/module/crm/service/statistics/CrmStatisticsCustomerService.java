@@ -93,4 +93,20 @@ public interface CrmStatisticsCustomerService {
      */
     List<CrmStatisticsCustomerDealCycleByUserRespVO> getCustomerDealCycleByUser(CrmStatisticsCustomerReqVO reqVO);
 
+    /**
+     * 客户成交周期(按区域)
+     *
+     * @param reqVO 请求参数
+     * @return 统计数据
+     */
+    List<CrmStatisticsCustomerDealCycleByAreaRespVO> getCustomerDealCycleByArea(CrmStatisticsCustomerReqVO reqVO);
+
+    /**
+     * 客户成交周期(按产品)
+     *
+     * @param reqVO 请求参数
+     * @return 统计数据
+     */
+    List<CrmStatisticsCustomerDealCycleByProductRespVO> getCustomerDealCycleByProduct(CrmStatisticsCustomerReqVO reqVO);
+
 }
