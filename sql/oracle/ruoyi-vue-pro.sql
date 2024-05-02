@@ -1,6 +1,17 @@
+/*
+ Yudao Database Transfer Tool
+
+ Source Server Type    : MySQL
+
+ Target Server Type    : Oracle
+
+ Date: 2024-05-02 00:10:33
+*/
+
+
 -- ----------------------------
--- infra_api_access_log
--- ------------------------------
+-- Table structure for infra_api_access_log
+-- ----------------------------
 CREATE TABLE infra_api_access_log
 (
     id               number                                  NOT NULL,
@@ -36,9 +47,12 @@ ALTER TABLE infra_api_access_log
 CREATE INDEX idx_infra_api_access_log_01 ON infra_api_access_log (create_time);
 
 COMMENT ON COLUMN infra_api_access_log.id IS '日志主键';
+COMMENT ON COLUMN infra_api_access_log.trace_id IS '链路追踪编号';
 COMMENT ON COLUMN infra_api_access_log.user_id IS '用户编号';
 COMMENT ON COLUMN infra_api_access_log.user_type IS '用户类型';
 COMMENT ON COLUMN infra_api_access_log.application_name IS '应用名';
+COMMENT ON COLUMN infra_api_access_log.request_method IS '请求方法名';
+COMMENT ON COLUMN infra_api_access_log.request_url IS '请求地址';
 COMMENT ON COLUMN infra_api_access_log.request_params IS '请求参数';
 COMMENT ON COLUMN infra_api_access_log.response_body IS '响应结果';
 COMMENT ON COLUMN infra_api_access_log.user_ip IS '用户 IP';
@@ -50,19 +64,21 @@ COMMENT ON COLUMN infra_api_access_log.begin_time IS '开始请求时间';
 COMMENT ON COLUMN infra_api_access_log.end_time IS '结束请求时间';
 COMMENT ON COLUMN infra_api_access_log.duration IS '执行时长';
 COMMENT ON COLUMN infra_api_access_log.result_code IS '结果码';
+COMMENT ON COLUMN infra_api_access_log.result_msg IS '结果提示';
+COMMENT ON COLUMN infra_api_access_log.creator IS '创建者';
 COMMENT ON COLUMN infra_api_access_log.create_time IS '创建时间';
+COMMENT ON COLUMN infra_api_access_log.updater IS '更新者';
 COMMENT ON COLUMN infra_api_access_log.update_time IS '更新时间';
+COMMENT ON COLUMN infra_api_access_log.deleted IS '是否删除';
 COMMENT ON COLUMN infra_api_access_log.tenant_id IS '租户编号';
 COMMENT ON TABLE infra_api_access_log IS 'API 访问日志表';
 
 CREATE SEQUENCE infra_api_access_log_seq
-    START WITH 1
-    INCREMENT BY 1;
-
+    START WITH 1;
 
 -- ----------------------------
--- infra_api_error_log
--- ------------------------------
+-- Table structure for infra_api_error_log
+-- ----------------------------
 CREATE TABLE infra_api_error_log
 (
     id                           number                                  NOT NULL,
@@ -113,6 +129,9 @@ COMMENT ON COLUMN infra_api_error_log.request_params IS '请求参数';
 COMMENT ON COLUMN infra_api_error_log.user_ip IS '用户 IP';
 COMMENT ON COLUMN infra_api_error_log.user_agent IS '浏览器 UA';
 COMMENT ON COLUMN infra_api_error_log.exception_time IS '异常发生时间';
+COMMENT ON COLUMN infra_api_error_log.exception_name IS '异常名
+     *
+     * {@link Throwable#getClass()} 的类全名';
 COMMENT ON COLUMN infra_api_error_log.exception_message IS '异常导致的消息
      *
      * {@link cn.iocoder.common.framework.util.ExceptionUtil#getMessage(Throwable)}';
@@ -137,19 +156,20 @@ COMMENT ON COLUMN infra_api_error_log.exception_line_number IS '异常发生的�
 COMMENT ON COLUMN infra_api_error_log.process_status IS '处理状态';
 COMMENT ON COLUMN infra_api_error_log.process_time IS '处理时间';
 COMMENT ON COLUMN infra_api_error_log.process_user_id IS '处理用户编号';
+COMMENT ON COLUMN infra_api_error_log.creator IS '创建者';
 COMMENT ON COLUMN infra_api_error_log.create_time IS '创建时间';
+COMMENT ON COLUMN infra_api_error_log.updater IS '更新者';
 COMMENT ON COLUMN infra_api_error_log.update_time IS '更新时间';
+COMMENT ON COLUMN infra_api_error_log.deleted IS '是否删除';
 COMMENT ON COLUMN infra_api_error_log.tenant_id IS '租户编号';
 COMMENT ON TABLE infra_api_error_log IS '系统异常日志';
 
 CREATE SEQUENCE infra_api_error_log_seq
-    START WITH 1
-    INCREMENT BY 1;
-
+    START WITH 1;
 
 -- ----------------------------
--- infra_codegen_column
--- ------------------------------
+-- Table structure for infra_codegen_column
+-- ----------------------------
 CREATE TABLE infra_codegen_column
 (
     id                       number                                  NOT NULL,
@@ -190,24 +210,27 @@ COMMENT ON COLUMN infra_codegen_column.primary_key IS '是否主键';
 COMMENT ON COLUMN infra_codegen_column.ordinal_position IS '排序';
 COMMENT ON COLUMN infra_codegen_column.java_type IS 'Java 属性类型';
 COMMENT ON COLUMN infra_codegen_column.java_field IS 'Java 属性名';
+COMMENT ON COLUMN infra_codegen_column.dict_type IS '字典类型';
 COMMENT ON COLUMN infra_codegen_column.example IS '数据示例';
 COMMENT ON COLUMN infra_codegen_column.create_operation IS '是否为 Create 创建操作的字段';
 COMMENT ON COLUMN infra_codegen_column.update_operation IS '是否为 Update 更新操作的字段';
 COMMENT ON COLUMN infra_codegen_column.list_operation IS '是否为 List 查询操作的字段';
+COMMENT ON COLUMN infra_codegen_column.list_operation_condition IS 'List 查询操作的条件类型';
 COMMENT ON COLUMN infra_codegen_column.list_operation_result IS '是否为 List 查询操作的返回字段';
 COMMENT ON COLUMN infra_codegen_column.html_type IS '显示类型';
+COMMENT ON COLUMN infra_codegen_column.creator IS '创建者';
 COMMENT ON COLUMN infra_codegen_column.create_time IS '创建时间';
+COMMENT ON COLUMN infra_codegen_column.updater IS '更新者';
 COMMENT ON COLUMN infra_codegen_column.update_time IS '更新时间';
+COMMENT ON COLUMN infra_codegen_column.deleted IS '是否删除';
 COMMENT ON TABLE infra_codegen_column IS '代码生成表字段定义';
 
 CREATE SEQUENCE infra_codegen_column_seq
-    START WITH 1
-    INCREMENT BY 1;
-
+    START WITH 1;
 
 -- ----------------------------
--- infra_codegen_table
--- ------------------------------
+-- Table structure for infra_codegen_table
+-- ----------------------------
 CREATE TABLE infra_codegen_table
 (
     id                    number                                  NOT NULL,
@@ -242,9 +265,12 @@ ALTER TABLE infra_codegen_table
 COMMENT ON COLUMN infra_codegen_table.id IS '编号';
 COMMENT ON COLUMN infra_codegen_table.data_source_config_id IS '数据源配置的编号';
 COMMENT ON COLUMN infra_codegen_table.scene IS '生成场景';
+COMMENT ON COLUMN infra_codegen_table.table_name IS '表名称';
+COMMENT ON COLUMN infra_codegen_table.table_comment IS '表描述';
 COMMENT ON COLUMN infra_codegen_table.remark IS '备注';
 COMMENT ON COLUMN infra_codegen_table.module_name IS '模块名';
 COMMENT ON COLUMN infra_codegen_table.business_name IS '业务名';
+COMMENT ON COLUMN infra_codegen_table.class_name IS '类名称';
 COMMENT ON COLUMN infra_codegen_table.class_comment IS '类描述';
 COMMENT ON COLUMN infra_codegen_table.author IS '作者';
 COMMENT ON COLUMN infra_codegen_table.template_type IS '模板类型';
@@ -255,18 +281,19 @@ COMMENT ON COLUMN infra_codegen_table.sub_join_column_id IS '子表关联主表�
 COMMENT ON COLUMN infra_codegen_table.sub_join_many IS '主表与子表是否一对多';
 COMMENT ON COLUMN infra_codegen_table.tree_parent_column_id IS '树表的父字段编号';
 COMMENT ON COLUMN infra_codegen_table.tree_name_column_id IS '树表的名字字段编号';
+COMMENT ON COLUMN infra_codegen_table.creator IS '创建者';
 COMMENT ON COLUMN infra_codegen_table.create_time IS '创建时间';
+COMMENT ON COLUMN infra_codegen_table.updater IS '更新者';
 COMMENT ON COLUMN infra_codegen_table.update_time IS '更新时间';
+COMMENT ON COLUMN infra_codegen_table.deleted IS '是否删除';
 COMMENT ON TABLE infra_codegen_table IS '代码生成表定义';
 
 CREATE SEQUENCE infra_codegen_table_seq
-    START WITH 1
-    INCREMENT BY 1;
-
+    START WITH 1;
 
 -- ----------------------------
--- infra_config
--- ------------------------------
+-- Table structure for infra_config
+-- ----------------------------
 CREATE TABLE infra_config
 (
     id          number                                  NOT NULL,
@@ -290,12 +317,21 @@ ALTER TABLE infra_config
 COMMENT ON COLUMN infra_config.id IS '参数主键';
 COMMENT ON COLUMN infra_config.category IS '参数分组';
 COMMENT ON COLUMN infra_config.type IS '参数类型';
+COMMENT ON COLUMN infra_config.name IS '参数名称';
+COMMENT ON COLUMN infra_config.config_key IS '参数键名';
+COMMENT ON COLUMN infra_config.value IS '参数键值';
 COMMENT ON COLUMN infra_config.visible IS '是否可见';
 COMMENT ON COLUMN infra_config.remark IS '备注';
+COMMENT ON COLUMN infra_config.creator IS '创建者';
 COMMENT ON COLUMN infra_config.create_time IS '创建时间';
+COMMENT ON COLUMN infra_config.updater IS '更新者';
 COMMENT ON COLUMN infra_config.update_time IS '更新时间';
+COMMENT ON COLUMN infra_config.deleted IS '是否删除';
 COMMENT ON TABLE infra_config IS '参数配置表';
 
+-- ----------------------------
+-- Records of infra_config
+-- ----------------------------
 -- @formatter:off
 INSERT INTO infra_config (id, category, type, name, config_key, value, visible, remark, creator, create_time, updater, update_time, deleted) VALUES (2, 'biz', 1, '用户管理-账号初始密码', 'sys.user.init-password', '123456', '0', '初始化密码 123456', 'admin', to_date('2021-01-05 17:03:48', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-04-03 17:22:28', 'SYYYY-MM-DD HH24:MI:SS'), '0');
 INSERT INTO infra_config (id, category, type, name, config_key, value, visible, remark, creator, create_time, updater, update_time, deleted) VALUES (7, 'url', 2, 'MySQL 监控的地址', 'url.druid', '', '1', '', '1', to_date('2023-04-07 13:41:16', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-04-07 14:33:38', 'SYYYY-MM-DD HH24:MI:SS'), '0');
@@ -308,13 +344,11 @@ COMMIT;
 -- @formatter:on
 
 CREATE SEQUENCE infra_config_seq
-    START WITH 13
-    INCREMENT BY 1;
-
+    START WITH 13;
 
 -- ----------------------------
--- infra_data_source_config
--- ------------------------------
+-- Table structure for infra_data_source_config
+-- ----------------------------
 CREATE TABLE infra_data_source_config
 (
     id          number                                  NOT NULL,
@@ -333,232 +367,23 @@ ALTER TABLE infra_data_source_config
     ADD CONSTRAINT pk_infra_data_source_config PRIMARY KEY (id);
 
 COMMENT ON COLUMN infra_data_source_config.id IS '主键编号';
+COMMENT ON COLUMN infra_data_source_config.name IS '参数名称';
 COMMENT ON COLUMN infra_data_source_config.url IS '数据源连接';
 COMMENT ON COLUMN infra_data_source_config.username IS '用户名';
+COMMENT ON COLUMN infra_data_source_config.password IS '密码';
+COMMENT ON COLUMN infra_data_source_config.creator IS '创建者';
 COMMENT ON COLUMN infra_data_source_config.create_time IS '创建时间';
+COMMENT ON COLUMN infra_data_source_config.updater IS '更新者';
 COMMENT ON COLUMN infra_data_source_config.update_time IS '更新时间';
+COMMENT ON COLUMN infra_data_source_config.deleted IS '是否删除';
 COMMENT ON TABLE infra_data_source_config IS '数据源配置表';
 
 CREATE SEQUENCE infra_data_source_config_seq
-    START WITH 1
-    INCREMENT BY 1;
-
+    START WITH 1;
 
 -- ----------------------------
--- infra_demo01_contact
--- ------------------------------
-CREATE TABLE infra_demo01_contact
-(
-    id          number                                  NOT NULL,
-    name        varchar2(100) DEFAULT ''                NULL,
-    sex         smallint                                NOT NULL,
-    birthday    date                                    NOT NULL,
-    description varchar2(255)                           NOT NULL,
-    avatar      varchar2(512) DEFAULT NULL              NULL,
-    creator     varchar2(64)  DEFAULT ''                NULL,
-    create_time date          DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updater     varchar2(64)  DEFAULT ''                NULL,
-    update_time date          DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    deleted     number(1, 0)  DEFAULT 0                 NOT NULL,
-    tenant_id   number        DEFAULT 0                 NOT NULL
-);
-
-ALTER TABLE infra_demo01_contact
-    ADD CONSTRAINT pk_infra_demo01_contact PRIMARY KEY (id);
-
-COMMENT ON COLUMN infra_demo01_contact.id IS '编号';
-COMMENT ON COLUMN infra_demo01_contact.sex IS '性别';
-COMMENT ON COLUMN infra_demo01_contact.birthday IS '出生年';
-COMMENT ON COLUMN infra_demo01_contact.description IS '简介';
-COMMENT ON COLUMN infra_demo01_contact.avatar IS '头像';
-COMMENT ON COLUMN infra_demo01_contact.create_time IS '创建时间';
-COMMENT ON COLUMN infra_demo01_contact.update_time IS '更新时间';
-COMMENT ON COLUMN infra_demo01_contact.tenant_id IS '租户编号';
-COMMENT ON TABLE infra_demo01_contact IS '示例联系人表';
-
--- @formatter:off
-INSERT INTO infra_demo01_contact (id, name, sex, birthday, description, avatar, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1, '土豆', 2, to_date('2023-11-07 00:00:00', 'SYYYY-MM-DD HH24:MI:SS'), '<p>天蚕土豆！呀</p>', 'http://127.0.0.1:48080/admin-api/infra/file/4/get/46f8fa1a37db3f3960d8910ff2fe3962ab3b2db87cf2f8ccb4dc8145b8bdf237.jpeg', '1', to_date('2023-11-15 23:34:30', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-11-15 23:47:39', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-COMMIT;
--- @formatter:on
-
-CREATE SEQUENCE infra_demo01_contact_seq
-    START WITH 2
-    INCREMENT BY 1;
-
-
+-- Table structure for infra_file
 -- ----------------------------
--- infra_demo02_category
--- ------------------------------
-CREATE TABLE infra_demo02_category
-(
-    id          number                                  NOT NULL,
-    name        varchar2(100) DEFAULT ''                NULL,
-    parent_id   number                                  NOT NULL,
-    creator     varchar2(64)  DEFAULT ''                NULL,
-    create_time date          DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updater     varchar2(64)  DEFAULT ''                NULL,
-    update_time date          DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    deleted     number(1, 0)  DEFAULT 0                 NOT NULL,
-    tenant_id   number        DEFAULT 0                 NOT NULL
-);
-
-ALTER TABLE infra_demo02_category
-    ADD CONSTRAINT pk_infra_demo02_category PRIMARY KEY (id);
-
-COMMENT ON COLUMN infra_demo02_category.id IS '编号';
-COMMENT ON COLUMN infra_demo02_category.parent_id IS '父级编号';
-COMMENT ON COLUMN infra_demo02_category.create_time IS '创建时间';
-COMMENT ON COLUMN infra_demo02_category.update_time IS '更新时间';
-COMMENT ON COLUMN infra_demo02_category.tenant_id IS '租户编号';
-COMMENT ON TABLE infra_demo02_category IS '示例分类表';
-
--- @formatter:off
-INSERT INTO infra_demo02_category (id, name, parent_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1, '土豆', 0, '1', to_date('2023-11-15 23:34:30', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-11-16 20:24:23', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO infra_demo02_category (id, name, parent_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2, '番茄', 0, '1', to_date('2023-11-16 20:24:00', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-11-16 20:24:15', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO infra_demo02_category (id, name, parent_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3, '怪怪', 0, '1', to_date('2023-11-16 20:24:32', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-11-16 20:24:32', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO infra_demo02_category (id, name, parent_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4, '小番茄', 2, '1', to_date('2023-11-16 20:24:39', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-11-16 20:24:39', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO infra_demo02_category (id, name, parent_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (5, '大番茄', 2, '1', to_date('2023-11-16 20:24:46', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-11-16 20:24:46', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO infra_demo02_category (id, name, parent_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6, '11', 3, '1', to_date('2023-11-24 19:29:34', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-11-24 19:29:34', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-COMMIT;
--- @formatter:on
-
-CREATE SEQUENCE infra_demo02_category_seq
-    START WITH 7
-    INCREMENT BY 1;
-
-
--- ----------------------------
--- infra_demo03_course
--- ------------------------------
-CREATE TABLE infra_demo03_course
-(
-    id          number                                  NOT NULL,
-    student_id  number                                  NOT NULL,
-    name        varchar2(100) DEFAULT ''                NULL,
-    score       smallint                                NOT NULL,
-    creator     varchar2(64)  DEFAULT ''                NULL,
-    create_time date          DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updater     varchar2(64)  DEFAULT ''                NULL,
-    update_time date          DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    deleted     number(1, 0)  DEFAULT 0                 NOT NULL,
-    tenant_id   number        DEFAULT 0                 NOT NULL
-);
-
-ALTER TABLE infra_demo03_course
-    ADD CONSTRAINT pk_infra_demo03_course PRIMARY KEY (id);
-
-COMMENT ON COLUMN infra_demo03_course.id IS '编号';
-COMMENT ON COLUMN infra_demo03_course.student_id IS '学生编号';
-COMMENT ON COLUMN infra_demo03_course.score IS '分数';
-COMMENT ON COLUMN infra_demo03_course.create_time IS '创建时间';
-COMMENT ON COLUMN infra_demo03_course.update_time IS '更新时间';
-COMMENT ON COLUMN infra_demo03_course.tenant_id IS '租户编号';
-COMMENT ON TABLE infra_demo03_course IS '学生课程表';
-
--- @formatter:off
-INSERT INTO infra_demo03_course (id, student_id, name, score, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2, 2, '语文', 66, '1', to_date('2023-11-16 23:21:49', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-11-16 23:21:49', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO infra_demo03_course (id, student_id, name, score, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3, 2, '数学', 22, '1', to_date('2023-11-16 23:21:49', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-11-16 23:21:49', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO infra_demo03_course (id, student_id, name, score, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6, 5, '体育', 23, '1', to_date('2023-11-16 23:22:46', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-11-16 15:44:40', 'SYYYY-MM-DD HH24:MI:SS'), '1', 1);
-INSERT INTO infra_demo03_course (id, student_id, name, score, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (7, 5, '计算机', 11, '1', to_date('2023-11-16 23:22:46', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-11-16 15:44:40', 'SYYYY-MM-DD HH24:MI:SS'), '1', 1);
-INSERT INTO infra_demo03_course (id, student_id, name, score, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (8, 5, '体育', 23, '1', to_date('2023-11-16 23:22:46', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-11-16 15:47:09', 'SYYYY-MM-DD HH24:MI:SS'), '1', 1);
-INSERT INTO infra_demo03_course (id, student_id, name, score, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (9, 5, '计算机', 11, '1', to_date('2023-11-16 23:22:46', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-11-16 15:47:09', 'SYYYY-MM-DD HH24:MI:SS'), '1', 1);
-INSERT INTO infra_demo03_course (id, student_id, name, score, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (10, 5, '体育', 23, '1', to_date('2023-11-16 23:22:46', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-11-16 23:47:10', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO infra_demo03_course (id, student_id, name, score, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (11, 5, '计算机', 11, '1', to_date('2023-11-16 23:22:46', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-11-16 23:47:10', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO infra_demo03_course (id, student_id, name, score, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (12, 2, '电脑', 33, '1', to_date('2023-11-17 00:20:42', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-11-16 16:20:45', 'SYYYY-MM-DD HH24:MI:SS'), '1', 1);
-INSERT INTO infra_demo03_course (id, student_id, name, score, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (13, 9, '滑雪', 12, '1', to_date('2023-11-17 13:13:20', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-11-17 13:13:20', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-COMMIT;
--- @formatter:on
-
-CREATE SEQUENCE infra_demo03_course_seq
-    START WITH 14
-    INCREMENT BY 1;
-
-
--- ----------------------------
--- infra_demo03_grade
--- ------------------------------
-CREATE TABLE infra_demo03_grade
-(
-    id          number                                  NOT NULL,
-    student_id  number                                  NOT NULL,
-    name        varchar2(100) DEFAULT ''                NULL,
-    teacher     varchar2(255)                           NOT NULL,
-    creator     varchar2(64)  DEFAULT ''                NULL,
-    create_time date          DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updater     varchar2(64)  DEFAULT ''                NULL,
-    update_time date          DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    deleted     number(1, 0)  DEFAULT 0                 NOT NULL,
-    tenant_id   number        DEFAULT 0                 NOT NULL
-);
-
-ALTER TABLE infra_demo03_grade
-    ADD CONSTRAINT pk_infra_demo03_grade PRIMARY KEY (id);
-
-COMMENT ON COLUMN infra_demo03_grade.id IS '编号';
-COMMENT ON COLUMN infra_demo03_grade.student_id IS '学生编号';
-COMMENT ON COLUMN infra_demo03_grade.teacher IS '班主任';
-COMMENT ON COLUMN infra_demo03_grade.create_time IS '创建时间';
-COMMENT ON COLUMN infra_demo03_grade.update_time IS '更新时间';
-COMMENT ON COLUMN infra_demo03_grade.tenant_id IS '租户编号';
-COMMENT ON TABLE infra_demo03_grade IS '学生班级表';
-
--- @formatter:off
-INSERT INTO infra_demo03_grade (id, student_id, name, teacher, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (7, 2, '三年 2 班', '周杰伦', '1', to_date('2023-11-16 23:21:49', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-11-16 23:21:49', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO infra_demo03_grade (id, student_id, name, teacher, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (8, 5, '华为', '遥遥领先', '1', to_date('2023-11-16 23:22:46', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-11-16 23:47:10', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO infra_demo03_grade (id, student_id, name, teacher, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (9, 9, '小图', '小娃111', '1', to_date('2023-11-17 13:10:23', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-11-17 13:10:23', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-COMMIT;
--- @formatter:on
-
-CREATE SEQUENCE infra_demo03_grade_seq
-    START WITH 10
-    INCREMENT BY 1;
-
-
--- ----------------------------
--- infra_demo03_student
--- ------------------------------
-CREATE TABLE infra_demo03_student
-(
-    id          number                                  NOT NULL,
-    name        varchar2(100) DEFAULT ''                NULL,
-    sex         smallint                                NOT NULL,
-    birthday    date                                    NOT NULL,
-    description varchar2(255)                           NOT NULL,
-    creator     varchar2(64)  DEFAULT ''                NULL,
-    create_time date          DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updater     varchar2(64)  DEFAULT ''                NULL,
-    update_time date          DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    deleted     number(1, 0)  DEFAULT 0                 NOT NULL,
-    tenant_id   number        DEFAULT 0                 NOT NULL
-);
-
-ALTER TABLE infra_demo03_student
-    ADD CONSTRAINT pk_infra_demo03_student PRIMARY KEY (id);
-
-COMMENT ON COLUMN infra_demo03_student.id IS '编号';
-COMMENT ON COLUMN infra_demo03_student.sex IS '性别';
-COMMENT ON COLUMN infra_demo03_student.birthday IS '出生日期';
-COMMENT ON COLUMN infra_demo03_student.description IS '简介';
-COMMENT ON COLUMN infra_demo03_student.create_time IS '创建时间';
-COMMENT ON COLUMN infra_demo03_student.update_time IS '更新时间';
-COMMENT ON COLUMN infra_demo03_student.tenant_id IS '租户编号';
-COMMENT ON TABLE infra_demo03_student IS '学生表';
-
--- @formatter:off
-INSERT INTO infra_demo03_student (id, name, sex, birthday, description, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2, '小白', 1, to_date('2023-11-16 00:00:00', 'SYYYY-MM-DD HH24:MI:SS'), '<p>厉害</p>', '1', to_date('2023-11-16 23:21:49', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-11-17 16:49:06', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO infra_demo03_student (id, name, sex, birthday, description, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (5, '大黑', 2, to_date('2023-11-13 00:00:00', 'SYYYY-MM-DD HH24:MI:SS'), '<p>你在教我做事?</p>', '1', to_date('2023-11-16 23:22:46', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-11-17 16:49:07', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO infra_demo03_student (id, name, sex, birthday, description, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (9, '小花', 1, to_date('2023-11-07 00:00:00', 'SYYYY-MM-DD HH24:MI:SS'), '<p>哈哈哈</p>', '1', to_date('2023-11-17 00:04:47', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-11-17 16:49:08', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-COMMIT;
--- @formatter:on
-
-CREATE SEQUENCE infra_demo03_student_seq
-    START WITH 10
-    INCREMENT BY 1;
-
-
--- ----------------------------
--- infra_file
--- ------------------------------
 CREATE TABLE infra_file
 (
     id          number                                  NOT NULL,
@@ -585,18 +410,19 @@ COMMENT ON COLUMN infra_file.path IS '文件路径';
 COMMENT ON COLUMN infra_file.url IS '文件 URL';
 COMMENT ON COLUMN infra_file.type IS '文件类型';
 COMMENT ON COLUMN infra_file.size IS '文件大小';
+COMMENT ON COLUMN infra_file.creator IS '创建者';
 COMMENT ON COLUMN infra_file.create_time IS '创建时间';
+COMMENT ON COLUMN infra_file.updater IS '更新者';
 COMMENT ON COLUMN infra_file.update_time IS '更新时间';
+COMMENT ON COLUMN infra_file.deleted IS '是否删除';
 COMMENT ON TABLE infra_file IS '文件表';
 
 CREATE SEQUENCE infra_file_seq
-    START WITH 1
-    INCREMENT BY 1;
-
+    START WITH 1;
 
 -- ----------------------------
--- infra_file_config
--- ------------------------------
+-- Table structure for infra_file_config
+-- ----------------------------
 CREATE TABLE infra_file_config
 (
     id          number                                  NOT NULL,
@@ -621,10 +447,16 @@ COMMENT ON COLUMN infra_file_config.storage IS '存储器';
 COMMENT ON COLUMN infra_file_config.remark IS '备注';
 COMMENT ON COLUMN infra_file_config.master IS '是否为主配置';
 COMMENT ON COLUMN infra_file_config.config IS '存储配置';
+COMMENT ON COLUMN infra_file_config.creator IS '创建者';
 COMMENT ON COLUMN infra_file_config.create_time IS '创建时间';
+COMMENT ON COLUMN infra_file_config.updater IS '更新者';
 COMMENT ON COLUMN infra_file_config.update_time IS '更新时间';
+COMMENT ON COLUMN infra_file_config.deleted IS '是否删除';
 COMMENT ON TABLE infra_file_config IS '文件配置表';
 
+-- ----------------------------
+-- Records of infra_file_config
+-- ----------------------------
 -- @formatter:off
 INSERT INTO infra_file_config (id, name, storage, remark, master, config, creator, create_time, updater, update_time, deleted) VALUES (4, '数据库', 1, '我是数据库', '0', '{"@class":"cn.iocoder.yudao.module.infra.framework.file.core.client.db.DBFileClientConfig","domain":"http://127.0.0.1:48080"}', '1', to_date('2022-03-15 23:56:24', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-02-28 22:54:07', 'SYYYY-MM-DD HH24:MI:SS'), '0');
 INSERT INTO infra_file_config (id, name, storage, remark, master, config, creator, create_time, updater, update_time, deleted) VALUES (22, '七牛存储器', 20, '', '1', '{"@class":"cn.iocoder.yudao.module.infra.framework.file.core.client.s3.S3FileClientConfig","endpoint":"s3.cn-south-1.qiniucs.com","domain":"http://test.yudao.iocoder.cn","bucket":"ruoyi-vue-pro","accessKey":"3TvrJ70gl2Gt6IBe7_IZT1F6i_k0iMuRtyEv4EyS","accessSecret":"wd0tbVBYlp0S-ihA8Qg2hPLncoP83wyrIq24OZuY"}', '1', to_date('2024-01-13 22:11:12', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-04-03 19:38:34', 'SYYYY-MM-DD HH24:MI:SS'), '0');
@@ -632,13 +464,11 @@ COMMIT;
 -- @formatter:on
 
 CREATE SEQUENCE infra_file_config_seq
-    START WITH 23
-    INCREMENT BY 1;
-
+    START WITH 23;
 
 -- ----------------------------
--- infra_file_content
--- ------------------------------
+-- Table structure for infra_file_content
+-- ----------------------------
 CREATE TABLE infra_file_content
 (
     id          number                                 NOT NULL,
@@ -659,18 +489,19 @@ COMMENT ON COLUMN infra_file_content.id IS '编号';
 COMMENT ON COLUMN infra_file_content.config_id IS '配置编号';
 COMMENT ON COLUMN infra_file_content.path IS '文件路径';
 COMMENT ON COLUMN infra_file_content.content IS '文件内容';
+COMMENT ON COLUMN infra_file_content.creator IS '创建者';
 COMMENT ON COLUMN infra_file_content.create_time IS '创建时间';
+COMMENT ON COLUMN infra_file_content.updater IS '更新者';
 COMMENT ON COLUMN infra_file_content.update_time IS '更新时间';
+COMMENT ON COLUMN infra_file_content.deleted IS '是否删除';
 COMMENT ON TABLE infra_file_content IS '文件表';
 
 CREATE SEQUENCE infra_file_content_seq
-    START WITH 1
-    INCREMENT BY 1;
-
+    START WITH 1;
 
 -- ----------------------------
--- infra_job
--- ------------------------------
+-- Table structure for infra_job
+-- ----------------------------
 CREATE TABLE infra_job
 (
     id              number                                  NOT NULL,
@@ -701,10 +532,16 @@ COMMENT ON COLUMN infra_job.cron_expression IS 'CRON 表达式';
 COMMENT ON COLUMN infra_job.retry_count IS '重试次数';
 COMMENT ON COLUMN infra_job.retry_interval IS '重试间隔';
 COMMENT ON COLUMN infra_job.monitor_timeout IS '监控超时时间';
+COMMENT ON COLUMN infra_job.creator IS '创建者';
 COMMENT ON COLUMN infra_job.create_time IS '创建时间';
+COMMENT ON COLUMN infra_job.updater IS '更新者';
 COMMENT ON COLUMN infra_job.update_time IS '更新时间';
+COMMENT ON COLUMN infra_job.deleted IS '是否删除';
 COMMENT ON TABLE infra_job IS '定时任务表';
 
+-- ----------------------------
+-- Records of infra_job
+-- ----------------------------
 -- @formatter:off
 INSERT INTO infra_job (id, name, status, handler_name, handler_param, cron_expression, retry_count, retry_interval, monitor_timeout, creator, create_time, updater, update_time, deleted) VALUES (5, '支付通知 Job', 2, 'payNotifyJob', NULL, '* * * * * ?', 0, 0, 0, '1', to_date('2021-10-27 08:34:42', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-07-09 20:51:41', 'SYYYY-MM-DD HH24:MI:SS'), '0');
 INSERT INTO infra_job (id, name, status, handler_name, handler_param, cron_expression, retry_count, retry_interval, monitor_timeout, creator, create_time, updater, update_time, deleted) VALUES (17, '支付订单同步 Job', 2, 'payOrderSyncJob', NULL, '0 0/1 * * * ?', 0, 0, 0, '1', to_date('2023-07-22 14:36:26', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-07-22 15:39:08', 'SYYYY-MM-DD HH24:MI:SS'), '0');
@@ -721,13 +558,11 @@ COMMIT;
 -- @formatter:on
 
 CREATE SEQUENCE infra_job_seq
-    START WITH 28
-    INCREMENT BY 1;
-
+    START WITH 28;
 
 -- ----------------------------
--- infra_job_log
--- ------------------------------
+-- Table structure for infra_job_log
+-- ----------------------------
 CREATE TABLE infra_job_log
 (
     id            number                                   NOT NULL,
@@ -759,18 +594,20 @@ COMMENT ON COLUMN infra_job_log.begin_time IS '开始执行时间';
 COMMENT ON COLUMN infra_job_log.end_time IS '结束执行时间';
 COMMENT ON COLUMN infra_job_log.duration IS '执行时长';
 COMMENT ON COLUMN infra_job_log.status IS '任务状态';
+COMMENT ON COLUMN infra_job_log.result IS '结果数据';
+COMMENT ON COLUMN infra_job_log.creator IS '创建者';
 COMMENT ON COLUMN infra_job_log.create_time IS '创建时间';
+COMMENT ON COLUMN infra_job_log.updater IS '更新者';
 COMMENT ON COLUMN infra_job_log.update_time IS '更新时间';
+COMMENT ON COLUMN infra_job_log.deleted IS '是否删除';
 COMMENT ON TABLE infra_job_log IS '定时任务日志表';
 
 CREATE SEQUENCE infra_job_log_seq
-    START WITH 1
-    INCREMENT BY 1;
-
+    START WITH 1;
 
 -- ----------------------------
--- system_dept
--- ------------------------------
+-- Table structure for system_dept
+-- ----------------------------
 CREATE TABLE system_dept
 (
     id             number                                 NOT NULL,
@@ -793,17 +630,24 @@ ALTER TABLE system_dept
     ADD CONSTRAINT pk_system_dept PRIMARY KEY (id);
 
 COMMENT ON COLUMN system_dept.id IS '部门id';
+COMMENT ON COLUMN system_dept.name IS '部门名称';
 COMMENT ON COLUMN system_dept.parent_id IS '父部门id';
 COMMENT ON COLUMN system_dept.sort IS '显示顺序';
 COMMENT ON COLUMN system_dept.leader_user_id IS '负责人';
 COMMENT ON COLUMN system_dept.phone IS '联系电话';
 COMMENT ON COLUMN system_dept.email IS '邮箱';
 COMMENT ON COLUMN system_dept.status IS '部门状态（0正常 1停用）';
+COMMENT ON COLUMN system_dept.creator IS '创建者';
 COMMENT ON COLUMN system_dept.create_time IS '创建时间';
+COMMENT ON COLUMN system_dept.updater IS '更新者';
 COMMENT ON COLUMN system_dept.update_time IS '更新时间';
+COMMENT ON COLUMN system_dept.deleted IS '是否删除';
 COMMENT ON COLUMN system_dept.tenant_id IS '租户编号';
 COMMENT ON TABLE system_dept IS '部门表';
 
+-- ----------------------------
+-- Records of system_dept
+-- ----------------------------
 -- @formatter:off
 INSERT INTO system_dept (id, name, parent_id, sort, leader_user_id, phone, email, status, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (100, '芋道源码', 0, 0, 1, '15888888888', 'ry@qq.com', 0, 'admin', to_date('2021-01-05 17:03:47', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-11-14 23:30:36', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
 INSERT INTO system_dept (id, name, parent_id, sort, leader_user_id, phone, email, status, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (101, '深圳总公司', 100, 1, 104, '15888888888', 'ry@qq.com', 0, 'admin', to_date('2021-01-05 17:03:47', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-02 09:53:35', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
@@ -823,13 +667,11 @@ COMMIT;
 -- @formatter:on
 
 CREATE SEQUENCE system_dept_seq
-    START WITH 114
-    INCREMENT BY 1;
-
+    START WITH 114;
 
 -- ----------------------------
--- system_dict_data
--- ------------------------------
+-- Table structure for system_dict_data
+-- ----------------------------
 CREATE TABLE system_dict_data
 (
     id          number                                  NOT NULL,
@@ -853,12 +695,23 @@ ALTER TABLE system_dict_data
 
 COMMENT ON COLUMN system_dict_data.id IS '字典编码';
 COMMENT ON COLUMN system_dict_data.sort IS '字典排序';
+COMMENT ON COLUMN system_dict_data.label IS '字典标签';
+COMMENT ON COLUMN system_dict_data.value IS '字典键值';
+COMMENT ON COLUMN system_dict_data.dict_type IS '字典类型';
 COMMENT ON COLUMN system_dict_data.status IS '状态（0正常 1停用）';
+COMMENT ON COLUMN system_dict_data.color_type IS '颜色类型';
+COMMENT ON COLUMN system_dict_data.css_class IS 'css 样式';
 COMMENT ON COLUMN system_dict_data.remark IS '备注';
+COMMENT ON COLUMN system_dict_data.creator IS '创建者';
 COMMENT ON COLUMN system_dict_data.create_time IS '创建时间';
+COMMENT ON COLUMN system_dict_data.updater IS '更新者';
 COMMENT ON COLUMN system_dict_data.update_time IS '更新时间';
+COMMENT ON COLUMN system_dict_data.deleted IS '是否删除';
 COMMENT ON TABLE system_dict_data IS '字典数据表';
 
+-- ----------------------------
+-- Records of system_dict_data
+-- ----------------------------
 -- @formatter:off
 INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (1, 1, '男', '1', 'system_user_sex', 0, 'default', 'A', '性别男', 'admin', to_date('2021-01-05 17:03:48', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-03-29 00:14:39', 'SYYYY-MM-DD HH24:MI:SS'), '0');
 INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2, 2, '女', '2', 'system_user_sex', 0, 'success', '', '性别女', 'admin', to_date('2021-01-05 17:03:48', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-11-15 23:30:37', 'SYYYY-MM-DD HH24:MI:SS'), '0');
@@ -1046,15 +899,6 @@ INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_t
 INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (1232, 20, 'Vue3 Element Plus 标准模版', '20', 'infra_codegen_front_type', 0, '', '', '', '1', to_date('2023-04-13 00:04:08', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-04-13 00:04:08', 'SYYYY-MM-DD HH24:MI:SS'), '0');
 INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (1233, 21, 'Vue3 Element Plus Schema 模版', '21', 'infra_codegen_front_type', 0, '', '', '', '1', to_date('2023-04-13 00:04:26', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-04-13 00:04:26', 'SYYYY-MM-DD HH24:MI:SS'), '0');
 INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (1234, 30, 'Vue3 vben 模版', '30', 'infra_codegen_front_type', 0, '', '', '', '1', to_date('2023-04-13 00:04:26', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-04-13 00:04:26', 'SYYYY-MM-DD HH24:MI:SS'), '0');
-INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (1235, 1, '个', '1', 'product_unit', 0, '', '', '', '1', to_date('2023-05-23 14:38:38', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-05-23 14:38:38', 'SYYYY-MM-DD HH24:MI:SS'), '0');
-INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (1236, 1, '件', '2', 'product_unit', 0, '', '', '', '1', to_date('2023-05-23 14:38:38', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-05-23 14:38:38', 'SYYYY-MM-DD HH24:MI:SS'), '0');
-INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (1237, 1, '盒', '3', 'product_unit', 0, '', '', '', '1', to_date('2023-05-23 14:38:38', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-05-23 14:38:38', 'SYYYY-MM-DD HH24:MI:SS'), '0');
-INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (1238, 1, '袋', '4', 'product_unit', 0, '', '', '', '1', to_date('2023-05-23 14:38:38', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-05-23 14:38:38', 'SYYYY-MM-DD HH24:MI:SS'), '0');
-INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (1239, 1, '箱', '5', 'product_unit', 0, '', '', '', '1', to_date('2023-05-23 14:38:38', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-05-23 14:38:38', 'SYYYY-MM-DD HH24:MI:SS'), '0');
-INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (1240, 1, '套', '6', 'product_unit', 0, '', '', '', '1', to_date('2023-05-23 14:38:38', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-05-23 14:38:38', 'SYYYY-MM-DD HH24:MI:SS'), '0');
-INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (1241, 1, '包', '7', 'product_unit', 0, '', '', '', '1', to_date('2023-05-23 14:38:38', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-05-23 14:38:38', 'SYYYY-MM-DD HH24:MI:SS'), '0');
-INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (1242, 1, '双', '8', 'product_unit', 0, '', '', '', '1', to_date('2023-05-23 14:38:38', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-05-23 14:38:38', 'SYYYY-MM-DD HH24:MI:SS'), '0');
-INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (1243, 1, '卷', '9', 'product_unit', 0, '', '', '', '1', to_date('2023-05-23 14:38:38', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-05-23 14:38:38', 'SYYYY-MM-DD HH24:MI:SS'), '0');
 INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (1244, 0, '按件', '1', 'trade_delivery_express_charge_mode', 0, '', '', '', '1', to_date('2023-05-21 22:46:40', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-05-21 22:46:40', 'SYYYY-MM-DD HH24:MI:SS'), '0');
 INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (1245, 1, '按重量', '2', 'trade_delivery_express_charge_mode', 0, '', '', '', '1', to_date('2023-05-21 22:46:58', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-05-21 22:46:58', 'SYYYY-MM-DD HH24:MI:SS'), '0');
 INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (1246, 2, '按体积', '3', 'trade_delivery_express_charge_mode', 0, '', '', '', '1', to_date('2023-05-21 22:47:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-05-21 22:47:18', 'SYYYY-MM-DD HH24:MI:SS'), '0');
@@ -1238,13 +1082,11 @@ COMMIT;
 -- @formatter:on
 
 CREATE SEQUENCE system_dict_data_seq
-    START WITH 1537
-    INCREMENT BY 1;
-
+    START WITH 1537;
 
 -- ----------------------------
--- system_dict_type
--- ------------------------------
+-- Table structure for system_dict_type
+-- ----------------------------
 CREATE TABLE system_dict_type
 (
     id           number                                  NOT NULL,
@@ -1264,13 +1106,21 @@ ALTER TABLE system_dict_type
     ADD CONSTRAINT pk_system_dict_type PRIMARY KEY (id);
 
 COMMENT ON COLUMN system_dict_type.id IS '字典主键';
+COMMENT ON COLUMN system_dict_type.name IS '字典名称';
+COMMENT ON COLUMN system_dict_type.type IS '字典类型';
 COMMENT ON COLUMN system_dict_type.status IS '状态（0正常 1停用）';
 COMMENT ON COLUMN system_dict_type.remark IS '备注';
+COMMENT ON COLUMN system_dict_type.creator IS '创建者';
 COMMENT ON COLUMN system_dict_type.create_time IS '创建时间';
+COMMENT ON COLUMN system_dict_type.updater IS '更新者';
 COMMENT ON COLUMN system_dict_type.update_time IS '更新时间';
+COMMENT ON COLUMN system_dict_type.deleted IS '是否删除';
 COMMENT ON COLUMN system_dict_type.deleted_time IS '删除时间';
 COMMENT ON TABLE system_dict_type IS '字典类型表';
 
+-- ----------------------------
+-- Records of system_dict_type
+-- ----------------------------
 -- @formatter:off
 INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (1, '用户性别', 'system_user_sex', 0, NULL, 'admin', to_date('2021-01-05 17:03:48', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-05-16 20:29:32', 'SYYYY-MM-DD HH24:MI:SS'), '0', NULL);
 INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (6, '参数类型', 'infra_config_type', 0, NULL, 'admin', to_date('2021-01-05 17:03:48', 'SYYYY-MM-DD HH24:MI:SS'), '', to_date('2022-02-01 16:36:54', 'SYYYY-MM-DD HH24:MI:SS'), '0', NULL);
@@ -1322,7 +1172,6 @@ INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_ti
 INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (166, '邮件发送状态', 'system_mail_send_status', 0, '邮件发送状态', '1', to_date('2023-01-26 09:53:13', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-01-26 09:53:13', 'SYYYY-MM-DD HH24:MI:SS'), '0', to_date('1970-01-01 00:00:00', 'SYYYY-MM-DD HH24:MI:SS'));
 INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (167, '站内信模版的类型', 'system_notify_template_type', 0, '站内信模版的类型', '1', to_date('2023-01-28 10:35:10', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-01-28 10:35:10', 'SYYYY-MM-DD HH24:MI:SS'), '0', to_date('1970-01-01 00:00:00', 'SYYYY-MM-DD HH24:MI:SS'));
 INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (168, '代码生成的前端类型', 'infra_codegen_front_type', 0, '', '1', to_date('2023-04-12 23:57:52', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-04-12 23:57:52', 'SYYYY-MM-DD HH24:MI:SS'), '0', to_date('1970-01-01 00:00:00', 'SYYYY-MM-DD HH24:MI:SS'));
-INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (169, '商品的单位', 'product_unit', 0, '商品的单位', '1', to_date('2023-05-24 21:23:59', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-05-24 21:23:59', 'SYYYY-MM-DD HH24:MI:SS'), '0', to_date('1970-01-01 00:00:00', 'SYYYY-MM-DD HH24:MI:SS'));
 INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (170, '快递计费方式', 'trade_delivery_express_charge_mode', 0, '用于商城交易模块配送管理', '1', to_date('2023-05-21 22:45:03', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-05-21 22:45:03', 'SYYYY-MM-DD HH24:MI:SS'), '0', to_date('1970-01-01 00:00:00', 'SYYYY-MM-DD HH24:MI:SS'));
 INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (171, '积分业务类型', 'member_point_biz_type', 0, '', '1', to_date('2023-06-10 12:15:00', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-06-28 13:48:20', 'SYYYY-MM-DD HH24:MI:SS'), '0', to_date('1970-01-01 00:00:00', 'SYYYY-MM-DD HH24:MI:SS'));
 INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (173, '支付通知类型', 'pay_notify_type', 0, NULL, '1', to_date('2023-07-20 12:23:03', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-07-20 12:23:03', 'SYYYY-MM-DD HH24:MI:SS'), '0', to_date('1970-01-01 00:00:00', 'SYYYY-MM-DD HH24:MI:SS'));
@@ -1360,13 +1209,11 @@ COMMIT;
 -- @formatter:on
 
 CREATE SEQUENCE system_dict_type_seq
-    START WITH 620
-    INCREMENT BY 1;
-
+    START WITH 620;
 
 -- ----------------------------
--- system_login_log
--- ------------------------------
+-- Table structure for system_login_log
+-- ----------------------------
 CREATE TABLE system_login_log
 (
     id          number                                 NOT NULL,
@@ -1391,24 +1238,27 @@ ALTER TABLE system_login_log
 
 COMMENT ON COLUMN system_login_log.id IS '访问ID';
 COMMENT ON COLUMN system_login_log.log_type IS '日志类型';
+COMMENT ON COLUMN system_login_log.trace_id IS '链路追踪编号';
 COMMENT ON COLUMN system_login_log.user_id IS '用户编号';
 COMMENT ON COLUMN system_login_log.user_type IS '用户类型';
+COMMENT ON COLUMN system_login_log.username IS '用户账号';
 COMMENT ON COLUMN system_login_log.result IS '登陆结果';
 COMMENT ON COLUMN system_login_log.user_ip IS '用户 IP';
 COMMENT ON COLUMN system_login_log.user_agent IS '浏览器 UA';
+COMMENT ON COLUMN system_login_log.creator IS '创建者';
 COMMENT ON COLUMN system_login_log.create_time IS '创建时间';
+COMMENT ON COLUMN system_login_log.updater IS '更新者';
 COMMENT ON COLUMN system_login_log.update_time IS '更新时间';
+COMMENT ON COLUMN system_login_log.deleted IS '是否删除';
 COMMENT ON COLUMN system_login_log.tenant_id IS '租户编号';
 COMMENT ON TABLE system_login_log IS '系统访问记录';
 
 CREATE SEQUENCE system_login_log_seq
-    START WITH 1
-    INCREMENT BY 1;
-
+    START WITH 1;
 
 -- ----------------------------
--- system_mail_account
--- ------------------------------
+-- Table structure for system_mail_account
+-- ----------------------------
 CREATE TABLE system_mail_account
 (
     id              number                                 NOT NULL,
@@ -1435,10 +1285,18 @@ COMMENT ON COLUMN system_mail_account.username IS '用户名';
 COMMENT ON COLUMN system_mail_account.password IS '密码';
 COMMENT ON COLUMN system_mail_account.host IS 'SMTP 服务器域名';
 COMMENT ON COLUMN system_mail_account.port IS 'SMTP 服务器端口';
+COMMENT ON COLUMN system_mail_account.ssl_enable IS '是否开启 SSL';
+COMMENT ON COLUMN system_mail_account.starttls_enable IS '是否开启 STARTTLS';
+COMMENT ON COLUMN system_mail_account.creator IS '创建者';
 COMMENT ON COLUMN system_mail_account.create_time IS '创建时间';
+COMMENT ON COLUMN system_mail_account.updater IS '更新者';
 COMMENT ON COLUMN system_mail_account.update_time IS '更新时间';
+COMMENT ON COLUMN system_mail_account.deleted IS '是否删除';
 COMMENT ON TABLE system_mail_account IS '邮箱账号表';
 
+-- ----------------------------
+-- Records of system_mail_account
+-- ----------------------------
 -- @formatter:off
 INSERT INTO system_mail_account (id, mail, username, password, host, port, ssl_enable, starttls_enable, creator, create_time, updater, update_time, deleted) VALUES (1, '7684413@qq.com', '7684413@qq.com', '1234576', '127.0.0.1', 8080, '0', '0', '1', to_date('2023-01-25 17:39:52', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-04-24 09:13:56', 'SYYYY-MM-DD HH24:MI:SS'), '0');
 INSERT INTO system_mail_account (id, mail, username, password, host, port, ssl_enable, starttls_enable, creator, create_time, updater, update_time, deleted) VALUES (2, 'ydym_test@163.com', 'ydym_test@163.com', 'WBZTEINMIFVRYSOE', 'smtp.163.com', 465, '1', '0', '1', to_date('2023-01-26 01:26:03', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-04-12 22:39:38', 'SYYYY-MM-DD HH24:MI:SS'), '0');
@@ -1448,13 +1306,11 @@ COMMIT;
 -- @formatter:on
 
 CREATE SEQUENCE system_mail_account_seq
-    START WITH 5
-    INCREMENT BY 1;
-
+    START WITH 5;
 
 -- ----------------------------
--- system_mail_log
--- ------------------------------
+-- Table structure for system_mail_log
+-- ----------------------------
 CREATE TABLE system_mail_log
 (
     id                number                                   NOT NULL,
@@ -1499,18 +1355,19 @@ COMMENT ON COLUMN system_mail_log.send_status IS '发送状态';
 COMMENT ON COLUMN system_mail_log.send_time IS '发送时间';
 COMMENT ON COLUMN system_mail_log.send_message_id IS '发送返回的消息 ID';
 COMMENT ON COLUMN system_mail_log.send_exception IS '发送异常';
+COMMENT ON COLUMN system_mail_log.creator IS '创建者';
 COMMENT ON COLUMN system_mail_log.create_time IS '创建时间';
+COMMENT ON COLUMN system_mail_log.updater IS '更新者';
 COMMENT ON COLUMN system_mail_log.update_time IS '更新时间';
+COMMENT ON COLUMN system_mail_log.deleted IS '是否删除';
 COMMENT ON TABLE system_mail_log IS '邮件日志表';
 
 CREATE SEQUENCE system_mail_log_seq
-    START WITH 1
-    INCREMENT BY 1;
-
+    START WITH 1;
 
 -- ----------------------------
--- system_mail_template
--- ------------------------------
+-- Table structure for system_mail_template
+-- ----------------------------
 CREATE TABLE system_mail_template
 (
     id          number                                  NOT NULL,
@@ -1543,10 +1400,16 @@ COMMENT ON COLUMN system_mail_template.content IS '模板内容';
 COMMENT ON COLUMN system_mail_template.params IS '参数数组';
 COMMENT ON COLUMN system_mail_template.status IS '开启状态';
 COMMENT ON COLUMN system_mail_template.remark IS '备注';
+COMMENT ON COLUMN system_mail_template.creator IS '创建者';
 COMMENT ON COLUMN system_mail_template.create_time IS '创建时间';
+COMMENT ON COLUMN system_mail_template.updater IS '更新者';
 COMMENT ON COLUMN system_mail_template.update_time IS '更新时间';
+COMMENT ON COLUMN system_mail_template.deleted IS '是否删除';
 COMMENT ON TABLE system_mail_template IS '邮件模版表';
 
+-- ----------------------------
+-- Records of system_mail_template
+-- ----------------------------
 -- @formatter:off
 INSERT INTO system_mail_template (id, name, code, account_id, nickname, title, content, params, status, remark, creator, create_time, updater, update_time, deleted) VALUES (13, '后台用户短信登录', 'admin-sms-login', 1, '奥特曼', '你猜我猜', '<p>您的验证码是{code}，名字是{name}</p>', '["code","name"]', 0, '3', '1', to_date('2021-10-11 08:10:00', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-02 19:51:14', 'SYYYY-MM-DD HH24:MI:SS'), '0');
 INSERT INTO system_mail_template (id, name, code, account_id, nickname, title, content, params, status, remark, creator, create_time, updater, update_time, deleted) VALUES (14, '测试模版', 'test_01', 2, '芋艿', '一个标题', '<p>你是 {key01} 吗？</p><p><br></p><p>是的话，赶紧 {key02} 一下！</p>', '["key01","key02"]', 0, NULL, '1', to_date('2023-01-26 01:27:40', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-01-27 10:32:16', 'SYYYY-MM-DD HH24:MI:SS'), '0');
@@ -1555,13 +1418,11 @@ COMMIT;
 -- @formatter:on
 
 CREATE SEQUENCE system_mail_template_seq
-    START WITH 16
-    INCREMENT BY 1;
-
+    START WITH 16;
 
 -- ----------------------------
--- system_menu
--- ------------------------------
+-- Table structure for system_menu
+-- ----------------------------
 CREATE TABLE system_menu
 (
     id             number                                  NOT NULL,
@@ -1590,16 +1451,28 @@ ALTER TABLE system_menu
 
 COMMENT ON COLUMN system_menu.id IS '菜单ID';
 COMMENT ON COLUMN system_menu.name IS '菜单名称';
+COMMENT ON COLUMN system_menu.permission IS '权限标识';
 COMMENT ON COLUMN system_menu.type IS '菜单类型';
 COMMENT ON COLUMN system_menu.sort IS '显示顺序';
 COMMENT ON COLUMN system_menu.parent_id IS '父菜单ID';
+COMMENT ON COLUMN system_menu.path IS '路由地址';
+COMMENT ON COLUMN system_menu.icon IS '菜单图标';
 COMMENT ON COLUMN system_menu.component IS '组件路径';
 COMMENT ON COLUMN system_menu.component_name IS '组件名';
 COMMENT ON COLUMN system_menu.status IS '菜单状态';
+COMMENT ON COLUMN system_menu.visible IS '是否可见';
+COMMENT ON COLUMN system_menu.keep_alive IS '是否缓存';
+COMMENT ON COLUMN system_menu.always_show IS '是否总是显示';
+COMMENT ON COLUMN system_menu.creator IS '创建者';
 COMMENT ON COLUMN system_menu.create_time IS '创建时间';
+COMMENT ON COLUMN system_menu.updater IS '更新者';
 COMMENT ON COLUMN system_menu.update_time IS '更新时间';
+COMMENT ON COLUMN system_menu.deleted IS '是否删除';
 COMMENT ON TABLE system_menu IS '菜单权限表';
 
+-- ----------------------------
+-- Records of system_menu
+-- ----------------------------
 -- @formatter:off
 INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (1, '系统管理', '', 1, 10, 0, '/system', 'ep:tools', NULL, NULL, 0, '1', '1', '1', 'admin', to_date('2021-01-05 17:03:48', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-02-29 01:04:23', 'SYYYY-MM-DD HH24:MI:SS'), '0');
 INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (2, '基础设施', '', 1, 20, 0, '/infra', 'ep:monitor', NULL, NULL, 0, '1', '1', '1', 'admin', to_date('2021-01-05 17:03:48', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-01 08:28:40', 'SYYYY-MM-DD HH24:MI:SS'), '0');
@@ -2395,13 +2268,11 @@ COMMIT;
 -- @formatter:on
 
 CREATE SEQUENCE system_menu_seq
-    START WITH 2758
-    INCREMENT BY 1;
-
+    START WITH 2758;
 
 -- ----------------------------
--- system_notice
--- ------------------------------
+-- Table structure for system_notice
+-- ----------------------------
 CREATE TABLE system_notice
 (
     id          number                                 NOT NULL,
@@ -2425,11 +2296,17 @@ COMMENT ON COLUMN system_notice.title IS '公告标题';
 COMMENT ON COLUMN system_notice.content IS '公告内容';
 COMMENT ON COLUMN system_notice.type IS '公告类型（1通知 2公告）';
 COMMENT ON COLUMN system_notice.status IS '公告状态（0正常 1关闭）';
+COMMENT ON COLUMN system_notice.creator IS '创建者';
 COMMENT ON COLUMN system_notice.create_time IS '创建时间';
+COMMENT ON COLUMN system_notice.updater IS '更新者';
 COMMENT ON COLUMN system_notice.update_time IS '更新时间';
+COMMENT ON COLUMN system_notice.deleted IS '是否删除';
 COMMENT ON COLUMN system_notice.tenant_id IS '租户编号';
 COMMENT ON TABLE system_notice IS '通知公告表';
 
+-- ----------------------------
+-- Records of system_notice
+-- ----------------------------
 -- @formatter:off
 INSERT INTO system_notice (id, title, content, type, status, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1, '芋道的公众', '<p>新版本内容133</p>', 1, 0, 'admin', to_date('2021-01-05 17:03:48', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-05-04 21:00:20', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
 INSERT INTO system_notice (id, title, content, type, status, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2, '维护通知：2018-07-01 系统凌晨维护', '<p><img src="http://test.yudao.iocoder.cn/b7cb3cf49b4b3258bf7309a09dd2f4e5.jpg" alt="" data-href="" style=""/>11112222</p>', 2, 1, 'admin', to_date('2021-01-05 17:03:48', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-02 20:07:26', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
@@ -2438,13 +2315,11 @@ COMMIT;
 -- @formatter:on
 
 CREATE SEQUENCE system_notice_seq
-    START WITH 5
-    INCREMENT BY 1;
-
+    START WITH 5;
 
 -- ----------------------------
--- system_notify_message
--- ------------------------------
+-- Table structure for system_notify_message
+-- ----------------------------
 CREATE TABLE system_notify_message
 (
     id                number                                 NOT NULL,
@@ -2480,11 +2355,17 @@ COMMENT ON COLUMN system_notify_message.template_type IS '模版类型';
 COMMENT ON COLUMN system_notify_message.template_params IS '模版参数';
 COMMENT ON COLUMN system_notify_message.read_status IS '是否已读';
 COMMENT ON COLUMN system_notify_message.read_time IS '阅读时间';
+COMMENT ON COLUMN system_notify_message.creator IS '创建者';
 COMMENT ON COLUMN system_notify_message.create_time IS '创建时间';
+COMMENT ON COLUMN system_notify_message.updater IS '更新者';
 COMMENT ON COLUMN system_notify_message.update_time IS '更新时间';
+COMMENT ON COLUMN system_notify_message.deleted IS '是否删除';
 COMMENT ON COLUMN system_notify_message.tenant_id IS '租户编号';
 COMMENT ON TABLE system_notify_message IS '站内信消息表';
 
+-- ----------------------------
+-- Records of system_notify_message
+-- ----------------------------
 -- @formatter:off
 INSERT INTO system_notify_message (id, user_id, user_type, template_id, template_code, template_nickname, template_content, template_type, template_params, read_status, read_time, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2, 1, 2, 1, 'test', '123', '我是 1，我开始 2 了', 1, '{"name":"1","what":"2"}', '1', to_date('2023-02-10 00:47:04', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-01-28 11:44:08', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-02-10 00:47:04', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
 INSERT INTO system_notify_message (id, user_id, user_type, template_id, template_code, template_nickname, template_content, template_type, template_params, read_status, read_time, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3, 1, 2, 1, 'test', '123', '我是 1，我开始 2 了', 1, '{"name":"1","what":"2"}', '1', to_date('2023-02-10 00:47:04', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-01-28 11:45:04', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-02-10 00:47:04', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
@@ -2499,13 +2380,11 @@ COMMIT;
 -- @formatter:on
 
 CREATE SEQUENCE system_notify_message_seq
-    START WITH 11
-    INCREMENT BY 1;
-
+    START WITH 11;
 
 -- ----------------------------
--- system_notify_template
--- ------------------------------
+-- Table structure for system_notify_template
+-- ----------------------------
 CREATE TABLE system_notify_template
 (
     id          number                                  NOT NULL,
@@ -2536,18 +2415,19 @@ COMMENT ON COLUMN system_notify_template.type IS '类型';
 COMMENT ON COLUMN system_notify_template.params IS '参数数组';
 COMMENT ON COLUMN system_notify_template.status IS '状态';
 COMMENT ON COLUMN system_notify_template.remark IS '备注';
+COMMENT ON COLUMN system_notify_template.creator IS '创建者';
 COMMENT ON COLUMN system_notify_template.create_time IS '创建时间';
+COMMENT ON COLUMN system_notify_template.updater IS '更新者';
 COMMENT ON COLUMN system_notify_template.update_time IS '更新时间';
+COMMENT ON COLUMN system_notify_template.deleted IS '是否删除';
 COMMENT ON TABLE system_notify_template IS '站内信模板表';
 
 CREATE SEQUENCE system_notify_template_seq
-    START WITH 1
-    INCREMENT BY 1;
-
+    START WITH 1;
 
 -- ----------------------------
--- system_oauth2_access_token
--- ------------------------------
+-- Table structure for system_oauth2_access_token
+-- ----------------------------
 CREATE TABLE system_oauth2_access_token
 (
     id            number                                  NOT NULL,
@@ -2582,19 +2462,20 @@ COMMENT ON COLUMN system_oauth2_access_token.refresh_token IS '刷新令牌';
 COMMENT ON COLUMN system_oauth2_access_token.client_id IS '客户端编号';
 COMMENT ON COLUMN system_oauth2_access_token.scopes IS '授权范围';
 COMMENT ON COLUMN system_oauth2_access_token.expires_time IS '过期时间';
+COMMENT ON COLUMN system_oauth2_access_token.creator IS '创建者';
 COMMENT ON COLUMN system_oauth2_access_token.create_time IS '创建时间';
+COMMENT ON COLUMN system_oauth2_access_token.updater IS '更新者';
 COMMENT ON COLUMN system_oauth2_access_token.update_time IS '更新时间';
+COMMENT ON COLUMN system_oauth2_access_token.deleted IS '是否删除';
 COMMENT ON COLUMN system_oauth2_access_token.tenant_id IS '租户编号';
 COMMENT ON TABLE system_oauth2_access_token IS 'OAuth2 访问令牌';
 
 CREATE SEQUENCE system_oauth2_access_token_seq
-    START WITH 1
-    INCREMENT BY 1;
-
+    START WITH 1;
 
 -- ----------------------------
--- system_oauth2_approve
--- ------------------------------
+-- Table structure for system_oauth2_approve
+-- ----------------------------
 CREATE TABLE system_oauth2_approve
 (
     id           number                                  NOT NULL,
@@ -2619,20 +2500,23 @@ COMMENT ON COLUMN system_oauth2_approve.id IS '编号';
 COMMENT ON COLUMN system_oauth2_approve.user_id IS '用户编号';
 COMMENT ON COLUMN system_oauth2_approve.user_type IS '用户类型';
 COMMENT ON COLUMN system_oauth2_approve.client_id IS '客户端编号';
+COMMENT ON COLUMN system_oauth2_approve.scope IS '授权范围';
+COMMENT ON COLUMN system_oauth2_approve.approved IS '是否接受';
 COMMENT ON COLUMN system_oauth2_approve.expires_time IS '过期时间';
+COMMENT ON COLUMN system_oauth2_approve.creator IS '创建者';
 COMMENT ON COLUMN system_oauth2_approve.create_time IS '创建时间';
+COMMENT ON COLUMN system_oauth2_approve.updater IS '更新者';
 COMMENT ON COLUMN system_oauth2_approve.update_time IS '更新时间';
+COMMENT ON COLUMN system_oauth2_approve.deleted IS '是否删除';
 COMMENT ON COLUMN system_oauth2_approve.tenant_id IS '租户编号';
 COMMENT ON TABLE system_oauth2_approve IS 'OAuth2 批准表';
 
 CREATE SEQUENCE system_oauth2_approve_seq
-    START WITH 1
-    INCREMENT BY 1;
-
+    START WITH 1;
 
 -- ----------------------------
--- system_oauth2_client
--- ------------------------------
+-- Table structure for system_oauth2_client
+-- ----------------------------
 CREATE TABLE system_oauth2_client
 (
     id                             number                                   NOT NULL,
@@ -2677,10 +2561,16 @@ COMMENT ON COLUMN system_oauth2_client.auto_approve_scopes IS '自动通过的�
 COMMENT ON COLUMN system_oauth2_client.authorities IS '权限';
 COMMENT ON COLUMN system_oauth2_client.resource_ids IS '资源';
 COMMENT ON COLUMN system_oauth2_client.additional_information IS '附加信息';
+COMMENT ON COLUMN system_oauth2_client.creator IS '创建者';
 COMMENT ON COLUMN system_oauth2_client.create_time IS '创建时间';
+COMMENT ON COLUMN system_oauth2_client.updater IS '更新者';
 COMMENT ON COLUMN system_oauth2_client.update_time IS '更新时间';
+COMMENT ON COLUMN system_oauth2_client.deleted IS '是否删除';
 COMMENT ON TABLE system_oauth2_client IS 'OAuth2 客户端表';
 
+-- ----------------------------
+-- Records of system_oauth2_client
+-- ----------------------------
 -- @formatter:off
 INSERT INTO system_oauth2_client (id, client_id, secret, name, logo, description, status, access_token_validity_seconds, refresh_token_validity_seconds, redirect_uris, authorized_grant_types, scopes, auto_approve_scopes, authorities, resource_ids, additional_information, creator, create_time, updater, update_time, deleted) VALUES (1, 'default', 'admin123', '芋道源码', 'http://test.yudao.iocoder.cn/a5e2e244368878a366b516805a4aabf1.png', '我是描述', 0, 1800, 2592000, '["https://www.iocoder.cn","https://doc.iocoder.cn"]', '["password","authorization_code","implicit","refresh_token"]', '["user.read","user.write"]', '[]', '["user.read","user.write"]', '[]', '{}', '1', to_date('2022-05-11 21:47:12', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-02-22 16:31:52', 'SYYYY-MM-DD HH24:MI:SS'), '0');
 INSERT INTO system_oauth2_client (id, client_id, secret, name, logo, description, status, access_token_validity_seconds, refresh_token_validity_seconds, redirect_uris, authorized_grant_types, scopes, auto_approve_scopes, authorities, resource_ids, additional_information, creator, create_time, updater, update_time, deleted) VALUES (40, 'test', 'test2', 'biubiu', 'http://test.yudao.iocoder.cn/277a899d573723f1fcdfb57340f00379.png', '啦啦啦啦', 0, 1800, 43200, '["https://www.iocoder.cn"]', '["password","authorization_code","implicit"]', '["user_info","projects"]', '["user_info"]', '[]', '[]', '{}', '1', to_date('2022-05-12 00:28:20', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-02 21:01:01', 'SYYYY-MM-DD HH24:MI:SS'), '0');
@@ -2690,13 +2580,11 @@ COMMIT;
 -- @formatter:on
 
 CREATE SEQUENCE system_oauth2_client_seq
-    START WITH 43
-    INCREMENT BY 1;
-
+    START WITH 43;
 
 -- ----------------------------
--- system_oauth2_code
--- ------------------------------
+-- Table structure for system_oauth2_code
+-- ----------------------------
 CREATE TABLE system_oauth2_code
 (
     id           number                                  NOT NULL,
@@ -2724,21 +2612,24 @@ COMMENT ON COLUMN system_oauth2_code.user_id IS '用户编号';
 COMMENT ON COLUMN system_oauth2_code.user_type IS '用户类型';
 COMMENT ON COLUMN system_oauth2_code.code IS '授权码';
 COMMENT ON COLUMN system_oauth2_code.client_id IS '客户端编号';
+COMMENT ON COLUMN system_oauth2_code.scopes IS '授权范围';
 COMMENT ON COLUMN system_oauth2_code.expires_time IS '过期时间';
 COMMENT ON COLUMN system_oauth2_code.redirect_uri IS '可重定向的 URI 地址';
+COMMENT ON COLUMN system_oauth2_code.state IS '状态';
+COMMENT ON COLUMN system_oauth2_code.creator IS '创建者';
 COMMENT ON COLUMN system_oauth2_code.create_time IS '创建时间';
+COMMENT ON COLUMN system_oauth2_code.updater IS '更新者';
 COMMENT ON COLUMN system_oauth2_code.update_time IS '更新时间';
+COMMENT ON COLUMN system_oauth2_code.deleted IS '是否删除';
 COMMENT ON COLUMN system_oauth2_code.tenant_id IS '租户编号';
 COMMENT ON TABLE system_oauth2_code IS 'OAuth2 授权码表';
 
 CREATE SEQUENCE system_oauth2_code_seq
-    START WITH 1
-    INCREMENT BY 1;
-
+    START WITH 1;
 
 -- ----------------------------
--- system_oauth2_refresh_token
--- ------------------------------
+-- Table structure for system_oauth2_refresh_token
+-- ----------------------------
 CREATE TABLE system_oauth2_refresh_token
 (
     id            number                                  NOT NULL,
@@ -2766,19 +2657,20 @@ COMMENT ON COLUMN system_oauth2_refresh_token.user_type IS '用户类型';
 COMMENT ON COLUMN system_oauth2_refresh_token.client_id IS '客户端编号';
 COMMENT ON COLUMN system_oauth2_refresh_token.scopes IS '授权范围';
 COMMENT ON COLUMN system_oauth2_refresh_token.expires_time IS '过期时间';
+COMMENT ON COLUMN system_oauth2_refresh_token.creator IS '创建者';
 COMMENT ON COLUMN system_oauth2_refresh_token.create_time IS '创建时间';
+COMMENT ON COLUMN system_oauth2_refresh_token.updater IS '更新者';
 COMMENT ON COLUMN system_oauth2_refresh_token.update_time IS '更新时间';
+COMMENT ON COLUMN system_oauth2_refresh_token.deleted IS '是否删除';
 COMMENT ON COLUMN system_oauth2_refresh_token.tenant_id IS '租户编号';
 COMMENT ON TABLE system_oauth2_refresh_token IS 'OAuth2 刷新令牌';
 
 CREATE SEQUENCE system_oauth2_refresh_token_seq
-    START WITH 1
-    INCREMENT BY 1;
-
+    START WITH 1;
 
 -- ----------------------------
--- system_operate_log
--- ------------------------------
+-- Table structure for system_operate_log
+-- ----------------------------
 CREATE TABLE system_operate_log
 (
     id             number                                   NOT NULL,
@@ -2806,26 +2698,32 @@ ALTER TABLE system_operate_log
     ADD CONSTRAINT pk_system_operate_log PRIMARY KEY (id);
 
 COMMENT ON COLUMN system_operate_log.id IS '日志主键';
+COMMENT ON COLUMN system_operate_log.trace_id IS '链路追踪编号';
 COMMENT ON COLUMN system_operate_log.user_id IS '用户编号';
 COMMENT ON COLUMN system_operate_log.user_type IS '用户类型';
 COMMENT ON COLUMN system_operate_log.type IS '操作模块类型';
 COMMENT ON COLUMN system_operate_log.sub_type IS '操作名';
 COMMENT ON COLUMN system_operate_log.biz_id IS '操作数据模块编号';
+COMMENT ON COLUMN system_operate_log.action IS '操作内容';
+COMMENT ON COLUMN system_operate_log.extra IS '拓展字段';
+COMMENT ON COLUMN system_operate_log.request_method IS '请求方法名';
+COMMENT ON COLUMN system_operate_log.request_url IS '请求地址';
 COMMENT ON COLUMN system_operate_log.user_ip IS '用户 IP';
 COMMENT ON COLUMN system_operate_log.user_agent IS '浏览器 UA';
+COMMENT ON COLUMN system_operate_log.creator IS '创建者';
 COMMENT ON COLUMN system_operate_log.create_time IS '创建时间';
+COMMENT ON COLUMN system_operate_log.updater IS '更新者';
 COMMENT ON COLUMN system_operate_log.update_time IS '更新时间';
+COMMENT ON COLUMN system_operate_log.deleted IS '是否删除';
 COMMENT ON COLUMN system_operate_log.tenant_id IS '租户编号';
 COMMENT ON TABLE system_operate_log IS '操作日志记录 V2 版本';
 
 CREATE SEQUENCE system_operate_log_seq
-    START WITH 1
-    INCREMENT BY 1;
-
+    START WITH 1;
 
 -- ----------------------------
--- system_post
--- ------------------------------
+-- Table structure for system_post
+-- ----------------------------
 CREATE TABLE system_post
 (
     id          number                                  NOT NULL,
@@ -2851,11 +2749,17 @@ COMMENT ON COLUMN system_post.name IS '岗位名称';
 COMMENT ON COLUMN system_post.sort IS '显示顺序';
 COMMENT ON COLUMN system_post.status IS '状态（0正常 1停用）';
 COMMENT ON COLUMN system_post.remark IS '备注';
+COMMENT ON COLUMN system_post.creator IS '创建者';
 COMMENT ON COLUMN system_post.create_time IS '创建时间';
+COMMENT ON COLUMN system_post.updater IS '更新者';
 COMMENT ON COLUMN system_post.update_time IS '更新时间';
+COMMENT ON COLUMN system_post.deleted IS '是否删除';
 COMMENT ON COLUMN system_post.tenant_id IS '租户编号';
 COMMENT ON TABLE system_post IS '岗位信息表';
 
+-- ----------------------------
+-- Records of system_post
+-- ----------------------------
 -- @formatter:off
 INSERT INTO system_post (id, code, name, sort, status, remark, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1, 'ceo', '董事长', 1, 0, '', 'admin', to_date('2021-01-06 17:03:48', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-02-11 15:19:04', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
 INSERT INTO system_post (id, code, name, sort, status, remark, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2, 'se', '项目经理', 2, 0, '', 'admin', to_date('2021-01-05 17:03:48', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-11-15 09:18:20', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
@@ -2865,13 +2769,11 @@ COMMIT;
 -- @formatter:on
 
 CREATE SEQUENCE system_post_seq
-    START WITH 6
-    INCREMENT BY 1;
-
+    START WITH 6;
 
 -- ----------------------------
--- system_role
--- ------------------------------
+-- Table structure for system_role
+-- ----------------------------
 CREATE TABLE system_role
 (
     id                  number                                  NOT NULL,
@@ -2899,46 +2801,37 @@ COMMENT ON COLUMN system_role.name IS '角色名称';
 COMMENT ON COLUMN system_role.code IS '角色权限字符串';
 COMMENT ON COLUMN system_role.sort IS '显示顺序';
 COMMENT ON COLUMN system_role.data_scope IS '数据范围（1：全部数据权限 2：自定数据权限 3：本部门数据权限 4：本部门及以下数据权限）';
+COMMENT ON COLUMN system_role.data_scope_dept_ids IS '数据范围(指定部门数组)';
 COMMENT ON COLUMN system_role.status IS '角色状态（0正常 1停用）';
 COMMENT ON COLUMN system_role.type IS '角色类型';
 COMMENT ON COLUMN system_role.remark IS '备注';
+COMMENT ON COLUMN system_role.creator IS '创建者';
 COMMENT ON COLUMN system_role.create_time IS '创建时间';
+COMMENT ON COLUMN system_role.updater IS '更新者';
 COMMENT ON COLUMN system_role.update_time IS '更新时间';
+COMMENT ON COLUMN system_role.deleted IS '是否删除';
 COMMENT ON COLUMN system_role.tenant_id IS '租户编号';
 COMMENT ON TABLE system_role IS '角色信息表';
 
+-- ----------------------------
+-- Records of system_role
+-- ----------------------------
 -- @formatter:off
 INSERT INTO system_role (id, name, code, sort, data_scope, data_scope_dept_ids, status, type, remark, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1, '超级管理员', 'super_admin', 1, 1, '', 0, 1, '超级管理员', 'admin', to_date('2021-01-05 17:03:48', 'SYYYY-MM-DD HH24:MI:SS'), '', to_date('2022-02-22 05:08:21', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
 INSERT INTO system_role (id, name, code, sort, data_scope, data_scope_dept_ids, status, type, remark, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2, '普通角色', 'common', 2, 2, '', 0, 1, '普通角色', 'admin', to_date('2021-01-05 17:03:48', 'SYYYY-MM-DD HH24:MI:SS'), '', to_date('2022-02-22 05:08:20', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
 INSERT INTO system_role (id, name, code, sort, data_scope, data_scope_dept_ids, status, type, remark, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3, 'CRM 管理员', 'crm_admin', 2, 1, '', 0, 1, 'CRM 专属角色', '1', to_date('2024-02-24 10:51:13', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-02-24 02:51:32', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
 INSERT INTO system_role (id, name, code, sort, data_scope, data_scope_dept_ids, status, type, remark, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (101, '测试账号', 'test', 0, 1, '[]', 0, 2, '我想测试', '', to_date('2021-01-06 13:49:35', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-24 22:22:45', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
 INSERT INTO system_role (id, name, code, sort, data_scope, data_scope_dept_ids, status, type, remark, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (109, '租户管理员', 'tenant_admin', 0, 1, '', 0, 1, '系统自动生成', '1', to_date('2022-02-22 00:56:14', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-02-22 00:56:14', 'SYYYY-MM-DD HH24:MI:SS'), '0', 121);
-INSERT INTO system_role (id, name, code, sort, data_scope, data_scope_dept_ids, status, type, remark, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (110, '测试角色', 'test', 0, 1, '[]', 0, 2, '嘿嘿', '110', to_date('2022-02-23 00:14:34', 'SYYYY-MM-DD HH24:MI:SS'), '110', to_date('2022-02-23 13:14:58', 'SYYYY-MM-DD HH24:MI:SS'), '0', 121);
 INSERT INTO system_role (id, name, code, sort, data_scope, data_scope_dept_ids, status, type, remark, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (111, '租户管理员', 'tenant_admin', 0, 1, '', 0, 1, '系统自动生成', '1', to_date('2022-03-07 21:37:58', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-03-07 21:37:58', 'SYYYY-MM-DD HH24:MI:SS'), '0', 122);
-INSERT INTO system_role (id, name, code, sort, data_scope, data_scope_dept_ids, status, type, remark, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (113, '租户管理员', 'tenant_admin', 0, 1, '', 0, 1, '系统自动生成', '1', to_date('2022-05-17 10:07:10', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-05-17 10:07:10', 'SYYYY-MM-DD HH24:MI:SS'), '0', 124);
-INSERT INTO system_role (id, name, code, sort, data_scope, data_scope_dept_ids, status, type, remark, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (114, '租户管理员', 'tenant_admin', 0, 1, '', 0, 1, '系统自动生成', '1', to_date('2022-12-30 11:32:03', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-12-30 11:32:03', 'SYYYY-MM-DD HH24:MI:SS'), '0', 125);
-INSERT INTO system_role (id, name, code, sort, data_scope, data_scope_dept_ids, status, type, remark, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (115, '租户管理员', 'tenant_admin', 0, 1, '', 0, 1, '系统自动生成', '1', to_date('2022-12-30 11:33:42', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-12-30 11:33:42', 'SYYYY-MM-DD HH24:MI:SS'), '0', 126);
-INSERT INTO system_role (id, name, code, sort, data_scope, data_scope_dept_ids, status, type, remark, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (116, '租户管理员', 'tenant_admin', 0, 1, '', 0, 1, '系统自动生成', '1', to_date('2022-12-30 11:33:48', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-12-30 11:33:48', 'SYYYY-MM-DD HH24:MI:SS'), '0', 127);
-INSERT INTO system_role (id, name, code, sort, data_scope, data_scope_dept_ids, status, type, remark, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (118, '租户管理员', 'tenant_admin', 0, 1, '', 0, 1, '系统自动生成', '1', to_date('2022-12-30 11:47:52', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-12-30 11:47:52', 'SYYYY-MM-DD HH24:MI:SS'), '0', 129);
-INSERT INTO system_role (id, name, code, sort, data_scope, data_scope_dept_ids, status, type, remark, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (136, '租户管理员', 'tenant_admin', 0, 1, '', 0, 1, '系统自动生成', '1', to_date('2023-03-05 21:23:32', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-03-05 21:23:32', 'SYYYY-MM-DD HH24:MI:SS'), '0', 147);
-INSERT INTO system_role (id, name, code, sort, data_scope, data_scope_dept_ids, status, type, remark, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (137, '租户管理员', 'tenant_admin', 0, 1, '', 0, 1, '系统自动生成', '1', to_date('2023-03-05 21:42:27', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-03-05 21:42:27', 'SYYYY-MM-DD HH24:MI:SS'), '0', 148);
-INSERT INTO system_role (id, name, code, sort, data_scope, data_scope_dept_ids, status, type, remark, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (138, '租户管理员', 'tenant_admin', 0, 1, '', 0, 1, '系统自动生成', '1', to_date('2023-03-05 21:59:02', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-03-05 21:59:02', 'SYYYY-MM-DD HH24:MI:SS'), '0', 149);
-INSERT INTO system_role (id, name, code, sort, data_scope, data_scope_dept_ids, status, type, remark, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (139, '租户管理员', 'tenant_admin', 0, 1, '', 0, 1, '系统自动生成', '1', to_date('2023-07-25 23:06:04', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-07-25 23:06:04', 'SYYYY-MM-DD HH24:MI:SS'), '0', 150);
-INSERT INTO system_role (id, name, code, sort, data_scope, data_scope_dept_ids, status, type, remark, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (140, '租户管理员', 'tenant_admin', 0, 1, '', 0, 1, '系统自动生成', '1', to_date('2023-12-02 23:35:05', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-02 23:35:05', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_role (id, name, code, sort, data_scope, data_scope_dept_ids, status, type, remark, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (141, '租户管理员', 'tenant_admin', 0, 1, '', 0, 1, '系统自动生成', '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role (id, name, code, sort, data_scope, data_scope_dept_ids, status, type, remark, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (143, '租户管理员', 'tenant_admin', 0, 1, '', 0, 1, '系统自动生成', '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role (id, name, code, sort, data_scope, data_scope_dept_ids, status, type, remark, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (144, '租户管理员', 'tenant_admin', 0, 1, '', 0, 1, '系统自动生成', '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
 COMMIT;
 -- @formatter:on
 
 CREATE SEQUENCE system_role_seq
-    START WITH 145
-    INCREMENT BY 1;
-
+    START WITH 112;
 
 -- ----------------------------
--- system_role_menu
--- ------------------------------
+-- Table structure for system_role_menu
+-- ----------------------------
 CREATE TABLE system_role_menu
 (
     id          number                                 NOT NULL,
@@ -2958,11 +2851,17 @@ ALTER TABLE system_role_menu
 COMMENT ON COLUMN system_role_menu.id IS '自增编号';
 COMMENT ON COLUMN system_role_menu.role_id IS '角色ID';
 COMMENT ON COLUMN system_role_menu.menu_id IS '菜单ID';
+COMMENT ON COLUMN system_role_menu.creator IS '创建者';
 COMMENT ON COLUMN system_role_menu.create_time IS '创建时间';
+COMMENT ON COLUMN system_role_menu.updater IS '更新者';
 COMMENT ON COLUMN system_role_menu.update_time IS '更新时间';
+COMMENT ON COLUMN system_role_menu.deleted IS '是否删除';
 COMMENT ON COLUMN system_role_menu.tenant_id IS '租户编号';
 COMMENT ON TABLE system_role_menu IS '角色和菜单关联表';
 
+-- ----------------------------
+-- Records of system_role_menu
+-- ----------------------------
 -- @formatter:off
 INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (263, 109, 1, '1', to_date('2022-02-22 00:56:14', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-02-22 00:56:14', 'SYYYY-MM-DD HH24:MI:SS'), '0', 121);
 INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (434, 2, 1, '1', to_date('2022-02-22 13:09:12', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-02-22 13:09:12', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
@@ -2998,38 +2897,6 @@ INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, update
 INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (706, 2, 112, '1', to_date('2022-02-22 13:16:57', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-02-22 13:16:57', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
 INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (707, 2, 113, '1', to_date('2022-02-22 13:16:57', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-02-22 13:16:57', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
 INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1296, 110, 1, '110', to_date('2022-02-23 00:23:55', 'SYYYY-MM-DD HH24:MI:SS'), '110', to_date('2022-02-23 00:23:55', 'SYYYY-MM-DD HH24:MI:SS'), '0', 121);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1489, 1, 1, '1', to_date('2022-02-23 20:03:57', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-02-23 20:03:57', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1490, 1, 2, '1', to_date('2022-02-23 20:03:57', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-02-23 20:03:57', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1494, 1, 1077, '1', to_date('2022-02-23 20:03:57', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-02-23 20:03:57', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1495, 1, 1078, '1', to_date('2022-02-23 20:03:57', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-02-23 20:03:57', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1496, 1, 1083, '1', to_date('2022-02-23 20:03:57', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-02-23 20:03:57', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1497, 1, 1084, '1', to_date('2022-02-23 20:03:57', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-02-23 20:03:57', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1498, 1, 1090, '1', to_date('2022-02-23 20:03:57', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-02-23 20:03:57', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1499, 1, 1093, '1', to_date('2022-02-23 20:03:57', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-02-23 20:03:57', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1500, 1, 1094, '1', to_date('2022-02-23 20:03:57', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-02-23 20:03:57', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1501, 1, 1100, '1', to_date('2022-02-23 20:03:57', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-02-23 20:03:57', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1502, 1, 1107, '1', to_date('2022-02-23 20:03:57', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-02-23 20:03:57', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1505, 1, 1117, '1', to_date('2022-02-23 20:03:57', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-02-23 20:03:57', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1506, 1, 100, '1', to_date('2022-02-23 20:03:57', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-02-23 20:03:57', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1507, 1, 101, '1', to_date('2022-02-23 20:03:57', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-02-23 20:03:57', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1508, 1, 102, '1', to_date('2022-02-23 20:03:57', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-02-23 20:03:57', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1509, 1, 1126, '1', to_date('2022-02-23 20:03:57', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-02-23 20:03:57', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1510, 1, 103, '1', to_date('2022-02-23 20:03:57', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-02-23 20:03:57', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1511, 1, 104, '1', to_date('2022-02-23 20:03:57', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-02-23 20:03:57', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1512, 1, 105, '1', to_date('2022-02-23 20:03:57', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-02-23 20:03:57', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1513, 1, 106, '1', to_date('2022-02-23 20:03:57', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-02-23 20:03:57', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1514, 1, 107, '1', to_date('2022-02-23 20:03:57', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-02-23 20:03:57', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1515, 1, 108, '1', to_date('2022-02-23 20:03:57', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-02-23 20:03:57', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1516, 1, 109, '1', to_date('2022-02-23 20:03:57', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-02-23 20:03:57', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1517, 1, 110, '1', to_date('2022-02-23 20:03:57', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-02-23 20:03:57', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1518, 1, 111, '1', to_date('2022-02-23 20:03:57', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-02-23 20:03:57', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1519, 1, 112, '1', to_date('2022-02-23 20:03:57', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-02-23 20:03:57', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1520, 1, 113, '1', to_date('2022-02-23 20:03:57', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-02-23 20:03:57', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1522, 1, 1138, '1', to_date('2022-02-23 20:03:57', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-02-23 20:03:57', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1525, 1, 1224, '1', to_date('2022-02-23 20:03:57', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-02-23 20:03:57', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1526, 1, 1225, '1', to_date('2022-02-23 20:03:57', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-02-23 20:03:57', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1527, 1, 500, '1', to_date('2022-02-23 20:03:57', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-02-23 20:03:57', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1528, 1, 501, '1', to_date('2022-02-23 20:03:57', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-02-23 20:03:57', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
 INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1578, 111, 1, '1', to_date('2022-03-07 21:37:58', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-03-07 21:37:58', 'SYYYY-MM-DD HH24:MI:SS'), '0', 122);
 INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1604, 101, 1216, '1', to_date('2022-03-19 21:45:52', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-03-19 21:45:52', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
 INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1605, 101, 1217, '1', to_date('2022-03-19 21:45:52', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-03-19 21:45:52', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
@@ -3113,23 +2980,6 @@ INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, update
 INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1692, 101, 114, '1', to_date('2022-04-01 22:21:37', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-04-01 22:21:37', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
 INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1693, 101, 115, '1', to_date('2022-04-01 22:21:37', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-04-01 22:21:37', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
 INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1694, 101, 116, '1', to_date('2022-04-01 22:21:37', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-04-01 22:21:37', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1712, 113, 1024, '1', to_date('2022-05-17 10:07:10', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-05-17 10:07:10', 'SYYYY-MM-DD HH24:MI:SS'), '0', 124);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1713, 113, 1025, '1', to_date('2022-05-17 10:07:10', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-05-17 10:07:10', 'SYYYY-MM-DD HH24:MI:SS'), '0', 124);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1714, 113, 1, '1', to_date('2022-05-17 10:07:10', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-05-17 10:07:10', 'SYYYY-MM-DD HH24:MI:SS'), '0', 124);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1715, 113, 102, '1', to_date('2022-05-17 10:07:10', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-05-17 10:07:10', 'SYYYY-MM-DD HH24:MI:SS'), '0', 124);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1716, 113, 103, '1', to_date('2022-05-17 10:07:10', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-05-17 10:07:10', 'SYYYY-MM-DD HH24:MI:SS'), '0', 124);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1717, 113, 104, '1', to_date('2022-05-17 10:07:10', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-05-17 10:07:10', 'SYYYY-MM-DD HH24:MI:SS'), '0', 124);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1718, 113, 1013, '1', to_date('2022-05-17 10:07:10', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-05-17 10:07:10', 'SYYYY-MM-DD HH24:MI:SS'), '0', 124);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1719, 113, 1014, '1', to_date('2022-05-17 10:07:10', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-05-17 10:07:10', 'SYYYY-MM-DD HH24:MI:SS'), '0', 124);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1720, 113, 1015, '1', to_date('2022-05-17 10:07:10', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-05-17 10:07:10', 'SYYYY-MM-DD HH24:MI:SS'), '0', 124);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1721, 113, 1016, '1', to_date('2022-05-17 10:07:10', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-05-17 10:07:10', 'SYYYY-MM-DD HH24:MI:SS'), '0', 124);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1722, 113, 1017, '1', to_date('2022-05-17 10:07:10', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-05-17 10:07:10', 'SYYYY-MM-DD HH24:MI:SS'), '0', 124);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1723, 113, 1018, '1', to_date('2022-05-17 10:07:10', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-05-17 10:07:10', 'SYYYY-MM-DD HH24:MI:SS'), '0', 124);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1724, 113, 1019, '1', to_date('2022-05-17 10:07:10', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-05-17 10:07:10', 'SYYYY-MM-DD HH24:MI:SS'), '0', 124);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1725, 113, 1020, '1', to_date('2022-05-17 10:07:10', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-05-17 10:07:10', 'SYYYY-MM-DD HH24:MI:SS'), '0', 124);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1726, 113, 1021, '1', to_date('2022-05-17 10:07:10', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-05-17 10:07:10', 'SYYYY-MM-DD HH24:MI:SS'), '0', 124);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1727, 113, 1022, '1', to_date('2022-05-17 10:07:10', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-05-17 10:07:10', 'SYYYY-MM-DD HH24:MI:SS'), '0', 124);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1728, 113, 1023, '1', to_date('2022-05-17 10:07:10', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-05-17 10:07:10', 'SYYYY-MM-DD HH24:MI:SS'), '0', 124);
 INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1729, 109, 100, '1', to_date('2022-09-21 22:08:51', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-09-21 22:08:51', 'SYYYY-MM-DD HH24:MI:SS'), '0', 121);
 INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1730, 109, 101, '1', to_date('2022-09-21 22:08:51', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-09-21 22:08:51', 'SYYYY-MM-DD HH24:MI:SS'), '0', 121);
 INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1731, 109, 1063, '1', to_date('2022-09-21 22:08:51', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-09-21 22:08:51', 'SYYYY-MM-DD HH24:MI:SS'), '0', 121);
@@ -3252,118 +3102,6 @@ INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, update
 INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1848, 111, 1038, '1', to_date('2022-09-21 22:48:13', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-09-21 22:48:13', 'SYYYY-MM-DD HH24:MI:SS'), '0', 122);
 INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1849, 111, 1039, '1', to_date('2022-09-21 22:48:13', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-09-21 22:48:13', 'SYYYY-MM-DD HH24:MI:SS'), '0', 122);
 INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1850, 111, 107, '1', to_date('2022-09-21 22:48:13', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-09-21 22:48:13', 'SYYYY-MM-DD HH24:MI:SS'), '0', 122);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1851, 114, 1, '1', to_date('2022-12-30 11:32:03', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-12-30 11:32:03', 'SYYYY-MM-DD HH24:MI:SS'), '0', 125);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1852, 114, 1036, '1', to_date('2022-12-30 11:32:03', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-12-30 11:32:03', 'SYYYY-MM-DD HH24:MI:SS'), '0', 125);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1853, 114, 1037, '1', to_date('2022-12-30 11:32:03', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-12-30 11:32:03', 'SYYYY-MM-DD HH24:MI:SS'), '0', 125);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1854, 114, 1038, '1', to_date('2022-12-30 11:32:03', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-12-30 11:32:03', 'SYYYY-MM-DD HH24:MI:SS'), '0', 125);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1855, 114, 1039, '1', to_date('2022-12-30 11:32:03', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-12-30 11:32:03', 'SYYYY-MM-DD HH24:MI:SS'), '0', 125);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1856, 114, 100, '1', to_date('2022-12-30 11:32:03', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-12-30 11:32:03', 'SYYYY-MM-DD HH24:MI:SS'), '0', 125);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1857, 114, 101, '1', to_date('2022-12-30 11:32:03', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-12-30 11:32:03', 'SYYYY-MM-DD HH24:MI:SS'), '0', 125);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1858, 114, 1063, '1', to_date('2022-12-30 11:32:03', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-12-30 11:32:03', 'SYYYY-MM-DD HH24:MI:SS'), '0', 125);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1859, 114, 103, '1', to_date('2022-12-30 11:32:03', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-12-30 11:32:03', 'SYYYY-MM-DD HH24:MI:SS'), '0', 125);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1860, 114, 1064, '1', to_date('2022-12-30 11:32:03', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-12-30 11:32:03', 'SYYYY-MM-DD HH24:MI:SS'), '0', 125);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1861, 114, 1001, '1', to_date('2022-12-30 11:32:03', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-12-30 11:32:03', 'SYYYY-MM-DD HH24:MI:SS'), '0', 125);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1862, 114, 1065, '1', to_date('2022-12-30 11:32:03', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-12-30 11:32:03', 'SYYYY-MM-DD HH24:MI:SS'), '0', 125);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1863, 114, 1002, '1', to_date('2022-12-30 11:32:03', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-12-30 11:32:03', 'SYYYY-MM-DD HH24:MI:SS'), '0', 125);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1864, 114, 1003, '1', to_date('2022-12-30 11:32:03', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-12-30 11:32:03', 'SYYYY-MM-DD HH24:MI:SS'), '0', 125);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1865, 114, 107, '1', to_date('2022-12-30 11:32:03', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-12-30 11:32:03', 'SYYYY-MM-DD HH24:MI:SS'), '0', 125);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1866, 114, 1004, '1', to_date('2022-12-30 11:32:03', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-12-30 11:32:03', 'SYYYY-MM-DD HH24:MI:SS'), '0', 125);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1867, 114, 1005, '1', to_date('2022-12-30 11:32:03', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-12-30 11:32:03', 'SYYYY-MM-DD HH24:MI:SS'), '0', 125);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1868, 114, 1006, '1', to_date('2022-12-30 11:32:03', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-12-30 11:32:03', 'SYYYY-MM-DD HH24:MI:SS'), '0', 125);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1869, 114, 1007, '1', to_date('2022-12-30 11:32:03', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-12-30 11:32:03', 'SYYYY-MM-DD HH24:MI:SS'), '0', 125);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1870, 114, 1008, '1', to_date('2022-12-30 11:32:03', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-12-30 11:32:03', 'SYYYY-MM-DD HH24:MI:SS'), '0', 125);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1871, 114, 1009, '1', to_date('2022-12-30 11:32:03', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-12-30 11:32:03', 'SYYYY-MM-DD HH24:MI:SS'), '0', 125);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1872, 114, 1010, '1', to_date('2022-12-30 11:32:03', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-12-30 11:32:03', 'SYYYY-MM-DD HH24:MI:SS'), '0', 125);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1873, 114, 1011, '1', to_date('2022-12-30 11:32:03', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-12-30 11:32:03', 'SYYYY-MM-DD HH24:MI:SS'), '0', 125);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1874, 114, 1012, '1', to_date('2022-12-30 11:32:03', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-12-30 11:32:03', 'SYYYY-MM-DD HH24:MI:SS'), '0', 125);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1875, 114, 1017, '1', to_date('2022-12-30 11:32:03', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-12-30 11:32:03', 'SYYYY-MM-DD HH24:MI:SS'), '0', 125);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1876, 114, 1018, '1', to_date('2022-12-30 11:32:03', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-12-30 11:32:03', 'SYYYY-MM-DD HH24:MI:SS'), '0', 125);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1877, 114, 1019, '1', to_date('2022-12-30 11:32:03', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-12-30 11:32:03', 'SYYYY-MM-DD HH24:MI:SS'), '0', 125);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1878, 114, 1020, '1', to_date('2022-12-30 11:32:03', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-12-30 11:32:03', 'SYYYY-MM-DD HH24:MI:SS'), '0', 125);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1879, 115, 1, '1', to_date('2022-12-30 11:33:42', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-12-30 11:33:42', 'SYYYY-MM-DD HH24:MI:SS'), '0', 126);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1880, 115, 1036, '1', to_date('2022-12-30 11:33:42', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-12-30 11:33:42', 'SYYYY-MM-DD HH24:MI:SS'), '0', 126);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1881, 115, 1037, '1', to_date('2022-12-30 11:33:42', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-12-30 11:33:42', 'SYYYY-MM-DD HH24:MI:SS'), '0', 126);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1882, 115, 1038, '1', to_date('2022-12-30 11:33:42', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-12-30 11:33:42', 'SYYYY-MM-DD HH24:MI:SS'), '0', 126);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1883, 115, 1039, '1', to_date('2022-12-30 11:33:42', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-12-30 11:33:42', 'SYYYY-MM-DD HH24:MI:SS'), '0', 126);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1884, 115, 100, '1', to_date('2022-12-30 11:33:42', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-12-30 11:33:42', 'SYYYY-MM-DD HH24:MI:SS'), '0', 126);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1885, 115, 101, '1', to_date('2022-12-30 11:33:42', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-12-30 11:33:42', 'SYYYY-MM-DD HH24:MI:SS'), '0', 126);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1886, 115, 1063, '1', to_date('2022-12-30 11:33:42', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-12-30 11:33:42', 'SYYYY-MM-DD HH24:MI:SS'), '0', 126);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1887, 115, 103, '1', to_date('2022-12-30 11:33:42', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-12-30 11:33:42', 'SYYYY-MM-DD HH24:MI:SS'), '0', 126);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1888, 115, 1064, '1', to_date('2022-12-30 11:33:42', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-12-30 11:33:42', 'SYYYY-MM-DD HH24:MI:SS'), '0', 126);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1889, 115, 1001, '1', to_date('2022-12-30 11:33:42', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-12-30 11:33:42', 'SYYYY-MM-DD HH24:MI:SS'), '0', 126);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1890, 115, 1065, '1', to_date('2022-12-30 11:33:42', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-12-30 11:33:42', 'SYYYY-MM-DD HH24:MI:SS'), '0', 126);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1891, 115, 1002, '1', to_date('2022-12-30 11:33:42', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-12-30 11:33:42', 'SYYYY-MM-DD HH24:MI:SS'), '0', 126);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1892, 115, 1003, '1', to_date('2022-12-30 11:33:42', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-12-30 11:33:42', 'SYYYY-MM-DD HH24:MI:SS'), '0', 126);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1893, 115, 107, '1', to_date('2022-12-30 11:33:42', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-12-30 11:33:42', 'SYYYY-MM-DD HH24:MI:SS'), '0', 126);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1894, 115, 1004, '1', to_date('2022-12-30 11:33:42', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-12-30 11:33:42', 'SYYYY-MM-DD HH24:MI:SS'), '0', 126);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1895, 115, 1005, '1', to_date('2022-12-30 11:33:42', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-12-30 11:33:42', 'SYYYY-MM-DD HH24:MI:SS'), '0', 126);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1896, 115, 1006, '1', to_date('2022-12-30 11:33:42', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-12-30 11:33:42', 'SYYYY-MM-DD HH24:MI:SS'), '0', 126);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1897, 115, 1007, '1', to_date('2022-12-30 11:33:42', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-12-30 11:33:42', 'SYYYY-MM-DD HH24:MI:SS'), '0', 126);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1898, 115, 1008, '1', to_date('2022-12-30 11:33:42', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-12-30 11:33:42', 'SYYYY-MM-DD HH24:MI:SS'), '0', 126);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1899, 115, 1009, '1', to_date('2022-12-30 11:33:42', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-12-30 11:33:42', 'SYYYY-MM-DD HH24:MI:SS'), '0', 126);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1900, 115, 1010, '1', to_date('2022-12-30 11:33:42', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-12-30 11:33:42', 'SYYYY-MM-DD HH24:MI:SS'), '0', 126);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1901, 115, 1011, '1', to_date('2022-12-30 11:33:42', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-12-30 11:33:42', 'SYYYY-MM-DD HH24:MI:SS'), '0', 126);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1902, 115, 1012, '1', to_date('2022-12-30 11:33:42', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-12-30 11:33:42', 'SYYYY-MM-DD HH24:MI:SS'), '0', 126);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1903, 115, 1017, '1', to_date('2022-12-30 11:33:42', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-12-30 11:33:42', 'SYYYY-MM-DD HH24:MI:SS'), '0', 126);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1904, 115, 1018, '1', to_date('2022-12-30 11:33:42', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-12-30 11:33:42', 'SYYYY-MM-DD HH24:MI:SS'), '0', 126);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1905, 115, 1019, '1', to_date('2022-12-30 11:33:42', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-12-30 11:33:42', 'SYYYY-MM-DD HH24:MI:SS'), '0', 126);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1906, 115, 1020, '1', to_date('2022-12-30 11:33:42', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-12-30 11:33:42', 'SYYYY-MM-DD HH24:MI:SS'), '0', 126);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1907, 116, 1, '1', to_date('2022-12-30 11:33:48', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-12-30 11:33:48', 'SYYYY-MM-DD HH24:MI:SS'), '0', 127);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1908, 116, 1036, '1', to_date('2022-12-30 11:33:48', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-12-30 11:33:48', 'SYYYY-MM-DD HH24:MI:SS'), '0', 127);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1909, 116, 1037, '1', to_date('2022-12-30 11:33:48', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-12-30 11:33:48', 'SYYYY-MM-DD HH24:MI:SS'), '0', 127);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1910, 116, 1038, '1', to_date('2022-12-30 11:33:48', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-12-30 11:33:48', 'SYYYY-MM-DD HH24:MI:SS'), '0', 127);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1911, 116, 1039, '1', to_date('2022-12-30 11:33:48', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-12-30 11:33:48', 'SYYYY-MM-DD HH24:MI:SS'), '0', 127);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1912, 116, 100, '1', to_date('2022-12-30 11:33:48', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-12-30 11:33:48', 'SYYYY-MM-DD HH24:MI:SS'), '0', 127);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1913, 116, 101, '1', to_date('2022-12-30 11:33:48', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-12-30 11:33:48', 'SYYYY-MM-DD HH24:MI:SS'), '0', 127);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1914, 116, 1063, '1', to_date('2022-12-30 11:33:48', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-12-30 11:33:48', 'SYYYY-MM-DD HH24:MI:SS'), '0', 127);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1915, 116, 103, '1', to_date('2022-12-30 11:33:48', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-12-30 11:33:48', 'SYYYY-MM-DD HH24:MI:SS'), '0', 127);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1916, 116, 1064, '1', to_date('2022-12-30 11:33:48', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-12-30 11:33:48', 'SYYYY-MM-DD HH24:MI:SS'), '0', 127);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1917, 116, 1001, '1', to_date('2022-12-30 11:33:48', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-12-30 11:33:48', 'SYYYY-MM-DD HH24:MI:SS'), '0', 127);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1918, 116, 1065, '1', to_date('2022-12-30 11:33:48', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-12-30 11:33:48', 'SYYYY-MM-DD HH24:MI:SS'), '0', 127);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1919, 116, 1002, '1', to_date('2022-12-30 11:33:48', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-12-30 11:33:48', 'SYYYY-MM-DD HH24:MI:SS'), '0', 127);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1920, 116, 1003, '1', to_date('2022-12-30 11:33:48', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-12-30 11:33:48', 'SYYYY-MM-DD HH24:MI:SS'), '0', 127);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1921, 116, 107, '1', to_date('2022-12-30 11:33:48', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-12-30 11:33:48', 'SYYYY-MM-DD HH24:MI:SS'), '0', 127);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1922, 116, 1004, '1', to_date('2022-12-30 11:33:48', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-12-30 11:33:48', 'SYYYY-MM-DD HH24:MI:SS'), '0', 127);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1923, 116, 1005, '1', to_date('2022-12-30 11:33:48', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-12-30 11:33:48', 'SYYYY-MM-DD HH24:MI:SS'), '0', 127);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1924, 116, 1006, '1', to_date('2022-12-30 11:33:48', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-12-30 11:33:48', 'SYYYY-MM-DD HH24:MI:SS'), '0', 127);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1925, 116, 1007, '1', to_date('2022-12-30 11:33:48', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-12-30 11:33:48', 'SYYYY-MM-DD HH24:MI:SS'), '0', 127);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1926, 116, 1008, '1', to_date('2022-12-30 11:33:48', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-12-30 11:33:48', 'SYYYY-MM-DD HH24:MI:SS'), '0', 127);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1927, 116, 1009, '1', to_date('2022-12-30 11:33:48', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-12-30 11:33:48', 'SYYYY-MM-DD HH24:MI:SS'), '0', 127);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1928, 116, 1010, '1', to_date('2022-12-30 11:33:48', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-12-30 11:33:48', 'SYYYY-MM-DD HH24:MI:SS'), '0', 127);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1929, 116, 1011, '1', to_date('2022-12-30 11:33:48', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-12-30 11:33:48', 'SYYYY-MM-DD HH24:MI:SS'), '0', 127);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1930, 116, 1012, '1', to_date('2022-12-30 11:33:48', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-12-30 11:33:48', 'SYYYY-MM-DD HH24:MI:SS'), '0', 127);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1931, 116, 1017, '1', to_date('2022-12-30 11:33:48', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-12-30 11:33:48', 'SYYYY-MM-DD HH24:MI:SS'), '0', 127);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1932, 116, 1018, '1', to_date('2022-12-30 11:33:48', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-12-30 11:33:48', 'SYYYY-MM-DD HH24:MI:SS'), '0', 127);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1933, 116, 1019, '1', to_date('2022-12-30 11:33:48', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-12-30 11:33:48', 'SYYYY-MM-DD HH24:MI:SS'), '0', 127);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1934, 116, 1020, '1', to_date('2022-12-30 11:33:48', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-12-30 11:33:48', 'SYYYY-MM-DD HH24:MI:SS'), '0', 127);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1963, 118, 1, '1', to_date('2022-12-30 11:47:52', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-12-30 11:47:52', 'SYYYY-MM-DD HH24:MI:SS'), '0', 129);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1964, 118, 1036, '1', to_date('2022-12-30 11:47:52', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-12-30 11:47:52', 'SYYYY-MM-DD HH24:MI:SS'), '0', 129);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1965, 118, 1037, '1', to_date('2022-12-30 11:47:52', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-12-30 11:47:52', 'SYYYY-MM-DD HH24:MI:SS'), '0', 129);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1966, 118, 1038, '1', to_date('2022-12-30 11:47:52', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-12-30 11:47:52', 'SYYYY-MM-DD HH24:MI:SS'), '0', 129);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1967, 118, 1039, '1', to_date('2022-12-30 11:47:52', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-12-30 11:47:52', 'SYYYY-MM-DD HH24:MI:SS'), '0', 129);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1968, 118, 100, '1', to_date('2022-12-30 11:47:52', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-12-30 11:47:52', 'SYYYY-MM-DD HH24:MI:SS'), '0', 129);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1969, 118, 101, '1', to_date('2022-12-30 11:47:52', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-12-30 11:47:52', 'SYYYY-MM-DD HH24:MI:SS'), '0', 129);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1970, 118, 1063, '1', to_date('2022-12-30 11:47:52', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-12-30 11:47:52', 'SYYYY-MM-DD HH24:MI:SS'), '0', 129);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1971, 118, 103, '1', to_date('2022-12-30 11:47:52', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-12-30 11:47:52', 'SYYYY-MM-DD HH24:MI:SS'), '0', 129);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1972, 118, 1064, '1', to_date('2022-12-30 11:47:52', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-12-30 11:47:52', 'SYYYY-MM-DD HH24:MI:SS'), '0', 129);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1973, 118, 1001, '1', to_date('2022-12-30 11:47:52', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-12-30 11:47:52', 'SYYYY-MM-DD HH24:MI:SS'), '0', 129);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1974, 118, 1065, '1', to_date('2022-12-30 11:47:52', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-12-30 11:47:52', 'SYYYY-MM-DD HH24:MI:SS'), '0', 129);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1975, 118, 1002, '1', to_date('2022-12-30 11:47:52', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-12-30 11:47:52', 'SYYYY-MM-DD HH24:MI:SS'), '0', 129);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1976, 118, 1003, '1', to_date('2022-12-30 11:47:52', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-12-30 11:47:52', 'SYYYY-MM-DD HH24:MI:SS'), '0', 129);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1977, 118, 107, '1', to_date('2022-12-30 11:47:52', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-12-30 11:47:52', 'SYYYY-MM-DD HH24:MI:SS'), '0', 129);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1978, 118, 1004, '1', to_date('2022-12-30 11:47:52', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-12-30 11:47:52', 'SYYYY-MM-DD HH24:MI:SS'), '0', 129);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1979, 118, 1005, '1', to_date('2022-12-30 11:47:52', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-12-30 11:47:52', 'SYYYY-MM-DD HH24:MI:SS'), '0', 129);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1980, 118, 1006, '1', to_date('2022-12-30 11:47:52', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-12-30 11:47:52', 'SYYYY-MM-DD HH24:MI:SS'), '0', 129);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1981, 118, 1007, '1', to_date('2022-12-30 11:47:52', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-12-30 11:47:52', 'SYYYY-MM-DD HH24:MI:SS'), '0', 129);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1982, 118, 1008, '1', to_date('2022-12-30 11:47:52', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-12-30 11:47:52', 'SYYYY-MM-DD HH24:MI:SS'), '0', 129);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1983, 118, 1009, '1', to_date('2022-12-30 11:47:52', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-12-30 11:47:52', 'SYYYY-MM-DD HH24:MI:SS'), '0', 129);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1984, 118, 1010, '1', to_date('2022-12-30 11:47:52', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-12-30 11:47:52', 'SYYYY-MM-DD HH24:MI:SS'), '0', 129);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1985, 118, 1011, '1', to_date('2022-12-30 11:47:52', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-12-30 11:47:52', 'SYYYY-MM-DD HH24:MI:SS'), '0', 129);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1986, 118, 1012, '1', to_date('2022-12-30 11:47:52', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-12-30 11:47:52', 'SYYYY-MM-DD HH24:MI:SS'), '0', 129);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1987, 118, 1017, '1', to_date('2022-12-30 11:47:52', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-12-30 11:47:52', 'SYYYY-MM-DD HH24:MI:SS'), '0', 129);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1988, 118, 1018, '1', to_date('2022-12-30 11:47:52', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-12-30 11:47:52', 'SYYYY-MM-DD HH24:MI:SS'), '0', 129);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1989, 118, 1019, '1', to_date('2022-12-30 11:47:52', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-12-30 11:47:52', 'SYYYY-MM-DD HH24:MI:SS'), '0', 129);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1990, 118, 1020, '1', to_date('2022-12-30 11:47:52', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-12-30 11:47:52', 'SYYYY-MM-DD HH24:MI:SS'), '0', 129);
 INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1991, 2, 1024, '1', to_date('2023-01-25 08:42:52', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-01-25 08:42:52', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
 INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1992, 2, 1025, '1', to_date('2023-01-25 08:42:52', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-01-25 08:42:52', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
 INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1993, 2, 1026, '1', to_date('2023-01-25 08:42:52', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-01-25 08:42:52', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
@@ -3642,146 +3380,6 @@ INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, update
 INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2310, 101, 1021, '1', to_date('2023-02-09 23:49:46', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-02-09 23:49:46', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
 INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2311, 101, 1022, '1', to_date('2023-02-09 23:49:46', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-02-09 23:49:46', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
 INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2312, 101, 1023, '1', to_date('2023-02-09 23:49:46', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-02-09 23:49:46', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2789, 136, 1, '1', to_date('2023-03-05 21:23:32', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-03-05 21:23:32', 'SYYYY-MM-DD HH24:MI:SS'), '0', 147);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2790, 136, 1036, '1', to_date('2023-03-05 21:23:32', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-03-05 21:23:32', 'SYYYY-MM-DD HH24:MI:SS'), '0', 147);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2791, 136, 1037, '1', to_date('2023-03-05 21:23:32', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-03-05 21:23:32', 'SYYYY-MM-DD HH24:MI:SS'), '0', 147);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2792, 136, 1038, '1', to_date('2023-03-05 21:23:32', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-03-05 21:23:32', 'SYYYY-MM-DD HH24:MI:SS'), '0', 147);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2793, 136, 1039, '1', to_date('2023-03-05 21:23:32', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-03-05 21:23:32', 'SYYYY-MM-DD HH24:MI:SS'), '0', 147);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2794, 136, 100, '1', to_date('2023-03-05 21:23:32', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-03-05 21:23:32', 'SYYYY-MM-DD HH24:MI:SS'), '0', 147);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2795, 136, 101, '1', to_date('2023-03-05 21:23:32', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-03-05 21:23:32', 'SYYYY-MM-DD HH24:MI:SS'), '0', 147);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2796, 136, 1063, '1', to_date('2023-03-05 21:23:32', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-03-05 21:23:32', 'SYYYY-MM-DD HH24:MI:SS'), '0', 147);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2797, 136, 103, '1', to_date('2023-03-05 21:23:32', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-03-05 21:23:32', 'SYYYY-MM-DD HH24:MI:SS'), '0', 147);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2798, 136, 1064, '1', to_date('2023-03-05 21:23:32', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-03-05 21:23:32', 'SYYYY-MM-DD HH24:MI:SS'), '0', 147);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2799, 136, 1001, '1', to_date('2023-03-05 21:23:32', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-03-05 21:23:32', 'SYYYY-MM-DD HH24:MI:SS'), '0', 147);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2800, 136, 1065, '1', to_date('2023-03-05 21:23:32', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-03-05 21:23:32', 'SYYYY-MM-DD HH24:MI:SS'), '0', 147);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2801, 136, 1002, '1', to_date('2023-03-05 21:23:32', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-03-05 21:23:32', 'SYYYY-MM-DD HH24:MI:SS'), '0', 147);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2802, 136, 1003, '1', to_date('2023-03-05 21:23:32', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-03-05 21:23:32', 'SYYYY-MM-DD HH24:MI:SS'), '0', 147);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2803, 136, 107, '1', to_date('2023-03-05 21:23:32', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-03-05 21:23:32', 'SYYYY-MM-DD HH24:MI:SS'), '0', 147);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2804, 136, 1004, '1', to_date('2023-03-05 21:23:32', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-03-05 21:23:32', 'SYYYY-MM-DD HH24:MI:SS'), '0', 147);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2805, 136, 1005, '1', to_date('2023-03-05 21:23:32', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-03-05 21:23:32', 'SYYYY-MM-DD HH24:MI:SS'), '0', 147);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2806, 136, 1006, '1', to_date('2023-03-05 21:23:32', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-03-05 21:23:32', 'SYYYY-MM-DD HH24:MI:SS'), '0', 147);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2807, 136, 1007, '1', to_date('2023-03-05 21:23:32', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-03-05 21:23:32', 'SYYYY-MM-DD HH24:MI:SS'), '0', 147);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2808, 136, 1008, '1', to_date('2023-03-05 21:23:32', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-03-05 21:23:32', 'SYYYY-MM-DD HH24:MI:SS'), '0', 147);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2809, 136, 1009, '1', to_date('2023-03-05 21:23:32', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-03-05 21:23:32', 'SYYYY-MM-DD HH24:MI:SS'), '0', 147);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2810, 136, 1010, '1', to_date('2023-03-05 21:23:32', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-03-05 21:23:32', 'SYYYY-MM-DD HH24:MI:SS'), '0', 147);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2811, 136, 1011, '1', to_date('2023-03-05 21:23:32', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-03-05 21:23:32', 'SYYYY-MM-DD HH24:MI:SS'), '0', 147);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2812, 136, 1012, '1', to_date('2023-03-05 21:23:32', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-03-05 21:23:32', 'SYYYY-MM-DD HH24:MI:SS'), '0', 147);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2813, 136, 1017, '1', to_date('2023-03-05 21:23:32', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-03-05 21:23:32', 'SYYYY-MM-DD HH24:MI:SS'), '0', 147);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2814, 136, 1018, '1', to_date('2023-03-05 21:23:32', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-03-05 21:23:32', 'SYYYY-MM-DD HH24:MI:SS'), '0', 147);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2815, 136, 1019, '1', to_date('2023-03-05 21:23:32', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-03-05 21:23:32', 'SYYYY-MM-DD HH24:MI:SS'), '0', 147);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2816, 136, 1020, '1', to_date('2023-03-05 21:23:32', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-03-05 21:23:32', 'SYYYY-MM-DD HH24:MI:SS'), '0', 147);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2817, 137, 1, '1', to_date('2023-03-05 21:42:27', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-03-05 21:42:27', 'SYYYY-MM-DD HH24:MI:SS'), '0', 148);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2818, 137, 1036, '1', to_date('2023-03-05 21:42:27', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-03-05 21:42:27', 'SYYYY-MM-DD HH24:MI:SS'), '0', 148);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2819, 137, 1037, '1', to_date('2023-03-05 21:42:27', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-03-05 21:42:27', 'SYYYY-MM-DD HH24:MI:SS'), '0', 148);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2820, 137, 1038, '1', to_date('2023-03-05 21:42:27', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-03-05 21:42:27', 'SYYYY-MM-DD HH24:MI:SS'), '0', 148);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2821, 137, 1039, '1', to_date('2023-03-05 21:42:27', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-03-05 21:42:27', 'SYYYY-MM-DD HH24:MI:SS'), '0', 148);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2822, 137, 100, '1', to_date('2023-03-05 21:42:27', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-03-05 21:42:27', 'SYYYY-MM-DD HH24:MI:SS'), '0', 148);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2823, 137, 101, '1', to_date('2023-03-05 21:42:27', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-03-05 21:42:27', 'SYYYY-MM-DD HH24:MI:SS'), '0', 148);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2824, 137, 1063, '1', to_date('2023-03-05 21:42:27', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-03-05 21:42:27', 'SYYYY-MM-DD HH24:MI:SS'), '0', 148);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2825, 137, 103, '1', to_date('2023-03-05 21:42:27', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-03-05 21:42:27', 'SYYYY-MM-DD HH24:MI:SS'), '0', 148);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2826, 137, 1064, '1', to_date('2023-03-05 21:42:27', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-03-05 21:42:27', 'SYYYY-MM-DD HH24:MI:SS'), '0', 148);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2827, 137, 1001, '1', to_date('2023-03-05 21:42:27', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-03-05 21:42:27', 'SYYYY-MM-DD HH24:MI:SS'), '0', 148);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2828, 137, 1065, '1', to_date('2023-03-05 21:42:27', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-03-05 21:42:27', 'SYYYY-MM-DD HH24:MI:SS'), '0', 148);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2829, 137, 1002, '1', to_date('2023-03-05 21:42:27', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-03-05 21:42:27', 'SYYYY-MM-DD HH24:MI:SS'), '0', 148);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2830, 137, 1003, '1', to_date('2023-03-05 21:42:27', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-03-05 21:42:27', 'SYYYY-MM-DD HH24:MI:SS'), '0', 148);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2831, 137, 107, '1', to_date('2023-03-05 21:42:27', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-03-05 21:42:27', 'SYYYY-MM-DD HH24:MI:SS'), '0', 148);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2832, 137, 1004, '1', to_date('2023-03-05 21:42:27', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-03-05 21:42:27', 'SYYYY-MM-DD HH24:MI:SS'), '0', 148);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2833, 137, 1005, '1', to_date('2023-03-05 21:42:27', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-03-05 21:42:27', 'SYYYY-MM-DD HH24:MI:SS'), '0', 148);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2834, 137, 1006, '1', to_date('2023-03-05 21:42:27', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-03-05 21:42:27', 'SYYYY-MM-DD HH24:MI:SS'), '0', 148);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2835, 137, 1007, '1', to_date('2023-03-05 21:42:27', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-03-05 21:42:27', 'SYYYY-MM-DD HH24:MI:SS'), '0', 148);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2836, 137, 1008, '1', to_date('2023-03-05 21:42:27', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-03-05 21:42:27', 'SYYYY-MM-DD HH24:MI:SS'), '0', 148);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2837, 137, 1009, '1', to_date('2023-03-05 21:42:27', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-03-05 21:42:27', 'SYYYY-MM-DD HH24:MI:SS'), '0', 148);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2838, 137, 1010, '1', to_date('2023-03-05 21:42:27', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-03-05 21:42:27', 'SYYYY-MM-DD HH24:MI:SS'), '0', 148);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2839, 137, 1011, '1', to_date('2023-03-05 21:42:27', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-03-05 21:42:27', 'SYYYY-MM-DD HH24:MI:SS'), '0', 148);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2840, 137, 1012, '1', to_date('2023-03-05 21:42:27', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-03-05 21:42:27', 'SYYYY-MM-DD HH24:MI:SS'), '0', 148);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2841, 137, 1017, '1', to_date('2023-03-05 21:42:27', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-03-05 21:42:27', 'SYYYY-MM-DD HH24:MI:SS'), '0', 148);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2842, 137, 1018, '1', to_date('2023-03-05 21:42:27', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-03-05 21:42:27', 'SYYYY-MM-DD HH24:MI:SS'), '0', 148);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2843, 137, 1019, '1', to_date('2023-03-05 21:42:27', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-03-05 21:42:27', 'SYYYY-MM-DD HH24:MI:SS'), '0', 148);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2844, 137, 1020, '1', to_date('2023-03-05 21:42:27', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-03-05 21:42:27', 'SYYYY-MM-DD HH24:MI:SS'), '0', 148);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2845, 138, 1, '1', to_date('2023-03-05 21:59:02', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-03-05 21:59:02', 'SYYYY-MM-DD HH24:MI:SS'), '0', 149);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2846, 138, 1036, '1', to_date('2023-03-05 21:59:02', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-03-05 21:59:02', 'SYYYY-MM-DD HH24:MI:SS'), '0', 149);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2847, 138, 1037, '1', to_date('2023-03-05 21:59:02', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-03-05 21:59:02', 'SYYYY-MM-DD HH24:MI:SS'), '0', 149);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2848, 138, 1038, '1', to_date('2023-03-05 21:59:02', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-03-05 21:59:02', 'SYYYY-MM-DD HH24:MI:SS'), '0', 149);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2849, 138, 1039, '1', to_date('2023-03-05 21:59:02', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-03-05 21:59:02', 'SYYYY-MM-DD HH24:MI:SS'), '0', 149);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2850, 138, 100, '1', to_date('2023-03-05 21:59:02', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-03-05 21:59:02', 'SYYYY-MM-DD HH24:MI:SS'), '0', 149);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2851, 138, 101, '1', to_date('2023-03-05 21:59:02', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-03-05 21:59:02', 'SYYYY-MM-DD HH24:MI:SS'), '0', 149);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2852, 138, 1063, '1', to_date('2023-03-05 21:59:02', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-03-05 21:59:02', 'SYYYY-MM-DD HH24:MI:SS'), '0', 149);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2853, 138, 103, '1', to_date('2023-03-05 21:59:02', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-03-05 21:59:02', 'SYYYY-MM-DD HH24:MI:SS'), '0', 149);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2854, 138, 1064, '1', to_date('2023-03-05 21:59:02', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-03-05 21:59:02', 'SYYYY-MM-DD HH24:MI:SS'), '0', 149);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2855, 138, 1001, '1', to_date('2023-03-05 21:59:02', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-03-05 21:59:02', 'SYYYY-MM-DD HH24:MI:SS'), '0', 149);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2856, 138, 1065, '1', to_date('2023-03-05 21:59:02', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-03-05 21:59:02', 'SYYYY-MM-DD HH24:MI:SS'), '0', 149);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2857, 138, 1002, '1', to_date('2023-03-05 21:59:02', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-03-05 21:59:02', 'SYYYY-MM-DD HH24:MI:SS'), '0', 149);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2858, 138, 1003, '1', to_date('2023-03-05 21:59:02', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-03-05 21:59:02', 'SYYYY-MM-DD HH24:MI:SS'), '0', 149);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2859, 138, 107, '1', to_date('2023-03-05 21:59:02', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-03-05 21:59:02', 'SYYYY-MM-DD HH24:MI:SS'), '0', 149);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2860, 138, 1004, '1', to_date('2023-03-05 21:59:02', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-03-05 21:59:02', 'SYYYY-MM-DD HH24:MI:SS'), '0', 149);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2861, 138, 1005, '1', to_date('2023-03-05 21:59:02', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-03-05 21:59:02', 'SYYYY-MM-DD HH24:MI:SS'), '0', 149);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2862, 138, 1006, '1', to_date('2023-03-05 21:59:02', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-03-05 21:59:02', 'SYYYY-MM-DD HH24:MI:SS'), '0', 149);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2863, 138, 1007, '1', to_date('2023-03-05 21:59:02', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-03-05 21:59:02', 'SYYYY-MM-DD HH24:MI:SS'), '0', 149);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2864, 138, 1008, '1', to_date('2023-03-05 21:59:02', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-03-05 21:59:02', 'SYYYY-MM-DD HH24:MI:SS'), '0', 149);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2865, 138, 1009, '1', to_date('2023-03-05 21:59:02', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-03-05 21:59:02', 'SYYYY-MM-DD HH24:MI:SS'), '0', 149);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2866, 138, 1010, '1', to_date('2023-03-05 21:59:02', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-03-05 21:59:02', 'SYYYY-MM-DD HH24:MI:SS'), '0', 149);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2867, 138, 1011, '1', to_date('2023-03-05 21:59:02', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-03-05 21:59:02', 'SYYYY-MM-DD HH24:MI:SS'), '0', 149);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2868, 138, 1012, '1', to_date('2023-03-05 21:59:02', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-03-05 21:59:02', 'SYYYY-MM-DD HH24:MI:SS'), '0', 149);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2869, 138, 1017, '1', to_date('2023-03-05 21:59:02', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-03-05 21:59:02', 'SYYYY-MM-DD HH24:MI:SS'), '0', 149);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2870, 138, 1018, '1', to_date('2023-03-05 21:59:02', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-03-05 21:59:02', 'SYYYY-MM-DD HH24:MI:SS'), '0', 149);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2871, 138, 1019, '1', to_date('2023-03-05 21:59:02', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-03-05 21:59:02', 'SYYYY-MM-DD HH24:MI:SS'), '0', 149);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2872, 138, 1020, '1', to_date('2023-03-05 21:59:02', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-03-05 21:59:02', 'SYYYY-MM-DD HH24:MI:SS'), '0', 149);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2873, 139, 1, '1', to_date('2023-07-25 23:06:04', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-07-25 23:06:04', 'SYYYY-MM-DD HH24:MI:SS'), '0', 150);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2874, 139, 1036, '1', to_date('2023-07-25 23:06:04', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-07-25 23:06:04', 'SYYYY-MM-DD HH24:MI:SS'), '0', 150);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2875, 139, 1037, '1', to_date('2023-07-25 23:06:04', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-07-25 23:06:04', 'SYYYY-MM-DD HH24:MI:SS'), '0', 150);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2876, 139, 1038, '1', to_date('2023-07-25 23:06:04', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-07-25 23:06:04', 'SYYYY-MM-DD HH24:MI:SS'), '0', 150);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2877, 139, 1039, '1', to_date('2023-07-25 23:06:04', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-07-25 23:06:04', 'SYYYY-MM-DD HH24:MI:SS'), '0', 150);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2878, 139, 100, '1', to_date('2023-07-25 23:06:04', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-07-25 23:06:04', 'SYYYY-MM-DD HH24:MI:SS'), '0', 150);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2879, 139, 101, '1', to_date('2023-07-25 23:06:04', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-07-25 23:06:04', 'SYYYY-MM-DD HH24:MI:SS'), '0', 150);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2880, 139, 1063, '1', to_date('2023-07-25 23:06:04', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-07-25 23:06:04', 'SYYYY-MM-DD HH24:MI:SS'), '0', 150);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2881, 139, 103, '1', to_date('2023-07-25 23:06:04', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-07-25 23:06:04', 'SYYYY-MM-DD HH24:MI:SS'), '0', 150);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2882, 139, 1064, '1', to_date('2023-07-25 23:06:04', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-07-25 23:06:04', 'SYYYY-MM-DD HH24:MI:SS'), '0', 150);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2883, 139, 1001, '1', to_date('2023-07-25 23:06:04', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-07-25 23:06:04', 'SYYYY-MM-DD HH24:MI:SS'), '0', 150);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2884, 139, 1065, '1', to_date('2023-07-25 23:06:04', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-07-25 23:06:04', 'SYYYY-MM-DD HH24:MI:SS'), '0', 150);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2885, 139, 1002, '1', to_date('2023-07-25 23:06:04', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-07-25 23:06:04', 'SYYYY-MM-DD HH24:MI:SS'), '0', 150);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2886, 139, 1003, '1', to_date('2023-07-25 23:06:04', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-07-25 23:06:04', 'SYYYY-MM-DD HH24:MI:SS'), '0', 150);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2887, 139, 107, '1', to_date('2023-07-25 23:06:04', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-07-25 23:06:04', 'SYYYY-MM-DD HH24:MI:SS'), '0', 150);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2888, 139, 1004, '1', to_date('2023-07-25 23:06:04', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-07-25 23:06:04', 'SYYYY-MM-DD HH24:MI:SS'), '0', 150);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2889, 139, 1005, '1', to_date('2023-07-25 23:06:04', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-07-25 23:06:04', 'SYYYY-MM-DD HH24:MI:SS'), '0', 150);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2890, 139, 1006, '1', to_date('2023-07-25 23:06:04', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-07-25 23:06:04', 'SYYYY-MM-DD HH24:MI:SS'), '0', 150);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2891, 139, 1007, '1', to_date('2023-07-25 23:06:04', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-07-25 23:06:04', 'SYYYY-MM-DD HH24:MI:SS'), '0', 150);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2892, 139, 1008, '1', to_date('2023-07-25 23:06:04', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-07-25 23:06:04', 'SYYYY-MM-DD HH24:MI:SS'), '0', 150);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2893, 139, 1009, '1', to_date('2023-07-25 23:06:04', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-07-25 23:06:04', 'SYYYY-MM-DD HH24:MI:SS'), '0', 150);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2894, 139, 1010, '1', to_date('2023-07-25 23:06:04', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-07-25 23:06:04', 'SYYYY-MM-DD HH24:MI:SS'), '0', 150);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2895, 139, 1011, '1', to_date('2023-07-25 23:06:04', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-07-25 23:06:04', 'SYYYY-MM-DD HH24:MI:SS'), '0', 150);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2896, 139, 1012, '1', to_date('2023-07-25 23:06:04', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-07-25 23:06:04', 'SYYYY-MM-DD HH24:MI:SS'), '0', 150);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2897, 139, 1017, '1', to_date('2023-07-25 23:06:04', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-07-25 23:06:04', 'SYYYY-MM-DD HH24:MI:SS'), '0', 150);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2898, 139, 1018, '1', to_date('2023-07-25 23:06:04', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-07-25 23:06:04', 'SYYYY-MM-DD HH24:MI:SS'), '0', 150);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2899, 139, 1019, '1', to_date('2023-07-25 23:06:04', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-07-25 23:06:04', 'SYYYY-MM-DD HH24:MI:SS'), '0', 150);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2900, 139, 1020, '1', to_date('2023-07-25 23:06:04', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-07-25 23:06:04', 'SYYYY-MM-DD HH24:MI:SS'), '0', 150);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2901, 101, 1117, '1', to_date('2023-12-02 21:33:13', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-02 21:33:13', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2902, 101, 1126, '1', to_date('2023-12-02 21:33:13', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-02 21:33:13', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2903, 101, 1127, '1', to_date('2023-12-02 21:33:13', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-02 21:33:13', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2904, 101, 1128, '1', to_date('2023-12-02 21:33:13', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-02 21:33:13', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2905, 101, 1129, '1', to_date('2023-12-02 21:33:13', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-02 21:33:13', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2906, 101, 1130, '1', to_date('2023-12-02 21:33:13', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-02 21:33:13', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2907, 101, 1132, '1', to_date('2023-12-02 21:33:13', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-02 21:33:13', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2908, 101, 1133, '1', to_date('2023-12-02 21:33:13', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-02 21:33:13', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2909, 101, 1134, '1', to_date('2023-12-02 21:33:13', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-02 21:33:13', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2910, 101, 1135, '1', to_date('2023-12-02 21:33:13', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-02 21:33:13', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2911, 101, 1136, '1', to_date('2023-12-02 21:33:13', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-02 21:33:13', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2912, 101, 1137, '1', to_date('2023-12-02 21:33:13', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-02 21:33:13', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2913, 101, 2161, '1', to_date('2023-12-02 21:33:13', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-02 21:33:13', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2914, 101, 1150, '1', to_date('2023-12-02 21:33:13', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-02 21:33:13', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2915, 101, 1161, '1', to_date('2023-12-02 21:33:13', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-02 21:33:13', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2916, 101, 1162, '1', to_date('2023-12-02 21:33:13', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-02 21:33:13', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2917, 101, 1163, '1', to_date('2023-12-02 21:33:13', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-02 21:33:13', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2918, 101, 1164, '1', to_date('2023-12-02 21:33:13', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-02 21:33:13', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2919, 101, 1165, '1', to_date('2023-12-02 21:33:13', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-02 21:33:13', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2920, 101, 1166, '1', to_date('2023-12-02 21:33:13', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-02 21:33:13', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2921, 101, 1173, '1', to_date('2023-12-02 21:33:13', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-02 21:33:13', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2922, 101, 1174, '1', to_date('2023-12-02 21:33:13', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-02 21:33:13', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2923, 101, 1175, '1', to_date('2023-12-02 21:33:13', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-02 21:33:13', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2924, 101, 1176, '1', to_date('2023-12-02 21:33:13', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-02 21:33:13', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2925, 101, 1177, '1', to_date('2023-12-02 21:33:13', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-02 21:33:13', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2926, 101, 1178, '1', to_date('2023-12-02 21:33:13', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-02 21:33:13', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2927, 101, 2301, '1', to_date('2023-12-02 21:33:13', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-02 21:33:13', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2928, 101, 2302, '1', to_date('2023-12-02 21:33:13', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-02 21:33:13', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
 INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2929, 109, 1224, '1', to_date('2023-12-02 23:19:40', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-02 23:19:40', 'SYYYY-MM-DD HH24:MI:SS'), '0', 121);
 INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2930, 109, 1225, '1', to_date('2023-12-02 23:19:40', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-02 23:19:40', 'SYYYY-MM-DD HH24:MI:SS'), '0', 121);
 INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2931, 109, 1226, '1', to_date('2023-12-02 23:19:40', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-02 23:19:40', 'SYYYY-MM-DD HH24:MI:SS'), '0', 121);
@@ -3806,46 +3404,6 @@ INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, update
 INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2950, 111, 1141, '1', to_date('2023-12-02 23:19:40', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-02 23:19:40', 'SYYYY-MM-DD HH24:MI:SS'), '0', 122);
 INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2951, 111, 1142, '1', to_date('2023-12-02 23:19:40', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-02 23:19:40', 'SYYYY-MM-DD HH24:MI:SS'), '0', 122);
 INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2952, 111, 1143, '1', to_date('2023-12-02 23:19:40', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-02 23:19:40', 'SYYYY-MM-DD HH24:MI:SS'), '0', 122);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2953, 140, 1, '1', to_date('2023-12-02 23:35:05', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-02 23:35:05', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2954, 140, 1224, '1', to_date('2023-12-02 23:35:05', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-02 23:35:05', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2955, 140, 1225, '1', to_date('2023-12-02 23:35:05', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-02 23:35:05', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2956, 140, 1226, '1', to_date('2023-12-02 23:35:05', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-02 23:35:05', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2957, 140, 1227, '1', to_date('2023-12-02 23:35:05', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-02 23:35:05', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2958, 140, 1228, '1', to_date('2023-12-02 23:35:05', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-02 23:35:05', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2959, 140, 1036, '1', to_date('2023-12-02 23:35:05', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-02 23:35:05', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2960, 140, 1229, '1', to_date('2023-12-02 23:35:05', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-02 23:35:05', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2961, 140, 1037, '1', to_date('2023-12-02 23:35:05', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-02 23:35:05', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2962, 140, 1038, '1', to_date('2023-12-02 23:35:05', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-02 23:35:05', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2963, 140, 1039, '1', to_date('2023-12-02 23:35:05', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-02 23:35:05', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2964, 140, 100, '1', to_date('2023-12-02 23:35:05', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-02 23:35:05', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2965, 140, 101, '1', to_date('2023-12-02 23:35:05', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-02 23:35:05', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2966, 140, 1063, '1', to_date('2023-12-02 23:35:05', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-02 23:35:05', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2967, 140, 103, '1', to_date('2023-12-02 23:35:05', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-02 23:35:05', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2968, 140, 1064, '1', to_date('2023-12-02 23:35:05', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-02 23:35:05', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2969, 140, 1001, '1', to_date('2023-12-02 23:35:05', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-02 23:35:05', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2970, 140, 1065, '1', to_date('2023-12-02 23:35:05', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-02 23:35:05', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2971, 140, 1002, '1', to_date('2023-12-02 23:35:05', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-02 23:35:05', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2972, 140, 1003, '1', to_date('2023-12-02 23:35:05', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-02 23:35:05', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2973, 140, 107, '1', to_date('2023-12-02 23:35:05', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-02 23:35:05', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2974, 140, 1004, '1', to_date('2023-12-02 23:35:05', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-02 23:35:05', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2975, 140, 1005, '1', to_date('2023-12-02 23:35:05', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-02 23:35:05', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2976, 140, 1006, '1', to_date('2023-12-02 23:35:05', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-02 23:35:05', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2977, 140, 1007, '1', to_date('2023-12-02 23:35:05', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-02 23:35:05', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2978, 140, 1008, '1', to_date('2023-12-02 23:35:05', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-02 23:35:05', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2979, 140, 1009, '1', to_date('2023-12-02 23:35:05', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-02 23:35:05', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2980, 140, 1138, '1', to_date('2023-12-02 23:35:05', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-02 23:35:05', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2981, 140, 1010, '1', to_date('2023-12-02 23:35:05', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-02 23:35:05', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2982, 140, 1139, '1', to_date('2023-12-02 23:35:05', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-02 23:35:05', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2983, 140, 1011, '1', to_date('2023-12-02 23:35:05', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-02 23:35:05', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2984, 140, 1140, '1', to_date('2023-12-02 23:35:05', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-02 23:35:05', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2985, 140, 1012, '1', to_date('2023-12-02 23:35:05', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-02 23:35:05', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2986, 140, 1141, '1', to_date('2023-12-02 23:35:05', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-02 23:35:05', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2987, 140, 1142, '1', to_date('2023-12-02 23:35:05', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-02 23:35:05', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2988, 140, 1143, '1', to_date('2023-12-02 23:35:05', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-02 23:35:05', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2989, 140, 1017, '1', to_date('2023-12-02 23:35:05', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-02 23:35:05', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2990, 140, 1018, '1', to_date('2023-12-02 23:35:05', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-02 23:35:05', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2991, 140, 1019, '1', to_date('2023-12-02 23:35:05', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-02 23:35:05', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2992, 140, 1020, '1', to_date('2023-12-02 23:35:05', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-02 23:35:05', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
 INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2993, 109, 2, '1', to_date('2023-12-02 23:41:02', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-02 23:41:02', 'SYYYY-MM-DD HH24:MI:SS'), '0', 121);
 INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2994, 109, 1031, '1', to_date('2023-12-02 23:41:02', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-02 23:41:02', 'SYYYY-MM-DD HH24:MI:SS'), '0', 121);
 INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2995, 109, 1032, '1', to_date('2023-12-02 23:41:02', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-02 23:41:02', 'SYYYY-MM-DD HH24:MI:SS'), '0', 121);
@@ -3998,82 +3556,6 @@ INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, update
 INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3142, 111, 1258, '1', to_date('2023-12-02 23:41:02', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-02 23:41:02', 'SYYYY-MM-DD HH24:MI:SS'), '0', 122);
 INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3143, 111, 1259, '1', to_date('2023-12-02 23:41:02', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-02 23:41:02', 'SYYYY-MM-DD HH24:MI:SS'), '0', 122);
 INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3144, 111, 1260, '1', to_date('2023-12-02 23:41:02', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-02 23:41:02', 'SYYYY-MM-DD HH24:MI:SS'), '0', 122);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3145, 140, 2, '1', to_date('2023-12-02 23:41:02', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-02 23:41:02', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3146, 140, 1031, '1', to_date('2023-12-02 23:41:02', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-02 23:41:02', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3147, 140, 1032, '1', to_date('2023-12-02 23:41:02', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-02 23:41:02', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3148, 140, 1033, '1', to_date('2023-12-02 23:41:02', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-02 23:41:02', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3149, 140, 1034, '1', to_date('2023-12-02 23:41:02', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-02 23:41:02', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3150, 140, 1035, '1', to_date('2023-12-02 23:41:02', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-02 23:41:02', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3151, 140, 1050, '1', to_date('2023-12-02 23:41:02', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-02 23:41:02', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3152, 140, 1051, '1', to_date('2023-12-02 23:41:02', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-02 23:41:02', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3153, 140, 1052, '1', to_date('2023-12-02 23:41:02', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-02 23:41:02', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3154, 140, 1053, '1', to_date('2023-12-02 23:41:02', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-02 23:41:02', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3155, 140, 1054, '1', to_date('2023-12-02 23:41:02', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-02 23:41:02', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3156, 140, 1056, '1', to_date('2023-12-02 23:41:02', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-02 23:41:02', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3157, 140, 1057, '1', to_date('2023-12-02 23:41:02', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-02 23:41:02', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3158, 140, 1058, '1', to_date('2023-12-02 23:41:02', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-02 23:41:02', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3159, 140, 1059, '1', to_date('2023-12-02 23:41:02', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-02 23:41:02', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3160, 140, 1060, '1', to_date('2023-12-02 23:41:02', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-02 23:41:02', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3161, 140, 1066, '1', to_date('2023-12-02 23:41:02', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-02 23:41:02', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3162, 140, 1067, '1', to_date('2023-12-02 23:41:02', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-02 23:41:02', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3163, 140, 1070, '1', to_date('2023-12-02 23:41:02', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-02 23:41:02', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3164, 140, 1075, '1', to_date('2023-12-02 23:41:02', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-02 23:41:02', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3165, 140, 1076, '1', to_date('2023-12-02 23:41:02', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-02 23:41:02', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3166, 140, 1077, '1', to_date('2023-12-02 23:41:02', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-02 23:41:02', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3167, 140, 1078, '1', to_date('2023-12-02 23:41:02', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-02 23:41:02', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3168, 140, 1082, '1', to_date('2023-12-02 23:41:02', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-02 23:41:02', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3169, 140, 1083, '1', to_date('2023-12-02 23:41:02', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-02 23:41:02', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3170, 140, 1084, '1', to_date('2023-12-02 23:41:02', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-02 23:41:02', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3171, 140, 1085, '1', to_date('2023-12-02 23:41:02', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-02 23:41:02', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3172, 140, 1086, '1', to_date('2023-12-02 23:41:02', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-02 23:41:02', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3173, 140, 1087, '1', to_date('2023-12-02 23:41:02', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-02 23:41:02', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3174, 140, 1088, '1', to_date('2023-12-02 23:41:02', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-02 23:41:02', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3175, 140, 1089, '1', to_date('2023-12-02 23:41:02', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-02 23:41:02', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3176, 140, 1090, '1', to_date('2023-12-02 23:41:02', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-02 23:41:02', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3177, 140, 1091, '1', to_date('2023-12-02 23:41:02', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-02 23:41:02', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3178, 140, 1092, '1', to_date('2023-12-02 23:41:02', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-02 23:41:02', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3179, 140, 106, '1', to_date('2023-12-02 23:41:02', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-02 23:41:02', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3180, 140, 110, '1', to_date('2023-12-02 23:41:02', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-02 23:41:02', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3181, 140, 111, '1', to_date('2023-12-02 23:41:02', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-02 23:41:02', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3182, 140, 112, '1', to_date('2023-12-02 23:41:02', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-02 23:41:02', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3183, 140, 113, '1', to_date('2023-12-02 23:41:02', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-02 23:41:02', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3184, 140, 114, '1', to_date('2023-12-02 23:41:02', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-02 23:41:02', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3185, 140, 115, '1', to_date('2023-12-02 23:41:02', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-02 23:41:02', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3186, 140, 116, '1', to_date('2023-12-02 23:41:02', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-02 23:41:02', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3187, 140, 2472, '1', to_date('2023-12-02 23:41:02', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-02 23:41:02', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3188, 140, 2478, '1', to_date('2023-12-02 23:41:02', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-02 23:41:02', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3189, 140, 2479, '1', to_date('2023-12-02 23:41:02', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-02 23:41:02', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3190, 140, 2480, '1', to_date('2023-12-02 23:41:02', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-02 23:41:02', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3191, 140, 2481, '1', to_date('2023-12-02 23:41:02', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-02 23:41:02', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3192, 140, 2482, '1', to_date('2023-12-02 23:41:02', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-02 23:41:02', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3193, 140, 2483, '1', to_date('2023-12-02 23:41:02', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-02 23:41:02', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3194, 140, 2484, '1', to_date('2023-12-02 23:41:02', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-02 23:41:02', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3195, 140, 2485, '1', to_date('2023-12-02 23:41:02', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-02 23:41:02', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3196, 140, 2486, '1', to_date('2023-12-02 23:41:02', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-02 23:41:02', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3197, 140, 2487, '1', to_date('2023-12-02 23:41:02', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-02 23:41:02', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3198, 140, 2488, '1', to_date('2023-12-02 23:41:02', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-02 23:41:02', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3199, 140, 2489, '1', to_date('2023-12-02 23:41:02', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-02 23:41:02', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3200, 140, 2490, '1', to_date('2023-12-02 23:41:02', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-02 23:41:02', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3201, 140, 2491, '1', to_date('2023-12-02 23:41:02', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-02 23:41:02', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3202, 140, 2492, '1', to_date('2023-12-02 23:41:02', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-02 23:41:02', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3203, 140, 2493, '1', to_date('2023-12-02 23:41:02', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-02 23:41:02', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3204, 140, 2494, '1', to_date('2023-12-02 23:41:02', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-02 23:41:02', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3205, 140, 2495, '1', to_date('2023-12-02 23:41:02', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-02 23:41:02', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3206, 140, 2497, '1', to_date('2023-12-02 23:41:02', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-02 23:41:02', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3207, 140, 1237, '1', to_date('2023-12-02 23:41:02', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-02 23:41:02', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3208, 140, 1238, '1', to_date('2023-12-02 23:41:02', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-02 23:41:02', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3209, 140, 1239, '1', to_date('2023-12-02 23:41:02', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-02 23:41:02', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3210, 140, 1240, '1', to_date('2023-12-02 23:41:02', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-02 23:41:02', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3211, 140, 1241, '1', to_date('2023-12-02 23:41:02', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-02 23:41:02', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3212, 140, 1242, '1', to_date('2023-12-02 23:41:02', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-02 23:41:02', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3213, 140, 1243, '1', to_date('2023-12-02 23:41:02', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-02 23:41:02', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3214, 140, 2525, '1', to_date('2023-12-02 23:41:02', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-02 23:41:02', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3215, 140, 1255, '1', to_date('2023-12-02 23:41:02', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-02 23:41:02', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3216, 140, 1256, '1', to_date('2023-12-02 23:41:02', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-02 23:41:02', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3217, 140, 1257, '1', to_date('2023-12-02 23:41:02', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-02 23:41:02', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3218, 140, 1258, '1', to_date('2023-12-02 23:41:02', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-02 23:41:02', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3219, 140, 1259, '1', to_date('2023-12-02 23:41:02', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-02 23:41:02', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3220, 140, 1260, '1', to_date('2023-12-02 23:41:02', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-02 23:41:02', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
 INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3221, 109, 102, '1', to_date('2023-12-30 11:42:36', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-30 11:42:36', 'SYYYY-MM-DD HH24:MI:SS'), '0', 121);
 INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3222, 109, 1013, '1', to_date('2023-12-30 11:42:36', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-30 11:42:36', 'SYYYY-MM-DD HH24:MI:SS'), '0', 121);
 INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3223, 109, 1014, '1', to_date('2023-12-30 11:42:36', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-30 11:42:36', 'SYYYY-MM-DD HH24:MI:SS'), '0', 121);
@@ -4084,920 +3566,6 @@ INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, update
 INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3228, 111, 1014, '1', to_date('2023-12-30 11:42:36', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-30 11:42:36', 'SYYYY-MM-DD HH24:MI:SS'), '0', 122);
 INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3229, 111, 1015, '1', to_date('2023-12-30 11:42:36', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-30 11:42:36', 'SYYYY-MM-DD HH24:MI:SS'), '0', 122);
 INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3230, 111, 1016, '1', to_date('2023-12-30 11:42:36', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-30 11:42:36', 'SYYYY-MM-DD HH24:MI:SS'), '0', 122);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3231, 140, 102, '1', to_date('2023-12-30 11:42:36', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-30 11:42:36', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3232, 140, 1013, '1', to_date('2023-12-30 11:42:36', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-30 11:42:36', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3233, 140, 1014, '1', to_date('2023-12-30 11:42:36', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-30 11:42:36', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3234, 140, 1015, '1', to_date('2023-12-30 11:42:36', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-30 11:42:36', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3235, 140, 1016, '1', to_date('2023-12-30 11:42:36', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-30 11:42:36', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3236, 141, 1, '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3237, 141, 2, '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3238, 141, 1031, '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3239, 141, 1032, '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3240, 141, 1033, '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3241, 141, 1034, '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3242, 141, 1035, '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3243, 141, 1036, '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3244, 141, 1037, '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3245, 141, 1038, '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3246, 141, 1039, '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3247, 141, 1050, '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3248, 141, 1051, '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3249, 141, 1052, '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3250, 141, 1053, '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3251, 141, 1054, '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3252, 141, 1056, '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3253, 141, 1057, '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3254, 141, 1058, '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3255, 141, 1059, '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3256, 141, 1060, '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3257, 141, 1063, '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3258, 141, 1064, '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3259, 141, 1065, '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3260, 141, 1066, '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3261, 141, 1067, '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3262, 141, 1070, '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3263, 141, 1075, '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3264, 141, 1076, '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3265, 141, 1077, '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3266, 141, 1078, '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3267, 141, 1082, '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3268, 141, 1083, '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3269, 141, 1084, '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3270, 141, 1085, '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3271, 141, 1086, '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3272, 141, 1087, '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3273, 141, 1088, '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3274, 141, 1089, '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3275, 141, 1090, '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3276, 141, 1091, '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3277, 141, 1092, '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3278, 141, 100, '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3279, 141, 101, '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3280, 141, 102, '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3281, 141, 103, '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3282, 141, 106, '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3283, 141, 107, '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3284, 141, 110, '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3285, 141, 111, '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3286, 141, 112, '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3287, 141, 113, '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3288, 141, 1138, '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3289, 141, 114, '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3290, 141, 1139, '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3291, 141, 115, '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3292, 141, 1140, '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3293, 141, 116, '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3294, 141, 1141, '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3295, 141, 1142, '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3296, 141, 1143, '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3297, 141, 2472, '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3298, 141, 2478, '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3299, 141, 2479, '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3300, 141, 2480, '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3301, 141, 2481, '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3302, 141, 2482, '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3303, 141, 2483, '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3304, 141, 2484, '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3305, 141, 2485, '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3306, 141, 2486, '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3307, 141, 2487, '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3308, 141, 2488, '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3309, 141, 2489, '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3310, 141, 2490, '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3311, 141, 2491, '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3312, 141, 2492, '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3313, 141, 2493, '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3314, 141, 2494, '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3315, 141, 2495, '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3316, 141, 2497, '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3317, 141, 1224, '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3318, 141, 1225, '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3319, 141, 1226, '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3320, 141, 1227, '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3321, 141, 1228, '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3322, 141, 1229, '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3323, 141, 1237, '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3324, 141, 1238, '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3325, 141, 1239, '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3326, 141, 1240, '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3327, 141, 1241, '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3328, 141, 1242, '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3329, 141, 1243, '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3330, 141, 2525, '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3331, 141, 1255, '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3332, 141, 1256, '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3333, 141, 1001, '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3334, 141, 1257, '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3335, 141, 1002, '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3336, 141, 1258, '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3337, 141, 1003, '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3338, 141, 1259, '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3339, 141, 1004, '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3340, 141, 1260, '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3341, 141, 1005, '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3342, 141, 1006, '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3343, 141, 1007, '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3344, 141, 1008, '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3345, 141, 1009, '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3346, 141, 1010, '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3347, 141, 1011, '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3348, 141, 1012, '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3349, 141, 1013, '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3350, 141, 1014, '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3351, 141, 1015, '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3352, 141, 1016, '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3353, 141, 1017, '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3354, 141, 1018, '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3355, 141, 1019, '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3356, 141, 1020, '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3357, 1, 1024, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3358, 1, 2048, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3359, 1, 1025, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3360, 1, 2049, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3361, 1, 1026, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3362, 1, 2050, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3363, 1, 1027, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3364, 1, 2051, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3365, 1, 1028, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3366, 1, 2052, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3367, 1, 1029, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3368, 1, 5, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3369, 1, 1030, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3370, 1, 1031, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3371, 1, 1032, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3372, 1, 1033, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3373, 1, 1034, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3374, 1, 1035, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3375, 1, 2059, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3376, 1, 1036, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3377, 1, 2060, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3378, 1, 1037, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3379, 1, 2061, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3380, 1, 1038, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3381, 1, 2062, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3382, 1, 1039, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3383, 1, 2063, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3384, 1, 1040, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3385, 1, 1042, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3386, 1, 2066, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3387, 1, 1043, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3388, 1, 2067, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3389, 1, 2068, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3390, 1, 1045, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3391, 1, 2069, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3392, 1, 1046, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3393, 1, 2070, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3394, 1, 1048, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3395, 1, 2072, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3396, 1, 2073, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3397, 1, 1050, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3398, 1, 2074, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3399, 1, 1051, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3400, 1, 2075, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3401, 1, 1052, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3402, 1, 2076, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3403, 1, 1053, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3404, 1, 1054, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3405, 1, 1056, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3406, 1, 1057, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3407, 1, 1058, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3408, 1, 2083, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3409, 1, 1059, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3410, 1, 1060, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3411, 1, 2084, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3412, 1, 2085, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3413, 1, 2086, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3414, 1, 1063, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3415, 1, 2087, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3416, 1, 1064, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3417, 1, 2088, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3418, 1, 1065, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3419, 1, 2089, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3420, 1, 1066, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3421, 1, 2090, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3422, 1, 1067, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3423, 1, 2091, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3424, 1, 2092, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3425, 1, 2093, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3426, 1, 1070, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3427, 1, 2094, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3428, 1, 2095, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3429, 1, 2096, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3430, 1, 2097, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3431, 1, 2098, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3432, 1, 1075, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3433, 1, 2099, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3435, 1, 2100, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3436, 1, 2101, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3437, 1, 2102, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3438, 1, 2103, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3439, 1, 2104, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3440, 1, 2105, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3441, 1, 1082, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3442, 1, 2106, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3443, 1, 2107, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3444, 1, 2108, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3445, 1, 1085, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3446, 1, 2109, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3447, 1, 1086, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3448, 1, 2110, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3449, 1, 1087, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3450, 1, 2111, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3451, 1, 1088, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3452, 1, 2112, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3453, 1, 1089, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3454, 1, 2113, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3455, 1, 2114, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3456, 1, 1091, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3457, 1, 2115, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3458, 1, 1092, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3459, 1, 2116, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3460, 1, 2117, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3461, 1, 2118, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3462, 1, 1095, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3463, 1, 2119, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3464, 1, 1096, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3465, 1, 2120, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3466, 1, 1097, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3467, 1, 2121, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3468, 1, 1098, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3469, 1, 2122, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3470, 1, 2123, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3471, 1, 2124, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3472, 1, 1101, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3473, 1, 2125, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3474, 1, 1102, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3475, 1, 2126, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3476, 1, 1103, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3477, 1, 2127, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3478, 1, 1104, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3479, 1, 2128, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3480, 1, 1105, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3481, 1, 2129, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3482, 1, 1106, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3483, 1, 2130, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3484, 1, 2131, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3485, 1, 1108, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3486, 1, 2132, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3487, 1, 1109, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3488, 1, 2133, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3489, 1, 2134, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3490, 1, 2135, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3492, 1, 2136, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3494, 1, 2137, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3496, 1, 2138, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3498, 1, 2139, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3500, 1, 2140, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3501, 1, 2141, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3502, 1, 2142, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3503, 1, 1118, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3504, 1, 2143, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3505, 1, 1119, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3506, 1, 2144, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3507, 1, 1120, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3508, 1, 2145, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3509, 1, 2146, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3510, 1, 2147, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3511, 1, 2148, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3512, 1, 2149, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3513, 1, 2150, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3514, 1, 2151, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3515, 1, 1127, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3516, 1, 2152, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3517, 1, 1128, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3518, 1, 1129, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3519, 1, 2153, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3520, 1, 1130, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3521, 1, 2154, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3522, 1, 2155, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3523, 1, 1132, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3524, 1, 2156, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3525, 1, 1133, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3526, 1, 2157, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3527, 1, 1134, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3528, 1, 2158, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3529, 1, 2159, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3530, 1, 1135, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3531, 1, 2160, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3532, 1, 1136, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3533, 1, 1137, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3534, 1, 2161, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3535, 1, 114, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3536, 1, 2162, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3537, 1, 1139, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3538, 1, 115, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3539, 1, 1140, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3540, 1, 116, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3541, 1, 2164, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3542, 1, 1141, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3543, 1, 2165, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3544, 1, 1142, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3545, 1, 2166, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3546, 1, 1143, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3547, 1, 2167, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3548, 1, 2168, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3549, 1, 2169, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3550, 1, 2170, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3551, 1, 2171, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3552, 1, 2172, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3553, 1, 2173, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3554, 1, 1150, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3555, 1, 2174, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3556, 1, 2175, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3557, 1, 2176, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3558, 1, 2177, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3559, 1, 2178, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3560, 1, 2179, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3561, 1, 2180, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3562, 1, 2181, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3563, 1, 2182, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3564, 1, 2183, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3565, 1, 2184, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3566, 1, 1161, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3567, 1, 1162, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3568, 1, 1163, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3569, 1, 1164, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3570, 1, 1165, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3571, 1, 1166, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3572, 1, 1173, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3573, 1, 1174, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3574, 1, 1175, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3575, 1, 1176, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3576, 1, 1177, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3577, 1, 1178, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3578, 1, 1185, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3579, 1, 2209, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3580, 1, 1186, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3581, 1, 1187, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3582, 1, 1188, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3583, 1, 1189, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3584, 1, 1190, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3585, 1, 1191, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3586, 1, 1192, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3587, 1, 1193, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3588, 1, 1194, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3589, 1, 1195, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3590, 1, 1196, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3591, 1, 1197, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3592, 1, 1198, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3593, 1, 1199, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3594, 1, 1200, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3595, 1, 1201, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3596, 1, 1202, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3597, 1, 1207, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3598, 1, 1208, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3599, 1, 1209, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3600, 1, 1210, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3601, 1, 1211, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3602, 1, 1212, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3603, 1, 1213, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3604, 1, 1215, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3605, 1, 1216, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3606, 1, 1217, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3607, 1, 1218, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3608, 1, 1219, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3609, 1, 1220, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3610, 1, 1221, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3611, 1, 1222, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3612, 1, 1226, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3613, 1, 1227, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3614, 1, 1228, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3615, 1, 1229, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3616, 1, 1237, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3617, 1, 1238, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3618, 1, 2262, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3619, 1, 1239, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3620, 1, 1240, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3621, 1, 1241, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3622, 1, 1242, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3623, 1, 1243, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3629, 1, 2275, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3631, 1, 2276, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3632, 1, 2277, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3633, 1, 1254, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3634, 1, 1255, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3635, 1, 1256, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3636, 1, 1257, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3637, 1, 2281, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3638, 1, 1258, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3639, 1, 2282, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3640, 1, 1259, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3641, 1, 2283, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3642, 1, 1260, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3643, 1, 2284, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3644, 1, 1261, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3645, 1, 2285, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3646, 1, 1263, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3647, 1, 2287, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3648, 1, 1264, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3649, 1, 2288, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3650, 1, 1265, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3651, 1, 1266, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3652, 1, 1267, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3653, 1, 2293, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3654, 1, 2294, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3655, 1, 2297, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3656, 1, 2300, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3657, 1, 2301, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3658, 1, 2302, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3659, 1, 2303, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3660, 1, 2304, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3661, 1, 1281, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3662, 1, 2305, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3663, 1, 1282, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3664, 1, 2306, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3665, 1, 2307, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3666, 1, 2308, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3667, 1, 2309, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3668, 1, 2310, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3669, 1, 2311, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3670, 1, 2312, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3671, 1, 2313, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3672, 1, 2314, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3673, 1, 2315, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3674, 1, 2316, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3675, 1, 2317, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3676, 1, 2318, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3677, 1, 2319, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3678, 1, 2320, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3679, 1, 2321, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3680, 1, 2322, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3681, 1, 2323, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3682, 1, 2324, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3683, 1, 2325, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3684, 1, 2326, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3685, 1, 2327, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3686, 1, 2328, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3687, 1, 2329, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3688, 1, 2330, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3689, 1, 2331, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3690, 1, 2332, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3691, 1, 2333, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3692, 1, 2334, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3693, 1, 2335, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3694, 1, 2336, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3695, 1, 2337, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3696, 1, 2338, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3697, 1, 2339, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3698, 1, 2340, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3699, 1, 2341, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3700, 1, 2342, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3701, 1, 2343, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3702, 1, 2344, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3703, 1, 2345, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3704, 1, 2346, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3705, 1, 2347, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3706, 1, 2348, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3707, 1, 2349, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3708, 1, 2350, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3709, 1, 2351, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3710, 1, 2352, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3711, 1, 2353, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3712, 1, 2354, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3713, 1, 2355, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3714, 1, 2356, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3715, 1, 2357, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3716, 1, 2358, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3717, 1, 2359, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3718, 1, 2360, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3719, 1, 2361, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3720, 1, 2362, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3721, 1, 2363, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3722, 1, 2364, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3723, 1, 2365, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3724, 1, 2366, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3725, 1, 2367, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3726, 1, 2368, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3727, 1, 2369, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3728, 1, 2374, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3729, 1, 2375, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3730, 1, 2376, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3731, 1, 2377, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3732, 1, 2378, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3733, 1, 2379, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3734, 1, 2380, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3735, 1, 2381, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3736, 1, 2382, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3737, 1, 2383, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3738, 1, 2384, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3739, 1, 2385, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3740, 1, 2386, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3741, 1, 2387, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3742, 1, 2388, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3743, 1, 2389, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3744, 1, 2390, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3745, 1, 2391, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3746, 1, 2392, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3747, 1, 2393, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3748, 1, 2394, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3749, 1, 2395, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3750, 1, 2396, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3751, 1, 2397, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3752, 1, 2398, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3753, 1, 2399, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3754, 1, 2400, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3755, 1, 2401, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3756, 1, 2402, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3757, 1, 2403, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3758, 1, 2404, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3759, 1, 2405, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3760, 1, 2406, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3761, 1, 2407, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3762, 1, 2408, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3763, 1, 2409, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3764, 1, 2410, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3765, 1, 2411, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3766, 1, 2412, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3767, 1, 2413, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3768, 1, 2414, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3769, 1, 2415, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3770, 1, 2416, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3771, 1, 2417, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3772, 1, 2418, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3773, 1, 2419, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3774, 1, 2420, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3775, 1, 2421, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3776, 1, 2422, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3777, 1, 2423, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3778, 1, 2424, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3779, 1, 2425, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3780, 1, 2426, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3781, 1, 2427, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3782, 1, 2428, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3783, 1, 2429, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3784, 1, 2430, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3785, 1, 2431, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3786, 1, 2432, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3787, 1, 2433, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3788, 1, 2435, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3789, 1, 2436, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3790, 1, 2437, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3791, 1, 2438, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3792, 1, 2439, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3793, 1, 2440, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3794, 1, 2441, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3795, 1, 2442, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3796, 1, 2443, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3797, 1, 2444, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3798, 1, 2445, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3799, 1, 2446, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3800, 1, 2447, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3801, 1, 2448, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3802, 1, 2449, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3803, 1, 2450, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3804, 1, 2451, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3805, 1, 2452, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3806, 1, 2453, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3807, 1, 2472, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3808, 1, 2478, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3809, 1, 2479, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3810, 1, 2480, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3811, 1, 2481, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3812, 1, 2482, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3813, 1, 2483, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3814, 1, 2484, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3815, 1, 2485, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3816, 1, 2486, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3817, 1, 2487, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3818, 1, 2488, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3819, 1, 2489, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3820, 1, 2490, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3821, 1, 2491, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3822, 1, 2492, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3823, 1, 2493, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3824, 1, 2494, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3825, 1, 2495, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3826, 1, 2497, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3827, 1, 2516, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3828, 1, 2517, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3829, 1, 2518, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3830, 1, 2519, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3831, 1, 2520, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3832, 1, 2521, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3833, 1, 2522, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3834, 1, 2523, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3835, 1, 2524, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3836, 1, 2525, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3837, 1, 2526, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3838, 1, 2527, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3839, 1, 2528, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3840, 1, 2529, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3841, 1, 2530, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3842, 1, 2531, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3843, 1, 2532, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3844, 1, 2533, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3845, 1, 2534, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3846, 1, 2535, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3847, 1, 2536, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3854, 1, 2543, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3855, 1, 2544, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3856, 1, 2000, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3857, 1, 2002, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3858, 1, 2003, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3859, 1, 2004, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3860, 1, 2005, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3861, 1, 2006, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3862, 1, 2008, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3863, 1, 2009, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3864, 1, 2010, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3865, 1, 2011, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3866, 1, 2012, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3867, 1, 2014, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3868, 1, 2015, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3869, 1, 2016, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3870, 1, 2017, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3871, 1, 2018, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3872, 1, 2019, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3873, 1, 2020, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3874, 1, 2021, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3875, 1, 2022, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3876, 1, 2023, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3877, 1, 1001, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3878, 1, 2025, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3879, 1, 1002, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3880, 1, 2026, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3881, 1, 1003, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3882, 1, 2027, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3883, 1, 1004, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3884, 1, 2028, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3885, 1, 1005, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3886, 1, 2029, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3887, 1, 1006, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3888, 1, 2030, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3889, 1, 1007, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3890, 1, 1008, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3891, 1, 2032, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3892, 1, 1009, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3893, 1, 2033, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3894, 1, 1010, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3895, 1, 2034, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3896, 1, 1011, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3897, 1, 2035, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3898, 1, 1012, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3899, 1, 2036, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3900, 1, 1013, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3901, 1, 1014, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3902, 1, 2038, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3903, 1, 1015, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3904, 1, 2039, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3905, 1, 1016, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3906, 1, 2040, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3907, 1, 1017, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3908, 1, 2041, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3909, 1, 1018, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3910, 1, 2042, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3911, 1, 1019, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3912, 1, 2043, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3913, 1, 1020, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3914, 1, 2044, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3915, 1, 1021, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3916, 1, 2045, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3917, 1, 1022, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3918, 1, 2046, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3919, 1, 1023, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3920, 1, 2047, '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-01-02 17:35:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3921, 143, 1, '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3922, 143, 2, '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3923, 143, 1031, '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3924, 143, 1032, '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3925, 143, 1033, '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3926, 143, 1034, '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3927, 143, 1035, '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3928, 143, 1036, '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3929, 143, 1037, '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3930, 143, 1038, '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3931, 143, 1039, '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3932, 143, 1050, '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3933, 143, 1051, '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3934, 143, 1052, '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3935, 143, 1053, '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3936, 143, 1054, '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3937, 143, 1056, '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3938, 143, 1057, '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3939, 143, 1058, '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3940, 143, 1059, '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3941, 143, 1060, '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3942, 143, 1063, '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3943, 143, 1064, '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3944, 143, 1065, '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3945, 143, 1066, '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3946, 143, 1067, '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3947, 143, 1070, '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3948, 143, 1075, '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3949, 143, 1076, '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3950, 143, 1077, '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3951, 143, 1078, '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3952, 143, 1082, '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3953, 143, 1083, '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3954, 143, 1084, '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3955, 143, 1085, '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3956, 143, 1086, '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3957, 143, 1087, '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3958, 143, 1088, '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3959, 143, 1089, '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3960, 143, 1090, '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3961, 143, 1091, '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3962, 143, 1092, '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3963, 143, 100, '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3964, 143, 101, '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3965, 143, 102, '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3966, 143, 103, '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3967, 143, 106, '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3968, 143, 107, '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3969, 143, 110, '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3970, 143, 111, '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3971, 143, 112, '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3972, 143, 113, '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3973, 143, 1138, '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3974, 143, 114, '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3975, 143, 1139, '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3976, 143, 115, '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3977, 143, 1140, '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3978, 143, 116, '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3979, 143, 1141, '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3980, 143, 1142, '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3981, 143, 1143, '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3982, 143, 2472, '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3983, 143, 2478, '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3984, 143, 2479, '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3985, 143, 2480, '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3986, 143, 2481, '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3987, 143, 2482, '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3988, 143, 2483, '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3989, 143, 2484, '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3990, 143, 2485, '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3991, 143, 2486, '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3992, 143, 2487, '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3993, 143, 2488, '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3994, 143, 2489, '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3995, 143, 2490, '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3996, 143, 2491, '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3997, 143, 2492, '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3998, 143, 2493, '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3999, 143, 2494, '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4000, 143, 2495, '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4001, 143, 2497, '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4002, 143, 1224, '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4003, 143, 1225, '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4004, 143, 1226, '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4005, 143, 1227, '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4006, 143, 1228, '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4007, 143, 1229, '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4008, 143, 1237, '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4009, 143, 1238, '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4010, 143, 1239, '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4011, 143, 1240, '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4012, 143, 1241, '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4013, 143, 1242, '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4014, 143, 1243, '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4015, 143, 2525, '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4016, 143, 1255, '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4017, 143, 1256, '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4018, 143, 1001, '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4019, 143, 1257, '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4020, 143, 1002, '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4021, 143, 1258, '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4022, 143, 1003, '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4023, 143, 1259, '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4024, 143, 1004, '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4025, 143, 1260, '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4026, 143, 1005, '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4027, 143, 1006, '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4028, 143, 1007, '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4029, 143, 1008, '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4030, 143, 1009, '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4031, 143, 1010, '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4032, 143, 1011, '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4033, 143, 1012, '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4034, 143, 1013, '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4035, 143, 1014, '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4036, 143, 1015, '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4037, 143, 1016, '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4038, 143, 1017, '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4039, 143, 1018, '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4040, 143, 1019, '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4041, 143, 1020, '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4042, 144, 1, '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4043, 144, 2, '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4044, 144, 1031, '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4045, 144, 1032, '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4046, 144, 1033, '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4047, 144, 1034, '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4048, 144, 1035, '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4049, 144, 1036, '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4050, 144, 1037, '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4051, 144, 1038, '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4052, 144, 1039, '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4053, 144, 1050, '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4054, 144, 1051, '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4055, 144, 1052, '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4056, 144, 1053, '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4057, 144, 1054, '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4058, 144, 1056, '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4059, 144, 1057, '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4060, 144, 1058, '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4061, 144, 1059, '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4062, 144, 1060, '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4063, 144, 1063, '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4064, 144, 1064, '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4065, 144, 1065, '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4066, 144, 1066, '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4067, 144, 1067, '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4068, 144, 1070, '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4069, 144, 1075, '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4070, 144, 1076, '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4071, 144, 1077, '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4072, 144, 1078, '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4073, 144, 1082, '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4074, 144, 1083, '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4075, 144, 1084, '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4076, 144, 1085, '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4077, 144, 1086, '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4078, 144, 1087, '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4079, 144, 1088, '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4080, 144, 1089, '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4081, 144, 1090, '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4082, 144, 1091, '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4083, 144, 1092, '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4084, 144, 100, '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4085, 144, 101, '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4086, 144, 102, '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4087, 144, 103, '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4088, 144, 106, '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4089, 144, 107, '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4090, 144, 110, '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4091, 144, 111, '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4092, 144, 112, '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4093, 144, 113, '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4094, 144, 1138, '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4095, 144, 114, '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4096, 144, 1139, '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4097, 144, 115, '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4098, 144, 1140, '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4099, 144, 116, '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4100, 144, 1141, '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4101, 144, 1142, '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4102, 144, 1143, '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4103, 144, 2472, '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4104, 144, 2478, '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4105, 144, 2479, '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4106, 144, 2480, '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4107, 144, 2481, '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4108, 144, 2482, '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4109, 144, 2483, '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4110, 144, 2484, '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4111, 144, 2485, '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4112, 144, 2486, '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4113, 144, 2487, '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4114, 144, 2488, '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4115, 144, 2489, '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4116, 144, 2490, '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4117, 144, 2491, '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4118, 144, 2492, '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4119, 144, 2493, '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4120, 144, 2494, '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4121, 144, 2495, '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4122, 144, 2497, '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4123, 144, 1224, '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4124, 144, 1225, '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4125, 144, 1226, '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4126, 144, 1227, '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4127, 144, 1228, '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4128, 144, 1229, '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4129, 144, 1237, '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4130, 144, 1238, '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4131, 144, 1239, '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4132, 144, 1240, '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4133, 144, 1241, '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4134, 144, 1242, '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4135, 144, 1243, '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4136, 144, 2525, '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4137, 144, 1255, '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4138, 144, 1256, '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4139, 144, 1001, '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4140, 144, 1257, '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4141, 144, 1002, '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4142, 144, 1258, '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4143, 144, 1003, '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4144, 144, 1259, '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4145, 144, 1004, '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4146, 144, 1260, '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4147, 144, 1005, '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4148, 144, 1006, '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4149, 144, 1007, '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4150, 144, 1008, '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4151, 144, 1009, '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4152, 144, 1010, '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4153, 144, 1011, '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4154, 144, 1012, '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4155, 144, 1013, '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4156, 144, 1014, '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4157, 144, 1015, '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4158, 144, 1016, '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4159, 144, 1017, '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4160, 144, 1018, '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4161, 144, 1019, '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4162, 144, 1020, '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
 INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4163, 109, 5, '1', to_date('2024-03-30 17:53:17', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:17', 'SYYYY-MM-DD HH24:MI:SS'), '0', 121);
 INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4164, 109, 1118, '1', to_date('2024-03-30 17:53:17', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:17', 'SYYYY-MM-DD HH24:MI:SS'), '0', 121);
 INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4165, 109, 1119, '1', to_date('2024-03-30 17:53:17', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:17', 'SYYYY-MM-DD HH24:MI:SS'), '0', 121);
@@ -5116,253 +3684,17 @@ INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, update
 INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4278, 111, 1220, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 122);
 INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4279, 111, 1221, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 122);
 INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4280, 111, 1222, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 122);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4281, 140, 5, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4282, 140, 1118, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4283, 140, 1119, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4284, 140, 1120, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4285, 140, 2713, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4286, 140, 2714, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4287, 140, 2715, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4288, 140, 2716, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4289, 140, 2717, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4290, 140, 2718, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4291, 140, 2720, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4292, 140, 1185, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4293, 140, 2721, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4294, 140, 1186, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4295, 140, 2722, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4296, 140, 1187, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4297, 140, 2723, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4298, 140, 1188, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4299, 140, 2724, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4300, 140, 1189, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4301, 140, 2725, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4302, 140, 1190, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4303, 140, 2726, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4304, 140, 1191, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4305, 140, 2727, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4306, 140, 1192, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4307, 140, 2728, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4308, 140, 1193, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4309, 140, 2729, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4310, 140, 1194, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4311, 140, 2730, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4312, 140, 1195, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4313, 140, 2731, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4314, 140, 1196, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4315, 140, 2732, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4316, 140, 1197, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4317, 140, 2733, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4318, 140, 1198, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4319, 140, 2734, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4320, 140, 1199, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4321, 140, 2735, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4322, 140, 1200, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4323, 140, 1201, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4324, 140, 1202, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4325, 140, 1207, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4326, 140, 1208, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4327, 140, 1209, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4328, 140, 1210, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4329, 140, 1211, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4330, 140, 1212, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4331, 140, 1213, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4332, 140, 1215, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4333, 140, 1216, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4334, 140, 1217, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4335, 140, 1218, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4336, 140, 1219, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4337, 140, 1220, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4338, 140, 1221, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4339, 140, 1222, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4340, 141, 5, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4341, 141, 1118, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4342, 141, 1119, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4343, 141, 1120, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4344, 141, 2713, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4345, 141, 2714, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4346, 141, 2715, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4347, 141, 2716, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4348, 141, 2717, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4349, 141, 2718, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4350, 141, 2720, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4351, 141, 1185, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4352, 141, 2721, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4353, 141, 1186, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4354, 141, 2722, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4355, 141, 1187, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4356, 141, 2723, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4357, 141, 1188, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4358, 141, 2724, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4359, 141, 1189, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4360, 141, 2725, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4361, 141, 1190, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4362, 141, 2726, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4363, 141, 1191, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4364, 141, 2727, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4365, 141, 1192, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4366, 141, 2728, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4367, 141, 1193, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4368, 141, 2729, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4369, 141, 1194, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4370, 141, 2730, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4371, 141, 1195, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4372, 141, 2731, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4373, 141, 1196, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4374, 141, 2732, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4375, 141, 1197, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4376, 141, 2733, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4377, 141, 1198, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4378, 141, 2734, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4379, 141, 1199, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4380, 141, 2735, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4381, 141, 1200, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4382, 141, 1201, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4383, 141, 1202, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4384, 141, 1207, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4385, 141, 1208, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4386, 141, 1209, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4387, 141, 1210, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4388, 141, 1211, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4389, 141, 1212, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4390, 141, 1213, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4391, 141, 1215, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4392, 141, 1216, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4393, 141, 1217, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4394, 141, 1218, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4395, 141, 1219, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4396, 141, 1220, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4397, 141, 1221, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4398, 141, 1222, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4399, 143, 5, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4400, 143, 1118, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4401, 143, 1119, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4402, 143, 1120, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4403, 143, 2713, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4404, 143, 2714, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4405, 143, 2715, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4406, 143, 2716, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4407, 143, 2717, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4408, 143, 2718, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4409, 143, 2720, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4410, 143, 1185, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4411, 143, 2721, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4412, 143, 1186, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4413, 143, 2722, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4414, 143, 1187, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4415, 143, 2723, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4416, 143, 1188, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4417, 143, 2724, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4418, 143, 1189, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4419, 143, 2725, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4420, 143, 1190, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4421, 143, 2726, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4422, 143, 1191, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4423, 143, 2727, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4424, 143, 1192, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4425, 143, 2728, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4426, 143, 1193, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4427, 143, 2729, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4428, 143, 1194, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4429, 143, 2730, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4430, 143, 1195, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4431, 143, 2731, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4432, 143, 1196, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4433, 143, 2732, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4434, 143, 1197, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4435, 143, 2733, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4436, 143, 1198, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4437, 143, 2734, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4438, 143, 1199, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4439, 143, 2735, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4440, 143, 1200, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4441, 143, 1201, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4442, 143, 1202, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4443, 143, 1207, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4444, 143, 1208, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4445, 143, 1209, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4446, 143, 1210, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4447, 143, 1211, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4448, 143, 1212, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4449, 143, 1213, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4450, 143, 1215, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4451, 143, 1216, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4452, 143, 1217, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4453, 143, 1218, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4454, 143, 1219, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4455, 143, 1220, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4456, 143, 1221, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4457, 143, 1222, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4458, 144, 5, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4459, 144, 1118, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4460, 144, 1119, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4461, 144, 1120, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4462, 144, 2713, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4463, 144, 2714, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4464, 144, 2715, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4465, 144, 2716, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4466, 144, 2717, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4467, 144, 2718, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4468, 144, 2720, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4469, 144, 1185, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4470, 144, 2721, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4471, 144, 1186, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4472, 144, 2722, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4473, 144, 1187, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4474, 144, 2723, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4475, 144, 1188, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4476, 144, 2724, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4477, 144, 1189, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4478, 144, 2725, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4479, 144, 1190, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4480, 144, 2726, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4481, 144, 1191, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4482, 144, 2727, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4483, 144, 1192, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4484, 144, 2728, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4485, 144, 1193, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4486, 144, 2729, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4487, 144, 1194, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4488, 144, 2730, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4489, 144, 1195, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4490, 144, 2731, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4491, 144, 1196, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4492, 144, 2732, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4493, 144, 1197, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4494, 144, 2733, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4495, 144, 1198, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4496, 144, 2734, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4497, 144, 1199, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4498, 144, 2735, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4499, 144, 1200, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4500, 144, 1201, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4501, 144, 1202, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4502, 144, 1207, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4503, 144, 1208, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4504, 144, 1209, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4505, 144, 1210, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4506, 144, 1211, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4507, 144, 1212, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4508, 144, 1213, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4509, 144, 1215, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4510, 144, 1216, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4511, 144, 1217, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4512, 144, 1218, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4513, 144, 1219, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4514, 144, 1220, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4515, 144, 1221, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4516, 144, 1222, '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:18', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (5777, 101, 2739, '1', to_date('2024-04-30 09:38:37', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-04-30 09:38:37', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (5778, 101, 2740, '1', to_date('2024-04-30 09:38:37', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-04-30 09:38:37', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
 COMMIT;
 -- @formatter:on
 
 CREATE SEQUENCE system_role_menu_seq
-    START WITH 4517
-    INCREMENT BY 1;
-
+    START WITH 5779;
 
 -- ----------------------------
--- system_sms_channel
--- ------------------------------
+-- Table structure for system_sms_channel
+-- ----------------------------
 CREATE TABLE system_sms_channel
 (
     id           number                                  NOT NULL,
@@ -5391,10 +3723,16 @@ COMMENT ON COLUMN system_sms_channel.remark IS '备注';
 COMMENT ON COLUMN system_sms_channel.api_key IS '短信 API 的账号';
 COMMENT ON COLUMN system_sms_channel.api_secret IS '短信 API 的秘钥';
 COMMENT ON COLUMN system_sms_channel.callback_url IS '短信发送回调 URL';
+COMMENT ON COLUMN system_sms_channel.creator IS '创建者';
 COMMENT ON COLUMN system_sms_channel.create_time IS '创建时间';
+COMMENT ON COLUMN system_sms_channel.updater IS '更新者';
 COMMENT ON COLUMN system_sms_channel.update_time IS '更新时间';
+COMMENT ON COLUMN system_sms_channel.deleted IS '是否删除';
 COMMENT ON TABLE system_sms_channel IS '短信渠道';
 
+-- ----------------------------
+-- Records of system_sms_channel
+-- ----------------------------
 -- @formatter:off
 INSERT INTO system_sms_channel (id, signature, code, status, remark, api_key, api_secret, callback_url, creator, create_time, updater, update_time, deleted) VALUES (2, 'Ballcat', 'ALIYUN', 0, '你要改哦，只有我可以用！！！！', 'LTAI5tCnKso2uG3kJ5gRav88', 'fGJ5SNXL7P1NHNRmJ7DJaMJGPyE55C', NULL, '', to_date('2021-03-31 11:53:10', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-02 22:10:17', 'SYYYY-MM-DD HH24:MI:SS'), '0');
 INSERT INTO system_sms_channel (id, signature, code, status, remark, api_key, api_secret, callback_url, creator, create_time, updater, update_time, deleted) VALUES (4, '测试渠道', 'DEBUG_DING_TALK', 0, '123', '696b5d8ead48071237e4aa5861ff08dbadb2b4ded1c688a7b7c9afc615579859', 'SEC5c4e5ff888bc8a9923ae47f59e7ccd30af1f14d93c55b4e2c9cb094e35aeed67', NULL, '1', to_date('2021-04-13 00:23:14', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-03-27 20:29:49', 'SYYYY-MM-DD HH24:MI:SS'), '0');
@@ -5403,13 +3741,11 @@ COMMIT;
 -- @formatter:on
 
 CREATE SEQUENCE system_sms_channel_seq
-    START WITH 7
-    INCREMENT BY 1;
-
+    START WITH 7;
 
 -- ----------------------------
--- system_sms_code
--- ------------------------------
+-- Table structure for system_sms_code
+-- ----------------------------
 CREATE TABLE system_sms_code
 (
     id          number                                  NOT NULL,
@@ -5443,20 +3779,21 @@ COMMENT ON COLUMN system_sms_code.today_index IS '今日发送的第几条';
 COMMENT ON COLUMN system_sms_code.used IS '是否使用';
 COMMENT ON COLUMN system_sms_code.used_time IS '使用时间';
 COMMENT ON COLUMN system_sms_code.used_ip IS '使用 IP';
+COMMENT ON COLUMN system_sms_code.creator IS '创建者';
 COMMENT ON COLUMN system_sms_code.create_time IS '创建时间';
+COMMENT ON COLUMN system_sms_code.updater IS '更新者';
 COMMENT ON COLUMN system_sms_code.update_time IS '更新时间';
+COMMENT ON COLUMN system_sms_code.deleted IS '是否删除';
 COMMENT ON COLUMN system_sms_code.tenant_id IS '租户编号';
-COMMENT ON COLUMN system_sms_code.mobile IS '手机号';
+COMMENT ON COLUMN system_sms_code.idx_mobile IS '手机号';
 COMMENT ON TABLE system_sms_code IS '手机验证码';
 
 CREATE SEQUENCE system_sms_code_seq
-    START WITH 1
-    INCREMENT BY 1;
-
+    START WITH 1;
 
 -- ----------------------------
--- system_sms_log
--- ------------------------------
+-- Table structure for system_sms_log
+-- ----------------------------
 CREATE TABLE system_sms_log
 (
     id               number                                  NOT NULL,
@@ -5513,18 +3850,19 @@ COMMENT ON COLUMN system_sms_log.receive_status IS '接收状态';
 COMMENT ON COLUMN system_sms_log.receive_time IS '接收时间';
 COMMENT ON COLUMN system_sms_log.api_receive_code IS 'API 接收结果的编码';
 COMMENT ON COLUMN system_sms_log.api_receive_msg IS 'API 接收结果的说明';
+COMMENT ON COLUMN system_sms_log.creator IS '创建者';
 COMMENT ON COLUMN system_sms_log.create_time IS '创建时间';
+COMMENT ON COLUMN system_sms_log.updater IS '更新者';
 COMMENT ON COLUMN system_sms_log.update_time IS '更新时间';
+COMMENT ON COLUMN system_sms_log.deleted IS '是否删除';
 COMMENT ON TABLE system_sms_log IS '短信日志';
 
 CREATE SEQUENCE system_sms_log_seq
-    START WITH 1
-    INCREMENT BY 1;
-
+    START WITH 1;
 
 -- ----------------------------
--- system_sms_template
--- ------------------------------
+-- Table structure for system_sms_template
+-- ----------------------------
 CREATE TABLE system_sms_template
 (
     id              number                                  NOT NULL,
@@ -5549,7 +3887,7 @@ ALTER TABLE system_sms_template
     ADD CONSTRAINT pk_system_sms_template PRIMARY KEY (id);
 
 COMMENT ON COLUMN system_sms_template.id IS '编号';
-COMMENT ON COLUMN system_sms_template.type IS '短信签名';
+COMMENT ON COLUMN system_sms_template.type IS '模板类型';
 COMMENT ON COLUMN system_sms_template.status IS '开启状态';
 COMMENT ON COLUMN system_sms_template.code IS '模板编码';
 COMMENT ON COLUMN system_sms_template.name IS '模板名称';
@@ -5559,10 +3897,16 @@ COMMENT ON COLUMN system_sms_template.remark IS '备注';
 COMMENT ON COLUMN system_sms_template.api_template_id IS '短信 API 的模板编号';
 COMMENT ON COLUMN system_sms_template.channel_id IS '短信渠道编号';
 COMMENT ON COLUMN system_sms_template.channel_code IS '短信渠道编码';
+COMMENT ON COLUMN system_sms_template.creator IS '创建者';
 COMMENT ON COLUMN system_sms_template.create_time IS '创建时间';
+COMMENT ON COLUMN system_sms_template.updater IS '更新者';
 COMMENT ON COLUMN system_sms_template.update_time IS '更新时间';
+COMMENT ON COLUMN system_sms_template.deleted IS '是否删除';
 COMMENT ON TABLE system_sms_template IS '短信模板';
 
+-- ----------------------------
+-- Records of system_sms_template
+-- ----------------------------
 -- @formatter:off
 INSERT INTO system_sms_template (id, type, status, code, name, content, params, remark, api_template_id, channel_id, channel_code, creator, create_time, updater, update_time, deleted) VALUES (2, 1, 0, 'test_01', '测试验证码短信', '正在进行登录操作{operation}，您的验证码是{code}', '["operation","code"]', '测试备注', '4383920', 6, 'DEBUG_DING_TALK', '', to_date('2021-03-31 10:49:38', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-02 22:32:47', 'SYYYY-MM-DD HH24:MI:SS'), '0');
 INSERT INTO system_sms_template (id, type, status, code, name, content, params, remark, api_template_id, channel_id, channel_code, creator, create_time, updater, update_time, deleted) VALUES (3, 1, 0, 'test_02', '公告通知', '您的验证码{code}，该验证码5分钟内有效，请勿泄漏于他人！', '["code"]', NULL, 'SMS_207945135', 2, 'ALIYUN', '', to_date('2021-03-31 11:56:30', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2021-04-10 01:22:02', 'SYYYY-MM-DD HH24:MI:SS'), '0');
@@ -5580,13 +3924,11 @@ COMMIT;
 -- @formatter:on
 
 CREATE SEQUENCE system_sms_template_seq
-    START WITH 17
-    INCREMENT BY 1;
-
+    START WITH 17;
 
 -- ----------------------------
--- system_social_client
--- ------------------------------
+-- Table structure for system_social_client
+-- ----------------------------
 CREATE TABLE system_social_client
 (
     id            number                                  NOT NULL,
@@ -5616,11 +3958,17 @@ COMMENT ON COLUMN system_social_client.client_id IS '客户端编号';
 COMMENT ON COLUMN system_social_client.client_secret IS '客户端密钥';
 COMMENT ON COLUMN system_social_client.agent_id IS '代理编号';
 COMMENT ON COLUMN system_social_client.status IS '状态';
+COMMENT ON COLUMN system_social_client.creator IS '创建者';
 COMMENT ON COLUMN system_social_client.create_time IS '创建时间';
+COMMENT ON COLUMN system_social_client.updater IS '更新者';
 COMMENT ON COLUMN system_social_client.update_time IS '更新时间';
+COMMENT ON COLUMN system_social_client.deleted IS '是否删除';
 COMMENT ON COLUMN system_social_client.tenant_id IS '租户编号';
 COMMENT ON TABLE system_social_client IS '社交客户端表';
 
+-- ----------------------------
+-- Records of system_social_client
+-- ----------------------------
 -- @formatter:off
 INSERT INTO system_social_client (id, name, social_type, user_type, client_id, client_secret, agent_id, status, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1, '钉钉', 20, 2, 'dingvrnreaje3yqvzhxg', 'i8E6iZyDvZj51JIb0tYsYfVQYOks9Cq1lgryEjFRqC79P3iJcrxEwT6Qk2QvLrLI', NULL, 0, '', to_date('2023-10-18 11:21:18', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-20 21:28:26', 'SYYYY-MM-DD HH24:MI:SS'), '1', 1);
 INSERT INTO system_social_client (id, name, social_type, user_type, client_id, client_secret, agent_id, status, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2, '钉钉（王土豆）', 20, 2, 'dingtsu9hpepjkbmthhw', 'FP_bnSq_HAHKCSncmJjw5hxhnzs6vaVDSZZn3egj6rdqTQ_hu5tQVJyLMpgCakdP', NULL, 0, '', to_date('2023-10-18 11:21:18', 'SYYYY-MM-DD HH24:MI:SS'), '', to_date('2023-12-20 21:28:26', 'SYYYY-MM-DD HH24:MI:SS'), '1', 121);
@@ -5630,13 +3978,11 @@ COMMIT;
 -- @formatter:on
 
 CREATE SEQUENCE system_social_client_seq
-    START WITH 44
-    INCREMENT BY 1;
-
+    START WITH 44;
 
 -- ----------------------------
--- system_social_user
--- ------------------------------
+-- Table structure for system_social_user
+-- ----------------------------
 CREATE TABLE system_social_user
 (
     id             number                                  NOT NULL,
@@ -5670,19 +4016,20 @@ COMMENT ON COLUMN system_social_user.avatar IS '用户头像';
 COMMENT ON COLUMN system_social_user.raw_user_info IS '原始用户数据，一般是 JSON 格式';
 COMMENT ON COLUMN system_social_user.code IS '最后一次的认证 code';
 COMMENT ON COLUMN system_social_user.state IS '最后一次的认证 state';
+COMMENT ON COLUMN system_social_user.creator IS '创建者';
 COMMENT ON COLUMN system_social_user.create_time IS '创建时间';
+COMMENT ON COLUMN system_social_user.updater IS '更新者';
 COMMENT ON COLUMN system_social_user.update_time IS '更新时间';
+COMMENT ON COLUMN system_social_user.deleted IS '是否删除';
 COMMENT ON COLUMN system_social_user.tenant_id IS '租户编号';
 COMMENT ON TABLE system_social_user IS '社交用户表';
 
 CREATE SEQUENCE system_social_user_seq
-    START WITH 1
-    INCREMENT BY 1;
-
+    START WITH 1;
 
 -- ----------------------------
--- system_social_user_bind
--- ------------------------------
+-- Table structure for system_social_user_bind
+-- ----------------------------
 CREATE TABLE system_social_user_bind
 (
     id             number                                 NOT NULL,
@@ -5706,19 +4053,20 @@ COMMENT ON COLUMN system_social_user_bind.user_id IS '用户编号';
 COMMENT ON COLUMN system_social_user_bind.user_type IS '用户类型';
 COMMENT ON COLUMN system_social_user_bind.social_type IS '社交平台的类型';
 COMMENT ON COLUMN system_social_user_bind.social_user_id IS '社交用户的编号';
+COMMENT ON COLUMN system_social_user_bind.creator IS '创建者';
 COMMENT ON COLUMN system_social_user_bind.create_time IS '创建时间';
+COMMENT ON COLUMN system_social_user_bind.updater IS '更新者';
 COMMENT ON COLUMN system_social_user_bind.update_time IS '更新时间';
+COMMENT ON COLUMN system_social_user_bind.deleted IS '是否删除';
 COMMENT ON COLUMN system_social_user_bind.tenant_id IS '租户编号';
 COMMENT ON TABLE system_social_user_bind IS '社交绑定表';
 
 CREATE SEQUENCE system_social_user_bind_seq
-    START WITH 1
-    INCREMENT BY 1;
-
+    START WITH 1;
 
 -- ----------------------------
--- system_tenant
--- ------------------------------
+-- Table structure for system_tenant
+-- ----------------------------
 CREATE TABLE system_tenant
 (
     id              number                                  NOT NULL,
@@ -5747,32 +4095,33 @@ COMMENT ON COLUMN system_tenant.contact_user_id IS '联系人的用户编号';
 COMMENT ON COLUMN system_tenant.contact_name IS '联系人';
 COMMENT ON COLUMN system_tenant.contact_mobile IS '联系手机';
 COMMENT ON COLUMN system_tenant.status IS '租户状态（0正常 1停用）';
+COMMENT ON COLUMN system_tenant.website IS '绑定域名';
 COMMENT ON COLUMN system_tenant.package_id IS '租户套餐编号';
 COMMENT ON COLUMN system_tenant.expire_time IS '过期时间';
 COMMENT ON COLUMN system_tenant.account_count IS '账号数量';
+COMMENT ON COLUMN system_tenant.creator IS '创建者';
 COMMENT ON COLUMN system_tenant.create_time IS '创建时间';
+COMMENT ON COLUMN system_tenant.updater IS '更新者';
 COMMENT ON COLUMN system_tenant.update_time IS '更新时间';
+COMMENT ON COLUMN system_tenant.deleted IS '是否删除';
 COMMENT ON TABLE system_tenant IS '租户表';
 
+-- ----------------------------
+-- Records of system_tenant
+-- ----------------------------
 -- @formatter:off
 INSERT INTO system_tenant (id, name, contact_user_id, contact_name, contact_mobile, status, website, package_id, expire_time, account_count, creator, create_time, updater, update_time, deleted) VALUES (1, '芋道源码', NULL, '芋艿', '17321315478', 0, 'www.iocoder.cn', 0, to_date('2099-02-19 17:14:16', 'SYYYY-MM-DD HH24:MI:SS'), 9999, '1', to_date('2021-01-05 17:03:47', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-11-06 11:41:41', 'SYYYY-MM-DD HH24:MI:SS'), '0');
 INSERT INTO system_tenant (id, name, contact_user_id, contact_name, contact_mobile, status, website, package_id, expire_time, account_count, creator, create_time, updater, update_time, deleted) VALUES (121, '小租户', 110, '小王2', '15601691300', 0, 'zsxq.iocoder.cn', 111, to_date('2024-03-11 00:00:00', 'SYYYY-MM-DD HH24:MI:SS'), 20, '1', to_date('2022-02-22 00:56:14', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-11-06 11:41:47', 'SYYYY-MM-DD HH24:MI:SS'), '0');
 INSERT INTO system_tenant (id, name, contact_user_id, contact_name, contact_mobile, status, website, package_id, expire_time, account_count, creator, create_time, updater, update_time, deleted) VALUES (122, '测试租户', 113, '芋道', '15601691300', 0, 'test.iocoder.cn', 111, to_date('2022-04-30 00:00:00', 'SYYYY-MM-DD HH24:MI:SS'), 50, '1', to_date('2022-03-07 21:37:58', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-11-06 11:41:53', 'SYYYY-MM-DD HH24:MI:SS'), '0');
-INSERT INTO system_tenant (id, name, contact_user_id, contact_name, contact_mobile, status, website, package_id, expire_time, account_count, creator, create_time, updater, update_time, deleted) VALUES (151, '大租户', 126, '土豆大', NULL, 0, 'https://tudou.iocoder.cn', 111, to_date('2023-12-08 00:00:00', 'SYYYY-MM-DD HH24:MI:SS'), 10, '1', to_date('2023-12-02 23:35:05', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-08 23:39:56', 'SYYYY-MM-DD HH24:MI:SS'), '0');
-INSERT INTO system_tenant (id, name, contact_user_id, contact_name, contact_mobile, status, website, package_id, expire_time, account_count, creator, create_time, updater, update_time, deleted) VALUES (152, '新租户', 127, '土豆', NULL, 0, 'http://xx.iocoder.cn', 111, to_date('2025-12-31 00:00:00', 'SYYYY-MM-DD HH24:MI:SS'), 50, '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '0');
-INSERT INTO system_tenant (id, name, contact_user_id, contact_name, contact_mobile, status, website, package_id, expire_time, account_count, creator, create_time, updater, update_time, deleted) VALUES (153, '小明的租户', 128, 'xiaoming', '15601691301', 0, 'xiaoming.iocoder.cn', 111, to_date('2025-12-01 00:00:00', 'SYYYY-MM-DD HH24:MI:SS'), 100, '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-02-28 22:53:54', 'SYYYY-MM-DD HH24:MI:SS'), '0');
-INSERT INTO system_tenant (id, name, contact_user_id, contact_name, contact_mobile, status, website, package_id, expire_time, account_count, creator, create_time, updater, update_time, deleted) VALUES (154, 'hh', 129, 'hh', NULL, 0, 'http://hh.iocoder.cn', 111, to_date('2024-04-30 00:00:00', 'SYYYY-MM-DD HH24:MI:SS'), 123, '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-04-10 09:40:57', 'SYYYY-MM-DD HH24:MI:SS'), '0');
 COMMIT;
 -- @formatter:on
 
 CREATE SEQUENCE system_tenant_seq
-    START WITH 155
-    INCREMENT BY 1;
-
+    START WITH 123;
 
 -- ----------------------------
--- system_tenant_package
--- ------------------------------
+-- Table structure for system_tenant_package
+-- ----------------------------
 CREATE TABLE system_tenant_package
 (
     id          number                                  NOT NULL,
@@ -5793,24 +4142,29 @@ ALTER TABLE system_tenant_package
 COMMENT ON COLUMN system_tenant_package.id IS '套餐编号';
 COMMENT ON COLUMN system_tenant_package.name IS '套餐名';
 COMMENT ON COLUMN system_tenant_package.status IS '租户状态（0正常 1停用）';
+COMMENT ON COLUMN system_tenant_package.remark IS '备注';
 COMMENT ON COLUMN system_tenant_package.menu_ids IS '关联的菜单编号';
+COMMENT ON COLUMN system_tenant_package.creator IS '创建者';
 COMMENT ON COLUMN system_tenant_package.create_time IS '创建时间';
+COMMENT ON COLUMN system_tenant_package.updater IS '更新者';
 COMMENT ON COLUMN system_tenant_package.update_time IS '更新时间';
+COMMENT ON COLUMN system_tenant_package.deleted IS '是否删除';
 COMMENT ON TABLE system_tenant_package IS '租户套餐表';
 
+-- ----------------------------
+-- Records of system_tenant_package
+-- ----------------------------
 -- @formatter:off
 INSERT INTO system_tenant_package (id, name, status, remark, menu_ids, creator, create_time, updater, update_time, deleted) VALUES (111, '普通套餐', 0, '小功能', '[1,2,5,1031,1032,1033,1034,1035,1036,1037,1038,1039,1050,1051,1052,1053,1054,1056,1057,1058,1059,1060,1063,1064,1065,1066,1067,1070,1075,1076,1077,1078,1082,1083,1084,1085,1086,1087,1088,1089,1090,1091,1092,1118,1119,1120,100,101,102,103,106,107,110,111,112,113,1138,114,1139,115,1140,116,1141,1142,1143,2713,2714,2715,2716,2717,2718,2720,1185,2721,1186,2722,1187,2723,1188,2724,1189,2725,1190,2726,1191,2727,2472,1192,2728,1193,2729,1194,2730,1195,2731,1196,2732,1197,2733,2478,1198,2734,2479,1199,2735,2480,1200,2481,1201,2482,1202,2483,2484,2485,2486,2487,1207,2488,1208,2489,1209,2490,1210,2491,1211,2492,1212,2493,1213,2494,2495,1215,1216,2497,1217,1218,1219,1220,1221,1222,1224,1225,1226,1227,1228,1229,1237,1238,1239,1240,1241,1242,1243,2525,1255,1256,1001,1257,1002,1258,1003,1259,1004,1260,1005,1006,1007,1008,1009,1010,1011,1012,1013,1014,1015,1016,1017,1018,1019,1020]', '1', to_date('2022-02-22 00:54:00', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:53:17', 'SYYYY-MM-DD HH24:MI:SS'), '0');
 COMMIT;
 -- @formatter:on
 
 CREATE SEQUENCE system_tenant_package_seq
-    START WITH 112
-    INCREMENT BY 1;
-
+    START WITH 112;
 
 -- ----------------------------
--- system_user_post
--- ------------------------------
+-- Table structure for system_user_post
+-- ----------------------------
 CREATE TABLE system_user_post
 (
     id          number                                 NOT NULL,
@@ -5830,11 +4184,17 @@ ALTER TABLE system_user_post
 COMMENT ON COLUMN system_user_post.id IS 'id';
 COMMENT ON COLUMN system_user_post.user_id IS '用户ID';
 COMMENT ON COLUMN system_user_post.post_id IS '岗位ID';
+COMMENT ON COLUMN system_user_post.creator IS '创建者';
 COMMENT ON COLUMN system_user_post.create_time IS '创建时间';
+COMMENT ON COLUMN system_user_post.updater IS '更新者';
 COMMENT ON COLUMN system_user_post.update_time IS '更新时间';
+COMMENT ON COLUMN system_user_post.deleted IS '是否删除';
 COMMENT ON COLUMN system_user_post.tenant_id IS '租户编号';
 COMMENT ON TABLE system_user_post IS '用户岗位表';
 
+-- ----------------------------
+-- Records of system_user_post
+-- ----------------------------
 -- @formatter:off
 INSERT INTO system_user_post (id, user_id, post_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (112, 1, 1, 'admin', to_date('2022-05-02 07:25:24', 'SYYYY-MM-DD HH24:MI:SS'), 'admin', to_date('2022-05-02 07:25:24', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
 INSERT INTO system_user_post (id, user_id, post_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (113, 100, 1, 'admin', to_date('2022-05-02 07:25:24', 'SYYYY-MM-DD HH24:MI:SS'), 'admin', to_date('2022-05-02 07:25:24', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
@@ -5848,13 +4208,11 @@ COMMIT;
 -- @formatter:on
 
 CREATE SEQUENCE system_user_post_seq
-    START WITH 125
-    INCREMENT BY 1;
-
+    START WITH 125;
 
 -- ----------------------------
--- system_user_role
--- ------------------------------
+-- Table structure for system_user_role
+-- ----------------------------
 CREATE TABLE system_user_role
 (
     id          number                                 NOT NULL,
@@ -5874,11 +4232,17 @@ ALTER TABLE system_user_role
 COMMENT ON COLUMN system_user_role.id IS '自增编号';
 COMMENT ON COLUMN system_user_role.user_id IS '用户ID';
 COMMENT ON COLUMN system_user_role.role_id IS '角色ID';
+COMMENT ON COLUMN system_user_role.creator IS '创建者';
 COMMENT ON COLUMN system_user_role.create_time IS '创建时间';
+COMMENT ON COLUMN system_user_role.updater IS '更新者';
 COMMENT ON COLUMN system_user_role.update_time IS '更新时间';
+COMMENT ON COLUMN system_user_role.deleted IS '是否删除';
 COMMENT ON COLUMN system_user_role.tenant_id IS '租户编号';
 COMMENT ON TABLE system_user_role IS '用户和角色关联表';
 
+-- ----------------------------
+-- Records of system_user_role
+-- ----------------------------
 -- @formatter:off
 INSERT INTO system_user_role (id, user_id, role_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1, 1, 1, '', to_date('2022-01-11 13:19:45', 'SYYYY-MM-DD HH24:MI:SS'), '', to_date('2022-05-12 12:35:17', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
 INSERT INTO system_user_role (id, user_id, role_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2, 2, 2, '', to_date('2022-01-11 13:19:45', 'SYYYY-MM-DD HH24:MI:SS'), '', to_date('2022-05-12 12:35:13', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
@@ -5886,42 +4250,24 @@ INSERT INTO system_user_role (id, user_id, role_id, creator, create_time, update
 INSERT INTO system_user_role (id, user_id, role_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (5, 100, 1, '', to_date('2022-01-11 13:19:45', 'SYYYY-MM-DD HH24:MI:SS'), '', to_date('2022-05-12 12:35:12', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
 INSERT INTO system_user_role (id, user_id, role_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6, 100, 2, '', to_date('2022-01-11 13:19:45', 'SYYYY-MM-DD HH24:MI:SS'), '', to_date('2022-05-12 12:35:11', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
 INSERT INTO system_user_role (id, user_id, role_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (10, 103, 1, '1', to_date('2022-01-11 13:19:45', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-01-11 13:19:45', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_user_role (id, user_id, role_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (11, 107, 106, '1', to_date('2022-02-20 22:59:33', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-02-20 22:59:33', 'SYYYY-MM-DD HH24:MI:SS'), '0', 118);
-INSERT INTO system_user_role (id, user_id, role_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (12, 108, 107, '1', to_date('2022-02-20 23:00:50', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-02-20 23:00:50', 'SYYYY-MM-DD HH24:MI:SS'), '0', 119);
-INSERT INTO system_user_role (id, user_id, role_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (13, 109, 108, '1', to_date('2022-02-20 23:11:50', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-02-20 23:11:50', 'SYYYY-MM-DD HH24:MI:SS'), '0', 120);
 INSERT INTO system_user_role (id, user_id, role_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (14, 110, 109, '1', to_date('2022-02-22 00:56:14', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-02-22 00:56:14', 'SYYYY-MM-DD HH24:MI:SS'), '0', 121);
 INSERT INTO system_user_role (id, user_id, role_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (15, 111, 110, '110', to_date('2022-02-23 13:14:38', 'SYYYY-MM-DD HH24:MI:SS'), '110', to_date('2022-02-23 13:14:38', 'SYYYY-MM-DD HH24:MI:SS'), '0', 121);
 INSERT INTO system_user_role (id, user_id, role_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (16, 113, 111, '1', to_date('2022-03-07 21:37:58', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-03-07 21:37:58', 'SYYYY-MM-DD HH24:MI:SS'), '0', 122);
 INSERT INTO system_user_role (id, user_id, role_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (18, 1, 2, '1', to_date('2022-05-12 20:39:29', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-05-12 20:39:29', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_user_role (id, user_id, role_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (19, 116, 113, '1', to_date('2022-05-17 10:07:10', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-05-17 10:07:10', 'SYYYY-MM-DD HH24:MI:SS'), '0', 124);
 INSERT INTO system_user_role (id, user_id, role_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (20, 104, 101, '1', to_date('2022-05-28 15:43:57', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-05-28 15:43:57', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
 INSERT INTO system_user_role (id, user_id, role_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (22, 115, 2, '1', to_date('2022-07-21 22:08:30', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-07-21 22:08:30', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_user_role (id, user_id, role_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (23, 119, 114, '1', to_date('2022-12-30 11:32:04', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-12-30 11:32:04', 'SYYYY-MM-DD HH24:MI:SS'), '0', 125);
-INSERT INTO system_user_role (id, user_id, role_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (24, 120, 115, '1', to_date('2022-12-30 11:33:42', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-12-30 11:33:42', 'SYYYY-MM-DD HH24:MI:SS'), '0', 126);
-INSERT INTO system_user_role (id, user_id, role_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (25, 121, 116, '1', to_date('2022-12-30 11:33:49', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-12-30 11:33:49', 'SYYYY-MM-DD HH24:MI:SS'), '0', 127);
-INSERT INTO system_user_role (id, user_id, role_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (26, 122, 118, '1', to_date('2022-12-30 11:47:53', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-12-30 11:47:53', 'SYYYY-MM-DD HH24:MI:SS'), '0', 129);
-INSERT INTO system_user_role (id, user_id, role_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (28, 123, 136, '1', to_date('2023-03-05 21:23:35', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-03-05 21:23:35', 'SYYYY-MM-DD HH24:MI:SS'), '0', 147);
-INSERT INTO system_user_role (id, user_id, role_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (29, 124, 137, '1', to_date('2023-03-05 21:42:27', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-03-05 21:42:27', 'SYYYY-MM-DD HH24:MI:SS'), '0', 148);
-INSERT INTO system_user_role (id, user_id, role_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (30, 125, 138, '1', to_date('2023-03-05 21:59:03', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-03-05 21:59:03', 'SYYYY-MM-DD HH24:MI:SS'), '0', 149);
-INSERT INTO system_user_role (id, user_id, role_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (31, 126, 139, '1', to_date('2023-07-25 23:06:04', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-07-25 23:06:04', 'SYYYY-MM-DD HH24:MI:SS'), '0', 150);
-INSERT INTO system_user_role (id, user_id, role_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (32, 126, 140, '1', to_date('2023-12-02 23:35:05', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-02 23:35:05', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_user_role (id, user_id, role_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (33, 127, 141, '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_user_role (id, user_id, role_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (34, 128, 143, '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
 INSERT INTO system_user_role (id, user_id, role_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (35, 112, 1, '1', to_date('2024-03-15 20:00:24', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-15 20:00:24', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
 INSERT INTO system_user_role (id, user_id, role_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (36, 118, 1, '1', to_date('2024-03-17 09:12:08', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-17 09:12:08', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
 INSERT INTO system_user_role (id, user_id, role_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (38, 114, 101, '1', to_date('2024-03-24 22:23:03', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-24 22:23:03', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_user_role (id, user_id, role_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (39, 129, 144, '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
 COMMIT;
 -- @formatter:on
 
 CREATE SEQUENCE system_user_role_seq
-    START WITH 40
-    INCREMENT BY 1;
-
+    START WITH 39;
 
 -- ----------------------------
--- system_users
--- ------------------------------
+-- Table structure for system_users
+-- ----------------------------
 CREATE TABLE system_users
 (
     id          number                                  NOT NULL,
@@ -5951,20 +4297,31 @@ ALTER TABLE system_users
 
 COMMENT ON COLUMN system_users.id IS '用户ID';
 COMMENT ON COLUMN system_users.username IS '用户账号';
+COMMENT ON COLUMN system_users.password IS '密码';
 COMMENT ON COLUMN system_users.nickname IS '用户昵称';
 COMMENT ON COLUMN system_users.remark IS '备注';
 COMMENT ON COLUMN system_users.dept_id IS '部门ID';
 COMMENT ON COLUMN system_users.post_ids IS '岗位编号数组';
+COMMENT ON COLUMN system_users.email IS '用户邮箱';
+COMMENT ON COLUMN system_users.mobile IS '手机号码';
 COMMENT ON COLUMN system_users.sex IS '用户性别';
+COMMENT ON COLUMN system_users.avatar IS '头像地址';
 COMMENT ON COLUMN system_users.status IS '帐号状态（0正常 1停用）';
+COMMENT ON COLUMN system_users.login_ip IS '最后登录IP';
 COMMENT ON COLUMN system_users.login_date IS '最后登录时间';
+COMMENT ON COLUMN system_users.creator IS '创建者';
 COMMENT ON COLUMN system_users.create_time IS '创建时间';
+COMMENT ON COLUMN system_users.updater IS '更新者';
 COMMENT ON COLUMN system_users.update_time IS '更新时间';
+COMMENT ON COLUMN system_users.deleted IS '是否删除';
 COMMENT ON COLUMN system_users.tenant_id IS '租户编号';
 COMMENT ON TABLE system_users IS '用户信息表';
 
+-- ----------------------------
+-- Records of system_users
+-- ----------------------------
 -- @formatter:off
-INSERT INTO system_users (id, username, password, nickname, remark, dept_id, post_ids, email, mobile, sex, avatar, status, login_ip, login_date, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1, 'admin', '$2a$10$mRMIYLDtRHlf6.9ipiqH1.Z.bh/R9dO9d5iHiGYPigi6r5KOoR2Wm', '芋道源码', '管理员', 103, '[1]', 'aoteman@126.com', '18818260277', 2, 'http://test.yudao.iocoder.cn/96c787a2ce88bf6d0ce3cd8b6cf5314e80e7703cd41bf4af8cd2e2909dbd6b6d.png', 0, '0:0:0:0:0:0:0:1', to_date('2024-04-23 23:51:16', 'SYYYY-MM-DD HH24:MI:SS'), 'admin', to_date('2021-01-05 17:03:47', 'SYYYY-MM-DD HH24:MI:SS'), NULL, to_date('2024-04-23 23:51:16', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
+INSERT INTO system_users (id, username, password, nickname, remark, dept_id, post_ids, email, mobile, sex, avatar, status, login_ip, login_date, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1, 'admin', '$2a$10$mRMIYLDtRHlf6.9ipiqH1.Z.bh/R9dO9d5iHiGYPigi6r5KOoR2Wm', '芋道源码', '管理员', 103, '[1]', 'aoteman@126.com', '18818260277', 2, 'http://test.yudao.iocoder.cn/96c787a2ce88bf6d0ce3cd8b6cf5314e80e7703cd41bf4af8cd2e2909dbd6b6d.png', 0, '0:0:0:0:0:0:0:1', to_date('2024-04-29 21:50:32', 'SYYYY-MM-DD HH24:MI:SS'), 'admin', to_date('2021-01-05 17:03:47', 'SYYYY-MM-DD HH24:MI:SS'), NULL, to_date('2024-04-29 21:50:32', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
 INSERT INTO system_users (id, username, password, nickname, remark, dept_id, post_ids, email, mobile, sex, avatar, status, login_ip, login_date, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (100, 'yudao', '$2a$10$11U48RhyJ5pSBYWSn12AD./ld671.ycSzJHbyrtpeoMeYiw31eo8a', '芋道', '不要吓我', 104, '[1]', 'yudao@iocoder.cn', '15601691300', 1, '', 1, '127.0.0.1', to_date('2022-07-09 23:03:33', 'SYYYY-MM-DD HH24:MI:SS'), '', to_date('2021-01-07 09:07:17', 'SYYYY-MM-DD HH24:MI:SS'), NULL, to_date('2022-07-09 23:03:33', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
 INSERT INTO system_users (id, username, password, nickname, remark, dept_id, post_ids, email, mobile, sex, avatar, status, login_ip, login_date, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (103, 'yuanma', '$2a$10$YMpimV4T6BtDhIaA8jSW.u8UTGBeGhc/qwXP4oxoMr4mOw9.qttt6', '源码', NULL, 106, NULL, 'yuanma@iocoder.cn', '15601701300', 0, '', 0, '0:0:0:0:0:0:0:1', to_date('2024-03-18 21:09:04', 'SYYYY-MM-DD HH24:MI:SS'), '', to_date('2021-01-13 23:50:35', 'SYYYY-MM-DD HH24:MI:SS'), NULL, to_date('2024-03-18 21:09:04', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
 INSERT INTO system_users (id, username, password, nickname, remark, dept_id, post_ids, email, mobile, sex, avatar, status, login_ip, login_date, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (104, 'test', '$2a$04$KhExCYl7lx6eWWZYKsibKOZ8IBJRyuNuCcEOLQ11RYhJKgHmlSwK.', '测试号', NULL, 107, '[1,2]', '111@qq.com', '15601691200', 1, '', 0, '0:0:0:0:0:0:0:1', to_date('2024-03-26 07:11:35', 'SYYYY-MM-DD HH24:MI:SS'), '', to_date('2021-01-21 02:13:53', 'SYYYY-MM-DD HH24:MI:SS'), NULL, to_date('2024-03-26 07:11:35', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
@@ -5977,18 +4334,249 @@ INSERT INTO system_users (id, username, password, nickname, remark, dept_id, pos
 INSERT INTO system_users (id, username, password, nickname, remark, dept_id, post_ids, email, mobile, sex, avatar, status, login_ip, login_date, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (113, 'aoteman', '$2a$10$0acJOIk2D25/oC87nyclE..0lzeu9DtQ/n3geP4fkun/zIVRhHJIO', '芋道', NULL, NULL, NULL, '', '15601691300', 0, '', 0, '127.0.0.1', to_date('2022-03-19 18:38:51', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-03-07 21:37:58', 'SYYYY-MM-DD HH24:MI:SS'), NULL, to_date('2022-03-19 18:38:51', 'SYYYY-MM-DD HH24:MI:SS'), '0', 122);
 INSERT INTO system_users (id, username, password, nickname, remark, dept_id, post_ids, email, mobile, sex, avatar, status, login_ip, login_date, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (114, 'hrmgr', '$2a$10$TR4eybBioGRhBmDBWkqWLO6NIh3mzYa8KBKDDB5woiGYFVlRAi.fu', 'hr 小姐姐', NULL, NULL, '[5]', '', '15601691236', 1, '', 0, '0:0:0:0:0:0:0:1', to_date('2024-03-24 22:21:05', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-03-19 21:50:58', 'SYYYY-MM-DD HH24:MI:SS'), NULL, to_date('2024-03-24 22:21:05', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
 INSERT INTO system_users (id, username, password, nickname, remark, dept_id, post_ids, email, mobile, sex, avatar, status, login_ip, login_date, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (115, 'aotemane', '$2a$04$GcyP0Vyzb2F2Yni5PuIK9ueGxM0tkZGMtDwVRwrNbtMvorzbpNsV2', '阿呆', '11222', 102, '[1,2]', '7648@qq.com', '15601691229', 2, '', 0, '', NULL, '1', to_date('2022-04-30 02:55:43', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-04-04 09:37:14', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_users (id, username, password, nickname, remark, dept_id, post_ids, email, mobile, sex, avatar, status, login_ip, login_date, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (116, '15601691302', '$2a$10$L5C4S0U6adBWMvFv1Wwl4.DI/NwYS3WIfLj5Q.Naqr5II8CmqsDZ6', '小豆', NULL, NULL, NULL, '', '', 0, '', 0, '', NULL, '1', to_date('2022-05-17 10:07:10', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-05-17 10:07:10', 'SYYYY-MM-DD HH24:MI:SS'), '0', 124);
 INSERT INTO system_users (id, username, password, nickname, remark, dept_id, post_ids, email, mobile, sex, avatar, status, login_ip, login_date, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (117, 'admin123', '$2a$10$WI8Gg/lpZQIrOEZMHqka7OdFaD4Nx.B/qY8ZGTTUKrOJwaHFqibaC', '测试号', '1111', 100, '[2]', '', '15601691234', 1, '', 0, '', NULL, '1', to_date('2022-07-09 17:40:26', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-07-09 17:40:26', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
 INSERT INTO system_users (id, username, password, nickname, remark, dept_id, post_ids, email, mobile, sex, avatar, status, login_ip, login_date, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (118, 'goudan', '$2a$04$OB1SuphCdiLVRpiYRKeqH.8NYS7UIp5vmIv1W7U4w6toiFeOAATVK', '狗蛋', NULL, 103, '[1]', '', '15601691239', 1, '', 0, '0:0:0:0:0:0:0:1', to_date('2024-03-17 09:10:27', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2022-07-09 17:44:43', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-04-04 09:48:05', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
-INSERT INTO system_users (id, username, password, nickname, remark, dept_id, post_ids, email, mobile, sex, avatar, status, login_ip, login_date, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (126, 'tudou123', '$2a$04$lecJZ/CqgknEp7mDV2d4ou0beyj1GbM3.nVEZe//8WgQpR.JBgnAu', '土豆', NULL, NULL, NULL, '', '', 0, '', 0, '', NULL, '1', to_date('2023-12-02 23:35:05', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-02 23:35:05', 'SYYYY-MM-DD HH24:MI:SS'), '0', 151);
-INSERT INTO system_users (id, username, password, nickname, remark, dept_id, post_ids, email, mobile, sex, avatar, status, login_ip, login_date, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (127, 'admin2024', '$2a$04$cHdZ7N6AUKysa2XTUG/J/egYtAzdwtpnNpcMVHDrupt1dyn4teOku', '土豆', NULL, NULL, NULL, '', '', 0, '', 0, '0:0:0:0:0:0:0:1', to_date('2023-12-30 11:43:28', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-12-30 11:43:17', 'SYYYY-MM-DD HH24:MI:SS'), NULL, to_date('2023-12-30 11:43:28', 'SYYYY-MM-DD HH24:MI:SS'), '0', 152);
-INSERT INTO system_users (id, username, password, nickname, remark, dept_id, post_ids, email, mobile, sex, avatar, status, login_ip, login_date, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (128, 'xiaoming', '$2a$04$BRinw4an9PBGvx6K7GLNre6rWU0.1HMYHkQCN6Oir74zNFKkNKRzm', 'xiaoming', NULL, NULL, NULL, '', '15601691301', 0, '', 0, '0:0:0:0:0:0:0:1', to_date('2024-02-29 23:48:33', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-02-27 21:58:25', 'SYYYY-MM-DD HH24:MI:SS'), NULL, to_date('2024-02-29 23:48:33', 'SYYYY-MM-DD HH24:MI:SS'), '0', 153);
-INSERT INTO system_users (id, username, password, nickname, remark, dept_id, post_ids, email, mobile, sex, avatar, status, login_ip, login_date, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (129, 'hh123456', '$2a$04$8mHJM7n03bcNjtaw.IlfV.l38ikWWFJQ7NR1rHywavN7v2UyoDjwq', 'hh', NULL, NULL, NULL, '', '', 0, '', 0, '0:0:0:0:0:0:0:1', to_date('2024-03-30 17:53:24', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-03-30 17:52:59', 'SYYYY-MM-DD HH24:MI:SS'), NULL, to_date('2024-03-30 17:53:24', 'SYYYY-MM-DD HH24:MI:SS'), '0', 154);
+INSERT INTO system_users (id, username, password, nickname, remark, dept_id, post_ids, email, mobile, sex, avatar, status, login_ip, login_date, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (131, 'hh', '$2a$04$jyH9h6.gaw8mpOjPfHIpx.8as2Rzfcmdlj5rlJFwgCw4rsv/MTb2K', '呵呵', NULL, 100, '[]', '777@qq.com', '15601882312', 1, '', 0, '', NULL, '1', to_date('2024-04-27 08:45:56', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2024-04-27 08:45:56', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
 COMMIT;
 -- @formatter:on
 
 CREATE SEQUENCE system_users_seq
-    START WITH 130
-    INCREMENT BY 1;
+    START WITH 132;
 
+-- ----------------------------
+-- Table structure for yudao_demo01_contact
+-- ----------------------------
+CREATE TABLE yudao_demo01_contact
+(
+    id          number                                  NOT NULL,
+    name        varchar2(100) DEFAULT ''                NULL,
+    sex         smallint                                NOT NULL,
+    birthday    date                                    NOT NULL,
+    description varchar2(255)                           NOT NULL,
+    avatar      varchar2(512) DEFAULT NULL              NULL,
+    creator     varchar2(64)  DEFAULT ''                NULL,
+    create_time date          DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updater     varchar2(64)  DEFAULT ''                NULL,
+    update_time date          DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    deleted     number(1, 0)  DEFAULT 0                 NOT NULL,
+    tenant_id   number        DEFAULT 0                 NOT NULL
+);
+
+ALTER TABLE yudao_demo01_contact
+    ADD CONSTRAINT pk_yudao_demo01_contact PRIMARY KEY (id);
+
+COMMENT ON COLUMN yudao_demo01_contact.id IS '编号';
+COMMENT ON COLUMN yudao_demo01_contact.name IS '名字';
+COMMENT ON COLUMN yudao_demo01_contact.sex IS '性别';
+COMMENT ON COLUMN yudao_demo01_contact.birthday IS '出生年';
+COMMENT ON COLUMN yudao_demo01_contact.description IS '简介';
+COMMENT ON COLUMN yudao_demo01_contact.avatar IS '头像';
+COMMENT ON COLUMN yudao_demo01_contact.creator IS '创建者';
+COMMENT ON COLUMN yudao_demo01_contact.create_time IS '创建时间';
+COMMENT ON COLUMN yudao_demo01_contact.updater IS '更新者';
+COMMENT ON COLUMN yudao_demo01_contact.update_time IS '更新时间';
+COMMENT ON COLUMN yudao_demo01_contact.deleted IS '是否删除';
+COMMENT ON COLUMN yudao_demo01_contact.tenant_id IS '租户编号';
+COMMENT ON TABLE yudao_demo01_contact IS '示例联系人表';
+
+-- ----------------------------
+-- Records of yudao_demo01_contact
+-- ----------------------------
+-- @formatter:off
+INSERT INTO yudao_demo01_contact (id, name, sex, birthday, description, avatar, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1, '土豆', 2, to_date('2023-11-07 00:00:00', 'SYYYY-MM-DD HH24:MI:SS'), '<p>天蚕土豆！呀</p>', 'http://127.0.0.1:48080/admin-api/infra/file/4/get/46f8fa1a37db3f3960d8910ff2fe3962ab3b2db87cf2f8ccb4dc8145b8bdf237.jpeg', '1', to_date('2023-11-15 23:34:30', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-11-15 23:47:39', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
+COMMIT;
+-- @formatter:on
+
+CREATE SEQUENCE yudao_demo01_contact_seq
+    START WITH 2;
+
+-- ----------------------------
+-- Table structure for yudao_demo02_category
+-- ----------------------------
+CREATE TABLE yudao_demo02_category
+(
+    id          number                                  NOT NULL,
+    name        varchar2(100) DEFAULT ''                NULL,
+    parent_id   number                                  NOT NULL,
+    creator     varchar2(64)  DEFAULT ''                NULL,
+    create_time date          DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updater     varchar2(64)  DEFAULT ''                NULL,
+    update_time date          DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    deleted     number(1, 0)  DEFAULT 0                 NOT NULL,
+    tenant_id   number        DEFAULT 0                 NOT NULL
+);
+
+ALTER TABLE yudao_demo02_category
+    ADD CONSTRAINT pk_yudao_demo02_category PRIMARY KEY (id);
+
+COMMENT ON COLUMN yudao_demo02_category.id IS '编号';
+COMMENT ON COLUMN yudao_demo02_category.name IS '名字';
+COMMENT ON COLUMN yudao_demo02_category.parent_id IS '父级编号';
+COMMENT ON COLUMN yudao_demo02_category.creator IS '创建者';
+COMMENT ON COLUMN yudao_demo02_category.create_time IS '创建时间';
+COMMENT ON COLUMN yudao_demo02_category.updater IS '更新者';
+COMMENT ON COLUMN yudao_demo02_category.update_time IS '更新时间';
+COMMENT ON COLUMN yudao_demo02_category.deleted IS '是否删除';
+COMMENT ON COLUMN yudao_demo02_category.tenant_id IS '租户编号';
+COMMENT ON TABLE yudao_demo02_category IS '示例分类表';
+
+-- ----------------------------
+-- Records of yudao_demo02_category
+-- ----------------------------
+-- @formatter:off
+INSERT INTO yudao_demo02_category (id, name, parent_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1, '土豆', 0, '1', to_date('2023-11-15 23:34:30', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-11-16 20:24:23', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
+INSERT INTO yudao_demo02_category (id, name, parent_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2, '番茄', 0, '1', to_date('2023-11-16 20:24:00', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-11-16 20:24:15', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
+INSERT INTO yudao_demo02_category (id, name, parent_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3, '怪怪', 0, '1', to_date('2023-11-16 20:24:32', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-11-16 20:24:32', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
+INSERT INTO yudao_demo02_category (id, name, parent_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4, '小番茄', 2, '1', to_date('2023-11-16 20:24:39', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-11-16 20:24:39', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
+INSERT INTO yudao_demo02_category (id, name, parent_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (5, '大番茄', 2, '1', to_date('2023-11-16 20:24:46', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-11-16 20:24:46', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
+INSERT INTO yudao_demo02_category (id, name, parent_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6, '11', 3, '1', to_date('2023-11-24 19:29:34', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-11-24 19:29:34', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
+COMMIT;
+-- @formatter:on
+
+CREATE SEQUENCE yudao_demo02_category_seq
+    START WITH 7;
+
+-- ----------------------------
+-- Table structure for yudao_demo03_course
+-- ----------------------------
+CREATE TABLE yudao_demo03_course
+(
+    id          number                                  NOT NULL,
+    student_id  number                                  NOT NULL,
+    name        varchar2(100) DEFAULT ''                NULL,
+    score       smallint                                NOT NULL,
+    creator     varchar2(64)  DEFAULT ''                NULL,
+    create_time date          DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updater     varchar2(64)  DEFAULT ''                NULL,
+    update_time date          DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    deleted     number(1, 0)  DEFAULT 0                 NOT NULL,
+    tenant_id   number        DEFAULT 0                 NOT NULL
+);
+
+ALTER TABLE yudao_demo03_course
+    ADD CONSTRAINT pk_yudao_demo03_course PRIMARY KEY (id);
+
+COMMENT ON COLUMN yudao_demo03_course.id IS '编号';
+COMMENT ON COLUMN yudao_demo03_course.student_id IS '学生编号';
+COMMENT ON COLUMN yudao_demo03_course.name IS '名字';
+COMMENT ON COLUMN yudao_demo03_course.score IS '分数';
+COMMENT ON COLUMN yudao_demo03_course.creator IS '创建者';
+COMMENT ON COLUMN yudao_demo03_course.create_time IS '创建时间';
+COMMENT ON COLUMN yudao_demo03_course.updater IS '更新者';
+COMMENT ON COLUMN yudao_demo03_course.update_time IS '更新时间';
+COMMENT ON COLUMN yudao_demo03_course.deleted IS '是否删除';
+COMMENT ON COLUMN yudao_demo03_course.tenant_id IS '租户编号';
+COMMENT ON TABLE yudao_demo03_course IS '学生课程表';
+
+-- ----------------------------
+-- Records of yudao_demo03_course
+-- ----------------------------
+-- @formatter:off
+INSERT INTO yudao_demo03_course (id, student_id, name, score, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2, 2, '语文', 66, '1', to_date('2023-11-16 23:21:49', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-11-16 23:21:49', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
+INSERT INTO yudao_demo03_course (id, student_id, name, score, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3, 2, '数学', 22, '1', to_date('2023-11-16 23:21:49', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-11-16 23:21:49', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
+INSERT INTO yudao_demo03_course (id, student_id, name, score, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6, 5, '体育', 23, '1', to_date('2023-11-16 23:22:46', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-11-16 15:44:40', 'SYYYY-MM-DD HH24:MI:SS'), '1', 1);
+INSERT INTO yudao_demo03_course (id, student_id, name, score, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (7, 5, '计算机', 11, '1', to_date('2023-11-16 23:22:46', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-11-16 15:44:40', 'SYYYY-MM-DD HH24:MI:SS'), '1', 1);
+INSERT INTO yudao_demo03_course (id, student_id, name, score, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (8, 5, '体育', 23, '1', to_date('2023-11-16 23:22:46', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-11-16 15:47:09', 'SYYYY-MM-DD HH24:MI:SS'), '1', 1);
+INSERT INTO yudao_demo03_course (id, student_id, name, score, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (9, 5, '计算机', 11, '1', to_date('2023-11-16 23:22:46', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-11-16 15:47:09', 'SYYYY-MM-DD HH24:MI:SS'), '1', 1);
+INSERT INTO yudao_demo03_course (id, student_id, name, score, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (10, 5, '体育', 23, '1', to_date('2023-11-16 23:22:46', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-11-16 23:47:10', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
+INSERT INTO yudao_demo03_course (id, student_id, name, score, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (11, 5, '计算机', 11, '1', to_date('2023-11-16 23:22:46', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-11-16 23:47:10', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
+INSERT INTO yudao_demo03_course (id, student_id, name, score, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (12, 2, '电脑', 33, '1', to_date('2023-11-17 00:20:42', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-11-16 16:20:45', 'SYYYY-MM-DD HH24:MI:SS'), '1', 1);
+INSERT INTO yudao_demo03_course (id, student_id, name, score, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (13, 9, '滑雪', 12, '1', to_date('2023-11-17 13:13:20', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-11-17 13:13:20', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
+COMMIT;
+-- @formatter:on
+
+CREATE SEQUENCE yudao_demo03_course_seq
+    START WITH 14;
+
+-- ----------------------------
+-- Table structure for yudao_demo03_grade
+-- ----------------------------
+CREATE TABLE yudao_demo03_grade
+(
+    id          number                                  NOT NULL,
+    student_id  number                                  NOT NULL,
+    name        varchar2(100) DEFAULT ''                NULL,
+    teacher     varchar2(255)                           NOT NULL,
+    creator     varchar2(64)  DEFAULT ''                NULL,
+    create_time date          DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updater     varchar2(64)  DEFAULT ''                NULL,
+    update_time date          DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    deleted     number(1, 0)  DEFAULT 0                 NOT NULL,
+    tenant_id   number        DEFAULT 0                 NOT NULL
+);
+
+ALTER TABLE yudao_demo03_grade
+    ADD CONSTRAINT pk_yudao_demo03_grade PRIMARY KEY (id);
+
+COMMENT ON COLUMN yudao_demo03_grade.id IS '编号';
+COMMENT ON COLUMN yudao_demo03_grade.student_id IS '学生编号';
+COMMENT ON COLUMN yudao_demo03_grade.name IS '名字';
+COMMENT ON COLUMN yudao_demo03_grade.teacher IS '班主任';
+COMMENT ON COLUMN yudao_demo03_grade.creator IS '创建者';
+COMMENT ON COLUMN yudao_demo03_grade.create_time IS '创建时间';
+COMMENT ON COLUMN yudao_demo03_grade.updater IS '更新者';
+COMMENT ON COLUMN yudao_demo03_grade.update_time IS '更新时间';
+COMMENT ON COLUMN yudao_demo03_grade.deleted IS '是否删除';
+COMMENT ON COLUMN yudao_demo03_grade.tenant_id IS '租户编号';
+COMMENT ON TABLE yudao_demo03_grade IS '学生班级表';
+
+-- ----------------------------
+-- Records of yudao_demo03_grade
+-- ----------------------------
+-- @formatter:off
+INSERT INTO yudao_demo03_grade (id, student_id, name, teacher, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (7, 2, '三年 2 班', '周杰伦', '1', to_date('2023-11-16 23:21:49', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-11-16 23:21:49', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
+INSERT INTO yudao_demo03_grade (id, student_id, name, teacher, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (8, 5, '华为', '遥遥领先', '1', to_date('2023-11-16 23:22:46', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-11-16 23:47:10', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
+INSERT INTO yudao_demo03_grade (id, student_id, name, teacher, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (9, 9, '小图', '小娃111', '1', to_date('2023-11-17 13:10:23', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-11-17 13:10:23', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
+COMMIT;
+-- @formatter:on
+
+CREATE SEQUENCE yudao_demo03_grade_seq
+    START WITH 10;
+
+-- ----------------------------
+-- Table structure for yudao_demo03_student
+-- ----------------------------
+CREATE TABLE yudao_demo03_student
+(
+    id          number                                  NOT NULL,
+    name        varchar2(100) DEFAULT ''                NULL,
+    sex         smallint                                NOT NULL,
+    birthday    date                                    NOT NULL,
+    description varchar2(255)                           NOT NULL,
+    creator     varchar2(64)  DEFAULT ''                NULL,
+    create_time date          DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updater     varchar2(64)  DEFAULT ''                NULL,
+    update_time date          DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    deleted     number(1, 0)  DEFAULT 0                 NOT NULL,
+    tenant_id   number        DEFAULT 0                 NOT NULL
+);
+
+ALTER TABLE yudao_demo03_student
+    ADD CONSTRAINT pk_yudao_demo03_student PRIMARY KEY (id);
+
+COMMENT ON COLUMN yudao_demo03_student.id IS '编号';
+COMMENT ON COLUMN yudao_demo03_student.name IS '名字';
+COMMENT ON COLUMN yudao_demo03_student.sex IS '性别';
+COMMENT ON COLUMN yudao_demo03_student.birthday IS '出生日期';
+COMMENT ON COLUMN yudao_demo03_student.description IS '简介';
+COMMENT ON COLUMN yudao_demo03_student.creator IS '创建者';
+COMMENT ON COLUMN yudao_demo03_student.create_time IS '创建时间';
+COMMENT ON COLUMN yudao_demo03_student.updater IS '更新者';
+COMMENT ON COLUMN yudao_demo03_student.update_time IS '更新时间';
+COMMENT ON COLUMN yudao_demo03_student.deleted IS '是否删除';
+COMMENT ON COLUMN yudao_demo03_student.tenant_id IS '租户编号';
+COMMENT ON TABLE yudao_demo03_student IS '学生表';
+
+-- ----------------------------
+-- Records of yudao_demo03_student
+-- ----------------------------
+-- @formatter:off
+INSERT INTO yudao_demo03_student (id, name, sex, birthday, description, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2, '小白', 1, to_date('2023-11-16 00:00:00', 'SYYYY-MM-DD HH24:MI:SS'), '<p>厉害</p>', '1', to_date('2023-11-16 23:21:49', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-11-17 16:49:06', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
+INSERT INTO yudao_demo03_student (id, name, sex, birthday, description, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (5, '大黑', 2, to_date('2023-11-13 00:00:00', 'SYYYY-MM-DD HH24:MI:SS'), '<p>你在教我做事?</p>', '1', to_date('2023-11-16 23:22:46', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-11-17 16:49:07', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
+INSERT INTO yudao_demo03_student (id, name, sex, birthday, description, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (9, '小花', 1, to_date('2023-11-07 00:00:00', 'SYYYY-MM-DD HH24:MI:SS'), '<p>哈哈哈</p>', '1', to_date('2023-11-17 00:04:47', 'SYYYY-MM-DD HH24:MI:SS'), '1', to_date('2023-11-17 16:49:08', 'SYYYY-MM-DD HH24:MI:SS'), '0', 1);
+COMMIT;
+-- @formatter:on
+
+CREATE SEQUENCE yudao_demo03_student_seq
+    START WITH 10;
 

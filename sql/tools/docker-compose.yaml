@@ -43,6 +43,7 @@ services:
 
     oracle:
         image: gvenzl/oracle-xe:18-slim-faststart
+        restart: unless-stopped
         environment:
             ## 登录信息 SID: XE user: system password: oracle
             ORACLE_PASSWORD: oracle
