@@ -61,7 +61,7 @@ services:
         environment:
             TZ: Asia/Shanghai
             ACCEPT_EULA: "Y"
-            SA_PASSWORD: "Yudao@24"
+            SA_PASSWORD: "Yudao@2024"
         ports:
             - "1433:1433"
         volumes:
