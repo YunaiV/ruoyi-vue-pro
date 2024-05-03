@@ -13,6 +13,8 @@ public interface SimpleModelConstants {
      */
     String APPROVE_METHOD_ATTRIBUTE = "approveMethod";
 
+    // TODO @芋艿：条件表达式的字段名
+
     /**
      * 网关节点默认序列流属性
      */
@@ -27,4 +29,5 @@ public interface SimpleModelConstants {
      * 条件节点条件表达式属性
      */
     String CONDITION_EXPRESSION_ATTRIBUTE = "conditionExpression";
+
 }
