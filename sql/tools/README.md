@@ -42,7 +42,24 @@ docker compose exec sqlserver bash /tmp/create_schema.sh
 
 ### 1.5 DM 达梦
 
-TODO 暂未支持
+下载达梦docker镜像 https://download.dameng.com/eco/dm8/dm8_20230808_rev197096_x86_rh6_64_single.tar
+
+加载镜像文件，在镜像tar文件所在目录运行：
+
+```Bash
+docker load -i dm8_20230808_rev197096_x86_rh6_64_single.tar
+````
+在项目`sql/tools`目录下运行：
+
+```Bash
+docker compose up -d dm8
+# 注意：启动完 sqlserver 后，需要手动再执行如下命令，因为 SQL Server 不支持初始化脚本
+docker compose exec -i dm8 /bin/bash -c "exec /opt/dmdbms/bin/disql SYSDBA/SYSDBA001 \`/tmp/schema.sql"
+```
+
+**注意**: `sql/dm/ruoyi-vue-pro-dm8.sql`文件编码必须为`GBK`或者`GBK`超集
+
+暂不支持 MacBook Apple Silicon，因为 达梦 官方没有提供 Apple Silicon 版本的 Docker 镜像。
 
 ## 2. MySQL 转换其它数据库
 
