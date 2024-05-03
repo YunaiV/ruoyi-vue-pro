@@ -90,6 +90,14 @@ public class JobController {
         return success(true);
     }
 
+    @PostMapping("/sync")
+    @Operation(summary = "同步定时任务")
+    @PreAuthorize("@ss.hasPermission('infra:job:create')")
+    public CommonResult<Boolean> syncJob() throws SchedulerException {
+        jobService.syncJob();
+        return success(true);
+    }
+
     @GetMapping("/get")
     @Operation(summary = "获得定时任务")
     @Parameter(name = "id", description = "编号", required = true, example = "1024")
