@@ -54,7 +54,8 @@ docker load -i dm8_20230808_rev197096_x86_rh6_64_single.tar
 ```Bash
 docker compose up -d dm8
 # 注意：启动完 sqlserver 后，需要手动再执行如下命令，因为 SQL Server 不支持初始化脚本
-docker compose exec -i dm8 /bin/bash -c "exec /opt/dmdbms/bin/disql SYSDBA/SYSDBA001 \`/tmp/schema.sql"
+docker compose exec dm8 bash -c "exec /opt/dmdbms/bin/disql SYSDBA/SYSDBA001 \`/tmp/schema.sql"
+exit
 ```
 
 **注意**: `sql/dm/ruoyi-vue-pro-dm8.sql`文件编码必须为`GBK`或者`GBK`超集

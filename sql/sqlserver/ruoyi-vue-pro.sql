@@ -5,8 +5,27 @@
 
  Target Server Type    : Microsoft SQL Server
 
- Date: 2024-05-02 15:29:31
+ Date: 2024-05-03 23:36:38
 */
+
+
+-- ----------------------------
+-- Table structure for dual
+-- ----------------------------
+DROP TABLE IF EXISTS dual
+GO
+
+CREATE TABLE dual
+(
+    id int NULL
+)
+GO
+
+EXEC sp_addextendedproperty
+     'MS_Description', N'数据库连接的表',
+     'SCHEMA', N'dbo',
+     'TABLE', N'dual'
+GO
 
 
 -- ----------------------------

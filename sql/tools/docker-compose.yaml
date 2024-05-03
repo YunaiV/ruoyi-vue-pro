@@ -91,4 +91,4 @@ services:
         volumes:
             - dm8:/opt/dmdbms/data
             - ../dm/ruoyi-vue-pro-dm8.sql:/tmp/schema.sql:ro
-            # docker compose exec -i dm8 /bin/bash -c "exec /opt/dmdbms/bin/disql SYSDBA/SYSDBA001 \`/tmp/schema.sql"
+            # docker compose exec dm8 bash -c "exec /opt/dmdbms/bin/disql SYSDBA/SYSDBA001 \`/tmp/schema.sql"

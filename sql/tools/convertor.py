@@ -134,6 +134,14 @@ class Convertor(ABC):
         """
         pass
 
+    def gen_dual(self) -> str:
+        """生成虚拟 dual 表
+
+        Returns:
+            str: 生成脚本, 默认返回空脚本, 表示当前数据库无需手工创建
+        """
+        return ""
+
     @staticmethod
     def inserts(table_name: str, script_content: str) -> Generator:
         PREFIX = f"INSERT INTO `{table_name}`"
@@ -191,6 +199,17 @@ class Convertor(ABC):
                 date=time.strftime("%Y-%m-%d %H:%M:%S"),
             )
         )
+
+        dual = self.gen_dual()
+        if dual:
+            print(
+                f"""-- ----------------------------
+-- Table structure for dual
+-- ----------------------------
+{dual}
+
+"""
+            )
 
         error_scripts = []
         for table_sql in self.table_script_list:
@@ -347,6 +366,12 @@ CREATE SEQUENCE {table_name}_seq
         )
 
         return script
+
+    def gen_dual(self) -> str:
+        return """DROP TABLE IF EXISTS dual;
+CREATE TABLE dual
+(
+);"""
 
 
 class OracleConvertor(Convertor):
@@ -604,6 +629,22 @@ GO
 -- @formatter:on"""
 
         return script
+
+    def gen_dual(self) -> str:
+        return """DROP TABLE IF EXISTS dual
+GO
+
+CREATE TABLE dual
+(
+  id int NULL
+)
+GO
+
+EXEC sp_addextendedproperty
+    'MS_Description', N'数据库连接的表',
+    'SCHEMA', N'dbo',
+    'TABLE', N'dual'
+GO"""
 
 
 class DM8Convertor(Convertor):
