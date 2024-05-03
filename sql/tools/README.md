@@ -46,20 +46,26 @@ TODO 暂未支持
 
 ## 2. MySQL 转换其它数据库
 
-实现原理：通过读取 MySQL 的 `sql/mysql/ruoyi-vue-pro.sql` 数据库文件，转换成 Oracle、PostgreSQL、SQL Server 等数据库的脚本。
+### 2.1 实现原理
 
-使用方式如下：
+通过读取 MySQL 的 `sql/mysql/ruoyi-vue-pro.sql` 数据库文件，转换成 Oracle、PostgreSQL、SQL Server 等数据库的脚本。
 
-安装依赖库
+### 2.2 使用方法
+
+① 安装依赖库 `simple-ddl-parser`
 
 ```bash
 pip install simple-ddl-parser
+# pip3 install simple-ddl-parser
 ```
 
-执行如下命令打印生成 postgresql 的脚本内容，其他可选参数有：oracle, sqlserver
+② 执行如下命令打印生成 postgres 的脚本内容，其他可选参数有：`oracle`、`sqlserver`
 
 ```Bash
 python3 convertor.py postgres
+# python3 convertor.py postgres > tmp.sql
 ```
 
-程序将sql脚本打印到终端，可以重定向到临时文件tmp.sql, 确认无误后可以利用IDEA（专业版）进行格式化。
+程序将 SQL 脚本打印到终端，可以重定向到临时文件 `tmp.sql`。
+
+确认无误后，可以利用 IDEA 进行格式化。当然，也可以直接导入到数据库中。
