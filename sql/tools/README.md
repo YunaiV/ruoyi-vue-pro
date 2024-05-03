@@ -50,8 +50,16 @@ TODO 暂未支持
 
 使用方式如下：
 
-```Bash
-python3 convertor.py
+安装依赖库
+
+```bash
+pip install simple-ddl-parser
 ```
 
-然后，TODO
+执行如下命令打印生成 postgresql 的脚本内容，其他可选参数有：oracle, sqlserver
+
+```Bash
+python3 convertor.py postgres
+```
+
+程序将sql脚本打印到终端，可以重定向到临时文件tmp.sql, 确认无误后可以利用IDEA（专业版）进行格式化。
