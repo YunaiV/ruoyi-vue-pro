@@ -42,36 +42,39 @@ docker compose exec sqlserver bash /tmp/create_schema.sh
 
 ### 1.5 DM 达梦
 
-下载达梦docker镜像 https://download.dameng.com/eco/dm8/dm8_20230808_rev197096_x86_rh6_64_single.tar
+① 下载达梦 Docker 镜像：https://download.dameng.com/eco/dm8/dm8_20230808_rev197096_x86_rh6_64_single.tar
 
-加载镜像文件，在镜像tar文件所在目录运行：
+② 加载镜像文件，在镜像 tar 文件所在目录运行：
 
 ```Bash
 docker load -i dm8_20230808_rev197096_x86_rh6_64_single.tar
 ````
-在项目`sql/tools`目录下运行：
+
+③ 在项目 `sql/tools` 目录下运行：
 
 ```Bash
 docker compose up -d dm8
-# 注意：启动完 sqlserver 后，需要手动再执行如下命令，因为 SQL Server 不支持初始化脚本
+# 注意：启动完 dm 后，需要手动再执行如下命令，因为 dm 不支持初始化脚本
 docker compose exec dm8 bash -c "exec /opt/dmdbms/bin/disql SYSDBA/SYSDBA001 \`/tmp/schema.sql"
 exit
 ```
 
-**注意**: `sql/dm/ruoyi-vue-pro-dm8.sql`文件编码必须为`GBK`或者`GBK`超集
+**注意**: `sql/dm/ruoyi-vue-pro-dm8.sql` 文件编码必须为 `GBK` 或者 `GBK` 超集，否则会出现中文乱码。
 
 暂不支持 MacBook Apple Silicon，因为 达梦 官方没有提供 Apple Silicon 版本的 Docker 镜像。
 
-## 2. 测试数据库docker容器的销毁重建
+## 1.X 容器的销毁重建
 
-开发测试过程中，有时候需要创建全新干净的数据库。由于测试数据docker容器采用数据卷（volume）挂载数据库实例的数据目录，因此销毁数据需要停止容器后，删除数据卷，然后再重新创建容器。以postgres为例，操作如下：
+开发测试过程中，有时候需要创建全新干净的数据库。由于测试数据 Docker 容器采用数据卷 Volume 挂载数据库实例的数据目录，因此销毁数据需要停止容器后，删除数据卷，然后再重新创建容器。
+
+以 postgres 为例，操作如下：
 
 ```Bash
 docker compose down postgres
 docker volume rm ruoyi-vue-pro_postgres
 ```
 
-## 3. MySQL 转换其它数据库
+## 2. MySQL 转换其它数据库
 
 ### 2.1 实现原理
 
@@ -86,7 +89,7 @@ pip install simple-ddl-parser
 # pip3 install simple-ddl-parser
 ```
 
-② 执行如下命令打印生成 postgres 的脚本内容，其他可选参数有：`oracle`、`sqlserver`
+② 执行如下命令打印生成 postgres 的脚本内容，其他可选参数有：`oracle`、`sqlserver`、`dm8`：
 
 ```Bash
 python3 convertor.py postgres
