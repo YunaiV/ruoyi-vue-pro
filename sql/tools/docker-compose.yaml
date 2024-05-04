@@ -4,6 +4,7 @@ volumes:
     mysql: { }
     postgres: { }
     sqlserver: { }
+    dm8: { }
 
 services:
     mysql:
@@ -69,3 +70,25 @@ services:
             - ../sqlserver/ruoyi-vue-pro.sql:/tmp/schema.sql:ro
             # docker compose exec sqlserver bash /tmp/create_schema.sh
             - ./sqlserver/create_schema.sh:/tmp/create_schema.sh:ro
+
+
+    dm8:
+        # wget https://download.dameng.com/eco/dm8/dm8_20230808_rev197096_x86_rh6_64_single.tar
+        # docker load -i dm8_20230808_rev197096_x86_rh6_64_single.tar
+        image: dm8_single:dm8_20230808_rev197096_x86_rh6_64
+        restart: unless-stopped
+        environment:
+            PAGE_SIZE: 16
+            LD_LIBRARY_PATH: /opt/dmdbms/bin
+            EXTENT_SIZE: 32
+            BLANK_PAD_MODE: 1
+            LOG_SIZE: 1024
+            UNICODE_FLAG: 1
+            LENGTH_IN_CHAR: 1
+            INSTANCE_NAME: dm8_test
+        ports:
+            - "5236:5236"
+        volumes:
+            - dm8:/opt/dmdbms/data
+            - ../dm/ruoyi-vue-pro-dm8.sql:/tmp/schema.sql:ro
+            # docker compose exec dm8 bash -c "exec /opt/dmdbms/bin/disql SYSDBA/SYSDBA001 \`/tmp/schema.sql"

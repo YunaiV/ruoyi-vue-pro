@@ -50,14 +50,14 @@ spring:
 #          url: jdbc:mysql://127.0.0.1:3306/ruoyi-vue-pro?useSSL=false&allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=UTF-8&serverTimezone=CTT # MySQL Connector/J 5.X 连接的示例
 #          url: jdbc:postgresql://127.0.0.1:5432/ruoyi-vue-pro?useUnicode=true&characterEncoding=utf8&useSSL=true&autoReconnect=true&reWriteBatchedInserts=true # PostgreSQL 连接的示例
 #          url: jdbc:oracle:thin:@//127.0.0.1:1521/XEPDB1 # Oracle 连接的示例
-          url: jdbc:sqlserver://127.0.0.1:1433;DatabaseName=ruoyi-vue-pro;SelectMethod=cursor;encrypt=false;rewriteBatchedStatements=true;useUnicode=true;characterEncoding=utf-8 # SQLServer 连接的示例
-#          url: jdbc:dm://10.211.55.4:5236?schema=RUOYI_VUE_PRO # DM 连接的示例
+#          url: jdbc:sqlserver://127.0.0.1:1433;DatabaseName=ruoyi-vue-pro;SelectMethod=cursor;encrypt=false;rewriteBatchedStatements=true;useUnicode=true;characterEncoding=utf-8 # SQLServer 连接的示例
+          url: jdbc:dm://localhost:5236 # DM 连接的示例
 #          username: root
 #          password: 123456
-          username: sa       # SQLServer 连接的示例
-          password: Yudao@2024 # SQLServer 连接的示例
-#          username: SYSDBA # DM 连接的示例
-#          password: SYSDBA # DM 连接的示例
+#          username: sa       # SQLServer 连接的示例
+#          password: Yudao@2024 # SQLServer 连接的示例
+          username: SYSDBA # DM 连接的示例
+          password: SYSDBA001 # DM 连接的示例
         slave: # 模拟从库，可根据自己需要修改
           lazy: true # 开启懒加载，保证启动速度
 #          url: jdbc:mysql://127.0.0.1:3306/ruoyi-vue-pro?useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true&nullCatalogMeansCurrent=true # MySQL Connector/J 8.X 连接的示例

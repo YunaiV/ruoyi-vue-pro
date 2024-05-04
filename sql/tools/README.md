@@ -42,9 +42,36 @@ docker compose exec sqlserver bash /tmp/create_schema.sh
 
 ### 1.5 DM 达梦
 
-TODO 暂未支持
+下载达梦docker镜像 https://download.dameng.com/eco/dm8/dm8_20230808_rev197096_x86_rh6_64_single.tar
 
-## 2. MySQL 转换其它数据库
+加载镜像文件，在镜像tar文件所在目录运行：
+
+```Bash
+docker load -i dm8_20230808_rev197096_x86_rh6_64_single.tar
+````
+在项目`sql/tools`目录下运行：
+
+```Bash
+docker compose up -d dm8
+# 注意：启动完 sqlserver 后，需要手动再执行如下命令，因为 SQL Server 不支持初始化脚本
+docker compose exec dm8 bash -c "exec /opt/dmdbms/bin/disql SYSDBA/SYSDBA001 \`/tmp/schema.sql"
+exit
+```
+
+**注意**: `sql/dm/ruoyi-vue-pro-dm8.sql`文件编码必须为`GBK`或者`GBK`超集
+
+暂不支持 MacBook Apple Silicon，因为 达梦 官方没有提供 Apple Silicon 版本的 Docker 镜像。
+
+## 2. 测试数据库docker容器的销毁重建
+
+开发测试过程中，有时候需要创建全新干净的数据库。由于测试数据docker容器采用数据卷（volume）挂载数据库实例的数据目录，因此销毁数据需要停止容器后，删除数据卷，然后再重新创建容器。以postgres为例，操作如下：
+
+```Bash
+docker compose down postgres
+docker volume rm ruoyi-vue-pro_postgres
+```
+
+## 3. MySQL 转换其它数据库
 
 ### 2.1 实现原理
 

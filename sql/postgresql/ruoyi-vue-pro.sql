@@ -5,8 +5,17 @@
 
  Target Server Type    : PostgreSQL
 
- Date: 2024-05-01 23:25:45
+ Date: 2024-05-03 23:36:19
 */
+
+
+-- ----------------------------
+-- Table structure for dual
+-- ----------------------------
+DROP TABLE IF EXISTS dual;
+CREATE TABLE dual
+(
+);
 
 
 -- ----------------------------
@@ -3866,7 +3875,6 @@ COMMENT ON COLUMN system_sms_code.updater IS '更新者';
 COMMENT ON COLUMN system_sms_code.update_time IS '更新时间';
 COMMENT ON COLUMN system_sms_code.deleted IS '是否删除';
 COMMENT ON COLUMN system_sms_code.tenant_id IS '租户编号';
-COMMENT ON COLUMN system_sms_code.idx_mobile IS '手机号';
 COMMENT ON TABLE system_sms_code IS '手机验证码';
 
 DROP SEQUENCE IF EXISTS system_sms_code_seq;
@@ -4703,3 +4711,4 @@ COMMIT;
 DROP SEQUENCE IF EXISTS yudao_demo03_student_seq;
 CREATE SEQUENCE yudao_demo03_student_seq
     START 10;
+
