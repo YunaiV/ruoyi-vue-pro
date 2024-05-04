@@ -631,7 +631,7 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
 
         // 2. 更新订单
         tradeOrderMapper.updateById(new TradeOrderDO().setId(order.getId())
-                .setAdjustPrice(reqVO.getAdjustPrice()).setPayPrice(newPayPrice));
+                .setAdjustPrice(reqVO.getAdjustPrice() + order.getAdjustPrice()).setPayPrice(newPayPrice));
 
         // 3. 更新 TradeOrderItem，需要做 adjustPrice 的分摊
         List<TradeOrderItemDO> orderOrderItems = tradeOrderItemMapper.selectListByOrderId(order.getId());
@@ -639,9 +639,7 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
         List<TradeOrderItemDO> updateItems = new ArrayList<>();
         for (int i = 0; i < orderOrderItems.size(); i++) {
             TradeOrderItemDO item = orderOrderItems.get(i);
-            // TODO puhui999: 已有分摊记录的情况下价格是否会不对，也就是说之前订单项 1 分摊了 10 块这次是 -100
-            // 那么 setPayPrice 是否改为 (item.getPayPrice()-item.getAdjustPrice()) + dividePrices.get(i) 先减掉原来的价格再加上调价。经过验证可行，修改后订单价格增减都能正确分摊
-            updateItems.add(new TradeOrderItemDO().setId(item.getId()).setAdjustPrice(dividePrices.get(i))
+            updateItems.add(new TradeOrderItemDO().setId(item.getId()).setAdjustPrice(item.getAdjustPrice() + dividePrices.get(i))
                     .setPayPrice((item.getPayPrice() - item.getAdjustPrice()) + dividePrices.get(i)));
         }
         tradeOrderItemMapper.updateBatch(updateItems);
@@ -652,6 +650,7 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
         // 5. 记录订单日志
         TradeOrderLogUtils.setOrderInfo(order.getId(), order.getStatus(), order.getStatus(),
                 MapUtil.<String, Object>builder().put("oldPayPrice", MoneyUtils.fenToYuanStr(order.getPayPrice()))
+                        .put("adjustPrice", MoneyUtils.fenToYuanStr(reqVO.getAdjustPrice()))
                         .put("newPayPrice", MoneyUtils.fenToYuanStr(newPayPrice)).build());
     }
 

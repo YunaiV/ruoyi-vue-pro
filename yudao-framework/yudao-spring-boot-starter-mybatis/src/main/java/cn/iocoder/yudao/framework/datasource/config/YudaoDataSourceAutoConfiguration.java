@@ -23,7 +23,7 @@ public class YudaoDataSourceAutoConfiguration {
      * 创建 DruidAdRemoveFilter 过滤器，过滤 common.js 的广告
      */
     @Bean
-    @ConditionalOnProperty(name = "spring.datasource.druid.web-stat-filter.enabled", havingValue = "true")
+    @ConditionalOnProperty(name = "spring.datasource.druid.stat-view-servlet.enabled", havingValue = "true")
     public FilterRegistrationBean<DruidAdRemoveFilter> druidAdRemoveFilterFilter(DruidStatProperties properties) {
         // 获取 druid web 监控页面的参数
         DruidStatProperties.StatViewServlet config = properties.getStatViewServlet();

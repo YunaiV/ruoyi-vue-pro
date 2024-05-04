@@ -5,6 +5,7 @@ import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.map.MapUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.promotion.controller.admin.discount.vo.DiscountActivityBaseVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.discount.vo.DiscountActivityCreateReqVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.discount.vo.DiscountActivityPageReqVO;
@@ -17,6 +18,7 @@ import cn.iocoder.yudao.module.promotion.dal.mysql.discount.DiscountProductMappe
 import cn.iocoder.yudao.module.promotion.enums.common.PromotionActivityStatusEnum;
 import cn.iocoder.yudao.module.promotion.util.PromotionUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
@@ -48,31 +50,30 @@ public class DiscountActivityServiceImpl implements DiscountActivityService {
 
     @Override
     public List<DiscountProductDO> getMatchDiscountProductList(Collection<Long> skuIds) {
-        // TODO @zhangshuai：这里是不是可以直接 return discountProductMapper.getMatchDiscountProductList(skuIds)； 一般来说，如果 idea 报“黄色”的警告，尽量都处理下哈；原则是，一切警告，皆为异常（错误），这样可以写出更好的代码。
-        List<DiscountProductDO> matchDiscountProductList = discountProductMapper.getMatchDiscountProductList(skuIds);
-        return matchDiscountProductList;
+        return discountProductMapper.getMatchDiscountProductList(skuIds);
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public Long createDiscountActivity(DiscountActivityCreateReqVO createReqVO) {
         // 校验商品是否冲突
         validateDiscountActivityProductConflicts(null, createReqVO.getProducts());
 
         // 插入活动
         DiscountActivityDO discountActivity = DiscountActivityConvert.INSTANCE.convert(createReqVO)
-                // TODO @zhangshuai：这里的调用去掉哈，强制就是开启的；
-                .setStatus(PromotionUtils.calculateActivityStatus(createReqVO.getEndTime()));
+                .setStatus(CommonStatusEnum.ENABLE.getStatus());
         discountActivityMapper.insert(discountActivity);
         // 插入商品
-        // TODO @zhangshuai：activityStatus 最好代码里，也做下设置噢。
-        List<DiscountProductDO> discountProducts = convertList(createReqVO.getProducts(),
-                product -> DiscountActivityConvert.INSTANCE.convert(product).setActivityId(discountActivity.getId()));
+        List<DiscountProductDO> discountProducts = BeanUtils.toBean(createReqVO.getProducts(), DiscountProductDO.class,
+                product -> product.setActivityId(discountActivity.getId()).setActivityStatus(discountActivity.getStatus())
+                        .setActivityStartTime(createReqVO.getStartTime()).setActivityEndTime(createReqVO.getEndTime()));
         discountProductMapper.insertBatch(discountProducts);
         // 返回
         return discountActivity.getId();
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void updateDiscountActivity(DiscountActivityUpdateReqVO updateReqVO) {
         // 校验存在
         DiscountActivityDO discountActivity = validateDiscountActivityExists(updateReqVO.getId());

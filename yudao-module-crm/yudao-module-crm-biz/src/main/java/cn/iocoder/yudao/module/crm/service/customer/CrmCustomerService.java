@@ -39,7 +39,7 @@ public interface CrmCustomerService {
     /**
      * 更新客户的跟进状态
      *
-     * @param id        编号
+     * @param id         编号
      * @param dealStatus 跟进状态
      */
     void updateCustomerDealStatus(Long id, Boolean dealStatus);
@@ -47,8 +47,8 @@ public interface CrmCustomerService {
     /**
      * 更新客户相关的跟进信息
      *
-     * @param id 编号
-     * @param contactNextTime 下次联系时间
+     * @param id                 编号
+     * @param contactNextTime    下次联系时间
      * @param contactLastContent 最后联系内容
      */
     void updateCustomerFollowUp(Long id, LocalDateTime contactNextTime, String contactLastContent);
@@ -99,8 +99,8 @@ public interface CrmCustomerService {
     /**
      * 获得放入公海提醒的客户分页
      *
-     * @param pageVO       分页查询
-     * @param userId       用户编号
+     * @param pageVO 分页查询
+     * @param userId 用户编号
      * @return 客户分页
      */
     PageResult<CrmCustomerDO> getPutPoolRemindCustomerPage(CrmCustomerPageReqVO pageVO, Long userId);
@@ -108,7 +108,7 @@ public interface CrmCustomerService {
     /**
      * 获得待进入公海的客户数量
      *
-     * @param userId       用户编号
+     * @param userId 用户编号
      * @return 提醒数量
      */
     Long getPutPoolRemindCustomerCount(Long userId);
