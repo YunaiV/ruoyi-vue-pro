@@ -5,7 +5,9 @@ import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.pojo.SortablePageParam;
 import cn.iocoder.yudao.framework.common.pojo.SortingField;
+import cn.iocoder.yudao.framework.mybatis.core.enums.SqlConstants;
 import cn.iocoder.yudao.framework.mybatis.core.util.MyBatisUtils;
+import com.baomidou.mybatisplus.annotation.DbType;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -20,6 +22,7 @@ import org.apache.ibatis.annotations.Param;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * 在 MyBatis Plus 的 BaseMapper 的基础上拓展，提供更多的能力
@@ -147,6 +150,11 @@ public interface BaseMapperX<T> extends MPJBaseMapper<T> {
      * @param entities 实体们
      */
     default Boolean insertBatch(Collection<T> entities) {
+        // 特殊：SQL Server 批量插入后，获取 id 会报错，因此通过循环处理
+        if (Objects.equals(SqlConstants.DB_TYPE, DbType.SQL_SERVER)) {
+            entities.forEach(this::insert);
+            return CollUtil.isNotEmpty(entities);
+        }
         return Db.saveBatch(entities);
     }
 
@@ -157,6 +165,11 @@ public interface BaseMapperX<T> extends MPJBaseMapper<T> {
      * @param size     插入数量 Db.saveBatch 默认为 1000
      */
     default Boolean insertBatch(Collection<T> entities, int size) {
+        // 特殊：SQL Server 批量插入后，获取 id 会报错，因此通过循环处理
+        if (Objects.equals(SqlConstants.DB_TYPE, DbType.SQL_SERVER)) {
+            entities.forEach(this::insert);
+            return CollUtil.isNotEmpty(entities);
+        }
         return Db.saveBatch(entities, size);
     }
 

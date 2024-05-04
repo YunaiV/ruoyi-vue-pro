@@ -89,7 +89,7 @@ public class CrmBusinessServiceImpl implements CrmBusinessService {
             success = CRM_BUSINESS_CREATE_SUCCESS)
     public Long createBusiness(CrmBusinessSaveReqVO createReqVO, Long userId) {
         // 1.1 校验产品项的有效性
-        List<CrmBusinessProductDO> businessProducts = validateBusinessProducts(createReqVO.getBusinessProducts());
+        List<CrmBusinessProductDO> businessProducts = validateBusinessProducts(createReqVO.getProducts());
         // 1.2 校验关联字段
         validateRelationDataExists(createReqVO);
 
@@ -130,7 +130,7 @@ public class CrmBusinessServiceImpl implements CrmBusinessService {
         // 1.1 校验存在
         CrmBusinessDO oldBusiness = validateBusinessExists(updateReqVO.getId());
         // 1.2 校验产品项的有效性
-        List<CrmBusinessProductDO> businessProducts = validateBusinessProducts(updateReqVO.getBusinessProducts());
+        List<CrmBusinessProductDO> businessProducts = validateBusinessProducts(updateReqVO.getProducts());
         // 1.3 校验关联字段
         validateRelationDataExists(updateReqVO);
 
