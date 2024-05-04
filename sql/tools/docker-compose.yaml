@@ -1,0 +1,94 @@
+name: ruoyi-vue-pro
+
+volumes:
+    mysql: { }
+    postgres: { }
+    sqlserver: { }
+    dm8: { }
+
+services:
+    mysql:
+        image: mysql:8.0.33
+        restart: unless-stopped
+        environment:
+            TZ: Asia/Shanghai
+            MYSQL_ROOT_PASSWORD: 123456
+            MYSQL_DATABASE: ruoyi-vue-pro
+        ports:
+            - "3306:3306"
+        volumes:
+            - mysql:/var/lib/mysql/
+            # 注入初始化脚本
+            - ./mysql/ruoyi-vue-pro.sql:/docker-entrypoint-initdb.d/init.sql:ro
+        command:
+            --default-authentication-plugin=mysql_native_password
+            --character-set-server=utf8mb4
+            --collation-server=utf8mb4_general_ci
+            --explicit_defaults_for_timestamp=true
+            --lower_case_table_names=1
+
+    postgres:
+        image: postgres:14.2
+        restart: unless-stopped
+        environment:
+            POSTGRES_USER: root
+            POSTGRES_PASSWORD: 123456
+            POSTGRES_DB: ruoyi-vue-pro
+        ports:
+            - "5432:5432"
+        volumes:
+            - postgres:/var/lib/postgresql/data
+            # 注入初始化脚本
+            - ../postgresql/quartz.sql:/docker-entrypoint-initdb.d/quartz.sql:ro
+            - ../postgresql/ruoyi-vue-pro.sql:/docker-entrypoint-initdb.d/ruoyi-vue-pro.sql:ro
+
+    oracle:
+        image: gvenzl/oracle-xe:18-slim-faststart
+        restart: unless-stopped
+        environment:
+            ## 登录信息 SID: XE user: system password: oracle
+            ORACLE_PASSWORD: oracle
+        ports:
+            - "1521:1521"
+        volumes:
+            - ../oracle/ruoyi-vue-pro.sql:/tmp/schema.sql:ro
+            # 创建app用户: ROOT/123456@//localhost/XEPDB1
+            - ./oracle/1_create_user.sql:/docker-entrypoint-initdb.d/1_create_user.sql:ro
+            - ./oracle/2_create_schema.sh:/docker-entrypoint-initdb.d/2_create_schema.sh:ro
+
+    sqlserver:
+        image: mcr.microsoft.com/mssql/server:2017-latest
+        restart: unless-stopped
+        environment:
+            TZ: Asia/Shanghai
+            ACCEPT_EULA: "Y"
+            SA_PASSWORD: "Yudao@2024"
+        ports:
+            - "1433:1433"
+        volumes:
+            - sqlserver:/var/opt/mssql
+            - ../sqlserver/ruoyi-vue-pro.sql:/tmp/schema.sql:ro
+            # docker compose exec sqlserver bash /tmp/create_schema.sh
+            - ./sqlserver/create_schema.sh:/tmp/create_schema.sh:ro
+
+
+    dm8:
+        # wget https://download.dameng.com/eco/dm8/dm8_20230808_rev197096_x86_rh6_64_single.tar
+        # docker load -i dm8_20230808_rev197096_x86_rh6_64_single.tar
+        image: dm8_single:dm8_20230808_rev197096_x86_rh6_64
+        restart: unless-stopped
+        environment:
+            PAGE_SIZE: 16
+            LD_LIBRARY_PATH: /opt/dmdbms/bin
+            EXTENT_SIZE: 32
+            BLANK_PAD_MODE: 1
+            LOG_SIZE: 1024
+            UNICODE_FLAG: 1
+            LENGTH_IN_CHAR: 1
+            INSTANCE_NAME: dm8_test
+        ports:
+            - "5236:5236"
+        volumes:
+            - dm8:/opt/dmdbms/data
+            - ../dm/ruoyi-vue-pro-dm8.sql:/tmp/schema.sql:ro
+            # docker compose exec dm8 bash -c "exec /opt/dmdbms/bin/disql SYSDBA/SYSDBA001 \`/tmp/schema.sql"
