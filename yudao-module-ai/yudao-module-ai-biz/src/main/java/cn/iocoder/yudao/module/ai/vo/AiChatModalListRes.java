@@ -1,5 +1,7 @@
 package cn.iocoder.yudao.module.ai.vo;
 
+import cn.iocoder.yudao.module.ai.dal.dataobject.AiChatModalDO;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
@@ -13,29 +15,25 @@ import lombok.experimental.Accessors;
 @Data
 @Accessors(chain = true)
 public class AiChatModalListRes {
-    /**
-     * 编号
-     */
+
+    @Schema(description = "id")
     private Long id;
-    /**
-     * 模型名字
-     */
-    private String modelName;
-    /**
-     * 模型类型(qianwen、yiyan、xinghuo、openai)
-     */
-    private String modelType;
-    /**
-     * 模型照片
-     */
-    private String modalImage;
-    /**
-     * 模型配置JSON
-     */
-    private String modelConfig;
-    /**
-     * 禁用 0、正常 1、禁用
-     */
+
+    @Schema(description = "模型平台 参考 AiPlatformEnum")
+    private String platform;
+
+    @Schema(description = "模型类型 参考 YiYanChatModel、XingHuoChatModel")
+    private String modal;
+
+    @Schema(description = "模型名字")
+    private String name;
+
+    @Schema(description = "模型照片")
+    private String image;
+
+    @Schema(description = "禁用 0、正常 1、禁用")
     private Integer disable;
 
+    @Schema(description = "modal 配置")
+    private String config;
 }

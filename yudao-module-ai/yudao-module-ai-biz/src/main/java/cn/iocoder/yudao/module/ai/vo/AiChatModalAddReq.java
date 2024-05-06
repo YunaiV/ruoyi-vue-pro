@@ -6,6 +6,8 @@ import jakarta.validation.constraints.Size;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
+import java.util.Map;
+
 /**
  * ai chat modal
  *
@@ -19,18 +21,24 @@ public class AiChatModalAddReq {
 
     @NotNull
     @Schema(description = "模型名字")
-    @Size(max = 60, message = "模型名字最大60")
-    private String modelName;
+    @Size(max = 60, message = "模型名字最大60个字符")
+    private String name;
+
+    @NotNull
+    @Size(max = 32, message = "模型平台最大32个字符")
+    @Schema(description = "模型平台 参考 AiPlatformEnum")
+    private String platform;
 
     @NotNull
     @Schema(description = "模型类型(qianwen、yiyan、xinghuo、openai)")
-    @Size(max = 32, message = "模型类型最大32")
-    private String modelType;
+    @Size(max = 32, message = "模型类型最大32个字符")
+    private String modal;
 
     @Schema(description = "模型照片")
-    private String modalImage;
+    @Size(max = 256, message = "模型照片地址最大256个字符")
+    private String imageUrl;
 
     @Schema(description = "模型配置JSON")
-    private String modelConfig;
-
+//    @Size(max = 1024, message = "模型配置最大1024个字符")
+    private Map<String, Object> config;
 }

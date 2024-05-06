@@ -30,7 +30,7 @@ public class AiChatModalController {
 
     private final AiChatModalService aiChatModalService;
 
-    @Operation(summary = "ai模型 - 模型照片上传")
+    @Operation(summary = "ai模型 - 模型列表")
     @GetMapping("/modal/list")
     public PageResult<AiChatModalListRes> list(@ModelAttribute AiChatModalListReq req) {
         return aiChatModalService.list(req);

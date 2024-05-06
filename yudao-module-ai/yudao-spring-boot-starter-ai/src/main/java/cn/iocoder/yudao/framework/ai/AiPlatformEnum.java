@@ -1,7 +1,10 @@
 package cn.iocoder.yudao.framework.ai;
 
+import com.google.common.collect.Lists;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+
+import java.util.List;
 
 /**
  * ai 模型平台
@@ -17,11 +20,26 @@ public enum AiPlatformEnum {
     YI_YAN("yiyan", "一言"),
     QIAN_WEN("qianwen", "千问"),
     XING_HUO("xinghuo", "星火"),
+    OPEN_AI("openai", "openAi"),
+    OPEN_AI_DALL("dall", "dall"),
+    MIDJOURNEY("midjourney", "midjourney"),
 
     ;
 
     private String platform;
     private String name;
+
+    public static List<AiPlatformEnum> CHAT_PLATFORM_LIST = Lists.newArrayList(
+            AiPlatformEnum.YI_YAN,
+            AiPlatformEnum.QIAN_WEN,
+            AiPlatformEnum.XING_HUO,
+            AiPlatformEnum.OPEN_AI
+    );
+
+    public static List<AiPlatformEnum> IMAGE_PLATFORM_LIST = Lists.newArrayList(
+            AiPlatformEnum.OPEN_AI_DALL,
+            AiPlatformEnum.MIDJOURNEY
+    );
 
     public static AiPlatformEnum valueOfPlatform(String platform) {
         for (AiPlatformEnum itemEnum : AiPlatformEnum.values()) {

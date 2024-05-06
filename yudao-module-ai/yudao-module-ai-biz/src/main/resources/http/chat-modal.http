@@ -1,9 +1,7 @@
 
-
 ### chat call
 GET {{baseUrl}}/ai/chat/modal/list
 Authorization: {{token}}
-
 
 
 ### chat call
@@ -12,8 +10,32 @@ Content-Type: application/json
 Authorization: {{token}}
 
 {
-  "modelName": "小红书Ai写作大模型",
-  "modelType": "yiyan",
-  "modalImage": "",
-  "modelConfig": ""
+  "name": "小红书Ai写作大模型-plus",
+  "modal": "ERNIE-3.5-8K",
+  "platform": "yiyan",
+  "imageUrl": "",
+  "config": {
+    "topK": 0.6,
+    "topP": 0.6,
+    "temperature": 0.86,
+    "maxTokens": 2048
+  }
+}
+
+### chat call
+POST {{baseUrl}}/ai/chat/modal/7
+Content-Type: application/json
+Authorization: {{token}}
+
+{
+  "name": "小红书Ai写作大模型-plus",
+  "modal": "ERNIE-3.5-8K",
+  "platform": "yiyan",
+  "imageUrl": "",
+  "config": {
+    "topK": 0.6,
+    "topP": 0.6,
+    "temperature": 0.86,
+    "maxTokens": 2048
+  }
 }
