@@ -34,6 +34,9 @@ public class AiChatModalListRes {
     @Schema(description = "禁用 0、正常 1、禁用")
     private Integer disable;
 
+    @Schema(description = "排序 asc 排序")
+    private Integer sort;
+
     @Schema(description = "modal 配置")
     private String config;
 }

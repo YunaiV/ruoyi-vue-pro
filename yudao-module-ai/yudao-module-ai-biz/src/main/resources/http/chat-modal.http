@@ -10,10 +10,11 @@ Content-Type: application/json
 Authorization: {{token}}
 
 {
-  "name": "小红书Ai写作大模型-plus",
-  "modal": "ERNIE-3.5-8K",
+  "name": "小红书Ai写作大模型4.0",
+  "modal": "ERNIE 4.0",
   "platform": "yiyan",
   "imageUrl": "",
+  "sort": 100,
   "config": {
     "topK": 0.6,
     "topP": 0.6,
@@ -32,6 +33,7 @@ Authorization: {{token}}
   "modal": "ERNIE-3.5-8K",
   "platform": "yiyan",
   "imageUrl": "",
+  "sort": 1,
   "config": {
     "topK": 0.6,
     "topP": 0.6,

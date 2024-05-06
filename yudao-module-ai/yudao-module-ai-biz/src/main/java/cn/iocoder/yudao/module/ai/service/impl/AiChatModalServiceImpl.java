@@ -54,7 +54,7 @@ public class AiChatModalServiceImpl implements AiChatModalService {
             queryWrapperX.like(AiChatModalDO::getName, req.getSearch().trim());
         }
         // 默认排序
-        queryWrapperX.orderByDesc(AiChatModalDO::getId);
+        queryWrapperX.orderByAsc(AiChatModalDO::getSort);
         // 查询
         PageResult<AiChatModalDO> aiChatModalDOPageResult = aiChatModalMapper.selectPage(req, queryWrapperX);
         // 转换 res

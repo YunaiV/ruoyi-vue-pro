@@ -44,7 +44,12 @@ public class AiChatModalDO extends BaseDO {
      */
     private Integer disable;
     /**
+     * 排序
+     */
+    private Integer sort;
+    /**
      * modal 配置(json)
      */
     private String config;
+
 }
