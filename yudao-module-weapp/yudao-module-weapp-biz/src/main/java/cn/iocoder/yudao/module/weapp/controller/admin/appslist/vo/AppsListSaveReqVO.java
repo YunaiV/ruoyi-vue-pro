@@ -24,7 +24,7 @@ public class AppsListSaveReqVO {
     @Schema(description = "小程序图标")
     private String logoImg;
 
-    @Schema(description = "发布状态", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
+    @Schema(description = "发布状态", requiredMode = Schema.RequiredMode.REQUIRED, example = "已发布")
     @NotNull(message = "发布状态不能为空")
     private Integer status;
 

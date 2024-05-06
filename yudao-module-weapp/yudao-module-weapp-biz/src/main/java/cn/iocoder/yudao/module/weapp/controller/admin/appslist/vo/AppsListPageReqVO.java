@@ -27,7 +27,7 @@ public class AppsListPageReqVO extends PageParam {
     @Schema(description = "小程序图标")
     private String logoImg;
 
-    @Schema(description = "发布状态", example = "1")
+    @Schema(description = "发布状态", example = "已发布")
     private Integer status;
 
     @Schema(description = "小程序简介", example = "随便")

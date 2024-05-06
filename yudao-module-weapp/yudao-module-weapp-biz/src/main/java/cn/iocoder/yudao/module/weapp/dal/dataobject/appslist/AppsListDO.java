@@ -40,6 +40,8 @@ public class AppsListDO extends BaseDO {
     private String logoImg;
     /**
      * 发布状态
+     *
+     * 枚举 {@link TODO weapp_publish_status 对应的类}
      */
     private Integer status;
     /**
