@@ -42,7 +42,7 @@ public interface AiChatRoleService {
      * @param id
      * @param req
      */
-    void updateVisibility(Long id, AiChatRoleUpdateVisibilityReq req);
+    void updateEnable(Long id, AiChatRoleUpdateVisibilityReq req);
 
     /**
      * chat角色 - 删除

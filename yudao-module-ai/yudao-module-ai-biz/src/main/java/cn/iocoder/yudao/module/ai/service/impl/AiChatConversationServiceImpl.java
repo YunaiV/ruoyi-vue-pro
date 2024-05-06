@@ -65,7 +65,7 @@ public class AiChatConversationServiceImpl implements AiChatConversationService 
         AiChatRoleDO aiChatRoleDO = aiChatRoleMapper.selectById(req.getChatRoleId());
         // 创建新的 Conversation
         AiChatConversationDO insertConversation = saveConversation(req.getTitle(), loginUserId,
-                req.getChatRoleId(), aiChatRoleDO.getRoleName(), AiChatConversationTypeEnum.ROLE_CHAT);
+                req.getChatRoleId(), aiChatRoleDO.getName(), AiChatConversationTypeEnum.ROLE_CHAT);
         // 转换 res
         return AiChatConversationConvert.INSTANCE.covnertChatConversationRes(insertConversation);
     }

@@ -17,6 +17,6 @@ import lombok.experimental.Accessors;
 public class AiChatRoleUpdateVisibilityReq extends PageParam {
 
     @NotNull
-    @Schema(description = "发布状态，0表示仅自己可见，1表示公开，2表示禁用")
-    private String visibility;
+    @Schema(description = "开启状态 open、close")
+    private String enable;
 }

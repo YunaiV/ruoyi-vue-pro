@@ -9,8 +9,7 @@ import cn.iocoder.yudao.module.ai.ErrorCodeConstants;
 import cn.iocoder.yudao.module.ai.convert.AiChatRoleConvert;
 import cn.iocoder.yudao.module.ai.dal.dataobject.AiChatRoleDO;
 import cn.iocoder.yudao.module.ai.enums.AiChatRoleClassifyEnum;
-import cn.iocoder.yudao.module.ai.enums.AiChatRoleSourceEnum;
-import cn.iocoder.yudao.module.ai.enums.AiChatRoleVisibilityEnum;
+import cn.iocoder.yudao.module.ai.enums.AiChatRoleEnableEnum;
 import cn.iocoder.yudao.module.ai.mapper.AiChatRoleMapper;
 import cn.iocoder.yudao.module.ai.service.AiChatRoleService;
 import cn.iocoder.yudao.module.ai.vo.*;
@@ -39,7 +38,7 @@ public class AiChatRoleServiceImpl implements AiChatRoleService {
         LambdaQueryWrapperX<AiChatRoleDO> queryWrapperX = new LambdaQueryWrapperX<>();
         // search 查询
         if (!StrUtil.isBlank(req.getSearch())) {
-            queryWrapperX.eq(AiChatRoleDO::getRoleName, req.getSearch());
+            queryWrapperX.eq(AiChatRoleDO::getName, req.getSearch());
         }
         // 默认排序id desc
         queryWrapperX.orderByDesc(AiChatRoleDO::getId);
@@ -56,8 +55,7 @@ public class AiChatRoleServiceImpl implements AiChatRoleService {
     public void add(AiChatRoleAddReq req) {
         // 转换enum，并校验enum
         AiChatRoleClassifyEnum.valueOfClassify(req.getClassify());
-        AiChatRoleVisibilityEnum.valueOfType(req.getVisibility());
-        AiChatRoleSourceEnum.valueOfType(req.getRoleSource());
+        AiChatRoleEnableEnum.valueOfType(req.getEnable());
         // 转换do
         AiChatRoleDO insertAiChatRoleDO = AiChatRoleConvert.INSTANCE.convertAiChatRoleDO(req);
         insertAiChatRoleDO.setUserId(SecurityFrameworkUtils.getLoginUserId());
@@ -70,8 +68,7 @@ public class AiChatRoleServiceImpl implements AiChatRoleService {
     public void update(Long id, AiChatRoleUpdateReq req) {
         // 转换enum，并校验enum
         AiChatRoleClassifyEnum.valueOfClassify(req.getClassify());
-        AiChatRoleVisibilityEnum.valueOfType(req.getVisibility());
-        AiChatRoleSourceEnum.valueOfType(req.getRoleSource());
+        AiChatRoleEnableEnum.valueOfType(req.getEnable());
         // 检查角色是否存在
         validateChatRoleExists(id);
         // 转换do
@@ -82,15 +79,15 @@ public class AiChatRoleServiceImpl implements AiChatRoleService {
 
 
     @Override
-    public void updateVisibility(Long id, AiChatRoleUpdateVisibilityReq req) {
+    public void updateEnable(Long id, AiChatRoleUpdateVisibilityReq req) {
         // 转换enum，并校验enum
-        AiChatRoleVisibilityEnum.valueOfType(req.getVisibility());
+        AiChatRoleEnableEnum.valueOfType(req.getEnable());
         // 检查角色是否存在
         validateChatRoleExists(id);
         // 更新
         aiChatRoleMapper.updateById(new AiChatRoleDO()
                 .setId(id)
-                .setVisibility(req.getVisibility())
+                .setEnable(req.getEnable())
         );
     }
 

@@ -11,41 +11,33 @@ Authorization: {{token}}
 
 {
   "modelId": 1,
-  "roleName": "小红书写作v1",
-  "roleIntroduce": "采用gpt3.5模型，拥有小红书优质作者写作经验。",
-  "roleSource": "system",
+  "name": "小红书写作v1",
+  "introduce": "采用gpt3.5模型，拥有小红书优质作者写作经验。",
   "classify": "writing",
-  "visibility": "public",
-  "topK": 0.2,
-  "topP": 0.4,
-  "temperature": 0.7
+  "enable": "open"
 }
 
 
 ### chat update
-POST {{baseUrl}}/ai/chat/role/1
+POST {{baseUrl}}/ai/chat/role/6
 Content-Type: application/json
 Authorization: {{token}}
 
 {
   "modelId": 1,
-  "roleName": "小红书写作v1---hh😄",
-  "roleIntroduce": "采用gpt3.5模型，拥有小红书优质作者写作经验。",
-  "roleSource": "system",
+  "name": "小红书写作v1---hh😄",
+  "introduce": "采用gpt3.5模型，拥有小红书优质作者写作经验。",
   "classify": "writing",
-  "visibility": "public",
-  "topK": 0.2,
-  "topP": 0.4,
-  "temperature": 0.7
+  "enable": "close"
 }
 
 ### chat update
-POST {{baseUrl}}/ai/chat/role/1/update-visibility
+POST {{baseUrl}}/ai/chat/role/6/update-visibility
 Content-Type: application/json
 Authorization: {{token}}
 
 {
-  "visibility": "private"
+  "enable": "open"
 }
 
 

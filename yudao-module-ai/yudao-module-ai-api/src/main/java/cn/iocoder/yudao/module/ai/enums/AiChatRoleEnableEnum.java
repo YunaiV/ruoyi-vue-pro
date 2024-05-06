@@ -4,19 +4,18 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 /**
- * chat角色 source
+ * chat角色 可见范围
  *
  * @author fansili
- * @time 2024/4/24 16:37
+ * @time 2024/4/24 16:44
  * @since 1.0
  */
 @AllArgsConstructor
 @Getter
-public enum AiChatRoleSourceEnum {
+public enum AiChatRoleEnableEnum {
 
-    SYSTEM("system", "系统"),
-    CUSTOMER("customer", "用户自定义"),
-
+    OPEN("open", "公开"),
+    CLOSE("close", "关闭"),
 
     ;
 
@@ -25,12 +24,13 @@ public enum AiChatRoleSourceEnum {
     private String name;
 
 
-    public static AiChatRoleSourceEnum valueOfType(String type) {
-        for (AiChatRoleSourceEnum itemEnum : AiChatRoleSourceEnum.values()) {
+    public static AiChatRoleEnableEnum valueOfType(String type) {
+        for (AiChatRoleEnableEnum itemEnum : AiChatRoleEnableEnum.values()) {
             if (itemEnum.getType().equals(type)) {
                 return itemEnum;
             }
         }
         throw new IllegalArgumentException("Invalid MessageType value: " + type);
     }
+
 }

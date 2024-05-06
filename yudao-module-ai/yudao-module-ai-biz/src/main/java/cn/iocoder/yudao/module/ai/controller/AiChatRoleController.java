@@ -48,10 +48,10 @@ public class AiChatRoleController {
     }
 
     @Operation(summary = "chat角色 - 修改可见性")
-    @PostMapping("/role/{id}/update-visibility")
-    public CommonResult<Void> updateVisibility(@PathVariable("id") Long id,
-                                               @Validated @RequestBody AiChatRoleUpdateVisibilityReq req) {
-        chatRoleService.updateVisibility(id, req);
+    @PostMapping("/role/{id}/update-enable")
+    public CommonResult<Void> updateEnable(@PathVariable("id") Long id,
+                                           @Validated @RequestBody AiChatRoleUpdateVisibilityReq req) {
+        chatRoleService.updateEnable(id, req);
         return CommonResult.success(null);
     }
 
