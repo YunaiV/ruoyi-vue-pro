@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.ai.convert;
 
-import cn.iocoder.yudao.module.ai.dal.dataobject.AiChatModalDO;
+import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiChatModalDO;
 import cn.iocoder.yudao.module.ai.vo.AiChatModalAddReq;
 import cn.iocoder.yudao.module.ai.vo.AiChatModalListRes;
 import cn.iocoder.yudao.module.ai.vo.AiChatModalRes;

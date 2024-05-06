@@ -7,7 +7,7 @@ import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
 import cn.iocoder.yudao.module.ai.ErrorCodeConstants;
 import cn.iocoder.yudao.module.ai.convert.AiChatRoleConvert;
-import cn.iocoder.yudao.module.ai.dal.dataobject.AiChatRoleDO;
+import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiChatRoleDO;
 import cn.iocoder.yudao.module.ai.enums.AiChatRoleClassifyEnum;
 import cn.iocoder.yudao.module.ai.enums.AiChatRoleEnableEnum;
 import cn.iocoder.yudao.module.ai.mapper.AiChatRoleMapper;

@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.module.ai.vo;
 
-import cn.iocoder.yudao.module.ai.dal.dataobject.AiChatModalDO;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.experimental.Accessors;

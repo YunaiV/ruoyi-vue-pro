@@ -5,7 +5,7 @@ import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.ai.midjourney.MidjourneyMessage;
 import cn.iocoder.yudao.framework.ai.midjourney.constants.MidjourneyGennerateStatusEnum;
 import cn.iocoder.yudao.framework.ai.midjourney.webSocket.MidjourneyMessageHandler;
-import cn.iocoder.yudao.module.ai.dal.dataobject.AiImageDO;
+import cn.iocoder.yudao.module.ai.dal.dataobject.image.AiImageDO;
 import cn.iocoder.yudao.module.ai.enums.AiChatDrawingStatusEnum;
 import cn.iocoder.yudao.module.ai.mapper.AiImageMapper;
 import com.alibaba.fastjson2.JSON;

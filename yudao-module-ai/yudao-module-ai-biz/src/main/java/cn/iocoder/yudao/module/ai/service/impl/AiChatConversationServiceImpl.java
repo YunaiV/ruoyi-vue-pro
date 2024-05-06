@@ -4,8 +4,6 @@ import cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil;
 import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
 import cn.iocoder.yudao.module.ai.ErrorCodeConstants;
 import cn.iocoder.yudao.module.ai.convert.AiChatConversationConvert;
-import cn.iocoder.yudao.module.ai.dal.dataobject.AiChatConversationDO;
-import cn.iocoder.yudao.module.ai.dal.dataobject.AiChatModalDO;
 import cn.iocoder.yudao.module.ai.enums.AiChatConversationTypeEnum;
 import cn.iocoder.yudao.module.ai.enums.AiChatModalDisableEnum;
 import cn.iocoder.yudao.module.ai.mapper.AiChatConversationMapper;

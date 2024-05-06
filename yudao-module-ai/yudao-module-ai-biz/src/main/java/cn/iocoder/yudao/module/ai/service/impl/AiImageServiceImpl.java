@@ -15,7 +15,7 @@ import cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil;
 import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
 import cn.iocoder.yudao.module.ai.ErrorCodeConstants;
 import cn.iocoder.yudao.module.ai.controller.Utf8SseEmitter;
-import cn.iocoder.yudao.module.ai.dal.dataobject.AiImageDO;
+import cn.iocoder.yudao.module.ai.dal.dataobject.image.AiImageDO;
 import cn.iocoder.yudao.module.ai.enums.AiChatDrawingStatusEnum;
 import cn.iocoder.yudao.module.ai.mapper.AiImageMapper;
 import cn.iocoder.yudao.module.ai.service.AiImageService;

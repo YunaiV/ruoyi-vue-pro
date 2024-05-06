@@ -12,7 +12,6 @@ import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.module.ai.ErrorCodeConstants;
 import cn.iocoder.yudao.module.ai.convert.AiChatModalConvert;
-import cn.iocoder.yudao.module.ai.dal.dataobject.AiChatModalDO;
 import cn.iocoder.yudao.module.ai.dal.vo.AiChatModalChatConfigVO;
 import cn.iocoder.yudao.module.ai.dal.vo.AiChatModalConfigVO;
 import cn.iocoder.yudao.module.ai.dal.vo.AiChatModalDallConfigVO;

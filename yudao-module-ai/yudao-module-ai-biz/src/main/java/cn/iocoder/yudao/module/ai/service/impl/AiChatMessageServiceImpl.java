@@ -6,8 +6,8 @@ import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
 import cn.iocoder.yudao.module.ai.ErrorCodeConstants;
 import cn.iocoder.yudao.module.ai.convert.AiChatMessageConvert;
-import cn.iocoder.yudao.module.ai.dal.dataobject.AiChatConversationDO;
-import cn.iocoder.yudao.module.ai.dal.dataobject.AiChatMessageDO;
+import cn.iocoder.yudao.module.ai.dal.dataobject.chat.AiChatConversationDO;
+import cn.iocoder.yudao.module.ai.dal.dataobject.chat.AiChatMessageDO;
 import cn.iocoder.yudao.module.ai.mapper.AiChatConversationMapper;
 import cn.iocoder.yudao.module.ai.mapper.AiChatMessageMapper;
 import cn.iocoder.yudao.module.ai.service.AiChatMessageService;
@@ -38,7 +38,7 @@ public class AiChatMessageServiceImpl implements AiChatMessageService {
     public PageResult<AiChatMessageListRes> list(AiChatMessageReq req) {
         // 查询
         LambdaQueryWrapperX<AiChatMessageDO> queryWrapperX = new LambdaQueryWrapperX<>();
-        queryWrapperX.eq(AiChatMessageDO::getChatConversationId, req.getChatConversationId());
+        queryWrapperX.eq(AiChatMessageDO::getConversationId, req.getChatConversationId());
         // 默认排序
         queryWrapperX.orderByDesc(AiChatMessageDO::getId);
         PageResult<AiChatMessageDO> pageResult = aiChatMessageMapper.selectPage(req, queryWrapperX);

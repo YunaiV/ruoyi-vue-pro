@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.ai.mapper;
 
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
-import cn.iocoder.yudao.module.ai.dal.dataobject.AiImageDO;
+import cn.iocoder.yudao.module.ai.dal.dataobject.image.AiImageDO;
 import org.apache.ibatis.annotations.Mapper;
 import org.springframework.stereotype.Repository;
 

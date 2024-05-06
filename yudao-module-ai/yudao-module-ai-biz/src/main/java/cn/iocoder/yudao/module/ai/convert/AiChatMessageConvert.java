@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.ai.convert;
 
-import cn.iocoder.yudao.module.ai.dal.dataobject.AiChatMessageDO;
+import cn.iocoder.yudao.module.ai.dal.dataobject.chat.AiChatMessageDO;
 import cn.iocoder.yudao.module.ai.vo.AiChatMessageListRes;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;

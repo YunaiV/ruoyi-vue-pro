@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.ai.convert;
 
-import cn.iocoder.yudao.module.ai.dal.dataobject.AiChatRoleDO;
+import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiChatRoleDO;
 import cn.iocoder.yudao.module.ai.vo.AiChatRoleAddReq;
 import cn.iocoder.yudao.module.ai.vo.AiChatRoleRes;
 import cn.iocoder.yudao.module.ai.vo.AiChatRoleUpdateReq;

@@ -10,7 +10,7 @@ import cn.iocoder.yudao.framework.ai.chat.prompt.Prompt;
 import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
 import cn.iocoder.yudao.module.ai.config.AiChatClientFactory;
 import cn.iocoder.yudao.module.ai.controller.Utf8SseEmitter;
-import cn.iocoder.yudao.module.ai.dal.dataobject.AiChatMessageDO;
+import cn.iocoder.yudao.module.ai.dal.dataobject.chat.AiChatMessageDO;
 import cn.iocoder.yudao.module.ai.mapper.AiChatConversationMapper;
 import cn.iocoder.yudao.module.ai.mapper.AiChatMessageMapper;
 import cn.iocoder.yudao.module.ai.mapper.AiChatRoleMapper;
@@ -89,7 +89,7 @@ public class AiChatServiceImpl implements AiChatService {
         aiChatMessageMapper.insert(
                 new AiChatMessageDO()
                         .setId(null)
-                        .setChatConversationId(chatConversationId)
+                        .setConversationId(chatConversationId)
                         .setUserId(loginUserId)
                         .setMessage(req.getPrompt())
                         .setMessageType(MessageType.USER.getValue())
@@ -107,7 +107,7 @@ public class AiChatServiceImpl implements AiChatService {
         aiChatMessageMapper.insert(
                 new AiChatMessageDO()
                         .setId(null)
-                        .setChatConversationId(chatConversationId)
+                        .setConversationId(chatConversationId)
                         .setUserId(loginUserId)
                         .setMessage(systemPrompts)
                         .setMessageType(MessageType.SYSTEM.getValue())
