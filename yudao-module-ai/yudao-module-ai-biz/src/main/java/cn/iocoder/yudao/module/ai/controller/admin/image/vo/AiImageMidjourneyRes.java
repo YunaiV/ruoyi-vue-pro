@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.ai.vo;
+package cn.iocoder.yudao.module.ai.controller.admin.image.vo;
 
 import lombok.Data;
 import lombok.experimental.Accessors;

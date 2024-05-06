@@ -1,9 +1,10 @@
-package cn.iocoder.yudao.module.ai.controller;
+package cn.iocoder.yudao.module.ai.controller.admin.image;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
+import cn.iocoder.yudao.module.ai.controller.Utf8SseEmitter;
 import cn.iocoder.yudao.module.ai.service.AiImageService;
-import cn.iocoder.yudao.module.ai.vo.AiImageDallDrawingReq;
-import cn.iocoder.yudao.module.ai.vo.AiImageMidjourneyReq;
+import cn.iocoder.yudao.module.ai.controller.admin.image.vo.AiImageDallDrawingReq;
+import cn.iocoder.yudao.module.ai.controller.admin.image.vo.AiImageMidjourneyReq;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
+// TODO @芋艿：整理接口定义
 /**
  * ai作图
  *

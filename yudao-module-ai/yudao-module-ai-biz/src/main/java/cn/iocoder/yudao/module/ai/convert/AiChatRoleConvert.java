@@ -1,10 +1,10 @@
 package cn.iocoder.yudao.module.ai.convert;
 
 import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiChatRoleDO;
-import cn.iocoder.yudao.module.ai.vo.AiChatRoleAddReq;
-import cn.iocoder.yudao.module.ai.vo.AiChatRoleRes;
-import cn.iocoder.yudao.module.ai.vo.AiChatRoleUpdateReq;
-import cn.iocoder.yudao.module.ai.vo.AiChatRoleListRes;
+import cn.iocoder.yudao.module.ai.controller.admin.model.vo.role.AiChatRoleAddReq;
+import cn.iocoder.yudao.module.ai.controller.admin.model.vo.role.AiChatRoleRes;
+import cn.iocoder.yudao.module.ai.controller.admin.model.vo.role.AiChatRoleUpdateReq;
+import cn.iocoder.yudao.module.ai.controller.admin.model.vo.role.AiChatRoleListRes;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 

@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.ai.vo;
+package cn.iocoder.yudao.module.ai.controller.admin.model.vo.model;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
@@ -13,7 +13,7 @@ import lombok.experimental.Accessors;
  */
 @Data
 @Accessors(chain = true)
-public class AiChatModalListRes {
+public class AiChatModalRes {
 
     @Schema(description = "id")
     private Long id;

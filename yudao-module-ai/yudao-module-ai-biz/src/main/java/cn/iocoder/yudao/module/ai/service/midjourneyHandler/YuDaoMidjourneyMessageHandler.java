@@ -7,7 +7,7 @@ import cn.iocoder.yudao.framework.ai.midjourney.constants.MidjourneyGennerateSta
 import cn.iocoder.yudao.framework.ai.midjourney.webSocket.MidjourneyMessageHandler;
 import cn.iocoder.yudao.module.ai.dal.dataobject.image.AiImageDO;
 import cn.iocoder.yudao.module.ai.enums.AiChatDrawingStatusEnum;
-import cn.iocoder.yudao.module.ai.mapper.AiImageMapper;
+import cn.iocoder.yudao.module.ai.dal.mysql.AiImageMapper;
 import com.alibaba.fastjson2.JSON;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

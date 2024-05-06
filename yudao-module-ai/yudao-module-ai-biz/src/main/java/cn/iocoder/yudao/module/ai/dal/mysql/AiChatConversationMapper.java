@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.ai.mapper;
+package cn.iocoder.yudao.module.ai.dal.mysql;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;

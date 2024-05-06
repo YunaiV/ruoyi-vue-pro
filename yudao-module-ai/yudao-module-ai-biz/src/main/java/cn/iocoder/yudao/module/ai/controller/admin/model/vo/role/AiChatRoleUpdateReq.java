@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.ai.vo;
+package cn.iocoder.yudao.module.ai.controller.admin.model.vo.role;
 
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -7,14 +7,14 @@ import lombok.Data;
 import lombok.experimental.Accessors;
 
 /**
- * chat 角色列表
+ * chat 角色 - 更新
  *
  * @fansili
  * @since v1.0
  */
 @Data
 @Accessors(chain = true)
-public class AiChatRoleAddReq extends PageParam {
+public class AiChatRoleUpdateReq extends PageParam {
 
     @NotNull
     @Schema(description = "角色名，角色的显示名称")

@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.ai.vo;
+package cn.iocoder.yudao.module.ai.controller.admin.model.vo.model;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;

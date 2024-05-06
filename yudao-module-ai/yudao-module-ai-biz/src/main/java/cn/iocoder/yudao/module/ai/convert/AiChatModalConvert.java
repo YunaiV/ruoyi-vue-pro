@@ -1,9 +1,9 @@
 package cn.iocoder.yudao.module.ai.convert;
 
 import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiChatModalDO;
-import cn.iocoder.yudao.module.ai.vo.AiChatModalAddReq;
-import cn.iocoder.yudao.module.ai.vo.AiChatModalListRes;
-import cn.iocoder.yudao.module.ai.vo.AiChatModalRes;
+import cn.iocoder.yudao.module.ai.controller.admin.model.vo.model.AiChatModalAddReq;
+import cn.iocoder.yudao.module.ai.controller.admin.model.vo.model.AiChatModalListRes;
+import cn.iocoder.yudao.module.ai.controller.admin.model.vo.model.AiChatModalRes;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;

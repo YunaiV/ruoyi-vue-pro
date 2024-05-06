@@ -1,11 +1,11 @@
-package cn.iocoder.yudao.module.ai.controller;
+package cn.iocoder.yudao.module.ai.controller.admin.model;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.ai.service.AiChatModalService;
-import cn.iocoder.yudao.module.ai.vo.AiChatModalAddReq;
-import cn.iocoder.yudao.module.ai.vo.AiChatModalListReq;
-import cn.iocoder.yudao.module.ai.vo.AiChatModalListRes;
+import cn.iocoder.yudao.module.ai.controller.admin.model.vo.model.AiChatModalAddReq;
+import cn.iocoder.yudao.module.ai.controller.admin.model.vo.model.AiChatModalListReq;
+import cn.iocoder.yudao.module.ai.controller.admin.model.vo.model.AiChatModalListRes;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
@@ -14,6 +14,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+// TODO @fan：调整下接口；相关 vo 的命名等等；modal => model
 /**
  * ai 模型
  *

@@ -1,10 +1,10 @@
 package cn.iocoder.yudao.module.ai.service;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.ai.vo.AiChatModalAddReq;
-import cn.iocoder.yudao.module.ai.vo.AiChatModalListReq;
-import cn.iocoder.yudao.module.ai.vo.AiChatModalListRes;
-import cn.iocoder.yudao.module.ai.vo.AiChatModalRes;
+import cn.iocoder.yudao.module.ai.controller.admin.model.vo.model.AiChatModalAddReq;
+import cn.iocoder.yudao.module.ai.controller.admin.model.vo.model.AiChatModalListReq;
+import cn.iocoder.yudao.module.ai.controller.admin.model.vo.model.AiChatModalListRes;
+import cn.iocoder.yudao.module.ai.controller.admin.model.vo.model.AiChatModalRes;
 
 /**
  * ai modal
