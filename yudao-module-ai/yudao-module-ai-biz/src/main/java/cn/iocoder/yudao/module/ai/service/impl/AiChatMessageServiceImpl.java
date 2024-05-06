@@ -11,8 +11,7 @@ import cn.iocoder.yudao.module.ai.dal.dataobject.chat.AiChatMessageDO;
 import cn.iocoder.yudao.module.ai.mapper.AiChatConversationMapper;
 import cn.iocoder.yudao.module.ai.mapper.AiChatMessageMapper;
 import cn.iocoder.yudao.module.ai.service.AiChatMessageService;
-import cn.iocoder.yudao.module.ai.vo.AiChatMessageListRes;
-import cn.iocoder.yudao.module.ai.vo.AiChatMessageReq;
+import cn.iocoder.yudao.module.ai.controller.admin.chat.vo.message.AiChatMessageRespVO;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -35,7 +34,7 @@ public class AiChatMessageServiceImpl implements AiChatMessageService {
     private final AiChatConversationMapper aiChatConversationMapper;
 
     @Override
-    public PageResult<AiChatMessageListRes> list(AiChatMessageReq req) {
+    public PageResult<AiChatMessageRespVO> list(AiChatMessageReq req) {
         // 查询
         LambdaQueryWrapperX<AiChatMessageDO> queryWrapperX = new LambdaQueryWrapperX<>();
         queryWrapperX.eq(AiChatMessageDO::getConversationId, req.getChatConversationId());
@@ -43,7 +42,7 @@ public class AiChatMessageServiceImpl implements AiChatMessageService {
         queryWrapperX.orderByDesc(AiChatMessageDO::getId);
         PageResult<AiChatMessageDO> pageResult = aiChatMessageMapper.selectPage(req, queryWrapperX);
         // 转换 res
-        List<AiChatMessageListRes> messageListResList = AiChatMessageConvert.INSTANCE.convert(pageResult.getList());
+        List<AiChatMessageRespVO> messageListResList = AiChatMessageConvert.INSTANCE.convert(pageResult.getList());
         return new PageResult(messageListResList, pageResult.getTotal());
     }
 

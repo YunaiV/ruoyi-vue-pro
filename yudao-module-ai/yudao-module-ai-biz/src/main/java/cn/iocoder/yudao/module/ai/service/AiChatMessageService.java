@@ -1,8 +1,7 @@
 package cn.iocoder.yudao.module.ai.service;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.ai.vo.AiChatMessageListRes;
-import cn.iocoder.yudao.module.ai.vo.AiChatMessageReq;
+import cn.iocoder.yudao.module.ai.controller.admin.chat.vo.message.AiChatMessageRespVO;
 
 /**
  * chat message
@@ -19,7 +18,7 @@ public interface AiChatMessageService {
      * @param req
      * @return
      */
-    PageResult<AiChatMessageListRes> list(AiChatMessageReq req);
+    PageResult<AiChatMessageRespVO> list(AiChatMessageReq req);
 
     /**
      * message - 删除

@@ -81,7 +81,7 @@ public class AiChatMessageDO extends BaseDO {
     /**
      * 消耗 Token 数量
      */
-    private Integer usedTokens;
+    private Integer tokens;
 
     // TODO 芋艿：是否作为上下文语料？use_context，待定
 

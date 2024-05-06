@@ -17,7 +17,7 @@ import cn.iocoder.yudao.module.ai.mapper.AiChatRoleMapper;
 import cn.iocoder.yudao.module.ai.service.AiChatConversationService;
 import cn.iocoder.yudao.module.ai.service.AiChatService;
 import cn.iocoder.yudao.module.ai.controller.admin.chat.vo.conversation.AiChatConversationRespVO;
-import cn.iocoder.yudao.module.ai.vo.AiChatReq;
+import cn.iocoder.yudao.module.ai.controller.admin.chat.vo.message.AiChatMessageSendReqVO;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
@@ -53,7 +53,7 @@ public class AiChatServiceImpl implements AiChatService {
      * @return
      */
     @Transactional(rollbackFor = Exception.class)
-    public String chat(AiChatReq req) {
+    public String chat(AiChatMessageSendReqVO req) {
         Long loginUserId = SecurityFrameworkUtils.getLoginUserId();
         // 获取 client 类型
         AiPlatformEnum platformEnum = AiPlatformEnum.valueOfPlatform(req.getModal());
@@ -83,7 +83,7 @@ public class AiChatServiceImpl implements AiChatService {
         return content;
     }
 
-    private void saveChatMessage(AiChatReq req, AiChatConversationRespVO conversationRes, Long loginUserId) {
+    private void saveChatMessage(AiChatMessageSendReqVO req, AiChatConversationRespVO conversationRes, Long loginUserId) {
         Long chatConversationId = conversationRes.getId();
         // 增加 chat message 记录
         aiChatMessageMapper.insert(
@@ -101,7 +101,7 @@ public class AiChatServiceImpl implements AiChatService {
         aiChatConversationMapper.updateIncrChatCount(req.getConversationId());
     }
 
-    public void saveSystemChatMessage(AiChatReq req, AiChatConversationRespVO conversationRes, Long loginUserId, String systemPrompts) {
+    public void saveSystemChatMessage(AiChatMessageSendReqVO req, AiChatConversationRespVO conversationRes, Long loginUserId, String systemPrompts) {
         Long chatConversationId = conversationRes.getId();
         // 增加 chat message 记录
         aiChatMessageMapper.insert(
@@ -128,7 +128,7 @@ public class AiChatServiceImpl implements AiChatService {
      * @return
      */
     @Override
-    public void chatStream(AiChatReq req, Utf8SseEmitter sseEmitter) {
+    public void chatStream(AiChatMessageSendReqVO req, Utf8SseEmitter sseEmitter) {
         Long loginUserId = SecurityFrameworkUtils.getLoginUserId();
         // 获取 client 类型
         AiPlatformEnum platformEnum = AiPlatformEnum.valueOfPlatform(req.getModal());

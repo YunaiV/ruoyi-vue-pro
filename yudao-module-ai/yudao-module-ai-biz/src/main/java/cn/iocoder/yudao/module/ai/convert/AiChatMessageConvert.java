@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.ai.convert;
 
 import cn.iocoder.yudao.module.ai.dal.dataobject.chat.AiChatMessageDO;
-import cn.iocoder.yudao.module.ai.vo.AiChatMessageListRes;
+import cn.iocoder.yudao.module.ai.controller.admin.chat.vo.message.AiChatMessageRespVO;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
@@ -25,5 +25,5 @@ public interface AiChatMessageConvert {
      * @param list
      * @return
      */
-    List<AiChatMessageListRes> convert(List<AiChatMessageDO> list);
+    List<AiChatMessageRespVO> convert(List<AiChatMessageDO> list);
 }
