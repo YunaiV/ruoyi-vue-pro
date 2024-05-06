@@ -3,21 +3,25 @@ package cn.iocoder.yudao.module.ai.dal.dataobject.model;
 import cn.iocoder.yudao.framework.ai.AiPlatformEnum;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import lombok.Data;
+import lombok.*;
 import lombok.experimental.Accessors;
 
 /**
  * AI 聊天模型 DO
  *
  * @author fansili
- * @time 2024/4/24 19:39
- * @since 1.0
+ * @since 2024/4/24 19:39
  */
+@TableName("ai_chat_model")
+@KeySequence("ai_chat_model_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
 @Data
-@Accessors(chain = true)
-@TableName("ai_chat_modal")
+@EqualsAndHashCode(callSuper = true)
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class AiChatModalDO extends BaseDO {
 
     /**
@@ -30,7 +34,7 @@ public class AiChatModalDO extends BaseDO {
      *
      * 关联 {@link AiApiKeyDO#getId()}
      */
-    private Long key_id;
+    private Long keyId;
     /**
      * 模型名称
      */
@@ -66,10 +70,12 @@ public class AiChatModalDO extends BaseDO {
      */
     private Double temperature;
     /**
-     * 单条回复的 Token 数量
+     * 单条回复的最大 Token 数量
      */
     private Integer maxTokens;
-
-    // TODO 芋艿：到底使用 max_context、还是 contextCount，待定！一个是轮次，一个是长度数量；貌似轮次更常用一点；
+    /**
+     * 上下文的最大 Message 数量
+     */
+    private Integer maxContexts;
 
 }

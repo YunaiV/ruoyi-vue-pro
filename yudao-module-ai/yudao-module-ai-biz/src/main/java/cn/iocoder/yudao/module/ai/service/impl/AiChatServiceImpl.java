@@ -16,7 +16,7 @@ import cn.iocoder.yudao.module.ai.mapper.AiChatMessageMapper;
 import cn.iocoder.yudao.module.ai.mapper.AiChatRoleMapper;
 import cn.iocoder.yudao.module.ai.service.AiChatConversationService;
 import cn.iocoder.yudao.module.ai.service.AiChatService;
-import cn.iocoder.yudao.module.ai.vo.AiChatConversationRes;
+import cn.iocoder.yudao.module.ai.controller.admin.chat.vo.conversation.AiChatConversationRespVO;
 import cn.iocoder.yudao.module.ai.vo.AiChatReq;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -58,7 +58,7 @@ public class AiChatServiceImpl implements AiChatService {
         // 获取 client 类型
         AiPlatformEnum platformEnum = AiPlatformEnum.valueOfPlatform(req.getModal());
         // 获取对话信息
-        AiChatConversationRes conversationRes = chatConversationService.getConversation(req.getConversationId());
+        AiChatConversationRespVO conversationRes = chatConversationService.getConversation(req.getConversationId());
         // 保存 chat message
         saveChatMessage(req, conversationRes, loginUserId);
         String content = null;
@@ -83,7 +83,7 @@ public class AiChatServiceImpl implements AiChatService {
         return content;
     }
 
-    private void saveChatMessage(AiChatReq req, AiChatConversationRes conversationRes, Long loginUserId) {
+    private void saveChatMessage(AiChatReq req, AiChatConversationRespVO conversationRes, Long loginUserId) {
         Long chatConversationId = conversationRes.getId();
         // 增加 chat message 记录
         aiChatMessageMapper.insert(
@@ -101,7 +101,7 @@ public class AiChatServiceImpl implements AiChatService {
         aiChatConversationMapper.updateIncrChatCount(req.getConversationId());
     }
 
-    public void saveSystemChatMessage(AiChatReq req, AiChatConversationRes conversationRes, Long loginUserId, String systemPrompts) {
+    public void saveSystemChatMessage(AiChatReq req, AiChatConversationRespVO conversationRes, Long loginUserId, String systemPrompts) {
         Long chatConversationId = conversationRes.getId();
         // 增加 chat message 记录
         aiChatMessageMapper.insert(
@@ -133,7 +133,7 @@ public class AiChatServiceImpl implements AiChatService {
         // 获取 client 类型
         AiPlatformEnum platformEnum = AiPlatformEnum.valueOfPlatform(req.getModal());
         // 获取对话信息
-        AiChatConversationRes conversationRes = chatConversationService.getConversation(req.getConversationId());
+        AiChatConversationRespVO conversationRes = chatConversationService.getConversation(req.getConversationId());
         // 创建 chat 需要的 Prompt
         Prompt prompt = new Prompt(req.getPrompt());
         req.setTopK(req.getTopK());

@@ -3,6 +3,8 @@ package cn.iocoder.yudao.module.ai.service.impl;
 import cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil;
 import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
 import cn.iocoder.yudao.module.ai.ErrorCodeConstants;
+import cn.iocoder.yudao.module.ai.controller.admin.chat.vo.conversation.AiChatConversationCreateReqVO;
+import cn.iocoder.yudao.module.ai.controller.admin.chat.vo.conversation.AiChatConversationRespVO;
 import cn.iocoder.yudao.module.ai.convert.AiChatConversationConvert;
 import cn.iocoder.yudao.module.ai.enums.AiChatConversationTypeEnum;
 import cn.iocoder.yudao.module.ai.enums.AiChatModalDisableEnum;
@@ -38,7 +40,7 @@ public class AiChatConversationServiceImpl implements AiChatConversationService 
     private final AiChatRoleService aiChatRoleService;
 
     @Override
-    public AiChatConversationRes createConversation(AiChatConversationCreateUserReq req) {
+    public AiChatConversationRespVO createConversation(AiChatConversationCreateUserReq req) {
         // 获取用户id
         Long loginUserId = SecurityFrameworkUtils.getLoginUserId();
         // 查询最新的对话
@@ -58,7 +60,7 @@ public class AiChatConversationServiceImpl implements AiChatConversationService 
     }
 
     @Override
-    public AiChatConversationRes createRoleConversation(AiChatConversationCreateRoleReq req) {
+    public AiChatConversationRespVO createRoleConversation(AiChatConversationCreateReqVO req) {
         // 获取用户id
         Long loginUserId = SecurityFrameworkUtils.getLoginUserId();
         // 查询最新的对话
@@ -101,7 +103,7 @@ public class AiChatConversationServiceImpl implements AiChatConversationService 
     }
 
     @Override
-    public AiChatConversationRes getConversation(Long id) {
+    public AiChatConversationRespVO getConversation(Long id) {
         AiChatConversationDO aiChatConversationDO = validateExists(id);
         return AiChatConversationConvert.INSTANCE.covnertChatConversationRes(aiChatConversationDO);
     }
@@ -115,7 +117,7 @@ public class AiChatConversationServiceImpl implements AiChatConversationService 
     }
 
     @Override
-    public List<AiChatConversationRes> listConversation(AiChatConversationListReq req) {
+    public List<AiChatConversationRespVO> listConversation(AiChatConversationListReq req) {
         // 获取用户id
         Long loginUserId = SecurityFrameworkUtils.getLoginUserId();
         // 查询前100对话

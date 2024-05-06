@@ -40,11 +40,15 @@ public class AiChatConversationDO extends BaseDO {
     private Long userId;
 
     /**
-     * 标题
+     * 会话标题
      *
      * 默认由系统自动生成，可用户手动修改
      */
     private String title;
+    /**
+     * 是否置顶
+     */
+    private Boolean pinned;
 
     /**
      * 角色编号
@@ -52,12 +56,6 @@ public class AiChatConversationDO extends BaseDO {
      * 关联 {@link AiChatRoleDO#getId()}
      */
     private Long roleId;
-    /**
-     * 模型标志
-     *
-     * 枚举 {@link AiOpenAiModelEnum}
-     */
-    private String model;
 
     /**
      * 模型编号
@@ -65,6 +63,12 @@ public class AiChatConversationDO extends BaseDO {
      * 关联 {@link AiChatModalDO#getId()} 字段
      */
     private Long modelId;
+    /**
+     * 模型标志
+     *
+     * 枚举 {@link AiOpenAiModelEnum}
+     */
+    private String model;
 
     // ========== 会话配置 ==========
 
@@ -75,12 +79,12 @@ public class AiChatConversationDO extends BaseDO {
      */
     private Double temperature;
     /**
-     * 上下文数量
-     */
-    private Integer contextCount;
-    /**
-     * 单条回复的 Token 数量
+     * 单条回复的最大 Token 数量
      */
     private Integer maxTokens;
+    /**
+     * 上下文的最大 Message 数量
+     */
+    private Integer maxContexts;
 
 }

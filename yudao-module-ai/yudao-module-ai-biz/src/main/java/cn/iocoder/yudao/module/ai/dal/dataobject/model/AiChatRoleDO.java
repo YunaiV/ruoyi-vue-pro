@@ -1,22 +1,30 @@
 package cn.iocoder.yudao.module.ai.dal.dataobject.model;
 
+import cn.iocoder.yudao.framework.ai.chat.messages.MessageType;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
+import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
-import lombok.Data;
+import com.baomidou.mybatisplus.annotation.*;
+import com.baomidou.mybatisplus.extension.handlers.AbstractJsonTypeHandler;
+import lombok.*;
 import lombok.experimental.Accessors;
 
+import java.io.Serializable;
+import java.util.List;
+
 /**
- * ai 聊天角色
+ * AI 聊天角色 DO
  *
- * @fansili
- * @since v1.0
+ * @author fansili
+ * @since 2024/4/24 19:39
  */
+@TableName(value = "ai_chat_role", autoResultMap = true)
+@KeySequence("ai_chat_role_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
 @Data
-@Accessors(chain = true)
-@TableName("ai_chat_role")
+@EqualsAndHashCode(callSuper = true)
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class AiChatRoleDO extends BaseDO {
 
     /**
@@ -44,6 +52,10 @@ public class AiChatRoleDO extends BaseDO {
      * 角色欢迎语
      */
     private String welcomeMessage;
+    /**
+     * 角色设定（消息）
+     */
+    private String systemMessage;
 
     /**
      * 用户编号
@@ -76,7 +88,5 @@ public class AiChatRoleDO extends BaseDO {
      * 枚举 {@link CommonStatusEnum}
      */
     private Integer status;
-
-    // TODO 芋艿：要不要加一个 context，内置的上下文
 
 }

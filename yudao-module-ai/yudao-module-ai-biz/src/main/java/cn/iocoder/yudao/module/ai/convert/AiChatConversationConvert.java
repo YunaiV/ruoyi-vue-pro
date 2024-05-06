@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.ai.convert;
 
 import cn.iocoder.yudao.module.ai.dal.dataobject.chat.AiChatConversationDO;
-import cn.iocoder.yudao.module.ai.vo.AiChatConversationRes;
+import cn.iocoder.yudao.module.ai.controller.admin.chat.vo.conversation.AiChatConversationRespVO;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
@@ -25,7 +25,7 @@ public interface AiChatConversationConvert {
      * @param top100Conversation
      * @return
      */
-    List<AiChatConversationRes> covnertChatConversationResList(List<AiChatConversationDO> top100Conversation);
+    List<AiChatConversationRespVO> covnertChatConversationResList(List<AiChatConversationDO> top100Conversation);
 
     /**
      * 转换 - 单个 ChatConversationRes
@@ -33,5 +33,5 @@ public interface AiChatConversationConvert {
      * @param aiChatConversationDO
      * @return
      */
-    AiChatConversationRes covnertChatConversationRes(AiChatConversationDO aiChatConversationDO);
+    AiChatConversationRespVO covnertChatConversationRes(AiChatConversationDO aiChatConversationDO);
 }

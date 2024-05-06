@@ -1,9 +1,7 @@
 package cn.iocoder.yudao.module.ai.service;
 
-import cn.iocoder.yudao.module.ai.vo.AiChatConversationCreateRoleReq;
-import cn.iocoder.yudao.module.ai.vo.AiChatConversationCreateUserReq;
-import cn.iocoder.yudao.module.ai.vo.AiChatConversationListReq;
-import cn.iocoder.yudao.module.ai.vo.AiChatConversationRes;
+import cn.iocoder.yudao.module.ai.controller.admin.chat.vo.conversation.AiChatConversationCreateReqVO;
+import cn.iocoder.yudao.module.ai.controller.admin.chat.vo.conversation.AiChatConversationRespVO;
 
 import java.util.List;
 
@@ -21,7 +19,7 @@ public interface AiChatConversationService {
      * @param req
      * @return
      */
-    AiChatConversationRes createConversation(AiChatConversationCreateUserReq req);
+    AiChatConversationRespVO createConversation(AiChatConversationCreateUserReq req);
 
     /**
      * 对话 - 创建role对话
@@ -29,7 +27,7 @@ public interface AiChatConversationService {
      * @param req
      * @return
      */
-    AiChatConversationRes createRoleConversation(AiChatConversationCreateRoleReq req);
+    AiChatConversationRespVO createRoleConversation(AiChatConversationCreateReqVO req);
 
 
     /**
@@ -38,7 +36,7 @@ public interface AiChatConversationService {
      * @param id
      * @return
      */
-    AiChatConversationRes getConversation(Long id);
+    AiChatConversationRespVO getConversation(Long id);
 
     /**
      * 获取 - 对话列表
@@ -46,7 +44,7 @@ public interface AiChatConversationService {
      * @param req
      * @return
      */
-    List<AiChatConversationRes> listConversation(AiChatConversationListReq req);
+    List<AiChatConversationRespVO> listConversation(AiChatConversationListReq req);
 
     /**
      * 更新 - 更新模型

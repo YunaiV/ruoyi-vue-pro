@@ -88,22 +88,22 @@ public class AiChatMessageDO extends BaseDO {
     // ========== 会话配置 ==========
 
     /**
-     * 上下文数量
-     *
-     * 冗余 {@link AiChatConversationDO#getContextCount()}
-     */
-    private Integer contextCount;
-    /**
      * 温度参数
      *
      * 冗余 {@link AiChatConversationDO#getTemperature()}
      */
     private Double temperature;
     /**
-     * 单条回复的 Token 数量
+     * 单条回复的最大 Token 数量
      *
      * 冗余 {@link AiChatConversationDO#getMaxTokens()}
      */
     private Integer maxTokens;
+    /**
+     * 上下文的最大 Message 数量
+     *
+     * 冗余 {@link AiChatConversationDO#getMaxContexts()}
+     */
+    private Integer maxContexts;
 
 }
