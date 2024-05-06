@@ -32,13 +32,13 @@ public class AiChatConversationController {
     private final AiChatConversationService chatConversationService;
 
     @Operation(summary = "创建 - 对话普通对话")
-    @PostMapping("/createConversation")
+    @PutMapping("/createConversation")
     public CommonResult<AiChatConversationRes> createConversation(@RequestBody @Validated AiChatConversationCreateUserReq req) {
         return CommonResult.success(chatConversationService.createConversation(req));
     }
 
     @Operation(summary = "创建 - 对话角色对话")
-    @PostMapping("/createRoleConversation")
+    @PutMapping("/createRoleConversation")
     public CommonResult<AiChatConversationRes> createRoleConversation(@RequestBody @Validated AiChatConversationCreateRoleReq req) {
         return CommonResult.success(chatConversationService.createRoleConversation(req));
     }
@@ -53,6 +53,14 @@ public class AiChatConversationController {
     @GetMapping("/list")
     public CommonResult<List<AiChatConversationRes>> listConversation(@ModelAttribute @Validated AiChatConversationListReq req) {
         return CommonResult.success(chatConversationService.listConversation(req));
+    }
+
+    @Operation(summary = "更新 - 更新模型")
+    @PostMapping("/{id}/modal")
+    public CommonResult<Void> updateModal(@PathVariable("id") Long id,
+                                          @RequestParam("modalId") Long modalId) {
+        chatConversationService.updateModal(id, modalId);
+        return CommonResult.success(null);
     }
 
     @Operation(summary = "删除")

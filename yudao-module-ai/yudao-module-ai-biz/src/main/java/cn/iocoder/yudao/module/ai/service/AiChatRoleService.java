@@ -51,4 +51,11 @@ public interface AiChatRoleService {
      */
     void delete(Long chatRoleId);
 
+    /**
+     * 获取角色
+     *
+     * @param roleId
+     * @return
+     */
+    AiChatRoleRes getChatRole(Long roleId);
 }

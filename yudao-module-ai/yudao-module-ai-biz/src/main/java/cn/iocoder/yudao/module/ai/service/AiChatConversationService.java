@@ -49,6 +49,15 @@ public interface AiChatConversationService {
     List<AiChatConversationRes> listConversation(AiChatConversationListReq req);
 
     /**
+     * 更新 - 更新模型
+     *
+     * @param id
+     * @param modalId
+     * @return
+     */
+    void updateModal(Long id, Long modalId);
+
+    /**
      * 删除 - 根据id
      *
      * @param id

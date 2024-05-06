@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.ai.convert;
 import cn.iocoder.yudao.module.ai.dal.dataobject.AiChatModalDO;
 import cn.iocoder.yudao.module.ai.vo.AiChatModalAddReq;
 import cn.iocoder.yudao.module.ai.vo.AiChatModalListRes;
+import cn.iocoder.yudao.module.ai.vo.AiChatModalRes;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;
@@ -40,4 +41,14 @@ public interface AiChatModalConvert {
             @Mapping(target = "config", ignore = true)
     })
     AiChatModalDO convertAiChatModalDO(AiChatModalAddReq req);
+
+
+    /**
+     * 转换 - AiChatModalRes
+     *
+     * @param aiChatModalDO
+     * @return
+     */
+    AiChatModalRes convertAiChatModalRes(AiChatModalDO aiChatModalDO);
+
 }

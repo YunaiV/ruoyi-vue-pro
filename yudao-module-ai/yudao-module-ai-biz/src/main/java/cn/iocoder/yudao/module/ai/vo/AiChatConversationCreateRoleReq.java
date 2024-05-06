@@ -18,7 +18,7 @@ public class AiChatConversationCreateRoleReq {
 
     @Schema(description = "chat角色Id")
     @NotNull(message = "聊天角色id不能为空!")
-    private Long chatRoleId;
+    private Long roleId;
 
     @Schema(description = "标题(有程序自动生成)")
     @NotNull(message = "标题不能为空!")

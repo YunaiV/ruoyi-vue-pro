@@ -25,12 +25,18 @@ public class AiChatConversationDO extends BaseDO {
     private Long userId;
 
     @Schema(description = "chat角色Id")
-    private Long chatRoleId;
+    private Long roleId;
 
     @Schema(description = "chat角色名称")
-    private String chatRoleName;
+    private String roleName;
 
-    @Schema(description = "标题(有程序自动生成)")
+    @Schema(description = "模型id")
+    private Long modalId;
+
+    @Schema(description = "使用的模型")
+    private String modal;
+
+    @Schema(description = "标题")
     private String title;
 
     @Schema(description = "对话类型(roleChat、userChat)")

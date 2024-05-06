@@ -33,5 +33,6 @@ public interface ErrorCodeConstants {
     ErrorCode AI_MODAL_CONFIG_PARAMS_INCORRECT = new ErrorCode(1_022_000_081, "AI 模型 config 参数不正确! {} ");
     ErrorCode AI_MODAL_NOT_SUPPORTED_MODAL = new ErrorCode(1_022_000_082, "AI 模型不支持的 modal! {} ");
     ErrorCode AI_MODAL_PLATFORM_PARAMS_INCORRECT = new ErrorCode(1_022_000_083, "AI 平台参数不正确! {} ");
+    ErrorCode AI_MODAL_DISABLE_NOT_USED = new ErrorCode(1_022_000_084, "AI 模型禁用不能使用!");
 
 }

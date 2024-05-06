@@ -19,4 +19,5 @@ public class AiChatConversationCreateUserReq {
     @Schema(description = "对话标题")
     @NotNull(message = "标题不能为空!")
     private String title;
+
 }

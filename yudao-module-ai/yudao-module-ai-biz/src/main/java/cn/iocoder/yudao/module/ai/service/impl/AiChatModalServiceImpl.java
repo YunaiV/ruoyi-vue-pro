@@ -22,6 +22,7 @@ import cn.iocoder.yudao.module.ai.service.AiChatModalService;
 import cn.iocoder.yudao.module.ai.vo.AiChatModalAddReq;
 import cn.iocoder.yudao.module.ai.vo.AiChatModalListReq;
 import cn.iocoder.yudao.module.ai.vo.AiChatModalListRes;
+import cn.iocoder.yudao.module.ai.vo.AiChatModalRes;
 import jakarta.validation.ConstraintViolation;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -108,11 +109,19 @@ public class AiChatModalServiceImpl implements AiChatModalService {
         aiChatModalMapper.deleteById(id);
     }
 
-    private void validateChatModalExists(Long id) {
+    @Override
+    public AiChatModalRes getChatModal(Long modalId) {
+        // 检查 modal 是否存在
+        AiChatModalDO aiChatModalDO = validateChatModalExists(modalId);
+        return AiChatModalConvert.INSTANCE.convertAiChatModalRes(aiChatModalDO);
+    }
+
+    private AiChatModalDO validateChatModalExists(Long id) {
         AiChatModalDO aiChatModalDO = aiChatModalMapper.selectById(id);
         if (aiChatModalDO == null) {
             throw ServiceExceptionUtil.exception(ErrorCodeConstants.AI_MODAL_NOT_EXIST);
         }
+        return aiChatModalDO;
     }
 
     private void validateModal(String platform, String modal) {

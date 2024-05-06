@@ -4,6 +4,7 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.ai.vo.AiChatModalAddReq;
 import cn.iocoder.yudao.module.ai.vo.AiChatModalListReq;
 import cn.iocoder.yudao.module.ai.vo.AiChatModalListRes;
+import cn.iocoder.yudao.module.ai.vo.AiChatModalRes;
 
 /**
  * ai modal
@@ -44,4 +45,11 @@ public interface AiChatModalService {
      */
     void delete(Long id);
 
+    /**
+     * 获取 - 获取 modal
+     *
+     * @param modalId
+     * @return
+     */
+    AiChatModalRes getChatModal(Long modalId);
 }

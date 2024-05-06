@@ -2,13 +2,25 @@
 ### 登录 详细使用  https://www.jetbrains.com/help/idea/testing-restful-web-services.html、https://www.cnblogs.com/crazymakercircle/p/14317222.html
 
 ### 对话 - 创建对话
-POST {{baseUrl}}/ai/chat/conversation/create
+PUT {{baseUrl}}/ai/chat/conversation/createConversation
 Content-Type: application/json
 Authorization: {{token}}
 
 {
-  "chatType": "userChat"
+  "title": "新增对话"
 }
+
+
+### 对话 - 创建对话
+PUT {{baseUrl}}/ai/chat/conversation/createRoleConversation
+Content-Type: application/json
+Authorization: {{token}}
+
+{
+  "roleId": 7,
+  "title": "新增对话"
+}
+
 
 
 ### 对话 - id获取

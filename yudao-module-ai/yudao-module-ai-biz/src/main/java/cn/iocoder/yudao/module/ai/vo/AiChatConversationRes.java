@@ -22,10 +22,16 @@ public class AiChatConversationRes {
     private Long userId;
 
     @Schema(description = "chat角色Id")
-    private Long chatRoleId;
+    private Long roleId;
 
     @Schema(description = "chat角色名称")
-    private String chatRoleName;
+    private String roleName;
+
+    @Schema(description = "模型id")
+    private Long modalId;
+
+    @Schema(description = "使用的模型")
+    private String modal;
 
     @Schema(description = "标题(有程序自动生成)")
     private String title;
@@ -35,4 +41,5 @@ public class AiChatConversationRes {
 
     @Schema(description = "聊天次数(有程序自动生成)")
     private Integer chatCount;
+
 }

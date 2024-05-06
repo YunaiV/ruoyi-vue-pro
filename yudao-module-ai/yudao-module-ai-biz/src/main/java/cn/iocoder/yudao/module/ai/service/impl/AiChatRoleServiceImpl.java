@@ -99,6 +99,13 @@ public class AiChatRoleServiceImpl implements AiChatRoleService {
         aiChatRoleMapper.deleteById(chatRoleId);
     }
 
+    @Override
+    public AiChatRoleRes getChatRole(Long roleId) {
+        // 检查角色是否存在
+        AiChatRoleDO aiChatRoleDO = validateChatRoleExists(roleId);
+        return AiChatRoleConvert.INSTANCE.convertAiChatRoleRes(aiChatRoleDO);
+    }
+
     private AiChatRoleDO validateChatRoleExists(Long id) {
         AiChatRoleDO aiChatRoleDO = aiChatRoleMapper.selectById(id);
         if (aiChatRoleDO == null) {

@@ -19,14 +19,14 @@ Authorization: {{token}}
 
 
 ### chat update
-POST {{baseUrl}}/ai/chat/role/6
+POST {{baseUrl}}/ai/chat/role/7
 Content-Type: application/json
 Authorization: {{token}}
 
 {
   "modelId": 1,
-  "name": "小红书写作v1---hh😄",
-  "introduce": "采用gpt3.5模型，拥有小红书优质作者写作经验。",
+  "name": "小红书写作v1---hh😄❀",
+  "introduce": "采用gpt3.5模型，拥有小红书优质作者写作经验。0----",
   "classify": "writing",
   "enable": "close"
 }
