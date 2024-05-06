@@ -1,6 +1,8 @@
 package cn.iocoder.yudao.framework.ai.imageopenai;
 
 import cn.iocoder.yudao.framework.ai.image.ImageOptions;
+import cn.iocoder.yudao.framework.ai.imageopenai.enums.OpenAiImageModelEnum;
+import cn.iocoder.yudao.framework.ai.imageopenai.enums.OpenAiImageStyleEnum;
 import lombok.Data;
 import lombok.Getter;
 import lombok.experimental.Accessors;

@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.framework.ai.imageopenai;
+package cn.iocoder.yudao.framework.ai.imageopenai.enums;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
