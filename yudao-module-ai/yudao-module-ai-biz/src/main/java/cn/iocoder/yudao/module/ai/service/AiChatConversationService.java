@@ -4,6 +4,8 @@ import cn.iocoder.yudao.module.ai.controller.admin.chat.vo.conversation.AiChatCo
 import cn.iocoder.yudao.module.ai.controller.admin.chat.vo.conversation.AiChatConversationListReqVO;
 import cn.iocoder.yudao.module.ai.controller.admin.chat.vo.conversation.AiChatConversationRespVO;
 import cn.iocoder.yudao.module.ai.controller.admin.chat.vo.conversation.AiChatConversationUpdateReqVO;
+import cn.iocoder.yudao.module.ai.dal.dataobject.chat.AiChatConversationDO;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
@@ -34,10 +36,9 @@ public interface AiChatConversationService {
     /**
      * 获取 - 对话列表
      *
-     * @param req
      * @return
      */
-    List<AiChatConversationRespVO> listConversation(AiChatConversationListReqVO req);
+    List<AiChatConversationRespVO> listConversation();
 
     /**
      * 获取 - 对话
@@ -54,4 +55,11 @@ public interface AiChatConversationService {
      */
     Boolean deleteConversation(Long id);
 
+    /**
+     * 校验 - 是否存在
+     *
+     * @param id
+     * @return
+     */
+    AiChatConversationDO validateExists(Long id);
 }

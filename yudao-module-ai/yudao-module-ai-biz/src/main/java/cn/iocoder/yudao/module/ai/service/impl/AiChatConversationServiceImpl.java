@@ -98,12 +98,12 @@ public class AiChatConversationServiceImpl implements AiChatConversationService 
     }
 
     @Override
-    public List<AiChatConversationRespVO> listConversation(AiChatConversationListReqVO listReqVO) {
+    public List<AiChatConversationRespVO> listConversation() {
         // 获取用户id
         Long loginUserId = SecurityFrameworkUtils.getLoginUserId();
         // 查询前100对话
         List<AiChatConversationDO> top100Conversation
-                = aiChatConversationMapper.selectTop100Conversation(loginUserId, listReqVO.getTitle());
+                = aiChatConversationMapper.selectTop100Conversation(loginUserId, null);
         return AiChatConversationConvert.INSTANCE.covnertChatConversationResList(top100Conversation);
     }
 
@@ -118,7 +118,7 @@ public class AiChatConversationServiceImpl implements AiChatConversationService 
         return aiChatConversationMapper.deleteById(id) > 0;
     }
 
-    private @NotNull AiChatConversationDO validateExists(Long id) {
+    public @NotNull AiChatConversationDO validateExists(Long id) {
         AiChatConversationDO aiChatConversationDO = aiChatConversationMapper.selectById(id);
         if (aiChatConversationDO == null) {
             throw ServiceExceptionUtil.exception(ErrorCodeConstants.AI_CONVERSATION_NOT_EXISTS);

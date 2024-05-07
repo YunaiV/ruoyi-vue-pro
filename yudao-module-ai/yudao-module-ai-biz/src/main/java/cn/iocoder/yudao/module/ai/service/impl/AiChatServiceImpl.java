@@ -14,6 +14,7 @@ import cn.iocoder.yudao.module.ai.controller.admin.chat.vo.conversation.AiChatCo
 import cn.iocoder.yudao.module.ai.controller.admin.chat.vo.message.AiChatMessageRespVO;
 import cn.iocoder.yudao.module.ai.controller.admin.chat.vo.message.AiChatMessageSendReqVO;
 import cn.iocoder.yudao.module.ai.controller.admin.model.vo.model.AiChatModalRes;
+import cn.iocoder.yudao.module.ai.convert.AiChatMessageConvert;
 import cn.iocoder.yudao.module.ai.dal.dataobject.chat.AiChatMessageDO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiChatRoleDO;
 import cn.iocoder.yudao.module.ai.dal.mysql.AiChatConversationMapper;
@@ -31,6 +32,7 @@ import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Flux;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.function.Consumer;
 
 /**
@@ -186,5 +188,20 @@ public class AiChatServiceImpl implements AiChatService {
 
                 }
         );
+    }
+
+    @Override
+    public List<AiChatMessageRespVO> getMessageListByConversationId(Long conversationId) {
+        // 校验对话是否存在
+        chatConversationService.validateExists(conversationId);
+        // 获取对话所有 message
+        List<AiChatMessageDO> aiChatMessageDOList = aiChatMessageMapper.selectByConversationId(conversationId);
+        // 转换 AiChatMessageRespVO
+       return AiChatMessageConvert.INSTANCE.convertAiChatMessageRespVOList(aiChatMessageDOList);
+    }
+
+    @Override
+    public Boolean deleteMessage(Long id) {
+        return aiChatMessageMapper.deleteById(id) > 0;
     }
 }

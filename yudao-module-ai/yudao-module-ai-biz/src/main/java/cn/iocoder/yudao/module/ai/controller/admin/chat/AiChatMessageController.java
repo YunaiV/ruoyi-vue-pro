@@ -31,7 +31,7 @@ public class AiChatMessageController {
     @Operation(summary = "发送消息（段式）", description = "一次性返回，响应较慢")
     @PostMapping("/send")
     public CommonResult<AiChatMessageRespVO> sendMessage(@Validated @ModelAttribute AiChatMessageSendReqVO sendReqVO) {
-        // TODO @fan：使用 static import；这样就 success 就行了；
+        // TODO done @fan：使用 static import；这样就 success 就行了；
         return success(chatService.chat(sendReqVO));
     }
 
@@ -49,14 +49,14 @@ public class AiChatMessageController {
     @GetMapping("/list-by-conversation-id")
     @Parameter(name = "conversationId", required = true, description = "会话编号", example = "1024")
     public CommonResult<List<AiChatMessageRespVO>> getMessageListByConversationId(@RequestParam("conversationId") Long conversationId) {
-        return success(null);
+        return success(chatService.getMessageListByConversationId(conversationId));
     }
 
     @Operation(summary = "删除消息")
     @DeleteMapping("/delete")
     @Parameter(name = "id", required = true, description = "消息编号", example = "1024")
-    public CommonResult<Boolean> delete(@RequestParam("id") Long id) {
-        return success(null);
+    public CommonResult<Boolean> deleteMessage(@RequestParam("id") Long id) {
+        return success(chatService.deleteMessage(id));
     }
 
 }

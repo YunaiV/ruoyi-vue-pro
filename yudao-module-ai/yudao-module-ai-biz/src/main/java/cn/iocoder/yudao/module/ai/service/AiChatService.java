@@ -4,6 +4,8 @@ import cn.iocoder.yudao.module.ai.controller.Utf8SseEmitter;
 import cn.iocoder.yudao.module.ai.controller.admin.chat.vo.message.AiChatMessageRespVO;
 import cn.iocoder.yudao.module.ai.controller.admin.chat.vo.message.AiChatMessageSendReqVO;
 
+import java.util.List;
+
 /**
  * 聊天 chat
  *
@@ -29,4 +31,21 @@ public interface AiChatService {
      * @return
      */
     void chatStream(AiChatMessageSendReqVO req, Utf8SseEmitter sseEmitter);
+
+    /**
+     * 获取 - 获取对话 message list
+     *
+     * @param conversationId
+     * @return
+     */
+    List<AiChatMessageRespVO> getMessageListByConversationId(Long conversationId);
+
+    /**
+     * 删除 - 删除message
+     *
+     * @param id
+     * @return
+     */
+    Boolean deleteMessage(Long id);
+
 }

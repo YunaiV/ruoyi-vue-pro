@@ -2,7 +2,6 @@ package cn.iocoder.yudao.module.ai.controller.admin.chat;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.module.ai.controller.admin.chat.vo.conversation.AiChatConversationCreateReqVO;
-import cn.iocoder.yudao.module.ai.controller.admin.chat.vo.conversation.AiChatConversationListReqVO;
 import cn.iocoder.yudao.module.ai.controller.admin.chat.vo.conversation.AiChatConversationRespVO;
 import cn.iocoder.yudao.module.ai.controller.admin.chat.vo.conversation.AiChatConversationUpdateReqVO;
 import cn.iocoder.yudao.module.ai.service.AiChatConversationService;
@@ -47,8 +46,8 @@ public class AiChatConversationController {
     // TODO done @fan：实现一下
     @GetMapping("/list")
     @Operation(summary = "获得聊天会话列表")
-    public CommonResult<List<AiChatConversationRespVO>> getConversationList(@ModelAttribute AiChatConversationListReqVO listReqVO) {
-        return success(aiChatConversationService.listConversation(listReqVO));
+    public CommonResult<List<AiChatConversationRespVO>> getConversationList() {
+        return success(aiChatConversationService.listConversation());
     }
 
     // TODO @fan：实现一下

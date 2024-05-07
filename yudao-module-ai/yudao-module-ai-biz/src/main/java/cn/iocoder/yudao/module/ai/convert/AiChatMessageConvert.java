@@ -20,10 +20,18 @@ public interface AiChatMessageConvert {
     AiChatMessageConvert INSTANCE = Mappers.getMapper(AiChatMessageConvert.class);
 
     /**
-     * 转换  ChatMessageListRes
+     * 转换 ChatMessageListRes
      *
      * @param list
      * @return
      */
     List<AiChatMessageRespVO> convert(List<AiChatMessageDO> list);
+
+    /**
+     * 转换 AiChatMessageRespVO
+     *
+     * @param aiChatMessageDOList
+     * @return
+     */
+    List<AiChatMessageRespVO> convertAiChatMessageRespVOList(List<AiChatMessageDO> aiChatMessageDOList);
 }
