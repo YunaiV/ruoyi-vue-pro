@@ -1,10 +1,9 @@
 package cn.iocoder.yudao.module.ai.controller.admin.image;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
-import cn.iocoder.yudao.module.ai.controller.Utf8SseEmitter;
-import cn.iocoder.yudao.module.ai.service.AiImageService;
 import cn.iocoder.yudao.module.ai.controller.admin.image.vo.AiImageDallDrawingReq;
 import cn.iocoder.yudao.module.ai.controller.admin.image.vo.AiImageMidjourneyReq;
+import cn.iocoder.yudao.module.ai.service.AiImageService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
@@ -14,7 +13,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 // TODO @芋艿：整理接口定义
 /**
@@ -35,10 +33,11 @@ public class AiImageController {
 
     @Operation(summary = "dall2/dall3绘画", description = "openAi dall3是付费的!")
     @PostMapping("/dallDrawing")
-    public SseEmitter dallDrawing(@Validated @RequestBody AiImageDallDrawingReq req) {
-        Utf8SseEmitter sseEmitter = new Utf8SseEmitter();
-        aiImageService.dallDrawing(req, sseEmitter);
-        return sseEmitter;
+    public void dallDrawing(@Validated @RequestBody AiImageDallDrawingReq req) {
+//        Utf8SseEmitter sseEmitter = new Utf8SseEmitter();
+//        aiImageService.dallDrawing(req, sseEmitter);
+//        return sseEmitter;
+
     }
 
     @Operation(summary = "midjourney", description = "midjourney图片绘画流程：1、提交任务 2、获取完成的任务 3、选择对应功能 4、获取最终结果")

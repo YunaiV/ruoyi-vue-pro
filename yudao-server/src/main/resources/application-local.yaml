@@ -2,7 +2,6 @@ server:
   port: 48080
 
 --- #################### 数据库相关配置 ####################
-
 spring:
   # 数据源配置项
   autoconfigure:
@@ -79,7 +78,12 @@ spring:
       port: 6379 # 端口
       database: 0 # 数据库索引
 #    password: dev # 密码，建议生产环境开启
-
+server:
+  servlet:
+    encoding:
+      enabled: true
+      charset: UTF-8
+      force: true
 --- #################### 定时任务相关配置 ####################
 
 # Quartz 配置项，对应 QuartzProperties 配置类

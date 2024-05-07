@@ -1,8 +1,8 @@
 package cn.iocoder.yudao.module.ai.service;
 
-import cn.iocoder.yudao.module.ai.controller.Utf8SseEmitter;
 import cn.iocoder.yudao.module.ai.controller.admin.chat.vo.message.AiChatMessageRespVO;
 import cn.iocoder.yudao.module.ai.controller.admin.chat.vo.message.AiChatMessageSendReqVO;
+import reactor.core.publisher.Flux;
 
 import java.util.List;
 
@@ -26,11 +26,10 @@ public interface AiChatService {
     /**
      * chat stream
      *
-     * @param req
-     * @param sseEmitter
+     * @param sendReqVO
      * @return
      */
-    void chatStream(AiChatMessageSendReqVO req, Utf8SseEmitter sseEmitter);
+    Flux<AiChatMessageRespVO> chatStream(AiChatMessageSendReqVO sendReqVO);
 
     /**
      * 获取 - 获取对话 message list

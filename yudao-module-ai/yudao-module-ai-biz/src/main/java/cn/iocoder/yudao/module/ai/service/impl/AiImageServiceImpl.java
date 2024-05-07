@@ -5,8 +5,8 @@ import cn.iocoder.yudao.framework.ai.image.ImageGeneration;
 import cn.iocoder.yudao.framework.ai.image.ImagePrompt;
 import cn.iocoder.yudao.framework.ai.image.ImageResponse;
 import cn.iocoder.yudao.framework.ai.imageopenai.OpenAiImageClient;
-import cn.iocoder.yudao.framework.ai.imageopenai.enums.OpenAiImageModelEnum;
 import cn.iocoder.yudao.framework.ai.imageopenai.OpenAiImageOptions;
+import cn.iocoder.yudao.framework.ai.imageopenai.enums.OpenAiImageModelEnum;
 import cn.iocoder.yudao.framework.ai.imageopenai.enums.OpenAiImageStyleEnum;
 import cn.iocoder.yudao.framework.ai.midjourney.api.MidjourneyInteractionsApi;
 import cn.iocoder.yudao.framework.ai.midjourney.webSocket.MidjourneyWebSocketStarter;
@@ -14,21 +14,17 @@ import cn.iocoder.yudao.framework.ai.midjourney.webSocket.WssNotify;
 import cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil;
 import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
 import cn.iocoder.yudao.module.ai.ErrorCodeConstants;
-import cn.iocoder.yudao.module.ai.controller.Utf8SseEmitter;
-import cn.iocoder.yudao.module.ai.dal.dataobject.image.AiImageDO;
-import cn.iocoder.yudao.module.ai.enums.AiChatDrawingStatusEnum;
-import cn.iocoder.yudao.module.ai.dal.mysql.AiImageMapper;
-import cn.iocoder.yudao.module.ai.service.AiImageService;
 import cn.iocoder.yudao.module.ai.controller.admin.image.vo.AiImageDallDrawingReq;
 import cn.iocoder.yudao.module.ai.controller.admin.image.vo.AiImageMidjourneyReq;
+import cn.iocoder.yudao.module.ai.dal.dataobject.image.AiImageDO;
+import cn.iocoder.yudao.module.ai.dal.mysql.AiImageMapper;
+import cn.iocoder.yudao.module.ai.enums.AiChatDrawingStatusEnum;
+import cn.iocoder.yudao.module.ai.service.AiImageService;
 import jakarta.annotation.PostConstruct;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.io.IOException;
 
 /**
  * ai 作图
@@ -64,7 +60,7 @@ public class AiImageServiceImpl implements AiImageService {
     }
 
     @Override
-    public void dallDrawing(AiImageDallDrawingReq req, Utf8SseEmitter sseEmitter) {
+    public void dallDrawing(AiImageDallDrawingReq req) {
         // 获取 model
         OpenAiImageModelEnum openAiImageModelEnum = OpenAiImageModelEnum.valueOfModel(req.getModal());
         OpenAiImageStyleEnum openAiImageStyleEnum = OpenAiImageStyleEnum.valueOfStyle(req.getStyle());
@@ -79,7 +75,7 @@ public class AiImageServiceImpl implements AiImageService {
             // 发送
             ImageGeneration imageGeneration = imageResponse.getResult();
             // 发送信息
-            sendSseEmitter(sseEmitter, imageGeneration);
+//            sendSseEmitter(sseEmitter, imageGeneration);
             // 保存数据库
             doSave(req.getPrompt(), req.getSize(), req.getModal(),
                     imageGeneration.getOutput().getUrl(), AiChatDrawingStatusEnum.COMPLETE, null);
@@ -88,7 +84,7 @@ public class AiImageServiceImpl implements AiImageService {
             doSave(req.getPrompt(), req.getSize(), req.getModal(),
                     null, AiChatDrawingStatusEnum.FAIL, aiException.getMessage());
             // 发送错误信息
-            sendSseEmitter(sseEmitter, aiException.getMessage());
+//            sendSseEmitter(sseEmitter, aiException.getMessage());
         }
     }
 
@@ -105,16 +101,16 @@ public class AiImageServiceImpl implements AiImageService {
         }
     }
 
-    private static void sendSseEmitter(Utf8SseEmitter sseEmitter, Object object) {
-        try {
-            sseEmitter.send(object, MediaType.APPLICATION_JSON);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        } finally {
-            // 发送 complete
-            sseEmitter.complete();
-        }
-    }
+//    private static void sendSseEmitter(Utf8SseEmitter sseEmitter, Object object) {
+//        try {
+//            sseEmitter.send(object, MediaType.APPLICATION_JSON);
+//        } catch (IOException e) {
+//            throw new RuntimeException(e);
+//        } finally {
+//            // 发送 complete
+//            sseEmitter.complete();
+//        }
+//    }
 
     private AiImageDO doSave(String prompt,
                         String size,
