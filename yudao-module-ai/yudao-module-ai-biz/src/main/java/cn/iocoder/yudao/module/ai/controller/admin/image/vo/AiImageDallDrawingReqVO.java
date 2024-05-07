@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.ai.controller.admin.image.vo;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
@@ -14,10 +15,11 @@ import lombok.experimental.Accessors;
  */
 @Data
 @Accessors(chain = true)
-public class AiImageDallDrawingReq {
+public class AiImageDallDrawingReqVO {
 
     @Schema(description = "提示词")
     @NotNull(message = "提示词不能为空!")
+    @Size(max = 1200, message = "提示词最大1200")
     private String prompt;
 
     @Schema(description = "模型")

@@ -1,7 +1,7 @@
 
 ### chat dallDrawing
 
-POST {{baseUrl}}/ai/image/dallDrawing
+POST {{baseUrl}}/admin-api/ai/image/dallDrawing
 Content-Type: application/json
 Authorization: {{token}}
 

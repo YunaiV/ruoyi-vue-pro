@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.ai.service;
 
-import cn.iocoder.yudao.module.ai.controller.admin.image.vo.AiImageDallDrawingReq;
+import cn.iocoder.yudao.module.ai.controller.admin.image.vo.AiImageDallDrawingReqVO;
+import cn.iocoder.yudao.module.ai.controller.admin.image.vo.AiImageDallDrawingRespVO;
 import cn.iocoder.yudao.module.ai.controller.admin.image.vo.AiImageMidjourneyReq;
 
 /**
@@ -17,7 +18,7 @@ public interface AiImageService {
      *
      * @param req
      */
-    void dallDrawing(AiImageDallDrawingReq req);
+    AiImageDallDrawingRespVO dallDrawing(AiImageDallDrawingReqVO req);
 
     /**
      * midjourney 图片生成
