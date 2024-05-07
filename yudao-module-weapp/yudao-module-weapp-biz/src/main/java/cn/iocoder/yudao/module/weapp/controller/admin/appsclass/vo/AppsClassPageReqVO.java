@@ -15,14 +15,17 @@ import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_
 @ToString(callSuper = true)
 public class AppsClassPageReqVO extends PageParam {
 
-    @Schema(description = "分类名;分类名称", example = "张三")
+    @Schema(description = "分类名", example = "张三")
     private String className;
 
-    @Schema(description = "状态;是否启用", example = "2")
+    @Schema(description = "状态", example = "0")
     private String status;
 
-    @Schema(description = "创建时间;创建时间")
+    @Schema(description = "创建时间")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
     private LocalDateTime[] createTime;
+
+    @Schema(description = "排序", example = "1")
+    private Integer indexNum;
 
 }

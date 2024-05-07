@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.weapp.controller.app;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
+import cn.iocoder.yudao.framework.security.core.annotations.PreAuthenticated;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.validation.annotation.Validated;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Validated
 public class AppWeappController {
     @GetMapping("/getWeappList")
+    @PreAuthenticated
     @Operation(summary = "获取小程序列表")
     public CommonResult<String> getWeappListByPage(){
         return CommonResult.success("true");

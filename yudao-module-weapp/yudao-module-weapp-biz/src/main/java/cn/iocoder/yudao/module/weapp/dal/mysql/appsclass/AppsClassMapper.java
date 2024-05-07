@@ -5,6 +5,7 @@ import java.util.*;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
+import cn.iocoder.yudao.module.weapp.controller.app.appslist.vo.AppAppsListRespVO;
 import cn.iocoder.yudao.module.weapp.dal.dataobject.appsclass.AppsClassDO;
 import org.apache.ibatis.annotations.Mapper;
 import cn.iocoder.yudao.module.weapp.controller.admin.appsclass.vo.*;
@@ -12,7 +13,7 @@ import cn.iocoder.yudao.module.weapp.controller.admin.appsclass.vo.*;
 /**
  * 小程序分类 Mapper
  *
- * @author 芋道源码
+ * @author jingjianqian
  */
 @Mapper
 public interface AppsClassMapper extends BaseMapperX<AppsClassDO> {
@@ -22,7 +23,10 @@ public interface AppsClassMapper extends BaseMapperX<AppsClassDO> {
                 .likeIfPresent(AppsClassDO::getClassName, reqVO.getClassName())
                 .eqIfPresent(AppsClassDO::getStatus, reqVO.getStatus())
                 .betweenIfPresent(AppsClassDO::getCreateTime, reqVO.getCreateTime())
-                .orderByDesc(AppsClassDO::getId));
+                .eqIfPresent(AppsClassDO::getIndexNum, reqVO.getIndexNum())
+                .orderByAsc(AppsClassDO::getIndexNum));
     }
+
+
 
 }

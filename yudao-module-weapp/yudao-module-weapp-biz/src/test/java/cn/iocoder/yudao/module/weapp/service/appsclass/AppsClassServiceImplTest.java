@@ -31,7 +31,7 @@ import static org.mockito.Mockito.*;
 /**
  * {@link AppsClassServiceImpl} 的单元测试类
  *
- * @author 芋道源码
+ * @author jingjianqian
  */
 @Import(AppsClassServiceImpl.class)
 public class AppsClassServiceImplTest extends BaseDbUnitTest {
@@ -113,6 +113,7 @@ public class AppsClassServiceImplTest extends BaseDbUnitTest {
            o.setClassName(null);
            o.setStatus(null);
            o.setCreateTime(null);
+           o.setIndexNum(null);
        });
        appsClassMapper.insert(dbAppsClass);
        // 测试 className 不匹配
@@ -121,11 +122,14 @@ public class AppsClassServiceImplTest extends BaseDbUnitTest {
        appsClassMapper.insert(cloneIgnoreId(dbAppsClass, o -> o.setStatus(null)));
        // 测试 createTime 不匹配
        appsClassMapper.insert(cloneIgnoreId(dbAppsClass, o -> o.setCreateTime(null)));
+       // 测试 index 不匹配
+       appsClassMapper.insert(cloneIgnoreId(dbAppsClass, o -> o.setIndexNum(null)));
        // 准备参数
        AppsClassPageReqVO reqVO = new AppsClassPageReqVO();
        reqVO.setClassName(null);
        reqVO.setStatus(null);
        reqVO.setCreateTime(buildBetweenTime(2023, 2, 1, 2023, 2, 28));
+       reqVO.setIndexNum(null);
 
        // 调用
        PageResult<AppsClassDO> pageResult = appsClassService.getAppsClassPage(reqVO);

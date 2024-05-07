@@ -13,6 +13,11 @@ import cn.iocoder.yudao.framework.common.pojo.PageParam;
  * @author jingjianqian
  */
 public interface AppsListService {
+    /**
+     * 获取banner小程序清单
+     * @return AppAppsListRespVO
+     */
+    List<AppsListDO> getBannerAppList();
 
     /**
      * 创建小程序清单

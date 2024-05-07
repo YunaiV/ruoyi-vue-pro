@@ -20,7 +20,7 @@ import static cn.iocoder.yudao.module.weapp.enums.ErrorCodeConstants.*;
 /**
  * 小程序分类 Service 实现类
  *
- * @author 芋道源码
+ * @author jingjianqian
  */
 @Service
 @Validated

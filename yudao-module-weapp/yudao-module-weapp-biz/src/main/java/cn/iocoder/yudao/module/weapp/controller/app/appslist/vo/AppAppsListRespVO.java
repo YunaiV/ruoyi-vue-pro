@@ -1,17 +1,16 @@
-package cn.iocoder.yudao.module.weapp.controller.admin.appslist.vo;
+package cn.iocoder.yudao.module.weapp.controller.app.appslist.vo;
 
-import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.*;
-import java.util.*;
-import java.util.*;
-import com.alibaba.excel.annotation.*;
 import cn.iocoder.yudao.framework.excel.core.annotations.DictFormat;
 import cn.iocoder.yudao.framework.excel.core.convert.DictConvert;
+import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
+import com.alibaba.excel.annotation.ExcelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Data;
 
-@Schema(description = "管理后台 - 小程序清单 Response VO")
+@Schema(description = "小程序 - 小功能导航站清单 Response VO")
 @Data
 @ExcelIgnoreUnannotated
-public class AppsListRespVO {
+public class AppAppsListRespVO {
 
     @Schema(description = "小程序名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "赵六")
     @ExcelProperty("小程序名称")

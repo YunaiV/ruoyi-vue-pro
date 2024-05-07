@@ -5,6 +5,7 @@ import java.util.*;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
+import cn.iocoder.yudao.module.weapp.dal.dataobject.appsclass.AppsClassDO;
 import cn.iocoder.yudao.module.weapp.dal.dataobject.appslist.AppsListDO;
 import org.apache.ibatis.annotations.Mapper;
 import cn.iocoder.yudao.module.weapp.controller.admin.appslist.vo.*;
@@ -16,7 +17,7 @@ import cn.iocoder.yudao.module.weapp.controller.admin.appslist.vo.*;
  */
 @Mapper
 public interface AppsListMapper extends BaseMapperX<AppsListDO> {
-
+    //默认翻页查询
     default PageResult<AppsListDO> selectPage(AppsListPageReqVO reqVO) {
         return selectPage(reqVO, new LambdaQueryWrapperX<AppsListDO>()
                 .likeIfPresent(AppsListDO::getWeappName, reqVO.getWeappName())
@@ -28,4 +29,7 @@ public interface AppsListMapper extends BaseMapperX<AppsListDO> {
                 .orderByDesc(AppsListDO::getId));
     }
 
+    default  List<AppsListDO> selectBannerList(Integer isBanner){
+        return selectList("is_banner", isBanner);
+    }
 }

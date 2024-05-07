@@ -31,6 +31,10 @@ public class AppsListDO extends BaseDO {
      */
     private String weappOpenid;
     /**
+     * 是否再banner展示
+     */
+    private String isBanner;
+    /**
      * 分类ID
      */
     private String classId;

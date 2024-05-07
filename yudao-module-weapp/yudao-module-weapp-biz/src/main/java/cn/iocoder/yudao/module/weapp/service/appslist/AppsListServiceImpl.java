@@ -30,6 +30,12 @@ public class AppsListServiceImpl implements AppsListService {
     private AppsListMapper appsListMapper;
 
     @Override
+    public List<AppsListDO> getBannerAppList() {
+
+        return appsListMapper.selectBannerList(1);
+    }
+
+    @Override
     public Long createAppsList(AppsListSaveReqVO createReqVO) {
         // 插入
         AppsListDO appsList = BeanUtils.toBean(createReqVO, AppsListDO.class);

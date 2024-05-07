@@ -21,6 +21,9 @@ public class AppsListPageReqVO extends PageParam {
     @Schema(description = "小程序OPENID", example = "25136")
     private String weappOpenid;
 
+    @Schema(description = "banner展示", example = "是")
+    private String isBanner;
+
     @Schema(description = "分类ID", example = "5963")
     private String classId;
 

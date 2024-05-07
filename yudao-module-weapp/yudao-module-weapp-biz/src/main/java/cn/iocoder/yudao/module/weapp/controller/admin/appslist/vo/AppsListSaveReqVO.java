@@ -17,6 +17,11 @@ public class AppsListSaveReqVO {
     @NotEmpty(message = "小程序OPENID不能为空")
     private String weappOpenid;
 
+
+    @Schema(description = "banner展示", requiredMode = Schema.RequiredMode.REQUIRED, example = "是")
+    @NotEmpty(message = "小程序OPENID不能为空")
+    private String isBanner;
+
     @Schema(description = "分类ID", requiredMode = Schema.RequiredMode.REQUIRED, example = "5963")
     @NotEmpty(message = "分类ID不能为空")
     private String classId;

@@ -10,7 +10,7 @@ import cn.iocoder.yudao.framework.common.pojo.PageParam;
 /**
  * 小程序分类 Service 接口
  *
- * @author 芋道源码
+ * @author jingjianqian
  */
 public interface AppsClassService {
 
