@@ -11,11 +11,11 @@ import cn.iocoder.yudao.module.ai.controller.admin.model.vo.model.AiChatModalRes
 import cn.iocoder.yudao.module.ai.controller.admin.model.vo.role.AiChatRoleRespVO;
 import cn.iocoder.yudao.module.ai.convert.AiChatConversationConvert;
 import cn.iocoder.yudao.module.ai.dal.dataobject.chat.AiChatConversationDO;
-import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiChatModalDO;
+import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiChatModelDO;
 import cn.iocoder.yudao.module.ai.dal.mysql.AiChatConversationMapper;
-import cn.iocoder.yudao.module.ai.dal.mysql.AiChatModalMapper;
+import cn.iocoder.yudao.module.ai.dal.mysql.AiChatModelMapper;
 import cn.iocoder.yudao.module.ai.service.AiChatConversationService;
-import cn.iocoder.yudao.module.ai.service.AiChatModalService;
+import cn.iocoder.yudao.module.ai.service.AiChatModelService;
 import cn.iocoder.yudao.module.ai.service.AiChatRoleService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -35,8 +35,8 @@ import java.util.List;
 @AllArgsConstructor
 public class AiChatConversationServiceImpl implements AiChatConversationService {
 
-    private final AiChatModalMapper aiChatModalMapper;
-    private final AiChatModalService aiChatModalService;
+    private final AiChatModelMapper aiChatModalMapper;
+    private final AiChatModelService aiChatModalService;
     private final AiChatRoleService aiChatRoleService;
     private final AiChatConversationMapper aiChatConversationMapper;
 
@@ -45,7 +45,7 @@ public class AiChatConversationServiceImpl implements AiChatConversationService 
         // 获取用户id
         Long loginUserId = SecurityFrameworkUtils.getLoginUserId();
         // 默认使用 sort 排序第一个模型
-        AiChatModalDO aiChatModalDO = aiChatModalMapper.selectFirstModal();
+        AiChatModelDO aiChatModalDO = aiChatModalMapper.selectFirstModal();
         // 查询角色
         AiChatRoleRespVO chatRoleRes = null;
         if (req.getRoleId() != null) {

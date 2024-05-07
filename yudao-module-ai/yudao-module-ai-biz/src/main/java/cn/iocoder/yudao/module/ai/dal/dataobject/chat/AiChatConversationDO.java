@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.ai.dal.dataobject.chat;
 
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
-import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiChatModalDO;
+import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiChatModelDO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiChatRoleDO;
 import cn.iocoder.yudao.module.ai.enums.AiModelEnum;
 import com.baomidou.mybatisplus.annotation.KeySequence;
@@ -60,7 +60,7 @@ public class AiChatConversationDO extends BaseDO {
     /**
      * 模型编号
      *
-     * 关联 {@link AiChatModalDO#getId()} 字段
+     * 关联 {@link AiChatModelDO#getId()} 字段
      */
     private Long modelId;
     /**
