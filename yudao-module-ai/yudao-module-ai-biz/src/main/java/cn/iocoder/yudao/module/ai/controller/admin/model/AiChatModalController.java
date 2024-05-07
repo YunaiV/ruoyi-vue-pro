@@ -4,7 +4,7 @@ import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.ai.controller.admin.model.vo.model.AiChatModalAddReqVO;
 import cn.iocoder.yudao.module.ai.controller.admin.model.vo.model.AiChatModalListReqVO;
-import cn.iocoder.yudao.module.ai.controller.admin.model.vo.model.AiChatModalListRes;
+import cn.iocoder.yudao.module.ai.controller.admin.model.vo.model.AiChatModalListRespVO;
 import cn.iocoder.yudao.module.ai.service.AiChatModalService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -33,7 +33,7 @@ public class AiChatModalController {
 
     @Operation(summary = "ai模型 - 模型列表")
     @GetMapping("/list")
-    public PageResult<AiChatModalListRes> list(@ModelAttribute AiChatModalListReqVO req) {
+    public PageResult<AiChatModalListRespVO> list(@ModelAttribute AiChatModalListReqVO req) {
         return aiChatModalService.list(req);
     }
 

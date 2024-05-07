@@ -10,8 +10,8 @@ import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.module.ai.ErrorCodeConstants;
 import cn.iocoder.yudao.module.ai.controller.admin.model.vo.model.AiChatModalAddReqVO;
 import cn.iocoder.yudao.module.ai.controller.admin.model.vo.model.AiChatModalListReqVO;
-import cn.iocoder.yudao.module.ai.controller.admin.model.vo.model.AiChatModalListRes;
-import cn.iocoder.yudao.module.ai.controller.admin.model.vo.model.AiChatModalRes;
+import cn.iocoder.yudao.module.ai.controller.admin.model.vo.model.AiChatModalListRespVO;
+import cn.iocoder.yudao.module.ai.controller.admin.model.vo.model.AiChatModalRespVO;
 import cn.iocoder.yudao.module.ai.convert.AiChatModalConvert;
 import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiChatModalDO;
 import cn.iocoder.yudao.module.ai.dal.mysql.AiChatModalMapper;
@@ -40,7 +40,7 @@ public class AiChatModalServiceImpl implements AiChatModalService {
     private final AiChatModalMapper aiChatModalMapper;
 
     @Override
-    public PageResult<AiChatModalListRes> list(AiChatModalListReqVO req) {
+    public PageResult<AiChatModalListRespVO> list(AiChatModalListReqVO req) {
         LambdaQueryWrapperX<AiChatModalDO> queryWrapperX = new LambdaQueryWrapperX<>();
         // 查询的都是未禁用的模型
         queryWrapperX.eq(AiChatModalDO::getStatus, CommonStatusEnum.ENABLE.getStatus());
@@ -53,7 +53,7 @@ public class AiChatModalServiceImpl implements AiChatModalService {
         // 查询
         PageResult<AiChatModalDO> aiChatModalDOPageResult = aiChatModalMapper.selectPage(req, queryWrapperX);
         // 转换 res
-        List<AiChatModalListRes> resList = AiChatModalConvert.INSTANCE.convertAiChatModalListRes(aiChatModalDOPageResult.getList());
+        List<AiChatModalListRespVO> resList = AiChatModalConvert.INSTANCE.convertAiChatModalListRes(aiChatModalDOPageResult.getList());
         return new PageResult<>(resList, aiChatModalDOPageResult.getTotal());
     }
 
@@ -91,14 +91,14 @@ public class AiChatModalServiceImpl implements AiChatModalService {
     }
 
     @Override
-    public AiChatModalRes getChatModalOfValidate(Long modalId) {
+    public AiChatModalRespVO getChatModalOfValidate(Long modalId) {
         // 检查 modal 是否存在
         AiChatModalDO aiChatModalDO = validateExists(modalId);
         return AiChatModalConvert.INSTANCE.convertAiChatModalRes(aiChatModalDO);
     }
 
     @Override
-    public void validateAvailable(AiChatModalRes chatModal) {
+    public void validateAvailable(AiChatModalRespVO chatModal) {
         // 对话模型是否可用
         if (CommonStatusEnum.ENABLE.getStatus().equals(chatModal.getStatus())) {
             throw ServiceExceptionUtil.exception(ErrorCodeConstants.AI_MODAL_DISABLE_NOT_USED);

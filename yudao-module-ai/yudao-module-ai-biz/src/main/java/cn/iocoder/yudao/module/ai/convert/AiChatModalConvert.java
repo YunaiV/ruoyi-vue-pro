@@ -1,8 +1,8 @@
 package cn.iocoder.yudao.module.ai.convert;
 
 import cn.iocoder.yudao.module.ai.controller.admin.model.vo.model.AiChatModalAddReqVO;
-import cn.iocoder.yudao.module.ai.controller.admin.model.vo.model.AiChatModalListRes;
-import cn.iocoder.yudao.module.ai.controller.admin.model.vo.model.AiChatModalRes;
+import cn.iocoder.yudao.module.ai.controller.admin.model.vo.model.AiChatModalListRespVO;
+import cn.iocoder.yudao.module.ai.controller.admin.model.vo.model.AiChatModalRespVO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiChatModalDO;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
@@ -27,7 +27,7 @@ public interface AiChatModalConvert {
      * @param list
      * @return
      */
-    List<AiChatModalListRes> convertAiChatModalListRes(List<AiChatModalDO> list);
+    List<AiChatModalListRespVO> convertAiChatModalListRes(List<AiChatModalDO> list);
 
     /**
      * 转换 - AiChatModalDO
@@ -44,6 +44,6 @@ public interface AiChatModalConvert {
      * @param aiChatModalDO
      * @return
      */
-    AiChatModalRes convertAiChatModalRes(AiChatModalDO aiChatModalDO);
+    AiChatModalRespVO convertAiChatModalRes(AiChatModalDO aiChatModalDO);
 
 }

@@ -3,8 +3,8 @@ package cn.iocoder.yudao.module.ai.service;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.ai.controller.admin.model.vo.model.AiChatModalAddReqVO;
 import cn.iocoder.yudao.module.ai.controller.admin.model.vo.model.AiChatModalListReqVO;
-import cn.iocoder.yudao.module.ai.controller.admin.model.vo.model.AiChatModalListRes;
-import cn.iocoder.yudao.module.ai.controller.admin.model.vo.model.AiChatModalRes;
+import cn.iocoder.yudao.module.ai.controller.admin.model.vo.model.AiChatModalListRespVO;
+import cn.iocoder.yudao.module.ai.controller.admin.model.vo.model.AiChatModalRespVO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiChatModalDO;
 
 /**
@@ -22,7 +22,7 @@ public interface AiChatModalService {
      * @param req
      * @return
      */
-    PageResult<AiChatModalListRes> list(AiChatModalListReqVO req);
+    PageResult<AiChatModalListRespVO> list(AiChatModalListReqVO req);
 
     /**
      * ai modal - 添加
@@ -52,7 +52,7 @@ public interface AiChatModalService {
      * @param modalId
      * @return
      */
-    AiChatModalRes getChatModalOfValidate(Long modalId);
+    AiChatModalRespVO getChatModalOfValidate(Long modalId);
 
     /**
      * 校验 - 是否存在
@@ -67,5 +67,5 @@ public interface AiChatModalService {
      *
      * @param chatModal
      */
-    void validateAvailable(AiChatModalRes chatModal);
+    void validateAvailable(AiChatModalRespVO chatModal);
 }

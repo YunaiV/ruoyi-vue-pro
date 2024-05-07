@@ -13,7 +13,7 @@ import cn.iocoder.yudao.module.ai.controller.Utf8SseEmitter;
 import cn.iocoder.yudao.module.ai.controller.admin.chat.vo.conversation.AiChatConversationRespVO;
 import cn.iocoder.yudao.module.ai.controller.admin.chat.vo.message.AiChatMessageRespVO;
 import cn.iocoder.yudao.module.ai.controller.admin.chat.vo.message.AiChatMessageSendReqVO;
-import cn.iocoder.yudao.module.ai.controller.admin.model.vo.model.AiChatModalRes;
+import cn.iocoder.yudao.module.ai.controller.admin.model.vo.model.AiChatModalRespVO;
 import cn.iocoder.yudao.module.ai.convert.AiChatMessageConvert;
 import cn.iocoder.yudao.module.ai.dal.dataobject.chat.AiChatMessageDO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiChatRoleDO;
@@ -61,7 +61,7 @@ public class AiChatServiceImpl implements AiChatService {
         // 查询对话
         AiChatConversationRespVO conversation = chatConversationService.getConversationOfValidate(req.getConversationId());
         // 获取对话模型
-        AiChatModalRes chatModal = aiChatModalService.getChatModalOfValidate(conversation.getModelId());
+        AiChatModalRespVO chatModal = aiChatModalService.getChatModalOfValidate(conversation.getModelId());
         // 对话模型是否可用
         aiChatModalService.validateAvailable(chatModal);
         // 获取角色信息
@@ -132,7 +132,7 @@ public class AiChatServiceImpl implements AiChatService {
         // 查询对话
         AiChatConversationRespVO conversation = chatConversationService.getConversationOfValidate(req.getConversationId());
         // 获取对话模型
-        AiChatModalRes chatModal = aiChatModalService.getChatModalOfValidate(conversation.getModelId());
+        AiChatModalRespVO chatModal = aiChatModalService.getChatModalOfValidate(conversation.getModelId());
         // 对话模型是否可用
         aiChatModalService.validateAvailable(chatModal);
         // 获取角色信息
