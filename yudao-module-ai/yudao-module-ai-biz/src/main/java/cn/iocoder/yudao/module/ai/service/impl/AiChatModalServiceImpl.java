@@ -97,7 +97,7 @@ public class AiChatModalServiceImpl implements AiChatModelService {
     @Override
     public void validateAvailable(AiChatModalRespVO chatModal) {
         // 对话模型是否可用
-        if (CommonStatusEnum.ENABLE.getStatus().equals(chatModal.getStatus())) {
+        if (!CommonStatusEnum.ENABLE.getStatus().equals(chatModal.getStatus())) {
             throw ServiceExceptionUtil.exception(ErrorCodeConstants.AI_MODAL_DISABLE_NOT_USED);
         }
     }

@@ -1,10 +1,31 @@
 
+### chat call
+POST {{baseUrl}}/admin-api/ai/chat/message/send
+Content-Type: application/json
+Authorization: {{token}}
+
+{
+  "conversationId": "1781604279872581649",
+  "content": "中国好看吗？"
+}
+
+
+### chat call
+POST {{baseUrl}}/admin-api/ai/chat/message/send-stream
+Content-Type: application/json
+Authorization: {{token}}
+
+{
+  "conversationId": "1781604279872581649",
+  "content": "苹果是什么颜色？"
+}
+
 
 ### message list
-GET {{baseUrl}}/ai/chat/message/list?chatConversationId=1781604279872581644
+GET {{baseUrl}}/admin-api/ai/chat/message/list-by-conversation-id?conversationId=1781604279872581649
 Authorization: {{token}}
 
 
 ### message delete
-DELETE {{baseUrl}}/ai/chat/message/1781604279872581644/8
+DELETE {{baseUrl}}/admin-api/ai/chat/message/delete?id=50
 Authorization: {{token}}

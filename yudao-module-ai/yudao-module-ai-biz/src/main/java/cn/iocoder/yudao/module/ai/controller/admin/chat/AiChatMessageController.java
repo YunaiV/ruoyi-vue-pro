@@ -30,7 +30,7 @@ public class AiChatMessageController {
 
     @Operation(summary = "发送消息（段式）", description = "一次性返回，响应较慢")
     @PostMapping("/send")
-    public CommonResult<AiChatMessageRespVO> sendMessage(@Validated @ModelAttribute AiChatMessageSendReqVO sendReqVO) {
+    public CommonResult<AiChatMessageRespVO> sendMessage(@Validated @RequestBody AiChatMessageSendReqVO sendReqVO) {
         // TODO done @fan：使用 static import；这样就 success 就行了；
         return success(chatService.chat(sendReqVO));
     }
@@ -39,7 +39,7 @@ public class AiChatMessageController {
     // TODO @fan：要不要使用 Flux 来返回；可以使用 Flux<AiChatMessageRespVO>
     @Operation(summary = "发送消息（流式）", description = "流式返回，响应较快")
     @PostMapping(value = "/send-stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public SseEmitter sendMessageStream(@Validated @ModelAttribute AiChatMessageSendReqVO sendReqVO) {
+    public SseEmitter sendMessageStream(@Validated @RequestBody AiChatMessageSendReqVO sendReqVO) {
         Utf8SseEmitter sseEmitter = new Utf8SseEmitter();
         chatService.chatStream(sendReqVO, sseEmitter);
         return sseEmitter;
