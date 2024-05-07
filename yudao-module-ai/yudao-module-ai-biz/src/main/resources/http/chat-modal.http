@@ -1,43 +1,32 @@
 
 ### chat call
-GET {{baseUrl}}/ai/chat/modal/list
+GET {{baseUrl}}/admin-api/ai/chat/model/list
 Authorization: {{token}}
 
 
 ### chat call
-PUT {{baseUrl}}/ai/chat/modal
+PUT {{baseUrl}}/admin-api/ai/chat/model/add
 Content-Type: application/json
 Authorization: {{token}}
 
 {
+  "keyId": "1",
   "name": "小红书Ai写作大模型4.0",
-  "modal": "ERNIE 4.0",
+  "model": "ERNIE 4.0",
   "platform": "yiyan",
-  "imageUrl": "",
-  "sort": 100,
-  "config": {
-    "topK": 0.6,
-    "topP": 0.6,
-    "temperature": 0.86,
-    "maxTokens": 2048
-  }
+  "sort": 100
 }
 
 ### chat call
-POST {{baseUrl}}/ai/chat/modal/7
+POST {{baseUrl}}/admin-api/ai/chat/model/update
 Content-Type: application/json
 Authorization: {{token}}
 
 {
-  "name": "小红书Ai写作大模型-plus",
-  "modal": "ERNIE-3.5-8K",
+  "id": 9,
+  "keyId": "1",
+  "name": "小红书Ai写作大模型3.5 8k",
+  "model": "ERNIE-3.5-8K",
   "platform": "yiyan",
-  "imageUrl": "",
-  "sort": 1,
-  "config": {
-    "topK": 0.6,
-    "topP": 0.6,
-    "temperature": 0.86,
-    "maxTokens": 2048
-  }
+  "sort": 100
 }
