@@ -1,16 +1,9 @@
 package cn.iocoder.yudao.module.ai.dal.dataobject.model;
 
-import cn.iocoder.yudao.framework.ai.chat.messages.MessageType;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
-import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import com.baomidou.mybatisplus.annotation.*;
-import com.baomidou.mybatisplus.extension.handlers.AbstractJsonTypeHandler;
 import lombok.*;
-import lombok.experimental.Accessors;
-
-import java.io.Serializable;
-import java.util.List;
 
 /**
  * AI 聊天角色 DO
@@ -67,12 +60,12 @@ public class AiChatRoleDO extends BaseDO {
     /**
      * 模型编号
      *
-     * 关联 {@link AiChatModalDO#getId()} 字段
+     * 关联 {@link AiChatModelDO#getId()} 字段
      */
-    private String modelId;
+    private Long modelId;
 
     /**
-     * 是否公开
+     * 是否公开 true - 公开；false - 私有
      *
      * true - 公开；false - 私有
      */

@@ -42,7 +42,7 @@ public class AiChatRoleAddReqVO {
     private Long modelId;
 
     @NotNull
-    @Schema(description = "开启状态 open、close")
+    @Schema(description = "开启状态 0、open 1、close")
     private Boolean publicStatus;
 
     @NotNull

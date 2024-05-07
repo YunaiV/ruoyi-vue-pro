@@ -12,7 +12,7 @@ import cn.iocoder.yudao.module.ai.convert.AiChatRoleConvert;
 import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiChatRoleDO;
 import cn.iocoder.yudao.module.ai.dal.mysql.AiChatRoleMapper;
 import cn.iocoder.yudao.module.ai.enums.AiChatRoleCategoryEnum;
-import cn.iocoder.yudao.module.ai.service.AiChatModalService;
+import cn.iocoder.yudao.module.ai.service.AiChatModelService;
 import cn.iocoder.yudao.module.ai.service.AiChatRoleService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -32,7 +32,7 @@ import java.util.List;
 public class AiChatRoleServiceImpl implements AiChatRoleService {
 
     private final AiChatRoleMapper aiChatRoleMapper;
-    private final AiChatModalService aiChatModalService;
+    private final AiChatModelService aiChatModalService;
 
     @Override
     public PageResult<AiChatRoleListRespVO> list(AiChatRoleListReqVO req) {
