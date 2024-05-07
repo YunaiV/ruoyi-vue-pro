@@ -53,7 +53,6 @@ public class CrmOperateLogController {
 
     @GetMapping("/page")
     @Operation(summary = "获得操作日志")
-    @PreAuthorize("@ss.hasPermission('crm:operate-log:query')")
     public CommonResult<PageResult<CrmOperateLogRespVO>> getCustomerOperateLog(@Valid CrmOperateLogPageReqVO pageReqVO) {
         OperateLogPageReqDTO reqDTO = new OperateLogPageReqDTO();
         reqDTO.setPageSize(PAGE_SIZE_NONE); // 默认不分页，需要分页需注释

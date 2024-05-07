@@ -93,12 +93,12 @@
           AND deleted = FALSE
     </select>
 
-    <select id="selectPaySummaryByStatusAndPayTimeBetween"
+    <select id="selectPaySummaryByPayStatusAndPayTimeBetween"
             resultType="cn.iocoder.yudao.module.statistics.controller.admin.trade.vo.TradeOrderSummaryRespVO">
         SELECT IFNULL(SUM(pay_price), 0) AS orderPayPrice,
                COUNT(1)                  AS orderPayCount
         FROM trade_order
-        WHERE status = #{status}
+        WHERE pay_status = #{payStatus}
           AND pay_time BETWEEN #{beginTime} AND #{endTime}
           AND deleted = FALSE
     </select>

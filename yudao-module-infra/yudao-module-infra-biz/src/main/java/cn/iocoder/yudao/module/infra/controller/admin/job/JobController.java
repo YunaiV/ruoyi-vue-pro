@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.infra.controller.admin.job;
 
-import cn.iocoder.yudao.framework.apilog.core.annotations.ApiAccessLog;
+import cn.iocoder.yudao.framework.apilog.core.annotation.ApiAccessLog;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
@@ -87,6 +87,14 @@ public class JobController {
     @PreAuthorize("@ss.hasPermission('infra:job:trigger')")
     public CommonResult<Boolean> triggerJob(@RequestParam("id") Long id) throws SchedulerException {
         jobService.triggerJob(id);
+        return success(true);
+    }
+
+    @PostMapping("/sync")
+    @Operation(summary = "同步定时任务")
+    @PreAuthorize("@ss.hasPermission('infra:job:create')")
+    public CommonResult<Boolean> syncJob() throws SchedulerException {
+        jobService.syncJob();
         return success(true);
     }
 

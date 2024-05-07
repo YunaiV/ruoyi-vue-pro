@@ -127,10 +127,6 @@
             <groupId>cn.hutool</groupId>
             <artifactId>hutool-all</artifactId>
         </dependency>
-        <dependency>
-            <groupId>org.dromara.hutool</groupId>
-            <artifactId>hutool-all</artifactId>
-        </dependency>
 
         <dependency>
             <groupId>com.alibaba</groupId>

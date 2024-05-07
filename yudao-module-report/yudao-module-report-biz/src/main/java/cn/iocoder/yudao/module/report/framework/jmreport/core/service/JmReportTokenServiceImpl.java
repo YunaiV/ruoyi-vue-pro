@@ -11,12 +11,13 @@ import cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder;
 import cn.iocoder.yudao.framework.web.core.util.WebFrameworkUtils;
 import cn.iocoder.yudao.module.system.api.oauth2.OAuth2TokenApi;
 import cn.iocoder.yudao.module.system.api.oauth2.dto.OAuth2AccessTokenCheckRespDTO;
-import cn.iocoder.yudao.module.system.api.permission.RoleApi;
+import cn.iocoder.yudao.module.system.api.permission.PermissionApi;
+import cn.iocoder.yudao.module.system.enums.permission.RoleCodeEnum;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.jeecg.modules.jmreport.api.JmReportTokenServiceI;
 import org.springframework.http.HttpHeaders;
 
-import jakarta.servlet.http.HttpServletRequest;
 import java.util.Objects;
 
 /**
@@ -37,6 +38,7 @@ public class JmReportTokenServiceImpl implements JmReportTokenServiceI {
     private static final String AUTHORIZATION_FORMAT = SecurityFrameworkUtils.AUTHORIZATION_BEARER + " %s";
 
     private final OAuth2TokenApi oauth2TokenApi;
+    private final PermissionApi permissionApi;
 
     private final SecurityProperties securityProperties;
 
@@ -130,9 +132,12 @@ public class JmReportTokenServiceImpl implements JmReportTokenServiceI {
     }
 
     @Override
-    public String[] getRoles(String s) {
-        // 暂时不用实现，因为不用 JmReport 的角色
-        return null;
+    public String[] getRoles(String token) {
+        // 参见文档 https://help.jeecg.com/jimureport/prodSafe.html 文档
+        // 适配：如果是本系统的管理员，则转换成 jimu 报表的管理员
+        Long userId = SecurityFrameworkUtils.getLoginUserId();
+        return permissionApi.hasAnyRoles(userId, RoleCodeEnum.SUPER_ADMIN.getCode())
+                ? new String[]{"admin"} : null;
     }
 
     @Override

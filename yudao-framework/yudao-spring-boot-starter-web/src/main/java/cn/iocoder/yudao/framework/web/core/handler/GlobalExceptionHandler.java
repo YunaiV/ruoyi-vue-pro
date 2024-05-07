@@ -6,11 +6,16 @@ import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.apilog.core.service.ApiErrorLogFrameworkService;
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
+import cn.iocoder.yudao.framework.common.util.collection.SetUtils;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.common.util.monitor.TracerUtils;
 import cn.iocoder.yudao.framework.common.util.servlet.ServletUtils;
 import cn.iocoder.yudao.framework.web.core.util.WebFrameworkUtils;
 import cn.iocoder.yudao.module.infra.api.logger.dto.ApiErrorLogCreateReqDTO;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.ConstraintViolationException;
+import jakarta.validation.ValidationException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -26,13 +31,9 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.NoHandlerFoundException;
 
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.validation.ConstraintViolation;
-import jakarta.validation.ConstraintViolationException;
-import jakarta.validation.ValidationException;
 import java.time.LocalDateTime;
 import java.util.Map;
-import java.util.Objects;
+import java.util.Set;
 
 import static cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants.*;
 
@@ -45,6 +46,11 @@ import static cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeC
 @AllArgsConstructor
 @Slf4j
 public class GlobalExceptionHandler {
+
+    /**
+     * 忽略的 ServiceException 错误提示，避免打印过多 logger
+     */
+    public static final Set<String> IGNORE_ERROR_MESSAGES = SetUtils.asSet("无效的刷新令牌");
 
     @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
     private final String applicationName;
@@ -182,14 +188,6 @@ public class GlobalExceptionHandler {
     }
 
     /**
-     * 处理 Resilience4j 限流抛出的异常
-     */
-    public CommonResult<?> requestNotPermittedExceptionHandler(HttpServletRequest req, Throwable ex) {
-        log.warn("[requestNotPermittedExceptionHandler][url({}) 访问过于频繁]", req.getRequestURL(), ex);
-        return CommonResult.error(TOO_MANY_REQUESTS);
-    }
-
-    /**
      * 处理 Spring Security 权限不足的异常
      *
      * 来源是，使用 @PreAuthorize 注解，AOP 进行权限拦截
@@ -208,7 +206,10 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(value = ServiceException.class)
     public CommonResult<?> serviceExceptionHandler(ServiceException ex) {
-        log.info("[serviceExceptionHandler]", ex);
+        if (!IGNORE_ERROR_MESSAGES.contains(ex.getMessage())) {
+            // 不包含的时候，才进行打印，避免 ex 堆栈过多
+            log.info("[serviceExceptionHandler]", ex);
+        }
         return CommonResult.error(ex.getCode(), ex.getMessage());
     }
 
@@ -223,12 +224,7 @@ public class GlobalExceptionHandler {
             return tableNotExistsResult;
         }
 
-        // 情况二：部分特殊的库的处理
-        if (Objects.equals("io.github.resilience4j.ratelimiter.RequestNotPermitted", ex.getClass().getName())) {
-            return requestNotPermittedExceptionHandler(req, ex);
-        }
-
-        // 情况三：处理异常
+        // 情况二：处理异常
         log.error("[defaultExceptionHandler]", ex);
         // 插入异常日志
         this.createExceptionLog(req, ex);

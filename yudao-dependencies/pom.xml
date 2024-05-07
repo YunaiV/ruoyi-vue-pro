@@ -14,7 +14,7 @@
     <url>https://github.com/YunaiV/ruoyi-vue-pro</url>
 
     <properties>
-        <revision>2.0.1-snapshot</revision>
+        <revision>2.1.0-snapshot</revision>
         <flatten-maven-plugin.version>1.5.0</flatten-maven-plugin.version>
         <!-- 统一依赖管理 -->
         <spring.boot.version>3.2.2</spring.boot.version>
@@ -34,7 +34,6 @@
         <rocketmq-spring.version>2.3.0</rocketmq-spring.version>
         <!-- 服务保障相关 -->
         <lock4j.version>2.2.7</lock4j.version>
-        <resilience4j.version>2.1.0</resilience4j.version>
         <!-- 监控相关 -->
         <skywalking.version>9.0.0</skywalking.version>
         <spring-boot-admin.version>3.2.1</spring-boot-admin.version>
@@ -282,17 +281,6 @@
                 </exclusions>
             </dependency>
 
-            <dependency>
-                <groupId>io.github.resilience4j</groupId>
-                <artifactId>resilience4j-ratelimiter</artifactId>
-                <version>${resilience4j.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>io.github.resilience4j</groupId>
-                <artifactId>resilience4j-spring-boot2</artifactId>
-                <version>${resilience4j.version}</version>
-            </dependency>
-
             <!-- 监控相关 -->
             <dependency>
                 <groupId>cn.iocoder.boot</groupId>
@@ -455,7 +443,7 @@
             </dependency>
             <dependency>
                 <groupId>org.dromara.hutool</groupId>
-                <artifactId>hutool-all</artifactId>
+                <artifactId>hutool-extra</artifactId>
                 <version>${hutool-6.version}</version>
             </dependency>
 
@@ -485,22 +473,6 @@
                 <groupId>com.alibaba</groupId>
                 <artifactId>fastjson</artifactId>
                 <version>${fastjson.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>cn.smallbun.screw</groupId>
-                <artifactId>screw-core</artifactId> <!-- 实现数据库文档 -->
-                <version>${screw.version}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>org.freemarker</groupId>
-                        <artifactId>freemarker</artifactId> <!-- 移除 Freemarker 依赖，采用 Velocity 作为模板引擎 -->
-                    </exclusion>
-                    <exclusion>
-                        <groupId>com.alibaba</groupId>
-                        <artifactId>fastjson</artifactId> <!-- 最新版screw-core1.0.5依赖fastjson1.2.73存在漏洞，移除。 -->
-                    </exclusion>
-                </exclusions>
             </dependency>
 
             <dependency>
