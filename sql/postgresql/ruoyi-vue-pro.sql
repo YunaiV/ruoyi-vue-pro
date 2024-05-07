@@ -5,7 +5,7 @@
 
  Target Server Type    : PostgreSQL
 
- Date: 2024-05-03 23:36:19
+ Date: 2024-05-08 00:11:06
 */
 
 
@@ -15,8 +15,17 @@
 DROP TABLE IF EXISTS dual;
 CREATE TABLE dual
 (
+    id int2
 );
 
+COMMENT ON TABLE dual IS '数据库连接的表';
+
+-- ----------------------------
+-- Records of dual
+-- ----------------------------
+-- @formatter:off
+INSERT INTO dual VALUES (1);
+-- @formatter:on
 
 -- ----------------------------
 -- Table structure for infra_api_access_log

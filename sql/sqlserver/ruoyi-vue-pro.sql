@@ -5,7 +5,7 @@
 
  Target Server Type    : Microsoft SQL Server
 
- Date: 2024-05-03 23:36:38
+ Date: 2024-05-08 00:22:09
 */
 
 
@@ -17,7 +17,7 @@ GO
 
 CREATE TABLE dual
 (
-    id int NULL
+    id int
 )
 GO
 
@@ -27,6 +27,13 @@ EXEC sp_addextendedproperty
      'TABLE', N'dual'
 GO
 
+-- ----------------------------
+-- Records of dual
+-- ----------------------------
+-- @formatter:off
+INSERT INTO dual VALUES (1)
+GO
+-- @formatter:on
 
 -- ----------------------------
 -- Table structure for infra_api_access_log
