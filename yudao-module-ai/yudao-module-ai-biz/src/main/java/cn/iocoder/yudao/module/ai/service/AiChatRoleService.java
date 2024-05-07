@@ -26,24 +26,22 @@ public interface AiChatRoleService {
      * @param req
      * @return
      */
-    void add(AiChatRoleAddReq req);
+    void add(AiChatRoleAddReqVO req);
 
     /**
      * chat角色 - 修改
      *
-     * @param id
      * @param req
      */
-    void update(Long id, AiChatRoleUpdateReq req);
+    void update(AiChatRoleUpdateReqVO req);
 
 
     /**
      * chat角色 - 修改可见性
      *
-     * @param id
      * @param req
      */
-    void updateEnable(Long id, AiChatRoleUpdateVisibilityReq req);
+    void updatePublicStatus(AiChatRoleUpdatePublicStatusReqVO req);
 
     /**
      * chat角色 - 删除

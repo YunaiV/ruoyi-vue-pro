@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.ai.service.impl;
 
 import cn.hutool.core.util.StrUtil;
+import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
@@ -9,9 +10,9 @@ import cn.iocoder.yudao.module.ai.ErrorCodeConstants;
 import cn.iocoder.yudao.module.ai.controller.admin.model.vo.role.*;
 import cn.iocoder.yudao.module.ai.convert.AiChatRoleConvert;
 import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiChatRoleDO;
-import cn.iocoder.yudao.module.ai.enums.AiChatRoleClassifyEnum;
-import cn.iocoder.yudao.module.ai.enums.AiChatRoleEnableEnum;
 import cn.iocoder.yudao.module.ai.dal.mysql.AiChatRoleMapper;
+import cn.iocoder.yudao.module.ai.enums.AiChatRoleCategoryEnum;
+import cn.iocoder.yudao.module.ai.service.AiChatModalService;
 import cn.iocoder.yudao.module.ai.service.AiChatRoleService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,6 +32,7 @@ import java.util.List;
 public class AiChatRoleServiceImpl implements AiChatRoleService {
 
     private final AiChatRoleMapper aiChatRoleMapper;
+    private final AiChatModalService aiChatModalService;
 
     @Override
     public PageResult<AiChatRoleListRes> list(AiChatRoleListReq req) {
@@ -52,42 +54,43 @@ public class AiChatRoleServiceImpl implements AiChatRoleService {
     }
 
     @Override
-    public void add(AiChatRoleAddReq req) {
+    public void add(AiChatRoleAddReqVO req) {
         // 转换enum，并校验enum
-        AiChatRoleClassifyEnum.valueOfClassify(req.getClassify());
-        AiChatRoleEnableEnum.valueOfType(req.getEnable());
+        AiChatRoleCategoryEnum.valueOfCategory(req.getCategory());
+        // 校验模型是否存在
+        aiChatModalService.validateExists(req.getModelId());
         // 转换do
         AiChatRoleDO insertAiChatRoleDO = AiChatRoleConvert.INSTANCE.convertAiChatRoleDO(req);
         insertAiChatRoleDO.setUserId(SecurityFrameworkUtils.getLoginUserId());
-        insertAiChatRoleDO.setUseCount(0);
+        insertAiChatRoleDO.setStatus(CommonStatusEnum.ENABLE.getStatus());
         // 保存
         aiChatRoleMapper.insert(insertAiChatRoleDO);
     }
 
     @Override
-    public void update(Long id, AiChatRoleUpdateReq req) {
-        // 转换enum，并校验enum
-        AiChatRoleClassifyEnum.valueOfClassify(req.getClassify());
-        AiChatRoleEnableEnum.valueOfType(req.getEnable());
+    public void update(AiChatRoleUpdateReqVO req) {
         // 检查角色是否存在
-        validateExists(id);
+        validateExists(req.getId());
+        // 转换enum，并校验enum
+        AiChatRoleCategoryEnum.valueOfCategory(req.getCategory());
+        // 校验模型是否存在
+        aiChatModalService.validateExists(req.getModelId());
         // 转换do
         AiChatRoleDO updateChatRole = AiChatRoleConvert.INSTANCE.convertAiChatRoleDO(req);
-        updateChatRole.setId(id);
+        updateChatRole.setId(req.getId());
         aiChatRoleMapper.updateById(updateChatRole);
     }
 
 
     @Override
-    public void updateEnable(Long id, AiChatRoleUpdateVisibilityReq req) {
-        // 转换enum，并校验enum
-        AiChatRoleEnableEnum.valueOfType(req.getEnable());
+    public void updatePublicStatus(AiChatRoleUpdatePublicStatusReqVO req) {
         // 检查角色是否存在
-        validateExists(id);
+        validateExists(req.getId());
         // 更新
-        aiChatRoleMapper.updateById(new AiChatRoleDO()
-                .setId(id)
-                .setEnable(req.getEnable())
+        aiChatRoleMapper.updateById(
+                new AiChatRoleDO()
+                        .setId(req.getId())
+                        .setPublicStatus(req.getPublicStatus())
         );
     }
 

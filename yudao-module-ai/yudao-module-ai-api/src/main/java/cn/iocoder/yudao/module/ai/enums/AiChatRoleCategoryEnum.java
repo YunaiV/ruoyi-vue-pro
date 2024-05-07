@@ -12,7 +12,7 @@ import lombok.Getter;
  */
 @AllArgsConstructor
 @Getter
-public enum AiChatRoleClassifyEnum {
+public enum AiChatRoleCategoryEnum {
 
     WRITING("writing", "写作"),
 
@@ -21,17 +21,17 @@ public enum AiChatRoleClassifyEnum {
     ;
 
 
-    private String classify;
+    private String category;
 
     private String name;
 
 
-    public static AiChatRoleClassifyEnum valueOfClassify(String classify) {
-        for (AiChatRoleClassifyEnum itemEnum : AiChatRoleClassifyEnum.values()) {
-            if (itemEnum.getClassify().equals(classify)) {
+    public static AiChatRoleCategoryEnum valueOfCategory(String category) {
+        for (AiChatRoleCategoryEnum itemEnum : AiChatRoleCategoryEnum.values()) {
+            if (itemEnum.getCategory().equals(category)) {
                 return itemEnum;
             }
         }
-        throw new IllegalArgumentException("Invalid MessageType value: " + classify);
+        throw new IllegalArgumentException("Invalid MessageType value: " + category);
     }
 }

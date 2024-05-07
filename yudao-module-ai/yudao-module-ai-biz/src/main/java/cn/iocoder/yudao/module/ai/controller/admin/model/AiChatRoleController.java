@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.*;
  */
 @Tag(name = "A4-chat角色")
 @RestController
-@RequestMapping("/ai/chat")
+@RequestMapping("/ai/chat/role")
 @Slf4j
 @AllArgsConstructor
 public class AiChatRoleController {
@@ -28,37 +28,35 @@ public class AiChatRoleController {
     private final AiChatRoleService chatRoleService;
 
     @Operation(summary = "chat角色 - 角色列表")
-    @GetMapping("/role/list")
+    @GetMapping("/list")
     public PageResult<AiChatRoleListRes> list(@Validated @ModelAttribute AiChatRoleListReq req) {
         return chatRoleService.list(req);
     }
 
     @Operation(summary = "chat角色 - 添加")
-    @PutMapping("/role")
-    public CommonResult<Void> add(@Validated @RequestBody AiChatRoleAddReq req) {
+    @PutMapping("/add")
+    public CommonResult<Void> add(@Validated @RequestBody AiChatRoleAddReqVO req) {
         chatRoleService.add(req);
         return CommonResult.success(null);
     }
 
     @Operation(summary = "chat角色 - 修改")
-    @PostMapping("/role/{id}")
-    public CommonResult<Void> update(@PathVariable("id") Long id,
-                                     @Validated @RequestBody AiChatRoleUpdateReq req) {
-        chatRoleService.update(id, req);
+    @PostMapping("/update")
+    public CommonResult<Void> update(@Validated @RequestBody AiChatRoleUpdateReqVO req) {
+        chatRoleService.update(req);
         return CommonResult.success(null);
     }
 
     @Operation(summary = "chat角色 - 修改可见性")
-    @PostMapping("/role/{id}/update-enable")
-    public CommonResult<Void> updateEnable(@PathVariable("id") Long id,
-                                           @Validated @RequestBody AiChatRoleUpdateVisibilityReq req) {
-        chatRoleService.updateEnable(id, req);
+    @PostMapping("/update-public-status")
+    public CommonResult<Void> updatePublicStatus(@Validated @RequestBody AiChatRoleUpdatePublicStatusReqVO req) {
+        chatRoleService.updatePublicStatus(req);
         return CommonResult.success(null);
     }
 
     @Operation(summary = "chat角色 - 删除")
-    @DeleteMapping("/role/{id}")
-    public CommonResult<Void> delete(@PathVariable("id") Long id) {
+    @DeleteMapping("/delete")
+    public CommonResult<Void> delete(@RequestParam("id") Long id) {
         chatRoleService.delete(id);
         return CommonResult.success(null);
     }

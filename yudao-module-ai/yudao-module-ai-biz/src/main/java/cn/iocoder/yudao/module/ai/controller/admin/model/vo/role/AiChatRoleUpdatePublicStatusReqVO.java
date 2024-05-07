@@ -14,9 +14,14 @@ import lombok.experimental.Accessors;
  */
 @Data
 @Accessors(chain = true)
-public class AiChatRoleUpdateVisibilityReq extends PageParam {
+public class AiChatRoleUpdatePublicStatusReqVO extends PageParam {
 
-    @NotNull
+
+    @NotNull(message = "角色编号不能为空")
+    @Schema(description = "角色编号")
+    private Long id;
+
+    @NotNull(message = "开启状态不能为空")
     @Schema(description = "开启状态 open、close")
-    private String enable;
+    private Boolean publicStatus;
 }
