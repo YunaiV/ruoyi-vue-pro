@@ -58,7 +58,7 @@ public class AiChatServiceImpl implements AiChatService {
         // 获取 client 类型
         AiPlatformEnum platformEnum = AiPlatformEnum.valueOfPlatform(req.getModal());
         // 获取对话信息
-        AiChatConversationRespVO conversationRes = chatConversationService.getConversation(req.getConversationId());
+        AiChatConversationRespVO conversationRes = chatConversationService.getConversationOfValidate(req.getConversationId());
         // 保存 chat message
         saveChatMessage(req, conversationRes, loginUserId);
         String content = null;
@@ -133,7 +133,7 @@ public class AiChatServiceImpl implements AiChatService {
         // 获取 client 类型
         AiPlatformEnum platformEnum = AiPlatformEnum.valueOfPlatform(req.getModal());
         // 获取对话信息
-        AiChatConversationRespVO conversationRes = chatConversationService.getConversation(req.getConversationId());
+        AiChatConversationRespVO conversationRes = chatConversationService.getConversationOfValidate(req.getConversationId());
         // 创建 chat 需要的 Prompt
         Prompt prompt = new Prompt(req.getPrompt());
         req.setTopK(req.getTopK());

@@ -51,5 +51,5 @@ public interface AiChatModalService {
      * @param modalId
      * @return
      */
-    AiChatModalRes getChatModal(Long modalId);
+    AiChatModalRes getChatModalOfValidate(Long modalId);
 }

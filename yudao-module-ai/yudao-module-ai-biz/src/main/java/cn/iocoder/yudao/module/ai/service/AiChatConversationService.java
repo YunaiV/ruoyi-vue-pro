@@ -1,7 +1,9 @@
 package cn.iocoder.yudao.module.ai.service;
 
 import cn.iocoder.yudao.module.ai.controller.admin.chat.vo.conversation.AiChatConversationCreateReqVO;
+import cn.iocoder.yudao.module.ai.controller.admin.chat.vo.conversation.AiChatConversationListReqVO;
 import cn.iocoder.yudao.module.ai.controller.admin.chat.vo.conversation.AiChatConversationRespVO;
+import cn.iocoder.yudao.module.ai.controller.admin.chat.vo.conversation.AiChatConversationUpdateReqVO;
 
 import java.util.List;
 
@@ -14,29 +16,20 @@ import java.util.List;
 public interface AiChatConversationService {
 
     /**
-     * 对话 - 创建普通对话
+     * 对话 - 创建对话
      *
      * @param req
      * @return
      */
-    AiChatConversationRespVO createConversation(AiChatConversationCreateUserReq req);
+    Long createConversation(AiChatConversationCreateReqVO req);
 
     /**
-     * 对话 - 创建role对话
+     * 对话 - 更新对话
      *
-     * @param req
+     * @param updateReqVO
      * @return
      */
-    AiChatConversationRespVO createRoleConversation(AiChatConversationCreateReqVO req);
-
-
-    /**
-     * 获取 - 对话
-     *
-     * @param id
-     * @return
-     */
-    AiChatConversationRespVO getConversation(Long id);
+    Boolean updateConversation(AiChatConversationUpdateReqVO updateReqVO);
 
     /**
      * 获取 - 对话列表
@@ -44,22 +37,21 @@ public interface AiChatConversationService {
      * @param req
      * @return
      */
-    List<AiChatConversationRespVO> listConversation(AiChatConversationListReq req);
+    List<AiChatConversationRespVO> listConversation(AiChatConversationListReqVO req);
 
     /**
-     * 更新 - 更新模型
+     * 获取 - 对话
      *
      * @param id
-     * @param modalId
      * @return
      */
-    void updateModal(Long id, Long modalId);
+    AiChatConversationRespVO getConversationOfValidate(Long id);
 
     /**
      * 删除 - 根据id
      *
      * @param id
      */
-    void delete(Long id);
+    Boolean deleteConversation(Long id);
 
 }

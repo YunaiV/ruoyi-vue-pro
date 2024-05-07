@@ -12,6 +12,7 @@ import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.module.ai.ErrorCodeConstants;
 import cn.iocoder.yudao.module.ai.convert.AiChatModalConvert;
+import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiChatModalDO;
 import cn.iocoder.yudao.module.ai.dal.vo.AiChatModalChatConfigVO;
 import cn.iocoder.yudao.module.ai.dal.vo.AiChatModalConfigVO;
 import cn.iocoder.yudao.module.ai.dal.vo.AiChatModalDallConfigVO;
@@ -109,7 +110,7 @@ public class AiChatModalServiceImpl implements AiChatModalService {
     }
 
     @Override
-    public AiChatModalRes getChatModal(Long modalId) {
+    public AiChatModalRes getChatModalOfValidate(Long modalId) {
         // 检查 modal 是否存在
         AiChatModalDO aiChatModalDO = validateChatModalExists(modalId);
         return AiChatModalConvert.INSTANCE.convertAiChatModalRes(aiChatModalDO);
