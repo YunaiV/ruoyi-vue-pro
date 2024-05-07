@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.ai.controller.admin.image.vo;
 
-import io.swagger.v3.oas.annotations.media.Schema;
+import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
@@ -13,9 +13,6 @@ import lombok.experimental.Accessors;
  */
 @Data
 @Accessors(chain = true)
-public class AiImageMidjourneyReq {
-
-    @Schema(description = "提示词")
-    private String prompt;
+public class AiImageMidjourneyListRespVO extends PageParam {
 
 }

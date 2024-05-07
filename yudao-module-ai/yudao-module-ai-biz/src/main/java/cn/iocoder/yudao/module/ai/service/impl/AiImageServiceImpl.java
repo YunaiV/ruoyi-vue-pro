@@ -16,7 +16,7 @@ import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
 import cn.iocoder.yudao.module.ai.ErrorCodeConstants;
 import cn.iocoder.yudao.module.ai.controller.admin.image.vo.AiImageDallDrawingReqVO;
 import cn.iocoder.yudao.module.ai.controller.admin.image.vo.AiImageDallDrawingRespVO;
-import cn.iocoder.yudao.module.ai.controller.admin.image.vo.AiImageMidjourneyReq;
+import cn.iocoder.yudao.module.ai.controller.admin.image.vo.AiImageMidjourneyReqVO;
 import cn.iocoder.yudao.module.ai.convert.AiImageConvert;
 import cn.iocoder.yudao.module.ai.dal.dataobject.image.AiImageDO;
 import cn.iocoder.yudao.module.ai.dal.mysql.AiImageMapper;
@@ -96,7 +96,7 @@ public class AiImageServiceImpl implements AiImageService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void midjourney(AiImageMidjourneyReq req) {
+    public void midjourney(AiImageMidjourneyReqVO req) {
         // 保存数据库
         AiImageDO aiImageDO = doSave(req.getPrompt(), null, "midjoureny",
                 null, AiChatDrawingStatusEnum.SUBMIT, null);
