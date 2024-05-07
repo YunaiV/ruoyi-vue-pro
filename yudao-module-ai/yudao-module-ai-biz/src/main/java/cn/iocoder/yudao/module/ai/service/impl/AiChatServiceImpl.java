@@ -72,10 +72,10 @@ public class AiChatServiceImpl implements AiChatService {
         // 校验角色是否公开
         aiChatRoleService.validateIsPublic(aiChatRoleDO);
         // 获取 client 类型
-        AiPlatformEnum platformEnum = AiPlatformEnum.valueOfPlatform(chatModal.getModal());
+        AiPlatformEnum platformEnum = AiPlatformEnum.valueOfPlatform(chatModal.getModel());
         // 保存 chat message
         insertChatMessage(conversation.getId(), MessageType.USER, loginUserId, conversation.getRoleId(),
-                chatModal.getModal(), chatModal.getId(), req.getContent(),
+                chatModal.getModel(), chatModal.getId(), req.getContent(),
                 null, conversation.getTemperature(), conversation.getMaxTokens(), conversation.getMaxContexts());
         String content = null;
         try {
@@ -96,7 +96,7 @@ public class AiChatServiceImpl implements AiChatService {
         } finally {
             // 保存 chat message
             insertChatMessage(conversation.getId(), MessageType.SYSTEM, loginUserId, conversation.getRoleId(),
-                    chatModal.getModal(), chatModal.getId(), req.getContent(),
+                    chatModal.getModel(), chatModal.getId(), req.getContent(),
                     null, conversation.getTemperature(), conversation.getMaxTokens(), conversation.getMaxContexts());
         }
         return new AiChatMessageRespVO().setContent(content);
@@ -150,11 +150,11 @@ public class AiChatServiceImpl implements AiChatService {
         // 保存 chat message
         // 保存 chat message
         insertChatMessage(conversation.getId(), MessageType.USER, loginUserId, conversation.getRoleId(),
-                chatModal.getModal(), chatModal.getId(), req.getContent(),
+                chatModal.getModel(), chatModal.getId(), req.getContent(),
                 null, conversation.getTemperature(), conversation.getMaxTokens(), conversation.getMaxContexts());
 
         // 获取 client 类型
-        AiPlatformEnum platformEnum = AiPlatformEnum.valueOfPlatform(chatModal.getModal());
+        AiPlatformEnum platformEnum = AiPlatformEnum.valueOfPlatform(chatModal.getModel());
         StreamingChatClient streamingChatClient = aiChatClientFactory.getStreamingChatClient(platformEnum);
         Flux<ChatResponse> streamResponse = streamingChatClient.stream(prompt);
 
@@ -183,7 +183,7 @@ public class AiChatServiceImpl implements AiChatService {
                     sseEmitter.complete();
                     // 保存 chat message
                     insertChatMessage(conversation.getId(), MessageType.SYSTEM, loginUserId, conversation.getRoleId(),
-                            chatModal.getModal(), chatModal.getId(), req.getContent(),
+                            chatModal.getModel(), chatModal.getId(), req.getContent(),
                             null, conversation.getTemperature(), conversation.getMaxTokens(), conversation.getMaxContexts());
 
                 }

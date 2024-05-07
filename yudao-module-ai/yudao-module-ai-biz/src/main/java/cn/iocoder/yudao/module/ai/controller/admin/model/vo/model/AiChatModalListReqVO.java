@@ -14,7 +14,7 @@ import lombok.experimental.Accessors;
  */
 @Data
 @Accessors(chain = true)
-public class AiChatModalListReq extends PageParam {
+public class AiChatModalListReqVO extends PageParam {
 
     @Schema(description = "名字搜搜")
     private String search;
