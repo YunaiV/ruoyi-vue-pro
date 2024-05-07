@@ -21,7 +21,7 @@ import cn.iocoder.yudao.module.ai.dal.mysql.AiChatConversationMapper;
 import cn.iocoder.yudao.module.ai.dal.mysql.AiChatMessageMapper;
 import cn.iocoder.yudao.module.ai.dal.mysql.AiChatRoleMapper;
 import cn.iocoder.yudao.module.ai.service.AiChatConversationService;
-import cn.iocoder.yudao.module.ai.service.AiChatModalService;
+import cn.iocoder.yudao.module.ai.service.AiChatModelService;
 import cn.iocoder.yudao.module.ai.service.AiChatRoleService;
 import cn.iocoder.yudao.module.ai.service.AiChatService;
 import lombok.AllArgsConstructor;
@@ -52,7 +52,7 @@ public class AiChatServiceImpl implements AiChatService {
     private final AiChatMessageMapper aiChatMessageMapper;
     private final AiChatConversationMapper aiChatConversationMapper;
     private final AiChatConversationService chatConversationService;
-    private final AiChatModalService aiChatModalService;
+    private final AiChatModelService aiChatModalService;
     private final AiChatRoleService aiChatRoleService;
 
     @Transactional(rollbackFor = Exception.class)
