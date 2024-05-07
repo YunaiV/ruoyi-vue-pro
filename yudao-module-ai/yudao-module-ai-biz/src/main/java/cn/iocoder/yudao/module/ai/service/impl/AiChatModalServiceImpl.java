@@ -8,10 +8,7 @@ import cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.module.ai.ErrorCodeConstants;
-import cn.iocoder.yudao.module.ai.controller.admin.model.vo.model.AiChatModelAddReqVO;
-import cn.iocoder.yudao.module.ai.controller.admin.model.vo.model.AiChatModelListReqVO;
-import cn.iocoder.yudao.module.ai.controller.admin.model.vo.model.AiChatModelListRespVO;
-import cn.iocoder.yudao.module.ai.controller.admin.model.vo.model.AiChatModalRespVO;
+import cn.iocoder.yudao.module.ai.controller.admin.model.vo.model.*;
 import cn.iocoder.yudao.module.ai.convert.AiChatModelConvert;
 import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiChatModelDO;
 import cn.iocoder.yudao.module.ai.dal.mysql.AiChatModelMapper;
@@ -70,14 +67,14 @@ public class AiChatModalServiceImpl implements AiChatModelService {
     }
 
     @Override
-    public void update(Long id, AiChatModelAddReqVO req) {
+    public void update(AiChatModelUpdateReqVO req) {
         // 校验 platform
         validatePlatform(req.getPlatform());
         // 校验模型是否存在
-        validateExists(id);
+        validateExists(req.getId());
         // 转换 updateChatModalDO
         AiChatModelDO updateChatModalDO = AiChatModelConvert.INSTANCE.convertAiChatModalDO(req);
-        updateChatModalDO.setId(id);
+        updateChatModalDO.setId(req.getId());
         // 更新数据库
         aiChatModelMapper.updateById(updateChatModalDO);
     }

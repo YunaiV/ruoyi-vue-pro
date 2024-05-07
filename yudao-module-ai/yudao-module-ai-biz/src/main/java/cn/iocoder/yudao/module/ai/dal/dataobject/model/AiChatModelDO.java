@@ -75,6 +75,6 @@ public class AiChatModelDO extends BaseDO {
     /**
      * 上下文的最大 Message 数量
      */
-    private Integer i;
+    private Integer maxContexts;
 
 }

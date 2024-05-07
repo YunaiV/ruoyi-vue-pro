@@ -5,6 +5,7 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.ai.controller.admin.model.vo.model.AiChatModelAddReqVO;
 import cn.iocoder.yudao.module.ai.controller.admin.model.vo.model.AiChatModelListReqVO;
 import cn.iocoder.yudao.module.ai.controller.admin.model.vo.model.AiChatModelListRespVO;
+import cn.iocoder.yudao.module.ai.controller.admin.model.vo.model.AiChatModelUpdateReqVO;
 import cn.iocoder.yudao.module.ai.service.AiChatModelService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -46,9 +47,8 @@ public class AiChatModelController {
 
     @Operation(summary = "ai模型 - 修改")
     @PostMapping("/update")
-    public CommonResult<Void> update(@RequestParam("id") Long id,
-                                     @RequestBody @Validated AiChatModelAddReqVO req) {
-        aiChatModelService.update(id, req);
+    public CommonResult<Void> update(@RequestBody @Validated AiChatModelUpdateReqVO req) {
+        aiChatModelService.update(req);
         return CommonResult.success(null);
     }
 

@@ -1,5 +1,9 @@
 package cn.iocoder.yudao.module.ai.controller.admin.model.vo.model;
 
+import cn.iocoder.yudao.framework.ai.AiPlatformEnum;
+import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
+import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiApiKeyDO;
+import com.baomidou.mybatisplus.annotation.TableId;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.experimental.Accessors;
@@ -15,27 +19,36 @@ import lombok.experimental.Accessors;
 @Accessors(chain = true)
 public class AiChatModelListRespVO {
 
-    @Schema(description = "id")
+    @Schema(description = "编号")
     private Long id;
 
-    @Schema(description = "模型平台 参考 AiPlatformEnum")
-    private String platform;
+    @Schema(description = "API 秘钥编号")
+    private Long keyId;
 
-    @Schema(description = "模型类型 参考 YiYanChatModel、XingHuoChatModel")
-    private String modal;
-
-    @Schema(description = "模型名字")
+    @Schema(description = "模型名称")
     private String name;
 
-    @Schema(description = "模型照片")
-    private String image;
+    @Schema(description = "模型标志")
+    private String model;
 
-    @Schema(description = "禁用 0、正常 1、禁用")
-    private Integer disable;
+    @Schema(description = "平台")
+    private String platform;
 
-    @Schema(description = "排序 asc 排序")
+    @Schema(description = "排序值")
     private Integer sort;
 
-    @Schema(description = "modal 配置")
-    private String config;
+    @Schema(description = "状态")
+    private Integer status;
+
+    // ========== 会话配置 ==========
+
+    @Schema(description = "温度参数")
+    private Double temperature;
+
+    @Schema(description = "单条回复的最大 Token 数量")
+    private Integer maxTokens;
+
+    @Schema(description = "上下文的最大 Message 数量")
+    private Integer maxContexts;
+
 }

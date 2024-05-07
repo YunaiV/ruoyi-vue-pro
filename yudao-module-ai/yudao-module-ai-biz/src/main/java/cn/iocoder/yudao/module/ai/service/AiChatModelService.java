@@ -1,10 +1,7 @@
 package cn.iocoder.yudao.module.ai.service;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.ai.controller.admin.model.vo.model.AiChatModelAddReqVO;
-import cn.iocoder.yudao.module.ai.controller.admin.model.vo.model.AiChatModelListReqVO;
-import cn.iocoder.yudao.module.ai.controller.admin.model.vo.model.AiChatModelListRespVO;
-import cn.iocoder.yudao.module.ai.controller.admin.model.vo.model.AiChatModalRespVO;
+import cn.iocoder.yudao.module.ai.controller.admin.model.vo.model.*;
 import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiChatModelDO;
 
 /**
@@ -34,10 +31,9 @@ public interface AiChatModelService {
     /**
      * ai modal - 更新
      *
-     * @param id
      * @param req
      */
-    void update(Long id, AiChatModelAddReqVO req);
+    void update(AiChatModelUpdateReqVO req);
 
     /**
      * ai modal - 删除
