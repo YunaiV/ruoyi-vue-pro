@@ -18,7 +18,7 @@ public interface AiChatRoleService {
      * @param req
      * @return
      */
-    PageResult<AiChatRoleListRes> list(AiChatRoleListReq req);
+    PageResult<AiChatRoleListRespVO> list(AiChatRoleListReqVO req);
 
     /**
      * chat角色 - 添加
@@ -56,7 +56,7 @@ public interface AiChatRoleService {
      * @param roleId
      * @return
      */
-    AiChatRoleRes getChatRole(Long roleId);
+    AiChatRoleRespVO getChatRole(Long roleId);
 
     /**
      * 校验 - 角色是否存在

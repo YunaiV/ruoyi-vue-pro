@@ -35,7 +35,7 @@ public class AiChatRoleServiceImpl implements AiChatRoleService {
     private final AiChatModalService aiChatModalService;
 
     @Override
-    public PageResult<AiChatRoleListRes> list(AiChatRoleListReq req) {
+    public PageResult<AiChatRoleListRespVO> list(AiChatRoleListReqVO req) {
         // 查询条件
         LambdaQueryWrapperX<AiChatRoleDO> queryWrapperX = new LambdaQueryWrapperX<>();
         // search 查询
@@ -49,7 +49,7 @@ public class AiChatRoleServiceImpl implements AiChatRoleService {
         Long total = aiChatRoleDOPageResult.getTotal();
         List<AiChatRoleDO> roleList = aiChatRoleDOPageResult.getList();
         // 换货res
-        List<AiChatRoleListRes> chatRoleListResList = AiChatRoleConvert.INSTANCE.convertChatRoleListRes(roleList);
+        List<AiChatRoleListRespVO> chatRoleListResList = AiChatRoleConvert.INSTANCE.convertChatRoleListRes(roleList);
         return new PageResult<>(chatRoleListResList, total);
     }
 
@@ -103,7 +103,7 @@ public class AiChatRoleServiceImpl implements AiChatRoleService {
     }
 
     @Override
-    public AiChatRoleRes getChatRole(Long roleId) {
+    public AiChatRoleRespVO getChatRole(Long roleId) {
         // 检查角色是否存在
         AiChatRoleDO aiChatRoleDO = validateExists(roleId);
         return AiChatRoleConvert.INSTANCE.convertAiChatRoleRes(aiChatRoleDO);

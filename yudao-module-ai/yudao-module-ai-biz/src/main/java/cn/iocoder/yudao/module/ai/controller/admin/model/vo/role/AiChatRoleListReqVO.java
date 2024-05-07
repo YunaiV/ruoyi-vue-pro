@@ -13,7 +13,7 @@ import lombok.experimental.Accessors;
  */
 @Data
 @Accessors(chain = true)
-public class AiChatRoleListReq extends PageParam {
+public class AiChatRoleListReqVO extends PageParam {
 
     @Schema(description = "查询")
     private String search;

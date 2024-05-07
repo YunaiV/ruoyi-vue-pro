@@ -5,14 +5,14 @@ import lombok.Data;
 import lombok.experimental.Accessors;
 
 /**
- * chat 角色列表
+ * chat 角色
  *
  * @fansili
  * @since v1.0
  */
 @Data
 @Accessors(chain = true)
-public class AiChatRoleListRes {
+public class AiChatRoleRespVO {
 
     @Schema(description = "id")
     private Long id;

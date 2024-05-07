@@ -29,7 +29,7 @@ public class AiChatRoleController {
 
     @Operation(summary = "chat角色 - 角色列表")
     @GetMapping("/list")
-    public PageResult<AiChatRoleListRes> list(@Validated @ModelAttribute AiChatRoleListReq req) {
+    public PageResult<AiChatRoleListRespVO> list(@Validated @ModelAttribute AiChatRoleListReqVO req) {
         return chatRoleService.list(req);
     }
 

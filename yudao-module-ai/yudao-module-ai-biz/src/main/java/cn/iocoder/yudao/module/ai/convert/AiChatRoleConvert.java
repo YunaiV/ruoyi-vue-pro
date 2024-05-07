@@ -2,9 +2,9 @@ package cn.iocoder.yudao.module.ai.convert;
 
 import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiChatRoleDO;
 import cn.iocoder.yudao.module.ai.controller.admin.model.vo.role.AiChatRoleAddReqVO;
-import cn.iocoder.yudao.module.ai.controller.admin.model.vo.role.AiChatRoleRes;
+import cn.iocoder.yudao.module.ai.controller.admin.model.vo.role.AiChatRoleRespVO;
 import cn.iocoder.yudao.module.ai.controller.admin.model.vo.role.AiChatRoleUpdateReqVO;
-import cn.iocoder.yudao.module.ai.controller.admin.model.vo.role.AiChatRoleListRes;
+import cn.iocoder.yudao.module.ai.controller.admin.model.vo.role.AiChatRoleListRespVO;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
@@ -28,7 +28,7 @@ public interface AiChatRoleConvert {
      * @param roleList
      * @return
      */
-    List<AiChatRoleListRes> convertChatRoleListRes(List<AiChatRoleDO> roleList);
+    List<AiChatRoleListRespVO> convertChatRoleListRes(List<AiChatRoleDO> roleList);
 
     /**
      * 转换 - AiChatRoleDO
@@ -52,5 +52,5 @@ public interface AiChatRoleConvert {
      * @param aiChatRoleDO
      * @return
      */
-    AiChatRoleRes convertAiChatRoleRes(AiChatRoleDO aiChatRoleDO);
+    AiChatRoleRespVO convertAiChatRoleRes(AiChatRoleDO aiChatRoleDO);
 }

@@ -8,7 +8,7 @@ import cn.iocoder.yudao.module.ai.controller.admin.chat.vo.conversation.AiChatCo
 import cn.iocoder.yudao.module.ai.controller.admin.chat.vo.conversation.AiChatConversationRespVO;
 import cn.iocoder.yudao.module.ai.controller.admin.chat.vo.conversation.AiChatConversationUpdateReqVO;
 import cn.iocoder.yudao.module.ai.controller.admin.model.vo.model.AiChatModalRespVO;
-import cn.iocoder.yudao.module.ai.controller.admin.model.vo.role.AiChatRoleRes;
+import cn.iocoder.yudao.module.ai.controller.admin.model.vo.role.AiChatRoleRespVO;
 import cn.iocoder.yudao.module.ai.convert.AiChatConversationConvert;
 import cn.iocoder.yudao.module.ai.dal.dataobject.chat.AiChatConversationDO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiChatModalDO;
@@ -47,7 +47,7 @@ public class AiChatConversationServiceImpl implements AiChatConversationService 
         // 默认使用 sort 排序第一个模型
         AiChatModalDO aiChatModalDO = aiChatModalMapper.selectFirstModal();
         // 查询角色
-        AiChatRoleRes chatRoleRes = null;
+        AiChatRoleRespVO chatRoleRes = null;
         if (req.getRoleId() != null) {
             chatRoleRes = aiChatRoleService.getChatRole(req.getRoleId());
         }
