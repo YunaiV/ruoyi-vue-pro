@@ -8,15 +8,15 @@ import cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.module.ai.ErrorCodeConstants;
-import cn.iocoder.yudao.module.ai.controller.admin.model.vo.model.AiChatModalAddReqVO;
-import cn.iocoder.yudao.module.ai.controller.admin.model.vo.model.AiChatModalListReqVO;
-import cn.iocoder.yudao.module.ai.controller.admin.model.vo.model.AiChatModalListRespVO;
+import cn.iocoder.yudao.module.ai.controller.admin.model.vo.model.AiChatModelAddReqVO;
+import cn.iocoder.yudao.module.ai.controller.admin.model.vo.model.AiChatModelListReqVO;
+import cn.iocoder.yudao.module.ai.controller.admin.model.vo.model.AiChatModelListRespVO;
 import cn.iocoder.yudao.module.ai.controller.admin.model.vo.model.AiChatModalRespVO;
-import cn.iocoder.yudao.module.ai.convert.AiChatModalConvert;
-import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiChatModalDO;
-import cn.iocoder.yudao.module.ai.dal.mysql.AiChatModalMapper;
+import cn.iocoder.yudao.module.ai.convert.AiChatModelConvert;
+import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiChatModelDO;
+import cn.iocoder.yudao.module.ai.dal.mysql.AiChatModelMapper;
 import cn.iocoder.yudao.module.ai.dal.vo.AiChatModalConfigVO;
-import cn.iocoder.yudao.module.ai.service.AiChatModalService;
+import cn.iocoder.yudao.module.ai.service.AiChatModelService;
 import jakarta.validation.ConstraintViolation;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -35,51 +35,51 @@ import java.util.Set;
 @AllArgsConstructor
 @Service
 @Slf4j
-public class AiChatModalServiceImpl implements AiChatModalService {
+public class AiChatModalServiceImpl implements AiChatModelService {
 
-    private final AiChatModalMapper aiChatModalMapper;
+    private final AiChatModelMapper aiChatModelMapper;
 
     @Override
-    public PageResult<AiChatModalListRespVO> list(AiChatModalListReqVO req) {
-        LambdaQueryWrapperX<AiChatModalDO> queryWrapperX = new LambdaQueryWrapperX<>();
+    public PageResult<AiChatModelListRespVO> list(AiChatModelListReqVO req) {
+        LambdaQueryWrapperX<AiChatModelDO> queryWrapperX = new LambdaQueryWrapperX<>();
         // 查询的都是未禁用的模型
-        queryWrapperX.eq(AiChatModalDO::getStatus, CommonStatusEnum.ENABLE.getStatus());
+        queryWrapperX.eq(AiChatModelDO::getStatus, CommonStatusEnum.ENABLE.getStatus());
         // search
         if (!StrUtil.isBlank(req.getSearch())) {
-            queryWrapperX.like(AiChatModalDO::getName, req.getSearch().trim());
+            queryWrapperX.like(AiChatModelDO::getName, req.getSearch().trim());
         }
         // 默认排序
-        queryWrapperX.orderByAsc(AiChatModalDO::getSort);
+        queryWrapperX.orderByAsc(AiChatModelDO::getSort);
         // 查询
-        PageResult<AiChatModalDO> aiChatModalDOPageResult = aiChatModalMapper.selectPage(req, queryWrapperX);
+        PageResult<AiChatModelDO> aiChatModalDOPageResult = aiChatModelMapper.selectPage(req, queryWrapperX);
         // 转换 res
-        List<AiChatModalListRespVO> resList = AiChatModalConvert.INSTANCE.convertAiChatModalListRes(aiChatModalDOPageResult.getList());
+        List<AiChatModelListRespVO> resList = AiChatModelConvert.INSTANCE.convertAiChatModalListRes(aiChatModalDOPageResult.getList());
         return new PageResult<>(resList, aiChatModalDOPageResult.getTotal());
     }
 
     @Override
-    public void add(AiChatModalAddReqVO req) {
+    public void add(AiChatModelAddReqVO req) {
         // 校验 platform、type
         validatePlatform(req.getPlatform());
         // 转换 do
-        AiChatModalDO insertChatModalDO = AiChatModalConvert.INSTANCE.convertAiChatModalDO(req);
+        AiChatModelDO insertChatModalDO = AiChatModelConvert.INSTANCE.convertAiChatModalDO(req);
         // 设置默认属性
         insertChatModalDO.setStatus(CommonStatusEnum.ENABLE.getStatus());
         // 保存数据库
-        aiChatModalMapper.insert(insertChatModalDO);
+        aiChatModelMapper.insert(insertChatModalDO);
     }
 
     @Override
-    public void update(Long id, AiChatModalAddReqVO req) {
+    public void update(Long id, AiChatModelAddReqVO req) {
         // 校验 platform
         validatePlatform(req.getPlatform());
         // 校验模型是否存在
         validateExists(id);
         // 转换 updateChatModalDO
-        AiChatModalDO updateChatModalDO = AiChatModalConvert.INSTANCE.convertAiChatModalDO(req);
+        AiChatModelDO updateChatModalDO = AiChatModelConvert.INSTANCE.convertAiChatModalDO(req);
         updateChatModalDO.setId(id);
         // 更新数据库
-        aiChatModalMapper.updateById(updateChatModalDO);
+        aiChatModelMapper.updateById(updateChatModalDO);
     }
 
     @Override
@@ -87,14 +87,14 @@ public class AiChatModalServiceImpl implements AiChatModalService {
         // 检查 modal 是否存在
         validateExists(id);
         // 删除 delete
-        aiChatModalMapper.deleteById(id);
+        aiChatModelMapper.deleteById(id);
     }
 
     @Override
     public AiChatModalRespVO getChatModalOfValidate(Long modalId) {
         // 检查 modal 是否存在
-        AiChatModalDO aiChatModalDO = validateExists(modalId);
-        return AiChatModalConvert.INSTANCE.convertAiChatModalRes(aiChatModalDO);
+        AiChatModelDO aiChatModalDO = validateExists(modalId);
+        return AiChatModelConvert.INSTANCE.convertAiChatModalRes(aiChatModalDO);
     }
 
     @Override
@@ -105,8 +105,8 @@ public class AiChatModalServiceImpl implements AiChatModalService {
         }
     }
 
-    public AiChatModalDO validateExists(Long id) {
-        AiChatModalDO aiChatModalDO = aiChatModalMapper.selectById(id);
+    public AiChatModelDO validateExists(Long id) {
+        AiChatModelDO aiChatModalDO = aiChatModelMapper.selectById(id);
         if (aiChatModalDO == null) {
             throw ServiceExceptionUtil.exception(ErrorCodeConstants.AI_MODAL_NOT_EXIST);
         }

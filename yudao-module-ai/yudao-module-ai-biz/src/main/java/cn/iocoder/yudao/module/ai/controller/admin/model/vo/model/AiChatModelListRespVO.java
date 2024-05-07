@@ -13,7 +13,7 @@ import lombok.experimental.Accessors;
  */
 @Data
 @Accessors(chain = true)
-public class AiChatModalListRespVO {
+public class AiChatModelListRespVO {
 
     @Schema(description = "id")
     private Long id;

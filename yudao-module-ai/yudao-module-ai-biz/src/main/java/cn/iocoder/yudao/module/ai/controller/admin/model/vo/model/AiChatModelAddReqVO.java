@@ -15,10 +15,9 @@ import lombok.experimental.Accessors;
  */
 @Data
 @Accessors(chain = true)
-public class AiChatModalAddReqVO {
+public class AiChatModelAddReqVO {
 
     @Schema(description = "API 秘钥编号")
-    @Size(max = 32, message = "API 秘钥编号最大32个字符")
     @NotNull(message = "API 秘钥编号不能为空!")
     private Long keyId;
 

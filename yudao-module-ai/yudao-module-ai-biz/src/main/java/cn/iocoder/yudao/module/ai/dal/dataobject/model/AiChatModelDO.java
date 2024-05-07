@@ -7,7 +7,6 @@ import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
-import lombok.experimental.Accessors;
 
 /**
  * AI 聊天模型 DO
@@ -22,7 +21,7 @@ import lombok.experimental.Accessors;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class AiChatModalDO extends BaseDO {
+public class AiChatModelDO extends BaseDO {
 
     /**
      * 编号
@@ -76,6 +75,6 @@ public class AiChatModalDO extends BaseDO {
     /**
      * 上下文的最大 Message 数量
      */
-    private Integer maxContexts;
+    private Integer i;
 
 }

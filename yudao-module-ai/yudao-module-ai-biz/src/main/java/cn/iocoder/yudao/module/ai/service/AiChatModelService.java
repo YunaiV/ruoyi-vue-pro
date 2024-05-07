@@ -1,11 +1,11 @@
 package cn.iocoder.yudao.module.ai.service;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.ai.controller.admin.model.vo.model.AiChatModalAddReqVO;
-import cn.iocoder.yudao.module.ai.controller.admin.model.vo.model.AiChatModalListReqVO;
-import cn.iocoder.yudao.module.ai.controller.admin.model.vo.model.AiChatModalListRespVO;
+import cn.iocoder.yudao.module.ai.controller.admin.model.vo.model.AiChatModelAddReqVO;
+import cn.iocoder.yudao.module.ai.controller.admin.model.vo.model.AiChatModelListReqVO;
+import cn.iocoder.yudao.module.ai.controller.admin.model.vo.model.AiChatModelListRespVO;
 import cn.iocoder.yudao.module.ai.controller.admin.model.vo.model.AiChatModalRespVO;
-import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiChatModalDO;
+import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiChatModelDO;
 
 /**
  * ai modal
@@ -14,7 +14,7 @@ import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiChatModalDO;
  * @time 2024/4/24 19:42
  * @since 1.0
  */
-public interface AiChatModalService {
+public interface AiChatModelService {
 
     /**
      * ai modal - 列表
@@ -22,14 +22,14 @@ public interface AiChatModalService {
      * @param req
      * @return
      */
-    PageResult<AiChatModalListRespVO> list(AiChatModalListReqVO req);
+    PageResult<AiChatModelListRespVO> list(AiChatModelListReqVO req);
 
     /**
      * ai modal - 添加
      *
      * @param req
      */
-    void add(AiChatModalAddReqVO req);
+    void add(AiChatModelAddReqVO req);
 
     /**
      * ai modal - 更新
@@ -37,7 +37,7 @@ public interface AiChatModalService {
      * @param id
      * @param req
      */
-    void update(Long id, AiChatModalAddReqVO req);
+    void update(Long id, AiChatModelAddReqVO req);
 
     /**
      * ai modal - 删除
@@ -60,7 +60,7 @@ public interface AiChatModalService {
      * @param id
      * @return
      */
-    AiChatModalDO validateExists(Long id);
+    AiChatModelDO validateExists(Long id);
 
     /**
      * 校验 - 校验是否可用

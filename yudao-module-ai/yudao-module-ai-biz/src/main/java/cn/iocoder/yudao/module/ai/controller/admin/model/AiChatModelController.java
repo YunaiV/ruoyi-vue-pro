@@ -2,10 +2,10 @@ package cn.iocoder.yudao.module.ai.controller.admin.model;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.ai.controller.admin.model.vo.model.AiChatModalAddReqVO;
-import cn.iocoder.yudao.module.ai.controller.admin.model.vo.model.AiChatModalListReqVO;
-import cn.iocoder.yudao.module.ai.controller.admin.model.vo.model.AiChatModalListRespVO;
-import cn.iocoder.yudao.module.ai.service.AiChatModalService;
+import cn.iocoder.yudao.module.ai.controller.admin.model.vo.model.AiChatModelAddReqVO;
+import cn.iocoder.yudao.module.ai.controller.admin.model.vo.model.AiChatModelListReqVO;
+import cn.iocoder.yudao.module.ai.controller.admin.model.vo.model.AiChatModelListRespVO;
+import cn.iocoder.yudao.module.ai.service.AiChatModelService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
@@ -24,38 +24,38 @@ import org.springframework.web.bind.annotation.*;
  */
 @Tag(name = "A6-AI模型")
 @RestController
-@RequestMapping("/ai/chat/modal")
+@RequestMapping("/ai/chat/model")
 @Slf4j
 @AllArgsConstructor
-public class AiChatModalController {
+public class AiChatModelController {
 
-    private final AiChatModalService aiChatModalService;
+    private final AiChatModelService aiChatModelService;
 
     @Operation(summary = "ai模型 - 模型列表")
     @GetMapping("/list")
-    public PageResult<AiChatModalListRespVO> list(@ModelAttribute AiChatModalListReqVO req) {
-        return aiChatModalService.list(req);
+    public PageResult<AiChatModelListRespVO> list(@ModelAttribute AiChatModelListReqVO req) {
+        return aiChatModelService.list(req);
     }
 
     @Operation(summary = "ai模型 - 添加")
     @PutMapping("/add")
-    public CommonResult<Void> add(@RequestBody @Validated AiChatModalAddReqVO req) {
-        aiChatModalService.add(req);
+    public CommonResult<Void> add(@RequestBody @Validated AiChatModelAddReqVO req) {
+        aiChatModelService.add(req);
         return CommonResult.success(null);
     }
 
     @Operation(summary = "ai模型 - 修改")
     @PostMapping("/update")
     public CommonResult<Void> update(@RequestParam("id") Long id,
-                                     @RequestBody @Validated AiChatModalAddReqVO req) {
-        aiChatModalService.update(id, req);
+                                     @RequestBody @Validated AiChatModelAddReqVO req) {
+        aiChatModelService.update(id, req);
         return CommonResult.success(null);
     }
 
     @Operation(summary = "ai模型 - 删除")
     @DeleteMapping("/delete")
     public CommonResult<Void> delete(@RequestParam("id") Long id) {
-        aiChatModalService.delete(id);
+        aiChatModelService.delete(id);
         return CommonResult.success(null);
     }
 }
