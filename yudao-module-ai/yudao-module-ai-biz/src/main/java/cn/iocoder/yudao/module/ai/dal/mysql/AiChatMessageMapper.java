@@ -19,24 +19,15 @@ import java.util.List;
 public interface AiChatMessageMapper extends BaseMapperX<AiChatMessageDO> {
 
     /**
-     * 删除 - 根据 Conversation 和 id
-     *
-     * @param chatConversationId
-     * @param id
-     */
-    default int deleteByConversationAndId(Long chatConversationId, Long id) {
-        return this.delete(new LambdaQueryWrapperX<AiChatMessageDO>()
-                .eq(AiChatMessageDO::getConversationId, chatConversationId)
-                .eq(AiChatMessageDO::getId, id)
-        );
-    }
-
-    /**
      * 查询 - 根据 对话id查询
      *
      * @param conversationId
      */
     default List<AiChatMessageDO> selectByConversationId(Long conversationId) {
-        return selectList()
+        return this.selectList(
+                new LambdaQueryWrapperX<AiChatMessageDO>()
+                        .eq(AiChatMessageDO::getConversationId, conversationId)
+                        .orderByAsc(AiChatMessageDO::getId)
+        );
     }
 }
