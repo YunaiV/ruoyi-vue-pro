@@ -15,7 +15,6 @@ import cn.iocoder.yudao.module.ai.dal.dataobject.chat.AiChatConversationDO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiChatModalDO;
 import cn.iocoder.yudao.module.ai.dal.mysql.AiChatConversationMapper;
 import cn.iocoder.yudao.module.ai.dal.mysql.AiChatModalMapper;
-import cn.iocoder.yudao.module.ai.enums.AiChatModalDisableEnum;
 import cn.iocoder.yudao.module.ai.service.AiChatConversationService;
 import cn.iocoder.yudao.module.ai.service.AiChatModalService;
 import cn.iocoder.yudao.module.ai.service.AiChatRoleService;
@@ -91,9 +90,7 @@ public class AiChatConversationServiceImpl implements AiChatConversationService 
         // 获取模型信息并验证
         AiChatModalRes chatModal = aiChatModalService.getChatModalOfValidate(updateReqVO.getModelId());
         // 校验modal是否可用
-        if (AiChatModalDisableEnum.YES.getValue().equals(chatModal.getDisable())) {
-            throw ServiceExceptionUtil.exception(ErrorCodeConstants.AI_MODAL_DISABLE_NOT_USED);
-        }
+        aiChatModalService.validateAvailable(chatModal);
         // 更新对话信息
         AiChatConversationDO updateAiChatConversationDO
                 = AiChatConversationConvert.INSTANCE.convertAiChatConversationDO(updateReqVO);

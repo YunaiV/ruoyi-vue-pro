@@ -52,4 +52,11 @@ public interface AiChatModalService {
      * @return
      */
     AiChatModalRes getChatModalOfValidate(Long modalId);
+
+    /**
+     * 校验 - 校验是否可用
+     *
+     * @param chatModal
+     */
+    void validateAvailable(AiChatModalRes chatModal);
 }

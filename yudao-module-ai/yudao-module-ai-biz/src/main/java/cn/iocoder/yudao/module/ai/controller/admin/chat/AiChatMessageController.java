@@ -32,7 +32,7 @@ public class AiChatMessageController {
     @PostMapping("/send")
     public CommonResult<AiChatMessageRespVO> sendMessage(@Validated @ModelAttribute AiChatMessageSendReqVO sendReqVO) {
         // TODO @fan：使用 static import；这样就 success 就行了；
-        return success(null);
+        return success(chatService.chat(sendReqVO));
     }
 
     // TODO @芋艿：调用这个方法异常，Unable to handle the Spring Security Exception because the response is already committed.；可以再试试

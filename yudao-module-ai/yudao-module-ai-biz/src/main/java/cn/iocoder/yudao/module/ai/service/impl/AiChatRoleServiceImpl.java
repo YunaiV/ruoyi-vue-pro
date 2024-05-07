@@ -70,7 +70,7 @@ public class AiChatRoleServiceImpl implements AiChatRoleService {
         AiChatRoleClassifyEnum.valueOfClassify(req.getClassify());
         AiChatRoleEnableEnum.valueOfType(req.getEnable());
         // 检查角色是否存在
-        validateChatRoleExists(id);
+        validateExists(id);
         // 转换do
         AiChatRoleDO updateChatRole = AiChatRoleConvert.INSTANCE.convertAiChatRoleDO(req);
         updateChatRole.setId(id);
@@ -83,7 +83,7 @@ public class AiChatRoleServiceImpl implements AiChatRoleService {
         // 转换enum，并校验enum
         AiChatRoleEnableEnum.valueOfType(req.getEnable());
         // 检查角色是否存在
-        validateChatRoleExists(id);
+        validateExists(id);
         // 更新
         aiChatRoleMapper.updateById(new AiChatRoleDO()
                 .setId(id)
@@ -94,7 +94,7 @@ public class AiChatRoleServiceImpl implements AiChatRoleService {
     @Override
     public void delete(Long chatRoleId) {
         // 检查角色是否存在
-        validateChatRoleExists(chatRoleId);
+        validateExists(chatRoleId);
         // 删除
         aiChatRoleMapper.deleteById(chatRoleId);
     }
@@ -102,15 +102,25 @@ public class AiChatRoleServiceImpl implements AiChatRoleService {
     @Override
     public AiChatRoleRes getChatRole(Long roleId) {
         // 检查角色是否存在
-        AiChatRoleDO aiChatRoleDO = validateChatRoleExists(roleId);
+        AiChatRoleDO aiChatRoleDO = validateExists(roleId);
         return AiChatRoleConvert.INSTANCE.convertAiChatRoleRes(aiChatRoleDO);
     }
 
-    private AiChatRoleDO validateChatRoleExists(Long id) {
+    public AiChatRoleDO validateExists(Long id) {
         AiChatRoleDO aiChatRoleDO = aiChatRoleMapper.selectById(id);
         if (aiChatRoleDO == null) {
             throw ServiceExceptionUtil.exception(ErrorCodeConstants.AI_CHAT_ROLE_NOT_EXIST);
         }
         return aiChatRoleDO;
     }
+
+    public void validateIsPublic(AiChatRoleDO aiChatRoleDO) {
+        if (aiChatRoleDO == null) {
+            return;
+        }
+        if (!aiChatRoleDO.getPublicStatus()) {
+            throw ServiceExceptionUtil.exception(ErrorCodeConstants.AI_CHAT_ROLE_NOT_PUBLIC);
+        }
+    }
 }
+

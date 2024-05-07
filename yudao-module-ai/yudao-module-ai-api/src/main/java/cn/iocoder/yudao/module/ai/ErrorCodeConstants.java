@@ -30,6 +30,7 @@ public interface ErrorCodeConstants {
     // role
 
     ErrorCode AI_CHAT_ROLE_NOT_EXIST = new ErrorCode(1_022_000_060, "chatRole 不存在!");
+    ErrorCode AI_CHAT_ROLE_NOT_PUBLIC = new ErrorCode(1_022_000_060, "AI 角色未公开!");
 
     // modal
 

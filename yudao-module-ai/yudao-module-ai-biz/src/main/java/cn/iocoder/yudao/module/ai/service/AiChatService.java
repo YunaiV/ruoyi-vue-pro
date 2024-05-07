@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.ai.service;
 
 import cn.iocoder.yudao.module.ai.controller.Utf8SseEmitter;
+import cn.iocoder.yudao.module.ai.controller.admin.chat.vo.message.AiChatMessageRespVO;
 import cn.iocoder.yudao.module.ai.controller.admin.chat.vo.message.AiChatMessageSendReqVO;
 
 /**
@@ -15,10 +16,10 @@ public interface AiChatService {
     /**
      * chat
      *
-     * @param req
+     * @param sendReqVO
      * @return
      */
-    String chat(AiChatMessageSendReqVO req);
+    AiChatMessageRespVO chat(AiChatMessageSendReqVO sendReqVO);
 
     /**
      * chat stream

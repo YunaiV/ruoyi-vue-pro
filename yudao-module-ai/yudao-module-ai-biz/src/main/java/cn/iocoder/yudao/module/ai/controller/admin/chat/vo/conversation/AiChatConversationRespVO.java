@@ -21,6 +21,9 @@ public class AiChatConversationRespVO {
     @Schema(description = "是否置顶", requiredMode = Schema.RequiredMode.REQUIRED, example = "true")
     private Boolean pinned;
 
+    @Schema(description = "角色编号", requiredMode = Schema.RequiredMode.NOT_REQUIRED, example = "1")
+    private Long roleId;
+
     @Schema(description = "模型编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     private Long modelId;
 

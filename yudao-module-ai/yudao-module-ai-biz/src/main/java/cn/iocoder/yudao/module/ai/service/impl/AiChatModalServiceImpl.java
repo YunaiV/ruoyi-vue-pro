@@ -116,6 +116,14 @@ public class AiChatModalServiceImpl implements AiChatModalService {
         return AiChatModalConvert.INSTANCE.convertAiChatModalRes(aiChatModalDO);
     }
 
+    @Override
+    public void validateAvailable(AiChatModalRes chatModal) {
+        // 对话模型是否可用
+        if (AiChatModalDisableEnum.YES.getValue().equals(chatModal.getDisable())) {
+            throw ServiceExceptionUtil.exception(ErrorCodeConstants.AI_MODAL_DISABLE_NOT_USED);
+        }
+    }
+
     private AiChatModalDO validateChatModalExists(Long id) {
         AiChatModalDO aiChatModalDO = aiChatModalMapper.selectById(id);
         if (aiChatModalDO == null) {

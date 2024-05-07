@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.ai.service;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.ai.controller.admin.model.vo.role.*;
+import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiChatRoleDO;
 
 /**
  * chat 角色
@@ -58,4 +59,19 @@ public interface AiChatRoleService {
      * @return
      */
     AiChatRoleRes getChatRole(Long roleId);
+
+    /**
+     * 校验 - 角色是否存在
+     *
+     * @param id
+     * @return
+     */
+    AiChatRoleDO validateExists(Long id);
+
+    /**
+     * 校验 - 角色是否公开
+     *
+     * @param aiChatRoleDO
+     */
+    void validateIsPublic(AiChatRoleDO aiChatRoleDO);
 }
