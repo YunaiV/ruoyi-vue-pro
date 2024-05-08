@@ -251,7 +251,10 @@ public class SimpleModelUtils {
         serviceTask.setName(node.getName());
         // TODO @jason：建议使用 ServiceTask，通过 executionListeners 实现；
         // @芋艿 ServiceTask 就可以了吧。 不需要 executionListeners
+        // 添加抄送候选人元素
         addCandidateElements(node, serviceTask);
+        // 添加表单字段权限属性元素
+        addFormFieldsPermission(node, serviceTask);
         return serviceTask;
     }
 
