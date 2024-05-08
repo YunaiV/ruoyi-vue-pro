@@ -20,7 +20,6 @@ import com.mzt.logapi.context.LogRecordContext;
 import com.mzt.logapi.service.impl.DiffParseFunction;
 import com.mzt.logapi.starter.annotation.LogRecord;
 import jakarta.annotation.Resource;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
@@ -46,9 +45,6 @@ public class CrmReceivablePlanServiceImpl implements CrmReceivablePlanService {
     @Resource
     private CrmReceivablePlanMapper receivablePlanMapper;
 
-    @Resource
-    @Lazy // 延迟加载，避免循环依赖
-    private CrmReceivableService receivableService;
     @Resource
     private CrmContractService contractService;
     @Resource
@@ -144,7 +140,7 @@ public class CrmReceivablePlanServiceImpl implements CrmReceivablePlanService {
         // 2. 删除
         receivablePlanMapper.deleteById(id);
         // 3. 删除数据权限
-        permissionService.deletePermission(CrmBizTypeEnum.CRM_CUSTOMER.getType(), id);
+        permissionService.deletePermission(CrmBizTypeEnum.CRM_RECEIVABLE_PLAN.getType(), id);
 
         // 4. 记录操作日志上下文
         LogRecordContext.putVariable("receivablePlan", receivablePlan);

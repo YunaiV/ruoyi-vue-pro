@@ -78,7 +78,7 @@ public class CollectionUtils {
         if (CollUtil.isEmpty(from)) {
             return new ArrayList<>();
         }
-        return from.stream().flatMap(func).filter(Objects::nonNull).collect(Collectors.toList());
+        return from.stream().filter(Objects::nonNull).flatMap(func).filter(Objects::nonNull).collect(Collectors.toList());
     }
 
     public static <T, U, R> List<R> convertListByFlatMap(Collection<T> from,
@@ -87,7 +87,7 @@ public class CollectionUtils {
         if (CollUtil.isEmpty(from)) {
             return new ArrayList<>();
         }
-        return from.stream().map(mapper).flatMap(func).filter(Objects::nonNull).collect(Collectors.toList());
+        return from.stream().map(mapper).filter(Objects::nonNull).flatMap(func).filter(Objects::nonNull).collect(Collectors.toList());
     }
 
     public static <K, V> List<V> mergeValuesFromMap(Map<K, List<V>> map) {
@@ -95,6 +95,10 @@ public class CollectionUtils {
                 .stream()
                 .flatMap(List::stream)
                 .collect(Collectors.toList());
+    }
+
+    public static <T> Set<T> convertSet(Collection<T> from) {
+        return convertSet(from, v -> v);
     }
 
     public static <T, U> Set<U> convertSet(Collection<T> from, Function<T, U> func) {
@@ -123,7 +127,7 @@ public class CollectionUtils {
         if (CollUtil.isEmpty(from)) {
             return new HashSet<>();
         }
-        return from.stream().flatMap(func).filter(Objects::nonNull).collect(Collectors.toSet());
+        return from.stream().filter(Objects::nonNull).flatMap(func).filter(Objects::nonNull).collect(Collectors.toSet());
     }
 
     public static <T, U, R> Set<R> convertSetByFlatMap(Collection<T> from,
@@ -132,7 +136,7 @@ public class CollectionUtils {
         if (CollUtil.isEmpty(from)) {
             return new HashSet<>();
         }
-        return from.stream().map(mapper).flatMap(func).filter(Objects::nonNull).collect(Collectors.toSet());
+        return from.stream().map(mapper).filter(Objects::nonNull).flatMap(func).filter(Objects::nonNull).collect(Collectors.toSet());
     }
 
     public static <T, K> Map<K, T> convertMap(Collection<T> from, Function<T, K> keyFunc) {

@@ -1,9 +1,9 @@
 package cn.iocoder.yudao.module.infra.controller.admin.demo.demo02;
 
+import cn.iocoder.yudao.framework.apilog.core.annotation.ApiAccessLog;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
-import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
 import cn.iocoder.yudao.module.infra.controller.admin.demo.demo02.vo.Demo02CategoryListReqVO;
 import cn.iocoder.yudao.module.infra.controller.admin.demo.demo02.vo.Demo02CategoryRespVO;
 import cn.iocoder.yudao.module.infra.controller.admin.demo.demo02.vo.Demo02CategorySaveReqVO;
@@ -12,18 +12,18 @@ import cn.iocoder.yudao.module.infra.service.demo.demo02.Demo02CategoryService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.annotation.Resource;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import jakarta.annotation.Resource;
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.validation.Valid;
 import java.io.IOException;
 import java.util.List;
 
+import static cn.iocoder.yudao.framework.apilog.core.enums.OperateTypeEnum.EXPORT;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
-import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.EXPORT;
 
 @Tag(name = "管理后台 - 示例分类")
 @RestController
@@ -78,7 +78,7 @@ public class Demo02CategoryController {
     @GetMapping("/export-excel")
     @Operation(summary = "导出示例分类 Excel")
     @PreAuthorize("@ss.hasPermission('infra:demo02-category:export')")
-    @OperateLog(type = EXPORT)
+    @ApiAccessLog(operateType = EXPORT)
     public void exportDemo02CategoryExcel(@Valid Demo02CategoryListReqVO listReqVO,
               HttpServletResponse response) throws IOException {
         List<Demo02CategoryDO> list = demo02CategoryService.getDemo02CategoryList(listReqVO);

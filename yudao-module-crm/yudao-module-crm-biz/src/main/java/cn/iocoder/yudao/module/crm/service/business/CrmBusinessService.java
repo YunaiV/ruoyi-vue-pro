@@ -5,6 +5,7 @@ import cn.iocoder.yudao.module.crm.controller.admin.business.vo.business.CrmBusi
 import cn.iocoder.yudao.module.crm.controller.admin.business.vo.business.CrmBusinessSaveReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.business.vo.business.CrmBusinessTransferReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.business.vo.business.CrmBusinessUpdateStatusReqVO;
+import cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.funnel.CrmStatisticsFunnelReqVO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.business.CrmBusinessDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.business.CrmBusinessProductDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.business.CrmBusinessStatusDO;
@@ -46,8 +47,8 @@ public interface CrmBusinessService {
     /**
      * 更新商机相关跟进信息
      *
-     * @param id 编号
-     * @param contactNextTime 下次联系时间
+     * @param id                 编号
+     * @param contactNextTime    下次联系时间
      * @param contactLastContent 最后联系内容
      */
     void updateBusinessFollowUp(Long id, LocalDateTime contactNextTime, String contactLastContent);
@@ -55,7 +56,7 @@ public interface CrmBusinessService {
     /**
      * 更新商机的下次联系时间
      *
-     * @param ids 编号数组
+     * @param ids             编号数组
      * @param contactNextTime 下次联系时间
      */
     void updateBusinessContactNextTime(Collection<Long> ids, LocalDateTime contactNextTime);
@@ -184,5 +185,22 @@ public interface CrmBusinessService {
         }
         return status.getName();
     }
+
+    /**
+     * 获得商机列表
+     *
+     * @param customerId  客户编号
+     * @param ownerUserId 负责人编号
+     * @return 商机列表
+     */
+    List<CrmBusinessDO> getBusinessListByCustomerIdOwnerUserId(Long customerId, Long ownerUserId);
+
+    /**
+     * 获得商机分页，目前用于【数据统计】
+     *
+     * @param pageVO 请求
+     * @return 商机分页
+     */
+    PageResult<CrmBusinessDO> getBusinessPageByDate(CrmStatisticsFunnelReqVO pageVO);
 
 }

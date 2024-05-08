@@ -1,21 +1,22 @@
 package cn.iocoder.yudao.module.bpm.service.definition;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
-import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.process.BpmProcessDefinitionListReqVO;
-import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.process.BpmProcessDefinitionPageItemRespVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.process.BpmProcessDefinitionPageReqVO;
-import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.process.BpmProcessDefinitionRespVO;
-import cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmProcessDefinitionExtDO;
-import cn.iocoder.yudao.module.bpm.service.definition.dto.BpmProcessDefinitionCreateReqDTO;
+import cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmFormDO;
+import cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmProcessDefinitionInfoDO;
+import cn.iocoder.yudao.module.bpm.service.definition.dto.BpmModelMetaInfoRespDTO;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.engine.repository.Deployment;
+import org.flowable.engine.repository.Model;
 import org.flowable.engine.repository.ProcessDefinition;
 
-import jakarta.validation.Valid;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
+
 /**
  * Flowable流程定义接口
  *
@@ -31,23 +32,26 @@ public interface BpmProcessDefinitionService {
      * @param pageReqVO 分页入参
      * @return 流程定义 Page
      */
-    PageResult<BpmProcessDefinitionPageItemRespVO> getProcessDefinitionPage(BpmProcessDefinitionPageReqVO pageReqVO);
+    PageResult<ProcessDefinition> getProcessDefinitionPage(BpmProcessDefinitionPageReqVO pageReqVO);
 
     /**
      * 获得流程定义列表
      *
-     * @param listReqVO 列表入参
+     * @param suspensionState 中断状态
      * @return 流程定义列表
      */
-    List<BpmProcessDefinitionRespVO> getProcessDefinitionList(BpmProcessDefinitionListReqVO listReqVO);
+    List<ProcessDefinition> getProcessDefinitionListBySuspensionState(Integer suspensionState);
 
     /**
-     * 创建流程定义
+     * 基于流程模型，创建流程定义
      *
-     * @param createReqDTO 创建信息
+     * @param model 流程模型
+     * @param modelMetaInfo 流程模型元信息
+     * @param bpmnBytes BPMN XML 字节数组
+     * @param form 表单
      * @return 流程编号
      */
-    String createProcessDefinition(@Valid BpmProcessDefinitionCreateReqDTO createReqDTO);
+    String createProcessDefinition(Model model, BpmModelMetaInfoRespDTO modelMetaInfo, byte[] bpmnBytes, BpmFormDO form);
 
     /**
      * 更新流程定义状态
@@ -58,46 +62,52 @@ public interface BpmProcessDefinitionService {
     void updateProcessDefinitionState(String id, Integer state);
 
     /**
-     * 获得流程定义对应的 BPMN XML
+     * 获得流程定义对应的 BPMN
      *
      * @param id 流程定义编号
-     * @return BPMN XML
+     * @return BPMN
      */
-    String getProcessDefinitionBpmnXML(String id);
+    BpmnModel getProcessDefinitionBpmnModel(String id);
 
     /**
-     * 获得需要创建的流程定义，是否和当前激活的流程定义相等
+     * 获得流程定义的信息
      *
-     * @param createReqDTO 创建信息
-     * @return 是否相等
+     * @param id 流程定义编号
+     * @return 流程定义信息
      */
-    boolean isProcessDefinitionEquals(@Valid BpmProcessDefinitionCreateReqDTO createReqDTO);
+    BpmProcessDefinitionInfoDO getProcessDefinitionInfo(String id);
 
     /**
-     * 获得编号对应的 BpmProcessDefinitionExtDO
+     * 获得流程定义的信息 List
      *
-     * @param id 编号
-     * @return 流程定义拓展
+     * @param ids 流程定义编号数组
+     * @return 流程额定义信息数组
      */
-    BpmProcessDefinitionExtDO getProcessDefinitionExt(String id);
+    List<BpmProcessDefinitionInfoDO> getProcessDefinitionInfoList(Collection<String> ids);
+
+    default Map<String, BpmProcessDefinitionInfoDO> getProcessDefinitionInfoMap(Set<String> ids) {
+        return convertMap(getProcessDefinitionInfoList(ids), BpmProcessDefinitionInfoDO::getProcessDefinitionId);
+    }
 
     /**
-     * 获得编号对应的 ProcessDefinition
+     * 获得流程定义编号对应的 ProcessDefinition
      *
-     * @param id 编号
+     * @param id 流程定义编号
      * @return 流程定义
      */
     ProcessDefinition getProcessDefinition(String id);
 
     /**
-     * 获得编号对应的 ProcessDefinition
+     * 获得 ids 对应的 ProcessDefinition 数组
      *
-     * 相比 {@link #getProcessDefinition(String)} 方法，category 的取值是正确
-     *
-     * @param id 编号
-     * @return 流程定义
+     * @param ids 编号的数组
+     * @return 流程定义的数组
      */
-    ProcessDefinition getProcessDefinition2(String id);
+    List<ProcessDefinition> getProcessDefinitionList(Set<String> ids);
+
+    default Map<String, ProcessDefinition> getProcessDefinitionMap(Set<String> ids) {
+        return convertMap(getProcessDefinitionList(ids), ProcessDefinition::getId);
+    }
 
     /**
      * 获得 deploymentId 对应的 ProcessDefinition
@@ -130,7 +140,7 @@ public interface BpmProcessDefinitionService {
      * @return 流程部署 Map
      */
     default Map<String, Deployment> getDeploymentMap(Set<String> ids) {
-        return CollectionUtils.convertMap(getDeployments(ids), Deployment::getId);
+        return convertMap(getDeploymentList(ids), Deployment::getId);
     }
 
     /**
@@ -139,7 +149,7 @@ public interface BpmProcessDefinitionService {
      * @param ids 部署编号的数组
      * @return 流程部署的数组
      */
-    List<Deployment> getDeployments(Set<String> ids);
+    List<Deployment> getDeploymentList(Set<String> ids);
 
     /**
      * 获得 id 对应的 Deployment
@@ -149,11 +159,4 @@ public interface BpmProcessDefinitionService {
      */
     Deployment getDeployment(String id);
 
-    /**
-     * 获得 Bpmn 模型
-     *
-     * @param processDefinitionId 流程定义的编号
-     * @return Bpmn 模型
-     */
-    BpmnModel getBpmnModel(String processDefinitionId);
 }

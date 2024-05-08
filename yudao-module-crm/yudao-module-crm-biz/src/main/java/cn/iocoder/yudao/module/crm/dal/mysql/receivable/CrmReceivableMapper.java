@@ -99,4 +99,8 @@ public interface CrmReceivableMapper extends BaseMapperX<CrmReceivableDO> {
         return convertMap(result, obj -> (Long) obj.get("contract_id"), obj -> (BigDecimal) obj.get("total_price"));
     }
 
+    default Long selectCountByContractId(Long contractId) {
+        return selectCount(CrmReceivableDO::getContractId, contractId);
+    }
+
 }

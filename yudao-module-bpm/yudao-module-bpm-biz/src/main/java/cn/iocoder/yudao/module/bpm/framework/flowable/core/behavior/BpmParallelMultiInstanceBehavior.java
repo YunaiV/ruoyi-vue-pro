@@ -1,9 +1,8 @@
 package cn.iocoder.yudao.module.bpm.framework.flowable.core.behavior;
 
-import cn.iocoder.yudao.framework.flowable.core.util.FlowableUtils;
-import cn.iocoder.yudao.module.bpm.service.definition.BpmTaskAssignRuleService;
+import cn.iocoder.yudao.module.bpm.framework.flowable.core.util.FlowableUtils;
+import cn.iocoder.yudao.module.bpm.framework.flowable.core.candidate.BpmTaskCandidateInvoker;
 import lombok.Setter;
-import lombok.extern.slf4j.Slf4j;
 import org.flowable.bpmn.model.Activity;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.impl.bpmn.behavior.AbstractBpmnActivityBehavior;
@@ -17,13 +16,12 @@ import java.util.Set;
  * 第二步，将【多个】任务候选人们，设置到 DelegateExecution 的 collectionVariable 变量中，以便 BpmUserTaskActivityBehavior 使用它
  *
  * @author kemengkai
- * @date 2022-04-21 16:57
+ * @since 2022-04-21 16:57
  */
-@Slf4j
+@Setter
 public class BpmParallelMultiInstanceBehavior extends ParallelMultiInstanceBehavior {
 
-    @Setter
-    private BpmTaskAssignRuleService bpmTaskRuleService;
+    private BpmTaskCandidateInvoker taskCandidateInvoker;
 
     public BpmParallelMultiInstanceBehavior(Activity activity,
                                             AbstractBpmnActivityBehavior innerActivityBehavior) {
@@ -45,12 +43,12 @@ public class BpmParallelMultiInstanceBehavior extends ParallelMultiInstanceBehav
         // 第一步，设置 collectionVariable 和 CollectionVariable
         // 从  execution.getVariable() 读取所有任务处理人的 key
         super.collectionExpression = null; // collectionExpression 和 collectionVariable 是互斥的
-        super.collectionVariable = FlowableUtils.formatCollectionVariable(execution.getCurrentActivityId());
+        super.collectionVariable = FlowableUtils.formatExecutionCollectionVariable(execution.getCurrentActivityId());
         // 从 execution.getVariable() 读取当前所有任务处理的人的 key
-        super.collectionElementVariable = FlowableUtils.formatCollectionElementVariable(execution.getCurrentActivityId());
+        super.collectionElementVariable = FlowableUtils.formatExecutionCollectionElementVariable(execution.getCurrentActivityId());
 
         // 第二步，获取任务的所有处理人
-        Set<Long> assigneeUserIds = bpmTaskRuleService.calculateTaskCandidateUsers(execution);
+        Set<Long> assigneeUserIds = taskCandidateInvoker.calculateUsers(execution);
         execution.setVariable(super.collectionVariable, assigneeUserIds);
         return assigneeUserIds.size();
     }

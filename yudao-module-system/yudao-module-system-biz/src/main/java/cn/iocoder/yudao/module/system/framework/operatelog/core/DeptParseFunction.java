@@ -1,15 +1,16 @@
 package cn.iocoder.yudao.module.system.framework.operatelog.core;
 
+import cn.hutool.core.convert.Convert;
 import cn.hutool.core.util.StrUtil;
-import cn.iocoder.yudao.module.system.api.dept.DeptApi;
-import cn.iocoder.yudao.module.system.api.dept.dto.DeptRespDTO;
+import cn.iocoder.yudao.module.system.dal.dataobject.dept.DeptDO;
+import cn.iocoder.yudao.module.system.service.dept.DeptService;
 import com.mzt.logapi.service.IParseFunction;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 /**
- * 管理员名字的 {@link IParseFunction} 实现类
+ * 部门名字的 {@link IParseFunction} 实现类
  *
  * @author HUIHUI
  */
@@ -20,7 +21,7 @@ public class DeptParseFunction implements IParseFunction {
     public static final String NAME = "getDeptById";
 
     @Resource
-    private DeptApi deptApi;
+    private DeptService deptService;
 
     @Override
     public String functionName() {
@@ -34,7 +35,7 @@ public class DeptParseFunction implements IParseFunction {
         }
 
         // 获取部门信息
-        DeptRespDTO dept = deptApi.getDept(Long.parseLong(value.toString()));
+        DeptDO dept = deptService.getDept(Convert.toLong(value));
         if (dept == null) {
             log.warn("[apply][获取部门{{}}为空", value);
             return "";

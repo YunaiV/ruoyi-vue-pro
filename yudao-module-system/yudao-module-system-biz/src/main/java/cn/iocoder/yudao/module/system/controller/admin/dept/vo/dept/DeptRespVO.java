@@ -18,7 +18,7 @@ public class DeptRespVO {
     @Schema(description = "父部门 ID", example = "1024")
     private Long parentId;
 
-    @Schema(description = "显示顺序不能为空", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
+    @Schema(description = "显示顺序", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     private Integer sort;
 
     @Schema(description = "负责人的用户编号", example = "2048")

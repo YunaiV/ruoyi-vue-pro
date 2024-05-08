@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.iocoder.yudao.module.crm.dal.mysql.statistics.CrmStatisticsPerformanceMapper">
+
+    <select id="selectContractCountPerformance"
+            resultType="cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.performance.CrmStatisticsPerformanceRespVO">
+        SELECT
+            DATE_FORMAT(order_date, '%Y%m') AS time,
+            COUNT(1) AS currentMonthCount
+        FROM crm_contract
+        WHERE deleted = 0
+        <!-- TODO @scholar：20 改成静态类引入 -->
+        AND audit_status = 20
+        AND owner_user_id in
+            <foreach collection="userIds" item="userId" open="(" close=")" separator=",">
+                #{userId}
+            </foreach>
+        <!-- TODO @scholar：CrmStatisticsPerformanceReqVO 传递 year，然后 java 代码里，转换出 times；这样，order_time 使用范围查询，避免使用函数 -->
+        AND (DATE_FORMAT(order_date, '%Y') = DATE_FORMAT(#{times[0],javaType=java.time.LocalDateTime}, '%Y')
+        or DATE_FORMAT(order_date, '%Y') = DATE_FORMAT(#{times[0],javaType=java.time.LocalDateTime}, '%Y') - 1)
+        GROUP BY time
+    </select>
+
+    <!-- TODO @scholar：参考上面，调整下这个 SQL 的排版、和代码建议哈 -->
+    <select id="selectContractPricePerformance"
+            resultType="cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.performance.CrmStatisticsPerformanceRespVO">
+        SELECT
+        DATE_FORMAT(order_date, '%Y%m') AS time,
+        IFNULL(SUM(total_price), 0) AS currentMonthCount
+        FROM	crm_contract
+        WHERE deleted = 0
+        AND audit_status = 20
+        AND owner_user_id in
+        <foreach collection="userIds" item="userId" open="(" close=")" separator=",">
+            #{userId}
+        </foreach>
+        AND (DATE_FORMAT(order_date, '%Y') = DATE_FORMAT(#{times[0],javaType=java.time.LocalDateTime},'%Y')
+        or DATE_FORMAT(order_date, '%Y') = DATE_FORMAT(#{times[0],javaType=java.time.LocalDateTime},'%Y')-1)
+        GROUP BY time
+    </select>
+
+    <!-- TODO @scholar：参考上面，调整下这个 SQL 的排版、和代码建议哈 -->
+    <select id="selectReceivablePricePerformance"
+            resultType="cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.performance.CrmStatisticsPerformanceRespVO">
+        SELECT
+        DATE_FORMAT(return_time, '%Y%m') AS time,
+        IFNULL(SUM(price), 0) AS currentMonthCount
+        FROM	crm_receivable
+        WHERE deleted = 0
+        AND audit_status = 20
+        AND owner_user_id in
+        <foreach collection="userIds" item="userId" open="(" close=")" separator=",">
+            #{userId}
+        </foreach>
+        AND (DATE_FORMAT(return_time, '%Y') = DATE_FORMAT(#{times[0],javaType=java.time.LocalDateTime},'%Y')
+        or DATE_FORMAT(return_time, '%Y') = DATE_FORMAT(#{times[0],javaType=java.time.LocalDateTime},'%Y')-1)
+        GROUP BY time
+    </select>
+
+</mapper>

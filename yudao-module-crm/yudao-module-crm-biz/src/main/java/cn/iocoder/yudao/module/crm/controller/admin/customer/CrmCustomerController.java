@@ -2,7 +2,7 @@ package cn.iocoder.yudao.module.crm.controller.admin.customer;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.map.MapUtil;
-import cn.iocoder.yudao.framework.common.core.KeyValue;
+import cn.iocoder.yudao.framework.apilog.core.annotation.ApiAccessLog;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
@@ -10,11 +10,8 @@ import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
 import cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils;
 import cn.iocoder.yudao.framework.common.util.number.NumberUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
-import cn.iocoder.yudao.framework.excel.core.enums.ExcelColumn;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
-import cn.iocoder.yudao.framework.ip.core.Area;
 import cn.iocoder.yudao.framework.ip.core.utils.AreaUtils;
-import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
 import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.customer.*;
 import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerPoolConfigDO;
@@ -22,7 +19,6 @@ import cn.iocoder.yudao.module.crm.service.customer.CrmCustomerPoolConfigService
 import cn.iocoder.yudao.module.crm.service.customer.CrmCustomerService;
 import cn.iocoder.yudao.module.system.api.dept.DeptApi;
 import cn.iocoder.yudao.module.system.api.dept.dto.DeptRespDTO;
-import cn.iocoder.yudao.module.system.api.dict.DictDataApi;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import io.swagger.v3.oas.annotations.Operation;
@@ -38,18 +34,16 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
+import static cn.iocoder.yudao.framework.apilog.core.enums.OperateTypeEnum.EXPORT;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.common.pojo.PageParam.PAGE_SIZE_NONE;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
-import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.EXPORT;
 import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
-import static cn.iocoder.yudao.module.crm.enums.DictTypeConstants.*;
 import static java.util.Collections.singletonList;
 
 @Tag(name = "管理后台 - CRM 客户")
@@ -67,8 +61,6 @@ public class CrmCustomerController {
     private DeptApi deptApi;
     @Resource
     private AdminUserApi adminUserApi;
-    @Resource
-    private DictDataApi dictDataApi;
 
     @PostMapping("/create")
     @Operation(summary = "创建客户")
@@ -142,7 +134,7 @@ public class CrmCustomerController {
             return java.util.Collections.emptyList();
         }
         // 1.1 获取创建人、负责人列表
-        Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(convertListByFlatMap(list,
+        Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(convertSetByFlatMap(list,
                 contact -> Stream.of(NumberUtils.parseLong(contact.getCreator()), contact.getOwnerUserId())));
         Map<Long, DeptRespDTO> deptMap = deptApi.getDeptMap(convertSet(userMap.values(), AdminUserRespDTO::getDeptId));
         // 1.2 获取距离进入公海的时间
@@ -242,7 +234,7 @@ public class CrmCustomerController {
     @GetMapping("/export-excel")
     @Operation(summary = "导出客户 Excel")
     @PreAuthorize("@ss.hasPermission('crm:customer:export')")
-    @OperateLog(type = EXPORT)
+    @ApiAccessLog(operateType = EXPORT)
     public void exportCustomerExcel(@Valid CrmCustomerPageReqVO pageVO,
                                     HttpServletResponse response) throws IOException {
         pageVO.setPageSize(PAGE_SIZE_NONE); // 不分页
@@ -265,31 +257,13 @@ public class CrmCustomerController {
                         .areaId(null).detailAddress("").remark("").build()
         );
         // 输出
-        ExcelUtils.write(response, "客户导入模板.xls", "客户列表", CrmCustomerImportExcelVO.class, list, builderSelectMap());
-    }
-
-    private List<KeyValue<ExcelColumn, List<String>>> builderSelectMap() {
-        List<KeyValue<ExcelColumn, List<String>>> selectMap = new ArrayList<>();
-        // 获取地区下拉数据
-        // TODO @puhui999：嘿嘿，这里改成省份、城市、区域，三个选项，难度大么？
-        Area area = AreaUtils.getArea(Area.ID_CHINA);
-        selectMap.add(new KeyValue<>(ExcelColumn.G, AreaUtils.getAreaNodePathList(area.getChildren())));
-        // 获取客户所属行业
-        List<String> customerIndustries = dictDataApi.getDictDataLabelList(CRM_CUSTOMER_INDUSTRY);
-        selectMap.add(new KeyValue<>(ExcelColumn.I, customerIndustries));
-        // 获取客户等级
-        List<String> customerLevels = dictDataApi.getDictDataLabelList(CRM_CUSTOMER_LEVEL);
-        selectMap.add(new KeyValue<>(ExcelColumn.J, customerLevels));
-        // 获取客户来源
-        List<String> customerSources = dictDataApi.getDictDataLabelList(CRM_CUSTOMER_SOURCE);
-        selectMap.add(new KeyValue<>(ExcelColumn.K, customerSources));
-        return selectMap;
+        ExcelUtils.write(response, "客户导入模板.xls", "客户列表", CrmCustomerImportExcelVO.class, list);
     }
 
     @PostMapping("/import")
     @Operation(summary = "导入客户")
-    @PreAuthorize("@ss.hasPermission('system:customer:import')")
-    public CommonResult<CrmCustomerImportRespVO> importExcel(@Valid @RequestBody CrmCustomerImportReqVO importReqVO)
+    @PreAuthorize("@ss.hasPermission('crm:customer:import')")
+    public CommonResult<CrmCustomerImportRespVO> importExcel(@Valid CrmCustomerImportReqVO importReqVO)
             throws Exception {
         List<CrmCustomerImportExcelVO> list = ExcelUtils.read(importReqVO.getFile(), CrmCustomerImportExcelVO.class);
         return success(customerService.importCustomerList(list, importReqVO));

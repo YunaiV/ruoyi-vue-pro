@@ -1,12 +1,16 @@
 package cn.iocoder.yudao.framework.xss.core.json;
 
+import cn.iocoder.yudao.framework.common.util.servlet.ServletUtils;
+import cn.iocoder.yudao.framework.xss.config.XssProperties;
 import cn.iocoder.yudao.framework.xss.core.clean.XssCleaner;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.deser.std.StringDeserializer;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.util.PathMatcher;
 
 import java.io.IOException;
 
@@ -20,10 +24,29 @@ import java.io.IOException;
 @AllArgsConstructor
 public class XssStringJsonDeserializer extends StringDeserializer {
 
+    /**
+     * 属性
+     */
+    private final XssProperties properties;
+    /**
+     * 路径匹配器
+     */
+    private final PathMatcher pathMatcher;
+
     private final XssCleaner xssCleaner;
 
     @Override
     public String deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
+        // 1. 白名单 URL 的处理
+        HttpServletRequest request = ServletUtils.getRequest();
+        if (request != null) {
+            String uri = ServletUtils.getRequest().getRequestURI();
+            if (properties.getExcludeUrls().stream().anyMatch(excludeUrl -> pathMatcher.match(excludeUrl, uri))) {
+                return p.getText();
+            }
+        }
+
+        // 2. 真正使用 xssCleaner 进行过滤
         if (p.hasToken(JsonToken.VALUE_STRING)) {
             return xssCleaner.clean(p.getText());
         }

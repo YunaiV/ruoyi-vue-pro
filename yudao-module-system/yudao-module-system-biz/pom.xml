@@ -32,10 +32,6 @@
         <!-- 业务组件 -->
         <dependency>
             <groupId>cn.iocoder.boot</groupId>
-            <artifactId>yudao-spring-boot-starter-biz-operatelog</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>cn.iocoder.boot</groupId>
             <artifactId>yudao-spring-boot-starter-biz-data-permission</artifactId>
         </dependency>
         <dependency>
@@ -131,6 +127,12 @@
             <groupId>com.xingyuv</groupId>
             <artifactId>spring-boot-starter-captcha-plus</artifactId> <!-- 验证码，一般用于登录使用 -->
         </dependency>
+
+        <dependency>
+            <groupId>org.dromara.hutool</groupId>
+            <artifactId>hutool-extra</artifactId> <!-- 邮件 -->
+        </dependency>
+
     </dependencies>
 
 </project>

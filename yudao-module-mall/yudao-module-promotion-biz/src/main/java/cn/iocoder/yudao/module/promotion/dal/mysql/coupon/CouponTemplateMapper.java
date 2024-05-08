@@ -7,12 +7,12 @@ import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.module.promotion.controller.admin.coupon.vo.template.CouponTemplatePageReqVO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.coupon.CouponTemplateDO;
+import cn.iocoder.yudao.module.promotion.enums.coupon.CouponTemplateValidityTypeEnum;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.time.LocalDateTime;
-import java.util.Collection;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -68,9 +68,9 @@ public interface CouponTemplateMapper extends BaseMapperX<CouponTemplateDO> {
             canTakeConsumer = w ->
                     w.eq(CouponTemplateDO::getStatus, CommonStatusEnum.ENABLE.getStatus()) // 1. 状态为可用的
                             .in(CouponTemplateDO::getTakeType, canTakeTypes) // 2. 领取方式一致
-                            .and(ww -> ww.isNull(CouponTemplateDO::getValidEndTime)  // 3. 未过期
-                                    .or().gt(CouponTemplateDO::getValidEndTime, LocalDateTime.now()))
-                            .apply(" take_count < total_count "); // 4. 剩余数量大于 0
+                            .and(ww -> ww.gt(CouponTemplateDO::getValidEndTime, LocalDateTime.now())  // 3.1 未过期
+                                    .or().eq(CouponTemplateDO::getValidityType, CouponTemplateValidityTypeEnum.TERM.getType())) // 3.2 领取之后
+                            .apply(" (take_count < total_count OR total_count = -1 )"); // 4. 剩余数量大于 0，或者无限领取
         }
         return canTakeConsumer;
     }
