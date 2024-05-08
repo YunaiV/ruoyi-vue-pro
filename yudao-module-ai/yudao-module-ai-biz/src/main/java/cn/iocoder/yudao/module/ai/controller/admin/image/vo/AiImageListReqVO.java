@@ -1,7 +1,6 @@
 package cn.iocoder.yudao.module.ai.controller.admin.image.vo;
 
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
-import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
@@ -14,6 +13,6 @@ import lombok.experimental.Accessors;
  */
 @Data
 @Accessors(chain = true)
-public class AiImageMidjourneyListReqVO extends PageParam {
+public class AiImageListReqVO extends PageParam {
 
 }

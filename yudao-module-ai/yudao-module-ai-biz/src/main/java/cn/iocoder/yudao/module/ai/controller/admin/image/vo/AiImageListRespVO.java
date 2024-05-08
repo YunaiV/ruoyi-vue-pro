@@ -13,6 +13,6 @@ import lombok.experimental.Accessors;
  */
 @Data
 @Accessors(chain = true)
-public class AiImageMidjourneyListRespVO extends PageParam {
+public class AiImageListRespVO extends PageParam {
 
 }

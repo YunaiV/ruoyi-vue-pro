@@ -1,9 +1,8 @@
 package cn.iocoder.yudao.module.ai.controller.admin.image;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
-import cn.iocoder.yudao.module.ai.controller.admin.image.vo.AiImageDallDrawingReqVO;
-import cn.iocoder.yudao.module.ai.controller.admin.image.vo.AiImageDallDrawingRespVO;
-import cn.iocoder.yudao.module.ai.controller.admin.image.vo.AiImageMidjourneyReqVO;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.module.ai.controller.admin.image.vo.*;
 import cn.iocoder.yudao.module.ai.service.AiImageService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -31,6 +30,12 @@ public class AiImageController {
 
     private final AiImageService aiImageService;
 
+    @Operation(summary = "获取image列表", description = "dall3、midjourney")
+    @GetMapping("/list")
+    public PageResult<AiImageListRespVO> list(@Validated @RequestBody AiImageListReqVO req) {
+        return aiImageService.list(req);
+    }
+
     @Operation(summary = "dall2/dall3绘画", description = "openAi dall3是付费的!")
     @PostMapping("/dallDrawing")
     public AiImageDallDrawingRespVO dallDrawing(@Validated @RequestBody AiImageDallDrawingReqVO req) {
@@ -46,13 +51,8 @@ public class AiImageController {
 
     @Operation(summary = "midjourney绘画操作", description = "一般有选择图片、放大、换一批...")
     @PostMapping("/midjourney-operate")
-    public CommonResult<Void> midjourneyOperate(@Validated @RequestBody AiImageMidjourneyReqVO req) {
-        return success(null);
-    }
-
-    @Operation(summary = "获取midjourney绘画列表", description = "获取 Midjourney 绘画列表")
-    @GetMapping("/get-midjourney-list")
-    public CommonResult<Void> getMidjourneyList(@Validated @RequestBody AiImageMidjourneyReqVO req) {
+    public CommonResult<Void> midjourneyOperate(@Validated @RequestBody AiImageMidjourneyOperateReqVO req) {
+        aiImageService.midjourneyOperate(req);
         return success(null);
     }
 

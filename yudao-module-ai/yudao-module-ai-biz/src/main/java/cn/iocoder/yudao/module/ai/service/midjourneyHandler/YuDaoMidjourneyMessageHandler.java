@@ -6,7 +6,7 @@ import cn.iocoder.yudao.framework.ai.midjourney.MidjourneyMessage;
 import cn.iocoder.yudao.framework.ai.midjourney.constants.MidjourneyGennerateStatusEnum;
 import cn.iocoder.yudao.framework.ai.midjourney.webSocket.MidjourneyMessageHandler;
 import cn.iocoder.yudao.module.ai.dal.dataobject.image.AiImageDO;
-import cn.iocoder.yudao.module.ai.enums.AiChatDrawingStatusEnum;
+import cn.iocoder.yudao.module.ai.enums.AiImageDrawingStatusEnum;
 import cn.iocoder.yudao.module.ai.dal.mysql.AiImageMapper;
 import com.alibaba.fastjson2.JSON;
 import lombok.AllArgsConstructor;
@@ -53,14 +53,14 @@ public class YuDaoMidjourneyMessageHandler implements MidjourneyMessageHandler {
             imageUrl = midjourneyMessage.getAttachments().get(0).getUrl();
         }
         // 转换状态
-        AiChatDrawingStatusEnum drawingStatusEnum = null;
+        AiImageDrawingStatusEnum drawingStatusEnum = null;
         String generateStatus = midjourneyMessage.getGenerateStatus();
         if (MidjourneyGennerateStatusEnum.COMPLETED.getStatus().equals(generateStatus)) {
-            drawingStatusEnum = AiChatDrawingStatusEnum.COMPLETE;
+            drawingStatusEnum = AiImageDrawingStatusEnum.COMPLETE;
         } else if (MidjourneyGennerateStatusEnum.IN_PROGRESS.getStatus().equals(generateStatus)) {
-            drawingStatusEnum = AiChatDrawingStatusEnum.IN_PROGRESS;
+            drawingStatusEnum = AiImageDrawingStatusEnum.IN_PROGRESS;
         }  else if (MidjourneyGennerateStatusEnum.WAITING.getStatus().equals(generateStatus)) {
-            drawingStatusEnum = AiChatDrawingStatusEnum.WAITING;
+            drawingStatusEnum = AiImageDrawingStatusEnum.WAITING;
         }
         aiImageMapper.updateById(
                 new AiImageDO()

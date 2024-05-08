@@ -2,8 +2,12 @@ package cn.iocoder.yudao.module.ai.convert;
 
 import cn.iocoder.yudao.module.ai.controller.admin.image.vo.AiImageDallDrawingReqVO;
 import cn.iocoder.yudao.module.ai.controller.admin.image.vo.AiImageDallDrawingRespVO;
+import cn.iocoder.yudao.module.ai.controller.admin.image.vo.AiImageListRespVO;
+import cn.iocoder.yudao.module.ai.dal.dataobject.image.AiImageDO;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
+
+import java.util.List;
 
 /**
  * ai image convert
@@ -24,4 +28,12 @@ public interface AiImageConvert {
      * @return
      */
     AiImageDallDrawingRespVO convertAiImageDallDrawingRespVO(AiImageDallDrawingReqVO req);
+
+    /**
+     * 转换 - AiImageListRespVO
+     *
+     * @param list
+     * @return
+     */
+    List<AiImageListRespVO> convertAiImageListRespVO(List<AiImageDO> list);
 }
