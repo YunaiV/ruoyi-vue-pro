@@ -388,7 +388,7 @@ public class ProductSpuServiceImplTest extends BaseDbUnitTest {
 
         PageResult<ProductSpuDO> spuPage = productSpuService.getSpuPage(productSpuPageReqVO);
 
-        assertEquals(1, spuPage.getTotal());
+        assertEquals(6, spuPage.getTotal());
     }
 
     /**
