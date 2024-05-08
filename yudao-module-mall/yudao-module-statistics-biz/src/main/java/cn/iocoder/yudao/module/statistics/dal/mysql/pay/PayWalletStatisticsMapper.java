@@ -33,6 +33,6 @@ public interface PayWalletStatisticsMapper extends BaseMapperX {
                                                                @Param("endTime") LocalDateTime endTime,
                                                                @Param("payStatus") Boolean payStatus);
 
-    Integer selectRechargePriceSummary(@Param("payStatus") Integer payStatus);
+    Integer selectRechargePriceSummary(@Param("payStatus") Boolean payStatus);
 
 }
