@@ -1,8 +1,10 @@
 package cn.iocoder.yudao.module.ai.convert;
 
+import cn.iocoder.yudao.framework.ai.midjourney.MidjourneyMessage;
 import cn.iocoder.yudao.module.ai.controller.admin.image.vo.AiImageDallDrawingReqVO;
 import cn.iocoder.yudao.module.ai.controller.admin.image.vo.AiImageDallDrawingRespVO;
 import cn.iocoder.yudao.module.ai.controller.admin.image.vo.AiImageListRespVO;
+import cn.iocoder.yudao.module.ai.controller.admin.image.vo.AiImageMidjourneyOperationsVO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.image.AiImageDO;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
@@ -36,4 +38,12 @@ public interface AiImageConvert {
      * @return
      */
     List<AiImageListRespVO> convertAiImageListRespVO(List<AiImageDO> list);
+
+    /**
+     * 转换 - AiImageMidjourneyOperationsVO
+     *
+     * @param component
+     * @return
+     */
+    AiImageMidjourneyOperationsVO convertAiImageMidjourneyOperationsVO(MidjourneyMessage.Component component);
 }
