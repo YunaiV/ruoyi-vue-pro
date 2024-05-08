@@ -19,7 +19,7 @@ public class AiImageMidjourneyOperateReqVO {
 
     @NotNull(message = "图片编号不能为空")
     @Schema(description = "编号")
-    private String id;
+    private Long id;
 
     @NotNull(message = "消息编号不能为空")
     @Schema(description = "消息编号")

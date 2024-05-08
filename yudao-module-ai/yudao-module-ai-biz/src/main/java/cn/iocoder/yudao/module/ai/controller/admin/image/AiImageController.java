@@ -59,12 +59,14 @@ public class AiImageController {
     @Operation(summary = "取消 midjourney 绘画", description = "取消 midjourney 绘画")
     @PostMapping("/cancel-midjourney")
     public CommonResult<Void> cancelMidjourney(@RequestParam("id") Long id) {
+        // @范 这里实现mj取消逻辑
         return success(null);
     }
 
     @Operation(summary = "删除绘画记录", description = "")
     @DeleteMapping("/delete")
     public CommonResult<Void> delete(@RequestParam("id") Long id) {
+        aiImageService.delete(id);
         return success(null);
     }
 }

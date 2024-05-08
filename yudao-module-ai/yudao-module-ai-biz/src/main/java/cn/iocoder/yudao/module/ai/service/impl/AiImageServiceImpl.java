@@ -137,7 +137,7 @@ public class AiImageServiceImpl implements AiImageService {
     @Override
     public void midjourneyOperate(AiImageMidjourneyOperateReqVO req) {
         // 校验是否存在
-        AiImageDO aiImageDO = validateExists(req);
+        AiImageDO aiImageDO = validateExists(req.getId());
         // 获取 midjourneyOperations
         List<AiImageMidjourneyOperationsVO> midjourneyOperations = getMidjourneyOperations(aiImageDO);
         // 校验 OperateId 是否存在
@@ -156,6 +156,14 @@ public class AiImageServiceImpl implements AiImageService {
                         .setCustomId(req.getOperateId())
                         .setMessageId(req.getMessageId())
         );
+    }
+
+    @Override
+    public void delete(Long id) {
+        // 校验记录是否存在
+        AiImageDO aiImageDO = validateExists(id);
+        // 删除记录
+        aiImageMapper.deleteById(id);
     }
 
     private void validateMessageId(String mjMessageId, String messageId) {
@@ -181,8 +189,8 @@ public class AiImageServiceImpl implements AiImageService {
         return JsonUtils.parseArray(aiImageDO.getMjOperations(), AiImageMidjourneyOperationsVO.class);
     }
 
-    private AiImageDO validateExists(AiImageMidjourneyOperateReqVO req) {
-        AiImageDO aiImageDO = aiImageMapper.selectById(req.getId());
+    private AiImageDO validateExists(Long id) {
+        AiImageDO aiImageDO = aiImageMapper.selectById(id);
         if (aiImageDO == null) {
             throw ServiceExceptionUtil.exception(ErrorCodeConstants.AI_MIDJOURNEY_IMAGINE_FAIL);
         }

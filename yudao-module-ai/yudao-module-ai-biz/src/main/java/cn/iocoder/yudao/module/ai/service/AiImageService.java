@@ -44,4 +44,11 @@ public interface AiImageService {
      */
     void midjourneyOperate(AiImageMidjourneyOperateReqVO req);
 
+    /**
+     * 删除 - image 记录
+     *
+     * @param id
+     */
+    void delete(Long id);
+
 }
