@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.ai.service.impl;
 
+import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.ai.exception.AiException;
 import cn.iocoder.yudao.framework.ai.image.ImageGeneration;
@@ -123,11 +124,12 @@ public class AiImageServiceImpl implements AiImageService {
     @Transactional(rollbackFor = Exception.class)
     public void midjourney(AiImageMidjourneyReqVO req) {
         // 保存数据库
+        String messageId = String.valueOf(IdUtil.getSnowflakeNextId());
         AiImageDO aiImageDO = doSave(req.getPrompt(), null, "midjoureny",
                 null, AiImageDrawingStatusEnum.SUBMIT, null,
-                null, null, null);
+                messageId, null, null);
         // 提交 midjourney 任务
-        Boolean imagine = midjourneyInteractionsApi.imagine(aiImageDO.getId(), req.getPrompt());
+        Boolean imagine = midjourneyInteractionsApi.imagine(messageId, req.getPrompt());
         if (!imagine) {
             throw ServiceExceptionUtil.exception(ErrorCodeConstants.AI_MIDJOURNEY_IMAGINE_FAIL);
         }

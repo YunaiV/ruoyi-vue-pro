@@ -40,7 +40,7 @@ public class MidjourneyInteractionsTests {
     @Test
     public void mjImageTest() {
         MidjourneyInteractionsApi mjImagineInteractions = new MidjourneyInteractionsApi(midjourneyConfig);
-        mjImagineInteractions.imagine(IdUtil.getSnowflakeNextId(), "童话里应该是什么样子？");
+        mjImagineInteractions.imagine(String.valueOf(IdUtil.getSnowflakeNextId()), "童话里应该是什么样子？");
     }
 
 
