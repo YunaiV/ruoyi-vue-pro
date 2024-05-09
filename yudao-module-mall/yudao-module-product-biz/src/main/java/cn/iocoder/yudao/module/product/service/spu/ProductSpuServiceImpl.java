@@ -13,6 +13,7 @@ import cn.iocoder.yudao.module.product.controller.admin.spu.vo.ProductSpuSaveReq
 import cn.iocoder.yudao.module.product.controller.admin.spu.vo.ProductSpuUpdateStatusReqVO;
 import cn.iocoder.yudao.module.product.controller.app.spu.vo.AppProductSpuPageReqVO;
 import cn.iocoder.yudao.module.product.dal.dataobject.category.ProductCategoryDO;
+import cn.iocoder.yudao.module.product.dal.dataobject.sku.ProductSkuDO;
 import cn.iocoder.yudao.module.product.dal.dataobject.spu.ProductSpuDO;
 import cn.iocoder.yudao.module.product.dal.mysql.spu.ProductSpuMapper;
 import cn.iocoder.yudao.module.product.enums.spu.ProductSpuStatusEnum;
@@ -70,6 +71,26 @@ public class ProductSpuServiceImpl implements ProductSpuService {
         productSpuMapper.insert(spu);
         // 插入 SKU
         productSkuService.createSkuList(spu.getId(), skuSaveReqList);
+        // 返回
+        return spu.getId();
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public Long copySpu(Long srcId) {
+        ProductSpuDO productSpuDO = getSpu(srcId);
+        ProductSpuDO spu = productSpuDO.setId(null);
+        // 插入 SPU
+        productSpuMapper.insert(spu);
+
+        // 校验 SKU
+        List<ProductSkuDO> productSkuDOS = productSkuService.getSkuListBySpuId(srcId);
+        productSkuDOS.forEach(it -> it.setId(null));
+
+        List<ProductSkuSaveReqVO> skuSaveReqVOS = BeanUtils.toBean(productSkuDOS, ProductSkuSaveReqVO.class);
+
+        // 插入 SKU
+        productSkuService.createSkuList(spu.getId(), skuSaveReqVOS);
         // 返回
         return spu.getId();
     }
@@ -154,7 +175,7 @@ public class ProductSpuServiceImpl implements ProductSpuService {
 
     @Override
     public void updateBrowseCount(Long id, int incrCount) {
-        productSpuMapper.updateBrowseCount(id , incrCount);
+        productSpuMapper.updateBrowseCount(id, incrCount);
     }
 
     @Override

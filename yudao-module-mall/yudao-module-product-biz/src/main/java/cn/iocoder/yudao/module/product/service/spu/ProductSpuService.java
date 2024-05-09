@@ -29,6 +29,14 @@ public interface ProductSpuService {
     Long createSpu(@Valid ProductSpuSaveReqVO createReqVO);
 
     /**
+     * 复制商品 SPU
+     *
+     * @param srcId 原商品信息 id
+     * @return 编号
+     */
+    Long copySpu(Long srcId);
+
+    /**
      * 更新商品 SPU
      *
      * @param updateReqVO 更新信息

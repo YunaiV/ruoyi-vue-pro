@@ -50,6 +50,14 @@ public class ProductSpuController {
         return success(productSpuService.createSpu(createReqVO));
     }
 
+    @PostMapping("/copy")
+    @Operation(summary = "复制商品 SPU")
+    @Parameter(name = "id", description = "编号", required = true, example = "1024")
+    @PreAuthorize("@ss.hasPermission('product:spu:create')")
+    public CommonResult<Long> copyProductSpu(@RequestParam("id") Long id) {
+        return success(productSpuService.copySpu(id));
+    }
+
     @PutMapping("/update")
     @Operation(summary = "更新商品 SPU")
     @PreAuthorize("@ss.hasPermission('product:spu:update')")
@@ -129,7 +137,7 @@ public class ProductSpuController {
     @PreAuthorize("@ss.hasPermission('product:spu:export')")
     @ApiAccessLog(operateType = EXPORT)
     public void exportSpuList(@Validated ProductSpuPageReqVO reqVO,
-                               HttpServletResponse response) throws IOException {
+                              HttpServletResponse response) throws IOException {
         reqVO.setPageSize(PAGE_SIZE_NONE);
         List<ProductSpuDO> list = productSpuService.getSpuPage(reqVO).getList();
         // 导出 Excel
