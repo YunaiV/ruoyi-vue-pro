@@ -3,13 +3,14 @@ package cn.iocoder.yudao.module.ai;
 import cn.iocoder.yudao.framework.common.exception.ErrorCode;
 
 /**
- * System 错误码枚举类
+ * AI 错误码枚举类
  *
- * system 系统，使用 1-002-000-000 段
+ * ai 系统，使用 1-040-000-000 段
  */
 public interface ErrorCodeConstants {
 
-    // ========== 模块 ai 错误码区间 [1-022-000-000 ~ 1-023-000-000) ==========
+    // ========== API 密钥 1-040-000-000 ==========
+    ErrorCode API_KEY_NOT_EXISTS = new ErrorCode(1_040_000_000, "AI API 密钥不存在");
 
     // chat
 
@@ -36,5 +37,6 @@ public interface ErrorCodeConstants {
     ErrorCode AI_MODAL_CONFIG_PARAMS_INCORRECT = new ErrorCode(1_022_000_081, "AI 模型 config 参数不正确! {} ");
     ErrorCode AI_MODAL_PLATFORM_PARAMS_INCORRECT = new ErrorCode(1_022_000_083, "AI 平台参数不正确! {} ");
     ErrorCode AI_MODAL_DISABLE_NOT_USED = new ErrorCode(1_022_000_084, "AI 模型禁用不能使用!");
+
 
 }

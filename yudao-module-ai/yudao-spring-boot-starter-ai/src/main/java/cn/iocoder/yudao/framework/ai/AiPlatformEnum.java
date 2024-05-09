@@ -6,6 +6,7 @@ import lombok.Getter;
 
 import java.util.List;
 
+// TODO 芋艿：这块，看看要不要调整下；
 /**
  * ai 模型平台
  *
@@ -16,11 +17,10 @@ import java.util.List;
 @AllArgsConstructor
 public enum AiPlatformEnum {
 
-
     YI_YAN("yiyan", "一言"),
     QIAN_WEN("qianwen", "千问"),
     XING_HUO("xinghuo", "星火"),
-    OPEN_AI("openai", "openAi"),
+    OPEN_AI("openai", "openAi"), // TODO 芋艿：OpenAI
     OPEN_AI_DALL("dall", "dall"),
     MIDJOURNEY("midjourney", "midjourney"),
 

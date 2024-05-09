@@ -32,17 +32,15 @@ public class AiApiKeyDO extends BaseDO {
      */
     private String name;
     /**
+     * 密钥
+     */
+    private String apiKey;
+    /**
      * 平台
      *
      * 枚举 {@link AiPlatformEnum}
      */
     private String platform;
-    /**
-     * 用途
-     *
-     * TODO 芋艿：枚举；chat、image
-     */
-    private Integer type;
     /**
      * API 地址
      */
@@ -53,7 +51,5 @@ public class AiApiKeyDO extends BaseDO {
      * 枚举 {@link CommonStatusEnum}
      */
     private Integer status;
-
-    // TODO 芋艿：proxyUrl 代理地址
 
 }

@@ -1,9 +1,5 @@
 package cn.iocoder.yudao.module.ai.controller.admin.model.vo.model;
 
-import cn.iocoder.yudao.framework.ai.AiPlatformEnum;
-import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
-import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiApiKeyDO;
-import com.baomidou.mybatisplus.annotation.TableId;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.experimental.Accessors;
