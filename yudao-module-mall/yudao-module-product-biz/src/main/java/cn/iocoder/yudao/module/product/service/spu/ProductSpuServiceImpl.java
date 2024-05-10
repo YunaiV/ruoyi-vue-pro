@@ -79,7 +79,8 @@ public class ProductSpuServiceImpl implements ProductSpuService {
     @Transactional(rollbackFor = Exception.class)
     public Long copySpu(Long srcId) {
         ProductSpuDO productSpuDO = getSpu(srcId);
-        ProductSpuDO spu = productSpuDO.setId(null);
+        ProductSpuDO spu = productSpuDO.setId(null) // 删除 id
+                .setStatus(ProductSpuStatusEnum.DISABLE.getStatus()); // 新复制出来的商品默认未上架
         // 插入 SPU
         productSpuMapper.insert(spu);
 

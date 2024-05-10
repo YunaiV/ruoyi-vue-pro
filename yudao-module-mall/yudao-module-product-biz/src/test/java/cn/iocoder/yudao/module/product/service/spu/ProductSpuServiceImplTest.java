@@ -114,9 +114,11 @@ public class ProductSpuServiceImplTest extends BaseDbUnitTest {
 
         // copy spu
         Long copiedId = productSpuService.copySpu(spu);
-        // 断言除了 id 与时间外其他属性相同
-        assertPojoEquals(productSpuService.getSpu(spu), productSpuService.getSpu(copiedId),
-                "id", "createTime", "updateTime");
+        // 断言除了 id, status 与时间外其他属性相同
+        ProductSpuDO copied = productSpuService.getSpu(copiedId);
+        assertPojoEquals(productSpuService.getSpu(spu), copied,
+                "id", "createTime", "updateTime", "status");
+        assertEquals(ProductSpuStatusEnum.DISABLE.getStatus(), copied.getStatus());
 
         // 断言其下 sku 除 id 与时间外其他属性相同
         List<ProductSkuDO> copiedSkus = productSkuService.getSkuListBySpuId(copiedId);
