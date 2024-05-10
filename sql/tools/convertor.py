@@ -562,7 +562,8 @@ class SQLServerConvertor(Convertor):
         script = f"""-- ----------------------------
 -- Table structure for {table_name}
 -- ----------------------------
-DROP TABLE IF EXISTS {table_name};
+DROP TABLE IF EXISTS {table_name}
+GO
 CREATE TABLE {table_name} (
     {filed_def_list}
 )
@@ -642,7 +643,6 @@ GO
     def gen_dual(self) -> str:
         return """DROP TABLE IF EXISTS dual
 GO
-
 CREATE TABLE dual
 (
   id int
