@@ -29,14 +29,14 @@ public class AiApiKeyController {
     private AiApiKeyService apiKeyService;
 
     @PostMapping("/create")
-    @Operation(summary = "创建AI API 密钥")
+    @Operation(summary = "创建 API 密钥")
     @PreAuthorize("@ss.hasPermission('ai:api-key:create')")
     public CommonResult<Long> createApiKey(@Valid @RequestBody AiApiKeySaveReqVO createReqVO) {
         return success(apiKeyService.createApiKey(createReqVO));
     }
 
     @PutMapping("/update")
-    @Operation(summary = "更新AI API 密钥")
+    @Operation(summary = "更新 API 密钥")
     @PreAuthorize("@ss.hasPermission('ai:api-key:update')")
     public CommonResult<Boolean> updateApiKey(@Valid @RequestBody AiApiKeySaveReqVO updateReqVO) {
         apiKeyService.updateApiKey(updateReqVO);
@@ -44,7 +44,7 @@ public class AiApiKeyController {
     }
 
     @DeleteMapping("/delete")
-    @Operation(summary = "删除AI API 密钥")
+    @Operation(summary = "删除 API 密钥")
     @Parameter(name = "id", description = "编号", required = true)
     @PreAuthorize("@ss.hasPermission('ai:api-key:delete')")
     public CommonResult<Boolean> deleteApiKey(@RequestParam("id") Long id) {
@@ -53,7 +53,7 @@ public class AiApiKeyController {
     }
 
     @GetMapping("/get")
-    @Operation(summary = "获得AI API 密钥")
+    @Operation(summary = "获得 API 密钥")
     @Parameter(name = "id", description = "编号", required = true, example = "1024")
     @PreAuthorize("@ss.hasPermission('ai:api-key:query')")
     public CommonResult<AiApiKeyRespVO> getApiKey(@RequestParam("id") Long id) {
@@ -62,7 +62,7 @@ public class AiApiKeyController {
     }
 
     @GetMapping("/page")
-    @Operation(summary = "获得AI API 密钥分页")
+    @Operation(summary = "获得 API 密钥分页")
     @PreAuthorize("@ss.hasPermission('ai:api-key:query')")
     public CommonResult<PageResult<AiApiKeyRespVO>> getApiKeyPage(@Valid AiApiKeyPageReqVO pageReqVO) {
         PageResult<AiApiKeyDO> pageResult = apiKeyService.getApiKeyPage(pageReqVO);

@@ -41,7 +41,7 @@ public enum AiPlatformEnum {
             AiPlatformEnum.MIDJOURNEY
     );
 
-    public static AiPlatformEnum valueOfPlatform(String platform) {
+    public static AiPlatformEnum validatePlatform(String platform) {
         for (AiPlatformEnum itemEnum : AiPlatformEnum.values()) {
             if (itemEnum.getPlatform().equals(platform)) {
                 return itemEnum;

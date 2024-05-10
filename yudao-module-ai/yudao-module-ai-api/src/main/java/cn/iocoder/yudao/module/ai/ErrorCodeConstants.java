@@ -11,10 +11,15 @@ public interface ErrorCodeConstants {
 
     // ========== API 密钥 1-040-000-000 ==========
     ErrorCode API_KEY_NOT_EXISTS = new ErrorCode(1_040_000_000, "AI API 密钥不存在");
+    ErrorCode API_KEY_DISABLE = new ErrorCode(1_040_000_001, "AI API 密钥已禁用！");
 
-    // chat
+    // ========== API 聊天模型 1-040-001-000 ==========
 
-    ErrorCode AI_MODULE_NOT_SUPPORTED = new ErrorCode(1_022_000_000, "AI 模型暂不支持!");
+    ErrorCode CHAT_MODAL_NOT_EXIST = new ErrorCode(1_040_001_000, "AI 模型不存在!");
+    ErrorCode CHAT_MODAL_DISABLE = new ErrorCode(1_040_001_001, "AI 模型({})已禁用!");
+
+    //    ErrorCode AI_MODAL_CONFIG_PARAMS_INCORRECT = new ErrorCode(1_022_000_081, "AI 模型 config 参数不正确! {} ");
+//    ErrorCode AI_MODAL_PLATFORM_PARAMS_INCORRECT = new ErrorCode(1_022_000_083, "AI 平台参数不正确! {} ");
 
     // conversation
 
@@ -30,13 +35,6 @@ public interface ErrorCodeConstants {
 
     ErrorCode AI_CHAT_ROLE_NOT_EXIST = new ErrorCode(1_022_000_060, "AI 角色不存在!");
     ErrorCode AI_CHAT_ROLE_NOT_PUBLIC = new ErrorCode(1_022_000_060, "AI 角色未公开!");
-
-    // modal
-
-    ErrorCode AI_MODAL_NOT_EXIST = new ErrorCode(1_022_000_080, "AI 模型不存在!");
-    ErrorCode AI_MODAL_CONFIG_PARAMS_INCORRECT = new ErrorCode(1_022_000_081, "AI 模型 config 参数不正确! {} ");
-    ErrorCode AI_MODAL_PLATFORM_PARAMS_INCORRECT = new ErrorCode(1_022_000_083, "AI 平台参数不正确! {} ");
-    ErrorCode AI_MODAL_DISABLE_NOT_USED = new ErrorCode(1_022_000_084, "AI 模型禁用不能使用!");
 
 
 }

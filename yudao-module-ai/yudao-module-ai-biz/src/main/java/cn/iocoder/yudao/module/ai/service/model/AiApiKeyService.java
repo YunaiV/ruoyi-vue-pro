@@ -14,7 +14,7 @@ import jakarta.validation.Valid;
 public interface AiApiKeyService {
 
     /**
-     * 创建AI API 密钥
+     * 创建 API 密钥
      *
      * @param createReqVO 创建信息
      * @return 编号
@@ -22,32 +22,40 @@ public interface AiApiKeyService {
     Long createApiKey(@Valid AiApiKeySaveReqVO createReqVO);
 
     /**
-     * 更新AI API 密钥
+     * 更新 API 密钥
      *
      * @param updateReqVO 更新信息
      */
     void updateApiKey(@Valid AiApiKeySaveReqVO updateReqVO);
 
     /**
-     * 删除AI API 密钥
+     * 删除 API 密钥
      *
      * @param id 编号
      */
     void deleteApiKey(Long id);
 
     /**
-     * 获得AI API 密钥
+     * 获得 API 密钥
      *
      * @param id 编号
-     * @return AI API 密钥
+     * @return API 密钥
      */
     AiApiKeyDO getApiKey(Long id);
 
     /**
-     * 获得AI API 密钥分页
+     * 校验 API 密钥
+     *
+     * @param id 比那好
+     * @return API 密钥
+     */
+    AiApiKeyDO validateApiKey(Long id);
+
+    /**
+     * 获得 API 密钥分页
      *
      * @param pageReqVO 分页查询
-     * @return AI API 密钥分页
+     * @return API 密钥分页
      */
     PageResult<AiApiKeyDO> getApiKeyPage(AiApiKeyPageReqVO pageReqVO);
 
