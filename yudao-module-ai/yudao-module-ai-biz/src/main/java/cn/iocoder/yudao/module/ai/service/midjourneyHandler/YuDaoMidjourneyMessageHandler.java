@@ -62,12 +62,11 @@ public class YuDaoMidjourneyMessageHandler implements MidjourneyMessageHandler {
 
     private void errorHandler(MidjourneyMessage midjourneyMessage) {
         // image 编号
-        Long aiImageId = Long.valueOf(midjourneyMessage.getNonce());
+        Long nonceId = Long.valueOf(midjourneyMessage.getNonce());
         // 获取 error message
         String errorMessage = getErrorMessage(midjourneyMessage);
-        aiImageMapper.updateById(
+        aiImageMapper.updateByMjNonce(nonceId,
                 new AiImageDO()
-                        .setId(aiImageId)
                         .setDrawingErrorMessage(errorMessage)
                         .setDrawingStatus(AiImageDrawingStatusEnum.FAIL.getStatus())
         );
@@ -83,7 +82,7 @@ public class YuDaoMidjourneyMessageHandler implements MidjourneyMessageHandler {
 
     private void successHandler(MidjourneyMessage midjourneyMessage) {
         // 获取id
-        Long aiImageId = Long.valueOf(midjourneyMessage.getNonce());
+        Long nonceId = Long.valueOf(midjourneyMessage.getNonce());
         // 获取生成 url
         String imageUrl = null;
         if (CollUtil.isNotEmpty(midjourneyMessage.getAttachments())) {
@@ -102,12 +101,11 @@ public class YuDaoMidjourneyMessageHandler implements MidjourneyMessageHandler {
         // 获取 midjourneyOperations
         List<AiImageMidjourneyOperationsVO> midjourneyOperations = getMidjourneyOperationsList(midjourneyMessage);
         // 更新数据库
-        aiImageMapper.updateById(
+        aiImageMapper.updateByMjNonce(nonceId,
                 new AiImageDO()
-                        .setId(aiImageId)
                         .setDrawingImageUrl(imageUrl)
                         .setDrawingStatus(drawingStatusEnum == null ? null : drawingStatusEnum.getStatus())
-                        .setMjMessageId(midjourneyMessage.getId())
+                        .setMjNonceId(midjourneyMessage.getId())
                         .setMjOperations(JsonUtils.toJsonString(midjourneyOperations))
         );
     }
