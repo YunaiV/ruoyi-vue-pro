@@ -83,6 +83,7 @@ public class YuDaoMidjourneyMessageHandler implements MidjourneyMessageHandler {
     private void successHandler(MidjourneyMessage midjourneyMessage) {
         // 获取id
         Long nonceId = Long.valueOf(midjourneyMessage.getNonce());
+        // TODO @芋艿 这个地方有问题，不能根据 nonce来更新，不返回这个信息(别人获取了 image-xxx-xx 后面一段hash，由于没有mj账号测试，暂不清楚。)
         // 获取生成 url
         String imageUrl = null;
         if (CollUtil.isNotEmpty(midjourneyMessage.getAttachments())) {
