@@ -145,7 +145,7 @@ public class AiImageServiceImpl implements AiImageService {
         // 校验 OperateId 是否存在
         AiImageMidjourneyOperationsVO midjourneyOperationsVO = validateMidjourneyOperationsExists(midjourneyOperations, req.getOperateId());
         // 校验 messageId
-        validateMessageId(aiImageDO.getMjMessageId(), req.getMessageId());
+        validateMessageId(aiImageDO.getMjNonceId(), req.getMessageId());
         // 获取 mjOperationName
         String mjOperationName = midjourneyOperationsVO.getLabel();
         // 保存一个 image 任务记录
@@ -222,7 +222,7 @@ public class AiImageServiceImpl implements AiImageService {
         aiImageDO.setDrawingImageUrl(drawingImageUrl);
         aiImageDO.setDrawingErrorMessage(drawingErrorMessage);
         //
-        aiImageDO.setMjMessageId(mjMessageId);
+        aiImageDO.setMjNonceId(mjMessageId);
         aiImageDO.setMjOperationId(mjOperationId);
         aiImageDO.setMjOperationName(mjOperationName);
         aiImageMapper.insert(aiImageDO);

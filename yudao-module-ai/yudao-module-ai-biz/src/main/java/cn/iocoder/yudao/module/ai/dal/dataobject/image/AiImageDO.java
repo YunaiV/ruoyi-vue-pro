@@ -49,8 +49,8 @@ public class AiImageDO extends BaseDO {
 
     // ============ mj 需要字段
 
-    @Schema(description = "用户操作的消息编号(MJ返回)")
-    private String mjMessageId;
+    @Schema(description = "用户操作的Nonce编号(MJ返回)")
+    private String mjNonceId;
 
     @Schema(description = "用户操作的操作编号(MJ返回)")
     private String mjOperationId;

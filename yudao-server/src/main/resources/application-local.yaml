@@ -52,7 +52,7 @@ spring:
           #          url: jdbc:sqlserver://127.0.0.1:1433;DatabaseName=ruoyi-vue-pro;SelectMethod=cursor;encrypt=false;rewriteBatchedStatements=true;useUnicode=true;characterEncoding=utf-8 # SQLServer 连接的示例
           #          url: jdbc:dm://127.0.0.1:5236?schema=RUOYI_VUE_PRO # DM 连接的示例
           username: root
-          password: 123456
+          password: root
         #          username: sa # SQL Server 连接的示例
         #          password: Yudao@2024 # SQL Server 连接的示例
         #          username: SYSDBA # DM 连接的示例
@@ -61,7 +61,7 @@ spring:
           lazy: true # 开启懒加载，保证启动速度
           url: jdbc:mysql://127.0.0.1:3306/ruoyi-vue-pro?useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true&nullCatalogMeansCurrent=true
           username: root
-          password: 123456
+          password: root
 
   # Redis 配置。Redisson 默认的配置足够使用，一般不需要进行调优
   data:
@@ -248,9 +248,9 @@ yudao:
       style: vivid
     midjourney:
       enable: true
-      token: OTc1MzcyNDg1OTcxMzEyNzAw.G2iiSo.OqW9vToC5dokiyb1QOWnCwRPsYpOjLyNcf9--M
-      guild-id: 1234355413420347402
-      channel-id: 1234380679576424448
+      token: MTE4MjE3MjY2MjkxNTY3ODIzOA.GEV1SG.c49F8lZoGCUHwsj8O0UdodmM6nyQHvuD2fXflw
+      guild-id: 1237948819677904956
+      channel-id: 1237948819677904960
   captcha:
     enable: false # 本地环境，暂时关闭图片验证码，方便登录等接口的测试；
   security:
@@ -267,6 +267,8 @@ yudao:
     enable: false
   demo: false # 关闭演示模式
   tencent-lbs-key: TVDBZ-TDILD-4ON4B-PFDZA-RNLKH-VVF6E # QQ 地图的密钥 https://lbs.qq.com/service/staticV2/staticGuide/staticDoc
+  tenant:
+    enable: false
 
 justauth:
   enabled: true
