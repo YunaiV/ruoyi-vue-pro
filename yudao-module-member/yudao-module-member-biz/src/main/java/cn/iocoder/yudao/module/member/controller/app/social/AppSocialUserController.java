@@ -63,9 +63,10 @@ public class AppSocialUserController {
         return success(BeanUtils.toBean(socialUser, AppSocialUserRespVO.class));
     }
 
+    // TODO @puhui999：是不是 url 叫 wxa-qrcode？然后相关的方法，都做下调整哈；因为是微信小程序的二维码
     @PostMapping("/wxacode")
     @Operation(summary = "获得微信小程序码")
-    @PreAuthenticated
+    @PreAuthenticated // TODO @puhui999：可能不需要登录
     public CommonResult<String> getWxQrcode(@RequestBody @Valid AppSocialWxQrcodeReqVO reqVO) {
         byte[] wxQrcode = socialUserApi.getWxQrcode(BeanUtils.toBean(reqVO, SocialWxQrcodeReqDTO.class).setUserId(getLoginUserId())
                 .setUserType(UserTypeEnum.MEMBER.getValue()).setSocialType(reqVO.getType()));
