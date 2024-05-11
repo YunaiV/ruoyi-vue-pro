@@ -7,7 +7,7 @@
         SELECT
             DATE_FORMAT(order_date, '%Y%m') AS time,
             COUNT(1) AS currentMonthCount
-        FROM	crm_contract
+        FROM crm_contract
         WHERE deleted = 0
         AND audit_status = ${@cn.iocoder.yudao.module.crm.enums.common.CrmAuditStatusEnum@APPROVE.status}
         AND owner_user_id in
@@ -24,7 +24,7 @@
         SELECT
             DATE_FORMAT(order_date, '%Y%m') AS time,
             IFNULL(SUM(total_price), 0) AS currentMonthCount
-        FROM	crm_contract
+        FROM crm_contract
         WHERE deleted = 0
         AND audit_status = ${@cn.iocoder.yudao.module.crm.enums.common.CrmAuditStatusEnum@APPROVE.status}
         AND owner_user_id in
@@ -41,7 +41,7 @@
         SELECT
             DATE_FORMAT(return_time, '%Y%m') AS time,
             IFNULL(SUM(price), 0) AS currentMonthCount
-        FROM	crm_receivable
+        FROM crm_receivable
         WHERE deleted = 0
         AND audit_status = ${@cn.iocoder.yudao.module.crm.enums.common.CrmAuditStatusEnum@APPROVE.status}
         AND owner_user_id in

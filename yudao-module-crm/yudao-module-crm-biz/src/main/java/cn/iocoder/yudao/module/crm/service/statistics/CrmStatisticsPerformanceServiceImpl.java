@@ -1,7 +1,6 @@
 package cn.iocoder.yudao.module.crm.service.statistics;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.hutool.core.util.ObjUtil;
 import cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.performance.CrmStatisticsPerformanceReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.performance.CrmStatisticsPerformanceRespVO;
@@ -10,14 +9,16 @@ import cn.iocoder.yudao.module.system.api.dept.DeptApi;
 import cn.iocoder.yudao.module.system.api.dept.dto.DeptRespDTO;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
+import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
-import jakarta.annotation.Resource;
-
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
@@ -39,7 +40,6 @@ public class CrmStatisticsPerformanceServiceImpl implements CrmStatisticsPerform
     private AdminUserApi adminUserApi;
     @Resource
     private DeptApi deptApi;
-
 
     @Override
     public List<CrmStatisticsPerformanceRespVO> getContractCountPerformance(CrmStatisticsPerformanceReqVO performanceReqVO) {
@@ -77,11 +77,8 @@ public class CrmStatisticsPerformanceServiceImpl implements CrmStatisticsPerform
         performanceReqVO.setUserIds(userIds);
 
         // 2. 获得业绩数据
-        int year = Integer.parseInt(LocalDateTimeUtil.format(performanceReqVO.getTimes()[0],"yyyy"));//获取查询的年份
-        LocalDateTime[] timesRange = performanceReqVO.getTimes();//以时间段形式去数据库查询，时间段为所查询年份和前一年，两年时间的数据，便于计算同比数据
-        timesRange[0] = performanceReqVO.getTimes()[0].minusYears(1);//查询的起始时间往前推一年
-        timesRange[1] = performanceReqVO.getTimes()[1];//查询的结束时间
-        performanceReqVO.setTimes(timesRange);
+        int year = performanceReqVO.getTimes()[0].getYear(); // 获取查询的年份
+        performanceReqVO.getTimes()[0] = performanceReqVO.getTimes()[0].minusYears(1);
         List<CrmStatisticsPerformanceRespVO> performanceList = performanceFunction.apply(performanceReqVO);
         Map<String, BigDecimal> performanceMap = convertMap(performanceList, CrmStatisticsPerformanceRespVO::getTime,
                 CrmStatisticsPerformanceRespVO::getCurrentMonthCount);
