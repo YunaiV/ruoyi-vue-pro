@@ -11,6 +11,8 @@ import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
+import java.util.List;
+
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.ai.ErrorCodeConstants.*;
 
@@ -77,6 +79,11 @@ public class AiApiKeyServiceImpl implements AiApiKeyService {
     @Override
     public PageResult<AiApiKeyDO> getApiKeyPage(AiApiKeyPageReqVO pageReqVO) {
         return apiKeyMapper.selectPage(pageReqVO);
+    }
+
+    @Override
+    public List<AiApiKeyDO> getApiKeyList() {
+        return apiKeyMapper.selectList();
     }
 
 }

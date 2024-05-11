@@ -20,7 +20,7 @@ public enum AiPlatformEnum {
     YI_YAN("yiyan", "一言"),
     QIAN_WEN("qianwen", "千问"),
     XING_HUO("xinghuo", "星火"),
-    OPEN_AI("openai", "openAi"), // TODO 芋艿：OpenAI
+    OPENAI("OpenAI", "OpenAI"),
     OPEN_AI_DALL("dall", "dall"),
     MIDJOURNEY("midjourney", "midjourney"),
 
@@ -33,7 +33,7 @@ public enum AiPlatformEnum {
             AiPlatformEnum.YI_YAN,
             AiPlatformEnum.QIAN_WEN,
             AiPlatformEnum.XING_HUO,
-            AiPlatformEnum.OPEN_AI
+            AiPlatformEnum.OPENAI
     );
 
     public static List<AiPlatformEnum> IMAGE_PLATFORM_LIST = Lists.newArrayList(
@@ -42,12 +42,12 @@ public enum AiPlatformEnum {
     );
 
     public static AiPlatformEnum validatePlatform(String platform) {
-        for (AiPlatformEnum itemEnum : AiPlatformEnum.values()) {
-            if (itemEnum.getPlatform().equals(platform)) {
-                return itemEnum;
+        for (AiPlatformEnum platformEnum : AiPlatformEnum.values()) {
+            if (platformEnum.getPlatform().equals(platform)) {
+                return platformEnum;
             }
         }
-        throw new IllegalArgumentException("Invalid MessageType value: " + platform);
+        throw new IllegalArgumentException("非法平台： " + platform);
     }
 
 }

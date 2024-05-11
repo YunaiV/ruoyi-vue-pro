@@ -17,7 +17,11 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+import java.util.function.Function;
+
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
 
 @Tag(name = "管理后台 - AI 聊天模型")
 @RestController
@@ -67,6 +71,14 @@ public class AiChatModelController {
     public CommonResult<PageResult<AiChatModelRespVO>> getChatModelPage(@Valid AiChatModelPageReqVO pageReqVO) {
         PageResult<AiChatModelDO> pageResult = chatModelService.getChatModelPage(pageReqVO);
         return success(BeanUtils.toBean(pageResult, AiChatModelRespVO.class));
+    }
+
+    @GetMapping("/simple-list")
+    @Operation(summary = "获得聊天模型列表")
+    @Parameter(name = "status", description = "状态", required = true, example = "1")
+    public CommonResult<List<AiChatModelRespVO>> getChatModelSimpleList(@RequestParam("status") Integer status) {
+        List<AiChatModelDO> list = chatModelService.getChatModelList(status);
+        return success(convertList(list, model -> new AiChatModelRespVO().setId(model.getId()).setName(model.getName())));
     }
 
 }

@@ -6,6 +6,8 @@ import cn.iocoder.yudao.module.ai.controller.admin.model.vo.apikey.AiApiKeySaveR
 import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiApiKeyDO;
 import jakarta.validation.Valid;
 
+import java.util.List;
+
 /**
  * AI API 密钥 Service 接口
  *
@@ -58,5 +60,12 @@ public interface AiApiKeyService {
      * @return API 密钥分页
      */
     PageResult<AiApiKeyDO> getApiKeyPage(AiApiKeyPageReqVO pageReqVO);
+
+    /**
+     * 获得 API 密钥列表
+     *
+     * @return API 密钥列表
+     */
+    List<AiApiKeyDO> getApiKeyList();
 
 }

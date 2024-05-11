@@ -6,6 +6,8 @@ import cn.iocoder.yudao.module.ai.controller.admin.model.vo.chatModel.AiChatMode
 import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiChatModelDO;
 import jakarta.validation.Valid;
 
+import java.util.List;
+
 /**
  * AI 聊天模型 Service 接口
  *
@@ -40,7 +42,7 @@ public interface AiChatModelService {
      * 获得聊天模型
      *
      * @param id 编号
-     * @return API 聊天模型
+     * @return 聊天模型
      */
     AiChatModelDO getChatModel(Long id);
 
@@ -48,7 +50,7 @@ public interface AiChatModelService {
      * 获得聊天模型分页
      *
      * @param pageReqVO 分页查询
-     * @return API 聊天模型分页
+     * @return 聊天模型分页
      */
     PageResult<AiChatModelDO> getChatModelPage(AiChatModelPageReqVO pageReqVO);
 
@@ -59,5 +61,13 @@ public interface AiChatModelService {
      * @return 聊天模型
      */
     AiChatModelDO validateChatModel(Long id);
+
+    /**
+     * 获得聊天模型列表
+     *
+     * @param status 状态
+     * @return 聊天模型列表
+     */
+    List<AiChatModelDO> getChatModelList(Integer status);
 
 }

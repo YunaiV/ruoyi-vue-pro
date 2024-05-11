@@ -9,6 +9,8 @@ import cn.iocoder.yudao.module.ai.controller.admin.model.vo.chatModel.AiChatMode
 import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiChatModelDO;
 import org.apache.ibatis.annotations.Mapper;
 
+import java.util.List;
+
 /**
  * API 聊天模型 Mapper
  *
@@ -39,7 +41,13 @@ public interface AiChatModelMapper extends BaseMapperX<AiChatModelDO> {
                 .likeIfPresent(AiChatModelDO::getName, reqVO.getName())
                 .eqIfPresent(AiChatModelDO::getModel, reqVO.getModel())
                 .eqIfPresent(AiChatModelDO::getPlatform, reqVO.getPlatform())
-                .orderByDesc(AiChatModelDO::getId));
+                .orderByAsc(AiChatModelDO::getSort));
+    }
+
+    default List<AiChatModelDO> selectList(Integer status) {
+        return selectList(new LambdaQueryWrapperX<AiChatModelDO>()
+                .eq(AiChatModelDO::getStatus, status)
+                .orderByAsc(AiChatModelDO::getSort));
     }
 
 }
