@@ -207,7 +207,6 @@ class Convertor(ABC):
 -- Table structure for dual
 -- ----------------------------
 {dual}
-
 """
             )
 
@@ -371,7 +370,17 @@ CREATE SEQUENCE {table_name}_seq
         return """DROP TABLE IF EXISTS dual;
 CREATE TABLE dual
 (
-);"""
+    id int2
+);
+
+COMMENT ON TABLE dual IS '数据库连接的表';
+
+-- ----------------------------
+-- Records of dual
+-- ----------------------------
+-- @formatter:off
+INSERT INTO dual VALUES (1);
+-- @formatter:on"""
 
 
 class OracleConvertor(Convertor):
@@ -553,7 +562,8 @@ class SQLServerConvertor(Convertor):
         script = f"""-- ----------------------------
 -- Table structure for {table_name}
 -- ----------------------------
-DROP TABLE IF EXISTS {table_name};
+DROP TABLE IF EXISTS {table_name}
+GO
 CREATE TABLE {table_name} (
     {filed_def_list}
 )
@@ -633,10 +643,9 @@ GO
     def gen_dual(self) -> str:
         return """DROP TABLE IF EXISTS dual
 GO
-
 CREATE TABLE dual
 (
-  id int NULL
+  id int
 )
 GO
 
@@ -644,7 +653,15 @@ EXEC sp_addextendedproperty
     'MS_Description', N'数据库连接的表',
     'SCHEMA', N'dbo',
     'TABLE', N'dual'
-GO"""
+GO
+
+-- ----------------------------
+-- Records of dual
+-- ----------------------------
+-- @formatter:off
+INSERT INTO dual VALUES (1)
+GO
+-- @formatter:on"""
 
 
 class DM8Convertor(Convertor):
