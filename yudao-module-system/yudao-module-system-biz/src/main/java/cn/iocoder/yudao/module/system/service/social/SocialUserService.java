@@ -4,6 +4,7 @@ import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.system.api.social.dto.SocialUserBindReqDTO;
 import cn.iocoder.yudao.module.system.api.social.dto.SocialUserRespDTO;
+import cn.iocoder.yudao.module.system.api.social.dto.SocialWxQrcodeReqDTO;
 import cn.iocoder.yudao.module.system.controller.admin.socail.vo.user.SocialUserPageReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.social.SocialUserDO;
 import cn.iocoder.yudao.module.system.enums.social.SocialTypeEnum;
@@ -85,5 +86,13 @@ public interface SocialUserService {
      * @return 社交用户分页
      */
     PageResult<SocialUserDO> getSocialUserPage(SocialUserPageReqVO pageReqVO);
+
+    /**
+     * 获得小程序二维码
+     *
+     * @param reqVO 请求信息
+     * @return 小程序二维码
+     */
+    byte[] getWxQrcode(SocialWxQrcodeReqDTO reqVO);
 
 }
