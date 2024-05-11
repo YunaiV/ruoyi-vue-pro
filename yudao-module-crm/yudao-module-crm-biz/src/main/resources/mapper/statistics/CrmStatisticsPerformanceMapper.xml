@@ -5,51 +5,51 @@
     <select id="selectContractCountPerformance"
             resultType="cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.performance.CrmStatisticsPerformanceRespVO">
         SELECT
-        DATE_FORMAT(order_date, '%Y%m') AS time,
-        COUNT(1) AS currentMonthCount
+            DATE_FORMAT(order_date, '%Y%m') AS time,
+            COUNT(1) AS currentMonthCount
         FROM	crm_contract
         WHERE deleted = 0
-        AND audit_status = 20
+        AND audit_status = ${@cn.iocoder.yudao.module.crm.enums.common.CrmAuditStatusEnum@APPROVE.status}
         AND owner_user_id in
-        <foreach collection="userIds" item="userId" open="(" close=")" separator=",">
-            #{userId}
-        </foreach>
-        AND (DATE_FORMAT(order_date, '%Y') = DATE_FORMAT(#{times[0],javaType=java.time.LocalDateTime},'%Y')
-        or DATE_FORMAT(order_date, '%Y') = DATE_FORMAT(#{times[0],javaType=java.time.LocalDateTime},'%Y')-1)
+            <foreach collection="userIds" item="userId" open="(" close=")" separator=",">
+                #{userId}
+            </foreach>
+        AND order_date between #{times[0],javaType=java.time.LocalDateTime} and
+            #{times[1],javaType=java.time.LocalDateTime}
         GROUP BY time
     </select>
 
     <select id="selectContractPricePerformance"
             resultType="cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.performance.CrmStatisticsPerformanceRespVO">
         SELECT
-        DATE_FORMAT(order_date, '%Y%m') AS time,
-        IFNULL(SUM(total_price), 0) AS currentMonthCount
+            DATE_FORMAT(order_date, '%Y%m') AS time,
+            IFNULL(SUM(total_price), 0) AS currentMonthCount
         FROM	crm_contract
         WHERE deleted = 0
-        AND audit_status = 20
+        AND audit_status = ${@cn.iocoder.yudao.module.crm.enums.common.CrmAuditStatusEnum@APPROVE.status}
         AND owner_user_id in
-        <foreach collection="userIds" item="userId" open="(" close=")" separator=",">
-            #{userId}
-        </foreach>
-        AND (DATE_FORMAT(order_date, '%Y') = DATE_FORMAT(#{times[0],javaType=java.time.LocalDateTime},'%Y')
-        or DATE_FORMAT(order_date, '%Y') = DATE_FORMAT(#{times[0],javaType=java.time.LocalDateTime},'%Y')-1)
+            <foreach collection="userIds" item="userId" open="(" close=")" separator=",">
+                #{userId}
+            </foreach>
+        AND order_date between #{times[0],javaType=java.time.LocalDateTime} and
+            #{times[1],javaType=java.time.LocalDateTime}
         GROUP BY time
     </select>
 
     <select id="selectReceivablePricePerformance"
             resultType="cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.performance.CrmStatisticsPerformanceRespVO">
         SELECT
-        DATE_FORMAT(return_time, '%Y%m') AS time,
-        IFNULL(SUM(price), 0) AS currentMonthCount
+            DATE_FORMAT(return_time, '%Y%m') AS time,
+            IFNULL(SUM(price), 0) AS currentMonthCount
         FROM	crm_receivable
         WHERE deleted = 0
-        AND audit_status = 20
+        AND audit_status = ${@cn.iocoder.yudao.module.crm.enums.common.CrmAuditStatusEnum@APPROVE.status}
         AND owner_user_id in
-        <foreach collection="userIds" item="userId" open="(" close=")" separator=",">
-            #{userId}
-        </foreach>
-        AND (DATE_FORMAT(return_time, '%Y') = DATE_FORMAT(#{times[0],javaType=java.time.LocalDateTime},'%Y')
-        or DATE_FORMAT(return_time, '%Y') = DATE_FORMAT(#{times[0],javaType=java.time.LocalDateTime},'%Y')-1)
+            <foreach collection="userIds" item="userId" open="(" close=")" separator=",">
+                #{userId}
+            </foreach>
+        AND return_time between #{times[0],javaType=java.time.LocalDateTime} and
+            #{times[1],javaType=java.time.LocalDateTime}
         GROUP BY time
     </select>
 

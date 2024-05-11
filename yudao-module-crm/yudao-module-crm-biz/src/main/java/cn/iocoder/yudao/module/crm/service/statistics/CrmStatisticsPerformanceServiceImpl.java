@@ -16,10 +16,12 @@ import org.springframework.validation.annotation.Validated;
 import jakarta.annotation.Resource;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.function.Function;
 
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
 
 /**
  * CRM 员工业绩分析 Service 实现类
@@ -55,85 +57,47 @@ public class CrmStatisticsPerformanceServiceImpl implements CrmStatisticsPerform
     }
 
     /**
-     * 获得员工业绩数据，并通过如下方法拿到对应的lastYearCount，lastMonthCount
-     * 比如说，构造2024 年的CrmStatisticsPerformanceRespVO，获得 2023-01 到 2024-12的月统计数据即可
-     * 可以数据 group by 年-月，2023-01 到 2024-12的，然后聚合出 CrmStatisticsPerformanceRespVO
+     * 获得员工业绩数据
+     *
+     * 1. 获得今年 + 去年的数据
+     * 2. 遍历今年的月份，逐个拼接去年的月份数据
+     *
      * @param performanceReqVO  参数
      * @param performanceFunction 员工业绩统计方法
      * @return 员工业绩数据
      */
     private List<CrmStatisticsPerformanceRespVO> getPerformance(CrmStatisticsPerformanceReqVO performanceReqVO,
-               Function<CrmStatisticsPerformanceReqVO, List<CrmStatisticsPerformanceRespVO>> performanceFunction) {
+                                                                Function<CrmStatisticsPerformanceReqVO, List<CrmStatisticsPerformanceRespVO>> performanceFunction) {
 
         // 1. 获得用户编号数组
-        final List<Long> userIds = getUserIds(performanceReqVO);
+        List<Long> userIds = getUserIds(performanceReqVO);
         if (CollUtil.isEmpty(userIds)) {
             return Collections.emptyList();
         }
         performanceReqVO.setUserIds(userIds);
 
         // 2. 获得业绩数据
+        int year = Integer.parseInt(LocalDateTimeUtil.format(performanceReqVO.getTimes()[0],"yyyy"));//获取查询的年份
+        LocalDateTime[] timesRange = performanceReqVO.getTimes();//以时间段形式去数据库查询，时间段为所查询年份和前一年，两年时间的数据，便于计算同比数据
+        timesRange[0] = performanceReqVO.getTimes()[0].minusYears(1);//查询的起始时间往前推一年
+        timesRange[1] = performanceReqVO.getTimes()[1];//查询的结束时间
+        performanceReqVO.setTimes(timesRange);
         List<CrmStatisticsPerformanceRespVO> performanceList = performanceFunction.apply(performanceReqVO);
+        Map<String, BigDecimal> performanceMap = convertMap(performanceList, CrmStatisticsPerformanceRespVO::getTime,
+                CrmStatisticsPerformanceRespVO::getCurrentMonthCount);
 
-        // 获取查询的年份
-        String currentYear = LocalDateTimeUtil.format(performanceReqVO.getTimes()[0],"yyyy");
-        Map<Integer, CrmStatisticsPerformanceRespVO> currentYearMap = new TreeMap<>();//查询当年的map数据
-        Map<Integer, CrmStatisticsPerformanceRespVO> lastYearMap = new TreeMap<>();//前一年的map数据
-
+        // 3. 组装数据返回
+        List<CrmStatisticsPerformanceRespVO> result = new ArrayList<>();
         for (int month = 1; month <= 12; month++) {
-            //根据数据库的月销售数据查询结果，构造查询当年的map数据
-            String currentYearKey = String.format("%d%02d", Integer.parseInt(currentYear), month);
-            buildYearMapData(performanceList, currentYearMap, currentYearKey);
-
-            //根据数据库的月销售数据查询结果，构造查询前一年的map数据
-            String lastYearKey = String.format("%d%02d", Integer.parseInt(currentYear)-1, month);
-            buildYearMapData(performanceList, lastYearMap, lastYearKey);
+            String currentMonth = String.format("%d%02d", year, month);
+            String lastMonth = month == 1 ? String.format("%d%02d", year - 1, 12) : String.format("%d%02d", year, month - 1);
+            String lastYear = String.format("%d%02d", year - 1, month);
+            result.add(new CrmStatisticsPerformanceRespVO().setTime(currentMonth)
+                    .setCurrentMonthCount(performanceMap.getOrDefault(currentMonth, BigDecimal.ZERO))
+                    .setLastMonthCount(performanceMap.getOrDefault(lastMonth, BigDecimal.ZERO))
+                    .setLastYearCount(performanceMap.getOrDefault(lastYear, BigDecimal.ZERO)));
         }
-        //根据构造好的map数据，计算查询当年的环比和同比数据，并构造好返回的respVOList
-        List<CrmStatisticsPerformanceRespVO> respVOList = new ArrayList<>();
-        for (int key : currentYearMap.keySet()) {
-            BigDecimal lastYearCount = lastYearMap.get(key-100).getCurrentMonthCount();
-            BigDecimal lastMonthCount;
-            if (key % 100 > 1) {//2-12月份的前一个月数据
-                lastMonthCount = currentYearMap.get(key-1).getCurrentMonthCount();
-            } else {//1月份的前一个月数据
-                lastMonthCount = lastYearMap.get(key-89).getCurrentMonthCount();
-            }
-
-            currentYearMap.get(key).setLastYearCount(lastYearCount);
-            currentYearMap.get(key).setLastMonthCount(lastMonthCount);
-
-            respVOList.add(currentYearMap.get(key));
-        }
-
-        return respVOList;
-    }
-
-    /**
-     * 根据mapKey，添加当年和前一年的月销售记录到对应的map结构中
-     * @param performanceList   数据库中查询到的月销售记录
-     * @param YearDataMap   将查询到的月销售记录put到对应的map中，如果月销售记录为null，置为0
-     * @param mapKey        对应的mapKey
-     */
-    private void buildYearMapData(List<CrmStatisticsPerformanceRespVO> performanceList,
-                                  Map<Integer, CrmStatisticsPerformanceRespVO> YearDataMap,
-                                  String mapKey)
-    {
-        CrmStatisticsPerformanceRespVO currentYearData = performanceList.stream()
-                .filter(data -> data.getTime().equals(mapKey))
-                .findFirst()
-                .orElse(null);
-
-        if(currentYearData != null) {
-            YearDataMap.put(Integer.parseInt(mapKey), currentYearData);
-        } else {
-            CrmStatisticsPerformanceRespVO defaultVO = new CrmStatisticsPerformanceRespVO();
-            defaultVO.setTime(mapKey);
-            defaultVO.setCurrentMonthCount(BigDecimal.ZERO);
-            defaultVO.setLastMonthCount(BigDecimal.ZERO);
-            defaultVO.setLastYearCount(BigDecimal.ZERO);
-            YearDataMap.put(Integer.parseInt(mapKey), defaultVO);
-        }
+        return result;
     }
 
     /**
