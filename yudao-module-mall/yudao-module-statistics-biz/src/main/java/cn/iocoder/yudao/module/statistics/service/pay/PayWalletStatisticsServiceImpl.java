@@ -46,7 +46,7 @@ public class PayWalletStatisticsServiceImpl implements PayWalletStatisticsServic
 
     @Override
     public Integer getRechargePriceSummary() {
-        return payWalletStatisticsMapper.selectRechargePriceSummary(PayOrderStatusEnum.SUCCESS.getStatus());
+        return payWalletStatisticsMapper.selectRechargePriceSummary(Boolean.TRUE);
     }
 
 }
