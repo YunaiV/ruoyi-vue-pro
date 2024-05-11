@@ -13,6 +13,7 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.cache.CacheUtils;
 import cn.iocoder.yudao.framework.common.util.http.HttpUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
+import cn.iocoder.yudao.module.system.api.social.dto.SocialWxQrcodeReqDTO;
 import cn.iocoder.yudao.module.system.controller.admin.socail.vo.client.SocialClientPageReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.socail.vo.client.SocialClientSaveReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.social.SocialClientDO;
@@ -139,7 +140,7 @@ public class SocialClientServiceImpl implements SocialClientService {
      * 构建 AuthRequest 对象，支持多租户配置
      *
      * @param socialType 社交类型
-     * @param userType 用户类型
+     * @param userType   用户类型
      * @return AuthRequest 对象
      */
     @VisibleForTesting
@@ -196,7 +197,7 @@ public class SocialClientServiceImpl implements SocialClientService {
     /**
      * 创建 clientId + clientSecret 对应的 WxMpService 对象
      *
-     * @param clientId 微信公众号 appId
+     * @param clientId     微信公众号 appId
      * @param clientSecret 微信公众号 secret
      * @return WxMpService 对象
      */
@@ -227,6 +228,19 @@ public class SocialClientServiceImpl implements SocialClientService {
         }
     }
 
+    @Override
+    public byte[] getWxQrcode(SocialWxQrcodeReqDTO reqVO) {
+        WxMaService service = getWxMaService(reqVO.getUserType());
+        try {
+            return service.getQrcodeService().createWxaCodeUnlimitBytes(reqVO.getScene(), reqVO.getPath(),
+                    reqVO.getIsCheckPath(), reqVO.getEnvVersion(), reqVO.getWidth(), reqVO.getIsAutoColor(),
+                    null, reqVO.getIsHyaline());
+        } catch (WxErrorException e) {
+            log.error("[getWxQrcode][reqVO({})) 获得小程序码失败]", reqVO, e);
+            throw exception(SOCIAL_CLIENT_WEIXIN_MINI_APP_QRCODE_ERROR);
+        }
+    }
+
     /**
      * 获得 clientId + clientSecret 对应的 WxMpService 对象
      *
@@ -248,7 +262,7 @@ public class SocialClientServiceImpl implements SocialClientService {
     /**
      * 创建 clientId + clientSecret 对应的 WxMaService 对象
      *
-     * @param clientId 微信小程序 appId
+     * @param clientId     微信小程序 appId
      * @param clientSecret 微信小程序 secret
      * @return WxMaService 对象
      */
@@ -310,8 +324,8 @@ public class SocialClientServiceImpl implements SocialClientService {
      *
      * 原因是，不同端（userType）选择某个社交登录（socialType）时，需要通过 {@link #buildAuthRequest(Integer, Integer)} 构建对应的请求
      *
-     * @param id 编号
-     * @param userType 用户类型
+     * @param id         编号
+     * @param userType   用户类型
      * @param socialType 社交类型
      */
     private void validateSocialClientUnique(Long id, Integer userType, Integer socialType) {
