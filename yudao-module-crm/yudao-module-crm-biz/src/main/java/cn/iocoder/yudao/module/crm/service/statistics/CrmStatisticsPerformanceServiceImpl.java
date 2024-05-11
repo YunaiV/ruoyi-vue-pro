@@ -1,8 +1,7 @@
 package cn.iocoder.yudao.module.crm.service.statistics;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.collection.ListUtil;
-import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.hutool.core.util.ObjUtil;
 import cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.performance.CrmStatisticsPerformanceReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.performance.CrmStatisticsPerformanceRespVO;
@@ -11,15 +10,14 @@ import cn.iocoder.yudao.module.system.api.dept.DeptApi;
 import cn.iocoder.yudao.module.system.api.dept.dto.DeptRespDTO;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
-import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
+import jakarta.annotation.Resource;
+
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.time.LocalDateTime;
+import java.util.*;
 import java.util.function.Function;
 
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
@@ -69,7 +67,7 @@ public class CrmStatisticsPerformanceServiceImpl implements CrmStatisticsPerform
      * @return 员工业绩数据
      */
     private List<CrmStatisticsPerformanceRespVO> getPerformance(CrmStatisticsPerformanceReqVO performanceReqVO,
-               Function<CrmStatisticsPerformanceReqVO, List<CrmStatisticsPerformanceRespVO>> performanceFunction) {
+                                                                Function<CrmStatisticsPerformanceReqVO, List<CrmStatisticsPerformanceRespVO>> performanceFunction) {
 
         // 1. 获得用户编号数组
         List<Long> userIds = getUserIds(performanceReqVO);
@@ -79,13 +77,17 @@ public class CrmStatisticsPerformanceServiceImpl implements CrmStatisticsPerform
         performanceReqVO.setUserIds(userIds);
 
         // 2. 获得业绩数据
+        int year = Integer.parseInt(LocalDateTimeUtil.format(performanceReqVO.getTimes()[0],"yyyy"));//获取查询的年份
+        LocalDateTime[] timesRange = performanceReqVO.getTimes();//以时间段形式去数据库查询，时间段为所查询年份和前一年，两年时间的数据，便于计算同比数据
+        timesRange[0] = performanceReqVO.getTimes()[0].minusYears(1);//查询的起始时间往前推一年
+        timesRange[1] = performanceReqVO.getTimes()[1];//查询的结束时间
+        performanceReqVO.setTimes(timesRange);
         List<CrmStatisticsPerformanceRespVO> performanceList = performanceFunction.apply(performanceReqVO);
         Map<String, BigDecimal> performanceMap = convertMap(performanceList, CrmStatisticsPerformanceRespVO::getTime,
                 CrmStatisticsPerformanceRespVO::getCurrentMonthCount);
 
         // 3. 组装数据返回
         List<CrmStatisticsPerformanceRespVO> result = new ArrayList<>();
-        int year = DateUtil.thisYear();
         for (int month = 1; month <= 12; month++) {
             String currentMonth = String.format("%d%02d", year, month);
             String lastMonth = month == 1 ? String.format("%d%02d", year - 1, 12) : String.format("%d%02d", year, month - 1);
@@ -107,7 +109,7 @@ public class CrmStatisticsPerformanceServiceImpl implements CrmStatisticsPerform
     private List<Long> getUserIds(CrmStatisticsPerformanceReqVO reqVO) {
         // 情况一：选中某个用户
         if (ObjUtil.isNotNull(reqVO.getUserId())) {
-            return ListUtil.of(reqVO.getUserId());
+            return List.of(reqVO.getUserId());
         }
         // 情况二：选中某个部门
         // 2.1 获得部门列表
