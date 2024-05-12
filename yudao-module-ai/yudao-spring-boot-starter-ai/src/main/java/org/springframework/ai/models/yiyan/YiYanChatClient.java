@@ -1,7 +1,6 @@
 package org.springframework.ai.models.yiyan;
 
 import cn.hutool.core.bean.BeanUtil;
-import cn.iocoder.yudao.framework.ai.chat.*;
 import org.springframework.ai.chat.*;
 import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.chat.messages.MessageType;
