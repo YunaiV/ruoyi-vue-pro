@@ -1,7 +1,6 @@
 package cn.iocoder.yudao.module.ai.service;
 
-import cn.iocoder.yudao.module.ai.controller.admin.chat.vo.message.AiChatMessageRespVO;
-import cn.iocoder.yudao.module.ai.controller.admin.chat.vo.message.AiChatMessageSendReqVO;
+import cn.iocoder.yudao.module.ai.controller.admin.chat.vo.message.*;
 import reactor.core.publisher.Flux;
 
 import java.util.List;
@@ -29,7 +28,15 @@ public interface AiChatService {
      * @param sendReqVO
      * @return
      */
-    Flux<AiChatMessageRespVO> chatStream(AiChatMessageSendReqVO sendReqVO);
+    Flux<AiChatMessageRespVO> chatStream(AiChatMessageSendStreamReqVO sendReqVO);
+
+    /**
+     * 添加 - message
+     *
+     * @param sendReqVO
+     * @return
+     */
+    AiChatMessageRespVO add(AiChatMessageAddReqVO sendReqVO);
 
     /**
      * 获取 - 获取对话 message list

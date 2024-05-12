@@ -14,6 +14,9 @@ import org.springframework.validation.annotation.Validated;
 
 import java.util.List;
 
+import java.util.List;
+import java.util.Set;
+
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.ai.ErrorCodeConstants.*;
 
@@ -95,6 +98,11 @@ public class AiChatModelServiceImpl implements AiChatModelService {
     public List<AiChatModelDO> getChatModelList(Integer status) {
         chatModelMapper.selectList(status);
         return null;
+    }
+
+    @Override
+    public List<AiChatModelDO> getModalByIds(Set<Long> modalIds) {
+        return chatModelMapper.selectByIds(modalIds);
     }
 
 }

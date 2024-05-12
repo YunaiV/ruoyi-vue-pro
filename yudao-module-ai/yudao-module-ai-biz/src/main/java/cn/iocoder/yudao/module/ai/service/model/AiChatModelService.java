@@ -8,6 +8,9 @@ import jakarta.validation.Valid;
 
 import java.util.List;
 
+import java.util.List;
+import java.util.Set;
+
 /**
  * AI 聊天模型 Service 接口
  *
@@ -70,4 +73,11 @@ public interface AiChatModelService {
      */
     List<AiChatModelDO> getChatModelList(Integer status);
 
+    /**
+     * 获取 - 根据多个 ids 获取
+     *
+     * @param modalIds
+     * @return
+     */
+    List<AiChatModelDO> getModalByIds(Set<Long> modalIds);
 }
