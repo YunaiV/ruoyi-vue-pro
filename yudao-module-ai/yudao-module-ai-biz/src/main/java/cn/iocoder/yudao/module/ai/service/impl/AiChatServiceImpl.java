@@ -1,12 +1,12 @@
 package cn.iocoder.yudao.module.ai.service.impl;
 
 import cn.hutool.core.exceptions.ExceptionUtil;
-import cn.iocoder.yudao.framework.ai.AiPlatformEnum;
-import cn.iocoder.yudao.framework.ai.chat.ChatClient;
-import cn.iocoder.yudao.framework.ai.chat.ChatResponse;
-import cn.iocoder.yudao.framework.ai.chat.StreamingChatClient;
-import cn.iocoder.yudao.framework.ai.chat.messages.MessageType;
-import cn.iocoder.yudao.framework.ai.chat.prompt.Prompt;
+import cn.iocoder.yudao.framework.ai.core.enums.AiPlatformEnum;
+import org.springframework.ai.chat.ChatClient;
+import org.springframework.ai.chat.ChatResponse;
+import org.springframework.ai.chat.StreamingChatClient;
+import org.springframework.ai.chat.messages.MessageType;
+import org.springframework.ai.chat.prompt.Prompt;
 import cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil;
 import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
 import cn.iocoder.yudao.module.ai.ErrorCodeConstants;

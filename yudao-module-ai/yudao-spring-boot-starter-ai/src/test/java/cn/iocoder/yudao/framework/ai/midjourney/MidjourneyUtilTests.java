@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.framework.ai.midjourney;
 
-import cn.iocoder.yudao.framework.ai.midjourney.util.MidjourneyUtil;
+import org.springframework.ai.models.midjourney.util.MidjourneyUtil;
 import org.junit.Test;
 
 /**

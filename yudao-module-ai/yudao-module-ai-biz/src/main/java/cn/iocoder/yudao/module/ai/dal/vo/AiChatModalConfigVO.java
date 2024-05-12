@@ -1,7 +1,10 @@
 package cn.iocoder.yudao.module.ai.dal.vo;
 
+import cn.iocoder.yudao.framework.ai.core.enums.AiPlatformEnum;
 import lombok.Data;
 import lombok.experimental.Accessors;
+import org.springframework.ai.models.xinghuo.XingHuoChatModel;
+import org.springframework.ai.models.yiyan.YiYanChatModel;
 
 /**
  * modal config
@@ -16,13 +19,13 @@ public class AiChatModalConfigVO {
 
     /**
      * 模型平台 (冗余，方便类型转换)
-     * 参考：{@link cn.iocoder.yudao.framework.ai.AiPlatformEnum}
+     * 参考：{@link AiPlatformEnum}
      */
     private String platform;
     /**
      * 模型类型(冗余，方便类型转换)
-     * {@link cn.iocoder.yudao.framework.ai.chatyiyan.YiYanChatModel}
-     * {@link cn.iocoder.yudao.framework.ai.chatxinghuo.XingHuoChatModel}
+     * {@link YiYanChatModel}
+     * {@link XingHuoChatModel}
      */
     private String type;
 }

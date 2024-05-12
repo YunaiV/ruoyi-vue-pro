@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.ai.convert;
 
-import cn.iocoder.yudao.framework.ai.midjourney.MidjourneyMessage;
+import org.springframework.ai.models.midjourney.MidjourneyMessage;
 import cn.iocoder.yudao.module.ai.controller.admin.image.vo.AiImageDallDrawingReqVO;
 import cn.iocoder.yudao.module.ai.controller.admin.image.vo.AiImageDallDrawingRespVO;
 import cn.iocoder.yudao.module.ai.controller.admin.image.vo.AiImageListRespVO;

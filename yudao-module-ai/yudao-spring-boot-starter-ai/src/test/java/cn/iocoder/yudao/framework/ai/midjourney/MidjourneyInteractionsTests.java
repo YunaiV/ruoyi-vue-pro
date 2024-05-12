@@ -2,11 +2,12 @@ package cn.iocoder.yudao.framework.ai.midjourney;
 
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.IdUtil;
-import cn.iocoder.yudao.framework.ai.midjourney.api.MidjourneyInteractionsApi;
-import cn.iocoder.yudao.framework.ai.midjourney.api.req.AttachmentsReq;
-import cn.iocoder.yudao.framework.ai.midjourney.api.req.DescribeReq;
-import cn.iocoder.yudao.framework.ai.midjourney.api.req.ReRollReq;
-import cn.iocoder.yudao.framework.ai.midjourney.api.res.UploadAttachmentsRes;
+import org.springframework.ai.models.midjourney.MidjourneyConfig;
+import org.springframework.ai.models.midjourney.api.MidjourneyInteractionsApi;
+import org.springframework.ai.models.midjourney.api.req.AttachmentsReq;
+import org.springframework.ai.models.midjourney.api.req.DescribeReq;
+import org.springframework.ai.models.midjourney.api.req.ReRollReq;
+import org.springframework.ai.models.midjourney.api.res.UploadAttachmentsRes;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import org.junit.Before;
 import org.junit.Test;

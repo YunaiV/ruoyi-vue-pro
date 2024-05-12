@@ -10,6 +10,7 @@
     </parent>
 
     <artifactId>yudao-spring-boot-starter-ai</artifactId>
+    <!-- TODO 芋艿：这里需要进一步减少 -->
 
     <properties>
         <maven.compiler.source>21</maven.compiler.source>
@@ -17,6 +18,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
     <dependencies>
+        <!-- TODO fan：这里包，要进一步减少 -->
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-core</artifactId>

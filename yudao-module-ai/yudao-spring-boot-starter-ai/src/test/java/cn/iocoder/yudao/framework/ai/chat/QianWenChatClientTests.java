@@ -1,12 +1,13 @@
 package cn.iocoder.yudao.framework.ai.chat;
 
-import cn.iocoder.yudao.framework.ai.chat.messages.SystemMessage;
-import cn.iocoder.yudao.framework.ai.chat.messages.UserMessage;
-import cn.iocoder.yudao.framework.ai.chat.prompt.Prompt;
-import cn.iocoder.yudao.framework.ai.chatqianwen.QianWenChatClient;
-import cn.iocoder.yudao.framework.ai.chatqianwen.QianWenChatModal;
-import cn.iocoder.yudao.framework.ai.chatqianwen.QianWenOptions;
-import cn.iocoder.yudao.framework.ai.chatqianwen.api.QianWenApi;
+import org.springframework.ai.chat.ChatResponse;
+import org.springframework.ai.chat.messages.SystemMessage;
+import org.springframework.ai.chat.messages.UserMessage;
+import org.springframework.ai.chat.prompt.Prompt;
+import org.springframework.ai.models.tongyi.QianWenChatClient;
+import org.springframework.ai.models.tongyi.QianWenChatModal;
+import org.springframework.ai.models.tongyi.QianWenOptions;
+import org.springframework.ai.models.tongyi.api.QianWenApi;
 import com.alibaba.dashscope.aigc.generation.GenerationResult;
 import com.alibaba.dashscope.aigc.generation.models.QwenParam;
 import com.alibaba.dashscope.common.Message;
@@ -46,7 +47,7 @@ public class QianWenChatClientTests {
 
     @Test
     public void callTest() {
-        List<cn.iocoder.yudao.framework.ai.chat.messages.Message> messages = new ArrayList<>();
+        List<org.springframework.ai.chat.messages.Message> messages = new ArrayList<>();
         messages.add(new SystemMessage("你是一个优质的小红书文艺作者，抒写着各城市的美好文化和风景。"));
         messages.add(new UserMessage("长沙怎么样？"));
 
@@ -56,7 +57,7 @@ public class QianWenChatClientTests {
 
     @Test
     public void streamTest() {
-        List<cn.iocoder.yudao.framework.ai.chat.messages.Message> messages = new ArrayList<>();
+        List<org.springframework.ai.chat.messages.Message> messages = new ArrayList<>();
         messages.add(new SystemMessage("你是一个优质的文言文作者，用文言文描述着各城市的人文风景。"));
         messages.add(new UserMessage("长沙怎么样？"));
 

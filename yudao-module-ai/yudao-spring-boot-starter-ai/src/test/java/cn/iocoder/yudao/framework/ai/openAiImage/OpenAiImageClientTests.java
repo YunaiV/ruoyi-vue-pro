@@ -1,10 +1,10 @@
 package cn.iocoder.yudao.framework.ai.openAiImage;
 
-import cn.iocoder.yudao.framework.ai.imageopenai.OpenAiImageApi;
-import cn.iocoder.yudao.framework.ai.imageopenai.OpenAiImageClient;
-import cn.iocoder.yudao.framework.ai.imageopenai.OpenAiImageOptions;
-import cn.iocoder.yudao.framework.ai.image.ImagePrompt;
-import cn.iocoder.yudao.framework.ai.image.ImageResponse;
+import org.springframework.ai.models.openai.OpenAiImageApi;
+import org.springframework.ai.models.openai.OpenAiImageClient;
+import org.springframework.ai.models.openai.OpenAiImageOptions;
+import org.springframework.ai.image.ImagePrompt;
+import org.springframework.ai.image.ImageResponse;
 import org.junit.Before;
 import org.junit.Test;
 

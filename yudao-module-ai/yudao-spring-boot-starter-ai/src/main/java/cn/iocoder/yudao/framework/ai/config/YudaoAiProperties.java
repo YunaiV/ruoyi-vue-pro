@@ -1,10 +1,10 @@
 package cn.iocoder.yudao.framework.ai.config;
 
-import cn.iocoder.yudao.framework.ai.AiPlatformEnum;
-import cn.iocoder.yudao.framework.ai.chatxinghuo.XingHuoChatModel;
-import cn.iocoder.yudao.framework.ai.chatyiyan.YiYanChatModel;
-import cn.iocoder.yudao.framework.ai.imageopenai.enums.OpenAiImageModelEnum;
-import cn.iocoder.yudao.framework.ai.imageopenai.enums.OpenAiImageStyleEnum;
+import cn.iocoder.yudao.framework.ai.core.enums.AiPlatformEnum;
+import org.springframework.ai.models.xinghuo.XingHuoChatModel;
+import org.springframework.ai.models.yiyan.YiYanChatModel;
+import org.springframework.ai.models.openai.enums.OpenAiImageModelEnum;
+import org.springframework.ai.models.openai.enums.OpenAiImageStyleEnum;
 import lombok.Data;
 import lombok.experimental.Accessors;
 import org.springframework.boot.context.properties.ConfigurationProperties;

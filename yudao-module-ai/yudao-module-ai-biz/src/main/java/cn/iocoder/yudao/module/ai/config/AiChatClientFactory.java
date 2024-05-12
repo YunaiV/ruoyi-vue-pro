@@ -1,11 +1,11 @@
 package cn.iocoder.yudao.module.ai.config;
 
-import cn.iocoder.yudao.framework.ai.AiPlatformEnum;
-import cn.iocoder.yudao.framework.ai.chat.ChatClient;
-import cn.iocoder.yudao.framework.ai.chat.StreamingChatClient;
-import cn.iocoder.yudao.framework.ai.chatqianwen.QianWenChatClient;
-import cn.iocoder.yudao.framework.ai.chatxinghuo.XingHuoChatClient;
-import cn.iocoder.yudao.framework.ai.chatyiyan.YiYanChatClient;
+import cn.iocoder.yudao.framework.ai.core.enums.AiPlatformEnum;
+import org.springframework.ai.chat.ChatClient;
+import org.springframework.ai.chat.StreamingChatClient;
+import org.springframework.ai.models.tongyi.QianWenChatClient;
+import org.springframework.ai.models.xinghuo.XingHuoChatClient;
+import org.springframework.ai.models.yiyan.YiYanChatClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;

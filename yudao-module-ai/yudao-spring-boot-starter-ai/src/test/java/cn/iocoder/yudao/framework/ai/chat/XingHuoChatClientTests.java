@@ -1,13 +1,14 @@
 package cn.iocoder.yudao.framework.ai.chat;
 
-import cn.iocoder.yudao.framework.ai.chat.messages.Message;
-import cn.iocoder.yudao.framework.ai.chat.messages.SystemMessage;
-import cn.iocoder.yudao.framework.ai.chat.messages.UserMessage;
-import cn.iocoder.yudao.framework.ai.chat.prompt.Prompt;
-import cn.iocoder.yudao.framework.ai.chatxinghuo.XingHuoChatClient;
-import cn.iocoder.yudao.framework.ai.chatxinghuo.XingHuoChatModel;
-import cn.iocoder.yudao.framework.ai.chatxinghuo.XingHuoOptions;
-import cn.iocoder.yudao.framework.ai.chatxinghuo.api.XingHuoApi;
+import org.springframework.ai.chat.ChatResponse;
+import org.springframework.ai.chat.messages.Message;
+import org.springframework.ai.chat.messages.SystemMessage;
+import org.springframework.ai.chat.messages.UserMessage;
+import org.springframework.ai.chat.prompt.Prompt;
+import org.springframework.ai.models.xinghuo.XingHuoChatClient;
+import org.springframework.ai.models.xinghuo.XingHuoChatModel;
+import org.springframework.ai.models.xinghuo.XingHuoOptions;
+import org.springframework.ai.models.xinghuo.api.XingHuoApi;
 import org.junit.Before;
 import org.junit.Test;
 import reactor.core.publisher.Flux;

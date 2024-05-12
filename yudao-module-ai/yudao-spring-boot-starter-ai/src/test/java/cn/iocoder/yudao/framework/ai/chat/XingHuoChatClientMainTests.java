@@ -2,8 +2,8 @@ package cn.iocoder.yudao.framework.ai.chat;
 
 import cn.hutool.http.HttpUtil;
 import cn.hutool.json.JSONUtil;
-import cn.iocoder.yudao.framework.ai.chatxinghuo.api.XingHuoChatCompletion;
-import cn.iocoder.yudao.framework.ai.chatxinghuo.api.XingHuoChatCompletionRequest;
+import org.springframework.ai.models.xinghuo.api.XingHuoChatCompletion;
+import org.springframework.ai.models.xinghuo.api.XingHuoChatCompletionRequest;
 import org.springframework.web.reactive.socket.client.ReactorNettyWebSocketClient;
 import org.springframework.web.reactive.socket.client.WebSocketClient;
 import reactor.core.publisher.Flux;

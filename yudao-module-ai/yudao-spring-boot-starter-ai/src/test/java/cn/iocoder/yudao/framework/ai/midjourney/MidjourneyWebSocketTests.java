@@ -1,9 +1,10 @@
 package cn.iocoder.yudao.framework.ai.midjourney;
 
 import cn.hutool.core.io.FileUtil;
-import cn.iocoder.yudao.framework.ai.midjourney.webSocket.WssNotify;
-import cn.iocoder.yudao.framework.ai.midjourney.webSocket.listener.MidjourneyMessageListener;
-import cn.iocoder.yudao.framework.ai.midjourney.webSocket.MidjourneyWebSocketStarter;
+import org.springframework.ai.models.midjourney.MidjourneyConfig;
+import org.springframework.ai.models.midjourney.webSocket.WssNotify;
+import org.springframework.ai.models.midjourney.webSocket.listener.MidjourneyMessageListener;
+import org.springframework.ai.models.midjourney.webSocket.MidjourneyWebSocketStarter;
 import org.junit.Before;
 import org.junit.Test;
 

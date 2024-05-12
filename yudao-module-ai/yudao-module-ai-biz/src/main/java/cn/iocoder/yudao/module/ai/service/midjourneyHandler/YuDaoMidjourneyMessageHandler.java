@@ -2,9 +2,9 @@ package cn.iocoder.yudao.module.ai.service.midjourneyHandler;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.iocoder.yudao.framework.ai.midjourney.MidjourneyMessage;
-import cn.iocoder.yudao.framework.ai.midjourney.constants.MidjourneyGennerateStatusEnum;
-import cn.iocoder.yudao.framework.ai.midjourney.webSocket.MidjourneyMessageHandler;
+import org.springframework.ai.models.midjourney.MidjourneyMessage;
+import org.springframework.ai.models.midjourney.constants.MidjourneyGennerateStatusEnum;
+import org.springframework.ai.models.midjourney.webSocket.MidjourneyMessageHandler;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.module.ai.controller.admin.image.vo.AiImageMidjourneyOperationsVO;
 import cn.iocoder.yudao.module.ai.convert.AiImageConvert;
