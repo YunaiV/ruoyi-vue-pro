@@ -4,6 +4,9 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.ai.controller.admin.model.vo.model.*;
 import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiChatModelDO;
 
+import java.util.List;
+import java.util.Set;
+
 /**
  * ai modal
  *
@@ -64,4 +67,13 @@ public interface AiChatModelService {
      * @param chatModal
      */
     void validateAvailable(AiChatModalRespVO chatModal);
+
+    /**
+     * 获取 - 根据 ids 批量获取
+     *
+     * @param modalIds
+     * @return
+     */
+    List<AiChatModelDO> getModalByIds(Set<Long> modalIds);
+
 }

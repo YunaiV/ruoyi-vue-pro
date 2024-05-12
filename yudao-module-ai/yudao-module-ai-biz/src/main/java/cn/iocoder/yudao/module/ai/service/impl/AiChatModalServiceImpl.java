@@ -17,6 +17,7 @@ import cn.iocoder.yudao.module.ai.service.AiChatModelService;
 import jakarta.validation.ConstraintViolation;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.mybatis.spring.annotation.MapperScannerRegistrar;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -35,6 +36,7 @@ import java.util.Set;
 public class AiChatModalServiceImpl implements AiChatModelService {
 
     private final AiChatModelMapper aiChatModelMapper;
+    private final MapperScannerRegistrar mapperScannerRegistrar;
 
     @Override
     public PageResult<AiChatModelListRespVO> list(AiChatModelListReqVO req) {
@@ -100,6 +102,11 @@ public class AiChatModalServiceImpl implements AiChatModelService {
         if (!CommonStatusEnum.ENABLE.getStatus().equals(chatModal.getStatus())) {
             throw ServiceExceptionUtil.exception(ErrorCodeConstants.AI_MODAL_DISABLE_NOT_USED);
         }
+    }
+
+    @Override
+    public List<AiChatModelDO> getModalByIds(Set<Long> modalIds) {
+        return aiChatModelMapper.selectByIds(modalIds);
     }
 
     public AiChatModelDO validateExists(Long id) {

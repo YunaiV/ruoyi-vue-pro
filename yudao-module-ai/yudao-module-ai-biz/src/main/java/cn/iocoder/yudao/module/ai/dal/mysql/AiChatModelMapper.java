@@ -9,6 +9,10 @@ import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiChatModelDO;
 import org.apache.ibatis.annotations.Mapper;
 import org.springframework.stereotype.Repository;
 
+import java.util.Collection;
+import java.util.List;
+import java.util.Set;
+
 /**
  * chat modal
  *
@@ -36,5 +40,11 @@ public interface AiChatModelMapper extends BaseMapperX<AiChatModelDO> {
         return pageResult.getList().get(0);
     }
 
-
+    /**
+     * 查询 - 根据 ids
+     *
+     * @param modalIds
+     * @return
+     */
+    List<AiChatModelDO> selectByIds(Collection<Long> modalIds);
 }

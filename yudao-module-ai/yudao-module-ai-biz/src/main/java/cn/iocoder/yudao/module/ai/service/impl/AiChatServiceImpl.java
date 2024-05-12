@@ -15,6 +15,7 @@ import cn.iocoder.yudao.module.ai.controller.admin.chat.vo.message.AiChatMessage
 import cn.iocoder.yudao.module.ai.controller.admin.model.vo.model.AiChatModalRespVO;
 import cn.iocoder.yudao.module.ai.convert.AiChatMessageConvert;
 import cn.iocoder.yudao.module.ai.dal.dataobject.chat.AiChatMessageDO;
+import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiChatModelDO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiChatRoleDO;
 import cn.iocoder.yudao.module.ai.dal.mysql.AiChatConversationMapper;
 import cn.iocoder.yudao.module.ai.dal.mysql.AiChatMessageMapper;
@@ -29,8 +30,11 @@ import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Flux;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 /**
  * 聊天 service
@@ -188,8 +192,20 @@ public class AiChatServiceImpl implements AiChatService {
         chatConversationService.validateExists(conversationId);
         // 获取对话所有 message
         List<AiChatMessageDO> aiChatMessageDOList = aiChatMessageMapper.selectByConversationId(conversationId);
+        // 获取模型信息
+        Set<Long> modalIds = aiChatMessageDOList.stream().map(AiChatMessageDO::getModelId).collect(Collectors.toSet());
+        List<AiChatModelDO> modalList = aiChatModalService.getModalByIds(modalIds);
+        Map<Long, AiChatModelDO> modalIdMap = modalList.stream().collect(Collectors.toMap(AiChatModelDO::getId, o -> o));
         // 转换 AiChatMessageRespVO
-        return AiChatMessageConvert.INSTANCE.convertAiChatMessageRespVOList(aiChatMessageDOList);
+        List<AiChatMessageRespVO> aiChatMessageRespList = AiChatMessageConvert.INSTANCE.convertAiChatMessageRespVOList(aiChatMessageDOList);
+        // 设置用户头像 和 模型头像 todo @芋艿 这里需要转换 用户头像、模型头像
+        return aiChatMessageRespList.stream().map(item -> {
+            if (modalIdMap.containsKey(item.getModelId())) {
+//                modalIdMap.get(item.getModelId());
+//                item.setModelImage()
+            }
+            return item;
+        }).collect(Collectors.toList());
     }
 
     @Override
