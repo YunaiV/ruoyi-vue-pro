@@ -12,7 +12,7 @@ import cn.iocoder.yudao.module.ai.convert.AiChatRoleConvert;
 import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiChatRoleDO;
 import cn.iocoder.yudao.module.ai.dal.mysql.AiChatRoleMapper;
 import cn.iocoder.yudao.module.ai.enums.AiChatRoleCategoryEnum;
-import cn.iocoder.yudao.module.ai.service.AiChatModelService;
+import cn.iocoder.yudao.module.ai.service.model.AiChatModelService;
 import cn.iocoder.yudao.module.ai.service.AiChatRoleService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -57,8 +57,8 @@ public class AiChatRoleServiceImpl implements AiChatRoleService {
     public void add(AiChatRoleAddReqVO req) {
         // 转换enum，并校验enum
         AiChatRoleCategoryEnum.valueOfCategory(req.getCategory());
-        // 校验模型是否存在
-        aiChatModalService.validateExists(req.getModelId());
+        // 校验模型是否存在 TODO
+//        aiChatModalService.validateExists(req.getModelId());
         // 转换do
         AiChatRoleDO insertAiChatRoleDO = AiChatRoleConvert.INSTANCE.convertAiChatRoleDO(req);
         insertAiChatRoleDO.setUserId(SecurityFrameworkUtils.getLoginUserId());
@@ -73,8 +73,8 @@ public class AiChatRoleServiceImpl implements AiChatRoleService {
         validateExists(req.getId());
         // 转换enum，并校验enum
         AiChatRoleCategoryEnum.valueOfCategory(req.getCategory());
-        // 校验模型是否存在
-        aiChatModalService.validateExists(req.getModelId());
+        // 校验模型是否存在 TODO
+//        aiChatModalService.validateExists(req.getModelId());
         // 转换do
         AiChatRoleDO updateChatRole = AiChatRoleConvert.INSTANCE.convertAiChatRoleDO(req);
         updateChatRole.setId(req.getId());

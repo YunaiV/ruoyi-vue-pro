@@ -72,4 +72,5 @@ public interface AiChatRoleService {
      * @param aiChatRoleDO
      */
     void validateIsPublic(AiChatRoleDO aiChatRoleDO);
+
 }

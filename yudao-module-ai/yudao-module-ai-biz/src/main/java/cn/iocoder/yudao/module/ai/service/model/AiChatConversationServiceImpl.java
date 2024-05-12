@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.ai.service.impl;
+package cn.iocoder.yudao.module.ai.service.model;
 
 import cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil;
 import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
@@ -7,7 +7,6 @@ import cn.iocoder.yudao.module.ai.ErrorCodeConstants;
 import cn.iocoder.yudao.module.ai.controller.admin.chat.vo.conversation.AiChatConversationCreateReqVO;
 import cn.iocoder.yudao.module.ai.controller.admin.chat.vo.conversation.AiChatConversationRespVO;
 import cn.iocoder.yudao.module.ai.controller.admin.chat.vo.conversation.AiChatConversationUpdateReqVO;
-import cn.iocoder.yudao.module.ai.controller.admin.model.vo.model.AiChatModalRespVO;
 import cn.iocoder.yudao.module.ai.controller.admin.model.vo.role.AiChatRoleRespVO;
 import cn.iocoder.yudao.module.ai.convert.AiChatConversationConvert;
 import cn.iocoder.yudao.module.ai.dal.dataobject.chat.AiChatConversationDO;
@@ -15,7 +14,6 @@ import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiChatModelDO;
 import cn.iocoder.yudao.module.ai.dal.mysql.AiChatConversationMapper;
 import cn.iocoder.yudao.module.ai.dal.mysql.AiChatModelMapper;
 import cn.iocoder.yudao.module.ai.service.AiChatConversationService;
-import cn.iocoder.yudao.module.ai.service.AiChatModelService;
 import cn.iocoder.yudao.module.ai.service.AiChatRoleService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -87,9 +85,7 @@ public class AiChatConversationServiceImpl implements AiChatConversationService 
         // 校验对话是否存在
         validateExists(updateReqVO.getId());
         // 获取模型信息并验证
-        AiChatModalRespVO chatModal = aiChatModalService.getChatModalOfValidate(updateReqVO.getModelId());
-        // 校验modal是否可用
-        aiChatModalService.validateAvailable(chatModal);
+        aiChatModalService.validateChatModel(updateReqVO.getModelId());
         // 更新对话信息
         AiChatConversationDO updateAiChatConversationDO
                 = AiChatConversationConvert.INSTANCE.convertAiChatConversationDO(updateReqVO);

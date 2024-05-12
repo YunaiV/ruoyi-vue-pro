@@ -5,25 +5,23 @@ import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
+import cn.iocoder.yudao.module.ai.controller.admin.model.vo.chatModel.AiChatModelPageReqVO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiChatModelDO;
 import org.apache.ibatis.annotations.Mapper;
-import org.springframework.stereotype.Repository;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
 /**
- * chat modal
+ * API 聊天模型 Mapper
  *
  * @author fansili
- * @time 2024/4/24 19:41
- * @since 1.0
  */
-@Repository
 @Mapper
 public interface AiChatModelMapper extends BaseMapperX<AiChatModelDO> {
 
+    // TODO 芋艿：要搞一下
     /**
      * 查询 - 第一个modal
      *
@@ -46,5 +44,16 @@ public interface AiChatModelMapper extends BaseMapperX<AiChatModelDO> {
      * @param modalIds
      * @return
      */
-    List<AiChatModelDO> selectByIds(Collection<Long> modalIds);
+    default List<AiChatModelDO> selectByIds(Collection<Long> modalIds) {
+        return this.selectList(new LambdaQueryWrapperX<AiChatModelDO>().eq(AiChatModelDO::getId, modalIds));
+    }
+
+
+    default PageResult<AiChatModelDO> selectPage(AiChatModelPageReqVO reqVO) {
+        return selectPage(reqVO, new LambdaQueryWrapperX<AiChatModelDO>()
+                .likeIfPresent(AiChatModelDO::getName, reqVO.getName())
+                .eqIfPresent(AiChatModelDO::getModel, reqVO.getModel())
+                .eqIfPresent(AiChatModelDO::getPlatform, reqVO.getPlatform())
+                .orderByDesc(AiChatModelDO::getId));
+    }
 }

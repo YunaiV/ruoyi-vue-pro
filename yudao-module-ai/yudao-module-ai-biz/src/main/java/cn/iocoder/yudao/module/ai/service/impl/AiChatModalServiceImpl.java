@@ -17,7 +17,6 @@ import cn.iocoder.yudao.module.ai.service.AiChatModelService;
 import jakarta.validation.ConstraintViolation;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.mybatis.spring.annotation.MapperScannerRegistrar;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -36,7 +35,6 @@ import java.util.Set;
 public class AiChatModalServiceImpl implements AiChatModelService {
 
     private final AiChatModelMapper aiChatModelMapper;
-    private final MapperScannerRegistrar mapperScannerRegistrar;
 
     @Override
     public PageResult<AiChatModelListRespVO> list(AiChatModelListReqVO req) {

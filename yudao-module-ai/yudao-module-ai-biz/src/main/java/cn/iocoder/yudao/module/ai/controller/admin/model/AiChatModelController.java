@@ -2,60 +2,71 @@ package cn.iocoder.yudao.module.ai.controller.admin.model;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.ai.controller.admin.model.vo.model.AiChatModelAddReqVO;
-import cn.iocoder.yudao.module.ai.controller.admin.model.vo.model.AiChatModelListReqVO;
-import cn.iocoder.yudao.module.ai.controller.admin.model.vo.model.AiChatModelListRespVO;
-import cn.iocoder.yudao.module.ai.controller.admin.model.vo.model.AiChatModelUpdateReqVO;
-import cn.iocoder.yudao.module.ai.service.AiChatModelService;
+import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
+import cn.iocoder.yudao.module.ai.controller.admin.model.vo.chatModel.AiChatModelPageReqVO;
+import cn.iocoder.yudao.module.ai.controller.admin.model.vo.chatModel.AiChatModelRespVO;
+import cn.iocoder.yudao.module.ai.controller.admin.model.vo.chatModel.AiChatModelSaveReqVO;
+import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiChatModelDO;
+import cn.iocoder.yudao.module.ai.service.model.AiChatModelService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import lombok.AllArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import jakarta.annotation.Resource;
+import jakarta.validation.Valid;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-// TODO @fan：调整下接口；相关 vo 的命名等等；modal => model
+import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
-/**
- * ai 模型
- *
- * @author fansili
- * @time 2024/4/24 19:42
- * @since 1.0
- */
-@Tag(name = "A6-AI模型")
+@Tag(name = "管理后台 - AI 聊天模型")
 @RestController
-@RequestMapping("/ai/chat/model")
-@Slf4j
-@AllArgsConstructor
+@RequestMapping("/ai/chat-model")
+@Validated
 public class AiChatModelController {
 
-    private final AiChatModelService aiChatModelService;
+    @Resource
+    private AiChatModelService chatModelService;
 
-    @Operation(summary = "ai模型 - 模型列表")
-    @GetMapping("/list")
-    public PageResult<AiChatModelListRespVO> list(@ModelAttribute AiChatModelListReqVO req) {
-        return aiChatModelService.list(req);
+    @PostMapping("/create")
+    @Operation(summary = "创建聊天模型")
+    @PreAuthorize("@ss.hasPermission('ai:chat-model:create')")
+    public CommonResult<Long> createChatModel(@Valid @RequestBody AiChatModelSaveReqVO createReqVO) {
+        return success(chatModelService.createChatModel(createReqVO));
     }
 
-    @Operation(summary = "ai模型 - 添加")
-    @PutMapping("/add")
-    public CommonResult<Void> add(@RequestBody @Validated AiChatModelAddReqVO req) {
-        aiChatModelService.add(req);
-        return CommonResult.success(null);
+    @PutMapping("/update")
+    @Operation(summary = "更新聊天模型")
+    @PreAuthorize("@ss.hasPermission('ai:chat-model:update')")
+    public CommonResult<Boolean> updateChatModel(@Valid @RequestBody AiChatModelSaveReqVO updateReqVO) {
+        chatModelService.updateChatModel(updateReqVO);
+        return success(true);
     }
 
-    @Operation(summary = "ai模型 - 修改")
-    @PostMapping("/update")
-    public CommonResult<Void> update(@RequestBody @Validated AiChatModelUpdateReqVO req) {
-        aiChatModelService.update(req);
-        return CommonResult.success(null);
-    }
-
-    @Operation(summary = "ai模型 - 删除")
     @DeleteMapping("/delete")
-    public CommonResult<Void> delete(@RequestParam("id") Long id) {
-        aiChatModelService.delete(id);
-        return CommonResult.success(null);
+    @Operation(summary = "删除聊天模型")
+    @Parameter(name = "id", description = "编号", required = true)
+    @PreAuthorize("@ss.hasPermission('ai:chat-model:delete')")
+    public CommonResult<Boolean> deleteChatModel(@RequestParam("id") Long id) {
+        chatModelService.deleteChatModel(id);
+        return success(true);
     }
+
+    @GetMapping("/get")
+    @Operation(summary = "获得聊天模型")
+    @Parameter(name = "id", description = "编号", required = true, example = "1024")
+    @PreAuthorize("@ss.hasPermission('ai:chat-model:query')")
+    public CommonResult<AiChatModelRespVO> getChatModel(@RequestParam("id") Long id) {
+        AiChatModelDO chatModel = chatModelService.getChatModel(id);
+        return success(BeanUtils.toBean(chatModel, AiChatModelRespVO.class));
+    }
+
+    @GetMapping("/page")
+    @Operation(summary = "获得聊天模型分页")
+    @PreAuthorize("@ss.hasPermission('ai:chat-model:query')")
+    public CommonResult<PageResult<AiChatModelRespVO>> getChatModelPage(@Valid AiChatModelPageReqVO pageReqVO) {
+        PageResult<AiChatModelDO> pageResult = chatModelService.getChatModelPage(pageReqVO);
+        return success(BeanUtils.toBean(pageResult, AiChatModelRespVO.class));
+    }
+
 }

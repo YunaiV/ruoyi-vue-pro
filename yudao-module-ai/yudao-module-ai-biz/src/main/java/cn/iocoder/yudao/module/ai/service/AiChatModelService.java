@@ -75,5 +75,4 @@ public interface AiChatModelService {
      * @return
      */
     List<AiChatModelDO> getModalByIds(Set<Long> modalIds);
-
 }
