@@ -1,11 +1,11 @@
-package cn.iocoder.yudao.module.ai.controller.admin.model.vo.role;
+package cn.iocoder.yudao.module.ai.controller.admin.model.vo.chatRole;
 
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.validation.InEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
-import java.util.*;
 import jakarta.validation.constraints.*;
+import org.hibernate.validator.constraints.URL;
 
 @Schema(description = "管理后台 - AI 聊天角色新增/修改 Request VO")
 @Data
@@ -23,6 +23,7 @@ public class AiChatRoleSaveReqVO {
 
     @Schema(description = "角色头像", requiredMode = Schema.RequiredMode.REQUIRED, example = "https://www.iocoder.cn/1.png")
     @NotEmpty(message = "角色头像不能为空")
+    @URL(message = "角色头像必须是 URL 格式")
     private String avatar;
 
     @Schema(description = "角色类别", requiredMode = Schema.RequiredMode.REQUIRED, example = "创作")

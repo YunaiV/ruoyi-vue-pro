@@ -78,7 +78,8 @@ public class AiChatModelController {
     @Parameter(name = "status", description = "状态", required = true, example = "1")
     public CommonResult<List<AiChatModelRespVO>> getChatModelSimpleList(@RequestParam("status") Integer status) {
         List<AiChatModelDO> list = chatModelService.getChatModelList(status);
-        return success(convertList(list, model -> new AiChatModelRespVO().setId(model.getId()).setName(model.getName())));
+        return success(convertList(list, model -> new AiChatModelRespVO().setId(model.getId())
+                .setName(model.getName()).setModel(model.getModel())));
     }
 
 }

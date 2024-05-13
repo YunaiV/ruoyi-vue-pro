@@ -1,5 +1,9 @@
-package cn.iocoder.yudao.module.ai.controller.admin.model.vo.role;
+package cn.iocoder.yudao.module.ai.controller.admin.model.vo.chatRole;
 
+import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiChatModelDO;
+import com.fhs.core.trans.anno.Trans;
+import com.fhs.core.trans.constant.TransType;
+import com.fhs.core.trans.vo.VO;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
@@ -7,7 +11,7 @@ import java.time.LocalDateTime;
 
 @Schema(description = "管理后台 - AI 聊天角色 Response VO")
 @Data
-public class AiChatRoleRespVO {
+public class AiChatRoleRespVO implements VO {
 
     @Schema(description = "角色编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "32746")
     private Long id;
@@ -16,7 +20,12 @@ public class AiChatRoleRespVO {
     private Long userId;
 
     @Schema(description = "模型编号", example = "17640")
+    @Trans(type = TransType.SIMPLE, target = AiChatModelDO.class, fields = {"name", "model"}, refs = {"modelName", "model"})
     private Long modelId;
+    @Schema(description = "模型名字", example = "张三")
+    private String modelName;
+    @Schema(description = "模型标识", example = "gpt-3.5-turbo-0125")
+    private String model;
 
     @Schema(description = "角色名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "李四")
     private String name;
