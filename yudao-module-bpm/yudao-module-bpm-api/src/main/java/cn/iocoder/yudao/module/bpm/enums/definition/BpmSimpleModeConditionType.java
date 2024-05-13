@@ -13,7 +13,8 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum BpmSimpleModeConditionType {
 
-    CUSTOM_EXPRESSION(1, "自定义条件表达式");
+    EXPRESSION(1, "条件表达式"),
+    RULE(2, "条件规则");
 
     private final Integer type;
     private final String name;

@@ -1,18 +1,22 @@
 package cn.iocoder.yudao.module.bpm.framework.flowable.core.util;
 
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.lang.TypeReference;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.BooleanUtil;
+import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.simple.BpmSimpleModelNodeVO;
 import cn.iocoder.yudao.module.bpm.enums.definition.BpmApproveMethodEnum;
 import cn.iocoder.yudao.module.bpm.enums.definition.BpmSimpleModeConditionType;
 import cn.iocoder.yudao.module.bpm.enums.definition.BpmSimpleModelNodeType;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnModelConstants;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.SimpleModelConstants;
+import cn.iocoder.yudao.module.bpm.framework.flowable.core.simple.SimpleModelConditionGroups;
 import org.flowable.bpmn.BpmnAutoLayout;
 import org.flowable.bpmn.model.Process;
 import org.flowable.bpmn.model.*;
@@ -143,12 +147,34 @@ public class SimpleModelUtils {
         Integer conditionType = MapUtil.getInt(conditionNode.getAttributes(), CONDITION_TYPE_ATTRIBUTE);
         BpmSimpleModeConditionType conditionTypeEnum = BpmSimpleModeConditionType.valueOf(conditionType);
         String conditionExpression = null;
-        if (conditionTypeEnum == BpmSimpleModeConditionType.CUSTOM_EXPRESSION) {
+        if (conditionTypeEnum == BpmSimpleModeConditionType.EXPRESSION) {
             conditionExpression = MapUtil.getStr(conditionNode.getAttributes(), CONDITION_EXPRESSION_ATTRIBUTE);
+        }
+        if (conditionTypeEnum == BpmSimpleModeConditionType.RULE) {
+            SimpleModelConditionGroups conditionGroups = BeanUtil.toBean(MapUtil.get(conditionNode.getAttributes(),
+                            CONDITION_GROUPS_ATTRIBUTE, new TypeReference<Map<String, Object>>() {
+                            }),
+                    SimpleModelConditionGroups.class);
+            if (conditionGroups != null && CollUtil.isNotEmpty(conditionGroups.getConditions())) {
+                List<String> strConditionGroups = conditionGroups.getConditions().stream().map(item -> {
+                    if (CollUtil.isNotEmpty(item.getRules())) {
+                        Boolean and = item.getAnd();
+                        List<String> list = CollectionUtils.convertList(item.getRules(), (rule) -> {
+                            // 如果非数值类型加引号
+                            String rightSide = NumberUtil.isNumber(rule.getRightSide()) ? rule.getRightSide() : "\"" + rule.getRightSide() + "\"";
+                            return String.format(" %s %s var:convertByType(%s,%s)", rule.getLeftSide(), rule.getOpCode(), rule.getLeftSide(), rightSide);
+                        });
+                        return "(" + CollUtil.join(list, and ? " && " : " || ") + ")";
+                    } else {
+                        return "";
+                    }
+                }).toList();
+                conditionExpression = String.format("${%s}", CollUtil.join(strConditionGroups, conditionGroups.getAnd() ? " && " : " || "));
+            }
+
         }
         // TODO 待增加其它类型
         return conditionExpression;
-
     }
 
     private static SequenceFlow buildBpmnSequenceFlow(String sourceId, String targetId, String seqFlowId, String seqName, String conditionExpression) {

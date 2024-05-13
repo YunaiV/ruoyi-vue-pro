@@ -30,4 +30,9 @@ public interface SimpleModelConstants {
      */
     String CONDITION_EXPRESSION_ATTRIBUTE = "conditionExpression";
 
+    /**
+     * 条件规则的条件组属性
+     */
+    String CONDITION_GROUPS_ATTRIBUTE = "conditionGroups";
+
 }
