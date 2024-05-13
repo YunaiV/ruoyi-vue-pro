@@ -18,8 +18,9 @@ public interface ErrorCodeConstants {
     ErrorCode CHAT_MODAL_NOT_EXIST = new ErrorCode(1_040_001_000, "AI 模型不存在!");
     ErrorCode CHAT_MODAL_DISABLE = new ErrorCode(1_040_001_001, "AI 模型({})已禁用!");
 
-    //    ErrorCode AI_MODAL_CONFIG_PARAMS_INCORRECT = new ErrorCode(1_022_000_081, "AI 模型 config 参数不正确! {} ");
-//    ErrorCode AI_MODAL_PLATFORM_PARAMS_INCORRECT = new ErrorCode(1_022_000_083, "AI 平台参数不正确! {} ");
+    // ========== API 聊天模型 1-040-002-000 ==========
+    ErrorCode CHAT_ROLE_NOT_EXISTS = new ErrorCode(1_040_002_000, "AI 聊天角色不存在");
+    ErrorCode CHAT_ROLE_DISABLE = new ErrorCode(1_040_001_001, "AI 聊天角色({})已禁用!");
 
     // conversation
 
@@ -31,14 +32,7 @@ public interface ErrorCodeConstants {
     ErrorCode AI_MIDJOURNEY_OPERATION_NOT_EXISTS = new ErrorCode(1_022_000_040, "midjourney 操作不存在!");
     ErrorCode AI_MIDJOURNEY_MESSAGE_ID_INCORRECT = new ErrorCode(1_022_000_040, "midjourney message id 不正确!");
 
-    // role
-
-    ErrorCode AI_CHAT_ROLE_NOT_EXIST = new ErrorCode(1_022_000_060, "AI 角色不存在!");
-    ErrorCode AI_CHAT_ROLE_NOT_PUBLIC = new ErrorCode(1_022_000_060, "AI 角色未公开!");
-
     // chat
-
     ErrorCode AI_CHAT_MESSAGE_NOT_EXIST = new ErrorCode(1_022_000_100, "AI 提问的 MessageId 不存在!");
-
 
 }

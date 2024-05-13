@@ -46,7 +46,7 @@ public class AiChatRoleDO extends BaseDO {
      */
     private String welcomeMessage;
     /**
-     * 角色设定（消息）
+     * 角色上下文
      */
     private String systemMessage;
 
@@ -65,9 +65,10 @@ public class AiChatRoleDO extends BaseDO {
     private Long modelId;
 
     /**
-     * 是否公开 true - 公开；false - 私有
+     * 是否公开
      *
-     * true - 公开；false - 私有
+     * 1. true - 公开；由管理员在【角色管理】所创建
+     * 2. false - 私有；由个人在【我的角色】所创建
      */
     private Boolean publicStatus;
 

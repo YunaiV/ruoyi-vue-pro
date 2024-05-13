@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.ai.service.model;
+package cn.iocoder.yudao.module.ai.service.impl;
 
 import cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil;
 import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
@@ -7,14 +7,15 @@ import cn.iocoder.yudao.module.ai.ErrorCodeConstants;
 import cn.iocoder.yudao.module.ai.controller.admin.chat.vo.conversation.AiChatConversationCreateReqVO;
 import cn.iocoder.yudao.module.ai.controller.admin.chat.vo.conversation.AiChatConversationRespVO;
 import cn.iocoder.yudao.module.ai.controller.admin.chat.vo.conversation.AiChatConversationUpdateReqVO;
-import cn.iocoder.yudao.module.ai.controller.admin.model.vo.role.AiChatRoleRespVO;
 import cn.iocoder.yudao.module.ai.convert.AiChatConversationConvert;
 import cn.iocoder.yudao.module.ai.dal.dataobject.chat.AiChatConversationDO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiChatModelDO;
+import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiChatRoleDO;
 import cn.iocoder.yudao.module.ai.dal.mysql.AiChatConversationMapper;
 import cn.iocoder.yudao.module.ai.dal.mysql.AiChatModelMapper;
 import cn.iocoder.yudao.module.ai.service.AiChatConversationService;
-import cn.iocoder.yudao.module.ai.service.AiChatRoleService;
+import cn.iocoder.yudao.module.ai.service.model.AiChatModelService;
+import cn.iocoder.yudao.module.ai.service.model.AiChatRoleService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
@@ -45,10 +46,7 @@ public class AiChatConversationServiceImpl implements AiChatConversationService 
         // 默认使用 sort 排序第一个模型
         AiChatModelDO aiChatModalDO = aiChatModalMapper.selectFirstModal();
         // 查询角色
-        AiChatRoleRespVO chatRoleRes = null;
-        if (req.getRoleId() != null) {
-            chatRoleRes = aiChatRoleService.getChatRole(req.getRoleId());
-        }
+        AiChatRoleDO chatRoleRes = req.getRoleId() != null ? aiChatRoleService.getChatRole(req.getRoleId()) : null;
         Long chatRoleId = chatRoleRes != null ? chatRoleRes.getId() : null;
         // 创建新的 Conversation
         AiChatConversationDO insertConversation = saveConversation(AiCommonConstants.CONVERSATION_DEFAULT_TITLE,

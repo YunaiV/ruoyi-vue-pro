@@ -1,16 +1,29 @@
 package cn.iocoder.yudao.module.ai.controller.admin.model;
 
+import cn.iocoder.yudao.framework.apilog.core.annotation.ApiAccessLog;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
+import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.ai.controller.admin.model.vo.role.*;
-import cn.iocoder.yudao.module.ai.service.AiChatRoleService;
+import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
+import cn.iocoder.yudao.module.ai.controller.admin.model.vo.role.AiChatRolePageReqVO;
+import cn.iocoder.yudao.module.ai.controller.admin.model.vo.role.AiChatRoleRespVO;
+import cn.iocoder.yudao.module.ai.controller.admin.model.vo.role.AiChatRoleSaveReqVO;
+import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiChatRoleDO;
+import cn.iocoder.yudao.module.ai.service.model.AiChatRoleService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
-import lombok.AllArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
+import java.io.IOException;
+import java.util.List;
+
+import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
 @Tag(name = "管理后台 - AI 聊天角色")
 @RestController
@@ -21,42 +34,55 @@ public class AiChatRoleController {
     @Resource
     private AiChatRoleService chatRoleService;
 
-    @Operation(summary = "chat角色 - 角色列表")
-    @GetMapping("/list")
-    public PageResult<AiChatRoleListRespVO> list(@Validated @ModelAttribute AiChatRoleListReqVO req) {
-        return chatRoleService.list(req);
-    }
+    // TODO 芋艿：我的分页
 
-    @Operation(summary = "chat角色 - 添加")
-    @PutMapping("/add")
-    public CommonResult<Void> add(@Validated @RequestBody AiChatRoleAddReqVO req) {
-        chatRoleService.add(req);
-        return CommonResult.success(null);
-    }
+    // TODO 芋艿：我的新增
 
-    @Operation(summary = "chat角色 - 修改")
-    @PostMapping("/update")
-    public CommonResult<Void> update(@Validated @RequestBody AiChatRoleUpdateReqVO req) {
-        chatRoleService.update(req);
-        return CommonResult.success(null);
-    }
+    // TODO 芋艿：我的修改
 
-    @Operation(summary = "chat角色 - 修改可见性")
-    @PostMapping("/update-public-status")
-    public CommonResult<Void> updatePublicStatus(@Validated @RequestBody AiChatRoleUpdatePublicStatusReqVO req) {
-        chatRoleService.updatePublicStatus(req);
-        return CommonResult.success(null);
-    }
-
-    @Operation(summary = "chat角色 - 删除")
-    @DeleteMapping("/delete")
-    public CommonResult<Void> delete(@RequestParam("id") Long id) {
-        chatRoleService.delete(id);
-        return CommonResult.success(null);
-    }
+    // TODO 芋艿：我的删除
 
     // ========== 角色管理 ==========
 
+    @PostMapping("/create")
+    @Operation(summary = "创建聊天角色")
+    @PreAuthorize("@ss.hasPermission('ai:chat-role:create')")
+    public CommonResult<Long> createChatRole(@Valid @RequestBody AiChatRoleSaveReqVO createReqVO) {
+        return success(chatRoleService.createChatRole(createReqVO));
+    }
 
+    @PutMapping("/update")
+    @Operation(summary = "更新聊天角色")
+    @PreAuthorize("@ss.hasPermission('ai:chat-role:update')")
+    public CommonResult<Boolean> updateChatRole(@Valid @RequestBody AiChatRoleSaveReqVO updateReqVO) {
+        chatRoleService.updateChatRole(updateReqVO);
+        return success(true);
+    }
+
+    @DeleteMapping("/delete")
+    @Operation(summary = "删除聊天角色")
+    @Parameter(name = "id", description = "编号", required = true)
+    @PreAuthorize("@ss.hasPermission('ai:chat-role:delete')")
+    public CommonResult<Boolean> deleteChatRole(@RequestParam("id") Long id) {
+        chatRoleService.deleteChatRole(id);
+        return success(true);
+    }
+
+    @GetMapping("/get")
+    @Operation(summary = "获得聊天角色")
+    @Parameter(name = "id", description = "编号", required = true, example = "1024")
+    @PreAuthorize("@ss.hasPermission('ai:chat-role:query')")
+    public CommonResult<AiChatRoleRespVO> getChatRole(@RequestParam("id") Long id) {
+        AiChatRoleDO chatRole = chatRoleService.getChatRole(id);
+        return success(BeanUtils.toBean(chatRole, AiChatRoleRespVO.class));
+    }
+
+    @GetMapping("/page")
+    @Operation(summary = "获得聊天角色分页")
+    @PreAuthorize("@ss.hasPermission('ai:chat-role:query')")
+    public CommonResult<PageResult<AiChatRoleRespVO>> getChatRolePage(@Valid AiChatRolePageReqVO pageReqVO) {
+        PageResult<AiChatRoleDO> pageResult = chatRoleService.getChatRolePage(pageReqVO);
+        return success(BeanUtils.toBean(pageResult, AiChatRoleRespVO.class));
+    }
 
 }
