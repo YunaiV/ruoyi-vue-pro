@@ -52,7 +52,7 @@ spring:
           #          url: jdbc:sqlserver://127.0.0.1:1433;DatabaseName=ruoyi-vue-pro;SelectMethod=cursor;encrypt=false;rewriteBatchedStatements=true;useUnicode=true;characterEncoding=utf-8 # SQLServer 连接的示例
           #          url: jdbc:dm://127.0.0.1:5236?schema=RUOYI_VUE_PRO # DM 连接的示例
           username: root
-          password: root
+          password: 123456
         #          username: sa # SQL Server 连接的示例
         #          password: Yudao@2024 # SQL Server 连接的示例
         #          username: SYSDBA # DM 连接的示例

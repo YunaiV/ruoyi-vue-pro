@@ -1,18 +1,22 @@
 package cn.iocoder.yudao.module.ai.service.model;
 
+import cn.hutool.core.util.ObjectUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.ai.controller.admin.model.vo.chatRole.AiChatRolePageReqVO;
+import cn.iocoder.yudao.module.ai.controller.admin.model.vo.chatRole.AiChatRoleSaveMyReqVO;
 import cn.iocoder.yudao.module.ai.controller.admin.model.vo.chatRole.AiChatRoleSaveReqVO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiChatRoleDO;
 import cn.iocoder.yudao.module.ai.dal.mysql.AiChatRoleMapper;
 import jakarta.annotation.Resource;
-import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
 import static cn.iocoder.yudao.module.ai.ErrorCodeConstants.CHAT_ROLE_DISABLE;
 import static cn.iocoder.yudao.module.ai.ErrorCodeConstants.CHAT_ROLE_NOT_EXISTS;
 
@@ -22,7 +26,6 @@ import static cn.iocoder.yudao.module.ai.ErrorCodeConstants.CHAT_ROLE_NOT_EXISTS
  * @author fansili
  */
 @Service
-@AllArgsConstructor
 @Slf4j
 public class AiChatRoleServiceImpl implements AiChatRoleService {
 
@@ -37,6 +40,14 @@ public class AiChatRoleServiceImpl implements AiChatRoleService {
     }
 
     @Override
+    public Long createChatRoleMy(AiChatRoleSaveMyReqVO createReqVO, Long userId) {
+        AiChatRoleDO chatRole = BeanUtils.toBean(createReqVO, AiChatRoleDO.class).setUserId(userId)
+                .setStatus(CommonStatusEnum.ENABLE.getStatus()).setPublicStatus(false);
+        chatRoleMapper.insert(chatRole);
+        return chatRole.getId();
+    }
+
+    @Override
     public void updateChatRole(AiChatRoleSaveReqVO updateReqVO) {
         // 校验存在
         validateChatRoleExists(updateReqVO.getId());
@@ -46,9 +57,33 @@ public class AiChatRoleServiceImpl implements AiChatRoleService {
     }
 
     @Override
+    public void updateChatRoleMy(AiChatRoleSaveMyReqVO updateReqVO, Long userId) {
+        // 校验存在
+        AiChatRoleDO chatRole = validateChatRoleExists(updateReqVO.getId());
+        if (ObjectUtil.notEqual(chatRole.getUserId(), userId)) {
+            throw exception(CHAT_ROLE_NOT_EXISTS);
+        }
+
+        // 更新
+        AiChatRoleDO updateObj = BeanUtils.toBean(updateReqVO, AiChatRoleDO.class);
+        chatRoleMapper.updateById(updateObj);
+    }
+
+    @Override
     public void deleteChatRole(Long id) {
         // 校验存在
         validateChatRoleExists(id);
+        // 删除
+        chatRoleMapper.deleteById(id);
+    }
+
+    @Override
+    public void deleteChatRoleMy(Long id, Long userId) {
+        // 校验存在
+        AiChatRoleDO chatRole = validateChatRoleExists(id);
+        if (ObjectUtil.notEqual(chatRole.getUserId(), userId)) {
+            throw exception(CHAT_ROLE_NOT_EXISTS);
+        }
         // 删除
         chatRoleMapper.deleteById(id);
     }
@@ -78,6 +113,17 @@ public class AiChatRoleServiceImpl implements AiChatRoleService {
     @Override
     public PageResult<AiChatRoleDO> getChatRolePage(AiChatRolePageReqVO pageReqVO) {
         return chatRoleMapper.selectPage(pageReqVO);
+    }
+
+    @Override
+    public PageResult<AiChatRoleDO> getChatRoleMyPage(AiChatRolePageReqVO pageReqVO, Long userId) {
+        return chatRoleMapper.selectPageByMy(pageReqVO, userId);
+    }
+
+    @Override
+    public List<String> getChatRoleCategoryList() {
+        List<AiChatRoleDO> list = chatRoleMapper.selectListGroupByCategory(CommonStatusEnum.ENABLE.getStatus());
+        return convertList(list, AiChatRoleDO::getName);
     }
 
 }

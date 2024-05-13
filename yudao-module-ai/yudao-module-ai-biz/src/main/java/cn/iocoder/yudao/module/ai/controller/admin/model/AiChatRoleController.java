@@ -1,10 +1,12 @@
 package cn.iocoder.yudao.module.ai.controller.admin.model;
 
+import cn.hutool.core.util.ObjUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.ai.controller.admin.model.vo.chatRole.AiChatRolePageReqVO;
 import cn.iocoder.yudao.module.ai.controller.admin.model.vo.chatRole.AiChatRoleRespVO;
+import cn.iocoder.yudao.module.ai.controller.admin.model.vo.chatRole.AiChatRoleSaveMyReqVO;
 import cn.iocoder.yudao.module.ai.controller.admin.model.vo.chatRole.AiChatRoleSaveReqVO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiChatRoleDO;
 import cn.iocoder.yudao.module.ai.service.model.AiChatRoleService;
@@ -17,7 +19,10 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
+import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
 
 @Tag(name = "管理后台 - AI 聊天角色")
 @RestController
@@ -28,13 +33,50 @@ public class AiChatRoleController {
     @Resource
     private AiChatRoleService chatRoleService;
 
-    // TODO 芋艿：我的分页
+    @GetMapping("/my-page")
+    @Operation(summary = "获得【我的】聊天角色分页")
+    public CommonResult<PageResult<AiChatRoleRespVO>> getChatRoleMyPage(@Valid AiChatRolePageReqVO pageReqVO) {
+        PageResult<AiChatRoleDO> pageResult = chatRoleService.getChatRoleMyPage(pageReqVO, getLoginUserId());
+        return success(BeanUtils.toBean(pageResult, AiChatRoleRespVO.class));
+    }
 
-    // TODO 芋艿：我的新增
+    @GetMapping("/get-my")
+    @Operation(summary = "获得【我的】聊天角色")
+    @Parameter(name = "id", description = "编号", required = true, example = "1024")
+    public CommonResult<AiChatRoleRespVO> getChatRoleMy(@RequestParam("id") Long id) {
+        AiChatRoleDO chatRole = chatRoleService.getChatRole(id);
+        if (ObjUtil.notEqual(chatRole.getUserId(), getLoginUserId())) {
+            return success(null);
+        }
+        return success(BeanUtils.toBean(chatRole, AiChatRoleRespVO.class));
+    }
 
-    // TODO 芋艿：我的修改
+    @PostMapping("/create-my")
+    @Operation(summary = "创建【我的】聊天角色")
+    public CommonResult<Long> createChatRoleMy(@Valid @RequestBody AiChatRoleSaveMyReqVO createReqVO) {
+        return success(chatRoleService.createChatRoleMy(createReqVO, getLoginUserId()));
+    }
 
-    // TODO 芋艿：我的删除
+    @PutMapping("/update-my")
+    @Operation(summary = "更新【我的】聊天角色")
+    public CommonResult<Boolean> updateChatRoleMy(@Valid @RequestBody AiChatRoleSaveMyReqVO updateReqVO) {
+        chatRoleService.updateChatRoleMy(updateReqVO, getLoginUserId());
+        return success(true);
+    }
+
+    @DeleteMapping("/delete-my")
+    @Operation(summary = "删除【我的】聊天角色")
+    @Parameter(name = "id", description = "编号", required = true)
+    public CommonResult<Boolean> deleteChatRoleMy(@RequestParam("id") Long id) {
+        chatRoleService.deleteChatRoleMy(id, getLoginUserId());
+        return success(true);
+    }
+
+    @GetMapping("/category-list")
+    @Operation(summary = "获得聊天角色的分类列表")
+    public CommonResult<List<String>> getChatRoleCategoryList() {
+         return success(chatRoleService.getChatRoleCategoryList());
+    }
 
     // ========== 角色管理 ==========
 
