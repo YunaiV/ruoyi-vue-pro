@@ -61,7 +61,7 @@ spring:
           lazy: true # 开启懒加载，保证启动速度
           url: jdbc:mysql://127.0.0.1:3306/ruoyi-vue-pro?useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true&nullCatalogMeansCurrent=true
           username: root
-          password: root
+          password: 123456
 
   # Redis 配置。Redisson 默认的配置足够使用，一般不需要进行调优
   data:
@@ -229,7 +229,7 @@ yudao:
       appId: 13c8cca6
       appKey: cb6415c19d6162cda07b47316fcb0416
       secretKey: Y2JiYTIxZjA3MDMxMjNjZjQzYzVmNzdh
-      chatModel: XING_HUO_3_5
+      model: XING_HUO_3_5
     yiyan:
       enable: true
       aiPlatform: YI_YAN
@@ -240,7 +240,7 @@ yudao:
       appKey: x0cuLZ7XsaTCU08vuJWO87Lg
       secretKey: R9mYF9dl9KASgi5RUq0FQt3wRisSnOcK
       refreshTokenSecondTime: 86400
-      chatModel: ERNIE4_3_5_8K
+      model: ERNIE4_3_5_8K
     openAiImage:
       enable: true
       api-key: ${OPEN_AI_KEY}
