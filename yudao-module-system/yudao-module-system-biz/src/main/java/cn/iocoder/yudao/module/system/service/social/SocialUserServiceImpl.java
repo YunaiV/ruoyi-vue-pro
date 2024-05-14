@@ -171,9 +171,4 @@ public class SocialUserServiceImpl implements SocialUserService {
         return socialUserMapper.selectPage(pageReqVO);
     }
 
-    @Override
-    public byte[] getWxQrcode(SocialWxQrcodeReqDTO reqVO) {
-        return socialClientService.getWxQrcode(reqVO);
-    }
-
 }

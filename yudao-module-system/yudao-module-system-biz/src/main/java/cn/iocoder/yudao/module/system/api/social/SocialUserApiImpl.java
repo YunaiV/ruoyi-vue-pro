@@ -43,10 +43,4 @@ public class SocialUserApiImpl implements SocialUserApi {
        return socialUserService.getSocialUserByCode(userType, socialType, code, state);
     }
 
-    // TODO @puhui999：貌似搞到 SocialClientApiImpl 更合适，二维码和用户关系不大；这样 socialUserService 也不用绕一次了
-    @Override
-    public byte[] getWxQrcode(SocialWxQrcodeReqDTO reqVO) {
-        return socialUserService.getWxQrcode(reqVO);
-    }
-
 }

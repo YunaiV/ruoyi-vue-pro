@@ -67,7 +67,7 @@ public interface SocialClientService {
      * @param reqVO 请求信息
      * @return 小程序二维码
      */
-    byte[] getWxQrcode(SocialWxQrcodeReqDTO reqVO);
+    byte[] getWxaQrcode(SocialWxQrcodeReqDTO reqVO);
 
     // =================== 客户端管理 ===================
 

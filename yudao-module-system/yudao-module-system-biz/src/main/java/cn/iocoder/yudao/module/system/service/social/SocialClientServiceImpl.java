@@ -229,7 +229,7 @@ public class SocialClientServiceImpl implements SocialClientService {
     }
 
     @Override
-    public byte[] getWxQrcode(SocialWxQrcodeReqDTO reqVO) {
+    public byte[] getWxaQrcode(SocialWxQrcodeReqDTO reqVO) {
         WxMaService service = getWxMaService(reqVO.getUserType());
         try {
             return service.getQrcodeService().createWxaCodeUnlimitBytes(reqVO.getScene(), reqVO.getPath(),

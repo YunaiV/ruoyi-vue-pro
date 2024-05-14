@@ -12,8 +12,9 @@ import lombok.Data;
 @Data
 public class AppSocialWxQrcodeReqVO {
 
-    // TODO @puhui999：这个后续不用前端传递，应该是后端搞的
-    private static String SCENE = "1011"; // 默认场景值 1011 扫描二维码
+    // TODO @puhui999：这个后续不用前端传递，应该是后端搞的。
+    //      页面路径不能携带参数（参数请放在scene字段里）
+    private static String SCENE = ""; // 默认场景值 1011 扫描二维码
     // TODO @puhui999：这个默认是不是 release 哈？
     private static String ENV_VERSION = "develop"; // 小程序版本。正式版为 "release"，体验版为 "trial"，开发版为 "develop"
     // TODO @puhui999：这个去掉；因为本身就是 430 啦；
@@ -28,6 +29,10 @@ public class AppSocialWxQrcodeReqVO {
     @Schema(description = "场景值", requiredMode = Schema.RequiredMode.REQUIRED, example = "1001")
     private String scene = SCENE;
 
+    /**
+     * 默认是主页，页面 page，例如 pages/index/index，根路径前不要填加 /，不能携带参数（参数请放在scene字段里），
+     * 如果不填写这个字段，默认跳主页面。scancode_time为系统保留参数，不允许配置
+     */
     @Schema(description = "页面路径", requiredMode = Schema.RequiredMode.REQUIRED, example = "pages/goods/index")
     @NotEmpty(message = "页面路径不能为空")
     private String path;
