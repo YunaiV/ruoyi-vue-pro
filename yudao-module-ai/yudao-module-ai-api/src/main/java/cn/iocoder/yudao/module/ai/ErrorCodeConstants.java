@@ -25,7 +25,8 @@ public interface ErrorCodeConstants {
 
     // ========== API 聊天会话 1-040-003-000 ==========
 
-    ErrorCode CHAT_CONVERSATION_NOT_EXISTS = new ErrorCode(1_040_003_000, "AI 对话不存在!");;
+    ErrorCode CHAT_CONVERSATION_NOT_EXISTS = new ErrorCode(1_040_003_000, "AI 对话不存在!");
+    ErrorCode CHAT_CONVERSATION_MODEL_ERROR = new ErrorCode(1_040_003_001, "操作失败，该聊天模型的配置不完整");
 
     // chat
     ErrorCode AI_CHAT_MESSAGE_NOT_EXIST = new ErrorCode(1_022_000_100, "AI 提问的 MessageId 不存在!");

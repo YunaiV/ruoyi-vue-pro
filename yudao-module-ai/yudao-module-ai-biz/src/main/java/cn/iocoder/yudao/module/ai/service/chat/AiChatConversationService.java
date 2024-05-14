@@ -19,7 +19,7 @@ public interface AiChatConversationService {
      *
      * @param createReqVO 创建信息
      * @param userId 用户编号
-     * @return 聊天会话
+     * @return 编号
      */
     Long createChatConversationMy(AiChatConversationCreateMyReqVO createReqVO, Long userId);
 
@@ -32,11 +32,12 @@ public interface AiChatConversationService {
     void updateChatConversationMy(AiChatConversationUpdateMyReqVO updateReqVO, Long userId);
 
     /**
-     * 获取 - 对话列表
+     * 获得【我的】聊天会话列表
      *
-     * @return
+     * @param userId 用户编号
+     * @return 聊天会话列表
      */
-    List<AiChatConversationRespVO> listConversation();
+    List<AiChatConversationDO> getChatConversationListByUserId(Long userId);
 
     /**
      * 获取 - 对话

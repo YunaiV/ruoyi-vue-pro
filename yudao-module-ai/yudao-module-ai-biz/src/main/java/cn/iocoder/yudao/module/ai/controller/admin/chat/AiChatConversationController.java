@@ -1,9 +1,11 @@
 package cn.iocoder.yudao.module.ai.controller.admin.chat;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
+import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.ai.controller.admin.chat.vo.conversation.AiChatConversationCreateMyReqVO;
 import cn.iocoder.yudao.module.ai.controller.admin.chat.vo.conversation.AiChatConversationRespVO;
 import cn.iocoder.yudao.module.ai.controller.admin.chat.vo.conversation.AiChatConversationUpdateMyReqVO;
+import cn.iocoder.yudao.module.ai.dal.dataobject.chat.AiChatConversationDO;
 import cn.iocoder.yudao.module.ai.service.chat.AiChatConversationService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -40,11 +42,11 @@ public class AiChatConversationController {
         return success(true);
     }
 
-    // TODO done @fan：实现一下
     @GetMapping("/my-list")
-    @Operation(summary = "获得聊天会话列表")
-    public CommonResult<List<AiChatConversationRespVO>> getConversationList() {
-        return success(chatConversationService.listConversation());
+    @Operation(summary = "获得【我的】聊天会话列表")
+    public CommonResult<List<AiChatConversationRespVO>> getChatConversationMyList() {
+        List<AiChatConversationDO> list = chatConversationService.getChatConversationListByUserId(getLoginUserId());
+        return success(BeanUtils.toBean(list, AiChatConversationRespVO.class));
     }
 
     // TODO @fan：实现一下

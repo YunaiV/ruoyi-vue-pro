@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.ai.dal.mysql;
 
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
+import cn.iocoder.yudao.module.ai.dal.dataobject.chat.AiChatConversationDO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.chat.AiChatMessageDO;
 import org.apache.ibatis.annotations.Mapper;
 import org.springframework.stereotype.Repository;
@@ -30,4 +31,5 @@ public interface AiChatMessageMapper extends BaseMapperX<AiChatMessageDO> {
                         .orderByAsc(AiChatMessageDO::getId)
         );
     }
+
 }
