@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.ai.convert;
 
-import cn.iocoder.yudao.module.ai.controller.admin.chat.vo.conversation.AiChatConversationUpdateReqVO;
+import cn.iocoder.yudao.module.ai.controller.admin.chat.vo.conversation.AiChatConversationUpdateMyReqVO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.chat.AiChatConversationDO;
 import cn.iocoder.yudao.module.ai.controller.admin.chat.vo.conversation.AiChatConversationRespVO;
 import org.mapstruct.Mapper;
@@ -36,10 +36,4 @@ public interface AiChatConversationConvert {
      */
     AiChatConversationRespVO covnertChatConversationRes(AiChatConversationDO aiChatConversationDO);
 
-    /**
-     * 转换 - AiChatConversationDO
-     *
-     * @param updateReqVO
-     */
-    AiChatConversationDO convertAiChatConversationDO(AiChatConversationUpdateReqVO updateReqVO);
 }

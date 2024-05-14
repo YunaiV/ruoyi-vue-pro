@@ -26,6 +26,8 @@ import lombok.*;
 @AllArgsConstructor
 public class AiChatConversationDO extends BaseDO {
 
+    public static final String TITLE_DEFAULT = "新对话";
+
     /**
      * ID 编号，自增
      */

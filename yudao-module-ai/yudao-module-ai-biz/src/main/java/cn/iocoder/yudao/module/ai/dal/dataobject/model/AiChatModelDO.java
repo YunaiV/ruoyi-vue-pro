@@ -11,6 +11,8 @@ import lombok.*;
 /**
  * AI 聊天模型 DO
  *
+ * 默认聊天模型：{@link #status} 为开启，并且 {@link #sort} 排序第一
+ *
  * @author fansili
  * @since 2024/4/24 19:39
  */

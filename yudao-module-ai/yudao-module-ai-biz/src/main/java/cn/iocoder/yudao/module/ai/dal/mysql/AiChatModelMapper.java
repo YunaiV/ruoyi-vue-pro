@@ -5,8 +5,10 @@ import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
+import cn.iocoder.yudao.framework.mybatis.core.query.QueryWrapperX;
 import cn.iocoder.yudao.module.ai.controller.admin.model.vo.chatModel.AiChatModelPageReqVO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiChatModelDO;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
@@ -22,23 +24,14 @@ import java.util.List;
 @Mapper
 public interface AiChatModelMapper extends BaseMapperX<AiChatModelDO> {
 
-    // TODO 芋艿：要搞一下
-    /**
-     * 查询 - 第一个modal
-     *
-     * @return
-     */
-    default AiChatModelDO selectFirstModal() {
-        PageResult<AiChatModelDO> pageResult = selectPage(new PageParam().setPageNo(1).setPageSize(1),
-                new LambdaQueryWrapperX<AiChatModelDO>()
-                        .orderByAsc(AiChatModelDO::getSort)
-        );
-        if (CollUtil.isEmpty(pageResult.getList())) {
-            return null;
-        }
-        return pageResult.getList().get(0);
+    default AiChatModelDO selectFirstByStatus(Integer status) {
+        return selectOne(new QueryWrapperX<AiChatModelDO>()
+                .eq("status", status)
+                .limitN(1)
+                .orderByAsc("sort"));
     }
 
+    // TODO 芋艿：不需要哈
     /**
      * 查询 - 根据 ids
      *
