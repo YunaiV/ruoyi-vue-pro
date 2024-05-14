@@ -12,6 +12,7 @@ import cn.iocoder.yudao.module.member.dal.dataobject.tag.MemberTagDO;
 import cn.iocoder.yudao.module.member.dal.dataobject.user.MemberUserDO;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.Mappings;
 import org.mapstruct.factory.Mappers;
 
 import java.util.List;
@@ -27,8 +28,12 @@ public interface MemberUserConvert {
 
     AppMemberUserInfoRespVO convert(MemberUserDO bean);
 
-    @Mapping(source = "level", target = "level")
-    @Mapping(source = "bean.experience", target = "experience")
+
+    @Mappings({
+            @Mapping(source = "level", target = "level"),
+            @Mapping(source = "bean.id", target = "id"),
+            @Mapping(source = "bean.experience", target = "experience")
+    })
     AppMemberUserInfoRespVO convert(MemberUserDO bean, MemberLevelDO level);
 
     MemberUserRespDTO convert2(MemberUserDO bean);
