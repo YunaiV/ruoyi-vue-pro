@@ -4,6 +4,7 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.ai.controller.admin.model.vo.chatRole.AiChatRolePageReqVO;
 import cn.iocoder.yudao.module.ai.controller.admin.model.vo.chatRole.AiChatRoleSaveMyReqVO;
 import cn.iocoder.yudao.module.ai.controller.admin.model.vo.chatRole.AiChatRoleSaveReqVO;
+import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiChatModelDO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiChatRoleDO;
 import jakarta.validation.Valid;
 
@@ -77,6 +78,15 @@ public interface AiChatRoleService {
      * @param id 角色编号
      */
     AiChatRoleDO validateChatRole(Long id);
+
+    /**
+     * 获得默认的聊天角色
+     *
+     * 如果获取不到，则抛出 {@link cn.iocoder.yudao.framework.common.exception.ServiceException} 业务异常
+     *
+     * @return 聊天角色
+     */
+    AiChatRoleDO getRequiredDefaultChatRole();
 
     /**
      * 获得聊天角色分页

@@ -8,7 +8,6 @@ import jakarta.validation.Valid;
 
 import java.util.List;
 
-import java.util.List;
 import java.util.Set;
 
 /**
@@ -48,6 +47,15 @@ public interface AiChatModelService {
      * @return 聊天模型
      */
     AiChatModelDO getChatModel(Long id);
+
+    /**
+     * 获得默认的聊天模型
+     *
+     * 如果获取不到，则抛出 {@link cn.iocoder.yudao.framework.common.exception.ServiceException} 业务异常
+     *
+     * @return 聊天模型
+     */
+    AiChatModelDO getRequiredDefaultChatModel();
 
     /**
      * 获得聊天模型分页

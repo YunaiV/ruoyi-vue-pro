@@ -69,7 +69,7 @@ public class AiChatModelServiceImpl implements AiChatModelService {
     private AiChatModelDO validateChatModelExists(Long id) {
         AiChatModelDO model = chatModelMapper.selectById(id);
         if (chatModelMapper.selectById(id) == null) {
-            throw exception(CHAT_MODAL_NOT_EXIST);
+            throw exception(CHAT_MODEL_NOT_EXISTS);
         }
         return model;
     }
@@ -77,6 +77,15 @@ public class AiChatModelServiceImpl implements AiChatModelService {
     @Override
     public AiChatModelDO getChatModel(Long id) {
         return chatModelMapper.selectById(id);
+    }
+
+    @Override
+    public AiChatModelDO getRequiredDefaultChatModel() {
+        AiChatModelDO model = chatModelMapper.selectFirstByStatus(CommonStatusEnum.ENABLE.getStatus());
+        if (model == null) {
+            throw exception(CHAT_MODEL_DEFAULT_NOT_EXISTS);
+        }
+        return model;
     }
 
     @Override
@@ -88,7 +97,7 @@ public class AiChatModelServiceImpl implements AiChatModelService {
     public AiChatModelDO validateChatModel(Long id) {
         AiChatModelDO model = validateChatModelExists(id);
         if (CommonStatusEnum.isDisable(model.getStatus())) {
-            throw exception(CHAT_MODAL_DISABLE);
+            throw exception(CHAT_MODEL_DISABLE);
         }
         return model;
     }

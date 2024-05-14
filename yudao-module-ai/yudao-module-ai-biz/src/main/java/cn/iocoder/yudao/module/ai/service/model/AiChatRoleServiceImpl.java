@@ -17,8 +17,7 @@ import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
-import static cn.iocoder.yudao.module.ai.ErrorCodeConstants.CHAT_ROLE_DISABLE;
-import static cn.iocoder.yudao.module.ai.ErrorCodeConstants.CHAT_ROLE_NOT_EXISTS;
+import static cn.iocoder.yudao.module.ai.ErrorCodeConstants.*;
 
 /**
  * AI 聊天角色 Service 实现类
@@ -106,6 +105,16 @@ public class AiChatRoleServiceImpl implements AiChatRoleService {
         AiChatRoleDO chatRole = validateChatRoleExists(id);
         if (CommonStatusEnum.isDisable(chatRole.getStatus())) {
             throw exception(CHAT_ROLE_DISABLE, chatRole.getName());
+        }
+        return chatRole;
+    }
+
+    @Override
+    public AiChatRoleDO getRequiredDefaultChatRole() {
+        AiChatRoleDO chatRole = chatRoleMapper.selectFirstByPublicStatusAndStatus(
+                true, CommonStatusEnum.ENABLE.getStatus());
+        if (chatRole == null) {
+            throw exception(CHAT_ROLE_DEFAULT_NOT_EXISTS);
         }
         return chatRole;
     }

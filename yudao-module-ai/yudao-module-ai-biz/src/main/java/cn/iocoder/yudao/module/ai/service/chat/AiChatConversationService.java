@@ -1,37 +1,35 @@
-package cn.iocoder.yudao.module.ai.service;
+package cn.iocoder.yudao.module.ai.service.chat;
 
-import cn.iocoder.yudao.module.ai.controller.admin.chat.vo.conversation.AiChatConversationCreateReqVO;
-import cn.iocoder.yudao.module.ai.controller.admin.chat.vo.conversation.AiChatConversationListReqVO;
+import cn.iocoder.yudao.module.ai.controller.admin.chat.vo.conversation.AiChatConversationCreateMyReqVO;
 import cn.iocoder.yudao.module.ai.controller.admin.chat.vo.conversation.AiChatConversationRespVO;
-import cn.iocoder.yudao.module.ai.controller.admin.chat.vo.conversation.AiChatConversationUpdateReqVO;
+import cn.iocoder.yudao.module.ai.controller.admin.chat.vo.conversation.AiChatConversationUpdateMyReqVO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.chat.AiChatConversationDO;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
 /**
- * chat 对话
+ * AI 聊天对话 Service 接口
  *
- * @fansili
- * @since v1.0
+ * @author fansili
  */
 public interface AiChatConversationService {
 
     /**
-     * 对话 - 创建对话
+     * 创建【我的】聊天会话
      *
-     * @param req
-     * @return
+     * @param createReqVO 创建信息
+     * @param userId 用户编号
+     * @return 聊天会话
      */
-    Long createConversation(AiChatConversationCreateReqVO req);
+    Long createChatConversationMy(AiChatConversationCreateMyReqVO createReqVO, Long userId);
 
     /**
-     * 对话 - 更新对话
+     * 更新【我的】聊天会话
      *
-     * @param updateReqVO
-     * @return
+     * @param updateReqVO 更新信息
+     * @param userId 用户编号
      */
-    Boolean updateConversation(AiChatConversationUpdateReqVO updateReqVO);
+    void updateChatConversationMy(AiChatConversationUpdateMyReqVO updateReqVO, Long userId);
 
     /**
      * 获取 - 对话列表
