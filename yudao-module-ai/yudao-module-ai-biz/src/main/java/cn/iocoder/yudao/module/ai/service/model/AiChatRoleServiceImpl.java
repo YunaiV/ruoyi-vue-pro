@@ -132,7 +132,7 @@ public class AiChatRoleServiceImpl implements AiChatRoleService {
     @Override
     public List<String> getChatRoleCategoryList() {
         List<AiChatRoleDO> list = chatRoleMapper.selectListGroupByCategory(CommonStatusEnum.ENABLE.getStatus());
-        return convertList(list, AiChatRoleDO::getName);
+        return convertList(list, AiChatRoleDO::getCategory);
     }
 
 }

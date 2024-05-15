@@ -50,8 +50,9 @@ public interface AiChatRoleMapper extends BaseMapperX<AiChatRoleDO> {
 
     default List<AiChatRoleDO> selectListGroupByCategory(Integer status) {
         return selectList(new LambdaQueryWrapperX<AiChatRoleDO>()
+                .select(AiChatRoleDO::getCategory)
                 .eq(AiChatRoleDO::getStatus, status)
-                .apply("GROUP BY category"));
+                .groupBy(AiChatRoleDO::getCategory));
     }
 
 }
