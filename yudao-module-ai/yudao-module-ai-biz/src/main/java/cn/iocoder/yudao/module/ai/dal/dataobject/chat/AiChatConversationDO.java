@@ -9,6 +9,9 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
 
+import java.time.LocalDateTime;
+import java.util.Date;
+
 /**
  * AI Chat 会话 DO
  *
@@ -51,6 +54,10 @@ public class AiChatConversationDO extends BaseDO {
      * 是否置顶
      */
     private Boolean pinned;
+    /**
+     * 置顶时间
+     */
+    private LocalDateTime pinnedTime;
 
     /**
      * 角色编号

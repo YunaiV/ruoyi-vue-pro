@@ -20,11 +20,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.*;
-import static cn.iocoder.yudao.module.ai.ErrorCodeConstants.CHAT_CONVERSATION_MODEL_ERROR;
-import static cn.iocoder.yudao.module.ai.ErrorCodeConstants.CHAT_CONVERSATION_NOT_EXISTS;
+import static cn.iocoder.yudao.module.ai.ErrorCodeConstants.*;
 
 /**
  * AI 聊天对话 Service 实现类
@@ -72,16 +72,26 @@ public class AiChatConversationServiceImpl implements AiChatConversationService 
         if (ObjUtil.notEqual(conversation.getUserId(), userId)) {
             throw exception(CHAT_CONVERSATION_NOT_EXISTS);
         }
-        // 1.2 校验模型是否存在
-        AiChatModelDO model;
-        if (updateReqVO.getModelId() != null) {
-            model = chatModalService.validateChatModel(updateReqVO.getModelId());
+        // 1.2 校验模型是否存在（修改模型的情况）
+        if (!ObjectUtil.isAllEmpty(updateReqVO.getModelId(), updateReqVO.getMaxTokens(), updateReqVO.getMaxContexts())) {
+            AiChatModelDO model = chatModalService.validateChatModel(updateReqVO.getModelId());
             Assert.notNull(model, "必须找到默认模型");
+            validateChatModel(model);
+            // 校验 Token 数量、上下文数量
+            if (updateReqVO.getMaxTokens() != null && updateReqVO.getMaxTokens() > model.getMaxTokens()) {
+                throw exception(CHAT_CONVERSATION_UPDATE_MAX_TOKENS_ERROR);
+            }
+            if (updateReqVO.getMaxContexts() != null && updateReqVO.getMaxContexts() > model.getMaxContexts()) {
+                throw exception(CHAT_CONVERSATION_UPDATE_MAX_CONTEXTS_ERROR);
+            }
         }
-        // 1.3 校验温度参数、Token 数量、消息数量 TODO
 
         // 更新对话信息
-        chatConversationMapper.updateById(BeanUtils.toBean(updateReqVO, AiChatConversationDO.class));
+        AiChatConversationDO updateObj = BeanUtils.toBean(updateReqVO, AiChatConversationDO.class);
+        if (Boolean.TRUE.equals(updateReqVO.getPinned())) {
+            updateObj.setPinnedTime(LocalDateTime.now());
+        }
+        chatConversationMapper.updateById(updateObj);
     }
 
     @Override
