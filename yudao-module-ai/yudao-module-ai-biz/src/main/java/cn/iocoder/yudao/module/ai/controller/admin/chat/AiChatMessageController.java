@@ -18,24 +18,21 @@ import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
-// TODO @芋艿：权限标识；
 @Tag(name = "管理后台 - 聊天消息")
 @RestController
 @RequestMapping("/ai/chat/message")
 @Slf4j
 public class AiChatMessageController {
+
     @Resource
     private AiChatService chatService;
 
     @Operation(summary = "发送消息（段式）", description = "一次性返回，响应较慢")
     @PostMapping("/send")
     public CommonResult<AiChatMessageRespVO> sendMessage(@Validated @RequestBody AiChatMessageSendReqVO sendReqVO) {
-        // TODO done @fan：使用 static import；这样就 success 就行了；
         return success(chatService.chat(sendReqVO));
     }
 
-    // TODO @芋艿：调用这个方法异常，Unable to handle the Spring Security Exception because the response is already committed.；可以再试试
-    // TODO @fan：要不要使用 Flux 来返回；可以使用 Flux<AiChatMessageRespVO>
     @Operation(summary = "发送消息（流式）", description = "流式返回，响应较快")
     @PostMapping(value = "/send-stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     @PermitAll // 解决 SSE 最终响应的时候，会被 Access Denied 拦截的问题

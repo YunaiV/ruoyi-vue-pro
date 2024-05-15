@@ -32,10 +32,14 @@ public class AiChatConversationRespVO implements VO {
     private Long roleId;
 
     @Schema(description = "模型编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
+    @Trans(type = TransType.SIMPLE, target = AiChatModelDO.class, fields = "name", ref = "modelName")
     private Long modelId;
 
     @Schema(description = "模型标志", requiredMode = Schema.RequiredMode.REQUIRED, example = "ERNIE-Bot-turbo-0922")
     private String model;
+
+    @Schema(description = "模型名字", requiredMode = Schema.RequiredMode.REQUIRED, example = "张三")
+    private String modelName;
 
     @Schema(description = "角色设定", example = "一个快乐的程序员")
     private String systemMessage;
