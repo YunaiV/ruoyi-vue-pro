@@ -14,7 +14,6 @@ Authorization: {{token}}
   "avatar": "http://baidu.com",
   "category": "writing",
   "description": "采用gpt3.5模型，拥有小红书优质作者写作经验。",
-  "welcomeMessage": "欢迎使用小红书写作模型!",
   "systemMessage": "你是一名优秀的小红书人文、风光作者，你热爱旅游，每去往一个城市你都会用美妙的文字抒写着这座城市的大街小巷，描述着这座城市的美好。",
   "publicStatus": 0,
   "sort": 0
@@ -33,7 +32,6 @@ Authorization: {{token}}
   "avatar": "http://baidu.com",
   "category": "writing",
   "description": "采用gpt3.5模型，拥有小红书优质作者写作经验。",
-  "welcomeMessage": "欢迎使用小红书写作模型!",
   "systemMessage": "你是一名优秀的小红书人文、风光作者，你热爱旅游，每去往一个城市你都会用美妙的文字抒写着这座城市的大街小巷，描述着这座城市的美好。",
   "publicStatus": 0,
   "sort": 0,

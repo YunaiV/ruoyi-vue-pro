@@ -1,7 +1,6 @@
 package cn.iocoder.yudao.module.ai.service.chat;
 
 import cn.iocoder.yudao.module.ai.controller.admin.chat.vo.conversation.AiChatConversationCreateMyReqVO;
-import cn.iocoder.yudao.module.ai.controller.admin.chat.vo.conversation.AiChatConversationRespVO;
 import cn.iocoder.yudao.module.ai.controller.admin.chat.vo.conversation.AiChatConversationUpdateMyReqVO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.chat.AiChatConversationDO;
 
@@ -40,19 +39,20 @@ public interface AiChatConversationService {
     List<AiChatConversationDO> getChatConversationListByUserId(Long userId);
 
     /**
-     * 获取 - 对话
+     * 获得聊天会话
      *
-     * @param id
-     * @return
+     * @param id 编号
+     * @return 聊天会话
      */
-    AiChatConversationRespVO getConversationOfValidate(Long id);
+    AiChatConversationDO getChatConversation(Long id);
 
     /**
-     * 删除 - 根据id
+     * 删除【我的】聊天会话
      *
-     * @param id
+     * @param id 编号
+     * @param userId 用户编号
      */
-    Boolean deleteConversation(Long id);
+    void deleteChatConversationMy(Long id, Long userId);
 
     /**
      * 校验 - 是否存在
@@ -61,4 +61,5 @@ public interface AiChatConversationService {
      * @return
      */
     AiChatConversationDO validateExists(Long id);
+
 }

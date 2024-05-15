@@ -4,11 +4,9 @@ import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
-import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
 import cn.iocoder.yudao.module.ai.controller.admin.chat.vo.conversation.AiChatConversationCreateMyReqVO;
 import cn.iocoder.yudao.module.ai.controller.admin.chat.vo.conversation.AiChatConversationRespVO;
 import cn.iocoder.yudao.module.ai.controller.admin.chat.vo.conversation.AiChatConversationUpdateMyReqVO;
-import cn.iocoder.yudao.module.ai.convert.AiChatConversationConvert;
 import cn.iocoder.yudao.module.ai.dal.dataobject.chat.AiChatConversationDO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiChatModelDO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiChatRoleDO;
@@ -59,7 +57,7 @@ public class AiChatConversationServiceImpl implements AiChatConversationService 
         // 2. 创建 AiChatConversationDO 聊天对话
         AiChatConversationDO conversation = new AiChatConversationDO()
                 .setUserId(userId).setTitle(AiChatConversationDO.TITLE_DEFAULT).setPinned(false)
-                .setRoleId(role.getId()).setModelId(model.getId()).setModel(model.getModel())
+                .setRoleId(role.getId()).setModelId(model.getId()).setModel(model.getModel()).setSystemMessage(role.getSystemMessage())
                 .setTemperature(model.getTemperature()).setMaxTokens(model.getMaxTokens()).setMaxContexts(model.getMaxContexts());
         chatConversationMapper.insert(conversation);
         return conversation.getId();
@@ -73,23 +71,18 @@ public class AiChatConversationServiceImpl implements AiChatConversationService 
             throw exception(CHAT_CONVERSATION_NOT_EXISTS);
         }
         // 1.2 校验模型是否存在（修改模型的情况）
-        if (!ObjectUtil.isAllEmpty(updateReqVO.getModelId(), updateReqVO.getMaxTokens(), updateReqVO.getMaxContexts())) {
-            AiChatModelDO model = chatModalService.validateChatModel(updateReqVO.getModelId());
-            Assert.notNull(model, "必须找到默认模型");
-            validateChatModel(model);
-            // 校验 Token 数量、上下文数量
-            if (updateReqVO.getMaxTokens() != null && updateReqVO.getMaxTokens() > model.getMaxTokens()) {
-                throw exception(CHAT_CONVERSATION_UPDATE_MAX_TOKENS_ERROR);
-            }
-            if (updateReqVO.getMaxContexts() != null && updateReqVO.getMaxContexts() > model.getMaxContexts()) {
-                throw exception(CHAT_CONVERSATION_UPDATE_MAX_CONTEXTS_ERROR);
-            }
+        AiChatModelDO model = null;
+        if (updateReqVO.getModelId() != null) {
+            model = chatModalService.validateChatModel(updateReqVO.getModelId());
         }
 
-        // 更新对话信息
+        // 2. 更新对话信息
         AiChatConversationDO updateObj = BeanUtils.toBean(updateReqVO, AiChatConversationDO.class);
         if (Boolean.TRUE.equals(updateReqVO.getPinned())) {
             updateObj.setPinnedTime(LocalDateTime.now());
+        }
+        if (model != null) {
+            updateObj.setModel(model.getModel());
         }
         chatConversationMapper.updateById(updateObj);
     }
@@ -99,22 +92,28 @@ public class AiChatConversationServiceImpl implements AiChatConversationService 
         return chatConversationMapper.selectListByUserId(userId);
     }
 
+    @Override
+    public AiChatConversationDO getChatConversation(Long id) {
+        return chatConversationMapper.selectById(id);
+    }
+
+    @Override
+    public void deleteChatConversationMy(Long id, Long userId) {
+        // 1. 校验对话是否存在
+        AiChatConversationDO conversation = validateExists(id);
+        if (ObjUtil.notEqual(conversation.getUserId(), userId)) {
+            throw exception(CHAT_CONVERSATION_NOT_EXISTS);
+        }
+
+        // 2. 执行删除
+        chatConversationMapper.deleteById(id);
+    }
+
     private void validateChatModel(AiChatModelDO model) {
         if (ObjectUtil.isAllNotEmpty(model.getTemperature(), model.getMaxTokens(), model.getMaxContexts())) {
             return;
         }
         throw exception(CHAT_CONVERSATION_MODEL_ERROR);
-    }
-
-    @Override
-    public AiChatConversationRespVO getConversationOfValidate(Long id) {
-        AiChatConversationDO aiChatConversationDO = validateExists(id);
-        return AiChatConversationConvert.INSTANCE.covnertChatConversationRes(aiChatConversationDO);
-    }
-
-    @Override
-    public Boolean deleteConversation(Long id) {
-        return chatConversationMapper.deleteById(id) > 0;
     }
 
     public AiChatConversationDO validateExists(Long id) {

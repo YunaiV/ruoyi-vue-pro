@@ -32,12 +32,13 @@ public class AiChatConversationRespVO implements VO {
     private Long roleId;
 
     @Schema(description = "模型编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
-    @Trans(type = TransType.SIMPLE, target = AiChatModelDO.class, fields = {"maxTokens", "maxContexts"},
-            refs = {"modelMaxTokens", "modelMaxContexts"})
     private Long modelId;
 
     @Schema(description = "模型标志", requiredMode = Schema.RequiredMode.REQUIRED, example = "ERNIE-Bot-turbo-0922")
     private String model;
+
+    @Schema(description = "角色设定", example = "一个快乐的程序员")
+    private String systemMessage;
 
     @Schema(description = "温度参数", requiredMode = Schema.RequiredMode.REQUIRED, example = "0.8")
     private Double temperature;
@@ -52,13 +53,5 @@ public class AiChatConversationRespVO implements VO {
 
     @Schema(description = "角色头像", requiredMode = Schema.RequiredMode.REQUIRED, example = "https://www.iocoder.cn/1.png")
     private String roleAvatar;
-
-    // ========== 关联 model 信息 ==========
-
-    @Schema(description = "模型的单条回复的最大 Token 数量", requiredMode = Schema.RequiredMode.REQUIRED, example = "4096")
-    private Integer modelMaxTokens;
-
-    @Schema(description = "模型的上下文的最大 Message 数量", requiredMode = Schema.RequiredMode.REQUIRED, example = "10")
-    private Integer modelMaxContexts;
 
 }

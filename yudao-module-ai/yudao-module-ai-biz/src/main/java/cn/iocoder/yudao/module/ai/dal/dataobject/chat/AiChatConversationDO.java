@@ -82,6 +82,10 @@ public class AiChatConversationDO extends BaseDO {
     // ========== 会话配置 ==========
 
     /**
+     * 角色设定
+     */
+    private String systemMessage;
+    /**
      * 温度参数
      *
      * 用于调整生成回复的随机性和多样性程度：较低的温度值会使输出更收敛于高频词汇，较高的则增加多样性

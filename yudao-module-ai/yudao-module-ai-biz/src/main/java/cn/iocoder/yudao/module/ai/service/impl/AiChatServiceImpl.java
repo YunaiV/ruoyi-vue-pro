@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.ai.service.impl;
 
 import cn.hutool.core.exceptions.ExceptionUtil;
 import cn.iocoder.yudao.framework.ai.core.enums.AiPlatformEnum;
+import cn.iocoder.yudao.module.ai.dal.dataobject.chat.AiChatConversationDO;
 import org.springframework.ai.chat.ChatClient;
 import org.springframework.ai.chat.ChatResponse;
 import org.springframework.ai.chat.StreamingChatClient;
@@ -54,7 +55,6 @@ public class AiChatServiceImpl implements AiChatService {
     private final AiChatClientFactory aiChatClientFactory;
 
     private final AiChatMessageMapper aiChatMessageMapper;
-    private final AiChatConversationMapper aiChatConversationMapper;
     private final AiChatConversationService chatConversationService;
     private final AiChatModelService aiChatModalService;
     private final AiChatRoleService chatRoleService;
@@ -63,7 +63,7 @@ public class AiChatServiceImpl implements AiChatService {
     public AiChatMessageRespVO chat(AiChatMessageSendReqVO req) {
         Long loginUserId = SecurityFrameworkUtils.getLoginUserId();
         // 查询对话
-        AiChatConversationRespVO conversation = chatConversationService.getConversationOfValidate(req.getConversationId());
+        AiChatConversationDO conversation = chatConversationService.validateExists(req.getConversationId());
         // 获取对话模型
         AiChatModelDO chatModel = aiChatModalService.validateChatModel(conversation.getModelId());
         // 获取角色信息
@@ -130,7 +130,7 @@ public class AiChatServiceImpl implements AiChatService {
             throw ServiceExceptionUtil.exception(ErrorCodeConstants.AI_CHAT_MESSAGE_NOT_EXIST);
         }
         // 查询对话
-        AiChatConversationRespVO conversation = chatConversationService.getConversationOfValidate(aiChatMessageDO.getConversationId());
+        AiChatConversationDO conversation = chatConversationService.validateExists(aiChatMessageDO.getConversationId());
         // 获取对话模型
         AiChatModelDO chatModel = aiChatModalService.validateChatModel(conversation.getModelId());
         // 获取角色信息
@@ -188,7 +188,7 @@ public class AiChatServiceImpl implements AiChatService {
     public AiChatMessageRespVO add(AiChatMessageAddReqVO req) {
         Long loginUserId = SecurityFrameworkUtils.getLoginUserId();
         // 查询对话
-        AiChatConversationRespVO conversation = chatConversationService.getConversationOfValidate(req.getConversationId());
+        AiChatConversationDO conversation = chatConversationService.validateExists(req.getConversationId());
         // 获取对话模型
         AiChatModelDO chatModel = aiChatModalService.validateChatModel(conversation.getModelId());
         AiChatMessageDO userMessage = insertChatMessage(conversation.getId(), MessageType.USER, loginUserId, conversation.getRoleId(),

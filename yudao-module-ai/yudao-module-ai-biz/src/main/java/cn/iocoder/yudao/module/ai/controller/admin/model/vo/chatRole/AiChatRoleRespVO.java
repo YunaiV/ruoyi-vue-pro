@@ -42,10 +42,7 @@ public class AiChatRoleRespVO implements VO {
     @Schema(description = "角色描述", requiredMode = Schema.RequiredMode.REQUIRED, example = "你说的对")
     private String description;
 
-    @Schema(description = "角色欢迎语", requiredMode = Schema.RequiredMode.REQUIRED)
-    private String welcomeMessage;
-
-    @Schema(description = "角色上下文", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "角色设定", requiredMode = Schema.RequiredMode.REQUIRED)
     private String systemMessage;
 
     @Schema(description = "是否公开", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")

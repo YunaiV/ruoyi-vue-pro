@@ -42,11 +42,7 @@ public class AiChatRoleDO extends BaseDO {
      */
     private String description;
     /**
-     * 角色欢迎语
-     */
-    private String welcomeMessage;
-    /**
-     * 角色上下文
+     * 角色设定
      */
     private String systemMessage;
 

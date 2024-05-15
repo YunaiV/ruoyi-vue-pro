@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.ai.controller.admin.chat;
 
+import cn.hutool.core.util.ObjUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.ai.controller.admin.chat.vo.conversation.AiChatConversationCreateMyReqVO;
@@ -49,20 +50,23 @@ public class AiChatConversationController {
         return success(BeanUtils.toBean(list, AiChatConversationRespVO.class));
     }
 
-    // TODO @fan：实现一下
-    @GetMapping("/get")
-    @Operation(summary = "获得聊天会话")
+    @GetMapping("/get-my")
+    @Operation(summary = "获得【我的】聊天会话")
     @Parameter(name = "id", required = true, description = "会话编号", example = "1024")
-    public CommonResult<AiChatConversationRespVO> getConversation(@RequestParam("id") Long id) {
-        return success(chatConversationService.getConversationOfValidate(id));
+    public CommonResult<AiChatConversationRespVO> getChatConversationMy(@RequestParam("id") Long id) {
+        AiChatConversationDO conversation = chatConversationService.getChatConversation(id);
+        if (conversation != null && ObjUtil.notEqual(conversation.getUserId(), getLoginUserId())) {
+            conversation = null;
+        }
+        return success(BeanUtils.toBean(conversation, AiChatConversationRespVO.class));
     }
 
-    // TODO @fan：实现一下
-    @DeleteMapping("/delete")
+    @DeleteMapping("/delete-my")
     @Operation(summary = "删除聊天会话")
     @Parameter(name = "id", required = true, description = "会话编号", example = "1024")
-    public CommonResult<Boolean> deleteConversation(@RequestParam("id") Long id) {
-        return success(chatConversationService.deleteConversation(id));
+    public CommonResult<Boolean> deleteChatConversationMy(@RequestParam("id") Long id) {
+        chatConversationService.deleteChatConversationMy(id, getLoginUserId());
+        return success(true);
     }
 
     // ========== 会话管理 ==========
