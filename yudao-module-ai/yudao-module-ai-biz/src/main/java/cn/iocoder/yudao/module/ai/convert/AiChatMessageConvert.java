@@ -27,12 +27,4 @@ public interface AiChatMessageConvert {
      */
     List<AiChatMessageRespVO> convertAiChatMessageRespVOList(List<AiChatMessageDO> aiChatMessageDOList);
 
-    /**
-     * 转换 - aiChatMessageDO
-     *
-     * @param aiChatMessageDO
-     * @return
-     */
-    AiChatMessageRespVO convertAiChatMessageRespVO(AiChatMessageDO aiChatMessageDO);
-
 }

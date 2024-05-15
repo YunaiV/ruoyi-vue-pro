@@ -23,22 +23,6 @@ public interface AiChatService {
     AiChatMessageRespVO chat(AiChatMessageSendReqVO sendReqVO);
 
     /**
-     * chat stream
-     *
-     * @param sendReqVO
-     * @return
-     */
-    Flux<AiChatMessageRespVO> chatStream(AiChatMessageSendStreamReqVO sendReqVO);
-
-    /**
-     * 添加 - message
-     *
-     * @param sendReqVO
-     * @return
-     */
-    AiChatMessageRespVO add(AiChatMessageAddReqVO sendReqVO);
-
-    /**
      * 获取 - 获取对话 message list
      *
      * @param conversationId
@@ -53,5 +37,14 @@ public interface AiChatService {
      * @return
      */
     Boolean deleteMessage(Long id);
+
+    /**
+     * 发送消息
+     *
+     * @param sendReqVO
+     * @param userId
+     * @return
+     */
+    Flux<AiChatMessageSendRespVO> sendChatMessageStream(AiChatMessageSendReqVO sendReqVO, Long userId);
 
 }

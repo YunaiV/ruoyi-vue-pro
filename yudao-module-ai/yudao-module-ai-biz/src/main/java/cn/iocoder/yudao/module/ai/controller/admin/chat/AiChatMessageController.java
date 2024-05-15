@@ -17,6 +17,7 @@ import reactor.core.publisher.Flux;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
+import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
 
 @Tag(name = "管理后台 - 聊天消息")
 @RestController
@@ -36,14 +37,8 @@ public class AiChatMessageController {
     @Operation(summary = "发送消息（流式）", description = "流式返回，响应较快")
     @PostMapping(value = "/send-stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     @PermitAll // 解决 SSE 最终响应的时候，会被 Access Denied 拦截的问题
-    public Flux<AiChatMessageRespVO> sendMessageStream(@Validated @RequestBody AiChatMessageSendStreamReqVO sendReqVO) {
-        return chatService.chatStream(sendReqVO);
-    }
-
-    @Operation(summary = "添加/提问", description = "先创建好 message 前端才好渲染")
-    @PostMapping(value = "/add")
-    public CommonResult<AiChatMessageRespVO> add(@Validated @RequestBody AiChatMessageAddReqVO req) {
-        return success(chatService.add(req));
+    public Flux<AiChatMessageSendRespVO> sendChatMessageStream(@Validated @RequestBody AiChatMessageSendReqVO sendReqVO) {
+        return chatService.sendChatMessageStream(sendReqVO, getLoginUserId());
     }
 
     @Operation(summary = "获得指定会话的消息列表")

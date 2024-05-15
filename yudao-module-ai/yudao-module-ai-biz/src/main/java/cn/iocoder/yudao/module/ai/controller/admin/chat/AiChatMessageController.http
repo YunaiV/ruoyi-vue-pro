@@ -10,13 +10,13 @@ Authorization: {{token}}
 }
 
 
-### chat call
-POST {{baseUrl}}/admin-api/ai/chat/message/send-stream
+### 发送消息（流式）
+POST {{baseUrl}}/ai/chat/message/send-stream
 Content-Type: application/json
 Authorization: {{token}}
 
 {
-  "conversationId": "1781604279872581649",
+  "conversationId": "1781604279872581651",
   "content": "苹果是什么颜色？"
 }
 

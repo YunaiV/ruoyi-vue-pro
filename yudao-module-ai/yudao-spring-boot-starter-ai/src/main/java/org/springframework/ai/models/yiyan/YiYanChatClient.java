@@ -94,7 +94,10 @@ public class YiYanChatClient implements ChatClient, StreamingChatClient {
                 String a = ";";
             }
         });
-        return response.map(res -> new ChatResponse(List.of(new Generation(res.getResult()))));
+        return response.map(res -> {
+            // TODO @fan：这里缺少了 usage 的封装
+            return new ChatResponse(List.of(new Generation(res.getResult())));
+        });
     }
 
     private YiYanChatCompletionRequest createRequest(Prompt prompt, boolean stream) {
