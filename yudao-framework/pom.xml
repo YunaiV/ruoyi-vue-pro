@@ -19,6 +19,7 @@
 
         <module>yudao-spring-boot-starter-monitor</module>
         <module>yudao-spring-boot-starter-protection</module>
+        <module>yudao-spring-boot-starter-signature</module>
         <module>yudao-spring-boot-starter-job</module>
         <module>yudao-spring-boot-starter-mq</module>
 
