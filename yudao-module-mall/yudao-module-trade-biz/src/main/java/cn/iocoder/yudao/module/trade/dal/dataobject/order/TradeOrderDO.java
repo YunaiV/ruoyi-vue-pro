@@ -322,7 +322,7 @@ public class TradeOrderDO extends BaseDO {
      *
      * 关联 CombinationRecordDO 的 headId 字段
      */
-    private Long combinationHeadId;
+    private Long combinationHeadId; // FIXME 2024/5/15: "团长" 应该译作 leader / starter 而不是 head
     /**
      * 拼团记录编号
      *
