@@ -1,33 +1,49 @@
 package cn.iocoder.yudao.module.trade.service.order;
 
+import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
 import cn.iocoder.yudao.module.member.api.address.MemberAddressApi;
 import cn.iocoder.yudao.module.member.api.user.MemberUserApi;
 import cn.iocoder.yudao.module.pay.api.order.PayOrderApi;
 import cn.iocoder.yudao.module.pay.api.order.dto.PayOrderRespDTO;
 import cn.iocoder.yudao.module.pay.enums.order.PayOrderStatusEnum;
+import cn.iocoder.yudao.module.product.api.comment.ProductCommentApi;
 import cn.iocoder.yudao.module.product.api.sku.ProductSkuApi;
 import cn.iocoder.yudao.module.product.api.spu.ProductSpuApi;
 import cn.iocoder.yudao.module.promotion.api.coupon.CouponApi;
+import cn.iocoder.yudao.module.system.api.notify.NotifyMessageSendApi;
+import cn.iocoder.yudao.module.trade.controller.admin.delivery.vo.express.DeliveryExpressCreateReqVO;
 import cn.iocoder.yudao.module.trade.controller.admin.order.vo.TradeOrderDeliveryReqVO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderDO;
 import cn.iocoder.yudao.module.trade.dal.mysql.order.TradeOrderItemMapper;
 import cn.iocoder.yudao.module.trade.dal.mysql.order.TradeOrderMapper;
+import cn.iocoder.yudao.module.trade.dal.redis.no.TradeNoRedisDAO;
+import cn.iocoder.yudao.module.trade.enums.delivery.DeliveryTypeEnum;
+import cn.iocoder.yudao.module.trade.enums.order.TradeOrderRefundStatusEnum;
 import cn.iocoder.yudao.module.trade.enums.order.TradeOrderStatusEnum;
 import cn.iocoder.yudao.module.trade.framework.order.config.TradeOrderConfig;
 import cn.iocoder.yudao.module.trade.framework.order.config.TradeOrderProperties;
+import cn.iocoder.yudao.module.trade.service.cart.CartServiceImpl;
+import cn.iocoder.yudao.module.trade.service.delivery.DeliveryExpressService;
+import cn.iocoder.yudao.module.trade.service.delivery.DeliveryExpressServiceImpl;
+import cn.iocoder.yudao.module.trade.service.message.TradeMessageServiceImpl;
+import cn.iocoder.yudao.module.trade.service.order.handler.TradeOrderHandler;
+import cn.iocoder.yudao.module.trade.service.price.TradePriceServiceImpl;
+import cn.iocoder.yudao.module.trade.service.price.calculator.TradePriceCalculator;
+import jakarta.annotation.Resource;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 
-import jakarta.annotation.Resource;
 import java.time.Duration;
+import java.util.UUID;
 
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEquals;
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomPojo;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
@@ -37,8 +53,10 @@ import static org.mockito.Mockito.when;
  * @author LeeYan9
  * @since 2022-09-07
  */
-@Disabled // TODO 芋艿：后续 fix 补充的单测
-@Import({TradeOrderUpdateServiceImpl.class, TradeOrderConfig.class})
+@SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
+@Import({TradeOrderUpdateServiceImpl.class, TradeOrderConfig.class, CartServiceImpl.class, TradePriceServiceImpl.class,
+        DeliveryExpressServiceImpl.class, TradeMessageServiceImpl.class
+})
 public class TradeOrderUpdateServiceTest extends BaseDbUnitTest {
 
     @Resource
@@ -55,7 +73,9 @@ public class TradeOrderUpdateServiceTest extends BaseDbUnitTest {
     private ProductSpuApi productSpuApi;
     @MockBean
     private ProductSkuApi productSkuApi;
-//    @MockBean
+    @MockBean
+    private ProductCommentApi productCommentApi;
+    //    @MockBean
 //    private PriceApi priceApi;
     @MockBean
     private PayOrderApi payOrderApi;
@@ -66,11 +86,22 @@ public class TradeOrderUpdateServiceTest extends BaseDbUnitTest {
 
     @MockBean
     private TradeOrderProperties tradeOrderProperties;
+    @MockBean
+    private TradeNoRedisDAO tradeNoRedisDAO;
+    @MockBean
+    private TradeOrderHandler tradeOrderHandler;
+    @MockBean
+    private TradePriceCalculator tradePriceCalculator;
+    @MockBean
+    private NotifyMessageSendApi notifyMessageSendApi;
+    @Autowired
+    private DeliveryExpressService deliveryExpressService;
 
     @BeforeEach
     public void setUp() {
         when(tradeOrderProperties.getAppId()).thenReturn(888L);
         when(tradeOrderProperties.getPayExpireTime()).thenReturn(Duration.ofDays(1));
+        when(tradeNoRedisDAO.generate(anyString())).thenReturn(UUID.randomUUID().toString());
     }
 
 //    @Test
@@ -259,11 +290,18 @@ public class TradeOrderUpdateServiceTest extends BaseDbUnitTest {
         TradeOrderDO order = randomPojo(TradeOrderDO.class, o -> {
             o.setId(1L).setStatus(TradeOrderStatusEnum.UNDELIVERED.getStatus());
             o.setLogisticsId(null).setLogisticsNo(null).setDeliveryTime(null);
+            o.setRefundStatus(TradeOrderRefundStatusEnum.NONE.getStatus());
+            o.setDeliveryType(DeliveryTypeEnum.EXPRESS.getType());
         });
         tradeOrderMapper.insert(order);
+
+        DeliveryExpressCreateReqVO expressCreateReqVO = new DeliveryExpressCreateReqVO();
+        expressCreateReqVO.setCode("code").setName("Name").setLogo("logo").setSort(0).setStatus(CommonStatusEnum.ENABLE.getStatus());
+        Long deliveryExpressId = deliveryExpressService.createDeliveryExpress(expressCreateReqVO);
         // 准备参数
         TradeOrderDeliveryReqVO deliveryReqVO = new TradeOrderDeliveryReqVO().setId(1L)
-                .setLogisticsId(10L).setLogisticsNo("100");
+                .setLogisticsId(deliveryExpressId).setLogisticsNo("100");
+
         // mock 方法（支付单）
 
         // 调用
