@@ -3,8 +3,8 @@ package cn.iocoder.yudao.framework.ai.config;
 import cn.iocoder.yudao.framework.ai.core.enums.AiPlatformEnum;
 import org.springframework.ai.models.xinghuo.XingHuoChatModel;
 import org.springframework.ai.models.yiyan.YiYanChatModel;
-import org.springframework.ai.models.openai.enums.OpenAiImageModelEnum;
-import org.springframework.ai.models.openai.enums.OpenAiImageStyleEnum;
+import cn.iocoder.yudao.framework.ai.core.enums.OpenAiImageModelEnum;
+import cn.iocoder.yudao.framework.ai.core.enums.OpenAiImageStyleEnum;
 import lombok.Data;
 import lombok.experimental.Accessors;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -95,6 +95,7 @@ public class YudaoAiProperties {
     @Data
     @Accessors(chain = true)
     public static class OpenAiImageProperties {
+
         private boolean enable = false;
 
         /**
@@ -109,6 +110,7 @@ public class YudaoAiProperties {
          * 风格
          */
         private OpenAiImageStyleEnum style = OpenAiImageStyleEnum.VIVID;
+
     }
 
     @Data

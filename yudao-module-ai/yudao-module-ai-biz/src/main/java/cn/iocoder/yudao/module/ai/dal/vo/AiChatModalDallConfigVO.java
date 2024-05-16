@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.ai.dal.vo;
 
-import org.springframework.ai.models.openai.enums.OpenAiImageStyleEnum;
+import cn.iocoder.yudao.framework.ai.core.enums.OpenAiImageStyleEnum;
 import lombok.Data;
 import lombok.experimental.Accessors;
 

@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.ai.service.midjourneyHandler;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
+import com.alibaba.fastjson.JSON;
 import org.springframework.ai.models.midjourney.MidjourneyMessage;
 import org.springframework.ai.models.midjourney.constants.MidjourneyGennerateStatusEnum;
 import org.springframework.ai.models.midjourney.webSocket.MidjourneyMessageHandler;
@@ -11,7 +12,6 @@ import cn.iocoder.yudao.module.ai.convert.AiImageConvert;
 import cn.iocoder.yudao.module.ai.dal.dataobject.image.AiImageDO;
 import cn.iocoder.yudao.module.ai.dal.mysql.AiImageMapper;
 import cn.iocoder.yudao.module.ai.enums.AiImageDrawingStatusEnum;
-import com.alibaba.fastjson2.JSON;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;

@@ -1,5 +1,6 @@
 package org.springframework.ai.models.tongyi;
 
+import cn.iocoder.yudao.framework.ai.core.exception.ChatException;
 import org.springframework.ai.chat.*;
 import org.springframework.ai.chat.prompt.ChatOptions;
 import org.springframework.ai.chat.prompt.Prompt;

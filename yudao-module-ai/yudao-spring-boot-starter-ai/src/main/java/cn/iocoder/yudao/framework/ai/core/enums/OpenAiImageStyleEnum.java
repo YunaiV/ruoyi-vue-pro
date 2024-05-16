@@ -1,8 +1,9 @@
-package org.springframework.ai.models.openai.enums;
+package cn.iocoder.yudao.framework.ai.core.enums;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
+// TODO 芋艿：待梳理
 /**
  * open ai image style
  *

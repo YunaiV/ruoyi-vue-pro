@@ -12,4 +12,4 @@
  *  2.4 openai 包：【OpenAI】ChatGPT，拷贝 spring-ai 提供的 models/openai 包
  *  2.5 midjourney 包：Midjourney，参考 https://github.com/novicezk/midjourney-proxy 实现
  */
-package org.springframework.ai;
+package cn.iocoder.yudao.framework.ai;

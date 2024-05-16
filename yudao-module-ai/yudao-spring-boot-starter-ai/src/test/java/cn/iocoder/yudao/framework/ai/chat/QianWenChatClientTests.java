@@ -37,8 +37,8 @@ public class QianWenChatClientTests {
         QianWenApi qianWenApi = new QianWenApi("sk-Zsd81gZYg7", QianWenChatModal.QWEN_72B_CHAT);
         QianWenOptions qianWenOptions = new QianWenOptions();
         qianWenOptions.setTopP(0.8F);
-        qianWenOptions.setTopK(3);
-        qianWenOptions.setTemperature(0.6F);
+//        qianWenOptions.setTopK(3); TODO 芋艿：临时处理
+//        qianWenOptions.setTemperature(0.6F); TODO 芋艿：临时处理
         qianWenChatClient = new QianWenChatClient(
                 qianWenApi,
                 qianWenOptions

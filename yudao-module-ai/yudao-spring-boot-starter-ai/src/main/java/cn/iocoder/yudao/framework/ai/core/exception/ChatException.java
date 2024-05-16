@@ -1,4 +1,4 @@
-package org.springframework.ai.chat;
+package cn.iocoder.yudao.framework.ai.core.exception;
 
 /**
  * 聊天异常

@@ -6,10 +6,8 @@ import cn.iocoder.yudao.framework.ai.core.exception.AiException;
 import org.springframework.ai.image.ImageGeneration;
 import org.springframework.ai.image.ImagePrompt;
 import org.springframework.ai.image.ImageResponse;
-import org.springframework.ai.models.openai.OpenAiImageClient;
-import org.springframework.ai.models.openai.OpenAiImageOptions;
-import org.springframework.ai.models.openai.enums.OpenAiImageModelEnum;
-import org.springframework.ai.models.openai.enums.OpenAiImageStyleEnum;
+import cn.iocoder.yudao.framework.ai.core.enums.OpenAiImageModelEnum;
+import cn.iocoder.yudao.framework.ai.core.enums.OpenAiImageStyleEnum;
 import org.springframework.ai.models.midjourney.api.MidjourneyInteractionsApi;
 import org.springframework.ai.models.midjourney.api.req.ReRollReq;
 import org.springframework.ai.models.midjourney.webSocket.MidjourneyWebSocketStarter;
@@ -29,6 +27,8 @@ import cn.iocoder.yudao.module.ai.service.AiImageService;
 import jakarta.annotation.PostConstruct;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.ai.openai.OpenAiImageClient;
+import org.springframework.ai.openai.OpenAiImageOptions;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -95,8 +95,8 @@ public class AiImageServiceImpl implements AiImageService {
         try {
             // 转换openai 参数
             OpenAiImageOptions openAiImageOptions = new OpenAiImageOptions();
-            openAiImageOptions.setModel(openAiImageModelEnum);
-            openAiImageOptions.setStyle(openAiImageStyleEnum);
+            openAiImageOptions.setModel(openAiImageModelEnum.getModel());
+            openAiImageOptions.setStyle(openAiImageStyleEnum.getStyle());
             openAiImageOptions.setSize(req.getSize());
             ImageResponse imageResponse = openAiImageClient.call(new ImagePrompt(req.getPrompt(), openAiImageOptions));
             // 发送

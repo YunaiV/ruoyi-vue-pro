@@ -11,9 +11,6 @@ import org.springframework.ai.models.xinghuo.api.XingHuoApi;
 import org.springframework.ai.models.yiyan.YiYanChatClient;
 import org.springframework.ai.models.yiyan.YiYanOptions;
 import org.springframework.ai.models.yiyan.api.YiYanApi;
-import org.springframework.ai.models.openai.OpenAiImageApi;
-import org.springframework.ai.models.openai.OpenAiImageClient;
-import org.springframework.ai.models.openai.OpenAiImageOptions;
 import org.springframework.ai.models.midjourney.MidjourneyConfig;
 import org.springframework.ai.models.midjourney.MidjourneyMessage;
 import org.springframework.ai.models.midjourney.api.MidjourneyInteractionsApi;
@@ -22,6 +19,10 @@ import org.springframework.ai.models.midjourney.webSocket.MidjourneyWebSocketSta
 import org.springframework.ai.models.midjourney.webSocket.listener.MidjourneyMessageListener;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.ai.openai.OpenAiImageClient;
+import org.springframework.ai.openai.OpenAiImageOptions;
+import org.springframework.ai.openai.api.OpenAiImageApi;
+import org.springframework.ai.retry.RetryUtils;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -72,10 +73,10 @@ public class YudaoAiAutoConfiguration {
         YudaoAiProperties.QianWenProperties qianWenProperties = yudaoAiProperties.getQianwen();
         // 转换配置
         QianWenOptions qianWenOptions = new QianWenOptions();
-        qianWenOptions.setTopK(qianWenProperties.getTopK());
+//        qianWenOptions.setTopK(qianWenProperties.getTopK()); TODO 芋艿：后续弄
         qianWenOptions.setTopP(qianWenProperties.getTopP());
         qianWenOptions.setMaxTokens(qianWenProperties.getMaxTokens());
-        qianWenOptions.setTemperature(qianWenProperties.getTemperature());
+//        qianWenOptions.setTemperature(qianWenProperties.getTemperature()); TODO 芋艿：后续弄
         return new QianWenChatClient(
                 new QianWenApi(
                         qianWenProperties.getApiKey(),
@@ -91,7 +92,7 @@ public class YudaoAiAutoConfiguration {
         YudaoAiProperties.YiYanProperties yiYanProperties = yudaoAiProperties.getYiyan();
         // 转换配置
         YiYanOptions yiYanOptions = new YiYanOptions();
-        yiYanOptions.setTopK(yiYanProperties.getTopK());
+//        yiYanOptions.setTopK(yiYanProperties.getTopK()); TODO 芋艿：后续弄
         yiYanOptions.setTopP(yiYanProperties.getTopP());
         yiYanOptions.setTemperature(yiYanProperties.getTemperature());
         yiYanOptions.setMaxOutputTokens(yiYanProperties.getMaxTokens());
@@ -106,19 +107,19 @@ public class YudaoAiAutoConfiguration {
         );
     }
 
-
     @Bean
     @ConditionalOnProperty(value = "yudao.ai.openAiImage.enable", havingValue = "true")
     public OpenAiImageClient openAiImageClient(YudaoAiProperties yudaoAiProperties) {
         YudaoAiProperties.OpenAiImageProperties openAiImageProperties = yudaoAiProperties.getOpenAiImage();
+        OpenAiImageOptions openAiImageOptions = new OpenAiImageOptions();
+        openAiImageOptions.setModel(openAiImageProperties.getModel().getModel());
+        openAiImageOptions.setStyle(openAiImageProperties.getStyle().getStyle());
+        openAiImageOptions.setResponseFormat("url"); // TODO 芋艿：OpenAiImageOptions.ResponseFormatEnum.URL.getValue()
         // 创建 client
         return new OpenAiImageClient(
                 new OpenAiImageApi(openAiImageProperties.getApiKey()),
-                new OpenAiImageOptions()
-                        .setModel(openAiImageProperties.getModel())
-                        .setResponseFormat(OpenAiImageOptions.ResponseFormatEnum.URL.getValue())
-                        .setStyle(openAiImageProperties.getStyle())
-        );
+                openAiImageOptions,
+                RetryUtils.DEFAULT_RETRY_TEMPLATE);
     }
 
     @Bean
@@ -156,7 +157,6 @@ public class YudaoAiAutoConfiguration {
         // 创建 MidjourneyInteractionsApi
         return new MidjourneyInteractionsApi(midjourneyConfig);
     }
-
 
     private static @NotNull MidjourneyConfig getMidjourneyConfig(ApplicationContext applicationContext,
                                                                  YudaoAiProperties.MidjourneyProperties midjourneyProperties) {

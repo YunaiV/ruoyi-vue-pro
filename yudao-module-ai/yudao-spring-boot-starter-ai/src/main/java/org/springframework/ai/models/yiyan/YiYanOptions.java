@@ -114,20 +114,20 @@ public class YiYanOptions implements ChatOptions {
         return this.temperature;
     }
 
-    @Override
-    public void setTemperature(Float temperature) {
-        this.temperature = temperature;
-    }
+//    @Override
+//    public void setTemperature(Float temperature) {
+//        this.temperature = temperature;
+//    }
 
     @Override
     public Float getTopP() {
         return topP;
     }
 
-    @Override
-    public void setTopP(Float topP) {
-        this.topP = topP;
-    }
+//    @Override
+//    public void setTopP(Float topP) {
+//        this.topP = topP;
+//    }
 
     // 百度么有 topK
 
@@ -136,7 +136,7 @@ public class YiYanOptions implements ChatOptions {
         return null;
     }
 
-    @Override
-    public void setTopK(Integer topK) {
-    }
+//    @Override
+//    public void setTopK(Integer topK) {
+//    }
 }

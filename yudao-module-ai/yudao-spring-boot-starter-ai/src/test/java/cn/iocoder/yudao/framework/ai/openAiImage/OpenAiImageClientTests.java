@@ -1,12 +1,12 @@
 package cn.iocoder.yudao.framework.ai.openAiImage;
 
-import org.springframework.ai.models.openai.OpenAiImageApi;
-import org.springframework.ai.models.openai.OpenAiImageClient;
-import org.springframework.ai.models.openai.OpenAiImageOptions;
 import org.springframework.ai.image.ImagePrompt;
 import org.springframework.ai.image.ImageResponse;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.ai.openai.OpenAiImageClient;
+import org.springframework.ai.openai.OpenAiImageOptions;
+import org.springframework.ai.openai.api.OpenAiImageApi;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -29,8 +29,8 @@ public class OpenAiImageClientTests {
     public void setup() {
         // 初始化 openAiImageClient
         this.openAiImageClient = new OpenAiImageClient(
-                new OpenAiImageApi(""),
-                new OpenAiImageOptions().setResponseFormat(OpenAiImageOptions.ResponseFormatEnum.URL.getValue())
+                new OpenAiImageApi("")
+//                new OpenAiImageOptions().setResponseFormat(OpenAiImageOptions.ResponseFormatEnum.URL.getValue()) TODO 芋艿：临时处理
         );
     }
 

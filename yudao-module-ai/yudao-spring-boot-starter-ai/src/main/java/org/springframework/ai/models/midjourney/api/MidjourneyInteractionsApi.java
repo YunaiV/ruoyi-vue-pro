@@ -1,14 +1,14 @@
 package org.springframework.ai.models.midjourney.api;
 
 import cn.hutool.core.util.StrUtil;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import org.springframework.ai.models.midjourney.MidjourneyConfig;
 import org.springframework.ai.models.midjourney.api.req.AttachmentsReq;
 import org.springframework.ai.models.midjourney.api.req.DescribeReq;
 import org.springframework.ai.models.midjourney.api.req.ReRollReq;
 import org.springframework.ai.models.midjourney.api.res.UploadAttachmentsRes;
 import org.springframework.ai.models.midjourney.util.MidjourneyUtil;
-import com.alibaba.fastjson2.JSON;
-import com.alibaba.fastjson2.JSONObject;
 import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.FileSystemResource;

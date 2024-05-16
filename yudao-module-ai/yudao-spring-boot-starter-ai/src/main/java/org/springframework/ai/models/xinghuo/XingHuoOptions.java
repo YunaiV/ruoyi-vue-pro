@@ -49,28 +49,29 @@ public class XingHuoOptions implements ChatOptions {
         return this.temperature;
     }
 
-    @Override
-    public void setTemperature(Float temperature) {
-        this.temperature = temperature;
-    }
+//    @Override
+//    public void setTemperature(Float temperature) {
+//        this.temperature = temperature;
+//    }
 
     @Override
     public Float getTopP() {
         return null;
     }
 
-    @Override
-    public void setTopP(Float topP) {
-
-    }
+//    @Override
+//    public void setTopP(Float topP) {
+//
+//    }
 
     @Override
     public Integer getTopK() {
         return this.topK;
     }
 
-    @Override
-    public void setTopK(Integer topK) {
-        this.topK = topK;
-    }
+//    @Override
+//    public void setTopK(Integer topK) {
+//        this.topK = topK;
+//    }
+
 }
