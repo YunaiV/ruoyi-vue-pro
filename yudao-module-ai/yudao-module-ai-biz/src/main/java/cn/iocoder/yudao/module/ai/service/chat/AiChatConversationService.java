@@ -62,4 +62,10 @@ public interface AiChatConversationService {
      */
     AiChatConversationDO validateExists(Long id);
 
+    /**
+     * 删除 - 所有对话，置顶除外
+     *
+     * @param loginUserId
+     */
+    void deleteMyAllExceptPinned(Long loginUserId);
 }

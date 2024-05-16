@@ -4,8 +4,8 @@ import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
+import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.module.ai.controller.admin.chat.vo.conversation.AiChatConversationCreateMyReqVO;
-import cn.iocoder.yudao.module.ai.controller.admin.chat.vo.conversation.AiChatConversationRespVO;
 import cn.iocoder.yudao.module.ai.controller.admin.chat.vo.conversation.AiChatConversationUpdateMyReqVO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.chat.AiChatConversationDO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiChatModelDO;
@@ -21,8 +21,9 @@ import org.springframework.validation.annotation.Validated;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.*;
-import static cn.iocoder.yudao.module.ai.ErrorCodeConstants.*;
+import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.module.ai.ErrorCodeConstants.CHAT_CONVERSATION_MODEL_ERROR;
+import static cn.iocoder.yudao.module.ai.ErrorCodeConstants.CHAT_CONVERSATION_NOT_EXISTS;
 
 /**
  * AI 聊天对话 Service 实现类
@@ -122,6 +123,15 @@ public class AiChatConversationServiceImpl implements AiChatConversationService 
             throw exception(CHAT_CONVERSATION_NOT_EXISTS);
         }
         return conversation;
+    }
+
+    @Override
+    public void deleteMyAllExceptPinned(Long loginUserId) {
+        chatConversationMapper.delete(
+                new LambdaQueryWrapperX<AiChatConversationDO>()
+                        .eq(AiChatConversationDO::getUserId, loginUserId)
+                        .eq(AiChatConversationDO::getPinned, false)
+        );
     }
 
 }

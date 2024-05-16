@@ -69,6 +69,13 @@ public class AiChatConversationController {
         return success(true);
     }
 
+    @DeleteMapping("/delete-my-all-except-pinned")
+    @Operation(summary = "删除所有对话(置顶除外)")
+    @Parameter(name = "id", required = true, description = "会话编号", example = "1024")
+    public CommonResult<Boolean> deleteMyAllExceptPinned() {
+        chatConversationService.deleteMyAllExceptPinned(getLoginUserId());
+        return success(true);
+    }
     // ========== 会话管理 ==========
 
 }
