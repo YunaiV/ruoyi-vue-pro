@@ -70,7 +70,7 @@ public class AppSocialUserController {
     @Operation(summary = "获得微信小程序码(base64 image)")
     public CommonResult<String> getWxQrcode(@RequestBody @Valid AppSocialWxQrcodeReqVO reqVO) {
         byte[] wxQrcode = socialClientApi.getWxaQrcode(BeanUtils.toBean(reqVO, SocialWxQrcodeReqDTO.class)
-                .setUserId(getLoginUserId()).setUserType(UserTypeEnum.MEMBER.getValue()).setSocialType(reqVO.getType()));
+                .setEnvVersion(AppSocialWxQrcodeReqVO.ENV_VERSION));
         return success("data:image/png;base64," + Base64.getEncoder().encodeToString(wxQrcode));
     }
 
