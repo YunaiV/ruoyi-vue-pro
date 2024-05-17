@@ -127,7 +127,7 @@ public class AiChatServiceImpl implements AiChatService {
         // 1.1 校验对话存在
         AiChatConversationDO conversation = chatConversationService.validateExists(sendReqVO.getConversationId());
         if (ObjUtil.notEqual(conversation.getUserId(), userId)) {
-            throw exception(CHAT_CONVERSATION_NOT_EXISTS);
+            throw exception(CHAT_CONVERSATION_NOT_EXISTS); // TODO 芋艿：异常情况的对接；
         }
         // 1.2 校验模型
         AiChatModelDO model = chatModalService.validateChatModel(conversation.getModelId());

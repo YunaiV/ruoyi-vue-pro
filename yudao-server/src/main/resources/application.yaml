@@ -142,6 +142,14 @@ spring:
     listener:
       missing-topics-fatal: false # 消费监听接口监听的主题不存在时，默认会报错。所以通过设置为 false ，解决报错
 
+--- #################### AI 相关配置 ####################
+
+spring.ai:
+  ollama:
+    base-url: http://127.0.0.1:11434
+    chat:
+      model: llama3
+
 --- #################### 芋道相关配置 ####################
 
 yudao:
