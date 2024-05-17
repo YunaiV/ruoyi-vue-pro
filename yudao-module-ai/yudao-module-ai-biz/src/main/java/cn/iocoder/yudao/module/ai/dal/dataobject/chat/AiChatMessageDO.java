@@ -47,15 +47,11 @@ public class AiChatMessageDO extends BaseDO {
     /**
      * 用户编号
      *
-     * 仅当 user 发送时非空
-     *
      * 关联 AdminUserDO 的 userId 字段
      */
     private Long userId;
     /**
      * 角色编号
-     *
-     * 仅当 assistant 回复时非空
      *
      * 关联 {@link AiChatRoleDO#getId()} 字段
      */

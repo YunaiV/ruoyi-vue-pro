@@ -15,13 +15,13 @@ import lombok.Getter;
 public enum AiPlatformEnum {
 
     OPENAI("OpenAI", "OpenAI"),
-    OLLAMA("dall", "dall"),
+    OLLAMA("Ollama", "Ollama"),
 
     YI_YAN("yiyan", "一言"),
     QIAN_WEN("qianwen", "千问"),
     XING_HUO("xinghuo", "星火"),
     OPEN_AI_DALL("dall", "dall"),
-    MIDJOURNEY("Ollama", "Ollama"),
+    MIDJOURNEY("midjourney", "midjourney"),
 
     ;
 

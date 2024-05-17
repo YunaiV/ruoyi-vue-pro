@@ -19,10 +19,10 @@ public class AiChatMessageRespVO {
     private String type; // 参见 MessageType 枚举类
 
     @Schema(description = "用户编号", example = "4096")
-    private Long userId; // 仅当 user 发送时非空
+    private Long userId;
 
     @Schema(description = "角色编号", example = "888")
-    private Long roleId; // 仅当 assistant 回复时非空
+    private Long roleId;
 
     @Schema(description = "模型标志", requiredMode = Schema.RequiredMode.REQUIRED, example = "gpt-3.5-turbo")
     private String model; // 参见 AiOpenAiModelEnum 枚举类
