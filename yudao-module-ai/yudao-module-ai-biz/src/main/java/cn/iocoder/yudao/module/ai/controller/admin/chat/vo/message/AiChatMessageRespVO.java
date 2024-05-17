@@ -21,9 +21,6 @@ public class AiChatMessageRespVO {
     @Schema(description = "用户编号", example = "4096")
     private Long userId; // 仅当 user 发送时非空
 
-    @Schema(description = "用户头像", example = "http://xxx")
-    private Long avatarUrl; // 仅当 user 发送时非空
-
     @Schema(description = "角色编号", example = "888")
     private Long roleId; // 仅当 assistant 回复时非空
 
@@ -33,14 +30,8 @@ public class AiChatMessageRespVO {
     @Schema(description = "模型编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "123")
     private Long modelId;
 
-    @Schema(description = "模型图片", requiredMode = Schema.RequiredMode.REQUIRED, example = "123")
-    private String modelImage;
-
     @Schema(description = "聊天内容", requiredMode = Schema.RequiredMode.REQUIRED, example = "你好，你好啊")
     private String content;
-
-    @Schema(description = "消耗 Token 数量", requiredMode = Schema.RequiredMode.REQUIRED, example = "80")
-    private Integer tokens;
 
     @Schema(description = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED, example = "2024-05-12 12:51")
     private LocalDateTime createTime;

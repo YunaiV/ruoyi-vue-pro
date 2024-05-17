@@ -78,32 +78,7 @@ public class AiChatMessageDO extends BaseDO {
      * 聊天内容
      */
     private String content;
-    /**
-     * 消耗 Token 数量
-     */
-    private Integer tokens;
 
     // TODO 芋艿：是否作为上下文语料？use_context，待定
-
-    // ========== 会话配置 ==========
-
-    /**
-     * 温度参数
-     *
-     * 冗余 {@link AiChatConversationDO#getTemperature()}
-     */
-    private Double temperature;
-    /**
-     * 单条回复的最大 Token 数量
-     *
-     * 冗余 {@link AiChatConversationDO#getMaxTokens()}
-     */
-    private Integer maxTokens;
-    /**
-     * 上下文的最大 Message 数量
-     *
-     * 冗余 {@link AiChatConversationDO#getMaxContexts()}
-     */
-    private Integer maxContexts;
 
 }
