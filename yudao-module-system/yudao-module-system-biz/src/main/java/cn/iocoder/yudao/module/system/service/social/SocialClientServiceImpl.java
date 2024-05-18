@@ -9,6 +9,7 @@ import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.ReflectUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
+import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.cache.CacheUtils;
 import cn.iocoder.yudao.framework.common.util.http.HttpUtils;
@@ -229,12 +230,12 @@ public class SocialClientServiceImpl implements SocialClientService {
     }
 
     @Override
-    public byte[] getWxQrcode(SocialWxQrcodeReqDTO reqVO) {
-        WxMaService service = getWxMaService(reqVO.getUserType());
+    public byte[] getWxaQrcode(SocialWxQrcodeReqDTO reqVO) {
+        WxMaService service = getWxMaService(UserTypeEnum.MEMBER.getValue());
         try {
             return service.getQrcodeService().createWxaCodeUnlimitBytes(reqVO.getScene(), reqVO.getPath(),
-                    reqVO.getIsCheckPath(), reqVO.getEnvVersion(), reqVO.getWidth(), reqVO.getIsAutoColor(),
-                    null, reqVO.getIsHyaline());
+                    reqVO.getCheckPath(), reqVO.getEnvVersion(), reqVO.getWidth(), reqVO.getAutoColor(),
+                    null, reqVO.getHyaline());
         } catch (WxErrorException e) {
             log.error("[getWxQrcode][reqVO({})) 获得小程序码失败]", reqVO, e);
             throw exception(SOCIAL_CLIENT_WEIXIN_MINI_APP_QRCODE_ERROR);

@@ -87,12 +87,4 @@ public interface SocialUserService {
      */
     PageResult<SocialUserDO> getSocialUserPage(SocialUserPageReqVO pageReqVO);
 
-    /**
-     * 获得小程序二维码
-     *
-     * @param reqVO 请求信息
-     * @return 小程序二维码
-     */
-    byte[] getWxQrcode(SocialWxQrcodeReqDTO reqVO);
-
 }

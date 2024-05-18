@@ -8,6 +8,7 @@ import cn.iocoder.yudao.module.member.controller.app.social.vo.AppSocialUserBind
 import cn.iocoder.yudao.module.member.controller.app.social.vo.AppSocialUserRespVO;
 import cn.iocoder.yudao.module.member.controller.app.social.vo.AppSocialUserUnbindReqVO;
 import cn.iocoder.yudao.module.member.controller.app.social.vo.AppSocialWxQrcodeReqVO;
+import cn.iocoder.yudao.module.system.api.social.SocialClientApi;
 import cn.iocoder.yudao.module.system.api.social.SocialUserApi;
 import cn.iocoder.yudao.module.system.api.social.dto.SocialUserBindReqDTO;
 import cn.iocoder.yudao.module.system.api.social.dto.SocialUserRespDTO;
@@ -34,6 +35,8 @@ public class AppSocialUserController {
 
     @Resource
     private SocialUserApi socialUserApi;
+    @Resource
+    private SocialClientApi socialClientApi;
 
     @PostMapping("/bind")
     @Operation(summary = "社交绑定，使用 code 授权码")
@@ -63,14 +66,12 @@ public class AppSocialUserController {
         return success(BeanUtils.toBean(socialUser, AppSocialUserRespVO.class));
     }
 
-    // TODO @puhui999：是不是 url 叫 wxa-qrcode？然后相关的方法，都做下调整哈；因为是微信小程序的二维码
-    @PostMapping("/wxacode")
-    @Operation(summary = "获得微信小程序码")
-    @PreAuthenticated // TODO @puhui999：可能不需要登录
+    @PostMapping("/wxa-qrcode")
+    @Operation(summary = "获得微信小程序码(base64 image)")
     public CommonResult<String> getWxQrcode(@RequestBody @Valid AppSocialWxQrcodeReqVO reqVO) {
-        byte[] wxQrcode = socialUserApi.getWxQrcode(BeanUtils.toBean(reqVO, SocialWxQrcodeReqDTO.class).setUserId(getLoginUserId())
-                .setUserType(UserTypeEnum.MEMBER.getValue()).setSocialType(reqVO.getType()));
-        return success(Base64.getEncoder().encodeToString(wxQrcode));
+        byte[] wxQrcode = socialClientApi.getWxaQrcode(BeanUtils.toBean(reqVO, SocialWxQrcodeReqDTO.class)
+                .setEnvVersion(AppSocialWxQrcodeReqVO.ENV_VERSION));
+        return success("data:image/png;base64," + Base64.getEncoder().encodeToString(wxQrcode));
     }
 
 }

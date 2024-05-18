@@ -52,12 +52,4 @@ public interface SocialUserApi {
      */
     SocialUserRespDTO getSocialUserByCode(Integer userType, Integer socialType, String code, String state);
 
-    /**
-     * 获得小程序二维码
-     *
-     * @param reqVO 请求信息
-     * @return 小程序二维码
-     */
-    byte[] getWxQrcode(@Valid SocialWxQrcodeReqDTO reqVO);
-
 }
