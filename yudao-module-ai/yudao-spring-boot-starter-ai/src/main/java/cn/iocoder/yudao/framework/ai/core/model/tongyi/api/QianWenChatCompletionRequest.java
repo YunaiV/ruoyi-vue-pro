@@ -1,4 +1,4 @@
-package org.springframework.ai.models.tongyi.api;
+package cn.iocoder.yudao.framework.ai.core.model.tongyi.api;
 
 import com.alibaba.dashscope.aigc.generation.models.QwenParam;
 

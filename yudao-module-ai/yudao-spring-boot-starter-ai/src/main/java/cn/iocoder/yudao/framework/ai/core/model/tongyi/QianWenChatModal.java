@@ -1,4 +1,4 @@
-package org.springframework.ai.models.tongyi;
+package cn.iocoder.yudao.framework.ai.core.model.tongyi;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

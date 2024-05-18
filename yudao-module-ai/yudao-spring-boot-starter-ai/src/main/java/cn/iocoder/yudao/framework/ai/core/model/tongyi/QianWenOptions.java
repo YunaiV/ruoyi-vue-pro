@@ -1,4 +1,4 @@
-package org.springframework.ai.models.tongyi;
+package cn.iocoder.yudao.framework.ai.core.model.tongyi;
 
 import org.springframework.ai.chat.prompt.ChatOptions;
 import lombok.Data;

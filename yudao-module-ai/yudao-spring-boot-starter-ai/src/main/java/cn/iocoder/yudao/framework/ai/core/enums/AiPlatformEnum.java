@@ -5,10 +5,9 @@ import lombok.Getter;
 
 // TODO 芋艿：这块，看看要不要调整下；
 /**
- * ai 模型平台
+ * AI 模型平台
  *
- * author: fansili
- * time: 2024/3/11 10:12
+ * @author fansili
  */
 @Getter
 @AllArgsConstructor
@@ -18,7 +17,6 @@ public enum AiPlatformEnum {
     OLLAMA("Ollama", "Ollama"),
     YI_YAN("YiYan", "文心一言"), // 百度
     XING_HUO("XingHuo", "星火"), // 讯飞
-
     QIAN_WEN("qianwen", "千问"), // 阿里
 
     OPEN_AI_DALL("dall", "dall"),

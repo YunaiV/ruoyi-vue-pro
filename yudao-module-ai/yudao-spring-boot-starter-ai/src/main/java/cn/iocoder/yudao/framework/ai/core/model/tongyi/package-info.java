@@ -8,4 +8,4 @@
  * author: fansili
  * time: 2024/3/13 21:05
  */
-package org.springframework.ai.models.tongyi;
+package cn.iocoder.yudao.framework.ai.core.model.tongyi;

@@ -1,10 +1,10 @@
 package cn.iocoder.yudao.framework.ai.config;
 
 import cn.hutool.core.io.IoUtil;
-import org.springframework.ai.models.tongyi.QianWenChatClient;
-import org.springframework.ai.models.tongyi.QianWenChatModal;
-import org.springframework.ai.models.tongyi.QianWenOptions;
-import org.springframework.ai.models.tongyi.api.QianWenApi;
+import cn.iocoder.yudao.framework.ai.core.model.tongyi.QianWenChatClient;
+import cn.iocoder.yudao.framework.ai.core.model.tongyi.QianWenChatModal;
+import cn.iocoder.yudao.framework.ai.core.model.tongyi.QianWenOptions;
+import cn.iocoder.yudao.framework.ai.core.model.tongyi.api.QianWenApi;
 import cn.iocoder.yudao.framework.ai.core.model.xinghuo.XingHuoChatClient;
 import cn.iocoder.yudao.framework.ai.core.model.xinghuo.XingHuoOptions;
 import cn.iocoder.yudao.framework.ai.core.model.xinghuo.api.XingHuoApi;

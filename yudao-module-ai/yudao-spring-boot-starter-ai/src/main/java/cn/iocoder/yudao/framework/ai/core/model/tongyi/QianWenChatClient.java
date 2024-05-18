@@ -1,10 +1,10 @@
-package org.springframework.ai.models.tongyi;
+package cn.iocoder.yudao.framework.ai.core.model.tongyi;
 
 import cn.iocoder.yudao.framework.ai.core.exception.ChatException;
+import cn.iocoder.yudao.framework.ai.core.model.tongyi.api.QianWenApi;
 import org.springframework.ai.chat.*;
 import org.springframework.ai.chat.prompt.ChatOptions;
 import org.springframework.ai.chat.prompt.Prompt;
-import org.springframework.ai.models.tongyi.api.QianWenApi;
 import cn.iocoder.yudao.framework.ai.core.model.yiyan.exception.YiYanApiException;
 import com.alibaba.dashscope.aigc.generation.GenerationResult;
 import com.alibaba.dashscope.aigc.generation.models.QwenParam;
@@ -24,6 +24,7 @@ import java.time.Duration;
 import java.util.List;
 import java.util.stream.Collectors;
 
+// TODO @芋艿：暂时不需要重构；等 spring cloud alibaba 的 ai 发布最新的
 /**
  * 阿里 通义千问 client
  * <p>
@@ -38,7 +39,6 @@ public class QianWenChatClient implements ChatClient, StreamingChatClient {
     private QianWenApi qianWenApi;
 
     private QianWenOptions qianWenOptions;
-
 
     public QianWenChatClient() {
     }

@@ -3,7 +3,7 @@ package cn.iocoder.yudao.module.ai.config;
 import cn.iocoder.yudao.framework.ai.core.enums.AiPlatformEnum;
 import org.springframework.ai.chat.ChatClient;
 import org.springframework.ai.chat.StreamingChatClient;
-import org.springframework.ai.models.tongyi.QianWenChatClient;
+import cn.iocoder.yudao.framework.ai.core.model.tongyi.QianWenChatClient;
 import cn.iocoder.yudao.framework.ai.core.model.xinghuo.XingHuoChatClient;
 import cn.iocoder.yudao.framework.ai.core.model.yiyan.YiYanChatClient;
 import org.springframework.ai.ollama.OllamaChatClient;
