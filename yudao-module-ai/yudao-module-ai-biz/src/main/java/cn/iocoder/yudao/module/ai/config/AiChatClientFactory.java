@@ -7,6 +7,7 @@ import cn.iocoder.yudao.framework.ai.core.model.tongyi.QianWenChatClient;
 import cn.iocoder.yudao.framework.ai.core.model.xinghuo.XingHuoChatClient;
 import cn.iocoder.yudao.framework.ai.core.model.yiyan.YiYanChatClient;
 import org.springframework.ai.ollama.OllamaChatClient;
+import org.springframework.ai.openai.OpenAiChatClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
@@ -48,6 +49,8 @@ public class AiChatClientFactory {
             return applicationContext.getBean(XingHuoChatClient.class);
         }  else if (AiPlatformEnum.OLLAMA == platformEnum) {
             return applicationContext.getBean(OllamaChatClient.class);
+        } else if (AiPlatformEnum.OPENAI == platformEnum) {
+            return applicationContext.getBean(OpenAiChatClient.class);
         }
         throw new IllegalArgumentException("不支持的 chat client!");
     }

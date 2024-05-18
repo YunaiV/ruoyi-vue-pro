@@ -149,6 +149,13 @@ spring.ai:
     base-url: http://127.0.0.1:11434
     chat:
       model: llama3
+  openai:
+#    api-key: sk-QmgIIPc5xiYd8lPb076b1b7774Ea49Af9eD2Ef172c8f7e43
+#    base-url: https://openkey.cloud
+#    api-key: sk-gkgfYxhX9FxyZJznwxRZSJwKeGQYNPDVWjhby2PRRf17GHeT
+#    base-url: https://api.chatanywhere.tech
+    api-key: sk-yzKea6d8e8212c3bdd99f9f44ced1cae37c097e5aa3BTS7z
+    base-url: https://api.gptsapi.net
 
 yudao.ai:
   yiyan:

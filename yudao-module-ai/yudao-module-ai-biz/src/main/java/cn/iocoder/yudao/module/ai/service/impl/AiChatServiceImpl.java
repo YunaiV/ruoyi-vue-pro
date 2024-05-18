@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.ai.service.impl;
 
 import cn.hutool.core.util.ObjUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.ai.core.enums.AiPlatformEnum;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.ai.controller.admin.chat.vo.message.AiChatMessageSendRespVO;
@@ -123,7 +124,8 @@ public class AiChatServiceImpl implements AiChatService {
         // 3.3 流式返回
         StringBuffer contentBuffer = new StringBuffer();
         return streamResponse.map(response -> {
-            String newContent = response.getResult().getOutput().getContent();
+            String newContent = response.getResult() != null ? response.getResult().getOutput().getContent() : null;
+            newContent = StrUtil.nullToDefault(newContent, ""); // 避免 null 的 情况
             contentBuffer.append(newContent);
             // 响应结果
             return new AiChatMessageSendRespVO().setSend(BeanUtils.toBean(userMessage, AiChatMessageSendRespVO.Message.class))
@@ -152,7 +154,8 @@ public class AiChatServiceImpl implements AiChatService {
 
         // 2. 构建 ChatOptions 对象 TODO 芋艿：临时注释掉；等文心一言兼容了；
 //        ChatOptions chatOptions = ChatOptionsBuilder.builder().withTemperature(conversation.getTemperature().floatValue()).build();
-        return new Prompt(chatMessages, null);
+//        return new Prompt(chatMessages, null);
+        return new Prompt(chatMessages);
     }
 
     private AiChatMessageDO createChatMessage(Long conversationId, AiChatModelDO model,
