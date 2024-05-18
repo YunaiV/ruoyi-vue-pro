@@ -150,9 +150,9 @@ public class AiChatServiceImpl implements AiChatService {
         // 1.3 user message 新发送消息
         chatMessages.add(new UserMessage(sendReqVO.getContent()));
 
-        // 2. 构建 ChatOptions 对象
-        ChatOptions chatOptions = ChatOptionsBuilder.builder().withTemperature(conversation.getTemperature().floatValue()).build();
-        return new Prompt(chatMessages, chatOptions);
+        // 2. 构建 ChatOptions 对象 TODO 芋艿：临时注释掉；等文心一言兼容了；
+//        ChatOptions chatOptions = ChatOptionsBuilder.builder().withTemperature(conversation.getTemperature().floatValue()).build();
+        return new Prompt(chatMessages, null);
     }
 
     private AiChatMessageDO createChatMessage(Long conversationId, AiChatModelDO model,

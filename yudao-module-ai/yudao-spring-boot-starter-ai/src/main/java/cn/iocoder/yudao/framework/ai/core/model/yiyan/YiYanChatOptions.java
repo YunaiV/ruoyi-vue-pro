@@ -1,23 +1,22 @@
-package org.springframework.ai.models.yiyan;
+package cn.iocoder.yudao.framework.ai.core.model.yiyan;
 
-import org.springframework.ai.chat.prompt.ChatOptions;
-import org.springframework.ai.models.yiyan.api.YiYanChatCompletionRequest;
+import cn.iocoder.yudao.framework.ai.core.model.yiyan.api.YiYanChatCompletionRequest;
 import lombok.Data;
-import lombok.experimental.Accessors;
+import org.springframework.ai.chat.prompt.ChatOptions;
 
 import java.util.List;
 
+// TODO @fan：字段命名，penalty_score 类似的，建议改成驼峰原则
+// TODO @fan：字段的注释，可以都删除掉，让用户 https://cloud.baidu.com/doc/WENXINWORKSHOP/s/clntwmv7t 即可
 /**
- * 百度 问心一言
+ * 文心一言的 {@link ChatOptions} 实现类
  *
- * 文档地址：https://cloud.baidu.com/doc/WENXINWORKSHOP/s/clntwmv7t
+ * 字段说明：参考 <a href="https://cloud.baidu.com/doc/WENXINWORKSHOP/s/clntwmv7t">ERNIE-4.0-8K</a>
  *
- * author: fansili
- * time: 2024/3/16 19:33
+ * @author fansili
  */
 @Data
-@Accessors(chain = true)
-public class YiYanOptions implements ChatOptions {
+public class YiYanChatOptions implements ChatOptions {
 
     /**
      * 一个可触发函数的描述列表，说明：
@@ -106,37 +105,24 @@ public class YiYanOptions implements ChatOptions {
      */
     private String tool_choice;
 
-    //
-    // 以下兼容 spring-ai ChatOptions 暂时没有其他地方用到
-
     @Override
     public Float getTemperature() {
         return this.temperature;
     }
-
-//    @Override
-//    public void setTemperature(Float temperature) {
-//        this.temperature = temperature;
-//    }
 
     @Override
     public Float getTopP() {
         return topP;
     }
 
-//    @Override
-//    public void setTopP(Float topP) {
-//        this.topP = topP;
-//    }
-
-    // 百度么有 topK
-
+    /**
+     * 百度么有 topK
+     *
+     * @return null
+     */
     @Override
     public Integer getTopK() {
         return null;
     }
 
-//    @Override
-//    public void setTopK(Integer topK) {
-//    }
 }

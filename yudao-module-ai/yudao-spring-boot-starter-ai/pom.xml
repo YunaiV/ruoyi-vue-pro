@@ -10,23 +10,16 @@
     </parent>
 
     <artifactId>yudao-spring-boot-starter-ai</artifactId>
-    <!-- TODO 芋艿：这里需要进一步减少 -->
 
     <dependencies>
         <dependency>
             <groupId>io.springboot.ai</groupId>
-            <artifactId>spring-ai-core</artifactId>
-            <version>1.0.3</version>
-        </dependency>
-        <dependency>
-            <groupId>io.springboot.ai</groupId>
-            <artifactId>spring-ai-openai</artifactId>
-            <version>1.0.3</version>
-        </dependency>
-
-        <dependency>
-            <groupId>io.springboot.ai</groupId>
             <artifactId>spring-ai-ollama-spring-boot-starter</artifactId>
+            <version>1.0.3</version>
+        </dependency>
+        <dependency>
+            <groupId>io.springboot.ai</groupId>
+            <artifactId>spring-ai-openai-spring-boot-starter</artifactId>
             <version>1.0.3</version>
         </dependency>
 
@@ -35,7 +28,7 @@
             <artifactId>yudao-common</artifactId>
         </dependency>
 
-        <!--    阿里云 通义千问    -->
+        <!-- 阿里云 通义千问 -->
         <dependency>
             <groupId>com.alibaba</groupId>
             <artifactId>dashscope-sdk-java</artifactId>

@@ -5,7 +5,7 @@ import org.springframework.ai.chat.ChatClient;
 import org.springframework.ai.chat.StreamingChatClient;
 import org.springframework.ai.models.tongyi.QianWenChatClient;
 import org.springframework.ai.models.xinghuo.XingHuoChatClient;
-import org.springframework.ai.models.yiyan.YiYanChatClient;
+import cn.iocoder.yudao.framework.ai.core.model.yiyan.YiYanChatClient;
 import org.springframework.ai.ollama.OllamaChatClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
@@ -27,7 +27,7 @@ public class AiChatClientFactory {
     public ChatClient getChatClient(AiPlatformEnum platformEnum) {
         if (AiPlatformEnum.QIAN_WEN == platformEnum) {
             return applicationContext.getBean(QianWenChatClient.class);
-        } else if (AiPlatformEnum.YI_YAN == platformEnum) {
+        } else if (AiPlatformEnum.YIYAN == platformEnum) {
             return applicationContext.getBean(YiYanChatClient.class);
         } else if (AiPlatformEnum.XING_HUO == platformEnum) {
             return applicationContext.getBean(XingHuoChatClient.class);
@@ -42,7 +42,7 @@ public class AiChatClientFactory {
 //        }
         if (AiPlatformEnum.QIAN_WEN == platformEnum) {
             return applicationContext.getBean(QianWenChatClient.class);
-        } else if (AiPlatformEnum.YI_YAN == platformEnum) {
+        } else if (AiPlatformEnum.YIYAN == platformEnum) {
             return applicationContext.getBean(YiYanChatClient.class);
         } else if (AiPlatformEnum.XING_HUO == platformEnum) {
             return applicationContext.getBean(XingHuoChatClient.class);

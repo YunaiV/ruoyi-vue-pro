@@ -5,7 +5,7 @@ import org.springframework.ai.chat.*;
 import org.springframework.ai.chat.prompt.ChatOptions;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.models.tongyi.api.QianWenApi;
-import org.springframework.ai.models.yiyan.exception.YiYanApiException;
+import cn.iocoder.yudao.framework.ai.core.model.yiyan.exception.YiYanApiException;
 import com.alibaba.dashscope.aigc.generation.GenerationResult;
 import com.alibaba.dashscope.aigc.generation.models.QwenParam;
 import com.alibaba.dashscope.common.Message;

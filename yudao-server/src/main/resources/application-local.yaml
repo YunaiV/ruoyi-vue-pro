@@ -230,17 +230,6 @@ yudao:
       appKey: cb6415c19d6162cda07b47316fcb0416
       secretKey: Y2JiYTIxZjA3MDMxMjNjZjQzYzVmNzdh
       model: XING_HUO_3_5
-    yiyan:
-      enable: true
-      aiPlatform: YI_YAN
-      max-tokens: 1500
-      temperature: 0.85
-      topP: 0.8
-      topK: 0
-      appKey: x0cuLZ7XsaTCU08vuJWO87Lg
-      secretKey: R9mYF9dl9KASgi5RUq0FQt3wRisSnOcK
-      refreshTokenSecondTime: 86400
-      model: ERNIE4_3_5_8K
     openAiImage:
       enable: true
       api-key: ${OPEN_AI_KEY}

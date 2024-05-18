@@ -8,9 +8,9 @@ import org.springframework.ai.models.tongyi.api.QianWenApi;
 import org.springframework.ai.models.xinghuo.XingHuoChatClient;
 import org.springframework.ai.models.xinghuo.XingHuoOptions;
 import org.springframework.ai.models.xinghuo.api.XingHuoApi;
-import org.springframework.ai.models.yiyan.YiYanChatClient;
-import org.springframework.ai.models.yiyan.YiYanOptions;
-import org.springframework.ai.models.yiyan.api.YiYanApi;
+import cn.iocoder.yudao.framework.ai.core.model.yiyan.YiYanChatClient;
+import cn.iocoder.yudao.framework.ai.core.model.yiyan.YiYanChatOptions;
+import cn.iocoder.yudao.framework.ai.core.model.yiyan.api.YiYanApi;
 import org.springframework.ai.models.midjourney.MidjourneyConfig;
 import org.springframework.ai.models.midjourney.MidjourneyMessage;
 import org.springframework.ai.models.midjourney.api.MidjourneyInteractionsApi;
@@ -91,7 +91,7 @@ public class YudaoAiAutoConfiguration {
     public YiYanChatClient yiYanChatClient(YudaoAiProperties yudaoAiProperties) {
         YudaoAiProperties.YiYanProperties yiYanProperties = yudaoAiProperties.getYiyan();
         // 转换配置
-        YiYanOptions yiYanOptions = new YiYanOptions();
+        YiYanChatOptions yiYanOptions = new YiYanChatOptions();
 //        yiYanOptions.setTopK(yiYanProperties.getTopK()); TODO 芋艿：后续弄
         yiYanOptions.setTopP(yiYanProperties.getTopP());
         yiYanOptions.setTemperature(yiYanProperties.getTemperature());

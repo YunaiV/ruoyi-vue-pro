@@ -1,4 +1,4 @@
-package org.springframework.ai.models.yiyan.exception;
+package cn.iocoder.yudao.framework.ai.core.model.yiyan.exception;
 
 /**
  * 一言 api 调用异常

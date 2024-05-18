@@ -1,20 +1,14 @@
 package cn.iocoder.yudao.module.ai.controller.admin.chat.vo.conversation;
 
-import cn.iocoder.yudao.module.ai.controller.admin.model.vo.chatModel.AiChatModelRespVO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiChatModelDO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiChatRoleDO;
-import com.baomidou.mybatisplus.annotation.FieldFill;
-import com.baomidou.mybatisplus.annotation.TableField;
 import com.fhs.core.trans.anno.Trans;
 import com.fhs.core.trans.constant.TransType;
 import com.fhs.core.trans.vo.VO;
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.NotNull;
 import lombok.Data;
-import lombok.experimental.Accessors;
 
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 
 @Schema(description = "管理后台 - AI 聊天会话 Response VO")
 @Data
@@ -58,7 +52,7 @@ public class AiChatConversationRespVO implements VO {
     @Schema(description = "上下文的最大 Message 数量", requiredMode = Schema.RequiredMode.REQUIRED, example = "10")
     private Integer maxContexts;
 
-    @Schema(description = "最后更新时间", requiredMode = Schema.RequiredMode.REQUIRED, example = "2024-05-16")
+    @Schema(description = "最后更新时间", requiredMode = Schema.RequiredMode.REQUIRED)
     private LocalDateTime updateTime;
 
     // ========== 关联 role 信息 ==========

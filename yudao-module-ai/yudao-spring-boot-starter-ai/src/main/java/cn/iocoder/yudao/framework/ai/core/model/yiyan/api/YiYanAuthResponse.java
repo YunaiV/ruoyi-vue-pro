@@ -1,15 +1,15 @@
-package org.springframework.ai.models.yiyan.api;
+package cn.iocoder.yudao.framework.ai.core.model.yiyan.api;
 
 import lombok.Data;
 
+// TODO @fan：字段驼峰；字段注释都可以删除，贴个链接就好；
 /**
- * 一言 获取access_token
+ * 获取文心一言的 access_token 的 Response
  *
- * author: fansili
- * time: 2024/3/10 08:51
+ * @author fansili
  */
 @Data
-public class YiYanAuthRes {
+public class YiYanAuthResponse {
 
     /**
      * 	访问凭证

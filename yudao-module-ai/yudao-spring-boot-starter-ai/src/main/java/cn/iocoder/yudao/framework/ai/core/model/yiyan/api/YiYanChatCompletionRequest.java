@@ -1,16 +1,16 @@
-package org.springframework.ai.models.yiyan.api;
+package cn.iocoder.yudao.framework.ai.core.model.yiyan.api;
 
 import lombok.Data;
 
 import java.util.List;
 
+// TODO @fan：字段驼峰；字段注释都可以删除，贴个链接就好；
 /**
- * 一言 Completion req
+ * 文心一言 Completion Request
  *
- *  百度千帆文档：https://cloud.baidu.com/doc/WENXINWORKSHOP/s/jlil56u11
+ * 百度千帆文档：https://cloud.baidu.com/doc/WENXINWORKSHOP/s/jlil56u11
  *
- * author: fansili
- * time: 2024/3/9 10:34
+ * @author fansili
  */
 @Data
 public class YiYanChatCompletionRequest {
@@ -114,9 +114,11 @@ public class YiYanChatCompletionRequest {
 
     @Data
     public static class Message {
+
         private String role;
 
         private String content;
+
     }
 
     @Data

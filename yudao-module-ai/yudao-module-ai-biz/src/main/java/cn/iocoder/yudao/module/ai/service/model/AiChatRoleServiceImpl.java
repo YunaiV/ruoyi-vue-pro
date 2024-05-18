@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.ai.service.model;
 
 import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
@@ -15,6 +16,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
@@ -134,7 +137,7 @@ public class AiChatRoleServiceImpl implements AiChatRoleService {
     @Override
     public List<String> getChatRoleCategoryList() {
         List<AiChatRoleDO> list = chatRoleMapper.selectListGroupByCategory(CommonStatusEnum.ENABLE.getStatus());
-        return convertList(list.stream().filter(Objects::nonNull).collect(Collectors.toList()), AiChatRoleDO::getCategory);
+        return convertList(list, AiChatRoleDO::getCategory, role -> StrUtil.isNotBlank(role.getCategory()));
     }
 
 }

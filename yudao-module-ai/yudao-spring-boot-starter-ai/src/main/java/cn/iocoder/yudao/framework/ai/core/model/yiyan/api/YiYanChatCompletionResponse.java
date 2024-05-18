@@ -1,16 +1,16 @@
-package org.springframework.ai.models.yiyan.api;
+package cn.iocoder.yudao.framework.ai.core.model.yiyan.api;
 
 import lombok.Data;
 
 /**
- * 聊天返回
+ * 文心一言 Completion Response
+ *
  * 百度链接: https://cloud.baidu.com/doc/WENXINWORKSHOP/s/clntwmv7t
  *
- * author: fansili
- * time: 2024/3/9 10:34
+ * @author fansili
  */
 @Data
-public class YiYanChatCompletion {
+public class YiYanChatCompletionResponse {
 
     /**
      * 本轮对话的id
@@ -88,4 +88,5 @@ public class YiYanChatCompletion {
          */
         private int total_tokens;
     }
+
 }

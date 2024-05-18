@@ -4,7 +4,7 @@ import cn.iocoder.yudao.framework.ai.core.enums.AiPlatformEnum;
 import lombok.Data;
 import lombok.experimental.Accessors;
 import org.springframework.ai.models.xinghuo.XingHuoChatModel;
-import org.springframework.ai.models.yiyan.YiYanChatModel;
+import cn.iocoder.yudao.framework.ai.core.model.yiyan.api.YiYanChatModel;
 
 /**
  * modal config

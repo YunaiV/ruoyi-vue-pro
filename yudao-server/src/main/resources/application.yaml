@@ -150,6 +150,19 @@ spring.ai:
     chat:
       model: llama3
 
+yudao.ai:
+  yiyan:
+    enable: true
+    aiPlatform: YIYAN # TODO @fan：建议每个都独立配置属性类
+    max-tokens: 1500
+    temperature: 0.85
+    topP: 0.8
+    topK: 0
+    appKey: x0cuLZ7XsaTCU08vuJWO87Lg
+    secretKey: R9mYF9dl9KASgi5RUq0FQt3wRisSnOcK
+    refreshTokenSecondTime: 86400
+    model: ERNIE4_3_5_8K
+
 --- #################### 芋道相关配置 ####################
 
 yudao:

@@ -5,10 +5,10 @@ import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.chat.messages.SystemMessage;
 import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.prompt.Prompt;
-import org.springframework.ai.models.yiyan.YiYanChatClient;
-import org.springframework.ai.models.yiyan.YiYanChatModel;
-import org.springframework.ai.models.yiyan.YiYanOptions;
-import org.springframework.ai.models.yiyan.api.YiYanApi;
+import cn.iocoder.yudao.framework.ai.core.model.yiyan.YiYanChatClient;
+import cn.iocoder.yudao.framework.ai.core.model.yiyan.api.YiYanChatModel;
+import cn.iocoder.yudao.framework.ai.core.model.yiyan.YiYanChatOptions;
+import cn.iocoder.yudao.framework.ai.core.model.yiyan.api.YiYanApi;
 import org.junit.Before;
 import org.junit.Test;
 import reactor.core.publisher.Flux;
@@ -35,7 +35,7 @@ public class YiYanChatTests {
                 YiYanChatModel.ERNIE4_3_5_8K,
                 86400
         );
-        YiYanOptions yiYanOptions = new YiYanOptions();
+        YiYanChatOptions yiYanOptions = new YiYanChatOptions();
         yiYanOptions.setMaxOutputTokens(2048);
         yiYanOptions.setTopP(0.6f);
         yiYanOptions.setTemperature(0.85f);

@@ -16,8 +16,8 @@ public enum AiPlatformEnum {
 
     OPENAI("OpenAI", "OpenAI"),
     OLLAMA("Ollama", "Ollama"),
+    YIYAN("YiYan", "文心一言"),
 
-    YI_YAN("yiyan", "一言"),
     QIAN_WEN("qianwen", "千问"),
     XING_HUO("xinghuo", "星火"),
     OPEN_AI_DALL("dall", "dall"),
