@@ -71,6 +71,7 @@ public class AppSocialUserController {
     public CommonResult<String> getWxQrcode(@RequestBody @Valid AppSocialWxQrcodeReqVO reqVO) {
         byte[] wxQrcode = socialClientApi.getWxaQrcode(BeanUtils.toBean(reqVO, SocialWxQrcodeReqDTO.class)
                 .setEnvVersion(AppSocialWxQrcodeReqVO.ENV_VERSION));
+        // TODO @puhui999：1）是不是 base64 返回，不拼接哈 data:image/png;base64；2）cn.hutool.core.codec.Base64.encode()
         return success("data:image/png;base64," + Base64.getEncoder().encodeToString(wxQrcode));
     }
 

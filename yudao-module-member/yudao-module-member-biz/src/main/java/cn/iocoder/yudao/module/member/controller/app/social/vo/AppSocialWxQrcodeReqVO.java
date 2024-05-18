@@ -10,6 +10,7 @@ import lombok.Data;
 public class AppSocialWxQrcodeReqVO {
 
     // TODO @puhui999: 没有默认值 getQrcodeService().createWxaCodeUnlimitBytes() 转类型会报错 🤣
+    // TODO @puhui999：懂了哈；default 最好在 controller 搞；对于 VO 来说，不给默认值；
     public static String ENV_VERSION = "release"; // 小程序版本。正式版为 "release"，体验版为 "trial"，开发版为 "develop"
     private static String SCENE = ""; // 页面路径不能携带参数（参数请放在scene字段里）
     private static Integer WIDTH = 430; // 二维码宽度
