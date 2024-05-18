@@ -209,37 +209,6 @@ wx:
 
 # 芋道配置项，设置当前项目所有自定义的配置
 yudao:
-  ai:
-    initSource: yaml
-    qianwen:
-      enable: true
-      aiPlatform: QIAN_WEN
-      max-tokens: 1500
-      temperature: 0.85
-      topP: 0.8
-      topK: 0
-      api-key: sk-Zsd81gZYg7
-    xinghuo:
-      enable: true
-      aiPlatform: XING_HUO
-      max-tokens: 1500
-      temperature: 0.85
-      topP: 0.8
-      topK: 0
-      appId: 13c8cca6
-      appKey: cb6415c19d6162cda07b47316fcb0416
-      secretKey: Y2JiYTIxZjA3MDMxMjNjZjQzYzVmNzdh
-      model: XING_HUO_3_5
-    openAiImage:
-      enable: true
-      api-key: ${OPEN_AI_KEY}
-      model: dall_e_2
-      style: vivid
-    midjourney:
-      enable: true
-      token: MTE4MjE3MjY2MjkxNTY3ODIzOA.GEV1SG.c49F8lZoGCUHwsj8O0UdodmM6nyQHvuD2fXflw
-      guild-id: 1237948819677904956
-      channel-id: 1237948819677904960
   captcha:
     enable: false # 本地环境，暂时关闭图片验证码，方便登录等接口的测试；
   security:

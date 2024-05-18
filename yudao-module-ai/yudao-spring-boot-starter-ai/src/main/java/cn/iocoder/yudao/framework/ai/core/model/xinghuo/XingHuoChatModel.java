@@ -1,4 +1,4 @@
-package org.springframework.ai.models.xinghuo;
+package cn.iocoder.yudao.framework.ai.core.model.xinghuo;
 
 import lombok.Getter;
 

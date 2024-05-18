@@ -3,7 +3,7 @@ package cn.iocoder.yudao.module.ai.dal.vo;
 import cn.iocoder.yudao.framework.ai.core.enums.AiPlatformEnum;
 import lombok.Data;
 import lombok.experimental.Accessors;
-import org.springframework.ai.models.xinghuo.XingHuoChatModel;
+import cn.iocoder.yudao.framework.ai.core.model.xinghuo.XingHuoChatModel;
 import cn.iocoder.yudao.framework.ai.core.model.yiyan.api.YiYanChatModel;
 
 /**

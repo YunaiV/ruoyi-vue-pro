@@ -16,16 +16,23 @@ public enum AiPlatformEnum {
 
     OPENAI("OpenAI", "OpenAI"),
     OLLAMA("Ollama", "Ollama"),
-    YIYAN("YiYan", "文心一言"),
+    YI_YAN("YiYan", "文心一言"), // 百度
+    XING_HUO("XingHuo", "星火"), // 讯飞
 
-    QIAN_WEN("qianwen", "千问"),
-    XING_HUO("xinghuo", "星火"),
+    QIAN_WEN("qianwen", "千问"), // 阿里
+
     OPEN_AI_DALL("dall", "dall"),
     MIDJOURNEY("midjourney", "midjourney"),
 
     ;
 
+    /**
+     * 平台
+     */
     private final String platform;
+    /**
+     * 平台名
+     */
     private final String name;
 
 //    public static List<AiPlatformEnum> CHAT_PLATFORM_LIST = Lists.newArrayList(

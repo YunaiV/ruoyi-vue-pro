@@ -1,8 +1,8 @@
 package cn.iocoder.yudao.framework.ai.config;
 
 import cn.iocoder.yudao.framework.ai.core.enums.AiPlatformEnum;
-import org.springframework.ai.models.xinghuo.XingHuoChatModel;
-import org.springframework.ai.models.xinghuo.XingHuoOptions;
+import cn.iocoder.yudao.framework.ai.core.model.xinghuo.XingHuoChatModel;
+import cn.iocoder.yudao.framework.ai.core.model.xinghuo.XingHuoOptions;
 import cn.iocoder.yudao.framework.ai.core.model.yiyan.api.YiYanChatModel;
 import lombok.Data;
 import lombok.experimental.Accessors;

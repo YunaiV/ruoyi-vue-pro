@@ -153,7 +153,7 @@ spring.ai:
 yudao.ai:
   yiyan:
     enable: true
-    aiPlatform: YIYAN # TODO @fan：建议每个都独立配置属性类
+    aiPlatform: YI_YAN # TODO @fan：建议每个都独立配置属性类
     max-tokens: 1500
     temperature: 0.85
     topP: 0.8
@@ -162,6 +162,35 @@ yudao.ai:
     secretKey: R9mYF9dl9KASgi5RUq0FQt3wRisSnOcK
     refreshTokenSecondTime: 86400
     model: ERNIE4_3_5_8K
+  xinghuo:
+    enable: true
+    aiPlatform: XING_HUO # TODO @fan：建议每个都独立配置属性类
+    max-tokens: 1500
+    temperature: 0.85
+    topP: 0.8
+    topK: 0
+    appId: 13c8cca6
+    appKey: cb6415c19d6162cda07b47316fcb0416
+    secretKey: Y2JiYTIxZjA3MDMxMjNjZjQzYzVmNzdh
+    model: XING_HUO_3_5
+  qianwen:
+    enable: true
+    aiPlatform: QIAN_WEN
+    max-tokens: 1500
+    temperature: 0.85
+    topP: 0.8
+    topK: 0
+    api-key: sk-Zsd81gZYg7
+  openAiImage:
+    enable: true
+    api-key: ${OPEN_AI_KEY}
+    model: dall_e_2
+    style: vivid
+  midjourney:
+    enable: true
+    token: MTE4MjE3MjY2MjkxNTY3ODIzOA.GEV1SG.c49F8lZoGCUHwsj8O0UdodmM6nyQHvuD2fXflw
+    guild-id: 1237948819677904956
+    channel-id: 1237948819677904960
 
 --- #################### 芋道相关配置 ####################
 

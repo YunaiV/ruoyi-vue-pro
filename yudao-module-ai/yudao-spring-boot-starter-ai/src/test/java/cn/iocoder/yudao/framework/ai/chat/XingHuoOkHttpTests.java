@@ -2,9 +2,9 @@ package cn.iocoder.yudao.framework.ai.chat;
 
 import cn.hutool.http.HttpUtil;
 import cn.hutool.json.JSONUtil;
-import org.springframework.ai.models.xinghuo.XingHuoChatClient;
-import org.springframework.ai.models.xinghuo.api.XingHuoChatCompletion;
-import org.springframework.ai.models.xinghuo.api.XingHuoChatCompletionRequest;
+import cn.iocoder.yudao.framework.ai.core.model.xinghuo.XingHuoChatClient;
+import cn.iocoder.yudao.framework.ai.core.model.xinghuo.api.XingHuoChatCompletion;
+import cn.iocoder.yudao.framework.ai.core.model.xinghuo.api.XingHuoChatCompletionRequest;
 import okhttp3.*;
 import org.jetbrains.annotations.NotNull;
 

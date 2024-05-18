@@ -1,14 +1,14 @@
-package org.springframework.ai.models.xinghuo;
+package cn.iocoder.yudao.framework.ai.core.model.xinghuo;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.exceptions.ExceptionUtil;
 import cn.iocoder.yudao.framework.ai.core.exception.ChatException;
+import cn.iocoder.yudao.framework.ai.core.model.xinghuo.api.XingHuoApi;
+import cn.iocoder.yudao.framework.ai.core.model.xinghuo.api.XingHuoChatCompletion;
+import cn.iocoder.yudao.framework.ai.core.model.xinghuo.api.XingHuoChatCompletionRequest;
 import org.springframework.ai.chat.*;
 import org.springframework.ai.chat.prompt.ChatOptions;
 import org.springframework.ai.chat.prompt.Prompt;
-import org.springframework.ai.models.xinghuo.api.XingHuoApi;
-import org.springframework.ai.models.xinghuo.api.XingHuoChatCompletion;
-import org.springframework.ai.models.xinghuo.api.XingHuoChatCompletionRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.retry.RetryCallback;
@@ -21,6 +21,7 @@ import java.time.Duration;
 import java.util.List;
 import java.util.stream.Collectors;
 
+// TODO @fan：参考 yiyan 的修改建议，调整下 xinghuo 的实现；可以等 yiyan 修改完建议，然后我 review 完，再改这个哈；
 /**
  * 讯飞星火 client
  * <p>

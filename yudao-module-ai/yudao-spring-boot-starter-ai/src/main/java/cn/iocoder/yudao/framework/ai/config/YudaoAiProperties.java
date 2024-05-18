@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.framework.ai.config;
 
 import cn.iocoder.yudao.framework.ai.core.enums.AiPlatformEnum;
-import org.springframework.ai.models.xinghuo.XingHuoChatModel;
+import cn.iocoder.yudao.framework.ai.core.model.xinghuo.XingHuoChatModel;
 import cn.iocoder.yudao.framework.ai.core.model.yiyan.api.YiYanChatModel;
 import cn.iocoder.yudao.framework.ai.core.enums.OpenAiImageModelEnum;
 import cn.iocoder.yudao.framework.ai.core.enums.OpenAiImageStyleEnum;
@@ -21,7 +21,6 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @ConfigurationProperties(prefix = "yudao.ai")
 public class YudaoAiProperties {
 
-    private String initSource;
     private QianWenProperties qianwen;
     private XingHuoProperties xinghuo;
     private YiYanProperties yiyan;

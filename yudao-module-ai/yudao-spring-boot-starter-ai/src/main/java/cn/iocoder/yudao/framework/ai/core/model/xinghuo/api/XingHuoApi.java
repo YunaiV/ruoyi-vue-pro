@@ -1,8 +1,8 @@
-package org.springframework.ai.models.xinghuo.api;
+package cn.iocoder.yudao.framework.ai.core.model.xinghuo.api;
 
 import cn.hutool.http.HttpUtil;
 import cn.hutool.json.JSONUtil;
-import org.springframework.ai.models.xinghuo.XingHuoChatModel;
+import cn.iocoder.yudao.framework.ai.core.model.xinghuo.XingHuoChatModel;
 import lombok.Data;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
@@ -21,6 +21,7 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
+// TODO @fan：讯飞使用 spring websocket 接入，还是 okhttp？确认了，未使用的最好删除下，反正 git 也能找回 history
 /**
  * 讯飞星火 属性、api
  * <p>

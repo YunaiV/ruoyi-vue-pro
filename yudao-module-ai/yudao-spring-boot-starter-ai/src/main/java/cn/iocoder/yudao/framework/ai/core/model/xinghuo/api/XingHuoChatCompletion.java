@@ -1,4 +1,4 @@
-package org.springframework.ai.models.xinghuo.api;
+package cn.iocoder.yudao.framework.ai.core.model.xinghuo.api;
 
 import lombok.Data;
 import lombok.experimental.Accessors;
