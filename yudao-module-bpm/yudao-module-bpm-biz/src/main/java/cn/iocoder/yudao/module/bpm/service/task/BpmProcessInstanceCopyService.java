@@ -17,9 +17,11 @@ public interface BpmProcessInstanceCopyService {
      * 流程实例的抄送
      *
      * @param userIds 抄送的用户编号
-     * @param taskId 流程任务编号
+     * @param processInstanceId 流程编号
+     * @param taskId 任务编号
+     * @param taskName 任务名称
      */
-    void createProcessInstanceCopy(Collection<Long> userIds, String taskId);
+    void createProcessInstanceCopy(Collection<Long> userIds, String processInstanceId, String taskId, String taskName);
 
     /**
      * 获得抄送的流程的分页

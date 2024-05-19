@@ -1,5 +1,12 @@
 package cn.iocoder.yudao.module.bpm.framework.flowable.core.enums;
 
+import com.google.common.collect.ImmutableSet;
+import org.flowable.bpmn.model.EndEvent;
+import org.flowable.bpmn.model.FlowNode;
+import org.flowable.bpmn.model.UserTask;
+
+import java.util.Set;
+
 /**
  * BPMN XML 常量信息
  *
