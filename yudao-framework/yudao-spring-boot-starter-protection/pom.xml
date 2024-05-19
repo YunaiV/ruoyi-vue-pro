@@ -12,7 +12,7 @@
     <packaging>jar</packaging>
 
     <name>${project.artifactId}</name>
-    <description>服务保证，提供分布式锁、幂等、限流、熔断、API签名等等功能</description>
+    <description>服务保证，提供分布式锁、幂等、限流、熔断、API 签名等等功能</description>
     <url>https://github.com/YunaiV/ruoyi-vue-pro</url>
 
     <dependencies>
