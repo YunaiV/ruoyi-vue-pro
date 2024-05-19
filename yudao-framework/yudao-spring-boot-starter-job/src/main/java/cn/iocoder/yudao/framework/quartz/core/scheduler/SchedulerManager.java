@@ -48,7 +48,7 @@ public class SchedulerManager {
                 .withIdentity(jobHandlerName).build();
         // 创建 Trigger 对象
         Trigger trigger = this.buildTrigger(jobHandlerName, jobHandlerParam, cronExpression, retryCount, retryInterval);
-        // 新增调度
+        // 新增 Job 调度
         scheduler.scheduleJob(jobDetail, trigger);
     }
 
@@ -80,6 +80,10 @@ public class SchedulerManager {
      */
     public void deleteJob(String jobHandlerName) throws SchedulerException {
         validateScheduler();
+        // 暂停 Trigger 对象
+        scheduler.pauseTrigger(new TriggerKey(jobHandlerName));
+        // 取消并删除 Job 调度
+        scheduler.unscheduleJob(new TriggerKey(jobHandlerName));
         scheduler.deleteJob(new JobKey(jobHandlerName));
     }
 

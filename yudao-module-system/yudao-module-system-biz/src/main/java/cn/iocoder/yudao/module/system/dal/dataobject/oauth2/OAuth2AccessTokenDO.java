@@ -12,6 +12,7 @@ import lombok.EqualsAndHashCode;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 /**
  * OAuth2 访问令牌 DO
@@ -50,6 +51,11 @@ public class OAuth2AccessTokenDO extends TenantBaseDO {
      * 枚举 {@link UserTypeEnum}
      */
     private Integer userType;
+    /**
+     * 用户信息
+     */
+    @TableField(typeHandler = JacksonTypeHandler.class)
+    private Map<String, String> userInfo;
     /**
      * 客户端编号
      *

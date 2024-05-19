@@ -1,8 +1,9 @@
 package cn.iocoder.yudao.module.system.framework.operatelog.core;
 
+import cn.hutool.core.convert.Convert;
 import cn.hutool.core.util.StrUtil;
-import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
-import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
+import cn.iocoder.yudao.module.system.dal.dataobject.user.AdminUserDO;
+import cn.iocoder.yudao.module.system.service.user.AdminUserService;
 import com.mzt.logapi.service.IParseFunction;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
@@ -20,7 +21,7 @@ public class AdminUserParseFunction implements IParseFunction {
     public static final String NAME = "getAdminUserById";
 
     @Resource
-    private AdminUserApi adminUserApi;
+    private AdminUserService adminUserService;
 
     @Override
     public String functionName() {
@@ -34,7 +35,7 @@ public class AdminUserParseFunction implements IParseFunction {
         }
 
         // 获取用户信息
-        AdminUserRespDTO user = adminUserApi.getUser(Long.parseLong(value.toString()));
+        AdminUserDO user = adminUserService.getUser(Convert.toLong(value));
         if (user == null) {
             log.warn("[apply][获取用户{{}}为空", value);
             return "";

@@ -14,7 +14,7 @@
     <url>https://github.com/YunaiV/ruoyi-vue-pro</url>
 
     <properties>
-        <revision>2.0.1-snapshot</revision>
+        <revision>2.1.0-snapshot</revision>
         <flatten-maven-plugin.version>1.5.0</flatten-maven-plugin.version>
         <!-- 统一依赖管理 -->
         <spring.boot.version>3.2.2</spring.boot.version>
@@ -27,13 +27,13 @@
         <mybatis-plus-generator.version>3.5.5</mybatis-plus-generator.version>
         <dynamic-datasource.version>4.3.0</dynamic-datasource.version>
         <mybatis-plus-join.version>1.4.10</mybatis-plus-join.version>
+        <easy-trans.version>2.2.11</easy-trans.version>
         <redisson.version>3.26.0</redisson.version>
         <dm8.jdbc.version>8.1.3.62</dm8.jdbc.version>
         <!-- 消息队列 -->
-        <rocketmq-spring.version>2.2.3</rocketmq-spring.version>
+        <rocketmq-spring.version>2.3.0</rocketmq-spring.version>
         <!-- 服务保障相关 -->
         <lock4j.version>2.2.7</lock4j.version>
-        <resilience4j.version>2.1.0</resilience4j.version>
         <!-- 监控相关 -->
         <skywalking.version>9.0.0</skywalking.version>
         <spring-boot-admin.version>3.2.1</spring-boot-admin.version>
@@ -75,7 +75,6 @@
         <jimureport.version>1.6.6-beta2</jimureport.version>
         <xercesImpl.version>2.12.2</xercesImpl.version>
         <weixin-java.version>4.6.0</weixin-java.version>
-        <ureport2.version>2.2.9</ureport2.version>
     </properties>
 
     <dependencyManagement>
@@ -90,11 +89,6 @@
             </dependency>
 
             <!-- 业务组件 -->
-            <dependency>
-                <groupId>cn.iocoder.boot</groupId>
-                <artifactId>yudao-spring-boot-starter-biz-operatelog</artifactId>
-                <version>${revision}</version>
-            </dependency>
             <dependency>
                 <groupId>io.github.mouzt</groupId>
                 <artifactId>bizlog-sdk</artifactId>
@@ -199,6 +193,32 @@
             </dependency>
 
             <dependency>
+                <groupId>com.fhs-opensource</groupId> <!-- VO 数据翻译 -->
+                <artifactId>easy-trans-spring-boot-starter</artifactId>
+                <version>${easy-trans.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.springframework</groupId>
+                        <artifactId>spring-context</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.springframework.cloud</groupId>
+                        <artifactId>spring-cloud-commons</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>com.fhs-opensource</groupId>
+                <artifactId>easy-trans-mybatis-plus-extend</artifactId>
+                <version>${easy-trans.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.fhs-opensource</groupId>
+                <artifactId>easy-trans-anno</artifactId>
+                <version>${easy-trans.version}</version>
+            </dependency>
+
+            <dependency>
                 <groupId>cn.iocoder.boot</groupId>
                 <artifactId>yudao-spring-boot-starter-redis</artifactId>
                 <version>${revision}</version>
@@ -259,17 +279,6 @@
                         <groupId>org.redisson</groupId>
                     </exclusion>
                 </exclusions>
-            </dependency>
-
-            <dependency>
-                <groupId>io.github.resilience4j</groupId>
-                <artifactId>resilience4j-ratelimiter</artifactId>
-                <version>${resilience4j.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>io.github.resilience4j</groupId>
-                <artifactId>resilience4j-spring-boot2</artifactId>
-                <version>${resilience4j.version}</version>
             </dependency>
 
             <!-- 监控相关 -->
@@ -434,7 +443,7 @@
             </dependency>
             <dependency>
                 <groupId>org.dromara.hutool</groupId>
-                <artifactId>hutool-all</artifactId>
+                <artifactId>hutool-extra</artifactId>
                 <version>${hutool-6.version}</version>
             </dependency>
 
@@ -464,22 +473,6 @@
                 <groupId>com.alibaba</groupId>
                 <artifactId>fastjson</artifactId>
                 <version>${fastjson.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>cn.smallbun.screw</groupId>
-                <artifactId>screw-core</artifactId> <!-- 实现数据库文档 -->
-                <version>${screw.version}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>org.freemarker</groupId>
-                        <artifactId>freemarker</artifactId> <!-- 移除 Freemarker 依赖，采用 Velocity 作为模板引擎 -->
-                    </exclusion>
-                    <exclusion>
-                        <groupId>com.alibaba</groupId>
-                        <artifactId>fastjson</artifactId> <!-- 最新版screw-core1.0.5依赖fastjson1.2.73存在漏洞，移除。 -->
-                    </exclusion>
-                </exclusions>
             </dependency>
 
             <dependency>
@@ -619,13 +612,6 @@
                 <groupId>xerces</groupId>
                 <artifactId>xercesImpl</artifactId>
                 <version>${xercesImpl.version}</version>
-            </dependency>
-
-            <!-- UReport2 报表-->
-            <dependency>
-                <groupId>com.bstek.ureport</groupId>
-                <artifactId>ureport2-console</artifactId>
-                <version>${ureport2.version}</version>
             </dependency>
 
         </dependencies>

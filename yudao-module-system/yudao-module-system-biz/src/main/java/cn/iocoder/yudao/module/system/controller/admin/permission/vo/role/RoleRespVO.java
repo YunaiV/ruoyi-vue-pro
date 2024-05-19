@@ -30,7 +30,7 @@ public class RoleRespVO {
     @ExcelProperty("角色标志")
     private String code;
 
-    @Schema(description = "显示顺序不能为空", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
+    @Schema(description = "显示顺序", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     @ExcelProperty("角色排序")
     private Integer sort;
 

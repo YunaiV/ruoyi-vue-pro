@@ -5,6 +5,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
+import java.util.List;
+
 @Schema(description = "管理后台 - CRM 客户转移 Request VO")
 @Data
 public class CrmCustomerTransferReqVO {
@@ -27,5 +29,11 @@ public class CrmCustomerTransferReqVO {
      */
     @Schema(description = "老负责人加入团队后的权限级别", requiredMode = Schema.RequiredMode.REQUIRED, example = "2")
     private Integer oldOwnerPermissionLevel;
+
+    /**
+     * 转移客户时，需要额外有【联系人】【商机】【合同】的 checkbox 选择。选中时，也一起转移
+     */
+    @Schema(description = "同时转移", requiredMode = Schema.RequiredMode.REQUIRED, example = "10430")
+    private List<Integer> toBizTypes;
 
 }

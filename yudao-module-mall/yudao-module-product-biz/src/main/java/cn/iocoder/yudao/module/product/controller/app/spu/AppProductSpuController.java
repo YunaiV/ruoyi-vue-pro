@@ -101,7 +101,7 @@ public class AppProductSpuController {
             throw exception(SPU_NOT_EXISTS);
         }
         if (!ProductSpuStatusEnum.isEnable(spu.getStatus())) {
-            throw exception(SPU_NOT_ENABLE);
+            throw exception(SPU_NOT_ENABLE, spu.getName());
         }
         // 获得商品 SKU
         List<ProductSkuDO> skus = productSkuService.getSkuListBySpuId(spu.getId());

@@ -3,7 +3,6 @@ package cn.iocoder.yudao.module.bpm.framework.flowable.core.util;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.ArrayUtil;
-import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.util.number.NumberUtils;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnModelConstants;
 import org.flowable.bpmn.converter.BpmnXMLConverter;
@@ -15,6 +14,7 @@ import java.util.*;
 
 import static cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnModelConstants.*;
 import static org.flowable.bpmn.constants.BpmnXMLConstants.FLOWABLE_EXTENSIONS_NAMESPACE;
+import java.util.*;
 
 /**
  * 流程模型转操作工具类
@@ -359,4 +359,5 @@ public class BpmnModelUtils {
         }
         return userTaskList;
     }
+
 }

@@ -83,7 +83,7 @@ public class TradeBrokerageOrderHandler implements TradeOrderHandler {
         if (order.getBrokerageUserId() == null) {
             return;
         }
-        cancelBrokerage(order.getBrokerageUserId(), orderItem.getOrderId());
+        cancelBrokerage(order.getBrokerageUserId(), orderItem.getId());
     }
 
     /**

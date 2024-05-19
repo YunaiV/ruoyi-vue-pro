@@ -75,9 +75,9 @@ public class TradeOrderStatisticsServiceImpl implements TradeOrderStatisticsServ
 
     private TradeOrderSummaryRespVO getPayPriceSummary(LocalDateTime date) {
         LocalDateTime beginTime = LocalDateTimeUtil.beginOfDay(date);
-        LocalDateTime endTime = LocalDateTimeUtil.beginOfDay(date);
-        return tradeOrderStatisticsMapper.selectPaySummaryByStatusAndPayTimeBetween(
-                PayOrderStatusEnum.SUCCESS.getStatus(), beginTime, endTime);
+        LocalDateTime endTime = LocalDateTimeUtil.endOfDay(date);
+        return tradeOrderStatisticsMapper.selectPaySummaryByPayStatusAndPayTimeBetween(
+                Boolean.TRUE, beginTime, endTime);
     }
 
     @Override

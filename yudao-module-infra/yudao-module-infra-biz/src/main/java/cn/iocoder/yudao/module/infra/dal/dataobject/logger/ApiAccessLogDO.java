@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.infra.dal.dataobject.logger;
 
+import cn.iocoder.yudao.framework.apilog.core.enums.OperateTypeEnum;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
@@ -24,6 +25,16 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ApiAccessLogDO extends BaseDO {
+
+    /**
+     * {@link #requestParams} 的最大长度
+     */
+    public static final Integer REQUEST_PARAMS_MAX_LENGTH = 8000;
+
+    /**
+     * {@link #resultMsg} 的最大长度
+     */
+    public static final Integer RESULT_MSG_MAX_LENGTH = 512;
 
     /**
      * 编号
@@ -71,6 +82,10 @@ public class ApiAccessLogDO extends BaseDO {
      */
     private String requestParams;
     /**
+     * 响应结果
+     */
+    private String responseBody;
+    /**
      * 用户 IP
      */
     private String userIp;
@@ -80,6 +95,21 @@ public class ApiAccessLogDO extends BaseDO {
     private String userAgent;
 
     // ========== 执行相关字段 ==========
+
+    /**
+     * 操作模块
+     */
+    private String operateModule;
+    /**
+     * 操作名
+     */
+    private String operateName;
+    /**
+     * 操作分类
+     *
+     * 枚举 {@link OperateTypeEnum}
+     */
+    private Integer operateType;
 
     /**
      * 开始请求时间
@@ -93,6 +123,7 @@ public class ApiAccessLogDO extends BaseDO {
      * 执行时长，单位：毫秒
      */
     private Integer duration;
+
     /**
      * 结果码
      *

@@ -10,6 +10,7 @@ import cn.iocoder.yudao.module.crm.controller.admin.business.vo.business.CrmBusi
 import cn.iocoder.yudao.module.crm.controller.admin.business.vo.business.CrmBusinessTransferReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.business.vo.business.CrmBusinessUpdateStatusReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.contact.vo.CrmContactBusinessReqVO;
+import cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.funnel.CrmStatisticsFunnelReqVO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.business.CrmBusinessDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.business.CrmBusinessProductDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.business.CrmBusinessStatusDO;
@@ -202,9 +203,9 @@ public class CrmBusinessServiceImpl implements CrmBusinessService {
         }
     }
 
-    private List<CrmBusinessProductDO> validateBusinessProducts(List<CrmBusinessSaveReqVO.Product> list) {
+    private List<CrmBusinessProductDO> validateBusinessProducts(List<CrmBusinessSaveReqVO.BusinessProduct> list) {
         // 1. 校验产品存在
-         productService.validProductList(convertSet(list, CrmBusinessSaveReqVO.Product::getProductId));
+        productService.validProductList(convertSet(list, CrmBusinessSaveReqVO.BusinessProduct::getProductId));
         // 2. 转化为 CrmBusinessProductDO 列表
         return convertList(list, o -> BeanUtils.toBean(o, CrmBusinessProductDO.class,
                 item -> item.setTotalPrice(MoneyUtils.priceMultiply(item.getBusinessPrice(), item.getCount()))));
@@ -234,7 +235,7 @@ public class CrmBusinessServiceImpl implements CrmBusinessService {
         }
         // 1.4 校验是不是状态没变更
         if ((reqVO.getStatusId() != null && reqVO.getStatusId().equals(business.getStatusId()))
-            || (reqVO.getEndStatus() != null && reqVO.getEndStatus().equals(business.getEndStatus()))) {
+                || (reqVO.getEndStatus() != null && reqVO.getEndStatus().equals(business.getEndStatus()))) {
             throw exception(BUSINESS_UPDATE_STATUS_FAIL_STATUS_EQUALS);
         }
 
@@ -301,7 +302,7 @@ public class CrmBusinessServiceImpl implements CrmBusinessService {
 
         // 2.1 数据权限转移
         permissionService.transferPermission(new CrmPermissionTransferReqBO(userId, CrmBizTypeEnum.CRM_BUSINESS.getType(),
-                reqVO.getNewOwnerUserId(), reqVO.getId(), CrmPermissionLevelEnum.OWNER.getLevel()));
+                reqVO.getId(), reqVO.getNewOwnerUserId(), reqVO.getOldOwnerPermissionLevel()));
         // 2.2 设置新的负责人
         businessMapper.updateOwnerUserIdById(reqVO.getId(), reqVO.getNewOwnerUserId());
 
@@ -368,6 +369,16 @@ public class CrmBusinessServiceImpl implements CrmBusinessService {
     @Override
     public Long getBusinessCountByStatusTypeId(Long statusTypeId) {
         return businessMapper.selectCountByStatusTypeId(statusTypeId);
+    }
+
+    @Override
+    public List<CrmBusinessDO> getBusinessListByCustomerIdOwnerUserId(Long customerId, Long ownerUserId) {
+        return businessMapper.selectListByCustomerIdOwnerUserId(customerId, ownerUserId);
+    }
+
+    @Override
+    public PageResult<CrmBusinessDO> getBusinessPageByDate(CrmStatisticsFunnelReqVO pageVO) {
+        return businessMapper.selectPage(pageVO);
     }
 
 }

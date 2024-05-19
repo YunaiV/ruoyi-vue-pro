@@ -66,13 +66,13 @@ public class CrmBusinessSaveReqVO {
     private Long contactId; // 使用场景，在【联系人详情】添加商机时，如果需要关联两者，需要传递 contactId 字段
 
     @Schema(description = "产品列表")
-    private List<Product> products;
+    private List<BusinessProduct> products;
 
     @Schema(description = "产品列表")
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class Product {
+    public static class BusinessProduct {
 
         @Schema(description = "产品编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "20529")
         @NotNull(message = "产品编号不能为空")

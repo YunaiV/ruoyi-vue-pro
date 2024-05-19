@@ -41,14 +41,6 @@ public interface RoleService {
     void deleteRole(Long id);
 
     /**
-     * 更新角色状态
-     *
-     * @param id 角色编号
-     * @param status 状态
-     */
-    void updateRoleStatus(Long id, Integer status);
-
-    /**
      * 设置角色的数据权限
      *
      * @param id 角色编号
