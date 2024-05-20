@@ -21,6 +21,7 @@ public enum BpmTaskCandidateStrategyEnum {
     POST(22, "岗位"),
     USER(30, "用户"),
     START_USER_SELECT(35, "发起人自选"), // 申请人自己，可在提交申请时选择此节点的审批人
+    START_USER(36, "发起人自己"), // 申请人自己, 一般紧挨开始节点，常用于发起人信息审核场景
     USER_GROUP(40, "用户组"),
     EXPRESSION(60, "流程表达式"), // 表达式 ExpressionManager
     ;
