@@ -85,21 +85,19 @@ public class YiYanChatClient implements ChatClient, StreamingChatClient {
     @Override
     public Flux<ChatResponse> stream(Prompt prompt) {
         YiYanChatCompletionRequest request = this.createRequest(prompt, true);
-        // TODO @fan：return this.retryTemplate.execute(ctx -> {
-        // 调用 callWithFunctionSupport 发送请求
-        Flux<YiYanChatCompletionResponse> response = this.yiYanApi.chatCompletionStream(request);
-        // TODO @fan：下面的 doOnComplete 是不是可以删除哈？
-        response.doOnComplete(new Runnable() {
-            @Override
-            public void run() {
-                String a = ";";
-            }
-        });
-        return response.map(chunk -> {
-            // TODO @fan：ChatResponseMetadata chatResponseMetadata
-            return new ChatResponse(List.of(new Generation(chunk.getResult())));
+        // TODO done @fan：return this.retryTemplate.execute(ctx -> {
+        return retryTemplate.execute(ctx -> {
+            // 调用 callWithFunctionSupport 发送请求
+            Flux<YiYanChatCompletionResponse> response = this.yiYanApi.chatCompletionStream(request);
+            return response.map(chunk -> {
+//                System.err.println("---".concat(chunk.getResult()));
+                // TODO @fan：ChatResponseMetadata chatResponseMetadata
+                return new ChatResponse(List.of(new Generation(chunk.getResult())));
+            });
         });
     }
+
+
 
     private YiYanChatCompletionRequest createRequest(Prompt prompt, boolean stream) {
         // 参考 https://cloud.baidu.com/doc/WENXINWORKSHOP/s/clntwmv7t 文档，system 是独立字段
