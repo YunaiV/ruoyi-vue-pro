@@ -113,7 +113,7 @@ public class MidjourneyInteractionsApi extends MidjourneyInteractions {
 
         //
         // 上传文件
-        String uploadUrl = uploadAttachmentsRes.getAttachments().getFirst().getUploadUrl();
+        String uploadUrl = uploadAttachmentsRes.getAttachments().get(0).getUploadUrl();
         httpHeaders.setContentType(MediaType.MULTIPART_FORM_DATA);
         HttpEntity<FileSystemResource> fileSystemResourceHttpEntity = new HttpEntity<>(attachments.getFileSystemResource(), httpHeaders);
         ResponseEntity<String> exchange = restTemplate.exchange(uploadUrl, HttpMethod.PUT, fileSystemResourceHttpEntity, String.class);
