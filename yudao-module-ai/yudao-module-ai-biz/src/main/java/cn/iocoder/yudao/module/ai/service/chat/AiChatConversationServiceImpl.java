@@ -56,8 +56,9 @@ public class AiChatConversationServiceImpl implements AiChatConversationService 
         validateChatModel(model);
 
         // 2. 创建 AiChatConversationDO 聊天对话
+        String title = createReqVO.getRoleId() == null ? AiChatConversationDO.TITLE_DEFAULT : role.getName();
         AiChatConversationDO conversation = new AiChatConversationDO()
-                .setUserId(userId).setTitle(AiChatConversationDO.TITLE_DEFAULT).setPinned(false)
+                .setUserId(userId).setTitle(title).setPinned(false)
                 .setRoleId(role.getId()).setModelId(model.getId()).setModel(model.getModel()).setSystemMessage(role.getSystemMessage())
                 .setTemperature(model.getTemperature()).setMaxTokens(model.getMaxTokens()).setMaxContexts(model.getMaxContexts());
         chatConversationMapper.insert(conversation);
