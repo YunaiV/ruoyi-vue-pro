@@ -6,7 +6,7 @@ Authorization: {{token}}
 
 {
   "conversationId": "1781604279872581649",
-  "content": "中国好看吗？"
+  "content": "你是 OpenAI 么？"
 }
 
 
@@ -16,10 +16,9 @@ Content-Type: application/json
 Authorization: {{token}}
 
 {
-  "conversationId": "1781604279872581651",
-  "content": "苹果是什么颜色？"
+  "conversationId": "1781604279872581690",
+  "content": "1+1=?"
 }
-
 
 ### message list
 GET {{baseUrl}}/admin-api/ai/chat/message/list-by-conversation-id?conversationId=1781604279872581649

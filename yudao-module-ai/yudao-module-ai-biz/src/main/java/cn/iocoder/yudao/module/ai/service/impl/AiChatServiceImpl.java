@@ -32,6 +32,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Flux;
+import reactor.core.scheduler.Schedulers;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -125,9 +126,10 @@ public class AiChatServiceImpl implements AiChatService {
         Flux<ChatResponse> streamResponse = chatClient.stream(prompt);
 
         // 3.3 流式返回
+        // 注意：Schedulers.immediate() 目的是，避免默认 Schedulers.parallel() 并发消费 chunk 导致 SSE 响应前端会乱序问题
         StringBuffer contentBuffer = new StringBuffer();
-        return streamResponse.map(response -> {
-            String newContent = response.getResult() != null ? response.getResult().getOutput().getContent() : null;
+        return streamResponse.publishOn(Schedulers.immediate()).map(chunk -> {
+            String newContent = chunk.getResult() != null ? chunk.getResult().getOutput().getContent() : null;
             newContent = StrUtil.nullToDefault(newContent, ""); // 避免 null 的 情况
             contentBuffer.append(newContent);
             // 响应结果

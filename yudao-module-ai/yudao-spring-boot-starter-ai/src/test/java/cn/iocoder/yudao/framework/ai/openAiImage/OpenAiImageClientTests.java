@@ -71,21 +71,4 @@ public class OpenAiImageClientTests {
         }
     }
 
-    public static void main(String[] args) {
-//        OpenAiApi api = new OpenAiApi("https://api.gptsapi.net", "sk-yzKea6d8e8212c3bdd99f9f44ced1cae37c097e5aa3BTS7z");
-//        OpenAiApi api = new OpenAiApi("https://openkey.cloud", "sk-QmgIIPc5xiYd8lPb076b1b7774Ea49Af9eD2Ef172c8f7e43");
-        OpenAiApi api = new OpenAiApi("https://api.chatanywhere.tech", "sk-gkgfYxhX9FxyZJznwxRZSJwKeGQYNPDVWjhby2PRRf17GHeT");
-        OpenAiChatClient client = new OpenAiChatClient(api);
-//        String result = client.call("未来，英文是什么？");
-//        System.out.println(result);
-        Flux<String> result = client.stream("未来，英文是什么？");
-        result.map(new Function<String, String>() {
-            @Override
-            public String apply(String s) {
-                System.out.println(s);
-                return s;
-            }
-        }).blockLast();
-    }
-
 }

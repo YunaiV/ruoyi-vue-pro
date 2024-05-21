@@ -156,6 +156,9 @@ spring.ai:
 #    base-url: https://api.chatanywhere.tech
     api-key: sk-yzKea6d8e8212c3bdd99f9f44ced1cae37c097e5aa3BTS7z
     base-url: https://api.gptsapi.net
+#    chat:
+#      options:
+#        model: gpt-4-0125-preview
 
 yudao.ai:
   yiyan:
