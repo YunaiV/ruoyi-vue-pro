@@ -1,8 +1,8 @@
 package cn.iocoder.yudao.module.ai.dal.mysql.chat;
 
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
+import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.module.ai.dal.dataobject.chat.AiChatConversationDO;
-import cn.iocoder.yudao.module.ai.dal.dataobject.chat.AiChatMessageDO;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
@@ -16,7 +16,11 @@ import java.util.List;
 public interface AiChatConversationMapper extends BaseMapperX<AiChatConversationDO> {
 
     default List<AiChatConversationDO> selectListByUserId(Long userId) {
-        return selectList(AiChatConversationDO::getUserId, userId);
+        return selectList(
+                new LambdaQueryWrapperX<AiChatConversationDO>()
+                        .eq(AiChatConversationDO::getUserId, userId)
+                        .orderByAsc(AiChatConversationDO::getCreateTime)
+        );
     }
 
 }
