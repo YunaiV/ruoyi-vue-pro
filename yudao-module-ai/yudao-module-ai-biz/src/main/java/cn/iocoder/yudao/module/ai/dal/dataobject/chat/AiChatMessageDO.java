@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.ai.dal.dataobject.chat;
 
+import com.baomidou.mybatisplus.annotation.TableId;
 import org.springframework.ai.chat.messages.MessageType;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiChatModelDO;
@@ -27,14 +28,23 @@ public class AiChatMessageDO extends BaseDO {
     /**
      * 编号，作为每条聊天记录的唯一标识符
      */
+    @TableId
     private Long id;
 
     /**
      * 会话编号
      *
-     * 关联 {@link AiChatConversationDO#getId()}
+     * 关联 {@link AiChatConversationDO#getId()} 字段
      */
     private Long conversationId;
+    /**
+     * 回复消息编号
+     *
+     * 关联 {@link #id} 字段
+     *
+     * 大模型回复的消息编号，用于“问答”的关联
+     */
+    private Long replyId;
 
     /**
      * 消息类型
@@ -75,6 +85,9 @@ public class AiChatMessageDO extends BaseDO {
      */
     private String content;
 
-    // TODO 芋艿：是否作为上下文语料？use_context，待定
+    /**
+     * 是否携带上下文
+     */
+    private Boolean useContext;
 
 }

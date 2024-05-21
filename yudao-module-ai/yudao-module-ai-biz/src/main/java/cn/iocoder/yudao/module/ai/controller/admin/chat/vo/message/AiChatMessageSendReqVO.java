@@ -19,4 +19,7 @@ public class AiChatMessageSendReqVO {
     @NotEmpty(message = "聊天内容不能为空")
     private String content;
 
+    @Schema(description = "是否携带上下文", example = "true")
+    private Boolean useContext;
+
 }
