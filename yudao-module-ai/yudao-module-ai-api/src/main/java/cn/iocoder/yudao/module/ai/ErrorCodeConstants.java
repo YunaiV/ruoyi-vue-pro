@@ -30,8 +30,8 @@ public interface ErrorCodeConstants {
     ErrorCode CHAT_CONVERSATION_UPDATE_MAX_TOKENS_ERROR = new ErrorCode(1_040_003_002, "更新对话失败，最大 Token 超过上限");
     ErrorCode CHAT_CONVERSATION_UPDATE_MAX_CONTEXTS_ERROR = new ErrorCode(1_040_003_002, "更新对话失败，最大 Context 超过上限");
 
-    // chat
-    ErrorCode AI_CHAT_MESSAGE_NOT_EXIST = new ErrorCode(1_022_000_100, "提问的 MessageId 不存在!");
+    // ========== API 聊天消息 1-040-004-000 ==========
+    ErrorCode AI_CHAT_MESSAGE_NOT_EXIST = new ErrorCode(1_040_004_000, "消息不存在!");
 
     // midjourney
 

@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.ai.service.impl;
+package cn.iocoder.yudao.module.ai.service.chat;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjUtil;
@@ -20,13 +20,10 @@ import org.springframework.ai.chat.prompt.Prompt;
 import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
 import cn.iocoder.yudao.module.ai.controller.admin.chat.vo.message.AiChatMessageRespVO;
 import cn.iocoder.yudao.module.ai.controller.admin.chat.vo.message.AiChatMessageSendReqVO;
-import cn.iocoder.yudao.module.ai.convert.AiChatMessageConvert;
 import cn.iocoder.yudao.module.ai.dal.dataobject.chat.AiChatMessageDO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiChatModelDO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiChatRoleDO;
-import cn.iocoder.yudao.module.ai.dal.mysql.AiChatMessageMapper;
-import cn.iocoder.yudao.module.ai.service.AiChatService;
-import cn.iocoder.yudao.module.ai.service.chat.AiChatConversationService;
+import cn.iocoder.yudao.module.ai.dal.mysql.chat.AiChatMessageMapper;
 import cn.iocoder.yudao.module.ai.service.model.AiChatModelService;
 import cn.iocoder.yudao.module.ai.service.model.AiChatRoleService;
 import lombok.extern.slf4j.Slf4j;
@@ -37,21 +34,20 @@ import reactor.core.scheduler.Schedulers;
 
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
+import static cn.iocoder.yudao.module.ai.ErrorCodeConstants.AI_CHAT_MESSAGE_NOT_EXIST;
 import static cn.iocoder.yudao.module.ai.ErrorCodeConstants.CHAT_CONVERSATION_NOT_EXISTS;
 
 /**
- * 聊天 service
+ * AI 聊天消息 Service 实现类
  *
  * @author fansili
- * @time 2024/4/14 15:55
- * @since 1.0
  */
-@Slf4j
 @Service
-public class AiChatServiceImpl implements AiChatService {
+@Slf4j
+public class AiChatMessageServiceImpl implements AiChatMessageService {
 
     @Resource
     private AiChatMessageMapper chatMessageMapper;
@@ -72,7 +68,7 @@ public class AiChatServiceImpl implements AiChatService {
     private AdminUserApi adminUserApi;
 
     @Transactional(rollbackFor = Exception.class)
-    public AiChatMessageRespVO chat(AiChatMessageSendReqVO req) {
+    public AiChatMessageRespVO sendMessage(AiChatMessageSendReqVO req) {
          return null; // TODO 芋艿：一起改
 //        Long loginUserId = SecurityFrameworkUtils.getLoginUserId();
 //        // 查询对话
@@ -117,10 +113,13 @@ public class AiChatServiceImpl implements AiChatService {
         if (ObjUtil.notEqual(conversation.getUserId(), userId)) {
             throw exception(CHAT_CONVERSATION_NOT_EXISTS); // TODO 芋艿：异常情况的对接；
         }
-        List<AiChatMessageDO> historyMessages = chatMessageMapper.selectByConversationId(conversation.getId());
+        List<AiChatMessageDO> historyMessages = chatMessageMapper.selectListByConversationId(conversation.getId());
         // 1.2 校验模型
         AiChatModelDO model = chatModalService.validateChatModel(conversation.getModelId());
         StreamingChatClient chatClient = apiKeyService.getStreamingChatClient(model.getKeyId());
+        // 1.3 获取用户头像、角色头像
+        AdminUserRespDTO user = adminUserApi.getUser(SecurityFrameworkUtils.getLoginUserId());
+        AiChatRoleDO role = conversation.getRoleId() != null ? chatRoleService.getChatRole(conversation.getRoleId()) : null;
 
         // 2. 插入 user 发送消息
         AiChatMessageDO userMessage = createChatMessage(conversation.getId(), null, model,
@@ -136,30 +135,23 @@ public class AiChatServiceImpl implements AiChatService {
 
         // 3.3 流式返回
         // 注意：Schedulers.immediate() 目的是，避免默认 Schedulers.parallel() 并发消费 chunk 导致 SSE 响应前端会乱序问题
-
-        // 3.4 获取用户头像、角色头像
-        AdminUserRespDTO user = adminUserApi.getUser(SecurityFrameworkUtils.getLoginUserId());
-        AiChatRoleDO chatRole = chatRoleService.getChatRole(assistantMessage.getRoleId());
-
         StringBuffer contentBuffer = new StringBuffer();
         return streamResponse.publishOn(Schedulers.single()).map(chunk -> {
             String newContent = chunk.getResult() != null ? chunk.getResult().getOutput().getContent() : null;
             newContent = StrUtil.nullToDefault(newContent, ""); // 避免 null 的 情况
             contentBuffer.append(newContent);
             // 响应结果
-            return new AiChatMessageSendRespVO().setSend(BeanUtils.toBean(userMessage, AiChatMessageSendRespVO.Message.class).setUserAvatar(user.getAvatar()))
-                    .setReceive(BeanUtils.toBean(assistantMessage, AiChatMessageSendRespVO.Message.class).setContent(newContent).setRoleAvatar(chatRole == null ? null : chatRole.getAvatar()));
+            AiChatMessageSendRespVO.Message send = BeanUtils.toBean(userMessage, AiChatMessageSendRespVO.Message.class,
+                    o -> o.setUserAvatar(user.getAvatar()));
+            AiChatMessageSendRespVO.Message receive = BeanUtils.toBean(assistantMessage, AiChatMessageSendRespVO.Message.class,
+                            o -> o.setRoleAvatar(role != null ? role.getAvatar() : null)).setContent(newContent);
+            return new AiChatMessageSendRespVO().setSend(send).setReceive(receive);
         }).doOnComplete(() -> {
             chatMessageMapper.updateById(new AiChatMessageDO().setId(assistantMessage.getId()).setContent(contentBuffer.toString()));
         }).doOnError(throwable -> {
             log.error("[sendChatMessageStream][userId({}) sendReqVO({}) 发生异常]", userId, sendReqVO, throwable);
             chatMessageMapper.updateById(new AiChatMessageDO().setId(assistantMessage.getId()).setContent(throwable.getMessage()));
         });
-    }
-
-    @Override
-    public Boolean deleteByConversationId(Long conversationId) {
-        return chatMessageMapper.deleteByConversationId(conversationId) > 0;
     }
 
     private Prompt buildPrompt(AiChatConversationDO conversation, List<AiChatMessageDO> messages,
@@ -174,12 +166,11 @@ public class AiChatServiceImpl implements AiChatService {
         // 1.3 user message 新发送消息
         chatMessages.add(new UserMessage(sendReqVO.getContent()));
 
-        // 2. 构建 ChatOptions 对象 TODO 芋艿：临时注释掉；等文心一言兼容了；
+        // 2. 构建 ChatOptions 对象
         AiPlatformEnum platform = AiPlatformEnum.validatePlatform(model.getPlatform());
         ChatOptions chatOptions = clientFactory.buildChatOptions(platform, model.getModel(),
                 conversation.getTemperature(), conversation.getMaxTokens());
         return new Prompt(chatMessages, chatOptions);
-//        return new Prompt(chatMessages);
     }
 
     /**
@@ -231,42 +222,30 @@ public class AiChatServiceImpl implements AiChatService {
     }
 
     @Override
-    public List<AiChatMessageRespVO> getMessageListByConversationId(Long conversationId) {
-        // 校验对话是否存在
-        chatConversationService.validateExists(conversationId);
-        // 获取对话所有 message
-        List<AiChatMessageDO> aiChatMessageDOList = chatMessageMapper.selectByConversationId(conversationId);
-        // 获取模型信息
-        Set<Long> roleIds = aiChatMessageDOList.stream().map(AiChatMessageDO::getRoleId).collect(Collectors.toSet());
-        List<AiChatRoleDO> roleList;
-        if (!CollUtil.isEmpty(roleIds)) {
-            roleList = chatRoleService.getChatRoles(roleIds);
-        } else {
-            roleList = Collections.emptyList();
-        }
-        Map<Long, AiChatRoleDO> roleMap = roleList.stream().collect(Collectors.toMap(AiChatRoleDO::getId, o -> o));
-        // 转换 AiChatMessageRespVO
-        List<AiChatMessageRespVO> aiChatMessageRespList = AiChatMessageConvert.INSTANCE.convertAiChatMessageRespVOList(aiChatMessageDOList);
-        // 获取用户信息
-        AdminUserRespDTO user = adminUserApi.getUser(SecurityFrameworkUtils.getLoginUserId());
-        // 设置用户头像 和 模型头像
-        return aiChatMessageRespList.stream().map(item -> {
-            // 设置 role 头像
-            if (roleMap.containsKey(item.getRoleId())) {
-                AiChatRoleDO role = roleMap.get(item.getRoleId());
-                item.setRoleAvatar(role.getAvatar());
-            }
-            // 设置 user 头像
-            if (user != null) {
-                item.setUserAvatar(user.getAvatar());
-            }
-            return item;
-        }).collect(Collectors.toList());
+    public List<AiChatMessageDO> getChatMessageListByConversationId(Long conversationId) {
+        return chatMessageMapper.selectListByConversationId(conversationId);
     }
 
     @Override
-    public Boolean deleteMessage(Long id) {
-        return chatMessageMapper.deleteById(id) > 0;
+    public void deleteMessage(Long id, Long userId) {
+        // 1. 校验消息存在
+        AiChatMessageDO message = chatMessageMapper.selectById(id);
+        if (message == null || ObjUtil.notEqual(message.getUserId(), userId)) {
+            throw exception(AI_CHAT_MESSAGE_NOT_EXIST);
+        }
+        // 2. 执行删除
+        chatMessageMapper.deleteById(id);
+    }
+
+    @Override
+    public void deleteChatMessageByConversationId(Long conversationId, Long userId) {
+        // 1. 校验消息存在
+        List<AiChatMessageDO> messages = chatMessageMapper.selectListByConversationId(conversationId);
+        if (CollUtil.isEmpty(messages) || ObjUtil.notEqual(messages.get(0).getUserId(), userId)) {
+            throw exception(AI_CHAT_MESSAGE_NOT_EXIST);
+        }
+        // 2. 执行删除
+        chatMessageMapper.deleteBatchIds(convertList(messages, AiChatMessageDO::getId));
     }
 
 }

@@ -1,17 +1,12 @@
 package cn.iocoder.yudao.module.ai.dal.mysql;
 
-import cn.hutool.core.collection.CollUtil;
-import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.QueryWrapperX;
 import cn.iocoder.yudao.module.ai.controller.admin.model.vo.chatModel.AiChatModelPageReqVO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiChatModelDO;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import org.apache.ibatis.annotations.Mapper;
-
-import java.util.List;
 
 import java.util.Collection;
 import java.util.List;
@@ -41,7 +36,6 @@ public interface AiChatModelMapper extends BaseMapperX<AiChatModelDO> {
     default List<AiChatModelDO> selectByIds(Collection<Long> modalIds) {
         return this.selectList(new LambdaQueryWrapperX<AiChatModelDO>().eq(AiChatModelDO::getId, modalIds));
     }
-
 
     default PageResult<AiChatModelDO> selectPage(AiChatModelPageReqVO reqVO) {
         return selectPage(reqVO, new LambdaQueryWrapperX<AiChatModelDO>()

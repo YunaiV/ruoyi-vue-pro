@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.ai.service.model;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
@@ -14,12 +15,9 @@ import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
-import java.util.Set;
-import java.util.function.Function;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
@@ -107,8 +105,11 @@ public class AiChatRoleServiceImpl implements AiChatRoleService {
     }
 
     @Override
-    public List<AiChatRoleDO> getChatRoles(Set<Long> roleIds) {
-        return chatRoleMapper.selectBatchIds(roleIds);
+    public List<AiChatRoleDO> getChatRoleList(Collection<Long> ids) {
+        if (CollUtil.isEmpty(ids)) {
+            return Collections.emptyList();
+        }
+        return chatRoleMapper.selectBatchIds(ids);
     }
 
     @Override

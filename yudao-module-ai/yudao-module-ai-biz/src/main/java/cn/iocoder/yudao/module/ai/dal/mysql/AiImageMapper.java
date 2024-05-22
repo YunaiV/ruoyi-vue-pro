@@ -13,7 +13,6 @@ import org.springframework.stereotype.Repository;
  * @time 2024/4/28 14:01
  * @since 1.0
  */
-@Repository
 @Mapper
 public interface AiImageMapper extends BaseMapperX<AiImageDO> {
 

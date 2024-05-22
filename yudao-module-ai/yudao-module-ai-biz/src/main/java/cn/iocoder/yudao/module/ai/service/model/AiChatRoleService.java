@@ -4,12 +4,14 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.ai.controller.admin.model.vo.chatRole.AiChatRolePageReqVO;
 import cn.iocoder.yudao.module.ai.controller.admin.model.vo.chatRole.AiChatRoleSaveMyReqVO;
 import cn.iocoder.yudao.module.ai.controller.admin.model.vo.chatRole.AiChatRoleSaveReqVO;
-import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiChatModelDO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiChatRoleDO;
 import jakarta.validation.Valid;
 
+import java.util.Collection;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
+
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
 
 /**
  * AI 聊天角色 Service 接口
@@ -74,12 +76,16 @@ public interface AiChatRoleService {
     AiChatRoleDO getChatRole(Long id);
 
     /**
-     * 获得聊天角色 - 根据 ids
+     * 获得聊天角色列表
      *
-     * @param roleIds
-     * @return
+     * @param ids 编号数组
+     * @return 聊天角色列表
      */
-    List<AiChatRoleDO> getChatRoles(Set<Long> roleIds);
+    List<AiChatRoleDO> getChatRoleList(Collection<Long> ids);
+
+    default Map<Long, AiChatRoleDO> getChatRoleMap(Collection<Long> ids) {
+        return convertMap(getChatRoleList(ids), AiChatRoleDO::getId);
+    }
 
     /**
      * 校验聊天角色是否合法
