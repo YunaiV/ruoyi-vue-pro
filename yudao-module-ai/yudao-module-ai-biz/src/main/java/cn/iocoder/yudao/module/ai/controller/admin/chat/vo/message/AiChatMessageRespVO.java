@@ -36,4 +36,11 @@ public class AiChatMessageRespVO {
     @Schema(description = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED, example = "2024-05-12 12:51")
     private LocalDateTime createTime;
 
+    // ========= 扩展字段
+
+    @Schema(description = "用户头像", requiredMode = Schema.RequiredMode.REQUIRED, example = "http://xxx")
+    private String userAvatar;
+
+    @Schema(description = "角色头像", requiredMode = Schema.RequiredMode.REQUIRED, example = "http://xxx")
+    private String roleAvatar;
 }

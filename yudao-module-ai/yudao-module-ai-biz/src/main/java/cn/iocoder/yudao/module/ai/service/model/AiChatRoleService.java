@@ -9,6 +9,7 @@ import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiChatRoleDO;
 import jakarta.validation.Valid;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * AI 聊天角色 Service 接口
@@ -71,6 +72,14 @@ public interface AiChatRoleService {
      * @return AI 聊天角色
      */
     AiChatRoleDO getChatRole(Long id);
+
+    /**
+     * 获得聊天角色 - 根据 ids
+     *
+     * @param roleIds
+     * @return
+     */
+    List<AiChatRoleDO> getChatRoles(Set<Long> roleIds);
 
     /**
      * 校验聊天角色是否合法

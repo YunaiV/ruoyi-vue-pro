@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -103,6 +104,11 @@ public class AiChatRoleServiceImpl implements AiChatRoleService {
     @Override
     public AiChatRoleDO getChatRole(Long id) {
         return chatRoleMapper.selectById(id);
+    }
+
+    @Override
+    public List<AiChatRoleDO> getChatRoles(Set<Long> roleIds) {
+        return chatRoleMapper.selectBatchIds(roleIds);
     }
 
     @Override

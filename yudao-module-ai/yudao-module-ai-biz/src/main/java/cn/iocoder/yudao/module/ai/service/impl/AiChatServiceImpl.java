@@ -13,6 +13,7 @@ import cn.iocoder.yudao.module.ai.convert.AiChatMessageConvert;
 import cn.iocoder.yudao.module.ai.dal.dataobject.chat.AiChatConversationDO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.chat.AiChatMessageDO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiChatModelDO;
+import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiChatRoleDO;
 import cn.iocoder.yudao.module.ai.dal.mysql.AiChatMessageMapper;
 import cn.iocoder.yudao.module.ai.service.AiChatService;
 import cn.iocoder.yudao.module.ai.service.chat.AiChatConversationService;
@@ -216,16 +217,22 @@ public class AiChatServiceImpl implements AiChatService {
         // 获取对话所有 message
         List<AiChatMessageDO> aiChatMessageDOList = chatMessageMapper.selectByConversationId(conversationId);
         // 获取模型信息
-        Set<Long> modalIds = aiChatMessageDOList.stream().map(AiChatMessageDO::getModelId).collect(Collectors.toSet());
-        List<AiChatModelDO> modalList = chatModalService.getModalByIds(modalIds);
-        Map<Long, AiChatModelDO> modalIdMap = modalList.stream().collect(Collectors.toMap(AiChatModelDO::getId, o -> o));
+        Set<Long> roleIds = aiChatMessageDOList.stream().map(AiChatMessageDO::getRoleId).collect(Collectors.toSet());
+        List<AiChatRoleDO> roleList;
+        if (!CollUtil.isEmpty(roleIds)) {
+            roleList = chatRoleService.getChatRoles(roleIds);
+        } else {
+            roleList = Collections.emptyList();
+        }
+        Map<Long, AiChatRoleDO> roleMap = roleList.stream().collect(Collectors.toMap(AiChatRoleDO::getId, o -> o));
         // 转换 AiChatMessageRespVO
         List<AiChatMessageRespVO> aiChatMessageRespList = AiChatMessageConvert.INSTANCE.convertAiChatMessageRespVOList(aiChatMessageDOList);
-        // 设置用户头像 和 模型头像 todo @芋艿 这里需要转换 用户头像、模型头像
+        // 设置用户头像 和 模型头像
         return aiChatMessageRespList.stream().map(item -> {
-            if (modalIdMap.containsKey(item.getModelId())) {
-//                modalIdMap.get(item.getModelId());
-//                item.setModelImage()
+            // 设置 role 头像
+            if (roleMap.containsKey(item.getRoleId())) {
+                AiChatRoleDO role = roleMap.get(item.getRoleId());
+                item.setRoleAvatar(role.getAvatar());
             }
             return item;
         }).collect(Collectors.toList());
