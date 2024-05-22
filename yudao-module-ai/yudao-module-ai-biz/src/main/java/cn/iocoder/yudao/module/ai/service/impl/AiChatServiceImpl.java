@@ -5,6 +5,7 @@ import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.ai.core.enums.AiPlatformEnum;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
+import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
 import cn.iocoder.yudao.module.ai.config.AiChatClientFactory;
 import cn.iocoder.yudao.module.ai.controller.admin.chat.vo.message.AiChatMessageRespVO;
 import cn.iocoder.yudao.module.ai.controller.admin.chat.vo.message.AiChatMessageSendReqVO;
@@ -19,6 +20,8 @@ import cn.iocoder.yudao.module.ai.service.AiChatService;
 import cn.iocoder.yudao.module.ai.service.chat.AiChatConversationService;
 import cn.iocoder.yudao.module.ai.service.model.AiChatModelService;
 import cn.iocoder.yudao.module.ai.service.model.AiChatRoleService;
+import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
+import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.ChatResponse;
@@ -56,6 +59,7 @@ public class AiChatServiceImpl implements AiChatService {
     private final AiChatConversationService chatConversationService;
     private final AiChatModelService chatModalService;
     private final AiChatRoleService chatRoleService;
+    private final AdminUserApi adminUserApi;
 
     @Transactional(rollbackFor = Exception.class)
     public AiChatMessageRespVO chat(AiChatMessageSendReqVO req) {
@@ -124,13 +128,17 @@ public class AiChatServiceImpl implements AiChatService {
         // 3.3 流式返回
         // 注意：Schedulers.immediate() 目的是，避免默认 Schedulers.parallel() 并发消费 chunk 导致 SSE 响应前端会乱序问题
         StringBuffer contentBuffer = new StringBuffer();
+
+        // 3.4 获取用户头像、角色头像
+        AdminUserRespDTO user = adminUserApi.getUser(SecurityFrameworkUtils.getLoginUserId());
+        AiChatRoleDO chatRole = chatRoleService.getChatRole(assistantMessage.getRoleId());
         return streamResponse.publishOn(Schedulers.immediate()).map(chunk -> {
             String newContent = chunk.getResult() != null ? chunk.getResult().getOutput().getContent() : null;
             newContent = StrUtil.nullToDefault(newContent, ""); // 避免 null 的 情况
             contentBuffer.append(newContent);
             // 响应结果
-            return new AiChatMessageSendRespVO().setSend(BeanUtils.toBean(userMessage, AiChatMessageSendRespVO.Message.class))
-                    .setReceive(BeanUtils.toBean(assistantMessage, AiChatMessageSendRespVO.Message.class).setContent(newContent));
+            return new AiChatMessageSendRespVO().setSend(BeanUtils.toBean(userMessage, AiChatMessageSendRespVO.Message.class).setUserAvatar(user.getAvatar()))
+                    .setReceive(BeanUtils.toBean(assistantMessage, AiChatMessageSendRespVO.Message.class).setContent(newContent).setRoleAvatar(chatRole == null ? null : chatRole.getAvatar()));
         }).doOnComplete(() -> {
             chatMessageMapper.updateById(new AiChatMessageDO().setId(assistantMessage.getId()).setContent(contentBuffer.toString()));
         }).doOnError(throwable -> {
@@ -227,12 +235,18 @@ public class AiChatServiceImpl implements AiChatService {
         Map<Long, AiChatRoleDO> roleMap = roleList.stream().collect(Collectors.toMap(AiChatRoleDO::getId, o -> o));
         // 转换 AiChatMessageRespVO
         List<AiChatMessageRespVO> aiChatMessageRespList = AiChatMessageConvert.INSTANCE.convertAiChatMessageRespVOList(aiChatMessageDOList);
+        // 获取用户信息
+        AdminUserRespDTO user = adminUserApi.getUser(SecurityFrameworkUtils.getLoginUserId());
         // 设置用户头像 和 模型头像
         return aiChatMessageRespList.stream().map(item -> {
             // 设置 role 头像
             if (roleMap.containsKey(item.getRoleId())) {
                 AiChatRoleDO role = roleMap.get(item.getRoleId());
                 item.setRoleAvatar(role.getAvatar());
+            }
+            // 设置 user 头像
+            if (user != null) {
+                item.setUserAvatar(user.getAvatar());
             }
             return item;
         }).collect(Collectors.toList());
