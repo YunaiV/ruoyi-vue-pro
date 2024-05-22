@@ -32,4 +32,12 @@ public interface AiChatMessageMapper extends BaseMapperX<AiChatMessageDO> {
         );
     }
 
+    /**
+     * 删除 - 根据 conversationId
+     *
+     * @param conversationId
+     */
+    default int deleteByConversationId(Long conversationId) {
+        return this.delete(new LambdaQueryWrapperX<AiChatMessageDO>().eq(AiChatMessageDO::getConversationId, conversationId));
+    }
 }

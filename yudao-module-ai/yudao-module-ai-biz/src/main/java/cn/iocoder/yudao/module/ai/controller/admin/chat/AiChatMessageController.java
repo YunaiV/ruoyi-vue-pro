@@ -55,4 +55,10 @@ public class AiChatMessageController {
         return success(chatService.deleteMessage(id));
     }
 
+    @Operation(summary = "删除消息-对于对话全部消息")
+    @DeleteMapping("/delete-by-conversation-id")
+    @Parameter(name = "id", required = true, description = "消息编号", example = "1024")
+    public CommonResult<Boolean> deleteByConversationId(@RequestParam("conversationId") Long conversationId) {
+        return success(chatService.deleteByConversationId(conversationId));
+    }
 }

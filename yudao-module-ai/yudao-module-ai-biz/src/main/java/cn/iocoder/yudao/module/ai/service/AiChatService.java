@@ -47,4 +47,11 @@ public interface AiChatService {
      */
     Flux<AiChatMessageSendRespVO> sendChatMessageStream(AiChatMessageSendReqVO sendReqVO, Long userId);
 
+    /**
+     * 删除消息-对于对话全部消息
+     *
+     * @param conversationId
+     * @return
+     */
+    Boolean deleteByConversationId(Long conversationId);
 }
