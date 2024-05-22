@@ -6,6 +6,8 @@ import lombok.experimental.Accessors;
 
 import java.util.List;
 
+// TODO @fan：增加一个 model 参数
+// TODO @fan：增加一个 Temperature 参数
 /**
  * 阿里云 千问 属性
  *

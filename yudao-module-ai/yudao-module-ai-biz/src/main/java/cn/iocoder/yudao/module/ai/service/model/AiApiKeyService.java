@@ -5,6 +5,7 @@ import cn.iocoder.yudao.module.ai.controller.admin.model.vo.apikey.AiApiKeyPageR
 import cn.iocoder.yudao.module.ai.controller.admin.model.vo.apikey.AiApiKeySaveReqVO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiApiKeyDO;
 import jakarta.validation.Valid;
+import org.springframework.ai.chat.StreamingChatClient;
 
 import java.util.List;
 
@@ -67,5 +68,15 @@ public interface AiApiKeyService {
      * @return API 密钥列表
      */
     List<AiApiKeyDO> getApiKeyList();
+
+    // ========== 与 spring-ai 集成 ==========
+
+    /**
+     * 获得 StreamingChatClient 对象
+     *
+     * @param id 编号
+     * @return StreamingChatClient 对象
+     */
+    StreamingChatClient getStreamingChatClient(Long id);
 
 }

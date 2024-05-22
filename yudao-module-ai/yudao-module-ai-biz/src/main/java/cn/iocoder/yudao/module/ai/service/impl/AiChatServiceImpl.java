@@ -4,13 +4,20 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.ai.core.enums.AiPlatformEnum;
+import cn.iocoder.yudao.framework.ai.core.factory.AiClientFactory;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
-import cn.iocoder.yudao.module.ai.config.AiChatClientFactory;
+import cn.iocoder.yudao.module.ai.controller.admin.chat.vo.message.AiChatMessageSendRespVO;
+import cn.iocoder.yudao.module.ai.dal.dataobject.chat.AiChatConversationDO;
+import cn.iocoder.yudao.module.ai.service.model.AiApiKeyService;
+import jakarta.annotation.Resource;
+import org.springframework.ai.chat.ChatResponse;
+import org.springframework.ai.chat.StreamingChatClient;
+import org.springframework.ai.chat.messages.*;
+import org.springframework.ai.chat.prompt.ChatOptions;
+import org.springframework.ai.chat.prompt.Prompt;
 import cn.iocoder.yudao.module.ai.controller.admin.chat.vo.message.AiChatMessageRespVO;
 import cn.iocoder.yudao.module.ai.controller.admin.chat.vo.message.AiChatMessageSendReqVO;
-import cn.iocoder.yudao.module.ai.controller.admin.chat.vo.message.AiChatMessageSendRespVO;
 import cn.iocoder.yudao.module.ai.convert.AiChatMessageConvert;
-import cn.iocoder.yudao.module.ai.dal.dataobject.chat.AiChatConversationDO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.chat.AiChatMessageDO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiChatModelDO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiChatRoleDO;
@@ -19,12 +26,7 @@ import cn.iocoder.yudao.module.ai.service.AiChatService;
 import cn.iocoder.yudao.module.ai.service.chat.AiChatConversationService;
 import cn.iocoder.yudao.module.ai.service.model.AiChatModelService;
 import cn.iocoder.yudao.module.ai.service.model.AiChatRoleService;
-import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.ai.chat.ChatResponse;
-import org.springframework.ai.chat.StreamingChatClient;
-import org.springframework.ai.chat.messages.*;
-import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Flux;
@@ -46,16 +48,22 @@ import static cn.iocoder.yudao.module.ai.ErrorCodeConstants.CHAT_CONVERSATION_NO
  */
 @Slf4j
 @Service
-@AllArgsConstructor
 public class AiChatServiceImpl implements AiChatService {
 
-    private final AiChatClientFactory chatClientFactory;
+    @Resource
+    private AiChatMessageMapper chatMessageMapper;
 
-    private final AiChatMessageMapper chatMessageMapper;
+    @Resource
+    private AiClientFactory clientFactory;
 
-    private final AiChatConversationService chatConversationService;
-    private final AiChatModelService chatModalService;
-    private final AiChatRoleService chatRoleService;
+    @Resource
+    private AiChatConversationService chatConversationService;
+    @Resource
+    private AiChatModelService chatModalService;
+    @Resource
+    private AiChatRoleService chatRoleService;
+    @Resource
+    private AiApiKeyService apiKeyService;
 
     @Transactional(rollbackFor = Exception.class)
     public AiChatMessageRespVO chat(AiChatMessageSendReqVO req) {
@@ -106,8 +114,7 @@ public class AiChatServiceImpl implements AiChatService {
         List<AiChatMessageDO> historyMessages = chatMessageMapper.selectByConversationId(conversation.getId());
         // 1.2 校验模型
         AiChatModelDO model = chatModalService.validateChatModel(conversation.getModelId());
-        AiPlatformEnum platform = AiPlatformEnum.validatePlatform(model.getPlatform());
-        StreamingChatClient chatClient = chatClientFactory.getStreamingChatClient(platform);
+        StreamingChatClient chatClient = apiKeyService.getStreamingChatClient(model.getKeyId());
 
         // 2. 插入 user 发送消息
         AiChatMessageDO userMessage = createChatMessage(conversation.getId(), null, model,
@@ -118,13 +125,13 @@ public class AiChatServiceImpl implements AiChatService {
                 userId, conversation.getRoleId(), MessageType.ASSISTANT, "", sendReqVO.getUseContext());
 
         // 3.2 创建 chat 需要的 Prompt
-        Prompt prompt = buildPrompt(conversation, historyMessages, sendReqVO);
+        Prompt prompt = buildPrompt(conversation, historyMessages, model, sendReqVO);
         Flux<ChatResponse> streamResponse = chatClient.stream(prompt);
 
         // 3.3 流式返回
         // 注意：Schedulers.immediate() 目的是，避免默认 Schedulers.parallel() 并发消费 chunk 导致 SSE 响应前端会乱序问题
         StringBuffer contentBuffer = new StringBuffer();
-        return streamResponse.publishOn(Schedulers.immediate()).map(chunk -> {
+        return streamResponse.publishOn(Schedulers.single()).map(chunk -> {
             String newContent = chunk.getResult() != null ? chunk.getResult().getOutput().getContent() : null;
             newContent = StrUtil.nullToDefault(newContent, ""); // 避免 null 的 情况
             contentBuffer.append(newContent);
@@ -144,7 +151,8 @@ public class AiChatServiceImpl implements AiChatService {
         return chatMessageMapper.deleteByConversationId(conversationId) > 0;
     }
 
-    private Prompt buildPrompt(AiChatConversationDO conversation, List<AiChatMessageDO> messages, AiChatMessageSendReqVO sendReqVO) {
+    private Prompt buildPrompt(AiChatConversationDO conversation, List<AiChatMessageDO> messages,
+                               AiChatModelDO model, AiChatMessageSendReqVO sendReqVO) {
         // 1. 构建 Prompt Message 列表
         List<Message> chatMessages = new ArrayList<>();
         // 1.1 system context 角色设定
@@ -156,10 +164,11 @@ public class AiChatServiceImpl implements AiChatService {
         chatMessages.add(new UserMessage(sendReqVO.getContent()));
 
         // 2. 构建 ChatOptions 对象 TODO 芋艿：临时注释掉；等文心一言兼容了；
-        // TODO 每一轮 token 数量
-//        ChatOptions chatOptions = ChatOptionsBuilder.builder().withTemperature(conversation.getTemperature().floatValue()).build();
-//        return new Prompt(chatMessages, null);
-        return new Prompt(chatMessages);
+        AiPlatformEnum platform = AiPlatformEnum.validatePlatform(model.getPlatform());
+        ChatOptions chatOptions = clientFactory.buildChatOptions(platform, model.getModel(),
+                conversation.getTemperature(), conversation.getMaxTokens());
+        return new Prompt(chatMessages, chatOptions);
+//        return new Prompt(chatMessages);
     }
 
     /**

@@ -1,6 +1,8 @@
 package cn.iocoder.yudao.framework.ai.config;
 
 import cn.hutool.core.io.IoUtil;
+import cn.iocoder.yudao.framework.ai.core.factory.AiClientFactory;
+import cn.iocoder.yudao.framework.ai.core.factory.AiClientFactoryImpl;
 import cn.iocoder.yudao.framework.ai.core.model.tongyi.QianWenChatClient;
 import cn.iocoder.yudao.framework.ai.core.model.tongyi.QianWenChatModal;
 import cn.iocoder.yudao.framework.ai.core.model.tongyi.QianWenOptions;
@@ -36,16 +38,21 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * ai 自动配置
+ * 芋道 AI 自动配置
  *
  * @author fansili
- * @time 2024/4/12 16:29
- * @since 1.0
  */
-@Slf4j
 @AutoConfiguration
 @EnableConfigurationProperties(YudaoAiProperties.class)
+@Slf4j
 public class YudaoAiAutoConfiguration {
+
+    @Bean
+    public AiClientFactory aiClientFactory() {
+        return new AiClientFactoryImpl();
+    }
+
+    // ========== 各种 AI Client 创建 ==========
 
     @Bean
     @ConditionalOnProperty(value = "yudao.ai.xinghuo.enable", havingValue = "true")
@@ -105,21 +112,6 @@ public class YudaoAiAutoConfiguration {
                 ),
                 yiYanOptions
         );
-    }
-
-    @Bean
-    @ConditionalOnProperty(value = "yudao.ai.openAiImage.enable", havingValue = "true")
-    public OpenAiImageClient openAiImageClient(YudaoAiProperties yudaoAiProperties) {
-        YudaoAiProperties.OpenAiImageProperties openAiImageProperties = yudaoAiProperties.getOpenAiImage();
-        OpenAiImageOptions openAiImageOptions = new OpenAiImageOptions();
-        openAiImageOptions.setModel(openAiImageProperties.getModel().getModel());
-        openAiImageOptions.setStyle(openAiImageProperties.getStyle().getStyle());
-        openAiImageOptions.setResponseFormat("url"); // TODO 芋艿：OpenAiImageOptions.ResponseFormatEnum.URL.getValue()
-        // 创建 client
-        return new OpenAiImageClient(
-                new OpenAiImageApi(openAiImageProperties.getApiKey()),
-                openAiImageOptions,
-                RetryUtils.DEFAULT_RETRY_TEMPLATE);
     }
 
     @Bean

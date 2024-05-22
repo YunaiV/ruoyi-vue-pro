@@ -6,6 +6,7 @@ import org.springframework.ai.chat.prompt.ChatOptions;
 
 import java.util.List;
 
+// TODO @fan：增加一个 model
 // TODO @fan：字段命名，penalty_score 类似的，建议改成驼峰原则
 // TODO @fan：字段的注释，可以都删除掉，让用户 https://cloud.baidu.com/doc/WENXINWORKSHOP/s/clntwmv7t 即可
 /**

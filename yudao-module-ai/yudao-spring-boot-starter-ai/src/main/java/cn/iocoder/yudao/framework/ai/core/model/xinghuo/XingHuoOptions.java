@@ -14,6 +14,7 @@ import lombok.experimental.Accessors;
 @Accessors(chain = true)
 public class XingHuoOptions implements ChatOptions {
 
+    // TODO @fan：这里 model 参数，然后使用 string
     /**
      * https://www.xfyun.cn/doc/spark/Web.html#_1-%E6%8E%A5%E5%8F%A3%E8%AF%B4%E6%98%8E
      * <p>
@@ -42,7 +43,6 @@ public class XingHuoOptions implements ChatOptions {
      * 需要保障用户下的唯一性，用于关联用户会话
      */
     private String chatId;
-
 
     @Override
     public Float getTemperature() {

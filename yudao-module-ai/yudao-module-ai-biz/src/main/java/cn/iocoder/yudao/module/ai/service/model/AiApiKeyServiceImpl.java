@@ -1,5 +1,7 @@
 package cn.iocoder.yudao.module.ai.service.model;
 
+import cn.iocoder.yudao.framework.ai.core.enums.AiPlatformEnum;
+import cn.iocoder.yudao.framework.ai.core.factory.AiClientFactory;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
@@ -8,6 +10,7 @@ import cn.iocoder.yudao.module.ai.controller.admin.model.vo.apikey.AiApiKeySaveR
 import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiApiKeyDO;
 import cn.iocoder.yudao.module.ai.dal.mysql.model.AiApiKeyMapper;
 import jakarta.annotation.Resource;
+import org.springframework.ai.chat.StreamingChatClient;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
@@ -27,6 +30,9 @@ public class AiApiKeyServiceImpl implements AiApiKeyService {
 
     @Resource
     private AiApiKeyMapper apiKeyMapper;
+
+    @Resource
+    private AiClientFactory clientFactory;
 
     @Override
     public Long createApiKey(AiApiKeySaveReqVO createReqVO) {
@@ -84,6 +90,15 @@ public class AiApiKeyServiceImpl implements AiApiKeyService {
     @Override
     public List<AiApiKeyDO> getApiKeyList() {
         return apiKeyMapper.selectList();
+    }
+
+    // ========== 与 spring-ai 集成 ==========
+
+    @Override
+    public StreamingChatClient getStreamingChatClient(Long id) {
+        AiApiKeyDO apiKey = validateApiKey(id);
+        AiPlatformEnum platform = AiPlatformEnum.validatePlatform(apiKey.getPlatform());
+        return clientFactory.getOrCreateStreamingChatClient(platform, apiKey.getApiKey(), apiKey.getUrl());
     }
 
 }

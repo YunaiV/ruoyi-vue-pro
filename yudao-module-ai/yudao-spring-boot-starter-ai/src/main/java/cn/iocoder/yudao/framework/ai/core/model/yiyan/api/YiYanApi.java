@@ -18,7 +18,7 @@ public class YiYanApi {
 
     private static final String AUTH_2_TOKEN_URI = "/oauth/2.0/token";
 
-    public static final String DEFAULT_CHAT_MODEL = YiYanChatModel.ERNIE4_0.getModel();
+    public static final YiYanChatModel DEFAULT_CHAT_MODEL = YiYanChatModel.ERNIE4_0;
 
     private final String appKey;
     private final String secretKey;
@@ -39,6 +39,7 @@ public class YiYanApi {
      */
     private final YiYanChatModel useChatModel;
 
+    // TODO fan：看看是不是去掉 refreshTokenSecondTime 字段
     public YiYanApi(String appKey, String secretKey, YiYanChatModel useChatModel, int refreshTokenSecondTime) {
         this.appKey = appKey;
         this.secretKey = secretKey;
