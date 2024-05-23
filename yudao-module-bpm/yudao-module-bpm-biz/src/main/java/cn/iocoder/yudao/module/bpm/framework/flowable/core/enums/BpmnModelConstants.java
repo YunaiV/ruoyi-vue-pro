@@ -31,6 +31,16 @@ public interface BpmnModelConstants {
     String USER_TASK_CANDIDATE_PARAM = "candidateParam";
 
     /**
+     * BPMN ExtensionElement 的扩展属性，用于标记用户任务超时执行动作
+     */
+    String USER_TASK_TIMEOUT_HANDLER_ACTION = "timeoutAction";
+
+    /**
+     * BPMN ExtensionElement 的扩展属性，用于标记定时边界事件类型
+     */
+    String TIMER_BOUNDARY_EVENT_TYPE = "timerBoundaryEventType";
+
+    /**
      * BPMN ExtensionElement 流程表单字段权限元素, 用于标记字段权限
      */
     String FORM_FIELD_PERMISSION_ELEMENT = "fieldsPermission";

@@ -128,6 +128,13 @@ public interface BpmTaskService {
     Task getTask(String id);
 
     /**
+     * 根据条件查询已经分配的用户任务列表
+     * @param processInstanceId 流程实例编号
+     * @param taskDefineKey 任务定义 Key
+     */
+    List<Task> getAssignedTaskListByConditions(String processInstanceId, String taskDefineKey);
+
+    /**
      * 获取当前任务的可回退的 UserTask 集合
      *
      * @param id 当前的任务 ID

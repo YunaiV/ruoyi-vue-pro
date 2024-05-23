@@ -433,6 +433,13 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         return taskService.createTaskQuery().taskId(id).includeTaskLocalVariables().singleResult();
     }
 
+    @Override
+    public List<Task> getAssignedTaskListByConditions(String processInstanceId, String defineKey) {
+        TaskQuery taskQuery = taskService.createTaskQuery().processInstanceId(processInstanceId)
+                .taskDefinitionKey(defineKey).active().taskAssigned().includeTaskLocalVariables();
+        return taskQuery.list();
+    }
+
     private HistoricTaskInstance getHistoricTask(String id) {
         return historyService.createHistoricTaskInstanceQuery().taskId(id).includeTaskLocalVariables().singleResult();
     }

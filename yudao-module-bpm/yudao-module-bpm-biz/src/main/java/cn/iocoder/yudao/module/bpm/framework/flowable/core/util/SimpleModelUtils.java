@@ -5,27 +5,27 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.lang.TypeReference;
 import cn.hutool.core.map.MapUtil;
-import cn.hutool.core.util.ArrayUtil;
-import cn.hutool.core.util.BooleanUtil;
-import cn.hutool.core.util.NumberUtil;
-import cn.hutool.core.util.StrUtil;
+import cn.hutool.core.util.*;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.simple.BpmSimpleModelNodeVO;
 import cn.iocoder.yudao.module.bpm.enums.definition.BpmApproveMethodEnum;
 import cn.iocoder.yudao.module.bpm.enums.definition.BpmSimpleModeConditionType;
 import cn.iocoder.yudao.module.bpm.enums.definition.BpmSimpleModelNodeType;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnModelConstants;
-import cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.SimpleModelConstants;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.simple.SimpleModelConditionGroups;
+import cn.iocoder.yudao.module.bpm.framework.flowable.core.simple.SimpleModelUserTaskConfig;
 import org.flowable.bpmn.BpmnAutoLayout;
 import org.flowable.bpmn.model.Process;
 import org.flowable.bpmn.model.*;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import static cn.iocoder.yudao.module.bpm.enums.definition.BpmSimpleModelNodeType.END_EVENT;
-import static cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnModelConstants.FORM_FIELD_PERMISSION_ELEMENT;
+import static cn.iocoder.yudao.module.bpm.enums.definition.BpmTimerBoundaryEventType.USER_TASK_TIMEOUT;
+import static cn.iocoder.yudao.module.bpm.enums.definition.BpmUserTaskTimeoutActionEnum.AUTO_REMINDER;
+import static cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnModelConstants.*;
 import static cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.SimpleModelConstants.*;
 import static org.flowable.bpmn.constants.BpmnXMLConstants.FLOWABLE_EXTENSIONS_NAMESPACE;
 import static org.flowable.bpmn.constants.BpmnXMLConstants.FLOWABLE_EXTENSIONS_PREFIX;
@@ -205,8 +205,15 @@ public class SimpleModelUtils {
                 break;
             }
             case USER_TASK: {
-                UserTask userTask = buildBpmnUserTask(simpleModelNode);
+                // 获取用户任务的配置
+                SimpleModelUserTaskConfig userTaskConfig = BeanUtil.toBean(simpleModelNode.getAttributes(), SimpleModelUserTaskConfig.class);
+                UserTask userTask = buildBpmnUserTask(simpleModelNode, userTaskConfig);
                 mainProcess.addFlowElement(userTask);
+                if (userTaskConfig.getTimeoutHandler() != null && userTaskConfig.getTimeoutHandler().getEnable()) {
+                    // 添加用户任务的 Timer Boundary Event, 用于任务的超时处理
+                    BoundaryEvent boundaryEvent = buildUserTaskTimerBoundaryEvent(userTask, userTaskConfig.getTimeoutHandler());
+                    mainProcess.addFlowElement(boundaryEvent);
+                }
                 break;
             }
             case COPY_TASK: {
@@ -263,6 +270,28 @@ public class SimpleModelUtils {
         }
     }
 
+    private static BoundaryEvent buildUserTaskTimerBoundaryEvent(UserTask userTask, SimpleModelUserTaskConfig.TimeoutHandler timeoutHandler) {
+        // 定时器边界事件
+        BoundaryEvent boundaryEvent = new BoundaryEvent();
+        boundaryEvent.setId(IdUtil.fastUUID());
+        // 设置关联的任务为不会被中断
+        boundaryEvent.setCancelActivity(false);
+        boundaryEvent.setAttachedToRef(userTask);
+        TimerEventDefinition eventDefinition = new TimerEventDefinition();
+        eventDefinition.setTimeDuration(timeoutHandler.getTimeDuration());
+        if (Objects.equals(AUTO_REMINDER.getAction(), timeoutHandler.getAction()) &&
+                timeoutHandler.getMaxRemindCount() != null && timeoutHandler.getMaxRemindCount() > 1) {
+            // 最大提醒次数
+            eventDefinition.setTimeCycle(String.format("R%d/%s", timeoutHandler.getMaxRemindCount(), timeoutHandler.getTimeDuration()));
+        }
+        boundaryEvent.addEventDefinition(eventDefinition);
+        // 添加定时器边界事件类型
+        addExtensionElement(boundaryEvent, TIMER_BOUNDARY_EVENT_TYPE, USER_TASK_TIMEOUT.getType().toString());
+        // 添加超时执行动作元素
+        addExtensionElement(boundaryEvent, USER_TASK_TIMEOUT_HANDLER_ACTION, StrUtil.toStringOrNull(timeoutHandler.getAction()));
+        return boundaryEvent;
+    }
+
     private static ParallelGateway buildBpmnParallelGateway(BpmSimpleModelNodeVO node) {
         ParallelGateway parallelGateway = new ParallelGateway();
         parallelGateway.setId(node.getId());
@@ -278,9 +307,14 @@ public class SimpleModelUtils {
         // TODO @jason：建议使用 ServiceTask，通过 executionListeners 实现；
         // @芋艿 ServiceTask 就可以了吧。 不需要 executionListeners
         // 添加抄送候选人元素
-        addCandidateElements(node, serviceTask);
+        addCandidateElements(MapUtil.getInt(node.getAttributes(), BpmnModelConstants.USER_TASK_CANDIDATE_STRATEGY),
+                MapUtil.getStr(node.getAttributes(), BpmnModelConstants.USER_TASK_CANDIDATE_PARAM),
+                serviceTask);
         // 添加表单字段权限属性元素
-        addFormFieldsPermission(node, serviceTask);
+        List<Map<String, String>> fieldsPermissions = MapUtil.get(node.getAttributes(),
+                FORM_FIELD_PERMISSION_ELEMENT, new TypeReference<>() {
+                });
+        addFormFieldsPermission(fieldsPermissions, serviceTask);
         return serviceTask;
     }
 
@@ -288,12 +322,10 @@ public class SimpleModelUtils {
     /**
      * 给节点添加候选人元素
      */
-    private static void addCandidateElements(BpmSimpleModelNodeVO node, FlowElement flowElement) {
-        Integer candidateStrategy = MapUtil.getInt(node.getAttributes(), BpmnModelConstants.USER_TASK_CANDIDATE_STRATEGY);
+    private static void addCandidateElements(Integer candidateStrategy, String candidateParam, FlowElement flowElement) {
         addExtensionElement(flowElement, BpmnModelConstants.USER_TASK_CANDIDATE_STRATEGY,
-                candidateStrategy == null ? null : String.valueOf(candidateStrategy));
-        addExtensionElement(flowElement, BpmnModelConstants.USER_TASK_CANDIDATE_PARAM,
-                MapUtil.getStr(node.getAttributes(), BpmnModelConstants.USER_TASK_CANDIDATE_PARAM));
+                candidateStrategy == null ? null : candidateStrategy.toString());
+        addExtensionElement(flowElement, BpmnModelConstants.USER_TASK_CANDIDATE_PARAM, candidateParam);
     }
 
     private static ExclusiveGateway buildBpmnExclusiveGateway(BpmSimpleModelNodeVO node) {
@@ -328,21 +360,25 @@ public class SimpleModelUtils {
         return endEvent;
     }
 
-    private static UserTask buildBpmnUserTask(BpmSimpleModelNodeVO node) {
+    private static UserTask buildBpmnUserTask(BpmSimpleModelNodeVO node, SimpleModelUserTaskConfig userTaskConfig) {
         UserTask userTask = new UserTask();
         userTask.setId(node.getId());
         userTask.setName(node.getName());
+        //  设置审批任务的截止时间
+        if (userTaskConfig.getTimeoutHandler() != null && userTaskConfig.getTimeoutHandler().getEnable()) {
+            userTask.setDueDate(userTaskConfig.getTimeoutHandler().getTimeDuration());
+        }
+
         // 添加候选人元素
-        addCandidateElements(node, userTask);
+        addCandidateElements(userTaskConfig.getCandidateStrategy(), userTaskConfig.getCandidateParam(), userTask);
         // 添加表单字段权限属性元素
-        addFormFieldsPermission(node, userTask);
+        addFormFieldsPermission(userTaskConfig.getFieldsPermission(), userTask);
         // 处理多实例
-        processMultiInstanceLoopCharacteristics(node, userTask);
+        processMultiInstanceLoopCharacteristics(userTaskConfig.getApproveMethod(), userTask);
         return userTask;
     }
 
-    private static void processMultiInstanceLoopCharacteristics(BpmSimpleModelNodeVO node, UserTask userTask) {
-        Integer approveMethod = MapUtil.getInt(node.getAttributes(), SimpleModelConstants.APPROVE_METHOD_ATTRIBUTE);
+    private static void processMultiInstanceLoopCharacteristics(Integer approveMethod, UserTask userTask) {
         BpmApproveMethodEnum bpmApproveMethodEnum = BpmApproveMethodEnum.valueOf(approveMethod);
         if (bpmApproveMethodEnum == null || bpmApproveMethodEnum == BpmApproveMethodEnum.SINGLE_PERSON_APPROVE) {
             return;
@@ -369,10 +405,7 @@ public class SimpleModelUtils {
     /**
      * 给节点添加表单字段权限元素
      */
-    private static void addFormFieldsPermission(BpmSimpleModelNodeVO node, FlowElement flowElement) {
-        List<Map<String, String>> fieldsPermissions = MapUtil.get(node.getAttributes(),
-                FORM_FIELD_PERMISSION_ELEMENT, new TypeReference<>() {
-                });
+    private static void addFormFieldsPermission(List<Map<String, String>> fieldsPermissions, FlowElement flowElement) {
         if (CollUtil.isNotEmpty(fieldsPermissions)) {
             fieldsPermissions.forEach(item -> addExtensionElement(flowElement, FORM_FIELD_PERMISSION_ELEMENT, item));
         }
