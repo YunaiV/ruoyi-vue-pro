@@ -20,6 +20,7 @@ import cn.iocoder.yudao.framework.ai.core.model.xinghuo.api.XingHuoApi;
 import cn.iocoder.yudao.framework.ai.core.model.yiyan.YiYanChatClient;
 import cn.iocoder.yudao.framework.ai.core.model.yiyan.YiYanChatOptions;
 import cn.iocoder.yudao.framework.ai.core.model.yiyan.api.YiYanApi;
+import com.google.cloud.vertexai.VertexAI;
 import org.springframework.ai.autoconfigure.ollama.OllamaAutoConfiguration;
 import org.springframework.ai.autoconfigure.openai.OpenAiAutoConfiguration;
 import org.springframework.ai.chat.StreamingChatClient;
@@ -31,6 +32,8 @@ import org.springframework.ai.openai.OpenAiChatClient;
 import org.springframework.ai.openai.OpenAiChatOptions;
 import org.springframework.ai.openai.api.ApiUtils;
 import org.springframework.ai.openai.api.OpenAiApi;
+import org.springframework.ai.vertexai.gemini.VertexAiGeminiChatClient;
+import org.springframework.ai.vertexai.gemini.VertexAiGeminiChatOptions;
 
 import java.util.List;
 
@@ -57,6 +60,8 @@ public class AiClientFactoryImpl implements AiClientFactory {
                     return buildXingHuoChatClient(apiKey);
                 case QIAN_WEN:
                     return buildQianWenChatClient(apiKey);
+                case GEMIR:
+                    return buildGoogleGemir(apiKey);
                 default:
                     throw new IllegalArgumentException(StrUtil.format("未知平台({})", platform));
             }
@@ -148,7 +153,7 @@ public class AiClientFactoryImpl implements AiClientFactory {
      */
     private static XingHuoChatClient buildXingHuoChatClient(String key) {
         List<String> keys = StrUtil.split(key, '|');
-        Assert.equals(keys.size(), 2, "XingHuoChatClient 的密钥需要 (appKey|secretKey) 格式");
+        Assert.equals(keys.size(), 3, "XingHuoChatClient 的密钥需要 (appid|appKey|secretKey) 格式");
         String appId = keys.get(0);
         String appKey = keys.get(1);
         String secretKey = keys.get(2);
