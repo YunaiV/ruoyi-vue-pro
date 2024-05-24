@@ -89,7 +89,7 @@ public class AiChatMessageController {
     @DeleteMapping("/delete")
     @Parameter(name = "id", required = true, description = "消息编号", example = "1024")
     public CommonResult<Boolean> deleteChatMessage(@RequestParam("id") Long id) {
-        chatMessageService.deleteMessage(id, getLoginUserId());
+        chatMessageService.deleteChatMessage(id, getLoginUserId());
         return success(true);
     }
 

@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.ai.dal.mysql;
+package cn.iocoder.yudao.module.ai.dal.mysql.model;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
@@ -26,17 +26,6 @@ public interface AiChatModelMapper extends BaseMapperX<AiChatModelDO> {
                 .orderByAsc("sort"));
     }
 
-    // TODO 芋艿：不需要哈
-    /**
-     * 查询 - 根据 ids
-     *
-     * @param modalIds
-     * @return
-     */
-    default List<AiChatModelDO> selectByIds(Collection<Long> modalIds) {
-        return this.selectList(new LambdaQueryWrapperX<AiChatModelDO>().eq(AiChatModelDO::getId, modalIds));
-    }
-
     default PageResult<AiChatModelDO> selectPage(AiChatModelPageReqVO reqVO) {
         return selectPage(reqVO, new LambdaQueryWrapperX<AiChatModelDO>()
                 .likeIfPresent(AiChatModelDO::getName, reqVO.getName())
@@ -50,4 +39,5 @@ public interface AiChatModelMapper extends BaseMapperX<AiChatModelDO> {
                 .eq(AiChatModelDO::getStatus, status)
                 .orderByAsc(AiChatModelDO::getSort));
     }
+
 }

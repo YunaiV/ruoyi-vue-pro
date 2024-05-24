@@ -3,7 +3,7 @@ package cn.iocoder.yudao.module.ai.controller.admin.image;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.ai.controller.admin.image.vo.*;
-import cn.iocoder.yudao.module.ai.service.AiImageService;
+import cn.iocoder.yudao.module.ai.service.image.AiImageService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;

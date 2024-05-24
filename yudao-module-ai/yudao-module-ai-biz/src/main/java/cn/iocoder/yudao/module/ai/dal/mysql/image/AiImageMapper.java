@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.ai.dal.mysql;
+package cn.iocoder.yudao.module.ai.dal.mysql.image;
 
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
@@ -26,4 +26,5 @@ public interface AiImageMapper extends BaseMapperX<AiImageDO> {
     default void updateByMjNonce(Long mjNonceId, AiImageDO aiImageDO) {
         this.update(aiImageDO, new LambdaQueryWrapperX<AiImageDO>().eq(AiImageDO::getMjNonceId, mjNonceId));
     }
+
 }

@@ -7,14 +7,13 @@ import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.ai.controller.admin.model.vo.chatModel.AiChatModelPageReqVO;
 import cn.iocoder.yudao.module.ai.controller.admin.model.vo.chatModel.AiChatModelSaveReqVO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiChatModelDO;
-import cn.iocoder.yudao.module.ai.dal.mysql.AiChatModelMapper;
+import cn.iocoder.yudao.module.ai.dal.mysql.model.AiChatModelMapper;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
+import java.util.Collection;
 import java.util.List;
-
-import java.util.Set;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.ai.ErrorCodeConstants.*;
@@ -103,13 +102,13 @@ public class AiChatModelServiceImpl implements AiChatModelService {
     }
 
     @Override
-    public List<AiChatModelDO> getChatModelList(Integer status) {
+    public List<AiChatModelDO> getChatModelListByStatus(Integer status) {
         return chatModelMapper.selectList(status);
     }
 
     @Override
-    public List<AiChatModelDO> getModalByIds(Set<Long> modalIds) {
-        return chatModelMapper.selectByIds(modalIds);
+    public List<AiChatModelDO> getChatModelList(Collection<Long> ids) {
+        return chatModelMapper.selectBatchIds(ids);
     }
 
 }

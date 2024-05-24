@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.ai.service.impl;
+package cn.iocoder.yudao.module.ai.service.image;
 
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
@@ -21,9 +21,8 @@ import cn.iocoder.yudao.module.ai.ErrorCodeConstants;
 import cn.iocoder.yudao.module.ai.controller.admin.image.vo.*;
 import cn.iocoder.yudao.module.ai.convert.AiImageConvert;
 import cn.iocoder.yudao.module.ai.dal.dataobject.image.AiImageDO;
-import cn.iocoder.yudao.module.ai.dal.mysql.AiImageMapper;
+import cn.iocoder.yudao.module.ai.dal.mysql.image.AiImageMapper;
 import cn.iocoder.yudao.module.ai.enums.AiImageDrawingStatusEnum;
-import cn.iocoder.yudao.module.ai.service.AiImageService;
 import jakarta.annotation.PostConstruct;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

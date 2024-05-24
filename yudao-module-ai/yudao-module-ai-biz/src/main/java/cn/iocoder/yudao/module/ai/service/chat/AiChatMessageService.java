@@ -45,7 +45,7 @@ public interface AiChatMessageService {
      * @param id 消息编号
      * @param userId 用户编号
      */
-    void deleteMessage(Long id, Long userId);
+    void deleteChatMessage(Long id, Long userId);
 
     /**
      * 删除指定会话的消息

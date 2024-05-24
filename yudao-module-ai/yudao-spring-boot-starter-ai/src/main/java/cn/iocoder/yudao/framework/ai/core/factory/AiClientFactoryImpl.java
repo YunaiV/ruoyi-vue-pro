@@ -20,6 +20,7 @@ import cn.iocoder.yudao.framework.ai.core.model.xinghuo.api.XingHuoApi;
 import cn.iocoder.yudao.framework.ai.core.model.yiyan.YiYanChatClient;
 import cn.iocoder.yudao.framework.ai.core.model.yiyan.YiYanChatOptions;
 import cn.iocoder.yudao.framework.ai.core.model.yiyan.api.YiYanApi;
+import com.google.cloud.vertexai.VertexAI;
 import org.springframework.ai.autoconfigure.ollama.OllamaAutoConfiguration;
 import org.springframework.ai.autoconfigure.openai.OpenAiAutoConfiguration;
 import org.springframework.ai.chat.StreamingChatClient;
@@ -31,6 +32,8 @@ import org.springframework.ai.openai.OpenAiChatClient;
 import org.springframework.ai.openai.OpenAiChatOptions;
 import org.springframework.ai.openai.api.ApiUtils;
 import org.springframework.ai.openai.api.OpenAiApi;
+import org.springframework.ai.vertexai.gemini.VertexAiGeminiChatClient;
+import org.springframework.ai.vertexai.gemini.VertexAiGeminiChatOptions;
 
 import java.util.List;
 
@@ -57,8 +60,8 @@ public class AiClientFactoryImpl implements AiClientFactory {
                     return buildXingHuoChatClient(apiKey);
                 case QIAN_WEN:
                     return buildQianWenChatClient(apiKey);
-//                case GEMIR:
-//                    return buildGoogleGemir(apiKey);
+                case GEMIR:
+                    return buildGoogleGemir(apiKey);
                 default:
                     throw new IllegalArgumentException(StrUtil.format("未知平台({})", platform));
             }
@@ -165,24 +168,13 @@ public class AiClientFactoryImpl implements AiClientFactory {
         QianWenApi qianWenApi = new QianWenApi(key, QianWenChatModal.QWEN_72B_CHAT);
         return new QianWenChatClient(qianWenApi);
     }
-//
-//    private static VertexAiGeminiChatClient buildGoogleGemir(String key) {
-//        List<String> keys = StrUtil.split(key, '|');
-//        Assert.equals(keys.size(), 2, "VertexAiGeminiChatClient 的密钥需要 (projectId|location) 格式");
-////        VertexAiGeminiConnectionProperties connectionProperties = new VertexAiGeminiConnectionProperties();
-////        connectionProperties.setApiKey("AIzaSyBpe376HTA8uPKJN_OJTh7MEO3v6LMqfXU");
-////
-////        GoogleCredentials credentials = GoogleCredentials.fromStream(connectionProperties.getCredentialsUri().getInputStream());
-//        // todo @芋艿 google gemini 没找到对于初始化 client 方式，文档中说是用过 GoogleCredentials 来初始化凭证
-//        // api-key: AIzaSyBpe376HTA8uPKJN_OJTh7MEO3v6LMqfXU
-//        VertexAI vertexApi =  new VertexAI(
-//                "skilled-snow-409401",
-//                "us-central1"
-//        );
-//        return new VertexAiGeminiChatClient(vertexApi,
-//                VertexAiGeminiChatOptions.builder()
-//                        .withTemperature(0.4F)
-//                        .withModel(VertexAiGeminiChatClient.ChatModel.GEMINI_PRO.getValue())
-//                        .build());
-//    }
+
+
+    private static VertexAiGeminiChatClient buildGoogleGemir(String key) {
+        List<String> keys = StrUtil.split(key, '|');
+        Assert.equals(keys.size(), 2, "VertexAiGeminiChatClient 的密钥需要 (projectId|location) 格式");
+        VertexAI vertexApi =  new VertexAI(keys.get(0), keys.get(1));
+        return new VertexAiGeminiChatClient(vertexApi);
+    }
+
 }

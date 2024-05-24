@@ -6,6 +6,7 @@ import cn.iocoder.yudao.module.ai.controller.admin.model.vo.chatModel.AiChatMode
 import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiChatModelDO;
 import jakarta.validation.Valid;
 
+import java.util.Collection;
 import java.util.List;
 
 import java.util.Set;
@@ -79,13 +80,13 @@ public interface AiChatModelService {
      * @param status 状态
      * @return 聊天模型列表
      */
-    List<AiChatModelDO> getChatModelList(Integer status);
+    List<AiChatModelDO> getChatModelListByStatus(Integer status);
 
     /**
-     * 获取 - 根据多个 ids 获取
+     * 获得聊天模型列表
      *
-     * @param modalIds
-     * @return
+     * @param ids 编号数组
+     * @return 模型列表
      */
-    List<AiChatModelDO> getModalByIds(Set<Long> modalIds);
+    List<AiChatModelDO> getChatModelList(Collection<Long> ids);
 }

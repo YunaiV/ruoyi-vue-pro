@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.framework.ai.core.model.tongyi;
 
+import cn.hutool.core.util.NumberUtil;
 import cn.iocoder.yudao.framework.ai.core.exception.ChatException;
 import cn.iocoder.yudao.framework.ai.core.model.tongyi.api.QianWenApi;
 import org.springframework.ai.chat.*;

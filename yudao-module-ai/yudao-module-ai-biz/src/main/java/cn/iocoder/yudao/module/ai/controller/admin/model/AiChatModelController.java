@@ -18,7 +18,6 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.function.Function;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
@@ -77,7 +76,7 @@ public class AiChatModelController {
     @Operation(summary = "获得聊天模型列表")
     @Parameter(name = "status", description = "状态", required = true, example = "1")
     public CommonResult<List<AiChatModelRespVO>> getChatModelSimpleList(@RequestParam("status") Integer status) {
-        List<AiChatModelDO> list = chatModelService.getChatModelList(status);
+        List<AiChatModelDO> list = chatModelService.getChatModelListByStatus(status);
         return success(convertList(list, model -> new AiChatModelRespVO().setId(model.getId())
                 .setName(model.getName()).setModel(model.getModel())));
     }

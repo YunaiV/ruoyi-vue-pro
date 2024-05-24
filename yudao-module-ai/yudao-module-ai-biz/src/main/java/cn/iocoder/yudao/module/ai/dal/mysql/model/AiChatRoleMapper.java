@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.ai.dal.mysql;
+package cn.iocoder.yudao.module.ai.dal.mysql.model;
 
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;

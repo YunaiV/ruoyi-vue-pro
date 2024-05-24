@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.ai.dal.vo;
+package cn.iocoder.yudao.module.ai.service.image.midjourneyHandler.vo;
 
 import cn.iocoder.yudao.framework.ai.core.enums.AiPlatformEnum;
 import lombok.Data;

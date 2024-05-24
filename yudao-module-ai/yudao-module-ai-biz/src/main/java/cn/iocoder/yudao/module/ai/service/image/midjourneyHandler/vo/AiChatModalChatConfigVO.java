@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.ai.dal.vo;
+package cn.iocoder.yudao.module.ai.service.image.midjourneyHandler.vo;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;

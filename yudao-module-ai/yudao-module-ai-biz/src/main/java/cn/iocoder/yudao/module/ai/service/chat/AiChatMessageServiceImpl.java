@@ -40,6 +40,8 @@ import java.time.LocalDateTime;
 import java.util.*;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.framework.common.pojo.CommonResult.error;
+import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
 import static cn.iocoder.yudao.module.ai.ErrorCodeConstants.AI_CHAT_MESSAGE_NOT_EXIST;
 import static cn.iocoder.yudao.module.ai.ErrorCodeConstants.CHAT_CONVERSATION_NOT_EXISTS;
@@ -138,7 +140,7 @@ public class AiChatMessageServiceImpl implements AiChatMessageService {
         Flux<ChatResponse> streamResponse = chatClient.stream(prompt);
 
         // 3.3 流式返回
-        // 注意：Schedulers.immediate() 目的是，避免默认 Schedulers.parallel() 并发消费 chunk 导致 SSE 响应前端会乱序问题
+        // TODO 注意：Schedulers.immediate() 目的是，避免默认 Schedulers.parallel() 并发消费 chunk 导致 SSE 响应前端会乱序问题
         StringBuffer contentBuffer = new StringBuffer();
         return streamResponse.map(chunk -> {
             String newContent = chunk.getResult() != null ? chunk.getResult().getOutput().getContent() : null;
@@ -149,14 +151,14 @@ public class AiChatMessageServiceImpl implements AiChatMessageService {
                     o -> o.setUserAvatar(user.getAvatar()));
             AiChatMessageSendRespVO.Message receive = BeanUtils.toBean(assistantMessage, AiChatMessageSendRespVO.Message.class,
                             o -> o.setRoleAvatar(role != null ? role.getAvatar() : null)).setContent(newContent);
-            return CommonResult.success(new AiChatMessageSendRespVO().setSend(send).setReceive(receive));
+            return success(new AiChatMessageSendRespVO().setSend(send).setReceive(receive));
         }).doOnComplete(() -> {
             chatMessageMapper.updateById(new AiChatMessageDO().setId(assistantMessage.getId()).setContent(contentBuffer.toString()));
         }).doOnError(throwable -> {
             log.error("[sendChatMessageStream][userId({}) sendReqVO({}) 发生异常]", userId, sendReqVO, throwable);
             chatMessageMapper.updateById(new AiChatMessageDO().setId(assistantMessage.getId()).setContent(throwable.getMessage()));
-        }).onErrorResume( error -> {
-            return Flux.just(CommonResult.error(ErrorCodeConstants.AI_CHAT_STREAM_ERROR));
+        }).onErrorResume(error -> {
+            return Flux.just(error(ErrorCodeConstants.AI_CHAT_STREAM_ERROR));
         });
     }
 
@@ -235,7 +237,7 @@ public class AiChatMessageServiceImpl implements AiChatMessageService {
     }
 
     @Override
-    public void deleteMessage(Long id, Long userId) {
+    public void deleteChatMessage(Long id, Long userId) {
         // 1. 校验消息存在
         AiChatMessageDO message = chatMessageMapper.selectById(id);
         if (message == null || ObjUtil.notEqual(message.getUserId(), userId)) {
