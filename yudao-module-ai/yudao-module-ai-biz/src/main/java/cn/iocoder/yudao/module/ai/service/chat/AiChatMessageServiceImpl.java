@@ -165,7 +165,9 @@ public class AiChatMessageServiceImpl implements AiChatMessageService {
         // 1. 构建 Prompt Message 列表
         List<Message> chatMessages = new ArrayList<>();
         // 1.1 system context 角色设定
-        chatMessages.add(new SystemMessage(conversation.getSystemMessage()));
+        if (StrUtil.isNotBlank(conversation.getSystemMessage())) {
+            chatMessages.add(new SystemMessage(conversation.getSystemMessage()));
+        }
         // 1.2 history message 历史消息
         List<AiChatMessageDO> contextMessages = filterContextMessages(messages, conversation, sendReqVO);
         contextMessages.forEach(message -> chatMessages.add(new ChatMessage(message.getType().toUpperCase(), message.getContent())));

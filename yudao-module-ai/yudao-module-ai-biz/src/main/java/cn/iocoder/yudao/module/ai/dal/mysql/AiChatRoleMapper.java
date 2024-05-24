@@ -20,14 +20,6 @@ import java.util.List;
 @Mapper
 public interface AiChatRoleMapper extends BaseMapperX<AiChatRoleDO> {
 
-    default AiChatRoleDO selectFirstByPublicStatusAndStatus(Boolean publicStatus, Integer status) {
-        return selectOne(new QueryWrapperX<AiChatRoleDO>()
-                .eq("status", status)
-                .eq("public_status", publicStatus)
-                .limitN(1)
-                .orderByAsc("sort"));
-    }
-
     default PageResult<AiChatRoleDO> selectPage(AiChatRolePageReqVO reqVO) {
         return selectPage(reqVO, new LambdaQueryWrapperX<AiChatRoleDO>()
                 .likeIfPresent(AiChatRoleDO::getName, reqVO.getName())

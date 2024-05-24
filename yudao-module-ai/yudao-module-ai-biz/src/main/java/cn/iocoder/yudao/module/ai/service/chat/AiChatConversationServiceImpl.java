@@ -46,21 +46,22 @@ public class AiChatConversationServiceImpl implements AiChatConversationService 
     @Override
     public Long createChatConversationMy(AiChatConversationCreateMyReqVO createReqVO, Long userId) {
         // 1.1 获得 AiChatRoleDO 聊天角色
-        AiChatRoleDO role = createReqVO.getRoleId() != null ? chatRoleService.validateChatRole(createReqVO.getRoleId())
-                : chatRoleService.getRequiredDefaultChatRole();
-        Assert.notNull(role, "必须找到聊天角色");
+        AiChatRoleDO role = createReqVO.getRoleId() != null ? chatRoleService.validateChatRole(createReqVO.getRoleId()) : null;
         // 1.2 获得 AiChatModelDO 聊天模型
-        AiChatModelDO model = role.getModelId() != null ? chatModalService.validateChatModel(role.getModelId())
+        AiChatModelDO model = role != null && role.getModelId() != null ? chatModalService.validateChatModel(role.getModelId())
                 : chatModalService.getRequiredDefaultChatModel();
         Assert.notNull(model, "必须找到默认模型");
         validateChatModel(model);
 
         // 2. 创建 AiChatConversationDO 聊天对话
-        String title = createReqVO.getRoleId() == null ? AiChatConversationDO.TITLE_DEFAULT : role.getName();
-        AiChatConversationDO conversation = new AiChatConversationDO()
-                .setUserId(userId).setTitle(title).setPinned(false)
-                .setRoleId(role.getId()).setModelId(model.getId()).setModel(model.getModel()).setSystemMessage(role.getSystemMessage())
+        AiChatConversationDO conversation = new AiChatConversationDO().setUserId(userId).setPinned(false)
+                .setModelId(model.getId()).setModel(model.getModel())
                 .setTemperature(model.getTemperature()).setMaxTokens(model.getMaxTokens()).setMaxContexts(model.getMaxContexts());
+        if (role != null) {
+            conversation.setTitle(role.getName()).setRoleId(role.getId()).setSystemMessage(role.getSystemMessage());
+        } else {
+            conversation.setTitle(AiChatConversationDO.TITLE_DEFAULT);
+        }
         chatConversationMapper.insert(conversation);
         return conversation.getId();
     }
