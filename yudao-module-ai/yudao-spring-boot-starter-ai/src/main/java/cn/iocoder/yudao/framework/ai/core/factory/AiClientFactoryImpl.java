@@ -169,4 +169,15 @@ public class AiClientFactoryImpl implements AiClientFactory {
         return new QianWenChatClient(qianWenApi);
     }
 
+
+    private static VertexAiGeminiChatClient buildGoogleGemir(String key) {
+        List<String> keys = StrUtil.split(key, '|');
+        Assert.equals(keys.size(), 2, "VertexAiGeminiChatClient 的密钥需要 (projectId|location) 格式");
+        VertexAI vertexApi =  new VertexAI(keys.get(0), keys.get(1));
+        return new VertexAiGeminiChatClient(vertexApi,
+                VertexAiGeminiChatOptions.builder()
+                        .withTemperature(0.4F)
+                        .build());
+    }
+
 }

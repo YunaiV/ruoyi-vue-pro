@@ -21,6 +21,7 @@ public enum AiPlatformEnum {
 
     OPEN_AI_DALL("dall", "dall"),
     MIDJOURNEY("midjourney", "midjourney"),
+    GEMIR ("gemir ", "gemir "), // google gemir
 
     ;
 
