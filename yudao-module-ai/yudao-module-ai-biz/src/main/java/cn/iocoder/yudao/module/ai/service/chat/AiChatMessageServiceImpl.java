@@ -5,13 +5,17 @@ import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.ai.core.enums.AiPlatformEnum;
 import cn.iocoder.yudao.framework.ai.core.factory.AiClientFactory;
+import cn.iocoder.yudao.framework.common.exception.ErrorCode;
+import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
+import cn.iocoder.yudao.module.ai.ErrorCodeConstants;
 import cn.iocoder.yudao.module.ai.controller.admin.chat.vo.message.AiChatMessageSendRespVO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.chat.AiChatConversationDO;
 import cn.iocoder.yudao.module.ai.service.model.AiApiKeyService;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import jakarta.annotation.Resource;
+import org.reactivestreams.Publisher;
 import org.springframework.ai.chat.ChatResponse;
 import org.springframework.ai.chat.StreamingChatClient;
 import org.springframework.ai.chat.messages.*;
@@ -107,7 +111,7 @@ public class AiChatMessageServiceImpl implements AiChatMessageService {
     }
 
     @Override
-    public Flux<AiChatMessageSendRespVO> sendChatMessageStream(AiChatMessageSendReqVO sendReqVO, Long userId) {
+    public Flux<CommonResult<AiChatMessageSendRespVO>> sendChatMessageStream(AiChatMessageSendReqVO sendReqVO, Long userId) {
         // 1.1 校验对话存在
         AiChatConversationDO conversation = chatConversationService.validateExists(sendReqVO.getConversationId());
         if (ObjUtil.notEqual(conversation.getUserId(), userId)) {
@@ -145,12 +149,14 @@ public class AiChatMessageServiceImpl implements AiChatMessageService {
                     o -> o.setUserAvatar(user.getAvatar()));
             AiChatMessageSendRespVO.Message receive = BeanUtils.toBean(assistantMessage, AiChatMessageSendRespVO.Message.class,
                             o -> o.setRoleAvatar(role != null ? role.getAvatar() : null)).setContent(newContent);
-            return new AiChatMessageSendRespVO().setSend(send).setReceive(receive);
+            return CommonResult.success(new AiChatMessageSendRespVO().setSend(send).setReceive(receive));
         }).doOnComplete(() -> {
             chatMessageMapper.updateById(new AiChatMessageDO().setId(assistantMessage.getId()).setContent(contentBuffer.toString()));
         }).doOnError(throwable -> {
             log.error("[sendChatMessageStream][userId({}) sendReqVO({}) 发生异常]", userId, sendReqVO, throwable);
             chatMessageMapper.updateById(new AiChatMessageDO().setId(assistantMessage.getId()).setContent(throwable.getMessage()));
+        }).onErrorResume( error -> {
+            return Flux.just(CommonResult.error(ErrorCodeConstants.AI_CHAT_STREAM_ERROR));
         });
     }
 

@@ -32,6 +32,7 @@ public interface ErrorCodeConstants {
 
     // ========== API 聊天消息 1-040-004-000 ==========
     ErrorCode AI_CHAT_MESSAGE_NOT_EXIST = new ErrorCode(1_040_004_000, "消息不存在!");
+    ErrorCode AI_CHAT_STREAM_ERROR = new ErrorCode(1_040_004_001, "Stream 对话异常!");
 
     // midjourney
 

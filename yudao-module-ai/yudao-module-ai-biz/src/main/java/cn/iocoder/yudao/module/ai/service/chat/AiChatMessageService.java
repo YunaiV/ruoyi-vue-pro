@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.ai.service.chat;
 
+import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.module.ai.controller.admin.chat.vo.message.*;
 import cn.iocoder.yudao.module.ai.dal.dataobject.chat.AiChatMessageDO;
 import reactor.core.publisher.Flux;
@@ -28,7 +29,7 @@ public interface AiChatMessageService {
      * @param userId 用户编号
      * @return 发送结果
      */
-    Flux<AiChatMessageSendRespVO> sendChatMessageStream(AiChatMessageSendReqVO sendReqVO, Long userId);
+    Flux<CommonResult<AiChatMessageSendRespVO>> sendChatMessageStream(AiChatMessageSendReqVO sendReqVO, Long userId);
 
     /**
      * 获得指定会话的消息列表

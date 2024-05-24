@@ -58,7 +58,7 @@ public class AiChatMessageController {
     @Operation(summary = "发送消息（流式）", description = "流式返回，响应较快")
     @PostMapping(value = "/send-stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     @PermitAll // 解决 SSE 最终响应的时候，会被 Access Denied 拦截的问题
-    public Flux<AiChatMessageSendRespVO> sendChatMessageStream(@Validated @RequestBody AiChatMessageSendReqVO sendReqVO) {
+    public Flux<CommonResult<AiChatMessageSendRespVO>> sendChatMessageStream(@Validated @RequestBody AiChatMessageSendReqVO sendReqVO) {
         return chatMessageService.sendChatMessageStream(sendReqVO, getLoginUserId());
     }
 
