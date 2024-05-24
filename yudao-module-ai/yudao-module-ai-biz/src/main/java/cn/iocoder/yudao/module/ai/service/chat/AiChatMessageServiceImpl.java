@@ -136,7 +136,7 @@ public class AiChatMessageServiceImpl implements AiChatMessageService {
         // 3.3 流式返回
         // 注意：Schedulers.immediate() 目的是，避免默认 Schedulers.parallel() 并发消费 chunk 导致 SSE 响应前端会乱序问题
         StringBuffer contentBuffer = new StringBuffer();
-        return streamResponse.publishOn(Schedulers.single()).map(chunk -> {
+        return streamResponse.map(chunk -> {
             String newContent = chunk.getResult() != null ? chunk.getResult().getOutput().getContent() : null;
             newContent = StrUtil.nullToDefault(newContent, ""); // 避免 null 的 情况
             contentBuffer.append(newContent);
