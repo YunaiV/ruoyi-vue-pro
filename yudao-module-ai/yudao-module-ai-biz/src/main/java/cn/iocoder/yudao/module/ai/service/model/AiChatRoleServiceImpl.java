@@ -122,16 +122,6 @@ public class AiChatRoleServiceImpl implements AiChatRoleService {
     }
 
     @Override
-    public AiChatRoleDO getRequiredDefaultChatRole() {
-        AiChatRoleDO chatRole = chatRoleMapper.selectFirstByPublicStatusAndStatus(
-                true, CommonStatusEnum.ENABLE.getStatus());
-        if (chatRole == null) {
-            throw exception(CHAT_ROLE_DEFAULT_NOT_EXISTS);
-        }
-        return chatRole;
-    }
-
-    @Override
     public PageResult<AiChatRoleDO> getChatRolePage(AiChatRolePageReqVO pageReqVO) {
         return chatRoleMapper.selectPage(pageReqVO);
     }
