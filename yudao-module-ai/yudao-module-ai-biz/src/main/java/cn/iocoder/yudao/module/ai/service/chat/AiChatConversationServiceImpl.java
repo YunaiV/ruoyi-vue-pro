@@ -1,11 +1,13 @@
 package cn.iocoder.yudao.module.ai.service.chat;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.ObjectUtil;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
-import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.module.ai.controller.admin.chat.vo.conversation.AiChatConversationCreateMyReqVO;
+import cn.iocoder.yudao.module.ai.controller.admin.chat.vo.conversation.AiChatConversationPageReqVO;
 import cn.iocoder.yudao.module.ai.controller.admin.chat.vo.conversation.AiChatConversationUpdateMyReqVO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.chat.AiChatConversationDO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiChatModelDO;
@@ -22,6 +24,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 import static cn.iocoder.yudao.module.ai.ErrorCodeConstants.CHAT_CONVERSATION_MODEL_ERROR;
 import static cn.iocoder.yudao.module.ai.ErrorCodeConstants.CHAT_CONVERSATION_NOT_EXISTS;
 
@@ -69,7 +73,7 @@ public class AiChatConversationServiceImpl implements AiChatConversationService 
     @Override
     public void updateChatConversationMy(AiChatConversationUpdateMyReqVO updateReqVO, Long userId) {
         // 1.1 校验对话是否存在
-        AiChatConversationDO conversation = validateExists(updateReqVO.getId());
+        AiChatConversationDO conversation = validateChatConversationExists(updateReqVO.getId());
         if (ObjUtil.notEqual(conversation.getUserId(), userId)) {
             throw exception(CHAT_CONVERSATION_NOT_EXISTS);
         }
@@ -103,7 +107,7 @@ public class AiChatConversationServiceImpl implements AiChatConversationService 
     @Override
     public void deleteChatConversationMy(Long id, Long userId) {
         // 1. 校验对话是否存在
-        AiChatConversationDO conversation = validateExists(id);
+        AiChatConversationDO conversation = validateChatConversationExists(id);
         if (ObjUtil.notEqual(conversation.getUserId(), userId)) {
             throw exception(CHAT_CONVERSATION_NOT_EXISTS);
         }
@@ -119,7 +123,7 @@ public class AiChatConversationServiceImpl implements AiChatConversationService 
         throw exception(CHAT_CONVERSATION_MODEL_ERROR);
     }
 
-    public AiChatConversationDO validateExists(Long id) {
+    public AiChatConversationDO validateChatConversationExists(Long id) {
         AiChatConversationDO conversation = chatConversationMapper.selectById(id);
         if (conversation == null) {
             throw exception(CHAT_CONVERSATION_NOT_EXISTS);
@@ -128,12 +132,17 @@ public class AiChatConversationServiceImpl implements AiChatConversationService 
     }
 
     @Override
-    public void deleteMyAllExceptPinned(Long loginUserId) {
-        chatConversationMapper.delete(
-                new LambdaQueryWrapperX<AiChatConversationDO>()
-                        .eq(AiChatConversationDO::getUserId, loginUserId)
-                        .eq(AiChatConversationDO::getPinned, false)
-        );
+    public void deleteChatConversationMyByUnpinned(Long userId) {
+        List<AiChatConversationDO> list = chatConversationMapper.selectListByUserIdAndPinned(userId, false);
+        if (CollUtil.isEmpty(list)) {
+            return;
+        }
+        chatConversationMapper.deleteBatchIds(convertList(list, AiChatConversationDO::getId));
+    }
+
+    @Override
+    public PageResult<AiChatConversationDO> getChatConversationPage(AiChatConversationPageReqVO pageReqVO) {
+        return chatConversationMapper.selectChatConversationPage(pageReqVO);
     }
 
 }

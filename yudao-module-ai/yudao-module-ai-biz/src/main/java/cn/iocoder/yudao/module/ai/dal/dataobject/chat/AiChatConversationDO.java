@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 import java.util.Date;
 
 /**
- * AI Chat 会话 DO
+ * AI Chat 对话 DO
  *
  * 用户每次发起 Chat 聊天时，会创建一个 {@link AiChatConversationDO} 对象，将它的消息关联在一起
  *
@@ -45,7 +45,7 @@ public class AiChatConversationDO extends BaseDO {
     private Long userId;
 
     /**
-     * 会话标题
+     * 对话标题
      *
      * 默认由系统自动生成，可用户手动修改
      */
@@ -79,7 +79,7 @@ public class AiChatConversationDO extends BaseDO {
      */
     private String model;
 
-    // ========== 会话配置 ==========
+    // ========== 对话配置 ==========
 
     /**
      * 角色设定

@@ -5,7 +5,6 @@ import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.ai.core.enums.AiPlatformEnum;
 import cn.iocoder.yudao.framework.ai.core.factory.AiClientFactory;
-import cn.iocoder.yudao.framework.common.exception.ErrorCode;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.ai.ErrorCodeConstants;
@@ -15,7 +14,6 @@ import cn.iocoder.yudao.module.ai.service.model.AiApiKeyService;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import jakarta.annotation.Resource;
-import org.reactivestreams.Publisher;
 import org.springframework.ai.chat.ChatResponse;
 import org.springframework.ai.chat.StreamingChatClient;
 import org.springframework.ai.chat.messages.*;
@@ -34,7 +32,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Flux;
-import reactor.core.scheduler.Schedulers;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -115,7 +112,7 @@ public class AiChatMessageServiceImpl implements AiChatMessageService {
     @Override
     public Flux<CommonResult<AiChatMessageSendRespVO>> sendChatMessageStream(AiChatMessageSendReqVO sendReqVO, Long userId) {
         // 1.1 校验对话存在
-        AiChatConversationDO conversation = chatConversationService.validateExists(sendReqVO.getConversationId());
+        AiChatConversationDO conversation = chatConversationService.validateChatConversationExists(sendReqVO.getConversationId());
         if (ObjUtil.notEqual(conversation.getUserId(), userId)) {
             throw exception(CHAT_CONVERSATION_NOT_EXISTS); // TODO 芋艿：异常情况的对接；
         }
@@ -189,7 +186,7 @@ public class AiChatMessageServiceImpl implements AiChatMessageService {
      * n 组：指的是 user + assistant 形成一组
      *
      * @param messages 消息列表
-     * @param conversation 会话
+     * @param conversation 对话
      * @param sendReqVO 发送请求
      * @return 消息上下文
      */
@@ -256,6 +253,11 @@ public class AiChatMessageServiceImpl implements AiChatMessageService {
         }
         // 2. 执行删除
         chatMessageMapper.deleteBatchIds(convertList(messages, AiChatMessageDO::getId));
+    }
+
+    @Override
+    public Map<Long, Integer> getChatMessageCountMap(Collection<Long> conversationIds) {
+        return chatMessageMapper.selectCountMapByConversationId(conversationIds);
     }
 
 }

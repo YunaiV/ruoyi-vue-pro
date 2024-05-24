@@ -62,9 +62,9 @@ public class AiChatMessageController {
         return chatMessageService.sendChatMessageStream(sendReqVO, getLoginUserId());
     }
 
-    @Operation(summary = "获得指定会话的消息列表")
+    @Operation(summary = "获得指定对话的消息列表")
     @GetMapping("/list-by-conversation-id")
-    @Parameter(name = "conversationId", required = true, description = "会话编号", example = "1024")
+    @Parameter(name = "conversationId", required = true, description = "对话编号", example = "1024")
     public CommonResult<List<AiChatMessageRespVO>> getChatMessageListByConversationId(
             @RequestParam("conversationId") Long conversationId) {
         AiChatConversationDO conversation = chatConversationService.getChatConversation(conversationId);
@@ -93,12 +93,16 @@ public class AiChatMessageController {
         return success(true);
     }
 
-    @Operation(summary = "删除指定会话的消息")
+    @Operation(summary = "删除指定对话的消息")
     @DeleteMapping("/delete-by-conversation-id")
-    @Parameter(name = "conversationId", required = true, description = "会话编号", example = "1024")
+    @Parameter(name = "conversationId", required = true, description = "对话编号", example = "1024")
     public CommonResult<Boolean> deleteChatMessageByConversationId(@RequestParam("conversationId") Long conversationId) {
         chatMessageService.deleteChatMessageByConversationId(conversationId, getLoginUserId());
         return success(true);
     }
+
+    // ========== 对话管理 ==========
+
+
 
 }

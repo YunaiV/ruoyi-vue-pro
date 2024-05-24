@@ -62,7 +62,7 @@ public class AiChatModelDO extends BaseDO {
      */
     private Integer status;
 
-    // ========== 会话配置 ==========
+    // ========== 对话配置 ==========
 
     /**
      * 温度参数

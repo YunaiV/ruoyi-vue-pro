@@ -4,15 +4,15 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
-@Schema(description = "管理后台 - AI 聊天会话更新【我的】 Request VO")
+@Schema(description = "管理后台 - AI 聊天对话更新【我的】 Request VO")
 @Data
 public class AiChatConversationUpdateMyReqVO {
 
-    @Schema(description = "会话编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
-    @NotNull(message = "会话编号不能为空")
+    @Schema(description = "对话编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
+    @NotNull(message = "对话编号不能为空")
     private Long id;
 
-    @Schema(description = "会话标题", example = "我是一个标题")
+    @Schema(description = "对话标题", example = "我是一个标题")
     private String title;
 
     @Schema(description = "是否置顶", example = "true")

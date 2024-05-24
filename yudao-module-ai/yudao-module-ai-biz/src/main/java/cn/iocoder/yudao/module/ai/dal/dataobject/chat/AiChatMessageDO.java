@@ -32,7 +32,7 @@ public class AiChatMessageDO extends BaseDO {
     private Long id;
 
     /**
-     * 会话编号
+     * 对话编号
      *
      * 关联 {@link AiChatConversationDO#getId()} 字段
      */

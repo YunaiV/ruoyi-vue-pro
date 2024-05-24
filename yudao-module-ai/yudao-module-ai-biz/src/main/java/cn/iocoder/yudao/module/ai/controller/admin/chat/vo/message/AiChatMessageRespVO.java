@@ -12,7 +12,7 @@ public class AiChatMessageRespVO {
     @Schema(description = "编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     private Long id;
 
-    @Schema(description = "会话编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "2048")
+    @Schema(description = "对话编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "2048")
     private Long conversationId;
 
     @Schema(description = "消息类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "role")

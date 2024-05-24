@@ -5,7 +5,9 @@ import cn.iocoder.yudao.module.ai.controller.admin.chat.vo.message.*;
 import cn.iocoder.yudao.module.ai.dal.dataobject.chat.AiChatMessageDO;
 import reactor.core.publisher.Flux;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 /**
  * AI 聊天消息 Service 接口
@@ -32,9 +34,9 @@ public interface AiChatMessageService {
     Flux<CommonResult<AiChatMessageSendRespVO>> sendChatMessageStream(AiChatMessageSendReqVO sendReqVO, Long userId);
 
     /**
-     * 获得指定会话的消息列表
+     * 获得指定对话的消息列表
      *
-     * @param conversationId 会话编号
+     * @param conversationId 对话编号
      * @return 消息列表
      */
     List<AiChatMessageDO> getChatMessageListByConversationId(Long conversationId);
@@ -48,11 +50,19 @@ public interface AiChatMessageService {
     void deleteChatMessage(Long id, Long userId);
 
     /**
-     * 删除指定会话的消息
+     * 删除指定对话的消息
      *
-     * @param conversationId 会话编号
+     * @param conversationId 对话编号
      * @param userId 用户编号
      */
     void deleteChatMessageByConversationId(Long conversationId, Long userId);
+
+    /**
+     * 获得聊天对话的消息数量 Map
+     *
+     * @param conversationIds 对话编号数组
+     * @return 消息数量 Map
+     */
+    Map<Long, Integer> getChatMessageCountMap(Collection<Long> conversationIds);
 
 }
