@@ -106,7 +106,7 @@ public class QianWenChatClient implements ChatClient, StreamingChatClient {
                 .messages(messageList)
                 .maxTokens(chatOptions.getMaxTokens())
                 .resultFormat(QwenParam.ResultFormat.MESSAGE)
-                .topP(Double.valueOf(chatOptions.getTopP()))
+                .topP(chatOptions.getTopP() == null ? null : Double.valueOf(chatOptions.getTopP()))
                 .topK(chatOptions.getTopK())
                 .temperature(chatOptions.getTemperature())
                 // 控制流式输出模式，即后面的内容会包含已经输出的内容；设置为True，将开启增量输出模式，后面的输出不会包含已经输出的内容，您需要自行拼接整体输出

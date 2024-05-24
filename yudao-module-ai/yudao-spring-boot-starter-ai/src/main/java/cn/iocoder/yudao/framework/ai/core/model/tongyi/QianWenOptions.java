@@ -43,25 +43,14 @@ public class QianWenOptions implements ChatOptions {
         return null;
     }
 
-//    @Override
-//    public void setTemperature(Float temperature) {
-//
-//    }
-//
-//    @Override
-//    public void setTopP(Float topP) {
-//        this.topP = topP;
-//    }
-
     @Override
     public Integer getTopK() {
         return null;
     }
 
-//    @Override
-//    public void setTopK(Integer topK) {
-//
-//    }
+    public Float getTopP() {
+        return topP;
+    }
 
     @Data
     @Accessors
