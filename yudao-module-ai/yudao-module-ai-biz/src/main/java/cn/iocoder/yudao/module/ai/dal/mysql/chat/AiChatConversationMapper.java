@@ -17,11 +17,8 @@ import java.util.List;
 @Mapper
 public interface AiChatConversationMapper extends BaseMapperX<AiChatConversationDO> {
 
-    // TODO @fan：建议这里不排序哈；交给他们前端排序
     default List<AiChatConversationDO> selectListByUserId(Long userId) {
-        return selectList(new LambdaQueryWrapperX<AiChatConversationDO>()
-                .eq(AiChatConversationDO::getUserId, userId)
-                .orderByAsc(AiChatConversationDO::getCreateTime));
+        return selectList(AiChatConversationDO::getUserId, userId);
     }
 
     default List<AiChatConversationDO> selectListByUserIdAndPinned(Long userId, boolean pinned) {

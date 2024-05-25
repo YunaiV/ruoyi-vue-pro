@@ -44,13 +44,7 @@ public class AiChatMessageRespVO {
 
     // ========== 仅在【对话管理】时加载 ==========
 
-    @Schema(description = "用户头像", requiredMode = Schema.RequiredMode.REQUIRED, example = "http://xxx")
-    private String userAvatar;
-
     @Schema(description = "角色名字", example = "小黄")
     private String roleName;
-
-    @Schema(description = "角色头像", requiredMode = Schema.RequiredMode.REQUIRED, example = "https://www.iocoder.cn/1.png")
-    private String roleAvatar;
 
 }

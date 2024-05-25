@@ -6,17 +6,16 @@ import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
-import cn.iocoder.yudao.module.ai.controller.admin.chat.vo.conversation.AiChatConversationPageReqVO;
-import cn.iocoder.yudao.module.ai.controller.admin.chat.vo.conversation.AiChatConversationRespVO;
-import cn.iocoder.yudao.module.ai.controller.admin.chat.vo.message.*;
+import cn.iocoder.yudao.module.ai.controller.admin.chat.vo.message.AiChatMessagePageReqVO;
+import cn.iocoder.yudao.module.ai.controller.admin.chat.vo.message.AiChatMessageRespVO;
+import cn.iocoder.yudao.module.ai.controller.admin.chat.vo.message.AiChatMessageSendReqVO;
+import cn.iocoder.yudao.module.ai.controller.admin.chat.vo.message.AiChatMessageSendRespVO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.chat.AiChatConversationDO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.chat.AiChatMessageDO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiChatRoleDO;
 import cn.iocoder.yudao.module.ai.service.chat.AiChatConversationService;
 import cn.iocoder.yudao.module.ai.service.chat.AiChatMessageService;
 import cn.iocoder.yudao.module.ai.service.model.AiChatRoleService;
-import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
-import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -34,7 +33,6 @@ import java.util.List;
 import java.util.Map;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
-import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
 
@@ -50,9 +48,6 @@ public class AiChatMessageController {
     private AiChatConversationService chatConversationService;
     @Resource
     private AiChatRoleService chatRoleService;
-
-    @Resource
-    private AdminUserApi adminUserApi;
 
     @Operation(summary = "发送消息（段式）", description = "一次性返回，响应较慢")
     @PostMapping("/send")
@@ -77,17 +72,7 @@ public class AiChatMessageController {
             return success(Collections.emptyList());
         }
         List<AiChatMessageDO> messageList = chatMessageService.getChatMessageListByConversationId(conversationId);
-        if (CollUtil.isEmpty(messageList)) {
-            return success(Collections.emptyList());
-        }
-
-        // 拼接数据
-        Map<Long, AiChatRoleDO> roleMap = chatRoleService.getChatRoleMap(convertSet(messageList, AiChatMessageDO::getRoleId));
-        AdminUserRespDTO user = adminUserApi.getUser(getLoginUserId());
-        return success(BeanUtils.toBean(messageList, AiChatMessageRespVO.class, respVO -> {
-            MapUtils.findAndThen(roleMap, respVO.getRoleId(), role -> respVO.setRoleAvatar(role.getAvatar()));
-            respVO.setUserAvatar(user.getAvatar());
-        }));
+        return success(BeanUtils.toBean(messageList, AiChatMessageRespVO.class));
     }
 
     @Operation(summary = "删除消息")
