@@ -60,8 +60,8 @@ public class AiClientFactoryImpl implements AiClientFactory {
                     return buildXingHuoChatClient(apiKey);
                 case QIAN_WEN:
                     return buildQianWenChatClient(apiKey);
-                case GEMIR:
-                    return buildGoogleGemir(apiKey);
+//                case GEMIR:
+//                    return buildGoogleGemir(apiKey);
                 default:
                     throw new IllegalArgumentException(StrUtil.format("未知平台({})", platform));
             }
@@ -170,11 +170,11 @@ public class AiClientFactoryImpl implements AiClientFactory {
     }
 
 
-    private static VertexAiGeminiChatClient buildGoogleGemir(String key) {
-        List<String> keys = StrUtil.split(key, '|');
-        Assert.equals(keys.size(), 2, "VertexAiGeminiChatClient 的密钥需要 (projectId|location) 格式");
-        VertexAI vertexApi =  new VertexAI(keys.get(0), keys.get(1));
-        return new VertexAiGeminiChatClient(vertexApi);
-    }
+//    private static VertexAiGeminiChatClient buildGoogleGemir(String key) {
+//        List<String> keys = StrUtil.split(key, '|');
+//        Assert.equals(keys.size(), 2, "VertexAiGeminiChatClient 的密钥需要 (projectId|location) 格式");
+//        VertexAI vertexApi =  new VertexAI(keys.get(0), keys.get(1));
+//        return new VertexAiGeminiChatClient(vertexApi);
+//    }
 
 }
