@@ -152,6 +152,11 @@ spring.ai:
   openai:
     api-key: sk-yzKea6d8e8212c3bdd99f9f44ced1cae37c097e5aa3BTS7z
     base-url: https://api.gptsapi.net
+  vertex:
+    ai:
+      gemini:
+        project-id: 1 # TODO 芋艿：缺配置
+        location: 2
 
 yudao.ai:
   yiyan:
