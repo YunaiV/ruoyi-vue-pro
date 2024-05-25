@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.trade.controller.app.brokerage;
 
 import cn.hutool.core.date.LocalDateTimeUtil;
+import cn.hutool.core.util.ObjUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.security.core.annotations.PreAuthenticated;
@@ -10,6 +11,8 @@ import cn.iocoder.yudao.module.trade.controller.app.brokerage.vo.user.*;
 import cn.iocoder.yudao.module.trade.convert.brokerage.BrokerageRecordConvert;
 import cn.iocoder.yudao.module.trade.convert.brokerage.BrokerageUserConvert;
 import cn.iocoder.yudao.module.trade.dal.dataobject.brokerage.BrokerageUserDO;
+import cn.iocoder.yudao.module.trade.dal.dataobject.config.TradeConfigDO;
+import cn.iocoder.yudao.module.trade.enums.brokerage.BrokerageEnabledConditionEnum;
 import cn.iocoder.yudao.module.trade.enums.brokerage.BrokerageRecordBizTypeEnum;
 import cn.iocoder.yudao.module.trade.enums.brokerage.BrokerageRecordStatusEnum;
 import cn.iocoder.yudao.module.trade.enums.brokerage.BrokerageWithdrawStatusEnum;
@@ -17,16 +20,17 @@ import cn.iocoder.yudao.module.trade.service.brokerage.BrokerageRecordService;
 import cn.iocoder.yudao.module.trade.service.brokerage.BrokerageUserService;
 import cn.iocoder.yudao.module.trade.service.brokerage.BrokerageWithdrawService;
 import cn.iocoder.yudao.module.trade.service.brokerage.bo.BrokerageWithdrawSummaryRespBO;
+import cn.iocoder.yudao.module.trade.service.config.TradeConfigService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.annotation.Resource;
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import jakarta.annotation.Resource;
-import jakarta.validation.Valid;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.Map;
@@ -50,7 +54,8 @@ public class AppBrokerageUserController {
     private BrokerageRecordService brokerageRecordService;
     @Resource
     private BrokerageWithdrawService brokerageWithdrawService;
-
+    @Resource
+    private TradeConfigService tradeConfigService;
     @Resource
     private MemberUserApi memberUserApi;
 
@@ -59,9 +64,13 @@ public class AppBrokerageUserController {
     @PreAuthenticated
     public CommonResult<AppBrokerageUserRespVO> getBrokerageUser() {
         Optional<BrokerageUserDO> user = Optional.ofNullable(brokerageUserService.getBrokerageUser(getLoginUserId()));
+        // 获得交易中心配置
+        TradeConfigDO tradeConfig = tradeConfigService.getTradeConfig();
+        // 如果是人人分佣 BrokerageUserDO 为 null 时，也有分销资格
+        boolean brokerageEnabled = ObjUtil.equal(BrokerageEnabledConditionEnum.ALL.getCondition(), tradeConfig.getBrokerageEnabledCondition());
         // 返回数据
         AppBrokerageUserRespVO respVO = new AppBrokerageUserRespVO()
-                .setBrokerageEnabled(user.map(BrokerageUserDO::getBrokerageEnabled).orElse(false))
+                .setBrokerageEnabled(user.map(BrokerageUserDO::getBrokerageEnabled).orElse(brokerageEnabled))
                 .setBrokeragePrice(user.map(BrokerageUserDO::getBrokeragePrice).orElse(0))
                 .setFrozenPrice(user.map(BrokerageUserDO::getFrozenPrice).orElse(0));
         return success(respVO);
@@ -79,21 +88,22 @@ public class AppBrokerageUserController {
     @PreAuthenticated
     public CommonResult<AppBrokerageUserMySummaryRespVO> getBrokerageUserSummary() {
         // 查询当前登录用户信息
-        BrokerageUserDO brokerageUser = brokerageUserService.getBrokerageUser(getLoginUserId());
+        Long userId = getLoginUserId();
+        BrokerageUserDO brokerageUser = brokerageUserService.getBrokerageUser(userId);
         // 统计用户昨日的佣金
         LocalDateTime yesterday = LocalDateTime.now().minusDays(1);
         LocalDateTime beginTime = LocalDateTimeUtil.beginOfDay(yesterday);
         LocalDateTime endTime = LocalDateTimeUtil.endOfDay(yesterday);
-        Integer yesterdayPrice = brokerageRecordService.getSummaryPriceByUserId(brokerageUser.getId(),
+        Integer yesterdayPrice = brokerageRecordService.getSummaryPriceByUserId(userId,
                 BrokerageRecordBizTypeEnum.ORDER, BrokerageRecordStatusEnum.SETTLEMENT, beginTime, endTime);
         // 统计用户提现的佣金
-        Integer withdrawPrice = brokerageWithdrawService.getWithdrawSummaryListByUserId(Collections.singleton(brokerageUser.getId()),
+        Integer withdrawPrice = brokerageWithdrawService.getWithdrawSummaryListByUserId(Collections.singleton(userId),
                         BrokerageWithdrawStatusEnum.AUDIT_SUCCESS).stream()
                 .findFirst().map(BrokerageWithdrawSummaryRespBO::getPrice).orElse(0);
         // 统计分销用户数量（一级）
-        Long firstBrokerageUserCount = brokerageUserService.getBrokerageUserCountByBindUserId(brokerageUser.getId(), 1);
+        Long firstBrokerageUserCount = brokerageUserService.getBrokerageUserCountByBindUserId(userId, 1);
         // 统计分销用户数量（二级）
-        Long secondBrokerageUserCount = brokerageUserService.getBrokerageUserCountByBindUserId(brokerageUser.getId(), 2);
+        Long secondBrokerageUserCount = brokerageUserService.getBrokerageUserCountByBindUserId(userId, 2);
 
         // 拼接返回
         return success(BrokerageUserConvert.INSTANCE.convert(yesterdayPrice, withdrawPrice, firstBrokerageUserCount, secondBrokerageUserCount, brokerageUser));
