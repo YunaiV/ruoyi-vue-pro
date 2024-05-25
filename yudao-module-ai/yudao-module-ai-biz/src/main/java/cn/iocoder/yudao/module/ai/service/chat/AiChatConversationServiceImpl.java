@@ -25,7 +25,6 @@ import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
-import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 import static cn.iocoder.yudao.module.ai.ErrorCodeConstants.CHAT_CONVERSATION_MODEL_ERROR;
 import static cn.iocoder.yudao.module.ai.ErrorCodeConstants.CHAT_CONVERSATION_NOT_EXISTS;
 
@@ -108,10 +107,20 @@ public class AiChatConversationServiceImpl implements AiChatConversationService 
     public void deleteChatConversationMy(Long id, Long userId) {
         // 1. 校验对话是否存在
         AiChatConversationDO conversation = validateChatConversationExists(id);
-        if (ObjUtil.notEqual(conversation.getUserId(), userId)) {
+        if (conversation == null || ObjUtil.notEqual(conversation.getUserId(), userId)) {
             throw exception(CHAT_CONVERSATION_NOT_EXISTS);
         }
+        // 2. 执行删除
+        chatConversationMapper.deleteById(id);
+    }
 
+    @Override
+    public void deleteChatConversationByAdmin(Long id) {
+        // 1. 校验对话是否存在
+        AiChatConversationDO conversation = validateChatConversationExists(id);
+        if (conversation == null) {
+            throw exception(CHAT_CONVERSATION_NOT_EXISTS);
+        }
         // 2. 执行删除
         chatConversationMapper.deleteById(id);
     }

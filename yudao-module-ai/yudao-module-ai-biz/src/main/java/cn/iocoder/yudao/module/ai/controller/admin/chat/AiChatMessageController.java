@@ -3,8 +3,11 @@ package cn.iocoder.yudao.module.ai.controller.admin.chat;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
+import cn.iocoder.yudao.module.ai.controller.admin.chat.vo.conversation.AiChatConversationPageReqVO;
+import cn.iocoder.yudao.module.ai.controller.admin.chat.vo.conversation.AiChatConversationRespVO;
 import cn.iocoder.yudao.module.ai.controller.admin.chat.vo.message.*;
 import cn.iocoder.yudao.module.ai.dal.dataobject.chat.AiChatConversationDO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.chat.AiChatMessageDO;
@@ -21,6 +24,7 @@ import jakarta.annotation.Resource;
 import jakarta.annotation.security.PermitAll;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
@@ -30,6 +34,7 @@ import java.util.List;
 import java.util.Map;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
 
@@ -103,6 +108,28 @@ public class AiChatMessageController {
 
     // ========== 对话管理 ==========
 
+    @GetMapping("/page")
+    @Operation(summary = "获得消息分页", description = "用于【对话管理】菜单")
+    @PreAuthorize("@ss.hasPermission('ai:chat-conversation:query')")
+    public CommonResult<PageResult<AiChatMessageRespVO>> getChatMessagePage(AiChatMessagePageReqVO pageReqVO) {
+        PageResult<AiChatMessageDO> pageResult = chatMessageService.getChatMessagePage(pageReqVO);
+        if (CollUtil.isEmpty(pageResult.getList())) {
+            return success(PageResult.empty());
+        }
+        // 拼接数据
+        Map<Long, AiChatRoleDO> roleMap = chatRoleService.getChatRoleMap(
+                convertSet(pageResult.getList(), AiChatMessageDO::getRoleId));
+        return success(BeanUtils.toBean(pageResult, AiChatMessageRespVO.class,
+                respVO -> MapUtils.findAndThen(roleMap, respVO.getRoleId(), role -> respVO.setRoleName(role.getName()))));
+    }
 
+    @Operation(summary = "管理员删除消息")
+    @DeleteMapping("/delete-by-admin")
+    @Parameter(name = "id", required = true, description = "消息编号", example = "1024")
+    @PreAuthorize("@ss.hasPermission('ai:chat-message:delete')")
+    public CommonResult<Boolean> deleteChatMessageByAdmin(@RequestParam("id") Long id) {
+        chatMessageService.deleteChatMessageByAdmin(id);
+        return success(true);
+    }
 
 }

@@ -1,6 +1,8 @@
 package cn.iocoder.yudao.module.ai.service.chat;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.module.ai.controller.admin.chat.vo.conversation.AiChatConversationPageReqVO;
 import cn.iocoder.yudao.module.ai.controller.admin.chat.vo.message.*;
 import cn.iocoder.yudao.module.ai.dal.dataobject.chat.AiChatMessageDO;
 import reactor.core.publisher.Flux;
@@ -58,11 +60,26 @@ public interface AiChatMessageService {
     void deleteChatMessageByConversationId(Long conversationId, Long userId);
 
     /**
+     * 【管理员】删除消息
+     *
+     * @param id 消息编号
+     */
+    void deleteChatMessageByAdmin(Long id);
+
+    /**
      * 获得聊天对话的消息数量 Map
      *
      * @param conversationIds 对话编号数组
      * @return 消息数量 Map
      */
     Map<Long, Integer> getChatMessageCountMap(Collection<Long> conversationIds);
+
+    /**
+     * 获得聊天消息的分页
+     *
+     * @param pageReqVO 分页查询
+     * @return 聊天消息的分页
+     */
+    PageResult<AiChatMessageDO> getChatMessagePage(AiChatMessagePageReqVO pageReqVO);
 
 }

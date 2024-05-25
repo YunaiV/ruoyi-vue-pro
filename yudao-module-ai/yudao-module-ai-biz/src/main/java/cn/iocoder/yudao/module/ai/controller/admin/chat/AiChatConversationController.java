@@ -104,4 +104,13 @@ public class AiChatConversationController {
                 conversation -> conversation.setMessageCount(messageCountMap.getOrDefault(conversation.getId(), 0))));
     }
 
+    @Operation(summary = "管理员删除对话")
+    @DeleteMapping("/delete-by-admin")
+    @Parameter(name = "id", required = true, description = "对话编号", example = "1024")
+    @PreAuthorize("@ss.hasPermission('ai:chat-conversation:delete')")
+    public CommonResult<Boolean> deleteChatConversationByAdmin(@RequestParam("id") Long id) {
+        chatConversationService.deleteChatConversationByAdmin(id);
+        return success(true);
+    }
+
 }

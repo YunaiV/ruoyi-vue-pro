@@ -6,8 +6,11 @@ import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.ai.core.enums.AiPlatformEnum;
 import cn.iocoder.yudao.framework.ai.core.factory.AiClientFactory;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.ai.ErrorCodeConstants;
+import cn.iocoder.yudao.module.ai.controller.admin.chat.vo.conversation.AiChatConversationPageReqVO;
+import cn.iocoder.yudao.module.ai.controller.admin.chat.vo.message.AiChatMessagePageReqVO;
 import cn.iocoder.yudao.module.ai.controller.admin.chat.vo.message.AiChatMessageSendRespVO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.chat.AiChatConversationDO;
 import cn.iocoder.yudao.module.ai.service.model.AiApiKeyService;
@@ -256,8 +259,24 @@ public class AiChatMessageServiceImpl implements AiChatMessageService {
     }
 
     @Override
+    public void deleteChatMessageByAdmin(Long id) {
+        // 1. 校验消息存在
+        AiChatMessageDO message = chatMessageMapper.selectById(id);
+        if (message == null) {
+            throw exception(AI_CHAT_MESSAGE_NOT_EXIST);
+        }
+        // 2. 执行删除
+        chatMessageMapper.deleteById(id);
+    }
+
+    @Override
     public Map<Long, Integer> getChatMessageCountMap(Collection<Long> conversationIds) {
         return chatMessageMapper.selectCountMapByConversationId(conversationIds);
+    }
+
+    @Override
+    public PageResult<AiChatMessageDO> getChatMessagePage(AiChatMessagePageReqVO pageReqVO) {
+        return chatMessageMapper.selectPage(pageReqVO);
     }
 
 }

@@ -4,6 +4,7 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.ai.controller.admin.chat.vo.conversation.AiChatConversationCreateMyReqVO;
 import cn.iocoder.yudao.module.ai.controller.admin.chat.vo.conversation.AiChatConversationPageReqVO;
 import cn.iocoder.yudao.module.ai.controller.admin.chat.vo.conversation.AiChatConversationUpdateMyReqVO;
+import cn.iocoder.yudao.module.ai.controller.admin.chat.vo.message.AiChatMessageRespVO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.chat.AiChatConversationDO;
 
 import java.util.List;
@@ -57,6 +58,13 @@ public interface AiChatConversationService {
     void deleteChatConversationMy(Long id, Long userId);
 
     /**
+     * 【管理员】删除聊天对话
+     *
+     * @param id 编号
+     */
+    void deleteChatConversationByAdmin(Long id);
+
+    /**
      * 校验聊天对话是否存在
      *
      * @param id 编号
@@ -71,6 +79,12 @@ public interface AiChatConversationService {
      */
     void deleteChatConversationMyByUnpinned(Long userId);
 
+    /**
+     * 获得聊天对话的分页列表
+     *
+     * @param pageReqVO 分页查询
+     * @return 聊天对话的分页列表
+     */
     PageResult<AiChatConversationDO> getChatConversationPage(AiChatConversationPageReqVO pageReqVO);
 
 }

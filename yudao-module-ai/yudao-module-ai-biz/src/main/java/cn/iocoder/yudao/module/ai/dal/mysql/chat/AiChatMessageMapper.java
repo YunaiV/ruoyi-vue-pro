@@ -2,9 +2,13 @@ package cn.iocoder.yudao.module.ai.dal.mysql.chat;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.map.MapUtil;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
+import cn.iocoder.yudao.module.ai.controller.admin.chat.vo.conversation.AiChatConversationPageReqVO;
+import cn.iocoder.yudao.module.ai.controller.admin.chat.vo.message.AiChatMessagePageReqVO;
+import cn.iocoder.yudao.module.ai.dal.dataobject.chat.AiChatConversationDO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.chat.AiChatMessageDO;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import org.apache.ibatis.annotations.Mapper;
@@ -41,6 +45,15 @@ public interface AiChatMessageMapper extends BaseMapperX<AiChatMessageDO> {
         return CollectionUtils.convertMap(result,
                 record -> MapUtil.getLong(record, "conversationId"),
                 record -> MapUtil.getInt(record, "count" ));
+    }
+
+    default PageResult<AiChatMessageDO> selectPage(AiChatMessagePageReqVO pageReqVO) {
+        return selectPage(pageReqVO, new LambdaQueryWrapperX<AiChatMessageDO>()
+                .eqIfPresent(AiChatMessageDO::getConversationId, pageReqVO.getConversationId())
+                .eqIfPresent(AiChatMessageDO::getUserId, pageReqVO.getUserId())
+                .likeIfPresent(AiChatMessageDO::getContent, pageReqVO.getContent())
+                .betweenIfPresent(AiChatMessageDO::getCreateTime, pageReqVO.getCreateTime())
+                .orderByDesc(AiChatMessageDO::getId));
     }
 
 }

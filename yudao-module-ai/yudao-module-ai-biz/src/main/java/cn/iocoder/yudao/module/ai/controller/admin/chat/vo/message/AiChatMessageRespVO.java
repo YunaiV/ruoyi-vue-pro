@@ -15,6 +15,9 @@ public class AiChatMessageRespVO {
     @Schema(description = "对话编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "2048")
     private Long conversationId;
 
+    @Schema(description = "回复消息编号", example = "1024")
+    private Long replyId;
+
     @Schema(description = "消息类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "role")
     private String type; // 参见 MessageType 枚举类
 
@@ -33,14 +36,21 @@ public class AiChatMessageRespVO {
     @Schema(description = "聊天内容", requiredMode = Schema.RequiredMode.REQUIRED, example = "你好，你好啊")
     private String content;
 
+    @Schema(description = "是否携带上下文", requiredMode = Schema.RequiredMode.REQUIRED, example = "true")
+    private Boolean useContext;
+
     @Schema(description = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED, example = "2024-05-12 12:51")
     private LocalDateTime createTime;
 
-    // ========= 扩展字段
+    // ========== 仅在【对话管理】时加载 ==========
 
     @Schema(description = "用户头像", requiredMode = Schema.RequiredMode.REQUIRED, example = "http://xxx")
     private String userAvatar;
 
-    @Schema(description = "角色头像", requiredMode = Schema.RequiredMode.REQUIRED, example = "http://xxx")
+    @Schema(description = "角色名字", example = "小黄")
+    private String roleName;
+
+    @Schema(description = "角色头像", requiredMode = Schema.RequiredMode.REQUIRED, example = "https://www.iocoder.cn/1.png")
     private String roleAvatar;
+
 }
