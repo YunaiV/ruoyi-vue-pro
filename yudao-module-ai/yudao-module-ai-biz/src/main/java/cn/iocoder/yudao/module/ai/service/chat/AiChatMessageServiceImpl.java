@@ -144,6 +144,7 @@ public class AiChatMessageServiceImpl implements AiChatMessageService {
         }).doOnComplete(() -> {
             chatMessageMapper.updateById(new AiChatMessageDO().setId(assistantMessage.getId()).setContent(contentBuffer.toString()));
         }).doOnError(throwable -> {
+            // TODO @芋艿：失败的情况下，要不要删除消息
             log.error("[sendChatMessageStream][userId({}) sendReqVO({}) 发生异常]", userId, sendReqVO, throwable);
             chatMessageMapper.updateById(new AiChatMessageDO().setId(assistantMessage.getId()).setContent(throwable.getMessage()));
         }).onErrorResume(error -> {

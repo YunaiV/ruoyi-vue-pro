@@ -17,12 +17,11 @@ public enum AiPlatformEnum {
     OLLAMA("Ollama", "Ollama"),
     YI_YAN("YiYan", "文心一言"), // 百度
     XING_HUO("XingHuo", "星火"), // 讯飞
-    QIAN_WEN("qianwen", "千问"), // 阿里
+    QIAN_WEN("QianWen", "千问"), // 阿里
+    GEMIR ("gemir ", "gemir "), // 谷歌
 
-    OPEN_AI_DALL("dall", "dall"),
-    MIDJOURNEY("midjourney", "midjourney"),
-    GEMIR ("gemir ", "gemir "), // google gemir
-
+    OPEN_AI_DALL("dall", "dall"), // TODO OpenAI 提供的绘图，接入中
+    MIDJOURNEY("midjourney", "midjourney"), // TODO MJ 提供的绘图，接入中
     ;
 
     /**
