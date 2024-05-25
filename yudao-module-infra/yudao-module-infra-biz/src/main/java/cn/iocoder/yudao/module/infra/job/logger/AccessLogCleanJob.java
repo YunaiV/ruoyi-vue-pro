@@ -35,7 +35,7 @@ public class AccessLogCleanJob implements JobHandler {
     public String execute(String param) {
         Integer count = apiAccessLogService.cleanAccessLog(JOB_CLEAN_RETAIN_DAY, DELETE_LIMIT);
         log.info("[execute][定时执行清理访问日志数量 ({}) 个]", count);
-        return String.format("定时执行清理错误日志数量 %s 个", count);
+        return String.format("定时执行清理访问日志数量 %s 个", count);
     }
 
 }
