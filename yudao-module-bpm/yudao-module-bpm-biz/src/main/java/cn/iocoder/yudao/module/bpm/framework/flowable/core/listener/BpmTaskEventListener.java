@@ -2,22 +2,40 @@ package cn.iocoder.yudao.module.bpm.framework.flowable.core.listener;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.iocoder.yudao.framework.common.util.number.NumberUtils;
+import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.task.BpmTaskReturnReqVO;
+import cn.iocoder.yudao.module.bpm.enums.definition.BpmUserTaskRejectHandlerType;
+import cn.iocoder.yudao.module.bpm.enums.task.BpmTaskStatusEnum;
+import cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnModelConstants;
+import cn.iocoder.yudao.module.bpm.framework.flowable.core.util.BpmnModelUtils;
+import cn.iocoder.yudao.module.bpm.framework.flowable.core.util.FlowableUtils;
+import cn.iocoder.yudao.module.bpm.service.definition.BpmModelService;
 import cn.iocoder.yudao.module.bpm.service.task.BpmActivityService;
+import cn.iocoder.yudao.module.bpm.service.task.BpmProcessInstanceService;
 import cn.iocoder.yudao.module.bpm.service.task.BpmTaskService;
 import com.google.common.collect.ImmutableSet;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.flowable.bpmn.model.BoundaryEvent;
+import org.flowable.bpmn.model.BpmnModel;
+import org.flowable.bpmn.model.FlowElement;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEntityEvent;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.delegate.event.AbstractFlowableEngineEventListener;
 import org.flowable.engine.delegate.event.FlowableActivityCancelledEvent;
+import org.flowable.engine.delegate.event.FlowableMessageEvent;
 import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.task.api.Task;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
-import jakarta.annotation.Resource;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
+
+import static cn.iocoder.yudao.framework.web.core.util.WebFrameworkUtils.getLoginUserId;
+import static cn.iocoder.yudao.module.bpm.enums.definition.BpmBoundaryEventType.USER_TASK_REJECT_POST_PROCESS;
+import static cn.iocoder.yudao.module.bpm.framework.flowable.core.util.BpmnModelUtils.parseBoundaryEventExtensionElement;
 
 /**
  * 监听 {@link Task} 的开始与完成
@@ -34,15 +52,22 @@ public class BpmTaskEventListener extends AbstractFlowableEngineEventListener {
     @Resource
     @Lazy // 解决循环依赖
     private BpmActivityService activityService;
+    @Resource
+    @Lazy // 解决循环依赖
+    private BpmProcessInstanceService processInstanceService;
+    @Resource
+    @Lazy // 延迟加载，避免循环依赖
+    private BpmModelService bpmModelService;
 
     public static final Set<FlowableEngineEventType> TASK_EVENTS = ImmutableSet.<FlowableEngineEventType>builder()
             .add(FlowableEngineEventType.TASK_CREATED)
             .add(FlowableEngineEventType.TASK_ASSIGNED)
-//            .add(FlowableEngineEventType.TASK_COMPLETED) // 由于审批通过时，已经记录了 task 的 status 为通过，所以不需要监听了。
+            //.add(FlowableEngineEventType.TASK_COMPLETED) // 由于审批通过时，已经记录了 task 的 status 为通过，所以不需要监听了。
+            .add(FlowableEngineEventType.ACTIVITY_MESSAGE_RECEIVED)
             .add(FlowableEngineEventType.ACTIVITY_CANCELLED)
             .build();
 
-    public BpmTaskEventListener(){
+    public BpmTaskEventListener() {
         super(TASK_EVENTS);
     }
 
@@ -53,7 +78,7 @@ public class BpmTaskEventListener extends AbstractFlowableEngineEventListener {
 
     @Override
     protected void taskAssigned(FlowableEngineEntityEvent event) {
-        taskService.updateTaskExtAssign((Task)event.getEntity());
+        taskService.updateTaskExtAssign((Task) event.getEntity());
     }
 
     @Override
@@ -70,6 +95,49 @@ public class BpmTaskEventListener extends AbstractFlowableEngineEventListener {
             }
             taskService.updateTaskStatusWhenCanceled(activity.getTaskId());
         });
+    }
+
+    @Override
+    protected void activityMessageReceived(FlowableMessageEvent event) {
+        BpmnModel bpmnModel = bpmModelService.getBpmnModelByDefinitionId(event.getProcessDefinitionId());
+        FlowElement element = BpmnModelUtils.getFlowElementById(bpmnModel, event.getActivityId());
+        if (element instanceof BoundaryEvent) {
+            BoundaryEvent boundaryEvent = (BoundaryEvent) element;
+            String boundaryEventType = parseBoundaryEventExtensionElement(boundaryEvent, BpmnModelConstants.BOUNDARY_EVENT_TYPE);
+            // 如果自定义类型为拒绝后处理，进行拒绝处理
+            if (Objects.equals(USER_TASK_REJECT_POST_PROCESS.getType(), NumberUtils.parseInt(boundaryEventType))) {
+                String rejectHandlerType = parseBoundaryEventExtensionElement((BoundaryEvent) element, BpmnModelConstants.USER_TASK_REJECT_HANDLER_TYPE);
+                rejectHandler(boundaryEvent, event.getProcessInstanceId(), boundaryEvent.getAttachedToRefId(), NumberUtils.parseInt(rejectHandlerType));
+            }
+        }
+    }
+
+    private void rejectHandler(BoundaryEvent boundaryEvent, String processInstanceId, String taskDefineKey, Integer rejectHandlerType) {
+        BpmUserTaskRejectHandlerType userTaskRejectHandlerType = BpmUserTaskRejectHandlerType.typeOf(rejectHandlerType);
+        if (userTaskRejectHandlerType != null) {
+            List<Task> taskList = taskService.getAssignedTaskListByConditions(processInstanceId, null, taskDefineKey);
+            taskList.forEach(task -> {
+                Integer taskStatus = FlowableUtils.getTaskStatus(task);
+                // 只有处于拒绝状态下才处理
+                if (Objects.equals(BpmTaskStatusEnum.REJECT.getStatus(), taskStatus)) {
+                    // 终止流程
+                    if (userTaskRejectHandlerType == BpmUserTaskRejectHandlerType.TERMINATION) {
+                        processInstanceService.updateProcessInstanceReject(task.getProcessInstanceId(), FlowableUtils.getTaskReason(task));
+                        return;
+                    }
+                    // 驳回
+                    if (userTaskRejectHandlerType == BpmUserTaskRejectHandlerType.RETURN_PRE_USER_TASK) {
+                        String returnTaskId = parseBoundaryEventExtensionElement(boundaryEvent, BpmnModelConstants.USER_TASK_REJECT_RETURN_TASK_ID);
+                        if (returnTaskId != null) {
+                            BpmTaskReturnReqVO reqVO = new BpmTaskReturnReqVO().setId(task.getId())
+                                    .setTargetTaskDefinitionKey(returnTaskId)
+                                    .setReason("任务拒绝回退");
+                            taskService.returnTask(getLoginUserId(), reqVO);
+                        }
+                    }
+                }
+            });
+        }
     }
 
 }

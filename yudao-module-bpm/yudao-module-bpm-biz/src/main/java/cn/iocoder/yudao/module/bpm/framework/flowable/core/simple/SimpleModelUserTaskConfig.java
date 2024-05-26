@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.bpm.framework.flowable.core.simple;
 
+import cn.iocoder.yudao.module.bpm.enums.definition.BpmUserTaskRejectHandlerType;
 import lombok.Data;
 
 import java.util.List;
@@ -33,12 +34,15 @@ public class SimpleModelUserTaskConfig {
      */
     private  Integer approveMethod;
 
-
     /**
      * 超时处理
      */
     private TimeoutHandler timeoutHandler;
 
+    /**
+     * 用户任务拒绝处理
+     */
+    private RejectHandler rejectHandler;
 
     @Data
     public static class TimeoutHandler {
@@ -62,7 +66,20 @@ public class SimpleModelUserTaskConfig {
          * 如果执行动作是自动提醒, 最大提醒次数
          */
         private Integer maxRemindCount;
+    }
 
+    @Data
+    public static class RejectHandler {
+
+        /**
+         * 用户任务拒绝处理类型 {@link BpmUserTaskRejectHandlerType}
+         */
+        private Integer type;
+
+        /**
+         * 用户任务拒绝后驳回的节点 Id
+         */
+        private String  returnNodeId;
     }
 
 }

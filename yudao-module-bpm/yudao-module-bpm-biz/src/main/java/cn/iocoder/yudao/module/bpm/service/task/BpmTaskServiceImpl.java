@@ -9,16 +9,18 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.date.DateUtils;
 import cn.iocoder.yudao.framework.common.util.number.NumberUtils;
 import cn.iocoder.yudao.framework.common.util.object.PageUtils;
-import cn.iocoder.yudao.module.bpm.framework.flowable.core.util.BpmnModelUtils;
-import cn.iocoder.yudao.module.bpm.framework.flowable.core.util.FlowableUtils;
 import cn.iocoder.yudao.framework.web.core.util.WebFrameworkUtils;
 import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.task.*;
 import cn.iocoder.yudao.module.bpm.convert.task.BpmTaskConvert;
+import cn.iocoder.yudao.module.bpm.enums.definition.BpmBoundaryEventType;
 import cn.iocoder.yudao.module.bpm.enums.task.BpmCommentTypeEnum;
 import cn.iocoder.yudao.module.bpm.enums.task.BpmDeleteReasonEnum;
 import cn.iocoder.yudao.module.bpm.enums.task.BpmTaskSignTypeEnum;
 import cn.iocoder.yudao.module.bpm.enums.task.BpmTaskStatusEnum;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmConstants;
+import cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnModelConstants;
+import cn.iocoder.yudao.module.bpm.framework.flowable.core.util.BpmnModelUtils;
+import cn.iocoder.yudao.module.bpm.framework.flowable.core.util.FlowableUtils;
 import cn.iocoder.yudao.module.bpm.service.definition.BpmModelService;
 import cn.iocoder.yudao.module.bpm.service.message.BpmMessageService;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
@@ -26,6 +28,7 @@ import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
+import org.flowable.bpmn.model.BoundaryEvent;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.UserTask;
@@ -33,6 +36,7 @@ import org.flowable.engine.HistoryService;
 import org.flowable.engine.ManagementService;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.TaskService;
+import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.task.api.DelegationState;
 import org.flowable.task.api.Task;
@@ -245,7 +249,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
 
     /**
      * 如果父任务是有前后【加签】的任务，如果它【加签】出来的子任务都被处理，需要处理父任务：
-     *
+     * <p>
      * 1. 如果是【向前】加签，则需要重新激活父任务，让它可以被审批
      * 2. 如果是【向后】加签，则需要完成父任务，让它完成审批
      *
@@ -278,7 +282,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
             taskService.resolveTask(parentTaskId);
             // 3.1.2 更新流程任务 status
             updateTaskStatus(parentTaskId, BpmTaskStatusEnum.RUNNING.getStatus());
-        // 3.2 情况二：处理向【向后】加签
+            // 3.2 情况二：处理向【向后】加签
         } else if (BpmTaskSignTypeEnum.AFTER.getType().equals(scopeType)) {
             // 只有 parentTask 处于 APPROVING 的情况下，才可以继续 complete 完成
             // 否则，一个未审批的 parentTask 任务，在加签出来的任务都被减签的情况下，就直接完成审批，这样会存在问题
@@ -333,14 +337,29 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         taskService.addComment(task.getId(), task.getProcessInstanceId(), BpmCommentTypeEnum.REJECT.getType(),
                 BpmCommentTypeEnum.REJECT.formatComment(reqVO.getReason()));
 
-        // 3. 更新流程实例，审批不通过！
+        BpmnModel bpmnModel = bpmModelService.getBpmnModelByDefinitionId(task.getProcessDefinitionId());
+        FlowElement flowElement = BpmnModelUtils.getFlowElementById(bpmnModel, task.getTaskDefinitionKey());
+        // 寻找用户任务的自定义拒绝后处理边界事件
+        BoundaryEvent rejectBoundaryEvent = BpmnModelUtils.findCustomBoundaryEventOfUserTask((UserTask) flowElement,
+                BpmBoundaryEventType.USER_TASK_REJECT_POST_PROCESS);
+
+        if (rejectBoundaryEvent != null) {
+            Execution execution = runtimeService.createExecutionQuery().processInstanceId(task.getProcessInstanceId())
+                    .activityId(rejectBoundaryEvent.getId()).singleResult();
+            if (execution != null) {
+                // 3.1 触发消息边界事件. 进一步的处理交给 BpmTaskEventListener
+                runtimeService.messageEventReceived(BpmnModelConstants.REJECT_POST_PROCESS_MESSAGE_NAME, execution.getId());
+                return;
+            }
+        }
+        // 3.2 没有找到拒绝后处理边界事件, 更新流程实例，审批不通过！
         processInstanceService.updateProcessInstanceReject(instance.getProcessInstanceId(), reqVO.getReason());
     }
 
     /**
      * 更新流程任务的 status 状态
      *
-     * @param id    任务编号
+     * @param id     任务编号
      * @param status 状态
      */
     private void updateTaskStatus(String id, Integer status) {
@@ -350,7 +369,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
     /**
      * 更新流程任务的 status 状态、reason 理由
      *
-     * @param id 任务编号
+     * @param id     任务编号
      * @param status 状态
      * @param reason 理由（审批通过、审批不通过的理由）
      */
@@ -434,9 +453,16 @@ public class BpmTaskServiceImpl implements BpmTaskService {
     }
 
     @Override
-    public List<Task> getAssignedTaskListByConditions(String processInstanceId, String defineKey) {
-        TaskQuery taskQuery = taskService.createTaskQuery().processInstanceId(processInstanceId)
-                .taskDefinitionKey(defineKey).active().taskAssigned().includeTaskLocalVariables();
+    public List<Task> getAssignedTaskListByConditions(String processInstanceId, String executionId, String defineKey) {
+        Assert.notNull(processInstanceId, "processInstanceId 不能为空");
+        TaskQuery taskQuery = taskService.createTaskQuery().taskAssigned().processInstanceId(processInstanceId).active()
+                .includeTaskLocalVariables();
+        if (StrUtil.isNotEmpty(executionId)) {
+            taskQuery.executionId(executionId);
+        }
+        if (StrUtil.isNotEmpty(defineKey)) {
+            taskQuery.taskDefinitionKey(defineKey);
+        }
         return taskQuery.list();
     }
 
@@ -664,7 +690,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         List<Long> currentAssigneeList = convertListByFlatMap(taskList, task -> // 需要考虑 owner 的情况，因为向后加签时，它暂时没 assignee 而是 owner
                 Stream.of(NumberUtils.parseLong(task.getAssignee()), NumberUtils.parseLong(task.getOwner())));
         if (CollUtil.containsAny(currentAssigneeList, reqVO.getUserIds())) {
-            List<AdminUserRespDTO> userList = adminUserApi.getUserList( CollUtil.intersection(currentAssigneeList, reqVO.getUserIds()));
+            List<AdminUserRespDTO> userList = adminUserApi.getUserList(CollUtil.intersection(currentAssigneeList, reqVO.getUserIds()));
             throw exception(TASK_SIGN_CREATE_USER_REPEAT, String.join(",", convertList(userList, AdminUserRespDTO::getNickname)));
         }
         return taskEntity;
@@ -673,8 +699,8 @@ public class BpmTaskServiceImpl implements BpmTaskService {
     /**
      * 创建加签子任务
      *
-     * @param userIds 被加签的用户 ID
-     * @param taskEntity        被加签的任务
+     * @param userIds    被加签的用户 ID
+     * @param taskEntity 被加签的任务
      */
     private void createSignTaskList(List<String> userIds, TaskEntityImpl taskEntity) {
         if (CollUtil.isEmpty(userIds)) {
@@ -703,7 +729,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         // 2.1 向前加签，设置审批人
         if (BpmTaskSignTypeEnum.BEFORE.getType().equals(parentTask.getScopeType())) {
             task.setAssignee(assignee);
-        // 2.2 向后加签，设置 owner 不设置 assignee 是因为不能同时审批，需要等父任务完成
+            // 2.2 向后加签，设置 owner 不设置 assignee 是因为不能同时审批，需要等父任务完成
         } else {
             task.setOwner(assignee);
         }

@@ -31,14 +31,24 @@ public interface BpmnModelConstants {
     String USER_TASK_CANDIDATE_PARAM = "candidateParam";
 
     /**
+     * BPMN ExtensionElement 的扩展属性，用于标记边界事件类型
+     */
+    String BOUNDARY_EVENT_TYPE = "boundaryEventType";
+
+    /**
      * BPMN ExtensionElement 的扩展属性，用于标记用户任务超时执行动作
      */
     String USER_TASK_TIMEOUT_HANDLER_ACTION = "timeoutAction";
 
     /**
-     * BPMN ExtensionElement 的扩展属性，用于标记定时边界事件类型
+     * BPMN ExtensionElement 的扩展属性，用于标记用户任务拒绝处理类型
      */
-    String TIMER_BOUNDARY_EVENT_TYPE = "timerBoundaryEventType";
+    String USER_TASK_REJECT_HANDLER_TYPE = "rejectHandlerType";
+
+    /**
+     * BPMN ExtensionElement 的扩展属性，用于标记用户任务拒绝后的回退的任务 Id
+     */
+    String USER_TASK_REJECT_RETURN_TASK_ID = "rejectReturnTaskId";
 
     /**
      * BPMN ExtensionElement 流程表单字段权限元素, 用于标记字段权限
@@ -66,4 +76,5 @@ public interface BpmnModelConstants {
      */
     Set<Class<? extends FlowNode>> SUPPORT_CONVERT_SIMPLE_FlOW_NODES = ImmutableSet.of(UserTask.class, EndEvent.class);
 
+    String REJECT_POST_PROCESS_MESSAGE_NAME = "message_reject_post_process";
 }

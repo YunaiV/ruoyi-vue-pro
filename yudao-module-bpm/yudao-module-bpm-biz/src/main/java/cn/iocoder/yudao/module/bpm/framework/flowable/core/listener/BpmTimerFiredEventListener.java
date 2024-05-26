@@ -1,11 +1,10 @@
 package cn.iocoder.yudao.module.bpm.framework.flowable.core.listener;
 
-import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.util.number.NumberUtils;
 import cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder;
 import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.task.BpmTaskApproveReqVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.task.BpmTaskRejectReqVO;
-import cn.iocoder.yudao.module.bpm.enums.definition.BpmTimerBoundaryEventType;
+import cn.iocoder.yudao.module.bpm.enums.definition.BpmBoundaryEventType;
 import cn.iocoder.yudao.module.bpm.enums.definition.BpmUserTaskTimeoutActionEnum;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnModelConstants;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.mq.message.task.TodoTaskReminderMessage;
@@ -18,7 +17,6 @@ import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.flowable.bpmn.model.BoundaryEvent;
 import org.flowable.bpmn.model.BpmnModel;
-import org.flowable.bpmn.model.ExtensionElement;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEntityEvent;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
@@ -29,7 +27,6 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -69,23 +66,21 @@ public class BpmTimerFiredEventListener extends AbstractFlowableEngineEventListe
         // 如果是定时器边界事件
         if (element instanceof BoundaryEvent) {
             BoundaryEvent boundaryEvent = (BoundaryEvent) element;
-            ExtensionElement extensionElement = CollUtil.getFirst(boundaryEvent.getExtensionElements().get(BpmnModelConstants.TIMER_BOUNDARY_EVENT_TYPE));
-            Integer timerBoundaryEventType = NumberUtils.parseInt(Optional.ofNullable(extensionElement).map(ExtensionElement::getElementText).orElse(null));
-            BpmTimerBoundaryEventType bpmTimerBoundaryEventType = BpmTimerBoundaryEventType.typeOf(timerBoundaryEventType);
+            String  boundaryEventType = BpmnModelUtils.parseBoundaryEventExtensionElement(boundaryEvent, BpmnModelConstants.BOUNDARY_EVENT_TYPE);
+            BpmBoundaryEventType bpmTimerBoundaryEventType = BpmBoundaryEventType.typeOf(NumberUtils.parseInt(boundaryEventType));
             // 类型为用户任务超时未处理的情况
-            if (bpmTimerBoundaryEventType == BpmTimerBoundaryEventType.USER_TASK_TIMEOUT) {
-                ExtensionElement timeoutActionElement = CollUtil.getFirst(boundaryEvent.getExtensionElements().get(BpmnModelConstants.USER_TASK_TIMEOUT_HANDLER_ACTION));
-                Integer timeoutAction = NumberUtils.parseInt(Optional.ofNullable(timeoutActionElement).map(ExtensionElement::getElementText).orElse(null));
-                processUserTaskTimeout(event.getProcessInstanceId(), boundaryEvent.getAttachedToRefId(), timeoutAction);
+            if (bpmTimerBoundaryEventType == BpmBoundaryEventType.USER_TASK_TIMEOUT) {
+                String timeoutAction = BpmnModelUtils.parseBoundaryEventExtensionElement(boundaryEvent, BpmnModelConstants.USER_TASK_TIMEOUT_HANDLER_ACTION);
+                userTaskTimeoutHandler(event.getProcessInstanceId(), boundaryEvent.getAttachedToRefId(), NumberUtils.parseInt(timeoutAction));
             }
         }
     }
 
-    private void processUserTaskTimeout(String processInstanceId, String taskDefKey, Integer timeoutAction) {
+    private void userTaskTimeoutHandler(String processInstanceId, String taskDefKey, Integer timeoutAction) {
         BpmUserTaskTimeoutActionEnum userTaskTimeoutAction = BpmUserTaskTimeoutActionEnum.actionOf(timeoutAction);
         if (userTaskTimeoutAction != null) {
-            // 查询超时未处理的任务
-            List<Task> taskList = bpmTaskService.getAssignedTaskListByConditions(processInstanceId, taskDefKey);
+            // 查询超时未处理的任务 TODO 加签的情况会不会有问题 ???
+            List<Task> taskList = bpmTaskService.getAssignedTaskListByConditions(processInstanceId, null, taskDefKey);
             taskList.forEach(task -> {
                 // 自动提醒
                 if (userTaskTimeoutAction == BpmUserTaskTimeoutActionEnum.AUTO_REMINDER) {

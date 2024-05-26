@@ -90,6 +90,8 @@ public interface BpmTaskService {
      */
     void rejectTask(Long userId, @Valid BpmTaskRejectReqVO reqVO);
 
+
+
     /**
      * 将流程任务分配给指定用户
      *
@@ -129,10 +131,11 @@ public interface BpmTaskService {
 
     /**
      * 根据条件查询已经分配的用户任务列表
-     * @param processInstanceId 流程实例编号
+     * @param processInstanceId 流程实例编号，不允许为空
+     * @param executionId execution Id
      * @param taskDefineKey 任务定义 Key
      */
-    List<Task> getAssignedTaskListByConditions(String processInstanceId, String taskDefineKey);
+    List<Task> getAssignedTaskListByConditions(String processInstanceId, String executionId, String taskDefineKey);
 
     /**
      * 获取当前任务的可回退的 UserTask 集合

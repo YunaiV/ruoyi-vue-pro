@@ -14,6 +14,7 @@ import cn.iocoder.yudao.module.bpm.enums.definition.BpmSimpleModelNodeType;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnModelConstants;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.simple.SimpleModelConditionGroups;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.simple.SimpleModelUserTaskConfig;
+import cn.iocoder.yudao.module.bpm.framework.flowable.core.simple.SimpleModelUserTaskConfig.RejectHandler;
 import org.flowable.bpmn.BpmnAutoLayout;
 import org.flowable.bpmn.model.Process;
 import org.flowable.bpmn.model.*;
@@ -22,13 +23,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import static cn.iocoder.yudao.module.bpm.enums.definition.BpmBoundaryEventType.USER_TASK_REJECT_POST_PROCESS;
+import static cn.iocoder.yudao.module.bpm.enums.definition.BpmBoundaryEventType.USER_TASK_TIMEOUT;
 import static cn.iocoder.yudao.module.bpm.enums.definition.BpmSimpleModelNodeType.END_EVENT;
-import static cn.iocoder.yudao.module.bpm.enums.definition.BpmTimerBoundaryEventType.USER_TASK_TIMEOUT;
+import static cn.iocoder.yudao.module.bpm.enums.definition.BpmUserTaskRejectHandlerType.RETURN_PRE_USER_TASK;
 import static cn.iocoder.yudao.module.bpm.enums.definition.BpmUserTaskTimeoutActionEnum.AUTO_REMINDER;
 import static cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnModelConstants.*;
 import static cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.SimpleModelConstants.*;
-import static org.flowable.bpmn.constants.BpmnXMLConstants.FLOWABLE_EXTENSIONS_NAMESPACE;
-import static org.flowable.bpmn.constants.BpmnXMLConstants.FLOWABLE_EXTENSIONS_PREFIX;
+import static org.flowable.bpmn.constants.BpmnXMLConstants.*;
 
 /**
  * 仿钉钉快搭模型相关的工具方法
@@ -42,12 +44,12 @@ public class SimpleModelUtils {
     /**
      * 所有审批人同意的表达式
      */
-    public static final String ALL_APPROVE_COMPLETE_EXPRESSION = "${ nrOfCompletedInstances >= 0 }";
+    public static final String ALL_APPROVE_COMPLETE_EXPRESSION = "${ nrOfCompletedInstances >= nrOfInstances }";
 
     /**
      * 任一一名审批人同意的表达式
      */
-    public static final String ANY_OF_APPROVE_COMPLETE_EXPRESSION = "${ nrOfCompletedInstances >= nrOfInstances }";
+    public static final String ANY_OF_APPROVE_COMPLETE_EXPRESSION = "${ nrOfCompletedInstances > 0 }";
 
     /**
      * 仿钉钉流程设计模型数据结构(json) 转换成 Bpmn Model (待完善）
@@ -59,6 +61,12 @@ public class SimpleModelUtils {
      */
     public static BpmnModel convertSimpleModelToBpmnModel(String processId, String processName, BpmSimpleModelNodeVO simpleModelNode) {
         BpmnModel bpmnModel = new BpmnModel();
+        // 不加这个 解析 Message 会报 NPE 异常
+        bpmnModel.setTargetNamespace(BPMN2_NAMESPACE);
+        Message rejectPostProcessMsg = new Message();
+        rejectPostProcessMsg.setName(REJECT_POST_PROCESS_MESSAGE_NAME);
+        bpmnModel.addMessage(rejectPostProcessMsg);
+
         Process mainProcess = new Process();
         mainProcess.setId(processId);
         mainProcess.setName(processName);
@@ -214,6 +222,12 @@ public class SimpleModelUtils {
                     BoundaryEvent boundaryEvent = buildUserTaskTimerBoundaryEvent(userTask, userTaskConfig.getTimeoutHandler());
                     mainProcess.addFlowElement(boundaryEvent);
                 }
+                if (userTaskConfig.getRejectHandler() != null) {
+                    // 添加用户任务拒绝 Message Boundary Event, 用于任务的拒绝处理
+                    BoundaryEvent boundaryEvent = buildUserTaskRejectBoundaryEvent(userTask, userTaskConfig.getRejectHandler());
+                    mainProcess.addFlowElement(boundaryEvent);
+                }
+
                 break;
             }
             case COPY_TASK: {
@@ -270,10 +284,27 @@ public class SimpleModelUtils {
         }
     }
 
+    private static BoundaryEvent buildUserTaskRejectBoundaryEvent(UserTask userTask, RejectHandler rejectHandler) {
+        BoundaryEvent messageBoundaryEvent = new BoundaryEvent();
+        messageBoundaryEvent.setId("Event-" + IdUtil.fastUUID());
+        // 设置关联的任务为不会被中断
+        messageBoundaryEvent.setCancelActivity(false);
+        messageBoundaryEvent.setAttachedToRef(userTask);
+        MessageEventDefinition messageEventDefinition = new MessageEventDefinition();
+        messageEventDefinition.setMessageRef(REJECT_POST_PROCESS_MESSAGE_NAME);
+        messageBoundaryEvent.addEventDefinition(messageEventDefinition);
+        addExtensionElement(messageBoundaryEvent, BOUNDARY_EVENT_TYPE, USER_TASK_REJECT_POST_PROCESS.getType().toString());
+        addExtensionElement(messageBoundaryEvent, USER_TASK_REJECT_HANDLER_TYPE, StrUtil.toStringOrNull(rejectHandler.getType()));
+        if (Objects.equals(rejectHandler.getType(), RETURN_PRE_USER_TASK.getType())) {
+            addExtensionElement(messageBoundaryEvent, USER_TASK_REJECT_RETURN_TASK_ID, rejectHandler.getReturnNodeId());
+        }
+        return messageBoundaryEvent;
+    }
+
     private static BoundaryEvent buildUserTaskTimerBoundaryEvent(UserTask userTask, SimpleModelUserTaskConfig.TimeoutHandler timeoutHandler) {
         // 定时器边界事件
         BoundaryEvent boundaryEvent = new BoundaryEvent();
-        boundaryEvent.setId(IdUtil.fastUUID());
+        boundaryEvent.setId("Event-" + IdUtil.fastUUID());
         // 设置关联的任务为不会被中断
         boundaryEvent.setCancelActivity(false);
         boundaryEvent.setAttachedToRef(userTask);
@@ -286,7 +317,7 @@ public class SimpleModelUtils {
         }
         boundaryEvent.addEventDefinition(eventDefinition);
         // 添加定时器边界事件类型
-        addExtensionElement(boundaryEvent, TIMER_BOUNDARY_EVENT_TYPE, USER_TASK_TIMEOUT.getType().toString());
+        addExtensionElement(boundaryEvent, BOUNDARY_EVENT_TYPE, USER_TASK_TIMEOUT.getType().toString());
         // 添加超时执行动作元素
         addExtensionElement(boundaryEvent, USER_TASK_TIMEOUT_HANDLER_ACTION, StrUtil.toStringOrNull(timeoutHandler.getAction()));
         return boundaryEvent;

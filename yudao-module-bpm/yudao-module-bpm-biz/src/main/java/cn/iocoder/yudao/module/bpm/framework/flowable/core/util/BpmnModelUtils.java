@@ -5,6 +5,7 @@ import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.util.number.NumberUtils;
+import cn.iocoder.yudao.module.bpm.enums.definition.BpmBoundaryEventType;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnModelConstants;
 import org.flowable.bpmn.converter.BpmnXMLConverter;
 import org.flowable.bpmn.model.Process;
@@ -360,4 +361,32 @@ public class BpmnModelUtils {
         return userTaskList;
     }
 
+    /**
+     * 在用户任务中查找自定义的边界事件
+     *
+     * @param userTask 用户任务
+     * @param bpmBoundaryEventType 自定义的边界事件类型
+     */
+    public static BoundaryEvent findCustomBoundaryEventOfUserTask(UserTask userTask, BpmBoundaryEventType bpmBoundaryEventType) {
+        if (userTask == null) {
+            return null;
+        }
+        BoundaryEvent result = null;
+        for (BoundaryEvent item : userTask.getBoundaryEvents()) {
+            String boundaryEventType = parseBoundaryEventExtensionElement(item, BpmnModelConstants.BOUNDARY_EVENT_TYPE);
+            if (Objects.equals(bpmBoundaryEventType.getType(), NumberUtils.parseInt(boundaryEventType))) {
+                result = item;
+                break;
+            }
+        }
+        return result;
+    }
+
+    public static String parseBoundaryEventExtensionElement(BoundaryEvent boundaryEvent, String customElement) {
+        if (boundaryEvent == null) {
+            return null;
+        }
+        ExtensionElement extensionElement = CollUtil.getFirst(boundaryEvent.getExtensionElements().get(customElement));
+        return Optional.ofNullable(extensionElement).map(ExtensionElement::getElementText).orElse(null);
+    }
 }
