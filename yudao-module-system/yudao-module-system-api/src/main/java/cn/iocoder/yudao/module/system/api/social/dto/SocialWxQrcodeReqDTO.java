@@ -13,6 +13,35 @@ import lombok.Data;
 public class SocialWxQrcodeReqDTO {
 
     /**
+     * 小程序版本
+     *
+     * 正式版为 "release"；体验版为 "trial"；开发版为 "develop"
+     */
+    public static final String ENV_VERSION = "release";
+    /**
+     * 页面路径不能携带参数（参数请放在scene字段里）
+     */
+    public static final String SCENE = "";
+    /**
+     * 二维码宽度
+     */
+    public static final Integer WIDTH = 430;
+    /**
+     * 自动配置线条颜色，如果颜色依然是黑色，则说明不建议配置主色调
+     */
+    public static final Boolean AUTO_COLOR = true;
+    /**
+     * 检查 page 是否存在
+     */
+    public static final Boolean CHECK_PATH = true;
+    /**
+     * 是否需要透明底色
+     *
+     * hyaline 为 true 时，生成透明底色的小程序码
+     */
+    public static final Boolean HYALINE = true;
+
+    /**
      * 场景
      */
     @NotEmpty(message = "场景不能为空")
