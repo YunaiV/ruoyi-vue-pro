@@ -9,20 +9,11 @@ import lombok.Data;
 @Data
 public class AppSocialWxQrcodeReqVO {
 
-    // TODO @puhui999: 没有默认值 getQrcodeService().createWxaCodeUnlimitBytes() 转类型会报错 🤣
-    // TODO @puhui999：懂了哈；default 最好在 controller 搞；对于 VO 来说，不给默认值；
-    public static String ENV_VERSION = "release"; // 小程序版本。正式版为 "release"，体验版为 "trial"，开发版为 "develop"
-    private static String SCENE = ""; // 页面路径不能携带参数（参数请放在scene字段里）
-    private static Integer WIDTH = 430; // 二维码宽度
-    private static Boolean AUTO_COLOR = true; // 默认true 自动配置线条颜色，如果颜色依然是黑色，则说明不建议配置主色调
-    private static Boolean CHECK_PATH = true; // 默认true 检查 page 是否存在
-    private static Boolean HYALINE = true; // 是否需要透明底色， is_hyaline 为true时，生成透明底色的小程序码
-
     /**
      * 页面路径不能携带参数（参数请放在scene字段里）
      */
     @Schema(description = "场景值", requiredMode = Schema.RequiredMode.REQUIRED, example = "1001")
-    private String scene = SCENE;
+    private String scene;
 
     /**
      * 默认是主页，页面 page，例如 pages/index/index，根路径前不要填加 /，不能携带参数（参数请放在scene字段里），
@@ -33,15 +24,15 @@ public class AppSocialWxQrcodeReqVO {
     private String path;
 
     @Schema(description = "二维码宽度", requiredMode = Schema.RequiredMode.REQUIRED, example = "430")
-    private Integer width = WIDTH;
+    private Integer width;
 
     @Schema(description = "是/否自动配置线条颜色", requiredMode = Schema.RequiredMode.REQUIRED, example = "true")
-    private Boolean autoColor = AUTO_COLOR;
+    private Boolean autoColor;
 
     @Schema(description = "是/否检查 page 是否存在", requiredMode = Schema.RequiredMode.REQUIRED, example = "true")
-    private Boolean checkPath = CHECK_PATH;
+    private Boolean checkPath;
 
     @Schema(description = "是/否需要透明底色", requiredMode = Schema.RequiredMode.REQUIRED, example = "true")
-    private Boolean hyaline = HYALINE;
+    private Boolean hyaline;
 
 }
