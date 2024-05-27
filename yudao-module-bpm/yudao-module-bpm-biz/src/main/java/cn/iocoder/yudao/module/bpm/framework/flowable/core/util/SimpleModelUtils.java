@@ -23,10 +23,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import static cn.iocoder.yudao.module.bpm.enums.definition.BpmBoundaryEventType.USER_TASK_REJECT_POST_PROCESS;
 import static cn.iocoder.yudao.module.bpm.enums.definition.BpmBoundaryEventType.USER_TASK_TIMEOUT;
 import static cn.iocoder.yudao.module.bpm.enums.definition.BpmSimpleModelNodeType.END_EVENT;
-import static cn.iocoder.yudao.module.bpm.enums.definition.BpmUserTaskRejectHandlerType.RETURN_PRE_USER_TASK;
 import static cn.iocoder.yudao.module.bpm.enums.definition.BpmUserTaskTimeoutActionEnum.AUTO_REMINDER;
 import static cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnModelConstants.*;
 import static cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.SimpleModelConstants.*;
@@ -222,12 +220,6 @@ public class SimpleModelUtils {
                     BoundaryEvent boundaryEvent = buildUserTaskTimerBoundaryEvent(userTask, userTaskConfig.getTimeoutHandler());
                     mainProcess.addFlowElement(boundaryEvent);
                 }
-                if (userTaskConfig.getRejectHandler() != null) {
-                    // 添加用户任务拒绝 Message Boundary Event, 用于任务的拒绝处理
-                    BoundaryEvent boundaryEvent = buildUserTaskRejectBoundaryEvent(userTask, userTaskConfig.getRejectHandler());
-                    mainProcess.addFlowElement(boundaryEvent);
-                }
-
                 break;
             }
             case COPY_TASK: {
@@ -282,23 +274,6 @@ public class SimpleModelUtils {
         if (simpleModelNode.getChildNode() != null) {
             buildAndAddBpmnFlowNode(simpleModelNode.getChildNode(), mainProcess);
         }
-    }
-
-    private static BoundaryEvent buildUserTaskRejectBoundaryEvent(UserTask userTask, RejectHandler rejectHandler) {
-        BoundaryEvent messageBoundaryEvent = new BoundaryEvent();
-        messageBoundaryEvent.setId("Event-" + IdUtil.fastUUID());
-        // 设置关联的任务为不会被中断
-        messageBoundaryEvent.setCancelActivity(false);
-        messageBoundaryEvent.setAttachedToRef(userTask);
-        MessageEventDefinition messageEventDefinition = new MessageEventDefinition();
-        messageEventDefinition.setMessageRef(REJECT_POST_PROCESS_MESSAGE_NAME);
-        messageBoundaryEvent.addEventDefinition(messageEventDefinition);
-        addExtensionElement(messageBoundaryEvent, BOUNDARY_EVENT_TYPE, USER_TASK_REJECT_POST_PROCESS.getType().toString());
-        addExtensionElement(messageBoundaryEvent, USER_TASK_REJECT_HANDLER_TYPE, StrUtil.toStringOrNull(rejectHandler.getType()));
-        if (Objects.equals(rejectHandler.getType(), RETURN_PRE_USER_TASK.getType())) {
-            addExtensionElement(messageBoundaryEvent, USER_TASK_REJECT_RETURN_TASK_ID, rejectHandler.getReturnNodeId());
-        }
-        return messageBoundaryEvent;
     }
 
     private static BoundaryEvent buildUserTaskTimerBoundaryEvent(UserTask userTask, SimpleModelUserTaskConfig.TimeoutHandler timeoutHandler) {
@@ -406,7 +381,17 @@ public class SimpleModelUtils {
         addFormFieldsPermission(userTaskConfig.getFieldsPermission(), userTask);
         // 处理多实例
         processMultiInstanceLoopCharacteristics(userTaskConfig.getApproveMethod(), userTask);
+        // 添加任务被拒绝的处理元素
+        addTaskRejectElements(userTaskConfig.getRejectHandler(), userTask);
         return userTask;
+    }
+
+    private static void addTaskRejectElements(RejectHandler rejectHandler, UserTask userTask) {
+        if (rejectHandler == null) {
+            return;
+        }
+        addExtensionElement(userTask, USER_TASK_REJECT_HANDLER_TYPE, StrUtil.toStringOrNull(rejectHandler.getType()));
+        addExtensionElement(userTask, USER_TASK_REJECT_RETURN_TASK_ID, rejectHandler.getReturnNodeId());
     }
 
     private static void processMultiInstanceLoopCharacteristics(Integer approveMethod, UserTask userTask) {

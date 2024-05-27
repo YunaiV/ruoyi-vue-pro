@@ -14,7 +14,7 @@ import lombok.Getter;
 public enum BpmUserTaskRejectHandlerType {
 
     TERMINATION(1, "终止流程"),
-    RETURN_PRE_USER_TASK(2, "驳回到用户任务");
+    RETURN_PRE_USER_TASK(2, "驳回到指定任务节点");
 
     private final Integer type;
     private final String name;

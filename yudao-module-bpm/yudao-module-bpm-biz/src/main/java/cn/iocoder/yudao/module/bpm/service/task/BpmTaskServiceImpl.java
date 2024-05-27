@@ -12,13 +12,12 @@ import cn.iocoder.yudao.framework.common.util.object.PageUtils;
 import cn.iocoder.yudao.framework.web.core.util.WebFrameworkUtils;
 import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.task.*;
 import cn.iocoder.yudao.module.bpm.convert.task.BpmTaskConvert;
-import cn.iocoder.yudao.module.bpm.enums.definition.BpmBoundaryEventType;
+import cn.iocoder.yudao.module.bpm.enums.definition.BpmUserTaskRejectHandlerType;
 import cn.iocoder.yudao.module.bpm.enums.task.BpmCommentTypeEnum;
 import cn.iocoder.yudao.module.bpm.enums.task.BpmDeleteReasonEnum;
 import cn.iocoder.yudao.module.bpm.enums.task.BpmTaskSignTypeEnum;
 import cn.iocoder.yudao.module.bpm.enums.task.BpmTaskStatusEnum;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmConstants;
-import cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnModelConstants;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.util.BpmnModelUtils;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.util.FlowableUtils;
 import cn.iocoder.yudao.module.bpm.service.definition.BpmModelService;
@@ -28,7 +27,6 @@ import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
-import org.flowable.bpmn.model.BoundaryEvent;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.UserTask;
@@ -36,7 +34,6 @@ import org.flowable.engine.HistoryService;
 import org.flowable.engine.ManagementService;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.TaskService;
-import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.task.api.DelegationState;
 import org.flowable.task.api.Task;
@@ -57,6 +54,8 @@ import java.util.stream.Stream;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
 import static cn.iocoder.yudao.module.bpm.enums.ErrorCodeConstants.*;
+import static cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnModelConstants.USER_TASK_REJECT_HANDLER_TYPE;
+import static cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnModelConstants.USER_TASK_REJECT_RETURN_TASK_ID;
 
 /**
  * 流程任务实例 Service 实现类
@@ -336,23 +335,23 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         // 2.2 添加评论
         taskService.addComment(task.getId(), task.getProcessInstanceId(), BpmCommentTypeEnum.REJECT.getType(),
                 BpmCommentTypeEnum.REJECT.formatComment(reqVO.getReason()));
-
+        // 3.1 解析用户任务的拒绝处理类型
         BpmnModel bpmnModel = bpmModelService.getBpmnModelByDefinitionId(task.getProcessDefinitionId());
         FlowElement flowElement = BpmnModelUtils.getFlowElementById(bpmnModel, task.getTaskDefinitionKey());
-        // 寻找用户任务的自定义拒绝后处理边界事件
-        BoundaryEvent rejectBoundaryEvent = BpmnModelUtils.findCustomBoundaryEventOfUserTask((UserTask) flowElement,
-                BpmBoundaryEventType.USER_TASK_REJECT_POST_PROCESS);
-
-        if (rejectBoundaryEvent != null) {
-            Execution execution = runtimeService.createExecutionQuery().processInstanceId(task.getProcessInstanceId())
-                    .activityId(rejectBoundaryEvent.getId()).singleResult();
-            if (execution != null) {
-                // 3.1 触发消息边界事件. 进一步的处理交给 BpmTaskEventListener
-                runtimeService.messageEventReceived(BpmnModelConstants.REJECT_POST_PROCESS_MESSAGE_NAME, execution.getId());
-                return;
+        Integer rejectHandlerType = NumberUtils.parseInt(BpmnModelUtils.parseExtensionElement(flowElement, USER_TASK_REJECT_HANDLER_TYPE));
+        BpmUserTaskRejectHandlerType userTaskRejectHandlerType = BpmUserTaskRejectHandlerType.typeOf(rejectHandlerType);
+        // 3.2 类型为驳回到指定的任务节点
+        if (userTaskRejectHandlerType == BpmUserTaskRejectHandlerType.RETURN_PRE_USER_TASK) {
+            String returnTaskId = BpmnModelUtils.parseExtensionElement(flowElement, USER_TASK_REJECT_RETURN_TASK_ID);
+            if (returnTaskId == null) {
+                throw exception(TASK_RETURN_NOT_ASSIGN_TARGET_TASK_ID);
             }
+            BpmTaskReturnReqVO returnReq = new BpmTaskReturnReqVO().setId(task.getId()).setTargetTaskDefinitionKey(returnTaskId)
+                    .setReason(reqVO.getReason());
+            returnTask(userId, returnReq);
+            return;
         }
-        // 3.2 没有找到拒绝后处理边界事件, 更新流程实例，审批不通过！
+        // 3.3 其他情况 终止流程。 TODO 后续可能会增加处理类型
         processInstanceService.updateProcessInstanceReject(instance.getProcessInstanceId(), reqVO.getReason());
     }
 
