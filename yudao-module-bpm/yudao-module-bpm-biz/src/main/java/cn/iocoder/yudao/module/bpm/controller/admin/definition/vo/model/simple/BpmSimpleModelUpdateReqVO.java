@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.simple;
+package cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.simple;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
@@ -6,10 +6,9 @@ import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
-// TODO @芋艿：或许挪到 model 里的 simple 包
 @Schema(description = "管理后台 - 仿钉钉流程设计模型的新增/修改 Request VO")
 @Data
-public class BpmSimpleModelSaveReqVO {
+public class BpmSimpleModelUpdateReqVO {
 
     @Schema(description = "流程模型编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     @NotEmpty(message = "流程模型编号不能为空")
