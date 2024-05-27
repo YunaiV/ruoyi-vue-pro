@@ -37,8 +37,8 @@ public class AiImageController {
     }
 
     @Operation(summary = "dall2/dall3绘画", description = "openAi dall3是付费的!")
-    @PostMapping("/dallDrawing")
-    public AiImageDallDrawingRespVO dallDrawing(@Validated @RequestBody AiImageDallDrawingReqVO req) {
+    @PostMapping("/dall")
+    public AiImageDallRespVO dallDrawing(@Validated @RequestBody AiImageDallReqVO req) {
         return aiImageService.dallDrawing(req);
     }
 

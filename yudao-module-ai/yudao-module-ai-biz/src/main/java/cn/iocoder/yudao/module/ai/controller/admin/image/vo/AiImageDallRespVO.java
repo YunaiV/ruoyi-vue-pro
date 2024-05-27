@@ -15,7 +15,7 @@ import lombok.experimental.Accessors;
  */
 @Data
 @Accessors(chain = true)
-public class AiImageDallDrawingReqVO {
+public class AiImageDallRespVO {
 
     @Schema(description = "提示词")
     @NotNull(message = "提示词不能为空!")
@@ -24,14 +24,24 @@ public class AiImageDallDrawingReqVO {
 
     @Schema(description = "模型")
     @NotNull(message = "模型不能为空")
-    private String modal;
+    private String model;
 
-    @Schema(description = "图像生成的风格。可为vivid（生动）或natural（自然)")
-    @NotNull(message = "图像生成的风格，不能为空!")
+    @Schema(description = "风格")
     private String style;
 
-    @Schema(description = "生成图像的尺寸大小。对于dall-e-2模型，尺寸可为256x256, 512x512, 或 1024x1024。对于dall-e-3模型，尺寸可为1024x1024, 1792x1024, 或 1024x1792。")
-    @NotNull(message = "size不能为空!")
+    @Schema(description = "图片size 1024x1024 ...")
     private String size;
+
+    @Schema(description = "图片地址(自己服务器)")
+    private String picUrl;
+
+    @Schema(description = "可以访问图像的URL。")
+    private String originalPicUrl;
+
+    @Schema(description = "图片base64。")
+    private String base64;
+
+    @Schema(description = "错误信息。")
+    private String errorMessage;
 
 }

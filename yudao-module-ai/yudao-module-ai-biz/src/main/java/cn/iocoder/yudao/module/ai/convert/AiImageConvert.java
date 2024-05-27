@@ -1,8 +1,8 @@
 package cn.iocoder.yudao.module.ai.convert;
 
 import org.springframework.ai.models.midjourney.MidjourneyMessage;
-import cn.iocoder.yudao.module.ai.controller.admin.image.vo.AiImageDallDrawingReqVO;
-import cn.iocoder.yudao.module.ai.controller.admin.image.vo.AiImageDallDrawingRespVO;
+import cn.iocoder.yudao.module.ai.controller.admin.image.vo.AiImageDallReqVO;
+import cn.iocoder.yudao.module.ai.controller.admin.image.vo.AiImageDallRespVO;
 import cn.iocoder.yudao.module.ai.controller.admin.image.vo.AiImageListRespVO;
 import cn.iocoder.yudao.module.ai.controller.admin.image.vo.AiImageMidjourneyOperationsVO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.image.AiImageDO;
@@ -29,7 +29,7 @@ public interface AiImageConvert {
      * @param req
      * @return
      */
-    AiImageDallDrawingRespVO convertAiImageDallDrawingRespVO(AiImageDallDrawingReqVO req);
+    AiImageDallRespVO convertAiImageDallDrawingRespVO(AiImageDallReqVO req);
 
     /**
      * 转换 - AiImageListRespVO

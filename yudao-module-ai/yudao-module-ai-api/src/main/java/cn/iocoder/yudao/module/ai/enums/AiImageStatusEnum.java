@@ -12,7 +12,7 @@ import lombok.Getter;
  */
 @AllArgsConstructor
 @Getter
-public enum AiImageDrawingStatusEnum {
+public enum AiImageStatusEnum {
 
     SUBMIT("submit", "提交任务"),
     WAITING("waiting", "等待"),
@@ -27,8 +27,8 @@ public enum AiImageDrawingStatusEnum {
     private String name;
 
 
-    public static AiImageDrawingStatusEnum valueOfStatus(String status) {
-        for (AiImageDrawingStatusEnum itemEnum : AiImageDrawingStatusEnum.values()) {
+    public static AiImageStatusEnum valueOfStatus(String status) {
+        for (AiImageStatusEnum itemEnum : AiImageStatusEnum.values()) {
             if (itemEnum.getStatus().equals(status)) {
                 return itemEnum;
             }

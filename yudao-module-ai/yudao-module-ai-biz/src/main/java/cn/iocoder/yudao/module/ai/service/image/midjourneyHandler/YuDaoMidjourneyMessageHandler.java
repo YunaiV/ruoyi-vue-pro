@@ -11,7 +11,7 @@ import cn.iocoder.yudao.module.ai.controller.admin.image.vo.AiImageMidjourneyOpe
 import cn.iocoder.yudao.module.ai.convert.AiImageConvert;
 import cn.iocoder.yudao.module.ai.dal.dataobject.image.AiImageDO;
 import cn.iocoder.yudao.module.ai.dal.mysql.image.AiImageMapper;
-import cn.iocoder.yudao.module.ai.enums.AiImageDrawingStatusEnum;
+import cn.iocoder.yudao.module.ai.enums.AiImageStatusEnum;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -67,8 +67,8 @@ public class YuDaoMidjourneyMessageHandler implements MidjourneyMessageHandler {
         String errorMessage = getErrorMessage(midjourneyMessage);
         aiImageMapper.updateByMjNonce(nonceId,
                 new AiImageDO()
-                        .setDrawingErrorMessage(errorMessage)
-                        .setDrawingStatus(AiImageDrawingStatusEnum.FAIL.getStatus())
+                        .setErrorMessage(errorMessage)
+                        .setStatus(AiImageStatusEnum.FAIL.getStatus())
         );
     }
 
@@ -90,22 +90,22 @@ public class YuDaoMidjourneyMessageHandler implements MidjourneyMessageHandler {
             imageUrl = midjourneyMessage.getAttachments().get(0).getUrl();
         }
         // 转换状态
-        AiImageDrawingStatusEnum drawingStatusEnum = null;
+        AiImageStatusEnum drawingStatusEnum = null;
         String generateStatus = midjourneyMessage.getGenerateStatus();
         if (MidjourneyGennerateStatusEnum.COMPLETED.getStatus().equals(generateStatus)) {
-            drawingStatusEnum = AiImageDrawingStatusEnum.COMPLETE;
+            drawingStatusEnum = AiImageStatusEnum.COMPLETE;
         } else if (MidjourneyGennerateStatusEnum.IN_PROGRESS.getStatus().equals(generateStatus)) {
-            drawingStatusEnum = AiImageDrawingStatusEnum.IN_PROGRESS;
+            drawingStatusEnum = AiImageStatusEnum.IN_PROGRESS;
         } else if (MidjourneyGennerateStatusEnum.WAITING.getStatus().equals(generateStatus)) {
-            drawingStatusEnum = AiImageDrawingStatusEnum.WAITING;
+            drawingStatusEnum = AiImageStatusEnum.WAITING;
         }
         // 获取 midjourneyOperations
         List<AiImageMidjourneyOperationsVO> midjourneyOperations = getMidjourneyOperationsList(midjourneyMessage);
         // 更新数据库
         aiImageMapper.updateByMjNonce(nonceId,
                 new AiImageDO()
-                        .setDrawingImageUrl(imageUrl)
-                        .setDrawingStatus(drawingStatusEnum == null ? null : drawingStatusEnum.getStatus())
+                        .setOriginalPicUrl(imageUrl)
+                        .setStatus(drawingStatusEnum == null ? null : drawingStatusEnum.getStatus())
                         .setMjNonceId(midjourneyMessage.getId())
                         .setMjOperations(JsonUtils.toJsonString(midjourneyOperations))
         );

@@ -22,7 +22,7 @@ import cn.iocoder.yudao.module.ai.controller.admin.image.vo.*;
 import cn.iocoder.yudao.module.ai.convert.AiImageConvert;
 import cn.iocoder.yudao.module.ai.dal.dataobject.image.AiImageDO;
 import cn.iocoder.yudao.module.ai.dal.mysql.image.AiImageMapper;
-import cn.iocoder.yudao.module.ai.enums.AiImageDrawingStatusEnum;
+import cn.iocoder.yudao.module.ai.enums.AiImageStatusEnum;
 import jakarta.annotation.PostConstruct;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -85,12 +85,12 @@ public class AiImageServiceImpl implements AiImageService {
     }
 
     @Override
-    public AiImageDallDrawingRespVO dallDrawing(AiImageDallDrawingReqVO req) {
+    public AiImageDallRespVO dallDrawing(AiImageDallReqVO req) {
         // 获取 model
-        OpenAiImageModelEnum openAiImageModelEnum = OpenAiImageModelEnum.valueOfModel(req.getModal());
+        OpenAiImageModelEnum openAiImageModelEnum = OpenAiImageModelEnum.valueOfModel(req.getModel());
         OpenAiImageStyleEnum openAiImageStyleEnum = OpenAiImageStyleEnum.valueOfStyle(req.getStyle());
         // 转换 AiImageDallDrawingRespVO
-        AiImageDallDrawingRespVO respVO = AiImageConvert.INSTANCE.convertAiImageDallDrawingRespVO(req);
+        AiImageDallRespVO respVO = AiImageConvert.INSTANCE.convertAiImageDallDrawingRespVO(req);
         try {
             // 转换openai 参数
             OpenAiImageOptions openAiImageOptions = new OpenAiImageOptions();
@@ -101,17 +101,17 @@ public class AiImageServiceImpl implements AiImageService {
             // 发送
             ImageGeneration imageGeneration = imageResponse.getResult();
             // 保存数据库
-            doSave(req.getPrompt(), req.getSize(), req.getModal(),
-                    imageGeneration.getOutput().getUrl(), AiImageDrawingStatusEnum.COMPLETE, null,
+            doSave(req.getPrompt(), req.getSize(), req.getModel(),
+                    imageGeneration.getOutput().getUrl(), AiImageStatusEnum.COMPLETE, null,
                     null, null, null);
             // 返回 flex
-            respVO.setUrl(imageGeneration.getOutput().getUrl());
+            respVO.setOriginalPicUrl(imageGeneration.getOutput().getUrl());
             respVO.setBase64(imageGeneration.getOutput().getB64Json());
             return respVO;
         } catch (AiException aiException) {
             // 保存数据库
-            doSave(req.getPrompt(), req.getSize(), req.getModal(),
-                    null, AiImageDrawingStatusEnum.FAIL, aiException.getMessage(),
+            doSave(req.getPrompt(), req.getSize(), req.getModel(),
+                    null, AiImageStatusEnum.FAIL, aiException.getMessage(),
                     null, null, null);
             // 发送错误信息
             respVO.setErrorMessage(aiException.getMessage());
@@ -125,7 +125,7 @@ public class AiImageServiceImpl implements AiImageService {
         // 保存数据库
         String messageId = String.valueOf(IdUtil.getSnowflakeNextId());
         AiImageDO aiImageDO = doSave(req.getPrompt(), null, "midjoureny",
-                null, AiImageDrawingStatusEnum.SUBMIT, null,
+                null, AiImageStatusEnum.SUBMIT, null,
                 messageId, null, null);
         // 提交 midjourney 任务
         Boolean imagine = midjourneyInteractionsApi.imagine(messageId, req.getPrompt());
@@ -148,8 +148,8 @@ public class AiImageServiceImpl implements AiImageService {
         // 获取 mjOperationName
         String mjOperationName = midjourneyOperationsVO.getLabel();
         // 保存一个 image 任务记录
-        doSave(aiImageDO.getPrompt(), aiImageDO.getSize(), aiImageDO.getModal(),
-                null, AiImageDrawingStatusEnum.SUBMIT, null,
+        doSave(aiImageDO.getPrompt(), aiImageDO.getSize(), aiImageDO.getModel(),
+                null, AiImageStatusEnum.SUBMIT, null,
                 req.getMessageId(), req.getOperateId(), mjOperationName);
         // 提交操作
         midjourneyInteractionsApi.reRoll(
@@ -201,9 +201,9 @@ public class AiImageServiceImpl implements AiImageService {
     private AiImageDO doSave(String prompt,
                              String size,
                              String model,
-                             String drawingImageUrl,
-                             AiImageDrawingStatusEnum drawingStatusEnum,
-                             String drawingErrorMessage,
+                             String originalPicUrl,
+                             AiImageStatusEnum statusEnum,
+                             String errorMessage,
                              String mjMessageId,
                              String mjOperationId,
                              String mjOperationName) {
@@ -213,13 +213,13 @@ public class AiImageServiceImpl implements AiImageService {
         aiImageDO.setId(null);
         aiImageDO.setPrompt(prompt);
         aiImageDO.setSize(size);
-        aiImageDO.setModal(model);
+        aiImageDO.setModel(model);
         aiImageDO.setUserId(loginUserId);
         // TODO @芋艿 如何上传到自己服务器
-        aiImageDO.setImageUrl(null);
-        aiImageDO.setDrawingStatus(drawingStatusEnum.getStatus());
-        aiImageDO.setDrawingImageUrl(drawingImageUrl);
-        aiImageDO.setDrawingErrorMessage(drawingErrorMessage);
+        aiImageDO.setPicUrl(null);
+        aiImageDO.setStatus(statusEnum.getStatus());
+        aiImageDO.setOriginalPicUrl(originalPicUrl);
+        aiImageDO.setErrorMessage(errorMessage);
         //
         aiImageDO.setMjNonceId(mjMessageId);
         aiImageDO.setMjOperationId(mjOperationId);

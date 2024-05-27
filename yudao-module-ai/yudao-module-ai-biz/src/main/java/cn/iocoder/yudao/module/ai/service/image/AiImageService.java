@@ -3,8 +3,6 @@ package cn.iocoder.yudao.module.ai.service.image;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.ai.controller.admin.image.vo.*;
 
-import java.util.List;
-
 /**
  * ai 作图
  *
@@ -27,7 +25,7 @@ public interface AiImageService {
      *
      * @param req
      */
-    AiImageDallDrawingRespVO dallDrawing(AiImageDallDrawingReqVO req);
+    AiImageDallRespVO dallDrawing(AiImageDallReqVO req);
 
     /**
      * midjourney 图片生成
