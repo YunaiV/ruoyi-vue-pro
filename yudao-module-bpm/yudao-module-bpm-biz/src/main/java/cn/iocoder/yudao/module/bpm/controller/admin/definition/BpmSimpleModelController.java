@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
-// TODO @芋艿：后续考虑下，怎么放这个 Controller
+// TODO @jason：融合到 BpmModelController 中，url 是 /bpm/model/simple/... 这样，通过一个子目录区分；目的是：逻辑更聚焦！
 @Tag(name = "管理后台 - BPM 仿钉钉流程设计器")
 @RestController
 @RequestMapping("/bpm/simple")

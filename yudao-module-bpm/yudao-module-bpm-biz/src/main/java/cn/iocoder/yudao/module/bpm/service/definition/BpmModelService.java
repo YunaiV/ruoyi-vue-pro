@@ -46,7 +46,6 @@ public interface BpmModelService {
      */
     byte[] getModelBpmnXML(String id);
 
-
     /**
      * 保存流程模型的 BPMN XML
      *
@@ -106,5 +105,14 @@ public interface BpmModelService {
      * @return BPMN Model
      */
     BpmnModel getBpmnModelByDefinitionId(String processDefinitionId);
+
+    // ========== 仿钉钉/飞书的精简模型 =========
+
+    // TODO @jason：使用 ========== 仿钉钉/飞书的精简模型 ========= 分隔下；把相关的 controller、service 懂合并了；另外，vo 可以挪到 model/simple 这样的形式；
+
+    // TODO @jason：BpmSimpleModelServiceImpl 迁移到这里，搞成 updateSimpleModel(BpmSimpleModelUpdateReqVO reqVO)
+    // TODO @jason：BpmSimpleModelServiceImpl 迁移到这里，搞成 getSimpleModel；
+
+    // TODO @jason：另外个问题，因为是存储到 modelExtra 里，那需要 deploy 存储出快照。和 bpmn xml 一样。目前我想到的，就是存储到 BpmProcessDefinitionInfoDO 加一个 simple_model 字段，text 类型。可以看看还有啥方案？
 
 }
