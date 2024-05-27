@@ -231,7 +231,7 @@ public class BpmModelServiceImpl implements BpmModelService {
             throw exception(MODEL_NOT_EXISTS);
         }
         // 1.2 JSON 转换成 bpmnModel
-        BpmnModel bpmnModel = SimpleModelUtils.convertSimpleModelToBpmnModel(model.getKey(), model.getName(), reqVO.getSimpleModelBody());
+        BpmnModel bpmnModel = SimpleModelUtils.buildBpmnModel(model.getKey(), model.getName(), reqVO.getSimpleModelBody());
         // 2.1 保存 Bpmn XML
         saveModelBpmnXml(model.getId(), StrUtil.utf8Bytes(BpmnModelUtils.getBpmnXml(bpmnModel)));
         // 2.2 保存 JSON 数据
