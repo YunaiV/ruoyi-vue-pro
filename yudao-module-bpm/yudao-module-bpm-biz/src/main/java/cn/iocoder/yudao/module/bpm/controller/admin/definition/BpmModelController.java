@@ -8,6 +8,8 @@ import cn.iocoder.yudao.framework.common.util.io.IoUtils;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.*;
+import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.simple.BpmSimpleModelNodeVO;
+import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.simple.BpmSimpleModelUpdateReqVO;
 import cn.iocoder.yudao.module.bpm.convert.definition.BpmModelConvert;
 import cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmCategoryDO;
 import cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmFormDO;
@@ -143,6 +145,23 @@ public class BpmModelController {
     public CommonResult<Boolean> deleteModel(@RequestParam("id") String id) {
         modelService.deleteModel(id);
         return success(true);
+    }
+
+    // ========== 仿钉钉/飞书的精简模型 =========
+
+    @GetMapping("/simple/get")
+    @Operation(summary = "获得仿钉钉流程设计模型")
+    @Parameter(name = "modelId", description = "流程模型编号", required = true, example = "a2c5eee0-eb6c-11ee-abf4-0c37967c420a")
+    public CommonResult<BpmSimpleModelNodeVO> getSimpleModel(@RequestParam("modelId") String modelId){
+        return success(modelService.getSimpleModel(modelId));
+    }
+
+    @PostMapping("/simple/update")
+    @Operation(summary = "保存仿钉钉流程设计模型")
+    @PreAuthorize("@ss.hasPermission('bpm:model:update')")
+    public CommonResult<Boolean> updateSimpleModel(@Valid @RequestBody BpmSimpleModelUpdateReqVO reqVO) {
+        modelService.updateSimpleModel(reqVO);
+        return success(Boolean.TRUE);
     }
 
 }

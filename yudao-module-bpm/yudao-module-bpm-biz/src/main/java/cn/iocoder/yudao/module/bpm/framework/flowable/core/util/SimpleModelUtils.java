@@ -7,7 +7,7 @@ import cn.hutool.core.lang.TypeReference;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.*;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
-import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.simple.BpmSimpleModelNodeVO;
+import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.simple.BpmSimpleModelNodeVO;
 import cn.iocoder.yudao.module.bpm.enums.definition.BpmApproveMethodEnum;
 import cn.iocoder.yudao.module.bpm.enums.definition.BpmSimpleModeConditionType;
 import cn.iocoder.yudao.module.bpm.enums.definition.BpmSimpleModelNodeType;
@@ -59,11 +59,6 @@ public class SimpleModelUtils {
      */
     public static BpmnModel convertSimpleModelToBpmnModel(String processId, String processName, BpmSimpleModelNodeVO simpleModelNode) {
         BpmnModel bpmnModel = new BpmnModel();
-        // 不加这个 解析 Message 会报 NPE 异常
-        bpmnModel.setTargetNamespace(BPMN2_NAMESPACE);
-        Message rejectPostProcessMsg = new Message();
-        rejectPostProcessMsg.setName(REJECT_POST_PROCESS_MESSAGE_NAME);
-        bpmnModel.addMessage(rejectPostProcessMsg);
 
         Process mainProcess = new Process();
         mainProcess.setId(processId);

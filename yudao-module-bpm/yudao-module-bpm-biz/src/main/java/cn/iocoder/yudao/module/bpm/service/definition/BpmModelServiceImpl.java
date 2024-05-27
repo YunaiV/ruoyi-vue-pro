@@ -9,12 +9,15 @@ import cn.iocoder.yudao.framework.common.util.validation.ValidationUtils;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.BpmModelCreateReqVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.BpmModelPageReqVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.BpmModelUpdateReqVO;
+import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.simple.BpmSimpleModelNodeVO;
+import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.simple.BpmSimpleModelUpdateReqVO;
 import cn.iocoder.yudao.module.bpm.convert.definition.BpmModelConvert;
 import cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmFormDO;
 import cn.iocoder.yudao.module.bpm.enums.definition.BpmModelFormTypeEnum;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.candidate.BpmTaskCandidateInvoker;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.util.BpmnModelUtils;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.util.FlowableUtils;
+import cn.iocoder.yudao.module.bpm.framework.flowable.core.util.SimpleModelUtils;
 import cn.iocoder.yudao.module.bpm.service.definition.dto.BpmModelMetaInfoRespDTO;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
@@ -208,6 +211,33 @@ public class BpmModelServiceImpl implements BpmModelService {
     public BpmnModel getBpmnModelByDefinitionId(String processDefinitionId) {
         return repositoryService.getBpmnModel(processDefinitionId);
     }
+
+    @Override
+    public BpmSimpleModelNodeVO getSimpleModel(String modelId) {
+        Model model = getModel(modelId);
+        if (model == null) {
+            throw exception(MODEL_NOT_EXISTS);
+        }
+        // 通过 ACT_RE_MODEL 表 EDITOR_SOURCE_EXTRA_VALUE_ID_  获取 仿钉钉快搭模型的JSON 数据
+        byte[] jsonBytes = getModelSimpleJson(model.getId());
+        return JsonUtils.parseObject(jsonBytes, BpmSimpleModelNodeVO.class);
+    }
+
+    @Override
+    public void updateSimpleModel(BpmSimpleModelUpdateReqVO reqVO) {
+        // 1.1 校验流程模型存在
+        Model model = getModel(reqVO.getModelId());
+        if (model == null) {
+            throw exception(MODEL_NOT_EXISTS);
+        }
+        // 1.2 JSON 转换成 bpmnModel
+        BpmnModel bpmnModel = SimpleModelUtils.convertSimpleModelToBpmnModel(model.getKey(), model.getName(), reqVO.getSimpleModelBody());
+        // 2.1 保存 Bpmn XML
+        saveModelBpmnXml(model.getId(), StrUtil.utf8Bytes(BpmnModelUtils.getBpmnXml(bpmnModel)));
+        // 2.2 保存 JSON 数据
+        saveModelSimpleJson(model.getId(), JsonUtils.toJsonByte(reqVO.getSimpleModelBody()));
+    }
+
 
     /**
      * 校验流程表单已配置
