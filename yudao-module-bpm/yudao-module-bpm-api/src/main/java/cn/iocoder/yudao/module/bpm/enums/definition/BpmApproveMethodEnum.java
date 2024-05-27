@@ -15,9 +15,9 @@ import lombok.Getter;
 public enum BpmApproveMethodEnum {
 
     SINGLE_PERSON_APPROVE(1, "单人审批"),
-    ALL_APPROVE(2, "多人会签(需所有审批人同意)"),
-    ANY_OF_APPROVE(3, "多人或签(一名审批人同意即可)"),
-    SEQUENTIAL_APPROVE(4, "依次审批");
+    ALL_APPROVE(2, "多人会签(需所有审批人同意)"), // 会签
+    ANY_OF_APPROVE(3, "多人或签(一名审批人同意即可)"), // 或签
+    SEQUENTIAL_APPROVE(4, "依次审批"); // 依次审批
 
     /**
      * 审批方式
@@ -31,4 +31,5 @@ public enum BpmApproveMethodEnum {
     public static BpmApproveMethodEnum valueOf(Integer method) {
         return ArrayUtil.firstMatch(item -> item.getMethod().equals(method), values());
     }
+
 }
