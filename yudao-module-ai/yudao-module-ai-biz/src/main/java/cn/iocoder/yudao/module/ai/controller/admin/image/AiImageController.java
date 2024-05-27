@@ -32,8 +32,8 @@ public class AiImageController {
 
     @Operation(summary = "获取image列表", description = "dall3、midjourney")
     @GetMapping("/list")
-    public PageResult<AiImageListRespVO> list(@Validated @RequestBody AiImageListReqVO req) {
-        return aiImageService.list(req);
+    public CommonResult<PageResult<AiImageListRespVO>> list(@Validated @ModelAttribute AiImageListReqVO req) {
+        return CommonResult.success(aiImageService.list(req));
     }
 
     @Operation(summary = "dall2/dall3绘画", description = "openAi dall3是付费的!")

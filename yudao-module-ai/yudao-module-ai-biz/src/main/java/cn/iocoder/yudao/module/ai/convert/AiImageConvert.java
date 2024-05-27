@@ -29,6 +29,14 @@ public interface AiImageConvert {
      * @param req
      * @return
      */
+    AiImageDallRespVO convertAiImageDallDrawingRespVO(AiImageDO req);
+
+    /**
+     * 转换 - AiImageDallDrawingRespVO
+     *
+     * @param req
+     * @return
+     */
     AiImageDallRespVO convertAiImageDallDrawingRespVO(AiImageDallReqVO req);
 
     /**
