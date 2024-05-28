@@ -39,6 +39,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+// TODO @fan：注释优化下哈
 /**
  * ai 作图
  *
@@ -51,14 +52,23 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 public class AiImageServiceImpl implements AiImageService {
 
+    // TODO @fan：使用 @Resource 注入
+
+    // TODO @fan：imageMapper
     private final AiImageMapper aiImageMapper;
+
     private final FileApi fileApi;
+
     private final OpenAiImageClient openAiImageClient;
+
     private final MidjourneyWebSocketStarter midjourneyWebSocketStarter;
+
     private final MidjourneyInteractionsApi midjourneyInteractionsApi;
+
     private static ThreadPoolExecutor EXECUTOR = new ThreadPoolExecutor(
             3, 5, 1, TimeUnit.HOURS, new LinkedBlockingQueue<>(32));
 
+    // TODO @fan：接 mj proxy
     @PostConstruct
     public void startMidjourney() {
         log.info("midjourney web socket starter...");
@@ -75,6 +85,7 @@ public class AiImageServiceImpl implements AiImageService {
         });
     }
 
+    // TODO @fan：1）分页，然后 loginUser 通过参数传入，这样 Service 无状态；2）另外，返回 DO；VO 的翻译，交给 Controller；3：还有，使用 BeanUtils 替代哈
     @Override
     public PageResult<AiImageListRespVO> list(AiImageListReqVO req) {
         // 获取登录用户
@@ -92,29 +103,33 @@ public class AiImageServiceImpl implements AiImageService {
         return result;
     }
 
+    // TODO @fan：1）返回 DO；VO 的翻译，交给 Controller；2）还有，使用 BeanUtils 替代哈
     @Override
     public AiImageListRespVO get(Long id) {
         AiImageDO aiImageDO = aiImageMapper.selectById(id);
         return AiImageConvert.INSTANCE.convertAiImageListRespVO(aiImageDO);
     }
 
+    // TODO @fan：1）loginUserId 通过 controller 传入；
     @Override
     public AiImageDallRespVO dallDrawing(AiImageDallReqVO req) {
         Long loginUserId = SecurityFrameworkUtils.getLoginUserId();
         // 保存数据库
+        // TODO @fan：1）使用 BeanUtils；2）使用链式调用哈；
         AiImageDO aiImageDO = AiImageConvert.INSTANCE.convertAiImageDO(req);
         aiImageDO.setStatus(AiImageStatusEnum.IN_PROGRESS.getStatus());
         aiImageDO.setUserId(loginUserId);
         aiImageMapper.insert(aiImageDO);
         // 异步执行
+        // TODO @fan：使用 @Async 去调用哈；
         EXECUTOR.execute(() -> {
             try {
-
                 // 获取 model
                 OpenAiImageModelEnum openAiImageModelEnum = OpenAiImageModelEnum.valueOfModel(req.getModel());
                 OpenAiImageStyleEnum openAiImageStyleEnum = OpenAiImageStyleEnum.valueOfStyle(req.getStyle());
 
                 // 转换openai 参数
+                // TODO @fan：需要考虑，不同平台，参数不同；
                 OpenAiImageOptions openAiImageOptions = new OpenAiImageOptions();
                 openAiImageOptions.setModel(openAiImageModelEnum.getModel());
                 openAiImageOptions.setStyle(openAiImageStyleEnum.getStyle());
@@ -125,23 +140,16 @@ public class AiImageServiceImpl implements AiImageService {
                 // 图片保存到服务器
                 String filePath = fileApi.createFile(HttpUtil.downloadBytes(imageGeneration.getOutput().getUrl()));
                 // 更新数据库
-                aiImageMapper.updateById(
-                        new AiImageDO()
-                                .setId(aiImageDO.getId())
-                                .setStatus(AiImageStatusEnum.COMPLETE.getStatus())
-                                .setPicUrl(filePath)
-                                .setOriginalPicUrl(imageGeneration.getOutput().getUrl())
+                aiImageMapper.updateById(new AiImageDO().setId(aiImageDO.getId()).setStatus(AiImageStatusEnum.COMPLETE.getStatus())
+                        .setPicUrl(filePath).setOriginalPicUrl(imageGeneration.getOutput().getUrl())
                 );
             } catch (AiException aiException) {
-                // 更新错误信息
-                aiImageMapper.updateById(
-                        new AiImageDO()
-                                .setId(aiImageDO.getId())
-                                .setStatus(AiImageStatusEnum.FAIL.getStatus())
-                                .setErrorMessage(aiException.getMessage())
-                );
+                // TODO @fan：错误日志，也打印下哈；因为 aiException.getMessage() 比较精简；
+                aiImageMapper.updateById(new AiImageDO().setId(aiImageDO.getId()).setStatus(AiImageStatusEnum.FAIL.getStatus())
+                        .setErrorMessage(aiException.getMessage()));
             }
         });
+        // TODO @fan：返回 id 就可以啦
         // 转换 AiImageDallDrawingRespVO
         return AiImageConvert.INSTANCE.convertAiImageDallDrawingRespVO(aiImageDO);
     }
@@ -188,6 +196,7 @@ public class AiImageServiceImpl implements AiImageService {
         );
     }
 
+    // TODO @fan：1）需要校验存在；2）需要校验属于我；
     @Override
     public void delete(Long id) {
         // 校验记录是否存在

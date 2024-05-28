@@ -11,6 +11,7 @@ import org.mapstruct.factory.Mappers;
 
 import java.util.List;
 
+// TODO @fan：convert 可以考虑去掉，使用 BeanUtils.copy 替代
 /**
  * ai image convert
  *

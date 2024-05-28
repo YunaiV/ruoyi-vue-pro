@@ -29,6 +29,8 @@ public class AiImageDO extends BaseDO {
     @Schema(description = "提示词")
     private String prompt;
 
+    // TODO @fan：要加一个平台字段；platform；因为一个平台，会有多种 model 模型；
+
     @Schema(description = "模型 dall2/dall3、MJ、NIJI")
     private String model;
 
