@@ -21,6 +21,14 @@ public interface AiImageService {
     PageResult<AiImageListRespVO> list(AiImageListReqVO req);
 
     /**
+     * 获取 - image 信息
+     *
+     * @param id
+     * @return
+     */
+    AiImageListRespVO get(Long id);
+
+    /**
      * ai绘画 - dall2/dall3 绘画
      *
      * @param req

@@ -93,6 +93,12 @@ public class AiImageServiceImpl implements AiImageService {
     }
 
     @Override
+    public AiImageListRespVO get(Long id) {
+        AiImageDO aiImageDO = aiImageMapper.selectById(id);
+        return AiImageConvert.INSTANCE.convertAiImageListRespVO(aiImageDO);
+    }
+
+    @Override
     public AiImageDallRespVO dallDrawing(AiImageDallReqVO req) {
         // 保存数据库
         AiImageDO aiImageDO = doSave(req.getPrompt(), req.getSize(), req.getModel(),

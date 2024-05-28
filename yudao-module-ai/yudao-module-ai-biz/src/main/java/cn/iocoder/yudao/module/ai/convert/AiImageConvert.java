@@ -48,6 +48,14 @@ public interface AiImageConvert {
     List<AiImageListRespVO> convertAiImageListRespVO(List<AiImageDO> list);
 
     /**
+     * 转换 - AiImageListRespVO
+     *
+     * @param aiImageDO
+     * @return
+     */
+    AiImageListRespVO convertAiImageListRespVO(AiImageDO aiImageDO);
+
+    /**
      * 转换 - AiImageMidjourneyOperationsVO
      *
      * @param component

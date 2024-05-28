@@ -36,6 +36,12 @@ public class AiImageController {
         return CommonResult.success(aiImageService.list(req));
     }
 
+    @Operation(summary = "获取image信息", description = "获取image信息")
+    @GetMapping("/get")
+    public CommonResult<AiImageListRespVO> get(@RequestParam("id") Long id) {
+        return CommonResult.success(aiImageService.get(id));
+    }
+
     @Operation(summary = "dall2/dall3绘画", description = "openAi dall3是付费的!")
     @PostMapping("/dall")
     public AiImageDallRespVO dallDrawing(@Validated @RequestBody AiImageDallReqVO req) {
