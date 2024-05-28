@@ -6,6 +6,7 @@ import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
+// TODO @jason：需要考虑，如果某个节点的配置不正确，需要有提示；具体怎么实现，可以讨论下；
 @Schema(description = "管理后台 - 仿钉钉流程设计模型的新增/修改 Request VO")
 @Data
 public class BpmSimpleModelUpdateReqVO {
@@ -14,6 +15,7 @@ public class BpmSimpleModelUpdateReqVO {
     @NotEmpty(message = "流程模型编号不能为空")
     private String modelId; // 对应 Flowable act_re_model 表 ID_ 字段
 
+    // TODO @jason：simpleModel 要不？
     @Schema(description = "仿钉钉流程设计模型对象", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "仿钉钉流程设计模型对象不能为空")
     @Valid

@@ -92,11 +92,13 @@ public class SimpleModelUtils {
 
     private static void buildAndAddBpmnSequenceFlow(Process mainProcess, BpmSimpleModelNodeVO node, String targetId) {
         // 节点为 null 或者 为END_EVENT 退出
+        // TODO @jason：isValidNode；然后把 END_NODE 是不是拿到  switch (nodeType) { 那 return 哈？这样出口更统一一点？
         if (node == null || node.getId() == null || END_NODE.getType().equals(node.getType())) {
             return;
         }
         BpmSimpleModelNodeVO childNode = node.getChildNode();
         // 如果是网关分支节点. 后续节点可能为 null。但不是 END_EVENT 节点
+        // TODO @芋艿：这个要不要挪到 START_NODE - INCLUSIVE_BRANCH_JOIN_NODE 待定；感觉 switch 那最终是分三个情况；branch、子节点、结束了；（每种情况的注释，需要写的更完整）
         if (!BpmSimpleModelNodeType.isBranchNode(node.getType()) && (childNode == null || childNode.getId() == null)) {
             SequenceFlow sequenceFlow = buildBpmnSequenceFlow(node.getId(), targetId, null, null, null);
             mainProcess.addFlowElement(sequenceFlow);
@@ -104,6 +106,7 @@ public class SimpleModelUtils {
         }
         BpmSimpleModelNodeType nodeType = BpmSimpleModelNodeType.valueOf(node.getType());
         Assert.notNull(nodeType, "模型节点类型不支持");
+        // TODO @jason：下面的 PARALLEL_BRANCH_FORK_NODE、CONDITION_BRANCH_NODE、INCLUSIVE_BRANCH_FORK_NODE 是不是就是 isBranchNode？如果是的话，貌似不用 swtich，而是 if else 分类处理呢。
         switch (nodeType) {
             case START_NODE:
             case APPROVE_NODE:
@@ -119,17 +122,24 @@ public class SimpleModelUtils {
             case PARALLEL_BRANCH_FORK_NODE:
             case CONDITION_BRANCH_NODE:
             case INCLUSIVE_BRANCH_FORK_NODE: {
+                // TODO @jason：这里 sequenceFlowTargetId 不建议做这样的 default。万一可能有 bug 哈；直接弄到对应的 136- 146 会更安全一点。
                 String sequenceFlowTargetId = (childNode == null || childNode.getId() == null) ? targetId : childNode.getId();
                 List<BpmSimpleModelNodeVO> conditionNodes = node.getConditionNodes();
                 Assert.notEmpty(conditionNodes, "网关节点的条件节点不能为空");
                 for (BpmSimpleModelNodeVO item : conditionNodes) {
+                    // 构建表达式
+                    // TODO @jason：条件分支的情况下，需要分 item 搞的条件，和 conditionNodes 搞的条件
                     String conditionExpression = buildConditionExpression(item);
+
                     BpmSimpleModelNodeVO nextNodeOnCondition = item.getChildNode();
+                    // TODO @jason：isValidNode
                     if (nextNodeOnCondition != null && nextNodeOnCondition.getId() != null) {
+                        // TODO @jason：会存在 item.name 未空的情况么？这个时候，要不要兜底处理拼接
                         SequenceFlow sequenceFlow = buildBpmnSequenceFlow(node.getId(), nextNodeOnCondition.getId(),
                                 item.getId(), item.getName(), conditionExpression);
                         mainProcess.addFlowElement(sequenceFlow);
                         // 递归调用后续节点
+                        // TODO @jason：最好也有个例子，嘿嘿；S4
                         buildAndAddBpmnSequenceFlow(mainProcess, nextNodeOnCondition, sequenceFlowTargetId);
                     } else {
                         SequenceFlow sequenceFlow = buildBpmnSequenceFlow(node.getId(), sequenceFlowTargetId,
@@ -137,7 +147,7 @@ public class SimpleModelUtils {
                         mainProcess.addFlowElement(sequenceFlow);
                     }
                 }
-                // 递归调用后续节点
+                // 递归调用后续节点 TODO @jason：最好有个例子哈
                 buildAndAddBpmnSequenceFlow(mainProcess, childNode, targetId);
                 break;
             }
@@ -188,6 +198,9 @@ public class SimpleModelUtils {
     }
 
     private static SequenceFlow buildBpmnSequenceFlow(String sourceId, String targetId, String seqFlowId, String seqName, String conditionExpression) {
+        // TODO @jason：最好断言下，sourceId、targetId 必须存在！
+        // TODO @jason：如果 seqFlowId 不存在的时候，是不是要生成一个默认的 seqFlowId？
+        // TODO @jason：如果 name 不存在的时候，是不是要生成一个默认的 name？
         SequenceFlow sequenceFlow = new SequenceFlow(sourceId, targetId);
         if (StrUtil.isNotEmpty(conditionExpression)) {
             sequenceFlow.setConditionExpression(conditionExpression);

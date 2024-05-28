@@ -30,6 +30,7 @@ public enum BpmSimpleModelNodeType implements IntArrayValuable {
     PARALLEL_BRANCH_JOIN_NODE(6, "并行分支聚合节点"),
     INCLUSIVE_BRANCH_FORK_NODE(7, "包容网关分叉节点"),
     INCLUSIVE_BRANCH_JOIN_NODE(8, "包容网关聚合节点"),
+    // TODO @jason：建议整合 join，最终只有 条件分支、并行分支、包容分支，三种~
     ;
 
     public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(BpmSimpleModelNodeType::getType).toArray();
@@ -43,7 +44,8 @@ public enum BpmSimpleModelNodeType implements IntArrayValuable {
      * @param type 节点类型
      */
     public static boolean isBranchNode(Integer type) {
-        return Objects.equals(CONDITION_BRANCH_NODE.getType(), type) || Objects.equals(PARALLEL_BRANCH_FORK_NODE.getType(), type)
+        return Objects.equals(CONDITION_BRANCH_NODE.getType(), type)
+                || Objects.equals(PARALLEL_BRANCH_FORK_NODE.getType(), type)
                 || Objects.equals(INCLUSIVE_BRANCH_FORK_NODE.getType(), type) ;
     }
 
