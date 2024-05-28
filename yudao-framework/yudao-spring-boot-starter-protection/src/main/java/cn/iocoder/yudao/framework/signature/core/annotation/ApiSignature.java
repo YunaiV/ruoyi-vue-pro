@@ -3,6 +3,7 @@ package cn.iocoder.yudao.framework.signature.core.annotation;
 import cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants;
 
 import java.lang.annotation.*;
+import java.util.concurrent.TimeUnit;
 
 
 /**
@@ -14,12 +15,17 @@ import java.lang.annotation.*;
 @Documented
 @Target({ElementType.METHOD, ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
-public @interface Signature {
+public @interface ApiSignature {
 
     /**
-     * 同一个请求多长时间内有效 默认 10分钟
+     * 同一个请求多长时间内有效 默认 60 秒
      */
-    long expireTime() default 600000L;
+    int timeout() default 60;
+
+    /**
+     * 时间单位，默认为 SECONDS 秒
+     */
+    TimeUnit timeUnit() default TimeUnit.SECONDS;
 
     // ========================== 签名参数 ==========================
 
@@ -50,8 +56,4 @@ public @interface Signature {
      */
     String sign() default "sign";
 
-    /**
-     * url 客户端不需要传递，但是可以用来加签(如： /{id} 带有动态参数的 url ，如果没有动态参数可设置为 false 不进行加签)
-     */
-    boolean urlEnable() default true;
 }

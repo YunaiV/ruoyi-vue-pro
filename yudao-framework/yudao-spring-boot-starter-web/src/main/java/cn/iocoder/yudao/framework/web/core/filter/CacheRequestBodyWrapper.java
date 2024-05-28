@@ -23,10 +23,6 @@ public class CacheRequestBodyWrapper extends HttpServletRequestWrapper {
      */
     private final byte[] body;
 
-    public byte[] getBody() {
-        return body;
-    }
-
     public CacheRequestBodyWrapper(HttpServletRequest request) {
         super(request);
         body = ServletUtils.getBodyBytes(request);

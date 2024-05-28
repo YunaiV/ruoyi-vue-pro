@@ -1,12 +1,13 @@
 package cn.iocoder.yudao.framework.signature.core.aop;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.crypto.SignUtil;
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants;
 import cn.iocoder.yudao.framework.common.util.servlet.ServletUtils;
-import cn.iocoder.yudao.framework.signature.core.annotation.Signature;
+import cn.iocoder.yudao.framework.signature.core.annotation.ApiSignature;
 import cn.iocoder.yudao.framework.signature.core.redis.SignatureRedisDAO;
 import cn.iocoder.yudao.framework.web.core.filter.CacheRequestBodyWrapper;
 import jakarta.servlet.http.HttpServletRequest;
@@ -15,7 +16,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
-import org.springframework.util.Assert;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
@@ -25,7 +25,7 @@ import java.util.TreeMap;
 import java.util.concurrent.TimeUnit;
 
 /**
- * 拦截声明了 {@link Signature} 注解的方法，实现签名
+ * 拦截声明了 {@link ApiSignature} 注解的方法，实现签名
  *
  * @author Zhougang
  */
@@ -37,9 +37,9 @@ public class SignatureAspect {
     private final SignatureRedisDAO signatureRedisDAO;
 
     @Before("@annotation(signature)")
-    public void beforePointCut(JoinPoint joinPoint, Signature signature) {
+    public void beforePointCut(JoinPoint joinPoint, ApiSignature signature) {
         if (!verifySignature(signature, Objects.requireNonNull(ServletUtils.getRequest()))) {
-            log.info("[beforePointCut][方法{} 参数({}) 签名失败]", joinPoint.getSignature().toString(),
+            log.error("[beforePointCut][方法{} 参数({}) 签名失败]", joinPoint.getSignature().toString(),
                     joinPoint.getArgs());
             String message = StrUtil.blankToDefault(signature.message(),
                     GlobalErrorCodeConstants.BAD_REQUEST.getMsg());
@@ -47,25 +47,22 @@ public class SignatureAspect {
         }
     }
 
-    private boolean verifySignature(Signature signature, HttpServletRequest request) {
+    private boolean verifySignature(ApiSignature signature, HttpServletRequest request) {
         if (!verifyHeaders(signature, request)) {
             return false;
         }
         // 校验 appId 是否能获取到对应的 appSecret
         String appId = request.getHeader(signature.appId());
         String appSecret = signatureRedisDAO.getAppSecret(appId);
-        Assert.notNull(appSecret, "找不到对应的 appSecret");
+        Assert.notNull(appSecret, "[appId({})] 找不到对应的 appSecret", appId);
         // 请求头
         SortedMap<String, String> headersMap = getRequestHeaders(signature, request);
-        // 如：/user/{id} url 带有动态参数的情况
-        String urlParams = signature.urlEnable() ? request.getServletPath() : "";
         // 请求参数
         String requestParams = getRequestParams(request);
         // 请求体
-        String requestBody = getRequestBody(request);
+        String requestBody = ServletUtils.isJsonRequest(request) ? ServletUtils.getBody(request) : "";
         // 生成服务端签名
-        String serverSignature = SignUtil.signParamsSha256(headersMap,
-                urlParams + requestParams + requestBody + appSecret);
+        String serverSignature = SignUtil.signParamsSha256(headersMap, requestParams + requestBody + appSecret);
         // 客户端签名
         String clientSignature = request.getHeader(signature.sign());
         if (!StrUtil.equals(clientSignature, serverSignature)) {
@@ -73,7 +70,7 @@ public class SignatureAspect {
         }
         String nonce = headersMap.get(signature.nonce());
         // 将 nonce 记入缓存，防止重复使用（重点二：此处需要将 ttl 设定为允许 timestamp 时间差的值 x 2 ）
-        signatureRedisDAO.setNonce(nonce, signature.expireTime(), TimeUnit.MILLISECONDS);
+        signatureRedisDAO.setNonce(nonce, signature.timeout() * 2L, signature.timeUnit());
         return true;
     }
 
@@ -87,7 +84,7 @@ public class SignatureAspect {
      * @param signature signature
      * @param request   request
      */
-    private boolean verifyHeaders(Signature signature, HttpServletRequest request) {
+    private boolean verifyHeaders(ApiSignature signature, HttpServletRequest request) {
         String appId = request.getHeader(signature.appId());
         if (StrUtil.isBlank(appId)) {
             return false;
@@ -97,7 +94,7 @@ public class SignatureAspect {
             return false;
         }
         String nonce = request.getHeader(signature.nonce());
-        if (StrUtil.isBlank(nonce) || nonce.length() < 10) {
+        if (StrUtil.isBlank(nonce) || StrUtil.length(nonce) < 10) {
             return false;
         }
         String sign = request.getHeader(signature.sign());
@@ -105,7 +102,7 @@ public class SignatureAspect {
             return false;
         }
         // 其他合法性校验
-        long expireTime = signature.expireTime();
+        long expireTime = signature.timeUnit().toMillis(signature.timeout());
         long requestTimestamp = Long.parseLong(timestamp);
         // 检查 timestamp 是否超出允许的范围 （重点一：此处需要取绝对值）
         long timestampDisparity = Math.abs(System.currentTimeMillis() - requestTimestamp);
@@ -122,7 +119,7 @@ public class SignatureAspect {
      * @param request request
      * @return signature params
      */
-    private SortedMap<String, String> getRequestHeaders(Signature signature, HttpServletRequest request) {
+    private SortedMap<String, String> getRequestHeaders(ApiSignature signature, HttpServletRequest request) {
         SortedMap<String, String> sortedMap = new TreeMap<>();
         sortedMap.put(signature.appId(), request.getHeader(signature.appId()));
         sortedMap.put(signature.timestamp(), request.getHeader(signature.timestamp()));
@@ -152,18 +149,6 @@ public class SignatureAspect {
             queryString.append("&").append(entry.getKey()).append("=").append(entry.getValue());
         }
         return queryString.substring(1);
-    }
-
-    /**
-     * 获取请求体参数
-     *
-     * @param request request
-     * @return body
-     */
-    private String getRequestBody(HttpServletRequest request) {
-        CacheRequestBodyWrapper requestWrapper = new CacheRequestBodyWrapper(request);
-        // 获取 body
-        return new String(requestWrapper.getBody(), StandardCharsets.UTF_8);
     }
 
 }

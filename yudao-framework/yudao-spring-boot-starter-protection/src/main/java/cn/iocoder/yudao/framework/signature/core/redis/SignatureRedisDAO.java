@@ -42,8 +42,7 @@ public class SignatureRedisDAO {
     }
 
     public void setNonce(String nonce, long time, TimeUnit timeUnit) {
-        // 将 nonce 记入缓存，防止重复使用（重点二：此处需要将 ttl 设定为允许 timestamp 时间差的值 x 2 ）
-        stringRedisTemplate.opsForValue().set(formatNonceKey(nonce), nonce, time * 2, timeUnit);
+        stringRedisTemplate.opsForValue().set(formatNonceKey(nonce), nonce, time, timeUnit);
     }
 
     private static String formatAppIdKey(String key) {
