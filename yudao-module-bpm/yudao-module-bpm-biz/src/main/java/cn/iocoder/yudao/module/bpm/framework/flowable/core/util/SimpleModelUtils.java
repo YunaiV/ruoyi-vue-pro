@@ -25,7 +25,7 @@ import java.util.Map;
 import java.util.Objects;
 
 import static cn.iocoder.yudao.module.bpm.enums.definition.BpmBoundaryEventType.USER_TASK_TIMEOUT;
-import static cn.iocoder.yudao.module.bpm.enums.definition.BpmSimpleModelNodeType.END_EVENT;
+import static cn.iocoder.yudao.module.bpm.enums.definition.BpmSimpleModelNodeType.END_NODE;
 import static cn.iocoder.yudao.module.bpm.enums.definition.BpmUserTaskTimeoutActionEnum.AUTO_REMINDER;
 import static cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnModelConstants.*;
 import static cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.SimpleModelConstants.*;
@@ -63,10 +63,10 @@ public class SimpleModelUtils {
      */
     public static BpmnModel buildBpmnModel(String processId, String processName, BpmSimpleModelNodeVO simpleModelNode) {
         BpmnModel bpmnModel = new BpmnModel();
+        // 不加这个 解析 Message 会报 NPE 异常 .
         bpmnModel.setTargetNamespace(BPMN2_NAMESPACE); // TODO @jason：待定：是不是搞个自定义的 namespace；
         // TODO 芋艿：后续在 review
         // @芋艿 这个 Message 可以去掉 暂时用不上
-        // 不加这个 解析 Message 会报 NPE 异常 .
         Message rejectPostProcessMsg = new Message();
         rejectPostProcessMsg.setName(REJECT_POST_PROCESS_MESSAGE_NAME);
         bpmnModel.addMessage(rejectPostProcessMsg);
@@ -92,7 +92,7 @@ public class SimpleModelUtils {
 
     private static void buildAndAddBpmnSequenceFlow(Process mainProcess, BpmSimpleModelNodeVO node, String targetId) {
         // 节点为 null 或者 为END_EVENT 退出
-        if (node == null || node.getId() == null || END_EVENT.getType().equals(node.getType())) {
+        if (node == null || node.getId() == null || END_NODE.getType().equals(node.getType())) {
             return;
         }
         BpmSimpleModelNodeVO childNode = node.getChildNode();
@@ -105,20 +105,20 @@ public class SimpleModelUtils {
         BpmSimpleModelNodeType nodeType = BpmSimpleModelNodeType.valueOf(node.getType());
         Assert.notNull(nodeType, "模型节点类型不支持");
         switch (nodeType) {
-            case START_EVENT:
-            case USER_TASK:
-            case COPY_TASK:
-            case PARALLEL_GATEWAY_JOIN:
-            case INCLUSIVE_GATEWAY_JOIN: {
+            case START_NODE:
+            case APPROVE_NODE:
+            case COPY_NODE:
+            case PARALLEL_BRANCH_JOIN_NODE:
+            case INCLUSIVE_BRANCH_JOIN_NODE: {
                 SequenceFlow sequenceFlow = buildBpmnSequenceFlow(node.getId(), childNode.getId(), null, null, null);
                 mainProcess.addFlowElement(sequenceFlow);
                 // 递归调用后续节点
                 buildAndAddBpmnSequenceFlow(mainProcess, childNode, targetId);
                 break;
             }
-            case PARALLEL_GATEWAY_FORK:
-            case EXCLUSIVE_GATEWAY:
-            case INCLUSIVE_GATEWAY_FORK: {
+            case PARALLEL_BRANCH_FORK_NODE:
+            case CONDITION_BRANCH_NODE:
+            case INCLUSIVE_BRANCH_FORK_NODE: {
                 String sequenceFlowTargetId = (childNode == null || childNode.getId() == null) ? targetId : childNode.getId();
                 List<BpmSimpleModelNodeVO> conditionNodes = node.getConditionNodes();
                 Assert.notEmpty(conditionNodes, "网关节点的条件节点不能为空");
@@ -238,55 +238,50 @@ public class SimpleModelUtils {
     private static List<FlowElement> buildFlowNode(BpmSimpleModelNodeVO node, BpmSimpleModelNodeType nodeType) {
         List<FlowElement> list = new ArrayList<>();
         switch (nodeType) {
-            case START_EVENT: {
+            case START_NODE: {
                 // TODO-DONE @jason：每个 nodeType，buildXXX 方法要不更明确，并且去掉 Bpmn；
-                StartEvent startEvent = buildStartEvent(node);
+                // @芋艿 改成 convert 是不是好理解一点
+                StartEvent startEvent = convertStartNode(node);
                 list.add(startEvent);
                 break;
             }
-            case USER_TASK: {
-                // TODO @jason：这个，搞成一个 buildUserTask，然后把下面这 2 种节点，搞在一起实现类；这样 buildNode 里面可以更简洁；
-                // TODO @jason：这里还有个想法，是不是可以所有的都叫 buildXXXNode，然后里面有一些是 bpmn 相关的构建，叫做 buildBpmnUserTask，用于区分；
-                // 获取用户任务的配置
-                SimpleModelUserTaskConfig userTaskConfig = BeanUtil.toBean(node.getAttributes(), SimpleModelUserTaskConfig.class);
-                UserTask userTask = buildBpmnUserTask(node, userTaskConfig);
-                list.add(userTask);
-                if (userTaskConfig.getTimeoutHandler() != null && userTaskConfig.getTimeoutHandler().getEnable()) {
-                    // 添加用户任务的 Timer Boundary Event, 用于任务的超时处理
-                    BoundaryEvent boundaryEvent = buildUserTaskTimerBoundaryEvent(userTask, userTaskConfig.getTimeoutHandler());
-                    //process.addFlowElement(boundaryEvent);
-                    list.add(boundaryEvent);
-                }
+            case APPROVE_NODE: {
+                // TODO-DONE @jason：这个，搞成一个 buildUserTask，然后把下面这 2 种节点，搞在一起实现类；这样 buildNode 里面可以更简洁；
+                // TODO-DONE @jason：这里还有个想法，是不是可以所有的都叫 buildXXXNode，然后里面有一些是 bpmn 相关的构建，叫做 buildBpmnUserTask，用于区分；
+                // @芋艿 改成 convertXXXNode, ， 方面里面使用 buildBpmnXXXNode. 是否更好理解
+                // 转换审批节点
+                List<FlowElement> flowElements = convertApproveNode(node);
+                list.addAll(flowElements);
                 break;
             }
-            case COPY_TASK: {
-                ServiceTask serviceTask = buildServiceTask(node);
+            case COPY_NODE: {
+                ServiceTask serviceTask = convertCopyNode(node);
                 list.add(serviceTask);
                 break;
             }
-            case EXCLUSIVE_GATEWAY: {
-                ExclusiveGateway exclusiveGateway = buildExclusiveGateway(node);
+            case CONDITION_BRANCH_NODE: {
+                ExclusiveGateway exclusiveGateway = convertConditionBranchNode(node);
                 list.add(exclusiveGateway);
                 break;
             }
-            case PARALLEL_GATEWAY_FORK:
-            case PARALLEL_GATEWAY_JOIN: {
-                ParallelGateway parallelGateway = buildParallelGateway(node);
+            case PARALLEL_BRANCH_FORK_NODE:
+            case PARALLEL_BRANCH_JOIN_NODE: {
+                ParallelGateway parallelGateway = convertParallelBranchNode(node);
                 list.add(parallelGateway);
                 break;
             }
-            case INCLUSIVE_GATEWAY_FORK: {
-                InclusiveGateway inclusiveGateway = buildInclusiveGateway(node, Boolean.TRUE);
+            case INCLUSIVE_BRANCH_FORK_NODE: {
+                InclusiveGateway inclusiveGateway = convertInclusiveBranchNode(node, Boolean.TRUE);
                 list.add(inclusiveGateway);
                 break;
             }
-            case INCLUSIVE_GATEWAY_JOIN: {
-                InclusiveGateway inclusiveGateway = buildInclusiveGateway(node, Boolean.FALSE);
+            case INCLUSIVE_BRANCH_JOIN_NODE: {
+                InclusiveGateway inclusiveGateway = convertInclusiveBranchNode(node, Boolean.FALSE);
                 list.add(inclusiveGateway);
                 break;
             }
-            case END_EVENT: {
-                EndEvent endEvent = buildEndEvent(node);
+            case END_NODE: {
+                EndEvent endEvent = convertEndNode(node);
                 list.add(endEvent);
                 break;
             }
@@ -295,6 +290,19 @@ public class SimpleModelUtils {
             }
         }
         return list;
+    }
+
+    private static List<FlowElement> convertApproveNode(BpmSimpleModelNodeVO node) {
+        List<FlowElement> flowElements = new ArrayList<>();
+        SimpleModelUserTaskConfig userTaskConfig = BeanUtil.toBean(node.getAttributes(), SimpleModelUserTaskConfig.class);
+        UserTask userTask = buildBpmnUserTask(node, userTaskConfig);
+        flowElements.add(userTask);
+        if (userTaskConfig.getTimeoutHandler() != null && userTaskConfig.getTimeoutHandler().getEnable()) {
+            // 添加用户任务的 Timer Boundary Event, 用于任务的超时处理
+            BoundaryEvent boundaryEvent = buildUserTaskTimerBoundaryEvent(userTask, userTaskConfig.getTimeoutHandler());
+            flowElements.add(boundaryEvent);
+        }
+        return flowElements;
     }
 
     private static BoundaryEvent buildUserTaskTimerBoundaryEvent(UserTask userTask, SimpleModelUserTaskConfig.TimeoutHandler timeoutHandler) {
@@ -319,16 +327,17 @@ public class SimpleModelUtils {
         return boundaryEvent;
     }
 
-    private static ParallelGateway buildParallelGateway(BpmSimpleModelNodeVO node) {
+    private static ParallelGateway convertParallelBranchNode(BpmSimpleModelNodeVO node) {
         ParallelGateway parallelGateway = new ParallelGateway();
         parallelGateway.setId(node.getId());
         // TODO @jason：setName
 
         // TODO @芋艿 + jason：合并网关；是不是要有条件啥的。微信讨论
+        // @芋艿 貌似并行网关没有条件的
         return parallelGateway;
     }
 
-    private static ServiceTask buildServiceTask(BpmSimpleModelNodeVO node) {
+    private static ServiceTask convertCopyNode(BpmSimpleModelNodeVO node) {
         ServiceTask serviceTask = new ServiceTask();
         serviceTask.setId(node.getId());
         serviceTask.setName(node.getName());
@@ -359,8 +368,8 @@ public class SimpleModelUtils {
         addExtensionElement(flowElement, BpmnModelConstants.USER_TASK_CANDIDATE_PARAM, candidateParam);
     }
 
-    private static ExclusiveGateway buildExclusiveGateway(BpmSimpleModelNodeVO node) {
-        Assert.notEmpty(node.getConditionNodes(), "网关节点的条件节点不能为空");
+    private static ExclusiveGateway convertConditionBranchNode(BpmSimpleModelNodeVO node) {
+        Assert.notEmpty(node.getConditionNodes(), "条件分支节点不能为空");
         ExclusiveGateway exclusiveGateway = new ExclusiveGateway();
         exclusiveGateway.setId(node.getId());
         // 寻找默认的序列流
@@ -372,26 +381,23 @@ public class SimpleModelUtils {
         return exclusiveGateway;
     }
 
-    private static InclusiveGateway buildInclusiveGateway(BpmSimpleModelNodeVO node, Boolean isFork) {
+    private static InclusiveGateway convertInclusiveBranchNode(BpmSimpleModelNodeVO node, Boolean isFork) {
         InclusiveGateway inclusiveGateway = new InclusiveGateway();
         inclusiveGateway.setId(node.getId());
         // TODO @jason：这里是不是 setName 哈；
 
         // TODO @芋艿 + jason：是不是搞个合并网关；这里微信讨论下，有点奇怪；
+        // @芋艿 isFork 为 false 就是合并网关。由前端传入。这个前端暂时还未实现
         if (isFork) {
-            Assert.notEmpty(node.getConditionNodes(), "网关节点的条件节点不能为空");
-            // 网关的最后一个条件为 网关的 default sequence flow
-            inclusiveGateway.setDefaultFlow(String.format("%s_SequenceFlow_%d", node.getId(), node.getConditionNodes().size()));
+            Assert.notEmpty(node.getConditionNodes(), "条件节点不能为空");
+            // 寻找默认的序列流
+            BpmSimpleModelNodeVO defaultSeqFlow = CollUtil.findOne(node.getConditionNodes(),
+                    item -> BooleanUtil.isTrue(MapUtil.getBool(item.getAttributes(), DEFAULT_FLOW_ATTRIBUTE)));
+            if (defaultSeqFlow != null) {
+                inclusiveGateway.setDefaultFlow(defaultSeqFlow.getId());
+            }
         }
         return inclusiveGateway;
-    }
-
-    private static EndEvent buildAndAddBpmnEndEvent(Process mainProcess) {
-        EndEvent endEvent = new EndEvent();
-        endEvent.setId(BpmnModelConstants.END_EVENT_ID);
-        endEvent.setName("结束");
-        mainProcess.addFlowElement(endEvent);
-        return endEvent;
     }
 
     private static UserTask buildBpmnUserTask(BpmSimpleModelNodeVO node, SimpleModelUserTaskConfig userTaskConfig) {
@@ -488,16 +494,18 @@ public class SimpleModelUtils {
 
     // ========== 各种 build 节点的方法 ==========
 
-    private static StartEvent buildStartEvent(BpmSimpleModelNodeVO node) {
+    private static StartEvent convertStartNode(BpmSimpleModelNodeVO node) {
         StartEvent startEvent = new StartEvent();
         startEvent.setId(node.getId());
         startEvent.setName(node.getName());
 
         // TODO 芋艿 + jason：要不要在开启节点后面，加一个“发起人”任务节点，然后自动审批通过
+        // @芋艿 这个是不是由前端来实现。 默认开始节点后面跟一个 “发起人”的审批节点(审批人是发起人自己）。
+        // 我看有些平台这个审批节点允许删除，有些不允许。由用户决定
         return startEvent;
     }
 
-    private static EndEvent buildEndEvent(BpmSimpleModelNodeVO node) {
+    private static EndEvent convertEndNode(BpmSimpleModelNodeVO node) {
         EndEvent endEvent = new EndEvent();
         endEvent.setId(node.getId());
         endEvent.setName(node.getName());
