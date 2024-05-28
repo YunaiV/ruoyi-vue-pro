@@ -1,11 +1,15 @@
 package cn.iocoder.yudao.module.ai.controller.admin.image.vo;
 
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
+import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.experimental.Accessors;
+
+import java.time.LocalDateTime;
 
 /**
  * midjourney req
@@ -49,6 +53,12 @@ public class AiImageListRespVO extends PageParam {
 
     @Schema(description = "是否发布")
     private String publicStatus;
+
+    @Schema(description = "创建时间")
+    private LocalDateTime createTime;
+
+    @Schema(description = "更新时间")
+    private LocalDateTime updateTime;
 
     // ============ mj 需要字段
 

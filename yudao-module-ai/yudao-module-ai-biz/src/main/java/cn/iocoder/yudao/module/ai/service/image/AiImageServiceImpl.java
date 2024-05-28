@@ -100,10 +100,12 @@ public class AiImageServiceImpl implements AiImageService {
 
     @Override
     public AiImageDallRespVO dallDrawing(AiImageDallReqVO req) {
+        Long loginUserId = SecurityFrameworkUtils.getLoginUserId();
         // 保存数据库
-        AiImageDO aiImageDO = doSave(req.getPrompt(), req.getSize(), req.getModel(),
-                null, null, AiImageStatusEnum.IN_PROGRESS, null,
-                null, null, null);
+        AiImageDO aiImageDO = AiImageConvert.INSTANCE.convertAiImageDO(req);
+        aiImageDO.setStatus(AiImageStatusEnum.IN_PROGRESS.getStatus());
+        aiImageDO.setUserId(loginUserId);
+        aiImageMapper.insert(aiImageDO);
         // 异步执行
         EXECUTOR.execute(() -> {
             try {
@@ -149,9 +151,10 @@ public class AiImageServiceImpl implements AiImageService {
     public void midjourney(AiImageMidjourneyReqVO req) {
         // 保存数据库
         String messageId = String.valueOf(IdUtil.getSnowflakeNextId());
-        AiImageDO aiImageDO = doSave(req.getPrompt(), null, "midjoureny",
-                null, null, AiImageStatusEnum.SUBMIT, null,
-                messageId, null, null);
+        // todo
+//        AiImageDO aiImageDO = doSave(req.getPrompt(), null, "midjoureny",
+//                null, null, AiImageStatusEnum.SUBMIT, null,
+//                messageId, null, null);
         // 提交 midjourney 任务
         Boolean imagine = midjourneyInteractionsApi.imagine(messageId, req.getPrompt());
         if (!imagine) {
@@ -173,9 +176,10 @@ public class AiImageServiceImpl implements AiImageService {
         // 获取 mjOperationName
         String mjOperationName = midjourneyOperationsVO.getLabel();
         // 保存一个 image 任务记录
-        doSave(aiImageDO.getPrompt(), aiImageDO.getSize(), aiImageDO.getModel(),
-                null, null, AiImageStatusEnum.SUBMIT, null,
-                req.getMessageId(), req.getOperateId(), mjOperationName);
+        // todo
+//        doSave(aiImageDO.getPrompt(), aiImageDO.getSize(), aiImageDO.getModel(),
+//                null, null, AiImageStatusEnum.SUBMIT, null,
+//                req.getMessageId(), req.getOperateId(), mjOperationName);
         // 提交操作
         midjourneyInteractionsApi.reRoll(
                 new ReRollReq()
@@ -220,38 +224,6 @@ public class AiImageServiceImpl implements AiImageService {
         if (aiImageDO == null) {
             throw ServiceExceptionUtil.exception(ErrorCodeConstants.AI_MIDJOURNEY_IMAGINE_FAIL);
         }
-        return aiImageDO;
-    }
-
-    private AiImageDO doSave(String prompt,
-                             String size,
-                             String model,
-                             String picUrl,
-                             String originalPicUrl,
-                             AiImageStatusEnum statusEnum,
-                             String errorMessage,
-                             String mjMessageId,
-                             String mjOperationId,
-                             String mjOperationName) {
-        // 保存数据库
-        Long loginUserId = SecurityFrameworkUtils.getLoginUserId();
-        AiImageDO aiImageDO = new AiImageDO();
-        aiImageDO.setId(null);
-        aiImageDO.setPrompt(prompt);
-        aiImageDO.setSize(size);
-        aiImageDO.setModel(model);
-        aiImageDO.setUserId(loginUserId);
-        // TODO @芋艿 如何上传到自己服务器
-        aiImageDO.setPicUrl(null);
-        aiImageDO.setStatus(statusEnum.getStatus());
-        aiImageDO.setPicUrl(picUrl);
-        aiImageDO.setOriginalPicUrl(originalPicUrl);
-        aiImageDO.setErrorMessage(errorMessage);
-        //
-        aiImageDO.setMjNonceId(mjMessageId);
-        aiImageDO.setMjOperationId(mjOperationId);
-        aiImageDO.setMjOperationName(mjOperationName);
-        aiImageMapper.insert(aiImageDO);
         return aiImageDO;
     }
 }

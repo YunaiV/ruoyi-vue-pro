@@ -62,4 +62,12 @@ public interface AiImageConvert {
      * @return
      */
     AiImageMidjourneyOperationsVO convertAiImageMidjourneyOperationsVO(MidjourneyMessage.Component component);
+
+    /**
+     * 转换 - AiImageDO
+     *
+     * @param req
+     * @return
+     */
+    AiImageDO convertAiImageDO(AiImageDallReqVO req);
 }
