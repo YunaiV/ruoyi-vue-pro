@@ -115,7 +115,7 @@ public class AiImageServiceImpl implements AiImageService {
 
     // TODO @fan：1）loginUserId 通过 controller 传入；
     @Override
-    public AiImageDallRespVO dallDrawing(AiImageDallReqVO req) {
+    public AiImageDallRespVO dall(AiImageDallReqVO req) {
         Long loginUserId = SecurityFrameworkUtils.getLoginUserId();
         // 保存数据库
         // TODO @fan：1）使用 BeanUtils；2）使用链式调用哈；

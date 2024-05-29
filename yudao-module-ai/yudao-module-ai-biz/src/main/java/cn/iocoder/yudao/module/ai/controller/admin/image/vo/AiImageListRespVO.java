@@ -10,6 +10,7 @@ import lombok.Data;
 import lombok.experimental.Accessors;
 
 import java.time.LocalDateTime;
+import java.util.Map;
 
 /**
  * midjourney req
@@ -22,56 +23,57 @@ import java.time.LocalDateTime;
 @Accessors(chain = true)
 public class AiImageListRespVO extends PageParam {
 
+    @Schema(description = "id编号", example = "1")
     private Long id;
 
-    @Schema(description = "用户id")
+    @Schema(description = "用户id", example = "1")
     private Long userId;
 
-    @Schema(description = "提示词")
+    @Schema(description = "提示词", example = "南极的小企鹅")
     private String prompt;
 
-    @Schema(description = "模型 dall2/dall3、MJ、NIJI")
+    @Schema(description = "平台", example = "openai")
+    private String platform;
+
+    @Schema(description = "模型", example = "dall2")
     private String model;
 
-    @Schema(description = "生成图像的尺寸大小。对于dall-e-2模型，尺寸可为256x256, 512x512, 或 1024x1024。对于dall-e-3模型，尺寸可为1024x1024, 1792x1024, 或 1024x1792。")
-    private String size;
+    @Schema(description = "图片宽度", example = "1024")
+    private String width;
 
-    @Schema(description = "风格")
-    private String style;
+    @Schema(description = "图片高度", example = "1024")
+    private String height;
 
-    @Schema(description = "图片地址(自己服务器)")
-    private String picUrl;
-
-    @Schema(description = "绘画状态：提交、排队、绘画中、绘画完成、绘画失败")
+    @Schema(description = "绘画状态：10 进行中、20 绘画完成、30 绘画失败", example = "10")
     private String status;
 
-    @Schema(description = "绘画图片地址(绘画好的服务器)")
-    private String originalPicUrl;
-
-    @Schema(description = "绘画错误信息")
-    private String errorMessage;
-
-    @Schema(description = "是否发布")
+    @Schema(description = "是否发布", example = "public")
     private String publicStatus;
 
-    @Schema(description = "创建时间")
-    private LocalDateTime createTime;
+    @Schema(description = "图片地址(自己服务器)", example = "http://")
+    private String picUrl;
 
-    @Schema(description = "更新时间")
-    private LocalDateTime updateTime;
+    @Schema(description = "绘画图片地址(绘画好的服务器)", example = "http://")
+    private String originalPicUrl;
 
-    // ============ mj 需要字段
+    @Schema(description = "绘画错误信息", example = "图片错误信息")
+    private String errorMessage;
 
-    @Schema(description = "用户操作的Nonce编号(MJ返回)")
-    private String mjNonceId;
+    // ============ 绘画请求参数
 
-    @Schema(description = "用户操作的操作编号(MJ返回)")
-    private String mjOperationId;
+    /**
+     * - style
+     */
+    @Schema(description = "绘画请求参数")
+    private Map<String, Object> drawRequest;
 
-    @Schema(description = "用户操作的操作名字(MJ返回)")
-    private String mjOperationName;
-
-    @Schema(description = "mj图片生产成功保存的 components json 数组")
-    private String mjOperations;
+    /**
+     * - mjNonceId
+     * - mjOperationId
+     * - mjOperationName
+     * - mjOperations
+     */
+    @Schema(description = "绘画请求响应参数")
+    private Map<String, Object> drawResponse;
 
 }

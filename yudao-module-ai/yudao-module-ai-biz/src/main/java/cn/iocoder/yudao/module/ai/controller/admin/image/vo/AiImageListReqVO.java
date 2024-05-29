@@ -5,7 +5,7 @@ import lombok.Data;
 import lombok.experimental.Accessors;
 
 /**
- * midjourney req
+ * AI Image 我的图片列表 req
  *
  * @author fansili
  * @time 2024/4/28 17:42

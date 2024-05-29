@@ -2,8 +2,10 @@ package cn.iocoder.yudao.module.ai.dal.dataobject.image;
 
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
@@ -60,6 +62,7 @@ public class AiImageDO extends BaseDO {
      * - style
      */
     @Schema(description = "绘画请求参数")
+    @TableField(typeHandler = JacksonTypeHandler.class)
     private Map<String, Object> drawRequest;
 
     /**
@@ -69,6 +72,7 @@ public class AiImageDO extends BaseDO {
      * - mjOperations
      */
     @Schema(description = "绘画请求响应参数")
+    @TableField(typeHandler = JacksonTypeHandler.class)
     private Map<String, Object> drawResponse;
 
 }

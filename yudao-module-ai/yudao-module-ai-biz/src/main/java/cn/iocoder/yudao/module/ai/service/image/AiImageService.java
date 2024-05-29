@@ -33,7 +33,7 @@ public interface AiImageService {
      *
      * @param req
      */
-    AiImageDallRespVO dallDrawing(AiImageDallReqVO req);
+    AiImageDallRespVO dall(AiImageDallReqVO req);
 
     /**
      * midjourney 图片生成

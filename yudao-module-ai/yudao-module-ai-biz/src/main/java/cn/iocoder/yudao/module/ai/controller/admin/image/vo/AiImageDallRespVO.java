@@ -1,10 +1,10 @@
 package cn.iocoder.yudao.module.ai.controller.admin.image.vo;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
 import lombok.Data;
 import lombok.experimental.Accessors;
+
+import java.util.Map;
 
 /**
  * dall2/dall2 绘画
@@ -17,31 +17,57 @@ import lombok.experimental.Accessors;
 @Accessors(chain = true)
 public class AiImageDallRespVO {
 
-    @Schema(description = "提示词")
-    @NotNull(message = "提示词不能为空!")
-    @Size(max = 1200, message = "提示词最大1200")
+    @Schema(description = "id编号", example = "1")
+    private Long id;
+
+    @Schema(description = "用户id", example = "1")
+    private Long userId;
+
+    @Schema(description = "提示词", example = "南极的小企鹅")
     private String prompt;
 
-    @Schema(description = "模型")
-    @NotNull(message = "模型不能为空")
+    @Schema(description = "平台", example = "openai")
+    private String platform;
+
+    @Schema(description = "模型", example = "dall2")
     private String model;
 
-    @Schema(description = "风格")
-    private String style;
+    @Schema(description = "图片宽度", example = "1024")
+    private String width;
 
-    @Schema(description = "图片size 1024x1024 ...")
-    private String size;
+    @Schema(description = "图片高度", example = "1024")
+    private String height;
 
-    @Schema(description = "图片地址(自己服务器)")
+    @Schema(description = "绘画状态：10 进行中、20 绘画完成、30 绘画失败", example = "10")
+    private String status;
+
+    @Schema(description = "是否发布", example = "public")
+    private String publicStatus;
+
+    @Schema(description = "图片地址(自己服务器)", example = "http://")
     private String picUrl;
 
-    @Schema(description = "可以访问图像的URL。")
+    @Schema(description = "绘画图片地址(绘画好的服务器)", example = "http://")
     private String originalPicUrl;
 
-    @Schema(description = "图片base64。")
-    private String base64;
-
-    @Schema(description = "错误信息。")
+    @Schema(description = "绘画错误信息", example = "图片错误信息")
     private String errorMessage;
+
+    // ============ 绘画请求参数
+
+    /**
+     * - style
+     */
+    @Schema(description = "绘画请求参数")
+    private Map<String, Object> drawRequest;
+
+    /**
+     * - mjNonceId
+     * - mjOperationId
+     * - mjOperationName
+     * - mjOperations
+     */
+    @Schema(description = "绘画请求响应参数")
+    private Map<String, Object> drawResponse;
 
 }
