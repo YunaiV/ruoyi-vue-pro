@@ -43,7 +43,7 @@ public class BaseDbAndRedisUnitTest {
             RedisTestConfiguration.class, // Redis 测试配置类，用于启动 RedisServer
             YudaoRedisAutoConfiguration.class, // 自己的 Redis 配置类
             RedisAutoConfiguration.class, // Spring Redis 自动配置类
-            RedissonAutoConfiguration.class, // Redisson 自动高配置类
+            RedissonAutoConfiguration.class, // Redisson 自动配置类
     })
     public static class Application {
     }

@@ -6,6 +6,7 @@ import cn.iocoder.yudao.framework.web.config.WebProperties;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
+import org.springframework.boot.autoconfigure.AutoConfigureOrder;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpMethod;
@@ -35,6 +36,7 @@ import java.util.Set;
  * @author 芋道源码
  */
 @AutoConfiguration
+@AutoConfigureOrder(-1) // 目的：先于 Spring Security 自动配置，避免一键改包后，org.* 基础包无法生效
 @EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true)
 public class YudaoWebSecurityConfigurerAdapter {
 

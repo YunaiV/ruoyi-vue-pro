@@ -57,7 +57,7 @@ public class MailAccountController {
     @GetMapping("/get")
     @Operation(summary = "获得邮箱账号")
     @Parameter(name = "id", description = "编号", required = true, example = "1024")
-    @PreAuthorize("@ss.hasPermission('system:mail-account:get')")
+    @PreAuthorize("@ss.hasPermission('system:mail-account:query')")
     public CommonResult<MailAccountRespVO> getMailAccount(@RequestParam("id") Long id) {
         MailAccountDO account = mailAccountService.getMailAccount(id);
         return success(BeanUtils.toBean(account, MailAccountRespVO.class));

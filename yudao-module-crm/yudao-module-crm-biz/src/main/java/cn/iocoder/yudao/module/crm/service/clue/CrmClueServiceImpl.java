@@ -120,7 +120,7 @@ public class CrmClueServiceImpl implements CrmClueService {
     }
 
     @Override
-    @LogRecord(type = CRM_CLUE_TYPE, subType = CRM_CLUE_FOLLOW_UP_SUB_TYPE, bizNo = "{{#id}",
+    @LogRecord(type = CRM_CLUE_TYPE, subType = CRM_CLUE_FOLLOW_UP_SUB_TYPE, bizNo = "{{#id}}",
             success = CRM_CLUE_FOLLOW_UP_SUCCESS)
     @CrmPermission(bizType = CrmBizTypeEnum.CRM_CLUE, bizId = "#id", level = CrmPermissionLevelEnum.WRITE)
     public void updateClueFollowUp(Long id, LocalDateTime contactNextTime, String contactLastContent) {

@@ -38,4 +38,8 @@ public class MailAccountSaveReqVO {
     @NotNull(message = "是否开启 ssl 必填")
     private Boolean sslEnable;
 
+    @Schema(description = "是否开启 starttls", requiredMode = Schema.RequiredMode.REQUIRED, example = "true")
+    @NotNull(message = "是否开启 starttls 必填")
+    private Boolean starttlsEnable;
+
 }

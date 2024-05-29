@@ -21,6 +21,18 @@
 * 启动文档：<https://doc.iocoder.cn/quick-start/>
 * 视频教程：<https://doc.iocoder.cn/video/>
 
+## 🐰 版本说明
+
+| 版本                                                                  | JDK 8 + Spring Boot 2.7                                                   | JDK 17/21 + Spring Boot 3.2                                                           |
+|---------------------------------------------------------------------|---------------------------------------------------------------------------|---------------------------------------------------------------------------------------|
+| 【完整版】[ruoyi-vue-pro](https://gitee.com/zhijiantianya/ruoyi-vue-pro) | [`master`](https://gitee.com/zhijiantianya/ruoyi-vue-pro/tree/master/) 分支 | [`master-jdk17`](https://gitee.com/zhijiantianya/ruoyi-vue-pro/tree/master-jdk17/) 分支 |
+| 【精简版】[yudao-boot-mini](https://gitee.com/yudaocode/yudao-boot-mini) | [`master`](https://gitee.com/yudaocode/yudao-boot-mini/tree/master/) 分支   | [`master-jdk17`](https://gitee.com/yudaocode/yudao-boot-mini/tree/master-jdk17/) 分支   |
+
+* 【完整版】：包括系统功能、基础设施、会员中心、数据报表、工作流程、商城系统、微信公众号、CRM、ERP 等功能
+* 【精简版】：只包括系统功能、基础设施功能，不包括会员中心、数据报表、工作流程、商城系统、微信公众号、CRM、ERP 等功能
+
+可参考 [《迁移文档》](https://doc.iocoder.cn/migrate-module/) ，只需要 5-10 分钟，即可将【完整版】按需迁移到【精简版】
+
 ## 🐯 平台简介
 
 **芋道**，以开发者为中心，打造中国第一流的快速开发平台，全部开源，个人与企业可 100% 免费使用。
@@ -31,7 +43,7 @@
 
 ![架构图](/.image/common/ruoyi-vue-pro-architecture.png)
 
-* Java 后端：`master` 分支为 JDK 8 + Spring Boot 2.7.18，`master-jdk21` 分支为 JDK21 + Spring Boot 3.2.0
+* Java 后端：`master` 分支为 JDK 8 + Spring Boot 2.7，`master-jdk17` 分支为 JDK 17/21 + Spring Boot 3.2
 * 管理后台的电脑端：Vue3 提供 `element-plus`、`vben(ant-design-vue)` 两个版本，Vue2 提供 `element-ui` 版本
 * 管理后台的移动端：采用 `uni-app` 方案，一份代码多终端适配，同时支持 APP、小程序、H5！
 * 后端采用 Spring Boot 多模块架构、MySQL + MyBatis Plus、Redis + Redisson
@@ -72,28 +84,6 @@
 | [yudao-ui-admin-uniapp](https://gitee.com/yudaocode/yudao-ui-admin-uniapp) | [![Gitee star](https://gitee.com/yudaocode/yudao-ui-admin-uniapp/badge/star.svg?theme=white)](https://gitee.com/yudaocode/yudao-ui-admin-uniapp) [![GitHub stars](https://img.shields.io/github/stars/yudaocode/yudao-ui-admin-uniapp.svg?style=social&label=Stars)](https://github.com/yudaocode/yudao-ui-admin-uniapp) | 基于 Vue2 + element-ui 实现的管理后台           |
 | [yudao-ui-go-view](https://gitee.com/yudaocode/yudao-ui-go-view)           | [![Gitee star](https://gitee.com/yudaocode/yudao-ui-go-view/badge/star.svg?theme=white)](https://gitee.com/yudaocode/yudao-ui-go-view) [![GitHub stars](https://img.shields.io/github/stars/yudaocode/yudao-ui-go-view.svg?style=social&label=Stars)](https://github.com/yudaocode/yudao-ui-go-view)                     | 基于 Vue3 + naive-ui 实现的大屏报表             |
 
-## 🐰 分支说明
-
-### ⬅️ 完整版
-
-【完整版】包括系统功能、基础设施、会员中心、数据报表、工作流程、商城系统、微信公众号、CRM 等功能
-
-* JDK 8 + Spring Boot 2.7.18 版本：<https://gitee.com/zhijiantianya/ruoyi-vue-pro> 的 `master` 分支
-* JDK 21 + Spring Boot 3.2.0 版本：<https://gitee.com/zhijiantianya/ruoyi-vue-pro> 的 `master-jdk21` 分支
-
-两个分支的功能是一致的，可以放心使用！
-
-### ➡️️ 精简版
-
-【精简版】只包括系统功能、基础设施功能，不包括会员中心、数据报表、工作流程、商城系统、微信公众号、CRM 等功能
-
-* JDK 8 + Spring Boot 2.7.18 版本：<https://gitee.com/yudaocode/yudao-boot-mini> 的 `master` 分支
-* JDK 21 + Spring Boot 3.2.0 版本：<https://gitee.com/yudaocode/yudao-boot-mini> 的 `master-jdk21` 分支
-
-如果你想把【完整版】的功能，迁移到【精简版】，可以参考 [《迁移功能到精简版》](https://doc.iocoder.cn/migrate-module/) 文档。
-
-如果你想把【完整版】的功能，迁移到【精简版】，可以参考 [《迁移功能到精简版》](https://doc.iocoder.cn/migrate-module/) 文档。
-
 ## 😎 开源协议
 
 **为什么推荐使用本项目？**
@@ -120,16 +110,9 @@
 
 ![功能分层](/.image/common/ruoyi-vue-pro-biz.png)
 
-* 系统功能
-* 基础设施
-* 工作流程
-* 支付系统
-* 会员中心
-* 数据报表
-* 商城系统
-* 微信公众号
-* ERP 系统
-* CRM 系统
+* 通用模块（必选）：系统功能、基础设施
+* 通用模块（可选）：工作流程、支付系统、数据报表、会员中心
+* 业务系统（按需）：ERP 系统、CRM 系统、商城系统、微信公众号
 
 > 友情提示：本项目基于 RuoYi-Vue 修改，**重构优化**后端的代码，**美化**前端的界面。
 >

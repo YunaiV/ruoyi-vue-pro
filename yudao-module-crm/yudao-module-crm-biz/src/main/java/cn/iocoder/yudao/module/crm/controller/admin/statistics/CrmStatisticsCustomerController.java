@@ -96,6 +96,18 @@ public class CrmStatisticsCustomerController {
         return success(customerService.getCustomerDealCycleByUser(reqVO));
     }
 
-    // TODO dhb52：【成交周期分析】里，有按照员工（已实现）、地区（未实现）、产品（未实现），需要在看看哈；可以把 CustomerDealCycle 拆成 3 个 tab，员工客户成交周期分析、地区客户成交周期分析、产品客户成交周期分析；
+    @GetMapping("/get-customer-deal-cycle-by-area")
+    @Operation(summary = "获取客户成交周期(按用户)")
+    @PreAuthorize("@ss.hasPermission('crm:statistics-customer:query')")
+    public CommonResult<List<CrmStatisticsCustomerDealCycleByAreaRespVO>> getCustomerDealCycleByArea(@Valid CrmStatisticsCustomerReqVO reqVO) {
+        return success(customerService.getCustomerDealCycleByArea(reqVO));
+    }
+
+    @GetMapping("/get-customer-deal-cycle-by-product")
+    @Operation(summary = "获取客户成交周期(按用户)")
+    @PreAuthorize("@ss.hasPermission('crm:statistics-customer:query')")
+    public CommonResult<List<CrmStatisticsCustomerDealCycleByProductRespVO>> getCustomerDealCycleByProduct(@Valid CrmStatisticsCustomerReqVO reqVO) {
+        return success(customerService.getCustomerDealCycleByProduct(reqVO));
+    }
 
 }

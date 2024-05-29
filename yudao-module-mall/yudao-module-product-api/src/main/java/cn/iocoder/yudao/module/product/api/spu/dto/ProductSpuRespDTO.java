@@ -24,12 +24,6 @@ public class ProductSpuRespDTO {
      * 商品名称
      */
     private String name;
-    /**
-     * 单位
-     *
-     * 对应 product_unit 数据字典
-     */
-    private Integer unit;
 
     /**
      * 商品分类编号

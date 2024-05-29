@@ -18,7 +18,6 @@
     "dataType" : "BIGINT",
     "columnComment" : "编号",
     "primaryKey" : true,
-    "autoIncrement" : true,
     "javaType" : "Long",
     "javaField" : "id",
     "example" : "1024",

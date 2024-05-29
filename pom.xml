@@ -22,9 +22,13 @@
 <!--        <module>yudao-module-pay</module>-->
 <!--        <module>yudao-module-mall</module>-->
 <!--        <module>yudao-module-crm</module>-->
+
         <module>yudao-module-erp</module>
         <!-- 示例项目 -->
 <!--        <module>yudao-example</module>-->
+
+<!--        <module>yudao-module-erp</module>-->
+
     </modules>
 
     <name>${project.artifactId}</name>
@@ -32,7 +36,7 @@
     <url>https://github.com/YunaiV/ruoyi-vue-pro</url>
 
     <properties>
-        <revision>2.0.1-jdk8-snapshot</revision>
+        <revision>2.1.0-jdk8-snapshot</revision>
         <!-- Maven 相关 -->
         <java.version>1.8</java.version>
         <maven.compiler.source>${java.version}</maven.compiler.source>

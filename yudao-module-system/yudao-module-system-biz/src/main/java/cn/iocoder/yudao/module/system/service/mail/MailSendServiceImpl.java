@@ -5,7 +5,6 @@ import cn.hutool.extra.mail.MailAccount;
 import cn.hutool.extra.mail.MailUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
-import cn.iocoder.yudao.module.system.convert.mail.MailAccountConvert;
 import cn.iocoder.yudao.module.system.dal.dataobject.mail.MailAccountDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.mail.MailTemplateDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.user.AdminUserDO;
@@ -105,17 +104,25 @@ public class MailSendServiceImpl implements MailSendService {
     public void doSendMail(MailSendMessage message) {
         // 1. 创建发送账号
         MailAccountDO account = validateMailAccount(message.getAccountId());
-        MailAccount mailAccount  = MailAccountConvert.INSTANCE.convert(account, message.getNickname());
+        MailAccount mailAccount  = buildMailAccount(account, message.getNickname());
         // 2. 发送邮件
         try {
             String messageId = MailUtil.send(mailAccount, message.getMail(),
-                    message.getTitle(), message.getContent(),true);
+                    message.getTitle(), message.getContent(), true);
             // 3. 更新结果（成功）
             mailLogService.updateMailSendResult(message.getLogId(), messageId, null);
         } catch (Exception e) {
             // 3. 更新结果（异常）
             mailLogService.updateMailSendResult(message.getLogId(), null, e);
         }
+    }
+
+    private MailAccount buildMailAccount(MailAccountDO account, String nickname) {
+        String from = StrUtil.isNotEmpty(nickname) ? nickname + " <" + account.getMail() + ">" : account.getMail();
+        return new MailAccount().setFrom(from).setAuth(true)
+                .setUser(account.getUsername()).setPass(account.getPassword())
+                .setHost(account.getHost()).setPort(account.getPort())
+                .setSslEnable(account.getSslEnable()).setStarttlsEnable(account.getStarttlsEnable());
     }
 
     @VisibleForTesting

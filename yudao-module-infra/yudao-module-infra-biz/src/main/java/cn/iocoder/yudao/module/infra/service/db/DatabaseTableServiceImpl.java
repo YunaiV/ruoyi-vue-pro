@@ -3,18 +3,22 @@ package cn.iocoder.yudao.module.infra.service.db;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.StrUtil;
+import cn.iocoder.yudao.framework.mybatis.core.util.JdbcUtils;
 import cn.iocoder.yudao.module.infra.dal.dataobject.db.DataSourceConfigDO;
+import com.baomidou.mybatisplus.annotation.DbType;
 import com.baomidou.mybatisplus.generator.config.DataSourceConfig;
 import com.baomidou.mybatisplus.generator.config.GlobalConfig;
 import com.baomidou.mybatisplus.generator.config.StrategyConfig;
 import com.baomidou.mybatisplus.generator.config.builder.ConfigBuilder;
 import com.baomidou.mybatisplus.generator.config.po.TableInfo;
 import com.baomidou.mybatisplus.generator.config.rules.DateType;
+import com.baomidou.mybatisplus.generator.query.SQLQuery;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -45,20 +49,27 @@ public class DatabaseTableServiceImpl implements DatabaseTableService {
         // 获得数据源配置
         DataSourceConfigDO config = dataSourceConfigService.getDataSourceConfig(dataSourceConfigId);
         Assert.notNull(config, "数据源({}) 不存在！", dataSourceConfigId);
+        DbType dbType = JdbcUtils.getDbType(config.getUrl());
 
         // 使用 MyBatis Plus Generator 解析表结构
-        DataSourceConfig dataSourceConfig = new DataSourceConfig.Builder(config.getUrl(), config.getUsername(),
-                config.getPassword()).build();
-        StrategyConfig.Builder strategyConfig = new StrategyConfig.Builder();
+        DataSourceConfig.Builder dataSourceConfigBuilder = new DataSourceConfig.Builder(config.getUrl(), config.getUsername(),
+                config.getPassword());
+        if (Objects.equals(dbType, DbType.SQL_SERVER)) { // 特殊：SQLServer jdbc 非标准，参见 https://github.com/baomidou/mybatis-plus/issues/5419
+            dataSourceConfigBuilder.databaseQueryClass(SQLQuery.class);
+        }
+        StrategyConfig.Builder strategyConfig = new StrategyConfig.Builder().enableSkipView(); // 忽略视图，业务上一般用不到
         if (StrUtil.isNotEmpty(name)) {
             strategyConfig.addInclude(name);
         } else {
-            // 移除工作流和定时任务前缀的表名 // TODO 未来做成可配置
+            // 移除工作流和定时任务前缀的表名
             strategyConfig.addExclude("ACT_[\\S\\s]+|QRTZ_[\\S\\s]+|FLW_[\\S\\s]+");
+            // 移除 ORACLE 相关的系统表
+            strategyConfig.addExclude("IMPDP_[\\S\\s]+|ALL_[\\S\\s]+|HS_[\\S\\\\s]+");
+            strategyConfig.addExclude("[\\S\\s]+\\$[\\S\\s]+|[\\S\\s]+\\$"); // 表里不能有 $，一般有都是系统的表
         }
 
         GlobalConfig globalConfig = new GlobalConfig.Builder().dateType(DateType.TIME_PACK).build(); // 只使用 LocalDateTime 类型，不使用 LocalDate
-        ConfigBuilder builder = new ConfigBuilder(null, dataSourceConfig, strategyConfig.build(),
+        ConfigBuilder builder = new ConfigBuilder(null, dataSourceConfigBuilder.build(), strategyConfig.build(),
                 null, globalConfig, null);
         // 按照名字排序
         List<TableInfo> tables = builder.getTableInfoList();

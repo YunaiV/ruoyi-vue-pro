@@ -21,7 +21,6 @@ import java.util.Map;
 
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
-import static cn.iocoder.yudao.framework.common.util.collection.MapUtils.findAndThen;
 
 /**
  * CRM 客户画像 Service 实现类
@@ -56,15 +55,18 @@ public class CrmStatisticsPortraitServiceImpl implements CrmStatisticsPortraitSe
 
         // 3. 拼接数据
         List<Area> areaList = AreaUtils.getByType(AreaTypeEnum.PROVINCE, area -> area);
-        areaList.add(new Area().setId(null).setName("未知")); // TODO @puhui999：是不是 65 find 的逻辑改下；不用 findAndThen，直接从 areaMap 拿；拿到就设置，不拿到就设置 null 和 未知；这样，58 本行可以删除掉完事了；这样代码更简单和一致
         Map<Integer, Area> areaMap = convertMap(areaList, Area::getId);
         return convertList(list, item -> {
             Integer parentId = AreaUtils.getParentIdByType(item.getAreaId(), AreaTypeEnum.PROVINCE);
-            if (parentId == null) { // 找不到，归到未知
-                return item.setAreaId(null).setAreaName("未知");
+            if (parentId != null) {
+                Area area = areaMap.get(parentId);
+                if (area != null) {
+                    item.setAreaId(parentId).setAreaName(area.getName());
+                    return item;
+                }
             }
-            findAndThen(areaMap, parentId, area -> item.setAreaId(parentId).setAreaName(area.getName()));
-            return item;
+            // 找不到，归到未知
+            return item.setAreaId(null).setAreaName("未知");
         });
     }
 

@@ -64,8 +64,10 @@ public class CrmPermissionUtils {
         }
         // 2.2 场景二：我参与的数据
         if (CrmSceneTypeEnum.isInvolved(sceneType)) {
-            query.ne(ownerUserIdField, userId)
-                    .in(CrmPermissionDO::getLevel, CrmPermissionLevelEnum.READ.getLevel(), CrmPermissionLevelEnum.WRITE.getLevel());
+            query.innerJoin(CrmPermissionDO.class, on -> on.eq(CrmPermissionDO::getBizType, bizType)
+                    .eq(CrmPermissionDO::getBizId, bizId)
+                    .in(CrmPermissionDO::getLevel, CrmPermissionLevelEnum.READ.getLevel(), CrmPermissionLevelEnum.WRITE.getLevel()));
+            query.ne(ownerUserIdField, userId);
         }
         // 2.3 场景三：下属负责的数据
         if (CrmSceneTypeEnum.isSubordinate(sceneType)) {

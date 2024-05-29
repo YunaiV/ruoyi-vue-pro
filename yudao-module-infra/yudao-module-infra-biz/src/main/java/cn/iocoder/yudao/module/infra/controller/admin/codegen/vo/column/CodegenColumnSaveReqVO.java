@@ -36,10 +36,6 @@ public class CodegenColumnSaveReqVO {
     @NotNull(message = "是否主键不能为空")
     private Boolean primaryKey;
 
-    @Schema(description = "是否自增", requiredMode = Schema.RequiredMode.REQUIRED, example = "true")
-    @NotNull(message = "是否自增不能为空")
-    private Boolean autoIncrement;
-
     @Schema(description = "排序", requiredMode = Schema.RequiredMode.REQUIRED, example = "10")
     @NotNull(message = "排序不能为空")
     private Integer ordinalPosition;
