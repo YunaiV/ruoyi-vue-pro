@@ -26,7 +26,7 @@ public interface AiImageService {
      * @param id
      * @return
      */
-    AiImageListRespVO get(Long id);
+    AiImageListRespVO getMy(Long id);
 
     /**
      * ai绘画 - dall2/dall3 绘画
@@ -54,7 +54,8 @@ public interface AiImageService {
      * 删除 - image 记录
      *
      * @param id
+     * @param loginUserId
      */
-    void delete(Long id);
+    void deleteMy(Long id, Long loginUserId);
 
 }

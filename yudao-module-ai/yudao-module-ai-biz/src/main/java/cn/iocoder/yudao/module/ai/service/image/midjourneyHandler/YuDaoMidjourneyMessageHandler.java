@@ -96,9 +96,10 @@ public class YuDaoMidjourneyMessageHandler implements MidjourneyMessageHandler {
             drawingStatusEnum = AiImageStatusEnum.COMPLETE;
         } else if (MidjourneyGennerateStatusEnum.IN_PROGRESS.getStatus().equals(generateStatus)) {
             drawingStatusEnum = AiImageStatusEnum.IN_PROGRESS;
-        } else if (MidjourneyGennerateStatusEnum.WAITING.getStatus().equals(generateStatus)) {
-            drawingStatusEnum = AiImageStatusEnum.WAITING;
         }
+//        else if (MidjourneyGennerateStatusEnum.WAITING.getStatus().equals(generateStatus)) {
+//            drawingStatusEnum = AiImageStatusEnum.WAITING;
+//        }
         // 获取 midjourneyOperations
         List<AiImageMidjourneyOperationsVO> midjourneyOperations = getMidjourneyOperationsList(midjourneyMessage);
         // 更新数据库
@@ -106,8 +107,8 @@ public class YuDaoMidjourneyMessageHandler implements MidjourneyMessageHandler {
                 new AiImageDO()
                         .setOriginalPicUrl(imageUrl)
                         .setStatus(drawingStatusEnum == null ? null : drawingStatusEnum.getStatus())
-                        .setMjNonceId(midjourneyMessage.getId())
-                        .setMjOperations(JsonUtils.toJsonString(midjourneyOperations))
+//                        .setMjNonceId(midjourneyMessage.getId())
+//                        .setMjOperations(JsonUtils.toJsonString(midjourneyOperations))
         );
     }
 

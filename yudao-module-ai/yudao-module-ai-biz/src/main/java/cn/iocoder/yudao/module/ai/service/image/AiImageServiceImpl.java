@@ -39,6 +39,9 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+
+
 // TODO @fan：注释优化下哈
 /**
  * ai 作图
@@ -105,7 +108,7 @@ public class AiImageServiceImpl implements AiImageService {
 
     // TODO @fan：1）返回 DO；VO 的翻译，交给 Controller；2）还有，使用 BeanUtils 替代哈
     @Override
-    public AiImageListRespVO get(Long id) {
+    public AiImageListRespVO getMy(Long id) {
         AiImageDO aiImageDO = aiImageMapper.selectById(id);
         return AiImageConvert.INSTANCE.convertAiImageListRespVO(aiImageDO);
     }
@@ -172,34 +175,37 @@ public class AiImageServiceImpl implements AiImageService {
     @Transactional(rollbackFor = Exception.class)
     @Override
     public void midjourneyOperate(AiImageMidjourneyOperateReqVO req) {
-        // 校验是否存在
-        AiImageDO aiImageDO = validateExists(req.getId());
-        // 获取 midjourneyOperations
-        List<AiImageMidjourneyOperationsVO> midjourneyOperations = getMidjourneyOperations(aiImageDO);
-        // 校验 OperateId 是否存在
-        AiImageMidjourneyOperationsVO midjourneyOperationsVO = validateMidjourneyOperationsExists(midjourneyOperations, req.getOperateId());
-        // 校验 messageId
-        validateMessageId(aiImageDO.getMjNonceId(), req.getMessageId());
-        // 获取 mjOperationName
-        String mjOperationName = midjourneyOperationsVO.getLabel();
-        // 保存一个 image 任务记录
-        // todo
-//        doSave(aiImageDO.getPrompt(), aiImageDO.getSize(), aiImageDO.getModel(),
-//                null, null, AiImageStatusEnum.SUBMIT, null,
-//                req.getMessageId(), req.getOperateId(), mjOperationName);
-        // 提交操作
-        midjourneyInteractionsApi.reRoll(
-                new ReRollReq()
-                        .setCustomId(req.getOperateId())
-                        .setMessageId(req.getMessageId())
-        );
+//        // 校验是否存在
+//        AiImageDO aiImageDO = validateExists(req.getId());
+//        // 获取 midjourneyOperations
+//        List<AiImageMidjourneyOperationsVO> midjourneyOperations = getMidjourneyOperations(aiImageDO);
+//        // 校验 OperateId 是否存在
+//        AiImageMidjourneyOperationsVO midjourneyOperationsVO = validateMidjourneyOperationsExists(midjourneyOperations, req.getOperateId());
+//        // 校验 messageId
+//        validateMessageId(aiImageDO.getMjNonceId(), req.getMessageId());
+//        // 获取 mjOperationName
+//        String mjOperationName = midjourneyOperationsVO.getLabel();
+//        // 保存一个 image 任务记录
+//        // todo
+////        doSave(aiImageDO.getPrompt(), aiImageDO.getSize(), aiImageDO.getModel(),
+////                null, null, AiImageStatusEnum.SUBMIT, null,
+////                req.getMessageId(), req.getOperateId(), mjOperationName);
+//        // 提交操作
+//        midjourneyInteractionsApi.reRoll(
+//                new ReRollReq()
+//                        .setCustomId(req.getOperateId())
+//                        .setMessageId(req.getMessageId())
+//        );
     }
 
     // TODO @fan：1）需要校验存在；2）需要校验属于我；
     @Override
-    public void delete(Long id) {
+    public void deleteMy(Long id, Long loginUserId) {
         // 校验记录是否存在
         AiImageDO aiImageDO = validateExists(id);
+        if (!aiImageDO.getUserId().equals(loginUserId)) {
+            throw exception(ErrorCodeConstants.AI_IMAGE_NOT_CREATE_USER);
+        }
         // 删除记录
         aiImageMapper.deleteById(id);
     }
@@ -221,10 +227,11 @@ public class AiImageServiceImpl implements AiImageService {
 
 
     private List<AiImageMidjourneyOperationsVO> getMidjourneyOperations(AiImageDO aiImageDO) {
-        if (StrUtil.isBlank(aiImageDO.getMjOperations())) {
-            return Collections.emptyList();
-        }
-        return JsonUtils.parseArray(aiImageDO.getMjOperations(), AiImageMidjourneyOperationsVO.class);
+//        if (StrUtil.isBlank(aiImageDO.getMjOperations())) {
+//            return Collections.emptyList();
+//        }
+//        return JsonUtils.parseArray(aiImageDO.getMjOperations(), AiImageMidjourneyOperationsVO.class);
+        return null;
     }
 
     private AiImageDO validateExists(Long id) {

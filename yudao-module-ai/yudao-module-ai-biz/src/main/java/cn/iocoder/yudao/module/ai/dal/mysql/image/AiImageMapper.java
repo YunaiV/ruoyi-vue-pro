@@ -24,7 +24,8 @@ public interface AiImageMapper extends BaseMapperX<AiImageDO> {
      * @param aiImageDO
      */
     default void updateByMjNonce(Long mjNonceId, AiImageDO aiImageDO) {
-        this.update(aiImageDO, new LambdaQueryWrapperX<AiImageDO>().eq(AiImageDO::getMjNonceId, mjNonceId));
+//        this.update(aiImageDO, new LambdaQueryWrapperX<AiImageDO>().eq(AiImageDO::getMjNonceId, mjNonceId));
+        return;
     }
 
 }
