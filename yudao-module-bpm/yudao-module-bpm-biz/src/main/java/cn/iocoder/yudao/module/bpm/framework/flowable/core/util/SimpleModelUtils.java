@@ -25,7 +25,7 @@ import java.util.Map;
 import java.util.Objects;
 
 import static cn.iocoder.yudao.module.bpm.enums.definition.BpmBoundaryEventType.USER_TASK_TIMEOUT;
-import static cn.iocoder.yudao.module.bpm.enums.definition.BpmSimpleModelNodeType.END_NODE;
+import static cn.iocoder.yudao.module.bpm.enums.definition.BpmSimpleModelNodeType.*;
 import static cn.iocoder.yudao.module.bpm.enums.definition.BpmUserTaskTimeoutActionEnum.AUTO_REMINDER;
 import static cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnModelConstants.*;
 import static cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.SimpleModelConstants.*;
@@ -84,77 +84,127 @@ public class SimpleModelUtils {
         EndEvent endEvent = (EndEvent) CollUtil.findOne(process.getFlowElements(), item -> item instanceof EndEvent);
 
         // 构建并添加节点之间的连线 Sequence Flow
-        buildAndAddBpmnSequenceFlow(process, simpleModelNode, endEvent.getId());
+        traverseNodeToBuildSequenceFlow(process, simpleModelNode, endEvent.getId());
         // 自动布局
         new BpmnAutoLayout(bpmnModel).execute();
         return bpmnModel;
     }
 
-    private static void buildAndAddBpmnSequenceFlow(Process mainProcess, BpmSimpleModelNodeVO node, String targetId) {
-        // 节点为 null 或者 为END_EVENT 退出
-        // TODO @jason：isValidNode；然后把 END_NODE 是不是拿到  switch (nodeType) { 那 return 哈？这样出口更统一一点？
-        if (node == null || node.getId() == null || END_NODE.getType().equals(node.getType())) {
+    private static void traverseNodeToBuildSequenceFlow(Process process, BpmSimpleModelNodeVO node, String targetNodeId) {
+        // 1.无效节点返回
+        if (!isValidNode(node)) {
             return;
         }
-        BpmSimpleModelNodeVO childNode = node.getChildNode();
+
         // 如果是网关分支节点. 后续节点可能为 null。但不是 END_EVENT 节点
-        // TODO @芋艿：这个要不要挪到 START_NODE - INCLUSIVE_BRANCH_JOIN_NODE 待定；感觉 switch 那最终是分三个情况；branch、子节点、结束了；（每种情况的注释，需要写的更完整）
-        if (!BpmSimpleModelNodeType.isBranchNode(node.getType()) && (childNode == null || childNode.getId() == null)) {
-            SequenceFlow sequenceFlow = buildBpmnSequenceFlow(node.getId(), targetId, null, null, null);
-            mainProcess.addFlowElement(sequenceFlow);
-            return;
-        }
+        // TODO-DONE @芋艿：这个要不要挪到 START_NODE - INCLUSIVE_BRANCH_JOIN_NODE 待定；感觉 switch 那最终是分三个情况；branch、子节点、结束了；（每种情况的注释，需要写的更完整）
+//        if (!BpmSimpleModelNodeType.isBranchNode(node.getType()) && (childNode == null || childNode.getId() == null)) {
+//            SequenceFlow sequenceFlow = buildBpmnSequenceFlow(node.getId(), targetNodeId, null, null, null);
+//            process.addFlowElement(sequenceFlow);
+//            return;
+//        }
         BpmSimpleModelNodeType nodeType = BpmSimpleModelNodeType.valueOf(node.getType());
         Assert.notNull(nodeType, "模型节点类型不支持");
-        // TODO @jason：下面的 PARALLEL_BRANCH_FORK_NODE、CONDITION_BRANCH_NODE、INCLUSIVE_BRANCH_FORK_NODE 是不是就是 isBranchNode？如果是的话，貌似不用 swtich，而是 if else 分类处理呢。
-        switch (nodeType) {
-            case START_NODE:
-            case APPROVE_NODE:
-            case COPY_NODE:
-            case PARALLEL_BRANCH_JOIN_NODE:
-            case INCLUSIVE_BRANCH_JOIN_NODE: {
+        BpmSimpleModelNodeVO childNode = node.getChildNode();
+        // 2.1 普通节点
+        if (!BpmSimpleModelNodeType.isBranchNode(node.getType())) {
+            // 2.1.1 结束节点退出递归
+            if (nodeType == END_NODE) {
+                return;
+            }
+            if (!isValidNode(childNode)) {
+                // 2.1.2 普通节点且无孩子节点。分两种情况
+                // a.结束节点  b. 条件分支的最后一个节点.与分支节点的孩子节点或聚合节点建立连线。
+                SequenceFlow sequenceFlow = buildBpmnSequenceFlow(node.getId(), targetNodeId, null, null, null);
+                process.addFlowElement(sequenceFlow);
+            } else {
+                // 2.1.3 普通节点且有孩子节点。建立连线
                 SequenceFlow sequenceFlow = buildBpmnSequenceFlow(node.getId(), childNode.getId(), null, null, null);
-                mainProcess.addFlowElement(sequenceFlow);
+                process.addFlowElement(sequenceFlow);
                 // 递归调用后续节点
-                buildAndAddBpmnSequenceFlow(mainProcess, childNode, targetId);
-                break;
+                traverseNodeToBuildSequenceFlow(process, childNode, targetNodeId);
             }
-            case PARALLEL_BRANCH_FORK_NODE:
-            case CONDITION_BRANCH_NODE:
-            case INCLUSIVE_BRANCH_FORK_NODE: {
-                // TODO @jason：这里 sequenceFlowTargetId 不建议做这样的 default。万一可能有 bug 哈；直接弄到对应的 136- 146 会更安全一点。
-                String sequenceFlowTargetId = (childNode == null || childNode.getId() == null) ? targetId : childNode.getId();
-                List<BpmSimpleModelNodeVO> conditionNodes = node.getConditionNodes();
-                Assert.notEmpty(conditionNodes, "网关节点的条件节点不能为空");
-                for (BpmSimpleModelNodeVO item : conditionNodes) {
-                    // 构建表达式
-                    // TODO @jason：条件分支的情况下，需要分 item 搞的条件，和 conditionNodes 搞的条件
-                    String conditionExpression = buildConditionExpression(item);
-
-                    BpmSimpleModelNodeVO nextNodeOnCondition = item.getChildNode();
-                    // TODO @jason：isValidNode
-                    if (nextNodeOnCondition != null && nextNodeOnCondition.getId() != null) {
-                        // TODO @jason：会存在 item.name 未空的情况么？这个时候，要不要兜底处理拼接
-                        SequenceFlow sequenceFlow = buildBpmnSequenceFlow(node.getId(), nextNodeOnCondition.getId(),
-                                item.getId(), item.getName(), conditionExpression);
-                        mainProcess.addFlowElement(sequenceFlow);
-                        // 递归调用后续节点
-                        // TODO @jason：最好也有个例子，嘿嘿；S4
-                        buildAndAddBpmnSequenceFlow(mainProcess, nextNodeOnCondition, sequenceFlowTargetId);
-                    } else {
-                        SequenceFlow sequenceFlow = buildBpmnSequenceFlow(node.getId(), sequenceFlowTargetId,
-                                item.getId(), item.getName(), conditionExpression);
-                        mainProcess.addFlowElement(sequenceFlow);
-                    }
+        } else {
+            // 2.2 分支节点
+            List<BpmSimpleModelNodeVO> conditionNodes = node.getConditionNodes();
+            Assert.notEmpty(conditionNodes, "分支节点的条件节点不能为空");
+            // 4.1 分支节点，遍历分支节点. 如下情况:
+            // 分支1、A->B->C->D->E 和 分支2、A->D->E。 A为分支节点, D为A孩子节点
+            // 分支终点节点， 1. 分支节点有孩子节点时为孩子节点  2. 当分支节点孩子为无效节点时。分支嵌套时并且为分支最后一个节点
+            String branchEndNodeId = isValidNode(childNode) ? childNode.getId() : targetNodeId ;
+            for (BpmSimpleModelNodeVO item : conditionNodes) {
+                // TODO @jason：条件分支的情况下，需要分 item 搞的条件，和 conditionNodes 搞的条件
+                // 构建表达式
+                String conditionExpression = buildConditionExpression(item);
+                BpmSimpleModelNodeVO nextNodeOnCondition = item.getChildNode();
+                // 4.2 分支有后续节点, 分支1: A->B->C->D
+                if (isValidNode(nextNodeOnCondition)) {
+                    // 4.2.1 建立 A->B
+                    SequenceFlow sequenceFlow = buildBpmnSequenceFlow(node.getId(), nextNodeOnCondition.getId(),
+                            item.getId(), item.getName(), conditionExpression);
+                    process.addFlowElement(sequenceFlow);
+                    // 4.2.2 递归调用后续节点连线。 建立 B->C->D 的连线
+                    traverseNodeToBuildSequenceFlow(process, nextNodeOnCondition, branchEndNodeId);
+                } else {
+                    // 4.3 分支无后续节点 建立 A->D
+                    SequenceFlow sequenceFlow = buildBpmnSequenceFlow(node.getId(), branchEndNodeId,
+                            item.getId(), item.getName(), conditionExpression);
+                    process.addFlowElement(sequenceFlow);
                 }
-                // 递归调用后续节点 TODO @jason：最好有个例子哈
-                buildAndAddBpmnSequenceFlow(mainProcess, childNode, targetId);
-                break;
             }
-            default: {
-                // TODO 其它节点类型的实现
-            }
+            // 递归调用后续节点 继续递归建立 D->E 的连线
+            traverseNodeToBuildSequenceFlow(process, childNode, targetNodeId);
         }
+
+        // TODO @jason：下面的 PARALLEL_BRANCH_FORK_NODE、CONDITION_BRANCH_NODE、INCLUSIVE_BRANCH_FORK_NODE 是不是就是 isBranchNode？如果是的话，貌似不用 swtich，而是 if else 分类处理呢。
+//        switch (nodeType) {
+//            case START_NODE:
+//            case APPROVE_NODE:
+//            case COPY_NODE:
+//            case PARALLEL_BRANCH_JOIN_NODE:
+//            case INCLUSIVE_BRANCH_JOIN_NODE: {
+//                SequenceFlow sequenceFlow = buildBpmnSequenceFlow(node.getId(), childNode.getId(), null, null, null);
+//                process.addFlowElement(sequenceFlow);
+//                // 递归调用后续节点
+//                buildAndAddBpmnSequenceFlow(process, childNode, targetNodeId);
+//                break;
+//            }
+//            case PARALLEL_BRANCH_FORK_NODE:
+//            case CONDITION_BRANCH_NODE:
+//            case INCLUSIVE_BRANCH_FORK_NODE: {
+//                // TODO @jason：这里 sequenceFlowTargetId 不建议做这样的 default。万一可能有 bug 哈；直接弄到对应的 136- 146 会更安全一点。
+//                String sequenceFlowTargetId = (childNode == null || childNode.getId() == null) ? targetNodeId : childNode.getId();
+//                List<BpmSimpleModelNodeVO> conditionNodes = node.getConditionNodes();
+//                Assert.notEmpty(conditionNodes, "网关节点的条件节点不能为空");
+//                for (BpmSimpleModelNodeVO item : conditionNodes) {
+//                    // 构建表达式
+//                    // TODO @jason：条件分支的情况下，需要分 item 搞的条件，和 conditionNodes 搞的条件
+//                    String conditionExpression = buildConditionExpression(item);
+//
+//                    BpmSimpleModelNodeVO nextNodeOnCondition = item.getChildNode();
+//                    // TODO @jason：isValidNode
+//                    if (nextNodeOnCondition != null && nextNodeOnCondition.getId() != null) {
+//                        // TODO @jason：会存在 item.name 未空的情况么？这个时候，要不要兜底处理拼接
+//                        SequenceFlow sequenceFlow = buildBpmnSequenceFlow(node.getId(), nextNodeOnCondition.getId(),
+//                                item.getId(), item.getName(), conditionExpression);
+//                        process.addFlowElement(sequenceFlow);
+//                        // 递归调用后续节点
+//                        // TODO @jason：最好也有个例子，嘿嘿；S4
+//                        buildAndAddBpmnSequenceFlow(process, nextNodeOnCondition, sequenceFlowTargetId);
+//                    } else {
+//                        SequenceFlow sequenceFlow = buildBpmnSequenceFlow(node.getId(), sequenceFlowTargetId,
+//                                item.getId(), item.getName(), conditionExpression);
+//                        process.addFlowElement(sequenceFlow);
+//                    }
+//                }
+//                // 递归调用后续节点 TODO @jason：最好有个例子哈
+//                buildAndAddBpmnSequenceFlow(process, childNode, targetNodeId);
+//                break;
+//            }
+//            default: {
+//                // TODO 其它节点类型的实现
+//            }
+//        }
 
     }
 
@@ -283,6 +333,7 @@ public class SimpleModelUtils {
                 list.add(parallelGateway);
                 break;
             }
+
             case INCLUSIVE_BRANCH_FORK_NODE: {
                 InclusiveGateway inclusiveGateway = convertInclusiveBranchNode(node, Boolean.TRUE);
                 list.add(inclusiveGateway);
