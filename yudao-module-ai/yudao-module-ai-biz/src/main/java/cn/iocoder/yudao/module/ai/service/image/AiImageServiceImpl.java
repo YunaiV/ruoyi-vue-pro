@@ -141,8 +141,7 @@ public class AiImageServiceImpl implements AiImageService {
                 String filePath = fileApi.createFile(HttpUtil.downloadBytes(imageGeneration.getOutput().getUrl()));
                 // 更新数据库
                 aiImageMapper.updateById(new AiImageDO().setId(aiImageDO.getId()).setStatus(AiImageStatusEnum.COMPLETE.getStatus())
-                        .setPicUrl(filePath).setOriginalPicUrl(imageGeneration.getOutput().getUrl())
-                );
+                        .setPicUrl(filePath).setOriginalPicUrl(imageGeneration.getOutput().getUrl()));
             } catch (AiException aiException) {
                 // TODO @fan：错误日志，也打印下哈；因为 aiException.getMessage() 比较精简；
                 aiImageMapper.updateById(new AiImageDO().setId(aiImageDO.getId()).setStatus(AiImageStatusEnum.FAIL.getStatus())

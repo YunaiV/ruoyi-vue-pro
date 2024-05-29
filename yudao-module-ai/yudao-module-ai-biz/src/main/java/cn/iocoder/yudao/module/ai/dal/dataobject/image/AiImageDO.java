@@ -8,16 +8,17 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
+// TODO @fan：@time、@sine 注解可以不加哈
 /**
- * ai 绘画
+ * AI 绘画 DO
  *
  * @author fansili
  * @time 2024/4/25 15:53
  * @since 1.0
  */
 @Data
-@Accessors(chain = true)
-@TableName("ai_image")
+@Accessors(chain = true) // TODO @fan：这个不用添加哈，全局的 lombok.config 搞啦
+@TableName("ai_image") // TODO @fan：建议放在 @Data 前面，因为它是关键注解，@Data 本质可悲替代
 public class AiImageDO extends BaseDO {
 
     @TableId(type = IdType.AUTO)
@@ -31,12 +32,14 @@ public class AiImageDO extends BaseDO {
 
     // TODO @fan：要加一个平台字段；platform；因为一个平台，会有多种 model 模型；
 
-    @Schema(description = "模型 dall2/dall3、MJ、NIJI")
+    @Schema(description = "模型")
     private String model;
 
-    @Schema(description = "生成图像的尺寸大小。对于dall-e-2模型，尺寸可为256x256, 512x512, 或 1024x1024。对于dall-e-3模型，尺寸可为1024x1024, 1792x1024, 或 1024x1792。")
+    // TODO @fan：这个记录到 db，要不改成 width、height？更明确的尺寸
+    @Schema(description = "尺寸大小")
     private String size;
 
+    // TODO @fan：style 是所有模型都有么？如果不是，是不是靠 drawRequest 记录下就好了；
     @Schema(description = "风格")
     private String style;
 
@@ -54,6 +57,9 @@ public class AiImageDO extends BaseDO {
 
     @Schema(description = "是否发布")
     private String publicStatus;
+
+    // TODO @fan：增加一个 Map<String, Object> 字段，drawRequest；用于记录请求模型的字段；对应的就是 ImageOptions
+    // TODO @fan：增加一个 Map<String, Object> 字段，记录 ImageResponseMetadata？这样 mjNonceId、mjOperationId、mjOperationName、mjOperations 这些字段，貌似可以收掉
 
     // ============ mj 需要字段
 
