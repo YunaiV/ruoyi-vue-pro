@@ -40,4 +40,7 @@ public interface ErrorCodeConstants {
     ErrorCode AI_MIDJOURNEY_OPERATION_NOT_EXISTS = new ErrorCode(1_022_000_040, "midjourney 操作不存在!");
     ErrorCode AI_MIDJOURNEY_MESSAGE_ID_INCORRECT = new ErrorCode(1_022_000_040, "midjourney message id 不正确!");
 
+    // ========== API 绘画 1-040-005-000 ==========
+
+    ErrorCode AI_IMAGE_NOT_CREATE_USER = new ErrorCode(1_022_005_000, "不是创建用户，不能删除 image!");
 }
