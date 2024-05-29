@@ -1,9 +1,10 @@
-package cn.iocoder.yudao.framework.ai.core.model.suno;
+package cn.iocoder.yudao.framework.ai.core.model.suno.api;
 
 
+import cn.iocoder.yudao.framework.ai.core.model.suno.SunoConfig;
+import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Data;
 import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
@@ -23,21 +24,26 @@ public class SunoApi {
     public static final String APPLICATION_JSON = "application/json";
     public static final String TOKEN_PREFIX = "Bearer ";
     public static final String API_URL = "https://api.acedata.cloud/suno/audios";
-    public static final String TEST_TOKEN = "13f13540dd3f4ae9885f63ac9f5d0b9f";
     private static final int READ_TIMEOUT = 160; // 连接超时时间（秒），音乐生成时间较长，设置为 160s，后续可做callback
     private final OkHttpClient client;
-    private final ObjectMapper objectMapper;
 
-    public SunoApi() {
-        this.client = new OkHttpClient().newBuilder().readTimeout(READ_TIMEOUT, TimeUnit.SECONDS).build();
-        this.objectMapper = new ObjectMapper();
+
+    public SunoApi(SunoConfig sunoConfig) {
+        this.client = new OkHttpClient().newBuilder().readTimeout(READ_TIMEOUT, TimeUnit.SECONDS)
+                .addInterceptor(chain -> {
+                    Request originalRequest = chain.request();
+                    Request requestWithUserAgent = originalRequest.newBuilder()
+                            .header("Authorization", TOKEN_PREFIX + sunoConfig.getToken())
+                            .build();
+                    return chain.proceed(requestWithUserAgent);
+                })
+                .build();
     }
 
-    public SunoResponse generateMusic(SunoRequest sunoRequest) throws IOException {
+    public SunoResponse musicGen(SunoRequest sunoRequest) {
         Request request = new Request.Builder()
                 .url(API_URL)
-                .header("Authorization", TOKEN_PREFIX + TEST_TOKEN)
-                .post(RequestBody.create(MediaType.parse(APPLICATION_JSON), objectMapper.writeValueAsString(sunoRequest)))
+                .post(RequestBody.create(MediaType.parse(APPLICATION_JSON), JsonUtils.toJsonString(sunoRequest)))
                 .build();
 
         try (Response response = client.newCall(request).execute()) {
@@ -45,7 +51,9 @@ public class SunoApi {
                 log.error("suno调用失败! response: {}", response);
                 throw new IllegalStateException("suno调用失败!" + response);
             }
-            return objectMapper.readValue(response.body().string(), SunoResponse.class);
+            return JsonUtils.parseObject(response.body().string(), SunoResponse.class);
+        } catch (IOException ioException) {
+            throw new RuntimeException(ioException);
         }
     }
 
@@ -90,7 +98,7 @@ public class SunoApi {
 
 
     /**
-     * API 响应的数据
+     * SunoAPI 响应的数据
      */
     @Data
     public static class SunoResponse {

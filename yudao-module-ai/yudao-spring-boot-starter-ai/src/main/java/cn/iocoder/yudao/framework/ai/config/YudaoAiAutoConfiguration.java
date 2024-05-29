@@ -3,6 +3,8 @@ package cn.iocoder.yudao.framework.ai.config;
 import cn.hutool.core.io.IoUtil;
 import cn.iocoder.yudao.framework.ai.core.factory.AiClientFactory;
 import cn.iocoder.yudao.framework.ai.core.factory.AiClientFactoryImpl;
+import cn.iocoder.yudao.framework.ai.core.model.suno.SunoConfig;
+import cn.iocoder.yudao.framework.ai.core.model.suno.api.SunoApi;
 import cn.iocoder.yudao.framework.ai.core.model.tongyi.QianWenChatClient;
 import cn.iocoder.yudao.framework.ai.core.model.tongyi.QianWenChatModal;
 import cn.iocoder.yudao.framework.ai.core.model.tongyi.QianWenOptions;
@@ -13,18 +15,14 @@ import cn.iocoder.yudao.framework.ai.core.model.xinghuo.api.XingHuoApi;
 import cn.iocoder.yudao.framework.ai.core.model.yiyan.YiYanChatClient;
 import cn.iocoder.yudao.framework.ai.core.model.yiyan.YiYanChatOptions;
 import cn.iocoder.yudao.framework.ai.core.model.yiyan.api.YiYanApi;
+import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.ai.models.midjourney.MidjourneyConfig;
 import org.springframework.ai.models.midjourney.MidjourneyMessage;
 import org.springframework.ai.models.midjourney.api.MidjourneyInteractionsApi;
 import org.springframework.ai.models.midjourney.webSocket.MidjourneyMessageHandler;
 import org.springframework.ai.models.midjourney.webSocket.MidjourneyWebSocketStarter;
 import org.springframework.ai.models.midjourney.webSocket.listener.MidjourneyMessageListener;
-import lombok.extern.slf4j.Slf4j;
-import org.jetbrains.annotations.NotNull;
-import org.springframework.ai.openai.OpenAiImageClient;
-import org.springframework.ai.openai.OpenAiImageOptions;
-import org.springframework.ai.openai.api.OpenAiImageApi;
-import org.springframework.ai.retry.RetryUtils;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -148,6 +146,13 @@ public class YudaoAiAutoConfiguration {
         MidjourneyConfig midjourneyConfig = getMidjourneyConfig(applicationContext, yudaoAiProperties.getMidjourney());
         // 创建 MidjourneyInteractionsApi
         return new MidjourneyInteractionsApi(midjourneyConfig);
+    }
+
+    @Bean
+    @ConditionalOnProperty(value = "yudao.ai.suno.enable", havingValue = "true")
+    public SunoApi sunoApi(YudaoAiProperties yudaoAiProperties) {
+        // 创建 sunoApi
+        return new SunoApi(new SunoConfig(yudaoAiProperties.getSuno().getToken()));
     }
 
     private static @NotNull MidjourneyConfig getMidjourneyConfig(ApplicationContext applicationContext,

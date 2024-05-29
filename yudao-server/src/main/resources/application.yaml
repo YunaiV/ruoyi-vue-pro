@@ -199,6 +199,9 @@ yudao.ai:
     token: MTE4MjE3MjY2MjkxNTY3ODIzOA.GEV1SG.c49F8lZoGCUHwsj8O0UdodmM6nyQHvuD2fXflw
     guild-id: 1237948819677904956
     channel-id: 1237948819677904960
+  suno:
+    enable: true
+    token: 13f13540dd3f4ae9885f63ac9f5d0b9f
 
 --- #################### 芋道相关配置 ####################
 

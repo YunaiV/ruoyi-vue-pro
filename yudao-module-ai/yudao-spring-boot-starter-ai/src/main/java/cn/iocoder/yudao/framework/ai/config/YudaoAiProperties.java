@@ -26,6 +26,7 @@ public class YudaoAiProperties {
     private YiYanProperties yiyan;
     private OpenAiImageProperties openAiImage;
     private MidjourneyProperties midjourney;
+    private SunoProperties suno;
 
     @Data
     @Accessors(chain = true)
@@ -133,5 +134,15 @@ public class YudaoAiProperties {
          * 频道id
          */
         private String channelId;
+    }
+
+    @Data
+    @Accessors(chain = true)
+    public static class SunoProperties {
+        private boolean enable = false;
+        /**
+         * token
+         */
+        private String token;
     }
 }
