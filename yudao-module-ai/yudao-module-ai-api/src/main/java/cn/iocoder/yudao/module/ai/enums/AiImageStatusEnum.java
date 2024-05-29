@@ -14,19 +14,16 @@ import lombok.Getter;
 @Getter
 public enum AiImageStatusEnum {
 
-    // TODO @fan：改成 10 生成中；20 成功；30 失败；其它可以去掉噢
-    SUBMIT("submit", "提交任务"),
-    WAITING("waiting", "等待"),
-    IN_PROGRESS("in_progress", "进行中"),
-    COMPLETE("complete", "完成"),
-    FAIL("fail", "失败"),
+    IN_PROGRESS("10", "进行中"),
+    COMPLETE("20", "完成"),
+    FAIL("30", "失败"),
 
     ;
 
     // TODO @fan：final 一下
-    private String status;
+    private final String status;
 
-    private String name;
+    private final String name;
 
 
     public static AiImageStatusEnum valueOfStatus(String status) {
