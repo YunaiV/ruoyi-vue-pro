@@ -62,6 +62,6 @@ public interface AiImageService {
      * @param id
      * @param loginUserId
      */
-    Boolean deleteMy(Long id, Long loginUserId);
+    Boolean myDelete(Long id, Long loginUserId);
 
 }
