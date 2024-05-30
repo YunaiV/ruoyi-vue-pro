@@ -5,6 +5,7 @@ import lombok.Data;
 
 import java.util.Map;
 
+// TODO @fan：待定
 /**
  * Midjourney：Imagine 请求
  *

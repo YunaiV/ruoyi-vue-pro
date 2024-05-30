@@ -7,6 +7,7 @@ import lombok.experimental.Accessors;
 
 import java.util.List;
 
+// TODO @fan：待定
 /**
  * midjourney req
  *
