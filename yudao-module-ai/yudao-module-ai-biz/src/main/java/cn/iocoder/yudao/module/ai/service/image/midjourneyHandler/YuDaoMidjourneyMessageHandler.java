@@ -2,23 +2,19 @@ package cn.iocoder.yudao.module.ai.service.image.midjourneyHandler;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
-import com.alibaba.fastjson.JSON;
-import org.springframework.ai.models.midjourney.MidjourneyMessage;
-import org.springframework.ai.models.midjourney.constants.MidjourneyGennerateStatusEnum;
-import org.springframework.ai.models.midjourney.webSocket.MidjourneyMessageHandler;
-import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.module.ai.controller.admin.image.vo.AiImageMidjourneyOperationsVO;
-import cn.iocoder.yudao.module.ai.convert.AiImageConvert;
 import cn.iocoder.yudao.module.ai.dal.dataobject.image.AiImageDO;
 import cn.iocoder.yudao.module.ai.dal.mysql.image.AiImageMapper;
 import cn.iocoder.yudao.module.ai.enums.AiImageStatusEnum;
+import com.alibaba.fastjson.JSON;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.ai.models.midjourney.MidjourneyMessage;
+import org.springframework.ai.models.midjourney.constants.MidjourneyGennerateStatusEnum;
+import org.springframework.ai.models.midjourney.webSocket.MidjourneyMessageHandler;
 import org.springframework.stereotype.Component;
 
-import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * yudao message handler
@@ -113,15 +109,16 @@ public class YuDaoMidjourneyMessageHandler implements MidjourneyMessageHandler {
     }
 
     private List<AiImageMidjourneyOperationsVO> getMidjourneyOperationsList(MidjourneyMessage midjourneyMessage) {
-        // 为空直接返回
-        if (CollUtil.isEmpty(midjourneyMessage.getComponents())) {
-            return Collections.emptyList();
-        }
-        // 将 component 转成 AiImageMidjourneyOperationsVO
-        return midjourneyMessage.getComponents().stream()
-                .map(componentType -> componentType.getComponents().stream()
-                        .map(AiImageConvert.INSTANCE::convertAiImageMidjourneyOperationsVO)
-                        .collect(Collectors.toList()))
-                .toList().stream().flatMap(List::stream).toList();
+//        // 为空直接返回
+//        if (CollUtil.isEmpty(midjourneyMessage.getComponents())) {
+//            return Collections.emptyList();
+//        }
+//        // 将 component 转成 AiImageMidjourneyOperationsVO
+//        return midjourneyMessage.getComponents().stream()
+//                .map(componentType -> componentType.getComponents().stream()
+//                        .map(AiImageConvert.INSTANCE::convertAiImageMidjourneyOperationsVO)
+//                        .collect(Collectors.toList()))
+//                .toList().stream().flatMap(List::stream).toList();
+        return null;
     }
 }

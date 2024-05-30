@@ -1,15 +1,10 @@
 package cn.iocoder.yudao.module.ai.controller.admin.image.vo;
 
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
-import com.baomidou.mybatisplus.annotation.FieldFill;
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
-import java.time.LocalDateTime;
 import java.util.Map;
 
 // TODO @fan：可以考虑，复用 AiImageDallRespVO，统一成 AIImageRespVO
@@ -22,7 +17,7 @@ import java.util.Map;
  */
 @Data
 @Accessors(chain = true)
-public class AiImageListRespVO extends PageParam {
+public class AiImagePageMyRespVO extends PageParam {
 
     @Schema(description = "id编号", example = "1")
     private Long id;
