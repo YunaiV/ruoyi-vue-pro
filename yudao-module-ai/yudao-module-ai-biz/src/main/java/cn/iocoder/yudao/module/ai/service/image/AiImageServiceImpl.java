@@ -200,10 +200,12 @@ public class AiImageServiceImpl implements AiImageService {
 
     // TODO @fan：1）需要校验存在；2）需要校验属于我；
     @Override
-    public void deleteMy(Long id, Long loginUserId) {
+    public void deleteMy(Long id, Long userId) {
         // 校验记录是否存在
+        // TODO @fan：aiImageDO 这种命名 image 就 ok 拉，更简洁
+        // TODO @fan：下面这个，可以返回图片不存在
         AiImageDO aiImageDO = validateExists(id);
-        if (!aiImageDO.getUserId().equals(loginUserId)) {
+        if (!aiImageDO.getUserId().equals(userId)) {
             throw exception(ErrorCodeConstants.AI_IMAGE_NOT_CREATE_USER);
         }
         // 删除记录

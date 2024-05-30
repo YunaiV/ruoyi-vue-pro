@@ -12,6 +12,7 @@ import lombok.experimental.Accessors;
 import java.time.LocalDateTime;
 import java.util.Map;
 
+// TODO @fan：可以考虑，复用 AiImageDallRespVO，统一成 AIImageRespVO
 /**
  * midjourney req
  *
@@ -60,6 +61,8 @@ public class AiImageListRespVO extends PageParam {
     private String errorMessage;
 
     // ============ 绘画请求参数
+
+    // todo @fan：下面的 style、mjNonceId 直接就不用注释啦，直接去看 DO 完事哈
 
     /**
      * - style

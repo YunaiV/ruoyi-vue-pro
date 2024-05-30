@@ -42,5 +42,7 @@ public interface ErrorCodeConstants {
 
     // ========== API 绘画 1-040-005-000 ==========
 
+    // TODO @fan：这个直接返回找不到图片就好了
     ErrorCode AI_IMAGE_NOT_CREATE_USER = new ErrorCode(1_022_005_000, "不是创建用户，不能删除 image!");
+
 }

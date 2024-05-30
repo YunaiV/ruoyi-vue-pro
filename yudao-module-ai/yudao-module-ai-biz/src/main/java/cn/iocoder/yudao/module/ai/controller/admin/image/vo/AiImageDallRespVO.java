@@ -44,17 +44,18 @@ public class AiImageDallRespVO {
     @Schema(description = "是否发布", example = "public")
     private String publicStatus;
 
-    @Schema(description = "图片地址(自己服务器)", example = "http://")
+    @Schema(description = "图片地址(自己服务器)", example = "https://")
     private String picUrl;
 
-    @Schema(description = "绘画图片地址(绘画好的服务器)", example = "http://")
+    @Schema(description = "绘画图片地址(绘画好的服务器)", example = "https://")
     private String originalPicUrl;
 
     @Schema(description = "绘画错误信息", example = "图片错误信息")
     private String errorMessage;
 
-    // ============ 绘画请求参数
+    // ============ 绘画请求参数 ============
 
+    // todo @fan：下面的 style、mjNonceId 直接就不用注释啦，直接去看 DO 完事哈
     /**
      * - style
      */

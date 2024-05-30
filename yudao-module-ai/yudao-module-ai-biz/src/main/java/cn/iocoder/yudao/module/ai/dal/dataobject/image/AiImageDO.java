@@ -20,10 +20,12 @@ import java.util.Map;
 @Data
 public class AiImageDO extends BaseDO {
 
+    // TODO @fan：1）使用 java 注释哈，不要注解。2）关联、枚举字段，要关联到对应类，参考 AiChatMessageDO 的注释
+
     @TableId(type = IdType.AUTO)
     private Long id;
 
-    @Schema(description = "用户id")
+    @Schema(description = "用户编号")
     private Long userId;
 
     @Schema(description = "提示词")
@@ -41,6 +43,7 @@ public class AiImageDO extends BaseDO {
     @Schema(description = "图片高度")
     private String height;
 
+    // TODO @fan：这种就注释绘画状态，然后枚举类关联下就好啦
     @Schema(description = "绘画状态：提交、排队、绘画中、绘画完成、绘画失败")
     private String status;
 
@@ -53,10 +56,7 @@ public class AiImageDO extends BaseDO {
     @Schema(description = "绘画图片地址(绘画好的服务器)")
     private String originalPicUrl;
 
-    @Schema(description = "绘画错误信息")
-    private String errorMessage;
-
-    // ============ 绘画请求参数
+    // ============ 绘画请求参数 ============
 
     /**
      * - style
@@ -74,6 +74,9 @@ public class AiImageDO extends BaseDO {
     @Schema(description = "绘画请求响应参数")
     @TableField(typeHandler = JacksonTypeHandler.class)
     private Map<String, Object> drawResponse;
+
+    @Schema(description = "绘画错误信息")
+    private String errorMessage;
 
 }
 

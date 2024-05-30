@@ -5,6 +5,7 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.ai.controller.admin.image.vo.*;
 import cn.iocoder.yudao.module.ai.service.image.AiImageService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
@@ -23,13 +24,15 @@ public class AiImageController {
     @Resource
     private AiImageService aiImageService;
 
-    @Operation(summary = "获取 - 我的分页列表", description = "dall3、midjourney")
+    // TODO @fan：方法名叫做，getImagePageMy ；我们的命名，还是以动名词哈。不考虑省略名词的原因，是担心一个 Service 扩多个模块，纯粹动词无法表达
+    @Operation(summary = "获取【我的】绘图分页")
     @GetMapping("/my-page")
     public CommonResult<PageResult<AiImageListRespVO>> myPage(@Validated AiImageListReqVO req) {
         return success(aiImageService.list(req));
     }
 
-    @Operation(summary = "获取 - 我的 image 信息", description = "...")
+    // TODO @fan：类似 /my-page 的建议
+    @Operation(summary = "获取【我的】绘图记录", description = "...")
     @GetMapping("/get-my")
     public CommonResult<AiImageListRespVO> getMy(@RequestParam("id") Long id) {
         return CommonResult.success(aiImageService.getMy(id));
@@ -64,9 +67,13 @@ public class AiImageController {
         return success(null);
     }
 
-    @Operation(summary = "删除绘画记录", description = "")
+    // TODO @fan：类似 /my-page 的建议
+    // TODO @fan：目前如果没结果，返回 Boolean 哈
+    @Operation(summary = "删除【我的】绘画记录")
     @DeleteMapping("/delete-my")
+    @Parameter(name = "id", required = true, description = "绘画编号", example = "1024")
     public CommonResult<Void> deleteMy(@RequestParam("id") Long id) {
+        // TODO @fan：这种一次性的 loginUserId，可以不用定义变量，直接当参数传递
         Long loginUserId = getLoginUserId();
         aiImageService.deleteMy(id, loginUserId);
         return success(null);

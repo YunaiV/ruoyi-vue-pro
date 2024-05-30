@@ -7,16 +7,14 @@ import org.apache.ibatis.annotations.Mapper;
 import org.springframework.stereotype.Repository;
 
 /**
- * ai image
+ * AI 绘图 Mapper
  *
  * @author fansili
- * @time 2024/4/28 14:01
- * @since 1.0
  */
 @Mapper
 public interface AiImageMapper extends BaseMapperX<AiImageDO> {
 
-
+    // TODO @fan：这个建议，直接使用 update，service 拼接要改的状态哈
     /**
      * 更新 - 根据 messageId
      *
