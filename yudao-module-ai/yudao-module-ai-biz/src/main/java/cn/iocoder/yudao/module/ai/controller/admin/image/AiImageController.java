@@ -78,10 +78,9 @@ public class AiImageController {
     }
 
     @Operation(summary = "删除【我的】绘画记录")
-    @DeleteMapping("/delete-my")
+    @DeleteMapping("/delete-id-my")
     @Parameter(name = "id", required = true, description = "绘画编号", example = "1024")
-    public CommonResult<Boolean> deleteMyById(@RequestParam("id") Long id) {
-        return success(aiImageService.deleteMyById(id, getLoginUserId()));
+    public CommonResult<Boolean> deleteIdMy(@RequestParam("id") Long id) {
+        return success(aiImageService.deleteIdMy(id, getLoginUserId()));
     }
-
 }

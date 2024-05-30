@@ -184,7 +184,7 @@ public class AiImageServiceImpl implements AiImageService {
     }
 
     @Override
-    public Boolean deleteMyById(Long id, Long userId) {
+    public Boolean deleteIdMy(Long id, Long userId) {
         // 校验是否存在，并获取 image
         AiImageDO image = validateExists(id);
         // 是否属于当前用户
