@@ -151,7 +151,6 @@ public class YudaoAiAutoConfiguration {
     @Bean
     @ConditionalOnProperty(value = "yudao.ai.suno.enable", havingValue = "true")
     public SunoApi sunoApi(YudaoAiProperties yudaoAiProperties) {
-        // 创建 sunoApi
         return new SunoApi(new SunoConfig(yudaoAiProperties.getSuno().getToken()));
     }
 

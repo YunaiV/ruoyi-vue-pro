@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.framework.ai.core.model.suno.api;
 
-
 import cn.iocoder.yudao.framework.ai.core.model.suno.SunoConfig;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -14,6 +13,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+// TODO @xiaoxin：类注释
 /**
  * @Author xiaoxin
  * @Date 2024/5/27
@@ -21,13 +21,17 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 public class SunoApi {
 
+    // TODO @xiaoxin：APPLICATION_JSON、TOKEN_PREFIX 看看 spring 有没自带的这 2 个枚举哈。变量越少越好
     public static final String APPLICATION_JSON = "application/json";
     public static final String TOKEN_PREFIX = "Bearer ";
     public static final String API_URL = "https://api.acedata.cloud/suno/audios";
+
     private static final int READ_TIMEOUT = 160; // 连接超时时间（秒），音乐生成时间较长，设置为 160s，后续可做callback
+
+    // TODO @xiaoxin：建议使用 webClient 对接。参考 https://github.com/spring-projects/spring-ai/blob/main/models/spring-ai-openai/src/main/java/org/springframework/ai/openai/api/OpenAiApi.java
     private final OkHttpClient client;
 
-
+    // TODO @xiaoxin：sunoConfig => config，简洁一点
     public SunoApi(SunoConfig sunoConfig) {
         this.client = new OkHttpClient().newBuilder().readTimeout(READ_TIMEOUT, TimeUnit.SECONDS)
                 .addInterceptor(chain -> {
@@ -40,6 +44,7 @@ public class SunoApi {
                 .build();
     }
 
+    // TODO @芋艿：方法名，要考虑下；
     public SunoResponse musicGen(SunoRequest sunoRequest) {
         Request request = new Request.Builder()
                 .url(API_URL)
@@ -57,6 +62,7 @@ public class SunoApi {
         }
     }
 
+    // TODO @xiaoxin：看看是不是使用 record 特性，简化下；
 
     /**
      * 请求数据对象，用于生成音乐音频
@@ -96,6 +102,7 @@ public class SunoApi {
         private String callbackUrl;
     }
 
+    // TODO @xiaoxin：看看是不是使用 record 特性，简化下；
 
     /**
      * SunoAPI 响应的数据
