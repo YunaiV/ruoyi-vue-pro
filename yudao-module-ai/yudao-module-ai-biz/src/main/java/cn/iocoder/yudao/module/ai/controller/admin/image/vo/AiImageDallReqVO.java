@@ -29,8 +29,12 @@ public class AiImageDallReqVO {
     @Schema(description = "图像生成的风格。可为vivid（生动）或natural（自然)")
     private String style;
 
-    @Schema(description = "生成图像的尺寸大小。对于dall-e-2模型，尺寸可为256x256, 512x512, 或 1024x1024。对于dall-e-3模型，尺寸可为1024x1024, 1792x1024, 或 1024x1792。")
-    @NotNull(message = "size不能为空!")
-    private String size;
+    @Schema(description = "图片高度。对于dall-e-2模型，尺寸可为256x256, 512x512, 或 1024x1024。对于dall-e-3模型，尺寸可为1024x1024, 1792x1024, 或 1024x1792。")
+    @NotNull(message = "图片高度不能为空!")
+    private String height;
+
+    @Schema(description = "图片宽度。对于dall-e-2模型，尺寸可为256x256, 512x512, 或 1024x1024。对于dall-e-3模型，尺寸可为1024x1024, 1792x1024, 或 1024x1792。")
+    @NotNull(message = "图片宽度不能为空!")
+    private String width;
 
 }
