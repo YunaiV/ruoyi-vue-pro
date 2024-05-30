@@ -3,8 +3,8 @@ package cn.iocoder.yudao.module.ai.service.image;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.ai.controller.admin.image.vo.AiImageDallReqVO;
 import cn.iocoder.yudao.module.ai.controller.admin.image.vo.AiImageListReqVO;
+import cn.iocoder.yudao.module.ai.controller.admin.image.vo.AiImageMidjourneyImagineReqVO;
 import cn.iocoder.yudao.module.ai.controller.admin.image.vo.AiImageMidjourneyOperateReqVO;
-import cn.iocoder.yudao.module.ai.controller.admin.image.vo.AiImageMidjourneyReqVO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.image.AiImageDO;
 
 /**
@@ -44,10 +44,11 @@ public interface AiImageService {
     /**
      * midjourney 图片生成
      *
+     * @param loginUserId
      * @param req
      * @return
      */
-    void midjourney(AiImageMidjourneyReqVO req);
+    Long midjourneyImagine(Long loginUserId, AiImageMidjourneyImagineReqVO req);
 
     /**
      * midjourney 操作(u1、u2、放大、换一批...)

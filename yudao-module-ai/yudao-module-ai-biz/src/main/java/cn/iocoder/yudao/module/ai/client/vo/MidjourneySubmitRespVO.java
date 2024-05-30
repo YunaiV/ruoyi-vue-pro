@@ -3,6 +3,8 @@ package cn.iocoder.yudao.module.ai.client.vo;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
+import java.util.Map;
+
 /**
  * Midjourney：Imagine 请求
  *
@@ -20,7 +22,7 @@ public class MidjourneySubmitRespVO {
     private String description;
 
     @Schema(description = "扩展字段")
-    private String properties;
+    private Map<String, Object> properties;
 
     @Schema(description = "任务ID")
     private String result;
