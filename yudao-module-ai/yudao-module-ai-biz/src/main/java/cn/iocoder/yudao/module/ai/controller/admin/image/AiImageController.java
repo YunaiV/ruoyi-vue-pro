@@ -78,13 +78,11 @@ public class AiImageController {
     }
 
     // TODO @fan：类似 /my-page 的建议
-    // TODO @fan：目前如果没结果，返回 Boolean 哈
     @Operation(summary = "删除【我的】绘画记录")
     @DeleteMapping("/delete-my")
     @Parameter(name = "id", required = true, description = "绘画编号", example = "1024")
-    public CommonResult<Void> deleteMy(@RequestParam("id") Long id) {
-        aiImageService.deleteMy(id, getLoginUserId());
-        return success(null);
+    public CommonResult<Boolean> deleteMy(@RequestParam("id") Long id) {
+        return success(aiImageService.deleteMy(id, getLoginUserId()));
     }
 
 }

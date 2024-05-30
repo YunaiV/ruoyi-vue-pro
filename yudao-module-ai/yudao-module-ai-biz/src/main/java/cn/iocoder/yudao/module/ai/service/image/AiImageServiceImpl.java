@@ -184,7 +184,7 @@ public class AiImageServiceImpl implements AiImageService {
     }
 
     @Override
-    public void deleteMy(Long id, Long userId) {
+    public Boolean deleteMy(Long id, Long userId) {
         // 校验是否存在，并获取 image
         AiImageDO image = validateExists(id);
         // 是否属于当前用户
@@ -192,7 +192,7 @@ public class AiImageServiceImpl implements AiImageService {
             throw exception(ErrorCodeConstants.AI_IMAGE_NOT_EXISTS);
         }
         // 删除记录
-        imageMapper.deleteById(id);
+        return imageMapper.deleteById(id) > 0;
     }
 
     private void validateMessageId(String mjMessageId, String messageId) {
