@@ -1,7 +1,11 @@
 package cn.iocoder.yudao.module.ai.service.image;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.ai.controller.admin.image.vo.*;
+import cn.iocoder.yudao.module.ai.controller.admin.image.vo.AiImageDallReqVO;
+import cn.iocoder.yudao.module.ai.controller.admin.image.vo.AiImageListReqVO;
+import cn.iocoder.yudao.module.ai.controller.admin.image.vo.AiImageMidjourneyOperateReqVO;
+import cn.iocoder.yudao.module.ai.controller.admin.image.vo.AiImageMidjourneyReqVO;
+import cn.iocoder.yudao.module.ai.dal.dataobject.image.AiImageDO;
 
 /**
  * ai 作图
@@ -15,10 +19,11 @@ public interface AiImageService {
     /**
      * ai绘画 - 列表
      *
+     * @param loginUserId
      * @param req
      * @return
      */
-    PageResult<AiImageListRespVO> list(AiImageListReqVO req);
+    PageResult<AiImageDO> getImagePageMy(Long loginUserId, AiImageListReqVO req);
 
     /**
      * 获取 - image 信息
@@ -26,14 +31,15 @@ public interface AiImageService {
      * @param id
      * @return
      */
-    AiImageListRespVO getMy(Long id);
+    AiImageDO getMy(Long id);
 
     /**
      * ai绘画 - dall2/dall3 绘画
      *
+     * @param loginUserId
      * @param req
      */
-    AiImageDallRespVO dall(AiImageDallReqVO req);
+    Long dall(Long loginUserId, AiImageDallReqVO req);
 
     /**
      * midjourney 图片生成
