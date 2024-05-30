@@ -15,18 +15,17 @@ public class SunoTests {
 
     @Before
     public void setup() {
-        String token = "13f13540dd3f4ae9885f63ac9f5d0b9f";
+        String token = "16b4356581984d538652354b60d69ff0";
         this.sunoConfig = new SunoConfig(token);
     }
 
     @Test
     public void generateMusic() {
         SunoApi sunoApi = new SunoApi(sunoConfig);
-        SunoApi.SunoRequest sunoRequest = new SunoApi
-                .SunoRequest()
-                .setPrompt("创作一首带有轻松吉他旋律的流行歌曲，[verse] 描述夏日海滩的宁静，[chorus] 节奏加快，表达对自由的向往。");
-        SunoApi.SunoResponse sunoResponse = sunoApi.musicGen(sunoRequest);
-        System.out.println(sunoResponse);
+        SunoApi.SunoReq sunoReq = new SunoApi.SunoReq("创作一首带有轻松吉他旋律的流行歌曲，[verse] 描述夏日海滩的宁静，[chorus] 节奏加快，表达对自由的向往。");
+
+        SunoApi.SunoResp sunoResp = sunoApi.musicGen(sunoReq);
+        System.out.println(sunoResp);
     }
 
 }

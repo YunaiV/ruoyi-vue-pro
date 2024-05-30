@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.ai.controller.admin.music.vo;
 
+import cn.iocoder.yudao.framework.ai.core.model.suno.api.SunoApi;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
@@ -25,5 +26,15 @@ public class SunoRespVO {
      * 音乐数据列表
      */
     private List<MusicDataVO> data;
+
+
+    //把 SunoResp转为本vo类
+    public static SunoRespVO convertFrom(SunoApi.SunoResp sunoResp) {
+        SunoRespVO sunoRespVO = new SunoRespVO();
+        sunoRespVO.setSuccess(sunoResp.success());
+        sunoRespVO.setTaskId(sunoResp.taskId());
+        sunoRespVO.setData(MusicDataVO.convertFrom(sunoResp.data()));
+        return sunoRespVO;
+    }
 
 }
