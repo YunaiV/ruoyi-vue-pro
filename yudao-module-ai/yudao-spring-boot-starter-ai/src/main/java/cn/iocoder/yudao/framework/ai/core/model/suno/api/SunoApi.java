@@ -3,7 +3,6 @@ package cn.iocoder.yudao.framework.ai.core.model.suno.api;
 import cn.iocoder.yudao.framework.ai.core.model.suno.SunoConfig;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.openai.api.ApiUtils;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -48,128 +47,69 @@ public class SunoApi {
                 .block();
     }
 
-    // TODO @xiaoxin：看看是不是使用 record 特性，简化下；
-
     /**
-     * 请求数据对象，用于生成音乐音频
+     * 请求数据对象，用于生成音乐音频。
+     *
+     * @param prompt      用于生成音乐音频的提示
+     * @param lyric       用于生成音乐音频的歌词
+     * @param custom      指示音乐音频是否为定制，如果为 true，则从歌词生成，否则从提示生成
+     * @param title       音乐音频的标题
+     * @param style       音乐音频的风格
+     * @param callbackUrl 音乐音频生成后回调的 URL
      */
-    @Data
     @JsonInclude(value = JsonInclude.Include.NON_NULL)
-    public static class SunoReq {
-        /**
-         * 用于生成音乐音频的提示
-         */
-        private String prompt;
+    public record SunoReq(
+            String prompt,
+            String lyric,
+            boolean custom,
+            String title,
+            String style,
+            String callbackUrl
+    ) {
+        public SunoReq(String prompt) {
+            this(prompt, null, false, null, null, null);
+        }
 
-        /**
-         * 用于生成音乐音频的歌词
-         */
-        private String lyric;
-
-        /**
-         * 指示音乐音频是否为定制，如果为 true，则从歌词生成，否则从提示生成
-         */
-        private boolean custom;
-
-        /**
-         * 音乐音频的标题
-         */
-        private String title;
-
-        /**
-         * 音乐音频的风格
-         */
-        private String style;
-
-        /**
-         * 音乐音频生成后回调的 URL
-         */
-        private String callbackUrl;
     }
 
-    // TODO @xiaoxin：看看是不是使用 record 特性，简化下；
-
     /**
-     * SunoAPI 响应的数据
+     * SunoAPI 响应的数据。
+     *
+     * @param success 表示请求是否成功
+     * @param taskId  任务 ID
+     * @param data    音乐数据列表
      */
-    @Data
-    public static class SunoResp {
+    public record SunoResp(
+            boolean success,
+            @JsonProperty("task_id") String taskId,
+            List<MusicData> data
+    ) {
         /**
-         * 表示请求是否成功
+         * 单个音乐数据。
+         *
+         * @param id        音乐数据的 ID
+         * @param title     音乐音频的标题
+         * @param imageUrl  音乐音频的图片 URL
+         * @param lyric     音乐音频的歌词
+         * @param audioUrl  音乐音频的 URL
+         * @param videoUrl  音乐视频的 URL
+         * @param createdAt 音乐音频的创建时间
+         * @param model     使用的模型名称
+         * @param prompt    生成音乐音频的提示
+         * @param style     音乐音频的风格
          */
-        private boolean success;
-
-        /**
-         * 任务 ID
-         */
-        @JsonProperty("task_id")
-        private String taskId;
-
-        /**
-         * 音乐数据列表
-         */
-        private List<MusicData> data;
-
-        /**
-         * 表示单个音乐数据的类
-         */
-        @Data
-        static class MusicData {
-            /**
-             * 音乐数据的 ID
-             */
-            private String id;
-
-            /**
-             * 音乐音频的标题
-             */
-            private String title;
-
-            /**
-             * 音乐音频的图片 URL
-             */
-            @JsonProperty("image_url")
-            private String imageUrl;
-
-            /**
-             * 音乐音频的歌词
-             */
-            private String lyric;
-
-            /**
-             * 音乐音频的 URL
-             */
-            @JsonProperty("audio_url")
-            private String audioUrl;
-
-            /**
-             * 音乐视频的 URL
-             */
-            @JsonProperty("video_url")
-            private String videoUrl;
-
-            /**
-             * 音乐音频的创建时间
-             */
-            @JsonProperty("created_at")
-            private String createdAt;
-
-            /**
-             * 使用的模型名称
-             */
-            private String model;
-
-            /**
-             * 生成音乐音频的提示
-             */
-            private String prompt;
-
-            /**
-             * 音乐音频的风格
-             */
-            private String style;
+        public record MusicData(
+                String id,
+                String title,
+                @JsonProperty("image_url") String imageUrl,
+                String lyric,
+                @JsonProperty("audio_url") String audioUrl,
+                @JsonProperty("video_url") String videoUrl,
+                @JsonProperty("created_at") String createdAt,
+                String model,
+                String prompt,
+                String style
+        ) {
         }
     }
-
-
 }

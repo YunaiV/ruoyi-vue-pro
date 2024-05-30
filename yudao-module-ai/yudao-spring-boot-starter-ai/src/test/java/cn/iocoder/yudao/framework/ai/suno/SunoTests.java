@@ -22,8 +22,8 @@ public class SunoTests {
     @Test
     public void generateMusic() {
         SunoApi sunoApi = new SunoApi(sunoConfig);
-        SunoApi.SunoReq sunoReq = new SunoApi.SunoReq()
-                .setPrompt("创作一首带有轻松吉他旋律的流行歌曲，[verse] 描述夏日海滩的宁静，[chorus] 节奏加快，表达对自由的向往。");
+        SunoApi.SunoReq sunoReq = new SunoApi.SunoReq("创作一首带有轻松吉他旋律的流行歌曲，[verse] 描述夏日海滩的宁静，[chorus] 节奏加快，表达对自由的向往。");
+
         SunoApi.SunoResp sunoResp = sunoApi.musicGen(sunoReq);
         System.out.println(sunoResp);
     }
