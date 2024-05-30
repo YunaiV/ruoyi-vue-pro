@@ -19,7 +19,7 @@ public class MusicServiceImpl implements MusicService {
 
     @Override
     public SunoRespVO musicGen(SunoReqVO sunoReqVO) {
-        SunoApi.SunoRequest req = BeanUtils.toBean(sunoReqVO, SunoApi.SunoRequest.class);
+        SunoApi.SunoReq req = BeanUtils.toBean(sunoReqVO, SunoApi.SunoReq.class);
         return BeanUtils.toBean(sunoApi.musicGen(req), SunoRespVO.class);
     }
 }
