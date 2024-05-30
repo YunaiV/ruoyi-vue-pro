@@ -28,4 +28,5 @@ public class SunoTests {
         SunoApi.SunoResponse sunoResponse = sunoApi.musicGen(sunoRequest);
         System.out.println(sunoResponse);
     }
+
 }

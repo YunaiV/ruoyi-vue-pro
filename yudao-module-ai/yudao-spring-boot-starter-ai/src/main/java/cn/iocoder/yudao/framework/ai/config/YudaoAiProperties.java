@@ -137,12 +137,15 @@ public class YudaoAiProperties {
     }
 
     @Data
-    @Accessors(chain = true)
+    @Accessors(chain = true) // TODO @xiaoxin：可以去掉这个，默认全局已经开启
     public static class SunoProperties {
+
         private boolean enable = false;
         /**
          * token
          */
         private String token;
+
     }
+
 }
