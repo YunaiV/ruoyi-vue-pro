@@ -10,7 +10,12 @@ package cn.iocoder.yudao.module.ai;
 public class AiCommonConstants {
 
     /**
-     * 对话 - 默认 title
+     * 绘画 request - style
      */
-    public static final String CONVERSATION_DEFAULT_TITLE = "新增对话";
+    public static final String DRAW_REQ_KEY_STYLE = "style";
+    /**
+     * dall size - 模板(1024x1024)
+     */
+    public static final String DALL_SIZE_TEMPLATE = "%sx%s";
+
 }
