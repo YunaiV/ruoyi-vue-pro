@@ -61,17 +61,19 @@ public class AiImageController {
         return success(aiImageService.dall(getLoginUserId(), req));
     }
 
-    @Operation(summary = "midjourney-imagine 绘画", description = "...")
-    @PostMapping("/midjourney/imagine")
-    public CommonResult<Long> midjourneyImagine(@Validated @RequestBody AiImageMidjourneyImagineReqVO req) {
-        return success(aiImageService.midjourneyImagine(getLoginUserId(), req));
-    }
-
     @Operation(summary = "删除【我的】绘画记录")
     @DeleteMapping("/delete-id-my")
     @Parameter(name = "id", required = true, description = "绘画编号", example = "1024")
     public CommonResult<Boolean> deleteIdMy(@RequestParam("id") Long id) {
         return success(aiImageService.deleteIdMy(id, getLoginUserId()));
+    }
+
+    // ================ midjourney 接口
+
+    @Operation(summary = "midjourney-imagine 绘画", description = "...")
+    @PostMapping("/midjourney/imagine")
+    public CommonResult<Long> midjourneyImagine(@Validated @RequestBody AiImageMidjourneyImagineReqVO req) {
+        return success(aiImageService.midjourneyImagine(getLoginUserId(), req));
     }
 
     @Operation(summary = "midjourney proxy - 回调通知")
