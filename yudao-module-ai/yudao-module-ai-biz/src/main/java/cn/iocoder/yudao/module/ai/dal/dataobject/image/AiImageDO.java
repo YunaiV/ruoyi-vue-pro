@@ -28,6 +28,9 @@ public class AiImageDO extends BaseDO {
     @Schema(description = "用户编号")
     private Long userId;
 
+    @Schema(description = "midjourney proxy 关联的 job id")
+    private String jobId;
+
     @Schema(description = "提示词")
     private String prompt;
 

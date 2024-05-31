@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.ai.service.image;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.module.ai.client.vo.MidjourneyNotifyReqVO;
 import cn.iocoder.yudao.module.ai.controller.admin.image.vo.AiImageDallReqVO;
 import cn.iocoder.yudao.module.ai.controller.admin.image.vo.AiImageListReqVO;
 import cn.iocoder.yudao.module.ai.controller.admin.image.vo.AiImageMidjourneyImagineReqVO;
@@ -65,4 +66,12 @@ public interface AiImageService {
      */
     Boolean deleteIdMy(Long id, Long loginUserId);
 
+    /**
+     * midjourney proxy - 回调通知
+     *
+     * @param loginUserId
+     * @param notifyReqVO
+     * @return
+     */
+    Boolean midjourneyNotify(Long loginUserId, MidjourneyNotifyReqVO notifyReqVO);
 }

@@ -11,7 +11,10 @@ import lombok.Data;
  * @since 1.0
  */
 @Data
-public class MidjourneyNotifyVO {
+public class MidjourneyNotifyReqVO {
+
+    @Schema(description = "job id")
+    private String id;
 
     @Schema(description = "任务类型")
     private MidjourneyTaskActionEnum action;

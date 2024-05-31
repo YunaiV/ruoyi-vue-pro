@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.ai.controller.admin.image;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
+import cn.iocoder.yudao.module.ai.client.vo.MidjourneyNotifyReqVO;
 import cn.iocoder.yudao.module.ai.controller.admin.image.vo.AiImageDallReqVO;
 import cn.iocoder.yudao.module.ai.controller.admin.image.vo.AiImageListReqVO;
 import cn.iocoder.yudao.module.ai.controller.admin.image.vo.AiImageMidjourneyImagineReqVO;
@@ -13,7 +14,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -74,9 +74,9 @@ public class AiImageController {
         return success(aiImageService.deleteIdMy(id, getLoginUserId()));
     }
 
-    @Operation(summary = "删除【我的】绘画记录")
+    @Operation(summary = "midjourney proxy - 回调通知")
     @RequestMapping("/midjourney-notify")
-    public CommonResult<Boolean> midjourneyNotify(HttpServletRequest request) {
-        return success(true);
+    public CommonResult<Boolean> midjourneyNotify(MidjourneyNotifyReqVO notifyReqVO) {
+        return success(aiImageService.midjourneyNotify(getLoginUserId(), notifyReqVO));
     }
 }

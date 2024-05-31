@@ -4,7 +4,6 @@ import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.module.ai.dal.dataobject.image.AiImageDO;
 import org.apache.ibatis.annotations.Mapper;
-import org.springframework.stereotype.Repository;
 
 /**
  * AI 绘图 Mapper
@@ -24,6 +23,16 @@ public interface AiImageMapper extends BaseMapperX<AiImageDO> {
     default void updateByMjNonce(Long mjNonceId, AiImageDO aiImageDO) {
 //        this.update(aiImageDO, new LambdaQueryWrapperX<AiImageDO>().eq(AiImageDO::getMjNonceId, mjNonceId));
         return;
+    }
+
+    /**
+     * 查询 - 根据 job id
+     *
+     * @param id
+     * @return
+     */
+    default AiImageDO selectByJobId(String id) {
+        return this.selectOne(new LambdaQueryWrapperX<AiImageDO>().eq(AiImageDO::getJobId, id));
     }
 
 }
