@@ -12,8 +12,8 @@ import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.module.ai.AiCommonConstants;
 import cn.iocoder.yudao.module.ai.ErrorCodeConstants;
 import cn.iocoder.yudao.module.ai.client.MidjourneyProxyClient;
+import cn.iocoder.yudao.module.ai.client.enums.MidjourneySubmitCodeEnum;
 import cn.iocoder.yudao.module.ai.client.vo.MidjourneyImagineReqVO;
-import cn.iocoder.yudao.module.ai.client.vo.MidjourneySubmitCodeEnum;
 import cn.iocoder.yudao.module.ai.client.vo.MidjourneySubmitRespVO;
 import cn.iocoder.yudao.module.ai.controller.admin.image.vo.*;
 import cn.iocoder.yudao.module.ai.dal.dataobject.image.AiImageDO;
@@ -157,7 +157,8 @@ public class AiImageServiceImpl implements AiImageService {
         // 3、调用 MidjourneyProxy 提交任务
         MidjourneyImagineReqVO imagineReqVO = BeanUtils.toBean(req, MidjourneyImagineReqVO.class);
         imagineReqVO.setNotifyHook(midjourneyNotifyUrl);
-        imagineReqVO.setState(String.valueOf(aiImageDO.getId()));
+        // 设置 midjourney 扩展参数，通过 --ar 来设置尺寸
+        imagineReqVO.setState(String.format("--ar %s:%s", req.getWidth(), req.getHeight()));
         MidjourneySubmitRespVO submitRespVO = midjourneyProxyClient.imagine(imagineReqVO);
 
         // 4、保存任务 id (状态码: 1(提交成功), 21(已存在), 22(排队中), other(错误))

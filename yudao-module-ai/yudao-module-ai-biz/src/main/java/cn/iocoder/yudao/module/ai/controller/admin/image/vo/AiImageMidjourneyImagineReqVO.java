@@ -25,6 +25,12 @@ public class AiImageMidjourneyImagineReqVO {
     @Schema(description = "模型(midjourney、niji)")
     private String model;
 
+    @Schema(description = "图片宽度")
+    private String width;
+
+    @Schema(description = "图片高度")
+    private String height;
+
     @Schema(description = "垫图(参考图)base64数组")
     private List<String> base64Array;
 }
