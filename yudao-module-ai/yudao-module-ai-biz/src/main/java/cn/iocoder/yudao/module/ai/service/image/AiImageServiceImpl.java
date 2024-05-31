@@ -2,17 +2,17 @@ package cn.iocoder.yudao.module.ai.service.image;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.core.util.ObjUtil;
+import cn.hutool.extra.spring.SpringUtil;
 import cn.hutool.http.HttpUtil;
 import cn.iocoder.yudao.framework.ai.core.enums.AiPlatformEnum;
 import cn.iocoder.yudao.framework.ai.core.enums.OpenAiImageModelEnum;
 import cn.iocoder.yudao.framework.ai.core.enums.OpenAiImageStyleEnum;
 import cn.iocoder.yudao.framework.ai.core.exception.AiException;
-import cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil;
+import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
-import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.module.ai.AiCommonConstants;
-import cn.iocoder.yudao.module.ai.ErrorCodeConstants;
 import cn.iocoder.yudao.module.ai.client.MidjourneyProxyClient;
 import cn.iocoder.yudao.module.ai.client.enums.MidjourneyModelEnum;
 import cn.iocoder.yudao.module.ai.client.enums.MidjourneySubmitCodeEnum;
@@ -21,9 +21,7 @@ import cn.iocoder.yudao.module.ai.client.vo.MidjourneyImagineReqVO;
 import cn.iocoder.yudao.module.ai.client.vo.MidjourneyNotifyReqVO;
 import cn.iocoder.yudao.module.ai.client.vo.MidjourneySubmitRespVO;
 import cn.iocoder.yudao.module.ai.controller.admin.image.vo.AiImageDallReqVO;
-import cn.iocoder.yudao.module.ai.controller.admin.image.vo.AiImageListReqVO;
 import cn.iocoder.yudao.module.ai.controller.admin.image.vo.AiImageMidjourneyImagineReqVO;
-import cn.iocoder.yudao.module.ai.controller.admin.image.vo.AiImageMidjourneyOperateReqVO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.image.AiImageDO;
 import cn.iocoder.yudao.module.ai.dal.mysql.image.AiImageMapper;
 import cn.iocoder.yudao.module.ai.enums.AiImagePublicStatusEnum;
@@ -46,12 +44,12 @@ import org.springframework.transaction.annotation.Transactional;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 
 
+import static cn.iocoder.yudao.module.ai.ErrorCodeConstants.AI_IMAGE_NOT_EXISTS;
+
 /**
- * AI 绘画(接入 dall2/dall3、midjourney)
+ * AI 绘画 Service 实现类
  *
  * @author fansili
- * @time 2024/4/25 15:51
- * @since 1.0
  */
 @Service
 @Slf4j
@@ -59,10 +57,13 @@ public class AiImageServiceImpl implements AiImageService {
 
     @Resource
     private AiImageMapper imageMapper;
+
     @Resource
     private FileApi fileApi;
+
     @Resource
     private OpenAiImageClient openAiImageClient;
+
     @Autowired
     private MidjourneyProxyClient midjourneyProxyClient;
 
@@ -70,16 +71,12 @@ public class AiImageServiceImpl implements AiImageService {
     private String midjourneyNotifyUrl;
 
     @Override
-    public PageResult<AiImageDO> getImagePageMy(Long loginUserId, AiImageListReqVO req) {
-        // 查询当前用户下所有的绘画记录
-        return imageMapper.selectPage(req,
-                new LambdaQueryWrapperX<AiImageDO>()
-                        .eq(AiImageDO::getUserId, loginUserId)
-                        .orderByDesc(AiImageDO::getId));
+    public PageResult<AiImageDO> getImagePageMy(Long userId, PageParam pageReqVO) {
+        return imageMapper.selectPage(userId, pageReqVO);
     }
 
     @Override
-    public AiImageDO getMy(Long id) {
+    public AiImageDO getImage(Long id) {
         return imageMapper.selectById(id);
     }
 
@@ -95,7 +92,7 @@ public class AiImageServiceImpl implements AiImageService {
                 .setStatus(AiImageStatusEnum.IN_PROGRESS.getStatus());
         imageMapper.insert(aiImageDO);
         // 异步执行
-        doDall(aiImageDO, req);
+        getSelf().doDall(aiImageDO, req);
         // 转换 AiImageDallDrawingRespVO
         return aiImageDO.getId();
     }
@@ -185,42 +182,15 @@ public class AiImageServiceImpl implements AiImageService {
         return aiImageDO.getId();
     }
 
-    @Transactional(rollbackFor = Exception.class)
     @Override
-    public void midjourneyOperate(AiImageMidjourneyOperateReqVO req) {
-//        // 校验是否存在
-//        AiImageDO aiImageDO = validateExists(req.getId());
-//        // 获取 midjourneyOperations
-//        List<AiImageMidjourneyOperationsVO> midjourneyOperations = getMidjourneyOperations(aiImageDO);
-//        // 校验 OperateId 是否存在
-//        AiImageMidjourneyOperationsVO midjourneyOperationsVO = validateMidjourneyOperationsExists(midjourneyOperations, req.getOperateId());
-//        // 校验 messageId
-//        validateMessageId(aiImageDO.getMjNonceId(), req.getMessageId());
-//        // 获取 mjOperationName
-//        String mjOperationName = midjourneyOperationsVO.getLabel();
-//        // 保存一个 image 任务记录
-//        // todo
-////        doSave(aiImageDO.getPrompt(), aiImageDO.getSize(), aiImageDO.getModel(),
-////                null, null, AiImageStatusEnum.SUBMIT, null,
-////                req.getMessageId(), req.getOperateId(), mjOperationName);
-//        // 提交操作
-//        midjourneyInteractionsApi.reRoll(
-//                new ReRollReq()
-//                        .setCustomId(req.getOperateId())
-//                        .setMessageId(req.getMessageId())
-//        );
-    }
-
-    @Override
-    public Boolean deleteIdMy(Long id, Long userId) {
-        // 校验是否存在，并获取 image
-        AiImageDO image = validateExists(id);
-        // 是否属于当前用户
-        if (!image.getUserId().equals(userId)) {
-            throw exception(ErrorCodeConstants.AI_IMAGE_NOT_EXISTS);
+    public void deleteImageMy(Long id, Long userId) {
+        // 1. 校验是否存在
+        AiImageDO image = validateImageExists(id);
+        if (ObjUtil.notEqual(image.getUserId(), userId)) {
+            throw exception(AI_IMAGE_NOT_EXISTS);
         }
         // 删除记录
-        return imageMapper.deleteById(id) > 0;
+        imageMapper.deleteById(id);
     }
 
     @Override
@@ -255,11 +225,21 @@ public class AiImageServiceImpl implements AiImageService {
         return true;
     }
 
-    private AiImageDO validateExists(Long id) {
-        AiImageDO aiImageDO = imageMapper.selectById(id);
-        if (aiImageDO == null) {
-            throw ServiceExceptionUtil.exception(ErrorCodeConstants.AI_MIDJOURNEY_IMAGINE_FAIL);
+    private AiImageDO validateImageExists(Long id) {
+        AiImageDO image = imageMapper.selectById(id);
+        if (image == null) {
+            throw exception(AI_IMAGE_NOT_EXISTS);
         }
-        return aiImageDO;
+        return image;
     }
+
+    /**
+     * 获得自身的代理对象，解决 AOP 生效问题
+     *
+     * @return 自己
+     */
+    private AiImageServiceImpl getSelf() {
+        return SpringUtil.getBean(getClass());
+    }
+
 }

@@ -1,38 +1,35 @@
 package cn.iocoder.yudao.module.ai.service.image;
 
+import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.ai.client.vo.MidjourneyNotifyReqVO;
 import cn.iocoder.yudao.module.ai.controller.admin.image.vo.AiImageDallReqVO;
-import cn.iocoder.yudao.module.ai.controller.admin.image.vo.AiImageListReqVO;
 import cn.iocoder.yudao.module.ai.controller.admin.image.vo.AiImageMidjourneyImagineReqVO;
-import cn.iocoder.yudao.module.ai.controller.admin.image.vo.AiImageMidjourneyOperateReqVO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.image.AiImageDO;
 
 /**
- * ai 作图
+ * AI 绘图 Service 接口
  *
  * @author fansili
- * @time 2024/4/25 15:50
- * @since 1.0
  */
 public interface AiImageService {
 
     /**
-     * ai绘画 - 列表
+     * 获取【我的】绘图分页
      *
-     * @param loginUserId
-     * @param req
-     * @return
+     * @param userId 用户编号
+     * @param pageReqVO 分页条件
+     * @return 绘图分页
      */
-    PageResult<AiImageDO> getImagePageMy(Long loginUserId, AiImageListReqVO req);
+    PageResult<AiImageDO> getImagePageMy(Long userId, PageParam pageReqVO);
 
     /**
-     * 获取 - image 信息
+     * 获得绘图记录
      *
-     * @param id
-     * @return
+     * @param id 绘图编号
+     * @return 绘图记录
      */
-    AiImageDO getMy(Long id);
+    AiImageDO getImage(Long id);
 
     /**
      * ai绘画 - dall2/dall3 绘画
@@ -52,19 +49,12 @@ public interface AiImageService {
     Long midjourneyImagine(Long loginUserId, AiImageMidjourneyImagineReqVO req);
 
     /**
-     * midjourney 操作(u1、u2、放大、换一批...)
+     * 删除【我的】绘画记录
      *
-     * @param req
+     * @param id 绘画编号
+     * @param userId 用户编号
      */
-    void midjourneyOperate(AiImageMidjourneyOperateReqVO req);
-
-    /**
-     * 删除 - image 记录
-     *
-     * @param id
-     * @param loginUserId
-     */
-    Boolean deleteIdMy(Long id, Long loginUserId);
+    void deleteImageMy(Long id, Long userId);
 
     /**
      * midjourney proxy - 回调通知

@@ -1,5 +1,7 @@
 package cn.iocoder.yudao.module.ai.dal.mysql.image;
 
+import cn.iocoder.yudao.framework.common.pojo.PageParam;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.module.ai.dal.dataobject.image.AiImageDO;
@@ -33,6 +35,12 @@ public interface AiImageMapper extends BaseMapperX<AiImageDO> {
      */
     default AiImageDO selectByJobId(String id) {
         return this.selectOne(new LambdaQueryWrapperX<AiImageDO>().eq(AiImageDO::getJobId, id));
+    }
+
+    default PageResult<AiImageDO> selectPage(Long userId, PageParam pageReqVO) {
+        return selectPage(pageReqVO, new LambdaQueryWrapperX<AiImageDO>()
+                .eq(AiImageDO::getUserId, userId)
+                .orderByDesc(AiImageDO::getId));
     }
 
 }

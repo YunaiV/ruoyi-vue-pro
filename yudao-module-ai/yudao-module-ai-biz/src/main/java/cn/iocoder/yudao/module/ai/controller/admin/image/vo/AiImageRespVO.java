@@ -1,23 +1,13 @@
 package cn.iocoder.yudao.module.ai.controller.admin.image.vo;
 
-import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
-import lombok.experimental.Accessors;
 
 import java.util.Map;
 
-// TODO @fan：可以考虑，复用 AiImageDallRespVO，统一成 AIImageRespVO
-/**
- * midjourney req
- *
- * @author fansili
- * @time 2024/4/28 17:42
- * @since 1.0
- */
+// TODO @芋艿：完善 swagger 注解
 @Data
-@Accessors(chain = true)
-public class AiImagePageMyRespVO extends PageParam {
+public class AiImageRespVO {
 
     @Schema(description = "id编号", example = "1")
     private Long id;
