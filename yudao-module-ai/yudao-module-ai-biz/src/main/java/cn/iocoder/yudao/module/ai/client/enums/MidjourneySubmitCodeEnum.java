@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.ai.client.vo;
+package cn.iocoder.yudao.module.ai.client.enums;
 
 import com.google.common.collect.Lists;
 import lombok.AllArgsConstructor;
