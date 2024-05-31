@@ -61,15 +61,15 @@ public class KeFuConversationDO extends BaseDO {
     /**
      * 用户是否可见
      *
-     * true - 可见，默认值
-     * false - 不可见，用户删除时设置为 false
+     * false - 可见，默认值
+     * true - 不可见，用户删除时设置为 true
      */
     private Boolean userDeleted;
     /**
      * 管理员是否可见
      *
-     * true - 可见，默认值
-     * false - 不可见，管理员删除时设置为 false
+     * false - 可见，默认值
+     * true - 不可见，管理员删除时设置为 true
      */
     private Boolean adminDeleted;
 
