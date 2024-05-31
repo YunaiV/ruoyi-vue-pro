@@ -158,7 +158,9 @@ public class AiImageServiceImpl implements AiImageService {
         MidjourneyImagineReqVO imagineReqVO = BeanUtils.toBean(req, MidjourneyImagineReqVO.class);
         imagineReqVO.setNotifyHook(midjourneyNotifyUrl);
         // 设置 midjourney 扩展参数，通过 --ar 来设置尺寸
-        imagineReqVO.setState(String.format("--ar %s:%s", req.getWidth(), req.getHeight()));
+        String midjourneySizeParam = String.format("--ar %s:%s", req.getWidth(), req.getHeight());
+        String midjourneyVersionParam = String.format("--v %s", req.getVersion());
+        imagineReqVO.setState(midjourneySizeParam.concat(" ").concat(midjourneyVersionParam));
         MidjourneySubmitRespVO submitRespVO = midjourneyProxyClient.imagine(imagineReqVO);
 
         // 4、保存任务 id (状态码: 1(提交成功), 21(已存在), 22(排队中), other(错误))
