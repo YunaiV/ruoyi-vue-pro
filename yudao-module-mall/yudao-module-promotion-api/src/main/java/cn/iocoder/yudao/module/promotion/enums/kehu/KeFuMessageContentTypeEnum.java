@@ -13,16 +13,17 @@ import java.util.Arrays;
  */
 @AllArgsConstructor
 @Getter
-public enum MessageTypeEnum implements IntArrayValuable {
+public enum KeFuMessageContentTypeEnum implements IntArrayValuable {
 
-    MESSAGE(1, "普通消息"),
-    PICTURE(2, "图片消息"),
+    TEXT(1, "文本消息"),
+    IMAGE(2, "图片消息"),
     VOICE(3, "语音消息"),
-    GOODS(4, "商品消息"),
-    ORDER(5, "订单消息"),
-    VIDEO(6, "视频消息");
+    VIDEO(4, "视频消息"),
+    // 和正常消息隔离下
+    PRODUCT(10, "商品消息"),
+    ORDER(11, "订单消息");
 
-    private static final int[] ARRAYS = Arrays.stream(values()).mapToInt(MessageTypeEnum::getType).toArray();
+    private static final int[] ARRAYS = Arrays.stream(values()).mapToInt(KeFuMessageContentTypeEnum::getType).toArray();
 
     /**
      * 类型
