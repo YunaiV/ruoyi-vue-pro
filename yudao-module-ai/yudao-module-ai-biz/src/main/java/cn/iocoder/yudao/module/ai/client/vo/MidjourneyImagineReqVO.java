@@ -6,6 +6,7 @@ import lombok.Data;
 
 import java.util.List;
 
+// TODO @fan：待定
 /**
  * Midjourney：Imagine 请求
  *

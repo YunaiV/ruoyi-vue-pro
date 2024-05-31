@@ -6,6 +6,7 @@ import lombok.Getter;
 
 import java.util.List;
 
+// TODO @fan：待定
 /**
  * Midjourney 提交任务 code 枚举
  *

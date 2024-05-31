@@ -1,13 +1,17 @@
 package cn.iocoder.yudao.module.ai.controller.admin.music.vo;
 
+import cn.iocoder.yudao.framework.ai.core.model.suno.api.SunoApi;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * 表示单个音乐数据的类
  */
 @Data
-public  class MusicDataVO {
+public class MusicDataVO {
     /**
      * 音乐数据的 ID
      */
@@ -61,4 +65,21 @@ public  class MusicDataVO {
      * 音乐音频的风格
      */
     private String style;
+
+    public static List<MusicDataVO> convertFrom(List<SunoApi.SunoResp.MusicData> musicDataList) {
+        return musicDataList.stream().map(musicData -> {
+            MusicDataVO musicDataVO = new MusicDataVO();
+            musicDataVO.setId(musicData.id());
+            musicDataVO.setTitle(musicData.title());
+            musicDataVO.setImageUrl(musicData.imageUrl());
+            musicDataVO.setLyric(musicData.lyric());
+            musicDataVO.setAudioUrl(musicData.audioUrl());
+            musicDataVO.setVideoUrl(musicData.videoUrl());
+            musicDataVO.setCreatedAt(musicData.createdAt());
+            musicDataVO.setModel(musicData.model());
+            musicDataVO.setPrompt(musicData.prompt());
+            musicDataVO.setStyle(musicData.style());
+            return musicDataVO;
+        }).collect(Collectors.toList());
+    }
 }

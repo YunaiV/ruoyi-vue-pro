@@ -54,6 +54,7 @@ public class AiImageController {
 
     // TODO @fan：建议把 dallDrawing、midjourney 融合成一个 draw 接口，异步绘制；然后返回一个 id 给前端；前端通过 get 接口轮询，直到获取到生成成功
     // TODO @芋艿: 参数差异较大
+    // TODO @fan：直接参数平铺？写好注释，要么？
     @Operation(summary = "dall2/dall3绘画", description = "openAi dall3是付费的!")
     @PostMapping("/dall")
     public CommonResult<Long> dall(@Validated @RequestBody AiImageDallReqVO req) {
