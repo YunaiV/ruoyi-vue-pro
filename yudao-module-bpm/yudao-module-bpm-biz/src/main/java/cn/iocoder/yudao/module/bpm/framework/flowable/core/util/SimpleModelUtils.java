@@ -248,9 +248,10 @@ public class SimpleModelUtils {
     }
 
     private static SequenceFlow buildBpmnSequenceFlow(String sourceId, String targetId, String seqFlowId, String seqName, String conditionExpression) {
-        // TODO @jason：最好断言下，sourceId、targetId 必须存在！
-        // TODO @jason：如果 seqFlowId 不存在的时候，是不是要生成一个默认的 seqFlowId？
-        // TODO @jason：如果 name 不存在的时候，是不是要生成一个默认的 name？
+        Assert.notEmpty(sourceId, "sourceId 不能为空");
+        Assert.notEmpty(targetId, "targetId 不能为空");
+        // TODO @jason：如果 seqFlowId 不存在的时候，是不是要生成一个默认的 seqFlowId？ @芋艿： 貌似不需要,Flowable 会默认生成
+        // TODO @jason：如果 name 不存在的时候，是不是要生成一个默认的 name？ @芋艿： 不需要生成默认的吧？ 这个会在流程图展示的， 一般用户填写的。不好生成默认的吧
         SequenceFlow sequenceFlow = new SequenceFlow(sourceId, targetId);
         if (StrUtil.isNotEmpty(conditionExpression)) {
             sequenceFlow.setConditionExpression(conditionExpression);

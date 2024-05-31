@@ -28,7 +28,7 @@ public class BpmSimpleModelNodeVO {
     @Schema(description = "模型节点名称", example = "领导审批")
     private String name;
 
-    // TODO @jason：要不改成 placeholder 和一般 Element-Plus 组件一致。占位符，用于展示。
+    // TODO @jason：要不改成 placeholder 和一般 Element-Plus 组件一致。占位符，用于展示。@芋艿。这个不是 placeholder 占位符的含义。节点配置后。节点展示的内容，不知道取什么名字好???
     @Schema(description = "节点展示内容", example = "指定成员: 芋道源码")
     private String showText;
 
@@ -42,6 +42,7 @@ public class BpmSimpleModelNodeVO {
     private Map<String, Object> attributes; // TODO @jason：建议是字段分拆下；类似说：
     // Map<String, Integer> formPermissions; 表单权限；仅发起、审批、抄送节点会使用
     // Integer approveMethod; 审批方式；仅审批节点会使用
+    // TODO @jason 后面和前端一起调整一下
     // TODO @芋艿：审批人的选择；
     // TODO @芋艿：没有人的策略？
     // TODO @芋艿：审批拒绝的策略？
