@@ -3,14 +3,13 @@ package cn.iocoder.yudao.module.ai.dal.dataobject.chat;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiChatModelDO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiChatRoleDO;
-import cn.iocoder.yudao.module.ai.enums.AiModelEnum;
+import cn.iocoder.yudao.module.ai.enums.model.AiModelEnum;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 
 /**
  * AI Chat 对话 DO

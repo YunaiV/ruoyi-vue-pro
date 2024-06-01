@@ -1,13 +1,17 @@
 package cn.iocoder.yudao.module.ai.dal.dataobject.image;
 
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiChatModelDO;
+import cn.iocoder.yudao.module.ai.enums.image.AiImageStatusEnum;
+import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
-import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
+import org.springframework.ai.openai.OpenAiImageOptions;
+import org.springframework.ai.stabilityai.api.StabilityAiImageOptions;
 
 import java.util.Map;
 
@@ -16,70 +20,86 @@ import java.util.Map;
  *
  * @author fansili
  */
-@TableName("ai_image")
+@TableName(value = "ai_image", autoResultMap = true)
 @Data
 public class AiImageDO extends BaseDO {
 
     // TODO @fan：1）使用 java 注释哈，不要注解。2）关联、枚举字段，要关联到对应类，参考 AiChatMessageDO 的注释
 
+    /**
+     * 编号
+     */
     @TableId(type = IdType.AUTO)
     private Long id;
 
-    @Schema(description = "用户编号")
+    /**
+     * 用户编号
+     *
+     * 关联 {@link AdminUserRespDTO#getId()}
+     */
     private Long userId;
 
-    @Schema(description = "midjourney proxy 关联的 job id")
-    private String jobId;
-
-    @Schema(description = "提示词")
+    /**
+     * 提示词
+     */
     private String prompt;
 
-    @Schema(description = "平台")
+    /**
+     * 平台
+     *
+     * 枚举 {@link cn.iocoder.yudao.framework.ai.core.enums.AiPlatformEnum}
+     */
     private String platform;
-
-    @Schema(description = "模型")
+    /**
+     * 模型
+     *
+     * 冗余 {@link AiChatModelDO#getModel()}
+     */
     private String model;
 
-    @Schema(description = "图片宽度")
+    /**
+     * 图片宽度
+     */
     private Integer width;
-
-    @Schema(description = "图片高度")
+    /**
+     * 图片高度
+     */
     private Integer height;
 
     // TODO @fan：这种就注释绘画状态，然后枚举类关联下就好啦
-    @Schema(description = "绘画状态：提交、排队、绘画中、绘画完成、绘画失败")
+    /**
+     * 生成状态
+     *
+     * 枚举 {@link AiImageStatusEnum}
+     */
     private String status;
 
-    @Schema(description = "是否发布")
-    private String publicStatus;
-
-    @Schema(description = "图片地址(自己服务器)")
+    /**
+     * 图片地址
+     */
     private String picUrl;
-
-    // TODO @芋艿：可能要删除掉
-    @Schema(description = "绘画图片地址(绘画好的服务器)")
-    private String originalPicUrl;
-
-    // ============ 绘画请求参数 ============
+    /**
+     * 是否公开
+     */
+    private Boolean publicStatus;
 
     /**
-     * - style
+     * 绘制参数，不同 platform 的不同参数
+     *
+     * 1. {@link OpenAiImageOptions}
+     * 2. {@link StabilityAiImageOptions}
      */
-    @Schema(description = "绘画请求参数")
     @TableField(typeHandler = JacksonTypeHandler.class)
-    private Map<String, Object> drawRequest;
+    private Map<String, String> options;
 
+    // TODO @芋艿：再瞅瞅
     /**
-     * - mjNonceId
-     * - mjOperationId
-     * - mjOperationName
-     * - mjOperations
+     * midjourney proxy 关联的 job id
      */
-    @Schema(description = "绘画请求响应参数")
-    @TableField(typeHandler = JacksonTypeHandler.class)
-    private Map<String, Object> drawResponse;
-
-    @Schema(description = "绘画错误信息")
+    private String jobId;
+    /**
+     * 绘画错误信息
+     */
     private String errorMessage;
 
 }

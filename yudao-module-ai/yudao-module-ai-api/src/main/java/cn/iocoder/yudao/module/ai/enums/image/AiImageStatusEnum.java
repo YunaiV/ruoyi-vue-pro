@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.ai.enums;
+package cn.iocoder.yudao.module.ai.enums.image;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -13,7 +13,7 @@ import lombok.Getter;
 public enum AiImageStatusEnum {
 
     IN_PROGRESS("10", "进行中"),
-    COMPLETE("20", "完成"),
+    SUCCESS("20", "完成"),
     FAIL("30", "失败");
 
     /**

@@ -33,6 +33,7 @@ import org.springframework.ai.openai.OpenAiChatOptions;
 import org.springframework.ai.openai.OpenAiImageClient;
 import org.springframework.ai.openai.api.ApiUtils;
 import org.springframework.ai.openai.api.OpenAiApi;
+import org.springframework.ai.stabilityai.StabilityAiImageClient;
 
 import java.util.List;
 
@@ -88,12 +89,15 @@ public class AiClientFactoryImpl implements AiClientFactory {
 
     @Override
     public ImageClient getDefaultImageClient(AiPlatformEnum platform) {
+        //noinspection EnhancedSwitchMigration
         switch (platform) {
-            case OPEN_AI_DALL:
+            case OPENAI:
                 return SpringUtil.getBean(OpenAiImageClient.class);
-
+            case STABLE_DIFFUSION:
+                return SpringUtil.getBean(StabilityAiImageClient.class);
+            default:
+                throw new IllegalArgumentException(StrUtil.format("未知平台({})", platform));
         }
-        return null;
     }
 
     private static String buildClientCacheKey(Class<?> clazz, Object... params) {

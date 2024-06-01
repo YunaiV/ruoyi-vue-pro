@@ -5,7 +5,7 @@ import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.module.ai.controller.admin.image.vo.AiImageMidjourneyOperationsVO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.image.AiImageDO;
 import cn.iocoder.yudao.module.ai.dal.mysql.image.AiImageMapper;
-import cn.iocoder.yudao.module.ai.enums.AiImageStatusEnum;
+import cn.iocoder.yudao.module.ai.enums.image.AiImageStatusEnum;
 import com.alibaba.fastjson.JSON;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -89,7 +89,7 @@ public class YuDaoMidjourneyMessageHandler implements MidjourneyMessageHandler {
         AiImageStatusEnum drawingStatusEnum = null;
         String generateStatus = midjourneyMessage.getGenerateStatus();
         if (MidjourneyGennerateStatusEnum.COMPLETED.getStatus().equals(generateStatus)) {
-            drawingStatusEnum = AiImageStatusEnum.COMPLETE;
+            drawingStatusEnum = AiImageStatusEnum.SUCCESS;
         } else if (MidjourneyGennerateStatusEnum.IN_PROGRESS.getStatus().equals(generateStatus)) {
             drawingStatusEnum = AiImageStatusEnum.IN_PROGRESS;
         }
@@ -101,7 +101,6 @@ public class YuDaoMidjourneyMessageHandler implements MidjourneyMessageHandler {
         // 更新数据库
         aiImageMapper.updateByMjNonce(nonceId,
                 new AiImageDO()
-                        .setOriginalPicUrl(imageUrl)
                         .setStatus(drawingStatusEnum == null ? null : drawingStatusEnum.getStatus())
 //                        .setMjNonceId(midjourneyMessage.getId())
 //                        .setMjOperations(JsonUtils.toJsonString(midjourneyOperations))

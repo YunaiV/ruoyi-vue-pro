@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.ai;
+package cn.iocoder.yudao.module.ai.enums;
 
 import cn.iocoder.yudao.framework.common.exception.ErrorCode;
 

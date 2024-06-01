@@ -3,10 +3,9 @@ package cn.iocoder.yudao.framework.ai.config;
 import cn.iocoder.yudao.framework.ai.core.enums.AiPlatformEnum;
 import cn.iocoder.yudao.framework.ai.core.model.xinghuo.XingHuoChatModel;
 import cn.iocoder.yudao.framework.ai.core.model.yiyan.api.YiYanChatModel;
-import cn.iocoder.yudao.framework.ai.core.enums.OpenAiImageModelEnum;
-import cn.iocoder.yudao.framework.ai.core.enums.OpenAiImageStyleEnum;
 import lombok.Data;
 import lombok.experimental.Accessors;
+import org.springframework.ai.autoconfigure.openai.OpenAiImageProperties;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
@@ -90,27 +89,6 @@ public class YudaoAiProperties {
          * token 刷新时间(默认 86400 = 24小时)
          */
         private int refreshTokenSecondTime = 86400;
-    }
-
-    @Data
-    @Accessors(chain = true)
-    public static class OpenAiImageProperties {
-
-        private boolean enable = false;
-
-        /**
-         * api key
-         */
-        private String apiKey;
-        /**
-         * 模型
-         */
-        private OpenAiImageModelEnum model = OpenAiImageModelEnum.DALL_E_2;
-        /**
-         * 风格
-         */
-        private OpenAiImageStyleEnum style = OpenAiImageStyleEnum.VIVID;
-
     }
 
     @Data

@@ -3,7 +3,7 @@ package cn.iocoder.yudao.module.ai.service.image;
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.ai.client.vo.MidjourneyNotifyReqVO;
-import cn.iocoder.yudao.module.ai.controller.admin.image.vo.AiImageDallReqVO;
+import cn.iocoder.yudao.module.ai.controller.admin.image.vo.AiImageDrawReqVO;
 import cn.iocoder.yudao.module.ai.controller.admin.image.vo.AiImageMidjourneyImagineReqVO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.image.AiImageDO;
 
@@ -32,12 +32,12 @@ public interface AiImageService {
     AiImageDO getImage(Long id);
 
     /**
-     * ai绘画 - dall2/dall3 绘画
+     * 绘制图片
      *
-     * @param loginUserId
-     * @param req
+     * @param userId 用户编号
+     * @param drawReqVO 绘制请求
      */
-    Long dall(Long loginUserId, AiImageDallReqVO req);
+    Long drawImage(Long userId, AiImageDrawReqVO drawReqVO);
 
     /**
      * midjourney 图片生成

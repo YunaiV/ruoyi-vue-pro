@@ -5,63 +5,44 @@ import lombok.Data;
 
 import java.util.Map;
 
-// TODO @芋艿：完善 swagger 注解
+@Schema(description = "管理后台 - 绘画 Response VO")
 @Data
 public class AiImageRespVO {
 
-    @Schema(description = "id编号", example = "1")
+    @Schema(description = "编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     private Long id;
 
-    @Schema(description = "用户id", example = "1")
+    @Schema(description = "用户编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     private Long userId;
 
-    @Schema(description = "提示词", example = "南极的小企鹅")
-    private String prompt;
+    @Schema(description = "平台", requiredMode = Schema.RequiredMode.REQUIRED, example = "OpenAI")
+    private String platform;  // 参见 AiPlatformEnum 枚举
 
-    @Schema(description = "平台", example = "openai")
-    private String platform;
-
-    @Schema(description = "模型", example = "dall2")
+    @Schema(description = "模型", requiredMode = Schema.RequiredMode.REQUIRED, example = "stable-diffusion-v1-6")
     private String model;
 
-    @Schema(description = "图片宽度", example = "1024")
-    private String width;
+    @Schema(description = "提示词", requiredMode = Schema.RequiredMode.REQUIRED, example = "南极的小企鹅")
+    private String prompt;
 
-    @Schema(description = "图片高度", example = "1024")
-    private String height;
+    @Schema(description = "图片宽度", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
+    private Integer width;
 
-    @Schema(description = "绘画状态：10 进行中、20 绘画完成、30 绘画失败", example = "10")
-    private String status;
+    @Schema(description = "图片高度", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
+    private Integer height;
 
-    @Schema(description = "是否发布", example = "public")
-    private String publicStatus;
+    @Schema(description = "绘画状态", requiredMode = Schema.RequiredMode.REQUIRED, example = "10")
+    private Integer status;
 
-    @Schema(description = "图片地址(自己服务器)", example = "http://")
+    @Schema(description = "是否发布", requiredMode = Schema.RequiredMode.REQUIRED, example = "public")
+    private Boolean publicStatus;
+
+    @Schema(description = "图片地址", example = "https://www.iocoder.cn/1.png")
     private String picUrl;
-
-    @Schema(description = "绘画图片地址(绘画好的服务器)", example = "http://")
-    private String originalPicUrl;
 
     @Schema(description = "绘画错误信息", example = "图片错误信息")
     private String errorMessage;
 
-    // ============ 绘画请求参数
-
-    // todo @fan：下面的 style、mjNonceId 直接就不用注释啦，直接去看 DO 完事哈
-
-    /**
-     * - style
-     */
-    @Schema(description = "绘画请求参数")
-    private Map<String, Object> drawRequest;
-
-    /**
-     * - mjNonceId
-     * - mjOperationId
-     * - mjOperationName
-     * - mjOperations
-     */
-    @Schema(description = "绘画请求响应参数")
-    private Map<String, Object> drawResponse;
+    @Schema(description = "绘制参数")
+    private Map<String, String> options;
 
 }

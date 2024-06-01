@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.ai.enums;
+package cn.iocoder.yudao.module.ai.enums.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

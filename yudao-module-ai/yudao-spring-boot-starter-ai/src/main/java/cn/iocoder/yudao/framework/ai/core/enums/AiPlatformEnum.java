@@ -20,7 +20,6 @@ public enum AiPlatformEnum {
     QIAN_WEN("QianWen", "千问"), // 阿里
     GEMIR ("gemir ", "gemir "), // 谷歌
 
-    OPEN_AI_DALL("dall", "dall"), // TODO OpenAI 提供的绘图，接入中；TODO 要不要统一下？！
     STABLE_DIFFUSION("StableDiffusion", "StableDiffusion"), // Stability AI
     MIDJOURNEY("midjourney", "midjourney"), // TODO MJ 提供的绘图，接入中
     ;

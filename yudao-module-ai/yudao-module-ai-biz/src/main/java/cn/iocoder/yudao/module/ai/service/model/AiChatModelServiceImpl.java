@@ -16,7 +16,7 @@ import java.util.Collection;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.module.ai.ErrorCodeConstants.*;
+import static cn.iocoder.yudao.module.ai.enums.ErrorCodeConstants.*;
 
 /**
  * AI 聊天模型 Service 实现类

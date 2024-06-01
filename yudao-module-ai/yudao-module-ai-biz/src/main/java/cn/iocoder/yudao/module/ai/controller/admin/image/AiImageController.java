@@ -6,7 +6,7 @@ import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.ai.client.vo.MidjourneyNotifyReqVO;
-import cn.iocoder.yudao.module.ai.controller.admin.image.vo.AiImageDallReqVO;
+import cn.iocoder.yudao.module.ai.controller.admin.image.vo.AiImageDrawReqVO;
 import cn.iocoder.yudao.module.ai.controller.admin.image.vo.AiImageMidjourneyImagineReqVO;
 import cn.iocoder.yudao.module.ai.controller.admin.image.vo.AiImageRespVO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.image.AiImageDO;
@@ -48,13 +48,10 @@ public class AiImageController {
         return success(BeanUtils.toBean(image, AiImageRespVO.class));
     }
 
-    // TODO @fan：建议把 dallDrawing、midjourney 融合成一个 draw 接口，异步绘制；然后返回一个 id 给前端；前端通过 get 接口轮询，直到获取到生成成功
-    // TODO @芋艿: 参数差异较大
-    // TODO @fan：直接参数平铺？写好注释，要么？
-    @Operation(summary = "dall2/dall3绘画", description = "openAi dall3是付费的!")
-    @PostMapping("/dall")
-    public CommonResult<Long> dall(@Validated @RequestBody AiImageDallReqVO req) {
-        return success(imageService.dall(getLoginUserId(), req));
+    @Operation(summary = "生成图片")
+    @PostMapping("/draw")
+    public CommonResult<Long> drawImage(@Validated @RequestBody AiImageDrawReqVO drawReqVO) {
+        return success(imageService.drawImage(getLoginUserId(), drawReqVO));
     }
 
     @Operation(summary = "删除【我的】绘画记录")
@@ -73,7 +70,7 @@ public class AiImageController {
         return success(imageService.midjourneyImagine(getLoginUserId(), req));
     }
 
-    // TODO @fan：可以考虑，复用 AiImageDallRespVO，统一成 AIImageRespVO
+    // TODO @芋艿：不拦截
     @Operation(summary = "midjourney proxy - 回调通知")
     @RequestMapping("/midjourney-notify")
     public CommonResult<Boolean> midjourneyNotify(MidjourneyNotifyReqVO notifyReqVO) {
