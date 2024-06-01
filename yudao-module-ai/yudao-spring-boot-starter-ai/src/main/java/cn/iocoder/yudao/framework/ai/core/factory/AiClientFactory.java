@@ -3,6 +3,7 @@ package cn.iocoder.yudao.framework.ai.core.factory;
 import cn.iocoder.yudao.framework.ai.core.enums.AiPlatformEnum;
 import org.springframework.ai.chat.StreamingChatClient;
 import org.springframework.ai.chat.prompt.ChatOptions;
+import org.springframework.ai.image.ImageClient;
 
 /**
  * AI 客户端工厂的接口类
@@ -32,6 +33,16 @@ public interface AiClientFactory {
      * @return StreamingChatClient 对象
      */
     StreamingChatClient getDefaultStreamingChatClient(AiPlatformEnum platform);
+
+    /**
+     * 基于默认配置，获得 ImageClient 对象
+     *
+     * 默认配置，指的是在 application.yaml 配置文件中的 spring.ai 相关的配置
+     *
+     * @param platform 平台
+     * @return ImageClient 对象
+     */
+    ImageClient getDefaultImageClient(AiPlatformEnum platform);
 
     /**
      * 创建 Chat 参数

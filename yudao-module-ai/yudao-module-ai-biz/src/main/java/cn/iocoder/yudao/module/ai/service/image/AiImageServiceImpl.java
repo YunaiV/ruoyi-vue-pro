@@ -1,14 +1,15 @@
 package cn.iocoder.yudao.module.ai.service.image;
 
 import cn.hutool.core.bean.BeanUtil;
-import cn.hutool.core.util.StrUtil;
+import cn.hutool.core.codec.Base64;
 import cn.hutool.core.util.ObjUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.spring.SpringUtil;
 import cn.hutool.http.HttpUtil;
 import cn.iocoder.yudao.framework.ai.core.enums.AiPlatformEnum;
 import cn.iocoder.yudao.framework.ai.core.enums.OpenAiImageModelEnum;
 import cn.iocoder.yudao.framework.ai.core.enums.OpenAiImageStyleEnum;
-import cn.iocoder.yudao.framework.ai.core.exception.AiException;
+import cn.iocoder.yudao.framework.ai.core.factory.AiClientFactory;
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
@@ -30,11 +31,9 @@ import cn.iocoder.yudao.module.infra.api.file.FileApi;
 import com.google.common.collect.ImmutableMap;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.ai.image.ImageGeneration;
-import org.springframework.ai.image.ImagePrompt;
-import org.springframework.ai.image.ImageResponse;
-import org.springframework.ai.openai.OpenAiImageClient;
+import org.springframework.ai.image.*;
 import org.springframework.ai.openai.OpenAiImageOptions;
+import org.springframework.ai.stabilityai.api.StabilityAiImageOptions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
@@ -42,8 +41,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-
-
 import static cn.iocoder.yudao.module.ai.ErrorCodeConstants.AI_IMAGE_NOT_EXISTS;
 
 /**
@@ -62,7 +59,7 @@ public class AiImageServiceImpl implements AiImageService {
     private FileApi fileApi;
 
     @Resource
-    private OpenAiImageClient openAiImageClient;
+    private AiClientFactory aiClientFactory;
 
     @Autowired
     private MidjourneyProxyClient midjourneyProxyClient;
@@ -81,48 +78,58 @@ public class AiImageServiceImpl implements AiImageService {
     }
 
     @Override
-    public Long dall(Long loginUserId, AiImageDallReqVO req) {
-        // 保存数据库
-        AiImageDO aiImageDO = BeanUtils.toBean(req, AiImageDO.class)
-                .setUserId(loginUserId)
-                .setWidth(req.getWidth())
-                .setHeight(req.getHeight())
+    public Long dall(Long userId, AiImageDallReqVO req) {
+        req.setPlatform("dall"); // TODO 芋艿：临时写死
+        // 1. 保存数据库
+        AiImageDO image = BeanUtils.toBean(req, AiImageDO.class)
+                .setUserId(userId).setStatus(AiImageStatusEnum.IN_PROGRESS.getStatus())
+                .setWidth(req.getWidth()).setHeight(req.getHeight())
                 .setDrawRequest(ImmutableMap.of(AiCommonConstants.DRAW_REQ_KEY_STYLE, req.getStyle()))
-                .setPublicStatus(AiImagePublicStatusEnum.PRIVATE.getStatus())
-                .setStatus(AiImageStatusEnum.IN_PROGRESS.getStatus());
-        imageMapper.insert(aiImageDO);
-        // 异步执行
-        getSelf().doDall(aiImageDO, req);
-        // 转换 AiImageDallDrawingRespVO
-        return aiImageDO.getId();
+                .setPublicStatus(AiImagePublicStatusEnum.PRIVATE.getStatus());
+        imageMapper.insert(image);
+        // 2. 异步绘制，后续前端通过返回的 id 进行伦旭
+        getSelf().doDall(image, req);
+        return image.getId();
     }
 
     @Async
-    public void doDall(AiImageDO aiImageDO, AiImageDallReqVO req) {
+    public void doDall(AiImageDO image, AiImageDallReqVO req) {
         try {
-            // 获取 model
-            OpenAiImageModelEnum openAiImageModelEnum = OpenAiImageModelEnum.valueOfModel(req.getModel());
-            OpenAiImageStyleEnum openAiImageStyleEnum = OpenAiImageStyleEnum.valueOfStyle(req.getStyle());
+            // 1.1 构建请求
+            ImageOptions request = buildImageOptions(req);
+            // 1.2 执行请求
+            ImageClient imageClient = aiClientFactory.getDefaultImageClient(AiPlatformEnum.validatePlatform(req.getPlatform()));
+            ImageResponse response = imageClient.call(new ImagePrompt(req.getPrompt(), request));
 
-            // 转换openai 参数
-            // TODO @fan：需要考虑，不同平台，参数不同；
-            OpenAiImageOptions openAiImageOptions = new OpenAiImageOptions();
-            openAiImageOptions.setModel(openAiImageModelEnum.getModel());
-            openAiImageOptions.setStyle(openAiImageStyleEnum.getStyle());
-            openAiImageOptions.setSize(String.format(AiCommonConstants.DALL_SIZE_TEMPLATE, req.getWidth(), req.getHeight()));
-            ImageResponse imageResponse = openAiImageClient.call(new ImagePrompt(req.getPrompt(), openAiImageOptions));
-            // 发送
-            ImageGeneration imageGeneration = imageResponse.getResult();
-            // 图片保存到服务器
-            String filePath = fileApi.createFile(HttpUtil.downloadBytes(imageGeneration.getOutput().getUrl()));
-            // 更新数据库
-            imageMapper.updateById(new AiImageDO().setId(aiImageDO.getId()).setStatus(AiImageStatusEnum.COMPLETE.getStatus())
-                    .setPicUrl(filePath).setOriginalPicUrl(imageGeneration.getOutput().getUrl()));
-        } catch (AiException aiException) {
-            // TODO @fan：错误日志，也打印下哈；因为 aiException.getMessage() 比较精简；
-            imageMapper.updateById(new AiImageDO().setId(aiImageDO.getId()).setStatus(AiImageStatusEnum.FAIL.getStatus())
-                    .setErrorMessage(aiException.getMessage()));
+            // 2. 上传到文件服务
+            byte[] fileContent = Base64.decode(response.getResult().getOutput().getB64Json());
+            String filePath = fileApi.createFile(fileContent);
+
+            // 3. 更新数据库
+            imageMapper.updateById(new AiImageDO().setId(image.getId()).setStatus(AiImageStatusEnum.COMPLETE.getStatus())
+                    .setPicUrl(filePath));
+        } catch (Exception ex) {
+            log.error("[doDall][image({}) 生成异常]", image, ex);
+            imageMapper.updateById(new AiImageDO().setId(image.getId())
+                    .setStatus(AiImageStatusEnum.FAIL.getStatus()).setErrorMessage(ex.getMessage()));
         }
+    }
+
+    private static ImageOptions buildImageOptions(AiImageDallReqVO draw) {
+        if (ObjUtil.equal(draw.getPlatform(), AiPlatformEnum.OPEN_AI_DALL.getPlatform())) {
+            OpenAiImageOptions request = new OpenAiImageOptions();
+            request.setModel(OpenAiImageModelEnum.valueOfModel(draw.getModel()).getModel());
+            request.setStyle(OpenAiImageStyleEnum.valueOfStyle(draw.getStyle()).getStyle());
+            request.setSize(String.format(AiCommonConstants.DALL_SIZE_TEMPLATE, draw.getWidth(), draw.getHeight()));
+            request.setResponseFormat("b64_json");
+            return request;
+        } else {
+            // https://platform.stability.ai/docs/api-reference#tag/Generate/paths/~1v2beta~1stable-image~1generate~1sd3/post
+            return StabilityAiImageOptions.builder().withModel(draw.getModel())
+                    .withHeight(draw.getHeight()).withWidth(draw.getWidth())
+                    .build();
+        }
+//        return null;
     }
 
     @Override

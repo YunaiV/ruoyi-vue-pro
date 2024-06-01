@@ -41,10 +41,10 @@ public class AiImageDO extends BaseDO {
     private String model;
 
     @Schema(description = "图片宽度")
-    private String width;
+    private Integer width;
 
     @Schema(description = "图片高度")
-    private String height;
+    private Integer height;
 
     // TODO @fan：这种就注释绘画状态，然后枚举类关联下就好啦
     @Schema(description = "绘画状态：提交、排队、绘画中、绘画完成、绘画失败")
@@ -56,6 +56,7 @@ public class AiImageDO extends BaseDO {
     @Schema(description = "图片地址(自己服务器)")
     private String picUrl;
 
+    // TODO @芋艿：可能要删除掉
     @Schema(description = "绘画图片地址(绘画好的服务器)")
     private String originalPicUrl;
 

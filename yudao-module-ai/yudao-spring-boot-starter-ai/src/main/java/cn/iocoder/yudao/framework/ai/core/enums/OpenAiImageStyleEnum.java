@@ -13,6 +13,7 @@ import lombok.Getter;
  */
 @AllArgsConstructor
 @Getter
+@Deprecated
 public enum OpenAiImageStyleEnum {
 
     // 图像生成的风格。可为vivid（生动）或 natural（自然）。vivid会使模型偏向生成超现实和戏剧性的图像，而natural则会让模型产出更自然、不那么超现实的图像。该参数仅对dall-e-3模型有效。

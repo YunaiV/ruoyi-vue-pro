@@ -22,6 +22,11 @@
             <artifactId>spring-ai-openai-spring-boot-starter</artifactId>
             <version>1.0.3</version>
         </dependency>
+        <dependency>
+            <groupId>io.springboot.ai</groupId>
+            <artifactId>spring-ai-stability-ai</artifactId>
+            <version>1.0.3</version>
+        </dependency>
 <!--        <dependency>-->
 <!--            <groupId>io.springboot.ai</groupId>-->
 <!--            <artifactId>spring-ai-vertex-ai-gemini</artifactId>-->

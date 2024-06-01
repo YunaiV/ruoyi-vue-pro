@@ -13,6 +13,7 @@ import lombok.Getter;
  */
 @AllArgsConstructor
 @Getter
+@Deprecated
 public enum OpenAiImageModelEnum {
 
     DALL_E_2("dall-e-2", "dall-e-2"),

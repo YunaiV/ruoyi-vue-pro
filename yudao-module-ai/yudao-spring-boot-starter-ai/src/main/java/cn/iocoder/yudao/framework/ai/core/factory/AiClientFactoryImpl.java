@@ -24,11 +24,13 @@ import org.springframework.ai.autoconfigure.ollama.OllamaAutoConfiguration;
 import org.springframework.ai.autoconfigure.openai.OpenAiAutoConfiguration;
 import org.springframework.ai.chat.StreamingChatClient;
 import org.springframework.ai.chat.prompt.ChatOptions;
+import org.springframework.ai.image.ImageClient;
 import org.springframework.ai.ollama.OllamaChatClient;
 import org.springframework.ai.ollama.api.OllamaApi;
 import org.springframework.ai.ollama.api.OllamaOptions;
 import org.springframework.ai.openai.OpenAiChatClient;
 import org.springframework.ai.openai.OpenAiChatOptions;
+import org.springframework.ai.openai.OpenAiImageClient;
 import org.springframework.ai.openai.api.ApiUtils;
 import org.springframework.ai.openai.api.OpenAiApi;
 
@@ -82,6 +84,16 @@ public class AiClientFactoryImpl implements AiClientFactory {
             default:
                 throw new IllegalArgumentException(StrUtil.format("未知平台({})", platform));
         }
+    }
+
+    @Override
+    public ImageClient getDefaultImageClient(AiPlatformEnum platform) {
+        switch (platform) {
+            case OPEN_AI_DALL:
+                return SpringUtil.getBean(OpenAiImageClient.class);
+
+        }
+        return null;
     }
 
     private static String buildClientCacheKey(Class<?> clazz, Object... params) {

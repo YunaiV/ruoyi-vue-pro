@@ -144,19 +144,23 @@ spring:
 
 --- #################### AI 相关配置 ####################
 
-spring.ai:
-  ollama:
-    base-url: http://127.0.0.1:11434
-    chat:
-      model: llama3
-  openai:
-    api-key: sk-yzKea6d8e8212c3bdd99f9f44ced1cae37c097e5aa3BTS7z
-    base-url: https://api.gptsapi.net
-  vertex:
-    ai:
-      gemini:
-        project-id: 1 # TODO 芋艿：缺配置
-        location: 2
+spring:
+  ai:
+    ollama:
+      base-url: http://127.0.0.1:11434
+      chat:
+        model: llama3
+    openai:
+      api-key: sk-yzKea6d8e8212c3bdd99f9f44ced1cae37c097e5aa3BTS7z
+      base-url: https://api.gptsapi.net
+    stabilityai:
+      api-key: sk-e53UqbboF8QJCscYvzJscJxJXoFcFg4iJjl1oqgE7baJETmx
+    vertex:
+      ai:
+        gemini:
+          project-id: 1 # TODO 芋艿：缺配置
+          location: 2
+
 
 yudao.ai:
   yiyan:
@@ -202,7 +206,6 @@ yudao.ai:
   suno:
     enable: true
     token: 16b4356581984d538652354b60d69ff0
-
 --- #################### 芋道相关配置 ####################
 
 yudao:
