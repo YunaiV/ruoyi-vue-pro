@@ -2,7 +2,6 @@ package cn.iocoder.yudao.framework.ai.core.factory;
 
 import cn.iocoder.yudao.framework.ai.core.enums.AiPlatformEnum;
 import org.springframework.ai.chat.StreamingChatClient;
-import org.springframework.ai.chat.prompt.ChatOptions;
 import org.springframework.ai.image.ImageClient;
 
 /**
@@ -45,14 +44,15 @@ public interface AiClientFactory {
     ImageClient getDefaultImageClient(AiPlatformEnum platform);
 
     /**
-     * 创建 Chat 参数
+     * 基于指定配置，获得 ImageClient 对象
+     *
+     * 如果不存在，则进行创建
      *
      * @param platform 平台
-     * @param model 模型
-     * @param temperature 温度
-     * @param maxTokens 生成的最大 Token
-     * @return Chat 参数
+     * @param apiKey API KEY
+     * @param url API URL
+     * @return ImageClient 对象
      */
-    ChatOptions buildChatOptions(AiPlatformEnum platform, String model, Double temperature, Integer maxTokens);
+    ImageClient getOrCreateImageClient(AiPlatformEnum platform, String apiKey, String url);
 
 }

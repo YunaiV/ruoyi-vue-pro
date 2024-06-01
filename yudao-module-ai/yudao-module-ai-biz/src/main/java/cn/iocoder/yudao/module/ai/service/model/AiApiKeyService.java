@@ -1,11 +1,13 @@
 package cn.iocoder.yudao.module.ai.service.model;
 
+import cn.iocoder.yudao.framework.ai.core.enums.AiPlatformEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.ai.controller.admin.model.vo.apikey.AiApiKeyPageReqVO;
 import cn.iocoder.yudao.module.ai.controller.admin.model.vo.apikey.AiApiKeySaveReqVO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiApiKeyDO;
 import jakarta.validation.Valid;
 import org.springframework.ai.chat.StreamingChatClient;
+import org.springframework.ai.image.ImageClient;
 
 import java.util.List;
 
@@ -78,5 +80,15 @@ public interface AiApiKeyService {
      * @return StreamingChatClient 对象
      */
     StreamingChatClient getStreamingChatClient(Long id);
+
+    /**
+     * 获得 ImageClient 对象
+     *
+     * TODO 可优化点：目前默认获取 platform 对应的第一个开启的配置用于绘画；后续可以支持配置选择
+     *
+     * @param platform 平台
+     * @return ImageClient 对象
+     */
+    ImageClient getImageClient(AiPlatformEnum platform);
 
 }

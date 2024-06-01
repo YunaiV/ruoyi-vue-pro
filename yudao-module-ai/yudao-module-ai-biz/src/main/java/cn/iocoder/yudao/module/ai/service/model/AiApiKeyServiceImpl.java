@@ -11,6 +11,7 @@ import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiApiKeyDO;
 import cn.iocoder.yudao.module.ai.dal.mysql.model.AiApiKeyMapper;
 import jakarta.annotation.Resource;
 import org.springframework.ai.chat.StreamingChatClient;
+import org.springframework.ai.image.ImageClient;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
@@ -99,6 +100,15 @@ public class AiApiKeyServiceImpl implements AiApiKeyService {
         AiApiKeyDO apiKey = validateApiKey(id);
         AiPlatformEnum platform = AiPlatformEnum.validatePlatform(apiKey.getPlatform());
         return clientFactory.getOrCreateStreamingChatClient(platform, apiKey.getApiKey(), apiKey.getUrl());
+    }
+
+    @Override
+    public ImageClient getImageClient(AiPlatformEnum platform) {
+        AiApiKeyDO apiKey = apiKeyMapper.selectFirstByPlatformAndStatus(platform.getName(), CommonStatusEnum.ENABLE.getStatus());
+        if (apiKey == null) {
+            return null;
+        }
+        return clientFactory.getOrCreateImageClient(platform, apiKey.getApiKey(), apiKey.getUrl());
     }
 
 }

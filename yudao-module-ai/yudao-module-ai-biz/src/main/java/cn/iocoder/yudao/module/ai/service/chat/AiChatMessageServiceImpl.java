@@ -4,11 +4,13 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.ai.core.enums.AiPlatformEnum;
-import cn.iocoder.yudao.framework.ai.core.factory.AiClientFactory;
+import cn.iocoder.yudao.framework.ai.core.model.tongyi.QianWenOptions;
+import cn.iocoder.yudao.framework.ai.core.model.xinghuo.XingHuoChatModel;
+import cn.iocoder.yudao.framework.ai.core.model.xinghuo.XingHuoOptions;
+import cn.iocoder.yudao.framework.ai.core.model.yiyan.YiYanChatOptions;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
-import cn.iocoder.yudao.module.ai.enums.ErrorCodeConstants;
 import cn.iocoder.yudao.module.ai.controller.admin.chat.vo.message.AiChatMessagePageReqVO;
 import cn.iocoder.yudao.module.ai.controller.admin.chat.vo.message.AiChatMessageRespVO;
 import cn.iocoder.yudao.module.ai.controller.admin.chat.vo.message.AiChatMessageSendReqVO;
@@ -18,6 +20,7 @@ import cn.iocoder.yudao.module.ai.dal.dataobject.chat.AiChatMessageDO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiChatModelDO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiChatRoleDO;
 import cn.iocoder.yudao.module.ai.dal.mysql.chat.AiChatMessageMapper;
+import cn.iocoder.yudao.module.ai.enums.ErrorCodeConstants;
 import cn.iocoder.yudao.module.ai.service.model.AiApiKeyService;
 import cn.iocoder.yudao.module.ai.service.model.AiChatModelService;
 import cn.iocoder.yudao.module.ai.service.model.AiChatRoleService;
@@ -28,6 +31,8 @@ import org.springframework.ai.chat.StreamingChatClient;
 import org.springframework.ai.chat.messages.*;
 import org.springframework.ai.chat.prompt.ChatOptions;
 import org.springframework.ai.chat.prompt.Prompt;
+import org.springframework.ai.ollama.api.OllamaOptions;
+import org.springframework.ai.openai.OpenAiChatOptions;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Flux;
@@ -53,9 +58,6 @@ public class AiChatMessageServiceImpl implements AiChatMessageService {
 
     @Resource
     private AiChatMessageMapper chatMessageMapper;
-
-    @Resource
-    private AiClientFactory clientFactory;
 
     @Resource
     private AiChatConversationService chatConversationService;
@@ -168,9 +170,31 @@ public class AiChatMessageServiceImpl implements AiChatMessageService {
 
         // 2. 构建 ChatOptions 对象
         AiPlatformEnum platform = AiPlatformEnum.validatePlatform(model.getPlatform());
-        ChatOptions chatOptions = clientFactory.buildChatOptions(platform, model.getModel(),
+        ChatOptions chatOptions = buildChatOptions(platform, model.getModel(),
                 conversation.getTemperature(), conversation.getMaxTokens());
         return new Prompt(chatMessages, chatOptions);
+    }
+
+    private static ChatOptions buildChatOptions(AiPlatformEnum platform, String model, Double temperature, Integer maxTokens) {
+        Float temperatureF = temperature != null ? temperature.floatValue() : null;
+        //noinspection EnhancedSwitchMigration
+        switch (platform) {
+            case OPENAI:
+                return OpenAiChatOptions.builder().withModel(model).withTemperature(temperatureF).withMaxTokens(maxTokens).build();
+            case OLLAMA:
+                return OllamaOptions.create().withModel(model).withTemperature(temperatureF).withNumPredict(maxTokens);
+            case YI_YAN:
+                // TODO @fan：增加一个 model
+                return new YiYanChatOptions().setTemperature(temperatureF).setMaxOutputTokens(maxTokens);
+            case XING_HUO:
+                return new XingHuoOptions().setChatModel(XingHuoChatModel.valueOfModel(model)).setTemperature(temperatureF)
+                        .setMaxTokens(maxTokens);
+            case QIAN_WEN:
+                // TODO @fan:增加 model、temperature 参数
+                return new QianWenOptions().setMaxTokens(maxTokens);
+            default:
+                throw new IllegalArgumentException(StrUtil.format("未知平台({})", platform));
+        }
     }
 
     /**
@@ -183,7 +207,9 @@ public class AiChatMessageServiceImpl implements AiChatMessageService {
      * @param sendReqVO 发送请求
      * @return 消息上下文
      */
-    private List<AiChatMessageDO> filterContextMessages(List<AiChatMessageDO> messages, AiChatConversationDO conversation, AiChatMessageSendReqVO sendReqVO) {
+    private List<AiChatMessageDO> filterContextMessages(List<AiChatMessageDO> messages,
+                                                        AiChatConversationDO conversation,
+                                                        AiChatMessageSendReqVO sendReqVO) {
         if (conversation.getMaxContexts() == null || ObjUtil.notEqual(sendReqVO.getUseContext(), Boolean.TRUE)) {
             return Collections.emptyList();
         }

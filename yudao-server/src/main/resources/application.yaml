@@ -161,7 +161,6 @@ spring:
           project-id: 1 # TODO 芋艿：缺配置
           location: 2
 
-
 yudao.ai:
   yiyan:
     enable: true
@@ -193,11 +192,6 @@ yudao.ai:
     topP: 0.8
     topK: 0
     api-key: sk-Zsd81gZYg7
-  openAiImage:
-    enable: true
-    api-key: ${OPEN_AI_KEY}
-    model: dall_e_2
-    style: vivid
   midjourney:
     enable: true
     token: MTE4MjE3MjY2MjkxNTY3ODIzOA.GEV1SG.c49F8lZoGCUHwsj8O0UdodmM6nyQHvuD2fXflw
@@ -206,6 +200,7 @@ yudao.ai:
   suno:
     enable: true
     token: 16b4356581984d538652354b60d69ff0
+
 --- #################### 芋道相关配置 ####################
 
 yudao:

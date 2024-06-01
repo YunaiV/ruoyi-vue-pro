@@ -64,4 +64,5 @@ public interface AiImageService {
      * @return
      */
     Boolean midjourneyNotify(Long loginUserId, MidjourneyNotifyReqVO notifyReqVO);
+
 }

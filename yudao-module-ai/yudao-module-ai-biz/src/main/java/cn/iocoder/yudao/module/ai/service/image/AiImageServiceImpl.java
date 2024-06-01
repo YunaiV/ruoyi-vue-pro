@@ -7,7 +7,6 @@ import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.spring.SpringUtil;
 import cn.hutool.http.HttpUtil;
 import cn.iocoder.yudao.framework.ai.core.enums.AiPlatformEnum;
-import cn.iocoder.yudao.framework.ai.core.factory.AiClientFactory;
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
@@ -23,6 +22,7 @@ import cn.iocoder.yudao.module.ai.controller.admin.image.vo.AiImageMidjourneyIma
 import cn.iocoder.yudao.module.ai.dal.dataobject.image.AiImageDO;
 import cn.iocoder.yudao.module.ai.dal.mysql.image.AiImageMapper;
 import cn.iocoder.yudao.module.ai.enums.image.AiImageStatusEnum;
+import cn.iocoder.yudao.module.ai.service.model.AiApiKeyService;
 import cn.iocoder.yudao.module.infra.api.file.FileApi;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
@@ -57,7 +57,7 @@ public class AiImageServiceImpl implements AiImageService {
     private FileApi fileApi;
 
     @Resource
-    private AiClientFactory aiClientFactory;
+    private AiApiKeyService apiKeyService;
 
     @Autowired
     private MidjourneyProxyClient midjourneyProxyClient;
@@ -82,17 +82,17 @@ public class AiImageServiceImpl implements AiImageService {
                 .setWidth(drawReqVO.getWidth()).setHeight(drawReqVO.getHeight()).setStatus(AiImageStatusEnum.IN_PROGRESS.getStatus());
         imageMapper.insert(image);
         // 2. 异步绘制，后续前端通过返回的 id 进行轮询结果
-        getSelf().doDall(image, drawReqVO);
+        getSelf().executeDrawImage(image, drawReqVO);
         return image.getId();
     }
 
     @Async
-    public void doDall(AiImageDO image, AiImageDrawReqVO req) {
+    public void executeDrawImage(AiImageDO image, AiImageDrawReqVO req) {
         try {
             // 1.1 构建请求
             ImageOptions request = buildImageOptions(req);
             // 1.2 执行请求
-            ImageClient imageClient = aiClientFactory.getDefaultImageClient(AiPlatformEnum.validatePlatform(req.getPlatform()));
+            ImageClient imageClient = apiKeyService.getImageClient(AiPlatformEnum.validatePlatform(req.getPlatform()));
             ImageResponse response = imageClient.call(new ImagePrompt(req.getPrompt(), request));
 
             // 2. 上传到文件服务
