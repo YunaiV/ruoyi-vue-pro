@@ -38,6 +38,11 @@ import static org.flowable.bpmn.constants.BpmnXMLConstants.*;
  */
 public class SimpleModelUtils {
 
+    /**
+     * 聚合网关节点 Id 后缀
+     */
+    public static final String JOIN_GATE_WAY_NODE_ID_SUFFIX = "_join";
+
     public static final String BPMN_SIMPLE_COPY_EXECUTION_SCRIPT = "#{bpmSimpleNodeService.copy(execution)}";
 
     /**
@@ -105,20 +110,20 @@ public class SimpleModelUtils {
 //        }
         BpmSimpleModelNodeType nodeType = BpmSimpleModelNodeType.valueOf(node.getType());
         Assert.notNull(nodeType, "模型节点类型不支持");
+
+        if (nodeType == END_NODE) {
+            return;
+        }
         BpmSimpleModelNodeVO childNode = node.getChildNode();
         // 2.1 普通节点
         if (!BpmSimpleModelNodeType.isBranchNode(node.getType())) {
-            // 2.1.1 结束节点退出递归
-            if (nodeType == END_NODE) {
-                return;
-            }
             if (!isValidNode(childNode)) {
-                // 2.1.2 普通节点且无孩子节点。分两种情况
+                // 2.1.1 普通节点且无孩子节点。分两种情况
                 // a.结束节点  b. 条件分支的最后一个节点.与分支节点的孩子节点或聚合节点建立连线。
                 SequenceFlow sequenceFlow = buildBpmnSequenceFlow(node.getId(), targetNodeId, null, null, null);
                 process.addFlowElement(sequenceFlow);
             } else {
-                // 2.1.3 普通节点且有孩子节点。建立连线
+                // 2.1.2 普通节点且有孩子节点。建立连线
                 SequenceFlow sequenceFlow = buildBpmnSequenceFlow(node.getId(), childNode.getId(), null, null, null);
                 process.addFlowElement(sequenceFlow);
                 // 递归调用后续节点
@@ -128,31 +133,48 @@ public class SimpleModelUtils {
             // 2.2 分支节点
             List<BpmSimpleModelNodeVO> conditionNodes = node.getConditionNodes();
             Assert.notEmpty(conditionNodes, "分支节点的条件节点不能为空");
-            // 4.1 分支节点，遍历分支节点. 如下情况:
+            // 分支终点节点 Id
+            String branchEndNodeId = null;
+            if (nodeType == CONDITION_BRANCH_NODE) { // 条件分支
+                // 分两种情况 1. 分支节点有孩子节点为孩子节点 Id 2. 分支节点孩子为无效节点时 (分支嵌套且为分支最后一个节点) 为分支终点节点Id
+                branchEndNodeId = isValidNode(childNode) ? childNode.getId() : targetNodeId;
+            } else if (nodeType == PARALLEL_BRANCH_NODE) {  // 并行分支
+                // 分支节点：分支终点节点 Id 为程序创建的网关集合节点。目前不会从前端传入。
+                branchEndNodeId = node.getId() + JOIN_GATE_WAY_NODE_ID_SUFFIX;
+            }
+            // TODO 包容网关待实现
+            Assert.notEmpty(branchEndNodeId, "分支终点节点 Id 不能为空");
+            // 3.1 遍历分支节点. 如下情况:
             // 分支1、A->B->C->D->E 和 分支2、A->D->E。 A为分支节点, D为A孩子节点
-            // 分支终点节点， 1. 分支节点有孩子节点时为孩子节点  2. 当分支节点孩子为无效节点时。分支嵌套时并且为分支最后一个节点
-            String branchEndNodeId = isValidNode(childNode) ? childNode.getId() : targetNodeId ;
             for (BpmSimpleModelNodeVO item : conditionNodes) {
                 // TODO @jason：条件分支的情况下，需要分 item 搞的条件，和 conditionNodes 搞的条件
-                // 构建表达式
+                // @芋艿 这个是啥意思。 这里的 item 的节点类型为 BpmSimpleModelNodeType.CONDITION_NODE 类型，没有对应的 bpmn 的节点。 仅仅用于构建条件表达式。
+                Assert.isTrue(Objects.equals(item.getType(), CONDITION_NODE.getType()), "条件节点类型不符合");
+                // 构建表达式,可以为空. 并行分支为空
                 String conditionExpression = buildConditionExpression(item);
                 BpmSimpleModelNodeVO nextNodeOnCondition = item.getChildNode();
-                // 4.2 分支有后续节点, 分支1: A->B->C->D
+                // 3.2 分支有后续节点, 分支1: A->B->C->D
                 if (isValidNode(nextNodeOnCondition)) {
-                    // 4.2.1 建立 A->B
+                    // 3.2.1 建立 A->B
                     SequenceFlow sequenceFlow = buildBpmnSequenceFlow(node.getId(), nextNodeOnCondition.getId(),
                             item.getId(), item.getName(), conditionExpression);
                     process.addFlowElement(sequenceFlow);
-                    // 4.2.2 递归调用后续节点连线。 建立 B->C->D 的连线
+                    // 3.2.2 递归调用后续节点连线。 建立 B->C->D 的连线
                     traverseNodeToBuildSequenceFlow(process, nextNodeOnCondition, branchEndNodeId);
                 } else {
-                    // 4.3 分支无后续节点 建立 A->D
+                    // 3.3 分支无后续节点 建立 A->D
                     SequenceFlow sequenceFlow = buildBpmnSequenceFlow(node.getId(), branchEndNodeId,
                             item.getId(), item.getName(), conditionExpression);
                     process.addFlowElement(sequenceFlow);
                 }
             }
-            // 递归调用后续节点 继续递归建立 D->E 的连线
+            // 如果是并行分支。由于是程序创建的聚合网关。需要手工创建聚合网关和下一个节点的连线
+            if (nodeType == PARALLEL_BRANCH_NODE) {
+                String nextNodeId = isValidNode(childNode) ? childNode.getId() : targetNodeId;
+                SequenceFlow sequenceFlow = buildBpmnSequenceFlow(branchEndNodeId, nextNodeId, null, null, null);
+                process.addFlowElement(sequenceFlow);
+            }
+            // 4.递归调用后续节点 继续递归建立 D->E 的连线
             traverseNodeToBuildSequenceFlow(process, childNode, targetNodeId);
         }
 
@@ -328,10 +350,9 @@ public class SimpleModelUtils {
                 list.add(exclusiveGateway);
                 break;
             }
-            case PARALLEL_BRANCH_FORK_NODE:
-            case PARALLEL_BRANCH_JOIN_NODE: {
-                ParallelGateway parallelGateway = convertParallelBranchNode(node);
-                list.add(parallelGateway);
+            case PARALLEL_BRANCH_NODE: {
+                List<ParallelGateway> parallelGateways = convertParallelBranchNode(node);
+                list.addAll(parallelGateways);
                 break;
             }
 
@@ -392,14 +413,17 @@ public class SimpleModelUtils {
         return boundaryEvent;
     }
 
-    private static ParallelGateway convertParallelBranchNode(BpmSimpleModelNodeVO node) {
+    private static List<ParallelGateway> convertParallelBranchNode(BpmSimpleModelNodeVO node) {
         ParallelGateway parallelGateway = new ParallelGateway();
         parallelGateway.setId(node.getId());
         // TODO @jason：setName
 
         // TODO @芋艿 + jason：合并网关；是不是要有条件啥的。微信讨论
-        // @芋艿 貌似并行网关没有条件的
-        return parallelGateway;
+        // @芋艿 感觉聚合网关(合并网关)还是从前端传过来好理解一点。
+        // 并行聚合网关
+        ParallelGateway joinParallelGateway = new ParallelGateway();
+        joinParallelGateway.setId(node.getId() + JOIN_GATE_WAY_NODE_ID_SUFFIX);
+        return CollUtil.newArrayList(parallelGateway, joinParallelGateway);
     }
 
     private static ServiceTask convertCopyNode(BpmSimpleModelNodeVO node) {
