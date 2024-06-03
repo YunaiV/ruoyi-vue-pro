@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.ai.controller.admin.music.vo;
 
-import cn.iocoder.yudao.framework.ai.core.model.suno.api.SunoApi;
+import cn.iocoder.yudao.framework.ai.core.model.suno.api.AceDataSunoApi;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
@@ -66,7 +66,7 @@ public class MusicDataVO {
      */
     private String style;
 
-    public static List<MusicDataVO> convertFrom(List<SunoApi.SunoResp.MusicData> musicDataList) {
+    public static List<MusicDataVO> convertFrom(List<AceDataSunoApi.SunoResp.MusicData> musicDataList) {
         return musicDataList.stream().map(musicData -> {
             MusicDataVO musicDataVO = new MusicDataVO();
             musicDataVO.setId(musicData.id());
