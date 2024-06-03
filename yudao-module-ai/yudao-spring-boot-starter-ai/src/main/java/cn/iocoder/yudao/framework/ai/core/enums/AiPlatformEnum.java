@@ -33,18 +33,6 @@ public enum AiPlatformEnum {
      */
     private final String name;
 
-//    public static List<AiPlatformEnum> CHAT_PLATFORM_LIST = Lists.newArrayList(
-//            AiPlatformEnum.YI_YAN,
-//            AiPlatformEnum.QIAN_WEN,
-//            AiPlatformEnum.XING_HUO,
-//            AiPlatformEnum.OPENAI
-//    );
-//
-//    public static List<AiPlatformEnum> IMAGE_PLATFORM_LIST = Lists.newArrayList(
-//            AiPlatformEnum.OPEN_AI_DALL,
-//            AiPlatformEnum.MIDJOURNEY
-//    );
-
     public static AiPlatformEnum validatePlatform(String platform) {
         for (AiPlatformEnum platformEnum : AiPlatformEnum.values()) {
             if (platformEnum.getPlatform().equals(platform)) {
