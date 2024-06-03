@@ -238,7 +238,6 @@ public class BpmModelServiceImpl implements BpmModelService {
         saveModelSimpleJson(model.getId(), JsonUtils.toJsonByte(reqVO.getSimpleModel()));
     }
 
-
     /**
      * 校验流程表单已配置
      *

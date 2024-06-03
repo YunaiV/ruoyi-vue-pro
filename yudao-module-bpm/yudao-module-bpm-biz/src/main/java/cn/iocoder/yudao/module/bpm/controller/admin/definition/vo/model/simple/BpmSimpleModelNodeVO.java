@@ -29,6 +29,7 @@ public class BpmSimpleModelNodeVO {
     private String name;
 
     // TODO @jason：要不改成 placeholder 和一般 Element-Plus 组件一致。占位符，用于展示。@芋艿。这个不是 placeholder 占位符的含义。节点配置后。节点展示的内容，不知道取什么名字好???
+    // TODO @jason：【回复】占位文本（showText）是指当一个文本框没有被 focus 的时候显示的是提示文字，当他被点击之后就显示空白。。。虽然不是完全精准，但是 placeholder 相对正式点~
     @Schema(description = "节点展示内容", example = "指定成员: 芋道源码")
     private String showText;
 
