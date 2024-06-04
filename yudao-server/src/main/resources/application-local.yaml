@@ -76,6 +76,13 @@ server:
       enabled: true
       charset: UTF-8
       force: true
+# ai
+ai:
+  midjourney-proxy:
+    url: https://api.holdai.top/mj
+    notifyUrl: http://7b1aada4.r26.cpolar.top/admin-api/ai/image/midjourney-notify
+
+
 --- #################### 定时任务相关配置 ####################
 
 # Quartz 配置项，对应 QuartzProperties 配置类

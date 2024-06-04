@@ -19,7 +19,7 @@ public class MidjourneyNotifyReqVO {
     @Schema(description = "任务类型")
     private MidjourneyTaskActionEnum action;
     @Schema(description = "任务状态")
-    private MidjourneyTaskStatusEnum status = MidjourneyTaskStatusEnum.NOT_START;
+    private MidjourneyTaskStatusEnum status;
 
     @Schema(description = "提示词")
     private String prompt;

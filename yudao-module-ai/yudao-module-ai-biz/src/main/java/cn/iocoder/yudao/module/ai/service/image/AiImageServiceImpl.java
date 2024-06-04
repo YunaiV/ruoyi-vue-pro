@@ -212,7 +212,6 @@ public class AiImageServiceImpl implements AiImageService {
                         .setId(image.getId())
                         .setStatus(imageStatus)
                         .setPicUrl(filePath)
-//                        .setOriginalPicUrl(notifyReqVO.getImageUrl()) TODO @fan：就不存原始的图片地址啦
         );
         return true;
     }

@@ -1,10 +1,12 @@
 package cn.iocoder.yudao.module.ai.client;
 
+import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.module.ai.client.vo.MidjourneyImagineReqVO;
 import cn.iocoder.yudao.module.ai.client.vo.MidjourneySubmitRespVO;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.*;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.client.RestTemplate;
@@ -35,7 +37,15 @@ public class MidjourneyProxyClient {
      * @return
      */
     public MidjourneySubmitRespVO imagine(@Validated @NotNull MidjourneyImagineReqVO imagineReqVO) {
-        return restTemplate.postForObject(url.concat(URI_IMAGINE), imagineReqVO, MidjourneySubmitRespVO.class);
+        // 创建 HttpHeaders 对象
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.set("Authorization", "Bearer sk-c3qxUCVKsPfdQiYU8440E3Fc8dE5424d9cB124A4Ee2489E3");
+        // 创建 HttpEntity 对象，将 HttpHeaders 和请求体传递给它
+        HttpEntity<String> requestEntity = new HttpEntity<>(JsonUtils.toJsonString(imagineReqVO), headers);
+        // 发送 post 请求
+        ResponseEntity<String> response = restTemplate.exchange(url.concat(URI_IMAGINE), HttpMethod.POST, requestEntity, String.class);
+        return JsonUtils.parseObject(response.getBody(), MidjourneySubmitRespVO.class);
     }
 
 }

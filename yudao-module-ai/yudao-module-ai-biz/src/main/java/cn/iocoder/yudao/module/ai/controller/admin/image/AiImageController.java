@@ -15,6 +15,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
+import jakarta.annotation.security.PermitAll;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -70,10 +71,10 @@ public class AiImageController {
         return success(imageService.midjourneyImagine(getLoginUserId(), req));
     }
 
-    // TODO @芋艿：不拦截
     @Operation(summary = "midjourney proxy - 回调通知")
-    @RequestMapping("/midjourney-notify")
-    public CommonResult<Boolean> midjourneyNotify(MidjourneyNotifyReqVO notifyReqVO) {
+    @PostMapping("/midjourney-notify")
+    @PermitAll
+    public CommonResult<Boolean> midjourneyNotify( @RequestBody MidjourneyNotifyReqVO notifyReqVO) {
         return success(imageService.midjourneyNotify(getLoginUserId(), notifyReqVO));
     }
 
