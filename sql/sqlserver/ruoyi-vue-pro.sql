@@ -5,7 +5,8 @@
 
  Target Server Type    : Microsoft SQL Server
 
- Date: 2024-05-03 23:36:38
+ Date: 2024-05-08 00:22:09
+ Date: 2024-05-10 22:07:48
 */
 
 
@@ -14,10 +15,9 @@
 -- ----------------------------
 DROP TABLE IF EXISTS dual
 GO
-
 CREATE TABLE dual
 (
-    id int NULL
+    id int
 )
 GO
 
@@ -27,11 +27,19 @@ EXEC sp_addextendedproperty
      'TABLE', N'dual'
 GO
 
+-- ----------------------------
+-- Records of dual
+-- ----------------------------
+-- @formatter:off
+INSERT INTO dual VALUES (1)
+GO
+-- @formatter:on
 
 -- ----------------------------
 -- Table structure for infra_api_access_log
 -- ----------------------------
-DROP TABLE IF EXISTS infra_api_access_log;
+DROP TABLE IF EXISTS infra_api_access_log
+GO
 CREATE TABLE infra_api_access_log
 (
     id               bigint                                  NOT NULL PRIMARY KEY IDENTITY,
@@ -249,7 +257,8 @@ GO
 -- ----------------------------
 -- Table structure for infra_api_error_log
 -- ----------------------------
-DROP TABLE IF EXISTS infra_api_error_log;
+DROP TABLE IF EXISTS infra_api_error_log
+GO
 CREATE TABLE infra_api_error_log
 (
     id                           bigint                                  NOT NULL PRIMARY KEY IDENTITY,
@@ -508,7 +517,8 @@ GO
 -- ----------------------------
 -- Table structure for infra_codegen_column
 -- ----------------------------
-DROP TABLE IF EXISTS infra_codegen_column;
+DROP TABLE IF EXISTS infra_codegen_column
+GO
 CREATE TABLE infra_codegen_column
 (
     id                       bigint                                  NOT NULL PRIMARY KEY IDENTITY,
@@ -707,7 +717,8 @@ GO
 -- ----------------------------
 -- Table structure for infra_codegen_table
 -- ----------------------------
-DROP TABLE IF EXISTS infra_codegen_table;
+DROP TABLE IF EXISTS infra_codegen_table
+GO
 CREATE TABLE infra_codegen_table
 (
     id                    bigint                                  NOT NULL PRIMARY KEY IDENTITY,
@@ -914,7 +925,8 @@ GO
 -- ----------------------------
 -- Table structure for infra_config
 -- ----------------------------
-DROP TABLE IF EXISTS infra_config;
+DROP TABLE IF EXISTS infra_config
+GO
 CREATE TABLE infra_config
 (
     id          bigint                                  NOT NULL PRIMARY KEY IDENTITY,
@@ -1061,7 +1073,8 @@ GO
 -- ----------------------------
 -- Table structure for infra_data_source_config
 -- ----------------------------
-DROP TABLE IF EXISTS infra_data_source_config;
+DROP TABLE IF EXISTS infra_data_source_config
+GO
 CREATE TABLE infra_data_source_config
 (
     id          bigint                                  NOT NULL PRIMARY KEY IDENTITY,
@@ -1156,7 +1169,8 @@ GO
 -- ----------------------------
 -- Table structure for infra_file
 -- ----------------------------
-DROP TABLE IF EXISTS infra_file;
+DROP TABLE IF EXISTS infra_file
+GO
 CREATE TABLE infra_file
 (
     id          bigint                                  NOT NULL PRIMARY KEY IDENTITY,
@@ -1267,7 +1281,8 @@ GO
 -- ----------------------------
 -- Table structure for infra_file_config
 -- ----------------------------
-DROP TABLE IF EXISTS infra_file_config;
+DROP TABLE IF EXISTS infra_file_config
+GO
 CREATE TABLE infra_file_config
 (
     id          bigint                                  NOT NULL PRIMARY KEY IDENTITY,
@@ -1388,7 +1403,8 @@ GO
 -- ----------------------------
 -- Table structure for infra_file_content
 -- ----------------------------
-DROP TABLE IF EXISTS infra_file_content;
+DROP TABLE IF EXISTS infra_file_content
+GO
 CREATE TABLE infra_file_content
 (
     id          bigint                                 NOT NULL PRIMARY KEY IDENTITY,
@@ -1475,7 +1491,8 @@ GO
 -- ----------------------------
 -- Table structure for infra_job
 -- ----------------------------
-DROP TABLE IF EXISTS infra_job;
+DROP TABLE IF EXISTS infra_job
+GO
 CREATE TABLE infra_job
 (
     id              bigint                                  NOT NULL PRIMARY KEY IDENTITY,
@@ -1638,7 +1655,8 @@ GO
 -- ----------------------------
 -- Table structure for infra_job_log
 -- ----------------------------
-DROP TABLE IF EXISTS infra_job_log;
+DROP TABLE IF EXISTS infra_job_log
+GO
 CREATE TABLE infra_job_log
 (
     id            bigint                                   NOT NULL PRIMARY KEY IDENTITY,
@@ -1773,7 +1791,8 @@ GO
 -- ----------------------------
 -- Table structure for system_dept
 -- ----------------------------
-DROP TABLE IF EXISTS system_dept;
+DROP TABLE IF EXISTS system_dept
+GO
 CREATE TABLE system_dept
 (
     id             bigint                                 NOT NULL PRIMARY KEY IDENTITY,
@@ -1942,7 +1961,8 @@ GO
 -- ----------------------------
 -- Table structure for system_dict_data
 -- ----------------------------
-DROP TABLE IF EXISTS system_dict_data;
+DROP TABLE IF EXISTS system_dict_data
+GO
 CREATE TABLE system_dict_data
 (
     id          bigint                                  NOT NULL PRIMARY KEY IDENTITY,
@@ -2813,7 +2833,8 @@ GO
 -- ----------------------------
 -- Table structure for system_dict_type
 -- ----------------------------
-DROP TABLE IF EXISTS system_dict_type;
+DROP TABLE IF EXISTS system_dict_type
+GO
 CREATE TABLE system_dict_type
 (
     id           bigint                                  NOT NULL PRIMARY KEY IDENTITY,
@@ -3096,7 +3117,8 @@ GO
 -- ----------------------------
 -- Table structure for system_login_log
 -- ----------------------------
-DROP TABLE IF EXISTS system_login_log;
+DROP TABLE IF EXISTS system_login_log
+GO
 CREATE TABLE system_login_log
 (
     id          bigint                                 NOT NULL PRIMARY KEY IDENTITY,
@@ -3231,7 +3253,8 @@ GO
 -- ----------------------------
 -- Table structure for system_mail_account
 -- ----------------------------
-DROP TABLE IF EXISTS system_mail_account;
+DROP TABLE IF EXISTS system_mail_account
+GO
 CREATE TABLE system_mail_account
 (
     id              bigint                                 NOT NULL PRIMARY KEY IDENTITY,
@@ -3372,7 +3395,8 @@ GO
 -- ----------------------------
 -- Table structure for system_mail_log
 -- ----------------------------
-DROP TABLE IF EXISTS system_mail_log;
+DROP TABLE IF EXISTS system_mail_log
+GO
 CREATE TABLE system_mail_log
 (
     id                bigint                                   NOT NULL PRIMARY KEY IDENTITY,
@@ -3555,7 +3579,8 @@ GO
 -- ----------------------------
 -- Table structure for system_mail_template
 -- ----------------------------
-DROP TABLE IF EXISTS system_mail_template;
+DROP TABLE IF EXISTS system_mail_template
+GO
 CREATE TABLE system_mail_template
 (
     id          bigint                                  NOT NULL PRIMARY KEY IDENTITY,
@@ -3710,7 +3735,8 @@ GO
 -- ----------------------------
 -- Table structure for system_menu
 -- ----------------------------
-DROP TABLE IF EXISTS system_menu;
+DROP TABLE IF EXISTS system_menu
+GO
 CREATE TABLE system_menu
 (
     id             bigint                                  NOT NULL PRIMARY KEY IDENTITY,
@@ -5471,7 +5497,8 @@ GO
 -- ----------------------------
 -- Table structure for system_notice
 -- ----------------------------
-DROP TABLE IF EXISTS system_notice;
+DROP TABLE IF EXISTS system_notice
+GO
 CREATE TABLE system_notice
 (
     id          bigint                                 NOT NULL PRIMARY KEY IDENTITY,
@@ -5594,7 +5621,8 @@ GO
 -- ----------------------------
 -- Table structure for system_notify_message
 -- ----------------------------
-DROP TABLE IF EXISTS system_notify_message;
+DROP TABLE IF EXISTS system_notify_message
+GO
 CREATE TABLE system_notify_message
 (
     id                bigint                                 NOT NULL PRIMARY KEY IDENTITY,
@@ -5777,7 +5805,8 @@ GO
 -- ----------------------------
 -- Table structure for system_notify_template
 -- ----------------------------
-DROP TABLE IF EXISTS system_notify_template;
+DROP TABLE IF EXISTS system_notify_template
+GO
 CREATE TABLE system_notify_template
 (
     id          bigint                                  NOT NULL PRIMARY KEY IDENTITY,
@@ -5904,7 +5933,8 @@ GO
 -- ----------------------------
 -- Table structure for system_oauth2_access_token
 -- ----------------------------
-DROP TABLE IF EXISTS system_oauth2_access_token;
+DROP TABLE IF EXISTS system_oauth2_access_token
+GO
 CREATE TABLE system_oauth2_access_token
 (
     id            bigint                                  NOT NULL PRIMARY KEY IDENTITY,
@@ -6044,7 +6074,8 @@ GO
 -- ----------------------------
 -- Table structure for system_oauth2_approve
 -- ----------------------------
-DROP TABLE IF EXISTS system_oauth2_approve;
+DROP TABLE IF EXISTS system_oauth2_approve
+GO
 CREATE TABLE system_oauth2_approve
 (
     id           bigint                                  NOT NULL PRIMARY KEY IDENTITY,
@@ -6163,7 +6194,8 @@ GO
 -- ----------------------------
 -- Table structure for system_oauth2_client
 -- ----------------------------
-DROP TABLE IF EXISTS system_oauth2_client;
+DROP TABLE IF EXISTS system_oauth2_client
+GO
 CREATE TABLE system_oauth2_client
 (
     id                             bigint                                   NOT NULL PRIMARY KEY IDENTITY,
@@ -6368,7 +6400,8 @@ GO
 -- ----------------------------
 -- Table structure for system_oauth2_code
 -- ----------------------------
-DROP TABLE IF EXISTS system_oauth2_code;
+DROP TABLE IF EXISTS system_oauth2_code
+GO
 CREATE TABLE system_oauth2_code
 (
     id           bigint                                  NOT NULL PRIMARY KEY IDENTITY,
@@ -6503,7 +6536,8 @@ GO
 -- ----------------------------
 -- Table structure for system_oauth2_refresh_token
 -- ----------------------------
-DROP TABLE IF EXISTS system_oauth2_refresh_token;
+DROP TABLE IF EXISTS system_oauth2_refresh_token
+GO
 CREATE TABLE system_oauth2_refresh_token
 (
     id            bigint                                  NOT NULL PRIMARY KEY IDENTITY,
@@ -6622,7 +6656,8 @@ GO
 -- ----------------------------
 -- Table structure for system_operate_log
 -- ----------------------------
-DROP TABLE IF EXISTS system_operate_log;
+DROP TABLE IF EXISTS system_operate_log
+GO
 CREATE TABLE system_operate_log
 (
     id             bigint                                   NOT NULL PRIMARY KEY IDENTITY,
@@ -6789,7 +6824,8 @@ GO
 -- ----------------------------
 -- Table structure for system_post
 -- ----------------------------
-DROP TABLE IF EXISTS system_post;
+DROP TABLE IF EXISTS system_post
+GO
 CREATE TABLE system_post
 (
     id          bigint                                  NOT NULL PRIMARY KEY IDENTITY,
@@ -6922,7 +6958,8 @@ GO
 -- ----------------------------
 -- Table structure for system_role
 -- ----------------------------
-DROP TABLE IF EXISTS system_role;
+DROP TABLE IF EXISTS system_role
+GO
 CREATE TABLE system_role
 (
     id                  bigint                                  NOT NULL PRIMARY KEY IDENTITY,
@@ -7083,7 +7120,8 @@ GO
 -- ----------------------------
 -- Table structure for system_role_menu
 -- ----------------------------
-DROP TABLE IF EXISTS system_role_menu;
+DROP TABLE IF EXISTS system_role_menu
+GO
 CREATE TABLE system_role_menu
 (
     id          bigint                                 NOT NULL PRIMARY KEY IDENTITY,
@@ -8830,7 +8868,8 @@ GO
 -- ----------------------------
 -- Table structure for system_sms_channel
 -- ----------------------------
-DROP TABLE IF EXISTS system_sms_channel;
+DROP TABLE IF EXISTS system_sms_channel
+GO
 CREATE TABLE system_sms_channel
 (
     id           bigint                                  NOT NULL PRIMARY KEY IDENTITY,
@@ -8969,7 +9008,8 @@ GO
 -- ----------------------------
 -- Table structure for system_sms_code
 -- ----------------------------
-DROP TABLE IF EXISTS system_sms_code;
+DROP TABLE IF EXISTS system_sms_code
+GO
 CREATE TABLE system_sms_code
 (
     id          bigint                                  NOT NULL PRIMARY KEY IDENTITY,
@@ -9107,7 +9147,8 @@ GO
 -- ----------------------------
 -- Table structure for system_sms_log
 -- ----------------------------
-DROP TABLE IF EXISTS system_sms_log;
+DROP TABLE IF EXISTS system_sms_log
+GO
 CREATE TABLE system_sms_log
 (
     id               bigint                                  NOT NULL PRIMARY KEY IDENTITY,
@@ -9338,7 +9379,8 @@ GO
 -- ----------------------------
 -- Table structure for system_sms_template
 -- ----------------------------
-DROP TABLE IF EXISTS system_sms_template;
+DROP TABLE IF EXISTS system_sms_template
+GO
 CREATE TABLE system_sms_template
 (
     id              bigint                                  NOT NULL PRIMARY KEY IDENTITY,
@@ -9519,7 +9561,8 @@ GO
 -- ----------------------------
 -- Table structure for system_social_client
 -- ----------------------------
-DROP TABLE IF EXISTS system_social_client;
+DROP TABLE IF EXISTS system_social_client
+GO
 CREATE TABLE system_social_client
 (
     id            bigint                                  NOT NULL PRIMARY KEY IDENTITY,
@@ -9668,7 +9711,8 @@ GO
 -- ----------------------------
 -- Table structure for system_social_user
 -- ----------------------------
-DROP TABLE IF EXISTS system_social_user;
+DROP TABLE IF EXISTS system_social_user
+GO
 CREATE TABLE system_social_user
 (
     id             bigint                                  NOT NULL PRIMARY KEY IDENTITY,
@@ -9811,7 +9855,8 @@ GO
 -- ----------------------------
 -- Table structure for system_social_user_bind
 -- ----------------------------
-DROP TABLE IF EXISTS system_social_user_bind;
+DROP TABLE IF EXISTS system_social_user_bind
+GO
 CREATE TABLE system_social_user_bind
 (
     id             bigint                                 NOT NULL PRIMARY KEY IDENTITY,
@@ -9914,7 +9959,8 @@ GO
 -- ----------------------------
 -- Table structure for system_tenant
 -- ----------------------------
-DROP TABLE IF EXISTS system_tenant;
+DROP TABLE IF EXISTS system_tenant
+GO
 CREATE TABLE system_tenant
 (
     id              bigint                                  NOT NULL PRIMARY KEY IDENTITY,
@@ -10069,7 +10115,8 @@ GO
 -- ----------------------------
 -- Table structure for system_tenant_package
 -- ----------------------------
-DROP TABLE IF EXISTS system_tenant_package;
+DROP TABLE IF EXISTS system_tenant_package
+GO
 CREATE TABLE system_tenant_package
 (
     id          bigint                                  NOT NULL PRIMARY KEY IDENTITY,
@@ -10180,7 +10227,8 @@ GO
 -- ----------------------------
 -- Table structure for system_user_post
 -- ----------------------------
-DROP TABLE IF EXISTS system_user_post;
+DROP TABLE IF EXISTS system_user_post
+GO
 CREATE TABLE system_user_post
 (
     id          bigint                                 NOT NULL PRIMARY KEY IDENTITY,
@@ -10297,7 +10345,8 @@ GO
 -- ----------------------------
 -- Table structure for system_user_role
 -- ----------------------------
-DROP TABLE IF EXISTS system_user_role;
+DROP TABLE IF EXISTS system_user_role
+GO
 CREATE TABLE system_user_role
 (
     id          bigint                                 NOT NULL PRIMARY KEY IDENTITY,
@@ -10428,7 +10477,8 @@ GO
 -- ----------------------------
 -- Table structure for system_users
 -- ----------------------------
-DROP TABLE IF EXISTS system_users;
+DROP TABLE IF EXISTS system_users
+GO
 CREATE TABLE system_users
 (
     id          bigint                                  NOT NULL PRIMARY KEY IDENTITY,
@@ -10649,7 +10699,8 @@ GO
 -- ----------------------------
 -- Table structure for yudao_demo01_contact
 -- ----------------------------
-DROP TABLE IF EXISTS yudao_demo01_contact;
+DROP TABLE IF EXISTS yudao_demo01_contact
+GO
 CREATE TABLE yudao_demo01_contact
 (
     id          bigint                                  NOT NULL PRIMARY KEY IDENTITY,
@@ -10776,7 +10827,8 @@ GO
 -- ----------------------------
 -- Table structure for yudao_demo02_category
 -- ----------------------------
-DROP TABLE IF EXISTS yudao_demo02_category;
+DROP TABLE IF EXISTS yudao_demo02_category
+GO
 CREATE TABLE yudao_demo02_category
 (
     id          bigint                                  NOT NULL PRIMARY KEY IDENTITY,
@@ -10889,7 +10941,8 @@ GO
 -- ----------------------------
 -- Table structure for yudao_demo03_course
 -- ----------------------------
-DROP TABLE IF EXISTS yudao_demo03_course;
+DROP TABLE IF EXISTS yudao_demo03_course
+GO
 CREATE TABLE yudao_demo03_course
 (
     id          bigint                                  NOT NULL PRIMARY KEY IDENTITY,
@@ -11018,7 +11071,8 @@ GO
 -- ----------------------------
 -- Table structure for yudao_demo03_grade
 -- ----------------------------
-DROP TABLE IF EXISTS yudao_demo03_grade;
+DROP TABLE IF EXISTS yudao_demo03_grade
+GO
 CREATE TABLE yudao_demo03_grade
 (
     id          bigint                                  NOT NULL PRIMARY KEY IDENTITY,
@@ -11133,7 +11187,8 @@ GO
 -- ----------------------------
 -- Table structure for yudao_demo03_student
 -- ----------------------------
-DROP TABLE IF EXISTS yudao_demo03_student;
+DROP TABLE IF EXISTS yudao_demo03_student
+GO
 CREATE TABLE yudao_demo03_student
 (
     id          bigint                                  NOT NULL PRIMARY KEY IDENTITY,

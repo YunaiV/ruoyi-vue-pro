@@ -20,7 +20,7 @@ public enum ErpBizTypeEnum implements IntArrayValuable {
     PURCHASE_RETURN(12, "采购退货"),
 
     SALE_ORDER(20, "销售订单"),
-    SALE_OUT(21, "销售订单"),
+    SALE_OUT(21, "销售出库"),
     SALE_RETURN(22, "销售退货"),
     ;
 

@@ -58,7 +58,7 @@ public interface TradeOrderStatisticsMapper extends BaseMapperX<TradeStatisticsD
 
     Long selectCountByStatusAndDeliveryType(@Param("status") Integer status, @Param("deliveryType") Integer deliveryType);
 
-    TradeOrderSummaryRespVO selectPaySummaryByPayStatusAndPayTimeBetween(@Param("payStatus") Integer payStatus,
+    TradeOrderSummaryRespVO selectPaySummaryByPayStatusAndPayTimeBetween(@Param("payStatus") Boolean payStatus,
                                                                          @Param("beginTime") LocalDateTime beginTime,
                                                                          @Param("endTime") LocalDateTime endTime);
 
