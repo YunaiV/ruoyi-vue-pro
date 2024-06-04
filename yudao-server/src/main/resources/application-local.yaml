@@ -52,6 +52,7 @@ spring:
           #          url: jdbc:oracle:thin:@127.0.0.1:1521:xe # Oracle 连接的示例
           #          url: jdbc:sqlserver://127.0.0.1:1433;DatabaseName=ruoyi-vue-pro;SelectMethod=cursor;encrypt=false;rewriteBatchedStatements=true;useUnicode=true;characterEncoding=utf-8 # SQLServer 连接的示例
           #          url: jdbc:dm://127.0.0.1:5236?schema=RUOYI_VUE_PRO # DM 连接的示例
+          #          url: jdbc:postgresql://127.0.0.1:54321/test  # KingbaseES 人大金仓 连接的示例, MyBatis不兼容官方驱动
           username: root
           password: 123456
         #          username: sa # SQL Server 连接的示例
