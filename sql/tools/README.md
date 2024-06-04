@@ -67,8 +67,8 @@ exit
 
 ① 下载人大金仓 Docker 镜像：
 
-> x86_64版本: https://kingbase.oss-cn-beijing.aliyuncs.com/KESV8R3/V009R001C001B0025-安装包-docker/x86_64/kdb_x86_64_V009R001C001B0025.tar 
-> aarch64版本：https://kingbase.oss-cn-beijing.aliyuncs.com/KESV8R3/V009R001C001B0025-安装包-docker/aarch64/kdb_aarch64_V009R001C001B0025.tar
+> x86_64 版本: https://kingbase.oss-cn-beijing.aliyuncs.com/KESV8R3/V009R001C001B0025-安装包-docker/x86_64/kdb_x86_64_V009R001C001B0025.tar 
+> aarch64 版本：https://kingbase.oss-cn-beijing.aliyuncs.com/KESV8R3/V009R001C001B0025-安装包-docker/aarch64/kdb_aarch64_V009R001C001B0025.tar
 
 ② 加载镜像文件，在镜像 tar 文件所在目录运行：
 
@@ -80,11 +80,11 @@ docker load -i x86_64/kdb_x86_64_V009R001C001B0025.tar
 
 ```Bash
 docker compose up -d kingbase
-# 注意：启动完 dm 后，需要手动再执行如下命令，因为 dm 不支持初始化脚本
+# 注意：启动完 kingbase 后，需要手动再执行如下命令，因为 dm 不支持初始化脚本
 docker compose exec kingbase bash -c "exec ksql -Uroot -d test -f /tmp/schema.sql"
 ```
 
-**注意**: MyBatis, MyBatis Plus 目前不兼容人大金仓，推荐直接使用PostgreSQL JDBC 驱动，已经 url 配置方式连接数据库。
+**注意**: MyBatis、MyBatis Plus 目前不兼容人大金仓，推荐直接使用 PostgreSQL JDBC 驱动，已经 url 配置方式连接数据库。
 
 ## 1.X 容器的销毁重建
 
