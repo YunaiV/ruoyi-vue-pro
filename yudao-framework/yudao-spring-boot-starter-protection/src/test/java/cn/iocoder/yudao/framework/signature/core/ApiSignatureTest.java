@@ -6,13 +6,13 @@ import cn.hutool.crypto.digest.DigestUtil;
 import cn.iocoder.yudao.framework.signature.core.annotation.ApiSignature;
 import cn.iocoder.yudao.framework.signature.core.aop.ApiSignatureAspect;
 import cn.iocoder.yudao.framework.signature.core.redis.ApiSignatureRedisDAO;
-import jakarta.servlet.http.HttpServletRequest;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import javax.servlet.http.HttpServletRequest;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
