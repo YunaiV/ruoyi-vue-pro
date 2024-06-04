@@ -43,5 +43,6 @@ public interface ErrorCodeConstants {
     // ========== API 绘画 1-040-005-000 ==========
 
     ErrorCode AI_IMAGE_NOT_EXISTS = new ErrorCode(1_022_005_000, "image 不存在!");
+    ErrorCode AI_IMAGE_MIDJOURNEY_SUBMIT_FAIL = new ErrorCode(1_022_005_001, "Midjourney 提交失败! {}");
 
 }

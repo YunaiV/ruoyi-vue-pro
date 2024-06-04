@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.ai.service.image;
 
 import cn.hutool.core.codec.Base64;
+import cn.hutool.core.exceptions.ExceptionUtil;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.StrUtil;
@@ -39,6 +40,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.module.ai.enums.ErrorCodeConstants.AI_IMAGE_MIDJOURNEY_SUBMIT_FAIL;
 import static cn.iocoder.yudao.module.ai.enums.ErrorCodeConstants.AI_IMAGE_NOT_EXISTS;
 
 /**
@@ -157,19 +159,12 @@ public class AiImageServiceImpl implements AiImageService {
         // 设置参数
         imagineReqVO.setState(midjourneySizeParam.concat(midjourneyVersionParam).concat(midjourneyNijiParam));
         MidjourneySubmitRespVO submitRespVO = midjourneyProxyClient.imagine(imagineReqVO);
-
         // 4、保存任务 id (状态码: 1(提交成功), 21(已存在), 22(排队中), other(错误))
-        String updateStatus = null;
-        String errorMessage = null;
-
         if (!MidjourneySubmitCodeEnum.SUCCESS_CODES.contains(submitRespVO.getCode())) {
-            updateStatus = AiImageStatusEnum.FAIL.getStatus();
-            errorMessage = submitRespVO.getDescription();
+            throw exception(AI_IMAGE_MIDJOURNEY_SUBMIT_FAIL, submitRespVO.getDescription());
         }
         imageMapper.updateById(new AiImageDO()
                 .setId(aiImageDO.getId())
-                .setStatus(updateStatus)
-                .setErrorMessage(errorMessage)
                 .setJobId(submitRespVO.getResult())
         );
         return aiImageDO.getId();
@@ -194,24 +189,33 @@ public class AiImageServiceImpl implements AiImageService {
             log.warn("midjourneyNotify 回调的 jobId 不存在! jobId: {}", notifyReqVO.getId());
             return false;
         }
-        //
+        // 2、转换状态
         String imageStatus = null;
-        if (MidjourneyTaskStatusEnum.SUCCESS == notifyReqVO.getStatus()) {
+        MidjourneyTaskStatusEnum taskStatusEnum = MidjourneyTaskStatusEnum.valueOf(notifyReqVO.getStatus());
+        if (MidjourneyTaskStatusEnum.SUCCESS == taskStatusEnum) {
             imageStatus = AiImageStatusEnum.SUCCESS.getStatus();
-        } else if (MidjourneyTaskStatusEnum.FAILURE == notifyReqVO.getStatus()) {
+        } else if (MidjourneyTaskStatusEnum.FAILURE == taskStatusEnum) {
             imageStatus = AiImageStatusEnum.FAIL.getStatus();
         }
-        // 2、上传图片
+        // 3、上传图片
         String filePath = null;
         if (!StrUtil.isBlank(notifyReqVO.getImageUrl())) {
-            filePath = fileApi.createFile(HttpUtil.downloadBytes(notifyReqVO.getImageUrl()));
+            try {
+                filePath = fileApi.createFile(HttpUtil.downloadBytes(notifyReqVO.getImageUrl()));
+            } catch (Exception e) {
+                log.warn("midjourneyNotify 图片上传失败! {} 异常：{}", notifyReqVO.getImageUrl(), ExceptionUtil.getMessage(e));
+            }
         }
-        // 2、更新 image 状态
+        // 4、更新 image 状态
         imageMapper.updateById(
                 new AiImageDO()
                         .setId(image.getId())
                         .setStatus(imageStatus)
                         .setPicUrl(filePath)
+                        .setProgress(notifyReqVO.getProgress())
+                        .setResponse(notifyReqVO)
+                        .setButtons(notifyReqVO.getButtons())
+                        .setErrorMessage(notifyReqVO.getFailReason())
         );
         return true;
     }
