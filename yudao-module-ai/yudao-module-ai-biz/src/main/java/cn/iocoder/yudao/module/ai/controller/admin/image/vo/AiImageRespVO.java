@@ -1,8 +1,10 @@
 package cn.iocoder.yudao.module.ai.controller.admin.image.vo;
 
+import cn.iocoder.yudao.module.ai.client.vo.MidjourneyNotifyReqVO;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
+import java.util.List;
 import java.util.Map;
 
 @Schema(description = "管理后台 - 绘画 Response VO")
@@ -45,4 +47,12 @@ public class AiImageRespVO {
     @Schema(description = "绘制参数")
     private Map<String, String> options;
 
+    @Schema(description = "绘画 response")
+    private MidjourneyNotifyReqVO response;
+
+    @Schema(description = "mj 进度")
+    private String progress;
+
+    @Schema(description = "mj buttons 按钮")
+    private List<MidjourneyNotifyReqVO.Button> buttons;
 }

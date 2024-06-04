@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.ai.dal.dataobject.image;
 
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import cn.iocoder.yudao.module.ai.client.vo.MidjourneyNotifyReqVO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiChatModelDO;
 import cn.iocoder.yudao.module.ai.enums.image.AiImageStatusEnum;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
@@ -13,6 +14,7 @@ import lombok.Data;
 import org.springframework.ai.openai.OpenAiImageOptions;
 import org.springframework.ai.stabilityai.api.StabilityAiImageOptions;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -91,6 +93,23 @@ public class AiImageDO extends BaseDO {
      */
     @TableField(typeHandler = JacksonTypeHandler.class)
     private Map<String, String> options;
+
+    /**
+     * 绘画 response
+     */
+    @TableField(typeHandler = JacksonTypeHandler.class)
+    private MidjourneyNotifyReqVO response;
+
+    /**
+     * mj 进度
+     */
+    private String progress;
+
+    /**
+     * mj buttons 按钮
+     */
+    @TableField(typeHandler = JacksonTypeHandler.class)
+    private List<MidjourneyNotifyReqVO.Button> buttons;
 
     // TODO @芋艿：再瞅瞅
     /**
