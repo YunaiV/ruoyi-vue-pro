@@ -25,10 +25,12 @@ public class AppKeFuConversationController {
     @Resource
     private KeFuConversationService conversationService;
 
+    // TODO @puhui999：接口名不对噢；
     @GetMapping("/get")
     @Operation(summary = "获得客服会话")
     @PreAuthenticated
     public CommonResult<AppKeFuConversationRespVO> getDiyPage() {
+        // TODO @puhui999：建议获取；和转换，分成 2 个哈；干净一些；
         return success(BeanUtils.toBean(conversationService.getOrCreateConversation(getLoginUserId()), AppKeFuConversationRespVO.class));
     }
 

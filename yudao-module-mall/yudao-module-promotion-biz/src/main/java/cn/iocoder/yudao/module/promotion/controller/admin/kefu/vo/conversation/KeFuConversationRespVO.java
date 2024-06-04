@@ -15,8 +15,10 @@ public class KeFuConversationRespVO {
     @Schema(description = "会话所属用户", requiredMode = Schema.RequiredMode.REQUIRED, example = "8300")
     private Long userId;
 
-    @Schema(description = "最后聊天时间", requiredMode = Schema.RequiredMode.REQUIRED,example = "2024-01-01 00:00:00")
+    @Schema(description = "最后聊天时间", requiredMode = Schema.RequiredMode.REQUIRED)
     private LocalDateTime lastMessageTime;
+
+    // TODO @puhui999：, 缺了空格哈
 
     @Schema(description = "最后聊天内容", requiredMode = Schema.RequiredMode.REQUIRED,example = "嗨，您好啊")
     private String lastMessageContent;
@@ -36,7 +38,7 @@ public class KeFuConversationRespVO {
     @Schema(description = "管理员未读消息数", requiredMode = Schema.RequiredMode.REQUIRED,example = "6")
     private Integer adminUnreadMessageCount;
 
-    @Schema(description = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED,example = "2024-01-01 00:00:00")
+    @Schema(description = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED)
     private LocalDateTime createTime;
 
 }

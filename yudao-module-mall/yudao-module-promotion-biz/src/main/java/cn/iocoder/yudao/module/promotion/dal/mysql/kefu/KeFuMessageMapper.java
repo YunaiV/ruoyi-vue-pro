@@ -26,13 +26,16 @@ public interface KeFuMessageMapper extends BaseMapperX<KeFuMessageDO> {
                 .orderByDesc(KeFuMessageDO::getId));
     }
 
-    default List<KeFuMessageDO> selectListByConversationIdAndReceiverIdAndReadStatus(Long conversationId, Long receiverId, Boolean readStatus) {
+    default List<KeFuMessageDO> selectListByConversationIdAndReceiverIdAndReadStatus(Long conversationId,
+                                                                                     Long receiverId,
+                                                                                     Boolean readStatus) {
         return selectList(new LambdaQueryWrapper<KeFuMessageDO>()
                 .eq(KeFuMessageDO::getConversationId, conversationId)
                 .eq(KeFuMessageDO::getReceiverId, receiverId)
                 .eq(KeFuMessageDO::getReadStatus, readStatus));
     }
 
+    // TODO @puhui999：status 拼写不对哈；ps：是不是搞个 ids + entity 的更新，更通用点
     default void updateReadStstusBatchByIds(Collection<Long> ids, Boolean readStatus) {
         update(new LambdaUpdateWrapper<KeFuMessageDO>()
                 .in(KeFuMessageDO::getId, ids)

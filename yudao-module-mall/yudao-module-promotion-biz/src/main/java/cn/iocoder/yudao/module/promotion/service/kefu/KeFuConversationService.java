@@ -6,6 +6,7 @@ import cn.iocoder.yudao.module.promotion.dal.dataobject.kefu.KeFuConversationDO;
 import java.time.LocalDateTime;
 import java.util.List;
 
+// TODO @puhui999：可以在每个方法前面，加个【会员】【管理员】区分下
 /**
  * 客服会话 Service 接口
  *
@@ -20,6 +21,7 @@ public interface KeFuConversationService {
      */
     void deleteKefuConversation(Long id);
 
+    // TODO @puhui999：是不是方法名，体现出更新的是管理员的置顶哈
     /**
      * 客服会话置顶
      *
@@ -27,6 +29,7 @@ public interface KeFuConversationService {
      */
     void updatePinned(KeFuConversationUpdatePinnedReqVO updateReqVO);
 
+    // TODO @puhui999：updateConversationLastMessage 会好点哈
     /**
      * 更新会话客服消息冗余信息
      *
@@ -60,7 +63,9 @@ public interface KeFuConversationService {
     List<KeFuConversationDO> getKefuConversationList();
 
     /**
-     * 获得或创建会话
+     * 【会员】获得或创建会话
+     *
+     * 对于【会员】来说，有且仅有一个对话
      *
      * @param userId 用户编号
      * @return 客服会话

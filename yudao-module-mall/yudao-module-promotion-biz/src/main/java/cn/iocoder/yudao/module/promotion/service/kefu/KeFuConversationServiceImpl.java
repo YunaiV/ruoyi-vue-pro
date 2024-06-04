@@ -37,7 +37,6 @@ public class KeFuConversationServiceImpl implements KeFuConversationService {
 
     @Override
     public void updatePinned(KeFuConversationUpdatePinnedReqVO updateReqVO) {
-        // 只有管理员端可以置顶会话
         conversationMapper.updateById(new KeFuConversationDO().setId(updateReqVO.getId()).setAdminPinned(updateReqVO.getAdminPinned()));
     }
 
@@ -62,10 +61,12 @@ public class KeFuConversationServiceImpl implements KeFuConversationService {
         return conversationMapper.selectListWithSort();
     }
 
+    // TODO @puhui999：貌似这个对话，得用户主动创建。不然管理员会看到一个空的对话？
     @Override
     public KeFuConversationDO getOrCreateConversation(Long userId) {
         KeFuConversationDO conversation = conversationMapper.selectOne(KeFuConversationDO::getUserId, userId);
-        if (conversation == null) { // 没有历史会话则初始化一个新会话
+        // 没有历史会话，则初始化一个新会话
+        if (conversation == null) {
             conversation = new KeFuConversationDO().setUserId(userId).setLastMessageTime(LocalDateTime.now())
                     .setLastMessageContent("").setLastMessageContentType(KeFuMessageContentTypeEnum.TEXT.getType())
                     .setAdminPinned(Boolean.FALSE).setUserDeleted(Boolean.FALSE).setAdminDeleted(Boolean.FALSE)
@@ -77,12 +78,11 @@ public class KeFuConversationServiceImpl implements KeFuConversationService {
 
     @Override
     public KeFuConversationDO validateKefuConversationExists(Long id) {
-        KeFuConversationDO conversationDO = conversationMapper.selectById(id);
-        if (conversationDO == null) {
+        KeFuConversationDO conversation = conversationMapper.selectById(id);
+        if (conversation == null) {
             throw exception(KEFU_CONVERSATION_NOT_EXISTS);
         }
-
-        return conversationDO;
+        return conversation;
     }
 
 }

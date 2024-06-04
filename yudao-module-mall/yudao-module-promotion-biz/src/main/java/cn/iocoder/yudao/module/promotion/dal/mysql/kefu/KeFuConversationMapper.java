@@ -16,6 +16,7 @@ import java.util.List;
 @Mapper
 public interface KeFuConversationMapper extends BaseMapperX<KeFuConversationDO> {
 
+    // TODO @puhui999：排序可以交给前端，或者 controller；数据库的计算尽量少哈；
     default List<KeFuConversationDO> selectListWithSort() {
         return selectList(new LambdaQueryWrapperX<KeFuConversationDO>()
                 .eq(KeFuConversationDO::getAdminDeleted, Boolean.FALSE)
@@ -23,6 +24,7 @@ public interface KeFuConversationMapper extends BaseMapperX<KeFuConversationDO> 
                 .orderByDesc(KeFuConversationDO::getCreateTime));
     }
 
+    // TODO @puhui999：是不是置零，用 update 就 ok 拉；然后单独搞个 +1 的方法；
     default void updateAdminUnreadMessageCountByConversationId(Long id, Integer count) {
         LambdaUpdateWrapper<KeFuConversationDO> updateWrapper = new LambdaUpdateWrapper<>();
         updateWrapper.eq(KeFuConversationDO::getId, id);
@@ -31,7 +33,6 @@ public interface KeFuConversationMapper extends BaseMapperX<KeFuConversationDO> 
         } else { // 情况二：管理员已读后重置
             updateWrapper.set(KeFuConversationDO::getAdminUnreadMessageCount, 0);
         }
-
         update(updateWrapper);
     }
 

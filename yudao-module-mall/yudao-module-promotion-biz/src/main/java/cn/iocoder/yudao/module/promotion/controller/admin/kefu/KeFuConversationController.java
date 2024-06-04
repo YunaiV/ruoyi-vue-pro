@@ -27,6 +27,7 @@ public class KeFuConversationController {
     @Resource
     private KeFuConversationService conversationService;
 
+    // TODO @puhui999：updateConversationPinned
     @PostMapping("/update-pinned")
     @Operation(summary = "置顶客服会话")
     @PreAuthorize("@ss.hasPermission('promotion:kefu-conversation:update')")

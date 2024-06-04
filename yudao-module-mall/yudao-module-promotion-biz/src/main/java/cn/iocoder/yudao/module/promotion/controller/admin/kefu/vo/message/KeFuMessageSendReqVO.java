@@ -9,6 +9,8 @@ import lombok.Data;
 @Data
 public class KeFuMessageSendReqVO {
 
+    // TODO @puhui999：貌似字段多了；1）id 不用；2）senderId、senderType 不用；3）receiverId、receiverType 也不用；原因可以想下哈
+
     @Schema(description = "编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "23202")
     private Long id;
 

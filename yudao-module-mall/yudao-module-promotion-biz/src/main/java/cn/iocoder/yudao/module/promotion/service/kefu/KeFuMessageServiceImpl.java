@@ -34,12 +34,16 @@ import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.
 @Validated
 public class KeFuMessageServiceImpl implements KeFuMessageService {
 
+    // TODO @puhui999：@芋艿：捉摸要不要拿到一个地方枚举；
     private static final String KEFU_MESSAGE_TYPE = "kefu_message_type"; // 客服消息类型
 
+    // TODO @puhui999：kefuMessageMapper；因为 messageMapper 可能会重叠
     @Resource
     private KeFuMessageMapper messageMapper;
+
     @Resource
     private KeFuConversationService conversationService;
+
     @Resource
     private AdminUserApi adminUserApi;
     @Resource
@@ -58,6 +62,7 @@ public class KeFuMessageServiceImpl implements KeFuMessageService {
         // 2.1 保存消息
         KeFuMessageDO kefuMessage = BeanUtils.toBean(sendReqVO, KeFuMessageDO.class);
         messageMapper.insert(kefuMessage);
+        // TODO @puhui999：是不是 updateConversationMessage，里面统一处理未读、恢复；直接设置 KeFuMessageDO 作为参数好了。。。
         // 2.2 更新会话消息冗余
         conversationService.updateConversationMessage(kefuMessage.getConversationId(), LocalDateTime.now(),
                 kefuMessage.getContent(), kefuMessage.getContentType());
@@ -66,14 +71,13 @@ public class KeFuMessageServiceImpl implements KeFuMessageService {
             conversationService.updateAdminUnreadMessageCountByConversationId(kefuMessage.getConversationId(), 1);
         }
         // 2.4 会员用户发送消息时，如果管理员删除过会话则进行恢复
+        // TODO @puhui999：建议 && 换一行
         if (UserTypeEnum.MEMBER.getValue().equals(kefuMessage.getSenderType()) && Boolean.TRUE.equals(conversation.getAdminDeleted())) {
             conversationService.updateConversationAdminDeleted(kefuMessage.getConversationId(), Boolean.FALSE);
         }
 
         // 3. 发送消息
         getSelf().sendAsyncMessage(sendReqVO.getReceiverType(), sendReqVO.getReceiverId(), kefuMessage);
-
-        // 返回
         return kefuMessage.getId();
     }
 
@@ -83,6 +87,7 @@ public class KeFuMessageServiceImpl implements KeFuMessageService {
         // 1.1 校验会话是否存在
         conversationService.validateKefuConversationExists(conversationId);
         // 1.2 查询接收人所有的未读消息
+        // TODO @puhui999：应该不能 receiverId 过滤哈。因为多个客服，一个人点了，就都点了。
         List<KeFuMessageDO> messageList = messageMapper.selectListByConversationIdAndReceiverIdAndReadStatus(
                 conversationId, receiverId, Boolean.FALSE);
         // 1.3 情况一：没有未读消息
@@ -98,7 +103,9 @@ public class KeFuMessageServiceImpl implements KeFuMessageService {
         if (UserTypeEnum.ADMIN.getValue().equals(message.getReceiverType())) {
             conversationService.updateAdminUnreadMessageCountByConversationId(conversationId, 0);
         }
+
         // 2.3 发送消息通知发送者，接收者已读 -> 发送者更新发送的消息状态
+        // TODO @puhui999：待定~
         getSelf().sendAsyncMessage(message.getSenderType(), message.getSenderId(), "keFuMessageReadStatusChange");
     }
 

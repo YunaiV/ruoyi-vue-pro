@@ -131,8 +131,9 @@ public class BrokerageUserServiceImpl implements BrokerageUserService {
     @Override
     public BrokerageUserDO getOrCreateBrokerageUser(Long id) {
         BrokerageUserDO brokerageUser = brokerageUserMapper.selectById(id);
+        // 特殊：人人分销的情况下，如果分销人为空则创建分销人
         if (brokerageUser == null && ObjUtil.equal(BrokerageEnabledConditionEnum.ALL.getCondition(),
-                tradeConfigService.getTradeConfig().getBrokerageEnabledCondition())) { // 人人分销的情况下，如果分销人为空则创建分销人
+                tradeConfigService.getTradeConfig().getBrokerageEnabledCondition())) {
             brokerageUser = new BrokerageUserDO().setId(id).setBrokerageEnabled(true).setBrokeragePrice(0)
                     .setBrokerageTime(LocalDateTime.now()).setFrozenPrice(0);
             brokerageUserMapper.insert(brokerageUser);

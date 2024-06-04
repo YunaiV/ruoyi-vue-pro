@@ -9,11 +9,11 @@ import lombok.Data;
 public class KeFuConversationUpdatePinnedReqVO {
 
     @Schema(description = "编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "23202")
-    @NotNull(message = "会话编号，不能为空")
+    @NotNull(message = "会话编号不能为空")
     private Long id;
 
     @Schema(description = "管理端置顶", requiredMode = Schema.RequiredMode.REQUIRED, example = "false")
-    @NotNull(message = "管理端置顶，不能为空")
+    @NotNull(message = "管理端置顶不能为空")
     private Boolean adminPinned;
 
 }

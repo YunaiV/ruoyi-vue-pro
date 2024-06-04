@@ -6,6 +6,7 @@ import cn.iocoder.yudao.module.promotion.controller.admin.kefu.vo.message.KeFuMe
 import cn.iocoder.yudao.module.promotion.dal.dataobject.kefu.KeFuMessageDO;
 import jakarta.validation.Valid;
 
+// TODO @puhui999：可以在每个方法前面，加个【会员】【管理员】区分下
 /**
  * 客服消息 Service 接口
  *
