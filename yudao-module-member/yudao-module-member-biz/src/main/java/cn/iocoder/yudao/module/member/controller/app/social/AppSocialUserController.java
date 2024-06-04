@@ -67,8 +67,8 @@ public class AppSocialUserController {
 
     @PostMapping("/wxa-qrcode")
     @Operation(summary = "获得微信小程序码(base64 image)")
-    public CommonResult<String> getWxQrcode(@RequestBody @Valid AppSocialWxQrcodeReqVO reqVO) {
-        byte[] wxQrcode = socialClientApi.getWxaQrcode(new SocialWxQrcodeReqDTO().setPath(reqVO.getPath()));
+    public CommonResult<String> getWxaQrcode(@RequestBody @Valid AppSocialWxQrcodeReqVO reqVO) {
+        byte[] wxQrcode = socialClientApi.getWxaQrcode(BeanUtils.toBean(reqVO, SocialWxQrcodeReqDTO.class));
         return success(Base64.encode(wxQrcode));
     }
 

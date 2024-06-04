@@ -13,12 +13,6 @@ import lombok.Data;
 public class SocialWxQrcodeReqDTO {
 
     /**
-     * 小程序版本
-     *
-     * 正式版为 "release"；体验版为 "trial"；开发版为 "develop"
-     */
-    public static final String ENV_VERSION = "release";
-    /**
      * 页面路径不能携带参数（参数请放在scene字段里）
      */
     public static final String SCENE = "";
@@ -51,10 +45,6 @@ public class SocialWxQrcodeReqDTO {
      */
     @NotEmpty(message = "页面路径不能为空")
     private String path;
-    /**
-     * 要打开的小程序版本
-     */
-    private String envVersion;
     /**
      * 二维码宽度
      */
