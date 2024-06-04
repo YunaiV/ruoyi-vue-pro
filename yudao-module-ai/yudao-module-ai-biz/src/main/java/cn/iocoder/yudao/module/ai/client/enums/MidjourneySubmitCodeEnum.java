@@ -20,7 +20,7 @@ public enum MidjourneySubmitCodeEnum {
 
     // 状态码: 1(提交成功), 21(已存在), 22(排队中), other(错误)
     SUBMIT_SUCCESS("1", "提交成功"),
-    ALREADY_EXISTS("1", "已存在"),
+    ALREADY_EXISTS("21", "已存在"),
     QUEUING("22", "排队中"),
 
     ;
