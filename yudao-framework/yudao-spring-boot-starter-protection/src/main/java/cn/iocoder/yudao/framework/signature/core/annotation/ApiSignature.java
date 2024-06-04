@@ -7,7 +7,7 @@ import java.util.concurrent.TimeUnit;
 
 
 /**
- * 签名注解
+ * HTTP API 签名注解
  *
  * @author Zhougang
  */
