@@ -158,7 +158,7 @@ public class AiImageServiceImpl implements AiImageService {
         }
         imageMapper.updateById(new AiImageDO()
                 .setId(aiImageDO.getId())
-                .setJobId(submitRespVO.getResult())
+                .setTaskId(submitRespVO.getResult())
         );
         return aiImageDO.getId();
     }
@@ -228,7 +228,7 @@ public class AiImageServiceImpl implements AiImageService {
         midjourneyProxyClient.action(
                 new MidjourneyActionReqVO()
                         .setCustomId(customId)
-                        .setTaskId(aiImageDO.getJobId())
+                        .setTaskId(aiImageDO.getTaskId())
                         .setNotifyHook(midjourneyNotifyUrl)
         );
         return Boolean.TRUE;

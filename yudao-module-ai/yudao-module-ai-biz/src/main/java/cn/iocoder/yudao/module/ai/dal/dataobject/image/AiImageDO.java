@@ -111,11 +111,11 @@ public class AiImageDO extends BaseDO {
     @TableField(typeHandler = JacksonTypeHandler.class)
     private List<MidjourneyNotifyReqVO.Button> buttons;
 
-    // TODO @芋艿：再瞅瞅
     /**
-     * midjourney proxy 关联的 job id
+     * midjourney proxy 关联的 task id
      */
-    private String jobId;
+    private String taskId;
+
     /**
      * 绘画错误信息
      */

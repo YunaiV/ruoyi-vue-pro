@@ -34,7 +34,7 @@ public interface AiImageMapper extends BaseMapperX<AiImageDO> {
      * @return
      */
     default AiImageDO selectByJobId(String id) {
-        return this.selectOne(new LambdaQueryWrapperX<AiImageDO>().eq(AiImageDO::getJobId, id));
+        return this.selectOne(new LambdaQueryWrapperX<AiImageDO>().eq(AiImageDO::getTaskId, id));
     }
 
     default PageResult<AiImageDO> selectPage(Long userId, PageParam pageReqVO) {
