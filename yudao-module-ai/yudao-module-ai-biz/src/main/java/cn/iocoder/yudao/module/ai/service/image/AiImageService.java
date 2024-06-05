@@ -65,6 +65,15 @@ public interface AiImageService {
     Boolean midjourneyNotify(MidjourneyNotifyReqVO notifyReqVO);
 
     /**
+     * 构建 midjourney - 更新对象
+     *
+     * @param imageId
+     * @param notifyReqVO
+     * @return
+     */
+    AiImageDO buildUpdateImage(Long imageId, MidjourneyNotifyReqVO notifyReqVO);
+
+    /**
      * midjourney - action(放大、缩小、U1、U2...)
      *
      * @param loginUserId

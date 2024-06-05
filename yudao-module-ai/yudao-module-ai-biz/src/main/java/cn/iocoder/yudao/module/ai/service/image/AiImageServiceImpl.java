@@ -194,6 +194,13 @@ public class AiImageServiceImpl implements AiImageService {
             return false;
         }
         // 2、转换状态
+        AiImageDO updateImage = buildUpdateImage(image.getId(), notifyReqVO);
+        // 3、更新 image 状态
+        return imageMapper.updateById(updateImage) > 0;
+    }
+
+    public AiImageDO buildUpdateImage(Long imageId, MidjourneyNotifyReqVO notifyReqVO) {
+        // 2、转换状态
         String imageStatus = null;
         MidjourneyTaskStatusEnum taskStatusEnum = MidjourneyTaskStatusEnum.valueOf(notifyReqVO.getStatus());
         if (MidjourneyTaskStatusEnum.SUCCESS == taskStatusEnum) {
@@ -211,17 +218,14 @@ public class AiImageServiceImpl implements AiImageService {
             }
         }
         // 4、更新 image 状态
-        imageMapper.updateById(
-                new AiImageDO()
-                        .setId(image.getId())
-                        .setStatus(imageStatus)
-                        .setPicUrl(filePath)
-                        .setProgress(notifyReqVO.getProgress())
-                        .setResponse(notifyReqVO)
-                        .setButtons(notifyReqVO.getButtons())
-                        .setErrorMessage(notifyReqVO.getFailReason())
-        );
-        return true;
+        return new AiImageDO()
+                .setId(imageId)
+                .setStatus(imageStatus)
+                .setPicUrl(filePath)
+                .setProgress(notifyReqVO.getProgress())
+                .setResponse(notifyReqVO)
+                .setButtons(notifyReqVO.getButtons())
+                .setErrorMessage(notifyReqVO.getFailReason());
     }
 
     @Override
@@ -234,12 +238,28 @@ public class AiImageServiceImpl implements AiImageService {
             throw exception(AI_IMAGE_CUSTOM_ID_NOT_EXISTS);
         }
         // 3、调用 midjourney proxy
-        midjourneyProxyClient.action(
+        MidjourneySubmitRespVO submitRespVO = midjourneyProxyClient.action(
                 new MidjourneyActionReqVO()
                         .setCustomId(customId)
                         .setTaskId(aiImageDO.getTaskId())
                         .setNotifyHook(midjourneyNotifyUrl)
         );
+        // 6、保存任务 id (状态码: 1(提交成功), 21(已存在), 22(排队中), other(错误))
+        if (!MidjourneySubmitCodeEnum.SUCCESS_CODES.contains(submitRespVO.getCode())) {
+            throw exception(AI_IMAGE_MIDJOURNEY_SUBMIT_FAIL, submitRespVO.getDescription());
+        }
+        // 4、新增 image 记录
+        AiImageDO newImage = BeanUtils.toBean(aiImageDO, AiImageDO.class);
+        // 4.1、重置参数
+        newImage.setId(null);
+        newImage.setStatus(AiImageStatusEnum.IN_PROGRESS.getStatus());
+        newImage.setPicUrl(null);
+        newImage.setResponse(null);
+        newImage.setProgress(null);
+        newImage.setTaskId(submitRespVO.getResult());
+        newImage.setErrorMessage(null);
+        // 4.2、保存数据库
+        imageMapper.insert(newImage);
         return Boolean.TRUE;
     }
 
