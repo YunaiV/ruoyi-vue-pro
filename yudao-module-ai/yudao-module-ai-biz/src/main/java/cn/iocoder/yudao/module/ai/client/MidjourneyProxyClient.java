@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.ai.client;
 
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
+import cn.iocoder.yudao.module.ai.client.vo.MidjourneyActionReqVO;
 import cn.iocoder.yudao.module.ai.client.vo.MidjourneyImagineReqVO;
 import cn.iocoder.yudao.module.ai.client.vo.MidjourneySubmitRespVO;
 import jakarta.validation.constraints.NotNull;
@@ -23,9 +24,12 @@ import org.springframework.web.client.RestTemplate;
 public class MidjourneyProxyClient {
 
     private static final String URI_IMAGINE = "/submit/imagine";
+    private static final String URI_ACTON = "/submit/action";
 
     @Value("${ai.midjourney-proxy.url:http://127.0.0.1:8080/mj}")
     private String url;
+    @Value("${ai.midjourney-proxy.key}")
+    private String key;
 
     @Autowired
     private RestTemplate restTemplate;
@@ -37,15 +41,32 @@ public class MidjourneyProxyClient {
      * @return
      */
     public MidjourneySubmitRespVO imagine(@Validated @NotNull MidjourneyImagineReqVO imagineReqVO) {
-        // 创建 HttpHeaders 对象
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.set("Authorization", "Bearer sk-c3qxUCVKsPfdQiYU8440E3Fc8dE5424d9cB124A4Ee2489E3");
-        // 创建 HttpEntity 对象，将 HttpHeaders 和请求体传递给它
-        HttpEntity<String> requestEntity = new HttpEntity<>(JsonUtils.toJsonString(imagineReqVO), headers);
-        // 发送 post 请求
-        ResponseEntity<String> response = restTemplate.exchange(url.concat(URI_IMAGINE), HttpMethod.POST, requestEntity, String.class);
+        // 1、发送 post 请求
+        ResponseEntity<String> response = post(URI_IMAGINE, imagineReqVO);
+        // 2、转换 resp
         return JsonUtils.parseObject(response.getBody(), MidjourneySubmitRespVO.class);
     }
 
+    /**
+     * action - 放大、缩小、U1、U2...
+     *
+     * @param actionReqVO
+     */
+    public MidjourneySubmitRespVO action(@Validated @NotNull MidjourneyActionReqVO actionReqVO) {
+        // 1、发送 post 请求
+        ResponseEntity<String> response = post(URI_ACTON, actionReqVO);
+        // 2、转换 resp
+        return JsonUtils.parseObject(response.getBody(), MidjourneySubmitRespVO.class);
+    }
+
+    private ResponseEntity<String> post(String uri, Object body) {
+        // 1、创建 HttpHeaders 对象
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.set("Authorization", "Bearer ".concat(key));
+        // 2、创建 HttpEntity 对象，将 HttpHeaders 和请求体传递给它
+        HttpEntity<String> requestEntity = new HttpEntity<>(JsonUtils.toJsonString(body), headers);
+        // 3、发送 post 请求
+        return restTemplate.exchange(url.concat(uri), HttpMethod.POST, requestEntity, String.class);
+    }
 }
