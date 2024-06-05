@@ -258,6 +258,7 @@ public class AiImageServiceImpl implements AiImageService {
         newImage.setProgress(null);
         newImage.setTaskId(submitRespVO.getResult());
         newImage.setErrorMessage(null);
+        newImage.setButtons(null);
         // 4.2、保存数据库
         imageMapper.insert(newImage);
         return Boolean.TRUE;

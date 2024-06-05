@@ -79,7 +79,7 @@ public class AiImageController {
     }
 
     @Operation(summary = "midjourney - action(放大、缩小、U1、U2...)")
-    @PostMapping("/midjourney/action")
+    @GetMapping("/midjourney/action")
     public CommonResult<Boolean> midjourneyAction(@RequestParam("id") Long imageId,
                                                   @RequestParam("customId") String customId) {
         return success(imageService.midjourneyAction(getLoginUserId(), imageId, customId));
