@@ -80,7 +80,8 @@ server:
 ai:
   midjourney-proxy:
     url: https://api.holdai.top/mj
-    notifyUrl: http://7b1aada4.r26.cpolar.top/admin-api/ai/image/midjourney-notify
+    notifyUrl: http://61d61685.r21.cpolar.top/admin-api/ai/image/midjourney-notify
+    key: sk-c3qxUCVKsPfdQiYU8440E3Fc8dE5424d9cB124A4Ee2489E3
 
 
 --- #################### 定时任务相关配置 ####################

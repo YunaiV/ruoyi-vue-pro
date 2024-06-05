@@ -74,8 +74,14 @@ public class AiImageController {
     @Operation(summary = "midjourney proxy - 回调通知")
     @PostMapping("/midjourney-notify")
     @PermitAll
-    public CommonResult<Boolean> midjourneyNotify( @RequestBody MidjourneyNotifyReqVO notifyReqVO) {
-        return success(imageService.midjourneyNotify(getLoginUserId(), notifyReqVO));
+    public CommonResult<Boolean> midjourneyNotify(@RequestBody MidjourneyNotifyReqVO notifyReqVO) {
+        return success(imageService.midjourneyNotify(notifyReqVO));
     }
 
+    @Operation(summary = "midjourney - action(放大、缩小、U1、U2...)")
+    @PostMapping("/midjourney/action")
+    public CommonResult<Boolean> midjourneyAction(@RequestParam("id") Long imageId,
+                                                  @RequestParam("customId") String customId) {
+        return success(imageService.midjourneyAction(getLoginUserId(), imageId, customId));
+    }
 }

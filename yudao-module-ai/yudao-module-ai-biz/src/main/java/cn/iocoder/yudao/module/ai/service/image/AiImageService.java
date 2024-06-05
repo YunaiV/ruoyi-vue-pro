@@ -59,10 +59,18 @@ public interface AiImageService {
     /**
      * midjourney proxy - 回调通知
      *
-     * @param loginUserId
      * @param notifyReqVO
      * @return
      */
-    Boolean midjourneyNotify(Long loginUserId, MidjourneyNotifyReqVO notifyReqVO);
+    Boolean midjourneyNotify(MidjourneyNotifyReqVO notifyReqVO);
 
+    /**
+     * midjourney - action(放大、缩小、U1、U2...)
+     *
+     * @param loginUserId
+     * @param imageId
+     * @param customId
+     * @return
+     */
+    Boolean midjourneyAction(Long loginUserId, Long imageId, String customId);
 }
