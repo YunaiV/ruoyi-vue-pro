@@ -92,7 +92,7 @@ public class AiImageDO extends BaseDO {
      * 2. {@link StabilityAiImageOptions}
      */
     @TableField(typeHandler = JacksonTypeHandler.class)
-    private Map<String, String> options;
+    private Map<String, Object> options;
 
     /**
      * 绘画 response

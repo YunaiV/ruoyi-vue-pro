@@ -27,10 +27,10 @@ public class AiImageMidjourneyImagineReqVO {
     private String model;
 
     @Schema(description = "图片宽度 --ar 设置")
-    private String width;
+    private Integer width;
 
     @Schema(description = "图片高度 --ar 设置")
-    private String height;
+    private Integer height;
 
     @Schema(description = "版本号 --v 设置")
     private String version;

@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.ai.service.image;
 
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.codec.Base64;
 import cn.hutool.core.exceptions.ExceptionUtil;
 import cn.hutool.core.map.MapUtil;
@@ -138,9 +139,9 @@ public class AiImageServiceImpl implements AiImageService {
         aiImageDO.setUserId(loginUserId);
         aiImageDO.setPrompt(req.getPrompt());
         aiImageDO.setPlatform(AiPlatformEnum.MIDJOURNEY.getPlatform());
-        aiImageDO.setModel(null);
-        aiImageDO.setWidth(null);
-        aiImageDO.setHeight(null);
+        aiImageDO.setModel(req.getModel());
+        aiImageDO.setWidth(req.getWidth());
+        aiImageDO.setHeight(req.getHeight());
         aiImageDO.setStatus(AiImageStatusEnum.IN_PROGRESS.getStatus());
         // 2、保存 image
         imageMapper.insert(aiImageDO);
@@ -156,13 +157,21 @@ public class AiImageServiceImpl implements AiImageService {
         if (!MidjourneySubmitCodeEnum.SUCCESS_CODES.contains(submitRespVO.getCode())) {
             throw exception(AI_IMAGE_MIDJOURNEY_SUBMIT_FAIL, submitRespVO.getDescription());
         }
+        // 7、构建 imageOptions 参数
+        MidjourneyImageOptions imageOptions = new MidjourneyImageOptions()
+                .setWidth(req.getWidth())
+                .setHeight(req.getHeight())
+                .setModel(req.getModel())
+                .setVersion(req.getVersion())
+                .setState(imagineReqVO.getState());
+        // 8、更新 taskId 和参数
         imageMapper.updateById(new AiImageDO()
                 .setId(aiImageDO.getId())
                 .setTaskId(submitRespVO.getResult())
+                .setOptions(BeanUtil.beanToMap(imageOptions))
         );
         return aiImageDO.getId();
     }
-
 
 
     @Override
@@ -269,7 +278,7 @@ public class AiImageServiceImpl implements AiImageService {
      * @param model
      * @return
      */
-    private String buildParams(String width, String height, String version, MidjourneyModelEnum model) {
+    private String buildParams(Integer width, Integer height, String version, MidjourneyModelEnum model) {
         StringBuilder params = new StringBuilder();
         //  --ar 来设置尺寸
         params.append(String.format(" --ar %s:%s ", width, height));
