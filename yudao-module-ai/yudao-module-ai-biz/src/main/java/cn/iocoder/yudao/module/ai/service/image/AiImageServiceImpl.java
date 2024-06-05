@@ -172,7 +172,7 @@ public class AiImageServiceImpl implements AiImageService {
         if (ObjUtil.notEqual(image.getUserId(), userId)) {
             throw exception(AI_IMAGE_NOT_EXISTS);
         }
-        // 删除记录
+        // 2、删除记录
         imageMapper.deleteById(id);
     }
 
