@@ -36,17 +36,18 @@ public interface AiImageService {
      *
      * @param userId 用户编号
      * @param drawReqVO 绘制请求
+     * @return 绘画编号
      */
     Long drawImage(Long userId, AiImageDrawReqVO drawReqVO);
 
     /**
-     * midjourney 图片生成
+     * Midjourney imagine（绘画）
      *
-     * @param loginUserId
-     * @param req
-     * @return
+     * @param userId 用户编号
+     * @param imagineReqVO 绘制请求
+     * @return 绘画编号
      */
-    Long midjourneyImagine(Long loginUserId, AiImageMidjourneyImagineReqVO req);
+    Long midjourneyImagine(Long userId, AiImageMidjourneyImagineReqVO imagineReqVO);
 
     /**
      * 删除【我的】绘画记录

@@ -76,13 +76,12 @@ server:
       enabled: true
       charset: UTF-8
       force: true
-# ai
+# ai TODO @fan：这个融合到 yudao.ai 那好点哈
 ai:
   midjourney-proxy:
     url: https://api.holdai.top/mj
     notifyUrl: http://61d61685.r21.cpolar.top/admin-api/ai/image/midjourney-notify
     key: sk-c3qxUCVKsPfdQiYU8440E3Fc8dE5424d9cB124A4Ee2489E3
-
 
 --- #################### 定时任务相关配置 ####################
 

@@ -63,25 +63,27 @@ public class AiImageController {
         return success(true);
     }
 
-    // ================ midjourney 接口
+    // ================ midjourney 接口 ================
 
-    @Operation(summary = "midjourney-imagine 绘画", description = "...")
+    @Operation(summary = "Midjourney imagine（绘画）")
     @PostMapping("/midjourney/imagine")
     public CommonResult<Long> midjourneyImagine(@Validated @RequestBody AiImageMidjourneyImagineReqVO req) {
         return success(imageService.midjourneyImagine(getLoginUserId(), req));
     }
 
-    @Operation(summary = "midjourney proxy - 回调通知")
+    @Operation(summary = "Midjourney 回调通知", description = "由 Midjourney Proxy 回调")
     @PostMapping("/midjourney-notify")
     @PermitAll
     public CommonResult<Boolean> midjourneyNotify(@RequestBody MidjourneyNotifyReqVO notifyReqVO) {
         return success(imageService.midjourneyNotify(notifyReqVO));
     }
 
-    @Operation(summary = "midjourney - action(放大、缩小、U1、U2...)")
+    @Operation(summary = "Midjourney Action", description = "例如说：放大、缩小、U1、U2 等")
     @GetMapping("/midjourney/action")
+    // TODO @fan：id、customerId 的 swagger 注解
     public CommonResult<Boolean> midjourneyAction(@RequestParam("id") Long imageId,
                                                   @RequestParam("customId") String customId) {
         return success(imageService.midjourneyAction(getLoginUserId(), imageId, customId));
     }
+
 }

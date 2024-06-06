@@ -17,7 +17,7 @@ import org.springframework.web.client.RestTemplate;
 import java.util.Collection;
 import java.util.List;
 
-// TODO @fan：这个写到 starter-ai 里哈。搞个 MidjourneyApi，参考 https://github.com/spring-projects/spring-ai/blob/main/models/spring-ai-openai/src/main/java/org/springframework/ai/openai/api/OpenAiApi.java 的风格写哈
+// TODO @fan：【高优】这个写到 starter-ai 里哈。搞个 MidjourneyApi，参考 https://github.com/spring-projects/spring-ai/blob/main/models/spring-ai-openai/src/main/java/org/springframework/ai/openai/api/OpenAiApi.java 的风格写哈
 /**
  * Midjourney Proxy 客户端
  *

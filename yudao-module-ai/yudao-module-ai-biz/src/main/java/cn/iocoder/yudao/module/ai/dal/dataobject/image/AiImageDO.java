@@ -123,6 +123,7 @@ public class AiImageDO extends BaseDO {
      */
     private String errorMessage;
 
+    // TODO @芋艿：看看是不是 MidjourneyNotifyReqVO.Button 搞到 MJ API 那
     public static class ButtonTypeHandler extends AbstractJsonTypeHandler<Object> {
 
         @Override
@@ -134,6 +135,7 @@ public class AiImageDO extends BaseDO {
         protected String toJson(Object obj) {
             return JsonUtils.toJsonString(obj);
         }
+
     }
 
 }
