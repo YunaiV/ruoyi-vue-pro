@@ -35,8 +35,7 @@ public class JdbcUtils {
      * @return DB 类型
      */
     public static DbType getDbType(String url) {
-        String name = com.alibaba.druid.util.JdbcUtils.getDbType(url, null);
-        return DbType.getDbType(name);
+        return com.baomidou.mybatisplus.extension.toolkit.JdbcUtils.getDbType(url);
     }
 
 }
