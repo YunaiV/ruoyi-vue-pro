@@ -34,6 +34,7 @@ import org.flowable.engine.HistoryService;
 import org.flowable.engine.ManagementService;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.TaskService;
+import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.task.api.DelegationState;
 import org.flowable.task.api.Task;
@@ -337,7 +338,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
                 BpmCommentTypeEnum.REJECT.formatComment(reqVO.getReason()));
         // 3.1 解析用户任务的拒绝处理类型
         BpmnModel bpmnModel = bpmModelService.getBpmnModelByDefinitionId(task.getProcessDefinitionId());
-        FlowElement flowElement = BpmnModelUtils.getFlowElementById(bpmnModel, task.getTaskDefinitionKey());
+        UserTask flowElement = (UserTask) BpmnModelUtils.getFlowElementById(bpmnModel, task.getTaskDefinitionKey());
         Integer rejectHandlerType = NumberUtils.parseInt(BpmnModelUtils.parseExtensionElement(flowElement, USER_TASK_REJECT_HANDLER_TYPE));
         BpmUserTaskRejectHandlerType userTaskRejectHandlerType = BpmUserTaskRejectHandlerType.typeOf(rejectHandlerType);
         // 3.2 类型为驳回到指定的任务节点
@@ -350,6 +351,30 @@ public class BpmTaskServiceImpl implements BpmTaskService {
                     .setReason(reqVO.getReason());
             returnTask(userId, returnReq);
             return;
+        } else if (userTaskRejectHandlerType == BpmUserTaskRejectHandlerType.FINISH_PROCESS_BY_REJECT_RATIO) {
+            // 3.3 按拒绝人数比例终止流程
+            if(!flowElement.hasMultiInstanceLoopCharacteristics()) {
+                throw exception(TASK_REJECT_HANDLER_TYPE_BY_REJECT_RATIO_ERROR);
+            }
+            Execution execution = runtimeService.createExecutionQuery().processInstanceId(task.getProcessInstanceId())
+                    .executionId(task.getExecutionId()).singleResult();
+            // 获取并行任务总数
+            Integer nrOfInstances = runtimeService.getVariable(execution.getParentId(), "nrOfInstances", Integer.class);
+            // 获取未完成任务列表
+            List<Task> taskList = getAssignedTaskListByConditions(task.getProcessInstanceId(), null, task.getTaskDefinitionKey());
+            // 获取已经拒绝的任务数
+            int rejectNumber = 0;
+            for (Task item : taskList) {
+                if (Objects.equals(BpmTaskStatusEnum.REJECT.getStatus(), FlowableUtils.getTaskStatus(item))) {
+                    rejectNumber ++;
+                }
+            }
+            // 拒绝任务后,任务分配人清空。但不能完成任务
+            taskService.setAssignee(task.getId(), "");
+            // 不是所有人拒绝返回。 TODO 后续需要做按拒绝人数比例来判断
+            if(!Objects.equals(nrOfInstances, rejectNumber)) {
+                return;
+            }
         }
         // 3.3 其他情况 终止流程。 TODO 后续可能会增加处理类型
         processInstanceService.updateProcessInstanceReject(instance.getProcessInstanceId(), reqVO.getReason());
@@ -431,8 +456,10 @@ public class BpmTaskServiceImpl implements BpmTaskService {
                     return;
                 }
                 ProcessInstance processInstance = processInstanceService.getProcessInstance(task.getProcessInstanceId());
-                AdminUserRespDTO startUser = adminUserApi.getUser(Long.valueOf(processInstance.getStartUserId()));
-                messageService.sendMessageWhenTaskAssigned(BpmTaskConvert.INSTANCE.convert(processInstance, startUser, task));
+                if (processInstance != null) {
+                    AdminUserRespDTO startUser = adminUserApi.getUser(Long.valueOf(processInstance.getStartUserId()));
+                    messageService.sendMessageWhenTaskAssigned(BpmTaskConvert.INSTANCE.convert(processInstance, startUser, task));
+                }
             }
 
         });

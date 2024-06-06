@@ -474,7 +474,7 @@ public class SimpleModelUtils {
         if (bpmApproveMethodEnum == BpmApproveMethodEnum.ALL_APPROVE) {
             multiInstanceCharacteristics.setCompletionCondition(ALL_APPROVE_COMPLETE_EXPRESSION);
             multiInstanceCharacteristics.setSequential(false);
-        } else if (bpmApproveMethodEnum == BpmApproveMethodEnum.ANY_OF_APPROVE) {
+        } else if (bpmApproveMethodEnum == BpmApproveMethodEnum.ANY_APPROVE) {
             multiInstanceCharacteristics.setCompletionCondition(ANY_OF_APPROVE_COMPLETE_EXPRESSION);
             multiInstanceCharacteristics.setSequential(false);
             userTask.setLoopCharacteristics(multiInstanceCharacteristics);
@@ -483,7 +483,12 @@ public class SimpleModelUtils {
             multiInstanceCharacteristics.setSequential(true);
             multiInstanceCharacteristics.setLoopCardinality("1");
             userTask.setLoopCharacteristics(multiInstanceCharacteristics);
+        } else if (bpmApproveMethodEnum == BpmApproveMethodEnum.ANY_APPROVE_ALL_REJECT) {
+            // 这种情况。拒绝任务时候，不会终止或者完成任务 参见 BpmTaskService#rejectTask 方法
+            multiInstanceCharacteristics.setCompletionCondition(ANY_OF_APPROVE_COMPLETE_EXPRESSION);
+            multiInstanceCharacteristics.setSequential(false);
         }
+        // TODO 会签(按比例投票 )
         userTask.setLoopCharacteristics(multiInstanceCharacteristics);
     }
 
