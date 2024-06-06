@@ -55,6 +55,17 @@ public class SunoApi {
                 .block();
     }
 
+    public List<MusicData> customGenerate(SunoApi.SunoReq sunReq) {
+        return this.webClient.post()
+                .uri("/api/custom_generate")
+                .body(Mono.just(sunReq), SunoApi.SunoReq.class)
+                .retrieve()
+                .onStatus(STATUS_PREDICATE, EXCEPTION_FUNCTION)
+                .bodyToMono(new ParameterizedTypeReference<List<MusicData>>() {
+                })
+                .block();
+    }
+
     public List<MusicData> doChatCompletion(String prompt) {
         return this.webClient.post()
                 .uri("/v1/chat/completions")
@@ -105,8 +116,9 @@ public class SunoApi {
      * 根据提示生成音频
      *
      * @param prompt           用于生成音乐音频的提示
-     * @param tags             自定义模式才需要
-     * @param title            自定义模式才需要
+     * @param tags             音乐风格
+     * @param title            音乐名称
+     * @param mv               模型
      * @param waitAudio        false表示后台模式，仅返回音频任务信息，需要调用get API获取详细的音频信息。
      *                         true表示同步模式，API最多等待100s，音频生成完毕后直接返回音频链接等信息，建议在GPT等agent中使用。
      * @param makeInstrumental 指示音乐音频是否为定制，如果为 true，则从歌词生成，否则从提示生成
@@ -116,15 +128,21 @@ public class SunoApi {
             String prompt,
             String tags,
             String title,
+            String mv,
             @JsonProperty("wait_audio") boolean waitAudio,
             @JsonProperty("make_instrumental") boolean makeInstrumental
     ) {
         public SunoReq(String prompt) {
-            this(prompt, null, null, false, false);
+            this(prompt, null, null, null, false, false);
         }
 
+        public SunoReq(String prompt, String mv, boolean makeInstrumental) {
+            this(prompt, null, null, mv, false, makeInstrumental);
+        }
+
+
         public SunoReq(String prompt, String tags, String title) {
-            this(prompt, tags, title, false, false);
+            this(prompt, tags, title, null, false, false);
         }
     }
 
@@ -140,7 +158,7 @@ public class SunoApi {
      * @param videoUrl             音乐视频的 URL
      * @param createdAt            音乐音频的创建时间
      * @param modelName
-     * @param status
+     * @param status               submitted、queued、streaming、complete
      * @param gptDescriptionPrompt
      * @param prompt               生成音乐音频的提示
      * @param type
