@@ -97,6 +97,10 @@ public class CollectionUtils {
                 .collect(Collectors.toList());
     }
 
+    public static <T> Set<T> convertSet(Collection<T> from) {
+        return convertSet(from, v -> v);
+    }
+
     public static <T, U> Set<U> convertSet(Collection<T> from, Function<T, U> func) {
         if (CollUtil.isEmpty(from)) {
             return new HashSet<>();

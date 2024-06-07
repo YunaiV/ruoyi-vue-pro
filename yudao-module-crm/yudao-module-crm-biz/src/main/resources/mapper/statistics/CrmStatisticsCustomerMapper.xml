@@ -16,20 +16,20 @@
          GROUP BY time
     </select>
 
-    <!-- TODO 芋艿：应该不用过滤时间 -->
     <select id="selectCustomerDealCountGroupByDate"
             resultType="cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.customer.CrmStatisticsCustomerSummaryByDateRespVO">
-        SELECT DATE_FORMAT(customer.create_time, '%Y-%m-%d') AS time,
-               COUNT(DISTINCT customer.id) AS customer_deal_count
+        SELECT DATE_FORMAT(customer.create_time, '%Y-%m-%d')    AS time,
+               COUNT(DISTINCT customer.id)                      AS customer_deal_count
           FROM crm_customer AS customer
                 LEFT JOIN crm_contract AS contract ON contract.customer_id = customer.id
-         WHERE customer.deleted = 0 AND contract.deleted = 0
+         WHERE customer.deleted = 0
+           AND contract.deleted = 0
            AND contract.audit_status = ${@cn.iocoder.yudao.module.crm.enums.common.CrmAuditStatusEnum@APPROVE.status}
            AND customer.owner_user_id IN
                 <foreach collection="userIds" item="userId" open="(" close=")" separator=",">
                     #{userId}
                 </foreach>
-           AND contract.create_time BETWEEN #{times[0],javaType=java.time.LocalDateTime} AND #{times[1],javaType=java.time.LocalDateTime}
+           AND customer.create_time BETWEEN #{times[0],javaType=java.time.LocalDateTime} AND #{times[1],javaType=java.time.LocalDateTime}
          GROUP BY time
     </select>
 
@@ -53,13 +53,14 @@
                COUNT(DISTINCT customer.id) AS customer_deal_count
           FROM crm_customer AS customer
                 LEFT JOIN crm_contract AS contract ON contract.customer_id = customer.id
-         WHERE customer.deleted = 0 AND contract.deleted = 0
+         WHERE customer.deleted = 0
+           AND contract.deleted = 0
            AND contract.audit_status = ${@cn.iocoder.yudao.module.crm.enums.common.CrmAuditStatusEnum@APPROVE.status}
            AND customer.owner_user_id IN
                 <foreach collection="userIds" item="userId" open="(" close=")" separator=",">
                     #{userId}
                 </foreach>
-           AND contract.create_time BETWEEN #{times[0],javaType=java.time.LocalDateTime} AND #{times[1],javaType=java.time.LocalDateTime}
+           AND customer.create_time BETWEEN #{times[0],javaType=java.time.LocalDateTime} AND #{times[1],javaType=java.time.LocalDateTime}
          GROUP BY customer.owner_user_id
     </select>
 
@@ -219,6 +220,47 @@
                 </foreach>
            AND customer.create_time BETWEEN #{times[0],javaType=java.time.LocalDateTime} AND #{times[1],javaType=java.time.LocalDateTime}
          GROUP BY customer.owner_user_id
+    </select>
+
+    <select id="selectCustomerDealCycleGroupByAreaId"
+            resultType="cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.customer.CrmStatisticsCustomerDealCycleByAreaRespVO">
+        SELECT customer.area_id AS area_id,
+               IFNULL(TRUNCATE(AVG(TIMESTAMPDIFF(DAY, customer.create_time, contract.order_date)), 1), 0) AS customer_deal_cycle,
+               COUNT(DISTINCT customer.id) AS customer_deal_count
+        FROM crm_customer AS customer
+                LEFT JOIN crm_contract AS contract ON customer.id = contract.customer_id
+        WHERE customer.deleted = 0
+          AND contract.deleted = 0
+          AND contract.audit_status = ${@cn.iocoder.yudao.module.crm.enums.common.CrmAuditStatusEnum@APPROVE.status}
+          AND customer.owner_user_id IN
+                <foreach collection="userIds" item="userId" open="(" close=")" separator=",">
+                    #{userId}
+                </foreach>
+          AND customer.create_time BETWEEN #{times[0],javaType=java.time.LocalDateTime} AND #{times[1],javaType=java.time.LocalDateTime}
+        GROUP BY
+            customer.area_id
+    </select>
+
+    <select id="selectCustomerDealCycleGroupByProductId"
+            resultType="cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.customer.CrmStatisticsCustomerDealCycleByProductRespVO">
+        SELECT product.name                                                                                 AS product_name,
+               IFNULL(TRUNCATE(AVG(TIMESTAMPDIFF(DAY, customer.create_time, contract.order_date)), 1), 0)   AS customer_deal_cycle,
+               COUNT(DISTINCT customer.id)                                                                  AS customer_deal_count
+          FROM crm_customer AS customer
+                LEFT JOIN crm_contract AS contract ON customer.id = contract.customer_id
+                LEFT JOIN crm_contract_product AS contract_product ON contract_product.contract_id = contract.id
+                LEFT JOIN crm_product AS product ON contract_product.product_id = product.id
+         WHERE customer.deleted = 0
+           AND contract.deleted = 0
+           AND contract_product.deleted = 0
+           AND product.deleted = 0
+           AND contract.audit_status = ${@cn.iocoder.yudao.module.crm.enums.common.CrmAuditStatusEnum@APPROVE.status}
+           AND customer.owner_user_id IN
+                 <foreach collection="userIds" item="userId" open="(" close=")" separator=",">
+                     #{userId}
+                 </foreach>
+           AND customer.create_time BETWEEN #{times[0],javaType=java.time.LocalDateTime} AND #{times[1],javaType=java.time.LocalDateTime}
+        GROUP BY product.id
     </select>
 
 </mapper>

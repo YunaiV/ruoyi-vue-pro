@@ -6,6 +6,7 @@ import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.apilog.core.service.ApiErrorLogFrameworkService;
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
+import cn.iocoder.yudao.framework.common.util.collection.SetUtils;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.common.util.monitor.TracerUtils;
 import cn.iocoder.yudao.framework.common.util.servlet.ServletUtils;
@@ -32,6 +33,7 @@ import org.springframework.web.servlet.NoHandlerFoundException;
 
 import java.time.LocalDateTime;
 import java.util.Map;
+import java.util.Set;
 
 import static cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants.*;
 
@@ -44,6 +46,11 @@ import static cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeC
 @AllArgsConstructor
 @Slf4j
 public class GlobalExceptionHandler {
+
+    /**
+     * 忽略的 ServiceException 错误提示，避免打印过多 logger
+     */
+    public static final Set<String> IGNORE_ERROR_MESSAGES = SetUtils.asSet("无效的刷新令牌");
 
     @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
     private final String applicationName;
@@ -199,7 +206,10 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(value = ServiceException.class)
     public CommonResult<?> serviceExceptionHandler(ServiceException ex) {
-        log.info("[serviceExceptionHandler]", ex);
+        if (!IGNORE_ERROR_MESSAGES.contains(ex.getMessage())) {
+            // 不包含的时候，才进行打印，避免 ex 堆栈过多
+            log.info("[serviceExceptionHandler]", ex);
+        }
         return CommonResult.error(ex.getCode(), ex.getMessage());
     }
 

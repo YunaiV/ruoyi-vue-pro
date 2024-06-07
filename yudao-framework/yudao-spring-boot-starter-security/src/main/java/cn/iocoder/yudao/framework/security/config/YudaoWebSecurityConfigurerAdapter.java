@@ -5,14 +5,16 @@ import cn.iocoder.yudao.framework.security.core.filter.TokenAuthenticationFilter
 import cn.iocoder.yudao.framework.web.config.WebProperties;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
+import jakarta.annotation.Resource;
+import jakarta.annotation.security.PermitAll;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
+import org.springframework.boot.autoconfigure.AutoConfigureOrder;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -26,12 +28,14 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
+import org.springframework.web.util.pattern.PathPattern;
 
-import jakarta.annotation.Resource;
-import jakarta.annotation.security.PermitAll;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
 
 /**
  * 自定义的 Spring Security 配置适配器实现
@@ -39,6 +43,7 @@ import java.util.Set;
  * @author 芋道源码
  */
 @AutoConfiguration
+@AutoConfigureOrder(-1) // 目的：先于 Spring Security 自动配置，避免一键改包后，org.* 基础包无法生效
 @EnableMethodSecurity(securedEnabled = true)
 public class YudaoWebSecurityConfigurerAdapter {
 
@@ -162,13 +167,20 @@ public class YudaoWebSecurityConfigurerAdapter {
             if (!handlerMethod.hasMethodAnnotation(PermitAll.class)) {
                 continue;
             }
-            if (entry.getKey().getPatternsCondition() == null) {
+            Set<String> urls = new HashSet<>();
+            if (entry.getKey().getPatternsCondition() != null) {
+                urls.addAll(entry.getKey().getPatternsCondition().getPatterns());
+            }
+            if (entry.getKey().getPathPatternsCondition() != null) {
+                urls.addAll(convertList(entry.getKey().getPathPatternsCondition().getPatterns(), PathPattern::getPatternString));
+            }
+            if (urls.isEmpty()) {
                 continue;
             }
-            Set<String> urls = entry.getKey().getPatternsCondition().getPatterns();
+
             // 特殊：使用 @RequestMapping 注解，并且未写 method 属性，此时认为都需要免登录
             Set<RequestMethod> methods = entry.getKey().getMethodsCondition().getMethods();
-            if (CollUtil.isEmpty(methods)) { //
+            if (CollUtil.isEmpty(methods)) {
                 result.putAll(HttpMethod.GET, urls);
                 result.putAll(HttpMethod.POST, urls);
                 result.putAll(HttpMethod.PUT, urls);

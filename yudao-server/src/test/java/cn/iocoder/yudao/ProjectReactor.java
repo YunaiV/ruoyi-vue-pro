@@ -34,7 +34,8 @@ public class ProjectReactor {
      * 白名单文件，不进行重写，避免出问题
      */
     private static final Set<String> WHITE_FILE_TYPES = SetUtils.asSet("gif", "jpg", "svg", "png", // 图片
-            "eot", "woff2", "ttf", "woff"); // 字体
+            "eot", "woff2", "ttf", "woff",  // 字体
+            "xdb"); // IP 库
 
     public static void main(String[] args) {
         long start = System.currentTimeMillis();

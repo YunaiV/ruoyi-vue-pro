@@ -23,6 +23,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Primary;
 import org.springframework.http.HttpHeaders;
 
 import java.util.HashMap;
@@ -91,6 +92,7 @@ public class YudaoSwaggerAutoConfiguration {
      * 自定义 OpenAPI 处理器
      */
     @Bean
+    @Primary // 目的：以我们创建的 OpenAPIService Bean 为主，避免一键改包后，启动报错！
     public OpenAPIService openApiBuilder(Optional<OpenAPI> openAPI,
                                          SecurityService securityParser,
                                          SpringDocConfigProperties springDocConfigProperties,
@@ -98,7 +100,6 @@ public class YudaoSwaggerAutoConfiguration {
                                          Optional<List<OpenApiBuilderCustomizer>> openApiBuilderCustomizers,
                                          Optional<List<ServerBaseUrlCustomizer>> serverBaseUrlCustomizers,
                                          Optional<JavadocProvider> javadocProvider) {
-
         return new OpenAPIService(openAPI, securityParser, springDocConfigProperties,
                 propertyResolverUtils, openApiBuilderCustomizers, serverBaseUrlCustomizers, javadocProvider);
     }

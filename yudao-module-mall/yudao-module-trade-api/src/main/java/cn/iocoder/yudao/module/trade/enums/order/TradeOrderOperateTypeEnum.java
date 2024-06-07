@@ -14,7 +14,7 @@ import lombok.RequiredArgsConstructor;
 public enum TradeOrderOperateTypeEnum {
 
     MEMBER_CREATE(1, "用户下单"),
-    ADMIN_UPDATE_PRICE(2, "订单价格 {oldPayPrice} 修改，实际支付金额为 {newPayPrice} 元"),
+    ADMIN_UPDATE_PRICE(2, "订单价格 {oldPayPrice} 修改，调整价格 {adjustPrice}，实际支付金额为 {newPayPrice} 元"),
     MEMBER_PAY(10, "用户付款成功"),
     ADMIN_UPDATE_ADDRESS(11, "收货地址修改"),
     ADMIN_DELIVERY(20, "已发货，快递公司：{deliveryName}，快递单号：{logisticsNo}"),

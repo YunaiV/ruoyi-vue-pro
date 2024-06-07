@@ -1,9 +1,13 @@
 package cn.iocoder.yudao.module.crm.service.statistics;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.util.ObjUtil;
 import cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils;
 import cn.iocoder.yudao.framework.common.util.number.NumberUtils;
+import cn.iocoder.yudao.framework.ip.core.Area;
+import cn.iocoder.yudao.framework.ip.core.enums.AreaTypeEnum;
+import cn.iocoder.yudao.framework.ip.core.utils.AreaUtils;
 import cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.customer.*;
 import cn.iocoder.yudao.module.crm.dal.mysql.statistics.CrmStatisticsCustomerMapper;
 import cn.iocoder.yudao.module.system.api.dept.DeptApi;
@@ -19,6 +23,7 @@ import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Stream;
 
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
@@ -290,6 +295,46 @@ public class CrmStatisticsCustomerServiceImpl implements CrmStatisticsCustomerSe
         return summaryList;
     }
 
+    @Override
+    public List<CrmStatisticsCustomerDealCycleByAreaRespVO> getCustomerDealCycleByArea(CrmStatisticsCustomerReqVO reqVO) {
+        // 1. 获得用户编号数组
+        List<Long> userIds = getUserIds(reqVO);
+        if (CollUtil.isEmpty(userIds)) {
+            return Collections.emptyList();
+        }
+        reqVO.setUserIds(userIds);
+
+        // 2. 获取客户地区统计数据
+        List<CrmStatisticsCustomerDealCycleByAreaRespVO> dealCycleByAreaList = customerMapper.selectCustomerDealCycleGroupByAreaId(reqVO);
+        if (CollUtil.isEmpty(dealCycleByAreaList)) {
+            return Collections.emptyList();
+        }
+
+        // 3. 拼接数据
+        Map<Integer, Area> areaMap = convertMap(AreaUtils.getByType(AreaTypeEnum.PROVINCE, Function.identity()), Area::getId);
+        return convertList(dealCycleByAreaList, vo -> {
+            if (vo.getAreaId() != null) {
+                Integer parentId = AreaUtils.getParentIdByType(vo.getAreaId(), AreaTypeEnum.PROVINCE);
+                findAndThen(areaMap, parentId, area -> vo.setAreaId(parentId).setAreaName(area.getName()));
+            }
+            return vo;
+        });
+    }
+
+    @Override
+    public List<CrmStatisticsCustomerDealCycleByProductRespVO> getCustomerDealCycleByProduct(CrmStatisticsCustomerReqVO reqVO) {
+        // 1. 获得用户编号数组
+        List<Long> userIds = getUserIds(reqVO);
+        if (CollUtil.isEmpty(userIds)) {
+            return Collections.emptyList();
+        }
+        reqVO.setUserIds(userIds);
+
+        // 2. 获取客户产品统计数据
+        // TODO @dhb52：未读取产品名
+        return customerMapper.selectCustomerDealCycleGroupByProductId(reqVO);
+    }
+
     /**
      * 拼接用户信息（昵称）
      *
@@ -310,7 +355,7 @@ public class CrmStatisticsCustomerServiceImpl implements CrmStatisticsCustomerSe
     private List<Long> getUserIds(CrmStatisticsCustomerReqVO reqVO) {
         // 情况一：选中某个用户
         if (ObjUtil.isNotNull(reqVO.getUserId())) {
-            return List.of(reqVO.getUserId());
+            return ListUtil.of(reqVO.getUserId());
         }
         // 情况二：选中某个部门
         // 2.1 获得部门列表

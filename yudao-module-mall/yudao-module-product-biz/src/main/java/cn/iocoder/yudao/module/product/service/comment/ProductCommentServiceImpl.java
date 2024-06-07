@@ -113,7 +113,7 @@ public class ProductCommentServiceImpl implements ProductCommentService {
 
         // 更新可见状态
         productCommentMapper.updateById(new ProductCommentDO().setId(updateReqVO.getId())
-                .setVisible(true));
+                .setVisible(updateReqVO.getVisible()));
     }
 
     @Override
