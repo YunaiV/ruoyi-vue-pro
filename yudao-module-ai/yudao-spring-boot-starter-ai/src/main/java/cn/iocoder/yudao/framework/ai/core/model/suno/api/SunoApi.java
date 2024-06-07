@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.framework.ai.core.model.suno.api;
 
+import cn.iocoder.yudao.framework.ai.core.model.suno.SunoConfig;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.extern.slf4j.Slf4j;
@@ -25,10 +26,7 @@ import java.util.function.Predicate;
 @Slf4j
 public class SunoApi {
 
-    public static final String DEFAULT_BASE_URL = "https://suno-9323szg26-status2xxs-projects.vercel.app";
     private final WebClient webClient;
-
-
     private final Predicate<HttpStatusCode> STATUS_PREDICATE = status -> !status.is2xxSuccessful();
     private final Function<ClientResponse, Mono<? extends Throwable>> EXCEPTION_FUNCTION = response -> response.bodyToMono(String.class)
             .handle((respBody, sink) -> {
@@ -37,9 +35,9 @@ public class SunoApi {
             });
 
 
-    public SunoApi() {
+    public SunoApi(SunoConfig config) {
         this.webClient = WebClient.builder()
-                .baseUrl(DEFAULT_BASE_URL)
+                .baseUrl(config.getBaseUrl())
                 .defaultHeaders((headers) -> headers.setContentType(MediaType.APPLICATION_JSON))
                 .build();
     }
@@ -141,8 +139,8 @@ public class SunoApi {
         }
 
 
-        public SunoReq(String prompt, String tags, String title) {
-            this(prompt, tags, title, null, false, false);
+        public SunoReq(String prompt, String mv, String tags, String title) {
+            this(prompt, tags, title, mv, false, false);
         }
     }
 
