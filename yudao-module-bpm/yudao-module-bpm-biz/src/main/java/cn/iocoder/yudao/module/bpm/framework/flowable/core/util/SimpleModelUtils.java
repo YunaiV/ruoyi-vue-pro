@@ -26,6 +26,7 @@ import java.util.Objects;
 
 import static cn.iocoder.yudao.module.bpm.enums.definition.BpmBoundaryEventType.USER_TASK_TIMEOUT;
 import static cn.iocoder.yudao.module.bpm.enums.definition.BpmSimpleModelNodeType.*;
+import static cn.iocoder.yudao.module.bpm.enums.definition.BpmUserTaskRejectHandlerType.FINISH_PROCESS_BY_REJECT_NUMBER;
 import static cn.iocoder.yudao.module.bpm.enums.definition.BpmUserTaskTimeoutActionEnum.AUTO_REMINDER;
 import static cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnModelConstants.*;
 import static cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.SimpleModelConstants.*;
@@ -55,6 +56,11 @@ public class SimpleModelUtils {
      */
     public static final String ANY_OF_APPROVE_COMPLETE_EXPRESSION = "${ nrOfCompletedInstances > 0 }";
 
+    /**
+     * 按拒绝人数计算多实例完成条件的表达式
+     */
+    public static final String COMPLETE_BY_REJECT_COUNT_EXPRESSION = "${completeByRejectCountExpression.completionCondition(execution)}";
+
     // TODO-DONE @jason：建议方法名，改成 buildBpmnModel
     // TODO @yunai：注释需要完善下；
 
@@ -71,10 +77,6 @@ public class SimpleModelUtils {
         // 不加这个 解析 Message 会报 NPE 异常 .
         bpmnModel.setTargetNamespace(BPMN2_NAMESPACE); // TODO @jason：待定：是不是搞个自定义的 namespace；
         // TODO 芋艿：后续在 review
-        // @芋艿 这个 Message 可以去掉 暂时用不上
-        Message rejectPostProcessMsg = new Message();
-        rejectPostProcessMsg.setName(REJECT_POST_PROCESS_MESSAGE_NAME);
-        bpmnModel.addMessage(rejectPostProcessMsg);
 
         Process process = new Process();
         process.setId(processId);
@@ -107,19 +109,30 @@ public class SimpleModelUtils {
         if (nodeType == END_NODE) {
             return;
         }
-
         // 2.1 情况一：普通节点
         BpmSimpleModelNodeVO childNode = node.getChildNode();
         if (!BpmSimpleModelNodeType.isBranchNode(node.getType())) {
             if (!isValidNode(childNode)) {
                 // 2.1.1 普通节点且无孩子节点。分两种情况
                 // a.结束节点  b. 条件分支的最后一个节点.与分支节点的孩子节点或聚合节点建立连线。
-                SequenceFlow sequenceFlow = buildBpmnSequenceFlow(node.getId(), targetNodeId, null, null, null);
-                process.addFlowElement(sequenceFlow);
+                if (StrUtil.isNotEmpty(node.getAttachNodeId())) {
+                    // 2.1.1.1 如果有附加节点. 需要先建立和附加节点的连线。再建立附加节点和目标节点的连线
+                    List<SequenceFlow> sequenceFlows = buildAttachNodeSequenceFlow(node.getId(), node.getAttachNodeId(), targetNodeId);
+                    sequenceFlows.forEach(process::addFlowElement);
+                } else {
+                    SequenceFlow sequenceFlow = buildBpmnSequenceFlow(node.getId(), targetNodeId, null, null, null);
+                    process.addFlowElement(sequenceFlow);
+                }
             } else {
                 // 2.1.2 普通节点且有孩子节点。建立连线
-                SequenceFlow sequenceFlow = buildBpmnSequenceFlow(node.getId(), childNode.getId(), null, null, null);
-                process.addFlowElement(sequenceFlow);
+                if (StrUtil.isNotEmpty(node.getAttachNodeId())) {
+                    // 2.1.1.2 如果有附加节点. 需要先建立和附加节点的连线。再建立附加节点和目标节点的连线
+                    List<SequenceFlow> sequenceFlows = buildAttachNodeSequenceFlow(node.getId(), node.getAttachNodeId(), childNode.getId());
+                    sequenceFlows.forEach(process::addFlowElement);
+                } else {
+                    SequenceFlow sequenceFlow = buildBpmnSequenceFlow(node.getId(), childNode.getId(), null, null, null);
+                    process.addFlowElement(sequenceFlow);
+                }
                 // 递归调用后续节点
                 traverseNodeToBuildSequenceFlow(process, childNode, targetNodeId);
             }
@@ -171,6 +184,18 @@ public class SimpleModelUtils {
             // 4.递归调用后续节点 继续递归建立 D->E 的连线
             traverseNodeToBuildSequenceFlow(process, childNode, targetNodeId);
         }
+    }
+
+    /**
+     *  构建有附加节点的连线
+     * @param nodeId 当前节点 Id
+     * @param attachNodeId 附属节点 Id
+     * @param targetNodeId 目标节点 Id
+     */
+    private static List<SequenceFlow> buildAttachNodeSequenceFlow(String nodeId, String attachNodeId, String targetNodeId) {
+        SequenceFlow sequenceFlow = buildBpmnSequenceFlow(nodeId, attachNodeId, null, null, null);
+        SequenceFlow attachSequenceFlow = buildBpmnSequenceFlow(attachNodeId, targetNodeId, null, null, null);
+        return CollUtil.newArrayList(sequenceFlow, attachSequenceFlow);
     }
 
     /**
@@ -331,7 +356,26 @@ public class SimpleModelUtils {
             BoundaryEvent boundaryEvent = buildUserTaskTimerBoundaryEvent(userTask, userTaskConfig.getTimeoutHandler());
             flowElements.add(boundaryEvent);
         }
+        // 如果按拒绝人数终止流程。需要添加附加的 ServiceTask 处理
+        if (userTaskConfig.getRejectHandler() != null &&
+                Objects.equals(FINISH_PROCESS_BY_REJECT_NUMBER.getType(), userTaskConfig.getRejectHandler().getType())) {
+            ServiceTask serviceTask = buildMultiInstanceServiceTask(node);
+            flowElements.add(serviceTask);
+        }
         return flowElements;
+    }
+
+    private static ServiceTask buildMultiInstanceServiceTask(BpmSimpleModelNodeVO node) {
+        ServiceTask serviceTask = new ServiceTask();
+        String id = String.format("Activity-%s", IdUtil.fastSimpleUUID());
+        serviceTask.setId(id);
+        serviceTask.setName("会签服务任务");
+        serviceTask.setImplementationType(ImplementationType.IMPLEMENTATION_TYPE_DELEGATEEXPRESSION);
+        serviceTask.setImplementation("${multiInstanceServiceTaskExpression}");
+        serviceTask.setAsynchronous(false);
+        addExtensionElement(serviceTask, SERVICE_TASK_ATTACH_USER_TASK_ID, node.getId());
+        node.setAttachNodeId(id);
+        return serviceTask;
     }
 
     private static BoundaryEvent buildUserTaskTimerBoundaryEvent(UserTask userTask, SimpleModelUserTaskConfig.TimeoutHandler timeoutHandler) {
@@ -468,6 +512,9 @@ public class SimpleModelUtils {
         if (bpmApproveMethodEnum == null || bpmApproveMethodEnum == BpmApproveMethodEnum.SINGLE_PERSON_APPROVE) {
             return;
         }
+        // 添加审批方式的扩展属性
+        addExtensionElement(userTask, BpmnModelConstants.USER_TASK_APPROVE_METHOD,
+                approveMethod == null ? null : approveMethod.toString());
         MultiInstanceLoopCharacteristics multiInstanceCharacteristics = new MultiInstanceLoopCharacteristics();
         //  设置 collectionVariable。本系统用不到。会在 仅仅为了校验。
         multiInstanceCharacteristics.setInputDataItem("${coll_userList}");
@@ -484,8 +531,7 @@ public class SimpleModelUtils {
             multiInstanceCharacteristics.setLoopCardinality("1");
             userTask.setLoopCharacteristics(multiInstanceCharacteristics);
         } else if (bpmApproveMethodEnum == BpmApproveMethodEnum.ANY_APPROVE_ALL_REJECT) {
-            // 这种情况。拒绝任务时候，不会终止或者完成任务 参见 BpmTaskService#rejectTask 方法
-            multiInstanceCharacteristics.setCompletionCondition(ANY_OF_APPROVE_COMPLETE_EXPRESSION);
+            multiInstanceCharacteristics.setCompletionCondition(COMPLETE_BY_REJECT_COUNT_EXPRESSION);
             multiInstanceCharacteristics.setSequential(false);
         }
         // TODO 会签(按比例投票 )

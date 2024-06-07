@@ -51,6 +51,16 @@ public interface BpmnModelConstants {
     String USER_TASK_REJECT_RETURN_TASK_ID = "rejectReturnTaskId";
 
     /**
+     * BPMN UserTask 的扩展属性，用于标记用户任务的审批方式
+     */
+    String USER_TASK_APPROVE_METHOD = "approveMethod";
+
+    /**
+     * BPMN ExtensionElement 的扩展属性，用于标记 服务任务附属的用户任务 Id
+     */
+    String SERVICE_TASK_ATTACH_USER_TASK_ID = "attachUserTaskId";
+
+    /**
      * BPMN ExtensionElement 流程表单字段权限元素, 用于标记字段权限
      */
     String FORM_FIELD_PERMISSION_ELEMENT = "fieldsPermission";
@@ -75,6 +85,4 @@ public interface BpmnModelConstants {
      * 支持转仿钉钉设计模型的 Bpmn 节点
      */
     Set<Class<? extends FlowNode>> SUPPORT_CONVERT_SIMPLE_FlOW_NODES = ImmutableSet.of(UserTask.class, EndEvent.class);
-
-    String REJECT_POST_PROCESS_MESSAGE_NAME = "message_reject_post_process";
 }

@@ -35,7 +35,6 @@ import org.flowable.engine.HistoryService;
 import org.flowable.engine.ManagementService;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.TaskService;
-import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.task.api.DelegationState;
 import org.flowable.task.api.Task;
@@ -352,30 +351,17 @@ public class BpmTaskServiceImpl implements BpmTaskService {
                     .setReason(reqVO.getReason());
             returnTask(userId, returnReq);
             return;
-        } else if (userTaskRejectHandlerType == BpmUserTaskRejectHandlerType.FINISH_PROCESS_BY_REJECT_RATIO) {
-            // 3.3 按拒绝人数比例终止流程
+        } else if (userTaskRejectHandlerType == BpmUserTaskRejectHandlerType.FINISH_PROCESS_BY_REJECT_NUMBER) {
+            // 3.3 按拒绝人数终止流程
             if (!flowElement.hasMultiInstanceLoopCharacteristics()) {
                 log.error("[rejectTask] 用户任务拒绝处理类型配置错误, 按拒绝人数终止流程只能用于会签任务");
                 throw exception(GlobalErrorCodeConstants.ERROR_CONFIGURATION);
             }
-            // 获取并行任务总数
-            Execution execution = runtimeService.createExecutionQuery().processInstanceId(task.getProcessInstanceId())
-                    .executionId(task.getExecutionId()).singleResult();
-            Integer nrOfInstances = runtimeService.getVariable(execution.getParentId(), "nrOfInstances", Integer.class);
-            // 获取未完成任务列表
-            List<Task> taskList = getTaskListByProcessInstanceIdAndAssigned(task.getProcessInstanceId(), null,
-                    task.getTaskDefinitionKey());
-            // 获取已经拒绝的任务数
-            Integer rejectNumber = getSumValue(taskList,
-                    item -> Objects.equals(BpmTaskStatusEnum.REJECT.getStatus(), FlowableUtils.getTaskStatus(item)) ? 1 : 0,
-                    Integer::sum, 0);
-//            // TODO @jason：如果这样的话，后续会不会在【已完成】里面查询不到哈？【重要！！！！】
-//            // 拒绝任务后,任务分配人清空。但不能完成任务
-//            taskService.setAssignee(task.getId(), "");
-            // 不是所有人拒绝返回。 TODO 后续需要做按拒绝人数比例来判断
-            if (!Objects.equals(nrOfInstances, rejectNumber)) {
-                return;
-            }
+            // 设置变量值为拒绝
+            runtimeService.setVariableLocal(task.getExecutionId(), BpmConstants.TASK_VARIABLE_STATUS, BpmTaskStatusEnum.REJECT.getStatus());
+            // 完成任务
+            taskService.complete(task.getId());
+            return;
         }
         // 3.4 其他情况 终止流程。 TODO 后续可能会增加处理类型
         processInstanceService.updateProcessInstanceReject(instance.getProcessInstanceId(), reqVO.getReason());

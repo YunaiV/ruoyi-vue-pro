@@ -41,6 +41,12 @@ public class BpmSimpleModelNodeVO {
 
     @Schema(description = "节点的属性")
     private Map<String, Object> attributes; // TODO @jason：建议是字段分拆下；类似说：
+
+    /**
+     * 附加节点 Id, 该节点不从前端传入。 由程序生成. 由于当个节点无法完成功能。 需要附加节点来完成。
+     * 例如： 会签时需要按拒绝人数来终止流程。 需要 userTask + ServiceTask 两个节点配合完成。 serviceTask 由后端生成。
+     */
+    private String attachNodeId;
     // Map<String, Integer> formPermissions; 表单权限；仅发起、审批、抄送节点会使用
     // Integer approveMethod; 审批方式；仅审批节点会使用
     // TODO @jason 后面和前端一起调整一下

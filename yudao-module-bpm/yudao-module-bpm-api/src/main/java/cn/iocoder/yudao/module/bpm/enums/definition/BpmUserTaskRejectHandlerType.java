@@ -15,7 +15,7 @@ public enum BpmUserTaskRejectHandlerType {
 
     FINISH_PROCESS(1, "终止流程"),
     RETURN_PRE_USER_TASK(2, "驳回到指定任务节点"),
-    FINISH_PROCESS_BY_REJECT_RATIO(3, "按拒绝人数比例终止流程"), // 用于会签
+    FINISH_PROCESS_BY_REJECT_NUMBER(3, "按拒绝人数终止流程"), // 用于会签
     FINISH_TASK(4, "结束任务"); // 待实现，可能会用于意见分支
 
     private final Integer type;
