@@ -67,7 +67,8 @@ public class SmsCodeServiceImpl implements SmsCodeService {
         }
 
         // 创建验证码记录
-        String code = String.valueOf(randomInt(smsCodeProperties.getBeginCode(), smsCodeProperties.getEndCode() + 1));
+        String code = String.format("%0" + smsCodeProperties.getEndCode().toString().length() + "d",
+                randomInt(smsCodeProperties.getBeginCode(), smsCodeProperties.getEndCode() + 1));
         SmsCodeDO newSmsCode = SmsCodeDO.builder().mobile(mobile).code(code).scene(scene)
                 .todayIndex(lastSmsCode != null && isToday(lastSmsCode.getCreateTime()) ? lastSmsCode.getTodayIndex() + 1 : 1)
                 .createIp(ip).used(false).build();

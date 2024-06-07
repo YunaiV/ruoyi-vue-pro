@@ -3,9 +3,9 @@
 
  Source Server Type    : MySQL
 
- Target Server Type    : PostgreSQL
+ Target Server Type    : Kingbase
 
- Date: 2024-05-08 00:11:06
+ Date: 2024-05-31 22:42:53
 */
 
 
@@ -34,12 +34,12 @@ DROP TABLE IF EXISTS infra_api_access_log;
 CREATE TABLE infra_api_access_log
 (
     id               int8         NOT NULL,
-    trace_id         varchar(64)  NOT NULL DEFAULT '',
+    trace_id         varchar(64)  NULL     DEFAULT '',
     user_id          int8         NOT NULL DEFAULT 0,
     user_type        int2         NOT NULL DEFAULT 0,
     application_name varchar(50)  NOT NULL,
-    request_method   varchar(16)  NOT NULL DEFAULT '',
-    request_url      varchar(255) NOT NULL DEFAULT '',
+    request_method   varchar(16)  NULL     DEFAULT '',
+    request_url      varchar(255) NULL     DEFAULT '',
     request_params   text         NULL,
     response_body    text         NULL,
     user_ip          varchar(50)  NOT NULL,
@@ -113,7 +113,7 @@ CREATE TABLE infra_api_error_log
     user_ip                      varchar(50)   NOT NULL,
     user_agent                   varchar(512)  NOT NULL,
     exception_time               timestamp     NOT NULL,
-    exception_name               varchar(128)  NOT NULL DEFAULT '',
+    exception_name               varchar(128)  NULL     DEFAULT '',
     exception_message            text          NOT NULL,
     exception_root_cause_message text          NOT NULL,
     exception_stack_trace        text          NOT NULL,
@@ -261,12 +261,12 @@ CREATE TABLE infra_codegen_table
     id                    int8         NOT NULL,
     data_source_config_id int8         NOT NULL,
     scene                 int2         NOT NULL DEFAULT 1,
-    table_name            varchar(200) NOT NULL DEFAULT '',
-    table_comment         varchar(500) NOT NULL DEFAULT '',
+    table_name            varchar(200) NULL     DEFAULT '',
+    table_comment         varchar(500) NULL     DEFAULT '',
     remark                varchar(500) NULL     DEFAULT NULL,
     module_name           varchar(30)  NOT NULL,
     business_name         varchar(30)  NOT NULL,
-    class_name            varchar(100) NOT NULL DEFAULT '',
+    class_name            varchar(100) NULL     DEFAULT '',
     class_comment         varchar(50)  NOT NULL,
     author                varchar(50)  NOT NULL,
     template_type         int2         NOT NULL DEFAULT 1,
@@ -326,9 +326,9 @@ CREATE TABLE infra_config
     id          int4         NOT NULL,
     category    varchar(50)  NOT NULL,
     type        int2         NOT NULL,
-    name        varchar(100) NOT NULL DEFAULT '',
-    config_key  varchar(100) NOT NULL DEFAULT '',
-    value       varchar(500) NOT NULL DEFAULT '',
+    name        varchar(100) NULL     DEFAULT '',
+    config_key  varchar(100) NULL     DEFAULT '',
+    value       varchar(500) NULL     DEFAULT '',
     visible     bool         NOT NULL,
     remark      varchar(500) NULL     DEFAULT NULL,
     creator     varchar(64)  NULL     DEFAULT '',
@@ -382,10 +382,10 @@ DROP TABLE IF EXISTS infra_data_source_config;
 CREATE TABLE infra_data_source_config
 (
     id          int8          NOT NULL,
-    name        varchar(100)  NOT NULL DEFAULT '',
+    name        varchar(100)  NULL     DEFAULT '',
     url         varchar(1024) NOT NULL,
     username    varchar(255)  NOT NULL,
-    password    varchar(255)  NOT NULL DEFAULT '',
+    password    varchar(255)  NULL     DEFAULT '',
     creator     varchar(64)   NULL     DEFAULT '',
     create_time timestamp     NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updater     varchar(64)   NULL     DEFAULT '',
@@ -655,7 +655,7 @@ DROP TABLE IF EXISTS system_dept;
 CREATE TABLE system_dept
 (
     id             int8        NOT NULL,
-    name           varchar(30) NOT NULL DEFAULT '',
+    name           varchar(30) NULL     DEFAULT '',
     parent_id      int8        NOT NULL DEFAULT 0,
     sort           int4        NOT NULL DEFAULT 0,
     leader_user_id int8        NULL     DEFAULT NULL,
@@ -723,9 +723,9 @@ CREATE TABLE system_dict_data
 (
     id          int8         NOT NULL,
     sort        int4         NOT NULL DEFAULT 0,
-    label       varchar(100) NOT NULL DEFAULT '',
-    value       varchar(100) NOT NULL DEFAULT '',
-    dict_type   varchar(100) NOT NULL DEFAULT '',
+    label       varchar(100) NULL     DEFAULT '',
+    value       varchar(100) NULL     DEFAULT '',
+    dict_type   varchar(100) NULL     DEFAULT '',
     status      int2         NOT NULL DEFAULT 0,
     color_type  varchar(100) NULL     DEFAULT '',
     css_class   varchar(100) NULL     DEFAULT '',
@@ -1140,8 +1140,8 @@ DROP TABLE IF EXISTS system_dict_type;
 CREATE TABLE system_dict_type
 (
     id           int8         NOT NULL,
-    name         varchar(100) NOT NULL DEFAULT '',
-    type         varchar(100) NOT NULL DEFAULT '',
+    name         varchar(100) NULL     DEFAULT '',
+    type         varchar(100) NULL     DEFAULT '',
     status       int2         NOT NULL DEFAULT 0,
     remark       varchar(500) NULL     DEFAULT NULL,
     creator      varchar(64)  NULL     DEFAULT '',
@@ -1271,10 +1271,10 @@ CREATE TABLE system_login_log
 (
     id          int8         NOT NULL,
     log_type    int8         NOT NULL,
-    trace_id    varchar(64)  NOT NULL DEFAULT '',
+    trace_id    varchar(64)  NULL     DEFAULT '',
     user_id     int8         NOT NULL DEFAULT 0,
     user_type   int2         NOT NULL DEFAULT 0,
-    username    varchar(50)  NOT NULL DEFAULT '',
+    username    varchar(50)  NULL     DEFAULT '',
     result      int2         NOT NULL,
     user_ip     varchar(50)  NOT NULL,
     user_agent  varchar(512) NOT NULL,
@@ -1490,7 +1490,7 @@ CREATE TABLE system_menu
 (
     id             int8         NOT NULL,
     name           varchar(50)  NOT NULL,
-    permission     varchar(100) NOT NULL DEFAULT '',
+    permission     varchar(100) NULL     DEFAULT '',
     type           int2         NOT NULL,
     sort           int4         NOT NULL DEFAULT 0,
     parent_id      int8         NOT NULL DEFAULT 0,
@@ -2558,7 +2558,7 @@ CREATE TABLE system_oauth2_approve
     user_id      int8         NOT NULL,
     user_type    int2         NOT NULL,
     client_id    varchar(255) NOT NULL,
-    scope        varchar(255) NOT NULL DEFAULT '',
+    scope        varchar(255) NULL     DEFAULT '',
     approved     bool         NOT NULL DEFAULT '0',
     expires_time timestamp    NOT NULL,
     creator      varchar(64)  NULL     DEFAULT '',
@@ -2676,7 +2676,7 @@ CREATE TABLE system_oauth2_code
     scopes       varchar(255) NULL     DEFAULT '',
     expires_time timestamp    NOT NULL,
     redirect_uri varchar(255) NULL     DEFAULT NULL,
-    state        varchar(255) NOT NULL DEFAULT '',
+    state        varchar(255) NULL     DEFAULT '',
     creator      varchar(64)  NULL     DEFAULT '',
     create_time  timestamp    NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updater      varchar(64)  NULL     DEFAULT '',
@@ -2759,14 +2759,14 @@ DROP TABLE IF EXISTS system_operate_log;
 CREATE TABLE system_operate_log
 (
     id             int8          NOT NULL,
-    trace_id       varchar(64)   NOT NULL DEFAULT '',
+    trace_id       varchar(64)   NULL     DEFAULT '',
     user_id        int8          NOT NULL,
     user_type      int2          NOT NULL DEFAULT 0,
     type           varchar(50)   NOT NULL,
     sub_type       varchar(50)   NOT NULL,
     biz_id         int8          NOT NULL,
-    action         varchar(2000) NOT NULL DEFAULT '',
-    extra          varchar(2000) NOT NULL DEFAULT '',
+    action         varchar(2000) NULL     DEFAULT '',
+    extra          varchar(2000) NULL     DEFAULT '',
     request_method varchar(16)   NULL     DEFAULT '',
     request_url    varchar(255)  NULL     DEFAULT '',
     user_ip        varchar(50)   NULL     DEFAULT NULL,
@@ -2871,7 +2871,7 @@ CREATE TABLE system_role
     code                varchar(100) NOT NULL,
     sort                int4         NOT NULL,
     data_scope          int2         NOT NULL DEFAULT 1,
-    data_scope_dept_ids varchar(500) NOT NULL DEFAULT '',
+    data_scope_dept_ids varchar(500) NULL     DEFAULT '',
     status              int2         NOT NULL,
     type                int2         NOT NULL,
     remark              varchar(500) NULL     DEFAULT NULL,
@@ -4191,7 +4191,7 @@ CREATE TABLE system_tenant
     package_id      int8         NOT NULL,
     expire_time     timestamp    NOT NULL,
     account_count   int4         NOT NULL,
-    creator         varchar(64)  NOT NULL DEFAULT '',
+    creator         varchar(64)  NULL     DEFAULT '',
     create_time     timestamp    NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updater         varchar(64)  NULL     DEFAULT '',
     update_time     timestamp    NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -4244,7 +4244,7 @@ CREATE TABLE system_tenant_package
     status      int2          NOT NULL DEFAULT 0,
     remark      varchar(256)  NULL     DEFAULT '',
     menu_ids    varchar(4096) NOT NULL,
-    creator     varchar(64)   NOT NULL DEFAULT '',
+    creator     varchar(64)   NULL     DEFAULT '',
     create_time timestamp     NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updater     varchar(64)   NULL     DEFAULT '',
     update_time timestamp     NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -4396,7 +4396,7 @@ CREATE TABLE system_users
 (
     id          int8         NOT NULL,
     username    varchar(30)  NOT NULL,
-    password    varchar(100) NOT NULL DEFAULT '',
+    password    varchar(100) NULL     DEFAULT '',
     nickname    varchar(30)  NOT NULL,
     remark      varchar(500) NULL     DEFAULT NULL,
     dept_id     int8         NULL     DEFAULT NULL,
@@ -4476,7 +4476,7 @@ DROP TABLE IF EXISTS yudao_demo01_contact;
 CREATE TABLE yudao_demo01_contact
 (
     id          int8         NOT NULL,
-    name        varchar(100) NOT NULL DEFAULT '',
+    name        varchar(100) NULL     DEFAULT '',
     sex         int2         NOT NULL,
     birthday    timestamp    NOT NULL,
     description varchar(255) NOT NULL,
@@ -4526,7 +4526,7 @@ DROP TABLE IF EXISTS yudao_demo02_category;
 CREATE TABLE yudao_demo02_category
 (
     id          int8         NOT NULL,
-    name        varchar(100) NOT NULL DEFAULT '',
+    name        varchar(100) NULL     DEFAULT '',
     parent_id   int8         NOT NULL,
     creator     varchar(64)  NULL     DEFAULT '',
     create_time timestamp    NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -4576,7 +4576,7 @@ CREATE TABLE yudao_demo03_course
 (
     id          int8         NOT NULL,
     student_id  int8         NOT NULL,
-    name        varchar(100) NOT NULL DEFAULT '',
+    name        varchar(100) NULL     DEFAULT '',
     score       int2         NOT NULL,
     creator     varchar(64)  NULL     DEFAULT '',
     create_time timestamp    NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -4631,7 +4631,7 @@ CREATE TABLE yudao_demo03_grade
 (
     id          int8         NOT NULL,
     student_id  int8         NOT NULL,
-    name        varchar(100) NOT NULL DEFAULT '',
+    name        varchar(100) NULL     DEFAULT '',
     teacher     varchar(255) NOT NULL,
     creator     varchar(64)  NULL     DEFAULT '',
     create_time timestamp    NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -4678,7 +4678,7 @@ DROP TABLE IF EXISTS yudao_demo03_student;
 CREATE TABLE yudao_demo03_student
 (
     id          int8         NOT NULL,
-    name        varchar(100) NOT NULL DEFAULT '',
+    name        varchar(100) NULL     DEFAULT '',
     sex         int2         NOT NULL,
     birthday    timestamp    NOT NULL,
     description varchar(255) NOT NULL,
