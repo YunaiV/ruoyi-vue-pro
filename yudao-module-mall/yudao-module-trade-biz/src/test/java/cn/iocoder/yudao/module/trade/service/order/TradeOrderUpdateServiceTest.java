@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.trade.service.order;
 
+import cn.hutool.core.util.IdUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
 import cn.iocoder.yudao.module.member.api.address.MemberAddressApi;
@@ -38,7 +39,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 
 import java.time.Duration;
-import java.util.UUID;
 
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEquals;
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomPojo;
@@ -101,7 +101,7 @@ public class TradeOrderUpdateServiceTest extends BaseDbUnitTest {
     public void setUp() {
         when(tradeOrderProperties.getAppId()).thenReturn(888L);
         when(tradeOrderProperties.getPayExpireTime()).thenReturn(Duration.ofDays(1));
-        when(tradeNoRedisDAO.generate(anyString())).thenReturn(UUID.randomUUID().toString());
+        when(tradeNoRedisDAO.generate(anyString())).thenReturn(IdUtil.randomUUID());
     }
 
 //    @Test
