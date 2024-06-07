@@ -135,7 +135,7 @@ public interface BpmTaskService {
      * @param executionId execution Id
      * @param taskDefineKey 任务定义 Key
      */
-    List<Task> getAssignedTaskListByConditions(String processInstanceId, String executionId, String taskDefineKey);
+    List<Task> getTaskListByProcessInstanceIdAndAssigned(String processInstanceId, String executionId, String taskDefineKey);
 
     /**
      * 获取当前任务的可回退的 UserTask 集合

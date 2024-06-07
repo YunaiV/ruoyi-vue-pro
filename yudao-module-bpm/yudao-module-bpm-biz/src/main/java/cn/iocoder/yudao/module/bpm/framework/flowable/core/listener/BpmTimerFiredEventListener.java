@@ -80,7 +80,7 @@ public class BpmTimerFiredEventListener extends AbstractFlowableEngineEventListe
         BpmUserTaskTimeoutActionEnum userTaskTimeoutAction = BpmUserTaskTimeoutActionEnum.actionOf(timeoutAction);
         if (userTaskTimeoutAction != null) {
             // 查询超时未处理的任务 TODO 加签的情况会不会有问题 ???
-            List<Task> taskList = bpmTaskService.getAssignedTaskListByConditions(processInstanceId, null, taskDefKey);
+            List<Task> taskList = bpmTaskService.getTaskListByProcessInstanceIdAndAssigned(processInstanceId, null, taskDefKey);
             taskList.forEach(task -> {
                 // 自动提醒
                 if (userTaskTimeoutAction == BpmUserTaskTimeoutActionEnum.AUTO_REMINDER) {

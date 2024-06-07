@@ -5,6 +5,7 @@ import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.date.DateUtils;
 import cn.iocoder.yudao.framework.common.util.number.NumberUtils;
@@ -353,34 +354,30 @@ public class BpmTaskServiceImpl implements BpmTaskService {
             return;
         } else if (userTaskRejectHandlerType == BpmUserTaskRejectHandlerType.FINISH_PROCESS_BY_REJECT_RATIO) {
             // 3.3 按拒绝人数比例终止流程
-            // TODO @jason：建议抛出系统异常
             if (!flowElement.hasMultiInstanceLoopCharacteristics()) {
-                throw exception(TASK_REJECT_HANDLER_TYPE_BY_REJECT_RATIO_ERROR);
+                log.error("[rejectTask] 用户任务拒绝处理类型配置错误, 按拒绝人数终止流程只能用于会签任务");
+                throw exception(GlobalErrorCodeConstants.ERROR_CONFIGURATION);
             }
+            // 获取并行任务总数
             Execution execution = runtimeService.createExecutionQuery().processInstanceId(task.getProcessInstanceId())
                     .executionId(task.getExecutionId()).singleResult();
-            // 获取并行任务总数 TODO @jason：这个注释，其实挪到 Execution execution 前面好，更有整体性。
             Integer nrOfInstances = runtimeService.getVariable(execution.getParentId(), "nrOfInstances", Integer.class);
             // 获取未完成任务列表
-            List<Task> taskList = getAssignedTaskListByConditions(task.getProcessInstanceId(), null,
+            List<Task> taskList = getTaskListByProcessInstanceIdAndAssigned(task.getProcessInstanceId(), null,
                     task.getTaskDefinitionKey());
             // 获取已经拒绝的任务数
-            int rejectNumber = 0;
-            // TODO @jason: CollectionUtils.getSumValue() 替代
-            for (Task item : taskList) {
-                if (Objects.equals(BpmTaskStatusEnum.REJECT.getStatus(), FlowableUtils.getTaskStatus(item))) {
-                    rejectNumber ++;
-                }
-            }
-            // TODO @jason：如果这样的话，后续会不会在【已完成】里面查询不到哈？【重要！！！！】
-            // 拒绝任务后,任务分配人清空。但不能完成任务
-            taskService.setAssignee(task.getId(), "");
+            Integer rejectNumber = getSumValue(taskList,
+                    item -> Objects.equals(BpmTaskStatusEnum.REJECT.getStatus(), FlowableUtils.getTaskStatus(item)) ? 1 : 0,
+                    Integer::sum, 0);
+//            // TODO @jason：如果这样的话，后续会不会在【已完成】里面查询不到哈？【重要！！！！】
+//            // 拒绝任务后,任务分配人清空。但不能完成任务
+//            taskService.setAssignee(task.getId(), "");
             // 不是所有人拒绝返回。 TODO 后续需要做按拒绝人数比例来判断
             if (!Objects.equals(nrOfInstances, rejectNumber)) {
                 return;
             }
         }
-        // 3.3 其他情况 终止流程。 TODO 后续可能会增加处理类型
+        // 3.4 其他情况 终止流程。 TODO 后续可能会增加处理类型
         processInstanceService.updateProcessInstanceReject(instance.getProcessInstanceId(), reqVO.getReason());
     }
 
@@ -482,9 +479,8 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         return taskService.createTaskQuery().taskId(id).includeTaskLocalVariables().singleResult();
     }
 
-    // TODO @jason：改成 getTaskListByProcessInstanceIdAndAssigned；其它条件就不写了。主要考虑，还是动名词
     @Override
-    public List<Task> getAssignedTaskListByConditions(String processInstanceId, String executionId, String defineKey) {
+    public List<Task> getTaskListByProcessInstanceIdAndAssigned(String processInstanceId, String executionId, String defineKey) {
         Assert.notNull(processInstanceId, "processInstanceId 不能为空");
         TaskQuery taskQuery = taskService.createTaskQuery().taskAssigned().processInstanceId(processInstanceId).active()
                 .includeTaskLocalVariables();
