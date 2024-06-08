@@ -493,7 +493,7 @@ public class SimpleModelUtils {
         // 添加表单字段权限属性元素
         addFormFieldsPermission(userTaskConfig.getFieldsPermission(), userTask);
         // 处理多实例
-        processMultiInstanceLoopCharacteristics(userTaskConfig.getApproveMethod(), userTask);
+        processMultiInstanceLoopCharacteristics(userTaskConfig.getApproveMethod(), userTaskConfig.getApproveRatio(), userTask);
         // 添加任务被拒绝的处理元素
         addTaskRejectElements(userTaskConfig.getRejectHandler(), userTask);
         return userTask;
@@ -507,7 +507,7 @@ public class SimpleModelUtils {
         addExtensionElement(userTask, USER_TASK_REJECT_RETURN_TASK_ID, rejectHandler.getReturnNodeId());
     }
 
-    private static void processMultiInstanceLoopCharacteristics(Integer approveMethod, UserTask userTask) {
+    private static void processMultiInstanceLoopCharacteristics(Integer approveMethod, Integer approveRatio, UserTask userTask) {
         BpmApproveMethodEnum bpmApproveMethodEnum = BpmApproveMethodEnum.valueOf(approveMethod);
         if (bpmApproveMethodEnum == null || bpmApproveMethodEnum == BpmApproveMethodEnum.SINGLE_PERSON_APPROVE) {
             return;
@@ -530,11 +530,16 @@ public class SimpleModelUtils {
             multiInstanceCharacteristics.setSequential(true);
             multiInstanceCharacteristics.setLoopCardinality("1");
             userTask.setLoopCharacteristics(multiInstanceCharacteristics);
-        } else if (bpmApproveMethodEnum == BpmApproveMethodEnum.ANY_APPROVE_ALL_REJECT) {
+        } else if (bpmApproveMethodEnum == BpmApproveMethodEnum.ANY_APPROVE_ALL_REJECT ){
             multiInstanceCharacteristics.setCompletionCondition(COMPLETE_BY_REJECT_COUNT_EXPRESSION);
             multiInstanceCharacteristics.setSequential(false);
+        } else if (bpmApproveMethodEnum == BpmApproveMethodEnum.APPROVE_BY_RATIO) {
+            multiInstanceCharacteristics.setCompletionCondition(COMPLETE_BY_REJECT_COUNT_EXPRESSION);
+            multiInstanceCharacteristics.setSequential(false);
+            Assert.notNull(approveRatio, "通过比例不能为空");
+            // 添加通过比例的扩展属性
+            addExtensionElement(userTask, BpmnModelConstants.USER_TASK_APPROVE_RATIO, approveRatio.toString());
         }
-        // TODO 会签(按比例投票 )
         userTask.setLoopCharacteristics(multiInstanceCharacteristics);
     }
 

@@ -56,6 +56,11 @@ public interface BpmnModelConstants {
     String USER_TASK_APPROVE_METHOD = "approveMethod";
 
     /**
+     * BPMN UserTask 的扩展属性，当审批方式为按通过比例时, 标记会签通过比例
+     */
+    String USER_TASK_APPROVE_RATIO = "approveRatio";
+
+    /**
      * BPMN ExtensionElement 的扩展属性，用于标记 服务任务附属的用户任务 Id
      */
     String SERVICE_TASK_ATTACH_USER_TASK_ID = "attachUserTaskId";

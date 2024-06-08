@@ -16,7 +16,9 @@ import java.util.Objects;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.bpm.enums.definition.BpmApproveMethodEnum.ANY_APPROVE_ALL_REJECT;
+import static cn.iocoder.yudao.module.bpm.enums.definition.BpmApproveMethodEnum.APPROVE_BY_RATIO;
 import static cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnModelConstants.USER_TASK_APPROVE_METHOD;
+import static cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnModelConstants.USER_TASK_APPROVE_RATIO;
 
 /**
  * 按拒绝人数计算会签的完成条件的流程表达式实现
@@ -28,7 +30,7 @@ import static cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnMode
 public class CompleteByRejectCountExpression {
 
     /**
-     *  会签的完成条件
+     * 会签的完成条件
      */
     public boolean completionCondition(DelegateExecution execution) {
         FlowElement flowElement = execution.getCurrentFlowElement();
@@ -53,13 +55,29 @@ public class CompleteByRejectCountExpression {
             } else {
                 // 1.2 所有人都拒绝了。设置任务拒绝变量, 会签任务完成。 后续终止流程在 ServiceTask【MultiInstanceServiceTaskExpression】处理
                 if (Objects.equals(nrOfInstances, rejectCount)) {
-                    execution.setVariable(String.format("%s_reject",flowElement.getId()), Boolean.TRUE);
+                    execution.setVariable(String.format("%s_reject", flowElement.getId()), Boolean.TRUE);
                     return true;
                 }
                 return false;
             }
+        } else if (Objects.equals(APPROVE_BY_RATIO.getMethod(), approveMethod)) {
+            Integer approveRatio = NumberUtils.parseInt(BpmnModelUtils.parseExtensionElement(flowElement, USER_TASK_APPROVE_RATIO));
+            Assert.notNull(approveRatio, "通过比例不能空");
+            double approvePct =  approveRatio / (double) 100;
+            double realApprovePct = (double) agreeCount / nrOfInstances;
+            // 判断通过比例
+            if (realApprovePct >= approvePct) {
+                return true;
+            }
+            double rejectPct =  (100 - approveRatio) / (double) 100;
+            double realRejectPct = (double) rejectCount / nrOfInstances;
+            // 判断拒绝比例
+            if (realRejectPct >= rejectPct) {
+                execution.setVariable(String.format("%s_reject", flowElement.getId()), Boolean.TRUE);
+                return true;
+            }
+            return false;
         }
-        // TODO 多人会签(按比例投票)
         log.error("[completionCondition] 按拒绝人数计算会签的完成条件的审批方式[{}]，配置有误", approveMethod);
         throw exception(GlobalErrorCodeConstants.ERROR_CONFIGURATION);
     }

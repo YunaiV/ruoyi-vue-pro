@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.bpm.framework.flowable.core.simple;
 
+import cn.iocoder.yudao.module.bpm.enums.definition.BpmApproveMethodEnum;
 import cn.iocoder.yudao.module.bpm.enums.definition.BpmUserTaskRejectHandlerType;
 import lombok.Data;
 
@@ -30,10 +31,14 @@ public class SimpleModelUserTaskConfig {
     private List<Map<String,String>> fieldsPermission;
 
     /**
-     * 审批方式
+     * 审批方式 {@link BpmApproveMethodEnum }
      */
     private  Integer approveMethod;
 
+    /**
+     * 通过比例  当审批方式为 多人会签(按通过比例) 需设置
+     */
+    private Integer approveRatio;
     /**
      * 超时处理
      */
