@@ -44,8 +44,6 @@ public class SimpleModelUtils {
      */
     public static final String JOIN_GATE_WAY_NODE_ID_SUFFIX = "_join";
 
-    public static final String BPMN_SIMPLE_COPY_EXECUTION_SCRIPT = "#{bpmSimpleNodeService.copy(execution)}";
-
     /**
      * 所有审批人同意的表达式
      */
@@ -371,7 +369,7 @@ public class SimpleModelUtils {
         serviceTask.setId(id);
         serviceTask.setName("会签服务任务");
         serviceTask.setImplementationType(ImplementationType.IMPLEMENTATION_TYPE_DELEGATEEXPRESSION);
-        serviceTask.setImplementation("${multiInstanceServiceTaskExpression}");
+        serviceTask.setImplementation("${multiInstanceServiceTaskDelegate}");
         serviceTask.setAsynchronous(false);
         addExtensionElement(serviceTask, SERVICE_TASK_ATTACH_USER_TASK_ID, node.getId());
         node.setAttachNodeId(id);
@@ -417,9 +415,8 @@ public class SimpleModelUtils {
         ServiceTask serviceTask = new ServiceTask();
         serviceTask.setId(node.getId());
         serviceTask.setName(node.getName());
-        // TODO @jason：建议用 delegateExpression；原因是，直接走 bpmSimpleNodeService.copy(execution) 的话，万一后续抄送改实现，可能比较麻烦。最好是搞个独立的 bean，然后它去调用抄 bpmSimpleNodeService；
-        serviceTask.setImplementationType(ImplementationType.IMPLEMENTATION_TYPE_EXPRESSION);
-        serviceTask.setImplementation(BPMN_SIMPLE_COPY_EXECUTION_SCRIPT);
+        serviceTask.setImplementationType(ImplementationType.IMPLEMENTATION_TYPE_DELEGATEEXPRESSION);
+        serviceTask.setImplementation("${copyUserDelegate}");
 
         // 添加抄送候选人元素
         addCandidateElements(MapUtil.getInt(node.getAttributes(), BpmnModelConstants.USER_TASK_CANDIDATE_STRATEGY),

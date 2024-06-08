@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.bpm.framework.flowable.core.expression;
+package cn.iocoder.yudao.module.bpm.framework.flowable.core.custom.expression;
 
 import cn.hutool.core.lang.Assert;
 import cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants;

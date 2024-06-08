@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.bpm.framework.flowable.core.expression;
+package cn.iocoder.yudao.module.bpm.framework.flowable.core.custom.delegate;
 
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.BooleanUtil;
@@ -12,12 +12,12 @@ import org.flowable.engine.delegate.JavaDelegate;
 import org.springframework.stereotype.Component;
 
 /**
- * 处理会签 Service Task 代理表达式
+ * 处理会签 Service Task 代理
  *
  * @author jason
  */
 @Component
-public class MultiInstanceServiceTaskExpression implements JavaDelegate {
+public class MultiInstanceServiceTaskDelegate implements JavaDelegate {
 
     @Resource
     private BpmProcessInstanceService processInstanceService;
@@ -35,4 +35,5 @@ public class MultiInstanceServiceTaskExpression implements JavaDelegate {
                     BpmCommentTypeEnum.REJECT.formatComment("会签任务拒绝人数满足条件"));
         }
     }
+
 }
