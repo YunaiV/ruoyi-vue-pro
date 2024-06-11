@@ -134,49 +134,39 @@ public class AiImageServiceImpl implements AiImageService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Long midjourneyImagine(Long userId, AiImageMidjourneyImagineReqVO req) {
-        // TODO @fan：1 和 2 应该放在一个 1 里面。不然 = = 一个逻辑就显得有很多 1、/2、/3、/4；这么分的原因，是方便阅读的时候，容易理解。
-        // 1、构建 AiImageDO
-        // TODO @fan：1）aiImageDO 可以缩写成 image 更简洁；2）可以链式调用，把相同的放在一行里，这样更容易分组
-        AiImageDO aiImageDO = new AiImageDO();
-        aiImageDO.setUserId(userId);
-        aiImageDO.setPrompt(req.getPrompt());
-        aiImageDO.setPlatform(AiPlatformEnum.MIDJOURNEY.getPlatform());
-        aiImageDO.setModel(req.getModel());
-        aiImageDO.setWidth(req.getWidth());
-        aiImageDO.setHeight(req.getHeight());
-        aiImageDO.setStatus(AiImageStatusEnum.IN_PROGRESS.getStatus());
-        // 2、保存 image
-        imageMapper.insert(aiImageDO);
-        // TODO @fan：3 和 2 之间，应该空一行；因为这里是开始发起请求第三方，是个单独的小块逻辑
+        // 1、构建 AiImageDO 并 保存
+        AiImageDO image = new AiImageDO()
+                .setUserId(userId)
+                .setPrompt(req.getPrompt())
+                .setPlatform(AiPlatformEnum.MIDJOURNEY.getPlatform())
+                .setModel(req.getModel())
+                .setWidth(req.getWidth())
+                .setHeight(req.getHeight())
+                .setStatus(AiImageStatusEnum.IN_PROGRESS.getStatus());
+        imageMapper.insert(image);
+
         // 3、调用 MidjourneyProxy 提交任务
+
+        // 3.1、设置 midjourney 扩展参数
         MidjourneyImagineReqVO imagineReqVO = BeanUtils.toBean(req, MidjourneyImagineReqVO.class);
         imagineReqVO.setNotifyHook(midjourneyNotifyUrl);
-        // 4、设置 midjourney 扩展参数
         imagineReqVO.setState(buildParams(req.getWidth(),
                 req.getHeight(), req.getVersion(), MidjourneyModelEnum.valueOfModel(req.getModel())));
-        // 5、提交绘画请求
+        // 3.2、提交绘画请求
         // TODO @fan：5 这里，失败的情况，到底抛出异常，还是 RespVO，可以参考 OpenAI 的 API 封装
         MidjourneySubmitRespVO submitRespVO = midjourneyProxyClient.imagine(imagineReqVO);
-        // 6、保存任务 id (状态码: 1(提交成功), 21(已存在), 22(排队中), other(错误))
+
+        // 4、保存任务 id (状态码: 1(提交成功), 21(已存在), 22(排队中), other(错误))
         if (!MidjourneySubmitCodeEnum.SUCCESS_CODES.contains(submitRespVO.getCode())) {
             throw exception(AI_IMAGE_MIDJOURNEY_SUBMIT_FAIL, submitRespVO.getDescription());
         }
-        // TODO @fan：7 和 6 之间，应该空一行；这样，最终这个逻辑，就会有 2 个空行，3 小块逻辑：1）插入；2）调用；3）更新
-        // 7、构建 imageOptions 参数
-        // TODO @fan：1）链式调用；2）其实可以直接使用 AiImageMidjourneyImagineReqVO。不用单独一个 options 类哈。
-        MidjourneyImageOptions imageOptions = new MidjourneyImageOptions()
-                .setWidth(req.getWidth())
-                .setHeight(req.getHeight())
-                .setModel(req.getModel())
-                .setVersion(req.getVersion())
-                .setState(imagineReqVO.getState());
-        // 8、更新 taskId 和参数
+        // 4.1、更新 taskId 和参数
         imageMapper.updateById(new AiImageDO()
-                .setId(aiImageDO.getId())
+                .setId(image.getId())
                 .setTaskId(submitRespVO.getResult())
-                .setOptions(BeanUtil.beanToMap(imageOptions))
+                .setOptions(BeanUtil.beanToMap(req))
         );
-        return aiImageDO.getId();
+        return image.getId();
     }
 
 
@@ -191,23 +181,21 @@ public class AiImageServiceImpl implements AiImageService {
         imageMapper.deleteById(id);
     }
 
-    // TODO @fan：建议返回 void；然后如果不存在，就抛出异常哈；
     @Override
-    public Boolean midjourneyNotify(MidjourneyNotifyReqVO notifyReqVO) {
+    public void midjourneyNotify(MidjourneyNotifyReqVO notifyReqVO) {
         // 1、根据 job id 查询关联的 image
         AiImageDO image = imageMapper.selectByJobId(notifyReqVO.getId());
         if (image == null) {
             log.warn("midjourneyNotify 回调的 jobId 不存在! jobId: {}", notifyReqVO.getId());
-            return false;
         }
         // 2、转换状态
         AiImageDO updateImage = buildUpdateImage(image.getId(), notifyReqVO);
         // 3、更新 image 状态
-        return imageMapper.updateById(updateImage) > 0;
+        imageMapper.updateById(updateImage);
     }
 
     public AiImageDO buildUpdateImage(Long imageId, MidjourneyNotifyReqVO notifyReqVO) {
-        // 2、转换状态
+        // 1、转换状态
         String imageStatus = null;
         MidjourneyTaskStatusEnum taskStatusEnum = MidjourneyTaskStatusEnum.valueOf(notifyReqVO.getStatus());
         if (MidjourneyTaskStatusEnum.SUCCESS == taskStatusEnum) {
@@ -215,7 +203,8 @@ public class AiImageServiceImpl implements AiImageService {
         } else if (MidjourneyTaskStatusEnum.FAILURE == taskStatusEnum) {
             imageStatus = AiImageStatusEnum.FAIL.getStatus();
         }
-        // 3、上传图片
+
+        // 2、上传图片
         String filePath = null;
         if (!StrUtil.isBlank(notifyReqVO.getImageUrl())) {
             try {
@@ -224,7 +213,8 @@ public class AiImageServiceImpl implements AiImageService {
                 log.warn("midjourneyNotify 图片上传失败! {} 异常：{}", notifyReqVO.getImageUrl(), ExceptionUtil.getMessage(e));
             }
         }
-        // 4、更新 image 状态
+
+        // 3、更新 image 状态
         return new AiImageDO()
                 .setId(imageId)
                 .setStatus(imageStatus)
@@ -235,55 +225,60 @@ public class AiImageServiceImpl implements AiImageService {
                 .setErrorMessage(notifyReqVO.getFailReason());
     }
 
-    // TODO @fan：1）不用返回 Boolean
     @Override
-    @Transactional(rollbackFor = Exception.class) // TODO @fan：只操作一个 db，不用事务哈；
-    public Boolean midjourneyAction(Long loginUserId, Long imageId, String customId) {
-        // TODO @fan：1）1 和 2，可以写成 1.1、1.2，都是在做校验；2）validateCustomId 可以直接抛出 AI_IMAGE_CUSTOM_ID_NOT_EXISTS 异常；一般情况下，validateXXX 都是失败抛出异常，isXXXValid 返回 true、false
+    public void midjourneyAction(Long loginUserId, Long imageId, String customId) {
         // 1、检查 image
-        // TODO @fan：1）aiImageDO 缩写成 image；
-        AiImageDO aiImageDO = validateImageExists(imageId);
+        AiImageDO image = validateImageExists(imageId);
         // 2、检查 customId
-        if (!validateCustomId(customId, aiImageDO.getButtons())) {
-            throw exception(AI_IMAGE_CUSTOM_ID_NOT_EXISTS);
-        }
-        // TODO @fan：2 和 3 之间，空一行
+        validateCustomId(customId, image.getButtons());
+
         // 3、调用 midjourney proxy
         MidjourneySubmitRespVO submitRespVO = midjourneyProxyClient.action(
                 new MidjourneyActionReqVO()
                         .setCustomId(customId)
-                        .setTaskId(aiImageDO.getTaskId())
+                        .setTaskId(image.getTaskId())
                         .setNotifyHook(midjourneyNotifyUrl)
         );
-        // 6、保存任务 id (状态码: 1(提交成功), 21(已存在), 22(排队中), other(错误))
+        // 4、检查错误 code (状态码: 1(提交成功), 21(已存在), 22(排队中), other(错误))
         if (!MidjourneySubmitCodeEnum.SUCCESS_CODES.contains(submitRespVO.getCode())) {
             throw exception(AI_IMAGE_MIDJOURNEY_SUBMIT_FAIL, submitRespVO.getDescription());
         }
-        // TODO 6 和 4 之间空一行；
-        // 4、新增 image 记录
-        AiImageDO newImage = BeanUtils.toBean(aiImageDO, AiImageDO.class);
-        // TODO @fan：最好不要 copy 属性。因为未来如果加属性，可能会导致额外 copy 了；最好是 new 赋值下，显示声明。
-        // 4.1、重置参数
+
+        // 5、新增 image 记录(根据 image 新增一个)
+        AiImageDO newImage = new AiImageDO();
         newImage.setId(null);
+        newImage.setUserId(image.getUserId());
+        newImage.setPrompt(image.getPrompt());
+
+        newImage.setPlatform(image.getPlatform());
+        newImage.setModel(image.getModel());
+        newImage.setWidth(image.getWidth());
+        newImage.setHeight(image.getHeight());
+
         newImage.setStatus(AiImageStatusEnum.IN_PROGRESS.getStatus());
+        newImage.setPublicStatus(image.getPublicStatus());
+
         newImage.setPicUrl(null);
-        newImage.setResponse(null);
         newImage.setProgress(null);
+        newImage.setButtons(null);
+        newImage.setOptions(image.getOptions());
+        newImage.setResponse(image.getResponse());
         newImage.setTaskId(submitRespVO.getResult());
         newImage.setErrorMessage(null);
-        newImage.setButtons(null);
-        // 4.2、保存数据库
         imageMapper.insert(newImage);
-        return Boolean.TRUE;
     }
 
-    private static boolean validateCustomId(String customId, List<MidjourneyNotifyReqVO.Button> buttons) {
+    private static void validateCustomId(String customId, List<MidjourneyNotifyReqVO.Button> buttons) {
+        boolean isTrue = false;
         for (MidjourneyNotifyReqVO.Button button : buttons) {
             if (button.getCustomId().equals(customId)) {
-                return true;
+                isTrue = true;
+                break;
             }
         }
-        return false;
+        if (isTrue) {
+            throw exception(AI_IMAGE_CUSTOM_ID_NOT_EXISTS);
+        }
     }
 
     private AiImageDO validateImageExists(Long id) {
@@ -304,6 +299,7 @@ public class AiImageServiceImpl implements AiImageService {
     }
 
     // TODO @fan：这个是不是应该放在 MJ API 的封装里面搞哈？
+
     /**
      * 构建 Midjourney 自定义参数
      *

@@ -63,7 +63,7 @@ public interface AiImageService {
      * @param notifyReqVO
      * @return
      */
-    Boolean midjourneyNotify(MidjourneyNotifyReqVO notifyReqVO);
+    void midjourneyNotify(MidjourneyNotifyReqVO notifyReqVO);
 
     /**
      * 构建 midjourney - 更新对象
@@ -82,5 +82,5 @@ public interface AiImageService {
      * @param customId
      * @return
      */
-    Boolean midjourneyAction(Long loginUserId, Long imageId, String customId);
+    void midjourneyAction(Long loginUserId, Long imageId, String customId);
 }

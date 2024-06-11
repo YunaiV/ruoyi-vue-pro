@@ -74,16 +74,18 @@ public class AiImageController {
     @Operation(summary = "Midjourney 回调通知", description = "由 Midjourney Proxy 回调")
     @PostMapping("/midjourney-notify")
     @PermitAll
-    public CommonResult<Boolean> midjourneyNotify(@RequestBody MidjourneyNotifyReqVO notifyReqVO) {
-        return success(imageService.midjourneyNotify(notifyReqVO));
+    public void midjourneyNotify(@RequestBody MidjourneyNotifyReqVO notifyReqVO) {
+        imageService.midjourneyNotify(notifyReqVO);
     }
 
     @Operation(summary = "Midjourney Action", description = "例如说：放大、缩小、U1、U2 等")
     @GetMapping("/midjourney/action")
-    // TODO @fan：id、customerId 的 swagger 注解
+    @Parameter(name = "id", description = "图片id", example = "1")
+    @Parameter(name = "customId", description = "操作id", example = "MJ::JOB::upsample::1::85a4b4c1-8835-46c5-a15c-aea34fad1862")
     public CommonResult<Boolean> midjourneyAction(@RequestParam("id") Long imageId,
                                                   @RequestParam("customId") String customId) {
-        return success(imageService.midjourneyAction(getLoginUserId(), imageId, customId));
+        imageService.midjourneyAction(getLoginUserId(), imageId, customId);
+        return success(null);
     }
 
 }

@@ -103,7 +103,7 @@ public class AiImageDO extends BaseDO {
     private MidjourneyNotifyReqVO response;
 
     /**
-     * mj 进度
+     * mj 进度(10%、50%、100%)
      */
     private String progress;
 
