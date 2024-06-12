@@ -195,6 +195,9 @@ public class MidjourneyApi {
 
     // ====== enums
 
+    /**
+     * Midjourney - 模型
+     */
     @AllArgsConstructor
     @Getter
     public enum ModelEnum {
@@ -217,6 +220,9 @@ public class MidjourneyApi {
         }
     }
 
+    /**
+     * Midjourney - 提交返回的状态码
+     */
     @Getter
     @AllArgsConstructor
     public enum SubmitCodeEnum {
@@ -236,6 +242,9 @@ public class MidjourneyApi {
         private final String name;
     }
 
+    /**
+     * Midjourney - action
+     */
     @Getter
     @AllArgsConstructor
     public enum TaskActionEnum {
@@ -265,6 +274,9 @@ public class MidjourneyApi {
         BLEND
     }
 
+    /**
+     * Midjourney - 任务状态
+     */
     @Getter
     @AllArgsConstructor
     public enum TaskStatusEnum {
@@ -289,7 +301,6 @@ public class MidjourneyApi {
          */
         SUCCESS(4);
 
-        @Getter
         private final int order;
 
     }
