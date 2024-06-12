@@ -12,12 +12,12 @@ import cn.iocoder.yudao.module.system.service.permission.MenuService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.annotation.Resource;
+import jakarta.validation.Valid;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import jakarta.annotation.Resource;
-import jakarta.validation.Valid;
 import java.util.Comparator;
 import java.util.List;
 
@@ -50,7 +50,7 @@ public class MenuController {
 
     @DeleteMapping("/delete")
     @Operation(summary = "删除菜单")
-    @Parameter(name = "id", description = "菜单编号", required= true, example = "1024")
+    @Parameter(name = "id", description = "菜单编号", required = true, example = "1024")
     @PreAuthorize("@ss.hasPermission('system:menu:delete')")
     public CommonResult<Boolean> deleteMenu(@RequestParam("id") Long id) {
         menuService.deleteMenu(id);
@@ -62,7 +62,7 @@ public class MenuController {
     @PreAuthorize("@ss.hasPermission('system:menu:query')")
     public CommonResult<List<MenuRespVO>> getMenuList(MenuListReqVO reqVO) {
         List<MenuDO> list = menuService.getMenuList(reqVO);
-        list.sort(Comparator.comparing(MenuDO::getSort));
+        list.sort(Comparator.comparing(MenuDO::getSort).thenComparing(MenuDO::getPermission));
         return success(BeanUtils.toBean(list, MenuRespVO.class));
     }
 
