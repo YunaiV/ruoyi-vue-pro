@@ -49,6 +49,7 @@ public class BpmSimpleModelNodeVO {
      */
     @JsonIgnore
     private String attachNodeId;
+
     // Map<String, Integer> formPermissions; 表单权限；仅发起、审批、抄送节点会使用
     // Integer approveMethod; 审批方式；仅审批节点会使用
     // TODO @jason 后面和前端一起调整一下

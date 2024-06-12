@@ -353,6 +353,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
             return;
         } else if (userTaskRejectHandlerType == BpmUserTaskRejectHandlerType.FINISH_PROCESS_BY_REJECT_NUMBER) {
             // 3.3 按拒绝人数终止流程
+            // TODO @jason：建议抛出系统异常。类似 throw new IllegalStateException()
             if (!flowElement.hasMultiInstanceLoopCharacteristics()) {
                 log.error("[rejectTask] 用户任务拒绝处理类型配置错误, 按拒绝人数终止流程只能用于会签任务");
                 throw exception(GlobalErrorCodeConstants.ERROR_CONFIGURATION);

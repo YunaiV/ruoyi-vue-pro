@@ -30,6 +30,8 @@ public class MultiInstanceServiceTaskDelegate implements JavaDelegate {
         // 获取会签任务是否被拒绝
         Boolean userTaskRejected = execution.getVariable(String.format("%s_reject", attachUserTaskId), Boolean.class);
         // 如果会签任务被拒绝, 终止流程
+        // TODO @jason：【重要】需要测试下，如果基于 createChangeActivityStateBuilder()、changeState 到结束节点，实现审批不通过；
+        // 注意：需要考虑 bpmn 的高亮问题；（不过这个，未来可能会废弃掉！）
         if (BooleanUtil.isTrue(userTaskRejected)) {
             processInstanceService.updateProcessInstanceReject(execution.getProcessInstanceId(),
                     BpmCommentTypeEnum.REJECT.formatComment("会签任务拒绝人数满足条件"));

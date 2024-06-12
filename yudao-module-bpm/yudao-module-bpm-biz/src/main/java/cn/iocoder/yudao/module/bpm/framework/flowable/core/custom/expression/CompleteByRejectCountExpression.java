@@ -42,6 +42,7 @@ public class CompleteByRejectCountExpression {
         Integer approveMethod = NumberUtils.parseInt(BpmnModelUtils.parseExtensionElement(flowElement, USER_TASK_APPROVE_METHOD));
         Assert.notNull(approveMethod, "审批方式不能空");
         // 计算拒绝的人数
+        // TODO @jason：CollUtil.filter().size();貌似可以更简洁
         Integer rejectCount = CollectionUtils.getSumValue(execution.getExecutions(),
                 item -> Objects.equals(BpmTaskStatusEnum.REJECT.getStatus(), item.getVariableLocal(BpmConstants.TASK_VARIABLE_STATUS, Integer.class)) ? 1 : 0,
                 Integer::sum, 0);
@@ -81,4 +82,5 @@ public class CompleteByRejectCountExpression {
         log.error("[completionCondition] 按拒绝人数计算会签的完成条件的审批方式[{}]，配置有误", approveMethod);
         throw exception(GlobalErrorCodeConstants.ERROR_CONFIGURATION);
     }
+
 }
