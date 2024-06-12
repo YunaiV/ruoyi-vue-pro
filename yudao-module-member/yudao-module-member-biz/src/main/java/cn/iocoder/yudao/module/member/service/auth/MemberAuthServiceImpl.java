@@ -88,6 +88,12 @@ public class MemberAuthServiceImpl implements MemberAuthService {
         MemberUserDO user = userService.createUserIfAbsent(reqVO.getMobile(), userIp, getTerminal());
         Assert.notNull(user, "获取用户失败，结果为空");
 
+        // 校验是否禁用
+        if (ObjectUtil.notEqual(user.getStatus(), CommonStatusEnum.ENABLE.getStatus())) {
+            createLoginLog(user.getId(), reqVO.getMobile(), LoginLogTypeEnum.LOGIN_SMS, LoginResultEnum.USER_DISABLED);
+            throw exception(AUTH_LOGIN_USER_DISABLED);
+        }
+
         // 如果 socialType 非空，说明需要绑定社交用户
         String openid = null;
         if (reqVO.getSocialType() != null) {
