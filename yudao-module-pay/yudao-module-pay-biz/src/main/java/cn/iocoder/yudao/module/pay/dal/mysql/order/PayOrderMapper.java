@@ -18,6 +18,7 @@ public interface PayOrderMapper extends BaseMapperX<PayOrderDO> {
     default PageResult<PayOrderDO> selectPage(PayOrderPageReqVO reqVO) {
         return selectPage(reqVO, new LambdaQueryWrapperX<PayOrderDO>()
                 .eqIfPresent(PayOrderDO::getAppId, reqVO.getAppId())
+                .eqIfPresent(PayOrderDO::getUserId, reqVO.getUserId())
                 .eqIfPresent(PayOrderDO::getChannelCode, reqVO.getChannelCode())
                 .likeIfPresent(PayOrderDO::getMerchantOrderId, reqVO.getMerchantOrderId())
                 .likeIfPresent(PayOrderDO::getChannelOrderNo, reqVO.getChannelOrderNo())
