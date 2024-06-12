@@ -28,6 +28,10 @@ public class PayOrderCreateReqDTO implements Serializable {
     @NotEmpty(message = "用户 IP 不能为空")
     private String userIp;
 
+
+    @NotEmpty(message = "用户 Id 不能为空")
+    private Long userId;
+
     // ========== 商户相关字段 ==========
 
     /**
