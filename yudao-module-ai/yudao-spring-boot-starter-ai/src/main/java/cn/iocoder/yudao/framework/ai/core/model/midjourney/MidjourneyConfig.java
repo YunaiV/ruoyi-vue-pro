@@ -10,9 +10,18 @@ import lombok.Data;
  * @since 1.0
  */
 @Data
-public class MidjourneyProperties {
+public class MidjourneyConfig {
 
+    /**
+     * keys
+     */
     private String key;
+    /**
+     * 请求地址
+     */
     private String url;
+    /**
+     * 通知回调地址
+     */
     private String notifyUrl;
 }

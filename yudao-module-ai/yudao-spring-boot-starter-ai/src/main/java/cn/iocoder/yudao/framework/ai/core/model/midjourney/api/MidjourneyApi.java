@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.framework.ai.core.model.midjourney.api;
 
-import cn.iocoder.yudao.framework.ai.core.model.midjourney.MidjourneyProperties;
+import cn.iocoder.yudao.framework.ai.core.model.midjourney.MidjourneyConfig;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
@@ -29,13 +29,13 @@ public class MidjourneyApi {
     private static final String URI_ACTON = "/submit/action";
     private static final String URI_LIST_BY_CONDITION = "/task/list-by-condition";
     private final WebClient webClient;
-    private final MidjourneyProperties midjourneyProperties;
+    private final MidjourneyConfig midjourneyConfig;
 
-    public MidjourneyApi(MidjourneyProperties midjourneyProperties) {
-        this.midjourneyProperties = midjourneyProperties;
+    public MidjourneyApi(MidjourneyConfig midjourneyConfig) {
+        this.midjourneyConfig = midjourneyConfig;
         this.webClient = WebClient.builder()
-                .baseUrl(midjourneyProperties.getUrl())
-                .defaultHeaders(ApiUtils.getJsonContentHeaders(midjourneyProperties.getKey()))
+                .baseUrl(midjourneyConfig.getUrl())
+                .defaultHeaders(ApiUtils.getJsonContentHeaders(midjourneyConfig.getKey()))
                 .build();
     }
 
