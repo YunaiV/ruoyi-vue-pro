@@ -46,11 +46,11 @@ public class MidjourneyApi {
      * @param imagineReqVO
      * @return
      */
-    public MidjourneySubmitResponse imagine(MidjourneyImagineRequest imagineReqVO) {
+    public SubmitResponse imagine(ImagineRequest imagineReqVO) {
         // 1、发送 post 请求
         String res = post(URI_IMAGINE, imagineReqVO);
         // 2、转换 resp
-        return JsonUtils.parseObject(res, MidjourneySubmitResponse.class);
+        return JsonUtils.parseObject(res, SubmitResponse.class);
     }
 
     /**
@@ -58,11 +58,11 @@ public class MidjourneyApi {
      *
      * @param actionReqVO
      */
-    public MidjourneySubmitResponse action(MidjourneyActionRequest actionReqVO) {
+    public SubmitResponse action(ActionRequest actionReqVO) {
         // 1、发送 post 请求
         String res = post(URI_ACTON, actionReqVO);
         // 2、转换 resp
-        return JsonUtils.parseObject(res, MidjourneySubmitResponse.class);
+        return JsonUtils.parseObject(res, SubmitResponse.class);
     }
 
     /**
@@ -104,24 +104,23 @@ public class MidjourneyApi {
      * @param prompt 提示词
      * @param state 自定义参数
      */
-    public record MidjourneyImagineRequest(List<String> base64Array,
-                                          String notifyHook,
-                                          String prompt,
-                                          String state) {
+    public record ImagineRequest(List<String> base64Array,
+                                 String notifyHook,
+                                 String prompt,
+                                 String state) {
     }
 
     /**
      * Midjourney - Action 请求
      *
-     * @param customId 操作按钮id
-     * @param taskId 操作按钮id
+     * @param customId   操作按钮id
+     * @param taskId     操作按钮id
      * @param notifyHook 通知地址
-     * @param state 自定义参数
      */
-    public record MidjourneyActionRequest(String customId,
-                                          String taskId,
-                                          String notifyHook,
-                                          String state) {
+    public record ActionRequest(String customId,
+                                String taskId,
+                                String notifyHook
+    ) {
     }
 
     /**
@@ -132,10 +131,10 @@ public class MidjourneyApi {
      * @param properties 扩展字段
      * @param result 任务ID
      */
-    public record MidjourneySubmitResponse(String code,
-                                           String description,
-                                           Map<String, Object> properties,
-                                           String result) {
+    public record SubmitResponse(String code,
+                                 String description,
+                                 Map<String, Object> properties,
+                                 String result) {
     }
 
     /**

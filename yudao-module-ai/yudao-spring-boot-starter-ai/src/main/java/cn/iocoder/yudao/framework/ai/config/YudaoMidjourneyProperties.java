@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.ai.config;
+package cn.iocoder.yudao.framework.ai.config;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -14,9 +14,9 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @ConfigurationProperties(prefix = "ai.midjourney-proxy")
 @Data
-public class MidjourneyProperties {
+public class YudaoMidjourneyProperties {
 
+    private String enable;
     private String key;
     private String url;
-    private String notifyUrl;
 }

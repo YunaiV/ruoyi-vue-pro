@@ -20,8 +20,4 @@ public class MidjourneyConfig {
      * 请求地址
      */
     private String url;
-    /**
-     * 通知回调地址
-     */
-    private String notifyUrl;
 }
