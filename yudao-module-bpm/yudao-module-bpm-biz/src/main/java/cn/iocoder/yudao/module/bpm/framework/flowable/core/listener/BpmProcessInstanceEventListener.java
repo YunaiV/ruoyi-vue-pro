@@ -41,7 +41,7 @@ public class BpmProcessInstanceEventListener extends AbstractFlowableEngineEvent
 
     @Override
     protected void processCompleted(FlowableEngineEntityEvent event) {
-        processInstanceService.updateProcessInstanceWhenApprove((ProcessInstance)event.getEntity());
+        processInstanceService.updateProcessInstanceWhenCompleted((ProcessInstance)event.getEntity());
     }
 
 }

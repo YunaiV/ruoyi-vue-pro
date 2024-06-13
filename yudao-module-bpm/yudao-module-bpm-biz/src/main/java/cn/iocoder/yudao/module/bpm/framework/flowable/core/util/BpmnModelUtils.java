@@ -136,6 +136,12 @@ public class BpmnModelUtils {
         return (StartEvent) CollUtil.findOne(process.getFlowElements(), flowElement -> flowElement instanceof StartEvent);
     }
 
+    public static EndEvent getEndEvent(BpmnModel model) {
+        Process process = model.getMainProcess();
+        // 从 flowElementList 找 endEvent. TODO 多个 EndEvent 会有问题
+        return (EndEvent) CollUtil.findOne(process.getFlowElements(), flowElement -> flowElement instanceof EndEvent);
+    }
+
     public static BpmnModel getBpmnModel(byte[] bpmnBytes) {
         if (ArrayUtil.isEmpty(bpmnBytes)) {
             return null;

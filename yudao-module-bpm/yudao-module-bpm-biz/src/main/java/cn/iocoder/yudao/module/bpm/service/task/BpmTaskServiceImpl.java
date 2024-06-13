@@ -5,7 +5,6 @@ import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.date.DateUtils;
 import cn.iocoder.yudao.framework.common.util.number.NumberUtils;
@@ -353,19 +352,17 @@ public class BpmTaskServiceImpl implements BpmTaskService {
             return;
         } else if (userTaskRejectHandlerType == BpmUserTaskRejectHandlerType.FINISH_PROCESS_BY_REJECT_NUMBER) {
             // 3.3 按拒绝人数终止流程
-            // TODO @jason：建议抛出系统异常。类似 throw new IllegalStateException()
             if (!flowElement.hasMultiInstanceLoopCharacteristics()) {
-                log.error("[rejectTask] 用户任务拒绝处理类型配置错误, 按拒绝人数终止流程只能用于会签任务");
-                throw exception(GlobalErrorCodeConstants.ERROR_CONFIGURATION);
+                log.error("[rejectTask] 按拒绝人数终止流程类型,只能用于会签任务. 当前任务【{}】不是会签任务", task.getId());
+                throw new IllegalStateException("按拒绝人数终止流程类型,只能用于会签任务");
             }
             // 设置变量值为拒绝
             runtimeService.setVariableLocal(task.getExecutionId(), BpmConstants.TASK_VARIABLE_STATUS, BpmTaskStatusEnum.REJECT.getStatus());
-            // 完成任务
             taskService.complete(task.getId());
             return;
         }
-        // 3.4 其他情况 终止流程。 TODO 后续可能会增加处理类型
-        processInstanceService.updateProcessInstanceReject(instance.getProcessInstanceId(), reqVO.getReason());
+        // 3.4 其他情况 终止流程。
+        processInstanceService.updateProcessInstanceReject(instance.getProcessInstanceId(), task.getTaskDefinitionKey(),  reqVO.getReason());
     }
 
     /**
