@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.ai.client.vo;
+package cn.iocoder.yudao.module.ai.controller.admin.image.vo;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;

@@ -9,19 +9,13 @@ import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.spring.SpringUtil;
 import cn.hutool.http.HttpUtil;
 import cn.iocoder.yudao.framework.ai.core.enums.AiPlatformEnum;
+import cn.iocoder.yudao.framework.ai.core.model.midjourney.api.MidjourneyApi;
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
-import cn.iocoder.yudao.module.ai.client.MidjourneyProxyClient;
-import cn.iocoder.yudao.module.ai.client.enums.MidjourneyModelEnum;
-import cn.iocoder.yudao.module.ai.client.enums.MidjourneySubmitCodeEnum;
-import cn.iocoder.yudao.module.ai.client.enums.MidjourneyTaskStatusEnum;
-import cn.iocoder.yudao.module.ai.client.vo.MidjourneyActionReqVO;
-import cn.iocoder.yudao.module.ai.client.vo.MidjourneyImagineReqVO;
-import cn.iocoder.yudao.module.ai.client.vo.MidjourneyNotifyReqVO;
-import cn.iocoder.yudao.module.ai.client.vo.MidjourneySubmitRespVO;
 import cn.iocoder.yudao.module.ai.controller.admin.image.vo.AiImageDrawReqVO;
 import cn.iocoder.yudao.module.ai.controller.admin.image.vo.AiImageMidjourneyImagineReqVO;
+import cn.iocoder.yudao.module.ai.controller.admin.image.vo.MidjourneyNotifyReqVO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.image.AiImageDO;
 import cn.iocoder.yudao.module.ai.dal.mysql.image.AiImageMapper;
 import cn.iocoder.yudao.module.ai.enums.image.AiImageStatusEnum;
@@ -57,16 +51,12 @@ public class AiImageServiceImpl implements AiImageService {
 
     @Resource
     private AiImageMapper imageMapper;
-
     @Resource
     private FileApi fileApi;
-
     @Resource
     private AiApiKeyService apiKeyService;
-
     @Autowired
-    private MidjourneyProxyClient midjourneyProxyClient;
-
+    private MidjourneyApi midjourneyApi;
     @Value("${ai.midjourney-proxy.notifyUrl:http://127.0.0.1:48080/admin-api/ai/image/midjourney-notify}")
     private String midjourneyNotifyUrl;
 
@@ -148,22 +138,21 @@ public class AiImageServiceImpl implements AiImageService {
         // 3、调用 MidjourneyProxy 提交任务
 
         // 3.1、设置 midjourney 扩展参数
-        MidjourneyImagineReqVO imagineReqVO = BeanUtils.toBean(req, MidjourneyImagineReqVO.class);
-        imagineReqVO.setNotifyHook(midjourneyNotifyUrl);
-        imagineReqVO.setState(buildParams(req.getWidth(),
-                req.getHeight(), req.getVersion(), MidjourneyModelEnum.valueOfModel(req.getModel())));
+        MidjourneyApi.ImagineRequest imagineRequest = new MidjourneyApi.ImagineRequest(null, midjourneyNotifyUrl, req.getPrompt(),
+                buildParams(req.getWidth(), req.getHeight(), req.getVersion(),
+                        MidjourneyApi.ModelEnum.valueOfModel(req.getModel())));
         // 3.2、提交绘画请求
         // TODO @fan：5 这里，失败的情况，到底抛出异常，还是 RespVO，可以参考 OpenAI 的 API 封装
-        MidjourneySubmitRespVO submitRespVO = midjourneyProxyClient.imagine(imagineReqVO);
+        MidjourneyApi.SubmitResponse submitResponse = midjourneyApi.imagine(imagineRequest);
 
         // 4、保存任务 id (状态码: 1(提交成功), 21(已存在), 22(排队中), other(错误))
-        if (!MidjourneySubmitCodeEnum.SUCCESS_CODES.contains(submitRespVO.getCode())) {
-            throw exception(AI_IMAGE_MIDJOURNEY_SUBMIT_FAIL, submitRespVO.getDescription());
+        if (!MidjourneyApi.SubmitCodeEnum.SUCCESS_CODES.contains(submitResponse.code())) {
+            throw exception(AI_IMAGE_MIDJOURNEY_SUBMIT_FAIL, submitResponse.description());
         }
         // 4.1、更新 taskId 和参数
         imageMapper.updateById(new AiImageDO()
                 .setId(image.getId())
-                .setTaskId(submitRespVO.getResult())
+                .setTaskId(submitResponse.result())
                 .setOptions(BeanUtil.beanToMap(req))
         );
         return image.getId();
@@ -197,10 +186,10 @@ public class AiImageServiceImpl implements AiImageService {
     public AiImageDO buildUpdateImage(Long imageId, MidjourneyNotifyReqVO notifyReqVO) {
         // 1、转换状态
         String imageStatus = null;
-        MidjourneyTaskStatusEnum taskStatusEnum = MidjourneyTaskStatusEnum.valueOf(notifyReqVO.getStatus());
-        if (MidjourneyTaskStatusEnum.SUCCESS == taskStatusEnum) {
+        MidjourneyApi.TaskStatusEnum taskStatusEnum = MidjourneyApi.TaskStatusEnum.valueOf(notifyReqVO.getStatus());
+        if (MidjourneyApi.TaskStatusEnum.SUCCESS == taskStatusEnum) {
             imageStatus = AiImageStatusEnum.SUCCESS.getStatus();
-        } else if (MidjourneyTaskStatusEnum.FAILURE == taskStatusEnum) {
+        } else if (MidjourneyApi.TaskStatusEnum.FAILURE == taskStatusEnum) {
             imageStatus = AiImageStatusEnum.FAIL.getStatus();
         }
 
@@ -233,15 +222,11 @@ public class AiImageServiceImpl implements AiImageService {
         validateCustomId(customId, image.getButtons());
 
         // 3、调用 midjourney proxy
-        MidjourneySubmitRespVO submitRespVO = midjourneyProxyClient.action(
-                new MidjourneyActionReqVO()
-                        .setCustomId(customId)
-                        .setTaskId(image.getTaskId())
-                        .setNotifyHook(midjourneyNotifyUrl)
-        );
+        MidjourneyApi.SubmitResponse submitResponse = midjourneyApi.action(
+                new MidjourneyApi.ActionRequest(customId, image.getTaskId(), midjourneyNotifyUrl));
         // 4、检查错误 code (状态码: 1(提交成功), 21(已存在), 22(排队中), other(错误))
-        if (!MidjourneySubmitCodeEnum.SUCCESS_CODES.contains(submitRespVO.getCode())) {
-            throw exception(AI_IMAGE_MIDJOURNEY_SUBMIT_FAIL, submitRespVO.getDescription());
+        if (!MidjourneyApi.SubmitCodeEnum.SUCCESS_CODES.contains(submitResponse.code())) {
+            throw exception(AI_IMAGE_MIDJOURNEY_SUBMIT_FAIL, submitResponse.description());
         }
 
         // 5、新增 image 记录(根据 image 新增一个)
@@ -263,7 +248,7 @@ public class AiImageServiceImpl implements AiImageService {
         newImage.setButtons(null);
         newImage.setOptions(image.getOptions());
         newImage.setResponse(image.getResponse());
-        newImage.setTaskId(submitRespVO.getResult());
+        newImage.setTaskId(submitResponse.result());
         newImage.setErrorMessage(null);
         imageMapper.insert(newImage);
     }
@@ -309,14 +294,14 @@ public class AiImageServiceImpl implements AiImageService {
      * @param model
      * @return
      */
-    private String buildParams(Integer width, Integer height, String version, MidjourneyModelEnum model) {
+    private String buildParams(Integer width, Integer height, String version, MidjourneyApi.ModelEnum model) {
         StringBuilder params = new StringBuilder();
         //  --ar 来设置尺寸
         params.append(String.format(" --ar %s:%s ", width, height));
         // --v 版本
         params.append(String.format(" --v %s ", version));
         // --niji 模型
-        if (MidjourneyModelEnum.NIJI == model) {
+        if (MidjourneyApi.ModelEnum.NIJI == model) {
             params.append(" --niji ");
         }
         return params.toString();

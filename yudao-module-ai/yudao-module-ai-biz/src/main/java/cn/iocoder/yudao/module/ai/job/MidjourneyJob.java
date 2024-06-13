@@ -2,9 +2,9 @@ package cn.iocoder.yudao.module.ai.job;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.ai.core.enums.AiPlatformEnum;
+import cn.iocoder.yudao.framework.ai.core.model.midjourney.api.MidjourneyApi;
 import cn.iocoder.yudao.framework.quartz.core.handler.JobHandler;
-import cn.iocoder.yudao.module.ai.client.MidjourneyProxyClient;
-import cn.iocoder.yudao.module.ai.client.vo.MidjourneyNotifyReqVO;
+import cn.iocoder.yudao.module.ai.controller.admin.image.vo.MidjourneyNotifyReqVO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.image.AiImageDO;
 import cn.iocoder.yudao.module.ai.dal.mysql.image.AiImageMapper;
 import cn.iocoder.yudao.module.ai.enums.image.AiImageStatusEnum;
@@ -32,7 +32,7 @@ public class MidjourneyJob implements JobHandler {
 
     // TODO @fan：@Resource
     @Autowired
-    private MidjourneyProxyClient midjourneyProxyClient;
+    private MidjourneyApi midjourneyApi;
     @Autowired
     private AiImageMapper imageMapper;
     @Autowired
@@ -57,10 +57,10 @@ public class MidjourneyJob implements JobHandler {
         }
         // 2、批量拉去 task 信息
         // TODO @fan：imageList.stream().map(AiImageDO::getTaskId).collect(Collectors.toSet()))，可以使用 CollectionUtils.convertSet 简化
-        List<MidjourneyNotifyReqVO> taskList = midjourneyProxyClient
+        List<MidjourneyApi.NotifyRequest> taskList = midjourneyApi
                 .listByCondition(imageList.stream().map(AiImageDO::getTaskId).collect(Collectors.toSet()));
         // TODO @fan：taskList.stream().collect(Collectors.toMap(MidjourneyNotifyReqVO::getId, o -> o))，也可以使用 CollectionUtils.convertMap；本质上，重用 set、map 转换，要 convert 简化
-        Map<String, MidjourneyNotifyReqVO> taskIdMap = taskList.stream().collect(Collectors.toMap(MidjourneyNotifyReqVO::getId, o -> o));
+        Map<String, MidjourneyApi.NotifyRequest> taskIdMap = taskList.stream().collect(Collectors.toMap(MidjourneyApi.NotifyRequest::id, o -> o));
         // 3、更新 image 状态
         List<AiImageDO> updateImageList = new ArrayList<>();
         for (AiImageDO aiImageDO : imageList) {
@@ -71,10 +71,10 @@ public class MidjourneyJob implements JobHandler {
             }
             // TODO @ 3.1 和 3.2 是不是融合下；get，然后判空，continue；
             // 3.2 获取通知对象
-            MidjourneyNotifyReqVO notifyReqVO = taskIdMap.get(aiImageDO.getTaskId());
+//            MidjourneyNotifyReqVO notifyReqVO = taskIdMap.get(aiImageDO.getTaskId());
             // 3.2 构建更新对象
             // TODO @fan：建议 List<MidjourneyNotifyReqVO> 作为 imageService 去更新；
-            updateImageList.add(imageService.buildUpdateImage(aiImageDO.getId(), notifyReqVO));
+//            updateImageList.add(imageService.buildUpdateImage(aiImageDO.getId(), notifyReqVO));
         }
         // 4、批了更新 updateImageList
         imageMapper.updateBatch(updateImageList);
