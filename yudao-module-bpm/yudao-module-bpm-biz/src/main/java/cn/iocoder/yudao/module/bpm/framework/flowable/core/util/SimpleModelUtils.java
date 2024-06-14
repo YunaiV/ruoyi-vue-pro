@@ -506,7 +506,7 @@ public class SimpleModelUtils {
 
     private static void processMultiInstanceLoopCharacteristics(Integer approveMethod, Integer approveRatio, UserTask userTask) {
         BpmApproveMethodEnum bpmApproveMethodEnum = BpmApproveMethodEnum.valueOf(approveMethod);
-        if (bpmApproveMethodEnum == null || bpmApproveMethodEnum == BpmApproveMethodEnum.SINGLE_PERSON_APPROVE) {
+        if (bpmApproveMethodEnum == null || bpmApproveMethodEnum == BpmApproveMethodEnum.RANDOM_SELECT_ONE_APPROVE) {
             return;
         }
         // 添加审批方式的扩展属性
@@ -515,10 +515,7 @@ public class SimpleModelUtils {
         MultiInstanceLoopCharacteristics multiInstanceCharacteristics = new MultiInstanceLoopCharacteristics();
         //  设置 collectionVariable。本系统用不到。会在 仅仅为了校验。
         multiInstanceCharacteristics.setInputDataItem("${coll_userList}");
-        if (bpmApproveMethodEnum == BpmApproveMethodEnum.ALL_APPROVE) {
-            multiInstanceCharacteristics.setCompletionCondition(ALL_APPROVE_COMPLETE_EXPRESSION);
-            multiInstanceCharacteristics.setSequential(false);
-        } else if (bpmApproveMethodEnum == BpmApproveMethodEnum.ANY_APPROVE) {
+        if (bpmApproveMethodEnum == BpmApproveMethodEnum.ANY_APPROVE) {
             multiInstanceCharacteristics.setCompletionCondition(ANY_OF_APPROVE_COMPLETE_EXPRESSION);
             multiInstanceCharacteristics.setSequential(false);
             userTask.setLoopCharacteristics(multiInstanceCharacteristics);
@@ -527,9 +524,6 @@ public class SimpleModelUtils {
             multiInstanceCharacteristics.setSequential(true);
             multiInstanceCharacteristics.setLoopCardinality("1");
             userTask.setLoopCharacteristics(multiInstanceCharacteristics);
-        } else if (bpmApproveMethodEnum == BpmApproveMethodEnum.ANY_APPROVE_ALL_REJECT ){
-            multiInstanceCharacteristics.setCompletionCondition(COMPLETE_BY_REJECT_COUNT_EXPRESSION);
-            multiInstanceCharacteristics.setSequential(false);
         } else if (bpmApproveMethodEnum == BpmApproveMethodEnum.APPROVE_BY_RATIO) {
             multiInstanceCharacteristics.setCompletionCondition(COMPLETE_BY_REJECT_COUNT_EXPRESSION);
             multiInstanceCharacteristics.setSequential(false);

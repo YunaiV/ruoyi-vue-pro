@@ -15,7 +15,6 @@ import org.springframework.stereotype.Component;
 import java.util.Objects;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.module.bpm.enums.definition.BpmApproveMethodEnum.ANY_APPROVE_ALL_REJECT;
 import static cn.iocoder.yudao.module.bpm.enums.definition.BpmApproveMethodEnum.APPROVE_BY_RATIO;
 import static cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnModelConstants.USER_TASK_APPROVE_METHOD;
 import static cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnModelConstants.USER_TASK_APPROVE_RATIO;
@@ -41,46 +40,46 @@ public class CompleteByRejectCountExpression {
         // 审批方式
         Integer approveMethod = NumberUtils.parseInt(BpmnModelUtils.parseExtensionElement(flowElement, USER_TASK_APPROVE_METHOD));
         Assert.notNull(approveMethod, "审批方式不能空");
-        // 计算拒绝的人数
-        // TODO @jason：CollUtil.filter().size();貌似可以更简洁
+        if (!Objects.equals(APPROVE_BY_RATIO.getMethod(), approveMethod)) {
+            log.error("[completionCondition] the execution is [{}] 审批方式[{}] 不匹配", execution, approveMethod);
+            throw exception(GlobalErrorCodeConstants.ERROR_CONFIGURATION);
+        }
+        // 获取拒绝人数
+        // TODO @jason：CollUtil.filter().size();貌似可以更简洁 @芋艿 CollUtil.filter().size() 使用这个会报错，好坑了.
         Integer rejectCount = CollectionUtils.getSumValue(execution.getExecutions(),
                 item -> Objects.equals(BpmTaskStatusEnum.REJECT.getStatus(), item.getVariableLocal(BpmConstants.TASK_VARIABLE_STATUS, Integer.class)) ? 1 : 0,
                 Integer::sum, 0);
-        // 同意的人数为 完成人数 - 拒绝人数
+         // 同意人数： 完成人数 - 拒绝人数
         int agreeCount = nrOfCompletedInstances - rejectCount;
-        // 1. 多人会签(通过只需一人,拒绝需要全员)
-        if (Objects.equals(ANY_APPROVE_ALL_REJECT.getMethod(), approveMethod)) {
-            // 1.1 一人同意. 会签任务完成
-            if (agreeCount > 0) {
+        // 多人会签(按通过比例)
+        Integer approveRatio = NumberUtils.parseInt(BpmnModelUtils.parseExtensionElement(flowElement, USER_TASK_APPROVE_RATIO));
+        Assert.notNull(approveRatio, "通过比例不能空");
+        if (Objects.equals(100, approveRatio)) {
+            // 所有人都同意
+            if (agreeCount == nrOfInstances) {
                 return true;
-            } else {
-                // 1.2 所有人都拒绝了。设置任务拒绝变量, 会签任务完成。 后续终止流程在 ServiceTask【MultiInstanceServiceTaskExpression】处理
-                if (Objects.equals(nrOfInstances, rejectCount)) {
-                    execution.setVariable(String.format("%s_reject", flowElement.getId()), Boolean.TRUE);
-                    return true;
-                }
-                return false;
             }
-        } else if (Objects.equals(APPROVE_BY_RATIO.getMethod(), approveMethod)) {
-            Integer approveRatio = NumberUtils.parseInt(BpmnModelUtils.parseExtensionElement(flowElement, USER_TASK_APPROVE_RATIO));
-            Assert.notNull(approveRatio, "通过比例不能空");
-            double approvePct =  approveRatio / (double) 100;
-            double realApprovePct = (double) agreeCount / nrOfInstances;
+            // 一个人拒绝了
+            if (rejectCount > 0) {
+                execution.setVariable(String.format("%s_reject", flowElement.getId()), Boolean.TRUE);
+                return true;
+            }
+        } else {
             // 判断通过比例
+            double approvePct = approveRatio / (double) 100;
+            double realApprovePct = (double) agreeCount / nrOfInstances;
             if (realApprovePct >= approvePct) {
                 return true;
             }
-            double rejectPct =  (100 - approveRatio) / (double) 100;
+            double rejectPct = (100 - approveRatio) / (double) 100;
             double realRejectPct = (double) rejectCount / nrOfInstances;
             // 判断拒绝比例
             if (realRejectPct >= rejectPct) {
                 execution.setVariable(String.format("%s_reject", flowElement.getId()), Boolean.TRUE);
                 return true;
             }
-            return false;
         }
-        log.error("[completionCondition] 按拒绝人数计算会签的完成条件的审批方式[{}]，配置有误", approveMethod);
-        throw exception(GlobalErrorCodeConstants.ERROR_CONFIGURATION);
+        return false;
     }
 
 }

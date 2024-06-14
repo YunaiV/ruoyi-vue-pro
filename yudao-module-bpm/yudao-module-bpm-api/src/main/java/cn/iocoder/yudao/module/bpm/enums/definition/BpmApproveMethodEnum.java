@@ -6,7 +6,7 @@ import lombok.Getter;
 
 // TODO @芋艿：审批方式的名字，可能要看下；
 /**
- * BPM 审批方式的枚举
+ * BPM 多人审批方式的枚举
  *
  * @author jason
  */
@@ -14,12 +14,10 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum BpmApproveMethodEnum {
 
-    SINGLE_PERSON_APPROVE(1, "单人审批"),
-    ALL_APPROVE(2, "多人会签(需所有审批人同意)"), // 会签
-    APPROVE_BY_RATIO(3, "多人会签(按通过比例)"), // 会签（按通过比例）
-    ANY_APPROVE_ALL_REJECT(4, "多人会签(通过只需一人,拒绝需要全员)"), // 会签（通过只需一人，拒绝需要全员）
-    ANY_APPROVE(5, "多人或签(一名审批人通过即可)"), // 或签（通过只需一人，拒绝只需一人）
-    SEQUENTIAL_APPROVE(6, "依次审批"); // 依次审批
+    RANDOM_SELECT_ONE_APPROVE(1, "随机挑选一人审批"),
+    APPROVE_BY_RATIO(2, "多人会签(按通过比例)"), // 会签（按通过比例）
+    ANY_APPROVE(3, "多人或签(一人通过或拒绝)"), // 或签（通过只需一人，拒绝只需一人）
+    SEQUENTIAL_APPROVE(4, "依次审批"); // 依次审批
 
     /**
      * 审批方式
