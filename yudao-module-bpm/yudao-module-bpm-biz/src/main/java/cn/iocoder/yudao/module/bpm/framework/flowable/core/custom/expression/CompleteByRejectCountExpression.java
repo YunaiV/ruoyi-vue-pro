@@ -49,35 +49,23 @@ public class CompleteByRejectCountExpression {
         Integer rejectCount = CollectionUtils.getSumValue(execution.getExecutions(),
                 item -> Objects.equals(BpmTaskStatusEnum.REJECT.getStatus(), item.getVariableLocal(BpmConstants.TASK_VARIABLE_STATUS, Integer.class)) ? 1 : 0,
                 Integer::sum, 0);
-         // 同意人数： 完成人数 - 拒绝人数
+        // 同意人数： 完成人数 - 拒绝人数
         int agreeCount = nrOfCompletedInstances - rejectCount;
         // 多人会签(按通过比例)
         Integer approveRatio = NumberUtils.parseInt(BpmnModelUtils.parseExtensionElement(flowElement, USER_TASK_APPROVE_RATIO));
         Assert.notNull(approveRatio, "通过比例不能空");
-        if (Objects.equals(100, approveRatio)) {
-            // 所有人都同意
-            if (agreeCount == nrOfInstances) {
-                return true;
-            }
-            // 一个人拒绝了
-            if (rejectCount > 0) {
-                execution.setVariable(String.format("%s_reject", flowElement.getId()), Boolean.TRUE);
-                return true;
-            }
-        } else {
-            // 判断通过比例
-            double approvePct = approveRatio / (double) 100;
-            double realApprovePct = (double) agreeCount / nrOfInstances;
-            if (realApprovePct >= approvePct) {
-                return true;
-            }
-            double rejectPct = (100 - approveRatio) / (double) 100;
-            double realRejectPct = (double) rejectCount / nrOfInstances;
-            // 判断拒绝比例
-            if (realRejectPct >= rejectPct) {
-                execution.setVariable(String.format("%s_reject", flowElement.getId()), Boolean.TRUE);
-                return true;
-            }
+        // 判断通过比例
+        double approvePct = approveRatio / (double) 100;
+        double realApprovePct = (double) agreeCount / nrOfInstances;
+        if (realApprovePct >= approvePct) {
+            return true;
+        }
+        double rejectPct = (100 - approveRatio) / (double) 100;
+        double realRejectPct = (double) rejectCount / nrOfInstances;
+        // 判断拒绝比例
+        if (realRejectPct > rejectPct) {
+            execution.setVariable(String.format("%s_reject", flowElement.getId()), Boolean.TRUE);
+            return true;
         }
         return false;
     }
