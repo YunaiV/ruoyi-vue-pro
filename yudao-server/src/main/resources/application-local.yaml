@@ -52,13 +52,16 @@ spring:
           #          url: jdbc:oracle:thin:@127.0.0.1:1521:xe # Oracle 连接的示例
           #          url: jdbc:sqlserver://127.0.0.1:1433;DatabaseName=ruoyi-vue-pro;SelectMethod=cursor;encrypt=false;rewriteBatchedStatements=true;useUnicode=true;characterEncoding=utf-8 # SQLServer 连接的示例
           #          url: jdbc:dm://127.0.0.1:5236?schema=RUOYI_VUE_PRO # DM 连接的示例
-          #          url: jdbc:postgresql://127.0.0.1:54321/test  # KingbaseES 人大金仓 连接的示例, MyBatis不兼容官方驱动
+          #          url: jdbc:kingbase8://127.0.0.1:54321/test  # 人大金仓 KingbaseES 连接的示例
+          #          url: jdbc:postgresql://127.0.0.1:5432/postgres # OpenGauss 连接的示例
           username: root
           password: 123456
-        #          username: sa # SQL Server 连接的示例
-        #          password: Yudao@2024 # SQL Server 连接的示例
-        #          username: SYSDBA # DM 连接的示例
-        #          password: SYSDBA001 # DM 连接的示例
+          #          username: sa # SQL Server 连接的示例
+          #          password: Yudao@2024 # SQL Server 连接的示例
+          #          username: SYSDBA # DM 连接的示例
+          #          password: SYSDBA001 # DM 连接的示例
+          #          username: root # OpenGauss 连接的示例
+          #          password: Yudao@2024 # OpenGauss 连接的示例
         slave: # 模拟从库，可根据自己需要修改
           lazy: true # 开启懒加载，保证启动速度
           url: jdbc:mysql://127.0.0.1:3306/ruoyi-vue-pro?useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true&nullCatalogMeansCurrent=true

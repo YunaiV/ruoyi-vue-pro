@@ -30,6 +30,8 @@
         <easy-trans.version>2.2.11</easy-trans.version>
         <redisson.version>3.26.0</redisson.version>
         <dm8.jdbc.version>8.1.3.62</dm8.jdbc.version>
+        <kingbase.jdbc.version>8.6.0</kingbase.jdbc.version>
+        <opengauss.jdbc.version>5.0.2</opengauss.jdbc.version>
         <!-- 消息队列 -->
         <rocketmq-spring.version>2.3.0</rocketmq-spring.version>
         <!-- 服务保障相关 -->
@@ -240,6 +242,18 @@
                 <groupId>com.dameng</groupId>
                 <artifactId>DmJdbcDriver18</artifactId>
                 <version>${dm8.jdbc.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.opengauss</groupId>
+                <artifactId>opengauss-jdbc</artifactId>
+                <version>${opengauss.jdbc.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>cn.com.kingbase</groupId>
+                <artifactId>kingbase8</artifactId>
+                <version>${kingbase.jdbc.version}</version>
             </dependency>
 
             <!-- Job 定时任务相关 -->

@@ -53,6 +53,16 @@
             <artifactId>DmJdbcDriver18</artifactId>
             <optional>true</optional>
         </dependency>
+        <dependency>
+            <groupId>cn.com.kingbase</groupId>
+            <artifactId>kingbase8</artifactId>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>org.opengauss</groupId>
+            <artifactId>opengauss-jdbc</artifactId>
+            <optional>true</optional>
+        </dependency>
 
         <dependency>
             <groupId>com.alibaba</groupId>
