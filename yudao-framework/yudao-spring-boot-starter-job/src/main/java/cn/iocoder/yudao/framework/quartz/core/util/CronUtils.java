@@ -46,6 +46,10 @@ public class CronUtils {
         List<LocalDateTime> nextTimes = new ArrayList<>(n);
         for (int i = 0; i < n; i++) {
             Date nextTime = cron.getNextValidTimeAfter(now);
+            if (nextTime == null) {
+                // 如果 nextTime 为 null，说明没有更多的有效时间，退出循环
+                break;
+            }
             nextTimes.add(LocalDateTimeUtil.of(nextTime));
             // 切换现在，为下一个触发时间；
             now = nextTime;
