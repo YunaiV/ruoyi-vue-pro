@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.system.service.permission;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.system.controller.admin.permission.vo.menu.MenuListReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.permission.vo.menu.MenuSaveVO;
@@ -13,14 +14,15 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Lists;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
@@ -106,11 +108,59 @@ public class MenuServiceImpl implements MenuService {
 
     @Override
     public List<MenuDO> getMenuListByTenant(MenuListReqVO reqVO) {
-        List<MenuDO> menus = getMenuList(reqVO);
+        // 查询所有菜单，并过滤掉关闭的节点
+        List<MenuDO> menus = filterClosedNodes(getMenuList(reqVO));
         // 开启多租户的情况下，需要过滤掉未开通的菜单
         tenantService.handleTenantMenu(menuIds -> menus.removeIf(menu -> !CollUtil.contains(menuIds, menu.getId())));
         return menus;
     }
+
+    /**
+     * 过滤关闭的菜单节点及其子节点
+     *
+     * @param menuList 所有菜单列表
+     * @return 过滤后的菜单列表
+     */
+    public List<MenuDO> filterClosedNodes(List<MenuDO> menuList) {
+        // 根据parentId快速查找子节点
+        Map<Long, List<MenuDO>> childrenMap = menuList.stream()
+                .collect(Collectors.groupingBy(MenuDO::getParentId));
+
+        // 所有关闭的节点ID
+        Set<Long> closedNodeIds = new HashSet<>();
+
+        // 标记所有关闭的节点
+        for (MenuDO menu : menuList) {
+            if (Objects.equals(menu.getStatus(), CommonStatusEnum.DISABLE.getStatus())) {
+                markClosedNodes(menu.getId(), childrenMap, closedNodeIds);
+            }
+        }
+
+        // 过滤掉关闭的节点及其子节点
+        return menuList.stream()
+                .filter(menu -> !closedNodeIds.contains(menu.getId()))
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * 递归标记关闭的节点及其子节点
+     *
+     * @param nodeId 节点ID
+     * @param childrenMap 子节点Map
+     * @param closedNodeIds 关闭节点ID集合
+     */
+    private void markClosedNodes(Long nodeId, Map<Long,
+                                List<MenuDO>> childrenMap,
+                                 Set<Long> closedNodeIds) {
+        closedNodeIds.add(nodeId);
+        List<MenuDO> children = childrenMap.get(nodeId);
+        if (CollectionUtils.isNotEmpty(children)) {
+            for (MenuDO child : children) {
+                markClosedNodes(child.getId(), childrenMap, closedNodeIds);
+            }
+        }
+    }
+
 
     @Override
     public List<MenuDO> getMenuList(MenuListReqVO reqVO) {
@@ -135,7 +185,7 @@ public class MenuServiceImpl implements MenuService {
         if (CollUtil.isEmpty(ids)) {
             return Lists.newArrayList();
         }
-        return menuMapper.selectBatchIds(ids);
+        return filterClosedNodes(menuMapper.selectBatchIds(ids));
     }
 
     /**
