@@ -126,16 +126,18 @@ public class MenuServiceImpl implements MenuService {
         if(CollectionUtils.isEmpty(menuList)){
             return Collections.emptyList();
         }
+        List<MenuDO> allMenuList = getMenuList();
+
         // 根据parentId快速查找子节点
-        Map<Long, List<MenuDO>> childrenMap = menuList.stream()
+        Map<Long, List<MenuDO>> childrenMap = allMenuList.stream()
                 .collect(Collectors.groupingBy(MenuDO::getParentId));
 
         // 所有关闭的节点ID
         Set<Long> closedNodeIds = new HashSet<>();
 
         // 标记所有关闭的节点
-        for (MenuDO menu : menuList) {
-            if (Objects.equals(menu.getStatus(), CommonStatusEnum.DISABLE.getStatus())) {
+        for (MenuDO menu : allMenuList) {
+            if (!Objects.equals(menu.getStatus(), CommonStatusEnum.ENABLE.getStatus())) {
                 markClosedNodes(menu.getId(), childrenMap, closedNodeIds);
             }
         }
