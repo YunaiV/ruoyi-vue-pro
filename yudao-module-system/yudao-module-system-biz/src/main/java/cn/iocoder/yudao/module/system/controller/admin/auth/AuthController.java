@@ -109,6 +109,8 @@ public class AuthController {
         // 1.3 获得菜单列表
         Set<Long> menuIds = permissionService.getRoleMenuListByRoleId(convertSet(roles, RoleDO::getId));
         List<MenuDO> menuList = menuService.getMenuList(menuIds);
+        // 过滤掉关闭的菜单及其子菜单
+        menuList = menuService.filterClosedMenus(menuList);
 
         // 2. 拼接结果返回
         return success(AuthConvert.INSTANCE.convert(user, roles, menuList));

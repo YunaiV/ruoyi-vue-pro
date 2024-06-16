@@ -109,7 +109,7 @@ public class MenuServiceImpl implements MenuService {
     @Override
     public List<MenuDO> getMenuListByTenant(MenuListReqVO reqVO) {
         // 查询所有菜单，并过滤掉关闭的节点
-        List<MenuDO> menus = filterClosedNodes(getMenuList(reqVO));
+        List<MenuDO> menus = getMenuList(reqVO);
         // 开启多租户的情况下，需要过滤掉未开通的菜单
         tenantService.handleTenantMenu(menuIds -> menus.removeIf(menu -> !CollUtil.contains(menuIds, menu.getId())));
         return menus;
@@ -119,9 +119,13 @@ public class MenuServiceImpl implements MenuService {
      * 过滤关闭的菜单节点及其子节点
      *
      * @param menuList 所有菜单列表
-     * @return 过滤后的菜单列表
+     * @return
      */
-    public List<MenuDO> filterClosedNodes(List<MenuDO> menuList) {
+    @Override
+    public List<MenuDO> filterClosedMenus(List<MenuDO> menuList) {
+        if(CollectionUtils.isEmpty(menuList)){
+            return Collections.emptyList();
+        }
         // 根据parentId快速查找子节点
         Map<Long, List<MenuDO>> childrenMap = menuList.stream()
                 .collect(Collectors.groupingBy(MenuDO::getParentId));
@@ -135,8 +139,7 @@ public class MenuServiceImpl implements MenuService {
                 markClosedNodes(menu.getId(), childrenMap, closedNodeIds);
             }
         }
-
-        // 过滤掉关闭的节点及其子节点
+        // 移除掉关闭的节点及其子节点
         return menuList.stream()
                 .filter(menu -> !closedNodeIds.contains(menu.getId()))
                 .collect(Collectors.toList());
@@ -152,12 +155,13 @@ public class MenuServiceImpl implements MenuService {
     private void markClosedNodes(Long nodeId, Map<Long,
                                 List<MenuDO>> childrenMap,
                                  Set<Long> closedNodeIds) {
-        closedNodeIds.add(nodeId);
-        List<MenuDO> children = childrenMap.get(nodeId);
-        if (CollectionUtils.isNotEmpty(children)) {
-            for (MenuDO child : children) {
-                markClosedNodes(child.getId(), childrenMap, closedNodeIds);
-            }
+        // 如果已经标记过，则直接返回
+        if (!closedNodeIds.add(nodeId)) {
+            return;
+        }
+        List<MenuDO> children = childrenMap.getOrDefault(nodeId,Collections.emptyList());
+        for (MenuDO child : children) {
+            markClosedNodes(child.getId(), childrenMap, closedNodeIds);
         }
     }
 
@@ -185,7 +189,7 @@ public class MenuServiceImpl implements MenuService {
         if (CollUtil.isEmpty(ids)) {
             return Lists.newArrayList();
         }
-        return filterClosedNodes(menuMapper.selectBatchIds(ids));
+        return menuMapper.selectBatchIds(ids);
     }
 
     /**

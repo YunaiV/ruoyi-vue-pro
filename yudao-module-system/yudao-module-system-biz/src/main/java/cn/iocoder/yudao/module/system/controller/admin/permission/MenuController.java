@@ -71,7 +71,9 @@ public class MenuController {
             "在多租户的场景下，会只返回租户所在套餐有的菜单")
     public CommonResult<List<MenuSimpleRespVO>> getSimpleMenuList() {
         List<MenuDO> list = menuService.getMenuListByTenant(
-                new MenuListReqVO());
+                new MenuListReqVO().setStatus(CommonStatusEnum.ENABLE.getStatus()));
+        // 过滤掉关闭的菜单及其子菜单
+        list = menuService.filterClosedMenus(list);
         list.sort(Comparator.comparing(MenuDO::getSort));
         return success(BeanUtils.toBean(list, MenuSimpleRespVO.class));
     }
