@@ -112,7 +112,6 @@ public class AuthController {
         // 过滤掉关闭的菜单
         menuList = menuService.filterClosedMenus(menuList);
 
-        menuList.removeIf(menu -> !CommonStatusEnum.ENABLE.getStatus().equals(menu.getStatus())); // 移除禁用的菜单
         // 2. 拼接结果返回
         return success(AuthConvert.INSTANCE.convert(user, roles, menuList));
     }
