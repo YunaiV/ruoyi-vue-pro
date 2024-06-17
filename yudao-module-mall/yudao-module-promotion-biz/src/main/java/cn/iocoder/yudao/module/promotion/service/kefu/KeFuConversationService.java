@@ -2,11 +2,10 @@ package cn.iocoder.yudao.module.promotion.service.kefu;
 
 import cn.iocoder.yudao.module.promotion.controller.admin.kefu.vo.conversation.KeFuConversationUpdatePinnedReqVO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.kefu.KeFuConversationDO;
+import cn.iocoder.yudao.module.promotion.dal.dataobject.kefu.KeFuMessageDO;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
-// TODO @puhui999：可以在每个方法前面，加个【会员】【管理员】区分下
 /**
  * 客服会话 Service 接口
  *
@@ -15,48 +14,43 @@ import java.util.List;
 public interface KeFuConversationService {
 
     /**
-     * 删除客服会话
+     * 【管理员】删除客服会话
      *
      * @param id 编号
      */
     void deleteKefuConversation(Long id);
 
-    // TODO @puhui999：是不是方法名，体现出更新的是管理员的置顶哈
     /**
-     * 客服会话置顶
+     * 【管理员】客服会话置顶
      *
      * @param updateReqVO 请求
      */
-    void updatePinned(KeFuConversationUpdatePinnedReqVO updateReqVO);
+    void updateAdminPinned(KeFuConversationUpdatePinnedReqVO updateReqVO);
 
-    // TODO @puhui999：updateConversationLastMessage 会好点哈
     /**
      * 更新会话客服消息冗余信息
      *
-     * @param id                     编号
-     * @param lastMessageTime        最后聊天时间
-     * @param lastMessageContent     最后聊天内容
-     * @param lastMessageContentType 最后聊天内容类型
+     * @param kefuMessage 消息
      */
-    void updateConversationMessage(Long id, LocalDateTime lastMessageTime, String lastMessageContent, Integer lastMessageContentType);
+    void updateConversationLastMessage(KeFuMessageDO kefuMessage);
 
     /**
-     * 更新管理员未读消息数
+     * 【管理员】将管理员未读消息计数更新为零
      *
-     * @param id    编号
-     * @param count 数量：0 则重置 1 则消息数加一
+     * @param id 编号
      */
-    void updateAdminUnreadMessageCountByConversationId(Long id, Integer count);
+    void updateAdminUnreadMessageCountWithZero(Long id);
 
     /**
-     * 更新会话对于管理员是否可见
+     * 【管理员】更新会话对于管理员是否可见
      *
+     * @param id           编号
      * @param adminDeleted 管理员是否可见
      */
     void updateConversationAdminDeleted(Long id, Boolean adminDeleted);
 
     /**
-     * 获得客服会话列表
+     * 【管理员】获得客服会话列表
      *
      * @return 会话列表
      */
@@ -79,5 +73,13 @@ public interface KeFuConversationService {
      * @return 客服会话
      */
     KeFuConversationDO validateKefuConversationExists(Long id);
+
+    /**
+     * 【会员】获得客服会话
+     *
+     * @param userId 用户编号
+     * @return 客服会话
+     */
+    KeFuConversationDO getConversationByUserId(Long userId);
 
 }

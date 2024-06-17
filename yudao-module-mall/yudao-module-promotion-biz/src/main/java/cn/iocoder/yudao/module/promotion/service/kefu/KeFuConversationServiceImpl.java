@@ -1,11 +1,15 @@
 package cn.iocoder.yudao.module.promotion.service.kefu;
 
+import cn.hutool.core.util.StrUtil;
+import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.module.promotion.controller.admin.kefu.vo.conversation.KeFuConversationUpdatePinnedReqVO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.kefu.KeFuConversationDO;
+import cn.iocoder.yudao.module.promotion.dal.dataobject.kefu.KeFuMessageDO;
 import cn.iocoder.yudao.module.promotion.dal.mysql.kefu.KeFuConversationMapper;
 import cn.iocoder.yudao.module.promotion.enums.kehu.KeFuMessageContentTypeEnum;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import java.time.LocalDateTime;
@@ -36,19 +40,35 @@ public class KeFuConversationServiceImpl implements KeFuConversationService {
     }
 
     @Override
-    public void updatePinned(KeFuConversationUpdatePinnedReqVO updateReqVO) {
+    public void updateAdminPinned(KeFuConversationUpdatePinnedReqVO updateReqVO) {
         conversationMapper.updateById(new KeFuConversationDO().setId(updateReqVO.getId()).setAdminPinned(updateReqVO.getAdminPinned()));
     }
 
     @Override
-    public void updateConversationMessage(Long id, LocalDateTime lastMessageTime, String lastMessageContent, Integer lastMessageContentType) {
-        conversationMapper.updateById(new KeFuConversationDO().setId(id).setLastMessageTime(lastMessageTime)
-                .setLastMessageContent(lastMessageContent).setLastMessageContentType(lastMessageContentType));
+    @Transactional(rollbackFor = Exception.class)
+    public void updateConversationLastMessage(KeFuMessageDO kefuMessage) {
+        // 1.1 校验会话是否存在
+        KeFuConversationDO conversation = validateKefuConversationExists(kefuMessage.getConversationId());
+        // 1.2 更新会话消息冗余
+        conversationMapper.updateById(new KeFuConversationDO().setId(kefuMessage.getConversationId())
+                .setLastMessageTime(kefuMessage.getCreateTime()).setLastMessageContent(kefuMessage.getContent())
+                .setLastMessageContentType(kefuMessage.getContentType()));
+
+        // 2.2 更新管理员未读消息数
+        if (UserTypeEnum.MEMBER.getValue().equals(kefuMessage.getSenderType())) {
+            conversationMapper.updateAdminUnreadMessageCount(kefuMessage.getConversationId());
+        }
+        // 2.4 会员用户发送消息时，如果管理员删除过会话则进行恢复
+        if (UserTypeEnum.MEMBER.getValue().equals(kefuMessage.getSenderType())
+                && Boolean.TRUE.equals(conversation.getAdminDeleted())) {
+            updateConversationAdminDeleted(kefuMessage.getConversationId(), Boolean.FALSE);
+        }
     }
 
     @Override
-    public void updateAdminUnreadMessageCountByConversationId(Long id, Integer count) {
-        conversationMapper.updateAdminUnreadMessageCountByConversationId(id, count);
+    public void updateAdminUnreadMessageCountWithZero(Long id) {
+        validateKefuConversationExists(id);
+        conversationMapper.updateAdminUnreadMessageCountWithZero(id);
     }
 
     @Override
@@ -58,17 +78,16 @@ public class KeFuConversationServiceImpl implements KeFuConversationService {
 
     @Override
     public List<KeFuConversationDO> getKefuConversationList() {
-        return conversationMapper.selectListWithSort();
+        return conversationMapper.selectConversationList();
     }
 
-    // TODO @puhui999：貌似这个对话，得用户主动创建。不然管理员会看到一个空的对话？
     @Override
     public KeFuConversationDO getOrCreateConversation(Long userId) {
         KeFuConversationDO conversation = conversationMapper.selectOne(KeFuConversationDO::getUserId, userId);
         // 没有历史会话，则初始化一个新会话
         if (conversation == null) {
             conversation = new KeFuConversationDO().setUserId(userId).setLastMessageTime(LocalDateTime.now())
-                    .setLastMessageContent("").setLastMessageContentType(KeFuMessageContentTypeEnum.TEXT.getType())
+                    .setLastMessageContent(StrUtil.EMPTY).setLastMessageContentType(KeFuMessageContentTypeEnum.TEXT.getType())
                     .setAdminPinned(Boolean.FALSE).setUserDeleted(Boolean.FALSE).setAdminDeleted(Boolean.FALSE)
                     .setAdminUnreadMessageCount(0);
             conversationMapper.insert(conversation);
@@ -83,6 +102,11 @@ public class KeFuConversationServiceImpl implements KeFuConversationService {
             throw exception(KEFU_CONVERSATION_NOT_EXISTS);
         }
         return conversation;
+    }
+
+    @Override
+    public KeFuConversationDO getConversationByUserId(Long userId) {
+        return conversationMapper.selectOne(KeFuConversationDO::getUserId, userId);
     }
 
 }

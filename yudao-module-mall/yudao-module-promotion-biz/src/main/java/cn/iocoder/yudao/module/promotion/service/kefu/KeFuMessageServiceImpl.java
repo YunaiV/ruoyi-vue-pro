@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.promotion.service.kefu;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
@@ -9,6 +10,8 @@ import cn.iocoder.yudao.module.infra.api.websocket.WebSocketSenderApi;
 import cn.iocoder.yudao.module.member.api.user.MemberUserApi;
 import cn.iocoder.yudao.module.promotion.controller.admin.kefu.vo.message.KeFuMessagePageReqVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.kefu.vo.message.KeFuMessageSendReqVO;
+import cn.iocoder.yudao.module.promotion.controller.app.kefu.vo.message.AppKeFuMessagePageReqVO;
+import cn.iocoder.yudao.module.promotion.controller.app.kefu.vo.message.AppKeFuMessageSendReqVO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.kefu.KeFuConversationDO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.kefu.KeFuMessageDO;
 import cn.iocoder.yudao.module.promotion.dal.mysql.kefu.KeFuMessageMapper;
@@ -19,11 +22,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
-import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 
-import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
-import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.getFirst;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
+import static cn.iocoder.yudao.module.promotion.enums.WebSocketMessageTypeConstants.KEFU_MESSAGE_ADMIN_READ;
+import static cn.iocoder.yudao.module.promotion.enums.WebSocketMessageTypeConstants.KEFU_MESSAGE_TYPE;
 
 /**
  * 客服消息 Service 实现类
@@ -34,16 +38,10 @@ import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.
 @Validated
 public class KeFuMessageServiceImpl implements KeFuMessageService {
 
-    // TODO @puhui999：@芋艿：捉摸要不要拿到一个地方枚举；
-    private static final String KEFU_MESSAGE_TYPE = "kefu_message_type"; // 客服消息类型
-
-    // TODO @puhui999：kefuMessageMapper；因为 messageMapper 可能会重叠
     @Resource
-    private KeFuMessageMapper messageMapper;
-
+    private KeFuMessageMapper keFuMessageMapper;
     @Resource
     private KeFuConversationService conversationService;
-
     @Resource
     private AdminUserApi adminUserApi;
     @Resource
@@ -55,26 +53,15 @@ public class KeFuMessageServiceImpl implements KeFuMessageService {
     @Transactional(rollbackFor = Exception.class)
     public Long sendKefuMessage(KeFuMessageSendReqVO sendReqVO) {
         // 1.1 校验会话是否存在
-        KeFuConversationDO conversation = conversationService.validateKefuConversationExists(sendReqVO.getConversationId());
+        conversationService.validateKefuConversationExists(sendReqVO.getConversationId());
         // 1.2 校验接收人是否存在
         validateReceiverExist(sendReqVO.getReceiverId(), sendReqVO.getReceiverType());
 
         // 2.1 保存消息
         KeFuMessageDO kefuMessage = BeanUtils.toBean(sendReqVO, KeFuMessageDO.class);
-        messageMapper.insert(kefuMessage);
-        // TODO @puhui999：是不是 updateConversationMessage，里面统一处理未读、恢复；直接设置 KeFuMessageDO 作为参数好了。。。
+        keFuMessageMapper.insert(kefuMessage);
         // 2.2 更新会话消息冗余
-        conversationService.updateConversationMessage(kefuMessage.getConversationId(), LocalDateTime.now(),
-                kefuMessage.getContent(), kefuMessage.getContentType());
-        // 2.3 更新管理员未读消息数
-        if (UserTypeEnum.ADMIN.getValue().equals(kefuMessage.getReceiverType())) {
-            conversationService.updateAdminUnreadMessageCountByConversationId(kefuMessage.getConversationId(), 1);
-        }
-        // 2.4 会员用户发送消息时，如果管理员删除过会话则进行恢复
-        // TODO @puhui999：建议 && 换一行
-        if (UserTypeEnum.MEMBER.getValue().equals(kefuMessage.getSenderType()) && Boolean.TRUE.equals(conversation.getAdminDeleted())) {
-            conversationService.updateConversationAdminDeleted(kefuMessage.getConversationId(), Boolean.FALSE);
-        }
+        conversationService.updateConversationLastMessage(kefuMessage);
 
         // 3. 发送消息
         getSelf().sendAsyncMessage(sendReqVO.getReceiverType(), sendReqVO.getReceiverId(), kefuMessage);
@@ -82,31 +69,44 @@ public class KeFuMessageServiceImpl implements KeFuMessageService {
     }
 
     @Override
+    public Long sendKefuMessage(AppKeFuMessageSendReqVO sendReqVO) {
+        // 1.1 设置会话编号
+        KeFuMessageDO kefuMessage = BeanUtils.toBean(sendReqVO, KeFuMessageDO.class);
+        KeFuConversationDO conversation = conversationService.getOrCreateConversation(sendReqVO.getSenderId());
+        kefuMessage.setConversationId(conversation.getId());
+        // 1.2 保存消息
+        keFuMessageMapper.insert(kefuMessage);
+
+        // 2. 更新会话消息冗余
+        conversationService.updateConversationLastMessage(kefuMessage);
+        // 3. 发送消息
+        getSelf().sendAsyncMessageToAdmin(kefuMessage);
+        return kefuMessage.getId();
+    }
+
+    @Override
     @Transactional(rollbackFor = Exception.class)
-    public void updateKefuMessageReadStatus(Long conversationId, Long receiverId) {
+    public void updateKefuMessageReadStatus(Long conversationId) {
         // 1.1 校验会话是否存在
         conversationService.validateKefuConversationExists(conversationId);
-        // 1.2 查询接收人所有的未读消息
-        // TODO @puhui999：应该不能 receiverId 过滤哈。因为多个客服，一个人点了，就都点了。
-        List<KeFuMessageDO> messageList = messageMapper.selectListByConversationIdAndReceiverIdAndReadStatus(
-                conversationId, receiverId, Boolean.FALSE);
+        // 1.2 查询会话所有的未读消息 (tips: 多个客服，一个人点了，就都点了)
+        List<KeFuMessageDO> messageList = keFuMessageMapper.selectListByConversationIdAndReadStatus(conversationId, Boolean.FALSE);
         // 1.3 情况一：没有未读消息
         if (CollUtil.isEmpty(messageList)) {
             return;
         }
 
         // 2.1 情况二：更新未读消息状态为已读
-        messageMapper.updateReadStstusBatchByIds(convertSet(messageList, KeFuMessageDO::getId), Boolean.TRUE);
-        // 2.2 更新管理员未读消息数
-        KeFuMessageDO message = getFirst(messageList);
-        assert message != null;
-        if (UserTypeEnum.ADMIN.getValue().equals(message.getReceiverType())) {
-            conversationService.updateAdminUnreadMessageCountByConversationId(conversationId, 0);
-        }
+        keFuMessageMapper.updateReadStatusBatchByIds(convertSet(messageList, KeFuMessageDO::getId),
+                new KeFuMessageDO().setReadStatus(Boolean.TRUE));
+        // 2.2 将管理员未读消息计数更新为零
+        conversationService.updateAdminUnreadMessageCountWithZero(conversationId);
 
-        // 2.3 发送消息通知发送者，接收者已读 -> 发送者更新发送的消息状态
+        // 2.3 发送消息通知会员，管理员已读 -> 会员更新发送的消息状态
         // TODO @puhui999：待定~
-        getSelf().sendAsyncMessage(message.getSenderType(), message.getSenderId(), "keFuMessageReadStatusChange");
+        KeFuMessageDO keFuMessage = getFirst(filterList(messageList, message -> UserTypeEnum.MEMBER.getValue().equals(message.getSenderType())));
+        assert keFuMessage != null; // 断言避免警告
+        webSocketSenderApi.sendObject(UserTypeEnum.MEMBER.getValue(), keFuMessage.getSenderId(), KEFU_MESSAGE_ADMIN_READ, StrUtil.EMPTY);
     }
 
     private void validateReceiverExist(Long receiverId, Integer receiverType) {
@@ -123,9 +123,26 @@ public class KeFuMessageServiceImpl implements KeFuMessageService {
         webSocketSenderApi.sendObject(userType, userId, KEFU_MESSAGE_TYPE, content);
     }
 
+    @Async
+    public void sendAsyncMessageToAdmin(Object content) {
+        webSocketSenderApi.sendObject(UserTypeEnum.ADMIN.getValue(), KEFU_MESSAGE_TYPE, content);
+    }
+
     @Override
     public PageResult<KeFuMessageDO> getKefuMessagePage(KeFuMessagePageReqVO pageReqVO) {
-        return messageMapper.selectPage(pageReqVO);
+        return keFuMessageMapper.selectPage(pageReqVO);
+    }
+
+    @Override
+    public PageResult<KeFuMessageDO> getKefuMessagePage(AppKeFuMessagePageReqVO pageReqVO, Long userId) {
+        // 1. 获得客服会话
+        KeFuConversationDO conversation = conversationService.getConversationByUserId(userId);
+        if (conversation == null) {
+            return PageResult.empty();
+        }
+        // 2. 设置会话编号
+        pageReqVO.setConversationId(conversation.getId());
+        return keFuMessageMapper.selectPage(pageReqVO);
     }
 
     private KeFuMessageServiceImpl getSelf() {

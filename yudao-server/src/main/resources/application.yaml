@@ -156,7 +156,7 @@ yudao:
       - /admin-api/mp/open/** # 微信公众号开放平台，微信回调接口，不需要登录
   websocket:
     enable: true # websocket的开关
-    path: /infra/ws # 路径
+    path: /infra/ws/ # 路径 // TODO @puhui999: 小程序 socket.io 连接会多一个 / 🤣🤣🤣
     sender-type: local # 消息发送的类型，可选值为 local、redis、rocketmq、kafka、rabbitmq
     sender-rocketmq:
       topic: ${spring.application.name}-websocket # 消息发送的 RocketMQ Topic
