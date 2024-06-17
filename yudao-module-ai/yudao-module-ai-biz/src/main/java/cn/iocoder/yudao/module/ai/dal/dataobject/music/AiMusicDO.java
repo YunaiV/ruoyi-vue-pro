@@ -18,6 +18,8 @@ import java.util.stream.Collectors;
 @TableName("ai_music")
 @Data
 public class AiMusicDO extends BaseDO {
+
+    // TODO @xin：@Schema 只在 VO 里使用，这里还是使用标准的注释哈
     @TableId(type = IdType.AUTO)
     @Schema(description = "编号")
     private Long id;
@@ -40,6 +42,7 @@ public class AiMusicDO extends BaseDO {
     @Schema(description = "视频地址")
     private String videoUrl;
 
+    // TODO @xin：需要关联下对应的枚举
     @Schema(description = "音乐状态")
     private String status;
 
@@ -49,19 +52,24 @@ public class AiMusicDO extends BaseDO {
     @Schema(description = "提示词")
     private String prompt;
 
+    // TODO @xin：生成模式，需要记录下；歌词、描述
+
+    // TODO @xin：多存储一个平台，platform；考虑未来可能有别的音乐接口
     @Schema(description = "模型")
     private String model;
 
     @Schema(description = "错误信息")
     private String errorMessage;
 
+    // TODO @xin：tags 要不要使用 List<String>
+
     @Schema(description = "音乐风格标签")
     private String tags;
 
-    @Schema(description = "任务id")
+    @Schema(description = "任务编号")
     private String taskId;
 
-
+    // TODO @xin：转换不放在 DO 里面哈。
 
     public static AiMusicDO convertFrom(SunoApi.MusicData musicData) {
         return new AiMusicDO()
@@ -83,6 +91,5 @@ public class AiMusicDO extends BaseDO {
                 .map(AiMusicDO::convertFrom)
                 .collect(Collectors.toList());
     }
-
 
 }

@@ -17,6 +17,7 @@ import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
+// TODO @xin：AI 前缀；都要加下哈
 @Tag(name = "管理后台 - AI 音乐生成")
 @RestController
 @RequestMapping("/ai/music")

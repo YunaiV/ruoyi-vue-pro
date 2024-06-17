@@ -118,8 +118,9 @@ public class YudaoAiProperties {
     public static class SunoProperties {
 
         private boolean enable = false;
+
         /**
-         * suno-api 服务的基本地址
+         * API 服务的基本地址
          */
         private String baseUrl;
 
