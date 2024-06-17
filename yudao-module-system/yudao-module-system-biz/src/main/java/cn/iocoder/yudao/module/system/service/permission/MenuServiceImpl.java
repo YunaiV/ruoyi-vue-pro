@@ -22,6 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
@@ -119,54 +120,54 @@ public class MenuServiceImpl implements MenuService {
      * 过滤关闭的菜单节点及其子节点
      *
      * @param menuList 所有菜单列表
-     * @return
+     * @return List<MenuDO> 过滤后的菜单列表
      */
     @Override
-    public List<MenuDO> filterClosedMenus(List<MenuDO> menuList) {
+    public List<MenuDO> filterDisableMenus(List<MenuDO> menuList) {
         if(CollectionUtils.isEmpty(menuList)){
             return Collections.emptyList();
         }
-        List<MenuDO> allMenuList = getMenuList();
 
-        // 根据parentId快速查找子节点
-        Map<Long, List<MenuDO>> childrenMap = allMenuList.stream()
-                .collect(Collectors.groupingBy(MenuDO::getParentId));
+        Map<Long, MenuDO> menuMap = new HashMap<>();
 
-        // 所有关闭的节点ID
-        Set<Long> closedNodeIds = new HashSet<>();
+        for (MenuDO menuDO : menuList) {
+            menuMap.put(menuDO.getId(),menuDO);
+        }
 
-        // 标记所有关闭的节点
-        for (MenuDO menu : allMenuList) {
-            if (!Objects.equals(menu.getStatus(), CommonStatusEnum.ENABLE.getStatus())) {
-                markClosedNodes(menu.getId(), childrenMap, closedNodeIds);
+        // 存下递归搜索过被禁用的菜单，防止重复的搜索
+        Set<Long> disabledMenuIds = new HashSet<>();
+
+        List<MenuDO> enabledMenus = new ArrayList<>();
+        for (MenuDO menu : menuList) {
+            if (!isMenuDisabled(menu, menuMap, disabledMenuIds)) {
+                enabledMenus.add(menu);
             }
         }
-        // 移除掉关闭的节点及其子节点
-        return menuList.stream()
-                .filter(menu -> !closedNodeIds.contains(menu.getId()))
-                .collect(Collectors.toList());
+        return enabledMenus;
     }
 
-    /**
-     * 递归标记关闭的节点及其子节点
-     *
-     * @param nodeId 节点ID
-     * @param childrenMap 子节点Map
-     * @param closedNodeIds 关闭节点ID集合
-     */
-    private void markClosedNodes(Long nodeId, Map<Long,
-                                List<MenuDO>> childrenMap,
-                                 Set<Long> closedNodeIds) {
-        // 如果已经标记过，则直接返回
-        if (!closedNodeIds.add(nodeId)) {
-            return;
+    private boolean isMenuDisabled(MenuDO node, Map<Long, MenuDO> menuMap, Set<Long> disabledMenuIds) {
+        if (disabledMenuIds.contains(node.getId())) {
+            return true;
         }
-        List<MenuDO> children = childrenMap.getOrDefault(nodeId,Collections.emptyList());
-        for (MenuDO child : children) {
-            markClosedNodes(child.getId(), childrenMap, closedNodeIds);
-        }
-    }
 
+        Long parentId = node.getParentId();
+        if (parentId == 0) {
+            if (!node.getStatus().equals(CommonStatusEnum.ENABLE.getStatus())) {
+                disabledMenuIds.add(node.getId());
+                return true;
+            }
+            return false;
+        }
+
+        MenuDO parent = menuMap.get(parentId);
+        if (parent == null || isMenuDisabled(parent, menuMap, disabledMenuIds)) {
+            disabledMenuIds.add(node.getId());
+            return true;
+        }
+
+        return false;
+    }
 
     @Override
     public List<MenuDO> getMenuList(MenuListReqVO reqVO) {

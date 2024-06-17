@@ -55,10 +55,10 @@ public interface MenuService {
     /**
      * 过滤掉关闭的菜单及其子菜单
      *
-     * @param menuList
-     * @return
+     * @param list 菜单列表
+     * @return List<MenuDO> 过滤后的菜单列表
      */
-    List<MenuDO> filterClosedMenus(List<MenuDO> menuList);
+    List<MenuDO> filterDisableMenus(List<MenuDO> list);
 
     /**
      * 筛选菜单列表

@@ -72,8 +72,7 @@ public class MenuController {
     public CommonResult<List<MenuSimpleRespVO>> getSimpleMenuList() {
         List<MenuDO> list = menuService.getMenuListByTenant(
                 new MenuListReqVO().setStatus(CommonStatusEnum.ENABLE.getStatus()));
-        // 过滤掉关闭的菜单及其子菜单
-        list = menuService.filterClosedMenus(list);
+        list = menuService.filterDisableMenus(list);
         list.sort(Comparator.comparing(MenuDO::getSort));
         return success(BeanUtils.toBean(list, MenuSimpleRespVO.class));
     }
