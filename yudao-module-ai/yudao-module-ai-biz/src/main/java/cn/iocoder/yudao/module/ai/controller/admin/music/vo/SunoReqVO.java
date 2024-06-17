@@ -2,39 +2,21 @@ package cn.iocoder.yudao.module.ai.controller.admin.music.vo;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
-import lombok.experimental.Accessors;
 
 @Data
-@Accessors(chain = true)
 @JsonInclude(value = JsonInclude.Include.NON_NULL)
 public class SunoReqVO {
     /**
      * 用于生成音乐音频的提示
      */
     private String prompt;
-
     /**
-     * 用于生成音乐音频的歌词
+     *  是否纯音乐
      */
-    private String lyric;
-
+    private boolean makeInstrumental;
     /**
-     * 指示音乐音频是否为定制，如果为 true，则从歌词生成，否则从提示生成
+     * //todo 首次请求返回的模型是对的，后续更新音频返回的模型又变成v3.5了
+     * 模型版本  {@link cn.iocoder.yudao.module.ai.enums.AiModelEnum} Suno
      */
-    private boolean custom;
-
-    /**
-     * 音乐音频的标题
-     */
-    private String title;
-
-    /**
-     * 音乐音频的风格
-     */
-    private String style;
-
-    /**
-     * 音乐音频生成后回调的 URL
-     */
-    private String callbackUrl;
+    private String mv;
 }

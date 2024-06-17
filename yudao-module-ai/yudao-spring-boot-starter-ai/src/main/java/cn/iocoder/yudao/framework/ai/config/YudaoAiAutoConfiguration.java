@@ -151,7 +151,7 @@ public class YudaoAiAutoConfiguration {
     @Bean
     @ConditionalOnProperty(value = "yudao.ai.suno.enable", havingValue = "true")
     public SunoApi sunoApi(YudaoAiProperties yudaoAiProperties) {
-        return new SunoApi(new SunoConfig(yudaoAiProperties.getSuno().getToken()));
+        return new SunoApi(new SunoConfig(yudaoAiProperties.getSuno().getBaseUrl()));
     }
 
     private static @NotNull MidjourneyConfig getMidjourneyConfig(ApplicationContext applicationContext,

@@ -49,6 +49,11 @@ public enum AiModelEnum {
     XING_HUO_2_0("星火大模型2.0", "generalv2", "/v2.1/chat"),
     XING_HUO_3_0("星火大模型3.0", "generalv3", "/v3.1/chat"),
     XING_HUO_3_5("星火大模型3.5", "generalv3.5", "/v3.5/chat"),
+
+    //Suno
+    SUNO_2( "SUNO-2", "chirp-v2-xxl-alpha",null),
+    SUNO_3_0( "SUNO-3.0", "chirp-v3-0",null),
+    SUNO_3_5( "SUNO-3.5", "chirp-v3.5",null),
     ;
 
     /**

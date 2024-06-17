@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class SunoConfig {
     /**
-     * token信息
+     * suno-api服务的基本路径
      */
-    private String token;
+    private String baseUrl;
 }
