@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.framework.ai.config;
+package cn.iocoder.yudao.module.ai.config;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;

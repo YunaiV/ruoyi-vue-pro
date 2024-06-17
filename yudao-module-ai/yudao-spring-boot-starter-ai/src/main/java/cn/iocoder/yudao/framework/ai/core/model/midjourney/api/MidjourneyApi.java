@@ -202,7 +202,7 @@ public class MidjourneyApi {
     public enum ModelEnum {
 
         MIDJOURNEY("midjourney", "midjourney"),
-        NIJI("Niji", "Niji"),
+        NIJI("niji", "niji"),
 
         ;
 

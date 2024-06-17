@@ -4,7 +4,10 @@ import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.ai.core.enums.AiPlatformEnum;
 import cn.iocoder.yudao.framework.ai.core.model.midjourney.api.MidjourneyApi;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
+import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
+import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.quartz.core.handler.JobHandler;
+import cn.iocoder.yudao.module.ai.controller.admin.image.vo.MidjourneyNotifyReqVO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.image.AiImageDO;
 import cn.iocoder.yudao.module.ai.dal.mysql.image.AiImageMapper;
 import cn.iocoder.yudao.module.ai.enums.image.AiImageStatusEnum;
@@ -38,7 +41,7 @@ public class MidjourneyJob implements JobHandler {
 
     // TODO @fan：这个方法，建议实现到 AiImageService，例如说 midjourneySync，返回 int 同步数量。
     @Override
-    public String execute(String param) throws Exception {
+    public String execute(String param) {
         // 1、获取 midjourney 平台，状态在 “进行中” 的 image
         List<AiImageDO> imageList = imageMapper.selectByStatusAndPlatform(AiImageStatusEnum.IN_PROGRESS, AiPlatformEnum.MIDJOURNEY);
         log.info("Midjourney 同步 - 任务数量 {}!", imageList.size());
@@ -61,10 +64,12 @@ public class MidjourneyJob implements JobHandler {
             }
             // TODO @ 3.1 和 3.2 是不是融合下；get，然后判空，continue；
             // 3.2 获取通知对象
-//            MidjourneyNotifyReqVO notifyReqVO = taskIdMap.get(aiImageDO.getTaskId());
+            MidjourneyApi.NotifyRequest notifyRequest = taskIdMap.get(aiImageDO.getTaskId());
             // 3.2 构建更新对象
             // TODO @fan：建议 List<MidjourneyNotifyReqVO> 作为 imageService 去更新；
-//            updateImageList.add(imageService.buildUpdateImage(aiImageDO.getId(), notifyReqVO));
+            // TODO @芋艿 BeanUtils.toBean 转换为 null
+            updateImageList.add(imageService.buildUpdateImage(aiImageDO.getId(),
+                    JsonUtils.parseObject(JsonUtils.toJsonString(notifyRequest), MidjourneyNotifyReqVO.class)));
         }
         // 4、批了更新 updateImageList
         imageMapper.updateBatch(updateImageList);

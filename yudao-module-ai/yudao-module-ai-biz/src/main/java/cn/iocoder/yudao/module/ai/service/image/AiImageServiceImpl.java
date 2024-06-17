@@ -186,11 +186,13 @@ public class AiImageServiceImpl implements AiImageService {
     public AiImageDO buildUpdateImage(Long imageId, MidjourneyNotifyReqVO notifyReqVO) {
         // 1、转换状态
         String imageStatus = null;
-        MidjourneyApi.TaskStatusEnum taskStatusEnum = MidjourneyApi.TaskStatusEnum.valueOf(notifyReqVO.getStatus());
-        if (MidjourneyApi.TaskStatusEnum.SUCCESS == taskStatusEnum) {
-            imageStatus = AiImageStatusEnum.SUCCESS.getStatus();
-        } else if (MidjourneyApi.TaskStatusEnum.FAILURE == taskStatusEnum) {
-            imageStatus = AiImageStatusEnum.FAIL.getStatus();
+        if (StrUtil.isNotBlank(notifyReqVO.getStatus())) {
+            MidjourneyApi.TaskStatusEnum taskStatusEnum = MidjourneyApi.TaskStatusEnum.valueOf(notifyReqVO.getStatus());
+            if (MidjourneyApi.TaskStatusEnum.SUCCESS == taskStatusEnum) {
+                imageStatus = AiImageStatusEnum.SUCCESS.getStatus();
+            } else if (MidjourneyApi.TaskStatusEnum.FAILURE == taskStatusEnum) {
+                imageStatus = AiImageStatusEnum.FAIL.getStatus();
+            }
         }
 
         // 2、上传图片
@@ -261,7 +263,7 @@ public class AiImageServiceImpl implements AiImageService {
                 break;
             }
         }
-        if (isTrue) {
+        if (!isTrue) {
             throw exception(AI_IMAGE_CUSTOM_ID_NOT_EXISTS);
         }
     }
