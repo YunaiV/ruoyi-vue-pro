@@ -4,12 +4,13 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 
 @Data
-@JsonInclude(value = JsonInclude.Include.NON_NULL)
+@JsonInclude(value = JsonInclude.Include.NON_NULL) // TODO @xin：不用加这个哈
 public class SunoReqVO {
     /**
      * 用于生成音乐音频的提示
      */
     private String prompt;
+    // TODO @xin：Boolean，不使用基本类型。
     /**
      *  是否纯音乐
      */

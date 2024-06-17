@@ -29,7 +29,7 @@ public class SunoTests {
 
     @Test
     public void generate() {
-        List<SunoApi.MusicData> generate = sunoApi.generate(new SunoApi.SunoReq("创作一首带有轻松吉他旋律的流行歌曲，[verse] 描述夏日海滩的宁静，[chorus] 节奏加快，表达对自由的向往。"));
+        List<SunoApi.MusicData> generate = sunoApi.generate(new SunoApi.SunoRequest("创作一首带有轻松吉他旋律的流行歌曲，[verse] 描述夏日海滩的宁静，[chorus] 节奏加快，表达对自由的向往。"));
         System.out.println(generate);
     }
 

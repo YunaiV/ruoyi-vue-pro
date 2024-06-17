@@ -31,26 +31,29 @@ import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUti
 @Slf4j
 public class MusicServiceImpl implements MusicService {
 
+    // TODO @xin：使用 @Resource 注入，整个项目保持统一哈；
     private final SunoApi sunoApi;
     private final AiMusicMapper musicMapper;
 
     private final Queue<String> taskQueue = new ConcurrentLinkedQueue<>();
 
+    // TODO @xin：要不把 descriptionMode、lyricMode 合并，同一个 generateMusic 方法，然后根据传入的 mode 模式：歌词、描述来区分？
 
     @Override
     public List<Long> descriptionMode(SunoReqVO reqVO) {
-        SunoApi.SunoReq sunoReq = new SunoApi.SunoReq(reqVO.getPrompt(), reqVO.getMv(), reqVO.isMakeInstrumental());
-        //默认异步
+        // 1. 异步生成
+        SunoApi.SunoRequest sunoReq = new SunoApi.SunoRequest(reqVO.getPrompt(), reqVO.getMv(), reqVO.isMakeInstrumental());
         List<SunoApi.MusicData> musicDataList = sunoApi.generate(sunoReq);
+        // 2. 插入数据库
         return insertMusicData(musicDataList);
     }
 
-
     @Override
     public List<Long> lyricMode(SunoLyricModeVO reqVO) {
-        SunoApi.SunoReq sunoReq = new SunoApi.SunoReq(reqVO.getPrompt(), reqVO.getMv(), reqVO.getTags(), reqVO.getTitle());
-        //默认异步
+        // 1. 异步生成
+        SunoApi.SunoRequest sunoReq = new SunoApi.SunoRequest(reqVO.getPrompt(), reqVO.getMv(), reqVO.getTags(), reqVO.getTitle());
         List<SunoApi.MusicData> musicDataList = sunoApi.customGenerate(sunoReq);
+        // 2. 插入数据库
         return insertMusicData(musicDataList);
     }
 
@@ -64,6 +67,7 @@ public class MusicServiceImpl implements MusicService {
         if (CollUtil.isEmpty(musicDataList)) {
             return Collections.emptyList();
         }
+        // TODO @xin：建议使用 insertBatch 方法，批量插入
         return AiMusicDO.convertFrom(musicDataList).stream()
                 .peek(musicDO -> musicMapper.insert(musicDO.setUserId(getLoginUserId())))
                 .peek(e -> Optional.of(e.getTaskId()).ifPresent(taskQueue::add))
@@ -71,6 +75,7 @@ public class MusicServiceImpl implements MusicService {
                 .collect(Collectors.toList());
     }
 
+    // TODO @xin：这个，改成标准的 job 来实现哈。从数据库加载任务，然后执行。
     @Scheduled(fixedDelay = 5, timeUnit = TimeUnit.SECONDS)
     @Transactional
     public void flushSunoTask() {

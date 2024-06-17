@@ -50,6 +50,7 @@ public enum AiModelEnum {
     XING_HUO_3_0("星火大模型3.0", "generalv3", "/v3.1/chat"),
     XING_HUO_3_5("星火大模型3.5", "generalv3.5", "/v3.5/chat"),
 
+    // TODO @xin：// Suno；中间加个空格，会更清晰一点。一般来说，不同类型的单词之间，最好有空格。例如说，// 新增一个；再例如说；// 这是 1 个 create 逻辑
     //Suno
     SUNO_2( "SUNO-2", "chirp-v2-xxl-alpha",null),
     SUNO_3_0( "SUNO-3.0", "chirp-v3-0",null),

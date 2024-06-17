@@ -5,10 +5,9 @@ import cn.iocoder.yudao.module.ai.dal.dataobject.music.AiMusicDO;
 import org.apache.ibatis.annotations.Mapper;
 
 /**
- * @Author xiaoxin
- * @Date 2024/6/5
+ * AI 音乐 Mapper
+ * @author  xiaoxin
  */
 @Mapper
 public interface AiMusicMapper extends BaseMapperX<AiMusicDO> {
-
 }
