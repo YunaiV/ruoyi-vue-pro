@@ -31,7 +31,7 @@ public class KeFuConversationController {
     @Operation(summary = "置顶客服会话")
     @PreAuthorize("@ss.hasPermission('promotion:kefu-conversation:update')")
     public CommonResult<Boolean> updateConversationPinned(@Valid @RequestBody KeFuConversationUpdatePinnedReqVO updateReqVO) {
-        conversationService.updateAdminPinned(updateReqVO);
+        conversationService.updateConversationPinnedByAdmin(updateReqVO);
         return success(true);
     }
 

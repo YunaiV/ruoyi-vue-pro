@@ -22,12 +22,14 @@ public interface KeFuConversationMapper extends BaseMapperX<KeFuConversationDO> 
                 .orderByDesc(KeFuConversationDO::getCreateTime));
     }
 
+    // TODO @puhui999：这个不用单独搞个方法哈。Service 直接 new 一个对象，然后调用 update 方法。
     default void updateAdminUnreadMessageCountWithZero(Long id) {
         update(new LambdaUpdateWrapper<KeFuConversationDO>()
                 .eq(KeFuConversationDO::getId, id)
                 .set(KeFuConversationDO::getAdminUnreadMessageCount, 0));
     }
 
+    // TODO @puhui999：改成 updateAdminUnreadMessageCountIncrement 增加
     default void updateAdminUnreadMessageCount(Long id) {
         update(new LambdaUpdateWrapper<KeFuConversationDO>()
                 .eq(KeFuConversationDO::getId, id)

@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.module.promotion.controller.admin.kefu;
 
-import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
@@ -37,7 +36,7 @@ public class KeFuMessageController {
     }
 
     @PutMapping("/update-read-status")
-    @Operation(summary = "更新会员客服消息已读状态")
+    @Operation(summary = "更新客服消息已读状态")
     @Parameter(name = "conversationId", description = "会话编号", required = true)
     @PreAuthorize("@ss.hasPermission('promotion:kefu-message:update')")
     public CommonResult<Boolean> updateKefuMessageReadStatus(@RequestParam("conversationId") Long conversationId) {

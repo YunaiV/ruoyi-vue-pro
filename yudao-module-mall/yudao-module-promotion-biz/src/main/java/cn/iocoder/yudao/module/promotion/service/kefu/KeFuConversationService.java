@@ -25,7 +25,7 @@ public interface KeFuConversationService {
      *
      * @param updateReqVO 请求
      */
-    void updateAdminPinned(KeFuConversationUpdatePinnedReqVO updateReqVO);
+    void updateConversationPinnedByAdmin(KeFuConversationUpdatePinnedReqVO updateReqVO);
 
     /**
      * 更新会话客服消息冗余信息

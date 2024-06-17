@@ -40,7 +40,7 @@ public class KeFuConversationServiceImpl implements KeFuConversationService {
     }
 
     @Override
-    public void updateAdminPinned(KeFuConversationUpdatePinnedReqVO updateReqVO) {
+    public void updateConversationPinnedByAdmin(KeFuConversationUpdatePinnedReqVO updateReqVO) {
         conversationMapper.updateById(new KeFuConversationDO().setId(updateReqVO.getId()).setAdminPinned(updateReqVO.getAdminPinned()));
     }
 
@@ -54,11 +54,12 @@ public class KeFuConversationServiceImpl implements KeFuConversationService {
                 .setLastMessageTime(kefuMessage.getCreateTime()).setLastMessageContent(kefuMessage.getContent())
                 .setLastMessageContentType(kefuMessage.getContentType()));
 
-        // 2.2 更新管理员未读消息数
+        // 2.1 更新管理员未读消息数
         if (UserTypeEnum.MEMBER.getValue().equals(kefuMessage.getSenderType())) {
             conversationMapper.updateAdminUnreadMessageCount(kefuMessage.getConversationId());
         }
-        // 2.4 会员用户发送消息时，如果管理员删除过会话则进行恢复
+        // 2.2 会员用户发送消息时，如果管理员删除过会话则进行恢复
+        // TODO @puhui999：其实不用判断用户类型；只要be已删除，就恢复！
         if (UserTypeEnum.MEMBER.getValue().equals(kefuMessage.getSenderType())
                 && Boolean.TRUE.equals(conversation.getAdminDeleted())) {
             updateConversationAdminDeleted(kefuMessage.getConversationId(), Boolean.FALSE);
@@ -106,6 +107,7 @@ public class KeFuConversationServiceImpl implements KeFuConversationService {
 
     @Override
     public KeFuConversationDO getConversationByUserId(Long userId) {
+        // TODO @puhui999：service 不写 dao 的逻辑哈
         return conversationMapper.selectOne(KeFuConversationDO::getUserId, userId);
     }
 

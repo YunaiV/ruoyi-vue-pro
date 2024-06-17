@@ -33,7 +33,7 @@ public class AppKeFuMessageController {
     @PostMapping("/send")
     @Operation(summary = "发送客服消息")
     @PreAuthenticated
-    public CommonResult<Long> createKefuMessage(@Valid @RequestBody AppKeFuMessageSendReqVO sendReqVO) {
+    public CommonResult<Long> sendKefuMessage(@Valid @RequestBody AppKeFuMessageSendReqVO sendReqVO) {
         sendReqVO.setSenderId(getLoginUserId()).setSenderType(UserTypeEnum.MEMBER.getValue()); // 设置用户编号和类型
         return success(kefuMessageService.sendKefuMessage(sendReqVO));
     }
@@ -43,6 +43,7 @@ public class AppKeFuMessageController {
     @Parameter(name = "conversationId", description = "会话编号", required = true)
     @PreAuthenticated
     public CommonResult<Boolean> updateKefuMessageReadStatus(@RequestParam("conversationId") Long conversationId) {
+        // TODO @puhui999：需要传递 userId；万一用户模拟一个 conversationId
         kefuMessageService.updateKefuMessageReadStatus(conversationId);
         return success(true);
     }
