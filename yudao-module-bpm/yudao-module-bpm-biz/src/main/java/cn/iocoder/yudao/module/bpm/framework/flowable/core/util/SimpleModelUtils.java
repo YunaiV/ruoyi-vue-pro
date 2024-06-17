@@ -26,7 +26,6 @@ import java.util.Objects;
 
 import static cn.iocoder.yudao.module.bpm.enums.definition.BpmBoundaryEventType.USER_TASK_TIMEOUT;
 import static cn.iocoder.yudao.module.bpm.enums.definition.BpmSimpleModelNodeType.*;
-import static cn.iocoder.yudao.module.bpm.enums.definition.BpmUserTaskRejectHandlerType.FINISH_PROCESS_BY_REJECT_NUMBER;
 import static cn.iocoder.yudao.module.bpm.enums.definition.BpmUserTaskTimeoutActionEnum.AUTO_REMINDER;
 import static cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnModelConstants.*;
 import static cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.SimpleModelConstants.*;
@@ -55,9 +54,9 @@ public class SimpleModelUtils {
     public static final String ANY_OF_APPROVE_COMPLETE_EXPRESSION = "${ nrOfCompletedInstances > 0 }";
 
     /**
-     * 按拒绝人数计算多实例完成条件的表达式
+     * 按通过比例完成表达式
      */
-    public static final String COMPLETE_BY_REJECT_COUNT_EXPRESSION = "${completeByRejectCountExpression.completionCondition(execution)}";
+    public static final String APPROVE_BY_RATIO_COMPLETE_EXPRESSION = "${ nrOfCompletedInstances/nrOfInstances >= %s}";
 
     // TODO-DONE @jason：建议方法名，改成 buildBpmnModel
     // TODO @yunai：注释需要完善下；
@@ -185,8 +184,9 @@ public class SimpleModelUtils {
     }
 
     /**
-     *  构建有附加节点的连线
-     * @param nodeId 当前节点 Id
+     * 构建有附加节点的连线
+     *
+     * @param nodeId       当前节点 Id
      * @param attachNodeId 附属节点 Id
      * @param targetNodeId 目标节点 Id
      */
@@ -344,26 +344,7 @@ public class SimpleModelUtils {
             BoundaryEvent boundaryEvent = buildUserTaskTimerBoundaryEvent(userTask, userTaskConfig.getTimeoutHandler());
             flowElements.add(boundaryEvent);
         }
-        // 如果按拒绝人数终止流程。需要添加附加的 ServiceTask 处理
-        if (userTaskConfig.getRejectHandler() != null &&
-                Objects.equals(FINISH_PROCESS_BY_REJECT_NUMBER.getType(), userTaskConfig.getRejectHandler().getType())) {
-            ServiceTask serviceTask = buildMultiInstanceServiceTask(node);
-            flowElements.add(serviceTask);
-        }
         return flowElements;
-    }
-
-    private static ServiceTask buildMultiInstanceServiceTask(BpmSimpleModelNodeVO node) {
-        ServiceTask serviceTask = new ServiceTask();
-        String id = String.format("Activity-%s", IdUtil.fastSimpleUUID());
-        serviceTask.setId(id);
-        serviceTask.setName("会签服务任务");
-        serviceTask.setImplementationType(ImplementationType.IMPLEMENTATION_TYPE_DELEGATEEXPRESSION);
-        serviceTask.setImplementation("${multiInstanceServiceTaskDelegate}");
-        serviceTask.setAsynchronous(false);
-        addExtensionElement(serviceTask, SERVICE_TASK_ATTACH_USER_TASK_ID, node.getId());
-        node.setAttachNodeId(id);
-        return serviceTask;
     }
 
     private static BoundaryEvent buildUserTaskTimerBoundaryEvent(UserTask userTask, SimpleModelUserTaskConfig.TimeoutHandler timeoutHandler) {
@@ -406,7 +387,7 @@ public class SimpleModelUtils {
         serviceTask.setId(node.getId());
         serviceTask.setName(node.getName());
         serviceTask.setImplementationType(ImplementationType.IMPLEMENTATION_TYPE_DELEGATEEXPRESSION);
-        serviceTask.setImplementation("${copyUserDelegate}");
+        serviceTask.setImplementation("${bpmCopyTaskDelegate}");
 
         // 添加抄送候选人元素
         addCandidateElements(MapUtil.getInt(node.getAttributes(), BpmnModelConstants.USER_TASK_CANDIDATE_STRATEGY),
@@ -515,11 +496,10 @@ public class SimpleModelUtils {
             multiInstanceCharacteristics.setLoopCardinality("1");
             userTask.setLoopCharacteristics(multiInstanceCharacteristics);
         } else if (bpmApproveMethodEnum == BpmApproveMethodEnum.APPROVE_BY_RATIO) {
-            multiInstanceCharacteristics.setCompletionCondition(COMPLETE_BY_REJECT_COUNT_EXPRESSION);
-            multiInstanceCharacteristics.setSequential(false);
             Assert.notNull(approveRatio, "通过比例不能为空");
-            // 添加通过比例的扩展属性
-            addExtensionElement(userTask, BpmnModelConstants.USER_TASK_APPROVE_RATIO, approveRatio.toString());
+            double approvePct = approveRatio / (double) 100;
+            multiInstanceCharacteristics.setCompletionCondition(String.format(APPROVE_BY_RATIO_COMPLETE_EXPRESSION, String.format("%.2f", approvePct)));
+            multiInstanceCharacteristics.setSequential(false);
         }
         userTask.setLoopCharacteristics(multiInstanceCharacteristics);
     }

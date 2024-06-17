@@ -54,8 +54,6 @@ import java.util.stream.Stream;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
 import static cn.iocoder.yudao.module.bpm.enums.ErrorCodeConstants.*;
-import static cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnModelConstants.USER_TASK_REJECT_HANDLER_TYPE;
-import static cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnModelConstants.USER_TASK_REJECT_RETURN_TASK_ID;
 
 /**
  * 流程任务实例 Service 实现类
@@ -189,8 +187,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
 
         // 2. 抄送用户
         if (CollUtil.isNotEmpty(reqVO.getCopyUserIds())) {
-            processInstanceCopyService.createProcessInstanceCopy(reqVO.getCopyUserIds(), instance.getProcessInstanceId(),
-                    reqVO.getId(), task.getName());
+            processInstanceCopyService.createProcessInstanceCopy(reqVO.getCopyUserIds(), reqVO.getId());
         }
 
         // 情况一：被委派的任务，不调用 complete 去完成任务
@@ -338,35 +335,18 @@ public class BpmTaskServiceImpl implements BpmTaskService {
 
         // 3.1 解析用户任务的拒绝处理类型
         BpmnModel bpmnModel = bpmModelService.getBpmnModelByDefinitionId(task.getProcessDefinitionId());
-        // TODO @jason：342 到 344 最好抽象一个方法出来哈。放在 BpmnModelUtils，参照类似 parseCandidateStrategy
-        UserTask flowElement = (UserTask) BpmnModelUtils.getFlowElementById(bpmnModel, task.getTaskDefinitionKey());
-        Integer rejectHandlerType = NumberUtils.parseInt(BpmnModelUtils.parseExtensionElement(flowElement, USER_TASK_REJECT_HANDLER_TYPE));
-        BpmUserTaskRejectHandlerType userTaskRejectHandlerType = BpmUserTaskRejectHandlerType.typeOf(rejectHandlerType);
-        // 3.2 类型为驳回到指定的任务节点 TODO @jason：下面这种判断，最好是 JSON
-        if (userTaskRejectHandlerType == BpmUserTaskRejectHandlerType.RETURN_PRE_USER_TASK) {
-            // TODO @jason：348 最好抽象一个方法出来哈。放在 BpmnModelUtils，参照类似 parseCandidateStrategy
-            String returnTaskId = BpmnModelUtils.parseExtensionElement(flowElement, USER_TASK_REJECT_RETURN_TASK_ID);
-            // TODO @jason：这里如果找不到，直接抛出系统异常；因为说白了，已经不是业务异常啦。
-            if (returnTaskId == null) {
-                throw exception(TASK_RETURN_NOT_ASSIGN_TARGET_TASK_ID);
-            }
+        FlowElement flowElement = BpmnModelUtils.getFlowElementById(bpmnModel, task.getTaskDefinitionKey());
+        BpmUserTaskRejectHandlerType userTaskRejectHandlerType = BpmnModelUtils.parseRejectHandlerType(flowElement);
+        // 3.2 类型为驳回到指定的任务节点
+        if (userTaskRejectHandlerType == BpmUserTaskRejectHandlerType.RETURN_USER_TASK) {
+            String returnTaskId = BpmnModelUtils.parseReturnTaskId(flowElement);
+            Assert.notNull(returnTaskId, "回退的节点不能为空");
             BpmTaskReturnReqVO returnReq = new BpmTaskReturnReqVO().setId(task.getId()).setTargetTaskDefinitionKey(returnTaskId)
                     .setReason(reqVO.getReason());
             returnTask(userId, returnReq);
             return;
-        } else if (userTaskRejectHandlerType == BpmUserTaskRejectHandlerType.FINISH_PROCESS_BY_REJECT_NUMBER) {
-            // TODO @jason：微信沟通，去掉类似的逻辑；
-            // 3.3 按拒绝人数终止流程
-            if (!flowElement.hasMultiInstanceLoopCharacteristics()) {
-                log.error("[rejectTask] 按拒绝人数终止流程类型,只能用于会签任务. 当前任务【{}】不是会签任务", task.getId());
-                throw new IllegalStateException("按拒绝人数终止流程类型,只能用于会签任务");
-            }
-            // 设置变量值为拒绝
-            runtimeService.setVariableLocal(task.getExecutionId(), BpmConstants.TASK_VARIABLE_STATUS, BpmTaskStatusEnum.REJECT.getStatus());
-            taskService.complete(task.getId());
-            return;
         }
-        // 3.4 其他情况 终止流程。
+        // 3.3 其他情况 终止流程。
         processInstanceService.updateProcessInstanceReject(instance.getProcessInstanceId(),
                 task.getTaskDefinitionKey(), reqVO.getReason());
     }

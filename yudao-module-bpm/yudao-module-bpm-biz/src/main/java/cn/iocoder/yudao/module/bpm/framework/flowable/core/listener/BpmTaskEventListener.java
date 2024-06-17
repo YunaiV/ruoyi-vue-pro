@@ -73,48 +73,4 @@ public class BpmTaskEventListener extends AbstractFlowableEngineEventListener {
         });
     }
 
-    // TODO @jason：这块如果不需要，可以删除掉~~~
-//    @Override
-//    protected void activityMessageReceived(FlowableMessageEvent event) {
-//        BpmnModel bpmnModel = bpmModelService.getBpmnModelByDefinitionId(event.getProcessDefinitionId());
-//        FlowElement element = BpmnModelUtils.getFlowElementById(bpmnModel, event.getActivityId());
-//        if (element instanceof BoundaryEvent) {
-//            BoundaryEvent boundaryEvent = (BoundaryEvent) element;
-//            String boundaryEventType = parseBoundaryEventExtensionElement(boundaryEvent, BpmnModelConstants.BOUNDARY_EVENT_TYPE);
-//            // 如果自定义类型为拒绝后处理，进行拒绝处理
-//            if (Objects.equals(USER_TASK_REJECT_POST_PROCESS.getType(), NumberUtils.parseInt(boundaryEventType))) {
-//                String rejectHandlerType = parseBoundaryEventExtensionElement((BoundaryEvent) element, BpmnModelConstants.USER_TASK_REJECT_HANDLER_TYPE);
-//                rejectHandler(boundaryEvent, event.getProcessInstanceId(), boundaryEvent.getAttachedToRefId(), NumberUtils.parseInt(rejectHandlerType));
-//            }
-//        }
-//    }
-//
-//    private void rejectHandler(BoundaryEvent boundaryEvent, String processInstanceId, String taskDefineKey, Integer rejectHandlerType) {
-//        BpmUserTaskRejectHandlerType userTaskRejectHandlerType = BpmUserTaskRejectHandlerType.typeOf(rejectHandlerType);
-//        if (userTaskRejectHandlerType != null) {
-//            List<Task> taskList = taskService.getAssignedTaskListByConditions(processInstanceId, null, taskDefineKey);
-//            taskList.forEach(task -> {
-//                Integer taskStatus = FlowableUtils.getTaskStatus(task);
-//                // 只有处于拒绝状态下才处理
-//                if (Objects.equals(BpmTaskStatusEnum.REJECT.getStatus(), taskStatus)) {
-//                    // 终止流程
-//                    if (userTaskRejectHandlerType == BpmUserTaskRejectHandlerType.TERMINATION) {
-//                        processInstanceService.updateProcessInstanceReject(task.getProcessInstanceId(), FlowableUtils.getTaskReason(task));
-//                        return;
-//                    }
-//                    // 驳回
-//                    if (userTaskRejectHandlerType == BpmUserTaskRejectHandlerType.RETURN_PRE_USER_TASK) {
-//                        String returnTaskId = parseBoundaryEventExtensionElement(boundaryEvent, BpmnModelConstants.USER_TASK_REJECT_RETURN_TASK_ID);
-//                        if (returnTaskId != null) {
-//                            BpmTaskReturnReqVO reqVO = new BpmTaskReturnReqVO().setId(task.getId())
-//                                    .setTargetTaskDefinitionKey(returnTaskId)
-//                                    .setReason("任务拒绝回退");
-//                            taskService.returnTask(getLoginUserId(), reqVO);
-//                        }
-//                    }
-//                }
-//            });
-//        }
-//    }
-
 }

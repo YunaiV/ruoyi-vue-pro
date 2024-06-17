@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.bpm.service.task;
 
+import cn.hutool.core.util.ObjectUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.instance.BpmProcessInstanceCopyPageReqVO;
 import cn.iocoder.yudao.module.bpm.dal.dataobject.task.BpmProcessInstanceCopyDO;
@@ -10,6 +11,7 @@ import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.ProcessInstance;
+import org.flowable.task.api.Task;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
@@ -44,21 +46,25 @@ public class BpmProcessInstanceCopyServiceImpl implements BpmProcessInstanceCopy
     @Lazy // 延迟加载，避免循环依赖
     private BpmProcessDefinitionService processDefinitionService;
 
+    @Override
+    public void createProcessInstanceCopy(Collection<Long> userIds, String taskId) {
+        Task task = taskService.getTask(taskId);
+        if (ObjectUtil.isNull(task)) {
+            throw exception(ErrorCodeConstants.TASK_NOT_EXISTS);
+        }
+        String processInstanceId = task.getProcessInstanceId();
+        createProcessInstanceCopy(userIds, processInstanceId, task.getId(), task.getName());
+    }
+
     // TODO @芋艿：这里多加了一个 name；
     @Override
     public void createProcessInstanceCopy(Collection<Long> userIds, String processInstanceId, String taskId, String taskName) {
-        // 1.1 校验任务存在 暂时去掉这个校验. 因为任务可能仿钉钉快搭的抄送节点(UserTask) TODO jason：抄送节点，会没有来源的 taskId 么？ @芋艿 是否校验一下 传递进来的 id 不为空就行
-//        Task task = taskService.getTask(taskId);
-//        if (ObjectUtil.isNull(task)) {
-//            throw exception(ErrorCodeConstants.TASK_NOT_EXISTS);
-//        }
-        // 1.2 校验流程实例存在
-//      String processInstanceId = task.getProcessInstanceId();
+        // 1.1 校验流程实例存在
         ProcessInstance processInstance = processInstanceService.getProcessInstance(processInstanceId);
         if (processInstance == null) {
             throw exception(ErrorCodeConstants.PROCESS_INSTANCE_NOT_EXISTS);
         }
-        // 1.3 校验流程定义存在
+        // 1.2 校验流程定义存在
         ProcessDefinition processDefinition = processDefinitionService.getProcessDefinition(
                 processInstance.getProcessDefinitionId());
         if (processDefinition == null) {

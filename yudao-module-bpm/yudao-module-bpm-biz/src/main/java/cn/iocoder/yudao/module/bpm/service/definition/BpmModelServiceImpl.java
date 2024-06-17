@@ -226,7 +226,7 @@ public class BpmModelServiceImpl implements BpmModelService {
     @Override
     public void updateSimpleModel(BpmSimpleModelUpdateReqVO reqVO) {
         // 1. 校验流程模型存在
-        Model model = getModel(reqVO.getModelId());
+        Model model = getModel(reqVO.getId());
         if (model == null) {
             throw exception(MODEL_NOT_EXISTS);
         }

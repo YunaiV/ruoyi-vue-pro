@@ -5,6 +5,7 @@ import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.util.number.NumberUtils;
+import cn.iocoder.yudao.module.bpm.enums.definition.BpmUserTaskRejectHandlerType;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnModelConstants;
 import org.flowable.bpmn.converter.BpmnXMLConverter;
 import org.flowable.bpmn.model.Process;
@@ -27,8 +28,7 @@ public class BpmnModelUtils {
         // TODO @芋艿 尝试从 ExtensionElement 取. 后续相关扩展是否都可以 存 extensionElement。 如表单权限。 按钮权限
         if (candidateStrategy == null) {
             ExtensionElement element = CollUtil.getFirst(userTask.getExtensionElements().get(BpmnModelConstants.USER_TASK_CANDIDATE_STRATEGY));
-            // TODO @jason：这里可以改成 element != null 看着会简单点 element != null ? NumberUtils.parseInt(element.getElementText()) : null;
-            candidateStrategy = NumberUtils.parseInt(Optional.ofNullable(element).map(ExtensionElement::getElementText).orElse(null));
+            candidateStrategy = element != null ? NumberUtils.parseInt(element.getElementText()) : null;
         }
         return candidateStrategy;
     }
@@ -38,10 +38,18 @@ public class BpmnModelUtils {
                 BpmnModelConstants.NAMESPACE, BpmnModelConstants.USER_TASK_CANDIDATE_PARAM);
         if (candidateParam == null) {
             ExtensionElement element = CollUtil.getFirst(userTask.getExtensionElements().get(BpmnModelConstants.USER_TASK_CANDIDATE_PARAM));
-            // TODO @jason：这里可以改成 element != null 看着会简单点 element != null ? element.getElementText() : null;
-            candidateParam = Optional.ofNullable(element).map(ExtensionElement::getElementText).orElse(null);
+            candidateParam = element != null ? element.getElementText() : null;
         }
         return candidateParam;
+    }
+
+    public static BpmUserTaskRejectHandlerType parseRejectHandlerType(FlowElement userTask) {
+        Integer rejectHandlerType = NumberUtils.parseInt(BpmnModelUtils.parseExtensionElement(userTask, USER_TASK_REJECT_HANDLER_TYPE));
+        return BpmUserTaskRejectHandlerType.typeOf(rejectHandlerType);
+    }
+
+    public static String parseReturnTaskId(FlowElement flowElement) {
+        return BpmnModelUtils.parseExtensionElement(flowElement, USER_TASK_REJECT_RETURN_TASK_ID);
     }
 
     public static String parseExtensionElement(FlowElement flowElement, String elementName) {
@@ -49,7 +57,7 @@ public class BpmnModelUtils {
             return null;
         }
         ExtensionElement element = CollUtil.getFirst(flowElement.getExtensionElements().get(elementName));
-        return Optional.ofNullable(element).map(ExtensionElement::getElementText).orElse(null);
+        return element != null ? element.getElementText() : null;
     }
 
     // TODO @jason：貌似这个没地方调用？？？  @芋艿 在 BpmTaskConvert里面。暂时注释掉了。

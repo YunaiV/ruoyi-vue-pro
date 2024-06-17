@@ -51,9 +51,6 @@ public interface ErrorCodeConstants {
     ErrorCode TASK_SIGN_DELETE_NO_PARENT = new ErrorCode(1_009_005_012, "任务减签失败，被减签的任务必须是通过加签生成的任务");
     ErrorCode TASK_TRANSFER_FAIL_USER_REPEAT = new ErrorCode(1_009_005_013, "任务转办失败，转办人和当前审批人为同一人");
     ErrorCode TASK_TRANSFER_FAIL_USER_NOT_EXISTS = new ErrorCode(1_009_005_014, "任务转办失败，转办人不存在");
-    ErrorCode TASK_RETURN_NOT_ASSIGN_TARGET_TASK_ID = new ErrorCode(1_009_005_015, "回退任务未指定目标任务编号");
-    ErrorCode TASK_REJECT_HANDLER_TYPE_BY_REJECT_RATIO_ERROR = new ErrorCode(1_009_005_016, "按拒绝人数比例终止流程只能用于会签任务");
-
     ErrorCode TASK_CREATE_FAIL_NO_CANDIDATE_USER = new ErrorCode(1_009_006_003, "操作失败，原因：找不到任务的审批人！");
 
     // ========== 动态表单模块 1-009-010-000 ==========

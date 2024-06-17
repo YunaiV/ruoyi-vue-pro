@@ -7,18 +7,17 @@ import jakarta.annotation.Resource;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.JavaDelegate;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
 import java.util.Set;
 
-// TODO @jason：类名可以改成 BpmCopyTaskDelegate
 /**
  * 处理抄送用户的 {@link JavaDelegate} 的实现类
  *
  * @author jason
  */
-@Service // TODO @jason：这种注解，建议用 @Component
-public class CopyUserDelegate implements JavaDelegate  {
+@Component
+public class BpmCopyTaskDelegate implements JavaDelegate  {
 
     @Resource
     private BpmTaskCandidateInvoker taskCandidateInvoker;

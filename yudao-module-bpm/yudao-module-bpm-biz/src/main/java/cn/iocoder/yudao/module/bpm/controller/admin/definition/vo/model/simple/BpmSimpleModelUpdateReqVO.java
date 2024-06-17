@@ -11,10 +11,9 @@ import lombok.Data;
 @Data
 public class BpmSimpleModelUpdateReqVO {
 
-    // TODO @jason：=> id
     @Schema(description = "流程模型编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     @NotEmpty(message = "流程模型编号不能为空")
-    private String modelId; // 对应 Flowable act_re_model 表 ID_ 字段
+    private String id; // 对应 Flowable act_re_model 表 ID_ 字段
 
     @Schema(description = "仿钉钉流程设计模型对象", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "仿钉钉流程设计模型对象不能为空")
