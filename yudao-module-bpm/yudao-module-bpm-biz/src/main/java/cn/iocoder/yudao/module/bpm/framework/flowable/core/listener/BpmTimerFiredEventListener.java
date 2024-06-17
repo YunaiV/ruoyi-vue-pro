@@ -29,6 +29,7 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 import java.util.Set;
 
+// TODO @芋艿：这块需要仔细再瞅瞅
 /**
  * 监听定时器触发事件
  *
@@ -96,7 +97,6 @@ public class BpmTimerFiredEventListener extends AbstractFlowableEngineEventListe
                     BpmTaskApproveReqVO req = new BpmTaskApproveReqVO().setId(task.getId())
                             .setReason("超时系统自动同意");
                     bpmTaskService.approveTask(Long.parseLong(task.getAssignee()), req);
-
                 }
                 // 自动拒绝
                 if (userTaskTimeoutAction == BpmUserTaskTimeoutActionEnum.AUTO_REJECT) {

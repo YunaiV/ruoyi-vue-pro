@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.bpm.framework.flowable.core.simple;
+package cn.iocoder.yudao.module.bpm.framework.flowable.core.simplemodel;
 
 import cn.iocoder.yudao.module.bpm.enums.definition.BpmApproveMethodEnum;
 import cn.iocoder.yudao.module.bpm.enums.definition.BpmUserTaskRejectHandlerType;
@@ -18,12 +18,11 @@ public class SimpleModelUserTaskConfig {
     /**
      * 候选人策略
      */
-    private  Integer candidateStrategy;
-
+    private Integer candidateStrategy;
     /**
      * 候选人参数
      */
-    private  String candidateParam;
+    private String candidateParam;
 
     /**
      * 字段权限
@@ -34,11 +33,11 @@ public class SimpleModelUserTaskConfig {
      * 审批方式 {@link BpmApproveMethodEnum }
      */
     private  Integer approveMethod;
-
     /**
      * 通过比例  当审批方式为 多人会签(按通过比例) 需设置
      */
     private Integer approveRatio;
+
     /**
      * 超时处理
      */

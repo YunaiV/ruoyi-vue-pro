@@ -13,6 +13,8 @@ import java.util.Collection;
  */
 public interface BpmProcessInstanceCopyService {
 
+    // TODO @jason：要不把 createProcessInstanceCopy 搞 2 个方法，一个方法参数是之前的 userIds、taskId；一个方法是现在 userIds、processInstanceId、taskId、taskName；
+
     /**
      * 流程实例的抄送
      *

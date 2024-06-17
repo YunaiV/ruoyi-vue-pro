@@ -127,23 +127,23 @@ public interface BpmProcessInstanceService {
     void updateProcessInstanceWhenCancel(FlowableCancelledEvent event);
 
     /**
-     * 更新 ProcessInstance 拓展记录为完成
+     * 更新 ProcessInstance 为完成
      *
      * @param instance 流程任务
      */
     void updateProcessInstanceWhenApprove(ProcessInstance instance);
 
     /**
-     * 更新 ProcessInstance 拓展记录为不通过
+     * 更新 ProcessInstance 为不通过
      *
      * @param id     流程编号
-     * @param currentActivityId  当前的活动Id
+     * @param currentActivityId  当前的活动编号
      * @param reason 理由。例如说，审批不通过时，需要传递该值
      */
     void updateProcessInstanceReject(String id, String currentActivityId,  String reason);
 
     /**
-     * 当流程结束时候。 更新 ProcessInstance
+     * 当流程结束时候，更新 ProcessInstance 为通过
      *
      * @param instance 流程任务
      */

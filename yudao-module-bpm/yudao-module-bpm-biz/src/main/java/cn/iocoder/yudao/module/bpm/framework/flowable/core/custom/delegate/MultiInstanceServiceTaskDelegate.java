@@ -10,6 +10,7 @@ import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.JavaDelegate;
 import org.springframework.stereotype.Component;
 
+// TODO @jason：微信已经讨论，简化哈
 /**
  * 处理会签 Service Task 代理
  *
@@ -25,7 +26,7 @@ public class MultiInstanceServiceTaskDelegate implements JavaDelegate {
     public void execute(DelegateExecution execution) {
 
         String attachUserTaskId = BpmnModelUtils.parseExtensionElement(execution.getCurrentFlowElement(),
-                BpmnModelConstants.SERVICE_TASK_ATTACH_USER_TASK_ID);
+                BpmnModelConstants.SERVICE_TASK_ATTACH_USER_TASK_ID); // TODO @jason：上面不需要加空行哈；
         Assert.notNull(attachUserTaskId, "附属的用户任务 Id 不能为空");
         // 获取会签任务是否被拒绝
         Boolean userTaskRejected = execution.getVariable(String.format("%s_reject", attachUserTaskId), Boolean.class);

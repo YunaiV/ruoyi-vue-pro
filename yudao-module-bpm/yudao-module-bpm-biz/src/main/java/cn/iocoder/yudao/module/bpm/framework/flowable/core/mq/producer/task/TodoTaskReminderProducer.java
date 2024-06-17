@@ -7,6 +7,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.annotation.Validated;
 
+// TODO @jason：建议直接调用 BpmMessageService 哈；更简化一点~
 /**
  * 待办任务提醒 Producer
  *
@@ -22,4 +23,5 @@ public class TodoTaskReminderProducer {
     public void sendReminderMessage(@Valid TodoTaskReminderMessage message) {
         applicationContext.publishEvent(message);
     }
+
 }

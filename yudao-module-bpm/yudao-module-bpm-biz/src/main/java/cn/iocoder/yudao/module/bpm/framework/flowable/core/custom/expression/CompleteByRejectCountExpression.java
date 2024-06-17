@@ -19,6 +19,7 @@ import static cn.iocoder.yudao.module.bpm.enums.definition.BpmApproveMethodEnum.
 import static cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnModelConstants.USER_TASK_APPROVE_METHOD;
 import static cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnModelConstants.USER_TASK_APPROVE_RATIO;
 
+// TODO @jason：微信已经讨论，简化哈
 /**
  * 按拒绝人数计算会签的完成条件的流程表达式实现
  *

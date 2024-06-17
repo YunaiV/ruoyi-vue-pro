@@ -28,9 +28,6 @@ public class BpmTaskCandidateStartUserStrategy implements BpmTaskCandidateStrate
         return BpmTaskCandidateStrategyEnum.START_USER;
     }
 
-    /**
-     * 无需校验参数
-     */
     @Override
     public void validateParam(String param) {}
 
@@ -40,11 +37,9 @@ public class BpmTaskCandidateStartUserStrategy implements BpmTaskCandidateStrate
         return SetUtils.asSet(Long.valueOf(startUserId));
     }
 
-    /**
-     * 不需要参数
-     */
     @Override
     public boolean isParamRequired() {
         return false;
     }
+
 }

@@ -40,6 +40,7 @@ public interface BpmnModelConstants {
      */
     String USER_TASK_TIMEOUT_HANDLER_ACTION = "timeoutAction";
 
+    // TODO @jason：1）是不是上面的 timeoutAction 改成 timeoutHandler；2）rejectHandlerType 改成 rejectHandler 哇？
     /**
      * BPMN ExtensionElement 的扩展属性，用于标记用户任务拒绝处理类型
      */

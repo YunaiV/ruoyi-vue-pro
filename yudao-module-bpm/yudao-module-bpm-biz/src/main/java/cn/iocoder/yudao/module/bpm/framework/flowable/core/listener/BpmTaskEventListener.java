@@ -73,6 +73,7 @@ public class BpmTaskEventListener extends AbstractFlowableEngineEventListener {
         });
     }
 
+    // TODO @jason：这块如果不需要，可以删除掉~~~
 //    @Override
 //    protected void activityMessageReceived(FlowableMessageEvent event) {
 //        BpmnModel bpmnModel = bpmModelService.getBpmnModelByDefinitionId(event.getProcessDefinitionId());

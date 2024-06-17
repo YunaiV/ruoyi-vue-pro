@@ -4,6 +4,7 @@ import org.flowable.common.engine.api.variable.VariableContainer;
 import org.flowable.common.engine.impl.el.function.AbstractFlowableVariableExpressionFunction;
 import org.springframework.stereotype.Component;
 
+// TODO @jason：这个自定义转换的原因是啥呀？
 /**
  * 根据流程变量 variable 的类型, 转换参数的值
  *

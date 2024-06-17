@@ -27,6 +27,7 @@ public class BpmnModelUtils {
         // TODO @芋艿 尝试从 ExtensionElement 取. 后续相关扩展是否都可以 存 extensionElement。 如表单权限。 按钮权限
         if (candidateStrategy == null) {
             ExtensionElement element = CollUtil.getFirst(userTask.getExtensionElements().get(BpmnModelConstants.USER_TASK_CANDIDATE_STRATEGY));
+            // TODO @jason：这里可以改成 element != null 看着会简单点 element != null ? NumberUtils.parseInt(element.getElementText()) : null;
             candidateStrategy = NumberUtils.parseInt(Optional.ofNullable(element).map(ExtensionElement::getElementText).orElse(null));
         }
         return candidateStrategy;
@@ -37,6 +38,7 @@ public class BpmnModelUtils {
                 BpmnModelConstants.NAMESPACE, BpmnModelConstants.USER_TASK_CANDIDATE_PARAM);
         if (candidateParam == null) {
             ExtensionElement element = CollUtil.getFirst(userTask.getExtensionElements().get(BpmnModelConstants.USER_TASK_CANDIDATE_PARAM));
+            // TODO @jason：这里可以改成 element != null 看着会简单点 element != null ? element.getElementText() : null;
             candidateParam = Optional.ofNullable(element).map(ExtensionElement::getElementText).orElse(null);
         }
         return candidateParam;

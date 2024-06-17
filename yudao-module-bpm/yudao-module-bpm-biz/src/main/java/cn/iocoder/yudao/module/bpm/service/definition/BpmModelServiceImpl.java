@@ -107,7 +107,7 @@ public class BpmModelServiceImpl implements BpmModelService {
         // 保存流程定义
         repositoryService.saveModel(model);
         // 保存 BPMN XML
-        saveModelBpmnXml(model.getId(), StrUtil.utf8Bytes(bpmnXml));
+        saveModelBpmnXml(model.getId(), bpmnXml);
         return model.getId();
     }
 
@@ -125,7 +125,7 @@ public class BpmModelServiceImpl implements BpmModelService {
         // 更新模型
         repositoryService.saveModel(model);
         // 更新 BPMN XML
-        saveModelBpmnXml(model.getId(), StrUtil.utf8Bytes(updateReqVO.getBpmnXml()));
+        saveModelBpmnXml(model.getId(), updateReqVO.getBpmnXml());
     }
 
     @Override
@@ -218,23 +218,24 @@ public class BpmModelServiceImpl implements BpmModelService {
         if (model == null) {
             throw exception(MODEL_NOT_EXISTS);
         }
-        // 通过 ACT_RE_MODEL 表 EDITOR_SOURCE_EXTRA_VALUE_ID_  获取 仿钉钉快搭模型的JSON 数据
+        // 通过 ACT_RE_MODEL 表 EDITOR_SOURCE_EXTRA_VALUE_ID_ ，获取仿钉钉快搭模型的 JSON 数据
         byte[] jsonBytes = getModelSimpleJson(model.getId());
         return JsonUtils.parseObject(jsonBytes, BpmSimpleModelNodeVO.class);
     }
 
     @Override
     public void updateSimpleModel(BpmSimpleModelUpdateReqVO reqVO) {
-        // 1.1 校验流程模型存在
+        // 1. 校验流程模型存在
         Model model = getModel(reqVO.getModelId());
         if (model == null) {
             throw exception(MODEL_NOT_EXISTS);
         }
-        // 1.2 JSON 转换成 bpmnModel
+
+        // 2.1 JSON 转换成 bpmnModel
         BpmnModel bpmnModel = SimpleModelUtils.buildBpmnModel(model.getKey(), model.getName(), reqVO.getSimpleModel());
-        // 2.1 保存 Bpmn XML
-        saveModelBpmnXml(model.getId(), StrUtil.utf8Bytes(BpmnModelUtils.getBpmnXml(bpmnModel)));
-        // 2.2 保存 JSON 数据
+        // 2.2 保存 Bpmn XML
+        saveModelBpmnXml(model.getId(), BpmnModelUtils.getBpmnXml(bpmnModel));
+        // 2.3 保存 JSON 数据
         saveModelSimpleJson(model.getId(), JsonUtils.toJsonByte(reqVO.getSimpleModel()));
     }
 
@@ -266,21 +267,18 @@ public class BpmModelServiceImpl implements BpmModelService {
         }
     }
 
-    @Override
-    public void saveModelBpmnXml(String id,  byte[] xmlBytes) {
-        if (ArrayUtil.isEmpty(xmlBytes)) {
+    private void saveModelBpmnXml(String id, String bpmnXml) {
+        if (StrUtil.isEmpty(bpmnXml)) {
             return;
         }
-        repositoryService.addModelEditorSource(id, xmlBytes);
+        repositoryService.addModelEditorSource(id, StrUtil.utf8Bytes(bpmnXml));
     }
 
-    @Override
-    public byte[] getModelSimpleJson(String id) {
+    private byte[] getModelSimpleJson(String id) {
         return repositoryService.getModelEditorSourceExtra(id);
     }
 
-    @Override
-    public void saveModelSimpleJson(String id, byte[] jsonBytes) {
+    private void saveModelSimpleJson(String id, byte[] jsonBytes) {
         if (ArrayUtil.isEmpty(jsonBytes)) {
             return;
         }

@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.bpm.framework.flowable.core.simple;
+package cn.iocoder.yudao.module.bpm.framework.flowable.core.simplemodel;
 
 import lombok.Data;
 

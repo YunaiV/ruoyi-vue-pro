@@ -12,9 +12,9 @@ import cn.iocoder.yudao.module.bpm.enums.definition.BpmApproveMethodEnum;
 import cn.iocoder.yudao.module.bpm.enums.definition.BpmSimpleModeConditionType;
 import cn.iocoder.yudao.module.bpm.enums.definition.BpmSimpleModelNodeType;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnModelConstants;
-import cn.iocoder.yudao.module.bpm.framework.flowable.core.simple.SimpleModelConditionGroups;
-import cn.iocoder.yudao.module.bpm.framework.flowable.core.simple.SimpleModelUserTaskConfig;
-import cn.iocoder.yudao.module.bpm.framework.flowable.core.simple.SimpleModelUserTaskConfig.RejectHandler;
+import cn.iocoder.yudao.module.bpm.framework.flowable.core.simplemodel.SimpleModelConditionGroups;
+import cn.iocoder.yudao.module.bpm.framework.flowable.core.simplemodel.SimpleModelUserTaskConfig;
+import cn.iocoder.yudao.module.bpm.framework.flowable.core.simplemodel.SimpleModelUserTaskConfig.RejectHandler;
 import org.flowable.bpmn.BpmnAutoLayout;
 import org.flowable.bpmn.model.Process;
 import org.flowable.bpmn.model.*;
@@ -253,33 +253,26 @@ public class SimpleModelUtils {
         return sequenceFlow;
     }
 
-    // TODO-DONE @jason：要不改成 recursionNode 递归节点，然后把 build 名字让出来，专门用于构建各种 Node
-    // @芋艿 改成了 traverseNodeToBuildFlowNode， 连线的叫 traverseNodeToBuildSequenceFlow
-    // TODO-DONE @jason：node 改成 node，process 改成 process；更符合递归的感觉哈，处理当前节点
+    // TODO @芋艿 改成了 traverseNodeToBuildFlowNode， 连线的叫 traverseNodeToBuildSequenceFlow
     private static void traverseNodeToBuildFlowNode(BpmSimpleModelNodeVO node, Process process) {
         // 判断是否有效节点
-        // TODO-DONE @jason：是不是写个 isValidNode 方法：判断是否为有效节点；
         if (!isValidNode(node)) {
             return;
         }
         BpmSimpleModelNodeType nodeType = BpmSimpleModelNodeType.valueOf(node.getType());
         Assert.notNull(nodeType, "模型节点类型不支持");
 
-        // TODO-DONE @jason：要不抽个 buildNode 方法，然后返回一个 List<FlowElement>，之后这个方法 addFlowElement；原因是，让当前这个方法，有主干逻辑；不然现在太长了；
         List<FlowElement> flowElements = buildFlowNode(node, nodeType);
         flowElements.forEach(process::addFlowElement);
 
         // 如果不是网关类型的接口， 并且chileNode为空退出
-        // TODO-DONE @jason：建议这个判断去掉，可以更简洁一点；因为往下走；如果不成功，本身也就会结束哈；主要是，这里多了一个这样的判断，增加了理解成本；
         // 如果是“分支”节点，则递归处理条件
         if (BpmSimpleModelNodeType.isBranchNode(node.getType())
                 && ArrayUtil.isNotEmpty(node.getConditionNodes())) {
-            // TODO-DONE @jason：可以搞成 stream 写成一行哈
             node.getConditionNodes().forEach(item -> traverseNodeToBuildFlowNode(item.getChildNode(), process));
         }
 
         // 如果有“子”节点，则递归处理子节点
-        // TODO-DONE @jason：这个，是不是不写判断，直接继续调用；因为本身 buildAndAddBpmnFlowNode 就会最开始判断了哈，就不重复判断了；
         traverseNodeToBuildFlowNode(node.getChildNode(), process);
     }
 
@@ -291,16 +284,13 @@ public class SimpleModelUtils {
         List<FlowElement> list = new ArrayList<>();
         switch (nodeType) {
             case START_NODE: {
-                // TODO-DONE @jason：每个 nodeType，buildXXX 方法要不更明确，并且去掉 Bpmn；
                 // @芋艿 改成 convert 是不是好理解一点
                 StartEvent startEvent = convertStartNode(node);
                 list.add(startEvent);
                 break;
             }
             case APPROVE_NODE: {
-                // TODO-DONE @jason：这个，搞成一个 buildUserTask，然后把下面这 2 种节点，搞在一起实现类；这样 buildNode 里面可以更简洁；
-                // TODO-DONE @jason：这里还有个想法，是不是可以所有的都叫 buildXXXNode，然后里面有一些是 bpmn 相关的构建，叫做 buildBpmnUserTask，用于区分；
-                // @芋艿 改成 convertXXXNode, ， 方面里面使用 buildBpmnXXXNode. 是否更好理解
+                // TODO @芋艿 改成 convertXXXNode, ， 方面里面使用 buildBpmnXXXNode. 是否更好理解
                 // 转换审批节点
                 List<FlowElement> flowElements = convertApproveNode(node);
                 list.addAll(flowElements);

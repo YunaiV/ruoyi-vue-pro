@@ -4,7 +4,6 @@ import cn.hutool.core.util.ArrayUtil;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
-// TODO @芋艿：审批方式的名字，可能要看下；
 /**
  * BPM 多人审批方式的枚举
  *
