@@ -29,7 +29,7 @@ import java.util.Map;
 public class MidjourneyJob implements JobHandler {
 
     // TODO @fan：@Resource
-    @Autowired
+    @Autowired(required = false)
     private MidjourneyApi midjourneyApi;
     @Autowired
     private AiImageMapper imageMapper;

@@ -85,7 +85,7 @@ public class AiImageController {
     public CommonResult<Boolean> midjourneyAction(@RequestParam("id") Long imageId,
                                                   @RequestParam("customId") String customId) {
         imageService.midjourneyAction(getLoginUserId(), imageId, customId);
-        return success(null);
+        return success(true);
     }
 
 }

@@ -102,6 +102,7 @@ public class AiImageDO extends BaseDO {
     @TableField(typeHandler = JacksonTypeHandler.class)
     private MidjourneyNotifyReqVO response;
 
+    // TODO @fan：这个建议 Double
     /**
      * mj 进度(10%、50%、100%)
      */

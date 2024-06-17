@@ -55,7 +55,7 @@ public class AiImageServiceImpl implements AiImageService {
     private FileApi fileApi;
     @Resource
     private AiApiKeyService apiKeyService;
-    @Autowired
+    @Autowired(required = false)
     private MidjourneyApi midjourneyApi;
     @Value("${ai.midjourney-proxy.notifyUrl:http://127.0.0.1:48080/admin-api/ai/image/midjourney-notify}")
     private String midjourneyNotifyUrl;
