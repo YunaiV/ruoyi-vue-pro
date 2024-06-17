@@ -20,7 +20,7 @@ public class PayOrderPageReqVO extends PageParam {
     @Schema(description = "应用编号", example = "1024")
     private Long appId;
 
-    @Schema(description = "用户 id", example = "1024")
+    @Schema(description = "用户编号", example = "1024")
     private Long userId;
 
     @Schema(description = "渠道编码", example = "wx_app")
