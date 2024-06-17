@@ -104,4 +104,9 @@ public class KeFuConversationServiceImpl implements KeFuConversationService {
         return conversation;
     }
 
+    @Override
+    public KeFuConversationDO getConversationByUserId(Long userId) {
+        return conversationMapper.selectOne(KeFuConversationDO::getUserId, userId);
+    }
+
 }

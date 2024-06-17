@@ -74,4 +74,12 @@ public interface KeFuConversationService {
      */
     KeFuConversationDO validateKefuConversationExists(Long id);
 
+    /**
+     * 【会员】获得客服会话
+     *
+     * @param userId 用户编号
+     * @return 客服会话
+     */
+    KeFuConversationDO getConversationByUserId(Long userId);
+
 }

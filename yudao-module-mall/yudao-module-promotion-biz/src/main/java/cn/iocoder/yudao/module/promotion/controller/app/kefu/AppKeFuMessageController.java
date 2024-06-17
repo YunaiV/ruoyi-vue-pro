@@ -5,9 +5,8 @@ import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.security.core.annotations.PreAuthenticated;
-import cn.iocoder.yudao.module.promotion.controller.admin.kefu.vo.message.KeFuMessagePageReqVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.kefu.vo.message.KeFuMessageRespVO;
-import cn.iocoder.yudao.module.promotion.controller.admin.kefu.vo.message.KeFuMessageSendReqVO;
+import cn.iocoder.yudao.module.promotion.controller.app.kefu.vo.message.AppKeFuMessagePageReqVO;
 import cn.iocoder.yudao.module.promotion.controller.app.kefu.vo.message.AppKeFuMessageSendReqVO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.kefu.KeFuMessageDO;
 import cn.iocoder.yudao.module.promotion.service.kefu.KeFuMessageService;
@@ -16,14 +15,13 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
 
-@Tag(name = "管理后台 - 客服消息")
+@Tag(name = "用户 APP - 客服消息")
 @RestController
 @RequestMapping("/promotion/kefu-message")
 @Validated
@@ -52,8 +50,8 @@ public class AppKeFuMessageController {
     @GetMapping("/page")
     @Operation(summary = "获得客服消息分页")
     @PreAuthenticated
-    public CommonResult<PageResult<KeFuMessageRespVO>> getKefuMessagePage(@Valid KeFuMessagePageReqVO pageReqVO) {
-        PageResult<KeFuMessageDO> pageResult = kefuMessageService.getKefuMessagePage(pageReqVO);
+    public CommonResult<PageResult<KeFuMessageRespVO>> getKefuMessagePage(@Valid AppKeFuMessagePageReqVO pageReqVO) {
+        PageResult<KeFuMessageDO> pageResult = kefuMessageService.getKefuMessagePage(pageReqVO, getLoginUserId());
         return success(BeanUtils.toBean(pageResult, KeFuMessageRespVO.class));
     }
 

@@ -10,6 +10,7 @@ import cn.iocoder.yudao.module.infra.api.websocket.WebSocketSenderApi;
 import cn.iocoder.yudao.module.member.api.user.MemberUserApi;
 import cn.iocoder.yudao.module.promotion.controller.admin.kefu.vo.message.KeFuMessagePageReqVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.kefu.vo.message.KeFuMessageSendReqVO;
+import cn.iocoder.yudao.module.promotion.controller.app.kefu.vo.message.AppKeFuMessagePageReqVO;
 import cn.iocoder.yudao.module.promotion.controller.app.kefu.vo.message.AppKeFuMessageSendReqVO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.kefu.KeFuConversationDO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.kefu.KeFuMessageDO;
@@ -21,6 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
+import java.util.Collections;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
@@ -128,6 +130,18 @@ public class KeFuMessageServiceImpl implements KeFuMessageService {
 
     @Override
     public PageResult<KeFuMessageDO> getKefuMessagePage(KeFuMessagePageReqVO pageReqVO) {
+        return keFuMessageMapper.selectPage(pageReqVO);
+    }
+
+    @Override
+    public PageResult<KeFuMessageDO> getKefuMessagePage(AppKeFuMessagePageReqVO pageReqVO, Long userId) {
+        // 1. 获得客服会话
+        KeFuConversationDO conversation = conversationService.getConversationByUserId(userId);
+        if (conversation == null) {
+            return PageResult.empty();
+        }
+        // 2. 设置会话编号
+        pageReqVO.setConversationId(conversation.getId());
         return keFuMessageMapper.selectPage(pageReqVO);
     }
 
