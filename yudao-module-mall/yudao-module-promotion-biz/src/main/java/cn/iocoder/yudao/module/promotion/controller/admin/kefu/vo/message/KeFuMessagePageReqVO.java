@@ -6,8 +6,6 @@ import cn.iocoder.yudao.framework.common.pojo.PageParam;
 
 @Schema(description = "管理后台 - 客服消息分页 Request VO")
 @Data
-// TODO @puhui999：不用 @EqualsAndHashCode 哈
-@EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 public class KeFuMessagePageReqVO extends PageParam {
 

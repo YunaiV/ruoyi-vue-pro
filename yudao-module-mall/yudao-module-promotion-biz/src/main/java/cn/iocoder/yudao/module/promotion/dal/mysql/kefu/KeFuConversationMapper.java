@@ -16,24 +16,22 @@ import java.util.List;
 @Mapper
 public interface KeFuConversationMapper extends BaseMapperX<KeFuConversationDO> {
 
-    // TODO @puhui999：排序可以交给前端，或者 controller；数据库的计算尽量少哈；
-    default List<KeFuConversationDO> selectListWithSort() {
+    default List<KeFuConversationDO> selectConversationList() {
         return selectList(new LambdaQueryWrapperX<KeFuConversationDO>()
                 .eq(KeFuConversationDO::getAdminDeleted, Boolean.FALSE)
-                .orderByDesc(KeFuConversationDO::getAdminPinned) // 置顶优先
                 .orderByDesc(KeFuConversationDO::getCreateTime));
     }
 
-    // TODO @puhui999：是不是置零，用 update 就 ok 拉；然后单独搞个 +1 的方法；
-    default void updateAdminUnreadMessageCountByConversationId(Long id, Integer count) {
-        LambdaUpdateWrapper<KeFuConversationDO> updateWrapper = new LambdaUpdateWrapper<>();
-        updateWrapper.eq(KeFuConversationDO::getId, id);
-        if (count != null && count > 0) { // 情况一：会员发送消息时增加管理员的未读消息数
-            updateWrapper.setSql("admin_unread_message_count = admin_unread_message_count + 1");
-        } else { // 情况二：管理员已读后重置
-            updateWrapper.set(KeFuConversationDO::getAdminUnreadMessageCount, 0);
-        }
-        update(updateWrapper);
+    default void updateAdminUnreadMessageCountWithZero(Long id) {
+        update(new LambdaUpdateWrapper<KeFuConversationDO>()
+                .eq(KeFuConversationDO::getId, id)
+                .set(KeFuConversationDO::getAdminUnreadMessageCount, 0));
+    }
+
+    default void updateAdminUnreadMessageCount(Long id) {
+        update(new LambdaUpdateWrapper<KeFuConversationDO>()
+                .eq(KeFuConversationDO::getId, id)
+                .setSql("admin_unread_message_count = admin_unread_message_count + 1"));
     }
 
 }

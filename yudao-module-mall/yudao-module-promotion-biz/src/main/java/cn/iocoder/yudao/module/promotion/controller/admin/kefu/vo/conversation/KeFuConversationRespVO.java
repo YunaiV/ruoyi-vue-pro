@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.promotion.controller.admin.kefu.vo.conversation;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.*;
+import lombok.Data;
 
 import java.time.LocalDateTime;
 
@@ -18,24 +18,22 @@ public class KeFuConversationRespVO {
     @Schema(description = "最后聊天时间", requiredMode = Schema.RequiredMode.REQUIRED)
     private LocalDateTime lastMessageTime;
 
-    // TODO @puhui999：, 缺了空格哈
-
-    @Schema(description = "最后聊天内容", requiredMode = Schema.RequiredMode.REQUIRED,example = "嗨，您好啊")
+    @Schema(description = "最后聊天内容", requiredMode = Schema.RequiredMode.REQUIRED, example = "嗨，您好啊")
     private String lastMessageContent;
 
-    @Schema(description = "最后发送的消息类型", requiredMode = Schema.RequiredMode.REQUIRED,example = "1")
+    @Schema(description = "最后发送的消息类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     private Integer lastMessageContentType;
 
-    @Schema(description = "管理端置顶", requiredMode = Schema.RequiredMode.REQUIRED,example = "false")
+    @Schema(description = "管理端置顶", requiredMode = Schema.RequiredMode.REQUIRED, example = "false")
     private Boolean adminPinned;
 
-    @Schema(description = "用户是否可见", requiredMode = Schema.RequiredMode.REQUIRED,example = "true")
+    @Schema(description = "用户是否可见", requiredMode = Schema.RequiredMode.REQUIRED, example = "true")
     private Boolean userDeleted;
 
-    @Schema(description = "管理员是否可见", requiredMode = Schema.RequiredMode.REQUIRED,example = "true")
+    @Schema(description = "管理员是否可见", requiredMode = Schema.RequiredMode.REQUIRED, example = "true")
     private Boolean adminDeleted;
 
-    @Schema(description = "管理员未读消息数", requiredMode = Schema.RequiredMode.REQUIRED,example = "6")
+    @Schema(description = "管理员未读消息数", requiredMode = Schema.RequiredMode.REQUIRED, example = "6")
     private Integer adminUnreadMessageCount;
 
     @Schema(description = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED)

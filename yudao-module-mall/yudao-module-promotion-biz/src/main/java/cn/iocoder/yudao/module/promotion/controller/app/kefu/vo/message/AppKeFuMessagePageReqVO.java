@@ -8,8 +8,6 @@ import lombok.ToString;
 
 @Schema(description = "用户 App - 客服消息分页 Request VO")
 @Data
-// TODO @puhui999：不用 @EqualsAndHashCode 哈
-@EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 public class AppKeFuMessagePageReqVO extends PageParam {
 

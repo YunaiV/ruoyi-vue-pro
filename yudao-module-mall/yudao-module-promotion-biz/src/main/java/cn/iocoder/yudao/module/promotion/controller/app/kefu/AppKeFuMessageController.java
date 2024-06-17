@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.promotion.controller.app.kefu;
 
+import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
@@ -35,7 +36,8 @@ public class AppKeFuMessageController {
     @Operation(summary = "发送客服消息")
     @PreAuthenticated
     public CommonResult<Long> createKefuMessage(@Valid @RequestBody AppKeFuMessageSendReqVO sendReqVO) {
-        return success(kefuMessageService.sendKefuMessage(BeanUtils.toBean(sendReqVO, KeFuMessageSendReqVO.class)));
+        sendReqVO.setSenderId(getLoginUserId()).setSenderType(UserTypeEnum.MEMBER.getValue()); // 设置用户编号和类型
+        return success(kefuMessageService.sendKefuMessage(sendReqVO));
     }
 
     @PutMapping("/update-read-status")
@@ -43,7 +45,7 @@ public class AppKeFuMessageController {
     @Parameter(name = "conversationId", description = "会话编号", required = true)
     @PreAuthenticated
     public CommonResult<Boolean> updateKefuMessageReadStatus(@RequestParam("conversationId") Long conversationId) {
-        kefuMessageService.updateKefuMessageReadStatus(conversationId, getLoginUserId());
+        kefuMessageService.updateKefuMessageReadStatus(conversationId);
         return success(true);
     }
 
