@@ -97,7 +97,7 @@ public class PayOrderDO extends BaseDO {
      */
     private String userIp;
     /**
-     * 用户 IP
+     * 用户 ID
      */
     private Long userId;
     /**
