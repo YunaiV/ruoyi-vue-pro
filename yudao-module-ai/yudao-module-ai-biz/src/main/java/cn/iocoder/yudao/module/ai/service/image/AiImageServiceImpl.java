@@ -147,6 +147,9 @@ public class AiImageServiceImpl implements AiImageService {
 
         // 4、保存任务 id (状态码: 1(提交成功), 21(已存在), 22(排队中), other(错误))
         if (!MidjourneyApi.SubmitCodeEnum.SUCCESS_CODES.contains(submitResponse.code())) {
+            if (submitResponse.description().contains("quota_not_enough")) {
+                throw exception(AI_IMAGE_SYSTEM_ACCOUNT_INSUFFICIENT_BALANCE, submitResponse.description());
+            }
             throw exception(AI_IMAGE_MIDJOURNEY_SUBMIT_FAIL, submitResponse.description());
         }
         // 4.1、更新 taskId 和参数

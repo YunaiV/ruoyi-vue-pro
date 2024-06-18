@@ -45,5 +45,6 @@ public interface ErrorCodeConstants {
     ErrorCode AI_IMAGE_NOT_EXISTS = new ErrorCode(1_022_005_000, "image 不存在!");
     ErrorCode AI_IMAGE_MIDJOURNEY_SUBMIT_FAIL = new ErrorCode(1_022_005_001, "Midjourney 提交失败! {}");
     ErrorCode AI_IMAGE_CUSTOM_ID_NOT_EXISTS = new ErrorCode(1_022_005_002, "Midjourney 按钮 customId 不存在! {}");
+    ErrorCode AI_IMAGE_SYSTEM_ACCOUNT_INSUFFICIENT_BALANCE = new ErrorCode(1_022_005_003, "Midjourney 系统账户余额不足!");
 
 }
