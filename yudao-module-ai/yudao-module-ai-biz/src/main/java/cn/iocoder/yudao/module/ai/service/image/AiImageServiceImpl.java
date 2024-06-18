@@ -300,11 +300,12 @@ public class AiImageServiceImpl implements AiImageService {
         StringBuilder params = new StringBuilder();
         //  --ar 来设置尺寸
         params.append(String.format(" --ar %s:%s ", width, height));
-        // --v 版本
-        params.append(String.format(" --v %s ", version));
         // --niji 模型
         if (MidjourneyApi.ModelEnum.NIJI == model) {
-            params.append(" --niji ");
+            params.append(String.format(" --niji %s ", version));
+        } else {
+            // --v 版本
+            params.append(String.format(" --v %s ", version));
         }
         return params.toString();
     }
