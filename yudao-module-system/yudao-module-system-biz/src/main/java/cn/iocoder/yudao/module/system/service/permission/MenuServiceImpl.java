@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.system.service.permission;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.ObjUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.system.controller.admin.permission.vo.menu.MenuListReqVO;
@@ -14,7 +15,6 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Lists;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.annotation.Lazy;
@@ -22,11 +22,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
 import static cn.iocoder.yudao.module.system.dal.dataobject.permission.MenuDO.ID_ROOT;
 import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.*;
 
@@ -116,56 +115,47 @@ public class MenuServiceImpl implements MenuService {
         return menus;
     }
 
-    /**
-     * 过滤关闭的菜单节点及其子节点
-     *
-     * @param menuList 所有菜单列表
-     * @return List<MenuDO> 过滤后的菜单列表
-     */
     @Override
     public List<MenuDO> filterDisableMenus(List<MenuDO> menuList) {
-        if(CollectionUtils.isEmpty(menuList)){
+        if (CollUtil.isEmpty(menuList)){
             return Collections.emptyList();
         }
+        Map<Long, MenuDO> menuMap = convertMap(menuList, MenuDO::getId);
 
-        Map<Long, MenuDO> menuMap = new HashMap<>();
-
-        for (MenuDO menuDO : menuList) {
-            menuMap.put(menuDO.getId(),menuDO);
-        }
-
-        // 存下递归搜索过被禁用的菜单，防止重复的搜索
-        Set<Long> disabledMenuIds = new HashSet<>();
-
+        // 遍历 menu 菜单，查找不是禁用的菜单，添加到 enabledMenus 结果
         List<MenuDO> enabledMenus = new ArrayList<>();
+        Set<Long> disabledMenuCache = new HashSet<>(); // 存下递归搜索过被禁用的菜单，防止重复的搜索
         for (MenuDO menu : menuList) {
-            if (!isMenuDisabled(menu, menuMap, disabledMenuIds)) {
-                enabledMenus.add(menu);
+            if (isMenuDisabled(menu, menuMap, disabledMenuCache)) {
+                continue;
             }
+            enabledMenus.add(menu);
         }
         return enabledMenus;
     }
 
-    private boolean isMenuDisabled(MenuDO node, Map<Long, MenuDO> menuMap, Set<Long> disabledMenuIds) {
-        if (disabledMenuIds.contains(node.getId())) {
+    private boolean isMenuDisabled(MenuDO node, Map<Long, MenuDO> menuMap, Set<Long> disabledMenuCache) {
+        // 如果已经判定是禁用的节点，直接结束
+        if (disabledMenuCache.contains(node.getId())) {
             return true;
         }
 
+        // 1. 遍历到 parentId 为根节点，则无需判断
         Long parentId = node.getParentId();
-        if (parentId == 0) {
-            if (!node.getStatus().equals(CommonStatusEnum.ENABLE.getStatus())) {
-                disabledMenuIds.add(node.getId());
+        if (ObjUtil.equal(parentId, ID_ROOT)) {
+            if (CommonStatusEnum.isDisable(node.getStatus())) {
+                disabledMenuCache.add(node.getId());
                 return true;
             }
             return false;
         }
 
+        // 2. 继续遍历 parent 节点
         MenuDO parent = menuMap.get(parentId);
-        if (parent == null || isMenuDisabled(parent, menuMap, disabledMenuIds)) {
-            disabledMenuIds.add(node.getId());
+        if (parent == null || isMenuDisabled(parent, menuMap, disabledMenuCache)) {
+            disabledMenuCache.add(node.getId());
             return true;
         }
-
         return false;
     }
 
