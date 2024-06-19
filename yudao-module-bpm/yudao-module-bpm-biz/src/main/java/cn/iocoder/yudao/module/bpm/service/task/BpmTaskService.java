@@ -129,14 +129,15 @@ public interface BpmTaskService {
      */
     Task getTask(String id);
 
-    // TODO @jason：jason：这个貌似可以去掉了。
     /**
-     * 根据条件查询已经分配的用户任务列表
+     * 根据条件查询正在进行中的任务
+     *
      * @param processInstanceId 流程实例编号，不允许为空
+     * @param assigned 是否分配了审批人
      * @param executionId execution Id
      * @param taskDefineKey 任务定义 Key
      */
-    List<Task> getTaskListByProcessInstanceIdAndAssigned(String processInstanceId, String executionId, String taskDefineKey);
+    List<Task> getRunningTaskListByProcessInstanceId(String processInstanceId, Boolean assigned, String executionId, String taskDefineKey);
 
     /**
      * 获取当前任务的可回退的 UserTask 集合

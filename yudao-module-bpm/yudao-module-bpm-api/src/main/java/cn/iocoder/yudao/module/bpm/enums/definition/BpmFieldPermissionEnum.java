@@ -13,10 +13,8 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum BpmFieldPermissionEnum {
 
-    // TODO @jason：这个顺序要不要改下，和页面保持一致；只读（1）、编辑（2）、隐藏（3）
-    // @芋艿 我看钉钉页面的顺序 是 可编辑 只读 隐藏
-    WRITE(1, "可编辑"),
-    READ(2, "只读"),
+    READ(1, "只读"),
+    WRITE(2, "可编辑"),
     NONE(3, "隐藏");
 
     /**

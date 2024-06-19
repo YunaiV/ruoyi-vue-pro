@@ -1,11 +1,9 @@
 package cn.iocoder.yudao.module.bpm.service.task;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.util.ArrayUtil;
-import cn.hutool.core.util.IdUtil;
-import cn.hutool.core.util.ObjectUtil;
-import cn.hutool.core.util.StrUtil;
+import cn.hutool.core.util.*;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.date.DateUtils;
 import cn.iocoder.yudao.framework.common.util.number.NumberUtils;
 import cn.iocoder.yudao.framework.common.util.object.PageUtils;
@@ -28,6 +26,7 @@ import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.flowable.bpmn.model.BpmnModel;
+import org.flowable.bpmn.model.EndEvent;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.UserTask;
 import org.flowable.engine.HistoryService;
@@ -54,6 +53,8 @@ import java.util.stream.Stream;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
 import static cn.iocoder.yudao.module.bpm.enums.ErrorCodeConstants.*;
+import static cn.iocoder.yudao.module.bpm.enums.task.BpmCommentTypeEnum.REJECT_BY_ADD_SIGN_TASK_REJECT;
+import static cn.iocoder.yudao.module.bpm.enums.task.BpmDeleteReasonEnum.AUTO_REJECT_BY_ADD_SIGN_REJECT;
 
 /**
  * 流程任务实例 Service 实现类
@@ -326,18 +327,40 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         if (instance == null) {
             throw exception(PROCESS_INSTANCE_NOT_EXISTS);
         }
-
-        // 2.1 更新流程实例为不通过
+        // 2.1 更新流程任务为不通过
         updateTaskStatusAndReason(task.getId(), BpmTaskStatusEnum.REJECT.getStatus(), reqVO.getReason());
         // 2.2 添加评论
         taskService.addComment(task.getId(), task.getProcessInstanceId(), BpmCommentTypeEnum.REJECT.getType(),
                 BpmCommentTypeEnum.REJECT.formatComment(reqVO.getReason()));
 
-        // 3.1 解析用户任务的拒绝处理类型
+        // 3.1 如果是被加签任务且是后加签。 更新加签任务状态为取消
+        if (BpmTaskSignTypeEnum.AFTER.getType().equals(task.getScopeType())) {
+            List<Task> childTaskList = getTaskListByParentTaskId(task.getId());
+            updateTaskStatusWhenCanceled(childTaskList, reqVO.getReason());
+        }
+        // 3.2 如果是加签的任务
+        if (StrUtil.isNotEmpty(task.getParentTaskId())) {
+            Task signTask = validateTaskExist(task.getParentTaskId());
+            // 3.2.1 更新被加签的任务为不通过
+            if (BpmTaskSignTypeEnum.BEFORE.getType().equals(signTask.getScopeType())) {
+                updateTaskStatusAndReason(task.getParentTaskId(), BpmTaskStatusEnum.REJECT.getStatus(), AUTO_REJECT_BY_ADD_SIGN_REJECT.getReason());
+            } else if (BpmTaskSignTypeEnum.AFTER.getType().equals(signTask.getScopeType())) {
+                updateTaskStatus(task.getParentTaskId(), BpmTaskStatusEnum.REJECT.getStatus());
+                // 后加签 不添加拒绝意见。因为会把原来的意见覆盖.
+            }
+            // 3.2.2 添加评论
+            taskService.addComment(task.getParentTaskId(), task.getProcessInstanceId(),
+                    BpmCommentTypeEnum.REJECT.getType(), BpmCommentTypeEnum.REJECT.formatComment(REJECT_BY_ADD_SIGN_TASK_REJECT));
+            // 3.2.3 更新还在进行中的加签任务状态为取消
+            List<Task> addSignTaskList = getTaskListByParentTaskId(task.getParentTaskId());
+            updateTaskStatusWhenCanceled(CollectionUtils.filterList(addSignTaskList, item -> !item.getId().equals(task.getId())),
+                    reqVO.getReason());
+        }
+
+        // 4.1 驳回到指定的任务节点
         BpmnModel bpmnModel = bpmModelService.getBpmnModelByDefinitionId(task.getProcessDefinitionId());
         FlowElement flowElement = BpmnModelUtils.getFlowElementById(bpmnModel, task.getTaskDefinitionKey());
         BpmUserTaskRejectHandlerType userTaskRejectHandlerType = BpmnModelUtils.parseRejectHandlerType(flowElement);
-        // 3.2 类型为驳回到指定的任务节点
         if (userTaskRejectHandlerType == BpmUserTaskRejectHandlerType.RETURN_USER_TASK) {
             String returnTaskId = BpmnModelUtils.parseReturnTaskId(flowElement);
             Assert.notNull(returnTaskId, "回退的节点不能为空");
@@ -346,9 +369,25 @@ public class BpmTaskServiceImpl implements BpmTaskService {
             returnTask(userId, returnReq);
             return;
         }
-        // 3.3 其他情况 终止流程。
-        processInstanceService.updateProcessInstanceReject(instance.getProcessInstanceId(),
-                task.getTaskDefinitionKey(), reqVO.getReason());
+
+        // 4.2.1 更新其它正在运行的任务状态为取消。需要过滤掉当前任务和被加签的任务
+        List<Task> taskList = getRunningTaskListByProcessInstanceId(instance.getProcessInstanceId(), false, null, null);
+        updateTaskStatusWhenCanceled(CollectionUtils.filterList(taskList, item -> !item.getId().equals(task.getId()) && !item.getId().equals(task.getParentTaskId())),
+                reqVO.getReason());
+        // 4.2.2 终止流程
+        List<String> activityIds = convertList(taskList, Task::getTaskDefinitionKey);
+        EndEvent endEvent = BpmnModelUtils.getEndEvent(bpmnModel);
+        Assert.notNull(endEvent, "结束节点不能未空");
+        processInstanceService.updateProcessInstanceReject(instance, activityIds, endEvent.getId(), reqVO.getReason());
+    }
+
+    private void updateTaskStatusWhenCanceled(List<Task> taskList, String reason) {
+        taskList.forEach(task -> {
+            updateTaskStatusAndReason(task.getId(), BpmTaskStatusEnum.CANCEL.getStatus(), BpmDeleteReasonEnum.CANCEL_BY_SYSTEM.getReason());
+            taskService.addComment(task.getId(), task.getProcessInstanceId(),
+                    BpmCommentTypeEnum.CANCEL.getType(), BpmCommentTypeEnum.CANCEL.formatComment(reason));
+
+        });
     }
 
     /**
@@ -399,6 +438,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
 
     @Override
     public void updateTaskStatusWhenCanceled(String taskId) {
+        // @芋艿。这里是不是可以不要了，要不然。  updateTaskStatusAndReason 会报错 task 已经删除了。
         Task task = getTask(taskId);
         // 1. 可能只是活动，不是任务，所以查询不到
         if (task == null) {
@@ -450,10 +490,13 @@ public class BpmTaskServiceImpl implements BpmTaskService {
     }
 
     @Override
-    public List<Task> getTaskListByProcessInstanceIdAndAssigned(String processInstanceId, String executionId, String defineKey) {
+    public List<Task> getRunningTaskListByProcessInstanceId(String processInstanceId, Boolean assigned, String executionId, String defineKey) {
         Assert.notNull(processInstanceId, "processInstanceId 不能为空");
-        TaskQuery taskQuery = taskService.createTaskQuery().taskAssigned().processInstanceId(processInstanceId).active()
+        TaskQuery taskQuery = taskService.createTaskQuery().processInstanceId(processInstanceId).active()
                 .includeTaskLocalVariables();
+        if (BooleanUtil.isTrue(assigned)) {
+            taskQuery.taskAssigned();
+        }
         if (StrUtil.isNotEmpty(executionId)) {
             taskQuery.executionId(executionId);
         }

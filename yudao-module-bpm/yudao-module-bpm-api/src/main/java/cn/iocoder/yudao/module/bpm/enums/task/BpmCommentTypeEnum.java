@@ -22,6 +22,7 @@ public enum BpmCommentTypeEnum {
     TRANSFER("7", "转派", "[{}]将任务转派给[{}]，转派理由为:{}"),
     ADD_SIGN("8", "加签", "[{}]{}给了[{}]，理由为：{}"),
     SUB_SIGN("9", "减签", "[{}]操作了【减签】,审批人[{}]的任务被取消"),
+    REJECT_BY_ADD_SIGN_TASK_REJECT("10", "不通过","系统自动不通过，原因是：加签任务不通过")
     ;
 
     /**

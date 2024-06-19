@@ -136,11 +136,12 @@ public interface BpmProcessInstanceService {
     /**
      * 更新 ProcessInstance 为不通过
      *
-     * @param id     流程编号
-     * @param currentActivityId  当前的活动编号
+     * @param processInstance   流程实例
+     * @param activityIds  当前未完成活动节点 Id
+     * @param endId  结束节点 Id
      * @param reason 理由。例如说，审批不通过时，需要传递该值
      */
-    void updateProcessInstanceReject(String id, String currentActivityId,  String reason);
+    void updateProcessInstanceReject(ProcessInstance processInstance, List<String> activityIds, String endId, String reason);
 
     /**
      * 当流程结束时候，更新 ProcessInstance 为通过
