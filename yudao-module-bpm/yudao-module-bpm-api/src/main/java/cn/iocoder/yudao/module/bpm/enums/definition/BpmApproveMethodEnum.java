@@ -1,8 +1,11 @@
 package cn.iocoder.yudao.module.bpm.enums.definition;
 
 import cn.hutool.core.util.ArrayUtil;
+import cn.iocoder.yudao.framework.common.core.IntArrayValuable;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+
+import java.util.Arrays;
 
 /**
  * BPM 多人审批方式的枚举
@@ -11,7 +14,7 @@ import lombok.Getter;
  */
 @Getter
 @AllArgsConstructor
-public enum BpmApproveMethodEnum {
+public enum BpmApproveMethodEnum implements IntArrayValuable {
 
     RANDOM_SELECT_ONE_APPROVE(1, "随机挑选一人审批"),
     APPROVE_BY_RATIO(2, "多人会签(按通过比例)"), // 会签（按通过比例）
@@ -22,13 +25,20 @@ public enum BpmApproveMethodEnum {
      * 审批方式
      */
     private final Integer method;
+
     /**
      * 名字
      */
     private final String name;
 
+    public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(BpmApproveMethodEnum::getMethod).toArray();
+
     public static BpmApproveMethodEnum valueOf(Integer method) {
         return ArrayUtil.firstMatch(item -> item.getMethod().equals(method), values());
     }
 
+    @Override
+    public int[] array() {
+        return ARRAYS;
+    }
 }

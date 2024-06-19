@@ -1,7 +1,11 @@
 package cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.simple;
 
 import cn.iocoder.yudao.framework.common.validation.InEnum;
+import cn.iocoder.yudao.module.bpm.enums.definition.BpmApproveMethodEnum;
 import cn.iocoder.yudao.module.bpm.enums.definition.BpmSimpleModelNodeType;
+import cn.iocoder.yudao.module.bpm.enums.definition.BpmUserTaskRejectHandlerType;
+import cn.iocoder.yudao.module.bpm.enums.definition.BpmUserTaskTimeoutActionEnum;
+import cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmTaskCandidateStrategyEnum;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -50,6 +54,64 @@ public class BpmSimpleModelNodeVO {
     @JsonIgnore
     private String attachNodeId;
 
+    @Schema(description = "候选人策略", example = "30")
+    @InEnum(BpmTaskCandidateStrategyEnum.class)
+    private Integer candidateStrategy;  // 用于审批，抄送节点
+
+    @Schema(description = "候选人参数")
+    private String candidateParam;    // 用于审批，抄送节点
+
+    @Schema(description = "多人审批方式", example = "1")
+    @InEnum(BpmApproveMethodEnum.class)  // 用于审批节点
+    private Integer approveMethod;
+
+    @Schema(description = "表单权限", example = "[]")
+    private List<Map<String, String>> fieldsPermission;
+
+    @Schema(description = "通过比例", example = "100")
+    private Integer approveRatio;  // 通过比例  当多人审批方式为：多人会签(按通过比例) 需要设置
+
+    /**
+     * 审批节点拒绝处理
+     */
+    private RejectHandler rejectHandler;
+
+    /**
+     * 审批节点超时处理
+     */
+    private TimeoutHandler timeoutHandler;
+
+    @Data
+    @Schema(description = "审批节点拒绝处理策略")
+    public static class RejectHandler {
+
+        @Schema(description = "拒绝处理类型", example = "1")
+        @InEnum(BpmUserTaskRejectHandlerType.class)
+        private Integer type;
+
+        @Schema(description = "任务拒绝后驳回的节点 Id", example = "Activity_1")
+        private String returnNodeId;
+    }
+
+    @Data
+    @Schema(description = "审批节点超时处理策略")
+    public static class TimeoutHandler {
+
+        @Schema(description = "是否开启超时处理", example = "false")
+        private Boolean enable;
+
+        @Schema(description = "任务超时未处理的行为", example = "1")
+        @InEnum(BpmUserTaskTimeoutActionEnum.class)
+        private Integer action;
+
+        @Schema(description = "超时时间", example = "PT6H")
+        private String timeDuration;
+
+        @Schema(description = "最大提醒次数", example = "1")
+        private Integer maxRemindCount;
+    }
+
+
     // Map<String, Integer> formPermissions; 表单权限；仅发起、审批、抄送节点会使用
     // Integer approveMethod; 审批方式；仅审批节点会使用
     // TODO @jason 后面和前端一起调整一下；下面的 ①、②、③ 是优先级
@@ -60,5 +122,6 @@ public class BpmSimpleModelNodeVO {
     // TODO @芋艿：④ 表单的权限列表？
     // TODO @芋艿：⑨ 超时配置；要支持指定时间点、指定时间间隔；
     // TODO @芋艿：条件；建议可以固化的一些选项；然后有个表达式兜底；要支持
+
 
 }

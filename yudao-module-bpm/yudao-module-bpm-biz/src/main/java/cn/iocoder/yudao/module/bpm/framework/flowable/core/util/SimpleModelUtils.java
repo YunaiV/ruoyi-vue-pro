@@ -8,13 +8,12 @@ import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.*;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.simple.BpmSimpleModelNodeVO;
+import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.simple.BpmSimpleModelNodeVO.RejectHandler;
 import cn.iocoder.yudao.module.bpm.enums.definition.BpmApproveMethodEnum;
 import cn.iocoder.yudao.module.bpm.enums.definition.BpmSimpleModeConditionType;
 import cn.iocoder.yudao.module.bpm.enums.definition.BpmSimpleModelNodeType;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnModelConstants;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.simplemodel.SimpleModelConditionGroups;
-import cn.iocoder.yudao.module.bpm.framework.flowable.core.simplemodel.SimpleModelUserTaskConfig;
-import cn.iocoder.yudao.module.bpm.framework.flowable.core.simplemodel.SimpleModelUserTaskConfig.RejectHandler;
 import org.flowable.bpmn.BpmnAutoLayout;
 import org.flowable.bpmn.model.Process;
 import org.flowable.bpmn.model.*;
@@ -24,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import static cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.simple.BpmSimpleModelNodeVO.TimeoutHandler;
 import static cn.iocoder.yudao.module.bpm.enums.definition.BpmBoundaryEventType.USER_TASK_TIMEOUT;
 import static cn.iocoder.yudao.module.bpm.enums.definition.BpmSimpleModelNodeType.*;
 import static cn.iocoder.yudao.module.bpm.enums.definition.BpmUserTaskTimeoutActionEnum.AUTO_REMINDER;
@@ -336,18 +336,17 @@ public class SimpleModelUtils {
 
     private static List<FlowElement> convertApproveNode(BpmSimpleModelNodeVO node) {
         List<FlowElement> flowElements = new ArrayList<>();
-        SimpleModelUserTaskConfig userTaskConfig = BeanUtil.toBean(node.getAttributes(), SimpleModelUserTaskConfig.class);
-        UserTask userTask = buildBpmnUserTask(node, userTaskConfig);
+        UserTask userTask = buildBpmnUserTask(node);
         flowElements.add(userTask);
-        if (userTaskConfig.getTimeoutHandler() != null && userTaskConfig.getTimeoutHandler().getEnable()) {
+        if (node.getTimeoutHandler() != null && node.getTimeoutHandler().getEnable()) {
             // 添加用户任务的 Timer Boundary Event, 用于任务的超时处理
-            BoundaryEvent boundaryEvent = buildUserTaskTimerBoundaryEvent(userTask, userTaskConfig.getTimeoutHandler());
+            BoundaryEvent boundaryEvent = buildUserTaskTimerBoundaryEvent(userTask, node.getTimeoutHandler());
             flowElements.add(boundaryEvent);
         }
         return flowElements;
     }
 
-    private static BoundaryEvent buildUserTaskTimerBoundaryEvent(UserTask userTask, SimpleModelUserTaskConfig.TimeoutHandler timeoutHandler) {
+    private static BoundaryEvent buildUserTaskTimerBoundaryEvent(UserTask userTask, TimeoutHandler timeoutHandler) {
         // 定时器边界事件
         BoundaryEvent boundaryEvent = new BoundaryEvent();
         boundaryEvent.setId("Event-" + IdUtil.fastUUID());
@@ -444,26 +443,26 @@ public class SimpleModelUtils {
         return inclusiveGateway;
     }
 
-    private static UserTask buildBpmnUserTask(BpmSimpleModelNodeVO node, SimpleModelUserTaskConfig userTaskConfig) {
+    private static UserTask buildBpmnUserTask(BpmSimpleModelNodeVO node) {
         UserTask userTask = new UserTask();
         userTask.setId(node.getId());
         userTask.setName(node.getName());
         //  设置审批任务的截止时间
-        if (userTaskConfig.getTimeoutHandler() != null && userTaskConfig.getTimeoutHandler().getEnable()) {
-            userTask.setDueDate(userTaskConfig.getTimeoutHandler().getTimeDuration());
+        if (node.getTimeoutHandler() != null && node.getTimeoutHandler().getEnable()) {
+            userTask.setDueDate(node.getTimeoutHandler().getTimeDuration());
         }
 
         // TODO 芋艿 + jason：要不要基于服务任务，实现或签下的审批不通过？或者说，按比例审批
 
         // TODO @jason：addCandidateElements、processMultiInstanceLoopCharacteristics 建议一起搞哈？
         // 添加候选人元素
-        addCandidateElements(userTaskConfig.getCandidateStrategy(), userTaskConfig.getCandidateParam(), userTask);
+        addCandidateElements(node.getCandidateStrategy(), node.getCandidateParam(), userTask);
         // 添加表单字段权限属性元素
-        addFormFieldsPermission(userTaskConfig.getFieldsPermission(), userTask);
+        addFormFieldsPermission(node.getFieldsPermission(), userTask);
         // 处理多实例
-        processMultiInstanceLoopCharacteristics(userTaskConfig.getApproveMethod(), userTaskConfig.getApproveRatio(), userTask);
+        processMultiInstanceLoopCharacteristics(node.getApproveMethod(), node.getApproveRatio(), userTask);
         // 添加任务被拒绝的处理元素
-        addTaskRejectElements(userTaskConfig.getRejectHandler(), userTask);
+        addTaskRejectElements(node.getRejectHandler(), userTask);
         return userTask;
     }
 

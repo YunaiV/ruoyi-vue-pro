@@ -350,7 +350,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
             }
             // 3.2.2 添加评论
             taskService.addComment(task.getParentTaskId(), task.getProcessInstanceId(),
-                    BpmCommentTypeEnum.REJECT.getType(), BpmCommentTypeEnum.REJECT.formatComment(REJECT_BY_ADD_SIGN_TASK_REJECT));
+                    BpmCommentTypeEnum.REJECT.getType(), REJECT_BY_ADD_SIGN_TASK_REJECT.getComment());
             // 3.2.3 更新还在进行中的加签任务状态为取消
             List<Task> addSignTaskList = getTaskListByParentTaskId(task.getParentTaskId());
             updateTaskStatusWhenCanceled(CollectionUtils.filterList(addSignTaskList, item -> !item.getId().equals(task.getId())),
@@ -375,10 +375,10 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         updateTaskStatusWhenCanceled(CollectionUtils.filterList(taskList, item -> !item.getId().equals(task.getId()) && !item.getId().equals(task.getParentTaskId())),
                 reqVO.getReason());
         // 4.2.2 终止流程
-        List<String> activityIds = convertList(taskList, Task::getTaskDefinitionKey);
+        Set<String> activityIds = convertSet(taskList, Task::getTaskDefinitionKey);
         EndEvent endEvent = BpmnModelUtils.getEndEvent(bpmnModel);
         Assert.notNull(endEvent, "结束节点不能未空");
-        processInstanceService.updateProcessInstanceReject(instance, activityIds, endEvent.getId(), reqVO.getReason());
+        processInstanceService.updateProcessInstanceReject(instance, CollUtil.newArrayList(activityIds), endEvent.getId(), reqVO.getReason());
     }
 
     private void updateTaskStatusWhenCanceled(List<Task> taskList, String reason) {

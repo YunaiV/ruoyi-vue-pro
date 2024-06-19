@@ -1,8 +1,11 @@
 package cn.iocoder.yudao.module.bpm.framework.flowable.core.enums;
 
 import cn.hutool.core.util.ArrayUtil;
+import cn.iocoder.yudao.framework.common.core.IntArrayValuable;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+
+import java.util.Arrays;
 
 /**
  * BPM 任务的候选人策略枚举
@@ -13,7 +16,7 @@ import lombok.Getter;
  */
 @Getter
 @AllArgsConstructor
-public enum BpmTaskCandidateStrategyEnum {
+public enum BpmTaskCandidateStrategyEnum implements IntArrayValuable {
 
     ROLE(10, "角色"),
     DEPT_MEMBER(20, "部门的成员"), // 包括负责人
@@ -26,6 +29,8 @@ public enum BpmTaskCandidateStrategyEnum {
     EXPRESSION(60, "流程表达式"), // 表达式 ExpressionManager
     ;
 
+    public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(BpmTaskCandidateStrategyEnum::getStrategy).toArray();
+
     /**
      * 类型
      */
@@ -37,6 +42,11 @@ public enum BpmTaskCandidateStrategyEnum {
 
     public static BpmTaskCandidateStrategyEnum valueOf(Integer strategy) {
         return ArrayUtil.firstMatch(o -> o.getStrategy().equals(strategy), values());
+    }
+
+    @Override
+    public int[] array() {
+        return ARRAYS;
     }
 
 }
