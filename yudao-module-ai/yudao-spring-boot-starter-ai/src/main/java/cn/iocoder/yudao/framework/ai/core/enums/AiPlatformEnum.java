@@ -22,6 +22,7 @@ public enum AiPlatformEnum {
 
     STABLE_DIFFUSION("StableDiffusion", "StableDiffusion"), // Stability AI
     MIDJOURNEY("midjourney", "midjourney"), // TODO MJ 提供的绘图，接入中
+    SUNO("Suno", "Suno"), // Suno AI
     ;
 
     /**

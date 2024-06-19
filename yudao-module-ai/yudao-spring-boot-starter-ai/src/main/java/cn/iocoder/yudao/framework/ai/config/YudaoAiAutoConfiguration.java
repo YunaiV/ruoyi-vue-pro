@@ -3,7 +3,6 @@ package cn.iocoder.yudao.framework.ai.config;
 import cn.hutool.core.io.IoUtil;
 import cn.iocoder.yudao.framework.ai.core.factory.AiClientFactory;
 import cn.iocoder.yudao.framework.ai.core.factory.AiClientFactoryImpl;
-import cn.iocoder.yudao.framework.ai.core.model.suno.SunoConfig;
 import cn.iocoder.yudao.framework.ai.core.model.suno.api.SunoApi;
 import cn.iocoder.yudao.framework.ai.core.model.tongyi.QianWenChatClient;
 import cn.iocoder.yudao.framework.ai.core.model.tongyi.QianWenChatModal;
@@ -151,7 +150,7 @@ public class YudaoAiAutoConfiguration {
     @Bean
     @ConditionalOnProperty(value = "yudao.ai.suno.enable", havingValue = "true")
     public SunoApi sunoApi(YudaoAiProperties yudaoAiProperties) {
-        return new SunoApi(new SunoConfig(yudaoAiProperties.getSuno().getBaseUrl()));
+        return new SunoApi(yudaoAiProperties.getSuno().getBaseUrl());
     }
 
     private static @NotNull MidjourneyConfig getMidjourneyConfig(ApplicationContext applicationContext,
