@@ -63,7 +63,8 @@ import static cn.iocoder.yudao.module.bpm.enums.ErrorCodeConstants.*;
 @Slf4j
 @Service
 public class BpmTaskServiceImpl implements BpmTaskService {
-
+    @Resource
+    private JdbcTemplate jdbcTemplate;
     @Resource
     private TaskService taskService;
     @Resource
@@ -689,9 +690,14 @@ public class BpmTaskServiceImpl implements BpmTaskService {
      */
     private void createSignTask(TaskEntityImpl parentTask, String assignee) {
         // 1. 生成子任务
+        String executionId = parentTask.getExecutionId();
+        Map parentExecute = jdbcTemplate.queryForMap("select ID_, REV_, PROC_INST_ID_, BUSINESS_KEY_, PARENT_ID_, PROC_DEF_ID_, SUPER_EXEC_, ROOT_PROC_INST_ID_, ACT_ID_, IS_ACTIVE_, IS_CONCURRENT_, IS_SCOPE_, IS_EVENT_SCOPE_, IS_MI_ROOT_, SUSPENSION_STATE_, CACHED_ENT_STATE_, TENANT_ID_, NAME_, START_ACT_ID_, START_TIME_, START_USER_ID_, LOCK_TIME_, LOCK_OWNER_, IS_COUNT_ENABLED_, EVT_SUBSCR_COUNT_, TASK_COUNT_, JOB_COUNT_, TIMER_JOB_COUNT_, SUSP_JOB_COUNT_, DEADLETTER_JOB_COUNT_, EXTERNAL_WORKER_JOB_COUNT_, VAR_COUNT_, ID_LINK_COUNT_, CALLBACK_ID_, CALLBACK_TYPE_, REFERENCE_ID_, REFERENCE_TYPE_, PROPAGATED_STAGE_INST_ID_, BUSINESS_STATUS_ from ACT_RU_EXECUTION where ID_ = '" + executionId + "'");
+        String newExecutionId = IdUtil.fastSimpleUUID();
+        jdbcTemplate.execute("INSERT INTO ACT_RU_EXECUTION(ID_, REV_, PROC_INST_ID_, BUSINESS_KEY_, PARENT_ID_, PROC_DEF_ID_, SUPER_EXEC_, ROOT_PROC_INST_ID_, ACT_ID_, IS_ACTIVE_, IS_CONCURRENT_, IS_SCOPE_, IS_EVENT_SCOPE_, IS_MI_ROOT_, SUSPENSION_STATE_, CACHED_ENT_STATE_, TENANT_ID_, NAME_, START_ACT_ID_, START_TIME_, START_USER_ID_, LOCK_TIME_, LOCK_OWNER_, IS_COUNT_ENABLED_, EVT_SUBSCR_COUNT_, TASK_COUNT_, JOB_COUNT_, TIMER_JOB_COUNT_, SUSP_JOB_COUNT_, DEADLETTER_JOB_COUNT_, EXTERNAL_WORKER_JOB_COUNT_, VAR_COUNT_, ID_LINK_COUNT_, CALLBACK_ID_, CALLBACK_TYPE_, REFERENCE_ID_, REFERENCE_TYPE_, PROPAGATED_STAGE_INST_ID_, BUSINESS_STATUS_) VALUES " +
+                " ('"+newExecutionId+"', 1, '"+parentTask.getProcessInstanceId()+"', NULL, '"+executionId+"', '"+parentTask.getProcessDefinitionId()+"', NULL, '"+parentTask.getProcessInstanceId()+"', '"+ MapUtil.getStr(parentExecute,"ACT_ID_") +"', 1, 0, 0, 0, 0, 1, NULL, '', NULL, NULL, NULL, NULL, NULL, NULL, 1, 0, 1, 0, 0, 0, 0, 0, 2, 0, NULL, NULL, NULL, NULL, NULL, NULL)");
         TaskEntityImpl task = (TaskEntityImpl) taskService.newTask(IdUtil.fastSimpleUUID());
         BpmTaskConvert.INSTANCE.copyTo(parentTask, task);
-
+        task.setExecutionId(newExecutionId);
         // 2.1 向前加签，设置审批人
         if (BpmTaskSignTypeEnum.BEFORE.getType().equals(parentTask.getScopeType())) {
             task.setAssignee(assignee);
