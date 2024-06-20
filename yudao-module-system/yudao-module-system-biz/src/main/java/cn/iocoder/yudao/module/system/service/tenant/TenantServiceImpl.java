@@ -11,6 +11,7 @@ import cn.iocoder.yudao.framework.common.util.date.DateUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.tenant.config.TenantProperties;
 import cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder;
+import cn.iocoder.yudao.framework.tenant.core.service.TenantFrameworkService;
 import cn.iocoder.yudao.framework.tenant.core.util.TenantUtils;
 import cn.iocoder.yudao.module.system.controller.admin.permission.vo.role.RoleSaveReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.tenant.vo.tenant.TenantPageReqVO;
@@ -30,10 +31,12 @@ import cn.iocoder.yudao.module.system.service.tenant.handler.TenantInfoHandler;
 import cn.iocoder.yudao.module.system.service.tenant.handler.TenantMenuHandler;
 import cn.iocoder.yudao.module.system.service.user.AdminUserService;
 import com.baomidou.dynamic.datasource.annotation.DSTransactional;
+import com.baomidou.dynamic.datasource.tx.TransactionContext;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
@@ -73,6 +76,9 @@ public class TenantServiceImpl implements TenantService {
     private MenuService menuService;
     @Resource
     private PermissionService permissionService;
+    @Autowired
+    @Lazy // 延迟注入，避免循环依赖报错
+    private TenantFrameworkService tenantFrameworkService;
 
     @Override
     public List<Long> getTenantIdList() {
@@ -157,6 +163,13 @@ public class TenantServiceImpl implements TenantService {
         if (ObjectUtil.notEqual(tenant.getPackageId(), updateReqVO.getPackageId())) {
             updateTenantRoleMenu(tenant.getId(), tenantPackage.getMenuIds());
         }
+        TransactionContext.registerSynchronization(new TransactionSynchronization() {
+            @Override
+            public void afterCommit() {
+                // 立即更新租户缓存，例如修改了租户的过期时间后，租户立马可以感知到
+                tenantFrameworkService.refreshTenant(tenant.getId());
+            }
+        });
     }
 
     private void validTenantNameDuplicate(String name, Long id) {

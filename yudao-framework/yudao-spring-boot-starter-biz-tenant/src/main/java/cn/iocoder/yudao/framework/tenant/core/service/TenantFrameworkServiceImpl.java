@@ -70,4 +70,9 @@ public class TenantFrameworkServiceImpl implements TenantFrameworkService {
         }
     }
 
+    @Override
+    public void refreshTenant(Long id) {
+        validTenantCache.refresh(id);
+    }
+
 }
