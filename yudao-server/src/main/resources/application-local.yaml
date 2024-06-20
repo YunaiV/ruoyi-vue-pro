@@ -74,7 +74,7 @@ spring:
 #    password: dev # 密码，建议生产环境开启
   cache:
     redis:
-      key-prefix: ruoyi-vue-pro # Redis Key 的前缀
+      key-prefix: yudao-server # Redis Key 的前缀
 
 --- #################### 定时任务相关配置 ####################
 
