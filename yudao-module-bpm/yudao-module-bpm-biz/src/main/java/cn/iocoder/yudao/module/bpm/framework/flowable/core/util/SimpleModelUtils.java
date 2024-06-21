@@ -389,16 +389,11 @@ public class SimpleModelUtils {
         serviceTask.setImplementation("${bpmCopyTaskDelegate}");
 
         // 添加抄送候选人元素
-        addCandidateElements(MapUtil.getInt(node.getAttributes(), BpmnModelConstants.USER_TASK_CANDIDATE_STRATEGY),
-                MapUtil.getStr(node.getAttributes(), BpmnModelConstants.USER_TASK_CANDIDATE_PARAM),
-                serviceTask);
+        addCandidateElements(node.getCandidateStrategy(), node.getCandidateParam(), serviceTask);
 
         // 添加表单字段权限属性元素
         // TODO @芋艿：这块关注下哈；
-        List<Map<String, String>> fieldsPermissions = MapUtil.get(node.getAttributes(),
-                FORM_FIELD_PERMISSION_ELEMENT, new TypeReference<>() {
-                });
-        addFormFieldsPermission(fieldsPermissions, serviceTask);
+        addFormFieldsPermission(node.getFieldsPermission(), serviceTask);
         return serviceTask;
     }
 
