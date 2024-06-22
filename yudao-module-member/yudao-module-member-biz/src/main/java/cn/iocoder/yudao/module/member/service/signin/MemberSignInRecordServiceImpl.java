@@ -75,11 +75,12 @@ public class MemberSignInRecordServiceImpl implements MemberSignInRecordService 
         }
         summary.setTodaySignIn(DateUtils.isToday(lastRecord.getCreateTime()));
 
-        // 4.1 校验今天是否签到，没有签到则直接返回
-        if (!summary.getTodaySignIn()) {
+        // 4.1 检查今天是否未签到且记录不是昨天创建的，如果是则直接返回
+        if (!summary.getTodaySignIn() && !DateUtils.isYesterday(lastRecord.getCreateTime())) {
             return summary;
         }
-        // 4.2 连续签到天数
+
+        // 4.2 要么是今天签到了，要么是昨天的记录，设置连续签到天数
         summary.setContinuousDay(lastRecord.getDay());
         return summary;
     }
