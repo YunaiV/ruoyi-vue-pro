@@ -30,7 +30,8 @@ public interface ProductSpuMapper extends BaseMapperX<ProductSpuDO> {
                 .likeIfPresent(ProductSpuDO::getName, reqVO.getName())
                 .eqIfPresent(ProductSpuDO::getCategoryId, reqVO.getCategoryId())
                 .betweenIfPresent(ProductSpuDO::getCreateTime, reqVO.getCreateTime())
-                .orderByDesc(ProductSpuDO::getSort);
+                .orderByDesc(ProductSpuDO::getSort)
+                .orderByDesc(ProductSpuDO::getId);
         appendTabQuery(tabType, queryWrapper);
         return selectPage(reqVO, queryWrapper);
     }
