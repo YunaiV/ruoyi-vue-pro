@@ -4,7 +4,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 import java.util.*;
 ## 处理 BigDecimal 字段的引入
-import java.util.*;
 #foreach ($column in $columns)
 #if (${column.javaType} == "BigDecimal")
 import java.math.BigDecimal;
