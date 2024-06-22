@@ -1,8 +1,11 @@
 package cn.iocoder.yudao.framework.mybatis.core.util;
 
 import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.SortingField;
+import cn.iocoder.yudao.framework.mybatis.core.enums.FindInSetEnum;
+import com.baomidou.mybatisplus.annotation.DbType;
 import com.baomidou.mybatisplus.core.metadata.OrderItem;
 import com.baomidou.mybatisplus.core.toolkit.StringPool;
 import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
@@ -34,7 +37,7 @@ public class MyBatisUtils {
         // 排序字段
         if (!CollectionUtil.isEmpty(sortingFields)) {
             page.addOrder(sortingFields.stream().map(sortingField -> SortingField.ORDER_ASC.equals(sortingField.getOrder()) ?
-                    OrderItem.asc(sortingField.getField()) : OrderItem.desc(sortingField.getField()))
+                            OrderItem.asc(sortingField.getField()) : OrderItem.desc(sortingField.getField()))
                     .collect(Collectors.toList()));
         }
         return page;
@@ -56,7 +59,7 @@ public class MyBatisUtils {
 
     /**
      * 获得 Table 对应的表名
-     *
+     * <p>
      * 兼容 MySQL 转义表名 `t_xxx`
      *
      * @param table 表
@@ -85,4 +88,18 @@ public class MyBatisUtils {
         return new Column(tableName + StringPool.DOT + column);
     }
 
+    /**
+     * 跨数据库的 find_in_set 实现
+     *
+     * @param column 字段名称
+     * @param value  查询值(不带单引号)
+     * @return sql
+     */
+    public static String findInSet(String column, Object value) {
+        // 这里不用SqlConstants.DB_TYPE，因为它是使用 primary 数据源的 url 推断出来的类型
+        DbType dbType = JdbcUtils.getDbType();
+        return FindInSetEnum.getTemplate(dbType)
+                .replace("#{column}", column)
+                .replace("#{value}", StrUtil.toString(value));
+    }
 }

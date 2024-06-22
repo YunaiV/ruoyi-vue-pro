@@ -93,7 +93,7 @@ services:
         volumes:
             - dm8:/opt/dmdbms/data
             - ../dm/ruoyi-vue-pro-dm8.sql:/tmp/schema.sql:ro
-            # docker compose exec dm8 bash -c "exec /opt/dmdbms/bin/disql SYSDBA/SYSDBA001 \`/tmp/schema.sql"
+            # docker compose exec dm8 bash -c '/opt/dmdbms/bin/disql SYSDBA/SYSDBA001 \`/tmp/schema.sql'
 
     kingbase:
         # x86_64: https://kingbase.oss-cn-beijing.aliyuncs.com/KESV8R3/V009R001C001B0025-安装包-docker/x86_64/kdb_x86_64_V009R001C001B0025.tar
