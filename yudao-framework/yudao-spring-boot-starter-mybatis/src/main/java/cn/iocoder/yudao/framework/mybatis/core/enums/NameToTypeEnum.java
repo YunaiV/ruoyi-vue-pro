@@ -9,6 +9,7 @@ import java.util.Arrays;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+// TODO @dhb52：是不是把 FindInSetEnum、NameToTypeEnum 融合，搞成 DbTypeEnum？然后里面 type、productName，findInSet
 /**
  * 数据库产品名 => mp DbType 的映射关系
  *

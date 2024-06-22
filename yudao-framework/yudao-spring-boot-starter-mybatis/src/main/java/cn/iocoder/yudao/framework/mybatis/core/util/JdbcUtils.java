@@ -7,7 +7,6 @@ import com.baomidou.mybatisplus.annotation.DbType;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
-import java.sql.DatabaseMetaData;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
@@ -53,10 +52,7 @@ public class JdbcUtils {
         DynamicRoutingDataSource dynamicRoutingDataSource = SpringUtils.getBean(DynamicRoutingDataSource.class);
         DataSource dataSource = dynamicRoutingDataSource.determineDataSource();
         try (Connection conn = dataSource.getConnection()) {
-            DatabaseMetaData metaData = conn.getMetaData();
-            String databaseProductName = metaData.getDatabaseProductName();
-            DbType dbType = NameToTypeEnum.find(databaseProductName);
-            return dbType;
+            return NameToTypeEnum.find(conn.getMetaData().getDatabaseProductName());
         } catch (SQLException e) {
             throw new IllegalArgumentException(e.getMessage());
         }
