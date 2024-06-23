@@ -30,8 +30,10 @@ public class AiMusicConvert {
                 .setTags(StrUtil.isNotBlank(musicData.tags()) ? List.of(musicData.tags().split(StrPool.COMMA)) : null);
     }
 
-    public static List<AiMusicDO> convertFrom(List<SunoApi.MusicData> musicDataList) {
-        return musicDataList.stream()
+    // TODO @xin：一般情况下，不用 convert，直接逻辑里 convert 就好啦。
+    public static List<AiMusicDO> convertFrom(List<SunoApi.MusicData> list) {
+        // TODO @xin：可以使用 CollectionUtils.convertList 简洁一点
+        return list.stream()
                 .map(AiMusicConvert::convertFrom)
                 .collect(Collectors.toList());
     }

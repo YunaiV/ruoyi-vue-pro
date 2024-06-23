@@ -16,12 +16,13 @@ import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
-@Tag(name = "管理后台 - AI 音乐生成")
+@Tag(name = "管理后台 - AI 音乐")
 @RestController
 @RequestMapping("/ai/music")
-@RequiredArgsConstructor
+@RequiredArgsConstructor // TODO @xin：通过 @Resource 注入哈
 public class AiMusicController {
 
+    // TODO @xin：变量不用有 ai 前缀
     private final AiMusicService aiMusicService;
 
     @PostMapping("/generate")

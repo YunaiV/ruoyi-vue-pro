@@ -6,7 +6,7 @@ import lombok.Data;
 
 import java.util.List;
 
-
+// TODO @xin：1）ai 前缀；2）AiSunoGenerateReqVO，要有生成哈。3）swaggger 缺少的属性，也最好加下，类似 example，类上的 swagger 等
 /**
  * @author xiaoxin
  */
@@ -19,7 +19,8 @@ public class SunoReqVO {
     @Schema(description = "是否纯音乐")
     private Boolean makeInstrumental;
 
-    @Schema(description = "模型版本 ")
+    // TODO @xin：我们自己是不是用 modelVersion？还是什么梗精准，减少非必要的缩写
+    @Schema(description = "模型版本")
     private String mv;
 
     @Schema(description = "音乐风格")

@@ -21,6 +21,7 @@ import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUti
 
 /**
  * AI 音乐 Service 实现类
+ *
  * @author xiaoxin
  */
 @Service
@@ -29,11 +30,13 @@ public class AiMusicServiceImpl implements AiMusicService {
 
     @Resource
     private SunoApi sunoApi;
+
     @Resource
     private AiMusicMapper musicMapper;
 
     @Override
     public List<Long> generateMusic(SunoReqVO reqVO) {
+        // TODO @xin：是不是可以 if else 调用对应的 API，然后 insertMusicData 逻辑
         AiMusicGenerateEnum generateEnum = AiMusicGenerateEnum.valueOfMode(reqVO.getGenerateMode());
         return switch (generateEnum) {
             case DESCRIPTION -> descriptionMode(reqVO);

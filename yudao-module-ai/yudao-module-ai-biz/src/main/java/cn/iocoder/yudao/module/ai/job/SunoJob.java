@@ -15,6 +15,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+// TODO @xin：不要直接叫这个名字哈，要有它的目的
 /**
  * 处理 Suno Job
  * @author xiaoxin
@@ -30,6 +31,7 @@ public class SunoJob implements JobHandler {
 
     @Override
     public String execute(String param) {
+        // TODO @xin：可以考虑，整个逻辑都下沉到 Service 里，有点类似 AccessLogCleanJob
         List<AiMusicDO> unCompletedTask = musicService.getUnCompletedTask();
 
         if (CollUtil.isEmpty(unCompletedTask)) {

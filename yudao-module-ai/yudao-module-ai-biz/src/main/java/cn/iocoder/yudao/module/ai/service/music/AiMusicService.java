@@ -12,7 +12,6 @@ import java.util.List;
  */
 public interface AiMusicService {
 
-
     /**
      * 音乐生成
      *
@@ -21,7 +20,6 @@ public interface AiMusicService {
      */
     List<Long> generateMusic(SunoReqVO reqVO);
 
-
     /**
      * 获取未完成状态的任务
      *
@@ -29,8 +27,6 @@ public interface AiMusicService {
      */
     List<AiMusicDO> getUnCompletedTask();
 
-
     Boolean updateBatch(List<AiMusicDO> aiMusicDOList);
-
 
 }

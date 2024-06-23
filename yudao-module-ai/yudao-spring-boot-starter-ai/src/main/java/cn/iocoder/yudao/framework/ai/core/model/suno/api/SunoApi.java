@@ -19,8 +19,8 @@ import java.util.function.Predicate;
 
 /**
  * Suno API
- * <b>
- * 文档地址：https://github.com/status2xx/suno-api/blob/main/README_CN.md
+ *
+ * 对接 Suno Proxy：<a href="https://github.com/gcui-art/suno-api">suno-api</a>
  *
  * @author xiaoxin
  */
@@ -31,13 +31,13 @@ public class SunoApi {
 
     private final Predicate<HttpStatusCode> STATUS_PREDICATE = status -> !status.is2xxSuccessful();
 
-    private final Function<Object, Function<ClientResponse, Mono<? extends Throwable>>> EXCEPTION_FUNCTION = reqParam -> response -> response.bodyToMono(String.class)
-            .handle((respBody, sink) -> {
+    private final Function<Object, Function<ClientResponse, Mono<? extends Throwable>>> EXCEPTION_FUNCTION =
+            reqParam -> response -> response.bodyToMono(String.class).handle((responseBody, sink) -> {
                 HttpRequest request = response.request();
-                log.error("[suno-api] 调用失败！请求方式:[{}], 请求地址:[{}], 请求参数:[{}], 响应数据: [{}]", request.getMethod(), request.getURI(), reqParam, respBody);
+                log.error("[suno-api] 调用失败！请求方式:[{}]，请求地址:[{}]，请求参数:[{}]，响应数据: [{}]",
+                        request.getMethod(), request.getURI(), reqParam, responseBody);
                 sink.error(new IllegalStateException("[suno-api] 调用失败！"));
             });
-
 
     public SunoApi(String baseUrl) {
         this.webClient = WebClient.builder()
@@ -110,7 +110,6 @@ public class SunoApi {
                 .bodyToMono(LimitUsageData.class)
                 .block();
     }
-
 
     /**
      * 根据提示生成音频

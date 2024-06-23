@@ -12,6 +12,7 @@ import lombok.Data;
 
 import java.util.List;
 
+// TODO @xin：注释完善下
 /**
  * @Author xiaoxin
  * @Date 2024/6/5
@@ -94,7 +95,6 @@ public class AiMusicDO extends BaseDO {
      */
     private String errorMessage;
 
-
     /**
      * 音乐风格标签
      */
@@ -106,7 +106,7 @@ public class AiMusicDO extends BaseDO {
      */
     private String taskId;
 
-
+    // TODO @xin：用     @TableField(typeHandler = JacksonTypeHandler.class) 替代即可
     public static class AiMusicTagsHandler extends AbstractJsonTypeHandler<Object> {
 
         @Override
