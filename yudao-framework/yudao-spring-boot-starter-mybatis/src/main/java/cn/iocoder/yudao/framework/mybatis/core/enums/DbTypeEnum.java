@@ -18,46 +18,46 @@ public enum DbTypeEnum {
     /**
      * MySQL
      */
-    MY_SQL("MySQL", "FIND_IN_SET('#{value}', #{column}) <> 0", DbType.MYSQL),
+    MY_SQL( DbType.MYSQL, "MySQL", "FIND_IN_SET('#{value}', #{column}) <> 0"),
 
     /**
      * Oracle
      */
-    ORACLE("Oracle", "FIND_IN_SET('#{value}', #{column}) <> 0", DbType.ORACLE),
+    ORACLE(DbType.ORACLE, "Oracle", "FIND_IN_SET('#{value}', #{column}) <> 0"),
 
     /**
      * PostgreSQL
      */
-    POSTGRE_SQL("PostgreSQL", "POSITION('#{value}' IN #{column}) <> 0", DbType.POSTGRE_SQL),
+    POSTGRE_SQL(DbType.POSTGRE_SQL,"PostgreSQL", "POSITION('#{value}' IN #{column}) <> 0"),
 
     /**
      * SQL Server
      */
-    SQL_SERVER("Microsoft SQL Server", "CHARINDEX(',' + #{value} + ',', ',' + #{column} + ',') <> 0", DbType.SQL_SERVER),
+    SQL_SERVER(DbType.SQL_SERVER, "Microsoft SQL Server", "CHARINDEX(',' + #{value} + ',', ',' + #{column} + ',') <> 0"),
 
     /**
      * 达梦
      */
-    DM("DM DBMS", "FIND_IN_SET('#{value}', #{column}) <> 0", DbType.DM),
+    DM(DbType.DM, "DM DBMS", "FIND_IN_SET('#{value}', #{column}) <> 0"),
 
     /**
      * 人大金仓
      */
-    KINGBASE_ES("KingbaseES", "POSITION('#{value}' IN #{column}) <> 0", DbType.KINGBASE_ES),
+    KINGBASE_ES(DbType.KINGBASE_ES, "KingbaseES", "POSITION('#{value}' IN #{column}) <> 0"),
 
     // 华为openGauss 使用ProductName 与 PostgreSQL相同
     ;
 
     public static final Map<String, DbTypeEnum> MAP_BY_NAME = Arrays.stream(values())
-            .collect(Collectors.toMap(DbTypeEnum::getName, Function.identity()));
+            .collect(Collectors.toMap(DbTypeEnum::getProductName, Function.identity()));
 
     public static final Map<DbType, DbTypeEnum> MAP_BY_MP = Arrays.stream(values())
             .collect(Collectors.toMap(DbTypeEnum::getMpDbType, Function.identity()));
 
 
-    private final String name;
-    private final String findInSetTemplate;
     private final DbType mpDbType;
+    private final String productName;
+    private final String findInSetTemplate;
 
     public static DbType find(String databaseProductName) {
         if (StrUtil.isBlank(databaseProductName)) {
