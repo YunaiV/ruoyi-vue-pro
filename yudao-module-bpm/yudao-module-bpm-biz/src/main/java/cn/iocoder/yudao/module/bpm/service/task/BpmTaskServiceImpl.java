@@ -371,8 +371,10 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         }
 
         // 4.2.1 更新其它正在运行的任务状态为取消。需要过滤掉当前任务和被加签的任务
+        // TODO @jason：如果过滤掉被加签的任务，这些任务被对应的审批人看到是啥状态哈？
         List<Task> taskList = getRunningTaskListByProcessInstanceId(instance.getProcessInstanceId(), false, null, null);
-        updateTaskStatusWhenCanceled(CollectionUtils.filterList(taskList, item -> !item.getId().equals(task.getId()) && !item.getId().equals(task.getParentTaskId())),
+        updateTaskStatusWhenCanceled(
+                CollectionUtils.filterList(taskList, item -> !item.getId().equals(task.getId()) && !item.getId().equals(task.getParentTaskId())),
                 reqVO.getReason());
         // 4.2.2 终止流程
         Set<String> activityIds = convertSet(taskList, Task::getTaskDefinitionKey);

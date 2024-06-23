@@ -54,6 +54,7 @@ public class BpmTaskEventListener extends AbstractFlowableEngineEventListener {
 
     @Override
     protected void activityCancelled(FlowableActivityCancelledEvent event) {
+        // TODO @jason：如果用户主动取消，可能需要考虑这个
         // @芋艿。 这里是不是就可以不要了， 取消的任务状态，在rejectTask 里面做了， 如果在 updateTaskStatusWhenCanceled 里面修改会报错。
 //        List<HistoricActivityInstance> activityList = activityService.getHistoricActivityListByExecutionId(event.getExecutionId());
 //        if (CollUtil.isEmpty(activityList)) {

@@ -56,20 +56,20 @@ public class BpmSimpleModelNodeVO {
 
     @Schema(description = "候选人策略", example = "30")
     @InEnum(BpmTaskCandidateStrategyEnum.class)
-    private Integer candidateStrategy;  // 用于审批，抄送节点
+    private Integer candidateStrategy; // 用于审批，抄送节点
 
     @Schema(description = "候选人参数")
-    private String candidateParam;    // 用于审批，抄送节点
+    private String candidateParam; // 用于审批，抄送节点
 
     @Schema(description = "多人审批方式", example = "1")
-    @InEnum(BpmApproveMethodEnum.class)  // 用于审批节点
-    private Integer approveMethod;
+    @InEnum(BpmApproveMethodEnum.class)
+    private Integer approveMethod; // 用于审批节点
 
     @Schema(description = "表单权限", example = "[]")
     private List<Map<String, String>> fieldsPermission;
 
     @Schema(description = "通过比例", example = "100")
-    private Integer approveRatio;  // 通过比例  当多人审批方式为：多人会签(按通过比例) 需要设置
+    private Integer approveRatio; // 通过比例，当多人审批方式为：多人会签(按通过比例) 需要设置
 
     /**
      * 审批节点拒绝处理
@@ -122,6 +122,5 @@ public class BpmSimpleModelNodeVO {
     // TODO @芋艿：④ 表单的权限列表？
     // TODO @芋艿：⑨ 超时配置；要支持指定时间点、指定时间间隔；
     // TODO @芋艿：条件；建议可以固化的一些选项；然后有个表达式兜底；要支持
-
 
 }
