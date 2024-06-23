@@ -1,23 +1,39 @@
 package cn.iocoder.yudao.module.ai.controller.admin.music.vo;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
+import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
+import java.util.List;
+
+
+/**
+ * @author xiaoxin
+ */
 @Data
-@JsonInclude(value = JsonInclude.Include.NON_NULL) // TODO @xin：不用加这个哈
 public class SunoReqVO {
-    /**
-     * 用于生成音乐音频的提示
-     */
+
+    @Schema(description = "用于生成音乐音频的提示")
     private String prompt;
-    // TODO @xin：Boolean，不使用基本类型。
-    /**
-     *  是否纯音乐
-     */
-    private boolean makeInstrumental;
-    /**
-     * //todo 首次请求返回的模型是对的，后续更新音频返回的模型又变成v3.5了
-     * 模型版本  {@link cn.iocoder.yudao.module.ai.enums.AiModelEnum} Suno
-     */
+
+    @Schema(description = "是否纯音乐")
+    private Boolean makeInstrumental;
+
+    @Schema(description = "模型版本 ")
     private String mv;
+
+    @Schema(description = "音乐风格")
+    private List<String> tags;
+
+    @Schema(description = "音乐/歌曲名称")
+    private String title;
+
+    @Schema(description = "平台")
+    @NotBlank(message = "平台不能为空")
+    private String platform;
+
+    @Schema(description = "生成模式 lyric(歌词模式), description(描述模式)")
+    @NotBlank(message = "生成模式不能为空")
+    private String generateMode;
+
 }

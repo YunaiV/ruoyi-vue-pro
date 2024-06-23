@@ -1,22 +1,18 @@
-package cn.iocoder.yudao.module.ai.enums;
+package cn.iocoder.yudao.module.ai.enums.music;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
-// TODO @xin：这个类，挪到 enums/music 包下；
-// TODO @xin：1）@author 这个是标准的 javadoc；2）@date 可以不要哈；3）可以加下枚举类的注释
 /**
- * @Author xiaoxin
- * @Date 2024/6/5
+ * AI 音乐状态的枚举
+ *
+ * @author xiaoxin
  */
 @AllArgsConstructor
 @Getter
 public enum AiMusicStatusEnum {
 
-    // TODO @xin：是不是收敛成，只有 3 个：进行中，成功，失败；类似 AiImageStatusEnum
-
-    SUBMITTED("submitted", "已提交"),
-    QUEUED("queued", "排队中"),
+    // @xin 文档中无失败这个返回值
     STREAMING("streaming", "进行中"),
     COMPLETE("complete", "完成");
 
