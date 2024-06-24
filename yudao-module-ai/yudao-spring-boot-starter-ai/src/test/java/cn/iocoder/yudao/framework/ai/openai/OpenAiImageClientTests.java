@@ -1,15 +1,11 @@
-package cn.iocoder.yudao.framework.ai.openAiImage;
+package cn.iocoder.yudao.framework.ai.openai;
 
 import org.springframework.ai.image.ImagePrompt;
 import org.springframework.ai.image.ImageResponse;
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.ai.openai.OpenAiChatClient;
 import org.springframework.ai.openai.OpenAiImageClient;
-import org.springframework.ai.openai.OpenAiImageOptions;
-import org.springframework.ai.openai.api.OpenAiApi;
 import org.springframework.ai.openai.api.OpenAiImageApi;
-import reactor.core.publisher.Flux;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -18,7 +14,6 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.Base64;
 import java.util.Scanner;
-import java.util.function.Function;
 
 /**
  * author: fansili

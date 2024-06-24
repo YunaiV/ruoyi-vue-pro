@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.framework.ai.config;
 
-import cn.hutool.core.io.IoUtil;
 import cn.iocoder.yudao.framework.ai.core.factory.AiClientFactory;
 import cn.iocoder.yudao.framework.ai.core.factory.AiClientFactoryImpl;
 import cn.iocoder.yudao.framework.ai.core.model.suno.api.SunoApi;
@@ -15,24 +14,10 @@ import cn.iocoder.yudao.framework.ai.core.model.yiyan.YiYanChatClient;
 import cn.iocoder.yudao.framework.ai.core.model.yiyan.YiYanChatOptions;
 import cn.iocoder.yudao.framework.ai.core.model.yiyan.api.YiYanApi;
 import lombok.extern.slf4j.Slf4j;
-import org.jetbrains.annotations.NotNull;
-import org.springframework.ai.models.midjourney.MidjourneyConfig;
-import org.springframework.ai.models.midjourney.MidjourneyMessage;
-import org.springframework.ai.models.midjourney.api.MidjourneyInteractionsApi;
-import org.springframework.ai.models.midjourney.webSocket.MidjourneyMessageHandler;
-import org.springframework.ai.models.midjourney.webSocket.MidjourneyWebSocketStarter;
-import org.springframework.ai.models.midjourney.webSocket.listener.MidjourneyMessageListener;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
-import org.springframework.core.io.Resource;
-
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * 芋道 AI 自动配置
@@ -112,62 +97,9 @@ public class YudaoAiAutoConfiguration {
     }
 
     @Bean
-    @ConditionalOnMissingBean(value = MidjourneyMessageHandler.class)
-    public MidjourneyMessageHandler defaultMidjourneyMessageHandler() {
-        // 如果没有实现 MidjourneyMessageHandler 默认注入一个
-        return new MidjourneyMessageHandler() {
-            @Override
-            public void messageHandler(MidjourneyMessage midjourneyMessage) {
-                log.info("default midjourney message: {}", midjourneyMessage);
-            }
-        };
-    }
-
-    @Bean
-    @ConditionalOnProperty(value = "yudao.ai.midjourney.enable", havingValue = "true")
-    public MidjourneyWebSocketStarter midjourneyWebSocketStarter(ApplicationContext applicationContext,
-                                                                 MidjourneyMessageHandler midjourneyMessageHandler,
-                                                                 YudaoAiProperties yudaoAiProperties) {
-        // 获取 midjourneyProperties
-        YudaoAiProperties.MidjourneyProperties midjourneyProperties = yudaoAiProperties.getMidjourney();
-        // 获取 midjourneyConfig
-        MidjourneyConfig midjourneyConfig = getMidjourneyConfig(applicationContext, midjourneyProperties);
-        // 创建 socket messageListener
-        MidjourneyMessageListener messageListener = new MidjourneyMessageListener(midjourneyConfig, midjourneyMessageHandler);
-        // 创建 MidjourneyWebSocketStarter
-        return new MidjourneyWebSocketStarter(midjourneyProperties.getWssUrl(), null, midjourneyConfig, messageListener);
-    }
-
-    @Bean
-    @ConditionalOnProperty(value = "yudao.ai.midjourney.enable", havingValue = "true")
-    public MidjourneyInteractionsApi midjourneyInteractionsApi(ApplicationContext applicationContext, YudaoAiProperties yudaoAiProperties) {
-        // 获取 midjourneyConfig
-        MidjourneyConfig midjourneyConfig = getMidjourneyConfig(applicationContext, yudaoAiProperties.getMidjourney());
-        // 创建 MidjourneyInteractionsApi
-        return new MidjourneyInteractionsApi(midjourneyConfig);
-    }
-
-    @Bean
     @ConditionalOnProperty(value = "yudao.ai.suno.enable", havingValue = "true")
     public SunoApi sunoApi(YudaoAiProperties yudaoAiProperties) {
         return new SunoApi(yudaoAiProperties.getSuno().getBaseUrl());
     }
 
-    private static @NotNull MidjourneyConfig getMidjourneyConfig(ApplicationContext applicationContext,
-                                                                 YudaoAiProperties.MidjourneyProperties midjourneyProperties) {
-        Map<String, String> requestTemplates = new HashMap<>();
-        try {
-            Resource[] resources = applicationContext.getResources("classpath:http-body/*.json");
-            for (var resource : resources) {
-                String filename = resource.getFilename();
-                String params = IoUtil.readUtf8(resource.getInputStream());
-                requestTemplates.put(filename.substring(0, filename.length() - 5), params);
-            }
-        } catch (IOException e) {
-            throw new IllegalArgumentException("Midjourney json模板初始化出错! " + e.getMessage());
-        }
-        // 创建 midjourneyConfig
-        return new MidjourneyConfig(midjourneyProperties.getToken(),
-                midjourneyProperties.getGuildId(), midjourneyProperties.getChannelId(), requestTemplates);
-    }
 }
