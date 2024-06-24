@@ -35,8 +35,10 @@ public interface KeFuMessageService {
      * 【管理员】更新消息已读状态
      *
      * @param conversationId 会话编号
+     * @param userId         用户编号
+     * @param userType       用户类型
      */
-    void updateKefuMessageReadStatus(Long conversationId);
+    void updateKefuMessageReadStatus(Long conversationId, Long userId, Integer userType);
 
     /**
      * 获得客服消息分页

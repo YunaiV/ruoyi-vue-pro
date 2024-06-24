@@ -9,10 +9,6 @@ import lombok.Data;
 @Data
 public class AppKeFuMessageSendReqVO {
 
-    // TODO @puhui999：应该没有传递编号哈
-    @Schema(description = "编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "23202")
-    private Long id;
-
     @Schema(description = "消息类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     @NotNull(message = "消息类型不能为空")
     private Integer contentType;

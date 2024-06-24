@@ -43,8 +43,7 @@ public class AppKeFuMessageController {
     @Parameter(name = "conversationId", description = "会话编号", required = true)
     @PreAuthenticated
     public CommonResult<Boolean> updateKefuMessageReadStatus(@RequestParam("conversationId") Long conversationId) {
-        // TODO @puhui999：需要传递 userId；万一用户模拟一个 conversationId
-        kefuMessageService.updateKefuMessageReadStatus(conversationId);
+        kefuMessageService.updateKefuMessageReadStatus(conversationId, getLoginUserId(), UserTypeEnum.MEMBER.getValue());
         return success(true);
     }
 

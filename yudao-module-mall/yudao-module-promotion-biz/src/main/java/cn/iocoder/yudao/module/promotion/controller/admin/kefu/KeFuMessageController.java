@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.promotion.controller.admin.kefu;
 
+import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
@@ -18,6 +19,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
+import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
 
 @Tag(name = "管理后台 - 客服消息")
 @RestController
@@ -32,6 +34,7 @@ public class KeFuMessageController {
     @Operation(summary = "发送客服消息")
     @PreAuthorize("@ss.hasPermission('promotion:kefu-message:send')")
     public CommonResult<Long> createKefuMessage(@Valid @RequestBody KeFuMessageSendReqVO sendReqVO) {
+        sendReqVO.setSenderId(getLoginUserId()).setSenderType(UserTypeEnum.ADMIN.getValue()); // 设置用户编号和类型
         return success(messageService.sendKefuMessage(sendReqVO));
     }
 
@@ -40,7 +43,7 @@ public class KeFuMessageController {
     @Parameter(name = "conversationId", description = "会话编号", required = true)
     @PreAuthorize("@ss.hasPermission('promotion:kefu-message:update')")
     public CommonResult<Boolean> updateKefuMessageReadStatus(@RequestParam("conversationId") Long conversationId) {
-        messageService.updateKefuMessageReadStatus(conversationId);
+        messageService.updateKefuMessageReadStatus(conversationId, getLoginUserId(), UserTypeEnum.ADMIN.getValue());
         return success(true);
     }
 
