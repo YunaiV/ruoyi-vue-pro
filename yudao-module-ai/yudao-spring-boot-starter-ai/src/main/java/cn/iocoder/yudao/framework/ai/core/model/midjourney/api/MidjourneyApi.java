@@ -1,10 +1,11 @@
 package cn.iocoder.yudao.framework.ai.core.model.midjourney.api;
 
-import cn.iocoder.yudao.framework.ai.core.model.midjourney.MidjourneyConfig;
+import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.openai.api.ApiUtils;
@@ -26,11 +27,17 @@ public class MidjourneyApi {
 
     private final WebClient webClient;
 
-    public MidjourneyApi(MidjourneyConfig midjourneyConfig) {
+    /**
+     * 回调地址
+     */
+    private final String notifyUrl;
+
+    public MidjourneyApi(String baseUrl, String apiKey, String notifyUrl) {
         this.webClient = WebClient.builder()
-                .baseUrl(midjourneyConfig.getUrl())
-                .defaultHeaders(ApiUtils.getJsonContentHeaders(midjourneyConfig.getKey()))
+                .baseUrl(baseUrl)
+                .defaultHeaders(ApiUtils.getJsonContentHeaders(apiKey))
                 .build();
+        this.notifyUrl = notifyUrl;
     }
 
     /**
@@ -40,6 +47,9 @@ public class MidjourneyApi {
      * @return 提交结果
      */
     public SubmitResponse imagine(ImagineRequest request) {
+        if (StrUtil.isEmpty(request.getNotifyHook())) {
+            request.setNotifyHook(notifyUrl);
+        }
         String response = post("/submit/imagine", request);
         return JsonUtils.parseObject(response, SubmitResponse.class);
     }
@@ -51,8 +61,11 @@ public class MidjourneyApi {
      * @return 提交结果
      */
     public SubmitResponse action(ActionRequest request) {
-        String res = post("/submit/action", request);
-        return JsonUtils.parseObject(res, SubmitResponse.class);
+        if (StrUtil.isEmpty(request.getNotifyHook())) {
+            request.setNotifyHook(notifyUrl);
+        }
+        String response = post("/submit/action", request);
+        return JsonUtils.parseObject(response, SubmitResponse.class);
     }
 
     /**
@@ -86,23 +99,40 @@ public class MidjourneyApi {
 
     /**
      * Imagine 请求（生成图片）
-     *
-     * @param base64Array 垫图(参考图) base64数 组
-     * @param notifyHook 通知地址
-     * @param prompt 提示词
-     * @param state 自定义参数
      */
-    public record ImagineRequest(List<String> base64Array,
-                                 String notifyHook,
-                                 String prompt,
-                                 String state) {
+    @Data
+    public static final class ImagineRequest {
+
+        /**
+         * 垫图(参考图) base64 数组
+         */
+        private List<String> base64Array;
+        /**
+         * 提示词
+         */
+        private String prompt;
+        /**
+         * 通知地址
+         */
+        private String notifyHook;
+        /**
+         * 自定义参数
+         */
+        private String state;
+
+        public ImagineRequest(List<String> base64Array, String prompt, String notifyHook, String state) {
+            this.base64Array = base64Array;
+            this.prompt = prompt;
+            this.notifyHook = notifyHook;
+            this.state = state;
+        }
 
         public static String buildState(Integer width, Integer height, String version, String model) {
             StringBuilder params = new StringBuilder();
             //  --ar 来设置尺寸
             params.append(String.format(" --ar %s:%s ", width, height));
             // --niji 模型
-            if (MidjourneyApi.ModelEnum.NIJI.getModel().equals(model)) {
+            if (ModelEnum.NIJI.getModel().equals(model)) {
                 params.append(String.format(" --niji %s ", version));
             } else {
                 params.append(String.format(" --v %s ", version));
@@ -114,15 +144,20 @@ public class MidjourneyApi {
 
     /**
      * Action 请求
-     *
-     * @param customId   操作按钮id
-     * @param taskId     操作按钮id
-     * @param notifyHook 通知地址
      */
-    public record ActionRequest(String customId,
-                                String taskId,
-                                String notifyHook
-    ) {
+    @Data
+    public static final class ActionRequest {
+
+        private String customId;
+        private String taskId;
+        private String notifyHook;
+
+        public ActionRequest(String taskId, String customId, String notifyHook) {
+            this.customId = customId;
+            this.taskId = taskId;
+            this.notifyHook = notifyHook;
+        }
+
     }
 
     /**

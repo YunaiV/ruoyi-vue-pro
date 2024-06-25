@@ -2,6 +2,7 @@ package cn.iocoder.yudao.framework.ai.config;
 
 import cn.iocoder.yudao.framework.ai.core.factory.AiClientFactory;
 import cn.iocoder.yudao.framework.ai.core.factory.AiClientFactoryImpl;
+import cn.iocoder.yudao.framework.ai.core.model.midjourney.api.MidjourneyApi;
 import cn.iocoder.yudao.framework.ai.core.model.suno.api.SunoApi;
 import cn.iocoder.yudao.framework.ai.core.model.tongyi.QianWenChatClient;
 import cn.iocoder.yudao.framework.ai.core.model.tongyi.QianWenChatModal;
@@ -94,6 +95,13 @@ public class YudaoAiAutoConfiguration {
                 ),
                 yiYanOptions
         );
+    }
+
+    @Bean
+    @ConditionalOnProperty(value = "yudao.ai.midjourney.enable", havingValue = "true")
+    public MidjourneyApi midjourneyApi(YudaoAiProperties yudaoAiProperties) {
+        YudaoAiProperties.MidjourneyProperties config = yudaoAiProperties.getMidjourney();
+        return new MidjourneyApi(config.getBaseUrl(), config.getApiKey(), config.getNotifyUrl());
     }
 
     @Bean

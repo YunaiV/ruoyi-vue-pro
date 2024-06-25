@@ -29,7 +29,6 @@ import org.springframework.ai.image.ImagePrompt;
 import org.springframework.ai.image.ImageResponse;
 import org.springframework.ai.openai.OpenAiImageOptions;
 import org.springframework.ai.stabilityai.api.StabilityAiImageOptions;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -62,9 +61,6 @@ public class AiImageServiceImpl implements AiImageService {
 
     @Resource
     private MidjourneyApi midjourneyApi;
-
-    @Value("${ai.midjourney-proxy.notifyUrl:http://127.0.0.1:48080/admin-api/ai/image/midjourney-notify}")
-    private String midjourneyNotifyUrl;
 
     @Override
     public PageResult<AiImageDO> getImagePageMy(Long userId, PageParam pageReqVO) {
@@ -159,7 +155,7 @@ public class AiImageServiceImpl implements AiImageService {
 
         // 2. 调用 Midjourney Proxy 提交任务
         MidjourneyApi.ImagineRequest imagineRequest = new MidjourneyApi.ImagineRequest(
-                null, midjourneyNotifyUrl, reqVO.getPrompt(),
+                null, reqVO.getPrompt(),null,
                 MidjourneyApi.ImagineRequest.buildState(reqVO.getWidth(), reqVO.getHeight(), reqVO.getVersion(), reqVO.getModel()));
         MidjourneyApi.SubmitResponse imagineResponse = midjourneyApi.imagine(imagineRequest);
 
@@ -258,7 +254,7 @@ public class AiImageServiceImpl implements AiImageService {
 
         // 2. 调用 Midjourney Proxy 提交任务
         MidjourneyApi.SubmitResponse actionResponse = midjourneyApi.action(
-                new MidjourneyApi.ActionRequest(button.customId(), image.getTaskId(), midjourneyNotifyUrl));
+                new MidjourneyApi.ActionRequest(button.customId(), image.getTaskId(), null));
         if (!MidjourneyApi.SubmitCodeEnum.SUCCESS_CODES.contains(actionResponse.code())) {
             String description = actionResponse.description().contains("quota_not_enough") ?
                     "账户余额不足" : actionResponse.description();

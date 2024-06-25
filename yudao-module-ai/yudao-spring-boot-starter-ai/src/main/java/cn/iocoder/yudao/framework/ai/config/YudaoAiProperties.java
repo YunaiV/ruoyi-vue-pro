@@ -64,15 +64,18 @@ public class YudaoAiProperties {
     @Data
     @Accessors(chain = true)
     public static class XingHuoProperties extends ChatProperties {
+
         private String appId;
         private String appKey;
         private String secretKey;
         private XingHuoChatModel model;
+
     }
 
     @Data
     @Accessors(chain = true)
     public static class YiYanProperties extends ChatProperties {
+
         /**
          * appKey
          */
@@ -92,26 +95,13 @@ public class YudaoAiProperties {
     }
 
     @Data
-    @Accessors(chain = true)
     public static class MidjourneyProperties {
-        private boolean enable = false;
 
-        /**
-         * socket 链接地址
-         */
-        private String wssUrl = "wss://gateway.discord.gg";
-        /**
-         * token
-         */
-        private String token;
-        /**
-         * 服务id
-         */
-        private String guildId;
-        /**
-         * 频道id
-         */
-        private String channelId;
+        private String enable;
+        private String apiKey;
+        private String baseUrl;
+        private String notifyUrl;
+
     }
 
     @Data

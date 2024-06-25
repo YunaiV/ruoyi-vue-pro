@@ -194,19 +194,13 @@ yudao.ai:
     api-key: sk-Zsd81gZYg7
   midjourney:
     enable: true
-    token: MTE4MjE3MjY2MjkxNTY3ODIzOA.GEV1SG.c49F8lZoGCUHwsj8O0UdodmM6nyQHvuD2fXflw
-    guild-id: 1237948819677904956
-    channel-id: 1237948819677904960
+#    base-url: https://api.holdai.top/mj-relax/mj
+    base-url: https://api.holdai.top/mj
+    api-key: sk-dZEPiVaNcT3FHhef51996bAa0bC74806BeAb620dA5Da10Bf
+    notify-url: http://java.nat300.top/admin-api/ai/image/midjourney/notify
   suno:
     enable: true
     base-url: https://suno-imrqwwui8-status2xxs-projects.vercel.app
-
-ai:
-  midjourney-proxy:
-    enable: true
-    url: https://api.holdai.top/mj
-    notifyUrl: http://61d61685.r21.cpolar.top/admin-api/ai/image/midjourney-notify
-    key: sk-dZEPiVaNcT3FHhef51996bAa0bC74806BeAb620dA5Da10Bf
 
 --- #################### 芋道相关配置 ####################
 
