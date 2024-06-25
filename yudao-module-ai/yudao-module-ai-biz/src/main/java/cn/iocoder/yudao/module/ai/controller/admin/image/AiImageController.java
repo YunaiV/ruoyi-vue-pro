@@ -1,14 +1,14 @@
 package cn.iocoder.yudao.module.ai.controller.admin.image;
 
 import cn.hutool.core.util.ObjUtil;
+import cn.iocoder.yudao.framework.ai.core.model.midjourney.api.MidjourneyApi;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
-import cn.iocoder.yudao.module.ai.controller.admin.image.vo.MidjourneyNotifyReqVO;
 import cn.iocoder.yudao.module.ai.controller.admin.image.vo.AiImageDrawReqVO;
-import cn.iocoder.yudao.module.ai.controller.admin.image.vo.AiImageMidjourneyImagineReqVO;
 import cn.iocoder.yudao.module.ai.controller.admin.image.vo.AiImageRespVO;
+import cn.iocoder.yudao.module.ai.controller.admin.image.vo.midjourney.AiImageMidjourneyImagineReqVO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.image.AiImageDO;
 import cn.iocoder.yudao.module.ai.service.image.AiImageService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -63,19 +63,24 @@ public class AiImageController {
         return success(true);
     }
 
-    // ================ midjourney 接口 ================
+    // ================ midjourney 专属 ================
 
-    @Operation(summary = "Midjourney imagine（绘画）")
+    @Operation(summary = "【Midjourney】生成图片")
     @PostMapping("/midjourney/imagine")
-    public CommonResult<Long> midjourneyImagine(@Validated @RequestBody AiImageMidjourneyImagineReqVO req) {
-        return success(imageService.midjourneyImagine(getLoginUserId(), req));
+    public CommonResult<Long> midjourneyImagine(@Validated @RequestBody AiImageMidjourneyImagineReqVO reqVO) {
+        if (true) {
+            imageService.midjourneySync();
+            return null;
+        }
+        Long imageId = imageService.midjourneyImagine(getLoginUserId(), reqVO);
+        return success(imageId);
     }
 
-    @Operation(summary = "Midjourney 回调通知", description = "由 Midjourney Proxy 回调")
+    @Operation(summary = "Midjourney 生成图片的回调通知", description = "由 Midjourney Proxy 回调")
     @PostMapping("/midjourney-notify")
     @PermitAll
-    public void midjourneyNotify(@RequestBody MidjourneyNotifyReqVO notifyReqVO) {
-        imageService.midjourneyNotify(notifyReqVO);
+    public void midjourneyNotify(@RequestBody MidjourneyApi.Notify notify) {
+        imageService.midjourneyNotify(notify);
     }
 
     @Operation(summary = "Midjourney Action", description = "例如说：放大、缩小、U1、U2 等")

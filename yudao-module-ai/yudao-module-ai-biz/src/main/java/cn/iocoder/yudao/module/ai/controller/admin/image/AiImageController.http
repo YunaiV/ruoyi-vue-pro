@@ -29,12 +29,17 @@ Authorization: {{token}}
   "style": "vivid"
 }
 
-### chat midjourney
+### 生成图片：生成图片
 
-POST {{baseUrl}}/admin-api/ai/image/midjourney
+POST {{baseUrl}}/ai/image/midjourney/imagine
 Content-Type: application/json
 Authorization: {{token}}
 
 {
-  "prompt": "Cute cartoon style mobile game scene, a colorful camping car with an outdoor table and chairs next to it on the road in a spring forest, the simple structure of the camper van, soft lighting, C4D rendering, 3d model in the style of a cartoon, cute shape, a pastel color scheme, closeup view from the side angle, high resolution, bright colors, a happy atmosphere."
+  "prompt": "中国旗袍",
+  "model": "midjourney",
+  "width": "1",
+  "height": "1",
+  "version": "6.0",
+  "base64Array": []
 }

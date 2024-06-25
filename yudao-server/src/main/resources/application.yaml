@@ -201,6 +201,13 @@ yudao.ai:
     enable: true
     base-url: https://suno-imrqwwui8-status2xxs-projects.vercel.app
 
+ai:
+  midjourney-proxy:
+    enable: true
+    url: https://api.holdai.top/mj
+    notifyUrl: http://61d61685.r21.cpolar.top/admin-api/ai/image/midjourney-notify
+    key: sk-dZEPiVaNcT3FHhef51996bAa0bC74806BeAb620dA5Da10Bf
+
 --- #################### 芋道相关配置 ####################
 
 yudao:

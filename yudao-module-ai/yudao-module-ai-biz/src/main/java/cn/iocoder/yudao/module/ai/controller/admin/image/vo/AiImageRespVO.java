@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.ai.controller.admin.image.vo;
 
+import cn.iocoder.yudao.framework.ai.core.model.midjourney.api.MidjourneyApi;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
@@ -46,14 +47,11 @@ public class AiImageRespVO {
     @Schema(description = "绘制参数")
     private Map<String, String> options;
 
-    @Schema(description = "绘画 response")
-    private MidjourneyNotifyReqVO response;
-
     // TODO @fan：进度是百分比，还是一个数字哈？感觉这个可以统一成通用字段；
     @Schema(description = "mj 进度")
     private String progress;
 
     @Schema(description = "mj buttons 按钮")
-    private List<MidjourneyNotifyReqVO.Button> buttons;
+    private List<MidjourneyApi.Button> buttons;
 
 }

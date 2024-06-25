@@ -1,8 +1,8 @@
 package cn.iocoder.yudao.module.ai.dal.dataobject.image;
 
+import cn.iocoder.yudao.framework.ai.core.model.midjourney.api.MidjourneyApi;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
-import cn.iocoder.yudao.module.ai.controller.admin.image.vo.MidjourneyNotifyReqVO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiChatModelDO;
 import cn.iocoder.yudao.module.ai.enums.image.AiImageStatusEnum;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
@@ -27,8 +27,6 @@ import java.util.Map;
 @TableName(value = "ai_image", autoResultMap = true)
 @Data
 public class AiImageDO extends BaseDO {
-
-    // TODO @fan：1）使用 java 注释哈，不要注解。2）关联、枚举字段，要关联到对应类，参考 AiChatMessageDO 的注释
 
     /**
      * 编号
@@ -76,7 +74,7 @@ public class AiImageDO extends BaseDO {
      *
      * 枚举 {@link AiImageStatusEnum}
      */
-    private String status;
+    private Integer status;
 
     /**
      * 图片地址
@@ -97,22 +95,10 @@ public class AiImageDO extends BaseDO {
     private Map<String, Object> options;
 
     /**
-     * 绘画 response
-     */
-    @TableField(typeHandler = JacksonTypeHandler.class)
-    private MidjourneyNotifyReqVO response;
-
-    // TODO @fan：这个建议 Double
-    /**
-     * mj 进度(10%、50%、100%)
-     */
-    private String progress;
-
-    /**
      * mj buttons 按钮
      */
     @TableField(typeHandler = ButtonTypeHandler.class)
-    private List<MidjourneyNotifyReqVO.Button> buttons;
+    private List<MidjourneyApi.Button> buttons;
 
     /**
      * midjourney proxy 关联的 task id
@@ -124,12 +110,11 @@ public class AiImageDO extends BaseDO {
      */
     private String errorMessage;
 
-    // TODO @芋艿：看看是不是 MidjourneyNotifyReqVO.Button 搞到 MJ API 那
     public static class ButtonTypeHandler extends AbstractJsonTypeHandler<Object> {
 
         @Override
         protected Object parse(String json) {
-            return JsonUtils.parseArray(json, MidjourneyNotifyReqVO.Button.class);
+            return JsonUtils.parseArray(json, MidjourneyApi.Button.class);
         }
 
         @Override

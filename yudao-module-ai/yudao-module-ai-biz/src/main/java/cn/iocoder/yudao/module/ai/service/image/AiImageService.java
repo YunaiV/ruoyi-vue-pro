@@ -1,10 +1,10 @@
 package cn.iocoder.yudao.module.ai.service.image;
 
+import cn.iocoder.yudao.framework.ai.core.model.midjourney.api.MidjourneyApi;
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.ai.controller.admin.image.vo.MidjourneyNotifyReqVO;
 import cn.iocoder.yudao.module.ai.controller.admin.image.vo.AiImageDrawReqVO;
-import cn.iocoder.yudao.module.ai.controller.admin.image.vo.AiImageMidjourneyImagineReqVO;
+import cn.iocoder.yudao.module.ai.controller.admin.image.vo.midjourney.AiImageMidjourneyImagineReqVO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.image.AiImageDO;
 
 /**
@@ -41,15 +41,6 @@ public interface AiImageService {
     Long drawImage(Long userId, AiImageDrawReqVO drawReqVO);
 
     /**
-     * Midjourney imagine（绘画）
-     *
-     * @param userId 用户编号
-     * @param imagineReqVO 绘制请求
-     * @return 绘画编号
-     */
-    Long midjourneyImagine(Long userId, AiImageMidjourneyImagineReqVO imagineReqVO);
-
-    /**
      * 删除【我的】绘画记录
      *
      * @param id 绘画编号
@@ -57,22 +48,30 @@ public interface AiImageService {
      */
     void deleteImageMy(Long id, Long userId);
 
-    /**
-     * midjourney proxy - 回调通知
-     *
-     * @param notifyReqVO
-     * @return
-     */
-    void midjourneyNotify(MidjourneyNotifyReqVO notifyReqVO);
+    // ================ midjourney 专属 ================
 
     /**
-     * 构建 midjourney - 更新对象
+     * 【Midjourney】生成图片
      *
-     * @param imageId
-     * @param notifyReqVO
-     * @return
+     * @param userId 用户编号
+     * @param reqVO 绘制请求
+     * @return 绘画编号
      */
-    AiImageDO buildUpdateImage(Long imageId, MidjourneyNotifyReqVO notifyReqVO);
+    Long midjourneyImagine(Long userId, AiImageMidjourneyImagineReqVO reqVO);
+
+    /**
+     * 【Midjourney】同步图片进展
+     *
+     * @return 同步成功数量
+     */
+    Integer midjourneySync();
+
+    /**
+     * 【Midjourney】通知图片进展
+     *
+     * @param notify 通知
+     */
+    void midjourneyNotify(MidjourneyApi.Notify notify);
 
     /**
      * midjourney - action(放大、缩小、U1、U2...)
@@ -83,4 +82,5 @@ public interface AiImageService {
      * @return
      */
     void midjourneyAction(Long loginUserId, Long imageId, String customId);
+
 }

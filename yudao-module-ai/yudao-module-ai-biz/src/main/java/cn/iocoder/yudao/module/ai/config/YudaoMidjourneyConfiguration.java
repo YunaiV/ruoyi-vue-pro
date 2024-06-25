@@ -3,7 +3,6 @@ package cn.iocoder.yudao.module.ai.config;
 import cn.iocoder.yudao.framework.ai.core.model.midjourney.MidjourneyConfig;
 import cn.iocoder.yudao.framework.ai.core.model.midjourney.api.MidjourneyApi;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
-import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
