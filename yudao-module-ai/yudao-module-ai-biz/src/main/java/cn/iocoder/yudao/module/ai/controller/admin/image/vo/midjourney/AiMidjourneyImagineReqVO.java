@@ -9,7 +9,7 @@ import java.util.List;
 
 @Schema(description = "管理后台 - 绘画生成（Midjourney） Request VO")
 @Data
-public class AiImageMidjourneyImagineReqVO {
+public class AiMidjourneyImagineReqVO {
 
     @Schema(description = "提示词", requiredMode = Schema.RequiredMode.REQUIRED, example = "中国神龙")
     @NotEmpty(message = "提示词不能为空!")

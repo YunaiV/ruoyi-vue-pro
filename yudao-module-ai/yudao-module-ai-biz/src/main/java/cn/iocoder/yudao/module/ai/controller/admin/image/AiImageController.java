@@ -8,7 +8,8 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.ai.controller.admin.image.vo.AiImageDrawReqVO;
 import cn.iocoder.yudao.module.ai.controller.admin.image.vo.AiImageRespVO;
-import cn.iocoder.yudao.module.ai.controller.admin.image.vo.midjourney.AiImageMidjourneyImagineReqVO;
+import cn.iocoder.yudao.module.ai.controller.admin.image.vo.midjourney.AiMidjourneyActionReqVO;
+import cn.iocoder.yudao.module.ai.controller.admin.image.vo.midjourney.AiMidjourneyImagineReqVO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.image.AiImageDO;
 import cn.iocoder.yudao.module.ai.service.image.AiImageService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -67,30 +68,24 @@ public class AiImageController {
 
     @Operation(summary = "【Midjourney】生成图片")
     @PostMapping("/midjourney/imagine")
-    public CommonResult<Long> midjourneyImagine(@Validated @RequestBody AiImageMidjourneyImagineReqVO reqVO) {
-        if (true) {
-            imageService.midjourneySync();
-            return null;
-        }
+    public CommonResult<Long> midjourneyImagine(@Validated @RequestBody AiMidjourneyImagineReqVO reqVO) {
         Long imageId = imageService.midjourneyImagine(getLoginUserId(), reqVO);
         return success(imageId);
     }
 
-    @Operation(summary = "Midjourney 生成图片的回调通知", description = "由 Midjourney Proxy 回调")
-    @PostMapping("/midjourney-notify")
+    @Operation(summary = "【Midjourney】通知图片进展", description = "由 Midjourney Proxy 回调")
+    @PostMapping("/midjourney/notify") // 必须是 POST 方法，否则会报错
     @PermitAll
-    public void midjourneyNotify(@RequestBody MidjourneyApi.Notify notify) {
+    public CommonResult<Boolean> midjourneyNotify(@Validated @RequestBody MidjourneyApi.Notify notify) {
         imageService.midjourneyNotify(notify);
+        return success(true);
     }
 
-    @Operation(summary = "Midjourney Action", description = "例如说：放大、缩小、U1、U2 等")
-    @GetMapping("/midjourney/action")
-    @Parameter(name = "id", description = "图片id", example = "1")
-    @Parameter(name = "customId", description = "操作id", example = "MJ::JOB::upsample::1::85a4b4c1-8835-46c5-a15c-aea34fad1862")
-    public CommonResult<Boolean> midjourneyAction(@RequestParam("id") Long imageId,
-                                                  @RequestParam("customId") String customId) {
-        imageService.midjourneyAction(getLoginUserId(), imageId, customId);
-        return success(true);
+    @Operation(summary = "【Midjourney】Action 操作（二次生成图片）", description = "例如说：放大、缩小、U1、U2 等")
+    @PostMapping("/midjourney/action")
+    public CommonResult<Long> midjourneyAction(@Validated @RequestBody AiMidjourneyActionReqVO reqVO) {
+        Long imageId = imageService.midjourneyAction(getLoginUserId(), reqVO);
+        return success(imageId);
     }
 
 }

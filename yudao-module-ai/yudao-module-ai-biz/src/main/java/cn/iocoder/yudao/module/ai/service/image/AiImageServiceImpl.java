@@ -14,7 +14,8 @@ import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.ai.controller.admin.image.vo.AiImageDrawReqVO;
-import cn.iocoder.yudao.module.ai.controller.admin.image.vo.midjourney.AiImageMidjourneyImagineReqVO;
+import cn.iocoder.yudao.module.ai.controller.admin.image.vo.midjourney.AiMidjourneyActionReqVO;
+import cn.iocoder.yudao.module.ai.controller.admin.image.vo.midjourney.AiMidjourneyImagineReqVO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.image.AiImageDO;
 import cn.iocoder.yudao.module.ai.dal.mysql.image.AiImageMapper;
 import cn.iocoder.yudao.module.ai.enums.image.AiImageStatusEnum;
@@ -149,7 +150,7 @@ public class AiImageServiceImpl implements AiImageService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Long midjourneyImagine(Long userId, AiImageMidjourneyImagineReqVO reqVO) {
+    public Long midjourneyImagine(Long userId, AiMidjourneyImagineReqVO reqVO) {
         // 1. 保存数据库
         AiImageDO image = BeanUtils.toBean(reqVO, AiImageDO.class).setUserId(userId).setPublicStatus(false)
                 .setStatus(AiImageStatusEnum.IN_PROGRESS.getStatus())
@@ -170,11 +171,8 @@ public class AiImageServiceImpl implements AiImageService {
         }
 
         // 4. 情况二【成功】：更新 taskId 和参数
-        imageMapper.updateById(new AiImageDO()
-                .setId(image.getId())
-                .setTaskId(imagineResponse.result())
-                .setOptions(BeanUtil.beanToMap(reqVO))
-        );
+        imageMapper.updateById(new AiImageDO().setId(image.getId())
+                .setTaskId(imagineResponse.result()).setOptions(BeanUtil.beanToMap(reqVO)));
         return image.getId();
     }
 
@@ -245,49 +243,36 @@ public class AiImageServiceImpl implements AiImageService {
     }
 
     @Override
-    public void midjourneyAction(Long loginUserId, Long imageId, String customId) {
-        // 1、检查 image
-        AiImageDO image = validateImageExists(imageId);
-        // 2、检查 customId
-        validateCustomId(customId, image.getButtons());
-
-        // 3、调用 midjourney proxy
-        MidjourneyApi.SubmitResponse submitResponse = midjourneyApi.action(
-                new MidjourneyApi.ActionRequest(customId, image.getTaskId(), midjourneyNotifyUrl));
-        // 4、检查错误 code (状态码: 1(提交成功), 21(已存在), 22(排队中), other(错误))
-        if (!MidjourneyApi.SubmitCodeEnum.SUCCESS_CODES.contains(submitResponse.code())) {
-            throw exception(AI_IMAGE_MIDJOURNEY_SUBMIT_FAIL, submitResponse.description());
+    public Long midjourneyAction(Long userId, AiMidjourneyActionReqVO reqVO) {
+        // 1.1 检查 image
+        AiImageDO image = validateImageExists(reqVO.getId());
+        if (ObjUtil.notEqual(userId, image.getUserId())) {
+            throw exception(AI_IMAGE_NOT_EXISTS);
         }
-
-        // 5、新增 image 记录(根据 image 新增一个)
-        AiImageDO newImage = new AiImageDO();
-        newImage.setUserId(image.getUserId());
-        newImage.setPrompt(image.getPrompt());
-
-        newImage.setPlatform(image.getPlatform());
-        newImage.setModel(image.getModel());
-        newImage.setWidth(image.getWidth());
-        newImage.setHeight(image.getHeight());
-
-        newImage.setStatus(AiImageStatusEnum.IN_PROGRESS.getStatus());
-        newImage.setPublicStatus(image.getPublicStatus());
-
-        newImage.setOptions(image.getOptions());
-        newImage.setTaskId(submitResponse.result());
-        imageMapper.insert(newImage);
-    }
-
-    private static void validateCustomId(String customId, List<MidjourneyApi.Button> buttons) {
-        boolean isTrue = false;
-        for (MidjourneyApi.Button button : buttons) {
-            if (button.customId().equals(customId)) {
-                isTrue = true;
-                break;
-            }
-        }
-        if (!isTrue) {
+        // 1.2 检查 customId
+        MidjourneyApi.Button button = CollUtil.findOne(image.getButtons(),
+                buttonX -> buttonX.customId().equals(reqVO.getCustomId()));
+        if (button == null) {
             throw exception(AI_IMAGE_CUSTOM_ID_NOT_EXISTS);
         }
+
+        // 2. 调用 Midjourney Proxy 提交任务
+        MidjourneyApi.SubmitResponse actionResponse = midjourneyApi.action(
+                new MidjourneyApi.ActionRequest(button.customId(), image.getTaskId(), midjourneyNotifyUrl));
+        if (!MidjourneyApi.SubmitCodeEnum.SUCCESS_CODES.contains(actionResponse.code())) {
+            String description = actionResponse.description().contains("quota_not_enough") ?
+                    "账户余额不足" : actionResponse.description();
+            throw exception(AI_IMAGE_MIDJOURNEY_SUBMIT_FAIL, description);
+        }
+
+        // 3. 新增 image 记录
+        AiImageDO newImage = new AiImageDO().setUserId(image.getUserId()).setPublicStatus(false).setPrompt(image.getPrompt())
+                .setStatus(AiImageStatusEnum.IN_PROGRESS.getStatus())
+                .setPlatform(AiPlatformEnum.MIDJOURNEY.getPlatform())
+                .setModel(image.getModel()).setWidth(image.getWidth()).setHeight(image.getHeight())
+                .setOptions(image.getOptions()).setTaskId(actionResponse.result());
+        imageMapper.insert(newImage);
+        return newImage.getId();
     }
 
     /**

@@ -4,7 +4,8 @@ import cn.iocoder.yudao.framework.ai.core.model.midjourney.api.MidjourneyApi;
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.ai.controller.admin.image.vo.AiImageDrawReqVO;
-import cn.iocoder.yudao.module.ai.controller.admin.image.vo.midjourney.AiImageMidjourneyImagineReqVO;
+import cn.iocoder.yudao.module.ai.controller.admin.image.vo.midjourney.AiMidjourneyActionReqVO;
+import cn.iocoder.yudao.module.ai.controller.admin.image.vo.midjourney.AiMidjourneyImagineReqVO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.image.AiImageDO;
 
 /**
@@ -57,7 +58,7 @@ public interface AiImageService {
      * @param reqVO 绘制请求
      * @return 绘画编号
      */
-    Long midjourneyImagine(Long userId, AiImageMidjourneyImagineReqVO reqVO);
+    Long midjourneyImagine(Long userId, AiMidjourneyImagineReqVO reqVO);
 
     /**
      * 【Midjourney】同步图片进展
@@ -74,13 +75,12 @@ public interface AiImageService {
     void midjourneyNotify(MidjourneyApi.Notify notify);
 
     /**
-     * midjourney - action(放大、缩小、U1、U2...)
+     * 【Midjourney】Action 操作(放大、缩小、U1、U2...)
      *
-     * @param loginUserId
-     * @param imageId
-     * @param customId
-     * @return
+     * @param userId 用户编号
+     * @param reqVO 绘制请求
+     * @return 绘画编号
      */
-    void midjourneyAction(Long loginUserId, Long imageId, String customId);
+    Long midjourneyAction(Long userId, AiMidjourneyActionReqVO reqVO);
 
 }
