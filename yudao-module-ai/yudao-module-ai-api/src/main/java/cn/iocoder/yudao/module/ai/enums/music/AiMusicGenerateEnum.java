@@ -12,9 +12,8 @@ import lombok.Getter;
 @Getter
 public enum AiMusicGenerateEnum {
 
-    // TODO @xin：用数字哈。项目目前枚举都是数字
-    LYRIC("lyric", "歌词模式"),
-    DESCRIPTION("description", "描述模式");
+    LYRIC("1", "歌词模式"),
+    DESCRIPTION("2", "描述模式");
 
     /**
      * 模式

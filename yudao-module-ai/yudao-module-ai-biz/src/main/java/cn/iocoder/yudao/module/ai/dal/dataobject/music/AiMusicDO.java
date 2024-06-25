@@ -1,21 +1,21 @@
 package cn.iocoder.yudao.module.ai.dal.dataobject.music;
 
-import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.module.ai.enums.music.AiMusicStatusEnum;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.baomidou.mybatisplus.extension.handlers.AbstractJsonTypeHandler;
+import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import lombok.Data;
 
 import java.util.List;
 
-// TODO @xin：注释完善下
+
 /**
- * @Author xiaoxin
- * @Date 2024/6/5
+ * AI 音乐 DO
+ *
+ * @author xiaoxin
  */
 @TableName("ai_music")
 @Data
@@ -98,25 +98,11 @@ public class AiMusicDO extends BaseDO {
     /**
      * 音乐风格标签
      */
-    @TableField(typeHandler = AiMusicTagsHandler.class)
+    @TableField(typeHandler = JacksonTypeHandler.class)
     private List<String> tags;
 
     /**
      * 任务编号
      */
     private String taskId;
-
-    // TODO @xin：用     @TableField(typeHandler = JacksonTypeHandler.class) 替代即可
-    public static class AiMusicTagsHandler extends AbstractJsonTypeHandler<Object> {
-
-        @Override
-        protected Object parse(String json) {
-            return JsonUtils.parseArray(json, String.class);
-        }
-
-        @Override
-        protected String toJson(Object obj) {
-            return JsonUtils.toJsonString(obj);
-        }
-    }
 }

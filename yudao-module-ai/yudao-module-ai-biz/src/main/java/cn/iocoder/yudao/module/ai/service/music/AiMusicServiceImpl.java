@@ -2,8 +2,10 @@ package cn.iocoder.yudao.module.ai.service.music;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.text.StrPool;
+import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.ai.core.model.suno.api.SunoApi;
-import cn.iocoder.yudao.module.ai.controller.admin.music.vo.SunoReqVO;
+import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
+import cn.iocoder.yudao.module.ai.controller.admin.music.vo.AiSunoGenerateReqVO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.music.AiMusicDO;
 import cn.iocoder.yudao.module.ai.dal.mysql.music.AiMusicMapper;
 import cn.iocoder.yudao.module.ai.enums.music.AiMusicGenerateEnum;
@@ -13,8 +15,7 @@ import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
@@ -35,13 +36,22 @@ public class AiMusicServiceImpl implements AiMusicService {
     private AiMusicMapper musicMapper;
 
     @Override
-    public List<Long> generateMusic(SunoReqVO reqVO) {
-        // TODO @xin：是不是可以 if else 调用对应的 API，然后 insertMusicData 逻辑
-        AiMusicGenerateEnum generateEnum = AiMusicGenerateEnum.valueOfMode(reqVO.getGenerateMode());
-        return switch (generateEnum) {
-            case DESCRIPTION -> descriptionMode(reqVO);
-            case LYRIC -> lyricMode(reqVO);
-        };
+    public List<Long> generateMusic(AiSunoGenerateReqVO reqVO) {
+        List<SunoApi.MusicData> musicDataList;
+        if (Objects.equals(AiMusicGenerateEnum.LYRIC.getMode(), reqVO.getGenerateMode())) {
+            //歌词模式
+            SunoApi.MusicGenerateRequest sunoReq = new SunoApi.MusicGenerateRequest(reqVO.getPrompt(), reqVO.getModelVersion(), CollUtil.join(reqVO.getTags(), StrPool.COMMA), reqVO.getTitle());
+            musicDataList = sunoApi.customGenerate(sunoReq);
+        } else if (Objects.equals(AiMusicGenerateEnum.DESCRIPTION.getMode(), reqVO.getGenerateMode())) {
+            //描述模式
+            SunoApi.MusicGenerateRequest sunoReq = new SunoApi.MusicGenerateRequest(reqVO.getPrompt(), reqVO.getModelVersion(), reqVO.getMakeInstrumental());
+            musicDataList = sunoApi.generate(sunoReq);
+        } else {
+            log.error("未知的生成模式：{}", reqVO.getGenerateMode());
+            throw new IllegalArgumentException("未知的生成模式");
+        }
+        // 2. 插入数据库
+        return insertMusicData(musicDataList, reqVO.getGenerateMode(), reqVO.getPlatform());
     }
 
     @Override
@@ -50,36 +60,33 @@ public class AiMusicServiceImpl implements AiMusicService {
     }
 
     @Override
-    public Boolean updateBatch(List<AiMusicDO> aiMusicDOList) {
-        return musicMapper.updateBatch(aiMusicDOList);
+    public Integer syncMusicTask() {
+        List<AiMusicDO> unCompletedTask = this.getUnCompletedTask();
+        if (CollUtil.isEmpty(unCompletedTask)) {
+            log.info("Suno 无进行中任务需要更新!");
+            return 0;
+        }
+        log.info("Suno 开始同步, 共 [{}] 个任务!", unCompletedTask.size());
+        //GET 请求，为避免参数过长，分批次处理
+        CollUtil.split(unCompletedTask, 4)
+                .forEach(chunk -> {
+                    Map<String, Long> taskIdMap = CollUtil.toMap(chunk, new HashMap<>(), AiMusicDO::getTaskId, AiMusicDO::getId);
+                    List<SunoApi.MusicData> musicTaskList = sunoApi.getMusicList(new ArrayList<>(taskIdMap.keySet()));
+                    if (CollUtil.isNotEmpty(musicTaskList)) {
+                        List<AiMusicDO> aiMusicDOS = buildMusicDOList(musicTaskList);
+                        //回填id
+                        aiMusicDOS.forEach(aiMusicDO -> aiMusicDO.setId(taskIdMap.get(aiMusicDO.getTaskId())));
+                        this.updateBatch(aiMusicDOS);
+                    } else {
+                        log.warn("Suno 任务同步失败, 任务ID: [{}]", taskIdMap.keySet());
+                    }
+                });
+        return unCompletedTask.size();
     }
 
-    /**
-     * 描述模式生成音乐
-     *
-     * @param reqVO 请求参数
-     * @return 生成的音乐ID集合
-     */
-    public List<Long> descriptionMode(SunoReqVO reqVO) {
-        // 1. 异步生成
-        SunoApi.MusicGenerateRequest sunoReq = new SunoApi.MusicGenerateRequest(reqVO.getPrompt(), reqVO.getMv(), reqVO.getMakeInstrumental());
-        List<SunoApi.MusicData> musicDataList = sunoApi.generate(sunoReq);
-        // 2. 插入数据库
-        return insertMusicData(musicDataList, reqVO.getGenerateMode(), reqVO.getPlatform());
-    }
-
-    /**
-     * 歌词模式生成音乐
-     *
-     * @param reqVO 请求参数
-     * @return 生成的音乐ID集合
-     */
-    public List<Long> lyricMode(SunoReqVO reqVO) {
-        // 1. 异步生成
-        SunoApi.MusicGenerateRequest sunoReq = new SunoApi.MusicGenerateRequest(reqVO.getPrompt(), reqVO.getMv(), CollUtil.join(reqVO.getTags(), StrPool.COMMA), reqVO.getTitle());
-        List<SunoApi.MusicData> musicDataList = sunoApi.customGenerate(sunoReq);
-        // 2. 插入数据库
-        return insertMusicData(musicDataList, reqVO.getGenerateMode(), reqVO.getPlatform());
+    @Override
+    public Boolean updateBatch(List<AiMusicDO> musicDOS) {
+        return musicMapper.updateBatch(musicDOS);
     }
 
     /**
@@ -92,7 +99,7 @@ public class AiMusicServiceImpl implements AiMusicService {
         if (CollUtil.isEmpty(musicDataList)) {
             return Collections.emptyList();
         }
-        List<AiMusicDO> aiMusicDOList = AiMusicConvert.convertFrom(musicDataList).stream()
+        List<AiMusicDO> aiMusicDOList = buildMusicDOList(musicDataList).stream()
                 .map(musicDO -> musicDO.setUserId(getLoginUserId())
                         .setGenerateMode(generateMode)
                         .setPlatform(platform))
@@ -103,4 +110,24 @@ public class AiMusicServiceImpl implements AiMusicService {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * 构建 AiMusicDO 集合
+     *
+     * @param musicTaskList suno 音乐任务列表
+     * @return AiMusicDO 集合
+     */
+    private static List<AiMusicDO> buildMusicDOList(List<SunoApi.MusicData> musicTaskList) {
+        return CollectionUtils.convertList(musicTaskList, musicData -> new AiMusicDO()
+                .setTaskId(musicData.id())
+                .setPrompt(musicData.prompt())
+                .setGptDescriptionPrompt(musicData.gptDescriptionPrompt())
+                .setAudioUrl(musicData.audioUrl())
+                .setVideoUrl(musicData.videoUrl())
+                .setImageUrl(musicData.imageUrl())
+                .setLyric(musicData.lyric())
+                .setTitle(musicData.title())
+                .setStatus(Objects.equals("complete", musicData.status()) ? AiMusicStatusEnum.COMPLETE.getStatus() : AiMusicStatusEnum.STREAMING.getStatus())
+                .setModel(musicData.modelName())
+                .setTags(StrUtil.isNotBlank(musicData.tags()) ? List.of(musicData.tags().split(StrPool.COMMA)) : null));
+    }
 }
