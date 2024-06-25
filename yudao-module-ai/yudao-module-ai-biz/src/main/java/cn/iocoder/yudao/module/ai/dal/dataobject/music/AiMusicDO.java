@@ -11,7 +11,6 @@ import lombok.Data;
 
 import java.util.List;
 
-
 /**
  * AI 音乐 DO
  *
@@ -29,6 +28,8 @@ public class AiMusicDO extends BaseDO {
 
     /**
      * 用户编号
+     *
+     * 关联 AdminUserDO 的 userId 字段
      */
     private Long userId;
 
@@ -105,4 +106,5 @@ public class AiMusicDO extends BaseDO {
      * 任务编号
      */
     private String taskId;
+
 }

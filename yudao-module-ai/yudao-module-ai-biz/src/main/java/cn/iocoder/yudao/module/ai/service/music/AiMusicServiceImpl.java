@@ -39,51 +39,61 @@ public class AiMusicServiceImpl implements AiMusicService {
     public List<Long> generateMusic(AiSunoGenerateReqVO reqVO) {
         List<SunoApi.MusicData> musicDataList;
         if (Objects.equals(AiMusicGenerateEnum.LYRIC.getMode(), reqVO.getGenerateMode())) {
-            //歌词模式
-            SunoApi.MusicGenerateRequest sunoReq = new SunoApi.MusicGenerateRequest(reqVO.getPrompt(), reqVO.getModelVersion(), CollUtil.join(reqVO.getTags(), StrPool.COMMA), reqVO.getTitle());
+            // 1.1 歌词模式
+            SunoApi.MusicGenerateRequest sunoReq = new SunoApi.MusicGenerateRequest(
+                    reqVO.getPrompt(), reqVO.getModelVersion(), CollUtil.join(reqVO.getTags(), StrPool.COMMA), reqVO.getTitle());
             musicDataList = sunoApi.customGenerate(sunoReq);
         } else if (Objects.equals(AiMusicGenerateEnum.DESCRIPTION.getMode(), reqVO.getGenerateMode())) {
-            //描述模式
-            SunoApi.MusicGenerateRequest sunoReq = new SunoApi.MusicGenerateRequest(reqVO.getPrompt(), reqVO.getModelVersion(), reqVO.getMakeInstrumental());
+            // 1.2 描述模式
+            SunoApi.MusicGenerateRequest sunoReq = new SunoApi.MusicGenerateRequest(
+                    reqVO.getPrompt(), reqVO.getModelVersion(), reqVO.getMakeInstrumental());
             musicDataList = sunoApi.generate(sunoReq);
         } else {
+            // TODO @xin：不用 log error，直接抛异常，吧 reqVO 呆进去，有全局处理的哈
             log.error("未知的生成模式：{}", reqVO.getGenerateMode());
             throw new IllegalArgumentException("未知的生成模式");
         }
+
         // 2. 插入数据库
+        // TODO @xin：因为 insertMusicData 复用的比较少，所以不用愁单独的方法，直接写在这里就好啦
         return insertMusicData(musicDataList, reqVO.getGenerateMode(), reqVO.getPlatform());
     }
 
+    // TODO @xin：1）service 里面，不要直接查询 db；2）不要用 ne，用 STREAMING 哈
     @Override
     public List<AiMusicDO> getUnCompletedTask() {
         return musicMapper.selectList(new LambdaQueryWrapper<AiMusicDO>().ne(AiMusicDO::getStatus, AiMusicStatusEnum.COMPLETE.getStatus()));
     }
 
     @Override
-    public Integer syncMusicTask() {
+    public Integer syncMusic() {
         List<AiMusicDO> unCompletedTask = this.getUnCompletedTask();
         if (CollUtil.isEmpty(unCompletedTask)) {
+            // TODO @xin：这里不用打，反正 Job 也打了
             log.info("Suno 无进行中任务需要更新!");
             return 0;
         }
-        log.info("Suno 开始同步, 共 [{}] 个任务!", unCompletedTask.size());
-        //GET 请求，为避免参数过长，分批次处理
-        CollUtil.split(unCompletedTask, 4)
-                .forEach(chunk -> {
-                    Map<String, Long> taskIdMap = CollUtil.toMap(chunk, new HashMap<>(), AiMusicDO::getTaskId, AiMusicDO::getId);
-                    List<SunoApi.MusicData> musicTaskList = sunoApi.getMusicList(new ArrayList<>(taskIdMap.keySet()));
-                    if (CollUtil.isNotEmpty(musicTaskList)) {
-                        List<AiMusicDO> aiMusicDOS = buildMusicDOList(musicTaskList);
-                        //回填id
-                        aiMusicDOS.forEach(aiMusicDO -> aiMusicDO.setId(taskIdMap.get(aiMusicDO.getTaskId())));
-                        this.updateBatch(aiMusicDOS);
-                    } else {
-                        log.warn("Suno 任务同步失败, 任务ID: [{}]", taskIdMap.keySet());
-                    }
-                });
+        log.info("[syncMusic][Suno 开始同步, 共 ({}) 个任务]", unCompletedTask.size());
+        // GET 请求，为避免参数过长，分批次处理
+        // TODO @xin：建议批量更大一些。
+        CollUtil.split(unCompletedTask, 4).forEach(chunk -> {
+            // TODO @xin：可以使用 CollectionUtils 里的 map 转换
+            Map<String, Long> taskIdMap = CollUtil.toMap(chunk, new HashMap<>(), AiMusicDO::getTaskId, AiMusicDO::getId);
+            List<SunoApi.MusicData> musicTaskList = sunoApi.getMusicList(new ArrayList<>(taskIdMap.keySet()));
+            // TODO @xin：查询不到，直接 return；这样真正逻辑的 85 - 87 就不用多一层括号
+            if (CollUtil.isNotEmpty(musicTaskList)) {
+                List<AiMusicDO> aiMusicDOS = buildMusicDOList(musicTaskList);
+                //回填id
+                aiMusicDOS.forEach(aiMusicDO -> aiMusicDO.setId(taskIdMap.get(aiMusicDO.getTaskId())));
+                this.updateBatch(aiMusicDOS);
+            } else {
+                log.warn("Suno 任务同步失败, 任务ID: [{}]", taskIdMap.keySet());
+            }
+        });
         return unCompletedTask.size();
     }
 
+    // TODO @xin：这个方法，看着不用啦
     @Override
     public Boolean updateBatch(List<AiMusicDO> musicDOS) {
         return musicMapper.updateBatch(musicDOS);
@@ -105,6 +115,7 @@ public class AiMusicServiceImpl implements AiMusicService {
                         .setPlatform(platform))
                 .toList();
         musicMapper.insertBatch(aiMusicDOList);
+        // TODO @xin：用 CollectionUtils 简化操作
         return aiMusicDOList.stream()
                 .map(AiMusicDO::getId)
                 .collect(Collectors.toList());
@@ -117,6 +128,7 @@ public class AiMusicServiceImpl implements AiMusicService {
      * @return AiMusicDO 集合
      */
     private static List<AiMusicDO> buildMusicDOList(List<SunoApi.MusicData> musicTaskList) {
+        // TODO @xin：想通的变量，放在同一行，避免过长。
         return CollectionUtils.convertList(musicTaskList, musicData -> new AiMusicDO()
                 .setTaskId(musicData.id())
                 .setPrompt(musicData.prompt())
@@ -128,6 +140,8 @@ public class AiMusicServiceImpl implements AiMusicService {
                 .setTitle(musicData.title())
                 .setStatus(Objects.equals("complete", musicData.status()) ? AiMusicStatusEnum.COMPLETE.getStatus() : AiMusicStatusEnum.STREAMING.getStatus())
                 .setModel(musicData.modelName())
+                // TODO @xin：可以用 hutool 的 StrUtil 的 split 之类的
                 .setTags(StrUtil.isNotBlank(musicData.tags()) ? List.of(musicData.tags().split(StrPool.COMMA)) : null));
     }
+
 }

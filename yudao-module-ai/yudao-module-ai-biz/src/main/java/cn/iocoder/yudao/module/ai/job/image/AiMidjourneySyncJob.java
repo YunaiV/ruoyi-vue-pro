@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @Slf4j
-public class MidjourneySyncJob implements JobHandler {
+public class AiMidjourneySyncJob implements JobHandler {
 
     @Resource
     private AiImageService imageService;

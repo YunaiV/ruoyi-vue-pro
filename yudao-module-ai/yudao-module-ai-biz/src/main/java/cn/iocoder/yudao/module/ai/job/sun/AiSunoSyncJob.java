@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.ai.job;
+package cn.iocoder.yudao.module.ai.job.sun;
 
 import cn.iocoder.yudao.framework.quartz.core.handler.JobHandler;
 import cn.iocoder.yudao.module.ai.service.music.AiMusicService;
@@ -14,15 +14,16 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @Slf4j
-public class SunoJob implements JobHandler {
+public class AiSunoSyncJob implements JobHandler {
 
     @Resource
     private AiMusicService musicService;
 
     @Override
     public String execute(String param) {
-        Integer count = musicService.syncMusicTask();
-        log.info("[execute][Suno 同步任务数量 [{}] 个]", count);
-        return String.format("Suno 同步 -  [%s] 个任务", count);
+        Integer count = musicService.syncMusic();
+        log.info("[execute][同步 Suno ({}) 个]", count);
+        return String.format("同步 Suno %s 个", count);
     }
+
 }

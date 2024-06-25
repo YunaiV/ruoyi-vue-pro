@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.ai.enums.music;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
+// TODO @xiaoxin：这个也叫 AiMusicGenerateModeEnum 吧。虽然长，但是和项目统一一点。
 /**
  * AI 音乐状态的枚举
  *

@@ -12,7 +12,7 @@ import lombok.Getter;
 @Getter
 public enum AiMusicStatusEnum {
 
-    // @xin 文档中无失败这个返回值
+    // @xin 文档中无失败这个返回值 TODO @xin：用 Integer 哈。另外个枚举类也是
     STREAMING("10", "进行中"),
     COMPLETE("20", "完成");
 

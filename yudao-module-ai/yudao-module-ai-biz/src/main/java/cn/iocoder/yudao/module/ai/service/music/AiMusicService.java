@@ -27,13 +27,12 @@ public interface AiMusicService {
      */
     List<AiMusicDO> getUnCompletedTask();
 
-
     /**
      * 同步音乐任务
      *
      * @return 同步数量
      */
-    Integer syncMusicTask();
+    Integer syncMusic();
 
     /**
      * 批量更新音乐信息

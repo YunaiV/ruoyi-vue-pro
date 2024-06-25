@@ -68,13 +68,17 @@ public class AiImageDO extends BaseDO {
      */
     private Integer height;
 
-    // TODO @fan：这种就注释绘画状态，然后枚举类关联下就好啦
     /**
      * 生成状态
      *
      * 枚举 {@link AiImageStatusEnum}
      */
     private Integer status;
+
+    /**
+     * 绘画错误信息
+     */
+    private String errorMessage;
 
     /**
      * 图片地址
@@ -101,14 +105,11 @@ public class AiImageDO extends BaseDO {
     private List<MidjourneyApi.Button> buttons;
 
     /**
-     * midjourney proxy 关联的 task id
+     * 任务编号
+     *
+     * 1. midjourney proxy：关联的 task id
      */
     private String taskId;
-
-    /**
-     * 绘画错误信息
-     */
-    private String errorMessage;
 
     public static class ButtonTypeHandler extends AbstractJsonTypeHandler<Object> {
 
