@@ -47,10 +47,6 @@ public class AiImageRespVO {
     @Schema(description = "绘制参数")
     private Map<String, String> options;
 
-    // TODO @fan：进度是百分比，还是一个数字哈？感觉这个可以统一成通用字段；
-    @Schema(description = "mj 进度")
-    private String progress;
-
     @Schema(description = "mj buttons 按钮")
     private List<MidjourneyApi.Button> buttons;
 
