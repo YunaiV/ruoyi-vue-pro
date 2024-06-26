@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.framework.ai.core.model.yiyan.api;
 
 import cn.iocoder.yudao.framework.ai.core.model.yiyan.exception.YiYanApiException;
+import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -85,7 +86,7 @@ public class YiYanApi {
                         -> uriBuilder.path(useChatModel.getUri())
                         .queryParam("access_token", token)
                         .build())
-                .body(Mono.just(request), YiYanChatCompletionRequest.class)
+                .body(Mono.just(JsonUtils.toJsonString(request)), String.class)
                 .retrieve()
                 .toEntity(YiYanChatCompletionResponse.class)
                 .block();

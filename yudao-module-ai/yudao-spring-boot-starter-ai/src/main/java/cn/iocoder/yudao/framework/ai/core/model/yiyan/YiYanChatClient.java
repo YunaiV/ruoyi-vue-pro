@@ -119,8 +119,8 @@ public class YiYanChatClient implements ChatClient, StreamingChatClient {
         // 复制 YiYanOptions 属性，到 request 中（这里 options 属性和 request 基本保持一致）
         YiYanChatOptions useOptions = getYiYanOptions(prompt);
         BeanUtil.copyProperties(useOptions, request);
-        request.setTop_p(useOptions.getTopP())
-                .setMax_output_tokens(useOptions.getMaxOutputTokens())
+        request.setTopP(useOptions.getTopP())
+                .setMaxOutputTokens(useOptions.getMaxOutputTokens())
                 .setTemperature(useOptions.getTemperature())
                 .setSystem(systemPrompt)
                 .setStream(stream);
