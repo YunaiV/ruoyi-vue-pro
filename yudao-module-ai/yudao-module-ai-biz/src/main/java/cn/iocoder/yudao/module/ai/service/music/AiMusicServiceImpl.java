@@ -93,19 +93,12 @@ public class AiMusicServiceImpl implements AiMusicService {
      * @return AiMusicDO 集合
      */
     private static List<AiMusicDO> buildMusicDOList(List<SunoApi.MusicData> musicTaskList) {
-        // TODO @xin：想通的变量，放在同一行，避免过长。
         return CollectionUtils.convertList(musicTaskList, musicData -> new AiMusicDO()
                 .setTaskId(musicData.id())
-                .setPrompt(musicData.prompt())
-                .setGptDescriptionPrompt(musicData.gptDescriptionPrompt())
-                .setAudioUrl(musicData.audioUrl())
-                .setVideoUrl(musicData.videoUrl())
-                .setImageUrl(musicData.imageUrl())
-                .setLyric(musicData.lyric())
-                .setTitle(musicData.title())
-                .setStatus(Objects.equals("complete", musicData.status()) ? AiMusicStatusEnum.COMPLETE.getStatus() : AiMusicStatusEnum.STREAMING.getStatus())
-                .setModel(musicData.modelName())
-                .setTags(StrUtil.split(musicData.tags(), StrPool.COMMA)));
-    }
+                .setPrompt(musicData.prompt()).setGptDescriptionPrompt(musicData.gptDescriptionPrompt())
+                .setAudioUrl(musicData.audioUrl()).setVideoUrl(musicData.videoUrl()).setImageUrl(musicData.imageUrl())
+                .setTitle(musicData.title()).setLyric(musicData.lyric()).setTags(StrUtil.split(musicData.tags(), StrPool.COMMA))
+                .setModel(musicData.modelName()).setStatus(Objects.equals("complete", musicData.status()) ? AiMusicStatusEnum.COMPLETE.getStatus() : AiMusicStatusEnum.STREAMING.getStatus()));
 
+    }
 }
