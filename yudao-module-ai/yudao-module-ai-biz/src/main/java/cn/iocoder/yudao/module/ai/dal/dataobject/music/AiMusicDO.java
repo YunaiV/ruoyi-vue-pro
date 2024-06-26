@@ -63,7 +63,7 @@ public class AiMusicDO extends BaseDO {
      * <p>
      * 枚举 {@link AiMusicStatusEnum}
      */
-    private String status;
+    private Integer status;
 
     /**
      * 描述词
@@ -77,7 +77,7 @@ public class AiMusicDO extends BaseDO {
     /**
      * 生成模式
      */
-    private String generateMode;
+    private Integer generateMode;
 
     /**
      * 平台

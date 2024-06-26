@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.ai.job.sun;
+package cn.iocoder.yudao.module.ai.job.music;
 
 import cn.iocoder.yudao.framework.quartz.core.handler.JobHandler;
 import cn.iocoder.yudao.module.ai.service.music.AiMusicService;
