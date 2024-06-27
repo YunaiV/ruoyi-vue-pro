@@ -4,10 +4,11 @@ import cn.iocoder.yudao.framework.ai.core.model.midjourney.api.MidjourneyApi;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
-@Schema(description = "管理后台 - 绘画 Response VO")
+@Schema(description = "管理后台 - AI 绘画 Response VO")
 @Data
 public class AiImageRespVO {
 
@@ -47,11 +48,10 @@ public class AiImageRespVO {
     @Schema(description = "绘制参数")
     private Map<String, String> options;
 
-    // TODO @fan：进度是百分比，还是一个数字哈？感觉这个可以统一成通用字段；
-    @Schema(description = "mj 进度")
-    private String progress;
-
     @Schema(description = "mj buttons 按钮")
     private List<MidjourneyApi.Button> buttons;
+
+    @Schema(description = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED)
+    private LocalDateTime createTime;
 
 }

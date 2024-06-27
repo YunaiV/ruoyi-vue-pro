@@ -7,7 +7,9 @@ import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.ai.controller.admin.image.vo.AiImageDrawReqVO;
+import cn.iocoder.yudao.module.ai.controller.admin.image.vo.AiImagePageReqVO;
 import cn.iocoder.yudao.module.ai.controller.admin.image.vo.AiImageRespVO;
+import cn.iocoder.yudao.module.ai.controller.admin.image.vo.AiImageUpdatePublicStatusReqVO;
 import cn.iocoder.yudao.module.ai.controller.admin.image.vo.midjourney.AiMidjourneyActionReqVO;
 import cn.iocoder.yudao.module.ai.controller.admin.image.vo.midjourney.AiMidjourneyImagineReqVO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.image.AiImageDO;
@@ -17,7 +19,9 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import jakarta.annotation.security.PermitAll;
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -86,6 +90,33 @@ public class AiImageController {
     public CommonResult<Long> midjourneyAction(@Validated @RequestBody AiMidjourneyActionReqVO reqVO) {
         Long imageId = imageService.midjourneyAction(getLoginUserId(), reqVO);
         return success(imageId);
+    }
+
+    // ================ 绘图管理 ================
+
+    @GetMapping("/page")
+    @Operation(summary = "获得绘画分页")
+    @PreAuthorize("@ss.hasPermission('ai:image:query')")
+    public CommonResult<PageResult<AiImageRespVO>> getImagePage(@Valid AiImagePageReqVO pageReqVO) {
+        PageResult<AiImageDO> pageResult = imageService.getImagePage(pageReqVO);
+        return success(BeanUtils.toBean(pageResult, AiImageRespVO.class));
+    }
+
+    @PutMapping("/update-public-status")
+    @Operation(summary = "更新绘画发布状态")
+    @PreAuthorize("@ss.hasPermission('ai:image:update')")
+    public CommonResult<Boolean> updateImagePublicStatus(@Valid @RequestBody AiImageUpdatePublicStatusReqVO updateReqVO) {
+        imageService.updateImagePublicStatus(updateReqVO);
+        return success(true);
+    }
+
+    @DeleteMapping("/delete")
+    @Operation(summary = "删除绘画")
+    @Parameter(name = "id", description = "编号", required = true)
+    @PreAuthorize("@ss.hasPermission('ai:image:delete')")
+    public CommonResult<Boolean> deleteImage(@RequestParam("id") Long id) {
+        imageService.deleteImage(id);
+        return success(true);
     }
 
 }

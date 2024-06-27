@@ -7,7 +7,7 @@ import lombok.Data;
 
 import java.util.List;
 
-@Schema(description = "管理后台 - 绘画生成（Midjourney） Request VO")
+@Schema(description = "管理后台 - AI 绘画生成（Midjourney） Request VO")
 @Data
 public class AiMidjourneyImagineReqVO {
 

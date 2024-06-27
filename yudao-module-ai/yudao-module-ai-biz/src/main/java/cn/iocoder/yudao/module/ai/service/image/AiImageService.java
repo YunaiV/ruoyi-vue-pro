@@ -4,9 +4,12 @@ import cn.iocoder.yudao.framework.ai.core.model.midjourney.api.MidjourneyApi;
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.ai.controller.admin.image.vo.AiImageDrawReqVO;
+import cn.iocoder.yudao.module.ai.controller.admin.image.vo.AiImagePageReqVO;
+import cn.iocoder.yudao.module.ai.controller.admin.image.vo.AiImageUpdatePublicStatusReqVO;
 import cn.iocoder.yudao.module.ai.controller.admin.image.vo.midjourney.AiMidjourneyActionReqVO;
 import cn.iocoder.yudao.module.ai.controller.admin.image.vo.midjourney.AiMidjourneyImagineReqVO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.image.AiImageDO;
+import jakarta.validation.Valid;
 
 /**
  * AI 绘图 Service 接口
@@ -48,6 +51,28 @@ public interface AiImageService {
      * @param userId 用户编号
      */
     void deleteImageMy(Long id, Long userId);
+
+    /**
+     * 获得绘画分页
+     *
+     * @param pageReqVO 分页查询
+     * @return 绘画分页
+     */
+    PageResult<AiImageDO> getImagePage(AiImagePageReqVO pageReqVO);
+
+    /**
+     * 更新绘画发布状态
+     *
+     * @param updateReqVO 更新信息
+     */
+    void updateImagePublicStatus(@Valid AiImageUpdatePublicStatusReqVO updateReqVO);
+
+    /**
+     * 删除绘画
+     *
+     * @param id 编号
+     */
+    void deleteImage(Long id);
 
     // ================ midjourney 专属 ================
 

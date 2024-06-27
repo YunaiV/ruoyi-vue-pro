@@ -10,7 +10,7 @@ import org.springframework.ai.stabilityai.api.StabilityAiImageOptions;
 
 import java.util.Map;
 
-@Schema(description = "管理后台 - 绘画 Request VO")
+@Schema(description = "管理后台 - AI 绘画 Request VO")
 @Data
 public class AiImageDrawReqVO {
 
