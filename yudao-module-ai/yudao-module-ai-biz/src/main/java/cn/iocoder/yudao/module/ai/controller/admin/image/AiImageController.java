@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.ai.controller.admin.image;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjUtil;
 import cn.iocoder.yudao.framework.ai.core.model.midjourney.api.MidjourneyApi;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
@@ -24,6 +25,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
@@ -52,6 +57,19 @@ public class AiImageController {
             return success(null);
         }
         return success(BeanUtils.toBean(image, AiImageRespVO.class));
+    }
+
+    @Operation(summary = "获取【我的】绘图记录 - ids")
+    @GetMapping("/get-my-ids")
+    public CommonResult<List<AiImageRespVO>> getImageMyIds(@RequestParam("ids") List<Long> ids) {
+        List<AiImageDO> imageList = imageService.getImageByIds(ids);
+        if (CollUtil.isEmpty(imageList)) {
+            return success(Collections.emptyList());
+        }
+        List<AiImageDO> userImageList = imageList.stream()
+                .map(item -> ObjUtil.equal(getLoginUserId(), item.getUserId()) ? item : null)
+                .filter(Objects::nonNull).toList();
+        return success(BeanUtils.toBean(userImageList, AiImageRespVO.class));
     }
 
     @Operation(summary = "生成图片")

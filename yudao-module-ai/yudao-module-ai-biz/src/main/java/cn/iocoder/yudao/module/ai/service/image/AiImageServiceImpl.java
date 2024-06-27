@@ -75,6 +75,11 @@ public class AiImageServiceImpl implements AiImageService {
     }
 
     @Override
+    public List<AiImageDO> getImageByIds(List<Long> ids) {
+        return imageMapper.selectBatchIds(ids);
+    }
+
+    @Override
     public Long drawImage(Long userId, AiImageDrawReqVO drawReqVO) {
         // 1. 保存数据库
         AiImageDO image = BeanUtils.toBean(drawReqVO, AiImageDO.class).setUserId(userId).setPublicStatus(false)
