@@ -4,6 +4,9 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.text.StrPool;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.ai.core.model.suno.api.SunoApi;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.module.ai.controller.admin.music.vo.AiMusicPageReqVO;
+import cn.iocoder.yudao.module.ai.controller.admin.music.vo.AiMusicUpdatePublicStatusReqVO;
 import cn.iocoder.yudao.module.ai.controller.admin.music.vo.AiSunoGenerateReqVO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.music.AiMusicDO;
 import cn.iocoder.yudao.module.ai.dal.mysql.music.AiMusicMapper;
@@ -15,8 +18,10 @@ import org.springframework.stereotype.Service;
 
 import java.util.*;
 
+import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
+import static cn.iocoder.yudao.module.ai.enums.ErrorCodeConstants.MUSIC_NOT_EXISTS;
 
 /**
  * AI 音乐 Service 实现类
@@ -56,7 +61,7 @@ public class AiMusicServiceImpl implements AiMusicService {
             return Collections.emptyList();
         }
         List<AiMusicDO> musicList = buildMusicDOList(musicDataList);
-        musicList.forEach(music -> music.setUserId(userId).setPlatform(music.getPlatform()).setGenerateMode(reqVO.getGenerateMode()));
+        musicList.forEach(music -> music.setUserId(userId).setPlatform(reqVO.getPlatform()).setGenerateMode(reqVO.getGenerateMode()));
         musicMapper.insertBatch(musicList);
         return convertList(musicList, AiMusicDO::getId);
     }
@@ -92,12 +97,41 @@ public class AiMusicServiceImpl implements AiMusicService {
      * @return AiMusicDO 集合
      */
     private static List<AiMusicDO> buildMusicDOList(List<SunoApi.MusicData> musicList) {
+        // TODO @xin：成功的情况下，需要下载到自己的文件服务器。参考图片的处理
         return convertList(musicList, musicData -> new AiMusicDO()
                 .setTaskId(musicData.id()).setModel(musicData.modelName())
                 .setPrompt(musicData.prompt()).setGptDescriptionPrompt(musicData.gptDescriptionPrompt())
                 .setAudioUrl(musicData.audioUrl()).setVideoUrl(musicData.videoUrl()).setImageUrl(musicData.imageUrl())
                 .setTitle(musicData.title()).setLyric(musicData.lyric()).setTags(StrUtil.split(musicData.tags(), StrPool.COMMA))
-                .setStatus(Objects.equals("complete", musicData.status()) ? AiMusicStatusEnum.SUCCESS.getStatus() : AiMusicStatusEnum.IN_PROGRESS.getStatus()));
-
+                .setStatus(Objects.equals("complete", musicData.status()) ?
+                        AiMusicStatusEnum.SUCCESS.getStatus() : AiMusicStatusEnum.IN_PROGRESS.getStatus()));
     }
+
+    @Override
+    public void updateMusicPublicStatus(AiMusicUpdatePublicStatusReqVO updateReqVO) {
+        // 校验存在
+        validateMusicExists(updateReqVO.getId());
+        // 更新
+        musicMapper.updateBatch(new AiMusicDO().setPublicStatus(updateReqVO.getPublicStatus()));
+    }
+
+    @Override
+    public void deleteMusic(Long id) {
+        // 校验存在
+        validateMusicExists(id);
+        // 删除
+        musicMapper.deleteById(id);
+    }
+
+    private void validateMusicExists(Long id) {
+        if (musicMapper.selectById(id) == null) {
+            throw exception(MUSIC_NOT_EXISTS);
+        }
+    }
+
+    @Override
+    public PageResult<AiMusicDO> getMusicPage(AiMusicPageReqVO pageReqVO) {
+        return musicMapper.selectPage(pageReqVO);
+    }
+
 }

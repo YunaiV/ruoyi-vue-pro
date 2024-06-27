@@ -1,0 +1,26 @@
+### 生成音乐：Suno + 歌词模式
+POST {{baseUrl}}/ai/music/generate
+Content-Type: application/json
+Authorization: {{token}}
+
+{
+  "platform": "Suno",
+  "generateMode": 1,
+  "prompt": "来一首快乐的歌曲",
+  "modelVersion": "chirp-v3.5",
+  "tags": ["Happy"],
+  "title": "Happy Song"
+}
+
+### 生成音乐：Suno + 描述模式
+POST {{baseUrl}}/ai/music/generate
+Content-Type: application/json
+Authorization: {{token}}
+
+{
+  "platform": "Suno",
+  "generateMode": 2,
+  "prompt": "来一首快乐的歌曲",
+  "makeInstrumental": false,
+  "title": "Happy Song"
+}

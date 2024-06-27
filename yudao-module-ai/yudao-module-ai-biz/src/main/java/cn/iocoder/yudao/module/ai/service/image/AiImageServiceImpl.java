@@ -35,6 +35,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -76,6 +77,9 @@ public class AiImageServiceImpl implements AiImageService {
 
     @Override
     public List<AiImageDO> getImageByIds(List<Long> ids) {
+        if (CollUtil.isEmpty(ids)) {
+            return Collections.emptyList();
+        }
         return imageMapper.selectBatchIds(ids);
     }
 
@@ -135,7 +139,7 @@ public class AiImageServiceImpl implements AiImageService {
         // 1. 校验是否存在
         AiImageDO image = validateImageExists(id);
         if (ObjUtil.notEqual(image.getUserId(), userId)) {
-            throw exception(AI_IMAGE_NOT_EXISTS);
+            throw exception(IMAGE_NOT_EXISTS);
         }
         // 2. 删除记录
         imageMapper.deleteById(id);
@@ -165,7 +169,7 @@ public class AiImageServiceImpl implements AiImageService {
     private AiImageDO validateImageExists(Long id) {
         AiImageDO image = imageMapper.selectById(id);
         if (image == null) {
-            throw exception(AI_IMAGE_NOT_EXISTS);
+            throw exception(IMAGE_NOT_EXISTS);
         }
         return image;
     }
@@ -191,7 +195,7 @@ public class AiImageServiceImpl implements AiImageService {
         if (!MidjourneyApi.SubmitCodeEnum.SUCCESS_CODES.contains(imagineResponse.code())) {
             String description = imagineResponse.description().contains("quota_not_enough") ?
                     "账户余额不足" : imagineResponse.description();
-            throw exception(AI_IMAGE_MIDJOURNEY_SUBMIT_FAIL, description);
+            throw exception(IMAGE_MIDJOURNEY_SUBMIT_FAIL, description);
         }
 
         // 4. 情况二【成功】：更新 taskId 和参数
@@ -271,13 +275,13 @@ public class AiImageServiceImpl implements AiImageService {
         // 1.1 检查 image
         AiImageDO image = validateImageExists(reqVO.getId());
         if (ObjUtil.notEqual(userId, image.getUserId())) {
-            throw exception(AI_IMAGE_NOT_EXISTS);
+            throw exception(IMAGE_NOT_EXISTS);
         }
         // 1.2 检查 customId
         MidjourneyApi.Button button = CollUtil.findOne(image.getButtons(),
                 buttonX -> buttonX.customId().equals(reqVO.getCustomId()));
         if (button == null) {
-            throw exception(AI_IMAGE_CUSTOM_ID_NOT_EXISTS);
+            throw exception(IMAGE_CUSTOM_ID_NOT_EXISTS);
         }
 
         // 2. 调用 Midjourney Proxy 提交任务
@@ -286,7 +290,7 @@ public class AiImageServiceImpl implements AiImageService {
         if (!MidjourneyApi.SubmitCodeEnum.SUCCESS_CODES.contains(actionResponse.code())) {
             String description = actionResponse.description().contains("quota_not_enough") ?
                     "账户余额不足" : actionResponse.description();
-            throw exception(AI_IMAGE_MIDJOURNEY_SUBMIT_FAIL, description);
+            throw exception(IMAGE_MIDJOURNEY_SUBMIT_FAIL, description);
         }
 
         // 3. 新增 image 记录

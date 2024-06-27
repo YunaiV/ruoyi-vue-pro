@@ -99,6 +99,11 @@ public class AiMusicDO extends BaseDO {
     private List<String> tags;
 
     /**
+     * 是否公开
+     */
+    private Boolean publicStatus;
+
+    /**
      * 任务编号
      */
     private String taskId;

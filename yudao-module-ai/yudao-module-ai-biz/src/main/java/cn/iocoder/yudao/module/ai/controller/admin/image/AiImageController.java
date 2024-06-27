@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.module.ai.controller.admin.image;
 
-import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjUtil;
 import cn.iocoder.yudao.framework.ai.core.model.midjourney.api.MidjourneyApi;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
@@ -26,9 +25,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
@@ -42,15 +39,16 @@ public class AiImageController {
     @Resource
     private AiImageService imageService;
 
-    @Operation(summary = "获取【我的】绘图分页")
     @GetMapping("/my-page")
+    @Operation(summary = "获取【我的】绘图分页")
     public CommonResult<PageResult<AiImageRespVO>> getImagePageMy(@Validated PageParam pageReqVO) {
         PageResult<AiImageDO> pageResult = imageService.getImagePageMy(getLoginUserId(), pageReqVO);
         return success(BeanUtils.toBean(pageResult, AiImageRespVO.class));
     }
 
-    @Operation(summary = "获取【我的】绘图记录")
     @GetMapping("/get-my")
+    @Operation(summary = "获取【我的】绘图记录")
+    @Parameter(name = "id", required = true, description = "绘画编号", example = "1024")
     public CommonResult<AiImageRespVO> getImageMy(@RequestParam("id") Long id) {
         AiImageDO image = imageService.getImage(id);
         if (image == null || ObjUtil.notEqual(getLoginUserId(), image.getUserId())) {
@@ -59,17 +57,13 @@ public class AiImageController {
         return success(BeanUtils.toBean(image, AiImageRespVO.class));
     }
 
-    @Operation(summary = "获取【我的】绘图记录 - ids")
     @GetMapping("/get-my-ids")
+    @Operation(summary = "获取【我的】绘图记录列表")
+    @Parameter(name = "ids", required = true, description = "绘画编号数组", example = "1024,2048")
     public CommonResult<List<AiImageRespVO>> getImageMyIds(@RequestParam("ids") List<Long> ids) {
         List<AiImageDO> imageList = imageService.getImageByIds(ids);
-        if (CollUtil.isEmpty(imageList)) {
-            return success(Collections.emptyList());
-        }
-        List<AiImageDO> userImageList = imageList.stream()
-                .map(item -> ObjUtil.equal(getLoginUserId(), item.getUserId()) ? item : null)
-                .filter(Objects::nonNull).toList();
-        return success(BeanUtils.toBean(userImageList, AiImageRespVO.class));
+        imageList.removeIf(item -> !ObjUtil.equal(getLoginUserId(), item.getUserId()));
+        return success(BeanUtils.toBean(imageList, AiImageRespVO.class));
     }
 
     @Operation(summary = "生成图片")

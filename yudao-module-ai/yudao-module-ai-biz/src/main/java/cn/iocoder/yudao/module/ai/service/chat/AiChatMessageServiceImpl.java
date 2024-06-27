@@ -44,7 +44,7 @@ import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionU
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.error;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
-import static cn.iocoder.yudao.module.ai.enums.ErrorCodeConstants.AI_CHAT_MESSAGE_NOT_EXIST;
+import static cn.iocoder.yudao.module.ai.enums.ErrorCodeConstants.CHAT_MESSAGE_NOT_EXIST;
 import static cn.iocoder.yudao.module.ai.enums.ErrorCodeConstants.CHAT_CONVERSATION_NOT_EXISTS;
 
 /**
@@ -150,7 +150,7 @@ public class AiChatMessageServiceImpl implements AiChatMessageService {
             log.error("[sendChatMessageStream][userId({}) sendReqVO({}) 发生异常]", userId, sendReqVO, throwable);
             chatMessageMapper.updateById(new AiChatMessageDO().setId(assistantMessage.getId()).setContent(throwable.getMessage()));
         }).onErrorResume(error -> {
-            return Flux.just(error(ErrorCodeConstants.AI_CHAT_STREAM_ERROR));
+            return Flux.just(error(ErrorCodeConstants.CHAT_STREAM_ERROR));
         });
     }
 
@@ -257,7 +257,7 @@ public class AiChatMessageServiceImpl implements AiChatMessageService {
         // 1. 校验消息存在
         AiChatMessageDO message = chatMessageMapper.selectById(id);
         if (message == null || ObjUtil.notEqual(message.getUserId(), userId)) {
-            throw exception(AI_CHAT_MESSAGE_NOT_EXIST);
+            throw exception(CHAT_MESSAGE_NOT_EXIST);
         }
         // 2. 执行删除
         chatMessageMapper.deleteById(id);
@@ -268,7 +268,7 @@ public class AiChatMessageServiceImpl implements AiChatMessageService {
         // 1. 校验消息存在
         List<AiChatMessageDO> messages = chatMessageMapper.selectListByConversationId(conversationId);
         if (CollUtil.isEmpty(messages) || ObjUtil.notEqual(messages.get(0).getUserId(), userId)) {
-            throw exception(AI_CHAT_MESSAGE_NOT_EXIST);
+            throw exception(CHAT_MESSAGE_NOT_EXIST);
         }
         // 2. 执行删除
         chatMessageMapper.deleteBatchIds(convertList(messages, AiChatMessageDO::getId));
@@ -279,7 +279,7 @@ public class AiChatMessageServiceImpl implements AiChatMessageService {
         // 1. 校验消息存在
         AiChatMessageDO message = chatMessageMapper.selectById(id);
         if (message == null) {
-            throw exception(AI_CHAT_MESSAGE_NOT_EXIST);
+            throw exception(CHAT_MESSAGE_NOT_EXIST);
         }
         // 2. 执行删除
         chatMessageMapper.deleteById(id);

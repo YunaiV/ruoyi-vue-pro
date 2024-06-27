@@ -29,13 +29,16 @@ public interface ErrorCodeConstants {
 
     // ========== API 聊天消息 1-040-004-000 ==========
 
-    ErrorCode AI_CHAT_MESSAGE_NOT_EXIST = new ErrorCode(1_040_004_000, "消息不存在!");
-    ErrorCode AI_CHAT_STREAM_ERROR = new ErrorCode(1_040_004_001, "Stream 对话异常!");
+    ErrorCode CHAT_MESSAGE_NOT_EXIST = new ErrorCode(1_040_004_000, "消息不存在!");
+    ErrorCode CHAT_STREAM_ERROR = new ErrorCode(1_040_004_001, "Stream 对话异常!");
 
     // ========== API 绘画 1-040-005-000 ==========
 
-    ErrorCode AI_IMAGE_NOT_EXISTS = new ErrorCode(1_022_005_000, "图片不存在!");
-    ErrorCode AI_IMAGE_MIDJOURNEY_SUBMIT_FAIL = new ErrorCode(1_022_005_001, "Midjourney 提交失败!原因：{}");
-    ErrorCode AI_IMAGE_CUSTOM_ID_NOT_EXISTS = new ErrorCode(1_022_005_002, "Midjourney 按钮 customId 不存在! {}");
+    ErrorCode IMAGE_NOT_EXISTS = new ErrorCode(1_022_005_000, "图片不存在!");
+    ErrorCode IMAGE_MIDJOURNEY_SUBMIT_FAIL = new ErrorCode(1_022_005_001, "Midjourney 提交失败!原因：{}");
+    ErrorCode IMAGE_CUSTOM_ID_NOT_EXISTS = new ErrorCode(1_022_005_002, "Midjourney 按钮 customId 不存在! {}");
+
+    // ========== API 音乐 1-040-006-000 ==========
+    ErrorCode MUSIC_NOT_EXISTS = new ErrorCode(1_022_006_000, "音乐不存在!");
 
 }
