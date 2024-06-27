@@ -14,10 +14,11 @@ public interface AiMusicService {
     /**
      * 音乐生成
      *
+     * @param userId 用户编号
      * @param reqVO 请求参数
      * @return 生成的音乐ID
      */
-    List<Long> generateMusic(AiSunoGenerateReqVO reqVO);
+    List<Long> generateMusic(Long userId, AiSunoGenerateReqVO reqVO);
 
     /**
      * 同步音乐任务
@@ -25,4 +26,5 @@ public interface AiMusicService {
      * @return 同步数量
      */
     Integer syncMusic();
+
 }

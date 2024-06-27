@@ -1,6 +1,8 @@
 package cn.iocoder.yudao.module.ai.dal.dataobject.music;
 
+import cn.iocoder.yudao.framework.ai.core.enums.AiPlatformEnum;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import cn.iocoder.yudao.module.ai.enums.music.AiMusicGenerateModeEnum;
 import cn.iocoder.yudao.module.ai.enums.music.AiMusicStatusEnum;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
@@ -39,20 +41,18 @@ public class AiMusicDO extends BaseDO {
     private String title;
 
     /**
-     * 图片地址
-     */
-    private String imageUrl;
-
-    /**
      * 歌词
      */
     private String lyric;
 
     /**
+     * 图片地址
+     */
+    private String imageUrl;
+    /**
      * 音频地址
      */
     private String audioUrl;
-
     /**
      * 视频地址
      */
@@ -66,6 +66,13 @@ public class AiMusicDO extends BaseDO {
     private Integer status;
 
     /**
+     * 生成模式
+     *
+     * 枚举 {@link AiMusicGenerateModeEnum}
+     */
+    private Integer generateMode;
+
+    /**
      * 描述词
      */
     private String gptDescriptionPrompt;
@@ -75,26 +82,15 @@ public class AiMusicDO extends BaseDO {
     private String prompt;
 
     /**
-     * 生成模式
-     */
-    private Integer generateMode;
-
-    /**
      * 平台
      * <p>
-     * 枚举 {@link cn.iocoder.yudao.framework.ai.core.enums.AiPlatformEnum}
+     * 枚举 {@link AiPlatformEnum}
      */
     private String platform;
-
     /**
      * 模型
      */
     private String model;
-
-    /**
-     * 错误信息
-     */
-    private String errorMessage;
 
     /**
      * 音乐风格标签
@@ -106,5 +102,10 @@ public class AiMusicDO extends BaseDO {
      * 任务编号
      */
     private String taskId;
+
+    /**
+     * 错误信息
+     */
+    private String errorMessage;
 
 }

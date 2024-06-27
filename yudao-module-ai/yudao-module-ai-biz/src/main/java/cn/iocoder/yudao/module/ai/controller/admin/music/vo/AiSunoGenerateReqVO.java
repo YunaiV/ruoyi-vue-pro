@@ -7,11 +7,20 @@ import lombok.Data;
 
 import java.util.List;
 
-@Schema(description = "管理后台 - 音乐生成 Request VO")
+@Schema(description = "管理后台 - AI 音乐生成 Request VO")
 @Data
 public class AiSunoGenerateReqVO {
 
-    @Schema(description = "用于生成音乐音频的提示", requiredMode = Schema.RequiredMode.REQUIRED, example = "创作一首带有轻松吉他旋律的流行歌曲，[verse] 描述夏日海滩的宁静，[chorus] 节奏加快，表达对自由的向往。")
+    @Schema(description = "平台", requiredMode = Schema.RequiredMode.REQUIRED, example = "Suno")
+    @NotBlank(message = "平台不能为空")
+    private String platform; // 参见 AiPlatformEnum 枚举
+
+    @Schema(description = "生成模式", requiredMode = Schema.RequiredMode.REQUIRED, example = "2")
+    @NotNull(message = "生成模式不能为空")
+    private Integer generateMode; // 参见 AiMusicGenerateEnum 枚举
+
+    @Schema(description = "用于生成音乐音频的提示", requiredMode = Schema.RequiredMode.REQUIRED,
+            example = "创作一首带有轻松吉他旋律的流行歌曲，[verse] 描述夏日海滩的宁静，[chorus] 节奏加快，表达对自由的向往。")
     private String prompt;
 
     @Schema(description = "是否纯音乐", requiredMode = Schema.RequiredMode.NOT_REQUIRED, example = "true")
@@ -25,13 +34,5 @@ public class AiSunoGenerateReqVO {
 
     @Schema(description = "音乐/歌曲名称", requiredMode = Schema.RequiredMode.NOT_REQUIRED, example = "夜空中最亮的星")
     private String title;
-
-    @Schema(description = "平台", requiredMode = Schema.RequiredMode.REQUIRED, example = "Suno")
-    @NotBlank(message = "平台不能为空")
-    private String platform; // 参见 AiPlatformEnum 枚举
-
-    @Schema(description = "生成模式", requiredMode = Schema.RequiredMode.REQUIRED, example = "2")
-    @NotNull(message = "生成模式不能为空")
-    private Integer generateMode; // 参见 AiMusicGenerateEnum 枚举
 
 }

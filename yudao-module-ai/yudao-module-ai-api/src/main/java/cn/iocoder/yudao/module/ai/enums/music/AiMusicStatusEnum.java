@@ -12,9 +12,8 @@ import lombok.Getter;
 @Getter
 public enum AiMusicStatusEnum {
 
-    // @xin 文档中无失败这个返回值
-    STREAMING(10, "进行中"),
-    COMPLETE(20, "完成");
+    IN_PROGRESS(10, "进行中"),
+    SUCCESS(20, "已完成");
 
     /**
      * 状态
