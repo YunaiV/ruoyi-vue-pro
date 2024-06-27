@@ -1,10 +1,10 @@
 package cn.iocoder.yudao.framework.ai.core.model.yiyan.api;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
 import java.util.List;
 
-// TODO @fan：字段驼峰；字段注释都可以删除，贴个链接就好；
 /**
  * 文心一言 Completion Request
  *
@@ -20,96 +20,70 @@ public class YiYanChatCompletionRequest {
     }
 
     /**
-     * 聊天上下文信息。
-     * 必填：是
+     * 聊天上下文信息
      */
     private List<Message> messages;
     /**
-     * 一个可触发函数的描述列表，说明：
-     * （1）支持的function数量无限制
-     * （2）长度限制，最后一个message的content长度（即此轮对话的问题）、functions和system字段总内容不能超过20480 个字符，且不能超过5120 tokens
-     * 必填：否
+     * functions 函数
      */
     private List<Function> functions;
     /**
-     * 说明：
-     * （1）较高的数值会使输出更加随机，而较低的数值会使其更加集中和确定
-     * （2）默认0.8，范围 (0, 1.0]，不能为0
-     * 必填：否
+     * temperature
      */
     private Float temperature;
     /**
-     * 说明：
-     * （1）影响输出文本的多样性，取值越大，生成文本的多样性越强
-     * （2）默认0.8，取值范围 [0, 1.0]
-     * 必填：否
+     * topP
      */
-    private Float top_p;
+    @JsonProperty("top_p")
+    private Float topP;
     /**
-     * 通过对已生成的token增加惩罚，减少重复生成的现象。说明：
-     * （1）值越大表示惩罚越大
-     * （2）默认1.0，取值范围：[1.0, 2.0]
-     *
-     * 必填：否
+     * 通过对已生成的token增加惩罚，减少重复生成的现象
      */
-    private Float penalty_score;
+    @JsonProperty("penalty_score")
+    private Float penaltyScore;
     /**
-     * 是否以流式接口的形式返回数据，默认false
-     * 必填：否
+     * stream 模式
      */
     private Boolean stream;
     /**
-     * 模型人设，主要用于人设设定，例如，你是xxx公司制作的AI助手，说明：
-     * （1）长度限制，最后一个message的content长度（即此轮对话的问题）、functions和system字段总内容不能超过20480 个字符，且不能超过5120 tokens
-     * （2）如果同时使用system和functions，可能暂无法保证使用效果，持续进行优化
-     * 必填：否
+     * system 预设角色
      */
     private String system;
     /**
-     * 生成停止标识，当模型生成结果以stop中某个元素结尾时，停止文本生成。说明：
-     * （1）每个元素长度不超过20字符
-     * （2）最多4个元素
-     * 必填：否
+     * 生成停止标识，当模型生成结果以stop中某个元素结尾时，停止文本生成
      */
     private List<String> stop;
     /**
-     * 是否强制关闭实时搜索功能，默认false，表示不关闭
-     * 必填：否
+     * 是否强制关闭实时搜索功能
      */
-    private Boolean disable_search;
+    @JsonProperty("disable_search")
+    private Boolean disableSearch;
     /**
-     * 是否开启上角标返回，说明：
-     * （1）开启后，有概率触发搜索溯源信息search_info，search_info内容见响应参数介绍
-     * （2）默认false，不开启
-     * 必填：否
+     * 是否开启上角标返回
      */
-    private Boolean enable_citation;
+    @JsonProperty("enable_citation")
+    private Boolean enableCitation;
     /**
-     * 指定模型最大输出token数，范围[2, 2048]
-     * 必填：否
+     * 最大输出 token 数
      */
-    private Integer max_output_tokens;
+    @JsonProperty("max_output_tokens")
+    private Integer maxOutputTokens;
     /**
-     * 指定响应内容的格式，说明：
-     * （1）可选值：
-     * · json_object：以json格式返回，可能出现不满足效果情况
-     * · text：以文本格式返回
-     * （2）如果不填写参数response_format值，默认为text
-     * 必填：否
+     * 返回格式 text、json_object
      */
-    private String response_format;
+    @JsonProperty("response_format")
+    private String responseFormat;
     /**
-     * 表示最终用户的唯一标识符
-     * 必填：否
+     * 用户 id
      */
-    private String user_id;
+    @JsonProperty("user_id")
+    private String userId;
     /**
      * 在函数调用场景下，提示大模型选择指定的函数（非强制），说明：指定的函数名必须在functions中存在
-     * 必填：否
-     *
-     * ERNIE-4.0-8K 模型没有这个字段
+     * tip: ERNIE-4.0-8K 模型没有这个字段
      */
-    private String tool_choice;
+    @JsonProperty("tool_choice")
+    private String toolChoice;
 
 
     @Data
