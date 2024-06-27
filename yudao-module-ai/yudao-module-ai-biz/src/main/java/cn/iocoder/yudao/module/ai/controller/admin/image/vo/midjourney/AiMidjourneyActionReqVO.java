@@ -5,7 +5,7 @@ import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
-@Schema(description = "管理后台 - Action（Midjourney） Request VO")
+@Schema(description = "管理后台 - AI 绘图操作（Midjourney） Request VO")
 @Data
 public class AiMidjourneyActionReqVO {
 

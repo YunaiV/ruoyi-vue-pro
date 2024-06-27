@@ -21,7 +21,7 @@ public enum AiPlatformEnum {
     GEMIR ("gemir ", "gemir "), // 谷歌
 
     STABLE_DIFFUSION("StableDiffusion", "StableDiffusion"), // Stability AI
-    MIDJOURNEY("midjourney", "midjourney"), // TODO MJ 提供的绘图，接入中
+    MIDJOURNEY("Midjourney", "Midjourney"),
     SUNO("Suno", "Suno"), // Suno AI
     ;
 

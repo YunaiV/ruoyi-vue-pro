@@ -14,6 +14,8 @@ import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.ai.controller.admin.image.vo.AiImageDrawReqVO;
+import cn.iocoder.yudao.module.ai.controller.admin.image.vo.AiImagePageReqVO;
+import cn.iocoder.yudao.module.ai.controller.admin.image.vo.AiImageUpdatePublicStatusReqVO;
 import cn.iocoder.yudao.module.ai.controller.admin.image.vo.midjourney.AiMidjourneyActionReqVO;
 import cn.iocoder.yudao.module.ai.controller.admin.image.vo.midjourney.AiMidjourneyImagineReqVO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.image.AiImageDO;
@@ -131,6 +133,27 @@ public class AiImageServiceImpl implements AiImageService {
             throw exception(AI_IMAGE_NOT_EXISTS);
         }
         // 2. 删除记录
+        imageMapper.deleteById(id);
+    }
+
+    @Override
+    public PageResult<AiImageDO> getImagePage(AiImagePageReqVO pageReqVO) {
+        return imageMapper.selectPage(pageReqVO);
+    }
+
+    @Override
+    public void updateImagePublicStatus(AiImageUpdatePublicStatusReqVO updateReqVO) {
+        // 1. 校验存在
+        validateImageExists(updateReqVO.getId());
+        // 2. 更新发布状态
+        imageMapper.updateById(BeanUtils.toBean(updateReqVO, AiImageDO.class));
+    }
+
+    @Override
+    public void deleteImage(Long id) {
+        // 1. 校验存在
+        validateImageExists(id);
+        // 2. 删除
         imageMapper.deleteById(id);
     }
 

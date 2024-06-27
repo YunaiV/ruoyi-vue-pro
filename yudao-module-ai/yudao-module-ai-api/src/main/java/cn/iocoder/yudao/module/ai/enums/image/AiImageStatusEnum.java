@@ -13,8 +13,8 @@ import lombok.Getter;
 public enum AiImageStatusEnum {
 
     IN_PROGRESS(10, "进行中"),
-    SUCCESS(20, "完成"),
-    FAIL(30, "失败");
+    SUCCESS(20, "已完成"),
+    FAIL(30, "已失败");
 
     /**
      * 状态
