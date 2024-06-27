@@ -67,6 +67,8 @@ public class BpmTaskRespVO {
     private List<String> formFields;
     @Schema(description = "提交的表单值", requiredMode = Schema.RequiredMode.REQUIRED)
     private Map<String, Object> formVariables;
+    @Schema(description = "表单字段权限值")
+    private Map<String,String> fieldsPermission;
 
     @Data
     @Schema(description = "流程实例")

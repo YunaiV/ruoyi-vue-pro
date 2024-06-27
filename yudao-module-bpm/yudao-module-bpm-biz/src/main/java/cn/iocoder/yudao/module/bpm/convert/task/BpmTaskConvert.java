@@ -9,6 +9,8 @@ import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.instance.BpmProcessInstanceRespVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.task.BpmTaskRespVO;
 import cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmFormDO;
+import cn.iocoder.yudao.module.bpm.enums.task.BpmTaskStatusEnum;
+import cn.iocoder.yudao.module.bpm.framework.flowable.core.util.BpmnModelUtils;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.util.FlowableUtils;
 import cn.iocoder.yudao.module.bpm.service.message.dto.BpmMessageSendWhenTaskCreatedReqDTO;
 import cn.iocoder.yudao.module.system.api.dept.dto.DeptRespDTO;
@@ -86,7 +88,8 @@ public interface BpmTaskConvert {
                                                                  BpmnModel bpmnModel) {
         List<BpmTaskRespVO> taskVOList = CollectionUtils.convertList(taskList, task -> {
             BpmTaskRespVO taskVO = BeanUtils.toBean(task, BpmTaskRespVO.class);
-            taskVO.setStatus(FlowableUtils.getTaskStatus(task)).setReason(FlowableUtils.getTaskReason(task));
+            Integer taskStatus = FlowableUtils.getTaskStatus(task);
+            taskVO.setStatus(taskStatus).setReason(FlowableUtils.getTaskReason(task));
             // 流程实例
             AdminUserRespDTO startUser = userMap.get(NumberUtils.parseLong(processInstance.getStartUserId()));
             taskVO.setProcessInstance(BeanUtils.toBean(processInstance, BpmTaskRespVO.ProcessInstance.class));
@@ -94,12 +97,6 @@ public interface BpmTaskConvert {
             // 表单信息
             BpmFormDO form = MapUtil.get(formMap, NumberUtils.parseLong(task.getFormKey()), BpmFormDO.class);
             if (form != null) {
-                // 测试一下权限处理
-                // TODO @jason：这里是不是还没实现完哈？
-                // TODO @芋艿 测试了一下。 暂时注释掉。  前端不知道要怎样改， 可能需要讨论一下如何改
-//                List<String> afterChangedFields = BpmnFormUtils.changeCreateFormFiledPermissionRule(form.getFields(),
-//                        BpmnModelUtils.parseFormFieldsPermission(bpmnModel, task.getTaskDefinitionKey()));
-
                 taskVO.setFormId(form.getId()).setFormName(form.getName()).setFormConf(form.getConf())
                         .setFormFields(form.getFields()).setFormVariables(FlowableUtils.getTaskFormVariable(task));
             }
@@ -114,7 +111,11 @@ public interface BpmTaskConvert {
                 taskVO.setOwnerUser(BeanUtils.toBean(ownerUser, BpmProcessInstanceRespVO.User.class));
                 findAndThen(deptMap, ownerUser.getDeptId(), dept -> taskVO.getOwnerUser().setDeptName(dept.getName()));
             }
-            return taskVO;
+            if(BpmTaskStatusEnum.RUNNING.getStatus().equals(taskStatus)){
+                // 设置表单权限 TODO @芋艿 是不是还要加一个全局的权限 基于 processInstance 的权限
+                taskVO.setFieldsPermission(BpmnModelUtils.parseFormFieldsPermission(bpmnModel, task.getTaskDefinitionKey()));
+            }
+           return taskVO;
         });
 
         // 拼接父子关系
@@ -159,12 +160,12 @@ public interface BpmTaskConvert {
 
     /**
      * 将父任务的属性，拷贝到子任务（加签任务）
-     *
+     * <p>
      * 为什么不使用 mapstruct 映射？因为 TaskEntityImpl 还有很多其他属性，这里我们只设置我们需要的。
      * 使用 mapstruct 会将里面嵌套的各个属性值都设置进去，会出现意想不到的问题。
      *
      * @param parentTask 父任务
-     * @param childTask 加签任务
+     * @param childTask  加签任务
      */
     default void copyTo(TaskEntityImpl parentTask, TaskEntityImpl childTask) {
         childTask.setName(parentTask.getName());

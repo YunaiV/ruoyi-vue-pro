@@ -213,6 +213,8 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         // 其中，variables 是存储动态表单到 local 任务级别。过滤一下，避免 ProcessInstance 系统级的变量被占用
         if (CollUtil.isNotEmpty(reqVO.getVariables())) {
             Map<String, Object> variables = FlowableUtils.filterTaskFormVariable(reqVO.getVariables());
+            // 修改表单的值需要存储到 ProcessInstance 变量
+            runtimeService.setVariables(task.getProcessInstanceId(), variables);
             taskService.complete(task.getId(), variables, true);
         } else {
             taskService.complete(task.getId());
@@ -371,7 +373,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         }
 
         // 4.2.1 更新其它正在运行的任务状态为取消。需要过滤掉当前任务和被加签的任务
-        // TODO @jason：如果过滤掉被加签的任务，这些任务被对应的审批人看到是啥状态哈？
+        // TODO @jason：如果过滤掉被加签的任务，这些任务被对应的审批人看到是啥状态哈？ @芋艿 为不通过状态。
         List<Task> taskList = getRunningTaskListByProcessInstanceId(instance.getProcessInstanceId(), false, null, null);
         updateTaskStatusWhenCanceled(
                 CollectionUtils.filterList(taskList, item -> !item.getId().equals(task.getId()) && !item.getId().equals(task.getParentTaskId())),

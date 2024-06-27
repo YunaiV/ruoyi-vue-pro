@@ -60,19 +60,18 @@ public class BpmnModelUtils {
         return element != null ? element.getElementText() : null;
     }
 
-    // TODO @jason：貌似这个没地方调用？？？  @芋艿 在 BpmTaskConvert里面。暂时注释掉了。
-    public static Map<String, Integer> parseFormFieldsPermission(BpmnModel bpmnModel, String flowElementId) {
+    public static Map<String, String> parseFormFieldsPermission(BpmnModel bpmnModel, String flowElementId) {
         FlowElement flowElement = getFlowElementById(bpmnModel, flowElementId);
         if (flowElement == null) {
             return null;
         }
-        Map<String, Integer> fieldsPermission = MapUtil.newHashMap();
+        Map<String, String> fieldsPermission = MapUtil.newHashMap();
         List<ExtensionElement> extensionElements = flowElement.getExtensionElements().get(FORM_FIELD_PERMISSION_ELEMENT);
         extensionElements.forEach(element -> {
             String field = element.getAttributeValue(FLOWABLE_EXTENSIONS_NAMESPACE, FORM_FIELD_PERMISSION_ELEMENT_FIELD_ATTRIBUTE);
             String permission = element.getAttributeValue(FLOWABLE_EXTENSIONS_NAMESPACE, FORM_FIELD_PERMISSION_ELEMENT_PERMISSION_ATTRIBUTE);
             if (StrUtil.isNotEmpty(field) && StrUtil.isNotEmpty(permission)) {
-                fieldsPermission.put(field, Integer.parseInt(permission));
+                fieldsPermission.put(field, permission);
             }
         });
         return fieldsPermission;
