@@ -10,18 +10,17 @@ import lombok.Getter;
  */
 @AllArgsConstructor
 @Getter
-public enum AiMusicStatusEnum {
+public enum AiMusicGenerateModeEnum {
 
-    IN_PROGRESS(10, "进行中"),
-    SUCCESS(20, "已完成");
+    LYRIC(1, "歌词模式"),
+    DESCRIPTION(2, "描述模式");
 
     /**
-     * 状态
+     * 模式
      */
-    private final Integer status;
-
+    private final Integer mode;
     /**
-     * 状态名
+     * 模式名
      */
     private final String name;
 

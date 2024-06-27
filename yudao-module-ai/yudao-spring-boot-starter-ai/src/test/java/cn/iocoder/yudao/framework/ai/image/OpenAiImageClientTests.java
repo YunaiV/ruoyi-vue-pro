@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.framework.ai.openai;
+package cn.iocoder.yudao.framework.ai.image;
 
 import org.springframework.ai.image.ImagePrompt;
 import org.springframework.ai.image.ImageResponse;
@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.util.Base64;
 import java.util.Scanner;
 
+// TODO 芋艿：整理单测
 /**
  * author: fansili
  * time: 2024/3/17 10:40

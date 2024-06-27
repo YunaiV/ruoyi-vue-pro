@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.framework.ai.suno;
+package cn.iocoder.yudao.framework.ai.music;
 
 import cn.iocoder.yudao.framework.ai.core.model.suno.api.SunoApi;
 import org.junit.Before;
@@ -6,24 +6,24 @@ import org.junit.Test;
 
 import java.util.List;
 
+// TODO 芋艿：整理单测
 /**
  * @Author xiaoxin
  * @Date 2024/5/27
  */
 public class SunoTests {
 
-    SunoApi sunoApi;
+    private SunoApi sunoApi;
 
     @Before
     public void setup() {
-        String url = "https://suno-imrqwwui8-status2xxs-projects.vercel.app";
+        String url = "https://suno-om0w1cy6e-status2xxs-projects.vercel.app";
         this.sunoApi = new SunoApi(url);
     }
 
     @Test
     public void selectById() {
         System.out.println(sunoApi.getMusicList(List.of("d460ddda-7c87-4f34-b751-419b08a590ca,ff90ea66-49cd-4fd2-b44c-44267dfd5551")));
-
     }
 
     @Test
