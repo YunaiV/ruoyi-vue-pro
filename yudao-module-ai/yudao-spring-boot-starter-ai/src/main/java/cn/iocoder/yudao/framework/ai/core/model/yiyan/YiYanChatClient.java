@@ -3,8 +3,8 @@ package cn.iocoder.yudao.framework.ai.core.model.yiyan;
 import cn.hutool.core.bean.BeanUtil;
 import cn.iocoder.yudao.framework.ai.core.exception.ChatException;
 import cn.iocoder.yudao.framework.ai.core.model.yiyan.api.YiYanApi;
-import cn.iocoder.yudao.framework.ai.core.model.yiyan.api.YiYanChatCompletionResponse;
 import cn.iocoder.yudao.framework.ai.core.model.yiyan.api.YiYanChatCompletionRequest;
+import cn.iocoder.yudao.framework.ai.core.model.yiyan.api.YiYanChatCompletionResponse;
 import cn.iocoder.yudao.framework.ai.core.model.yiyan.exception.YiYanApiException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.ChatClient;
@@ -76,21 +76,23 @@ public class YiYanChatClient implements ChatClient, StreamingChatClient {
             ResponseEntity<YiYanChatCompletionResponse> response = yiYanApi.chatCompletionEntity(request);
             // 获取结果封装 ChatResponse
             YiYanChatCompletionResponse chatCompletion = response.getBody();
-            // TODO @fan：为空时，参考 OpenAiChatClient 的封装；
-            // TODO @fan：chatResponseMetadata，参考 OpenAiChatResponseMetadata.from(completionEntity.getBody())
-            return new ChatResponse(List.of(new Generation(chatCompletion.getResult())));
+            if (chatCompletion == null) {
+                log.warn("No chat completion returned for prompt: {}", prompt);
+                return new ChatResponse(List.of());
+            } else {
+                // TODO @fan：chatResponseMetadata，参考 OpenAiChatResponseMetadata.from(completionEntity.getBody())
+                return new ChatResponse(List.of(new Generation(chatCompletion.getResult())));
+            }
         });
     }
 
     @Override
     public Flux<ChatResponse> stream(Prompt prompt) {
         YiYanChatCompletionRequest request = this.createRequest(prompt, true);
-        // TODO done @fan：return this.retryTemplate.execute(ctx -> {
-        return retryTemplate.execute(ctx -> {
+        return this.retryTemplate.execute(ctx -> {
             // 调用 callWithFunctionSupport 发送请求
             Flux<YiYanChatCompletionResponse> response = this.yiYanApi.chatCompletionStream(request);
             return response.map(chunk -> {
-//                System.err.println("---".concat(chunk.getResult()));
                 // TODO @fan：ChatResponseMetadata chatResponseMetadata
                 return new ChatResponse(List.of(new Generation(chunk.getResult())));
             });
