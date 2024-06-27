@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
+import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
 
 @Tag(name = "管理后台 - AI 音乐")
 @RestController
@@ -27,7 +28,7 @@ public class AiMusicController {
     @PostMapping("/generate")
     @Operation(summary = "音乐生成")
     public CommonResult<List<Long>> generateMusic(@RequestBody @Valid AiSunoGenerateReqVO reqVO) {
-        return success(musicService.generateMusic(reqVO));
+        return success(musicService.generateMusic(getLoginUserId(), reqVO));
     }
 
 }

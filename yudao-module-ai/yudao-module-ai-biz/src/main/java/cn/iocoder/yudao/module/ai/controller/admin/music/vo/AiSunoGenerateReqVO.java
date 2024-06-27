@@ -17,7 +17,7 @@ public class AiSunoGenerateReqVO {
 
     @Schema(description = "生成模式", requiredMode = Schema.RequiredMode.REQUIRED, example = "2")
     @NotNull(message = "生成模式不能为空")
-    private Integer generateMode; // 参见 AiMusicGenerateEnum 枚举
+    private Integer generateMode; // 参见 AiMusicGenerateModeEnum 枚举
 
     @Schema(description = "用于生成音乐音频的提示", requiredMode = Schema.RequiredMode.REQUIRED,
             example = "创作一首带有轻松吉他旋律的流行歌曲，[verse] 描述夏日海滩的宁静，[chorus] 节奏加快，表达对自由的向往。")
@@ -26,7 +26,7 @@ public class AiSunoGenerateReqVO {
     @Schema(description = "是否纯音乐", requiredMode = Schema.RequiredMode.NOT_REQUIRED, example = "true")
     private Boolean makeInstrumental;
 
-    @Schema(description = "模型版本, 默认 chirp-v3.5", requiredMode = Schema.RequiredMode.NOT_REQUIRED, example = "chirp-v3.5")
+    @Schema(description = "模型版本", requiredMode = Schema.RequiredMode.NOT_REQUIRED, example = "chirp-v3.5")
     private String modelVersion; // 参见 AiModelEnum 枚举
 
     @Schema(description = "音乐风格", requiredMode = Schema.RequiredMode.NOT_REQUIRED, example = "[\"pop\",\"jazz\",\"punk\"]")
