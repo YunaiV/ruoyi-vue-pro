@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.framework.ai.config;
 
 import cn.iocoder.yudao.framework.ai.core.enums.AiPlatformEnum;
+import cn.iocoder.yudao.framework.ai.core.model.tongyi.QianWenChatModal;
 import cn.iocoder.yudao.framework.ai.core.model.xinghuo.XingHuoChatModel;
 import cn.iocoder.yudao.framework.ai.core.model.yiyan.api.YiYanChatModel;
 import lombok.Data;
@@ -57,7 +58,7 @@ public class YudaoAiProperties {
         /**
          * model
          */
-        private YiYanChatModel model;
+        private QianWenChatModal model;
 
     }
 
