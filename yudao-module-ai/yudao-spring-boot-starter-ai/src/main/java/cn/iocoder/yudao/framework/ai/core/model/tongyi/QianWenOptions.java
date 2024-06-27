@@ -6,8 +6,6 @@ import lombok.experimental.Accessors;
 
 import java.util.List;
 
-// TODO @fan：增加一个 model 参数
-// TODO @fan：增加一个 Temperature 参数
 /**
  * 阿里云 千问 属性
  *
@@ -34,6 +32,14 @@ public class QianWenOptions implements ChatOptions {
      * 用于限制模型生成token的数量，max_tokens设置的是生成上限，并不表示一定会生成这么多的token数量。其中qwen1.5-14b-chat、qwen1.5-7b-chat、qwen-14b-chat和qwen-7b-chat最大值和默认值均为1500，qwen-1.8b-chat、qwen-1.8b-longcontext-chat和qwen-72b-chat最大值和默认值均为2000
      */
     private Integer maxTokens = 1500;
+    /**
+     * 模型
+     */
+    private String model;
+    /**
+     * temperature
+     */
+    private Float temperature;
 
     //
     // 适配 ChatOptions

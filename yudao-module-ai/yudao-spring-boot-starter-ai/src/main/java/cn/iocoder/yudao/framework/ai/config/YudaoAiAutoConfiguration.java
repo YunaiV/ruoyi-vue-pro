@@ -63,6 +63,8 @@ public class YudaoAiAutoConfiguration {
         YudaoAiProperties.QianWenProperties qianWenProperties = yudaoAiProperties.getQianwen();
         // 转换配置
         QianWenOptions qianWenOptions = new QianWenOptions();
+        qianWenOptions.setModel(qianWenProperties.getModel().getModel());
+        qianWenOptions.setTemperature(qianWenProperties.getTemperature());
 //        qianWenOptions.setTopK(qianWenProperties.getTopK()); TODO 芋艿：后续弄
         qianWenOptions.setTopP(qianWenProperties.getTopP());
         qianWenOptions.setMaxTokens(qianWenProperties.getMaxTokens());
