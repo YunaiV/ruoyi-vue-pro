@@ -2,13 +2,12 @@ package cn.iocoder.yudao.module.ai.service.music;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.text.StrPool;
+import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.http.HttpUtil;
 import cn.iocoder.yudao.framework.ai.core.model.suno.api.SunoApi;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.ai.controller.admin.music.vo.AiMusicPageReqVO;
-import cn.iocoder.yudao.module.ai.controller.admin.music.vo.AiMusicUpdatePublicStatusReqVO;
-import cn.iocoder.yudao.module.ai.controller.admin.music.vo.AiSunoGenerateReqVO;
+import cn.iocoder.yudao.module.ai.controller.admin.music.vo.*;
 import cn.iocoder.yudao.module.ai.dal.dataobject.music.AiMusicDO;
 import cn.iocoder.yudao.module.ai.dal.mysql.music.AiMusicMapper;
 import cn.iocoder.yudao.module.ai.enums.music.AiMusicGenerateModeEnum;
@@ -23,6 +22,7 @@ import java.util.*;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
+import static cn.iocoder.yudao.module.ai.enums.ErrorCodeConstants.IMAGE_NOT_EXISTS;
 import static cn.iocoder.yudao.module.ai.enums.ErrorCodeConstants.MUSIC_NOT_EXISTS;
 
 /**
@@ -55,7 +55,7 @@ public class AiMusicServiceImpl implements AiMusicService {
         } else if (Objects.equals(AiMusicGenerateModeEnum.DESCRIPTION.getMode(), reqVO.getGenerateMode())) {
             // 1.2 描述模式
             SunoApi.MusicGenerateRequest generateRequest = new SunoApi.MusicGenerateRequest(
-                    reqVO.getPrompt(), reqVO.getModel(), reqVO.getMakeInstrumental());
+                    reqVO.getGptDescriptionPrompt(), reqVO.getModel(), reqVO.getMakeInstrumental());
             musicDataList = sunoApi.generate(generateRequest);
         } else {
             throw new IllegalArgumentException(StrUtil.format("未知生成模式({})", reqVO));
@@ -104,6 +104,14 @@ public class AiMusicServiceImpl implements AiMusicService {
     }
 
     @Override
+    public void updateMusicTitle(AiMusicUpdateTitleReqVO updateReqVO) {
+        // 校验存在
+        validateMusicExists(updateReqVO.getId());
+        // 更新
+        musicMapper.updateById(new AiMusicDO().setId(updateReqVO.getId()).setTitle(updateReqVO.getTitle()));
+    }
+
+    @Override
     public void deleteMusic(Long id) {
         // 校验存在
         validateMusicExists(id);
@@ -111,15 +119,30 @@ public class AiMusicServiceImpl implements AiMusicService {
         musicMapper.deleteById(id);
     }
 
-    private void validateMusicExists(Long id) {
-        if (musicMapper.selectById(id) == null) {
-            throw exception(MUSIC_NOT_EXISTS);
+    @Override
+    public void deleteMusicMy(Long id, Long userId) {
+        // 1. 校验是否存在
+        AiMusicDO music = validateMusicExists(id);
+        if (ObjUtil.notEqual(music.getUserId(), userId)) {
+            throw exception(IMAGE_NOT_EXISTS);
         }
+        // 2. 删除记录
+        musicMapper.deleteById(id);
+    }
+
+    @Override
+    public AiMusicDO getMusic(Long id) {
+        return musicMapper.selectById(id);
     }
 
     @Override
     public PageResult<AiMusicDO> getMusicPage(AiMusicPageReqVO pageReqVO) {
         return musicMapper.selectPage(pageReqVO);
+    }
+
+    @Override
+    public PageResult<AiMusicDO> getMusicMyPage(AiMusicPageReqVO pageReqVO, Long userId) {
+        return musicMapper.selectPageByMy(pageReqVO, userId);
     }
 
     /**
@@ -151,4 +174,19 @@ public class AiMusicServiceImpl implements AiMusicService {
         byte[] bytes = HttpUtil.downloadBytes(url);
         return fileApi.createFile(bytes);
     }
+
+    /**
+     * 校验音乐是否存在
+     *
+     * @param id 音乐编号
+     * @return 音乐信息
+     */
+    private AiMusicDO validateMusicExists(Long id) {
+        AiMusicDO music = musicMapper.selectById(id);
+        if (music == null) {
+            throw exception(MUSIC_NOT_EXISTS);
+        }
+        return music;
+    }
+
 }
