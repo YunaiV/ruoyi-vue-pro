@@ -57,10 +57,10 @@ public class AiImageController {
         return success(BeanUtils.toBean(image, AiImageRespVO.class));
     }
 
-    @GetMapping("/get-my-ids")
+    @GetMapping("/my-list-by-ids")
     @Operation(summary = "获取【我的】绘图记录列表")
     @Parameter(name = "ids", required = true, description = "绘画编号数组", example = "1024,2048")
-    public CommonResult<List<AiImageRespVO>> getImageMyIds(@RequestParam("ids") List<Long> ids) {
+    public CommonResult<List<AiImageRespVO>> getImageListMyByIds(@RequestParam("ids") List<Long> ids) {
         List<AiImageDO> imageList = imageService.getImageByIds(ids);
         imageList.removeIf(item -> !ObjUtil.equal(getLoginUserId(), item.getUserId()));
         return success(BeanUtils.toBean(imageList, AiImageRespVO.class));
