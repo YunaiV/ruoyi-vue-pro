@@ -20,21 +20,20 @@ public class AiSunoGenerateReqVO {
      * 1. 描述模式：描述词 + 是否纯音乐 + 模型 TODO @xin：目前貌似描述词没弄对？看着不是 prompt 字段（也可能我弄错了）。可以微信再沟通下哈
      * 2. 歌词模式：歌词 + 音乐风格 + 标题 + 模型 TODO @xin：目前这块少传递了标题；
      */
-    @Schema(description = "生成模式", requiredMode = Schema.RequiredMode.REQUIRED, example = "2")
+    @Schema(description = "生成模式 1.描述模式 2. 歌词模式", requiredMode = Schema.RequiredMode.REQUIRED, example = "2")
     @NotNull(message = "生成模式不能为空")
     private Integer generateMode; // 参见 AiMusicGenerateModeEnum 枚举
 
-    @Schema(description = "用于生成音乐音频的提示", requiredMode = Schema.RequiredMode.REQUIRED,
+    @Schema(description = "用于生成音乐音频的提示 1.描述模式：音乐/歌词说明 2.歌词模式：歌词", requiredMode = Schema.RequiredMode.REQUIRED,
             example = "创作一首带有轻松吉他旋律的流行歌曲，[verse] 描述夏日海滩的宁静，[chorus] 节奏加快，表达对自由的向往。")
     private String prompt;
 
     @Schema(description = "是否纯音乐", requiredMode = Schema.RequiredMode.NOT_REQUIRED, example = "true")
     private Boolean makeInstrumental;
 
-    // TODO @xin：看了下这个字段，发现最终还是 model 合适点；因为它其实是模型
-    @Schema(description = "模型版本", requiredMode = Schema.RequiredMode.REQUIRED, example = "chirp-v3.5")
+    @Schema(description = "模型", requiredMode = Schema.RequiredMode.REQUIRED, example = "chirp-v3.5")
     @NotEmpty(message = "模型不能为空")
-    private String modelVersion; // 参见 AiModelEnum 枚举
+    private String model; // 参见 AiModelEnum 枚举
 
     @Schema(description = "音乐风格", requiredMode = Schema.RequiredMode.NOT_REQUIRED, example = "[\"pop\",\"jazz\",\"punk\"]")
     private List<String> tags;

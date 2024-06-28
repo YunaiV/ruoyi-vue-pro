@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.ai.service.music;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.text.StrPool;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.http.HttpUtil;
 import cn.iocoder.yudao.framework.ai.core.model.suno.api.SunoApi;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.ai.controller.admin.music.vo.AiMusicPageReqVO;
@@ -12,6 +13,7 @@ import cn.iocoder.yudao.module.ai.dal.dataobject.music.AiMusicDO;
 import cn.iocoder.yudao.module.ai.dal.mysql.music.AiMusicMapper;
 import cn.iocoder.yudao.module.ai.enums.music.AiMusicGenerateModeEnum;
 import cn.iocoder.yudao.module.ai.enums.music.AiMusicStatusEnum;
+import cn.iocoder.yudao.module.infra.api.file.FileApi;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -38,6 +40,9 @@ public class AiMusicServiceImpl implements AiMusicService {
     @Resource
     private AiMusicMapper musicMapper;
 
+    @Resource
+    private FileApi fileApi;
+
     @Override
     public List<Long> generateMusic(Long userId, AiSunoGenerateReqVO reqVO) {
         // 1. 调用 Suno 生成音乐
@@ -45,12 +50,12 @@ public class AiMusicServiceImpl implements AiMusicService {
         if (Objects.equals(AiMusicGenerateModeEnum.LYRIC.getMode(), reqVO.getGenerateMode())) {
             // 1.1 歌词模式
             SunoApi.MusicGenerateRequest generateRequest = new SunoApi.MusicGenerateRequest(
-                    reqVO.getPrompt(), reqVO.getModelVersion(), CollUtil.join(reqVO.getTags(), StrPool.COMMA), reqVO.getTitle());
+                    reqVO.getPrompt(), reqVO.getModel(), CollUtil.join(reqVO.getTags(), StrPool.COMMA), reqVO.getTitle());
             musicDataList = sunoApi.customGenerate(generateRequest);
         } else if (Objects.equals(AiMusicGenerateModeEnum.DESCRIPTION.getMode(), reqVO.getGenerateMode())) {
             // 1.2 描述模式
             SunoApi.MusicGenerateRequest generateRequest = new SunoApi.MusicGenerateRequest(
-                    reqVO.getPrompt(), reqVO.getModelVersion(), reqVO.getMakeInstrumental());
+                    reqVO.getPrompt(), reqVO.getModel(), reqVO.getMakeInstrumental());
             musicDataList = sunoApi.generate(generateRequest);
         } else {
             throw new IllegalArgumentException(StrUtil.format("未知生成模式({})", reqVO));
@@ -90,23 +95,6 @@ public class AiMusicServiceImpl implements AiMusicService {
         return streamingTask.size();
     }
 
-    /**
-     * 构建 AiMusicDO 集合
-     *
-     * @param musicList suno 音乐任务列表
-     * @return AiMusicDO 集合
-     */
-    private static List<AiMusicDO> buildMusicDOList(List<SunoApi.MusicData> musicList) {
-        // TODO @xin：成功的情况下，需要下载到自己的文件服务器。参考图片的处理
-        return convertList(musicList, musicData -> new AiMusicDO()
-                .setTaskId(musicData.id()).setModel(musicData.modelName())
-                .setPrompt(musicData.prompt()).setGptDescriptionPrompt(musicData.gptDescriptionPrompt())
-                .setAudioUrl(musicData.audioUrl()).setVideoUrl(musicData.videoUrl()).setImageUrl(musicData.imageUrl())
-                .setTitle(musicData.title()).setLyric(musicData.lyric()).setTags(StrUtil.split(musicData.tags(), StrPool.COMMA))
-                .setStatus(Objects.equals("complete", musicData.status()) ?
-                        AiMusicStatusEnum.SUCCESS.getStatus() : AiMusicStatusEnum.IN_PROGRESS.getStatus()));
-    }
-
     @Override
     public void updateMusicPublicStatus(AiMusicUpdatePublicStatusReqVO updateReqVO) {
         // 校验存在
@@ -134,4 +122,33 @@ public class AiMusicServiceImpl implements AiMusicService {
         return musicMapper.selectPage(pageReqVO);
     }
 
+    /**
+     * 构建 AiMusicDO 集合
+     *
+     * @param musicList suno 音乐任务列表
+     * @return AiMusicDO 集合
+     */
+    private List<AiMusicDO> buildMusicDOList(List<SunoApi.MusicData> musicList) {
+        return convertList(musicList, musicData -> new AiMusicDO()
+                .setTaskId(musicData.id()).setModel(musicData.modelName())
+                .setPrompt(musicData.prompt()).setGptDescriptionPrompt(musicData.gptDescriptionPrompt())
+                .setAudioUrl(createFile(musicData.audioUrl())).setVideoUrl(createFile(musicData.videoUrl())).setImageUrl(createFile(musicData.imageUrl()))
+                .setTitle(musicData.title()).setLyric(musicData.lyric()).setTags(StrUtil.split(musicData.tags(), StrPool.COMMA))
+                .setStatus(Objects.equals("complete", musicData.status()) ?
+                        AiMusicStatusEnum.SUCCESS.getStatus() : AiMusicStatusEnum.IN_PROGRESS.getStatus()));
+    }
+
+    /**
+     * 将生成的音频文件上传到文件服务器
+     *
+     * @param url 音频文件地址
+     * @return 内部文件地址
+     */
+    private String createFile(String url) {
+        if (StrUtil.isBlank(url)) {
+            return null;
+        }
+        byte[] bytes = HttpUtil.downloadBytes(url);
+        return fileApi.createFile(bytes);
+    }
 }
