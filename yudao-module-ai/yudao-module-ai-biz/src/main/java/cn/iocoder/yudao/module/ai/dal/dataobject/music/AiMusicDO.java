@@ -30,7 +30,7 @@ public class AiMusicDO extends BaseDO {
 
     /**
      * 用户编号
-     *
+     * <p>
      * 关联 AdminUserDO 的 userId 字段
      */
     private Long userId;
@@ -67,7 +67,7 @@ public class AiMusicDO extends BaseDO {
 
     /**
      * 生成模式
-     *
+     * <p>
      * 枚举 {@link AiMusicGenerateModeEnum}
      */
     private Integer generateMode;
@@ -112,5 +112,11 @@ public class AiMusicDO extends BaseDO {
      * 错误信息
      */
     private String errorMessage;
+
+
+    /**
+     * 音乐时长
+     */
+    private Double duration;
 
 }

@@ -132,7 +132,7 @@ public class AiMusicServiceImpl implements AiMusicService {
         return convertList(musicList, musicData -> new AiMusicDO()
                 .setTaskId(musicData.id()).setModel(musicData.modelName())
                 .setPrompt(musicData.prompt()).setGptDescriptionPrompt(musicData.gptDescriptionPrompt())
-                .setAudioUrl(createFile(musicData.audioUrl())).setVideoUrl(createFile(musicData.videoUrl())).setImageUrl(createFile(musicData.imageUrl()))
+                .setAudioUrl(createFile(musicData.audioUrl())).setVideoUrl(createFile(musicData.videoUrl())).setImageUrl(createFile(musicData.imageUrl())).setDuration(musicData.duration())
                 .setTitle(musicData.title()).setLyric(musicData.lyric()).setTags(StrUtil.split(musicData.tags(), StrPool.COMMA))
                 .setStatus(Objects.equals("complete", musicData.status()) ?
                         AiMusicStatusEnum.SUCCESS.getStatus() : AiMusicStatusEnum.IN_PROGRESS.getStatus()));
