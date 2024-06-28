@@ -18,7 +18,7 @@ import java.util.List;
  *
  * @author xiaoxin
  */
-@TableName("ai_music")
+@TableName(value = "ai_music", autoResultMap = true)
 @Data
 public class AiMusicDO extends BaseDO {
 

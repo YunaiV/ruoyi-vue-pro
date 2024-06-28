@@ -112,7 +112,7 @@ public class AiMusicServiceImpl implements AiMusicService {
         // 校验存在
         validateMusicExists(updateReqVO.getId());
         // 更新
-        musicMapper.updateBatch(new AiMusicDO().setPublicStatus(updateReqVO.getPublicStatus()));
+        musicMapper.updateById(new AiMusicDO().setId(updateReqVO.getId()).setPublicStatus(updateReqVO.getPublicStatus()));
     }
 
     @Override

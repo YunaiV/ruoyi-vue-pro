@@ -30,6 +30,14 @@ public class AiMusicController {
     @Resource
     private AiMusicService musicService;
 
+    // TODO @xin：一个接口，获得【我的】音乐分页，参考 获得【我的】聊天角色分页 来写；用于我自己生成的列表，和音乐广场
+
+    // TODO @xin：一个接口，删除【我的】音乐
+
+    // TODO @xin：一个接口，获得【我的】音乐
+
+    // TODO @xin：一个接口，修改【我的】音乐，目前只支持修改标题
+
     @PostMapping("/generate")
     @Operation(summary = "音乐生成")
     public CommonResult<List<Long>> generateMusic(@RequestBody @Valid AiSunoGenerateReqVO reqVO) {
@@ -55,7 +63,7 @@ public class AiMusicController {
         return success(true);
     }
 
-    @PutMapping("/update")
+    @PutMapping("/update-public-status")
     @Operation(summary = "更新音乐发布状态")
     @PreAuthorize("@ss.hasPermission('ai:music:update')")
     public CommonResult<Boolean> updateMusicPublicStatus(@Valid @RequestBody AiMusicUpdatePublicStatusReqVO updateReqVO) {
