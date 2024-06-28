@@ -61,7 +61,7 @@ public class AiImageController {
     @Operation(summary = "获取【我的】绘图记录列表")
     @Parameter(name = "ids", required = true, description = "绘画编号数组", example = "1024,2048")
     public CommonResult<List<AiImageRespVO>> getImageListMyByIds(@RequestParam("ids") List<Long> ids) {
-        List<AiImageDO> imageList = imageService.getImageByIds(ids);
+        List<AiImageDO> imageList = imageService.getImageList(ids);
         imageList.removeIf(item -> !ObjUtil.equal(getLoginUserId(), item.getUserId()));
         return success(BeanUtils.toBean(imageList, AiImageRespVO.class));
     }

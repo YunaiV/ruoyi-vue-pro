@@ -5,7 +5,6 @@ import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.ai.controller.admin.image.vo.AiImageDrawReqVO;
 import cn.iocoder.yudao.module.ai.controller.admin.image.vo.AiImagePageReqVO;
-import cn.iocoder.yudao.module.ai.controller.admin.image.vo.AiImageRespVO;
 import cn.iocoder.yudao.module.ai.controller.admin.image.vo.AiImageUpdatePublicStatusReqVO;
 import cn.iocoder.yudao.module.ai.controller.admin.image.vo.midjourney.AiMidjourneyActionReqVO;
 import cn.iocoder.yudao.module.ai.controller.admin.image.vo.midjourney.AiMidjourneyImagineReqVO;
@@ -39,12 +38,12 @@ public interface AiImageService {
     AiImageDO getImage(Long id);
 
     /**
-     * 获得绘图记录 - 多个
+     * 获得绘图列表
      *
-     * @param ids
-     * @return
+     * @param ids 绘图编号数组
+     * @return 绘图记录列表
      */
-    List<AiImageDO> getImageByIds(List<Long> ids);
+    List<AiImageDO> getImageList(List<Long> ids);
 
     /**
      * 绘制图片

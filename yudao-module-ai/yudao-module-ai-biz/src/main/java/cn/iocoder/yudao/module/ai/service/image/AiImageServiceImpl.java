@@ -76,7 +76,7 @@ public class AiImageServiceImpl implements AiImageService {
     }
 
     @Override
-    public List<AiImageDO> getImageByIds(List<Long> ids) {
+    public List<AiImageDO> getImageList(List<Long> ids) {
         if (CollUtil.isEmpty(ids)) {
             return Collections.emptyList();
         }
@@ -128,7 +128,7 @@ public class AiImageServiceImpl implements AiImageService {
         } else if (ObjUtil.equal(draw.getPlatform(), AiPlatformEnum.STABLE_DIFFUSION.getPlatform())) {
             // https://platform.stability.ai/docs/api-reference#tag/Text-to-Image/operation/textToImage
             return StabilityAiImageOptions.builder().withModel(draw.getModel())
-                    .withHeight(draw.getHeight()).withWidth(draw.getWidth()) // TODO @芋艿：各种参数
+                    .withHeight(draw.getHeight()).withWidth(draw.getWidth()) // TODO @范：各种参数的接入
                     .build();
         }
         throw new IllegalArgumentException("不支持的 AI 平台：" + draw.getPlatform());
