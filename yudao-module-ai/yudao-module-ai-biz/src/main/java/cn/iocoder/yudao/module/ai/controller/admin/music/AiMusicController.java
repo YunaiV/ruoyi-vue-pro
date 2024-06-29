@@ -1,12 +1,10 @@
 package cn.iocoder.yudao.module.ai.controller.admin.music;
 
+import cn.hutool.core.util.ObjUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
-import cn.iocoder.yudao.module.ai.controller.admin.music.vo.AiMusicPageReqVO;
-import cn.iocoder.yudao.module.ai.controller.admin.music.vo.AiMusicRespVO;
-import cn.iocoder.yudao.module.ai.controller.admin.music.vo.AiMusicUpdatePublicStatusReqVO;
-import cn.iocoder.yudao.module.ai.controller.admin.music.vo.AiSunoGenerateReqVO;
+import cn.iocoder.yudao.module.ai.controller.admin.music.vo.*;
 import cn.iocoder.yudao.module.ai.dal.dataobject.music.AiMusicDO;
 import cn.iocoder.yudao.module.ai.service.music.AiMusicService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -30,13 +28,39 @@ public class AiMusicController {
     @Resource
     private AiMusicService musicService;
 
-    // TODO @xin：一个接口，获得【我的】音乐分页，参考 获得【我的】聊天角色分页 来写；用于我自己生成的列表，和音乐广场
+    @GetMapping("/my-page")
+    @Operation(summary = "获得【我的】音乐分页")
+    public CommonResult<PageResult<AiMusicRespVO>> getMusicMyPage(@Valid AiMusicPageReqVO pageReqVO) {
+        PageResult<AiMusicDO> pageResult = musicService.getMusicMyPage(pageReqVO, getLoginUserId());
+        return success(BeanUtils.toBean(pageResult, AiMusicRespVO.class));
+    }
 
-    // TODO @xin：一个接口，删除【我的】音乐
+    @Operation(summary = "删除【我的】音乐记录")
+    @DeleteMapping("/delete-my")
+    @Parameter(name = "id", required = true, description = "音乐编号", example = "1024")
+    public CommonResult<Boolean> deleteMusicMy(@RequestParam("id") Long id) {
+        musicService.deleteMusicMy(id, getLoginUserId());
+        return success(true);
+    }
 
-    // TODO @xin：一个接口，获得【我的】音乐
+    @GetMapping("/get-my")
+    @Operation(summary = "获取【我的】音乐")
+    @Parameter(name = "id", required = true, description = "音乐编号", example = "1024")
+    public CommonResult<AiMusicRespVO> getMusicMy(@RequestParam("id") Long id) {
+        AiMusicDO music = musicService.getMusic(id);
+        if (music == null || ObjUtil.notEqual(getLoginUserId(), music.getUserId())) {
+            return success(null);
+        }
+        return success(BeanUtils.toBean(music, AiMusicRespVO.class));
+    }
 
-    // TODO @xin：一个接口，修改【我的】音乐，目前只支持修改标题
+    @PostMapping("/updateTitle-my")
+    @Operation(summary = "修改【我的】音乐 目前只支持修改标题")
+    @Parameter(name = "title", required = true, description = "音乐名称", example = "夜空中最亮的星")
+    public CommonResult<Boolean> updateMusicTitle(AiMusicUpdateTitleReqVO updateReqVO) {
+        musicService.updateMusicTitle(updateReqVO);
+        return success(true);
+    }
 
     @PostMapping("/generate")
     @Operation(summary = "音乐生成")
@@ -44,7 +68,7 @@ public class AiMusicController {
         return success(musicService.generateMusic(getLoginUserId(), reqVO));
     }
 
-    // ================ 绘图管理 ================
+    // ================ 音乐管理 ================
 
     @GetMapping("/page")
     @Operation(summary = "获得音乐分页")

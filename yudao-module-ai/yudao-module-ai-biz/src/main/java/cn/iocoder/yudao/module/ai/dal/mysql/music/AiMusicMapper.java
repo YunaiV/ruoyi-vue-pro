@@ -32,4 +32,13 @@ public interface AiMusicMapper extends BaseMapperX<AiMusicDO> {
                 .orderByDesc(AiMusicDO::getId));
     }
 
+    default PageResult<AiMusicDO> selectPageByMy(AiMusicPageReqVO reqVO, Long userId) {
+        return selectPage(reqVO, new LambdaQueryWrapperX<AiMusicDO>()
+                // 情况一：公开
+                .eq(Boolean.TRUE.equals(reqVO.getPublicStatus()), AiMusicDO::getPublicStatus, reqVO.getPublicStatus())
+                // 情况二：私有
+                .eq(Boolean.FALSE.equals(reqVO.getPublicStatus()), AiMusicDO::getUserId, userId)
+                .orderByAsc(AiMusicDO::getId));
+    }
+    
 }

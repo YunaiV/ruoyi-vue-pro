@@ -201,8 +201,8 @@ yudao.ai:
     notify-url: http://java.nat300.top/admin-api/ai/image/midjourney/notify
   suno:
     enable: true
-#    base-url: https://suno-om0w1cy6e-status2xxs-projects.vercel.app
-    base-url: http://127.0.0.1:3001
+    base-url: https://suno-55ishh05u-status2xxs-projects.vercel.app
+#    base-url: http://127.0.0.1:3001
 
 --- #################### 芋道相关配置 ####################
 
