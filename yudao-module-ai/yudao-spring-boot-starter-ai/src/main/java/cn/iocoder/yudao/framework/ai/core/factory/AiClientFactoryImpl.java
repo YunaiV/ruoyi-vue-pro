@@ -9,6 +9,7 @@ import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.framework.ai.config.YudaoAiAutoConfiguration;
 import cn.iocoder.yudao.framework.ai.config.YudaoAiProperties;
 import cn.iocoder.yudao.framework.ai.core.enums.AiPlatformEnum;
+import cn.iocoder.yudao.framework.ai.core.model.midjourney.api.MidjourneyApi;
 import cn.iocoder.yudao.framework.ai.core.model.suno.api.SunoApi;
 import cn.iocoder.yudao.framework.ai.core.model.tongyi.QianWenChatClient;
 import cn.iocoder.yudao.framework.ai.core.model.tongyi.QianWenChatModal;
@@ -111,8 +112,18 @@ public class AiClientFactoryImpl implements AiClientFactory {
     }
 
     @Override
+    public MidjourneyApi getOrCreateMidjourneyApi(String apiKey, String url) {
+        String cacheKey = buildClientCacheKey(MidjourneyApi.class, AiPlatformEnum.MIDJOURNEY.getPlatform(), apiKey, url);
+        return Singleton.get(cacheKey, (Func0<MidjourneyApi>) () -> {
+            YudaoAiProperties.MidjourneyProperties properties = SpringUtil.getBean(YudaoAiProperties.class).getMidjourney();
+            return new MidjourneyApi(url, apiKey, properties.getNotifyUrl());
+        });
+    }
+
+    @Override
     public SunoApi getOrCreateSunoApi(String apiKey, String url) {
-        return new SunoApi(url);
+        String cacheKey = buildClientCacheKey(SunoApi.class, AiPlatformEnum.SUNO.getPlatform(), apiKey, url);
+        return Singleton.get(cacheKey, (Func0<SunoApi>) () -> new SunoApi(url));
     }
 
     private static String buildClientCacheKey(Class<?> clazz, Object... params) {

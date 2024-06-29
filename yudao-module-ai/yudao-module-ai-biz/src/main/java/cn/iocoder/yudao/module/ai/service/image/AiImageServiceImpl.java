@@ -15,7 +15,7 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.ai.controller.admin.image.vo.AiImageDrawReqVO;
 import cn.iocoder.yudao.module.ai.controller.admin.image.vo.AiImagePageReqVO;
-import cn.iocoder.yudao.module.ai.controller.admin.image.vo.AiImageUpdatePublicStatusReqVO;
+import cn.iocoder.yudao.module.ai.controller.admin.image.vo.AiImageUpdateReqVO;
 import cn.iocoder.yudao.module.ai.controller.admin.image.vo.midjourney.AiMidjourneyActionReqVO;
 import cn.iocoder.yudao.module.ai.controller.admin.image.vo.midjourney.AiMidjourneyImagineReqVO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.image.AiImageDO;
@@ -61,9 +61,6 @@ public class AiImageServiceImpl implements AiImageService {
 
     @Resource
     private AiApiKeyService apiKeyService;
-
-    @Resource
-    private MidjourneyApi midjourneyApi;
 
     @Override
     public PageResult<AiImageDO> getImagePageMy(Long userId, PageParam pageReqVO) {
@@ -151,7 +148,7 @@ public class AiImageServiceImpl implements AiImageService {
     }
 
     @Override
-    public void updateImagePublicStatus(AiImageUpdatePublicStatusReqVO updateReqVO) {
+    public void updateImage(AiImageUpdateReqVO updateReqVO) {
         // 1. 校验存在
         validateImageExists(updateReqVO.getId());
         // 2. 更新发布状态
@@ -179,6 +176,7 @@ public class AiImageServiceImpl implements AiImageService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Long midjourneyImagine(Long userId, AiMidjourneyImagineReqVO reqVO) {
+        MidjourneyApi midjourneyApi = apiKeyService.getMidjourneyApi();
         // 1. 保存数据库
         AiImageDO image = BeanUtils.toBean(reqVO, AiImageDO.class).setUserId(userId).setPublicStatus(false)
                 .setStatus(AiImageStatusEnum.IN_PROGRESS.getStatus())
@@ -206,6 +204,7 @@ public class AiImageServiceImpl implements AiImageService {
 
     @Override
     public Integer midjourneySync() {
+        MidjourneyApi midjourneyApi = apiKeyService.getMidjourneyApi();
         // 1.1 获取 Midjourney 平台，状态在 “进行中” 的 image
         List<AiImageDO> imageList = imageMapper.selectListByStatusAndPlatform(
                 AiImageStatusEnum.IN_PROGRESS.getStatus(), AiPlatformEnum.MIDJOURNEY.getPlatform());
@@ -272,6 +271,7 @@ public class AiImageServiceImpl implements AiImageService {
 
     @Override
     public Long midjourneyAction(Long userId, AiMidjourneyActionReqVO reqVO) {
+        MidjourneyApi midjourneyApi = apiKeyService.getMidjourneyApi();
         // 1.1 检查 image
         AiImageDO image = validateImageExists(reqVO.getId());
         if (ObjUtil.notEqual(userId, image.getUserId())) {

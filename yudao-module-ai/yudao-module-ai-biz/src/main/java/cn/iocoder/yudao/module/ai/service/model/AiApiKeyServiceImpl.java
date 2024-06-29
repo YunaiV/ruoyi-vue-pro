@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.ai.service.model;
 
 import cn.iocoder.yudao.framework.ai.core.enums.AiPlatformEnum;
 import cn.iocoder.yudao.framework.ai.core.factory.AiClientFactory;
+import cn.iocoder.yudao.framework.ai.core.model.midjourney.api.MidjourneyApi;
 import cn.iocoder.yudao.framework.ai.core.model.suno.api.SunoApi;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
@@ -110,6 +111,16 @@ public class AiApiKeyServiceImpl implements AiApiKeyService {
             return null;
         }
         return clientFactory.getOrCreateImageClient(platform, apiKey.getApiKey(), apiKey.getUrl());
+    }
+
+    @Override
+    public MidjourneyApi getMidjourneyApi() {
+        AiApiKeyDO apiKey = apiKeyMapper.selectFirstByPlatformAndStatus(
+                AiPlatformEnum.MIDJOURNEY.getPlatform(), CommonStatusEnum.ENABLE.getStatus());
+        if (apiKey == null) {
+            return null;
+        }
+        return clientFactory.getOrCreateMidjourneyApi(apiKey.getApiKey(), apiKey.getUrl());
     }
 
     @Override
