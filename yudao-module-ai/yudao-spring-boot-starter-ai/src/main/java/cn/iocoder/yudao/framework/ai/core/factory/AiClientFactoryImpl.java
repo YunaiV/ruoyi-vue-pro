@@ -9,6 +9,7 @@ import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.framework.ai.config.YudaoAiAutoConfiguration;
 import cn.iocoder.yudao.framework.ai.config.YudaoAiProperties;
 import cn.iocoder.yudao.framework.ai.core.enums.AiPlatformEnum;
+import cn.iocoder.yudao.framework.ai.core.model.suno.api.SunoApi;
 import cn.iocoder.yudao.framework.ai.core.model.tongyi.QianWenChatClient;
 import cn.iocoder.yudao.framework.ai.core.model.tongyi.QianWenChatModal;
 import cn.iocoder.yudao.framework.ai.core.model.tongyi.api.QianWenApi;
@@ -107,6 +108,11 @@ public class AiClientFactoryImpl implements AiClientFactory {
             default:
                 throw new IllegalArgumentException(StrUtil.format("未知平台({})", platform));
         }
+    }
+
+    @Override
+    public SunoApi getOrCreateSunoApi(String apiKey, String url) {
+        return new SunoApi(url);
     }
 
     private static String buildClientCacheKey(Class<?> clazz, Object... params) {

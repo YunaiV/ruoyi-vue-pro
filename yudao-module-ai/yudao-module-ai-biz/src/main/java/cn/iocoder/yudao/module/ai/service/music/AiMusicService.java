@@ -35,7 +35,7 @@ public interface AiMusicService {
      *
      * @param updateReqVO 更新信息
      */
-    void updateMusicPublicStatus(@Valid AiMusicUpdatePublicStatusReqVO updateReqVO);
+    void updateMusic(@Valid AiMusicUpdateReqVO updateReqVO);
 
     /**
      * 更新音乐名称
@@ -83,4 +83,5 @@ public interface AiMusicService {
      * @return 音乐分页
      */
     PageResult<AiMusicDO> getMusicMyPage(AiMusicPageReqVO pageReqVO, Long userId);
+
 }

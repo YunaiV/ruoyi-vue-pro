@@ -12,6 +12,7 @@ import cn.iocoder.yudao.module.ai.dal.dataobject.music.AiMusicDO;
 import cn.iocoder.yudao.module.ai.dal.mysql.music.AiMusicMapper;
 import cn.iocoder.yudao.module.ai.enums.music.AiMusicGenerateModeEnum;
 import cn.iocoder.yudao.module.ai.enums.music.AiMusicStatusEnum;
+import cn.iocoder.yudao.module.ai.service.model.AiApiKeyService;
 import cn.iocoder.yudao.module.infra.api.file.FileApi;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
@@ -35,7 +36,7 @@ import static cn.iocoder.yudao.module.ai.enums.ErrorCodeConstants.MUSIC_NOT_EXIS
 public class AiMusicServiceImpl implements AiMusicService {
 
     @Resource
-    private SunoApi sunoApi;
+    private AiApiKeyService apiKeyService;
 
     @Resource
     private AiMusicMapper musicMapper;
@@ -46,6 +47,8 @@ public class AiMusicServiceImpl implements AiMusicService {
     @Override
     public List<Long> generateMusic(Long userId, AiSunoGenerateReqVO reqVO) {
         // 1. 调用 Suno 生成音乐
+        SunoApi sunoApi = apiKeyService.getSunoApi();
+        // TODO @xin：这两个貌似一直没跑成功，你那可以么？用的请求是 AiMusicController.http 的
         List<SunoApi.MusicData> musicDataList;
         if (Objects.equals(AiMusicGenerateModeEnum.LYRIC.getMode(), reqVO.getGenerateMode())) {
             // 1.1 歌词模式
@@ -80,6 +83,7 @@ public class AiMusicServiceImpl implements AiMusicService {
         log.info("[syncMusic][Suno 开始同步, 共 ({}) 个任务]", streamingTask.size());
 
         // GET 请求，为避免参数过长，分批次处理
+        SunoApi sunoApi = apiKeyService.getSunoApi();
         CollUtil.split(streamingTask, 36).forEach(chunkList -> {
             Map<String, Long> taskIdMap = convertMap(chunkList, AiMusicDO::getTaskId, AiMusicDO::getId);
             List<SunoApi.MusicData> musicTaskList = sunoApi.getMusicList(new ArrayList<>(taskIdMap.keySet()));
@@ -96,7 +100,7 @@ public class AiMusicServiceImpl implements AiMusicService {
     }
 
     @Override
-    public void updateMusicPublicStatus(AiMusicUpdatePublicStatusReqVO updateReqVO) {
+    public void updateMusic(AiMusicUpdateReqVO updateReqVO) {
         // 校验存在
         validateMusicExists(updateReqVO.getId());
         // 更新
@@ -152,11 +156,16 @@ public class AiMusicServiceImpl implements AiMusicService {
      * @return AiMusicDO 集合
      */
     private List<AiMusicDO> buildMusicDOList(List<SunoApi.MusicData> musicList) {
+        // TODO @xin：它有 status = error 状态，表示失败噢。
         return convertList(musicList, musicData -> new AiMusicDO()
                 .setTaskId(musicData.id()).setModel(musicData.modelName())
                 .setPrompt(musicData.prompt()).setGptDescriptionPrompt(musicData.gptDescriptionPrompt())
-                .setAudioUrl(createFile(musicData.audioUrl())).setVideoUrl(createFile(musicData.videoUrl())).setImageUrl(createFile(musicData.imageUrl())).setDuration(musicData.duration())
-                .setTitle(musicData.title()).setLyric(musicData.lyric()).setTags(StrUtil.split(musicData.tags(), StrPool.COMMA))
+                // TODO @xin：只有在完成的状态，在下载文件
+                .setAudioUrl(downloadFile(musicData.audioUrl()))
+                .setVideoUrl(downloadFile(musicData.videoUrl()))
+                .setImageUrl(downloadFile(musicData.imageUrl()))
+                .setTitle(musicData.title()).setDuration(musicData.duration())
+                .setLyric(musicData.lyric()).setTags(StrUtil.split(musicData.tags(), StrPool.COMMA))
                 .setStatus(Objects.equals("complete", musicData.status()) ?
                         AiMusicStatusEnum.SUCCESS.getStatus() : AiMusicStatusEnum.IN_PROGRESS.getStatus()));
     }
@@ -167,12 +176,17 @@ public class AiMusicServiceImpl implements AiMusicService {
      * @param url 音频文件地址
      * @return 内部文件地址
      */
-    private String createFile(String url) {
+    private String downloadFile(String url) {
         if (StrUtil.isBlank(url)) {
             return null;
         }
-        byte[] bytes = HttpUtil.downloadBytes(url);
-        return fileApi.createFile(bytes);
+        try {
+            byte[] bytes = HttpUtil.downloadBytes(url);
+            return fileApi.createFile(bytes);
+        } catch (Exception e) {
+            log.error("[downloadFile][url({}) 下载失败]", url, e);
+            return url;
+        }
     }
 
     /**

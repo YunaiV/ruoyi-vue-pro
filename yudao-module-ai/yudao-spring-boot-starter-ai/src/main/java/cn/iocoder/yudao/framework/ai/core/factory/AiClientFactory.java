@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.framework.ai.core.factory;
 
 import cn.iocoder.yudao.framework.ai.core.enums.AiPlatformEnum;
+import cn.iocoder.yudao.framework.ai.core.model.suno.api.SunoApi;
 import org.springframework.ai.chat.StreamingChatClient;
 import org.springframework.ai.image.ImageClient;
 
@@ -54,5 +55,16 @@ public interface AiClientFactory {
      * @return ImageClient 对象
      */
     ImageClient getOrCreateImageClient(AiPlatformEnum platform, String apiKey, String url);
+
+    /**
+     * 基于指定配置，获得 SunoApi 对象
+     *
+     * 如果不存在，则进行创建
+     *
+     * @param apiKey API KEY
+     * @param url API URL
+     * @return SunoApi 对象
+     */
+    SunoApi getOrCreateSunoApi(String apiKey, String url);
 
 }

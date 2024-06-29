@@ -99,6 +99,11 @@ public class AiMusicDO extends BaseDO {
     private List<String> tags;
 
     /**
+     * 音乐时长
+     */
+    private Double duration;
+
+    /**
      * 是否公开
      */
     private Boolean publicStatus;
@@ -112,11 +117,5 @@ public class AiMusicDO extends BaseDO {
      * 错误信息
      */
     private String errorMessage;
-
-
-    /**
-     * 音乐时长
-     */
-    private Double duration;
 
 }

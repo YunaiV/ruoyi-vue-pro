@@ -52,6 +52,9 @@ public class AiMusicRespVO {
     @Schema(description = "音乐风格标签")
     private List<String> tags;
 
+    @Schema(description = "音乐时长", example = "[\"pop\",\"jazz\",\"punk\"]")
+    private Double duration;
+
     @Schema(description = "是否发布", requiredMode = Schema.RequiredMode.REQUIRED, example = "true")
     private Boolean publicStatus;
 
@@ -60,9 +63,6 @@ public class AiMusicRespVO {
 
     @Schema(description = "错误信息")
     private String errorMessage;
-
-    @Schema(description = "音乐时长")
-    private Double duration;
 
     @Schema(description = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED)
     private LocalDateTime createTime;

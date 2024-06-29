@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.ai.service.model;
 
 import cn.iocoder.yudao.framework.ai.core.enums.AiPlatformEnum;
+import cn.iocoder.yudao.framework.ai.core.model.suno.api.SunoApi;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.ai.controller.admin.model.vo.apikey.AiApiKeyPageReqVO;
 import cn.iocoder.yudao.module.ai.controller.admin.model.vo.apikey.AiApiKeySaveReqVO;
@@ -90,5 +91,14 @@ public interface AiApiKeyService {
      * @return ImageClient 对象
      */
     ImageClient getImageClient(AiPlatformEnum platform);
+
+    /**
+     * 获得 SunoApi 对象
+     *
+     * TODO 可优化点：目前默认获取 Suno 对应的第一个开启的配置用于音乐；后续可以支持配置选择
+     *
+     * @return SunoApi 对象
+     */
+    SunoApi getSunoApi();
 
 }

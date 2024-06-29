@@ -35,6 +35,16 @@ public class AiMusicController {
         return success(BeanUtils.toBean(pageResult, AiMusicRespVO.class));
     }
 
+    @PostMapping("/generate")
+    @Operation(summary = "音乐生成")
+    public CommonResult<List<Long>> generateMusic(@RequestBody @Valid AiSunoGenerateReqVO reqVO) {
+        if (true) {
+            musicService.syncMusic();
+            return null;
+        }
+        return success(musicService.generateMusic(getLoginUserId(), reqVO));
+    }
+
     @Operation(summary = "删除【我的】音乐记录")
     @DeleteMapping("/delete-my")
     @Parameter(name = "id", required = true, description = "音乐编号", example = "1024")
@@ -54,18 +64,13 @@ public class AiMusicController {
         return success(BeanUtils.toBean(music, AiMusicRespVO.class));
     }
 
+    // TODO @xin：这个搞成 updateMy ，修改【我的】音乐。方便后续支持其它字段；另外，需要校验下，更新的音乐，是不是我的！
     @PostMapping("/updateTitle-my")
     @Operation(summary = "修改【我的】音乐 目前只支持修改标题")
     @Parameter(name = "title", required = true, description = "音乐名称", example = "夜空中最亮的星")
     public CommonResult<Boolean> updateMusicTitle(AiMusicUpdateTitleReqVO updateReqVO) {
         musicService.updateMusicTitle(updateReqVO);
         return success(true);
-    }
-
-    @PostMapping("/generate")
-    @Operation(summary = "音乐生成")
-    public CommonResult<List<Long>> generateMusic(@RequestBody @Valid AiSunoGenerateReqVO reqVO) {
-        return success(musicService.generateMusic(getLoginUserId(), reqVO));
     }
 
     // ================ 音乐管理 ================
@@ -87,11 +92,11 @@ public class AiMusicController {
         return success(true);
     }
 
-    @PutMapping("/update-public-status")
-    @Operation(summary = "更新音乐发布状态")
+    @PutMapping("/update")
+    @Operation(summary = "更新音乐")
     @PreAuthorize("@ss.hasPermission('ai:music:update')")
-    public CommonResult<Boolean> updateMusicPublicStatus(@Valid @RequestBody AiMusicUpdatePublicStatusReqVO updateReqVO) {
-        musicService.updateMusicPublicStatus(updateReqVO);
+    public CommonResult<Boolean> updateMusic(@Valid @RequestBody AiMusicUpdateReqVO updateReqVO) {
+        musicService.updateMusic(updateReqVO);
         return success(true);
     }
 
