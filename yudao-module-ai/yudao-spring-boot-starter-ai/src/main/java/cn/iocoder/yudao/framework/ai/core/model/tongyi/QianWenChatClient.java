@@ -1,11 +1,7 @@
 package cn.iocoder.yudao.framework.ai.core.model.tongyi;
 
-import cn.hutool.core.util.NumberUtil;
 import cn.iocoder.yudao.framework.ai.core.exception.ChatException;
 import cn.iocoder.yudao.framework.ai.core.model.tongyi.api.QianWenApi;
-import org.springframework.ai.chat.*;
-import org.springframework.ai.chat.prompt.ChatOptions;
-import org.springframework.ai.chat.prompt.Prompt;
 import cn.iocoder.yudao.framework.ai.core.model.yiyan.exception.YiYanApiException;
 import com.alibaba.dashscope.aigc.generation.GenerationResult;
 import com.alibaba.dashscope.aigc.generation.models.QwenParam;
@@ -14,6 +10,12 @@ import com.google.common.collect.Lists;
 import io.reactivex.Flowable;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.ai.chat.model.ChatModel;
+import org.springframework.ai.chat.model.ChatResponse;
+import org.springframework.ai.chat.model.Generation;
+import org.springframework.ai.chat.model.StreamingChatModel;
+import org.springframework.ai.chat.prompt.ChatOptions;
+import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.http.ResponseEntity;
 import org.springframework.retry.RetryCallback;
 import org.springframework.retry.RetryContext;
@@ -35,7 +37,7 @@ import java.util.stream.Collectors;
  * time: 2024/3/13 21:06
  */
 @Slf4j
-public class QianWenChatClient implements ChatClient, StreamingChatClient {
+public class QianWenChatClient implements ChatModel, StreamingChatModel {
 
     private QianWenApi qianWenApi;
 
@@ -88,6 +90,12 @@ public class QianWenChatClient implements ChatClient, StreamingChatClient {
                     .map(choices -> new Generation(choices.getMessage().getContent()))
                     .collect(Collectors.toList()));
         });
+    }
+
+    @Override
+    public ChatOptions getDefaultOptions() {
+        // TODO 芋艿：需要跟进下
+        throw new UnsupportedOperationException();
     }
 
     private QwenParam createRequest(Prompt prompt, boolean stream) {

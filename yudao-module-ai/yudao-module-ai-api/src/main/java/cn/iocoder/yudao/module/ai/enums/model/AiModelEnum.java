@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.ai.enums.model;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
+// TODO @芋艿：可以考虑清理掉
 /**
  * ai 模型
  *

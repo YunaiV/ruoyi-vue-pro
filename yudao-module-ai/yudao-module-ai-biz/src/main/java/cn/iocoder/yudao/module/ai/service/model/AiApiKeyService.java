@@ -8,8 +8,8 @@ import cn.iocoder.yudao.module.ai.controller.admin.model.vo.apikey.AiApiKeyPageR
 import cn.iocoder.yudao.module.ai.controller.admin.model.vo.apikey.AiApiKeySaveReqVO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiApiKeyDO;
 import jakarta.validation.Valid;
-import org.springframework.ai.chat.StreamingChatClient;
-import org.springframework.ai.image.ImageClient;
+import org.springframework.ai.chat.model.StreamingChatModel;
+import org.springframework.ai.image.ImageModel;
 
 import java.util.List;
 
@@ -81,7 +81,7 @@ public interface AiApiKeyService {
      * @param id 编号
      * @return StreamingChatClient 对象
      */
-    StreamingChatClient getStreamingChatClient(Long id);
+    StreamingChatModel getStreamingChatClient(Long id);
 
     /**
      * 获得 ImageClient 对象
@@ -91,7 +91,7 @@ public interface AiApiKeyService {
      * @param platform 平台
      * @return ImageClient 对象
      */
-    ImageClient getImageClient(AiPlatformEnum platform);
+    ImageModel getImageClient(AiPlatformEnum platform);
 
     /**
      * 获得 MidjourneyApi 对象

@@ -2,33 +2,38 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>cn.iocoder.boot</groupId>
         <artifactId>yudao-module-ai</artifactId>
         <version>${revision}</version>
     </parent>
+    <modelVersion>4.0.0</modelVersion>
 
     <artifactId>yudao-spring-boot-starter-ai</artifactId>
+    <name>${project.artifactId}</name>
+    <description>AI 大模型拓展，接入国内外大模型</description>
+    <properties>
+        <spring-ai.version>1.0.0-M1</spring-ai.version>
+    </properties>
 
     <dependencies>
         <dependency>
-            <groupId>io.springboot.ai</groupId>
+            <groupId>org.springframework.ai</groupId>
             <artifactId>spring-ai-ollama-spring-boot-starter</artifactId>
-            <version>1.0.3</version>
+            <version>${spring-ai.version}</version>
         </dependency>
         <dependency>
-            <groupId>io.springboot.ai</groupId>
+            <groupId>org.springframework.ai</groupId>
             <artifactId>spring-ai-openai-spring-boot-starter</artifactId>
-            <version>1.0.3</version>
+            <version>${spring-ai.version}</version>
         </dependency>
         <dependency>
-            <groupId>io.springboot.ai</groupId>
-            <artifactId>spring-ai-stability-ai</artifactId>
-            <version>1.0.3</version>
+            <groupId>org.springframework.ai</groupId>
+            <artifactId>spring-ai-stability-ai-spring-boot-starter</artifactId>
+            <version>${spring-ai.version}</version>
         </dependency>
 <!--        <dependency>-->
-<!--            <groupId>io.springboot.ai</groupId>-->
+<!--            <groupId>org.springframework.ai</groupId>-->
 <!--            <artifactId>spring-ai-vertex-ai-gemini</artifactId>-->
 <!--            <version>1.0.3</version>-->
 <!--        </dependency>-->

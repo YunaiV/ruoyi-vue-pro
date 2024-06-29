@@ -1,16 +1,16 @@
 package cn.iocoder.yudao.framework.ai.chat;
 
-import org.springframework.ai.chat.ChatResponse;
+import cn.iocoder.yudao.framework.ai.core.model.yiyan.YiYanChatClient;
+import cn.iocoder.yudao.framework.ai.core.model.yiyan.YiYanChatOptions;
+import cn.iocoder.yudao.framework.ai.core.model.yiyan.api.YiYanApi;
+import cn.iocoder.yudao.framework.ai.core.model.yiyan.api.YiYanChatModel;
+import org.junit.Before;
+import org.junit.Test;
 import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.chat.messages.SystemMessage;
 import org.springframework.ai.chat.messages.UserMessage;
+import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.prompt.Prompt;
-import cn.iocoder.yudao.framework.ai.core.model.yiyan.YiYanChatClient;
-import cn.iocoder.yudao.framework.ai.core.model.yiyan.api.YiYanChatModel;
-import cn.iocoder.yudao.framework.ai.core.model.yiyan.YiYanChatOptions;
-import cn.iocoder.yudao.framework.ai.core.model.yiyan.api.YiYanApi;
-import org.junit.Before;
-import org.junit.Test;
 import reactor.core.publisher.Flux;
 
 import java.util.ArrayList;

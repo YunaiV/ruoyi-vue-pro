@@ -6,10 +6,13 @@ import cn.iocoder.yudao.framework.ai.core.exception.ChatException;
 import cn.iocoder.yudao.framework.ai.core.model.xinghuo.api.XingHuoApi;
 import cn.iocoder.yudao.framework.ai.core.model.xinghuo.api.XingHuoChatCompletion;
 import cn.iocoder.yudao.framework.ai.core.model.xinghuo.api.XingHuoChatCompletionRequest;
-import org.springframework.ai.chat.*;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.ai.chat.model.ChatModel;
+import org.springframework.ai.chat.model.ChatResponse;
+import org.springframework.ai.chat.model.Generation;
+import org.springframework.ai.chat.model.StreamingChatModel;
 import org.springframework.ai.chat.prompt.ChatOptions;
 import org.springframework.ai.chat.prompt.Prompt;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.retry.RetryCallback;
 import org.springframework.retry.RetryContext;
@@ -29,7 +32,7 @@ import java.util.stream.Collectors;
  * time: 2024/3/11 10:19
  */
 @Slf4j
-public class XingHuoChatClient implements ChatClient, StreamingChatClient {
+public class XingHuoChatClient implements ChatModel, StreamingChatModel {
 
     private XingHuoApi xingHuoApi;
 
@@ -64,7 +67,6 @@ public class XingHuoChatClient implements ChatClient, StreamingChatClient {
 
     @Override
     public ChatResponse call(Prompt prompt) {
-
         return this.retryTemplate.execute(ctx -> {
             // ctx 会有重试的信息
             // 获取 chatOptions 属性
@@ -76,6 +78,12 @@ public class XingHuoChatClient implements ChatClient, StreamingChatClient {
             // 获取结果封装 ChatResponse
             return new ChatResponse(List.of(new Generation(response.getBody().getPayload().getChoices().getText().get(0).getContent())));
         });
+    }
+
+    @Override
+    public ChatOptions getDefaultOptions() {
+        // TODO 芋艿：需要跟进下
+        throw new UnsupportedOperationException();
     }
 
     @Override

@@ -7,12 +7,13 @@ import cn.iocoder.yudao.framework.ai.core.model.yiyan.api.YiYanChatCompletionReq
 import cn.iocoder.yudao.framework.ai.core.model.yiyan.api.YiYanChatCompletionResponse;
 import cn.iocoder.yudao.framework.ai.core.model.yiyan.exception.YiYanApiException;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.ai.chat.ChatClient;
-import org.springframework.ai.chat.ChatResponse;
-import org.springframework.ai.chat.Generation;
-import org.springframework.ai.chat.StreamingChatClient;
+import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.chat.messages.MessageType;
+import org.springframework.ai.chat.model.ChatModel;
+import org.springframework.ai.chat.model.ChatResponse;
+import org.springframework.ai.chat.model.Generation;
+import org.springframework.ai.chat.model.StreamingChatModel;
 import org.springframework.ai.chat.prompt.ChatOptions;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.http.ResponseEntity;
@@ -33,7 +34,7 @@ import java.util.stream.Collectors;
  * @author fansili
  */
 @Slf4j
-public class YiYanChatClient implements ChatClient, StreamingChatClient {
+public class YiYanChatClient implements ChatModel, StreamingChatModel {
 
     private final YiYanApi yiYanApi;
 
@@ -87,6 +88,12 @@ public class YiYanChatClient implements ChatClient, StreamingChatClient {
     }
 
     @Override
+    public ChatOptions getDefaultOptions() {
+        // TODO 芋艿：需要跟进下
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public Flux<ChatResponse> stream(Prompt prompt) {
         YiYanChatCompletionRequest request = this.createRequest(prompt, true);
         return this.retryTemplate.execute(ctx -> {
@@ -98,8 +105,6 @@ public class YiYanChatClient implements ChatClient, StreamingChatClient {
             });
         });
     }
-
-
 
     private YiYanChatCompletionRequest createRequest(Prompt prompt, boolean stream) {
         // 参考 https://cloud.baidu.com/doc/WENXINWORKSHOP/s/clntwmv7t 文档，system 是独立字段
