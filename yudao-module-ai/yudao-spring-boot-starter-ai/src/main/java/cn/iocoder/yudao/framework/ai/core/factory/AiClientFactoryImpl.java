@@ -11,11 +11,13 @@ import cn.iocoder.yudao.framework.ai.config.YudaoAiProperties;
 import cn.iocoder.yudao.framework.ai.core.enums.AiPlatformEnum;
 import cn.iocoder.yudao.framework.ai.core.model.midjourney.api.MidjourneyApi;
 import cn.iocoder.yudao.framework.ai.core.model.suno.api.SunoApi;
-import cn.iocoder.yudao.framework.ai.core.model.tongyi.QianWenChatClient;
-import cn.iocoder.yudao.framework.ai.core.model.tongyi.QianWenChatModal;
-import cn.iocoder.yudao.framework.ai.core.model.tongyi.api.QianWenApi;
 import cn.iocoder.yudao.framework.ai.core.model.xinghuo.XingHuoChatClient;
 import cn.iocoder.yudao.framework.ai.core.model.xinghuo.api.XingHuoApi;
+import com.alibaba.cloud.ai.tongyi.TongYiAutoConfiguration;
+import com.alibaba.cloud.ai.tongyi.TongYiConnectionProperties;
+import com.alibaba.cloud.ai.tongyi.chat.TongYiChatModel;
+import com.alibaba.cloud.ai.tongyi.chat.TongYiChatProperties;
+import com.alibaba.dashscope.aigc.generation.Generation;
 import org.springframework.ai.autoconfigure.ollama.OllamaAutoConfiguration;
 import org.springframework.ai.autoconfigure.openai.OpenAiAutoConfiguration;
 import org.springframework.ai.autoconfigure.qianfan.QianFanAutoConfiguration;
@@ -84,7 +86,7 @@ public class AiClientFactoryImpl implements AiClientFactory {
             case XING_HUO:
                 return SpringUtil.getBean(XingHuoChatClient.class);
             case QIAN_WEN:
-                return SpringUtil.getBean(QianWenChatClient.class);
+                return SpringUtil.getBean(TongYiChatModel.class);
             default:
                 throw new IllegalArgumentException(StrUtil.format("未知平台({})", platform));
         }
@@ -184,11 +186,16 @@ public class AiClientFactoryImpl implements AiClientFactory {
     }
 
     /**
-     * 可参考 {@link YudaoAiAutoConfiguration#qianWenChatClient(YudaoAiProperties)}
+     * 可参考 {@link TongYiAutoConfiguration#tongYiChatClient(Generation, TongYiChatProperties, TongYiConnectionProperties)}
      */
-    private static QianWenChatClient buildQianWenChatClient(String key) {
-        QianWenApi qianWenApi = new QianWenApi(key, QianWenChatModal.QWEN_72B_CHAT);
-        return new QianWenChatClient(qianWenApi);
+    private static TongYiChatModel buildQianWenChatClient(String key) {
+        com.alibaba.dashscope.aigc.generation.Generation generation = SpringUtil.getBean(Generation.class);
+        TongYiChatProperties chatOptions = SpringUtil.getBean(TongYiChatProperties.class);
+        // TODO @芋艿：貌似 apiKey 是全局唯一的？？？得测试下
+        // TODO @芋艿：貌似阿里云不是增量返回的
+        TongYiConnectionProperties connectionProperties = new TongYiConnectionProperties();
+        connectionProperties.setApiKey(key);
+        return new TongYiAutoConfiguration().tongYiChatClient(generation, chatOptions, connectionProperties);
     }
 
 //    private static VertexAiGeminiChatClient buildGoogleGemir(String key) {

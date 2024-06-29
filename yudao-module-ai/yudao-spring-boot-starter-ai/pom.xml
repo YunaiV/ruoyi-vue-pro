@@ -51,10 +51,11 @@
         </dependency>
 
         <!-- 阿里云 通义千问 -->
+        <!-- TODO 芋艿：等 spring cloud alibaba ai 发布最新的时候，可以替换掉这个依赖，并且删除我们直接 cv 的代码 -->
         <dependency>
             <groupId>com.alibaba</groupId>
             <artifactId>dashscope-sdk-java</artifactId>
-            <version>2.11.0</version>
+            <version>2.14.0</version>
         </dependency>
 
         <dependency>

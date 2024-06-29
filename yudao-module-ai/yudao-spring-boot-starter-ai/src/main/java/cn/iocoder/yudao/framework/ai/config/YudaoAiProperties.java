@@ -1,7 +1,6 @@
 package cn.iocoder.yudao.framework.ai.config;
 
 import cn.iocoder.yudao.framework.ai.core.enums.AiPlatformEnum;
-import cn.iocoder.yudao.framework.ai.core.model.tongyi.QianWenChatModal;
 import cn.iocoder.yudao.framework.ai.core.model.xinghuo.XingHuoChatModel;
 import lombok.Data;
 import lombok.experimental.Accessors;
@@ -20,7 +19,6 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @ConfigurationProperties(prefix = "yudao.ai")
 public class YudaoAiProperties {
 
-    private QianWenProperties qianwen;
     private XingHuoProperties xinghuo;
     private OpenAiImageProperties openAiImage;
     private MidjourneyProperties midjourney;
@@ -43,21 +41,6 @@ public class YudaoAiProperties {
          * 用于限制模型生成token的数量，max_tokens设置的是生成上限，并不表示一定会生成这么多的token数量
          */
         private Integer maxTokens;
-    }
-
-    @Data
-    @Accessors(chain = true)
-    public static class QianWenProperties extends ChatProperties {
-
-        /**
-         * api key
-         */
-        private String apiKey;
-        /**
-         * model
-         */
-        private QianWenChatModal model;
-
     }
 
     @Data
