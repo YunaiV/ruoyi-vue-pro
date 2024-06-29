@@ -16,10 +16,11 @@ import cn.iocoder.yudao.framework.ai.core.model.tongyi.QianWenChatModal;
 import cn.iocoder.yudao.framework.ai.core.model.tongyi.api.QianWenApi;
 import cn.iocoder.yudao.framework.ai.core.model.xinghuo.XingHuoChatClient;
 import cn.iocoder.yudao.framework.ai.core.model.xinghuo.api.XingHuoApi;
-import cn.iocoder.yudao.framework.ai.core.model.yiyan.YiYanChatClient;
-import cn.iocoder.yudao.framework.ai.core.model.yiyan.api.YiYanApi;
 import org.springframework.ai.autoconfigure.ollama.OllamaAutoConfiguration;
 import org.springframework.ai.autoconfigure.openai.OpenAiAutoConfiguration;
+import org.springframework.ai.autoconfigure.qianfan.QianFanAutoConfiguration;
+import org.springframework.ai.autoconfigure.qianfan.QianFanChatProperties;
+import org.springframework.ai.autoconfigure.qianfan.QianFanConnectionProperties;
 import org.springframework.ai.chat.model.StreamingChatModel;
 import org.springframework.ai.image.ImageModel;
 import org.springframework.ai.ollama.OllamaChatModel;
@@ -29,8 +30,12 @@ import org.springframework.ai.openai.OpenAiImageModel;
 import org.springframework.ai.openai.api.ApiUtils;
 import org.springframework.ai.openai.api.OpenAiApi;
 import org.springframework.ai.openai.api.OpenAiImageApi;
+import org.springframework.ai.qianfan.QianFanChatModel;
+import org.springframework.ai.qianfan.api.QianFanApi;
 import org.springframework.ai.stabilityai.StabilityAiImageModel;
 import org.springframework.ai.stabilityai.api.StabilityAiApi;
+import org.springframework.retry.support.RetryTemplate;
+import org.springframework.web.client.ResponseErrorHandler;
 import org.springframework.web.client.RestClient;
 
 import java.util.List;
@@ -75,7 +80,7 @@ public class AiClientFactoryImpl implements AiClientFactory {
             case OLLAMA:
                 return SpringUtil.getBean(OllamaChatModel.class);
             case YI_YAN:
-                return SpringUtil.getBean(YiYanChatClient.class);
+                return SpringUtil.getBean(QianFanChatModel.class);
             case XING_HUO:
                 return SpringUtil.getBean(XingHuoChatClient.class);
             case QIAN_WEN:
@@ -153,15 +158,16 @@ public class AiClientFactoryImpl implements AiClientFactory {
     }
 
     /**
-     * 可参考 {@link YudaoAiAutoConfiguration#yiYanChatClient(YudaoAiProperties)}
+     * 可参考 {@link QianFanAutoConfiguration#qianFanChatModel(QianFanConnectionProperties, QianFanChatProperties, RestClient.Builder, RetryTemplate, ResponseErrorHandler)}
      */
-    private static YiYanChatClient buildYiYanChatClient(String key) {
+    private static QianFanChatModel buildYiYanChatClient(String key) {
+        // TODO 芋艿：貌似目前设置，request 势必会报错
         List<String> keys = StrUtil.split(key, '|');
         Assert.equals(keys.size(), 2, "YiYanChatClient 的密钥需要 (appKey|secretKey) 格式");
         String appKey = keys.get(0);
         String secretKey = keys.get(1);
-        YiYanApi yiYanApi = new YiYanApi(appKey, secretKey, YiYanApi.DEFAULT_CHAT_MODEL, 0);
-        return new YiYanChatClient(yiYanApi);
+        QianFanApi qianFanApi = new QianFanApi(appKey, secretKey);
+        return new QianFanChatModel(qianFanApi);
     }
 
     /**

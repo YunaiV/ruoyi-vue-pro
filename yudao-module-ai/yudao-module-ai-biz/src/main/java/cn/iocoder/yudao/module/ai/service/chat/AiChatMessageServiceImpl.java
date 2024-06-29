@@ -7,7 +7,6 @@ import cn.iocoder.yudao.framework.ai.core.enums.AiPlatformEnum;
 import cn.iocoder.yudao.framework.ai.core.model.tongyi.QianWenOptions;
 import cn.iocoder.yudao.framework.ai.core.model.xinghuo.XingHuoChatModel;
 import cn.iocoder.yudao.framework.ai.core.model.xinghuo.XingHuoOptions;
-import cn.iocoder.yudao.framework.ai.core.model.yiyan.YiYanChatOptions;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
@@ -33,6 +32,7 @@ import org.springframework.ai.chat.prompt.ChatOptions;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.ollama.api.OllamaOptions;
 import org.springframework.ai.openai.OpenAiChatOptions;
+import org.springframework.ai.qianfan.QianFanChatOptions;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Flux;
@@ -191,8 +191,9 @@ public class AiChatMessageServiceImpl implements AiChatMessageService {
             case OLLAMA:
                 return OllamaOptions.create().withModel(model).withTemperature(temperatureF).withNumPredict(maxTokens);
             case YI_YAN:
-                // TODO @fan：增加一个 model
-                return new YiYanChatOptions().setTemperature(temperatureF).setMaxOutputTokens(maxTokens);
+                // TODO 芋艿：貌似 model 只要一设置，就报错
+//                return QianFanChatOptions.builder().withModel(model).withTemperature(temperatureF).withMaxTokens(maxTokens).build();
+                return QianFanChatOptions.builder().withTemperature(temperatureF).withMaxTokens(maxTokens).build();
             case XING_HUO:
                 return new XingHuoOptions().setChatModel(XingHuoChatModel.valueOfModel(model)).setTemperature(temperatureF)
                         .setMaxTokens(maxTokens);

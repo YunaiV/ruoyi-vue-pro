@@ -43,6 +43,13 @@
             <artifactId>yudao-common</artifactId>
         </dependency>
 
+        <!-- TODO 芋艿：等 spring-ai 官方发布后，需要把 groupId 改下 -->
+        <dependency>
+            <groupId>group.springframework.ai</groupId>
+            <artifactId>spring-ai-qianfan-spring-boot-starter</artifactId>
+            <version>1.1.0</version>
+        </dependency>
+
         <!-- 阿里云 通义千问 -->
         <dependency>
             <groupId>com.alibaba</groupId>

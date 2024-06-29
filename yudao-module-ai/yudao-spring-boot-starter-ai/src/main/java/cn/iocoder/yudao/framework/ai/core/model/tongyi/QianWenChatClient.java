@@ -2,7 +2,6 @@ package cn.iocoder.yudao.framework.ai.core.model.tongyi;
 
 import cn.iocoder.yudao.framework.ai.core.exception.ChatException;
 import cn.iocoder.yudao.framework.ai.core.model.tongyi.api.QianWenApi;
-import cn.iocoder.yudao.framework.ai.core.model.yiyan.exception.YiYanApiException;
 import com.alibaba.dashscope.aigc.generation.GenerationResult;
 import com.alibaba.dashscope.aigc.generation.models.QwenParam;
 import com.alibaba.dashscope.common.Message;
@@ -59,7 +58,7 @@ public class QianWenChatClient implements ChatModel, StreamingChatModel {
     public final RetryTemplate retryTemplate = RetryTemplate.builder()
             // 最大重试次数 10
             .maxAttempts(10)
-            .retryOn(YiYanApiException.class)
+            .retryOn(Exception.class) // TODO 芋艿：临时这么写
             // 最大重试5次，第一次间隔3000ms，第二次3000ms * 2，第三次3000ms * 3，以此类推，最大间隔3 * 60000ms
             .exponentialBackoff(Duration.ofMillis(3000), 2, Duration.ofMillis(3 * 60000))
             .withListener(new RetryListener() {

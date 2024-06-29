@@ -160,19 +160,11 @@ spring:
         gemini:
           project-id: 1 # TODO 芋艿：缺配置
           location: 2
+    qianfan: # 文心一言
+      api-key: x0cuLZ7XsaTCU08vuJWO87Lg
+      secret-key: R9mYF9dl9KASgi5RUq0FQt3wRisSnOcK
 
 yudao.ai:
-  yiyan:
-    enable: true
-    aiPlatform: YI_YAN # TODO @fan：建议每个都独立配置属性类
-    max-tokens: 1500
-    temperature: 0.85
-    topP: 0.8
-    topK: 0
-    appKey: x0cuLZ7XsaTCU08vuJWO87Lg
-    secretKey: R9mYF9dl9KASgi5RUq0FQt3wRisSnOcK
-    refreshTokenSecondTime: 86400
-    model: ERNIE4_3_5_8K
   xinghuo:
     enable: true
     aiPlatform: XING_HUO # TODO @fan：建议每个都独立配置属性类

@@ -11,9 +11,6 @@ import cn.iocoder.yudao.framework.ai.core.model.tongyi.api.QianWenApi;
 import cn.iocoder.yudao.framework.ai.core.model.xinghuo.XingHuoChatClient;
 import cn.iocoder.yudao.framework.ai.core.model.xinghuo.XingHuoOptions;
 import cn.iocoder.yudao.framework.ai.core.model.xinghuo.api.XingHuoApi;
-import cn.iocoder.yudao.framework.ai.core.model.yiyan.YiYanChatClient;
-import cn.iocoder.yudao.framework.ai.core.model.yiyan.YiYanChatOptions;
-import cn.iocoder.yudao.framework.ai.core.model.yiyan.api.YiYanApi;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -75,27 +72,6 @@ public class YudaoAiAutoConfiguration {
                         QianWenChatModal.QWEN_72B_CHAT
                 ),
                 qianWenOptions
-        );
-    }
-
-    @Bean
-    @ConditionalOnProperty(value = "yudao.ai.yiyan.enable", havingValue = "true")
-    public YiYanChatClient yiYanChatClient(YudaoAiProperties yudaoAiProperties) {
-        YudaoAiProperties.YiYanProperties yiYanProperties = yudaoAiProperties.getYiyan();
-        // 转换配置
-        YiYanChatOptions yiYanOptions = new YiYanChatOptions();
-//        yiYanOptions.setTopK(yiYanProperties.getTopK()); TODO 芋艿：后续弄
-        yiYanOptions.setTopP(yiYanProperties.getTopP());
-        yiYanOptions.setTemperature(yiYanProperties.getTemperature());
-        yiYanOptions.setMaxOutputTokens(yiYanProperties.getMaxTokens());
-        return new YiYanChatClient(
-                new YiYanApi(
-                        yiYanProperties.getAppKey(),
-                        yiYanProperties.getSecretKey(),
-                        yiYanProperties.getModel(),
-                        yiYanProperties.getRefreshTokenSecondTime()
-                ),
-                yiYanOptions
         );
     }
 
