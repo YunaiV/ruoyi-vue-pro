@@ -123,9 +123,16 @@ public class AiImageServiceImpl implements AiImageService {
                     .withResponseFormat("b64_json")
                     .build();
         } else if (ObjUtil.equal(draw.getPlatform(), AiPlatformEnum.STABLE_DIFFUSION.getPlatform())) {
+            // https://platform.stability.ai/docs/api-reference#tag/SDXL-and-SD1.6/operation/textToImage
             // https://platform.stability.ai/docs/api-reference#tag/Text-to-Image/operation/textToImage
             return StabilityAiImageOptions.builder().withModel(draw.getModel())
-                    .withHeight(draw.getHeight()).withWidth(draw.getWidth()) // TODO @范：各种参数的接入
+                    .withHeight(draw.getHeight()).withWidth(draw.getWidth())
+                    .withSeed(Long.valueOf(draw.getOptions().get("seed")))
+                    .withCfgScale(Float.valueOf(draw.getOptions().get("scale")))
+                    .withSteps(Integer.valueOf(draw.getOptions().get("steps")))
+                    .withSampler(String.valueOf(draw.getOptions().get("sampler")))
+                    .withStylePreset(String.valueOf(draw.getOptions().get("stylePreset")))
+                    .withClipGuidancePreset(String.valueOf(draw.getOptions().get("clipGuidancePreset")))
                     .build();
         }
         throw new IllegalArgumentException("不支持的 AI 平台：" + draw.getPlatform());
