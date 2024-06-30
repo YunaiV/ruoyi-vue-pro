@@ -75,11 +75,7 @@ public class AiMusicDO extends BaseDO {
     /**
      * 描述词
      */
-    private String gptDescriptionPrompt;
-    /**
-     * 提示词
-     */
-    private String prompt;
+    private String description;
 
     /**
      * 平台

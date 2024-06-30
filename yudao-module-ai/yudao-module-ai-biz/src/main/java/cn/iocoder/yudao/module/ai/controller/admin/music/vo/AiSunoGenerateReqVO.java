@@ -24,10 +24,10 @@ public class AiSunoGenerateReqVO {
     @NotNull(message = "生成模式不能为空")
     private Integer generateMode; // 参见 AiMusicGenerateModeEnum 枚举
 
-    // TODO @xin：方案一：prompt => lyric 歌词；gptDescriptionPrompt => description 描述（db 那字段也改下，避免和 gpt 直接耦合）；这样搞完后，会更统一好理解一点
-    // TODO @xin：方案二：还是之前的做法，都用 prompt；不过最终 gptDescriptionPrompt 还是存储 description 算描述。可以微信一起讨论下。
     @Schema(description = "用于生成音乐音频的歌词提示",
             example = """
+                    1.描述模式：创作一首带有轻松吉他旋律的流行歌曲，[verse] 描述夏日海滩的宁静，[chorus] 节奏加快，表达对自由的向往。
+                    2.歌词模式：
                     [Verse]
                     阳光下奔跑 多么欢快
                     假期就要来 心都飞起来
@@ -39,11 +39,7 @@ public class AiSunoGenerateReqVO {
                     日子太短暂 别再等待
                     马上放假了 梦想起飞
                     """)
-    private String prompt; // 歌词模式用
-
-    @Schema(description = "用于生成音乐音频的描述",
-            example = "创作一首带有轻松吉他旋律的流行歌曲，[verse] 描述夏日海滩的宁静，[chorus] 节奏加快，表达对自由的向往。")
-    private String gptDescriptionPrompt; // 描述模式用
+    private String prompt;
 
     @Schema(description = "是否纯音乐", example = "true")
     private Boolean makeInstrumental;

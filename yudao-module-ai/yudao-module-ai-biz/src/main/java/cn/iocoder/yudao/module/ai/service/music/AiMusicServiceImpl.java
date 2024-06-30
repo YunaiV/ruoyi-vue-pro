@@ -3,11 +3,14 @@ package cn.iocoder.yudao.module.ai.service.music;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.text.StrPool;
 import cn.hutool.core.util.ObjUtil;
+import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.http.HttpUtil;
 import cn.iocoder.yudao.framework.ai.core.model.suno.api.SunoApi;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.ai.controller.admin.music.vo.*;
+import cn.iocoder.yudao.module.ai.controller.admin.music.vo.AiMusicPageReqVO;
+import cn.iocoder.yudao.module.ai.controller.admin.music.vo.AiMusicUpdateReqVO;
+import cn.iocoder.yudao.module.ai.controller.admin.music.vo.AiSunoGenerateReqVO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.music.AiMusicDO;
 import cn.iocoder.yudao.module.ai.dal.mysql.music.AiMusicMapper;
 import cn.iocoder.yudao.module.ai.enums.music.AiMusicGenerateModeEnum;
@@ -48,18 +51,18 @@ public class AiMusicServiceImpl implements AiMusicService {
     public List<Long> generateMusic(Long userId, AiSunoGenerateReqVO reqVO) {
         // 1. 调用 Suno 生成音乐
         SunoApi sunoApi = apiKeyService.getSunoApi();
-        // TODO @xin：这两个貌似一直没跑成功，你那可以么？用的请求是 AiMusicController.http 的
+        // TODO 芋艿：这两个貌似一直没跑成功，你那可以么？用的请求是 AiMusicController.http 的  --xin：大部分ok的，补充了error_message
         List<SunoApi.MusicData> musicDataList;
-        if (Objects.equals(AiMusicGenerateModeEnum.LYRIC.getMode(), reqVO.getGenerateMode())) {
-            // 1.1 歌词模式
+        if (Objects.equals(AiMusicGenerateModeEnum.DESCRIPTION.getMode(), reqVO.getGenerateMode())) {
+            // 1.1 描述模式
+            SunoApi.MusicGenerateRequest generateRequest = new SunoApi.MusicGenerateRequest(
+                    reqVO.getPrompt(), reqVO.getModel(), reqVO.getMakeInstrumental());
+            musicDataList = sunoApi.generate(generateRequest);
+        } else if (Objects.equals(AiMusicGenerateModeEnum.LYRIC.getMode(), reqVO.getGenerateMode())) {
+            // 1.2 歌词模式
             SunoApi.MusicGenerateRequest generateRequest = new SunoApi.MusicGenerateRequest(
                     reqVO.getPrompt(), reqVO.getModel(), CollUtil.join(reqVO.getTags(), StrPool.COMMA), reqVO.getTitle());
             musicDataList = sunoApi.customGenerate(generateRequest);
-        } else if (Objects.equals(AiMusicGenerateModeEnum.DESCRIPTION.getMode(), reqVO.getGenerateMode())) {
-            // 1.2 描述模式
-            SunoApi.MusicGenerateRequest generateRequest = new SunoApi.MusicGenerateRequest(
-                    reqVO.getGptDescriptionPrompt(), reqVO.getModel(), reqVO.getMakeInstrumental());
-            musicDataList = sunoApi.generate(generateRequest);
         } else {
             throw new IllegalArgumentException(StrUtil.format("未知生成模式({})", reqVO));
         }
@@ -108,9 +111,12 @@ public class AiMusicServiceImpl implements AiMusicService {
     }
 
     @Override
-    public void updateMusicTitle(AiMusicUpdateTitleReqVO updateReqVO) {
-        // 校验存在
-        validateMusicExists(updateReqVO.getId());
+    public void updateMyMusic(AiMusicUpdateReqVO updateReqVO, Long userId) {
+        // 校验音乐是否存在
+        AiMusicDO musicDO = validateMusicExists(updateReqVO.getId());
+        if (ObjUtil.notEqual(musicDO.getUserId(), userId)) {
+            throw exception(MUSIC_NOT_EXISTS);
+        }
         // 更新
         musicMapper.updateById(new AiMusicDO().setId(updateReqVO.getId()).setTitle(updateReqVO.getTitle()));
     }
@@ -156,29 +162,38 @@ public class AiMusicServiceImpl implements AiMusicService {
      * @return AiMusicDO 集合
      */
     private List<AiMusicDO> buildMusicDOList(List<SunoApi.MusicData> musicList) {
-        // TODO @xin：它有 status = error 状态，表示失败噢。
-        return convertList(musicList, musicData -> new AiMusicDO()
-                .setTaskId(musicData.id()).setModel(musicData.modelName())
-                .setPrompt(musicData.prompt()).setGptDescriptionPrompt(musicData.gptDescriptionPrompt())
-                // TODO @xin：只有在完成的状态，在下载文件
-                .setAudioUrl(downloadFile(musicData.audioUrl()))
-                .setVideoUrl(downloadFile(musicData.videoUrl()))
-                .setImageUrl(downloadFile(musicData.imageUrl()))
-                .setTitle(musicData.title()).setDuration(musicData.duration())
-                .setLyric(musicData.lyric()).setTags(StrUtil.split(musicData.tags(), StrPool.COMMA))
-                .setStatus(Objects.equals("complete", musicData.status()) ?
-                        AiMusicStatusEnum.SUCCESS.getStatus() : AiMusicStatusEnum.IN_PROGRESS.getStatus()));
+        return convertList(musicList, musicData -> {
+            Integer status;
+            if (Objects.equals("complete", musicData.status())) {
+                status = AiMusicStatusEnum.SUCCESS.getStatus();
+            } else if (Objects.equals("error", musicData.status())) {
+                status = AiMusicStatusEnum.FAIL.getStatus();
+            } else {
+                status = AiMusicStatusEnum.IN_PROGRESS.getStatus();
+            }
+            return new AiMusicDO()
+                    .setTaskId(musicData.id()).setModel(musicData.modelName())
+                    .setDescription(musicData.gptDescriptionPrompt())
+                    .setAudioUrl(downloadFile(status, musicData.audioUrl()))
+                    .setVideoUrl(downloadFile(status, musicData.videoUrl()))
+                    .setImageUrl(downloadFile(status, musicData.imageUrl()))
+                    .setTitle(musicData.title()).setDuration(musicData.duration())
+                    .setLyric(musicData.lyric()).setTags(StrUtil.split(musicData.tags(), StrPool.COMMA))
+                    .setErrorMessage(musicData.errorMessage())
+                    .setStatus(status);
+        });
     }
 
     /**
-     * 将生成的音频文件上传到文件服务器
+     * 音乐生成好后，将音频文件上传到文件服务器
      *
-     * @param url 音频文件地址
+     * @param status 音乐状态
+     * @param url    音频文件地址
      * @return 内部文件地址
      */
-    private String downloadFile(String url) {
-        if (StrUtil.isBlank(url)) {
-            return null;
+    private String downloadFile(Integer status, String url) {
+        if (StrUtil.isBlank(url) || ObjectUtil.notEqual(status, AiMusicStatusEnum.SUCCESS.getStatus())) {
+            return url;
         }
         try {
             byte[] bytes = HttpUtil.downloadBytes(url);

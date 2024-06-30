@@ -38,11 +38,11 @@ public interface AiMusicService {
     void updateMusic(@Valid AiMusicUpdateReqVO updateReqVO);
 
     /**
-     * 更新音乐名称
+     * 更新我的音乐
      *
      * @param updateReqVO 更新信息
      */
-    void updateMusicTitle(@Valid AiMusicUpdateTitleReqVO updateReqVO);
+    void updateMyMusic(@Valid AiMusicUpdateReqVO updateReqVO, Long userId);
 
     /**
      * 删除AI 音乐

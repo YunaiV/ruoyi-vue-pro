@@ -15,4 +15,7 @@ public class AiMusicUpdateReqVO {
     @Schema(description = "是否发布", example = "true")
     private Boolean publicStatus;
 
+    @Schema(description = "音乐名称", example = "夜空中最亮的星")
+    private String title;
+
 }

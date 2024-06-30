@@ -16,7 +16,8 @@ import java.util.Arrays;
 public enum AiMusicStatusEnum implements IntArrayValuable {
 
     IN_PROGRESS(10, "进行中"),
-    SUCCESS(20, "已完成");
+    SUCCESS(20, "已完成"),
+    FAIL(30, "已失败");
 
     /**
      * 状态

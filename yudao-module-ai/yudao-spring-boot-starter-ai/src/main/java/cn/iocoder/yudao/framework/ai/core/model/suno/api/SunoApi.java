@@ -175,6 +175,7 @@ public class SunoApi {
             @JsonProperty("model_name") String modelName,
             String status,
             @JsonProperty("gpt_description_prompt") String gptDescriptionPrompt,
+            @JsonProperty("error_message") String errorMessage,
             String prompt,
             String type,
             String tags,
