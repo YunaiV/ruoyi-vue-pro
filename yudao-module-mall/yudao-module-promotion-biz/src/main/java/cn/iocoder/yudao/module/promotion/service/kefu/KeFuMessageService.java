@@ -38,7 +38,7 @@ public interface KeFuMessageService {
      * @param userId         用户编号
      * @param userType       用户类型
      */
-    void updateKefuMessageReadStatus(Long conversationId, Long userId, Integer userType);
+    void updateKeFuMessageReadStatus(Long conversationId, Long userId, Integer userType);
 
     /**
      * 获得客服消息分页
@@ -46,7 +46,7 @@ public interface KeFuMessageService {
      * @param pageReqVO 分页查询
      * @return 客服消息分页
      */
-    PageResult<KeFuMessageDO> getKefuMessagePage(KeFuMessagePageReqVO pageReqVO);
+    PageResult<KeFuMessageDO> getKeFuMessagePage(KeFuMessagePageReqVO pageReqVO);
 
     /**
      * 【会员】获得客服消息分页
@@ -55,6 +55,6 @@ public interface KeFuMessageService {
      * @param userId    用户编号
      * @return 客服消息分页
      */
-    PageResult<KeFuMessageDO> getKefuMessagePage(AppKeFuMessagePageReqVO pageReqVO, Long userId);
+    PageResult<KeFuMessageDO> getKeFuMessagePage(AppKeFuMessagePageReqVO pageReqVO, Long userId);
 
 }

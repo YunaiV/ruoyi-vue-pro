@@ -43,7 +43,7 @@ public class AppKeFuMessageController {
     @Parameter(name = "conversationId", description = "会话编号", required = true)
     @PreAuthenticated
     public CommonResult<Boolean> updateKefuMessageReadStatus(@RequestParam("conversationId") Long conversationId) {
-        kefuMessageService.updateKefuMessageReadStatus(conversationId, getLoginUserId(), UserTypeEnum.MEMBER.getValue());
+        kefuMessageService.updateKeFuMessageReadStatus(conversationId, getLoginUserId(), UserTypeEnum.MEMBER.getValue());
         return success(true);
     }
 
@@ -51,7 +51,7 @@ public class AppKeFuMessageController {
     @Operation(summary = "获得客服消息分页")
     @PreAuthenticated
     public CommonResult<PageResult<KeFuMessageRespVO>> getKefuMessagePage(@Valid AppKeFuMessagePageReqVO pageReqVO) {
-        PageResult<KeFuMessageDO> pageResult = kefuMessageService.getKefuMessagePage(pageReqVO, getLoginUserId());
+        PageResult<KeFuMessageDO> pageResult = kefuMessageService.getKeFuMessagePage(pageReqVO, getLoginUserId());
         return success(BeanUtils.toBean(pageResult, KeFuMessageRespVO.class));
     }
 

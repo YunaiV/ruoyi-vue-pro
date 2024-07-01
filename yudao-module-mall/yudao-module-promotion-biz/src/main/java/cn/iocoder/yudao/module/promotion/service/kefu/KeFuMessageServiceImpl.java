@@ -89,7 +89,7 @@ public class KeFuMessageServiceImpl implements KeFuMessageService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void updateKefuMessageReadStatus(Long conversationId, Long userId, Integer userType) {
+    public void updateKeFuMessageReadStatus(Long conversationId, Long userId, Integer userType) {
         // 1.1 校验会话是否存在
         KeFuConversationDO conversation = conversationService.validateKefuConversationExists(conversationId);
         // 1.2 如果是会员端处理已读，需要传递 userId；万一用户模拟一个 conversationId
@@ -136,12 +136,12 @@ public class KeFuMessageServiceImpl implements KeFuMessageService {
     }
 
     @Override
-    public PageResult<KeFuMessageDO> getKefuMessagePage(KeFuMessagePageReqVO pageReqVO) {
+    public PageResult<KeFuMessageDO> getKeFuMessagePage(KeFuMessagePageReqVO pageReqVO) {
         return keFuMessageMapper.selectPage(pageReqVO);
     }
 
     @Override
-    public PageResult<KeFuMessageDO> getKefuMessagePage(AppKeFuMessagePageReqVO pageReqVO, Long userId) {
+    public PageResult<KeFuMessageDO> getKeFuMessagePage(AppKeFuMessagePageReqVO pageReqVO, Long userId) {
         // 1. 获得客服会话
         KeFuConversationDO conversation = conversationService.getConversationByUserId(userId);
         if (conversation == null) {
