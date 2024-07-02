@@ -67,9 +67,8 @@ public class KeFuMessageController {
         PageResult<KeFuMessageRespVO> result = BeanUtils.toBean(pageResult, KeFuMessageRespVO.class);
         Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(convertSet(filterList(result.getList(),
                 item -> UserTypeEnum.ADMIN.getValue().equals(item.getSenderType())), KeFuMessageRespVO::getSenderId));
-        result.getList().forEach(item->{
-            findAndThen(userMap, item.getSenderId(), adminUser -> item.setSenderAvatar(adminUser.getAvatar()));
-        });
+        result.getList().forEach(item-> findAndThen(userMap, item.getSenderId(),
+                user -> item.setSenderAvatar(user.getAvatar())));
         return success(result);
     }
 

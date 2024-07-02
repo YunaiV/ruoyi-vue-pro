@@ -23,9 +23,9 @@ public class KeFuMessageSendReqVO {
 
     // ========== 后端设置的参数，前端无需传递 ==========
 
-    @Schema(description = "发送人编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "24571", hidden = true)
+    @Schema(description = "发送人编号", example = "24571", hidden = true)
     private Long senderId;
-    @Schema(description = "发送人类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "1", hidden = true)
+    @Schema(description = "发送人类型", example = "1", hidden = true)
     private Integer senderType;
 
 }

@@ -39,7 +39,7 @@ public interface KeFuConversationService {
      *
      * @param id 编号
      */
-    void updateAdminUnreadMessageCountWithZero(Long id);
+    void updateAdminUnreadMessageCountToZero(Long id);
 
     /**
      * 【管理员】更新会话对于管理员是否可见

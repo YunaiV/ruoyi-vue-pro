@@ -65,10 +65,10 @@ public class KeFuConversationServiceImpl implements KeFuConversationService {
     }
 
     @Override
-    public void updateAdminUnreadMessageCountWithZero(Long id) {
+    public void updateAdminUnreadMessageCountToZero(Long id) {
         // 校验存在
         validateKefuConversationExists(id);
-        
+
         // 管理员未读消息数归零
         conversationMapper.updateById(new KeFuConversationDO().setId(id).setAdminUnreadMessageCount(0));
     }

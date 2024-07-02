@@ -96,9 +96,8 @@ public class KeFuMessageServiceImpl implements KeFuMessageService {
         if (UserTypeEnum.MEMBER.getValue().equals(userType) && ObjUtil.notEqual(conversation.getUserId(), userId)) {
             throw exception(KEFU_CONVERSATION_NOT_EXISTS);
         }
-        // 1.2 查询会话所有的未读消息 (tips: 多个客服，一个人点了，就都点了)
+        // 1.3 查询会话所有的未读消息 (tips: 多个客服，一个人点了，就都点了)
         List<KeFuMessageDO> messageList = keFuMessageMapper.selectListByConversationIdAndReadStatus(conversationId, Boolean.FALSE);
-        // 1.3 情况一：没有未读消息
         if (CollUtil.isEmpty(messageList)) {
             return;
         }
@@ -107,7 +106,7 @@ public class KeFuMessageServiceImpl implements KeFuMessageService {
         keFuMessageMapper.updateReadStatusBatchByIds(convertSet(messageList, KeFuMessageDO::getId),
                 new KeFuMessageDO().setReadStatus(Boolean.TRUE));
         // 2.2 将管理员未读消息计数更新为零
-        conversationService.updateAdminUnreadMessageCountWithZero(conversationId);
+        conversationService.updateAdminUnreadMessageCountToZero(conversationId);
 
         // 2.3 发送消息通知会员，管理员已读 -> 会员更新发送的消息状态
         // TODO @puhui999：待定~

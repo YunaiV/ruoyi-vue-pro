@@ -61,10 +61,8 @@ public class KeFuConversationController {
 
         // 拼接数据
         Map<Long, MemberUserRespDTO> userMap = memberUserApi.getUserMap(convertSet(respList, KeFuConversationRespVO::getUserId));
-        respList.forEach(item->{
-            findAndThen(userMap, item.getUserId(), memberUser-> item.setUserAvatar(memberUser.getAvatar())
-                    .setUserNickname(memberUser.getNickname()));
-        });
+        respList.forEach(item-> findAndThen(userMap, item.getUserId(),
+                memberUser-> item.setUserAvatar(memberUser.getAvatar()).setUserNickname(memberUser.getNickname())));
         return success(respList);
     }
 

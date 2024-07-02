@@ -28,7 +28,7 @@ public interface KeFuConversationMapper extends BaseMapperX<KeFuConversationDO> 
                 .setSql("admin_unread_message_count = admin_unread_message_count + 1"));
     }
 
-    default KeFuConversationDO selectByUserId(Long userId){
+    default KeFuConversationDO selectByUserId(Long userId) {
         return selectOne(KeFuConversationDO::getUserId, userId);
     }
 
