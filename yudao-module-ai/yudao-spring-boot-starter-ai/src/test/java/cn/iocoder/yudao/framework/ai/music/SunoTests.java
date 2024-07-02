@@ -17,8 +17,8 @@ public class SunoTests {
 
     @Before
     public void setup() {
-//        String url = "https://suno-om0w1cy6e-status2xxs-projects.vercel.app";
-        String url = "http://127.0.0.1:3001";
+        String url = "https://suno-55ishh05u-status2xxs-projects.vercel.app";
+//        String url = "http://127.0.0.1:3001";
         this.sunoApi = new SunoApi(url);
     }
 

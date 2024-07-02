@@ -38,10 +38,6 @@ public class AiMusicController {
     @PostMapping("/generate")
     @Operation(summary = "音乐生成")
     public CommonResult<List<Long>> generateMusic(@RequestBody @Valid AiSunoGenerateReqVO reqVO) {
-        if (true) {
-            musicService.syncMusic();
-            return null;
-        }
         return success(musicService.generateMusic(getLoginUserId(), reqVO));
     }
 
@@ -64,12 +60,11 @@ public class AiMusicController {
         return success(BeanUtils.toBean(music, AiMusicRespVO.class));
     }
 
-    // TODO @xin：这个搞成 updateMy ，修改【我的】音乐。方便后续支持其它字段；另外，需要校验下，更新的音乐，是不是我的！
-    @PostMapping("/updateTitle-my")
+    @PostMapping("/update-my")
     @Operation(summary = "修改【我的】音乐 目前只支持修改标题")
     @Parameter(name = "title", required = true, description = "音乐名称", example = "夜空中最亮的星")
-    public CommonResult<Boolean> updateMusicTitle(AiMusicUpdateTitleReqVO updateReqVO) {
-        musicService.updateMusicTitle(updateReqVO);
+    public CommonResult<Boolean> updateMy(AiMusicUpdateReqVO updateReqVO) {
+        musicService.updateMyMusic(updateReqVO, getLoginUserId());
         return success(true);
     }
 
