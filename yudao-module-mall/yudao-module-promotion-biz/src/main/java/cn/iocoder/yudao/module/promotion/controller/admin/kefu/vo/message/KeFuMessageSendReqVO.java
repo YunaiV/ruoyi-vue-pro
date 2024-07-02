@@ -13,6 +13,10 @@ public class KeFuMessageSendReqVO {
     @NotNull(message = "会话编号不能为空")
     private Long conversationId;
 
+    @Schema(description = "消息类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
+    @NotNull(message = "消息类型不能为空")
+    private Integer contentType;
+
     @Schema(description = "消息", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotEmpty(message = "消息不能为空")
     private String content;
