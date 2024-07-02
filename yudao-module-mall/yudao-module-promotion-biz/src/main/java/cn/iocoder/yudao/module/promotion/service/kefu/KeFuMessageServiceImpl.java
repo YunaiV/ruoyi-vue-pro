@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.promotion.service.kefu;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
@@ -22,10 +23,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
-import java.util.Collections;
 import java.util.List;
 
+import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
+import static cn.iocoder.yudao.module.promotion.enums.ErrorCodeConstants.KEFU_CONVERSATION_NOT_EXISTS;
 import static cn.iocoder.yudao.module.promotion.enums.WebSocketMessageTypeConstants.KEFU_MESSAGE_ADMIN_READ;
 import static cn.iocoder.yudao.module.promotion.enums.WebSocketMessageTypeConstants.KEFU_MESSAGE_TYPE;
 
@@ -53,18 +55,19 @@ public class KeFuMessageServiceImpl implements KeFuMessageService {
     @Transactional(rollbackFor = Exception.class)
     public Long sendKefuMessage(KeFuMessageSendReqVO sendReqVO) {
         // 1.1 校验会话是否存在
-        conversationService.validateKefuConversationExists(sendReqVO.getConversationId());
+        KeFuConversationDO conversation = conversationService.validateKefuConversationExists(sendReqVO.getConversationId());
         // 1.2 校验接收人是否存在
-        validateReceiverExist(sendReqVO.getReceiverId(), sendReqVO.getReceiverType());
+        validateReceiverExist(conversation.getUserId(), UserTypeEnum.MEMBER.getValue());
 
         // 2.1 保存消息
         KeFuMessageDO kefuMessage = BeanUtils.toBean(sendReqVO, KeFuMessageDO.class);
+        kefuMessage.setReceiverId(conversation.getUserId()).setReceiverType(UserTypeEnum.MEMBER.getValue()); // 设置接收人
         keFuMessageMapper.insert(kefuMessage);
         // 2.2 更新会话消息冗余
         conversationService.updateConversationLastMessage(kefuMessage);
 
         // 3. 发送消息
-        getSelf().sendAsyncMessage(sendReqVO.getReceiverType(), sendReqVO.getReceiverId(), kefuMessage);
+        getSelf().sendAsyncMessage(UserTypeEnum.MEMBER.getValue(), conversation.getUserId(), kefuMessage);
         return kefuMessage.getId();
     }
 
@@ -86,9 +89,13 @@ public class KeFuMessageServiceImpl implements KeFuMessageService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void updateKefuMessageReadStatus(Long conversationId) {
+    public void updateKeFuMessageReadStatus(Long conversationId, Long userId, Integer userType) {
         // 1.1 校验会话是否存在
-        conversationService.validateKefuConversationExists(conversationId);
+        KeFuConversationDO conversation = conversationService.validateKefuConversationExists(conversationId);
+        // 1.2 如果是会员端处理已读，需要传递 userId；万一用户模拟一个 conversationId
+        if (UserTypeEnum.MEMBER.getValue().equals(userType) && ObjUtil.notEqual(conversation.getUserId(), userId)) {
+            throw exception(KEFU_CONVERSATION_NOT_EXISTS);
+        }
         // 1.2 查询会话所有的未读消息 (tips: 多个客服，一个人点了，就都点了)
         List<KeFuMessageDO> messageList = keFuMessageMapper.selectListByConversationIdAndReadStatus(conversationId, Boolean.FALSE);
         // 1.3 情况一：没有未读消息
@@ -129,12 +136,12 @@ public class KeFuMessageServiceImpl implements KeFuMessageService {
     }
 
     @Override
-    public PageResult<KeFuMessageDO> getKefuMessagePage(KeFuMessagePageReqVO pageReqVO) {
+    public PageResult<KeFuMessageDO> getKeFuMessagePage(KeFuMessagePageReqVO pageReqVO) {
         return keFuMessageMapper.selectPage(pageReqVO);
     }
 
     @Override
-    public PageResult<KeFuMessageDO> getKefuMessagePage(AppKeFuMessagePageReqVO pageReqVO, Long userId) {
+    public PageResult<KeFuMessageDO> getKeFuMessagePage(AppKeFuMessagePageReqVO pageReqVO, Long userId) {
         // 1. 获得客服会话
         KeFuConversationDO conversation = conversationService.getConversationByUserId(userId);
         if (conversation == null) {

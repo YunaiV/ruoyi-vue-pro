@@ -18,6 +18,8 @@ public class KeFuMessageRespVO {
 
     @Schema(description = "发送人编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "24571")
     private Long senderId;
+    @Schema(description = "发送人头像", requiredMode = Schema.RequiredMode.REQUIRED, example = "https://yudao.com/images/avatar.jpg")
+    private String senderAvatar;
 
     @Schema(description = "发送人类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     private Integer senderType;

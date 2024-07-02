@@ -9,30 +9,9 @@ import lombok.Data;
 @Data
 public class KeFuMessageSendReqVO {
 
-    // TODO @puhui999：貌似字段多了；1）id 不用；2）senderId、senderType 不用；3）receiverId、receiverType 也不用；原因可以想下哈
-
-    @Schema(description = "编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "23202")
-    private Long id;
-
     @Schema(description = "会话编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "12580")
     @NotNull(message = "会话编号不能为空")
     private Long conversationId;
-
-    @Schema(description = "发送人编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "24571")
-    @NotNull(message = "发送人编号不能为空")
-    private Long senderId;
-
-    @Schema(description = "发送人类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
-    @NotNull(message = "发送人类型不能为空")
-    private Integer senderType;
-
-    @Schema(description = "接收人编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "29124")
-    @NotNull(message = "接收人编号不能为空")
-    private Long receiverId;
-
-    @Schema(description = "接收人类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "2")
-    @NotNull(message = "接收人类型不能为空")
-    private Integer receiverType;
 
     @Schema(description = "消息类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     @NotNull(message = "消息类型不能为空")
@@ -41,5 +20,12 @@ public class KeFuMessageSendReqVO {
     @Schema(description = "消息", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotEmpty(message = "消息不能为空")
     private String content;
+
+    // ========== 后端设置的参数，前端无需传递 ==========
+
+    @Schema(description = "发送人编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "24571", hidden = true)
+    private Long senderId;
+    @Schema(description = "发送人类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "1", hidden = true)
+    private Integer senderType;
 
 }

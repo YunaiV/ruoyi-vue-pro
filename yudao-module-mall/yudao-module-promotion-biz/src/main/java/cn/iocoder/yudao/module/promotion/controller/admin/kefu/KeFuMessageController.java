@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.promotion.controller.admin.kefu;
 
+import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
@@ -8,6 +9,8 @@ import cn.iocoder.yudao.module.promotion.controller.admin.kefu.vo.message.KeFuMe
 import cn.iocoder.yudao.module.promotion.controller.admin.kefu.vo.message.KeFuMessageSendReqVO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.kefu.KeFuMessageDO;
 import cn.iocoder.yudao.module.promotion.service.kefu.KeFuMessageService;
+import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
+import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -17,7 +20,13 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.filterList;
+import static cn.iocoder.yudao.framework.common.util.collection.MapUtils.findAndThen;
+import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
 
 @Tag(name = "管理后台 - 客服消息")
 @RestController
@@ -27,11 +36,14 @@ public class KeFuMessageController {
 
     @Resource
     private KeFuMessageService messageService;
+    @Resource
+    private AdminUserApi adminUserApi;
 
     @PostMapping("/send")
     @Operation(summary = "发送客服消息")
     @PreAuthorize("@ss.hasPermission('promotion:kefu-message:send')")
-    public CommonResult<Long> createKefuMessage(@Valid @RequestBody KeFuMessageSendReqVO sendReqVO) {
+    public CommonResult<Long> sendKeFuMessage(@Valid @RequestBody KeFuMessageSendReqVO sendReqVO) {
+        sendReqVO.setSenderId(getLoginUserId()).setSenderType(UserTypeEnum.ADMIN.getValue()); // 设置用户编号和类型
         return success(messageService.sendKefuMessage(sendReqVO));
     }
 
@@ -39,18 +51,26 @@ public class KeFuMessageController {
     @Operation(summary = "更新客服消息已读状态")
     @Parameter(name = "conversationId", description = "会话编号", required = true)
     @PreAuthorize("@ss.hasPermission('promotion:kefu-message:update')")
-    public CommonResult<Boolean> updateKefuMessageReadStatus(@RequestParam("conversationId") Long conversationId) {
-        messageService.updateKefuMessageReadStatus(conversationId);
+    public CommonResult<Boolean> updateKeFuMessageReadStatus(@RequestParam("conversationId") Long conversationId) {
+        messageService.updateKeFuMessageReadStatus(conversationId, getLoginUserId(), UserTypeEnum.ADMIN.getValue());
         return success(true);
     }
 
-    // TODO @puhui999：这个应该是某个会话，上翻、下翻；不是传统的分页哈；
     @GetMapping("/page")
     @Operation(summary = "获得客服消息分页")
     @PreAuthorize("@ss.hasPermission('promotion:kefu-message:query')")
-    public CommonResult<PageResult<KeFuMessageRespVO>> getKefuMessagePage(@Valid KeFuMessagePageReqVO pageReqVO) {
-        PageResult<KeFuMessageDO> pageResult = messageService.getKefuMessagePage(pageReqVO);
-        return success(BeanUtils.toBean(pageResult, KeFuMessageRespVO.class));
+    public CommonResult<PageResult<KeFuMessageRespVO>> getKeFuMessagePage(@Valid KeFuMessagePageReqVO pageReqVO) {
+        // 获得数据
+        PageResult<KeFuMessageDO> pageResult = messageService.getKeFuMessagePage(pageReqVO);
+
+        // 拼接数据
+        PageResult<KeFuMessageRespVO> result = BeanUtils.toBean(pageResult, KeFuMessageRespVO.class);
+        Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(convertSet(filterList(result.getList(),
+                item -> UserTypeEnum.ADMIN.getValue().equals(item.getSenderType())), KeFuMessageRespVO::getSenderId));
+        result.getList().forEach(item->{
+            findAndThen(userMap, item.getSenderId(), adminUser -> item.setSenderAvatar(adminUser.getAvatar()));
+        });
+        return success(result);
     }
 
 }

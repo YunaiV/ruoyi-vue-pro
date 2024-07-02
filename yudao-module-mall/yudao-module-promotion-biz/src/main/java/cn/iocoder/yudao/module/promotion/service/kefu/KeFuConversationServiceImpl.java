@@ -56,20 +56,21 @@ public class KeFuConversationServiceImpl implements KeFuConversationService {
 
         // 2.1 更新管理员未读消息数
         if (UserTypeEnum.MEMBER.getValue().equals(kefuMessage.getSenderType())) {
-            conversationMapper.updateAdminUnreadMessageCount(kefuMessage.getConversationId());
+            conversationMapper.updateAdminUnreadMessageCountIncrement(kefuMessage.getConversationId());
         }
         // 2.2 会员用户发送消息时，如果管理员删除过会话则进行恢复
-        // TODO @puhui999：其实不用判断用户类型；只要be已删除，就恢复！
-        if (UserTypeEnum.MEMBER.getValue().equals(kefuMessage.getSenderType())
-                && Boolean.TRUE.equals(conversation.getAdminDeleted())) {
+        if (Boolean.TRUE.equals(conversation.getAdminDeleted())) {
             updateConversationAdminDeleted(kefuMessage.getConversationId(), Boolean.FALSE);
         }
     }
 
     @Override
     public void updateAdminUnreadMessageCountWithZero(Long id) {
+        // 校验存在
         validateKefuConversationExists(id);
-        conversationMapper.updateAdminUnreadMessageCountWithZero(id);
+        
+        // 管理员未读消息数归零
+        conversationMapper.updateById(new KeFuConversationDO().setId(id).setAdminUnreadMessageCount(0));
     }
 
     @Override
@@ -107,8 +108,7 @@ public class KeFuConversationServiceImpl implements KeFuConversationService {
 
     @Override
     public KeFuConversationDO getConversationByUserId(Long userId) {
-        // TODO @puhui999：service 不写 dao 的逻辑哈
-        return conversationMapper.selectOne(KeFuConversationDO::getUserId, userId);
+        return conversationMapper.selectByUserId(userId);
     }
 
 }
