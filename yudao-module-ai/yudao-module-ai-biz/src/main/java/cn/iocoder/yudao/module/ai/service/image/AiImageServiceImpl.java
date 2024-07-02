@@ -35,6 +35,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -191,9 +192,14 @@ public class AiImageServiceImpl implements AiImageService {
         imageMapper.insert(image);
 
         // 2. 调用 Midjourney Proxy 提交任务
+        List<String> base64Array = new ArrayList<>(8);
+        if (StrUtil.isNotBlank(reqVO.getReferImageUrl())) {
+            base64Array.add("data:image/jpeg;base64,".concat(Base64.encode(HttpUtil.downloadBytes(reqVO.getReferImageUrl()))));
+        }
         MidjourneyApi.ImagineRequest imagineRequest = new MidjourneyApi.ImagineRequest(
-                null, reqVO.getPrompt(),null,
-                MidjourneyApi.ImagineRequest.buildState(reqVO.getWidth(), reqVO.getHeight(), reqVO.getVersion(), reqVO.getModel()));
+                base64Array, reqVO.getPrompt(),null,
+                MidjourneyApi.ImagineRequest.buildState(reqVO.getWidth(),
+                        reqVO.getHeight(), reqVO.getVersion(), reqVO.getModel()));
         MidjourneyApi.SubmitResponse imagineResponse = midjourneyApi.imagine(imagineRequest);
 
         // 3. 情况一【失败】：抛出业务异常
