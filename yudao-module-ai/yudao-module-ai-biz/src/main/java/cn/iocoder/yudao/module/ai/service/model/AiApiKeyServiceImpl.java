@@ -117,6 +117,7 @@ public class AiApiKeyServiceImpl implements AiApiKeyService {
     public MidjourneyApi getMidjourneyApi() {
         AiApiKeyDO apiKey = apiKeyMapper.selectFirstByPlatformAndStatus(
                 AiPlatformEnum.MIDJOURNEY.getPlatform(), CommonStatusEnum.ENABLE.getStatus());
+        // todo @芋艿 这些地方直接抛异常会好点，不然调用到的地方都需要做判断
         if (apiKey == null) {
             return null;
         }
