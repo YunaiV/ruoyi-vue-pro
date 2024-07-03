@@ -28,7 +28,7 @@ public class AiWriteController {
     @PostMapping(value = "/generate-stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     @PermitAll
     @Operation(summary = "写作生成（流式）", description = "流式返回，响应较快")
-    public Flux<CommonResult<String>> generateComposition(@RequestBody @Valid AiWriteGenerateReqVO generateReqVO) {
+    public Flux<CommonResult<String>> generateWriteContent(@RequestBody @Valid AiWriteGenerateReqVO generateReqVO) {
         return writeService.generateWriteContent(generateReqVO, getLoginUserId());
     }
 }

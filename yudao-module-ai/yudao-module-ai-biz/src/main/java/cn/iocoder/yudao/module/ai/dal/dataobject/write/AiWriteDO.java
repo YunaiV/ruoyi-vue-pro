@@ -32,12 +32,12 @@ public class AiWriteDO extends BaseDO {
      * <p>
      * 枚举 {@link AiWriteTypeEnum}
      */
-    private Integer writeType;
+    private Integer type;
 
     /**
      * 生成内容提示
      */
-    private String contentPrompt;
+    private String prompt;
 
     /**
      * 生成的内容
@@ -52,22 +52,22 @@ public class AiWriteDO extends BaseDO {
     /**
      * 长度提示词
      */
-    private String length;
+    private Integer length;
 
     /**
      * 格式提示词
      */
-    private String format;
+    private Integer format;
 
     /**
      * 语气提示词
      */
-    private String tone;
+    private Integer tone;
 
     /**
      * 语言提示词
      */
-    private String language;
+    private Integer language;
 
     /**
      * 模型

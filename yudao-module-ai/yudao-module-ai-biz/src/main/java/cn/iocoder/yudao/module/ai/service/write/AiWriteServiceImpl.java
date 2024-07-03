@@ -11,7 +11,7 @@ import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiChatModelDO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.write.AiWriteDO;
 import cn.iocoder.yudao.module.ai.dal.mysql.write.AiWriteMapper;
 import cn.iocoder.yudao.module.ai.enums.ErrorCodeConstants;
-import cn.iocoder.yudao.module.ai.enums.write.AiWriteTypeEnum;
+import cn.iocoder.yudao.module.ai.enums.write.*;
 import cn.iocoder.yudao.module.ai.service.model.AiApiKeyService;
 import cn.iocoder.yudao.module.ai.service.model.AiChatModelService;
 import com.alibaba.cloud.ai.tongyi.chat.TongYiChatOptions;
@@ -84,17 +84,17 @@ public class AiWriteServiceImpl implements AiWriteService {
 
     private String buildWritingPrompt(AiWriteGenerateReqVO generateReqVO) {
         String template;
-        Integer writeType = generateReqVO.getWriteType();
-        String format = generateReqVO.getFormat();
-        String tone = generateReqVO.getTone();
-        String language = generateReqVO.getLanguage();
-        String length = generateReqVO.getLength();
+        Integer writeType = generateReqVO.getType();
+        String format = AiWriteFormatEnum.valueOfFormat(generateReqVO.getFormat()).getName();
+        String tone = AiWriteToneEnum.valueOfTone(generateReqVO.getTone()).getName();
+        String language = AiLanguageEnum.valueOfLanguage(generateReqVO.getLanguage()).getName();
+        String length = AiWriteLengthEnum.valueOfLength(generateReqVO.getLength()).getName();
         if (Objects.equals(writeType, AiWriteTypeEnum.WRITING.getType())) {
             template = "请撰写一篇关于 [{}] 的文章。文章的内容格式为：[{}]，语气为：[{}]，语言为：[{}]，长度为：[{}]。请确保涵盖主要内容，不需要除了正文内容外的其他回复，如标题、额外的解释或道歉。";
-            return StrUtil.format(template, generateReqVO.getContentPrompt(), format, tone, language, length);
+            return StrUtil.format(template, generateReqVO.getPrompt(), format, tone, language, length);
         } else if (Objects.equals(writeType, AiWriteTypeEnum.REPLY.getType())) {
             template = "请针对如下内容：[{}] 做个回复。回复内容参考：[{}], 回复的内容格式为：[{}]，语气为：[{}]，语言为：[{}]，长度为：[{}]。不需要除了正文内容外的其他回复，如标题、额外的解释或道歉。";
-            return StrUtil.format(template, generateReqVO.getOriginalContent(), generateReqVO.getContentPrompt(), format, tone, language, length);
+            return StrUtil.format(template, generateReqVO.getOriginalContent(), generateReqVO.getPrompt(), format, tone, language, length);
         } else {
             throw new IllegalArgumentException(StrUtil.format("未知写作类型({})", writeType));
         }
