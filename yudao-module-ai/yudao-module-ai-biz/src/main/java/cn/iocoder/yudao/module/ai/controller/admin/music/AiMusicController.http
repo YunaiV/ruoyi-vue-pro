@@ -7,7 +7,7 @@ Authorization: {{token}}
   "platform": "Suno",
   "generateMode": 2,
   "prompt": "周末啦！",
-  "model": "chirp-v3.5",
+  "model": "chirp-v3-5",
   "tags": ["Happy"],
   "title": "Happy Song"
 }
@@ -20,7 +20,7 @@ Authorization: {{token}}
 {
   "platform": "Suno",
   "generateMode": 1,
-  "model": "chirp-v3.5",
-  "gptDescriptionPrompt": "今天是星球六，结果是个下雨天，希望心情很美丽",
+  "model": "chirp-v3-5",
+  "prompt": "今天是星球六，结果是个下雨天，希望心情很美丽",
   "makeInstrumental": false
 }
