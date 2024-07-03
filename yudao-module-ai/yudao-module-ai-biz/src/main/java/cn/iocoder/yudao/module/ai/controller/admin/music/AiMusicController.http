@@ -1,0 +1,26 @@
+### 生成音乐：Suno + 歌词模式
+POST {{baseUrl}}/ai/music/generate
+Content-Type: application/json
+Authorization: {{token}}
+
+{
+  "platform": "Suno",
+  "generateMode": 2,
+  "prompt": "周末啦！",
+  "model": "chirp-v3.5",
+  "tags": ["Happy"],
+  "title": "Happy Song"
+}
+
+### 生成音乐：Suno + 描述模式
+POST {{baseUrl}}/ai/music/generate
+Content-Type: application/json
+Authorization: {{token}}
+
+{
+  "platform": "Suno",
+  "generateMode": 1,
+  "model": "chirp-v3.5",
+  "gptDescriptionPrompt": "今天是星球六，结果是个下雨天，希望心情很美丽",
+  "makeInstrumental": false
+}

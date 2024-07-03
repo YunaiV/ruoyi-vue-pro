@@ -9,26 +9,35 @@ import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.framework.ai.config.YudaoAiAutoConfiguration;
 import cn.iocoder.yudao.framework.ai.config.YudaoAiProperties;
 import cn.iocoder.yudao.framework.ai.core.enums.AiPlatformEnum;
-import cn.iocoder.yudao.framework.ai.core.model.tongyi.QianWenChatClient;
-import cn.iocoder.yudao.framework.ai.core.model.tongyi.QianWenChatModal;
-import cn.iocoder.yudao.framework.ai.core.model.tongyi.api.QianWenApi;
+import cn.iocoder.yudao.framework.ai.core.model.midjourney.api.MidjourneyApi;
+import cn.iocoder.yudao.framework.ai.core.model.suno.api.SunoApi;
 import cn.iocoder.yudao.framework.ai.core.model.xinghuo.XingHuoChatClient;
 import cn.iocoder.yudao.framework.ai.core.model.xinghuo.api.XingHuoApi;
-import cn.iocoder.yudao.framework.ai.core.model.yiyan.YiYanChatClient;
-import cn.iocoder.yudao.framework.ai.core.model.yiyan.api.YiYanApi;
+import com.alibaba.cloud.ai.tongyi.TongYiAutoConfiguration;
+import com.alibaba.cloud.ai.tongyi.TongYiConnectionProperties;
+import com.alibaba.cloud.ai.tongyi.chat.TongYiChatModel;
+import com.alibaba.cloud.ai.tongyi.chat.TongYiChatProperties;
+import com.alibaba.dashscope.aigc.generation.Generation;
 import org.springframework.ai.autoconfigure.ollama.OllamaAutoConfiguration;
 import org.springframework.ai.autoconfigure.openai.OpenAiAutoConfiguration;
-import org.springframework.ai.chat.StreamingChatClient;
-import org.springframework.ai.image.ImageClient;
-import org.springframework.ai.ollama.OllamaChatClient;
+import org.springframework.ai.autoconfigure.qianfan.QianFanAutoConfiguration;
+import org.springframework.ai.autoconfigure.qianfan.QianFanChatProperties;
+import org.springframework.ai.autoconfigure.qianfan.QianFanConnectionProperties;
+import org.springframework.ai.chat.model.StreamingChatModel;
+import org.springframework.ai.image.ImageModel;
+import org.springframework.ai.ollama.OllamaChatModel;
 import org.springframework.ai.ollama.api.OllamaApi;
-import org.springframework.ai.openai.OpenAiChatClient;
-import org.springframework.ai.openai.OpenAiImageClient;
+import org.springframework.ai.openai.OpenAiChatModel;
+import org.springframework.ai.openai.OpenAiImageModel;
 import org.springframework.ai.openai.api.ApiUtils;
 import org.springframework.ai.openai.api.OpenAiApi;
 import org.springframework.ai.openai.api.OpenAiImageApi;
-import org.springframework.ai.stabilityai.StabilityAiImageClient;
+import org.springframework.ai.qianfan.QianFanChatModel;
+import org.springframework.ai.qianfan.api.QianFanApi;
+import org.springframework.ai.stabilityai.StabilityAiImageModel;
 import org.springframework.ai.stabilityai.api.StabilityAiApi;
+import org.springframework.retry.support.RetryTemplate;
+import org.springframework.web.client.ResponseErrorHandler;
 import org.springframework.web.client.RestClient;
 
 import java.util.List;
@@ -41,9 +50,9 @@ import java.util.List;
 public class AiClientFactoryImpl implements AiClientFactory {
 
     @Override
-    public StreamingChatClient getOrCreateStreamingChatClient(AiPlatformEnum platform, String apiKey, String url) {
-        String cacheKey = buildClientCacheKey(StreamingChatClient.class, platform, apiKey, url);
-        return Singleton.get(cacheKey, (Func0<StreamingChatClient>) () -> {
+    public StreamingChatModel getOrCreateStreamingChatClient(AiPlatformEnum platform, String apiKey, String url) {
+        String cacheKey = buildClientCacheKey(StreamingChatModel.class, platform, apiKey, url);
+        return Singleton.get(cacheKey, (Func0<StreamingChatModel>) () -> {
             //noinspection EnhancedSwitchMigration
             switch (platform) {
                 case OPENAI:
@@ -65,39 +74,39 @@ public class AiClientFactoryImpl implements AiClientFactory {
     }
 
     @Override
-    public StreamingChatClient getDefaultStreamingChatClient(AiPlatformEnum platform) {
+    public StreamingChatModel getDefaultStreamingChatClient(AiPlatformEnum platform) {
         //noinspection EnhancedSwitchMigration
         switch (platform) {
             case OPENAI:
-                return SpringUtil.getBean(OpenAiChatClient.class);
+                return SpringUtil.getBean(OpenAiChatModel.class);
             case OLLAMA:
-                return SpringUtil.getBean(OllamaChatClient.class);
+                return SpringUtil.getBean(OllamaChatModel.class);
             case YI_YAN:
-                return SpringUtil.getBean(YiYanChatClient.class);
+                return SpringUtil.getBean(QianFanChatModel.class);
             case XING_HUO:
                 return SpringUtil.getBean(XingHuoChatClient.class);
             case QIAN_WEN:
-                return SpringUtil.getBean(QianWenChatClient.class);
+                return SpringUtil.getBean(TongYiChatModel.class);
             default:
                 throw new IllegalArgumentException(StrUtil.format("未知平台({})", platform));
         }
     }
 
     @Override
-    public ImageClient getDefaultImageClient(AiPlatformEnum platform) {
+    public ImageModel getDefaultImageClient(AiPlatformEnum platform) {
         //noinspection EnhancedSwitchMigration
         switch (platform) {
             case OPENAI:
-                return SpringUtil.getBean(OpenAiImageClient.class);
+                return SpringUtil.getBean(OpenAiImageModel.class);
             case STABLE_DIFFUSION:
-                return SpringUtil.getBean(StabilityAiImageClient.class);
+                return SpringUtil.getBean(StabilityAiImageModel.class);
             default:
                 throw new IllegalArgumentException(StrUtil.format("未知平台({})", platform));
         }
     }
 
     @Override
-    public ImageClient getOrCreateImageClient(AiPlatformEnum platform, String apiKey, String url) {
+    public ImageModel getOrCreateImageClient(AiPlatformEnum platform, String apiKey, String url) {
         //noinspection EnhancedSwitchMigration
         switch (platform) {
             case OPENAI:
@@ -107,6 +116,21 @@ public class AiClientFactoryImpl implements AiClientFactory {
             default:
                 throw new IllegalArgumentException(StrUtil.format("未知平台({})", platform));
         }
+    }
+
+    @Override
+    public MidjourneyApi getOrCreateMidjourneyApi(String apiKey, String url) {
+        String cacheKey = buildClientCacheKey(MidjourneyApi.class, AiPlatformEnum.MIDJOURNEY.getPlatform(), apiKey, url);
+        return Singleton.get(cacheKey, (Func0<MidjourneyApi>) () -> {
+            YudaoAiProperties.MidjourneyProperties properties = SpringUtil.getBean(YudaoAiProperties.class).getMidjourney();
+            return new MidjourneyApi(url, apiKey, properties.getNotifyUrl());
+        });
+    }
+
+    @Override
+    public SunoApi getOrCreateSunoApi(String apiKey, String url) {
+        String cacheKey = buildClientCacheKey(SunoApi.class, AiPlatformEnum.SUNO.getPlatform(), apiKey, url);
+        return Singleton.get(cacheKey, (Func0<SunoApi>) () -> new SunoApi(url));
     }
 
     private static String buildClientCacheKey(Class<?> clazz, Object... params) {
@@ -121,30 +145,31 @@ public class AiClientFactoryImpl implements AiClientFactory {
     /**
      * 可参考 {@link OpenAiAutoConfiguration}
      */
-    private static OpenAiChatClient buildOpenAiChatClient(String openAiToken, String url) {
+    private static OpenAiChatModel buildOpenAiChatClient(String openAiToken, String url) {
         url = StrUtil.blankToDefault(url, ApiUtils.DEFAULT_BASE_URL);
         OpenAiApi openAiApi = new OpenAiApi(url, openAiToken);
-        return new OpenAiChatClient(openAiApi);
+        return new OpenAiChatModel(openAiApi);
     }
 
     /**
      * 可参考 {@link OllamaAutoConfiguration}
      */
-    private static OllamaChatClient buildOllamaChatClient(String url) {
+    private static OllamaChatModel buildOllamaChatClient(String url) {
         OllamaApi ollamaApi = new OllamaApi(url);
-        return new OllamaChatClient(ollamaApi);
+        return new OllamaChatModel(ollamaApi);
     }
 
     /**
-     * 可参考 {@link YudaoAiAutoConfiguration#yiYanChatClient(YudaoAiProperties)}
+     * 可参考 {@link QianFanAutoConfiguration#qianFanChatModel(QianFanConnectionProperties, QianFanChatProperties, RestClient.Builder, RetryTemplate, ResponseErrorHandler)}
      */
-    private static YiYanChatClient buildYiYanChatClient(String key) {
+    private static QianFanChatModel buildYiYanChatClient(String key) {
+        // TODO 芋艿：貌似目前设置，request 势必会报错
         List<String> keys = StrUtil.split(key, '|');
         Assert.equals(keys.size(), 2, "YiYanChatClient 的密钥需要 (appKey|secretKey) 格式");
         String appKey = keys.get(0);
         String secretKey = keys.get(1);
-        YiYanApi yiYanApi = new YiYanApi(appKey, secretKey, YiYanApi.DEFAULT_CHAT_MODEL, 0);
-        return new YiYanChatClient(yiYanApi);
+        QianFanApi qianFanApi = new QianFanApi(appKey, secretKey);
+        return new QianFanChatModel(qianFanApi);
     }
 
     /**
@@ -161,11 +186,16 @@ public class AiClientFactoryImpl implements AiClientFactory {
     }
 
     /**
-     * 可参考 {@link YudaoAiAutoConfiguration#qianWenChatClient(YudaoAiProperties)}
+     * 可参考 {@link TongYiAutoConfiguration#tongYiChatClient(Generation, TongYiChatProperties, TongYiConnectionProperties)}
      */
-    private static QianWenChatClient buildQianWenChatClient(String key) {
-        QianWenApi qianWenApi = new QianWenApi(key, QianWenChatModal.QWEN_72B_CHAT);
-        return new QianWenChatClient(qianWenApi);
+    private static TongYiChatModel buildQianWenChatClient(String key) {
+        com.alibaba.dashscope.aigc.generation.Generation generation = SpringUtil.getBean(Generation.class);
+        TongYiChatProperties chatOptions = SpringUtil.getBean(TongYiChatProperties.class);
+        // TODO @芋艿：貌似 apiKey 是全局唯一的？？？得测试下
+        // TODO @芋艿：貌似阿里云不是增量返回的
+        TongYiConnectionProperties connectionProperties = new TongYiConnectionProperties();
+        connectionProperties.setApiKey(key);
+        return new TongYiAutoConfiguration().tongYiChatClient(generation, chatOptions, connectionProperties);
     }
 
 //    private static VertexAiGeminiChatClient buildGoogleGemir(String key) {
@@ -175,16 +205,16 @@ public class AiClientFactoryImpl implements AiClientFactory {
 //        return new VertexAiGeminiChatClient(vertexApi);
 //    }
 
-    private ImageClient buildOpenAiImageClient(String openAiToken, String url) {
+    private OpenAiImageModel buildOpenAiImageClient(String openAiToken, String url) {
         url = StrUtil.blankToDefault(url, ApiUtils.DEFAULT_BASE_URL);
         OpenAiImageApi openAiApi = new OpenAiImageApi(url, openAiToken, RestClient.builder());
-        return new OpenAiImageClient(openAiApi);
+        return new OpenAiImageModel(openAiApi);
     }
 
-    private ImageClient buildStabilityAiImageClient(String apiKey, String url) {
+    private StabilityAiImageModel buildStabilityAiImageClient(String apiKey, String url) {
         url = StrUtil.blankToDefault(url, StabilityAiApi.DEFAULT_BASE_URL);
         StabilityAiApi stabilityAiApi = new StabilityAiApi(apiKey, StabilityAiApi.DEFAULT_IMAGE_MODEL, url);
-        return new StabilityAiImageClient(stabilityAiApi);
+        return new StabilityAiImageModel(stabilityAiApi);
     }
 
 }

@@ -31,8 +31,7 @@ public class AiMidjourneyImagineReqVO {
     @NotEmpty(message = "版本号不能为空")
     private String version;
 
-    // TODO @fan：参考图，建议用 referImageUrl。
-    @Schema(description = "垫图(参考图)base64数组")
-    private List<String> base64Array;
+    @Schema(description = "参考图")
+    private String referImageUrl;
 
 }

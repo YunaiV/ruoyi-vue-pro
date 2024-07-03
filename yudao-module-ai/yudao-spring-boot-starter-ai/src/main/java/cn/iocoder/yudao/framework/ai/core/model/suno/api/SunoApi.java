@@ -117,7 +117,7 @@ public class SunoApi {
      * @param prompt           用于生成音乐音频的提示
      * @param tags             音乐风格
      * @param title            音乐名称
-     * @param mv               模型
+     * @param model            模型
      * @param waitAudio        false 表示后台模式，仅返回音频任务信息，需要调用 get API 获取详细的音频信息。
      *                         true 表示同步模式，API 最多等待 100s，音频生成完毕后直接返回音频链接等信息，建议在 GPT 等 agent 中使用。
      * @param makeInstrumental 指示音乐音频是否为定制，如果为 true，则从歌词生成，否则从提示生成
@@ -127,7 +127,7 @@ public class SunoApi {
             String prompt,
             String tags,
             String title,
-            String mv,
+            String model,
             @JsonProperty("wait_audio") boolean waitAudio,
             @JsonProperty("make_instrumental") boolean makeInstrumental
     ) {
@@ -136,12 +136,12 @@ public class SunoApi {
             this(prompt, null, null, null, false, false);
         }
 
-        public MusicGenerateRequest(String prompt, String mv, boolean makeInstrumental) {
-            this(prompt, null, null, mv, false, makeInstrumental);
+        public MusicGenerateRequest(String prompt, String model, boolean makeInstrumental) {
+            this(prompt, null, null, model, false, makeInstrumental);
         }
 
-        public MusicGenerateRequest(String prompt, String mv, String tags, String title) {
-            this(prompt, tags, title, mv, false, false);
+        public MusicGenerateRequest(String prompt, String model, String tags, String title) {
+            this(prompt, tags, title, model, false, false);
         }
 
     }
@@ -162,6 +162,7 @@ public class SunoApi {
      * @param prompt               生成音乐音频的提示
      * @param type                 操作类型
      * @param tags                 音乐类型标签
+     * @param duration             音乐时长
      */
     public record MusicData(
             String id,
@@ -174,9 +175,11 @@ public class SunoApi {
             @JsonProperty("model_name") String modelName,
             String status,
             @JsonProperty("gpt_description_prompt") String gptDescriptionPrompt,
+            @JsonProperty("error_message") String errorMessage,
             String prompt,
             String type,
-            String tags
+            String tags,
+            Double duration
     ) {
     }
 

@@ -5,11 +5,13 @@ import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.ai.controller.admin.image.vo.AiImageDrawReqVO;
 import cn.iocoder.yudao.module.ai.controller.admin.image.vo.AiImagePageReqVO;
-import cn.iocoder.yudao.module.ai.controller.admin.image.vo.AiImageUpdatePublicStatusReqVO;
+import cn.iocoder.yudao.module.ai.controller.admin.image.vo.AiImageUpdateReqVO;
 import cn.iocoder.yudao.module.ai.controller.admin.image.vo.midjourney.AiMidjourneyActionReqVO;
 import cn.iocoder.yudao.module.ai.controller.admin.image.vo.midjourney.AiMidjourneyImagineReqVO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.image.AiImageDO;
 import jakarta.validation.Valid;
+
+import java.util.List;
 
 /**
  * AI 绘图 Service 接口
@@ -34,6 +36,14 @@ public interface AiImageService {
      * @return 绘图记录
      */
     AiImageDO getImage(Long id);
+
+    /**
+     * 获得绘图列表
+     *
+     * @param ids 绘图编号数组
+     * @return 绘图记录列表
+     */
+    List<AiImageDO> getImageList(List<Long> ids);
 
     /**
      * 绘制图片
@@ -61,11 +71,11 @@ public interface AiImageService {
     PageResult<AiImageDO> getImagePage(AiImagePageReqVO pageReqVO);
 
     /**
-     * 更新绘画发布状态
+     * 更新绘画
      *
      * @param updateReqVO 更新信息
      */
-    void updateImagePublicStatus(@Valid AiImageUpdatePublicStatusReqVO updateReqVO);
+    void updateImage(@Valid AiImageUpdateReqVO updateReqVO);
 
     /**
      * 删除绘画

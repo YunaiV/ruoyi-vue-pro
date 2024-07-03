@@ -2,7 +2,6 @@ package cn.iocoder.yudao.framework.ai.config;
 
 import cn.iocoder.yudao.framework.ai.core.enums.AiPlatformEnum;
 import cn.iocoder.yudao.framework.ai.core.model.xinghuo.XingHuoChatModel;
-import cn.iocoder.yudao.framework.ai.core.model.yiyan.api.YiYanChatModel;
 import lombok.Data;
 import lombok.experimental.Accessors;
 import org.springframework.ai.autoconfigure.openai.OpenAiImageProperties;
@@ -20,9 +19,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @ConfigurationProperties(prefix = "yudao.ai")
 public class YudaoAiProperties {
 
-    private QianWenProperties qianwen;
     private XingHuoProperties xinghuo;
-    private YiYanProperties yiyan;
     private OpenAiImageProperties openAiImage;
     private MidjourneyProperties midjourney;
     private SunoProperties suno;
@@ -47,22 +44,6 @@ public class YudaoAiProperties {
     }
 
     @Data
-    @Accessors(chain = true)
-    public static class QianWenProperties extends ChatProperties {
-
-        /**
-         * api key
-         */
-        private String apiKey;
-        /**
-         * model
-         */
-        private YiYanChatModel model;
-
-    }
-
-    @Data
-    @Accessors(chain = true)
     public static class XingHuoProperties extends ChatProperties {
 
         private String appId;
@@ -70,28 +51,6 @@ public class YudaoAiProperties {
         private String secretKey;
         private XingHuoChatModel model;
 
-    }
-
-    @Data
-    @Accessors(chain = true)
-    public static class YiYanProperties extends ChatProperties {
-
-        /**
-         * appKey
-         */
-        private String appKey;
-        /**
-         * secretKey
-         */
-        private String secretKey;
-        /**
-         * 模型
-         */
-        private YiYanChatModel model = YiYanChatModel.ERNIE4_3_5_8K;
-        /**
-         * token 刷新时间(默认 86400 = 24小时)
-         */
-        private int refreshTokenSecondTime = 86400;
     }
 
     @Data

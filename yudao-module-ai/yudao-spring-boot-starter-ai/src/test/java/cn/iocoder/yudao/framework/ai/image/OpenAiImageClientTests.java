@@ -4,7 +4,7 @@ import org.springframework.ai.image.ImagePrompt;
 import org.springframework.ai.image.ImageResponse;
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.ai.openai.OpenAiImageClient;
+import org.springframework.ai.openai.OpenAiImageModel;
 import org.springframework.ai.openai.api.OpenAiImageApi;
 
 import javax.imageio.ImageIO;
@@ -23,12 +23,12 @@ import java.util.Scanner;
 public class OpenAiImageClientTests {
 
 
-    private OpenAiImageClient openAiImageClient;
+    private OpenAiImageModel openAiImageClient;
 
     @Before
     public void setup() {
         // 初始化 openAiImageClient
-        this.openAiImageClient = new OpenAiImageClient(
+        this.openAiImageClient = new OpenAiImageModel(
                 new OpenAiImageApi("")
 //                new OpenAiImageOptions().setResponseFormat(OpenAiImageOptions.ResponseFormatEnum.URL.getValue()) TODO 芋艿：临时处理
         );

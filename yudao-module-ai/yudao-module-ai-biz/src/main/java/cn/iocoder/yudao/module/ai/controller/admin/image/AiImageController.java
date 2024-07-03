@@ -9,7 +9,7 @@ import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.ai.controller.admin.image.vo.AiImageDrawReqVO;
 import cn.iocoder.yudao.module.ai.controller.admin.image.vo.AiImagePageReqVO;
 import cn.iocoder.yudao.module.ai.controller.admin.image.vo.AiImageRespVO;
-import cn.iocoder.yudao.module.ai.controller.admin.image.vo.AiImageUpdatePublicStatusReqVO;
+import cn.iocoder.yudao.module.ai.controller.admin.image.vo.AiImageUpdateReqVO;
 import cn.iocoder.yudao.module.ai.controller.admin.image.vo.midjourney.AiMidjourneyActionReqVO;
 import cn.iocoder.yudao.module.ai.controller.admin.image.vo.midjourney.AiMidjourneyImagineReqVO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.image.AiImageDO;
@@ -25,6 +25,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
 
@@ -37,21 +39,31 @@ public class AiImageController {
     @Resource
     private AiImageService imageService;
 
-    @Operation(summary = "获取【我的】绘图分页")
     @GetMapping("/my-page")
+    @Operation(summary = "获取【我的】绘图分页")
     public CommonResult<PageResult<AiImageRespVO>> getImagePageMy(@Validated PageParam pageReqVO) {
         PageResult<AiImageDO> pageResult = imageService.getImagePageMy(getLoginUserId(), pageReqVO);
         return success(BeanUtils.toBean(pageResult, AiImageRespVO.class));
     }
 
-    @Operation(summary = "获取【我的】绘图记录")
     @GetMapping("/get-my")
+    @Operation(summary = "获取【我的】绘图记录")
+    @Parameter(name = "id", required = true, description = "绘画编号", example = "1024")
     public CommonResult<AiImageRespVO> getImageMy(@RequestParam("id") Long id) {
         AiImageDO image = imageService.getImage(id);
         if (image == null || ObjUtil.notEqual(getLoginUserId(), image.getUserId())) {
             return success(null);
         }
         return success(BeanUtils.toBean(image, AiImageRespVO.class));
+    }
+
+    @GetMapping("/my-list-by-ids")
+    @Operation(summary = "获取【我的】绘图记录列表")
+    @Parameter(name = "ids", required = true, description = "绘画编号数组", example = "1024,2048")
+    public CommonResult<List<AiImageRespVO>> getImageListMyByIds(@RequestParam("ids") List<Long> ids) {
+        List<AiImageDO> imageList = imageService.getImageList(ids);
+        imageList.removeIf(item -> !ObjUtil.equal(getLoginUserId(), item.getUserId()));
+        return success(BeanUtils.toBean(imageList, AiImageRespVO.class));
     }
 
     @Operation(summary = "生成图片")
@@ -102,11 +114,11 @@ public class AiImageController {
         return success(BeanUtils.toBean(pageResult, AiImageRespVO.class));
     }
 
-    @PutMapping("/update-public-status")
-    @Operation(summary = "更新绘画发布状态")
+    @PutMapping("/update")
+    @Operation(summary = "更新绘画")
     @PreAuthorize("@ss.hasPermission('ai:image:update')")
-    public CommonResult<Boolean> updateImagePublicStatus(@Valid @RequestBody AiImageUpdatePublicStatusReqVO updateReqVO) {
-        imageService.updateImagePublicStatus(updateReqVO);
+    public CommonResult<Boolean> updateImage(@Valid @RequestBody AiImageUpdateReqVO updateReqVO) {
+        imageService.updateImage(updateReqVO);
         return success(true);
     }
 

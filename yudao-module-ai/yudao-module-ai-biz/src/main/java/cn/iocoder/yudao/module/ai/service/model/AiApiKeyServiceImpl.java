@@ -2,6 +2,8 @@ package cn.iocoder.yudao.module.ai.service.model;
 
 import cn.iocoder.yudao.framework.ai.core.enums.AiPlatformEnum;
 import cn.iocoder.yudao.framework.ai.core.factory.AiClientFactory;
+import cn.iocoder.yudao.framework.ai.core.model.midjourney.api.MidjourneyApi;
+import cn.iocoder.yudao.framework.ai.core.model.suno.api.SunoApi;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
@@ -10,8 +12,8 @@ import cn.iocoder.yudao.module.ai.controller.admin.model.vo.apikey.AiApiKeySaveR
 import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiApiKeyDO;
 import cn.iocoder.yudao.module.ai.dal.mysql.model.AiApiKeyMapper;
 import jakarta.annotation.Resource;
-import org.springframework.ai.chat.StreamingChatClient;
-import org.springframework.ai.image.ImageClient;
+import org.springframework.ai.chat.model.StreamingChatModel;
+import org.springframework.ai.image.ImageModel;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
@@ -96,19 +98,40 @@ public class AiApiKeyServiceImpl implements AiApiKeyService {
     // ========== 与 spring-ai 集成 ==========
 
     @Override
-    public StreamingChatClient getStreamingChatClient(Long id) {
+    public StreamingChatModel getStreamingChatClient(Long id) {
         AiApiKeyDO apiKey = validateApiKey(id);
         AiPlatformEnum platform = AiPlatformEnum.validatePlatform(apiKey.getPlatform());
         return clientFactory.getOrCreateStreamingChatClient(platform, apiKey.getApiKey(), apiKey.getUrl());
     }
 
     @Override
-    public ImageClient getImageClient(AiPlatformEnum platform) {
+    public ImageModel getImageClient(AiPlatformEnum platform) {
         AiApiKeyDO apiKey = apiKeyMapper.selectFirstByPlatformAndStatus(platform.getName(), CommonStatusEnum.ENABLE.getStatus());
         if (apiKey == null) {
             return null;
         }
         return clientFactory.getOrCreateImageClient(platform, apiKey.getApiKey(), apiKey.getUrl());
+    }
+
+    @Override
+    public MidjourneyApi getMidjourneyApi() {
+        AiApiKeyDO apiKey = apiKeyMapper.selectFirstByPlatformAndStatus(
+                AiPlatformEnum.MIDJOURNEY.getPlatform(), CommonStatusEnum.ENABLE.getStatus());
+        // todo @芋艿 这些地方直接抛异常会好点，不然调用到的地方都需要做判断
+        if (apiKey == null) {
+            return null;
+        }
+        return clientFactory.getOrCreateMidjourneyApi(apiKey.getApiKey(), apiKey.getUrl());
+    }
+
+    @Override
+    public SunoApi getSunoApi() {
+        AiApiKeyDO apiKey = apiKeyMapper.selectFirstByPlatformAndStatus(
+                AiPlatformEnum.SUNO.getPlatform(), CommonStatusEnum.ENABLE.getStatus());
+        if (apiKey == null) {
+            return null;
+        }
+        return clientFactory.getOrCreateSunoApi(apiKey.getApiKey(), apiKey.getUrl());
     }
 
 }

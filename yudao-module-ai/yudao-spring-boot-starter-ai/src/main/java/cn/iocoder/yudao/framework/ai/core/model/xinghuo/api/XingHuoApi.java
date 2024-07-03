@@ -134,7 +134,7 @@ public class XingHuoApi {
         URI uri = URI.create(authUrl);
         // 发起 wss 请求并处理响应
         // 创建一个 Flux 来处理接收到的消息
-        Flux<XingHuoChatCompletion> messageFlux = Flux.create(sink -> {
+        return Flux.create(sink -> {
             socketClient.execute(uri, session ->
                             session.send(Mono.just(session.textMessage(JSONUtil.toJsonStr(request))))
                                     .thenMany(session.receive()
@@ -145,6 +145,5 @@ public class XingHuoApi {
                                     .then())
                     .subscribe(); // 订阅以开始会话
         });
-        return messageFlux;
     }
 }

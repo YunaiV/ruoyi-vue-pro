@@ -18,7 +18,7 @@ import java.util.List;
  *
  * @author xiaoxin
  */
-@TableName("ai_music")
+@TableName(value = "ai_music", autoResultMap = true)
 @Data
 public class AiMusicDO extends BaseDO {
 
@@ -30,7 +30,7 @@ public class AiMusicDO extends BaseDO {
 
     /**
      * 用户编号
-     *
+     * <p>
      * 关联 AdminUserDO 的 userId 字段
      */
     private Long userId;
@@ -67,7 +67,7 @@ public class AiMusicDO extends BaseDO {
 
     /**
      * 生成模式
-     *
+     * <p>
      * 枚举 {@link AiMusicGenerateModeEnum}
      */
     private Integer generateMode;
@@ -75,11 +75,7 @@ public class AiMusicDO extends BaseDO {
     /**
      * 描述词
      */
-    private String gptDescriptionPrompt;
-    /**
-     * 提示词
-     */
-    private String prompt;
+    private String description;
 
     /**
      * 平台
@@ -97,6 +93,16 @@ public class AiMusicDO extends BaseDO {
      */
     @TableField(typeHandler = JacksonTypeHandler.class)
     private List<String> tags;
+
+    /**
+     * 音乐时长
+     */
+    private Double duration;
+
+    /**
+     * 是否公开
+     */
+    private Boolean publicStatus;
 
     /**
      * 任务编号

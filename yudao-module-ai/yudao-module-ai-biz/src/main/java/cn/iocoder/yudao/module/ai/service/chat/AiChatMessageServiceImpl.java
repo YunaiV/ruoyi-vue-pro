@@ -4,10 +4,8 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.ai.core.enums.AiPlatformEnum;
-import cn.iocoder.yudao.framework.ai.core.model.tongyi.QianWenOptions;
 import cn.iocoder.yudao.framework.ai.core.model.xinghuo.XingHuoChatModel;
 import cn.iocoder.yudao.framework.ai.core.model.xinghuo.XingHuoOptions;
-import cn.iocoder.yudao.framework.ai.core.model.yiyan.YiYanChatOptions;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
@@ -24,15 +22,17 @@ import cn.iocoder.yudao.module.ai.enums.ErrorCodeConstants;
 import cn.iocoder.yudao.module.ai.service.model.AiApiKeyService;
 import cn.iocoder.yudao.module.ai.service.model.AiChatModelService;
 import cn.iocoder.yudao.module.ai.service.model.AiChatRoleService;
+import com.alibaba.cloud.ai.tongyi.chat.TongYiChatOptions;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.ai.chat.ChatResponse;
-import org.springframework.ai.chat.StreamingChatClient;
 import org.springframework.ai.chat.messages.*;
+import org.springframework.ai.chat.model.ChatResponse;
+import org.springframework.ai.chat.model.StreamingChatModel;
 import org.springframework.ai.chat.prompt.ChatOptions;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.ollama.api.OllamaOptions;
 import org.springframework.ai.openai.OpenAiChatOptions;
+import org.springframework.ai.qianfan.QianFanChatOptions;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Flux;
@@ -44,8 +44,8 @@ import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionU
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.error;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
-import static cn.iocoder.yudao.module.ai.enums.ErrorCodeConstants.AI_CHAT_MESSAGE_NOT_EXIST;
 import static cn.iocoder.yudao.module.ai.enums.ErrorCodeConstants.CHAT_CONVERSATION_NOT_EXISTS;
+import static cn.iocoder.yudao.module.ai.enums.ErrorCodeConstants.CHAT_MESSAGE_NOT_EXIST;
 
 /**
  * AI 聊天消息 Service 实现类
@@ -117,7 +117,7 @@ public class AiChatMessageServiceImpl implements AiChatMessageService {
         List<AiChatMessageDO> historyMessages = chatMessageMapper.selectListByConversationId(conversation.getId());
         // 1.2 校验模型
         AiChatModelDO model = chatModalService.validateChatModel(conversation.getModelId());
-        StreamingChatClient chatClient = apiKeyService.getStreamingChatClient(model.getKeyId());
+        StreamingChatModel chatClient = apiKeyService.getStreamingChatClient(model.getKeyId());
         // 1.3 获取用户头像、角色头像
         AiChatRoleDO role = conversation.getRoleId() != null ? chatRoleService.getChatRole(conversation.getRoleId()) : null;
 
@@ -150,7 +150,7 @@ public class AiChatMessageServiceImpl implements AiChatMessageService {
             log.error("[sendChatMessageStream][userId({}) sendReqVO({}) 发生异常]", userId, sendReqVO, throwable);
             chatMessageMapper.updateById(new AiChatMessageDO().setId(assistantMessage.getId()).setContent(throwable.getMessage()));
         }).onErrorResume(error -> {
-            return Flux.just(error(ErrorCodeConstants.AI_CHAT_STREAM_ERROR));
+            return Flux.just(error(ErrorCodeConstants.CHAT_STREAM_ERROR));
         });
     }
 
@@ -164,7 +164,14 @@ public class AiChatMessageServiceImpl implements AiChatMessageService {
         }
         // 1.2 history message 历史消息
         List<AiChatMessageDO> contextMessages = filterContextMessages(messages, conversation, sendReqVO);
-        contextMessages.forEach(message -> chatMessages.add(new ChatMessage(message.getType().toUpperCase(), message.getContent())));
+        contextMessages.forEach(message -> {
+            // TODO @芋艿：看看有没优化空间
+            if (MessageType.USER.getValue().equals(message.getType())) {
+                chatMessages.add(new UserMessage(message.getContent()));
+            } else {
+                chatMessages.add(new AssistantMessage(message.getContent()));
+            }
+        });
         // 1.3 user message 新发送消息
         chatMessages.add(new UserMessage(sendReqVO.getContent()));
 
@@ -184,14 +191,14 @@ public class AiChatMessageServiceImpl implements AiChatMessageService {
             case OLLAMA:
                 return OllamaOptions.create().withModel(model).withTemperature(temperatureF).withNumPredict(maxTokens);
             case YI_YAN:
-                // TODO @fan：增加一个 model
-                return new YiYanChatOptions().setTemperature(temperatureF).setMaxOutputTokens(maxTokens);
+                // TODO 芋艿：貌似 model 只要一设置，就报错
+//                return QianFanChatOptions.builder().withModel(model).withTemperature(temperatureF).withMaxTokens(maxTokens).build();
+                return QianFanChatOptions.builder().withTemperature(temperatureF).withMaxTokens(maxTokens).build();
             case XING_HUO:
                 return new XingHuoOptions().setChatModel(XingHuoChatModel.valueOfModel(model)).setTemperature(temperatureF)
                         .setMaxTokens(maxTokens);
             case QIAN_WEN:
-                // TODO @fan:增加 model、temperature 参数
-                return new QianWenOptions().setMaxTokens(maxTokens);
+                return TongYiChatOptions.builder().withModel(model).withTemperature(temperature).withMaxTokens(maxTokens).build();
             default:
                 throw new IllegalArgumentException(StrUtil.format("未知平台({})", platform));
         }
@@ -257,7 +264,7 @@ public class AiChatMessageServiceImpl implements AiChatMessageService {
         // 1. 校验消息存在
         AiChatMessageDO message = chatMessageMapper.selectById(id);
         if (message == null || ObjUtil.notEqual(message.getUserId(), userId)) {
-            throw exception(AI_CHAT_MESSAGE_NOT_EXIST);
+            throw exception(CHAT_MESSAGE_NOT_EXIST);
         }
         // 2. 执行删除
         chatMessageMapper.deleteById(id);
@@ -268,7 +275,7 @@ public class AiChatMessageServiceImpl implements AiChatMessageService {
         // 1. 校验消息存在
         List<AiChatMessageDO> messages = chatMessageMapper.selectListByConversationId(conversationId);
         if (CollUtil.isEmpty(messages) || ObjUtil.notEqual(messages.get(0).getUserId(), userId)) {
-            throw exception(AI_CHAT_MESSAGE_NOT_EXIST);
+            throw exception(CHAT_MESSAGE_NOT_EXIST);
         }
         // 2. 执行删除
         chatMessageMapper.deleteBatchIds(convertList(messages, AiChatMessageDO::getId));
@@ -279,7 +286,7 @@ public class AiChatMessageServiceImpl implements AiChatMessageService {
         // 1. 校验消息存在
         AiChatMessageDO message = chatMessageMapper.selectById(id);
         if (message == null) {
-            throw exception(AI_CHAT_MESSAGE_NOT_EXIST);
+            throw exception(CHAT_MESSAGE_NOT_EXIST);
         }
         // 2. 执行删除
         chatMessageMapper.deleteById(id);

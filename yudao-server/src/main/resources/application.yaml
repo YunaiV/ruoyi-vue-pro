@@ -160,19 +160,16 @@ spring:
         gemini:
           project-id: 1 # TODO 芋艿：缺配置
           location: 2
+    qianfan: # 文心一言
+      api-key: x0cuLZ7XsaTCU08vuJWO87Lg
+      secret-key: R9mYF9dl9KASgi5RUq0FQt3wRisSnOcK
+  cloud:
+    ai:
+      tongyi: # 通义千问
+        tongyi:
+          api-key: sk-Zsd81gZYg7
 
 yudao.ai:
-  yiyan:
-    enable: true
-    aiPlatform: YI_YAN # TODO @fan：建议每个都独立配置属性类
-    max-tokens: 1500
-    temperature: 0.85
-    topP: 0.8
-    topK: 0
-    appKey: x0cuLZ7XsaTCU08vuJWO87Lg
-    secretKey: R9mYF9dl9KASgi5RUq0FQt3wRisSnOcK
-    refreshTokenSecondTime: 86400
-    model: ERNIE4_3_5_8K
   xinghuo:
     enable: true
     aiPlatform: XING_HUO # TODO @fan：建议每个都独立配置属性类
@@ -192,6 +189,7 @@ yudao.ai:
     topP: 0.8
     topK: 0
     api-key: sk-Zsd81gZYg7
+    model: QWEN_TURBO
   midjourney:
     enable: true
 #    base-url: https://api.holdai.top/mj-relax/mj
@@ -200,7 +198,8 @@ yudao.ai:
     notify-url: http://java.nat300.top/admin-api/ai/image/midjourney/notify
   suno:
     enable: true
-    base-url: https://suno-om0w1cy6e-status2xxs-projects.vercel.app
+#    base-url: https://suno-55ishh05u-status2xxs-projects.vercel.app
+    base-url: http://127.0.0.1:3001
 
 --- #################### 芋道相关配置 ####################
 
