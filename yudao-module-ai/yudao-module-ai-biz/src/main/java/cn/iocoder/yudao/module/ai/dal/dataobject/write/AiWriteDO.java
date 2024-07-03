@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.ai.dal.dataobject.write;
 
+import cn.iocoder.yudao.framework.ai.core.enums.AiPlatformEnum;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -35,6 +36,18 @@ public class AiWriteDO extends BaseDO {
     private Integer type;
 
     /**
+     * 模型
+     */
+    private String model;
+
+    /**
+     * 平台
+     *
+     * 枚举 {@link AiPlatformEnum}
+     */
+    private String platform;
+
+    /**
      * 生成内容提示
      */
     private String prompt;
@@ -68,16 +81,6 @@ public class AiWriteDO extends BaseDO {
      * 语言提示词
      */
     private Integer language;
-
-    /**
-     * 模型
-     */
-    private String model;
-
-    /**
-     * 平台
-     */
-    private String platform;
 
     /**
      * 错误信息

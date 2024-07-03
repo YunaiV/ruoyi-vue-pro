@@ -11,7 +11,6 @@ import reactor.core.publisher.Flux;
  */
 public interface AiWriteService {
 
-
     /**
      * 生成写作内容
      *
@@ -20,6 +19,5 @@ public interface AiWriteService {
      * @return 生成结果
      */
     Flux<CommonResult<String>> generateWriteContent(AiWriteGenerateReqVO generateReqVO, Long userId);
-
 
 }

@@ -6,6 +6,7 @@ import lombok.Getter;
 
 import java.util.Arrays;
 
+// TODO @xin：写作的几个，不用枚举类哈。直接搞字段就好了。AiWriteTypeEnum 还是需要的哈
 @AllArgsConstructor
 @Getter
 public enum AiLanguageEnum implements IntArrayValuable {

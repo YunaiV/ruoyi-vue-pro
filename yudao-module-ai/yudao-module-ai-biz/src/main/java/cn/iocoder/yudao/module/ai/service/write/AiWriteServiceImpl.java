@@ -46,23 +46,22 @@ public class AiWriteServiceImpl implements AiWriteService {
     @Resource
     private AiChatModelService chatModalService;
     @Resource
-    private AiWriteMapper writeMapper;
-
+    private AiWriteMapper writeMapper; // TODO @xin：上面空一行；因为同类之间不要空行，非同类空行；
 
     @Override
     public Flux<CommonResult<String>> generateWriteContent(AiWriteGenerateReqVO generateReqVO, Long userId) {
-        //TODO 芋艿 写作的模型配置放哪好 先用千问测试
         // 1.1 校验模型
+        // TODO @xin：可以约定大于配置先，查询某个名字。例如说，写作助手！然后写作助手，上面是有个 model 的，可以使用它。
         AiChatModelDO model = chatModalService.validateChatModel(14L);
         StreamingChatModel chatClient = apiKeyService.getStreamingChatClient(model.getKeyId());
         AiPlatformEnum platform = AiPlatformEnum.validatePlatform(model.getPlatform());
         ChatOptions chatOptions = buildChatOptions(platform, model.getModel(), model.getTemperature(), model.getMaxTokens());
 
-        //1.2 插入写作信息
+        // 1.2 插入写作信息
         AiWriteDO writeDO = BeanUtils.toBean(generateReqVO, AiWriteDO.class);
         writeMapper.insert(writeDO.setUserId(userId).setModel(model.getModel()).setPlatform(platform.getPlatform()));
 
-        //2.1 构建提示词
+        // 2.1 构建提示词
         Prompt prompt = new Prompt(buildWritingPrompt(generateReqVO), chatOptions);
         Flux<ChatResponse> streamResponse = chatClient.stream(prompt);
         // 2.2 流式返回
@@ -80,7 +79,6 @@ public class AiWriteServiceImpl implements AiWriteService {
             writeMapper.updateById(new AiWriteDO().setId(writeDO.getId()).setErrorMessage(throwable.getMessage()));
         }).onErrorResume(error -> Flux.just(error(ErrorCodeConstants.WRITE_STREAM_ERROR)));
     }
-
 
     private String buildWritingPrompt(AiWriteGenerateReqVO generateReqVO) {
         String template;

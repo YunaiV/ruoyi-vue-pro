@@ -33,7 +33,7 @@ public interface ErrorCodeConstants {
     // ========== API 聊天消息 1-040-004-000 ==========
 
     ErrorCode CHAT_MESSAGE_NOT_EXIST = new ErrorCode(1_040_004_000, "消息不存在!");
-    ErrorCode CHAT_STREAM_ERROR = new ErrorCode(1_040_004_001, "Stream 对话异常!");
+    ErrorCode CHAT_STREAM_ERROR = new ErrorCode(1_040_004_001, "对话生成异常!");
 
     // ========== API 绘画 1-040-005-000 ==========
 
@@ -48,6 +48,6 @@ public interface ErrorCodeConstants {
 
     // ========== API 写作 1-022-007-000 ==========
     ErrorCode WRITE_NOT_EXISTS = new ErrorCode(1_022_007_000, "作文不存在!");
-    ErrorCode WRITE_STREAM_ERROR = new ErrorCode(1_022_07_001, "Stream 对话异常!");
+    ErrorCode WRITE_STREAM_ERROR = new ErrorCode(1_022_07_001, "写作生成异常!");
 
 }

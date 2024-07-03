@@ -1,5 +1,7 @@
 package cn.iocoder.yudao.module.ai.controller.admin.write.vo;
 
+import cn.iocoder.yudao.framework.common.validation.InEnum;
+import cn.iocoder.yudao.module.ai.enums.write.AiWriteTypeEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
@@ -8,6 +10,11 @@ import lombok.Data;
 @Data
 public class AiWriteGenerateReqVO {
 
+    @Schema(description = "写作类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
+    @InEnum(AiWriteTypeEnum.class)
+    private Integer type;
+
+    // TODO @xin：如果非必填，可以不用写 requiredMode
     @Schema(description = "写作内容提示", requiredMode = Schema.RequiredMode.NOT_REQUIRED, example = "1.撰写：田忌赛马；2.回复：不批")
     private String prompt;
 
@@ -30,7 +37,4 @@ public class AiWriteGenerateReqVO {
     @NotNull(message = "语言不能为空")
     private Integer language;
 
-
-    @Schema(description = "写作类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
-    private Integer type; //参见 AiWriteTypeEnum 枚举
 }

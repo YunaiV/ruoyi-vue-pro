@@ -9,12 +9,17 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.openai.api.ApiUtils;
+import org.springframework.http.HttpRequest;
+import org.springframework.http.HttpStatusCode;
+import org.springframework.web.reactive.function.client.ClientResponse;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
+import java.util.function.Predicate;
 
 /**
  * Midjourney API
@@ -24,6 +29,16 @@ import java.util.Map;
  */
 @Slf4j
 public class MidjourneyApi {
+
+    private final Predicate<HttpStatusCode> STATUS_PREDICATE = status -> !status.is2xxSuccessful();
+
+    private final Function<Object, Function<ClientResponse, Mono<? extends Throwable>>> EXCEPTION_FUNCTION =
+            reqParam -> response -> response.bodyToMono(String.class).handle((responseBody, sink) -> {
+                HttpRequest request = response.request();
+                log.error("[midjourney-api] 调用失败！请求方式:[{}]，请求地址:[{}]，请求参数:[{}]，响应数据: [{}]",
+                        request.getMethod(), request.getURI(), reqParam, responseBody);
+                sink.error(new IllegalStateException("[midjourney-api] 调用失败！"));
+            });
 
     private final WebClient webClient;
 
@@ -80,17 +95,11 @@ public class MidjourneyApi {
     }
 
     private String post(String uri, Object body) {
-        // 1、发送 post 请求
         return webClient.post()
                 .uri(uri)
                 .body(Mono.just(JsonUtils.toJsonString(body)), String.class)
                 .retrieve()
-                .onStatus(status -> !status.is2xxSuccessful(),
-                        response -> response.bodyToMono(String.class)
-                                .handle((respBody, sink) -> {
-                                    log.error("【Midjourney api】调用失败！resp: 【{}】", respBody);
-                                    sink.error(new IllegalStateException("【Midjourney api】调用失败！"));
-                                }))
+                .onStatus(STATUS_PREDICATE, EXCEPTION_FUNCTION.apply(body))
                 .bodyToMono(String.class)
                 .block();
     }
