@@ -11,8 +11,6 @@ import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_
 
 @Schema(description = "管理后台 - AI API 密钥分页 Request VO")
 @Data
-@EqualsAndHashCode(callSuper = true)
-@ToString(callSuper = true)
 public class AiApiKeyPageReqVO extends PageParam {
 
     @Schema(description = "名称", example = "文心一言")

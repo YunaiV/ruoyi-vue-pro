@@ -5,8 +5,6 @@ import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
-import java.util.List;
-
 @Schema(description = "管理后台 - AI 绘画生成（Midjourney） Request VO")
 @Data
 public class AiMidjourneyImagineReqVO {
@@ -31,7 +29,7 @@ public class AiMidjourneyImagineReqVO {
     @NotEmpty(message = "版本号不能为空")
     private String version;
 
-    @Schema(description = "参考图")
+    @Schema(description = "参考图", example = "https://www.iocoder.cn/x.png")
     private String referImageUrl;
 
 }

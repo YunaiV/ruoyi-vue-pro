@@ -16,8 +16,6 @@ import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_
 
 @Schema(description = "管理后台 - AI 音乐分页 Request VO")
 @Data
-@EqualsAndHashCode(callSuper = true)
-@ToString(callSuper = true)
 public class AiMusicPageReqVO extends PageParam {
 
     @Schema(description = "用户编号", example = "12212")

@@ -75,7 +75,6 @@
         <jimureport.version>1.6.6-beta2</jimureport.version>
         <xercesImpl.version>2.12.2</xercesImpl.version>
         <weixin-java.version>4.6.0</weixin-java.version>
-        <ureport2.version>2.2.9</ureport2.version>
         <spring-ai-bom.version>0.8.0</spring-ai-bom.version>
     </properties>
 

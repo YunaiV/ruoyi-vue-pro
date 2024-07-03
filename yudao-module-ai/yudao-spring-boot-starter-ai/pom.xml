@@ -8,8 +8,9 @@
         <version>${revision}</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
-
     <artifactId>yudao-spring-boot-starter-ai</artifactId>
+    <packaging>jar</packaging>
+
     <name>${project.artifactId}</name>
     <description>AI 大模型拓展，接入国内外大模型</description>
     <properties>
@@ -58,6 +59,7 @@
             <version>2.14.0</version>
         </dependency>
 
+        <!-- Test 测试相关 -->
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>

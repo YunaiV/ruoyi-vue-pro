@@ -108,7 +108,7 @@ public class AiApiKeyServiceImpl implements AiApiKeyService {
     public ImageModel getImageClient(AiPlatformEnum platform) {
         AiApiKeyDO apiKey = apiKeyMapper.selectFirstByPlatformAndStatus(platform.getName(), CommonStatusEnum.ENABLE.getStatus());
         if (apiKey == null) {
-            return null;
+            throw exception(API_KEY_IMAGE_NODE_FOUND, platform.getName());
         }
         return clientFactory.getOrCreateImageClient(platform, apiKey.getApiKey(), apiKey.getUrl());
     }
@@ -117,9 +117,8 @@ public class AiApiKeyServiceImpl implements AiApiKeyService {
     public MidjourneyApi getMidjourneyApi() {
         AiApiKeyDO apiKey = apiKeyMapper.selectFirstByPlatformAndStatus(
                 AiPlatformEnum.MIDJOURNEY.getPlatform(), CommonStatusEnum.ENABLE.getStatus());
-        // todo @芋艿 这些地方直接抛异常会好点，不然调用到的地方都需要做判断
         if (apiKey == null) {
-            return null;
+            throw exception(API_KEY_MIDJOURNEY_NOT_FOUND);
         }
         return clientFactory.getOrCreateMidjourneyApi(apiKey.getApiKey(), apiKey.getUrl());
     }
@@ -129,7 +128,7 @@ public class AiApiKeyServiceImpl implements AiApiKeyService {
         AiApiKeyDO apiKey = apiKeyMapper.selectFirstByPlatformAndStatus(
                 AiPlatformEnum.SUNO.getPlatform(), CommonStatusEnum.ENABLE.getStatus());
         if (apiKey == null) {
-            return null;
+            throw exception(API_KEY_SUNO_NOT_FOUND);
         }
         return clientFactory.getOrCreateSunoApi(apiKey.getApiKey(), apiKey.getUrl());
     }

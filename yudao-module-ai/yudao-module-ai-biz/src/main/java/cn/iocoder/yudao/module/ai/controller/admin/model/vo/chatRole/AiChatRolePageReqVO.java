@@ -6,8 +6,6 @@ import cn.iocoder.yudao.framework.common.pojo.PageParam;
 
 @Schema(description = "管理后台 - AI 聊天角色分页 Request VO")
 @Data
-@EqualsAndHashCode(callSuper = true)
-@ToString(callSuper = true)
 public class AiChatRolePageReqVO extends PageParam {
 
     @Schema(description = "角色名称", example = "李四")

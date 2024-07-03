@@ -2,21 +2,21 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>cn.iocoder.boot</groupId>
         <artifactId>yudao-module-ai</artifactId>
         <version>${revision}</version>
     </parent>
-
+    <modelVersion>4.0.0</modelVersion>
     <artifactId>yudao-module-ai-biz</artifactId>
 
-    <properties>
-        <maven.compiler.source>8</maven.compiler.source>
-        <maven.compiler.target>8</maven.compiler.target>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    </properties>
-
+    <name>${project.artifactId}</name>
+    <description>
+        ai 模块下，接入 LLM 大模型，支持聊天、绘图、音乐、写作、思维脑图等功能。
+        目前已接入各种模型，不限于：
+        国内：通义千问、文心一言、讯飞星火
+        国外：OpenAI、Ollama、Midjourney、StableDiffusion、Suno
+    </description>
 
     <dependencies>
         <dependency>
@@ -24,44 +24,36 @@
             <artifactId>yudao-module-ai-api</artifactId>
             <version>${revision}</version>
         </dependency>
+
+        <!-- 业务组件 -->
         <dependency>
             <groupId>cn.iocoder.boot</groupId>
             <artifactId>yudao-spring-boot-starter-ai</artifactId>
             <version>${revision}</version>
         </dependency>
-        <!--  yudao framwork  -->
-        <dependency>
-            <groupId>cn.iocoder.boot</groupId>
-            <artifactId>yudao-common</artifactId>
-        </dependency>
+
+        <!-- Web 相关 -->
         <dependency>
             <groupId>cn.iocoder.boot</groupId>
             <artifactId>yudao-spring-boot-starter-security</artifactId>
         </dependency>
+
+        <!-- DB 相关 -->
         <dependency>
             <groupId>cn.iocoder.boot</groupId>
             <artifactId>yudao-spring-boot-starter-mybatis</artifactId>
         </dependency>
-        <!--  测试  -->
-        <dependency>
-            <groupId>cn.iocoder.boot</groupId>
-            <artifactId>yudao-spring-boot-starter-test</artifactId>
-        </dependency>
+
+        <!-- Job 相关 -->
         <dependency>
             <groupId>cn.iocoder.boot</groupId>
             <artifactId>yudao-spring-boot-starter-job</artifactId>
         </dependency>
+
+        <!-- Test 测试相关 -->
+        <dependency>
+            <groupId>cn.iocoder.boot</groupId>
+            <artifactId>yudao-spring-boot-starter-test</artifactId>
+        </dependency>
     </dependencies>
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <source>17</source>
-                    <target>17</target>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
 </project>
