@@ -42,7 +42,7 @@ public interface AiMusicService {
      *
      * @param updateReqVO 更新信息
      */
-    void updateMyMusic(@Valid AiMusicUpdateReqVO updateReqVO, Long userId);
+    void updateMyMusic(@Valid AiMusicUpdateMyReqVO updateReqVO, Long userId);
 
     /**
      * 删除AI 音乐
