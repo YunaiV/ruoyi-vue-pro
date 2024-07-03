@@ -12,7 +12,14 @@ import reactor.core.publisher.Flux;
 public interface AiWriteService {
 
 
-    Flux<CommonResult<String>> generateComposition(AiWriteGenerateReqVO generateReqVO);
+    /**
+     * 生成写作内容
+     *
+     * @param generateReqVO 作文生成请求参数
+     * @param userId        用户编号
+     * @return 生成结果
+     */
+    Flux<CommonResult<String>> generateWriteContent(AiWriteGenerateReqVO generateReqVO, Long userId);
 
 
 }

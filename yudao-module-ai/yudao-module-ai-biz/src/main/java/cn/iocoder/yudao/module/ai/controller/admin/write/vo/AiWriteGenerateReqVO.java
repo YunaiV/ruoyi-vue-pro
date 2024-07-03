@@ -8,14 +8,14 @@ import lombok.Data;
 @Data
 public class AiWriteGenerateReqVO {
 
-    @Schema(description = "写作内容", requiredMode = Schema.RequiredMode.NOT_REQUIRED, example = "田忌赛马")
-    private String content;
+    @Schema(description = "写作内容提示", requiredMode = Schema.RequiredMode.NOT_REQUIRED, example = "田忌赛马")
+    private String contentPrompt;
 
     @Schema(description = "原文", requiredMode = Schema.RequiredMode.NOT_REQUIRED, example = "领导我要辞职")
     private String originalContent;
 
     @Schema(description = "回复内容", requiredMode = Schema.RequiredMode.NOT_REQUIRED, example = "准了")
-    private String replyContent;
+    private String replyContentPrompt;
 
     @Schema(description = "长度", requiredMode = Schema.RequiredMode.REQUIRED, example = "中等")
     @NotBlank(message = "长度不能为空")
@@ -35,5 +35,5 @@ public class AiWriteGenerateReqVO {
 
 
     @Schema(description = "写作类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
-    private Integer writeType;
+    private Integer writeType; //参见 AiWriteTypeEnum 枚举
 }

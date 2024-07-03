@@ -15,6 +15,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Flux;
 
+import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
+
 @Tag(name = "管理后台 - AI 写作")
 @RestController
 @RequestMapping("/ai/write")
@@ -27,6 +29,6 @@ public class AiWriteController {
     @PermitAll
     @Operation(summary = "写作生成（流式）", description = "流式返回，响应较快")
     public Flux<CommonResult<String>> generateComposition(@RequestBody @Valid AiWriteGenerateReqVO generateReqVO) {
-        return writeService.generateComposition(generateReqVO);
+        return writeService.generateWriteContent(generateReqVO, getLoginUserId());
     }
 }
