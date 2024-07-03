@@ -15,8 +15,8 @@ import java.util.Arrays;
 @Getter
 public enum AiWriteTypeEnum implements IntArrayValuable {
 
-    DESCRIPTION(1, "撰写"),
-    LYRIC(2, "回复");
+    WRITING(1, "撰写"),
+    REPLY(2, "回复");
 
     /**
      * 类型

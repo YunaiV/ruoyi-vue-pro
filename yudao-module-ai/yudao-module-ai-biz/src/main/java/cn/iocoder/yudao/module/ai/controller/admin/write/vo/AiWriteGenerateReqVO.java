@@ -14,9 +14,6 @@ public class AiWriteGenerateReqVO {
     @Schema(description = "原文", requiredMode = Schema.RequiredMode.NOT_REQUIRED, example = "领导我要辞职")
     private String originalContent;
 
-    @Schema(description = "回复内容", requiredMode = Schema.RequiredMode.NOT_REQUIRED, example = "准了")
-    private String replyContentPrompt;
-
     @Schema(description = "长度", requiredMode = Schema.RequiredMode.REQUIRED, example = "中等")
     @NotBlank(message = "长度不能为空")
     private String length;

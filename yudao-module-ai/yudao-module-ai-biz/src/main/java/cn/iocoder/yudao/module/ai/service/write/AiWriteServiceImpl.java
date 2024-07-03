@@ -11,6 +11,7 @@ import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiChatModelDO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.write.AiWriteDO;
 import cn.iocoder.yudao.module.ai.dal.mysql.write.AiWriteMapper;
 import cn.iocoder.yudao.module.ai.enums.ErrorCodeConstants;
+import cn.iocoder.yudao.module.ai.enums.write.AiWriteTypeEnum;
 import cn.iocoder.yudao.module.ai.service.model.AiApiKeyService;
 import cn.iocoder.yudao.module.ai.service.model.AiChatModelService;
 import com.alibaba.cloud.ai.tongyi.chat.TongYiChatOptions;
@@ -25,6 +26,8 @@ import org.springframework.ai.openai.OpenAiChatOptions;
 import org.springframework.ai.qianfan.QianFanChatOptions;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
+
+import java.util.Objects;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.error;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
@@ -80,13 +83,21 @@ public class AiWriteServiceImpl implements AiWriteService {
 
 
     private String buildWritingPrompt(AiWriteGenerateReqVO generateReqVO) {
-        String template = "请直接写一篇关于 [{}] 的文章，格式为：{}，语气为：{}，语言为：{}，长度为：{}。请确保涵盖主要内容，不需要除了正文内容外的其他回复，如标题、额外的解释或道歉。";
-        String content = generateReqVO.getContentPrompt();
+        String template;
+        Integer writeType = generateReqVO.getWriteType();
         String format = generateReqVO.getFormat();
         String tone = generateReqVO.getTone();
         String language = generateReqVO.getLanguage();
         String length = generateReqVO.getLength();
-        return StrUtil.format(template, content, format, tone, language, length);
+        if (Objects.equals(writeType, AiWriteTypeEnum.WRITING.getType())) {
+            template = "请撰写一篇关于 [{}] 的文章。文章的内容格式为：[{}]，语气为：[{}]，语言为：[{}]，长度为：[{}]。请确保涵盖主要内容，不需要除了正文内容外的其他回复，如标题、额外的解释或道歉。";
+            return StrUtil.format(template, generateReqVO.getContentPrompt(), format, tone, language, length);
+        } else if (Objects.equals(writeType, AiWriteTypeEnum.REPLY.getType())) {
+            template = "请针对如下内容：[{}] 做个回复。回复内容参考：[{}], 回复的内容格式为：[{}]，语气为：[{}]，语言为：[{}]，长度为：[{}]。不需要除了正文内容外的其他回复，如标题、额外的解释或道歉。";
+            return StrUtil.format(template, generateReqVO.getOriginalContent(), generateReqVO.getContentPrompt(), format, tone, language, length);
+        } else {
+            throw new IllegalArgumentException(StrUtil.format("未知写作类型({})", writeType));
+        }
     }
 
     // TODO 芋艿：复用

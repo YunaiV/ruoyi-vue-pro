@@ -35,12 +35,12 @@ public class AiWriteDO extends BaseDO {
     private Integer writeType;
 
     /**
-     * 撰写内容提示
+     * 生成内容提示
      */
     private String contentPrompt;
 
     /**
-     * 生成的撰写内容
+     * 生成的内容
      */
     private String generatedContent;
 
@@ -48,16 +48,6 @@ public class AiWriteDO extends BaseDO {
      * 原文
      */
     private String originalContent;
-
-    /**
-     * 回复内容提示
-     */
-    private String replyContentPrompt;
-
-    /**
-     * 生成的回复内容
-     */
-    private String generatedReplyContent;
 
     /**
      * 长度提示词
