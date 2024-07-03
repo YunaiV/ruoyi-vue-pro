@@ -63,7 +63,7 @@ public class AiMusicController {
     @PostMapping("/update-my")
     @Operation(summary = "修改【我的】音乐 目前只支持修改标题")
     @Parameter(name = "title", required = true, description = "音乐名称", example = "夜空中最亮的星")
-    public CommonResult<Boolean> updateMy(AiMusicUpdateReqVO updateReqVO) {
+    public CommonResult<Boolean> updateMy(AiMusicUpdateMyReqVO updateReqVO) {
         musicService.updateMyMusic(updateReqVO, getLoginUserId());
         return success(true);
     }

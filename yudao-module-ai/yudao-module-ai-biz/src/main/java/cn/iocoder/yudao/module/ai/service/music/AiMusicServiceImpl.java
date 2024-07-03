@@ -9,6 +9,7 @@ import cn.hutool.http.HttpUtil;
 import cn.iocoder.yudao.framework.ai.core.model.suno.api.SunoApi;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.ai.controller.admin.music.vo.AiMusicPageReqVO;
+import cn.iocoder.yudao.module.ai.controller.admin.music.vo.AiMusicUpdateMyReqVO;
 import cn.iocoder.yudao.module.ai.controller.admin.music.vo.AiMusicUpdateReqVO;
 import cn.iocoder.yudao.module.ai.controller.admin.music.vo.AiSunoGenerateReqVO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.music.AiMusicDO;
@@ -111,7 +112,7 @@ public class AiMusicServiceImpl implements AiMusicService {
     }
 
     @Override
-    public void updateMyMusic(AiMusicUpdateReqVO updateReqVO, Long userId) {
+    public void updateMyMusic(AiMusicUpdateMyReqVO updateReqVO, Long userId) {
         // 校验音乐是否存在
         AiMusicDO musicDO = validateMusicExists(updateReqVO.getId());
         if (ObjUtil.notEqual(musicDO.getUserId(), userId)) {
