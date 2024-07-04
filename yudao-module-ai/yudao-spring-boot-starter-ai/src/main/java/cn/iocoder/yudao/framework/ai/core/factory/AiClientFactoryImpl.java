@@ -23,7 +23,7 @@ import org.springframework.ai.autoconfigure.openai.OpenAiAutoConfiguration;
 import org.springframework.ai.autoconfigure.qianfan.QianFanAutoConfiguration;
 import org.springframework.ai.autoconfigure.qianfan.QianFanChatProperties;
 import org.springframework.ai.autoconfigure.qianfan.QianFanConnectionProperties;
-import org.springframework.ai.chat.model.StreamingChatModel;
+import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.image.ImageModel;
 import org.springframework.ai.ollama.OllamaChatModel;
 import org.springframework.ai.ollama.api.OllamaApi;
@@ -50,9 +50,9 @@ import java.util.List;
 public class AiClientFactoryImpl implements AiClientFactory {
 
     @Override
-    public StreamingChatModel getOrCreateStreamingChatClient(AiPlatformEnum platform, String apiKey, String url) {
-        String cacheKey = buildClientCacheKey(StreamingChatModel.class, platform, apiKey, url);
-        return Singleton.get(cacheKey, (Func0<StreamingChatModel>) () -> {
+    public ChatModel getOrCreateChatClient(AiPlatformEnum platform, String apiKey, String url) {
+        String cacheKey = buildClientCacheKey(ChatModel.class, platform, apiKey, url);
+        return Singleton.get(cacheKey, (Func0<ChatModel>) () -> {
             //noinspection EnhancedSwitchMigration
             switch (platform) {
                 case OPENAI:
@@ -74,7 +74,7 @@ public class AiClientFactoryImpl implements AiClientFactory {
     }
 
     @Override
-    public StreamingChatModel getDefaultStreamingChatClient(AiPlatformEnum platform) {
+    public ChatModel getDefaultChatClient(AiPlatformEnum platform) {
         //noinspection EnhancedSwitchMigration
         switch (platform) {
             case OPENAI:

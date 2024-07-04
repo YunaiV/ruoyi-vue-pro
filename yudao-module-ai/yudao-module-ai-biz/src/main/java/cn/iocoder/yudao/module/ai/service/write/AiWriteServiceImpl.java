@@ -53,7 +53,7 @@ public class AiWriteServiceImpl implements AiWriteService {
         // 1.1 校验模型
         // TODO @xin：可以约定大于配置先，查询某个名字。例如说，写作助手！然后写作助手，上面是有个 model 的，可以使用它。
         AiChatModelDO model = chatModalService.validateChatModel(14L);
-        StreamingChatModel chatClient = apiKeyService.getStreamingChatClient(model.getKeyId());
+        StreamingChatModel chatClient = apiKeyService.getChatClient(model.getKeyId());
         AiPlatformEnum platform = AiPlatformEnum.validatePlatform(model.getPlatform());
         ChatOptions chatOptions = buildChatOptions(platform, model.getModel(), model.getTemperature(), model.getMaxTokens());
 
