@@ -10,10 +10,12 @@ import cn.iocoder.yudao.module.ai.controller.admin.write.vo.AiWriteGenerateReqVO
 import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiChatModelDO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.write.AiWriteDO;
 import cn.iocoder.yudao.module.ai.dal.mysql.write.AiWriteMapper;
+import cn.iocoder.yudao.module.ai.enums.DictTypeConstants;
 import cn.iocoder.yudao.module.ai.enums.ErrorCodeConstants;
-import cn.iocoder.yudao.module.ai.enums.write.*;
+import cn.iocoder.yudao.module.ai.enums.write.AiWriteTypeEnum;
 import cn.iocoder.yudao.module.ai.service.model.AiApiKeyService;
 import cn.iocoder.yudao.module.ai.service.model.AiChatModelService;
+import cn.iocoder.yudao.module.system.api.dict.DictDataApi;
 import com.alibaba.cloud.ai.tongyi.chat.TongYiChatOptions;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
@@ -45,14 +47,17 @@ public class AiWriteServiceImpl implements AiWriteService {
     private AiApiKeyService apiKeyService;
     @Resource
     private AiChatModelService chatModalService;
+
     @Resource
-    private AiWriteMapper writeMapper; // TODO @xin：上面空一行；因为同类之间不要空行，非同类空行；
+    private DictDataApi dictDataApi;
+
+    @Resource
+    private AiWriteMapper writeMapper;
 
     @Override
     public Flux<CommonResult<String>> generateWriteContent(AiWriteGenerateReqVO generateReqVO, Long userId) {
-        // 1.1 校验模型
-        // TODO @xin：可以约定大于配置先，查询某个名字。例如说，写作助手！然后写作助手，上面是有个 model 的，可以使用它。
-        AiChatModelDO model = chatModalService.validateChatModel(14L);
+        // 1.1 校验模型 TODO 芋艿 是不是取默认的模型也ok？
+        AiChatModelDO model = chatModalService.getRequiredDefaultChatModel();
         StreamingChatModel chatClient = apiKeyService.getChatClient(model.getKeyId());
         AiPlatformEnum platform = AiPlatformEnum.validatePlatform(model.getPlatform());
         ChatOptions chatOptions = buildChatOptions(platform, model.getModel(), model.getTemperature(), model.getMaxTokens());
@@ -83,10 +88,10 @@ public class AiWriteServiceImpl implements AiWriteService {
     private String buildWritingPrompt(AiWriteGenerateReqVO generateReqVO) {
         String template;
         Integer writeType = generateReqVO.getType();
-        String format = AiWriteFormatEnum.valueOfFormat(generateReqVO.getFormat()).getName();
-        String tone = AiWriteToneEnum.valueOfTone(generateReqVO.getTone()).getName();
-        String language = AiLanguageEnum.valueOfLanguage(generateReqVO.getLanguage()).getName();
-        String length = AiWriteLengthEnum.valueOfLength(generateReqVO.getLength()).getName();
+        String format = dictDataApi.getDictDataLabel(DictTypeConstants.AI_WRITE_FORMAT, generateReqVO.getFormat());
+        String tone = dictDataApi.getDictDataLabel(DictTypeConstants.AI_WRITE_TONE, generateReqVO.getFormat());
+        String language = dictDataApi.getDictDataLabel(DictTypeConstants.AI_WRITE_LANGUAGE, generateReqVO.getFormat());
+        String length = dictDataApi.getDictDataLabel(DictTypeConstants.AI_WRITE_LENGTH, generateReqVO.getFormat());
         if (Objects.equals(writeType, AiWriteTypeEnum.WRITING.getType())) {
             template = "请撰写一篇关于 [{}] 的文章。文章的内容格式为：[{}]，语气为：[{}]，语言为：[{}]，长度为：[{}]。请确保涵盖主要内容，不需要除了正文内容外的其他回复，如标题、额外的解释或道歉。";
             return StrUtil.format(template, generateReqVO.getPrompt(), format, tone, language, length);

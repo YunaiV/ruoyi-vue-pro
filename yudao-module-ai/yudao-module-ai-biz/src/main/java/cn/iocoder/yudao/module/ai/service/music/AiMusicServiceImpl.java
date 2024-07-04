@@ -54,7 +54,6 @@ public class AiMusicServiceImpl implements AiMusicService {
     public List<Long> generateMusic(Long userId, AiSunoGenerateReqVO reqVO) {
         // 1. 调用 Suno 生成音乐
         SunoApi sunoApi = apiKeyService.getSunoApi();
-        // TODO 芋艿：这两个貌似一直没跑成功，你那可以么？用的请求是 AiMusicController.http 的  --xin：大部分ok的，补充了error_message
         List<SunoApi.MusicData> musicDataList;
         if (Objects.equals(AiMusicGenerateModeEnum.DESCRIPTION.getMode(), reqVO.getGenerateMode())) {
             // 1.1 描述模式
