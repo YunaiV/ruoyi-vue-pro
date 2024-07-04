@@ -14,11 +14,10 @@ public class AiWriteGenerateReqVO {
     @InEnum(AiWriteTypeEnum.class)
     private Integer type;
 
-    // TODO @xin：如果非必填，可以不用写 requiredMode
-    @Schema(description = "写作内容提示", requiredMode = Schema.RequiredMode.NOT_REQUIRED, example = "1.撰写：田忌赛马；2.回复：不批")
+    @Schema(description = "写作内容提示", example = "1.撰写：田忌赛马；2.回复：不批")
     private String prompt;
 
-    @Schema(description = "原文", requiredMode = Schema.RequiredMode.NOT_REQUIRED, example = "领导我要辞职")
+    @Schema(description = "原文", example = "领导我要辞职")
     private String originalContent;
 
     @Schema(description = "长度", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")

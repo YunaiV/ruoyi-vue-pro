@@ -54,7 +54,7 @@ public enum AiModelEnum {
     // Suno 模型
     SUNO_2( "SUNO-2", "chirp-v2-xxl-alpha",null),
     SUNO_3_0( "SUNO-3.0", "chirp-v3-0",null),
-    SUNO_3_5( "SUNO-3.5", "chirp-v3.5",null),
+    SUNO_3_5( "SUNO-3.5", "chirp-v3-5",null),
     ;
 
     /**
