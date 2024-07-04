@@ -4,8 +4,7 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.ai.core.enums.AiPlatformEnum;
-import cn.iocoder.yudao.framework.ai.core.model.xinghuo.XingHuoChatModel;
-import cn.iocoder.yudao.framework.ai.core.model.xinghuo.XingHuoOptions;
+import cn.iocoder.yudao.framework.ai.core.util.AiUtils;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
@@ -19,7 +18,6 @@ import cn.iocoder.yudao.module.ai.dal.mysql.chat.AiChatMessageMapper;
 import cn.iocoder.yudao.module.ai.enums.ErrorCodeConstants;
 import cn.iocoder.yudao.module.ai.service.model.AiApiKeyService;
 import cn.iocoder.yudao.module.ai.service.model.AiChatModelService;
-import com.alibaba.cloud.ai.tongyi.chat.TongYiChatOptions;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.messages.*;
@@ -28,9 +26,6 @@ import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.model.StreamingChatModel;
 import org.springframework.ai.chat.prompt.ChatOptions;
 import org.springframework.ai.chat.prompt.Prompt;
-import org.springframework.ai.ollama.api.OllamaOptions;
-import org.springframework.ai.openai.OpenAiChatOptions;
-import org.springframework.ai.qianfan.QianFanChatOptions;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Flux;
@@ -148,44 +143,15 @@ public class AiChatMessageServiceImpl implements AiChatMessageService {
         }
         // 1.2 history message 历史消息
         List<AiChatMessageDO> contextMessages = filterContextMessages(messages, conversation, sendReqVO);
-        contextMessages.forEach(message -> {
-            // TODO @芋艿：看看有没优化空间
-            if (MessageType.USER.getValue().equals(message.getType())) {
-                chatMessages.add(new UserMessage(message.getContent()));
-            } else {
-                chatMessages.add(new AssistantMessage(message.getContent()));
-            }
-        });
+        contextMessages.forEach(message -> chatMessages.add(AiUtils.buildMessage(message.getType(), message.getContent())));
         // 1.3 user message 新发送消息
         chatMessages.add(new UserMessage(sendReqVO.getContent()));
 
         // 2. 构建 ChatOptions 对象
         AiPlatformEnum platform = AiPlatformEnum.validatePlatform(model.getPlatform());
-        ChatOptions chatOptions = buildChatOptions(platform, model.getModel(),
+        ChatOptions chatOptions = AiUtils.buildChatOptions(platform, model.getModel(),
                 conversation.getTemperature(), conversation.getMaxTokens());
         return new Prompt(chatMessages, chatOptions);
-    }
-
-    private static ChatOptions buildChatOptions(AiPlatformEnum platform, String model, Double temperature, Integer maxTokens) {
-        Float temperatureF = temperature != null ? temperature.floatValue() : null;
-        //noinspection EnhancedSwitchMigration
-        switch (platform) {
-            case OPENAI:
-                return OpenAiChatOptions.builder().withModel(model).withTemperature(temperatureF).withMaxTokens(maxTokens).build();
-            case OLLAMA:
-                return OllamaOptions.create().withModel(model).withTemperature(temperatureF).withNumPredict(maxTokens);
-            case YI_YAN:
-                // TODO 芋艿：貌似 model 只要一设置，就报错
-//                return QianFanChatOptions.builder().withModel(model).withTemperature(temperatureF).withMaxTokens(maxTokens).build();
-                return QianFanChatOptions.builder().withTemperature(temperatureF).withMaxTokens(maxTokens).build();
-            case XING_HUO:
-                return new XingHuoOptions().setChatModel(XingHuoChatModel.valueOfModel(model)).setTemperature(temperatureF)
-                        .setMaxTokens(maxTokens);
-            case QIAN_WEN:
-                return TongYiChatOptions.builder().withModel(model).withTemperature(temperature).withMaxTokens(maxTokens).build();
-            default:
-                throw new IllegalArgumentException(StrUtil.format("未知平台({})", platform));
-        }
     }
 
     /**
