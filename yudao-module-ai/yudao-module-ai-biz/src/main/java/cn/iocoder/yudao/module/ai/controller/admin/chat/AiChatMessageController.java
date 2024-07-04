@@ -21,10 +21,10 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import jakarta.annotation.security.PermitAll;
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 
@@ -51,14 +51,14 @@ public class AiChatMessageController {
 
     @Operation(summary = "发送消息（段式）", description = "一次性返回，响应较慢")
     @PostMapping("/send")
-    public CommonResult<AiChatMessageRespVO> sendMessage(@Validated @RequestBody AiChatMessageSendReqVO sendReqVO) {
-        return success(chatMessageService.sendMessage(sendReqVO));
+    public CommonResult<AiChatMessageSendRespVO> sendMessage(@Valid @RequestBody AiChatMessageSendReqVO sendReqVO) {
+        return success(chatMessageService.sendMessage(sendReqVO, getLoginUserId()));
     }
 
     @Operation(summary = "发送消息（流式）", description = "流式返回，响应较快")
     @PostMapping(value = "/send-stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     @PermitAll // 解决 SSE 最终响应的时候，会被 Access Denied 拦截的问题
-    public Flux<CommonResult<AiChatMessageSendRespVO>> sendChatMessageStream(@Validated @RequestBody AiChatMessageSendReqVO sendReqVO) {
+    public Flux<CommonResult<AiChatMessageSendRespVO>> sendChatMessageStream(@Valid @RequestBody AiChatMessageSendReqVO sendReqVO) {
         return chatMessageService.sendChatMessageStream(sendReqVO, getLoginUserId());
     }
 

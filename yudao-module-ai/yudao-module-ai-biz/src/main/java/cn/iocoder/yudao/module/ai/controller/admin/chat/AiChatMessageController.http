@@ -1,14 +1,12 @@
-
-### chat call
-POST {{baseUrl}}/admin-api/ai/chat/message/send
+### 发送消息（段式）
+POST {{baseUrl}}/ai/chat/message/send
 Content-Type: application/json
 Authorization: {{token}}
 
 {
-  "conversationId": "1781604279872581649",
+  "conversationId": "1781604279872581724",
   "content": "你是 OpenAI 么？"
 }
-
 
 ### 发送消息（流式）
 POST {{baseUrl}}/ai/chat/message/send-stream
@@ -20,11 +18,10 @@ Authorization: {{token}}
   "content": "1+1=?"
 }
 
-### message list
-GET {{baseUrl}}/admin-api/ai/chat/message/list-by-conversation-id?conversationId=1781604279872581649
+### 获得指定对话的消息列表
+GET {{baseUrl}}/ai/chat/message/list-by-conversation-id?conversationId=1781604279872581649
 Authorization: {{token}}
 
-
-### message delete
-DELETE {{baseUrl}}/admin-api/ai/chat/message/delete?id=50
+### 删除消息
+DELETE {{baseUrl}}/ai/chat/message/delete?id=50
 Authorization: {{token}}

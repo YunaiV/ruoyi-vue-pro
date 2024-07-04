@@ -8,7 +8,7 @@ import cn.iocoder.yudao.module.ai.controller.admin.model.vo.apikey.AiApiKeyPageR
 import cn.iocoder.yudao.module.ai.controller.admin.model.vo.apikey.AiApiKeySaveReqVO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiApiKeyDO;
 import jakarta.validation.Valid;
-import org.springframework.ai.chat.model.StreamingChatModel;
+import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.image.ImageModel;
 
 import java.util.List;
@@ -76,12 +76,12 @@ public interface AiApiKeyService {
     // ========== 与 spring-ai 集成 ==========
 
     /**
-     * 获得 StreamingChatClient 对象
+     * 获得 ChatModel 对象
      *
      * @param id 编号
-     * @return StreamingChatClient 对象
+     * @return ChatModel 对象
      */
-    StreamingChatModel getStreamingChatClient(Long id);
+    ChatModel getChatClient(Long id);
 
     /**
      * 获得 ImageClient 对象

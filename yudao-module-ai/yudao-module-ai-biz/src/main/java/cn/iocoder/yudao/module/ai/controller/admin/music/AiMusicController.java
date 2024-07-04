@@ -38,6 +38,10 @@ public class AiMusicController {
     @PostMapping("/generate")
     @Operation(summary = "音乐生成")
     public CommonResult<List<Long>> generateMusic(@RequestBody @Valid AiSunoGenerateReqVO reqVO) {
+//        if (true) {
+//            musicService.syncMusic();
+//            return null;
+//        }
         return success(musicService.generateMusic(getLoginUserId(), reqVO));
     }
 
