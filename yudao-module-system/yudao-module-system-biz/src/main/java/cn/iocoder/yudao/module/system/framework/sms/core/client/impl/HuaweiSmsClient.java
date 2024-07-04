@@ -2,16 +2,17 @@ package cn.iocoder.yudao.module.system.framework.sms.core.client.impl;
 
 
 import cn.hutool.core.lang.Assert;
+import cn.hutool.core.util.HexUtil;
 import cn.hutool.core.util.StrUtil;
 
+import cn.hutool.crypto.SecureUtil;
+import cn.hutool.crypto.digest.DigestUtil;
 import cn.hutool.json.JSONArray;
 import cn.iocoder.yudao.framework.common.core.KeyValue;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.module.system.framework.sms.core.client.dto.SmsReceiveRespDTO;
 import cn.iocoder.yudao.module.system.framework.sms.core.client.dto.SmsSendRespDTO;
 import cn.iocoder.yudao.module.system.framework.sms.core.client.dto.SmsTemplateRespDTO;
-import cn.iocoder.yudao.module.system.framework.sms.core.client.utils.HuaweiRequest;
-import cn.iocoder.yudao.module.system.framework.sms.core.client.utils.HuaweiSigner;
 import cn.iocoder.yudao.module.system.framework.sms.core.enums.SmsTemplateAuditStatusEnum;
 import cn.iocoder.yudao.module.system.framework.sms.core.property.SmsChannelProperties;
 import org.apache.http.client.methods.*;
@@ -30,6 +31,7 @@ import org.apache.http.HttpResponse;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 
@@ -55,6 +57,7 @@ public class HuaweiSmsClient extends AbstractSmsClient {
      */
     public static final String API_CODE_SUCCESS = "OK";
     private static final Logger LOGGER = LoggerFactory.getLogger(HuaweiSmsClient.class);
+
     public HuaweiSmsClient(SmsChannelProperties properties) {
         super(properties);
         Assert.notEmpty(properties.getApiKey(), "apiKey 不能为空");
@@ -79,6 +82,18 @@ public class HuaweiSmsClient extends AbstractSmsClient {
         //选填,短信状态报告接收地址,推荐使用域名,为空或者不填表示不接收状态报告
         String statusCallBack = properties.getCallbackUrl();
 
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd'T'HHmmss'Z'", Locale.ENGLISH);
+        sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
+        String singerDate = sdf.format(new Date());
+
+        // ************* 步骤 1：拼接规范请求串 *************
+        String httpRequestMethod = "POST";
+        String canonicalUri = "/sms/batchSendSms/v1/";
+        String canonicalQueryString = "";//查询参数为空
+        String canonicalHeaders = "content-type:application/x-www-form-urlencoded\n"
+                + "host:smsapi.cn-north-4.myhuaweicloud.com:443\n"
+                + "x-sdk-date:" + singerDate + "\n";
+        String signedHeaders = "content-type;host;x-sdk-date";
         /**
          * 选填,使用无变量模板时请赋空值 String templateParas = "";
          * 单变量模板示例:模板内容为"您的验证码是${NUM_6}"时,templateParas可填写为"[\"111111\"]"
@@ -92,31 +107,34 @@ public class HuaweiSmsClient extends AbstractSmsClient {
         //请求Body,不携带签名名称时,signature请填null
         String body = buildRequestBody(sender, receiver, templateId, templateParas, statusCallBack, null);
         if (null == body || body.isEmpty()) {
-            LOGGER.warn("body is null.");
             return null;
         }
+        String hashedRequestBody = HexUtil.encodeHexStr(DigestUtil.sha256(body));
+        String canonicalRequest = httpRequestMethod + "\n" + canonicalUri + "\n" + canonicalQueryString + "\n"
+                + canonicalHeaders + "\n" + signedHeaders + "\n" + hashedRequestBody;
 
-        HuaweiRequest request = new HuaweiRequest();
-        request.setKey(properties.getApiKey());
-        request.setSecret(properties.getApiSecret());
-        request.setMethod("POST");
-        request.setUrl(url);
-        request.addHeader("Content-Type", "application/x-www-form-urlencoded");
-        request.setBody(body);
-        LOGGER.info("Print the body: {}", body);
+        // ************* 步骤 2：拼接待签名字符串 *************
+        String hashedCanonicalRequest = HexUtil.encodeHexStr(DigestUtil.sha256(canonicalRequest));
+        String stringToSign = "SDK-HMAC-SHA256" + "\n" + singerDate + "\n" + hashedCanonicalRequest;
 
-        HuaweiSigner signer = new HuaweiSigner("SDK-HMAC-SHA256");
-        signer.sign(request);
+        // ************* 步骤 3：计算签名 *************
+        String signature = SecureUtil.hmacSha256(properties.getApiSecret()).digestHex(stringToSign);
+
+        // ************* 步骤 4：拼接 Authorization *************
+        String authorization = "SDK-HMAC-SHA256" + " " + "Access=" + properties.getApiKey() + ", "
+                + "SignedHeaders=" + signedHeaders + ", " + "Signature=" + signature;
+
+        // ************* 步骤 5：构造HttpRequest 并执行request请求，获得response *************
         HttpUriRequest postMethod = RequestBuilder.post()
                 .setUri(url)
-                .setEntity(new StringEntity(request.getBody(), StandardCharsets.UTF_8))
+                .setEntity(new StringEntity(body, StandardCharsets.UTF_8))
                 .setHeader("Content-Type","application/x-www-form-urlencoded")
-                .setHeader("X-Sdk-Date",request.getHeaders().get("X-Sdk-Date"))
-                .setHeader("Authorization",request.getHeaders().get("Authorization"))
+                .setHeader("X-Sdk-Date",singerDate)
+                .setHeader("Authorization",authorization)
                 .build();
         CloseableHttpClient client = HttpClientBuilder.create().build();
-
         HttpResponse response = client.execute(postMethod);
+
         return new SmsSendRespDTO().setSuccess(Objects.equals(response.getStatusLine().getReasonPhrase(), API_CODE_SUCCESS)).setSerialNo(Integer.toString(response.getStatusLine().getStatusCode()))
                 .setApiRequestId(null).setApiCode(null).setApiMsg(null);
     }
@@ -141,7 +159,6 @@ public class HuaweiSmsClient extends AbstractSmsClient {
 
     private static void appendToBody(StringBuilder body, String key, String val) throws UnsupportedEncodingException {
         if (null != val && !val.isEmpty()) {
-            LOGGER.info("Print appendToBody: {}:{}", key, val);
             body.append(key).append(URLEncoder.encode(val, "UTF-8"));
         }
     }
@@ -181,20 +198,17 @@ public class HuaweiSmsClient extends AbstractSmsClient {
         /**
          * 短信资源的更新时间，通常为短信平台接收短信状态报告的时间
          */
-        @JsonProperty("updateTime")
         @JsonFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND, timezone = TIME_ZONE_DEFAULT)
         private LocalDateTime updateTime;
 
         /**
          * 短信状态报告枚举值
          */
-        @JsonProperty("status")
         private String status;
 
         /**
          * 发送短信成功时返回的短信唯一标识。
          */
-        @JsonProperty("smsMsgId")
         private String smsMsgId;
     }
 
