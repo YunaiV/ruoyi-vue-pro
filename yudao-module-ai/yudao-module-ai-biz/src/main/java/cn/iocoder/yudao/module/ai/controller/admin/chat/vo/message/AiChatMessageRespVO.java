@@ -28,7 +28,7 @@ public class AiChatMessageRespVO {
     private Long roleId;
 
     @Schema(description = "模型标志", requiredMode = Schema.RequiredMode.REQUIRED, example = "gpt-3.5-turbo")
-    private String model; // 参见 AiOpenAiModelEnum 枚举类
+    private String model;
 
     @Schema(description = "模型编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "123")
     private Long modelId;
