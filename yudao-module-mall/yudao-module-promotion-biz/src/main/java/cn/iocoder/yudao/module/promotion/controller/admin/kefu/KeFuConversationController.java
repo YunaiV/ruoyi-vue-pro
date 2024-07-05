@@ -34,8 +34,8 @@ public class KeFuConversationController {
     @Resource
     private MemberUserApi memberUserApi;
 
-    @PostMapping("/update-conversation-pinned")
-    @Operation(summary = "置顶客服会话")
+    @PutMapping("/update-conversation-pinned")
+    @Operation(summary = "置顶/取消置顶客服会话")
     @PreAuthorize("@ss.hasPermission('promotion:kefu-conversation:update')")
     public CommonResult<Boolean> updateConversationPinned(@Valid @RequestBody KeFuConversationUpdatePinnedReqVO updateReqVO) {
         conversationService.updateConversationPinnedByAdmin(updateReqVO);

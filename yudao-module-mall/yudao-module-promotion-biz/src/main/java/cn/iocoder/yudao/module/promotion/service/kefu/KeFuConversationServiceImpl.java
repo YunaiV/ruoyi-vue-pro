@@ -41,6 +41,10 @@ public class KeFuConversationServiceImpl implements KeFuConversationService {
 
     @Override
     public void updateConversationPinnedByAdmin(KeFuConversationUpdatePinnedReqVO updateReqVO) {
+        // 校验存在
+        validateKefuConversationExists(updateReqVO.getId());
+
+        // 更新管理员会话置顶状态
         conversationMapper.updateById(new KeFuConversationDO().setId(updateReqVO.getId()).setAdminPinned(updateReqVO.getAdminPinned()));
     }
 
