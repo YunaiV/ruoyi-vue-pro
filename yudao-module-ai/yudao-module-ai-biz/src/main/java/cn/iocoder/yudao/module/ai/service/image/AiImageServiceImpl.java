@@ -35,6 +35,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -106,11 +107,12 @@ public class AiImageServiceImpl implements AiImageService {
 
             // 3. 更新数据库
             imageMapper.updateById(new AiImageDO().setId(image.getId()).setStatus(AiImageStatusEnum.SUCCESS.getStatus())
-                    .setPicUrl(filePath));
+                    .setPicUrl(filePath).setFinishTime(LocalDateTime.now()));
         } catch (Exception ex) {
             log.error("[doDall][image({}) 生成异常]", image, ex);
             imageMapper.updateById(new AiImageDO().setId(image.getId())
-                    .setStatus(AiImageStatusEnum.FAIL.getStatus()).setErrorMessage(ex.getMessage()));
+                    .setStatus(AiImageStatusEnum.FAIL.getStatus())
+                    .setErrorMessage(ex.getMessage()).setFinishTime(LocalDateTime.now()));
         }
     }
 
@@ -254,12 +256,15 @@ public class AiImageServiceImpl implements AiImageService {
     private void updateMidjourneyStatus(AiImageDO image, MidjourneyApi.Notify notify) {
         // 1. 转换状态
         Integer status = null;
+        LocalDateTime finishTime = null;
         if (StrUtil.isNotBlank(notify.status())) {
             MidjourneyApi.TaskStatusEnum taskStatusEnum = MidjourneyApi.TaskStatusEnum.valueOf(notify.status());
             if (MidjourneyApi.TaskStatusEnum.SUCCESS == taskStatusEnum) {
                 status = AiImageStatusEnum.SUCCESS.getStatus();
+                finishTime = LocalDateTime.now();
             } else if (MidjourneyApi.TaskStatusEnum.FAILURE == taskStatusEnum) {
                 status = AiImageStatusEnum.FAIL.getStatus();
+                finishTime = LocalDateTime.now();
             }
         }
 
@@ -276,7 +281,8 @@ public class AiImageServiceImpl implements AiImageService {
 
         // 3. 更新 image 状态
         imageMapper.updateById(new AiImageDO().setId(image.getId()).setStatus(status)
-                .setPicUrl(picUrl).setButtons(notify.buttons()).setErrorMessage(notify.failReason()));
+                .setPicUrl(picUrl).setButtons(notify.buttons()).setErrorMessage(notify.failReason())
+                .setFinishTime(finishTime));
     }
 
     @Override

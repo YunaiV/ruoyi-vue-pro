@@ -51,7 +51,12 @@ public class AiImageRespVO {
     @Schema(description = "mj buttons 按钮")
     private List<MidjourneyApi.Button> buttons;
 
+    @Schema(description = "完成时间")
+    private LocalDateTime finishTime;
+
     @Schema(description = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED)
     private LocalDateTime createTime;
+
+
 
 }

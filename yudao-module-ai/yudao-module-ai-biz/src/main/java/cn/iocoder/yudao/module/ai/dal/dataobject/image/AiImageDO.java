@@ -16,6 +16,7 @@ import lombok.Data;
 import org.springframework.ai.openai.OpenAiImageOptions;
 import org.springframework.ai.stabilityai.api.StabilityAiImageOptions;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -110,6 +111,11 @@ public class AiImageDO extends BaseDO {
      * 1. midjourney proxy：关联的 task id
      */
     private String taskId;
+
+    /**
+     * 完成时间
+     */
+    private LocalDateTime finishTime;
 
     public static class ButtonTypeHandler extends AbstractJsonTypeHandler<Object> {
 
