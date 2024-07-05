@@ -2,8 +2,9 @@ package cn.iocoder.yudao.module.ai.service.chat;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.ai.controller.admin.chat.vo.conversation.AiChatConversationPageReqVO;
-import cn.iocoder.yudao.module.ai.controller.admin.chat.vo.message.*;
+import cn.iocoder.yudao.module.ai.controller.admin.chat.vo.message.AiChatMessagePageReqVO;
+import cn.iocoder.yudao.module.ai.controller.admin.chat.vo.message.AiChatMessageSendReqVO;
+import cn.iocoder.yudao.module.ai.controller.admin.chat.vo.message.AiChatMessageSendRespVO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.chat.AiChatMessageDO;
 import reactor.core.publisher.Flux;
 
@@ -22,9 +23,10 @@ public interface AiChatMessageService {
      * 发送消息
      *
      * @param sendReqVO 发送信息
+     * @param userId 用户编号
      * @return 发送结果
      */
-    AiChatMessageRespVO sendMessage(AiChatMessageSendReqVO sendReqVO);
+    AiChatMessageSendRespVO sendMessage(AiChatMessageSendReqVO sendReqVO, Long userId);
 
     /**
      * 发送消息

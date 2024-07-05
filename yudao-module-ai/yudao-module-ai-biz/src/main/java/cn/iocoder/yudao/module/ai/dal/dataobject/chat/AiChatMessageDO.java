@@ -5,7 +5,6 @@ import org.springframework.ai.chat.messages.MessageType;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiChatModelDO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiChatRoleDO;
-import cn.iocoder.yudao.module.ai.enums.model.AiModelEnum;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
@@ -69,8 +68,6 @@ public class AiChatMessageDO extends BaseDO {
 
     /**
      * 模型标志
-     *
-     * 枚举 {@link AiModelEnum}
      */
     private String model;
     /**

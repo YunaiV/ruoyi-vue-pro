@@ -23,7 +23,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
-import java.util.function.Consumer;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
@@ -79,9 +78,8 @@ public class AiChatConversationController {
         return success(true);
     }
 
-    // TODO 芋艿：这个 url 可以改下
-    @DeleteMapping("/delete-my-all-except-pinned")
-    @Operation(summary = "删除所有对话(置顶除外)")
+    @DeleteMapping("/delete-by-unpinned")
+    @Operation(summary = "删除未置顶的聊天对话")
     public CommonResult<Boolean> deleteChatConversationMyByUnpinned() {
         chatConversationService.deleteChatConversationMyByUnpinned(getLoginUserId());
         return success(true);

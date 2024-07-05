@@ -21,6 +21,7 @@ import cn.iocoder.yudao.module.infra.api.file.FileApi;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 
@@ -49,10 +50,10 @@ public class AiMusicServiceImpl implements AiMusicService {
     private FileApi fileApi;
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public List<Long> generateMusic(Long userId, AiSunoGenerateReqVO reqVO) {
         // 1. 调用 Suno 生成音乐
         SunoApi sunoApi = apiKeyService.getSunoApi();
-        // TODO 芋艿：这两个貌似一直没跑成功，你那可以么？用的请求是 AiMusicController.http 的  --xin：大部分ok的，补充了error_message
         List<SunoApi.MusicData> musicDataList;
         if (Objects.equals(AiMusicGenerateModeEnum.DESCRIPTION.getMode(), reqVO.getGenerateMode())) {
             // 1.1 描述模式
@@ -164,14 +165,9 @@ public class AiMusicServiceImpl implements AiMusicService {
      */
     private List<AiMusicDO> buildMusicDOList(List<SunoApi.MusicData> musicList) {
         return convertList(musicList, musicData -> {
-            Integer status;
-            if (Objects.equals("complete", musicData.status())) {
-                status = AiMusicStatusEnum.SUCCESS.getStatus();
-            } else if (Objects.equals("error", musicData.status())) {
-                status = AiMusicStatusEnum.FAIL.getStatus();
-            } else {
-                status = AiMusicStatusEnum.IN_PROGRESS.getStatus();
-            }
+            Integer status = Objects.equals("complete", musicData.status()) ? AiMusicStatusEnum.SUCCESS.getStatus()
+                    : Objects.equals("error", musicData.status()) ? AiMusicStatusEnum.FAIL.getStatus()
+                    : AiMusicStatusEnum.IN_PROGRESS.getStatus();
             return new AiMusicDO()
                     .setTaskId(musicData.id()).setModel(musicData.modelName())
                     .setDescription(musicData.gptDescriptionPrompt())

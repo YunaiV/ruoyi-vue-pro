@@ -68,7 +68,7 @@ public class AiImageController {
 
     @Operation(summary = "生成图片")
     @PostMapping("/draw")
-    public CommonResult<Long> drawImage(@Validated @RequestBody AiImageDrawReqVO drawReqVO) {
+    public CommonResult<Long> drawImage(@Valid @RequestBody AiImageDrawReqVO drawReqVO) {
         return success(imageService.drawImage(getLoginUserId(), drawReqVO));
     }
 
@@ -84,7 +84,7 @@ public class AiImageController {
 
     @Operation(summary = "【Midjourney】生成图片")
     @PostMapping("/midjourney/imagine")
-    public CommonResult<Long> midjourneyImagine(@Validated @RequestBody AiMidjourneyImagineReqVO reqVO) {
+    public CommonResult<Long> midjourneyImagine(@Valid @RequestBody AiMidjourneyImagineReqVO reqVO) {
         Long imageId = imageService.midjourneyImagine(getLoginUserId(), reqVO);
         return success(imageId);
     }
@@ -92,14 +92,14 @@ public class AiImageController {
     @Operation(summary = "【Midjourney】通知图片进展", description = "由 Midjourney Proxy 回调")
     @PostMapping("/midjourney/notify") // 必须是 POST 方法，否则会报错
     @PermitAll
-    public CommonResult<Boolean> midjourneyNotify(@Validated @RequestBody MidjourneyApi.Notify notify) {
+    public CommonResult<Boolean> midjourneyNotify(@Valid @RequestBody MidjourneyApi.Notify notify) {
         imageService.midjourneyNotify(notify);
         return success(true);
     }
 
     @Operation(summary = "【Midjourney】Action 操作（二次生成图片）", description = "例如说：放大、缩小、U1、U2 等")
     @PostMapping("/midjourney/action")
-    public CommonResult<Long> midjourneyAction(@Validated @RequestBody AiMidjourneyActionReqVO reqVO) {
+    public CommonResult<Long> midjourneyAction(@Valid @RequestBody AiMidjourneyActionReqVO reqVO) {
         Long imageId = imageService.midjourneyAction(getLoginUserId(), reqVO);
         return success(imageId);
     }

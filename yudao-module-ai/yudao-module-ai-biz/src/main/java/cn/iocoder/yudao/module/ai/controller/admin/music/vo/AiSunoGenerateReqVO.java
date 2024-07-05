@@ -46,7 +46,7 @@ public class AiSunoGenerateReqVO {
 
     @Schema(description = "模型", requiredMode = Schema.RequiredMode.REQUIRED, example = "chirp-v3.5")
     @NotEmpty(message = "模型不能为空")
-    private String model; // 参见 AiModelEnum 枚举
+    private String model;
 
     @Schema(description = "音乐风格", example = "[\"pop\",\"jazz\",\"punk\"]")
     private List<String> tags;

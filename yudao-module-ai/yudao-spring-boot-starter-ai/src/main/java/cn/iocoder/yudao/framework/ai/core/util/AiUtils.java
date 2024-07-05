@@ -1,0 +1,59 @@
+package cn.iocoder.yudao.framework.ai.core.util;
+
+import cn.hutool.core.util.StrUtil;
+import cn.iocoder.yudao.framework.ai.core.enums.AiPlatformEnum;
+import cn.iocoder.yudao.framework.ai.core.model.xinghuo.XingHuoChatModel;
+import cn.iocoder.yudao.framework.ai.core.model.xinghuo.XingHuoOptions;
+import com.alibaba.cloud.ai.tongyi.chat.TongYiChatOptions;
+import org.springframework.ai.chat.messages.*;
+import org.springframework.ai.chat.prompt.ChatOptions;
+import org.springframework.ai.ollama.api.OllamaOptions;
+import org.springframework.ai.openai.OpenAiChatOptions;
+import org.springframework.ai.qianfan.QianFanChatOptions;
+
+/**
+ * Spring AI 工具类
+ *
+ * @author 芋道源码
+ */
+public class AiUtils {
+
+    public static ChatOptions buildChatOptions(AiPlatformEnum platform, String model, Double temperature, Integer maxTokens) {
+        Float temperatureF = temperature != null ? temperature.floatValue() : null;
+        //noinspection EnhancedSwitchMigration
+        switch (platform) {
+            case OPENAI:
+                return OpenAiChatOptions.builder().withModel(model).withTemperature(temperatureF).withMaxTokens(maxTokens).build();
+            case OLLAMA:
+                return OllamaOptions.create().withModel(model).withTemperature(temperatureF).withNumPredict(maxTokens);
+            case YI_YAN:
+                // TODO @xin：貌似 model 只要一设置，就报错；可以排查下
+//                return QianFanChatOptions.builder().withModel(model).withTemperature(temperatureF).withMaxTokens(maxTokens).build();
+                return QianFanChatOptions.builder().withTemperature(temperatureF).withMaxTokens(maxTokens).build();
+            case XING_HUO:
+                return new XingHuoOptions().setChatModel(XingHuoChatModel.valueOfModel(model)).setTemperature(temperatureF)
+                        .setMaxTokens(maxTokens);
+            case QIAN_WEN:
+                return TongYiChatOptions.builder().withModel(model).withTemperature(temperature).withMaxTokens(maxTokens).build();
+            default:
+                throw new IllegalArgumentException(StrUtil.format("未知平台({})", platform));
+        }
+    }
+
+    public static Message buildMessage(String type, String content) {
+        if (MessageType.USER.getValue().equals(type)) {
+            return new UserMessage(content);
+        }
+        if (MessageType.ASSISTANT.getValue().equals(type)) {
+            return new AssistantMessage(content);
+        }
+        if (MessageType.SYSTEM.getValue().equals(type)) {
+            return new SystemMessage(content);
+        }
+        if (MessageType.FUNCTION.getValue().equals(type)) {
+            return new FunctionMessage(content);
+        }
+        throw new IllegalArgumentException(StrUtil.format("未知消息类型({})", type));
+    }
+
+}

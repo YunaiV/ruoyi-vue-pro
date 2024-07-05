@@ -1,4 +1,3 @@
-
 ### 生成图片：OpenAI（DALL）
 POST {{baseUrl}}/ai/image/draw
 Content-Type: application/json
@@ -29,8 +28,7 @@ Authorization: {{token}}
   "style": "vivid"
 }
 
-### 生成图片：生成图片
-
+### 生成图片：生成图片（Midjourney）
 POST {{baseUrl}}/ai/image/midjourney/imagine
 Content-Type: application/json
 Authorization: {{token}}
@@ -40,6 +38,5 @@ Authorization: {{token}}
   "model": "midjourney",
   "width": "1",
   "height": "1",
-  "version": "6.0",
-  "base64Array": []
+  "version": "6.0"
 }

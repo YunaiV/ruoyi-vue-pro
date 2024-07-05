@@ -26,9 +26,10 @@ public class AiWriteController {
     private AiWriteService writeService;
 
     @PostMapping(value = "/generate-stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    @PermitAll
     @Operation(summary = "写作生成（流式）", description = "流式返回，响应较快")
+    @PermitAll  // 解决 SSE 最终响应的时候，会被 Access Denied 拦截的问题
     public Flux<CommonResult<String>> generateWriteContent(@RequestBody @Valid AiWriteGenerateReqVO generateReqVO) {
         return writeService.generateWriteContent(generateReqVO, getLoginUserId());
     }
+
 }
