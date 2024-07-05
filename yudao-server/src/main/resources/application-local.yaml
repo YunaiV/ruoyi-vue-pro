@@ -70,12 +70,6 @@ spring:
       port: 6379 # 端口
       database: 0 # 数据库索引
 #    password: dev # 密码，建议生产环境开启
-server:
-  servlet:
-    encoding:
-      enabled: true
-      charset: UTF-8
-      force: true
 
 --- #################### 定时任务相关配置 ####################
 
@@ -226,8 +220,6 @@ yudao:
     enable: false
   demo: false # 关闭演示模式
   tencent-lbs-key: TVDBZ-TDILD-4ON4B-PFDZA-RNLKH-VVF6E # QQ 地图的密钥 https://lbs.qq.com/service/staticV2/staticGuide/staticDoc
-  tenant:
-    enable: false
 
 justauth:
   enabled: true

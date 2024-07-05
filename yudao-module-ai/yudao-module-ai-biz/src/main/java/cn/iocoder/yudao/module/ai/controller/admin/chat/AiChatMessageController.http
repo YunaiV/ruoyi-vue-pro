@@ -2,6 +2,7 @@
 POST {{baseUrl}}/ai/chat/message/send
 Content-Type: application/json
 Authorization: {{token}}
+tenant-id: {{adminTenentId}}
 
 {
   "conversationId": "1781604279872581724",
@@ -12,9 +13,10 @@ Authorization: {{token}}
 POST {{baseUrl}}/ai/chat/message/send-stream
 Content-Type: application/json
 Authorization: {{token}}
+tenant-id: {{adminTenentId}}
 
 {
-  "conversationId": "1781604279872581690",
+  "conversationId": "1781604279872581724",
   "content": "1+1=?"
 }
 

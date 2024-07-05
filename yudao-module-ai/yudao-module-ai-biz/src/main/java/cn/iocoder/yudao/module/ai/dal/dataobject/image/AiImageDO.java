@@ -77,6 +77,11 @@ public class AiImageDO extends BaseDO {
     private Integer status;
 
     /**
+     * 完成时间
+     */
+    private LocalDateTime finishTime;
+
+    /**
      * 绘画错误信息
      */
     private String errorMessage;
@@ -111,11 +116,6 @@ public class AiImageDO extends BaseDO {
      * 1. midjourney proxy：关联的 task id
      */
     private String taskId;
-
-    /**
-     * 完成时间
-     */
-    private LocalDateTime finishTime;
 
     public static class ButtonTypeHandler extends AbstractJsonTypeHandler<Object> {
 

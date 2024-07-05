@@ -57,6 +57,4 @@ public class AiImageRespVO {
     @Schema(description = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED)
     private LocalDateTime createTime;
 
-
-
 }

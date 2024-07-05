@@ -34,6 +34,13 @@ spring:
     redis:
       time-to-live: 1h # 设置过期时间为 1 小时
 
+server:
+  servlet:
+    encoding:
+      enabled: true
+      charset: UTF-8 # 必须设置 UTF-8，避免 WebFlux 流式返回（AI 场景）会乱码问题
+      force: true
+
 --- #################### 接口文档配置 ####################
 
 springdoc:

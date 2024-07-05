@@ -163,7 +163,7 @@ public class AiClientFactoryImpl implements AiClientFactory {
      * 可参考 {@link QianFanAutoConfiguration#qianFanChatModel(QianFanConnectionProperties, QianFanChatProperties, RestClient.Builder, RetryTemplate, ResponseErrorHandler)}
      */
     private static QianFanChatModel buildYiYanChatClient(String key) {
-        // TODO 芋艿：貌似目前设置，request 势必会报错
+        // TODO @xin：貌似目前设置，request 势必会报错；看看能不能有办法，参考 buildQianWenChatClient，调用 QianFanAutoConfiguration#qianFanChatModel初始化，当然 key 要用自己的哈
         List<String> keys = StrUtil.split(key, '|');
         Assert.equals(keys.size(), 2, "YiYanChatClient 的密钥需要 (appKey|secretKey) 格式");
         String appKey = keys.get(0);
@@ -191,8 +191,8 @@ public class AiClientFactoryImpl implements AiClientFactory {
     private static TongYiChatModel buildQianWenChatClient(String key) {
         com.alibaba.dashscope.aigc.generation.Generation generation = SpringUtil.getBean(Generation.class);
         TongYiChatProperties chatOptions = SpringUtil.getBean(TongYiChatProperties.class);
-        // TODO @芋艿：貌似 apiKey 是全局唯一的？？？得测试下
-        // TODO @芋艿：貌似阿里云不是增量返回的
+        // TODO @xin：貌似 apiKey 是全局唯一的？？？得测试下
+        // TODO @xin：貌似阿里云不是增量返回的
         TongYiConnectionProperties connectionProperties = new TongYiConnectionProperties();
         connectionProperties.setApiKey(key);
         return new TongYiAutoConfiguration().tongYiChatClient(generation, chatOptions, connectionProperties);
