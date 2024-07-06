@@ -7,11 +7,11 @@ import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.image.ImageModel;
 
 /**
- * AI 客户端工厂的接口类
+ * AI Model 模型工厂的接口类
  *
  * @author fansili
  */
-public interface AiClientFactory {
+public interface AiModelFactory {
 
     /**
      * 基于指定配置，获得 ChatModel 对象
@@ -33,29 +33,29 @@ public interface AiClientFactory {
      * @param platform 平台
      * @return ChatModel 对象
      */
-    ChatModel getDefaultChatClient(AiPlatformEnum platform);
+    ChatModel getDefaultChatModel(AiPlatformEnum platform);
 
     /**
-     * 基于默认配置，获得 ImageClient 对象
+     * 基于默认配置，获得 ImageModel 对象
      *
      * 默认配置，指的是在 application.yaml 配置文件中的 spring.ai 相关的配置
      *
      * @param platform 平台
-     * @return ImageClient 对象
+     * @return ImageModel 对象
      */
-    ImageModel getDefaultImageClient(AiPlatformEnum platform);
+    ImageModel getDefaultImageModel(AiPlatformEnum platform);
 
     /**
-     * 基于指定配置，获得 ImageClient 对象
+     * 基于指定配置，获得 ImageModel 对象
      *
      * 如果不存在，则进行创建
      *
      * @param platform 平台
      * @param apiKey API KEY
      * @param url API URL
-     * @return ImageClient 对象
+     * @return ImageModel 对象
      */
-    ImageModel getOrCreateImageClient(AiPlatformEnum platform, String apiKey, String url);
+    ImageModel getOrCreateImageModel(AiPlatformEnum platform, String apiKey, String url);
 
     /**
      * 基于指定配置，获得 MidjourneyApi 对象

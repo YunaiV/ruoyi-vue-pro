@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.framework.ai.config;
 
-import cn.iocoder.yudao.framework.ai.core.factory.AiClientFactory;
-import cn.iocoder.yudao.framework.ai.core.factory.AiClientFactoryImpl;
+import cn.iocoder.yudao.framework.ai.core.factory.AiModelFactory;
+import cn.iocoder.yudao.framework.ai.core.factory.AiModelFactoryImpl;
 import cn.iocoder.yudao.framework.ai.core.model.deepseek.DeepSeekChatClient;
 import cn.iocoder.yudao.framework.ai.core.model.deepseek.DeepSeekChatOptions;
 import cn.iocoder.yudao.framework.ai.core.model.midjourney.api.MidjourneyApi;
@@ -28,8 +28,8 @@ import org.springframework.context.annotation.Import;
 public class YudaoAiAutoConfiguration {
 
     @Bean
-    public AiClientFactory aiClientFactory() {
-        return new AiClientFactoryImpl();
+    public AiModelFactory aiModelFactory() {
+        return new AiModelFactoryImpl();
     }
 
     // ========== 各种 AI Client 创建 ==========

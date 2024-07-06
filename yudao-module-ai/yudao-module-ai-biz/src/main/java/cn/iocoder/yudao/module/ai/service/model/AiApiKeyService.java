@@ -81,17 +81,17 @@ public interface AiApiKeyService {
      * @param id 编号
      * @return ChatModel 对象
      */
-    ChatModel getChatClient(Long id);
+    ChatModel getChatModel(Long id);
 
     /**
-     * 获得 ImageClient 对象
+     * 获得 ImageModel 对象
      *
      * TODO 可优化点：目前默认获取 platform 对应的第一个开启的配置用于绘画；后续可以支持配置选择
      *
      * @param platform 平台
-     * @return ImageClient 对象
+     * @return ImageModel 对象
      */
-    ImageModel getImageClient(AiPlatformEnum platform);
+    ImageModel getImageModel(AiPlatformEnum platform);
 
     /**
      * 获得 MidjourneyApi 对象

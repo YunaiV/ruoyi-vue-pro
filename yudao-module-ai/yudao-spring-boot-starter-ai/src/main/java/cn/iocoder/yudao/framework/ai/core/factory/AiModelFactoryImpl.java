@@ -43,11 +43,11 @@ import org.springframework.web.client.RestClient;
 import java.util.List;
 
 /**
- * AI 客户端工厂的实现类
+ * AI Model 模型工厂的实现类
  *
  * @author 芋道源码
  */
-public class AiClientFactoryImpl implements AiClientFactory {
+public class AiModelFactoryImpl implements AiModelFactory {
 
     @Override
     public ChatModel getOrCreateChatClient(AiPlatformEnum platform, String apiKey, String url) {
@@ -55,8 +55,6 @@ public class AiClientFactoryImpl implements AiClientFactory {
         return Singleton.get(cacheKey, (Func0<ChatModel>) () -> {
             //noinspection EnhancedSwitchMigration
             switch (platform) {
-                case OPENAI:
-                    return buildOpenAiChatClient(apiKey, url);
                 case OLLAMA:
                     return buildOllamaChatClient(url);
                 case YI_YAN:
@@ -67,6 +65,8 @@ public class AiClientFactoryImpl implements AiClientFactory {
                     return buildQianWenChatClient(apiKey);
                 case DEEP_SEEK:
                     return buildDeepSeekChatClient(apiKey);
+                case OPENAI:
+                    return buildOpenAiChatModel(apiKey, url);
                 default:
                     throw new IllegalArgumentException(StrUtil.format("未知平台({})", platform));
             }
@@ -74,11 +74,9 @@ public class AiClientFactoryImpl implements AiClientFactory {
     }
 
     @Override
-    public ChatModel getDefaultChatClient(AiPlatformEnum platform) {
+    public ChatModel getDefaultChatModel(AiPlatformEnum platform) {
         //noinspection EnhancedSwitchMigration
         switch (platform) {
-            case OPENAI:
-                return SpringUtil.getBean(OpenAiChatModel.class);
             case OLLAMA:
                 return SpringUtil.getBean(OllamaChatModel.class);
             case YI_YAN:
@@ -87,13 +85,15 @@ public class AiClientFactoryImpl implements AiClientFactory {
                 return SpringUtil.getBean(XingHuoChatClient.class);
             case QIAN_WEN:
                 return SpringUtil.getBean(TongYiChatModel.class);
+            case OPENAI:
+                return SpringUtil.getBean(OpenAiChatModel.class);
             default:
                 throw new IllegalArgumentException(StrUtil.format("未知平台({})", platform));
         }
     }
 
     @Override
-    public ImageModel getDefaultImageClient(AiPlatformEnum platform) {
+    public ImageModel getDefaultImageModel(AiPlatformEnum platform) {
         //noinspection EnhancedSwitchMigration
         switch (platform) {
             case OPENAI:
@@ -106,11 +106,11 @@ public class AiClientFactoryImpl implements AiClientFactory {
     }
 
     @Override
-    public ImageModel getOrCreateImageClient(AiPlatformEnum platform, String apiKey, String url) {
+    public ImageModel getOrCreateImageModel(AiPlatformEnum platform, String apiKey, String url) {
         //noinspection EnhancedSwitchMigration
         switch (platform) {
             case OPENAI:
-                return buildOpenAiImageClient(apiKey, url);
+                return buildOpenAiImageModel(apiKey, url);
             case STABLE_DIFFUSION:
                 return buildStabilityAiImageClient(apiKey, url);
             default:
@@ -145,10 +145,19 @@ public class AiClientFactoryImpl implements AiClientFactory {
     /**
      * 可参考 {@link OpenAiAutoConfiguration}
      */
-    private static OpenAiChatModel buildOpenAiChatClient(String openAiToken, String url) {
+    private static OpenAiChatModel buildOpenAiChatModel(String openAiToken, String url) {
         url = StrUtil.blankToDefault(url, ApiUtils.DEFAULT_BASE_URL);
         OpenAiApi openAiApi = new OpenAiApi(url, openAiToken);
         return new OpenAiChatModel(openAiApi);
+    }
+
+    /**
+     * 可参考 {@link OpenAiAutoConfiguration}
+     */
+    private OpenAiImageModel buildOpenAiImageModel(String openAiToken, String url) {
+        url = StrUtil.blankToDefault(url, ApiUtils.DEFAULT_BASE_URL);
+        OpenAiImageApi openAiApi = new OpenAiImageApi(url, openAiToken, RestClient.builder());
+        return new OpenAiImageModel(openAiApi);
     }
 
     /**
@@ -198,12 +207,6 @@ public class AiClientFactoryImpl implements AiClientFactory {
         TongYiConnectionProperties connectionProperties = new TongYiConnectionProperties();
         connectionProperties.setApiKey(key);
         return new TongYiAutoConfiguration().tongYiChatClient(generation, chatOptions, connectionProperties);
-    }
-
-    private OpenAiImageModel buildOpenAiImageClient(String openAiToken, String url) {
-        url = StrUtil.blankToDefault(url, ApiUtils.DEFAULT_BASE_URL);
-        OpenAiImageApi openAiApi = new OpenAiImageApi(url, openAiToken, RestClient.builder());
-        return new OpenAiImageModel(openAiApi);
     }
 
     private StabilityAiImageModel buildStabilityAiImageClient(String apiKey, String url) {

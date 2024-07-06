@@ -70,7 +70,7 @@ public class AiChatMessageServiceImpl implements AiChatMessageService {
         List<AiChatMessageDO> historyMessages = chatMessageMapper.selectListByConversationId(conversation.getId());
         // 1.2 校验模型
         AiChatModelDO model = chatModalService.validateChatModel(conversation.getModelId());
-        ChatModel chatClient = apiKeyService.getChatClient(model.getKeyId());
+        ChatModel chatModel = apiKeyService.getChatModel(model.getKeyId());
 
         // 2. 插入 user 发送消息
         AiChatMessageDO userMessage = createChatMessage(conversation.getId(), null, model,
@@ -82,7 +82,7 @@ public class AiChatMessageServiceImpl implements AiChatMessageService {
 
         // 3.2 创建 chat 需要的 Prompt
         Prompt prompt = buildPrompt(conversation, historyMessages, model, sendReqVO);
-        ChatResponse chatResponse = chatClient.call(prompt);
+        ChatResponse chatResponse = chatModel.call(prompt);
 
         // 3.3 段式返回
         String newContent = chatResponse.getResult().getOutput().getContent();
@@ -101,7 +101,7 @@ public class AiChatMessageServiceImpl implements AiChatMessageService {
         List<AiChatMessageDO> historyMessages = chatMessageMapper.selectListByConversationId(conversation.getId());
         // 1.2 校验模型
         AiChatModelDO model = chatModalService.validateChatModel(conversation.getModelId());
-        StreamingChatModel chatClient = apiKeyService.getChatClient(model.getKeyId());
+        StreamingChatModel chatModel = apiKeyService.getChatModel(model.getKeyId());
 
         // 2. 插入 user 发送消息
         AiChatMessageDO userMessage = createChatMessage(conversation.getId(), null, model,
@@ -113,7 +113,7 @@ public class AiChatMessageServiceImpl implements AiChatMessageService {
 
         // 3.2 创建 chat 需要的 Prompt
         Prompt prompt = buildPrompt(conversation, historyMessages, model, sendReqVO);
-        Flux<ChatResponse> streamResponse = chatClient.stream(prompt);
+        Flux<ChatResponse> streamResponse = chatModel.stream(prompt);
 
         // 3.3 流式返回
         // TODO 注意：Schedulers.immediate() 目的是，避免默认 Schedulers.parallel() 并发消费 chunk 导致 SSE 响应前端会乱序问题

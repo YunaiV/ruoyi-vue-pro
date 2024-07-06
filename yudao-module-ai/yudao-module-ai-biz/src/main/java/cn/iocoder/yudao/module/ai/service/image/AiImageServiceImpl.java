@@ -98,8 +98,8 @@ public class AiImageServiceImpl implements AiImageService {
             // 1.1 构建请求
             ImageOptions request = buildImageOptions(req);
             // 1.2 执行请求
-            ImageModel imageClient = apiKeyService.getImageClient(AiPlatformEnum.validatePlatform(req.getPlatform()));
-            ImageResponse response = imageClient.call(new ImagePrompt(req.getPrompt(), request));
+            ImageModel imageModel = apiKeyService.getImageModel(AiPlatformEnum.validatePlatform(req.getPlatform()));
+            ImageResponse response = imageModel.call(new ImagePrompt(req.getPrompt(), request));
 
             // 2. 上传到文件服务
             byte[] fileContent = Base64.decode(response.getResult().getOutput().getB64Json());

@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.ai.service.model;
 
 import cn.iocoder.yudao.framework.ai.core.enums.AiPlatformEnum;
-import cn.iocoder.yudao.framework.ai.core.factory.AiClientFactory;
+import cn.iocoder.yudao.framework.ai.core.factory.AiModelFactory;
 import cn.iocoder.yudao.framework.ai.core.model.midjourney.api.MidjourneyApi;
 import cn.iocoder.yudao.framework.ai.core.model.suno.api.SunoApi;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
@@ -35,7 +35,7 @@ public class AiApiKeyServiceImpl implements AiApiKeyService {
     private AiApiKeyMapper apiKeyMapper;
 
     @Resource
-    private AiClientFactory clientFactory;
+    private AiModelFactory modelFactory;
 
     @Override
     public Long createApiKey(AiApiKeySaveReqVO createReqVO) {
@@ -98,19 +98,19 @@ public class AiApiKeyServiceImpl implements AiApiKeyService {
     // ========== 与 spring-ai 集成 ==========
 
     @Override
-    public ChatModel getChatClient(Long id) {
+    public ChatModel getChatModel(Long id) {
         AiApiKeyDO apiKey = validateApiKey(id);
         AiPlatformEnum platform = AiPlatformEnum.validatePlatform(apiKey.getPlatform());
-        return clientFactory.getOrCreateChatClient(platform, apiKey.getApiKey(), apiKey.getUrl());
+        return modelFactory.getOrCreateChatClient(platform, apiKey.getApiKey(), apiKey.getUrl());
     }
 
     @Override
-    public ImageModel getImageClient(AiPlatformEnum platform) {
+    public ImageModel getImageModel(AiPlatformEnum platform) {
         AiApiKeyDO apiKey = apiKeyMapper.selectFirstByPlatformAndStatus(platform.getName(), CommonStatusEnum.ENABLE.getStatus());
         if (apiKey == null) {
             throw exception(API_KEY_IMAGE_NODE_FOUND, platform.getName());
         }
-        return clientFactory.getOrCreateImageClient(platform, apiKey.getApiKey(), apiKey.getUrl());
+        return modelFactory.getOrCreateImageModel(platform, apiKey.getApiKey(), apiKey.getUrl());
     }
 
     @Override
@@ -120,7 +120,7 @@ public class AiApiKeyServiceImpl implements AiApiKeyService {
         if (apiKey == null) {
             throw exception(API_KEY_MIDJOURNEY_NOT_FOUND);
         }
-        return clientFactory.getOrCreateMidjourneyApi(apiKey.getApiKey(), apiKey.getUrl());
+        return modelFactory.getOrCreateMidjourneyApi(apiKey.getApiKey(), apiKey.getUrl());
     }
 
     @Override
@@ -130,7 +130,7 @@ public class AiApiKeyServiceImpl implements AiApiKeyService {
         if (apiKey == null) {
             throw exception(API_KEY_SUNO_NOT_FOUND);
         }
-        return clientFactory.getOrCreateSunoApi(apiKey.getApiKey(), apiKey.getUrl());
+        return modelFactory.getOrCreateSunoApi(apiKey.getApiKey(), apiKey.getUrl());
     }
 
 }

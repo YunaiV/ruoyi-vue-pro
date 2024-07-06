@@ -54,7 +54,7 @@ public class AiWriteServiceImpl implements AiWriteService {
     public Flux<CommonResult<String>> generateWriteContent(AiWriteGenerateReqVO generateReqVO, Long userId) {
         // 1.1 校验模型 TODO 芋艿 是不是取默认的模型也ok？；那可以，有限拿 chatRole 的角色；如果没有，则获取默认的；
         AiChatModelDO model = chatModalService.getRequiredDefaultChatModel();
-        StreamingChatModel chatClient = apiKeyService.getChatClient(model.getKeyId());
+        StreamingChatModel chatModel = apiKeyService.getChatModel(model.getKeyId());
         AiPlatformEnum platform = AiPlatformEnum.validatePlatform(model.getPlatform());
 
         // 1.2 插入写作信息
@@ -65,7 +65,7 @@ public class AiWriteServiceImpl implements AiWriteService {
         // 2.1 构建提示词
         ChatOptions chatOptions = AiUtils.buildChatOptions(platform, model.getModel(), model.getTemperature(), model.getMaxTokens());
         Prompt prompt = new Prompt(buildWritingPrompt(generateReqVO), chatOptions);
-        Flux<ChatResponse> streamResponse = chatClient.stream(prompt);
+        Flux<ChatResponse> streamResponse = chatModel.stream(prompt);
 
         // 2.2 流式返回
         StringBuffer contentBuffer = new StringBuffer();
