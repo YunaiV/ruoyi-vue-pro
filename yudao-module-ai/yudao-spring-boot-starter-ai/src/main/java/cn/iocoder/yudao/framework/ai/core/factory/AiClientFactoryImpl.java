@@ -9,6 +9,7 @@ import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.framework.ai.config.YudaoAiAutoConfiguration;
 import cn.iocoder.yudao.framework.ai.config.YudaoAiProperties;
 import cn.iocoder.yudao.framework.ai.core.enums.AiPlatformEnum;
+import cn.iocoder.yudao.framework.ai.core.model.deepseek.DeepSeekChatClient;
 import cn.iocoder.yudao.framework.ai.core.model.midjourney.api.MidjourneyApi;
 import cn.iocoder.yudao.framework.ai.core.model.suno.api.SunoApi;
 import cn.iocoder.yudao.framework.ai.core.model.xinghuo.XingHuoChatClient;
@@ -64,8 +65,8 @@ public class AiClientFactoryImpl implements AiClientFactory {
                     return buildXingHuoChatClient(apiKey);
                 case QIAN_WEN:
                     return buildQianWenChatClient(apiKey);
-//                case GEMIR:
-//                    return buildGoogleGemir(apiKey);
+                case DEEP_SEEK:
+                    return buildDeepSeekChatClient(apiKey);
                 default:
                     throw new IllegalArgumentException(StrUtil.format("未知平台({})", platform));
             }
@@ -182,6 +183,10 @@ public class AiClientFactoryImpl implements AiClientFactory {
         return new XingHuoChatClient(appKey, secretKey);
     }
 
+    private static DeepSeekChatClient buildDeepSeekChatClient(String apiKey) {
+        return new DeepSeekChatClient(apiKey);
+    }
+
     /**
      * 可参考 {@link TongYiAutoConfiguration#tongYiChatClient(Generation, TongYiChatProperties, TongYiConnectionProperties)}
      */
@@ -194,13 +199,6 @@ public class AiClientFactoryImpl implements AiClientFactory {
         connectionProperties.setApiKey(key);
         return new TongYiAutoConfiguration().tongYiChatClient(generation, chatOptions, connectionProperties);
     }
-
-//    private static VertexAiGeminiChatClient buildGoogleGemir(String key) {
-//        List<String> keys = StrUtil.split(key, '|');
-//        Assert.equals(keys.size(), 2, "VertexAiGeminiChatClient 的密钥需要 (projectId|location) 格式");
-//        VertexAI vertexApi =  new VertexAI(keys.get(0), keys.get(1));
-//        return new VertexAiGeminiChatClient(vertexApi);
-//    }
 
     private OpenAiImageModel buildOpenAiImageClient(String openAiToken, String url) {
         url = StrUtil.blankToDefault(url, ApiUtils.DEFAULT_BASE_URL);

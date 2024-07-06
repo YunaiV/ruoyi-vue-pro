@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.framework.ai.chat;
 
-import cn.iocoder.yudao.framework.ai.core.model.xinghuo.XingHuoChatClient;
+import cn.iocoder.yudao.framework.ai.core.model.deepseek.DeepSeekChatClient;
 import org.junit.jupiter.api.Test;
 import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.chat.messages.SystemMessage;
@@ -13,15 +13,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * {@link XingHuoChatClient} 集成测试
+ * {@link DeepSeekChatClient} 集成测试
  *
- * @author fansili
+ * @author 芋道源码
  */
-public class XingHuoChatClientTests {
+public class DeepSeekChatTests {
 
-    private final XingHuoChatClient chatModel = new XingHuoChatClient(
-            "cb6415c19d6162cda07b47316fcb0416",
-            "Y2JiYTIxZjA3MDMxMjNjZjQzYzVmNzdh");
+    private final DeepSeekChatClient chatModel = new DeepSeekChatClient("sk-e94db327cc7d457d99a8de8810fc6b12");
 
     @Test
     public void testCall() {

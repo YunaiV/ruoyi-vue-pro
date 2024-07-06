@@ -2,6 +2,7 @@ package cn.iocoder.yudao.framework.ai.core.util;
 
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.ai.core.enums.AiPlatformEnum;
+import cn.iocoder.yudao.framework.ai.core.model.deepseek.DeepSeekChatOptions;
 import cn.iocoder.yudao.framework.ai.core.model.xinghuo.XingHuoChatOptions;
 import com.alibaba.cloud.ai.tongyi.chat.TongYiChatOptions;
 import org.springframework.ai.chat.messages.*;
@@ -33,6 +34,8 @@ public class AiUtils {
                 return XingHuoChatOptions.builder().model(model).temperature(temperatureF).maxTokens(maxTokens).build();
             case QIAN_WEN:
                 return TongYiChatOptions.builder().withModel(model).withTemperature(temperature).withMaxTokens(maxTokens).build();
+            case DEEP_SEEK:
+                return DeepSeekChatOptions.builder().model(model).temperature(temperatureF).maxTokens(maxTokens).build();
             default:
                 throw new IllegalArgumentException(StrUtil.format("未知平台({})", platform));
         }

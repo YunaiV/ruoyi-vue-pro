@@ -3,7 +3,6 @@ package cn.iocoder.yudao.framework.ai.core.enums;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
-// TODO 芋艿：这块，看看要不要调整下；
 /**
  * AI 模型平台
  *
@@ -13,15 +12,20 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum AiPlatformEnum {
 
+    // ========== 国内平台 ==========
+
+    YI_YAN("YiYan", "文心一言"), // 百度
+    QIAN_WEN("QianWen", "千问"), // 阿里
+    DEEP_SEEK("DeepSeek", "DeepSeek"), // DeepSeek
+    XING_HUO("XingHuo", "星火"), // 讯飞
+
+    // ========== 国外平台 ==========
+
     OPENAI("OpenAI", "OpenAI"),
     OLLAMA("Ollama", "Ollama"),
-    YI_YAN("YiYan", "文心一言"), // 百度
-    XING_HUO("XingHuo", "星火"), // 讯飞
-    QIAN_WEN("QianWen", "千问"), // 阿里
-    GEMIR ("gemir ", "gemir "), // 谷歌
 
     STABLE_DIFFUSION("StableDiffusion", "StableDiffusion"), // Stability AI
-    MIDJOURNEY("Midjourney", "Midjourney"),
+    MIDJOURNEY("Midjourney", "Midjourney"), // Midjourney
     SUNO("Suno", "Suno"), // Suno AI
     ;
 

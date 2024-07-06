@@ -19,6 +19,11 @@ public class YudaoAiProperties {
     private XingHuoProperties xinghuo;
 
     /**
+     * DeepSeek
+     */
+    private DeepSeekProperties deepSeek;
+
+    /**
      * Midjourney 绘图
      */
     private MidjourneyProperties midjourney;
@@ -40,6 +45,19 @@ public class YudaoAiProperties {
         private Float temperature;
         private Integer maxTokens;
         private Integer topK;
+
+    }
+
+    @Data
+    public static class DeepSeekProperties {
+
+        private String enable;
+        private String apiKey;
+
+        private String model;
+        private Float temperature;
+        private Integer maxTokens;
+        private Float topP;
 
     }
 
