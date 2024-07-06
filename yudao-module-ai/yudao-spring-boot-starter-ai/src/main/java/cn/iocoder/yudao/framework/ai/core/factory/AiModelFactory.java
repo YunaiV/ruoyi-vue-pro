@@ -23,7 +23,7 @@ public interface AiModelFactory {
      * @param url API URL
      * @return ChatModel 对象
      */
-    ChatModel getOrCreateChatClient(AiPlatformEnum platform, String apiKey, String url);
+    ChatModel getOrCreateChatModel(AiPlatformEnum platform, String apiKey, String url);
 
     /**
      * 基于默认配置，获得 ChatModel 对象

@@ -50,7 +50,7 @@ import java.util.List;
 public class AiModelFactoryImpl implements AiModelFactory {
 
     @Override
-    public ChatModel getOrCreateChatClient(AiPlatformEnum platform, String apiKey, String url) {
+    public ChatModel getOrCreateChatModel(AiPlatformEnum platform, String apiKey, String url) {
         String cacheKey = buildClientCacheKey(ChatModel.class, platform, apiKey, url);
         return Singleton.get(cacheKey, (Func0<ChatModel>) () -> {
             //noinspection EnhancedSwitchMigration

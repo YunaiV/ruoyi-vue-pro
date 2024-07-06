@@ -101,7 +101,7 @@ public class AiApiKeyServiceImpl implements AiApiKeyService {
     public ChatModel getChatModel(Long id) {
         AiApiKeyDO apiKey = validateApiKey(id);
         AiPlatformEnum platform = AiPlatformEnum.validatePlatform(apiKey.getPlatform());
-        return modelFactory.getOrCreateChatClient(platform, apiKey.getApiKey(), apiKey.getUrl());
+        return modelFactory.getOrCreateChatModel(platform, apiKey.getApiKey(), apiKey.getUrl());
     }
 
     @Override
