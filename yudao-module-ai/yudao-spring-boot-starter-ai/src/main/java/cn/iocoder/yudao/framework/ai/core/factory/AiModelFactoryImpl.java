@@ -55,8 +55,6 @@ public class AiModelFactoryImpl implements AiModelFactory {
         return Singleton.get(cacheKey, (Func0<ChatModel>) () -> {
             //noinspection EnhancedSwitchMigration
             switch (platform) {
-                case OLLAMA:
-                    return buildOllamaChatClient(url);
                 case YI_YAN:
                     return buildYiYanChatClient(apiKey);
                 case XING_HUO:
@@ -67,6 +65,8 @@ public class AiModelFactoryImpl implements AiModelFactory {
                     return buildDeepSeekChatClient(apiKey);
                 case OPENAI:
                     return buildOpenAiChatModel(apiKey, url);
+                case OLLAMA:
+                    return buildOllamaChatModel(url);
                 default:
                     throw new IllegalArgumentException(StrUtil.format("未知平台({})", platform));
             }
@@ -163,7 +163,7 @@ public class AiModelFactoryImpl implements AiModelFactory {
     /**
      * 可参考 {@link OllamaAutoConfiguration}
      */
-    private static OllamaChatModel buildOllamaChatClient(String url) {
+    private static OllamaChatModel buildOllamaChatModel(String url) {
         OllamaApi ollamaApi = new OllamaApi(url);
         return new OllamaChatModel(ollamaApi);
     }
