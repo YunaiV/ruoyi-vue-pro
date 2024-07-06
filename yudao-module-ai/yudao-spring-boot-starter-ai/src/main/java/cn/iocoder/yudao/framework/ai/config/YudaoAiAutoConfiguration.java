@@ -5,8 +5,7 @@ import cn.iocoder.yudao.framework.ai.core.factory.AiClientFactoryImpl;
 import cn.iocoder.yudao.framework.ai.core.model.midjourney.api.MidjourneyApi;
 import cn.iocoder.yudao.framework.ai.core.model.suno.api.SunoApi;
 import cn.iocoder.yudao.framework.ai.core.model.xinghuo.XingHuoChatClient;
-import cn.iocoder.yudao.framework.ai.core.model.xinghuo.XingHuoOptions;
-import cn.iocoder.yudao.framework.ai.core.model.xinghuo.api.XingHuoApi;
+import cn.iocoder.yudao.framework.ai.core.model.xinghuo.XingHuoChatOptions;
 import com.alibaba.cloud.ai.tongyi.TongYiAutoConfiguration;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
@@ -36,21 +35,14 @@ public class YudaoAiAutoConfiguration {
     @Bean
     @ConditionalOnProperty(value = "yudao.ai.xinghuo.enable", havingValue = "true")
     public XingHuoChatClient xingHuoChatClient(YudaoAiProperties yudaoAiProperties) {
-        YudaoAiProperties.XingHuoProperties xingHuoProperties = yudaoAiProperties.getXinghuo();
-        // 转换配置
-        XingHuoOptions xingHuoOptions = new XingHuoOptions();
-        xingHuoOptions.setChatModel(xingHuoProperties.getModel());
-        xingHuoOptions.setTopK(xingHuoProperties.getTopK());
-        xingHuoOptions.setTemperature(xingHuoProperties.getTemperature());
-        xingHuoOptions.setMaxTokens(xingHuoProperties.getMaxTokens());
-        return new XingHuoChatClient(
-                new XingHuoApi(
-                        xingHuoProperties.getAppId(),
-                        xingHuoProperties.getAppKey(),
-                        xingHuoProperties.getSecretKey()
-                ),
-                xingHuoOptions
-        );
+        YudaoAiProperties.XingHuoProperties properties = yudaoAiProperties.getXinghuo();
+        XingHuoChatOptions options = XingHuoChatOptions.builder()
+                .model(properties.getModel())
+                .temperature(properties.getTemperature())
+                .maxTokens(properties.getMaxTokens())
+                .topK(properties.getTopK())
+                .build();
+        return new XingHuoChatClient(properties.getAppKey(), properties.getSecretKey(), options);
     }
 
     @Bean

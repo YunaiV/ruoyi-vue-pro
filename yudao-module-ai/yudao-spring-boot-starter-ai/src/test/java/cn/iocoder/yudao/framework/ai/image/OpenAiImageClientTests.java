@@ -1,9 +1,9 @@
 package cn.iocoder.yudao.framework.ai.image;
 
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.ai.image.ImagePrompt;
 import org.springframework.ai.image.ImageResponse;
-import org.junit.Before;
-import org.junit.Test;
 import org.springframework.ai.openai.OpenAiImageModel;
 import org.springframework.ai.openai.api.OpenAiImageApi;
 
@@ -25,7 +25,7 @@ public class OpenAiImageClientTests {
 
     private OpenAiImageModel openAiImageClient;
 
-    @Before
+    @BeforeEach
     public void setup() {
         // 初始化 openAiImageClient
         this.openAiImageClient = new OpenAiImageModel(

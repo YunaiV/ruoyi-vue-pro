@@ -1,55 +1,45 @@
 package cn.iocoder.yudao.framework.ai.config;
 
-import cn.iocoder.yudao.framework.ai.core.enums.AiPlatformEnum;
-import cn.iocoder.yudao.framework.ai.core.model.xinghuo.XingHuoChatModel;
 import lombok.Data;
-import lombok.experimental.Accessors;
-import org.springframework.ai.autoconfigure.openai.OpenAiImageProperties;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
- * ai 自动配置
+ * 芋道 AI 配置类
  *
  * @author fansili
- * @time 2024/4/12 16:29
  * @since 1.0
  */
-@Data
-@Accessors(chain = true)
 @ConfigurationProperties(prefix = "yudao.ai")
+@Data
 public class YudaoAiProperties {
 
+    /**
+     * 讯飞星火
+     */
     private XingHuoProperties xinghuo;
-    private OpenAiImageProperties openAiImage;
+
+    /**
+     * Midjourney 绘图
+     */
     private MidjourneyProperties midjourney;
+
+    /**
+     * Suno 音乐
+     */
     private SunoProperties suno;
 
     @Data
-    @Accessors(chain = true)
-    public static class ChatProperties {
+    public static class XingHuoProperties {
 
-        private boolean enable = false;
-
-        private AiPlatformEnum aiPlatform;
-
-        private Float temperature;
-
-        private Float topP;
-
-        private Integer topK;
-        /**
-         * 用于限制模型生成token的数量，max_tokens设置的是生成上限，并不表示一定会生成这么多的token数量
-         */
-        private Integer maxTokens;
-    }
-
-    @Data
-    public static class XingHuoProperties extends ChatProperties {
-
+        private String enable;
         private String appId;
         private String appKey;
         private String secretKey;
-        private XingHuoChatModel model;
+
+        private String model;
+        private Float temperature;
+        private Integer maxTokens;
+        private Integer topK;
 
     }
 
@@ -57,8 +47,9 @@ public class YudaoAiProperties {
     public static class MidjourneyProperties {
 
         private String enable;
-        private String apiKey;
         private String baseUrl;
+
+        private String apiKey;
         private String notifyUrl;
 
     }
@@ -68,9 +59,6 @@ public class YudaoAiProperties {
 
         private boolean enable = false;
 
-        /**
-         * API 服务的基本地址
-         */
         private String baseUrl;
 
     }

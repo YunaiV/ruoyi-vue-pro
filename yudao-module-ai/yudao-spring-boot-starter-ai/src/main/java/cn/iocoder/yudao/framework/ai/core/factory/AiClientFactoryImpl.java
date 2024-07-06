@@ -12,7 +12,6 @@ import cn.iocoder.yudao.framework.ai.core.enums.AiPlatformEnum;
 import cn.iocoder.yudao.framework.ai.core.model.midjourney.api.MidjourneyApi;
 import cn.iocoder.yudao.framework.ai.core.model.suno.api.SunoApi;
 import cn.iocoder.yudao.framework.ai.core.model.xinghuo.XingHuoChatClient;
-import cn.iocoder.yudao.framework.ai.core.model.xinghuo.api.XingHuoApi;
 import com.alibaba.cloud.ai.tongyi.TongYiAutoConfiguration;
 import com.alibaba.cloud.ai.tongyi.TongYiConnectionProperties;
 import com.alibaba.cloud.ai.tongyi.chat.TongYiChatModel;
@@ -178,11 +177,9 @@ public class AiClientFactoryImpl implements AiClientFactory {
     private static XingHuoChatClient buildXingHuoChatClient(String key) {
         List<String> keys = StrUtil.split(key, '|');
         Assert.equals(keys.size(), 3, "XingHuoChatClient 的密钥需要 (appid|appKey|secretKey) 格式");
-        String appId = keys.get(0);
         String appKey = keys.get(1);
         String secretKey = keys.get(2);
-        XingHuoApi xingHuoApi = new XingHuoApi(appId, appKey, secretKey);
-        return new XingHuoChatClient(xingHuoApi);
+        return new XingHuoChatClient(appKey, secretKey);
     }
 
     /**

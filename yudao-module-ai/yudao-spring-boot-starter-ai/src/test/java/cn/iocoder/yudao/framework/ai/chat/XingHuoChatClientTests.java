@@ -1,11 +1,7 @@
 package cn.iocoder.yudao.framework.ai.chat;
 
 import cn.iocoder.yudao.framework.ai.core.model.xinghuo.XingHuoChatClient;
-import cn.iocoder.yudao.framework.ai.core.model.xinghuo.XingHuoChatModel;
-import cn.iocoder.yudao.framework.ai.core.model.xinghuo.XingHuoOptions;
-import cn.iocoder.yudao.framework.ai.core.model.xinghuo.api.XingHuoApi;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.chat.messages.SystemMessage;
 import org.springframework.ai.chat.messages.UserMessage;
@@ -15,58 +11,44 @@ import reactor.core.publisher.Flux;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Scanner;
-import java.util.function.Consumer;
 
-// TODO 芋艿：整理单测
 /**
- * 讯飞星火 tests
- * <p>
- * author: fansili
- * time: 2024/3/11 11:00
+ * {@link XingHuoChatClient} 集成测试
+ *
+ * @author fansili
  */
 public class XingHuoChatClientTests {
 
-    private XingHuoChatClient xingHuoChatClient;
+    private final XingHuoChatClient client = new XingHuoChatClient(
+            "cb6415c19d6162cda07b47316fcb0416",
+            "Y2JiYTIxZjA3MDMxMjNjZjQzYzVmNzdh");
 
-    @Before
-    public void setup() {
-        // 初始化 xingHuoChatClient
-        xingHuoChatClient = new XingHuoChatClient(
-                new XingHuoApi(
-                        "13c8cca6",
-                        "cb6415c19d6162cda07b47316fcb0416",
-                        "Y2JiYTIxZjA3MDMxMjNjZjQzYzVmNzdh"
-                ),
-                new XingHuoOptions().setChatModel(XingHuoChatModel.XING_HUO_3_5)
-        );
+    @Test
+    public void testCall() {
+        // 准备参数
+        List<Message> messages = new ArrayList<>();
+        messages.add(new SystemMessage("你是一个优质的文言文作者，用文言文描述着各城市的人文风景。"));
+        messages.add(new UserMessage("1 + 1 = ？"));
+
+        // 调用
+        ChatResponse response = client.call(new Prompt(messages));
+        // 打印结果
+        System.err.println(response);
     }
 
     @Test
-    public void callTest() {
+    public void testStream() {
+        // 准备参数
         List<Message> messages = new ArrayList<>();
         messages.add(new SystemMessage("你是一个优质的文言文作者，用文言文描述着各城市的人文风景。"));
-        messages.add(new UserMessage("长沙怎么样？"));
+        messages.add(new UserMessage("1 + 1 = ？"));
 
-        ChatResponse call = xingHuoChatClient.call(new Prompt(messages));
-        System.err.println(call.getResult());
+        // 调用
+        Flux<ChatResponse> flux = client.stream(new Prompt(messages));
+        // 打印结果
+        List<ChatResponse> responses = flux.collectList().block();
+        assert responses != null;
+        responses.forEach(System.err::println);
     }
 
-    @Test
-    public void streamTest() {
-        List<Message> messages = new ArrayList<>();
-        messages.add(new SystemMessage("你是一个优质的文言文作者，用文言文描述着各城市的人文风景。"));
-        messages.add(new UserMessage("长沙怎么样？"));
-
-        Flux<ChatResponse> stream = xingHuoChatClient.stream(new Prompt(messages));
-        stream.subscribe(new Consumer<ChatResponse>() {
-            @Override
-            public void accept(ChatResponse chatResponse) {
-                System.err.print(chatResponse.getResult().getOutput().getContent());
-            }
-        });
-        // 阻止退出
-        Scanner scanner = new Scanner(System.in);
-        scanner.nextLine();
-    }
 }

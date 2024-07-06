@@ -1,8 +1,7 @@
 package cn.iocoder.yudao.framework.ai.music;
 
 import cn.iocoder.yudao.framework.ai.core.model.suno.api.SunoApi;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
@@ -13,14 +12,8 @@ import java.util.List;
  */
 public class SunoTests {
 
-    private SunoApi sunoApi;
-
-    @Before
-    public void setup() {
-        String url = "https://suno-55ishh05u-status2xxs-projects.vercel.app";
-//        String url = "http://127.0.0.1:3001";
-        this.sunoApi = new SunoApi(url);
-    }
+    private final SunoApi sunoApi = new SunoApi("https://suno-55ishh05u-status2xxs-projects.vercel.app");
+//    private final SunoApi sunoApi = new SunoApi("http://127.0.0.1:3001");
 
     @Test
     public void selectById() {

@@ -33,11 +33,6 @@
             <artifactId>spring-ai-stability-ai-spring-boot-starter</artifactId>
             <version>${spring-ai.version}</version>
         </dependency>
-<!--        <dependency>-->
-<!--            <groupId>org.springframework.ai</groupId>-->
-<!--            <artifactId>spring-ai-vertex-ai-gemini</artifactId>-->
-<!--            <version>1.0.3</version>-->
-<!--        </dependency>-->
 
         <dependency>
             <groupId>cn.iocoder.boot</groupId>
@@ -61,8 +56,8 @@
 
         <!-- Test 测试相关 -->
         <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>

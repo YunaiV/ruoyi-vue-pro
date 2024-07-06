@@ -2,8 +2,7 @@ package cn.iocoder.yudao.framework.ai.core.util;
 
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.ai.core.enums.AiPlatformEnum;
-import cn.iocoder.yudao.framework.ai.core.model.xinghuo.XingHuoChatModel;
-import cn.iocoder.yudao.framework.ai.core.model.xinghuo.XingHuoOptions;
+import cn.iocoder.yudao.framework.ai.core.model.xinghuo.XingHuoChatOptions;
 import com.alibaba.cloud.ai.tongyi.chat.TongYiChatOptions;
 import org.springframework.ai.chat.messages.*;
 import org.springframework.ai.chat.prompt.ChatOptions;
@@ -31,8 +30,7 @@ public class AiUtils {
 //                return QianFanChatOptions.builder().withModel(model).withTemperature(temperatureF).withMaxTokens(maxTokens).build();
                 return QianFanChatOptions.builder().withTemperature(temperatureF).withMaxTokens(maxTokens).build();
             case XING_HUO:
-                return new XingHuoOptions().setChatModel(XingHuoChatModel.valueOfModel(model)).setTemperature(temperatureF)
-                        .setMaxTokens(maxTokens);
+                return XingHuoChatOptions.builder().model(model).temperature(temperatureF).maxTokens(maxTokens).build();
             case QIAN_WEN:
                 return TongYiChatOptions.builder().withModel(model).withTemperature(temperature).withMaxTokens(maxTokens).build();
             default:
