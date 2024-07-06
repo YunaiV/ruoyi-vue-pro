@@ -35,6 +35,7 @@ public class OpenAiImageModelTests {
 
         // 方法调用
         ImageResponse response = imageClient.call(prompt);
+        // 打印结果
         System.out.println(response);
     }
 
