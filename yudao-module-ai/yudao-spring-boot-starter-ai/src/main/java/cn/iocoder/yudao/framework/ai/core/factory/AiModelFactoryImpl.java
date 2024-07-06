@@ -55,12 +55,12 @@ public class AiModelFactoryImpl implements AiModelFactory {
         return Singleton.get(cacheKey, (Func0<ChatModel>) () -> {
             //noinspection EnhancedSwitchMigration
             switch (platform) {
+                case TONG_YI:
+                    return buildTongYiChatModel(apiKey);
                 case YI_YAN:
                     return buildYiYanChatClient(apiKey);
                 case XING_HUO:
                     return buildXingHuoChatClient(apiKey);
-                case QIAN_WEN:
-                    return buildQianWenChatClient(apiKey);
                 case DEEP_SEEK:
                     return buildDeepSeekChatClient(apiKey);
                 case OPENAI:
@@ -77,16 +77,16 @@ public class AiModelFactoryImpl implements AiModelFactory {
     public ChatModel getDefaultChatModel(AiPlatformEnum platform) {
         //noinspection EnhancedSwitchMigration
         switch (platform) {
-            case OLLAMA:
-                return SpringUtil.getBean(OllamaChatModel.class);
+            case TONG_YI:
+                return SpringUtil.getBean(TongYiChatModel.class);
             case YI_YAN:
                 return SpringUtil.getBean(QianFanChatModel.class);
             case XING_HUO:
                 return SpringUtil.getBean(XingHuoChatClient.class);
-            case QIAN_WEN:
-                return SpringUtil.getBean(TongYiChatModel.class);
             case OPENAI:
                 return SpringUtil.getBean(OpenAiChatModel.class);
+            case OLLAMA:
+                return SpringUtil.getBean(OllamaChatModel.class);
             default:
                 throw new IllegalArgumentException(StrUtil.format("未知平台({})", platform));
         }
@@ -143,6 +143,20 @@ public class AiModelFactoryImpl implements AiModelFactory {
     // ========== 各种创建 spring-ai 客户端的方法 ==========
 
     /**
+     * 可参考 {@link TongYiAutoConfiguration#tongYiChatClient(Generation, TongYiChatProperties, TongYiConnectionProperties)}
+     */
+    private static TongYiChatModel buildTongYiChatModel(String key) {
+        com.alibaba.dashscope.aigc.generation.Generation generation = SpringUtil.getBean(Generation.class);
+        TongYiChatProperties chatOptions = SpringUtil.getBean(TongYiChatProperties.class);
+        // TODO @芋艿：貌似 apiKey 是全局唯一的？？？得测试下
+        // TODO @芋艿：貌似阿里云不是增量返回的
+        // 该 issue 进行跟进中 https://github.com/alibaba/spring-cloud-alibaba/issues/3790
+        TongYiConnectionProperties connectionProperties = new TongYiConnectionProperties();
+        connectionProperties.setApiKey(key);
+        return new TongYiAutoConfiguration().tongYiChatClient(generation, chatOptions, connectionProperties);
+    }
+
+    /**
      * 可参考 {@link OpenAiAutoConfiguration}
      */
     private static OpenAiChatModel buildOpenAiChatModel(String openAiToken, String url) {
@@ -194,19 +208,6 @@ public class AiModelFactoryImpl implements AiModelFactory {
 
     private static DeepSeekChatClient buildDeepSeekChatClient(String apiKey) {
         return new DeepSeekChatClient(apiKey);
-    }
-
-    /**
-     * 可参考 {@link TongYiAutoConfiguration#tongYiChatClient(Generation, TongYiChatProperties, TongYiConnectionProperties)}
-     */
-    private static TongYiChatModel buildQianWenChatClient(String key) {
-        com.alibaba.dashscope.aigc.generation.Generation generation = SpringUtil.getBean(Generation.class);
-        TongYiChatProperties chatOptions = SpringUtil.getBean(TongYiChatProperties.class);
-        // TODO @xin：貌似 apiKey 是全局唯一的？？？得测试下
-        // TODO @xin：貌似阿里云不是增量返回的
-        TongYiConnectionProperties connectionProperties = new TongYiConnectionProperties();
-        connectionProperties.setApiKey(key);
-        return new TongYiAutoConfiguration().tongYiChatClient(generation, chatOptions, connectionProperties);
     }
 
     private StabilityAiImageModel buildStabilityAiImageClient(String apiKey, String url) {

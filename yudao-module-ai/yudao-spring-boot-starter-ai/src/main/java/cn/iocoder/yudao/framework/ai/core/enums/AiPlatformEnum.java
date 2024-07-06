@@ -14,8 +14,8 @@ public enum AiPlatformEnum {
 
     // ========== 国内平台 ==========
 
+    TONG_YI("TongYi", "通义千问"), // 阿里
     YI_YAN("YiYan", "文心一言"), // 百度
-    QIAN_WEN("QianWen", "千问"), // 阿里
     DEEP_SEEK("DeepSeek", "DeepSeek"), // DeepSeek
     XING_HUO("XingHuo", "星火"), // 讯飞
 
