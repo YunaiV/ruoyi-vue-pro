@@ -156,13 +156,15 @@ spring:
     qianfan: # 文心一言
       api-key: x0cuLZ7XsaTCU08vuJWO87Lg
       secret-key: R9mYF9dl9KASgi5RUq0FQt3wRisSnOcK
+    zhipuai: # 智谱 AI
+      api-key: 32f84543e54eee31f8d56b2bd6020573.3vh9idLJZ2ZhxDEs
+    openai:
+      api-key: sk-yzKea6d8e8212c3bdd99f9f44ced1cae37c097e5aa3BTS7z
+      base-url: https://api.gptsapi.net
     ollama:
       base-url: http://127.0.0.1:11434
       chat:
         model: llama3
-    openai:
-      api-key: sk-yzKea6d8e8212c3bdd99f9f44ced1cae37c097e5aa3BTS7z
-      base-url: https://api.gptsapi.net
     stabilityai:
       api-key: sk-e53UqbboF8QJCscYvzJscJxJXoFcFg4iJjl1oqgE7baJETmx
   cloud:
@@ -173,11 +175,11 @@ spring:
 
 yudao:
   ai:
-    deep-seek:
+    deep-seek: # DeepSeek
       enable: true
       api-key: sk-e94db327cc7d457d99a8de8810fc6b12
       model: deepseek-chat
-    xinghuo:
+    xinghuo: # 讯飞星火
       enable: true
       appId: 13c8cca6
       appKey: cb6415c19d6162cda07b47316fcb0416

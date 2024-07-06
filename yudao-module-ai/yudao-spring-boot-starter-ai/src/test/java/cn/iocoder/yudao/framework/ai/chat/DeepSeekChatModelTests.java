@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.framework.ai.chat;
 
 import cn.iocoder.yudao.framework.ai.core.model.deepseek.DeepSeekChatModel;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.chat.messages.SystemMessage;
@@ -22,6 +23,7 @@ public class DeepSeekChatModelTests {
     private final DeepSeekChatModel chatModel = new DeepSeekChatModel("sk-e94db327cc7d457d99a8de8810fc6b12");
 
     @Test
+    @Disabled
     public void testCall() {
         // 准备参数
         List<Message> messages = new ArrayList<>();
@@ -35,6 +37,7 @@ public class DeepSeekChatModelTests {
     }
 
     @Test
+    @Disabled
     public void testStream() {
         // 准备参数
         List<Message> messages = new ArrayList<>();

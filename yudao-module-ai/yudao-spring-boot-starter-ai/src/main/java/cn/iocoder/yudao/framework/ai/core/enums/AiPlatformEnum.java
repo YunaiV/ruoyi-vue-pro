@@ -17,6 +17,7 @@ public enum AiPlatformEnum {
     TONG_YI("TongYi", "通义千问"), // 阿里
     YI_YAN("YiYan", "文心一言"), // 百度
     DEEP_SEEK("DeepSeek", "DeepSeek"), // DeepSeek
+    ZHI_PU("ZhiPu", "智谱"), // 智谱 AI
     XING_HUO("XingHuo", "星火"), // 讯飞
 
     // ========== 国外平台 ==========

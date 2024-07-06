@@ -23,8 +23,12 @@ import org.springframework.ai.autoconfigure.openai.OpenAiAutoConfiguration;
 import org.springframework.ai.autoconfigure.qianfan.QianFanAutoConfiguration;
 import org.springframework.ai.autoconfigure.qianfan.QianFanChatProperties;
 import org.springframework.ai.autoconfigure.qianfan.QianFanConnectionProperties;
+import org.springframework.ai.autoconfigure.zhipuai.ZhiPuAiAutoConfiguration;
+import org.springframework.ai.autoconfigure.zhipuai.ZhiPuAiChatProperties;
+import org.springframework.ai.autoconfigure.zhipuai.ZhiPuAiConnectionProperties;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.image.ImageModel;
+import org.springframework.ai.model.function.FunctionCallbackContext;
 import org.springframework.ai.ollama.OllamaChatModel;
 import org.springframework.ai.ollama.api.OllamaApi;
 import org.springframework.ai.openai.OpenAiChatModel;
@@ -36,6 +40,8 @@ import org.springframework.ai.qianfan.QianFanChatModel;
 import org.springframework.ai.qianfan.api.QianFanApi;
 import org.springframework.ai.stabilityai.StabilityAiImageModel;
 import org.springframework.ai.stabilityai.api.StabilityAiApi;
+import org.springframework.ai.zhipuai.ZhiPuAiChatModel;
+import org.springframework.ai.zhipuai.api.ZhiPuAiApi;
 import org.springframework.retry.support.RetryTemplate;
 import org.springframework.web.client.ResponseErrorHandler;
 import org.springframework.web.client.RestClient;
@@ -61,6 +67,8 @@ public class AiModelFactoryImpl implements AiModelFactory {
                     return buildYiYanChatModel(apiKey);
                 case DEEP_SEEK:
                     return buildDeepSeekChatModel(apiKey);
+                case ZHI_PU:
+                    return buildZhiPuChatModel(apiKey, url);
                 case XING_HUO:
                     return buildXingHuoChatModel(apiKey);
                 case OPENAI:
@@ -81,6 +89,10 @@ public class AiModelFactoryImpl implements AiModelFactory {
                 return SpringUtil.getBean(TongYiChatModel.class);
             case YI_YAN:
                 return SpringUtil.getBean(QianFanChatModel.class);
+            case DEEP_SEEK:
+                return SpringUtil.getBean(DeepSeekChatModel.class);
+            case ZHI_PU:
+                return SpringUtil.getBean(ZhiPuAiChatModel.class);
             case XING_HUO:
                 return SpringUtil.getBean(XingHuoChatModel.class);
             case OPENAI:
@@ -173,6 +185,15 @@ public class AiModelFactoryImpl implements AiModelFactory {
      */
     private static DeepSeekChatModel buildDeepSeekChatModel(String apiKey) {
         return new DeepSeekChatModel(apiKey);
+    }
+
+    /**
+     * 可参考 {@link ZhiPuAiAutoConfiguration#zhiPuAiChatModel(ZhiPuAiConnectionProperties, ZhiPuAiChatProperties, RestClient.Builder, List, FunctionCallbackContext, RetryTemplate, ResponseErrorHandler)}
+     */
+    private ZhiPuAiChatModel buildZhiPuChatModel(String apiKey, String url) {
+        url = StrUtil.blankToDefault(url, ZhiPuAiConnectionProperties.DEFAULT_BASE_URL);
+        ZhiPuAiApi zhiPuAiApi = new ZhiPuAiApi(url, apiKey);
+        return new ZhiPuAiChatModel(zhiPuAiApi);
     }
 
     /**
