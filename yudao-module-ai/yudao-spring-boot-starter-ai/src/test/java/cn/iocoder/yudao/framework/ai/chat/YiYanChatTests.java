@@ -1,74 +1,61 @@
 package cn.iocoder.yudao.framework.ai.chat;
 
-//import cn.iocoder.yudao.framework.ai.core.model.yiyan.YiYanChatClient;
-//import cn.iocoder.yudao.framework.ai.core.model.yiyan.YiYanChatOptions;
-//import cn.iocoder.yudao.framework.ai.core.model.yiyan.api.YiYanApi;
-//import cn.iocoder.yudao.framework.ai.core.model.yiyan.api.YiYanChatModel;
-//import org.junit.Before;
-//import org.junit.Test;
-//import org.springframework.ai.chat.messages.Message;
-//import org.springframework.ai.chat.messages.SystemMessage;
-//import org.springframework.ai.chat.messages.UserMessage;
-//import org.springframework.ai.chat.model.ChatResponse;
-//import org.springframework.ai.chat.prompt.Prompt;
-//import reactor.core.publisher.Flux;
-//
-//import java.util.ArrayList;
-//import java.util.List;
-//import java.util.Scanner;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+import org.springframework.ai.chat.messages.Message;
+import org.springframework.ai.chat.messages.UserMessage;
+import org.springframework.ai.chat.model.ChatResponse;
+import org.springframework.ai.chat.prompt.Prompt;
+import org.springframework.ai.qianfan.QianFanChatModel;
+import org.springframework.ai.qianfan.QianFanChatOptions;
+import org.springframework.ai.qianfan.api.QianFanApi;
+import reactor.core.publisher.Flux;
 
-// TODO 芋艿：整理单测
+import java.util.ArrayList;
+import java.util.List;
+
 /**
- * chat 文心一言
- * <p>
- * author: fansili
- * time: 2024/3/12 20:59
+ * {@link QianFanChatModel} 的集成测试
+ *
+ * @author fansili
  */
 public class YiYanChatTests {
 
-//    private YiYanChatClient yiYanChatClient;
-//
-//    @Before
-//    public void setup() {
-//        YiYanApi yiYanApi = new YiYanApi(
-//                "x0cuLZ7XsaTCU08vuJWO87Lg",
-//                "R9mYF9dl9KASgi5RUq0FQt3wRisSnOcK",
-//                YiYanChatModel.ERNIE4_3_5_8K,
-//                86400
-//        );
-//        YiYanChatOptions yiYanOptions = new YiYanChatOptions();
-//        yiYanOptions.setMaxOutputTokens(2048);
-//        yiYanOptions.setTopP(0.6f);
-//        yiYanOptions.setTemperature(0.85f);
-//        yiYanChatClient = new YiYanChatClient(
-//                yiYanApi,
-//                yiYanOptions
-//        );
-//    }
-//
-//    @Test
-//    public void callTest() {
-//
-//        // tip: 百度的message 有特殊规则(最后一个message为当前请求的信息，前面的message为历史对话信息)
-//        // tip: 地址 https://cloud.baidu.com/doc/WENXINWORKSHOP/s/jlil56u11
-//        List<Message> messages = new ArrayList<>();
-//        messages.add(new SystemMessage("你是一个优质的文言文作者，用文言文描述着各城市的人文风景，所有问题都采用文言文回答。"));
-//        messages.add(new UserMessage("长沙怎么样？"));
-//
-//        ChatResponse call = yiYanChatClient.call(new Prompt(messages));
-//        System.err.println(call.getResult());
-//    }
-//
-//    @Test
-//    public void streamTest() {
-//        List<Message> messages = new ArrayList<>();
-//        messages.add(new SystemMessage("你是一个优质的文言文作者，用文言文描述着各城市的人文风景，所有问题都采用文言文回答。"));
-//        messages.add(new UserMessage("长沙怎么样？"));
-//
-//        Flux<ChatResponse> fluxResponse = yiYanChatClient.stream(new Prompt(messages));
-//        fluxResponse.subscribe(chatResponse -> System.err.print(chatResponse.getResult().getOutput().getContent()));
-//        // 阻止退出
-//        Scanner scanner = new Scanner(System.in);
-//        scanner.nextLine();
-//    }
+    private final QianFanApi qianFanApi = new QianFanApi(
+            "qS8k8dYr2nXunagK4SSU8Xjj",
+            "pHGbx51ql2f0hOyabQvSZezahVC3hh3e");
+    private final QianFanChatModel chatModel = new QianFanChatModel(qianFanApi,
+            QianFanChatOptions.builder().withModel(QianFanApi.ChatModel.ERNIE_Tiny_8K.getValue()).build()
+    );
+
+    @Test
+    @Disabled
+    public void testCall() {
+        // 准备参数
+        List<Message> messages = new ArrayList<>();
+        // TODO @芋艿：文心一言，只要带上 system message 就报错，已经各种测试，很莫名！
+//        messages.add(new SystemMessage("你是一个优质的文言文作者，用文言文描述着各城市的人文风景。"));
+        messages.add(new UserMessage("1 + 1 = ？"));
+
+        // 调用
+        ChatResponse response = chatModel.call(new Prompt(messages));
+        // 打印结果
+        System.out.println(response);
+    }
+
+    @Test
+    @Disabled
+    public void testStream() {
+        // 准备参数
+        List<Message> messages = new ArrayList<>();
+        // TODO @芋艿：文心一言，只要带上 system message 就报错，已经各种测试，很莫名！
+//        messages.add(new SystemMessage("你是一个优质的文言文作者，用文言文描述着各城市的人文风景。"));
+        messages.add(new UserMessage("1 + 1 = ？"));
+
+        // 调用
+        Flux<ChatResponse> flux = chatModel.stream(new Prompt(messages));
+        // 打印结果
+        flux.doOnNext(System.out::println).then().block();
+    }
+
 }

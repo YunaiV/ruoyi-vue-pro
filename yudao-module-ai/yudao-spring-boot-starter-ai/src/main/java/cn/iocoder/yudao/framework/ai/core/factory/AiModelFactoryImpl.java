@@ -58,7 +58,7 @@ public class AiModelFactoryImpl implements AiModelFactory {
                 case TONG_YI:
                     return buildTongYiChatModel(apiKey);
                 case YI_YAN:
-                    return buildYiYanChatClient(apiKey);
+                    return buildYiYanChatModel(apiKey);
                 case XING_HUO:
                     return buildXingHuoChatClient(apiKey);
                 case DEEP_SEEK:
@@ -157,6 +157,18 @@ public class AiModelFactoryImpl implements AiModelFactory {
     }
 
     /**
+     * 可参考 {@link QianFanAutoConfiguration#qianFanChatModel(QianFanConnectionProperties, QianFanChatProperties, RestClient.Builder, RetryTemplate, ResponseErrorHandler)}
+     */
+    private static QianFanChatModel buildYiYanChatModel(String key) {
+        List<String> keys = StrUtil.split(key, '|');
+        Assert.equals(keys.size(), 2, "YiYanChatClient 的密钥需要 (appKey|secretKey) 格式");
+        String appKey = keys.get(0);
+        String secretKey = keys.get(1);
+        QianFanApi qianFanApi = new QianFanApi(appKey, secretKey);
+        return new QianFanChatModel(qianFanApi);
+    }
+
+    /**
      * 可参考 {@link OpenAiAutoConfiguration}
      */
     private static OpenAiChatModel buildOpenAiChatModel(String openAiToken, String url) {
@@ -180,19 +192,6 @@ public class AiModelFactoryImpl implements AiModelFactory {
     private static OllamaChatModel buildOllamaChatModel(String url) {
         OllamaApi ollamaApi = new OllamaApi(url);
         return new OllamaChatModel(ollamaApi);
-    }
-
-    /**
-     * 可参考 {@link QianFanAutoConfiguration#qianFanChatModel(QianFanConnectionProperties, QianFanChatProperties, RestClient.Builder, RetryTemplate, ResponseErrorHandler)}
-     */
-    private static QianFanChatModel buildYiYanChatClient(String key) {
-        // TODO @xin：貌似目前设置，request 势必会报错；看看能不能有办法，参考 buildQianWenChatClient，调用 QianFanAutoConfiguration#qianFanChatModel初始化，当然 key 要用自己的哈
-        List<String> keys = StrUtil.split(key, '|');
-        Assert.equals(keys.size(), 2, "YiYanChatClient 的密钥需要 (appKey|secretKey) 格式");
-        String appKey = keys.get(0);
-        String secretKey = keys.get(1);
-        QianFanApi qianFanApi = new QianFanApi(appKey, secretKey);
-        return new QianFanChatModel(qianFanApi);
     }
 
     /**

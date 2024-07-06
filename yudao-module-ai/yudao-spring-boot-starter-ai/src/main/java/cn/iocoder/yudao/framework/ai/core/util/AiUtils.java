@@ -27,9 +27,7 @@ public class AiUtils {
             case OLLAMA:
                 return OllamaOptions.create().withModel(model).withTemperature(temperatureF).withNumPredict(maxTokens);
             case YI_YAN:
-                // TODO @xin：貌似 model 只要一设置，就报错；可以排查下
-//                return QianFanChatOptions.builder().withModel(model).withTemperature(temperatureF).withMaxTokens(maxTokens).build();
-                return QianFanChatOptions.builder().withTemperature(temperatureF).withMaxTokens(maxTokens).build();
+                return QianFanChatOptions.builder().withModel(model).withTemperature(temperatureF).withMaxTokens(maxTokens).build();
             case XING_HUO:
                 return XingHuoChatOptions.builder().model(model).temperature(temperatureF).maxTokens(maxTokens).build();
             case TONG_YI:
