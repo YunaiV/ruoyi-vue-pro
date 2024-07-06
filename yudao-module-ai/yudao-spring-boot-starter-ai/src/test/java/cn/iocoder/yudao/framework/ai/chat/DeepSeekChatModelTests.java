@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.framework.ai.chat;
 
-import cn.iocoder.yudao.framework.ai.core.model.deepseek.DeepSeekChatClient;
+import cn.iocoder.yudao.framework.ai.core.model.deepseek.DeepSeekChatModel;
 import org.junit.jupiter.api.Test;
 import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.chat.messages.SystemMessage;
@@ -13,13 +13,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * {@link DeepSeekChatClient} 集成测试
+ * {@link DeepSeekChatModel} 集成测试
  *
  * @author 芋道源码
  */
-public class DeepSeekChatTests {
+public class DeepSeekChatModelTests {
 
-    private final DeepSeekChatClient chatModel = new DeepSeekChatClient("sk-e94db327cc7d457d99a8de8810fc6b12");
+    private final DeepSeekChatModel chatModel = new DeepSeekChatModel("sk-e94db327cc7d457d99a8de8810fc6b12");
 
     @Test
     public void testCall() {

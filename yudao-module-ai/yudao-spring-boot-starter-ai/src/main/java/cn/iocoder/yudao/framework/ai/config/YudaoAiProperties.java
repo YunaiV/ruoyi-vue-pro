@@ -14,14 +14,14 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 public class YudaoAiProperties {
 
     /**
-     * 讯飞星火
-     */
-    private XingHuoProperties xinghuo;
-
-    /**
      * DeepSeek
      */
     private DeepSeekProperties deepSeek;
+
+    /**
+     * 讯飞星火
+     */
+    private XingHuoProperties xinghuo;
 
     /**
      * Midjourney 绘图

@@ -153,6 +153,9 @@ spring:
 
 spring:
   ai:
+    qianfan: # 文心一言
+      api-key: x0cuLZ7XsaTCU08vuJWO87Lg
+      secret-key: R9mYF9dl9KASgi5RUq0FQt3wRisSnOcK
     ollama:
       base-url: http://127.0.0.1:11434
       chat:
@@ -162,9 +165,6 @@ spring:
       base-url: https://api.gptsapi.net
     stabilityai:
       api-key: sk-e53UqbboF8QJCscYvzJscJxJXoFcFg4iJjl1oqgE7baJETmx
-    qianfan: # 文心一言
-      api-key: x0cuLZ7XsaTCU08vuJWO87Lg
-      secret-key: R9mYF9dl9KASgi5RUq0FQt3wRisSnOcK
   cloud:
     ai:
       tongyi: # 通义千问
@@ -173,6 +173,10 @@ spring:
 
 yudao:
   ai:
+    deep-seek:
+      enable: true
+      api-key: sk-e94db327cc7d457d99a8de8810fc6b12
+      model: deepseek-chat
     xinghuo:
       enable: true
       appId: 13c8cca6

@@ -19,7 +19,7 @@ import java.util.List;
  *
  * @author fansili
  */
-public class YiYanChatTests {
+public class YiYanChatModelTests {
 
     private final QianFanApi qianFanApi = new QianFanApi(
             "qS8k8dYr2nXunagK4SSU8Xjj",

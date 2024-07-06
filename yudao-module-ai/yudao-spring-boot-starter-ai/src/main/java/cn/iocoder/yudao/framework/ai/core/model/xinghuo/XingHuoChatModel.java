@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.framework.ai.core.model.deepseek;
+package cn.iocoder.yudao.framework.ai.core.model.xinghuo;
 
 import cn.hutool.core.lang.Assert;
 import lombok.extern.slf4j.Slf4j;
@@ -21,41 +21,43 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static cn.iocoder.yudao.framework.ai.core.model.deepseek.DeepSeekChatOptions.MODEL_DEFAULT;
+import static cn.iocoder.yudao.framework.ai.core.model.xinghuo.XingHuoChatOptions.MODEL_DEFAULT;
 
 /**
- * DeepSeek {@link ChatModel} 实现类
+ * 讯飞星火 {@link ChatModel} 实现类
  *
  * @author fansili
  */
 @Slf4j
-public class DeepSeekChatClient implements ChatModel {
+public class XingHuoChatModel implements ChatModel {
 
-    private static final String BASE_URL = "https://api.deepseek.com";
+    private static final String BASE_URL = "https://spark-api-open.xf-yun.com";
 
-    private final DeepSeekChatOptions defaultOptions;
+    private final XingHuoChatOptions defaultOptions;
     private final RetryTemplate retryTemplate;
 
     /**
-     * DeepSeek 兼容 OpenAI 的 HTTP 接口，所以复用它的实现，简化接入成本
+     * 星火兼容 OpenAI 的 HTTP 接口，所以复用它的实现，简化接入成本
      *
-     * 不过要注意，DeepSeek 没有完全兼容，所以不能使用 {@link org.springframework.ai.openai.OpenAiChatModel} 调用，但是实现会参考它
+     * 不过要注意，星火没有完全兼容，所以不能使用 {@link org.springframework.ai.openai.OpenAiChatModel} 调用，但是实现会参考它
      */
     private final OpenAiApi openAiApi;
 
-    public DeepSeekChatClient(String apiKey) {
-        this(apiKey, DeepSeekChatOptions.builder().model(MODEL_DEFAULT).temperature(0.7F).build());
+    public XingHuoChatModel(String apiKey, String secretKey) {
+        this(apiKey, secretKey,
+                XingHuoChatOptions.builder().model(MODEL_DEFAULT).temperature(0.7F).build());
     }
 
-    public DeepSeekChatClient(String apiKey, DeepSeekChatOptions options) {
-       this(apiKey, options, RetryUtils.DEFAULT_RETRY_TEMPLATE);
+    public XingHuoChatModel(String apiKey, String secretKey, XingHuoChatOptions options) {
+       this(apiKey, secretKey, options, RetryUtils.DEFAULT_RETRY_TEMPLATE);
     }
 
-    public DeepSeekChatClient(String apiKey, DeepSeekChatOptions options, RetryTemplate retryTemplate) {
+    public XingHuoChatModel(String apiKey, String secretKey, XingHuoChatOptions options, RetryTemplate retryTemplate) {
         Assert.notEmpty(apiKey, "apiKey 不能为空");
+        Assert.notEmpty(secretKey, "secretKey 不能为空");
         Assert.notNull(options, "options 不能为空");
         Assert.notNull(retryTemplate, "retryTemplate 不能为空");
-        this.openAiApi = new OpenAiApi(BASE_URL, apiKey);
+        this.openAiApi = new OpenAiApi(BASE_URL, apiKey + ":" + secretKey);
         this.defaultOptions = options;
         this.retryTemplate = retryTemplate;
     }
@@ -115,13 +117,8 @@ public class DeepSeekChatClient implements ChatModel {
                 // 2. 转换 ChatResponse 返回
                 List<Generation> generations = chatCompletion.choices().stream().map(choice -> {
                     String finish = (choice.finishReason() != null ? choice.finishReason().name() : "");
-                    String role = (choice.delta().role() != null ? choice.delta().role().name() : "");
-                    if (choice.finishReason() == OpenAiApi.ChatCompletionFinishReason.STOP) {
-                        // 兜底处理 DeepSeek 返回 STOP 时，role 为空的情况
-                        role = OpenAiApi.ChatCompletionMessage.Role.ASSISTANT.name();
-                    }
                     Generation generation = new Generation(choice.delta().content(),
-                            Map.of("id", id, "role", role, "finishReason", finish));
+                            Map.of("id", id, "role", choice.delta().role().name(), "finishReason", finish));
                     if (choice.finishReason() != null) {
                         generation = generation.withGenerationMetadata(
                                 ChatGenerationMetadata.from(choice.finishReason().name(), null));
@@ -159,7 +156,7 @@ public class DeepSeekChatClient implements ChatModel {
 
     @Override
     public ChatOptions getDefaultOptions() {
-         return DeepSeekChatOptions.fromOptions(defaultOptions);
+         return XingHuoChatOptions.fromOptions(defaultOptions);
     }
 
 }

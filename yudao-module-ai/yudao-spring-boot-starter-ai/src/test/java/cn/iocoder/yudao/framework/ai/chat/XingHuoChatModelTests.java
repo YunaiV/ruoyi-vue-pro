@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.framework.ai.chat;
 
-import cn.iocoder.yudao.framework.ai.core.model.xinghuo.XingHuoChatClient;
+import cn.iocoder.yudao.framework.ai.core.model.xinghuo.XingHuoChatModel;
 import org.junit.jupiter.api.Test;
 import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.chat.messages.SystemMessage;
@@ -13,13 +13,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * {@link XingHuoChatClient} 集成测试
+ * {@link XingHuoChatModel} 集成测试
  *
  * @author fansili
  */
-public class XingHuoChatClientTests {
+public class XingHuoChatModelTests {
 
-    private final XingHuoChatClient chatModel = new XingHuoChatClient(
+    private final XingHuoChatModel chatModel = new XingHuoChatModel(
             "cb6415c19d6162cda07b47316fcb0416",
             "Y2JiYTIxZjA3MDMxMjNjZjQzYzVmNzdh");
 

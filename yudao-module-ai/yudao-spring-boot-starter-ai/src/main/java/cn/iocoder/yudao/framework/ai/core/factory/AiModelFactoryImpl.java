@@ -9,10 +9,10 @@ import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.framework.ai.config.YudaoAiAutoConfiguration;
 import cn.iocoder.yudao.framework.ai.config.YudaoAiProperties;
 import cn.iocoder.yudao.framework.ai.core.enums.AiPlatformEnum;
-import cn.iocoder.yudao.framework.ai.core.model.deepseek.DeepSeekChatClient;
+import cn.iocoder.yudao.framework.ai.core.model.deepseek.DeepSeekChatModel;
 import cn.iocoder.yudao.framework.ai.core.model.midjourney.api.MidjourneyApi;
 import cn.iocoder.yudao.framework.ai.core.model.suno.api.SunoApi;
-import cn.iocoder.yudao.framework.ai.core.model.xinghuo.XingHuoChatClient;
+import cn.iocoder.yudao.framework.ai.core.model.xinghuo.XingHuoChatModel;
 import com.alibaba.cloud.ai.tongyi.TongYiAutoConfiguration;
 import com.alibaba.cloud.ai.tongyi.TongYiConnectionProperties;
 import com.alibaba.cloud.ai.tongyi.chat.TongYiChatModel;
@@ -59,10 +59,10 @@ public class AiModelFactoryImpl implements AiModelFactory {
                     return buildTongYiChatModel(apiKey);
                 case YI_YAN:
                     return buildYiYanChatModel(apiKey);
-                case XING_HUO:
-                    return buildXingHuoChatClient(apiKey);
                 case DEEP_SEEK:
-                    return buildDeepSeekChatClient(apiKey);
+                    return buildDeepSeekChatModel(apiKey);
+                case XING_HUO:
+                    return buildXingHuoChatModel(apiKey);
                 case OPENAI:
                     return buildOpenAiChatModel(apiKey, url);
                 case OLLAMA:
@@ -82,7 +82,7 @@ public class AiModelFactoryImpl implements AiModelFactory {
             case YI_YAN:
                 return SpringUtil.getBean(QianFanChatModel.class);
             case XING_HUO:
-                return SpringUtil.getBean(XingHuoChatClient.class);
+                return SpringUtil.getBean(XingHuoChatModel.class);
             case OPENAI:
                 return SpringUtil.getBean(OpenAiChatModel.class);
             case OLLAMA:
@@ -112,7 +112,7 @@ public class AiModelFactoryImpl implements AiModelFactory {
             case OPENAI:
                 return buildOpenAiImageModel(apiKey, url);
             case STABLE_DIFFUSION:
-                return buildStabilityAiImageClient(apiKey, url);
+                return buildStabilityAiImageModel(apiKey, url);
             default:
                 throw new IllegalArgumentException(StrUtil.format("未知平台({})", platform));
         }
@@ -169,6 +169,24 @@ public class AiModelFactoryImpl implements AiModelFactory {
     }
 
     /**
+     * 可参考 {@link YudaoAiAutoConfiguration#deepSeekChatModel(YudaoAiProperties)}
+     */
+    private static DeepSeekChatModel buildDeepSeekChatModel(String apiKey) {
+        return new DeepSeekChatModel(apiKey);
+    }
+
+    /**
+     * 可参考 {@link YudaoAiAutoConfiguration#xingHuoChatClient(YudaoAiProperties)}
+     */
+    private static XingHuoChatModel buildXingHuoChatModel(String key) {
+        List<String> keys = StrUtil.split(key, '|');
+        Assert.equals(keys.size(), 3, "XingHuoChatClient 的密钥需要 (appid|appKey|secretKey) 格式");
+        String appKey = keys.get(1);
+        String secretKey = keys.get(2);
+        return new XingHuoChatModel(appKey, secretKey);
+    }
+
+    /**
      * 可参考 {@link OpenAiAutoConfiguration}
      */
     private static OpenAiChatModel buildOpenAiChatModel(String openAiToken, String url) {
@@ -194,22 +212,7 @@ public class AiModelFactoryImpl implements AiModelFactory {
         return new OllamaChatModel(ollamaApi);
     }
 
-    /**
-     * 可参考 {@link YudaoAiAutoConfiguration#xingHuoChatClient(YudaoAiProperties)}
-     */
-    private static XingHuoChatClient buildXingHuoChatClient(String key) {
-        List<String> keys = StrUtil.split(key, '|');
-        Assert.equals(keys.size(), 3, "XingHuoChatClient 的密钥需要 (appid|appKey|secretKey) 格式");
-        String appKey = keys.get(1);
-        String secretKey = keys.get(2);
-        return new XingHuoChatClient(appKey, secretKey);
-    }
-
-    private static DeepSeekChatClient buildDeepSeekChatClient(String apiKey) {
-        return new DeepSeekChatClient(apiKey);
-    }
-
-    private StabilityAiImageModel buildStabilityAiImageClient(String apiKey, String url) {
+    private StabilityAiImageModel buildStabilityAiImageModel(String apiKey, String url) {
         url = StrUtil.blankToDefault(url, StabilityAiApi.DEFAULT_BASE_URL);
         StabilityAiApi stabilityAiApi = new StabilityAiApi(apiKey, StabilityAiApi.DEFAULT_IMAGE_MODEL, url);
         return new StabilityAiImageModel(stabilityAiApi);
