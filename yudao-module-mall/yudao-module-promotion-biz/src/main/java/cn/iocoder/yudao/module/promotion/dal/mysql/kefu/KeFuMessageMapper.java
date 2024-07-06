@@ -27,9 +27,11 @@ public interface KeFuMessageMapper extends BaseMapperX<KeFuMessageDO> {
                 .orderByDesc(KeFuMessageDO::getCreateTime));
     }
 
-    default List<KeFuMessageDO> selectListByConversationIdAndReadStatus(Long conversationId, Boolean readStatus) {
+    default List<KeFuMessageDO> selectListByConversationIdAndUserTypeAndReadStatus(Long conversationId, Integer userType,
+                                                                                   Boolean readStatus) {
         return selectList(new LambdaQueryWrapper<KeFuMessageDO>()
                 .eq(KeFuMessageDO::getConversationId, conversationId)
+                .ne(KeFuMessageDO::getSenderType, userType) // 管理员：查询出未读的会员消息，会员：查询出未读的客服消息
                 .eq(KeFuMessageDO::getReadStatus, readStatus));
     }
 
@@ -38,7 +40,7 @@ public interface KeFuMessageMapper extends BaseMapperX<KeFuMessageDO> {
                 .in(KeFuMessageDO::getId, ids));
     }
 
-    default PageResult<KeFuMessageDO> selectPage(AppKeFuMessagePageReqVO pageReqVO){
+    default PageResult<KeFuMessageDO> selectPage(AppKeFuMessagePageReqVO pageReqVO) {
         return selectPage(pageReqVO, new LambdaQueryWrapperX<KeFuMessageDO>()
                 .eqIfPresent(KeFuMessageDO::getConversationId, pageReqVO.getConversationId())
                 .orderByDesc(KeFuMessageDO::getCreateTime));

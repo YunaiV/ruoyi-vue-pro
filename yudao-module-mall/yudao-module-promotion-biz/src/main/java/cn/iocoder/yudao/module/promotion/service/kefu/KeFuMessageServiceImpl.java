@@ -67,7 +67,7 @@ public class KeFuMessageServiceImpl implements KeFuMessageService {
         conversationService.updateConversationLastMessage(kefuMessage);
 
         // 3. 发送消息
-        getSelf().sendAsyncMessage(UserTypeEnum.MEMBER.getValue(), conversation.getUserId(), kefuMessage);
+        getSelf().sendAsyncMessageToMember(conversation.getUserId(), KEFU_MESSAGE_TYPE, kefuMessage);
         return kefuMessage.getId();
     }
 
@@ -83,7 +83,7 @@ public class KeFuMessageServiceImpl implements KeFuMessageService {
         // 2. 更新会话消息冗余
         conversationService.updateConversationLastMessage(kefuMessage);
         // 3. 发送消息
-        getSelf().sendAsyncMessageToAdmin(kefuMessage);
+        getSelf().sendAsyncMessageToAdmin(KEFU_MESSAGE_TYPE, kefuMessage);
         return kefuMessage.getId();
     }
 
@@ -97,7 +97,7 @@ public class KeFuMessageServiceImpl implements KeFuMessageService {
             throw exception(KEFU_CONVERSATION_NOT_EXISTS);
         }
         // 1.3 查询会话所有的未读消息 (tips: 多个客服，一个人点了，就都点了)
-        List<KeFuMessageDO> messageList = keFuMessageMapper.selectListByConversationIdAndReadStatus(conversationId, Boolean.FALSE);
+        List<KeFuMessageDO> messageList = keFuMessageMapper.selectListByConversationIdAndUserTypeAndReadStatus(conversationId, userType, Boolean.FALSE);
         if (CollUtil.isEmpty(messageList)) {
             return;
         }
@@ -109,10 +109,11 @@ public class KeFuMessageServiceImpl implements KeFuMessageService {
         conversationService.updateAdminUnreadMessageCountToZero(conversationId);
 
         // 2.3 发送消息通知会员，管理员已读 -> 会员更新发送的消息状态
-        // TODO @puhui999：待定~
         KeFuMessageDO keFuMessage = getFirst(filterList(messageList, message -> UserTypeEnum.MEMBER.getValue().equals(message.getSenderType())));
         assert keFuMessage != null; // 断言避免警告
-        webSocketSenderApi.sendObject(UserTypeEnum.MEMBER.getValue(), keFuMessage.getSenderId(), KEFU_MESSAGE_ADMIN_READ, StrUtil.EMPTY);
+        getSelf().sendAsyncMessageToMember(keFuMessage.getSenderId(), KEFU_MESSAGE_ADMIN_READ, StrUtil.EMPTY);
+        // 2.4 通知所有管理员消息已读
+        getSelf().sendAsyncMessageToAdmin(KEFU_MESSAGE_ADMIN_READ, StrUtil.EMPTY);
     }
 
     private void validateReceiverExist(Long receiverId, Integer receiverType) {
@@ -125,13 +126,13 @@ public class KeFuMessageServiceImpl implements KeFuMessageService {
     }
 
     @Async
-    public void sendAsyncMessage(Integer userType, Long userId, Object content) {
-        webSocketSenderApi.sendObject(userType, userId, KEFU_MESSAGE_TYPE, content);
+    public void sendAsyncMessageToMember(Long userId, String messageType, Object content) {
+        webSocketSenderApi.sendObject(UserTypeEnum.MEMBER.getValue(), userId, messageType, content);
     }
 
     @Async
-    public void sendAsyncMessageToAdmin(Object content) {
-        webSocketSenderApi.sendObject(UserTypeEnum.ADMIN.getValue(), KEFU_MESSAGE_TYPE, content);
+    public void sendAsyncMessageToAdmin(String messageType, Object content) {
+        webSocketSenderApi.sendObject(UserTypeEnum.ADMIN.getValue(), messageType, content);
     }
 
     @Override
