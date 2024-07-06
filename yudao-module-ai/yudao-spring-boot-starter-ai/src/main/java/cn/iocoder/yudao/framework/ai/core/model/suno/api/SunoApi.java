@@ -68,17 +68,6 @@ public class SunoApi {
                 .block();
     }
 
-    public List<MusicData> chatCompletion(String prompt) {
-        return this.webClient.post()
-                .uri("/v1/chat/completions")
-                .body(Mono.just(new MusicGenerateRequest(prompt)), MusicGenerateRequest.class)
-                .retrieve()
-                .onStatus(STATUS_PREDICATE, EXCEPTION_FUNCTION.apply(prompt))
-                .bodyToMono(new ParameterizedTypeReference<List<MusicData>>() {
-                })
-                .block();
-    }
-
     public LyricsData generateLyrics(String prompt) {
         return this.webClient.post()
                 .uri("/api/generate_lyrics")
@@ -198,7 +187,7 @@ public class SunoApi {
     }
 
     /**
-     * Suno API 响应的限额数据，目前每日免费50
+     * Suno API 响应的限额数据，目前每日免费 50
      */
     public record LimitUsageData(
             @JsonProperty("credits_left") Long creditsLeft,
