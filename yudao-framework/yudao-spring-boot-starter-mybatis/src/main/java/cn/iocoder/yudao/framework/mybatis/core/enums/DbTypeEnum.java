@@ -11,10 +11,13 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-
+/**
+ * 针对 MyBatis Plus 的 {@link DbType} 增强，补充更多信息
+ */
 @Getter
 @AllArgsConstructor
 public enum DbTypeEnum {
+
     /**
      * MySQL
      */
@@ -27,6 +30,8 @@ public enum DbTypeEnum {
 
     /**
      * PostgreSQL
+     *
+     * 华为 openGauss 使用 ProductName 与 PostgreSQL 相同
      */
     POSTGRE_SQL(DbType.POSTGRE_SQL,"PostgreSQL", "POSITION('#{value}' IN #{column}) <> 0"),
 
@@ -44,8 +49,6 @@ public enum DbTypeEnum {
      * 人大金仓
      */
     KINGBASE_ES(DbType.KINGBASE_ES, "KingbaseES", "POSITION('#{value}' IN #{column}) <> 0"),
-
-    // 华为openGauss 使用ProductName 与 PostgreSQL相同
     ;
 
     public static final Map<String, DbTypeEnum> MAP_BY_NAME = Arrays.stream(values())
@@ -54,9 +57,17 @@ public enum DbTypeEnum {
     public static final Map<DbType, DbTypeEnum> MAP_BY_MP = Arrays.stream(values())
             .collect(Collectors.toMap(DbTypeEnum::getMpDbType, Function.identity()));
 
-
+    /**
+     * MyBatis Plus 类型
+     */
     private final DbType mpDbType;
+    /**
+     * 数据库产品名
+     */
     private final String productName;
+    /**
+     * SQL FIND_IN_SET 模板
+     */
     private final String findInSetTemplate;
 
     public static DbType find(String databaseProductName) {

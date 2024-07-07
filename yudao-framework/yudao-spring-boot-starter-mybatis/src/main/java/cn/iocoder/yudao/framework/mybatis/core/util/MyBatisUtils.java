@@ -102,4 +102,5 @@ public class MyBatisUtils {
                 .replace("#{column}", column)
                 .replace("#{value}", StrUtil.toString(value));
     }
+
 }
