@@ -290,7 +290,7 @@ public class BrokerageUserServiceImpl implements BrokerageUserService {
      */
     private boolean isNewRegisterUser(Long userId) {
         MemberUserRespDTO user = memberUserApi.getUser(userId);
-        return user != null && LocalDateTimeUtils.beforeNow(user.getCreateTime().plusSeconds(30));
+        return user != null && LocalDateTimeUtils.afterNow(user.getCreateTime().plusSeconds(30));
     }
 
     private void validateCanBindUser(BrokerageUserDO user, Long bindUserId) {
