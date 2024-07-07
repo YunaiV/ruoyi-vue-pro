@@ -79,7 +79,9 @@ public class BpmProcessDefinitionServiceImpl implements BpmProcessDefinitionServ
 
     @Override
     public ProcessDefinition getActiveProcessDefinition(String key) {
-        return repositoryService.createProcessDefinitionQuery().processDefinitionKey(key).active().singleResult();
+        return repositoryService.createProcessDefinitionQuery()
+                .processDefinitionTenantId(FlowableUtils.getTenantId())
+                .processDefinitionKey(key).active().singleResult();
     }
 
     @Override
@@ -172,6 +174,7 @@ public class BpmProcessDefinitionServiceImpl implements BpmProcessDefinitionServ
     @Override
     public PageResult<ProcessDefinition> getProcessDefinitionPage(BpmProcessDefinitionPageReqVO pageVO) {
         ProcessDefinitionQuery query = repositoryService.createProcessDefinitionQuery();
+        query.processDefinitionTenantId(FlowableUtils.getTenantId());
         if (StrUtil.isNotBlank(pageVO.getKey())) {
             query.processDefinitionKey(pageVO.getKey());
         }

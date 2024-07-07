@@ -72,6 +72,7 @@ public class MenuController {
     public CommonResult<List<MenuSimpleRespVO>> getSimpleMenuList() {
         List<MenuDO> list = menuService.getMenuListByTenant(
                 new MenuListReqVO().setStatus(CommonStatusEnum.ENABLE.getStatus()));
+        list = menuService.filterDisableMenus(list);
         list.sort(Comparator.comparing(MenuDO::getSort));
         return success(BeanUtils.toBean(list, MenuSimpleRespVO.class));
     }
