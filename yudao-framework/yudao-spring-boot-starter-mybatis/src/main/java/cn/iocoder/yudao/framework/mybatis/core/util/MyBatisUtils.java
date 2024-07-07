@@ -4,7 +4,7 @@ import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.SortingField;
-import cn.iocoder.yudao.framework.mybatis.core.enums.FindInSetEnum;
+import cn.iocoder.yudao.framework.mybatis.core.enums.DbTypeEnum;
 import com.baomidou.mybatisplus.annotation.DbType;
 import com.baomidou.mybatisplus.core.metadata.OrderItem;
 import com.baomidou.mybatisplus.core.toolkit.StringPool;
@@ -98,7 +98,7 @@ public class MyBatisUtils {
     public static String findInSet(String column, Object value) {
         // 这里不用SqlConstants.DB_TYPE，因为它是使用 primary 数据源的 url 推断出来的类型
         DbType dbType = JdbcUtils.getDbType();
-        return FindInSetEnum.getTemplate(dbType)
+        return DbTypeEnum.getFindInSetTemplate(dbType)
                 .replace("#{column}", column)
                 .replace("#{value}", StrUtil.toString(value));
     }
