@@ -137,9 +137,9 @@ public class AiImageServiceImpl implements AiImageService {
                     .withStylePreset(String.valueOf(draw.getOptions().get("stylePreset")))
                     .withClipGuidancePreset(String.valueOf(draw.getOptions().get("clipGuidancePreset")))
                     .build();
-        } else if (ObjUtil.equal(draw.getPlatform(), AiPlatformEnum.TONG_YI_WAN_XIANG.getPlatform())) {
+        } else if (ObjUtil.equal(draw.getPlatform(), AiPlatformEnum.TONG_YI.getPlatform())) {
             return TongYiImagesOptions.builder()
-                    .withModel(draw.getModel()).withN(Integer.valueOf(draw.getOptions().get("n")))
+                    .withModel(draw.getModel()).withN(1)
                     .withHeight(draw.getHeight()).withWidth(draw.getWidth())
                     .build();
         }

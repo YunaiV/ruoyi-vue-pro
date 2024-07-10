@@ -28,7 +28,6 @@ public enum AiPlatformEnum {
     STABLE_DIFFUSION("StableDiffusion", "StableDiffusion"), // Stability AI
     MIDJOURNEY("Midjourney", "Midjourney"), // Midjourney
     SUNO("Suno", "Suno"), // Suno AI
-    TONG_YI_WAN_XIANG("TongYiWanXiang", "通义万相"), // Suno AI
 
     ;
 

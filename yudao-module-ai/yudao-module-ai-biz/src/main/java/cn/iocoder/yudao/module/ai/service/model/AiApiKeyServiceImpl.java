@@ -106,7 +106,7 @@ public class AiApiKeyServiceImpl implements AiApiKeyService {
 
     @Override
     public ImageModel getImageModel(AiPlatformEnum platform) {
-        AiApiKeyDO apiKey = apiKeyMapper.selectFirstByPlatformAndStatus(platform.getName(), CommonStatusEnum.ENABLE.getStatus());
+        AiApiKeyDO apiKey = apiKeyMapper.selectFirstByPlatformAndStatus(platform.getPlatform(), CommonStatusEnum.ENABLE.getStatus());
         if (apiKey == null) {
             throw exception(API_KEY_IMAGE_NODE_FOUND, platform.getName());
         }

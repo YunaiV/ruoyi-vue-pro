@@ -17,6 +17,7 @@ import com.alibaba.cloud.ai.tongyi.TongYiAutoConfiguration;
 import com.alibaba.cloud.ai.tongyi.TongYiConnectionProperties;
 import com.alibaba.cloud.ai.tongyi.chat.TongYiChatModel;
 import com.alibaba.cloud.ai.tongyi.chat.TongYiChatProperties;
+import com.alibaba.cloud.ai.tongyi.image.TongYiImagesModel;
 import com.alibaba.dashscope.aigc.generation.Generation;
 import org.springframework.ai.autoconfigure.ollama.OllamaAutoConfiguration;
 import org.springframework.ai.autoconfigure.openai.OpenAiAutoConfiguration;
@@ -125,6 +126,8 @@ public class AiModelFactoryImpl implements AiModelFactory {
                 return buildOpenAiImageModel(apiKey, url);
             case STABLE_DIFFUSION:
                 return buildStabilityAiImageModel(apiKey, url);
+            case TONG_YI:
+                return SpringUtil.getBean(TongYiImagesModel.class);
             default:
                 throw new IllegalArgumentException(StrUtil.format("未知平台({})", platform));
         }
