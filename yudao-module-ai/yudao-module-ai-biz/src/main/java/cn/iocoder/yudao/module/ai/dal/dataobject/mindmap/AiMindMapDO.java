@@ -12,6 +12,7 @@ import lombok.Data;
  *
  * @author xiaoxin
  */
+// TODO @xin：如果没 typehandler 的需求，autoResultMap 可以去掉哈
 @TableName(value = "ai_mind_map", autoResultMap = true)
 @Data
 public class AiMindMapDO extends BaseDO {
@@ -24,13 +25,10 @@ public class AiMindMapDO extends BaseDO {
 
     /**
      * 用户编号
+     *
+     * 关联 AdminUserDO 的 userId 字段
      */
     private Long userId;
-
-    /**
-     * 模型
-     */
-    private String model;
 
     /**
      * 平台
@@ -38,6 +36,10 @@ public class AiMindMapDO extends BaseDO {
      * 枚举 {@link AiPlatformEnum}
      */
     private String platform;
+    /**
+     * 模型
+     */
+    private String model;
 
     /**
      * 生成内容提示

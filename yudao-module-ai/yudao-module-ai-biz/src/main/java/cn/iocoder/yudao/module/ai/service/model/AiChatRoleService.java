@@ -120,6 +120,7 @@ public interface AiChatRoleService {
 
     /**
      * 根据名字获得聊天角色
+     *
      * @param name 名字
      * @return 聊天角色列表
      */

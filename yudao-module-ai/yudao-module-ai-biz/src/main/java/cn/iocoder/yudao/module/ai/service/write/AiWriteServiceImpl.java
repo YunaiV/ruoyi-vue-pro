@@ -65,6 +65,7 @@ public class AiWriteServiceImpl implements AiWriteService {
     public Flux<CommonResult<String>> generateWriteContent(AiWriteGenerateReqVO generateReqVO, Long userId) {
         // 1.1 获取写作模型 尝试获取写作助手角色，如果没有则使用默认模型
         AiChatRoleDO writeRole = CollUtil.getFirst(chatRoleService.getChatRoleListByName(AiChatRoleEnum.AI_WRITE_ROLE.getName()));
+        // TODO @xin：如果有 writeRole，但是没 modeId，是不是也可以用 systemMessage 哈？建议的写法是：先通过 modelId 获取 model。如果 model == null，则 chatModalService.getRequiredDefaultChatModel()；如果还是 null，则抛出异常；。。。。。。。。。。。。。。然后，systemMessage = writeRole != null && writeRole.systemPrompt != "" 这样处理。
         AiChatModelDO model;
         String systemMessage;
         if (Objects.nonNull(writeRole) && Objects.nonNull(writeRole.getModelId())) {
@@ -72,18 +73,21 @@ public class AiWriteServiceImpl implements AiWriteService {
             systemMessage = writeRole.getSystemMessage();
         } else {
             model = chatModalService.getRequiredDefaultChatModel();
-            systemMessage = AiChatRoleEnum.AI_WRITE_ROLE.getPrompt();
+            systemMessage = AiChatRoleEnum.AI_WRITE_ROLE.getSystemMessage();
         }
         // 1.2 校验平台
         AiPlatformEnum platform = AiPlatformEnum.validatePlatform(model.getPlatform());
         StreamingChatModel chatModel = apiKeyService.getChatModel(model.getKeyId());
 
         // 2. 插入写作信息
-        AiWriteDO writeDO = BeanUtils.toBean(generateReqVO, AiWriteDO.class, e -> e.setUserId(userId).setModel(model.getModel()).setPlatform(platform.getPlatform()));
+        AiWriteDO writeDO = BeanUtils.toBean(generateReqVO, AiWriteDO.class,
+                write -> write.setUserId(userId).setPlatform(platform.getPlatform()).setModel(model.getModel()));
         writeMapper.insert(writeDO);
 
+        // 3. 调用大模型，写作生成
         ChatOptions chatOptions = AiUtils.buildChatOptions(platform, model.getModel(), model.getTemperature(), model.getMaxTokens());
         // 3.1 角色设定
+        // TODO @xin：要不把 90 到 97 这部分，合并到一个方法里。目的是：让这个方法的主干更明确
         List<Message> chatMessages = new ArrayList<>();
         if (StrUtil.isNotBlank(systemMessage)) {
             chatMessages.add(new SystemMessage(systemMessage));
@@ -94,7 +98,7 @@ public class AiWriteServiceImpl implements AiWriteService {
         Prompt prompt = new Prompt(chatMessages, chatOptions);
         Flux<ChatResponse> streamResponse = chatModel.stream(prompt);
 
-        // 3.2 流式返回
+        // 4. 流式返回
         StringBuffer contentBuffer = new StringBuffer();
         return streamResponse.map(chunk -> {
             String newContent = chunk.getResult() != null ? chunk.getResult().getOutput().getContent() : null;
@@ -115,13 +119,13 @@ public class AiWriteServiceImpl implements AiWriteService {
     }
 
     private String buildWritingPrompt(AiWriteGenerateReqVO generateReqVO) {
-        Integer type = generateReqVO.getType();
         String format = dictDataApi.getDictDataLabel(DictTypeConstants.AI_WRITE_FORMAT, generateReqVO.getFormat());
         String tone = dictDataApi.getDictDataLabel(DictTypeConstants.AI_WRITE_TONE, generateReqVO.getTone());
         String language = dictDataApi.getDictDataLabel(DictTypeConstants.AI_WRITE_LANGUAGE, generateReqVO.getLanguage());
         String length = dictDataApi.getDictDataLabel(DictTypeConstants.AI_WRITE_LENGTH, generateReqVO.getLength());
+        // 格式化 prompt
         String prompt = generateReqVO.getPrompt();
-        if (Objects.equals(type, AiWriteTypeEnum.WRITING.getType())) {
+        if (Objects.equals(generateReqVO.getType(), AiWriteTypeEnum.WRITING.getType())) {
             return StrUtil.format(AiWriteTypeEnum.WRITING.getPrompt(), prompt, format, tone, language, length);
         } else {
             return StrUtil.format(AiWriteTypeEnum.REPLY.getPrompt(), generateReqVO.getOriginalContent(), prompt, format, tone, language, length);

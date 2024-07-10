@@ -66,7 +66,7 @@ public class AiMindMapServiceImpl implements AiMindMapService {
             systemMessage = mindMapRole.getSystemMessage();
         } else {
             model = chatModalService.getRequiredDefaultChatModel();
-            systemMessage = AiChatRoleEnum.AI_MIND_MAP_ROLE.getPrompt();
+            systemMessage = AiChatRoleEnum.AI_MIND_MAP_ROLE.getSystemMessage();
         }
 
         AiPlatformEnum platform = AiPlatformEnum.validatePlatform(model.getPlatform());

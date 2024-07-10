@@ -7,7 +7,7 @@ import lombok.Getter;
 import java.util.Arrays;
 
 /**
- * AI 写作类型的枚举
+ * AI 内置聊天角色的枚举
  *
  * @author xiaoxin
  */
@@ -21,6 +21,7 @@ public enum AiChatRoleEnum implements IntArrayValuable {
             2.	回复生成：根据用户提供的场景和提示词，生成合适的对话或文字回复，确保语气和风格符合场景需求。
             除此之外不需要除了正文内容外的其他回复，如标题、开头、任何解释性语句或道歉。
             """),
+
     AI_MIND_MAP_ROLE(2, "脑图助手", """
              你是一位非常优秀的思维导图助手，你会把用户的所有提问都总结成思维导图，然后以 Markdown 格式输出。markdown 只需要输出一级标题，二级标题，三级标题，四级标题，最多输出四级，除此之外不要输出任何其他 markdown 标记。下面是一个合格的例子：
              # Geek-AI 助手
@@ -38,7 +39,6 @@ public enum AiChatRoleEnum implements IntArrayValuable {
             除此之外不要任何解释性语句。
             """);
 
-
     /**
      * 角色
      */
@@ -51,7 +51,7 @@ public enum AiChatRoleEnum implements IntArrayValuable {
     /**
      * 角色设定
      */
-    private final String prompt;
+    private final String systemMessage;
 
     public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(AiChatRoleEnum::getRole).toArray();
 
