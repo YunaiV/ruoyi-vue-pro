@@ -32,7 +32,7 @@ public enum AiWriteTypeEnum implements IntArrayValuable {
     /**
      * 模版
      */
-    private final String template;
+    private final String prompt;
 
     public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(AiWriteTypeEnum::getType).toArray();
 

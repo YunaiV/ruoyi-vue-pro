@@ -10,15 +10,16 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Map;
 
+// TODO @fan：改成 TongYiImagesModel 哈
 /**
- * 通义万象 - 测试
+ * 通义万象
  */
 public class TongYiImagesModelTests {
 
     @Test
     public void imageCallTest() throws NoApiKeyException {
         // 设置 api key
-        Constants.apiKey="sk-Zsd81gZYg7";
+        Constants.apiKey = "sk-Zsd81gZYg7";
         ImageSynthesisParam param =
                 ImageSynthesisParam.builder()
                         .model(ImageSynthesis.Models.WANX_V1)
