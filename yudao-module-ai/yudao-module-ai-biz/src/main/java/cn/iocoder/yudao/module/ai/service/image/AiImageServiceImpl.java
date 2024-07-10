@@ -23,6 +23,7 @@ import cn.iocoder.yudao.module.ai.dal.mysql.image.AiImageMapper;
 import cn.iocoder.yudao.module.ai.enums.image.AiImageStatusEnum;
 import cn.iocoder.yudao.module.ai.service.model.AiApiKeyService;
 import cn.iocoder.yudao.module.infra.api.file.FileApi;
+import com.alibaba.cloud.ai.tongyi.image.TongYiImagesOptions;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.image.ImageModel;
@@ -135,6 +136,11 @@ public class AiImageServiceImpl implements AiImageService {
                     .withSampler(String.valueOf(draw.getOptions().get("sampler")))
                     .withStylePreset(String.valueOf(draw.getOptions().get("stylePreset")))
                     .withClipGuidancePreset(String.valueOf(draw.getOptions().get("clipGuidancePreset")))
+                    .build();
+        } else if (ObjUtil.equal(draw.getPlatform(), AiPlatformEnum.TONG_YI_WAN_XIANG.getPlatform())) {
+            return TongYiImagesOptions.builder()
+                    .withModel(draw.getModel()).withN(Integer.valueOf(draw.getOptions().get("n")))
+                    .withHeight(draw.getHeight()).withWidth(draw.getWidth())
                     .build();
         }
         throw new IllegalArgumentException("不支持的 AI 平台：" + draw.getPlatform());
