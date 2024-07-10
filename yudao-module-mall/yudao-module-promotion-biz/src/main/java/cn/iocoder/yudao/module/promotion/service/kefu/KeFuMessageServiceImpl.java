@@ -66,8 +66,10 @@ public class KeFuMessageServiceImpl implements KeFuMessageService {
         // 2.2 更新会话消息冗余
         conversationService.updateConversationLastMessage(kefuMessage);
 
-        // 3. 发送消息
+        // 3.1 发送消息给会员
         getSelf().sendAsyncMessageToMember(conversation.getUserId(), KEFU_MESSAGE_TYPE, kefuMessage);
+        // 3.2 通知所有管理员更新对话
+        getSelf().sendAsyncMessageToAdmin(KEFU_MESSAGE_TYPE, kefuMessage);
         return kefuMessage.getId();
     }
 
@@ -82,7 +84,7 @@ public class KeFuMessageServiceImpl implements KeFuMessageService {
 
         // 2. 更新会话消息冗余
         conversationService.updateConversationLastMessage(kefuMessage);
-        // 3. 发送消息
+        // 3. 通知所有管理员更新对话
         getSelf().sendAsyncMessageToAdmin(KEFU_MESSAGE_TYPE, kefuMessage);
         return kefuMessage.getId();
     }
