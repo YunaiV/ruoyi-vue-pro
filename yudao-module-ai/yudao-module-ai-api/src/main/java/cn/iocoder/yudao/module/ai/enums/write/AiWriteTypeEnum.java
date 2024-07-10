@@ -1,7 +1,5 @@
 package cn.iocoder.yudao.module.ai.enums.write;
 
-import cn.hutool.core.util.ArrayUtil;
-import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.core.IntArrayValuable;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -39,11 +37,6 @@ public enum AiWriteTypeEnum implements IntArrayValuable {
     @Override
     public int[] array() {
         return ARRAYS;
-    }
-
-    public static void validateType(Integer type) {
-        if (ArrayUtil.contains(ARRAYS, type)) return;
-        throw new IllegalArgumentException(StrUtil.format("未知写作类型({})", type));
     }
 
 }

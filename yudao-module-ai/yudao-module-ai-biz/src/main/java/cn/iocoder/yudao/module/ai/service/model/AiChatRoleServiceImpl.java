@@ -137,5 +137,10 @@ public class AiChatRoleServiceImpl implements AiChatRoleService {
         return convertList(list, AiChatRoleDO::getCategory, role -> role != null && StrUtil.isNotBlank(role.getCategory()));
     }
 
+    @Override
+    public List<AiChatRoleDO> getChatRoleListByName(String name) {
+        return chatRoleMapper.selectListByName(name);
+    }
+
 }
 
