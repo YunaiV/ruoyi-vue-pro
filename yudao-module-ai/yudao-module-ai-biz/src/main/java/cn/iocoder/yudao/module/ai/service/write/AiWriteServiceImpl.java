@@ -5,9 +5,11 @@ import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.ai.core.enums.AiPlatformEnum;
 import cn.iocoder.yudao.framework.ai.core.util.AiUtils;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.tenant.core.util.TenantUtils;
 import cn.iocoder.yudao.module.ai.controller.admin.write.vo.AiWriteGenerateReqVO;
+import cn.iocoder.yudao.module.ai.controller.admin.write.vo.AiWritePageReqVO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiChatModelDO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiChatRoleDO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.write.AiWriteDO;
@@ -36,8 +38,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.error;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
+import static cn.iocoder.yudao.module.ai.enums.ErrorCodeConstants.WRITE_NOT_EXISTS;
 
 /**
  * AI 写作 Service 实现类
@@ -130,6 +134,25 @@ public class AiWriteServiceImpl implements AiWriteService {
         } else {
             return StrUtil.format(AiWriteTypeEnum.REPLY.getPrompt(), generateReqVO.getOriginalContent(), prompt, format, tone, language, length);
         }
+    }
+
+    @Override
+    public void deleteWrite(Long id) {
+        // 校验存在
+        validateWriteExists(id);
+        // 删除
+        writeMapper.deleteById(id);
+    }
+
+    private void validateWriteExists(Long id) {
+        if (writeMapper.selectById(id) == null) {
+            throw exception(WRITE_NOT_EXISTS);
+        }
+    }
+
+    @Override
+    public PageResult<AiWriteDO> getWritePage(AiWritePageReqVO pageReqVO) {
+        return writeMapper.selectPage(pageReqVO);
     }
 
 }
