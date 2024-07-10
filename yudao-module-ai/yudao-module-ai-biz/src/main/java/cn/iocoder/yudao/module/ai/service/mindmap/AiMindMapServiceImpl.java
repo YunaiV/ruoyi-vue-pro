@@ -5,15 +5,14 @@ import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.ai.core.enums.AiPlatformEnum;
 import cn.iocoder.yudao.framework.ai.core.util.AiUtils;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.tenant.core.util.TenantUtils;
 import cn.iocoder.yudao.module.ai.controller.admin.mindmap.vo.AiMindMapGenerateReqVO;
-import cn.iocoder.yudao.module.ai.controller.admin.model.vo.chatRole.AiChatRolePageReqVO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.mindmap.AiMindMapDO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiChatModelDO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiChatRoleDO;
 import cn.iocoder.yudao.module.ai.dal.mysql.mindmap.AiMindMapMapper;
+import cn.iocoder.yudao.module.ai.enums.AiChatRoleEnum;
 import cn.iocoder.yudao.module.ai.enums.ErrorCodeConstants;
 import cn.iocoder.yudao.module.ai.service.model.AiApiKeyService;
 import cn.iocoder.yudao.module.ai.service.model.AiChatModelService;
@@ -56,61 +55,40 @@ public class AiMindMapServiceImpl implements AiMindMapService {
     @Resource
     private AiMindMapMapper mindMapMapper;
 
-    private static final String DEFAULT_SYSTEM_MESSAGE = """
-             你是一位非常优秀的思维导图助手，你会把用户的所有提问都总结成思维导图，然后以 Markdown 格式输出。markdown 只需要输出一级标题，二级标题，三级标题，四级标题，最多输出四级，除此之外不要输出任何其他 markdown 标记。下面是一个合格的例子：
-             # Geek-AI 助手
-             
-             ## 完整的开源系统
-             ### 前端开源
-             ### 后端开源
-                      
-             ## 支持各种大模型
-             ### OpenAI
-             ### Azure
-             ### 文心一言
-             ### 通义千问
-                        
-             ## 集成多种收费方式
-             ### 支付宝
-             ### 微信
-                       
-             另外，除此之外不要任何解释性语句。
-            """;
-
     @Override
     public Flux<CommonResult<String>> generateMindMap(AiMindMapGenerateReqVO generateReqVO, Long userId) {
         // 1.1 获取脑图模型 尝试获取思维导图助手角色，如果没有则使用默认模型
-        AiChatRoleDO mindMapRole = selectOneMindMapRole();
+        AiChatRoleDO mindMapRole = CollUtil.getFirst(chatRoleService.getChatRoleListByName(AiChatRoleEnum.AI_MIND_MAP_ROLE.getName()));
         AiChatModelDO model;
         String systemMessage;
-        if (Objects.nonNull(mindMapRole)) {
+        if (Objects.nonNull(mindMapRole) && Objects.nonNull(mindMapRole.getModelId())) {
             model = chatModalService.getChatModel(mindMapRole.getModelId());
             systemMessage = mindMapRole.getSystemMessage();
         } else {
             model = chatModalService.getRequiredDefaultChatModel();
-            systemMessage = DEFAULT_SYSTEM_MESSAGE;
+            systemMessage = AiChatRoleEnum.AI_MIND_MAP_ROLE.getPrompt();
         }
 
         AiPlatformEnum platform = AiPlatformEnum.validatePlatform(model.getPlatform());
         ChatModel chatModel = apiKeyService.getChatModel(model.getKeyId());
 
-        // 1.2 插入思维导图信息
+        // 2 插入思维导图信息
         AiMindMapDO mindMapDO = BeanUtils.toBean(generateReqVO, AiMindMapDO.class, e -> e.setUserId(userId).setModel(model.getModel()).setPlatform(platform.getPlatform()));
         mindMapMapper.insert(mindMapDO);
 
         ChatOptions chatOptions = AiUtils.buildChatOptions(platform, model.getModel(), model.getTemperature(), model.getMaxTokens());
-        // 2.1 角色设定
+        // 3.1 角色设定
         List<Message> chatMessages = new ArrayList<>();
         if (StrUtil.isNotBlank(systemMessage)) {
             chatMessages.add(new SystemMessage(systemMessage));
         }
-        // 2.2 用户输入
+        // 3.2 用户输入
         chatMessages.add(new UserMessage(generateReqVO.getPrompt()));
-        // 2.3 构建提示词
+        // 3.3 构建提示词
         Prompt prompt = new Prompt(chatMessages, chatOptions);
 
         Flux<ChatResponse> streamResponse = chatModel.stream(prompt);
-        // 2.4 流式返回
+        // 3.4 流式返回
         StringBuffer contentBuffer = new StringBuffer();
         return streamResponse.map(chunk -> {
             String newContent = chunk.getResult() != null ? chunk.getResult().getOutput().getContent() : null;
@@ -131,13 +109,4 @@ public class AiMindMapServiceImpl implements AiMindMapService {
 
     }
 
-    private AiChatRoleDO selectOneMindMapRole() {
-        AiChatRoleDO chatRoleDO = null;
-        PageResult<AiChatRoleDO> mindMapRolePage = chatRoleService.getChatRolePage(new AiChatRolePageReqVO().setName("思维导图助手"));
-        List<AiChatRoleDO> list = mindMapRolePage.getList();
-        if (CollUtil.isNotEmpty(list)) {
-            chatRoleDO = list.get(0);
-        }
-        return chatRoleDO;
-    }
 }

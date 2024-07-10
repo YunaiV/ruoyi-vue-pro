@@ -11,7 +11,7 @@ import lombok.Data;
 public class AiWriteGenerateReqVO {
 
     @Schema(description = "写作类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
-    @InEnum(AiWriteTypeEnum.class)
+    @InEnum(value = AiWriteTypeEnum.class, message = "写作类型必须是 {value}")
     private Integer type;
 
     @Schema(description = "写作内容提示", example = "1.撰写：田忌赛马；2.回复：不批")

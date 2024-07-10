@@ -4,9 +4,7 @@ import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
-import cn.iocoder.yudao.framework.mybatis.core.query.QueryWrapperX;
 import cn.iocoder.yudao.module.ai.controller.admin.model.vo.chatRole.AiChatRolePageReqVO;
-import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiChatModelDO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiChatRoleDO;
 import org.apache.ibatis.annotations.Mapper;
 
@@ -45,6 +43,12 @@ public interface AiChatRoleMapper extends BaseMapperX<AiChatRoleDO> {
                 .select(AiChatRoleDO::getCategory)
                 .eq(AiChatRoleDO::getStatus, status)
                 .groupBy(AiChatRoleDO::getCategory));
+    }
+
+    default List<AiChatRoleDO> selectListByName(String name) {
+        return selectList(new LambdaQueryWrapperX<AiChatRoleDO>()
+                .likeIfPresent(AiChatRoleDO::getName, name)
+                .orderByAsc(AiChatRoleDO::getSort));
     }
 
 }
