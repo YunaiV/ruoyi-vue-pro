@@ -38,7 +38,9 @@ import org.springframework.ai.openai.api.ApiUtils;
 import org.springframework.ai.openai.api.OpenAiApi;
 import org.springframework.ai.openai.api.OpenAiImageApi;
 import org.springframework.ai.qianfan.QianFanChatModel;
+import org.springframework.ai.qianfan.QianFanImageModel;
 import org.springframework.ai.qianfan.api.QianFanApi;
+import org.springframework.ai.qianfan.api.QianFanImageApi;
 import org.springframework.ai.stabilityai.StabilityAiImageModel;
 import org.springframework.ai.stabilityai.api.StabilityAiApi;
 import org.springframework.ai.zhipuai.ZhiPuAiChatModel;
@@ -128,6 +130,8 @@ public class AiModelFactoryImpl implements AiModelFactory {
                 return buildStabilityAiImageModel(apiKey, url);
             case TONG_YI:
                 return SpringUtil.getBean(TongYiImagesModel.class);
+            case YI_YAN:
+                return buildQianFanImageModel(apiKey);
             default:
                 throw new IllegalArgumentException(StrUtil.format("未知平台({})", platform));
         }
@@ -242,4 +246,8 @@ public class AiModelFactoryImpl implements AiModelFactory {
         return new StabilityAiImageModel(stabilityAiApi);
     }
 
+    private QianFanImageModel buildQianFanImageModel(String key) {
+        List<String> keys = StrUtil.split(key, '|');
+        return new QianFanImageModel(new QianFanImageApi(keys.get(0), keys.get(1)));
+    }
 }
