@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.ai.service.mindmap;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.ai.core.enums.AiPlatformEnum;
 import cn.iocoder.yudao.framework.ai.core.util.AiUtils;
@@ -57,33 +58,25 @@ public class AiMindMapServiceImpl implements AiMindMapService {
 
     @Override
     public Flux<CommonResult<String>> generateMindMap(AiMindMapGenerateReqVO generateReqVO, Long userId) {
-        // 1.1 获取脑图模型 尝试获取思维导图助手角色，如果没有则使用默认模型
+        // 1 获取脑图模型 尝试获取思维导图助手角色，如果没有则使用默认模型
         AiChatRoleDO mindMapRole = CollUtil.getFirst(chatRoleService.getChatRoleListByName(AiChatRoleEnum.AI_MIND_MAP_ROLE.getName()));
-        AiChatModelDO model;
-        String systemMessage;
-        if (Objects.nonNull(mindMapRole) && Objects.nonNull(mindMapRole.getModelId())) {
-            model = chatModalService.getChatModel(mindMapRole.getModelId());
-            systemMessage = mindMapRole.getSystemMessage();
-        } else {
-            model = chatModalService.getRequiredDefaultChatModel();
-            systemMessage = AiChatRoleEnum.AI_MIND_MAP_ROLE.getSystemMessage();
-        }
-
+        // 1.1 获取脑图执行模型
+        AiChatModelDO model = getModel(mindMapRole);
+        // 1.2 获取角色设定消息
+        String systemMessage = Objects.nonNull(mindMapRole) && StrUtil.isNotBlank(mindMapRole.getSystemMessage())
+                ? mindMapRole.getSystemMessage() : AiChatRoleEnum.AI_MIND_MAP_ROLE.getSystemMessage();
+        // 1.3 校验平台
         AiPlatformEnum platform = AiPlatformEnum.validatePlatform(model.getPlatform());
         ChatModel chatModel = apiKeyService.getChatModel(model.getKeyId());
 
         // 2 插入思维导图信息
-        AiMindMapDO mindMapDO = BeanUtils.toBean(generateReqVO, AiMindMapDO.class, e -> e.setUserId(userId).setModel(model.getModel()).setPlatform(platform.getPlatform()));
+        AiMindMapDO mindMapDO = BeanUtils.toBean(generateReqVO, AiMindMapDO.class,
+                mindMap -> mindMap.setUserId(userId).setModel(model.getModel()).setPlatform(platform.getPlatform()));
         mindMapMapper.insert(mindMapDO);
 
         ChatOptions chatOptions = AiUtils.buildChatOptions(platform, model.getModel(), model.getTemperature(), model.getMaxTokens());
         // 3.1 角色设定
-        List<Message> chatMessages = new ArrayList<>();
-        if (StrUtil.isNotBlank(systemMessage)) {
-            chatMessages.add(new SystemMessage(systemMessage));
-        }
-        // 3.2 用户输入
-        chatMessages.add(new UserMessage(generateReqVO.getPrompt()));
+        List<Message> chatMessages = buildMessages(generateReqVO, systemMessage);
         // 3.3 构建提示词
         Prompt prompt = new Prompt(chatMessages, chatOptions);
 
@@ -107,6 +100,30 @@ public class AiMindMapServiceImpl implements AiMindMapService {
                     mindMapMapper.updateById(new AiMindMapDO().setId(mindMapDO.getId()).setErrorMessage(throwable.getMessage())));
         }).onErrorResume(error -> Flux.just(error(ErrorCodeConstants.WRITE_STREAM_ERROR)));
 
+    }
+
+    private static List<Message> buildMessages(AiMindMapGenerateReqVO generateReqVO, String systemMessage) {
+        List<Message> chatMessages = new ArrayList<>();
+        if (StrUtil.isNotBlank(systemMessage)) {
+            // 1.1 角色设定
+            chatMessages.add(new SystemMessage(systemMessage));
+        }
+        // 1.2 用户输入
+        chatMessages.add(new UserMessage(generateReqVO.getPrompt()));
+        return chatMessages;
+    }
+
+    // TODO 芋艿：这里脑图、写作都用到了，是不是可以抽哪里去
+    private AiChatModelDO getModel(AiChatRoleDO chatRoleDO) {
+        AiChatModelDO model = null;
+        if (Objects.nonNull(chatRoleDO) && Objects.nonNull(chatRoleDO.getModelId())) {
+            model = chatModalService.getChatModel(chatRoleDO.getModelId());
+        }
+        if (Objects.isNull(model)) {
+            model = chatModalService.getRequiredDefaultChatModel();
+        }
+        Assert.notNull(model, "[AI] 获取不到模型");
+        return model;
     }
 
 }
