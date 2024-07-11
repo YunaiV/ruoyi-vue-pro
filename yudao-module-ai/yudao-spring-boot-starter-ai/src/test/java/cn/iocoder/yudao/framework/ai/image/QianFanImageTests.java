@@ -17,6 +17,7 @@ public class QianFanImageTests {
 
     @Test
     public void callTest() {
+        // todo @芋艿 千帆sdk有个错误，暂时没找到问题
         QianFanImageApi qianFanImageApi = new QianFanImageApi(
                 "ghbbvbW2t7HK7WtYmEITAupm", "njJEr5AsQ5fkB3ucYYDjiQqsOZK20SGb");
         QianFanImageModel qianFanImageModel = new QianFanImageModel(qianFanImageApi);
