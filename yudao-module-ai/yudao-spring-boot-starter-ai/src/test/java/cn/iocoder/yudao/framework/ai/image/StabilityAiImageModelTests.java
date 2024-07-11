@@ -24,7 +24,7 @@ public class StabilityAiImageModelTests {
 
     private final StabilityAiApi imageApi = new StabilityAiApi(
             "sk-e53UqbboF8QJCscYvzJscJxJXoFcFg4iJjl1oqgE7baJETmx");
-    private final StabilityAiImageModel imageClient = new StabilityAiImageModel(imageApi);
+    private final StabilityAiImageModel imageModel = new StabilityAiImageModel(imageApi);
 
     @Test
     @Disabled
@@ -37,7 +37,7 @@ public class StabilityAiImageModelTests {
         ImagePrompt prompt = new ImagePrompt("great wall", options);
 
         // 方法调用
-        ImageResponse response = imageClient.call(prompt);
+        ImageResponse response = imageModel.call(prompt);
         // 打印结果
         String b64Json = response.getResult().getOutput().getB64Json();
         System.out.println(response);
