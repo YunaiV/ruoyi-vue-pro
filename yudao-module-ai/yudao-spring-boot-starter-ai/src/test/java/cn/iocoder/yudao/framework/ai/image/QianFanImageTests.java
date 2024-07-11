@@ -7,7 +7,6 @@ import org.springframework.ai.image.ImagePrompt;
 import org.springframework.ai.image.ImageResponse;
 import org.springframework.ai.qianfan.QianFanImageModel;
 import org.springframework.ai.qianfan.QianFanImageOptions;
-import org.springframework.ai.qianfan.api.QianFanApi;
 import org.springframework.ai.qianfan.api.QianFanImageApi;
 
 /**
@@ -19,7 +18,7 @@ public class QianFanImageTests {
     public void callTest() {
         // todo @芋艿 千帆sdk有个错误，暂时没找到问题
         QianFanImageApi qianFanImageApi = new QianFanImageApi(
-                "ghbbvbW2t7HK7WtYmEITAupm", "njJEr5AsQ5fkB3ucYYDjiQqsOZK20SGb");
+                "qS8k8dYr2nXunagK4SSU8Xjj", "pHGbx51ql2f0hOyabQvSZezahVC3hh3e");
         QianFanImageModel qianFanImageModel = new QianFanImageModel(qianFanImageApi);
 
         QianFanImageOptions imageOptions = QianFanImageOptions.builder()
@@ -44,5 +43,7 @@ public class QianFanImageTests {
         QianFanImageModel imageModel = new QianFanImageModel(qianFanImageApi);
         ImageResponse imageResponse = imageModel.call(imagePrompt);
     }
+
+
 
 }
