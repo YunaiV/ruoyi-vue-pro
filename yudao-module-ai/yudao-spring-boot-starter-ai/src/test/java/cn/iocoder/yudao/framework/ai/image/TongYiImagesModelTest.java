@@ -3,6 +3,7 @@ package cn.iocoder.yudao.framework.ai.image;
 import com.alibaba.cloud.ai.tongyi.image.TongYiImagesModel;
 import com.alibaba.dashscope.aigc.imagesynthesis.ImageSynthesis;
 import com.alibaba.dashscope.utils.Constants;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.ai.image.ImageOptions;
 import org.springframework.ai.image.ImagePrompt;
@@ -24,6 +25,7 @@ public class TongYiImagesModelTest {
     }
 
     @Test
+    @Disabled
     public void imageCallTest() {
         // 准备参数
         ImageOptions options = OpenAiImageOptions.builder()
