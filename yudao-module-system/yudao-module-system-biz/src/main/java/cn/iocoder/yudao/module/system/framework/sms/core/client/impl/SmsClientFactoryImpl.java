@@ -78,6 +78,7 @@ public class SmsClientFactoryImpl implements SmsClientFactory {
             case ALIYUN: return new AliyunSmsClient(properties);
             case DEBUG_DING_TALK: return new DebugDingTalkSmsClient(properties);
             case TENCENT: return new TencentSmsClient(properties);
+            case HUAWEI: return  new HuaweiSmsClient(properties);
         }
         // 创建失败，错误日志 + 抛出异常
         log.error("[createSmsClient][配置({}) 找不到合适的客户端实现]", properties);
