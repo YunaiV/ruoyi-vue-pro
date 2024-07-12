@@ -31,6 +31,7 @@ import org.springframework.ai.image.ImageOptions;
 import org.springframework.ai.image.ImagePrompt;
 import org.springframework.ai.image.ImageResponse;
 import org.springframework.ai.openai.OpenAiImageOptions;
+import org.springframework.ai.qianfan.QianFanImageOptions;
 import org.springframework.ai.stabilityai.api.StabilityAiImageOptions;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -139,6 +140,11 @@ public class AiImageServiceImpl implements AiImageService {
                     .build();
         } else if (ObjUtil.equal(draw.getPlatform(), AiPlatformEnum.TONG_YI.getPlatform())) {
             return TongYiImagesOptions.builder()
+                    .withModel(draw.getModel()).withN(1)
+                    .withHeight(draw.getHeight()).withWidth(draw.getWidth())
+                    .build();
+        } else if (ObjUtil.equal(draw.getPlatform(), AiPlatformEnum.YI_YAN.getPlatform())) {
+            return QianFanImageOptions.builder()
                     .withModel(draw.getModel()).withN(1)
                     .withHeight(draw.getHeight()).withWidth(draw.getWidth())
                     .build();

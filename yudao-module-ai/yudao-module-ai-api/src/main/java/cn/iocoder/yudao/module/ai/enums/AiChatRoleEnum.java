@@ -39,6 +39,7 @@ public enum AiChatRoleEnum implements IntArrayValuable {
             除此之外不要任何解释性语句。
             """);
 
+    // TODO @xin：这个 role 是不是删除掉好点哈。= = 目前主要是没做角色枚举。这里多了 role 反倒容易误解哈
     /**
      * 角色
      */

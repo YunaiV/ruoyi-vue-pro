@@ -5,7 +5,7 @@ import cn.iocoder.yudao.module.ai.dal.dataobject.mindmap.AiMindMapDO;
 import org.apache.ibatis.annotations.Mapper;
 
 /**
- * AI 音乐 Mapper
+ * AI 思维导图 Mapper
  *
  * @author xiaoxin
  */
