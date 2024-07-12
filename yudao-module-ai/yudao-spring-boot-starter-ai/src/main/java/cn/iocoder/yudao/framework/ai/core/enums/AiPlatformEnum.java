@@ -28,6 +28,7 @@ public enum AiPlatformEnum {
     STABLE_DIFFUSION("StableDiffusion", "StableDiffusion"), // Stability AI
     MIDJOURNEY("Midjourney", "Midjourney"), // Midjourney
     SUNO("Suno", "Suno"), // Suno AI
+    CHATGLM("ChatGlm", "ChatGlm"), // Suno AI
 
     ;
 

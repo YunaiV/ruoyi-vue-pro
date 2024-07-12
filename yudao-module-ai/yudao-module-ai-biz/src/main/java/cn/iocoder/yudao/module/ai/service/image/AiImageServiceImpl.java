@@ -9,6 +9,7 @@ import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.spring.SpringUtil;
 import cn.hutool.http.HttpUtil;
 import cn.iocoder.yudao.framework.ai.core.enums.AiPlatformEnum;
+import cn.iocoder.yudao.framework.ai.core.model.chatglm.ChatGlmImageOptions;
 import cn.iocoder.yudao.framework.ai.core.model.midjourney.api.MidjourneyApi;
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
@@ -147,6 +148,10 @@ public class AiImageServiceImpl implements AiImageService {
             return QianFanImageOptions.builder()
                     .withModel(draw.getModel()).withN(1)
                     .withHeight(draw.getHeight()).withWidth(draw.getWidth())
+                    .build();
+        } else if (ObjUtil.equal(draw.getPlatform(), AiPlatformEnum.CHATGLM.getPlatform())) {
+            return ChatGlmImageOptions.builder()
+                    .withModel(draw.getModel())
                     .build();
         }
         throw new IllegalArgumentException("不支持的 AI 平台：" + draw.getPlatform());
