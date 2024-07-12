@@ -46,7 +46,6 @@ public class SmsCallbackController {
     @PostMapping("/huawei")
     @PermitAll
     @Operation(summary = "华为云短信的回调", description = "参见 https://support.huaweicloud.com/api-msgsms/sms_05_0003.html 文档")
-    @OperateLog(enable = false)
     public CommonResult<Boolean> receiveHuaweiSmsStatus(HttpServletRequest request) throws Throwable {
         String text = ServletUtils.getBody(request);
         smsSendService.receiveSmsStatus(SmsChannelEnum.HUAWEI.getCode(), text);
