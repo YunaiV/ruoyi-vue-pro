@@ -1,0 +1,42 @@
+### 生成图片：OpenAI（DALL）
+POST {{baseUrl}}/ai/image/draw
+Content-Type: application/json
+Authorization: {{token}}
+
+{
+  "platform": "OpenAI",
+  "prompt": "可爱的小喵星人",
+  "model": "dall-e-3",
+  "height": "1024",
+  "width": "1024",
+  "options": {
+    "style": "vivid"
+  }
+}
+
+### 生成图片：StableDiffusion
+POST {{baseUrl}}/ai/image/draw
+Content-Type: application/json
+Authorization: {{token}}
+
+{
+  "platform": "StableDiffusion",
+  "prompt": "中国长城",
+  "model": "stable-diffusion-v1-6",
+  "height": "1024",
+  "width": "1024",
+  "style": "vivid"
+}
+
+### 生成图片：生成图片（Midjourney）
+POST {{baseUrl}}/ai/image/midjourney/imagine
+Content-Type: application/json
+Authorization: {{token}}
+
+{
+  "prompt": "中国旗袍",
+  "model": "midjourney",
+  "width": "1",
+  "height": "1",
+  "version": "6.0"
+}

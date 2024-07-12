@@ -23,6 +23,7 @@
 <!--        <module>yudao-module-mall</module>-->
 <!--        <module>yudao-module-crm</module>-->
 <!--        <module>yudao-module-erp</module>-->
+        <module>yudao-module-ai</module>
     </modules>
 
     <name>${project.artifactId}</name>
@@ -146,6 +147,23 @@
             <id>aliyunmaven</id>
             <name>aliyun</name>
             <url>https://maven.aliyun.com/repository/public</url>
+        </repository>
+
+        <repository>
+            <id>spring-milestones</id>
+            <name>Spring Milestones</name>
+            <url>https://repo.spring.io/milestone</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+        <repository>
+            <id>spring-snapshots</id>
+            <name>Spring Snapshots</name>
+            <url>https://repo.spring.io/snapshot</url>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
         </repository>
     </repositories>
 
