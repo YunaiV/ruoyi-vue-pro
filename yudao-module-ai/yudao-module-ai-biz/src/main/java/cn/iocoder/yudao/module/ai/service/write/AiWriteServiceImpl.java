@@ -68,8 +68,9 @@ public class AiWriteServiceImpl implements AiWriteService {
 
     @Override
     public Flux<CommonResult<String>> generateWriteContent(AiWriteGenerateReqVO generateReqVO, Long userId) {
-        // 1 获取写作模型 尝试获取写作助手角色，没有则使用默认模型
-        AiChatRoleDO writeRole = CollUtil.getFirst(chatRoleService.getChatRoleListByName(AiChatRoleEnum.AI_WRITE_ROLE.getName()));
+        // 1 获取写作模型。尝试获取写作助手角色，没有则使用默认模型
+        AiChatRoleDO writeRole = CollUtil.getFirst(
+                chatRoleService.getChatRoleListByName(AiChatRoleEnum.AI_WRITE_ROLE.getName()));
         // 1.1 获取写作执行模型
         AiChatModelDO model = getModel(writeRole);
         // 1.2 获取角色设定消息
@@ -84,16 +85,11 @@ public class AiWriteServiceImpl implements AiWriteService {
                 write -> write.setUserId(userId).setPlatform(platform.getPlatform()).setModel(model.getModel()));
         writeMapper.insert(writeDO);
 
-        // 3. 调用大模型，写作生成
-        ChatOptions chatOptions = AiUtils.buildChatOptions(platform, model.getModel(), model.getTemperature(), model.getMaxTokens());
-        // 3.1 构建消息列表
-        List<Message> chatMessages = buildMessages(generateReqVO, systemMessage);
-        // 3.2 构建提示词
-        Prompt prompt = new Prompt(chatMessages, chatOptions);
-        // 3.3 流式调用
+        // 3.1 构建 Prompt，并进行调用
+        Prompt prompt = buildPrompt(generateReqVO, model, systemMessage);
         Flux<ChatResponse> streamResponse = chatModel.stream(prompt);
 
-        // 4. 流式返回
+        // 3.2 流式返回
         StringBuffer contentBuffer = new StringBuffer();
         return streamResponse.map(chunk -> {
             String newContent = chunk.getResult() != null ? chunk.getResult().getOutput().getContent() : null;
@@ -125,6 +121,15 @@ public class AiWriteServiceImpl implements AiWriteService {
         return model;
     }
 
+    private Prompt buildPrompt(AiWriteGenerateReqVO generateReqVO, AiChatModelDO model, String systemMessage) {
+        // 1. 构建 message 列表
+        List<Message> chatMessages = buildMessages(generateReqVO, systemMessage);
+        // 2. 构建 options 对象
+        AiPlatformEnum platform = AiPlatformEnum.validatePlatform(model.getPlatform());
+        ChatOptions options = AiUtils.buildChatOptions(platform, model.getModel(), model.getTemperature(), model.getMaxTokens());
+        return new Prompt(chatMessages, options);
+    }
+
     private List<Message> buildMessages(AiWriteGenerateReqVO generateReqVO, String systemMessage) {
         List<Message> chatMessages = new ArrayList<>();
         if (StrUtil.isNotBlank(systemMessage)) {
@@ -132,11 +137,11 @@ public class AiWriteServiceImpl implements AiWriteService {
             chatMessages.add(new SystemMessage(systemMessage));
         }
         // 1.2 用户输入
-        chatMessages.add(new UserMessage(buildWritingPrompt(generateReqVO)));
+        chatMessages.add(new UserMessage(buildUserMessage(generateReqVO)));
         return chatMessages;
     }
 
-    private String buildWritingPrompt(AiWriteGenerateReqVO generateReqVO) {
+    private String buildUserMessage(AiWriteGenerateReqVO generateReqVO) {
         String format = dictDataApi.getDictDataLabel(DictTypeConstants.AI_WRITE_FORMAT, generateReqVO.getFormat());
         String tone = dictDataApi.getDictDataLabel(DictTypeConstants.AI_WRITE_TONE, generateReqVO.getTone());
         String language = dictDataApi.getDictDataLabel(DictTypeConstants.AI_WRITE_LANGUAGE, generateReqVO.getLanguage());

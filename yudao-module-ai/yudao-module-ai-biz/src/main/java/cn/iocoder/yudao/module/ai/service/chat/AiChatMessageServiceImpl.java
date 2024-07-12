@@ -111,7 +111,7 @@ public class AiChatMessageServiceImpl implements AiChatMessageService {
         AiChatMessageDO assistantMessage = createChatMessage(conversation.getId(), userMessage.getId(), model,
                 userId, conversation.getRoleId(), MessageType.ASSISTANT, "", sendReqVO.getUseContext());
 
-        // 3.2 创建 chat 需要的 Prompt
+        // 3.2 构建 Prompt，并进行调用
         Prompt prompt = buildPrompt(conversation, historyMessages, model, sendReqVO);
         Flux<ChatResponse> streamResponse = chatModel.stream(prompt);
 
