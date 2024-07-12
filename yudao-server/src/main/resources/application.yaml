@@ -34,6 +34,13 @@ spring:
     redis:
       time-to-live: 1h # 设置过期时间为 1 小时
 
+server:
+  servlet:
+    encoding:
+      enabled: true
+      charset: UTF-8 # 必须设置 UTF-8，避免 WebFlux 流式返回（AI 场景）会乱码问题
+      force: true
+
 --- #################### 接口文档配置 ####################
 
 springdoc:
@@ -141,6 +148,53 @@ spring:
     # Kafka Consumer Listener 监听器配置
     listener:
       missing-topics-fatal: false # 消费监听接口监听的主题不存在时，默认会报错。所以通过设置为 false ，解决报错
+
+--- #################### AI 相关配置 ####################
+
+spring:
+  ai:
+    qianfan: # 文心一言
+      api-key: x0cuLZ7XsaTCU08vuJWO87Lg
+      secret-key: R9mYF9dl9KASgi5RUq0FQt3wRisSnOcK
+    zhipuai: # 智谱 AI
+      api-key: 32f84543e54eee31f8d56b2bd6020573.3vh9idLJZ2ZhxDEs
+    openai:
+      api-key: sk-yzKea6d8e8212c3bdd99f9f44ced1cae37c097e5aa3BTS7z
+      base-url: https://api.gptsapi.net
+    ollama:
+      base-url: http://127.0.0.1:11434
+      chat:
+        model: llama3
+    stabilityai:
+      api-key: sk-e53UqbboF8QJCscYvzJscJxJXoFcFg4iJjl1oqgE7baJETmx
+  cloud:
+    ai:
+      tongyi: # 通义千问
+        tongyi:
+          api-key: sk-Zsd81gZYg7
+
+yudao:
+  ai:
+    deep-seek: # DeepSeek
+      enable: true
+      api-key: sk-e94db327cc7d457d99a8de8810fc6b12
+      model: deepseek-chat
+    xinghuo: # 讯飞星火
+      enable: true
+      appId: 13c8cca6
+      appKey: cb6415c19d6162cda07b47316fcb0416
+      secretKey: Y2JiYTIxZjA3MDMxMjNjZjQzYzVmNzdh
+      model: generalv3.5
+    midjourney:
+      enable: true
+  #    base-url: https://api.holdai.top/mj-relax/mj
+      base-url: https://api.holdai.top/mj
+      api-key: sk-dZEPiVaNcT3FHhef51996bAa0bC74806BeAb620dA5Da10Bf
+      notify-url: http://java.nat300.top/admin-api/ai/image/midjourney/notify
+    suno:
+      enable: true
+  #    base-url: https://suno-55ishh05u-status2xxs-projects.vercel.app
+      base-url: http://127.0.0.1:3001
 
 --- #################### 芋道相关配置 ####################
 
