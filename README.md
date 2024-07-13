@@ -220,11 +220,11 @@
 
 ### 商城系统
 
+演示地址：<https://doc.iocoder.cn/mall-preview/>
+
 ![功能图](/.image/common/mall-feature.png)
 
 ![功能图](/.image/common/mall-preview.png)
-
-演示地址：<https://doc.iocoder.cn/mall-preview/>
 
 ### 会员中心
 
@@ -238,21 +238,23 @@
 
 ### ERP 系统
 
-![功能图](/.image/common/erp-feature.png)
-
 演示地址：<https://doc.iocoder.cn/erp-preview/>
+
+![功能图](/.image/common/erp-feature.png)
 
 ### CRM 系统
 
-![功能图](/.image/common/crm-feature.png)
-
 演示地址：<https://doc.iocoder.cn/crm-preview/>
+
+![功能图](/.image/common/crm-feature.png)
 
 ### AI 大模型
 
+演示地址：<https://doc.iocoder.cn/ai-preview/>
+
 ![功能图](/.image/common/ai-feature.png)
 
-演示地址：<https://doc.iocoder.cn/ai-preview/>
+![功能图](/.image/common/ai-preview.gif)
 
 ## 🐨 技术栈
 
