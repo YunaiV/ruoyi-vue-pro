@@ -33,7 +33,6 @@ public class CrmStatisticsPerformanceReqVO {
     @Schema(description = "负责人用户 id 集合", requiredMode = Schema.RequiredMode.NOT_REQUIRED, example = "2")
     private List<Long> userIds;
 
-    // TODO @scholar：应该传递的是 int year；年份
     @Schema(description = "时间范围", requiredMode = Schema.RequiredMode.REQUIRED)
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
     @NotEmpty(message = "时间范围不能为空")

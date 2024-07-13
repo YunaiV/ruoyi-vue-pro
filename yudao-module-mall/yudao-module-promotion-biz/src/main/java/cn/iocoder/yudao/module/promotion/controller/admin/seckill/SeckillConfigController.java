@@ -78,9 +78,9 @@ public class SeckillConfigController {
         return success(SeckillConfigConvert.INSTANCE.convertList(list));
     }
 
-    @GetMapping("/list-all-simple")
+    @GetMapping("/simple-list")
     @Operation(summary = "获得所有开启状态的秒杀时段精简列表", description = "主要用于前端的下拉选项")
-    public CommonResult<List<SeckillConfigSimpleRespVO>> getListAllSimple() {
+    public CommonResult<List<SeckillConfigSimpleRespVO>> getSeckillConfigSimpleList() {
         List<SeckillConfigDO> list = seckillConfigService.getSeckillConfigListByStatus(
                 CommonStatusEnum.ENABLE.getStatus());
         return success(SeckillConfigConvert.INSTANCE.convertList1(list));

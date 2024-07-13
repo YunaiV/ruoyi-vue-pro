@@ -9,10 +9,12 @@ import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.ReflectUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
+import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.cache.CacheUtils;
 import cn.iocoder.yudao.framework.common.util.http.HttpUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
+import cn.iocoder.yudao.module.system.api.social.dto.SocialWxQrcodeReqDTO;
 import cn.iocoder.yudao.module.system.controller.admin.socail.vo.client.SocialClientPageReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.socail.vo.client.SocialClientSaveReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.social.SocialClientDO;
@@ -38,6 +40,7 @@ import me.chanjar.weixin.common.redis.RedisTemplateWxRedisOps;
 import me.chanjar.weixin.mp.api.WxMpService;
 import me.chanjar.weixin.mp.api.impl.WxMpServiceImpl;
 import me.chanjar.weixin.mp.config.impl.WxMpRedisConfigImpl;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
@@ -57,6 +60,12 @@ import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.*;
 @Service
 @Slf4j
 public class SocialClientServiceImpl implements SocialClientService {
+
+    /**
+     * 小程序版本
+     */
+    @Value("${yudao.wxa-code.env-version}")
+    public String envVersion;
 
     @Resource
     private AuthRequestFactory authRequestFactory;
@@ -139,7 +148,7 @@ public class SocialClientServiceImpl implements SocialClientService {
      * 构建 AuthRequest 对象，支持多租户配置
      *
      * @param socialType 社交类型
-     * @param userType 用户类型
+     * @param userType   用户类型
      * @return AuthRequest 对象
      */
     @VisibleForTesting
@@ -196,7 +205,7 @@ public class SocialClientServiceImpl implements SocialClientService {
     /**
      * 创建 clientId + clientSecret 对应的 WxMpService 对象
      *
-     * @param clientId 微信公众号 appId
+     * @param clientId     微信公众号 appId
      * @param clientSecret 微信公众号 secret
      * @return WxMpService 对象
      */
@@ -227,6 +236,25 @@ public class SocialClientServiceImpl implements SocialClientService {
         }
     }
 
+    @Override
+    public byte[] getWxaQrcode(SocialWxQrcodeReqDTO reqVO) {
+        WxMaService service = getWxMaService(UserTypeEnum.MEMBER.getValue());
+        try {
+            return service.getQrcodeService().createWxaCodeUnlimitBytes(
+                    ObjUtil.defaultIfEmpty(reqVO.getScene(), SocialWxQrcodeReqDTO.SCENE),
+                    reqVO.getPath(),
+                    ObjUtil.defaultIfNull(reqVO.getCheckPath(), SocialWxQrcodeReqDTO.CHECK_PATH),
+                    envVersion,
+                    ObjUtil.defaultIfNull(reqVO.getWidth(), SocialWxQrcodeReqDTO.WIDTH),
+                    ObjUtil.defaultIfNull(reqVO.getAutoColor(), SocialWxQrcodeReqDTO.AUTO_COLOR),
+                    null,
+                    ObjUtil.defaultIfNull(reqVO.getHyaline(), SocialWxQrcodeReqDTO.HYALINE));
+        } catch (WxErrorException e) {
+            log.error("[getWxQrcode][reqVO({})) 获得小程序码失败]", reqVO, e);
+            throw exception(SOCIAL_CLIENT_WEIXIN_MINI_APP_QRCODE_ERROR);
+        }
+    }
+
     /**
      * 获得 clientId + clientSecret 对应的 WxMpService 对象
      *
@@ -248,7 +276,7 @@ public class SocialClientServiceImpl implements SocialClientService {
     /**
      * 创建 clientId + clientSecret 对应的 WxMaService 对象
      *
-     * @param clientId 微信小程序 appId
+     * @param clientId     微信小程序 appId
      * @param clientSecret 微信小程序 secret
      * @return WxMaService 对象
      */
@@ -310,8 +338,8 @@ public class SocialClientServiceImpl implements SocialClientService {
      *
      * 原因是，不同端（userType）选择某个社交登录（socialType）时，需要通过 {@link #buildAuthRequest(Integer, Integer)} 构建对应的请求
      *
-     * @param id 编号
-     * @param userType 用户类型
+     * @param id         编号
+     * @param userType   用户类型
      * @param socialType 社交类型
      */
     private void validateSocialClientUnique(Long id, Integer userType, Integer socialType) {

@@ -11,6 +11,9 @@ import javax.annotation.Resource;
 import java.util.Collection;
 import java.util.List;
 
+import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.module.member.enums.ErrorCodeConstants.USER_MOBILE_NOT_EXISTS;
+
 /**
  * 会员用户的 API 实现类
  *
@@ -42,6 +45,14 @@ public class MemberUserApiImpl implements MemberUserApi {
     @Override
     public MemberUserRespDTO getUserByMobile(String mobile) {
         return MemberUserConvert.INSTANCE.convert2(userService.getUserByMobile(mobile));
+    }
+
+    @Override
+    public void validateUser(Long id) {
+        MemberUserDO user = userService.getUser(id);
+        if (user == null) {
+            throw exception(USER_MOBILE_NOT_EXISTS);
+        }
     }
 
 }
