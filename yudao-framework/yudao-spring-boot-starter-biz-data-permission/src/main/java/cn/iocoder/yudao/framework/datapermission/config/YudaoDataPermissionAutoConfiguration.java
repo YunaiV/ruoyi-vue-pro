@@ -1,12 +1,13 @@
 package cn.iocoder.yudao.framework.datapermission.config;
 
 import cn.iocoder.yudao.framework.datapermission.core.aop.DataPermissionAnnotationAdvisor;
-import cn.iocoder.yudao.framework.datapermission.core.db.DataPermissionDatabaseInterceptor;
+import cn.iocoder.yudao.framework.datapermission.core.db.DataPermissionRuleHandler;
 import cn.iocoder.yudao.framework.datapermission.core.rule.DataPermissionRule;
 import cn.iocoder.yudao.framework.datapermission.core.rule.DataPermissionRuleFactory;
 import cn.iocoder.yudao.framework.datapermission.core.rule.DataPermissionRuleFactoryImpl;
 import cn.iocoder.yudao.framework.mybatis.core.util.MyBatisUtils;
 import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
+import com.baomidou.mybatisplus.extension.plugins.inner.DataPermissionInterceptor;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.context.annotation.Bean;
 
@@ -26,14 +27,15 @@ public class YudaoDataPermissionAutoConfiguration {
     }
 
     @Bean
-    public DataPermissionDatabaseInterceptor dataPermissionDatabaseInterceptor(MybatisPlusInterceptor interceptor,
-                                                                               DataPermissionRuleFactory ruleFactory) {
-        // 创建 DataPermissionDatabaseInterceptor 拦截器
-        DataPermissionDatabaseInterceptor inner = new DataPermissionDatabaseInterceptor(ruleFactory);
+    public DataPermissionRuleHandler dataPermissionRuleHandler(MybatisPlusInterceptor interceptor,
+                                                               DataPermissionRuleFactory ruleFactory) {
+        // 创建 DataPermissionInterceptor 拦截器
+        DataPermissionRuleHandler handler = new DataPermissionRuleHandler(ruleFactory);
+        DataPermissionInterceptor inner = new DataPermissionInterceptor(handler);
         // 添加到 interceptor 中
         // 需要加在首个，主要是为了在分页插件前面。这个是 MyBatis Plus 的规定
         MyBatisUtils.addInterceptor(interceptor, inner, 0);
-        return inner;
+        return handler;
     }
 
     @Bean
