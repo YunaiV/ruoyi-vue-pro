@@ -100,7 +100,7 @@ public class ProductCommentDO extends BaseDO {
      *
      * 关联 {@link ProductSkuDO#getProperties()}
      */
-    @TableField(typeHandler = ProductSkuDO.PropertyTypeHandler.class)
+    @TableField(typeHandler = JacksonTypeHandler.class)
     private List<ProductSkuDO.Property> skuProperties;
 
     /**

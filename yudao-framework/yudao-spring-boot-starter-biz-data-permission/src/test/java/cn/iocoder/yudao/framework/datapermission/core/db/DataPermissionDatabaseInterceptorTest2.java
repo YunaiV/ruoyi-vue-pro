@@ -7,6 +7,7 @@ import cn.iocoder.yudao.framework.test.core.ut.BaseMockitoUnitTest;
 import net.sf.jsqlparser.expression.Alias;
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.LongValue;
+import net.sf.jsqlparser.expression.Parenthesis;
 import net.sf.jsqlparser.expression.operators.relational.EqualsTo;
 import net.sf.jsqlparser.expression.operators.relational.ExpressionList;
 import net.sf.jsqlparser.expression.operators.relational.InExpression;
@@ -71,9 +72,9 @@ public class DataPermissionDatabaseInterceptorTest2 extends BaseMockitoUnitTest 
             @Override
             public Expression getExpression(String tableName, Alias tableAlias) {
                 Column column = MyBatisUtils.buildColumn(tableName, tableAlias, COLUMN);
-                ExpressionList values = new ExpressionList(new LongValue(10L),
+                ExpressionList<LongValue> values = new ExpressionList<>(new LongValue(10L),
                         new LongValue(20L));
-                return new InExpression(column, values);
+                return new InExpression(column, new Parenthesis((values)));
             }
 
         };
@@ -262,7 +263,7 @@ public class DataPermissionDatabaseInterceptorTest2 extends BaseMockitoUnitTest 
                         "right join entity2 e2 on e1.id = e2.id",
                 "SELECT * FROM entity e " +
                         "LEFT JOIN entity1 e1 ON e1.id = e.id AND e1.tenant_id = 1 " +
-                        "RIGHT JOIN entity2 e2 ON e1.id = e2.id AND e1.tenant_id = 1 " +
+                        "RIGHT JOIN entity2 e2 ON e1.id = e2.id AND e.tenant_id = 1 " +
                         "WHERE e2.tenant_id = 1");
 
         assertSql("SELECT * FROM entity e " +

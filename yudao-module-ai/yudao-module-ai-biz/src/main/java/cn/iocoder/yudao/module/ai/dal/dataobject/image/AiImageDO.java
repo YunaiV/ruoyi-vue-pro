@@ -1,7 +1,6 @@
 package cn.iocoder.yudao.module.ai.dal.dataobject.image;
 
 import cn.iocoder.yudao.framework.ai.core.model.midjourney.api.MidjourneyApi;
-import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiChatModelDO;
 import cn.iocoder.yudao.module.ai.enums.image.AiImageStatusEnum;
@@ -10,7 +9,6 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.baomidou.mybatisplus.extension.handlers.AbstractJsonTypeHandler;
 import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import lombok.Data;
 import org.springframework.ai.openai.OpenAiImageOptions;
@@ -107,7 +105,7 @@ public class AiImageDO extends BaseDO {
     /**
      * mj buttons 按钮
      */
-    @TableField(typeHandler = ButtonTypeHandler.class)
+    @TableField(typeHandler = JacksonTypeHandler.class)
     private List<MidjourneyApi.Button> buttons;
 
     /**
@@ -116,20 +114,6 @@ public class AiImageDO extends BaseDO {
      * 1. midjourney proxy：关联的 task id
      */
     private String taskId;
-
-    public static class ButtonTypeHandler extends AbstractJsonTypeHandler<Object> {
-
-        @Override
-        protected Object parse(String json) {
-            return JsonUtils.parseArray(json, MidjourneyApi.Button.class);
-        }
-
-        @Override
-        protected String toJson(Object obj) {
-            return JsonUtils.toJsonString(obj);
-        }
-
-    }
 
 }
 

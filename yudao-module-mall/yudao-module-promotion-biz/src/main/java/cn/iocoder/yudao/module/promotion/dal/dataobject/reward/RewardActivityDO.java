@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.module.promotion.dal.dataobject.reward;
 
-import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.framework.mybatis.core.type.LongListTypeHandler;
 import cn.iocoder.yudao.module.promotion.enums.common.PromotionActivityStatusEnum;
@@ -10,7 +9,7 @@ import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.baomidou.mybatisplus.extension.handlers.AbstractJsonTypeHandler;
+import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -76,7 +75,7 @@ public class RewardActivityDO extends BaseDO {
     /**
      * 优惠规则的数组
      */
-    @TableField(typeHandler = RuleTypeHandler.class)
+    @TableField(typeHandler = JacksonTypeHandler.class)
     private List<Rule> rules;
 
     /**
@@ -112,21 +111,6 @@ public class RewardActivityDO extends BaseDO {
          * 赠送的优惠券数量的数组
          */
         private List<Integer> couponCounts;
-
-    }
-
-    // TODO @芋艿：可以找一些新的思路
-    public static class RuleTypeHandler extends AbstractJsonTypeHandler<List<Rule>> {
-
-        @Override
-        protected List<Rule> parse(String json) {
-            return JsonUtils.parseArray(json, Rule.class);
-        }
-
-        @Override
-        protected String toJson(List<Rule> obj) {
-            return JsonUtils.toJsonString(obj);
-        }
 
     }
 
