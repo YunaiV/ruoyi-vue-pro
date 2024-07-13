@@ -2,7 +2,7 @@ package cn.iocoder.yudao.module.promotion.dal.dataobject.kefu;
 
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.module.member.api.user.dto.MemberUserRespDTO;
-import cn.iocoder.yudao.module.promotion.enums.kehu.KeFuMessageContentTypeEnum;
+import cn.iocoder.yudao.module.promotion.enums.kefu.KeFuMessageContentTypeEnum;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
