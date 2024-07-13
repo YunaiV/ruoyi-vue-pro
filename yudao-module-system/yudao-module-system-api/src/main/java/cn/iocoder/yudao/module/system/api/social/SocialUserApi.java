@@ -4,8 +4,8 @@ import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.module.system.api.social.dto.SocialUserBindReqDTO;
 import cn.iocoder.yudao.module.system.api.social.dto.SocialUserRespDTO;
 import cn.iocoder.yudao.module.system.api.social.dto.SocialUserUnbindReqDTO;
-import cn.iocoder.yudao.module.system.api.social.dto.SocialWxQrcodeReqDTO;
-import jakarta.validation.Valid;
+
+import javax.validation.Valid;
 
 /**
  * 社交用户的 API 接口

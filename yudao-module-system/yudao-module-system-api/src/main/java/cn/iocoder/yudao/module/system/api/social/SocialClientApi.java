@@ -4,7 +4,8 @@ import cn.iocoder.yudao.module.system.api.social.dto.SocialWxJsapiSignatureRespD
 import cn.iocoder.yudao.module.system.api.social.dto.SocialWxPhoneNumberInfoRespDTO;
 import cn.iocoder.yudao.module.system.api.social.dto.SocialWxQrcodeReqDTO;
 import cn.iocoder.yudao.module.system.enums.social.SocialTypeEnum;
-import jakarta.validation.Valid;
+
+import javax.validation.Valid;
 
 /**
  * 社交应用的 API 接口

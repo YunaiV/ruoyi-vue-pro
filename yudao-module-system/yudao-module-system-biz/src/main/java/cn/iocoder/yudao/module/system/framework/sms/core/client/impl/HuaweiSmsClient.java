@@ -24,6 +24,7 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 
+import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
@@ -142,7 +143,7 @@ public class HuaweiSmsClient extends AbstractSmsClient {
     }
 
     static String buildRequestBody(String sender, String receiver, String templateId, List<String> templateParas,
-                                   String statusCallBack, @SuppressWarnings("SameParameterValue") String signature) {
+                                   String statusCallBack, @SuppressWarnings("SameParameterValue") String signature) throws UnsupportedEncodingException {
         // TODO @scholar：参数不满足，是不是抛出异常更好哈；通过 hutool 的 Assert 去断言
         if (null == sender || null == receiver || null == templateId || sender.isEmpty() || receiver.isEmpty()
                 || templateId.isEmpty()) {
@@ -161,10 +162,10 @@ public class HuaweiSmsClient extends AbstractSmsClient {
         return body.toString();
     }
 
-    private static void appendToBody(StringBuilder body, String key, String val) {
+    private static void appendToBody(StringBuilder body, String key, String val) throws UnsupportedEncodingException {
         // TODO @scholar：StrUtils.isNotEmpty(val)，是不是更简洁哈
         if (null != val && !val.isEmpty()) {
-            body.append(key).append(URLEncoder.encode(val, StandardCharsets.UTF_8));
+            body.append(key).append(URLEncoder.encode(val, StandardCharsets.UTF_8.name()));
         }
     }
 

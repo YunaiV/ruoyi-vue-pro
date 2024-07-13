@@ -7,8 +7,8 @@ import cn.iocoder.yudao.module.trade.controller.app.brokerage.vo.user.AppBrokera
 import cn.iocoder.yudao.module.trade.controller.app.brokerage.vo.user.AppBrokerageUserRankByUserCountRespVO;
 import cn.iocoder.yudao.module.trade.controller.app.brokerage.vo.user.AppBrokerageUserRankPageReqVO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.brokerage.BrokerageUserDO;
-import jakarta.validation.constraints.NotNull;
 
+import javax.validation.constraints.NotNull;
 import java.util.Collection;
 import java.util.List;
 

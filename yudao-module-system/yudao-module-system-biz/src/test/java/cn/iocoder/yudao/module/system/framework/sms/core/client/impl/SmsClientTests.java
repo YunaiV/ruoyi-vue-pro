@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.system.framework.sms.core.client.impl;
 
+import cn.hutool.core.collection.ListUtil;
 import cn.iocoder.yudao.framework.common.core.KeyValue;
 import cn.iocoder.yudao.module.system.framework.sms.core.client.dto.SmsSendRespDTO;
 import cn.iocoder.yudao.module.system.framework.sms.core.property.SmsChannelProperties;
@@ -26,7 +27,7 @@ public class SmsClientTests {
         Long sendLogId = System.currentTimeMillis();
         String mobile = "15601691323";
         String apiTemplateId = "xx test01";
-        List<KeyValue<String, Object>> templateParams = List.of(new KeyValue<>("code", "1024"));
+        List<KeyValue<String, Object>> templateParams = ListUtil.of(new KeyValue<>("code", "1024"));
         // 调用
         SmsSendRespDTO smsSendRespDTO = client.sendSms(sendLogId, mobile, apiTemplateId, templateParams);
         // 打印结果
