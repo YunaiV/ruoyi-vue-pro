@@ -231,6 +231,8 @@ yudao:
     license-url: https://gitee.com/zhijiantianya/ruoyi-vue-pro/blob/master/LICENSE
   captcha:
     enable: true # 验证码的开关，默认为 true
+  wxa-code:
+    env-version: release # 小程序版本: 正式版为 "release"；体验版为 "trial"；开发版为 "develop"。默认为 release
   codegen:
     base-package: ${yudao.info.base-package}
     db-schemas: ${spring.datasource.dynamic.datasource.master.name}
