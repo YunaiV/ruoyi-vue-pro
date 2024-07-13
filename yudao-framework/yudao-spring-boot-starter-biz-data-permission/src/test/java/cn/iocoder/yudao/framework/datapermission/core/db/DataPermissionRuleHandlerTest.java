@@ -4,6 +4,7 @@ import cn.iocoder.yudao.framework.datapermission.core.rule.DataPermissionRule;
 import cn.iocoder.yudao.framework.datapermission.core.rule.DataPermissionRuleFactory;
 import cn.iocoder.yudao.framework.mybatis.core.util.MyBatisUtils;
 import cn.iocoder.yudao.framework.test.core.ut.BaseMockitoUnitTest;
+import com.baomidou.mybatisplus.extension.plugins.inner.DataPermissionInterceptor;
 import net.sf.jsqlparser.expression.Alias;
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.LongValue;
@@ -22,24 +23,30 @@ import java.util.Set;
 
 import static cn.iocoder.yudao.framework.common.util.collection.SetUtils.asSet;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 
 /**
- * {@link DataPermissionDatabaseInterceptor} 的单元测试
+ * {@link DataPermissionRuleHandler} 的单元测试
  * 主要复用了 MyBatis Plus 的 TenantLineInnerInterceptorTest 的单元测试
  * 不过它的单元测试不是很规范，考虑到是复用的，所以暂时不进行修改~
  *
  * @author 芋道源码
  */
-public class DataPermissionDatabaseInterceptorTest2 extends BaseMockitoUnitTest {
+public class DataPermissionRuleHandlerTest extends BaseMockitoUnitTest {
 
     @InjectMocks
-    private DataPermissionDatabaseInterceptor interceptor;
+    private DataPermissionRuleHandler handler;
 
     @Mock
     private DataPermissionRuleFactory ruleFactory;
 
+    private DataPermissionInterceptor interceptor;
+
     @BeforeEach
     public void setUp() {
+        interceptor = new DataPermissionInterceptor(handler);
+
         // 租户的数据权限规则
         DataPermissionRule tenantRule = new DataPermissionRule() {
 
@@ -78,8 +85,8 @@ public class DataPermissionDatabaseInterceptorTest2 extends BaseMockitoUnitTest 
             }
 
         };
-        // 设置到上下文，保证
-        DataPermissionDatabaseInterceptor.ContextHolder.init(Arrays.asList(tenantRule, deptRule));
+        // 设置到上下文
+        when(ruleFactory.getDataPermissionRule(any())).thenReturn(Arrays.asList(tenantRule, deptRule));
     }
 
     @Test
@@ -447,7 +454,6 @@ public class DataPermissionDatabaseInterceptorTest2 extends BaseMockitoUnitTest 
     private void assertSql(String sql, String targetSql) {
         assertEquals(targetSql, interceptor.parserSingle(sql, null));
     }
-
 
     // ========== 额外的测试 ==========
 
