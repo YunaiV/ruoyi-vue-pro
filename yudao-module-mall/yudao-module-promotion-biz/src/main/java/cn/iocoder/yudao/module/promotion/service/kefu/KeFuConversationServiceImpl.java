@@ -7,11 +7,11 @@ import cn.iocoder.yudao.module.promotion.dal.dataobject.kefu.KeFuConversationDO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.kefu.KeFuMessageDO;
 import cn.iocoder.yudao.module.promotion.dal.mysql.kefu.KeFuConversationMapper;
 import cn.iocoder.yudao.module.promotion.enums.kefu.KeFuMessageContentTypeEnum;
-import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
+import javax.annotation.Resource;
 import java.time.LocalDateTime;
 import java.util.List;
 
