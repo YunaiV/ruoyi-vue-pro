@@ -5,6 +5,7 @@ import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.util.number.NumberUtils;
+import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.task.BpmTaskRespVO;
 import cn.iocoder.yudao.module.bpm.enums.definition.BpmUserTaskRejectHandlerType;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnModelConstants;
 import org.flowable.bpmn.converter.BpmnXMLConverter;
@@ -65,8 +66,11 @@ public class BpmnModelUtils {
         if (flowElement == null) {
             return null;
         }
-        Map<String, String> fieldsPermission = MapUtil.newHashMap();
         List<ExtensionElement> extensionElements = flowElement.getExtensionElements().get(FORM_FIELD_PERMISSION_ELEMENT);
+        if (CollUtil.isEmpty(extensionElements)) {
+            return null;
+        }
+        Map<String, String> fieldsPermission = MapUtil.newHashMap();
         extensionElements.forEach(element -> {
             String field = element.getAttributeValue(FLOWABLE_EXTENSIONS_NAMESPACE, FORM_FIELD_PERMISSION_ELEMENT_FIELD_ATTRIBUTE);
             String permission = element.getAttributeValue(FLOWABLE_EXTENSIONS_NAMESPACE, FORM_FIELD_PERMISSION_ELEMENT_PERMISSION_ATTRIBUTE);
@@ -75,6 +79,28 @@ public class BpmnModelUtils {
             }
         });
         return fieldsPermission;
+    }
+
+    public static Map<Integer, BpmTaskRespVO.OperationButtonSetting> parseButtonsSetting(BpmnModel bpmnModel, String flowElementId) {
+        FlowElement flowElement = getFlowElementById(bpmnModel, flowElementId);
+        if (flowElement == null) {
+            return null;
+        }
+        List<ExtensionElement> extensionElements = flowElement.getExtensionElements().get(BUTTON_SETTING_ELEMENT);
+        if (CollUtil.isEmpty(extensionElements)) {
+            return null;
+        }
+        Map<Integer, BpmTaskRespVO.OperationButtonSetting> buttonSettings = MapUtil.newHashMap(16);
+        extensionElements.forEach(element -> {
+            String id = element.getAttributeValue(FLOWABLE_EXTENSIONS_NAMESPACE, BUTTON_SETTING_ELEMENT_ID_ATTRIBUTE);
+            String displayName = element.getAttributeValue(FLOWABLE_EXTENSIONS_NAMESPACE, BUTTON_SETTING_ELEMENT_DISPLAY_NAME_ATTRIBUTE);
+            String enable = element.getAttributeValue(FLOWABLE_EXTENSIONS_NAMESPACE, BUTTON_SETTING_ELEMENT_ENABLE_ATTRIBUTE);
+            if (StrUtil.isNotEmpty(id)) {
+                BpmTaskRespVO.OperationButtonSetting setting = new BpmTaskRespVO.OperationButtonSetting();
+                buttonSettings.put(Integer.valueOf(id), setting.setDisplayName(displayName).setEnable(Boolean.parseBoolean(enable)));
+            }
+        });
+        return buttonSettings;
     }
 
     /**

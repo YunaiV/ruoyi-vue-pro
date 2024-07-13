@@ -71,6 +71,26 @@ public interface BpmnModelConstants {
      */
     String FORM_FIELD_PERMISSION_ELEMENT_PERMISSION_ATTRIBUTE = "permission";
 
+    /**
+     * BPMN ExtensionElement 操作按钮设置元素, 用于审批节点操作按钮设置
+     */
+    String BUTTON_SETTING_ELEMENT = "buttonsSettings";
+
+    /**
+     * BPMN ExtensionElement Attribute, 用于标记按钮编号
+     */
+    String BUTTON_SETTING_ELEMENT_ID_ATTRIBUTE = "id";
+
+    /**
+     * BPMN ExtensionElement Attribute, 用于标记按钮显示名称
+     */
+    String BUTTON_SETTING_ELEMENT_DISPLAY_NAME_ATTRIBUTE = "displayName";
+
+    /**
+     * BPMN ExtensionElement Attribute, 用于标记按钮是否启用
+     */
+    String BUTTON_SETTING_ELEMENT_ENABLE_ATTRIBUTE = "enable";
+
     // TODO @芋艿：这里后面得关注下；
     /**
      * BPMN End Event 节点 Id， 用于后端生成 End Event 节点

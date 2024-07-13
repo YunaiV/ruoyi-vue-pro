@@ -69,6 +69,8 @@ public class BpmTaskRespVO {
     private Map<String, Object> formVariables;
     @Schema(description = "表单字段权限值")
     private Map<String,String> fieldsPermission;
+    @Schema(description = "操作按钮设置值")
+    private Map<Integer,OperationButtonSetting> buttonsSetting;
 
     @Data
     @Schema(description = "流程实例")
@@ -91,6 +93,17 @@ public class BpmTaskRespVO {
          */
         private BpmProcessInstanceRespVO.User startUser;
 
+    }
+
+    @Data
+    @Schema(description = "操作按钮设置")
+    public static class OperationButtonSetting {
+
+        @Schema(description = "显示名称", example = "审批")
+        private String displayName;
+
+        @Schema(description = "是否启用", example = "true")
+        private Boolean enable;
     }
 
 }

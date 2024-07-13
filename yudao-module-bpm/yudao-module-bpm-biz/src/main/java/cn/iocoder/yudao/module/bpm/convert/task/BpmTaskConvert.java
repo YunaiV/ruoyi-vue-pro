@@ -114,6 +114,8 @@ public interface BpmTaskConvert {
             if(BpmTaskStatusEnum.RUNNING.getStatus().equals(taskStatus)){
                 // 设置表单权限 TODO @芋艿 是不是还要加一个全局的权限 基于 processInstance 的权限
                 taskVO.setFieldsPermission(BpmnModelUtils.parseFormFieldsPermission(bpmnModel, task.getTaskDefinitionKey()));
+                // 操作按钮设置
+                taskVO.setButtonsSetting(BpmnModelUtils.parseButtonsSetting(bpmnModel, task.getTaskDefinitionKey()));
             }
            return taskVO;
         });

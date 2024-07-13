@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import static cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.simple.BpmSimpleModelNodeVO.OperationButtonSetting;
 import static cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.simple.BpmSimpleModelNodeVO.TimeoutHandler;
 import static cn.iocoder.yudao.module.bpm.enums.definition.BpmBoundaryEventType.USER_TASK_TIMEOUT;
 import static cn.iocoder.yudao.module.bpm.enums.definition.BpmSimpleModelNodeType.*;
@@ -454,12 +455,15 @@ public class SimpleModelUtils {
         addCandidateElements(node.getCandidateStrategy(), node.getCandidateParam(), userTask);
         // 添加表单字段权限属性元素
         addFormFieldsPermission(node.getFieldsPermission(), userTask);
+        // 添加操作按钮配置属性元素
+        addButtonsSetting(node.getButtonsSetting(), userTask);
         // 处理多实例
         processMultiInstanceLoopCharacteristics(node.getApproveMethod(), node.getApproveRatio(), userTask);
         // 添加任务被拒绝的处理元素
         addTaskRejectElements(node.getRejectHandler(), userTask);
         return userTask;
     }
+
 
     private static void addTaskRejectElements(RejectHandler rejectHandler, UserTask userTask) {
         if (rejectHandler == null) {
@@ -496,6 +500,22 @@ public class SimpleModelUtils {
             multiInstanceCharacteristics.setSequential(false);
         }
         userTask.setLoopCharacteristics(multiInstanceCharacteristics);
+    }
+
+    /**
+     * 给节点添加操作按钮设置元素
+     */
+    private static void addButtonsSetting(List<OperationButtonSetting> buttonsSetting, UserTask userTask) {
+        if (CollUtil.isNotEmpty(buttonsSetting)) {
+            List<Map<String, String>> list = CollectionUtils.convertList(buttonsSetting, item -> {
+                Map<String, String> settingMap = MapUtil.newHashMap(16);
+                settingMap.put(BUTTON_SETTING_ELEMENT_ID_ATTRIBUTE, String.valueOf(item.getId()));
+                settingMap.put(BUTTON_SETTING_ELEMENT_DISPLAY_NAME_ATTRIBUTE, item.getDisplayName());
+                settingMap.put(BUTTON_SETTING_ELEMENT_ENABLE_ATTRIBUTE, String.valueOf(item.getEnable()));
+                return settingMap;
+            });
+            list.forEach(item -> addExtensionElement(userTask, BUTTON_SETTING_ELEMENT, item));
+        }
     }
 
     /**

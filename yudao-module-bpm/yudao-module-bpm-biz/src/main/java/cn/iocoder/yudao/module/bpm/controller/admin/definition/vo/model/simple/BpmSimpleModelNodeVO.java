@@ -65,11 +65,14 @@ public class BpmSimpleModelNodeVO {
     @InEnum(BpmApproveMethodEnum.class)
     private Integer approveMethod; // 用于审批节点
 
+    @Schema(description = "通过比例", example = "100")
+    private Integer approveRatio; // 通过比例，当多人审批方式为：多人会签(按通过比例) 需要设置
+
     @Schema(description = "表单权限", example = "[]")
     private List<Map<String, String>> fieldsPermission;
 
-    @Schema(description = "通过比例", example = "100")
-    private Integer approveRatio; // 通过比例，当多人审批方式为：多人会签(按通过比例) 需要设置
+    @Schema(description = "操作按钮设置", example = "[]")
+    private List<OperationButtonSetting> buttonsSetting;  // 用于审批节点
 
     /**
      * 审批节点拒绝处理
@@ -111,6 +114,19 @@ public class BpmSimpleModelNodeVO {
         private Integer maxRemindCount;
     }
 
+    @Data
+    @Schema(description = "操作按钮设置")
+    public static class OperationButtonSetting {
+
+        @Schema(description = "按钮 Id", example = "1")
+        private  Integer id;
+
+        @Schema(description = "显示名称", example = "审批")
+        private String displayName;
+
+        @Schema(description = "是否启用", example = "true")
+        private Boolean enable;
+    }
 
     // Map<String, Integer> formPermissions; 表单权限；仅发起、审批、抄送节点会使用
     // Integer approveMethod; 审批方式；仅审批节点会使用
