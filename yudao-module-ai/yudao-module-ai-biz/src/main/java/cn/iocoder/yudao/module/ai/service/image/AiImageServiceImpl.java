@@ -33,6 +33,7 @@ import org.springframework.ai.image.ImageResponse;
 import org.springframework.ai.openai.OpenAiImageOptions;
 import org.springframework.ai.qianfan.QianFanImageOptions;
 import org.springframework.ai.stabilityai.api.StabilityAiImageOptions;
+import org.springframework.ai.zhipuai.ZhiPuAiImageOptions;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -104,7 +105,9 @@ public class AiImageServiceImpl implements AiImageService {
             ImageResponse response = imageModel.call(new ImagePrompt(req.getPrompt(), request));
 
             // 2. 上传到文件服务
-            byte[] fileContent = Base64.decode(response.getResult().getOutput().getB64Json());
+            String b64Json = response.getResult().getOutput().getB64Json();
+            byte[] fileContent = StrUtil.isNotEmpty(b64Json) ? Base64.decode(b64Json)
+                    : HttpUtil.downloadBytes(response.getResult().getOutput().getUrl());
             String filePath = fileApi.createFile(fileContent);
 
             // 3. 更新数据库
@@ -147,6 +150,10 @@ public class AiImageServiceImpl implements AiImageService {
             return QianFanImageOptions.builder()
                     .withModel(draw.getModel()).withN(1)
                     .withHeight(draw.getHeight()).withWidth(draw.getWidth())
+                    .build();
+        } else if (ObjUtil.equal(draw.getPlatform(), AiPlatformEnum.ZHI_PU.getPlatform())) {
+            return ZhiPuAiImageOptions.builder()
+                    .withModel(draw.getModel())
                     .build();
         }
         throw new IllegalArgumentException("不支持的 AI 平台：" + draw.getPlatform());
