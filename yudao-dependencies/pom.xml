@@ -41,8 +41,8 @@
         <spring-boot-admin.version>3.3.2</spring-boot-admin.version>
         <opentracing.version>0.33.0</opentracing.version>
         <!-- Test 测试相关 -->
-        <podam.version>8.0.1.RELEASE</podam.version>
-        <jedis-mock.version>1.0.13</jedis-mock.version>
+        <podam.version>8.0.2.RELEASE</podam.version>
+        <jedis-mock.version>1.1.2</jedis-mock.version>
         <mockito-inline.version>5.2.0</mockito-inline.version>
         <!-- Bpm 工作流相关 -->
         <flowable.version>7.0.1</flowable.version>
