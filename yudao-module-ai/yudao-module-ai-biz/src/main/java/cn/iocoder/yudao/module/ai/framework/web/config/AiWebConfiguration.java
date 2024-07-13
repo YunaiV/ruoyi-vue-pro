@@ -11,7 +11,7 @@ import org.springframework.context.annotation.Configuration;
  * @author 芋道源码
  */
 @Configuration(proxyBeanMethods = false)
-public class CrmWebConfiguration {
+public class AiWebConfiguration {
 
     /**
      * ai 模块的 API 分组
