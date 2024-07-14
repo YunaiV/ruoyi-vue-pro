@@ -308,8 +308,3 @@ yudao:
         customer: E77DF18BE109F454A5CD319E44BF5177
 
 debug: false
-
-# 积木报表配置
-jeecg:
-  jmreport:
-    saas-mode: tenant
