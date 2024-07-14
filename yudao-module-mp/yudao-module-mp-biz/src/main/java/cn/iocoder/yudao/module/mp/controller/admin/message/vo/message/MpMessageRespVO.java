@@ -81,7 +81,6 @@ public class MpMessageRespVO {
      *
      * 消息类型为 {@link WxConsts.XmlMsgType} 的 NEWS
      */
-    @TableField(typeHandler = JacksonTypeHandler.class)
     private List<MpMessageDO.Article> articles;
 
     @Schema(description = "音乐链接 消息类型为 music 时，才有值", example = "https://www.iocoder.cn/xxx.mp3")
