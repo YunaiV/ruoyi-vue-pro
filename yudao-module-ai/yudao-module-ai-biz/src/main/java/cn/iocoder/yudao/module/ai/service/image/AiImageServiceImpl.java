@@ -13,9 +13,7 @@ import cn.iocoder.yudao.framework.ai.core.model.midjourney.api.MidjourneyApi;
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
-import cn.iocoder.yudao.module.ai.controller.admin.image.vo.AiImageDrawReqVO;
-import cn.iocoder.yudao.module.ai.controller.admin.image.vo.AiImagePageReqVO;
-import cn.iocoder.yudao.module.ai.controller.admin.image.vo.AiImageUpdateReqVO;
+import cn.iocoder.yudao.module.ai.controller.admin.image.vo.*;
 import cn.iocoder.yudao.module.ai.controller.admin.image.vo.midjourney.AiMidjourneyActionReqVO;
 import cn.iocoder.yudao.module.ai.controller.admin.image.vo.midjourney.AiMidjourneyImagineReqVO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.image.AiImageDO;
@@ -336,6 +334,11 @@ public class AiImageServiceImpl implements AiImageService {
                 .setOptions(image.getOptions()).setTaskId(actionResponse.result());
         imageMapper.insert(newImage);
         return newImage.getId();
+    }
+
+    @Override
+    public PageResult<AiImageDO> releaseList(AiImageReleaseListReqVO releaseListReqVO) {
+        return imageMapper.selectPageOfReleaseList(releaseListReqVO);
     }
 
     /**

@@ -6,10 +6,7 @@ import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
-import cn.iocoder.yudao.module.ai.controller.admin.image.vo.AiImageDrawReqVO;
-import cn.iocoder.yudao.module.ai.controller.admin.image.vo.AiImagePageReqVO;
-import cn.iocoder.yudao.module.ai.controller.admin.image.vo.AiImageRespVO;
-import cn.iocoder.yudao.module.ai.controller.admin.image.vo.AiImageUpdateReqVO;
+import cn.iocoder.yudao.module.ai.controller.admin.image.vo.*;
 import cn.iocoder.yudao.module.ai.controller.admin.image.vo.midjourney.AiMidjourneyActionReqVO;
 import cn.iocoder.yudao.module.ai.controller.admin.image.vo.midjourney.AiMidjourneyImagineReqVO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.image.AiImageDO;
@@ -131,4 +128,10 @@ public class AiImageController {
         return success(true);
     }
 
+    @GetMapping("/release-list")
+    @Operation(summary = "发布列表")
+    public CommonResult<PageResult<AiImageRespVO>> releaseList(AiImageReleaseListReqVO releaseListReqVO) {
+        PageResult<AiImageDO> pageResult = imageService.releaseList(releaseListReqVO);
+        return success(BeanUtils.toBean(pageResult, AiImageRespVO.class));
+    }
 }

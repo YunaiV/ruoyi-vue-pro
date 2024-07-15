@@ -3,9 +3,7 @@ package cn.iocoder.yudao.module.ai.service.image;
 import cn.iocoder.yudao.framework.ai.core.model.midjourney.api.MidjourneyApi;
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.ai.controller.admin.image.vo.AiImageDrawReqVO;
-import cn.iocoder.yudao.module.ai.controller.admin.image.vo.AiImagePageReqVO;
-import cn.iocoder.yudao.module.ai.controller.admin.image.vo.AiImageUpdateReqVO;
+import cn.iocoder.yudao.module.ai.controller.admin.image.vo.*;
 import cn.iocoder.yudao.module.ai.controller.admin.image.vo.midjourney.AiMidjourneyActionReqVO;
 import cn.iocoder.yudao.module.ai.controller.admin.image.vo.midjourney.AiMidjourneyImagineReqVO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.image.AiImageDO;
@@ -117,5 +115,12 @@ public interface AiImageService {
      * @return 绘画编号
      */
     Long midjourneyAction(Long userId, AiMidjourneyActionReqVO reqVO);
+
+    /**
+     * 发布列表
+     * @param releaseListReqVO
+     * @return
+     */
+    PageResult<AiImageDO> releaseList(AiImageReleaseListReqVO releaseListReqVO);
 
 }
