@@ -26,7 +26,7 @@ public class OperateLogRespDTO implements VO {
     /**
      * 用户编号
      */
-    @Trans(type = TransType.RPC, targetClassName = "cn.iocoder.yudao.module.system.dal.dataobject.user.AdminUserDO",
+    @Trans(type = TransType.SIMPLE, targetClassName = "cn.iocoder.yudao.module.system.dal.dataobject.user.AdminUserDO",
             fields = "nickname", ref = "userName")
     private Long userId;
     /**
