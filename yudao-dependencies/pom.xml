@@ -29,7 +29,7 @@
         <mybatis-plus-generator.version>3.5.7</mybatis-plus-generator.version>
         <dynamic-datasource.version>4.3.1</dynamic-datasource.version>
         <mybatis-plus-join.version>1.4.13</mybatis-plus-join.version>
-        <easy-trans.version>2.2.11</easy-trans.version>
+        <easy-trans.version>3.0.5</easy-trans.version>
         <redisson.version>3.18.0</redisson.version> <!-- Spring Boot 2.X 最多使用 3.18.0 版本，否则会报 Tuple NoClassDefFoundError -->
         <dm8.jdbc.version>8.1.3.62</dm8.jdbc.version>
         <kingbase.jdbc.version>8.6.0</kingbase.jdbc.version>
@@ -56,7 +56,6 @@
         <hutool.version>5.8.29</hutool.version>
         <easyexcel.verion>3.3.4</easyexcel.verion>
         <velocity.version>2.3</velocity.version>
-        <screw.version>1.0.5</screw.version>
         <fastjson.version>1.2.83</fastjson.version>
         <guava.version>33.2.1-jre</guava.version>
         <transmittable-thread-local.version>2.14.5</transmittable-thread-local.version>
