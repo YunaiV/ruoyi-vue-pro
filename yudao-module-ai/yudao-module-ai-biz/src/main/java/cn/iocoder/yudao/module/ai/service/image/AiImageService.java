@@ -118,9 +118,9 @@ public interface AiImageService {
 
     /**
      * 发布列表
-     * @param releaseListReqVO
+     * @param publicListReqVO
      * @return
      */
-    PageResult<AiImageDO> releaseList(AiImageReleaseListReqVO releaseListReqVO);
+    PageResult<AiImageDO> publicList(AiImagePublicListReqVO publicListReqVO);
 
 }

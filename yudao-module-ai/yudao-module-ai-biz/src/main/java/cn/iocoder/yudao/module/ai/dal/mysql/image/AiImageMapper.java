@@ -5,7 +5,7 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.module.ai.controller.admin.image.vo.AiImagePageReqVO;
-import cn.iocoder.yudao.module.ai.controller.admin.image.vo.AiImageReleaseListReqVO;
+import cn.iocoder.yudao.module.ai.controller.admin.image.vo.AiImagePublicListReqVO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.image.AiImageDO;
 import org.apache.ibatis.annotations.Mapper;
 
@@ -44,7 +44,7 @@ public interface AiImageMapper extends BaseMapperX<AiImageDO> {
                 AiImageDO::getPlatform, platform);
     }
 
-    default PageResult<AiImageDO> selectPageOfReleaseList(AiImageReleaseListReqVO releaseListReqVO) {
+    default PageResult<AiImageDO> selectPageOfPublicList(AiImagePublicListReqVO releaseListReqVO) {
         return selectPage(releaseListReqVO, new LambdaQueryWrapperX<AiImageDO>()
                 .eqIfPresent(AiImageDO::getPublicStatus, Boolean.TRUE)
                 .eqIfPresent(AiImageDO::getPrompt, releaseListReqVO.getPrompt())

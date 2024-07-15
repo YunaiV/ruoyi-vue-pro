@@ -128,10 +128,10 @@ public class AiImageController {
         return success(true);
     }
 
-    @GetMapping("/release-list")
+    @GetMapping("/public-list")
     @Operation(summary = "发布列表")
-    public CommonResult<PageResult<AiImageRespVO>> releaseList(AiImageReleaseListReqVO releaseListReqVO) {
-        PageResult<AiImageDO> pageResult = imageService.releaseList(releaseListReqVO);
+    public CommonResult<PageResult<AiImageRespVO>> publicList(AiImagePublicListReqVO publicListReqVO) {
+        PageResult<AiImageDO> pageResult = imageService.publicList(publicListReqVO);
         return success(BeanUtils.toBean(pageResult, AiImageRespVO.class));
     }
 }

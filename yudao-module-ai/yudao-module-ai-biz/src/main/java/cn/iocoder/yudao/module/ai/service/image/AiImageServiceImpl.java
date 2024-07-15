@@ -337,8 +337,8 @@ public class AiImageServiceImpl implements AiImageService {
     }
 
     @Override
-    public PageResult<AiImageDO> releaseList(AiImageReleaseListReqVO releaseListReqVO) {
-        return imageMapper.selectPageOfReleaseList(releaseListReqVO);
+    public PageResult<AiImageDO> publicList(AiImagePublicListReqVO publicListReqVO) {
+        return imageMapper.selectPageOfPublicList(publicListReqVO);
     }
 
     /**

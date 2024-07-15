@@ -6,7 +6,7 @@ import lombok.Data;
 
 @Schema(description = "Ai Image 发布列表 req")
 @Data
-public class AiImageReleaseListReqVO extends PageParam {
+public class AiImagePublicListReqVO extends PageParam {
 
     @Schema(description = "提示词")
     private String prompt;
