@@ -234,7 +234,17 @@
                         <groupId>org.springframework.boot</groupId>
                         <artifactId>spring-boot-starter-actuator</artifactId>
                     </exclusion>
+                    <exclusion>
+                        <groupId>org.springframework.boot</groupId>
+                        <!-- 使用 redisson-spring-data-22 替代，解决 Tuple NoClassDefFoundError 报错 -->
+                        <artifactId>redisson-spring-data-33</artifactId>
+                    </exclusion>
                 </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>org.redisson</groupId>
+                <artifactId>redisson-spring-data-22</artifactId>
+                <version>${redisson.version}</version>
             </dependency>
 
             <dependency>
