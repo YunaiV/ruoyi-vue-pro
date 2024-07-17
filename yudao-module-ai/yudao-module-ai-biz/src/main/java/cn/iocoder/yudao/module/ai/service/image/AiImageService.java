@@ -28,6 +28,14 @@ public interface AiImageService {
     PageResult<AiImageDO> getImagePageMy(Long userId, PageParam pageReqVO);
 
     /**
+     * 获取公开的绘图分页
+     *
+     * @param pageReqVO 分页条件
+     * @return 绘图分页
+     */
+    PageResult<AiImageDO> getImagePagePublic(AiImagePublicPageReqVO pageReqVO);
+
+    /**
      * 获得绘图记录
      *
      * @param id 绘图编号
@@ -115,12 +123,5 @@ public interface AiImageService {
      * @return 绘画编号
      */
     Long midjourneyAction(Long userId, AiMidjourneyActionReqVO reqVO);
-
-    /**
-     * 发布列表
-     * @param publicListReqVO
-     * @return
-     */
-    PageResult<AiImageDO> publicList(AiImagePublicListReqVO publicListReqVO);
 
 }

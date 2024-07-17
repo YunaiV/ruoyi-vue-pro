@@ -43,6 +43,13 @@ public class AiImageController {
         return success(BeanUtils.toBean(pageResult, AiImageRespVO.class));
     }
 
+    @GetMapping("/public-page")
+    @Operation(summary = "获取公开的绘图分页")
+    public CommonResult<PageResult<AiImageRespVO>> getImagePagePublic(AiImagePublicPageReqVO pageReqVO) {
+        PageResult<AiImageDO> pageResult = imageService.getImagePagePublic(pageReqVO);
+        return success(BeanUtils.toBean(pageResult, AiImageRespVO.class));
+    }
+
     @GetMapping("/get-my")
     @Operation(summary = "获取【我的】绘图记录")
     @Parameter(name = "id", required = true, description = "绘画编号", example = "1024")
@@ -128,10 +135,4 @@ public class AiImageController {
         return success(true);
     }
 
-    @GetMapping("/public-list")
-    @Operation(summary = "发布列表")
-    public CommonResult<PageResult<AiImageRespVO>> publicList(AiImagePublicListReqVO publicListReqVO) {
-        PageResult<AiImageDO> pageResult = imageService.publicList(publicListReqVO);
-        return success(BeanUtils.toBean(pageResult, AiImageRespVO.class));
-    }
 }

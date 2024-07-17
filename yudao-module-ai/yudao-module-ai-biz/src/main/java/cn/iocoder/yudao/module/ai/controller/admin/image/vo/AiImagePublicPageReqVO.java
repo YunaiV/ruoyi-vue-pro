@@ -4,9 +4,9 @@ import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
-@Schema(description = "Ai Image 发布列表 req")
+@Schema(description = "管理后台 - AI 绘画公开的分页 Request VO")
 @Data
-public class AiImagePublicListReqVO extends PageParam {
+public class AiImagePublicPageReqVO extends PageParam {
 
     @Schema(description = "提示词")
     private String prompt;

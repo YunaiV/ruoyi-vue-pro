@@ -70,6 +70,11 @@ public class AiImageServiceImpl implements AiImageService {
     }
 
     @Override
+    public PageResult<AiImageDO> getImagePagePublic(AiImagePublicPageReqVO pageReqVO) {
+        return imageMapper.selectPage(pageReqVO);
+    }
+
+    @Override
     public AiImageDO getImage(Long id) {
         return imageMapper.selectById(id);
     }
@@ -334,11 +339,6 @@ public class AiImageServiceImpl implements AiImageService {
                 .setOptions(image.getOptions()).setTaskId(actionResponse.result());
         imageMapper.insert(newImage);
         return newImage.getId();
-    }
-
-    @Override
-    public PageResult<AiImageDO> publicList(AiImagePublicListReqVO publicListReqVO) {
-        return imageMapper.selectPageOfPublicList(publicListReqVO);
     }
 
     /**
