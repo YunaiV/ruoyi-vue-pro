@@ -6,7 +6,7 @@ import cn.iocoder.yudao.module.promotion.controller.admin.kefu.vo.conversation.K
 import cn.iocoder.yudao.module.promotion.dal.dataobject.kefu.KeFuConversationDO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.kefu.KeFuMessageDO;
 import cn.iocoder.yudao.module.promotion.dal.mysql.kefu.KeFuConversationMapper;
-import cn.iocoder.yudao.module.promotion.enums.kehu.KeFuMessageContentTypeEnum;
+import cn.iocoder.yudao.module.promotion.enums.kefu.KeFuMessageContentTypeEnum;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
