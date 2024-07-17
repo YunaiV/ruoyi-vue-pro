@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.promotion.enums.kehu;
+package cn.iocoder.yudao.module.promotion.enums.kefu;
 
 import cn.iocoder.yudao.framework.common.core.IntArrayValuable;
 import lombok.AllArgsConstructor;
