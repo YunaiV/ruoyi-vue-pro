@@ -219,9 +219,11 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(value = ServiceException.class)
     public CommonResult<?> serviceExceptionHandler(ServiceException ex) {
+        // 不包含的时候，才进行打印，避免 ex 堆栈过多
         if (!IGNORE_ERROR_MESSAGES.contains(ex.getMessage())) {
-            // 不包含的时候，才进行打印，避免 ex 堆栈过多
-            log.info("[serviceExceptionHandler]", ex);
+            // 即使打印，也只打印第一层 StackTraceElement，并且使用 warn 在控制台输出，更容易看到
+            StackTraceElement[] stackTrace = ex.getStackTrace();
+            log.warn("[serviceExceptionHandler]\n\t{}", stackTrace[0]);
         }
         return CommonResult.error(ex.getCode(), ex.getMessage());
     }
