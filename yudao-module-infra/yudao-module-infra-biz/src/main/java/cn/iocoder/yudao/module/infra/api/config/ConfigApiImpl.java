@@ -2,9 +2,10 @@ package cn.iocoder.yudao.module.infra.api.config;
 
 import cn.iocoder.yudao.module.infra.dal.dataobject.config.ConfigDO;
 import cn.iocoder.yudao.module.infra.service.config.ConfigService;
-import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
+
+import javax.annotation.Resource;
 
 /**
  * 参数配置 API 实现类
