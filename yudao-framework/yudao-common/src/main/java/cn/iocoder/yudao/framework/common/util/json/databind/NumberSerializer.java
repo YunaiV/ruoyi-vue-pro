@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.framework.jackson.core.databind;
+package cn.iocoder.yudao.framework.common.util.json.databind;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.SerializerProvider;
