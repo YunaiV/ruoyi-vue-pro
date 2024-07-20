@@ -63,8 +63,12 @@ public class SocialClientServiceImpl implements SocialClientService {
 
     /**
      * 小程序版本
+     *
+     * 1. release：正式版
+     * 2. trial：体验版
+     * 3. developer：开发版
      */
-    @Value("${yudao.wxa-code.env-version}")
+    @Value("${yudao.wxa-code.env-version:release}")
     public String envVersion;
 
     @Resource
