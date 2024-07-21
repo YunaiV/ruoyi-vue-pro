@@ -222,7 +222,6 @@ public class TradeOrderQueryServiceImpl implements TradeOrderQueryService {
                         .setPhone(receiverMobile));
     }
 
-
     // =================== Order Item ===================
 
     @Override
