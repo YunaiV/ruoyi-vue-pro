@@ -65,8 +65,8 @@ public class PayWalletServiceImpl implements  PayWalletService {
     }
 
     @Override
-    public PageResult<PayWalletDO> getWalletPage(Integer userType,PayWalletPageReqVO pageReqVO) {
-        return walletMapper.selectPage(userType, pageReqVO);
+    public PageResult<PayWalletDO> getWalletPage(PayWalletPageReqVO pageReqVO) {
+        return walletMapper.selectPage(pageReqVO);
     }
 
     @Override

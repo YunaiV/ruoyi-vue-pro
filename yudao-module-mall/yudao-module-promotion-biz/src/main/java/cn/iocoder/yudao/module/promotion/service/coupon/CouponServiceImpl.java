@@ -215,7 +215,7 @@ public class CouponServiceImpl implements CouponService {
         int count = 0;
         for (CouponDO coupon : list) {
             try {
-                boolean success = getSelf().expireCoupon(coupon);
+                boolean success = expireCoupon(coupon);
                 if (success) {
                     count++;
                 }

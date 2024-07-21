@@ -77,7 +77,6 @@ public class BpmProcessDefinitionController {
     @GetMapping ("/list")
     @Operation(summary = "获得流程定义列表")
     @Parameter(name = "suspensionState", description = "挂起状态", required = true, example = "1") // 参见 Flowable SuspensionState 枚举
-    @PreAuthorize("@ss.hasPermission('bpm:process-definition:query')")
     public CommonResult<List<BpmProcessDefinitionRespVO>> getProcessDefinitionList(
             @RequestParam("suspensionState") Integer suspensionState) {
         List<ProcessDefinition> list = processDefinitionService.getProcessDefinitionListBySuspensionState(suspensionState);
@@ -96,7 +95,6 @@ public class BpmProcessDefinitionController {
     @Operation(summary = "获得流程定义")
     @Parameter(name = "id", description = "流程编号", required = true, example = "1024")
     @Parameter(name = "key", description = "流程定义标识", required = true, example = "1024")
-    @PreAuthorize("@ss.hasPermission('bpm:process-definition:query')")
     public CommonResult<BpmProcessDefinitionRespVO> getProcessDefinition(
             @RequestParam(value = "id", required = false) String id,
             @RequestParam(value = "key", required = false) String key) {
@@ -105,10 +103,11 @@ public class BpmProcessDefinitionController {
         if (processDefinition == null) {
             return success(null);
         }
+        BpmProcessDefinitionInfoDO processDefinitionInfo = processDefinitionService.getProcessDefinitionInfo(processDefinition.getId());
         BpmnModel bpmnModel = processDefinitionService.getProcessDefinitionBpmnModel(processDefinition.getId());
         List<UserTask> userTaskList = BpmTaskCandidateStartUserSelectStrategy.getStartUserSelectUserTaskList(bpmnModel);
         return success(BpmProcessDefinitionConvert.INSTANCE.buildProcessDefinition(
-                processDefinition, null, null, null, null, bpmnModel, userTaskList));
+                processDefinition, null, processDefinitionInfo, null, null, bpmnModel, userTaskList));
     }
 
 }

@@ -47,7 +47,8 @@ public interface BpmProcessInstanceConvert {
             BpmProcessInstanceRespVO respVO = vpPageResult.getList().get(i);
             respVO.setStatus(FlowableUtils.getProcessInstanceStatus(pageResult.getList().get(i)));
             MapUtils.findAndThen(processDefinitionMap, respVO.getProcessDefinitionId(),
-                    processDefinition -> respVO.setCategory(processDefinition.getCategory()));
+                    processDefinition -> respVO.setCategory(processDefinition.getCategory())
+                            .setProcessDefinition(BeanUtils.toBean(processDefinition, BpmProcessDefinitionRespVO.class)));
             MapUtils.findAndThen(categoryMap, respVO.getCategory(), category -> respVO.setCategoryName(category.getName()));
             respVO.setTasks(BeanUtils.toBean(taskMap.get(respVO.getId()), BpmProcessInstanceRespVO.Task.class));
             // user
