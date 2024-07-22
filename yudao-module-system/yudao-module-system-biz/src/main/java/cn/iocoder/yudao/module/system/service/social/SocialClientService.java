@@ -10,6 +10,9 @@ import cn.iocoder.yudao.module.system.enums.social.SocialTypeEnum;
 import com.xingyuv.jushauth.model.AuthUser;
 import jakarta.validation.Valid;
 import me.chanjar.weixin.common.bean.WxJsapiSignature;
+import me.chanjar.weixin.common.bean.subscribemsg.TemplateInfo;
+
+import java.util.List;
 
 /**
  * 社交应用 Service 接口
@@ -108,5 +111,12 @@ public interface SocialClientService {
      * @return 社交客户端分页
      */
     PageResult<SocialClientDO> getSocialClientPage(SocialClientPageReqVO pageReqVO);
+
+    /**
+     * 获得微信小程订阅模板
+     *
+     * @return 微信小程订阅模板
+     */
+    List<TemplateInfo> getSubscribeTemplate();
 
 }

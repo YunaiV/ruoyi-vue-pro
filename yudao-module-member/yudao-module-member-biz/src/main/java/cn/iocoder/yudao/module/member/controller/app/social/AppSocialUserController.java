@@ -5,10 +5,7 @@ import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.security.core.annotations.PreAuthenticated;
-import cn.iocoder.yudao.module.member.controller.app.social.vo.AppSocialUserBindReqVO;
-import cn.iocoder.yudao.module.member.controller.app.social.vo.AppSocialUserRespVO;
-import cn.iocoder.yudao.module.member.controller.app.social.vo.AppSocialUserUnbindReqVO;
-import cn.iocoder.yudao.module.member.controller.app.social.vo.AppSocialWxQrcodeReqVO;
+import cn.iocoder.yudao.module.member.controller.app.social.vo.*;
 import cn.iocoder.yudao.module.system.api.social.SocialClientApi;
 import cn.iocoder.yudao.module.system.api.social.SocialUserApi;
 import cn.iocoder.yudao.module.system.api.social.dto.SocialUserBindReqDTO;
@@ -22,6 +19,8 @@ import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
@@ -70,6 +69,12 @@ public class AppSocialUserController {
     public CommonResult<String> getWxaQrcode(@RequestBody @Valid AppSocialWxQrcodeReqVO reqVO) {
         byte[] wxQrcode = socialClientApi.getWxaQrcode(BeanUtils.toBean(reqVO, SocialWxQrcodeReqDTO.class));
         return success(Base64.encode(wxQrcode));
+    }
+
+    @GetMapping("/get-subscribe-template")
+    @Operation(summary = "获得微信小程订阅模板")
+    public CommonResult<List<AppSocialWxSubscribeTemplateRespVO>> getSubscribeTemplate() {
+        return success(BeanUtils.toBean(socialClientApi.getSubscribeTemplate(), AppSocialWxSubscribeTemplateRespVO.class));
     }
 
 }

@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.system.service.social;
 
 import cn.binarywang.wx.miniapp.api.WxMaService;
+import cn.binarywang.wx.miniapp.api.WxMaSubscribeService;
 import cn.binarywang.wx.miniapp.api.impl.WxMaServiceImpl;
 import cn.binarywang.wx.miniapp.bean.WxMaPhoneNumberInfo;
 import cn.binarywang.wx.miniapp.config.impl.WxMaRedisBetterConfigImpl;
@@ -36,6 +37,7 @@ import jakarta.annotation.Resource;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import me.chanjar.weixin.common.bean.WxJsapiSignature;
+import me.chanjar.weixin.common.bean.subscribemsg.TemplateInfo;
 import me.chanjar.weixin.common.error.WxErrorException;
 import me.chanjar.weixin.common.redis.RedisTemplateWxRedisOps;
 import me.chanjar.weixin.mp.api.WxMpService;
@@ -46,6 +48,7 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
+import java.util.List;
 import java.util.Objects;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
@@ -362,6 +365,18 @@ public class SocialClientServiceImpl implements SocialClientService {
     @Override
     public PageResult<SocialClientDO> getSocialClientPage(SocialClientPageReqVO pageReqVO) {
         return socialClientMapper.selectPage(pageReqVO);
+    }
+
+    @Override
+    public List<TemplateInfo> getSubscribeTemplate() {
+        WxMaService service = getWxMaService(UserTypeEnum.MEMBER.getValue());
+        try {
+            WxMaSubscribeService subscribeService = service.getSubscribeService();
+            return subscribeService.getTemplateList();
+        }catch (WxErrorException e) {
+            log.error("[getSubscribeTemplate][获得小程序订阅消息模版]", e);
+            throw exception(SOCIAL_CLIENT_WEIXIN_MINI_APP_SUBSCRIBE_TEMPLATE_ERROR);
+        }
     }
 
 }
