@@ -5,6 +5,8 @@ volumes:
     postgres: { }
     sqlserver: { }
     dm8: { }
+    kingbase: { }
+    opengauss: { }
 
 services:
     mysql:
@@ -91,4 +93,34 @@ services:
         volumes:
             - dm8:/opt/dmdbms/data
             - ../dm/ruoyi-vue-pro-dm8.sql:/tmp/schema.sql:ro
-            # docker compose exec dm8 bash -c "exec /opt/dmdbms/bin/disql SYSDBA/SYSDBA001 \`/tmp/schema.sql"
+            # docker compose exec dm8 bash -c '/opt/dmdbms/bin/disql SYSDBA/SYSDBA001 \`/tmp/schema.sql'
+
+    kingbase:
+        # x86_64: https://kingbase.oss-cn-beijing.aliyuncs.com/KESV8R3/V009R001C001B0025-安装包-docker/x86_64/kdb_x86_64_V009R001C001B0025.tar
+        # aarch64: https://kingbase.oss-cn-beijing.aliyuncs.com/KESV8R3/V009R001C001B0025-安装包-docker/aarch64/kdb_aarch64_V009R001C001B0025.tar
+        # docker load -i kdb_x86_64_V009R001C001B0025.tar
+        image: kingbase_v009r001c001b0025_single_x86:v1
+        restart: unless-stopped
+        environment:
+            DB_USER: root
+            DB_PASSWORD: 123456
+        ports:
+            - "54321:54321"
+        volumes:
+            - kingbase:/home/kingbase/userdata
+            - ../kingbase/ruoyi-vue-pro.sql:/tmp/schema.sql:ro
+            # docker compose exec kingbase bash -c 'ksql -U $DB_USER -d test -f /tmp/schema.sql'
+
+    opengauss:
+        image: opengauss/opengauss:5.0.0
+        restart: unless-stopped
+        environment:
+            GS_USERNAME: root
+            GS_PASSWORD: Yudao@2024
+            LD_LIBRARY_PATH: /usr/local/opengauss/lib:/usr/lib
+        ports:
+            - "5432:5432"
+        volumes:
+            - opengauss:/var/lib/opengauss
+            - ../opengauss/ruoyi-vue-pro.sql:/tmp/schema.sql:ro
+            # docker compose exec opengauss bash -c '/usr/local/opengauss/bin/gsql -U $GS_USERNAME -W $GS_PASSWORD -d postgres -f /tmp/schema.sql'

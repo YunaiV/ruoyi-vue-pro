@@ -1,13 +1,12 @@
 package cn.iocoder.yudao.module.trade.dal.dataobject.order;
 
-import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.aftersale.AfterSaleDO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.cart.CartDO;
 import cn.iocoder.yudao.module.trade.enums.order.TradeOrderItemAfterSaleStatusEnum;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.baomidou.mybatisplus.extension.handlers.AbstractJsonTypeHandler;
+import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
@@ -74,7 +73,7 @@ public class TradeOrderItemDO extends BaseDO {
      *
      * 冗余 ProductSkuDO 的 properties 字段
      */
-    @TableField(typeHandler = PropertyTypeHandler.class)
+    @TableField(typeHandler = JacksonTypeHandler.class)
     private List<Property> properties;
     /**
      * 商品图片
@@ -207,21 +206,6 @@ public class TradeOrderItemDO extends BaseDO {
          * 关联 ProductPropertyValueDO 的 name 字段
          */
         private String valueName;
-
-    }
-
-    // TODO @芋艿：可以找一些新的思路
-    public static class PropertyTypeHandler extends AbstractJsonTypeHandler<List<Property>> {
-
-        @Override
-        protected List<Property> parse(String json) {
-            return JsonUtils.parseArray(json, Property.class);
-        }
-
-        @Override
-        protected String toJson(List<Property> obj) {
-            return JsonUtils.toJsonString(obj);
-        }
 
     }
 

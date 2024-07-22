@@ -27,6 +27,16 @@ import java.time.LocalDateTime;
 public class ApiAccessLogDO extends BaseDO {
 
     /**
+     * {@link #requestParams} 的最大长度
+     */
+    public static final Integer REQUEST_PARAMS_MAX_LENGTH = 8000;
+
+    /**
+     * {@link #resultMsg} 的最大长度
+     */
+    public static final Integer RESULT_MSG_MAX_LENGTH = 512;
+
+    /**
      * 编号
      */
     @TableId

@@ -22,10 +22,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
-import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 
 @Tag(name = "管理后台 - 商品浏览记录")
@@ -49,8 +47,8 @@ public class ProductBrowseHistoryController {
         }
 
         // 得到商品 spu 信息
-        Set<Long> spuIds = convertSet(pageResult.getList(), ProductBrowseHistoryDO::getSpuId);
-        Map<Long, ProductSpuDO> spuMap = convertMap(productSpuService.getSpuList(spuIds), ProductSpuDO::getId);
+        Map<Long, ProductSpuDO> spuMap = productSpuService.getSpuMap(
+                convertSet(pageResult.getList(), ProductBrowseHistoryDO::getSpuId));
         return success(BeanUtils.toBean(pageResult, ProductBrowseHistoryRespVO.class,
                 vo -> Optional.ofNullable(spuMap.get(vo.getSpuId()))
                         .ifPresent(spu -> vo.setSpuName(spu.getName()).setPicUrl(spu.getPicUrl()).setPrice(spu.getPrice()))));

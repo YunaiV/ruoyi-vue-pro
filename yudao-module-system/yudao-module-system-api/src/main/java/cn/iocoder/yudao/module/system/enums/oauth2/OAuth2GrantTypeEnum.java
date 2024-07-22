@@ -22,7 +22,7 @@ public enum OAuth2GrantTypeEnum {
 
     private final String grantType;
 
-    public static OAuth2GrantTypeEnum getByGranType(String grantType) {
+    public static OAuth2GrantTypeEnum getByGrantType(String grantType) {
         return ArrayUtil.firstMatch(o -> o.getGrantType().equals(grantType), values());
     }
 

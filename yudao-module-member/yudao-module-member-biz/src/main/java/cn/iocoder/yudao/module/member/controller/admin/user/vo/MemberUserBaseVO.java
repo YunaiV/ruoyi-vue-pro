@@ -38,7 +38,7 @@ public class MemberUserBaseVO {
     private String name;
 
     @Schema(description = "用户性别", example = "1")
-    private Byte sex;
+    private Integer sex;
 
     @Schema(description = "所在地编号", example = "4371")
     private Long areaId;

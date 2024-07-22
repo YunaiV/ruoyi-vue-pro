@@ -207,7 +207,6 @@ class Convertor(ABC):
 -- Table structure for dual
 -- ----------------------------
 {dual}
-
 """
             )
 
@@ -371,7 +370,17 @@ CREATE SEQUENCE {table_name}_seq
         return """DROP TABLE IF EXISTS dual;
 CREATE TABLE dual
 (
-);"""
+    id int2
+);
+
+COMMENT ON TABLE dual IS '数据库连接的表';
+
+-- ----------------------------
+-- Records of dual
+-- ----------------------------
+-- @formatter:off
+INSERT INTO dual VALUES (1);
+-- @formatter:on"""
 
 
 class OracleConvertor(Convertor):
@@ -553,7 +562,8 @@ class SQLServerConvertor(Convertor):
         script = f"""-- ----------------------------
 -- Table structure for {table_name}
 -- ----------------------------
-DROP TABLE IF EXISTS {table_name};
+DROP TABLE IF EXISTS {table_name}
+GO
 CREATE TABLE {table_name} (
     {filed_def_list}
 )
@@ -633,10 +643,9 @@ GO
     def gen_dual(self) -> str:
         return """DROP TABLE IF EXISTS dual
 GO
-
 CREATE TABLE dual
 (
-  id int NULL
+  id int
 )
 GO
 
@@ -644,7 +653,15 @@ EXEC sp_addextendedproperty
     'MS_Description', N'数据库连接的表',
     'SCHEMA', N'dbo',
     'TABLE', N'dual'
-GO"""
+GO
+
+-- ----------------------------
+-- Records of dual
+-- ----------------------------
+-- @formatter:off
+INSERT INTO dual VALUES (1)
+GO
+-- @formatter:on"""
 
 
 class DM8Convertor(Convertor):
@@ -751,13 +768,55 @@ SET IDENTITY_INSERT {table_name.lower()} OFF;
         return script
 
 
+class KingbaseConvertor(PostgreSQLConvertor):
+    def __init__(self, src):
+        super().__init__(src)
+        self.db_type = "Kingbase"
+
+    def gen_create(self, ddl: Dict) -> str:
+        """生成 create"""
+
+        def _generate_column(col):
+            name = col["name"].lower()
+            if name == "deleted":
+                return "deleted int2 NOT NULL DEFAULT 0"
+
+            type = col["type"].lower()
+            full_type = self.translate_type(type, col["size"])
+            nullable = "NULL" if col["nullable"] else "NOT NULL"
+            default = f"DEFAULT {col['default']}" if col["default"] is not None else ""
+            return f"{name} {full_type} {nullable} {default}"
+
+        table_name = ddl["table_name"].lower()
+        columns = [f"{_generate_column(col).strip()}" for col in ddl["columns"]]
+        filed_def_list = ",\n  ".join(columns)
+        script = f"""-- ----------------------------
+-- Table structure for {table_name}
+-- ----------------------------
+DROP TABLE IF EXISTS {table_name};
+CREATE TABLE {table_name} (
+    {filed_def_list}
+);"""
+
+        # Kingbase INSERT '' 不能通过 NOT NULL 校验
+        script = script.replace("NOT NULL DEFAULT ''", "NULL DEFAULT ''")
+
+        return script
+
+
+class OpengaussConvertor(KingbaseConvertor):
+    def __init__(self, src):
+        super().__init__(src)
+        self.db_type = "OpenGauss"
+
+
 def main():
     parser = argparse.ArgumentParser(description="芋道系统数据库转换工具")
     parser.add_argument(
         "type",
         type=str,
         help="目标数据库类型",
-        choices=["postgres", "oracle", "sqlserver", "dm8"],
+        choices=["postgres", "oracle", "sqlserver", "dm8", "kingbase", "opengauss"],
     )
     args = parser.parse_args()
 
@@ -771,6 +830,10 @@ def main():
         convertor = SQLServerConvertor(sql_file)
     elif args.type == "dm8":
         convertor = DM8Convertor(sql_file)
+    elif args.type == "kingbase":
+        convertor = KingbaseConvertor(sql_file)
+    elif args.type == "opengauss":
+        convertor = OpengaussConvertor(sql_file)
     else:
         raise NotImplementedError(f"不支持目标数据库类型: {args.type}")
 

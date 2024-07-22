@@ -29,6 +29,12 @@ public interface ${subTable.className}Mapper extends BaseMapperX<${subTable.clas
             .orderByDesc(${subTable.className}DO::getId));## 大多数情况下，id 倒序
 
     }
+## 主表与子表是一对一时 
+    #if (!$subTable.subJoinMany)
+        default ${subTable.className}DO selectBy${SubJoinColumnName}(${subJoinColumn.javaType} ${subJoinColumn.javaField}) {
+        return selectOne(${subTable.className}DO::get${SubJoinColumnName}, ${subJoinColumn.javaField});
+        }
+    #end
 
 ## 情况二：非 MASTER_ERP 时，需要列表查询子表
 #else
