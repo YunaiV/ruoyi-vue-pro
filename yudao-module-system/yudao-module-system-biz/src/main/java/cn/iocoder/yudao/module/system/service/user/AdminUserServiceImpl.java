@@ -9,6 +9,7 @@ import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
+import cn.iocoder.yudao.framework.common.util.validation.ValidationUtils;
 import cn.iocoder.yudao.framework.datapermission.core.util.DataPermissionUtils;
 import cn.iocoder.yudao.module.infra.api.config.ConfigApi;
 import cn.iocoder.yudao.module.infra.api.file.FileApi;
@@ -32,6 +33,7 @@ import com.mzt.logapi.context.LogRecordContext;
 import com.mzt.logapi.service.impl.DiffParseFunction;
 import com.mzt.logapi.starter.annotation.LogRecord;
 import jakarta.annotation.Resource;
+import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -40,13 +42,36 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.io.InputStream;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
-import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.*;
-import static cn.iocoder.yudao.module.system.enums.LogRecordConstants.*;
+import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.USER_COUNT_MAX;
+import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.USER_EMAIL_EXISTS;
+import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.USER_IMPORT_INIT_PASSWORD;
+import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.USER_IMPORT_LIST_IS_EMPTY;
+import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.USER_IS_DISABLE;
+import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.USER_MOBILE_EXISTS;
+import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.USER_NOT_EXISTS;
+import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.USER_PASSWORD_FAILED;
+import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.USER_USERNAME_EXISTS;
+import static cn.iocoder.yudao.module.system.enums.LogRecordConstants.SYSTEM_USER_CREATE_SUB_TYPE;
+import static cn.iocoder.yudao.module.system.enums.LogRecordConstants.SYSTEM_USER_CREATE_SUCCESS;
+import static cn.iocoder.yudao.module.system.enums.LogRecordConstants.SYSTEM_USER_DELETE_SUB_TYPE;
+import static cn.iocoder.yudao.module.system.enums.LogRecordConstants.SYSTEM_USER_DELETE_SUCCESS;
+import static cn.iocoder.yudao.module.system.enums.LogRecordConstants.SYSTEM_USER_TYPE;
+import static cn.iocoder.yudao.module.system.enums.LogRecordConstants.SYSTEM_USER_UPDATE_PASSWORD_SUB_TYPE;
+import static cn.iocoder.yudao.module.system.enums.LogRecordConstants.SYSTEM_USER_UPDATE_PASSWORD_SUCCESS;
+import static cn.iocoder.yudao.module.system.enums.LogRecordConstants.SYSTEM_USER_UPDATE_SUB_TYPE;
+import static cn.iocoder.yudao.module.system.enums.LogRecordConstants.SYSTEM_USER_UPDATE_SUCCESS;
 
 /**
  * 后台用户 Service 实现类
@@ -448,6 +473,13 @@ public class AdminUserServiceImpl implements AdminUserService {
                 validateUserForCreateOrUpdate(null, null, importUser.getMobile(), importUser.getEmail(),
                         importUser.getDeptId(), null);
             } catch (ServiceException ex) {
+                respVO.getFailureUsernames().put(importUser.getUsername(), ex.getMessage());
+                return;
+            }
+            // 校验字段是否符合要求
+            try {
+                ValidationUtils.validate(BeanUtils.toBean(importUser, UserSaveReqVO.class).setPassword(initPassword));
+            }catch (ConstraintViolationException ex){
                 respVO.getFailureUsernames().put(importUser.getUsername(), ex.getMessage());
                 return;
             }

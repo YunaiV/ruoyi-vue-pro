@@ -452,6 +452,8 @@ public class AdminUserServiceImplTest extends BaseDbUnitTest {
         UserImportExcelVO importUser = randomPojo(UserImportExcelVO.class, o -> {
             o.setStatus(randomEle(CommonStatusEnum.values()).getStatus()); // 保证 status 的范围
             o.setSex(randomEle(SexEnum.values()).getSex()); // 保证 sex 的范围
+            o.setEmail(randomEmail());
+            o.setMobile(randomMobile());
         });
         // mock deptService 的方法
         DeptDO dept = randomPojo(DeptDO.class, o -> {
@@ -486,6 +488,8 @@ public class AdminUserServiceImplTest extends BaseDbUnitTest {
             o.setStatus(randomEle(CommonStatusEnum.values()).getStatus()); // 保证 status 的范围
             o.setSex(randomEle(SexEnum.values()).getSex()); // 保证 sex 的范围
             o.setUsername(dbUser.getUsername());
+            o.setEmail(randomEmail());
+            o.setMobile(randomMobile());
         });
         // mock deptService 的方法
         DeptDO dept = randomPojo(DeptDO.class, o -> {
@@ -516,6 +520,8 @@ public class AdminUserServiceImplTest extends BaseDbUnitTest {
             o.setStatus(randomEle(CommonStatusEnum.values()).getStatus()); // 保证 status 的范围
             o.setSex(randomEle(SexEnum.values()).getSex()); // 保证 sex 的范围
             o.setUsername(dbUser.getUsername());
+            o.setEmail(randomEmail());
+            o.setMobile(randomMobile());
         });
         // mock deptService 的方法
         DeptDO dept = randomPojo(DeptDO.class, o -> {
