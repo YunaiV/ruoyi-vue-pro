@@ -27,7 +27,11 @@ public class SecurityFrameworkServiceImpl implements SecurityFrameworkService {
 
     @Override
     public boolean hasAnyPermissions(String... permissions) {
-        return permissionApi.hasAnyPermissions(getLoginUserId(), permissions);
+        Long userId = getLoginUserId();
+        if (userId == null) {
+            return false;
+        }
+        return permissionApi.hasAnyPermissions(userId, permissions);
     }
 
     @Override
@@ -37,7 +41,11 @@ public class SecurityFrameworkServiceImpl implements SecurityFrameworkService {
 
     @Override
     public boolean hasAnyRoles(String... roles) {
-        return permissionApi.hasAnyRoles(getLoginUserId(), roles);
+        Long userId = getLoginUserId();
+        if (userId == null) {
+            return false;
+        }
+        return permissionApi.hasAnyRoles(userId, roles);
     }
 
     @Override
