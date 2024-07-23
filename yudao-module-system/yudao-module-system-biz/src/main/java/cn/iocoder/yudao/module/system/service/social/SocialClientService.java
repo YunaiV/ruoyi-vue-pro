@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.system.service.social;
 import cn.binarywang.wx.miniapp.bean.WxMaPhoneNumberInfo;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.system.api.social.dto.SocialWxQrcodeReqDTO;
+import cn.iocoder.yudao.module.system.api.social.dto.SocialWxSubscribeMessageReqDTO;
 import cn.iocoder.yudao.module.system.controller.admin.socail.vo.client.SocialClientPageReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.socail.vo.client.SocialClientSaveReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.social.SocialClientDO;
@@ -72,6 +73,20 @@ public interface SocialClientService {
      */
     byte[] getWxaQrcode(SocialWxQrcodeReqDTO reqVO);
 
+    /**
+     * 获得微信小程订阅模板
+     *
+     * @return 微信小程订阅模板
+     */
+    List<TemplateInfo> getSubscribeTemplate();
+
+    /**
+     * 发送订阅消息
+     *
+     * @param reqDTO 请求
+     */
+    void sendSubscribeMessage(SocialWxSubscribeMessageReqDTO reqDTO);
+
     // =================== 客户端管理 ===================
 
     /**
@@ -111,12 +126,5 @@ public interface SocialClientService {
      * @return 社交客户端分页
      */
     PageResult<SocialClientDO> getSocialClientPage(SocialClientPageReqVO pageReqVO);
-
-    /**
-     * 获得微信小程订阅模板
-     *
-     * @return 微信小程订阅模板
-     */
-    List<TemplateInfo> getSubscribeTemplate();
 
 }

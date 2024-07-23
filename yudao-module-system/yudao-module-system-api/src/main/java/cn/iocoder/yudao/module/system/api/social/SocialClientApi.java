@@ -1,9 +1,6 @@
 package cn.iocoder.yudao.module.system.api.social;
 
-import cn.iocoder.yudao.module.system.api.social.dto.SocialWxJsapiSignatureRespDTO;
-import cn.iocoder.yudao.module.system.api.social.dto.SocialWxPhoneNumberInfoRespDTO;
-import cn.iocoder.yudao.module.system.api.social.dto.SocialWxQrcodeReqDTO;
-import cn.iocoder.yudao.module.system.api.social.dto.SocialWxSubscribeTemplateRespDTO;
+import cn.iocoder.yudao.module.system.api.social.dto.*;
 import cn.iocoder.yudao.module.system.enums.social.SocialTypeEnum;
 import jakarta.validation.Valid;
 
@@ -58,5 +55,12 @@ public interface SocialClientApi {
      * @return 小程序订阅消息模版
      */
     List<SocialWxSubscribeTemplateRespDTO> getSubscribeTemplate();
+
+    /**
+     * 发送订阅消息
+     *
+     * @param reqDTO 请求
+     */
+    void sendSubscribeMessage(SocialWxSubscribeMessageReqDTO reqDTO);
 
 }
