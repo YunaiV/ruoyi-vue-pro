@@ -286,6 +286,13 @@ yudao:
       - rep_demo_jianpiao
       - tmp_report_data_1
       - tmp_report_data_income
+    ignore-caches:
+      - permission_menu_ids
+      - oauth_client
+      - notify_template
+      - mail_account
+      - mail_template
+      - sms_template
   sms-code: # 短信验证码相关的配置项
     expire-times: 10m
     send-frequency: 1m
