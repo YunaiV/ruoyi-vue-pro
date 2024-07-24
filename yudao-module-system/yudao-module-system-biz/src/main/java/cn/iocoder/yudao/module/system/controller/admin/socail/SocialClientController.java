@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.system.controller.admin.socail;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
+import cn.iocoder.yudao.module.system.api.social.dto.SocialWxSubscribeMessageReqDTO;
 import cn.iocoder.yudao.module.system.controller.admin.socail.vo.client.SocialClientPageReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.socail.vo.client.SocialClientRespVO;
 import cn.iocoder.yudao.module.system.controller.admin.socail.vo.client.SocialClientSaveReqVO;
@@ -11,12 +12,11 @@ import cn.iocoder.yudao.module.system.service.social.SocialClientService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.annotation.Resource;
+import jakarta.validation.Valid;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-
-import jakarta.annotation.Resource;
-import jakarta.validation.Valid;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
@@ -68,6 +68,18 @@ public class SocialClientController {
     public CommonResult<PageResult<SocialClientRespVO>> getSocialClientPage(@Valid SocialClientPageReqVO pageVO) {
         PageResult<SocialClientDO> pageResult = socialClientService.getSocialClientPage(pageVO);
         return success(BeanUtils.toBean(pageResult, SocialClientRespVO.class));
+    }
+
+    //======================= TODO 测试发送订阅消息 =======================
+
+    @PostMapping("/send-subscribe-message")
+    public void testSendSubscribeMessage() {
+        SocialWxSubscribeMessageReqDTO reqDTO = new SocialWxSubscribeMessageReqDTO().setLang("zh_CN")
+                .setMiniprogramState("developer").setTemplateId("W4ybDTIwCfKHtMKR7fSfx83DtmVKEeXQo3Ti7GCw4_4")
+                .setToUser("oKNkb4xxw2H135-MVPKtEMkumK08");
+        reqDTO.addData("character_string1", "11111111").addData("amount2", "6666").addData("time3", "2024-01-01 10:10:10")
+                .addData("phrase4", "成功");
+        socialClientService.sendSubscribeMessage(reqDTO);
     }
 
 }

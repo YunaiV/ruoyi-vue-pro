@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.system.service.social;
 import cn.binarywang.wx.miniapp.bean.WxMaPhoneNumberInfo;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.system.api.social.dto.SocialWxQrcodeReqDTO;
+import cn.iocoder.yudao.module.system.api.social.dto.SocialWxSubscribeMessageReqDTO;
 import cn.iocoder.yudao.module.system.controller.admin.socail.vo.client.SocialClientPageReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.socail.vo.client.SocialClientSaveReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.social.SocialClientDO;
@@ -10,6 +11,9 @@ import cn.iocoder.yudao.module.system.enums.social.SocialTypeEnum;
 import com.xingyuv.jushauth.model.AuthUser;
 import jakarta.validation.Valid;
 import me.chanjar.weixin.common.bean.WxJsapiSignature;
+import me.chanjar.weixin.common.bean.subscribemsg.TemplateInfo;
+
+import java.util.List;
 
 /**
  * 社交应用 Service 接口
@@ -68,6 +72,20 @@ public interface SocialClientService {
      * @return 小程序二维码
      */
     byte[] getWxaQrcode(SocialWxQrcodeReqDTO reqVO);
+
+    /**
+     * 获得微信小程订阅模板
+     *
+     * @return 微信小程订阅模板
+     */
+    List<TemplateInfo> getSubscribeTemplate();
+
+    /**
+     * 发送订阅消息
+     *
+     * @param reqDTO 请求
+     */
+    void sendSubscribeMessage(SocialWxSubscribeMessageReqDTO reqDTO);
 
     // =================== 客户端管理 ===================
 
