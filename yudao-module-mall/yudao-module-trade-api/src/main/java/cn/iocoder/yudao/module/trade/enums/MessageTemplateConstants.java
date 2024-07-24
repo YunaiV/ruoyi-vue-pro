@@ -13,4 +13,9 @@ public interface MessageTemplateConstants {
     String BROKERAGE_WITHDRAW_AUDIT_APPROVE = "brokerage_withdraw_audit_approve"; // 佣金提现（审核通过）
     String BROKERAGE_WITHDRAW_AUDIT_REJECT = "brokerage_withdraw_audit_reject"; // 佣金提现（审核不通过）
 
+    //======================= 订阅消息模版 =======================
+
+    String ORDER_AFTERSALE_CHANGE = "售后进度通知";
+    String MONEY_CHANGE = "充值成功通知";
+
 }

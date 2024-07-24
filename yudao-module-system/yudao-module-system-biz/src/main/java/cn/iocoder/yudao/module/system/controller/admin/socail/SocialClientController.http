@@ -1,0 +1,5 @@
+### 请求 /system/social-client/send-subscribe-message 接口 => 发送测试订阅消息
+POST {{baseUrl}}/system/social-client/send-subscribe-message
+Authorization: Bearer {{token}}
+#Authorization: Bearer test100
+tenant-id: {{adminTenentId}}

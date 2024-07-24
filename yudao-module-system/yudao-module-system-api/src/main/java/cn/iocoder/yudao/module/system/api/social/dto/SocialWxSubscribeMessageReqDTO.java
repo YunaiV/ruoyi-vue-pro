@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.system.api.social.dto;
 import cn.iocoder.yudao.framework.common.core.KeyValue;
 import lombok.Data;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -65,6 +66,14 @@ public class SocialWxSubscribeMessageReqDTO {
      * 描述： 模板内容，不填则下发空模板
      * </pre>
      */
-    private List<KeyValue<String, String>> data;
+    private List<KeyValue<String, String>> messages;
+
+    public SocialWxSubscribeMessageReqDTO addData(String key, String value) {
+        if (messages == null) {
+            messages = new ArrayList<>();
+        }
+        messages.add(new KeyValue<>(key, value));
+        return this;
+    }
 
 }

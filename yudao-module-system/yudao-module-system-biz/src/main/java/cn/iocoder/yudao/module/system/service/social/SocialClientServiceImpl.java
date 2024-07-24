@@ -278,7 +278,7 @@ public class SocialClientServiceImpl implements SocialClientService {
         try {
             WxMaSubscribeService subscribeService = service.getSubscribeService();
             WxMaSubscribeMessage message = BeanUtils.toBean(reqDTO, WxMaSubscribeMessage.class);
-            reqDTO.getData().forEach(item-> message.addData(new WxMaSubscribeMessage.MsgData(item.getKey(), item.getValue())));
+            reqDTO.getMessages().forEach(item-> message.addData(new WxMaSubscribeMessage.MsgData(item.getKey(), item.getValue())));
             subscribeService.sendSubscribeMsg(message);
         }catch (WxErrorException e) {
             log.error("[sendSubscribeMessage][发送小程序订阅消息]", e);
