@@ -90,7 +90,7 @@ public class ApiAccessLogInterceptor implements HandlerInterceptor {
                     .filter(i -> clazzContents.get(i).contains(" " + method.getName() + "(")) // 简单匹配，不考虑方法重名
                     .mapToObj(i -> i + 1) // 行号从 1 开始
                     .findFirst();
-            if (lineNumber.isEmpty()) {
+            if (!lineNumber.isPresent()) {
                 return;
             }
             // 打印结果
