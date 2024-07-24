@@ -50,10 +50,9 @@ public interface BrokerageRecordMapper extends BaseMapperX<BrokerageRecordDO> {
                 .eq(BrokerageRecordDO::getStatus, status));
     }
 
-    default BrokerageRecordDO selectByBizTypeAndBizIdAndUserId(Integer bizType, String bizId, Long userId) {
-        return selectOne(BrokerageRecordDO::getBizType, bizType,
-                BrokerageRecordDO::getBizId, bizId,
-                BrokerageRecordDO::getUserId, userId);
+    default List<BrokerageRecordDO> selectListByBizTypeAndBizId(Integer bizType, String bizId) {
+        return selectList(BrokerageRecordDO::getBizType, bizType,
+                BrokerageRecordDO::getBizId, bizId);
     }
 
     default List<UserBrokerageSummaryRespBO> selectCountAndSumPriceByUserIdInAndBizTypeAndStatus(Collection<Long> userIds,

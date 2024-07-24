@@ -7,10 +7,7 @@ import cn.iocoder.yudao.module.trade.controller.app.brokerage.vo.user.AppBrokera
 import cn.iocoder.yudao.module.trade.controller.app.brokerage.vo.user.AppBrokerageUserRankByUserCountRespVO;
 import cn.iocoder.yudao.module.trade.controller.app.brokerage.vo.user.AppBrokerageUserRankPageReqVO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.brokerage.BrokerageUserDO;
-
-import javax.validation.constraints.NotNull;
-import java.util.Collection;
-import java.util.List;
+import jakarta.validation.constraints.NotNull;
 
 /**
  * 分销用户 Service 接口
@@ -26,14 +23,6 @@ public interface BrokerageUserService {
      * @return 分销用户
      */
     BrokerageUserDO getBrokerageUser(Long id);
-
-    /**
-     * 获得分销用户列表
-     *
-     * @param ids 编号
-     * @return 分销用户列表
-     */
-    List<BrokerageUserDO> getBrokerageUserList(Collection<Long> ids);
 
     /**
      * 获得分销用户分页

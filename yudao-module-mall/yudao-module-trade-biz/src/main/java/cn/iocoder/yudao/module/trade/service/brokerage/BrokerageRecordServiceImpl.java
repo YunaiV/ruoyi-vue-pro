@@ -107,27 +107,29 @@ public class BrokerageRecordServiceImpl implements BrokerageRecordService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void cancelBrokerage(Long userId, BrokerageRecordBizTypeEnum bizType, String bizId) {
-        BrokerageRecordDO record = brokerageRecordMapper.selectByBizTypeAndBizIdAndUserId(bizType.getType(), bizId, userId);
-        if (record == null) {
-            log.error("[cancelBrokerage][userId({})][bizId({}) 更新为已失效失败：记录不存在]", userId, bizId);
+    public void cancelBrokerage(BrokerageRecordBizTypeEnum bizType, String bizId) {
+        List<BrokerageRecordDO> records = brokerageRecordMapper.selectListByBizTypeAndBizId(bizType.getType(), bizId);
+        if (CollUtil.isEmpty(records)) {
+            log.error("[cancelBrokerage][bizId({}) bizType({}) 更新为已失效失败：记录不存在]", bizId, bizType);
             return;
         }
 
-        // 1. 更新佣金记录为已失效
-        BrokerageRecordDO updateObj = new BrokerageRecordDO().setStatus(BrokerageRecordStatusEnum.CANCEL.getStatus());
-        int updateRows = brokerageRecordMapper.updateByIdAndStatus(record.getId(), record.getStatus(), updateObj);
-        if (updateRows == 0) {
-            log.error("[cancelBrokerage][record({}) 更新为已失效失败]", record.getId());
-            return;
-        }
+        records.forEach(record -> {
+            // 1. 更新佣金记录为已失效
+            BrokerageRecordDO updateObj = new BrokerageRecordDO().setStatus(BrokerageRecordStatusEnum.CANCEL.getStatus());
+            int updateRows = brokerageRecordMapper.updateByIdAndStatus(record.getId(), record.getStatus(), updateObj);
+            if (updateRows == 0) {
+                log.error("[cancelBrokerage][record({}) 更新为已失效失败]", record.getId());
+                return;
+            }
 
-        // 2. 更新用户的佣金
-        if (BrokerageRecordStatusEnum.WAIT_SETTLEMENT.getStatus().equals(record.getStatus())) {
-            brokerageUserService.updateUserFrozenPrice(userId, -record.getPrice());
-        } else if (BrokerageRecordStatusEnum.SETTLEMENT.getStatus().equals(record.getStatus())) {
-            brokerageUserService.updateUserPrice(userId, -record.getPrice());
-        }
+            // 2. 更新用户的佣金
+            if (BrokerageRecordStatusEnum.WAIT_SETTLEMENT.getStatus().equals(record.getStatus())) {
+                brokerageUserService.updateUserFrozenPrice(record.getUserId(), -record.getPrice());
+            } else if (BrokerageRecordStatusEnum.SETTLEMENT.getStatus().equals(record.getStatus())) {
+                brokerageUserService.updateUserPrice(record.getUserId(), -record.getPrice());
+            }
+        });
     }
 
     /**

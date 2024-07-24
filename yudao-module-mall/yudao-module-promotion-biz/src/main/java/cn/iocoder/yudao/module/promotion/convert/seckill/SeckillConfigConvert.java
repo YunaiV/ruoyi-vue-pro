@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.promotion.convert.seckill.seckillconfig;
+package cn.iocoder.yudao.module.promotion.convert.seckill;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.promotion.controller.admin.seckill.vo.config.SeckillConfigCreateReqVO;

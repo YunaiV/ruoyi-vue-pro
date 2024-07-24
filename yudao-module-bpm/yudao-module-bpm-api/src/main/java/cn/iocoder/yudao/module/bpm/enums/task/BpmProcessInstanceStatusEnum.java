@@ -33,7 +33,7 @@ public enum BpmProcessInstanceStatusEnum implements IntArrayValuable {
 
     @Override
     public int[] array() {
-        return new int[0];
+        return ARRAYS;
     }
 
 }
