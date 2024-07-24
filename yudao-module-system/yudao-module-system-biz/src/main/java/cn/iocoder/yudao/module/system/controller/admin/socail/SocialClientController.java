@@ -72,6 +72,7 @@ public class SocialClientController {
 
     //======================= TODO 测试发送订阅消息 =======================
 
+    // TODO @puhui999：这个接口，其实可以留着。然后把参数挪到 .http 文件。先直接用 SocialWxSubscribeMessageReqDTO 接参数
     @PostMapping("/send-subscribe-message")
     public void testSendSubscribeMessage() {
         SocialWxSubscribeMessageReqDTO reqDTO = new SocialWxSubscribeMessageReqDTO().setLang("zh_CN")

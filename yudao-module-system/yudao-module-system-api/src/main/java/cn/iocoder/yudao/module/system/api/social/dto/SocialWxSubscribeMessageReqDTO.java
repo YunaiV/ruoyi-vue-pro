@@ -6,6 +6,7 @@ import lombok.Data;
 import java.util.ArrayList;
 import java.util.List;
 
+// TODO @puhui99：1）参考 SocialWxQrcodeReqDTO，可以 @see 文档。这样，注释会更见见一点。2）是不是少了 Send：SocialWxSubscribeMessageSendReqDTO
 /**
  * 微信小程序订阅消息 Request DTO
  *
@@ -14,6 +15,7 @@ import java.util.List;
 @Data
 public class SocialWxSubscribeMessageReqDTO {
 
+    // TODO @puhui999：参数校验
     /**
      * 接收者（用户）的 openid.
      * <pre>
@@ -58,6 +60,7 @@ public class SocialWxSubscribeMessageReqDTO {
      */
     private String lang;
 
+    // TODO @puhui999：是必须 List<KeyValue<String, String>>，还是 Map<String, String 即可）
     /**
      * 模板内容，不填则下发空模板.
      * <pre>

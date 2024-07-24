@@ -15,7 +15,10 @@ public interface MessageTemplateConstants {
 
     //======================= 订阅消息模版 =======================
 
+    // TODO @puhui999：建议 TRADE_AFTER_SALE_CHANGE
     String ORDER_AFTERSALE_CHANGE = "售后进度通知";
+
+    // TODO @puhui999：是不是改成 PAY_WALLET_CHANGE 放在 PAY 模块
     String MONEY_CHANGE = "充值成功通知";
 
 }

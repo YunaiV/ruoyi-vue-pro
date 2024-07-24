@@ -236,6 +236,7 @@ public class SocialClientServiceImpl implements SocialClientService {
         try {
             return service.getUserService().getPhoneNoInfo(phoneCode);
         } catch (WxErrorException e) {
+            // TODO @puhui999：这里的日志，reqDTO 要打进去
             log.error("[getPhoneNoInfo][userType({}) phoneCode({}) 获得手机号失败]", userType, phoneCode, e);
             throw exception(SOCIAL_CLIENT_WEIXIN_MINI_APP_PHONE_CODE_ERROR);
         }
@@ -262,11 +263,12 @@ public class SocialClientServiceImpl implements SocialClientService {
 
     @Override
     public List<TemplateInfo> getSubscribeTemplate() {
+        // TODO @puhui999：这个 userType 最好通过参数，传递过来；然后这个方法名，貌似叫 getSubscribeTemplateList 更合适哈；
         WxMaService service = getWxMaService(UserTypeEnum.MEMBER.getValue());
         try {
             WxMaSubscribeService subscribeService = service.getSubscribeService();
             return subscribeService.getTemplateList();
-        }catch (WxErrorException e) {
+        } catch (WxErrorException e) {
             log.error("[getSubscribeTemplate][获得小程序订阅消息模版]", e);
             throw exception(SOCIAL_CLIENT_WEIXIN_MINI_APP_SUBSCRIBE_TEMPLATE_ERROR);
         }
@@ -274,13 +276,15 @@ public class SocialClientServiceImpl implements SocialClientService {
 
     @Override
     public void sendSubscribeMessage(SocialWxSubscribeMessageReqDTO reqDTO) {
+        // TODO @puhui999：这个 userType 最好通过参数，
         WxMaService service = getWxMaService(UserTypeEnum.MEMBER.getValue());
         try {
             WxMaSubscribeService subscribeService = service.getSubscribeService();
             WxMaSubscribeMessage message = BeanUtils.toBean(reqDTO, WxMaSubscribeMessage.class);
             reqDTO.getMessages().forEach(item-> message.addData(new WxMaSubscribeMessage.MsgData(item.getKey(), item.getValue())));
             subscribeService.sendSubscribeMsg(message);
-        }catch (WxErrorException e) {
+        } catch (WxErrorException e) {
+            // TODO @puhui999：这里的日志，reqDTO 要打进去
             log.error("[sendSubscribeMessage][发送小程序订阅消息]", e);
             throw exception(SOCIAL_CLIENT_WEIXIN_MINI_APP_SUBSCRIBE_MESSAGE_ERROR);
         }

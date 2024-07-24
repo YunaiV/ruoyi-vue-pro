@@ -8,10 +8,7 @@ import cn.iocoder.yudao.framework.security.core.annotations.PreAuthenticated;
 import cn.iocoder.yudao.module.member.controller.app.social.vo.*;
 import cn.iocoder.yudao.module.system.api.social.SocialClientApi;
 import cn.iocoder.yudao.module.system.api.social.SocialUserApi;
-import cn.iocoder.yudao.module.system.api.social.dto.SocialUserBindReqDTO;
-import cn.iocoder.yudao.module.system.api.social.dto.SocialUserRespDTO;
-import cn.iocoder.yudao.module.system.api.social.dto.SocialUserUnbindReqDTO;
-import cn.iocoder.yudao.module.system.api.social.dto.SocialWxQrcodeReqDTO;
+import cn.iocoder.yudao.module.system.api.social.dto.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -74,7 +71,8 @@ public class AppSocialUserController {
     @GetMapping("/get-subscribe-template")
     @Operation(summary = "获得微信小程订阅模板")
     public CommonResult<List<AppSocialWxSubscribeTemplateRespVO>> getSubscribeTemplate() {
-        return success(BeanUtils.toBean(socialClientApi.getSubscribeTemplate(), AppSocialWxSubscribeTemplateRespVO.class));
+        List<SocialWxSubscribeTemplateRespDTO> template = socialClientApi.getSubscribeTemplate();
+        return success(BeanUtils.toBean(template, AppSocialWxSubscribeTemplateRespVO.class));
     }
 
 }

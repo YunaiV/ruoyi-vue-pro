@@ -81,7 +81,7 @@ public interface SocialClientService {
     List<TemplateInfo> getSubscribeTemplate();
 
     /**
-     * 发送订阅消息
+     * 发送微信小程序订阅消息
      *
      * @param reqDTO 请求
      */
