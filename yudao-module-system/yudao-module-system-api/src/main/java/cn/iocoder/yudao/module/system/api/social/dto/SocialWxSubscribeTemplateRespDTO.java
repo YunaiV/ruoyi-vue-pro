@@ -11,11 +11,10 @@ import lombok.Data;
 @Data
 public class SocialWxSubscribeTemplateRespDTO {
 
-    // TODO @puhui999：建议搞成 id
     /**
      * 添加至账号下的模板 id，发送小程序订阅消息时所需
      */
-    private String priTmplId;
+    private String id;
 
     /**
      * 模版标题
@@ -32,7 +31,7 @@ public class SocialWxSubscribeTemplateRespDTO {
      */
     private String example;
 
-    // TODO @puhui999：这个在 wxjava 里面，有枚举字段么？
+    // TODO @puhui999：这个在 wxjava 里面，有枚举字段么？没得🤣
     /**
      * 模版类型
      *

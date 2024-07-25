@@ -1,9 +1,10 @@
 package cn.iocoder.yudao.module.system.controller.admin.socail;
 
+import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
-import cn.iocoder.yudao.module.system.api.social.dto.SocialWxSubscribeMessageReqDTO;
+import cn.iocoder.yudao.module.system.api.social.dto.SocialWxSubscribeMessageSendReqDTO;
 import cn.iocoder.yudao.module.system.controller.admin.socail.vo.client.SocialClientPageReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.socail.vo.client.SocialClientRespVO;
 import cn.iocoder.yudao.module.system.controller.admin.socail.vo.client.SocialClientSaveReqVO;
@@ -72,15 +73,9 @@ public class SocialClientController {
 
     //======================= TODO 测试发送订阅消息 =======================
 
-    // TODO @puhui999：这个接口，其实可以留着。然后把参数挪到 .http 文件。先直接用 SocialWxSubscribeMessageReqDTO 接参数
     @PostMapping("/send-subscribe-message")
-    public void testSendSubscribeMessage() {
-        SocialWxSubscribeMessageReqDTO reqDTO = new SocialWxSubscribeMessageReqDTO().setLang("zh_CN")
-                .setMiniprogramState("developer").setTemplateId("W4ybDTIwCfKHtMKR7fSfx83DtmVKEeXQo3Ti7GCw4_4")
-                .setToUser("oKNkb4xxw2H135-MVPKtEMkumK08");
-        reqDTO.addData("character_string1", "11111111").addData("amount2", "6666").addData("time3", "2024-01-01 10:10:10")
-                .addData("phrase4", "成功");
-        socialClientService.sendSubscribeMessage(reqDTO);
+    public void testSendSubscribeMessage(@RequestBody SocialWxSubscribeMessageSendReqDTO reqDTO) {
+        socialClientService.sendSubscribeMessage(reqDTO, UserTypeEnum.MEMBER.getValue());
     }
 
 }

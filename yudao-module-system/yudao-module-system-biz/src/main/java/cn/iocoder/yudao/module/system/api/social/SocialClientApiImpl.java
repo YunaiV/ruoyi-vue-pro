@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.system.api.social;
 import cn.binarywang.wx.miniapp.bean.WxMaPhoneNumberInfo;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.system.api.social.dto.*;
+import cn.iocoder.yudao.module.system.convert.social.SocialUserConvert;
 import cn.iocoder.yudao.module.system.service.social.SocialClientService;
 import jakarta.annotation.Resource;
 import me.chanjar.weixin.common.bean.WxJsapiSignature;
@@ -47,14 +48,14 @@ public class SocialClientApiImpl implements SocialClientApi {
     }
 
     @Override
-    public List<SocialWxSubscribeTemplateRespDTO> getSubscribeTemplate() {
-        List<TemplateInfo> subscribeTemplate = socialClientService.getSubscribeTemplate();
-        return BeanUtils.toBean(subscribeTemplate, SocialWxSubscribeTemplateRespDTO.class);
+    public List<SocialWxSubscribeTemplateRespDTO> getSubscribeTemplateList(Integer userType) {
+        List<TemplateInfo> subscribeTemplate = socialClientService.getSubscribeTemplateList(userType);
+        return SocialUserConvert.INSTANCE.convertList(subscribeTemplate);
     }
 
     @Override
-    public void sendSubscribeMessage(SocialWxSubscribeMessageReqDTO reqDTO) {
-        socialClientService.sendSubscribeMessage(reqDTO);
+    public void sendSubscribeMessage(SocialWxSubscribeMessageSendReqDTO reqDTO, Integer userType) {
+        socialClientService.sendSubscribeMessage(reqDTO, userType);
     }
 
 }

@@ -1,21 +1,20 @@
 package cn.iocoder.yudao.module.system.api.social.dto;
 
-import cn.iocoder.yudao.framework.common.core.KeyValue;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
-// TODO @puhui99：1）参考 SocialWxQrcodeReqDTO，可以 @see 文档。这样，注释会更见见一点。2）是不是少了 Send：SocialWxSubscribeMessageSendReqDTO
 /**
- * 微信小程序订阅消息 Request DTO
+ * 微信小程序订阅消息发送 Request DTO
  *
+ * @see <a href="https://developers.weixin.qq.com/miniprogram/dev/api-backend/open-api/subscribe-message/subscribeMessage.send.html">接口文档</a>
  * @author HUIHUI
  */
 @Data
-public class SocialWxSubscribeMessageReqDTO {
+public class SocialWxSubscribeMessageSendReqDTO {
 
-    // TODO @puhui999：参数校验
     /**
      * 接收者（用户）的 openid.
      * <pre>
@@ -24,6 +23,7 @@ public class SocialWxSubscribeMessageReqDTO {
      * 描述： 接收者（用户）的 openid
      * </pre>
      */
+    @NotNull(message = "接收者（用户）的 openid不能为空")
     private String toUser;
 
     /**
@@ -34,6 +34,7 @@ public class SocialWxSubscribeMessageReqDTO {
      * 描述： 所需下发的模板消息的id
      * </pre>
      */
+    @NotNull(message = "模板消息的id不能为空")
     private String templateId;
 
     /**
@@ -51,6 +52,7 @@ public class SocialWxSubscribeMessageReqDTO {
      *
      * 枚举 WxMaConstants.MiniProgramState
      */
+    @NotNull(message = "跳转小程序类型不能为空")
     private String miniprogramState;
 
     /**
@@ -58,9 +60,9 @@ public class SocialWxSubscribeMessageReqDTO {
      *
      * 枚举 WxMaConstants.MiniProgramLang
      */
+    @NotNull(message = "进入小程序查看的语言类型不能为空")
     private String lang;
 
-    // TODO @puhui999：是必须 List<KeyValue<String, String>>，还是 Map<String, String 即可）
     /**
      * 模板内容，不填则下发空模板.
      * <pre>
@@ -69,13 +71,13 @@ public class SocialWxSubscribeMessageReqDTO {
      * 描述： 模板内容，不填则下发空模板
      * </pre>
      */
-    private List<KeyValue<String, String>> messages;
+    private Map<String, String> messages;
 
-    public SocialWxSubscribeMessageReqDTO addData(String key, String value) {
+    public SocialWxSubscribeMessageSendReqDTO addData(String key, String value) {
         if (messages == null) {
-            messages = new ArrayList<>();
+            messages = new HashMap<>();
         }
-        messages.add(new KeyValue<>(key, value));
+        messages.put(key, value);
         return this;
     }
 

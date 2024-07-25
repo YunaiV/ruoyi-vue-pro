@@ -68,10 +68,10 @@ public class AppSocialUserController {
         return success(Base64.encode(wxQrcode));
     }
 
-    @GetMapping("/get-subscribe-template")
-    @Operation(summary = "获得微信小程订阅模板")
-    public CommonResult<List<AppSocialWxSubscribeTemplateRespVO>> getSubscribeTemplate() {
-        List<SocialWxSubscribeTemplateRespDTO> template = socialClientApi.getSubscribeTemplate();
+    @GetMapping("/get-subscribe-template-list")
+    @Operation(summary = "获得微信小程订阅模板列表")
+    public CommonResult<List<AppSocialWxSubscribeTemplateRespVO>> getSubscribeTemplateList() {
+        List<SocialWxSubscribeTemplateRespDTO> template = socialClientApi.getSubscribeTemplateList(UserTypeEnum.MEMBER.getValue());
         return success(BeanUtils.toBean(template, AppSocialWxSubscribeTemplateRespVO.class));
     }
 

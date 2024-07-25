@@ -4,7 +4,6 @@ import cn.binarywang.wx.miniapp.api.WxMaService;
 import cn.binarywang.wx.miniapp.api.WxMaSubscribeService;
 import cn.binarywang.wx.miniapp.api.impl.WxMaServiceImpl;
 import cn.binarywang.wx.miniapp.bean.WxMaPhoneNumberInfo;
-import cn.binarywang.wx.miniapp.bean.WxMaSubscribeMessage;
 import cn.binarywang.wx.miniapp.config.impl.WxMaRedisBetterConfigImpl;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.lang.Assert;
@@ -17,9 +16,10 @@ import cn.iocoder.yudao.framework.common.util.cache.CacheUtils;
 import cn.iocoder.yudao.framework.common.util.http.HttpUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.system.api.social.dto.SocialWxQrcodeReqDTO;
-import cn.iocoder.yudao.module.system.api.social.dto.SocialWxSubscribeMessageReqDTO;
+import cn.iocoder.yudao.module.system.api.social.dto.SocialWxSubscribeMessageSendReqDTO;
 import cn.iocoder.yudao.module.system.controller.admin.socail.vo.client.SocialClientPageReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.socail.vo.client.SocialClientSaveReqVO;
+import cn.iocoder.yudao.module.system.convert.social.SocialUserConvert;
 import cn.iocoder.yudao.module.system.dal.dataobject.social.SocialClientDO;
 import cn.iocoder.yudao.module.system.dal.mysql.social.SocialClientMapper;
 import cn.iocoder.yudao.module.system.enums.social.SocialTypeEnum;
@@ -236,7 +236,6 @@ public class SocialClientServiceImpl implements SocialClientService {
         try {
             return service.getUserService().getPhoneNoInfo(phoneCode);
         } catch (WxErrorException e) {
-            // TODO @puhui999：这里的日志，reqDTO 要打进去
             log.error("[getPhoneNoInfo][userType({}) phoneCode({}) 获得手机号失败]", userType, phoneCode, e);
             throw exception(SOCIAL_CLIENT_WEIXIN_MINI_APP_PHONE_CODE_ERROR);
         }
@@ -256,36 +255,31 @@ public class SocialClientServiceImpl implements SocialClientService {
                     null,
                     ObjUtil.defaultIfNull(reqVO.getHyaline(), SocialWxQrcodeReqDTO.HYALINE));
         } catch (WxErrorException e) {
-            log.error("[getWxQrcode][reqVO({})) 获得小程序码失败]", reqVO, e);
+            log.error("[getWxQrcode][reqVO({}) 获得小程序码失败]", reqVO, e);
             throw exception(SOCIAL_CLIENT_WEIXIN_MINI_APP_QRCODE_ERROR);
         }
     }
 
     @Override
-    public List<TemplateInfo> getSubscribeTemplate() {
-        // TODO @puhui999：这个 userType 最好通过参数，传递过来；然后这个方法名，貌似叫 getSubscribeTemplateList 更合适哈；
-        WxMaService service = getWxMaService(UserTypeEnum.MEMBER.getValue());
+    public List<TemplateInfo> getSubscribeTemplateList(Integer userType) {
+        WxMaService service = getWxMaService(userType);
         try {
             WxMaSubscribeService subscribeService = service.getSubscribeService();
             return subscribeService.getTemplateList();
         } catch (WxErrorException e) {
-            log.error("[getSubscribeTemplate][获得小程序订阅消息模版]", e);
+            log.error("[getSubscribeTemplate][userType({}) 获得小程序订阅消息模版]", userType, e);
             throw exception(SOCIAL_CLIENT_WEIXIN_MINI_APP_SUBSCRIBE_TEMPLATE_ERROR);
         }
     }
 
     @Override
-    public void sendSubscribeMessage(SocialWxSubscribeMessageReqDTO reqDTO) {
-        // TODO @puhui999：这个 userType 最好通过参数，
-        WxMaService service = getWxMaService(UserTypeEnum.MEMBER.getValue());
+    public void sendSubscribeMessage(SocialWxSubscribeMessageSendReqDTO reqDTO, Integer userType) {
+        WxMaService service = getWxMaService(userType);
         try {
             WxMaSubscribeService subscribeService = service.getSubscribeService();
-            WxMaSubscribeMessage message = BeanUtils.toBean(reqDTO, WxMaSubscribeMessage.class);
-            reqDTO.getMessages().forEach(item-> message.addData(new WxMaSubscribeMessage.MsgData(item.getKey(), item.getValue())));
-            subscribeService.sendSubscribeMsg(message);
+            subscribeService.sendSubscribeMsg(SocialUserConvert.INSTANCE.convert(reqDTO));
         } catch (WxErrorException e) {
-            // TODO @puhui999：这里的日志，reqDTO 要打进去
-            log.error("[sendSubscribeMessage][发送小程序订阅消息]", e);
+            log.error("[sendSubscribeMessage][reqVO({}) userType({}) 发送小程序订阅消息]", reqDTO, userType, e);
             throw exception(SOCIAL_CLIENT_WEIXIN_MINI_APP_SUBSCRIBE_MESSAGE_ERROR);
         }
     }
