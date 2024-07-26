@@ -14,18 +14,20 @@ import cn.iocoder.yudao.module.pay.convert.channel.PayChannelConvert;
 import cn.iocoder.yudao.module.pay.dal.dataobject.channel.PayChannelDO;
 import cn.iocoder.yudao.module.pay.dal.mysql.channel.PayChannelMapper;
 import cn.iocoder.yudao.module.pay.framework.pay.core.WalletPayClient;
-import jakarta.annotation.PostConstruct;
-import jakarta.annotation.Resource;
-import jakarta.validation.Validator;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
+import javax.annotation.PostConstruct;
+import javax.annotation.Resource;
+import javax.validation.Validator;
 import java.util.Collection;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.pay.enums.ErrorCodeConstants.*;
+
+;
 
 /**
  * 支付渠道 Service 实现类

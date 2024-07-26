@@ -2,9 +2,10 @@ package cn.iocoder.yudao.framework.pay.core.client.impl.weixin;
 
 import cn.iocoder.yudao.framework.common.util.validation.ValidationUtils;
 import cn.iocoder.yudao.framework.pay.core.client.PayClientConfig;
-import jakarta.validation.Validator;
-import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
+
+import javax.validation.Validator;
+import javax.validation.constraints.NotBlank;
 
 /**
  * 微信支付的 PayClientConfig 实现类
