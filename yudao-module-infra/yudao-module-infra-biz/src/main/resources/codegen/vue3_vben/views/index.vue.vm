@@ -4,7 +4,8 @@ import { columns, searchFormSchema } from './${classNameVar}.data'
 import { useI18n } from '@/hooks/web/useI18n'
 import { useMessage } from '@/hooks/web/useMessage'
 import { useModal } from '@/components/Modal'
-import { useTable } from '@/components/Table'
+import { IconEnum } from '@/enums/appEnum'
+import { BasicTable, TableAction, useTable } from '@/components/Table'
 import { delete${simpleClassName}, export${simpleClassName}, get${simpleClassName}Page } from '@/api/${table.moduleName}/${table.businessName}'
 
 defineOptions({ name: '${table.className}' })
