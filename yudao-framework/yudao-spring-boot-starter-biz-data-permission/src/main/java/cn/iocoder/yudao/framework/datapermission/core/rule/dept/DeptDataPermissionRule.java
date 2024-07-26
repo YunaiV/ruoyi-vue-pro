@@ -157,7 +157,7 @@ public class DeptDataPermissionRule implements DataPermissionRule {
         // 拼接条件
         return new InExpression(MyBatisUtils.buildColumn(tableName, tableAlias, columnName),
                 // Parenthesis 的目的，是提供 (1,2,3) 的 () 左右括号
-                new Parenthesis(new ExpressionList<>(CollectionUtils.convertList(deptIds, LongValue::new))));
+                new Parenthesis(new ExpressionList<LongValue>(CollectionUtils.convertList(deptIds, LongValue::new))));
     }
 
     private Expression buildUserExpression(String tableName, Alias tableAlias, Boolean self, Long userId) {
