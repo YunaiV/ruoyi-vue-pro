@@ -14,22 +14,17 @@ import cn.iocoder.yudao.module.pay.convert.channel.PayChannelConvert;
 import cn.iocoder.yudao.module.pay.dal.dataobject.channel.PayChannelDO;
 import cn.iocoder.yudao.module.pay.dal.mysql.channel.PayChannelMapper;
 import cn.iocoder.yudao.module.pay.framework.pay.core.WalletPayClient;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
-import lombok.Getter;
+import jakarta.annotation.PostConstruct;
+import jakarta.annotation.Resource;
+import jakarta.validation.Validator;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
-import javax.annotation.PostConstruct;
-import javax.annotation.Resource;
-import javax.validation.Validator;
-import java.time.Duration;
 import java.util.Collection;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.framework.common.util.cache.CacheUtils.buildAsyncReloadingCache;
 import static cn.iocoder.yudao.module.pay.enums.ErrorCodeConstants.*;
 
 /**
@@ -41,25 +36,6 @@ import static cn.iocoder.yudao.module.pay.enums.ErrorCodeConstants.*;
 @Slf4j
 @Validated
 public class PayChannelServiceImpl implements PayChannelService {
-
-    /**
-     * {@link PayClient} 缓存，通过它异步清空 smsClientFactory
-     */
-    @Getter
-    private final LoadingCache<Long, PayClient> clientCache = buildAsyncReloadingCache(Duration.ofSeconds(10L),
-            new CacheLoader<Long, PayClient>() {
-
-                @Override
-                public PayClient load(Long id) {
-                    // 查询，然后尝试清空
-                    PayChannelDO channel = payChannelMapper.selectById(id);
-                    if (channel != null) {
-                        payClientFactory.createOrUpdatePayClient(channel.getId(), channel.getCode(), channel.getConfig());
-                    }
-                    return payClientFactory.getPayClient(id);
-                }
-
-            });
 
     @Resource
     private PayClientFactory payClientFactory;
@@ -102,9 +78,6 @@ public class PayChannelServiceImpl implements PayChannelService {
         PayChannelDO channel = PayChannelConvert.INSTANCE.convert(updateReqVO)
                 .setConfig(parseConfig(dbChannel.getCode(), updateReqVO.getConfig()));
         payChannelMapper.updateById(channel);
-
-        // 清空缓存
-        clearCache(channel.getId());
     }
 
     /**
@@ -135,18 +108,6 @@ public class PayChannelServiceImpl implements PayChannelService {
 
         // 删除
         payChannelMapper.deleteById(id);
-
-        // 清空缓存
-        clearCache(id);
-    }
-
-    /**
-     * 删除缓存
-     *
-     * @param id 渠道编号
-     */
-    private void clearCache(Long id) {
-        clientCache.invalidate(id);
     }
 
     private PayChannelDO validateChannelExists(Long id) {
@@ -202,7 +163,8 @@ public class PayChannelServiceImpl implements PayChannelService {
 
     @Override
     public PayClient getPayClient(Long id) {
-        return clientCache.getUnchecked(id);
+        PayChannelDO channel = validPayChannel(id);
+        return payClientFactory.createOrUpdatePayClient(id, channel.getCode(), channel.getConfig());
     }
 
 }

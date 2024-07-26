@@ -36,6 +36,7 @@ import java.util.Objects;
 
 import static cn.hutool.core.date.DatePattern.*;
 import static cn.iocoder.yudao.framework.pay.core.client.impl.weixin.WxPayClientConfig.API_VERSION_V2;
+import static cn.iocoder.yudao.framework.pay.core.client.impl.weixin.WxPayClientConfig.API_VERSION_V3;
 
 /**
  * 微信支付抽象类，实现微信统一的接口、以及部分实现（退款）
@@ -59,19 +60,14 @@ public abstract class AbstractWxPayClient extends AbstractPayClient<WxPayClientC
     protected void doInit(String tradeType) {
         // 创建 config 配置
         WxPayConfig payConfig = new WxPayConfig();
-        BeanUtil.copyProperties(config, payConfig, "keyContent", "privateKeyContent", "privateCertContent");
+        BeanUtil.copyProperties(config, payConfig, "keyContent", "privateKeyContent");
         payConfig.setTradeType(tradeType);
         // weixin-pay-java 无法设置内容，只允许读取文件，所以这里要创建临时文件来解决
-        if (Base64.isBase64(config.getKeyContent())) {
+        if (Objects.equals(config.getApiVersion(), API_VERSION_V2)) {
             payConfig.setKeyPath(FileUtils.createTempFile(Base64.decode(config.getKeyContent())).getPath());
-        }
-        if (StrUtil.isNotEmpty(config.getPrivateKeyContent())) {
+        } else if (Objects.equals(config.getApiVersion(), API_VERSION_V3)) {
             payConfig.setPrivateKeyPath(FileUtils.createTempFile(config.getPrivateKeyContent()).getPath());
         }
-        if (StrUtil.isNotEmpty(config.getPrivateCertContent())) {
-            payConfig.setPrivateCertPath(FileUtils.createTempFile(config.getPrivateCertContent()).getPath());
-        }
-//        payConfig.setCertSerialNo();
 
         // 创建 client 客户端
         client = new WxPayServiceImpl();
@@ -86,7 +82,7 @@ public abstract class AbstractWxPayClient extends AbstractPayClient<WxPayClientC
             switch (config.getApiVersion()) {
                 case API_VERSION_V2:
                     return doUnifiedOrderV2(reqDTO);
-                case WxPayClientConfig.API_VERSION_V3:
+                case API_VERSION_V3:
                     return doUnifiedOrderV3(reqDTO);
                 default:
                     throw new IllegalArgumentException(String.format("未知的 API 版本(%s)", config.getApiVersion()));
@@ -157,7 +153,7 @@ public abstract class AbstractWxPayClient extends AbstractPayClient<WxPayClientC
         switch (config.getApiVersion()) {
             case API_VERSION_V2:
                 return doParseOrderNotifyV2(body);
-            case WxPayClientConfig.API_VERSION_V3:
+            case API_VERSION_V3:
                 return doParseOrderNotifyV3(body);
             default:
                 throw new IllegalArgumentException(String.format("未知的 API 版本(%s)", config.getApiVersion()));
@@ -192,7 +188,7 @@ public abstract class AbstractWxPayClient extends AbstractPayClient<WxPayClientC
             switch (config.getApiVersion()) {
                 case API_VERSION_V2:
                     return doGetOrderV2(outTradeNo);
-                case WxPayClientConfig.API_VERSION_V3:
+                case API_VERSION_V3:
                     return doGetOrderV3(outTradeNo);
                 default:
                     throw new IllegalArgumentException(String.format("未知的 API 版本(%s)", config.getApiVersion()));
@@ -261,7 +257,7 @@ public abstract class AbstractWxPayClient extends AbstractPayClient<WxPayClientC
             switch (config.getApiVersion()) {
                 case API_VERSION_V2:
                     return doUnifiedRefundV2(reqDTO);
-                case WxPayClientConfig.API_VERSION_V3:
+                case API_VERSION_V3:
                     return doUnifiedRefundV3(reqDTO);
                 default:
                     throw new IllegalArgumentException(String.format("未知的 API 版本(%s)", config.getApiVersion()));
@@ -321,7 +317,7 @@ public abstract class AbstractWxPayClient extends AbstractPayClient<WxPayClientC
         switch (config.getApiVersion()) {
             case API_VERSION_V2:
                 return doParseRefundNotifyV2(body);
-            case WxPayClientConfig.API_VERSION_V3:
+            case API_VERSION_V3:
                 return parseRefundNotifyV3(body);
             default:
                 throw new IllegalArgumentException(String.format("未知的 API 版本(%s)", config.getApiVersion()));
@@ -358,7 +354,7 @@ public abstract class AbstractWxPayClient extends AbstractPayClient<WxPayClientC
             switch (config.getApiVersion()) {
                 case API_VERSION_V2:
                     return doGetRefundV2(outTradeNo, outRefundNo);
-                case WxPayClientConfig.API_VERSION_V3:
+                case API_VERSION_V3:
                     return doGetRefundV3(outTradeNo, outRefundNo);
                 default:
                     throw new IllegalArgumentException(String.format("未知的 API 版本(%s)", config.getApiVersion()));

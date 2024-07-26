@@ -2,9 +2,11 @@ package cn.iocoder.yudao.framework.web.core.handler;
 
 import cn.hutool.core.exceptions.ExceptionUtil;
 import cn.hutool.core.map.MapUtil;
+import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.apilog.core.service.ApiErrorLogFrameworkService;
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
+import cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.util.collection.SetUtils;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
@@ -209,8 +211,17 @@ public class GlobalExceptionHandler {
         // 不包含的时候，才进行打印，避免 ex 堆栈过多
         if (!IGNORE_ERROR_MESSAGES.contains(ex.getMessage())) {
             // 即使打印，也只打印第一层 StackTraceElement，并且使用 warn 在控制台输出，更容易看到
-            StackTraceElement[] stackTrace = ex.getStackTrace();
-            log.warn("[serviceExceptionHandler]\n\t{}", stackTrace[0]);
+            try {
+                StackTraceElement[] stackTraces = ex.getStackTrace();
+                for (StackTraceElement stackTrace : stackTraces) {
+                    if (ObjUtil.notEqual(stackTrace.getClassName(), ServiceExceptionUtil.class.getName())) {
+                        log.warn("[serviceExceptionHandler]\n\t{}", stackTrace);
+                        break;
+                    }
+                }
+            } catch (Exception ignored) {
+                // 忽略日志，避免影响主流程
+            }
         }
         return CommonResult.error(ex.getCode(), ex.getMessage());
     }

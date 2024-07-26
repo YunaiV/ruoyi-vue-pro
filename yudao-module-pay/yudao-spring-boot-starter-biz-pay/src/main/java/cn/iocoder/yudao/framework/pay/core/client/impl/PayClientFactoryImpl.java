@@ -71,8 +71,8 @@ public class PayClientFactoryImpl implements PayClientFactory {
 
     @Override
     @SuppressWarnings("unchecked")
-    public <Config extends PayClientConfig> void createOrUpdatePayClient(Long channelId, String channelCode,
-                                                                         Config config) {
+    public <Config extends PayClientConfig> PayClient createOrUpdatePayClient(Long channelId, String channelCode,
+                                                                              Config config) {
         AbstractPayClient<Config> client = (AbstractPayClient<Config>) clients.get(channelId);
         if (client == null) {
             client = this.createPayClient(channelId, channelCode, config);
@@ -81,6 +81,7 @@ public class PayClientFactoryImpl implements PayClientFactory {
         } else {
             client.refresh(config);
         }
+        return client;
     }
 
     @SuppressWarnings("unchecked")
