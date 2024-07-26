@@ -176,7 +176,7 @@ public interface TradeOrderConvert {
                                                 TradeOrderProperties tradeOrderProperties,
                                                 DeliveryExpressDO express) {
         AppTradeOrderDetailRespVO orderVO = convert3(order, orderItems);
-        orderVO.setPayExpireTime(addTime(tradeOrderProperties.getPayExpireTime()));
+        orderVO.setPayExpireTime(order.getCreateTime().plus(tradeOrderProperties.getPayExpireTime()));
         if (StrUtil.isNotEmpty(order.getPayChannelCode())) {
             orderVO.setPayChannelName(DictFrameworkUtils.getDictDataLabel(DictTypeConstants.CHANNEL_CODE, order.getPayChannelCode()));
         }
