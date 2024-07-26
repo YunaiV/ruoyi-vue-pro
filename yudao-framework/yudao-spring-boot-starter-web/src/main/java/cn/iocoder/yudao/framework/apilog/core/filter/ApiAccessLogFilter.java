@@ -181,7 +181,7 @@ public class ApiAccessLogFilter extends ApiRequestFilter {
     // ========== 请求和响应的脱敏逻辑，移除类似 password、token 等敏感字段 ==========
 
     private static String sanitizeMap(Map<String, ?> map, String[] sanitizeKeys) {
-        if (CollUtil.isNotEmpty(map)) {
+        if (CollUtil.isEmpty(map)) {
             return null;
         }
         if (sanitizeKeys != null) {
