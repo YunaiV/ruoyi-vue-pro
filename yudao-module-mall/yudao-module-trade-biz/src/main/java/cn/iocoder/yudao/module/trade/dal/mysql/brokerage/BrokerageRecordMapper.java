@@ -63,7 +63,7 @@ public interface BrokerageRecordMapper extends BaseMapperX<BrokerageRecordDO> {
                 .selectCount(BrokerageRecordDO::getId, UserBrokerageSummaryRespBO::getCount)
                 .selectSum(BrokerageRecordDO::getPrice)
                 .in(BrokerageRecordDO::getUserId, userIds)
-                .eq(BrokerageRecordDO::getBizId, bizType)
+                .eq(BrokerageRecordDO::getBizType, bizType)
                 .eq(BrokerageRecordDO::getStatus, status)
                 .groupBy(BrokerageRecordDO::getUserId)); // 按照 userId 聚合
         return BeanUtil.copyToList(list, UserBrokerageSummaryRespBO.class);
@@ -73,7 +73,7 @@ public interface BrokerageRecordMapper extends BaseMapperX<BrokerageRecordDO> {
 //                    .selectCount(BrokerageRecordDO::getId, UserBrokerageSummaryBO::getCount)
 //                    .selectSum(BrokerageRecordDO::getPrice)
 //                    .in(BrokerageRecordDO::getUserId, userIds)
-//                    .eq(BrokerageRecordDO::getBizId, bizType)
+//                    .eq(BrokerageRecordDO::getBizType, bizType)
 //                    .eq(BrokerageRecordDO::getStatus, status)
 //                    .groupBy(BrokerageRecordDO::getUserId));
     }
