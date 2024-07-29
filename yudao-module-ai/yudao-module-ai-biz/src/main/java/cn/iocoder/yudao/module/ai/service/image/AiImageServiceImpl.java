@@ -10,7 +10,6 @@ import cn.hutool.extra.spring.SpringUtil;
 import cn.hutool.http.HttpUtil;
 import cn.iocoder.yudao.framework.ai.core.enums.AiPlatformEnum;
 import cn.iocoder.yudao.framework.ai.core.model.midjourney.api.MidjourneyApi;
-import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.ai.controller.admin.image.vo.AiImageDrawReqVO;
@@ -67,8 +66,8 @@ public class AiImageServiceImpl implements AiImageService {
     private AiApiKeyService apiKeyService;
 
     @Override
-    public PageResult<AiImageDO> getImagePageMy(Long userId, PageParam pageReqVO) {
-        return imageMapper.selectPage(userId, pageReqVO);
+    public PageResult<AiImageDO> getImagePageMy(Long userId, AiImagePageReqVO pageReqVO) {
+        return imageMapper.selectPageMy(userId, pageReqVO);
     }
 
     @Override
