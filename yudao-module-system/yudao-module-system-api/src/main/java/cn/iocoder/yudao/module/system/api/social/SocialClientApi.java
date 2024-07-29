@@ -54,13 +54,13 @@ public interface SocialClientApi {
      *
      * @return 小程序订阅消息模版
      */
-    List<SocialWxSubscribeTemplateRespDTO> getSubscribeTemplate();
+    List<SocialWxSubscribeTemplateRespDTO> getSubscribeTemplateList(Integer userType);
 
     /**
      * 发送微信小程序订阅消息
      *
      * @param reqDTO 请求
      */
-    void sendSubscribeMessage(SocialWxSubscribeMessageReqDTO reqDTO);
+    void sendSubscribeMessage(SocialWxSubscribeMessageSendReqDTO reqDTO, Integer userType);
 
 }

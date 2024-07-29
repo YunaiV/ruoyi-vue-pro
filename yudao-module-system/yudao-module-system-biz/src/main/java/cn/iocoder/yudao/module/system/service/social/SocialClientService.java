@@ -3,7 +3,7 @@ package cn.iocoder.yudao.module.system.service.social;
 import cn.binarywang.wx.miniapp.bean.WxMaPhoneNumberInfo;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.system.api.social.dto.SocialWxQrcodeReqDTO;
-import cn.iocoder.yudao.module.system.api.social.dto.SocialWxSubscribeMessageReqDTO;
+import cn.iocoder.yudao.module.system.api.social.dto.SocialWxSubscribeMessageSendReqDTO;
 import cn.iocoder.yudao.module.system.controller.admin.socail.vo.client.SocialClientPageReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.socail.vo.client.SocialClientSaveReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.social.SocialClientDO;
@@ -78,14 +78,14 @@ public interface SocialClientService {
      *
      * @return 微信小程订阅模板
      */
-    List<TemplateInfo> getSubscribeTemplate();
+    List<TemplateInfo> getSubscribeTemplateList(Integer userType);
 
     /**
      * 发送微信小程序订阅消息
      *
      * @param reqDTO 请求
      */
-    void sendSubscribeMessage(SocialWxSubscribeMessageReqDTO reqDTO);
+    void sendSubscribeMessage(SocialWxSubscribeMessageSendReqDTO reqDTO, Integer userType);
 
     // =================== 客户端管理 ===================
 

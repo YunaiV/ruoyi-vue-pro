@@ -7,10 +7,9 @@ import lombok.Data;
 @Data
 public class AppSocialWxSubscribeTemplateRespVO {
 
-    // TODO @puhui999：是不是使用 id 作为字段，更干净些哈；
     @Schema(description = "模版编号", requiredMode = Schema.RequiredMode.REQUIRED,
             example = "9Aw5ZV1j9xdWTFEkqCpZ7mIBbSC34khK55OtzUPl0rU")
-    private String priTmplId;
+    private String id;
 
     @Schema(description = "模版标题", requiredMode = Schema.RequiredMode.REQUIRED, example = "订单支付通知")
     private String title;
