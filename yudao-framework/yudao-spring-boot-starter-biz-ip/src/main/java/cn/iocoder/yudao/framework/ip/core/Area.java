@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.framework.ip.core;
 
 import cn.iocoder.yudao.framework.ip.core.enums.AreaTypeEnum;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -54,7 +55,7 @@ public class Area {
     /**
      * 子节点
      */
-    @JsonManagedReference
+    @JsonBackReference
     private List<Area> children;
 
 }
