@@ -430,6 +430,8 @@ public class AdminUserServiceImplTest extends BaseDbUnitTest {
     public void testImportUserList_01() {
         // 准备参数
         UserImportExcelVO importUser = randomPojo(UserImportExcelVO.class, o -> {
+            o.setEmail(randomEmail());
+            o.setMobile(randomMobile());
         });
         // mock 方法，模拟失败
         doThrow(new ServiceException(DEPT_NOT_FOUND)).when(deptService).validateDeptList(any());
