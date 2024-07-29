@@ -12,7 +12,7 @@ import lombok.Data;
 public class SocialWxSubscribeTemplateRespDTO {
 
     /**
-     * 添加至账号下的模板 id，发送小程序订阅消息时所需
+     * 模版编号
      */
     private String id;
 
@@ -31,12 +31,11 @@ public class SocialWxSubscribeTemplateRespDTO {
      */
     private String example;
 
-    // TODO @puhui999：这个在 wxjava 里面，有枚举字段么？没得🤣
     /**
      * 模版类型
      *
-     * 2 为一次性订阅
-     * 3 为长期订阅
+     * 2：为一次性订阅
+     * 3：为长期订阅
      */
     private Integer type;
 

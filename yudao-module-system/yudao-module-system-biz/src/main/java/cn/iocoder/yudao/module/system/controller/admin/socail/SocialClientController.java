@@ -71,10 +71,10 @@ public class SocialClientController {
         return success(BeanUtils.toBean(pageResult, SocialClientRespVO.class));
     }
 
-    //======================= TODO 测试发送订阅消息 =======================
-
     @PostMapping("/send-subscribe-message")
-    public void testSendSubscribeMessage(@RequestBody SocialWxSubscribeMessageSendReqDTO reqDTO) {
+    @Operation(summary = "发送订阅消息") // 用于测试
+    @PreAuthorize("@ss.hasPermission('system:social-client:query')")
+    public void sendSubscribeMessage(@RequestBody SocialWxSubscribeMessageSendReqDTO reqDTO) {
         socialClientService.sendSubscribeMessage(reqDTO, UserTypeEnum.MEMBER.getValue());
     }
 

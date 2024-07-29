@@ -26,20 +26,21 @@ public interface SocialUserConvert {
     @Mapping(source = "reqVO.type", target = "socialType")
     SocialUserBindReqDTO convert(Long userId, Integer userType, SocialUserBindReqVO reqVO);
 
+    // TODO @puhui999：要不 convert 直接放到 service 里。
     default WxMaSubscribeMessage convert(SocialWxSubscribeMessageSendReqDTO reqDTO) {
         WxMaSubscribeMessage message = BeanUtils.toBean(reqDTO, WxMaSubscribeMessage.class);
         Map<String, String> messages = reqDTO.getMessages();
         if (CollUtil.isNotEmpty(messages)) {
-            messages.keySet().forEach(key -> {
-                findAndThen(messages, key, value -> message.addData(new WxMaSubscribeMessage.MsgData(key, value)));
-            });
+            messages.keySet().forEach(key -> findAndThen(messages, key, value -> message.addData(new WxMaSubscribeMessage.MsgData(key, value))));
         }
         return message;
     }
 
+    // TODO @puhui999：要不 convert 直接放到 service 里。其实可以 BeanUtils.toBean(reqDTO, WxMaSubscribeMessage.class) 来搞的呀。
     @Mapping(target = "id", source = "priTmplId")
     SocialWxSubscribeTemplateRespDTO convert(TemplateInfo templateInfo);
 
+    // TODO @puhui999：是不是用 CollectionUtils.convertList 就 ok 啦。
     default List<SocialWxSubscribeTemplateRespDTO> convertList(List<TemplateInfo> subscribeTemplate) {
         List<SocialWxSubscribeTemplateRespDTO> list = new ArrayList<>();
         subscribeTemplate.forEach(templateInfo -> list.add(convert(templateInfo)));
