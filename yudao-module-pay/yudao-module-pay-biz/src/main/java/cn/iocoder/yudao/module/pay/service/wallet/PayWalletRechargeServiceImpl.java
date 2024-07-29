@@ -139,8 +139,10 @@ public class PayWalletRechargeServiceImpl implements PayWalletRechargeService {
         sendPayWalletChangeMessage(payOrderId, walletRecharge);
     }
 
+    // TODO @puhui999：发送，使用异步发送；@Async
     private void sendPayWalletChangeMessage(Long payOrderId, PayWalletRechargeDO walletRecharge) {
         PayWalletDO wallet = payWalletService.getWallet(walletRecharge.getWalletId());
+        // TODO @puhui999：可以使用 MapUtil.builder()；另外，不应该是并发 hashmap 哈
         Map<String, String> messages = MapUtil.newConcurrentHashMap(4);
         messages.put(MessageTemplateConstants.PayWalletChangeTemplateParams.NO, String.valueOf(payOrderId));
         messages.put(MessageTemplateConstants.PayWalletChangeTemplateParams.PRICE,

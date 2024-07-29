@@ -11,6 +11,7 @@ public interface MessageTemplateConstants {
 
     String PAY_WALLET_CHANGE = "充值成功通知";
 
+    // TODO @puhui999：这种建议不枚举，直接写~嘿嘿。
     /**
      * 充值成功通知模版参数
      *

@@ -75,6 +75,7 @@ public class SocialClientApiImpl implements SocialClientApi {
 
     public void sendSubscribeMessage(String templateTitle, Map<String, String> messages, Integer userType, Long userId,
                             Integer socialType, String path) {
+        // TODO @puhui999：建议是，先不拆小方法。因为逻辑的复杂度其实不高哈。合在一个方法里，因为咱写了 1.1 1.2 2. 这样的逻辑，也能一下子看懂。
         // 1.1 获得订阅模版
         SocialWxSubscribeTemplateRespDTO template = getTemplate(templateTitle, userType);
         if (template == null) {
@@ -104,6 +105,7 @@ public class SocialClientApiImpl implements SocialClientApi {
                 .setTemplateId(template.getId()).setToUser(openId).setPage(path);
     }
 
+    // TODO @puhui999：建议下沉到 service 实现。
     /**
      * 获得小程序订阅消息模版
      *
@@ -120,6 +122,7 @@ public class SocialClientApiImpl implements SocialClientApi {
         return CollectionUtil.findOne(templateList, item -> ObjUtil.equal(item.getTitle(), templateTitle));
     }
 
+    // TODO @puhui999：建议下沉到 service 实现。
     /**
      * 获得用户 openId
      *

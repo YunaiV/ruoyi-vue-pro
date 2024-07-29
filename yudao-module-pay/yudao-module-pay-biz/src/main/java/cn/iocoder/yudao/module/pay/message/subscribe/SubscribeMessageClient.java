@@ -11,6 +11,7 @@ import java.util.Map;
 
 import static cn.iocoder.yudao.module.pay.enums.MessageTemplateConstants.PAY_WALLET_CHANGE;
 
+// TODO @puhui999：建议可以先直接调用，不要新建一个 client。
 /**
  * 订阅消息
  *

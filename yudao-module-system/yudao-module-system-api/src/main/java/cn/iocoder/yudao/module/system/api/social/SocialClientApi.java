@@ -57,6 +57,7 @@ public interface SocialClientApi {
      */
     List<SocialWxSubscribeTemplateRespDTO> getSubscribeTemplateList(Integer userType);
 
+    // TODO @puhui999：sendSubscribeMessage 两个方法，可以融合成一个么？
     /**
      * 发送微信小程序订阅消息
      *
