@@ -1,6 +1,8 @@
 package cn.iocoder.yudao.module.pay.service.wallet;
 
+import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.hutool.core.lang.Assert;
+import cn.hutool.core.map.MapUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.pay.core.enums.refund.PayRefundStatusRespEnum;
@@ -13,24 +15,28 @@ import cn.iocoder.yudao.module.pay.dal.dataobject.wallet.PayWalletDO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.wallet.PayWalletRechargeDO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.wallet.PayWalletRechargePackageDO;
 import cn.iocoder.yudao.module.pay.dal.mysql.wallet.PayWalletRechargeMapper;
-import cn.iocoder.yudao.module.pay.enums.wallet.PayWalletBizTypeEnum;
+import cn.iocoder.yudao.module.pay.enums.MessageTemplateConstants;
 import cn.iocoder.yudao.module.pay.enums.order.PayOrderStatusEnum;
 import cn.iocoder.yudao.module.pay.enums.refund.PayRefundStatusEnum;
+import cn.iocoder.yudao.module.pay.enums.wallet.PayWalletBizTypeEnum;
+import cn.iocoder.yudao.module.pay.message.subscribe.SubscribeMessageClient;
 import cn.iocoder.yudao.module.pay.service.order.PayOrderService;
 import cn.iocoder.yudao.module.pay.service.refund.PayRefundService;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import jakarta.annotation.Resource;
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.Map;
 import java.util.Objects;
 
 import static cn.hutool.core.util.ObjectUtil.notEqual;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils.addTime;
 import static cn.iocoder.yudao.framework.common.util.json.JsonUtils.toJsonString;
+import static cn.iocoder.yudao.framework.common.util.number.MoneyUtils.fenToYuanStr;
 import static cn.iocoder.yudao.module.pay.convert.wallet.PayWalletRechargeConvert.INSTANCE;
 import static cn.iocoder.yudao.module.pay.enums.ErrorCodeConstants.*;
 import static cn.iocoder.yudao.module.pay.enums.refund.PayRefundStatusEnum.*;
@@ -61,6 +67,8 @@ public class PayWalletRechargeServiceImpl implements PayWalletRechargeService {
     private PayRefundService payRefundService;
     @Resource
     private PayWalletRechargePackageService payWalletRechargePackageService;
+    @Resource
+    private SubscribeMessageClient subscribeMessageClient;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -96,7 +104,7 @@ public class PayWalletRechargeServiceImpl implements PayWalletRechargeService {
 
     @Override
     public PageResult<PayWalletRechargeDO> getWalletRechargePackagePage(Long userId, Integer userType,
-                                                                               PageParam pageReqVO, Boolean payStatus) {
+                                                                        PageParam pageReqVO, Boolean payStatus) {
         PayWalletDO wallet = payWalletService.getOrCreateWallet(userId, userType);
         return walletRechargeMapper.selectPage(pageReqVO, wallet.getId(), payStatus);
     }
@@ -126,6 +134,21 @@ public class PayWalletRechargeServiceImpl implements PayWalletRechargeService {
         // TODO 需要钱包中加个可提现余额
         payWalletService.addWalletBalance(walletRecharge.getWalletId(), String.valueOf(id),
                 PayWalletBizTypeEnum.RECHARGE, walletRecharge.getTotalPrice());
+
+        // 4. 发送订阅消息
+        sendPayWalletChangeMessage(payOrderId, walletRecharge);
+    }
+
+    private void sendPayWalletChangeMessage(Long payOrderId, PayWalletRechargeDO walletRecharge) {
+        PayWalletDO wallet = payWalletService.getWallet(walletRecharge.getWalletId());
+        Map<String, String> messages = MapUtil.newConcurrentHashMap(4);
+        messages.put(MessageTemplateConstants.PayWalletChangeTemplateParams.NO, String.valueOf(payOrderId));
+        messages.put(MessageTemplateConstants.PayWalletChangeTemplateParams.PRICE,
+                fenToYuanStr(walletRecharge.getTotalPrice()));
+        messages.put(MessageTemplateConstants.PayWalletChangeTemplateParams.STATUS, "充值成功");
+        messages.put(MessageTemplateConstants.PayWalletChangeTemplateParams.PAY_TIME,
+                LocalDateTimeUtil.formatNormal(LocalDateTime.now()));
+        subscribeMessageClient.sendPayWalletChangeMessage(messages, wallet.getUserType(), wallet.getUserId());
     }
 
     @Override

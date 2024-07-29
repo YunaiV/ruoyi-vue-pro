@@ -18,4 +18,15 @@ public interface MessageTemplateConstants {
 
     String TRADE_AFTER_SALE_CHANGE = "售后进度通知";
 
+    /**
+     * 售后进度通知相关参数枚举
+     *
+     * @author HUIHUI
+     */
+    class TradeAfterSaleChangeReqParams {
+
+        public static final String ORDER_DELIVERY = "order_delivery";
+
+    }
+
 }
