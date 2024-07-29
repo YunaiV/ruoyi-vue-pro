@@ -73,12 +73,4 @@ public class SocialWxSubscribeMessageSendReqDTO {
      */
     private Map<String, String> messages;
 
-    public SocialWxSubscribeMessageSendReqDTO addData(String key, String value) {
-        if (messages == null) {
-            messages = new HashMap<>();
-        }
-        messages.put(key, value);
-        return this;
-    }
-
 }

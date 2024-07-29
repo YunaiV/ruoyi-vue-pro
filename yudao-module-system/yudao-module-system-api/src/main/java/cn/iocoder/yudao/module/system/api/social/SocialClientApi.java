@@ -5,6 +5,7 @@ import cn.iocoder.yudao.module.system.enums.social.SocialTypeEnum;
 import jakarta.validation.Valid;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * 社交应用的 API 接口
@@ -62,5 +63,18 @@ public interface SocialClientApi {
      * @param reqDTO 请求
      */
     void sendSubscribeMessage(SocialWxSubscribeMessageSendReqDTO reqDTO, Integer userType);
+
+    /**
+     * 发送微信小程序订阅消息
+     *
+     * @param templateTitle 模版标题
+     * @param messages      消息
+     * @param userType      用户类型
+     * @param userId        用户编号
+     * @param socialType    社交客服端类型
+     * @param path          点击模板卡片后的跳转页面，仅限本小程序内的页面
+     */
+    void sendSubscribeMessage(String templateTitle, Map<String, String> messages, Integer userType, Long userId,
+                              Integer socialType, String path);
 
 }
