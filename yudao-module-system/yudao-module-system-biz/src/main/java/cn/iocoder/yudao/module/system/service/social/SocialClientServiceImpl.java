@@ -24,6 +24,7 @@ import cn.iocoder.yudao.module.system.controller.admin.socail.vo.client.SocialCl
 import cn.iocoder.yudao.module.system.controller.admin.socail.vo.client.SocialClientSaveReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.social.SocialClientDO;
 import cn.iocoder.yudao.module.system.dal.mysql.social.SocialClientMapper;
+import cn.iocoder.yudao.module.system.dal.redis.RedisKeyConstants;
 import cn.iocoder.yudao.module.system.enums.social.SocialTypeEnum;
 import com.binarywang.spring.starter.wxjava.miniapp.properties.WxMaProperties;
 import com.binarywang.spring.starter.wxjava.mp.properties.WxMpProperties;
@@ -48,6 +49,7 @@ import me.chanjar.weixin.mp.api.WxMpService;
 import me.chanjar.weixin.mp.api.impl.WxMpServiceImpl;
 import me.chanjar.weixin.mp.config.impl.WxMpRedisConfigImpl;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
@@ -265,6 +267,7 @@ public class SocialClientServiceImpl implements SocialClientService {
     }
 
     @Override
+    @Cacheable(cacheNames = RedisKeyConstants.WXA_SUBSCRIBE_TEMPLATE, key = "#userType", condition = "#result != null")
     public List<TemplateInfo> getSubscribeTemplateList(Integer userType) {
         WxMaService service = getWxMaService(userType);
         try {
