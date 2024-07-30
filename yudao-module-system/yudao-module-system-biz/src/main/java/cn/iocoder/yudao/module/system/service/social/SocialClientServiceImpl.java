@@ -4,8 +4,10 @@ import cn.binarywang.wx.miniapp.api.WxMaService;
 import cn.binarywang.wx.miniapp.api.WxMaSubscribeService;
 import cn.binarywang.wx.miniapp.api.impl.WxMaServiceImpl;
 import cn.binarywang.wx.miniapp.bean.WxMaPhoneNumberInfo;
+import cn.binarywang.wx.miniapp.bean.WxMaSubscribeMessage;
 import cn.binarywang.wx.miniapp.config.impl.WxMaRedisBetterConfigImpl;
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.ReflectUtil;
@@ -19,7 +21,6 @@ import cn.iocoder.yudao.module.system.api.social.dto.SocialWxQrcodeReqDTO;
 import cn.iocoder.yudao.module.system.api.social.dto.SocialWxSubscribeMessageSendReqDTO;
 import cn.iocoder.yudao.module.system.controller.admin.socail.vo.client.SocialClientPageReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.socail.vo.client.SocialClientSaveReqVO;
-import cn.iocoder.yudao.module.system.convert.social.SocialUserConvert;
 import cn.iocoder.yudao.module.system.dal.dataobject.social.SocialClientDO;
 import cn.iocoder.yudao.module.system.dal.mysql.social.SocialClientMapper;
 import cn.iocoder.yudao.module.system.enums.social.SocialTypeEnum;
@@ -51,9 +52,11 @@ import org.springframework.stereotype.Service;
 
 import java.time.Duration;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.framework.common.util.collection.MapUtils.findAndThen;
 import static cn.iocoder.yudao.framework.common.util.json.JsonUtils.toJsonString;
 import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.*;
 
@@ -273,15 +276,37 @@ public class SocialClientServiceImpl implements SocialClientService {
     }
 
     @Override
-    public void sendSubscribeMessage(SocialWxSubscribeMessageSendReqDTO reqDTO, Integer userType) {
-        WxMaService service = getWxMaService(userType);
+    public void sendSubscribeMessage(SocialWxSubscribeMessageSendReqDTO reqDTO, String templateId, String openId) {
+        WxMaService service = getWxMaService(reqDTO.getUserType());
         try {
             WxMaSubscribeService subscribeService = service.getSubscribeService();
-            subscribeService.sendSubscribeMsg(SocialUserConvert.INSTANCE.convert(reqDTO));
+            subscribeService.sendSubscribeMsg(buildMessageSendReqDTO(reqDTO, templateId, openId));
         } catch (WxErrorException e) {
-            log.error("[sendSubscribeMessage][reqVO({}) userType({}) 发送小程序订阅消息]", reqDTO, userType, e);
+            log.error("[sendSubscribeMessage][reqVO({}) templateId({}) openId({}) 发送小程序订阅消息失败]", reqDTO, templateId, openId, e);
             throw exception(SOCIAL_CLIENT_WEIXIN_MINI_APP_SUBSCRIBE_MESSAGE_ERROR);
         }
+    }
+
+    /**
+     * 构建发送消息请求参数
+     *
+     * @param reqDTO     请求
+     * @param templateId 模版编号
+     * @param openId     会员 openId
+     * @return 微信小程序订阅消息发送
+     */
+    private WxMaSubscribeMessage buildMessageSendReqDTO(SocialWxSubscribeMessageSendReqDTO reqDTO,
+                                                        String templateId, String openId) {
+        // 1.1 设置订阅消息基本参数
+        WxMaSubscribeMessage subscribeMessage = new WxMaSubscribeMessage().setLang("zh_CN").setMiniprogramState(envVersion)
+                .setTemplateId(templateId).setToUser(openId).setPage(reqDTO.getPage());
+        // 1.2 设置具体消息参数
+        Map<String, String> messages = reqDTO.getMessages();
+        if (CollUtil.isNotEmpty(messages)) {
+            messages.keySet().forEach(key -> findAndThen(messages, key, value ->
+                    subscribeMessage.addData(new WxMaSubscribeMessage.MsgData(key, value))));
+        }
+        return subscribeMessage;
     }
 
     /**

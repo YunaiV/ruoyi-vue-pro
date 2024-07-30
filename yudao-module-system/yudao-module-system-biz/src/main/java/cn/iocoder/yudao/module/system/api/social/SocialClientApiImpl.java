@@ -2,12 +2,10 @@ package cn.iocoder.yudao.module.system.api.social;
 
 import cn.binarywang.wx.miniapp.bean.WxMaPhoneNumberInfo;
 import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.system.api.social.dto.*;
-import cn.iocoder.yudao.module.system.convert.social.SocialUserConvert;
 import cn.iocoder.yudao.module.system.service.social.SocialClientService;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
@@ -18,7 +16,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
 import java.util.List;
-import java.util.Map;
+
+import static cn.hutool.core.collection.CollUtil.findOne;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
 
 /**
  * 社交应用的 API 实现类
@@ -65,80 +65,36 @@ public class SocialClientApiImpl implements SocialClientApi {
     @Override
     public List<SocialWxSubscribeTemplateRespDTO> getSubscribeTemplateList(Integer userType) {
         List<TemplateInfo> subscribeTemplate = socialClientService.getSubscribeTemplateList(userType);
-        return SocialUserConvert.INSTANCE.convertList(subscribeTemplate);
+        return convertList(subscribeTemplate, item -> BeanUtils.toBean(item, SocialWxSubscribeTemplateRespDTO.class)
+                .setId(item.getPriTmplId()));
     }
 
     @Override
-    public void sendSubscribeMessage(SocialWxSubscribeMessageSendReqDTO reqDTO, Integer userType) {
-        socialClientService.sendSubscribeMessage(reqDTO, userType);
-    }
-
-    public void sendSubscribeMessage(String templateTitle, Map<String, String> messages, Integer userType, Long userId,
-                            Integer socialType, String path) {
-        // TODO @puhui999：建议是，先不拆小方法。因为逻辑的复杂度其实不高哈。合在一个方法里，因为咱写了 1.1 1.2 2. 这样的逻辑，也能一下子看懂。
-        // 1.1 获得订阅模版
-        SocialWxSubscribeTemplateRespDTO template = getTemplate(templateTitle, userType);
-        if (template == null) {
-            return;
-        }
-        // 1.2 获得发送对象的 openId
-        String openId = getUserOpenId(userType, userId, socialType);
-        if (StrUtil.isBlankIfStr(openId)) {
-            return;
-        }
-
-        // 2. 发送消息
-        sendSubscribeMessage(buildMessageSendReqDTO(openId, path, template).setMessages(messages), userType);
-    }
-
-    /**
-     * 构建发送消息请求参数
-     *
-     * @param openId   接收者（用户）的 openid
-     * @param path     点击模板卡片后的跳转页面，仅限本小程序内的页面
-     * @param template 订阅模版
-     * @return 微信小程序订阅消息发送
-     */
-    private SocialWxSubscribeMessageSendReqDTO buildMessageSendReqDTO(String openId, String path,
-                                                                      SocialWxSubscribeTemplateRespDTO template) {
-        return new SocialWxSubscribeMessageSendReqDTO().setLang("zh_CN").setMiniprogramState(envVersion)
-                .setTemplateId(template.getId()).setToUser(openId).setPage(path);
-    }
-
-    // TODO @puhui999：建议下沉到 service 实现。
-    /**
-     * 获得小程序订阅消息模版
-     *
-     * @param templateTitle 模版标题
-     * @param userType      用户类型
-     * @return 小程序订阅消息模版
-     */
-    private SocialWxSubscribeTemplateRespDTO getTemplate(String templateTitle, Integer userType) {
-        List<SocialWxSubscribeTemplateRespDTO> templateList = getSubscribeTemplateList(userType);
+    public void sendSubscribeMessage(SocialWxSubscribeMessageSendReqDTO reqDTO) {
+        // 1.1 获得订阅模版列表
+        List<SocialWxSubscribeTemplateRespDTO> templateList = getSubscribeTemplateList(reqDTO.getUserType());
         if (CollUtil.isEmpty(templateList)) {
-            log.warn("[getTemplate][templateTitle({}) userType({}) 没有找到订阅模板]", templateTitle, userType);
-            return null;
+            log.warn("[sendSubscribeMessage][reqDTO({}) 发送订阅消息失败，原因：没有找到订阅模板]", reqDTO);
+            return;
         }
-        return CollectionUtil.findOne(templateList, item -> ObjUtil.equal(item.getTitle(), templateTitle));
-    }
+        // 1.2 获得需要使用的模版
+        SocialWxSubscribeTemplateRespDTO template = findOne(templateList, item ->
+                ObjUtil.equal(item.getTitle(), reqDTO.getTemplateTitle()));
+        if (template == null) {
+            log.warn("[sendSubscribeMessage][reqDTO({}) 发送订阅消息失败，原因：没有找到订阅模板]", reqDTO);
+            return;
+        }
 
-    // TODO @puhui999：建议下沉到 service 实现。
-    /**
-     * 获得用户 openId
-     *
-     * @param userType   用户类型
-     * @param userId     用户编号
-     * @param socialType 社交类型
-     * @return 用户 openId
-     */
-    private String getUserOpenId(Integer userType, Long userId, Integer socialType) {
-        SocialUserRespDTO socialUser = socialUserApi.getSocialUserByUserId(userType, userId, socialType);
+        // 2. 获得社交用户
+        SocialUserRespDTO socialUser = socialUserApi.getSocialUserByUserId(reqDTO.getUserType(), reqDTO.getUserId(),
+                reqDTO.getSocialType());
         if (StrUtil.isBlankIfStr(socialUser.getOpenid())) {
-            log.warn("[getUserOpenId][userType({}) userId({}) socialType({}) 会员 openid 缺失]",
-                    userType, userId, socialType);
-            return null;
+            log.warn("[sendSubscribeMessage][reqDTO({}) 发送订阅消息失败，原因：会员 openid 缺失]", reqDTO);
+            return;
         }
-        return socialUser.getOpenid();
+
+        // 3. 发送订阅消息
+        socialClientService.sendSubscribeMessage(reqDTO, template.getId(), socialUser.getOpenid());
     }
 
 }

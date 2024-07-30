@@ -83,9 +83,11 @@ public interface SocialClientService {
     /**
      * 发送微信小程序订阅消息
      *
-     * @param reqDTO 请求
+     * @param reqDTO     请求
+     * @param templateId 模版编号
+     * @param openId     会员 openId
      */
-    void sendSubscribeMessage(SocialWxSubscribeMessageSendReqDTO reqDTO, Integer userType);
+    void sendSubscribeMessage(SocialWxSubscribeMessageSendReqDTO reqDTO, String templateId, String openId);
 
     // =================== 客户端管理 ===================
 
