@@ -133,6 +133,13 @@ public class JmReportTokenServiceImpl implements JmReportTokenServiceI {
 
     @Override
     public String[] getRoles(String token) {
+        // 设置租户上下文。原因是：/jmreport/** 纯前端地址，不会走 buildLoginUserByToken 逻辑
+        LoginUser loginUser = SecurityFrameworkUtils.getLoginUser();
+        if (loginUser == null) {
+            return null;
+        }
+        TenantContextHolder.setTenantId(loginUser.getTenantId());
+
         // 参见文档 https://help.jeecg.com/jimureport/prodSafe.html 文档
         // 适配：如果是本系统的管理员，则转换成 jimu 报表的管理员
         Long userId = SecurityFrameworkUtils.getLoginUserId();

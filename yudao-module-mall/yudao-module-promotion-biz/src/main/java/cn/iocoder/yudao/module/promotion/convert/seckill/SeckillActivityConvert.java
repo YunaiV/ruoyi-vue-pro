@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.promotion.convert.seckill.seckillactivity;
+package cn.iocoder.yudao.module.promotion.convert.seckill;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
@@ -14,7 +14,6 @@ import cn.iocoder.yudao.module.promotion.controller.admin.seckill.vo.product.Sec
 import cn.iocoder.yudao.module.promotion.controller.app.seckill.vo.activity.AppSeckillActivityDetailRespVO;
 import cn.iocoder.yudao.module.promotion.controller.app.seckill.vo.activity.AppSeckillActivityNowRespVO;
 import cn.iocoder.yudao.module.promotion.controller.app.seckill.vo.activity.AppSeckillActivityRespVO;
-import cn.iocoder.yudao.module.promotion.convert.seckill.seckillconfig.SeckillConfigConvert;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.seckill.SeckillActivityDO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.seckill.SeckillConfigDO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.seckill.SeckillProductDO;
@@ -56,10 +55,11 @@ public interface SeckillActivityConvert {
         PageResult<SeckillActivityRespVO> pageResult = convertPage(page);
         // 拼接商品
         Map<Long, ProductSpuRespDTO> spuMap = CollectionUtils.convertMap(spuList, ProductSpuRespDTO::getId);
-        pageResult.getList().forEach(item -> {
-            item.setProducts(convertList2(seckillProducts));
-            MapUtils.findAndThen(spuMap, item.getSpuId(),
-                    spu -> item.setSpuName(spu.getName()).setPicUrl(spu.getPicUrl()).setMarketPrice(spu.getMarketPrice()));
+        Map<Long, List<SeckillProductDO>> productMap = convertMultiMap(seckillProducts, SeckillProductDO::getActivityId);
+        pageResult.getList().forEach(activity -> {
+            activity.setProducts(convertList2(productMap.get(activity.getId())));
+            MapUtils.findAndThen(spuMap, activity.getSpuId(),
+                    spu -> activity.setSpuName(spu.getName()).setPicUrl(spu.getPicUrl()).setMarketPrice(spu.getMarketPrice()));
         });
         return pageResult;
     }

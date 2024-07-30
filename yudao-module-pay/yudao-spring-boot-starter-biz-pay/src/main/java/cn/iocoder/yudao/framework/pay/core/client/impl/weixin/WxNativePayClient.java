@@ -34,7 +34,8 @@ public class WxNativePayClient extends AbstractWxPayClient {
     @Override
     protected PayOrderRespDTO doUnifiedOrderV2(PayOrderUnifiedReqDTO reqDTO) throws WxPayException {
         // 构建 WxPayUnifiedOrderRequest 对象
-        WxPayUnifiedOrderRequest request = buildPayUnifiedOrderRequestV2(reqDTO);
+        WxPayUnifiedOrderRequest request = buildPayUnifiedOrderRequestV2(reqDTO)
+                .setProductId(reqDTO.getOutTradeNo()); // V2 必须传递 productId，无需在微信配置。该参数在 V3 简化，无需传递！
         // 执行请求
         WxPayNativeOrderResult response = client.createOrder(request);
 

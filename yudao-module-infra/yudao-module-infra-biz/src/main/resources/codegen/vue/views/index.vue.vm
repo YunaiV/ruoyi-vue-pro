@@ -306,8 +306,8 @@ export default {
       await this.#[[$modal]]#.confirm('是否确认导出所有${table.classComment}数据项?');
       try {
         this.exportLoading = true;
-        const res = await ${simpleClassName}Api.export${simpleClassName}Excel(this.queryParams);
-        this.#[[$]]#download.excel(res.data, '${table.classComment}.xls');
+        const data = await ${simpleClassName}Api.export${simpleClassName}Excel(this.queryParams);
+        this.#[[$]]#download.excel(data, '${table.classComment}.xls');
       } catch {
       } finally {
         this.exportLoading = false;

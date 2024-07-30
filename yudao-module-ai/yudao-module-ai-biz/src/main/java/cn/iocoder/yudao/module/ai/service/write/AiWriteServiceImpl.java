@@ -114,7 +114,7 @@ public class AiWriteServiceImpl implements AiWriteService {
         if (Objects.nonNull(writeRole) && Objects.nonNull(writeRole.getModelId())) {
             model = chatModalService.getChatModel(writeRole.getModelId());
         }
-        if (Objects.isNull(model)) {
+        if (model == null) {
             model = chatModalService.getRequiredDefaultChatModel();
         }
         Assert.notNull(model, "[AI] 获取不到模型");

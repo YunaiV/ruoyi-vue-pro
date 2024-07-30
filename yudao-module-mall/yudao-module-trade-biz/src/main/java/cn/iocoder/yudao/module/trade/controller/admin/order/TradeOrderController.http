@@ -7,3 +7,8 @@ tenant-id: {{adminTenentId}}
 GET {{baseUrl}}/trade/order/get-detail?id=21
 Authorization: Bearer {{token}}
 tenant-id: {{adminTenentId}}
+
+### 获得交易订单的物流轨迹 => 成功
+GET {{baseUrl}}/trade/order/get-express-track-list?id=21
+Authorization: Bearer {{token}}
+tenant-id: {{adminTenentId}}
