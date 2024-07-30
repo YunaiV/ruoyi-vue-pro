@@ -64,9 +64,8 @@ public class SocialClientApiImpl implements SocialClientApi {
 
     @Override
     public List<SocialWxSubscribeTemplateRespDTO> getSubscribeTemplateList(Integer userType) {
-        List<TemplateInfo> subscribeTemplate = socialClientService.getSubscribeTemplateList(userType);
-        return convertList(subscribeTemplate, item -> BeanUtils.toBean(item, SocialWxSubscribeTemplateRespDTO.class)
-                .setId(item.getPriTmplId()));
+        List<TemplateInfo> list = socialClientService.getSubscribeTemplateList(userType);
+        return convertList(list, item -> BeanUtils.toBean(item, SocialWxSubscribeTemplateRespDTO.class).setId(item.getPriTmplId()));
     }
 
     @Override

@@ -49,6 +49,7 @@ public interface SocialClientApi {
      */
     byte[] getWxaQrcode(@Valid SocialWxQrcodeReqDTO reqVO);
 
+    // TODO @puhui999：要不是统一都叫 getWxaSubscribeTemplateList、SocialWxaSubscribeTemplateRespDTO
     /**
      * 获得微信小程订阅模板
      *
@@ -56,6 +57,7 @@ public interface SocialClientApi {
      */
     List<SocialWxSubscribeTemplateRespDTO> getSubscribeTemplateList(Integer userType);
 
+    // TODO @puhui999：sendWxaSubscribeMessage、SocialWxaSubscribeMessageSendReqDTO；然后不传递 socialType；就是专门给微信小程序的
     /**
      * 发送微信小程序订阅消息
      *

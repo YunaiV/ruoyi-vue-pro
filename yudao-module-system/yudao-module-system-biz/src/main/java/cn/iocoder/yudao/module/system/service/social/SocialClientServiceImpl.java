@@ -297,13 +297,13 @@ public class SocialClientServiceImpl implements SocialClientService {
      */
     private WxMaSubscribeMessage buildMessageSendReqDTO(SocialWxSubscribeMessageSendReqDTO reqDTO,
                                                         String templateId, String openId) {
-        // 1.1 设置订阅消息基本参数
+        // 设置订阅消息基本参数
         WxMaSubscribeMessage subscribeMessage = new WxMaSubscribeMessage().setLang("zh_CN").setMiniprogramState(envVersion)
                 .setTemplateId(templateId).setToUser(openId).setPage(reqDTO.getPage());
-        // 1.2 设置具体消息参数
+        // 设置具体消息参数
         Map<String, String> messages = reqDTO.getMessages();
         if (CollUtil.isNotEmpty(messages)) {
-            messages.keySet().forEach(key -> findAndThen(messages, key, value ->
+            reqDTO.getMessages().keySet().forEach(key -> findAndThen(messages, key, value ->
                     subscribeMessage.addData(new WxMaSubscribeMessage.MsgData(key, value))));
         }
         return subscribeMessage;

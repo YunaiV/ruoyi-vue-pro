@@ -2,6 +2,8 @@ package cn.iocoder.yudao.module.system.api.social.dto;
 
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.module.system.enums.social.SocialTypeEnum;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 import java.util.HashMap;
@@ -16,17 +18,19 @@ import java.util.Map;
 public class SocialWxSubscribeMessageSendReqDTO {
 
     /**
-     * 用户 id
+     * 用户编号
      *
      * 关联 MemberUserDO 的 id 编号
      * 关联 AdminUserDO 的 id 编号
      */
+    @NotNull(message = "用户编号不能为空")
     private Long userId;
     /**
-     * 用户类型, 预留 多商户转帐可能需要用到
+     * 用户类型
      *
      * 关联 {@link UserTypeEnum}
      */
+    @NotNull(message = "用户类型不能为空")
     private Integer userType;
 
     /**
@@ -34,11 +38,13 @@ public class SocialWxSubscribeMessageSendReqDTO {
      *
      * 枚举 {@link SocialTypeEnum}
      */
+    @NotNull(message = "社交类型不能为空")
     private Integer socialType;
 
     /**
      * 消息模版标题
      */
+    @NotEmpty(message = "消息模版标题不能为空")
     private String templateTitle;
 
     /**

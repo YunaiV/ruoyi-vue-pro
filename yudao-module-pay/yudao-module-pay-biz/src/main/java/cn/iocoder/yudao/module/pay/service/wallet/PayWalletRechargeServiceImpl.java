@@ -145,16 +145,16 @@ public class PayWalletRechargeServiceImpl implements PayWalletRechargeService {
 
     @Async
     public void sendPayWalletChangeMessage(Long payOrderId, PayWalletRechargeDO walletRecharge) {
-        // 1.1 获得会员钱包信息
+        // 1. 获得会员钱包信息
         PayWalletDO wallet = payWalletService.getWallet(walletRecharge.getWalletId());
-        // 1.2 构建并发送模版消息
+        // 2. 构建并发送模版消息
         socialClientApi.sendSubscribeMessage(new SocialWxSubscribeMessageSendReqDTO().setPage(WALLET_MONEY_PATH)
-                .setUserId(wallet.getUserId()).setUserType(wallet.getUserType()).setTemplateTitle(PAY_WALLET_CHANGE)
-                .setSocialType(SocialTypeEnum.WECHAT_MINI_APP.getType())
-                // 添加模版消息
-                .addMessage("phrase4", "充值成功").addMessage("character_string1", String.valueOf(payOrderId))
+                .setUserId(wallet.getUserId()).setUserType(wallet.getUserType())
+                .setTemplateTitle(PAY_WALLET_CHANGE).setSocialType(SocialTypeEnum.WECHAT_MINI_APP.getType())
+                .addMessage("character_string1", String.valueOf(payOrderId))
                 .addMessage("amount2", fenToYuanStr(walletRecharge.getTotalPrice()))
-                .addMessage("time3", LocalDateTimeUtil.formatNormal(LocalDateTime.now())));
+                .addMessage("time3", LocalDateTimeUtil.formatNormal(LocalDateTime.now()))
+                .addMessage("phrase4", "充值成功"));
     }
 
     @Override
