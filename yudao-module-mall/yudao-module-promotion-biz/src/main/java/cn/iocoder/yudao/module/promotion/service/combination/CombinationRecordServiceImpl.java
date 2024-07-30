@@ -66,7 +66,7 @@ public class CombinationRecordServiceImpl implements CombinationRecordService {
     private ProductSkuApi productSkuApi;
 
     @Resource
-    @Lazy
+    @Lazy // 延迟加载，避免循环依赖
     private TradeOrderApi tradeOrderApi;
 
     // TODO @芋艿：在详细预览下；

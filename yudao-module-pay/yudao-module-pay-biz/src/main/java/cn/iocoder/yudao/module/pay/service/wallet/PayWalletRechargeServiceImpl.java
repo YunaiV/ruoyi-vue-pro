@@ -59,8 +59,6 @@ public class PayWalletRechargeServiceImpl implements PayWalletRechargeService {
 
     private static final String WALLET_RECHARGE_ORDER_SUBJECT = "钱包余额充值";
 
-    public static final String WALLET_MONEY_PATH = "pages/user/wallet/money"; // 钱包详情页
-
     @Resource
     private PayWalletRechargeMapper walletRechargeMapper;
     @Resource
@@ -148,8 +146,10 @@ public class PayWalletRechargeServiceImpl implements PayWalletRechargeService {
         // 1. 获得会员钱包信息
         PayWalletDO wallet = payWalletService.getWallet(walletRecharge.getWalletId());
         // 2. 构建并发送模版消息
-        socialClientApi.sendWxaSubscribeMessage(new SocialWxaSubscribeMessageSendReqDTO().setPage(WALLET_MONEY_PATH)
-                .setUserId(wallet.getUserId()).setUserType(wallet.getUserType()).setTemplateTitle(WALLET_RECHARGER_PAID)
+        socialClientApi.sendWxaSubscribeMessage(new SocialWxaSubscribeMessageSendReqDTO()
+                .setUserId(wallet.getUserId()).setUserType(wallet.getUserType())
+                .setTemplateTitle(WALLET_RECHARGER_PAID)
+                .setPage("pages/user/wallet/money") // 钱包详情界面
                 .addMessage("character_string1", String.valueOf(payOrderId)) // 支付单编号
                 .addMessage("amount2", fenToYuanStr(walletRecharge.getTotalPrice())) // 充值金额
                 .addMessage("time3", LocalDateTimeUtil.formatNormal(walletRecharge.getCreateTime())) // 充值时间
@@ -229,8 +229,10 @@ public class PayWalletRechargeServiceImpl implements PayWalletRechargeService {
         PayWalletDO wallet = payWalletService.getWallet(walletId);
         // 2. 构建并发送模版消息
         String thing8 = PayRefundStatusEnum.isSuccess(payRefund.getStatus()) ? SUCCESS.getName() : FAILURE.getName();
-        socialClientApi.sendWxaSubscribeMessage(new SocialWxaSubscribeMessageSendReqDTO().setPage(WALLET_MONEY_PATH)
-                .setUserId(wallet.getUserId()).setUserType(wallet.getUserType()).setTemplateTitle(WALLET_RECHARGE_REFUNDED)
+        socialClientApi.sendWxaSubscribeMessage(new SocialWxaSubscribeMessageSendReqDTO()
+                .setUserId(wallet.getUserId()).setUserType(wallet.getUserType())
+                .setTemplateTitle(WALLET_RECHARGE_REFUNDED)
+                .setPage("pages/user/wallet/money") // 钱包详情界面
                 .addMessage("character_string1", String.valueOf(payRefund.getId())) // 退款订单编号
                 .addMessage("time7", LocalDateTimeUtil.formatNormal(payRefund.getCreateTime())) // 申请时间
                 .addMessage("amount3", fenToYuanStr(payRefund.getRefundPrice())) // 退款金额

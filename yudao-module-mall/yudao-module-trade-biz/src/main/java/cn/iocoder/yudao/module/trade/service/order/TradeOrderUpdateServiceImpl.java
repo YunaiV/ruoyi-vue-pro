@@ -83,8 +83,6 @@ import static cn.iocoder.yudao.module.trade.enums.MessageTemplateConstants.DELIV
 @Slf4j
 public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
 
-    public static final String ORDER_DETAIL_PATH = "pages/order/detail"; // 订单详情页
-
     @Resource
     private TradeOrderMapper tradeOrderMapper;
     @Resource
@@ -373,6 +371,7 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
                 MapUtil.<String, Object>builder().put("expressName", express != null ? express.getName() : "")
                         .put("logisticsNo", express != null ? deliveryReqVO.getLogisticsNo() : "").build());
 
+        // TODO @puhui999：可以改成 4.1 4.2。因为都算通知哈；
         // 4. 发送站内信
         tradeMessageService.sendMessageWhenDeliveryOrder(new TradeOrderMessageWhenDeliveryOrderReqBO()
                 .setOrderId(order.getId()).setUserId(order.getUserId()).setMessage(null));
@@ -384,8 +383,10 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
     public void sendDeliveryOrderMessage(TradeOrderDO order, TradeOrderDeliveryReqVO deliveryReqVO) {
         // 构建并发送模版消息
         Long orderId = order.getId();
-        socialClientApi.sendWxaSubscribeMessage(new SocialWxaSubscribeMessageSendReqDTO().setPage(ORDER_DETAIL_PATH + "?id=" + orderId)
-                .setUserId(order.getUserId()).setUserType(UserTypeEnum.MEMBER.getValue()).setTemplateTitle(DELIVERY_ORDER)
+        socialClientApi.sendWxaSubscribeMessage(new SocialWxaSubscribeMessageSendReqDTO()
+                .setUserId(order.getUserId()).setUserType(UserTypeEnum.MEMBER.getValue())
+                .setTemplateTitle(DELIVERY_ORDER)
+                .setPage("pages/order/detail?id=" + orderId) // 订单详情页
                 .addMessage("character_string3", String.valueOf(orderId)) // 订单编号
                 .addMessage("phrase6", TradeOrderStatusEnum.DELIVERED.getName()) // 订单状态
                 .addMessage("date4", LocalDateTimeUtil.formatNormal(LocalDateTime.now()))// 发货时间
