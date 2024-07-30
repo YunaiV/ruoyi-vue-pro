@@ -1,7 +1,6 @@
 package cn.iocoder.yudao.module.system.api.social.dto;
 
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
-import cn.iocoder.yudao.module.system.enums.social.SocialTypeEnum;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
@@ -15,7 +14,7 @@ import java.util.Map;
  * @author HUIHUI
  */
 @Data
-public class SocialWxSubscribeMessageSendReqDTO {
+public class SocialWxaSubscribeMessageSendReqDTO {
 
     /**
      * 用户编号
@@ -32,14 +31,6 @@ public class SocialWxSubscribeMessageSendReqDTO {
      */
     @NotNull(message = "用户类型不能为空")
     private Integer userType;
-
-    /**
-     * 社交类型
-     *
-     * 枚举 {@link SocialTypeEnum}
-     */
-    @NotNull(message = "社交类型不能为空")
-    private Integer socialType;
 
     /**
      * 消息模版标题
@@ -59,7 +50,7 @@ public class SocialWxSubscribeMessageSendReqDTO {
      */
     private Map<String, String> messages;
 
-    public SocialWxSubscribeMessageSendReqDTO addMessage(String key, String value) {
+    public SocialWxaSubscribeMessageSendReqDTO addMessage(String key, String value) {
         if (messages == null) {
             messages = new HashMap<>();
         }

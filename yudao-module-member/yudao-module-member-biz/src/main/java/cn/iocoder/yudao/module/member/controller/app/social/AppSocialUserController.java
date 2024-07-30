@@ -71,7 +71,7 @@ public class AppSocialUserController {
     @GetMapping("/get-subscribe-template-list")
     @Operation(summary = "获得微信小程订阅模板列表")
     public CommonResult<List<AppSocialWxSubscribeTemplateRespVO>> getSubscribeTemplateList() {
-        List<SocialWxSubscribeTemplateRespDTO> template = socialClientApi.getSubscribeTemplateList(UserTypeEnum.MEMBER.getValue());
+        List<SocialWxaSubscribeTemplateRespDTO> template = socialClientApi.getWxaSubscribeTemplateList(UserTypeEnum.MEMBER.getValue());
         return success(BeanUtils.toBean(template, AppSocialWxSubscribeTemplateRespVO.class));
     }
 

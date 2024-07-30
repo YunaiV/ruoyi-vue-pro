@@ -9,7 +9,7 @@ import lombok.Data;
  * @author HUIHUI
  */
 @Data
-public class SocialWxSubscribeTemplateRespDTO {
+public class SocialWxaSubscribeTemplateRespDTO {
 
     /**
      * 模版编号

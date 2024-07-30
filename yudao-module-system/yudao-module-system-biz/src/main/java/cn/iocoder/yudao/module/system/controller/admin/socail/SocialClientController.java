@@ -4,7 +4,7 @@ import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.system.api.social.SocialClientApi;
-import cn.iocoder.yudao.module.system.api.social.dto.SocialWxSubscribeMessageSendReqDTO;
+import cn.iocoder.yudao.module.system.api.social.dto.SocialWxaSubscribeMessageSendReqDTO;
 import cn.iocoder.yudao.module.system.controller.admin.socail.vo.client.SocialClientPageReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.socail.vo.client.SocialClientRespVO;
 import cn.iocoder.yudao.module.system.controller.admin.socail.vo.client.SocialClientSaveReqVO;
@@ -76,8 +76,8 @@ public class SocialClientController {
     @PostMapping("/send-subscribe-message")
     @Operation(summary = "发送订阅消息") // 用于测试
     @PreAuthorize("@ss.hasPermission('system:social-client:query')")
-    public void sendSubscribeMessage(@RequestBody SocialWxSubscribeMessageSendReqDTO reqDTO) {
-        socialClientApi.sendSubscribeMessage(reqDTO);
+    public void sendSubscribeMessage(@RequestBody SocialWxaSubscribeMessageSendReqDTO reqDTO) {
+        socialClientApi.sendWxaSubscribeMessage(reqDTO);
     }
 
 }
