@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.trade.service.order;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.ObjUtil;
@@ -19,6 +20,8 @@ import cn.iocoder.yudao.module.pay.api.order.dto.PayOrderRespDTO;
 import cn.iocoder.yudao.module.pay.enums.order.PayOrderStatusEnum;
 import cn.iocoder.yudao.module.product.api.comment.ProductCommentApi;
 import cn.iocoder.yudao.module.product.api.comment.dto.ProductCommentCreateReqDTO;
+import cn.iocoder.yudao.module.system.api.social.SocialClientApi;
+import cn.iocoder.yudao.module.system.api.social.dto.SocialWxaSubscribeMessageSendReqDTO;
 import cn.iocoder.yudao.module.trade.controller.admin.order.vo.TradeOrderDeliveryReqVO;
 import cn.iocoder.yudao.module.trade.controller.admin.order.vo.TradeOrderRemarkReqVO;
 import cn.iocoder.yudao.module.trade.controller.admin.order.vo.TradeOrderUpdateAddressReqVO;
@@ -52,6 +55,7 @@ import cn.iocoder.yudao.module.trade.service.price.calculator.TradePriceCalculat
 import jakarta.annotation.Resource;
 import jakarta.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -67,6 +71,7 @@ import static cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils.min
 import static cn.iocoder.yudao.framework.common.util.servlet.ServletUtils.getClientIP;
 import static cn.iocoder.yudao.framework.web.core.util.WebFrameworkUtils.getTerminal;
 import static cn.iocoder.yudao.module.trade.enums.ErrorCodeConstants.*;
+import static cn.iocoder.yudao.module.trade.enums.MessageTemplateConstants.DELIVERY_ORDER;
 
 /**
  * 交易订单【写】Service 实现类
@@ -77,6 +82,8 @@ import static cn.iocoder.yudao.module.trade.enums.ErrorCodeConstants.*;
 @Service
 @Slf4j
 public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
+
+    public static final String ORDER_DETAIL_PATH = "pages/order/detail"; // 订单详情页
 
     @Resource
     private TradeOrderMapper tradeOrderMapper;
@@ -103,6 +110,8 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
     private MemberAddressApi addressApi;
     @Resource
     private ProductCommentApi productCommentApi;
+    @Resource
+    public SocialClientApi socialClientApi;
 
     @Resource
     private TradeOrderProperties tradeOrderProperties;
@@ -367,6 +376,21 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
         // 4. 发送站内信
         tradeMessageService.sendMessageWhenDeliveryOrder(new TradeOrderMessageWhenDeliveryOrderReqBO()
                 .setOrderId(order.getId()).setUserId(order.getUserId()).setMessage(null));
+        // 5. 发送订阅消息
+        getSelf().sendDeliveryOrderMessage(order, deliveryReqVO);
+    }
+
+    @Async
+    public void sendDeliveryOrderMessage(TradeOrderDO order, TradeOrderDeliveryReqVO deliveryReqVO) {
+        // 构建并发送模版消息
+        Long orderId = order.getId();
+        socialClientApi.sendWxaSubscribeMessage(new SocialWxaSubscribeMessageSendReqDTO().setPage(ORDER_DETAIL_PATH + "?id=" + orderId)
+                .setUserId(order.getUserId()).setUserType(UserTypeEnum.MEMBER.getValue()).setTemplateTitle(DELIVERY_ORDER)
+                .addMessage("character_string3", String.valueOf(orderId)) // 订单编号
+                .addMessage("phrase6", TradeOrderStatusEnum.DELIVERED.getName()) // 订单状态
+                .addMessage("date4", LocalDateTimeUtil.formatNormal(LocalDateTime.now()))// 发货时间
+                .addMessage("character_string5", deliveryReqVO.getLogisticsNo()) // 快递单号
+                .addMessage("thing9", order.getReceiverDetailAddress())); // 收货地址
     }
 
     /**

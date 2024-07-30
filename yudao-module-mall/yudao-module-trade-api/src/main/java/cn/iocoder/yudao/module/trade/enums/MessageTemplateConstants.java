@@ -17,16 +17,6 @@ public interface MessageTemplateConstants {
     //======================= 小程序订阅消息模版 =======================
 
     String TRADE_AFTER_SALE_CHANGE = "售后进度通知";
-
-    /**
-     * 售后进度通知相关参数枚举
-     *
-     * @author HUIHUI
-     */
-    class TradeAfterSaleChangeReqParams {
-
-        public static final String ORDER_DELIVERY = "order_delivery";
-
-    }
+    String DELIVERY_ORDER = "订单发货通知";
 
 }

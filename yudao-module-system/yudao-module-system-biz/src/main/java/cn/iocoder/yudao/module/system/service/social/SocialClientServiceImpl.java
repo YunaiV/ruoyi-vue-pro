@@ -6,6 +6,7 @@ import cn.binarywang.wx.miniapp.api.impl.WxMaServiceImpl;
 import cn.binarywang.wx.miniapp.bean.WxMaPhoneNumberInfo;
 import cn.binarywang.wx.miniapp.bean.WxMaSubscribeMessage;
 import cn.binarywang.wx.miniapp.config.impl.WxMaRedisBetterConfigImpl;
+import cn.binarywang.wx.miniapp.constant.WxMaConstants;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Assert;
@@ -18,11 +19,12 @@ import cn.iocoder.yudao.framework.common.util.cache.CacheUtils;
 import cn.iocoder.yudao.framework.common.util.http.HttpUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.system.api.social.dto.SocialWxQrcodeReqDTO;
-import cn.iocoder.yudao.module.system.api.social.dto.SocialWxSubscribeMessageSendReqDTO;
+import cn.iocoder.yudao.module.system.api.social.dto.SocialWxaSubscribeMessageSendReqDTO;
 import cn.iocoder.yudao.module.system.controller.admin.socail.vo.client.SocialClientPageReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.socail.vo.client.SocialClientSaveReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.social.SocialClientDO;
 import cn.iocoder.yudao.module.system.dal.mysql.social.SocialClientMapper;
+import cn.iocoder.yudao.module.system.dal.redis.RedisKeyConstants;
 import cn.iocoder.yudao.module.system.enums.social.SocialTypeEnum;
 import com.binarywang.spring.starter.wxjava.miniapp.properties.WxMaProperties;
 import com.binarywang.spring.starter.wxjava.mp.properties.WxMpProperties;
@@ -47,6 +49,7 @@ import me.chanjar.weixin.mp.api.WxMpService;
 import me.chanjar.weixin.mp.api.impl.WxMpServiceImpl;
 import me.chanjar.weixin.mp.config.impl.WxMpRedisConfigImpl;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
@@ -264,6 +267,7 @@ public class SocialClientServiceImpl implements SocialClientService {
     }
 
     @Override
+    @Cacheable(cacheNames = RedisKeyConstants.WXA_SUBSCRIBE_TEMPLATE, key = "#userType", condition = "#result != null")
     public List<TemplateInfo> getSubscribeTemplateList(Integer userType) {
         WxMaService service = getWxMaService(userType);
         try {
@@ -276,7 +280,7 @@ public class SocialClientServiceImpl implements SocialClientService {
     }
 
     @Override
-    public void sendSubscribeMessage(SocialWxSubscribeMessageSendReqDTO reqDTO, String templateId, String openId) {
+    public void sendSubscribeMessage(SocialWxaSubscribeMessageSendReqDTO reqDTO, String templateId, String openId) {
         WxMaService service = getWxMaService(reqDTO.getUserType());
         try {
             WxMaSubscribeService subscribeService = service.getSubscribeService();
@@ -293,13 +297,13 @@ public class SocialClientServiceImpl implements SocialClientService {
      * @param reqDTO     请求
      * @param templateId 模版编号
      * @param openId     会员 openId
-     * @return 微信小程序订阅消息发送
+     * @return 微信小程序订阅消息请求参数
      */
-    private WxMaSubscribeMessage buildMessageSendReqDTO(SocialWxSubscribeMessageSendReqDTO reqDTO,
+    private WxMaSubscribeMessage buildMessageSendReqDTO(SocialWxaSubscribeMessageSendReqDTO reqDTO,
                                                         String templateId, String openId) {
         // 设置订阅消息基本参数
-        WxMaSubscribeMessage subscribeMessage = new WxMaSubscribeMessage().setLang("zh_CN").setMiniprogramState(envVersion)
-                .setTemplateId(templateId).setToUser(openId).setPage(reqDTO.getPage());
+        WxMaSubscribeMessage subscribeMessage = new WxMaSubscribeMessage().setLang(WxMaConstants.MiniProgramLang.ZH_CN)
+                .setMiniprogramState(envVersion).setTemplateId(templateId).setToUser(openId).setPage(reqDTO.getPage());
         // 设置具体消息参数
         Map<String, String> messages = reqDTO.getMessages();
         if (CollUtil.isNotEmpty(messages)) {

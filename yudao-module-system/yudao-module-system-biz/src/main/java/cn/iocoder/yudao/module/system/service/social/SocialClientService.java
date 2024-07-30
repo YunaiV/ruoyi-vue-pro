@@ -3,7 +3,7 @@ package cn.iocoder.yudao.module.system.service.social;
 import cn.binarywang.wx.miniapp.bean.WxMaPhoneNumberInfo;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.system.api.social.dto.SocialWxQrcodeReqDTO;
-import cn.iocoder.yudao.module.system.api.social.dto.SocialWxSubscribeMessageSendReqDTO;
+import cn.iocoder.yudao.module.system.api.social.dto.SocialWxaSubscribeMessageSendReqDTO;
 import cn.iocoder.yudao.module.system.controller.admin.socail.vo.client.SocialClientPageReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.socail.vo.client.SocialClientSaveReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.social.SocialClientDO;
@@ -76,6 +76,9 @@ public interface SocialClientService {
     /**
      * 获得微信小程订阅模板
      *
+     * 缓存的目的：考虑到微信小程序订阅消息选择好模版后几乎不会变动，缓存增加查询效率
+     *
+     * @param userType 用户类型
      * @return 微信小程订阅模板
      */
     List<TemplateInfo> getSubscribeTemplateList(Integer userType);
@@ -87,7 +90,7 @@ public interface SocialClientService {
      * @param templateId 模版编号
      * @param openId     会员 openId
      */
-    void sendSubscribeMessage(SocialWxSubscribeMessageSendReqDTO reqDTO, String templateId, String openId);
+    void sendSubscribeMessage(SocialWxaSubscribeMessageSendReqDTO reqDTO, String templateId, String openId);
 
     // =================== 客户端管理 ===================
 

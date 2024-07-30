@@ -9,6 +9,7 @@ public interface MessageTemplateConstants {
 
     //======================= 小程序订阅消息 =======================
 
-    String PAY_WALLET_CHANGE = "充值成功通知";
+    String WALLET_RECHARGER_PAID = "充值成功通知";
+    String WALLET_RECHARGE_REFUNDED = "退款申请通知";
 
 }
