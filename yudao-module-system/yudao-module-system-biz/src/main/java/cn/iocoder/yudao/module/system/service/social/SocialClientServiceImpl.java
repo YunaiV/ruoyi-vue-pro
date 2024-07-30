@@ -290,9 +290,9 @@ public class SocialClientServiceImpl implements SocialClientService {
     /**
      * 构建发送消息请求参数
      *
-     * @param openId   接收者（用户）的 openid
-     * @param path     点击模板卡片后的跳转页面，仅限本小程序内的页面
-     * @param template 订阅模版
+     * @param reqDTO     请求
+     * @param templateId 模版编号
+     * @param openId     会员 openId
      * @return 微信小程序订阅消息发送
      */
     private WxMaSubscribeMessage buildMessageSendReqDTO(SocialWxSubscribeMessageSendReqDTO reqDTO,
