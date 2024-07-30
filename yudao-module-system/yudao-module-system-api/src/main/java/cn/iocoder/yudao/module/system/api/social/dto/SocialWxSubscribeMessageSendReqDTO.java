@@ -1,36 +1,45 @@
 package cn.iocoder.yudao.module.system.api.social.dto;
 
-import jakarta.validation.constraints.NotNull;
+import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
+import cn.iocoder.yudao.module.system.enums.social.SocialTypeEnum;
 import lombok.Data;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
  * 微信小程序订阅消息发送 Request DTO
  *
- * @see <a href="https://developers.weixin.qq.com/miniprogram/dev/api-backend/open-api/subscribe-message/subscribeMessage.send.html">接口文档</a>
  * @author HUIHUI
  */
 @Data
 public class SocialWxSubscribeMessageSendReqDTO {
 
-    // TODO @puhui999：貌似使用 userId + userType 会不会更合理哈。这样，后端进行查询三方用户的绑定表~
     /**
-     * 接收者（用户）的 openid.
-     * <pre>
-     * 参数：touser
-     * 是否必填： 是
-     * 描述： 接收者（用户）的 openid
-     * </pre>
+     * 用户 id
+     *
+     * 关联 MemberUserDO 的 id 编号
+     * 关联 AdminUserDO 的 id 编号
      */
-    @NotNull(message = "接收者（用户）的 openid不能为空")
-    private String toUser;
+    private Long userId;
+    /**
+     * 用户类型, 预留 多商户转帐可能需要用到
+     *
+     * 关联 {@link UserTypeEnum}
+     */
+    private Integer userType;
 
     /**
-     * 模版消息编号
+     * 社交类型
+     *
+     * 枚举 {@link SocialTypeEnum}
      */
-    @NotNull(message = "模版消息编号不能为空")
-    private String templateId;
+    private Integer socialType;
+
+    /**
+     * 消息模版标题
+     */
+    private String templateTitle;
 
     /**
      * 点击模板卡片后的跳转页面，仅限本小程序内的页面
@@ -40,30 +49,16 @@ public class SocialWxSubscribeMessageSendReqDTO {
     private String page;
 
     /**
-     * 跳转小程序类型
-     *
-     * developer 为开发版；trial 为体验版；formal 为正式版【默认】
-     *
-     * 枚举 WxMaConstants.MiniProgramState
-     */
-    // TODO @puhui999：这个非必填。如果没有，代码里去默认下；
-    @NotNull(message = "跳转小程序类型不能为空")
-    private String miniprogramState;
-
-    /**
-     * 进入小程序查看的语言类型
-     *
-     * zh_CN(简体中文)【默认】、en_US(英文)、zh_HK(繁体中文)、zh_TW(繁体中文)
-     *
-     * 枚举 WxMaConstants.MiniProgramLang
-     */
-    // TODO @puhui999：这个非必填。如果没有，代码里去默认下；
-    @NotNull(message = "进入小程序查看的语言类型不能为空")
-    private String lang;
-
-    /**
      * 模板内容的参数
      */
     private Map<String, String> messages;
+
+    public SocialWxSubscribeMessageSendReqDTO addMessage(String key, String value) {
+        if (messages == null) {
+            messages = new HashMap<>();
+        }
+        messages.put(key, value);
+        return this;
+    }
 
 }

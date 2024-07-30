@@ -6,14 +6,15 @@ Content-Type: application/json
 tenant-id: {{adminTenentId}}
 
 {
-  "toUser": "oKNkb4xxw2H135-MVPKtEMkumK08",
-  "templateId": "W4ybDTIwCfKHtMKR7fSfx83DtmVKEeXQo3Ti7GCw4_4",
-  "miniprogramState": "developer",
-  "lang": "zh_CN",
+  "userId": 247,
+  "userType": 1,
+  "socialType": 34,
+  "templateTitle": "充值成功通知",
+  "page": "",
   "messages": {
      "character_string1":"5616122165165",
      "amount2":"1000.00",
      "time3":"2024-01-01 10:10:10",
-     "phrase4":"成功"
+    "phrase4": "充值成功"
   }
 }
