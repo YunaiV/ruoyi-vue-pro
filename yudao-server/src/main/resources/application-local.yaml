@@ -223,6 +223,8 @@ yudao:
   demo: false # 关闭演示模式
   wxa-code:
     env-version: develop # 小程序版本: 正式版为 "release"；体验版为 "trial"；开发版为 "develop"
+  wxa-subscribe-message:
+    miniprogram-state: developer # 跳转小程序类型：developer为开发版；trial为体验版；formal为正式版；
   tencent-lbs-key: TVDBZ-TDILD-4ON4B-PFDZA-RNLKH-VVF6E # QQ 地图的密钥 https://lbs.qq.com/service/staticV2/staticGuide/staticDoc
 
 justauth:
