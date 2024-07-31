@@ -371,11 +371,10 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
                 MapUtil.<String, Object>builder().put("expressName", express != null ? express.getName() : "")
                         .put("logisticsNo", express != null ? deliveryReqVO.getLogisticsNo() : "").build());
 
-        // TODO @puhui999：可以改成 4.1 4.2。因为都算通知哈；
-        // 4. 发送站内信
+        // 4.1 发送站内信
         tradeMessageService.sendMessageWhenDeliveryOrder(new TradeOrderMessageWhenDeliveryOrderReqBO()
                 .setOrderId(order.getId()).setUserId(order.getUserId()).setMessage(null));
-        // 5. 发送订阅消息
+        // 4.2 发送订阅消息
         getSelf().sendDeliveryOrderMessage(order, deliveryReqVO);
     }
 

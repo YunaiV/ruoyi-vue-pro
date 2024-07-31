@@ -73,7 +73,7 @@ import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.*;
 public class SocialClientServiceImpl implements SocialClientService {
 
     /**
-     * 小程序版本
+     * 小程序码要打开的小程序版本
      *
      * 1. release：正式版
      * 2. trial：体验版
@@ -81,6 +81,11 @@ public class SocialClientServiceImpl implements SocialClientService {
      */
     @Value("${yudao.wxa-code.env-version:release}")
     public String envVersion;
+    /**
+     * 订阅消息跳转小程序类型：developer为开发版；trial为体验版；formal为正式版；
+     */
+    @Value("${yudao.wxa-subscribe-message.miniprogram-state:formal}")
+    public String miniprogramState;
 
     @Resource
     private AuthRequestFactory authRequestFactory;
@@ -307,7 +312,7 @@ public class SocialClientServiceImpl implements SocialClientService {
                                                         String templateId, String openId) {
         // 设置订阅消息基本参数
         WxMaSubscribeMessage subscribeMessage = new WxMaSubscribeMessage().setLang(WxMaConstants.MiniProgramLang.ZH_CN)
-                .setMiniprogramState(envVersion).setTemplateId(templateId).setToUser(openId).setPage(reqDTO.getPage());
+                .setMiniprogramState(miniprogramState).setTemplateId(templateId).setToUser(openId).setPage(reqDTO.getPage());
         // 设置具体消息参数
         Map<String, String> messages = reqDTO.getMessages();
         if (CollUtil.isNotEmpty(messages)) {
