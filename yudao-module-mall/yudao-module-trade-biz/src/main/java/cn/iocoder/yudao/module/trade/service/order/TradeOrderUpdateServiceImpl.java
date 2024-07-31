@@ -7,6 +7,7 @@ import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.RandomUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.framework.common.core.KeyValue;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
@@ -389,7 +390,7 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
                 .addMessage("character_string3", String.valueOf(orderId)) // 订单编号
                 .addMessage("phrase6", TradeOrderStatusEnum.DELIVERED.getName()) // 订单状态
                 .addMessage("date4", LocalDateTimeUtil.formatNormal(LocalDateTime.now()))// 发货时间
-                .addMessage("character_string5", deliveryReqVO.getLogisticsNo()) // 快递单号
+                .addMessage("character_string5", StrUtil.blankToDefault(deliveryReqVO.getLogisticsNo(), "-")) // 快递单号
                 .addMessage("thing9", order.getReceiverDetailAddress())); // 收货地址
     }
 
