@@ -35,4 +35,10 @@ public @interface RegexDesensitize {
      * 脱敏后字符串 ******456789
      */
     String replacer() default "******";
+
+    /**
+     * el 表达式，当执行 condition 返回 true 的时候，跳过脱敏
+     */
+    String condition() default "";
+
 }

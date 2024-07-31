@@ -40,4 +40,10 @@ public @interface SliderDesensitize {
      * 前缀保留长度
      */
     int prefixKeep() default 0;
+
+    /**
+     * el 表达式，当执行 condition 返回 true 的时候，跳过脱敏
+     */
+    String condition() default "";
+
 }

@@ -22,4 +22,10 @@ public class CarLicenseDesensitization extends AbstractSliderDesensitizationHand
     String getReplacer(CarLicenseDesensitize annotation) {
         return annotation.replacer();
     }
+
+    @Override
+    String getCondition(CarLicenseDesensitize annotation) {
+        return annotation.condition();
+    }
+
 }

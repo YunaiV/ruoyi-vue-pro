@@ -18,4 +18,10 @@ public class DefaultRegexDesensitizationHandler extends AbstractRegexDesensitiza
     String getReplacer(RegexDesensitize annotation) {
         return annotation.replacer();
     }
+
+    @Override
+    String getCondition(RegexDesensitize annotation) {
+        return annotation.condition();
+    }
+
 }
