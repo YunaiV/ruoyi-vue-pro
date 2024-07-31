@@ -124,7 +124,7 @@ public class AiMindMapServiceImpl implements AiMindMapService {
         if (role != null && role.getModelId() != null) {
             model = chatModalService.getChatModel(role.getModelId());
         }
-        if (model != null) {
+        if (model == null) {
             model = chatModalService.getRequiredDefaultChatModel();
         }
         Assert.notNull(model, "[AI] 获取不到模型");
