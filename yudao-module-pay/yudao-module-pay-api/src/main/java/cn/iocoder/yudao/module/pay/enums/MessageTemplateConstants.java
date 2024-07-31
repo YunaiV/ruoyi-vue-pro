@@ -7,8 +7,8 @@ package cn.iocoder.yudao.module.pay.enums;
  */
 public interface MessageTemplateConstants {
 
-    //======================= 小程序订阅消息 =======================
+    // ======================= 小程序订阅消息 =======================
 
-    String WALLET_RECHARGER_PAID = "充值成功通知";
+    String WXA_WALLET_RECHARGER_PAID = "充值成功通知";
 
 }

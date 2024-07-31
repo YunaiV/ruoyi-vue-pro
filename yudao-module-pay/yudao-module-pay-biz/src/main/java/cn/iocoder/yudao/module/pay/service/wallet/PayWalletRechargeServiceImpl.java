@@ -39,7 +39,7 @@ import static cn.iocoder.yudao.framework.common.util.json.JsonUtils.toJsonString
 import static cn.iocoder.yudao.framework.common.util.number.MoneyUtils.fenToYuanStr;
 import static cn.iocoder.yudao.module.pay.convert.wallet.PayWalletRechargeConvert.INSTANCE;
 import static cn.iocoder.yudao.module.pay.enums.ErrorCodeConstants.*;
-import static cn.iocoder.yudao.module.pay.enums.MessageTemplateConstants.WALLET_RECHARGER_PAID;
+import static cn.iocoder.yudao.module.pay.enums.MessageTemplateConstants.WXA_WALLET_RECHARGER_PAID;
 import static cn.iocoder.yudao.module.pay.enums.refund.PayRefundStatusEnum.*;
 
 /**
@@ -147,7 +147,7 @@ public class PayWalletRechargeServiceImpl implements PayWalletRechargeService {
         // 2. 构建并发送模版消息
         socialClientApi.sendWxaSubscribeMessage(new SocialWxaSubscribeMessageSendReqDTO()
                 .setUserId(wallet.getUserId()).setUserType(wallet.getUserType())
-                .setTemplateTitle(WALLET_RECHARGER_PAID)
+                .setTemplateTitle(WXA_WALLET_RECHARGER_PAID)
                 .setPage("pages/user/wallet/money") // 钱包详情界面
                 .addMessage("character_string1", String.valueOf(payOrderId)) // 支付单编号
                 .addMessage("amount2", fenToYuanStr(walletRecharge.getTotalPrice())) // 充值金额

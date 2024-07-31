@@ -71,7 +71,7 @@ import static cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils.min
 import static cn.iocoder.yudao.framework.common.util.servlet.ServletUtils.getClientIP;
 import static cn.iocoder.yudao.framework.web.core.util.WebFrameworkUtils.getTerminal;
 import static cn.iocoder.yudao.module.trade.enums.ErrorCodeConstants.*;
-import static cn.iocoder.yudao.module.trade.enums.MessageTemplateConstants.DELIVERY_ORDER;
+import static cn.iocoder.yudao.module.trade.enums.MessageTemplateConstants.WXA_ORDER_DELIVERY;
 
 /**
  * 交易订单【写】Service 实现类
@@ -384,7 +384,7 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
         Long orderId = order.getId();
         socialClientApi.sendWxaSubscribeMessage(new SocialWxaSubscribeMessageSendReqDTO()
                 .setUserId(order.getUserId()).setUserType(UserTypeEnum.MEMBER.getValue())
-                .setTemplateTitle(DELIVERY_ORDER)
+                .setTemplateTitle(WXA_ORDER_DELIVERY)
                 .setPage("pages/order/detail?id=" + orderId) // 订单详情页
                 .addMessage("character_string3", String.valueOf(orderId)) // 订单编号
                 .addMessage("phrase6", TradeOrderStatusEnum.DELIVERED.getName()) // 订单状态
