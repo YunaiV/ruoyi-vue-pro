@@ -40,7 +40,6 @@ import static cn.iocoder.yudao.framework.common.util.number.MoneyUtils.fenToYuan
 import static cn.iocoder.yudao.module.pay.convert.wallet.PayWalletRechargeConvert.INSTANCE;
 import static cn.iocoder.yudao.module.pay.enums.ErrorCodeConstants.*;
 import static cn.iocoder.yudao.module.pay.enums.MessageTemplateConstants.WALLET_RECHARGER_PAID;
-import static cn.iocoder.yudao.module.pay.enums.MessageTemplateConstants.WALLET_RECHARGE_REFUNDED;
 import static cn.iocoder.yudao.module.pay.enums.refund.PayRefundStatusEnum.*;
 
 /**
@@ -218,26 +217,6 @@ public class PayWalletRechargeServiceImpl implements PayWalletRechargeService {
         }
         // 3. 更新钱包充值的退款字段
         walletRechargeMapper.updateByIdAndRefunded(id, WAITING.getStatus(), updateObj);
-
-        // 4. 发送订阅消息
-        getSelf().sendWalletRechargeRefundedMessage(walletRecharge.getWalletId(), payRefund);
-    }
-
-    @Async
-    public void sendWalletRechargeRefundedMessage(Long walletId, PayRefundDO payRefund) {
-        // 1. 获得会员钱包信息
-        PayWalletDO wallet = payWalletService.getWallet(walletId);
-        // 2. 构建并发送模版消息
-        String thing8 = PayRefundStatusEnum.isSuccess(payRefund.getStatus()) ? SUCCESS.getName() : FAILURE.getName();
-        socialClientApi.sendWxaSubscribeMessage(new SocialWxaSubscribeMessageSendReqDTO()
-                .setUserId(wallet.getUserId()).setUserType(wallet.getUserType())
-                .setTemplateTitle(WALLET_RECHARGE_REFUNDED)
-                .setPage("pages/user/wallet/money") // 钱包详情界面
-                .addMessage("character_string1", String.valueOf(payRefund.getId())) // 退款订单编号
-                .addMessage("time7", LocalDateTimeUtil.formatNormal(payRefund.getCreateTime())) // 申请时间
-                .addMessage("amount3", fenToYuanStr(payRefund.getRefundPrice())) // 退款金额
-                .addMessage("thing4", payRefund.getReason()) // 退款原因
-                .addMessage("thing8", thing8 + "，点击卡片查看详情")); // 温馨提示
     }
 
     private PayRefundDO validateWalletRechargeCanRefunded(PayWalletRechargeDO walletRecharge, Long payRefundId) {

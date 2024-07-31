@@ -16,7 +16,6 @@ public interface MessageTemplateConstants {
 
     //======================= 小程序订阅消息模版 =======================
 
-    String TRADE_AFTER_SALE_CHANGE = "售后进度通知";
     String DELIVERY_ORDER = "订单发货通知";
 
 }
