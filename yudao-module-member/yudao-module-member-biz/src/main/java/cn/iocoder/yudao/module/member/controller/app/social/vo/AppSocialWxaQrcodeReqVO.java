@@ -7,7 +7,7 @@ import lombok.Data;
 
 @Schema(description = "用户 APP - 获得获取小程序码 Request VO")
 @Data
-public class AppSocialWxQrcodeReqVO {
+public class AppSocialWxaQrcodeReqVO {
 
     /**
      * 页面路径不能携带参数（参数请放在scene字段里）
