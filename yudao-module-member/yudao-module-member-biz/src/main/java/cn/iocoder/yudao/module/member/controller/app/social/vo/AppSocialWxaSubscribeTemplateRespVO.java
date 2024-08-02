@@ -5,7 +5,7 @@ import lombok.Data;
 
 @Schema(description = "用户 APP - 获得小程序订阅模版 Response VO")
 @Data
-public class AppSocialWxSubscribeTemplateRespVO {
+public class AppSocialWxaSubscribeTemplateRespVO {
 
     @Schema(description = "模版编号", requiredMode = Schema.RequiredMode.REQUIRED,
             example = "9Aw5ZV1j9xdWTFEkqCpZ7mIBbSC34khK55OtzUPl0rU")
