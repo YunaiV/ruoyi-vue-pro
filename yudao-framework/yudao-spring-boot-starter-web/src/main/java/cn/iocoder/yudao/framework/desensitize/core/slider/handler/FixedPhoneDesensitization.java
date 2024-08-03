@@ -22,4 +22,10 @@ public class FixedPhoneDesensitization extends AbstractSliderDesensitizationHand
     String getReplacer(FixedPhoneDesensitize annotation) {
         return annotation.replacer();
     }
+
+    @Override
+    String getCondition(FixedPhoneDesensitize annotation) {
+        return annotation.condition();
+    }
+
 }

@@ -22,4 +22,10 @@ public class DefaultDesensitizationHandler extends AbstractSliderDesensitization
     String getReplacer(SliderDesensitize annotation) {
         return annotation.replacer();
     }
+
+    @Override
+    String getCondition(SliderDesensitize annotation) {
+        return annotation.condition();
+    }
+
 }

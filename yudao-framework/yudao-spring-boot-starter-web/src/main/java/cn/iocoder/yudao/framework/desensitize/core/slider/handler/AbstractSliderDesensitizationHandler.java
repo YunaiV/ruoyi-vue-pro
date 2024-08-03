@@ -1,5 +1,7 @@
 package cn.iocoder.yudao.framework.desensitize.core.slider.handler;
 
+import cn.hutool.extra.spring.SpringUtil;
+import cn.iocoder.yudao.framework.common.util.spring.SpringExpressionUtils;
 import cn.iocoder.yudao.framework.desensitize.core.base.handler.DesensitizationHandler;
 
 import java.lang.annotation.Annotation;
@@ -14,6 +16,10 @@ public abstract class AbstractSliderDesensitizationHandler<T extends Annotation>
 
     @Override
     public String desensitize(String origin, T annotation) {
+        Object expressionResult = SpringExpressionUtils.parseExpression(SpringUtil.getApplicationContext(), getCondition(annotation));
+        if (expressionResult instanceof Boolean && (Boolean) expressionResult) {
+            return origin;
+        }
         int prefixKeep = getPrefixKeep(annotation);
         int suffixKeep = getSuffixKeep(annotation);
         String replacer = getReplacer(annotation);
@@ -74,5 +80,13 @@ public abstract class AbstractSliderDesensitizationHandler<T extends Annotation>
      * @return 替换符
      */
     abstract String getReplacer(T annotation);
+
+    /**
+     * el 表达式
+     *
+     * @param annotation 注解信息
+     * @return el 表达式
+     */
+    abstract String getCondition(T annotation);
 
 }
