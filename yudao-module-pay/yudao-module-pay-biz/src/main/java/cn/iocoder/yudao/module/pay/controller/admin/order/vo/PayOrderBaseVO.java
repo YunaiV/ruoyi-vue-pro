@@ -1,9 +1,10 @@
 package cn.iocoder.yudao.module.pay.controller.admin.order.vo;
+
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
 
-import jakarta.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
@@ -20,6 +21,10 @@ public class PayOrderBaseVO {
     @Schema(description = "应用编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     @NotNull(message = "应用编号不能为空")
     private Long appId;
+
+    @Schema(description = "用户编号", example = "1024")
+    @NotNull(message = "用户编号不能为空")
+    private Long userId;
 
     @Schema(description = "渠道编号", example = "2048")
     private Long channelId;
