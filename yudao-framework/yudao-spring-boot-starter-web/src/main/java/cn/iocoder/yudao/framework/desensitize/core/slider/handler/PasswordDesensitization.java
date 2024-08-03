@@ -23,9 +23,4 @@ public class PasswordDesensitization extends AbstractSliderDesensitizationHandle
         return annotation.replacer();
     }
 
-    @Override
-    String getCondition(PasswordDesensitize annotation) {
-        return annotation.condition();
-    }
-
 }

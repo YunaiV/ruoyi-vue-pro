@@ -8,6 +8,7 @@ import cn.iocoder.yudao.framework.desensitize.core.slider.annotation.SliderDesen
  * @author gaibu
  */
 public class DefaultDesensitizationHandler extends AbstractSliderDesensitizationHandler<SliderDesensitize> {
+
     @Override
     Integer getPrefixKeep(SliderDesensitize annotation) {
         return annotation.prefixKeep();
@@ -21,11 +22,6 @@ public class DefaultDesensitizationHandler extends AbstractSliderDesensitization
     @Override
     String getReplacer(SliderDesensitize annotation) {
         return annotation.replacer();
-    }
-
-    @Override
-    String getCondition(SliderDesensitize annotation) {
-        return annotation.condition();
     }
 
 }

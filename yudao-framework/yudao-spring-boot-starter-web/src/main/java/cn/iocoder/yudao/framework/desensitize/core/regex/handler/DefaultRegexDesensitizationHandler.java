@@ -20,8 +20,8 @@ public class DefaultRegexDesensitizationHandler extends AbstractRegexDesensitiza
     }
 
     @Override
-    String getCondition(RegexDesensitize annotation) {
-        return annotation.condition();
+    public String getDisable(RegexDesensitize annotation) {
+        return annotation.disable();
     }
 
 }

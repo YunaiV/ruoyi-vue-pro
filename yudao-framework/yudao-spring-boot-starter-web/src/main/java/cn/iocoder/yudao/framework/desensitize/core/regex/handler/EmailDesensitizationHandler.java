@@ -19,9 +19,4 @@ public class EmailDesensitizationHandler extends AbstractRegexDesensitizationHan
         return annotation.replacer();
     }
 
-    @Override
-    String getCondition(EmailDesensitize annotation) {
-        return annotation.condition();
-    }
-
 }

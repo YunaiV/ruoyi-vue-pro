@@ -24,9 +24,4 @@ public class ChineseNameDesensitization extends AbstractSliderDesensitizationHan
         return annotation.replacer();
     }
 
-    @Override
-    String getCondition(ChineseNameDesensitize annotation) {
-        return annotation.condition();
-    }
-
 }

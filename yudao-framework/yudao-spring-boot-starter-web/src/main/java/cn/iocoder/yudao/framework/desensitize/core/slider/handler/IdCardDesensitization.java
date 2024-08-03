@@ -23,9 +23,4 @@ public class IdCardDesensitization extends AbstractSliderDesensitizationHandler<
         return annotation.replacer();
     }
 
-    @Override
-    String getCondition(IdCardDesensitize annotation) {
-        return annotation.condition();
-    }
-
 }

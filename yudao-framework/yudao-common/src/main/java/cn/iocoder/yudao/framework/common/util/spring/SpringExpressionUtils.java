@@ -4,9 +4,9 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.extra.spring.SpringUtil;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.reflect.MethodSignature;
-import org.springframework.beans.factory.BeanFactory;
 import org.springframework.context.expression.BeanFactoryResolver;
 import org.springframework.core.DefaultParameterNameDiscoverer;
 import org.springframework.core.ParameterNameDiscoverer;
@@ -93,17 +93,16 @@ public class SpringExpressionUtils {
     /**
      * 从 Bean 工厂，解析 EL 表达式的结果
      *
-     * @param beanFactory      Bean 工程
      * @param expressionString EL 表达式
      * @return 执行界面
      */
-    public static Object parseExpression(BeanFactory beanFactory, String expressionString) {
+    public static Object parseExpression(String expressionString) {
         if (StrUtil.isBlank(expressionString)) {
             return null;
         }
         Expression expression = EXPRESSION_PARSER.parseExpression(expressionString);
         StandardEvaluationContext context = new StandardEvaluationContext();
-        context.setBeanResolver(new BeanFactoryResolver(beanFactory));
+        context.setBeanResolver(new BeanFactoryResolver(SpringUtil.getApplicationContext()));
         return expression.getValue(context);
     }
 

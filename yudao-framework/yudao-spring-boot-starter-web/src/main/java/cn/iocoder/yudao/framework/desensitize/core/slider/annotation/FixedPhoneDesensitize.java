@@ -38,8 +38,10 @@ public @interface FixedPhoneDesensitize {
     String replacer() default "*";
 
     /**
-     * el 表达式，当执行 condition 返回 true 的时候，跳过脱敏
+     * 是否禁用脱敏
+     *
+     * 支持 Spring EL 表达式，如果返回 true 则跳过脱敏
      */
-    String condition() default "";
+    String disable() default "";
 
 }
