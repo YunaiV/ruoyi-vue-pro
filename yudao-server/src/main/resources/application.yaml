@@ -153,6 +153,10 @@ spring:
 
 spring:
   ai:
+    vectorstore:
+      redis:
+        index: default-index
+        prefix: "default:"
     qianfan: # 文心一言
       api-key: x0cuLZ7XsaTCU08vuJWO87Lg
       secret-key: R9mYF9dl9KASgi5RUq0FQt3wRisSnOcK
