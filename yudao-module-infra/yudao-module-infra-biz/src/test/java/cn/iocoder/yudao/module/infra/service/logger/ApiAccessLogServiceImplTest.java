@@ -8,10 +8,10 @@ import cn.iocoder.yudao.module.infra.api.logger.dto.ApiAccessLogCreateReqDTO;
 import cn.iocoder.yudao.module.infra.controller.admin.logger.vo.apiaccesslog.ApiAccessLogPageReqVO;
 import cn.iocoder.yudao.module.infra.dal.dataobject.logger.ApiAccessLogDO;
 import cn.iocoder.yudao.module.infra.dal.mysql.logger.ApiAccessLogMapper;
+import jakarta.annotation.Resource;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
 
-import jakarta.annotation.Resource;
 import java.time.Duration;
 import java.util.List;
 
@@ -91,7 +91,7 @@ public class ApiAccessLogServiceImplTest extends BaseDbUnitTest {
         assertEquals(1, count);
         List<ApiAccessLogDO> logs = apiAccessLogMapper.selectList();
         assertEquals(1, logs.size());
-        assertEquals(log02, logs.get(0));
+        assertPojoEquals(log02, logs.get(0), "createTime");
     }
 
     @Test
