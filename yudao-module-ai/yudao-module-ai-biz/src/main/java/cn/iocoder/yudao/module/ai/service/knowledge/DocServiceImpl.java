@@ -3,7 +3,7 @@ package cn.iocoder.yudao.module.ai.service.knowledge;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.document.Document;
-import org.springframework.ai.reader.TextReader;
+import org.springframework.ai.reader.tika.TikaDocumentReader;
 import org.springframework.ai.transformer.splitter.TokenTextSplitter;
 import org.springframework.ai.vectorstore.RedisVectorStore;
 import org.springframework.beans.factory.annotation.Value;
@@ -34,7 +34,7 @@ public class DocServiceImpl implements DocService {
     public void embeddingDoc() {
         // 读取文件
         org.springframework.core.io.Resource file = data;
-        TextReader loader = new TextReader(file);
+        TikaDocumentReader loader = new TikaDocumentReader(file);
         List<Document> documents = loader.get();
         // 文档分段
         List<Document> segments = tokenTextSplitter.apply(documents);
