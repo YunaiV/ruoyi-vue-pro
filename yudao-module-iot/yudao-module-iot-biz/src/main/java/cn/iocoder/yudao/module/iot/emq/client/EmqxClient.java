@@ -43,7 +43,7 @@ public class EmqxClient {
 
     private void createMqttClient() {
         try {
-            mqttClient = new MqttClient(mqttConfig.getHostUrl(), "yudao-" + mqttConfig.getClientId(), new MemoryPersistence());
+            mqttClient = new MqttClient(mqttConfig.getHostUrl(), "yudao" + mqttConfig.getClientId(), new MemoryPersistence());
             mqttClient.setCallback(emqxCallback);
         } catch (MqttException e) {
             log.error("创建MQTT客户端失败", e);
