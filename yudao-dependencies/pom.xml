@@ -64,6 +64,7 @@
         <tika-core.version>2.9.2</tika-core.version>
         <ip2region.version>2.7.0</ip2region.version>
         <bizlog-sdk.version>3.0.6</bizlog-sdk.version>
+        <mqtt.version>1.2.5</mqtt.version>
         <!-- 三方云服务相关 -->
         <okio.version>3.5.0</okio.version>
         <okhttp3.version>4.11.0</okhttp3.version>
@@ -619,6 +620,13 @@
                 <groupId>xerces</groupId>
                 <artifactId>xercesImpl</artifactId>
                 <version>${xercesImpl.version}</version>
+            </dependency>
+
+            <!-- mqtt -->
+            <dependency>
+                <groupId>org.eclipse.paho</groupId>
+                <artifactId>org.eclipse.paho.client.mqttv3</artifactId>
+                <version>${mqtt.version}</version>
             </dependency>
 
         </dependencies>
