@@ -2,11 +2,11 @@ package cn.iocoder.yudao.module.trade.controller.app.order.vo;
 
 import cn.iocoder.yudao.module.trade.controller.app.base.property.AppProductPropertyValueDetailRespVO;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import jakarta.validation.constraints.NotNull;
 import java.util.List;
 
 @Schema(description = "用户 App - 交易订单结算信息 Response VO")
@@ -26,7 +26,7 @@ public class AppTradeOrderSettlementRespVO {
     private Address address;
 
     @Schema(description = "已使用的积分", requiredMode = Schema.RequiredMode.REQUIRED, example = "10")
-    private Integer usedPoint;
+    private Integer usePoint;
 
     @Schema(description = "总积分", requiredMode = Schema.RequiredMode.REQUIRED, example = "10")
     private Integer totalPoint;
