@@ -2,6 +2,11 @@ package cn.iocoder.yudao.module.system.framework.sms.core.client.impl;
 
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.http.HttpRequest;
+import cn.hutool.http.HttpResponse;
+import cn.hutool.json.JSONArray;
+import cn.hutool.json.JSONObject;
+import cn.hutool.json.JSONUtil;
 import cn.iocoder.yudao.framework.common.core.KeyValue;
 import cn.iocoder.yudao.framework.common.util.collection.ArrayUtils;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
@@ -13,15 +18,17 @@ import cn.iocoder.yudao.module.system.framework.sms.core.property.SmsChannelProp
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.annotations.VisibleForTesting;
-import com.tencentcloudapi.common.Credential;
-import com.tencentcloudapi.sms.v20210111.SmsClient;
-import com.tencentcloudapi.sms.v20210111.models.*;
 import lombok.Data;
 
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
+import javax.xml.bind.DatatypeConverter;
+import java.nio.charset.StandardCharsets;
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
+import static cn.hutool.crypto.digest.DigestUtil.sha256Hex;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.TIME_ZONE_DEFAULT;
@@ -41,11 +48,6 @@ public class TencentSmsClient extends AbstractSmsClient {
     public static final String API_CODE_SUCCESS = "Ok";
 
     /**
-     * REGION，使用南京
-     */
-    private static final String ENDPOINT = "ap-nanjing";
-
-    /**
      * 是否国际/港澳台短信：
      *
      * 0：表示国内短信。
@@ -53,7 +55,6 @@ public class TencentSmsClient extends AbstractSmsClient {
      */
     private static final long INTERNATIONAL_CHINA = 0L;
 
-    private SmsClient client;
 
     public TencentSmsClient(SmsChannelProperties properties) {
         super(properties);
@@ -63,9 +64,7 @@ public class TencentSmsClient extends AbstractSmsClient {
 
     @Override
     protected void doInit() {
-        // 实例化一个认证对象，入参需要传入腾讯云账户密钥对 secretId，secretKey
-        Credential credential = new Credential(getApiKey(), properties.getApiSecret());
-        client = new SmsClient(credential, ENDPOINT);
+
     }
 
     /**
@@ -96,18 +95,87 @@ public class TencentSmsClient extends AbstractSmsClient {
     public SmsSendRespDTO sendSms(Long sendLogId, String mobile,
                                   String apiTemplateId, List<KeyValue<String, Object>> templateParams) throws Throwable {
         // 构建请求
-        SendSmsRequest request = new SendSmsRequest();
-        request.setSmsSdkAppId(getSdkAppId());
-        request.setPhoneNumberSet(new String[]{mobile});
-        request.setSignName(properties.getSignature());
-        request.setTemplateId(apiTemplateId);
-        request.setTemplateParamSet(ArrayUtils.toArray(templateParams, e -> String.valueOf(e.getValue())));
-        request.setSessionContext(JsonUtils.toJsonString(new SessionContext().setLogId(sendLogId)));
-        // 执行请求
-        SendSmsResponse response = client.SendSms(request);
-        SendStatus status = response.getSendStatusSet()[0];
-        return new SmsSendRespDTO().setSuccess(Objects.equals(status.getCode(), API_CODE_SUCCESS)).setSerialNo(status.getSerialNo())
-                .setApiRequestId(response.getRequestId()).setApiCode(status.getCode()).setApiMsg(status.getMessage());
+        TreeMap<String, Object> body = new TreeMap<>();
+        String[] phones = {mobile};
+        body.put("PhoneNumberSet",phones);
+        body.put("SmsSdkAppId",getSdkAppId());
+        body.put("SignName",properties.getSignature());
+        body.put("TemplateId",apiTemplateId);
+        body.put("TemplateParamSet",ArrayUtils.toArray(templateParams, e -> String.valueOf(e.getValue())));
+
+        JSONObject JsonResponse = sendSmsRequest(body,"SendSms","2021-01-11","ap-guangzhou");
+        SmsResponse smsResponse = getSmsSendResponse(JsonResponse);
+
+        return new SmsSendRespDTO().setSuccess(smsResponse.success).setApiMsg(smsResponse.data.toString());
+
+    }
+
+    JSONObject sendSmsRequest(TreeMap<String, Object> body,String action,String version,String region) throws Exception {
+
+        String timestamp = String.valueOf(System.currentTimeMillis() / 1000);
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        // 注意时区，否则容易出错
+        sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
+        String date = sdf.format(new Date(Long.valueOf(timestamp + "000")));
+
+        // ************* 步骤 1：拼接规范请求串 *************
+        String host = "sms.tencentcloudapi.com"; //APP接入地址+接口访问URI
+        String httpMethod = "POST"; // 请求方式
+        String canonicalUri = "/";
+        String canonicalQueryString = "";
+
+        String canonicalHeaders = "content-type:application/json; charset=utf-8\n"
+                + "host:" + host + "\n" + "x-tc-action:" + action.toLowerCase() + "\n";
+        String signedHeaders = "content-type;host;x-tc-action";
+        String hashedRequestBody = sha256Hex(JSONUtil.toJsonStr(body));
+        String canonicalRequest = httpMethod + "\n" + canonicalUri + "\n" + canonicalQueryString + "\n" + canonicalHeaders + "\n" + signedHeaders + "\n" + hashedRequestBody;
+
+        // ************* 步骤 2：拼接待签名字符串 *************
+        String credentialScope = date + "/" + "sms" + "/" + "tc3_request";
+        String hashedCanonicalRequest = sha256Hex(canonicalRequest);
+        String stringToSign = "TC3-HMAC-SHA256" + "\n" + timestamp + "\n" + credentialScope + "\n" + hashedCanonicalRequest;
+
+        // ************* 步骤 3：计算签名 *************
+        byte[] secretDate = hmac256(("TC3" + properties.getApiSecret()).getBytes(StandardCharsets.UTF_8), date);
+        byte[] secretService = hmac256(secretDate, "sms");
+        byte[] secretSigning = hmac256(secretService, "tc3_request");
+        String signature = DatatypeConverter.printHexBinary(hmac256(secretSigning, stringToSign)).toLowerCase();
+
+        // ************* 步骤 4：拼接 Authorization *************
+        String authorization = "TC3-HMAC-SHA256" + " " + "Credential=" + getApiKey() + "/" + credentialScope + ", "
+                + "SignedHeaders=" + signedHeaders + ", " + "Signature=" + signature;
+
+        // ************* 步骤 5：构造HttpRequest 并执行request请求，获得response *************
+        Map<String, String> headers = new HashMap<>();
+        headers.put("Authorization", authorization);
+        headers.put("Content-Type", "application/json; charset=utf-8");
+        headers.put("Host", host);
+        headers.put("X-TC-Action", action);
+        headers.put("X-TC-Timestamp", timestamp);
+        headers.put("X-TC-Version", version);
+        headers.put("X-TC-Region", region);
+
+        HttpResponse response = HttpRequest.post("https://"+host)
+                .addHeaders(headers)
+                .body(JSONUtil.toJsonStr(body))
+                .execute();
+
+        return JSONUtil.parseObj(response.body());
+    }
+
+    public static byte[] hmac256(byte[] key, String msg) throws Exception {
+        Mac mac = Mac.getInstance("HmacSHA256");
+        SecretKeySpec secretKeySpec = new SecretKeySpec(key, mac.getAlgorithm());
+        mac.init(secretKeySpec);
+        return mac.doFinal(msg.getBytes(StandardCharsets.UTF_8));
+    }
+
+    private SmsResponse getSmsSendResponse(JSONObject resJson) {
+        SmsResponse smsResponse = new SmsResponse();
+        JSONArray statusJson =resJson.getJSONObject("Response").getJSONArray("SendStatusSet");
+        smsResponse.setSuccess("Ok".equals(statusJson.getJSONObject(0).getStr("Code")));
+        smsResponse.setData(resJson);
+        return smsResponse;
     }
 
     @Override
@@ -122,18 +190,49 @@ public class TencentSmsClient extends AbstractSmsClient {
 
     @Override
     public SmsTemplateRespDTO getSmsTemplate(String apiTemplateId) throws Throwable {
+
         // 构建请求
-        DescribeSmsTemplateListRequest request = new DescribeSmsTemplateListRequest();
-        request.setTemplateIdSet(new Long[]{Long.parseLong(apiTemplateId)});
-        request.setInternational(INTERNATIONAL_CHINA);
-        // 执行请求
-        DescribeSmsTemplateListResponse response = client.DescribeSmsTemplateList(request);
-        DescribeTemplateListStatus status = response.getDescribeTemplateStatusSet()[0];
-        if (status == null || status.getStatusCode() == null) {
-            return null;
-        }
-        return new SmsTemplateRespDTO().setId(status.getTemplateId().toString()).setContent(status.getTemplateContent())
-                .setAuditStatus(convertSmsTemplateAuditStatus(status.getStatusCode().intValue())).setAuditReason(status.getReviewReply());
+        TreeMap<String, Object> body = new TreeMap<>();
+        body.put("International",0);
+        Integer[] templateIds = {Integer.valueOf(apiTemplateId)};
+        body.put("TemplateIdSet",templateIds);
+
+        JSONObject JsonResponse = sendSmsRequest(body,"DescribeSmsTemplateList","2021-01-11","ap-guangzhou");
+        QuerySmsTemplateResponse smsTemplateResponse = getSmsTemplateResponse(JsonResponse);
+        String templateId = Integer.toString(smsTemplateResponse.getDescribeTemplateStatusSet().get(0).getTemplateId());
+        String content = smsTemplateResponse.getDescribeTemplateStatusSet().get(0).getTemplateContent();
+        Integer templateStatus = smsTemplateResponse.getDescribeTemplateStatusSet().get(0).getStatusCode();
+        String auditReason = smsTemplateResponse.getDescribeTemplateStatusSet().get(0).getReviewReply();
+
+        return new SmsTemplateRespDTO().setId(templateId).setContent(content)
+                .setAuditStatus(convertSmsTemplateAuditStatus(templateStatus)).setAuditReason(auditReason);
+    }
+
+    private QuerySmsTemplateResponse getSmsTemplateResponse(JSONObject resJson) {
+
+        QuerySmsTemplateResponse smsTemplateResponse = new QuerySmsTemplateResponse();
+
+        smsTemplateResponse.setRequestId(resJson.getJSONObject("Response").getStr("RequestId"));
+
+        smsTemplateResponse.setDescribeTemplateStatusSet(new ArrayList<>());
+
+        QuerySmsTemplateResponse.TemplateInfo templateInfo = new QuerySmsTemplateResponse.TemplateInfo();
+
+        Object statusObject = resJson.getJSONObject("Response").getJSONArray("DescribeTemplateStatusSet").getFirst();
+
+        JSONObject statusJSON = new JSONObject(statusObject);
+
+        templateInfo.setTemplateContent(statusJSON.get("TemplateContent").toString());
+
+        templateInfo.setStatusCode(Integer.parseInt(statusJSON.get("StatusCode").toString()));
+
+        templateInfo.setReviewReply(statusJSON.get("ReviewReply").toString());
+
+        templateInfo.setTemplateId(Integer.parseInt(statusJSON.get("TemplateId").toString()));
+
+        smsTemplateResponse.getDescribeTemplateStatusSet().add(templateInfo);
+
+        return smsTemplateResponse;
     }
 
     @VisibleForTesting
@@ -143,6 +242,45 @@ public class TencentSmsClient extends AbstractSmsClient {
             case 0: return SmsTemplateAuditStatusEnum.SUCCESS.getStatus();
             case -1: return SmsTemplateAuditStatusEnum.FAIL.getStatus();
             default: throw new IllegalArgumentException(String.format("未知审核状态(%d)", templateStatus));
+        }
+    }
+
+    @Data
+    public static class SmsResponse {
+
+        /**
+         * 是否成功
+         */
+        private boolean success;
+
+        /**
+         * 厂商原返回体
+         */
+        private Object data;
+
+    }
+
+
+    /**
+     * <p>类名: QuerySmsTemplateResponse
+     * <p>说明：  sms模板查询返回信息
+     *
+     * @author :scholar
+     * 2024/07/17  0:25
+     **/
+    @Data
+    public static class QuerySmsTemplateResponse {
+        private List<TemplateInfo> DescribeTemplateStatusSet;
+        private String RequestId;
+        @Data
+        static class TemplateInfo {
+            private String TemplateName;
+            private Integer TemplateId;
+            private Integer International;
+            private String ReviewReply;
+            private long CreateTime;
+            private String TemplateContent;
+            private Integer StatusCode;
         }
     }
 
