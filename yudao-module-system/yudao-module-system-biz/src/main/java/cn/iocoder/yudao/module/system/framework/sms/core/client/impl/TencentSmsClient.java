@@ -18,11 +18,11 @@ import cn.iocoder.yudao.module.system.framework.sms.core.property.SmsChannelProp
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.annotations.VisibleForTesting;
+import jakarta.xml.bind.DatatypeConverter;
 import lombok.Data;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
-import javax.xml.bind.DatatypeConverter;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
@@ -33,6 +33,7 @@ import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.TIME_ZONE_DEFAULT;
 
+// TODO @scholar 建议参考 AliyunSmsClient 优化下
 /**
  * 腾讯云短信功能实现
  *
@@ -218,7 +219,7 @@ public class TencentSmsClient extends AbstractSmsClient {
 
         QuerySmsTemplateResponse.TemplateInfo templateInfo = new QuerySmsTemplateResponse.TemplateInfo();
 
-        Object statusObject = resJson.getJSONObject("Response").getJSONArray("DescribeTemplateStatusSet").getFirst();
+        Object statusObject = resJson.getJSONObject("Response").getJSONArray("DescribeTemplateStatusSet").get(0);
 
         JSONObject statusJSON = new JSONObject(statusObject);
 
