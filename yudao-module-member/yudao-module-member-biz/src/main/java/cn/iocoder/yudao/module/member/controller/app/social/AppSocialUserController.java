@@ -63,16 +63,16 @@ public class AppSocialUserController {
 
     @PostMapping("/wxa-qrcode")
     @Operation(summary = "获得微信小程序码(base64 image)")
-    public CommonResult<String> getWxaQrcode(@RequestBody @Valid AppSocialWxQrcodeReqVO reqVO) {
+    public CommonResult<String> getWxaQrcode(@RequestBody @Valid AppSocialWxaQrcodeReqVO reqVO) {
         byte[] wxQrcode = socialClientApi.getWxaQrcode(BeanUtils.toBean(reqVO, SocialWxQrcodeReqDTO.class));
         return success(Base64.encode(wxQrcode));
     }
 
     @GetMapping("/get-subscribe-template-list")
     @Operation(summary = "获得微信小程订阅模板列表")
-    public CommonResult<List<AppSocialWxSubscribeTemplateRespVO>> getSubscribeTemplateList() {
+    public CommonResult<List<AppSocialWxaSubscribeTemplateRespVO>> getSubscribeTemplateList() {
         List<SocialWxaSubscribeTemplateRespDTO> template = socialClientApi.getWxaSubscribeTemplateList(UserTypeEnum.MEMBER.getValue());
-        return success(BeanUtils.toBean(template, AppSocialWxSubscribeTemplateRespVO.class));
+        return success(BeanUtils.toBean(template, AppSocialWxaSubscribeTemplateRespVO.class));
     }
 
 }

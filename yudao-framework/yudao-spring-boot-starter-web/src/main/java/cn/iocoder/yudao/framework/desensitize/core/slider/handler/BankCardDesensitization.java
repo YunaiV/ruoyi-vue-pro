@@ -24,4 +24,9 @@ public class BankCardDesensitization extends AbstractSliderDesensitizationHandle
         return annotation.replacer();
     }
 
+    @Override
+    public String getDisable(BankCardDesensitize annotation) {
+        return "";
+    }
+
 }

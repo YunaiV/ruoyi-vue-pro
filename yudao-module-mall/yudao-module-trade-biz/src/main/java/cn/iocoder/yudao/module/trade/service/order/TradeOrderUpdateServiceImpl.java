@@ -7,6 +7,7 @@ import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.RandomUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.framework.common.core.KeyValue;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
@@ -71,7 +72,7 @@ import static cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils.min
 import static cn.iocoder.yudao.framework.common.util.servlet.ServletUtils.getClientIP;
 import static cn.iocoder.yudao.framework.web.core.util.WebFrameworkUtils.getTerminal;
 import static cn.iocoder.yudao.module.trade.enums.ErrorCodeConstants.*;
-import static cn.iocoder.yudao.module.trade.enums.MessageTemplateConstants.DELIVERY_ORDER;
+import static cn.iocoder.yudao.module.trade.enums.MessageTemplateConstants.WXA_ORDER_DELIVERY;
 
 /**
  * 交易订单【写】Service 实现类
@@ -384,12 +385,12 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
         Long orderId = order.getId();
         socialClientApi.sendWxaSubscribeMessage(new SocialWxaSubscribeMessageSendReqDTO()
                 .setUserId(order.getUserId()).setUserType(UserTypeEnum.MEMBER.getValue())
-                .setTemplateTitle(DELIVERY_ORDER)
+                .setTemplateTitle(WXA_ORDER_DELIVERY)
                 .setPage("pages/order/detail?id=" + orderId) // 订单详情页
                 .addMessage("character_string3", String.valueOf(orderId)) // 订单编号
                 .addMessage("phrase6", TradeOrderStatusEnum.DELIVERED.getName()) // 订单状态
                 .addMessage("date4", LocalDateTimeUtil.formatNormal(LocalDateTime.now()))// 发货时间
-                .addMessage("character_string5", deliveryReqVO.getLogisticsNo()) // 快递单号
+                .addMessage("character_string5", StrUtil.blankToDefault(deliveryReqVO.getLogisticsNo(), "-")) // 快递单号
                 .addMessage("thing9", order.getReceiverDetailAddress())); // 收货地址
     }
 
