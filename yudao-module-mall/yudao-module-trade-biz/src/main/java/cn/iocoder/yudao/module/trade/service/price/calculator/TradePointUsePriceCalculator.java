@@ -37,14 +37,12 @@ public class TradePointUsePriceCalculator implements TradePriceCalculator {
 
     @Override
     public void calculate(TradePriceCalculateReqBO param, TradePriceCalculateRespBO result) {
-        // 默认使用积分为 0
-        result.setUsePoint(0);
+        // 0. 初始化积分
         MemberUserRespDTO user = memberUserApi.getUser(param.getUserId());
-        result.setTotalPoint(user.getPoint()); // 设置会员总积分
+        result.setTotalPoint(user.getPoint()).setUsePoint(0);
 
         // 1.1 校验是否使用积分
         if (!BooleanUtil.isTrue(param.getPointStatus())) {
-            result.setUsePoint(0);
             return;
         }
         // 1.2 校验积分抵扣是否开启
