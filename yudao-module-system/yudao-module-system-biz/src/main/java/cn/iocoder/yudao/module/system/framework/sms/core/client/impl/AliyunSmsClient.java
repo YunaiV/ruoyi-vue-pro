@@ -23,6 +23,8 @@ import cn.iocoder.yudao.module.system.framework.sms.core.property.SmsChannelProp
 import com.google.common.annotations.VisibleForTesting;
 import lombok.extern.slf4j.Slf4j;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -64,7 +66,7 @@ public class AliyunSmsClient extends AbstractSmsClient {
         queryParam.put("TemplateCode", apiTemplateId);
         queryParam.put("TemplateParam", JsonUtils.toJsonString(MapUtils.convertMap(templateParams)));
         queryParam.put("OutId", sendLogId);
-        JSONObject response = request("sendSms", queryParam);
+        JSONObject response = request("SendSms", queryParam);
 
         // 2. 解析请求
         return new SmsSendRespDTO()
@@ -99,6 +101,8 @@ public class AliyunSmsClient extends AbstractSmsClient {
         TreeMap<String, Object> queryParam = new TreeMap<>();
         queryParam.put("TemplateCode", apiTemplateId);
         JSONObject response = request("QuerySmsTemplate", queryParam);
+
+        System.out.println("getSmsTemplate response is =====" + response.toString());
 
         // 2.1 请求失败
         String code = response.getStr("Code");
@@ -144,6 +148,7 @@ public class AliyunSmsClient extends AbstractSmsClient {
         headers.put("x-acs-action", apiName);
         headers.put("x-acs-date", FastDateFormat.getInstance("yyyy-MM-dd'T'HH:mm:ss'Z'", TimeZone.getTimeZone("GMT")).format(new Date()));
         headers.put("x-acs-signature-nonce", IdUtil.randomUUID());
+
         // 2.2 构建签名 Header
         StringBuilder canonicalHeaders = new StringBuilder(); // 构造请求头，多个规范化消息头，按照消息头名称（小写）的字符代码顺序以升序排列后拼接在一起
         StringBuilder signedHeadersBuilder = new StringBuilder(); // 已签名消息头列表，多个请求头名称（小写）按首字母升序排列并以英文分号（;）分隔
@@ -162,16 +167,18 @@ public class AliyunSmsClient extends AbstractSmsClient {
         String hashedRequestBody = DigestUtil.sha256Hex(requestBody);
 
         // 4. 构建 Authorization 签名
-        String hashedCanonicalRequest = DigestUtil.sha256Hex("POST" // httpMethod
-                + "\n" + "/" // canonicalUri
-                + "\n" + queryString + "\n" + canonicalHeaders + "\n" + signedHeaders + "\n" + hashedRequestBody);
+        String canonicalRequest = "POST" + "\n" + "/" + "\n" + queryString + "\n" + canonicalHeaders + "\n" + signedHeaders + "\n" + hashedRequestBody;
+        String hashedCanonicalRequest = DigestUtil.sha256Hex(canonicalRequest);
+
         String stringToSign = "ACS3-HMAC-SHA256" + "\n" + hashedCanonicalRequest;
         String signature = SecureUtil.hmacSha256(properties.getApiSecret()).digestHex(stringToSign); // 计算签名
         headers.put("Authorization", "ACS3-HMAC-SHA256" + " " + "Credential=" + properties.getApiKey()
                 + ", " + "SignedHeaders=" + signedHeaders + ", " + "Signature=" + signature);
 
         // 5. 发起请求
-        String urlWithParams = URL + "?" + URLUtil.buildQuery(queryParams, null);
+        String urlWithParams = URL + "?" + queryString;
+
+        System.out.println("urlWithParams ======" + urlWithParams);
         try (HttpResponse response = HttpRequest.post(urlWithParams).addHeaders(headers).body(requestBody).execute()) {
             return JSONUtil.parseObj(response.body());
         }
@@ -183,12 +190,15 @@ public class AliyunSmsClient extends AbstractSmsClient {
      * @param str 需要进行URL编码的字符串
      * @return 编码后的字符串
      */
-    private static String percentCode(String str) {
-        Assert.notNull(str, "str 不能为空");
-        return URLUtil.encode(str)
-                .replace("+", "%20") // 加号 "+" 被替换为 "%20"
-                .replace("*", "%2A") // 星号 "*" 被替换为 "%2A"
-                .replace("%7E", "~"); // 波浪号 "%7E" 被替换为 "~"
+    public static String percentCode(String str) {
+        if (str == null) {
+            throw new IllegalArgumentException("输入字符串不可为null");
+        }
+        try {
+            return URLEncoder.encode(str, "UTF-8").replace("+", "%20").replace("*", "%2A").replace("%7E", "~");
+        } catch (UnsupportedEncodingException e) {
+            throw new RuntimeException("UTF-8编码不被支持", e);
+        }
     }
 
 }
