@@ -22,4 +22,7 @@ public class AppProductSpuBaseRespVO {
     @Schema(description = "商品主图地址", example = "https://www.iocoder.cn/xx.png")
     private String picUrl;
 
+    @Schema(description = "商品分类编号", example = "1")
+    private Long categoryId;
+
 }
