@@ -140,8 +140,8 @@ public class CouponServiceImpl implements CouponService {
         if (deleteCount == 0) {
             throw exception(COUPON_DELETE_FAIL_USED);
         }
-        // 减少优惠劵模板的领取数量 -1
-        couponTemplateService.updateCouponTemplateTakeCount(id, -1);
+        // 传入优惠券模板ID，减少优惠劵模板的领取数量 -1
+        couponTemplateService.updateCouponTemplateTakeCount(couponMapper.selectById(id).getTemplateId(), -1);
     }
 
     @Override
