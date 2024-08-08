@@ -25,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import jakarta.annotation.Resource;
+
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -134,14 +135,16 @@ public class CouponServiceImpl implements CouponService {
         // 校验存在
         validateCouponExists(id);
 
+        // 查询优惠券信息
+        CouponDO couponDO = couponMapper.selectById(id);
         // 更新优惠劵
         int deleteCount = couponMapper.delete(id,
                 asList(CouponStatusEnum.UNUSED.getStatus(), CouponStatusEnum.EXPIRE.getStatus()));
         if (deleteCount == 0) {
             throw exception(COUPON_DELETE_FAIL_USED);
         }
-        // 减少优惠劵模板的领取数量 -1
-        couponTemplateService.updateCouponTemplateTakeCount(id, -1);
+        // 传入优惠券模板ID，减少优惠劵模板的领取数量 -1
+        couponTemplateService.updateCouponTemplateTakeCount(couponDO.getTemplateId(), -1);
     }
 
     @Override
