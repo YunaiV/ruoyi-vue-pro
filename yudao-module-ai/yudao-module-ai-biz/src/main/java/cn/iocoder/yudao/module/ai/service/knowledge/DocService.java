@@ -7,7 +7,6 @@ package cn.iocoder.yudao.module.ai.service.knowledge;
  */
 public interface DocService {
 
-
     /**
      * 向量化文档
      */

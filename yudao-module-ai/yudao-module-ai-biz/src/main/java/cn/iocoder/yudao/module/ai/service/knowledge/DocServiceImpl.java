@@ -21,24 +21,23 @@ import java.util.List;
 public class DocServiceImpl implements DocService {
 
     @Resource
-    RedisVectorStore vectorStore;
+    private RedisVectorStore vectorStore;
     @Resource
-    TokenTextSplitter tokenTextSplitter;
+    private TokenTextSplitter tokenTextSplitter;
 
     // TODO @xin 临时测试用，后续删
     @Value("classpath:/webapp/test/Fel.pdf")
     private org.springframework.core.io.Resource data;
 
-
     @Override
     public void embeddingDoc() {
         // 读取文件
-        org.springframework.core.io.Resource file = data;
-        TikaDocumentReader loader = new TikaDocumentReader(file);
+        TikaDocumentReader loader = new TikaDocumentReader(data);
         List<Document> documents = loader.get();
         // 文档分段
         List<Document> segments = tokenTextSplitter.apply(documents);
         // 向量化并存储
         vectorStore.add(segments);
     }
+
 }

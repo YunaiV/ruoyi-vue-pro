@@ -40,6 +40,7 @@
             <version>${spring-ai.version}</version>
         </dependency>
 
+        <!-- 向量化，基于 Redis 存储，Tika 解析内容 -->
         <dependency>
             <groupId>org.springframework.ai</groupId>
             <artifactId>spring-ai-transformers-spring-boot-starter</artifactId>
@@ -55,12 +56,13 @@
             <artifactId>spring-ai-redis-store</artifactId>
             <version>${spring-ai.version}</version>
         </dependency>
+
+        <!-- TODO @xin：引入我们项目的 starter -->
         <dependency>
             <groupId>org.springframework.data</groupId>
             <artifactId>spring-data-redis</artifactId>
             <optional>true</optional>
         </dependency>
-
 
         <dependency>
             <groupId>cn.iocoder.boot</groupId>
