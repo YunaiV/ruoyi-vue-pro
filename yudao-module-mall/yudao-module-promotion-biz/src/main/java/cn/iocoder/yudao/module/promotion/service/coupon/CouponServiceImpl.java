@@ -133,18 +133,17 @@ public class CouponServiceImpl implements CouponService {
     @Transactional
     public void deleteCoupon(Long id) {
         // 校验存在
-        validateCouponExists(id);
+        CouponDO coupon = validateCouponExists(id);
 
-        // 查询优惠券信息
-        CouponDO couponDO = couponMapper.selectById(id);
         // 更新优惠劵
         int deleteCount = couponMapper.delete(id,
                 asList(CouponStatusEnum.UNUSED.getStatus(), CouponStatusEnum.EXPIRE.getStatus()));
         if (deleteCount == 0) {
             throw exception(COUPON_DELETE_FAIL_USED);
         }
-        // 传入优惠券模板ID，减少优惠劵模板的领取数量 -1
-        couponTemplateService.updateCouponTemplateTakeCount(couponDO.getTemplateId(), -1);
+
+        // 减少优惠劵模板的领取数量 -1
+        couponTemplateService.updateCouponTemplateTakeCount(coupon.getTemplateId(), -1);
     }
 
     @Override
@@ -152,10 +151,12 @@ public class CouponServiceImpl implements CouponService {
         return couponMapper.selectListByUserIdAndStatus(userId, status);
     }
 
-    private void validateCouponExists(Long id) {
-        if (couponMapper.selectById(id) == null) {
+    private CouponDO validateCouponExists(Long id) {
+        CouponDO coupon = couponMapper.selectById(id);
+        if (coupon == null) {
             throw exception(COUPON_NOT_EXISTS);
         }
+        return coupon;
     }
 
     @Override
