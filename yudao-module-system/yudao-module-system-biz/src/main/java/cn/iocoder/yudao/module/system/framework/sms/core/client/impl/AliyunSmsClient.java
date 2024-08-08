@@ -4,7 +4,6 @@ import cn.hutool.core.date.format.FastDateFormat;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.ObjectUtil;
-import cn.hutool.core.util.URLUtil;
 import cn.hutool.crypto.SecureUtil;
 import cn.hutool.crypto.digest.DigestUtil;
 import cn.hutool.http.HttpRequest;
@@ -21,10 +20,11 @@ import cn.iocoder.yudao.module.system.framework.sms.core.client.dto.SmsTemplateR
 import cn.iocoder.yudao.module.system.framework.sms.core.enums.SmsTemplateAuditStatusEnum;
 import cn.iocoder.yudao.module.system.framework.sms.core.property.SmsChannelProperties;
 import com.google.common.annotations.VisibleForTesting;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
-import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -176,10 +176,8 @@ public class AliyunSmsClient extends AbstractSmsClient {
                 + ", " + "SignedHeaders=" + signedHeaders + ", " + "Signature=" + signature);
 
         // 5. 发起请求
-        String urlWithParams = URL + "?" + queryString;
-
-        System.out.println("urlWithParams ======" + urlWithParams);
-        try (HttpResponse response = HttpRequest.post(urlWithParams).addHeaders(headers).body(requestBody).execute()) {
+        try (HttpResponse response = HttpRequest.post(URL + "?" + queryString)
+                .addHeaders(headers).body(requestBody).execute()) {
             return JSONUtil.parseObj(response.body());
         }
     }
@@ -187,18 +185,16 @@ public class AliyunSmsClient extends AbstractSmsClient {
     /**
      * 对指定的字符串进行 URL 编码，并对特定的字符进行替换，以符合URL编码规范
      *
-     * @param str 需要进行URL编码的字符串
+     * @param str 需要进行 URL 编码的字符串
      * @return 编码后的字符串
      */
-    public static String percentCode(String str) {
-        if (str == null) {
-            throw new IllegalArgumentException("输入字符串不可为null");
-        }
-        try {
-            return URLEncoder.encode(str, "UTF-8").replace("+", "%20").replace("*", "%2A").replace("%7E", "~");
-        } catch (UnsupportedEncodingException e) {
-            throw new RuntimeException("UTF-8编码不被支持", e);
-        }
+    @SneakyThrows
+    private static String percentCode(String str) {
+        Assert.notNull(str, "str 不能为空");
+        return URLEncoder.encode(str, StandardCharsets.UTF_8.name())
+                .replace("+", "%20") // 加号 "+" 被替换为 "%20"
+                .replace("*", "%2A") // 星号 "*" 被替换为 "%2A"
+                .replace("%7E", "~"); // 波浪号 "%7E" 被替换为 "~"
     }
 
 }
