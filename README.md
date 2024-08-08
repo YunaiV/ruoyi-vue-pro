@@ -362,3 +362,39 @@
 | ![](/.image/admin-uniapp/07.png) | ![](/.image/admin-uniapp/08.png) | ![](/.image/admin-uniapp/09.png) |
 
 目前已经实现登录、我的、工作台、编辑资料、头像修改、密码修改、常见问题、关于我们等基础功能。
+
+### 微信公众号的模版消息对接
+
+`yudao-module-mp` 模块现已支持微信公众号的模版消息对接功能。以下是使用说明和示例：
+
+#### 使用说明
+
+1. 确保在 `pom.xml` 文件中取消注释 `yudao-module-mp` 模块，以便将其包含在构建过程中。
+2. 在 `yudao-module-mp/yudao-module-mp-biz/src/main/java/cn/iocoder/yudao/module/mp/service/message` 目录下，定义 `MpTemplateMessageService` 接口，并在同一目录下实现该接口。
+3. 在 `yudao-module-mp/yudao-module-mp-biz/src/main/java/cn/iocoder/yudao/module/mp/service/handler/message` 目录下，添加 `TemplateMessageHandler` 类以处理传入的模版消息。
+
+#### 示例
+
+以下是一个发送模版消息的示例：
+
+```java
+@Service
+public class MpTemplateMessageServiceImpl implements MpTemplateMessageService {
+
+    @Resource
+    private MpServiceFactory mpServiceFactory;
+
+    @Override
+    public void sendTemplateMessage(WxMpTemplateMessage templateMessage) {
+        WxMpService mpService = mpServiceFactory.getRequiredMpService(templateMessage.getAppid());
+        try {
+            mpService.getTemplateMsgService().sendTemplateMsg(templateMessage);
+        } catch (WxErrorException e) {
+            log.error("[sendTemplateMessage][发送模板消息失败，templateMessage={}]", templateMessage, e);
+            throw new RuntimeException("发送模板消息失败", e);
+        }
+    }
+}
+```
+
+更多详细信息，请参考项目中的相关代码和文档。
