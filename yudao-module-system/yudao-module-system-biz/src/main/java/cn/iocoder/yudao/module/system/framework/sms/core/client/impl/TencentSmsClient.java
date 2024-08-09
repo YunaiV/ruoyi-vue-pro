@@ -18,11 +18,11 @@ import cn.iocoder.yudao.module.system.framework.sms.core.property.SmsChannelProp
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.annotations.VisibleForTesting;
-import jakarta.xml.bind.DatatypeConverter;
 import lombok.Data;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
+import javax.xml.bind.DatatypeConverter;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;

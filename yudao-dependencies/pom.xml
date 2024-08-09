@@ -69,7 +69,7 @@
         <okhttp3.version>4.11.0</okhttp3.version>
         <commons-io.version>2.15.1</commons-io.version>
         <minio.version>8.5.7</minio.version>
-        <justauth.version>2.0.5</justauth.version>
+        <justauth.version>1.0.8</justauth.version>
         <jimureport.version>1.7.8</jimureport.version>
         <xercesImpl.version>2.12.2</xercesImpl.version>
         <weixin-java.version>4.6.0</weixin-java.version>

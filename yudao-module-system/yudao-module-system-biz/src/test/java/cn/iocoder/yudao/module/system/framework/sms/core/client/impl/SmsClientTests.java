@@ -66,7 +66,7 @@ public class SmsClientTests {
         String mobile = "173213154791";
         String apiTemplateId = "SMS_207945135";
         // 调用
-        SmsSendRespDTO sendRespDTO = client.sendSms(sendLogId, mobile, apiTemplateId, List.of(new KeyValue<>("code", "1024")));
+        SmsSendRespDTO sendRespDTO = client.sendSms(sendLogId, mobile, apiTemplateId, ListUtil.of(new KeyValue<>("code", "1024")));
         // 打印结果
         System.out.println(sendRespDTO);
     }
