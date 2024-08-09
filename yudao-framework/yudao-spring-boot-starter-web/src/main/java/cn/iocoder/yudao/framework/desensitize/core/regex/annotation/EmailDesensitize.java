@@ -33,4 +33,12 @@ public @interface EmailDesensitize {
      * 比如：example@gmail.com 脱敏之后为 e****@gmail.com
      */
     String replacer() default "$1****$2";
+
+    /**
+     * 是否禁用脱敏
+     *
+     * 支持 Spring EL 表达式，如果返回 true 则跳过脱敏
+     */
+    String disable() default "";
+
 }

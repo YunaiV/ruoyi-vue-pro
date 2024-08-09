@@ -69,9 +69,6 @@
         <okhttp3.version>4.11.0</okhttp3.version>
         <commons-io.version>2.15.1</commons-io.version>
         <minio.version>8.5.7</minio.version>
-        <aliyun-java-sdk-core.version>4.6.4</aliyun-java-sdk-core.version>
-        <aliyun-java-sdk-dysmsapi.version>2.2.1</aliyun-java-sdk-dysmsapi.version>
-        <tencentcloud-sdk-java.version>3.1.880</tencentcloud-sdk-java.version>
         <justauth.version>2.0.5</justauth.version>
         <jimureport.version>1.7.8</jimureport.version>
         <xercesImpl.version>2.12.2</xercesImpl.version>
@@ -546,34 +543,6 @@
                 <artifactId>minio</artifactId>
                 <version>${minio.version}</version>
             </dependency>
-
-            <!-- SMS SDK begin -->
-            <dependency>
-                <groupId>com.aliyun</groupId>
-                <artifactId>aliyun-java-sdk-core</artifactId>
-                <version>${aliyun-java-sdk-core.version}</version>
-                <exclusions>
-                    <exclusion>
-                        <artifactId>opentracing-api</artifactId>
-                        <groupId>io.opentracing</groupId>
-                    </exclusion>
-                    <exclusion>
-                        <artifactId>opentracing-util</artifactId>
-                        <groupId>io.opentracing</groupId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-            <dependency>
-                <groupId>com.aliyun</groupId>
-                <artifactId>aliyun-java-sdk-dysmsapi</artifactId>
-                <version>${aliyun-java-sdk-dysmsapi.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.tencentcloudapi</groupId>
-                <artifactId>tencentcloud-sdk-java-sms</artifactId>
-                <version>${tencentcloud-sdk-java.version}</version>
-            </dependency>
-            <!-- SMS SDK end -->
 
             <dependency>
                 <groupId>com.xingyuv</groupId>
