@@ -250,6 +250,11 @@ public class AdminUserServiceImpl implements AdminUserService {
     }
 
     @Override
+    public AdminUserDO getUserByEmail(String email) {
+        return userMapper.selectByEmail(email);
+    }
+
+    @Override
     public PageResult<AdminUserDO> getUserPage(UserPageReqVO reqVO) {
         return userMapper.selectPage(reqVO, getDeptCondition(reqVO.getDeptId()));
     }

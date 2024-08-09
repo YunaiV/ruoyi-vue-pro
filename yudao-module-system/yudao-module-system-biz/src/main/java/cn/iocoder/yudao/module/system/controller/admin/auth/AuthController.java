@@ -154,4 +154,11 @@ public class AuthController {
         return success(authService.socialLogin(reqVO));
     }
 
+    @PostMapping("/mail-login")
+    @PermitAll
+    @Operation(summary = "使用邮箱密码登录")
+    public CommonResult<AuthLoginRespVO> mailLogin(@RequestBody @Valid AuthMailLoginReqVO reqVO) {
+        return success(authService.mailLogin(reqVO));
+    }
+
 }
