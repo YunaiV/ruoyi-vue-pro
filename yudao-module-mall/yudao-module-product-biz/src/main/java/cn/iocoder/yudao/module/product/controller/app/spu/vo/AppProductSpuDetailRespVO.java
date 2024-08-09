@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import java.util.List;
+import java.util.Objects;
 
 @Schema(description = "用户 App - 商品 SPU 明细 Response VO")
 @Data
@@ -46,7 +47,7 @@ public class AppProductSpuDetailRespVO {
     @Schema(description = "市场价，单位使用：分", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     private Integer marketPrice;
 
-    @Schema(description = "VIP 价格，单位使用：分", requiredMode = Schema.RequiredMode.REQUIRED, example = "968") // 通过会员等级，计算出折扣后价格
+    @Schema(description = "VIP 减免价格，单位使用：分", requiredMode = Schema.RequiredMode.REQUIRED, example = "968")
     private Integer vipPrice;
 
     @Schema(description = "库存", requiredMode = Schema.RequiredMode.REQUIRED, example = "666")
@@ -80,7 +81,7 @@ public class AppProductSpuDetailRespVO {
         @Schema(description = "市场价，单位使用：分", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
         private Integer marketPrice;
 
-        @Schema(description = "VIP 价格，单位使用：分", requiredMode = Schema.RequiredMode.REQUIRED, example = "968") // 通过会员等级，计算出折扣后价格
+        @Schema(description = "VIP 减免金额，单位使用：分", requiredMode = Schema.RequiredMode.REQUIRED, example = "968")
         private Integer vipPrice;
 
         @Schema(description = "图片地址", requiredMode = Schema.RequiredMode.REQUIRED, example = "https://www.iocoder.cn/xx.png")
@@ -95,6 +96,32 @@ public class AppProductSpuDetailRespVO {
         @Schema(description = "商品体积", example = "1024") // 单位：m^3 平米
         private Double volume;
 
+        /**
+         * 会员价格（单）
+         * = 商品价格（单） - 会员减免金额（单）
+         *
+         * @return 会员价格（单）
+         */
+        public Integer getMemberPrice() {
+            if (Objects.isNull(this.getVipPrice())) {
+                return this.getPrice();
+            }
+
+            return this.getPrice() - this.getVipPrice();
+        }
     }
 
+    /**
+     * 会员价格（单）
+     * = 商品价格（单） - 会员减免金额（单）
+     *
+     * @return 会员价格（单）
+     */
+    public Integer getMemberPrice() {
+        if (Objects.isNull(this.getVipPrice())) {
+            return this.getPrice();
+        }
+
+        return this.getPrice() - this.getVipPrice();
+    }
 }
