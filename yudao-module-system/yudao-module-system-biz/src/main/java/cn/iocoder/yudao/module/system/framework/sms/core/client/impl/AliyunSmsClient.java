@@ -6,13 +6,12 @@ import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.crypto.SecureUtil;
 import cn.hutool.crypto.digest.DigestUtil;
-import cn.hutool.http.HttpRequest;
-import cn.hutool.http.HttpResponse;
 import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import cn.iocoder.yudao.framework.common.core.KeyValue;
 import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
+import cn.iocoder.yudao.framework.common.util.http.HttpUtils;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.module.system.framework.sms.core.client.dto.SmsReceiveRespDTO;
 import cn.iocoder.yudao.module.system.framework.sms.core.client.dto.SmsSendRespDTO;
@@ -58,10 +57,11 @@ public class AliyunSmsClient extends AbstractSmsClient {
     @Override
     public SmsSendRespDTO sendSms(Long sendLogId, String mobile, String apiTemplateId,
                                   List<KeyValue<String, Object>> templateParams) throws Throwable {
+        Assert.notBlank(properties.getSignature(), "短信签名不能为空");
         // 1. 执行请求
         // 参考链接 https://api.aliyun.com/document/Dysmsapi/2017-05-25/SendSms
         TreeMap<String, Object> queryParam = new TreeMap<>();
-        queryParam.put("PhoneNumbers",mobile);
+        queryParam.put("PhoneNumbers", mobile);
         queryParam.put("SignName", properties.getSignature());
         queryParam.put("TemplateCode", apiTemplateId);
         queryParam.put("TemplateParam", JsonUtils.toJsonString(MapUtils.convertMap(templateParams)));
@@ -111,7 +111,8 @@ public class AliyunSmsClient extends AbstractSmsClient {
             return null;
         }
         // 2.2 请求成功
-        return new SmsTemplateRespDTO().setId(apiTemplateId)
+        return new SmsTemplateRespDTO()
+                .setId(response.getStr("TemplateCode"))
                 .setContent(response.getStr("TemplateContent"))
                 .setAuditStatus(convertSmsTemplateAuditStatus(response.getInt("TemplateStatus")))
                 .setAuditReason(response.getStr("Reason"));
@@ -176,10 +177,8 @@ public class AliyunSmsClient extends AbstractSmsClient {
                 + ", " + "SignedHeaders=" + signedHeaders + ", " + "Signature=" + signature);
 
         // 5. 发起请求
-        try (HttpResponse response = HttpRequest.post(URL + "?" + queryString)
-                .addHeaders(headers).body(requestBody).execute()) {
-            return JSONUtil.parseObj(response.body());
-        }
+        String responseBody = HttpUtils.post(URL + "?" + queryString, headers, requestBody);
+        return JSONUtil.parseObj(responseBody);
     }
 
     /**

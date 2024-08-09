@@ -5,6 +5,8 @@ import cn.hutool.core.map.TableMap;
 import cn.hutool.core.net.url.UrlBuilder;
 import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.http.HttpRequest;
+import cn.hutool.http.HttpResponse;
 import org.springframework.util.StringUtils;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -122,5 +124,23 @@ public class HttpUtils {
         return null;
     }
 
+    /**
+     * HTTP post 请求，基于 {@link cn.hutool.http.HttpUtil} 实现
+     *
+     * 为什么要封装该方法，因为 HttpUtil 默认封装的方法，没有允许传递 headers 参数
+     *
+     * @param url URL
+     * @param headers 请求头
+     * @param requestBody 请求体
+     * @return 请求结果
+     */
+    public static String post(String url, Map<String, String> headers, String requestBody) {
+        try (HttpResponse response = HttpRequest.post(url)
+                .addHeaders(headers)
+                .body(requestBody)
+                .execute()) {
+            return response.body();
+        }
+    }
 
 }
