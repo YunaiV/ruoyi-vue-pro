@@ -106,6 +106,14 @@ public interface AdminUserService {
     AdminUserDO getUserByMobile(String mobile);
 
     /**
+     * 通过邮箱获取用户
+     *
+     * @param email 邮箱
+     * @return 用户对象信息
+     */
+    AdminUserDO getUserByEmail(String email);
+
+    /**
      * 获得用户分页列表
      *
      * @param reqVO 分页条件

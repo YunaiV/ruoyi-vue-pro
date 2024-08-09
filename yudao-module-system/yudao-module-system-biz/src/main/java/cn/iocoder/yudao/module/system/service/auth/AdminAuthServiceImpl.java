@@ -134,6 +134,35 @@ public class AdminAuthServiceImpl implements AdminAuthService {
         return createTokenAfterLoginSuccess(user.getId(), reqVO.getMobile(), LoginLogTypeEnum.LOGIN_MOBILE);
     }
 
+    @Override
+    public AuthLoginRespVO mailLogin(AuthMailLoginReqVO reqVO) {
+        // 使用邮箱和密码进行登录
+        AdminUserDO user = authenticateByEmail(reqVO.getEmail(), reqVO.getPassword());
+
+        // 创建 Token 令牌，记录登录日志
+        return createTokenAfterLoginSuccess(user.getId(), reqVO.getEmail(), LoginLogTypeEnum.LOGIN_EMAIL);
+    }
+
+    private AdminUserDO authenticateByEmail(String email, String password) {
+        final LoginLogTypeEnum logTypeEnum = LoginLogTypeEnum.LOGIN_EMAIL;
+        // 校验邮箱是否存在
+        AdminUserDO user = userService.getUserByEmail(email);
+        if (user == null) {
+            createLoginLog(null, email, logTypeEnum, LoginResultEnum.BAD_CREDENTIALS);
+            throw exception(AUTH_LOGIN_BAD_CREDENTIALS);
+        }
+        if (!userService.isPasswordMatch(password, user.getPassword())) {
+            createLoginLog(user.getId(), email, logTypeEnum, LoginResultEnum.BAD_CREDENTIALS);
+            throw exception(AUTH_LOGIN_BAD_CREDENTIALS);
+        }
+        // 校验是否禁用
+        if (CommonStatusEnum.isDisable(user.getStatus())) {
+            createLoginLog(user.getId(), email, logTypeEnum, LoginResultEnum.USER_DISABLED);
+            throw exception(AUTH_LOGIN_USER_DISABLED);
+        }
+        return user;
+    }
+
     private void createLoginLog(Long userId, String username,
                                 LoginLogTypeEnum logTypeEnum, LoginResultEnum loginResult) {
         // 插入登录日志
