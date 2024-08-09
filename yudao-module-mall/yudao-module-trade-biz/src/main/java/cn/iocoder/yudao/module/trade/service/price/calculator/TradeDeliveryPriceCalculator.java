@@ -55,6 +55,7 @@ public class TradeDeliveryPriceCalculator implements TradePriceCalculator {
         if (param.getDeliveryType() == null) {
             return;
         }
+        // TODO @puhui999：需要校验，是不是存在商品不能门店自提，或者不能快递发货的情况。就是说，配送方式不匹配哈
         if (DeliveryTypeEnum.PICK_UP.getType().equals(param.getDeliveryType())) {
             calculateByPickUp(param);
         } else if (DeliveryTypeEnum.EXPRESS.getType().equals(param.getDeliveryType())) {

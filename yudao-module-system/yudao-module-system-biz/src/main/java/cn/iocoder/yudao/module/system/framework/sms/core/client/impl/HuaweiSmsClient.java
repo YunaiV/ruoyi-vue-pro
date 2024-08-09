@@ -1,39 +1,42 @@
 package cn.iocoder.yudao.module.system.framework.sms.core.client.impl;
 
+
 import cn.hutool.core.lang.Assert;
-import cn.hutool.core.util.HexUtil;
 import cn.hutool.core.util.StrUtil;
+
 import cn.hutool.crypto.SecureUtil;
-import cn.hutool.crypto.digest.DigestUtil;
-import cn.hutool.json.JSONArray;
+import cn.hutool.http.HttpRequest;
+import cn.hutool.http.HttpResponse;
+import cn.hutool.json.JSONObject;
+import cn.hutool.json.JSONUtil;
 import cn.iocoder.yudao.framework.common.core.KeyValue;
+import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.module.system.framework.sms.core.client.dto.SmsReceiveRespDTO;
 import cn.iocoder.yudao.module.system.framework.sms.core.client.dto.SmsSendRespDTO;
 import cn.iocoder.yudao.module.system.framework.sms.core.client.dto.SmsTemplateRespDTO;
 import cn.iocoder.yudao.module.system.framework.sms.core.enums.SmsTemplateAuditStatusEnum;
 import cn.iocoder.yudao.module.system.framework.sms.core.property.SmsChannelProperties;
+
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.HttpUriRequest;
-import org.apache.http.client.methods.RequestBuilder;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
 import java.util.*;
 
+
+import java.time.LocalDateTime;
+
+
+import static cn.hutool.crypto.digest.DigestUtil.sha256Hex;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.TIME_ZONE_DEFAULT;
+
 
 /**
  * 华为短信客户端的实现类
@@ -47,7 +50,14 @@ public class HuaweiSmsClient extends AbstractSmsClient {
     /**
      * 调用成功 code
      */
-    public static final String API_CODE_SUCCESS = "OK";
+    public static final String URL = "https://smsapi.cn-north-4.myhuaweicloud.com:443/sms/batchSendSms/v1";//APP接入地址+接口访问URI
+    public static final String HOST = "smsapi.cn-north-4.myhuaweicloud.com:443";
+    public static final String SIGNEDHEADERS = "content-type;host;x-sdk-date";
+
+    @Override
+    protected void doInit() {
+
+    }
 
     public HuaweiSmsClient(SmsChannelProperties properties) {
         super(properties);
@@ -56,95 +66,78 @@ public class HuaweiSmsClient extends AbstractSmsClient {
     }
 
     @Override
-    protected void doInit() {
-    }
-
-    @Override
     public SmsSendRespDTO sendSms(Long sendLogId, String mobile, String apiTemplateId,
                                   List<KeyValue<String, Object>> templateParams) throws Throwable {
-        // TODO @scholar：https://smsapi.cn-north-4.myhuaweicloud.com:443 是不是枚举成静态变量
-        String url = "https://smsapi.cn-north-4.myhuaweicloud.com:443/sms/batchSendSms/v1"; //APP接入地址+接口访问URI
         // 相比较阿里短信，华为短信发送的时候需要额外的参数“通道号”，考虑到不破坏原有的的结构
         // 所以将 通道号 拼接到 apiTemplateId 字段中，格式为 "apiTemplateId 通道号"。空格为分隔符。
-        // TODO @scholar：暂时只考虑中国大陆，所以不需要 sender 哈
         String sender = StrUtil.subAfter(apiTemplateId, " ", true); //中国大陆短信签名通道号或全球短信通道号
         String templateId = StrUtil.subBefore(apiTemplateId, " ", true); //模板ID
 
-        // 选填,短信状态报告接收地址,推荐使用域名,为空或者不填表示不接收状态报告
+        //选填,短信状态报告接收地址,推荐使用域名,为空或者不填表示不接收状态报告
         String statusCallBack = properties.getCallbackUrl();
 
-        // TODO @scholar：1）是不是用  LocalDateTimeUtil.format()；这样 3 行变成一行
-        // TODO @scholar：singerDate 叫 sdkDate 会更合适哈，这样理解起来简单。另外，singer 应该是 signed 么？
+        List<String> templateParas = CollectionUtils.convertList(templateParams, kv -> String.valueOf(kv.getValue()));
+
+        JSONObject JsonResponse = sendSmsRequest(sender,mobile,templateId,templateParas,statusCallBack);
+        SmsResponse smsResponse = getSmsSendResponse(JsonResponse);
+
+        return new SmsSendRespDTO().setSuccess(smsResponse.success).setApiMsg(smsResponse.data.toString());
+    }
+
+    JSONObject sendSmsRequest(String sender,String mobile,String templateId,List<String> templateParas,String statusCallBack) throws UnsupportedEncodingException {
+
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd'T'HHmmss'Z'", Locale.ENGLISH);
         sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
-        String singerDate = sdf.format(new Date());
+        String sdkDate = sdf.format(new Date());
 
-        // TODO @scholar：整个处理加密的过程，是不是应该抽成一个 private 方法哈。这样整个调用的主干更清晰。
         // ************* 步骤 1：拼接规范请求串 *************
         String httpRequestMethod = "POST";
         String canonicalUri = "/sms/batchSendSms/v1/";
-        String canonicalQueryString = ""; // 查询参数为空
+        String canonicalQueryString = "";//查询参数为空
         String canonicalHeaders = "content-type:application/x-www-form-urlencoded\n"
-                + "host:smsapi.cn-north-4.myhuaweicloud.com:443\n"
-                + "x-sdk-date:" + singerDate + "\n";
-        // TODO @scholar：静态枚举了
-        String signedHeaders = "content-type;host;x-sdk-date";
-        // TODO @scholar：下面的注释，可以考虑去掉
-        /*
-         * 选填,使用无变量模板时请赋空值 String templateParas = "";
-         * 单变量模板示例:模板内容为"您的验证码是${NUM_6}"时,templateParas可填写为"[\"111111\"]"
-         * 双变量模板示例:模板内容为"您有${NUM_2}件快递请到${TXT_20}领取"时,templateParas可填写为"[\"3\",\"人民公园正门\"]"
-         */
-        // TODO @scholar：CollectionUtils.convertList 可以把 4 行变成 1 行。
-        // TODO @scholar：templateParams 拼写错误哈
-        List<String> templateParas = new ArrayList<>();
-        for (KeyValue<String, Object> kv : templateParams) {
-            templateParas.add(String.valueOf(kv.getValue()));
-        }
-
-        // 请求Body,不携带签名名称时,signature请填null
+                + "host:"+ HOST +"\n"
+                + "x-sdk-date:" + sdkDate + "\n";
+        //请求Body,不携带签名名称时,signature请填null
         String body = buildRequestBody(sender, mobile, templateId, templateParas, statusCallBack, null);
-        // TODO @scholar：Assert 断言，抛出异常
         if (null == body || body.isEmpty()) {
             return null;
         }
-        String hashedRequestBody = HexUtil.encodeHexStr(DigestUtil.sha256(body));
+        String hashedRequestBody = sha256Hex(body);
         String canonicalRequest = httpRequestMethod + "\n" + canonicalUri + "\n" + canonicalQueryString + "\n"
-                + canonicalHeaders + "\n" + signedHeaders + "\n" + hashedRequestBody;
+                + canonicalHeaders + "\n" + SIGNEDHEADERS + "\n" + hashedRequestBody;
 
         // ************* 步骤 2：拼接待签名字符串 *************
-        // TODO @scholar：sha256Hex 是不是更简洁哈
-        String hashedCanonicalRequest = HexUtil.encodeHexStr(DigestUtil.sha256(canonicalRequest));
-        String stringToSign = "SDK-HMAC-SHA256" + "\n" + singerDate + "\n" + hashedCanonicalRequest;
+        String hashedCanonicalRequest = sha256Hex(canonicalRequest);
+        String stringToSign = "SDK-HMAC-SHA256" + "\n" + sdkDate + "\n" + hashedCanonicalRequest;
 
         // ************* 步骤 3：计算签名 *************
         String signature = SecureUtil.hmacSha256(properties.getApiSecret()).digestHex(stringToSign);
 
         // ************* 步骤 4：拼接 Authorization *************
         String authorization = "SDK-HMAC-SHA256" + " " + "Access=" + properties.getApiKey() + ", "
-                + "SignedHeaders=" + signedHeaders + ", " + "Signature=" + signature;
+                + "SignedHeaders=" + SIGNEDHEADERS + ", " + "Signature=" + signature;
 
         // ************* 步骤 5：构造HttpRequest 并执行request请求，获得response *************
-        // TODO @scholar：考虑了下，还是换 hutool 的 httpUtils。因为未来 httpclient 我们可能会移除掉
-        HttpUriRequest postMethod = RequestBuilder.post()
-                .setUri(url)
-                .setEntity(new StringEntity(body, StandardCharsets.UTF_8))
-                .setHeader("Content-Type","application/x-www-form-urlencoded")
-                .setHeader("X-Sdk-Date", singerDate)
-                .setHeader("Authorization", authorization)
-                .build();
-        // TODO @scholar：这种不太适合一直 new 的哈
-        CloseableHttpClient client = HttpClientBuilder.create().build();
-        HttpResponse response = client.execute(postMethod);
-        // TODO @scholar：失败的情况下的处理
-        // TODO @scholar：setSerialNo(Integer.toString(response.getStatusLine().getStatusCode())) 这部分，空一行。一行代码太多了，阅读性不太好哈
-        return new SmsSendRespDTO().setSuccess(Objects.equals(response.getStatusLine().getReasonPhrase(), API_CODE_SUCCESS)).setSerialNo(Integer.toString(response.getStatusLine().getStatusCode()))
-                .setApiRequestId(null).setApiCode(null).setApiMsg(null);
+        HttpResponse response = HttpRequest.post(URL)
+                .header("Content-Type", "application/x-www-form-urlencoded")
+                .header("X-Sdk-Date", sdkDate)
+                .header("host",HOST)
+                .header("Authorization", authorization)
+                .body(body)
+                .execute();
+
+        return JSONUtil.parseObj(response.body());
+    }
+
+    private SmsResponse getSmsSendResponse(JSONObject resJson) {
+        SmsResponse smsResponse = new SmsResponse();
+        smsResponse.setSuccess("000000".equals(resJson.getStr("code")));
+        smsResponse.setData(resJson);
+        return smsResponse;
     }
 
     static String buildRequestBody(String sender, String receiver, String templateId, List<String> templateParas,
-                                   String statusCallBack, @SuppressWarnings("SameParameterValue") String signature) throws UnsupportedEncodingException {
-        // TODO @scholar：参数不满足，是不是抛出异常更好哈；通过 hutool 的 Assert 去断言
+                                   String statusCallBack, String signature) throws UnsupportedEncodingException {
         if (null == sender || null == receiver || null == templateId || sender.isEmpty() || receiver.isEmpty()
                 || templateId.isEmpty()) {
             System.out.println("buildRequestBody(): sender, receiver or templateId is null.");
@@ -155,20 +148,17 @@ public class HuaweiSmsClient extends AbstractSmsClient {
         appendToBody(body, "from=", sender);
         appendToBody(body, "&to=", receiver);
         appendToBody(body, "&templateId=", templateId);
-        // TODO @scholar：new JSONArray(templateParas).toString()，是不是 JsonUtils.toString 呀？
-        appendToBody(body, "&templateParas=", new JSONArray(templateParas).toString());
+        appendToBody(body, "&templateParas=", JsonUtils.toJsonString(templateParas));
         appendToBody(body, "&statusCallback=", statusCallBack);
         appendToBody(body, "&signature=", signature);
         return body.toString();
     }
 
     private static void appendToBody(StringBuilder body, String key, String val) throws UnsupportedEncodingException {
-        // TODO @scholar：StrUtils.isNotEmpty(val)，是不是更简洁哈
         if (null != val && !val.isEmpty()) {
-            body.append(key).append(URLEncoder.encode(val, StandardCharsets.UTF_8.name()));
+            body.append(key).append(URLEncoder.encode(val, "UTF-8"));
         }
     }
-
     @Override
     public List<SmsReceiveRespDTO> parseSmsReceiveStatus(String text) {
         List<SmsReceiveStatus> statuses = JsonUtils.parseArray(text, SmsReceiveStatus.class);
@@ -180,11 +170,27 @@ public class HuaweiSmsClient extends AbstractSmsClient {
 
     @Override
     public SmsTemplateRespDTO getSmsTemplate(String apiTemplateId) throws Throwable {
-        // 华为短信模板查询和发送短信，是不同的两套 key 和 secret，与阿里、腾讯的区别较大，这里模板查询校验暂不实现
-        // 对应文档 https://support.huaweicloud.com/api-msgsms/sms_05_0040.html
-        return new SmsTemplateRespDTO().setId(apiTemplateId).setContent(null)
+        //华为短信模板查询和发送短信，是不同的两套key和secret，与阿里、腾讯的区别较大，这里模板查询校验暂不实现。
+        return new SmsTemplateRespDTO().setId(null).setContent(null)
                 .setAuditStatus(SmsTemplateAuditStatusEnum.SUCCESS.getStatus()).setAuditReason(null);
+
     }
+
+    @Data
+    public static class SmsResponse {
+
+        /**
+         * 是否成功
+         */
+        private boolean success;
+
+        /**
+         * 厂商原返回体
+         */
+        private Object data;
+
+    }
+
 
     /**
      * 短信接收状态

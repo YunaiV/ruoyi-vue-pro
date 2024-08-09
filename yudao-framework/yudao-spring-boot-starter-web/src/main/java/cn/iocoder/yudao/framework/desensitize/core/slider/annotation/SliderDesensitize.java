@@ -40,4 +40,12 @@ public @interface SliderDesensitize {
      * 前缀保留长度
      */
     int prefixKeep() default 0;
+
+    /**
+     * 是否禁用脱敏
+     *
+     * 支持 Spring EL 表达式，如果返回 true 则跳过脱敏
+     */
+    String disable() default "";
+
 }
