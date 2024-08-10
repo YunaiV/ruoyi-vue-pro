@@ -12,6 +12,7 @@ import com.alibaba.cloud.ai.tongyi.TongYiAutoConfiguration;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.autoconfigure.vectorstore.redis.RedisVectorStoreProperties;
 import org.springframework.ai.document.MetadataMode;
+import org.springframework.ai.embedding.EmbeddingModel;
 import org.springframework.ai.transformer.splitter.TokenTextSplitter;
 import org.springframework.ai.transformers.TransformersEmbeddingModel;
 import org.springframework.ai.vectorstore.RedisVectorStore;
@@ -21,6 +22,7 @@ import org.springframework.boot.autoconfigure.data.redis.RedisProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
+import org.springframework.context.annotation.Lazy;
 import redis.clients.jedis.JedisPooled;
 
 /**
@@ -82,7 +84,8 @@ public class YudaoAiAutoConfiguration {
 
     // ========== rag 相关 ==========
     @Bean
-    public TransformersEmbeddingModel transformersEmbeddingClient() {
+    @Lazy // TODO 芋艿：临时注释，避免无法启动
+    public EmbeddingModel transformersEmbeddingClient() {
         return new TransformersEmbeddingModel(MetadataMode.EMBED);
     }
 
@@ -90,6 +93,7 @@ public class YudaoAiAutoConfiguration {
      * 我们启动有加载很多 Embedding 模型，不晓得取哪个好，先 new 个 TransformersEmbeddingModel 跑
      */
     @Bean
+    @Lazy // TODO 芋艿：临时注释，避免无法启动
     public RedisVectorStore vectorStore(TransformersEmbeddingModel transformersEmbeddingModel, RedisVectorStoreProperties properties,
                                         RedisProperties redisProperties) {
         var config = RedisVectorStore.RedisVectorStoreConfig.builder()
@@ -105,6 +109,7 @@ public class YudaoAiAutoConfiguration {
     }
 
     @Bean
+    @Lazy // TODO 芋艿：临时注释，避免无法启动
     public TokenTextSplitter tokenTextSplitter() {
         return new TokenTextSplitter(500, 100, 5, 10000, true);
     }

@@ -7,7 +7,6 @@ import org.springframework.ai.reader.tika.TikaDocumentReader;
 import org.springframework.ai.transformer.splitter.TokenTextSplitter;
 import org.springframework.ai.vectorstore.RedisVectorStore;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
 
 import java.util.List;
 
@@ -16,7 +15,7 @@ import java.util.List;
  *
  * @author xiaoxin
  */
-@Service
+//@Service  // TODO 芋艿：临时注释，避免无法启动
 @Slf4j
 public class DocServiceImpl implements DocService {
 
