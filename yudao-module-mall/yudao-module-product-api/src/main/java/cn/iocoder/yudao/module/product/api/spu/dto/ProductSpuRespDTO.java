@@ -3,7 +3,6 @@ package cn.iocoder.yudao.module.product.api.spu.dto;
 import cn.iocoder.yudao.module.product.enums.spu.ProductSpuStatusEnum;
 import lombok.Data;
 
-// TODO @LeeYan9: ProductSpuRespDTO
 /**
  * 商品 SPU 信息 Response DTO
  *
