@@ -17,10 +17,10 @@ public interface PayWalletMapper extends BaseMapperX<PayWalletDO> {
                 PayWalletDO::getUserType, userType);
     }
 
-    default PageResult<PayWalletDO> selectPage(Integer userType, PayWalletPageReqVO reqVO) {
+    default PageResult<PayWalletDO> selectPage(PayWalletPageReqVO reqVO) {
         return selectPage(reqVO, new LambdaQueryWrapperX<PayWalletDO>()
-                .inIfPresent(PayWalletDO::getUserId, reqVO.getUserIds())
-                .eqIfPresent(PayWalletDO::getUserType, userType)
+                .eqIfPresent(PayWalletDO::getUserId, reqVO.getUserId())
+                .eqIfPresent(PayWalletDO::getUserType, reqVO.getUserType())
                 .betweenIfPresent(PayWalletDO::getCreateTime, reqVO.getCreateTime())
                 .orderByDesc(PayWalletDO::getId));
     }
@@ -31,7 +31,7 @@ public interface PayWalletMapper extends BaseMapperX<PayWalletDO> {
      * @param id 钱包 id
      * @param price 消费金额
      */
-    default int updateWhenConsumptionRefund(Long id, Integer price){
+    default int updateWhenConsumptionRefund(Long id, Integer price) {
         LambdaUpdateWrapper<PayWalletDO> lambdaUpdateWrapper = new LambdaUpdateWrapper<PayWalletDO>()
                 .setSql(" balance = balance + " + price
                         + ", total_expense = total_expense - " + price)

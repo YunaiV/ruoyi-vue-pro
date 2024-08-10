@@ -25,7 +25,6 @@ import java.time.LocalDateTime;
 @KeySequence(value = "infra_api_error_log_seq")
 public class ApiErrorLogDO extends BaseDO {
 
-
     /**
      * {@link #requestParams} 的最大长度
      */

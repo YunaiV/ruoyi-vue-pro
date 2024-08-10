@@ -30,7 +30,8 @@ public interface ProductSpuMapper extends BaseMapperX<ProductSpuDO> {
                 .likeIfPresent(ProductSpuDO::getName, reqVO.getName())
                 .eqIfPresent(ProductSpuDO::getCategoryId, reqVO.getCategoryId())
                 .betweenIfPresent(ProductSpuDO::getCreateTime, reqVO.getCreateTime())
-                .orderByDesc(ProductSpuDO::getSort);
+                .orderByDesc(ProductSpuDO::getSort)
+                .orderByDesc(ProductSpuDO::getId);
         appendTabQuery(tabType, queryWrapper);
         return selectPage(reqVO, queryWrapper);
     }
@@ -84,9 +85,19 @@ public interface ProductSpuMapper extends BaseMapperX<ProductSpuDO> {
      * @param incrCount 增加的库存数量
      */
     default void updateStock(Long id, Integer incrCount) {
+        // 拼接 SQL
+        if (incrCount == 0) {
+            return;
+        }
+        String sql;
+        if (incrCount > 0) {
+            sql = " stock = stock + " + incrCount + ", sales_count = sales_count - " + incrCount;
+        } else {
+            sql = " stock = stock - " + Math.abs(incrCount) + ", sales_count = sales_count + " + Math.abs(incrCount);
+        }
+        // 执行更新
         LambdaUpdateWrapper<ProductSpuDO> updateWrapper = new LambdaUpdateWrapper<ProductSpuDO>()
-                // 负数，所以使用 + 号
-                .setSql(" stock = stock +" + incrCount)
+                .setSql(sql)
                 .eq(ProductSpuDO::getId, id);
         update(null, updateWrapper);
     }

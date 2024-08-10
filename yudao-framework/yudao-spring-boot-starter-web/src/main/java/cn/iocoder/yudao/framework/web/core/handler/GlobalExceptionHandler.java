@@ -2,9 +2,11 @@ package cn.iocoder.yudao.framework.web.core.handler;
 
 import cn.hutool.core.exceptions.ExceptionUtil;
 import cn.hutool.core.map.MapUtil;
+import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.apilog.core.service.ApiErrorLogFrameworkService;
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
+import cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.util.collection.SetUtils;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
@@ -30,6 +32,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.NoHandlerFoundException;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import java.time.LocalDateTime;
 import java.util.Map;
@@ -86,6 +89,9 @@ public class GlobalExceptionHandler {
         }
         if (ex instanceof NoHandlerFoundException) {
             return noHandlerFoundExceptionHandler(request, (NoHandlerFoundException) ex);
+        }
+        if (ex instanceof NoResourceFoundException) {
+            return noResourceFoundExceptionHandler(request, (NoResourceFoundException) ex);
         }
         if (ex instanceof HttpRequestMethodNotSupportedException) {
             return httpRequestMethodNotSupportedExceptionHandler((HttpRequestMethodNotSupportedException) ex);
@@ -177,6 +183,15 @@ public class GlobalExceptionHandler {
     }
 
     /**
+     * 处理 SpringMVC 请求地址不存在
+     */
+    @ExceptionHandler(NoResourceFoundException.class)
+    private CommonResult<?> noResourceFoundExceptionHandler(HttpServletRequest req, NoResourceFoundException ex) {
+        log.warn("[noResourceFoundExceptionHandler]", ex);
+        return CommonResult.error(NOT_FOUND.getCode(), String.format("请求地址不存在:%s", ex.getResourcePath()));
+    }
+
+    /**
      * 处理 SpringMVC 请求方法不正确
      *
      * 例如说，A 接口的方法为 GET 方式，结果请求方法为 POST 方式，导致不匹配
@@ -206,9 +221,20 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(value = ServiceException.class)
     public CommonResult<?> serviceExceptionHandler(ServiceException ex) {
+        // 不包含的时候，才进行打印，避免 ex 堆栈过多
         if (!IGNORE_ERROR_MESSAGES.contains(ex.getMessage())) {
-            // 不包含的时候，才进行打印，避免 ex 堆栈过多
-            log.info("[serviceExceptionHandler]", ex);
+            // 即使打印，也只打印第一层 StackTraceElement，并且使用 warn 在控制台输出，更容易看到
+            try {
+                StackTraceElement[] stackTraces = ex.getStackTrace();
+                for (StackTraceElement stackTrace : stackTraces) {
+                    if (ObjUtil.notEqual(stackTrace.getClassName(), ServiceExceptionUtil.class.getName())) {
+                        log.warn("[serviceExceptionHandler]\n\t{}", stackTrace);
+                        break;
+                    }
+                }
+            } catch (Exception ignored) {
+                // 忽略日志，避免影响主流程
+            }
         }
         return CommonResult.error(ex.getCode(), ex.getMessage());
     }
@@ -327,6 +353,12 @@ public class GlobalExceptionHandler {
             log.error("[支付模块 yudao-module-pay - 表结构未导入][参考 https://doc.iocoder.cn/pay/build/ 开启]");
             return CommonResult.error(NOT_IMPLEMENTED.getCode(),
                     "[支付模块 yudao-module-pay - 表结构未导入][参考 https://doc.iocoder.cn/pay/build/ 开启]");
+        }
+        // 8. AI 大模型
+        if (message.contains("ai_")) {
+            log.error("[AI 大模型 yudao-module-ai - 表结构未导入][参考 https://doc.iocoder.cn/ai/build/ 开启]");
+            return CommonResult.error(NOT_IMPLEMENTED.getCode(),
+                    "[AI 大模型 yudao-module-ai - 表结构未导入][参考 https://doc.iocoder.cn/ai/build/ 开启]");
         }
         return null;
     }

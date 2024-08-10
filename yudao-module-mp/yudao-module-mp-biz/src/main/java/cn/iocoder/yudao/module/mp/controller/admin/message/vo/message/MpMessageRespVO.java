@@ -2,12 +2,12 @@ package cn.iocoder.yudao.module.mp.controller.admin.message.vo.message;
 
 import cn.iocoder.yudao.module.mp.dal.dataobject.message.MpMessageDO;
 import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import me.chanjar.weixin.common.api.WxConsts;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.List;
 
 @Schema(description = "管理后台 - 公众号消息 Response VO")
@@ -81,7 +81,6 @@ public class MpMessageRespVO {
      *
      * 消息类型为 {@link WxConsts.XmlMsgType} 的 NEWS
      */
-    @TableField(typeHandler = MpMessageDO.ArticleTypeHandler.class)
     private List<MpMessageDO.Article> articles;
 
     @Schema(description = "音乐链接 消息类型为 music 时，才有值", example = "https://www.iocoder.cn/xxx.mp3")

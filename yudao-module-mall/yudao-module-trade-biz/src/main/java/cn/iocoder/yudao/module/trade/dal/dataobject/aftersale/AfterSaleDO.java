@@ -124,7 +124,7 @@ public class AfterSaleDO extends BaseDO {
      *
      * 冗余 {@link TradeOrderItemDO#getProperties()}
      */
-    @TableField(typeHandler = TradeOrderItemDO.PropertyTypeHandler.class)
+    @TableField(typeHandler = JacksonTypeHandler.class)
     private List<TradeOrderItemDO.Property> properties;
     /**
      * 商品图片

@@ -9,11 +9,11 @@ import cn.iocoder.yudao.module.member.api.user.dto.MemberUserRespDTO;
 import cn.iocoder.yudao.module.promotion.enums.common.PromotionTypeEnum;
 import cn.iocoder.yudao.module.trade.service.price.bo.TradePriceCalculateReqBO;
 import cn.iocoder.yudao.module.trade.service.price.bo.TradePriceCalculateRespBO;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
-import jakarta.annotation.Resource;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
@@ -37,11 +37,12 @@ public class TradePointUsePriceCalculator implements TradePriceCalculator {
 
     @Override
     public void calculate(TradePriceCalculateReqBO param, TradePriceCalculateRespBO result) {
-        // 默认使用积分为 0
-        result.setUsePoint(0);
+        // 0. 初始化积分
+        MemberUserRespDTO user = memberUserApi.getUser(param.getUserId());
+        result.setTotalPoint(user.getPoint()).setUsePoint(0);
+
         // 1.1 校验是否使用积分
         if (!BooleanUtil.isTrue(param.getPointStatus())) {
-            result.setUsePoint(0);
             return;
         }
         // 1.2 校验积分抵扣是否开启
@@ -50,7 +51,6 @@ public class TradePointUsePriceCalculator implements TradePriceCalculator {
             return;
         }
         // 1.3 校验用户积分余额
-        MemberUserRespDTO user = memberUserApi.getUser(param.getUserId());
         if (user.getPoint() == null || user.getPoint() <= 0) {
             return;
         }

@@ -7,10 +7,7 @@ import cn.iocoder.yudao.module.trade.controller.app.brokerage.vo.user.AppBrokera
 import cn.iocoder.yudao.module.trade.controller.app.brokerage.vo.user.AppBrokerageUserRankByUserCountRespVO;
 import cn.iocoder.yudao.module.trade.controller.app.brokerage.vo.user.AppBrokerageUserRankPageReqVO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.brokerage.BrokerageUserDO;
-
 import jakarta.validation.constraints.NotNull;
-import java.util.Collection;
-import java.util.List;
 
 /**
  * 分销用户 Service 接口
@@ -26,14 +23,6 @@ public interface BrokerageUserService {
      * @return 分销用户
      */
     BrokerageUserDO getBrokerageUser(Long id);
-
-    /**
-     * 获得分销用户列表
-     *
-     * @param ids 编号
-     * @return 分销用户列表
-     */
-    List<BrokerageUserDO> getBrokerageUserList(Collection<Long> ids);
 
     /**
      * 获得分销用户分页
@@ -66,6 +55,14 @@ public interface BrokerageUserService {
      * @return 用户的推广人
      */
     BrokerageUserDO getBindBrokerageUser(Long id);
+
+    /**
+     * 获得或创建分销用户
+     *
+     * @param id 用户编号
+     * @return 分销用户
+     */
+    BrokerageUserDO getOrCreateBrokerageUser(Long id);
 
     /**
      * 更新用户佣金
@@ -104,8 +101,8 @@ public interface BrokerageUserService {
     /**
      * 【会员】绑定推广员
      *
-     * @param userId       用户编号
-     * @param bindUserId   推广员编号
+     * @param userId     用户编号
+     * @param bindUserId 推广员编号
      * @return 是否绑定
      */
     boolean bindBrokerageUser(@NotNull Long userId, @NotNull Long bindUserId);
@@ -134,4 +131,5 @@ public interface BrokerageUserService {
      * @return 下级分销统计分页
      */
     PageResult<AppBrokerageUserChildSummaryRespVO> getBrokerageUserChildSummaryPage(AppBrokerageUserChildSummaryPageReqVO pageReqVO, Long userId);
+
 }

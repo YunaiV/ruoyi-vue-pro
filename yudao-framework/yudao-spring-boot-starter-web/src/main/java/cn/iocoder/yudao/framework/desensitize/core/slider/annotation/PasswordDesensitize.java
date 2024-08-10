@@ -39,4 +39,11 @@ public @interface PasswordDesensitize {
      */
     String replacer() default "*";
 
+    /**
+     * 是否禁用脱敏
+     *
+     * 支持 Spring EL 表达式，如果返回 true 则跳过脱敏
+     */
+    String disable() default "";
+
 }

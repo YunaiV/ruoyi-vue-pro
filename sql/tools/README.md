@@ -48,20 +48,50 @@ docker compose exec sqlserver bash /tmp/create_schema.sh
 
 ```Bash
 docker load -i dm8_20230808_rev197096_x86_rh6_64_single.tar
-````
+```
 
 ③ 在项目 `sql/tools` 目录下运行：
 
 ```Bash
 docker compose up -d dm8
 # 注意：启动完 dm 后，需要手动再执行如下命令，因为 dm 不支持初始化脚本
-docker compose exec dm8 bash -c "exec /opt/dmdbms/bin/disql SYSDBA/SYSDBA001 \`/tmp/schema.sql"
+docker compose exec dm8 bash -c '/opt/dmdbms/bin/disql SYSDBA/SYSDBA001 \`/tmp/schema.sql'
 exit
 ```
 
 **注意**: `sql/dm/ruoyi-vue-pro-dm8.sql` 文件编码必须为 `GBK` 或者 `GBK` 超集，否则会出现中文乱码。
 
 暂不支持 MacBook Apple Silicon，因为 达梦 官方没有提供 Apple Silicon 版本的 Docker 镜像。
+
+### 1.6 KingbaseES 人大金仓
+
+① 下载人大金仓 Docker 镜像：
+
+> x86_64 版本: https://kingbase.oss-cn-beijing.aliyuncs.com/KESV8R3/V009R001C001B0025-安装包-docker/x86_64/kdb_x86_64_V009R001C001B0025.tar
+
+> aarch64 版本：https://kingbase.oss-cn-beijing.aliyuncs.com/KESV8R3/V009R001C001B0025-安装包-docker/aarch64/kdb_aarch64_V009R001C001B0025.tar
+
+② 加载镜像文件，在镜像 tar 文件所在目录运行：
+
+```Bash
+docker load -i x86_64/kdb_x86_64_V009R001C001B0025.tar
+```
+
+③ 在项目 `sql/tools` 目录下运行：
+
+```Bash
+docker compose up -d kingbase
+# 注意：启动完 kingbase 后，需要手动再执行如下命令
+docker compose exec kingbase bash -c 'ksql -U $DB_USER -d test -f /tmp/schema.sql'
+```
+
+### 1.7 华为 OpenGauss
+
+```Bash
+docker compose up -d opengauss
+# 注意：启动完 opengauss 后，需要手动再执行如下命令
+docker compose exec opengauss bash -c '/usr/local/opengauss/bin/gsql -U $GS_USERNAME -W $GS_PASSWORD -d postgres -f /tmp/schema.sql'
+```
 
 ## 1.X 容器的销毁重建
 
@@ -78,7 +108,7 @@ docker volume rm ruoyi-vue-pro_postgres
 
 ### 2.1 实现原理
 
-通过读取 MySQL 的 `sql/mysql/ruoyi-vue-pro.sql` 数据库文件，转换成 Oracle、PostgreSQL、SQL Server 等数据库的脚本。
+通过读取 MySQL 的 `sql/mysql/ruoyi-vue-pro.sql` 数据库文件，转换成 Oracle、PostgreSQL、SQL Server、达梦、人大金仓 等数据库的脚本。
 
 ### 2.2 使用方法
 
@@ -89,7 +119,7 @@ pip install simple-ddl-parser
 # pip3 install simple-ddl-parser
 ```
 
-② 执行如下命令打印生成 postgres 的脚本内容，其他可选参数有：`oracle`、`sqlserver`、`dm8`：
+② 执行如下命令打印生成 postgres 的脚本内容，其他可选参数有：`oracle`、`sqlserver`、`dm8`、`kingbase`：
 
 ```Bash
 python3 convertor.py postgres

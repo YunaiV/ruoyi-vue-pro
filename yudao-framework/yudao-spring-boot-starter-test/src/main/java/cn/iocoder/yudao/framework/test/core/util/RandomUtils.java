@@ -103,6 +103,10 @@ public class RandomUtils {
         return randomString() + "@qq.com";
     }
 
+    public static String randomMobile() {
+        return "13800138" + RandomUtil.randomNumbers(3);
+    }
+
     public static String randomURL() {
         return "https://www.iocoder.cn/" + randomString();
     }
