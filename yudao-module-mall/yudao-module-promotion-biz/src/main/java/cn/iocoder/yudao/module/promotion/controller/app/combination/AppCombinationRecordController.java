@@ -10,9 +10,7 @@ import cn.iocoder.yudao.module.promotion.controller.app.combination.vo.record.Ap
 import cn.iocoder.yudao.module.promotion.controller.app.combination.vo.record.AppCombinationRecordSummaryRespVO;
 import cn.iocoder.yudao.module.promotion.convert.combination.CombinationActivityConvert;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.combination.CombinationRecordDO;
-import cn.iocoder.yudao.module.promotion.enums.combination.CombinationRecordStatusEnum;
 import cn.iocoder.yudao.module.promotion.service.combination.CombinationRecordService;
-import cn.iocoder.yudao.module.trade.api.order.TradeOrderApi;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
@@ -20,7 +18,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -43,9 +40,6 @@ public class AppCombinationRecordController {
 
     @Resource
     private CombinationRecordService combinationRecordService;
-    @Resource
-    @Lazy
-    private TradeOrderApi tradeOrderApi;
 
     @GetMapping("/get-summary")
     @Operation(summary = "获得拼团记录的概要信息", description = "用于小程序首页")
@@ -115,28 +109,6 @@ public class AppCombinationRecordController {
 
         // 3. 拼接数据
         return success(CombinationActivityConvert.INSTANCE.convert(getLoginUserId(), headRecord, memberRecords));
-    }
-
-    @GetMapping("/cancel")
-    @Operation(summary = "取消拼团")
-    @Parameter(name = "id", description = "拼团记录编号", required = true, example = "1024")
-    public CommonResult<Boolean> cancelCombinationRecord(@RequestParam("id") Long id) {
-        Long userId = getLoginUserId();
-        // 1、查找这条拼团记录
-        CombinationRecordDO record = combinationRecordService.getCombinationRecordByIdAndUser(userId, id);
-        if (record == null) {
-            return success(Boolean.FALSE);
-        }
-        // 1.1、需要先校验拼团记录未完成；
-        if (!CombinationRecordStatusEnum.isInProgress(record.getStatus())) {
-            return success(Boolean.FALSE);
-        }
-
-        // 2. 取消已支付的订单
-        tradeOrderApi.cancelPaidOrder(userId, record.getOrderId());
-        // 3. 取消拼团记录
-        combinationRecordService.cancelCombinationRecord(userId, record.getId(), record.getHeadId());
-        return success(Boolean.TRUE);
     }
 
 }
