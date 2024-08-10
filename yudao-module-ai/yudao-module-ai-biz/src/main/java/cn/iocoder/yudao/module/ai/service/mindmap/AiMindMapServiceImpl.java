@@ -6,9 +6,11 @@ import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.ai.core.enums.AiPlatformEnum;
 import cn.iocoder.yudao.framework.ai.core.util.AiUtils;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.tenant.core.util.TenantUtils;
 import cn.iocoder.yudao.module.ai.controller.admin.mindmap.vo.AiMindMapGenerateReqVO;
+import cn.iocoder.yudao.module.ai.controller.admin.mindmap.vo.AiMindMapPageReqVO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.mindmap.AiMindMapDO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiChatModelDO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiChatRoleDO;
@@ -33,8 +35,10 @@ import reactor.core.publisher.Flux;
 import java.util.ArrayList;
 import java.util.List;
 
+import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.error;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
+import static cn.iocoder.yudao.module.ai.enums.ErrorCodeConstants.MIND_MAP_NOT_EXISTS;
 
 /**
  * AI 思维导图 Service 实现类
@@ -129,6 +133,25 @@ public class AiMindMapServiceImpl implements AiMindMapService {
         }
         Assert.notNull(model, "[AI] 获取不到模型");
         return model;
+    }
+
+    @Override
+    public void deleteMindMap(Long id) {
+        // 校验存在
+        validateMindMapExists(id);
+        // 删除
+        mindMapMapper.deleteById(id);
+    }
+
+    private void validateMindMapExists(Long id) {
+        if (mindMapMapper.selectById(id) == null) {
+            throw exception(MIND_MAP_NOT_EXISTS);
+        }
+    }
+
+    @Override
+    public PageResult<AiMindMapDO> getMindMapPage(AiMindMapPageReqVO pageReqVO) {
+        return mindMapMapper.selectPage(pageReqVO);
     }
 
 }
