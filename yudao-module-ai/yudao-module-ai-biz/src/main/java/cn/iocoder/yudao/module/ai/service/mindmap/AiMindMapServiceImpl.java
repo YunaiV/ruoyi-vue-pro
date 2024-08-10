@@ -61,10 +61,10 @@ public class AiMindMapServiceImpl implements AiMindMapService {
 
     @Override
     public Flux<CommonResult<String>> generateMindMap(AiMindMapGenerateReqVO generateReqVO, Long userId) {
-        // 1. 获取脑图模型。尝试获取思维导图助手角色，如果没有则使用默认模型
+        // 1. 获取导图模型。尝试获取思维导图助手角色，如果没有则使用默认模型
         AiChatRoleDO role = CollUtil.getFirst(
                 chatRoleService.getChatRoleListByName(AiChatRoleEnum.AI_MIND_MAP_ROLE.getName()));
-        // 1.1 获取脑图执行模型
+        // 1.1 获取导图执行模型
         AiChatModelDO model = getModel(role);
         // 1.2 获取角色设定消息
         String systemMessage = role != null && StrUtil.isNotBlank(role.getSystemMessage())
