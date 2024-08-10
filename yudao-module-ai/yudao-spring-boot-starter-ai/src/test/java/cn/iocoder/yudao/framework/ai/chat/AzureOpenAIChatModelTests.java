@@ -1,32 +1,39 @@
 package cn.iocoder.yudao.framework.ai.chat;
 
+import com.azure.ai.openai.OpenAIClient;
+import com.azure.ai.openai.OpenAIClientBuilder;
+import com.azure.core.credential.AzureKeyCredential;
+import com.azure.core.util.ClientOptions;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.springframework.ai.azure.openai.AzureOpenAiChatModel;
+import org.springframework.ai.azure.openai.AzureOpenAiChatOptions;
 import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.chat.messages.SystemMessage;
 import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.prompt.Prompt;
-import org.springframework.ai.openai.OpenAiChatModel;
-import org.springframework.ai.openai.OpenAiChatOptions;
-import org.springframework.ai.openai.api.OpenAiApi;
 import reactor.core.publisher.Flux;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.springframework.ai.autoconfigure.azure.openai.AzureOpenAiChatProperties.DEFAULT_DEPLOYMENT_NAME;
+
 /**
- * {@link OpenAiChatModel} 集成测试
+ * {@link AzureOpenAiChatModel} 集成测试
  *
  * @author 芋道源码
  */
-public class OpenAIChatModelTests {
+public class AzureOpenAIChatModelTests {
 
-    private final OpenAiApi openAiApi = new OpenAiApi(
-            "https://api.holdai.top",
-            "sk-dZEPiVaNcT3FHhef51996bAa0bC74806BeAb620dA5Da10Bf");
-    private final OpenAiChatModel chatModel = new OpenAiChatModel(openAiApi,
-            OpenAiChatOptions.builder().withModel(OpenAiApi.ChatModel.GPT_4_O).build());
+    private final OpenAIClient openAiApi = (new OpenAIClientBuilder())
+            .endpoint("https://eastusprejade.openai.azure.com")
+            .credential(new AzureKeyCredential("xxx"))
+            .clientOptions((new ClientOptions()).setApplicationId("spring-ai"))
+            .buildClient();
+    private final AzureOpenAiChatModel chatModel = new AzureOpenAiChatModel(openAiApi,
+            AzureOpenAiChatOptions.builder().withDeploymentName(DEFAULT_DEPLOYMENT_NAME).build());
 
     @Test
     @Disabled
