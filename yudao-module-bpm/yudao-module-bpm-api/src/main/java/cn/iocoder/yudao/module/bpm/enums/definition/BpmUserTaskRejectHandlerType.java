@@ -16,7 +16,7 @@ import java.util.Arrays;
 @AllArgsConstructor
 public enum BpmUserTaskRejectHandlerType implements IntArrayValuable {
 
-    FINISH_PROCESS(1, "终止流程"),
+    FINISH_PROCESS_INSTANCE(1, "终止流程"),
     RETURN_USER_TASK(2, "驳回到指定任务节点");
 
     private final Integer type;

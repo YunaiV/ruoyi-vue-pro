@@ -12,7 +12,9 @@ import org.springframework.stereotype.Component;
 import java.util.Set;
 
 /**
- * 发起人自己 {@link BpmTaskCandidateUserStrategy} 实现类。 用于需要发起人信息复核等场景
+ * 发起人自己 {@link BpmTaskCandidateUserStrategy} 实现类
+ *
+ * 适合场景：用于需要发起人信息复核等场景
  *
  * @author jason
  */

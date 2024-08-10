@@ -7,6 +7,7 @@ import lombok.Getter;
 
 import java.util.Arrays;
 
+// TODO @jason：BpmUserTaskTimeoutHandlerTypeEnum 会不会更匹配哈
 /**
  * 用户任务超时处理执行动作枚举
  *
@@ -16,9 +17,9 @@ import java.util.Arrays;
 @AllArgsConstructor
 public enum BpmUserTaskTimeoutActionEnum implements IntArrayValuable {
 
-    AUTO_REMINDER(1,"自动提醒"),
-    AUTO_APPROVE(2, "自动同意"),
-    AUTO_REJECT(3, "自动拒绝");
+    REMINDER(1,"自动提醒"),
+    APPROVE(2, "自动同意"),
+    REJECT(3, "自动拒绝");
 
     private final Integer action;
     private final String name;

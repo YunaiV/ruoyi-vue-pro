@@ -27,7 +27,7 @@ import static cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.s
 import static cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.simple.BpmSimpleModelNodeVO.TimeoutHandler;
 import static cn.iocoder.yudao.module.bpm.enums.definition.BpmBoundaryEventType.USER_TASK_TIMEOUT;
 import static cn.iocoder.yudao.module.bpm.enums.definition.BpmSimpleModelNodeType.*;
-import static cn.iocoder.yudao.module.bpm.enums.definition.BpmUserTaskTimeoutActionEnum.AUTO_REMINDER;
+import static cn.iocoder.yudao.module.bpm.enums.definition.BpmUserTaskTimeoutActionEnum.REMINDER;
 import static cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnModelConstants.*;
 import static cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.SimpleModelConstants.*;
 import static org.flowable.bpmn.constants.BpmnXMLConstants.*;
@@ -356,7 +356,7 @@ public class SimpleModelUtils {
         boundaryEvent.setAttachedToRef(userTask);
         TimerEventDefinition eventDefinition = new TimerEventDefinition();
         eventDefinition.setTimeDuration(timeoutHandler.getTimeDuration());
-        if (Objects.equals(AUTO_REMINDER.getAction(), timeoutHandler.getAction()) &&
+        if (Objects.equals(REMINDER.getAction(), timeoutHandler.getAction()) &&
                 timeoutHandler.getMaxRemindCount() != null && timeoutHandler.getMaxRemindCount() > 1) {
             // 最大提醒次数
             eventDefinition.setTimeCycle(String.format("R%d/%s", timeoutHandler.getMaxRemindCount(), timeoutHandler.getTimeDuration()));
@@ -475,7 +475,7 @@ public class SimpleModelUtils {
 
     private static void processMultiInstanceLoopCharacteristics(Integer approveMethod, Integer approveRatio, UserTask userTask) {
         BpmApproveMethodEnum bpmApproveMethodEnum = BpmApproveMethodEnum.valueOf(approveMethod);
-        if (bpmApproveMethodEnum == null || bpmApproveMethodEnum == BpmApproveMethodEnum.RANDOM_SELECT_ONE_APPROVE) {
+        if (bpmApproveMethodEnum == null || bpmApproveMethodEnum == BpmApproveMethodEnum.RANDOM) {
             return;
         }
         // 添加审批方式的扩展属性
@@ -484,16 +484,16 @@ public class SimpleModelUtils {
         MultiInstanceLoopCharacteristics multiInstanceCharacteristics = new MultiInstanceLoopCharacteristics();
         //  设置 collectionVariable。本系统用不到。会在 仅仅为了校验。
         multiInstanceCharacteristics.setInputDataItem("${coll_userList}");
-        if (bpmApproveMethodEnum == BpmApproveMethodEnum.ANY_APPROVE) {
+        if (bpmApproveMethodEnum == BpmApproveMethodEnum.ANY) {
             multiInstanceCharacteristics.setCompletionCondition(ANY_OF_APPROVE_COMPLETE_EXPRESSION);
             multiInstanceCharacteristics.setSequential(false);
             userTask.setLoopCharacteristics(multiInstanceCharacteristics);
-        } else if (bpmApproveMethodEnum == BpmApproveMethodEnum.SEQUENTIAL_APPROVE) {
+        } else if (bpmApproveMethodEnum == BpmApproveMethodEnum.SEQUENTIAL) {
             multiInstanceCharacteristics.setCompletionCondition(ALL_APPROVE_COMPLETE_EXPRESSION);
             multiInstanceCharacteristics.setSequential(true);
             multiInstanceCharacteristics.setLoopCardinality("1");
             userTask.setLoopCharacteristics(multiInstanceCharacteristics);
-        } else if (bpmApproveMethodEnum == BpmApproveMethodEnum.APPROVE_BY_RATIO) {
+        } else if (bpmApproveMethodEnum == BpmApproveMethodEnum.RATIO) {
             Assert.notNull(approveRatio, "通过比例不能为空");
             double approvePct = approveRatio / (double) 100;
             multiInstanceCharacteristics.setCompletionCondition(String.format(APPROVE_BY_RATIO_COMPLETE_EXPRESSION, String.format("%.2f", approvePct)));

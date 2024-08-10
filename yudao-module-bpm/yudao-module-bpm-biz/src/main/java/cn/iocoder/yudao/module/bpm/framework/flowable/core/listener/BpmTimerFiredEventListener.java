@@ -85,13 +85,13 @@ public class BpmTimerFiredEventListener extends AbstractFlowableEngineEventListe
                     null, taskDefKey);
             taskList.forEach(task -> {
                 // 自动提醒
-                if (userTaskTimeoutAction == BpmUserTaskTimeoutActionEnum.AUTO_REMINDER) {
+                if (userTaskTimeoutAction == BpmUserTaskTimeoutActionEnum.REMINDER) {
                     TodoTaskReminderMessage message = new TodoTaskReminderMessage().setTenantId(Long.parseLong(task.getTenantId()))
                             .setUserId(Long.parseLong(task.getAssignee())).setTaskName(task.getName());
                     todoTaskReminderProducer.sendReminderMessage(message);
                 }
                 // 自动同意
-                if (userTaskTimeoutAction == BpmUserTaskTimeoutActionEnum.AUTO_APPROVE) {
+                if (userTaskTimeoutAction == BpmUserTaskTimeoutActionEnum.APPROVE) {
                     // TODO @芋艿 这个上下文如何清除呢？ 任务通过后, BpmProcessInstanceEventListener 会有回调
                     TenantContextHolder.setTenantId(Long.parseLong(task.getTenantId()));
                     TenantContextHolder.setIgnore(false);
@@ -100,7 +100,7 @@ public class BpmTimerFiredEventListener extends AbstractFlowableEngineEventListe
                     bpmTaskService.approveTask(Long.parseLong(task.getAssignee()), req);
                 }
                 // 自动拒绝
-                if (userTaskTimeoutAction == BpmUserTaskTimeoutActionEnum.AUTO_REJECT) {
+                if (userTaskTimeoutAction == BpmUserTaskTimeoutActionEnum.REJECT) {
                     // TODO  @芋艿 这个上下文如何清除呢？ 任务拒绝后, BpmProcessInstanceEventListener 会有回调
                     TenantContextHolder.setTenantId(Long.parseLong(task.getTenantId()));
                     TenantContextHolder.setIgnore(false);

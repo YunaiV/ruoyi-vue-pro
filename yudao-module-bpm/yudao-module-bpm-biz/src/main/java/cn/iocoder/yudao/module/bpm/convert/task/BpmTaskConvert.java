@@ -111,8 +111,8 @@ public interface BpmTaskConvert {
                 taskVO.setOwnerUser(BeanUtils.toBean(ownerUser, BpmProcessInstanceRespVO.User.class));
                 findAndThen(deptMap, ownerUser.getDeptId(), dept -> taskVO.getOwnerUser().setDeptName(dept.getName()));
             }
-            if(BpmTaskStatusEnum.RUNNING.getStatus().equals(taskStatus)){
-                // 设置表单权限 TODO @芋艿 是不是还要加一个全局的权限 基于 processInstance 的权限
+            if (BpmTaskStatusEnum.RUNNING.getStatus().equals(taskStatus)){
+                // 设置表单权限 TODO @芋艿 是不是还要加一个全局的权限 基于 processInstance 的权限；回复：可能不需要，但是发起人，需要有个权限配置
                 taskVO.setFieldsPermission(BpmnModelUtils.parseFormFieldsPermission(bpmnModel, task.getTaskDefinitionKey()));
                 // 操作按钮设置
                 taskVO.setButtonsSetting(BpmnModelUtils.parseButtonsSetting(bpmnModel, task.getTaskDefinitionKey()));

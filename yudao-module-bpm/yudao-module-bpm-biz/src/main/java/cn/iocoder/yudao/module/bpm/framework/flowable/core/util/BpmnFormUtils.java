@@ -26,8 +26,10 @@ public class BpmnFormUtils {
     private static final String CREATE_FORM_DISPLAY_ATTRIBUTE = "display";
     private static final String CREATE_FORM_DISABLED_ATTRIBUTE = "disabled";
 
+    // TODO @jason：这个方法，还要哇？
     /**
      * 修改 form-create 表单组件字段权限规则： 包括可编辑、只读、隐藏规则
+     *
      * @param fields 字段规则
      * @param fieldsPermission 字段权限
      * @return 修改权限后的字段规则

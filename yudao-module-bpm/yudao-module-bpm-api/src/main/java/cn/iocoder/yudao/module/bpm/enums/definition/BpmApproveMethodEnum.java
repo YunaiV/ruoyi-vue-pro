@@ -16,10 +16,10 @@ import java.util.Arrays;
 @AllArgsConstructor
 public enum BpmApproveMethodEnum implements IntArrayValuable {
 
-    RANDOM_SELECT_ONE_APPROVE(1, "随机挑选一人审批"),
-    APPROVE_BY_RATIO(2, "多人会签(按通过比例)"), // 会签（按通过比例）
-    ANY_APPROVE(3, "多人或签(一人通过或拒绝)"), // 或签（通过只需一人，拒绝只需一人）
-    SEQUENTIAL_APPROVE(4, "依次审批"); // 依次审批
+    RANDOM(1, "随机挑选一人审批"),
+    RATIO(2, "多人会签(按通过比例)"), // 会签（按通过比例）
+    ANY(3, "多人或签(一人通过或拒绝)"), // 或签（通过只需一人，拒绝只需一人）
+    SEQUENTIAL(4, "依次审批"); // 依次审批
 
     /**
      * 审批方式
