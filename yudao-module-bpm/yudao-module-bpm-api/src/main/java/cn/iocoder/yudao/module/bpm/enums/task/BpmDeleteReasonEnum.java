@@ -22,8 +22,6 @@ public enum BpmDeleteReasonEnum {
     // ========== 流程任务的独有原因 ==========
 
     CANCEL_BY_SYSTEM("系统自动取消"), // 场景：非常多，比如说：1）多任务审批已经满足条件，无需审批该任务；2）流程实例被取消，无需审批该任务；等等
-    // TODO @芋艿：这个枚举状态，需要关注下！
-    AUTO_REJECT_BY_ADD_SIGN_REJECT("系统自动拒绝，原因：加签任务被拒绝") // 加签任务审批不通过，导致任务不通过
     ;
 
     private final String reason;

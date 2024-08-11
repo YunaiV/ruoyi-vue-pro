@@ -10,6 +10,7 @@ import org.flowable.engine.delegate.event.FlowableCancelledEvent;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.runtime.ProcessInstance;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -141,7 +142,7 @@ public interface BpmProcessInstanceService {
      * @param endId  结束节点 Id
      * @param reason 理由。例如说，审批不通过时，需要传递该值
      */
-    void updateProcessInstanceReject(ProcessInstance processInstance, List<String> activityIds, String endId, String reason);
+    void updateProcessInstanceReject(ProcessInstance processInstance, Collection<String> activityIds, String endId, String reason);
 
     /**
      * 当流程结束时候，更新 ProcessInstance 为通过

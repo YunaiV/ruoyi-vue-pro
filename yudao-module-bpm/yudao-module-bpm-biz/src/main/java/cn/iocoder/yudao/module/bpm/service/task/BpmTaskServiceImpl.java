@@ -3,7 +3,6 @@ package cn.iocoder.yudao.module.bpm.service.task;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.*;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.date.DateUtils;
 import cn.iocoder.yudao.framework.common.util.number.NumberUtils;
 import cn.iocoder.yudao.framework.common.util.object.PageUtils;
@@ -53,8 +52,6 @@ import java.util.stream.Stream;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
 import static cn.iocoder.yudao.module.bpm.enums.ErrorCodeConstants.*;
-import static cn.iocoder.yudao.module.bpm.enums.task.BpmCommentTypeEnum.REJECT_BY_ADD_SIGN_TASK_REJECT;
-import static cn.iocoder.yudao.module.bpm.enums.task.BpmDeleteReasonEnum.AUTO_REJECT_BY_ADD_SIGN_REJECT;
 
 /**
  * 流程任务实例 Service 实现类
@@ -329,35 +326,41 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         if (instance == null) {
             throw exception(PROCESS_INSTANCE_NOT_EXISTS);
         }
+
+        // 2. 处理当前任务
         // 2.1 更新流程任务为不通过
         updateTaskStatusAndReason(task.getId(), BpmTaskStatusEnum.REJECT.getStatus(), reqVO.getReason());
         // 2.2 添加评论
         taskService.addComment(task.getId(), task.getProcessInstanceId(), BpmCommentTypeEnum.REJECT.getType(),
                 BpmCommentTypeEnum.REJECT.formatComment(reqVO.getReason()));
 
-        // 3.1 如果是被加签任务且是后加签。 更新加签任务状态为取消
-        if (BpmTaskSignTypeEnum.AFTER.getType().equals(task.getScopeType())) {
-            List<Task> childTaskList = getTaskListByParentTaskId(task.getId());
-            updateTaskStatusWhenCanceled(childTaskList, reqVO.getReason());
+        // 3. 处理其他进行中的任务
+        // 3.1 如果当前任务时被加签的，则加它的根任务也标记成未通过
+        // 疑问：为什么要标记未通过呢？
+        // 回答：例如说 A 任务被向前加签除 B 任务时，B 任务被审批不通过，此时 A 会被取消。而 yudao-ui-admin-vue3 不展示“已取消”的任务，导致展示不出审批不通过的细节。
+        if (task.getParentTaskId() != null) {
+            String rootParentId = getTaskRootParentId(task);
+            updateTaskStatusAndReason(rootParentId, BpmTaskStatusEnum.REJECT.getStatus(),
+                    BpmCommentTypeEnum.REJECT.formatComment("加签任务不通过"));
+            taskService.addComment(rootParentId, task.getProcessInstanceId(), BpmCommentTypeEnum.REJECT.getType(),
+                    BpmCommentTypeEnum.REJECT.formatComment("加签任务不通过"));
         }
-        // 3.2 如果是加签的任务
-        if (StrUtil.isNotEmpty(task.getParentTaskId())) {
-            Task signTask = validateTaskExist(task.getParentTaskId());
-            // 3.2.1 更新被加签的任务为不通过
-            if (BpmTaskSignTypeEnum.BEFORE.getType().equals(signTask.getScopeType())) {
-                updateTaskStatusAndReason(task.getParentTaskId(), BpmTaskStatusEnum.REJECT.getStatus(), AUTO_REJECT_BY_ADD_SIGN_REJECT.getReason());
-            } else if (BpmTaskSignTypeEnum.AFTER.getType().equals(signTask.getScopeType())) {
-                updateTaskStatus(task.getParentTaskId(), BpmTaskStatusEnum.REJECT.getStatus());
-                // 后加签 不添加拒绝意见。因为会把原来的意见覆盖.
+        // 3.2 其它未结束的任务，直接取消
+        // 疑问：为什么不通过 updateTaskStatusWhenCanceled 监听取消，而是直接提前调用呢？
+        // 回答：详细见 updateTaskStatusWhenCanceled 的方法，加签的场景
+        List<Task> taskList = getRunningTaskListByProcessInstanceId(instance.getProcessInstanceId(), null, null, null);
+        taskList.forEach(otherTask -> {
+            if (!otherTask.getId().equals(task.getId())) { // 不需要处理当前任务
+                return;
             }
-            // 3.2.2 添加评论
-            taskService.addComment(task.getParentTaskId(), task.getProcessInstanceId(),
-                    BpmCommentTypeEnum.REJECT.getType(), REJECT_BY_ADD_SIGN_TASK_REJECT.getComment());
-            // 3.2.3 更新还在进行中的加签任务状态为取消
-            List<Task> addSignTaskList = getTaskListByParentTaskId(task.getParentTaskId());
-            updateTaskStatusWhenCanceled(CollectionUtils.filterList(addSignTaskList, item -> !item.getId().equals(task.getId())),
-                    reqVO.getReason());
-        }
+            Integer otherTaskStatus = (Integer) task.getTaskLocalVariables().get(BpmConstants.TASK_VARIABLE_STATUS);
+            if (BpmTaskStatusEnum.isEndStatus(otherTaskStatus)) {
+                return;
+            }
+            updateTaskStatusWhenCanceled(otherTask.getId());
+        });
+        taskList.stream().filter(otherTask -> !otherTask.getId().equals(task.getId())) // 需要排除当前任务
+                .forEach(otherTask -> updateTaskStatusWhenCanceled(otherTask.getId()));
 
         // 4.1 驳回到指定的任务节点
         BpmnModel bpmnModel = bpmModelService.getBpmnModelByDefinitionId(task.getProcessDefinitionId());
@@ -372,26 +375,11 @@ public class BpmTaskServiceImpl implements BpmTaskService {
             return;
         }
 
-        // 4.2.1 更新其它正在运行的任务状态为取消。需要过滤掉当前任务和被加签的任务
-        // TODO @jason：如果过滤掉被加签的任务，这些任务被对应的审批人看到是啥状态哈？ @芋艿 为不通过状态。
-        List<Task> taskList = getRunningTaskListByProcessInstanceId(instance.getProcessInstanceId(), false, null, null);
-        updateTaskStatusWhenCanceled(
-                CollectionUtils.filterList(taskList, item -> !item.getId().equals(task.getId()) && !item.getId().equals(task.getParentTaskId())),
-                reqVO.getReason());
-        // 4.2.2 终止流程
+        // 4.2 终止流程
         Set<String> activityIds = convertSet(taskList, Task::getTaskDefinitionKey);
         EndEvent endEvent = BpmnModelUtils.getEndEvent(bpmnModel);
         Assert.notNull(endEvent, "结束节点不能未空");
-        processInstanceService.updateProcessInstanceReject(instance, CollUtil.newArrayList(activityIds), endEvent.getId(), reqVO.getReason());
-    }
-
-    private void updateTaskStatusWhenCanceled(List<Task> taskList, String reason) {
-        taskList.forEach(task -> {
-            updateTaskStatusAndReason(task.getId(), BpmTaskStatusEnum.CANCEL.getStatus(), BpmDeleteReasonEnum.CANCEL_BY_SYSTEM.getReason());
-            taskService.addComment(task.getId(), task.getProcessInstanceId(),
-                    BpmCommentTypeEnum.CANCEL.getType(), BpmCommentTypeEnum.CANCEL.formatComment(reason));
-
-        });
+        processInstanceService.updateProcessInstanceReject(instance, activityIds, endEvent.getId(), reqVO.getReason());
     }
 
     /**
@@ -440,9 +428,14 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         updateTaskStatus(task.getId(), BpmTaskStatusEnum.RUNNING.getStatus());
     }
 
+    /**
+     * 重要补充说明：该方法目前主要有两个情况会调用到：
+     *
+     * 1. 或签场景 + 审批通过：一个或签有多个审批时，如果 A 审批通过，其它或签 B、C 等任务会被 Flowable 自动删除，此时需要通过该方法更新状态为已取消
+     * 2. 审批不通过：在 {@link #rejectTask(Long, BpmTaskRejectReqVO)} 不通过时，对于加签的任务，不会被 Flowable 删除，此时需要通过该方法更新状态为已取消
+     */
     @Override
     public void updateTaskStatusWhenCanceled(String taskId) {
-        // @芋艿。这里是不是可以不要了，要不然。  updateTaskStatusAndReason 会报错 task 已经删除了。
         Task task = getTask(taskId);
         // 1. 可能只是活动，不是任务，所以查询不到
         if (task == null) {
@@ -500,6 +493,8 @@ public class BpmTaskServiceImpl implements BpmTaskService {
                 .includeTaskLocalVariables();
         if (BooleanUtil.isTrue(assigned)) {
             taskQuery.taskAssigned();
+        } else if (BooleanUtil.isFalse(assigned)) {
+            taskQuery.taskUnassigned();
         }
         if (StrUtil.isNotEmpty(executionId)) {
             taskQuery.executionId(executionId);
@@ -886,6 +881,29 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         String tableName = managementService.getTableName(TaskEntity.class);
         String sql = "SELECT COUNT(1) from " + tableName + " WHERE PARENT_TASK_ID_=#{parentTaskId}";
         return taskService.createNativeTaskQuery().sql(sql).parameter("parentTaskId", parentTaskId).count();
+    }
+
+    /**
+     * 获得任务根任务的父任务编号
+     *
+     * @param task 任务
+     * @return 根任务的父任务编号
+     */
+    private String getTaskRootParentId(Task task) {
+        if (task == null || task.getParentTaskId() == null) {
+            return null;
+        }
+        for (int i = 0; i < Short.MAX_VALUE; i++) {
+            Task parentTask = getTask(task.getParentTaskId());
+            if (parentTask == null) {
+                return null;
+            }
+            if (parentTask.getParentTaskId() == null) {
+                return parentTask.getId();
+            }
+            task = parentTask;
+        }
+        throw new IllegalArgumentException(String.format("Task(%s) 层级过深，无法获取父节点编号", task.getId()));
     }
 
     @Override

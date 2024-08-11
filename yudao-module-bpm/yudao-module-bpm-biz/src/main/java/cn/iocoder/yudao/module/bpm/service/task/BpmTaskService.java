@@ -133,9 +133,9 @@ public interface BpmTaskService {
      * 根据条件查询正在进行中的任务
      *
      * @param processInstanceId 流程实例编号，不允许为空
-     * @param assigned 是否分配了审批人
-     * @param executionId execution Id
-     * @param taskDefineKey 任务定义 Key
+     * @param assigned 是否分配了审批人，允许空
+     * @param executionId execution Id，允许空
+     * @param taskDefineKey 任务定义 Key，允许空
      */
     List<Task> getRunningTaskListByProcessInstanceId(String processInstanceId,
                                                      Boolean assigned,
