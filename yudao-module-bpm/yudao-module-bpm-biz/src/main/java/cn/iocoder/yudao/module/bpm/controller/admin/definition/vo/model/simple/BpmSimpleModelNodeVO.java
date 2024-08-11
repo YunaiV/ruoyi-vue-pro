@@ -4,7 +4,7 @@ import cn.iocoder.yudao.framework.common.validation.InEnum;
 import cn.iocoder.yudao.module.bpm.enums.definition.BpmApproveMethodEnum;
 import cn.iocoder.yudao.module.bpm.enums.definition.BpmSimpleModelNodeType;
 import cn.iocoder.yudao.module.bpm.enums.definition.BpmUserTaskRejectHandlerType;
-import cn.iocoder.yudao.module.bpm.enums.definition.BpmUserTaskTimeoutActionEnum;
+import cn.iocoder.yudao.module.bpm.enums.definition.BpmUserTaskTimeoutHandlerType;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmTaskCandidateStrategyEnum;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -104,7 +104,7 @@ public class BpmSimpleModelNodeVO {
         private Boolean enable;
 
         @Schema(description = "任务超时未处理的行为", example = "1")
-        @InEnum(BpmUserTaskTimeoutActionEnum.class)
+        @InEnum(BpmUserTaskTimeoutHandlerType.class)
         private Integer action;
 
         @Schema(description = "超时时间", example = "PT6H")

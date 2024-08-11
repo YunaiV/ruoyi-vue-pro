@@ -5,7 +5,7 @@ import cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder;
 import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.task.BpmTaskApproveReqVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.task.BpmTaskRejectReqVO;
 import cn.iocoder.yudao.module.bpm.enums.definition.BpmBoundaryEventType;
-import cn.iocoder.yudao.module.bpm.enums.definition.BpmUserTaskTimeoutActionEnum;
+import cn.iocoder.yudao.module.bpm.enums.definition.BpmUserTaskTimeoutHandlerType;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnModelConstants;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.mq.message.task.TodoTaskReminderMessage;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.mq.producer.task.TodoTaskReminderProducer;
@@ -78,20 +78,20 @@ public class BpmTimerFiredEventListener extends AbstractFlowableEngineEventListe
     }
 
     private void userTaskTimeoutHandler(String processInstanceId, String taskDefKey, Integer timeoutAction) {
-        BpmUserTaskTimeoutActionEnum userTaskTimeoutAction = BpmUserTaskTimeoutActionEnum.actionOf(timeoutAction);
+        BpmUserTaskTimeoutHandlerType userTaskTimeoutAction = BpmUserTaskTimeoutHandlerType.typeOf(timeoutAction);
         if (userTaskTimeoutAction != null) {
             // 查询超时未处理的任务 TODO 加签的情况会不会有问题 ???
             List<Task> taskList = bpmTaskService.getRunningTaskListByProcessInstanceId(processInstanceId, true,
                     null, taskDefKey);
             taskList.forEach(task -> {
                 // 自动提醒
-                if (userTaskTimeoutAction == BpmUserTaskTimeoutActionEnum.REMINDER) {
+                if (userTaskTimeoutAction == BpmUserTaskTimeoutHandlerType.REMINDER) {
                     TodoTaskReminderMessage message = new TodoTaskReminderMessage().setTenantId(Long.parseLong(task.getTenantId()))
                             .setUserId(Long.parseLong(task.getAssignee())).setTaskName(task.getName());
                     todoTaskReminderProducer.sendReminderMessage(message);
                 }
                 // 自动同意
-                if (userTaskTimeoutAction == BpmUserTaskTimeoutActionEnum.APPROVE) {
+                if (userTaskTimeoutAction == BpmUserTaskTimeoutHandlerType.APPROVE) {
                     // TODO @芋艿 这个上下文如何清除呢？ 任务通过后, BpmProcessInstanceEventListener 会有回调
                     TenantContextHolder.setTenantId(Long.parseLong(task.getTenantId()));
                     TenantContextHolder.setIgnore(false);
@@ -100,7 +100,7 @@ public class BpmTimerFiredEventListener extends AbstractFlowableEngineEventListe
                     bpmTaskService.approveTask(Long.parseLong(task.getAssignee()), req);
                 }
                 // 自动拒绝
-                if (userTaskTimeoutAction == BpmUserTaskTimeoutActionEnum.REJECT) {
+                if (userTaskTimeoutAction == BpmUserTaskTimeoutHandlerType.REJECT) {
                     // TODO  @芋艿 这个上下文如何清除呢？ 任务拒绝后, BpmProcessInstanceEventListener 会有回调
                     TenantContextHolder.setTenantId(Long.parseLong(task.getTenantId()));
                     TenantContextHolder.setIgnore(false);

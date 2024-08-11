@@ -1,12 +1,5 @@
 package cn.iocoder.yudao.module.bpm.framework.flowable.core.enums;
 
-import com.google.common.collect.ImmutableSet;
-import org.flowable.bpmn.model.EndEvent;
-import org.flowable.bpmn.model.FlowNode;
-import org.flowable.bpmn.model.UserTask;
-
-import java.util.Set;
-
 /**
  * BPMN XML 常量信息
  *
@@ -88,17 +81,5 @@ public interface BpmnModelConstants {
      * BPMN ExtensionElement Attribute, 用于标记按钮是否启用
      */
     String BUTTON_SETTING_ELEMENT_ENABLE_ATTRIBUTE = "enable";
-
-    // TODO @jason：这个是不是可以删除啦
-    /**
-     * BPMN End Event 节点 Id， 用于后端生成 End Event 节点
-     */
-    String END_EVENT_ID = "EndEvent_1";
-
-    // TODO @jason：这个是不是可以删除啦
-    /**
-     * 支持转仿钉钉设计模型的 Bpmn 节点
-     */
-    Set<Class<? extends FlowNode>> SUPPORT_CONVERT_SIMPLE_FlOW_NODES = ImmutableSet.of(UserTask.class, EndEvent.class);
 
 }

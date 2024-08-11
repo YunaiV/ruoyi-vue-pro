@@ -58,7 +58,6 @@ public class BpmTaskEventListener extends AbstractFlowableEngineEventListener {
 
     @Override
     protected void activityCancelled(FlowableActivityCancelledEvent event) {
-        // TODO @jason：如果用户主动取消，可能需要考虑这个
         List<HistoricActivityInstance> activityList = activityService.getHistoricActivityListByExecutionId(event.getExecutionId());
         if (CollUtil.isEmpty(activityList)) {
             log.error("[activityCancelled][使用 executionId({}) 查找不到对应的活动实例]", event.getExecutionId());

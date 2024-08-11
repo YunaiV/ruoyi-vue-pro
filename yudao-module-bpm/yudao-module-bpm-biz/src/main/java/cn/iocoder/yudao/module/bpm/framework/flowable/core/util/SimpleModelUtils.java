@@ -27,7 +27,7 @@ import static cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.s
 import static cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.simple.BpmSimpleModelNodeVO.TimeoutHandler;
 import static cn.iocoder.yudao.module.bpm.enums.definition.BpmBoundaryEventType.USER_TASK_TIMEOUT;
 import static cn.iocoder.yudao.module.bpm.enums.definition.BpmSimpleModelNodeType.*;
-import static cn.iocoder.yudao.module.bpm.enums.definition.BpmUserTaskTimeoutActionEnum.REMINDER;
+import static cn.iocoder.yudao.module.bpm.enums.definition.BpmUserTaskTimeoutHandlerType.REMINDER;
 import static cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnModelConstants.*;
 import static cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.SimpleModelConstants.*;
 import static org.flowable.bpmn.constants.BpmnXMLConstants.*;
