@@ -5,13 +5,13 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 /**
- * 流程实例/任务的删除原因枚举
+ * 流程实例/任务的的处理原因枚举
  *
  * @author 芋道源码
  */
 @Getter
 @AllArgsConstructor
-public enum BpmDeleteReasonEnum {
+public enum BpmReasonEnum {
 
     // ========== 流程实例的独有原因 ==========
 
@@ -34,12 +34,6 @@ public enum BpmDeleteReasonEnum {
      */
     public String format(Object... args) {
         return StrUtil.format(reason, args);
-    }
-
-    // ========== 逻辑 ==========
-
-    public static boolean isRejectReason(String reason) {
-        return StrUtil.startWith(reason, "审批不通过任务，原因：");
     }
 
 }

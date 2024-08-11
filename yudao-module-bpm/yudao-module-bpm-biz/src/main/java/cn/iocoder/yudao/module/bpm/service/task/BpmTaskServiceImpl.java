@@ -11,7 +11,7 @@ import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.task.*;
 import cn.iocoder.yudao.module.bpm.convert.task.BpmTaskConvert;
 import cn.iocoder.yudao.module.bpm.enums.definition.BpmUserTaskRejectHandlerType;
 import cn.iocoder.yudao.module.bpm.enums.task.BpmCommentTypeEnum;
-import cn.iocoder.yudao.module.bpm.enums.task.BpmDeleteReasonEnum;
+import cn.iocoder.yudao.module.bpm.enums.task.BpmReasonEnum;
 import cn.iocoder.yudao.module.bpm.enums.task.BpmTaskSignTypeEnum;
 import cn.iocoder.yudao.module.bpm.enums.task.BpmTaskStatusEnum;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmConstants;
@@ -327,15 +327,12 @@ public class BpmTaskServiceImpl implements BpmTaskService {
             throw exception(PROCESS_INSTANCE_NOT_EXISTS);
         }
 
-        // 2. 处理当前任务
         // 2.1 更新流程任务为不通过
         updateTaskStatusAndReason(task.getId(), BpmTaskStatusEnum.REJECT.getStatus(), reqVO.getReason());
-        // 2.2 添加评论
+        // 2.2 添加流程评论
         taskService.addComment(task.getId(), task.getProcessInstanceId(), BpmCommentTypeEnum.REJECT.getType(),
                 BpmCommentTypeEnum.REJECT.formatComment(reqVO.getReason()));
-
-        // 3. 处理其他进行中的任务
-        // 3.1 如果当前任务时被加签的，则加它的根任务也标记成未通过
+        // 2.3 如果当前任务时被加签的，则加它的根任务也标记成未通过
         // 疑问：为什么要标记未通过呢？
         // 回答：例如说 A 任务被向前加签除 B 任务时，B 任务被审批不通过，此时 A 会被取消。而 yudao-ui-admin-vue3 不展示“已取消”的任务，导致展示不出审批不通过的细节。
         if (task.getParentTaskId() != null) {
@@ -345,41 +342,22 @@ public class BpmTaskServiceImpl implements BpmTaskService {
             taskService.addComment(rootParentId, task.getProcessInstanceId(), BpmCommentTypeEnum.REJECT.getType(),
                     BpmCommentTypeEnum.REJECT.formatComment("加签任务不通过"));
         }
-        // 3.2 其它未结束的任务，直接取消
-        // 疑问：为什么不通过 updateTaskStatusWhenCanceled 监听取消，而是直接提前调用呢？
-        // 回答：详细见 updateTaskStatusWhenCanceled 的方法，加签的场景
-        List<Task> taskList = getRunningTaskListByProcessInstanceId(instance.getProcessInstanceId(), null, null, null);
-        taskList.forEach(otherTask -> {
-            if (!otherTask.getId().equals(task.getId())) { // 不需要处理当前任务
-                return;
-            }
-            Integer otherTaskStatus = (Integer) task.getTaskLocalVariables().get(BpmConstants.TASK_VARIABLE_STATUS);
-            if (BpmTaskStatusEnum.isEndStatus(otherTaskStatus)) {
-                return;
-            }
-            updateTaskStatusWhenCanceled(otherTask.getId());
-        });
-        taskList.stream().filter(otherTask -> !otherTask.getId().equals(task.getId())) // 需要排除当前任务
-                .forEach(otherTask -> updateTaskStatusWhenCanceled(otherTask.getId()));
 
-        // 4.1 驳回到指定的任务节点
+        // 3. 根据不同的 RejectHandler 处理策略
         BpmnModel bpmnModel = bpmModelService.getBpmnModelByDefinitionId(task.getProcessDefinitionId());
         FlowElement flowElement = BpmnModelUtils.getFlowElementById(bpmnModel, task.getTaskDefinitionKey());
+        // 3.1 情况一：驳回到指定的任务节点
         BpmUserTaskRejectHandlerType userTaskRejectHandlerType = BpmnModelUtils.parseRejectHandlerType(flowElement);
         if (userTaskRejectHandlerType == BpmUserTaskRejectHandlerType.RETURN_USER_TASK) {
             String returnTaskId = BpmnModelUtils.parseReturnTaskId(flowElement);
             Assert.notNull(returnTaskId, "回退的节点不能为空");
-            BpmTaskReturnReqVO returnReq = new BpmTaskReturnReqVO().setId(task.getId()).setTargetTaskDefinitionKey(returnTaskId)
-                    .setReason(reqVO.getReason());
-            returnTask(userId, returnReq);
+            returnTask(userId, new BpmTaskReturnReqVO().setId(task.getId())
+                    .setTargetTaskDefinitionKey(returnTaskId).setReason(reqVO.getReason()));
             return;
         }
-
-        // 4.2 终止流程
-        Set<String> activityIds = convertSet(taskList, Task::getTaskDefinitionKey);
-        EndEvent endEvent = BpmnModelUtils.getEndEvent(bpmnModel);
-        Assert.notNull(endEvent, "结束节点不能未空");
-        processInstanceService.updateProcessInstanceReject(instance, activityIds, endEvent.getId(), reqVO.getReason());
+        // 3.2 情况二：直接结束，审批不通过
+        processInstanceService.updateProcessInstanceReject(instance, reqVO.getReason()); // 标记不通过
+        moveTaskToEnd(task.getProcessInstanceId()); // 结束流程
     }
 
     /**
@@ -449,7 +427,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
             log.error("[updateTaskStatusWhenCanceled][taskId({}) 处于结果({})，无需进行更新]", taskId, status);
             return;
         }
-        updateTaskStatusAndReason(taskId, BpmTaskStatusEnum.CANCEL.getStatus(), BpmDeleteReasonEnum.CANCEL_BY_SYSTEM.getReason());
+        updateTaskStatusAndReason(taskId, BpmTaskStatusEnum.CANCEL.getStatus(), BpmReasonEnum.CANCEL_BY_SYSTEM.getReason());
         // 补充说明：由于 Task 被删除成 HistoricTask 后，无法通过 taskService.addComment 添加理由，所以无法存储具体的取消理由
     }
 
@@ -663,6 +641,35 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         // 3.2 执行转派（审批人），将任务转派给 assigneeUser
         // 委托（ delegate）和转派（transfer）的差别，就在这块的调用！！！！
         taskService.setAssignee(taskId, reqVO.getAssigneeUserId().toString());
+    }
+
+    @Override
+    public void moveTaskToEnd(String processInstanceId) {
+        List<Task> taskList = getRunningTaskListByProcessInstanceId(processInstanceId, null, null, null);
+        if (CollUtil.isEmpty(taskList)) {
+            return;
+        }
+
+        // 1. 其它未结束的任务，直接取消
+        // 疑问：为什么不通过 updateTaskStatusWhenCanceled 监听取消，而是直接提前调用呢？
+        // 回答：详细见 updateTaskStatusWhenCanceled 的方法，加签的场景
+        taskList.forEach(task -> {
+            Integer otherTaskStatus = (Integer) task.getTaskLocalVariables().get(BpmConstants.TASK_VARIABLE_STATUS);
+            if (BpmTaskStatusEnum.isEndStatus(otherTaskStatus)) {
+                return;
+            }
+            updateTaskStatusWhenCanceled(task.getId());
+        });
+
+        // 2. 终止流程
+        BpmnModel bpmnModel = bpmModelService.getBpmnModelByDefinitionId(taskList.get(0).getProcessDefinitionId());
+        List<String> activityIds = CollUtil.newArrayList(convertSet(taskList, Task::getTaskDefinitionKey));
+        EndEvent endEvent = BpmnModelUtils.getEndEvent(bpmnModel);
+        Assert.notNull(endEvent, "结束节点不能未空");
+        runtimeService.createChangeActivityStateBuilder()
+                .processInstanceId(processInstanceId)
+                .moveActivityIdsToSingleActivityId(activityIds, endEvent.getId())
+                .changeState();
     }
 
     @Override

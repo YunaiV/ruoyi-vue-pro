@@ -6,11 +6,9 @@ import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.instance.BpmProcessI
 import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.instance.BpmProcessInstanceCreateReqVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.instance.BpmProcessInstancePageReqVO;
 import jakarta.validation.Valid;
-import org.flowable.engine.delegate.event.FlowableCancelledEvent;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.runtime.ProcessInstance;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -121,31 +119,15 @@ public interface BpmProcessInstanceService {
     void cancelProcessInstanceByAdmin(Long userId, BpmProcessInstanceCancelReqVO cancelReqVO);
 
     /**
-     * 更新 ProcessInstance 拓展记录为取消
-     *
-     * @param event 流程取消事件
-     */
-    void updateProcessInstanceWhenCancel(FlowableCancelledEvent event);
-
-    /**
-     * 更新 ProcessInstance 为完成
-     *
-     * @param instance 流程任务
-     */
-    void updateProcessInstanceWhenApprove(ProcessInstance instance);
-
-    /**
      * 更新 ProcessInstance 为不通过
      *
      * @param processInstance   流程实例
-     * @param activityIds  当前未完成活动节点 Id
-     * @param endId  结束节点 Id
      * @param reason 理由。例如说，审批不通过时，需要传递该值
      */
-    void updateProcessInstanceReject(ProcessInstance processInstance, Collection<String> activityIds, String endId, String reason);
+    void updateProcessInstanceReject(ProcessInstance processInstance, String reason);
 
     /**
-     * 当流程结束时候，更新 ProcessInstance 为通过
+     * 处理 ProcessInstance 完成（审批通过、不通过、取消）
      *
      * @param instance 流程任务
      */

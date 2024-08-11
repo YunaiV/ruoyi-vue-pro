@@ -90,8 +90,6 @@ public interface BpmTaskService {
      */
     void rejectTask(Long userId, @Valid BpmTaskRejectReqVO reqVO);
 
-
-
     /**
      * 将流程任务分配给指定用户
      *
@@ -99,6 +97,13 @@ public interface BpmTaskService {
      * @param reqVO  分配请求
      */
     void transferTask(Long userId, BpmTaskTransferReqVO reqVO);
+
+    /**
+     * 将指定流程实例的、进行中的流程任务，移动到结束节点
+     *
+     * @param processInstanceId 流程编号
+     */
+    void moveTaskToEnd(String processInstanceId);
 
     /**
      * 更新 Task 状态，在创建时

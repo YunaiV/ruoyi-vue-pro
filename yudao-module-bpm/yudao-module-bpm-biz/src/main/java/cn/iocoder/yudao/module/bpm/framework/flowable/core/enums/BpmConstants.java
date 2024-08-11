@@ -16,6 +16,14 @@ public class BpmConstants {
      */
     public static final String PROCESS_INSTANCE_VARIABLE_STATUS = "PROCESS_STATUS";
     /**
+     * 流程实例的变量 - 理由
+     *
+     * 例如说：审批不通过的理由（目前审核通过暂时不会记录）
+     *
+     * @see ProcessInstance#getProcessVariables()
+     */
+    public static final String PROCESS_INSTANCE_VARIABLE_REASON = "PROCESS_REASON";
+    /**
      * 流程实例的变量 - 发起用户选择的审批人 Map
      *
      * @see ProcessInstance#getProcessVariables()
