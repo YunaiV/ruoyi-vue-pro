@@ -22,6 +22,8 @@ import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.
  */
 public interface BpmProcessInstanceService {
 
+    // ========== Query 查询相关方法 ==========
+
     /**
      * 获得流程实例
      *
@@ -73,6 +75,8 @@ public interface BpmProcessInstanceService {
     default Map<String, HistoricProcessInstance> getHistoricProcessInstanceMap(Set<String> ids) {
         return convertMap(getHistoricProcessInstances(ids), HistoricProcessInstance::getId);
     }
+
+    // ========== Update 写入相关方法 ==========
 
     /**
      * 获得流程实例的分页
@@ -126,11 +130,13 @@ public interface BpmProcessInstanceService {
      */
     void updateProcessInstanceReject(ProcessInstance processInstance, String reason);
 
+    // ========== Event 事件相关方法 ==========
+
     /**
-     * 处理 ProcessInstance 完成（审批通过、不通过、取消）
+     * 处理 ProcessInstance 完成事件，例如说：审批通过、不通过、取消
      *
      * @param instance 流程任务
      */
-    void updateProcessInstanceWhenCompleted(ProcessInstance instance);
+    void processProcessInstanceCompleted(ProcessInstance instance);
 
 }

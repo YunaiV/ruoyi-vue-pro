@@ -42,7 +42,6 @@ public class BpmTimerFiredEventListener extends AbstractFlowableEngineEventListe
     @Resource
     @Lazy // 延迟加载，避免循环依赖
     private BpmModelService bpmModelService;
-
     @Resource
     @Lazy // 延迟加载，避免循环依赖
     private BpmTaskService bpmTaskService;
@@ -67,7 +66,7 @@ public class BpmTimerFiredEventListener extends AbstractFlowableEngineEventListe
         // 如果是定时器边界事件
         if (element instanceof BoundaryEvent) {
             BoundaryEvent boundaryEvent = (BoundaryEvent) element;
-            String  boundaryEventType = BpmnModelUtils.parseBoundaryEventExtensionElement(boundaryEvent, BpmnModelConstants.BOUNDARY_EVENT_TYPE);
+            String boundaryEventType = BpmnModelUtils.parseBoundaryEventExtensionElement(boundaryEvent, BpmnModelConstants.BOUNDARY_EVENT_TYPE);
             BpmBoundaryEventType bpmTimerBoundaryEventType = BpmBoundaryEventType.typeOf(NumberUtils.parseInt(boundaryEventType));
             // 类型为用户任务超时未处理的情况
             if (bpmTimerBoundaryEventType == BpmBoundaryEventType.USER_TASK_TIMEOUT) {
@@ -81,8 +80,7 @@ public class BpmTimerFiredEventListener extends AbstractFlowableEngineEventListe
         BpmUserTaskTimeoutActionEnum userTaskTimeoutAction = BpmUserTaskTimeoutActionEnum.actionOf(timeoutAction);
         if (userTaskTimeoutAction != null) {
             // 查询超时未处理的任务 TODO 加签的情况会不会有问题 ???
-            List<Task> taskList = bpmTaskService.getRunningTaskListByProcessInstanceId(processInstanceId, true,
-                    null, taskDefKey);
+            List<Task> taskList = bpmTaskService.getRunningTaskListByProcessInstanceId(processInstanceId, true, taskDefKey);
             taskList.forEach(task -> {
                 // 自动提醒
                 if (userTaskTimeoutAction == BpmUserTaskTimeoutActionEnum.REMINDER) {

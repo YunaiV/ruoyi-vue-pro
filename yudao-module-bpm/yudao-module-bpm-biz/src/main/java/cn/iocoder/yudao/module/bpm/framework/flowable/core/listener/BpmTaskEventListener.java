@@ -48,17 +48,16 @@ public class BpmTaskEventListener extends AbstractFlowableEngineEventListener {
 
     @Override
     protected void taskCreated(FlowableEngineEntityEvent event) {
-        taskService.updateTaskStatusWhenCreated((Task) event.getEntity());
+        taskService.processTaskCreated((Task) event.getEntity());
     }
 
     @Override
     protected void taskAssigned(FlowableEngineEntityEvent event) {
-        taskService.updateTaskExtAssign((Task) event.getEntity());
+        taskService.processTaskAssigned((Task) event.getEntity());
     }
 
     @Override
     protected void activityCancelled(FlowableActivityCancelledEvent event) {
-        // TODO @jason：如果用户主动取消，可能需要考虑这个
         List<HistoricActivityInstance> activityList = activityService.getHistoricActivityListByExecutionId(event.getExecutionId());
         if (CollUtil.isEmpty(activityList)) {
             log.error("[activityCancelled][使用 executionId({}) 查找不到对应的活动实例]", event.getExecutionId());
@@ -69,7 +68,7 @@ public class BpmTaskEventListener extends AbstractFlowableEngineEventListener {
             if (StrUtil.isEmpty(activity.getTaskId())) {
                 return;
             }
-            taskService.updateTaskStatusWhenCanceled(activity.getTaskId());
+            taskService.processTaskCanceled(activity.getTaskId());
         });
     }
 
