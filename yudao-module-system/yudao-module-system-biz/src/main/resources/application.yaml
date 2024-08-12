@@ -1,0 +1,5 @@
+sms:
+  qiniu:
+    apiKey: your_qiniu_api_key
+    apiSecret: your_qiniu_api_secret
+    signature: your_qiniu_signature

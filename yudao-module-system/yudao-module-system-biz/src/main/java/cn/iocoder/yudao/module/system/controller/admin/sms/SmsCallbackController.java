@@ -52,4 +52,13 @@ public class SmsCallbackController {
         return success(true);
     }
 
+    @PostMapping("/qiniu")
+    @PermitAll
+    @Operation(summary = "七牛云短信的回调", description = "参见 https://www.qiniu.com/products/sms 文档")
+    public CommonResult<Boolean> receiveQiniuSmsStatus(HttpServletRequest request) throws Throwable {
+        String text = ServletUtils.getBody(request);
+        smsSendService.receiveSmsStatus(SmsChannelEnum.QINIU.getCode(), text);
+        return success(true);
+    }
+
 }
