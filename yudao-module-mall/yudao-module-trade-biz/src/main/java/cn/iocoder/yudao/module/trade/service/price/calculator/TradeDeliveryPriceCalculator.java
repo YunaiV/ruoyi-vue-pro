@@ -223,4 +223,17 @@ public class TradeDeliveryPriceCalculator implements TradePriceCalculator {
         }
     }
 
+    private void checkDeliveryType(TradePriceCalculateReqBO param, List<ProductSpuRespDTO> spuList) {
+        if (param.getDeliveryType() == null) {
+            return;
+        }
+        Set<Integer> supportedDeliveryTypes = spuList.stream()
+                .flatMap(spu -> spu.getDeliveryTypes().stream())
+                .collect(Collectors.toSet());
+        if (!supportedDeliveryTypes.contains(param.getDeliveryType())) {
+            log.error("[checkDeliveryType][配送方式不匹配，请求 deliveryType({})，支持的 deliveryTypes({})]",
+                    param.getDeliveryType(), supportedDeliveryTypes);
+            throw exception(PRICE_CALCULATE_DELIVERY_TYPE_NOT_SUPPORTED);
+        }
+    }
 }

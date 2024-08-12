@@ -3,7 +3,8 @@ package cn.iocoder.yudao.module.product.api.spu.dto;
 import cn.iocoder.yudao.module.product.enums.spu.ProductSpuStatusEnum;
 import lombok.Data;
 
-// TODO @LeeYan9: ProductSpuRespDTO
+import java.util.List;
+
 /**
  * 商品 SPU 信息 Response DTO
  *
@@ -75,6 +76,11 @@ public class ProductSpuRespDTO {
      * 对应 TradeDeliveryExpressTemplateDO 的 id 编号
      */
     private Long deliveryTemplateId;
+
+    /**
+     * 支持的配送方式
+     */
+    private List<Integer> deliveryTypes;
 
     // ========== 营销相关字段 =========
 

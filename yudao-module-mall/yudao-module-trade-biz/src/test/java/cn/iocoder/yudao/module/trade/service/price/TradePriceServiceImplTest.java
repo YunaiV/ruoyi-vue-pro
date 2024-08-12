@@ -30,7 +30,6 @@ import static org.mockito.Mockito.when;
  *
  * @author 芋道源码
  */
-@Disabled // TODO 芋艿：后续 fix 补充的单测
 public class TradePriceServiceImplTest extends BaseMockitoUnitTest {
 
     @InjectMocks
@@ -132,6 +131,36 @@ public class TradePriceServiceImplTest extends BaseMockitoUnitTest {
         assertEquals("https://t.cn/3.png", calculateRespBO.getItems().get(2).getPicUrl());
         assertEquals(666L, calculateRespBO.getItems().get(2).getCategoryId());
         assertEquals(skuList.get(2).getProperties(), calculateRespBO.getItems().get(2).getProperties());
+    }
+
+    @Test
+    public void testCalculatePrice_DeliveryTypeMismatch() {
+        // 准备参数
+        TradePriceCalculateReqBO calculateReqBO = new TradePriceCalculateReqBO()
+                .setUserId(10L)
+                .setCouponId(20L).setAddressId(30L)
+                .setDeliveryType(DeliveryTypeEnum.EXPRESS.getType()) // 设置配送方式
+                .setItems(Arrays.asList(
+                        new TradePriceCalculateReqBO.Item().setSkuId(100L).setCount(1).setSelected(true),
+                        new TradePriceCalculateReqBO.Item().setSkuId(200L).setCount(3).setSelected(true)
+                ));
+        // mock 方法
+        List<ProductSkuRespDTO> skuList = Arrays.asList(
+                new ProductSkuRespDTO().setId(100L).setStock(500).setPrice(1000).setPicUrl("https://t.cn/1.png").setSpuId(1001L)
+                        .setProperties(singletonList(new ProductPropertyValueDetailRespDTO().setPropertyId(1L).setPropertyName("颜色")
+                                .setValueId(2L).setValueName("红色"))),
+                new ProductSkuRespDTO().setId(200L).setStock(400).setPrice(2000).setPicUrl("https://t.cn/2.png").setSpuId(1001L)
+                        .setProperties(singletonList(new ProductPropertyValueDetailRespDTO().setPropertyId(1L).setPropertyName("颜色")
+                                .setValueId(3L).setValueName("黄色")))
+        );
+        when(productSkuApi.getSkuList(Mockito.eq(asSet(100L, 200L)))).thenReturn(skuList);
+        when(productSpuApi.getSpuList(Mockito.eq(asSet(1001L))))
+                .thenReturn(singletonList(new ProductSpuRespDTO().setId(1001L).setName("小菜").setCategoryId(666L)
+                        .setStatus(ProductSpuStatusEnum.ENABLE.getStatus())
+                        .setDeliveryTypes(singletonList(DeliveryTypeEnum.PICK_UP.getType())))); // 设置不支持的配送方式
+
+        // 调用并断言抛出异常
+        assertThrows(ServiceException.class, () -> tradePriceService.calculatePrice(calculateReqBO));
     }
 
 }

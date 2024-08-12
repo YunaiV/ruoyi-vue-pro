@@ -4,6 +4,7 @@ import cn.iocoder.yudao.module.product.api.sku.ProductSkuApi;
 import cn.iocoder.yudao.module.product.api.sku.dto.ProductSkuRespDTO;
 import cn.iocoder.yudao.module.product.api.spu.ProductSpuApi;
 import cn.iocoder.yudao.module.product.api.spu.dto.ProductSpuRespDTO;
+import cn.iocoder.yudao.module.trade.enums.delivery.DeliveryTypeEnum;
 import cn.iocoder.yudao.module.trade.service.price.bo.TradePriceCalculateReqBO;
 import cn.iocoder.yudao.module.trade.service.price.bo.TradePriceCalculateRespBO;
 import cn.iocoder.yudao.module.trade.service.price.calculator.TradePriceCalculator;
@@ -15,6 +16,8 @@ import org.springframework.validation.annotation.Validated;
 import jakarta.annotation.Resource;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
@@ -22,6 +25,7 @@ import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.
 import static cn.iocoder.yudao.module.product.enums.ErrorCodeConstants.SKU_NOT_EXISTS;
 import static cn.iocoder.yudao.module.product.enums.ErrorCodeConstants.SKU_STOCK_NOT_ENOUGH;
 import static cn.iocoder.yudao.module.trade.enums.ErrorCodeConstants.PRICE_CALCULATE_PAY_PRICE_ILLEGAL;
+import static cn.iocoder.yudao.module.trade.enums.ErrorCodeConstants.PRICE_CALCULATE_DELIVERY_TYPE_NOT_SUPPORTED;
 
 /**
  * 价格计算 Service 实现类
@@ -47,6 +51,9 @@ public class TradePriceServiceImpl implements TradePriceService {
         List<ProductSkuRespDTO> skuList = checkSkuList(calculateReqBO);
         // 1.2 获得商品 SPU 数组
         List<ProductSpuRespDTO> spuList = checkSpuList(skuList);
+
+        // 1.3 校验配送方式是否匹配
+        checkDeliveryType(calculateReqBO, spuList);
 
         // 2.1 计算价格
         TradePriceCalculateRespBO calculateRespBO = TradePriceCalculatorHelper
@@ -85,4 +92,17 @@ public class TradePriceServiceImpl implements TradePriceService {
         return productSpuApi.validateSpuList(convertSet(skuList, ProductSkuRespDTO::getSpuId));
     }
 
+    private void checkDeliveryType(TradePriceCalculateReqBO reqBO, List<ProductSpuRespDTO> spuList) {
+        if (reqBO.getDeliveryType() == null) {
+            return;
+        }
+        Set<Integer> supportedDeliveryTypes = spuList.stream()
+                .flatMap(spu -> spu.getDeliveryTypes().stream())
+                .collect(Collectors.toSet());
+        if (!supportedDeliveryTypes.contains(reqBO.getDeliveryType())) {
+            log.error("[checkDeliveryType][配送方式不匹配，请求 deliveryType({})，支持的 deliveryTypes({})]",
+                    reqBO.getDeliveryType(), supportedDeliveryTypes);
+            throw exception(PRICE_CALCULATE_DELIVERY_TYPE_NOT_SUPPORTED);
+        }
+    }
 }
