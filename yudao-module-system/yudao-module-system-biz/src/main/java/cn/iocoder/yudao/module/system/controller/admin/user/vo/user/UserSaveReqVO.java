@@ -77,4 +77,16 @@ public class UserSaveReqVO {
                 || (ObjectUtil.isAllNotEmpty(password)); // 新增时，必须都传递 password
     }
 
+    // ========== 新增字段 ==========
+
+    @Schema(description = "用户邮箱", requiredMode = Schema.RequiredMode.REQUIRED, example = "test@example.com")
+    @NotBlank(message = "用户邮箱不能为空")
+    @Email(message = "邮箱格式不正确")
+    private String registrationEmail;
+
+    @Schema(description = "密码", requiredMode = Schema.RequiredMode.REQUIRED, example = "123456")
+    @NotBlank(message = "密码不能为空")
+    @Size(min = 4, max = 16, message = "密码长度为 4-16 位")
+    private String registrationPassword;
+
 }

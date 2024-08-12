@@ -154,4 +154,14 @@ public class AuthController {
         return success(authService.socialLogin(reqVO));
     }
 
+    // ========== 邮箱注册相关 ==========
+
+    @PostMapping("/register")
+    @PermitAll
+    @Operation(summary = "使用邮箱和密码注册")
+    public CommonResult<Boolean> register(@RequestBody @Valid AuthRegisterReqVO reqVO) {
+        userService.registerUser(reqVO);
+        return success(true);
+    }
+
 }

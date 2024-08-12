@@ -201,4 +201,12 @@ public interface AdminUserService {
      */
     boolean isPasswordMatch(String rawPassword, String encodedPassword);
 
+    /**
+     * 注册用户
+     *
+     * @param registerReqVO 注册信息
+     * @return 用户编号
+     */
+    Long registerUser(@Valid AuthRegisterReqVO registerReqVO);
+
 }

@@ -13,6 +13,7 @@ import cn.iocoder.yudao.framework.common.util.validation.ValidationUtils;
 import cn.iocoder.yudao.framework.datapermission.core.util.DataPermissionUtils;
 import cn.iocoder.yudao.module.infra.api.config.ConfigApi;
 import cn.iocoder.yudao.module.infra.api.file.FileApi;
+import cn.iocoder.yudao.module.system.controller.admin.auth.vo.AuthRegisterReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.user.vo.profile.UserProfileUpdatePasswordReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.user.vo.profile.UserProfileUpdateReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.user.vo.user.UserImportExcelVO;
@@ -21,12 +22,14 @@ import cn.iocoder.yudao.module.system.controller.admin.user.vo.user.UserPageReqV
 import cn.iocoder.yudao.module.system.controller.admin.user.vo.user.UserSaveReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.dept.DeptDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.dept.UserPostDO;
+import cn.iocoder.yudao.module.system.dal.dataobject.permission.RoleDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.user.AdminUserDO;
 import cn.iocoder.yudao.module.system.dal.mysql.dept.UserPostMapper;
 import cn.iocoder.yudao.module.system.dal.mysql.user.AdminUserMapper;
 import cn.iocoder.yudao.module.system.service.dept.DeptService;
 import cn.iocoder.yudao.module.system.service.dept.PostService;
 import cn.iocoder.yudao.module.system.service.permission.PermissionService;
+import cn.iocoder.yudao.module.system.service.permission.RoleService;
 import cn.iocoder.yudao.module.system.service.tenant.TenantService;
 import com.google.common.annotations.VisibleForTesting;
 import com.mzt.logapi.context.LogRecordContext;
@@ -83,6 +86,9 @@ public class AdminUserServiceImpl implements AdminUserService {
     private FileApi fileApi;
     @Resource
     private ConfigApi configApi;
+
+    @Resource
+    private RoleService roleService;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -490,6 +496,28 @@ public class AdminUserServiceImpl implements AdminUserService {
     @Override
     public boolean isPasswordMatch(String rawPassword, String encodedPassword) {
         return passwordEncoder.matches(rawPassword, encodedPassword);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public Long registerUser(AuthRegisterReqVO registerReqVO) {
+        // 1. 校验邮箱是否已被使用
+        validateEmailUnique(null, registerReqVO.getEmail());
+
+        // 2. 创建用户
+        AdminUserDO user = new AdminUserDO();
+        user.setEmail(registerReqVO.getEmail());
+        user.setPassword(encodePassword(registerReqVO.getPassword()));
+        user.setStatus(CommonStatusEnum.ENABLE.getStatus()); // 默认启用
+        userMapper.insert(user);
+
+        // 3. 赋予 'normal' 角色
+        RoleDO normalRole = roleService.getRoleByCode("normal");
+        if (normalRole != null) {
+            permissionService.assignRoleToUser(user.getId(), normalRole.getId());
+        }
+
+        return user.getId();
     }
 
     /**
