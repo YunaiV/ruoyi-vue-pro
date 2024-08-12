@@ -94,7 +94,7 @@ public class ConfigController {
     @Operation(summary = "导出参数配置")
     @PreAuthorize("@ss.hasPermission('infra:config:export')")
     @ApiAccessLog(operateType = EXPORT)
-    public void exportConfig(@Valid ConfigPageReqVO exportReqVO,
+    public void exportConfig(ConfigPageReqVO exportReqVO,
                              HttpServletResponse response) throws IOException {
         exportReqVO.setPageSize(PageParam.PAGE_SIZE_NONE);
         List<ConfigDO> list = configService.getConfigPage(exportReqVO).getList();

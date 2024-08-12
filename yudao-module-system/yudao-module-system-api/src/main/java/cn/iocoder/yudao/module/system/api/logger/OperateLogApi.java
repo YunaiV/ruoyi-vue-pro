@@ -24,9 +24,9 @@ public interface OperateLogApi {
     /**
      * 获取指定模块的指定数据的操作日志分页
      *
-     * @param pageReqVO 请求
+     * @param pageReqDTO 请求
      * @return 操作日志分页
      */
-    PageResult<OperateLogRespDTO> getOperateLogPage(OperateLogPageReqDTO pageReqVO);
+    PageResult<OperateLogRespDTO> getOperateLogPage(OperateLogPageReqDTO pageReqDTO);
 
 }

@@ -56,7 +56,7 @@ public interface BaseMapperX<T> extends MPJBaseMapper<T> {
 
     default <D> PageResult<D> selectJoinPage(PageParam pageParam, Class<D> clazz, MPJLambdaWrapper<T> lambdaWrapper) {
         // 特殊：不分页，直接查询全部
-        if (PageParam.PAGE_SIZE_NONE.equals(pageParam.getPageNo())) {
+        if (PageParam.PAGE_SIZE_NONE.equals(pageParam.getPageSize())) {
             List<D> list = selectJoinList(clazz, lambdaWrapper);
             return new PageResult<>(list, (long) list.size());
         }
@@ -183,10 +183,6 @@ public interface BaseMapperX<T> extends MPJBaseMapper<T> {
 
     default Boolean updateBatch(Collection<T> entities, int size) {
         return Db.updateBatchById(entities, size);
-    }
-
-    default Boolean insertOrUpdate(T entity) {
-        return  Db.saveOrUpdate(entity);
     }
 
     default Boolean insertOrUpdateBatch(Collection<T> collection) {

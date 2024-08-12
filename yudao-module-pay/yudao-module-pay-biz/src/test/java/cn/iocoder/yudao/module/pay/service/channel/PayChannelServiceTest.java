@@ -60,8 +60,6 @@ public class PayChannelServiceTest extends BaseDbUnitTest {
         PayChannelDO channel = channelMapper.selectById(channelId);
         assertPojoEquals(reqVO, channel, "config");
         assertPojoEquals(config, channel.getConfig());
-        // 校验缓存
-        assertNull(channelService.getClientCache().getIfPresent(channelId));
     }
 
     @Test
@@ -102,8 +100,6 @@ public class PayChannelServiceTest extends BaseDbUnitTest {
         PayChannelDO channel = channelMapper.selectById(reqVO.getId()); // 获取最新的
         assertPojoEquals(reqVO, channel, "config");
         assertPojoEquals(config, channel.getConfig());
-        // 校验缓存
-        assertNull(channelService.getClientCache().getIfPresent(channel.getId()));
     }
 
     @Test
@@ -134,8 +130,6 @@ public class PayChannelServiceTest extends BaseDbUnitTest {
         channelService.deleteChannel(id);
         // 校验数据不存在了
         assertNull(channelMapper.selectById(id));
-        // 校验缓存
-        assertNull(channelService.getClientCache().getIfPresent(id));
     }
 
     @Test
@@ -306,20 +300,20 @@ public class PayChannelServiceTest extends BaseDbUnitTest {
         PayChannelDO channel = randomPojo(PayChannelDO.class, o -> {
             o.setCode(PayChannelEnum.ALIPAY_APP.getCode());
             o.setConfig(randomAlipayPayClientConfig());
+            o.setStatus(CommonStatusEnum.ENABLE.getStatus());
         });
         channelMapper.insert(channel);
         // mock 参数
         Long id = channel.getId();
         // mock 方法
         PayClient mockClient = mock(PayClient.class);
-        when(payClientFactory.getPayClient(eq(id))).thenReturn(mockClient);
+        when(payClientFactory.createOrUpdatePayClient(eq(id), eq(channel.getCode()), eq(channel.getConfig())))
+                .thenReturn(mockClient);
 
         // 调用
         PayClient client = channelService.getPayClient(id);
         // 断言
         assertSame(client, mockClient);
-        verify(payClientFactory).createOrUpdatePayClient(eq(id), eq(channel.getCode()),
-                eq(channel.getConfig()));
     }
 
     public WxPayClientConfig randomWxPayClientConfig() {

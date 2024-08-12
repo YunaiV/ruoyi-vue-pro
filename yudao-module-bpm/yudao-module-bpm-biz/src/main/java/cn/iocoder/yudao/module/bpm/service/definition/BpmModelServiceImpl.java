@@ -262,7 +262,9 @@ public class BpmModelServiceImpl implements BpmModelService {
     }
 
     private Model getModelByKey(String key) {
-        return repositoryService.createModelQuery().modelKey(key).singleResult();
+        return repositoryService.createModelQuery()
+                .modelTenantId(FlowableUtils.getTenantId())
+                .modelKey(key).singleResult();
     }
 
     @Override

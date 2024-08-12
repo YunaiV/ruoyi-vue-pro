@@ -1,6 +1,9 @@
 package cn.iocoder.yudao.module.crm.controller.admin.receivable.vo.receivable;
 
+import cn.iocoder.yudao.framework.excel.core.annotations.DictFormat;
+import cn.iocoder.yudao.framework.excel.core.convert.DictConvert;
 import cn.iocoder.yudao.module.crm.controller.admin.contract.vo.contract.CrmContractRespVO;
+import cn.iocoder.yudao.module.crm.enums.DictTypeConstants;
 import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
 import com.alibaba.excel.annotation.ExcelProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -27,7 +30,8 @@ public class CrmReceivableRespVO {
     private Long planId;
 
     @Schema(description = "回款方式", example = "2")
-    @ExcelProperty("回款方式")
+    @ExcelProperty(value = "回款方式", converter = DictConvert.class)
+    @DictFormat(DictTypeConstants.CRM_RECEIVABLE_RETURN_TYPE)
     private Integer returnType;
 
     @Schema(description = "回款金额", requiredMode = Schema.RequiredMode.REQUIRED, example = "9000")
@@ -39,7 +43,6 @@ public class CrmReceivableRespVO {
     private LocalDateTime returnTime;
 
     @Schema(description = "客户编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "2")
-    @ExcelProperty("客户编号")
     private Long customerId;
     @Schema(description = "客户名字", requiredMode = Schema.RequiredMode.REQUIRED, example = "test")
     @ExcelProperty("客户名字")
@@ -49,11 +52,9 @@ public class CrmReceivableRespVO {
     @ExcelProperty("合同编号")
     private Long contractId;
     @Schema(description = "合同信息")
-    @ExcelProperty("合同信息")
     private CrmContractRespVO contract;
 
     @Schema(description = "负责人的用户编号", example = "25682")
-    @ExcelProperty("负责人的用户编号")
     private Long ownerUserId;
     @Schema(description = "负责人名字", example = "25682")
     @ExcelProperty("负责人名字")
@@ -67,7 +68,8 @@ public class CrmReceivableRespVO {
     private String processInstanceId;
 
     @Schema(description = "审批状态", requiredMode = Schema.RequiredMode.REQUIRED, example = "0")
-    @ExcelProperty("审批状态")
+    @ExcelProperty(value = "审批状态", converter = DictConvert.class)
+    @DictFormat(DictTypeConstants.CRM_AUDIT_STATUS)
     private Integer auditStatus;
 
     @Schema(description = "工作流编号", example = "备注")
@@ -83,7 +85,6 @@ public class CrmReceivableRespVO {
     private LocalDateTime updateTime;
 
     @Schema(description = "创建人", example = "25682")
-    @ExcelProperty("创建人")
     private String creator;
     @Schema(description = "创建人名字", example = "test")
     @ExcelProperty("创建人名字")

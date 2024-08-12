@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.product.service.spu;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.module.product.controller.admin.spu.vo.ProductSpuPageReqVO;
 import cn.iocoder.yudao.module.product.controller.admin.spu.vo.ProductSpuSaveReqVO;
 import cn.iocoder.yudao.module.product.controller.admin.spu.vo.ProductSpuUpdateStatusReqVO;
@@ -57,6 +58,17 @@ public interface ProductSpuService {
      * @return 商品 SPU 列表
      */
     List<ProductSpuDO> getSpuList(Collection<Long> ids);
+
+    /**
+     * 获得商品 SPU Map
+     *
+     * @param ids 编号数组
+     * @return 商品 SPU Map
+     */
+    default Map<Long, ProductSpuDO> getSpuMap(Collection<Long> ids) {
+        List<ProductSpuDO> list = getSpuList(ids);
+        return CollectionUtils.convertMap(list, ProductSpuDO::getId);
+    }
 
     /**
      * 获得指定状态的商品 SPU 列表

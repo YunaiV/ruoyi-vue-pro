@@ -121,8 +121,8 @@ public class ${sceneEnum.prefixClass}${table.className}Controller {
         pageReqVO.setPageSize(PageParam.PAGE_SIZE_NONE);
         List<${table.className}DO> list = ${classNameVar}Service.get${simpleClassName}Page(pageReqVO).getList();
         // 导出 Excel
-        ExcelUtils.write(response, "${table.classComment}.xls", "数据", ${table.className}RespVO.class,
-                        BeanUtils.toBean(list, ${table.className}RespVO.class));
+        ExcelUtils.write(response, "${table.classComment}.xls", "数据", ${sceneEnum.prefixClass}${table.className}RespVO.class,
+                        BeanUtils.toBean(list, ${sceneEnum.prefixClass}${table.className}RespVO.class));
     }
 ## 特殊：树表专属逻辑（树不需要分页接口）
 #else

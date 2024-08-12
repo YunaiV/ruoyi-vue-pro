@@ -78,11 +78,10 @@ public interface BrokerageRecordService {
     /**
      * 取消佣金：将佣金记录，状态修改为已失效
      *
-     * @param userId  会员编号
      * @param bizType 业务类型
      * @param bizId   业务编号
      */
-    void cancelBrokerage(Long userId, BrokerageRecordBizTypeEnum bizType, String bizId);
+    void cancelBrokerage(BrokerageRecordBizTypeEnum bizType, String bizId);
 
     /**
      * 解冻佣金：将待结算的佣金记录，状态修改为已结算

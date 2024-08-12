@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.module.mp.dal.dataobject.message;
 
-import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.module.mp.dal.dataobject.account.MpAccountDO;
 import cn.iocoder.yudao.module.mp.dal.dataobject.user.MpUserDO;
@@ -9,8 +8,10 @@ import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.baomidou.mybatisplus.extension.handlers.AbstractJsonTypeHandler;
-import lombok.*;
+import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import me.chanjar.weixin.common.api.WxConsts;
 import me.chanjar.weixin.mp.builder.kefu.NewsBuilder;
 
@@ -173,7 +174,7 @@ public class MpMessageDO extends BaseDO {
      *
      * 消息类型为 {@link WxConsts.XmlMsgType} 的 NEWS
      */
-    @TableField(typeHandler = ArticleTypeHandler.class)
+    @TableField(typeHandler = JacksonTypeHandler.class)
     private List<Article> articles;
 
     /**
@@ -238,18 +239,4 @@ public class MpMessageDO extends BaseDO {
 
     }
 
-    // TODO @芋艿：可以找一些新的思路
-    public static class ArticleTypeHandler extends AbstractJsonTypeHandler<List<Article>> {
-
-        @Override
-        protected List<Article> parse(String json) {
-            return JsonUtils.parseArray(json, Article.class);
-        }
-
-        @Override
-        protected String toJson(List<Article> obj) {
-            return JsonUtils.toJsonString(obj);
-        }
-
-    }
 }

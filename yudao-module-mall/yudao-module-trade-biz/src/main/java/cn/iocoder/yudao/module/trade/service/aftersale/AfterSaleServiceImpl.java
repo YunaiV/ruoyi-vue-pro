@@ -33,6 +33,7 @@ import cn.iocoder.yudao.module.trade.service.delivery.DeliveryExpressService;
 import cn.iocoder.yudao.module.trade.service.order.TradeOrderQueryService;
 import cn.iocoder.yudao.module.trade.service.order.TradeOrderUpdateService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionSynchronization;
@@ -56,6 +57,7 @@ import static cn.iocoder.yudao.module.trade.enums.ErrorCodeConstants.*;
 public class AfterSaleServiceImpl implements AfterSaleService {
 
     @Resource
+    @Lazy // 延迟加载，避免循环依赖
     private TradeOrderUpdateService tradeOrderUpdateService;
     @Resource
     private TradeOrderQueryService tradeOrderQueryService;

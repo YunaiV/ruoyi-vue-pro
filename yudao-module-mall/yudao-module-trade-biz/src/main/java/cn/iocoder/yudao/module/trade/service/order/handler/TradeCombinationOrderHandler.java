@@ -10,6 +10,7 @@ import cn.iocoder.yudao.module.trade.enums.order.TradeOrderStatusEnum;
 import cn.iocoder.yudao.module.trade.enums.order.TradeOrderTypeEnum;
 import cn.iocoder.yudao.module.trade.service.order.TradeOrderQueryService;
 import cn.iocoder.yudao.module.trade.service.order.TradeOrderUpdateService;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -28,11 +29,13 @@ import static cn.iocoder.yudao.module.trade.enums.ErrorCodeConstants.ORDER_DELIV
 public class TradeCombinationOrderHandler implements TradeOrderHandler {
 
     @Resource
+    @Lazy // 延迟加载，避免循环依赖
     private TradeOrderUpdateService orderUpdateService;
     @Resource
     private TradeOrderQueryService orderQueryService;
 
     @Resource
+    @Lazy // 延迟加载，避免循环依赖
     private CombinationRecordApi combinationRecordApi;
 
     @Override

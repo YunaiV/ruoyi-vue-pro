@@ -1,6 +1,8 @@
 package cn.iocoder.yudao.module.system.service.permission;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.ObjUtil;
+import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.system.controller.admin.permission.vo.menu.MenuListReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.permission.vo.menu.MenuSaveVO;
@@ -19,11 +21,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
 import static cn.iocoder.yudao.module.system.dal.dataobject.permission.MenuDO.ID_ROOT;
 import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.*;
 
@@ -106,10 +108,55 @@ public class MenuServiceImpl implements MenuService {
 
     @Override
     public List<MenuDO> getMenuListByTenant(MenuListReqVO reqVO) {
+        // 查询所有菜单，并过滤掉关闭的节点
         List<MenuDO> menus = getMenuList(reqVO);
         // 开启多租户的情况下，需要过滤掉未开通的菜单
         tenantService.handleTenantMenu(menuIds -> menus.removeIf(menu -> !CollUtil.contains(menuIds, menu.getId())));
         return menus;
+    }
+
+    @Override
+    public List<MenuDO> filterDisableMenus(List<MenuDO> menuList) {
+        if (CollUtil.isEmpty(menuList)){
+            return Collections.emptyList();
+        }
+        Map<Long, MenuDO> menuMap = convertMap(menuList, MenuDO::getId);
+
+        // 遍历 menu 菜单，查找不是禁用的菜单，添加到 enabledMenus 结果
+        List<MenuDO> enabledMenus = new ArrayList<>();
+        Set<Long> disabledMenuCache = new HashSet<>(); // 存下递归搜索过被禁用的菜单，防止重复的搜索
+        for (MenuDO menu : menuList) {
+            if (isMenuDisabled(menu, menuMap, disabledMenuCache)) {
+                continue;
+            }
+            enabledMenus.add(menu);
+        }
+        return enabledMenus;
+    }
+
+    private boolean isMenuDisabled(MenuDO node, Map<Long, MenuDO> menuMap, Set<Long> disabledMenuCache) {
+        // 如果已经判定是禁用的节点，直接结束
+        if (disabledMenuCache.contains(node.getId())) {
+            return true;
+        }
+
+        // 1. 遍历到 parentId 为根节点，则无需判断
+        Long parentId = node.getParentId();
+        if (ObjUtil.equal(parentId, ID_ROOT)) {
+            if (CommonStatusEnum.isDisable(node.getStatus())) {
+                disabledMenuCache.add(node.getId());
+                return true;
+            }
+            return false;
+        }
+
+        // 2. 继续遍历 parent 节点
+        MenuDO parent = menuMap.get(parentId);
+        if (parent == null || isMenuDisabled(parent, menuMap, disabledMenuCache)) {
+            disabledMenuCache.add(node.getId());
+            return true;
+        }
+        return false;
     }
 
     @Override

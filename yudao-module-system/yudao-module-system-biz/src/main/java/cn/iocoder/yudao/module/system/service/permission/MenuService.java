@@ -53,6 +53,14 @@ public interface MenuService {
     List<MenuDO> getMenuListByTenant(MenuListReqVO reqVO);
 
     /**
+     * 过滤掉关闭的菜单及其子菜单
+     *
+     * @param list 菜单列表
+     * @return 过滤后的菜单列表
+     */
+    List<MenuDO> filterDisableMenus(List<MenuDO> list);
+
+    /**
      * 筛选菜单列表
      *
      * @param reqVO 筛选条件请求 VO

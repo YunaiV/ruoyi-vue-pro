@@ -50,7 +50,6 @@ public class AppBrokerageUserController {
     private BrokerageRecordService brokerageRecordService;
     @Resource
     private BrokerageWithdrawService brokerageWithdrawService;
-
     @Resource
     private MemberUserApi memberUserApi;
 
@@ -58,7 +57,7 @@ public class AppBrokerageUserController {
     @Operation(summary = "获得个人分销信息")
     @PreAuthenticated
     public CommonResult<AppBrokerageUserRespVO> getBrokerageUser() {
-        Optional<BrokerageUserDO> user = Optional.ofNullable(brokerageUserService.getBrokerageUser(getLoginUserId()));
+        Optional<BrokerageUserDO> user = Optional.ofNullable(brokerageUserService.getOrCreateBrokerageUser(getLoginUserId()));
         // 返回数据
         AppBrokerageUserRespVO respVO = new AppBrokerageUserRespVO()
                 .setBrokerageEnabled(user.map(BrokerageUserDO::getBrokerageEnabled).orElse(false))
@@ -79,21 +78,22 @@ public class AppBrokerageUserController {
     @PreAuthenticated
     public CommonResult<AppBrokerageUserMySummaryRespVO> getBrokerageUserSummary() {
         // 查询当前登录用户信息
-        BrokerageUserDO brokerageUser = brokerageUserService.getBrokerageUser(getLoginUserId());
+        Long userId = getLoginUserId();
+        BrokerageUserDO brokerageUser = brokerageUserService.getBrokerageUser(userId);
         // 统计用户昨日的佣金
         LocalDateTime yesterday = LocalDateTime.now().minusDays(1);
         LocalDateTime beginTime = LocalDateTimeUtil.beginOfDay(yesterday);
         LocalDateTime endTime = LocalDateTimeUtil.endOfDay(yesterday);
-        Integer yesterdayPrice = brokerageRecordService.getSummaryPriceByUserId(brokerageUser.getId(),
+        Integer yesterdayPrice = brokerageRecordService.getSummaryPriceByUserId(userId,
                 BrokerageRecordBizTypeEnum.ORDER, BrokerageRecordStatusEnum.SETTLEMENT, beginTime, endTime);
         // 统计用户提现的佣金
-        Integer withdrawPrice = brokerageWithdrawService.getWithdrawSummaryListByUserId(Collections.singleton(brokerageUser.getId()),
+        Integer withdrawPrice = brokerageWithdrawService.getWithdrawSummaryListByUserId(Collections.singleton(userId),
                         BrokerageWithdrawStatusEnum.AUDIT_SUCCESS).stream()
                 .findFirst().map(BrokerageWithdrawSummaryRespBO::getPrice).orElse(0);
         // 统计分销用户数量（一级）
-        Long firstBrokerageUserCount = brokerageUserService.getBrokerageUserCountByBindUserId(brokerageUser.getId(), 1);
+        Long firstBrokerageUserCount = brokerageUserService.getBrokerageUserCountByBindUserId(userId, 1);
         // 统计分销用户数量（二级）
-        Long secondBrokerageUserCount = brokerageUserService.getBrokerageUserCountByBindUserId(brokerageUser.getId(), 2);
+        Long secondBrokerageUserCount = brokerageUserService.getBrokerageUserCountByBindUserId(userId, 2);
 
         // 拼接返回
         return success(BrokerageUserConvert.INSTANCE.convert(yesterdayPrice, withdrawPrice, firstBrokerageUserCount, secondBrokerageUserCount, brokerageUser));

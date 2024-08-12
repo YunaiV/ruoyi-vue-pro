@@ -40,5 +40,9 @@ public class AdminUserRespDTO {
      * 手机号码
      */
     private String mobile;
+    /**
+     * 用户头像
+     */
+    private String avatar;
 
 }

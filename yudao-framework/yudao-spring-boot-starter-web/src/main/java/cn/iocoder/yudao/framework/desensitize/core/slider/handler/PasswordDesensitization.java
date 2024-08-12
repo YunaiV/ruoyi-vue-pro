@@ -22,4 +22,5 @@ public class PasswordDesensitization extends AbstractSliderDesensitizationHandle
     String getReplacer(PasswordDesensitize annotation) {
         return annotation.replacer();
     }
+
 }

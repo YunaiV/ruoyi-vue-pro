@@ -1,14 +1,11 @@
 package cn.iocoder.yudao.framework.pay.core.client.impl.weixin;
 
-import cn.hutool.core.io.IoUtil;
 import cn.iocoder.yudao.framework.common.util.validation.ValidationUtils;
 import cn.iocoder.yudao.framework.pay.core.client.PayClientConfig;
 import lombok.Data;
 
 import javax.validation.Validator;
 import javax.validation.constraints.NotBlank;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 
 /**
  * 微信支付的 PayClientConfig 实现类
@@ -72,15 +69,18 @@ public class WxPayClientConfig implements PayClientConfig {
     @NotBlank(message = "apiclient_key 不能为空", groups = V3.class)
     private String privateKeyContent;
     /**
-     * apiclient_cert.pem 证书文件的对应的字符串
-     */
-    @NotBlank(message = "apiclient_cert 不能为空", groups = V3.class)
-    private String privateCertContent;
-    /**
      * apiV3 密钥值
      */
     @NotBlank(message = "apiV3 密钥值不能为空", groups = V3.class)
     private String apiV3Key;
+    /**
+     * 证书序列号
+     */
+    @NotBlank(message = "证书序列号不能为空", groups = V3.class)
+    private String certSerialNo;
+
+    @Deprecated // TODO 芋艿：V2.3.0 进行移除
+    private String privateCertContent;
 
     /**
      * 分组校验 v2版本
@@ -98,13 +98,6 @@ public class WxPayClientConfig implements PayClientConfig {
     public void validate(Validator validator) {
         ValidationUtils.validate(validator, this,
                 API_VERSION_V2.equals(this.getApiVersion()) ? V2.class : V3.class);
-    }
-
-    public static void main(String[] args) throws FileNotFoundException {
-        String path = "/Users/yunai/Downloads/wx_pay/apiclient_cert.p12";
-        /// String path = "/Users/yunai/Downloads/wx_pay/apiclient_key.pem";
-        /// String path = "/Users/yunai/Downloads/wx_pay/apiclient_cert.pem";
-        System.out.println(IoUtil.readUtf8(new FileInputStream(path)));
     }
 
 }

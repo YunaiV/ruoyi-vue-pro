@@ -58,6 +58,6 @@ public interface ConfigService {
      * @param reqVO 分页条件
      * @return 分页列表
      */
-    PageResult<ConfigDO> getConfigPage(@Valid ConfigPageReqVO reqVO);
+    PageResult<ConfigDO> getConfigPage(ConfigPageReqVO reqVO);
 
 }

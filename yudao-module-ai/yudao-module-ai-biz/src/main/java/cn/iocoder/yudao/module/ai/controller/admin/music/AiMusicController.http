@@ -1,0 +1,26 @@
+### 生成音乐：Suno + 歌词模式
+POST {{baseUrl}}/ai/music/generate
+Content-Type: application/json
+Authorization: {{token}}
+
+{
+  "platform": "Suno",
+  "generateMode": 2,
+  "prompt": "创作一首带有轻松吉他旋律的流行歌曲，[verse] 描述夏日海滩的宁静，[chorus] 节奏加快，表达对自由的向往。",
+  "model": "chirp-v3.5",
+  "tags": ["Happy"],
+  "title": "Happy Song"
+}
+
+### 生成音乐：Suno + 描述模式
+POST {{baseUrl}}/ai/music/generate
+Content-Type: application/json
+Authorization: {{token}}
+
+{
+  "platform": "Suno",
+  "generateMode": 1,
+  "model": "chirp-v3.5",
+  "prompt": "happy music",
+  "makeInstrumental": false
+}

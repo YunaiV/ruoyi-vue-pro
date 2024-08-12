@@ -58,7 +58,7 @@ public class CrmProductRespVO implements VO {
     private String description;
 
     @Schema(description = "负责人的用户编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "31926")
-    @Trans(type = TransType.RPC, targetClassName = "cn.iocoder.yudao.module.system.dal.dataobject.user.AdminUserDO",
+    @Trans(type = TransType.SIMPLE, targetClassName = "cn.iocoder.yudao.module.system.dal.dataobject.user.AdminUserDO",
             fields = "nickname", ref = "ownerUserName")
     private Long ownerUserId;
     @Schema(description = "负责人的用户昵称", requiredMode = Schema.RequiredMode.REQUIRED, example = "芋道源码")
@@ -66,7 +66,7 @@ public class CrmProductRespVO implements VO {
     private String ownerUserName;
 
     @Schema(description = "创建人编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
-    @Trans(type = TransType.RPC, targetClassName = "cn.iocoder.yudao.module.system.dal.dataobject.user.AdminUserDO",
+    @Trans(type = TransType.SIMPLE, targetClassName = "cn.iocoder.yudao.module.system.dal.dataobject.user.AdminUserDO",
             fields = "nickname", ref = "creatorName")
     private String creator;
     @Schema(description = "创建人名字", requiredMode = Schema.RequiredMode.REQUIRED, example = "芋道源码")

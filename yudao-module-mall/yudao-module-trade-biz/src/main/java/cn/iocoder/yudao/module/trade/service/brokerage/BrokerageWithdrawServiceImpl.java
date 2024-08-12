@@ -77,14 +77,14 @@ public class BrokerageWithdrawServiceImpl implements BrokerageWithdrawService {
 
         String templateCode;
         if (BrokerageWithdrawStatusEnum.AUDIT_SUCCESS.equals(status)) {
-            templateCode = MessageTemplateConstants.BROKERAGE_WITHDRAW_AUDIT_APPROVE;
+            templateCode = MessageTemplateConstants.SMS_BROKERAGE_WITHDRAW_AUDIT_APPROVE;
             // 3.1 通过时佣金转余额
             if (BrokerageWithdrawTypeEnum.WALLET.getType().equals(withdraw.getType())) {
                 // todo 疯狂：
             }
             // TODO 疯狂：调用转账接口
         } else if (BrokerageWithdrawStatusEnum.AUDIT_FAIL.equals(status)) {
-            templateCode = MessageTemplateConstants.BROKERAGE_WITHDRAW_AUDIT_REJECT;
+            templateCode = MessageTemplateConstants.SMS_BROKERAGE_WITHDRAW_AUDIT_REJECT;
             // 3.2 驳回时需要退还用户佣金
             brokerageRecordService.addBrokerage(withdraw.getUserId(), BrokerageRecordBizTypeEnum.WITHDRAW_REJECT,
                     String.valueOf(withdraw.getId()), withdraw.getPrice(), BrokerageRecordBizTypeEnum.WITHDRAW_REJECT.getTitle());

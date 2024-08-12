@@ -804,13 +804,19 @@ CREATE TABLE {table_name} (
         return script
 
 
+class OpengaussConvertor(KingbaseConvertor):
+    def __init__(self, src):
+        super().__init__(src)
+        self.db_type = "OpenGauss"
+
+
 def main():
     parser = argparse.ArgumentParser(description="芋道系统数据库转换工具")
     parser.add_argument(
         "type",
         type=str,
         help="目标数据库类型",
-        choices=["postgres", "oracle", "sqlserver", "dm8", "kingbase"],
+        choices=["postgres", "oracle", "sqlserver", "dm8", "kingbase", "opengauss"],
     )
     args = parser.parse_args()
 
@@ -826,6 +832,8 @@ def main():
         convertor = DM8Convertor(sql_file)
     elif args.type == "kingbase":
         convertor = KingbaseConvertor(sql_file)
+    elif args.type == "opengauss":
+        convertor = OpengaussConvertor(sql_file)
     else:
         raise NotImplementedError(f"不支持目标数据库类型: {args.type}")
 

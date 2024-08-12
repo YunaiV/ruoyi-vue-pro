@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -163,7 +164,7 @@ public class MpMenuDO extends BaseDO {
      *
      * 消息类型为 {@link WxConsts.XmlMsgType} 的 NEWS
      */
-    @TableField(typeHandler = MpMessageDO.ArticleTypeHandler.class)
+    @TableField(typeHandler = JacksonTypeHandler.class)
     private List<MpMessageDO.Article> replyArticles;
 
     /**

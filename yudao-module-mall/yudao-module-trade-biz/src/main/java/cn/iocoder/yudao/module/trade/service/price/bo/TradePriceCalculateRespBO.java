@@ -49,12 +49,16 @@ public class TradePriceCalculateRespBO {
     private Long couponId;
 
     /**
+     * 会员剩余积分
+     */
+    private Integer totalPoint;
+    /**
      * 使用的积分
      */
     private Integer usePoint;
 
     /**
-     * 使用的积分
+     * 赠送的积分
      */
     private Integer givePoint;
 

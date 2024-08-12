@@ -57,4 +57,12 @@ public interface MemberUserApi {
      * @return 用户信息
      */
     MemberUserRespDTO getUserByMobile(String mobile);
+
+    /**
+     * 校验用户是否存在
+     *
+     * @param id 用户编号
+     */
+    void validateUser(Long id);
+
 }
