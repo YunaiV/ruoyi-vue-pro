@@ -43,4 +43,9 @@ public class PayOrderRespDTO {
 
     // ========== 渠道相关字段 ==========
 
+    /**
+     * 应用密钥
+     */
+    private String appKey;
+
 }

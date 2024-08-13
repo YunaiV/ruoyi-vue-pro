@@ -59,4 +59,9 @@ public class PayAppDO extends BaseDO {
      */
     private String transferNotifyUrl;
 
+    /**
+     * 应用密钥
+     */
+    private String appKey;
+
 }
