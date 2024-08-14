@@ -22,7 +22,8 @@ public class SmsClientTests {
     public void testHuaweiSmsClient_sendSms() throws Throwable {
         SmsChannelProperties properties = new SmsChannelProperties()
                 .setApiKey("123")
-                .setApiSecret("456");
+                .setApiSecret("456")
+                .setSignature("runpu");
         HuaweiSmsClient client = new HuaweiSmsClient(properties);
         // 准备参数
         Long sendLogId = System.currentTimeMillis();
@@ -58,11 +59,11 @@ public class SmsClientTests {
         SmsChannelProperties properties = new SmsChannelProperties()
                 .setApiKey("LTAI5tAicJAxaSFiZuGGeXHR")
                 .setApiSecret("Fdr9vadxnDvS6GJU0W1tijQ0VmLhYz")
-                .setSignature("Ballcat");
+                .setSignature("runpu");
         AliyunSmsClient client = new AliyunSmsClient(properties);
         // 准备参数
         Long sendLogId = System.currentTimeMillis();
-        String mobile = "173213154791";
+        String mobile = "15601691323";
         String apiTemplateId = "SMS_207945135";
         // 调用
         SmsSendRespDTO sendRespDTO = client.sendSms(sendLogId, mobile, apiTemplateId, List.of(new KeyValue<>("code", "1024")));
@@ -99,4 +100,40 @@ public class SmsClientTests {
         System.out.println(statuses);
     }
 
+    // ========== 腾讯云 ==========
+
+    @Test
+    @Disabled
+    public void testTencentSmsClient_sendSms() throws Throwable {
+        SmsChannelProperties properties = new SmsChannelProperties()
+                .setApiKey("LTAI5tAicJAxaSFiZuGGeXHR 1428926523")
+                .setApiSecret("Fdr9vadxnDvS6GJU0W1tijQ0VmLhYz")
+                .setSignature("芋道源码");
+        TencentSmsClient client = new TencentSmsClient(properties);
+        // 准备参数
+        Long sendLogId = System.currentTimeMillis();
+        String mobile = "15601691323";
+        String apiTemplateId = "2136358";
+        // 调用
+        SmsSendRespDTO sendRespDTO = client.sendSms(sendLogId, mobile, apiTemplateId, List.of(new KeyValue<>("code", "1024")));
+        // 打印结果
+        System.out.println(sendRespDTO);
+    }
+
+    @Test
+    @Disabled
+    public void testTencentSmsClient_getSmsTemplate() throws Throwable {
+        SmsChannelProperties properties = new SmsChannelProperties()
+                .setApiKey("LTAI5tAicJAxaSFiZuGGeXHR 1428926523")
+                .setApiSecret("Fdr9vadxnDvS6GJU0W1tijQ0VmLhYz")
+                .setSignature("芋道源码");
+        TencentSmsClient client = new TencentSmsClient(properties);
+        // 准备参数
+        String apiTemplateId = "2136358";
+        // 调用
+        SmsTemplateRespDTO template = client.getSmsTemplate(apiTemplateId);
+        // 打印结果
+        System.out.println(template);
+    }
 }
+
