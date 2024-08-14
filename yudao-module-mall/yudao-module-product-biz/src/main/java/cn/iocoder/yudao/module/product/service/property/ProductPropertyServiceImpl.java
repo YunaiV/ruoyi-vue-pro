@@ -109,4 +109,9 @@ public class ProductPropertyServiceImpl implements ProductPropertyService {
         return productPropertyMapper.selectBatchIds(ids);
     }
 
+    @Override
+    public List<ProductPropertyDO> getPropertyList() {
+        return productPropertyMapper.selectList();
+    }
+
 }

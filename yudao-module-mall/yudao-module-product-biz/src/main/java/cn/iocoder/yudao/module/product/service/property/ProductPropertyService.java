@@ -62,4 +62,11 @@ public interface ProductPropertyService {
      */
     List<ProductPropertyDO> getPropertyList(Collection<Long> ids);
 
+    /**
+     * 获得指定状态的属性项列表
+     *
+     * @return 属性项列表
+     */
+    List<ProductPropertyDO> getPropertyList();
+
 }

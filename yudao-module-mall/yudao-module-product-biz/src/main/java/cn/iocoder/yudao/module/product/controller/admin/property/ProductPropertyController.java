@@ -11,14 +11,16 @@ import cn.iocoder.yudao.module.product.service.property.ProductPropertyService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.annotation.Resource;
+import jakarta.validation.Valid;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import javax.annotation.Resource;
-import javax.validation.Valid;
+import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
 
 @Tag(name = "管理后台 - 商品属性项")
 @RestController
@@ -68,6 +70,14 @@ public class ProductPropertyController {
     public CommonResult<PageResult<ProductPropertyRespVO>> getPropertyPage(@Valid ProductPropertyPageReqVO pageVO) {
         PageResult<ProductPropertyDO> pageResult = productPropertyService.getPropertyPage(pageVO);
         return success(BeanUtils.toBean(pageResult, ProductPropertyRespVO.class));
+    }
+
+    @GetMapping("/simple-list")
+    @Operation(summary = "获得属性项精简列表")
+    public CommonResult<List<ProductPropertyRespVO>> getPropertySimpleList() {
+        List<ProductPropertyDO> list = productPropertyService.getPropertyList();
+        return success(convertList(list, property -> new ProductPropertyRespVO() // 只返回 id、name 属性
+                .setId(property.getId()).setName(property.getName())));
     }
 
 }
