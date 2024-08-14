@@ -17,25 +17,6 @@ import java.util.List;
  */
 public class SmsClientTests {
 
-    @Test
-    @Disabled
-    public void testHuaweiSmsClient_sendSms() throws Throwable {
-        SmsChannelProperties properties = new SmsChannelProperties()
-                .setApiKey("123")
-                .setApiSecret("456")
-                .setSignature("runpu");
-        HuaweiSmsClient client = new HuaweiSmsClient(properties);
-        // 准备参数
-        Long sendLogId = System.currentTimeMillis();
-        String mobile = "15601691323";
-        String apiTemplateId = "xx test01";
-        List<KeyValue<String, Object>> templateParams = List.of(new KeyValue<>("code", "1024"));
-        // 调用
-        SmsSendRespDTO smsSendRespDTO = client.sendSms(sendLogId, mobile, apiTemplateId, templateParams);
-        // 打印结果
-        System.out.println(smsSendRespDTO);
-    }
-
     // ========== 阿里云 ==========
 
     @Test
@@ -135,5 +116,27 @@ public class SmsClientTests {
         // 打印结果
         System.out.println(template);
     }
+
+    // ========== 华为云 ==========
+
+    @Test
+    @Disabled
+    public void testHuaweiSmsClient_sendSms() throws Throwable {
+        SmsChannelProperties properties = new SmsChannelProperties()
+                .setApiKey("123")
+                .setApiSecret("456")
+                .setSignature("runpu");
+        HuaweiSmsClient client = new HuaweiSmsClient(properties);
+        // 准备参数
+        Long sendLogId = System.currentTimeMillis();
+        String mobile = "15601691323";
+        String apiTemplateId = "xx test01";
+        List<KeyValue<String, Object>> templateParams = List.of(new KeyValue<>("code", "1024"));
+        // 调用
+        SmsSendRespDTO smsSendRespDTO = client.sendSms(sendLogId, mobile, apiTemplateId, templateParams);
+        // 打印结果
+        System.out.println(smsSendRespDTO);
+    }
+
 }
 

@@ -25,7 +25,6 @@ import java.util.*;
 import static cn.hutool.crypto.digest.DigestUtil.sha256Hex;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
 
-
 /**
  * 腾讯云短信功能实现
  *
@@ -34,6 +33,9 @@ import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.
  * @author shiwp
  */
 public class TencentSmsClient extends AbstractSmsClient {
+
+    private static final String VERSION = "2021-01-11";
+    private static final String REGION = "ap-guangzhou";
 
     /**
      * 调用成功 code
@@ -48,7 +50,6 @@ public class TencentSmsClient extends AbstractSmsClient {
      */
     private static final long INTERNATIONAL_CHINA = 0L;
 
-
     public TencentSmsClient(SmsChannelProperties properties) {
         super(properties);
         Assert.notEmpty(properties.getApiSecret(), "apiSecret 不能为空");
@@ -57,7 +58,6 @@ public class TencentSmsClient extends AbstractSmsClient {
 
     @Override
     protected void doInit() {
-
     }
 
     /**
@@ -87,32 +87,96 @@ public class TencentSmsClient extends AbstractSmsClient {
     @Override
     public SmsSendRespDTO sendSms(Long sendLogId, String mobile,
                                   String apiTemplateId, List<KeyValue<String, Object>> templateParams) throws Throwable {
-        // 构建请求
+        // 1. 执行请求
+        // 参考链接 https://cloud.tencent.com/document/product/382/55981
         TreeMap<String, Object> body = new TreeMap<>();
-        String[] phones = {mobile};
-        body.put("PhoneNumberSet",phones);
-        body.put("SmsSdkAppId",getSdkAppId());
-        body.put("SignName",properties.getSignature());
+        body.put("PhoneNumberSet", new String[]{mobile});
+        body.put("SmsSdkAppId", getSdkAppId());
+        body.put("SignName", properties.getSignature());
         body.put("TemplateId",apiTemplateId);
-        body.put("TemplateParamSet",ArrayUtils.toArray(templateParams, e -> String.valueOf(e.getValue())));
+        body.put("TemplateParamSet", ArrayUtils.toArray(templateParams, param -> String.valueOf(param.getValue())));
+        JSONObject response = request("SendSms", body);
 
-        JSONObject JsonResponse = request(body,"SendSms","2021-01-11","ap-guangzhou");
-
-        return new SmsSendRespDTO().setSuccess(API_CODE_SUCCESS.equals(JsonResponse.getJSONObject("Response").getJSONArray("SendStatusSet").getJSONObject(0).getStr("Code")))
-                .setApiRequestId(JsonResponse.getJSONObject("Response").getStr("RequestId"))
-                .setSerialNo(JsonResponse.getJSONObject("Response").getJSONArray("SendStatusSet").getJSONObject(0).getStr("SerialNo"))
-                .setApiMsg(JsonResponse.getJSONObject("Response").getJSONArray("SendStatusSet").getJSONObject(0).getStr("Message"));
+        // 2. 解析请求
+        JSONObject responseResult = response.getJSONObject("Response");
+        JSONObject error = responseResult.getJSONObject("Error");
+        if (error != null) {
+            return new SmsSendRespDTO().setSuccess(false)
+                    .setApiRequestId(responseResult.getStr("RequestId"))
+                    .setApiCode(error.getStr("Code"))
+                    .setApiMsg(error.getStr("Message"));
+        }
+        JSONObject responseData = responseResult.getJSONArray("SendStatusSet").getJSONObject(0);
+        return new SmsSendRespDTO().setSuccess(Objects.equals(API_CODE_SUCCESS, responseData.getStr("Code")))
+                .setApiRequestId(responseResult.getStr("RequestId"))
+                .setSerialNo(responseData.getStr("SerialNo"))
+                .setApiMsg(responseData.getStr("Message"));
     }
 
-    JSONObject request(TreeMap<String, Object> body,String action,String version,String region) throws Exception {
+    @Override
+    public List<SmsReceiveRespDTO> parseSmsReceiveStatus(String text) {
+        JSONArray statuses = JSONUtil.parseArray(text);
+        // 字段参考
+        return convertList(statuses, status -> {
+            JSONObject statusObj = (JSONObject) status;
+            return new SmsReceiveRespDTO()
+                    .setSuccess("SUCCESS".equals(statusObj.getStr("report_status"))) // 是否接收成功
+                    .setErrorCode(statusObj.getStr("errmsg")) // 状态报告编码
+                    .setMobile(statusObj.getStr("mobile")) // 手机号
+                    .setReceiveTime(statusObj.getLocalDateTime("user_receive_time", null)) // 状态报告时间
+                    .setSerialNo(statusObj.getStr("sid")); // 发送序列号
+        });
+    }
 
+    @Override
+    public SmsTemplateRespDTO getSmsTemplate(String apiTemplateId) throws Throwable {
+        // 1. 构建请求
+        // 参考链接 https://cloud.tencent.com/document/product/382/52067
+        TreeMap<String, Object> body = new TreeMap<>();
+        body.put("International", INTERNATIONAL_CHINA);
+        body.put("TemplateIdSet", new Integer[]{Integer.valueOf(apiTemplateId)});
+        JSONObject response = request("DescribeSmsTemplateList", body);
+
+        // TODO @scholar：会有请求失败的情况么？类似发送的（那块逻辑我补充了）
+        JSONObject TemplateStatusSet = response.getJSONObject("Response").getJSONArray("DescribeTemplateStatusSet").getJSONObject(0);
+        String content = TemplateStatusSet.get("TemplateContent").toString();
+        int templateStatus = Integer.parseInt(TemplateStatusSet.get("StatusCode").toString());
+        String auditReason = TemplateStatusSet.get("ReviewReply").toString();
+
+        return new SmsTemplateRespDTO().setId(apiTemplateId).setContent(content)
+                .setAuditStatus(convertSmsTemplateAuditStatus(templateStatus)).setAuditReason(auditReason);
+    }
+
+    @VisibleForTesting
+    Integer convertSmsTemplateAuditStatus(int templateStatus) {
+        switch (templateStatus) {
+            case 1: return SmsTemplateAuditStatusEnum.CHECKING.getStatus();
+            case 0: return SmsTemplateAuditStatusEnum.SUCCESS.getStatus();
+            case -1: return SmsTemplateAuditStatusEnum.FAIL.getStatus();
+            default: throw new IllegalArgumentException(String.format("未知审核状态(%d)", templateStatus));
+        }
+    }
+
+    /**
+     * 请求腾讯云短信
+     *
+     * @see <a href="https://cloud.tencent.com/document/product/382/52072">签名方法 v3</a>
+     *
+     * @param action 请求的 API 名称
+     * @param body 请求参数
+     * @return 请求结果
+     */
+    private JSONObject request(String action, TreeMap<String, Object> body) throws Exception {
         String timestamp = String.valueOf(System.currentTimeMillis() / 1000);
+        // TODO @scholar：这个 format，看看怎么写的可以简化点
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         // 注意时区，否则容易出错
         sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
         String date = sdf.format(new Date(Long.valueOf(timestamp + "000")));
 
+        // TODO @scholar：这个步骤，看看怎么参考阿里云 client，归类下；1. 2.1 2.2 这种
         // ************* 步骤 1：拼接规范请求串 *************
+        // TODO @scholar：这个 hsot 枚举下；
         String host = "sms.tencentcloudapi.com"; //APP接入地址+接口访问URI
         String httpMethod = "POST"; // 请求方式
         String canonicalUri = "/";
@@ -122,6 +186,7 @@ public class TencentSmsClient extends AbstractSmsClient {
                 + "host:" + host + "\n" + "x-tc-action:" + action.toLowerCase() + "\n";
         String signedHeaders = "content-type;host;x-tc-action";
         String hashedRequestBody = sha256Hex(JSONUtil.toJsonStr(body));
+        // TODO @scholar：换行下，不然单行太长了
         String canonicalRequest = httpMethod + "\n" + canonicalUri + "\n" + canonicalQueryString + "\n" + canonicalHeaders + "\n" + signedHeaders + "\n" + hashedRequestBody;
 
         // ************* 步骤 2：拼接待签名字符串 *************
@@ -146,65 +211,19 @@ public class TencentSmsClient extends AbstractSmsClient {
         headers.put("Host", host);
         headers.put("X-TC-Action", action);
         headers.put("X-TC-Timestamp", timestamp);
-        headers.put("X-TC-Version", version);
-        headers.put("X-TC-Region", region);
+        headers.put("X-TC-Version", VERSION);
+        headers.put("X-TC-Region", REGION);
 
-        String responseBody = HttpUtils.post("https://"+host, headers, JSONUtil.toJsonStr(body));
+        String responseBody = HttpUtils.post("https://" + host, headers, JSONUtil.toJsonStr(body));
 
         return JSONUtil.parseObj(responseBody);
     }
 
-    public static byte[] hmac256(byte[] key, String msg) throws Exception {
+    // TODO @scholar：使用 hutool 简化下
+    private static byte[] hmac256(byte[] key, String msg) throws Exception {
         Mac mac = Mac.getInstance("HmacSHA256");
         SecretKeySpec secretKeySpec = new SecretKeySpec(key, mac.getAlgorithm());
         mac.init(secretKeySpec);
         return mac.doFinal(msg.getBytes(StandardCharsets.UTF_8));
-    }
-
-    @Override
-    public List<SmsReceiveRespDTO> parseSmsReceiveStatus(String text) {
-
-        JSONArray statuses = JSONUtil.parseArray(text);
-        // 字段参考
-        return convertList(statuses, status -> {
-            JSONObject statusObj = (JSONObject) status;
-            return new SmsReceiveRespDTO()
-                    .setSuccess("SUCCESS".equals(statusObj.getStr("report_status"))) // 是否接收成功
-                    .setErrorCode(statusObj.getStr("errmsg")) // 状态报告编码
-                    .setMobile(statusObj.getStr("mobile")) // 手机号
-                    .setReceiveTime(statusObj.getLocalDateTime("user_receive_time", null)) // 状态报告时间
-                    .setSerialNo(statusObj.getStr("sid")); // 发送序列号
-        });
-    }
-
-    @Override
-    public SmsTemplateRespDTO getSmsTemplate(String apiTemplateId) throws Throwable {
-
-        // 构建请求
-        TreeMap<String, Object> body = new TreeMap<>();
-        body.put("International",INTERNATIONAL_CHINA);
-        Integer[] templateIds = {Integer.valueOf(apiTemplateId)};
-        body.put("TemplateIdSet",templateIds);
-
-        JSONObject JsonResponse = request(body,"DescribeSmsTemplateList","2021-01-11","ap-guangzhou");
-        System.out.println("JsonResponse======"+JsonResponse);
-
-        JSONObject TemplateStatusSet = JsonResponse.getJSONObject("Response").getJSONArray("DescribeTemplateStatusSet").getJSONObject(0);
-        String content = TemplateStatusSet.get("TemplateContent").toString();
-        int templateStatus = Integer.parseInt(TemplateStatusSet.get("StatusCode").toString());
-        String auditReason = TemplateStatusSet.get("ReviewReply").toString();
-
-        return new SmsTemplateRespDTO().setId(apiTemplateId).setContent(content)
-                .setAuditStatus(convertSmsTemplateAuditStatus(templateStatus)).setAuditReason(auditReason);
-    }
-
-    @VisibleForTesting
-    Integer convertSmsTemplateAuditStatus(int templateStatus) {
-        switch (templateStatus) {
-            case 1: return SmsTemplateAuditStatusEnum.CHECKING.getStatus();
-            case 0: return SmsTemplateAuditStatusEnum.SUCCESS.getStatus();
-            case -1: return SmsTemplateAuditStatusEnum.FAIL.getStatus();
-            default: throw new IllegalArgumentException(String.format("未知审核状态(%d)", templateStatus));
-        }
     }
 }

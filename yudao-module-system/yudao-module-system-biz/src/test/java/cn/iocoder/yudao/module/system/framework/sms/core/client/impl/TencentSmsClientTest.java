@@ -39,17 +39,7 @@ public class TencentSmsClientTest extends BaseMockitoUnitTest {
     private TencentSmsClient smsClient = new TencentSmsClient(properties);
 
     @Test
-    public void testDoInit() {
-        // 准备参数
-        // mock 方法
-
-        // 调用
-        smsClient.doInit();
-    }
-
-    @Test
     public void testDoSendSms_success() throws Throwable {
-
         try (MockedStatic<HttpUtils> httpUtilsMockedStatic = mockStatic(HttpUtils.class)) {
             // 准备参数
             Long sendLogId = randomLongId();
@@ -57,11 +47,9 @@ public class TencentSmsClientTest extends BaseMockitoUnitTest {
             String apiTemplateId = randomString();
             List<KeyValue<String, Object>> templateParams = Lists.newArrayList(
                     new KeyValue<>("1", 1234), new KeyValue<>("2", "login"));
-
             // mock 方法
             httpUtilsMockedStatic.when(() -> HttpUtils.post(anyString(), anyMap(), anyString()))
-                    .thenReturn(
-                            "{\n" +
+                    .thenReturn("{\n" +
                                     "    \"Response\": {\n" +
                                     "        \"SendStatusSet\": [\n" +
                                     "            {\n" +
@@ -76,8 +64,7 @@ public class TencentSmsClientTest extends BaseMockitoUnitTest {
                                     "        ],\n" +
                                     "        \"RequestId\": \"a0aabda6-cf91-4f3e-a81f-9198114a2279\"\n" +
                                     "    }\n" +
-                                    "}"
-                    );
+                                    "}");
 
             // 调用
             SmsSendRespDTO result = smsClient.sendSms(sendLogId, mobile,
@@ -87,7 +74,6 @@ public class TencentSmsClientTest extends BaseMockitoUnitTest {
             assertEquals("5000:1045710669157053657849499619", result.getSerialNo());
             assertEquals("a0aabda6-cf91-4f3e-a81f-9198114a2279", result.getApiRequestId());
             assertEquals("send success", result.getApiMsg());
-
         }
     }
 
@@ -103,8 +89,7 @@ public class TencentSmsClientTest extends BaseMockitoUnitTest {
 
             // mock 方法
             httpUtilsMockedStatic.when(() -> HttpUtils.post(anyString(), anyMap(), anyString()))
-                    .thenReturn(
-                            "{\n" +
+                    .thenReturn("{\n" +
                                     "    \"Response\": {\n" +
                                     "        \"SendStatusSet\": [\n" +
                                     "            {\n" +
@@ -119,8 +104,7 @@ public class TencentSmsClientTest extends BaseMockitoUnitTest {
                                     "        ],\n" +
                                     "        \"RequestId\": \"a0aabda6-cf91-4f3e-a81f-9198114a2279\"\n" +
                                     "    }\n" +
-                                    "}"
-                    );
+                                    "}");
 
             // 调用
             SmsSendRespDTO result = smsClient.sendSms(sendLogId, mobile,
@@ -162,9 +146,7 @@ public class TencentSmsClientTest extends BaseMockitoUnitTest {
 
     @Test
     public void testGetSmsTemplate() throws Throwable {
-
         try (MockedStatic<HttpUtils> httpUtilsMockedStatic = mockStatic(HttpUtils.class)) {
-
             // 准备参数
             String apiTemplateId = "1122";
 
