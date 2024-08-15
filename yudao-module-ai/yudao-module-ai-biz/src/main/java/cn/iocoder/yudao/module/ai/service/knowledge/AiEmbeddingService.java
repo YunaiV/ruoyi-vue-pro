@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.ai.service.knowledge;
 
 import org.springframework.ai.document.Document;
+import org.springframework.ai.vectorstore.SearchRequest;
 
 import java.util.List;
 
@@ -12,9 +13,9 @@ import java.util.List;
 public interface AiEmbeddingService {
 
     /**
-     * 向量化文档
+     * 向量化文档并存储
      */
-    void embeddingDoc();
+    void add(List<Document> documents);
 
 
     /**
@@ -22,5 +23,5 @@ public interface AiEmbeddingService {
      *
      * @param content 查询内容
      */
-    List<Document> similaritySearch(String content);
+    List<Document> similaritySearch(SearchRequest request);
 }

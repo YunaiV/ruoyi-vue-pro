@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.ai.dal.dataobject.knowledge;
 
+import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -41,8 +42,10 @@ public class AiKnowledgeSegmentDO extends BaseDO {
      */
     private Integer tokens;
     /**
-     * 是否启用
+     * 状态
+     * <p>
+     * 枚举 {@link CommonStatusEnum}
      */
-    private Boolean status;
+    private Integer status;
 
 }

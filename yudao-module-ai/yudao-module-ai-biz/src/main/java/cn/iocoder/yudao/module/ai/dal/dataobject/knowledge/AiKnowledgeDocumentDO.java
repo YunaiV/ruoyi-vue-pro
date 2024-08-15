@@ -1,6 +1,8 @@
 package cn.iocoder.yudao.module.ai.dal.dataobject.knowledge;
 
+import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import cn.iocoder.yudao.module.ai.enums.knowledge.AiKnowledgeDocumentStatusEnum;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -46,10 +48,15 @@ public class AiKnowledgeDocumentDO extends BaseDO {
     private Integer wordCount;
     /**
      * 切片状态
+     * <p>
+     * 枚举 {@link AiKnowledgeDocumentStatusEnum}
      */
     private Integer sliceStatus;
+
     /**
-     * 是否启用
+     * 状态
+     * <p>
+     * 枚举 {@link CommonStatusEnum}
      */
-    private Boolean status;
+    private Integer status;
 }

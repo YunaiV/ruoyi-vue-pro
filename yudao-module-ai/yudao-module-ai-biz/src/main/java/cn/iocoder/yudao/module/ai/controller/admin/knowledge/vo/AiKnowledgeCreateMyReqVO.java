@@ -14,11 +14,11 @@ import java.util.List;
 @Data
 public class AiKnowledgeCreateMyReqVO {
 
-    @Schema(description = "知识库名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "")
+    @Schema(description = "知识库名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "ruoyi-vue-pro 用户指南")
     @NotBlank(message = "知识库名称不能为空")
     private String name;
 
-    @Schema(description = "知识库描述", requiredMode = Schema.RequiredMode.REQUIRED, example = "")
+    @Schema(description = "知识库描述", requiredMode = Schema.RequiredMode.REQUIRED, example = "存储 ruoyi-vue-pro 操作文档")
     private String description;
 
     @Schema(description = "可见权限,只能选择哪些人可见", requiredMode = Schema.RequiredMode.REQUIRED, example = "[1]")

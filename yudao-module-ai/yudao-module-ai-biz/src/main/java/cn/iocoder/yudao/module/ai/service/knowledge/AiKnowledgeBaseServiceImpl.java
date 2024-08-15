@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.ai.service.knowledge;
 
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.ObjUtil;
+import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.ai.controller.admin.knowledge.vo.AiKnowledgeCreateMyReqVO;
 import cn.iocoder.yudao.module.ai.controller.admin.knowledge.vo.AiKnowledgeUpdateMyReqVO;
@@ -26,16 +27,18 @@ import static cn.iocoder.yudao.module.ai.enums.ErrorCodeConstants.KNOWLEDGE_NOT_
 public class AiKnowledgeBaseServiceImpl implements AiKnowledgeBaseService {
 
     @Resource
-    private AiKnowledgeBaseMapper knowledgeBaseMapper;
-    @Resource
     private AiChatModelService chatModalService;
+
+    @Resource
+    private AiKnowledgeBaseMapper knowledgeBaseMapper;
+
 
     @Override
     public Long createKnowledgeMy(AiKnowledgeCreateMyReqVO createReqVO, Long userId) {
         AiChatModelDO model = validateChatModel(createReqVO.getModelId());
 
         AiKnowledgeBaseDO knowledgeBaseDO = BeanUtils.toBean(createReqVO, AiKnowledgeBaseDO.class);
-        knowledgeBaseDO.setModel(model.getModel()).setUserId(userId);
+        knowledgeBaseDO.setModel(model.getModel()).setUserId(userId).setStatus(CommonStatusEnum.ENABLE.getStatus());
 
         knowledgeBaseMapper.insert(knowledgeBaseDO);
         return knowledgeBaseDO.getId();
