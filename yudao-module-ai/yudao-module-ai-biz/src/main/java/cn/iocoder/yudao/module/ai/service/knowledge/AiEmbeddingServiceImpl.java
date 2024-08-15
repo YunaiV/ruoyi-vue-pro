@@ -4,7 +4,6 @@ import jakarta.annotation.Resource;
 import org.springframework.ai.document.Document;
 import org.springframework.ai.vectorstore.RedisVectorStore;
 import org.springframework.ai.vectorstore.SearchRequest;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -21,6 +20,8 @@ public class AiEmbeddingServiceImpl implements AiEmbeddingService {
     private RedisVectorStore vectorStore;
 
     @Override
+//    @Async
+    // TODO xiaoxin 报错先注释
     public void add(List<Document> documents) {
         vectorStore.add(documents);
     }

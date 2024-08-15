@@ -21,7 +21,7 @@ public interface AiEmbeddingService {
     /**
      * 相似查询
      *
-     * @param content 查询内容
+     * @param request 查询实体
      */
     List<Document> similaritySearch(SearchRequest request);
 }

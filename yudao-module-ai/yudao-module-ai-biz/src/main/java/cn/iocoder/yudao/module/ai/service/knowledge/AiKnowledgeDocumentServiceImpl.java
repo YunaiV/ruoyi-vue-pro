@@ -14,12 +14,14 @@ import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.document.Document;
 import org.springframework.ai.reader.tika.TikaDocumentReader;
+import org.springframework.ai.tokenizer.JTokkitTokenCountEstimator;
 import org.springframework.ai.transformer.splitter.TokenTextSplitter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Objects;
 
 /**
  * AI 知识库-文档 Service 实现类
@@ -41,7 +43,9 @@ public class AiKnowledgeDocumentServiceImpl implements AiKnowledgeDocumentServic
     @Resource
     private AiEmbeddingService embeddingService;
 
-    // TODO @xin 临时测试用，后续删
+    private static final JTokkitTokenCountEstimator TOKEN_COUNT_ESTIMATOR = new JTokkitTokenCountEstimator();
+
+    // TODO xiaoxin 临时测试用，后续删
     @Value("classpath:/webapp/test/Fel.pdf")
     private org.springframework.core.io.Resource data;
 
@@ -49,18 +53,23 @@ public class AiKnowledgeDocumentServiceImpl implements AiKnowledgeDocumentServic
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Long createKnowledgeDocument(AiKnowledgeDocumentCreateReqVO createReqVO) {
-        AiKnowledgeDocumentDO documentDO = BeanUtils.toBean(createReqVO, AiKnowledgeDocumentDO.class);
-        documentDO
-                //todo
-                .setTokens(0).setWordCount(0)
-                .setStatus(CommonStatusEnum.ENABLE.getStatus()).setSliceStatus(AiKnowledgeDocumentStatusEnum.SUCCESS.getStatus());
-        documentMapper.insert(documentDO);
 
+        // TODO xiaoxin 后续从 url 加载
         TikaDocumentReader loader = new TikaDocumentReader(data);
+        // 加载文档
         List<Document> documents = loader.get();
+        Document document = CollUtil.getFirst(documents);
+        // TODO 芋艿 文档层面有没有可能会比较大，这两个字段是否可以从分段表计算得出？
+        Integer tokens = Objects.nonNull(document) ? TOKEN_COUNT_ESTIMATOR.estimate(document.getContent()) : 0;
+        Integer wordCount = Objects.nonNull(document) ? document.getContent().length() : 0;
+
+        AiKnowledgeDocumentDO documentDO = BeanUtils.toBean(createReqVO, AiKnowledgeDocumentDO.class);
+        documentDO.setTokens(tokens).setWordCount(wordCount)
+                .setStatus(CommonStatusEnum.ENABLE.getStatus()).setSliceStatus(AiKnowledgeDocumentStatusEnum.SUCCESS.getStatus());
+        // 文档记录入库
+        documentMapper.insert(documentDO);
         Long documentId = documentDO.getId();
         if (CollUtil.isEmpty(documents)) {
-            log.info("文档内容为空");
             return documentId;
         }
 
@@ -69,10 +78,8 @@ public class AiKnowledgeDocumentServiceImpl implements AiKnowledgeDocumentServic
 
         List<AiKnowledgeSegmentDO> segmentDOList = CollectionUtils.convertList(segments,
                 segment -> new AiKnowledgeSegmentDO().setContent(segment.getContent()).setDocumentId(documentId)
-                        //todo
-                        .setTokens(0).setWordCount(0)
+                        .setTokens(TOKEN_COUNT_ESTIMATOR.estimate(segment.getContent())).setWordCount(segment.getContent().length())
                         .setStatus(CommonStatusEnum.ENABLE.getStatus()));
-
         // 分段内容入库
         segmentMapper.insertBatch(segmentDOList);
 
