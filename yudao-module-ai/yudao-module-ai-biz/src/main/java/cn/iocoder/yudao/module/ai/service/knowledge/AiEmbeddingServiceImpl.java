@@ -1,24 +1,23 @@
 package cn.iocoder.yudao.module.ai.service.knowledge;
 
 import jakarta.annotation.Resource;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.document.Document;
 import org.springframework.ai.reader.tika.TikaDocumentReader;
 import org.springframework.ai.transformer.splitter.TokenTextSplitter;
 import org.springframework.ai.vectorstore.RedisVectorStore;
+import org.springframework.ai.vectorstore.SearchRequest;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 /**
- * AI 知识库 Service 实现类
+ * AI 嵌入 Service 实现类
  *
  * @author xiaoxin
  */
 @Service
-@Slf4j
-public class DocServiceImpl implements DocService {
+public class AiEmbeddingServiceImpl implements AiEmbeddingService {
 
     @Resource
     private RedisVectorStore vectorStore;
@@ -40,4 +39,9 @@ public class DocServiceImpl implements DocService {
         vectorStore.add(segments);
     }
 
+    @Override
+    public List<Document> similaritySearch(String content) {
+        SearchRequest request = SearchRequest.query(content);
+        return vectorStore.similaritySearch(request);
+    }
 }

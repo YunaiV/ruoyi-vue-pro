@@ -57,11 +57,9 @@
             <version>${spring-ai.version}</version>
         </dependency>
 
-        <!-- TODO @xin：引入我们项目的 starter -->
         <dependency>
-            <groupId>org.springframework.data</groupId>
-            <artifactId>spring-data-redis</artifactId>
-            <optional>true</optional>
+            <groupId>cn.iocoder.boot</groupId>
+            <artifactId>yudao-spring-boot-starter-redis</artifactId>
         </dependency>
 
         <dependency>

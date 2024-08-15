@@ -50,4 +50,8 @@ public interface ErrorCodeConstants {
     ErrorCode WRITE_NOT_EXISTS = new ErrorCode(1_022_007_000, "作文不存在!");
     ErrorCode WRITE_STREAM_ERROR = new ErrorCode(1_022_07_001, "写作生成异常!");
 
+
+    // ========== API 知识库 1-022-008-000 ==========
+    ErrorCode KNOWLEDGE_NOT_EXISTS = new ErrorCode(1_022_008_000, "知识库不存在!");
+
 }
