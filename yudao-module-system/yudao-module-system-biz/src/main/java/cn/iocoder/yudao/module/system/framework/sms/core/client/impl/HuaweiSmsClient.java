@@ -5,12 +5,11 @@ import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.StrUtil;
 
 import cn.hutool.crypto.SecureUtil;
-import cn.hutool.http.HttpRequest;
-import cn.hutool.http.HttpResponse;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import cn.iocoder.yudao.framework.common.core.KeyValue;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
+import cn.iocoder.yudao.framework.common.util.http.HttpUtils;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.module.system.framework.sms.core.client.dto.SmsReceiveRespDTO;
 import cn.iocoder.yudao.module.system.framework.sms.core.client.dto.SmsSendRespDTO;
@@ -18,14 +17,14 @@ import cn.iocoder.yudao.module.system.framework.sms.core.client.dto.SmsTemplateR
 import cn.iocoder.yudao.module.system.framework.sms.core.enums.SmsTemplateAuditStatusEnum;
 import cn.iocoder.yudao.module.system.framework.sms.core.property.SmsChannelProperties;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.ZoneId;
 import java.util.*;
 
 
@@ -33,9 +32,6 @@ import java.time.LocalDateTime;
 
 
 import static cn.hutool.crypto.digest.DigestUtil.sha256Hex;
-import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
-import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
-import static cn.iocoder.yudao.framework.common.util.date.DateUtils.TIME_ZONE_DEFAULT;
 
 
 /**
@@ -47,9 +43,6 @@ import static cn.iocoder.yudao.framework.common.util.date.DateUtils.TIME_ZONE_DE
 @Slf4j
 public class HuaweiSmsClient extends AbstractSmsClient {
 
-    /**
-     * 调用成功 code
-     */
     public static final String URL = "https://smsapi.cn-north-4.myhuaweicloud.com:443/sms/batchSendSms/v1";//APP接入地址+接口访问URI
     public static final String HOST = "smsapi.cn-north-4.myhuaweicloud.com:443";
     public static final String SIGNEDHEADERS = "content-type;host;x-sdk-date";
@@ -78,13 +71,14 @@ public class HuaweiSmsClient extends AbstractSmsClient {
 
         List<String> templateParas = CollectionUtils.convertList(templateParams, kv -> String.valueOf(kv.getValue()));
 
-        JSONObject JsonResponse = sendSmsRequest(sender,mobile,templateId,templateParas,statusCallBack);
-        SmsResponse smsResponse = getSmsSendResponse(JsonResponse);
+        JSONObject JsonResponse = request(sendLogId,sender,mobile,templateId,templateParas,statusCallBack);
 
-        return new SmsSendRespDTO().setSuccess(smsResponse.success).setApiMsg(smsResponse.data.toString());
+        return new SmsSendRespDTO().setSuccess("000000".equals(JsonResponse.getStr("code")))
+                .setSerialNo(JsonResponse.getJSONArray("result").getJSONObject(0).getStr("smsMsgId"))
+                .setApiCode(JsonResponse.getJSONArray("result").getJSONObject(0).getStr("status"));
     }
 
-    JSONObject sendSmsRequest(String sender,String mobile,String templateId,List<String> templateParas,String statusCallBack) throws UnsupportedEncodingException {
+    JSONObject request(Long sendLogId,String sender,String mobile,String templateId,List<String> templateParas,String statusCallBack) throws UnsupportedEncodingException {
 
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd'T'HHmmss'Z'", Locale.ENGLISH);
         sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
@@ -97,8 +91,7 @@ public class HuaweiSmsClient extends AbstractSmsClient {
         String canonicalHeaders = "content-type:application/x-www-form-urlencoded\n"
                 + "host:"+ HOST +"\n"
                 + "x-sdk-date:" + sdkDate + "\n";
-        //请求Body,不携带签名名称时,signature请填null
-        String body = buildRequestBody(sender, mobile, templateId, templateParas, statusCallBack, null);
+        String body = buildRequestBody(sender, mobile, templateId, templateParas, statusCallBack, sendLogId);
         if (null == body || body.isEmpty()) {
             return null;
         }
@@ -118,26 +111,29 @@ public class HuaweiSmsClient extends AbstractSmsClient {
                 + "SignedHeaders=" + SIGNEDHEADERS + ", " + "Signature=" + signature;
 
         // ************* 步骤 5：构造HttpRequest 并执行request请求，获得response *************
-        HttpResponse response = HttpRequest.post(URL)
-                .header("Content-Type", "application/x-www-form-urlencoded")
-                .header("X-Sdk-Date", sdkDate)
-                .header("host",HOST)
-                .header("Authorization", authorization)
-                .body(body)
-                .execute();
+        TreeMap<String, String> headers = new TreeMap<>();
+        headers.put("Content-Type", "application/x-www-form-urlencoded");
+        headers.put("X-Sdk-Date", sdkDate);
+        headers.put("host", HOST);
+        headers.put("Authorization", authorization);
 
-        return JSONUtil.parseObj(response.body());
-    }
-
-    private SmsResponse getSmsSendResponse(JSONObject resJson) {
-        SmsResponse smsResponse = new SmsResponse();
-        smsResponse.setSuccess("000000".equals(resJson.getStr("code")));
-        smsResponse.setData(resJson);
-        return smsResponse;
+        String responseBody = HttpUtils.post(URL, headers, body);
+        return JSONUtil.parseObj(responseBody);
+//
+//
+//        HttpResponse response = HttpRequest.post(URL)
+//                .header("Content-Type", "application/x-www-form-urlencoded")
+//                .header("X-Sdk-Date", sdkDate)
+//                .header("host",HOST)
+//                .header("Authorization", authorization)
+//                .body(body)
+//                .execute();
+//
+//        return JSONUtil.parseObj(response.body());
     }
 
     static String buildRequestBody(String sender, String receiver, String templateId, List<String> templateParas,
-                                   String statusCallBack, String signature) throws UnsupportedEncodingException {
+                                   String statusCallBack, Long sendLogId) throws UnsupportedEncodingException {
         if (null == sender || null == receiver || null == templateId || sender.isEmpty() || receiver.isEmpty()
                 || templateId.isEmpty()) {
             System.out.println("buildRequestBody(): sender, receiver or templateId is null.");
@@ -150,7 +146,9 @@ public class HuaweiSmsClient extends AbstractSmsClient {
         appendToBody(body, "&templateId=", templateId);
         appendToBody(body, "&templateParas=", JsonUtils.toJsonString(templateParas));
         appendToBody(body, "&statusCallback=", statusCallBack);
-        appendToBody(body, "&signature=", signature);
+        appendToBody(body, "&signature=", null);
+        appendToBody(body, "&extend=", String.valueOf(sendLogId));
+
         return body.toString();
     }
 
@@ -160,12 +158,35 @@ public class HuaweiSmsClient extends AbstractSmsClient {
         }
     }
     @Override
-    public List<SmsReceiveRespDTO> parseSmsReceiveStatus(String text) {
-        List<SmsReceiveStatus> statuses = JsonUtils.parseArray(text, SmsReceiveStatus.class);
-        return convertList(statuses, status -> new SmsReceiveRespDTO().setSuccess(Objects.equals(status.getStatus(),"DELIVRD"))
-                .setErrorCode(status.getStatus()).setErrorMsg(status.getStatus())
-                .setMobile(status.getPhoneNumber()).setReceiveTime(status.getUpdateTime())
-                .setSerialNo(status.getSmsMsgId()));
+    public List<SmsReceiveRespDTO> parseSmsReceiveStatus(String requestBody) {
+
+        System.out.println("text in parseSmsReceiveStatus===== " + requestBody);
+
+        Map<String, String> params = new HashMap<>();
+        try {
+            String[] pairs = requestBody.split("&");
+            for (String pair : pairs) {
+                int idx = pair.indexOf("=");
+                String key = URLDecoder.decode(pair.substring(0, idx), "UTF-8");
+                String value = URLDecoder.decode(pair.substring(idx + 1), "UTF-8");
+                params.put(key, value);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        List<SmsReceiveRespDTO> respDTOS = new ArrayList<>();
+        respDTOS.add(new SmsReceiveRespDTO()
+                        .setSuccess("DELIVRD".equals(params.get("status"))) // 是否接收成功
+                        .setErrorCode(params.get("status")) // 状态报告编码
+                        .setErrorMsg(params.get("statusDesc"))
+                        .setMobile(params.get("to")) // 手机号
+                        .setReceiveTime(LocalDateTime.ofInstant(Instant.parse(params.get("updateTime")), ZoneId.of("UTC"))) // 状态报告时间
+                        .setSerialNo(params.get("smsMsgId")) // 发送序列号
+                        .setLogId(Long.valueOf(params.get("extend")))//logId
+        );
+
+        return respDTOS;
     }
 
     @Override
@@ -173,56 +194,5 @@ public class HuaweiSmsClient extends AbstractSmsClient {
         //华为短信模板查询和发送短信，是不同的两套key和secret，与阿里、腾讯的区别较大，这里模板查询校验暂不实现。
         return new SmsTemplateRespDTO().setId(null).setContent(null)
                 .setAuditStatus(SmsTemplateAuditStatusEnum.SUCCESS.getStatus()).setAuditReason(null);
-
     }
-
-    @Data
-    public static class SmsResponse {
-
-        /**
-         * 是否成功
-         */
-        private boolean success;
-
-        /**
-         * 厂商原返回体
-         */
-        private Object data;
-
-    }
-
-
-    /**
-     * 短信接收状态
-     *
-     * 参见 <a href="https://support.huaweicloud.com/api-msgsms/sms_05_0003.html">文档</a>
-     *
-     * @author scholar
-     */
-    @Data
-    public static class SmsReceiveStatus {
-
-        /**
-         * 本条状态报告对应的短信的接收方号码，仅当状态报告中携带了extend参数时才会同时携带该参数
-         */
-        @JsonProperty("to")
-        private String phoneNumber;
-
-        /**
-         * 短信资源的更新时间，通常为短信平台接收短信状态报告的时间
-         */
-        @JsonFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND, timezone = TIME_ZONE_DEFAULT)
-        private LocalDateTime updateTime;
-
-        /**
-         * 短信状态报告枚举值
-         */
-        private String status;
-
-        /**
-         * 发送短信成功时返回的短信唯一标识。
-         */
-        private String smsMsgId;
-    }
-
 }

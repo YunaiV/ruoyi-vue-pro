@@ -5,15 +5,16 @@ import cn.iocoder.yudao.framework.common.util.servlet.ServletUtils;
 import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
 import cn.iocoder.yudao.module.system.framework.sms.core.enums.SmsChannelEnum;
 import cn.iocoder.yudao.module.system.service.sms.SmsSendService;
+import com.xingyuv.captcha.util.StreamUtils;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import jakarta.annotation.Resource;
 import jakarta.annotation.security.PermitAll;
 import jakarta.servlet.http.HttpServletRequest;
+
+import java.nio.charset.Charset;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
@@ -50,10 +51,8 @@ public class SmsCallbackController {
     @PermitAll
     @Operation(summary = "华为云短信的回调", description = "参见 https://support.huaweicloud.com/api-msgsms/sms_05_0003.html 文档")
     @OperateLog(enable = false)
-    public CommonResult<Boolean> receiveHuaweiSmsStatus(HttpServletRequest request) throws Throwable {
-        String text = ServletUtils.getBody(request);
-        smsSendService.receiveSmsStatus(SmsChannelEnum.HUAWEI.getCode(), text);
+    public CommonResult<Boolean> receiveHuaweiSmsStatus(@RequestBody String requestBody) throws Throwable {
+        smsSendService.receiveSmsStatus(SmsChannelEnum.HUAWEI.getCode(), requestBody);
         return success(true);
     }
-
 }
