@@ -146,4 +146,22 @@ public interface PayOrderService {
      */
     int expireOrder();
 
+    /**
+     * 获得支付订单
+     *
+     * @param appKey 应用密钥
+     * @param merchantOrderId 商户订单编号
+     * @return 支付订单
+     */
+    PayOrderDO getOrder(String appKey, String merchantOrderId);
+
+    /**
+     * 创建支付单
+     *
+     * @param reqDTO 创建请求
+     * @param appKey 应用密钥
+     * @return 支付单编号
+     */
+    Long createOrder(@Valid PayOrderCreateReqDTO reqDTO, String appKey);
+
 }

@@ -86,6 +86,15 @@ public class PayOrderServiceImpl implements PayOrderService {
     }
 
     @Override
+    public PayOrderDO getOrder(String appKey, String merchantOrderId) {
+        PayAppDO app = appService.getAppByAppKey(appKey);
+        if (app == null) {
+            throw exception(PAY_APP_NOT_FOUND);
+        }
+        return orderMapper.selectByAppIdAndMerchantOrderId(app.getId(), merchantOrderId);
+    }
+
+    @Override
     public List<PayOrderDO> getOrderList(Collection<Long> ids) {
         if (CollUtil.isEmpty(ids)) {
             return Collections.emptyList();
