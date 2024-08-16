@@ -5,6 +5,8 @@ import cn.hutool.core.exceptions.ExceptionUtil;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.tenant.core.service.TenantFrameworkService;
 import cn.iocoder.yudao.framework.tenant.core.util.TenantUtils;
+import cn.iocoder.yudao.module.system.dal.dataobject.tenant.TenantDO;
+import cn.iocoder.yudao.module.system.service.tenant.TenantService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -29,6 +31,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class TenantJobAspect {
 
     private final TenantFrameworkService tenantFrameworkService;
+    private final TenantService tenantService;
 
     @Around("@annotation(tenantJob)")
     public String around(ProceedingJoinPoint joinPoint, TenantJob tenantJob) {
@@ -44,6 +47,10 @@ public class TenantJobAspect {
             // TODO 芋艿：先通过 parallel 实现并行；1）多个租户，是一条执行日志；2）异常的情况
             TenantUtils.execute(tenantId, () -> {
                 try {
+                    TenantDO tenant = tenantService.getTenant(tenantId);
+                    if (tenant.getStatus().equals(CommonStatusEnum.DISABLE.getStatus())) {
+                        return; // Skip disabled tenants
+                    }
                     joinPoint.proceed();
                 } catch (Throwable e) {
                     results.put(tenantId, ExceptionUtil.getRootCauseMessage(e));

@@ -404,12 +404,36 @@ public class TenantServiceImplTest extends BaseDbUnitTest {
     }
 
     @Test
+    public void testTenantJobAspect_skipDisabledTenants() {
+        // mock 租户
+        TenantDO enabledTenant = randomPojo(TenantDO.class, o -> o.setStatus(CommonStatusEnum.ENABLE.getStatus()));
+        TenantDO disabledTenant = randomPojo(TenantDO.class, o -> o.setStatus(CommonStatusEnum.DISABLE.getStatus()));
+        tenantMapper.insert(enabledTenant);
+        tenantMapper.insert(disabledTenant);
+        // mock tenantService
+        when(tenantService.getTenant(enabledTenant.getId())).thenReturn(enabledTenant);
+        when(tenantService.getTenant(disabledTenant.getId())).thenReturn(disabledTenant);
+
+        // mock tenantFrameworkService
+        when(tenantFrameworkService.getTenantIds()).thenReturn(Arrays.asList(enabledTenant.getId(), disabledTenant.getId()));
+
+        // mock joinPoint
+        ProceedingJoinPoint joinPoint = mock(ProceedingJoinPoint.class);
+
+        // 调用
+        TenantJobAspect aspect = new TenantJobAspect(tenantFrameworkService, tenantService);
+        aspect.around(joinPoint, mock(TenantJob.class));
+
+        // 断言
+        verify(joinPoint, times(1)).proceed();
+    }
+
+    @Test
     public void testHandleTenantMenu_disable() {
         // 准备参数
         TenantMenuHandler handler = mock(TenantMenuHandler.class);
         // mock 禁用
         when(tenantProperties.getEnable()).thenReturn(false);
-
         // 调用
         tenantService.handleTenantMenu(handler);
         // 断言
