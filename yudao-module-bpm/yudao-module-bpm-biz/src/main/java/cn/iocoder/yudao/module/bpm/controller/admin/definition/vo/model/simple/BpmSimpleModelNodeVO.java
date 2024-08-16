@@ -96,6 +96,7 @@ public class BpmSimpleModelNodeVO {
         private String returnNodeId;
     }
 
+    // TODO @芋艿：参数校验
     @Data
     @Schema(description = "审批节点超时处理策略")
     public static class TimeoutHandler {
@@ -103,6 +104,7 @@ public class BpmSimpleModelNodeVO {
         @Schema(description = "是否开启超时处理", example = "false")
         private Boolean enable;
 
+        // TODO @jason：type 是不是更合适哈；
         @Schema(description = "任务超时未处理的行为", example = "1")
         @InEnum(BpmUserTaskTimeoutHandlerType.class)
         private Integer action;
@@ -112,6 +114,7 @@ public class BpmSimpleModelNodeVO {
 
         @Schema(description = "最大提醒次数", example = "1")
         private Integer maxRemindCount;
+
     }
 
     @Data

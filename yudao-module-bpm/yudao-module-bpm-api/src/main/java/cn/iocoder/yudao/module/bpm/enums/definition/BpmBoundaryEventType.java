@@ -4,6 +4,7 @@ import cn.hutool.core.util.ArrayUtil;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
+// TODO @jason：这个是不是可以去掉了哈？
 /**
  * BPM 边界事件 (boundary event) 自定义类型枚举
  *

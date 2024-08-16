@@ -59,7 +59,6 @@ public class SimpleModelUtils {
      */
     public static final String APPROVE_BY_RATIO_COMPLETE_EXPRESSION = "${ nrOfCompletedInstances/nrOfInstances >= %s}";
 
-    // TODO-DONE @jason：建议方法名，改成 buildBpmnModel
     // TODO @yunai：注释需要完善下；
 
     /**
@@ -347,6 +346,13 @@ public class SimpleModelUtils {
         return flowElements;
     }
 
+    /**
+     * 添加 UserTask 用户审批的 BoundaryEvent 超时事件
+     *
+     * @param userTask 审批任务
+     * @param timeoutHandler 超时处理器
+     * @return
+     */
     private static BoundaryEvent buildUserTaskTimerBoundaryEvent(UserTask userTask, TimeoutHandler timeoutHandler) {
         // 定时器边界事件
         BoundaryEvent boundaryEvent = new BoundaryEvent();
@@ -362,6 +368,7 @@ public class SimpleModelUtils {
             eventDefinition.setTimeCycle(String.format("R%d/%s", timeoutHandler.getMaxRemindCount(), timeoutHandler.getTimeDuration()));
         }
         boundaryEvent.addEventDefinition(eventDefinition);
+
         // 添加定时器边界事件类型
         addExtensionElement(boundaryEvent, BOUNDARY_EVENT_TYPE, USER_TASK_TIMEOUT.getType().toString());
         // 添加超时执行动作元素

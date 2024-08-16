@@ -10,6 +10,7 @@ import cn.iocoder.yudao.framework.web.core.util.WebFrameworkUtils;
 import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.task.*;
 import cn.iocoder.yudao.module.bpm.convert.task.BpmTaskConvert;
 import cn.iocoder.yudao.module.bpm.enums.definition.BpmUserTaskRejectHandlerType;
+import cn.iocoder.yudao.module.bpm.enums.definition.BpmUserTaskTimeoutHandlerType;
 import cn.iocoder.yudao.module.bpm.enums.task.BpmCommentTypeEnum;
 import cn.iocoder.yudao.module.bpm.enums.task.BpmReasonEnum;
 import cn.iocoder.yudao.module.bpm.enums.task.BpmTaskSignTypeEnum;
@@ -19,6 +20,7 @@ import cn.iocoder.yudao.module.bpm.framework.flowable.core.util.BpmnModelUtils;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.util.FlowableUtils;
 import cn.iocoder.yudao.module.bpm.service.definition.BpmModelService;
 import cn.iocoder.yudao.module.bpm.service.message.BpmMessageService;
+import cn.iocoder.yudao.module.bpm.service.message.dto.BpmMessageSendWhenTaskTimeoutReqDTO;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import jakarta.annotation.Resource;
@@ -923,6 +925,45 @@ public class BpmTaskServiceImpl implements BpmTaskService {
             }
 
         });
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void processTaskTimeout(String processInstanceId, String taskDefineKey, Integer taskAction) {
+        ProcessInstance processInstance = processInstanceService.getProcessInstance(processInstanceId);
+        if (processInstance == null) {
+            log.error("[processTaskTimeout][processInstanceId({}) 没有找到流程实例]", processInstanceId);
+            return;
+        }
+        List<Task> taskList = getRunningTaskListByProcessInstanceId(processInstanceId, true, taskDefineKey);
+        // TODO 优化：未来需要考虑加签的情况
+        if (CollUtil.isEmpty(taskList)) {
+            log.error("[processTaskTimeout][processInstanceId({}) 定义Key({}) 没有找到任务]", processInstanceId, taskDefineKey);
+            return;
+        }
+
+        taskList.forEach(task -> FlowableUtils.execute(task.getTenantId(), () -> {
+            // 情况一：自动提醒
+            if (Objects.equals(taskAction, BpmUserTaskTimeoutHandlerType.REMINDER.getAction())) {
+                messageService.sendMessageWhenTaskTimeout(new BpmMessageSendWhenTaskTimeoutReqDTO()
+                        .setProcessInstanceId(processInstanceId).setProcessInstanceName(processInstance.getName())
+                        .setTaskId(task.getId()).setTaskName(task.getName()).setAssigneeUserId(Long.parseLong(task.getAssignee())));
+                return;
+            }
+
+            // 情况二：自动同意
+            if (Objects.equals(taskAction, BpmUserTaskTimeoutHandlerType.APPROVE.getAction())) {
+                approveTask(Long.parseLong(task.getAssignee()),
+                        new BpmTaskApproveReqVO().setId(task.getId()).setReason("超时系统自动同意"));
+                return;
+            }
+
+            // 情况三：自动拒绝
+            if (Objects.equals(taskAction, BpmUserTaskTimeoutHandlerType.REJECT.getAction())) {
+                rejectTask(Long.parseLong(task.getAssignee()),
+                        new BpmTaskRejectReqVO().setId(task.getId()).setReason("超时系统自动拒绝"));
+            }
+        }));
     }
 
 }

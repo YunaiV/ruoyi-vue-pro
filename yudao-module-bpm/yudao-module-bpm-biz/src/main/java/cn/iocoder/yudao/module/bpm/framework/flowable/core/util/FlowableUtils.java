@@ -1,6 +1,8 @@
 package cn.iocoder.yudao.module.bpm.framework.flowable.core.util;
 
+import cn.hutool.core.util.ObjectUtil;
 import cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder;
+import cn.iocoder.yudao.framework.tenant.core.util.TenantUtils;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmConstants;
 import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.common.engine.api.variable.VariableContainer;
@@ -16,6 +18,7 @@ import org.flowable.task.api.TaskInfo;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * Flowable 相关的工具方法
@@ -37,6 +40,16 @@ public class FlowableUtils {
     public static String getTenantId() {
         Long tenantId = TenantContextHolder.getTenantId();
         return tenantId != null ? String.valueOf(tenantId) : ProcessEngineConfiguration.NO_TENANT_ID;
+    }
+
+    public static void execute(String tenantIdStr, Runnable runnable) {
+        if (ObjectUtil.isEmpty(tenantIdStr)
+                || Objects.equals(tenantIdStr, ProcessEngineConfiguration.NO_TENANT_ID)) {
+            runnable.run();
+        } else {
+            Long tenantId = Long.valueOf(tenantIdStr);
+            TenantUtils.execute(tenantId, runnable);
+        }
     }
 
     // ========== Execution 相关的工具方法 ==========
