@@ -1,10 +1,7 @@
 package cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.simple;
 
 import cn.iocoder.yudao.framework.common.validation.InEnum;
-import cn.iocoder.yudao.module.bpm.enums.definition.BpmApproveMethodEnum;
-import cn.iocoder.yudao.module.bpm.enums.definition.BpmSimpleModelNodeType;
-import cn.iocoder.yudao.module.bpm.enums.definition.BpmUserTaskRejectHandlerType;
-import cn.iocoder.yudao.module.bpm.enums.definition.BpmUserTaskTimeoutHandlerType;
+import cn.iocoder.yudao.module.bpm.enums.definition.*;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmTaskCandidateStrategyEnum;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -84,6 +81,10 @@ public class BpmSimpleModelNodeVO {
      */
     private TimeoutHandler timeoutHandler;
 
+    @Schema(description = "审批节点的审批人与发起人相同时，对应的处理类型", example = "1")
+    @InEnum(BpmUserTaskAssignStartUserHandlerTypeEnum.class)
+    private Integer assignStartUserHandlerType;
+
     @Data
     @Schema(description = "审批节点拒绝处理策略")
     public static class RejectHandler {
@@ -132,14 +133,7 @@ public class BpmSimpleModelNodeVO {
     }
 
     // Map<String, Integer> formPermissions; 表单权限；仅发起、审批、抄送节点会使用
-    // Integer approveMethod; 审批方式；仅审批节点会使用
-    // TODO @jason 后面和前端一起调整一下；下面的 ①、②、③ 是优先级
-    // TODO @芋艿：① 审批人的选择；
     // TODO @芋艿：⑥ 没有人的策略？
-    // TODO @芋艿：② 审批拒绝的策略？
-    // TODO @芋艿：③ 配置的可操作列表？（操作权限）
-    // TODO @芋艿：④ 表单的权限列表？
-    // TODO @芋艿：⑨ 超时配置；要支持指定时间点、指定时间间隔；
     // TODO @芋艿：条件；建议可以固化的一些选项；然后有个表达式兜底；要支持
 
 }
