@@ -35,7 +35,7 @@ public class BpmTaskCandidateStartUserMultiLevelDeptLeaderStrategy extends BpmTa
     @Resource
     private AdminUserApi adminUserApi;
 
-    public BpmTaskCandidateStartUserMultiLevelDeptLeaderStrategy(AdminUserApi adminUserApi, DeptApi deptApi) {
+    public BpmTaskCandidateStartUserMultiLevelDeptLeaderStrategy(DeptApi deptApi) {
         super(deptApi);
     }
 
