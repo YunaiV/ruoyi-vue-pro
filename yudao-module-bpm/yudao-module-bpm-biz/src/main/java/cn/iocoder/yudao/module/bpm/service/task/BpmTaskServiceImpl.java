@@ -19,7 +19,7 @@ import cn.iocoder.yudao.module.bpm.enums.task.BpmCommentTypeEnum;
 import cn.iocoder.yudao.module.bpm.enums.task.BpmReasonEnum;
 import cn.iocoder.yudao.module.bpm.enums.task.BpmTaskSignTypeEnum;
 import cn.iocoder.yudao.module.bpm.enums.task.BpmTaskStatusEnum;
-import cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmConstants;
+import cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnVariableConstants;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.util.BpmnModelUtils;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.util.FlowableUtils;
 import cn.iocoder.yudao.module.bpm.service.definition.BpmModelService;
@@ -446,7 +446,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         } else if (BpmTaskSignTypeEnum.AFTER.getType().equals(scopeType)) {
             // 只有 parentTask 处于 APPROVING 的情况下，才可以继续 complete 完成
             // 否则，一个未审批的 parentTask 任务，在加签出来的任务都被减签的情况下，就直接完成审批，这样会存在问题
-            Integer status = (Integer) parentTask.getTaskLocalVariables().get(BpmConstants.TASK_VARIABLE_STATUS);
+            Integer status = (Integer) parentTask.getTaskLocalVariables().get(BpmnVariableConstants.TASK_VARIABLE_STATUS);
             if (ObjectUtil.notEqual(status, BpmTaskStatusEnum.APPROVING.getStatus())) {
                 return;
             }
@@ -531,7 +531,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
      * @param status 状态
      */
     private void updateTaskStatus(String id, Integer status) {
-        taskService.setVariableLocal(id, BpmConstants.TASK_VARIABLE_STATUS, status);
+        taskService.setVariableLocal(id, BpmnVariableConstants.TASK_VARIABLE_STATUS, status);
     }
 
     /**
@@ -543,7 +543,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
      */
     private void updateTaskStatusAndReason(String id, Integer status, String reason) {
         updateTaskStatus(id, status);
-        taskService.setVariableLocal(id, BpmConstants.TASK_VARIABLE_REASON, reason);
+        taskService.setVariableLocal(id, BpmnVariableConstants.TASK_VARIABLE_REASON, reason);
     }
 
     @Override
@@ -692,7 +692,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         // 疑问：为什么不通过 updateTaskStatusWhenCanceled 监听取消，而是直接提前调用呢？
         // 回答：详细见 updateTaskStatusWhenCanceled 的方法，加签的场景
         taskList.forEach(task -> {
-            Integer otherTaskStatus = (Integer) task.getTaskLocalVariables().get(BpmConstants.TASK_VARIABLE_STATUS);
+            Integer otherTaskStatus = (Integer) task.getTaskLocalVariables().get(BpmnVariableConstants.TASK_VARIABLE_STATUS);
             if (BpmTaskStatusEnum.isEndStatus(otherTaskStatus)) {
                 return;
             }
@@ -884,7 +884,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
 
     @Override
     public void processTaskCreated(Task task) {
-        Integer status = (Integer) task.getTaskLocalVariables().get(BpmConstants.TASK_VARIABLE_STATUS);
+        Integer status = (Integer) task.getTaskLocalVariables().get(BpmnVariableConstants.TASK_VARIABLE_STATUS);
         if (status != null) {
             log.error("[updateTaskStatusWhenCreated][taskId({}) 已经有状态({})]", task.getId(), status);
             return;
@@ -908,7 +908,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         }
 
         // 2. 更新 task 状态 + 原因
-        Integer status = (Integer) task.getTaskLocalVariables().get(BpmConstants.TASK_VARIABLE_STATUS);
+        Integer status = (Integer) task.getTaskLocalVariables().get(BpmnVariableConstants.TASK_VARIABLE_STATUS);
         if (BpmTaskStatusEnum.isEndStatus(status)) {
             log.error("[updateTaskStatusWhenCanceled][taskId({}) 处于结果({})，无需进行更新]", taskId, status);
             return;

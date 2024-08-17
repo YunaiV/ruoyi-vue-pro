@@ -11,6 +11,7 @@ import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.simple.B
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.simple.BpmSimpleModelNodeVO.RejectHandler;
 import cn.iocoder.yudao.module.bpm.enums.definition.*;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnModelConstants;
+import cn.iocoder.yudao.module.bpm.framework.flowable.core.listener.BpmCopyTaskDelegate;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.simplemodel.SimpleModelConditionGroups;
 import org.flowable.bpmn.BpmnAutoLayout;
 import org.flowable.bpmn.model.Process;
@@ -277,20 +278,22 @@ public class SimpleModelUtils {
     private static List<FlowElement> buildFlowNode(BpmSimpleModelNodeVO node, BpmSimpleModelNodeType nodeType) {
         List<FlowElement> list = new ArrayList<>();
         switch (nodeType) {
-            case START_NODE: {
-                // @芋艿 改成 convert 是不是好理解一点
+            case START_NODE: { // 开始节点
                 StartEvent startEvent = convertStartNode(node);
                 list.add(startEvent);
                 break;
             }
-            case APPROVE_NODE: {
-                // TODO @芋艿 改成 convertXXXNode, ， 方面里面使用 buildBpmnXXXNode. 是否更好理解
-                // 转换审批节点
+            case END_NODE: { // 结束节点
+                EndEvent endEvent = convertEndNode(node);
+                list.add(endEvent);
+                break;
+            }
+            case APPROVE_NODE: { // 审批节点
                 List<FlowElement> flowElements = convertApproveNode(node);
                 list.addAll(flowElements);
                 break;
             }
-            case COPY_NODE: {
+            case COPY_NODE: { // 抄送节点
                 ServiceTask serviceTask = convertCopyNode(node);
                 list.add(serviceTask);
                 break;
@@ -314,11 +317,6 @@ public class SimpleModelUtils {
             case INCLUSIVE_BRANCH_JOIN_NODE: {
                 InclusiveGateway inclusiveGateway = convertInclusiveBranchNode(node, Boolean.FALSE);
                 list.add(inclusiveGateway);
-                break;
-            }
-            case END_NODE: {
-                EndEvent endEvent = convertEndNode(node);
-                list.add(endEvent);
                 break;
             }
             default: {
@@ -389,13 +387,11 @@ public class SimpleModelUtils {
         serviceTask.setId(node.getId());
         serviceTask.setName(node.getName());
         serviceTask.setImplementationType(ImplementationType.IMPLEMENTATION_TYPE_DELEGATEEXPRESSION);
-        serviceTask.setImplementation("${bpmCopyTaskDelegate}");
+        serviceTask.setImplementation("${" + BpmCopyTaskDelegate.BEAN_NAME + "}");
 
         // 添加抄送候选人元素
         addCandidateElements(node.getCandidateStrategy(), node.getCandidateParam(), serviceTask);
-
         // 添加表单字段权限属性元素
-        // TODO @芋艿：这块关注下哈；
         addFormFieldsPermission(node.getFieldsPermission(), serviceTask);
         return serviceTask;
     }

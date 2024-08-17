@@ -3,11 +3,11 @@ package cn.iocoder.yudao.module.bpm.framework.flowable.core.enums;
 import org.flowable.engine.runtime.ProcessInstance;
 
 /**
- * BPM 通用常量
+ * BPM Variable 通用常量
  *
  * @author 芋道源码
  */
-public class BpmConstants {
+public class BpmnVariableConstants {
 
     /**
      * 流程实例的变量 - 状态

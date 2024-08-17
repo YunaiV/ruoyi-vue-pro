@@ -1,17 +1,12 @@
 package cn.iocoder.yudao.module.bpm.framework.flowable.core.enums;
 
+// TODO @jason：要不合并到 BpmnModelConstants 那
 /**
  * 仿钉钉快搭 JSON 常量信息
  *
  * @author jason
  */
 public interface SimpleModelConstants {
-
-    // TODO @芋艿：审批方式的名字，可能要看下；
-    /**
-     * 审批方式属性
-     */
-    String APPROVE_METHOD_ATTRIBUTE = "approveMethod";
 
     // TODO @芋艿：条件表达式的字段名
 
