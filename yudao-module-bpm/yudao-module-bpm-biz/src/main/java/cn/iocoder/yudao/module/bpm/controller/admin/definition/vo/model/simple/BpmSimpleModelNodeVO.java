@@ -31,8 +31,7 @@ public class BpmSimpleModelNodeVO {
     @Schema(description = "模型节点名称", example = "领导审批")
     private String name;
 
-    // TODO @jason：要不改成 placeholder 和一般 Element-Plus 组件一致。占位符，用于展示。@芋艿。这个不是 placeholder 占位符的含义。节点配置后。节点展示的内容，不知道取什么名字好???
-    // TODO @jason：【回复】占位文本（showText）是指当一个文本框没有被 focus 的时候显示的是提示文字，当他被点击之后就显示空白。。。虽然不是完全精准，但是 placeholder 相对正式点~
+    // TODO @jason：和 gpt 大模型对了下这个字段的命名，貌似叫 displayText 合适点。可以等最后我们全局替换下。（优先级：低）
     @Schema(description = "节点展示内容", example = "指定成员: 芋道源码")
     private String showText;
 
@@ -43,7 +42,7 @@ public class BpmSimpleModelNodeVO {
     private List<BpmSimpleModelNodeVO> conditionNodes; // 补充说明：有且仅有条件、并行、包容等分支会使用
 
     @Schema(description = "节点的属性")
-    private Map<String, Object> attributes; // TODO @jason：建议是字段分拆下；类似说：
+    private Map<String, Object> attributes; // TODO @jason：这个字段，目前只有条件表达式使用；是不是搞的更巨像。TODO @芋艿
 
     // TODO @jason：看看是不是可以简化；@芋艿： 暂时先放着。不知道后面是否会用到
     /**
@@ -95,8 +94,8 @@ public class BpmSimpleModelNodeVO {
      */
     private AssignEmptyHandler assignEmptyHandler;
 
-    @Data
     @Schema(description = "审批节点拒绝处理策略")
+    @Data
     public static class RejectHandler {
 
         @Schema(description = "拒绝处理类型", example = "1")
@@ -107,9 +106,9 @@ public class BpmSimpleModelNodeVO {
         private String returnNodeId;
     }
 
-    @Data
     @Schema(description = "审批节点超时处理策略")
     @Valid
+    @Data
     public static class TimeoutHandler {
 
         @Schema(description = "是否开启超时处理", requiredMode = Schema.RequiredMode.REQUIRED, example = "false")
@@ -130,8 +129,8 @@ public class BpmSimpleModelNodeVO {
 
     }
 
-    @Data
     @Schema(description = "空处理策略")
+    @Data
     @Valid
     public static class AssignEmptyHandler {
 
@@ -145,12 +144,14 @@ public class BpmSimpleModelNodeVO {
 
     }
 
-    @Data
     @Schema(description = "操作按钮设置")
+    @Data
+    @Valid
     public static class OperationButtonSetting {
 
+        // TODO @jason：是不是按钮的标识？id 会和数据库的 id 自增有点模糊，key 标识会更合理一点点哈。
         @Schema(description = "按钮 Id", example = "1")
-        private  Integer id;
+        private Integer id;
 
         @Schema(description = "显示名称", example = "审批")
         private String displayName;
