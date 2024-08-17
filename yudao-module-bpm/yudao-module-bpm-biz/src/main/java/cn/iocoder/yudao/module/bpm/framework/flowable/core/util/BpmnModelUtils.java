@@ -45,6 +45,10 @@ public class BpmnModelUtils {
         return candidateParam;
     }
 
+    public static Integer parseApproveType(FlowElement userTask) {
+        return NumberUtils.parseInt(parseExtensionElement(userTask, BpmnModelConstants.USER_TASK_APPROVE_TYPE));
+    }
+
     public static BpmUserTaskRejectHandlerType parseRejectHandlerType(FlowElement userTask) {
         Integer rejectHandlerType = NumberUtils.parseInt(parseExtensionElement(userTask, USER_TASK_REJECT_HANDLER_TYPE));
         return BpmUserTaskRejectHandlerType.typeOf(rejectHandlerType);

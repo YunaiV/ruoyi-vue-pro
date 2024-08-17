@@ -6,7 +6,9 @@ import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
+import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
 import cn.iocoder.yudao.framework.datapermission.core.annotation.DataPermission;
+import cn.iocoder.yudao.module.bpm.enums.definition.BpmUserTaskApproveTypeEnum;
 import cn.iocoder.yudao.module.bpm.enums.definition.BpmUserTaskAssignStartUserHandlerTypeEnum;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmTaskCandidateStrategyEnum;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.util.BpmnModelUtils;
@@ -20,10 +22,7 @@ import org.flowable.bpmn.model.UserTask;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.runtime.ProcessInstance;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.bpm.enums.ErrorCodeConstants.MODEL_DEPLOY_FAIL_TASK_CANDIDATE_NOT_CONFIG;
@@ -61,7 +60,14 @@ public class BpmTaskCandidateInvoker {
         List<UserTask> userTaskList = BpmnModelUtils.getBpmnModelElements(bpmnModel, UserTask.class);
         // 遍历所有的 UserTask，校验审批人配置
         userTaskList.forEach(userTask -> {
-            // 1. 非空校验
+            // 1.1 非人工审批，无需校验审批人配置
+            Integer approveType = BpmnModelUtils.parseApproveType(userTask);
+            if (ObjectUtils.equalsAny(approveType,
+                    BpmUserTaskApproveTypeEnum.AUTO_APPROVE.getType(),
+                    BpmUserTaskApproveTypeEnum.AUTO_REJECT.getType())) {
+                return;
+            }
+            // 1.2 非空校验
             Integer strategy = BpmnModelUtils.parseCandidateStrategy(userTask);
             String param = BpmnModelUtils.parseCandidateParam(userTask);
             if (strategy == null) {
@@ -84,6 +90,14 @@ public class BpmTaskCandidateInvoker {
      */
     @DataPermission(enable = false) // 忽略数据权限，避免因为过滤，导致找不到候选人
     public Set<Long> calculateUsers(DelegateExecution execution) {
+        // 审批类型非人工审核时，不进行计算候选人。原因是：后续会自动通过、不通过
+        Integer approveType = BpmnModelUtils.parseApproveType(execution.getCurrentFlowElement());
+        if (ObjectUtils.equalsAny(approveType,
+                BpmUserTaskApproveTypeEnum.AUTO_APPROVE.getType(),
+                BpmUserTaskApproveTypeEnum.AUTO_REJECT.getType())) {
+            return new HashSet<>();
+        }
+
         Integer strategy = BpmnModelUtils.parseCandidateStrategy(execution.getCurrentFlowElement());
         String param = BpmnModelUtils.parseCandidateParam(execution.getCurrentFlowElement());
         // 1.1 计算任务的候选人

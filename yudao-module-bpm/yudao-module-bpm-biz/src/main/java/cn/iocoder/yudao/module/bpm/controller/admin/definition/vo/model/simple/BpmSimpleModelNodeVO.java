@@ -59,8 +59,12 @@ public class BpmSimpleModelNodeVO {
     @Schema(description = "候选人参数")
     private String candidateParam; // 用于审批，抄送节点
 
+    @Schema(description = "审批节点类型", example = "1")
+    @InEnum(BpmUserTaskApproveTypeEnum.class)
+    private Integer approveType; // 用于审批节点
+
     @Schema(description = "多人审批方式", example = "1")
-    @InEnum(BpmApproveMethodEnum.class)
+    @InEnum(BpmUserTaskApproveMethodEnum.class)
     private Integer approveMethod; // 用于审批节点
 
     @Schema(description = "通过比例", example = "100")
@@ -155,8 +159,6 @@ public class BpmSimpleModelNodeVO {
         private Boolean enable;
     }
 
-    // Map<String, Integer> formPermissions; 表单权限；仅发起、审批、抄送节点会使用
-    // TODO @芋艿：⑥ 没有人的策略？
     // TODO @芋艿：条件；建议可以固化的一些选项；然后有个表达式兜底；要支持
 
 }

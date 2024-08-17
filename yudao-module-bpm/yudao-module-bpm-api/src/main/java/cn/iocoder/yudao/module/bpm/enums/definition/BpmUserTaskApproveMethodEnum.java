@@ -14,7 +14,7 @@ import java.util.Arrays;
  */
 @Getter
 @AllArgsConstructor
-public enum BpmApproveMethodEnum implements IntArrayValuable {
+public enum BpmUserTaskApproveMethodEnum implements IntArrayValuable {
 
     RANDOM(1, "随机挑选一人审批"),
     RATIO(2, "多人会签(按通过比例)"), // 会签（按通过比例）
@@ -31,9 +31,9 @@ public enum BpmApproveMethodEnum implements IntArrayValuable {
      */
     private final String name;
 
-    public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(BpmApproveMethodEnum::getMethod).toArray();
+    public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(BpmUserTaskApproveMethodEnum::getMethod).toArray();
 
-    public static BpmApproveMethodEnum valueOf(Integer method) {
+    public static BpmUserTaskApproveMethodEnum valueOf(Integer method) {
         return ArrayUtil.firstMatch(item -> item.getMethod().equals(method), values());
     }
 
