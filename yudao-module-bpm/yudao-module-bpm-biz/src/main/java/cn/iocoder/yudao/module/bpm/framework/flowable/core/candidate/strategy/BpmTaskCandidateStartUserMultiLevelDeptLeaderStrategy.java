@@ -15,7 +15,10 @@ import org.flowable.engine.runtime.ProcessInstance;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
+import java.util.Collections;
 import java.util.Set;
+
+import static cn.hutool.core.collection.ListUtil.toList;
 
 /**
  * 发起人连续多级部门的负责人 {@link BpmTaskCandidateStrategy} 实现类
@@ -52,9 +55,11 @@ public class BpmTaskCandidateStartUserMultiLevelDeptLeaderStrategy extends BpmTa
         // 获得流程发起人
         ProcessInstance processInstance = processInstanceService.getProcessInstance(execution.getProcessInstanceId());
         Long startUserId = NumberUtils.parseLong(processInstance.getStartUserId());
-
         DeptRespDTO dept = getStartUserDept(startUserId);
-        return getMultiLevelDeptLeaderIds(dept, Integer.valueOf(param)); // 参数是部门的层级
+        if (dept == null) {
+           return Collections.emptySet();
+        }
+        return getMultiLevelDeptLeaderIds(toList(dept.getId()), Integer.valueOf(param)); // 参数是部门的层级
     }
 
     /**
