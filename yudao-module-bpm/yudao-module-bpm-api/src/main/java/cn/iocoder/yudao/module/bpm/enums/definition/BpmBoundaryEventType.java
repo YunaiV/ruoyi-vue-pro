@@ -13,8 +13,7 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum BpmBoundaryEventType {
 
-    USER_TASK_TIMEOUT(1,"用户任务超时"),
-    USER_TASK_REJECT_POST_PROCESS(2, "用户任务拒绝后处理");
+    USER_TASK_TIMEOUT(1,"用户任务超时");
 
     private final Integer type;
     private final String name;
@@ -22,4 +21,5 @@ public enum BpmBoundaryEventType {
     public static BpmBoundaryEventType typeOf(Integer type) {
         return ArrayUtil.firstMatch(eventType -> eventType.getType().equals(type), values());
     }
+
 }

@@ -53,6 +53,10 @@ public class BpmnModelUtils {
         return BpmnModelUtils.parseExtensionElement(flowElement, USER_TASK_REJECT_RETURN_TASK_ID);
     }
 
+    public static Integer parseAssignStartUserHandlerType(FlowElement userTask) {
+        return NumberUtils.parseInt(BpmnModelUtils.parseExtensionElement(userTask, USER_TASK_ASSIGN_START_USER_HANDLER_TYPE));
+    }
+
     public static String parseExtensionElement(FlowElement flowElement, String elementName) {
         if (flowElement == null) {
             return null;

@@ -207,4 +207,13 @@ public interface BpmTaskService {
      */
     void processTaskAssigned(Task task);
 
+    /**
+     * 处理 Task 审批超时事件，可能会处理多个当前审批中的任务
+     *
+     * @param processInstanceId 流程示例编号
+     * @param taskDefineKey 任务 Key
+     * @param taskAction 处理类型
+     */
+    void processTaskTimeout(String processInstanceId, String taskDefineKey, Integer taskAction);
+
 }

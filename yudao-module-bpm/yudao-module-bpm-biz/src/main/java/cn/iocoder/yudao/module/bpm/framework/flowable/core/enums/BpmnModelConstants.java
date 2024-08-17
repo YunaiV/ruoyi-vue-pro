@@ -29,12 +29,17 @@ public interface BpmnModelConstants {
     String BOUNDARY_EVENT_TYPE = "boundaryEventType";
 
     // TODO @jason：这个命名，应该也要改哈
+    // TODO @jason：1）是不是上面的 timeoutAction 改成 timeoutHandler；
     /**
      * BPMN ExtensionElement 的扩展属性，用于标记用户任务超时执行动作
      */
     String USER_TASK_TIMEOUT_HANDLER_ACTION = "timeoutAction";
 
-    // TODO @jason：1）是不是上面的 timeoutAction 改成 timeoutHandler；2）rejectHandlerType 改成 rejectHandler 哇？
+    /**
+     * BPMN ExtensionElement 的扩展属性，用于标记用户任务的审批人与发起人相同时，对应的处理类型
+     */
+    String USER_TASK_ASSIGN_START_USER_HANDLER_TYPE = "assignStartUserHandlerType";
+
     /**
      * BPMN ExtensionElement 的扩展属性，用于标记用户任务拒绝处理类型
      */

@@ -20,6 +20,7 @@ public enum BpmUserTaskTimeoutHandlerType implements IntArrayValuable {
     APPROVE(2, "自动同意"),
     REJECT(3, "自动拒绝");
 
+    // TODO @jason：type 是不是更合适哈；
     private final Integer action;
     private final String name;
 
