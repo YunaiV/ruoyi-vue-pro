@@ -30,6 +30,7 @@ public enum BpmTaskCandidateStrategyEnum implements IntArrayValuable {
     START_USER_MULTI_LEVEL_DEPT_LEADER(38, "发起人连续多级部门的负责人"),
     USER_GROUP(40, "用户组"),
     EXPRESSION(60, "流程表达式"), // 表达式 ExpressionManager
+    ASSIGN_EMPTY(1, "审批人为空"),
     ;
 
     public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(BpmTaskCandidateStrategyEnum::getStrategy).toArray();

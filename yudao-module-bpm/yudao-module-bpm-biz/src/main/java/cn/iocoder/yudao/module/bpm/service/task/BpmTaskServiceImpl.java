@@ -191,7 +191,10 @@ public class BpmTaskServiceImpl implements BpmTaskService {
      */
     private Task validateTask(Long userId, String taskId) {
         Task task = validateTaskExist(taskId);
-        if (!Objects.equals(userId, NumberUtils.parseLong(task.getAssignee()))) {
+        // 为什么判断 assignee 非空的情况下？
+        // 例如说：在审批人为空时，我们会有“自动审批通过”的策略，此时 userId 为 null，允许通过
+        if (StrUtil.isNotBlank(task.getAssignee())
+            && ObjectUtil.notEqual(userId, NumberUtils.parseLong(task.getAssignee()))) {
             throw exception(TASK_OPERATE_FAIL_ASSIGN_NOT_SELF);
         }
         return task;

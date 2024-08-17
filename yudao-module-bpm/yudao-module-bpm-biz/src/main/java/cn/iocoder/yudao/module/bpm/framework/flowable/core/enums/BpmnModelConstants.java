@@ -39,6 +39,15 @@ public interface BpmnModelConstants {
     String USER_TASK_ASSIGN_START_USER_HANDLER_TYPE = "assignStartUserHandlerType";
 
     /**
+     * BPMN ExtensionElement 的扩展属性，用于标记用户任务的空处理类型
+     */
+    String USER_TASK_ASSIGN_EMPTY_HANDLER_TYPE = "assignEmptyHandlerType";
+    /**
+     * BPMN ExtensionElement 的扩展属性，用于标记用户任务的空处理的指定用户编号数组
+     */
+    String USER_TASK_ASSIGN_USER_IDS = "assignEmptyUserIds";
+
+    /**
      * BPMN ExtensionElement 的扩展属性，用于标记用户任务拒绝处理类型
      */
     String USER_TASK_REJECT_HANDLER_TYPE = "rejectHandlerType";

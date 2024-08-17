@@ -1,5 +1,7 @@
 package cn.iocoder.yudao.module.bpm.framework.flowable.core.behavior;
 
+import cn.hutool.core.collection.CollUtil;
+import cn.iocoder.yudao.framework.common.util.collection.SetUtils;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.util.FlowableUtils;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.candidate.BpmTaskCandidateInvoker;
 import lombok.Setter;
@@ -43,6 +45,10 @@ public class BpmSequentialMultiInstanceBehavior extends SequentialMultiInstanceB
 
         // 第二步，获取任务的所有处理人
         Set<Long> assigneeUserIds = new LinkedHashSet<>(taskCandidateInvoker.calculateUsers(execution)); // 保证有序！！！
+        if (CollUtil.isEmpty(assigneeUserIds)) {
+            // 特殊：如果没有处理人的情况下，至少有一个 null 空元素，保证在 BpmUserTaskActivityBehavior 至少创建出一个 Task 任务，避免自动通过！
+            assigneeUserIds = SetUtils.asSet((Long) null);
+        }
         execution.setVariable(super.collectionVariable, assigneeUserIds);
         return assigneeUserIds.size();
     }

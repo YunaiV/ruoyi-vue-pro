@@ -28,6 +28,8 @@ public enum BpmReasonEnum {
     ASSIGN_START_USER_APPROVE_WHEN_SKIP("审批人与提交人为同一人时，自动通过"),
     ASSIGN_START_USER_APPROVE_WHEN_DEPT_LEADER_NOT_FOUND("审批人与提交人为同一人时，找不到部门负责人，自动通过"),
     ASSIGN_START_USER_TRANSFER_DEPT_LEADER("审批人与提交人为同一人时，转交给部门负责人审批"),
+    ASSIGN_EMPTY_APPROVE("审批人为空，自动通过"),
+    ASSIGN_EMPTY_REJECT("审批人为空，自动不通过"),
     ;
 
     private final String reason;

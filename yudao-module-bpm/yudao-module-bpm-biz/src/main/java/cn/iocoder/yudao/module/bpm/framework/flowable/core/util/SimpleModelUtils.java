@@ -19,10 +19,7 @@ import org.flowable.bpmn.BpmnAutoLayout;
 import org.flowable.bpmn.model.Process;
 import org.flowable.bpmn.model.*;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 import static cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.simple.BpmSimpleModelNodeVO.OperationButtonSetting;
 import static cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.simple.BpmSimpleModelNodeVO.TimeoutHandler;
@@ -456,7 +453,6 @@ public class SimpleModelUtils {
             userTask.setDueDate(node.getTimeoutHandler().getTimeDuration());
         }
 
-        // TODO @jason：addCandidateElements、processMultiInstanceLoopCharacteristics 建议一起搞哈？
         // 添加候选人元素
         addCandidateElements(node.getCandidateStrategy(), node.getCandidateParam(), userTask);
         // 添加表单字段权限属性元素
@@ -469,6 +465,8 @@ public class SimpleModelUtils {
         addTaskRejectElements(node.getRejectHandler(), userTask);
         // 添加用户任务的审批人与发起人相同时的处理元素
         addAssignStartUserHandlerType(node.getAssignStartUserHandlerType(), userTask);
+        // 添加用户任务的空处理元素
+        addAssignEmptyHandlerType(node.getAssignEmptyHandler(), userTask);
         return userTask;
     }
 
@@ -487,6 +485,14 @@ public class SimpleModelUtils {
         addExtensionElement(userTask, USER_TASK_ASSIGN_START_USER_HANDLER_TYPE, assignStartUserHandlerType.toString());
     }
 
+    private static void addAssignEmptyHandlerType(BpmSimpleModelNodeVO.AssignEmptyHandler emptyHandler, UserTask userTask) {
+        if (emptyHandler == null) {
+            return;
+        }
+        addExtensionElement(userTask, USER_TASK_ASSIGN_EMPTY_HANDLER_TYPE, StrUtil.toStringOrNull(emptyHandler.getType()));
+        addExtensionElement(userTask, USER_TASK_ASSIGN_USER_IDS, StrUtil.join(",", emptyHandler.getUserIds()));
+    }
+
     private static void processMultiInstanceLoopCharacteristics(Integer approveMethod, Integer approveRatio, UserTask userTask) {
         BpmApproveMethodEnum bpmApproveMethodEnum = BpmApproveMethodEnum.valueOf(approveMethod);
         if (bpmApproveMethodEnum == null || bpmApproveMethodEnum == BpmApproveMethodEnum.RANDOM) {
@@ -496,7 +502,7 @@ public class SimpleModelUtils {
         addExtensionElement(userTask, BpmnModelConstants.USER_TASK_APPROVE_METHOD,
                 approveMethod == null ? null : approveMethod.toString());
         MultiInstanceLoopCharacteristics multiInstanceCharacteristics = new MultiInstanceLoopCharacteristics();
-        //  设置 collectionVariable。本系统用不到。会在 仅仅为了校验。
+        // 设置 collectionVariable。本系统用不到。仅仅为了 Flowable 校验不报错。
         multiInstanceCharacteristics.setInputDataItem("${coll_userList}");
         if (bpmApproveMethodEnum == BpmApproveMethodEnum.ANY) {
             multiInstanceCharacteristics.setCompletionCondition(ANY_OF_APPROVE_COMPLETE_EXPRESSION);

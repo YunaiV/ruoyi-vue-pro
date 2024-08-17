@@ -27,7 +27,6 @@ import java.util.Set;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.bpm.enums.ErrorCodeConstants.MODEL_DEPLOY_FAIL_TASK_CANDIDATE_NOT_CONFIG;
-import static cn.iocoder.yudao.module.bpm.enums.ErrorCodeConstants.TASK_CREATE_FAIL_NO_CANDIDATE_USER;
 
 /**
  * {@link BpmTaskCandidateStrategy} 的调用者，用于调用对应的策略，实现任务的候选人的计算
@@ -89,17 +88,16 @@ public class BpmTaskCandidateInvoker {
         String param = BpmnModelUtils.parseCandidateParam(execution.getCurrentFlowElement());
         // 1.1 计算任务的候选人
         Set<Long> userIds = getCandidateStrategy(strategy).calculateUsers(execution, param);
-        // 1.2 移除被禁用的用户
-        removeDisableUsers(userIds);
+        // 1.2 候选人为空时，根据“审批人为空”的配置补充
+        if (CollUtil.isEmpty(userIds)) {
+            userIds = getCandidateStrategy(BpmTaskCandidateStrategyEnum.ASSIGN_EMPTY.getStrategy())
+                    .calculateUsers(execution, param);
+        }
         // 1.3 移除发起人的用户
         removeStartUserIfSkip(execution, userIds);
 
-        // 2. 校验是否有候选人
-        if (CollUtil.isEmpty(userIds)) {
-            log.error("[calculateUsers][流程任务({}/{}/{}) 任务规则({}/{}) 找不到候选人]", execution.getId(),
-                    execution.getProcessDefinitionId(), execution.getCurrentActivityId(), strategy, param);
-            throw exception(TASK_CREATE_FAIL_NO_CANDIDATE_USER);
-        }
+        // 2. 移除被禁用的用户
+        removeDisableUsers(userIds);
         return userIds;
     }
 

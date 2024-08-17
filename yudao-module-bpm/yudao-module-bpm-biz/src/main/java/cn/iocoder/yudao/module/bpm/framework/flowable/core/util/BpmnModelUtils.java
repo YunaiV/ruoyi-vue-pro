@@ -5,6 +5,7 @@ import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.util.number.NumberUtils;
+import cn.iocoder.yudao.framework.common.util.string.StrUtils;
 import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.task.BpmTaskRespVO;
 import cn.iocoder.yudao.module.bpm.enums.definition.BpmUserTaskRejectHandlerType;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnModelConstants;
@@ -45,16 +46,24 @@ public class BpmnModelUtils {
     }
 
     public static BpmUserTaskRejectHandlerType parseRejectHandlerType(FlowElement userTask) {
-        Integer rejectHandlerType = NumberUtils.parseInt(BpmnModelUtils.parseExtensionElement(userTask, USER_TASK_REJECT_HANDLER_TYPE));
+        Integer rejectHandlerType = NumberUtils.parseInt(parseExtensionElement(userTask, USER_TASK_REJECT_HANDLER_TYPE));
         return BpmUserTaskRejectHandlerType.typeOf(rejectHandlerType);
     }
 
     public static String parseReturnTaskId(FlowElement flowElement) {
-        return BpmnModelUtils.parseExtensionElement(flowElement, USER_TASK_REJECT_RETURN_TASK_ID);
+        return parseExtensionElement(flowElement, USER_TASK_REJECT_RETURN_TASK_ID);
     }
 
     public static Integer parseAssignStartUserHandlerType(FlowElement userTask) {
-        return NumberUtils.parseInt(BpmnModelUtils.parseExtensionElement(userTask, USER_TASK_ASSIGN_START_USER_HANDLER_TYPE));
+        return NumberUtils.parseInt(parseExtensionElement(userTask, USER_TASK_ASSIGN_START_USER_HANDLER_TYPE));
+    }
+
+    public static Integer parseAssignEmptyHandlerType(FlowElement userTask) {
+        return NumberUtils.parseInt(parseExtensionElement(userTask, USER_TASK_ASSIGN_EMPTY_HANDLER_TYPE));
+    }
+
+    public static List<Long> parseAssignEmptyHandlerUserIds(FlowElement userTask) {
+        return StrUtils.splitToLong(parseExtensionElement(userTask, USER_TASK_ASSIGN_USER_IDS), ",");
     }
 
     public static String parseExtensionElement(FlowElement flowElement, String elementName) {

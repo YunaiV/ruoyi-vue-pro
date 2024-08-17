@@ -1,9 +1,16 @@
 package cn.iocoder.yudao.module.bpm.framework.flowable.core.behavior;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.lang.Assert;
+import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.RandomUtil;
+import cn.hutool.extra.spring.SpringUtil;
+import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.task.BpmTaskApproveReqVO;
+import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.task.BpmTaskRejectReqVO;
+import cn.iocoder.yudao.module.bpm.enums.definition.BpmUserTaskAssignEmptyHandlerTypeEnum;
+import cn.iocoder.yudao.module.bpm.enums.task.BpmReasonEnum;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.candidate.BpmTaskCandidateInvoker;
+import cn.iocoder.yudao.module.bpm.framework.flowable.core.util.BpmnModelUtils;
+import cn.iocoder.yudao.module.bpm.service.task.BpmTaskService;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.flowable.bpmn.model.UserTask;
@@ -14,6 +21,8 @@ import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.util.TaskHelper;
 import org.flowable.task.service.TaskService;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import java.util.List;
 import java.util.Set;
@@ -41,9 +50,29 @@ public class BpmUserTaskActivityBehavior extends UserTaskActivityBehavior {
         DelegateExecution execution, ProcessEngineConfigurationImpl processEngineConfiguration) {
         // 第一步，获得任务的候选用户
         Long assigneeUserId = calculateTaskCandidateUsers(execution);
-        Assert.notNull(assigneeUserId, "任务处理人不能为空");
         // 第二步，设置作为负责人
-        TaskHelper.changeTaskAssignee(task, String.valueOf(assigneeUserId));
+        if (assigneeUserId != null) {
+            TaskHelper.changeTaskAssignee(task, String.valueOf(assigneeUserId));
+            return;
+        }
+
+        // 特殊：审批人为空，根据配置是否要自动通过、自动拒绝
+        Integer assignEmptyHandlerType = BpmnModelUtils.parseAssignEmptyHandlerType(userTask);
+        TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+
+            @Override
+            public void afterCommit() {
+                if (ObjectUtil.equal(assignEmptyHandlerType, BpmUserTaskAssignEmptyHandlerTypeEnum.APPROVE.getType())) {
+                    SpringUtil.getBean(BpmTaskService.class).approveTask(null, new BpmTaskApproveReqVO()
+                            .setId(task.getId()).setReason(BpmReasonEnum.ASSIGN_EMPTY_APPROVE.getReason()));
+                } else if (ObjectUtil.equal(assignEmptyHandlerType, BpmUserTaskAssignEmptyHandlerTypeEnum.REJECT.getType())) {
+                    SpringUtil.getBean(BpmTaskService.class).rejectTask(null, new BpmTaskRejectReqVO()
+                            .setId(task.getId()).setReason(BpmReasonEnum.ASSIGN_EMPTY_REJECT.getReason()));
+                }
+
+            }
+
+        });
     }
 
     private Long calculateTaskCandidateUsers(DelegateExecution execution) {
@@ -56,6 +85,9 @@ public class BpmUserTaskActivityBehavior extends UserTaskActivityBehavior {
         // 情况二，如果非多实例的任务，则计算任务处理人
         // 第一步，先计算可处理该任务的处理人们
         Set<Long> candidateUserIds = taskCandidateInvoker.calculateUsers(execution);
+        if (CollUtil.isEmpty(candidateUserIds)) {
+            return null;
+        }
         // 第二步，后随机选择一个任务的处理人
         // 疑问：为什么一定要选择一个任务处理人？
         // 解答：项目对 bpm 的任务是责任到人，所以每个任务有且仅有一个处理人。

@@ -86,6 +86,11 @@ public class BpmSimpleModelNodeVO {
     @InEnum(BpmUserTaskAssignStartUserHandlerTypeEnum.class)
     private Integer assignStartUserHandlerType;
 
+    /**
+     * 空处理策略
+     */
+    private AssignEmptyHandler assignEmptyHandler;
+
     @Data
     @Schema(description = "审批节点拒绝处理策略")
     public static class RejectHandler {
@@ -118,6 +123,21 @@ public class BpmSimpleModelNodeVO {
 
         @Schema(description = "最大提醒次数", example = "1")
         private Integer maxRemindCount;
+
+    }
+
+    @Data
+    @Schema(description = "空处理策略")
+    @Valid
+    public static class AssignEmptyHandler {
+
+        @Schema(description = "空处理类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
+        @NotNull(message = "空处理类型不能为空")
+        @InEnum(BpmUserTaskAssignEmptyHandlerTypeEnum.class)
+        private Integer type;
+
+        @Schema(description = "指定人员审批的用户编号数组", example = "1")
+        private List<Long> userIds;
 
     }
 
