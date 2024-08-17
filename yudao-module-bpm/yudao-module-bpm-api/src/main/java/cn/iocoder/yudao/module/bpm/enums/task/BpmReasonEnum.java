@@ -22,6 +22,12 @@ public enum BpmReasonEnum {
     // ========== 流程任务的独有原因 ==========
 
     CANCEL_BY_SYSTEM("系统自动取消"), // 场景：非常多，比如说：1）多任务审批已经满足条件，无需审批该任务；2）流程实例被取消，无需审批该任务；等等
+    TIMEOUT_APPROVE("审批超时，系统自动通过"),
+    TIMEOUT_REJECT("审批超时，系统自动不通过"),
+    ASSIGN_START_USER_APPROVE("审批人与提交人为同一人时，自动通过"),
+    ASSIGN_START_USER_APPROVE_WHEN_SKIP("审批人与提交人为同一人时，自动通过"),
+    ASSIGN_START_USER_APPROVE_WHEN_DEPT_LEADER_NOT_FOUND("审批人与提交人为同一人时，找不到部门负责人，自动通过"),
+    ASSIGN_START_USER_TRANSFER_DEPT_LEADER("审批人与提交人为同一人时，转交给部门负责人审批"),
     ;
 
     private final String reason;

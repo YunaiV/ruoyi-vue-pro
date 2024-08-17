@@ -106,10 +106,10 @@ public class BpmTaskEventListener extends AbstractFlowableEngineEventListener {
         }
 
         // 2. 处理超时
-        String timeoutAction = BpmnModelUtils.parseBoundaryEventExtensionElement(boundaryEvent,
-                BpmnModelConstants.USER_TASK_TIMEOUT_HANDLER_ACTION);
+        String timeoutHandlerType = BpmnModelUtils.parseBoundaryEventExtensionElement(boundaryEvent,
+                BpmnModelConstants.USER_TASK_TIMEOUT_HANDLER_TYPE);
         String taskKey = boundaryEvent.getAttachedToRefId();
-        taskService.processTaskTimeout(event.getProcessInstanceId(), taskKey, NumberUtils.parseInt(timeoutAction));
+        taskService.processTaskTimeout(event.getProcessInstanceId(), taskKey, NumberUtils.parseInt(timeoutHandlerType));
     }
 
 }
