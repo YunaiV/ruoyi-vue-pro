@@ -31,23 +31,19 @@ public class BpmTaskCandidateDeptLeaderMultiStrategy extends BpmTaskCandidateAbs
 
     @Override
     public void validateParam(String param) {
-        // TODO @jason：是不是可以 | 分隔 deptId 数组，和 level；这样后续可以加更多的参数。
-        // 参数格式: , 分割。前面的部门编号，可以为多个。最后一个为部门层级
-        List<Long> params = StrUtils.splitToLong(param, ",");
-        List<List<Long>> splitList = CollUtil.split(params, params.size() - 1);
-        Assert.isTrue(splitList.size() == 2, "参数格式不匹配");
-        deptApi.validateDeptList(splitList.get(0));
-        Assert.isTrue(splitList.get(1).get(0) > 0, "部门层级必须大于 0");
+        // 参数格式: | 分隔 。左边为部门（多个部门用 , 分隔）。 右边为部门层级
+        String[] params = param.split("\\|");
+        Assert.isTrue(params.length == 2, "参数格式不匹配");
+        deptApi.validateDeptList(StrUtils.splitToLong(params[0], ","));
+        Assert.isTrue(Integer.parseInt(params[1]) > 0, "部门层级必须大于 0");
     }
 
     @Override
     public Set<Long> calculateUsers(DelegateExecution execution, String param) {
-        // TODO @jason：是不是可以 | 分隔 deptId 数组，和 level；这样后续可以加更多的参数。
+        // 参数格式: | 分隔 。左边为部门（多个部门用 , 分隔）。 右边为部门层级
         // 参数格式: ,分割。前面的部门Id. 可以为多个。 最后一个为部门层级
-        List<Long> params = StrUtils.splitToLong(param, ",");
-        List<List<Long>> splitList = CollUtil.split(params, params.size() - 1);
-        Long level = splitList.get(1).get(0);
-        return getMultiLevelDeptLeaderIds(splitList.get(0), level.intValue());
+        String[] params = param.split("\\|");
+        return getMultiLevelDeptLeaderIds(StrUtils.splitToLong(params[0], ","), Integer.valueOf(params[1]));
     }
 
 }
