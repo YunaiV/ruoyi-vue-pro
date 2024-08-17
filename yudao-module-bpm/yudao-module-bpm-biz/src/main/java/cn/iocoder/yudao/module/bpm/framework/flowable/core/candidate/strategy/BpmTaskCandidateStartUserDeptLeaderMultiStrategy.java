@@ -15,7 +15,7 @@ import org.flowable.engine.runtime.ProcessInstance;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
-import java.util.Collections;
+import java.util.HashSet;
 import java.util.Set;
 
 import static cn.hutool.core.collection.ListUtil.toList;
@@ -26,7 +26,7 @@ import static cn.hutool.core.collection.ListUtil.toList;
  * @author jason
  */
 @Component
-public class BpmTaskCandidateStartUserMultiLevelDeptLeaderStrategy extends BpmTaskCandidateAbstractDeptLeaderStrategy {
+public class BpmTaskCandidateStartUserDeptLeaderMultiStrategy extends BpmTaskCandidateAbstractDeptLeaderStrategy {
 
     @Resource
     @Lazy
@@ -35,13 +35,13 @@ public class BpmTaskCandidateStartUserMultiLevelDeptLeaderStrategy extends BpmTa
     @Resource
     private AdminUserApi adminUserApi;
 
-    public BpmTaskCandidateStartUserMultiLevelDeptLeaderStrategy(DeptApi deptApi) {
+    public BpmTaskCandidateStartUserDeptLeaderMultiStrategy(DeptApi deptApi) {
         super(deptApi);
     }
 
     @Override
     public BpmTaskCandidateStrategyEnum getStrategy() {
-        return BpmTaskCandidateStrategyEnum.START_USER_MULTI_LEVEL_DEPT_LEADER;
+        return BpmTaskCandidateStrategyEnum.START_USER_DEPT_LEADER_MULTI;
     }
 
     @Override
@@ -55,9 +55,10 @@ public class BpmTaskCandidateStartUserMultiLevelDeptLeaderStrategy extends BpmTa
         // 获得流程发起人
         ProcessInstance processInstance = processInstanceService.getProcessInstance(execution.getProcessInstanceId());
         Long startUserId = NumberUtils.parseLong(processInstance.getStartUserId());
+        // 获取发起人的 multi 部门负责人
         DeptRespDTO dept = getStartUserDept(startUserId);
         if (dept == null) {
-           return Collections.emptySet();
+           return new HashSet<>();
         }
         return getMultiLevelDeptLeaderIds(toList(dept.getId()), Integer.valueOf(param)); // 参数是部门的层级
     }

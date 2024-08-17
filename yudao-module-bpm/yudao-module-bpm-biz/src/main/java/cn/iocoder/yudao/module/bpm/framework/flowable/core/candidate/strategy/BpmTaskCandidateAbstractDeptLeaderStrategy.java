@@ -6,10 +6,7 @@ import cn.iocoder.yudao.module.bpm.framework.flowable.core.candidate.BpmTaskCand
 import cn.iocoder.yudao.module.system.api.dept.DeptApi;
 import cn.iocoder.yudao.module.system.api.dept.dto.DeptRespDTO;
 
-import java.util.Collections;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * 部门的负责人 {@link BpmTaskCandidateStrategy} 抽象类
@@ -25,44 +22,43 @@ public abstract class BpmTaskCandidateAbstractDeptLeaderStrategy implements BpmT
     }
 
     /**
-     * 获取上级部门的负责人
+     * 获得指定层级的部门负责人，只有第 level 的负责人
      *
-     * @param assignDept 指定部门
-     * @param level      第几级
-     * @return 部门负责人 Id
+     * @param dept 指定部门
+     * @param level 第几级
+     * @return 部门负责人的编号
      */
-    protected Long getAssignLevelDeptLeaderId(DeptRespDTO assignDept, Integer level) {
+    protected Long getAssignLevelDeptLeaderId(DeptRespDTO dept, Integer level) {
         Assert.isTrue(level > 0, "level 必须大于 0");
-        if (assignDept == null) {
+        if (dept == null) {
             return null;
         }
-        DeptRespDTO dept = assignDept;
+        DeptRespDTO currentDept = dept;
         for (int i = 1; i < level; i++) {
-            DeptRespDTO parentDept = deptApi.getDept(dept.getParentId());
+            DeptRespDTO parentDept = deptApi.getDept(currentDept.getParentId());
             if (parentDept == null) { // 找不到父级部门，到了最高级。返回最高级的部门负责人
                 break;
             }
-            dept = parentDept;
+            currentDept = parentDept;
         }
-        return dept.getLeaderUserId();
+        return currentDept.getLeaderUserId();
     }
 
     /**
-     * 获取连续上级部门的负责人, 包含指定部门的负责人
+     * 获得连续层级的部门负责人，包含 [1, level] 的负责人
      *
-     * @param assignDeptIds 指定部门 Ids
-     * @param level         第几级
+     * @param deptIds 指定部门编号数组
+     * @param level 最大层级
      * @return 连续部门负责人 Id
      */
-    protected Set<Long> getMultiLevelDeptLeaderIds(List<Long> assignDeptIds, Integer level) {
+    protected Set<Long> getMultiLevelDeptLeaderIds(List<Long> deptIds, Integer level) {
         Assert.isTrue(level > 0, "level 必须大于 0");
-        if (CollUtil.isEmpty(assignDeptIds)) {
-            return Collections.emptySet();
+        if (CollUtil.isEmpty(deptIds)) {
+            return new HashSet<>();
         }
         Set<Long> deptLeaderIds = new LinkedHashSet<>(); // 保证有序
-        DeptRespDTO dept;
-        for (Long deptId : assignDeptIds) {
-            dept = deptApi.getDept(deptId);
+        for (Long deptId : deptIds) {
+            DeptRespDTO dept = deptApi.getDept(deptId);
             for (int i = 0; i < level; i++) {
                 if (dept.getLeaderUserId() != null) {
                     deptLeaderIds.add(dept.getLeaderUserId());

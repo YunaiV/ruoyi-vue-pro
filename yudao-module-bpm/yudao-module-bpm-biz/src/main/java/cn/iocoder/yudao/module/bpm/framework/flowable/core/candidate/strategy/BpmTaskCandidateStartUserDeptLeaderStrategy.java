@@ -15,10 +15,10 @@ import org.flowable.engine.runtime.ProcessInstance;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
+import java.util.HashSet;
 import java.util.Set;
 
 import static cn.iocoder.yudao.framework.common.util.collection.SetUtils.asSet;
-import static java.util.Collections.emptySet;
 
 /**
  * 发起人的部门负责人, 可以是上级部门负责人 {@link BpmTaskCandidateStrategy} 实现类
@@ -27,11 +27,14 @@ import static java.util.Collections.emptySet;
  */
 @Component
 public class BpmTaskCandidateStartUserDeptLeaderStrategy extends BpmTaskCandidateAbstractDeptLeaderStrategy {
+
     @Resource
-    @Lazy
+    @Lazy // 避免循环依赖
     private BpmProcessInstanceService processInstanceService;
+
     @Resource
     private AdminUserApi adminUserApi;
+
     @Override
     public BpmTaskCandidateStrategyEnum getStrategy() {
         return BpmTaskCandidateStrategyEnum.START_USER_DEPT_LEADER;
@@ -52,10 +55,13 @@ public class BpmTaskCandidateStartUserDeptLeaderStrategy extends BpmTaskCandidat
         // 获得流程发起人
         ProcessInstance processInstance = processInstanceService.getProcessInstance(execution.getProcessInstanceId());
         Long startUserId = NumberUtils.parseLong(processInstance.getStartUserId());
-
+        // 获取发起人的部门负责人
         DeptRespDTO dept = getStartUserDept(startUserId);
+        if (dept == null) {
+            return new HashSet<>();
+        }
         Long deptLeaderId =  getAssignLevelDeptLeaderId(dept, Integer.valueOf(param)); // 参数是部门的层级
-        return deptLeaderId != null ? asSet(deptLeaderId) : emptySet();
+        return deptLeaderId != null ? asSet(deptLeaderId) : new HashSet<>();
     }
 
     /**

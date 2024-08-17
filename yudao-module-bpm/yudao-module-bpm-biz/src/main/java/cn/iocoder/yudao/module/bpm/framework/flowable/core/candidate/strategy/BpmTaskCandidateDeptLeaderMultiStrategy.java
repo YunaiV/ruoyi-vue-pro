@@ -18,20 +18,21 @@ import java.util.Set;
  * @author jason
  */
 @Component
-public class BpmTaskCandidateMultiLevelDeptLeaderStrategy extends BpmTaskCandidateAbstractDeptLeaderStrategy {
+public class BpmTaskCandidateDeptLeaderMultiStrategy extends BpmTaskCandidateAbstractDeptLeaderStrategy {
 
-    public BpmTaskCandidateMultiLevelDeptLeaderStrategy(DeptApi deptApi) {
+    public BpmTaskCandidateDeptLeaderMultiStrategy(DeptApi deptApi) {
         super(deptApi);
     }
 
     @Override
     public BpmTaskCandidateStrategyEnum getStrategy() {
-        return BpmTaskCandidateStrategyEnum.MULTI_LEVEL_DEPT_LEADER;
+        return BpmTaskCandidateStrategyEnum.MULTI_DEPT_LEADER_MULTI;
     }
 
     @Override
     public void validateParam(String param) {
-        // 参数格式: ,分割。前面的部门Id. 可以为多个。 最后一个为部门层级
+        // TODO @jason：是不是可以 | 分隔 deptId 数组，和 level；这样后续可以加更多的参数。
+        // 参数格式: , 分割。前面的部门编号，可以为多个。最后一个为部门层级
         List<Long> params = StrUtils.splitToLong(param, ",");
         List<List<Long>> splitList = CollUtil.split(params, params.size() - 1);
         Assert.isTrue(splitList.size() == 2, "参数格式不匹配");
@@ -41,6 +42,7 @@ public class BpmTaskCandidateMultiLevelDeptLeaderStrategy extends BpmTaskCandida
 
     @Override
     public Set<Long> calculateUsers(DelegateExecution execution, String param) {
+        // TODO @jason：是不是可以 | 分隔 deptId 数组，和 level；这样后续可以加更多的参数。
         // 参数格式: ,分割。前面的部门Id. 可以为多个。 最后一个为部门层级
         List<Long> params = StrUtils.splitToLong(param, ",");
         List<List<Long>> splitList = CollUtil.split(params, params.size() - 1);
