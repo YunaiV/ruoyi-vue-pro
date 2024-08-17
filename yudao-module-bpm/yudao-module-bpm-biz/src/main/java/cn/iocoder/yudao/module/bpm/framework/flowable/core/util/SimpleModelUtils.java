@@ -9,10 +9,7 @@ import cn.hutool.core.util.*;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.simple.BpmSimpleModelNodeVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.simple.BpmSimpleModelNodeVO.RejectHandler;
-import cn.iocoder.yudao.module.bpm.enums.definition.BpmApproveMethodEnum;
-import cn.iocoder.yudao.module.bpm.enums.definition.BpmBoundaryEventType;
-import cn.iocoder.yudao.module.bpm.enums.definition.BpmSimpleModeConditionType;
-import cn.iocoder.yudao.module.bpm.enums.definition.BpmSimpleModelNodeType;
+import cn.iocoder.yudao.module.bpm.enums.definition.*;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnModelConstants;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.simplemodel.SimpleModelConditionGroups;
 import org.flowable.bpmn.BpmnAutoLayout;
@@ -448,9 +445,11 @@ public class SimpleModelUtils {
         UserTask userTask = new UserTask();
         userTask.setId(node.getId());
         userTask.setName(node.getName());
-        //  设置审批任务的截止时间
-        if (node.getTimeoutHandler() != null && node.getTimeoutHandler().getEnable()) {
-            userTask.setDueDate(node.getTimeoutHandler().getTimeDuration());
+
+        // 如果不是审批人节点，则直接返回
+        addExtensionElement(userTask, USER_TASK_APPROVE_TYPE, StrUtil.toStringOrNull(node.getApproveType()));
+        if (ObjectUtil.notEqual(node.getApproveType(), BpmUserTaskApproveTypeEnum.USER.getType())) {
+            return userTask;
         }
 
         // 添加候选人元素
@@ -467,6 +466,10 @@ public class SimpleModelUtils {
         addAssignStartUserHandlerType(node.getAssignStartUserHandlerType(), userTask);
         // 添加用户任务的空处理元素
         addAssignEmptyHandlerType(node.getAssignEmptyHandler(), userTask);
+        //  设置审批任务的截止时间
+        if (node.getTimeoutHandler() != null && node.getTimeoutHandler().getEnable()) {
+            userTask.setDueDate(node.getTimeoutHandler().getTimeDuration());
+        }
         return userTask;
     }
 
@@ -494,8 +497,8 @@ public class SimpleModelUtils {
     }
 
     private static void processMultiInstanceLoopCharacteristics(Integer approveMethod, Integer approveRatio, UserTask userTask) {
-        BpmApproveMethodEnum bpmApproveMethodEnum = BpmApproveMethodEnum.valueOf(approveMethod);
-        if (bpmApproveMethodEnum == null || bpmApproveMethodEnum == BpmApproveMethodEnum.RANDOM) {
+        BpmUserTaskApproveMethodEnum approveMethodEnum = BpmUserTaskApproveMethodEnum.valueOf(approveMethod);
+        if (approveMethodEnum == null || approveMethodEnum == BpmUserTaskApproveMethodEnum.RANDOM) {
             return;
         }
         // 添加审批方式的扩展属性
@@ -504,19 +507,19 @@ public class SimpleModelUtils {
         MultiInstanceLoopCharacteristics multiInstanceCharacteristics = new MultiInstanceLoopCharacteristics();
         // 设置 collectionVariable。本系统用不到。仅仅为了 Flowable 校验不报错。
         multiInstanceCharacteristics.setInputDataItem("${coll_userList}");
-        if (bpmApproveMethodEnum == BpmApproveMethodEnum.ANY) {
+        if (approveMethodEnum == BpmUserTaskApproveMethodEnum.ANY) {
             multiInstanceCharacteristics.setCompletionCondition(ANY_OF_APPROVE_COMPLETE_EXPRESSION);
             multiInstanceCharacteristics.setSequential(false);
             userTask.setLoopCharacteristics(multiInstanceCharacteristics);
-        } else if (bpmApproveMethodEnum == BpmApproveMethodEnum.SEQUENTIAL) {
+        } else if (approveMethodEnum == BpmUserTaskApproveMethodEnum.SEQUENTIAL) {
             multiInstanceCharacteristics.setCompletionCondition(ALL_APPROVE_COMPLETE_EXPRESSION);
             multiInstanceCharacteristics.setSequential(true);
             multiInstanceCharacteristics.setLoopCardinality("1");
             userTask.setLoopCharacteristics(multiInstanceCharacteristics);
-        } else if (bpmApproveMethodEnum == BpmApproveMethodEnum.RATIO) {
+        } else if (approveMethodEnum == BpmUserTaskApproveMethodEnum.RATIO) {
             Assert.notNull(approveRatio, "通过比例不能为空");
-            double approvePct = approveRatio / (double) 100;
-            multiInstanceCharacteristics.setCompletionCondition(String.format(APPROVE_BY_RATIO_COMPLETE_EXPRESSION, String.format("%.2f", approvePct)));
+            multiInstanceCharacteristics.setCompletionCondition(
+                    String.format(APPROVE_BY_RATIO_COMPLETE_EXPRESSION, String.format("%.2f", approveRatio / (double) 100)));
             multiInstanceCharacteristics.setSequential(false);
         }
         userTask.setLoopCharacteristics(multiInstanceCharacteristics);

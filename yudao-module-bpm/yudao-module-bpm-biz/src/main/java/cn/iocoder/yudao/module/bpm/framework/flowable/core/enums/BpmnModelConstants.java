@@ -57,11 +57,15 @@ public interface BpmnModelConstants {
     String USER_TASK_REJECT_RETURN_TASK_ID = "rejectReturnTaskId";
 
     /**
+     * BPMN UserTask 的扩展属性，用于标记用户任务的审批类型
+     */
+    String USER_TASK_APPROVE_TYPE = "approveType";
+
+    /**
      * BPMN UserTask 的扩展属性，用于标记用户任务的审批方式
      */
     String USER_TASK_APPROVE_METHOD = "approveMethod";
 
-    // TODO @jason：这个命名，可能有个 fieldsPermissions 更合适点。可能 formPermissions 会更更合适。
     /**
      * BPMN ExtensionElement 流程表单字段权限元素, 用于标记字段权限
      */
@@ -76,6 +80,7 @@ public interface BpmnModelConstants {
      */
     String FORM_FIELD_PERMISSION_ELEMENT_PERMISSION_ATTRIBUTE = "permission";
 
+    // TODO @jason：上面是 fieldsPermission，然后这里是 buttonsSettings；感觉有点不统一。然后 BpmSimpleModelNodeVO 里面是 fieldsPermission、buttonsSetting；
     /**
      * BPMN ExtensionElement 操作按钮设置元素, 用于审批节点操作按钮设置
      */

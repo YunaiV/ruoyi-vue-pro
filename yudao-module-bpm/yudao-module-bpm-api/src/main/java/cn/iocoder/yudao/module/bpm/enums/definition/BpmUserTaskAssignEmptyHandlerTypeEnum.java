@@ -4,6 +4,8 @@ import cn.iocoder.yudao.framework.common.core.IntArrayValuable;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
+import java.util.Arrays;
+
 /**
  * BPM 用户任务的审批人为空时，处理类型枚举
  *
@@ -19,11 +21,13 @@ public enum BpmUserTaskAssignEmptyHandlerTypeEnum implements IntArrayValuable {
     ASSIGN_ADMIN(4), // 转交给流程管理员
     ;
 
+    public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(BpmUserTaskAssignEmptyHandlerTypeEnum::getType).toArray();
+
     private final Integer type;
 
     @Override
     public int[] array() {
-        return new int[0];
+        return ARRAYS;
     }
 
 }
