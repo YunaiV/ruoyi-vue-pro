@@ -1,15 +1,18 @@
 package cn.iocoder.yudao.module.bpm.service.task;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.*;
 import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.date.DateUtils;
 import cn.iocoder.yudao.framework.common.util.number.NumberUtils;
+import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
 import cn.iocoder.yudao.framework.common.util.object.PageUtils;
 import cn.iocoder.yudao.framework.web.core.util.WebFrameworkUtils;
 import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.task.*;
 import cn.iocoder.yudao.module.bpm.convert.task.BpmTaskConvert;
+import cn.iocoder.yudao.module.bpm.enums.definition.BpmUserTaskAssignStartUserHandlerTypeEnum;
 import cn.iocoder.yudao.module.bpm.enums.definition.BpmUserTaskRejectHandlerType;
 import cn.iocoder.yudao.module.bpm.enums.definition.BpmUserTaskTimeoutHandlerType;
 import cn.iocoder.yudao.module.bpm.enums.task.BpmCommentTypeEnum;
@@ -22,6 +25,8 @@ import cn.iocoder.yudao.module.bpm.framework.flowable.core.util.FlowableUtils;
 import cn.iocoder.yudao.module.bpm.service.definition.BpmModelService;
 import cn.iocoder.yudao.module.bpm.service.message.BpmMessageService;
 import cn.iocoder.yudao.module.bpm.service.message.dto.BpmMessageSendWhenTaskTimeoutReqDTO;
+import cn.iocoder.yudao.module.system.api.dept.DeptApi;
+import cn.iocoder.yudao.module.system.api.dept.dto.DeptRespDTO;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import jakarta.annotation.Resource;
@@ -47,7 +52,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
-import org.springframework.util.Assert;
 
 import java.util.*;
 import java.util.stream.Stream;
@@ -86,6 +90,8 @@ public class BpmTaskServiceImpl implements BpmTaskService {
 
     @Resource
     private AdminUserApi adminUserApi;
+    @Resource
+    private DeptApi deptApi;
 
     // ========== Query 查询相关方法 ==========
 
@@ -500,11 +506,11 @@ public class BpmTaskServiceImpl implements BpmTaskService {
 
         // 3. 根据不同的 RejectHandler 处理策略
         BpmnModel bpmnModel = modelService.getBpmnModelByDefinitionId(task.getProcessDefinitionId());
-        FlowElement flowElement = BpmnModelUtils.getFlowElementById(bpmnModel, task.getTaskDefinitionKey());
+        FlowElement userTaskElement = BpmnModelUtils.getFlowElementById(bpmnModel, task.getTaskDefinitionKey());
         // 3.1 情况一：驳回到指定的任务节点
-        BpmUserTaskRejectHandlerType userTaskRejectHandlerType = BpmnModelUtils.parseRejectHandlerType(flowElement);
+        BpmUserTaskRejectHandlerType userTaskRejectHandlerType = BpmnModelUtils.parseRejectHandlerType(userTaskElement);
         if (userTaskRejectHandlerType == BpmUserTaskRejectHandlerType.RETURN_USER_TASK) {
-            String returnTaskId = BpmnModelUtils.parseReturnTaskId(flowElement);
+            String returnTaskId = BpmnModelUtils.parseReturnTaskId(userTaskElement);
             Assert.notNull(returnTaskId, "回退的节点不能为空");
             returnTask(userId, new BpmTaskReturnReqVO().setId(task.getId())
                     .setTargetTaskDefinitionKey(returnTaskId).setReason(reqVO.getReason()));
@@ -924,17 +930,47 @@ public class BpmTaskServiceImpl implements BpmTaskService {
                     log.error("[processTaskAssigned][taskId({}) 没有找到流程实例]", task.getId());
                     return;
                 }
-                BpmnModel bpmnModel = modelService.getBpmnModelByDefinitionId(processInstance.getProcessDefinitionId());
-                if (bpmnModel == null) {
-                    log.error("[processTaskAssigned][taskId({}) 没有找到流程模型]", task.getId());
-                    return;
-                }
 
                 // 审批人与提交人为同一人时，根据策略进行处理
                 if (StrUtil.equals(task.getAssignee(), processInstance.getStartUserId())) {
-                    getSelf().approveTask(Long.valueOf(task.getAssignee()), new BpmTaskApproveReqVO()
-                            .setId(task.getId()).setReason("审批人与提交人为同一人时，自动通过"));
-                    return;
+                    BpmnModel bpmnModel = modelService.getBpmnModelByDefinitionId(processInstance.getProcessDefinitionId());
+                    if (bpmnModel == null) {
+                        log.error("[processTaskAssigned][taskId({}) 没有找到流程模型]", task.getId());
+                        return;
+                    }
+                    FlowElement userTaskElement = BpmnModelUtils.getFlowElementById(bpmnModel, task.getTaskDefinitionKey());
+                    Integer assignStartUserHandlerType = BpmnModelUtils.parseAssignStartUserHandlerType(userTaskElement);
+
+                    // 情况一：自动跳过
+                    if (ObjectUtils.equalsAny(assignStartUserHandlerType,
+                            BpmUserTaskAssignStartUserHandlerTypeEnum.SKIP.getType())) {
+                        getSelf().approveTask(Long.valueOf(task.getAssignee()), new BpmTaskApproveReqVO()
+                                .setId(task.getId()).setReason("审批人与提交人为同一人时，自动通过"));
+                        return;
+                    }
+                    // 情况二：转交给部门负责人审批
+                    if (ObjectUtils.equalsAny(assignStartUserHandlerType,
+                            BpmUserTaskAssignStartUserHandlerTypeEnum.ASSIGN_DEPT_LEADER.getType())) {
+                        AdminUserRespDTO startUser = adminUserApi.getUser(Long.valueOf(processInstance.getStartUserId()));
+                        Assert.notNull(startUser, "提交人({})信息为空", processInstance.getStartUserId());
+                        DeptRespDTO dept = startUser.getDeptId() != null ? deptApi.getDept(startUser.getDeptId()) : null;
+                        Assert.notNull(dept, "提交人({})部门({})信息为空", processInstance.getStartUserId(), startUser.getDeptId());
+                        // 找不到部门负责人的情况下，自动审批通过
+                        // noinspection DataFlowIssue
+                        if (dept.getLeaderUserId() == null) {
+                            getSelf().approveTask(Long.valueOf(task.getAssignee()), new BpmTaskApproveReqVO()
+                                    .setId(task.getId()).setReason("审批人与提交人为同一人时，找不到部门负责人，自动通过"));
+                            return;
+                        }
+                        // 找得到部门负责人的情况下，修改负责人
+                        if (ObjectUtil.notEqual(dept.getLeaderUserId(), startUser.getId())) {
+                            getSelf().transferTask(Long.valueOf(task.getAssignee()), new BpmTaskTransferReqVO()
+                                    .setId(task.getId()).setAssigneeUserId(dept.getLeaderUserId())
+                                    .setReason("审批人与提交人为同一人时，转交给部门负责人审批"));
+                            return;
+                        }
+                        // 如果部门负责人是自己，还是自己审批吧~
+                    }
                 }
 
                 AdminUserRespDTO startUser = adminUserApi.getUser(Long.valueOf(processInstance.getStartUserId()));

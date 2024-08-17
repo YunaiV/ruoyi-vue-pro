@@ -2,11 +2,15 @@ package cn.iocoder.yudao.module.bpm.framework.flowable.core.candidate;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Assert;
+import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.datapermission.core.annotation.DataPermission;
+import cn.iocoder.yudao.module.bpm.enums.definition.BpmUserTaskAssignStartUserHandlerTypeEnum;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmTaskCandidateStrategyEnum;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.util.BpmnModelUtils;
+import cn.iocoder.yudao.module.bpm.service.task.BpmProcessInstanceService;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import com.google.common.annotations.VisibleForTesting;
@@ -14,6 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.UserTask;
 import org.flowable.engine.delegate.DelegateExecution;
+import org.flowable.engine.runtime.ProcessInstance;
 
 import java.util.HashMap;
 import java.util.List;
@@ -86,6 +91,8 @@ public class BpmTaskCandidateInvoker {
         Set<Long> userIds = getCandidateStrategy(strategy).calculateUsers(execution, param);
         // 1.2 移除被禁用的用户
         removeDisableUsers(userIds);
+        // 1.3 移除发起人的用户
+        removeStartUserIfSkip(execution, userIds);
 
         // 2. 校验是否有候选人
         if (CollUtil.isEmpty(userIds)) {
@@ -106,6 +113,29 @@ public class BpmTaskCandidateInvoker {
             AdminUserRespDTO user = userMap.get(id);
             return user == null || !CommonStatusEnum.ENABLE.getStatus().equals(user.getStatus());
         });
+    }
+
+    /**
+     * 如果“审批人与发起人相同时”，配置了 SKIP 跳过，则移除发起人
+     *
+     * 注意：如果只有一个候选人，则不处理，避免无法审批
+     *
+     * @param execution 执行中的任务
+     * @param assigneeUserIds 当前分配的候选人
+     */
+    @VisibleForTesting
+    void removeStartUserIfSkip(DelegateExecution execution, Set<Long> assigneeUserIds) {
+        if (CollUtil.size(assigneeUserIds) <= 1) {
+            return;
+        }
+        Integer assignStartUserHandlerType = BpmnModelUtils.parseAssignStartUserHandlerType(execution.getCurrentFlowElement());
+        if (ObjectUtil.notEqual(assignStartUserHandlerType, BpmUserTaskAssignStartUserHandlerTypeEnum.SKIP.getType())) {
+            return;
+        }
+        ProcessInstance processInstance = SpringUtil.getBean(BpmProcessInstanceService.class)
+                .getProcessInstance(execution.getProcessInstanceId());
+        Assert.notNull(processInstance, "流程实例({}) 不存在", execution.getProcessInstanceId());
+        assigneeUserIds.remove(Long.valueOf(processInstance.getStartUserId()));
     }
 
     private BpmTaskCandidateStrategy getCandidateStrategy(Integer strategy) {
