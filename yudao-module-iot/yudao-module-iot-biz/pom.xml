@@ -47,6 +47,12 @@
             <artifactId>yudao-spring-boot-starter-test</artifactId>
         </dependency>
 
+        <!-- 工具类相关 -->
+        <dependency>
+            <groupId>cn.iocoder.boot</groupId>
+            <artifactId>yudao-spring-boot-starter-excel</artifactId>
+        </dependency>
+
         <!-- mqtt -->
         <dependency>
             <groupId>org.eclipse.paho</groupId>
