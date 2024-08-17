@@ -14,7 +14,7 @@ import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.task.*;
 import cn.iocoder.yudao.module.bpm.convert.task.BpmTaskConvert;
 import cn.iocoder.yudao.module.bpm.enums.definition.BpmUserTaskAssignStartUserHandlerTypeEnum;
 import cn.iocoder.yudao.module.bpm.enums.definition.BpmUserTaskRejectHandlerType;
-import cn.iocoder.yudao.module.bpm.enums.definition.BpmUserTaskTimeoutHandlerType;
+import cn.iocoder.yudao.module.bpm.enums.definition.BpmUserTaskTimeoutHandlerTypeEnum;
 import cn.iocoder.yudao.module.bpm.enums.task.BpmCommentTypeEnum;
 import cn.iocoder.yudao.module.bpm.enums.task.BpmReasonEnum;
 import cn.iocoder.yudao.module.bpm.enums.task.BpmTaskSignTypeEnum;
@@ -944,13 +944,13 @@ public class BpmTaskServiceImpl implements BpmTaskService {
                     // 情况一：自动跳过
                     if (ObjectUtils.equalsAny(assignStartUserHandlerType,
                             BpmUserTaskAssignStartUserHandlerTypeEnum.SKIP.getType())) {
-                        getSelf().approveTask(Long.valueOf(task.getAssignee()), new BpmTaskApproveReqVO()
-                                .setId(task.getId()).setReason("审批人与提交人为同一人时，自动通过"));
+                        getSelf().approveTask(Long.valueOf(task.getAssignee()), new BpmTaskApproveReqVO().setId(task.getId())
+                                .setReason(BpmReasonEnum.ASSIGN_START_USER_APPROVE_WHEN_SKIP.getReason()));
                         return;
                     }
                     // 情况二：转交给部门负责人审批
                     if (ObjectUtils.equalsAny(assignStartUserHandlerType,
-                            BpmUserTaskAssignStartUserHandlerTypeEnum.ASSIGN_DEPT_LEADER.getType())) {
+                            BpmUserTaskAssignStartUserHandlerTypeEnum.TRANSFER_DEPT_LEADER.getType())) {
                         AdminUserRespDTO startUser = adminUserApi.getUser(Long.valueOf(processInstance.getStartUserId()));
                         Assert.notNull(startUser, "提交人({})信息为空", processInstance.getStartUserId());
                         DeptRespDTO dept = startUser.getDeptId() != null ? deptApi.getDept(startUser.getDeptId()) : null;
@@ -958,15 +958,15 @@ public class BpmTaskServiceImpl implements BpmTaskService {
                         // 找不到部门负责人的情况下，自动审批通过
                         // noinspection DataFlowIssue
                         if (dept.getLeaderUserId() == null) {
-                            getSelf().approveTask(Long.valueOf(task.getAssignee()), new BpmTaskApproveReqVO()
-                                    .setId(task.getId()).setReason("审批人与提交人为同一人时，找不到部门负责人，自动通过"));
+                            getSelf().approveTask(Long.valueOf(task.getAssignee()), new BpmTaskApproveReqVO().setId(task.getId())
+                                    .setReason(BpmReasonEnum.ASSIGN_START_USER_APPROVE_WHEN_DEPT_LEADER_NOT_FOUND.getReason()));
                             return;
                         }
                         // 找得到部门负责人的情况下，修改负责人
                         if (ObjectUtil.notEqual(dept.getLeaderUserId(), startUser.getId())) {
                             getSelf().transferTask(Long.valueOf(task.getAssignee()), new BpmTaskTransferReqVO()
                                     .setId(task.getId()).setAssigneeUserId(dept.getLeaderUserId())
-                                    .setReason("审批人与提交人为同一人时，转交给部门负责人审批"));
+                                    .setReason(BpmReasonEnum.ASSIGN_START_USER_TRANSFER_DEPT_LEADER.getReason()));
                             return;
                         }
                         // 如果部门负责人是自己，还是自己审批吧~
@@ -982,7 +982,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void processTaskTimeout(String processInstanceId, String taskDefineKey, Integer taskAction) {
+    public void processTaskTimeout(String processInstanceId, String taskDefineKey, Integer handlerType) {
         ProcessInstance processInstance = processInstanceService.getProcessInstance(processInstanceId);
         if (processInstance == null) {
             log.error("[processTaskTimeout][processInstanceId({}) 没有找到流程实例]", processInstanceId);
@@ -997,7 +997,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
 
         taskList.forEach(task -> FlowableUtils.execute(task.getTenantId(), () -> {
             // 情况一：自动提醒
-            if (Objects.equals(taskAction, BpmUserTaskTimeoutHandlerType.REMINDER.getAction())) {
+            if (Objects.equals(handlerType, BpmUserTaskTimeoutHandlerTypeEnum.REMINDER.getType())) {
                 messageService.sendMessageWhenTaskTimeout(new BpmMessageSendWhenTaskTimeoutReqDTO()
                         .setProcessInstanceId(processInstanceId).setProcessInstanceName(processInstance.getName())
                         .setTaskId(task.getId()).setTaskName(task.getName()).setAssigneeUserId(Long.parseLong(task.getAssignee())));
@@ -1005,16 +1005,16 @@ public class BpmTaskServiceImpl implements BpmTaskService {
             }
 
             // 情况二：自动同意
-            if (Objects.equals(taskAction, BpmUserTaskTimeoutHandlerType.APPROVE.getAction())) {
+            if (Objects.equals(handlerType, BpmUserTaskTimeoutHandlerTypeEnum.APPROVE.getType())) {
                 approveTask(Long.parseLong(task.getAssignee()),
-                        new BpmTaskApproveReqVO().setId(task.getId()).setReason("超时系统自动同意"));
+                        new BpmTaskApproveReqVO().setId(task.getId()).setReason(BpmReasonEnum.TIMEOUT_APPROVE.getReason()));
                 return;
             }
 
             // 情况三：自动拒绝
-            if (Objects.equals(taskAction, BpmUserTaskTimeoutHandlerType.REJECT.getAction())) {
+            if (Objects.equals(handlerType, BpmUserTaskTimeoutHandlerTypeEnum.REJECT.getType())) {
                 rejectTask(Long.parseLong(task.getAssignee()),
-                        new BpmTaskRejectReqVO().setId(task.getId()).setReason("超时系统自动拒绝"));
+                        new BpmTaskRejectReqVO().setId(task.getId()).setReason(BpmReasonEnum.REJECT_TASK.getReason()));
             }
         }));
     }

@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.bpm.service.task;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.task.*;
+import cn.iocoder.yudao.module.bpm.enums.definition.BpmUserTaskTimeoutHandlerTypeEnum;
 import jakarta.validation.Valid;
 import org.flowable.bpmn.model.UserTask;
 import org.flowable.task.api.Task;
@@ -212,8 +213,8 @@ public interface BpmTaskService {
      *
      * @param processInstanceId 流程示例编号
      * @param taskDefineKey 任务 Key
-     * @param taskAction 处理类型
+     * @param handlerType 处理类型，参见 {@link BpmUserTaskTimeoutHandlerTypeEnum}
      */
-    void processTaskTimeout(String processInstanceId, String taskDefineKey, Integer taskAction);
+    void processTaskTimeout(String processInstanceId, String taskDefineKey, Integer handlerType);
 
 }

@@ -6,6 +6,7 @@ import cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmTaskCandidat
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
@@ -97,20 +98,22 @@ public class BpmSimpleModelNodeVO {
         private String returnNodeId;
     }
 
-    // TODO @芋艿：参数校验
     @Data
     @Schema(description = "审批节点超时处理策略")
+    @Valid
     public static class TimeoutHandler {
 
-        @Schema(description = "是否开启超时处理", example = "false")
+        @Schema(description = "是否开启超时处理", requiredMode = Schema.RequiredMode.REQUIRED, example = "false")
+        @NotNull(message = "是否开启超时处理不能为空")
         private Boolean enable;
 
-        // TODO @jason：type 是不是更合适哈；
-        @Schema(description = "任务超时未处理的行为", example = "1")
-        @InEnum(BpmUserTaskTimeoutHandlerType.class)
-        private Integer action;
+        @Schema(description = "任务超时未处理的行为", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
+        @NotNull(message = "任务超时未处理的行为不能为空")
+        @InEnum(BpmUserTaskTimeoutHandlerTypeEnum.class)
+        private Integer type;
 
-        @Schema(description = "超时时间", example = "PT6H")
+        @Schema(description = "超时时间", requiredMode = Schema.RequiredMode.REQUIRED, example = "PT6H")
+        @NotEmpty(message = "超时时间不能为空")
         private String timeDuration;
 
         @Schema(description = "最大提醒次数", example = "1")

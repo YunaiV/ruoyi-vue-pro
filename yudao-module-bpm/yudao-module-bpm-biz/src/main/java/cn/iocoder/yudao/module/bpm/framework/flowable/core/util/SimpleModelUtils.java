@@ -27,7 +27,7 @@ import java.util.Objects;
 import static cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.simple.BpmSimpleModelNodeVO.OperationButtonSetting;
 import static cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.simple.BpmSimpleModelNodeVO.TimeoutHandler;
 import static cn.iocoder.yudao.module.bpm.enums.definition.BpmSimpleModelNodeType.*;
-import static cn.iocoder.yudao.module.bpm.enums.definition.BpmUserTaskTimeoutHandlerType.REMINDER;
+import static cn.iocoder.yudao.module.bpm.enums.definition.BpmUserTaskTimeoutHandlerTypeEnum.REMINDER;
 import static cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnModelConstants.*;
 import static cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.SimpleModelConstants.*;
 import static org.flowable.bpmn.constants.BpmnXMLConstants.*;
@@ -341,7 +341,7 @@ public class SimpleModelUtils {
 
         // 添加用户任务的 Timer Boundary Event, 用于任务的审批超时处理
         if (node.getTimeoutHandler() != null && node.getTimeoutHandler().getEnable()) {
-            BoundaryEvent boundaryEvent = buildUserTaskTimerBoundaryEvent(userTask, node.getTimeoutHandler());
+            BoundaryEvent boundaryEvent = buildUserTaskTimeoutBoundaryEvent(userTask, node.getTimeoutHandler());
             flowElements.add(boundaryEvent);
         }
         return flowElements;
@@ -354,7 +354,7 @@ public class SimpleModelUtils {
      * @param timeoutHandler 超时处理器
      * @return BoundaryEvent 超时事件
      */
-    private static BoundaryEvent buildUserTaskTimerBoundaryEvent(UserTask userTask, TimeoutHandler timeoutHandler) {
+    private static BoundaryEvent buildUserTaskTimeoutBoundaryEvent(UserTask userTask, TimeoutHandler timeoutHandler) {
         // 1.1 定时器边界事件
         BoundaryEvent boundaryEvent = new BoundaryEvent();
         boundaryEvent.setId("Event-" + IdUtil.fastUUID());
@@ -363,7 +363,7 @@ public class SimpleModelUtils {
         // 1.2 定义超时时间、最大提醒次数
         TimerEventDefinition eventDefinition = new TimerEventDefinition();
         eventDefinition.setTimeDuration(timeoutHandler.getTimeDuration());
-        if (Objects.equals(REMINDER.getAction(), timeoutHandler.getAction()) &&
+        if (Objects.equals(REMINDER.getType(), timeoutHandler.getType()) &&
                 timeoutHandler.getMaxRemindCount() != null && timeoutHandler.getMaxRemindCount() > 1) {
             eventDefinition.setTimeCycle(String.format("R%d/%s",
                     timeoutHandler.getMaxRemindCount(), timeoutHandler.getTimeDuration()));
@@ -373,7 +373,7 @@ public class SimpleModelUtils {
         // 2.1 添加定时器边界事件类型
         addExtensionElement(boundaryEvent, BOUNDARY_EVENT_TYPE, BpmBoundaryEventType.USER_TASK_TIMEOUT.getType().toString());
         // 2.2 添加超时执行动作元素
-        addExtensionElement(boundaryEvent, USER_TASK_TIMEOUT_HANDLER_ACTION, StrUtil.toStringOrNull(timeoutHandler.getAction()));
+        addExtensionElement(boundaryEvent, USER_TASK_TIMEOUT_HANDLER_TYPE, StrUtil.toStringOrNull(timeoutHandler.getType()));
         return boundaryEvent;
     }
 
