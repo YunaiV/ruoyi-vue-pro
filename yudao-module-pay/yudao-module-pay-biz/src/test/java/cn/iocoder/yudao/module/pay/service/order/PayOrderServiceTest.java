@@ -243,6 +243,9 @@ public class PayOrderServiceTest extends BaseDbAndRedisUnitTest {
         // mock 数据
         PayOrderDO dbOrder = randomPojo(PayOrderDO.class,  o -> o.setAppId(1L).setMerchantOrderId("10"));
         orderMapper.insert(dbOrder);
+        // mock 方法
+        PayAppDO app = randomPojo(PayAppDO.class, o -> o.setId(1L).setOrderNotifyUrl("http://127.0.0.1"));
+        when(appService.validPayApp(eq(reqDTO.getAppKey()))).thenReturn(app);
 
         // 调用
         Long orderId = orderService.createOrder(reqDTO);
