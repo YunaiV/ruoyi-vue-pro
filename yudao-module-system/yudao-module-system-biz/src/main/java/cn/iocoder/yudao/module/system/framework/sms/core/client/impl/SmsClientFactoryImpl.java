@@ -59,7 +59,7 @@ public class SmsClientFactoryImpl implements SmsClientFactory {
     }
 
     @Override
-    public void createOrUpdateSmsClient(SmsChannelProperties properties) {
+    public SmsClient createOrUpdateSmsClient(SmsChannelProperties properties) {
         AbstractSmsClient client = channelIdClients.get(properties.getId());
         if (client == null) {
             client = this.createSmsClient(properties);
@@ -68,6 +68,7 @@ public class SmsClientFactoryImpl implements SmsClientFactory {
         } else {
             client.refresh(properties);
         }
+        return client;
     }
 
     private AbstractSmsClient createSmsClient(SmsChannelProperties properties) {
