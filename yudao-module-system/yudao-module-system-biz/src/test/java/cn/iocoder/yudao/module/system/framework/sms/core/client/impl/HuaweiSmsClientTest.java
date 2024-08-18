@@ -37,14 +37,7 @@ public class HuaweiSmsClientTest extends BaseMockitoUnitTest {
     private HuaweiSmsClient smsClient = new HuaweiSmsClient(properties);
 
     @Test
-    public void testDoInit() {
-        // 调用
-        smsClient.doInit();
-    }
-
-    @Test
     public void testDoSendSms_success() throws Throwable {
-
         try (MockedStatic<HttpUtils> httpUtilsMockedStatic = mockStatic(HttpUtils.class)) {
             // 准备参数
             Long sendLogId = randomLongId();
@@ -55,9 +48,7 @@ public class HuaweiSmsClientTest extends BaseMockitoUnitTest {
 
             // mock 方法
             httpUtilsMockedStatic.when(() -> HttpUtils.post(anyString(), anyMap(), anyString()))
-                    .thenReturn(
-                            "{\"result\":[{\"originTo\":\"+86155****5678\",\"createTime\":\"2018-05-25T16:34:34Z\",\"from\":\"1069********0012\",\"smsMsgId\":\"d6e3cdd0-522b-4692-8304-a07553cdf591_8539659\",\"status\":\"000000\",\"countryId\":\"CN\",\"total\":2}],\"code\":\"000000\",\"description\":\"Success\"}\n"
-                    );
+                    .thenReturn("{\"result\":[{\"originTo\":\"+86155****5678\",\"createTime\":\"2018-05-25T16:34:34Z\",\"from\":\"1069********0012\",\"smsMsgId\":\"d6e3cdd0-522b-4692-8304-a07553cdf591_8539659\",\"status\":\"000000\",\"countryId\":\"CN\",\"total\":2}],\"code\":\"000000\",\"description\":\"Success\"}\n");
 
             // 调用
             SmsSendRespDTO result = smsClient.sendSms(sendLogId, mobile,
@@ -66,12 +57,11 @@ public class HuaweiSmsClientTest extends BaseMockitoUnitTest {
             assertTrue(result.getSuccess());
             assertEquals("d6e3cdd0-522b-4692-8304-a07553cdf591_8539659", result.getSerialNo());
             assertEquals("000000", result.getApiCode());
-
         }
     }
 
     @Test
-    public void testDoSendSms_fail() throws Throwable {
+    public void testDoSendSms_fail_01() throws Throwable {
         try (MockedStatic<HttpUtils> httpUtilsMockedStatic = mockStatic(HttpUtils.class)) {
             // 准备参数
             Long sendLogId = randomLongId();
@@ -82,17 +72,39 @@ public class HuaweiSmsClientTest extends BaseMockitoUnitTest {
 
             // mock 方法
             httpUtilsMockedStatic.when(() -> HttpUtils.post(anyString(), anyMap(), anyString()))
-                    .thenReturn(
-                            "{\"result\":[{\"originTo\":\"+86155****5678\",\"createTime\":\"2018-05-25T16:34:34Z\",\"from\":\"1069********0012\",\"smsMsgId\":\"d6e3cdd0-522b-4692-8304-a07553cdf591_8539659\",\"status\":\"E200015\",\"countryId\":\"CN\",\"total\":2}],\"code\":\"E000000\",\"description\":\"Success\"}\n"
-                    );
+                    .thenReturn("{\"result\":[{\"total\":1,\"originTo\":\"17321315478\",\"createTime\":\"2024-08-18T11:32:20Z\",\"from\":\"x8824060312575\",\"smsMsgId\":\"06e4b966-ad87-479f-8b74-f57fb7aafb60_304613461\",\"countryId\":\"CN\",\"status\":\"E200033\"}],\"code\":\"E000510\",\"description\":\"The SMS fails to be sent. For details, see status.\"}");
 
             // 调用
             SmsSendRespDTO result = smsClient.sendSms(sendLogId, mobile,
                     apiTemplateId, templateParams);
             // 断言
             assertFalse(result.getSuccess());
-            assertEquals("d6e3cdd0-522b-4692-8304-a07553cdf591_8539659", result.getSerialNo());
-            assertEquals("E200015", result.getApiCode());
+            assertEquals("06e4b966-ad87-479f-8b74-f57fb7aafb60_304613461", result.getSerialNo());
+            assertEquals("E200033", result.getApiCode());
+        }
+    }
+
+    @Test
+    public void testDoSendSms_fail_02() throws Throwable {
+        try (MockedStatic<HttpUtils> httpUtilsMockedStatic = mockStatic(HttpUtils.class)) {
+            // 准备参数
+            Long sendLogId = randomLongId();
+            String mobile = randomString();
+            String apiTemplateId = randomString() + " " + randomString();
+            List<KeyValue<String, Object>> templateParams = Lists.newArrayList(
+                    new KeyValue<>("1", 1234), new KeyValue<>("2", "login"));
+
+            // mock 方法
+            httpUtilsMockedStatic.when(() -> HttpUtils.post(anyString(), anyMap(), anyString()))
+                    .thenReturn("{\"code\":\"E000102\",\"description\":\"Invalid app_key.\"}");
+
+            // 调用
+            SmsSendRespDTO result = smsClient.sendSms(sendLogId, mobile,
+                    apiTemplateId, templateParams);
+            // 断言
+            assertFalse(result.getSuccess());
+            assertEquals("E000102", result.getApiCode());
+            assertEquals("Invalid app_key.", result.getApiMsg());
         }
     }
 
@@ -105,10 +117,11 @@ public class HuaweiSmsClientTest extends BaseMockitoUnitTest {
         List<SmsReceiveRespDTO> statuses = smsClient.parseSmsReceiveStatus(text);
         // 断言
         assertEquals(1, statuses.size());
-        assertTrue(statuses.getFirst().getSuccess());
-        assertEquals("DELIVRD", statuses.getFirst().getErrorCode());
-        assertEquals(LocalDateTime.of(2024, 8, 15, 3, 0, 34), statuses.getFirst().getReceiveTime());
-        assertEquals("70207ed7-1d02-41b0-8537-bb25fd1c2364_143684459", statuses.getFirst().getSerialNo());
+        SmsReceiveRespDTO status = statuses.get(0);
+        assertTrue(status.getSuccess());
+        assertEquals("DELIVRD", status.getErrorCode());
+        assertEquals(LocalDateTime.of(2024, 8, 15, 3, 0, 34), status.getReceiveTime());
+        assertEquals("70207ed7-1d02-41b0-8537-bb25fd1c2364_143684459", status.getSerialNo());
     }
 
 }

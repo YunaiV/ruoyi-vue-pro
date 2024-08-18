@@ -4,7 +4,6 @@ import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.util.servlet.ServletUtils;
 import cn.iocoder.yudao.module.system.framework.sms.core.enums.SmsChannelEnum;
 import cn.iocoder.yudao.module.system.service.sms.SmsSendService;
-import com.xingyuv.captcha.util.StreamUtils;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.*;
@@ -12,8 +11,6 @@ import org.springframework.web.bind.annotation.*;
 import jakarta.annotation.Resource;
 import jakarta.annotation.security.PermitAll;
 import jakarta.servlet.http.HttpServletRequest;
-
-import java.nio.charset.Charset;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 

@@ -56,10 +56,6 @@ public class TencentSmsClient extends AbstractSmsClient {
         validateSdkAppId(properties);
     }
 
-    @Override
-    protected void doInit() {
-    }
-
     /**
      * 参数校验腾讯云的 SDK AppId
      *
