@@ -7,11 +7,8 @@ import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.quartz.core.handler.JobHandler;
 import cn.iocoder.yudao.framework.tenant.core.job.TenantJob;
 import cn.iocoder.yudao.module.statistics.service.product.ProductStatisticsService;
+import jakarta.annotation.Resource;
 import org.springframework.stereotype.Component;
-
-import javax.annotation.Resource;
-
-// TODO 芋艿：缺个 Job 的配置；等和 Product 一起配置
 
 /**
  * 商品统计 Job

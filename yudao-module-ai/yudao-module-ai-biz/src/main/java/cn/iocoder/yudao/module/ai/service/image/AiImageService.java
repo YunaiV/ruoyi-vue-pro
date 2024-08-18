@@ -2,9 +2,7 @@ package cn.iocoder.yudao.module.ai.service.image;
 
 import cn.iocoder.yudao.framework.ai.core.model.midjourney.api.MidjourneyApi;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.ai.controller.admin.image.vo.AiImageDrawReqVO;
-import cn.iocoder.yudao.module.ai.controller.admin.image.vo.AiImagePageReqVO;
-import cn.iocoder.yudao.module.ai.controller.admin.image.vo.AiImageUpdateReqVO;
+import cn.iocoder.yudao.module.ai.controller.admin.image.vo.*;
 import cn.iocoder.yudao.module.ai.controller.admin.image.vo.midjourney.AiMidjourneyActionReqVO;
 import cn.iocoder.yudao.module.ai.controller.admin.image.vo.midjourney.AiMidjourneyImagineReqVO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.image.AiImageDO;
@@ -27,6 +25,14 @@ public interface AiImageService {
      * @return 绘图分页
      */
     PageResult<AiImageDO> getImagePageMy(Long userId, AiImagePageReqVO pageReqVO);
+
+    /**
+     * 获取公开的绘图分页
+     *
+     * @param pageReqVO 分页条件
+     * @return 绘图分页
+     */
+    PageResult<AiImageDO> getImagePagePublic(AiImagePublicPageReqVO pageReqVO);
 
     /**
      * 获得绘图记录

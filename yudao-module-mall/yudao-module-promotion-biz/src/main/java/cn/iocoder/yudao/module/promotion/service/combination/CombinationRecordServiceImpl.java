@@ -69,7 +69,6 @@ public class CombinationRecordServiceImpl implements CombinationRecordService {
     private ProductSpuApi productSpuApi;
     @Resource
     private ProductSkuApi productSkuApi;
-
     @Resource
     @Lazy // 延迟加载，避免循环依赖
     private TradeOrderApi tradeOrderApi;
@@ -287,61 +286,6 @@ public class CombinationRecordServiceImpl implements CombinationRecordService {
     public Map<Long, Integer> getCombinationRecordCountMapByActivity(Collection<Long> activityIds,
                                                                      @Nullable Integer status, @Nullable Long headId) {
         return combinationRecordMapper.selectCombinationRecordCountMapByActivityIdAndStatusAndHeadId(activityIds, status, headId);
-    }
-
-    @Override
-    public CombinationRecordDO getCombinationRecordByIdAndUser(Long userId, Long id) {
-        return combinationRecordMapper.selectOne(CombinationRecordDO::getUserId, userId, CombinationRecordDO::getId, id);
-    }
-
-    @Override
-    @Transactional(rollbackFor = Exception.class)
-    public void cancelCombinationRecord(Long userId, Long id, Long headId) {
-        // 删除记录
-        combinationRecordMapper.deleteById(id);
-
-        // 需要更新的记录
-        List<CombinationRecordDO> updateRecords = new ArrayList<>();
-        // 如果它是团长，则顺序（下单时间）继承
-        if (Objects.equals(headId, CombinationRecordDO.HEAD_ID_GROUP)) { // 情况一：团长
-            // 团员
-            List<CombinationRecordDO> list = getCombinationRecordListByHeadId(id);
-            if (CollUtil.isEmpty(list)) {
-                return;
-            }
-            // 按照创建时间升序排序
-            list.sort(Comparator.comparing(CombinationRecordDO::getCreateTime)); // 影响原 list
-            CombinationRecordDO newHead = list.get(0); // 新团长继位
-            list.forEach(item -> {
-                CombinationRecordDO recordDO = new CombinationRecordDO();
-                recordDO.setId(item.getId());
-                if (ObjUtil.equal(item.getId(), newHead.getId())) { // 新团长
-                    recordDO.setHeadId(CombinationRecordDO.HEAD_ID_GROUP);
-                } else {
-                    recordDO.setHeadId(newHead.getId());
-                }
-                recordDO.setUserCount(list.size());
-                updateRecords.add(recordDO);
-            });
-        } else { // 情况二：团员
-            // 团长
-            CombinationRecordDO recordHead = combinationRecordMapper.selectById(headId);
-            // 团员
-            List<CombinationRecordDO> records = getCombinationRecordListByHeadId(headId);
-            if (CollUtil.isEmpty(records)) {
-                return;
-            }
-            records.add(recordHead); // 加入团长，团长数据也需要更新
-            records.forEach(item -> {
-                CombinationRecordDO recordDO = new CombinationRecordDO();
-                recordDO.setId(item.getId());
-                recordDO.setUserCount(records.size());
-                updateRecords.add(recordDO);
-            });
-        }
-
-        // 更新拼团记录
-        combinationRecordMapper.updateBatch(updateRecords);
     }
 
     @Override

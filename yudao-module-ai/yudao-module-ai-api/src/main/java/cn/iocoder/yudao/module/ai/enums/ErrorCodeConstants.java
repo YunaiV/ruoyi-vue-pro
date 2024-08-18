@@ -45,9 +45,11 @@ public interface ErrorCodeConstants {
     // ========== API 音乐 1-040-006-000 ==========
     ErrorCode MUSIC_NOT_EXISTS = new ErrorCode(1_022_006_000, "音乐不存在!");
 
-
     // ========== API 写作 1-022-007-000 ==========
     ErrorCode WRITE_NOT_EXISTS = new ErrorCode(1_022_007_000, "作文不存在!");
     ErrorCode WRITE_STREAM_ERROR = new ErrorCode(1_022_07_001, "写作生成异常!");
+
+    // ========== API 思维导图 1-040-008-000 ==========
+    ErrorCode MIND_MAP_NOT_EXISTS = new ErrorCode(1_040_008_000, "思维导图不存在!");
 
 }

@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.module.system.framework.sms.core.client.impl;
 
-
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.StrUtil;
 
@@ -31,13 +30,12 @@ import java.util.*;
 
 import java.time.LocalDateTime;
 
-
 import static cn.hutool.crypto.digest.DigestUtil.sha256Hex;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.TIME_ZONE_DEFAULT;
 
-
+// todo @scholar：参考阿里云在优化下
 /**
  * 华为短信客户端的实现类
  *
@@ -56,7 +54,6 @@ public class HuaweiSmsClient extends AbstractSmsClient {
 
     @Override
     protected void doInit() {
-
     }
 
     public HuaweiSmsClient(SmsChannelProperties properties) {
@@ -68,6 +65,7 @@ public class HuaweiSmsClient extends AbstractSmsClient {
     @Override
     public SmsSendRespDTO sendSms(Long sendLogId, String mobile, String apiTemplateId,
                                   List<KeyValue<String, Object>> templateParams) throws Throwable {
+        // 参考链接 https://support.huaweicloud.com/api-msgsms/sms_05_0001.html
         // 相比较阿里短信，华为短信发送的时候需要额外的参数“通道号”，考虑到不破坏原有的的结构
         // 所以将 通道号 拼接到 apiTemplateId 字段中，格式为 "apiTemplateId 通道号"。空格为分隔符。
         String sender = StrUtil.subAfter(apiTemplateId, " ", true); //中国大陆短信签名通道号或全球短信通道号

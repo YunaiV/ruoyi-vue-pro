@@ -102,8 +102,6 @@ public class AliyunSmsClient extends AbstractSmsClient {
         queryParam.put("TemplateCode", apiTemplateId);
         JSONObject response = request("QuerySmsTemplate", queryParam);
 
-        System.out.println("getSmsTemplate response is =====" + response.toString());
-
         // 2.1 请求失败
         String code = response.getStr("Code");
         if (ObjectUtil.notEqual(code, RESPONSE_CODE_SUCCESS)) {
@@ -170,7 +168,6 @@ public class AliyunSmsClient extends AbstractSmsClient {
         // 4. 构建 Authorization 签名
         String canonicalRequest = "POST" + "\n" + "/" + "\n" + queryString + "\n" + canonicalHeaders + "\n" + signedHeaders + "\n" + hashedRequestBody;
         String hashedCanonicalRequest = DigestUtil.sha256Hex(canonicalRequest);
-
         String stringToSign = "ACS3-HMAC-SHA256" + "\n" + hashedCanonicalRequest;
         String signature = SecureUtil.hmacSha256(properties.getApiSecret()).digestHex(stringToSign); // 计算签名
         headers.put("Authorization", "ACS3-HMAC-SHA256" + " " + "Credential=" + properties.getApiKey()

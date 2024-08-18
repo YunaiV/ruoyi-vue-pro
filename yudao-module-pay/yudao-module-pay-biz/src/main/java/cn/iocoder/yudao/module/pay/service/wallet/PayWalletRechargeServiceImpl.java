@@ -18,6 +18,7 @@ import cn.iocoder.yudao.module.pay.dal.mysql.wallet.PayWalletRechargeMapper;
 import cn.iocoder.yudao.module.pay.enums.order.PayOrderStatusEnum;
 import cn.iocoder.yudao.module.pay.enums.refund.PayRefundStatusEnum;
 import cn.iocoder.yudao.module.pay.enums.wallet.PayWalletBizTypeEnum;
+import cn.iocoder.yudao.module.pay.framework.pay.config.PayProperties;
 import cn.iocoder.yudao.module.pay.service.order.PayOrderService;
 import cn.iocoder.yudao.module.pay.service.refund.PayRefundService;
 import cn.iocoder.yudao.module.system.api.social.SocialClientApi;
@@ -51,11 +52,6 @@ import static cn.iocoder.yudao.module.pay.enums.refund.PayRefundStatusEnum.*;
 @Slf4j
 public class PayWalletRechargeServiceImpl implements PayWalletRechargeService {
 
-    /**
-     * TODO 芋艿：放到 payconfig
-     */
-    private static final Long WALLET_PAY_APP_ID = 8L;
-
     private static final String WALLET_RECHARGE_ORDER_SUBJECT = "钱包余额充值";
 
     @Resource
@@ -68,8 +64,12 @@ public class PayWalletRechargeServiceImpl implements PayWalletRechargeService {
     private PayRefundService payRefundService;
     @Resource
     private PayWalletRechargePackageService payWalletRechargePackageService;
+
     @Resource
     public SocialClientApi socialClientApi;
+
+    @Resource
+    private PayProperties payProperties;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -92,7 +92,7 @@ public class PayWalletRechargeServiceImpl implements PayWalletRechargeService {
 
         // 2.1 创建支付单
         Long payOrderId = payOrderService.createOrder(new PayOrderCreateReqDTO()
-                .setAppId(WALLET_PAY_APP_ID).setUserIp(userIp)
+                .setAppKey(payProperties.getWalletPayAppKey()).setUserIp(userIp)
                 .setMerchantOrderId(recharge.getId().toString()) // 业务的订单编号
                 .setSubject(WALLET_RECHARGE_ORDER_SUBJECT).setBody("")
                 .setPrice(recharge.getPayPrice())
@@ -174,7 +174,7 @@ public class PayWalletRechargeServiceImpl implements PayWalletRechargeService {
         String walletRechargeId = String.valueOf(id);
         String refundId = walletRechargeId + "-refund";
         Long payRefundId = payRefundService.createPayRefund(new PayRefundCreateReqDTO()
-                .setAppId(WALLET_PAY_APP_ID).setUserIp(userIp)
+                .setAppKey(payProperties.getWalletPayAppKey()).setUserIp(userIp)
                 .setMerchantOrderId(walletRechargeId)
                 .setMerchantRefundId(refundId)
                 .setReason("想退钱").setPrice(walletRecharge.getPayPrice()));

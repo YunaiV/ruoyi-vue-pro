@@ -21,6 +21,10 @@ import com.alibaba.cloud.ai.tongyi.image.TongYiImagesModel;
 import com.alibaba.cloud.ai.tongyi.image.TongYiImagesProperties;
 import com.alibaba.dashscope.aigc.generation.Generation;
 import com.alibaba.dashscope.aigc.imagesynthesis.ImageSynthesis;
+import com.azure.ai.openai.OpenAIClient;
+import org.springframework.ai.autoconfigure.azure.openai.AzureOpenAiAutoConfiguration;
+import org.springframework.ai.autoconfigure.azure.openai.AzureOpenAiChatProperties;
+import org.springframework.ai.autoconfigure.azure.openai.AzureOpenAiConnectionProperties;
 import org.springframework.ai.autoconfigure.ollama.OllamaAutoConfiguration;
 import org.springframework.ai.autoconfigure.openai.OpenAiAutoConfiguration;
 import org.springframework.ai.autoconfigure.qianfan.QianFanAutoConfiguration;
@@ -31,6 +35,7 @@ import org.springframework.ai.autoconfigure.zhipuai.ZhiPuAiAutoConfiguration;
 import org.springframework.ai.autoconfigure.zhipuai.ZhiPuAiChatProperties;
 import org.springframework.ai.autoconfigure.zhipuai.ZhiPuAiConnectionProperties;
 import org.springframework.ai.autoconfigure.zhipuai.ZhiPuAiImageProperties;
+import org.springframework.ai.azure.openai.AzureOpenAiChatModel;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.image.ImageModel;
 import org.springframework.ai.model.function.FunctionCallbackContext;
@@ -82,6 +87,8 @@ public class AiModelFactoryImpl implements AiModelFactory {
                     return buildXingHuoChatModel(apiKey);
                 case OPENAI:
                     return buildOpenAiChatModel(apiKey, url);
+                case AZURE_OPENAI:
+                    return buildAzureOpenAiChatModel(apiKey, url);
                 case OLLAMA:
                     return buildOllamaChatModel(url);
                 default:
@@ -106,6 +113,8 @@ public class AiModelFactoryImpl implements AiModelFactory {
                 return SpringUtil.getBean(XingHuoChatModel.class);
             case OPENAI:
                 return SpringUtil.getBean(OpenAiChatModel.class);
+            case AZURE_OPENAI:
+                return SpringUtil.getBean(AzureOpenAiChatModel.class);
             case OLLAMA:
                 return SpringUtil.getBean(OllamaChatModel.class);
             default:
@@ -266,6 +275,21 @@ public class AiModelFactoryImpl implements AiModelFactory {
         url = StrUtil.blankToDefault(url, ApiUtils.DEFAULT_BASE_URL);
         OpenAiApi openAiApi = new OpenAiApi(url, openAiToken);
         return new OpenAiChatModel(openAiApi);
+    }
+
+    /**
+     * 可参考 {@link AzureOpenAiAutoConfiguration}
+     */
+    private static AzureOpenAiChatModel buildAzureOpenAiChatModel(String apiKey, String url) {
+        AzureOpenAiAutoConfiguration azureOpenAiAutoConfiguration = new AzureOpenAiAutoConfiguration();
+        // 创建 OpenAIClient 对象
+        AzureOpenAiConnectionProperties connectionProperties = new AzureOpenAiConnectionProperties();
+        connectionProperties.setApiKey(apiKey);
+        connectionProperties.setEndpoint(url);
+        OpenAIClient openAIClient = azureOpenAiAutoConfiguration.openAIClient(connectionProperties);
+        // 获取 AzureOpenAiChatProperties 对象
+        AzureOpenAiChatProperties chatProperties = SpringUtil.getBean(AzureOpenAiChatProperties.class);
+        return azureOpenAiAutoConfiguration.azureOpenAiChatModel(openAIClient, chatProperties, null, null);
     }
 
     /**

@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.module.system.framework.sms.core.client.impl;
 
-import cn.hutool.core.collection.ListUtil;
 import cn.iocoder.yudao.framework.common.core.KeyValue;
 import cn.iocoder.yudao.module.system.framework.sms.core.client.dto.SmsReceiveRespDTO;
 import cn.iocoder.yudao.module.system.framework.sms.core.client.dto.SmsSendRespDTO;
@@ -17,24 +16,6 @@ import java.util.List;
  * @author 芋道源码
  */
 public class SmsClientTests {
-
-    @Test
-    @Disabled
-    public void testHuaweiSmsClient_sendSms() throws Throwable {
-        SmsChannelProperties properties = new SmsChannelProperties()
-                .setApiKey("123")
-                .setApiSecret("456");
-        HuaweiSmsClient client = new HuaweiSmsClient(properties);
-        // 准备参数
-        Long sendLogId = System.currentTimeMillis();
-        String mobile = "15601691323";
-        String apiTemplateId = "xx test01";
-        List<KeyValue<String, Object>> templateParams = ListUtil.of(new KeyValue<>("code", "1024"));
-        // 调用
-        SmsSendRespDTO smsSendRespDTO = client.sendSms(sendLogId, mobile, apiTemplateId, templateParams);
-        // 打印结果
-        System.out.println(smsSendRespDTO);
-    }
 
     // ========== 阿里云 ==========
 
@@ -59,14 +40,14 @@ public class SmsClientTests {
         SmsChannelProperties properties = new SmsChannelProperties()
                 .setApiKey("LTAI5tAicJAxaSFiZuGGeXHR")
                 .setApiSecret("Fdr9vadxnDvS6GJU0W1tijQ0VmLhYz")
-                .setSignature("Ballcat");
+                .setSignature("runpu");
         AliyunSmsClient client = new AliyunSmsClient(properties);
         // 准备参数
         Long sendLogId = System.currentTimeMillis();
-        String mobile = "173213154791";
+        String mobile = "15601691323";
         String apiTemplateId = "SMS_207945135";
         // 调用
-        SmsSendRespDTO sendRespDTO = client.sendSms(sendLogId, mobile, apiTemplateId, ListUtil.of(new KeyValue<>("code", "1024")));
+        SmsSendRespDTO sendRespDTO = client.sendSms(sendLogId, mobile, apiTemplateId, List.of(new KeyValue<>("code", "1024")));
         // 打印结果
         System.out.println(sendRespDTO);
     }
@@ -100,4 +81,62 @@ public class SmsClientTests {
         System.out.println(statuses);
     }
 
+    // ========== 腾讯云 ==========
+
+    @Test
+    @Disabled
+    public void testTencentSmsClient_sendSms() throws Throwable {
+        SmsChannelProperties properties = new SmsChannelProperties()
+                .setApiKey("LTAI5tAicJAxaSFiZuGGeXHR 1428926523")
+                .setApiSecret("Fdr9vadxnDvS6GJU0W1tijQ0VmLhYz")
+                .setSignature("芋道源码");
+        TencentSmsClient client = new TencentSmsClient(properties);
+        // 准备参数
+        Long sendLogId = System.currentTimeMillis();
+        String mobile = "15601691323";
+        String apiTemplateId = "2136358";
+        // 调用
+        SmsSendRespDTO sendRespDTO = client.sendSms(sendLogId, mobile, apiTemplateId, List.of(new KeyValue<>("code", "1024")));
+        // 打印结果
+        System.out.println(sendRespDTO);
+    }
+
+    @Test
+    @Disabled
+    public void testTencentSmsClient_getSmsTemplate() throws Throwable {
+        SmsChannelProperties properties = new SmsChannelProperties()
+                .setApiKey("LTAI5tAicJAxaSFiZuGGeXHR 1428926523")
+                .setApiSecret("Fdr9vadxnDvS6GJU0W1tijQ0VmLhYz")
+                .setSignature("芋道源码");
+        TencentSmsClient client = new TencentSmsClient(properties);
+        // 准备参数
+        String apiTemplateId = "2136358";
+        // 调用
+        SmsTemplateRespDTO template = client.getSmsTemplate(apiTemplateId);
+        // 打印结果
+        System.out.println(template);
+    }
+
+    // ========== 华为云 ==========
+
+    @Test
+    @Disabled
+    public void testHuaweiSmsClient_sendSms() throws Throwable {
+        SmsChannelProperties properties = new SmsChannelProperties()
+                .setApiKey("123")
+                .setApiSecret("456")
+                .setSignature("runpu");
+        HuaweiSmsClient client = new HuaweiSmsClient(properties);
+        // 准备参数
+        Long sendLogId = System.currentTimeMillis();
+        String mobile = "15601691323";
+        String apiTemplateId = "xx test01";
+        List<KeyValue<String, Object>> templateParams = List.of(new KeyValue<>("code", "1024"));
+        // 调用
+        SmsSendRespDTO smsSendRespDTO = client.sendSms(sendLogId, mobile, apiTemplateId, templateParams);
+        // 打印结果
+        System.out.println(smsSendRespDTO);
+    }
+
 }
+
