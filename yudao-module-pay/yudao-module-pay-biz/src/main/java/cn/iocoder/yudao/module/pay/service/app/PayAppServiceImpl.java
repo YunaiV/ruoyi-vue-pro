@@ -44,7 +44,7 @@ public class PayAppServiceImpl implements PayAppService {
     @Override
     public Long createApp(PayAppCreateReqVO createReqVO) {
         // 验证 appKey 是否重复
-        validateEmailUnique(null, createReqVO.getAppKey());
+        validateAppKeyUnique(null, createReqVO.getAppKey());
 
         // 插入
         PayAppDO app = PayAppConvert.INSTANCE.convert(createReqVO);
@@ -58,14 +58,14 @@ public class PayAppServiceImpl implements PayAppService {
         // 校验存在
         validateAppExists(updateReqVO.getId());
         // 验证 appKey 是否重复
-        validateEmailUnique(updateReqVO.getId(), updateReqVO.getAppKey());
+        validateAppKeyUnique(updateReqVO.getId(), updateReqVO.getAppKey());
 
         // 更新
         PayAppDO updateObj = PayAppConvert.INSTANCE.convert(updateReqVO);
         appMapper.updateById(updateObj);
     }
 
-    void validateEmailUnique(Long id, String appKey) {
+    void validateAppKeyUnique(Long id, String appKey) {
         PayAppDO app = appMapper.selectByAppKey(appKey);
         if (app == null) {
             return;
