@@ -25,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import jakarta.annotation.Resource;
+
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -132,7 +133,7 @@ public class CouponServiceImpl implements CouponService {
     @Transactional
     public void deleteCoupon(Long id) {
         // 校验存在
-        validateCouponExists(id);
+        CouponDO coupon = validateCouponExists(id);
 
         // 更新优惠劵
         int deleteCount = couponMapper.delete(id,
@@ -140,8 +141,9 @@ public class CouponServiceImpl implements CouponService {
         if (deleteCount == 0) {
             throw exception(COUPON_DELETE_FAIL_USED);
         }
+
         // 减少优惠劵模板的领取数量 -1
-        couponTemplateService.updateCouponTemplateTakeCount(id, -1);
+        couponTemplateService.updateCouponTemplateTakeCount(coupon.getTemplateId(), -1);
     }
 
     @Override
@@ -149,10 +151,12 @@ public class CouponServiceImpl implements CouponService {
         return couponMapper.selectListByUserIdAndStatus(userId, status);
     }
 
-    private void validateCouponExists(Long id) {
-        if (couponMapper.selectById(id) == null) {
+    private CouponDO validateCouponExists(Long id) {
+        CouponDO coupon = couponMapper.selectById(id);
+        if (coupon == null) {
             throw exception(COUPON_NOT_EXISTS);
         }
+        return coupon;
     }
 
     @Override

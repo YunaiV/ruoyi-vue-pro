@@ -17,7 +17,11 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.singleton;
 
 @Tag(name = "管理后台 - 商品属性值")
 @RestController
@@ -67,6 +71,15 @@ public class ProductPropertyValueController {
     public CommonResult<PageResult<ProductPropertyValueRespVO>> getPropertyValuePage(@Valid ProductPropertyValuePageReqVO pageVO) {
         PageResult<ProductPropertyValueDO> pageResult = productPropertyValueService.getPropertyValuePage(pageVO);
         return success(BeanUtils.toBean(pageResult, ProductPropertyValueRespVO.class));
+    }
+
+    @GetMapping("/simple-list")
+    @Operation(summary = "获得属性值精简列表")
+    @Parameter(name = "propertyId", description = "属性项编号", required = true, example = "1024")
+    public CommonResult<List<ProductPropertyValueRespVO>> getPropertyValueSimpleList(@RequestParam("propertyId") Long propertyId) {
+        List<ProductPropertyValueDO> list = productPropertyValueService.getPropertyValueListByPropertyId(singleton(propertyId));
+        return success(convertList(list, value -> new ProductPropertyValueRespVO() // 只返回 id、name 属性
+                .setId(value.getId()).setName(value.getName())));
     }
 
 }

@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.trade.service.price.calculator;
 
 import cn.hutool.core.lang.Assert;
+import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.module.product.api.sku.dto.ProductSkuRespDTO;
 import cn.iocoder.yudao.module.product.api.spu.dto.ProductSpuRespDTO;
@@ -61,7 +62,7 @@ public class TradePriceCalculatorHelper {
             orderItem.setSpuName(spu.getName()).setCategoryId(spu.getCategoryId())
                     .setDeliveryTemplateId(spu.getDeliveryTemplateId())
                     .setGivePoint(spu.getGiveIntegral()).setUsePoint(0);
-            if (orderItem.getPicUrl() == null) {
+            if (StrUtil.isBlank(orderItem.getPicUrl())) {
                 orderItem.setPicUrl(spu.getPicUrl());
             }
         });
@@ -240,7 +241,7 @@ public class TradePriceCalculatorHelper {
      *
      * 和 {@link #dividePrice(List, Integer)} 逻辑一致，只是传入的是 TradeOrderItemDO 对象
      *
-     * @param items         订单项
+     * @param items 订单项
      * @param price 订单支付金额
      * @return 分摊金额数组，和传入的 orderItems 一一对应
      */
