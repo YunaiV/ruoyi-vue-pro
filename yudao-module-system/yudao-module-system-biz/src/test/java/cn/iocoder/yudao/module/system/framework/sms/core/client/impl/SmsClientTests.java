@@ -57,15 +57,16 @@ public class SmsClientTests {
     @Test
     @Disabled
     public void testTencentSmsClient_sendSms() throws Throwable {
+        String sdkAppId = "1400500458";
         SmsChannelProperties properties = new SmsChannelProperties()
-                .setApiKey("LTAI5tAicJAxaSFiZuGGeXHR 1428926523")
-                .setApiSecret("Fdr9vadxnDvS6GJU0W1tijQ0VmLhYz")
+                .setApiKey(System.getenv("SMS_TENCENT_ACCESS_KEY") + " " + sdkAppId)
+                .setApiSecret(System.getenv("SMS_TENCENT_SECRET_KEY"))
                 .setSignature("芋道源码");
         TencentSmsClient client = new TencentSmsClient(properties);
         // 准备参数
         Long sendLogId = System.currentTimeMillis();
         String mobile = "15601691323";
-        String apiTemplateId = "2136358";
+        String apiTemplateId = "358212";
         // 调用
         SmsSendRespDTO sendRespDTO = client.sendSms(sendLogId, mobile, apiTemplateId, List.of(new KeyValue<>("code", "1024")));
         // 打印结果
@@ -75,13 +76,14 @@ public class SmsClientTests {
     @Test
     @Disabled
     public void testTencentSmsClient_getSmsTemplate() throws Throwable {
+        String sdkAppId = "1400500458";
         SmsChannelProperties properties = new SmsChannelProperties()
-                .setApiKey("LTAI5tAicJAxaSFiZuGGeXHR 1428926523")
-                .setApiSecret("Fdr9vadxnDvS6GJU0W1tijQ0VmLhYz")
+                .setApiKey(System.getenv("SMS_TENCENT_ACCESS_KEY") + " " + sdkAppId)
+                .setApiSecret(System.getenv("SMS_TENCENT_SECRET_KEY"))
                 .setSignature("芋道源码");
         TencentSmsClient client = new TencentSmsClient(properties);
         // 准备参数
-        String apiTemplateId = "2136358";
+        String apiTemplateId = "358212";
         // 调用
         SmsTemplateRespDTO template = client.getSmsTemplate(apiTemplateId);
         // 打印结果
