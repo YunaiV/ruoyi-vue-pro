@@ -54,7 +54,7 @@ public class PayWalletRechargeServiceImpl implements PayWalletRechargeService {
     /**
      * TODO 芋艿：放到 payconfig
      */
-    private static final Long WALLET_PAY_APP_ID = 8L;
+    private static final String WALLET_PAY_APP_KEY = "wallet";
 
     private static final String WALLET_RECHARGE_ORDER_SUBJECT = "钱包余额充值";
 
@@ -92,7 +92,7 @@ public class PayWalletRechargeServiceImpl implements PayWalletRechargeService {
 
         // 2.1 创建支付单
         Long payOrderId = payOrderService.createOrder(new PayOrderCreateReqDTO()
-                .setAppId(WALLET_PAY_APP_ID).setUserIp(userIp)
+                .setAppKey(WALLET_PAY_APP_KEY).setUserIp(userIp)
                 .setMerchantOrderId(recharge.getId().toString()) // 业务的订单编号
                 .setSubject(WALLET_RECHARGE_ORDER_SUBJECT).setBody("")
                 .setPrice(recharge.getPayPrice())
@@ -174,7 +174,7 @@ public class PayWalletRechargeServiceImpl implements PayWalletRechargeService {
         String walletRechargeId = String.valueOf(id);
         String refundId = walletRechargeId + "-refund";
         Long payRefundId = payRefundService.createPayRefund(new PayRefundCreateReqDTO()
-                .setAppId(WALLET_PAY_APP_ID).setUserIp(userIp)
+                .setAppKey(WALLET_PAY_APP_KEY).setUserIp(userIp)
                 .setMerchantOrderId(walletRechargeId)
                 .setMerchantRefundId(refundId)
                 .setReason("想退钱").setPrice(walletRecharge.getPayPrice()));

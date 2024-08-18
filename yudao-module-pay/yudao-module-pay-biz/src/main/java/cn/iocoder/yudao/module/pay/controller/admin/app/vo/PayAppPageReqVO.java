@@ -20,6 +20,9 @@ public class PayAppPageReqVO extends PageParam {
     @Schema(description = "应用名", example = "小豆")
     private String name;
 
+    @Schema(description = "应用标识", requiredMode = Schema.RequiredMode.REQUIRED, example = "yudao")
+    private String appKey;
+
     @Schema(description = "开启状态", example = "0")
     private Integer status;
 

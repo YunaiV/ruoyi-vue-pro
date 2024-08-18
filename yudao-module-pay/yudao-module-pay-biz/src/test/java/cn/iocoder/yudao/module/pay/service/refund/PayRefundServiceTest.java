@@ -209,7 +209,7 @@ public class PayRefundServiceTest extends BaseDbAndRedisUnitTest {
     @Test
     public void testCreateRefund_orderNotFound() {
         PayRefundCreateReqDTO reqDTO = randomPojo(PayRefundCreateReqDTO.class,
-                o -> o.setAppId(1L));
+                o -> o.setAppKey("demo"));
         // mock 方法（app）
         PayAppDO app = randomPojo(PayAppDO.class, o -> o.setId(1L));
         when(appService.validPayApp(eq(1L))).thenReturn(app);
@@ -232,7 +232,7 @@ public class PayRefundServiceTest extends BaseDbAndRedisUnitTest {
     private void testCreateRefund_orderWaitingOrClosed(Integer status) {
         // 准备参数
         PayRefundCreateReqDTO reqDTO = randomPojo(PayRefundCreateReqDTO.class,
-                o -> o.setAppId(1L).setMerchantOrderId("100"));
+                o -> o.setAppKey("demo").setMerchantOrderId("100"));
         // mock 方法（app）
         PayAppDO app = randomPojo(PayAppDO.class, o -> o.setId(1L));
         when(appService.validPayApp(eq(1L))).thenReturn(app);
@@ -249,7 +249,7 @@ public class PayRefundServiceTest extends BaseDbAndRedisUnitTest {
     public void testCreateRefund_refundPriceExceed() {
         // 准备参数
         PayRefundCreateReqDTO reqDTO = randomPojo(PayRefundCreateReqDTO.class,
-                o -> o.setAppId(1L).setMerchantOrderId("100").setPrice(10));
+                o -> o.setAppKey("demo").setMerchantOrderId("100").setPrice(10));
         // mock 方法（app）
         PayAppDO app = randomPojo(PayAppDO.class, o -> o.setId(1L));
         when(appService.validPayApp(eq(1L))).thenReturn(app);
@@ -268,7 +268,7 @@ public class PayRefundServiceTest extends BaseDbAndRedisUnitTest {
     public void testCreateRefund_orderHasRefunding() {
         // 准备参数
         PayRefundCreateReqDTO reqDTO = randomPojo(PayRefundCreateReqDTO.class,
-                o -> o.setAppId(1L).setMerchantOrderId("100").setPrice(10));
+                o -> o.setAppKey("demo").setMerchantOrderId("100").setPrice(10));
         // mock 方法（app）
         PayAppDO app = randomPojo(PayAppDO.class, o -> o.setId(1L));
         when(appService.validPayApp(eq(1L))).thenReturn(app);
@@ -291,7 +291,7 @@ public class PayRefundServiceTest extends BaseDbAndRedisUnitTest {
     public void testCreateRefund_channelNotFound() {
         // 准备参数
         PayRefundCreateReqDTO reqDTO = randomPojo(PayRefundCreateReqDTO.class,
-                o -> o.setAppId(1L).setMerchantOrderId("100").setPrice(9));
+                o -> o.setAppKey("demo").setMerchantOrderId("100").setPrice(9));
         // mock 方法（app）
         PayAppDO app = randomPojo(PayAppDO.class, o -> o.setId(1L));
         when(appService.validPayApp(eq(1L))).thenReturn(app);
@@ -315,7 +315,7 @@ public class PayRefundServiceTest extends BaseDbAndRedisUnitTest {
     public void testCreateRefund_refundExists() {
         // 准备参数
         PayRefundCreateReqDTO reqDTO = randomPojo(PayRefundCreateReqDTO.class,
-                o -> o.setAppId(1L).setMerchantOrderId("100").setPrice(9)
+                o -> o.setAppKey("demo").setMerchantOrderId("100").setPrice(9)
                         .setMerchantRefundId("200").setReason("测试退款"));
         // mock 方法（app）
         PayAppDO app = randomPojo(PayAppDO.class, o -> o.setId(1L));
@@ -347,7 +347,7 @@ public class PayRefundServiceTest extends BaseDbAndRedisUnitTest {
     public void testCreateRefund_invokeException() {
         // 准备参数
         PayRefundCreateReqDTO reqDTO = randomPojo(PayRefundCreateReqDTO.class,
-                o -> o.setAppId(1L).setMerchantOrderId("100").setPrice(9)
+                o -> o.setAppKey("demo").setMerchantOrderId("100").setPrice(9)
                         .setMerchantRefundId("200").setReason("测试退款"));
         // mock 方法（app）
         PayAppDO app = randomPojo(PayAppDO.class, o -> o.setId(1L));
@@ -391,7 +391,7 @@ public class PayRefundServiceTest extends BaseDbAndRedisUnitTest {
 
             // 准备参数
             PayRefundCreateReqDTO reqDTO = randomPojo(PayRefundCreateReqDTO.class,
-                    o -> o.setAppId(1L).setMerchantOrderId("100").setPrice(9)
+                    o -> o.setAppKey("demo").setMerchantOrderId("100").setPrice(9)
                             .setMerchantRefundId("200").setReason("测试退款"));
             // mock 方法（app）
             PayAppDO app = randomPojo(PayAppDO.class, o -> o.setId(1L));

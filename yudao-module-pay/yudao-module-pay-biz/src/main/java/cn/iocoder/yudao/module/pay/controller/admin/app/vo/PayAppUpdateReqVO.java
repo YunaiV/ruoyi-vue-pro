@@ -1,4 +1,5 @@
 package cn.iocoder.yudao.module.pay.controller.admin.app.vo;
+
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 import jakarta.validation.constraints.*;
@@ -12,5 +13,9 @@ public class PayAppUpdateReqVO extends PayAppBaseVO {
     @Schema(description = "应用编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     @NotNull(message = "应用编号不能为空")
     private Long id;
+
+    @Schema(description = "应用标识", requiredMode = Schema.RequiredMode.REQUIRED, example = "yudao")
+    @NotNull(message = "应用标识不能为空")
+    private String appKey;
 
 }

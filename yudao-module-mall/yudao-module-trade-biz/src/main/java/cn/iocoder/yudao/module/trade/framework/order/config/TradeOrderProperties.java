@@ -5,6 +5,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.validation.annotation.Validated;
 
 import jakarta.validation.constraints.NotNull;
+
 import java.time.Duration;
 
 /**
@@ -19,10 +20,16 @@ import java.time.Duration;
 public class TradeOrderProperties {
 
     /**
-     * 应用编号
+     * 默认应用标识
      */
-    @NotNull(message = "应用编号不能为空")
-    private Long appId;
+    private static final String APP_KEY_DEFAULT = "mall";
+
+    /**
+     * 应用标识，用于区分不同的应用程序
+     * 通过注解@NotNull确保应用标识不能为空
+     */
+    @NotNull(message = "应用标识不能为空")
+    private String appKey = APP_KEY_DEFAULT;
 
     /**
      * 支付超时时间

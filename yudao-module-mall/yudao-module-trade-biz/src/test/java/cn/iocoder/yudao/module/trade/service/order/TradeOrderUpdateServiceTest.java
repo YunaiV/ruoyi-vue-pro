@@ -99,7 +99,7 @@ public class TradeOrderUpdateServiceTest extends BaseDbUnitTest {
 
     @BeforeEach
     public void setUp() {
-        when(tradeOrderProperties.getAppId()).thenReturn(888L);
+        when(tradeOrderProperties.getAppKey()).thenReturn("demo");
         when(tradeOrderProperties.getPayExpireTime()).thenReturn(Duration.ofDays(1));
         when(tradeNoRedisDAO.generate(anyString())).thenReturn(IdUtil.randomUUID());
     }

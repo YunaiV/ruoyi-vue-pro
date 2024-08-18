@@ -7,8 +7,8 @@ import cn.iocoder.yudao.module.pay.controller.admin.app.vo.PayAppCreateReqVO;
 import cn.iocoder.yudao.module.pay.controller.admin.app.vo.PayAppPageReqVO;
 import cn.iocoder.yudao.module.pay.controller.admin.app.vo.PayAppUpdateReqVO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.app.PayAppDO;
-
 import jakarta.validation.Valid;
+
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -88,18 +88,28 @@ public interface PayAppService {
      * @return 商户 Map
      */
     default Map<Long, PayAppDO> getAppMap(Collection<Long> ids) {
-        List<PayAppDO> list =  getAppList(ids);
+        List<PayAppDO> list = getAppList(ids);
         return CollectionUtils.convertMap(list, PayAppDO::getId);
     }
 
     /**
      * 支付应用的合法性
-     *
+     * <p>
      * 如果不合法，抛出 {@link ServiceException} 业务异常
      *
      * @param id 应用编号
      * @return 应用
      */
     PayAppDO validPayApp(Long id);
+
+    /**
+     * 支付应用的合法性
+     * <p>
+     * 如果不合法，抛出 {@link ServiceException} 业务异常
+     *
+     * @param appKey 应用标识
+     * @return 应用
+     */
+    PayAppDO validPayApp(String appKey);
 
 }
