@@ -199,8 +199,8 @@ public class PayRefundServiceImpl implements PayRefundService {
      * @param channel 支付渠道
      * @param notify  通知
      */
-    @Transactional(rollbackFor = Exception.class)
     // 注意，如果是方法内调用该方法，需要通过 getSelf().notifyRefund(channel, notify) 调用，否则事务不生效
+    @Transactional(rollbackFor = Exception.class)
     public void notifyRefund(PayChannelDO channel, PayRefundRespDTO notify) {
         // 情况一：退款成功
         if (PayRefundStatusRespEnum.isSuccess(notify.getStatus())) {

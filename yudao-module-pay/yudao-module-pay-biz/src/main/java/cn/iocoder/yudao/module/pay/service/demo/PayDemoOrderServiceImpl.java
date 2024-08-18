@@ -43,7 +43,7 @@ import static cn.iocoder.yudao.module.pay.enums.ErrorCodeConstants.*;
 public class PayDemoOrderServiceImpl implements PayDemoOrderService {
 
     /**
-     * 接入的实力应用编号
+     * 接入的支付应用标识
      *
      * 从 [支付管理 -> 应用信息] 里添加
      */

@@ -14,8 +14,4 @@ public class PayAppUpdateReqVO extends PayAppBaseVO {
     @NotNull(message = "应用编号不能为空")
     private Long id;
 
-    @Schema(description = "应用标识", requiredMode = Schema.RequiredMode.REQUIRED, example = "yudao")
-    @NotNull(message = "应用标识不能为空")
-    private String appKey;
-
 }

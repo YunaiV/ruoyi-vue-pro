@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.trade.framework.order.config;
 
+import jakarta.validation.constraints.NotEmpty;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.validation.annotation.Validated;
@@ -19,17 +20,15 @@ import java.time.Duration;
 @Validated
 public class TradeOrderProperties {
 
-    /**
-     * 默认应用标识
-     */
-    private static final String APP_KEY_DEFAULT = "mall";
+    private static final String PAY_APP_KEY_DEFAULT = "mall";
 
     /**
-     * 应用标识，用于区分不同的应用程序
-     * 通过注解@NotNull确保应用标识不能为空
+     * 支付应用标识
+     *
+     * 在 pay 模块的 [支付管理 -> 应用信息] 里添加
      */
-    @NotNull(message = "应用标识不能为空")
-    private String appKey = APP_KEY_DEFAULT;
+    @NotEmpty(message = "Pay 应用标识不能为空")
+    private String payAppKey = PAY_APP_KEY_DEFAULT;
 
     /**
      * 支付超时时间

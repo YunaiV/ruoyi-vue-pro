@@ -98,9 +98,12 @@ public class AlipayPayClientConfig implements PayClientConfig {
     private String rootCertContent;
 
     /**
-     * 接口内容加密方式，如果为空，将使用无加密方式
-     * 如果要加密，目前支付宝只有 AES 一种加密方式
-     * <a href="https://opendocs.alipay.com/common/02mse3">支付宝开放平台</a>
+     * 接口内容加密方式
+     *
+     * 1. 如果为空，将使用无加密方式
+     * 2. 如果要加密，目前支付宝只有 AES 一种加密方式
+     *
+     * @see <a href="https://opendocs.alipay.com/common/02mse3">支付宝开放平台</a>
      * @see AlipayPayClientConfig#ENC_TYPE_AES
      */
     private String encryptType;
