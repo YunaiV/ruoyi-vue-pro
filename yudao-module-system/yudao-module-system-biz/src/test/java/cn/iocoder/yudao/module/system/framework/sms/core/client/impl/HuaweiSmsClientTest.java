@@ -29,7 +29,7 @@ import static org.mockito.Mockito.mockStatic;
 public class HuaweiSmsClientTest extends BaseMockitoUnitTest {
 
     private final SmsChannelProperties properties = new SmsChannelProperties()
-            .setApiKey(randomString())// 随机一个 apiKey，避免构建报错
+            .setApiKey(randomString() + " " + randomString()) // 随机一个 apiKey，避免构建报错
             .setApiSecret(randomString()) // 随机一个 apiSecret，避免构建报错
             .setSignature("芋道源码");
 

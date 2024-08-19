@@ -49,25 +49,43 @@ public class HuaweiSmsClient extends AbstractSmsClient {
         super(properties);
         Assert.notEmpty(properties.getApiKey(), "apiKey 不能为空");
         Assert.notEmpty(properties.getApiSecret(), "apiSecret 不能为空");
+        validateSender(properties);
+    }
+
+    /**
+     * 参数校验华为云的 sender 通道号
+     *
+     * 原因是：验华为云发放短信的时候，需要额外的参数 sender
+     *
+     * 解决方案：考虑到不破坏原有的 apiKey + apiSecret 的结构，所以将 secretId 拼接到 apiKey 字段中，格式为 "secretId sdkAppId"。
+     *
+     * @param properties 配置
+     */
+    private static void validateSender(SmsChannelProperties properties) {
+        String combineKey = properties.getApiKey();
+        Assert.notEmpty(combineKey, "apiKey 不能为空");
+        String[] keys = combineKey.trim().split(" ");
+        Assert.isTrue(keys.length == 2, "华为云短信 apiKey 配置格式错误，请配置 为[accessKeyId sender]");
+    }
+
+    private String getAccessKey() {
+        return StrUtil.subBefore(properties.getApiKey(), " ", true);
+    }
+
+    private String getSender() {
+        return StrUtil.subAfter(properties.getApiKey(), " ", true);
     }
 
     @Override
     public SmsSendRespDTO sendSms(Long sendLogId, String mobile, String apiTemplateId,
                                   List<KeyValue<String, Object>> templateParams) throws Throwable {
-        // 1. 执行请求
-        // 参考链接 https://support.huaweicloud.com/api-msgsms/sms_05_0001.html
-        // 相比较阿里短信，华为短信发送的时候需要额外的参数“通道号”，考虑到不破坏原有的的结构，
-        // 所以将 sender 通道号，拼接到 apiTemplateId 字段中，格式为 "apiTemplateId 通道号"（空格为分隔符）
-        String sender = apiTemplateId.split(" ")[1]; // 中国大陆短信签名通道号或全球短信通道号
-        String templateId = apiTemplateId.split(" ")[0]; //模板ID
-        String statusCallBack = properties.getCallbackUrl();
         StringBuilder requestBody = new StringBuilder();
-        appendToBody(requestBody, "from=", sender);
+        appendToBody(requestBody, "from=", getSender());
         appendToBody(requestBody, "&to=", mobile);
-        appendToBody(requestBody, "&templateId=", templateId);
+        appendToBody(requestBody, "&templateId=", apiTemplateId);
         appendToBody(requestBody, "&templateParas=", JsonUtils.toJsonString(
                 convertList(templateParams, kv -> String.valueOf(kv.getValue()))));
-        appendToBody(requestBody, "&statusCallback=", statusCallBack);
+        appendToBody(requestBody, "&statusCallback=", properties.getCallbackUrl());
         appendToBody(requestBody, "&extend=", String.valueOf(sendLogId));
         JSONObject response = request("/sms/batchSendSms/v1/", "POST", requestBody.toString());
 
@@ -107,7 +125,7 @@ public class HuaweiSmsClient extends AbstractSmsClient {
                 + canonicalHeaders + "\n" + SIGNEDHEADERS + "\n" + sha256Hex(requestBody);
         String stringToSign = "SDK-HMAC-SHA256" + "\n" + sdkDate + "\n" + sha256Hex(canonicalRequest);
         String signature = SecureUtil.hmacSha256(properties.getApiSecret()).digestHex(stringToSign);  // 计算签名
-        headers.put("Authorization", "SDK-HMAC-SHA256" + " " + "Access=" + properties.getApiKey()
+        headers.put("Authorization", "SDK-HMAC-SHA256" + " " + "Access=" + getAccessKey()
                 + ", " + "SignedHeaders=" + SIGNEDHEADERS + ", " + "Signature=" + signature);
 
         // 2. 发起请求
@@ -131,11 +149,10 @@ public class HuaweiSmsClient extends AbstractSmsClient {
 
     @Override
     public SmsTemplateRespDTO getSmsTemplate(String apiTemplateId) throws Throwable {
-        // 相比较阿里短信，华为短信发送的时候需要额外的参数“通道号”，考虑到不破坏原有的的结构，
-        // 所以将 sender 通道号，拼接到 apiTemplateId 字段中，格式为 "apiTemplateId 通道号"（空格为分隔符）
+        // 华为短信模板查询和发送短信，是不同的两套 key 和 secret，与阿里、腾讯的区别较大，这里模板查询校验暂不实现
         String[] strs = apiTemplateId.split(" ");
         Assert.isTrue(strs.length == 2, "格式不正确，需要满足：apiTemplateId sender");
-        return new SmsTemplateRespDTO().setId(strs[0]).setContent(null)
+        return new SmsTemplateRespDTO().setId(apiTemplateId).setContent(null)
                 .setAuditStatus(SmsTemplateAuditStatusEnum.SUCCESS.getStatus()).setAuditReason(null);
     }
 

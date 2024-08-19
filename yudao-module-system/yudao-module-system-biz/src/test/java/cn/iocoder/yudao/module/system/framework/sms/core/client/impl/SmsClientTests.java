@@ -95,15 +95,16 @@ public class SmsClientTests {
     @Test
     @Disabled
     public void testHuaweiSmsClient_sendSms() throws Throwable {
+        String sender = "x8824060312575";
         SmsChannelProperties properties = new SmsChannelProperties()
-                .setApiKey(System.getenv("SMS_HUAWEI_ACCESS_KEY"))
+                .setApiKey(System.getenv("SMS_HUAWEI_ACCESS_KEY") + " " + sender)
                 .setApiSecret(System.getenv("SMS_HUAWEI_SECRET_KEY"))
                 .setSignature("runpu");
         HuaweiSmsClient client = new HuaweiSmsClient(properties);
         // 准备参数
         Long sendLogId = System.currentTimeMillis();
         String mobile = "17321315478";
-        String apiTemplateId = "3644cdab863546a3b718d488659a99ef x8824060312575";
+        String apiTemplateId = "3644cdab863546a3b718d488659a99ef";
         List<KeyValue<String, Object>> templateParams = List.of(new KeyValue<>("code", "1024"));
         // 调用
         SmsSendRespDTO smsSendRespDTO = client.sendSms(sendLogId, mobile, apiTemplateId, templateParams);
