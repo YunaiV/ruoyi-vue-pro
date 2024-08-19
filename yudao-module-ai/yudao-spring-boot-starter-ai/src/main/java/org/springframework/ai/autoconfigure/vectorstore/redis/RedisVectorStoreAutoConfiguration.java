@@ -31,6 +31,7 @@ import redis.clients.jedis.JedisPooled;
  * TODO @xin 先拿 spring-ai 最新代码覆盖，1.0.0-M1 跟 redis 自动配置会冲突
  *
  * TODO 这个官方，有说啥时候 fix 哇？
+ * TODO 看着是列在1.0.0-M2版本
  *
  * @author Christian Tzolov
  * @author Eddú Meléndez
