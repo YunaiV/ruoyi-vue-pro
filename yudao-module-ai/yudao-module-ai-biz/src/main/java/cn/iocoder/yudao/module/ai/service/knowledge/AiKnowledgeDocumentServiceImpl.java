@@ -43,28 +43,30 @@ public class AiKnowledgeDocumentServiceImpl implements AiKnowledgeDocumentServic
     @Resource
     private AiEmbeddingService embeddingService;
 
+    // TODO @xin：@Resource 注入
     private static final JTokkitTokenCountEstimator TOKEN_COUNT_ESTIMATOR = new JTokkitTokenCountEstimator();
 
     // TODO xiaoxin 临时测试用，后续删
     @Value("classpath:/webapp/test/Fel.pdf")
     private org.springframework.core.io.Resource data;
 
-
+    // TODO 芋艿：需要 review 下，代码格式；
+    // TODO @xin：最好有 1、/2、/3 这种，让代码更有层次感
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Long createKnowledgeDocument(AiKnowledgeDocumentCreateReqVO createReqVO) {
-
         // TODO xiaoxin 后续从 url 加载
         TikaDocumentReader loader = new TikaDocumentReader(data);
         // 加载文档
         List<Document> documents = loader.get();
         Document document = CollUtil.getFirst(documents);
-        // TODO 芋艿 文档层面有没有可能会比较大，这两个字段是否可以从分段表计算得出？
+        // TODO @xin：是不是不存在，就抛出异常呀；厚泽 return 呀；
+        // TODO 芋艿 文档层面有没有可能会比较大，这两个字段是否可以从分段表计算得出？回复：先直接算；
         Integer tokens = Objects.nonNull(document) ? TOKEN_COUNT_ESTIMATOR.estimate(document.getContent()) : 0;
         Integer wordCount = Objects.nonNull(document) ? document.getContent().length() : 0;
 
-        AiKnowledgeDocumentDO documentDO = BeanUtils.toBean(createReqVO, AiKnowledgeDocumentDO.class);
-        documentDO.setTokens(tokens).setWordCount(wordCount)
+        AiKnowledgeDocumentDO documentDO = BeanUtils.toBean(createReqVO, AiKnowledgeDocumentDO.class)
+                .setTokens(tokens).setWordCount(wordCount)
                 .setStatus(CommonStatusEnum.ENABLE.getStatus()).setSliceStatus(AiKnowledgeDocumentStatusEnum.SUCCESS.getStatus());
         // 文档记录入库
         documentMapper.insert(documentDO);
@@ -75,17 +77,15 @@ public class AiKnowledgeDocumentServiceImpl implements AiKnowledgeDocumentServic
 
         // 文档分段
         List<Document> segments = tokenTextSplitter.apply(documents);
-
+        // 分段内容入库
         List<AiKnowledgeSegmentDO> segmentDOList = CollectionUtils.convertList(segments,
                 segment -> new AiKnowledgeSegmentDO().setContent(segment.getContent()).setDocumentId(documentId)
                         .setTokens(TOKEN_COUNT_ESTIMATOR.estimate(segment.getContent())).setWordCount(segment.getContent().length())
                         .setStatus(CommonStatusEnum.ENABLE.getStatus()));
-        // 分段内容入库
         segmentMapper.insertBatch(segmentDOList);
-
-        //向量化并存储
+        // 向量化并存储
         embeddingService.add(segments);
-
         return documentId;
     }
+
 }

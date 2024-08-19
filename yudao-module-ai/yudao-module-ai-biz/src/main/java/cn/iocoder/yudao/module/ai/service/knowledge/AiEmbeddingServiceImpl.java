@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+// TODO @xin：是不是不用 AiEmbeddingServiceImpl，直接 vectorStore 注入到需要的地方就好啦。通过 KnowledgeDocumentService 返回就好。
 /**
  * AI 嵌入 Service 实现类
  *
@@ -30,4 +31,5 @@ public class AiEmbeddingServiceImpl implements AiEmbeddingService {
     public List<Document> similaritySearch(SearchRequest request) {
         return vectorStore.similaritySearch(request);
     }
+
 }

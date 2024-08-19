@@ -17,11 +17,11 @@ public interface AiEmbeddingService {
      */
     void add(List<Document> documents);
 
-
     /**
      * 相似查询
      *
      * @param request 查询实体
      */
     List<Document> similaritySearch(SearchRequest request);
+
 }

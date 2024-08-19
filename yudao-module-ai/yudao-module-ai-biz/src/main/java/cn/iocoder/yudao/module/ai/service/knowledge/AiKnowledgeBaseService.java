@@ -9,7 +9,6 @@ import cn.iocoder.yudao.module.ai.controller.admin.knowledge.vo.AiKnowledgeUpdat
  */
 public interface AiKnowledgeBaseService {
 
-
     /**
      * 创建【我的】知识库
      *
@@ -27,4 +26,5 @@ public interface AiKnowledgeBaseService {
      * @param userId 用户编号
      */
     void updateKnowledgeMy(AiKnowledgeUpdateMyReqVO updateReqVO, Long userId);
+
 }

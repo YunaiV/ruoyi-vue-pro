@@ -9,7 +9,6 @@ import cn.iocoder.yudao.module.ai.controller.admin.knowledge.vo.AiKnowledgeDocum
  */
 public interface AiKnowledgeDocumentService {
 
-
     /**
      * 创建文档
      *

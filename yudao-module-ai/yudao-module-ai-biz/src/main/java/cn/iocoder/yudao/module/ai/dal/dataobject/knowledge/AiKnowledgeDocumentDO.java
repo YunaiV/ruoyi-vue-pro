@@ -3,7 +3,6 @@ package cn.iocoder.yudao.module.ai.dal.dataobject.knowledge;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.module.ai.enums.knowledge.AiKnowledgeDocumentStatusEnum;
-import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
@@ -20,10 +19,12 @@ public class AiKnowledgeDocumentDO extends BaseDO {
     /**
      * 编号
      */
-    @TableId(type = IdType.AUTO)
+    @TableId
     private Long id;
     /**
      * 知识库编号
+     *
+     * 关联 {@link AiKnowledgeBaseDO#getId()}
      */
     private Long knowledgeId;
     /**
@@ -39,7 +40,7 @@ public class AiKnowledgeDocumentDO extends BaseDO {
      */
     private String url;
     /**
-     * token数量
+     * token 数量
      */
     private Integer tokens;
     /**
@@ -59,4 +60,5 @@ public class AiKnowledgeDocumentDO extends BaseDO {
      * 枚举 {@link CommonStatusEnum}
      */
     private Integer status;
+
 }

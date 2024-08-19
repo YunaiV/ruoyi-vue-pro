@@ -7,13 +7,9 @@ import lombok.Data;
 
 import java.util.List;
 
-/**
- * @author xiaoxin
- */
 @Schema(description = "管理后台 - AI 知识库创建【我的】 Request VO")
 @Data
 public class AiKnowledgeUpdateMyReqVO {
-
 
     @Schema(description = "对话编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1204")
     @NotNull(message = "知识库编号不能为空")
@@ -26,10 +22,10 @@ public class AiKnowledgeUpdateMyReqVO {
     @Schema(description = "知识库描述", requiredMode = Schema.RequiredMode.REQUIRED, example = "")
     private String description;
 
-    @Schema(description = "可见权限,只能选择哪些人可见", requiredMode = Schema.RequiredMode.REQUIRED, example = "[1]")
+    @Schema(description = "可见权限，只能选择哪些人可见", requiredMode = Schema.RequiredMode.REQUIRED, example = "[1]")
     private List<Long> visibilityPermissions;
 
-    @Schema(description = "嵌入模型 id", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
+    @Schema(description = "嵌入模型编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     @NotNull(message = "嵌入模型不能为空")
     private Long modelId;
 
