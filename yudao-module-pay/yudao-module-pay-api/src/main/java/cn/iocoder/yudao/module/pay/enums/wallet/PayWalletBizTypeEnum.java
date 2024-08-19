@@ -21,8 +21,6 @@ public enum PayWalletBizTypeEnum implements IntArrayValuable {
     PAYMENT_REFUND(4, "支付退款"),
     UPDATE_BALANCE(5, "更新余额");
 
-    // TODO 后续增加
-
     /**
      * 业务分类
      */

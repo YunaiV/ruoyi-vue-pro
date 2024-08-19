@@ -33,6 +33,7 @@
             <artifactId>yudao-module-infra-api</artifactId>
             <version>${revision}</version>
         </dependency>
+        <!-- TODO @puhui999：不在 MemberUserController 提供接口，而是 PayWalletController 增加。不然 member 耦合 pay 拉。 -->
         <dependency>
             <groupId>cn.iocoder.boot</groupId>
             <artifactId>yudao-module-pay-api</artifactId>

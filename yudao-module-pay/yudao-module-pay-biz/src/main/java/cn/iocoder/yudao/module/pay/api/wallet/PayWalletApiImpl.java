@@ -13,6 +13,7 @@ import static cn.iocoder.yudao.framework.common.enums.UserTypeEnum.MEMBER;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.pay.enums.ErrorCodeConstants.WALLET_NOT_FOUND;
 
+// @puhui999：不在 MemberUserController 提供接口，而是 PayWalletController 增加。不然 member 耦合 pay 拉。
 /**
  * 会员钱包 API 实现类
  *

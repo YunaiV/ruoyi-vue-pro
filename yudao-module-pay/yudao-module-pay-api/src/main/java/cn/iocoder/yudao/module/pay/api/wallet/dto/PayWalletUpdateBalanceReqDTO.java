@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.pay.api.wallet.dto;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
+// TODO @puhui999：不在 MemberUserController 提供接口，而是 PayWalletController 增加。不然 member 耦合 pay 拉。
 /**
  * 钱包余额更新 Request DTO
  *
