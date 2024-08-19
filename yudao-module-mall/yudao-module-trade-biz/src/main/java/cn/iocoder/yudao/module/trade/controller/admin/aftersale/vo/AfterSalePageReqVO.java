@@ -27,6 +27,9 @@ public class AfterSalePageReqVO extends PageParam {
     @Schema(description = "售后流水号", example = "202211190847450020500077")
     private String no;
 
+    @Schema(description = "用户编号", example = "1024")
+    private Long userId;
+
     @Schema(description = "售后状态", example = "10")
     @InEnum(value = AfterSaleStatusEnum.class, message = "售后状态必须是 {value}")
     private Integer status;

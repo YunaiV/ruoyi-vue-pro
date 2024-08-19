@@ -12,12 +12,12 @@ import cn.iocoder.yudao.module.pay.enums.wallet.PayWalletBizTypeEnum;
 import cn.iocoder.yudao.module.pay.service.order.PayOrderService;
 import cn.iocoder.yudao.module.pay.service.refund.PayRefundService;
 import cn.iocoder.yudao.module.pay.service.wallet.bo.WalletTransactionCreateReqBO;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import jakarta.annotation.Resource;
 import java.time.LocalDateTime;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
@@ -176,6 +176,9 @@ public class PayWalletServiceImpl implements  PayWalletService {
                 walletMapper.updateWhenRecharge(payWallet.getId(), price);
                 break;
             }
+            case UPDATE_BALANCE: // 更新余额
+                walletMapper.updateWhenRecharge(payWallet.getId(), price);
+                break;
             default: {
                 // TODO 其它类型待实现
                 throw new UnsupportedOperationException("待实现");
