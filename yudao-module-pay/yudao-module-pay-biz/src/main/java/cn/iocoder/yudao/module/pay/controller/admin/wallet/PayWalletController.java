@@ -48,4 +48,6 @@ public class PayWalletController {
         return success(PayWalletConvert.INSTANCE.convertPage(pageResult));
     }
 
+    // TODO @puhui999：修改钱包余额，权限标识，记得加下噢
+
 }
