@@ -113,7 +113,7 @@ public class PayRefundServiceImpl implements PayRefundService {
         // 2.1 插入退款单
         String no = noRedisDAO.generate(payProperties.getRefundNoPrefix());
         refund = PayRefundConvert.INSTANCE.convert(reqDTO)
-                .setNo(no).setOrderId(order.getId()).setOrderNo(order.getNo())
+                .setNo(no).setAppId(app.getId()).setOrderId(order.getId()).setOrderNo(order.getNo())
                 .setChannelId(order.getChannelId()).setChannelCode(order.getChannelCode())
                 // 商户相关的字段
                 .setNotifyUrl(app.getRefundNotifyUrl())

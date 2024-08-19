@@ -212,7 +212,7 @@ public class PayRefundServiceTest extends BaseDbAndRedisUnitTest {
                 o -> o.setAppKey("demo"));
         // mock 方法（app）
         PayAppDO app = randomPojo(PayAppDO.class, o -> o.setId(1L));
-        when(appService.validPayApp(eq(1L))).thenReturn(app);
+        when(appService.validPayApp(eq("demo"))).thenReturn(app);
 
         // 调用，并断言异常
         assertServiceException(() -> refundService.createPayRefund(reqDTO),
@@ -235,7 +235,7 @@ public class PayRefundServiceTest extends BaseDbAndRedisUnitTest {
                 o -> o.setAppKey("demo").setMerchantOrderId("100"));
         // mock 方法（app）
         PayAppDO app = randomPojo(PayAppDO.class, o -> o.setId(1L));
-        when(appService.validPayApp(eq(1L))).thenReturn(app);
+        when(appService.validPayApp(eq("demo"))).thenReturn(app);
         // mock 数据（order）
         PayOrderDO order = randomPojo(PayOrderDO.class, o -> o.setStatus(status));
         when(orderService.getOrder(eq(1L), eq("100"))).thenReturn(order);
@@ -252,7 +252,7 @@ public class PayRefundServiceTest extends BaseDbAndRedisUnitTest {
                 o -> o.setAppKey("demo").setMerchantOrderId("100").setPrice(10));
         // mock 方法（app）
         PayAppDO app = randomPojo(PayAppDO.class, o -> o.setId(1L));
-        when(appService.validPayApp(eq(1L))).thenReturn(app);
+        when(appService.validPayApp(eq("demo"))).thenReturn(app);
         // mock 数据（order）
         PayOrderDO order = randomPojo(PayOrderDO.class, o ->
                 o.setStatus(PayOrderStatusEnum.REFUND.getStatus())
@@ -271,7 +271,7 @@ public class PayRefundServiceTest extends BaseDbAndRedisUnitTest {
                 o -> o.setAppKey("demo").setMerchantOrderId("100").setPrice(10));
         // mock 方法（app）
         PayAppDO app = randomPojo(PayAppDO.class, o -> o.setId(1L));
-        when(appService.validPayApp(eq(1L))).thenReturn(app);
+        when(appService.validPayApp(eq("demo"))).thenReturn(app);
         // mock 数据（order）
         PayOrderDO order = randomPojo(PayOrderDO.class, o ->
                 o.setStatus(PayOrderStatusEnum.REFUND.getStatus())
@@ -294,7 +294,7 @@ public class PayRefundServiceTest extends BaseDbAndRedisUnitTest {
                 o -> o.setAppKey("demo").setMerchantOrderId("100").setPrice(9));
         // mock 方法（app）
         PayAppDO app = randomPojo(PayAppDO.class, o -> o.setId(1L));
-        when(appService.validPayApp(eq(1L))).thenReturn(app);
+        when(appService.validPayApp(eq("demo"))).thenReturn(app);
         // mock 数据（order）
         PayOrderDO order = randomPojo(PayOrderDO.class, o ->
                 o.setStatus(PayOrderStatusEnum.REFUND.getStatus())
@@ -319,7 +319,7 @@ public class PayRefundServiceTest extends BaseDbAndRedisUnitTest {
                         .setMerchantRefundId("200").setReason("测试退款"));
         // mock 方法（app）
         PayAppDO app = randomPojo(PayAppDO.class, o -> o.setId(1L));
-        when(appService.validPayApp(eq(1L))).thenReturn(app);
+        when(appService.validPayApp(eq("demo"))).thenReturn(app);
         // mock 数据（order）
         PayOrderDO order = randomPojo(PayOrderDO.class, o ->
                 o.setStatus(PayOrderStatusEnum.REFUND.getStatus())
@@ -351,7 +351,7 @@ public class PayRefundServiceTest extends BaseDbAndRedisUnitTest {
                         .setMerchantRefundId("200").setReason("测试退款"));
         // mock 方法（app）
         PayAppDO app = randomPojo(PayAppDO.class, o -> o.setId(1L));
-        when(appService.validPayApp(eq(1L))).thenReturn(app);
+        when(appService.validPayApp(eq("demo"))).thenReturn(app);
         // mock 数据（order）
         PayOrderDO order = randomPojo(PayOrderDO.class, o ->
                 o.setStatus(PayOrderStatusEnum.REFUND.getStatus())
@@ -395,7 +395,7 @@ public class PayRefundServiceTest extends BaseDbAndRedisUnitTest {
                             .setMerchantRefundId("200").setReason("测试退款"));
             // mock 方法（app）
             PayAppDO app = randomPojo(PayAppDO.class, o -> o.setId(1L));
-            when(appService.validPayApp(eq(1L))).thenReturn(app);
+            when(appService.validPayApp(eq("demo"))).thenReturn(app);
             // mock 数据（order）
             PayOrderDO order = randomPojo(PayOrderDO.class, o ->
                     o.setStatus(PayOrderStatusEnum.REFUND.getStatus())
