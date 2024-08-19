@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.member.controller.admin.user;
 import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.member.controller.admin.user.vo.*;
 import cn.iocoder.yudao.module.member.convert.user.MemberUserConvert;
 import cn.iocoder.yudao.module.member.dal.dataobject.group.MemberGroupDO;
@@ -15,15 +16,17 @@ import cn.iocoder.yudao.module.member.service.level.MemberLevelService;
 import cn.iocoder.yudao.module.member.service.point.MemberPointRecordService;
 import cn.iocoder.yudao.module.member.service.tag.MemberTagService;
 import cn.iocoder.yudao.module.member.service.user.MemberUserService;
+import cn.iocoder.yudao.module.pay.api.wallet.PayWalletApi;
+import cn.iocoder.yudao.module.pay.api.wallet.dto.PayWalletUpdateBalanceReqDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.annotation.Resource;
+import jakarta.validation.Valid;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import jakarta.annotation.Resource;
-import jakarta.validation.Valid;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
@@ -50,6 +53,8 @@ public class MemberUserController {
     private MemberGroupService memberGroupService;
     @Resource
     private MemberPointRecordService memberPointRecordService;
+    @Resource
+    private PayWalletApi payWalletApi;
 
     @PutMapping("/update")
     @Operation(summary = "更新会员用户")
@@ -79,8 +84,9 @@ public class MemberUserController {
     @PutMapping("/update-balance")
     @Operation(summary = "更新会员用户余额")
     @PreAuthorize("@ss.hasPermission('member:user:update-balance')")
-    public CommonResult<Boolean> updateUserBalance(@Valid @RequestBody Long id) {
-        // todo @jason：增加一个【修改余额】
+    public CommonResult<Boolean> updateUserBalance(@Valid @RequestBody MemberUserUpdateBalanceReqVO updateReqVO) {
+        payWalletApi.updateBalance(BeanUtils.toBean(updateReqVO, PayWalletUpdateBalanceReqDTO.class)
+                .setUserId(updateReqVO.getId()));
         return success(true);
     }
 
