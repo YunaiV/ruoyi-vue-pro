@@ -18,6 +18,8 @@ import cn.iocoder.yudao.module.member.api.address.dto.MemberAddressRespDTO;
 import cn.iocoder.yudao.module.pay.api.order.PayOrderApi;
 import cn.iocoder.yudao.module.pay.api.order.dto.PayOrderCreateReqDTO;
 import cn.iocoder.yudao.module.pay.api.order.dto.PayOrderRespDTO;
+import cn.iocoder.yudao.module.pay.api.refund.PayRefundApi;
+import cn.iocoder.yudao.module.pay.api.refund.dto.PayRefundCreateReqDTO;
 import cn.iocoder.yudao.module.pay.enums.order.PayOrderStatusEnum;
 import cn.iocoder.yudao.module.product.api.comment.ProductCommentApi;
 import cn.iocoder.yudao.module.product.api.comment.dto.ProductCommentCreateReqDTO;
@@ -111,6 +113,8 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
     private ProductCommentApi productCommentApi;
     @Resource
     public SocialClientApi socialClientApi;
+    @Resource
+    public PayRefundApi payRefundApi;
 
     @Resource
     private TradeOrderProperties tradeOrderProperties;
@@ -855,14 +859,28 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void cancelPaidOrder(Long userId, Long orderId) {
-        // TODO @puhui999：需要校验状态；已支付的情况下，才可以。
+        // 1.1 检验订单存在
         TradeOrderDO order = tradeOrderMapper.selectOrderByIdAndUserId(orderId, userId);
         if (order == null) {
             throw exception(ORDER_NOT_FOUND);
         }
-        cancelOrder0(order, TradeOrderCancelTypeEnum.MEMBER_CANCEL);
+        // 1.2 校验订单是否支付
+        if (!order.getPayStatus()) {
+            throw exception(ORDER_CANCEL_PAID_FAIL, "已支付");
+        }
+        // 1.3 校验订单是否已退款
+        if (ObjUtil.equal(TradeOrderRefundStatusEnum.NONE.getStatus(), order.getRefundStatus())) {
+            throw exception(ORDER_CANCEL_PAID_FAIL, "未退款");
+        }
 
-        // TODO @puhui999：需要退款
+        // 2.1 取消订单
+        cancelOrder0(order, TradeOrderCancelTypeEnum.AFTER_SALE_CLOSE);
+        // 2.2 创建退款单
+        payRefundApi.createRefund(new PayRefundCreateReqDTO()
+                .setAppKey(tradeOrderProperties.getPayAppKey()).setUserIp(getClientIP()) // 支付应用
+                .setMerchantOrderId(String.valueOf(order.getId())) // 支付单号
+                .setMerchantRefundId(String.valueOf(order.getId()))
+                .setReason("取消支付订单").setPrice(order.getPayPrice()));// 价格信息
     }
 
     /**
