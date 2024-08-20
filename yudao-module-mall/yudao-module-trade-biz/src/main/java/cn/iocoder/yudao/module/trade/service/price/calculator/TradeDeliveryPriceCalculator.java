@@ -60,6 +60,7 @@ public class TradeDeliveryPriceCalculator implements TradePriceCalculator {
         if (param.getDeliveryType() == null) {
             return;
         }
+        // TODO @puhui999：1）TradePriceCalculateRespBO 传递进来 delveryType 配送方式，减少读取；2）如果不匹配，抛出业务异常； = = 不然就不扣钱啦。
         // 校验是不是存在商品不能门店自提，或者不能快递发货的情况。就是说，配送方式不匹配哈
         List<ProductSpuRespDTO> spuList = productSpuApi.getSpuList(convertSet(result.getItems(), OrderItem::getSpuId));
         if (anyMatch(spuList, item -> !item.getDeliveryTypes().contains(param.getDeliveryType()))) {

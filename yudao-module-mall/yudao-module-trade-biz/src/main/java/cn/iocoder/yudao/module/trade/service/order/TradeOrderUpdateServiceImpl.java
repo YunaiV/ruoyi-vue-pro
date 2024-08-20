@@ -859,6 +859,7 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void cancelPaidOrder(Long userId, Long orderId) {
+        // TODO @puhui999：可能要加一个拼团取消；TradeOrderCancelTypeEnum.AFTER_SALE_CLOSE；然后参数传入下；
         // 1.1 检验订单存在
         TradeOrderDO order = tradeOrderMapper.selectOrderByIdAndUserId(orderId, userId);
         if (order == null) {
