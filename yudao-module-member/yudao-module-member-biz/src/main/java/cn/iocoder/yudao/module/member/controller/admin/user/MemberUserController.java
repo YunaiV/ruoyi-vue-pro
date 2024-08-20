@@ -3,7 +3,6 @@ package cn.iocoder.yudao.module.member.controller.admin.user;
 import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.member.controller.admin.user.vo.*;
 import cn.iocoder.yudao.module.member.convert.user.MemberUserConvert;
 import cn.iocoder.yudao.module.member.dal.dataobject.group.MemberGroupDO;
@@ -16,8 +15,6 @@ import cn.iocoder.yudao.module.member.service.level.MemberLevelService;
 import cn.iocoder.yudao.module.member.service.point.MemberPointRecordService;
 import cn.iocoder.yudao.module.member.service.tag.MemberTagService;
 import cn.iocoder.yudao.module.member.service.user.MemberUserService;
-import cn.iocoder.yudao.module.pay.api.wallet.PayWalletApi;
-import cn.iocoder.yudao.module.pay.api.wallet.dto.PayWalletUpdateBalanceReqDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -53,8 +50,6 @@ public class MemberUserController {
     private MemberGroupService memberGroupService;
     @Resource
     private MemberPointRecordService memberPointRecordService;
-    @Resource
-    private PayWalletApi payWalletApi;
 
     @PutMapping("/update")
     @Operation(summary = "更新会员用户")
@@ -78,15 +73,6 @@ public class MemberUserController {
     public CommonResult<Boolean> updateUserPoint(@Valid @RequestBody MemberUserUpdatePointReqVO updateReqVO) {
         memberPointRecordService.createPointRecord(updateReqVO.getId(), updateReqVO.getPoint(),
                 MemberPointBizTypeEnum.ADMIN, String.valueOf(getLoginUserId()));
-        return success(true);
-    }
-
-    @PutMapping("/update-balance")
-    @Operation(summary = "更新会员用户余额")
-    @PreAuthorize("@ss.hasPermission('member:user:update-balance')")
-    public CommonResult<Boolean> updateUserBalance(@Valid @RequestBody MemberUserUpdateBalanceReqVO updateReqVO) {
-        payWalletApi.updateBalance(BeanUtils.toBean(updateReqVO, PayWalletUpdateBalanceReqDTO.class)
-                .setUserId(updateReqVO.getId()));
         return success(true);
     }
 
