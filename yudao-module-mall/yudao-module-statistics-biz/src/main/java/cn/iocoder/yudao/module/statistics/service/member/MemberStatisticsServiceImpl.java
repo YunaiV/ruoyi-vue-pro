@@ -69,9 +69,18 @@ public class MemberStatisticsServiceImpl implements MemberStatisticsService {
                 bo -> AreaUtils.getParentIdByType(bo.getAreaId(), AreaTypeEnum.PROVINCE),
                 bo -> bo,
                 (a, b) -> new MemberAreaStatisticsRespBO()
-                        .setOrderCreateUserCount(a.getOrderCreateUserCount() + b.getOrderCreateUserCount())
-                        .setOrderPayUserCount(a.getOrderPayUserCount() + b.getOrderPayUserCount())
-                        .setOrderPayPrice(a.getOrderPayPrice() + b.getOrderPayPrice()));
+                        .setOrderCreateUserCount(
+                                (a.getOrderCreateUserCount() != null ? a.getOrderCreateUserCount() : 0) +
+                                        (b.getOrderCreateUserCount() != null ? b.getOrderCreateUserCount() : 0)
+                        )
+                        .setOrderPayUserCount(
+                                (a.getOrderPayUserCount() != null ? a.getOrderPayUserCount() : 0) +
+                                        (b.getOrderPayUserCount() != null ? b.getOrderPayUserCount() : 0)
+                        )
+                        .setOrderPayPrice(
+                                (a.getOrderPayPrice() != null ? a.getOrderPayPrice() : 0.0) +
+                                        (b.getOrderPayPrice() != null ? b.getOrderPayPrice() : 0.0)
+                        )
         // 拼接数据
         List<Area> areaList = AreaUtils.getByType(AreaTypeEnum.PROVINCE, area -> area);
         areaList.add(new Area().setId(null).setName("未知"));
