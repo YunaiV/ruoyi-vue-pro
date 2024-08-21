@@ -13,14 +13,15 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 import java.util.zip.GZIPInputStream;
 
+import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.springframework.retry.support.RetryTemplate;
 import org.springframework.retry.support.RetryTemplateBuilder;
 import org.springframework.stereotype.Component;
 
-import com.alibaba.fastjson2.JSON;
-import com.alibaba.fastjson2.JSONArray;
-import com.alibaba.fastjson2.JSONObject;
+//import com.alibaba.fastjson2.JSON;
+//import com.alibaba.fastjson2.JSONArray;
+//import com.alibaba.fastjson2.JSONObject;
 
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.HttpUrl;
@@ -78,7 +79,7 @@ public class Util {
         String fullUrl = urlWithParams(url, queryParams);
         log.debug("full url: " + fullUrl);
 
-        String bodyString = JSON.toJSONString(payload);
+        String bodyString = JsonUtils.toJsonString(payload);
         RequestBody body = RequestBody.create(bodyString, MediaType.parse("application/json; charset=utf-8"));
         log.debug("body: " + bodyString);
         
@@ -120,7 +121,7 @@ public class Util {
         }
         log.debug("response: " + responseString);
 
-        return JSONObject.parseObject(responseString, responseClass);
+        return JsonUtils.parseObject2(responseString, responseClass);
     }
 
     public static <T> T getRequest(String url, Map<String, String> queryParams, Map<String, String> headers, Class<T> responseClass) {
@@ -154,7 +155,7 @@ public class Util {
             byte[] decompressedData = byteArrayOutputStream.toByteArray();
             String jsonString = new String(decompressedData);
             log.debug(jsonString);
-            return JSON.parseObject(jsonString, objectClass);
+            return JsonUtils.parseObject(jsonString, objectClass);
         } catch (Exception e) {
             log.error(compression);
             throw new RuntimeException(e);

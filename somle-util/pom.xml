@@ -14,6 +14,11 @@
 
     <dependencies>
         <dependency>
+            <groupId>cn.iocoder.boot</groupId>
+            <artifactId>yudao-common</artifactId>
+        </dependency>
+
+        <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
         </dependency>

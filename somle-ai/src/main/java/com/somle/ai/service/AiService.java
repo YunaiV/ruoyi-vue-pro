@@ -1,7 +1,6 @@
 package com.somle.ai.service;
 
-import com.alibaba.fastjson2.JSON;
-import com.alibaba.fastjson2.JSONObject;
+import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import com.somle.ai.model.AiName;
 import com.somle.ai.model.AiResponse;
 import com.somle.erp.model.ErpCountry;
@@ -53,8 +52,8 @@ public class AiService {
         return getNew("/api/persons/", dataDate, AiName.class);
     }
 
-    public Stream<JSONObject> getAddresses(LocalDate dataDate) {
-        return getNew("/api/locationsdtl/", dataDate, JSONObject.class);
+    public Stream<String> getAddresses(LocalDate dataDate) {
+        return getNew("/api/locationsdtl/", dataDate, String.class);
     }
 
     public <T> Stream<T> getNew(String endUrl, LocalDate dataDate, Class<T> objectclass) {
@@ -99,12 +98,12 @@ public class AiService {
     public Stream<ErpCountry> getCountries() {
         String endUrl = "/api/countriesiso/";
         String response = Util.getRequest(baseUrl + endUrl, Map.of(), headers, String.class);
-        return JSON.parseArray(response, ErpCountry.class).stream();
+        return JsonUtils.parseArray(response, ErpCountry.class).stream();
     }
 
     public Stream<ErpCurrency> getCurrencies() {
         String endUrl = "/api/currency/";
         String response = Util.getRequest(baseUrl + endUrl, Map.of(), headers, String.class);
-        return JSON.parseArray(response, ErpCurrency.class).stream();
+        return JsonUtils.parseArray(response, ErpCurrency.class).stream();
     }
 }

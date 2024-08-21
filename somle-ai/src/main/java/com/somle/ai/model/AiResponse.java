@@ -3,16 +3,17 @@ package com.somle.ai.model;
 import java.util.List;
 import java.util.stream.Stream;
 
-import com.alibaba.fastjson2.JSON;
-import com.alibaba.fastjson2.PropertyNamingStrategy;
-import com.alibaba.fastjson2.annotation.JSONType;
 
+import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @Builder
-@JSONType(naming = PropertyNamingStrategy.SnakeCase)
+@AllArgsConstructor
+@NoArgsConstructor
 public class AiResponse {
     private String previous;
     private String next;
@@ -20,6 +21,6 @@ public class AiResponse {
     private List<String> results;
 
     public <T> Stream<T> getResults(Class<T> objectClass) {
-        return results.stream().map(n->JSON.parseObject(n, objectClass));
+        return results.stream().map(n-> JsonUtils.parseObject(n, objectClass));
     }
 }

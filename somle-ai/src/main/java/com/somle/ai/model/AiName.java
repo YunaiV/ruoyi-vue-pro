@@ -1,14 +1,16 @@
 package com.somle.ai.model;
 
-import com.alibaba.fastjson2.PropertyNamingStrategy;
-import com.alibaba.fastjson2.annotation.JSONType;
 
+
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @Builder
-@JSONType(naming = PropertyNamingStrategy.SnakeCase)
+@AllArgsConstructor
+@NoArgsConstructor
 public class AiName {
     private String name;
     private String firstName;
