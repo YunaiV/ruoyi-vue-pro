@@ -8,7 +8,7 @@ import com.alibaba.fastjson2.annotation.JSONType;
 import lombok.Data;
 
 @Data
-@JSONType(naming = PropertyNamingStrategy.SnakeCase)
+@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class EccangUserAccount {
     private LocalDateTime lastOauthTime;
     private LocalDateTime lastAuthTime;

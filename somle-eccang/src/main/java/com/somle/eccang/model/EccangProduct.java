@@ -17,7 +17,7 @@ import java.util.stream.Stream;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@JSONType(naming = PropertyNamingStrategy.SnakeCase)
+@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class EccangProduct {
     private String actionType;
     private String productSku;

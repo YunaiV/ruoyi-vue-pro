@@ -1,5 +1,7 @@
 package com.somle.erp.model;
 
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -11,15 +13,14 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Transient;
 
-import com.alibaba.fastjson2.PropertyNamingStrategy;
-import com.alibaba.fastjson2.annotation.JSONType;
+
 
 @Entity
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@JSONType(naming = PropertyNamingStrategy.SnakeCase)
+@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class ErpDepartment {
     @Id
     private Long id;

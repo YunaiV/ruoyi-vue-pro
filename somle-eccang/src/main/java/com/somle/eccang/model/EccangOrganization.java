@@ -10,7 +10,7 @@ import lombok.Data;
 
 @Data
 @Builder
-@JSONType(naming = PropertyNamingStrategy.SnakeCase)
+@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class EccangOrganization {
     private Integer id;              // 组织id
     private String nameEn;       // 英文名

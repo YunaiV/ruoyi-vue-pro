@@ -1,15 +1,15 @@
 package com.somle.erp.model;
 
-import com.alibaba.fastjson2.PropertyNamingStrategy;
-import com.alibaba.fastjson2.annotation.JSONType;
 
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.Builder;
 import lombok.Data;
 
 
 @Data
 @Builder
-@JSONType(naming = PropertyNamingStrategy.SnakeCase)
+@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class ErpAddress {
     private String line1;
     private String line2;

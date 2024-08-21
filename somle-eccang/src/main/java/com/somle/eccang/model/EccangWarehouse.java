@@ -6,7 +6,7 @@ import com.alibaba.fastjson2.annotation.JSONType;
 import lombok.Data;
 
 @Data
-@JSONType(naming = PropertyNamingStrategy.SnakeCase)
+@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class EccangWarehouse {
     private int warehouseId; // 仓库ID
     private String warehouseCode; // 仓库代码

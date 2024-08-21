@@ -4,10 +4,12 @@ import java.util.List;
 import com.alibaba.fastjson2.annotation.JSONType;
 import com.alibaba.fastjson2.PropertyNamingStrategy;
 
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.Data;
 
 @Data
-@JSONType(naming = PropertyNamingStrategy.SnakeCase)
+@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class KingdeeCustomField {
     private String number;
     private String displayName;

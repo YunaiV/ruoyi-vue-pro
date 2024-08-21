@@ -10,7 +10,7 @@ import com.alibaba.fastjson2.PropertyNamingStrategy;
 import com.alibaba.fastjson2.annotation.JSONType;
 
 @Data
-@JSONType(naming = PropertyNamingStrategy.SnakeCase)
+@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class EccangResponse {
     private String code;
     private String message;
@@ -26,7 +26,7 @@ public class EccangResponse {
     }
 
     @Data
-    @JSONType(naming = PropertyNamingStrategy.SnakeCase)
+    @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
     public static class BizContent {
         private Integer total;
         private Integer totalCount;

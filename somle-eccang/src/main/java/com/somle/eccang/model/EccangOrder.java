@@ -8,7 +8,7 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-@JSONType(naming = PropertyNamingStrategy.SnakeCase)
+@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class EccangOrder {
     private String productCount;
     private String platformShipStatus;
@@ -84,7 +84,7 @@ public class EccangOrder {
     }
 
     @Data
-    @JSONType(naming = PropertyNamingStrategy.SnakeCase)
+    @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
     public static class EccangOrderDetail {
         private String opRefItemLocation;
         private String productSkuInfo;
@@ -111,7 +111,7 @@ public class EccangOrder {
         private String productSkuOrgQty;
 
         @Data
-        @JSONType(naming = PropertyNamingStrategy.SnakeCase)
+        @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
         public static class WarehouseSku {
             private String productLevel;
             private String warehouseSku;
@@ -120,7 +120,7 @@ public class EccangOrder {
     }
 
     @Data
-    @JSONType(naming = PropertyNamingStrategy.SnakeCase)
+    @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
     public static class EccangAddress {
         private String shippingAddressId;
         private String updateDate;
