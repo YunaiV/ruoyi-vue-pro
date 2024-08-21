@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
+import cn.hutool.core.collection.BoundedPriorityQueue;
+import com.somle.eccang.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.integration.support.MessageBuilder;
 import org.springframework.messaging.MessageChannel;
@@ -17,15 +19,7 @@ import org.springframework.stereotype.Service;
 
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
-import com.somle.eccang.model.EccangCategory;
-import com.somle.eccang.model.EccangOrder;
-import com.somle.eccang.model.EccangOrganization;
-import com.somle.eccang.model.EccangProduct;
-import com.somle.eccang.model.EccangResponse;
 import com.somle.eccang.model.EccangResponse.BizContent;
-import com.somle.eccang.model.EccangToken;
-import com.somle.eccang.model.EccangUserAccount;
-import com.somle.eccang.model.EccangWarehouse;
 import com.somle.eccang.repository.EccangTokenRepository;
 import com.somle.util.Limiter;
 import com.somle.util.Util;
@@ -246,15 +240,15 @@ public class EccangService {
             });
     }
 
-    // @Scheduled(fixedDelay = 999999999, initialDelay = 1000)
-    // public void getOrderShip() {
-    //     LocalDateTime endTime = LocalDate.of(2024, 7, 13).atStartOfDay();
-    //     LocalDateTime starTime = LocalDate.of(2024, 7, 11).atStartOfDay();
-    //     getOrderShip(starTime, endTime)
-    //         .forEach(order->{
-    //             saleChannel.send(MessageBuilder.withPayload(toEsb(order)).build());
-    //         });
-    // }
+    public Stream<BizContent> getOrder(EccangOrderVO order) {
+        JSONObject options = new JSONObject();
+        options.put("get_detail", "1");
+        options.put("get_address", "1");
+
+        JSONObject params = new JSONObject(options);
+        params.put("condition", order);
+        return getAllBiz(params, "getOrderList");
+    }
 
     public EccangProduct getProduct(String sku) {
         EccangProduct product = EccangProduct.builder()
@@ -343,11 +337,6 @@ public class EccangService {
         }
         return code;
     }
-
-
-
-
-
 
 
 }

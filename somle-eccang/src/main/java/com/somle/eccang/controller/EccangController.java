@@ -1,6 +1,8 @@
 package com.somle.eccang.controller;
 
 import com.alibaba.fastjson2.JSONObject;
+import com.somle.eccang.model.EccangOrder;
+import com.somle.eccang.model.EccangOrderVO;
 import com.somle.eccang.model.EccangResponse.BizContent;
 import com.somle.eccang.model.EccangProduct;
 import com.somle.eccang.service.EccangService;
@@ -31,6 +33,13 @@ public class EccangController {
             @RequestParam String endTime
     ) {
         return eccangService.getOrderShipPage(LocalDateTime.parse(startTime), LocalDateTime.parse(endTime)).toList();
+    }
+
+    @GetMapping("/getOrder")
+    public List<BizContent> getOrder(
+        @RequestParam EccangOrderVO order
+    ) {
+        return eccangService.getOrder(order).toList();
     }
 
     @GetMapping("/getProducts")

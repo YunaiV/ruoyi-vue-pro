@@ -248,7 +248,7 @@ public class EsbService {
 
                 break;
 
-            case AMAZONSP:
+            case AMAZONAD:
                 amazonService.adClient.getAllAdReport(beforeYesterday)
                     .forEach(page -> {
                         OssData data = OssData.builder()
@@ -264,7 +264,7 @@ public class EsbService {
                     });
                 break;
 
-            case AMAZONAD:
+            case AMAZONSP:
                 amazonService.spClient.getAllAsinReport(beforeYesterday).parallel()
                     .forEach(page -> {
                         OssData data = OssData.builder()

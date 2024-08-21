@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Stream;
 
 @Slf4j
@@ -89,21 +90,40 @@ public class AiService {
     public Stream<AiResponse> getReponses(String url) {
         log.debug("fetching from url: " + url);
         AiResponse response = Util.getRequest(url, Map.of(), headers, AiResponse.class);
+//        return response;
 
         log.debug("next url is: " + response.getNext());
         Stream<AiResponse> moreResponse = response.getNext() == null ? Stream.empty() : getReponses(response.getNext());
         return Stream.concat(Stream.of(response), moreResponse);
     }
 
+//    public Stream<AiResponse> getAllReponses(String url) {
+//        return Stream.iterate(
+//            getReponses(url), Objects::nonNull,
+//            page -> {
+//                var next = page.getNext();
+//                if (next != null) {
+//                    log.debug("have next");
+//                    return getReponses(next);
+//                } else {
+//                    log.debug("no next page");
+//                    return null;
+//                }
+//            }
+//        );
+//    }
+
     public Stream<ErpCountry> getCountries() {
         String endUrl = "/api/countriesiso/";
-        String response = Util.getRequest(baseUrl + endUrl, Map.of(), headers, String.class);
-        return JsonUtils.parseArray(response, ErpCountry.class).stream();
+//        String response = Util.getRequest(baseUrl + endUrl, Map.of(), headers, String.class);
+//        return JsonUtils.parseArray(response, ErpCountry.class).stream();
+        return getResults(baseUrl + endUrl, ErpCountry.class);
     }
 
     public Stream<ErpCurrency> getCurrencies() {
         String endUrl = "/api/currency/";
-        String response = Util.getRequest(baseUrl + endUrl, Map.of(), headers, String.class);
-        return JsonUtils.parseArray(response, ErpCurrency.class).stream();
+//        String response = Util.getRequest(baseUrl + endUrl, Map.of(), headers, String.class);
+//        return JsonUtils.parseArray(response, ErpCurrency.class).stream();
+        return getResults(baseUrl + endUrl, ErpCurrency.class);
     }
 }
