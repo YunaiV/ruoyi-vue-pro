@@ -9,7 +9,10 @@ import cn.hutool.core.util.*;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.simple.BpmSimpleModelNodeVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.simple.BpmSimpleModelNodeVO.RejectHandler;
-import cn.iocoder.yudao.module.bpm.enums.definition.*;
+import cn.iocoder.yudao.module.bpm.enums.definition.BpmBoundaryEventType;
+import cn.iocoder.yudao.module.bpm.enums.definition.BpmSimpleModeConditionType;
+import cn.iocoder.yudao.module.bpm.enums.definition.BpmSimpleModelNodeType;
+import cn.iocoder.yudao.module.bpm.enums.definition.BpmUserTaskApproveMethodEnum;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnModelConstants;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.listener.BpmCopyTaskDelegate;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.simplemodel.SimpleModelConditionGroups;
@@ -17,12 +20,18 @@ import org.flowable.bpmn.BpmnAutoLayout;
 import org.flowable.bpmn.model.Process;
 import org.flowable.bpmn.model.*;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 import static cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.simple.BpmSimpleModelNodeVO.OperationButtonSetting;
 import static cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.simple.BpmSimpleModelNodeVO.TimeoutHandler;
 import static cn.iocoder.yudao.module.bpm.enums.definition.BpmSimpleModelNodeType.*;
+import static cn.iocoder.yudao.module.bpm.enums.definition.BpmUserTaskApproveTypeEnum.USER;
+import static cn.iocoder.yudao.module.bpm.enums.definition.BpmUserTaskAssignStartUserHandlerTypeEnum.SKIP;
 import static cn.iocoder.yudao.module.bpm.enums.definition.BpmUserTaskTimeoutHandlerTypeEnum.REMINDER;
+import static cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmTaskCandidateStrategyEnum.START_USER;
 import static cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnModelConstants.*;
 import static cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.SimpleModelConstants.*;
 import static org.flowable.bpmn.constants.BpmnXMLConstants.*;
@@ -76,17 +85,27 @@ public class SimpleModelUtils {
         process.setExecutable(Boolean.TRUE); // TODO @jason：这个是必须设置的么？
         bpmnModel.addProcess(process);
 
-        // 前端模型数据结构
-        // 从 SimpleModel 构建 FlowNode 并添加到 Main Process
-        traverseNodeToBuildFlowNode(simpleModelNode, process);
+        // 目前前端的第一个节点是 发起人节点。这里构建一个StartNode. 用于创建 Bpmn 的 StartEvent 节点
+        BpmSimpleModelNodeVO startNode = buildStartSimpleModelNode();
+        startNode.setChildNode(simpleModelNode);
+        // 从 前端模型数据结构 SimpleModel 构建 FlowNode 并添加到 Main Process
+        traverseNodeToBuildFlowNode(startNode, process);
         // 找到 end event
         EndEvent endEvent = (EndEvent) CollUtil.findOne(process.getFlowElements(), item -> item instanceof EndEvent);
 
         // 构建并添加节点之间的连线 Sequence Flow
-        traverseNodeToBuildSequenceFlow(process, simpleModelNode, endEvent.getId());
+        traverseNodeToBuildSequenceFlow(process, startNode, endEvent.getId());
         // 自动布局
         new BpmnAutoLayout(bpmnModel).execute();
         return bpmnModel;
+    }
+
+    private static BpmSimpleModelNodeVO buildStartSimpleModelNode() {
+        BpmSimpleModelNodeVO startNode = new BpmSimpleModelNodeVO();
+        startNode.setId(START_EVENT_NODE_ID);
+        startNode.setName(START_EVENT_NODE_NAME);
+        startNode.setType(START_NODE.getType());
+        return startNode;
     }
 
     // TODO @芋艿：在优化下这个注释
@@ -288,6 +307,11 @@ public class SimpleModelUtils {
                 list.add(endEvent);
                 break;
             }
+            case START_USER_NODE: { // 发起人节点
+                UserTask userTask = convertStartUserNode(node);
+                list.add(userTask);
+                break;
+            }
             case APPROVE_NODE: { // 审批节点
                 List<FlowElement> flowElements = convertApproveNode(node);
                 list.addAll(flowElements);
@@ -309,14 +333,8 @@ public class SimpleModelUtils {
                 break;
             }
 
-            case INCLUSIVE_BRANCH_FORK_NODE: {
-                InclusiveGateway inclusiveGateway = convertInclusiveBranchNode(node, Boolean.TRUE);
-                list.add(inclusiveGateway);
-                break;
-            }
-            case INCLUSIVE_BRANCH_JOIN_NODE: {
-                InclusiveGateway inclusiveGateway = convertInclusiveBranchNode(node, Boolean.FALSE);
-                list.add(inclusiveGateway);
+            case INCLUSIVE_BRANCH_NODE: {
+                // TODO jason 待实现
                 break;
             }
             default: {
@@ -325,6 +343,11 @@ public class SimpleModelUtils {
         }
         return list;
     }
+
+    private static UserTask convertStartUserNode(BpmSimpleModelNodeVO node) {
+        return buildBpmnStartUserTask(node);
+    }
+
 
     private static List<FlowElement> convertApproveNode(BpmSimpleModelNodeVO node) {
         List<FlowElement> flowElements = new ArrayList<>();
@@ -444,7 +467,7 @@ public class SimpleModelUtils {
 
         // 如果不是审批人节点，则直接返回
         addExtensionElement(userTask, USER_TASK_APPROVE_TYPE, StrUtil.toStringOrNull(node.getApproveType()));
-        if (ObjectUtil.notEqual(node.getApproveType(), BpmUserTaskApproveTypeEnum.USER.getType())) {
+        if (ObjectUtil.notEqual(node.getApproveType(), USER.getType())) {
             return userTask;
         }
 
@@ -576,17 +599,32 @@ public class SimpleModelUtils {
 
     // ========== 各种 build 节点的方法 ==========
 
-    private static StartEvent convertStartNode(BpmSimpleModelNodeVO node) {
+    private static StartEvent  convertStartNode(BpmSimpleModelNodeVO node) {
         StartEvent startEvent = new StartEvent();
         startEvent.setId(node.getId());
         startEvent.setName(node.getName());
-
         // TODO 芋艿 + jason：要不要在开启节点后面，加一个“发起人”任务节点，然后自动审批通过
         // @芋艿 这个是不是由前端来实现。 默认开始节点后面跟一个 “发起人”的审批节点(审批人是发起人自己）。
-        // 我看有些平台这个审批节点允许删除，有些不允许。由用户决定
         return startEvent;
     }
 
+    private static UserTask buildBpmnStartUserTask(BpmSimpleModelNodeVO node) {
+        UserTask userTask = new UserTask();
+        userTask.setId(node.getId());
+        userTask.setName(node.getName());
+        // 人工审批
+        addExtensionElement(userTask, USER_TASK_APPROVE_TYPE, USER.getType().toString());
+        // 候选人策略为发起人自己
+        addCandidateElements(START_USER.getStrategy(),null, userTask);
+        // 添加表单字段权限属性元素
+        addFormFieldsPermission(node.getFieldsPermission(), userTask);
+        // 添加操作按钮配置属性元素.
+        addButtonsSetting(node.getButtonsSetting(), userTask);
+        // 使用自动通过策略。TODO @芋艿 复用了SKIP， 是否需要新加一个策略
+        addAssignStartUserHandlerType(SKIP.getType(), userTask);
+
+        return userTask;
+    }
     private static EndEvent convertEndNode(BpmSimpleModelNodeVO node) {
         EndEvent endEvent = new EndEvent();
         endEvent.setId(node.getId());

@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.module.bpm.framework.flowable.core.candidate.strategy;
 
-import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Assert;
 import cn.iocoder.yudao.framework.common.util.string.StrUtils;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.candidate.BpmTaskCandidateStrategy;
@@ -9,7 +8,6 @@ import cn.iocoder.yudao.module.system.api.dept.DeptApi;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
 import java.util.Set;
 
 /**

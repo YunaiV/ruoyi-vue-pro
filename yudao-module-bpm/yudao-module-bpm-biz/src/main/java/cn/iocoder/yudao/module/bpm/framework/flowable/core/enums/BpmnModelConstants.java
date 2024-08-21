@@ -99,4 +99,14 @@ public interface BpmnModelConstants {
      */
     String BUTTON_SETTING_ELEMENT_ENABLE_ATTRIBUTE = "enable";
 
+    /**
+     * BPMN Start Event Node Id
+     */
+    String START_EVENT_NODE_ID = "StartEvent";
+
+    /**
+     * BPMN Start Event Node Name
+     */
+    String START_EVENT_NODE_NAME = "开始";
+
 }

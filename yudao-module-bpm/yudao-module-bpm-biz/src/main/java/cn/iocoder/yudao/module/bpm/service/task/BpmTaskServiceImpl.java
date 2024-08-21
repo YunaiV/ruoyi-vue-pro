@@ -59,6 +59,7 @@ import java.util.stream.Stream;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
 import static cn.iocoder.yudao.module.bpm.enums.ErrorCodeConstants.*;
+import static cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnVariableConstants.PROCESS_INSTANCE_VARIABLE_RETURN_FLAG;
 
 /**
  * 流程任务实例 Service 实现类
@@ -194,7 +195,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         // 为什么判断 assignee 非空的情况下？
         // 例如说：在审批人为空时，我们会有“自动审批通过”的策略，此时 userId 为 null，允许通过
         if (StrUtil.isNotBlank(task.getAssignee())
-            && ObjectUtil.notEqual(userId, NumberUtils.parseLong(task.getAssignee()))) {
+                && ObjectUtil.notEqual(userId, NumberUtils.parseLong(task.getAssignee()))) {
             throw exception(TASK_OPERATE_FAIL_ASSIGN_NOT_SELF);
         }
         return task;
@@ -618,6 +619,9 @@ public class BpmTaskServiceImpl implements BpmTaskService {
             updateTaskStatusAndReason(task.getId(), BpmTaskStatusEnum.RETURN.getStatus(), reqVO.getReason());
         });
 
+        // 设置流程变量节点驳回标记。用于驳回到节点。不执行 BpmUserTaskAssignStartUserHandlerTypeEnum 策略 而自动通过
+        runtimeService.setVariable(currentTask.getProcessInstanceId(),
+                String.format(PROCESS_INSTANCE_VARIABLE_RETURN_FLAG, reqVO.getTargetTaskDefinitionKey()), Boolean.TRUE);
         // 3. 执行驳回
         runtimeService.createChangeActivityStateBuilder()
                 .processInstanceId(currentTask.getProcessInstanceId())
@@ -894,7 +898,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
 
     /**
      * 重要补充说明：该方法目前主要有两个情况会调用到：
-     *
+     * <p>
      * 1. 或签场景 + 审批通过：一个或签有多个审批时，如果 A 审批通过，其它或签 B、C 等任务会被 Flowable 自动删除，此时需要通过该方法更新状态为已取消
      * 2. 审批不通过：在 {@link #rejectTask(Long, BpmTaskRejectReqVO)} 不通过时，对于加签的任务，不会被 Flowable 删除，此时需要通过该方法更新状态为已取消
      */
@@ -933,46 +937,50 @@ public class BpmTaskServiceImpl implements BpmTaskService {
                     log.error("[processTaskAssigned][taskId({}) 没有找到流程实例]", task.getId());
                     return;
                 }
-
                 // 审批人与提交人为同一人时，根据策略进行处理
                 if (StrUtil.equals(task.getAssignee(), processInstance.getStartUserId())) {
-                    BpmnModel bpmnModel = modelService.getBpmnModelByDefinitionId(processInstance.getProcessDefinitionId());
-                    if (bpmnModel == null) {
-                        log.error("[processTaskAssigned][taskId({}) 没有找到流程模型]", task.getId());
-                        return;
-                    }
-                    FlowElement userTaskElement = BpmnModelUtils.getFlowElementById(bpmnModel, task.getTaskDefinitionKey());
-                    Integer assignStartUserHandlerType = BpmnModelUtils.parseAssignStartUserHandlerType(userTaskElement);
+                    // 判断是否为回退或者驳回
+                    Boolean returnTaskFlag = runtimeService.getVariable(processInstance.getProcessInstanceId(),
+                            String.format(PROCESS_INSTANCE_VARIABLE_RETURN_FLAG, task.getTaskDefinitionKey()), Boolean.class);
+                    if (!BooleanUtil.isTrue(returnTaskFlag)) { // 如果是回退或者驳回不走这个策略
+                        BpmnModel bpmnModel = modelService.getBpmnModelByDefinitionId(processInstance.getProcessDefinitionId());
+                        if (bpmnModel == null) {
+                            log.error("[processTaskAssigned][taskId({}) 没有找到流程模型]", task.getId());
+                            return;
+                        }
+                        FlowElement userTaskElement = BpmnModelUtils.getFlowElementById(bpmnModel, task.getTaskDefinitionKey());
+                        Integer assignStartUserHandlerType = BpmnModelUtils.parseAssignStartUserHandlerType(userTaskElement);
 
-                    // 情况一：自动跳过
-                    if (ObjectUtils.equalsAny(assignStartUserHandlerType,
-                            BpmUserTaskAssignStartUserHandlerTypeEnum.SKIP.getType())) {
-                        getSelf().approveTask(Long.valueOf(task.getAssignee()), new BpmTaskApproveReqVO().setId(task.getId())
-                                .setReason(BpmReasonEnum.ASSIGN_START_USER_APPROVE_WHEN_SKIP.getReason()));
-                        return;
-                    }
-                    // 情况二：转交给部门负责人审批
-                    if (ObjectUtils.equalsAny(assignStartUserHandlerType,
-                            BpmUserTaskAssignStartUserHandlerTypeEnum.TRANSFER_DEPT_LEADER.getType())) {
-                        AdminUserRespDTO startUser = adminUserApi.getUser(Long.valueOf(processInstance.getStartUserId()));
-                        Assert.notNull(startUser, "提交人({})信息为空", processInstance.getStartUserId());
-                        DeptRespDTO dept = startUser.getDeptId() != null ? deptApi.getDept(startUser.getDeptId()) : null;
-                        Assert.notNull(dept, "提交人({})部门({})信息为空", processInstance.getStartUserId(), startUser.getDeptId());
-                        // 找不到部门负责人的情况下，自动审批通过
-                        // noinspection DataFlowIssue
-                        if (dept.getLeaderUserId() == null) {
+                        // 情况一：自动跳过
+                        if (ObjectUtils.equalsAny(assignStartUserHandlerType,
+                                BpmUserTaskAssignStartUserHandlerTypeEnum.SKIP.getType())) {
                             getSelf().approveTask(Long.valueOf(task.getAssignee()), new BpmTaskApproveReqVO().setId(task.getId())
-                                    .setReason(BpmReasonEnum.ASSIGN_START_USER_APPROVE_WHEN_DEPT_LEADER_NOT_FOUND.getReason()));
+                                    .setReason(BpmReasonEnum.ASSIGN_START_USER_APPROVE_WHEN_SKIP.getReason()));
                             return;
                         }
-                        // 找得到部门负责人的情况下，修改负责人
-                        if (ObjectUtil.notEqual(dept.getLeaderUserId(), startUser.getId())) {
-                            getSelf().transferTask(Long.valueOf(task.getAssignee()), new BpmTaskTransferReqVO()
-                                    .setId(task.getId()).setAssigneeUserId(dept.getLeaderUserId())
-                                    .setReason(BpmReasonEnum.ASSIGN_START_USER_TRANSFER_DEPT_LEADER.getReason()));
-                            return;
+                        // 情况二：转交给部门负责人审批
+                        if (ObjectUtils.equalsAny(assignStartUserHandlerType,
+                                BpmUserTaskAssignStartUserHandlerTypeEnum.TRANSFER_DEPT_LEADER.getType())) {
+                            AdminUserRespDTO startUser = adminUserApi.getUser(Long.valueOf(processInstance.getStartUserId()));
+                            Assert.notNull(startUser, "提交人({})信息为空", processInstance.getStartUserId());
+                            DeptRespDTO dept = startUser.getDeptId() != null ? deptApi.getDept(startUser.getDeptId()) : null;
+                            Assert.notNull(dept, "提交人({})部门({})信息为空", processInstance.getStartUserId(), startUser.getDeptId());
+                            // 找不到部门负责人的情况下，自动审批通过
+                            // noinspection DataFlowIssue
+                            if (dept.getLeaderUserId() == null) {
+                                getSelf().approveTask(Long.valueOf(task.getAssignee()), new BpmTaskApproveReqVO().setId(task.getId())
+                                        .setReason(BpmReasonEnum.ASSIGN_START_USER_APPROVE_WHEN_DEPT_LEADER_NOT_FOUND.getReason()));
+                                return;
+                            }
+                            // 找得到部门负责人的情况下，修改负责人
+                            if (ObjectUtil.notEqual(dept.getLeaderUserId(), startUser.getId())) {
+                                getSelf().transferTask(Long.valueOf(task.getAssignee()), new BpmTaskTransferReqVO()
+                                        .setId(task.getId()).setAssigneeUserId(dept.getLeaderUserId())
+                                        .setReason(BpmReasonEnum.ASSIGN_START_USER_TRANSFER_DEPT_LEADER.getReason()));
+                                return;
+                            }
+                            // 如果部门负责人是自己，还是自己审批吧~
                         }
-                        // 如果部门负责人是自己，还是自己审批吧~
                     }
                 }
 
