@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.statistics.service.member;
 
 import cn.hutool.core.date.LocalDateTimeUtil;
+import cn.hutool.core.util.ObjectUtil;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.ip.core.Area;
 import cn.iocoder.yudao.framework.ip.core.enums.AreaTypeEnum;
@@ -15,10 +16,10 @@ import cn.iocoder.yudao.module.statistics.service.pay.PayWalletStatisticsService
 import cn.iocoder.yudao.module.statistics.service.pay.bo.RechargeSummaryRespBO;
 import cn.iocoder.yudao.module.statistics.service.trade.TradeOrderStatisticsService;
 import cn.iocoder.yudao.module.statistics.service.trade.TradeStatisticsService;
+import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
-import jakarta.annotation.Resource;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -69,18 +70,12 @@ public class MemberStatisticsServiceImpl implements MemberStatisticsService {
                 bo -> AreaUtils.getParentIdByType(bo.getAreaId(), AreaTypeEnum.PROVINCE),
                 bo -> bo,
                 (a, b) -> new MemberAreaStatisticsRespBO()
-                        .setOrderCreateUserCount(
-                                (a.getOrderCreateUserCount() != null ? a.getOrderCreateUserCount() : 0) +
-                                        (b.getOrderCreateUserCount() != null ? b.getOrderCreateUserCount() : 0)
-                        )
-                        .setOrderPayUserCount(
-                                (a.getOrderPayUserCount() != null ? a.getOrderPayUserCount() : 0) +
-                                        (b.getOrderPayUserCount() != null ? b.getOrderPayUserCount() : 0)
-                        )
-                        .setOrderPayPrice(
-                                (a.getOrderPayPrice() != null ? a.getOrderPayPrice() : 0.0) +
-                                        (b.getOrderPayPrice() != null ? b.getOrderPayPrice() : 0.0)
-                        )
+                        .setOrderCreateUserCount(ObjectUtil.defaultIfNull(a.getOrderCreateUserCount(), 0)
+                                + ObjectUtil.defaultIfNull(b.getOrderCreateUserCount(), 0))
+                        .setOrderPayUserCount(ObjectUtil.defaultIfNull(a.getOrderPayUserCount(), 0)
+                                + ObjectUtil.defaultIfNull(b.getOrderPayUserCount(), 0))
+                        .setOrderPayPrice(ObjectUtil.defaultIfNull(a.getOrderPayPrice(), 0)
+                                + ObjectUtil.defaultIfNull(b.getOrderPayPrice(), 0)));
         // 拼接数据
         List<Area> areaList = AreaUtils.getByType(AreaTypeEnum.PROVINCE, area -> area);
         areaList.add(new Area().setId(null).setName("未知"));
