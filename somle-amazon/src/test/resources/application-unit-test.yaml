@@ -20,6 +20,9 @@ spring:
       ddl-auto: update
       # format_sql: true
     # show-sql: true
+logging:
+  level:
+    com.somle: DEBUG
 
 --- #################### 数据库相关配置 ####################
 

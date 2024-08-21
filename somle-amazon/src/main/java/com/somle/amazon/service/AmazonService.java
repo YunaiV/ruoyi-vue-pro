@@ -62,32 +62,37 @@ public class AmazonService {
         body.put("grant_type", "refresh_token");
         account = accountRepository.findAll().get(0);
         for (AmazonSeller seller : account.getSellers()) {
-    
-            try {
-                body.put("client_id", account.getSpClientId());
-                body.put("client_secret", account.getSpClientSecret());
-                body.put("refresh_token", seller.getSpRefreshToken());
-                // JSONObject response = restTemplate.postForObject(authUrl, body, JSONObject.class);
-                JSONObject response = Util.postRequest(authUrl, Map.of(), Map.of(), body, JSONObject.class);
-                seller.setSpAccessToken(response.getString("access_token"));
-                accountRepository.save(account);
-            } catch (Exception e) {
-                log.error("Failed to set sp access token", e);
-                throw new RuntimeException("Failed to get access token", e);
-            }
+            seller.setSpAccessToken(
+                refreshAccessToken(
+                    account.getSpClientId(),
+                    account.getSpClientSecret(),
+                    seller.getSpRefreshToken()
+                )
+            );
 
-            try {
-                body.put("client_id", account.getSpClientId());
-                body.put("client_secret", account.getAdClientSecret());
-                body.put("refresh_token", seller.getAdRefreshToken());
-                JSONObject response = Util.postRequest(authUrl, Map.of(), Map.of(), body, JSONObject.class);
-                // JSONObject response = restTemplate.postForObject(authUrl, body, JSONObject.class);
-                seller.setAdAccessToken(response.getString("access_token"));
-                accountRepository.save(account);
-            } catch (Exception e) {
-                log.error("Failed to set ad access token", e);
-                throw new RuntimeException("Failed to get access token", e);
-            }
+            seller.setAdAccessToken(
+                refreshAccessToken(
+                    account.getAdClientId(),
+                    account.getAdClientSecret(),
+                    seller.getAdRefreshToken()
+                )
+            );
+        }
+        accountRepository.save(account);
+    }
+
+    public String refreshAccessToken(String clientId, String clientSecret, String refreshToken) {
+        JSONObject body = new JSONObject();
+        body.put("grant_type", "refresh_token");
+        try {
+            body.put("client_id", clientId);
+            body.put("client_secret", clientSecret);
+            body.put("refresh_token", refreshToken);
+            JSONObject response = Util.postRequest(authUrl, Map.of(), Map.of(), body, JSONObject.class);
+            var accessToken = response.getString("access_token");
+            return accessToken;
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to get access token", e);
         }
     }
 

@@ -5,6 +5,9 @@ spring:
   test:
     database:
       replace: none
+logging:
+  level:
+    com.somle: DEBUG
 
 --- #################### 数据库相关配置 ####################
 

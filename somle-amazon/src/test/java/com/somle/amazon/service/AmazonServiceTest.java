@@ -28,4 +28,10 @@ class AmazonServiceTest extends BaseSpringTest {
         var report = amazonService.spClient.getAsinReport("UK", LocalDate.of(2024,8,10));
         log.info(report.toString());
     }
+
+    @Test
+    void getAdReport() {
+        var report = amazonService.adClient.getAdReport("UK", LocalDate.of(2024,8,10));
+        log.info(report.toString());
+    }
 }

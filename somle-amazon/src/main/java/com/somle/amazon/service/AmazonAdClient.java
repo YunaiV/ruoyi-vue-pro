@@ -24,19 +24,6 @@ public class AmazonAdClient {
 
     private AmazonAccount account;
 
-    // @Value("${amazon.client.ad.id}")
-//    public String adClientId;
-
-    // private List<AmazonShop> shops;
-
-
-    // @Autowired
-//    AmazonSellerRepository sellerRepository;
-
-    // @EventListener(ApplicationReadyEvent.class)
-    // @Transactional(readOnly = true)
-    // public void initialize() {
-    // }
 
     public Stream<AmazonShop> getShops() {
         return account.getSellers().stream().flatMap(seller->seller.getShops().stream());
@@ -111,7 +98,9 @@ public class AmazonAdClient {
         String endpoint = region.getAdEndPoint();
         String fullUrl = endpoint + partialUrl;
 
-        
+        log.debug("profileId: " + shop.getProfileId());
+        log.debug("adClientId " + account.getAdClientId());
+        log.debug("Auth " + seller.getAdAccessToken());
 
         String contentType = "application/vnd.createasyncreportrequest.v3+json";
         Map<String, String> headers = Map.of(
@@ -121,6 +110,8 @@ public class AmazonAdClient {
             "Content-Type", contentType,
             "Accept", contentType
         );
+
+
 
 
 
