@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>com.somle</groupId>
+        <artifactId>somle-framework</artifactId>
+        <version>${revision}</version>
+    </parent>
+
+
+    <artifactId>somle-spring-boot-starter-test</artifactId>
+
+    <dependencies>
+<!--        <dependency>-->
+<!--            <groupId>cn.iocoder.boot</groupId>-->
+<!--            <artifactId>yudao-common</artifactId>-->
+<!--        </dependency>-->
+
+        <!-- DB 相关 -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jpa</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>cn.iocoder.boot</groupId>
+            <artifactId>yudao-spring-boot-starter-mybatis</artifactId>
+        </dependency>
+
+<!--        <dependency>-->
+<!--            <groupId>cn.iocoder.boot</groupId>-->
+<!--            <artifactId>yudao-spring-boot-starter-redis</artifactId>-->
+<!--        </dependency>-->
+
+        <!-- Test 测试相关 -->
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-inline</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+        </dependency>
+
+<!--        <dependency>-->
+<!--            <groupId>com.h2database</groupId> &lt;!&ndash; 单元测试，我们采用 H2 作为数据库 &ndash;&gt;-->
+<!--            <artifactId>h2</artifactId>-->
+<!--        </dependency>-->
+
+<!--        <dependency>-->
+<!--            <groupId>com.github.fppt</groupId> &lt;!&ndash; 单元测试，我们采用内嵌的 Redis 数据库 &ndash;&gt;-->
+<!--            <artifactId>jedis-mock</artifactId>-->
+<!--        </dependency>-->
+
+<!--        <dependency>-->
+<!--            <groupId>uk.co.jemos.podam</groupId> &lt;!&ndash; 单元测试，随机生成 POJO 类 &ndash;&gt;-->
+<!--            <artifactId>podam</artifactId>-->
+<!--        </dependency>-->
+    </dependencies>
+
+
+</project>

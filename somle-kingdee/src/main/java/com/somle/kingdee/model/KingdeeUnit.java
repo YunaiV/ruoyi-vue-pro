@@ -1,0 +1,27 @@
+package com.somle.kingdee.model;
+
+import java.time.LocalDateTime;
+
+import com.alibaba.fastjson2.PropertyNamingStrategy;
+import com.alibaba.fastjson2.annotation.JSONType;
+
+import lombok.Data;
+
+@Data
+@JSONType(naming = PropertyNamingStrategy.SnakeCase)
+public class KingdeeUnit {
+    private int conversionType;
+    private LocalDateTime createTime;
+    private String creatorId;
+    private boolean enable;
+    private String id;
+    private boolean isLeaf;
+    private int level;
+    private String longNumber;
+    private String modifierId;
+    private LocalDateTime modifyTime;
+    private String name;
+    private String number;
+    private int precision;
+    private int precisionAccount;
+}

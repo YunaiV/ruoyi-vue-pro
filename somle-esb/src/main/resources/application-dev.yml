@@ -1,0 +1,34 @@
+kingdee:
+  outerInstanceIds:
+    - 94464631434776576
+oss:
+  bucketName: somle-bigdata-dev
+logging:
+  level:
+    ROOT: INFO
+    org.springframework: DEBUG
+#    org.springframework.web: DEBUG
+#    org.springframework.web.client.RestTemplate: DEBUG
+#    org.springframework.http.client: DEBUG
+#    org.hibernate.SQL: DEBUG
+#    org.hibernate.type: TRACE
+#    org.hibernate.orm.jdbc.bind: TRACE
+#    org.hibernate.stat: DEBUG
+#    com.squareup.okhttp3: DEBUG
+    com.somle: DEBUG
+#    com.somle.erp.model.EsbStyleSku: DEBUG
+#    com.somle.erp.service.ErpService: DEBUG
+#    com.somle.eccang.service.EccangService: DEBUG
+#    com.somle.kingdee.controller.KingdeeController: DEBUG
+#    com.somle.kingdee.service.KingdeeService: DEBUG
+#    com.somle.kingdee.service.KingdeeClient: DEBUG
+#    com.somle.dingtalk.service.DingTalkService: DEBUG
+#    com.somle.ai.service.AiService: DEBUG
+#    com.somle.amazon.controller.AmazonSpController: DEBUG
+#    com.somle.amazon.service.AmazonService: DEBUG
+#    com.somle.amazon.service.AmazonSpService: DEBUG
+#    com.somle.amazon.service.AmazonAdService: DEBUG
+#    com.somle.util.Limiter: DEBUG
+#    com.somle.util.Util: DEBUG
+  file:
+    name: log/esb.log

@@ -57,6 +57,7 @@
         <easyexcel.verion>3.3.4</easyexcel.verion>
         <velocity.version>2.3</velocity.version>
         <fastjson.version>1.2.83</fastjson.version>
+        <fastjson2.version>2.0.52</fastjson2.version>
         <guava.version>33.2.1-jre</guava.version>
         <transmittable-thread-local.version>2.14.5</transmittable-thread-local.version>
         <commons-net.version>3.11.1</commons-net.version>
@@ -69,6 +70,9 @@
         <okhttp3.version>4.11.0</okhttp3.version>
         <commons-io.version>2.15.1</commons-io.version>
         <minio.version>8.5.7</minio.version>
+        <aliyun-java-sdk-core.version>4.6.4</aliyun-java-sdk-core.version>
+        <aliyun-java-sdk-dysmsapi.version>2.2.1</aliyun-java-sdk-dysmsapi.version>
+        <tencentcloud-sdk-java.version>3.1.880</tencentcloud-sdk-java.version>
         <justauth.version>2.0.5</justauth.version>
         <jimureport.version>1.7.8</jimureport.version>
         <xercesImpl.version>2.12.2</xercesImpl.version>
@@ -77,6 +81,46 @@
 
     <dependencyManagement>
         <dependencies>
+<!--            why this dependency necessary?-->
+            <dependency>
+                <groupId>com.somle</groupId>
+                <artifactId>somle-spring-boot-starter-test</artifactId>
+                <version>${revision}</version>
+                <scope>test</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>com.somle</groupId>
+                <artifactId>somle-util</artifactId>
+                <version>${revision}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.alibaba.fastjson2</groupId>
+                <artifactId>fastjson2</artifactId>
+                <version>${fastjson2.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.alibaba.fastjson2</groupId>
+                <artifactId>fastjson2-extension-spring6</artifactId>
+                <version>${fastjson2.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>commons-codec</groupId>
+                <artifactId>commons-codec</artifactId>
+                <version>1.15</version>
+            </dependency>
+
+
+
+            <dependency>
+                <groupId>com.aliyun.oss</groupId>
+                <artifactId>aliyun-sdk-oss</artifactId>
+                <version>3.16.3</version>
+            </dependency>
+
             <!-- 统一依赖管理 -->
             <dependency>
                 <groupId>org.springframework.boot</groupId>
@@ -543,6 +587,34 @@
                 <artifactId>minio</artifactId>
                 <version>${minio.version}</version>
             </dependency>
+
+            <!-- SMS SDK begin -->
+            <dependency>
+                <groupId>com.aliyun</groupId>
+                <artifactId>aliyun-java-sdk-core</artifactId>
+                <version>${aliyun-java-sdk-core.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <artifactId>opentracing-api</artifactId>
+                        <groupId>io.opentracing</groupId>
+                    </exclusion>
+                    <exclusion>
+                        <artifactId>opentracing-util</artifactId>
+                        <groupId>io.opentracing</groupId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>com.aliyun</groupId>
+                <artifactId>aliyun-java-sdk-dysmsapi</artifactId>
+                <version>${aliyun-java-sdk-dysmsapi.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.tencentcloudapi</groupId>
+                <artifactId>tencentcloud-sdk-java-sms</artifactId>
+                <version>${tencentcloud-sdk-java.version}</version>
+            </dependency>
+            <!-- SMS SDK end -->
 
             <dependency>
                 <groupId>com.xingyuv</groupId>

@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>cn.iocoder.boot</groupId>
+        <artifactId>yudao</artifactId>
+        <version>${revision}</version>
+    </parent>
+
+    <groupId>com.somle</groupId>
+    <artifactId>somle-esb</artifactId>
+    <version>${revision}</version>
+
+
+
+    <dependencies>
+
+        <dependency>
+            <groupId>com.somle</groupId>
+            <artifactId>somle-spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.aliyun.oss</groupId>
+            <artifactId>aliyun-sdk-oss</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.somle</groupId>
+            <artifactId>somle-util</artifactId>
+            <version>${revision}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.somle</groupId>
+            <artifactId>somle-amazon</artifactId>
+            <version>${revision}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.somle</groupId>
+            <artifactId>somle-ai</artifactId>
+            <version>${revision}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.somle</groupId>
+            <artifactId>somle-erp</artifactId>
+            <version>${revision}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.somle</groupId>
+            <artifactId>somle-matomo</artifactId>
+            <version>${revision}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.somle</groupId>
+            <artifactId>somle-dingtalk</artifactId>
+            <version>${revision}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.somle</groupId>
+            <artifactId>somle-kingdee</artifactId>
+            <version>${revision}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.somle</groupId>
+            <artifactId>somle-eccang</artifactId>
+            <version>${revision}</version>
+        </dependency>
+    </dependencies>
+
+    
+
+
+</project>

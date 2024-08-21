@@ -24,6 +24,19 @@
 <!--        <module>yudao-module-crm</module>-->
        <module>yudao-module-erp</module>
 <!--        <module>yudao-module-ai</module>-->
+
+
+        <module>somle-framework</module>
+        <module>somle-esb</module>
+        <module>somle-util</module>
+        <module>somle-amazon</module>
+        <module>somle-eccang</module>
+        <module>somle-kingdee</module>
+        <module>somle-erp</module>
+        <module>somle-dingtalk</module>
+        <module>somle-ai</module>
+        <module>somle-matomo</module>
+
     </modules>
 
     <name>${project.artifactId}</name>
