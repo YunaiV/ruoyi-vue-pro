@@ -15,7 +15,7 @@ After=network.target
 
 [Service]
 User=root
-ExecStart=/usr/bin/java -jar $JAR_PATH --server.port=55003
+ExecStart=/usr/bin/java -jar $JAR_PATH --server.port=55002
 Restart=always
 
 [Install]
