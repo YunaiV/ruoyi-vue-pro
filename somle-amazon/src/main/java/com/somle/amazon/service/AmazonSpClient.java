@@ -2,6 +2,7 @@ package com.somle.amazon.service;
 
 import com.alibaba.fastjson2.JSONObject;
 import com.somle.amazon.model.AmazonAccount;
+import com.somle.amazon.model.AmazonErrorList;
 import com.somle.amazon.model.AmazonShop;
 //import com.somle.amazon.repository.AmazonSellerRepository;
 import com.somle.util.Util;
@@ -29,21 +30,6 @@ public class AmazonSpClient {
 
     public AmazonAccount account;
 
-
-
-//    AmazonSellerRepository sellerRepository;
-
-
-    // @PostConstruct
-    // public void init() {
-    //     shops = sellerRepository.findAll().stream().flatMap(seller->seller.getShops().stream()).toList();
-    // }
-
-    // @EventListener(ApplicationReadyEvent.class)
-    // @Transactional(readOnly = true)
-    // public void initialize() {
-    //     shops = sellerRepository.findAll().stream().flatMap(seller->seller.getShops().stream()).toList();
-    // }
 
 
 
@@ -97,10 +83,6 @@ public class AmazonSpClient {
         String partialUrl = "/reports/2021-06-30/reports";
         String fullUrl = endPoint + partialUrl;
         var headers = Map.of("x-amz-access-token", getShop(countryCode).getSeller().getSpAccessToken());
-        // headers.set("Content-Type", "application/json");
-        // headers.set("Accept", "application/json");
-        // Add other headers if necessary
-        log.debug(headers.toString());
         JSONObject result = new JSONObject();
         payload.put("dataStartTime", dataDate.format(DATE_FORMAT));
         payload.put("dataEndTime", dataDate.format(DATE_FORMAT));
@@ -108,12 +90,27 @@ public class AmazonSpClient {
         // Create report
         String reportId = null;
         while (reportId == null) {
-            // HttpEntity<JSONObject> request = new HttpEntity<>(payload, headers);
-            log.debug(headers.toString());
             log.info("creating report");
-            // ResponseEntity<JSONObject> response = restTemplate.postForEntity(fullUrl, request, JSONObject.class, headers);
-            JSONObject response = Util.postRequest(fullUrl, Map.of(), headers, payload, JSONObject.class);
-            reportId = response.getString("reportId");
+            var response = Util.postRequest(fullUrl, Map.of(), headers, payload);
+            switch (response.code()) {
+                case 202:
+                    var report = Util.parseResponse(response, Report.class);
+                    reportId = report.getReportId();
+                    break;
+                case 403:
+                    var error = Util.parseResponse(response, AmazonErrorList.class);
+                    switch (error.getErrors().get(0).getCode()) {
+                        case "Unauthorized":
+                            log.error(error.toString());
+                            throw new RuntimeException("Error unauthorized");
+                        default:
+                            break;
+                    }
+                    log.error(error.toString());
+                    throw new RuntimeException("Error creating report");
+                default:
+                    throw new RuntimeException("Unknown response code");
+            }
         }
         log.info("Got report ID: {}", reportId);
 

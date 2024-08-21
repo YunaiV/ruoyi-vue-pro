@@ -63,7 +63,7 @@ public class Util {
         return urlBuilder.build().toString();
     }
 
-    public static <T> T sendRequest(String requestMethod, String url, Map<String, String> queryParams, Map<String, String> headers, Object payload, Class<T> responseClass) {
+    public static Response sendRequest(String requestMethod, String url, Map<String, String> queryParams, Map<String, String> headers, Object payload) {
         log.debug("method: " + requestMethod);
         log.debug("url: " + url);
         // HttpUrl.Builder urlBuilder = HttpUrl.parse(url).newBuilder();
@@ -107,7 +107,11 @@ public class Util {
             throw new RuntimeException(e);
         }
 
+        return response;
 
+    }
+
+    public static <T> T parseResponse(Response response, Class<T> responseClass) {
         String responseString;
         try {
             responseString = response.body().string();
@@ -115,16 +119,26 @@ public class Util {
             throw new RuntimeException(e);
         }
         log.debug("response: " + responseString);
-        
+
         return JSONObject.parseObject(responseString, responseClass);
     }
 
     public static <T> T getRequest(String url, Map<String, String> queryParams, Map<String, String> headers, Class<T> responseClass) {
-        return sendRequest("GET", url, queryParams, headers, null, responseClass);
+        var response = sendRequest("GET", url, queryParams, headers, null);
+        return parseResponse(response, responseClass);
     }
 
     public static <T> T postRequest(String url, Map<String, String> queryParams, Map<String, String> headers, Object payload, Class<T> responseClass) {
-        return sendRequest("POST", url, queryParams, headers, payload, responseClass);
+        var response =  sendRequest("POST", url, queryParams, headers, payload);
+        return parseResponse(response, responseClass);
+    }
+
+    public static Response getRequest(String url, Map<String, String> queryParams, Map<String, String> headers) {
+        return sendRequest("GET", url, queryParams, headers, null);
+    }
+
+    public static Response postRequest(String url, Map<String, String> queryParams, Map<String, String> headers, Object payload) {
+        return sendRequest("POST", url, queryParams, headers, payload);
     }
 
     public static <T> T urlToDict(String urlString, String compression, Class<T> objectClass) {

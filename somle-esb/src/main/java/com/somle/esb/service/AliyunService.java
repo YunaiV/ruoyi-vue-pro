@@ -41,7 +41,7 @@ public class AliyunService {
         
     @PostConstruct
     private void init() {
-        AliyunToken token = tokenRepository.findAll().getFirst();
+        AliyunToken token = tokenRepository.findAll().get(0);
         ossClient = new OSSClientBuilder().build(endpoint, token.getAccessKeyId(), token.getAccessKeySecret());
     }
 

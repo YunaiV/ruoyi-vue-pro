@@ -59,7 +59,7 @@ public class DingTalkService {
         log.info("fetching access token");
         String url = host + "/v1.0/oauth2/accessToken";
         JSONObject payload = new JSONObject();
-        DingTalkToken token = tokenRepository.findAll().getFirst();
+        DingTalkToken token = tokenRepository.findAll().get(0);
         payload.put("appKey", token.getAppKey());
         payload.put("appSecret", token.getAppSecret());
         String accessToken = Util.postRequest(url, Map.of(), Map.of(), payload, JSONObject.class).getString("accessToken");

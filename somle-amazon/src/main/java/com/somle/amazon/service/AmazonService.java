@@ -10,14 +10,9 @@ import com.somle.util.Util;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.integration.support.MessageBuilder;
-import org.springframework.messaging.MessageChannel;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.Map;
 
 @Slf4j
@@ -50,7 +45,7 @@ public class AmazonService {
 
     @PostConstruct
     public void init() {
-        account = accountRepository.findAll().getFirst();
+        account = accountRepository.findAll().get(0);
         spClient = new AmazonSpClient(account);
         adClient = new AmazonAdClient(account);
     }
@@ -62,10 +57,10 @@ public class AmazonService {
     //     shopList = shopRepository.findAll();
     // }
     @Scheduled(fixedDelay = 1800000, initialDelay = 1000)
-    public void updateAccessToken() {
+    public void refreshAuth() {
         JSONObject body = new JSONObject();
         body.put("grant_type", "refresh_token");
-        account = accountRepository.findAll().getFirst();
+        account = accountRepository.findAll().get(0);
         for (AmazonSeller seller : account.getSellers()) {
     
             try {
