@@ -477,7 +477,7 @@ public class SimpleModelUtils {
         addFormFieldsPermission(node.getFieldsPermission(), userTask);
         // 添加操作按钮配置属性元素
         addButtonsSetting(node.getButtonsSetting(), userTask);
-        // 处理多实例
+        // 处理多实例（审批方式）
         processMultiInstanceLoopCharacteristics(node.getApproveMethod(), node.getApproveRatio(), userTask);
         // 添加任务被拒绝的处理元素
         addTaskRejectElements(node.getRejectHandler(), userTask);

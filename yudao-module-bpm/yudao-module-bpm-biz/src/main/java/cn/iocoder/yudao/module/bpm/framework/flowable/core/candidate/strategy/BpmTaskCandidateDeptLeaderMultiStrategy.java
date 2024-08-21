@@ -29,7 +29,7 @@ public class BpmTaskCandidateDeptLeaderMultiStrategy extends BpmTaskCandidateAbs
 
     @Override
     public void validateParam(String param) {
-        // 参数格式: | 分隔 。左边为部门（多个部门用 , 分隔）。 右边为部门层级
+        // 参数格式: | 分隔：1）左边为部门（多个部门用 , 分隔）。2）右边为部门层级
         String[] params = param.split("\\|");
         Assert.isTrue(params.length == 2, "参数格式不匹配");
         deptApi.validateDeptList(StrUtils.splitToLong(params[0], ","));
@@ -38,8 +38,6 @@ public class BpmTaskCandidateDeptLeaderMultiStrategy extends BpmTaskCandidateAbs
 
     @Override
     public Set<Long> calculateUsers(DelegateExecution execution, String param) {
-        // 参数格式: | 分隔 。左边为部门（多个部门用 , 分隔）。 右边为部门层级
-        // 参数格式: ,分割。前面的部门Id. 可以为多个。 最后一个为部门层级
         String[] params = param.split("\\|");
         return getMultiLevelDeptLeaderIds(StrUtils.splitToLong(params[0], ","), Integer.valueOf(params[1]));
     }
