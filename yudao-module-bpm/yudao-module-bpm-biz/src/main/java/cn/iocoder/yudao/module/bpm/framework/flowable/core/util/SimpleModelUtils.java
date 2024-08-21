@@ -9,10 +9,7 @@ import cn.hutool.core.util.*;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.simple.BpmSimpleModelNodeVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.simple.BpmSimpleModelNodeVO.RejectHandler;
-import cn.iocoder.yudao.module.bpm.enums.definition.BpmBoundaryEventType;
-import cn.iocoder.yudao.module.bpm.enums.definition.BpmSimpleModeConditionType;
-import cn.iocoder.yudao.module.bpm.enums.definition.BpmSimpleModelNodeType;
-import cn.iocoder.yudao.module.bpm.enums.definition.BpmUserTaskApproveMethodEnum;
+import cn.iocoder.yudao.module.bpm.enums.definition.*;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnModelConstants;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.listener.BpmCopyTaskDelegate;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.simplemodel.SimpleModelConditionGroups;
@@ -28,7 +25,6 @@ import java.util.Objects;
 import static cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.simple.BpmSimpleModelNodeVO.OperationButtonSetting;
 import static cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.simple.BpmSimpleModelNodeVO.TimeoutHandler;
 import static cn.iocoder.yudao.module.bpm.enums.definition.BpmSimpleModelNodeType.*;
-import static cn.iocoder.yudao.module.bpm.enums.definition.BpmUserTaskApproveTypeEnum.USER;
 import static cn.iocoder.yudao.module.bpm.enums.definition.BpmUserTaskAssignStartUserHandlerTypeEnum.SKIP;
 import static cn.iocoder.yudao.module.bpm.enums.definition.BpmUserTaskTimeoutHandlerTypeEnum.REMINDER;
 import static cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmTaskCandidateStrategyEnum.START_USER;
@@ -85,7 +81,8 @@ public class SimpleModelUtils {
         process.setExecutable(Boolean.TRUE); // TODO @jason：这个是必须设置的么？
         bpmnModel.addProcess(process);
 
-        // 目前前端的第一个节点是 发起人节点。这里构建一个StartNode. 用于创建 Bpmn 的 StartEvent 节点
+        // TODO 芋艿：这里可能纠结下，到底前端传递，还是后端创建出来。
+        // 目前前端的第一个节点是“发起人节点”。这里构建一个 StartNode，用于创建 Bpmn 的 StartEvent 节点
         BpmSimpleModelNodeVO startNode = buildStartSimpleModelNode();
         startNode.setChildNode(simpleModelNode);
         // 从 前端模型数据结构 SimpleModel 构建 FlowNode 并添加到 Main Process
@@ -348,7 +345,6 @@ public class SimpleModelUtils {
         return buildBpmnStartUserTask(node);
     }
 
-
     private static List<FlowElement> convertApproveNode(BpmSimpleModelNodeVO node) {
         List<FlowElement> flowElements = new ArrayList<>();
         UserTask userTask = buildBpmnUserTask(node);
@@ -467,7 +463,7 @@ public class SimpleModelUtils {
 
         // 如果不是审批人节点，则直接返回
         addExtensionElement(userTask, USER_TASK_APPROVE_TYPE, StrUtil.toStringOrNull(node.getApproveType()));
-        if (ObjectUtil.notEqual(node.getApproveType(), USER.getType())) {
+        if (ObjectUtil.notEqual(node.getApproveType(), BpmUserTaskApproveTypeEnum.USER.getType())) {
             return userTask;
         }
 
@@ -599,12 +595,10 @@ public class SimpleModelUtils {
 
     // ========== 各种 build 节点的方法 ==========
 
-    private static StartEvent  convertStartNode(BpmSimpleModelNodeVO node) {
+    private static StartEvent convertStartNode(BpmSimpleModelNodeVO node) {
         StartEvent startEvent = new StartEvent();
         startEvent.setId(node.getId());
         startEvent.setName(node.getName());
-        // TODO 芋艿 + jason：要不要在开启节点后面，加一个“发起人”任务节点，然后自动审批通过
-        // @芋艿 这个是不是由前端来实现。 默认开始节点后面跟一个 “发起人”的审批节点(审批人是发起人自己）。
         return startEvent;
     }
 
@@ -613,18 +607,18 @@ public class SimpleModelUtils {
         userTask.setId(node.getId());
         userTask.setName(node.getName());
         // 人工审批
-        addExtensionElement(userTask, USER_TASK_APPROVE_TYPE, USER.getType().toString());
+        addExtensionElement(userTask, USER_TASK_APPROVE_TYPE, BpmUserTaskApproveTypeEnum.USER.getType().toString());
         // 候选人策略为发起人自己
         addCandidateElements(START_USER.getStrategy(),null, userTask);
         // 添加表单字段权限属性元素
         addFormFieldsPermission(node.getFieldsPermission(), userTask);
-        // 添加操作按钮配置属性元素.
+        // 添加操作按钮配置属性元素
         addButtonsSetting(node.getButtonsSetting(), userTask);
-        // 使用自动通过策略。TODO @芋艿 复用了SKIP， 是否需要新加一个策略
+        // 使用自动通过策略 TODO @芋艿 复用了SKIP， 是否需要新加一个策略；TODO @芋艿：【回复】是不是应该类似飞书，搞个草稿状态。待定；还有一种策略，不标记自动通过，而是首次发起后，第一个节点，自动通过；
         addAssignStartUserHandlerType(SKIP.getType(), userTask);
-
         return userTask;
     }
+
     private static EndEvent convertEndNode(BpmSimpleModelNodeVO node) {
         EndEvent endEvent = new EndEvent();
         endEvent.setId(node.getId());

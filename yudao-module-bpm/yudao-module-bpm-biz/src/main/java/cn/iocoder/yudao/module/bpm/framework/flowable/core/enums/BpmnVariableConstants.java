@@ -30,12 +30,14 @@ public class BpmnVariableConstants {
      */
     public static final String PROCESS_INSTANCE_VARIABLE_START_USER_SELECT_ASSIGNEES = "PROCESS_START_USER_SELECT_ASSIGNEES";
 
+    // TODO @芋艿：用于处理，驳回到发起人时，如果被自动通过的逻辑
     /**
      * 流程实例的变量 - 用于判断流程实例变量节点是否驳回. 格式 RETURN_FLAG_{节点 id}
      *
      * @see ProcessInstance#getProcessVariables()
      */
-    public  static final String PROCESS_INSTANCE_VARIABLE_RETURN_FLAG = "RETURN_FLAG_%s";
+    public static final String PROCESS_INSTANCE_VARIABLE_RETURN_FLAG = "RETURN_FLAG_%s";
+
     /**
      * 任务的变量 - 状态
      *

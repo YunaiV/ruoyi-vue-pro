@@ -103,7 +103,6 @@ public interface BpmnModelConstants {
      * BPMN Start Event Node Id
      */
     String START_EVENT_NODE_ID = "StartEvent";
-
     /**
      * BPMN Start Event Node Name
      */
