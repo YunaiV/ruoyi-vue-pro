@@ -18,7 +18,6 @@ public interface AfterSaleMapper extends BaseMapperX<AfterSaleDO> {
         return selectPage(reqVO, new LambdaQueryWrapperX<AfterSaleDO>()
                 .eqIfPresent(AfterSaleDO::getUserId, reqVO.getUserId())
                 .likeIfPresent(AfterSaleDO::getNo, reqVO.getNo())
-                .eqIfPresent(AfterSaleDO::getUserId, reqVO.getUserId())
                 .eqIfPresent(AfterSaleDO::getStatus, reqVO.getStatus())
                 .eqIfPresent(AfterSaleDO::getType, reqVO.getType())
                 .eqIfPresent(AfterSaleDO::getWay, reqVO.getWay())
