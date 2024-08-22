@@ -28,4 +28,9 @@ public class ExpressTrackQueryReqDTO {
      */
     private String phone;
 
+    /**
+     * 自定义名称（顺丰专用）
+     */
+    private String customerName;
+
 }
