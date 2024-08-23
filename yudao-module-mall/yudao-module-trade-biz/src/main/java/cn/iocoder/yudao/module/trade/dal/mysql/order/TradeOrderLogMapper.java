@@ -11,10 +11,9 @@ import java.util.List;
 public interface TradeOrderLogMapper extends BaseMapperX<TradeOrderLogDO> {
 
     default List<TradeOrderLogDO> selectListByOrderId(Long orderId) {
-        LambdaQueryWrapper<TradeOrderLogDO> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.eq(TradeOrderLogDO::getOrderId, orderId);
-        queryWrapper.orderByDesc(TradeOrderLogDO::getCreateTime);
-        return selectList(queryWrapper);
+        return selectList(new LambdaQueryWrapper<TradeOrderLogDO>()
+                .eq(TradeOrderLogDO::getOrderId, orderId)
+                .orderByDesc(TradeOrderLogDO::getCreateTime));
     }
 
 }

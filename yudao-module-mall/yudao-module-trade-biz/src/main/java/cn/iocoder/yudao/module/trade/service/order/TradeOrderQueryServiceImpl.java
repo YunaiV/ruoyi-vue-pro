@@ -219,6 +219,7 @@ public class TradeOrderQueryServiceImpl implements TradeOrderQueryService {
     public List<ExpressTrackRespDTO> getExpressTrackList(String code, String logisticsNo, String receiverMobile) {
         return expressClientFactory.getDefaultExpressClient().getExpressTrackList(
                 new ExpressTrackQueryReqDTO().setExpressCode(code).setLogisticsNo(logisticsNo)
+                        // TODO @卢越：1）为什么 customerName 使用 mobile 哈？2）如果使用 mobile，其实可以考虑通过 phone 计算下
                         .setPhone(receiverMobile).setCustomerName(StrUtil.subSuf(receiverMobile, receiverMobile.length() - 4)));
     }
 

@@ -80,13 +80,13 @@ public class TradeMemberPointOrderHandler implements TradeOrderHandler {
     public void afterCancelOrderItem(TradeOrderDO order, TradeOrderItemDO orderItem) {
         // 增加（回滚）积分（订单抵扣）
         addPoint(order.getUserId(), orderItem.getUsePoint(), MemberPointBizTypeEnum.ORDER_USE_CANCEL_ITEM, orderItem.getId());
-
         // 扣减（回滚）积分（订单赠送）
         reducePoint(order.getUserId(), orderItem.getGivePoint(), MemberPointBizTypeEnum.ORDER_GIVE_CANCEL_ITEM, orderItem.getId());
 
         // 扣减（回滚）用户经验
         AfterSaleDO afterSale = afterSaleService.getAfterSale(orderItem.getAfterSaleId());
-        memberLevelApi.reduceExperience(order.getUserId(), afterSale.getRefundPrice(), MemberExperienceBizTypeEnum.ORDER_GIVE_CANCEL_ITEM.getType(), String.valueOf(orderItem.getId()));
+        memberLevelApi.reduceExperience(order.getUserId(), afterSale.getRefundPrice(),
+                MemberExperienceBizTypeEnum.ORDER_GIVE_CANCEL_ITEM.getType(), String.valueOf(orderItem.getId()));
     }
 
     /**

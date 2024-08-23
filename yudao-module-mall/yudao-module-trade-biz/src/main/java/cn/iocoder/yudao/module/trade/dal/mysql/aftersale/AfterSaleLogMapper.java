@@ -11,10 +11,9 @@ import java.util.List;
 public interface AfterSaleLogMapper extends BaseMapperX<AfterSaleLogDO> {
 
     default List<AfterSaleLogDO> selectListByAfterSaleId(Long afterSaleId) {
-        LambdaQueryWrapper<AfterSaleLogDO> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.eq(AfterSaleLogDO::getAfterSaleId, afterSaleId);
-        queryWrapper.orderByDesc(AfterSaleLogDO::getCreateTime);
-        return selectList(queryWrapper);
+        return selectList(new LambdaQueryWrapper<AfterSaleLogDO>()
+                .eq(AfterSaleLogDO::getAfterSaleId, afterSaleId)
+                .orderByDesc(AfterSaleLogDO::getCreateTime));
     }
 
 }
