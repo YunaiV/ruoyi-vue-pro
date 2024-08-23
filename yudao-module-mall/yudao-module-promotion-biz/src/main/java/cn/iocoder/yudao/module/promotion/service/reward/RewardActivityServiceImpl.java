@@ -82,6 +82,7 @@ public class RewardActivityServiceImpl implements RewardActivityService {
     @Override
     public void closeRewardActivity(Long id) {
         // 校验存在
+        // TODO @puhui999：去掉 PromotionActivityStatusEnum，使用 CommonStatus 作为状态哈。开启，关闭
         RewardActivityDO dbRewardActivity = validateRewardActivityExists(id);
         if (dbRewardActivity.getStatus().equals(PromotionActivityStatusEnum.CLOSE.getStatus())) { // 已关闭的活动，不能关闭噢
             throw exception(REWARD_ACTIVITY_CLOSE_FAIL_STATUS_CLOSED);

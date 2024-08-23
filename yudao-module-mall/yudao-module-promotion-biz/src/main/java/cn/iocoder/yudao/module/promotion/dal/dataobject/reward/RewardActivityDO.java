@@ -99,6 +99,7 @@ public class RewardActivityDO extends BaseDO {
          * 是否包邮
          */
         private Boolean freeDelivery;
+        // TODO @puhui999：是不是大于零，就认为赠送积分哈；简洁一点；
         /**
          * 是否赠送积分
          */
@@ -107,6 +108,7 @@ public class RewardActivityDO extends BaseDO {
          * 赠送的积分
          */
         private Integer point;
+        // TODO @puhui999：非空，就认为赠送优惠劵
         /**
          * 是否赠送优惠券
          */

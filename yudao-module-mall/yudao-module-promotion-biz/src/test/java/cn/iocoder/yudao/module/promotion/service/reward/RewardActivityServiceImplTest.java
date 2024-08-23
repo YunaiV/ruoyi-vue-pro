@@ -190,6 +190,7 @@ public class RewardActivityServiceImplTest extends BaseDbUnitTest {
     @Test
     public void testGetRewardActivities_product() {
         // mock 数据
+       // TODO @puhui999：有单测的问题，也一起瞅瞅
         RewardActivityDO productActivity01 = randomPojo(RewardActivityDO.class, o -> o.setStatus(PromotionActivityStatusEnum.RUN.getStatus())
                 .setProductScope(PromotionProductScopeEnum.SPU.getScope()).setProductSpuIds(asList(1L, 2L)));
         rewardActivityMapper.insert(productActivity01);

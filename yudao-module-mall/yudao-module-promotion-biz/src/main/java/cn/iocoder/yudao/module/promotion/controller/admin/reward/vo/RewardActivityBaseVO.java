@@ -60,13 +60,6 @@ public class RewardActivityBaseVO {
     @Valid // 校验下子对象
     private List<Rule> rules;
 
-    @AssertTrue(message = "商品范围编号的数组不能为空")
-    @JsonIgnore
-    public boolean isProductScopeValuesValid() {
-        return Objects.equals(productScope, PromotionProductScopeEnum.ALL.getScope()) // 全部范围时，可以为空
-                || CollUtil.isNotEmpty(productScopeValues);
-    }
-
     @Schema(description = "优惠规则")
     @Data
     public static class Rule {
@@ -112,6 +105,13 @@ public class RewardActivityBaseVO {
             return BooleanUtil.isFalse(givePoint) || (point != null && point >= 1);
         }
 
+    }
+
+    @AssertTrue(message = "商品范围编号的数组不能为空")
+    @JsonIgnore
+    public boolean isProductScopeValuesValid() {
+        return Objects.equals(productScope, PromotionProductScopeEnum.ALL.getScope()) // 全部范围时，可以为空
+                || CollUtil.isNotEmpty(productScopeValues);
     }
 
 }
