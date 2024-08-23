@@ -6,7 +6,7 @@
     <parent>
         <groupId>com.somle</groupId>
         <artifactId>somle-framework</artifactId>
-        <version>2.2.0-snapshot</version>
+        <version>${revision}</version>
     </parent>
 
     <artifactId>somle-common</artifactId>
