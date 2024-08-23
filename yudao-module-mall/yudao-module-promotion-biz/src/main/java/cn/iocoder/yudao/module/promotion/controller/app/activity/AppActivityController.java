@@ -9,9 +9,7 @@ import cn.iocoder.yudao.module.promotion.dal.dataobject.bargain.BargainActivityD
 import cn.iocoder.yudao.module.promotion.dal.dataobject.combination.CombinationActivityDO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.discount.DiscountActivityDO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.discount.DiscountProductDO;
-import cn.iocoder.yudao.module.promotion.dal.dataobject.reward.RewardActivityDO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.seckill.SeckillActivityDO;
-import cn.iocoder.yudao.module.promotion.enums.common.PromotionActivityStatusEnum;
 import cn.iocoder.yudao.module.promotion.enums.common.PromotionTypeEnum;
 import cn.iocoder.yudao.module.promotion.service.bargain.BargainActivityService;
 import cn.iocoder.yudao.module.promotion.service.combination.CombinationActivityService;
@@ -30,7 +28,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
@@ -145,28 +142,28 @@ public class AppActivityController {
     }
 
     private void getRewardActivities(Collection<Long> spuIds, LocalDateTime now, List<AppActivityRespVO> activityList) {
-        // TODO @puhui999：有 3 范围，不只 spuId，还有 categoryId，全部
-        List<RewardActivityDO> rewardActivityList = rewardActivityService.getRewardActivityBySpuIdsAndStatusAndDateTimeLt(
-                spuIds, PromotionActivityStatusEnum.RUN.getStatus(), now);
-        if (CollUtil.isEmpty(rewardActivityList)) {
-            return;
-        }
-
-        Map<Long, Optional<RewardActivityDO>> spuIdAndActivityMap = spuIds.stream()
-                .collect(Collectors.toMap(
-                        spuId -> spuId,
-                        spuId -> rewardActivityList.stream()
-                                .filter(activity -> activity.getProductSpuIds().contains(spuId))
-                                .max(Comparator.comparing(RewardActivityDO::getCreateTime))));
-        for (Long supId : spuIdAndActivityMap.keySet()) {
-            if (spuIdAndActivityMap.get(supId).isEmpty()) {
-                continue;
-            }
-
-            RewardActivityDO rewardActivityDO = spuIdAndActivityMap.get(supId).get();
-            activityList.add(new AppActivityRespVO(rewardActivityDO.getId(), PromotionTypeEnum.REWARD_ACTIVITY.getType(),
-                    rewardActivityDO.getName(), supId, rewardActivityDO.getStartTime(), rewardActivityDO.getEndTime()));
-        }
+        // TODO @puhui999：有 3 范围，不只 spuId，还有 categoryId，全部，下次 fix
+        //List<RewardActivityDO> rewardActivityList = rewardActivityService.getRewardActivityBySpuIdsAndStatusAndDateTimeLt(
+        //        spuIds, PromotionActivityStatusEnum.RUN.getStatus(), now);
+        //if (CollUtil.isEmpty(rewardActivityList)) {
+        //    return;
+        //}
+        //
+        //Map<Long, Optional<RewardActivityDO>> spuIdAndActivityMap = spuIds.stream()
+        //        .collect(Collectors.toMap(
+        //                spuId -> spuId,
+        //                spuId -> rewardActivityList.stream()
+        //                        .filter(activity -> activity.getProductSpuIds().contains(spuId))
+        //                        .max(Comparator.comparing(RewardActivityDO::getCreateTime))));
+        //for (Long supId : spuIdAndActivityMap.keySet()) {
+        //    if (spuIdAndActivityMap.get(supId).isEmpty()) {
+        //        continue;
+        //    }
+        //
+        //    RewardActivityDO rewardActivityDO = spuIdAndActivityMap.get(supId).get();
+        //    activityList.add(new AppActivityRespVO(rewardActivityDO.getId(), PromotionTypeEnum.REWARD_ACTIVITY.getType(),
+        //            rewardActivityDO.getName(), supId, rewardActivityDO.getStartTime(), rewardActivityDO.getEndTime()));
+        //}
     }
 
 }
