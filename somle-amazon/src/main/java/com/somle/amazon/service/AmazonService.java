@@ -57,7 +57,7 @@ public class AmazonService {
     //     // shopList = shopRepository.findAll().stream().map(shop->shop.getCountryCode()).toList();
     //     shopList = shopRepository.findAll();
     // }
-    @Scheduled(fixedDelay = 1800000, initialDelay = 1000)
+    @Scheduled(fixedDelay = 900000, initialDelay = 1000)
     public void refreshAuth() {
         JSONObject body = JsonUtils.newObject();
         body.put("grant_type", "refresh_token");

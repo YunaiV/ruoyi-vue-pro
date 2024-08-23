@@ -23,17 +23,10 @@ public class MatomoController {
     @GetMapping("/getVisits")
     @ResponseBody
     public List<MatomoVisit> getVisits(
+        @RequestParam Integer idSite,
         @RequestParam String date
     ) {
-        return matomoService.getVisits(5, LocalDate.parse(date)).toList();
-    }
-
-    @GetMapping("/dataCollect")
-    @ResponseBody
-    public void dataCollect(
-        @RequestParam String scheduleDate
-    ) {
-        matomoService.dataCollect(LocalDate.parse(scheduleDate));
+        return matomoService.getVisits(idSite, LocalDate.parse(date)).toList();
     }
 
     

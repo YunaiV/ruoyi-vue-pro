@@ -100,7 +100,7 @@ public class WebUtils {
 
     }
 
-    public static <T> T parseResponse(Response response, Class<T> responseClass) {
+    public static String getBodyString(Response response) {
         String responseString;
         try {
             responseString = response.body().string();
@@ -108,9 +108,13 @@ public class WebUtils {
             throw new RuntimeException(e);
         }
         log.debug("response: " + responseString);
-
-        return JsonUtils.parseObject(responseString, responseClass);
+        return responseString;
     }
+
+    public static <T> T parseResponse(Response response, Class<T> responseClass) {
+        return JsonUtils.parseObject(getBodyString(response), responseClass);
+    }
+
 
     public static <T> T getRequest(String url, Map<String, String> queryParams, Map<String, String> headers, Class<T> responseClass) {
         var response = sendRequest("GET", url, queryParams, headers, null);

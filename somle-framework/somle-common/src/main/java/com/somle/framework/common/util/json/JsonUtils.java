@@ -83,7 +83,7 @@ public class JsonUtils {
 
     @SneakyThrows
     public static <T> List<T> parseArray(ArrayNode node, Class<T> clazz) {
-        
+
 //        return objectMapper.convertValue(node, new TypeReference<List<T>>() {});
         return  objectMapper.readerForListOf(clazz).readValue(node);
 
