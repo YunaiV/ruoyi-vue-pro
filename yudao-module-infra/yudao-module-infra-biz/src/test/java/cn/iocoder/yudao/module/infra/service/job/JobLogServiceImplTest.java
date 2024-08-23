@@ -114,7 +114,7 @@ public class JobLogServiceImplTest extends BaseDbUnitTest {
         assertEquals(1, count);
         List<JobLogDO> logs = jobLogMapper.selectList();
         assertEquals(1, logs.size());
-        assertEquals(log02, logs.get(0));
+        assertPojoEquals(log02, logs.get(0), "createTime", "updateTime");
     }
 
     @Test

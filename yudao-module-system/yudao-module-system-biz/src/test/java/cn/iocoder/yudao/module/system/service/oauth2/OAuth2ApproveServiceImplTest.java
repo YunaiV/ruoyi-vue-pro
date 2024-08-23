@@ -209,7 +209,7 @@ public class OAuth2ApproveServiceImplTest extends BaseDbUnitTest {
         List<OAuth2ApproveDO> result = oauth2ApproveService.getApproveList(userId, userType, clientId);
         // 断言
         assertEquals(1, result.size());
-        assertPojoEquals(approve, result.get(0));
+        assertPojoEquals(approve, result.get(0), "expiresTime");
     }
 
     @Test

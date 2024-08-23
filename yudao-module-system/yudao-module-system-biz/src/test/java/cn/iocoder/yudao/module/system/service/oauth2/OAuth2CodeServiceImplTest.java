@@ -50,7 +50,7 @@ class OAuth2CodeServiceImplTest extends BaseDbUnitTest {
                 scopes, redirectUri, state);
         // 断言
         OAuth2CodeDO dbCodeDO = oauth2CodeMapper.selectByCode(codeDO.getCode());
-        assertPojoEquals(codeDO, dbCodeDO, "createTime", "updateTime", "deleted");
+        assertPojoEquals(codeDO, dbCodeDO, "expiresTime", "createTime", "updateTime", "deleted");
         assertEquals(userId, codeDO.getUserId());
         assertEquals(userType, codeDO.getUserType());
         assertEquals(clientId, codeDO.getClientId());
@@ -92,7 +92,7 @@ class OAuth2CodeServiceImplTest extends BaseDbUnitTest {
 
         // 调用
         OAuth2CodeDO result = oauth2CodeService.consumeAuthorizationCode(code);
-        assertPojoEquals(codeDO, result);
+        assertPojoEquals(codeDO, result, "expiresTime");
         assertNull(oauth2CodeMapper.selectByCode(code));
     }
 

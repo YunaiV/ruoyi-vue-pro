@@ -19,6 +19,7 @@ spring:
   sql:
     init:
       schema-locations: classpath:/sql/create_tables.sql
+      encoding: UTF-8
 
   # Redis 配置。Redisson 默认的配置足够使用，一般不需要进行调优
   data:
