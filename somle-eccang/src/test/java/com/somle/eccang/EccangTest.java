@@ -62,6 +62,17 @@ public class EccangTest extends BaseSpringTest {
         log.info(result.toString());
     }
 
+    @Test
+    void getInventoryBatchLog() {
+        var date = LocalDate.of(2024,8,6);
+        var time1 = LocalTime.of(0,0,0);
+        var time2 = LocalTime.of(23,59,59);
+        var datetime1 = LocalDateTime.of(date,time1);
+        var datetime2 = LocalDateTime.of(date,time2);
+        var result = service.getInventoryBatchLog(datetime1, datetime2);
+        log.info(result.toString());
+    }
+
 
     @Test
     public void testRepo() {
@@ -73,10 +84,12 @@ public class EccangTest extends BaseSpringTest {
         var date = LocalDate.of(2024,8,6);
         var time1 = LocalTime.of(0,0,0);
         var time2 = LocalTime.of(23,59,59);
+        var datetime1 = LocalDateTime.of(date,time1);
+        var datetime2 = LocalDateTime.of(date,time2);
         var result = service.getOrderPages(
             EccangOrderVO.builder()
-                .warehouseShipDateStart(LocalDateTime.of(date,time1))
-                .warehouseShipDateEnd(LocalDateTime.of(date,time2))
+                .warehouseShipDateStart(datetime1)
+                .warehouseShipDateEnd(datetime2)
                 .platform("walmart")
             .build()
         );

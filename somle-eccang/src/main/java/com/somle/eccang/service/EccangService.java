@@ -277,7 +277,13 @@ public class EccangService {
         var payload = JsonUtils.newObject();
         payload.put(START_TIME_ALIAS, startTime.format(dateTimeFormatter));
         payload.put(END_TIME_ALIAS, endTime.format(dateTimeFormatter));
-        payload.put("warehouse_code", getWarehouseList().stream().map(warehouse -> warehouse.getWarehouseCode()).toList());
+        List<EccangWarehouse> warehouseList = getWarehouseList();
+        EccangWarehouse first = warehouseList.get(0);
+        log.info(first.toString());
+        String code = first.getWarehouseCode();
+        log.info(code);
+        var codeList = warehouseList.stream().map(EccangWarehouse::getWarehouseCode).toList();
+        payload.put("warehouse_code", warehouseList);
         return getAllBiz(payload, "getInventoryBatchLog");
     }
 
