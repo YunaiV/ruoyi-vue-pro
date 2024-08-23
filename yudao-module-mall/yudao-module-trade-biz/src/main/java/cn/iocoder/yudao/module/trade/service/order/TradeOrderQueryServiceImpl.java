@@ -219,7 +219,7 @@ public class TradeOrderQueryServiceImpl implements TradeOrderQueryService {
     public List<ExpressTrackRespDTO> getExpressTrackList(String code, String logisticsNo, String receiverMobile) {
         return expressClientFactory.getDefaultExpressClient().getExpressTrackList(
                 new ExpressTrackQueryReqDTO().setExpressCode(code).setLogisticsNo(logisticsNo)
-                        .setPhone(receiverMobile));
+                        .setPhone(receiverMobile).setCustomerName(StrUtil.subSuf(receiverMobile, receiverMobile.length() - 4)));
     }
 
     // =================== Order Item ===================
