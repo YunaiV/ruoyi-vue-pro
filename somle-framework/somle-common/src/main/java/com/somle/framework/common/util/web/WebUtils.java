@@ -1,4 +1,4 @@
-package com.somle.util;
+package com.somle.framework.common.util.web;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -6,17 +6,14 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Map;
-import java.util.TreeMap;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Supplier;
 import java.util.zip.GZIPInputStream;
 
-import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
+import com.somle.framework.common.util.json.JsonUtils;
 import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.springframework.retry.support.RetryTemplate;
-import org.springframework.retry.support.RetryTemplateBuilder;
 import org.springframework.stereotype.Component;
 
 //import com.alibaba.fastjson2.JSON;
@@ -33,7 +30,7 @@ import okhttp3.Response;
 
 @Component
 @Slf4j
-public class Util {
+public class WebUtils {
     private static final OkHttpClient client = new OkHttpClient().newBuilder()
         .connectTimeout(30, TimeUnit.SECONDS)
         .readTimeout(30, TimeUnit.SECONDS)
@@ -45,16 +42,7 @@ public class Util {
         .retryOn(RuntimeException.class) // specify the exception to retry on
         .build();
 
-    public static void sleep(long millis) {
-        try {
-            Thread.sleep(millis);
-            // Further code after the delay
-            System.out.println("Task performed after delay of " + millis + " milliseconds");
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            System.out.println("Operation was interrupted");
-        }
-    }
+
 
     public static String urlWithParams(String url, Map<String,String> queryParams) {
         HttpUrl.Builder urlBuilder = HttpUrl.parse(url).newBuilder();
@@ -121,7 +109,7 @@ public class Util {
         }
         log.debug("response: " + responseString);
 
-        return JsonUtils.parseObject2(responseString, responseClass);
+        return JsonUtils.parseObject(responseString, responseClass);
     }
 
     public static <T> T getRequest(String url, Map<String, String> queryParams, Map<String, String> headers, Class<T> responseClass) {

@@ -15,6 +15,7 @@
 
     <modules>
         <module>somle-spring-boot-starter-test</module>
+        <module>somle-common</module>
     </modules>
 
 

@@ -6,7 +6,7 @@ oss:
 logging:
   level:
     ROOT: INFO
-    org.springframework: DEBUG
+#    org.springframework: DEBUG
 #    org.springframework.web: DEBUG
 #    org.springframework.web.client.RestTemplate: DEBUG
 #    org.springframework.http.client: DEBUG
@@ -30,5 +30,4 @@ logging:
 #    com.somle.amazon.service.AmazonAdService: DEBUG
 #    com.somle.util.Limiter: DEBUG
 #    com.somle.util.Util: DEBUG
-  file:
-    name: log/esb.log
+

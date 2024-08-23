@@ -1,38 +1,29 @@
-server:
-  port: 55002
-  tomcat:
-    max-threads: 20
-    connection-timeout: 10000
-spring:
-  # h2:
-  #   console:
-  #     enabled: true
-  # datasource:
-  #   url: jdbc:h2:mem:testdb
-  #   driverClassName: org.h2.Driver
-  #   username: sa
-  #   password: password
-  devtools:
-    restart:
-      enabled: false
-  jpa:
-    properties:
-      hibernate:
-        # show_sql: true
-        format_sql: true
-        # type: trace
-        # use_sql_comments: true
-        # generate_statistics: true
-    hibernate:
-      ddl-auto: update
-      # format_sql: true
-    # show-sql: true
 
-  datasource:
-    url: jdbc:mysql://localhost:3306/ruoyi-vue-pro?serverTimezone=GMT%2B8&useSSL=false&characterEncoding=utf-8
-    driverClassName: com.mysql.cj.jdbc.Driver
-    username: root
-    password: 'YMCA@1978'
+#spring:
+#  # h2:
+#  #   console:
+#  #     enabled: true
+#  # datasource:
+#  #   url: jdbc:h2:mem:testdb
+#  #   driverClassName: org.h2.Driver
+#  #   username: sa
+#  #   password: password
+#  devtools:
+#    restart:
+#      enabled: false
+#  jpa:
+#    properties:
+#      hibernate:
+#        # show_sql: true
+#        format_sql: true
+#        # type: trace
+#        # use_sql_comments: true
+#        # generate_statistics: true
+#    hibernate:
+#      ddl-auto: update
+#      # format_sql: true
+#    # show-sql: true
+
 kingdee:
   outerInstanceIds:
     - 94464631434776576
@@ -48,15 +39,15 @@ logging:
   level:
     ROOT: INFO
 #    org.springframework: DEBUG
-    org.springframework.web: DEBUG
+#    org.springframework.web: DEBUG
     # org.springframework.web.client.RestTemplate: DEBUG
     # org.springframework.http.client: DEBUG
-    org.hibernate.SQL: DEBUG
-    org.hibernate.type: TRACE
-    org.hibernate.orm.jdbc.bind: TRACE
+#    org.hibernate.SQL: DEBUG
+#    org.hibernate.type: TRACE
+#    org.hibernate.orm.jdbc.bind: TRACE
     # org.hibernate.stat: DEBUG
     # com.squareup.okhttp3: DEBUG
-    com.somle: DEBUG
+#    com.somle: DEBUG
 #    com.somle.erp.model.EsbStyleSku: DEBUG
 #    com.somle.erp.service.ErpService: DEBUG
 #    com.somle.eccang.service.EccangService: DEBUG
@@ -71,10 +62,3 @@ logging:
 #    com.somle.amazon.service.AmazonAdService: DEBUG
 #    com.somle.util.Limiter: DEBUG
 #    com.somle.util.Util: DEBUG
-  file:
-    name: log/esb.log
-  logback:
-    rollingpolicy:
-      file-name-pattern: ${LOG_FILE}.%d{yyyy-MM-dd}.%i.log
-      maxFileSize: 10MB
-      maxHistory: 30

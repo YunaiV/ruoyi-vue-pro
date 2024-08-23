@@ -1,10 +1,11 @@
 package com.somle.amazon.service;
 
-import com.alibaba.fastjson2.JSONArray;
-import com.alibaba.fastjson2.JSONObject;
 import com.somle.amazon.model.AmazonAccount;
 import com.somle.amazon.model.AmazonShop;
-import com.somle.util.Util;
+import com.somle.framework.common.util.json.JSONArray;
+import com.somle.framework.common.util.json.JSONObject;
+import com.somle.framework.common.util.json.JsonUtils;
+import com.somle.framework.common.util.web.WebUtils;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -35,7 +36,7 @@ public class AmazonAdClient {
 
     public Stream<JSONArray> getAllAdReport(LocalDate dataDate) {
 //        return getShops().map(shop->getAdReport(shop, dataDate));
-        return Util.parallelRun(12, ()->
+        return WebUtils.parallelRun(12, ()->
             getShops().parallel().map(shop->getAdReport(shop, dataDate))
         );
     }
@@ -64,11 +65,11 @@ public class AmazonAdClient {
         baseMetric.remove("startDate");
         baseMetric.remove("endDate");
 
-        JSONObject params = new JSONObject();
-        params.put("startDate", null);
-        params.put("endDate", null);
+        JSONObject params = JsonUtils.newObject();
+//        params.put("startDate", null);
+//        params.put("endDate", null);
 
-        JSONObject configuration = new JSONObject();
+        JSONObject configuration = JsonUtils.newObject();
         configuration.put("adProduct", "SPONSORED_BRANDS");
         configuration.put("groupBy", new ArrayList<>(Arrays.asList("ads")));
         configuration.put("columns", baseMetric);
@@ -89,7 +90,7 @@ public class AmazonAdClient {
         // log.debug(shop.getProfileId());
         // log.debug(seller.getAdAccessToken());
         // log.debug(adClientId);
-        JSONObject updateDict = new JSONObject();
+        JSONObject updateDict = JsonUtils.newObject();
         updateDict.put("startDate", dataDate.toString());
         updateDict.put("endDate", dataDate.toString());
         payload.putAll(updateDict);
@@ -120,7 +121,7 @@ public class AmazonAdClient {
         while (reportId == null) {
             log.info("Creating ad report...");
             // ResponseEntity<JSONObject> response = restTemplate.exchange(fullUrl, HttpMethod.POST, new HttpEntity<JSONObject>(payload, headers), JSONObject.class);
-            JSONObject response = Util.postRequest(fullUrl, Map.of(), headers, payload, JSONObject.class);
+            JSONObject response = WebUtils.postRequest(fullUrl, Map.of(), headers, payload, JSONObject.class);
             log.debug(response.toString());
             reportId = response.getString("reportId");
         }
@@ -134,7 +135,7 @@ public class AmazonAdClient {
             String reportStatusUrl = endpoint + "/reporting/reports/" + reportId;
             log.info("Checking report status...");
             // response = restTemplate.exchange(reportStatusUrl, HttpMethod.GET, new HttpEntity<>(headers), JSONObject.class);
-            response = Util.getRequest(reportStatusUrl, Map.of(), headers, JSONObject.class);
+            response = WebUtils.getRequest(reportStatusUrl, Map.of(), headers, JSONObject.class);
             log.debug(response.toString());
             status = response.getString("status");
             log.info(status);
@@ -146,7 +147,7 @@ public class AmazonAdClient {
         String docUrl = response.getString("url");
         log.info("Got doc url {}", docUrl);
 
-        JSONArray contentDict = Util.urlToDict(docUrl, "gzip", JSONArray.class);
+        JSONArray contentDict = WebUtils.urlToDict(docUrl, "gzip", JSONArray.class);
 
         return contentDict;
     }

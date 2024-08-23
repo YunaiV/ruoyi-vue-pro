@@ -1,10 +1,10 @@
 package com.somle.erp.controller;
 
-import com.alibaba.fastjson2.JSONObject;
 import com.somle.erp.model.ErpDepartment;
 import com.somle.erp.model.ErpStyleSku;
 import com.somle.erp.service.ErpService;
 
+import com.somle.framework.common.util.json.JsonUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -31,7 +31,7 @@ public class ErpController {
     //     // @RequestBody List<@Valid EsbProduct> productList
     // ) {
     //     if (esbService.addProduct(productList)) {
-    //         JSONObject result = new JSONObject();
+    //         JSONObject result = JsonUtils.newObject();
     //         result.put("status", "200");
     //         return result;
     //     } else {
@@ -46,7 +46,7 @@ public class ErpController {
     //     @Validated @RequestBody Product product
     // ) {
     //     productChannel.send(MessageBuilder.withPayload(product).build());
-    //     JSONObject result = new JSONObject();
+    //     JSONObject result = JsonUtils.newObject();
     //     result.put("code", "200");
     //     return result;
     // }
@@ -76,11 +76,11 @@ public class ErpController {
     }
 
     @PostMapping("/saveStyleSku")
-    public JSONObject saveStyleSku(
+    public Object saveStyleSku(
         @RequestBody ErpStyleSku styleSku
     ) {
         if (erpService.saveStyleSku(styleSku)) {
-            JSONObject result = new JSONObject();
+            var result = JsonUtils.newObject();
             result.put("status", "200");
             return result;
         } else {

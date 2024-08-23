@@ -2,8 +2,8 @@ package com.somle.kingdee.service;
 
 // import com.smecloud.apigw.ApigwConfig;
 
-import com.alibaba.fastjson2.JSON;
-import com.alibaba.fastjson2.JSONObject;
+import com.somle.framework.common.util.json.JSONObject;
+import com.somle.framework.common.util.json.JsonUtils;
 import com.somle.kingdee.model.KingdeeAuxInfoDetail;
 import com.somle.kingdee.model.KingdeeAuxInfoTypeDetail;
 import com.somle.kingdee.model.KingdeeCustomField;
@@ -11,7 +11,7 @@ import com.somle.kingdee.model.KingdeeProduct;
 import com.somle.kingdee.model.KingdeeResponse;
 import com.somle.kingdee.model.KingdeeToken;
 import com.somle.kingdee.model.KingdeeUnit;
-import com.somle.util.Util;
+import com.somle.framework.common.util.web.WebUtils;
 
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
@@ -19,8 +19,6 @@ import lombok.extern.slf4j.Slf4j;
 // import org.apache.commons.codec.binary.Base16;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.binary.Hex;
-import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.messaging.Message;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
@@ -60,14 +58,14 @@ public class KingdeeClient {
         // product.auxInfos = list("/jdy/v2/bd/aux_info")
         //     .map(page -> page.getData().getJSONArray("rows"))
         //     .flatMap(array -> array.stream())
-        //     .map(info->JSON.parseObject(info.toString(), KingdeeAuxInfoDetail.class))
+        //     .map(info->JsonUtils.parseObject(info.toString(), KingdeeAuxInfoDetail.class))
         //     .toList();
 
 
         // product.auxInfoTypes = list("/jdy/v2/bd/aux_info_type")
         //     .map(page -> page.getData().getJSONArray("rows"))
         //     .flatMap(array -> array.stream())
-        //     .map(info->JSON.parseObject(info.toString(), KingdeeAuxInfoTypeDetail.class))
+        //     .map(info->JsonUtils.parseObject(info.toString(), KingdeeAuxInfoTypeDetail.class))
         //     .toList();
 
         // log.debug(auxInfoTypes.stream().filter(type -> type.getNumber().equals("BM")).findFirst().get().getId());
@@ -205,7 +203,7 @@ public class KingdeeClient {
             "X-Api-TimeStamp", ctime
         );
 
-        KingdeeResponse response = Util.getRequest(fullUrl, params, headers, KingdeeResponse.class);
+        KingdeeResponse response = WebUtils.getRequest(fullUrl, params, headers, KingdeeResponse.class);
         return response.getData().getString("app-token");
 
     }
@@ -242,7 +240,7 @@ public class KingdeeClient {
         // log.info("sending okhttp request");
         // try {
         //     KingdeeResponse response = client.newCall(request).execute();
-        //     return JSON.parseArray(parseBody(response, JSONObject.class).getString("data"), KingdeeToken.class).get(0);
+        //     return JsonUtils.parseArray(parseBody(response, JSONObject.class).getString("data"), KingdeeToken.class).get(0);
         // } catch (Exception e) {
         //     throw new RuntimeException(e);
         // }
@@ -257,7 +255,7 @@ public class KingdeeClient {
             "X-Api-TimeStamp", ctime
         );
 
-        KingdeeResponse response = Util.postRequest(fullUrl, params, headers, null, KingdeeResponse.class);
+        KingdeeResponse response = WebUtils.postRequest(fullUrl, params, headers, null, KingdeeResponse.class);
         return response.getDataList(KingdeeToken.class).get(0);
 
     }
@@ -402,7 +400,7 @@ public class KingdeeClient {
         params.put("number", number);
         KingdeeResponse response = getResponse(endUrl, params);
         return response.getData().getJSONArray("rows").stream()
-            .map(n->JSON.parseObject(n.toString(), KingdeeAuxInfoDetail.class))
+            .map(n->JsonUtils.parseObject(n.toString(), KingdeeAuxInfoDetail.class))
             .filter(n->n.getNumber().equals(number))
             .findFirst().get();
     }
@@ -414,7 +412,7 @@ public class KingdeeClient {
         params.put("number", number);
         KingdeeResponse response = getResponse(endUrl, params);
         return response.getData().getJSONArray("rows").stream()
-            .map(n->JSON.parseObject(n.toString(), KingdeeAuxInfoTypeDetail.class))
+            .map(n-> JsonUtils.parseObject(n.toString(), KingdeeAuxInfoTypeDetail.class))
             .filter(n->n.getNumber().equals(number))
             .findFirst().get();
     }
@@ -425,7 +423,7 @@ public class KingdeeClient {
         TreeMap<String, String>  params = new TreeMap<>();
         params.put("entity_number", entity_number);
         KingdeeResponse response = getResponse(endUrl, params);
-        return response.getData().getJSONArray("head").stream().map(n->JSON.parseObject(n.toString(), KingdeeCustomField.class));
+        return response.getData().getJSONArray("head").stream().map(n->JsonUtils.parseObject(n.toString(), KingdeeCustomField.class));
     }
 
     public KingdeeCustomField getCustomFieldByDisplayName(String entity_number, String displayName) {
@@ -513,11 +511,11 @@ public class KingdeeClient {
         KingdeeResponse response = null;
         switch (requestMethod) {
             case "POST":
-                response = Util.postRequest(baseHost + endUrl, params, headers, body, KingdeeResponse.class);
+                response = WebUtils.postRequest(baseHost + endUrl, params, headers, body, KingdeeResponse.class);
                 break;
         
             default:
-                response = Util.getRequest(baseHost + endUrl, params, headers, KingdeeResponse.class);
+                response = WebUtils.getRequest(baseHost + endUrl, params, headers, KingdeeResponse.class);
                 break;
         }
 

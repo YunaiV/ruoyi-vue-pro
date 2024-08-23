@@ -37,10 +37,17 @@ class AiServiceTest extends BaseSpringTest {
     }
 
     @Test
+    void getAddresses() {
+        var result = service.getAddresses(LocalDate.of(2024,8,21));
+        log.info(result.toList().toString());
+    }
+
+    @Test
     void getCountries() {
         var result = service.getCountries();
         log.info(result.toList().toString());
     }
+
 
 //    @org.junit.jupiter.api.Test
 //    void getAddresses() {

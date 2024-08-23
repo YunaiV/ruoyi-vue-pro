@@ -1,11 +1,11 @@
 package com.somle.ai.service;
 
-import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import com.somle.ai.model.AiName;
 import com.somle.ai.model.AiResponse;
+import com.somle.erp.model.ErpAddress;
 import com.somle.erp.model.ErpCountry;
 import com.somle.erp.model.ErpCurrency;
-import com.somle.util.Util;
+import com.somle.framework.common.util.web.WebUtils;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -16,7 +16,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Map;
-import java.util.Objects;
 import java.util.stream.Stream;
 
 @Slf4j
@@ -36,7 +35,7 @@ public class AiService {
 
     public void addName(AiName name) {
         String endUrl = "/api/persons/";
-        AiName response = Util.postRequest(baseUrl + endUrl, Map.of(), headers, name, AiName.class);
+        AiName response = WebUtils.postRequest(baseUrl + endUrl, Map.of(), headers, name, AiName.class);
 
     }
 
@@ -44,7 +43,7 @@ public class AiService {
     public void addAddress(Object address) {
         String endUrl = "/api/locationsdtl/";
 
-        AiResponse response = Util.postRequest(baseUrl + endUrl, Map.of(), headers, address, AiResponse.class);
+        AiResponse response = WebUtils.postRequest(baseUrl + endUrl, Map.of(), headers, address, AiResponse.class);
 
     }
     
@@ -53,8 +52,8 @@ public class AiService {
         return getNew("/api/persons/", dataDate, AiName.class);
     }
 
-    public Stream<String> getAddresses(LocalDate dataDate) {
-        return getNew("/api/locationsdtl/", dataDate, String.class);
+    public Stream<ErpAddress> getAddresses(LocalDate dataDate) {
+        return getNew("/api/locationsdtl/", dataDate, ErpAddress.class);
     }
 
     public <T> Stream<T> getNew(String endUrl, LocalDate dataDate, Class<T> objectclass) {
@@ -68,7 +67,7 @@ public class AiService {
 
         );
 
-        String urlAdded = Util.urlWithParams(baseUrl + endUrl, paramsAdded);
+        String urlAdded = WebUtils.urlWithParams(baseUrl + endUrl, paramsAdded);
 
         Map<String, String> paramsUpdated = Map.of(
             "create_time_before", today.toString(),
@@ -78,19 +77,21 @@ public class AiService {
 
         );
 
-        String urlUpdated = Util.urlWithParams(baseUrl + endUrl, paramsUpdated);
+        String urlUpdated = WebUtils.urlWithParams(baseUrl + endUrl, paramsUpdated);
 
         return Stream.concat(getResults(urlAdded, objectclass), getResults(urlUpdated, objectclass));
     }
 
     public <T> Stream<T> getResults(String url, Class<T> objectclass) {
-        return getReponses(url).flatMap(n->n.getResults(objectclass));
+        return getReponses(url).flatMap(n->{
+            log.info(n.toString());
+            return n.getResults(objectclass);
+        });
     }
 
     public Stream<AiResponse> getReponses(String url) {
         log.debug("fetching from url: " + url);
-        AiResponse response = Util.getRequest(url, Map.of(), headers, AiResponse.class);
-//        return response;
+        AiResponse response = WebUtils.getRequest(url, Map.of(), headers, AiResponse.class);
 
         log.debug("next url is: " + response.getNext());
         Stream<AiResponse> moreResponse = response.getNext() == null ? Stream.empty() : getReponses(response.getNext());
@@ -115,14 +116,14 @@ public class AiService {
 
     public Stream<ErpCountry> getCountries() {
         String endUrl = "/api/countriesiso/";
-//        String response = Util.getRequest(baseUrl + endUrl, Map.of(), headers, String.class);
+//        String response = WebUtils.getRequest(baseUrl + endUrl, Map.of(), headers, String.class);
 //        return JsonUtils.parseArray(response, ErpCountry.class).stream();
         return getResults(baseUrl + endUrl, ErpCountry.class);
     }
 
     public Stream<ErpCurrency> getCurrencies() {
         String endUrl = "/api/currency/";
-//        String response = Util.getRequest(baseUrl + endUrl, Map.of(), headers, String.class);
+//        String response = WebUtils.getRequest(baseUrl + endUrl, Map.of(), headers, String.class);
 //        return JsonUtils.parseArray(response, ErpCurrency.class).stream();
         return getResults(baseUrl + endUrl, ErpCurrency.class);
     }

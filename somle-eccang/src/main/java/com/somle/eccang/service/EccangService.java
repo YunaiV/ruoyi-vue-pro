@@ -8,8 +8,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
-import cn.hutool.core.collection.BoundedPriorityQueue;
 import com.somle.eccang.model.*;
+import com.somle.framework.common.util.json.JsonUtils;
+import com.somle.framework.common.util.json.JSONObject;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.integration.support.MessageBuilder;
 import org.springframework.messaging.MessageChannel;
@@ -17,12 +19,10 @@ import org.springframework.retry.annotation.Retryable;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
-import com.alibaba.fastjson2.JSON;
-import com.alibaba.fastjson2.JSONObject;
 import com.somle.eccang.model.EccangResponse.BizContent;
 import com.somle.eccang.repository.EccangTokenRepository;
-import com.somle.util.Limiter;
-import com.somle.util.Util;
+import com.somle.framework.common.util.general.Limiter;
+import com.somle.framework.common.util.web.WebUtils;
 
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
@@ -32,8 +32,7 @@ import lombok.extern.slf4j.Slf4j;
 public class EccangService {
 
 
-    private String username;
-    private String usertoken;
+    private EccangToken token;
     private int pageSize = 100;
     private Limiter limiter = new Limiter(20);
 
@@ -54,9 +53,7 @@ public class EccangService {
 
     @PostConstruct
     public void init() {
-        EccangToken defaultToken = tokenRepo.findAll().get(0);
-        this.username = defaultToken.getUserName();
-        this.usertoken = defaultToken.getUserToken();
+        token = tokenRepo.findAll().get(0);
     }
 
     private String md5(String input) {
@@ -73,48 +70,52 @@ public class EccangService {
         }
     }
 
-    private JSONObject concateParams(JSONObject reqParams, String ecMethod) {
+    public String concatenateParams(JSONObject postData) {
+        String postDataStr = postData.entrySet().stream()
+            .map(e -> e.getKey() + "=" + e.getValue().asText())
+            .reduce((e1, e2) -> e1 + "&" + e2)
+            .orElse("") + token.getUserToken();
+        return postDataStr;
+    }
+
+    protected JSONObject requestBody(Object reqParams, String ecMethod) {
         long timestamp = System.currentTimeMillis();
 
-        JSONObject postData = new JSONObject();
-        postData.put("app_key", username);
-        postData.put("biz_content", JSON.toJSONString(reqParams.isEmpty() ? Map.of("page_size", pageSize) : reqParams));
+        var postData = JsonUtils.newObject();
+        postData.put("app_key", token.getUserName());
+//        postData.put("biz_content", JSON.toJSONString(reqParams.isEmpty() ? Map.of("page_size", pageSize) : reqParams));
+        postData.put("biz_content", JsonUtils.toJsonString(reqParams));
         postData.put("charset", "UTF-8");
         postData.put("interface_method", ecMethod);
         postData.put("nonce_str", "113456");
         postData.put("service_id", "E7HPYV");
         postData.put("sign_type", "MD5");
         postData.put("timestamp", timestamp);
-        postData.put("version", "v1.0.0");
+        postData.put("version", "V1.0.0");
 
-        String postDataStr = postData.entrySet().stream()
-                .map(e -> e.getKey() + "=" + e.getValue())
-                .reduce((e1, e2) -> e1 + "&" + e2)
-                .orElse("") + usertoken;
-
-        // log.info(postDataStr);
-
-        postData.put("sign", md5(postDataStr));
+        postData.put("sign", md5(concatenateParams(postData)));
 
         return postData;
     }
 
     // core network io
     @Retryable(value = RuntimeException.class)
-    private EccangResponse getResponse(JSONObject payload, String endpoint){
+    private EccangResponse getResponse(Object payload, String endpoint){
         String url = "http://openapi-web.eccang.com/openApi/api/unity";
 
-        EccangResponse responseFinal = Util.retryTemplate.execute(ctx -> {
-            JSONObject concatedParams = concateParams(payload, endpoint);
-            EccangResponse response = limiter.executeWithLimiter(()->{
-                return Util.postRequest(url, Map.of(), Map.of(), concatedParams, EccangResponse.class);
+        EccangResponse responseFinal = WebUtils.retryTemplate.execute(ctx -> {
+            JSONObject requestBody = requestBody(payload, endpoint);
+            EccangResponse eccangResponse = limiter.executeWithLimiter(()->{
+                var response = WebUtils.postRequest(url, Map.of(), Map.of(), requestBody);
+                switch (response.code()) {
+                    case 200:
+                        log.info(response.toString());
+                        return WebUtils.parseResponse(response, EccangResponse.class);
+                    default:
+                        throw new RuntimeException("Error in network " + response.toString());
+                }
             });
-            String code = response.getCode();
-            // if (true) {
-            if (code.equals("common.error.code.9999")) {
-                throw new RuntimeException("Eccang return invalid response: " + response.toString());
-            }
-            return response;
+            return eccangResponse;
         });
 
         return responseFinal;
@@ -122,9 +123,18 @@ public class EccangService {
 
     }
 
-    private BizContent getBiz(JSONObject payload, String endpoint) {
+    private BizContent getBiz(Object payload, String endpoint) {
         EccangResponse response = getResponse(payload, endpoint);
-        return response.getBizContent();
+        switch (response.getCode()) {
+            case "200":
+                return response.getBizContent();
+            case "common.error.code.9999":
+                throw new RuntimeException("Eccang return invalid response: " + response.getErrors().toString());
+            case "300":
+                throw new RuntimeException("Error message from eccang: " + response.getErrors().toString());
+            default:
+                throw new RuntimeException("Error message from eccang: " + response.getErrors().toString());
+        }
     }
 
 
@@ -152,19 +162,19 @@ public class EccangService {
 
     // public Stream<BizContent> listPage (String endpoint) {
 
-    //     JSONObject payload = new JSONObject();
+    //     var payload = JsonUtils.newObject();
     //     return getAllBiz(payload, endpoint);
     // }
 
     public BizContent list (String endpoint) {
 
-        JSONObject payload = new JSONObject();
+        var payload = JsonUtils.newObject();
         return getBiz(payload, endpoint);
     }
 
     public <T> Stream<T> list (String endpoint, Class<T> objectClass) {
 
-        JSONObject payload = new JSONObject();
+        var payload = JsonUtils.newObject();
         // log.debug(payload.toString());
         // getAllBiz(payload, endpoint);
         // return Stream.of();
@@ -174,11 +184,11 @@ public class EccangService {
 
 
     public BizContent post(String endpoint, Object payload) {
-        return getBiz((JSONObject) JSON.toJSON(payload), endpoint);
+        return getBiz(payload, endpoint);
     }
 
     public <T> List<T> post(String endpoint, Object payload, Class<T> objectClass) {
-        return getBiz((JSONObject) JSON.toJSON(payload), endpoint).getData(objectClass);
+        return getBiz(payload, endpoint).getData(objectClass);
     }
 
     public List<String> getPlatforms() {
@@ -201,7 +211,7 @@ public class EccangService {
 
     public List<EccangWarehouse> getWarehouseList () {
 
-        JSONObject params = new JSONObject();
+        JSONObject params = JsonUtils.newObject();
         return getBiz(params, "getWarehouseList").getData(EccangWarehouse.class);
     }
 
@@ -211,12 +221,11 @@ public class EccangService {
         final String START_TIME_ALIAS = "platform_ship_date_start";
         final String END_TIME_ALIAS = "platform_ship_date_end";
 
-        JSONObject options = new JSONObject();
-        options.put("get_detail", "1");
-        options.put("get_address", "1");
+        JSONObject params = JsonUtils.newObject();
+        params.put("get_detail", "1");
+        params.put("get_address", "1");
 
-        JSONObject params = new JSONObject(options);
-        JSONObject condition = new JSONObject();
+        JSONObject condition = JsonUtils.newObject();
         condition.put(START_TIME_ALIAS, startTime.format(dateTimeFormatter));
         condition.put(END_TIME_ALIAS, endTime.format(dateTimeFormatter));
         params.put("condition", condition);
@@ -241,11 +250,10 @@ public class EccangService {
     }
 
     public Stream<BizContent> getOrder(EccangOrderVO order) {
-        JSONObject options = new JSONObject();
-        options.put("get_detail", "1");
-        options.put("get_address", "1");
+        JSONObject params = JsonUtils.newObject();
+        params.put("get_detail", "1");
+        params.put("get_address", "1");
 
-        JSONObject params = new JSONObject(options);
         params.put("condition", order);
         return getAllBiz(params, "getOrderList");
     }
@@ -256,7 +264,7 @@ public class EccangService {
             .build();
         // String response = post("getWmsProductList", product, String.class).get(0);
         // log.debug(response);
-        // return JSON.parseObject(response, EccangProduct.class);
+        // return JsonUtils.parseObject(response, EccangProduct.class);
         return post("getWmsProductList", product, EccangProduct.class).get(0);
     }
 
@@ -267,7 +275,7 @@ public class EccangService {
         final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         final String START_TIME_ALIAS = "date_from";
         final String END_TIME_ALIAS = "date_to";
-        JSONObject payload = new JSONObject();
+        var payload = JsonUtils.newObject();
         payload.put(START_TIME_ALIAS, startTime.format(dateTimeFormatter));
         payload.put(END_TIME_ALIAS, endTime.format(dateTimeFormatter));
         payload.put("warehouse_code", getWarehouseList().stream().map(warehouse -> warehouse.getWarehouseCode()).toList());

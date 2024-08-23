@@ -7,6 +7,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 import java.util.zip.GZIPOutputStream;
 
+import com.somle.framework.common.util.json.JsonUtils;
 import com.somle.esb.model.AliyunToken;
 import com.somle.esb.repository.AliyunTokenRepository;
 import jakarta.annotation.PostConstruct;
@@ -18,7 +19,7 @@ import org.springframework.integration.annotation.ServiceActivator;
 import org.springframework.messaging.Message;
 import org.springframework.stereotype.Service;
 
-import com.alibaba.fastjson2.JSON;
+
 import com.aliyun.oss.OSS;
 import com.aliyun.oss.OSSClientBuilder;
 import com.somle.esb.model.OssData;
@@ -50,7 +51,7 @@ public class AliyunService {
     public void storeOss(Message<OssData> message) throws IOException {
 
         OssData data = message.getPayload();
-        String jsonString = JSON.toJSONString(data);
+        String jsonString = JsonUtils.toJsonString(data);
         byte[] compressedContent = compressString(jsonString);
 
         String database = data.getDatabase();

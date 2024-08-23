@@ -1,14 +1,13 @@
 package com.somle.matomo.service;
 
-import com.alibaba.fastjson2.JSON;
+import com.somle.framework.common.util.json.JsonUtils;
 import com.somle.matomo.model.MatomoVisit;
-import com.somle.util.Util;
+import com.somle.framework.common.util.web.WebUtils;
 
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.stereotype.Service;
 import org.springframework.messaging.MessageChannel;
-import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 
@@ -80,9 +79,9 @@ public class MatomoService {
             "filter_limit", "10000"
         );
 
-        String response = Util.postRequest(baseUrl, params, Map.of(), null, String.class);
+        String response = WebUtils.postRequest(baseUrl, params, Map.of(), null, String.class);
 
-        return JSON.parseArray(response, MatomoVisit.class).stream();
+        return JsonUtils.parseArray(response, MatomoVisit.class).stream();
     }
 
     public Stream<MatomoVisit> getVisits(LocalDate dataDate) {

@@ -1,6 +1,6 @@
 package com.somle.eccang.controller;
 
-import com.alibaba.fastjson2.JSONObject;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.somle.eccang.model.EccangOrder;
 import com.somle.eccang.model.EccangOrderVO;
 import com.somle.eccang.model.EccangResponse.BizContent;
@@ -68,7 +68,7 @@ public class EccangController {
     @GetMapping("/post")
     public BizContent post(
         @RequestParam String endpoint,
-        @RequestBody JSONObject payload
+        @RequestBody Object payload
     ) {
         return eccangService.post(endpoint, payload);
     }

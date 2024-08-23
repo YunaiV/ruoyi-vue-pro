@@ -1,4 +1,4 @@
-package com.somle.util;
+package com.somle.framework.common.util.general;
 
 import lombok.*;
 

@@ -1,17 +1,21 @@
 package com.somle.eccang.model;
 
+import com.somle.framework.common.util.json.JSONArray;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.somle.framework.common.util.json.JsonUtils;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import java.util.List;
 import java.util.Objects;
 
-import com.alibaba.fastjson2.JSON;
-import com.alibaba.fastjson2.JSONArray;
-import com.alibaba.fastjson2.PropertyNamingStrategy;
-import com.alibaba.fastjson2.annotation.JSONType;
 
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class EccangResponse {
     private String code;
@@ -23,21 +27,35 @@ public class EccangResponse {
     private String sign;
     private String bizContent;
 
+    @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class EccangError {
+        private String errorMsg;
+        private String errorCode;
+    }
+
     public BizContent getBizContent() {
-        return JSON.parseObject(bizContent, BizContent.class);
+        return JsonUtils.parseObject(bizContent, BizContent.class);
+    }
+
+    public List<EccangError> getErrors() {
+        return JsonUtils.parseArray(bizContent, EccangError.class);
     }
 
     @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
     @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
     public static class BizContent {
         private Integer total;
         private Integer totalCount;
-        private JSONArray data;
+        private ArrayNode data;
         private Integer page;
         private Integer pageSize;
 
         public <T> List<T> getData(Class<T> objectClass) {
-            return data.toJavaList(objectClass);
+            return JsonUtils.parseArray((JSONArray) data,objectClass);
         }
 
         public int getTotal() {

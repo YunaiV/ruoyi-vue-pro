@@ -12,8 +12,6 @@ import java.util.List;
 
 import jakarta.persistence.Id;
 
-import com.alibaba.fastjson2.PropertyNamingStrategy;
-import com.alibaba.fastjson2.annotation.JSONType;
 
 
 @Data

@@ -1,11 +1,12 @@
 package com.somle.amazon.service;
 
-import com.alibaba.fastjson2.JSONObject;
 import com.somle.amazon.model.AmazonAccount;
 import com.somle.amazon.model.AmazonSeller;
 import com.somle.amazon.repository.AmazonAccountRepository;
 import com.somle.amazon.repository.AmazonShopRepository;
-import com.somle.util.Util;
+import com.somle.framework.common.util.web.WebUtils;
+import com.somle.framework.common.util.json.JSONObject;
+import com.somle.framework.common.util.json.JsonUtils;
 
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
@@ -58,7 +59,7 @@ public class AmazonService {
     // }
     @Scheduled(fixedDelay = 1800000, initialDelay = 1000)
     public void refreshAuth() {
-        JSONObject body = new JSONObject();
+        JSONObject body = JsonUtils.newObject();
         body.put("grant_type", "refresh_token");
         account = accountRepository.findAll().get(0);
         for (AmazonSeller seller : account.getSellers()) {
@@ -82,13 +83,13 @@ public class AmazonService {
     }
 
     public String refreshAccessToken(String clientId, String clientSecret, String refreshToken) {
-        JSONObject body = new JSONObject();
+        JSONObject body = JsonUtils.newObject();
         body.put("grant_type", "refresh_token");
         try {
             body.put("client_id", clientId);
             body.put("client_secret", clientSecret);
             body.put("refresh_token", refreshToken);
-            JSONObject response = Util.postRequest(authUrl, Map.of(), Map.of(), body, JSONObject.class);
+            JSONObject response = WebUtils.postRequest(authUrl, Map.of(), Map.of(), body, JSONObject.class);
             var accessToken = response.getString("access_token");
             return accessToken;
         } catch (Exception e) {

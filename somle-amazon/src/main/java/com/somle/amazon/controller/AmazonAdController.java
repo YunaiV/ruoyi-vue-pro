@@ -2,10 +2,10 @@ package com.somle.amazon.controller;
 
 import java.time.LocalDate;
 
+import com.somle.framework.common.util.json.JSONArray;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import com.alibaba.fastjson2.JSONArray;
 import com.somle.amazon.service.AmazonAdClient;
 import com.somle.amazon.service.AmazonService;
 
@@ -17,7 +17,7 @@ public class AmazonAdController {
 
     @GetMapping("/getAdReport")
     @ResponseBody
-    public JSONArray getAdReport( 
+    public JSONArray getAdReport(
         @RequestParam String countryCode,
         @RequestParam LocalDate dataDate
     ) {

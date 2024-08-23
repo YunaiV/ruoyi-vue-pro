@@ -14,6 +14,10 @@
 
 
     <dependencies>
+        <dependency>
+            <groupId>com.somle</groupId>
+            <artifactId>somle-common</artifactId>
+        </dependency>
 
         <dependency>
             <groupId>com.somle</groupId>
@@ -32,10 +36,7 @@
             <artifactId>spring-boot-starter-integration</artifactId>
         </dependency>
 
-        <dependency>
-            <groupId>com.somle</groupId>
-            <artifactId>somle-util</artifactId>
-        </dependency>
+
     </dependencies>
 
 </project>

@@ -1,7 +1,7 @@
 package com.somle.kingdee.controller;
 
 
-import com.alibaba.fastjson2.JSONObject;
+import com.somle.framework.common.util.json.JSONObject;
 import com.somle.kingdee.model.KingdeeCustomField;
 import com.somle.kingdee.model.KingdeeResponse;
 import com.somle.kingdee.model.KingdeeToken;
@@ -62,7 +62,7 @@ public class KingdeeController {
     //     log.debug(body.toString());
     //     String message = "Failed";
     //     String errorCode = "1";
-    //     JSONObject response = new JSONObject();
+    //     JSONObject response = JsonUtils.newObject();
         
     //     Map<String, String> data = new HashMap<>();
         

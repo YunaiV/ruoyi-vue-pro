@@ -2,10 +2,10 @@ package com.somle.amazon.controller;
 
 import java.time.LocalDate;
 
+import com.somle.framework.common.util.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import com.alibaba.fastjson2.JSONObject;
 import com.somle.amazon.service.AmazonService;
 
 
@@ -17,7 +17,7 @@ public class AmazonSpController {
 
     @GetMapping("/getAsinReport")
     @ResponseBody
-    public JSONObject getAsinReport( 
+    public JSONObject getAsinReport(
         @RequestParam String countryCode,
         @RequestParam LocalDate dataDate
     ) {

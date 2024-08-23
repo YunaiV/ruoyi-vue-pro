@@ -1,8 +1,6 @@
 package com.somle.kingdee.model;
 
 import java.util.List;
-import com.alibaba.fastjson2.annotation.JSONType;
-import com.alibaba.fastjson2.PropertyNamingStrategy;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;

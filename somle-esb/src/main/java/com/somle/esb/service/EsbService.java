@@ -17,9 +17,10 @@ import com.somle.esb.converter.ErpToEccangConverter;
 import com.somle.esb.converter.ErpToKingdeeConverter;
 import com.somle.esb.model.Domain;
 import com.somle.esb.model.OssData;
+import com.somle.framework.common.util.general.CoreUtils;
 import com.somle.kingdee.service.KingdeeService;
 import com.somle.matomo.service.MatomoService;
-import com.somle.util.Util;
+import com.somle.framework.common.util.web.WebUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.integration.annotation.ServiceActivator;
@@ -217,7 +218,7 @@ public class EsbService {
                     });
                 eccangService.getInventoryBatchLog(yesterdayFirstSecond, yesterdayLastSecond)
                     .forEach(page -> {
-                        Util.sleep(2000);
+                        CoreUtils.sleep(2000);
                         OssData data = OssData.builder()
                             .database(domain.getValue())
                             .tableName("stock_log")

@@ -1,14 +1,17 @@
 package com.somle.amazon.service;
 
-import com.alibaba.fastjson2.JSONObject;
 import com.somle.amazon.model.AmazonAccount;
 import com.somle.amazon.model.AmazonErrorList;
 import com.somle.amazon.model.AmazonShop;
 //import com.somle.amazon.repository.AmazonSellerRepository;
-import com.somle.util.Util;
+import com.somle.framework.common.util.general.CoreUtils;
+import com.somle.framework.common.util.json.JSONObject;
+import com.somle.framework.common.util.json.JsonUtils;
+import com.somle.framework.common.util.web.WebUtils;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.transaction.annotation.Transactional;
@@ -55,7 +58,7 @@ public class AmazonSpClient {
 
     @Transactional(readOnly = true)
     public JSONObject getAsinReport(AmazonShop shop, LocalDate dataDate) {
-        JSONObject options = new JSONObject();
+        JSONObject options = JsonUtils.newObject();
         
         // Add reportType
         options.put("reportType", "GET_SALES_AND_TRAFFIC_REPORT");
@@ -65,7 +68,7 @@ public class AmazonSpClient {
 
         // Create and add reportOptions
         // Create and add reportOptions
-        JSONObject reportOptions = new JSONObject();
+        JSONObject reportOptions = JsonUtils.newObject();
         reportOptions.put("asinGranularity", "CHILD");
         reportOptions.put("dateGranularity", "DAY");
         options.put("reportOptions", reportOptions);
@@ -83,7 +86,7 @@ public class AmazonSpClient {
         String partialUrl = "/reports/2021-06-30/reports";
         String fullUrl = endPoint + partialUrl;
         var headers = Map.of("x-amz-access-token", getShop(countryCode).getSeller().getSpAccessToken());
-        JSONObject result = new JSONObject();
+        JSONObject result = JsonUtils.newObject();
         payload.put("dataStartTime", dataDate.format(DATE_FORMAT));
         payload.put("dataEndTime", dataDate.format(DATE_FORMAT));
 
@@ -91,14 +94,14 @@ public class AmazonSpClient {
         String reportId = null;
         while (reportId == null) {
             log.info("creating report");
-            var response = Util.postRequest(fullUrl, Map.of(), headers, payload);
+            var response = WebUtils.postRequest(fullUrl, Map.of(), headers, payload);
             switch (response.code()) {
                 case 202:
-                    var report = Util.parseResponse(response, Report.class);
+                    var report = WebUtils.parseResponse(response, Report.class);
                     reportId = report.getReportId();
                     break;
                 case 403:
-                    var error = Util.parseResponse(response, AmazonErrorList.class);
+                    var error = WebUtils.parseResponse(response, AmazonErrorList.class);
                     switch (error.getErrors().get(0).getCode()) {
                         case "Unauthorized":
                             log.error(error.toString());
@@ -123,23 +126,45 @@ public class AmazonSpClient {
                 log.info("requesting for document id");
                 // ResponseEntity<JSONObject> response = restTemplate.exchange(reportStatusUrl, HttpMethod.GET, new HttpEntity<>(headers), JSONObject.class);
                 // JSONObject responseBody = response.getBody();
-                JSONObject response = Util.getRequest(reportStatusUrl, Map.of(), headers, JSONObject.class);
-                JSONObject responseBody = response;
+                var response = WebUtils.getRequest(reportStatusUrl, Map.of(), headers);
+
+                switch (response.code()) {
+                    case 200:
+                        break;
+                    case 429:
+                        log.info("Received 429 Too Many Requests. Retrying...");
+                        CoreUtils.sleep(3000);
+                        continue;
+                    default:
+                        throw new RuntimeException("Http error code: " + response.toString() + response.body().string());
+                }
+                var responseBody = WebUtils.parseResponse(response, JSONObject.class);
                 status = responseBody.getString("processingStatus");
                 log.info(status);
-                docId = responseBody.getString("reportDocumentId");
-                if ("CANCELLED".equals(status)) {
-                    result.put("Message", "No data returned, get report fail.");
-                    return result;
+                switch (status) {
+                    case "CANCELLED":
+                        result.put("Message", "No data returned, get report fail.");
+                        return result;
+                    case "IN_QUEUE":
+                        break;
+                    case "IN_PROGRESS":
+                        break;
+                    case "DONE":
+                        docId = responseBody.getString("reportDocumentId");
+                        break;
+                    default:
+                        throw new RuntimeException("Unknown status code: " + status);
                 }
-            } catch (HttpClientErrorException.TooManyRequests e) {
-                log.info("Received 429 Too Many Requests. Retrying...");
-                try {
-                    Thread.sleep(3000); // Sleep for 3000 miliseconds before retrying
-                } catch (InterruptedException ie) {
-                    log.info("Thread interrupted, restoring");
-                    Thread.currentThread().interrupt(); // Restore interrupted status
-                }
+//            } catch (HttpClientErrorException.TooManyRequests e) {
+//                log.info("Received 429 Too Many Requests. Retrying...");
+//                try {
+//                    Thread.sleep(3000); // Sleep for 3000 miliseconds before retrying
+//                } catch (InterruptedException ie) {
+//                    log.info("Thread interrupted, restoring");
+//                    Thread.currentThread().interrupt(); // Restore interrupted status
+//                }
+            } catch (Exception e) {
+                throw new RuntimeException(e);
             }
 
         }
@@ -151,7 +176,7 @@ public class AmazonSpClient {
             try {
                 // ResponseEntity<JSONObject> response = restTemplate.exchange(documentUrl, HttpMethod.GET, new HttpEntity<>(headers), JSONObject.class);
                 // JSONObject responseBody = response.getBody();
-                JSONObject response = Util.getRequest(documentUrl, Map.of(), headers, JSONObject.class);
+                JSONObject response = WebUtils.getRequest(documentUrl, Map.of(), headers, JSONObject.class);
                 JSONObject responseBody = response;
                 docUrl = responseBody.getString("url");
             } catch (HttpClientErrorException.TooManyRequests e) {
@@ -168,7 +193,7 @@ public class AmazonSpClient {
         log.info("Document URL: {}", docUrl);
 
         // Use util to process the document URL
-        result = Util.urlToDict(docUrl, "gzip", JSONObject.class);
+        result = WebUtils.urlToDict(docUrl, "gzip", JSONObject.class);
         // requestDict = {'headers': headers, 'body': payload};
         // return requestDict, contentDict;
 

@@ -28,11 +28,7 @@
             <artifactId>aliyun-sdk-oss</artifactId>
         </dependency>
 
-        <dependency>
-            <groupId>com.somle</groupId>
-            <artifactId>somle-util</artifactId>
-            <version>${revision}</version>
-        </dependency>
+
         <dependency>
             <groupId>com.somle</groupId>
             <artifactId>somle-amazon</artifactId>

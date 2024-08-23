@@ -82,6 +82,19 @@
     <dependencyManagement>
         <dependencies>
 <!--            why this dependency necessary?-->
+
+            <dependency>
+                <groupId>com.somle</groupId>
+                <artifactId>somle-framework</artifactId>
+                <version>${revision}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.somle</groupId>
+                <artifactId>somle-common</artifactId>
+                <version>${revision}</version>
+            </dependency>
+
             <dependency>
                 <groupId>com.somle</groupId>
                 <artifactId>somle-spring-boot-starter-test</artifactId>
@@ -89,23 +102,7 @@
                 <scope>test</scope>
             </dependency>
 
-            <dependency>
-                <groupId>com.somle</groupId>
-                <artifactId>somle-util</artifactId>
-                <version>${revision}</version>
-            </dependency>
 
-            <dependency>
-                <groupId>com.alibaba.fastjson2</groupId>
-                <artifactId>fastjson2</artifactId>
-                <version>${fastjson2.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>com.alibaba.fastjson2</groupId>
-                <artifactId>fastjson2-extension-spring6</artifactId>
-                <version>${fastjson2.version}</version>
-            </dependency>
 
             <dependency>
                 <groupId>commons-codec</groupId>
