@@ -24,41 +24,7 @@
 #      # format_sql: true
 #    # show-sql: true
 
-kingdee:
-  outerInstanceIds:
-    - 94464631434776576
-    - 94827482531893248
-    - 94827793875079168
-    - 94828068241281024
-    - 94828281114791936
-    - 94829067232219136
+
 oss:
   endpoint: https://oss-cn-hangzhou.aliyuncs.com
-  bucketName: somle-bigdata
-logging:
-  level:
-    ROOT: INFO
-#    org.springframework: DEBUG
-#    org.springframework.web: DEBUG
-    # org.springframework.web.client.RestTemplate: DEBUG
-    # org.springframework.http.client: DEBUG
-#    org.hibernate.SQL: DEBUG
-#    org.hibernate.type: TRACE
-#    org.hibernate.orm.jdbc.bind: TRACE
-    # org.hibernate.stat: DEBUG
-    # com.squareup.okhttp3: DEBUG
-#    com.somle: DEBUG
-#    com.somle.erp.model.EsbStyleSku: DEBUG
-#    com.somle.erp.service.ErpService: DEBUG
-#    com.somle.eccang.service.EccangService: DEBUG
-#    com.somle.kingdee.controller.KingdeeController: DEBUG
-#    com.somle.kingdee.service.KingdeeService: DEBUG
-#    com.somle.kingdee.service.KingdeeClient: DEBUG
-#    com.somle.dingtalk.service.DingTalkService: DEBUG
-#    com.somle.ai.service.AiService: DEBUG
-#    com.somle.amazon.controller.AmazonSpController: DEBUG
-#    com.somle.amazon.service.AmazonService: DEBUG
-#    com.somle.amazon.service.AmazonSpService: DEBUG
-#    com.somle.amazon.service.AmazonAdService: DEBUG
-#    com.somle.util.Limiter: DEBUG
-#    com.somle.util.Util: DEBUG
+
