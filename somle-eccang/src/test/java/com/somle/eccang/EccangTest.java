@@ -56,6 +56,12 @@ public class EccangTest extends BaseSpringTest {
     public void testInit() {
     }
 
+    @Test
+    void getWarehouseList() {
+        var result = service.getWarehouseList();
+        log.info(result.toString());
+    }
+
 
     @Test
     public void testRepo() {

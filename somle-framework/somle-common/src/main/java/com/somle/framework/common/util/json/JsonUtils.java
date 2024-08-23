@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.somle.framework.common.util.json.JSONObject;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -14,6 +15,7 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -76,21 +78,26 @@ public class JsonUtils {
 
     @SneakyThrows
     public static <T> T parseObject(JSONObject jsonObject, Class<T> clazz) {
-        return objectMapper.treeToValue(jsonObject, clazz);
+        return parseObject((ObjectNode) jsonObject, clazz);
+    }
+
+    @SneakyThrows
+    public static <T> List<T> parseArray(ArrayNode node, Class<T> clazz) {
+        return objectMapper.convertValue(node, new TypeReference<List<T>>() {});
+
+//        List<T> results = new ArrayList<>();
+//        if (node.isArray()) {
+//            for (var element : node) {
+//                var object = objectMapper.treeToValue(node, clazz);
+//                results.add(object);
+//            }
+//        }
+//        return results;
     }
 
     @SneakyThrows
     public static <T> List<T> parseArray(JSONArray jsonArray, Class<T> clazz) {
-        ArrayNode arrayNode = (ArrayNode) objectMapper.treeToValue(jsonArray, clazz);
-
-        List<T> results = new ArrayList<>();
-        if (arrayNode.isArray()) {
-            for (var node : arrayNode) {
-                var object = objectMapper.treeToValue(node, clazz);
-                results.add(object);
-            }
-        }
-        return results;
+        return parseArray((ArrayNode) jsonArray, clazz);
     }
 
     @SneakyThrows
