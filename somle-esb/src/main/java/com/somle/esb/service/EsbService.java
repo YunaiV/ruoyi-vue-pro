@@ -216,6 +216,21 @@ public class EsbService {
                             .build();
                         dataChannel.send(MessageBuilder.withPayload(data).build());
                     });
+
+                eccangService.getOrderUnShipPage()
+                    .forEach(page -> {
+                        OssData data = OssData.builder()
+                            .database(domain.getValue())
+                            .tableName("order_unship")
+                            .syncType("inc")
+                            .requestTimestamp(System.currentTimeMillis())
+                            .folderDate(yesterday)
+                            .content(page)
+                            .headers(null)
+                            .build();
+                        dataChannel.send(MessageBuilder.withPayload(data).build());
+                    });
+
                 eccangService.getInventoryBatchLog(yesterdayFirstSecond, yesterdayLastSecond)
                     .forEach(page -> {
                         CoreUtils.sleep(2000);

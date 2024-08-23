@@ -215,29 +215,6 @@ public class EccangService {
         return getBiz(params, "getWarehouseList").getData(EccangWarehouse.class);
     }
 
-
-    public Stream<BizContent> getOrderShipPage(LocalDateTime startTime, LocalDateTime endTime) {
-        final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        final String START_TIME_ALIAS = "platform_ship_date_start";
-        final String END_TIME_ALIAS = "platform_ship_date_end";
-
-        JSONObject params = JsonUtils.newObject();
-        params.put("get_detail", "1");
-        params.put("get_address", "1");
-
-        JSONObject condition = JsonUtils.newObject();
-        condition.put(START_TIME_ALIAS, startTime.format(dateTimeFormatter));
-        condition.put(END_TIME_ALIAS, endTime.format(dateTimeFormatter));
-        params.put("condition", condition);
-        return getAllBiz(params, "getOrderList");
-    }
-
-    public Stream<EccangOrder> getOrderShip(LocalDateTime startTime, LocalDateTime endTime) {
-        return getOrderShipPage(startTime, endTime)
-            .map(n->n.getData(EccangOrder.class))
-            .flatMap(n->n.stream());
-    }
-
     @Scheduled(cron = "0 0 * * * *") // Executes every hour
     // @Scheduled(fixedDelay = 999999999, initialDelay = 1000)
     public void uploadOrderShip() {
@@ -249,7 +226,29 @@ public class EccangService {
             });
     }
 
-    public Stream<BizContent> getOrder(EccangOrderVO order) {
+    public Stream<EccangOrder> getOrderShip(LocalDateTime startTime, LocalDateTime endTime) {
+        return getOrderShipPage(startTime, endTime)
+            .map(n->n.getData(EccangOrder.class))
+            .flatMap(n->n.stream());
+    }
+
+    public Stream<BizContent> getOrderShipPage(LocalDateTime startTime, LocalDateTime endTime) {
+        var query = EccangOrderVO.builder()
+            .platformShipDateStart(startTime)
+            .platformShipDateEnd(endTime)
+            .build();
+        return getOrderPages(query);
+    }
+
+    public Stream<BizContent> getOrderUnShipPage() {
+        var query = EccangOrderVO.builder()
+            .status("3")
+            .build();
+        return getOrderPages(query);
+    }
+
+
+    public Stream<BizContent> getOrderPages(EccangOrderVO order) {
         JSONObject params = JsonUtils.newObject();
         params.put("get_detail", "1");
         params.put("get_address", "1");

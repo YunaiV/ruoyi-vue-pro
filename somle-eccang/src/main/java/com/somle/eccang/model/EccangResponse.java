@@ -55,7 +55,7 @@ public class EccangResponse {
         private Integer pageSize;
 
         public <T> List<T> getData(Class<T> objectClass) {
-            return JsonUtils.parseArray((JSONArray) data,objectClass);
+            return JsonUtils.parseArray(new JSONArray(data),objectClass);
         }
 
         public int getTotal() {

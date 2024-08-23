@@ -1,7 +1,5 @@
 package com.somle.eccang.controller;
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.somle.eccang.model.EccangOrder;
 import com.somle.eccang.model.EccangOrderVO;
 import com.somle.eccang.model.EccangResponse.BizContent;
 import com.somle.eccang.model.EccangProduct;
@@ -9,7 +7,6 @@ import com.somle.eccang.service.EccangService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -39,7 +36,7 @@ public class EccangController {
     public List<BizContent> getOrder(
         @RequestParam EccangOrderVO order
     ) {
-        return eccangService.getOrder(order).toList();
+        return eccangService.getOrderPages(order).toList();
     }
 
     @GetMapping("/getProducts")
