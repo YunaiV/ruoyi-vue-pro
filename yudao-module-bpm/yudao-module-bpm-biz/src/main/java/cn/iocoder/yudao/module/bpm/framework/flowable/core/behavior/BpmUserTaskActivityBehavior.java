@@ -1,17 +1,8 @@
 package cn.iocoder.yudao.module.bpm.framework.flowable.core.behavior;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.RandomUtil;
-import cn.hutool.extra.spring.SpringUtil;
-import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.task.BpmTaskApproveReqVO;
-import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.task.BpmTaskRejectReqVO;
-import cn.iocoder.yudao.module.bpm.enums.definition.BpmUserTaskApproveTypeEnum;
-import cn.iocoder.yudao.module.bpm.enums.definition.BpmUserTaskAssignEmptyHandlerTypeEnum;
-import cn.iocoder.yudao.module.bpm.enums.task.BpmReasonEnum;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.candidate.BpmTaskCandidateInvoker;
-import cn.iocoder.yudao.module.bpm.framework.flowable.core.util.BpmnModelUtils;
-import cn.iocoder.yudao.module.bpm.service.task.BpmTaskService;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.flowable.bpmn.model.UserTask;
@@ -22,8 +13,7 @@ import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.util.TaskHelper;
 import org.flowable.task.service.TaskService;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
-import org.springframework.transaction.support.TransactionSynchronization;
-import org.springframework.transaction.support.TransactionSynchronizationManager;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Set;
@@ -46,6 +36,7 @@ public class BpmUserTaskActivityBehavior extends UserTaskActivityBehavior {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     protected void handleAssignments(TaskService taskService, String assignee, String owner,
         List<String> candidateUsers, List<String> candidateGroups, TaskEntity task, ExpressionManager expressionManager,
         DelegateExecution execution, ProcessEngineConfigurationImpl processEngineConfiguration) {
@@ -54,39 +45,7 @@ public class BpmUserTaskActivityBehavior extends UserTaskActivityBehavior {
         // 第二步，设置作为负责人
         if (assigneeUserId != null) {
             TaskHelper.changeTaskAssignee(task, String.valueOf(assigneeUserId));
-            return;
         }
-
-        // 特殊：处理需要自动通过、不通过的情况
-        Integer approveType = BpmnModelUtils.parseApproveType(userTask);
-        Integer assignEmptyHandlerType = BpmnModelUtils.parseAssignEmptyHandlerType(userTask);
-        TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
-
-            @Override
-            public void afterCommit() {
-                // 特殊情况一：【人工审核】审批人为空，根据配置是否要自动通过、自动拒绝
-                if (ObjectUtil.equal(approveType, BpmUserTaskApproveTypeEnum.USER.getType())) {
-                    if (ObjectUtil.equal(assignEmptyHandlerType, BpmUserTaskAssignEmptyHandlerTypeEnum.APPROVE.getType())) {
-                        SpringUtil.getBean(BpmTaskService.class).approveTask(null, new BpmTaskApproveReqVO()
-                                .setId(task.getId()).setReason(BpmReasonEnum.ASSIGN_EMPTY_APPROVE.getReason()));
-                    } else if (ObjectUtil.equal(assignEmptyHandlerType, BpmUserTaskAssignEmptyHandlerTypeEnum.REJECT.getType())) {
-                        SpringUtil.getBean(BpmTaskService.class).rejectTask(null, new BpmTaskRejectReqVO()
-                                .setId(task.getId()).setReason(BpmReasonEnum.ASSIGN_EMPTY_REJECT.getReason()));
-                    }
-                // 特殊情况二：【自动审核】审批类型为自动通过、不通过
-                } else {
-                    if (ObjectUtil.equal(approveType, BpmUserTaskApproveTypeEnum.AUTO_APPROVE.getType())) {
-                        SpringUtil.getBean(BpmTaskService.class).approveTask(null, new BpmTaskApproveReqVO()
-                                .setId(task.getId()).setReason(BpmReasonEnum.APPROVE_TYPE_AUTO_APPROVE.getReason()));
-                    } else if (ObjectUtil.equal(approveType, BpmUserTaskApproveTypeEnum.AUTO_REJECT.getType())) {
-                        SpringUtil.getBean(BpmTaskService.class).rejectTask(null, new BpmTaskRejectReqVO()
-                                .setId(task.getId()).setReason(BpmReasonEnum.APPROVE_TYPE_AUTO_REJECT.getReason()));
-                    }
-                }
-
-            }
-
-        });
     }
 
     private Long calculateTaskCandidateUsers(DelegateExecution execution) {
