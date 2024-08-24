@@ -59,8 +59,6 @@ public class AmazonService {
     // }
     @Scheduled(fixedDelay = 1800000, initialDelay = 1000)
     public void refreshAuth() {
-        JSONObject body = JsonUtils.newObject();
-        body.put("grant_type", "refresh_token");
         account = accountRepository.findAll().get(0);
         for (AmazonSeller seller : account.getSellers()) {
             seller.setSpAccessToken(
@@ -87,10 +85,10 @@ public class AmazonService {
     public String refreshAccessToken(String clientId, String clientSecret, String refreshToken) {
         JSONObject body = JsonUtils.newObject();
         body.put("grant_type", "refresh_token");
+        body.put("client_id", clientId);
+        body.put("client_secret", clientSecret);
+        body.put("refresh_token", refreshToken);
         try {
-            body.put("client_id", clientId);
-            body.put("client_secret", clientSecret);
-            body.put("refresh_token", refreshToken);
             JSONObject response = WebUtils.postRequest(authUrl, Map.of(), Map.of(), body, JSONObject.class);
             var accessToken = response.getString("access_token");
             return accessToken;

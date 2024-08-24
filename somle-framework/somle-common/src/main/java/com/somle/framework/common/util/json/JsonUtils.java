@@ -2,6 +2,7 @@ package com.somle.framework.common.util.json;
 
 import cn.hutool.core.util.StrUtil;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.somle.framework.common.util.json.JSONObject;
@@ -72,34 +73,24 @@ public class JsonUtils {
     }
 
     @SneakyThrows
-    public static <T> T parseObject(ObjectNode node, Class<T> clazz) {
+    public static <T> T parseObject(JsonNode node, Class<T> clazz) {
         return objectMapper.treeToValue(node, clazz);
     }
 
-    @SneakyThrows
-    public static <T> T parseObject(JSONObject jsonObject, Class<T> clazz) {
-        return parseObject((ObjectNode) jsonObject, clazz);
-    }
 
     @SneakyThrows
-    public static <T> List<T> parseArray(ArrayNode node, Class<T> clazz) {
-
-//        return objectMapper.convertValue(node, new TypeReference<List<T>>() {});
+    public static <T> List<T> parseArray(JsonNode node, Class<T> clazz) {
         return  objectMapper.readerForListOf(clazz).readValue(node);
-
-//        List<T> results = new ArrayList<>();
-//        if (node.isArray()) {
-//            for (var element : node) {
-//                var object = objectMapper.treeToValue(node, clazz);
-//                results.add(object);
-//            }
-//        }
-//        return results;
     }
 
     @SneakyThrows
     public static <T> List<T> parseArray(JSONArray jsonArray, Class<T> clazz) {
         return parseArray((ArrayNode) jsonArray, clazz);
+    }
+
+    @SneakyThrows
+    public static <T> T parseObject(JSONObject jsonObject, Class<T> clazz) {
+        return parseObject((ObjectNode) jsonObject, clazz);
     }
 
     @SneakyThrows
