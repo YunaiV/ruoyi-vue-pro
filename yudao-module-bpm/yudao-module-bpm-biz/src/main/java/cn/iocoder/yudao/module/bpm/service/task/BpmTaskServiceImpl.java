@@ -12,9 +12,7 @@ import cn.iocoder.yudao.framework.common.util.object.PageUtils;
 import cn.iocoder.yudao.framework.web.core.util.WebFrameworkUtils;
 import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.task.*;
 import cn.iocoder.yudao.module.bpm.convert.task.BpmTaskConvert;
-import cn.iocoder.yudao.module.bpm.enums.definition.BpmUserTaskAssignStartUserHandlerTypeEnum;
-import cn.iocoder.yudao.module.bpm.enums.definition.BpmUserTaskRejectHandlerType;
-import cn.iocoder.yudao.module.bpm.enums.definition.BpmUserTaskTimeoutHandlerTypeEnum;
+import cn.iocoder.yudao.module.bpm.enums.definition.*;
 import cn.iocoder.yudao.module.bpm.enums.task.BpmCommentTypeEnum;
 import cn.iocoder.yudao.module.bpm.enums.task.BpmReasonEnum;
 import cn.iocoder.yudao.module.bpm.enums.task.BpmTaskSignTypeEnum;
@@ -888,12 +886,55 @@ public class BpmTaskServiceImpl implements BpmTaskService {
 
     @Override
     public void processTaskCreated(Task task) {
+        // 1. 设置为待办中
         Integer status = (Integer) task.getTaskLocalVariables().get(BpmnVariableConstants.TASK_VARIABLE_STATUS);
         if (status != null) {
             log.error("[updateTaskStatusWhenCreated][taskId({}) 已经有状态({})]", task.getId(), status);
             return;
         }
         updateTaskStatus(task.getId(), BpmTaskStatusEnum.RUNNING.getStatus());
+
+        // 2. 处理自动通过的情况，例如说：1）无审批人时，是否自动通过、不通过；2）非【人工审核】时，是否自动通过、不通过
+        ProcessInstance processInstance = processInstanceService.getProcessInstance(task.getProcessInstanceId());
+        if (processInstance == null) {
+            log.error("[processTaskCreated][taskId({}) 没有找到流程实例]", task.getId());
+            return;
+        }
+        BpmnModel bpmnModel = modelService.getBpmnModelByDefinitionId(processInstance.getProcessDefinitionId());
+        FlowElement userTaskElement = BpmnModelUtils.getFlowElementById(bpmnModel, task.getTaskDefinitionKey());
+        Integer approveType = BpmnModelUtils.parseApproveType(userTaskElement);
+        Integer assignEmptyHandlerType = BpmnModelUtils.parseAssignEmptyHandlerType(userTaskElement);
+        TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+
+            @Override
+            public void afterCompletion(int transactionStatus) {
+                // 特殊情况：部分情况下，TransactionSynchronizationManager 注册 afterCommit 监听时，不会被调用，但是 afterCompletion 可以
+                // 例如说：第一个 task 就是配置【自动通过】或者【自动拒绝】时
+                if (ObjectUtil.notEqual(transactionStatus, TransactionSynchronization.STATUS_COMMITTED)) {
+                    return;
+                }
+                // 特殊情况一：【人工审核】审批人为空，根据配置是否要自动通过、自动拒绝
+                if (ObjectUtil.equal(approveType, BpmUserTaskApproveTypeEnum.USER.getType())) {
+                    if (ObjectUtil.equal(assignEmptyHandlerType, BpmUserTaskAssignEmptyHandlerTypeEnum.APPROVE.getType())) {
+                        SpringUtil.getBean(BpmTaskService.class).approveTask(null, new BpmTaskApproveReqVO()
+                                .setId(task.getId()).setReason(BpmReasonEnum.ASSIGN_EMPTY_APPROVE.getReason()));
+                    } else if (ObjectUtil.equal(assignEmptyHandlerType, BpmUserTaskAssignEmptyHandlerTypeEnum.REJECT.getType())) {
+                        SpringUtil.getBean(BpmTaskService.class).rejectTask(null, new BpmTaskRejectReqVO()
+                                .setId(task.getId()).setReason(BpmReasonEnum.ASSIGN_EMPTY_REJECT.getReason()));
+                    }
+                    // 特殊情况二：【自动审核】审批类型为自动通过、不通过
+                } else {
+                    if (ObjectUtil.equal(approveType, BpmUserTaskApproveTypeEnum.AUTO_APPROVE.getType())) {
+                        SpringUtil.getBean(BpmTaskService.class).approveTask(null, new BpmTaskApproveReqVO()
+                                .setId(task.getId()).setReason(BpmReasonEnum.APPROVE_TYPE_AUTO_APPROVE.getReason()));
+                    } else if (ObjectUtil.equal(approveType, BpmUserTaskApproveTypeEnum.AUTO_REJECT.getType())) {
+                        SpringUtil.getBean(BpmTaskService.class).rejectTask(null, new BpmTaskRejectReqVO()
+                                .setId(task.getId()).setReason(BpmReasonEnum.APPROVE_TYPE_AUTO_REJECT.getReason()));
+                    }
+                }
+            }
+
+        });
     }
 
     /**
