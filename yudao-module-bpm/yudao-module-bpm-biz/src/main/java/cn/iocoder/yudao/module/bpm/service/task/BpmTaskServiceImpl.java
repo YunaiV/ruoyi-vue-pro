@@ -617,10 +617,11 @@ public class BpmTaskServiceImpl implements BpmTaskService {
             updateTaskStatusAndReason(task.getId(), BpmTaskStatusEnum.RETURN.getStatus(), reqVO.getReason());
         });
 
-        // 设置流程变量节点驳回标记。用于驳回到节点。不执行 BpmUserTaskAssignStartUserHandlerTypeEnum 策略 而自动通过
+        // 3. 设置流程变量节点驳回标记：用于驳回到节点，不执行 BpmUserTaskAssignStartUserHandlerTypeEnum 策略。导致自动通过
         runtimeService.setVariable(currentTask.getProcessInstanceId(),
                 String.format(PROCESS_INSTANCE_VARIABLE_RETURN_FLAG, reqVO.getTargetTaskDefinitionKey()), Boolean.TRUE);
-        // 3. 执行驳回
+
+        // 4. 执行驳回
         runtimeService.createChangeActivityStateBuilder()
                 .processInstanceId(currentTask.getProcessInstanceId())
                 .moveActivityIdsToSingleActivityId(returnTaskKeyList, // 当前要跳转的节点列表( 1 或多)
@@ -978,12 +979,13 @@ public class BpmTaskServiceImpl implements BpmTaskService {
                     log.error("[processTaskAssigned][taskId({}) 没有找到流程实例]", task.getId());
                     return;
                 }
-                // 审批人与提交人为同一人时，根据策略进行处理
+                // 审批人与提交人为同一人时，根据 BpmUserTaskAssignStartUserHandlerTypeEnum 策略进行处理
                 if (StrUtil.equals(task.getAssignee(), processInstance.getStartUserId())) {
-                    // 判断是否为回退或者驳回
+                    // 判断是否为回退或者驳回：如果是回退或者驳回不走这个策略
+                    // TODO 芋艿：【优化】未来有没更好的判断方式？！另外，还要考虑清理机制。就是说，下次处理了之后，就移除这个标识
                     Boolean returnTaskFlag = runtimeService.getVariable(processInstance.getProcessInstanceId(),
                             String.format(PROCESS_INSTANCE_VARIABLE_RETURN_FLAG, task.getTaskDefinitionKey()), Boolean.class);
-                    if (!BooleanUtil.isTrue(returnTaskFlag)) { // 如果是回退或者驳回不走这个策略
+                    if (ObjUtil.notEqual(returnTaskFlag, Boolean.TRUE)) {
                         BpmnModel bpmnModel = modelService.getBpmnModelByDefinitionId(processInstance.getProcessDefinitionId());
                         if (bpmnModel == null) {
                             log.error("[processTaskAssigned][taskId({}) 没有找到流程模型]", task.getId());

@@ -30,9 +30,10 @@ public class BpmnVariableConstants {
      */
     public static final String PROCESS_INSTANCE_VARIABLE_START_USER_SELECT_ASSIGNEES = "PROCESS_START_USER_SELECT_ASSIGNEES";
 
-    // TODO @芋艿：用于处理，驳回到发起人时，如果被自动通过的逻辑
     /**
      * 流程实例的变量 - 用于判断流程实例变量节点是否驳回. 格式 RETURN_FLAG_{节点 id}
+     *
+     * 目的是：驳回到发起节点时，因为审批人与发起人相同，所以被自动通过。但是，此时还是希望不要自动通过
      *
      * @see ProcessInstance#getProcessVariables()
      */
