@@ -91,6 +91,7 @@ public class ApiAccessLogServiceImplTest extends BaseDbUnitTest {
         assertEquals(1, count);
         List<ApiAccessLogDO> logs = apiAccessLogMapper.selectList();
         assertEquals(1, logs.size());
+        // TODO @芋艿：createTime updateTime 被屏蔽，仅 win11 会复现，建议后续修复。
         assertPojoEquals(log02, logs.get(0), "createTime", "updateTime");
     }
 
