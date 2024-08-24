@@ -8,6 +8,7 @@ import com.somle.framework.common.util.json.JsonUtils;
 import com.somle.framework.common.util.web.WebUtils;
 
 import lombok.AllArgsConstructor;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.transaction.annotation.Transactional;
@@ -21,6 +22,7 @@ import java.util.stream.Stream;
 
 @Slf4j
 @AllArgsConstructor
+@Setter
 public class AmazonAdClient {
 
     private AmazonAccount account;

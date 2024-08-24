@@ -11,6 +11,7 @@ import com.somle.framework.common.util.web.WebUtils;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.Setter;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
@@ -27,11 +28,12 @@ import java.util.stream.Stream;
 
 @Slf4j
 @AllArgsConstructor
+@Setter
 public class AmazonSpClient {
 
     // private List<AmazonShop> shops;
 
-    public AmazonAccount account;
+    private AmazonAccount account;
 
 
 
