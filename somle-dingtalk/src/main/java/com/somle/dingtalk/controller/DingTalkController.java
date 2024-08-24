@@ -13,20 +13,25 @@ import com.somle.dingtalk.service.DingTalkService;
 @RequestMapping("/api/dingtalk")
 public class DingTalkController {
     @Autowired
-    private DingTalkService dingTalkService;
+    private DingTalkService service;
 
     @GetMapping("/getDepartments")
-    @ResponseBody
     public List<DingTalkDepartment> getDepartments( 
     ) {
-        return dingTalkService.getDepartmentStream().toList();
+        return service.getDepartmentStream().toList();
+    }
+
+    @GetMapping("/saveDepartments")
+    public String uploadDepartments() {
+        service.uploadDepartmentsResursive();
+        return "success";
     }
 
 
+
     @GetMapping("/cleanDepartments")
-    @ResponseBody
     public boolean cleanDepartments( 
     ) {
-        return dingTalkService.cleanDepartments();
+        return service.cleanDepartments();
     }
 }
