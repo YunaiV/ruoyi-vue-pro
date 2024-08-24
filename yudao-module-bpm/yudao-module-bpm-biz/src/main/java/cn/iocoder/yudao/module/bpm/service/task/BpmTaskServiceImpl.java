@@ -215,6 +215,11 @@ public class BpmTaskServiceImpl implements BpmTaskService {
     }
 
     @Override
+    public HistoricTaskInstance getHistoricTask(String id) {
+        return historyService.createHistoricTaskInstanceQuery().taskId(id).includeTaskLocalVariables().singleResult();
+    }
+
+    @Override
     public List<Task> getRunningTaskListByProcessInstanceId(String processInstanceId, Boolean assigned, String defineKey) {
         Assert.notNull(processInstanceId, "processInstanceId 不能为空");
         TaskQuery taskQuery = taskService.createTaskQuery().processInstanceId(processInstanceId).active()
@@ -228,10 +233,6 @@ public class BpmTaskServiceImpl implements BpmTaskService {
             taskQuery.taskDefinitionKey(defineKey);
         }
         return taskQuery.list();
-    }
-
-    private HistoricTaskInstance getHistoricTask(String id) {
-        return historyService.createHistoricTaskInstanceQuery().taskId(id).includeTaskLocalVariables().singleResult();
     }
 
     @Override

@@ -4,6 +4,7 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.bpm.api.task.dto.BpmProcessInstanceCreateReqDTO;
 import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.instance.BpmProcessInstanceCancelReqVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.instance.BpmProcessInstanceCreateReqVO;
+import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.instance.BpmProcessInstanceFormFieldsPermissionReqVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.instance.BpmProcessInstancePageReqVO;
 import jakarta.validation.Valid;
 import org.flowable.engine.history.HistoricProcessInstance;
@@ -76,8 +77,6 @@ public interface BpmProcessInstanceService {
         return convertMap(getHistoricProcessInstances(ids), HistoricProcessInstance::getId);
     }
 
-    // ========== Update 写入相关方法 ==========
-
     /**
      * 获得流程实例的分页
      *
@@ -87,6 +86,16 @@ public interface BpmProcessInstanceService {
      */
     PageResult<HistoricProcessInstance> getProcessInstancePage(Long userId,
                                                                @Valid BpmProcessInstancePageReqVO pageReqVO);
+
+    /**
+     * 获得流程实例表单字段权限
+     *
+     * @param reqVO 请求消息
+     * @return 表单字段权限
+     */
+    Map<String, String> getProcessInstanceFormFieldsPermission(@Valid BpmProcessInstanceFormFieldsPermissionReqVO reqVO);
+
+    // ========== Update 写入相关方法 ==========
 
     /**
      * 创建流程实例（提供给前端）
@@ -117,7 +126,7 @@ public interface BpmProcessInstanceService {
     /**
      * 管理员取消流程实例
      *
-     * @param userId           用户编号
+     * @param userId      用户编号
      * @param cancelReqVO 取消信息
      */
     void cancelProcessInstanceByAdmin(Long userId, BpmProcessInstanceCancelReqVO cancelReqVO);
@@ -125,8 +134,8 @@ public interface BpmProcessInstanceService {
     /**
      * 更新 ProcessInstance 为不通过
      *
-     * @param processInstance   流程实例
-     * @param reason 理由。例如说，审批不通过时，需要传递该值
+     * @param processInstance 流程实例
+     * @param reason          理由。例如说，审批不通过时，需要传递该值
      */
     void updateProcessInstanceReject(ProcessInstance processInstance, String reason);
 

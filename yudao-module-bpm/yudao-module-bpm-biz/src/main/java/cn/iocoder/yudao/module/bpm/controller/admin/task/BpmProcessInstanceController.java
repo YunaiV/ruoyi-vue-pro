@@ -4,10 +4,7 @@ import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.number.NumberUtils;
-import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.instance.BpmProcessInstanceCancelReqVO;
-import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.instance.BpmProcessInstanceCreateReqVO;
-import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.instance.BpmProcessInstancePageReqVO;
-import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.instance.BpmProcessInstanceRespVO;
+import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.instance.*;
 import cn.iocoder.yudao.module.bpm.convert.task.BpmProcessInstanceConvert;
 import cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmCategoryDO;
 import cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmProcessDefinitionInfoDO;
@@ -158,6 +155,14 @@ public class BpmProcessInstanceController {
             @Valid @RequestBody BpmProcessInstanceCancelReqVO cancelReqVO) {
         processInstanceService.cancelProcessInstanceByAdmin(getLoginUserId(), cancelReqVO);
         return success(true);
+    }
+
+    @GetMapping("/form-fields-permission")
+    @Operation(summary = "获得流程实例表单字段权限", description = "在【我的流程】菜单中，进行调用")
+    @PreAuthorize("@ss.hasPermission('bpm:process-instance:query')")
+    public CommonResult<Map<String, String>> getProcessInstanceFormFieldsPermission(
+            @Valid BpmProcessInstanceFormFieldsPermissionReqVO reqVO){
+        return success(processInstanceService.getProcessInstanceFormFieldsPermission(reqVO));
     }
 
 }

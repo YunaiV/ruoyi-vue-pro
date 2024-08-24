@@ -80,15 +80,16 @@ public interface BpmnModelConstants {
      */
     String FORM_FIELD_PERMISSION_ELEMENT_PERMISSION_ATTRIBUTE = "permission";
 
-    // TODO @jason：上面是 fieldsPermission，然后这里是 buttonsSettings；感觉有点不统一。然后 BpmSimpleModelNodeVO 里面是 fieldsPermission、buttonsSetting；
     /**
      * BPMN ExtensionElement 操作按钮设置元素, 用于审批节点操作按钮设置
      */
-    String BUTTON_SETTING_ELEMENT = "buttonsSettings";
+    String BUTTON_SETTING_ELEMENT = "buttonsSetting";
+
     /**
      * BPMN ExtensionElement Attribute, 用于标记按钮编号
      */
     String BUTTON_SETTING_ELEMENT_ID_ATTRIBUTE = "id";
+
     /**
      * BPMN ExtensionElement Attribute, 用于标记按钮显示名称
      */

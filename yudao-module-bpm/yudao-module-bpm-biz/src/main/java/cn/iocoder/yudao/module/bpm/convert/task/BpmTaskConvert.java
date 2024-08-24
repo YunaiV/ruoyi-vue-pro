@@ -114,6 +114,7 @@ public interface BpmTaskConvert {
             if (BpmTaskStatusEnum.RUNNING.getStatus().equals(taskStatus)){
                 // 设置表单权限 TODO @芋艿 是不是还要加一个全局的权限 基于 processInstance 的权限；回复：可能不需要，但是发起人，需要有个权限配置
                 // TODO @jason：貌似这么返回，主要解决当前审批 task 的表单权限，但是不同抄送人的表单权限，可能不太对。例如说，对 A 抄送人是隐藏某个字段。
+                // @芋艿 表单权限需要分离开。单独的接口来获取了 BpmProcessInstanceService.getProcessInstanceFormFieldsPermission
                 taskVO.setFieldsPermission(BpmnModelUtils.parseFormFieldsPermission(bpmnModel, task.getTaskDefinitionKey()));
                 // 操作按钮设置
                 taskVO.setButtonsSetting(BpmnModelUtils.parseButtonsSetting(bpmnModel, task.getTaskDefinitionKey()));

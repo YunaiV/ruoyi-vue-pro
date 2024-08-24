@@ -86,6 +86,14 @@ public interface BpmTaskService {
     Task getTask(String id);
 
     /**
+     * 获取历史任务
+     *
+     * @param id 任务编号
+     * @return 历史任务
+     */
+    HistoricTaskInstance getHistoricTask(String id);
+
+    /**
      * 根据条件查询正在进行中的任务
      *
      * @param processInstanceId 流程实例编号，不允许为空

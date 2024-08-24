@@ -67,10 +67,9 @@ public class BpmTaskRespVO {
     private List<String> formFields;
     @Schema(description = "提交的表单值", requiredMode = Schema.RequiredMode.REQUIRED)
     private Map<String, Object> formVariables;
-    // TODO @jason：fieldsPermissions
+    // @芋艿 都改成了 fieldsPermission。 buttonsSetting。和 BpmSimpleModelNodeVO 统一
     @Schema(description = "表单字段权限值")
     private Map<String, String> fieldsPermission;
-    // TODO @jason：buttonsSettings
     @Schema(description = "操作按钮设置值")
     private Map<Integer, OperationButtonSetting> buttonsSetting;
 

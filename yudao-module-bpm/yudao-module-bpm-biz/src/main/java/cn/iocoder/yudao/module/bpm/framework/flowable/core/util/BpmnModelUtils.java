@@ -79,6 +79,9 @@ public class BpmnModelUtils {
     }
 
     public static Map<String, String> parseFormFieldsPermission(BpmnModel bpmnModel, String flowElementId) {
+        if (bpmnModel == null || StrUtil.isEmpty(flowElementId)) {
+            return null;
+        }
         FlowElement flowElement = getFlowElementById(bpmnModel, flowElementId);
         if (flowElement == null) {
             return null;
