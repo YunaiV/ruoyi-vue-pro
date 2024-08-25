@@ -157,8 +157,7 @@ public class BpmProcessInstanceController {
         return success(true);
     }
 
-    // TODO @jason：有个 get-form-fields-permission
-    @GetMapping("/form-fields-permission")
+    @GetMapping("/get-form-fields-permission")
     @Operation(summary = "获得流程实例表单字段权限", description = "在【我的流程】菜单中，进行调用")
     @PreAuthorize("@ss.hasPermission('bpm:process-instance:query')")
     public CommonResult<Map<String, String>> getProcessInstanceFormFieldsPermission(

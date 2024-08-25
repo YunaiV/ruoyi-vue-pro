@@ -53,11 +53,11 @@ public class BpmProcessInstanceCopyServiceImpl implements BpmProcessInstanceCopy
             throw exception(ErrorCodeConstants.TASK_NOT_EXISTS);
         }
         String processInstanceId = task.getProcessInstanceId();
-        createProcessInstanceCopy(userIds, processInstanceId, task.getId(), task.getName());
+        createProcessInstanceCopy(userIds, processInstanceId, task.getTaskDefinitionKey(), task.getId(), task.getName());
     }
 
     @Override
-    public void createProcessInstanceCopy(Collection<Long> userIds, String processInstanceId, String taskId, String taskName) {
+    public void createProcessInstanceCopy(Collection<Long> userIds, String processInstanceId, String activityId, String taskId, String taskName) {
         // 1.1 校验流程实例存在
         ProcessInstance processInstance = processInstanceService.getProcessInstance(processInstanceId);
         if (processInstance == null) {
@@ -74,7 +74,8 @@ public class BpmProcessInstanceCopyServiceImpl implements BpmProcessInstanceCopy
         List<BpmProcessInstanceCopyDO> copyList = convertList(userIds, userId -> new BpmProcessInstanceCopyDO()
                 .setUserId(userId).setStartUserId(Long.valueOf(processInstance.getStartUserId()))
                 .setProcessInstanceId(processInstanceId).setProcessInstanceName(processInstance.getName())
-                .setCategory(processDefinition.getCategory()).setTaskId(taskId).setTaskName(taskName));
+                .setCategory(processDefinition.getCategory()).setActivityId(activityId)
+                .setTaskId(taskId).setTaskName(taskName));
         processInstanceCopyMapper.insertBatch(copyList);
     }
 

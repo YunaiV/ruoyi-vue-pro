@@ -26,10 +26,12 @@ public interface BpmProcessInstanceCopyService {
      *
      * @param userIds 抄送的用户编号
      * @param processInstanceId 流程编号
+     * @param activityId 流程活动编号 id (对应 BPMN XML 节点 Id)
+     * // TODO 芋艿这个 taskId 是不是可以不要了
      * @param taskId 任务编号
      * @param taskName 任务名称
      */
-    void createProcessInstanceCopy(Collection<Long> userIds, String processInstanceId, String taskId, String taskName);
+    void createProcessInstanceCopy(Collection<Long> userIds, String processInstanceId, String activityId, String taskId, String taskName);
 
     /**
      * 获得抄送的流程的分页
