@@ -217,13 +217,8 @@ public class TradeOrderQueryServiceImpl implements TradeOrderQueryService {
     @Cacheable(cacheNames = RedisKeyConstants.EXPRESS_TRACK, key = "#code + '-' + #logisticsNo + '-' + #receiverMobile",
             condition = "#result != null && #result.length() > 0")
     public List<ExpressTrackRespDTO> getExpressTrackList(String code, String logisticsNo, String receiverMobile) {
-        return expressClientFactory.getDefaultExpressClient()
-                .getExpressTrackList(
-                        new ExpressTrackQueryReqDTO()
-                                .setExpressCode(code)
-                                .setLogisticsNo(logisticsNo)
-                                .setPhone(receiverMobile)
-                );
+        return expressClientFactory.getDefaultExpressClient().getExpressTrackList(new ExpressTrackQueryReqDTO()
+                .setExpressCode(code).setLogisticsNo(logisticsNo).setPhone(receiverMobile));
     }
 
     // =================== Order Item ===================
