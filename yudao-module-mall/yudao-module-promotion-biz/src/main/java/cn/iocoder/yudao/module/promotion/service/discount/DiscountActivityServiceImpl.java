@@ -104,7 +104,10 @@ public class DiscountActivityServiceImpl implements DiscountActivityService {
         }
         // 计算新增的记录
         List<DiscountProductDO> newDiscountProducts = convertList(updateReqVO.getProducts(),
-                product -> DiscountActivityConvert.INSTANCE.convert(product).setActivityId(updateReqVO.getId()));
+                product -> DiscountActivityConvert.INSTANCE.convert(product)
+                        .setActivityId(updateReqVO.getId())
+                        .setActivityStartTime(updateReqVO.getStartTime())
+                        .setActivityEndTime(updateReqVO.getEndTime()));
         newDiscountProducts.removeIf(product -> dbDiscountProducts.stream().anyMatch(
                 dbProduct -> DiscountActivityConvert.INSTANCE.isEquals(dbProduct, product))); // 如果匹配到，说明是更新的
         if (CollectionUtil.isNotEmpty(newDiscountProducts)) {
