@@ -4,9 +4,7 @@ import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
-import cn.iocoder.yudao.framework.common.util.io.IoUtils;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
-import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.*;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.simple.BpmSimpleModelNodeVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.simple.BpmSimpleModelUpdateReqVO;
@@ -30,7 +28,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.IOException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -100,7 +97,7 @@ public class BpmModelController {
     @Operation(summary = "新建模型")
     @PreAuthorize("@ss.hasPermission('bpm:model:create')")
     public CommonResult<String> createModel(@Valid @RequestBody BpmModelCreateReqVO createRetVO) {
-        return success(modelService.createModel(createRetVO, null));
+        return success(modelService.createModel(createRetVO));
     }
 
     @PutMapping("/update")
@@ -109,16 +106,6 @@ public class BpmModelController {
     public CommonResult<Boolean> updateModel(@Valid @RequestBody BpmModelUpdateReqVO modelVO) {
         modelService.updateModel(modelVO);
         return success(true);
-    }
-
-    @PostMapping("/import")
-    @Operation(summary = "导入模型")
-    @PreAuthorize("@ss.hasPermission('bpm:model:import')")
-    public CommonResult<String> importModel(@Valid BpmModeImportReqVO importReqVO) throws IOException {
-        BpmModelCreateReqVO createReqVO = BeanUtils.toBean(importReqVO, BpmModelCreateReqVO.class);
-        // 读取文件
-        String bpmnXml = IoUtils.readUtf8(importReqVO.getBpmnFile().getInputStream(), false);
-        return success(modelService.createModel(createReqVO, bpmnXml));
     }
 
     @PostMapping("/deploy")

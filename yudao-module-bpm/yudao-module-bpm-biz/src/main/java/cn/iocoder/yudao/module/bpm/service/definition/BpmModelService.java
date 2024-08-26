@@ -29,10 +29,9 @@ public interface BpmModelService {
      * 创建流程模型
      *
      * @param modelVO 创建信息
-     * @param bpmnXml BPMN XML
      * @return 创建的流程模型的编号
      */
-    String createModel(@Valid BpmModelCreateReqVO modelVO, String bpmnXml);
+    String createModel(@Valid BpmModelCreateReqVO modelVO);
 
     /**
      * 获得流程模块

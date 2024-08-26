@@ -90,7 +90,7 @@ public class BpmModelServiceImpl implements BpmModelService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public String createModel(@Valid BpmModelCreateReqVO createReqVO, String bpmnXml) {
+    public String createModel(@Valid BpmModelCreateReqVO createReqVO) {
         if (!ValidationUtils.isXmlNCName(createReqVO.getKey())) {
             throw exception(MODEL_KEY_VALID);
         }
@@ -106,8 +106,6 @@ public class BpmModelServiceImpl implements BpmModelService {
         model.setTenantId(FlowableUtils.getTenantId());
         // 保存流程定义
         repositoryService.saveModel(model);
-        // 保存 BPMN XML
-        saveModelBpmnXml(model.getId(), bpmnXml);
         return model.getId();
     }
 
