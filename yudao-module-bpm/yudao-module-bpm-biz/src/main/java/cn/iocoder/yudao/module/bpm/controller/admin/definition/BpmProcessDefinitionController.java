@@ -79,14 +79,20 @@ public class BpmProcessDefinitionController {
     @Parameter(name = "suspensionState", description = "挂起状态", required = true, example = "1") // 参见 Flowable SuspensionState 枚举
     public CommonResult<List<BpmProcessDefinitionRespVO>> getProcessDefinitionList(
             @RequestParam("suspensionState") Integer suspensionState) {
+        // 1.1 获得开启的流程定义
         List<ProcessDefinition> list = processDefinitionService.getProcessDefinitionListBySuspensionState(suspensionState);
         if (CollUtil.isEmpty(list)) {
             return success(Collections.emptyList());
         }
-
-        // 获得 BpmProcessDefinitionInfoDO Map
+        // 1.2 移除不可见的流程定义
         Map<String, BpmProcessDefinitionInfoDO> processDefinitionMap = processDefinitionService.getProcessDefinitionInfoMap(
                 convertSet(list, ProcessDefinition::getId));
+        list.removeIf(processDefinition -> {
+            BpmProcessDefinitionInfoDO processDefinitionInfo = processDefinitionMap.get(processDefinition.getId());
+            return processDefinitionInfo != null && Boolean.FALSE.equals(processDefinitionInfo.getVisible());
+        });
+
+        // 2. 拼接 VO 返回
         return success(BpmProcessDefinitionConvert.INSTANCE.buildProcessDefinitionList(
                 list, null, processDefinitionMap, null, null));
     }

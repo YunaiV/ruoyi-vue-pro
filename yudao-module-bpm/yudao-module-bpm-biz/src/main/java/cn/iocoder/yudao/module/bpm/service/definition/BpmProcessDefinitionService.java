@@ -4,7 +4,7 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.process.BpmProcessDefinitionPageReqVO;
 import cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmFormDO;
 import cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmProcessDefinitionInfoDO;
-import cn.iocoder.yudao.module.bpm.service.definition.dto.BpmModelMetaInfoRespDTO;
+import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.BpmModelMetaInfoVO;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.repository.Model;
@@ -51,7 +51,7 @@ public interface BpmProcessDefinitionService {
      * @param form 表单
      * @return 流程编号
      */
-    String createProcessDefinition(Model model, BpmModelMetaInfoRespDTO modelMetaInfo, byte[] bpmnBytes, BpmFormDO form);
+    String createProcessDefinition(Model model, BpmModelMetaInfoVO modelMetaInfo, byte[] bpmnBytes, BpmFormDO form);
 
     /**
      * 更新流程定义状态

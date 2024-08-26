@@ -11,7 +11,7 @@ import cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmProcessDefinitio
 import cn.iocoder.yudao.module.bpm.dal.mysql.definition.BpmProcessDefinitionInfoMapper;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnModelConstants;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.util.FlowableUtils;
-import cn.iocoder.yudao.module.bpm.service.definition.dto.BpmModelMetaInfoRespDTO;
+import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.BpmModelMetaInfoVO;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.flowable.bpmn.model.BpmnModel;
@@ -105,7 +105,7 @@ public class BpmProcessDefinitionServiceImpl implements BpmProcessDefinitionServ
     }
 
     @Override
-    public String createProcessDefinition(Model model, BpmModelMetaInfoRespDTO modelMetaInfo,
+    public String createProcessDefinition(Model model, BpmModelMetaInfoVO modelMetaInfo,
                                           byte[] bpmnBytes, BpmFormDO form) {
         // 创建 Deployment 部署
         Deployment deploy = repositoryService.createDeployment()

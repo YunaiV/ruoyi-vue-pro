@@ -1,9 +1,8 @@
 package cn.iocoder.yudao.module.bpm.service.definition;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.BpmModelCreateReqVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.BpmModelPageReqVO;
-import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.BpmModelUpdateReqVO;
+import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.BpmModelSaveReqVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.simple.BpmSimpleModelNodeVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.simple.BpmSimpleModelUpdateReqVO;
 import jakarta.validation.Valid;
@@ -31,7 +30,7 @@ public interface BpmModelService {
      * @param modelVO 创建信息
      * @return 创建的流程模型的编号
      */
-    String createModel(@Valid BpmModelCreateReqVO modelVO);
+    String createModel(@Valid BpmModelSaveReqVO modelVO);
 
     /**
      * 获得流程模块
@@ -50,11 +49,19 @@ public interface BpmModelService {
     byte[] getModelBpmnXML(String id);
 
     /**
+     * 修改流程模型的 BPMN XML
+     *
+     * @param id      编号
+     * @param bpmnXml BPMN XML
+     */
+    void updateModelBpmnXml(String id, String bpmnXml);
+
+    /**
      * 修改流程模型
      *
      * @param updateReqVO 更新信息
      */
-    void updateModel(@Valid BpmModelUpdateReqVO updateReqVO);
+    void updateModel(@Valid BpmModelSaveReqVO updateReqVO);
 
     /**
      * 将流程模型，部署成一个流程定义

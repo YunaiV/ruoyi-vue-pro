@@ -15,7 +15,6 @@ import cn.iocoder.yudao.module.bpm.service.definition.BpmCategoryService;
 import cn.iocoder.yudao.module.bpm.service.definition.BpmFormService;
 import cn.iocoder.yudao.module.bpm.service.definition.BpmModelService;
 import cn.iocoder.yudao.module.bpm.service.definition.BpmProcessDefinitionService;
-import cn.iocoder.yudao.module.bpm.service.definition.dto.BpmModelMetaInfoRespDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -63,7 +62,7 @@ public class BpmModelController {
         // 拼接数据
         // 获得 Form 表单
         Set<Long> formIds = convertSet(pageResult.getList(), model -> {
-            BpmModelMetaInfoRespDTO metaInfo = JsonUtils.parseObject(model.getMetaInfo(), BpmModelMetaInfoRespDTO.class);
+            BpmModelMetaInfoVO metaInfo = JsonUtils.parseObject(model.getMetaInfo(), BpmModelMetaInfoVO.class);
             return metaInfo != null ? metaInfo.getFormId() : null;
         });
         Map<Long, BpmFormDO> formMap = formService.getFormMap(formIds);
@@ -96,14 +95,14 @@ public class BpmModelController {
     @PostMapping("/create")
     @Operation(summary = "新建模型")
     @PreAuthorize("@ss.hasPermission('bpm:model:create')")
-    public CommonResult<String> createModel(@Valid @RequestBody BpmModelCreateReqVO createRetVO) {
+    public CommonResult<String> createModel(@Valid @RequestBody BpmModelSaveReqVO createRetVO) {
         return success(modelService.createModel(createRetVO));
     }
 
     @PutMapping("/update")
     @Operation(summary = "修改模型")
     @PreAuthorize("@ss.hasPermission('bpm:model:update')")
-    public CommonResult<Boolean> updateModel(@Valid @RequestBody BpmModelUpdateReqVO modelVO) {
+    public CommonResult<Boolean> updateModel(@Valid @RequestBody BpmModelSaveReqVO modelVO) {
         modelService.updateModel(modelVO);
         return success(true);
     }
@@ -122,6 +121,14 @@ public class BpmModelController {
     @PreAuthorize("@ss.hasPermission('bpm:model:update')")
     public CommonResult<Boolean> updateModelState(@Valid @RequestBody BpmModelUpdateStateReqVO reqVO) {
         modelService.updateModelState(reqVO.getId(), reqVO.getState());
+        return success(true);
+    }
+
+    @PutMapping("/update-bpmn")
+    @Operation(summary = "修改模型的 BPMN")
+    @PreAuthorize("@ss.hasPermission('bpm:model:update')")
+    public CommonResult<Boolean> updateModelBpmn(@Valid @RequestBody BpmModeUpdateBpmnReqVO reqVO) {
+        modelService.updateModelBpmnXml(reqVO.getId(), reqVO.getBpmnXml());
         return success(true);
     }
 

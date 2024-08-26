@@ -6,7 +6,12 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.flowable.engine.repository.Model;
+import org.flowable.engine.repository.ProcessDefinition;
 
 import java.util.List;
 
@@ -31,15 +36,21 @@ public class BpmProcessDefinitionInfoDO extends BaseDO {
     /**
      * 流程定义的编号
      *
-     * 关联 ProcessDefinition 的 id 属性
+     * 关联 {@link ProcessDefinition#getId()} 属性
      */
     private String processDefinitionId;
     /**
      * 流程模型的编号
      *
-     * 关联 Model 的 id 属性
+     * 关联 {@link Model#getId()} 属性
      */
     private String modelId;
+    /**
+     * 流程模型的类型
+     *
+     * 枚举 {@link BpmModelFormTypeEnum}
+     */
+    private Integer modelType;
 
     /**
      * 图标
@@ -53,11 +64,12 @@ public class BpmProcessDefinitionInfoDO extends BaseDO {
     /**
      * 表单类型
      *
-     * 关联 {@link BpmModelFormTypeEnum}
+     * 枚举 {@link BpmModelFormTypeEnum}
      */
     private Integer formType;
     /**
      * 动态表单编号
+     *
      * 在表单类型为 {@link BpmModelFormTypeEnum#NORMAL} 时
      *
      * 关联 {@link BpmFormDO#getId()}
@@ -65,6 +77,7 @@ public class BpmProcessDefinitionInfoDO extends BaseDO {
     private Long formId;
     /**
      * 表单的配置
+     *
      * 在表单类型为 {@link BpmModelFormTypeEnum#NORMAL} 时
      *
      * 冗余 {@link BpmFormDO#getConf()}
@@ -72,21 +85,31 @@ public class BpmProcessDefinitionInfoDO extends BaseDO {
     private String formConf;
     /**
      * 表单项的数组
+     *
      * 在表单类型为 {@link BpmModelFormTypeEnum#NORMAL} 时
      *
-     * 冗余 {@link BpmFormDO#getFields()} ()}
+     * 冗余 {@link BpmFormDO#getFields()}
      */
     @TableField(typeHandler = JacksonTypeHandler.class)
     private List<String> formFields;
     /**
      * 自定义表单的提交路径，使用 Vue 的路由地址
+     *
      * 在表单类型为 {@link BpmModelFormTypeEnum#CUSTOM} 时
      */
     private String formCustomCreatePath;
     /**
      * 自定义表单的查看路径，使用 Vue 的路由地址
+     *
      * 在表单类型为 {@link BpmModelFormTypeEnum#CUSTOM} 时
      */
     private String formCustomViewPath;
+
+    /**
+     * 是否可见
+     *
+     * 目的：如果 false 不可见，则不展示在“发起流程”的列表里
+     */
+    private Boolean visible;
 
 }
