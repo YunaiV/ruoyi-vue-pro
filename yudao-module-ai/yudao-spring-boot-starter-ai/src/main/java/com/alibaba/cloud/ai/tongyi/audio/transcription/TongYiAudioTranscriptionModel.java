@@ -16,6 +16,7 @@
 
 package com.alibaba.cloud.ai.tongyi.audio.transcription;
 
+import cn.hutool.core.collection.ListUtil;
 import com.alibaba.cloud.ai.tongyi.audio.AudioTranscriptionModels;
 import com.alibaba.cloud.ai.tongyi.audio.transcription.api.AudioTranscriptionPrompt;
 import com.alibaba.cloud.ai.tongyi.audio.transcription.api.AudioTranscriptionResponse;
@@ -82,7 +83,7 @@ public class TongYiAudioTranscriptionModel
 			try {
 				transcriptionParam = TranscriptionParam.builder()
 						.model(AudioTranscriptionModels.Paraformer_V1)
-						.fileUrls(List.of(String.valueOf(instructions.getURL())))
+						.fileUrls(ListUtil.of(String.valueOf(instructions.getURL())))
 						.build();
 			}
 			catch (IOException e) {
