@@ -2,12 +2,13 @@ package cn.iocoder.yudao.module.trade.api.order;
 
 import cn.iocoder.yudao.module.trade.api.order.dto.TradeOrderRespDTO;
 import cn.iocoder.yudao.module.trade.convert.order.TradeOrderConvert;
+import cn.iocoder.yudao.module.trade.enums.order.TradeOrderCancelTypeEnum;
 import cn.iocoder.yudao.module.trade.service.order.TradeOrderQueryService;
 import cn.iocoder.yudao.module.trade.service.order.TradeOrderUpdateService;
+import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
-import jakarta.annotation.Resource;
 import java.util.Collection;
 import java.util.List;
 
@@ -36,8 +37,8 @@ public class TradeOrderApiImpl implements TradeOrderApi {
     }
 
     @Override
-    public void cancelPaidOrder(Long userId, Long orderId) {
-        tradeOrderUpdateService.cancelPaidOrder(userId, orderId);
+    public void cancelPaidOrder(Long userId, Long orderId, TradeOrderCancelTypeEnum cancelTypeEnum) {
+        tradeOrderUpdateService.cancelPaidOrder(userId, orderId, cancelTypeEnum);
     }
 
 }

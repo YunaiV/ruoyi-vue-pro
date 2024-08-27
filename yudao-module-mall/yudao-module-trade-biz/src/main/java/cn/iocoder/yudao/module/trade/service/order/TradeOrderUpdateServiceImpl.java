@@ -858,13 +858,13 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void cancelPaidOrder(Long userId, Long orderId) {
-        // TODO @puhui999：可能要加一个拼团取消；TradeOrderCancelTypeEnum.AFTER_SALE_CLOSE；然后参数传入下；
+    public void cancelPaidOrder(Long userId, Long orderId, TradeOrderCancelTypeEnum cancelTypeEnum) {
         // 1.1 检验订单存在
         TradeOrderDO order = tradeOrderMapper.selectOrderByIdAndUserId(orderId, userId);
         if (order == null) {
             throw exception(ORDER_NOT_FOUND);
         }
+
         // 1.2 校验订单是否支付
         if (!order.getPayStatus()) {
             throw exception(ORDER_CANCEL_PAID_FAIL, "已支付");
@@ -875,13 +875,13 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
         }
 
         // 2.1 取消订单
-        cancelOrder0(order, TradeOrderCancelTypeEnum.AFTER_SALE_CLOSE);
+        cancelOrder0(order, cancelTypeEnum);
         // 2.2 创建退款单
         payRefundApi.createRefund(new PayRefundCreateReqDTO()
                 .setAppKey(tradeOrderProperties.getPayAppKey()).setUserIp(getClientIP()) // 支付应用
                 .setMerchantOrderId(String.valueOf(order.getId())) // 支付单号
                 .setMerchantRefundId(String.valueOf(order.getId()))
-                .setReason("取消支付订单").setPrice(order.getPayPrice()));// 价格信息
+                .setReason(cancelTypeEnum.getName()).setPrice(order.getPayPrice()));// 价格信息
     }
 
     /**
