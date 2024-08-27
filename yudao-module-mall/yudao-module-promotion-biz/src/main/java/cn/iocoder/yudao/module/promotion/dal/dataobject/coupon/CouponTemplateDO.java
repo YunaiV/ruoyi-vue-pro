@@ -163,7 +163,6 @@ public class CouponTemplateDO extends BaseDO {
 
     // TODO 芋艿：领取开始时间、领取结束时间
 
-    // TODO 芋艿：要不要加描述
     @Schema(description = "优惠券描述", example = "限时优惠！使用优惠券即可享受全场商品 8 折优惠，快来抢购吧！") // 单位：分，仅在 discountType 为 PERCENT 使用
     private String description;
 }

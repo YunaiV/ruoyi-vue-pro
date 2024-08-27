@@ -67,4 +67,7 @@ public class AppCouponTemplateRespVO {
     @Schema(description = "是否可以领取", requiredMode = Schema.RequiredMode.REQUIRED, example = "true")
     private Boolean canTake;
 
+    @Schema(description = "优惠券描述", example = "限时优惠！使用优惠券即可享受全场商品 8 折优惠，快来抢购吧！") // 单位：分，仅在 discountType 为 PERCENT 使用
+    private String description;
+
 }
