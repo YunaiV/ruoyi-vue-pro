@@ -75,11 +75,10 @@ public interface RewardActivityService {
     /**
      * 获取指定 spu 编号最近参加的活动，每个 spuId 只返回一条记录
      *
-     * @param spuIds   spu 编号
      * @param status   状态
      * @param dateTime 当前日期时间
      * @return 满减送活动列表
      */
-    List<RewardActivityDO> getRewardActivityBySpuIdsAndStatusAndDateTimeLt(Collection<Long> spuIds, Integer status, LocalDateTime dateTime);
+    List<RewardActivityDO> getRewardActivityByStatusAndDateTimeLt(Integer status, LocalDateTime dateTime);
 
 }

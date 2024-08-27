@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.promotion.enums.common;
 
+import cn.hutool.core.util.ObjUtil;
 import cn.iocoder.yudao.framework.common.core.IntArrayValuable;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -33,6 +34,18 @@ public enum PromotionProductScopeEnum implements IntArrayValuable {
     @Override
     public int[] array() {
         return ARRAYS;
+    }
+
+    public static boolean isAll(Integer scope) {
+        return ObjUtil.equal(scope, ALL.scope);
+    }
+
+    public static boolean isSpu(Integer scope) {
+        return ObjUtil.equal(scope, SPU.scope);
+    }
+
+    public static boolean isCategory(Integer scope) {
+        return ObjUtil.equal(scope, CATEGORY.scope);
     }
 
 }
