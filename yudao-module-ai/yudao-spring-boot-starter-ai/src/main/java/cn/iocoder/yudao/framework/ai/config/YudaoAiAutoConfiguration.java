@@ -13,6 +13,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.autoconfigure.vectorstore.redis.RedisVectorStoreProperties;
 import org.springframework.ai.document.MetadataMode;
 import org.springframework.ai.embedding.EmbeddingModel;
+import org.springframework.ai.tokenizer.JTokkitTokenCountEstimator;
+import org.springframework.ai.tokenizer.TokenCountEstimator;
 import org.springframework.ai.transformer.splitter.TokenTextSplitter;
 import org.springframework.ai.transformers.TransformersEmbeddingModel;
 import org.springframework.ai.vectorstore.RedisVectorStore;
@@ -90,7 +92,7 @@ public class YudaoAiAutoConfiguration {
     }
 
     /**
-     * 我们启动有加载很多 Embedding 模型，不晓得取哪个好，先 new 个 TransformersEmbeddingModel 跑
+     * TODO @xin 抽离出去，根据具体模型走
      */
     @Bean
     @Lazy // TODO 芋艿：临时注释，避免无法启动
@@ -112,6 +114,12 @@ public class YudaoAiAutoConfiguration {
     @Lazy // TODO 芋艿：临时注释，避免无法启动
     public TokenTextSplitter tokenTextSplitter() {
         return new TokenTextSplitter(500, 100, 5, 10000, true);
+    }
+
+    @Bean
+    @Lazy // TODO 芋艿：临时注释，避免无法启动
+    public TokenCountEstimator tokenCountEstimator() {
+        return new JTokkitTokenCountEstimator();
     }
 
 }

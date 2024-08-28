@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.ai.dal.mysql.knowledge;
 
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
-import cn.iocoder.yudao.module.ai.dal.dataobject.knowledge.AiKnowledgeBaseDO;
+import cn.iocoder.yudao.module.ai.dal.dataobject.knowledge.AiKnowledgeDO;
 import org.apache.ibatis.annotations.Mapper;
 
 /**
@@ -10,5 +10,5 @@ import org.apache.ibatis.annotations.Mapper;
  * @author xiaoxin
  */
 @Mapper
-public interface AiKnowledgeBaseMapper extends BaseMapperX<AiKnowledgeBaseDO> {
+public interface AiKnowledgeBaseMapper extends BaseMapperX<AiKnowledgeDO> {
 }

@@ -7,7 +7,7 @@ import cn.iocoder.yudao.module.ai.controller.admin.knowledge.vo.AiKnowledgeUpdat
  *
  * @author xiaoxin
  */
-public interface AiKnowledgeBaseService {
+public interface AiKnowledgeService {
 
     /**
      * 创建【我的】知识库

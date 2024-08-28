@@ -3,7 +3,7 @@ package cn.iocoder.yudao.module.ai.controller.admin.knowledge;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.module.ai.controller.admin.knowledge.vo.AiKnowledgeCreateMyReqVO;
 import cn.iocoder.yudao.module.ai.controller.admin.knowledge.vo.AiKnowledgeUpdateMyReqVO;
-import cn.iocoder.yudao.module.ai.service.knowledge.AiKnowledgeBaseService;
+import cn.iocoder.yudao.module.ai.service.knowledge.AiKnowledgeService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
@@ -19,7 +19,7 @@ import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUti
 public class AiKnowledgeController {
 
     @Resource
-    private AiKnowledgeBaseService knowledgeBaseService;
+    private AiKnowledgeService knowledgeBaseService;
 
     @PostMapping("/create-my")
     @Operation(summary = "创建【我的】知识库")
