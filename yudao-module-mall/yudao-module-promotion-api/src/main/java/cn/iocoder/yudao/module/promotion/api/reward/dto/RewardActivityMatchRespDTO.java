@@ -1,8 +1,12 @@
 package cn.iocoder.yudao.module.promotion.api.reward.dto;
 
+import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.module.promotion.enums.common.PromotionConditionTypeEnum;
+import cn.iocoder.yudao.module.promotion.enums.common.PromotionProductScopeEnum;
 import lombok.Data;
 
+import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -22,27 +26,49 @@ public class RewardActivityMatchRespDTO {
      */
     private String name;
     /**
+     * 状态
+     *
+     * 枚举 {@link CommonStatusEnum}
+     */
+    private Integer status;
+    /**
+     * 开始时间
+     */
+    private LocalDateTime startTime;
+    /**
+     * 结束时间
+     */
+    private LocalDateTime endTime;
+    /**
+     * 备注
+     */
+    private String remark;
+    /**
      * 条件类型
      *
      * 枚举 {@link PromotionConditionTypeEnum}
      */
     private Integer conditionType;
     /**
+     * 商品范围
+     *
+     * 枚举 {@link PromotionProductScopeEnum}
+     */
+    private Integer productScope;
+    /**
+     * 商品 SPU 编号的数组
+     */
+    private List<Long> productScopeValues;
+    /**
      * 优惠规则的数组
      */
     private List<Rule> rules;
 
     /**
-     * 商品 SPU 编号的数组
-     */
-    private List<Long> spuIds;
-
-    // TODO 芋艿：后面 RewardActivityRespDTO 有了之后，Rule 可以放过去
-    /**
      * 优惠规则
      */
     @Data
-    public static class Rule {
+    public static class Rule implements Serializable {
 
         /**
          * 优惠门槛
@@ -60,9 +86,17 @@ public class RewardActivityMatchRespDTO {
          */
         private Boolean freeDelivery;
         /**
+         * 是否赠送积分
+         */
+        private Boolean givePoint;
+        /**
          * 赠送的积分
          */
         private Integer point;
+        /**
+         * 是否赠送优惠券
+         */
+        private Boolean giveCoupon;
         /**
          * 赠送的优惠劵编号的数组
          */

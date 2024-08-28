@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.module.trade.service.order;
 
-import cn.iocoder.yudao.framework.common.enums.TerminalEnum;
 import cn.iocoder.yudao.module.trade.controller.admin.order.vo.TradeOrderDeliveryReqVO;
 import cn.iocoder.yudao.module.trade.controller.admin.order.vo.TradeOrderRemarkReqVO;
 import cn.iocoder.yudao.module.trade.controller.admin.order.vo.TradeOrderUpdateAddressReqVO;
@@ -10,7 +9,7 @@ import cn.iocoder.yudao.module.trade.controller.app.order.vo.AppTradeOrderSettle
 import cn.iocoder.yudao.module.trade.controller.app.order.vo.AppTradeOrderSettlementRespVO;
 import cn.iocoder.yudao.module.trade.controller.app.order.vo.item.AppTradeOrderItemCommentCreateReqVO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderDO;
-
+import cn.iocoder.yudao.module.trade.enums.order.TradeOrderCancelTypeEnum;
 import jakarta.validation.constraints.NotNull;
 
 /**
@@ -188,12 +187,14 @@ public interface TradeOrderUpdateService {
     void updateOrderCombinationInfo(Long orderId, Long activityId, Long combinationRecordId, Long headId);
 
     // TODO 芋艿：拼团取消，不调这个接口哈；
+
     /**
      * 取消支付订单
      *
-     * @param userId  用户编号
-     * @param orderId 订单编号
+     * @param userId           用户编号
+     * @param orderId          订单编号
+     * @param cancelTypeEnum   取消类型
      */
-    void cancelPaidOrder(Long userId, Long orderId);
+    void cancelPaidOrder(Long userId, Long orderId, TradeOrderCancelTypeEnum cancelTypeEnum);
 
 }

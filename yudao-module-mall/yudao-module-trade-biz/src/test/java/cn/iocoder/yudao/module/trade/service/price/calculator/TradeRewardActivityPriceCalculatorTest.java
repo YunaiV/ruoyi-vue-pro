@@ -63,10 +63,10 @@ public class TradeRewardActivityPriceCalculatorTest extends BaseMockitoUnitTest 
         // mock 方法（限时折扣 DiscountActivity 信息）
         when(rewardActivityApi.getMatchRewardActivityList(eq(asSet(1L, 2L, 3L)))).thenReturn(asList(
                 randomPojo(RewardActivityMatchRespDTO.class, o -> o.setId(1000L).setName("活动 1000 号")
-                        .setSpuIds(asList(1L, 2L)).setConditionType(PromotionConditionTypeEnum.PRICE.getType())
+                        .setProductScopeValues(asList(1L, 2L)).setConditionType(PromotionConditionTypeEnum.PRICE.getType())
                         .setRules(singletonList(new RewardActivityMatchRespDTO.Rule().setLimit(200).setDiscountPrice(70)))),
                 randomPojo(RewardActivityMatchRespDTO.class, o -> o.setId(2000L).setName("活动 2000 号")
-                        .setSpuIds(singletonList(3L)).setConditionType(PromotionConditionTypeEnum.COUNT.getType())
+                        .setProductScopeValues(singletonList(3L)).setConditionType(PromotionConditionTypeEnum.COUNT.getType())
                         .setRules(asList(new RewardActivityMatchRespDTO.Rule().setLimit(1).setDiscountPrice(10),
                                 new RewardActivityMatchRespDTO.Rule().setLimit(2).setDiscountPrice(60), // 最大可满足，因为是 4 个
                                 new RewardActivityMatchRespDTO.Rule().setLimit(10).setDiscountPrice(100))))
@@ -175,7 +175,7 @@ public class TradeRewardActivityPriceCalculatorTest extends BaseMockitoUnitTest 
         // mock 方法（限时折扣 DiscountActivity 信息）
         when(rewardActivityApi.getMatchRewardActivityList(eq(asSet(1L, 2L)))).thenReturn(singletonList(
                 randomPojo(RewardActivityMatchRespDTO.class, o -> o.setId(1000L).setName("活动 1000 号")
-                        .setSpuIds(asList(1L, 2L)).setConditionType(PromotionConditionTypeEnum.PRICE.getType())
+                        .setProductScopeValues(asList(1L, 2L)).setConditionType(PromotionConditionTypeEnum.PRICE.getType())
                         .setRules(singletonList(new RewardActivityMatchRespDTO.Rule().setLimit(351).setDiscountPrice(70))))
         ));
 

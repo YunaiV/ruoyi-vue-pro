@@ -10,10 +10,10 @@ import cn.iocoder.yudao.module.promotion.enums.common.PromotionTypeEnum;
 import cn.iocoder.yudao.module.trade.enums.order.TradeOrderTypeEnum;
 import cn.iocoder.yudao.module.trade.service.price.bo.TradePriceCalculateReqBO;
 import cn.iocoder.yudao.module.trade.service.price.bo.TradePriceCalculateRespBO;
+import jakarta.annotation.Resource;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
-import jakarta.annotation.Resource;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
@@ -96,7 +96,7 @@ public class TradeRewardActivityPriceCalculator implements TradePriceCalculator 
     private List<TradePriceCalculateRespBO.OrderItem> filterMatchCouponOrderItems(TradePriceCalculateRespBO result,
                                                                                   RewardActivityMatchRespDTO rewardActivity) {
         return filterList(result.getItems(),
-                orderItem -> CollUtil.contains(rewardActivity.getSpuIds(), orderItem.getSpuId()));
+                orderItem -> CollUtil.contains(rewardActivity.getProductScopeValues(), orderItem.getSpuId()));
     }
 
     /**

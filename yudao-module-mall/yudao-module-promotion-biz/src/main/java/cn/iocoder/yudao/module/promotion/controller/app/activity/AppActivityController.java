@@ -2,14 +2,19 @@ package cn.iocoder.yudao.module.promotion.controller.app.activity;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.map.MapUtil;
+import cn.hutool.core.util.ObjUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
+import cn.iocoder.yudao.module.product.api.spu.ProductSpuApi;
+import cn.iocoder.yudao.module.product.api.spu.dto.ProductSpuRespDTO;
 import cn.iocoder.yudao.module.promotion.controller.app.activity.vo.AppActivityRespVO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.bargain.BargainActivityDO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.combination.CombinationActivityDO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.discount.DiscountActivityDO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.discount.DiscountProductDO;
+import cn.iocoder.yudao.module.promotion.dal.dataobject.reward.RewardActivityDO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.seckill.SeckillActivityDO;
+import cn.iocoder.yudao.module.promotion.enums.common.PromotionProductScopeEnum;
 import cn.iocoder.yudao.module.promotion.enums.common.PromotionTypeEnum;
 import cn.iocoder.yudao.module.promotion.service.bargain.BargainActivityService;
 import cn.iocoder.yudao.module.promotion.service.combination.CombinationActivityService;
@@ -48,6 +53,8 @@ public class AppActivityController {
     private DiscountActivityService discountActivityService;
     @Resource
     private RewardActivityService rewardActivityService;
+    @Resource
+    private ProductSpuApi productSpuApi;
 
     @GetMapping("/list-by-spu-id")
     @Operation(summary = "获得单个商品，近期参与的每个活动")
@@ -141,29 +148,52 @@ public class AppActivityController {
                 item.getName(), productMap.get(item.getId()), item.getStartTime(), item.getEndTime())));
     }
 
+    private static void buildAppActivityRespVO(RewardActivityDO rewardActivity, Collection<Long> spuIds,
+                                               List<AppActivityRespVO> activityList) {
+        for (Long spuId : spuIds) {
+            // 校验商品是否已经加入过活动
+            if (anyMatch(activityList, appActivity -> ObjUtil.equal(appActivity.getId(), rewardActivity.getId()) &&
+                    ObjUtil.equal(appActivity.getSpuId(), spuId))) {
+                continue;
+            }
+            activityList.add(new AppActivityRespVO(rewardActivity.getId(),
+                    PromotionTypeEnum.REWARD_ACTIVITY.getType(), rewardActivity.getName(), spuId,
+                    rewardActivity.getStartTime(), rewardActivity.getEndTime()));
+        }
+    }
+
     private void getRewardActivities(Collection<Long> spuIds, LocalDateTime now, List<AppActivityRespVO> activityList) {
-        // TODO @puhui999：有 3 范围，不只 spuId，还有 categoryId，全部，下次 fix
-        //List<RewardActivityDO> rewardActivityList = rewardActivityService.getRewardActivityBySpuIdsAndStatusAndDateTimeLt(
-        //        spuIds, PromotionActivityStatusEnum.RUN.getStatus(), now);
-        //if (CollUtil.isEmpty(rewardActivityList)) {
-        //    return;
-        //}
-        //
-        //Map<Long, Optional<RewardActivityDO>> spuIdAndActivityMap = spuIds.stream()
-        //        .collect(Collectors.toMap(
-        //                spuId -> spuId,
-        //                spuId -> rewardActivityList.stream()
-        //                        .filter(activity -> activity.getProductSpuIds().contains(spuId))
-        //                        .max(Comparator.comparing(RewardActivityDO::getCreateTime))));
-        //for (Long supId : spuIdAndActivityMap.keySet()) {
-        //    if (spuIdAndActivityMap.get(supId).isEmpty()) {
-        //        continue;
-        //    }
-        //
-        //    RewardActivityDO rewardActivityDO = spuIdAndActivityMap.get(supId).get();
-        //    activityList.add(new AppActivityRespVO(rewardActivityDO.getId(), PromotionTypeEnum.REWARD_ACTIVITY.getType(),
-        //            rewardActivityDO.getName(), supId, rewardActivityDO.getStartTime(), rewardActivityDO.getEndTime()));
-        //}
+        // 1.1 获得所有的活动
+        List<RewardActivityDO> rewardActivityList = rewardActivityService.getRewardActivityByStatusAndDateTimeLt(
+                CommonStatusEnum.ENABLE.getStatus(), now);
+        if (CollUtil.isEmpty(rewardActivityList)) {
+            return;
+        }
+        // 1.2 获得所有的商品信息
+        List<ProductSpuRespDTO> spuList = productSpuApi.getSpuList(spuIds);
+        if (CollUtil.isEmpty(spuList)) {
+            return;
+        }
+
+        // 2. 构建活动
+        for (RewardActivityDO rewardActivity : rewardActivityList) {
+            // 情况一：所有商品都能参加
+            if (PromotionProductScopeEnum.isAll(rewardActivity.getProductScope())) {
+                buildAppActivityRespVO(rewardActivity, spuIds, activityList);
+            }
+            // 情况二：指定商品参加
+            if (PromotionProductScopeEnum.isSpu(rewardActivity.getProductScope())) {
+                List<Long> fSpuIds = spuList.stream().map(ProductSpuRespDTO::getId).filter(id ->
+                        rewardActivity.getProductScopeValues().contains(id)).toList();
+                buildAppActivityRespVO(rewardActivity, fSpuIds, activityList);
+            }
+            // 情况三：指定商品类型参加
+            if (PromotionProductScopeEnum.isCategory(rewardActivity.getProductScope())) {
+                List<Long> fSpuIds = spuList.stream().filter(spuItem -> rewardActivity.getProductScopeValues()
+                        .contains(spuItem.getCategoryId())).map(ProductSpuRespDTO::getId).toList();
+                buildAppActivityRespVO(rewardActivity, fSpuIds, activityList);
+            }
+        }
     }
 
 }
