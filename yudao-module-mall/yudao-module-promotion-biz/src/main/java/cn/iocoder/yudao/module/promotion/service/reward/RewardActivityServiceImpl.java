@@ -165,7 +165,7 @@ public class RewardActivityServiceImpl implements RewardActivityService {
     }
 
     @Override
-    public List<RewardActivityDO> getRewardActivityByStatusAndDateTimeLt(Integer status, LocalDateTime dateTime) {
+    public List<RewardActivityDO> getRewardActivityListByStatusAndDateTimeLt(Integer status, LocalDateTime dateTime) {
         return rewardActivityMapper.selectListByStatusAndDateTimeLt(status, dateTime);
     }
 

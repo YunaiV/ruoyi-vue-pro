@@ -186,15 +186,14 @@ public interface TradeOrderUpdateService {
      */
     void updateOrderCombinationInfo(Long orderId, Long activityId, Long combinationRecordId, Long headId);
 
-    // TODO 芋艿：拼团取消，不调这个接口哈；
-
+    // TODO @puhui999：不传递枚举哈。因为 rpc 不好支持。
     /**
      * 取消支付订单
      *
      * @param userId           用户编号
      * @param orderId          订单编号
-     * @param cancelTypeEnum   取消类型
+     * @param cancelType   取消类型
      */
-    void cancelPaidOrder(Long userId, Long orderId, TradeOrderCancelTypeEnum cancelTypeEnum);
+    void cancelPaidOrder(Long userId, Long orderId, TradeOrderCancelTypeEnum cancelType);
 
 }

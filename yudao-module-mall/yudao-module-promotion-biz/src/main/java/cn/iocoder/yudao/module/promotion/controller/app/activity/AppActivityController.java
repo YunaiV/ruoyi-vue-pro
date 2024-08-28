@@ -53,6 +53,7 @@ public class AppActivityController {
     private DiscountActivityService discountActivityService;
     @Resource
     private RewardActivityService rewardActivityService;
+
     @Resource
     private ProductSpuApi productSpuApi;
 
@@ -91,7 +92,7 @@ public class AppActivityController {
         // 4. 限时折扣活动
         getDiscountActivities(spuIds, now, activityList);
         // 5. 满减送活动
-        getRewardActivities(spuIds, now, activityList);
+        getRewardActivityList(spuIds, now, activityList);
         return activityList;
     }
 
@@ -148,23 +149,9 @@ public class AppActivityController {
                 item.getName(), productMap.get(item.getId()), item.getStartTime(), item.getEndTime())));
     }
 
-    private static void buildAppActivityRespVO(RewardActivityDO rewardActivity, Collection<Long> spuIds,
-                                               List<AppActivityRespVO> activityList) {
-        for (Long spuId : spuIds) {
-            // 校验商品是否已经加入过活动
-            if (anyMatch(activityList, appActivity -> ObjUtil.equal(appActivity.getId(), rewardActivity.getId()) &&
-                    ObjUtil.equal(appActivity.getSpuId(), spuId))) {
-                continue;
-            }
-            activityList.add(new AppActivityRespVO(rewardActivity.getId(),
-                    PromotionTypeEnum.REWARD_ACTIVITY.getType(), rewardActivity.getName(), spuId,
-                    rewardActivity.getStartTime(), rewardActivity.getEndTime()));
-        }
-    }
-
-    private void getRewardActivities(Collection<Long> spuIds, LocalDateTime now, List<AppActivityRespVO> activityList) {
+    private void getRewardActivityList(Collection<Long> spuIds, LocalDateTime now, List<AppActivityRespVO> activityList) {
         // 1.1 获得所有的活动
-        List<RewardActivityDO> rewardActivityList = rewardActivityService.getRewardActivityByStatusAndDateTimeLt(
+        List<RewardActivityDO> rewardActivityList = rewardActivityService.getRewardActivityListByStatusAndDateTimeLt(
                 CommonStatusEnum.ENABLE.getStatus(), now);
         if (CollUtil.isEmpty(rewardActivityList)) {
             return;
@@ -193,6 +180,20 @@ public class AppActivityController {
                         .contains(spuItem.getCategoryId())).map(ProductSpuRespDTO::getId).toList();
                 buildAppActivityRespVO(rewardActivity, fSpuIds, activityList);
             }
+        }
+    }
+
+    private static void buildAppActivityRespVO(RewardActivityDO rewardActivity, Collection<Long> spuIds,
+                                               List<AppActivityRespVO> activityList) {
+        for (Long spuId : spuIds) {
+            // 校验商品是否已经加入过活动
+            if (anyMatch(activityList, appActivity -> ObjUtil.equal(appActivity.getId(), rewardActivity.getId()) &&
+                    ObjUtil.equal(appActivity.getSpuId(), spuId))) {
+                continue;
+            }
+            activityList.add(new AppActivityRespVO(rewardActivity.getId(),
+                    PromotionTypeEnum.REWARD_ACTIVITY.getType(), rewardActivity.getName(), spuId,
+                    rewardActivity.getStartTime(), rewardActivity.getEndTime()));
         }
     }
 

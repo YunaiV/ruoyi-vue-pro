@@ -79,6 +79,6 @@ public interface RewardActivityService {
      * @param dateTime 当前日期时间
      * @return 满减送活动列表
      */
-    List<RewardActivityDO> getRewardActivityByStatusAndDateTimeLt(Integer status, LocalDateTime dateTime);
+    List<RewardActivityDO> getRewardActivityListByStatusAndDateTimeLt(Integer status, LocalDateTime dateTime);
 
 }
