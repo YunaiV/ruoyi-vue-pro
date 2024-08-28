@@ -116,7 +116,6 @@ public class SmsClientTests {
     @Test
     @Disabled
     public void testQiniuSmsClient_sendSms() throws Throwable {
-
         SmsChannelProperties properties = new SmsChannelProperties()
                 .setApiKey("SMS_QINIU_ACCESS_KEY")
                 .setApiSecret("SMS_QINIU_SECRET_KEY");
@@ -135,7 +134,6 @@ public class SmsClientTests {
     @Test
     @Disabled
     public void testQiniuSmsClient_getSmsTemplate() throws Throwable {
-
         SmsChannelProperties properties = new SmsChannelProperties()
                 .setApiKey("SMS_QINIU_ACCESS_KEY")
                 .setApiSecret("SMS_QINIU_SECRET_KEY");

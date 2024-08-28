@@ -29,7 +29,6 @@ import static org.mockito.Mockito.mockStatic;
  * @author scholar
  */
 public class QiniuSmsClientTest extends BaseMockitoUnitTest {
-
     private final SmsChannelProperties properties = new SmsChannelProperties()
             .setApiKey(randomString())// 随机一个 apiKey，避免构建报错
             .setApiSecret(randomString()) // 随机一个 apiSecret，避免构建报错
@@ -46,7 +45,6 @@ public class QiniuSmsClientTest extends BaseMockitoUnitTest {
 
     @Test
     public void testDoSendSms_success() throws Throwable {
-
         try (MockedStatic<HttpUtils> httpUtilsMockedStatic = mockStatic(HttpUtils.class)) {
             // 准备参数
             Long sendLogId = randomLongId();
@@ -56,9 +54,7 @@ public class QiniuSmsClientTest extends BaseMockitoUnitTest {
                     new KeyValue<>("1", 1234), new KeyValue<>("2", "login"));
             // mock 方法
             httpUtilsMockedStatic.when(() -> HttpUtils.post(anyString(), anyMap(), anyString()))
-                    .thenReturn(
-                            "{\"message_id\":\"17245678901\"}"
-                    );
+                    .thenReturn("{\"message_id\":\"17245678901\"}");
             // 调用
             SmsSendRespDTO result = smsClient.sendSms(sendLogId, mobile,
                     apiTemplateId, templateParams);
@@ -77,17 +73,17 @@ public class QiniuSmsClientTest extends BaseMockitoUnitTest {
             String apiTemplateId = randomString() + " " + randomString();
             List<KeyValue<String, Object>> templateParams = Lists.newArrayList(
                     new KeyValue<>("1", 1234), new KeyValue<>("2", "login"));
-
             // mock 方法
             httpUtilsMockedStatic.when(() -> HttpUtils.post(anyString(), anyMap(), anyString()))
-                    .thenReturn(
-                            "{\"error\":\"BadToken\",\"message\":\"Your authorization token is invalid\",\"request_id\":\"etziWcJFo1C8Ne8X\"}"
-                    );
+                    .thenReturn("{\"error\":\"BadToken\",\"message\":\"Your authorization token is invalid\",\"request_id\":\"etziWcJFo1C8Ne8X\"}");
             // 调用
             SmsSendRespDTO result = smsClient.sendSms(sendLogId, mobile,
                     apiTemplateId, templateParams);
             // 断言
             assertFalse(result.getSuccess());
+            assertEquals("BadToken", result.getApiCode());
+            assertEquals("Your authorization token is invalid", result.getApiMsg());
+            assertEquals("etziWcJFo1C8Ne8X", result.getApiRequestId());
         }
     }
 
@@ -125,4 +121,15 @@ public class QiniuSmsClientTest extends BaseMockitoUnitTest {
         assertEquals(123, statuses.getFirst().getLogId());
     }
 
+    @Test
+    public void testConvertSmsTemplateAuditStatus() {
+        assertEquals(SmsTemplateAuditStatusEnum.SUCCESS.getStatus(),
+                smsClient.convertSmsTemplateAuditStatus("passed"));
+        assertEquals(SmsTemplateAuditStatusEnum.CHECKING.getStatus(),
+                smsClient.convertSmsTemplateAuditStatus("reviewing"));
+        assertEquals(SmsTemplateAuditStatusEnum.FAIL.getStatus(),
+                smsClient.convertSmsTemplateAuditStatus("rejected"));
+        assertThrows(IllegalArgumentException.class, () -> smsClient.convertSmsTemplateAuditStatus("unknown"),
+                "未知审核状态(3)");
+    }
 }

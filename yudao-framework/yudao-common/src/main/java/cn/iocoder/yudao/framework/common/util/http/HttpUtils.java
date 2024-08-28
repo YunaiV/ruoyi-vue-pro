@@ -135,7 +135,6 @@ public class HttpUtils {
      * @return 请求结果
      */
     public static String post(String url, Map<String, String> headers, String requestBody) {
-
         try (HttpResponse response = HttpRequest.post(url)
                 .addHeaders(headers)
                 .body(requestBody)
@@ -154,7 +153,6 @@ public class HttpUtils {
      * @return 请求结果
      */
     public static String get(String url, Map<String, String> headers) {
-
         try (HttpResponse response = HttpRequest.get(url)
                 .addHeaders(headers)
                 .execute()) {
