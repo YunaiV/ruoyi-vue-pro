@@ -25,6 +25,7 @@ import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.filterList;
 import static cn.iocoder.yudao.module.trade.service.price.calculator.TradePriceCalculatorHelper.formatPrice;
 
+// TODO @puhui999：相关的单测，建议改一改
 /**
  * 满减送活动的 {@link TradePriceCalculator} 实现类
  *
@@ -94,8 +95,8 @@ public class TradeRewardActivityPriceCalculator implements TradePriceCalculator 
         if (rule.getGivePoint()) {
             List<Integer> dividePoints = TradePriceCalculatorHelper.dividePrice(orderItems, rule.getPoint());
             for (int i = 0; i < orderItems.size(); i++) {
-                TradePriceCalculateRespBO.OrderItem orderItem = orderItems.get(i);
                 // 商品可能赠送了积分，所以这里要加上
+                TradePriceCalculateRespBO.OrderItem orderItem = orderItems.get(i);
                 orderItem.setGivePoint(orderItem.getGivePoint() + dividePoints.get(i));
             }
         }
@@ -189,7 +190,7 @@ public class TradeRewardActivityPriceCalculator implements TradePriceCalculator 
         Integer price = TradePriceCalculatorHelper.calculateTotalPayPrice(orderItems);
         assert count != null && price != null;
 
-        // 2. 构建不满足时的提示信息-按最低档规则算
+        // 2. 构建不满足时的提示信息：按最低档规则算
         String meetTip = "满减送：购满 {} {}，可以减 {} 元";
         List<RewardActivityMatchRespDTO.Rule> rules = new ArrayList<>(rewardActivity.getRules());
         rules.sort(Comparator.comparing(RewardActivityMatchRespDTO.Rule::getLimit)); // 按优惠门槛降序

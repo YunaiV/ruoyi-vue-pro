@@ -4,6 +4,7 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
+import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.module.member.api.address.MemberAddressApi;
 import cn.iocoder.yudao.module.member.api.address.dto.MemberAddressRespDTO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.config.TradeConfigDO;
@@ -56,7 +57,7 @@ public class TradeDeliveryPriceCalculator implements TradePriceCalculator {
             return;
         }
         // 校验是不是存在商品不能门店自提，或者不能快递发货的情况。就是说，配送方式不匹配哈
-        if (anyMatch(result.getItems(), item -> !item.getDeliveryTypes().contains(param.getDeliveryType()))) {
+        if (CollectionUtils.anyMatch(result.getItems(), item -> !item.getDeliveryTypes().contains(param.getDeliveryType()))) {
             throw exception(PRICE_CALCULATE_DELIVERY_PRICE_TYPE_ILLEGAL);
         }
 

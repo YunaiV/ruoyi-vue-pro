@@ -72,6 +72,7 @@ public class TradePriceCalculateRespBO {
      */
     private Boolean freeDelivery;
 
+    // TODO @puhui999：感觉要不要试着改成 Map<Long, Integer> giveCoupons？貌似整体会更好理解一点。
     /**
      * 赠送的优惠劵编号的数组
      */

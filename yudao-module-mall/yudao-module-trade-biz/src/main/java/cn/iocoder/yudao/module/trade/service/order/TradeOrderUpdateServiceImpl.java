@@ -201,7 +201,7 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
         order.setRefundStatus(TradeOrderRefundStatusEnum.NONE.getStatus());
         order.setProductCount(getSumValue(calculateRespBO.getItems(), TradePriceCalculateRespBO.OrderItem::getCount, Integer::sum));
         order.setUserIp(getClientIP()).setTerminal(getTerminal());
-        // 优惠券
+        // 使用 + 赠送优惠券
         order.setCouponIds(calculateRespBO.getCouponIds()).setCouponCounts(calculateRespBO.getCouponCounts());
         // 支付 + 退款信息
         order.setAdjustPrice(0).setPayStatus(false);
@@ -861,17 +861,17 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void cancelPaidOrder(Long userId, Long orderId, Integer cancelType) {
-        // 1. 这里校验下 cancelType 只允许拼团关闭；
-        if (!TradeOrderCancelTypeEnum.COMBINATION_CLOSE.getType().equals(cancelType)) {
+        // 1.1 这里校验下 cancelType 只允许拼团关闭；
+        if (ObjUtil.notEqual(TradeOrderCancelTypeEnum.COMBINATION_CLOSE.getType(), cancelType)) {
             return;
         }
-        // 1.1 检验订单存在
+        // 1.2 检验订单存在
         TradeOrderDO order = tradeOrderMapper.selectOrderByIdAndUserId(orderId, userId);
         if (order == null) {
             throw exception(ORDER_NOT_FOUND);
         }
 
-        // 1.2 校验订单是否支付
+        // 1.3 校验订单是否支付
         if (!order.getPayStatus()) {
             throw exception(ORDER_CANCEL_PAID_FAIL, "已支付");
         }

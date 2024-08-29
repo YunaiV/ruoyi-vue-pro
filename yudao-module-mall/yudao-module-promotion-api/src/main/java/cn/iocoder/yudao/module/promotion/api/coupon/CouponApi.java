@@ -36,6 +36,7 @@ public interface CouponApi {
      */
     CouponRespDTO validateCoupon(@Valid CouponValidReqDTO validReqDTO);
 
+    // TODO @puhui999：Map<Long, Integer> 优惠劵 会不会好点。
     /**
      * 【管理员】给指定用户批量发送优惠券
      *

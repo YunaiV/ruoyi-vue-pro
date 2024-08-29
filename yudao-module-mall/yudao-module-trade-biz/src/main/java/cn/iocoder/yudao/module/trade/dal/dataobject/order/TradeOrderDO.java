@@ -291,6 +291,8 @@ public class TradeOrderDO extends BaseDO {
      * VIP 减免金额，单位：分
      */
     private Integer vipPrice;
+
+    // TODO @puhui999：:1）建议命名要 giveXXX；不然不好理解哈；2）是不是搞成 Map 好点哈。
     /**
      * 赠送的优惠劵编号的数组
      *

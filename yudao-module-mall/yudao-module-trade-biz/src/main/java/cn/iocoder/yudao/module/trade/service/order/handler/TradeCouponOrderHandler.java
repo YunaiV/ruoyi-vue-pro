@@ -51,7 +51,7 @@ public class TradeCouponOrderHandler implements TradeOrderHandler {
         if (CollUtil.isEmpty(order.getCouponIds())) {
             return;
         }
-        // TODO @puhui999: 收回优惠券再考虑一下，是直接删除券还是改个状态
+        // TODO @puhui999: 收回优惠券再考虑一下，是直接删除券还是改个状态；建议是【已作废】
     }
 
 }

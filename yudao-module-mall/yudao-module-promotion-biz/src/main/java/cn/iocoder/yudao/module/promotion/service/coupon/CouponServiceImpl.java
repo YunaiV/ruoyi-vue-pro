@@ -181,6 +181,7 @@ public class CouponServiceImpl implements CouponService {
 
     @Override
     public void takeCouponsByAdmin(List<Long> templateIds, List<Integer> counts, Long userId) {
+        // TODO @puhui999：要不要循环调用上面的 takeCoupon 方法？按道理说，赠送也不会很多张。如果某次发卷失败，可以打个 error log；
         // 1. 获得优惠券模版
         List<CouponTemplateDO> templateList = couponTemplateService.getCouponTemplateList(templateIds);
         if (CollUtil.isEmpty(templateList)) {
