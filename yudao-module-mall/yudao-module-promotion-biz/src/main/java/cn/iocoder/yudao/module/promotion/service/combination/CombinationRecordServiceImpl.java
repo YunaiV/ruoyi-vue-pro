@@ -340,7 +340,7 @@ public class CombinationRecordServiceImpl implements CombinationRecordService {
                 CombinationRecordStatusEnum.FAILED);
         // 2. 订单取消
         headAndRecords.forEach(item -> tradeOrderApi.cancelPaidOrder(item.getUserId(), item.getOrderId(),
-                TradeOrderCancelTypeEnum.COMBINATION_CLOSE));
+                TradeOrderCancelTypeEnum.COMBINATION_CLOSE.getType()));
     }
 
     /**

@@ -3,9 +3,11 @@ package cn.iocoder.yudao.module.trade.service.price.calculator;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.iocoder.yudao.framework.common.util.number.MoneyUtils;
 import cn.iocoder.yudao.module.promotion.api.reward.RewardActivityApi;
 import cn.iocoder.yudao.module.promotion.api.reward.dto.RewardActivityMatchRespDTO;
 import cn.iocoder.yudao.module.promotion.enums.common.PromotionConditionTypeEnum;
+import cn.iocoder.yudao.module.promotion.enums.common.PromotionProductScopeEnum;
 import cn.iocoder.yudao.module.promotion.enums.common.PromotionTypeEnum;
 import cn.iocoder.yudao.module.trade.enums.order.TradeOrderTypeEnum;
 import cn.iocoder.yudao.module.trade.service.price.bo.TradePriceCalculateReqBO;
@@ -14,7 +16,10 @@ import jakarta.annotation.Resource;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.filterList;
@@ -61,7 +66,7 @@ public class TradeRewardActivityPriceCalculator implements TradePriceCalculator 
         if (rule == null) {
             TradePriceCalculatorHelper.addNotMatchPromotion(result, orderItems,
                     rewardActivity.getId(), rewardActivity.getName(), PromotionTypeEnum.REWARD_ACTIVITY.getType(),
-                    getRewardActivityNotMeetTip(rewardActivity));
+                    getRewardActivityNotMeetTip(rewardActivity, orderItems));
             return;
         }
 
@@ -84,6 +89,36 @@ public class TradeRewardActivityPriceCalculator implements TradePriceCalculator 
             TradePriceCalculatorHelper.recountPayPrice(orderItem);
         }
         TradePriceCalculatorHelper.recountAllPrice(result);
+
+        // 4.1 记录赠送的积分
+        if (rule.getGivePoint()) {
+            List<Integer> dividePoints = TradePriceCalculatorHelper.dividePrice(orderItems, rule.getPoint());
+            for (int i = 0; i < orderItems.size(); i++) {
+                TradePriceCalculateRespBO.OrderItem orderItem = orderItems.get(i);
+                // 商品可能赠送了积分，所以这里要加上
+                orderItem.setGivePoint(orderItem.getGivePoint() + dividePoints.get(i));
+            }
+        }
+        // 4.2 记录订单是否包邮
+        if (rule.getFreeDelivery()) {
+            // 只要满足一个活动包邮那么这单就包邮
+            result.setFreeDelivery(true);
+        }
+        // 4.3 记录赠送的优惠券
+        if (rule.getGiveCoupon()) {
+            for (int i = 0; i < rule.getCouponIds().size(); i++) {
+                Long couponId = result.getCouponIds().get(i);
+                Integer couponCount = result.getCouponCounts().get(i);
+                int index = CollUtil.indexOf(result.getCouponIds(), id -> Objects.equals(couponId, id));
+                if (index != -1) { // 情况一：别的满减活动送过同类优惠券，则直接增加数量
+                    List<Integer> couponCounts = result.getCouponCounts();
+                    couponCounts.set(index, couponCounts.get(index) + couponCount);
+                    result.setCouponCounts(couponCounts);
+                } else { // 情况二：还没有赠送的优惠券
+                    result.setCouponIds(rule.getCouponIds()).setCouponCounts(rule.getCouponCounts());
+                }
+            }
+        }
     }
 
     /**
@@ -95,9 +130,21 @@ public class TradeRewardActivityPriceCalculator implements TradePriceCalculator 
      */
     private List<TradePriceCalculateRespBO.OrderItem> filterMatchActivityOrderItems(TradePriceCalculateRespBO result,
                                                                                     RewardActivityMatchRespDTO rewardActivity) {
-        // TODO @puhui999：是不是得根据类型过滤哈
-        return filterList(result.getItems(),
-                orderItem -> CollUtil.contains(rewardActivity.getProductScopeValues(), orderItem.getSpuId()));
+        // 情况一：全部商品都可以参与
+        if (PromotionProductScopeEnum.isAll(rewardActivity.getProductScope())) {
+            return result.getItems();
+        }
+        // 情况二：指定商品参与
+        if (PromotionProductScopeEnum.isSpu(rewardActivity.getProductScope())) {
+            return filterList(result.getItems(),
+                    orderItem -> CollUtil.contains(rewardActivity.getProductScopeValues(), orderItem.getSpuId()));
+        }
+        // 情况三：指定商品类型参与
+        if (PromotionProductScopeEnum.isCategory(rewardActivity.getProductScope())) {
+            return filterList(result.getItems(),
+                    orderItem -> CollUtil.contains(rewardActivity.getProductScopeValues(), orderItem.getCategoryId()));
+        }
+        return List.of();
     }
 
     /**
@@ -130,14 +177,30 @@ public class TradeRewardActivityPriceCalculator implements TradePriceCalculator 
     }
 
     /**
-     * 获得满减送活动部匹配时的提示
+     * 获得满减送活动不匹配时的提示
      *
      * @param rewardActivity 满减送活动
      * @return 提示
      */
-    private String getRewardActivityNotMeetTip(RewardActivityMatchRespDTO rewardActivity) {
-        // TODO 芋艿：后面再想想；应该找第一个规则，算下还差多少即可。
-        return "TODO";
+    private String getRewardActivityNotMeetTip(RewardActivityMatchRespDTO rewardActivity,
+                                               List<TradePriceCalculateRespBO.OrderItem> orderItems) {
+        // 1. 计算数量和价格
+        Integer count = TradePriceCalculatorHelper.calculateTotalCount(orderItems);
+        Integer price = TradePriceCalculatorHelper.calculateTotalPayPrice(orderItems);
+        assert count != null && price != null;
+
+        // 2. 构建不满足时的提示信息-按最低档规则算
+        String meetTip = "满减送：购满 {} {}，可以减 {} 元";
+        List<RewardActivityMatchRespDTO.Rule> rules = new ArrayList<>(rewardActivity.getRules());
+        rules.sort(Comparator.comparing(RewardActivityMatchRespDTO.Rule::getLimit)); // 按优惠门槛降序
+        RewardActivityMatchRespDTO.Rule rule = rules.get(0);
+        if (PromotionConditionTypeEnum.PRICE.getType().equals(rewardActivity.getConditionType())) {
+            return StrUtil.format(meetTip, rule.getLimit(), "元", MoneyUtils.fenToYuanStr(rule.getDiscountPrice()));
+        }
+        if (PromotionConditionTypeEnum.COUNT.getType().equals(rewardActivity.getConditionType())) {
+            return StrUtil.format(meetTip, rule.getLimit(), "件", MoneyUtils.fenToYuanStr(rule.getDiscountPrice()));
+        }
+        return StrUtil.EMPTY;
     }
 
 }

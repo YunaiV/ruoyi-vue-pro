@@ -19,12 +19,11 @@ import cn.iocoder.yudao.module.promotion.dal.mysql.coupon.CouponMapper;
 import cn.iocoder.yudao.module.promotion.enums.coupon.CouponStatusEnum;
 import cn.iocoder.yudao.module.promotion.enums.coupon.CouponTakeTypeEnum;
 import cn.iocoder.yudao.module.promotion.enums.coupon.CouponTemplateValidityTypeEnum;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
-
-import jakarta.annotation.Resource;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -32,6 +31,7 @@ import java.util.stream.Collectors;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
+import static cn.iocoder.yudao.framework.common.util.collection.MapUtils.findAndThen;
 import static cn.iocoder.yudao.module.promotion.enums.ErrorCodeConstants.*;
 import static java.util.Arrays.asList;
 
@@ -175,8 +175,32 @@ public class CouponServiceImpl implements CouponService {
         // 3. 批量保存优惠劵
         couponMapper.insertBatch(convertList(userIds, userId -> CouponConvert.INSTANCE.convert(template, userId)));
 
-        // 3. 增加优惠劵模板的领取数量
+        // 4. 增加优惠劵模板的领取数量
         couponTemplateService.updateCouponTemplateTakeCount(templateId, userIds.size());
+    }
+
+    @Override
+    public void takeCouponsByAdmin(List<Long> templateIds, List<Integer> counts, Long userId) {
+        // 1. 获得优惠券模版
+        List<CouponTemplateDO> templateList = couponTemplateService.getCouponTemplateList(templateIds);
+        if (CollUtil.isEmpty(templateList)) {
+            return;
+        }
+
+        Map<Long, CouponTemplateDO> templateMap = convertMap(templateList, CouponTemplateDO::getId);
+        // 2.1 批量构建优惠券
+        List<CouponDO> couponList = new ArrayList<>();
+        for (int i = 0; i < templateIds.size(); i++) {
+            int finalI = i;
+            findAndThen(templateMap, templateIds.get(i), template -> {
+                for (int j = 0; j < counts.get(finalI); j++) {
+                    couponList.add(CouponConvert.INSTANCE.convert(template, userId)
+                            .setTakeType(CouponTakeTypeEnum.ADMIN.getValue()));
+                }
+            });
+        }
+        // 2.2 批量保存优惠券
+        couponMapper.insertBatch(couponList);
     }
 
     @Override
