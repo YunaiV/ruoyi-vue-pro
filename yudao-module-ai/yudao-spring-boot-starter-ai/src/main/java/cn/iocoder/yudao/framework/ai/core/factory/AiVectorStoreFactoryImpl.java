@@ -18,7 +18,7 @@ import redis.clients.jedis.JedisPooled;
  *
  * @author xiaoxin
  */
-public class AiVectorFactoryImpl implements AiVectorFactory {
+public class AiVectorStoreFactoryImpl implements AiVectorStoreFactory {
 
     @Override
     public VectorStore getOrCreateVectorStore(EmbeddingModel embeddingModel, AiPlatformEnum platform, String apiKey, String url) {

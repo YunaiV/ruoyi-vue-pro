@@ -2,8 +2,8 @@ package cn.iocoder.yudao.framework.ai.config;
 
 import cn.iocoder.yudao.framework.ai.core.factory.AiModelFactory;
 import cn.iocoder.yudao.framework.ai.core.factory.AiModelFactoryImpl;
-import cn.iocoder.yudao.framework.ai.core.factory.AiVectorFactory;
-import cn.iocoder.yudao.framework.ai.core.factory.AiVectorFactoryImpl;
+import cn.iocoder.yudao.framework.ai.core.factory.AiVectorStoreFactory;
+import cn.iocoder.yudao.framework.ai.core.factory.AiVectorStoreFactoryImpl;
 import cn.iocoder.yudao.framework.ai.core.model.deepseek.DeepSeekChatModel;
 import cn.iocoder.yudao.framework.ai.core.model.deepseek.DeepSeekChatOptions;
 import cn.iocoder.yudao.framework.ai.core.model.midjourney.api.MidjourneyApi;
@@ -39,8 +39,8 @@ public class YudaoAiAutoConfiguration {
     }
 
     @Bean
-    public AiVectorFactory aiVectorFactory() {
-        return new AiVectorFactoryImpl();
+    public AiVectorStoreFactory aiVectorFactory() {
+        return new AiVectorStoreFactoryImpl();
     }
 
 

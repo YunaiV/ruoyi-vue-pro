@@ -2,7 +2,7 @@ package cn.iocoder.yudao.module.ai.service.model;
 
 import cn.iocoder.yudao.framework.ai.core.enums.AiPlatformEnum;
 import cn.iocoder.yudao.framework.ai.core.factory.AiModelFactory;
-import cn.iocoder.yudao.framework.ai.core.factory.AiVectorFactory;
+import cn.iocoder.yudao.framework.ai.core.factory.AiVectorStoreFactory;
 import cn.iocoder.yudao.framework.ai.core.model.midjourney.api.MidjourneyApi;
 import cn.iocoder.yudao.framework.ai.core.model.suno.api.SunoApi;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
@@ -40,7 +40,7 @@ public class AiApiKeyServiceImpl implements AiApiKeyService {
     @Resource
     private AiModelFactory modelFactory;
     @Resource
-    private AiVectorFactory vectorFactory;
+    private AiVectorStoreFactory vectorFactory;
 
     @Override
     public Long createApiKey(AiApiKeySaveReqVO createReqVO) {

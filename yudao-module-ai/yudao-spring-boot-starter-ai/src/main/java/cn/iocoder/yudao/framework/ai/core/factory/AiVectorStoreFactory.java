@@ -8,7 +8,7 @@ import org.springframework.ai.vectorstore.VectorStore;
  * AI Vector 模型工厂的接口类
  * @author xiaoxin
  */
-public interface AiVectorFactory {
+public interface AiVectorStoreFactory {
 
 
     /**
