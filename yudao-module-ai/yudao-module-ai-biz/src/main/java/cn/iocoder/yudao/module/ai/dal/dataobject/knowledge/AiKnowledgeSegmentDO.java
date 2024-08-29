@@ -15,6 +15,8 @@ import lombok.Data;
 @Data
 public class AiKnowledgeSegmentDO extends BaseDO {
 
+    public static final String FIELD_KNOWLEDGE_ID = "knowledgeId";
+
     /**
      * 编号
      */

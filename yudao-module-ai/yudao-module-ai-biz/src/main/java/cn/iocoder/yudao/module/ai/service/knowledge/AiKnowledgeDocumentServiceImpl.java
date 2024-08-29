@@ -27,6 +27,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * AI 知识库-文档 Service 实现类
@@ -83,16 +84,22 @@ public class AiKnowledgeDocumentServiceImpl implements AiKnowledgeDocumentServic
         List<Document> segments = tokenTextSplitter.apply(documents);
         // 2.2 分段内容入库
         List<AiKnowledgeSegmentDO> segmentDOList = CollectionUtils.convertList(segments,
-                segment -> new AiKnowledgeSegmentDO().setContent(segment.getContent()).setDocumentId(documentId).setKnowledgeId(createReqVO.getKnowledgeId())
+                segment -> new AiKnowledgeSegmentDO().setContent(segment.getContent()).setDocumentId(documentId).setKnowledgeId(createReqVO.getKnowledgeId()).setVectorId(segment.getId())
                         .setTokens(tokenCountEstimator.estimate(segment.getContent())).setWordCount(segment.getContent().length())
                         .setStatus(CommonStatusEnum.ENABLE.getStatus()));
         segmentMapper.insertBatch(segmentDOList);
 
+        // 3.1 document 补充源数据
+        segments.forEach(segment -> {
+            Map<String, Object> metadata = segment.getMetadata();
+            metadata.put(AiKnowledgeSegmentDO.FIELD_KNOWLEDGE_ID, createReqVO.getKnowledgeId());
+        });
+
         AiKnowledgeDO knowledge = knowledgeService.validateKnowledgeExists(createReqVO.getKnowledgeId());
         AiChatModelDO model = chatModelService.validateChatModel(knowledge.getModelId());
-        // 3.1 获取向量存储实例
+        // 3.2 获取向量存储实例
         VectorStore vectorStore = apiKeyService.getOrCreateVectorStore(model.getKeyId());
-        // 3.2 向量化并存储
+        // 3.3 向量化并存储
         vectorStore.add(segments);
         return documentId;
     }
