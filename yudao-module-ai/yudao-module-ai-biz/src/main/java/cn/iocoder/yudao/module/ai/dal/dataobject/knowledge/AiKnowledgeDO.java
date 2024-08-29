@@ -45,7 +45,7 @@ public class AiKnowledgeDO extends BaseDO {
     @TableField(typeHandler = JacksonTypeHandler.class)
     private List<Long> visibilityPermissions;
     /**
-     * 嵌入模型编号，高质量模式时维护
+     * 嵌入模型编号
      */
     private Long modelId;
     /**

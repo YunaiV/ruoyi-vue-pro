@@ -2,6 +2,8 @@ package cn.iocoder.yudao.framework.ai.config;
 
 import cn.iocoder.yudao.framework.ai.core.factory.AiModelFactory;
 import cn.iocoder.yudao.framework.ai.core.factory.AiModelFactoryImpl;
+import cn.iocoder.yudao.framework.ai.core.factory.AiVectorFactory;
+import cn.iocoder.yudao.framework.ai.core.factory.AiVectorFactoryImpl;
 import cn.iocoder.yudao.framework.ai.core.model.deepseek.DeepSeekChatModel;
 import cn.iocoder.yudao.framework.ai.core.model.deepseek.DeepSeekChatOptions;
 import cn.iocoder.yudao.framework.ai.core.model.midjourney.api.MidjourneyApi;
@@ -10,22 +12,15 @@ import cn.iocoder.yudao.framework.ai.core.model.xinghuo.XingHuoChatModel;
 import cn.iocoder.yudao.framework.ai.core.model.xinghuo.XingHuoChatOptions;
 import com.alibaba.cloud.ai.tongyi.TongYiAutoConfiguration;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.ai.autoconfigure.vectorstore.redis.RedisVectorStoreProperties;
-import org.springframework.ai.document.MetadataMode;
-import org.springframework.ai.embedding.EmbeddingModel;
 import org.springframework.ai.tokenizer.JTokkitTokenCountEstimator;
 import org.springframework.ai.tokenizer.TokenCountEstimator;
 import org.springframework.ai.transformer.splitter.TokenTextSplitter;
-import org.springframework.ai.transformers.TransformersEmbeddingModel;
-import org.springframework.ai.vectorstore.RedisVectorStore;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.boot.autoconfigure.data.redis.RedisProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Lazy;
-import redis.clients.jedis.JedisPooled;
 
 /**
  * 芋道 AI 自动配置
@@ -42,6 +37,12 @@ public class YudaoAiAutoConfiguration {
     public AiModelFactory aiModelFactory() {
         return new AiModelFactoryImpl();
     }
+
+    @Bean
+    public AiVectorFactory aiVectorFactory() {
+        return new AiVectorFactoryImpl();
+    }
+
 
     // ========== 各种 AI Client 创建 ==========
 
@@ -85,30 +86,31 @@ public class YudaoAiAutoConfiguration {
     }
 
     // ========== rag 相关 ==========
-    @Bean
-    @Lazy // TODO 芋艿：临时注释，避免无法启动
-    public EmbeddingModel transformersEmbeddingClient() {
-        return new TransformersEmbeddingModel(MetadataMode.EMBED);
-    }
+    // TODO @xin 免费版本
+//    @Bean
+//    @Lazy // TODO 芋艿：临时注释，避免无法启动」
+//    public EmbeddingModel transformersEmbeddingClient() {
+//        return new TransformersEmbeddingModel(MetadataMode.EMBED);
+//    }
 
     /**
-     * TODO @xin 抽离出去，根据具体模型走
+     * TODO @xin 默认版本先不弄，目前都先取对应的 EmbeddingModel
      */
-    @Bean
-    @Lazy // TODO 芋艿：临时注释，避免无法启动
-    public RedisVectorStore vectorStore(TransformersEmbeddingModel transformersEmbeddingModel, RedisVectorStoreProperties properties,
-                                        RedisProperties redisProperties) {
-        var config = RedisVectorStore.RedisVectorStoreConfig.builder()
-                .withIndexName(properties.getIndex())
-                .withPrefix(properties.getPrefix())
-                .build();
-
-        RedisVectorStore redisVectorStore = new RedisVectorStore(config, transformersEmbeddingModel,
-                new JedisPooled(redisProperties.getHost(), redisProperties.getPort()),
-                properties.isInitializeSchema());
-        redisVectorStore.afterPropertiesSet();
-        return redisVectorStore;
-    }
+//    @Bean
+//    @Lazy // TODO 芋艿：临时注释，避免无法启动
+//    public RedisVectorStore vectorStore(TongYiTextEmbeddingModel tongYiTextEmbeddingModel, RedisVectorStoreProperties properties,
+//                                        RedisProperties redisProperties) {
+//        var config = RedisVectorStore.RedisVectorStoreConfig.builder()
+//                .withIndexName(properties.getIndex())
+//                .withPrefix(properties.getPrefix())
+//                .build();
+//
+//        RedisVectorStore redisVectorStore = new RedisVectorStore(config, tongYiTextEmbeddingModel,
+//                new JedisPooled(redisProperties.getHost(), redisProperties.getPort()),
+//                properties.isInitializeSchema());
+//        redisVectorStore.afterPropertiesSet();
+//        return redisVectorStore;
+//    }
 
     @Bean
     @Lazy // TODO 芋艿：临时注释，避免无法启动

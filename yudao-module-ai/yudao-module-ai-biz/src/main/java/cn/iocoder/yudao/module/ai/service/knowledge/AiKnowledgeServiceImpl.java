@@ -29,7 +29,7 @@ public class AiKnowledgeServiceImpl implements AiKnowledgeService {
     private AiChatModelService chatModalService;
 
     @Resource
-    private AiKnowledgeMapper knowledgeBaseMapper;
+    private AiKnowledgeMapper knowledgeMapper;
 
     @Override
     public Long createKnowledgeMy(AiKnowledgeCreateMyReqVO createReqVO, Long userId) {
@@ -39,7 +39,7 @@ public class AiKnowledgeServiceImpl implements AiKnowledgeService {
         // 2. 插入知识库
         AiKnowledgeDO knowledgeBase = BeanUtils.toBean(createReqVO, AiKnowledgeDO.class)
                 .setModel(model.getModel()).setUserId(userId).setStatus(CommonStatusEnum.ENABLE.getStatus());
-        knowledgeBaseMapper.insert(knowledgeBase);
+        knowledgeMapper.insert(knowledgeBase);
         return knowledgeBase.getId();
     }
 
@@ -56,11 +56,12 @@ public class AiKnowledgeServiceImpl implements AiKnowledgeService {
         // 2. 更新知识库
         AiKnowledgeDO updateDO = BeanUtils.toBean(updateReqVO, AiKnowledgeDO.class);
         updateDO.setModel(model.getModel());
-        knowledgeBaseMapper.updateById(updateDO);
+        knowledgeMapper.updateById(updateDO);
     }
 
+    @Override
     public AiKnowledgeDO validateKnowledgeExists(Long id) {
-        AiKnowledgeDO knowledgeBase = knowledgeBaseMapper.selectById(id);
+        AiKnowledgeDO knowledgeBase = knowledgeMapper.selectById(id);
         if (knowledgeBase == null) {
             throw exception(KNOWLEDGE_NOT_EXISTS);
         }
