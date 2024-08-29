@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.trade.service.order.handler;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.module.promotion.api.coupon.CouponApi;
 import cn.iocoder.yudao.module.promotion.api.coupon.dto.CouponUseReqDTO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderDO;
@@ -32,16 +33,25 @@ public class TradeCouponOrderHandler implements TradeOrderHandler {
 
     @Override
     public void afterPayOrder(TradeOrderDO order, List<TradeOrderItemDO> orderItems) {
-
+        if (CollUtil.isEmpty(order.getCouponIds())) {
+            return;
+        }
+        // 赠送优惠券
+        couponApi.takeCouponsByAdmin(order.getCouponIds(), order.getCouponCounts(), order.getUserId());
     }
 
     @Override
     public void afterCancelOrder(TradeOrderDO order, List<TradeOrderItemDO> orderItems) {
-        if (order.getCouponId() == null || order.getCouponId() <= 0) {
+        // 情况一：退还订单使用的优惠券
+        if (order.getCouponId() != null && order.getCouponId() > 0) {
+            // 退回优惠劵
+            couponApi.returnUsedCoupon(order.getCouponId());
+        }
+        // 情况二：收回赠送的优惠券
+        if (CollUtil.isEmpty(order.getCouponIds())) {
             return;
         }
-        // 退回优惠劵
-        couponApi.returnUsedCoupon(order.getCouponId());
+        // TODO @puhui999: 收回优惠券再考虑一下，是直接删除券还是改个状态
     }
 
 }

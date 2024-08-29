@@ -19,6 +19,7 @@ import org.springframework.stereotype.Component;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.filterList;
@@ -105,8 +106,18 @@ public class TradeRewardActivityPriceCalculator implements TradePriceCalculator 
         }
         // 4.3 记录赠送的优惠券
         if (rule.getGiveCoupon()) {
-            // TODO @puhui999: 需要考虑赠送的优惠券是否重叠，重叠则对数量进行累加
-            result.setCouponIds(rule.getCouponIds()).setCouponCounts(rule.getCouponCounts());
+            for (int i = 0; i < rule.getCouponIds().size(); i++) {
+                Long couponId = result.getCouponIds().get(i);
+                Integer couponCount = result.getCouponCounts().get(i);
+                int index = CollUtil.indexOf(result.getCouponIds(), id -> Objects.equals(couponId, id));
+                if (index != -1) { // 情况一：别的满减活动送过同类优惠券，则直接增加数量
+                    List<Integer> couponCounts = result.getCouponCounts();
+                    couponCounts.set(index, couponCounts.get(index) + couponCount);
+                    result.setCouponCounts(couponCounts);
+                } else { // 情况二：还没有赠送的优惠券
+                    result.setCouponIds(rule.getCouponIds()).setCouponCounts(rule.getCouponCounts());
+                }
+            }
         }
     }
 

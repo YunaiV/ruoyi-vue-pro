@@ -201,6 +201,8 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
         order.setRefundStatus(TradeOrderRefundStatusEnum.NONE.getStatus());
         order.setProductCount(getSumValue(calculateRespBO.getItems(), TradePriceCalculateRespBO.OrderItem::getCount, Integer::sum));
         order.setUserIp(getClientIP()).setTerminal(getTerminal());
+        // 优惠券
+        order.setCouponIds(calculateRespBO.getCouponIds()).setCouponCounts(calculateRespBO.getCouponCounts());
         // 支付 + 退款信息
         order.setAdjustPrice(0).setPayStatus(false);
         order.setRefundStatus(TradeOrderRefundStatusEnum.NONE.getStatus()).setRefundPrice(0);

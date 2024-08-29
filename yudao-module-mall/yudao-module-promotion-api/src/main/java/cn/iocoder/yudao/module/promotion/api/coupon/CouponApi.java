@@ -3,8 +3,9 @@ package cn.iocoder.yudao.module.promotion.api.coupon;
 import cn.iocoder.yudao.module.promotion.api.coupon.dto.CouponRespDTO;
 import cn.iocoder.yudao.module.promotion.api.coupon.dto.CouponUseReqDTO;
 import cn.iocoder.yudao.module.promotion.api.coupon.dto.CouponValidReqDTO;
-
 import jakarta.validation.Valid;
+
+import java.util.List;
 
 /**
  * 优惠劵 API 接口
@@ -34,5 +35,14 @@ public interface CouponApi {
      * @return 优惠劵
      */
     CouponRespDTO validateCoupon(@Valid CouponValidReqDTO validReqDTO);
+
+    /**
+     * 【管理员】给指定用户批量发送优惠券
+     *
+     * @param templateIds 优惠劵编号的数组
+     * @param counts      优惠券数量的数组
+     * @param userId      用户编号
+     */
+    void takeCouponsByAdmin(List<Long> templateIds, List<Integer> counts, Long userId);
 
 }

@@ -72,7 +72,6 @@ public class TradePriceCalculateRespBO {
      */
     private Boolean freeDelivery;
 
-    // TODO @puhui999: 订单保存时需要保存
     /**
      * 赠送的优惠劵编号的数组
      */

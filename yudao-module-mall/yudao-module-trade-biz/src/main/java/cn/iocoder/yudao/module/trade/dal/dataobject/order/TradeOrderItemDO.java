@@ -160,19 +160,6 @@ public class TradeOrderItemDO extends BaseDO {
      */
     private Integer vipPrice;
 
-    /**
-     * 赠送的优惠劵编号的数组
-     *
-     * 目的：用于后续取消或者售后订单时，需要扣减赠送
-     */
-    private List<Long> couponIds;
-    /**
-     * 赠送的优惠券数量的数组
-     *
-     * 目的：用于后续取消或者售后订单时，需要扣减赠送
-     */
-    private List<Integer> couponCounts;
-
     // ========== 售后基本信息 ==========
 
     /**
