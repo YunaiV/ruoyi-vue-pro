@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.ai.service.knowledge;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.http.HttpUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
@@ -17,7 +18,7 @@ import org.springframework.ai.reader.tika.TikaDocumentReader;
 import org.springframework.ai.tokenizer.TokenCountEstimator;
 import org.springframework.ai.transformer.splitter.TokenTextSplitter;
 import org.springframework.ai.vectorstore.RedisVectorStore;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -46,17 +47,14 @@ public class AiKnowledgeDocumentServiceImpl implements AiKnowledgeDocumentServic
     private RedisVectorStore vectorStore;
 
 
-    // TODO xiaoxin 临时测试用，后续删
-    @Value("classpath:/webapp/test/Fel.pdf")
-    private org.springframework.core.io.Resource data;
-
     // TODO 芋艿：需要 review 下，代码格式；
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Long createKnowledgeDocument(AiKnowledgeDocumentCreateReqVO createReqVO) {
-        // TODO xiaoxin 后续从 url 加载
-        TikaDocumentReader loader = new TikaDocumentReader(data);
-        // 1.1 加载文档
+        // 1.1 下载文档
+        String url = createReqVO.getUrl();
+        TikaDocumentReader loader = new TikaDocumentReader(downloadFile(url));
+        // 1.2 加载文档
         List<Document> documents = loader.get();
         Document document = CollUtil.getFirst(documents);
         // TODO @xin：是不是不存在，就抛出异常呀；厚泽 return 呀；
@@ -84,6 +82,16 @@ public class AiKnowledgeDocumentServiceImpl implements AiKnowledgeDocumentServic
         // 3 向量化并存储
         vectorStore.add(segments);
         return documentId;
+    }
+
+    private org.springframework.core.io.Resource downloadFile(String url) {
+        try {
+            byte[] bytes = HttpUtil.downloadBytes(url);
+            return new ByteArrayResource(bytes);
+        } catch (Exception e) {
+            log.error("[downloadFile][url({}) 下载失败]", url, e);
+            throw new RuntimeException(e);
+        }
     }
 
 }

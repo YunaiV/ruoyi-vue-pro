@@ -7,7 +7,7 @@ import cn.iocoder.yudao.module.ai.controller.admin.knowledge.vo.AiKnowledgeCreat
 import cn.iocoder.yudao.module.ai.controller.admin.knowledge.vo.AiKnowledgeUpdateMyReqVO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.knowledge.AiKnowledgeDO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiChatModelDO;
-import cn.iocoder.yudao.module.ai.dal.mysql.knowledge.AiKnowledgeBaseMapper;
+import cn.iocoder.yudao.module.ai.dal.mysql.knowledge.AiKnowledgeMapper;
 import cn.iocoder.yudao.module.ai.service.model.AiChatModelService;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
@@ -29,7 +29,7 @@ public class AiKnowledgeServiceImpl implements AiKnowledgeService {
     private AiChatModelService chatModalService;
 
     @Resource
-    private AiKnowledgeBaseMapper knowledgeBaseMapper;
+    private AiKnowledgeMapper knowledgeBaseMapper;
 
     @Override
     public Long createKnowledgeMy(AiKnowledgeCreateMyReqVO createReqVO, Long userId) {

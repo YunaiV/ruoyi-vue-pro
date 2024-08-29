@@ -10,5 +10,5 @@ import org.apache.ibatis.annotations.Mapper;
  * @author xiaoxin
  */
 @Mapper
-public interface AiKnowledgeBaseMapper extends BaseMapperX<AiKnowledgeDO> {
+public interface AiKnowledgeMapper extends BaseMapperX<AiKnowledgeDO> {
 }
