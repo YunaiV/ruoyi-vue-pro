@@ -31,8 +31,8 @@ public class TradePriceCalculatorHelper {
                                                                List<ProductSpuRespDTO> spuList, List<ProductSkuRespDTO> skuList) {
         // 创建 PriceCalculateRespDTO 对象
         TradePriceCalculateRespBO result = new TradePriceCalculateRespBO();
-        result.setType(getOrderType(param));
-        result.setPromotions(new ArrayList<>());
+        result.setType(getOrderType(param)).setPromotions(new ArrayList<>())
+                .setCouponIds(new ArrayList<>()).setCouponCounts(new ArrayList<>());
 
         // 创建它的 OrderItem 属性
         result.setItems(new ArrayList<>(param.getItems().size()));
@@ -60,7 +60,7 @@ public class TradePriceCalculatorHelper {
                     .setWeight(sku.getWeight()).setVolume(sku.getVolume());
             // spu 信息
             orderItem.setSpuName(spu.getName()).setCategoryId(spu.getCategoryId())
-                    .setDeliveryTemplateId(spu.getDeliveryTemplateId())
+                    .setDeliveryTypes(spu.getDeliveryTypes()).setDeliveryTemplateId(spu.getDeliveryTemplateId())
                     .setGivePoint(spu.getGiveIntegral()).setUsePoint(0);
             if (StrUtil.isBlank(orderItem.getPicUrl())) {
                 orderItem.setPicUrl(spu.getPicUrl());

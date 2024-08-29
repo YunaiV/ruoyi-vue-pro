@@ -9,7 +9,6 @@ import cn.iocoder.yudao.module.trade.controller.app.order.vo.AppTradeOrderSettle
 import cn.iocoder.yudao.module.trade.controller.app.order.vo.AppTradeOrderSettlementRespVO;
 import cn.iocoder.yudao.module.trade.controller.app.order.vo.item.AppTradeOrderItemCommentCreateReqVO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderDO;
-import cn.iocoder.yudao.module.trade.enums.order.TradeOrderCancelTypeEnum;
 import jakarta.validation.constraints.NotNull;
 
 /**
@@ -186,14 +185,13 @@ public interface TradeOrderUpdateService {
      */
     void updateOrderCombinationInfo(Long orderId, Long activityId, Long combinationRecordId, Long headId);
 
-    // TODO @puhui999：不传递枚举哈。因为 rpc 不好支持。
     /**
      * 取消支付订单
      *
      * @param userId           用户编号
      * @param orderId          订单编号
-     * @param cancelType   取消类型
+     * @param cancelType       取消类型
      */
-    void cancelPaidOrder(Long userId, Long orderId, TradeOrderCancelTypeEnum cancelType);
+    void cancelPaidOrder(Long userId, Long orderId, Integer cancelType);
 
 }

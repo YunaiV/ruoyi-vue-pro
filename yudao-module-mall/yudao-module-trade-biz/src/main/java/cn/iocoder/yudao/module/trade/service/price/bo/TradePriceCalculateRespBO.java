@@ -68,6 +68,21 @@ public class TradePriceCalculateRespBO {
     private Long bargainActivityId;
 
     /**
+     * 是否包邮
+     */
+    private Boolean freeDelivery;
+
+    // TODO @puhui999: 订单保存时需要保存
+    /**
+     * 赠送的优惠劵编号的数组
+     */
+    private List<Long> couponIds;
+    /**
+     * 赠送的优惠券数量的数组
+     */
+    private List<Integer> couponCounts;
+
+    /**
      * 订单价格
      */
     @Data
@@ -213,8 +228,19 @@ public class TradePriceCalculateRespBO {
          */
         private Long categoryId;
 
+        // ========== 物流相关字段 =========
+
         /**
-         * 运费模板 Id
+         * 配送方式数组
+         *
+         * 对应 DeliveryTypeEnum 枚举
+         */
+        private List<Integer> deliveryTypes;
+
+        /**
+         * 物流配置模板编号
+         *
+         * 对应 TradeDeliveryExpressTemplateDO 的 id 编号
          */
         private Long deliveryTemplateId;
 
@@ -234,7 +260,7 @@ public class TradePriceCalculateRespBO {
         private List<ProductPropertyValueDetailRespDTO> properties;
 
         /**
-         * 使用的积分
+         * 赠送的积分
          */
         private Integer givePoint;
 

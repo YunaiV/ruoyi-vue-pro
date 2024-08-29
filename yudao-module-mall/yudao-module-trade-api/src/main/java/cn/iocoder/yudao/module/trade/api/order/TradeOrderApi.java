@@ -1,7 +1,6 @@
 package cn.iocoder.yudao.module.trade.api.order;
 
 import cn.iocoder.yudao.module.trade.api.order.dto.TradeOrderRespDTO;
-import cn.iocoder.yudao.module.trade.enums.order.TradeOrderCancelTypeEnum;
 
 import java.util.Collection;
 import java.util.List;
@@ -34,8 +33,8 @@ public interface TradeOrderApi {
      *
      * @param userId           用户编号
      * @param orderId          订单编号
-     * @param cancelTypeEnum   取消类型
+     * @param cancelType       取消类型
      */
-    void cancelPaidOrder(Long userId, Long orderId, TradeOrderCancelTypeEnum cancelTypeEnum);
+    void cancelPaidOrder(Long userId, Long orderId, Integer cancelType);
 
 }

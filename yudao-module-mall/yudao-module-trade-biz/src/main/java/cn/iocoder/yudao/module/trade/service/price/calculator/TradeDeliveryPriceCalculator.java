@@ -6,8 +6,6 @@ import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.module.member.api.address.MemberAddressApi;
 import cn.iocoder.yudao.module.member.api.address.dto.MemberAddressRespDTO;
-import cn.iocoder.yudao.module.product.api.spu.ProductSpuApi;
-import cn.iocoder.yudao.module.product.api.spu.dto.ProductSpuRespDTO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.config.TradeConfigDO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.delivery.DeliveryPickUpStoreDO;
 import cn.iocoder.yudao.module.trade.enums.delivery.DeliveryExpressChargeModeEnum;
@@ -30,8 +28,7 @@ import java.util.Set;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
-import static cn.iocoder.yudao.module.trade.enums.ErrorCodeConstants.PICK_UP_STORE_NOT_EXISTS;
-import static cn.iocoder.yudao.module.trade.enums.ErrorCodeConstants.PRICE_CALCULATE_DELIVERY_PRICE_TEMPLATE_NOT_FOUND;
+import static cn.iocoder.yudao.module.trade.enums.ErrorCodeConstants.*;
 
 /**
  * 运费的 {@link TradePriceCalculator} 实现类
@@ -52,19 +49,15 @@ public class TradeDeliveryPriceCalculator implements TradePriceCalculator {
     private DeliveryExpressTemplateService deliveryExpressTemplateService;
     @Resource
     private TradeConfigService tradeConfigService;
-    @Resource
-    private ProductSpuApi productSpuApi;
 
     @Override
     public void calculate(TradePriceCalculateReqBO param, TradePriceCalculateRespBO result) {
         if (param.getDeliveryType() == null) {
             return;
         }
-        // TODO @puhui999：1）TradePriceCalculateRespBO 传递进来 delveryType 配送方式，减少读取；2）如果不匹配，抛出业务异常； = = 不然就不扣钱啦。
         // 校验是不是存在商品不能门店自提，或者不能快递发货的情况。就是说，配送方式不匹配哈
-        List<ProductSpuRespDTO> spuList = productSpuApi.getSpuList(convertSet(result.getItems(), OrderItem::getSpuId));
-        if (anyMatch(spuList, item -> !item.getDeliveryTypes().contains(param.getDeliveryType()))) {
-            return;
+        if (anyMatch(result.getItems(), item -> !item.getDeliveryTypes().contains(param.getDeliveryType()))) {
+            throw exception(PRICE_CALCULATE_DELIVERY_PRICE_TYPE_ILLEGAL);
         }
 
         if (DeliveryTypeEnum.PICK_UP.getType().equals(param.getDeliveryType())) {
@@ -101,7 +94,12 @@ public class TradeDeliveryPriceCalculator implements TradePriceCalculator {
             return;
         }
 
-        // 情况二：快递模版
+        // 情况二：活动包邮
+        if (Boolean.TRUE.equals(result.getFreeDelivery())) {
+            return;
+        }
+
+        // 情况三：快递模版
         // 2.1 过滤出已选中的商品 SKU
         List<OrderItem> selectedItem = filterList(result.getItems(), OrderItem::getSelected);
         Set<Long> deliveryTemplateIds = convertSet(selectedItem, OrderItem::getDeliveryTemplateId);

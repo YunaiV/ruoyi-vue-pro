@@ -96,7 +96,7 @@ public class RewardActivityBaseVO {
         @AssertTrue(message = "优惠劵和数量必须一一对应")
         @JsonIgnore
         public boolean isCouponCountsValid() {
-            return BooleanUtil.isFalse(givePoint) || CollUtil.size(couponIds) == CollUtil.size(couponCounts);
+            return BooleanUtil.isFalse(giveCoupon) || CollUtil.size(couponIds) == CollUtil.size(couponCounts);
         }
 
         @AssertTrue(message = "赠送的积分不能小于 1")

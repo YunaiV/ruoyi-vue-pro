@@ -858,8 +858,11 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void cancelPaidOrder(Long userId, Long orderId, TradeOrderCancelTypeEnum cancelType) {
-        // TODO @puhui999：这里校验下 cancelType 只允许拼团关闭；
+    public void cancelPaidOrder(Long userId, Long orderId, Integer cancelType) {
+        // 1. 这里校验下 cancelType 只允许拼团关闭；
+        if (!TradeOrderCancelTypeEnum.COMBINATION_CLOSE.getType().equals(cancelType)) {
+            return;
+        }
         // 1.1 检验订单存在
         TradeOrderDO order = tradeOrderMapper.selectOrderByIdAndUserId(orderId, userId);
         if (order == null) {
@@ -876,13 +879,13 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
         }
 
         // 2.1 取消订单
-        cancelOrder0(order, cancelType);
+        cancelOrder0(order, TradeOrderCancelTypeEnum.COMBINATION_CLOSE);
         // 2.2 创建退款单
         payRefundApi.createRefund(new PayRefundCreateReqDTO()
                 .setAppKey(tradeOrderProperties.getPayAppKey()).setUserIp(getClientIP()) // 支付应用
                 .setMerchantOrderId(String.valueOf(order.getId())) // 支付单号
                 .setMerchantRefundId(String.valueOf(order.getId()))
-                .setReason(cancelType.getName()).setPrice(order.getPayPrice()));// 价格信息
+                .setReason(TradeOrderCancelTypeEnum.COMBINATION_CLOSE.getName()).setPrice(order.getPayPrice()));// 价格信息
     }
 
     /**

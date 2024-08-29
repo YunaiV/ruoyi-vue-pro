@@ -4,9 +4,9 @@ import cn.iocoder.yudao.module.promotion.api.coupon.CouponApi;
 import cn.iocoder.yudao.module.promotion.api.coupon.dto.CouponUseReqDTO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderDO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderItemDO;
+import jakarta.annotation.Resource;
 import org.springframework.stereotype.Component;
 
-import jakarta.annotation.Resource;
 import java.util.List;
 
 /**
@@ -28,6 +28,11 @@ public class TradeCouponOrderHandler implements TradeOrderHandler {
         // 不在前置扣减的原因，是因为优惠劵要记录使用的订单号
         couponApi.useCoupon(new CouponUseReqDTO().setId(order.getCouponId()).setUserId(order.getUserId())
                 .setOrderId(order.getId()));
+    }
+
+    @Override
+    public void afterPayOrder(TradeOrderDO order, List<TradeOrderItemDO> orderItems) {
+
     }
 
     @Override
