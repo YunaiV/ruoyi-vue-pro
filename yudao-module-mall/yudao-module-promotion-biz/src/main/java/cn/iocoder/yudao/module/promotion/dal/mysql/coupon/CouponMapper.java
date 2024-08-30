@@ -72,6 +72,15 @@ public interface CouponMapper extends BaseMapperX<CouponDO> {
         );
     }
 
+    default List<CouponDO> selectListByTemplateIdAndUserIdAndTakeType(Long templateId, Collection<Long> userIds,
+                                                                      Integer takeType) {
+        return selectList(new LambdaQueryWrapperX<CouponDO>()
+                .eq(CouponDO::getTemplateId, templateId)
+                .eq(CouponDO::getTakeType, takeType)
+                .in(CouponDO::getUserId, userIds)
+        );
+    }
+
     default Map<Long, Integer> selectCountByUserIdAndTemplateIdIn(Long userId, Collection<Long> templateIds) {
         String templateIdAlias = "templateId";
         String countAlias = "count";

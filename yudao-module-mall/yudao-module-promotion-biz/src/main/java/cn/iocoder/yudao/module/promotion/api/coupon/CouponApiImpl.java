@@ -11,7 +11,7 @@ import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
-import java.util.List;
+import java.util.Map;
 
 /**
  * 优惠劵 API 实现类
@@ -43,8 +43,13 @@ public class CouponApiImpl implements CouponApi {
     }
 
     @Override
-    public void takeCouponsByAdmin(List<Long> templateIds, List<Integer> counts, Long userId) {
-        couponService.takeCouponsByAdmin(templateIds, counts, userId);
+    public void takeCouponsByAdmin(Map<Long, Integer> giveCouponsMap, Long userId) {
+        couponService.takeCouponsByAdmin(giveCouponsMap, userId);
+    }
+
+    @Override
+    public void takeBackCouponsByAdmin(Map<Long, Integer> giveCouponsMap, Long userId) {
+        couponService.takeBackCouponsByAdmin(giveCouponsMap, userId);
     }
 
 }

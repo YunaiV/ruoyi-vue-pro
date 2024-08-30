@@ -16,6 +16,7 @@ import lombok.EqualsAndHashCode;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 满减送活动 DO
@@ -114,13 +115,11 @@ public class RewardActivityDO extends BaseDO {
          */
         private Boolean giveCoupon;
         /**
-         * 赠送的优惠劵编号的数组
+         * 赠送的优惠劵
+         *
+         *  key: 优惠劵编号，value：对应的优惠券数量
          */
-        private List<Long> couponIds;
-        /**
-         * 赠送的优惠券数量的数组
-         */
-        private List<Integer> couponCounts;
+        private Map<Long, Integer> giveCouponsMap;
 
     }
 

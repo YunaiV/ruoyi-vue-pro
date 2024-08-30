@@ -108,11 +108,18 @@ public interface CouponService {
     /**
      * 【管理员】给指定用户批量发送优惠券
      *
-     * @param templateIds 优惠劵编号的数组
-     * @param counts      优惠券数量的数组
+     * @param giveCouponsMap key: 优惠劵编号，value：对应的优惠券数量
      * @param userId      用户编号
      */
-    void takeCouponsByAdmin(List<Long> templateIds, List<Integer> counts, Long userId);
+    void takeCouponsByAdmin(Map<Long, Integer> giveCouponsMap, Long userId);
+
+    /**
+     * 【管理员】收回给指定用户批量发送优惠券
+     *
+     * @param giveCouponsMap key: 优惠劵编号，value：对应的优惠券数量
+     * @param userId         用户编号
+     */
+    void takeBackCouponsByAdmin(Map<Long, Integer> giveCouponsMap, Long userId);
 
     /**
      * 【会员】领取优惠券
