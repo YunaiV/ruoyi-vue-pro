@@ -3,9 +3,12 @@ package cn.iocoder.yudao.module.ai.service.knowledge;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.http.HttpUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
-import cn.iocoder.yudao.module.ai.controller.admin.knowledge.vo.AiKnowledgeDocumentCreateReqVO;
+import cn.iocoder.yudao.module.ai.controller.admin.knowledge.vo.document.AiKnowledgeDocumentPageReqVO;
+import cn.iocoder.yudao.module.ai.controller.admin.knowledge.vo.document.AiKnowledgeDocumentUpdateReqVO;
+import cn.iocoder.yudao.module.ai.controller.admin.knowledge.vo.knowledge.AiKnowledgeDocumentCreateReqVO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.knowledge.AiKnowledgeDO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.knowledge.AiKnowledgeDocumentDO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.knowledge.AiKnowledgeSegmentDO;
@@ -28,6 +31,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
+
+import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.module.ai.enums.ErrorCodeConstants.KNOWLEDGE_DOCUMENT_NOT_EXISTS;
 
 /**
  * AI 知识库-文档 Service 实现类
@@ -102,6 +108,32 @@ public class AiKnowledgeDocumentServiceImpl implements AiKnowledgeDocumentServic
         // 3.3 向量化并存储
         vectorStore.add(segments);
         return documentId;
+    }
+
+    @Override
+    public PageResult<AiKnowledgeDocumentDO> getKnowledgeDocumentPage(AiKnowledgeDocumentPageReqVO pageReqVO) {
+        return documentMapper.selectPage(pageReqVO);
+    }
+
+    @Override
+    public void updateKnowledgeDocument(AiKnowledgeDocumentUpdateReqVO reqVO) {
+        validateKnowledgeDocumentExists(reqVO.getId());
+        AiKnowledgeDocumentDO document = BeanUtils.toBean(reqVO, AiKnowledgeDocumentDO.class);
+        documentMapper.updateById(document);
+    }
+
+    /**
+     * 校验文档是否存在
+     *
+     * @param id 文档编号
+     * @return 文档信息
+     */
+    private AiKnowledgeDocumentDO validateKnowledgeDocumentExists(Long id) {
+        AiKnowledgeDocumentDO knowledgeDocument = documentMapper.selectById(id);
+        if (knowledgeDocument == null) {
+            throw exception(KNOWLEDGE_DOCUMENT_NOT_EXISTS);
+        }
+        return knowledgeDocument;
     }
 
     private org.springframework.core.io.Resource downloadFile(String url) {

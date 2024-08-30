@@ -1,7 +1,9 @@
 package cn.iocoder.yudao.module.ai.service.knowledge;
 
-import cn.iocoder.yudao.module.ai.controller.admin.knowledge.vo.AiKnowledgeCreateMyReqVO;
-import cn.iocoder.yudao.module.ai.controller.admin.knowledge.vo.AiKnowledgeUpdateMyReqVO;
+import cn.iocoder.yudao.framework.common.pojo.PageParam;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.module.ai.controller.admin.knowledge.vo.knowledge.AiKnowledgeCreateMyReqVO;
+import cn.iocoder.yudao.module.ai.controller.admin.knowledge.vo.knowledge.AiKnowledgeUpdateMyReqVO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.knowledge.AiKnowledgeDO;
 
 /**
@@ -37,4 +39,12 @@ public interface AiKnowledgeService {
      */
     AiKnowledgeDO validateKnowledgeExists(Long id);
 
+    /**
+     * 获得【我的】知识库分页
+     *
+     * @param userId 用户编号
+     * @param pageReqVO   分页查询
+     * @return 知识库分页
+     */
+    PageResult<AiKnowledgeDO> getKnowledgePageMy(Long userId, PageParam pageReqVO);
 }
