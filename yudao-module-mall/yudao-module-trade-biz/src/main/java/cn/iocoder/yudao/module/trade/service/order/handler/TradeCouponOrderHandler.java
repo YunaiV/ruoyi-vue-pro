@@ -51,7 +51,7 @@ public class TradeCouponOrderHandler implements TradeOrderHandler {
         if (CollUtil.isEmpty(order.getGiveCouponsMap())) {
             return;
         }
-        couponApi.takeBackCouponsByAdmin(order.getGiveCouponsMap(), order.getUserId());
+        couponApi.invalidateCouponsByAdmin(order.getGiveCouponsMap(), order.getUserId());
     }
 
 }

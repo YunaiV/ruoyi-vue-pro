@@ -119,7 +119,7 @@ public interface CouponService {
      * @param giveCouponsMap key: 优惠劵编号，value：对应的优惠券数量
      * @param userId         用户编号
      */
-    void takeBackCouponsByAdmin(Map<Long, Integer> giveCouponsMap, Long userId);
+    void invalidateCouponsByAdmin(Map<Long, Integer> giveCouponsMap, Long userId);
 
     /**
      * 【会员】领取优惠券

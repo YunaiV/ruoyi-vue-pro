@@ -48,8 +48,8 @@ public class CouponApiImpl implements CouponApi {
     }
 
     @Override
-    public void takeBackCouponsByAdmin(Map<Long, Integer> giveCouponsMap, Long userId) {
-        couponService.takeBackCouponsByAdmin(giveCouponsMap, userId);
+    public void invalidateCouponsByAdmin(Map<Long, Integer> giveCouponsMap, Long userId) {
+        couponService.invalidateCouponsByAdmin(giveCouponsMap, userId);
     }
 
 }

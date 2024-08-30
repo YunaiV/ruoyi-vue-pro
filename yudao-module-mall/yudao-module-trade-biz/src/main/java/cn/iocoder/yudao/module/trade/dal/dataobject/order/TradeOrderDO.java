@@ -294,10 +294,13 @@ public class TradeOrderDO extends BaseDO {
      */
     private Integer vipPrice;
 
+    // TODO @puhui999：项了下，貌似这里存储 List<Long> giveCouponIds 更合适。因为优惠劵赠送到最后是对应的编号，然后从而进行取消？
     /**
      * 赠送的优惠劵
      *
-     *  key: 优惠劵编号，value：对应的优惠券数量
+     * key: 优惠劵编号
+     * value：对应的优惠券数量
+     *
      * 目的：用于后续取消或者售后订单时，需要扣减赠送
      */
     @TableField(typeHandler = JacksonTypeHandler.class)

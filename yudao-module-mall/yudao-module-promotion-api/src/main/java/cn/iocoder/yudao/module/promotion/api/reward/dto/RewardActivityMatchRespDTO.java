@@ -86,6 +86,7 @@ public class RewardActivityMatchRespDTO {
          * 是否包邮
          */
         private Boolean freeDelivery;
+        // TODO @puhui999：建议不返回 + 去掉 givePoint、giveCoupon 字段哈。
         /**
          * 是否赠送积分
          */
@@ -98,10 +99,12 @@ public class RewardActivityMatchRespDTO {
          * 是否赠送优惠券
          */
         private Boolean giveCoupon;
+        // TODO @puhui999：giveCoupons 即可
         /**
          * 赠送的优惠劵
          *
-         *  key: 优惠劵编号，value：对应的优惠券数量
+         * key: 优惠劵模版编号
+         * value：对应的优惠券数量
          */
         private Map<Long, Integer> giveCouponsMap;
 

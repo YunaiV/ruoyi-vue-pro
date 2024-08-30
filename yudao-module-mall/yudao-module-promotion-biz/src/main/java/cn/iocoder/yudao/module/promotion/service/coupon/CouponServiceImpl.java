@@ -198,7 +198,7 @@ public class CouponServiceImpl implements CouponService {
     }
 
     @Override
-    public void takeBackCouponsByAdmin(Map<Long, Integer> giveCouponsMap, Long userId) {
+    public void invalidateCouponsByAdmin(Map<Long, Integer> giveCouponsMap, Long userId) {
         // 循环收回
         for (Map.Entry<Long, Integer> entry : giveCouponsMap.entrySet()) {
             try {
