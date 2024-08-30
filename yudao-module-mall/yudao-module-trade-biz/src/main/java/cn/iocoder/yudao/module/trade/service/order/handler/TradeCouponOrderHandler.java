@@ -33,11 +33,11 @@ public class TradeCouponOrderHandler implements TradeOrderHandler {
 
     @Override
     public void afterPayOrder(TradeOrderDO order, List<TradeOrderItemDO> orderItems) {
-        if (CollUtil.isEmpty(order.getCouponIds())) {
+        if (CollUtil.isEmpty(order.getGiveCouponsMap())) {
             return;
         }
         // 赠送优惠券
-        couponApi.takeCouponsByAdmin(order.getCouponIds(), order.getCouponCounts(), order.getUserId());
+        couponApi.takeCouponsByAdmin(order.getGiveCouponsMap(), order.getUserId());
     }
 
     @Override
@@ -48,10 +48,10 @@ public class TradeCouponOrderHandler implements TradeOrderHandler {
             couponApi.returnUsedCoupon(order.getCouponId());
         }
         // 情况二：收回赠送的优惠券
-        if (CollUtil.isEmpty(order.getCouponIds())) {
+        if (CollUtil.isEmpty(order.getGiveCouponsMap())) {
             return;
         }
-        // TODO @puhui999: 收回优惠券再考虑一下，是直接删除券还是改个状态；建议是【已作废】
+        couponApi.takeBackCouponsByAdmin(order.getGiveCouponsMap(), order.getUserId());
     }
 
 }

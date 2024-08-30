@@ -16,6 +16,7 @@ import lombok.Data;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -88,16 +89,7 @@ public class RewardActivityBaseVO {
         private Boolean giveCoupon;
 
         @Schema(description = "赠送的优惠劵编号的数组", example = "1,2,3")
-        private List<Long> couponIds;
-
-        @Schema(description = "赠送的优惠券数量的数组", example = "1,2,3")
-        private List<Integer> couponCounts;
-
-        @AssertTrue(message = "优惠劵和数量必须一一对应")
-        @JsonIgnore
-        public boolean isCouponCountsValid() {
-            return BooleanUtil.isFalse(giveCoupon) || CollUtil.size(couponIds) == CollUtil.size(couponCounts);
-        }
+        private Map<Long, Integer> giveCouponsMap;
 
         @AssertTrue(message = "赠送的积分不能小于 1")
         @JsonIgnore

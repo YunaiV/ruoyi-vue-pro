@@ -18,7 +18,7 @@ public enum CouponStatusEnum implements IntArrayValuable {
     UNUSED(1, "未使用"),
     USED(2, "已使用"),
     EXPIRE(3, "已过期"),
-    ;
+    INVALID(4, "已作废");
 
     public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(CouponStatusEnum::getStatus).toArray();
 

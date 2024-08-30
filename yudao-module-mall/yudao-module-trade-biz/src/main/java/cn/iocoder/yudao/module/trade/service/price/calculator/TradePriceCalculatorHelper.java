@@ -11,6 +11,7 @@ import cn.iocoder.yudao.module.trade.service.price.bo.TradePriceCalculateReqBO;
 import cn.iocoder.yudao.module.trade.service.price.bo.TradePriceCalculateRespBO;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -31,8 +32,7 @@ public class TradePriceCalculatorHelper {
                                                                List<ProductSpuRespDTO> spuList, List<ProductSkuRespDTO> skuList) {
         // 创建 PriceCalculateRespDTO 对象
         TradePriceCalculateRespBO result = new TradePriceCalculateRespBO();
-        result.setType(getOrderType(param)).setPromotions(new ArrayList<>())
-                .setCouponIds(new ArrayList<>()).setCouponCounts(new ArrayList<>());
+        result.setType(getOrderType(param)).setPromotions(new ArrayList<>()).setGiveCouponsMap(new LinkedHashMap<>());
 
         // 创建它的 OrderItem 属性
         result.setItems(new ArrayList<>(param.getItems().size()));

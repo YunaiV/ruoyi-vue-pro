@@ -6,6 +6,7 @@ import cn.iocoder.yudao.module.trade.enums.order.TradeOrderTypeEnum;
 import lombok.Data;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * 价格计算 Response BO
@@ -72,15 +73,13 @@ public class TradePriceCalculateRespBO {
      */
     private Boolean freeDelivery;
 
-    // TODO @puhui999：感觉要不要试着改成 Map<Long, Integer> giveCoupons？貌似整体会更好理解一点。
     /**
-     * 赠送的优惠劵编号的数组
+     * 赠送的优惠劵
+     *
+     *  key: 优惠劵编号，value：对应的优惠券数量
+     * 目的：用于后续取消或者售后订单时，需要扣减赠送
      */
-    private List<Long> couponIds;
-    /**
-     * 赠送的优惠券数量的数组
-     */
-    private List<Integer> couponCounts;
+    private Map<Long, Integer> giveCouponsMap;
 
     /**
      * 订单价格

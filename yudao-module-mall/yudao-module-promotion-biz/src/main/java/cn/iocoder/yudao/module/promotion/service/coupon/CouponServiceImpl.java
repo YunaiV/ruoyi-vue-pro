@@ -31,7 +31,6 @@ import java.util.stream.Collectors;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
-import static cn.iocoder.yudao.framework.common.util.collection.MapUtils.findAndThen;
 import static cn.iocoder.yudao.module.promotion.enums.ErrorCodeConstants.*;
 import static java.util.Arrays.asList;
 
@@ -165,6 +164,7 @@ public class CouponServiceImpl implements CouponService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void takeCoupon(Long templateId, Set<Long> userIds, CouponTakeTypeEnum takeType) {
         CouponTemplateDO template = couponTemplateService.getCouponTemplate(templateId);
         // 1. 过滤掉达到领取限制的用户
@@ -180,28 +180,66 @@ public class CouponServiceImpl implements CouponService {
     }
 
     @Override
-    public void takeCouponsByAdmin(List<Long> templateIds, List<Integer> counts, Long userId) {
-        // TODO @puhui999：要不要循环调用上面的 takeCoupon 方法？按道理说，赠送也不会很多张。如果某次发卷失败，可以打个 error log；
-        // 1. 获得优惠券模版
-        List<CouponTemplateDO> templateList = couponTemplateService.getCouponTemplateList(templateIds);
-        if (CollUtil.isEmpty(templateList)) {
+    public void takeCouponsByAdmin(Map<Long, Integer> giveCouponsMap, Long userId) {
+        if (CollUtil.isEmpty(giveCouponsMap)) {
             return;
         }
 
-        Map<Long, CouponTemplateDO> templateMap = convertMap(templateList, CouponTemplateDO::getId);
-        // 2.1 批量构建优惠券
-        List<CouponDO> couponList = new ArrayList<>();
-        for (int i = 0; i < templateIds.size(); i++) {
-            int finalI = i;
-            findAndThen(templateMap, templateIds.get(i), template -> {
-                for (int j = 0; j < counts.get(finalI); j++) {
-                    couponList.add(CouponConvert.INSTANCE.convert(template, userId)
-                            .setTakeType(CouponTakeTypeEnum.ADMIN.getValue()));
+        // 循环发放
+        for (Map.Entry<Long, Integer> entry : giveCouponsMap.entrySet()) {
+            try {
+                for (int i = 0; i < entry.getValue(); i++) {
+                    getSelf().takeCoupon(entry.getKey(), CollUtil.newHashSet(userId), CouponTakeTypeEnum.ADMIN);
                 }
-            });
+            } catch (Exception e) {
+                log.error("[takeCouponsByAdmin][coupon({}) 优惠券发放失败]", entry, e);
+            }
         }
-        // 2.2 批量保存优惠券
-        couponMapper.insertBatch(couponList);
+    }
+
+    @Override
+    public void takeBackCouponsByAdmin(Map<Long, Integer> giveCouponsMap, Long userId) {
+        // 循环收回
+        for (Map.Entry<Long, Integer> entry : giveCouponsMap.entrySet()) {
+            try {
+                for (int i = 0; i < entry.getValue(); i++) {
+                    getSelf().takeBackCoupon(entry.getKey(), CollUtil.newHashSet(userId), CouponTakeTypeEnum.ADMIN);
+                }
+            } catch (Exception e) {
+                log.error("[takeBackCouponsByAdmin][coupon({}) 收回优惠券失败]", entry, e);
+            }
+        }
+    }
+
+    /**
+     * 【管理员】收回优惠券
+     *
+     * @param templateId 模版编号
+     * @param userIds 用户编号列表
+     * @param takeType 领取方式
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public void takeBackCoupon(Long templateId, Set<Long> userIds, CouponTakeTypeEnum takeType) {
+        CouponTemplateDO couponTemplate = couponTemplateService.getCouponTemplate(templateId);
+        // 1.1 校验模板
+        if (couponTemplate == null) {
+            throw exception(COUPON_TEMPLATE_NOT_EXISTS);
+        }
+        // 1.2 校验领取方式
+        if (ObjectUtil.notEqual(couponTemplate.getTakeType(), takeType.getValue())) {
+            throw exception(COUPON_TEMPLATE_CANNOT_TAKE);
+        }
+
+        // 2.1 过滤出还未使用的赠送的优惠券
+        List<CouponDO> couponList = couponMapper.selectListByTemplateIdAndUserIdAndTakeType(templateId, userIds,
+                takeType.getValue());
+        List<CouponDO> unUsedCouponList = filterList(couponList, item -> !CouponStatusEnum.USED.getStatus().equals(item.getStatus()));
+        // 2.2 减少优惠劵模板的领取数量
+        couponTemplateService.updateCouponTemplateTakeCount(templateId, unUsedCouponList.size() * -1);
+        // 2.3 批量更新优惠劵状态
+        couponMapper.updateById(convertList(unUsedCouponList, item -> new CouponDO().setId(item.getId())
+                .setStatus(CouponStatusEnum.INVALID.getStatus())));
+
     }
 
     @Override

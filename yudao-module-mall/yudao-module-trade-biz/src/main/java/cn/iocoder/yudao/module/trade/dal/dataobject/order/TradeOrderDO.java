@@ -12,11 +12,13 @@ import cn.iocoder.yudao.module.trade.enums.order.TradeOrderRefundStatusEnum;
 import cn.iocoder.yudao.module.trade.enums.order.TradeOrderStatusEnum;
 import cn.iocoder.yudao.module.trade.enums.order.TradeOrderTypeEnum;
 import com.baomidou.mybatisplus.annotation.KeySequence;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import lombok.*;
 
 import java.time.LocalDateTime;
-import java.util.List;
+import java.util.Map;
 
 /**
  * 交易订单 DO
@@ -292,19 +294,14 @@ public class TradeOrderDO extends BaseDO {
      */
     private Integer vipPrice;
 
-    // TODO @puhui999：:1）建议命名要 giveXXX；不然不好理解哈；2）是不是搞成 Map 好点哈。
     /**
-     * 赠送的优惠劵编号的数组
+     * 赠送的优惠劵
      *
+     *  key: 优惠劵编号，value：对应的优惠券数量
      * 目的：用于后续取消或者售后订单时，需要扣减赠送
      */
-    private List<Long> couponIds;
-    /**
-     * 赠送的优惠券数量的数组
-     *
-     * 目的：用于后续取消或者售后订单时，需要扣减赠送
-     */
-    private List<Integer> couponCounts;
+    @TableField(typeHandler = JacksonTypeHandler.class)
+    private Map<Long, Integer> giveCouponsMap;
 
     /**
      * 秒杀活动编号

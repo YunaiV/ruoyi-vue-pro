@@ -19,13 +19,14 @@ import org.springframework.stereotype.Component;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.filterList;
 import static cn.iocoder.yudao.module.trade.service.price.calculator.TradePriceCalculatorHelper.formatPrice;
 
 // TODO @puhui999：相关的单测，建议改一改
+
 /**
  * 满减送活动的 {@link TradePriceCalculator} 实现类
  *
@@ -92,7 +93,7 @@ public class TradeRewardActivityPriceCalculator implements TradePriceCalculator 
         TradePriceCalculatorHelper.recountAllPrice(result);
 
         // 4.1 记录赠送的积分
-        if (rule.getGivePoint()) {
+        if (Boolean.TRUE.equals(rule.getGivePoint())) {
             List<Integer> dividePoints = TradePriceCalculatorHelper.dividePrice(orderItems, rule.getPoint());
             for (int i = 0; i < orderItems.size(); i++) {
                 // 商品可能赠送了积分，所以这里要加上
@@ -101,22 +102,18 @@ public class TradeRewardActivityPriceCalculator implements TradePriceCalculator 
             }
         }
         // 4.2 记录订单是否包邮
-        if (rule.getFreeDelivery()) {
+        if (Boolean.TRUE.equals(rule.getFreeDelivery())) {
             // 只要满足一个活动包邮那么这单就包邮
             result.setFreeDelivery(true);
         }
         // 4.3 记录赠送的优惠券
-        if (rule.getGiveCoupon()) {
-            for (int i = 0; i < rule.getCouponIds().size(); i++) {
-                Long couponId = result.getCouponIds().get(i);
-                Integer couponCount = result.getCouponCounts().get(i);
-                int index = CollUtil.indexOf(result.getCouponIds(), id -> Objects.equals(couponId, id));
-                if (index != -1) { // 情况一：别的满减活动送过同类优惠券，则直接增加数量
-                    List<Integer> couponCounts = result.getCouponCounts();
-                    couponCounts.set(index, couponCounts.get(index) + couponCount);
-                    result.setCouponCounts(couponCounts);
-                } else { // 情况二：还没有赠送的优惠券
-                    result.setCouponIds(rule.getCouponIds()).setCouponCounts(rule.getCouponCounts());
+        if (Boolean.TRUE.equals(rule.getGiveCoupon())) {
+            for (Map.Entry<Long, Integer> entry : rule.getGiveCouponsMap().entrySet()) {
+                Map<Long, Integer> giveCouponsMap = result.getGiveCouponsMap();
+                if (giveCouponsMap.get(entry.getKey()) == null) { // 情况一：还没有赠送的优惠券
+                    result.setGiveCouponsMap(rule.getGiveCouponsMap());
+                } else { // 情况二：别的满减活动送过同类优惠券，则直接增加数量
+                    giveCouponsMap.put(entry.getKey(), giveCouponsMap.get(entry.getKey()) + entry.getValue());
                 }
             }
         }
@@ -193,7 +190,7 @@ public class TradeRewardActivityPriceCalculator implements TradePriceCalculator 
         // 2. 构建不满足时的提示信息：按最低档规则算
         String meetTip = "满减送：购满 {} {}，可以减 {} 元";
         List<RewardActivityMatchRespDTO.Rule> rules = new ArrayList<>(rewardActivity.getRules());
-        rules.sort(Comparator.comparing(RewardActivityMatchRespDTO.Rule::getLimit)); // 按优惠门槛降序
+        rules.sort(Comparator.comparing(RewardActivityMatchRespDTO.Rule::getLimit)); // 按优惠门槛升序
         RewardActivityMatchRespDTO.Rule rule = rules.get(0);
         if (PromotionConditionTypeEnum.PRICE.getType().equals(rewardActivity.getConditionType())) {
             return StrUtil.format(meetTip, rule.getLimit(), "元", MoneyUtils.fenToYuanStr(rule.getDiscountPrice()));
