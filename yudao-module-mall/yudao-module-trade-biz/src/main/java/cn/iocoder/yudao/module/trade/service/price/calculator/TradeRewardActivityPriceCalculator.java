@@ -93,7 +93,7 @@ public class TradeRewardActivityPriceCalculator implements TradePriceCalculator 
         TradePriceCalculatorHelper.recountAllPrice(result);
 
         // 4.1 记录赠送的积分
-        if (rule.getGivePoint()) {
+        if (Boolean.TRUE.equals(rule.getGivePoint())) {
             List<Integer> dividePoints = TradePriceCalculatorHelper.dividePrice(orderItems, rule.getPoint());
             for (int i = 0; i < orderItems.size(); i++) {
                 // 商品可能赠送了积分，所以这里要加上
@@ -102,12 +102,12 @@ public class TradeRewardActivityPriceCalculator implements TradePriceCalculator 
             }
         }
         // 4.2 记录订单是否包邮
-        if (rule.getFreeDelivery()) {
+        if (Boolean.TRUE.equals(rule.getFreeDelivery())) {
             // 只要满足一个活动包邮那么这单就包邮
             result.setFreeDelivery(true);
         }
         // 4.3 记录赠送的优惠券
-        if (rule.getGiveCoupon()) {
+        if (Boolean.TRUE.equals(rule.getGiveCoupon())) {
             for (Map.Entry<Long, Integer> entry : rule.getGiveCouponsMap().entrySet()) {
                 Map<Long, Integer> giveCouponsMap = result.getGiveCouponsMap();
                 if (giveCouponsMap.get(entry.getKey()) == null) { // 情况一：还没有赠送的优惠券

@@ -48,6 +48,7 @@ CREATE TABLE IF NOT EXISTS "trade_order"
     "give_point"              int      NULL,
     "refund_point"            int      NULL,
     "vip_price"               int      NULL,
+    "give_coupons_map"        varchar  NULL,
     "seckill_activity_id"     long     NULL,
     "bargain_activity_id"     long     NULL,
     "bargain_record_id"       long     NULL,
