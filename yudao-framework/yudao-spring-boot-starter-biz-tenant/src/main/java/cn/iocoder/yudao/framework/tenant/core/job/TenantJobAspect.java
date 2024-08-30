@@ -46,6 +46,7 @@ public class TenantJobAspect {
                 try {
                     joinPoint.proceed();
                 } catch (Throwable e) {
+                    log.error("occur error while executing job with tenant {}", tenantId, e);
                     results.put(tenantId, ExceptionUtil.getRootCauseMessage(e));
                 }
             });
