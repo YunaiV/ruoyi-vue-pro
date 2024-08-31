@@ -11,6 +11,7 @@ import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -162,5 +163,6 @@ public class CouponTemplateDO extends BaseDO {
 
     // TODO 芋艿：领取开始时间、领取结束时间
 
-    // TODO 芋艿：要不要加描述
+    @Schema(description = "优惠券说明", example = "优惠券使用说明") // 单位：分，仅在 discountType 为 PERCENT 使用
+    private String description;
 }

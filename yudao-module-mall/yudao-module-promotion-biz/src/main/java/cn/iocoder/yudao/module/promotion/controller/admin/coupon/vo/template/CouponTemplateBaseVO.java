@@ -95,6 +95,9 @@ public class CouponTemplateBaseVO {
     @Schema(description = "折扣上限", example = "100") // 单位：分，仅在 discountType 为 PERCENT 使用
     private Integer discountLimitPrice;
 
+    @Schema(description = "优惠券说明", example = "优惠券使用说明") // 单位：分，仅在 discountType 为 PERCENT 使用
+    private String description;
+
     @AssertTrue(message = "商品范围编号的数组不能为空")
     @JsonIgnore
     public boolean isProductScopeValuesValid() {
