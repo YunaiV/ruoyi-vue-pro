@@ -16,6 +16,7 @@
 
 package com.alibaba.cloud.ai.tongyi.embedding;
 
+import cn.hutool.core.collection.ListUtil;
 import com.alibaba.cloud.ai.tongyi.common.exception.TongYiException;
 import com.alibaba.cloud.ai.tongyi.metadata.TongYiTextEmbeddingResponseMetadata;
 import com.alibaba.dashscope.embeddings.TextEmbedding;
@@ -100,7 +101,7 @@ public class TongYiTextEmbeddingModel extends AbstractEmbeddingModel {
 
 		return this.call(
 						new EmbeddingRequest(
-								List.of(document.getFormattedContent(this.metadataMode)),
+								ListUtil.of(document.getFormattedContent(this.metadataMode)),
 								null)
 				).getResults().stream()
 				.map(Embedding::getOutput)
