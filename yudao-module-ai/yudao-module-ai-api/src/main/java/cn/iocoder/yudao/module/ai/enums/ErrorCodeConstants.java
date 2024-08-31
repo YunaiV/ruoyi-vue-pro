@@ -52,7 +52,6 @@ public interface ErrorCodeConstants {
     // ========== API 思维导图 1-040-008-000 ==========
     ErrorCode MIND_MAP_NOT_EXISTS = new ErrorCode(1_040_008_000, "思维导图不存在!");
 
-
     // ========== API 知识库 1-022-008-000 ==========
     ErrorCode KNOWLEDGE_NOT_EXISTS = new ErrorCode(1_022_008_000, "知识库不存在!");
     ErrorCode KNOWLEDGE_DOCUMENT_NOT_EXISTS = new ErrorCode(1_022_008_001, "文档不存在!");

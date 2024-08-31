@@ -7,7 +7,7 @@ import lombok.Data;
 import org.hibernate.validator.constraints.URL;
 
 
-@Schema(description = "管理后台 - AI 知识库创建【文档】 Request VO")
+@Schema(description = "管理后台 - AI 知识库文档的创建 Request VO")
 @Data
 public class AiKnowledgeDocumentCreateReqVO {
 

@@ -7,7 +7,7 @@ import cn.iocoder.yudao.module.ai.controller.admin.knowledge.vo.segment.AiKnowle
 import cn.iocoder.yudao.module.ai.dal.dataobject.knowledge.AiKnowledgeSegmentDO;
 
 /**
- * AI 知识库分片 Service 接口
+ * AI 知识库段落 Service 接口
  *
  * @author xiaoxin
  */
@@ -22,16 +22,17 @@ public interface AiKnowledgeSegmentService {
     PageResult<AiKnowledgeSegmentDO> getKnowledgeSegmentPage(AiKnowledgeSegmentPageReqVO pageReqVO);
 
     /**
-     * 更新段落内容
+     * 更新段落的内容
      *
      * @param reqVO 更新内容
      */
     void updateKnowledgeSegment(AiKnowledgeSegmentUpdateReqVO reqVO);
 
     /**
-     * 更新状态
+     * 更新段落的状态
      *
      * @param reqVO 更新内容
      */
     void updateKnowledgeSegmentStatus(AiKnowledgeSegmentUpdateStatusReqVO reqVO);
+
 }

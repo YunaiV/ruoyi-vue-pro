@@ -30,13 +30,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Map;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.ai.enums.ErrorCodeConstants.KNOWLEDGE_DOCUMENT_NOT_EXISTS;
 
 /**
- * AI 知识库-文档 Service 实现类
+ * AI 知识库文档 Service 实现类
  *
  * @author xiaoxin
  */
@@ -61,24 +60,21 @@ public class AiKnowledgeDocumentServiceImpl implements AiKnowledgeDocumentServic
     @Resource
     private AiChatModelService chatModelService;
 
-
-    // TODO 芋艿：需要 review 下，代码格式；
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Long createKnowledgeDocument(AiKnowledgeDocumentCreateReqVO createReqVO) {
+        // 0. 校验
+        AiKnowledgeDO knowledge = knowledgeService.validateKnowledgeExists(createReqVO.getKnowledgeId());
+        AiChatModelDO model = chatModelService.validateChatModel(knowledge.getModelId());
+
         // 1.1 下载文档
-        String url = createReqVO.getUrl();
-        // 1.2 加载文档
-        TikaDocumentReader loader = new TikaDocumentReader(downloadFile(url));
+        TikaDocumentReader loader = new TikaDocumentReader(downloadFile(createReqVO.getUrl()));
         List<Document> documents = loader.get();
         Document document = CollUtil.getFirst(documents);
+        // 1.2 文档记录入库
         String content = document.getContent();
-        Integer tokens = tokenCountEstimator.estimate(content);
-        Integer wordCount = content.length();
-
-        // 1.3 文档记录入库
         AiKnowledgeDocumentDO documentDO = BeanUtils.toBean(createReqVO, AiKnowledgeDocumentDO.class)
-                .setTokens(tokens).setWordCount(wordCount)
+                .setTokens(tokenCountEstimator.estimate(content)).setWordCount(content.length())
                 .setStatus(CommonStatusEnum.ENABLE.getStatus()).setSliceStatus(AiKnowledgeDocumentStatusEnum.SUCCESS.getStatus());
         documentMapper.insert(documentDO);
         Long documentId = documentDO.getId();
@@ -90,22 +86,16 @@ public class AiKnowledgeDocumentServiceImpl implements AiKnowledgeDocumentServic
         List<Document> segments = tokenTextSplitter.apply(documents);
         // 2.2 分段内容入库
         List<AiKnowledgeSegmentDO> segmentDOList = CollectionUtils.convertList(segments,
-                segment -> new AiKnowledgeSegmentDO().setContent(segment.getContent()).setDocumentId(documentId).setKnowledgeId(createReqVO.getKnowledgeId()).setVectorId(segment.getId())
+                segment -> new AiKnowledgeSegmentDO().setContent(segment.getContent()).setDocumentId(documentId)
+                        .setKnowledgeId(createReqVO.getKnowledgeId()).setVectorId(segment.getId())
                         .setTokens(tokenCountEstimator.estimate(segment.getContent())).setWordCount(segment.getContent().length())
                         .setStatus(CommonStatusEnum.ENABLE.getStatus()));
         segmentMapper.insertBatch(segmentDOList);
 
-        // 3.1 document 补充源数据
-        segments.forEach(segment -> {
-            Map<String, Object> metadata = segment.getMetadata();
-            metadata.put(AiKnowledgeSegmentDO.FIELD_KNOWLEDGE_ID, createReqVO.getKnowledgeId());
-        });
-
-        AiKnowledgeDO knowledge = knowledgeService.validateKnowledgeExists(createReqVO.getKnowledgeId());
-        AiChatModelDO model = chatModelService.validateChatModel(knowledge.getModelId());
-        // 3.2 获取向量存储实例
+        // 3.1 获取向量存储实例
         VectorStore vectorStore = apiKeyService.getOrCreateVectorStore(model.getKeyId());
-        // 3.3 向量化并存储
+        // 3.2 向量化并存储
+        segments.forEach(segment -> segment.getMetadata().put(AiKnowledgeSegmentDO.FIELD_KNOWLEDGE_ID, createReqVO.getKnowledgeId()));
         vectorStore.add(segments);
         return documentId;
     }
@@ -117,7 +107,9 @@ public class AiKnowledgeDocumentServiceImpl implements AiKnowledgeDocumentServic
 
     @Override
     public void updateKnowledgeDocument(AiKnowledgeDocumentUpdateReqVO reqVO) {
+        // 1. 校验文档是否存在
         validateKnowledgeDocumentExists(reqVO.getId());
+        // 2. 更新文档
         AiKnowledgeDocumentDO document = BeanUtils.toBean(reqVO, AiKnowledgeDocumentDO.class);
         documentMapper.updateById(document);
     }

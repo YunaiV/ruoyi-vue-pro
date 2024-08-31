@@ -86,14 +86,6 @@ public interface AiApiKeyService {
     ChatModel getChatModel(Long id);
 
     /**
-     * 获得 EmbeddingModel 对象
-     *
-     * @param id 编号
-     * @return EmbeddingModel 对象
-     */
-    EmbeddingModel getEmbeddingModel(Long id);
-
-    /**
      * 获得 ImageModel 对象
      *
      * TODO 可优化点：目前默认获取 platform 对应的第一个开启的配置用于绘画；后续可以支持配置选择
@@ -122,7 +114,15 @@ public interface AiApiKeyService {
     SunoApi getSunoApi();
 
     /**
-     * 获得 vector 对象
+     * 获得 EmbeddingModel 对象
+     *
+     * @param id 编号
+     * @return EmbeddingModel 对象
+     */
+    EmbeddingModel getEmbeddingModel(Long id);
+
+    /**
+     * 获得 VectorStore 对象
      *
      * @param id 编号
      * @return VectorStore 对象

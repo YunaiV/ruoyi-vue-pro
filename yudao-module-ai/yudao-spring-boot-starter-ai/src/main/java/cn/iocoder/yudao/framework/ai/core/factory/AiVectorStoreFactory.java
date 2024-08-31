@@ -4,12 +4,13 @@ import cn.iocoder.yudao.framework.ai.core.enums.AiPlatformEnum;
 import org.springframework.ai.embedding.EmbeddingModel;
 import org.springframework.ai.vectorstore.VectorStore;
 
+// TODO @xin：也放到 AiModelFactory 里面好了，后续改成 AiFactory
 /**
  * AI Vector 模型工厂的接口类
+ *
  * @author xiaoxin
  */
 public interface AiVectorStoreFactory {
-
 
     /**
      * 基于指定配置，获得 VectorStore 对象

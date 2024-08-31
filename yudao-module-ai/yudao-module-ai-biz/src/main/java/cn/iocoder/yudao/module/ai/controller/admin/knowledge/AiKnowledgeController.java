@@ -22,6 +22,7 @@ import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUti
 @Tag(name = "管理后台 - AI 知识库")
 @RestController
 @RequestMapping("/ai/knowledge")
+@Validated
 public class AiKnowledgeController {
 
     @Resource
@@ -34,13 +35,11 @@ public class AiKnowledgeController {
         return success(BeanUtils.toBean(pageResult, AiKnowledgeRespVO.class));
     }
 
-
     @PostMapping("/create-my")
     @Operation(summary = "创建【我的】知识库")
     public CommonResult<Long> createKnowledgeMy(@RequestBody @Valid AiKnowledgeCreateMyReqVO createReqVO) {
         return success(knowledgeService.createKnowledgeMy(createReqVO, getLoginUserId()));
     }
-
 
     @PutMapping("/update-my")
     @Operation(summary = "更新【我的】知识库")
@@ -48,6 +47,5 @@ public class AiKnowledgeController {
         knowledgeService.updateKnowledgeMy(updateReqVO, getLoginUserId());
         return success(true);
     }
-
 
 }

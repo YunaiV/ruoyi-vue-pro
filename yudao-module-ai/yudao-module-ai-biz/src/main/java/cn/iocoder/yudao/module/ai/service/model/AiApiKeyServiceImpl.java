@@ -110,13 +110,6 @@ public class AiApiKeyServiceImpl implements AiApiKeyService {
     }
 
     @Override
-    public EmbeddingModel getEmbeddingModel(Long id) {
-        AiApiKeyDO apiKey = validateApiKey(id);
-        AiPlatformEnum platform = AiPlatformEnum.validatePlatform(apiKey.getPlatform());
-        return modelFactory.getOrCreateEmbeddingModel(platform, apiKey.getApiKey(), apiKey.getUrl());
-    }
-
-    @Override
     public ImageModel getImageModel(AiPlatformEnum platform) {
         AiApiKeyDO apiKey = apiKeyMapper.selectFirstByPlatformAndStatus(platform.getPlatform(), CommonStatusEnum.ENABLE.getStatus());
         if (apiKey == null) {
@@ -146,9 +139,17 @@ public class AiApiKeyServiceImpl implements AiApiKeyService {
     }
 
     @Override
+    public EmbeddingModel getEmbeddingModel(Long id) {
+        AiApiKeyDO apiKey = validateApiKey(id);
+        AiPlatformEnum platform = AiPlatformEnum.validatePlatform(apiKey.getPlatform());
+        return modelFactory.getOrCreateEmbeddingModel(platform, apiKey.getApiKey(), apiKey.getUrl());
+    }
+
+    @Override
     public VectorStore getOrCreateVectorStore(Long id) {
         AiApiKeyDO apiKey = validateApiKey(id);
         AiPlatformEnum platform = AiPlatformEnum.validatePlatform(apiKey.getPlatform());
         return vectorFactory.getOrCreateVectorStore(getEmbeddingModel(id), platform, apiKey.getApiKey(), apiKey.getUrl());
     }
+
 }

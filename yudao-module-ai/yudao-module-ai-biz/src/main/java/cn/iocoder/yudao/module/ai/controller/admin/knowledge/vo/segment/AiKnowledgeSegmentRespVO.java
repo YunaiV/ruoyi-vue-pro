@@ -22,12 +22,13 @@ public class AiKnowledgeSegmentRespVO {
     @Schema(description = "切片内容", requiredMode = Schema.RequiredMode.REQUIRED, example = "Java 开发手册")
     private String content;
 
-    @Schema(description = "token 数量", example = "1024")
+    @Schema(description = "token 数量", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     private Integer tokens;
 
-    @Schema(description = "字符数", example = "1008")
+    @Schema(description = "字符数", requiredMode = Schema.RequiredMode.REQUIRED, example = "1008")
     private Integer wordCount;
 
-    @Schema(description = "文档状态", example = "1")
+    @Schema(description = "文档状态", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     private Integer status;
+
 }

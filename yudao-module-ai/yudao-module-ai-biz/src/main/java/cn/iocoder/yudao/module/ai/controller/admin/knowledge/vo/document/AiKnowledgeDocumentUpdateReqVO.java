@@ -1,5 +1,7 @@
 package cn.iocoder.yudao.module.ai.controller.admin.knowledge.vo.document;
 
+import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
+import cn.iocoder.yudao.framework.common.validation.InEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
@@ -15,6 +17,7 @@ public class AiKnowledgeDocumentUpdateReqVO {
     private Long id;
 
     @Schema(description = "是否启用", example = "1")
+    @InEnum(CommonStatusEnum.class)
     private Integer status;
 
     @Schema(description = "名称", example = "Java 开发手册")

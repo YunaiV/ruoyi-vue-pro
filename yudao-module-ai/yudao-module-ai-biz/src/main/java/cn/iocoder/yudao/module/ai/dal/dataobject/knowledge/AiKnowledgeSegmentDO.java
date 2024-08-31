@@ -28,12 +28,13 @@ public class AiKnowledgeSegmentDO extends BaseDO {
     private String vectorId;
     /**
      * 知识库编号
+     *
      * 关联 {@link AiKnowledgeDO#getId()}
      */
     private Long knowledgeId;
     /**
      * 文档编号
-     * <p>
+     *
      * 关联 {@link AiKnowledgeDocumentDO#getId()}
      */
     private Long documentId;
@@ -51,7 +52,7 @@ public class AiKnowledgeSegmentDO extends BaseDO {
     private Integer tokens;
     /**
      * 状态
-     * <p>
+     *
      * 枚举 {@link CommonStatusEnum}
      */
     private Integer status;

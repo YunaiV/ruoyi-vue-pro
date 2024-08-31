@@ -100,21 +100,6 @@ public class AiModelFactoryImpl implements AiModelFactory {
     }
 
     @Override
-    public EmbeddingModel getOrCreateEmbeddingModel(AiPlatformEnum platform, String apiKey, String url) {
-        String cacheKey = buildClientCacheKey(EmbeddingModel.class, platform, apiKey, url);
-        return Singleton.get(cacheKey, (Func0<EmbeddingModel>) () -> {
-            // TODO @xin 先测试一个
-            switch (platform) {
-                case TONG_YI:
-                    return buildTongYiEmbeddingModel(apiKey);
-                default:
-                    throw new IllegalArgumentException(StrUtil.format("未知平台({})", platform));
-            }
-        });
-    }
-
-
-    @Override
     public ChatModel getDefaultChatModel(AiPlatformEnum platform) {
         //noinspection EnhancedSwitchMigration
         switch (platform) {
@@ -192,6 +177,20 @@ public class AiModelFactoryImpl implements AiModelFactory {
         return Singleton.get(cacheKey, (Func0<SunoApi>) () -> new SunoApi(url));
     }
 
+    @Override
+    public EmbeddingModel getOrCreateEmbeddingModel(AiPlatformEnum platform, String apiKey, String url) {
+        String cacheKey = buildClientCacheKey(EmbeddingModel.class, platform, apiKey, url);
+        return Singleton.get(cacheKey, (Func0<EmbeddingModel>) () -> {
+            // TODO @xin 先测试一个
+            switch (platform) {
+                case TONG_YI:
+                    return buildTongYiEmbeddingModel(apiKey);
+                default:
+                    throw new IllegalArgumentException(StrUtil.format("未知平台({})", platform));
+            }
+        });
+    }
+
     private static String buildClientCacheKey(Class<?> clazz, Object... params) {
         if (ArrayUtil.isEmpty(params)) {
             return clazz.getName();
@@ -255,8 +254,7 @@ public class AiModelFactoryImpl implements AiModelFactory {
     }
 
     /**
-     * 可参考 {@link ZhiPuAiAutoConfiguration#zhiPuAiChatModel(
-     *ZhiPuAiConnectionProperties, ZhiPuAiChatProperties, RestClient.Builder, List, FunctionCallbackContext, RetryTemplate, ResponseErrorHandler)}
+     * 可参考 {@link ZhiPuAiAutoConfiguration#zhiPuAiChatModel(ZhiPuAiConnectionProperties, ZhiPuAiChatProperties, RestClient.Builder, List, FunctionCallbackContext, RetryTemplate, ResponseErrorHandler)}
      */
     private ZhiPuAiChatModel buildZhiPuChatModel(String apiKey, String url) {
         url = StrUtil.blankToDefault(url, ZhiPuAiConnectionProperties.DEFAULT_BASE_URL);
@@ -265,8 +263,7 @@ public class AiModelFactoryImpl implements AiModelFactory {
     }
 
     /**
-     * 可参考 {@link ZhiPuAiAutoConfiguration#zhiPuAiImageModel(
-     *ZhiPuAiConnectionProperties, ZhiPuAiImageProperties, RestClient.Builder, RetryTemplate, ResponseErrorHandler)}
+     * 可参考 {@link ZhiPuAiAutoConfiguration#zhiPuAiImageModel(ZhiPuAiConnectionProperties, ZhiPuAiImageProperties, RestClient.Builder, RetryTemplate, ResponseErrorHandler)}
      */
     private ZhiPuAiImageModel buildZhiPuAiImageModel(String apiKey, String url) {
         url = StrUtil.blankToDefault(url, ZhiPuAiConnectionProperties.DEFAULT_BASE_URL);

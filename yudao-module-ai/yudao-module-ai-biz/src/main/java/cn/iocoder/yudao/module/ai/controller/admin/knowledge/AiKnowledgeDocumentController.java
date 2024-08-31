@@ -12,43 +12,40 @@ import cn.iocoder.yudao.module.ai.service.knowledge.AiKnowledgeDocumentService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
+import jakarta.validation.Valid;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
-
-@Tag(name = "管理后台 - AI 知识库-文档")
+@Tag(name = "管理后台 - AI 知识库文档")
 @RestController
 @RequestMapping("/ai/knowledge/document")
+@Validated
 public class AiKnowledgeDocumentController {
 
     @Resource
     private AiKnowledgeDocumentService documentService;
 
-
     @PostMapping("/create")
     @Operation(summary = "新建文档")
-    public CommonResult<Long> createKnowledgeDocument(@Validated AiKnowledgeDocumentCreateReqVO reqVO) {
+    public CommonResult<Long> createKnowledgeDocument(@Valid AiKnowledgeDocumentCreateReqVO reqVO) {
         Long knowledgeDocumentId = documentService.createKnowledgeDocument(reqVO);
         return success(knowledgeDocumentId);
     }
 
-
     @GetMapping("/page")
     @Operation(summary = "获取文档分页")
-    public CommonResult<PageResult<AiKnowledgeDocumentRespVO>> getKnowledgeDocumentPageMy(@Validated AiKnowledgeDocumentPageReqVO pageReqVO) {
+    public CommonResult<PageResult<AiKnowledgeDocumentRespVO>> getKnowledgeDocumentPageMy(@Valid AiKnowledgeDocumentPageReqVO pageReqVO) {
         PageResult<AiKnowledgeDocumentDO> pageResult = documentService.getKnowledgeDocumentPage(pageReqVO);
         return success(BeanUtils.toBean(pageResult, AiKnowledgeDocumentRespVO.class));
     }
 
-
     @PutMapping("/update")
     @Operation(summary = "更新文档")
-    public CommonResult<Boolean> updateKnowledgeDocument(@Validated @RequestBody AiKnowledgeDocumentUpdateReqVO reqVO) {
+    public CommonResult<Boolean> updateKnowledgeDocument(@Valid @RequestBody AiKnowledgeDocumentUpdateReqVO reqVO) {
         documentService.updateKnowledgeDocument(reqVO);
         return success(true);
     }
-
 
 }

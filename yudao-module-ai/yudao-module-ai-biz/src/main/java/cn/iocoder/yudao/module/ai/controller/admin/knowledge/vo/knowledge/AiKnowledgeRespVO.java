@@ -14,12 +14,13 @@ public class AiKnowledgeRespVO {
     @Schema(description = "知识库名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "ruoyi-vue-pro 用户指南")
     private String name;
 
-    @Schema(description = "知识库描述", example = "ruoyi-vue-pro 用户指南")
+    @Schema(description = "知识库描述", example = "帮助你快速构建系统")
     private String description;
 
     @Schema(description = "模型编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "14")
     private Long modelId;
 
-    @Schema(description = "模型标识", example = "qwen-72b-chat")
+    @Schema(description = "模型标识", requiredMode = Schema.RequiredMode.REQUIRED, example = "qwen-72b-chat")
     private String model;
+
 }
