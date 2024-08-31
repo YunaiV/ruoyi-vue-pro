@@ -33,6 +33,9 @@ public class CouponTemplateBaseVO {
     @NotNull(message = "优惠劵名不能为空")
     private String name;
 
+    @Schema(description = "优惠券说明", example = "优惠券使用说明")
+    private String description;
+
     @Schema(description = "发行总量", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024") // -1 - 则表示不限制发放数量
     @NotNull(message = "发行总量不能为空")
     private Integer totalCount;
