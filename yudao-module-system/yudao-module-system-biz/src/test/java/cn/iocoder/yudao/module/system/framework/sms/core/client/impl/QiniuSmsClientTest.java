@@ -29,6 +29,7 @@ import static org.mockito.Mockito.mockStatic;
  * @author scholar
  */
 public class QiniuSmsClientTest extends BaseMockitoUnitTest {
+
     private final SmsChannelProperties properties = new SmsChannelProperties()
             .setApiKey(randomString())// 随机一个 apiKey，避免构建报错
             .setApiSecret(randomString()) // 随机一个 apiSecret，避免构建报错
@@ -36,12 +37,6 @@ public class QiniuSmsClientTest extends BaseMockitoUnitTest {
 
     @InjectMocks
     private QiniuSmsClient smsClient = new QiniuSmsClient(properties);
-
-    @Test
-    public void testDoInit() {
-        // 调用
-        smsClient.doInit();
-    }
 
     @Test
     public void testDoSendSms_success() throws Throwable {
@@ -113,12 +108,13 @@ public class QiniuSmsClientTest extends BaseMockitoUnitTest {
         List<SmsReceiveRespDTO> statuses = smsClient.parseSmsReceiveStatus(text);
         // 断言
         assertEquals(1, statuses.size());
-        assertTrue(statuses.getFirst().getSuccess());
-        assertEquals("DELIVRD", statuses.getFirst().getErrorMsg());
-        assertEquals(LocalDateTime.of(2024, 8, 25, 21, 14, 26), statuses.getFirst().getReceiveTime());
-        assertEquals("18881234567", statuses.getFirst().getMobile());
-        assertEquals("10135515063508004167", statuses.getFirst().getSerialNo());
-        assertEquals(123, statuses.getFirst().getLogId());
+        SmsReceiveRespDTO status = statuses.get(0);
+        assertTrue(status.getSuccess());
+        assertEquals("DELIVRD", status.getErrorMsg());
+        assertEquals(LocalDateTime.of(2024, 8, 25, 21, 14, 26), status.getReceiveTime());
+        assertEquals("18881234567", status.getMobile());
+        assertEquals("10135515063508004167", status.getSerialNo());
+        assertEquals(123, status.getLogId());
     }
 
     @Test

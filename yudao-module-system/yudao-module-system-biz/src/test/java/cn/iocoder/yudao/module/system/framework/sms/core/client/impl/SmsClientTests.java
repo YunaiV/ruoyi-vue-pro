@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.system.framework.sms.core.client.impl;
 
+import cn.hutool.core.collection.ListUtil;
 import cn.iocoder.yudao.framework.common.core.KeyValue;
 import cn.iocoder.yudao.module.system.framework.sms.core.client.SmsClient;
 import cn.iocoder.yudao.module.system.framework.sms.core.client.dto.SmsSendRespDTO;
@@ -47,7 +48,7 @@ public class SmsClientTests {
         String mobile = "15601691323";
         String apiTemplateId = "SMS_207945135";
         // 调用
-        SmsSendRespDTO sendRespDTO = client.sendSms(sendLogId, mobile, apiTemplateId, List.of(new KeyValue<>("code", "1024")));
+        SmsSendRespDTO sendRespDTO = client.sendSms(sendLogId, mobile, apiTemplateId, ListUtil.of(new KeyValue<>("code", "1024")));
         // 打印结果
         System.out.println(sendRespDTO);
     }
@@ -68,7 +69,7 @@ public class SmsClientTests {
         String mobile = "15601691323";
         String apiTemplateId = "358212";
         // 调用
-        SmsSendRespDTO sendRespDTO = client.sendSms(sendLogId, mobile, apiTemplateId, List.of(new KeyValue<>("code", "1024")));
+        SmsSendRespDTO sendRespDTO = client.sendSms(sendLogId, mobile, apiTemplateId, ListUtil.of(new KeyValue<>("code", "1024")));
         // 打印结果
         System.out.println(sendRespDTO);
     }
@@ -105,7 +106,7 @@ public class SmsClientTests {
         Long sendLogId = System.currentTimeMillis();
         String mobile = "17321315478";
         String apiTemplateId = "3644cdab863546a3b718d488659a99ef";
-        List<KeyValue<String, Object>> templateParams = List.of(new KeyValue<>("code", "1024"));
+        List<KeyValue<String, Object>> templateParams = ListUtil.of(new KeyValue<>("code", "1024"));
         // 调用
         SmsSendRespDTO smsSendRespDTO = client.sendSms(sendLogId, mobile, apiTemplateId, templateParams);
         // 打印结果
@@ -125,7 +126,7 @@ public class SmsClientTests {
         Long sendLogId = System.currentTimeMillis();
         String mobile = "17321315478";
         String apiTemplateId = "3644cdab863546a3b718d488659a99ef";
-        List<KeyValue<String, Object>> templateParams = List.of(new KeyValue<>("code", "1122"));
+        List<KeyValue<String, Object>> templateParams = ListUtil.of(new KeyValue<>("code", "1122"));
         // 调用
         SmsSendRespDTO smsSendRespDTO = client.sendSms(sendLogId, mobile, apiTemplateId, templateParams);
         // 打印结果

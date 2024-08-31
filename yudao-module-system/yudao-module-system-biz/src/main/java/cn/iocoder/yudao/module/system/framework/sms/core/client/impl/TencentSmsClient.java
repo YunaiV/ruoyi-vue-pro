@@ -162,7 +162,7 @@ public class TencentSmsClient extends AbstractSmsClient {
      * @param body 请求参数
      * @return 请求结果
      */
-    private JSONObject request(String action, TreeMap<String, Object> body) throws Exception {
+    private JSONObject request(String action, TreeMap<String, Object> body) {
         // 1.1 请求 Header
         Map<String, String> headers = new HashMap<>();
         headers.put("Content-Type", "application/json; charset=utf-8");
