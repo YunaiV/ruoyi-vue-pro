@@ -15,6 +15,8 @@ import lombok.Data;
 @Data
 public class AiKnowledgeSegmentDO extends BaseDO {
 
+    public static final String FIELD_KNOWLEDGE_ID = "knowledgeId";
+
     /**
      * 编号
      */
@@ -24,10 +26,14 @@ public class AiKnowledgeSegmentDO extends BaseDO {
      * 向量库的编号
      */
     private String vectorId;
-    // TODO @新：knowledgeId 加个，会方便点
+    /**
+     * 知识库编号
+     * 关联 {@link AiKnowledgeDO#getId()}
+     */
+    private Long knowledgeId;
     /**
      * 文档编号
-     *
+     * <p>
      * 关联 {@link AiKnowledgeDocumentDO#getId()}
      */
     private Long documentId;

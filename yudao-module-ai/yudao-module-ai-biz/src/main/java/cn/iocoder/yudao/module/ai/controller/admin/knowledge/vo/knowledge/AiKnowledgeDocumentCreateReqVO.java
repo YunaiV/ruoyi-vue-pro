@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.ai.controller.admin.knowledge.vo;
+package cn.iocoder.yudao.module.ai.controller.admin.knowledge.vo.knowledge;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
@@ -6,10 +6,8 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import org.hibernate.validator.constraints.URL;
 
-/**
- * @author xiaoxin
- */
-@Schema(description = "管理后台 - AI 知识库【创建文档】 Request VO")
+
+@Schema(description = "管理后台 - AI 知识库创建【文档】 Request VO")
 @Data
 public class AiKnowledgeDocumentCreateReqVO {
 

@@ -24,7 +24,7 @@ public class AiKnowledgeDocumentDO extends BaseDO {
     /**
      * 知识库编号
      *
-     * 关联 {@link AiKnowledgeBaseDO#getId()}
+     * 关联 {@link AiKnowledgeDO#getId()}
      */
     private Long knowledgeId;
     /**

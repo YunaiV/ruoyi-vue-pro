@@ -10,15 +10,14 @@ import lombok.Data;
 
 import java.util.List;
 
-// TODO @xin：要不把 AiKnowledgeBaseDO 改成 AiKnowledgeDO。感觉 base 后缀，感觉有点奇怪（让人以为是基类）。然后，我们很多地方的外键编号，都是 knowledgeId
 /**
  * AI 知识库 DO
  *
  * @author xiaoxin
  */
-@TableName(value = "ai_knowledge_base", autoResultMap = true)
+@TableName(value = "ai_knowledge", autoResultMap = true)
 @Data
-public class AiKnowledgeBaseDO extends BaseDO {
+public class AiKnowledgeDO extends BaseDO {
 
     /**
      * 编号
@@ -46,7 +45,7 @@ public class AiKnowledgeBaseDO extends BaseDO {
     @TableField(typeHandler = JacksonTypeHandler.class)
     private List<Long> visibilityPermissions;
     /**
-     * 嵌入模型编号，高质量模式时维护
+     * 嵌入模型编号
      */
     private Long modelId;
     /**
