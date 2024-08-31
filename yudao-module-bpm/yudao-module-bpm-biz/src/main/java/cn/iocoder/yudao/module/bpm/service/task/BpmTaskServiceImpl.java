@@ -97,7 +97,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         }
         if (ArrayUtil.isNotEmpty(pageVO.getCreateTime())) {
             taskQuery.taskCreatedAfter(DateUtils.of(pageVO.getCreateTime()[0]));
-            taskQuery.taskCreatedAfter(DateUtils.of(pageVO.getCreateTime()[1]));
+            taskQuery.taskCreatedBefore(DateUtils.of(pageVO.getCreateTime()[1]));
         }
         long count = taskQuery.count();
         if (count == 0) {
@@ -119,7 +119,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         }
         if (ArrayUtil.isNotEmpty(pageVO.getCreateTime())) {
             taskQuery.taskCreatedAfter(DateUtils.of(pageVO.getCreateTime()[0]));
-            taskQuery.taskCreatedAfter(DateUtils.of(pageVO.getCreateTime()[1]));
+            taskQuery.taskCreatedBefore(DateUtils.of(pageVO.getCreateTime()[1]));
         }
         // 执行查询
         long count = taskQuery.count();
@@ -141,7 +141,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         }
         if (ArrayUtil.isNotEmpty(pageVO.getCreateTime())) {
             taskQuery.taskCreatedAfter(DateUtils.of(pageVO.getCreateTime()[0]));
-            taskQuery.taskCreatedAfter(DateUtils.of(pageVO.getCreateTime()[1]));
+            taskQuery.taskCreatedBefore(DateUtils.of(pageVO.getCreateTime()[1]));
         }
         // 执行查询
         long count = taskQuery.count();

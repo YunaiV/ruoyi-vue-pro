@@ -22,7 +22,7 @@ public class ApiSignatureRedisDAO {
      * VALUE 格式：String
      * 过期时间：不固定
      */
-    private static final String SIGNATURE_NONCE = "api_signature_nonce:%s";
+    private static final String SIGNATURE_NONCE = "api_signature_nonce:%s:%s";
 
     /**
      * 签名密钥
@@ -36,16 +36,16 @@ public class ApiSignatureRedisDAO {
 
     // ========== 验签随机数 ==========
 
-    public String getNonce(String nonce) {
-        return stringRedisTemplate.opsForValue().get(formatNonceKey(nonce));
+    public String getNonce(String appId, String nonce) {
+        return stringRedisTemplate.opsForValue().get(formatNonceKey(appId, nonce));
     }
 
-    public void setNonce(String nonce, int time, TimeUnit timeUnit) {
-        stringRedisTemplate.opsForValue().set(formatNonceKey(nonce), "", time, timeUnit);
+    public void setNonce(String appId, String nonce, int time, TimeUnit timeUnit) {
+        stringRedisTemplate.opsForValue().set(formatNonceKey(appId, nonce), "", time, timeUnit);
     }
 
-    private static String formatNonceKey(String key) {
-        return String.format(SIGNATURE_NONCE, key);
+    private static String formatNonceKey(String appId, String nonce) {
+        return String.format(SIGNATURE_NONCE, appId, nonce);
     }
 
     // ========== 签名密钥 ==========
