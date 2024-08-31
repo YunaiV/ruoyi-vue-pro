@@ -49,4 +49,12 @@ public class SmsCallbackController {
         return success(true);
     }
 
+    @PostMapping("/qiniu")
+    @PermitAll
+    @Operation(summary = "七牛云短信的回调", description = "参见 https://developer.qiniu.com/sms/5910/message-push 文档")
+    public CommonResult<Boolean> receiveQiniuSmsStatus(@RequestBody String requestBody) throws Throwable {
+        smsSendService.receiveSmsStatus(SmsChannelEnum.QINIU.getCode(), requestBody);
+        return success(true);
+    }
+
 }
