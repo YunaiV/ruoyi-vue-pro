@@ -1,8 +1,5 @@
 package cn.iocoder.yudao.module.promotion.controller.app.coupon.vo.template;
 
-import cn.iocoder.yudao.framework.mybatis.core.type.LongListTypeHandler;
-import cn.iocoder.yudao.module.promotion.enums.common.PromotionProductScopeEnum;
-import com.baomidou.mybatisplus.annotation.TableField;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
@@ -19,6 +16,9 @@ public class AppCouponTemplateRespVO {
 
     @Schema(description = "优惠劵名", requiredMode = Schema.RequiredMode.REQUIRED, example = "春节送送送")
     private String name;
+
+    @Schema(description = "优惠券说明", example = "优惠券使用说明")
+    private String description;
 
     @Schema(description = "每人限领个数", requiredMode = Schema.RequiredMode.REQUIRED, example = "66") // -1 - 则表示不限制
     private Integer takeLimitCount;
@@ -66,8 +66,5 @@ public class AppCouponTemplateRespVO {
 
     @Schema(description = "是否可以领取", requiredMode = Schema.RequiredMode.REQUIRED, example = "true")
     private Boolean canTake;
-
-    @Schema(description = "优惠券说明", example = "优惠券使用说明") // 单位：分，仅在 discountType 为 PERCENT 使用
-    private String description;
 
 }

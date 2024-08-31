@@ -11,7 +11,6 @@ import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -41,6 +40,10 @@ public class CouponTemplateDO extends BaseDO {
      * 优惠劵名
      */
     private String name;
+    /**
+     * 优惠券说明
+     */
+    private String description;
     /**
      * 状态
      *
@@ -159,10 +162,9 @@ public class CouponTemplateDO extends BaseDO {
      * 使用优惠券的次数
      */
     private Integer useCount;
+
     // ========== 统计信息 END ==========
 
     // TODO 芋艿：领取开始时间、领取结束时间
 
-    @Schema(description = "优惠券说明", example = "优惠券使用说明") // 单位：分，仅在 discountType 为 PERCENT 使用
-    private String description;
 }
