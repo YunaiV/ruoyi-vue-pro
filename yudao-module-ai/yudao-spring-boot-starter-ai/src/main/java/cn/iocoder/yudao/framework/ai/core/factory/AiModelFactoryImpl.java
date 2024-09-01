@@ -21,6 +21,7 @@ import com.alibaba.cloud.ai.tongyi.image.TongYiImagesModel;
 import com.alibaba.cloud.ai.tongyi.image.TongYiImagesProperties;
 import com.alibaba.dashscope.aigc.generation.Generation;
 import com.alibaba.dashscope.aigc.imagesynthesis.ImageSynthesis;
+import com.alibaba.dashscope.embeddings.TextEmbedding;
 import com.azure.ai.openai.OpenAIClient;
 import org.springframework.ai.autoconfigure.azure.openai.AzureOpenAiAutoConfiguration;
 import org.springframework.ai.autoconfigure.azure.openai.AzureOpenAiChatProperties;
@@ -37,6 +38,7 @@ import org.springframework.ai.autoconfigure.zhipuai.ZhiPuAiConnectionProperties;
 import org.springframework.ai.autoconfigure.zhipuai.ZhiPuAiImageProperties;
 import org.springframework.ai.azure.openai.AzureOpenAiChatModel;
 import org.springframework.ai.chat.model.ChatModel;
+import org.springframework.ai.embedding.EmbeddingModel;
 import org.springframework.ai.image.ImageModel;
 import org.springframework.ai.model.function.FunctionCallbackContext;
 import org.springframework.ai.ollama.OllamaChatModel;
@@ -175,6 +177,20 @@ public class AiModelFactoryImpl implements AiModelFactory {
         return Singleton.get(cacheKey, (Func0<SunoApi>) () -> new SunoApi(url));
     }
 
+    @Override
+    public EmbeddingModel getOrCreateEmbeddingModel(AiPlatformEnum platform, String apiKey, String url) {
+        String cacheKey = buildClientCacheKey(EmbeddingModel.class, platform, apiKey, url);
+        return Singleton.get(cacheKey, (Func0<EmbeddingModel>) () -> {
+            // TODO @xin 先测试一个
+            switch (platform) {
+                case TONG_YI:
+                    return buildTongYiEmbeddingModel(apiKey);
+                default:
+                    throw new IllegalArgumentException(StrUtil.format("未知平台({})", platform));
+            }
+        });
+    }
+
     private static String buildClientCacheKey(Class<?> clazz, Object... params) {
         if (ArrayUtil.isEmpty(params)) {
             return clazz.getName();
@@ -238,8 +254,7 @@ public class AiModelFactoryImpl implements AiModelFactory {
     }
 
     /**
-     * 可参考 {@link ZhiPuAiAutoConfiguration#zhiPuAiChatModel(
-     * ZhiPuAiConnectionProperties, ZhiPuAiChatProperties, RestClient.Builder, List, FunctionCallbackContext, RetryTemplate, ResponseErrorHandler)}
+     * 可参考 {@link ZhiPuAiAutoConfiguration#zhiPuAiChatModel(ZhiPuAiConnectionProperties, ZhiPuAiChatProperties, RestClient.Builder, List, FunctionCallbackContext, RetryTemplate, ResponseErrorHandler)}
      */
     private ZhiPuAiChatModel buildZhiPuChatModel(String apiKey, String url) {
         url = StrUtil.blankToDefault(url, ZhiPuAiConnectionProperties.DEFAULT_BASE_URL);
@@ -248,8 +263,7 @@ public class AiModelFactoryImpl implements AiModelFactory {
     }
 
     /**
-     * 可参考 {@link ZhiPuAiAutoConfiguration#zhiPuAiImageModel(
-     * ZhiPuAiConnectionProperties, ZhiPuAiImageProperties, RestClient.Builder, RetryTemplate, ResponseErrorHandler)}
+     * 可参考 {@link ZhiPuAiAutoConfiguration#zhiPuAiImageModel(ZhiPuAiConnectionProperties, ZhiPuAiImageProperties, RestClient.Builder, RetryTemplate, ResponseErrorHandler)}
      */
     private ZhiPuAiImageModel buildZhiPuAiImageModel(String apiKey, String url) {
         url = StrUtil.blankToDefault(url, ZhiPuAiConnectionProperties.DEFAULT_BASE_URL);
@@ -313,6 +327,17 @@ public class AiModelFactoryImpl implements AiModelFactory {
         url = StrUtil.blankToDefault(url, StabilityAiApi.DEFAULT_BASE_URL);
         StabilityAiApi stabilityAiApi = new StabilityAiApi(apiKey, StabilityAiApi.DEFAULT_IMAGE_MODEL, url);
         return new StabilityAiImageModel(stabilityAiApi);
+    }
+
+    // ========== 各种创建 EmbeddingModel 的方法 ==========
+
+    /**
+     * 可参考 {@link TongYiAutoConfiguration#tongYiTextEmbeddingClient(TextEmbedding, TongYiConnectionProperties)}
+     */
+    private EmbeddingModel buildTongYiEmbeddingModel(String apiKey) {
+        TongYiConnectionProperties connectionProperties = new TongYiConnectionProperties();
+        connectionProperties.setApiKey(apiKey);
+        return new TongYiAutoConfiguration().tongYiTextEmbeddingClient(SpringUtil.getBean(TextEmbedding.class), connectionProperties);
     }
 
 }
