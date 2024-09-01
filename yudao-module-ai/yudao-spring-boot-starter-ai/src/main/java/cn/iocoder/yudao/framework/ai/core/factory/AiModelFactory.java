@@ -4,6 +4,7 @@ import cn.iocoder.yudao.framework.ai.core.enums.AiPlatformEnum;
 import cn.iocoder.yudao.framework.ai.core.model.midjourney.api.MidjourneyApi;
 import cn.iocoder.yudao.framework.ai.core.model.suno.api.SunoApi;
 import org.springframework.ai.chat.model.ChatModel;
+import org.springframework.ai.embedding.EmbeddingModel;
 import org.springframework.ai.image.ImageModel;
 
 /**
@@ -78,5 +79,17 @@ public interface AiModelFactory {
      * @return SunoApi 对象
      */
     SunoApi getOrCreateSunoApi(String apiKey, String url);
+
+    /**
+     * 基于指定配置，获得 EmbeddingModel 对象
+     *
+     * 如果不存在，则进行创建
+     *
+     * @param platform 平台
+     * @param apiKey   API KEY
+     * @param url      API URL
+     * @return ChatModel 对象
+     */
+    EmbeddingModel getOrCreateEmbeddingModel(AiPlatformEnum platform, String apiKey, String url);
 
 }
