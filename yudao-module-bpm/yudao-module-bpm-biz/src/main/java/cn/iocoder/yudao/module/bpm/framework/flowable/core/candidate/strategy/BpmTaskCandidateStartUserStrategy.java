@@ -35,13 +35,22 @@ public class BpmTaskCandidateStartUserStrategy implements BpmTaskCandidateStrate
 
     @Override
     public Set<Long> calculateUsers(DelegateExecution execution, String param) {
-        String startUserId = processInstanceService.getProcessInstance(execution.getProcessInstanceId()).getStartUserId();
-        return SetUtils.asSet(Long.valueOf(startUserId));
+        return getStartUserOfProcessInstance(execution.getProcessInstanceId());
     }
 
     @Override
     public boolean isParamRequired() {
         return false;
+    }
+
+    @Override
+    public Set<Long> calculateUsers(String processInstanceId, String param) {
+        return getStartUserOfProcessInstance(processInstanceId);
+    }
+
+    private Set<Long> getStartUserOfProcessInstance(String processInstanceId) {
+        String startUserId = processInstanceService.getProcessInstance(processInstanceId).getStartUserId();
+        return SetUtils.asSet(Long.valueOf(startUserId));
     }
 
 }

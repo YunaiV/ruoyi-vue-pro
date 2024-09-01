@@ -150,7 +150,7 @@ public class BpmTaskCandidateInvoker {
         assigneeUserIds.remove(Long.valueOf(processInstance.getStartUserId()));
     }
 
-    private BpmTaskCandidateStrategy getCandidateStrategy(Integer strategy) {
+    public BpmTaskCandidateStrategy getCandidateStrategy(Integer strategy) {
         BpmTaskCandidateStrategyEnum strategyEnum = BpmTaskCandidateStrategyEnum.valueOf(strategy);
         Assert.notNull(strategyEnum, "策略(%s) 不存在", strategy);
         BpmTaskCandidateStrategy strategyObj = strategyMap.get(strategyEnum);

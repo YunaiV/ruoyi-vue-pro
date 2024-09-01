@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.bpm.dal.dataobject.definition;
 
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.module.bpm.enums.definition.BpmModelFormTypeEnum;
+import cn.iocoder.yudao.module.bpm.enums.definition.BpmModelTypeEnum;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -48,7 +49,7 @@ public class BpmProcessDefinitionInfoDO extends BaseDO {
     /**
      * 流程模型的类型
      *
-     * 枚举 {@link BpmModelFormTypeEnum}
+     * 枚举 {@link BpmModelTypeEnum}
      */
     private Integer modelType;
 
@@ -105,6 +106,12 @@ public class BpmProcessDefinitionInfoDO extends BaseDO {
      */
     private String formCustomViewPath;
 
+    /**
+     * SIMPLE 设计器模型数据 json 格式
+     *
+     * 目的：当使用仿钉钉设计器时。流程模型发布的时候，需要保存流程模型设计器的快照数据。
+     */
+    private String simpleModel;
     /**
      * 是否可见
      *

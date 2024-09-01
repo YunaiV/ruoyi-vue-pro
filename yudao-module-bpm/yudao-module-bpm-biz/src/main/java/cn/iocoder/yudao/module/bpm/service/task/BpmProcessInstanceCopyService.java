@@ -5,6 +5,7 @@ import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.instance.BpmProcessI
 import cn.iocoder.yudao.module.bpm.dal.dataobject.task.BpmProcessInstanceCopyDO;
 
 import java.util.Collection;
+import java.util.Set;
 
 /**
  * 流程抄送 Service 接口
@@ -42,5 +43,13 @@ public interface BpmProcessInstanceCopyService {
      */
     PageResult<BpmProcessInstanceCopyDO> getProcessInstanceCopyPage(Long userId,
                                                                     BpmProcessInstanceCopyPageReqVO pageReqVO);
+    /**
+     * 通过流程实例和流程活动编号获取抄送人的 Id
+     *
+     * @param processInstanceId 流程实例 Id
+     * @param activityId 流程活动编号 Id
+     * @return 抄送人 Ids
+     */
+    Set<Long> getCopyUserIds(String processInstanceId, String activityId);
 
 }

@@ -2,10 +2,7 @@ package cn.iocoder.yudao.module.bpm.service.task;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.bpm.api.task.dto.BpmProcessInstanceCreateReqDTO;
-import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.instance.BpmProcessInstanceCancelReqVO;
-import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.instance.BpmProcessInstanceCreateReqVO;
-import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.instance.BpmProcessInstanceFormFieldsPermissionReqVO;
-import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.instance.BpmProcessInstancePageReqVO;
+import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.instance.*;
 import jakarta.validation.Valid;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.runtime.ProcessInstance;
@@ -95,6 +92,14 @@ public interface BpmProcessInstanceService {
      */
     Map<String, String> getProcessInstanceFormFieldsPermission(@Valid BpmProcessInstanceFormFieldsPermissionReqVO reqVO);
 
+    /**
+     * 获取流程实例的进度
+     *
+     * @param id 流程 Id
+     * @return 流程实例的进度
+     */
+    BpmProcessInstanceProgressRespVO getProcessInstanceProgress(String id);
+
     // ========== Update 写入相关方法 ==========
 
     /**
@@ -147,5 +152,6 @@ public interface BpmProcessInstanceService {
      * @param instance 流程任务
      */
     void processProcessInstanceCompleted(ProcessInstance instance);
+
 
 }

@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.bpm.enums.task;
 
 import cn.iocoder.yudao.framework.common.core.IntArrayValuable;
+import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -34,6 +35,11 @@ public enum BpmProcessInstanceStatusEnum implements IntArrayValuable {
     @Override
     public int[] array() {
         return ARRAYS;
+    }
+
+    public static boolean isProcessEndStatus(Integer status) {
+        return ObjectUtils.equalsAny(status,
+                APPROVE.getStatus(), REJECT.getStatus(), CANCEL.getStatus());
     }
 
 }

@@ -36,4 +36,9 @@ public class BpmTaskCandidateUserStrategy implements BpmTaskCandidateStrategy {
         return StrUtils.splitToLongSet(param);
     }
 
+    @Override
+    public Set<Long> calculateUsers(String processInstanceId, String param) {
+        return StrUtils.splitToLongSet(param);
+    }
+
 }

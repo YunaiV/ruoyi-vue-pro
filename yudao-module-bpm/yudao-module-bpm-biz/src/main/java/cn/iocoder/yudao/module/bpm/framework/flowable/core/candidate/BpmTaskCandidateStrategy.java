@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.bpm.framework.flowable.core.candidate;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmTaskCandidateStrategyEnum;
 import org.flowable.engine.delegate.DelegateExecution;
 
+import java.util.Collections;
 import java.util.Set;
 
 /**
@@ -35,6 +36,18 @@ public interface BpmTaskCandidateStrategy {
      * @return 用户编号集合
      */
     Set<Long> calculateUsers(DelegateExecution execution, String param);
+
+
+    /**
+     * 基于流程实例，获得任务的候选用户们。 用于获取未执行节点的候选用户们
+     *
+     * @param processInstanceId 流程实例
+     * @param param 节点的参数
+     * @return 用户编号集合
+     */
+    default Set<Long> calculateUsers(String processInstanceId, String param) {
+        return Collections.emptySet();
+    }
 
     /**
      * 是否一定要输入参数

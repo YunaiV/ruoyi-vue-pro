@@ -47,6 +47,7 @@ public class BpmProcessInstanceController {
     private BpmProcessInstanceService processInstanceService;
     @Resource
     private BpmTaskService taskService;
+
     @Resource
     private BpmProcessDefinitionService processDefinitionService;
     @Resource
@@ -158,11 +159,19 @@ public class BpmProcessInstanceController {
     }
 
     @GetMapping("/get-form-fields-permission")
-    @Operation(summary = "获得流程实例表单字段权限", description = "在【我的流程】菜单中，进行调用")
+    @Operation(summary = "获得流程实例表单字段权限")
     @PreAuthorize("@ss.hasPermission('bpm:process-instance:query')")
     public CommonResult<Map<String, String>> getProcessInstanceFormFieldsPermission(
-            @Valid BpmProcessInstanceFormFieldsPermissionReqVO reqVO){
+            @Valid BpmProcessInstanceFormFieldsPermissionReqVO reqVO) {
         return success(processInstanceService.getProcessInstanceFormFieldsPermission(reqVO));
+    }
+
+    @GetMapping("/get-progress")
+    @Operation(summary = "获得流程实例的进度")
+    @Parameter(name = "id", description = "流程实例的编号", required = true)
+    @PreAuthorize("@ss.hasPermission('bpm:process-instance:query')")
+    public CommonResult<BpmProcessInstanceProgressRespVO> getProcessInstanceProgress(@RequestParam("id") String id) {
+        return success(processInstanceService.getProcessInstanceProgress(id));
     }
 
 }
