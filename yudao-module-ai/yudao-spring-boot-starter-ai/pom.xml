@@ -14,49 +14,50 @@
     <name>${project.artifactId}</name>
     <description>AI 大模型拓展，接入国内外大模型</description>
     <properties>
-        <spring-ai.version>1.0.0-M1</spring-ai.version>
+        <spring-ai.groupId>group.springframework.ai</spring-ai.groupId>
+        <spring-ai.version>1.1.0</spring-ai.version>
     </properties>
 
     <dependencies>
         <dependency>
-            <groupId>org.springframework.ai</groupId>
+            <groupId>${spring-ai.groupId}</groupId>
             <artifactId>spring-ai-zhipuai-spring-boot-starter</artifactId>
             <version>${spring-ai.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.springframework.ai</groupId>
+            <groupId>${spring-ai.groupId}</groupId>
             <artifactId>spring-ai-openai-spring-boot-starter</artifactId>
             <version>${spring-ai.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.springframework.ai</groupId>
+            <groupId>${spring-ai.groupId}</groupId>
             <artifactId>spring-ai-azure-openai-spring-boot-starter</artifactId>
             <version>${spring-ai.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.springframework.ai</groupId>
+            <groupId>${spring-ai.groupId}</groupId>
             <artifactId>spring-ai-ollama-spring-boot-starter</artifactId>
             <version>${spring-ai.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.springframework.ai</groupId>
+            <groupId>${spring-ai.groupId}</groupId>
             <artifactId>spring-ai-stability-ai-spring-boot-starter</artifactId>
             <version>${spring-ai.version}</version>
         </dependency>
 
         <!-- 向量化，基于 Redis 存储，Tika 解析内容 -->
         <dependency>
-            <groupId>org.springframework.ai</groupId>
+            <groupId>${spring-ai.groupId}</groupId>
             <artifactId>spring-ai-transformers-spring-boot-starter</artifactId>
             <version>${spring-ai.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.springframework.ai</groupId>
+            <groupId>${spring-ai.groupId}</groupId>
             <artifactId>spring-ai-tika-document-reader</artifactId>
             <version>${spring-ai.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.springframework.ai</groupId>
+            <groupId>${spring-ai.groupId}</groupId>
             <artifactId>spring-ai-redis-store</artifactId>
             <version>${spring-ai.version}</version>
         </dependency>
@@ -71,11 +72,10 @@
             <artifactId>yudao-common</artifactId>
         </dependency>
 
-        <!-- TODO 芋艿：等 spring-ai 官方发布后，需要把 groupId 改下 -->
         <dependency>
-            <groupId>group.springframework.ai</groupId>
+            <groupId>${spring-ai.groupId}</groupId>
             <artifactId>spring-ai-qianfan-spring-boot-starter</artifactId>
-            <version>1.1.0</version>
+            <version>${spring-ai.version}</version>
         </dependency>
 
         <!-- 阿里云 通义千问 -->
