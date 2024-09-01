@@ -157,6 +157,12 @@ spring:
       redis:
         index: default-index
         prefix: "default:"
+    embedding:
+      transformer:
+        onnx:
+          model-uri: http://test.yudao.iocoder.cn/model.onnx
+        tokenizer:
+          uri: http://test.yudao.iocoder.cn/tokenizer.json
     qianfan: # 文心一言
       api-key: x0cuLZ7XsaTCU08vuJWO87Lg
       secret-key: R9mYF9dl9KASgi5RUq0FQt3wRisSnOcK
