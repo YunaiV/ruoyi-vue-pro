@@ -110,6 +110,10 @@ public class TradeRewardActivityPriceCalculator implements TradePriceCalculator 
         if (CollUtil.isNotEmpty(rule.getGiveCouponTemplateCounts())) {
             for (Map.Entry<Long, Integer> entry : rule.getGiveCouponTemplateCounts().entrySet()) {
                 Map<Long, Integer> giveCouponTemplateCounts = result.getGiveCouponTemplateCounts();
+                // TODO @puhui999：是不是有一种可能性，这个 key 没有，别的 key 有哈。
+                // TODO 这里还有一种简化的写法。就是下面，大概两行就可以啦
+//                result.getGiveCouponTemplateCounts().put(entry.getKey(),
+//                        result.getGiveCouponTemplateCounts().getOrDefault(entry.getKey(), 0) + entry.getValue());
                 if (giveCouponTemplateCounts.get(entry.getKey()) == null) { // 情况一：还没有赠送的优惠券
                     result.setGiveCouponTemplateCounts(rule.getGiveCouponTemplateCounts());
                 } else { // 情况二：别的满减活动送过同类优惠券，则直接增加数量
