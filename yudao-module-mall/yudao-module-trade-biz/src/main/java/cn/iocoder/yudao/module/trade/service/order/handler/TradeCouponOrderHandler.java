@@ -42,11 +42,11 @@ public class TradeCouponOrderHandler implements TradeOrderHandler {
 
     @Override
     public void afterPayOrder(TradeOrderDO order, List<TradeOrderItemDO> orderItems) {
-        if (CollUtil.isEmpty(order.getGiveCouponsMap())) {
+        if (CollUtil.isEmpty(order.getGiveCouponTemplateCounts())) {
             return;
         }
         // 赠送优惠券
-        List<Long> couponIds = couponApi.takeCouponsByAdmin(order.getGiveCouponsMap(), order.getUserId());
+        List<Long> couponIds = couponApi.takeCouponsByAdmin(order.getGiveCouponTemplateCounts(), order.getUserId());
         if (CollUtil.isEmpty(couponIds)) {
             return;
         }

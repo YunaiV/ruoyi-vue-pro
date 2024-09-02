@@ -107,13 +107,13 @@ public class TradeRewardActivityPriceCalculator implements TradePriceCalculator 
             result.setFreeDelivery(true);
         }
         // 4.3 记录赠送的优惠券
-        if (CollUtil.isNotEmpty(rule.getGiveCoupons())) {
-            for (Map.Entry<Long, Integer> entry : rule.getGiveCoupons().entrySet()) {
-                Map<Long, Integer> giveCoupons = result.getGiveCoupons();
-                if (giveCoupons.get(entry.getKey()) == null) { // 情况一：还没有赠送的优惠券
-                    result.setGiveCoupons(rule.getGiveCoupons());
+        if (CollUtil.isNotEmpty(rule.getGiveCouponTemplateCounts())) {
+            for (Map.Entry<Long, Integer> entry : rule.getGiveCouponTemplateCounts().entrySet()) {
+                Map<Long, Integer> giveCouponTemplateCounts = result.getGiveCouponTemplateCounts();
+                if (giveCouponTemplateCounts.get(entry.getKey()) == null) { // 情况一：还没有赠送的优惠券
+                    result.setGiveCouponTemplateCounts(rule.getGiveCouponTemplateCounts());
                 } else { // 情况二：别的满减活动送过同类优惠券，则直接增加数量
-                    giveCoupons.put(entry.getKey(), giveCoupons.get(entry.getKey()) + entry.getValue());
+                    giveCouponTemplateCounts.put(entry.getKey(), giveCouponTemplateCounts.get(entry.getKey()) + entry.getValue());
                 }
             }
         }

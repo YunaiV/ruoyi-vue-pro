@@ -80,7 +80,7 @@ public class RewardActivityBaseVO {
         private Integer point;
 
         @Schema(description = "赠送的优惠劵编号的数组")
-        private Map<Long, Integer> giveCoupons;
+        private Map<Long, Integer> giveCouponTemplateCounts;
 
         @AssertTrue(message = "赠送的积分不能小于 0")
         @JsonIgnore
