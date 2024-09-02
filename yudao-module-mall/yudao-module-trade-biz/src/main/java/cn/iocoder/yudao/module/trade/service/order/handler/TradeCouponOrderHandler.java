@@ -5,7 +5,10 @@ import cn.iocoder.yudao.module.promotion.api.coupon.CouponApi;
 import cn.iocoder.yudao.module.promotion.api.coupon.dto.CouponUseReqDTO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderDO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderItemDO;
+import cn.iocoder.yudao.module.trade.service.order.TradeOrderQueryService;
+import cn.iocoder.yudao.module.trade.service.order.TradeOrderUpdateService;
 import jakarta.annotation.Resource;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -17,6 +20,12 @@ import java.util.List;
  */
 @Component
 public class TradeCouponOrderHandler implements TradeOrderHandler {
+
+    @Resource
+    @Lazy // 延迟加载，避免循环依赖
+    private TradeOrderUpdateService orderUpdateService;
+    @Resource
+    private TradeOrderQueryService orderQueryService;
 
     @Resource
     private CouponApi couponApi;
@@ -37,7 +46,11 @@ public class TradeCouponOrderHandler implements TradeOrderHandler {
             return;
         }
         // 赠送优惠券
-        couponApi.takeCouponsByAdmin(order.getGiveCouponsMap(), order.getUserId());
+        List<Long> couponIds = couponApi.takeCouponsByAdmin(order.getGiveCouponsMap(), order.getUserId());
+        if (CollUtil.isEmpty(couponIds)) {
+            return;
+        }
+        orderUpdateService.updateOrderGiveCouponIds(order.getUserId(), order.getId(), couponIds);
     }
 
     @Override
@@ -48,10 +61,10 @@ public class TradeCouponOrderHandler implements TradeOrderHandler {
             couponApi.returnUsedCoupon(order.getCouponId());
         }
         // 情况二：收回赠送的优惠券
-        if (CollUtil.isEmpty(order.getGiveCouponsMap())) {
+        if (CollUtil.isEmpty(order.getGiveCouponIds())) {
             return;
         }
-        couponApi.invalidateCouponsByAdmin(order.getGiveCouponsMap(), order.getUserId());
+        couponApi.invalidateCouponsByAdmin(order.getGiveCouponIds(), order.getUserId());
     }
 
 }

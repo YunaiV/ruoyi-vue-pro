@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.trade.dal.dataobject.order;
 
 import cn.iocoder.yudao.framework.common.enums.TerminalEnum;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import cn.iocoder.yudao.framework.mybatis.core.type.LongListTypeHandler;
 import cn.iocoder.yudao.module.member.api.user.dto.MemberUserRespDTO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.brokerage.BrokerageUserDO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.delivery.DeliveryExpressDO;
@@ -18,6 +19,7 @@ import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -294,17 +296,23 @@ public class TradeOrderDO extends BaseDO {
      */
     private Integer vipPrice;
 
-    // TODO @puhui999：项了下，貌似这里存储 List<Long> giveCouponIds 更合适。因为优惠劵赠送到最后是对应的编号，然后从而进行取消？
     /**
      * 赠送的优惠劵
      *
      * key: 优惠劵编号
      * value：对应的优惠券数量
      *
-     * 目的：用于后续取消或者售后订单时，需要扣减赠送
+     * 目的：用于订单支付后赠送优惠券
      */
     @TableField(typeHandler = JacksonTypeHandler.class)
     private Map<Long, Integer> giveCouponsMap;
+    /**
+     * 赠送的优惠劵编号
+     *
+     * 目的：用于后续取消或者售后订单时，需要扣减赠送
+     */
+    @TableField(typeHandler = LongListTypeHandler.class)
+    private List<Long> giveCouponIds;
 
     /**
      * 秒杀活动编号

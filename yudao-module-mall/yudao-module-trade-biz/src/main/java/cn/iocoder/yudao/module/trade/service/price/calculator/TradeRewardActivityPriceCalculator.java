@@ -93,7 +93,7 @@ public class TradeRewardActivityPriceCalculator implements TradePriceCalculator 
         TradePriceCalculatorHelper.recountAllPrice(result);
 
         // 4.1 记录赠送的积分
-        if (Boolean.TRUE.equals(rule.getGivePoint())) {
+        if (rule.getPoint() != null && rule.getPoint() > 0) {
             List<Integer> dividePoints = TradePriceCalculatorHelper.dividePrice(orderItems, rule.getPoint());
             for (int i = 0; i < orderItems.size(); i++) {
                 // 商品可能赠送了积分，所以这里要加上
@@ -107,13 +107,13 @@ public class TradeRewardActivityPriceCalculator implements TradePriceCalculator 
             result.setFreeDelivery(true);
         }
         // 4.3 记录赠送的优惠券
-        if (Boolean.TRUE.equals(rule.getGiveCoupon())) {
-            for (Map.Entry<Long, Integer> entry : rule.getGiveCouponsMap().entrySet()) {
-                Map<Long, Integer> giveCouponsMap = result.getGiveCouponsMap();
-                if (giveCouponsMap.get(entry.getKey()) == null) { // 情况一：还没有赠送的优惠券
-                    result.setGiveCouponsMap(rule.getGiveCouponsMap());
+        if (CollUtil.isNotEmpty(rule.getGiveCoupons())) {
+            for (Map.Entry<Long, Integer> entry : rule.getGiveCoupons().entrySet()) {
+                Map<Long, Integer> giveCoupons = result.getGiveCoupons();
+                if (giveCoupons.get(entry.getKey()) == null) { // 情况一：还没有赠送的优惠券
+                    result.setGiveCoupons(rule.getGiveCoupons());
                 } else { // 情况二：别的满减活动送过同类优惠券，则直接增加数量
-                    giveCouponsMap.put(entry.getKey(), giveCouponsMap.get(entry.getKey()) + entry.getValue());
+                    giveCoupons.put(entry.getKey(), giveCoupons.get(entry.getKey()) + entry.getValue());
                 }
             }
         }

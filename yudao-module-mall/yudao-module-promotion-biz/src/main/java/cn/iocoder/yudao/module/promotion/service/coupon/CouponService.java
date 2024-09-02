@@ -39,14 +39,6 @@ public interface CouponService {
     void validCoupon(CouponDO coupon);
 
     /**
-     * 获得优惠劵分页
-     *
-     * @param pageReqVO 分页查询
-     * @return 优惠劵分页
-     */
-    PageResult<CouponDO> getCouponPage(CouponPageReqVO pageReqVO);
-
-    /**
      * 使用优惠劵
      *
      * @param id      优惠劵编号
@@ -70,56 +62,42 @@ public interface CouponService {
     void deleteCoupon(Long id);
 
     /**
-     * 获得用户的优惠劵列表
-     *
-     * @param userId 用户编号
-     * @param status 优惠劵状态
-     * @return 优惠劵列表
-     */
-    List<CouponDO> getCouponList(Long userId, Integer status);
-
-    /**
-     * 获得未使用的优惠劵数量
-     *
-     * @param userId 用户编号
-     * @return 未使用的优惠劵数量
-     */
-    Long getUnusedCouponCount(Long userId);
-
-    /**
      * 领取优惠券
      *
      * @param templateId 优惠券模板编号
      * @param userIds    用户编号列表
      * @param takeType   领取方式
+     * @return key: userId, value: 优惠券编号列表
      */
-    void takeCoupon(Long templateId, Set<Long> userIds, CouponTakeTypeEnum takeType);
+    Map<Long, List<Long>> takeCoupon(Long templateId, Set<Long> userIds, CouponTakeTypeEnum takeType);
 
     /**
      * 【管理员】给用户发送优惠券
      *
      * @param templateId 优惠券模板编号
      * @param userIds    用户编号列表
+     * @return key: userId, value: 优惠券编号列表
      */
-    default void takeCouponByAdmin(Long templateId, Set<Long> userIds) {
-        takeCoupon(templateId, userIds, CouponTakeTypeEnum.ADMIN);
+    default Map<Long, List<Long>> takeCouponByAdmin(Long templateId, Set<Long> userIds) {
+        return takeCoupon(templateId, userIds, CouponTakeTypeEnum.ADMIN);
     }
 
     /**
      * 【管理员】给指定用户批量发送优惠券
      *
-     * @param giveCouponsMap key: 优惠劵编号，value：对应的优惠券数量
+     * @param giveCoupons  key: 优惠劵模版编号，value：对应的数量
      * @param userId      用户编号
+     * @return 优惠券编号列表
      */
-    void takeCouponsByAdmin(Map<Long, Integer> giveCouponsMap, Long userId);
+    List<Long> takeCouponsByAdmin(Map<Long, Integer> giveCoupons, Long userId);
 
     /**
-     * 【管理员】收回给指定用户批量发送优惠券
+     * 【管理员】作废指定用户的指定优惠劵
      *
-     * @param giveCouponsMap key: 优惠劵编号，value：对应的优惠券数量
+     * @param giveCouponIds  赠送的优惠券编号
      * @param userId         用户编号
      */
-    void invalidateCouponsByAdmin(Map<Long, Integer> giveCouponsMap, Long userId);
+    void invalidateCouponsByAdmin(List<Long> giveCouponIds, Long userId);
 
     /**
      * 【会员】领取优惠券
@@ -139,6 +117,49 @@ public interface CouponService {
     void takeCouponByRegister(Long userId);
 
     /**
+     * 过期优惠券
+     *
+     * @return 过期数量
+     */
+    int expireCoupon();
+
+    //======================= 查询相关 =======================
+
+    /**
+     * 获得未使用的优惠劵数量
+     *
+     * @param userId 用户编号
+     * @return 未使用的优惠劵数量
+     */
+    Long getUnusedCouponCount(Long userId);
+
+    /**
+     * 获得优惠劵分页
+     *
+     * @param pageReqVO 分页查询
+     * @return 优惠劵分页
+     */
+    PageResult<CouponDO> getCouponPage(CouponPageReqVO pageReqVO);
+
+    /**
+     * 获得用户的优惠劵列表
+     *
+     * @param userId 用户编号
+     * @param status 优惠劵状态
+     * @return 优惠劵列表
+     */
+    List<CouponDO> getCouponList(Long userId, Integer status);
+
+    /**
+     * 统计会员领取优惠券的数量
+     *
+     * @param templateIds 优惠券模板编号列表
+     * @param userId      用户编号
+     * @return 领取优惠券的数量
+     */
+    Map<Long, Integer> getTakeCountMapByTemplateIds(Collection<Long> templateIds, Long userId);
+
+    /**
      * 获取会员领取指定优惠券的数量
      *
      * @param templateId 优惠券模板编号
@@ -151,15 +172,6 @@ public interface CouponService {
     }
 
     /**
-     * 统计会员领取优惠券的数量
-     *
-     * @param templateIds 优惠券模板编号列表
-     * @param userId      用户编号
-     * @return 领取优惠券的数量
-     */
-    Map<Long, Integer> getTakeCountMapByTemplateIds(Collection<Long> templateIds, Long userId);
-
-    /**
      * 获取用户匹配的优惠券列表
      *
      * @param userId     用户编号
@@ -167,13 +179,6 @@ public interface CouponService {
      * @return 优惠券列表
      */
     List<CouponDO> getMatchCouponList(Long userId, AppCouponMatchReqVO matchReqVO);
-
-    /**
-     * 过期优惠券
-     *
-     * @return 过期数量
-     */
-    int expireCoupon();
 
     /**
      * 获取用户是否可以领取优惠券

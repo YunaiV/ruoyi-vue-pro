@@ -202,7 +202,7 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
         order.setProductCount(getSumValue(calculateRespBO.getItems(), TradePriceCalculateRespBO.OrderItem::getCount, Integer::sum));
         order.setUserIp(getClientIP()).setTerminal(getTerminal());
         // 使用 + 赠送优惠券
-        order.setGiveCouponsMap(calculateRespBO.getGiveCouponsMap());
+        order.setGiveCouponsMap(calculateRespBO.getGiveCoupons());
         // 支付 + 退款信息
         order.setAdjustPrice(0).setPayStatus(false);
         order.setRefundStatus(TradeOrderRefundStatusEnum.NONE.getStatus()).setRefundPrice(0);
@@ -888,6 +888,22 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
                 .setMerchantOrderId(String.valueOf(order.getId())) // 支付单号
                 .setMerchantRefundId(String.valueOf(order.getId()))
                 .setReason(TradeOrderCancelTypeEnum.COMBINATION_CLOSE.getName()).setPrice(order.getPayPrice()));// 价格信息
+    }
+
+    @Override
+    public void updateOrderGiveCouponIds(Long userId, Long orderId, List<Long> giveCouponIds) {
+        // 1.1 检验订单存在
+        TradeOrderDO order = tradeOrderMapper.selectOrderByIdAndUserId(orderId, userId);
+        if (order == null) {
+            throw exception(ORDER_NOT_FOUND);
+        }
+        // 1.2 校验订单是否支付
+        if (!order.getPayStatus()) {
+            throw exception(ORDER_CANCEL_PAID_FAIL, "已支付");
+        }
+
+        // 2. 更新订单赠送的优惠券编号列表
+        tradeOrderMapper.updateById(new TradeOrderDO().setId(orderId).setGiveCouponIds(giveCouponIds));
     }
 
     /**

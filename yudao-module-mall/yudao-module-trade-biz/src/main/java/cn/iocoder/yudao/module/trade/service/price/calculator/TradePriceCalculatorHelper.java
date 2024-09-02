@@ -32,7 +32,7 @@ public class TradePriceCalculatorHelper {
                                                                List<ProductSpuRespDTO> spuList, List<ProductSkuRespDTO> skuList) {
         // 创建 PriceCalculateRespDTO 对象
         TradePriceCalculateRespBO result = new TradePriceCalculateRespBO();
-        result.setType(getOrderType(param)).setPromotions(new ArrayList<>()).setGiveCouponsMap(new LinkedHashMap<>());
+        result.setType(getOrderType(param)).setPromotions(new ArrayList<>()).setGiveCoupons(new LinkedHashMap<>());
 
         // 创建它的 OrderItem 属性
         result.setItems(new ArrayList<>(param.getItems().size()));
