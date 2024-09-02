@@ -79,13 +79,13 @@ public class RewardActivityBaseVO {
         @Schema(description = "赠送的积分", requiredMode = Schema.RequiredMode.REQUIRED, example = "100")
         private Integer point;
 
-        @Schema(description = "赠送的优惠劵编号的数组", example = "1,2,3")
-        private Map<Long, Integer> giveCouponsMap;
+        @Schema(description = "赠送的优惠劵编号的数组")
+        private Map<Long, Integer> giveCoupons;
 
-        @AssertTrue(message = "赠送的积分不能小于 1")
+        @AssertTrue(message = "赠送的积分不能小于 0")
         @JsonIgnore
         public boolean isPointValid() {
-            return point == null || point >= 1;
+            return point == null || point >= 0;
         }
 
     }
