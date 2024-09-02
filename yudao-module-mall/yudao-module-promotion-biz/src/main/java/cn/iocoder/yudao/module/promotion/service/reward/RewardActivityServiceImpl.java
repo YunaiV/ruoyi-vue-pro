@@ -10,7 +10,6 @@ import cn.iocoder.yudao.module.promotion.controller.admin.reward.vo.RewardActivi
 import cn.iocoder.yudao.module.promotion.controller.admin.reward.vo.RewardActivityCreateReqVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.reward.vo.RewardActivityPageReqVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.reward.vo.RewardActivityUpdateReqVO;
-import cn.iocoder.yudao.module.promotion.convert.reward.RewardActivityConvert;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.reward.RewardActivityDO;
 import cn.iocoder.yudao.module.promotion.dal.mysql.reward.RewardActivityMapper;
 import cn.iocoder.yudao.module.promotion.enums.common.PromotionProductScopeEnum;
@@ -54,7 +53,7 @@ public class RewardActivityServiceImpl implements RewardActivityService {
         validateRewardActivitySpuConflicts(null, createReqVO);
 
         // 2. 插入
-        RewardActivityDO rewardActivity = RewardActivityConvert.INSTANCE.convert(createReqVO)
+        RewardActivityDO rewardActivity = BeanUtils.toBean(createReqVO, RewardActivityDO.class)
                 .setStatus(PromotionUtils.calculateActivityStatus(createReqVO.getEndTime()));
         rewardActivityMapper.insert(rewardActivity);
         // 返回
@@ -74,7 +73,7 @@ public class RewardActivityServiceImpl implements RewardActivityService {
         validateRewardActivitySpuConflicts(updateReqVO.getId(), updateReqVO);
 
         // 2. 更新
-        RewardActivityDO updateObj = RewardActivityConvert.INSTANCE.convert(updateReqVO)
+        RewardActivityDO updateObj = BeanUtils.toBean(updateReqVO, RewardActivityDO.class)
                 .setStatus(PromotionUtils.calculateActivityStatus(updateReqVO.getEndTime()));
         rewardActivityMapper.updateById(updateObj);
     }

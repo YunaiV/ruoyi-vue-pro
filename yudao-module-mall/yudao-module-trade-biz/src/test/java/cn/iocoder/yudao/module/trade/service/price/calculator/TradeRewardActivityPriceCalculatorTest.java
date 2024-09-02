@@ -49,7 +49,7 @@ public class TradeRewardActivityPriceCalculatorTest extends BaseMockitoUnitTest 
         TradePriceCalculateRespBO result = new TradePriceCalculateRespBO()
                 .setType(TradeOrderTypeEnum.NORMAL.getType())
                 .setPrice(new TradePriceCalculateRespBO.Price())
-                .setPromotions(new ArrayList<>()).setGiveCoupons(new LinkedHashMap<>())
+                .setPromotions(new ArrayList<>()).setGiveCouponTemplateCounts(new LinkedHashMap<>())
                 .setItems(asList(
                         new TradePriceCalculateRespBO.OrderItem().setSkuId(10L).setCount(2).setSelected(true)
                                 .setPrice(100).setSpuId(1L),

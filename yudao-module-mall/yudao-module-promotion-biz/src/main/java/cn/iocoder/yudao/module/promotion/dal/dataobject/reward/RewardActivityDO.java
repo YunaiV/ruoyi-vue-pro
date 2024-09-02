@@ -107,9 +107,12 @@ public class RewardActivityDO extends BaseDO {
         /**
          * 赠送的优惠劵
          *
-         *  key: 优惠劵编号，value：对应的优惠券数量
+         * key: 优惠劵模版编号
+         * value：对应的优惠券数量
+         *
+         * 目的：用于订单支付后赠送优惠券
          */
-        private Map<Long, Integer> giveCouponsMap;
+        private Map<Long, Integer> giveCouponTemplateCounts;
 
     }
 
