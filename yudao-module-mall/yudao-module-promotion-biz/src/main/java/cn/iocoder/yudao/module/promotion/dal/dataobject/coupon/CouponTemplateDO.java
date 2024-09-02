@@ -41,6 +41,10 @@ public class CouponTemplateDO extends BaseDO {
      */
     private String name;
     /**
+     * 优惠券说明
+     */
+    private String description;
+    /**
      * 状态
      *
      * 枚举 {@link CommonStatusEnum}
@@ -158,9 +162,9 @@ public class CouponTemplateDO extends BaseDO {
      * 使用优惠券的次数
      */
     private Integer useCount;
+
     // ========== 统计信息 END ==========
 
     // TODO 芋艿：领取开始时间、领取结束时间
 
-    // TODO 芋艿：要不要加描述
 }

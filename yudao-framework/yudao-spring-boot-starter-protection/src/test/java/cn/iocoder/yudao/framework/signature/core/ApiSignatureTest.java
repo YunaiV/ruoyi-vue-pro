@@ -69,7 +69,7 @@ public class ApiSignatureTest {
         // 断言结果
         assertTrue(result);
         // 断言调用
-        verify(signatureRedisDAO).setNonce(eq(nonce), eq(120), eq(TimeUnit.SECONDS));
+        verify(signatureRedisDAO).setNonce(eq(appId), eq(nonce), eq(120), eq(TimeUnit.SECONDS));
     }
 
 }

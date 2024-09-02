@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.ai.service.model;
 
 import cn.iocoder.yudao.framework.ai.core.enums.AiPlatformEnum;
 import cn.iocoder.yudao.framework.ai.core.factory.AiModelFactory;
+import cn.iocoder.yudao.framework.ai.core.factory.AiVectorStoreFactory;
 import cn.iocoder.yudao.framework.ai.core.model.midjourney.api.MidjourneyApi;
 import cn.iocoder.yudao.framework.ai.core.model.suno.api.SunoApi;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
@@ -13,7 +14,9 @@ import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiApiKeyDO;
 import cn.iocoder.yudao.module.ai.dal.mysql.model.AiApiKeyMapper;
 import jakarta.annotation.Resource;
 import org.springframework.ai.chat.model.ChatModel;
+import org.springframework.ai.embedding.EmbeddingModel;
 import org.springframework.ai.image.ImageModel;
+import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
@@ -36,6 +39,8 @@ public class AiApiKeyServiceImpl implements AiApiKeyService {
 
     @Resource
     private AiModelFactory modelFactory;
+    @Resource
+    private AiVectorStoreFactory vectorFactory;
 
     @Override
     public Long createApiKey(AiApiKeySaveReqVO createReqVO) {
@@ -132,4 +137,19 @@ public class AiApiKeyServiceImpl implements AiApiKeyService {
         }
         return modelFactory.getOrCreateSunoApi(apiKey.getApiKey(), apiKey.getUrl());
     }
+
+    @Override
+    public EmbeddingModel getEmbeddingModel(Long id) {
+        AiApiKeyDO apiKey = validateApiKey(id);
+        AiPlatformEnum platform = AiPlatformEnum.validatePlatform(apiKey.getPlatform());
+        return modelFactory.getOrCreateEmbeddingModel(platform, apiKey.getApiKey(), apiKey.getUrl());
+    }
+
+    @Override
+    public VectorStore getOrCreateVectorStore(Long id) {
+        AiApiKeyDO apiKey = validateApiKey(id);
+        AiPlatformEnum platform = AiPlatformEnum.validatePlatform(apiKey.getPlatform());
+        return vectorFactory.getOrCreateVectorStore(getEmbeddingModel(id), platform, apiKey.getApiKey(), apiKey.getUrl());
+    }
+
 }
