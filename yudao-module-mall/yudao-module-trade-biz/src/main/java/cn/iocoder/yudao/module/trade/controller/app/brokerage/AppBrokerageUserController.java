@@ -133,6 +133,7 @@ public class AppBrokerageUserController {
     @GetMapping("/get-rank-by-price")
     @Operation(summary = "获得分销用户排行（基于佣金）")
     @Parameter(name = "times", description = "时间段", required = true)
+    @PreAuthenticated
     public CommonResult<Integer> getRankByPrice(
             @RequestParam("times") @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND) LocalDateTime[] times) {
         return success(brokerageRecordService.getUserRankByPrice(getLoginUserId(), times));

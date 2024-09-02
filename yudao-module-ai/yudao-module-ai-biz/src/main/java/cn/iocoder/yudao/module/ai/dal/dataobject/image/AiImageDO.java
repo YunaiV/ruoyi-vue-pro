@@ -30,7 +30,7 @@ public class AiImageDO extends BaseDO {
     /**
      * 编号
      */
-    @TableId(type = IdType.AUTO)
+    @TableId
     private Long id;
 
     /**

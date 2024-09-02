@@ -11,6 +11,7 @@ import com.mzt.logapi.service.ILogRecordService;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Async;
 
 import java.util.List;
 
@@ -28,19 +29,24 @@ public class LogRecordServiceImpl implements ILogRecordService {
     private OperateLogApi operateLogApi;
 
     @Override
+    @Async
     public void record(LogRecord logRecord) {
-        // 1. 补全通用字段
         OperateLogCreateReqDTO reqDTO = new OperateLogCreateReqDTO();
-        reqDTO.setTraceId(TracerUtils.getTraceId());
-        // 补充用户信息
-        fillUserFields(reqDTO);
-        // 补全模块信息
-        fillModuleFields(reqDTO, logRecord);
-        // 补全请求信息
-        fillRequestFields(reqDTO);
+        try {
+            reqDTO.setTraceId(TracerUtils.getTraceId());
+            // 补充用户信息
+            fillUserFields(reqDTO);
+            // 补全模块信息
+            fillModuleFields(reqDTO, logRecord);
+            // 补全请求信息
+            fillRequestFields(reqDTO);
 
-        // 2. 异步记录日志
-        operateLogApi.createOperateLog(reqDTO);
+            // 2. 异步记录日志
+            operateLogApi.createOperateLog(reqDTO);
+        } catch (Throwable ex) {
+            // 由于 @Async 异步调用，这里打印下日志，更容易跟进
+            log.error("[record][url({}) log({}) 发生异常]", reqDTO.getRequestUrl(), reqDTO, ex);
+        }
     }
 
     private static void fillUserFields(OperateLogCreateReqDTO reqDTO) {

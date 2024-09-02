@@ -19,6 +19,7 @@ import org.springframework.ai.embedding.EmbeddingModel;
 import org.springframework.ai.vectorstore.RedisVectorStore;
 import org.springframework.ai.vectorstore.RedisVectorStore.RedisVectorStoreConfig;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration;
@@ -31,13 +32,14 @@ import redis.clients.jedis.JedisPooled;
  * TODO @xin 先拿 spring-ai 最新代码覆盖，1.0.0-M1 跟 redis 自动配置会冲突
  *
  * TODO 这个官方，有说啥时候 fix 哇？
+ * TODO 看着是列在1.0.0-M2版本
  *
  * @author Christian Tzolov
  * @author Eddú Meléndez
  */
 @AutoConfiguration(after = RedisAutoConfiguration.class)
 @ConditionalOnClass({JedisPooled.class, JedisConnectionFactory.class, RedisVectorStore.class, EmbeddingModel.class})
-//@ConditionalOnBean(JedisConnectionFactory.class)
+@ConditionalOnBean(JedisConnectionFactory.class)
 @EnableConfigurationProperties(RedisVectorStoreProperties.class)
 public class RedisVectorStoreAutoConfiguration {
 

@@ -8,7 +8,6 @@ import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.module.promotion.controller.admin.coupon.vo.coupon.CouponPageReqVO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.coupon.CouponDO;
 import cn.iocoder.yudao.module.promotion.enums.common.PromotionProductScopeEnum;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.github.yulichang.toolkit.MPJWrappers;
 import org.apache.ibatis.annotations.Mapper;
@@ -106,13 +105,6 @@ public interface CouponMapper extends BaseMapperX<CouponDO> {
                 .eq(CouponDO::getStatus, status)
                 .le(CouponDO::getValidEndTime, validEndTime)
         );
-    }
-
-    default List<CouponDO> selectListByIdAndUserIdAndTakeType(Long couponId, Long userId, Integer takeType) {
-        return selectList(new LambdaQueryWrapper<CouponDO>()
-                .eq(CouponDO::getId, couponId)
-                .eq(CouponDO::getUserId, userId)
-                .eq(CouponDO::getTakeType, takeType));
     }
 
 }

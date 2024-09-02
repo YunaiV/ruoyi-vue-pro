@@ -892,14 +892,10 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
 
     @Override
     public void updateOrderGiveCouponIds(Long userId, Long orderId, List<Long> giveCouponIds) {
-        // 1.1 检验订单存在
+        // 1. 检验订单存在
         TradeOrderDO order = tradeOrderMapper.selectOrderByIdAndUserId(orderId, userId);
         if (order == null) {
             throw exception(ORDER_NOT_FOUND);
-        }
-        // 1.2 校验订单是否支付
-        if (!order.getPayStatus()) {
-            throw exception(ORDER_CANCEL_PAID_FAIL, "已支付");
         }
 
         // 2. 更新订单赠送的优惠券编号列表

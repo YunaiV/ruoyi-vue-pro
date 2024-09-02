@@ -296,10 +296,11 @@ public class TradeOrderDO extends BaseDO {
      */
     private Integer vipPrice;
 
+    // TODO @puhui999：我们要不要把相关的字段，定义的更明确一点？例如说，giveCouponTemplateCounts 赠送的优惠劵模版数量，或者 giveCouponCounts 赠送的优惠劵数量。感受上，Coupons 和 Map 有点点重叠哈。
     /**
      * 赠送的优惠劵
      *
-     * key: 优惠劵编号
+     * key: 优惠劵模版编号
      * value：对应的优惠券数量
      *
      * 目的：用于订单支付后赠送优惠券

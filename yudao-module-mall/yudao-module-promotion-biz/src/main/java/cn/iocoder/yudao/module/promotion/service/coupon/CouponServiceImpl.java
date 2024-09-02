@@ -179,7 +179,7 @@ public class CouponServiceImpl implements CouponService {
         // 循环收回
         for (Long couponId : giveCouponIds) {
             try {
-                getSelf().takeBackCoupon(couponId, userId, CouponTakeTypeEnum.ADMIN);
+                getSelf().invalidateCoupon(couponId, userId);
             } catch (Exception e) {
                 log.error("[invalidateCouponsByAdmin][couponId({}) 收回优惠券失败]", couponId, e);
             }
@@ -191,10 +191,9 @@ public class CouponServiceImpl implements CouponService {
      *
      * @param couponId 模版编号
      * @param userId   用户编号
-     * @param takeType 领取方式
      */
     @Transactional(rollbackFor = Exception.class)
-    public void takeBackCoupon(Long couponId, Long userId, CouponTakeTypeEnum takeType) {
+    public void invalidateCoupon(Long couponId, Long userId) {
         // 1.1 校验优惠券
         CouponDO coupon = couponMapper.selectByIdAndUserId(couponId, userId);
         if (coupon == null) {
@@ -205,19 +204,15 @@ public class CouponServiceImpl implements CouponService {
         if (couponTemplate == null) {
             throw exception(COUPON_TEMPLATE_NOT_EXISTS);
         }
-        // 1.3 校验领取方式
-        if (ObjectUtil.notEqual(couponTemplate.getTakeType(), takeType.getValue())) {
-            throw exception(COUPON_TEMPLATE_CANNOT_TAKE);
-        }
-
-        // 2.1 校验优惠券是否已经使用，如若使用则先不管
+        // 1.3 校验优惠券是否已经使用，如若使用则先不管
         if (ObjUtil.equal(coupon.getStatus(), CouponStatusEnum.USED.getStatus())) {
+            log.info("[invalidateCoupon][coupon({}) 已经使用，无法作废]", couponId);
             return;
         }
-        // 2.2 减少优惠劵模板的领取数量
+
+        // 2.1 减少优惠劵模板的领取数量
         couponTemplateService.updateCouponTemplateTakeCount(couponTemplate.getId(), -1);
-        // 2.3 批量作废优惠劵
-        // TODO @puhui999：捉摸了下，貌似搞成逻辑删除好了？不然好多地方的 status 都要做一些变动。可能未来加个 invalidateType 来标识，是管理后台删除，还是取消回收。或者优惠劵的 change log 可能更好。
+        // 2.2 作废优惠劵
         couponMapper.deleteById(couponId);
     }
 
