@@ -11,6 +11,8 @@ import cn.iocoder.yudao.module.trade.controller.app.order.vo.item.AppTradeOrderI
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderDO;
 import jakarta.validation.constraints.NotNull;
 
+import java.util.List;
+
 /**
  * 交易订单【写】Service 接口
  *
@@ -193,5 +195,14 @@ public interface TradeOrderUpdateService {
      * @param cancelType       取消类型
      */
     void cancelPaidOrder(Long userId, Long orderId, Integer cancelType);
+
+    /**
+     * 更新下单赠送的优惠券编号到订单
+     *
+     * @param userId        用户编号
+     * @param orderId       订单编号
+     * @param giveCouponIds 赠送的优惠券编号列表
+     */
+    void updateOrderGiveCouponIds(Long userId, Long orderId, List<Long> giveCouponIds);
 
 }

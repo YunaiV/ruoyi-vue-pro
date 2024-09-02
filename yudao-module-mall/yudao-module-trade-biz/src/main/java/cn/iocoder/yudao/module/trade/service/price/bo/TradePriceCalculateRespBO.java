@@ -79,7 +79,7 @@ public class TradePriceCalculateRespBO {
      *  key: 优惠劵编号，value：对应的优惠券数量
      * 目的：用于后续取消或者售后订单时，需要扣减赠送
      */
-    private Map<Long, Integer> giveCouponsMap;
+    private Map<Long, Integer> giveCoupons;
 
     /**
      * 订单价格

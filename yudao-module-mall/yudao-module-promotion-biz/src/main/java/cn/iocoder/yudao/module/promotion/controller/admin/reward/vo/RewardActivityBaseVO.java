@@ -1,7 +1,6 @@
 package cn.iocoder.yudao.module.promotion.controller.admin.reward.vo;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.util.BooleanUtil;
 import cn.iocoder.yudao.framework.common.validation.InEnum;
 import cn.iocoder.yudao.module.promotion.enums.common.PromotionConditionTypeEnum;
 import cn.iocoder.yudao.module.promotion.enums.common.PromotionProductScopeEnum;
@@ -77,16 +76,8 @@ public class RewardActivityBaseVO {
         @NotNull(message = "规则是否包邮不能为空")
         private Boolean freeDelivery;
 
-        @Schema(description = "是否赠送积分", requiredMode = Schema.RequiredMode.REQUIRED, example = "true")
-        @NotNull(message = "规则是否赠送积分不能为空")
-        private Boolean givePoint;
-
         @Schema(description = "赠送的积分", requiredMode = Schema.RequiredMode.REQUIRED, example = "100")
         private Integer point;
-
-        @Schema(description = "是否赠送优惠券", requiredMode = Schema.RequiredMode.REQUIRED, example = "true")
-        @NotNull(message = "规则是否赠送优惠券不能为空")
-        private Boolean giveCoupon;
 
         @Schema(description = "赠送的优惠劵编号的数组", example = "1,2,3")
         private Map<Long, Integer> giveCouponsMap;
@@ -94,7 +85,7 @@ public class RewardActivityBaseVO {
         @AssertTrue(message = "赠送的积分不能小于 1")
         @JsonIgnore
         public boolean isPointValid() {
-            return BooleanUtil.isFalse(givePoint) || (point != null && point >= 1);
+            return point == null || point >= 1;
         }
 
     }

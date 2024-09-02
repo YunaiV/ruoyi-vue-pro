@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.promotion.service.coupon;
 import cn.hutool.core.collection.CollStreamUtil;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.map.MapUtil;
+import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.spring.SpringUtil;
@@ -31,6 +32,7 @@ import java.util.stream.Collectors;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
+import static cn.iocoder.yudao.framework.common.util.collection.MapUtils.findAndThen;
 import static cn.iocoder.yudao.module.promotion.enums.ErrorCodeConstants.*;
 import static java.util.Arrays.asList;
 
@@ -73,20 +75,6 @@ public class CouponServiceImpl implements CouponService {
         if (!LocalDateTimeUtils.isBetween(coupon.getValidStartTime(), coupon.getValidEndTime())) {
             throw exception(COUPON_VALID_TIME_NOT_NOW);
         }
-    }
-
-    @Override
-    public PageResult<CouponDO> getCouponPage(CouponPageReqVO pageReqVO) {
-        // 获得用户编号
-        if (StrUtil.isNotEmpty(pageReqVO.getNickname())) {
-            List<MemberUserRespDTO> users = memberUserApi.getUserListByNickname(pageReqVO.getNickname());
-            if (CollUtil.isEmpty(users)) {
-                return PageResult.empty();
-            }
-            pageReqVO.setUserIds(convertSet(users, MemberUserRespDTO::getId));
-        }
-        // 分页查询
-        return couponMapper.selectPage(pageReqVO);
     }
 
     @Override
@@ -146,26 +134,8 @@ public class CouponServiceImpl implements CouponService {
     }
 
     @Override
-    public List<CouponDO> getCouponList(Long userId, Integer status) {
-        return couponMapper.selectListByUserIdAndStatus(userId, status);
-    }
-
-    private CouponDO validateCouponExists(Long id) {
-        CouponDO coupon = couponMapper.selectById(id);
-        if (coupon == null) {
-            throw exception(COUPON_NOT_EXISTS);
-        }
-        return coupon;
-    }
-
-    @Override
-    public Long getUnusedCouponCount(Long userId) {
-        return couponMapper.selectCountByUserIdAndStatus(userId, CouponStatusEnum.UNUSED.getStatus());
-    }
-
-    @Override
     @Transactional(rollbackFor = Exception.class)
-    public void takeCoupon(Long templateId, Set<Long> userIds, CouponTakeTypeEnum takeType) {
+    public Map<Long, List<Long>> takeCoupon(Long templateId, Set<Long> userIds, CouponTakeTypeEnum takeType) {
         CouponTemplateDO template = couponTemplateService.getCouponTemplate(templateId);
         // 1. 过滤掉达到领取限制的用户
         removeTakeLimitUser(userIds, template);
@@ -173,40 +143,45 @@ public class CouponServiceImpl implements CouponService {
         validateCouponTemplateCanTake(template, userIds, takeType);
 
         // 3. 批量保存优惠劵
-        couponMapper.insertBatch(convertList(userIds, userId -> CouponConvert.INSTANCE.convert(template, userId)));
+        List<CouponDO> couponList = convertList(userIds, userId -> CouponConvert.INSTANCE.convert(template, userId));
+        couponMapper.insertBatch(couponList);
 
         // 4. 增加优惠劵模板的领取数量
         couponTemplateService.updateCouponTemplateTakeCount(templateId, userIds.size());
+
+        return convertMultiMap(couponList, CouponDO::getUserId, CouponDO::getId);
     }
 
     @Override
-    public void takeCouponsByAdmin(Map<Long, Integer> giveCouponsMap, Long userId) {
-        if (CollUtil.isEmpty(giveCouponsMap)) {
-            return;
+    public List<Long> takeCouponsByAdmin(Map<Long, Integer> giveCoupons, Long userId) {
+        if (CollUtil.isEmpty(giveCoupons)) {
+            return Collections.emptyList();
         }
 
+        List<Long> couponIds = new ArrayList<>();
         // 循环发放
-        for (Map.Entry<Long, Integer> entry : giveCouponsMap.entrySet()) {
+        for (Map.Entry<Long, Integer> entry : giveCoupons.entrySet()) {
             try {
                 for (int i = 0; i < entry.getValue(); i++) {
-                    getSelf().takeCoupon(entry.getKey(), CollUtil.newHashSet(userId), CouponTakeTypeEnum.ADMIN);
+                    Map<Long, List<Long>> userCouponIdsMap = getSelf().takeCoupon(entry.getKey(), CollUtil.newHashSet(userId),
+                            CouponTakeTypeEnum.ADMIN);
+                    findAndThen(userCouponIdsMap, userId, couponIds::addAll);
                 }
             } catch (Exception e) {
                 log.error("[takeCouponsByAdmin][coupon({}) 优惠券发放失败]", entry, e);
             }
         }
+        return couponIds;
     }
 
     @Override
-    public void invalidateCouponsByAdmin(Map<Long, Integer> giveCouponsMap, Long userId) {
+    public void invalidateCouponsByAdmin(List<Long> giveCouponIds, Long userId) {
         // 循环收回
-        for (Map.Entry<Long, Integer> entry : giveCouponsMap.entrySet()) {
+        for (Long couponId : giveCouponIds) {
             try {
-                for (int i = 0; i < entry.getValue(); i++) {
-                    getSelf().takeBackCoupon(entry.getKey(), CollUtil.newHashSet(userId), CouponTakeTypeEnum.ADMIN);
-                }
+                getSelf().takeBackCoupon(couponId, userId, CouponTakeTypeEnum.ADMIN);
             } catch (Exception e) {
-                log.error("[takeBackCouponsByAdmin][coupon({}) 收回优惠券失败]", entry, e);
+                log.error("[invalidateCouponsByAdmin][couponId({}) 收回优惠券失败]", couponId, e);
             }
         }
     }
@@ -214,32 +189,36 @@ public class CouponServiceImpl implements CouponService {
     /**
      * 【管理员】收回优惠券
      *
-     * @param templateId 模版编号
-     * @param userIds 用户编号列表
+     * @param couponId 模版编号
+     * @param userId   用户编号
      * @param takeType 领取方式
      */
     @Transactional(rollbackFor = Exception.class)
-    public void takeBackCoupon(Long templateId, Set<Long> userIds, CouponTakeTypeEnum takeType) {
-        CouponTemplateDO couponTemplate = couponTemplateService.getCouponTemplate(templateId);
-        // 1.1 校验模板
+    public void takeBackCoupon(Long couponId, Long userId, CouponTakeTypeEnum takeType) {
+        // 1.1 校验优惠券
+        CouponDO coupon = couponMapper.selectByIdAndUserId(couponId, userId);
+        if (coupon == null) {
+            throw exception(COUPON_NOT_EXISTS);
+        }
+        // 1.2 校验模板
+        CouponTemplateDO couponTemplate = couponTemplateService.getCouponTemplate(coupon.getTemplateId());
         if (couponTemplate == null) {
             throw exception(COUPON_TEMPLATE_NOT_EXISTS);
         }
-        // 1.2 校验领取方式
+        // 1.3 校验领取方式
         if (ObjectUtil.notEqual(couponTemplate.getTakeType(), takeType.getValue())) {
             throw exception(COUPON_TEMPLATE_CANNOT_TAKE);
         }
 
-        // 2.1 过滤出还未使用的赠送的优惠券
-        List<CouponDO> couponList = couponMapper.selectListByTemplateIdAndUserIdAndTakeType(templateId, userIds,
-                takeType.getValue());
-        List<CouponDO> unUsedCouponList = filterList(couponList, item -> !CouponStatusEnum.USED.getStatus().equals(item.getStatus()));
+        // 2.1 校验优惠券是否已经使用，如若使用则先不管
+        if (ObjUtil.equal(coupon.getStatus(), CouponStatusEnum.USED.getStatus())) {
+            return;
+        }
         // 2.2 减少优惠劵模板的领取数量
-        couponTemplateService.updateCouponTemplateTakeCount(templateId, unUsedCouponList.size() * -1);
-        // 2.3 批量更新优惠劵状态
-        couponMapper.updateById(convertList(unUsedCouponList, item -> new CouponDO().setId(item.getId())
-                .setStatus(CouponStatusEnum.INVALID.getStatus())));
-
+        couponTemplateService.updateCouponTemplateTakeCount(couponTemplate.getId(), -1);
+        // 2.3 批量作废优惠劵
+        // TODO @puhui999：捉摸了下，貌似搞成逻辑删除好了？不然好多地方的 status 都要做一些变动。可能未来加个 invalidateType 来标识，是管理后台删除，还是取消回收。或者优惠劵的 change log 可能更好。
+        couponMapper.deleteById(couponId);
     }
 
     @Override
@@ -249,24 +228,6 @@ public class CouponServiceImpl implements CouponService {
         for (CouponTemplateDO template : templates) {
             takeCoupon(template.getId(), CollUtil.newHashSet(userId), CouponTakeTypeEnum.REGISTER);
         }
-    }
-
-    @Override
-    public Map<Long, Integer> getTakeCountMapByTemplateIds(Collection<Long> templateIds, Long userId) {
-        if (CollUtil.isEmpty(templateIds)) {
-            return Collections.emptyMap();
-        }
-        return couponMapper.selectCountByUserIdAndTemplateIdIn(userId, templateIds);
-    }
-
-    @Override
-    public List<CouponDO> getMatchCouponList(Long userId, AppCouponMatchReqVO matchReqVO) {
-        List<CouponDO> list = couponMapper.selectListByUserIdAndStatusAndUsePriceLeAndProductScope(userId,
-                CouponStatusEnum.UNUSED.getStatus(),
-                matchReqVO.getPrice(), matchReqVO.getSpuIds(), matchReqVO.getCategoryIds());
-        // 兜底逻辑：如果 CouponExpireJob 未执行，status 未变成 EXPIRE ，但是 validEndTime 已经过期了，需要进行过滤
-        list.removeIf(coupon -> !LocalDateTimeUtils.isBetween(coupon.getValidStartTime(), coupon.getValidEndTime()));
-        return list;
     }
 
     @Override
@@ -291,27 +252,6 @@ public class CouponServiceImpl implements CouponService {
             }
         }
         return count;
-    }
-
-    @Override
-    public Map<Long, Boolean> getUserCanCanTakeMap(Long userId, List<CouponTemplateDO> templates) {
-        // 1. 未登录时，都显示可以领取
-        Map<Long, Boolean> userCanTakeMap = convertMap(templates, CouponTemplateDO::getId, templateId -> true);
-        if (userId == null) {
-            return userCanTakeMap;
-        }
-
-        // 2.1 过滤领取数量无限制的
-        Set<Long> templateIds = convertSet(templates, CouponTemplateDO::getId, template -> template.getTakeLimitCount() != -1);
-        // 2.2 检查用户领取的数量是否超过限制
-        if (CollUtil.isNotEmpty(templateIds)) {
-            Map<Long, Integer> couponTakeCountMap = this.getTakeCountMapByTemplateIds(templateIds, userId);
-            for (CouponTemplateDO template : templates) {
-                Integer takeCount = couponTakeCountMap.get(template.getId());
-                userCanTakeMap.put(template.getId(), takeCount == null || takeCount < template.getTakeLimitCount());
-            }
-        }
-        return userCanTakeMap;
     }
 
     /**
@@ -385,9 +325,82 @@ public class CouponServiceImpl implements CouponService {
         userIds.removeIf(userId -> MapUtil.getInt(userTakeCountMap, userId, 0) >= couponTemplate.getTakeLimitCount());
     }
 
+    //======================= 查询相关 =======================
+
+    @Override
+    public Long getUnusedCouponCount(Long userId) {
+        return couponMapper.selectCountByUserIdAndStatus(userId, CouponStatusEnum.UNUSED.getStatus());
+    }
+
+    @Override
+    public PageResult<CouponDO> getCouponPage(CouponPageReqVO pageReqVO) {
+        // 获得用户编号
+        if (StrUtil.isNotEmpty(pageReqVO.getNickname())) {
+            List<MemberUserRespDTO> users = memberUserApi.getUserListByNickname(pageReqVO.getNickname());
+            if (CollUtil.isEmpty(users)) {
+                return PageResult.empty();
+            }
+            pageReqVO.setUserIds(convertSet(users, MemberUserRespDTO::getId));
+        }
+        // 分页查询
+        return couponMapper.selectPage(pageReqVO);
+    }
+
+    @Override
+    public List<CouponDO> getCouponList(Long userId, Integer status) {
+        return couponMapper.selectListByUserIdAndStatus(userId, status);
+    }
+
+    @Override
+    public Map<Long, Integer> getTakeCountMapByTemplateIds(Collection<Long> templateIds, Long userId) {
+        if (CollUtil.isEmpty(templateIds)) {
+            return Collections.emptyMap();
+        }
+        return couponMapper.selectCountByUserIdAndTemplateIdIn(userId, templateIds);
+    }
+
+    @Override
+    public List<CouponDO> getMatchCouponList(Long userId, AppCouponMatchReqVO matchReqVO) {
+        List<CouponDO> list = couponMapper.selectListByUserIdAndStatusAndUsePriceLeAndProductScope(userId,
+                CouponStatusEnum.UNUSED.getStatus(),
+                matchReqVO.getPrice(), matchReqVO.getSpuIds(), matchReqVO.getCategoryIds());
+        // 兜底逻辑：如果 CouponExpireJob 未执行，status 未变成 EXPIRE ，但是 validEndTime 已经过期了，需要进行过滤
+        list.removeIf(coupon -> !LocalDateTimeUtils.isBetween(coupon.getValidStartTime(), coupon.getValidEndTime()));
+        return list;
+    }
+
+    @Override
+    public Map<Long, Boolean> getUserCanCanTakeMap(Long userId, List<CouponTemplateDO> templates) {
+        // 1. 未登录时，都显示可以领取
+        Map<Long, Boolean> userCanTakeMap = convertMap(templates, CouponTemplateDO::getId, templateId -> true);
+        if (userId == null) {
+            return userCanTakeMap;
+        }
+
+        // 2.1 过滤领取数量无限制的
+        Set<Long> templateIds = convertSet(templates, CouponTemplateDO::getId, template -> template.getTakeLimitCount() != -1);
+        // 2.2 检查用户领取的数量是否超过限制
+        if (CollUtil.isNotEmpty(templateIds)) {
+            Map<Long, Integer> couponTakeCountMap = this.getTakeCountMapByTemplateIds(templateIds, userId);
+            for (CouponTemplateDO template : templates) {
+                Integer takeCount = couponTakeCountMap.get(template.getId());
+                userCanTakeMap.put(template.getId(), takeCount == null || takeCount < template.getTakeLimitCount());
+            }
+        }
+        return userCanTakeMap;
+    }
+
     @Override
     public CouponDO getCoupon(Long userId, Long id) {
         return couponMapper.selectByIdAndUserId(id, userId);
+    }
+
+    private CouponDO validateCouponExists(Long id) {
+        CouponDO coupon = couponMapper.selectById(id);
+        if (coupon == null) {
+            throw exception(COUPON_NOT_EXISTS);
+        }
+        return coupon;
     }
 
     /**
@@ -398,4 +411,5 @@ public class CouponServiceImpl implements CouponService {
     private CouponServiceImpl getSelf() {
         return SpringUtil.getBean(getClass());
     }
+
 }

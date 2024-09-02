@@ -17,9 +17,7 @@ public enum CouponStatusEnum implements IntArrayValuable {
 
     UNUSED(1, "未使用"),
     USED(2, "已使用"),
-    EXPIRE(3, "已过期"),
-    // TODO @puhui999：捉摸了下，貌似搞成逻辑删除好了？不然好多地方的 status 都要做一些变动。可能未来加个 invalidateType 来标识，是管理后台删除，还是取消回收。或者优惠劵的 change log 可能更好。
-    INVALID(4, "已作废");
+    EXPIRE(3, "已过期");
 
     public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(CouponStatusEnum::getStatus).toArray();
 

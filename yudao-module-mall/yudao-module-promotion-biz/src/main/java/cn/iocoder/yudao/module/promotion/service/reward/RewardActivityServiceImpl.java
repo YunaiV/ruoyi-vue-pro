@@ -159,7 +159,6 @@ public class RewardActivityServiceImpl implements RewardActivityService {
 
     @Override
     public List<RewardActivityMatchRespDTO> getMatchRewardActivityList(Collection<Long> spuIds) {
-        // TODO 芋艿：待实现；先指定，然后再全局的；
         List<RewardActivityDO> list = rewardActivityMapper.selectListBySpuIdsAndStatus(spuIds, CommonStatusEnum.ENABLE.getStatus());
         return BeanUtils.toBean(list, RewardActivityMatchRespDTO.class);
     }

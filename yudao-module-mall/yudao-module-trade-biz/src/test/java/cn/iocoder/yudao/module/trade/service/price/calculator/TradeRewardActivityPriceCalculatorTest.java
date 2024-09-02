@@ -49,7 +49,7 @@ public class TradeRewardActivityPriceCalculatorTest extends BaseMockitoUnitTest 
         TradePriceCalculateRespBO result = new TradePriceCalculateRespBO()
                 .setType(TradeOrderTypeEnum.NORMAL.getType())
                 .setPrice(new TradePriceCalculateRespBO.Price())
-                .setPromotions(new ArrayList<>()).setGiveCouponsMap(new LinkedHashMap<>())
+                .setPromotions(new ArrayList<>()).setGiveCoupons(new LinkedHashMap<>())
                 .setItems(asList(
                         new TradePriceCalculateRespBO.OrderItem().setSkuId(10L).setCount(2).setSelected(true)
                                 .setPrice(100).setSpuId(1L),
@@ -68,16 +68,16 @@ public class TradeRewardActivityPriceCalculatorTest extends BaseMockitoUnitTest 
                         .setConditionType(PromotionConditionTypeEnum.PRICE.getType())
                         .setProductScope(PromotionProductScopeEnum.SPU.getScope()).setProductScopeValues(asList(1L, 2L))
                         .setRules(singletonList(new RewardActivityMatchRespDTO.Rule().setLimit(20).setDiscountPrice(70)
-                                .setGivePoint(false).setFreeDelivery(false)))),
+                                .setFreeDelivery(false)))),
                 randomPojo(RewardActivityMatchRespDTO.class, o -> o.setId(2000L).setName("活动 2000 号")
                         .setConditionType(PromotionConditionTypeEnum.COUNT.getType())
                         .setProductScope(PromotionProductScopeEnum.SPU.getScope()).setProductScopeValues(singletonList(3L))
                         .setRules(asList(new RewardActivityMatchRespDTO.Rule().setLimit(1).setDiscountPrice(10)
-                                        .setGivePoint(true).setPoint(50).setFreeDelivery(false),
-                                new RewardActivityMatchRespDTO.Rule().setLimit(2).setDiscountPrice(60).setGivePoint(true)
+                                        .setPoint(50).setFreeDelivery(false),
+                                new RewardActivityMatchRespDTO.Rule().setLimit(2).setDiscountPrice(60)
                                         .setPoint(100).setFreeDelivery(false), // 最大可满足，因为是 4 个
                                 new RewardActivityMatchRespDTO.Rule().setLimit(10).setDiscountPrice(100)
-                                        .setGivePoint(false).setFreeDelivery(false))))
+                                        .setFreeDelivery(false))))
         ));
 
         // 调用
