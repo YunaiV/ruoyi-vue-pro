@@ -13,6 +13,7 @@ import cn.iocoder.yudao.framework.ai.core.model.deepseek.DeepSeekChatModel;
 import cn.iocoder.yudao.framework.ai.core.model.midjourney.api.MidjourneyApi;
 import cn.iocoder.yudao.framework.ai.core.model.suno.api.SunoApi;
 import cn.iocoder.yudao.framework.ai.core.model.xinghuo.XingHuoChatModel;
+import cn.iocoder.yudao.framework.common.util.spring.SpringUtils;
 import com.alibaba.cloud.ai.tongyi.TongYiAutoConfiguration;
 import com.alibaba.cloud.ai.tongyi.TongYiConnectionProperties;
 import com.alibaba.cloud.ai.tongyi.chat.TongYiChatModel;
@@ -54,13 +55,17 @@ import org.springframework.ai.qianfan.api.QianFanApi;
 import org.springframework.ai.qianfan.api.QianFanImageApi;
 import org.springframework.ai.stabilityai.StabilityAiImageModel;
 import org.springframework.ai.stabilityai.api.StabilityAiApi;
+import org.springframework.ai.vectorstore.RedisVectorStore;
+import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.ai.zhipuai.ZhiPuAiChatModel;
 import org.springframework.ai.zhipuai.ZhiPuAiImageModel;
 import org.springframework.ai.zhipuai.api.ZhiPuAiApi;
 import org.springframework.ai.zhipuai.api.ZhiPuAiImageApi;
+import org.springframework.boot.autoconfigure.data.redis.RedisProperties;
 import org.springframework.retry.support.RetryTemplate;
 import org.springframework.web.client.ResponseErrorHandler;
 import org.springframework.web.client.RestClient;
+import redis.clients.jedis.JedisPooled;
 
 import java.util.List;
 
@@ -188,6 +193,28 @@ public class AiModelFactoryImpl implements AiModelFactory {
                 default:
                     throw new IllegalArgumentException(StrUtil.format("未知平台({})", platform));
             }
+        });
+    }
+
+    @Override
+    public VectorStore getOrCreateVectorStore(EmbeddingModel embeddingModel, AiPlatformEnum platform, String apiKey, String url) {
+        String cacheKey = buildClientCacheKey(VectorStore.class, platform, apiKey, url);
+        return Singleton.get(cacheKey, (Func0<VectorStore>) () -> {
+            // TODO 芋艿 @xin 这两个配置取哪好呢
+            // TODO 不同模型的向量维度可能会不一样，目前看貌似是以 index 来做区分的，维度不一样存不到一个 index 上
+            // TODO 回复：好的哈
+            String index = "default-index";
+            String prefix = "default:";
+            var config = RedisVectorStore.RedisVectorStoreConfig.builder()
+                    .withIndexName(index)
+                    .withPrefix(prefix)
+                    .build();
+            RedisProperties redisProperties = SpringUtils.getBean(RedisProperties.class);
+            RedisVectorStore redisVectorStore = new RedisVectorStore(config, embeddingModel,
+                    new JedisPooled(redisProperties.getHost(), redisProperties.getPort()),
+                    true);
+            redisVectorStore.afterPropertiesSet();
+            return redisVectorStore;
         });
     }
 
