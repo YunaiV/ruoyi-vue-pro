@@ -113,12 +113,12 @@ public class AppCombinationActivityController {
         return success(CombinationActivityConvert.INSTANCE.convert3(activity, products));
     }
 
-    @GetMapping("/get-detail-list")
+    @GetMapping("/detail-list")
     @Operation(summary = "获得拼团活动明细")
-    @Parameter(name = "combinationActivityIds", description = "活动编号列表", required = true, example = "[1024, 1025]")
-    public CommonResult<List<AppCombinationActivityDetailRespVO>> getCombinationActivityDetailList(@RequestParam("combinationActivityIds") Collection<Long> combinationActivityIds) {
+    @Parameter(name = "ids", description = "活动编号列表", required = true, example = "[1024, 1025]")
+    public CommonResult<List<AppCombinationActivityDetailRespVO>> getCombinationActivityDetailList(@RequestParam("ids") Collection<Long> ids) {
         // 1. 获取活动
-        List<CombinationActivityDO> combinationActivityDOList = activityService.getCombinationActivityListByIds(combinationActivityIds);
+        List<CombinationActivityDO> combinationActivityDOList = activityService.getCombinationActivityListByIds(ids);
 
         // 过滤掉无效的活动
         List<CombinationActivityDO> validActivities = combinationActivityDOList.stream()

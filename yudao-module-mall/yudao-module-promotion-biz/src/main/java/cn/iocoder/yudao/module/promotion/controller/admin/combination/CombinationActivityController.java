@@ -89,13 +89,13 @@ public class CombinationActivityController {
         return success(CombinationActivityConvert.INSTANCE.convert(activity, products));
     }
 
-    @GetMapping("/list")
+    @GetMapping("/detail-list")
     @Operation(summary = "获得拼团活动详情列表")
-    @Parameter(name = "combinationActivityIds", description = "拼团活动编号列表", required = true, example = "[1,2,3]")
+    @Parameter(name = "ids", description = "拼团活动编号列表", required = true, example = "[1,2,3]")
     @PreAuthorize("@ss.hasPermission('product:spu:query')")
-    public CommonResult<List<CombinationActivityRespVO>> getCombinationActivityDetailList(@RequestParam("combinationActivityIds") Collection<Long> combinationActivityIds) {
+    public CommonResult<List<CombinationActivityRespVO>> getCombinationActivityDetailList(@RequestParam("ids") Collection<Long> ids) {
         // 查询拼团活动列表
-        List<CombinationActivityDO> activities = combinationActivityService.getCombinationActivityListByIds(combinationActivityIds);
+        List<CombinationActivityDO> activities = combinationActivityService.getCombinationActivityListByIds(ids);
 
         // 转换活动列表
         List<CombinationActivityRespVO> activityVOs = CombinationActivityConvert.INSTANCE.convertList(activities);
