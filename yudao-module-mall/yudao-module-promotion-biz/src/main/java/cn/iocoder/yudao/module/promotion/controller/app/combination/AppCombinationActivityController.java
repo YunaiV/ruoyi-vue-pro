@@ -128,7 +128,7 @@ public class AppCombinationActivityController {
 
         // 如果没有有效的活动，返回 null 或者适当的错误信息
         if (validActivities.isEmpty()) {
-            return success(null); // 或者 return error("没有有效的活动");
+            return success(null);
         }
 
         // 2. 构建结果列表
