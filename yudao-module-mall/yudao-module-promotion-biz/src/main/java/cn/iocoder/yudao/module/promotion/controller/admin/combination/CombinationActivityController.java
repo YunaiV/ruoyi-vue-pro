@@ -100,31 +100,18 @@ public class CombinationActivityController {
         // 转换活动列表
         List<CombinationActivityRespVO> activityVOs = CombinationActivityConvert.INSTANCE.convertList(activities);
 
-        // 获取商品SPU列表和拼团产品列表
-        Set<Long> spuIds = activities.stream().map(CombinationActivityDO::getSpuId).collect(Collectors.toSet());
-        List<ProductSpuRespDTO> spuList = productSpuApi.getSpuList(spuIds);
-
+        // 获取拼团产品列表
         Set<Long> activityIds = activities.stream().map(CombinationActivityDO::getId).collect(Collectors.toSet());
         List<CombinationProductDO> productList = combinationActivityService.getCombinationProductListByActivityIds(activityIds);
 
         // 创建SPU和产品的映射
-        Map<Long, ProductSpuRespDTO> spuMap = convertMap(spuList, ProductSpuRespDTO::getId);
         Map<Long, List<CombinationProductDO>> productMap = convertMultiMap(productList, CombinationProductDO::getActivityId);
 
-        // 更新VO列表
-        activityVOs.forEach(vo -> {
-            ProductSpuRespDTO spu = spuMap.get(vo.getSpuId());
-            if (spu != null) {
-                vo.setSpuName(spu.getName())
-                        .setPicUrl(spu.getPicUrl())
-                        .setMarketPrice(spu.getMarketPrice());
-            }
-            vo.setProducts(CombinationActivityConvert.INSTANCE.convertList2(productMap.get(vo.getId())));
-        });
+        // 往活动VO赋值产品列表
+        activityVOs.forEach(vo -> vo.setProducts(CombinationActivityConvert.INSTANCE.convertList2(productMap.get(vo.getId()))));
 
         return success(activityVOs);
     }
-
 
     @GetMapping("/page")
     @Operation(summary = "获得拼团活动分页")

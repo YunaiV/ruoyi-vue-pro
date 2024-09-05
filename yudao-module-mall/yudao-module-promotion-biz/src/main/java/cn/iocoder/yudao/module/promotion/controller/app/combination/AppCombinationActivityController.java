@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.promotion.controller.app.combination;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
@@ -126,9 +127,9 @@ public class AppCombinationActivityController {
                         !ObjectUtil.equal(combinationActivityDO.getStatus(), CommonStatusEnum.DISABLE.getStatus()))
                 .toList();
 
-        // 如果没有有效的活动，返回 null 或者适当的错误信息
+        // 如果没有有效的活动，返回空列表
         if (validActivities.isEmpty()) {
-            return success(null);
+            return success(ListUtil.empty());
         }
 
         // 2. 构建结果列表
