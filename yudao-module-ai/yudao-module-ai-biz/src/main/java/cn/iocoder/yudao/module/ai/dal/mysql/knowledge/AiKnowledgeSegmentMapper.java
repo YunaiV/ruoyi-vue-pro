@@ -7,6 +7,8 @@ import cn.iocoder.yudao.module.ai.controller.admin.knowledge.vo.segment.AiKnowle
 import cn.iocoder.yudao.module.ai.dal.dataobject.knowledge.AiKnowledgeSegmentDO;
 import org.apache.ibatis.annotations.Mapper;
 
+import java.util.List;
+
 /**
  * AI 知识库-分片 Mapper
  *
@@ -20,6 +22,12 @@ public interface AiKnowledgeSegmentMapper extends BaseMapperX<AiKnowledgeSegment
                 .eq(AiKnowledgeSegmentDO::getDocumentId, reqVO.getDocumentId())
                 .eqIfPresent(AiKnowledgeSegmentDO::getStatus, reqVO.getStatus())
                 .likeIfPresent(AiKnowledgeSegmentDO::getContent, reqVO.getKeyword())
+                .orderByDesc(AiKnowledgeSegmentDO::getId));
+    }
+
+    default List<AiKnowledgeSegmentDO> selectList(List<String> vectorIdList) {
+        return selectList(new LambdaQueryWrapperX<AiKnowledgeSegmentDO>()
+                .in(AiKnowledgeSegmentDO::getVectorId, vectorIdList)
                 .orderByDesc(AiKnowledgeSegmentDO::getId));
     }
 }

@@ -66,6 +66,7 @@ import org.springframework.retry.support.RetryTemplate;
 import org.springframework.web.client.ResponseErrorHandler;
 import org.springframework.web.client.RestClient;
 import redis.clients.jedis.JedisPooled;
+import redis.clients.jedis.search.Schema;
 
 import java.util.List;
 
@@ -200,14 +201,11 @@ public class AiModelFactoryImpl implements AiModelFactory {
     public VectorStore getOrCreateVectorStore(EmbeddingModel embeddingModel, AiPlatformEnum platform, String apiKey, String url) {
         String cacheKey = buildClientCacheKey(VectorStore.class, platform, apiKey, url);
         return Singleton.get(cacheKey, (Func0<VectorStore>) () -> {
-            // TODO 芋艿 @xin 这两个配置取哪好呢
-            // TODO 不同模型的向量维度可能会不一样，目前看貌似是以 index 来做区分的，维度不一样存不到一个 index 上
-            // TODO 回复：好的哈
-            String index = "default-index";
-            String prefix = "default:";
+            String prefix = StrUtil.format("{}#{}:", platform.getPlatform(), apiKey);
             var config = RedisVectorStore.RedisVectorStoreConfig.builder()
-                    .withIndexName(index)
+                    .withIndexName(cacheKey)
                     .withPrefix(prefix)
+                    .withMetadataFields(new RedisVectorStore.MetadataField("knowledgeId", Schema.FieldType.NUMERIC))
                     .build();
             RedisProperties redisProperties = SpringUtils.getBean(RedisProperties.class);
             RedisVectorStore redisVectorStore = new RedisVectorStore(config, embeddingModel,
