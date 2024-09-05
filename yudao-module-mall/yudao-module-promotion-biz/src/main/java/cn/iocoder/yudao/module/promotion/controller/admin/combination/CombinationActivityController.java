@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.promotion.controller.admin.combination;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.product.api.spu.ProductSpuApi;
@@ -22,15 +23,15 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import static cn.hutool.core.collection.CollectionUtil.newArrayList;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
-import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 
 @Tag(name = "管理后台 - 拼团活动")
 @RestController
@@ -89,28 +90,21 @@ public class CombinationActivityController {
         return success(CombinationActivityConvert.INSTANCE.convert(activity, products));
     }
 
-    @GetMapping("/detail-list")
-    @Operation(summary = "获得拼团活动详情列表")
-    @Parameter(name = "ids", description = "拼团活动编号列表", required = true, example = "[1,2,3]")
-    @PreAuthorize("@ss.hasPermission('product:spu:query')")
-    public CommonResult<List<CombinationActivityRespVO>> getCombinationActivityDetailList(@RequestParam("ids") Collection<Long> ids) {
-        // 查询拼团活动列表
-        List<CombinationActivityDO> activities = combinationActivityService.getCombinationActivityListByIds(ids);
-
-        // 转换活动列表
-        List<CombinationActivityRespVO> activityVOs = CombinationActivityConvert.INSTANCE.convertList(activities);
-
-        // 获取拼团产品列表
-        Set<Long> activityIds = activities.stream().map(CombinationActivityDO::getId).collect(Collectors.toSet());
-        List<CombinationProductDO> productList = combinationActivityService.getCombinationProductListByActivityIds(activityIds);
-
-        // 创建SPU和产品的映射
-        Map<Long, List<CombinationProductDO>> productMap = convertMultiMap(productList, CombinationProductDO::getActivityId);
-
-        // 往活动VO赋值产品列表
-        activityVOs.forEach(vo -> vo.setProducts(CombinationActivityConvert.INSTANCE.convertList2(productMap.get(vo.getId()))));
-
-        return success(activityVOs);
+    @GetMapping("/list-by-ids")
+    @Operation(summary = "获得拼团活动列表，基于活动编号数组")
+    @Parameter(name = "ids", description = "活动编号数组", required = true, example = "[1024, 1025]")
+    public CommonResult<List<CombinationActivityRespVO>> getCombinationActivityListByIds(@RequestParam("ids") List<Long> ids) {
+        // 1. 获得开启的活动列表
+        List<CombinationActivityDO> activityList = combinationActivityService.getCombinationActivityListByIds(ids);
+        activityList.removeIf(activity -> CommonStatusEnum.isDisable(activity.getStatus()));
+        if (CollUtil.isEmpty(activityList)) {
+            return success(Collections.emptyList());
+        }
+        // 2. 拼接返回
+        List<CombinationProductDO> productList = combinationActivityService.getCombinationProductListByActivityIds(
+                convertList(activityList, CombinationActivityDO::getId));
+        List<ProductSpuRespDTO> spuList = productSpuApi.getSpuList(convertList(activityList, CombinationActivityDO::getSpuId));
+        return success(CombinationActivityConvert.INSTANCE.convertList(activityList, productList, spuList));
     }
 
     @GetMapping("/page")
