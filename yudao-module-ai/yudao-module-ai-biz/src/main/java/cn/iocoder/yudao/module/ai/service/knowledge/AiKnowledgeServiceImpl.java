@@ -10,9 +10,11 @@ import cn.iocoder.yudao.module.ai.controller.admin.knowledge.vo.knowledge.AiKnow
 import cn.iocoder.yudao.module.ai.dal.dataobject.knowledge.AiKnowledgeDO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiChatModelDO;
 import cn.iocoder.yudao.module.ai.dal.mysql.knowledge.AiKnowledgeMapper;
+import cn.iocoder.yudao.module.ai.service.model.AiApiKeyService;
 import cn.iocoder.yudao.module.ai.service.model.AiChatModelService;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.stereotype.Service;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
@@ -32,6 +34,10 @@ public class AiKnowledgeServiceImpl implements AiKnowledgeService {
 
     @Resource
     private AiKnowledgeMapper knowledgeMapper;
+    @Resource
+    private AiChatModelService chatModelService;
+    @Resource
+    private AiApiKeyService apiKeyService;
 
     @Override
     public Long createKnowledgeMy(AiKnowledgeCreateMyReqVO createReqVO, Long userId) {
@@ -73,6 +79,13 @@ public class AiKnowledgeServiceImpl implements AiKnowledgeService {
     @Override
     public PageResult<AiKnowledgeDO> getKnowledgePageMy(Long userId, PageParam pageReqVO) {
         return knowledgeMapper.selectPageByMy(userId, pageReqVO);
+    }
+
+    @Override
+    public VectorStore getVectorStoreById(Long knowledgeId) {
+        AiKnowledgeDO knowledge = validateKnowledgeExists(knowledgeId);
+        AiChatModelDO model = chatModelService.validateChatModel(knowledge.getModelId());
+        return apiKeyService.getOrCreateVectorStore(model.getKeyId());
     }
 
 }

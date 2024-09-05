@@ -25,4 +25,11 @@ public class AiKnowledgeCreateMyReqVO {
     @NotNull(message = "嵌入模型不能为空")
     private Long modelId;
 
+    @Schema(description = "相似性阈值", requiredMode = Schema.RequiredMode.REQUIRED, example = "0.5")
+    @NotNull(message = "相似性阈值不能为空")
+    private Double similarityThreshold;
+
+    @Schema(description = "topK", requiredMode = Schema.RequiredMode.REQUIRED, example = "3")
+    @NotNull(message = "topK 不能为空")
+    private Integer topK;
 }

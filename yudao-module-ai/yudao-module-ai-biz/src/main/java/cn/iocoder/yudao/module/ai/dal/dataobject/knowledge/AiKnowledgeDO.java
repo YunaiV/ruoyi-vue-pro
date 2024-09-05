@@ -52,6 +52,18 @@ public class AiKnowledgeDO extends BaseDO {
      * 模型标识
      */
     private String model;
+
+    /**
+     * topK
+     */
+    private Integer topK;
+
+    /**
+     * 相似度阈值
+     */
+    private Double similarityThreshold;
+
+
     /**
      * 状态
      * <p>

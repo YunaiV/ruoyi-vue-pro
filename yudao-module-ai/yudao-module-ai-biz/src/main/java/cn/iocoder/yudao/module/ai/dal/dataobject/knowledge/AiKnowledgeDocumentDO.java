@@ -23,7 +23,7 @@ public class AiKnowledgeDocumentDO extends BaseDO {
     private Long id;
     /**
      * 知识库编号
-     *
+     * <p>
      * 关联 {@link AiKnowledgeDO#getId()}
      */
     private Long knowledgeId;
@@ -47,6 +47,26 @@ public class AiKnowledgeDocumentDO extends BaseDO {
      * 字符数
      */
     private Integer wordCount;
+    /**
+     * 每个文本块的目标 token 数
+     */
+    private Integer defaultChunkSize;
+    /**
+     * 每个文本块的最小字符数
+     */
+    private Integer minChunkSizeChars;
+    /**
+     * 低于此值的块会被丢弃
+     */
+    private Integer minChunkLengthToEmbed;
+    /**
+     * 最大块数
+     */
+    private Integer maxNumChunks;
+    /**
+     * 分块是否保留分隔符
+     */
+    private Boolean keepSeparator;
     /**
      * 切片状态
      * <p>
