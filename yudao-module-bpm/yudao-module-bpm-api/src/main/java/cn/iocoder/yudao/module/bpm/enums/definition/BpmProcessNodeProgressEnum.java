@@ -13,6 +13,7 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public enum BpmProcessNodeProgressEnum {
+
     // 0 未开始
     NOT_START(0,"未开始"),
     // 1 ~ 20 进行中

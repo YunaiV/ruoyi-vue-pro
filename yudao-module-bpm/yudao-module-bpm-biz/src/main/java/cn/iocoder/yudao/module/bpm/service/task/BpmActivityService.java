@@ -29,7 +29,9 @@ public interface BpmActivityService {
     List<HistoricActivityInstance> getHistoricActivityListByExecutionId(String executionId);
 
     /**
-     * 获取活动的用户列表。 例如：抄送人列表。 审批人列表
+     * 获取活动的用户列表。
+     *
+     * 例如：抄送人列表、审批人列表
      *
      * @param historicActivity     活动
      * @param isMultiInstance      是否多实例 (会签，或签 )
@@ -37,10 +39,11 @@ public interface BpmActivityService {
      * @return 用户列表
      */
     List<BpmProcessInstanceProgressRespVO.User> getHistoricActivityUserList(HistoricActivityInstance historicActivity,
-                                                                            Boolean isMultiInstance, List<HistoricActivityInstance> historicActivityList);
+                                                                            Boolean isMultiInstance,
+                                                                            List<HistoricActivityInstance> historicActivityList);
 
     /**
-     * 获取活动的进度状态。
+     * 获取活动的进度状态
      *
      * @param historicActivity     活动
      * @param isMultiInstance      是否多实例 (会签，或签 )
@@ -48,11 +51,15 @@ public interface BpmActivityService {
      * @return 活动的进度状态
      */
     Integer getHistoricActivityProgressStatus(HistoricActivityInstance historicActivity,
-                                              Boolean isMultiInstance, List<HistoricActivityInstance> historicActivityList);
+                                              Boolean isMultiInstance,
+                                              List<HistoricActivityInstance> historicActivityList);
 
+    // TODO @jason：可以写下这 2 个方法的注释
     Integer getNotRunActivityProgressStatus(Integer processInstanceStatus);
 
-    List<BpmProcessInstanceProgressRespVO.User> getNotRunActivityUserList(String processInstanceId, Integer processInstanceStatus
-            , Integer candidateStrategy, String candidateParam);
+    List<BpmProcessInstanceProgressRespVO.User> getNotRunActivityUserList(String processInstanceId,
+                                                                          Integer processInstanceStatus,
+                                                                          Integer candidateStrategy,
+                                                                          String candidateParam);
 
 }

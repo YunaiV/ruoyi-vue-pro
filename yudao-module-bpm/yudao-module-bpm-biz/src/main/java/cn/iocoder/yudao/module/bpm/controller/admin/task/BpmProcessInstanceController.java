@@ -47,7 +47,6 @@ public class BpmProcessInstanceController {
     private BpmProcessInstanceService processInstanceService;
     @Resource
     private BpmTaskService taskService;
-
     @Resource
     private BpmProcessDefinitionService processDefinitionService;
     @Resource

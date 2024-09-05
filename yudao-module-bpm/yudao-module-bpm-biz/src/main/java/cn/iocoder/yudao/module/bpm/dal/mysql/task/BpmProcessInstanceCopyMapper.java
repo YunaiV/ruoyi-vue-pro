@@ -20,7 +20,9 @@ public interface BpmProcessInstanceCopyMapper extends BaseMapperX<BpmProcessInst
                 .orderByDesc(BpmProcessInstanceCopyDO::getId));
     }
 
-    default List<BpmProcessInstanceCopyDO> selectListByProcInstIdAndActId(String processInstanceId, String activityId) {
-        return selectList(BpmProcessInstanceCopyDO::getProcessInstanceId, processInstanceId, BpmProcessInstanceCopyDO::getActivityId, activityId);
+    default List<BpmProcessInstanceCopyDO> selectListByProcessIstanceIdAndActivityId(String processInstanceId, String activityId) {
+        return selectList(BpmProcessInstanceCopyDO::getProcessInstanceId, processInstanceId,
+                BpmProcessInstanceCopyDO::getActivityId, activityId);
     }
+
 }

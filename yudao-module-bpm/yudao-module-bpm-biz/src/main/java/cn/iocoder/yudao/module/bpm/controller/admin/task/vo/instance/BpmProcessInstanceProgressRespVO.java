@@ -22,17 +22,24 @@ public class BpmProcessInstanceProgressRespVO {
 
         @Schema(description = "节点编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "StartUserNode")
         private String id;  // Bpmn XML 节点 Id
+
         @Schema(description = "节点名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "发起人")
         private String name;
+
+        @Schema(description = "节点展示内容", requiredMode = Schema.RequiredMode.REQUIRED, example = "指定成员: 芋道源码")
         private String displayText;
+
         @Schema(description = "节点类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
         private Integer nodeType; // 参见 BpmSimpleModelNodeType 枚举
+
         @Schema(description = "节点状态", requiredMode = Schema.RequiredMode.REQUIRED, example = "0")
         private Integer status; // 参见 BpmProcessNodeProgressEnum 枚举
+
         @Schema(description = "节点的开始时间")
         private LocalDateTime startTime;
         @Schema(description = "节点的结束时间")
         private LocalDateTime endTime;
+
         @Schema(description = "用户列表")
         private List<User> userList;
         @Schema(description = "分支节点")
@@ -48,13 +55,19 @@ public class BpmProcessInstanceProgressRespVO {
 
         @Schema(description = "用户编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
         private Long id;
+
         @Schema(description = "用户昵称", requiredMode = Schema.RequiredMode.REQUIRED, example = "芋艿")
         private String nickname;
+
         @Schema(description = "用户头像", example = "芋艿")
         private String avatar;
+
         @Schema(description = "是否已处理", requiredMode = Schema.RequiredMode.REQUIRED, example = "true")
         private Boolean processed;
+
         @Schema(description = "用户任务的处理状态", example = "1")
         private Integer userTaskStatus;
+
     }
+
 }

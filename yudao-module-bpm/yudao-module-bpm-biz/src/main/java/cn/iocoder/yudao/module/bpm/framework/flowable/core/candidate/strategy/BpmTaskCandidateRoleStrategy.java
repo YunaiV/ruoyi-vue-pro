@@ -45,7 +45,7 @@ public class BpmTaskCandidateRoleStrategy implements BpmTaskCandidateStrategy {
        return calculateUsersByParam(param);
     }
 
-    private  Set<Long> calculateUsersByParam(String param) {
+    private Set<Long> calculateUsersByParam(String param) {
         Set<Long> roleIds = StrUtils.splitToLongSet(param);
         return permissionApi.getUserRoleIdListByRoleIds(roleIds);
     }

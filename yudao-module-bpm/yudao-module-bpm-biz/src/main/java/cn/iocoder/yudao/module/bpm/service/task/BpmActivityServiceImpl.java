@@ -72,6 +72,7 @@ public class BpmActivityServiceImpl implements BpmActivityService {
         return historyService.createHistoricActivityInstanceQuery().executionId(executionId).list();
     }
 
+    // TODO @芋艿：重点在 review 下~
     @Override
     public List<User> getHistoricActivityUserList(HistoricActivityInstance historicActivity
             , Boolean isMultiInstance, List<HistoricActivityInstance> historicActivityList) {

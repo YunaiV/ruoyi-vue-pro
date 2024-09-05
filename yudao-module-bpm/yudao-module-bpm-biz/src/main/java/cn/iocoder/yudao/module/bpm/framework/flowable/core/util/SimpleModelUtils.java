@@ -519,6 +519,7 @@ public class SimpleModelUtils {
 
     private static void processMultiInstanceLoopCharacteristics(Integer approveMethod, Integer approveRatio, UserTask userTask) {
         BpmUserTaskApproveMethodEnum approveMethodEnum = BpmUserTaskApproveMethodEnum.valueOf(approveMethod);
+        // TODO @jason：这种枚举，最终不要去掉哈 BpmUserTaskApproveMethodEnum。因为容易不经意重叠
         if (approveMethodEnum == null || approveMethodEnum == RANDOM) {
             return;
         }
@@ -656,7 +657,7 @@ public class SimpleModelUtils {
         traverseNodeToBuildNodeProgress(processInstance, simpleModel.getChildNode(), historicActivityList, activityInstanceMap, nodeProgresses, returnNodePosition);
     }
 
-
+    // TODO @芋艿：重点在 review 下
     private static void buildNodeProgress(HistoricProcessInstance processInstance, BpmSimpleModelNodeVO node, List<ProcessNodeProgress> nodeProgresses,
                                           List<HistoricActivityInstance> historicActivityList, Map<String, HistoricActivityInstance> activityInstanceMap, List<Integer> returnNodePosition) {
         BpmSimpleModelNodeType nodeType = BpmSimpleModelNodeType.valueOf(node.getType());

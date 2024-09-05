@@ -34,13 +34,13 @@ public class BpmTaskCandidateStartUserStrategy implements BpmTaskCandidateStrate
     public void validateParam(String param) {}
 
     @Override
-    public Set<Long> calculateUsers(DelegateExecution execution, String param) {
-        return getStartUserOfProcessInstance(execution.getProcessInstanceId());
+    public boolean isParamRequired() {
+        return false;
     }
 
     @Override
-    public boolean isParamRequired() {
-        return false;
+    public Set<Long> calculateUsers(DelegateExecution execution, String param) {
+        return getStartUserOfProcessInstance(execution.getProcessInstanceId());
     }
 
     @Override
