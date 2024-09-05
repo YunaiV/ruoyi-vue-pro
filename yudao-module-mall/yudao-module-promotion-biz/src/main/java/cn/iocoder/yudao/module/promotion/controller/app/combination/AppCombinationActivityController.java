@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.promotion.controller.app.combination;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
@@ -26,9 +27,13 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.annotation.Resource;
+
 import java.time.Duration;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.common.util.cache.CacheUtils.buildAsyncReloadingCache;
@@ -108,5 +113,39 @@ public class AppCombinationActivityController {
         List<CombinationProductDO> products = activityService.getCombinationProductsByActivityId(activity.getId());
         return success(CombinationActivityConvert.INSTANCE.convert3(activity, products));
     }
+
+    @GetMapping("/detail-list")
+    @Operation(summary = "获得拼团活动明细")
+    @Parameter(name = "ids", description = "活动编号列表", required = true, example = "[1024, 1025]")
+    public CommonResult<List<AppCombinationActivityDetailRespVO>> getCombinationActivityDetailList(@RequestParam("ids") Collection<Long> ids) {
+        // 1. 获取活动
+        List<CombinationActivityDO> combinationActivityDOList = activityService.getCombinationActivityListByIds(ids);
+
+        // 过滤掉无效的活动
+        List<CombinationActivityDO> validActivities = combinationActivityDOList.stream()
+                .filter(combinationActivityDO -> combinationActivityDO != null &&
+                        !ObjectUtil.equal(combinationActivityDO.getStatus(), CommonStatusEnum.DISABLE.getStatus()))
+                .toList();
+
+        // 如果没有有效的活动，返回空列表
+        if (validActivities.isEmpty()) {
+            return success(ListUtil.empty());
+        }
+
+        // 2. 构建结果列表
+        List<AppCombinationActivityDetailRespVO> detailRespVOList = new ArrayList<>();
+        for (CombinationActivityDO activity : validActivities) {
+            // 获取活动商品
+            List<CombinationProductDO> products = activityService.getCombinationProductsByActivityId(activity.getId());
+
+            // 调用转换方法并添加到结果列表
+            AppCombinationActivityDetailRespVO detailRespVO = CombinationActivityConvert.INSTANCE.convert3(activity, products);
+            detailRespVOList.add(detailRespVO);
+        }
+
+        // 3. 返回转换后的结果
+        return success(detailRespVOList);
+    }
+
 
 }
