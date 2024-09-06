@@ -1,3 +1,6 @@
+oss:
+  endpoint: https://oss-cn-hangzhou.aliyuncs.com
+
 spring:
   application:
     name: yudao-server
@@ -35,6 +38,7 @@ server:
       enabled: true
       charset: UTF-8 # 必须设置 UTF-8，避免 WebFlux 流式返回（AI 场景）会乱码问题
       force: true
+  port: 55002
 
 --- #################### 接口文档配置 ####################
 

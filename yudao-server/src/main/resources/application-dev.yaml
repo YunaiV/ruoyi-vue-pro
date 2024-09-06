@@ -1,5 +1,8 @@
-server:
-  port: 48080
+oss:
+  bucketName: somle-bigdata-dev
+kingdee:
+  outerInstanceIds:
+    - 94464631434776576
 
 --- #################### 数据库相关配置 ####################
 
