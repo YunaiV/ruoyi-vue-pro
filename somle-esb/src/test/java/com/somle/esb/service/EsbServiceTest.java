@@ -39,7 +39,7 @@ import static org.junit.jupiter.api.Assertions.*;
 })
 //@ExtendWith(SpringExtension.class)
 class EsbServiceTest extends BaseSpringTest {
-    @Autowired
+    @Resource
     EsbService service;
 
     @Resource
