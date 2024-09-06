@@ -2,31 +2,34 @@ package com.somle.esb.controller;
 
 import com.somle.esb.model.Domain;
 import com.somle.esb.service.EsbService;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDate;
-import java.util.HashMap;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/esb")
 public class EsbController {
 
     @Autowired
-    private EsbService esbService;
+    private EsbService service;
 
     @PostMapping("/dataCollect")
     public String dataCollect(LocalDate scheduleDate, String database) {
         if (database == null) {
-            esbService.dataCollect(scheduleDate);
+            service.dataCollect(scheduleDate);
         } else {
-            esbService.dataCollect(scheduleDate, Domain.fromString(database));
+            service.dataCollect(scheduleDate, Domain.fromString(database));
         }
+        return "success";
+    }
+
+    @PostMapping("/syncDepartments")
+    public String syncDepartments() {
+        service.syncDepartments();
         return "success";
     }
 

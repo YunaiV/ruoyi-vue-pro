@@ -49,8 +49,4 @@ spring:
 #  info:
 #    base-package: cn.iocoder.yudao.module
 somle:
-  base-package: com.somle.*
-
-kingdee:
-  outerInstanceIds:
-    - 94464631434776576
+  base-package: com.somle.erp

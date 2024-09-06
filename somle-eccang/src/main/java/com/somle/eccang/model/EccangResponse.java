@@ -1,5 +1,6 @@
 package com.somle.eccang.model;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.somle.framework.common.util.json.JSONArray;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
@@ -50,7 +51,7 @@ public class EccangResponse {
     public static class BizContent {
         private Integer total;
         private Integer totalCount;
-        private ArrayNode data;
+        private JsonNode data;
         private Integer page;
         private Integer pageSize;
 

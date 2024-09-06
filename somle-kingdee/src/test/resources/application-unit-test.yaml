@@ -5,6 +5,21 @@ spring:
   test:
     database:
       replace: none
+  devtools:
+    restart:
+      enabled: false
+  jpa:
+    properties:
+      hibernate:
+        # show_sql: true
+        format_sql: true
+        # type: trace
+        # use_sql_comments: true
+        # generate_statistics: true
+    hibernate:
+      ddl-auto: update
+      # format_sql: true
+    # show-sql: true
 logging:
   level:
     com.somle: DEBUG
@@ -49,7 +64,7 @@ spring:
 #  info:
 #    base-package: cn.iocoder.yudao.module
 somle:
-  base-package: com.somle.*
+  base-package: com.somle.kingdee
 
 kingdee:
   outerInstanceIds:

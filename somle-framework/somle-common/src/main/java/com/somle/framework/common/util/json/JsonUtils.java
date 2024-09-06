@@ -52,47 +52,36 @@ public class JsonUtils {
 
 
 
-
-//    public static ObjectNode newObject() {
-//        return objectMapper.createObjectNode();
-//    }
-
+    // convert pojo to string
     @SneakyThrows
     public static String toJsonString(Object object) {
         return objectMapper.writeValueAsString(object);
     }
 
+    // convert json to string
     @SneakyThrows
     public static String toJsonString(JSONObject jsonObject) {
         return jsonObject.toString();
     }
 
-
+    //convert pojo to json
     public static JSONObject toJSONObject(Object object) {
         return new JSONObject(objectMapper.valueToTree(object));
     }
 
+    //convert json node to pojo
     @SneakyThrows
     public static <T> T parseObject(JsonNode node, Class<T> clazz) {
         return objectMapper.treeToValue(node, clazz);
     }
 
-
-    @SneakyThrows
-    public static <T> List<T> parseArray(JsonNode node, Class<T> clazz) {
-        return  objectMapper.readerForListOf(clazz).readValue(node);
-    }
-
-    @SneakyThrows
-    public static <T> List<T> parseArray(JSONArray jsonArray, Class<T> clazz) {
-        return parseArray((ArrayNode) jsonArray, clazz);
-    }
-
+    //convert json to pojo
     @SneakyThrows
     public static <T> T parseObject(JSONObject jsonObject, Class<T> clazz) {
         return parseObject((ObjectNode) jsonObject, clazz);
     }
 
+    //convert string to pojo
     @SneakyThrows
     public static <T> T parseObject(String text, Class<T> clazz) {
         if (StrUtil.isEmpty(text)) {
@@ -106,6 +95,18 @@ public class JsonUtils {
             return objectMapper.readValue(text, clazz);
         }
     }
+
+    @SneakyThrows
+    public static <T> List<T> parseArray(JsonNode node, Class<T> clazz) {
+        return  objectMapper.readerForListOf(clazz).readValue(node);
+    }
+
+    @SneakyThrows
+    public static <T> List<T> parseArray(JSONArray jsonArray, Class<T> clazz) {
+        return parseArray((ArrayNode) jsonArray, clazz);
+    }
+
+
 
 
 

@@ -28,16 +28,16 @@ public class ErpDepartment {
     private Integer level;
     private Long parentId;
 
-    @Transient
-    private ErpDepartment parent;
+//    @Transient
+//    private ErpDepartment parent;
 
     @Transient
     private List<ErpDepartment> children;
 
-    public ErpDepartment getParent(Integer parentLevel) {
-        if (parentLevel >= level) {
-            throw new RuntimeException("parent level " + parentLevel + "should be lower than current level " + level);
-        }
-        return parent.level <= parentLevel ? parent : parent.getParent(parentLevel);
-    }
+//    public ErpDepartment getParent(Integer parentLevel) {
+//        if (parentLevel >= level) {
+//            throw new RuntimeException("parent level " + parentLevel + "should be lower than current level " + level);
+//        }
+//        return parent.level <= parentLevel ? parent : parent.getParent(parentLevel);
+//    }
 }

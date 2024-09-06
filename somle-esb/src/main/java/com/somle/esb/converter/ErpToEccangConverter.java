@@ -16,7 +16,7 @@ import java.util.List;
 @Service
 public class ErpToEccangConverter {
     @Autowired
-    ErpService esbService;
+    ErpService erpService;
 
     @Autowired
     EccangService eccangService;
@@ -25,7 +25,7 @@ public class ErpToEccangConverter {
         ErpStyleSku erpStyleSku = erpCountrySku.getStyleSku();
         Long deptId = erpStyleSku.getSaleDepartmentId();
         EccangProduct product = new EccangProduct();
-        List<ErpDepartment> path = esbService.getDepartmentParents(deptId).toList().reversed();
+        List<ErpDepartment> path = erpService.getDepartmentParents(deptId).toList().reversed();
         // Integer level = path.size() - 1;
         EccangOrganization organization = eccangService.getOrganizationByNameEn(path.get(2).getId().toString());
 
@@ -90,10 +90,10 @@ public class ErpToEccangConverter {
         } catch (Exception e) {
         }
         try {
-            pid = eccangService.getCategoryByNameEn(erpDepartment.getParent(level - 1).getId().toString()).getPcId();
+            pid = eccangService.getCategoryByNameEn(erpService.getParent(erpDepartment, level - 1).getId().toString()).getPcId();
         } catch (Exception e) {
             if (level != 1) {
-                throw new RuntimeException("pid not found for " + erpDepartment.toString() + "Detail: " + e.toString());
+                throw new RuntimeException("pid not found for " + erpDepartment.toString() + " Detail: " + e.toString());
             }
         }
         return EccangCategory.builder()

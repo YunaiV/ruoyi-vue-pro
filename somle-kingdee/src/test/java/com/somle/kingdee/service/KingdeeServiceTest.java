@@ -4,13 +4,19 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.TreeMap;
 
+import com.somle.framework.test.core.ut.BaseSpringTest;
+import jakarta.annotation.Resource;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.binary.Hex;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-//import org.mockito.MockitoAnnotations;
+import org.springframework.context.annotation.Import;
 
-public class KingdeeServiceTest {
+//import org.mockito.MockitoAnnotations;
+@Import(KingdeeService.class)
+public class KingdeeServiceTest extends BaseSpringTest {
+    @Resource
+    KingdeeService service;
 
 
 
@@ -78,4 +84,9 @@ public class KingdeeServiceTest {
     //     assertEquals(expectedOutput1, actualOutput1);
 
     // }
+
+    @Test
+    void refreshAuth() {
+        service.refreshAuths();
+    }
 }

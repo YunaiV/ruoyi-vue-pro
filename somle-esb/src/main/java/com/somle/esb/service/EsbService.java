@@ -343,13 +343,26 @@ public class EsbService {
     @ServiceActivator(inputChannel = "departmentChannel")
     public void handleDepartment(Message<DingTalkDepartment> message) {
         log.info("receiving message: " + message.getPayload().toString());
-        var erpDepartment = dingTalkToErpConverter.toEsb(message.getPayload());
+        var erpDepartment = dingTalkToErpConverter.toErp(message.getPayload());
         erpService.saveDepartment(erpDepartment);
         var eccangDepartment = erpToEccangConverter.toEccang(erpDepartment);
         EccangResponse.BizContent response = eccangService.addDepartment(eccangDepartment);
         log.info(response.toString());
         var kingdeeDepartment = erpToKingdeeConverter.toKingdee(erpDepartment);
         kingdeeService.addDepartment(kingdeeDepartment);
+    }
+
+
+    public void syncDepartments() {
+        dingTalkService.getDepartmentStream().forEach(dingTalkDepartment -> {
+            var erpDepartment = dingTalkToErpConverter.toErp(dingTalkDepartment);
+            erpService.saveDepartment(erpDepartment);
+            var eccangDepartment = erpToEccangConverter.toEccang(erpDepartment);
+            EccangResponse.BizContent response = eccangService.addDepartment(eccangDepartment);
+            log.info(response.toString());
+            var kingdeeDepartment = erpToKingdeeConverter.toKingdee(erpDepartment);
+            kingdeeService.addDepartment(kingdeeDepartment);
+        });
     }
 
 }

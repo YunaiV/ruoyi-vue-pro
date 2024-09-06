@@ -25,11 +25,14 @@ import java.util.stream.Stream;
 @Service
 public class ErpService {
 
-    @Autowired
-    MessageChannel productChannel;
-
-    @Autowired
-    MessageChannel dataChannel;
+//    @Autowired
+//    MessageChannel productChannel;
+//
+//    @Autowired
+//    MessageChannel dataChannel;
+//
+//    @Autowired
+//    MessageChannel departmentChannel;
 
     @Autowired
     ErpStyleSkuRepository styleSkuRepository;
@@ -40,8 +43,7 @@ public class ErpService {
     // @Autowired
     // EsbPlatformRepository esbPlatformRepository;
 
-    @Autowired
-    MessageChannel departmentChannel;
+
 
     @Autowired
     ErpDepartmentRepository departmentRepository;
@@ -69,8 +71,9 @@ public class ErpService {
         return departmentRepository.findByNameZh(nameZh).get();
     }
 
+    //get parents in ascending order, parent id 1 is exclusded
     public Stream<ErpDepartment> getDepartmentParents(Long id) {
-        if (id == null) {
+        if (id == null || id == 1l) {
             return Stream.of();
         } else {
             ErpDepartment current = getDepartment(id);
@@ -80,8 +83,22 @@ public class ErpService {
 
     public ErpDepartment getParent(Long id, Integer parentLevel) {
         List<ErpDepartment> parents = getDepartmentParents(id).toList();
-        return parents.get(parents.size() - 1 - parentLevel);
+        return parents.get(parents.size() - parentLevel);
     }
+
+
+    public ErpDepartment getParent(ErpDepartment depart, Integer parentLevel) {
+//        if (parentLevel <= 1) {
+//            throw new RuntimeException(("parent level " + parentLevel + " is smaller then minimum level 1"));
+//        }
+//        if (parentLevel >= depart.getLevel()) {
+//            throw new RuntimeException("parent level " + parentLevel + "should be lower than current level " + depart.getLevel());
+//        }
+//        var parent = departmentRepository.findByParentId(depart.getParentId()).getFirst();
+//        return parent.getLevel() == parentLevel ? parent : getParent(parent, parentLevel)
+        return getParent(depart.getId(), parentLevel);
+    }
+
 
     public List<ErpDepartment> getChildren(Long id) {
         return departmentRepository.findByParentId(id);
@@ -117,14 +134,14 @@ public class ErpService {
 
 
 
-    public boolean addProduct(
-        List<ErpCountrySku> productList
-    ) {
-        for (ErpCountrySku product : productList) {
-            productChannel.send(MessageBuilder.withPayload(product).build());
-        }
-        return true;
-    }
+//    public boolean syncProduct(
+//        List<ErpCountrySku> productList
+//    ) {
+//        for (ErpCountrySku product : productList) {
+//            productChannel.send(MessageBuilder.withPayload(product).build());
+//        }
+//        return true;
+//    }
 
     // @Transactional
     public boolean saveProduct(
@@ -163,7 +180,7 @@ public class ErpService {
         ErpDepartment department
     ) {
         departmentRepository.save(department);
-        departmentChannel.send(MessageBuilder.withPayload(department).build());
+//        departmentChannel.send(MessageBuilder.withPayload(department).build());
         return true;
     }
 }

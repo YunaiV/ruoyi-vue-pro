@@ -2,6 +2,8 @@ package com.somle.kingdee.model;
 
 import java.util.List;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.somle.framework.common.util.json.JSONObject;
 import com.somle.framework.common.util.json.JsonUtils;
 import com.somle.framework.common.util.web.WebUtils;
@@ -13,12 +15,12 @@ import lombok.Data;
 @Data
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class KingdeeResponse {
-    private String data;
+    private JsonNode data;
     private String description;
     private String errcode;
 
     public JSONObject getData() {
-        return JsonUtils.parseObject(data, JSONObject.class);
+        return JsonUtils.toJSONObject(data);
     }
 
     public <T> T getData(Class<T> objectClass) {

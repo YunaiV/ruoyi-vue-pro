@@ -20,6 +20,12 @@
             <artifactId>somle-common</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>com.somle</groupId>
+            <artifactId>somle-spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+
 
         <dependency>
             <groupId>org.springframework.boot</groupId>
