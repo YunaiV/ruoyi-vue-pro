@@ -18,41 +18,38 @@ public class ProductPageReqVO extends PageParam {
     @Schema(description = "产品名称", example = "李四")
     private String name;
 
-    @Schema(description = "产品标识")
-    private String identification;
-
-    @Schema(description = "设备类型：device、gatway、gatway_sub", example = "1")
-    private String deviceType;
-
-    @Schema(description = "厂商名称", example = "李四")
-    private String manufacturerName;
-
-    @Schema(description = "产品型号")
-    private String model;
-
-    @Schema(description = "数据格式:1. 标准数据格式（JSON）2. 透传/自定义，脚本解析")
-    private Integer dataFormat;
-
-    @Schema(description = "设备接入平台的协议类型，默认为MQTT", example = "2")
-    private String protocolType;
-
-    @Schema(description = "产品描述", example = "随便")
-    private String description;
-
-    @Schema(description = "产品状态 (0: 启用, 1: 停用)", example = "2")
-    private Integer status;
-
-    @Schema(description = "物模型定义")
-    private String metadata;
-
-    @Schema(description = "消息协议ID")
-    private Long messageProtocol;
-
-    @Schema(description = "消息协议名称", example = "芋艿")
-    private String protocolName;
-
     @Schema(description = "创建时间")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
     private LocalDateTime[] createTime;
+
+    @Schema(description = "产品标识")
+    private String productKey;
+
+    @Schema(description = "协议编号（脚本解析 id）", example = "13177")
+    private Long protocolId;
+
+    @Schema(description = "产品所属品类标识符", example = "14237")
+    private Long categoryId;
+
+    @Schema(description = "产品描述", example = "你猜")
+    private String description;
+
+    @Schema(description = "数据校验级别, 0: 强校验, 1: 弱校验, 2: 免校验", example = "1")
+    private Integer validateType;
+
+    @Schema(description = "产品状态, 0: DEVELOPMENT_STATUS, 1: RELEASE_STATUS", example = "1")
+    private Integer status;
+
+    @Schema(description = "设备类型, 0: 直连设备, 1: 网关子设备, 2: 网关设备", example = "2")
+    private Integer deviceType;
+
+    @Schema(description = "联网方式, 0: Wi-Fi, 1: Cellular, 2: Ethernet, 3: 其他", example = "2")
+    private Integer netType;
+
+    @Schema(description = "接入网关协议, 0: modbus, 1: opc-ua, 2: customize, 3: ble, 4: zigbee", example = "2")
+    private Integer protocolType;
+
+    @Schema(description = "数据格式, 0: 透传模式, 1: Alink JSON")
+    private Integer dataFormat;
 
 }

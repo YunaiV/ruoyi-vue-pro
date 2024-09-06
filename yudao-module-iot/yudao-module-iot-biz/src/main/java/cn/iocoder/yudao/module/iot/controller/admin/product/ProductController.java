@@ -27,7 +27,7 @@ import java.util.List;
 import static cn.iocoder.yudao.framework.apilog.core.enums.OperateTypeEnum.EXPORT;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
-@Tag(name = "管理后台 - iot 产品")
+@Tag(name = "管理后台 - IOT 产品")
 @RestController
 @RequestMapping("/iot/product")
 @Validated

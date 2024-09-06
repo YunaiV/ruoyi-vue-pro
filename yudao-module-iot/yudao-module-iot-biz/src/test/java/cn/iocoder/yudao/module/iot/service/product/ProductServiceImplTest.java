@@ -111,61 +111,57 @@ public class ProductServiceImplTest extends BaseDbUnitTest {
        // mock 数据
        ProductDO dbProduct = randomPojo(ProductDO.class, o -> { // 等会查询到
            o.setName(null);
-           o.setIdentification(null);
-           o.setDeviceType(null);
-           o.setManufacturerName(null);
-           o.setModel(null);
-           o.setDataFormat(null);
-           o.setProtocolType(null);
-           o.setDescription(null);
-           o.setStatus(null);
-           o.setMetadata(null);
-           o.setMessageProtocol(null);
-           o.setProtocolName(null);
            o.setCreateTime(null);
+           o.setProductKey(null);
+           o.setProtocolId(null);
+           o.setCategoryId(null);
+           o.setDescription(null);
+           o.setValidateType(null);
+           o.setStatus(null);
+           o.setDeviceType(null);
+           o.setNetType(null);
+           o.setProtocolType(null);
+           o.setDataFormat(null);
        });
        productMapper.insert(dbProduct);
        // 测试 name 不匹配
        productMapper.insert(cloneIgnoreId(dbProduct, o -> o.setName(null)));
-       // 测试 identification 不匹配
-       productMapper.insert(cloneIgnoreId(dbProduct, o -> o.setIdentification(null)));
-       // 测试 deviceType 不匹配
-       productMapper.insert(cloneIgnoreId(dbProduct, o -> o.setDeviceType(null)));
-       // 测试 manufacturerName 不匹配
-       productMapper.insert(cloneIgnoreId(dbProduct, o -> o.setManufacturerName(null)));
-       // 测试 model 不匹配
-       productMapper.insert(cloneIgnoreId(dbProduct, o -> o.setModel(null)));
-       // 测试 dataFormat 不匹配
-       productMapper.insert(cloneIgnoreId(dbProduct, o -> o.setDataFormat(null)));
-       // 测试 protocolType 不匹配
-       productMapper.insert(cloneIgnoreId(dbProduct, o -> o.setProtocolType(null)));
-       // 测试 description 不匹配
-       productMapper.insert(cloneIgnoreId(dbProduct, o -> o.setDescription(null)));
-       // 测试 status 不匹配
-       productMapper.insert(cloneIgnoreId(dbProduct, o -> o.setStatus(null)));
-       // 测试 metadata 不匹配
-       productMapper.insert(cloneIgnoreId(dbProduct, o -> o.setMetadata(null)));
-       // 测试 messageProtocol 不匹配
-       productMapper.insert(cloneIgnoreId(dbProduct, o -> o.setMessageProtocol(null)));
-       // 测试 protocolName 不匹配
-       productMapper.insert(cloneIgnoreId(dbProduct, o -> o.setProtocolName(null)));
        // 测试 createTime 不匹配
        productMapper.insert(cloneIgnoreId(dbProduct, o -> o.setCreateTime(null)));
+       // 测试 productKey 不匹配
+       productMapper.insert(cloneIgnoreId(dbProduct, o -> o.setProductKey(null)));
+       // 测试 protocolId 不匹配
+       productMapper.insert(cloneIgnoreId(dbProduct, o -> o.setProtocolId(null)));
+       // 测试 categoryId 不匹配
+       productMapper.insert(cloneIgnoreId(dbProduct, o -> o.setCategoryId(null)));
+       // 测试 description 不匹配
+       productMapper.insert(cloneIgnoreId(dbProduct, o -> o.setDescription(null)));
+       // 测试 validateType 不匹配
+       productMapper.insert(cloneIgnoreId(dbProduct, o -> o.setValidateType(null)));
+       // 测试 status 不匹配
+       productMapper.insert(cloneIgnoreId(dbProduct, o -> o.setStatus(null)));
+       // 测试 deviceType 不匹配
+       productMapper.insert(cloneIgnoreId(dbProduct, o -> o.setDeviceType(null)));
+       // 测试 netType 不匹配
+       productMapper.insert(cloneIgnoreId(dbProduct, o -> o.setNetType(null)));
+       // 测试 protocolType 不匹配
+       productMapper.insert(cloneIgnoreId(dbProduct, o -> o.setProtocolType(null)));
+       // 测试 dataFormat 不匹配
+       productMapper.insert(cloneIgnoreId(dbProduct, o -> o.setDataFormat(null)));
        // 准备参数
        ProductPageReqVO reqVO = new ProductPageReqVO();
        reqVO.setName(null);
-       reqVO.setIdentification(null);
-       reqVO.setDeviceType(null);
-       reqVO.setManufacturerName(null);
-       reqVO.setModel(null);
-       reqVO.setDataFormat(null);
-       reqVO.setProtocolType(null);
-       reqVO.setDescription(null);
-       reqVO.setStatus(null);
-       reqVO.setMetadata(null);
-       reqVO.setMessageProtocol(null);
-       reqVO.setProtocolName(null);
        reqVO.setCreateTime(buildBetweenTime(2023, 2, 1, 2023, 2, 28));
+       reqVO.setProductKey(null);
+       reqVO.setProtocolId(null);
+       reqVO.setCategoryId(null);
+       reqVO.setDescription(null);
+       reqVO.setValidateType(null);
+       reqVO.setStatus(null);
+       reqVO.setDeviceType(null);
+       reqVO.setNetType(null);
+       reqVO.setProtocolType(null);
+       reqVO.setDataFormat(null);
 
        // 调用
        PageResult<ProductDO> pageResult = productService.getProductPage(reqVO);

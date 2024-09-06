@@ -23,57 +23,53 @@ import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 public class ProductDO extends BaseDO {
 
     /**
-     * 编号
-     */
-    @TableId
-    private Long id;
-    /**
      * 产品名称
      */
     private String name;
     /**
+     * 产品ID
+     */
+    @TableId
+    private Long id;
+    /**
      * 产品标识
      */
-    private String identification;
+    private String productKey;
     /**
-     * 设备类型：device、gatway、gatway_sub
+     * 协议编号（脚本解析 id）
      */
-    private String deviceType;
+    private Long protocolId;
     /**
-     * 厂商名称
+     * 产品所属品类标识符
      */
-    private String manufacturerName;
-    /**
-     * 产品型号
-     */
-    private String model;
-    /**
-     * 数据格式:1. 标准数据格式（JSON）2. 透传/自定义，脚本解析
-     */
-    private Integer dataFormat;
-    /**
-     * 设备接入平台的协议类型，默认为MQTT
-     */
-    private String protocolType;
+    private Long categoryId;
     /**
      * 产品描述
      */
     private String description;
     /**
-     * 产品状态 (0: 启用, 1: 停用)
+     * 数据校验级别, 0: 强校验, 1: 弱校验, 2: 免校验
+     */
+    private Integer validateType;
+    /**
+     * 产品状态, 0: DEVELOPMENT_STATUS, 1: RELEASE_STATUS
      */
     private Integer status;
     /**
-     * 物模型定义
+     * 设备类型, 0: 直连设备, 1: 网关子设备, 2: 网关设备
      */
-    private String metadata;
+    private Integer deviceType;
     /**
-     * 消息协议ID
+     * 联网方式, 0: Wi-Fi, 1: Cellular, 2: Ethernet, 3: 其他
      */
-    private Long messageProtocol;
+    private Integer netType;
     /**
-     * 消息协议名称
+     * 接入网关协议, 0: modbus, 1: opc-ua, 2: customize, 3: ble, 4: zigbee
      */
-    private String protocolName;
+    private Integer protocolType;
+    /**
+     * 数据格式, 0: 透传模式, 1: Alink JSON
+     */
+    private Integer dataFormat;
 
 }
