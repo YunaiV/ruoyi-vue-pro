@@ -1,19 +1,26 @@
 package cn.iocoder.yudao.module.system.service.auth;
 
+import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.util.monitor.TracerUtils;
+import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.common.util.servlet.ServletUtils;
 import cn.iocoder.yudao.framework.common.util.validation.ValidationUtils;
+import cn.iocoder.yudao.framework.datapermission.core.util.DataPermissionUtils;
 import cn.iocoder.yudao.module.system.api.logger.dto.LoginLogCreateReqDTO;
 import cn.iocoder.yudao.module.system.api.sms.SmsCodeApi;
 import cn.iocoder.yudao.module.system.api.social.dto.SocialUserBindReqDTO;
 import cn.iocoder.yudao.module.system.api.social.dto.SocialUserRespDTO;
 import cn.iocoder.yudao.module.system.controller.admin.auth.vo.*;
 import cn.iocoder.yudao.module.system.convert.auth.AuthConvert;
+import cn.iocoder.yudao.module.system.dal.dataobject.dept.UserPostDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.oauth2.OAuth2AccessTokenDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.user.AdminUserDO;
+import cn.iocoder.yudao.module.system.dal.mysql.dept.UserPostMapper;
+import cn.iocoder.yudao.module.system.dal.mysql.user.AdminUserMapper;
 import cn.iocoder.yudao.module.system.enums.logger.LoginLogTypeEnum;
 import cn.iocoder.yudao.module.system.enums.logger.LoginResultEnum;
 import cn.iocoder.yudao.module.system.enums.oauth2.OAuth2ClientConstants;
@@ -22,6 +29,7 @@ import cn.iocoder.yudao.module.system.service.logger.LoginLogService;
 import cn.iocoder.yudao.module.system.service.member.MemberService;
 import cn.iocoder.yudao.module.system.service.oauth2.OAuth2TokenService;
 import cn.iocoder.yudao.module.system.service.social.SocialUserService;
+import cn.iocoder.yudao.module.system.service.tenant.TenantService;
 import cn.iocoder.yudao.module.system.service.user.AdminUserService;
 import com.google.common.annotations.VisibleForTesting;
 import com.xingyuv.captcha.model.common.ResponseModel;
@@ -29,13 +37,17 @@ import com.xingyuv.captcha.model.vo.CaptchaVO;
 import com.xingyuv.captcha.service.CaptchaService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import jakarta.annotation.Resource;
 import jakarta.validation.Validator;
 import java.util.Objects;
+import java.util.Set;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
 import static cn.iocoder.yudao.framework.common.util.servlet.ServletUtils.getClientIP;
 import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.*;
 
@@ -64,12 +76,21 @@ public class AdminAuthServiceImpl implements AdminAuthService {
     private CaptchaService captchaService;
     @Resource
     private SmsCodeApi smsCodeApi;
-
+    @Resource
+    @Lazy // 延迟，避免循环依赖报错
+    private TenantService tenantService;
+    @Resource
+    private AdminUserMapper userMapper;
+    @Resource
+    private PasswordEncoder passwordEncoder;
     /**
      * 验证码的开关，默认为 true
      */
     @Value("${yudao.captcha.enable:true}")
     private Boolean captchaEnable;
+    @Resource
+    private UserPostMapper userPostMapper;
+
 
     @Override
     public AdminUserDO authenticate(String username, String password) {
@@ -247,4 +268,78 @@ public class AdminAuthServiceImpl implements AdminAuthService {
         return UserTypeEnum.ADMIN;
     }
 
+
+    public Long register(AuthRegisterReqVO registerReqVO) {
+        // 校验账户配合
+        tenantService.handleTenantInfo(tenant -> {
+            long count = userMapper.selectCount();
+            if (count >= tenant.getAccountCount()) {
+                throw exception(USER_COUNT_MAX, tenant.getAccountCount());
+            }
+        });
+        // 校验正确性
+        validateUserForRegister(null, registerReqVO.getUsername(),
+                registerReqVO.getMobile(), registerReqVO.getEmail(), registerReqVO.getDeptId(), registerReqVO.getPostIds());
+        // 插入用户
+        AdminUserDO user = BeanUtils.toBean(registerReqVO, AdminUserDO.class);
+        user.setStatus(CommonStatusEnum.ENABLE.getStatus()); // 默认开启
+        user.setPassword(encodePassword(registerReqVO.getPassword())); // 加密密码
+        userMapper.insert(user);
+        // 插入关联岗位
+        if (CollectionUtil.isNotEmpty(user.getPostIds())) {
+            userPostMapper.insertBatch(convertList(user.getPostIds(),
+                    postId -> new UserPostDO().setUserId(user.getId()).setPostId(postId)));
+        }
+        return user.getId();
+    }
+
+    private void validateUserForRegister(Long id, String username, String mobile, String email,
+                                               Long deptId, Set<Long> postIds) {
+        // 关闭数据权限，避免因为没有数据权限，查询不到数据，进而导致唯一校验不正确
+        DataPermissionUtils.executeIgnore(() -> {
+            // 校验用户存在
+            validateUserExists(id);
+            // 校验用户名唯一
+            validateUsernameUnique(id, username);
+        });
+    }
+
+    @VisibleForTesting
+    void validateUserExists(Long id) {
+        if (id == null) {
+            return;
+        }
+        AdminUserDO user = userMapper.selectById(id);
+        if (user == null) {
+            throw exception(USER_NOT_EXISTS);
+        }
+    }
+
+    @VisibleForTesting
+    void validateUsernameUnique(Long id, String username) {
+        if (StrUtil.isBlank(username)) {
+            return;
+        }
+        AdminUserDO user = userMapper.selectByUsername(username);
+        if (user == null) {
+            return;
+        }
+        // 如果 id 为空，说明不用比较是否为相同 id 的用户
+        if (id == null) {
+            throw exception(USER_USERNAME_EXISTS);
+        }
+        if (!user.getId().equals(id)) {
+            throw exception(USER_USERNAME_EXISTS);
+        }
+    }
+
+    /**
+     * 对密码进行加密
+     *
+     * @param password 密码
+     * @return 加密后的密码
+     */
+    private String encodePassword(String password) {
+        return passwordEncoder.encode(password);
+    }
 }

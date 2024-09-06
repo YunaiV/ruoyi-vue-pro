@@ -161,4 +161,11 @@ public class AuthController {
         return success(authService.socialLogin(reqVO));
     }
 
+    @PostMapping("/register")
+    @PermitAll
+    @Operation(summary = "注册用户")
+    @OperateLog(enable = false) // 避免 Post 请求被记录操作日志
+    public CommonResult<Long> register(@RequestBody @Valid AuthRegisterReqVO reqVO) {
+        return success(authService.register(reqVO));
+    }
 }
