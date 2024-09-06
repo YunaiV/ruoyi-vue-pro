@@ -10,6 +10,8 @@ import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
+import java.util.UUID;
+
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.iot.enums.ErrorCodeConstants.PRODUCT_NOT_EXISTS;
 
@@ -27,11 +29,24 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public Long createProduct(ProductSaveReqVO createReqVO) {
+        // 生成 ProductKey
+        createProductKey(createReqVO);
         // 插入
         ProductDO product = BeanUtils.toBean(createReqVO, ProductDO.class);
         productMapper.insert(product);
         // 返回
         return product.getId();
+    }
+
+    /**
+     * 创建 ProductKey
+     *
+     * @param createReqVO 创建信息
+     */
+    private void createProductKey(ProductSaveReqVO createReqVO) {
+        // 生成随机的 11 位字符串
+        String productKey = UUID.randomUUID().toString().replace("-", "").substring(0, 11);
+        createReqVO.setProductKey(productKey);
     }
 
     @Override
