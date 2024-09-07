@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 // @Validated
 @RestController
-@RequestMapping("/api/erp")
+@RequestMapping("/admin-api/erp")
 public class ErpController {
 
     @Autowired
