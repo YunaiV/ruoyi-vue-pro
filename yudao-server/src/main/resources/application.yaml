@@ -154,9 +154,9 @@ spring:
     embedding:
       transformer:
         onnx:
-          model-uri: http://test.yudao.iocoder.cn/model.onnx
+          model-uri: https://raw.gitcode.com/yudaocode/yudao-demo/raw/master/yudao-static/ai/model.onnx
         tokenizer:
-          uri: http://test.yudao.iocoder.cn/tokenizer.json
+          uri: https://raw.gitcode.com/yudaocode/yudao-demo/raw/master/yudao-static/ai/tokenizer.json
     qianfan: # 文心一言
       api-key: x0cuLZ7XsaTCU08vuJWO87Lg
       secret-key: R9mYF9dl9KASgi5RUq0FQt3wRisSnOcK
