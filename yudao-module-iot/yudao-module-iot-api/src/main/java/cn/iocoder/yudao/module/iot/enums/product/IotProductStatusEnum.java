@@ -6,13 +6,13 @@ import lombok.Getter;
 
 /**
  * IOT 产品状态枚举类
- * 产品状态, 0: 未发布, 1: 已发布
+ * 产品状态, 0: 开发中, 1: 已发布
  */
 @AllArgsConstructor
 @Getter
 public enum IotProductStatusEnum implements IntArrayValuable {
 
-    UNPUBLISHED(0, "未发布"),
+    UNPUBLISHED(0, "开发中"),
     PUBLISHED(1, "已发布");
 
     /**

@@ -51,4 +51,11 @@ public interface ProductService {
      */
     PageResult<ProductDO> getProductPage(ProductPageReqVO pageReqVO);
 
+    /**
+     * 更新产品状态
+     *
+     * @param id 编号
+     * @param status 状态
+     */
+    void updateProductStatus(Long id, Integer status);
 }

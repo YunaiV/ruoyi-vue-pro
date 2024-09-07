@@ -51,6 +51,17 @@ public class ProductController {
         return success(true);
     }
 
+    @PutMapping("/update-status")
+    @Operation(summary = "更新产品状态")
+    @Parameter(name = "id", description = "编号", required = true)
+    @Parameter(name = "status", description = "状态", required = true)
+    @PreAuthorize("@ss.hasPermission('iot:product:update')")
+    public CommonResult<Boolean> updateProductStatus(@RequestParam("id") Long id,
+                                                     @RequestParam("status") Integer status) {
+        productService.updateProductStatus(id, status);
+        return success(true);
+    }
+
     @DeleteMapping("/delete")
     @Operation(summary = "删除产品")
     @Parameter(name = "id", description = "编号", required = true)
