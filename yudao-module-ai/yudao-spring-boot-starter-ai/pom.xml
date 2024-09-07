@@ -46,11 +46,13 @@
         </dependency>
 
         <!-- 向量化，基于 Redis 存储，Tika 解析内容 -->
-        <dependency>
-            <groupId>${spring-ai.groupId}</groupId>
-            <artifactId>spring-ai-transformers-spring-boot-starter</artifactId>
-            <version>${spring-ai.version}</version>
-        </dependency>
+
+        <!-- 暂不做经济型，先注释 -->
+        <!--        <dependency>-->
+        <!--            <groupId>${spring-ai.groupId}</groupId>-->
+        <!--            <artifactId>spring-ai-transformers-spring-boot-starter</artifactId>-->
+        <!--            <version>${spring-ai.version}</version>-->
+        <!--        </dependency>-->
         <dependency>
             <groupId>${spring-ai.groupId}</groupId>
             <artifactId>spring-ai-tika-document-reader</artifactId>

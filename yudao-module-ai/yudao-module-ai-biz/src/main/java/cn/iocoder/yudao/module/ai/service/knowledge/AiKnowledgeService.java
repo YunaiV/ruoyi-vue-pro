@@ -5,6 +5,7 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.ai.controller.admin.knowledge.vo.knowledge.AiKnowledgeCreateMyReqVO;
 import cn.iocoder.yudao.module.ai.controller.admin.knowledge.vo.knowledge.AiKnowledgeUpdateMyReqVO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.knowledge.AiKnowledgeDO;
+import org.springframework.ai.vectorstore.VectorStore;
 
 /**
  * AI 知识库-基础信息 Service 接口
@@ -47,4 +48,12 @@ public interface AiKnowledgeService {
      * @return 知识库分页
      */
     PageResult<AiKnowledgeDO> getKnowledgePageMy(Long userId, PageParam pageReqVO);
+
+    /**
+     * 根据知识库编号获取向量存储实例
+     *
+     * @param knowledgeId 知识库编号
+     * @return 向量存储实例
+     */
+    VectorStore getVectorStoreById(Long knowledgeId);
 }
