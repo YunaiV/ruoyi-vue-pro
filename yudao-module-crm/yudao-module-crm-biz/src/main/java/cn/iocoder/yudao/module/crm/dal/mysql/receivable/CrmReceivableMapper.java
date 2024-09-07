@@ -92,7 +92,7 @@ public interface CrmReceivableMapper extends BaseMapperX<CrmReceivableDO> {
         List<Map<String, Object>> result = selectMaps(new QueryWrapper<CrmReceivableDO>()
                 .select("contract_id, SUM(price) AS total_price")
                 .in("audit_status", CrmAuditStatusEnum.DRAFT.getStatus(), // 草稿 + 审批中 + 审批通过
-                        CrmAuditStatusEnum.PROCESS, CrmAuditStatusEnum.APPROVE.getStatus())
+                        CrmAuditStatusEnum.PROCESS.getStatus(), CrmAuditStatusEnum.APPROVE.getStatus())
                 .groupBy("contract_id")
                 .in("contract_id", contractIds));
         // 获得金额

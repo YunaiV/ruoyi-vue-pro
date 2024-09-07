@@ -4,6 +4,7 @@ import cn.hutool.core.util.ObjectUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
+import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.member.api.user.dto.MemberUserRespDTO;
 import cn.iocoder.yudao.module.product.api.sku.dto.ProductSkuRespDTO;
 import cn.iocoder.yudao.module.product.api.spu.dto.ProductSpuRespDTO;
@@ -127,40 +128,42 @@ public interface CombinationActivityConvert {
                 .setSpuName(spu.getName()).setPicUrl(sku.getPicUrl());
     }
 
-    List<AppCombinationActivityRespVO> convertAppList(List<CombinationActivityDO> list);
-
-    default List<AppCombinationActivityRespVO> convertAppList(List<CombinationActivityDO> list,
-                                                              List<CombinationProductDO> productList,
-                                                              List<ProductSpuRespDTO> spuList) {
-        List<AppCombinationActivityRespVO> activityList = convertAppList(list);
+    default List<CombinationActivityRespVO> convertList(List<CombinationActivityDO> list,
+                                                        List<CombinationProductDO> productList,
+                                                        List<ProductSpuRespDTO> spuList) {
+        List<CombinationActivityRespVO> activityList = BeanUtils.toBean(list, CombinationActivityRespVO.class);
         Map<Long, ProductSpuRespDTO> spuMap = convertMap(spuList, ProductSpuRespDTO::getId);
         Map<Long, List<CombinationProductDO>> productMap = convertMultiMap(productList, CombinationProductDO::getActivityId);
         return CollectionUtils.convertList(activityList, item -> {
             // 设置 product 信息
             item.setCombinationPrice(getMinValue(productMap.get(item.getId()), CombinationProductDO::getCombinationPrice));
             // 设置 SPU 信息
-            findAndThen(spuMap, item.getSpuId(), spu -> item.setPicUrl(spu.getPicUrl()).setMarketPrice(spu.getMarketPrice()));
+            findAndThen(spuMap, item.getSpuId(), spu -> item.setSpuName(spu.getName())
+                    .setPicUrl(spu.getPicUrl()).setMarketPrice(spu.getMarketPrice()));
             return item;
         });
     }
 
-    PageResult<AppCombinationActivityRespVO> convertAppPage(PageResult<CombinationActivityDO> result);
+    default List<AppCombinationActivityRespVO> convertAppList(List<CombinationActivityDO> list,
+                                                              List<CombinationProductDO> productList,
+                                                              List<ProductSpuRespDTO> spuList) {
+        List<AppCombinationActivityRespVO> activityList = BeanUtils.toBean(list, AppCombinationActivityRespVO.class);
+        Map<Long, ProductSpuRespDTO> spuMap = convertMap(spuList, ProductSpuRespDTO::getId);
+        Map<Long, List<CombinationProductDO>> productMap = convertMultiMap(productList, CombinationProductDO::getActivityId);
+        return CollectionUtils.convertList(activityList, item -> {
+            // 设置 product 信息
+            item.setCombinationPrice(getMinValue(productMap.get(item.getId()), CombinationProductDO::getCombinationPrice));
+            // 设置 SPU 信息
+            findAndThen(spuMap, item.getSpuId(), spu -> item.setSpuName(spu.getName())
+                    .setPicUrl(spu.getPicUrl()).setMarketPrice(spu.getMarketPrice()));
+            return item;
+        });
+    }
 
     default PageResult<AppCombinationActivityRespVO> convertAppPage(PageResult<CombinationActivityDO> result,
                                                                     List<CombinationProductDO> productList,
                                                                     List<ProductSpuRespDTO> spuList) {
-        PageResult<AppCombinationActivityRespVO> appPage = convertAppPage(result);
-        Map<Long, ProductSpuRespDTO> spuMap = convertMap(spuList, ProductSpuRespDTO::getId);
-        Map<Long, List<CombinationProductDO>> productMap = convertMultiMap(productList, CombinationProductDO::getActivityId);
-        List<AppCombinationActivityRespVO> list = CollectionUtils.convertList(appPage.getList(), item -> {
-            // 设置 product 信息
-            item.setCombinationPrice(getMinValue(productMap.get(item.getId()), CombinationProductDO::getCombinationPrice));
-            // 设置 SPU 信息
-            findAndThen(spuMap, item.getSpuId(), spu -> item.setPicUrl(spu.getPicUrl()).setMarketPrice(spu.getMarketPrice()));
-            return item;
-        });
-        appPage.setList(list);
-        return appPage;
+        return new PageResult<>(convertAppList(result.getList(), productList, spuList), result.getTotal());
     }
 
     AppCombinationActivityDetailRespVO convert2(CombinationActivityDO combinationActivity);

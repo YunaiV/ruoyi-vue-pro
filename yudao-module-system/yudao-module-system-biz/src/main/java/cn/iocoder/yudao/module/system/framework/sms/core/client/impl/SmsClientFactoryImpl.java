@@ -59,7 +59,7 @@ public class SmsClientFactoryImpl implements SmsClientFactory {
     }
 
     @Override
-    public void createOrUpdateSmsClient(SmsChannelProperties properties) {
+    public SmsClient createOrUpdateSmsClient(SmsChannelProperties properties) {
         AbstractSmsClient client = channelIdClients.get(properties.getId());
         if (client == null) {
             client = this.createSmsClient(properties);
@@ -68,6 +68,7 @@ public class SmsClientFactoryImpl implements SmsClientFactory {
         } else {
             client.refresh(properties);
         }
+        return client;
     }
 
     private AbstractSmsClient createSmsClient(SmsChannelProperties properties) {
@@ -79,6 +80,7 @@ public class SmsClientFactoryImpl implements SmsClientFactory {
             case DEBUG_DING_TALK: return new DebugDingTalkSmsClient(properties);
             case TENCENT: return new TencentSmsClient(properties);
             case HUAWEI: return  new HuaweiSmsClient(properties);
+            case QINIU: return new QiniuSmsClient(properties);
         }
         // 创建失败，错误日志 + 抛出异常
         log.error("[createSmsClient][配置({}) 找不到合适的客户端实现]", properties);

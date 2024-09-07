@@ -3,6 +3,8 @@ package cn.iocoder.yudao.module.trade.service.order.handler;
 import cn.hutool.core.lang.Assert;
 import cn.iocoder.yudao.module.promotion.api.combination.CombinationRecordApi;
 import cn.iocoder.yudao.module.promotion.api.combination.dto.CombinationRecordCreateRespDTO;
+import cn.iocoder.yudao.module.promotion.api.combination.dto.CombinationRecordRespDTO;
+import cn.iocoder.yudao.module.promotion.enums.combination.CombinationRecordStatusEnum;
 import cn.iocoder.yudao.module.trade.convert.order.TradeOrderConvert;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderDO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderItemDO;
@@ -84,7 +86,9 @@ public class TradeCombinationOrderHandler implements TradeOrderHandler {
             return;
         }
         // 校验订单拼团是否成功
-        if (!combinationRecordApi.isCombinationRecordSuccess(order.getUserId(), order.getId())) {
+        CombinationRecordRespDTO combinationRecord = combinationRecordApi.getCombinationRecordByOrderId(order.getUserId(), order.getId());
+        Assert.notNull(combinationRecord, "订单({})对应的拼团记录不存在", order.getId());
+        if (!CombinationRecordStatusEnum.isSuccess(combinationRecord.getStatus())) {
             throw exception(ORDER_DELIVERY_FAIL_COMBINATION_RECORD_STATUS_NOT_SUCCESS);
         }
     }

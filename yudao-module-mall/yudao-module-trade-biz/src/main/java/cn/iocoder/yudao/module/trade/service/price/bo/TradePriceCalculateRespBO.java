@@ -5,7 +5,9 @@ import cn.iocoder.yudao.module.promotion.enums.common.PromotionTypeEnum;
 import cn.iocoder.yudao.module.trade.enums.order.TradeOrderTypeEnum;
 import lombok.Data;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 价格计算 Response BO
@@ -44,9 +46,13 @@ public class TradePriceCalculateRespBO {
     private List<Promotion> promotions;
 
     /**
-     * 优惠劵编号
+     * 使用的优惠劵编号
      */
     private Long couponId;
+    /**
+     * 用户的优惠劵列表（可用 + 不可用）
+     */
+    private List<Coupon> coupons;
 
     /**
      * 会员剩余积分
@@ -66,6 +72,21 @@ public class TradePriceCalculateRespBO {
      * 砍价活动编号
      */
     private Long bargainActivityId;
+
+    /**
+     * 是否包邮
+     */
+    private Boolean freeDelivery;
+
+    /**
+     * 赠送的优惠劵
+     *
+     * key: 优惠劵模版编号
+     * value：对应的优惠券数量
+     *
+     * 目的：用于订单支付后赠送优惠券
+     */
+    private Map<Long, Integer> giveCouponTemplateCounts;
 
     /**
      * 订单价格
@@ -213,8 +234,19 @@ public class TradePriceCalculateRespBO {
          */
         private Long categoryId;
 
+        // ========== 物流相关字段 =========
+
         /**
-         * 运费模板 Id
+         * 配送方式数组
+         *
+         * 对应 DeliveryTypeEnum 枚举
+         */
+        private List<Integer> deliveryTypes;
+
+        /**
+         * 物流配置模板编号
+         *
+         * 对应 TradeDeliveryExpressTemplateDO 的 id 编号
          */
         private Long deliveryTemplateId;
 
@@ -234,7 +266,7 @@ public class TradePriceCalculateRespBO {
         private List<ProductPropertyValueDetailRespDTO> properties;
 
         /**
-         * 使用的积分
+         * 赠送的积分
          */
         private Integer givePoint;
 
@@ -311,5 +343,63 @@ public class TradePriceCalculateRespBO {
         private Integer discountPrice;
 
     }
+
+    /**
+     * 优惠劵信息
+     */
+    @Data
+    public static class Coupon {
+
+        /**
+         * 优惠劵编号
+         */
+        private Long id;
+        /**
+         * 优惠劵名
+         */
+        private String name;
+
+        /**
+         * 是否设置满多少金额可用，单位：分
+         */
+        private Integer usePrice;
+
+        /**
+         * 生效开始时间
+         */
+        private LocalDateTime validStartTime;
+        /**
+         * 生效结束时间
+         */
+        private LocalDateTime validEndTime;
+
+        /**
+         * 优惠类型
+         */
+        private Integer discountType;
+        /**
+         * 折扣百分比
+         */
+        private Integer discountPercent;
+        /**
+         * 优惠金额，单位：分
+         */
+        private Integer discountPrice;
+        /**
+         * 折扣上限，单位：分
+         */
+        private Integer discountLimitPrice;
+
+        /**
+         * 是否匹配
+         */
+        private Boolean match;
+        /**
+         * 不匹配的原因
+         */
+        private String mismatchReason;
+
+    }
+
 
 }

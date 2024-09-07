@@ -57,9 +57,6 @@ public class SmsChannelServiceTest extends BaseDbUnitTest {
         // 校验记录的属性是否正确
         SmsChannelDO smsChannel = smsChannelMapper.selectById(smsChannelId);
         assertPojoEquals(reqVO, smsChannel, "id");
-        // 断言 cache
-        assertNull(smsChannelService.getIdClientCache().getIfPresent(smsChannel.getId()));
-        assertNull(smsChannelService.getCodeClientCache().getIfPresent(smsChannel.getCode()));
     }
 
     @Test
@@ -79,9 +76,6 @@ public class SmsChannelServiceTest extends BaseDbUnitTest {
         // 校验是否更新正确
         SmsChannelDO smsChannel = smsChannelMapper.selectById(reqVO.getId()); // 获取最新的
         assertPojoEquals(reqVO, smsChannel);
-        // 断言 cache
-        assertNull(smsChannelService.getIdClientCache().getIfPresent(smsChannel.getId()));
-        assertNull(smsChannelService.getCodeClientCache().getIfPresent(smsChannel.getCode()));
     }
 
     @Test
@@ -105,9 +99,6 @@ public class SmsChannelServiceTest extends BaseDbUnitTest {
         smsChannelService.deleteSmsChannel(id);
         // 校验数据不存在了
         assertNull(smsChannelMapper.selectById(id));
-        // 断言 cache
-        assertNull(smsChannelService.getIdClientCache().getIfPresent(dbSmsChannel.getId()));
-        assertNull(smsChannelService.getCodeClientCache().getIfPresent(dbSmsChannel.getCode()));
     }
 
     @Test
@@ -196,29 +187,23 @@ public class SmsChannelServiceTest extends BaseDbUnitTest {
         // mock 数据
         SmsChannelDO channel = randomPojo(SmsChannelDO.class);
         smsChannelMapper.insert(channel);
-        // mock 参数
+        // 准备参数
         Long id = channel.getId();
         // mock 方法
         SmsClient mockClient = mock(SmsClient.class);
-        when(smsClientFactory.getSmsClient(eq(id))).thenReturn(mockClient);
+        SmsChannelProperties properties = BeanUtils.toBean(channel, SmsChannelProperties.class);
+        when(smsClientFactory.createOrUpdateSmsClient(eq(properties))).thenReturn(mockClient);
 
         // 调用
         SmsClient client = smsChannelService.getSmsClient(id);
         // 断言
         assertSame(client, mockClient);
-        verify(smsClientFactory).createOrUpdateSmsClient(argThat(arg -> {
-            SmsChannelProperties properties = BeanUtils.toBean(channel, SmsChannelProperties.class);
-            return properties.equals(arg);
-        }));
     }
 
     @Test
     public void testGetSmsClient_code() {
-        // mock 数据
-        SmsChannelDO channel = randomPojo(SmsChannelDO.class);
-        smsChannelMapper.insert(channel);
-        // mock 参数
-        String code = channel.getCode();
+        // 准备参数
+        String code = randomString();
         // mock 方法
         SmsClient mockClient = mock(SmsClient.class);
         when(smsClientFactory.getSmsClient(eq(code))).thenReturn(mockClient);
@@ -227,10 +212,6 @@ public class SmsChannelServiceTest extends BaseDbUnitTest {
         SmsClient client = smsChannelService.getSmsClient(code);
         // 断言
         assertSame(client, mockClient);
-        verify(smsClientFactory).createOrUpdateSmsClient(argThat(arg -> {
-            SmsChannelProperties properties = BeanUtils.toBean(channel, SmsChannelProperties.class);
-            return properties.equals(arg);
-        }));
     }
 
 }

@@ -96,7 +96,7 @@ public class BrokerageWithdrawServiceImpl implements BrokerageWithdrawService {
         Map<String, Object> templateParams = MapUtil.<String, Object>builder()
                 .put("createTime", LocalDateTimeUtil.formatNormal(withdraw.getCreateTime()))
                 .put("price", MoneyUtils.fenToYuanStr(withdraw.getPrice()))
-                .put("reason", withdraw.getAuditReason())
+                .put("reason", auditReason)
                 .build();
         notifyMessageSendApi.sendSingleMessageToMember(new NotifySendSingleToUserReqDTO()
                 .setUserId(withdraw.getUserId()).setTemplateCode(templateCode).setTemplateParams(templateParams));

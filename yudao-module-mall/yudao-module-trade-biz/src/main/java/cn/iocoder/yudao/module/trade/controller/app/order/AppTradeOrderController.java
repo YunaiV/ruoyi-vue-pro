@@ -80,6 +80,7 @@ public class AppTradeOrderController {
     @GetMapping("/get-detail")
     @Operation(summary = "获得交易订单")
     @Parameter(name = "id", description = "交易订单编号")
+    @PreAuthenticated
     public CommonResult<AppTradeOrderDetailRespVO> getOrder(@RequestParam("id") Long id) {
         // 查询订单
         TradeOrderDO order = tradeOrderQueryService.getOrder(getLoginUserId(), id);
@@ -99,6 +100,7 @@ public class AppTradeOrderController {
     @GetMapping("/get-express-track-list")
     @Operation(summary = "获得交易订单的物流轨迹")
     @Parameter(name = "id", description = "交易订单编号")
+    @PreAuthenticated
     public CommonResult<List<AppOrderExpressTrackRespDTO>> getOrderExpressTrackList(@RequestParam("id") Long id) {
         return success(TradeOrderConvert.INSTANCE.convertList02(
                 tradeOrderQueryService.getExpressTrackList(id, getLoginUserId())));
@@ -106,6 +108,7 @@ public class AppTradeOrderController {
 
     @GetMapping("/page")
     @Operation(summary = "获得交易订单分页")
+    @PreAuthenticated
     public CommonResult<PageResult<AppTradeOrderPageItemRespVO>> getOrderPage(AppTradeOrderPageReqVO reqVO) {
         // 查询订单
         PageResult<TradeOrderDO> pageResult = tradeOrderQueryService.getOrderPage(getLoginUserId(), reqVO);
@@ -118,6 +121,7 @@ public class AppTradeOrderController {
 
     @GetMapping("/get-count")
     @Operation(summary = "获得交易订单数量")
+    @PreAuthenticated
     public CommonResult<Map<String, Long>> getOrderCount() {
         Map<String, Long> orderCount = Maps.newLinkedHashMapWithExpectedSize(5);
         // 全部
@@ -142,6 +146,7 @@ public class AppTradeOrderController {
     @PutMapping("/receive")
     @Operation(summary = "确认交易订单收货")
     @Parameter(name = "id", description = "交易订单编号")
+    @PreAuthenticated
     public CommonResult<Boolean> receiveOrder(@RequestParam("id") Long id) {
         tradeOrderUpdateService.receiveOrderByMember(getLoginUserId(), id);
         return success(true);
@@ -150,6 +155,7 @@ public class AppTradeOrderController {
     @DeleteMapping("/cancel")
     @Operation(summary = "取消交易订单")
     @Parameter(name = "id", description = "交易订单编号")
+    @PreAuthenticated
     public CommonResult<Boolean> cancelOrder(@RequestParam("id") Long id) {
         tradeOrderUpdateService.cancelOrderByMember(getLoginUserId(), id);
         return success(true);
@@ -158,6 +164,7 @@ public class AppTradeOrderController {
     @DeleteMapping("/delete")
     @Operation(summary = "删除交易订单")
     @Parameter(name = "id", description = "交易订单编号")
+    @PreAuthenticated
     public CommonResult<Boolean> deleteOrder(@RequestParam("id") Long id) {
         tradeOrderUpdateService.deleteOrder(getLoginUserId(), id);
         return success(true);
@@ -168,6 +175,7 @@ public class AppTradeOrderController {
     @GetMapping("/item/get")
     @Operation(summary = "获得交易订单项")
     @Parameter(name = "id", description = "交易订单项编号")
+    @PreAuthenticated
     public CommonResult<AppTradeOrderItemRespVO> getOrderItem(@RequestParam("id") Long id) {
         TradeOrderItemDO item = tradeOrderQueryService.getOrderItem(getLoginUserId(), id);
         return success(TradeOrderConvert.INSTANCE.convert03(item));
@@ -175,6 +183,7 @@ public class AppTradeOrderController {
 
     @PostMapping("/item/create-comment")
     @Operation(summary = "创建交易订单项的评价")
+    @PreAuthenticated
     public CommonResult<Long> createOrderItemComment(@RequestBody AppTradeOrderItemCommentCreateReqVO createReqVO) {
         return success(tradeOrderUpdateService.createOrderItemCommentByMember(getLoginUserId(), createReqVO));
     }

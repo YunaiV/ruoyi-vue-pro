@@ -18,6 +18,8 @@ import cn.iocoder.yudao.module.member.api.address.dto.MemberAddressRespDTO;
 import cn.iocoder.yudao.module.pay.api.order.PayOrderApi;
 import cn.iocoder.yudao.module.pay.api.order.dto.PayOrderCreateReqDTO;
 import cn.iocoder.yudao.module.pay.api.order.dto.PayOrderRespDTO;
+import cn.iocoder.yudao.module.pay.api.refund.PayRefundApi;
+import cn.iocoder.yudao.module.pay.api.refund.dto.PayRefundCreateReqDTO;
 import cn.iocoder.yudao.module.pay.enums.order.PayOrderStatusEnum;
 import cn.iocoder.yudao.module.product.api.comment.ProductCommentApi;
 import cn.iocoder.yudao.module.product.api.comment.dto.ProductCommentCreateReqDTO;
@@ -111,6 +113,8 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
     private ProductCommentApi productCommentApi;
     @Resource
     public SocialClientApi socialClientApi;
+    @Resource
+    public PayRefundApi payRefundApi;
 
     @Resource
     private TradeOrderProperties tradeOrderProperties;
@@ -197,6 +201,8 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
         order.setRefundStatus(TradeOrderRefundStatusEnum.NONE.getStatus());
         order.setProductCount(getSumValue(calculateRespBO.getItems(), TradePriceCalculateRespBO.OrderItem::getCount, Integer::sum));
         order.setUserIp(getClientIP()).setTerminal(getTerminal());
+        // 使用 + 赠送优惠券
+        order.setGiveCouponTemplateCounts(calculateRespBO.getGiveCouponTemplateCounts());
         // 支付 + 退款信息
         order.setAdjustPrice(0).setPayStatus(false);
         order.setRefundStatus(TradeOrderRefundStatusEnum.NONE.getStatus()).setRefundPrice(0);
@@ -854,15 +860,46 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void cancelPaidOrder(Long userId, Long orderId) {
-        // TODO @puhui999：需要校验状态；已支付的情况下，才可以。
+    public void cancelPaidOrder(Long userId, Long orderId, Integer cancelType) {
+        // 1.1 这里校验下 cancelType 只允许拼团关闭；
+        if (ObjUtil.notEqual(TradeOrderCancelTypeEnum.COMBINATION_CLOSE.getType(), cancelType)) {
+            return;
+        }
+        // 1.2 检验订单存在
         TradeOrderDO order = tradeOrderMapper.selectOrderByIdAndUserId(orderId, userId);
         if (order == null) {
             throw exception(ORDER_NOT_FOUND);
         }
-        cancelOrder0(order, TradeOrderCancelTypeEnum.MEMBER_CANCEL);
 
-        // TODO @puhui999：需要退款
+        // 1.3 校验订单是否支付
+        if (!order.getPayStatus()) {
+            throw exception(ORDER_CANCEL_PAID_FAIL, "已支付");
+        }
+        // 1.3 校验订单是否已退款
+        if (ObjUtil.equal(TradeOrderRefundStatusEnum.NONE.getStatus(), order.getRefundStatus())) {
+            throw exception(ORDER_CANCEL_PAID_FAIL, "未退款");
+        }
+
+        // 2.1 取消订单
+        cancelOrder0(order, TradeOrderCancelTypeEnum.COMBINATION_CLOSE);
+        // 2.2 创建退款单
+        payRefundApi.createRefund(new PayRefundCreateReqDTO()
+                .setAppKey(tradeOrderProperties.getPayAppKey()).setUserIp(getClientIP()) // 支付应用
+                .setMerchantOrderId(String.valueOf(order.getId())) // 支付单号
+                .setMerchantRefundId(String.valueOf(order.getId()))
+                .setReason(TradeOrderCancelTypeEnum.COMBINATION_CLOSE.getName()).setPrice(order.getPayPrice())); // 价格信息
+    }
+
+    @Override
+    public void updateOrderGiveCouponIds(Long userId, Long orderId, List<Long> giveCouponIds) {
+        // 1. 检验订单存在
+        TradeOrderDO order = tradeOrderMapper.selectOrderByIdAndUserId(orderId, userId);
+        if (order == null) {
+            throw exception(ORDER_NOT_FOUND);
+        }
+
+        // 2. 更新订单赠送的优惠券编号列表
+        tradeOrderMapper.updateById(new TradeOrderDO().setId(orderId).setGiveCouponIds(giveCouponIds));
     }
 
     /**

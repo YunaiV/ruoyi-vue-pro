@@ -56,7 +56,7 @@ public class OAuth2TokenServiceImpl implements OAuth2TokenService {
     private AdminUserService adminUserService;
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public OAuth2AccessTokenDO createAccessToken(Long userId, Integer userType, String clientId, List<String> scopes) {
         OAuth2ClientDO clientDO = oauth2ClientService.validOAuthClientFromCache(clientId);
         // 创建刷新令牌
@@ -66,6 +66,7 @@ public class OAuth2TokenServiceImpl implements OAuth2TokenService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public OAuth2AccessTokenDO refreshAccessToken(String refreshToken, String clientId) {
         // 查询访问令牌
         OAuth2RefreshTokenDO refreshTokenDO = oauth2RefreshTokenMapper.selectByRefreshToken(refreshToken);
@@ -82,7 +83,7 @@ public class OAuth2TokenServiceImpl implements OAuth2TokenService {
         // 移除相关的访问令牌
         List<OAuth2AccessTokenDO> accessTokenDOs = oauth2AccessTokenMapper.selectListByRefreshToken(refreshToken);
         if (CollUtil.isNotEmpty(accessTokenDOs)) {
-            oauth2AccessTokenMapper.deleteBatchIds(convertSet(accessTokenDOs, OAuth2AccessTokenDO::getId));
+            oauth2AccessTokenMapper.deleteByIds(convertSet(accessTokenDOs, OAuth2AccessTokenDO::getId));
             oauth2AccessTokenRedisDAO.deleteList(convertSet(accessTokenDOs, OAuth2AccessTokenDO::getAccessToken));
         }
 
@@ -126,6 +127,7 @@ public class OAuth2TokenServiceImpl implements OAuth2TokenService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public OAuth2AccessTokenDO removeAccessToken(String accessToken) {
         // 删除访问令牌
         OAuth2AccessTokenDO accessTokenDO = oauth2AccessTokenMapper.selectByAccessToken(accessToken);

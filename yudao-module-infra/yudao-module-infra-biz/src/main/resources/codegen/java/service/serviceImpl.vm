@@ -286,6 +286,7 @@ public class ${table.className}ServiceImpl implements ${table.className}Service 
         // 校验存在
         validate${subSimpleClassName}Exists(${subClassNameVar}.getId());
         // 更新
+        ${subClassNameVar}.setUpdater(null).setUpdateTime(null); // 解决更新情况下：updateTime 不更新
         ${subClassNameVars.get($index)}Mapper.updateById(${subClassNameVar});
     }
 

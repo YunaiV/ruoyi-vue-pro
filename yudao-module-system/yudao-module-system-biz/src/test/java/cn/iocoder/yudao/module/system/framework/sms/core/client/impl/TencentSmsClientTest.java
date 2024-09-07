@@ -78,7 +78,7 @@ public class TencentSmsClientTest extends BaseMockitoUnitTest {
     }
 
     @Test
-    public void testDoSendSms_fail() throws Throwable {
+    public void testDoSendSms_fail_01() throws Throwable {
         try (MockedStatic<HttpUtils> httpUtilsMockedStatic = mockStatic(HttpUtils.class)) {
             // 准备参数
             Long sendLogId = randomLongId();
@@ -114,6 +114,31 @@ public class TencentSmsClientTest extends BaseMockitoUnitTest {
             assertEquals("5000:1045710669157053657849499619", result.getSerialNo());
             assertEquals("a0aabda6-cf91-4f3e-a81f-9198114a2279", result.getApiRequestId());
             assertEquals("send success", result.getApiMsg());
+        }
+    }
+
+    @Test
+    public void testDoSendSms_fail_02() throws Throwable {
+        try (MockedStatic<HttpUtils> httpUtilsMockedStatic = mockStatic(HttpUtils.class)) {
+            // 准备参数
+            Long sendLogId = randomLongId();
+            String mobile = randomString();
+            String apiTemplateId = randomString();
+            List<KeyValue<String, Object>> templateParams = Lists.newArrayList(
+                    new KeyValue<>("1", 1234), new KeyValue<>("2", "login"));
+
+            // mock 方法
+            httpUtilsMockedStatic.when(() -> HttpUtils.post(anyString(), anyMap(), anyString()))
+                    .thenReturn("{\"Response\":{\"Error\":{\"Code\":\"AuthFailure.SecretIdNotFound\",\"Message\":\"The SecretId is not found, please ensure that your SecretId is correct.\"},\"RequestId\":\"2a88f82a-261c-4ac6-9fa9-c7d01aaa486a\"}}");
+
+            // 调用
+            SmsSendRespDTO result = smsClient.sendSms(sendLogId, mobile,
+                    apiTemplateId, templateParams);
+            // 断言
+            assertFalse(result.getSuccess());
+            assertEquals("2a88f82a-261c-4ac6-9fa9-c7d01aaa486a", result.getApiRequestId());
+            assertEquals("AuthFailure.SecretIdNotFound", result.getApiCode());
+            assertEquals("The SecretId is not found, please ensure that your SecretId is correct.", result.getApiMsg());
         }
     }
 

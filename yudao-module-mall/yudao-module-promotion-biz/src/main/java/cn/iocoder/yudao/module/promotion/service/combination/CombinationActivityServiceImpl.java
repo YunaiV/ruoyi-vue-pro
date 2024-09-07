@@ -226,11 +226,6 @@ public class CombinationActivityServiceImpl implements CombinationActivityServic
     }
 
     @Override
-    public List<CombinationActivityDO> getCombinationActivityListByCount(Integer count) {
-        return combinationActivityMapper.selectListByStatus(CommonStatusEnum.ENABLE.getStatus(), count);
-    }
-
-    @Override
     public PageResult<CombinationActivityDO> getCombinationActivityPage(PageParam pageParam) {
         return combinationActivityMapper.selectPage(pageParam, CommonStatusEnum.ENABLE.getStatus());
     }
