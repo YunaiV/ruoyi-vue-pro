@@ -10,6 +10,7 @@ import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
+// TODO @芋艿：详细再瞅瞅
 /**
  * 用于处理MQTT连接的回调，如连接断开、消息到达、消息发布完成、连接完成等事件。
  *

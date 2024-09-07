@@ -1,4 +1,6 @@
 /**
- * iot API 包，定义暴露给其它模块的 API
+ * 占位
+ *
+ * TODO 芋艿：后续删除
  */
 package cn.iocoder.yudao.module.iot.api;

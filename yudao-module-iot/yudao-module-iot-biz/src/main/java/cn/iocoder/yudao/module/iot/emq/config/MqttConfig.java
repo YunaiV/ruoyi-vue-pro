@@ -4,6 +4,8 @@ import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
+// TODO @芋艿：详细再瞅瞅
+
 /**
  * 配置类，用于读取MQTT连接的配置信息，如用户名、密码、连接地址等
  *

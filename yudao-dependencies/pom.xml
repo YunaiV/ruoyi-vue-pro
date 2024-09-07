@@ -622,7 +622,7 @@
                 <version>${xercesImpl.version}</version>
             </dependency>
 
-            <!-- mqtt -->
+            <!-- MQTT -->
             <dependency>
                 <groupId>org.eclipse.paho</groupId>
                 <artifactId>org.eclipse.paho.client.mqttv3</artifactId>

@@ -10,7 +10,7 @@ import org.apache.ibatis.annotations.Mapper;
 /**
  * iot 产品 Mapper
  *
- * @author 芋道源码
+ * @author ahh
  */
 @Mapper
 public interface ProductMapper extends BaseMapperX<ProductDO> {

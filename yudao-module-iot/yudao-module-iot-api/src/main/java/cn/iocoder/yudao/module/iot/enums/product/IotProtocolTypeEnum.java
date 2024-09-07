@@ -8,7 +8,8 @@ import java.util.Arrays;
 
 /**
  * IOT 接入网关协议枚举类
- * 接入网关协议, 0: 自定义, 1: Modbus, 2: OPC UA, 3: ZigBee, 4: BLE
+ *
+ * @author ahh
  */
 @AllArgsConstructor
 @Getter
@@ -20,18 +21,16 @@ public enum IotProtocolTypeEnum implements IntArrayValuable {
     ZIGBEE(3, "ZigBee"),
     BLE(4, "BLE");
 
+    public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(IotProtocolTypeEnum::getType).toArray();
 
     /**
      * 类型
      */
     private final Integer type;
-
     /**
      * 描述
      */
     private final String description;
-
-    public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(IotProtocolTypeEnum::getType).toArray();
 
     @Override
     public int[] array() {

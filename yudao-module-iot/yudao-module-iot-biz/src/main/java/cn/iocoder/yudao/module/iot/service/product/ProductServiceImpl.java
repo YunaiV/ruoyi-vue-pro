@@ -21,7 +21,7 @@ import static cn.iocoder.yudao.module.iot.enums.ErrorCodeConstants.PRODUCT_STATU
 /**
  * IOT 产品 Service 实现类
  *
- * @author 芋道源码
+ * @author ahh
  */
 @Service
 @Validated
@@ -37,7 +37,6 @@ public class ProductServiceImpl implements ProductService {
         // 插入
         ProductDO product = BeanUtils.toBean(createReqVO, ProductDO.class);
         productMapper.insert(product);
-        // 返回
         return product.getId();
     }
 
@@ -47,6 +46,7 @@ public class ProductServiceImpl implements ProductService {
      * @param createReqVO 创建信息
      */
     private void createProductKey(ProductSaveReqVO createReqVO) {
+        // TODO @haohao：应该前端没传递的时候，才生成哇？ps：需要校验下唯一性，万一有重复；
         // 生成随机的 11 位字符串
         String productKey = UUID.randomUUID().toString().replace("-", "").substring(0, 11);
         createReqVO.setProductKey(productKey);
@@ -54,8 +54,10 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public void updateProduct(ProductSaveReqVO updateReqVO) {
+        updateReqVO.setProductKey(null); // 不更新产品标识
         // 校验存在
         validateProductExists(updateReqVO.getId());
+        // TODO @haohao：如果已经发布，允许编辑么？
         // 更新
         ProductDO updateObj = BeanUtils.toBean(updateReqVO, ProductDO.class);
         productMapper.updateById(updateObj);
@@ -63,11 +65,12 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public void deleteProduct(Long id) {
-        // 校验存在
+        // TODO @haohao：这里最好只查询一次哈
+        // 1.1 校验存在
         validateProductExists(id);
-        // 发布状态不可删除
+        // 1.2 发布状态不可删除
         validateProductStatus(id);
-        // 删除
+        // 2. 删除
         productMapper.deleteById(id);
     }
 

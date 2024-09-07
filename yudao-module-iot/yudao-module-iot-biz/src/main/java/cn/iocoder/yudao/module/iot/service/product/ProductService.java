@@ -9,7 +9,7 @@ import jakarta.validation.Valid;
 /**
  * IOT 产品 Service 接口
  *
- * @author 芋道源码
+ * @author ahh
  */
 public interface ProductService {
 

@@ -7,8 +7,9 @@ import lombok.Getter;
 import java.util.Arrays;
 
 /**
- * IOT 产品设备类型
- * 设备类型, 0: 直连设备, 1: 网关子设备, 2: 网关设备
+ * IOT 产品的设备类型
+ *
+ * @author ahh
  */
 @AllArgsConstructor
 @Getter

@@ -19,6 +19,7 @@
     <name>${project.artifactId}</name>
     <description>
         物联网模块
+        <!-- TODO 芋艿：需要补充下说明！ -->
     </description>
 
 </project>

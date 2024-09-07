@@ -15,9 +15,10 @@
     <name>${project.artifactId}</name>
     <description>
         物联网 模块，主要实现 产品管理、设备管理、协议管理等功能。
+        <!-- TODO 芋艿：后续补充下 -->
     </description>
 
-    <dependencies>  <!-- 5. 新增依赖，这里引入的都是比较常用的业务组件、技术组件 -->
+    <dependencies>
         <dependency>
             <groupId>cn.iocoder.boot</groupId>
             <artifactId>yudao-module-iot-api</artifactId>
@@ -53,7 +54,7 @@
             <artifactId>yudao-spring-boot-starter-excel</artifactId>
         </dependency>
 
-        <!-- mqtt -->
+        <!-- MQTT -->
         <dependency>
             <groupId>org.eclipse.paho</groupId>
             <artifactId>org.eclipse.paho.client.mqttv3</artifactId>

@@ -4,9 +4,12 @@ import cn.iocoder.yudao.framework.common.core.IntArrayValuable;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
+import java.util.Arrays;
+
 /**
- * IOT 产品状态枚举类
- * 产品状态, 0: 开发中, 1: 已发布
+ * IOT 产品的状态枚举类
+ *
+ * @author ahh
  */
 @AllArgsConstructor
 @Getter
@@ -15,20 +18,20 @@ public enum IotProductStatusEnum implements IntArrayValuable {
     UNPUBLISHED(0, "开发中"),
     PUBLISHED(1, "已发布");
 
+    public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(IotProductStatusEnum::getType).toArray();
+
     /**
      * 类型
      */
     private final Integer type;
-
     /**
      * 描述
      */
     private final String description;
 
-    public static final int[] ARRAYS = {1, 2};
-
     @Override
     public int[] array() {
         return ARRAYS;
     }
+
 }
