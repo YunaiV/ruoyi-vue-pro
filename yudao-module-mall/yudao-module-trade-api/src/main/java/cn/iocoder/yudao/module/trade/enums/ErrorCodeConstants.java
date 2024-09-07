@@ -51,6 +51,7 @@ public interface ErrorCodeConstants {
     ErrorCode AFTER_SALE_REFUND_FAIL_STATUS_NOT_WAIT_REFUND = new ErrorCode(1_011_000_110, "退款失败，售后单状态不是【待退款】");
     ErrorCode AFTER_SALE_CANCEL_FAIL_STATUS_NOT_APPLY_OR_AGREE_OR_BUYER_DELIVERY =
             new ErrorCode(1_011_000_111, "取消售后单失败，售后单状态不是【待审核】或【卖家同意】或【商家待收货】");
+    ErrorCode AFTER_SALE_CREATE_FAIL_ORDER_STATUS_COMBINATION_IN_PROGRESS = new ErrorCode(1_011_000_112, "订单拼团中，无法申请售后");
 
     // ========== Cart 模块 1-011-002-000 ==========
     ErrorCode CARD_ITEM_NOT_FOUND = new ErrorCode(1_011_002_000, "购物车项不存在");

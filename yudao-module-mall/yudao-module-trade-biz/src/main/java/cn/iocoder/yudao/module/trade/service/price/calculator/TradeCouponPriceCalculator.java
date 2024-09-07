@@ -43,7 +43,7 @@ public class TradeCouponPriceCalculator implements TradePriceCalculator {
     public void calculate(TradePriceCalculateReqBO param, TradePriceCalculateRespBO result) {
         // 只有【普通】订单，才允许使用优惠劵
         if (ObjectUtil.notEqual(result.getType(), TradeOrderTypeEnum.NORMAL.getType())) {
-            if (ObjectUtil.notEqual(result.getType(), TradeOrderTypeEnum.NORMAL.getType())) {
+            if (param.getCouponId() != null) {
                 throw exception(PRICE_CALCULATE_COUPON_NOT_MATCH_NORMAL_ORDER);
             }
             return;
