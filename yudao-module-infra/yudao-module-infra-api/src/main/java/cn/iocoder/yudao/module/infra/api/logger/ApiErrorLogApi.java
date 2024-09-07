@@ -1,9 +1,9 @@
 package cn.iocoder.yudao.module.infra.api.logger;
 
 import cn.iocoder.yudao.module.infra.api.logger.dto.ApiErrorLogCreateReqDTO;
-
-import jakarta.validation.Valid;
 import org.springframework.scheduling.annotation.Async;
+
+import javax.validation.Valid;
 
 /**
  * API 错误日志的 API 接口

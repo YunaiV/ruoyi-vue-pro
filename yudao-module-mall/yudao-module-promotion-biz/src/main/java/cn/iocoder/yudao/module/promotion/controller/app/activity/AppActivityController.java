@@ -24,15 +24,16 @@ import cn.iocoder.yudao.module.promotion.service.seckill.SeckillActivityService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.annotation.Resource;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.annotation.Resource;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
@@ -171,13 +172,13 @@ public class AppActivityController {
             // 情况二：指定商品参加
             if (PromotionProductScopeEnum.isSpu(rewardActivity.getProductScope())) {
                 List<Long> fSpuIds = spuList.stream().map(ProductSpuRespDTO::getId).filter(id ->
-                        rewardActivity.getProductScopeValues().contains(id)).toList();
+                        rewardActivity.getProductScopeValues().contains(id)).collect(Collectors.toList());
                 buildAppActivityRespVO(rewardActivity, fSpuIds, activityList);
             }
             // 情况三：指定商品类型参加
             if (PromotionProductScopeEnum.isCategory(rewardActivity.getProductScope())) {
                 List<Long> fSpuIds = spuList.stream().filter(spuItem -> rewardActivity.getProductScopeValues()
-                        .contains(spuItem.getCategoryId())).map(ProductSpuRespDTO::getId).toList();
+                        .contains(spuItem.getCategoryId())).map(ProductSpuRespDTO::getId).collect(Collectors.toList());
                 buildAppActivityRespVO(rewardActivity, fSpuIds, activityList);
             }
         }
