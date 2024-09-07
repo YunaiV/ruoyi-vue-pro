@@ -57,38 +57,11 @@ public class ErpController {
     //     esbService.test();
     // }
 
-    @PostMapping("/github-webhook")
-    public String webhook( 
-    ) {
-        return "hello";
-    }
-
     @GetMapping("/departmentTree")
     public ErpDepartment getEsbDepartmentTree() {
         return erpService.getEsbDepartmentTree(53111133l);
     }
 
-    @GetMapping("/getStyleSku")
-    public CommonResult<Page<ErpStyleSku>> getStyleSku(
-        ErpStyleSku styleSku,
-        Pageable pageable
-    ) {
-        return CommonResult.success(erpService.getStyleSku(styleSku, pageable));
-    }
-
-    @PostMapping("/saveStyleSku")
-    public Object saveStyleSku(
-        @RequestBody ErpStyleSku styleSku
-    ) {
-        if (erpService.saveStyleSku(styleSku)) {
-            var result = JsonUtils.newObject();
-            result.put("status", "200");
-            return result;
-        } else {
-            throw new RuntimeException("Add style sku failed");
-        }
-
-    }
 
 
 }
