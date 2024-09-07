@@ -51,10 +51,6 @@ public class AliyunSmsClient extends AbstractSmsClient {
     }
 
     @Override
-    protected void doInit() {
-    }
-
-    @Override
     public SmsSendRespDTO sendSms(Long sendLogId, String mobile, String apiTemplateId,
                                   List<KeyValue<String, Object>> templateParams) throws Throwable {
         Assert.notBlank(properties.getSignature(), "短信签名不能为空");
@@ -80,7 +76,7 @@ public class AliyunSmsClient extends AbstractSmsClient {
     @Override
     public List<SmsReceiveRespDTO> parseSmsReceiveStatus(String text) {
         JSONArray statuses = JSONUtil.parseArray(text);
-        // 字段参考
+        // 字段参考 https://help.aliyun.com/zh/sms/developer-reference/smsreport-2
         return convertList(statuses, status -> {
             JSONObject statusObj = (JSONObject) status;
             return new SmsReceiveRespDTO()
@@ -166,7 +162,8 @@ public class AliyunSmsClient extends AbstractSmsClient {
         String hashedRequestBody = DigestUtil.sha256Hex(requestBody);
 
         // 4. 构建 Authorization 签名
-        String canonicalRequest = "POST" + "\n" + "/" + "\n" + queryString + "\n" + canonicalHeaders + "\n" + signedHeaders + "\n" + hashedRequestBody;
+        String canonicalRequest = "POST" + "\n" + "/" + "\n" + queryString + "\n"
+                + canonicalHeaders + "\n" + signedHeaders + "\n" + hashedRequestBody;
         String hashedCanonicalRequest = DigestUtil.sha256Hex(canonicalRequest);
         String stringToSign = "ACS3-HMAC-SHA256" + "\n" + hashedCanonicalRequest;
         String signature = SecureUtil.hmacSha256(properties.getApiSecret()).digestHex(stringToSign); // 计算签名

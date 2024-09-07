@@ -268,11 +268,6 @@ public class BrokerageUserServiceImpl implements BrokerageUserService {
             return false;
         }
 
-        // 校验分佣模式：仅可后台手动设置推广员
-        // if (BrokerageEnabledConditionEnum.ADMIN.getCondition().equals(tradeConfig.getBrokerageEnabledCondition())) {
-        //     throw exception(BROKERAGE_BIND_CONDITION_ADMIN);
-        // }
-
         // 校验分销关系绑定模式
         if (BrokerageBindModeEnum.REGISTER.getMode().equals(tradeConfig.getBrokerageBindMode())) {
             // 判断是否为新用户：注册时间在 30 秒内的，都算新用户

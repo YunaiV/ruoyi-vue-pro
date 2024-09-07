@@ -25,6 +25,7 @@ import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.
 import static cn.iocoder.yudao.module.promotion.enums.ErrorCodeConstants.COUPON_NO_MATCH_MIN_PRICE;
 import static cn.iocoder.yudao.module.promotion.enums.ErrorCodeConstants.COUPON_NO_MATCH_SPU;
 import static cn.iocoder.yudao.module.trade.enums.ErrorCodeConstants.PRICE_CALCULATE_COUPON_NOT_MATCH_NORMAL_ORDER;
+import static cn.iocoder.yudao.module.trade.enums.ErrorCodeConstants.PRICE_CALCULATE_COUPON_PRICE_TOO_MUCH;
 
 /**
  * 优惠劵的 {@link TradePriceCalculator} 实现类
@@ -65,8 +66,9 @@ public class TradeCouponPriceCalculator implements TradePriceCalculator {
 
         // 3.1 计算可以优惠的金额
         Integer couponPrice = getCouponPrice(coupon, totalPayPrice);
-        Assert.isTrue(couponPrice < totalPayPrice,
-                "优惠劵({}) 的优惠金额({})，不能大于订单总金额({})", coupon.getId(), couponPrice, totalPayPrice);
+        if (couponPrice <= totalPayPrice) {
+            throw exception(PRICE_CALCULATE_COUPON_PRICE_TOO_MUCH);
+        }
         // 3.2 计算分摊的优惠金额
         List<Integer> divideCouponPrices = TradePriceCalculatorHelper.dividePrice(orderItems, couponPrice);
 

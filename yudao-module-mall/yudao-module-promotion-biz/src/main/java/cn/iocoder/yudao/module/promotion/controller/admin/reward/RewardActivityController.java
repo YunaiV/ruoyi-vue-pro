@@ -2,22 +2,21 @@ package cn.iocoder.yudao.module.promotion.controller.admin.reward;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.promotion.controller.admin.reward.vo.RewardActivityCreateReqVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.reward.vo.RewardActivityPageReqVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.reward.vo.RewardActivityRespVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.reward.vo.RewardActivityUpdateReqVO;
-import cn.iocoder.yudao.module.promotion.convert.reward.RewardActivityConvert;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.reward.RewardActivityDO;
 import cn.iocoder.yudao.module.promotion.service.reward.RewardActivityService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.annotation.Resource;
+import jakarta.validation.Valid;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-
-import jakarta.annotation.Resource;
-import jakarta.validation.Valid;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
@@ -69,7 +68,7 @@ public class RewardActivityController {
     @PreAuthorize("@ss.hasPermission('promotion:reward-activity:query')")
     public CommonResult<RewardActivityRespVO> getRewardActivity(@RequestParam("id") Long id) {
         RewardActivityDO rewardActivity = rewardActivityService.getRewardActivity(id);
-        return success(RewardActivityConvert.INSTANCE.convert(rewardActivity));
+        return success(BeanUtils.toBean(rewardActivity, RewardActivityRespVO.class));
     }
 
     @GetMapping("/page")
@@ -77,7 +76,7 @@ public class RewardActivityController {
     @PreAuthorize("@ss.hasPermission('promotion:reward-activity:query')")
     public CommonResult<PageResult<RewardActivityRespVO>> getRewardActivityPage(@Valid RewardActivityPageReqVO pageVO) {
         PageResult<RewardActivityDO> pageResult = rewardActivityService.getRewardActivityPage(pageVO);
-        return success(RewardActivityConvert.INSTANCE.convertPage(pageResult));
+        return success(BeanUtils.toBean(pageResult, RewardActivityRespVO.class));
     }
 
 }

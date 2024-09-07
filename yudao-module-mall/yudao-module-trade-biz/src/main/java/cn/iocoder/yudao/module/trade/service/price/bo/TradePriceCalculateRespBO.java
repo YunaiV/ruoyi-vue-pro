@@ -6,6 +6,7 @@ import cn.iocoder.yudao.module.trade.enums.order.TradeOrderTypeEnum;
 import lombok.Data;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * 价格计算 Response BO
@@ -66,6 +67,21 @@ public class TradePriceCalculateRespBO {
      * 砍价活动编号
      */
     private Long bargainActivityId;
+
+    /**
+     * 是否包邮
+     */
+    private Boolean freeDelivery;
+
+    /**
+     * 赠送的优惠劵
+     *
+     * key: 优惠劵模版编号
+     * value：对应的优惠券数量
+     *
+     * 目的：用于订单支付后赠送优惠券
+     */
+    private Map<Long, Integer> giveCouponTemplateCounts;
 
     /**
      * 订单价格
@@ -213,8 +229,19 @@ public class TradePriceCalculateRespBO {
          */
         private Long categoryId;
 
+        // ========== 物流相关字段 =========
+
         /**
-         * 运费模板 Id
+         * 配送方式数组
+         *
+         * 对应 DeliveryTypeEnum 枚举
+         */
+        private List<Integer> deliveryTypes;
+
+        /**
+         * 物流配置模板编号
+         *
+         * 对应 TradeDeliveryExpressTemplateDO 的 id 编号
          */
         private Long deliveryTemplateId;
 
@@ -234,7 +261,7 @@ public class TradePriceCalculateRespBO {
         private List<ProductPropertyValueDetailRespDTO> properties;
 
         /**
-         * 使用的积分
+         * 赠送的积分
          */
         private Integer givePoint;
 

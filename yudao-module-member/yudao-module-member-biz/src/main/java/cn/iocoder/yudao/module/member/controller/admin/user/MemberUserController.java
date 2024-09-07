@@ -18,12 +18,12 @@ import cn.iocoder.yudao.module.member.service.user.MemberUserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.annotation.Resource;
+import jakarta.validation.Valid;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import jakarta.annotation.Resource;
-import jakarta.validation.Valid;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
@@ -73,14 +73,6 @@ public class MemberUserController {
     public CommonResult<Boolean> updateUserPoint(@Valid @RequestBody MemberUserUpdatePointReqVO updateReqVO) {
         memberPointRecordService.createPointRecord(updateReqVO.getId(), updateReqVO.getPoint(),
                 MemberPointBizTypeEnum.ADMIN, String.valueOf(getLoginUserId()));
-        return success(true);
-    }
-
-    @PutMapping("/update-balance")
-    @Operation(summary = "更新会员用户余额")
-    @PreAuthorize("@ss.hasPermission('member:user:update-balance')")
-    public CommonResult<Boolean> updateUserBalance(@Valid @RequestBody Long id) {
-        // todo @jason：增加一个【修改余额】
         return success(true);
     }
 

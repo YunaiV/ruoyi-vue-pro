@@ -1,7 +1,11 @@
 package cn.iocoder.yudao.module.system.framework.sms.core.client.impl;
 
+import cn.hutool.core.date.format.FastDateFormat;
 import cn.hutool.core.lang.Assert;
+import cn.hutool.core.util.HexUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.crypto.digest.DigestUtil;
+import cn.hutool.crypto.digest.HmacAlgorithm;
 import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
@@ -14,12 +18,8 @@ import cn.iocoder.yudao.module.system.framework.sms.core.client.dto.SmsTemplateR
 import cn.iocoder.yudao.module.system.framework.sms.core.enums.SmsTemplateAuditStatusEnum;
 import cn.iocoder.yudao.module.system.framework.sms.core.property.SmsChannelProperties;
 import com.google.common.annotations.VisibleForTesting;
-import jakarta.xml.bind.DatatypeConverter;
 
-import javax.crypto.Mac;
-import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 import static cn.hutool.crypto.digest.DigestUtil.sha256Hex;
@@ -34,6 +34,7 @@ import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.
  */
 public class TencentSmsClient extends AbstractSmsClient {
 
+    private static final String HOST = "sms.tencentcloudapi.com";
     private static final String VERSION = "2021-01-11";
     private static final String REGION = "ap-guangzhou";
 
@@ -54,10 +55,6 @@ public class TencentSmsClient extends AbstractSmsClient {
         super(properties);
         Assert.notEmpty(properties.getApiSecret(), "apiSecret 不能为空");
         validateSdkAppId(properties);
-    }
-
-    @Override
-    protected void doInit() {
     }
 
     /**
@@ -93,7 +90,7 @@ public class TencentSmsClient extends AbstractSmsClient {
         body.put("PhoneNumberSet", new String[]{mobile});
         body.put("SmsSdkAppId", getSdkAppId());
         body.put("SignName", properties.getSignature());
-        body.put("TemplateId",apiTemplateId);
+        body.put("TemplateId", apiTemplateId);
         body.put("TemplateParamSet", ArrayUtils.toArray(templateParams, param -> String.valueOf(param.getValue())));
         JSONObject response = request("SendSms", body);
 
@@ -106,11 +103,11 @@ public class TencentSmsClient extends AbstractSmsClient {
                     .setApiCode(error.getStr("Code"))
                     .setApiMsg(error.getStr("Message"));
         }
-        JSONObject responseData = responseResult.getJSONArray("SendStatusSet").getJSONObject(0);
-        return new SmsSendRespDTO().setSuccess(Objects.equals(API_CODE_SUCCESS, responseData.getStr("Code")))
+        JSONObject sendResult = responseResult.getJSONArray("SendStatusSet").getJSONObject(0);
+        return new SmsSendRespDTO().setSuccess(Objects.equals(API_CODE_SUCCESS, sendResult.getStr("Code")))
                 .setApiRequestId(responseResult.getStr("RequestId"))
-                .setSerialNo(responseData.getStr("SerialNo"))
-                .setApiMsg(responseData.getStr("Message"));
+                .setSerialNo(sendResult.getStr("SerialNo"))
+                .setApiMsg(sendResult.getStr("Message"));
     }
 
     @Override
@@ -137,14 +134,13 @@ public class TencentSmsClient extends AbstractSmsClient {
         body.put("TemplateIdSet", new Integer[]{Integer.valueOf(apiTemplateId)});
         JSONObject response = request("DescribeSmsTemplateList", body);
 
-        // TODO @scholar：会有请求失败的情况么？类似发送的（那块逻辑我补充了）
-        JSONObject TemplateStatusSet = response.getJSONObject("Response").getJSONArray("DescribeTemplateStatusSet").getJSONObject(0);
-        String content = TemplateStatusSet.get("TemplateContent").toString();
-        int templateStatus = Integer.parseInt(TemplateStatusSet.get("StatusCode").toString());
-        String auditReason = TemplateStatusSet.get("ReviewReply").toString();
-
-        return new SmsTemplateRespDTO().setId(apiTemplateId).setContent(content)
-                .setAuditStatus(convertSmsTemplateAuditStatus(templateStatus)).setAuditReason(auditReason);
+        // 2. 解析请求
+        JSONObject statusResult = response.getJSONObject("Response")
+                .getJSONArray("DescribeTemplateStatusSet").getJSONObject(0);
+        return new SmsTemplateRespDTO().setId(apiTemplateId)
+                .setContent(statusResult.get("TemplateContent").toString())
+                .setAuditStatus(convertSmsTemplateAuditStatus(statusResult.getInt("StatusCode")))
+                .setAuditReason(statusResult.get("ReviewReply").toString());
     }
 
     @VisibleForTesting
@@ -166,64 +162,40 @@ public class TencentSmsClient extends AbstractSmsClient {
      * @param body 请求参数
      * @return 请求结果
      */
-    private JSONObject request(String action, TreeMap<String, Object> body) throws Exception {
-        String timestamp = String.valueOf(System.currentTimeMillis() / 1000);
-        // TODO @scholar：这个 format，看看怎么写的可以简化点
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-        // 注意时区，否则容易出错
-        sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
-        String date = sdf.format(new Date(Long.valueOf(timestamp + "000")));
-
-        // TODO @scholar：这个步骤，看看怎么参考阿里云 client，归类下；1. 2.1 2.2 这种
-        // ************* 步骤 1：拼接规范请求串 *************
-        // TODO @scholar：这个 hsot 枚举下；
-        String host = "sms.tencentcloudapi.com"; //APP接入地址+接口访问URI
-        String httpMethod = "POST"; // 请求方式
-        String canonicalUri = "/";
-        String canonicalQueryString = "";
-
-        String canonicalHeaders = "content-type:application/json; charset=utf-8\n"
-                + "host:" + host + "\n" + "x-tc-action:" + action.toLowerCase() + "\n";
-        String signedHeaders = "content-type;host;x-tc-action";
-        String hashedRequestBody = sha256Hex(JSONUtil.toJsonStr(body));
-        // TODO @scholar：换行下，不然单行太长了
-        String canonicalRequest = httpMethod + "\n" + canonicalUri + "\n" + canonicalQueryString + "\n" + canonicalHeaders + "\n" + signedHeaders + "\n" + hashedRequestBody;
-
-        // ************* 步骤 2：拼接待签名字符串 *************
-        String credentialScope = date + "/" + "sms" + "/" + "tc3_request";
-        String hashedCanonicalRequest = sha256Hex(canonicalRequest);
-        String stringToSign = "TC3-HMAC-SHA256" + "\n" + timestamp + "\n" + credentialScope + "\n" + hashedCanonicalRequest;
-
-        // ************* 步骤 3：计算签名 *************
-        byte[] secretDate = hmac256(("TC3" + properties.getApiSecret()).getBytes(StandardCharsets.UTF_8), date);
-        byte[] secretService = hmac256(secretDate, "sms");
-        byte[] secretSigning = hmac256(secretService, "tc3_request");
-        String signature = DatatypeConverter.printHexBinary(hmac256(secretSigning, stringToSign)).toLowerCase();
-
-        // ************* 步骤 4：拼接 Authorization *************
-        String authorization = "TC3-HMAC-SHA256" + " " + "Credential=" + getApiKey() + "/" + credentialScope + ", "
-                + "SignedHeaders=" + signedHeaders + ", " + "Signature=" + signature;
-
-        // ************* 步骤 5：构造HttpRequest 并执行request请求，获得response *************
+    private JSONObject request(String action, TreeMap<String, Object> body) {
+        // 1.1 请求 Header
         Map<String, String> headers = new HashMap<>();
-        headers.put("Authorization", authorization);
         headers.put("Content-Type", "application/json; charset=utf-8");
-        headers.put("Host", host);
+        headers.put("Host", HOST);
         headers.put("X-TC-Action", action);
-        headers.put("X-TC-Timestamp", timestamp);
+        Date now = new Date();
+        String nowStr = FastDateFormat.getInstance("yyyy-MM-dd", TimeZone.getTimeZone("UTC")).format(now);
+        headers.put("X-TC-Timestamp", String.valueOf(now.getTime() / 1000));
         headers.put("X-TC-Version", VERSION);
         headers.put("X-TC-Region", REGION);
 
-        String responseBody = HttpUtils.post("https://" + host, headers, JSONUtil.toJsonStr(body));
+        // 1.2 构建签名 Header
+        String canonicalQueryString = "";
+        String canonicalHeaders = "content-type:application/json; charset=utf-8\n"
+                + "host:" + HOST + "\n" + "x-tc-action:" + action.toLowerCase() + "\n";
+        String signedHeaders = "content-type;host;x-tc-action";
+        String canonicalRequest = "POST" + "\n" + "/" + "\n" + canonicalQueryString + "\n" + canonicalHeaders + "\n"
+                + signedHeaders + "\n" + sha256Hex(JSONUtil.toJsonStr(body));
+        String credentialScope = nowStr + "/" + "sms" + "/" + "tc3_request";
+        String stringToSign = "TC3-HMAC-SHA256" + "\n" + now.getTime() / 1000 + "\n" + credentialScope + "\n" +
+                sha256Hex(canonicalRequest);
+        byte[] secretService = hmac256(hmac256(("TC3" + properties.getApiSecret()).getBytes(StandardCharsets.UTF_8), nowStr), "sms");
+        String signature = HexUtil.encodeHexStr(hmac256(hmac256(secretService, "tc3_request"), stringToSign));
+        headers.put("Authorization", "TC3-HMAC-SHA256" + " " + "Credential=" + getApiKey() + "/" + credentialScope + ", "
+                + "SignedHeaders=" + signedHeaders + ", " + "Signature=" + signature);
 
+        // 2. 发起请求
+        String responseBody = HttpUtils.post("https://" + HOST, headers, JSONUtil.toJsonStr(body));
         return JSONUtil.parseObj(responseBody);
     }
 
-    // TODO @scholar：使用 hutool 简化下
-    private static byte[] hmac256(byte[] key, String msg) throws Exception {
-        Mac mac = Mac.getInstance("HmacSHA256");
-        SecretKeySpec secretKeySpec = new SecretKeySpec(key, mac.getAlgorithm());
-        mac.init(secretKeySpec);
-        return mac.doFinal(msg.getBytes(StandardCharsets.UTF_8));
+    private static byte[] hmac256(byte[] key, String msg) {
+        return DigestUtil.hmac(HmacAlgorithm.HmacSHA256, key).digest(msg);
     }
+
 }

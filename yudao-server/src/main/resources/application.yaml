@@ -301,6 +301,7 @@ yudao:
       - tmp_report_data_1
       - tmp_report_data_income
     ignore-caches:
+      - user_role_ids
       - permission_menu_ids
       - oauth_client
       - notify_template

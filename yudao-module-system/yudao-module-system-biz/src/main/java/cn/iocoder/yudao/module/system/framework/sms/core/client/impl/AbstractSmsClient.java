@@ -26,14 +26,8 @@ public abstract class AbstractSmsClient implements SmsClient {
      * 初始化
      */
     public final void init() {
-        doInit();
         log.debug("[init][配置({}) 初始化完成]", properties);
     }
-
-    /**
-     * 自定义初始化
-     */
-    protected abstract void doInit();
 
     public final void refresh(SmsChannelProperties properties) {
         // 判断是否更新

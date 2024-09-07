@@ -7,10 +7,12 @@ import cn.iocoder.yudao.module.promotion.api.coupon.dto.CouponValidReqDTO;
 import cn.iocoder.yudao.module.promotion.convert.coupon.CouponConvert;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.coupon.CouponDO;
 import cn.iocoder.yudao.module.promotion.service.coupon.CouponService;
+import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
-import jakarta.annotation.Resource;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 优惠劵 API 实现类
@@ -39,6 +41,16 @@ public class CouponApiImpl implements CouponApi {
     public CouponRespDTO validateCoupon(CouponValidReqDTO validReqDTO) {
         CouponDO coupon = couponService.validCoupon(validReqDTO.getId(), validReqDTO.getUserId());
         return CouponConvert.INSTANCE.convert(coupon);
+    }
+
+    @Override
+    public List<Long> takeCouponsByAdmin(Map<Long, Integer> giveCoupons, Long userId) {
+        return couponService.takeCouponsByAdmin(giveCoupons, userId);
+    }
+
+    @Override
+    public void invalidateCouponsByAdmin(List<Long> giveCouponIds, Long userId) {
+        couponService.invalidateCouponsByAdmin(giveCouponIds, userId);
     }
 
 }

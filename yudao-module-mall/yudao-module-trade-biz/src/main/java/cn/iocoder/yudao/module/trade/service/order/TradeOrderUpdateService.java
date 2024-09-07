@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.module.trade.service.order;
 
-import cn.iocoder.yudao.framework.common.enums.TerminalEnum;
 import cn.iocoder.yudao.module.trade.controller.admin.order.vo.TradeOrderDeliveryReqVO;
 import cn.iocoder.yudao.module.trade.controller.admin.order.vo.TradeOrderRemarkReqVO;
 import cn.iocoder.yudao.module.trade.controller.admin.order.vo.TradeOrderUpdateAddressReqVO;
@@ -10,8 +9,9 @@ import cn.iocoder.yudao.module.trade.controller.app.order.vo.AppTradeOrderSettle
 import cn.iocoder.yudao.module.trade.controller.app.order.vo.AppTradeOrderSettlementRespVO;
 import cn.iocoder.yudao.module.trade.controller.app.order.vo.item.AppTradeOrderItemCommentCreateReqVO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderDO;
-
 import jakarta.validation.constraints.NotNull;
+
+import java.util.List;
 
 /**
  * 交易订单【写】Service 接口
@@ -187,13 +187,22 @@ public interface TradeOrderUpdateService {
      */
     void updateOrderCombinationInfo(Long orderId, Long activityId, Long combinationRecordId, Long headId);
 
-    // TODO 芋艿：拼团取消，不调这个接口哈；
     /**
      * 取消支付订单
      *
-     * @param userId  用户编号
-     * @param orderId 订单编号
+     * @param userId           用户编号
+     * @param orderId          订单编号
+     * @param cancelType       取消类型
      */
-    void cancelPaidOrder(Long userId, Long orderId);
+    void cancelPaidOrder(Long userId, Long orderId, Integer cancelType);
+
+    /**
+     * 更新下单赠送的优惠券编号到订单
+     *
+     * @param userId        用户编号
+     * @param orderId       订单编号
+     * @param giveCouponIds 赠送的优惠券编号列表
+     */
+    void updateOrderGiveCouponIds(Long userId, Long orderId, List<Long> giveCouponIds);
 
 }
