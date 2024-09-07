@@ -4,6 +4,7 @@ import com.somle.erp.model.ErpDepartment;
 import com.somle.erp.model.ErpStyleSku;
 import com.somle.erp.service.ErpService;
 
+import com.somle.framework.common.pojo.CommonResult;
 import com.somle.framework.common.util.json.JsonUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -68,11 +69,11 @@ public class ErpController {
     }
 
     @GetMapping("/getStyleSku")
-    public Page<ErpStyleSku> getStyleSku(
+    public CommonResult<Page<ErpStyleSku>> getStyleSku(
         ErpStyleSku styleSku,
         Pageable pageable
     ) {
-        return erpService.getStyleSku(styleSku, pageable);
+        return CommonResult.success(erpService.getStyleSku(styleSku, pageable));
     }
 
     @PostMapping("/saveStyleSku")
