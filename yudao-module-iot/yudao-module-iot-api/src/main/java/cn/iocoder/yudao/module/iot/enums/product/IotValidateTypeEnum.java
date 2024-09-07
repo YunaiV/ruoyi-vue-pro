@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.iot.enums;
+package cn.iocoder.yudao.module.iot.enums.product;
 
 import cn.iocoder.yudao.framework.common.core.IntArrayValuable;
 import lombok.AllArgsConstructor;
@@ -7,15 +7,16 @@ import lombok.Getter;
 import java.util.Arrays;
 
 /**
- * 产品数据格式枚举类
- * 1. 标准数据格式（JSON）2. 透传/自定义
+ * IOT 数据校验级别枚举类
+ * 数据校验级别,  0: 弱校验, 1: 免校验
  */
 @AllArgsConstructor
 @Getter
-public enum ProductDataFormatEnum implements IntArrayValuable {
+public enum IotValidateTypeEnum implements IntArrayValuable {
 
-    JSON(1, "标准数据格式（JSON）"),
-    SCRIPT(2, "透传/自定义");
+    WEAK(0, "弱校验"),
+    NONE(1, "免校验");
+
 
     /**
      * 类型
@@ -27,7 +28,7 @@ public enum ProductDataFormatEnum implements IntArrayValuable {
      */
     private final String description;
 
-    public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(ProductDataFormatEnum::getType).toArray();
+    public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(IotValidateTypeEnum::getType).toArray();
 
     @Override
     public int[] array() {

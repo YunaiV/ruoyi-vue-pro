@@ -1,13 +1,11 @@
 package cn.iocoder.yudao.module.iot.dal.mysql.product;
 
-import java.util.*;
-
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
+import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
+import cn.iocoder.yudao.module.iot.controller.admin.product.vo.ProductPageReqVO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.product.ProductDO;
 import org.apache.ibatis.annotations.Mapper;
-import cn.iocoder.yudao.module.iot.controller.admin.product.vo.*;
 
 /**
  * iot 产品 Mapper
@@ -21,7 +19,7 @@ public interface ProductMapper extends BaseMapperX<ProductDO> {
         return selectPage(reqVO, new LambdaQueryWrapperX<ProductDO>()
                 .likeIfPresent(ProductDO::getName, reqVO.getName())
                 .betweenIfPresent(ProductDO::getCreateTime, reqVO.getCreateTime())
-                .eqIfPresent(ProductDO::getProductKey, reqVO.getProductKey())
+                .likeIfPresent(ProductDO::getProductKey, reqVO.getProductKey())
                 .eqIfPresent(ProductDO::getProtocolId, reqVO.getProtocolId())
                 .eqIfPresent(ProductDO::getCategoryId, reqVO.getCategoryId())
                 .eqIfPresent(ProductDO::getDescription, reqVO.getDescription())

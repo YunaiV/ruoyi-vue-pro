@@ -1,19 +1,19 @@
-package cn.iocoder.yudao.module.iot.enums;
+package cn.iocoder.yudao.module.iot.enums.product;
 
 import cn.iocoder.yudao.framework.common.core.IntArrayValuable;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 /**
- * 产品状态枚举类
- * 禁用 启用
+ * IOT 产品状态枚举类
+ * 产品状态, 0: 未发布, 1: 已发布
  */
 @AllArgsConstructor
 @Getter
-public enum ProductStatusEnum implements IntArrayValuable {
+public enum IotProductStatusEnum implements IntArrayValuable {
 
-    DISABLE(0, "禁用"),
-    ENABLE(1, "启用");
+    UNPUBLISHED(0, "未发布"),
+    PUBLISHED(1, "已发布");
 
     /**
      * 类型
