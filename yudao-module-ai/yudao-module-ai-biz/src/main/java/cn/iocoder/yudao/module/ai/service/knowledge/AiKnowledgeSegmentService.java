@@ -38,9 +38,8 @@ public interface AiKnowledgeSegmentService {
      */
     void updateKnowledgeSegmentStatus(AiKnowledgeSegmentUpdateStatusReqVO reqVO);
 
-
     /**
-     * 段落召回
+     * 召回段落
      *
      * @param reqVO 召回请求信息
      * @return 召回的段落

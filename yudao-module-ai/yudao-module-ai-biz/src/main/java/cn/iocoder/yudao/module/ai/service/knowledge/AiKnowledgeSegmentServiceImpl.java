@@ -55,19 +55,19 @@ public class AiKnowledgeSegmentServiceImpl implements AiKnowledgeSegmentService 
 
     @Override
     public void updateKnowledgeSegment(AiKnowledgeSegmentUpdateReqVO reqVO) {
-        // 0 校验
+        // 1. 校验
         AiKnowledgeSegmentDO oldKnowledgeSegment = validateKnowledgeSegmentExists(reqVO.getId());
+
         // 2.1 获取知识库向量实例
         VectorStore vectorStore = knowledgeService.getVectorStoreById(oldKnowledgeSegment.getKnowledgeId());
         // 2.2 删除原向量
         vectorStore.delete(List.of(oldKnowledgeSegment.getVectorId()));
-
         // 2.3 重新向量化
         Document document = new Document(reqVO.getContent());
         document.getMetadata().put(AiKnowledgeSegmentDO.FIELD_KNOWLEDGE_ID, oldKnowledgeSegment.getKnowledgeId());
         vectorStore.add(List.of(document));
 
-        // 2.1 更新段落内容
+        // 3. 更新段落内容
         AiKnowledgeSegmentDO knowledgeSegment = BeanUtils.toBean(reqVO, AiKnowledgeSegmentDO.class);
         knowledgeSegment.setVectorId(document.getId());
         segmentMapper.updateById(knowledgeSegment);
@@ -98,14 +98,14 @@ public class AiKnowledgeSegmentServiceImpl implements AiKnowledgeSegmentService 
 
     @Override
     public List<AiKnowledgeSegmentDO> similaritySearch(AiKnowledgeSegmentSearchReqVO reqVO) {
-        // 0. 校验
+        // 1. 校验
         AiKnowledgeDO knowledge = knowledgeService.validateKnowledgeExists(reqVO.getKnowledgeId());
         AiChatModelDO model = chatModelService.validateChatModel(knowledge.getModelId());
 
-        // 1.1 获取向量存储实例
+        // 2. 获取向量存储实例
         VectorStore vectorStore = apiKeyService.getOrCreateVectorStore(model.getKeyId());
 
-        // 1.2 向量检索
+        // 3.1 向量检索
         List<Document> documentList = vectorStore.similaritySearch(SearchRequest.query(reqVO.getContent())
                 .withTopK(knowledge.getTopK())
                 .withSimilarityThreshold(knowledge.getSimilarityThreshold())
@@ -113,10 +113,9 @@ public class AiKnowledgeSegmentServiceImpl implements AiKnowledgeSegmentService 
         if (CollUtil.isEmpty(documentList)) {
             return ListUtil.empty();
         }
-        // 2.1 段落召回
+        // 3.2 段落召回
         return segmentMapper.selectList(CollUtil.getFieldValues(documentList, "id", String.class));
     }
-
 
     /**
      * 校验段落是否存在
@@ -131,4 +130,5 @@ public class AiKnowledgeSegmentServiceImpl implements AiKnowledgeSegmentService 
         }
         return knowledgeSegment;
     }
+
 }

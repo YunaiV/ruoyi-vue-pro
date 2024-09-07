@@ -23,7 +23,6 @@ public interface AiKnowledgeService {
      */
     Long createKnowledgeMy(AiKnowledgeCreateMyReqVO createReqVO, Long userId);
 
-
     /**
      * 创建【我的】知识库
      *
@@ -31,7 +30,6 @@ public interface AiKnowledgeService {
      * @param userId      用户编号
      */
     void updateKnowledgeMy(AiKnowledgeUpdateMyReqVO updateReqVO, Long userId);
-
 
     /**
      * 校验知识库是否存在
@@ -49,6 +47,7 @@ public interface AiKnowledgeService {
      */
     PageResult<AiKnowledgeDO> getKnowledgePageMy(Long userId, PageParam pageReqVO);
 
+    // TODO @新：knowledgeId 和 validateKnowledgeExists 的 id 是同一个么？如果是的话，建议变量也用 id 哈，然后两边的 id 注释，保持一致
     /**
      * 根据知识库编号获取向量存储实例
      *
@@ -56,4 +55,5 @@ public interface AiKnowledgeService {
      * @return 向量存储实例
      */
     VectorStore getVectorStoreById(Long knowledgeId);
+
 }

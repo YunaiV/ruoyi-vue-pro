@@ -27,7 +27,7 @@ public class AiKnowledgeSegmentDO extends BaseDO {
     /**
      * 向量库的编号
      */
-    @TableField(updateStrategy = FieldStrategy.ALWAYS)
+    @TableField(updateStrategy = FieldStrategy.ALWAYS) // TODO @新：尽量规避要这个注解。万一后面加个 status 单独更新，可能会踩坑。
     private String vectorId;
     /**
      * 知识库编号

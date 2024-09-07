@@ -38,6 +38,7 @@ public class AiKnowledgeServiceImpl implements AiKnowledgeService {
     private AiChatModelService chatModelService;
     @Resource
     private AiApiKeyService apiKeyService;
+    // TODO @新：chatModelService 和 apiKeyService 可以放到 33 行的 chatModalService 后面。尽量保持，想通类型的变量在一块。例如说，Service 一块，Mapper 一块。
 
     @Override
     public Long createKnowledgeMy(AiKnowledgeCreateMyReqVO createReqVO, Long userId) {
@@ -85,6 +86,7 @@ public class AiKnowledgeServiceImpl implements AiKnowledgeService {
     public VectorStore getVectorStoreById(Long knowledgeId) {
         AiKnowledgeDO knowledge = validateKnowledgeExists(knowledgeId);
         AiChatModelDO model = chatModelService.validateChatModel(knowledge.getModelId());
+        // 创建或获取 VectorStore 对象
         return apiKeyService.getOrCreateVectorStore(model.getKeyId());
     }
 

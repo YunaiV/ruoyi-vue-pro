@@ -42,4 +42,5 @@ public class AiKnowledgeDocumentCreateReqVO {
     @Schema(description = "分块是否保留分隔符", requiredMode = Schema.RequiredMode.REQUIRED, example = "true")
     @NotNull(message = "分块是否保留分隔符不能为空")
     private Boolean keepSeparator;
+
 }

@@ -32,4 +32,5 @@ public class AiKnowledgeCreateMyReqVO {
     @Schema(description = "topK", requiredMode = Schema.RequiredMode.REQUIRED, example = "3")
     @NotNull(message = "topK 不能为空")
     private Integer topK;
+
 }

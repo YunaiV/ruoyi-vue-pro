@@ -57,12 +57,10 @@ public class AiKnowledgeDO extends BaseDO {
      * topK
      */
     private Integer topK;
-
     /**
      * 相似度阈值
      */
     private Double similarityThreshold;
-
 
     /**
      * 状态
@@ -70,4 +68,5 @@ public class AiKnowledgeDO extends BaseDO {
      * 枚举 {@link CommonStatusEnum}
      */
     private Integer status;
+
 }

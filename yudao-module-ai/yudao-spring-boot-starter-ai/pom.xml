@@ -47,7 +47,7 @@
 
         <!-- 向量化，基于 Redis 存储，Tika 解析内容 -->
 
-        <!-- 暂不做经济型，先注释 -->
+        <!-- 暂不做经济型，先注释 TODO 经济型是啥呀？ -->
         <!--        <dependency>-->
         <!--            <groupId>${spring-ai.groupId}</groupId>-->
         <!--            <artifactId>spring-ai-transformers-spring-boot-starter</artifactId>-->

@@ -146,6 +146,7 @@ public class AiApiKeyServiceImpl implements AiApiKeyService {
     public VectorStore getOrCreateVectorStore(Long id) {
         AiApiKeyDO apiKey = validateApiKey(id);
         AiPlatformEnum platform = AiPlatformEnum.validatePlatform(apiKey.getPlatform());
+        // 创建或获取 VectorStore 对象
         return modelFactory.getOrCreateVectorStore(getEmbeddingModel(id), platform, apiKey.getApiKey(), apiKey.getUrl());
     }
 

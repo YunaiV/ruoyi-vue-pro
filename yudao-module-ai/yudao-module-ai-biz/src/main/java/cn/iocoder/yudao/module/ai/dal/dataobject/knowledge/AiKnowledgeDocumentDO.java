@@ -47,10 +47,12 @@ public class AiKnowledgeDocumentDO extends BaseDO {
      * 字符数
      */
     private Integer wordCount;
+    // TODO @新：chunk 1）是不是 segment，这样命名保持一致会好点哈？2）Size 是不是改成 Tokens 会统一点；3）defaultChunkSize、defaultChunkSize、minChunkSizeChars、maxNumChunks 这几个字段的命名，可能要微信一起讨论下。尽量命名保持风格统一哈。
     /**
      * 每个文本块的目标 token 数
      */
     private Integer defaultChunkSize;
+    // TODO @xin：SizeChars 和 wordCount 好像是一个意思，是不是也要统一哈。
     /**
      * 每个文本块的最小字符数
      */

@@ -83,7 +83,7 @@ public class AiKnowledgeDocumentServiceImpl implements AiKnowledgeDocumentServic
                         .setStatus(CommonStatusEnum.ENABLE.getStatus()));
         segmentMapper.insertBatch(segmentDOList);
 
-        // 3.2 向量化并存储
+        // 3. 向量化并存储
         segments.forEach(segment -> segment.getMetadata().put(AiKnowledgeSegmentDO.FIELD_KNOWLEDGE_ID, createReqVO.getKnowledgeId()));
         vectorStore.add(segments);
         return documentId;
