@@ -67,7 +67,7 @@ public class ErpController {
         return erpService.getEsbDepartmentTree(53111133l);
     }
 
-    @PostMapping("/getStyleSku")
+    @GetMapping("/getStyleSku")
     public Page<ErpStyleSku> getStyleSku(
         @RequestBody ErpStyleSku styleSku,
         Pageable pageable
