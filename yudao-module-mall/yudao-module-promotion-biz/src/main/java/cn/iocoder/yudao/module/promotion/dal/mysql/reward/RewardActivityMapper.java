@@ -30,15 +30,9 @@ public interface RewardActivityMapper extends BaseMapperX<RewardActivityDO> {
                 .orderByDesc(RewardActivityDO::getId));
     }
 
-    default List<RewardActivityDO> selectListByProductScopeAndStatus(Integer productScope, Integer status) {
-        return selectList(new LambdaQueryWrapperX<RewardActivityDO>()
-                .eq(RewardActivityDO::getProductScope, productScope)
-                .eq(RewardActivityDO::getStatus, status));
-    }
-
     default List<RewardActivityDO> selectListBySpuIdsAndStatus(Collection<Long> spuIds, Integer status) {
         Function<Collection<Long>, String> productScopeValuesFindInSetFunc = ids -> ids.stream()
-                .map(id -> StrUtil.format("FIND_IN_SET({}, product_spu_ids) ", id))
+                .map(id -> StrUtil.format("FIND_IN_SET({}, product_scope_values) ", id))
                 .collect(Collectors.joining(" OR "));
         return selectList(new QueryWrapper<RewardActivityDO>()
                 .eq("status", status)

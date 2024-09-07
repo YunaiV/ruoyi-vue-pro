@@ -1,31 +1,31 @@
 package cn.iocoder.yudao.module.trade.service.price.calculator;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils;
+import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.promotion.api.coupon.CouponApi;
 import cn.iocoder.yudao.module.promotion.api.coupon.dto.CouponRespDTO;
-import cn.iocoder.yudao.module.promotion.api.coupon.dto.CouponValidReqDTO;
 import cn.iocoder.yudao.module.promotion.enums.common.PromotionDiscountTypeEnum;
 import cn.iocoder.yudao.module.promotion.enums.common.PromotionProductScopeEnum;
 import cn.iocoder.yudao.module.promotion.enums.common.PromotionTypeEnum;
+import cn.iocoder.yudao.module.promotion.enums.coupon.CouponStatusEnum;
 import cn.iocoder.yudao.module.trade.enums.order.TradeOrderTypeEnum;
 import cn.iocoder.yudao.module.trade.service.price.bo.TradePriceCalculateReqBO;
 import cn.iocoder.yudao.module.trade.service.price.bo.TradePriceCalculateRespBO;
+import jakarta.annotation.Resource;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
-import jakarta.annotation.Resource;
 import java.util.List;
 import java.util.function.Predicate;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.filterList;
-import static cn.iocoder.yudao.module.promotion.enums.ErrorCodeConstants.COUPON_NO_MATCH_MIN_PRICE;
-import static cn.iocoder.yudao.module.promotion.enums.ErrorCodeConstants.COUPON_NO_MATCH_SPU;
+import static cn.iocoder.yudao.module.trade.enums.ErrorCodeConstants.PRICE_CALCULATE_COUPON_CAN_NOT_USE;
 import static cn.iocoder.yudao.module.trade.enums.ErrorCodeConstants.PRICE_CALCULATE_COUPON_NOT_MATCH_NORMAL_ORDER;
-import static cn.iocoder.yudao.module.trade.enums.ErrorCodeConstants.PRICE_CALCULATE_COUPON_PRICE_TOO_MUCH;
 
 /**
  * 优惠劵的 {@link TradePriceCalculator} 实现类
@@ -41,34 +41,37 @@ public class TradeCouponPriceCalculator implements TradePriceCalculator {
 
     @Override
     public void calculate(TradePriceCalculateReqBO param, TradePriceCalculateRespBO result) {
-        // 1.1 校验优惠劵
+        // 只有【普通】订单，才允许使用优惠劵
+        if (ObjectUtil.notEqual(result.getType(), TradeOrderTypeEnum.NORMAL.getType())) {
+            if (ObjectUtil.notEqual(result.getType(), TradeOrderTypeEnum.NORMAL.getType())) {
+                throw exception(PRICE_CALCULATE_COUPON_NOT_MATCH_NORMAL_ORDER);
+            }
+            return;
+        }
+
+        // 1.1 加载用户的优惠劵列表
+        List<CouponRespDTO> coupons = couponApi.getCouponListByUserId(param.getUserId(), CouponStatusEnum.UNUSED.getStatus());
+        coupons.removeIf(coupon -> LocalDateTimeUtils.beforeNow(coupon.getValidEndTime()));
+        // 1.2 计算优惠劵的使用条件
+        result.setCoupons(calculateCoupons(coupons, result));
+
+        // 2. 校验优惠劵是否可用
         if (param.getCouponId() == null) {
             return;
         }
-        CouponRespDTO coupon = couponApi.validateCoupon(new CouponValidReqDTO()
-                .setId(param.getCouponId()).setUserId(param.getUserId()));
-        Assert.notNull(coupon, "校验通过的优惠劵({})，不能为空", param.getCouponId());
-        // 1.2 只有【普通】订单，才允许使用优惠劵
-        if (ObjectUtil.notEqual(result.getType(), TradeOrderTypeEnum.NORMAL.getType())) {
-            throw exception(PRICE_CALCULATE_COUPON_NOT_MATCH_NORMAL_ORDER);
+        TradePriceCalculateRespBO.Coupon couponBO = CollUtil.findOne(result.getCoupons(), item -> item.getId().equals(param.getCouponId()));
+        CouponRespDTO coupon = CollUtil.findOne(coupons, item -> item.getId().equals(param.getCouponId()));
+        if (couponBO == null || coupon == null) {
+            throw exception(PRICE_CALCULATE_COUPON_CAN_NOT_USE, "优惠劵不存在");
         }
-
-        // 2.1 获得匹配的商品 SKU 数组
-        List<TradePriceCalculateRespBO.OrderItem> orderItems = filterMatchCouponOrderItems(result, coupon);
-        if (CollUtil.isEmpty(orderItems)) {
-            throw exception(COUPON_NO_MATCH_SPU);
-        }
-        // 2.2 计算是否满足优惠劵的使用金额
-        Integer totalPayPrice = TradePriceCalculatorHelper.calculateTotalPayPrice(orderItems);
-        if (totalPayPrice < coupon.getUsePrice()) {
-            throw exception(COUPON_NO_MATCH_MIN_PRICE);
+        if (Boolean.FALSE.equals(couponBO.getMatch())) {
+            throw exception(PRICE_CALCULATE_COUPON_CAN_NOT_USE, couponBO.getMismatchReason());
         }
 
         // 3.1 计算可以优惠的金额
+        List<TradePriceCalculateRespBO.OrderItem> orderItems = filterMatchCouponOrderItems(result, coupon);
+        Integer totalPayPrice = TradePriceCalculatorHelper.calculateTotalPayPrice(orderItems);
         Integer couponPrice = getCouponPrice(coupon, totalPayPrice);
-        if (couponPrice <= totalPayPrice) {
-            throw exception(PRICE_CALCULATE_COUPON_PRICE_TOO_MUCH);
-        }
         // 3.2 计算分摊的优惠金额
         List<Integer> divideCouponPrices = TradePriceCalculatorHelper.dividePrice(orderItems, couponPrice);
 
@@ -76,7 +79,7 @@ public class TradeCouponPriceCalculator implements TradePriceCalculator {
         result.setCouponId(param.getCouponId());
         // 4.2 记录优惠明细
         TradePriceCalculatorHelper.addPromotion(result, orderItems,
-                param.getCouponId(), coupon.getName(), PromotionTypeEnum.COUPON.getType(),
+                param.getCouponId(), couponBO.getName(), PromotionTypeEnum.COUPON.getType(),
                 StrUtil.format("优惠劵：省 {} 元", TradePriceCalculatorHelper.formatPrice(couponPrice)),
                 divideCouponPrices);
         // 4.3 更新 SKU 优惠金额
@@ -86,6 +89,43 @@ public class TradeCouponPriceCalculator implements TradePriceCalculator {
             TradePriceCalculatorHelper.recountPayPrice(orderItem);
         }
         TradePriceCalculatorHelper.recountAllPrice(result);
+    }
+
+    /**
+     * 计算用户的优惠劵列表（可用 + 不可用）
+     *
+     * @param coupons 优惠劵
+     * @param result 计算结果
+     * @return 优惠劵列表
+     */
+    private List<TradePriceCalculateRespBO.Coupon> calculateCoupons(List<CouponRespDTO> coupons,
+                                                                    TradePriceCalculateRespBO result) {
+        return convertList(coupons, coupon -> {
+            TradePriceCalculateRespBO.Coupon matchCoupon = BeanUtils.toBean(coupon, TradePriceCalculateRespBO.Coupon.class);
+            // 1.1 优惠劵未到使用时间
+            if (LocalDateTimeUtils.afterNow(coupon.getValidStartTime())) {
+                return matchCoupon.setMatch(false).setMismatchReason("优惠劵未到使用时间");
+            }
+            // 1.2 优惠劵没有匹配的商品
+            List<TradePriceCalculateRespBO.OrderItem> orderItems = filterMatchCouponOrderItems(result, coupon);
+            if (CollUtil.isEmpty(orderItems)) {
+                return matchCoupon.setMatch(false).setMismatchReason("优惠劵没有匹配的商品");
+            }
+            // 1.3 差 %1$,.2f 元可用优惠劵
+            Integer totalPayPrice = TradePriceCalculatorHelper.calculateTotalPayPrice(orderItems);
+            if (totalPayPrice < coupon.getUsePrice()) {
+                return matchCoupon.setMatch(false)
+                        .setMismatchReason(String.format("差 %1$,.2f 元可用优惠劵", (coupon.getUsePrice() - totalPayPrice) / 100D));
+            }
+            // 1.4 优惠金额超过订单金额
+            Integer couponPrice = getCouponPrice(coupon, totalPayPrice);
+            if (couponPrice >= totalPayPrice) {
+                return matchCoupon.setMatch(false).setMismatchReason("优惠金额超过订单金额");
+            }
+
+            // 2. 满足条件
+            return matchCoupon.setMatch(true);
+        });
     }
 
     private Integer getCouponPrice(CouponRespDTO coupon, Integer totalPayPrice) {

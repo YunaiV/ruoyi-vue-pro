@@ -61,7 +61,7 @@ public interface ErrorCodeConstants {
     ErrorCode PRICE_CALCULATE_COUPON_NOT_MATCH_NORMAL_ORDER = new ErrorCode(1_011_003_004, "参与秒杀、拼团、砍价的营销商品，无法使用优惠劵");
     ErrorCode PRICE_CALCULATE_SECKILL_TOTAL_LIMIT_COUNT = new ErrorCode(1_011_003_005, "参与秒杀的商品，超过了秒杀总限购数量");
     ErrorCode PRICE_CALCULATE_DELIVERY_PRICE_TYPE_ILLEGAL = new ErrorCode(1_011_003_006, "计算快递运费异常，配送方式不匹配");
-    ErrorCode PRICE_CALCULATE_COUPON_PRICE_TOO_MUCH = new ErrorCode(1_011_003_007, "该优惠劵无法使用，原因：优惠金额超过订单金额");
+    ErrorCode PRICE_CALCULATE_COUPON_CAN_NOT_USE = new ErrorCode(1_011_003_007, "该优惠劵无法使用，原因：{}」");
 
     // ========== 物流 Express 模块 1-011-004-000 ==========
     ErrorCode EXPRESS_NOT_EXISTS = new ErrorCode(1_011_004_000, "快递公司不存在");
