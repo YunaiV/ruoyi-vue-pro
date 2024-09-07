@@ -69,7 +69,7 @@ public class ErpController {
 
     @GetMapping("/getStyleSku")
     public Page<ErpStyleSku> getStyleSku(
-        @RequestBody ErpStyleSku styleSku,
+        ErpStyleSku styleSku,
         Pageable pageable
     ) {
         return erpService.getStyleSku(styleSku, pageable);
