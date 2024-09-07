@@ -72,7 +72,6 @@ public interface SeckillActivityMapper extends BaseMapperX<SeckillActivityDO> {
     default PageResult<SeckillActivityDO> selectPage(AppSeckillActivityPageReqVO pageReqVO, Integer status) {
         return selectPage(pageReqVO, new LambdaQueryWrapperX<SeckillActivityDO>()
                 .eqIfPresent(SeckillActivityDO::getStatus, status)
-                // TODO 芋艿：对 find in set 的想法；
                 .apply(ObjectUtil.isNotNull(pageReqVO.getConfigId()), "FIND_IN_SET(" + pageReqVO.getConfigId() + ",config_ids) > 0"));
     }
 

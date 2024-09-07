@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.framework.ai.core.model.deepseek;
 
+import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.lang.Assert;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.metadata.ChatGenerationMetadata;
@@ -70,12 +71,12 @@ public class DeepSeekChatModel implements ChatModel {
             OpenAiApi.ChatCompletion chatCompletion = completionEntity.getBody();
             if (chatCompletion == null) {
                 log.warn("No chat completion returned for prompt: {}", prompt);
-                return new ChatResponse(List.of());
+                return new ChatResponse(ListUtil.of());
             }
             List<OpenAiApi.ChatCompletion.Choice> choices = chatCompletion.choices();
             if (choices == null) {
                 log.warn("No choices returned for prompt: {}", prompt);
-                return new ChatResponse(List.of());
+                return new ChatResponse(ListUtil.of());
             }
 
             // 2. 转换 ChatResponse 返回

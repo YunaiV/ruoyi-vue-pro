@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.framework.ai.music;
 
+import cn.hutool.core.collection.ListUtil;
 import cn.iocoder.yudao.framework.ai.core.model.suno.api.SunoApi;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -66,7 +67,7 @@ public class SunoApiTests {
         String id = "584729e5-0fe9-4157-86da-1b4803ff42bf";
 
         // 调用方法
-        List<SunoApi.MusicData> musicList = sunoApi.getMusicList(List.of(id));
+        List<SunoApi.MusicData> musicList = sunoApi.getMusicList(ListUtil.of(id));
         // 打印结果
         System.out.println(musicList);
     }

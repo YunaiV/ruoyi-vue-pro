@@ -3,7 +3,8 @@ package cn.iocoder.yudao.module.product.api.spu.dto;
 import cn.iocoder.yudao.module.product.enums.spu.ProductSpuStatusEnum;
 import lombok.Data;
 
-// TODO @LeeYan9: ProductSpuRespDTO
+import java.util.List;
+
 /**
  * 商品 SPU 信息 Response DTO
  *
@@ -68,6 +69,13 @@ public class ProductSpuRespDTO {
     private Integer stock;
 
     // ========== 物流相关字段 =========
+
+    /**
+     * 配送方式数组
+     *
+     * 对应 DeliveryTypeEnum 枚举
+     */
+    private List<Integer> deliveryTypes;
 
     /**
      * 物流配置模板编号

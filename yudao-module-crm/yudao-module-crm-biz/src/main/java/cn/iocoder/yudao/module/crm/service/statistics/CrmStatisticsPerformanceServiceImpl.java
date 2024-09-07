@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.crm.service.statistics;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.util.ObjUtil;
 import cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.performance.CrmStatisticsPerformanceReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.performance.CrmStatisticsPerformanceRespVO;
@@ -106,7 +107,7 @@ public class CrmStatisticsPerformanceServiceImpl implements CrmStatisticsPerform
     private List<Long> getUserIds(CrmStatisticsPerformanceReqVO reqVO) {
         // 情况一：选中某个用户
         if (ObjUtil.isNotNull(reqVO.getUserId())) {
-            return List.of(reqVO.getUserId());
+            return ListUtil.of(reqVO.getUserId());
         }
         // 情况二：选中某个部门
         // 2.1 获得部门列表

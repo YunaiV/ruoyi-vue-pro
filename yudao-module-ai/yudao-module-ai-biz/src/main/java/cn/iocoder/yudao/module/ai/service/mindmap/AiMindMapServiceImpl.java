@@ -6,9 +6,11 @@ import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.ai.core.enums.AiPlatformEnum;
 import cn.iocoder.yudao.framework.ai.core.util.AiUtils;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.tenant.core.util.TenantUtils;
 import cn.iocoder.yudao.module.ai.controller.admin.mindmap.vo.AiMindMapGenerateReqVO;
+import cn.iocoder.yudao.module.ai.controller.admin.mindmap.vo.AiMindMapPageReqVO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.mindmap.AiMindMapDO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiChatModelDO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiChatRoleDO;
@@ -33,8 +35,10 @@ import reactor.core.publisher.Flux;
 import java.util.ArrayList;
 import java.util.List;
 
+import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.error;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
+import static cn.iocoder.yudao.module.ai.enums.ErrorCodeConstants.MIND_MAP_NOT_EXISTS;
 
 /**
  * AI 思维导图 Service 实现类
@@ -57,10 +61,10 @@ public class AiMindMapServiceImpl implements AiMindMapService {
 
     @Override
     public Flux<CommonResult<String>> generateMindMap(AiMindMapGenerateReqVO generateReqVO, Long userId) {
-        // 1. 获取脑图模型。尝试获取思维导图助手角色，如果没有则使用默认模型
+        // 1. 获取导图模型。尝试获取思维导图助手角色，如果没有则使用默认模型
         AiChatRoleDO role = CollUtil.getFirst(
                 chatRoleService.getChatRoleListByName(AiChatRoleEnum.AI_MIND_MAP_ROLE.getName()));
-        // 1.1 获取脑图执行模型
+        // 1.1 获取导图执行模型
         AiChatModelDO model = getModel(role);
         // 1.2 获取角色设定消息
         String systemMessage = role != null && StrUtil.isNotBlank(role.getSystemMessage())
@@ -124,11 +128,30 @@ public class AiMindMapServiceImpl implements AiMindMapService {
         if (role != null && role.getModelId() != null) {
             model = chatModalService.getChatModel(role.getModelId());
         }
-        if (model != null) {
+        if (model == null) {
             model = chatModalService.getRequiredDefaultChatModel();
         }
         Assert.notNull(model, "[AI] 获取不到模型");
         return model;
+    }
+
+    @Override
+    public void deleteMindMap(Long id) {
+        // 校验存在
+        validateMindMapExists(id);
+        // 删除
+        mindMapMapper.deleteById(id);
+    }
+
+    private void validateMindMapExists(Long id) {
+        if (mindMapMapper.selectById(id) == null) {
+            throw exception(MIND_MAP_NOT_EXISTS);
+        }
+    }
+
+    @Override
+    public PageResult<AiMindMapDO> getMindMapPage(AiMindMapPageReqVO pageReqVO) {
+        return mindMapMapper.selectPage(pageReqVO);
     }
 
 }

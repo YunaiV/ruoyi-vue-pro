@@ -24,12 +24,12 @@ import cn.iocoder.yudao.module.pay.enums.transfer.PayTransferStatusEnum;
 import cn.iocoder.yudao.module.pay.service.app.PayAppService;
 import cn.iocoder.yudao.module.pay.service.channel.PayChannelService;
 import cn.iocoder.yudao.module.pay.service.notify.PayNotifyService;
+import jakarta.annotation.Resource;
+import jakarta.validation.Validator;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import jakarta.annotation.Resource;
-import jakarta.validation.Validator;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
@@ -79,16 +79,16 @@ public class PayTransferServiceImpl implements PayTransferService {
     @Override
     public Long createTransfer(PayTransferCreateReqDTO reqDTO) {
         // 1.1 校验 App
-        PayAppDO payApp = appService.validPayApp(reqDTO.getAppId());
+        PayAppDO payApp = appService.validPayApp(reqDTO.getAppKey());
         // 1.2 校验支付渠道是否有效
-        PayChannelDO channel = channelService.validPayChannel(reqDTO.getAppId(), reqDTO.getChannelCode());
+        PayChannelDO channel = channelService.validPayChannel(payApp.getId(), reqDTO.getChannelCode());
         PayClient client = channelService.getPayClient(channel.getId());
         if (client == null) {
             log.error("[createTransfer][渠道编号({}) 找不到对应的支付客户端]", channel.getId());
             throw exception(CHANNEL_NOT_FOUND);
         }
         // 1.3 校验转账单已经发起过转账。
-        PayTransferDO transfer = validateTransferCanCreate(reqDTO);
+        PayTransferDO transfer = validateTransferCanCreate(reqDTO, payApp.getId());
 
         if (transfer == null) {
             // 2.不存在创建转账单. 否则允许使用相同的 no 再次发起转账
@@ -116,8 +116,8 @@ public class PayTransferServiceImpl implements PayTransferService {
         return transfer.getId();
     }
 
-    private PayTransferDO validateTransferCanCreate(PayTransferCreateReqDTO dto) {
-        PayTransferDO transfer = transferMapper.selectByAppIdAndMerchantTransferId(dto.getAppId(), dto.getMerchantTransferId());
+    private PayTransferDO validateTransferCanCreate(PayTransferCreateReqDTO dto, Long appId) {
+        PayTransferDO transfer = transferMapper.selectByAppIdAndMerchantTransferId(appId, dto.getMerchantTransferId());
         if (transfer != null) {
             // 已经存在,并且状态不为等待状态。说明已经调用渠道转账并返回结果.
             if (!PayTransferStatusEnum.isWaiting(transfer.getStatus())) {

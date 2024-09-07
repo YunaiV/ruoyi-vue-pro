@@ -20,8 +20,6 @@ public interface ErrorCodeConstants {
     ErrorCode BANNER_NOT_EXISTS = new ErrorCode(1_013_002_000, "Banner 不存在");
 
     // ========== Coupon 相关 1-013-003-000 ============
-    ErrorCode COUPON_NO_MATCH_SPU = new ErrorCode(1_013_003_000, "优惠劵没有可使用的商品！");
-    ErrorCode COUPON_NO_MATCH_MIN_PRICE = new ErrorCode(1_013_003_001, "所结算的商品中未满足使用的金额");
 
     // ========== 优惠劵模板 1-013-004-000 ==========
     ErrorCode COUPON_TEMPLATE_NOT_EXISTS = new ErrorCode(1_013_004_000, "优惠劵模板不存在");
@@ -44,7 +42,8 @@ public interface ErrorCodeConstants {
     ErrorCode REWARD_ACTIVITY_UPDATE_FAIL_STATUS_CLOSED = new ErrorCode(1_013_006_002, "满减送活动已关闭，不能修改");
     ErrorCode REWARD_ACTIVITY_DELETE_FAIL_STATUS_NOT_CLOSED = new ErrorCode(1_013_006_003, "满减送活动未关闭，不能删除");
     ErrorCode REWARD_ACTIVITY_CLOSE_FAIL_STATUS_CLOSED = new ErrorCode(1_013_006_004, "满减送活动已关闭，不能重复关闭");
-    ErrorCode REWARD_ACTIVITY_CLOSE_FAIL_STATUS_END = new ErrorCode(1_013_006_005, "满减送活动已结束，不能关闭");
+    ErrorCode REWARD_ACTIVITY_SCOPE_ALL_EXISTS = new ErrorCode(1_013_006_005, "已存在商品范围为全场的满减送活动");
+    ErrorCode REWARD_ACTIVITY_SCOPE_CATEGORY_EXISTS = new ErrorCode(1_013_006_006, "存在商品类型参加了其它满减送活动");
 
     // ========== TODO 空着 1-013-007-000 ============
 

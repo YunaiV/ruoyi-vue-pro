@@ -29,4 +29,10 @@ public class KdNiaoExpressQueryReqDTO {
     @JsonProperty("OrderCode")
     private String orderNo;
 
+    /**
+     * 自定义名称（顺丰专用）
+     */
+    @JsonProperty("CustomerName")
+    private String customerName;
+
 }

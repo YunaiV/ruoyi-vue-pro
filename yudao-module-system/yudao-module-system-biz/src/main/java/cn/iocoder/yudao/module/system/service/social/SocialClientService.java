@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.system.service.social;
 import cn.binarywang.wx.miniapp.bean.WxMaPhoneNumberInfo;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.system.api.social.dto.SocialWxQrcodeReqDTO;
+import cn.iocoder.yudao.module.system.api.social.dto.SocialWxaSubscribeMessageSendReqDTO;
 import cn.iocoder.yudao.module.system.controller.admin.socail.vo.client.SocialClientPageReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.socail.vo.client.SocialClientSaveReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.social.SocialClientDO;
@@ -10,6 +11,9 @@ import cn.iocoder.yudao.module.system.enums.social.SocialTypeEnum;
 import com.xingyuv.jushauth.model.AuthUser;
 import jakarta.validation.Valid;
 import me.chanjar.weixin.common.bean.WxJsapiSignature;
+import me.chanjar.weixin.common.bean.subscribemsg.TemplateInfo;
+
+import java.util.List;
 
 /**
  * 社交应用 Service 接口
@@ -68,6 +72,25 @@ public interface SocialClientService {
      * @return 小程序二维码
      */
     byte[] getWxaQrcode(SocialWxQrcodeReqDTO reqVO);
+
+    /**
+     * 获得微信小程订阅模板
+     *
+     * 缓存的目的：考虑到微信小程序订阅消息选择好模版后几乎不会变动，缓存增加查询效率
+     *
+     * @param userType 用户类型
+     * @return 微信小程订阅模板
+     */
+    List<TemplateInfo> getSubscribeTemplateList(Integer userType);
+
+    /**
+     * 发送微信小程序订阅消息
+     *
+     * @param reqDTO     请求
+     * @param templateId 模版编号
+     * @param openId     会员 openId
+     */
+    void sendSubscribeMessage(SocialWxaSubscribeMessageSendReqDTO reqDTO, String templateId, String openId);
 
     // =================== 客户端管理 ===================
 

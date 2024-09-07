@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.trade.dal.dataobject.order;
 
 import cn.iocoder.yudao.framework.common.enums.TerminalEnum;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import cn.iocoder.yudao.framework.mybatis.core.type.LongListTypeHandler;
 import cn.iocoder.yudao.module.member.api.user.dto.MemberUserRespDTO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.brokerage.BrokerageUserDO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.delivery.DeliveryExpressDO;
@@ -12,10 +13,14 @@ import cn.iocoder.yudao.module.trade.enums.order.TradeOrderRefundStatusEnum;
 import cn.iocoder.yudao.module.trade.enums.order.TradeOrderStatusEnum;
 import cn.iocoder.yudao.module.trade.enums.order.TradeOrderTypeEnum;
 import com.baomidou.mybatisplus.annotation.KeySequence;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 交易订单 DO
@@ -290,6 +295,24 @@ public class TradeOrderDO extends BaseDO {
      * VIP 减免金额，单位：分
      */
     private Integer vipPrice;
+
+    /**
+     * 赠送的优惠劵
+     *
+     * key: 优惠劵模版编号
+     * value：对应的优惠券数量
+     *
+     * 目的：用于订单支付后赠送优惠券
+     */
+    @TableField(typeHandler = JacksonTypeHandler.class)
+    private Map<Long, Integer> giveCouponTemplateCounts;
+    /**
+     * 赠送的优惠劵编号
+     *
+     * 目的：用于后续取消或者售后订单时，需要扣减赠送
+     */
+    @TableField(typeHandler = LongListTypeHandler.class)
+    private List<Long> giveCouponIds;
 
     /**
      * 秒杀活动编号

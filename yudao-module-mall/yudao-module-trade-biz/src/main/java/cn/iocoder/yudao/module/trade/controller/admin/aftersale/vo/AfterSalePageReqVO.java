@@ -21,6 +21,9 @@ import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_
 @ToString(callSuper = true)
 public class AfterSalePageReqVO extends PageParam {
 
+    @Schema(description = "用户编号", example = "1024")
+    private Long userId;
+
     @Schema(description = "售后流水号", example = "202211190847450020500077")
     private String no;
 

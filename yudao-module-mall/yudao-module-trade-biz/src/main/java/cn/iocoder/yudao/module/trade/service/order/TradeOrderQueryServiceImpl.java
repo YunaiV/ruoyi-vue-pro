@@ -206,7 +206,7 @@ public class TradeOrderQueryServiceImpl implements TradeOrderQueryService {
 
     /**
      * 查询物流轨迹
-     *
+     * <p>
      * 缓存的目的：考虑及时性要求不高，但是每次调用需要钱
      *
      * @param code           快递公司编码
@@ -217,9 +217,8 @@ public class TradeOrderQueryServiceImpl implements TradeOrderQueryService {
     @Cacheable(cacheNames = RedisKeyConstants.EXPRESS_TRACK, key = "#code + '-' + #logisticsNo + '-' + #receiverMobile",
             condition = "#result != null && #result.length() > 0")
     public List<ExpressTrackRespDTO> getExpressTrackList(String code, String logisticsNo, String receiverMobile) {
-        return expressClientFactory.getDefaultExpressClient().getExpressTrackList(
-                new ExpressTrackQueryReqDTO().setExpressCode(code).setLogisticsNo(logisticsNo)
-                        .setPhone(receiverMobile));
+        return expressClientFactory.getDefaultExpressClient().getExpressTrackList(new ExpressTrackQueryReqDTO()
+                .setExpressCode(code).setLogisticsNo(logisticsNo).setPhone(receiverMobile));
     }
 
     // =================== Order Item ===================

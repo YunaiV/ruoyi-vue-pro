@@ -11,7 +11,6 @@ import org.springframework.stereotype.Component;
 
 import jakarta.annotation.Resource;
 
-// TODO 芋艿：缺个 Job 的配置；等和 Product 一起配置
 /**
  * 交易统计 Job
  *

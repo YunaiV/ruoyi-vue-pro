@@ -1,10 +1,10 @@
 package cn.iocoder.yudao.module.ai.dal.mysql.image;
 
-import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.module.ai.controller.admin.image.vo.AiImagePageReqVO;
+import cn.iocoder.yudao.module.ai.controller.admin.image.vo.AiImagePublicPageReqVO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.image.AiImageDO;
 import org.apache.ibatis.annotations.Mapper;
 
@@ -19,7 +19,7 @@ import java.util.List;
 public interface AiImageMapper extends BaseMapperX<AiImageDO> {
 
     default AiImageDO selectByTaskId(String taskId) {
-        return this.selectOne(AiImageDO::getTaskId, taskId);
+        return selectOne(AiImageDO::getTaskId, taskId);
     }
 
     default PageResult<AiImageDO> selectPage(AiImagePageReqVO reqVO) {
@@ -32,9 +32,20 @@ public interface AiImageMapper extends BaseMapperX<AiImageDO> {
                 .orderByDesc(AiImageDO::getId));
     }
 
-    default PageResult<AiImageDO> selectPage(Long userId, PageParam pageReqVO) {
+    default PageResult<AiImageDO> selectPageMy(Long userId, AiImagePageReqVO reqVO) {
+        return selectPage(reqVO, new LambdaQueryWrapperX<AiImageDO>()
+                .likeIfPresent(AiImageDO::getPrompt, reqVO.getPrompt())
+                // 情况一：公开
+                .eq(Boolean.TRUE.equals(reqVO.getPublicStatus()), AiImageDO::getPublicStatus, reqVO.getPublicStatus())
+                // 情况二：私有
+                .eq(Boolean.FALSE.equals(reqVO.getPublicStatus()), AiImageDO::getUserId, userId)
+                .orderByDesc(AiImageDO::getId));
+    }
+
+    default PageResult<AiImageDO> selectPage(AiImagePublicPageReqVO pageReqVO) {
         return selectPage(pageReqVO, new LambdaQueryWrapperX<AiImageDO>()
-                .eq(AiImageDO::getUserId, userId)
+                .eqIfPresent(AiImageDO::getPublicStatus, Boolean.TRUE)
+                .likeIfPresent(AiImageDO::getPrompt, pageReqVO.getPrompt())
                 .orderByDesc(AiImageDO::getId));
     }
 

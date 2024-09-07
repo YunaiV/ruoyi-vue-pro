@@ -46,6 +46,8 @@ public interface SmsClient {
     /**
      * 查询指定的短信模板
      *
+     * 如果查询失败，则返回 null 空
+     *
      * @param apiTemplateId 短信 API 的模板编号
      * @return 短信模板
      */

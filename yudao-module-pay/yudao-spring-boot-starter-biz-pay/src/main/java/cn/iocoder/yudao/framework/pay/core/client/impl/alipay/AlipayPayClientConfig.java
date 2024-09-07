@@ -27,6 +27,11 @@ public class AlipayPayClientConfig implements PayClientConfig {
     public static final Integer MODE_CERTIFICATE = 2;
 
     /**
+     * 接口内容加密方式 - AES 加密
+     */
+    public static final String ENC_TYPE_AES = "AES";
+
+    /**
      * 签名算法类型 - RSA
      */
     public static final String SIGN_TYPE_DEFAULT = "RSA2";
@@ -91,6 +96,22 @@ public class AlipayPayClientConfig implements PayClientConfig {
      */
     @NotBlank(message = "指定根证书内容字符串不能为空", groups = {ModeCertificate.class})
     private String rootCertContent;
+
+    /**
+     * 接口内容加密方式
+     *
+     * 1. 如果为空，将使用无加密方式
+     * 2. 如果要加密，目前支付宝只有 AES 一种加密方式
+     *
+     * @see <a href="https://opendocs.alipay.com/common/02mse3">支付宝开放平台</a>
+     * @see AlipayPayClientConfig#ENC_TYPE_AES
+     */
+    private String encryptType;
+
+    /**
+     * 接口内容加密的私钥
+     */
+    private String encryptKey;
 
     public interface ModePublicKey {
     }

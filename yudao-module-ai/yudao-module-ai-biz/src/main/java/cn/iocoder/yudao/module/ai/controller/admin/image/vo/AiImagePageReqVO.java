@@ -3,8 +3,6 @@ package cn.iocoder.yudao.module.ai.controller.admin.image.vo;
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;
@@ -20,6 +18,9 @@ public class AiImagePageReqVO extends PageParam {
 
     @Schema(description = "平台", example = "OpenAI")
     private String platform;
+
+    @Schema(description = "提示词", example = "1")
+    private String prompt;
 
     @Schema(description = "绘画状态", example = "1")
     private Integer status;

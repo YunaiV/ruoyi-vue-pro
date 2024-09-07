@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.framework.desensitize.core.regex.handler;
 
+import cn.iocoder.yudao.framework.common.util.spring.SpringExpressionUtils;
 import cn.iocoder.yudao.framework.desensitize.core.base.handler.DesensitizationHandler;
 
 import java.lang.annotation.Annotation;
@@ -14,6 +15,13 @@ public abstract class AbstractRegexDesensitizationHandler<T extends Annotation>
 
     @Override
     public String desensitize(String origin, T annotation) {
+        // 1. 判断是否禁用脱敏
+        Object disable = SpringExpressionUtils.parseExpression(getDisable(annotation));
+        if (Boolean.TRUE.equals(disable)) {
+            return origin;
+        }
+
+        // 2. 执行脱敏
         String regex = getRegex(annotation);
         String replacer = getReplacer(annotation);
         return origin.replaceAll(regex, replacer);

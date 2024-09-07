@@ -3,6 +3,8 @@ package cn.iocoder.yudao.module.trade.framework.delivery.core.client.impl.kdniao
 import cn.hutool.core.codec.Base64;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.net.URLEncodeUtil;
+import cn.hutool.core.util.ObjUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.hutool.crypto.digest.DigestUtil;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.module.trade.framework.delivery.config.TradeExpressProperties;
@@ -60,6 +62,11 @@ public class KdNiaoExpressClient implements ExpressClient {
         // 发起请求
         KdNiaoExpressQueryReqDTO requestDTO = INSTANCE.convert(reqDTO)
                 .setExpressCode(reqDTO.getExpressCode().toUpperCase());
+        if (ObjUtil.equal(requestDTO.getExpressCode(), "SF")
+                && StrUtil.isBlank(reqDTO.getCustomerName())
+                && StrUtil.length(reqDTO.getPhone()) >= 4) {
+            requestDTO.setCustomerName(StrUtil.subSufByLength(reqDTO.getPhone(), 4));
+        }
         KdNiaoExpressQueryRespDTO respDTO = httpRequest(REAL_TIME_QUERY_URL, REAL_TIME_FREE_REQ_TYPE,
                 requestDTO, KdNiaoExpressQueryRespDTO.class);
 
