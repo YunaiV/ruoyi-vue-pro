@@ -202,12 +202,25 @@ public class EsbService {
                         .build()
                 ).build());
 
-
-                eccangService.getOrderShipPage(yesterdayFirstSecond, yesterdayLastSecond)
+                eccangService.getOrderPlatformShipPage(yesterdayFirstSecond, yesterdayLastSecond)
                     .forEach(page -> {
                         OssData data = OssData.builder()
                             .database(domain.getValue())
-                            .tableName("order_ship")
+                            .tableName("order_platform_ship")
+                            .syncType("inc")
+                            .requestTimestamp(System.currentTimeMillis())
+                            .folderDate(yesterday)
+                            .content(page)
+                            .headers(null)
+                            .build();
+                        dataChannel.send(MessageBuilder.withPayload(data).build());
+                    });
+
+                eccangService.getOrderWarehouseShipPage(yesterdayFirstSecond, yesterdayLastSecond)
+                    .forEach(page -> {
+                        OssData data = OssData.builder()
+                            .database(domain.getValue())
+                            .tableName("order_warehouse_ship")
                             .syncType("inc")
                             .requestTimestamp(System.currentTimeMillis())
                             .folderDate(yesterday)
