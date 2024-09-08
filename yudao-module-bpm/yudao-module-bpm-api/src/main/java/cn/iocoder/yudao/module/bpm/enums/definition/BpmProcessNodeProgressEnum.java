@@ -29,7 +29,7 @@ public enum BpmProcessNodeProgressEnum {
     USER_TASK_REJECT(31, "审批不通过"), // 审批节点
     USER_TASK_RETURN(32, "已退回"), // 审批节点
     USER_TASK_CANCEL(34, "已取消"), // 审批节点
-    // 40 ~ 50 一般节点的接榫状态 // TODO @jason：接榫 是啥呀？
+    // 40 ~ 50 节点的通用结束状态
     FINISHED(41, "已结束"), // 一般节点的节点的结束状态
     SKIP(42, "跳过"); // 未执行，跳过的节点
 

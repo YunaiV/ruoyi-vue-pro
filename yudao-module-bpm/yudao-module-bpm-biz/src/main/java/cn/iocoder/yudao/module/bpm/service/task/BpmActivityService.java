@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.bpm.service.task;
 
 import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.instance.BpmProcessInstanceProgressRespVO;
+import cn.iocoder.yudao.module.bpm.enums.task.BpmProcessInstanceStatusEnum;
 import org.flowable.engine.history.HistoricActivityInstance;
 
 import java.util.List;
@@ -54,9 +55,23 @@ public interface BpmActivityService {
                                               Boolean isMultiInstance,
                                               List<HistoricActivityInstance> historicActivityList);
 
-    // TODO @jason：可以写下这 2 个方法的注释
+    /**
+     * 获取未执行活动的进度状态
+     *
+     * @param processInstanceStatus 流程实例的状态 {@link BpmProcessInstanceStatusEnum}
+     * @return 活动的进度状态
+     */
     Integer getNotRunActivityProgressStatus(Integer processInstanceStatus);
 
+    /**
+     * 获取未执行活动的用户列表
+     *
+     * @param processInstanceId 流程实例的编号
+     * @param processInstanceStatus 流程实例的状态 {@link BpmProcessInstanceStatusEnum}
+     * @param candidateStrategy 活动的候选人策略
+     * @param candidateParam  活动的候选人参数
+     * @return 用户列表
+     */
     List<BpmProcessInstanceProgressRespVO.User> getNotRunActivityUserList(String processInstanceId,
                                                                           Integer processInstanceStatus,
                                                                           Integer candidateStrategy,
