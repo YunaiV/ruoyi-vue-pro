@@ -7,6 +7,7 @@ import com.somle.dingtalk.service.DingTalkService;
 import com.somle.eccang.model.EccangOrder;
 import com.somle.eccang.service.EccangService;
 import com.somle.erp.service.ErpService;
+import com.somle.esb.config.QuartzConfig;
 import com.somle.esb.converter.DingTalkToErpConverter;
 import com.somle.esb.converter.EccangToErpConverter;
 import com.somle.esb.converter.ErpToEccangConverter;
@@ -17,12 +18,15 @@ import com.somle.matomo.service.MatomoService;
 import jakarta.annotation.Resource;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.quartz.Scheduler;
+import org.quartz.SchedulerException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Import;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.context.ApplicationContext;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -36,6 +40,7 @@ import static org.junit.jupiter.api.Assertions.*;
     DingTalkToErpConverter.class,
     ErpToEccangConverter.class,
     ErpToKingdeeConverter.class,
+    QuartzConfig.class,
 })
 //@ExtendWith(SpringExtension.class)
 class EsbServiceTest extends BaseSpringTest {
@@ -87,6 +92,19 @@ class EsbServiceTest extends BaseSpringTest {
     @Resource
     ErpToKingdeeConverter erpToKingdeeConverter;
 
+    @Autowired
+    private ApplicationContext applicationContext;
+
+    @Test
+    public void printAllBeans() {
+        String[] beanNames = applicationContext.getBeanDefinitionNames();
+        System.out.println("Beans provided by Spring:");
+
+        for (String beanName : beanNames) {
+            System.out.println(beanName);
+        }
+    }
+
 //    @Test
 //    void dataCollect() {
 //    }
@@ -95,9 +113,10 @@ class EsbServiceTest extends BaseSpringTest {
 //    void testDataCollect() {
 //    }
 //
-//    @Test
-//    void testDataCollect1() {
-//    }
+    @Test
+    void testDataCollect1() throws InterruptedException {
+        Thread.sleep(10000);
+    }
 
     @Test
     void syncDepartments() {

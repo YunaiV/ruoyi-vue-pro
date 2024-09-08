@@ -96,7 +96,7 @@ public class EsbService {
     //     log.debug(x.getStyleSku().toString());
     // }
 
-    @Scheduled(cron = "0 10 1 * * *") // Executes at 1:10 AM every day
+//    @Scheduled(cron = "0 10 1 * * *") // Executes at 1:10 AM every day
 //    @Scheduled(fixedDelay = 999999999, initialDelay = 5000)
     public void dataCollect() {
         LocalDate scheduleDate = LocalDate.now();
