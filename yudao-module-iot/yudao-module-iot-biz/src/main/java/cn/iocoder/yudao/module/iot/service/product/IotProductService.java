@@ -1,9 +1,9 @@
 package cn.iocoder.yudao.module.iot.service.product;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.iot.controller.admin.product.vo.ProductPageReqVO;
-import cn.iocoder.yudao.module.iot.controller.admin.product.vo.ProductSaveReqVO;
-import cn.iocoder.yudao.module.iot.dal.dataobject.product.ProductDO;
+import cn.iocoder.yudao.module.iot.controller.admin.product.vo.IotProductPageReqVO;
+import cn.iocoder.yudao.module.iot.controller.admin.product.vo.IotProductSaveReqVO;
+import cn.iocoder.yudao.module.iot.dal.dataobject.product.IotProductDO;
 import jakarta.validation.Valid;
 
 /**
@@ -11,7 +11,7 @@ import jakarta.validation.Valid;
  *
  * @author ahh
  */
-public interface ProductService {
+public interface IotProductService {
 
     /**
      * 创建产品
@@ -19,14 +19,14 @@ public interface ProductService {
      * @param createReqVO 创建信息
      * @return 编号
      */
-    Long createProduct(@Valid ProductSaveReqVO createReqVO);
+    Long createProduct(@Valid IotProductSaveReqVO createReqVO);
 
     /**
      * 更新产品
      *
      * @param updateReqVO 更新信息
      */
-    void updateProduct(@Valid ProductSaveReqVO updateReqVO);
+    void updateProduct(@Valid IotProductSaveReqVO updateReqVO);
 
     /**
      * 删除产品
@@ -41,7 +41,7 @@ public interface ProductService {
      * @param id 编号
      * @return 产品
      */
-    ProductDO getProduct(Long id);
+    IotProductDO getProduct(Long id);
 
     /**
      * 获得产品分页
@@ -49,7 +49,7 @@ public interface ProductService {
      * @param pageReqVO 分页查询
      * @return 产品分页
      */
-    PageResult<ProductDO> getProductPage(ProductPageReqVO pageReqVO);
+    PageResult<IotProductDO> getProductPage(IotProductPageReqVO pageReqVO);
 
     /**
      * 更新产品状态

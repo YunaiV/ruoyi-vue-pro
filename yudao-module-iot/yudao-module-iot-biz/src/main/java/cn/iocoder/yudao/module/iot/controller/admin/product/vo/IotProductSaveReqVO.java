@@ -3,13 +3,13 @@ package cn.iocoder.yudao.module.iot.controller.admin.product.vo;
 import cn.iocoder.yudao.framework.common.validation.InEnum;
 import cn.iocoder.yudao.module.iot.enums.product.*;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.*;
-import java.util.*;
-import jakarta.validation.constraints.*;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
+import lombok.Data;
 
 @Schema(description = "管理后台 - iot 产品新增/修改 Request VO")
 @Data
-public class ProductSaveReqVO {
+public class IotProductSaveReqVO {
 
     @Schema(description = "产品编号", requiredMode = Schema.RequiredMode.AUTO, example = "1")
     private Long id;
@@ -26,15 +26,15 @@ public class ProductSaveReqVO {
     @NotNull(message = "设备类型不能为空")
     private Integer deviceType;
 
-    @Schema(description = "联网方式", requiredMode = Schema.RequiredMode.REQUIRED,example = "0")
+    @Schema(description = "联网方式", requiredMode = Schema.RequiredMode.REQUIRED, example = "0")
     @InEnum(value = IotNetTypeEnum.class, message = "联网方式必须是 {value}")
     private Integer netType;
 
-    @Schema(description = "接入网关协议", requiredMode = Schema.RequiredMode.REQUIRED,example = "0")
+    @Schema(description = "接入网关协议", requiredMode = Schema.RequiredMode.REQUIRED, example = "0")
     @InEnum(value = IotProtocolTypeEnum.class, message = "接入网关协议必须是 {value}")
     private Integer protocolType;
 
-    @Schema(description = "数据格式",requiredMode = Schema.RequiredMode.REQUIRED, example = "0")
+    @Schema(description = "数据格式", requiredMode = Schema.RequiredMode.REQUIRED, example = "0")
     @InEnum(value = IotDataFormatEnum.class, message = "数据格式必须是 {value}")
     @NotNull(message = "数据格式不能为空")
     private Integer dataFormat;

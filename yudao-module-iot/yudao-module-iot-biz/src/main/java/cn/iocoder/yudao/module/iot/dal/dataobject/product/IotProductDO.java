@@ -19,7 +19,7 @@ import lombok.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ProductDO extends BaseDO {
+public class IotProductDO extends BaseDO {
 
     /**
      * 产品ID
@@ -37,7 +37,7 @@ public class ProductDO extends BaseDO {
     private String productKey;
     /**
      * 产品所属品类编号
-     *
+     * <p>
      * TODO 外键：后续加
      */
     private Long categoryId;
@@ -48,44 +48,44 @@ public class ProductDO extends BaseDO {
 
     /**
      * 产品状态
-     *
+     * <p>
      * 枚举 {@link cn.iocoder.yudao.module.iot.enums.product.IotProductStatusEnum}
      */
     private Integer status;
     /**
      * 设备类型
-     *
+     * <p>
      * 枚举 {@link cn.iocoder.yudao.module.iot.enums.product.IotProductDeviceTypeEnum}
      */
     private Integer deviceType;
     /**
      * 联网方式
-     *
+     * <p>
      * 枚举 {@link cn.iocoder.yudao.module.iot.enums.product.IotNetTypeEnum}
      */
     private Integer netType;
 
     /**
      * 接入网关协议
-     *
+     * <p>
      * 枚举 {@link cn.iocoder.yudao.module.iot.enums.product.IotProtocolTypeEnum}
      */
     private Integer protocolType;
     /**
      * 协议编号
-     *
+     * <p>
      * TODO 外键：后续加
      */
     private Long protocolId;
     /**
      * 数据格式
-     *
+     * <p>
      * 枚举 {@link cn.iocoder.yudao.module.iot.enums.product.IotDataFormatEnum}
      */
     private Integer dataFormat;
     /**
      * 数据校验级别
-     *
+     * <p>
      * 枚举 {@link cn.iocoder.yudao.module.iot.enums.product.IotValidateTypeEnum}
      */
     private Integer validateType;

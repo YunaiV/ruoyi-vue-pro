@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 @Schema(description = "管理后台 - iot 产品 Response VO")
 @Data
 @ExcelIgnoreUnannotated
-public class ProductRespVO {
+public class IotProductRespVO {
 
     @Schema(description = "产品ID", requiredMode = Schema.RequiredMode.REQUIRED, example = "26087")
     @ExcelProperty("产品ID")
