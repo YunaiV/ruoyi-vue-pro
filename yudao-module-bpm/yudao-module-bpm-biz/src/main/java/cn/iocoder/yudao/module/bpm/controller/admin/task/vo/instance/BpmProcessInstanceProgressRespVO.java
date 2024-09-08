@@ -32,6 +32,7 @@ public class BpmProcessInstanceProgressRespVO {
         @Schema(description = "节点类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
         private Integer nodeType; // 参见 BpmSimpleModelNodeType 枚举
 
+        // TODO @jason：可以复用 BpmTaskStatusEnum 么？非必要不加太多状态枚举哈
         @Schema(description = "节点状态", requiredMode = Schema.RequiredMode.REQUIRED, example = "0")
         private Integer status; // 参见 BpmProcessNodeProgressEnum 枚举
 
@@ -42,6 +43,8 @@ public class BpmProcessInstanceProgressRespVO {
 
         @Schema(description = "用户列表")
         private List<User> userList;
+
+        // TODO @jason：如果条件信息，怎么展示哈？
         @Schema(description = "分支节点")
         private List<ProcessNodeProgress> branchNodes;  // 有且仅有条件、并行、包容节点才会有分支节点
 
@@ -61,6 +64,8 @@ public class BpmProcessInstanceProgressRespVO {
 
         @Schema(description = "用户头像", example = "芋艿")
         private String avatar;
+
+        // TODO @jason：是不是把 processed 和 userTaskStatus 合并？
 
         @Schema(description = "是否已处理", requiredMode = Schema.RequiredMode.REQUIRED, example = "true")
         private Boolean processed;

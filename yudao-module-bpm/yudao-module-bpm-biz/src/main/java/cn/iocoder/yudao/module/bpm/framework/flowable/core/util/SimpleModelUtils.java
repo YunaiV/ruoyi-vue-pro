@@ -654,10 +654,11 @@ public class SimpleModelUtils {
         }
         buildNodeProgress(processInstance, simpleModel, nodeProgresses, historicActivityList, activityInstanceMap, returnNodePosition);
         // 如果有“子”节点，则递归处理子节点
+        // TODO @jason：需要根据条件，是否继续递归。例如说，一共有 3 个 node；第 2 个 node 审批不通过了。那么第 3 个 node 就不用了。（微信讨论下）
         traverseNodeToBuildNodeProgress(processInstance, simpleModel.getChildNode(), historicActivityList, activityInstanceMap, nodeProgresses, returnNodePosition);
     }
 
-    // TODO @芋艿：重点在 review 下
+    // TODO @芋艿，@jason：可重构优化的点，SimpleModelUtils 负责提供一个遍历的方法，有个 Function 进行每个节点的处理。目的是，把逻辑拿回到 Service 里面；或者说，减少 Utils 去调用 Service
     private static void buildNodeProgress(HistoricProcessInstance processInstance, BpmSimpleModelNodeVO node, List<ProcessNodeProgress> nodeProgresses,
                                           List<HistoricActivityInstance> historicActivityList, Map<String, HistoricActivityInstance> activityInstanceMap, List<Integer> returnNodePosition) {
         BpmSimpleModelNodeType nodeType = BpmSimpleModelNodeType.valueOf(node.getType());
@@ -674,6 +675,7 @@ public class SimpleModelUtils {
             // 2. 设置节点状态
             nodeProgress.setStatus(activityService.getNotRunActivityProgressStatus(processInstanceStatus));
             // 3. 抄送节点, 审批节点设置用户列表
+            // TODO @芋艿：抄送节点，要不要跳过（不展示）
             if (COPY_NODE.getType().equals(node.getType()) ||
                     (APPROVE_NODE.getType().equals(node.getType()) && USER.getType().equals(node.getApproveType()))) {
                 nodeProgress.setUserList(activityService.getNotRunActivityUserList(processInstance.getId()
@@ -707,6 +709,7 @@ public class SimpleModelUtils {
                     }
                     break;
                 }
+                // TODO @芋艿：抄送节点，要不要跳过（不展示）
                 case COPY_NODE: { // 抄送节点
                     // 1. 设置节点的状态
                     nodeProgress.setStatus(activityService.getHistoricActivityProgressStatus(historicActivity, false, historicActivityList));
