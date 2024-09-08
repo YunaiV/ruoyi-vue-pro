@@ -8,8 +8,8 @@ import cn.iocoder.yudao.module.promotion.controller.admin.seckill.vo.activity.Se
 import cn.iocoder.yudao.module.promotion.controller.app.seckill.vo.activity.AppSeckillActivityPageReqVO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.seckill.SeckillActivityDO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.seckill.SeckillProductDO;
-
 import jakarta.validation.Valid;
+
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
@@ -98,7 +98,7 @@ public interface SeckillActivityService {
      * @param activityIds 活动编号
      * @return 活动商品列表
      */
-    List<SeckillProductDO> getSeckillProductListByActivityId(Collection<Long> activityIds);
+    List<SeckillProductDO> getSeckillProductListByActivityIds(Collection<Long> activityIds);
 
     /**
      * 通过活动时段编号获取指定 status 的秒杀活动
@@ -138,5 +138,13 @@ public interface SeckillActivityService {
      * @return 秒杀活动列表
      */
     List<SeckillActivityDO> getSeckillActivityBySpuIdsAndStatusAndDateTimeLt(Collection<Long> spuIds, Integer status, LocalDateTime dateTime);
+
+    /**
+     * 获得拼团活动列表
+     *
+     * @param ids 拼团活动 ids
+     * @return 拼团活动的列表
+     */
+    List<SeckillActivityDO> getSeckillActivityListByIds(Collection<Long> ids);
 
 }

@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.promotion.convert.seckill;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
+import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.product.api.spu.dto.ProductSpuRespDTO;
 import cn.iocoder.yudao.module.promotion.api.seckill.dto.SeckillValidateJoinRespDTO;
 import cn.iocoder.yudao.module.promotion.controller.admin.seckill.vo.activity.SeckillActivityCreateReqVO;
@@ -85,6 +86,22 @@ public interface SeckillActivityConvert {
 
     default List<SeckillProductDO> convertList(List<? extends SeckillProductBaseVO> products, SeckillActivityDO activity) {
         return CollectionUtils.convertList(products, item -> convert(activity, item).setActivityStatus(activity.getStatus()));
+    }
+
+    default List<SeckillActivityRespVO> convertList(List<SeckillActivityDO> list,
+                                                        List<SeckillProductDO> productList,
+                                                        List<ProductSpuRespDTO> spuList) {
+        List<SeckillActivityRespVO> activityList = BeanUtils.toBean(list, SeckillActivityRespVO.class);
+        Map<Long, ProductSpuRespDTO> spuMap = convertMap(spuList, ProductSpuRespDTO::getId);
+        Map<Long, List<SeckillProductDO>> productMap = convertMultiMap(productList, SeckillProductDO::getActivityId);
+        return CollectionUtils.convertList(activityList, item -> {
+            // 设置 product 信息
+            item.setSeckillPrice(getMinValue(productMap.get(item.getId()), SeckillProductDO::getSeckillPrice));
+            // 设置 SPU 信息
+            findAndThen(spuMap, item.getSpuId(), spu -> item.setSpuName(spu.getName())
+                    .setPicUrl(spu.getPicUrl()).setMarketPrice(spu.getMarketPrice()));
+            return item;
+        });
     }
 
     List<SeckillProductRespVO> convertList2(List<SeckillProductDO> list);
