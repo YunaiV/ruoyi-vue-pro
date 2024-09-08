@@ -24,13 +24,13 @@ public class EccangController {
         return eccangService.getInventoryBatchLog(LocalDateTime.parse(startTime), LocalDateTime.parse(endTime)).toList();
     }
 
-    @GetMapping("/getOrderShip")
-    public List<BizContent> getOrderShip(
-            @RequestParam String startTime,
-            @RequestParam String endTime
-    ) {
-        return eccangService.getOrderShipPage(LocalDateTime.parse(startTime), LocalDateTime.parse(endTime)).toList();
-    }
+//    @GetMapping("/getOrderShip")
+//    public List<BizContent> getOrderShip(
+//            @RequestParam String startTime,
+//            @RequestParam String endTime
+//    ) {
+//        return eccangService.getOrderShipPage(LocalDateTime.parse(startTime), LocalDateTime.parse(endTime)).toList();
+//    }
 
     @GetMapping("/getOrder")
     public List<BizContent> getOrder(
