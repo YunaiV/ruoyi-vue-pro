@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.trade.service.price.calculator;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.util.number.MoneyUtils;
@@ -146,7 +147,7 @@ public class TradeRewardActivityPriceCalculator implements TradePriceCalculator 
             return filterList(result.getItems(),
                     orderItem -> CollUtil.contains(rewardActivity.getProductScopeValues(), orderItem.getCategoryId()));
         }
-        return List.of();
+        return ListUtil.of();
     }
 
     /**

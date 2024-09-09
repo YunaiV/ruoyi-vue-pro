@@ -115,4 +115,5 @@ public class SeckillActivityController {
         List<ProductSpuRespDTO> spuList = productSpuApi.getSpuList(convertList(activityList, SeckillActivityDO::getSpuId));
         return success(SeckillActivityConvert.INSTANCE.convertList(activityList, productList, spuList));
     }
+
 }

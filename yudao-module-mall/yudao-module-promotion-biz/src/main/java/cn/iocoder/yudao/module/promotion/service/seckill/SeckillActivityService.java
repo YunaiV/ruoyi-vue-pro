@@ -142,7 +142,7 @@ public interface SeckillActivityService {
     /**
      * 获得拼团活动列表
      *
-     * @param ids 拼团活动 ids
+     * @param ids 拼团活动编号数组
      * @return 拼团活动的列表
      */
     List<SeckillActivityDO> getSeckillActivityListByIds(Collection<Long> ids);

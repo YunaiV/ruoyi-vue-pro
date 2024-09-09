@@ -57,5 +57,4 @@ public class SeckillActivityRespVO extends SeckillActivityBaseVO {
     @Schema(description = "拼团金额，单位：分", requiredMode = Schema.RequiredMode.REQUIRED, example = "100")
     private Integer seckillPrice; // 从 products 获取最小 price 读取
 
-
 }
