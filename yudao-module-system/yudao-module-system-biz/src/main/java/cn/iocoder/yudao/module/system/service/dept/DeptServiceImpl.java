@@ -98,6 +98,7 @@ public class DeptServiceImpl implements DeptService {
             // 删除部门
             deptMapper.deleteById(dept.getId());
         }
+        deptMapper.deleteById(id);
     }
 
     @VisibleForTesting
