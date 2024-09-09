@@ -16,6 +16,9 @@ public class AppSeckillActivityRespVO {
     @Schema(description = "商品 SPU 编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "2048")
     private Long spuId;
 
+    @Schema(description = "商品 SPU 名字", requiredMode = Schema.RequiredMode.REQUIRED, example = "一个白菜")
+    private String spuName; // 从 SPU 的 name 读取
+
     @Schema(description = "商品图片", requiredMode = Schema.RequiredMode.REQUIRED, // 从 SPU 的 picUrl 读取
             example = "https://www.iocoder.cn/xx.png")
     private String picUrl;

@@ -104,6 +104,22 @@ public interface SeckillActivityConvert {
         });
     }
 
+    default List<AppSeckillActivityRespVO> convertAppList(List<SeckillActivityDO> list,
+                                                              List<SeckillProductDO> productList,
+                                                              List<ProductSpuRespDTO> spuList) {
+        List<AppSeckillActivityRespVO> activityList = BeanUtils.toBean(list, AppSeckillActivityRespVO.class);
+        Map<Long, ProductSpuRespDTO> spuMap = convertMap(spuList, ProductSpuRespDTO::getId);
+        Map<Long, List<SeckillProductDO>> productMap = convertMultiMap(productList, SeckillProductDO::getActivityId);
+        return CollectionUtils.convertList(activityList, item -> {
+            // 设置 product 信息
+            item.setSeckillPrice(getMinValue(productMap.get(item.getId()), SeckillProductDO::getSeckillPrice));
+            // 设置 SPU 信息
+            findAndThen(spuMap, item.getSpuId(), spu -> item.setSpuName(spu.getName())
+                    .setPicUrl(spu.getPicUrl()).setMarketPrice(spu.getMarketPrice()));
+            return item;
+        });
+    }
+
     List<SeckillProductRespVO> convertList2(List<SeckillProductDO> list);
 
     List<AppSeckillActivityRespVO> convertList3(List<SeckillActivityDO> activityList);
