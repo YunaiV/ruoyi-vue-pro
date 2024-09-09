@@ -15,13 +15,16 @@ import com.somle.esb.converter.DingTalkToErpConverter;
 import com.somle.esb.converter.EccangToErpConverter;
 import com.somle.esb.converter.ErpToEccangConverter;
 import com.somle.esb.converter.ErpToKingdeeConverter;
+import com.somle.esb.job.DataJob;
 import com.somle.esb.model.Domain;
 import com.somle.esb.model.OssData;
 import com.somle.framework.common.util.general.CoreUtils;
 import com.somle.kingdee.service.KingdeeService;
 import com.somle.matomo.service.MatomoService;
 import com.somle.framework.common.util.web.WebUtils;
+import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
+import org.quartz.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.integration.annotation.ServiceActivator;
 import org.springframework.integration.support.MessageBuilder;
@@ -82,6 +85,27 @@ public class EsbService {
 
     @Autowired
     ErpToKingdeeConverter erpToKingdeeConverter;
+
+    @Autowired
+    private Scheduler scheduler;
+
+    @PostConstruct
+    public void scheduleJob() throws SchedulerException {
+        JobDetail dataJobDetail = JobBuilder.newJob(DataJob.class)
+            .withIdentity("dataJob")
+            .storeDurably()  // Keeps the job even if no trigger is associated
+            .build();
+
+        Trigger dataTrigger = TriggerBuilder.newTrigger()
+            .forJob(dataJobDetail)
+            .withIdentity("dataTrigger")
+            .withSchedule(CronScheduleBuilder.cronSchedule("0 10 1 * * ?"))
+//            .withSchedule(CronScheduleBuilder.cronSchedule("0/1 * * * * ?"))
+            .build();
+
+        // Schedule the job using the scheduler
+        scheduler.scheduleJob(dataJobDetail, dataTrigger);
+    }
 
 
     

@@ -7,7 +7,7 @@ import com.somle.dingtalk.service.DingTalkService;
 import com.somle.eccang.model.EccangOrder;
 import com.somle.eccang.service.EccangService;
 import com.somle.erp.service.ErpService;
-import com.somle.esb.config.QuartzConfig;
+import com.somle.esb.config.IntegrationConfig;
 import com.somle.esb.converter.DingTalkToErpConverter;
 import com.somle.esb.converter.EccangToErpConverter;
 import com.somle.esb.converter.ErpToEccangConverter;
@@ -21,6 +21,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.quartz.QuartzAutoConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Import;
@@ -40,24 +41,26 @@ import static org.junit.jupiter.api.Assertions.*;
     DingTalkToErpConverter.class,
     ErpToEccangConverter.class,
     ErpToKingdeeConverter.class,
-    QuartzConfig.class,
+    EccangToErpConverter.class,
+    IntegrationConfig.class,
+    QuartzAutoConfiguration.class,
 })
 //@ExtendWith(SpringExtension.class)
 class EsbServiceTest extends BaseSpringTest {
     @Resource
     EsbService service;
 
-    @Resource
-    ErpService erpService;
-
-    @Resource
-    EccangService eccangService;
-
-    @Resource
-    DingTalkService dingTalkService;
-
-    @Resource
-    KingdeeService kingdeeService;
+//    @Resource
+//    ErpService erpService;
+//
+//    @Resource
+//    EccangService eccangService;
+//
+//    @Resource
+//    DingTalkService dingTalkService;
+//
+//    @Resource
+//    KingdeeService kingdeeService;
 
     @MockBean
     AmazonService amazonService;
@@ -68,29 +71,6 @@ class EsbServiceTest extends BaseSpringTest {
     @MockBean
     AiService aiService;
 
-    @MockBean(name="productChannel")
-    MessageChannel productChannel;
-
-    @MockBean(name="saleChannel")
-    MessageChannel saleChannel;
-
-    @MockBean(name="dataChannel")
-    MessageChannel dataChannel;
-
-    @MockBean(name="departmentChannel")
-    MessageChannel departmentChannel;
-
-    @Resource
-    DingTalkToErpConverter dingTalkToErpConverter;
-
-    @MockBean
-    EccangToErpConverter eccangToErpConverter;
-
-    @Resource
-    ErpToEccangConverter erpToEccangConverter;
-
-    @Resource
-    ErpToKingdeeConverter erpToKingdeeConverter;
 
     @Autowired
     private ApplicationContext applicationContext;
@@ -114,7 +94,7 @@ class EsbServiceTest extends BaseSpringTest {
 //    }
 //
     @Test
-    void testDataCollect1() throws InterruptedException {
+    void testDataCollect1() throws InterruptedException, SchedulerException {
         Thread.sleep(10000);
     }
 

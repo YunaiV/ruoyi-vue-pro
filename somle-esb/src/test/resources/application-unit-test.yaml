@@ -1,6 +1,6 @@
 spring:
   main:
-    lazy-initialization: true # 开启懒加载，加快速度
+#    lazy-initialization: true # 开启懒加载，加快速度
     banner-mode: off # 单元测试，禁用 Banner
   test:
     database:
@@ -8,6 +8,10 @@ spring:
 logging:
   level:
     com.somle: DEBUG
+    org.quartz: DEBUG
+    org.springframework.scheduling.quartz: DEBUG
+  quartz:
+    auto-startup: true
 
 --- #################### 数据库相关配置 ####################
 
