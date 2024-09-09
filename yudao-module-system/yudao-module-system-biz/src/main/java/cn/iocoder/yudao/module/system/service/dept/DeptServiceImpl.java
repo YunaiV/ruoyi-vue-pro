@@ -74,18 +74,30 @@ public class DeptServiceImpl implements DeptService {
         deptMapper.updateById(updateObj);
     }
 
+//    @Override
+//    @CacheEvict(cacheNames = RedisKeyConstants.DEPT_CHILDREN_ID_LIST,
+//            allEntries = true) // allEntries 清空所有缓存，因为操作一个部门，涉及到多个缓存
+//    public void deleteDept(Long id) {
+//        // 校验是否存在
+//        validateDeptExists(id);
+//        // 校验是否有子部门
+//        if (deptMapper.selectCountByParentId(id) > 0) {
+//            throw exception(DEPT_EXITS_CHILDREN);
+//        }
+//        // 删除部门
+//        deptMapper.deleteById(id);
+//    }
+
     @Override
     @CacheEvict(cacheNames = RedisKeyConstants.DEPT_CHILDREN_ID_LIST,
-            allEntries = true) // allEntries 清空所有缓存，因为操作一个部门，涉及到多个缓存
+        allEntries = true) // allEntries 清空所有缓存，因为操作一个部门，涉及到多个缓存
     public void deleteDept(Long id) {
         // 校验是否存在
         validateDeptExists(id);
-        // 校验是否有子部门
-        if (deptMapper.selectCountByParentId(id) > 0) {
-            throw exception(DEPT_EXITS_CHILDREN);
+        for (var dept : getChildDeptList(id)) {
+            // 删除部门
+            deptMapper.deleteById(dept.getId());
         }
-        // 删除部门
-        deptMapper.deleteById(id);
     }
 
     @VisibleForTesting
