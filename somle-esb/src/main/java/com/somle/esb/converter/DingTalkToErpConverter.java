@@ -1,5 +1,8 @@
 package com.somle.esb.converter;
 
+import cn.iocoder.yudao.module.system.controller.admin.dept.vo.dept.DeptListReqVO;
+import cn.iocoder.yudao.module.system.controller.admin.dept.vo.dept.DeptSaveReqVO;
+import cn.iocoder.yudao.module.system.service.dept.DeptService;
 import com.somle.dingtalk.model.DingTalkDepartment;
 import com.somle.dingtalk.service.DingTalkService;
 import com.somle.erp.model.ErpDepartment;
@@ -20,15 +23,19 @@ public class DingTalkToErpConverter {
     @Autowired
     ErpService erpService;
 
-    public ErpDepartment toErp(DingTalkDepartment dept) {
-        ErpDepartment erpDepartment = ErpDepartment.builder()
-            .id(dept.getDeptId())
-            .nameZh(dept.getName())
-            .level(dept.getLevel())
-            .parentId(dept.getParentId())
-            .build();
-        return erpDepartment;
-    }
+    @Autowired
+    DeptService deptService;
+
+
+//    public ErpDepartment toErp(DingTalkDepartment dept) {
+//        ErpDepartment erpDepartment = ErpDepartment.builder()
+//            .id(dept.getDeptId())
+//            .nameZh(dept.getName())
+//            .level(dept.getLevel())
+//            .parentId(dept.getParentId())
+//            .build();
+//        return erpDepartment;
+//    }
 
 //    public Stream<ErpDepartment> toErpStream(ErpDepartment erpParent) {
 //        List<DingTalkDepartment> childList = dingTalkService.getOrphans(Long.valueOf(erpParent.getId())).toList();
@@ -57,4 +64,15 @@ public class DingTalkToErpConverter {
 //                .build()
 //        ));
 //    }
+
+    public DeptSaveReqVO toErp(DingTalkDepartment dept) {
+        var parentDept = dingTalkService.getDepartment(dept.getParentId());
+        var erpDepart = new DeptSaveReqVO().setName(dept.getName());
+        try {
+            var erpParentDept = deptService.getDeptList(new DeptListReqVO().setName(parentDept.getName())).getFirst();
+            erpParentDept.setParentId(erpParentDept.getId());
+        } catch (Exception e) {
+        }
+        return erpDepart;
+    }
 }

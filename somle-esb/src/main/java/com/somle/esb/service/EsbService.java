@@ -1,5 +1,6 @@
 package com.somle.esb.service;
 
+import cn.iocoder.yudao.module.system.service.dept.DeptService;
 import com.somle.ai.model.AiName;
 import com.somle.ai.service.AiService;
 import com.somle.amazon.service.AmazonService;
@@ -64,6 +65,9 @@ public class EsbService {
 
     @Autowired
     ErpService erpService;
+
+    @Autowired
+    DeptService deptService;
 
     @Autowired
     AiService aiService;
@@ -377,28 +381,30 @@ public class EsbService {
 
     }
 
-    @ServiceActivator(inputChannel = "departmentChannel")
-    public void handleDepartment(Message<DingTalkDepartment> message) {
-        log.info("receiving message: " + message.getPayload().toString());
-        var erpDepartment = dingTalkToErpConverter.toErp(message.getPayload());
-        erpService.saveDepartment(erpDepartment);
-        var eccangDepartment = erpToEccangConverter.toEccang(erpDepartment);
-        EccangResponse.BizContent response = eccangService.addDepartment(eccangDepartment);
-        log.info(response.toString());
-        var kingdeeDepartment = erpToKingdeeConverter.toKingdee(erpDepartment);
-        kingdeeService.addDepartment(kingdeeDepartment);
-    }
+//    @ServiceActivator(inputChannel = "departmentChannel")
+//    public void handleDepartment(Message<DingTalkDepartment> message) {
+//        var dingtalkDepartment = message.getPayload();
+//        log.info("receiving message: " + dingtalkDepartment.toString());
+//        var erpDepartment = dingTalkToErpConverter.toErp(message.getPayload());
+//        deptService.createDept(erpDepartment);
+//        var eccangDepartment = erpToEccangConverter.toEccang(erpDepartment);
+//        EccangResponse.BizContent response = eccangService.addDepartment(eccangDepartment);
+//        log.info(response.toString());
+//        var kingdeeDepartment = erpToKingdeeConverter.toKingdee(erpDepartment);
+//        kingdeeService.addDepartment(kingdeeDepartment);
+//    }
 
 
     public void syncDepartments() {
         dingTalkService.getDepartmentStream().forEach(dingTalkDepartment -> {
+            log.info("begin syncing: " + dingTalkDepartment.toString());
             var erpDepartment = dingTalkToErpConverter.toErp(dingTalkDepartment);
-            erpService.saveDepartment(erpDepartment);
-            var eccangDepartment = erpToEccangConverter.toEccang(erpDepartment);
-            EccangResponse.BizContent response = eccangService.addDepartment(eccangDepartment);
-            log.info(response.toString());
-            var kingdeeDepartment = erpToKingdeeConverter.toKingdee(erpDepartment);
-            kingdeeService.addDepartment(kingdeeDepartment);
+            deptService.createDept(erpDepartment);
+//        var eccangDepartment = erpToEccangConverter.toEccang(erpDepartment);
+//        EccangResponse.BizContent response = eccangService.addDepartment(eccangDepartment);
+//        log.info(response.toString());
+//        var kingdeeDepartment = erpToKingdeeConverter.toKingdee(erpDepartment);
+//        kingdeeService.addDepartment(kingdeeDepartment);
         });
     }
 

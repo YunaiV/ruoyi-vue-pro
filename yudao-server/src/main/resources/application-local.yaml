@@ -1,14 +1,3 @@
-oss:
-  bucketName: somle-bigdata
-kingdee:
-  outerInstanceIds:
-    - 94464631434776576
-    - 94827482531893248
-    - 94827793875079168
-    - 94828068241281024
-    - 94828281114791936
-    - 94829067232219136
-
 --- #################### 数据库相关配置 ####################
 spring:
   # 数据源配置项
@@ -62,7 +51,7 @@ spring:
           #          url: jdbc:kingbase8://127.0.0.1:54321/test  # 人大金仓 KingbaseES 连接的示例
           #          url: jdbc:postgresql://127.0.0.1:5432/postgres # OpenGauss 连接的示例
           username: root
-          password: 'YMCA@1978'
+          password: 123456
           #          username: sa # SQL Server 连接的示例
           #          password: Yudao@2024 # SQL Server 连接的示例
           #          username: SYSDBA # DM 连接的示例
@@ -73,7 +62,7 @@ spring:
           lazy: true # 开启懒加载，保证启动速度
           url: jdbc:mysql://127.0.0.1:3306/ruoyi-vue-pro?useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true&nullCatalogMeansCurrent=true
           username: root
-          password: 'YMCA@1978'
+          password: 123456
 
   # Redis 配置。Redisson 默认的配置足够使用，一般不需要进行调优
   data:
@@ -185,31 +174,6 @@ logging:
     cn.iocoder.yudao.module.ai.dal.mysql: debug
     org.springframework.context.support.PostProcessorRegistrationDelegate: ERROR # TODO 芋艿：先禁用，Spring Boot 3.X 存在部分错误的 WARN 提示
 #    org.springframework: DEBUG
-
-#    org.springframework: DEBUG
-#    org.springframework.web: DEBUG
-#    org.springframework.web.client.RestTemplate: DEBUG
-#    org.springframework.http.client: DEBUG
-#    org.hibernate.SQL: DEBUG
-#    org.hibernate.type: TRACE
-#    org.hibernate.orm.jdbc.bind: TRACE
-#    org.hibernate.stat: DEBUG
-#    com.squareup.okhttp3: DEBUG
-    com.somle: DEBUG
-#    com.somle.erp.model.EsbStyleSku: DEBUG
-#    com.somle.erp.service.ErpService: DEBUG
-#    com.somle.eccang.service.EccangService: DEBUG
-#    com.somle.kingdee.controller.KingdeeController: DEBUG
-#    com.somle.kingdee.service.KingdeeService: DEBUG
-#    com.somle.kingdee.service.KingdeeClient: DEBUG
-#    com.somle.dingtalk.service.DingTalkService: DEBUG
-#    com.somle.ai.service.AiService: DEBUG
-#    com.somle.amazon.controller.AmazonSpController: DEBUG
-#    com.somle.amazon.service.AmazonService: DEBUG
-#    com.somle.amazon.service.AmazonSpService: DEBUG
-#    com.somle.amazon.service.AmazonAdService: DEBUG
-#    com.somle.util.Limiter: DEBUG
-#    com.somle.util.Util: DEBUG
 
 debug: false
 

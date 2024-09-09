@@ -2,6 +2,7 @@ package com.somle.esb.converter;
 
 import java.time.LocalDateTime;
 
+import cn.iocoder.yudao.module.system.controller.admin.dept.vo.dept.DeptSaveReqVO;
 import com.somle.erp.model.ErpCountrySku;
 import com.somle.erp.model.ErpStyleSku;
 import com.somle.kingdee.model.KingdeeProduct;
@@ -69,7 +70,7 @@ public class ErpToKingdeeConverter {
 
     }
 
-    public KingdeeAuxInfoDetail toKingdee(ErpDepartment erpDepartment) {
+    public KingdeeAuxInfoDetail toKingdee(DeptSaveReqVO erpDepartment) {
         // Map<String, String> departmentMap = new HashMap<>();
         // departmentMap.put("ABD美视区1组", "ABD0101");
         // departmentMap.put("ABD美视区2组", "ABD0102");
@@ -126,7 +127,7 @@ public class ErpToKingdeeConverter {
 
         KingdeeAuxInfoDetail department = new KingdeeAuxInfoDetail();
         String number = String.valueOf(erpDepartment.getId());
-        String name = String.valueOf(erpDepartment.getNameZh());
+        String name = String.valueOf(erpDepartment.getName());
 
         department.setName(name);
         department.setNumber(number);

@@ -1,3 +1,9 @@
+oss:
+  bucketName: somle-bigdata-dev
+kingdee:
+  outerInstanceIds:
+    - 94464631434776576
+
 --- #################### 数据库相关配置 ####################
 
 spring:
@@ -39,12 +45,12 @@ spring:
         master:
           url: jdbc:mysql://127.0.0.1:3306/ruoyi-vue-pro?useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true&nullCatalogMeansCurrent=true # MySQL Connector/J 8.X 连接的示例
           username: root
-          password: 123456
+          password: 'YMCA@1978'
         slave: # 模拟从库，可根据自己需要修改 # 模拟从库，可根据自己需要修改
           lazy: true # 开启懒加载，保证启动速度
           url: jdbc:mysql://127.0.0.1:3306/ruoyi-vue-pro?useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true&nullCatalogMeansCurrent=true # MySQL Connector/J 8.X 连接的示例
           username: root
-          password: 123456
+          password: 'YMCA@1978'
 
   # Redis 配置。Redisson 默认的配置足够使用，一般不需要进行调优
   data:
@@ -61,7 +67,7 @@ spring:
   quartz:
     auto-startup: true # 测试环境，需要开启 Job
     scheduler-name: schedulerName # Scheduler 名字。默认为 schedulerName
-    job-store-type: jdbc # Job 存储器类型。默认为 memory 表示内存，可选 jdbc 使用数据库。
+    job-store-type: memory # Job 存储器类型。默认为 memory 表示内存，可选 jdbc 使用数据库。
     wait-for-jobs-to-complete-on-shutdown: true # 应用关闭时，是否等待定时任务执行完成。默认为 false ，建议设置为 true
     properties: # 添加 Quartz Scheduler 附加属性，更多可以看 http://www.quartz-scheduler.org/documentation/2.4.0-SNAPSHOT/configuration.html 文档
       org:
@@ -71,12 +77,12 @@ spring:
             instanceName: schedulerName
             instanceId: AUTO # 自动生成 instance ID
           # JobStore 相关配置
-          jobStore:
-            # JobStore 实现类。可见博客：https://blog.csdn.net/weixin_42458219/article/details/122247162
-            class: org.springframework.scheduling.quartz.LocalDataSourceJobStore
-            isClustered: true # 是集群模式
-            clusterCheckinInterval: 15000 # 集群检查频率，单位：毫秒。默认为 15000，即 15 秒
-            misfireThreshold: 60000 # misfire 阀值，单位：毫秒。
+#          jobStore:
+#            # JobStore 实现类。可见博客：https://blog.csdn.net/weixin_42458219/article/details/122247162
+#            class: org.springframework.scheduling.quartz.LocalDataSourceJobStore
+#            isClustered: true # 是集群模式
+#            clusterCheckinInterval: 15000 # 集群检查频率，单位：毫秒。默认为 15000，即 15 秒
+#            misfireThreshold: 60000 # misfire 阀值，单位：毫秒。
           # 线程池相关配置
           threadPool:
             threadCount: 25 # 线程池大小。默认为 10 。
@@ -159,10 +165,14 @@ wx: # 参见 https://github.com/Wechat-Group/WxJava/blob/develop/spring-boot-sta
 
 # 芋道配置项，设置当前项目所有自定义的配置
 yudao:
+  captcha:
+    enable: false # 本地环境，暂时关闭图片验证码，方便登录等接口的测试；
+  security:
+    mock-enable: true
   pay:
     order-notify-url: http://yunai.natapp1.cc/admin-api/pay/notify/order # 支付渠道的【支付】回调地址
     refund-notify-url: http://yunai.natapp1.cc/admin-api/pay/notify/refund # 支付渠道的【退款】回调地址
-  demo: true # 开启演示模式
+  demo: false # 开启演示模式
   tencent-lbs-key: TVDBZ-TDILD-4ON4B-PFDZA-RNLKH-VVF6E # QQ 地图的密钥 https://lbs.qq.com/service/staticV2/staticGuide/staticDoc
 
 justauth:
