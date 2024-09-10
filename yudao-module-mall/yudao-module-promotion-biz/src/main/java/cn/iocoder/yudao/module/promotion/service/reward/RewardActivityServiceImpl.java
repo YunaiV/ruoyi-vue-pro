@@ -6,6 +6,7 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.product.api.category.ProductCategoryApi;
 import cn.iocoder.yudao.module.product.api.spu.ProductSpuApi;
+import cn.iocoder.yudao.module.product.api.spu.dto.ProductSpuRespDTO;
 import cn.iocoder.yudao.module.promotion.controller.admin.reward.vo.RewardActivityBaseVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.reward.vo.RewardActivityCreateReqVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.reward.vo.RewardActivityPageReqVO;
@@ -24,6 +25,7 @@ import java.util.Objects;
 
 import static cn.hutool.core.collection.CollUtil.intersectionDistinct;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 import static cn.iocoder.yudao.module.promotion.enums.ErrorCodeConstants.*;
 
 /**
@@ -121,8 +123,7 @@ public class RewardActivityServiceImpl implements RewardActivityService {
             list.removeIf(activity -> id.equals(activity.getId()));
         }
 
-        // TODO @puhui999：这个可能要完整对标有赞的校验。完全不允许重叠。
-        // 例如说，rewardActivity 是全部活动，结果有个 db 里的 activity 是某个分类，它也是冲突的。也就是说，当前时间段内，有且仅有只能有一个活动！
+        // 完全不允许重叠。
         for (RewardActivityDO item : list) {
             // 1.1 校验满减送活动时间是否冲突，如果时段不冲突那么不同的时间段内则可以存在相同的商品范围
             if (!LocalDateTimeUtil.isOverlap(item.getStartTime(), item.getEndTime(),
@@ -130,15 +131,44 @@ public class RewardActivityServiceImpl implements RewardActivityService {
                 continue;
             }
             // 1.2 校验商品范围是否重叠
-            if (PromotionProductScopeEnum.isAll(rewardActivity.getProductScope()) &&
-                    PromotionProductScopeEnum.isAll(item.getProductScope())) { // 情况一：全部商品参加
-                throw exception(REWARD_ACTIVITY_SCOPE_ALL_EXISTS);
+            // 情况一：如果与该时间段内商品范围为全部的活动冲突，或 rewardActivity 商品范围为全部，那么则直接校验不通过
+            // 例如说，rewardActivity 是全部活动，结果有个 db 里的 activity 是某个分类，它也是冲突的。也就是说，当前时间段内，有且仅有只能有一个活动！
+            if (PromotionProductScopeEnum.isAll(item.getProductScope()) ||
+                    PromotionProductScopeEnum.isAll(rewardActivity.getProductScope())) {
+                throw exception(REWARD_ACTIVITY_SCOPE_EXISTS);
             }
-            if (PromotionProductScopeEnum.isSpu(rewardActivity.getProductScope()) ||  // 情况二：指定商品参加
-                    PromotionProductScopeEnum.isCategory(rewardActivity.getProductScope())) {  // 情况三：指定商品类型参加
-                if (!intersectionDistinct(item.getProductScopeValues(), rewardActivity.getProductScopeValues()).isEmpty()) {
-                    throw exception(PromotionProductScopeEnum.isSpu(rewardActivity.getProductScope()) ?
-                            REWARD_ACTIVITY_SPU_CONFLICTS : REWARD_ACTIVITY_SCOPE_CATEGORY_EXISTS);
+            // 情况二：如果与该时间段内商品范围为类别的活动冲突
+            if (PromotionProductScopeEnum.isCategory(item.getProductScope())) {
+                // 校验分类是否冲突
+                if (PromotionProductScopeEnum.isCategory(rewardActivity.getProductScope())) {
+                    if (!intersectionDistinct(item.getProductScopeValues(), rewardActivity.getProductScopeValues()).isEmpty()) {
+                        throw exception(REWARD_ACTIVITY_SCOPE_EXISTS);
+                    }
+                }
+                // 校验商品分类是否冲突
+                if (PromotionProductScopeEnum.isSpu(rewardActivity.getProductScope())) {
+                    List<ProductSpuRespDTO> spuList = productSpuApi.getSpuList(rewardActivity.getProductScopeValues());
+                    if (!intersectionDistinct(item.getProductScopeValues(),
+                            convertSet(spuList, ProductSpuRespDTO::getCategoryId)).isEmpty()) {
+                        throw exception(REWARD_ACTIVITY_SCOPE_EXISTS);
+                    }
+                }
+            }
+            // 情况三：如果与该时间段内商品范围为商品的活动冲突
+            if (PromotionProductScopeEnum.isSpu(item.getProductScope())) {
+                // 校验商品是否冲突
+                if (PromotionProductScopeEnum.isSpu(rewardActivity.getProductScope())) {
+                    if (!intersectionDistinct(item.getProductScopeValues(), rewardActivity.getProductScopeValues()).isEmpty()) {
+                        throw exception(REWARD_ACTIVITY_SCOPE_EXISTS);
+                    }
+                }
+                // 校验商品分类是否冲突
+                if (PromotionProductScopeEnum.isCategory(rewardActivity.getProductScope())) {
+                    List<ProductSpuRespDTO> spuList = productSpuApi.getSpuList(item.getProductScopeValues());
+                    if (!intersectionDistinct(rewardActivity.getProductScopeValues(),
+                            convertSet(spuList, ProductSpuRespDTO::getCategoryId)).isEmpty()) {
+                        throw exception(REWARD_ACTIVITY_SCOPE_EXISTS);
+                    }
                 }
             }
         }
