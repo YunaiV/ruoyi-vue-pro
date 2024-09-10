@@ -121,6 +121,8 @@ public class RewardActivityServiceImpl implements RewardActivityService {
             list.removeIf(activity -> id.equals(activity.getId()));
         }
 
+        // TODO @puhui999：这个可能要完整对标有赞的校验。完全不允许重叠。
+        // 例如说，rewardActivity 是全部活动，结果有个 db 里的 activity 是某个分类，它也是冲突的。也就是说，当前时间段内，有且仅有只能有一个活动！
         for (RewardActivityDO item : list) {
             // 1.1 校验满减送活动时间是否冲突，如果时段不冲突那么不同的时间段内则可以存在相同的商品范围
             if (!LocalDateTimeUtil.isOverlap(item.getStartTime(), item.getEndTime(),

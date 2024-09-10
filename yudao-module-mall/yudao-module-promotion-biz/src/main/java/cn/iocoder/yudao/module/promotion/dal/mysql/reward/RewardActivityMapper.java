@@ -28,8 +28,8 @@ public interface RewardActivityMapper extends BaseMapperX<RewardActivityDO> {
     default List<RewardActivityDO> selectListByStatusAndDateTimeLt(Integer status, LocalDateTime dateTime) {
         return selectList(new LambdaQueryWrapperX<RewardActivityDO>()
                 .eq(RewardActivityDO::getStatus, status)
-                .lt(RewardActivityDO::getStartTime, dateTime)
-                .gt(RewardActivityDO::getEndTime, dateTime)// 开始时间 < 指定时间 < 结束时间，也就是说获取指定时间段的活动
+                // 开始时间 < 指定时间（dateTime） < 结束时间，也就是说获取指定时间段的活动
+                .lt(RewardActivityDO::getStartTime, dateTime).gt(RewardActivityDO::getEndTime, dateTime)
                 .orderByAsc(RewardActivityDO::getStartTime)
         );
     }
