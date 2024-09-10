@@ -117,28 +117,30 @@ public class RewardActivityServiceImpl implements RewardActivityService {
      * @param rewardActivity 请求
      */
     private void validateRewardActivitySpuConflicts(Long id, RewardActivityBaseVO rewardActivity) {
-        // 0. 获得开启的所有的活动
+        // 1. 获得开启的所有的活动
         List<RewardActivityDO> list = rewardActivityMapper.selectList(RewardActivityDO::getStatus, CommonStatusEnum.ENABLE.getStatus());
         if (id != null) { // 排除自己这个活动
             list.removeIf(activity -> id.equals(activity.getId()));
         }
 
-        // 完全不允许重叠。
+        // 2. 完全不允许重叠
         for (RewardActivityDO item : list) {
-            // 1.1 校验满减送活动时间是否冲突，如果时段不冲突那么不同的时间段内则可以存在相同的商品范围
+            // 2.1 校验满减送活动时间是否冲突，如果时段不冲突那么不同的时间段内则可以存在相同的商品范围
             if (!LocalDateTimeUtil.isOverlap(item.getStartTime(), item.getEndTime(),
                     rewardActivity.getStartTime(), rewardActivity.getEndTime())) {
                 continue;
             }
-            // 1.2 校验商品范围是否重叠
+            // 2.2 校验商品范围是否重叠
             // 情况一：如果与该时间段内商品范围为全部的活动冲突，或 rewardActivity 商品范围为全部，那么则直接校验不通过
             // 例如说，rewardActivity 是全部活动，结果有个 db 里的 activity 是某个分类，它也是冲突的。也就是说，当前时间段内，有且仅有只能有一个活动！
             if (PromotionProductScopeEnum.isAll(item.getProductScope()) ||
                     PromotionProductScopeEnum.isAll(rewardActivity.getProductScope())) {
+                // TODO puhui999：需要提示出来与满减送活动“xxx 活动”存在商品范围冲突；这里可能要分情况，下面需要把 activityName 传入
                 throw exception(REWARD_ACTIVITY_SCOPE_EXISTS);
             }
             // 情况二：如果与该时间段内商品范围为类别的活动冲突
             if (PromotionProductScopeEnum.isCategory(item.getProductScope())) {
+                // TODO puhui999：前端我们有限制，只允许子分类么？可能要限制下，不然基于分类查询不到对应的商品。因为商品目前必须在子分类下
                 // 校验分类是否冲突
                 if (PromotionProductScopeEnum.isCategory(rewardActivity.getProductScope())) {
                     if (!intersectionDistinct(item.getProductScopeValues(), rewardActivity.getProductScopeValues()).isEmpty()) {
