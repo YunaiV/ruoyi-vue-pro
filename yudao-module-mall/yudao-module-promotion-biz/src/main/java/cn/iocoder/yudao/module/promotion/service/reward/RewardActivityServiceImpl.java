@@ -24,7 +24,6 @@ import java.util.Objects;
 
 import static cn.hutool.core.collection.CollUtil.intersectionDistinct;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.anyMatch;
 import static cn.iocoder.yudao.module.promotion.enums.ErrorCodeConstants.*;
 
 /**
@@ -116,29 +115,29 @@ public class RewardActivityServiceImpl implements RewardActivityService {
      * @param rewardActivity 请求
      */
     private void validateRewardActivitySpuConflicts(Long id, RewardActivityBaseVO rewardActivity) {
-        // 0. 获得所有的活动包括关闭的
-        List<RewardActivityDO> list = rewardActivityMapper.selectList();
+        // 0. 获得开启的所有的活动
+        List<RewardActivityDO> list = rewardActivityMapper.selectList(RewardActivityDO::getStatus, CommonStatusEnum.ENABLE.getStatus());
         if (id != null) { // 排除自己这个活动
             list.removeIf(activity -> id.equals(activity.getId()));
         }
 
-        // 1.1 校验满减送活动时间是否冲突
-        boolean hasConflict = list.stream().anyMatch(item -> LocalDateTimeUtil.isOverlap(item.getStartTime(), item.getEndTime(),
-                rewardActivity.getStartTime(), rewardActivity.getEndTime()));
-        if (hasConflict) {
-            throw exception(REWARD_ACTIVITY_TIME_CONFLICTS);
-        }
-        // 1.2 校验商品范围是否重叠
-        if (PromotionProductScopeEnum.isAll(rewardActivity.getProductScope()) &&  // 情况一：全部商品参加
-                anyMatch(list, item -> PromotionProductScopeEnum.isAll(item.getProductScope()))) {
-            throw exception(REWARD_ACTIVITY_SCOPE_ALL_EXISTS);
-        }
-        if (PromotionProductScopeEnum.isSpu(rewardActivity.getProductScope()) ||  // 情况二：指定商品参加
-                PromotionProductScopeEnum.isCategory(rewardActivity.getProductScope())) {  // 情况三：指定商品类型参加
-            if (anyMatch(list, item -> !intersectionDistinct(item.getProductScopeValues(),
-                    rewardActivity.getProductScopeValues()).isEmpty())) {
-                throw exception(PromotionProductScopeEnum.isSpu(rewardActivity.getProductScope()) ?
-                        REWARD_ACTIVITY_SPU_CONFLICTS : REWARD_ACTIVITY_SCOPE_CATEGORY_EXISTS);
+        for (RewardActivityDO item : list) {
+            // 1.1 校验满减送活动时间是否冲突，如果时段不冲突那么不同的时间段内则可以存在相同的商品范围
+            if (!LocalDateTimeUtil.isOverlap(item.getStartTime(), item.getEndTime(),
+                    rewardActivity.getStartTime(), rewardActivity.getEndTime())) {
+                continue;
+            }
+            // 1.2 校验商品范围是否重叠
+            if (PromotionProductScopeEnum.isAll(rewardActivity.getProductScope()) &&
+                    PromotionProductScopeEnum.isAll(item.getProductScope())) { // 情况一：全部商品参加
+                throw exception(REWARD_ACTIVITY_SCOPE_ALL_EXISTS);
+            }
+            if (PromotionProductScopeEnum.isSpu(rewardActivity.getProductScope()) ||  // 情况二：指定商品参加
+                    PromotionProductScopeEnum.isCategory(rewardActivity.getProductScope())) {  // 情况三：指定商品类型参加
+                if (!intersectionDistinct(item.getProductScopeValues(), rewardActivity.getProductScopeValues()).isEmpty()) {
+                    throw exception(PromotionProductScopeEnum.isSpu(rewardActivity.getProductScope()) ?
+                            REWARD_ACTIVITY_SPU_CONFLICTS : REWARD_ACTIVITY_SCOPE_CATEGORY_EXISTS);
+                }
             }
         }
     }
