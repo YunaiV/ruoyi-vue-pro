@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.trade.service.price.calculator;
 
+import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.test.core.ut.BaseMockitoUnitTest;
 import cn.iocoder.yudao.module.promotion.api.reward.RewardActivityApi;
 import cn.iocoder.yudao.module.promotion.api.reward.dto.RewardActivityMatchRespDTO;
@@ -13,15 +14,14 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 
-import static cn.iocoder.yudao.framework.common.util.collection.SetUtils.asSet;
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomPojo;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 /**
@@ -63,22 +63,23 @@ public class TradeRewardActivityPriceCalculatorTest extends BaseMockitoUnitTest 
         TradePriceCalculatorHelper.recountAllPrice(result);
 
         // mock 方法（满减送 RewardActivity 信息）
-        when(rewardActivityApi.getMatchRewardActivityList(eq(asSet(1L, 2L, 3L)))).thenReturn(asList(
-                randomPojo(RewardActivityMatchRespDTO.class, o -> o.setId(1000L).setName("活动 1000 号")
-                        .setConditionType(PromotionConditionTypeEnum.PRICE.getType())
-                        .setProductScope(PromotionProductScopeEnum.SPU.getScope()).setProductScopeValues(asList(1L, 2L))
-                        .setRules(singletonList(new RewardActivityMatchRespDTO.Rule().setLimit(20).setDiscountPrice(70)
-                                .setFreeDelivery(false)))),
-                randomPojo(RewardActivityMatchRespDTO.class, o -> o.setId(2000L).setName("活动 2000 号")
-                        .setConditionType(PromotionConditionTypeEnum.COUNT.getType())
-                        .setProductScope(PromotionProductScopeEnum.SPU.getScope()).setProductScopeValues(singletonList(3L))
-                        .setRules(asList(new RewardActivityMatchRespDTO.Rule().setLimit(1).setDiscountPrice(10)
-                                        .setPoint(50).setFreeDelivery(false),
-                                new RewardActivityMatchRespDTO.Rule().setLimit(2).setDiscountPrice(60)
-                                        .setPoint(100).setFreeDelivery(false), // 最大可满足，因为是 4 个
-                                new RewardActivityMatchRespDTO.Rule().setLimit(10).setDiscountPrice(100)
-                                        .setFreeDelivery(false))))
-        ));
+        when(rewardActivityApi.getRewardActivityListByStatusAndNow(CommonStatusEnum.ENABLE.getStatus(), LocalDateTime.now()))
+                .thenReturn(asList(
+                        randomPojo(RewardActivityMatchRespDTO.class, o -> o.setId(1000L).setName("活动 1000 号")
+                                .setConditionType(PromotionConditionTypeEnum.PRICE.getType())
+                                .setProductScope(PromotionProductScopeEnum.SPU.getScope()).setProductScopeValues(asList(1L, 2L))
+                                .setRules(singletonList(new RewardActivityMatchRespDTO.Rule().setLimit(20).setDiscountPrice(70)
+                                        .setFreeDelivery(false)))),
+                        randomPojo(RewardActivityMatchRespDTO.class, o -> o.setId(2000L).setName("活动 2000 号")
+                                .setConditionType(PromotionConditionTypeEnum.COUNT.getType())
+                                .setProductScope(PromotionProductScopeEnum.SPU.getScope()).setProductScopeValues(singletonList(3L))
+                                .setRules(asList(new RewardActivityMatchRespDTO.Rule().setLimit(1).setDiscountPrice(10)
+                                                .setPoint(50).setFreeDelivery(false),
+                                        new RewardActivityMatchRespDTO.Rule().setLimit(2).setDiscountPrice(60)
+                                                .setPoint(100).setFreeDelivery(false), // 最大可满足，因为是 4 个
+                                        new RewardActivityMatchRespDTO.Rule().setLimit(10).setDiscountPrice(100)
+                                                .setFreeDelivery(false))))
+                ));
 
         // 调用
         tradeRewardActivityPriceCalculator.calculate(param, result);
@@ -184,11 +185,12 @@ public class TradeRewardActivityPriceCalculatorTest extends BaseMockitoUnitTest 
         TradePriceCalculatorHelper.recountAllPrice(result);
 
         // mock 方法（限时折扣 DiscountActivity 信息）
-        when(rewardActivityApi.getMatchRewardActivityList(eq(asSet(1L, 2L)))).thenReturn(singletonList(
-                randomPojo(RewardActivityMatchRespDTO.class, o -> o.setId(1000L).setName("活动 1000 号")
-                        .setProductScopeValues(asList(1L, 2L)).setConditionType(PromotionConditionTypeEnum.PRICE.getType())
-                        .setRules(singletonList(new RewardActivityMatchRespDTO.Rule().setLimit(351).setDiscountPrice(70))))
-        ));
+        when(rewardActivityApi.getRewardActivityListByStatusAndNow(CommonStatusEnum.ENABLE.getStatus(), LocalDateTime.now()))
+                .thenReturn(singletonList(
+                        randomPojo(RewardActivityMatchRespDTO.class, o -> o.setId(1000L).setName("活动 1000 号")
+                                .setProductScopeValues(asList(1L, 2L)).setConditionType(PromotionConditionTypeEnum.PRICE.getType())
+                                .setRules(singletonList(new RewardActivityMatchRespDTO.Rule().setLimit(351).setDiscountPrice(70))))
+                ));
 
         // 调用
         tradeRewardActivityPriceCalculator.calculate(param, result);

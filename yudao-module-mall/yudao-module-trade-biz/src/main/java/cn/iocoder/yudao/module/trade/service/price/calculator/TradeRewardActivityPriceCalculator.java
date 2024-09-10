@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.trade.service.price.calculator;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.util.number.MoneyUtils;
 import cn.iocoder.yudao.module.promotion.api.reward.RewardActivityApi;
 import cn.iocoder.yudao.module.promotion.api.reward.dto.RewardActivityMatchRespDTO;
@@ -16,12 +17,12 @@ import jakarta.annotation.Resource;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
-import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.filterList;
 import static cn.iocoder.yudao.module.trade.service.price.calculator.TradePriceCalculatorHelper.formatPrice;
 
@@ -46,8 +47,8 @@ public class TradeRewardActivityPriceCalculator implements TradePriceCalculator 
             return;
         }
         // 获得 SKU 对应的满减送活动
-        List<RewardActivityMatchRespDTO> rewardActivities = rewardActivityApi.getMatchRewardActivityList(
-                convertSet(result.getItems(), TradePriceCalculateRespBO.OrderItem::getSpuId));
+        List<RewardActivityMatchRespDTO> rewardActivities = rewardActivityApi.getRewardActivityListByStatusAndNow(
+                CommonStatusEnum.ENABLE.getStatus(), LocalDateTime.now());
         if (CollUtil.isEmpty(rewardActivities)) {
             return;
         }
@@ -109,16 +110,8 @@ public class TradeRewardActivityPriceCalculator implements TradePriceCalculator 
         // 4.3 记录赠送的优惠券
         if (CollUtil.isNotEmpty(rule.getGiveCouponTemplateCounts())) {
             for (Map.Entry<Long, Integer> entry : rule.getGiveCouponTemplateCounts().entrySet()) {
-                Map<Long, Integer> giveCouponTemplateCounts = result.getGiveCouponTemplateCounts();
-                // TODO @puhui999：是不是有一种可能性，这个 key 没有，别的 key 有哈。
-                // TODO 这里还有一种简化的写法。就是下面，大概两行就可以啦
-//                result.getGiveCouponTemplateCounts().put(entry.getKey(),
-//                        result.getGiveCouponTemplateCounts().getOrDefault(entry.getKey(), 0) + entry.getValue());
-                if (giveCouponTemplateCounts.get(entry.getKey()) == null) { // 情况一：还没有赠送的优惠券
-                    result.setGiveCouponTemplateCounts(rule.getGiveCouponTemplateCounts());
-                } else { // 情况二：别的满减活动送过同类优惠券，则直接增加数量
-                    giveCouponTemplateCounts.put(entry.getKey(), giveCouponTemplateCounts.get(entry.getKey()) + entry.getValue());
-                }
+                result.getGiveCouponTemplateCounts().put(entry.getKey(),
+                        result.getGiveCouponTemplateCounts().getOrDefault(entry.getKey(), 0) + entry.getValue());
             }
         }
     }
@@ -126,7 +119,7 @@ public class TradeRewardActivityPriceCalculator implements TradePriceCalculator 
     /**
      * 获得满减送的订单项（商品）列表
      *
-     * @param result 计算结果
+     * @param result         计算结果
      * @param rewardActivity 满减送活动
      * @return 订单项（商品）列表
      */
@@ -153,7 +146,7 @@ public class TradeRewardActivityPriceCalculator implements TradePriceCalculator 
      * 获得最大匹配的满减送活动的规则
      *
      * @param rewardActivity 满减送活动
-     * @param orderItems 商品项
+     * @param orderItems     商品项
      * @return 匹配的活动规则
      */
     private RewardActivityMatchRespDTO.Rule getMaxMatchRewardActivityRule(RewardActivityMatchRespDTO rewardActivity,

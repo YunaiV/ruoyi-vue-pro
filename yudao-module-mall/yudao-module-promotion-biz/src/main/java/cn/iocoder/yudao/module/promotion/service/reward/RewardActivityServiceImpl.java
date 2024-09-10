@@ -1,11 +1,11 @@
 package cn.iocoder.yudao.module.promotion.service.reward;
 
+import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.product.api.category.ProductCategoryApi;
 import cn.iocoder.yudao.module.product.api.spu.ProductSpuApi;
-import cn.iocoder.yudao.module.promotion.api.reward.dto.RewardActivityMatchRespDTO;
 import cn.iocoder.yudao.module.promotion.controller.admin.reward.vo.RewardActivityBaseVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.reward.vo.RewardActivityCreateReqVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.reward.vo.RewardActivityPageReqVO;
@@ -19,7 +19,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
 import java.time.LocalDateTime;
-import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 
@@ -87,8 +86,7 @@ public class RewardActivityServiceImpl implements RewardActivityService {
         }
 
         // 更新
-        RewardActivityDO updateObj = new RewardActivityDO().setId(id).setStatus(CommonStatusEnum.DISABLE.getStatus());
-        rewardActivityMapper.updateById(updateObj);
+        rewardActivityMapper.updateById(new RewardActivityDO().setId(id).setStatus(CommonStatusEnum.DISABLE.getStatus()));
     }
 
     @Override
@@ -118,14 +116,21 @@ public class RewardActivityServiceImpl implements RewardActivityService {
      * @param rewardActivity 请求
      */
     private void validateRewardActivitySpuConflicts(Long id, RewardActivityBaseVO rewardActivity) {
-        List<RewardActivityDO> list = rewardActivityMapper.selectList(RewardActivityDO::getProductScope,
-                rewardActivity.getProductScope(), RewardActivityDO::getStatus, CommonStatusEnum.ENABLE.getStatus());
+        // 0. 获得所有的活动包括关闭的
+        List<RewardActivityDO> list = rewardActivityMapper.selectList();
         if (id != null) { // 排除自己这个活动
             list.removeIf(activity -> id.equals(activity.getId()));
         }
 
-        // 情况一：全部商品参加
-        if (PromotionProductScopeEnum.isAll(rewardActivity.getProductScope()) && !list.isEmpty()) {
+        // 1.1 校验满减送活动时间是否冲突
+        boolean hasConflict = list.stream().anyMatch(item -> LocalDateTimeUtil.isOverlap(item.getStartTime(), item.getEndTime(),
+                rewardActivity.getStartTime(), rewardActivity.getEndTime()));
+        if (hasConflict) {
+            throw exception(REWARD_ACTIVITY_TIME_CONFLICTS);
+        }
+        // 1.2 校验商品范围是否重叠
+        if (PromotionProductScopeEnum.isAll(rewardActivity.getProductScope()) &&  // 情况一：全部商品参加
+                anyMatch(list, item -> PromotionProductScopeEnum.isAll(item.getProductScope()))) {
             throw exception(REWARD_ACTIVITY_SCOPE_ALL_EXISTS);
         }
         if (PromotionProductScopeEnum.isSpu(rewardActivity.getProductScope()) ||  // 情况二：指定商品参加
@@ -154,12 +159,6 @@ public class RewardActivityServiceImpl implements RewardActivityService {
     @Override
     public PageResult<RewardActivityDO> getRewardActivityPage(RewardActivityPageReqVO pageReqVO) {
         return rewardActivityMapper.selectPage(pageReqVO);
-    }
-
-    @Override
-    public List<RewardActivityMatchRespDTO> getMatchRewardActivityList(Collection<Long> spuIds) {
-        List<RewardActivityDO> list = rewardActivityMapper.selectListBySpuIdsAndStatus(spuIds, CommonStatusEnum.ENABLE.getStatus());
-        return BeanUtils.toBean(list, RewardActivityMatchRespDTO.class);
     }
 
     @Override
