@@ -1,16 +1,23 @@
 package cn.iocoder.yudao.module.system.service.user;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
+import cn.iocoder.yudao.module.system.controller.admin.auth.vo.AuthRegisterReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.user.vo.profile.UserProfileUpdatePasswordReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.user.vo.profile.UserProfileUpdateReqVO;
-import cn.iocoder.yudao.module.system.controller.admin.user.vo.user.*;
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.module.system.controller.admin.user.vo.user.UserImportExcelVO;
+import cn.iocoder.yudao.module.system.controller.admin.user.vo.user.UserImportRespVO;
+import cn.iocoder.yudao.module.system.controller.admin.user.vo.user.UserPageReqVO;
+import cn.iocoder.yudao.module.system.controller.admin.user.vo.user.UserSaveReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.user.AdminUserDO;
-
 import jakarta.validation.Valid;
+
 import java.io.InputStream;
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 后台用户 Service 接口
@@ -26,6 +33,14 @@ public interface AdminUserService {
      * @return 用户编号
      */
     Long createUser(@Valid UserSaveReqVO createReqVO);
+
+    /**
+     * 注册用户
+     *
+     * @param registerReqVO 用户信息
+     * @return 用户编号
+     */
+    Long registerUser(@Valid AuthRegisterReqVO registerReqVO);
 
     /**
      * 修改用户

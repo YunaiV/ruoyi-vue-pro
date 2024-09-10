@@ -77,4 +77,5 @@ public interface AdminAuthService {
      * @return 注册结果
      */
     AuthLoginRespVO register(AuthRegisterReqVO createReqVO);
+
 }
