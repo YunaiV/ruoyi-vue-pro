@@ -8,7 +8,7 @@ import cn.iocoder.yudao.module.iot.dal.dataobject.product.IotProductDO;
 import org.apache.ibatis.annotations.Mapper;
 
 /**
- * iot 产品 Mapper
+ * IoT 产品 Mapper
  *
  * @author ahh
  */

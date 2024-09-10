@@ -7,7 +7,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
 
 /**
- * iot 产品 DO
+ * IoT 产品 DO
  *
  * @author ahh
  */

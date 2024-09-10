@@ -7,7 +7,7 @@ import cn.iocoder.yudao.module.iot.dal.dataobject.product.IotProductDO;
 import jakarta.validation.Valid;
 
 /**
- * IOT 产品 Service 接口
+ * IoT 产品 Service 接口
  *
  * @author ahh
  */

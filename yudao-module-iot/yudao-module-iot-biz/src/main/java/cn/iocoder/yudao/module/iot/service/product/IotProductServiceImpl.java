@@ -20,7 +20,7 @@ import static cn.iocoder.yudao.module.iot.enums.ErrorCodeConstants.PRODUCT_NOT_E
 import static cn.iocoder.yudao.module.iot.enums.ErrorCodeConstants.PRODUCT_STATUS_NOT_DELETE;
 
 /**
- * IOT 产品 Service 实现类
+ * IoT 产品 Service 实现类
  *
  * @author ahh
  */

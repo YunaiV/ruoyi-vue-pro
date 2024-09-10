@@ -7,7 +7,7 @@ import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
-@Schema(description = "管理后台 - iot 产品新增/修改 Request VO")
+@Schema(description = "管理后台 - IoT 产品新增/修改 Request VO")
 @Data
 public class IotProductSaveReqVO {
 

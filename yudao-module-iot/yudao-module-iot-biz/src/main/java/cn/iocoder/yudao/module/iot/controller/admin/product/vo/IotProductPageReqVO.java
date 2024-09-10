@@ -6,8 +6,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
-// TODO @haohao：涉及到 iot 的拼写，要不都用 IoT，貌似更规范
-@Schema(description = "管理后台 - iot 产品分页 Request VO")
+@Schema(description = "管理后台 - IoT 产品分页 Request VO")
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
