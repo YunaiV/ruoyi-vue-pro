@@ -40,12 +40,12 @@ public interface ErrorCodeConstants {
 
     // ========== 满减送活动 1-013-006-000 ==========
     ErrorCode REWARD_ACTIVITY_NOT_EXISTS = new ErrorCode(1_013_006_000, "满减送活动不存在");
-    ErrorCode REWARD_ACTIVITY_SPU_CONFLICTS = new ErrorCode(1_013_006_001, "存在商品参加了其它满减送活动");
+    ErrorCode REWARD_ACTIVITY_SPU_CONFLICTS = new ErrorCode(1_013_006_001, "该时间段存在商品参加了其它满减送活动");
     ErrorCode REWARD_ACTIVITY_UPDATE_FAIL_STATUS_CLOSED = new ErrorCode(1_013_006_002, "满减送活动已关闭，不能修改");
     ErrorCode REWARD_ACTIVITY_DELETE_FAIL_STATUS_NOT_CLOSED = new ErrorCode(1_013_006_003, "满减送活动未关闭，不能删除");
     ErrorCode REWARD_ACTIVITY_CLOSE_FAIL_STATUS_CLOSED = new ErrorCode(1_013_006_004, "满减送活动已关闭，不能重复关闭");
-    ErrorCode REWARD_ACTIVITY_SCOPE_ALL_EXISTS = new ErrorCode(1_013_006_005, "已存在商品范围为全场的满减送活动");
-    ErrorCode REWARD_ACTIVITY_SCOPE_CATEGORY_EXISTS = new ErrorCode(1_013_006_006, "存在商品类型参加了其它满减送活动");
+    ErrorCode REWARD_ACTIVITY_SCOPE_ALL_EXISTS = new ErrorCode(1_013_006_005, "该时间段已存在商品范围为全场的满减送活动");
+    ErrorCode REWARD_ACTIVITY_SCOPE_CATEGORY_EXISTS = new ErrorCode(1_013_006_006, "该时间段存在商品类型参加了其它满减送活动");
 
     // ========== TODO 空着 1-013-007-000 ============
 
