@@ -154,4 +154,10 @@ public class AuthController {
         return success(authService.socialLogin(reqVO));
     }
 
+    @PostMapping("/register")
+    @PermitAll
+    @Operation(summary = "注册用户")
+    public CommonResult<AuthLoginRespVO> register(@RequestBody @Valid AuthRegisterReqVO registerReqVO) {
+        return success(authService.register(registerReqVO));
+    }
 }

@@ -4,6 +4,7 @@ import cn.hutool.core.util.ObjectUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.util.monitor.TracerUtils;
+import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.common.util.servlet.ServletUtils;
 import cn.iocoder.yudao.framework.common.util.validation.ValidationUtils;
 import cn.iocoder.yudao.module.system.api.logger.dto.LoginLogCreateReqDTO;
@@ -14,6 +15,7 @@ import cn.iocoder.yudao.module.system.controller.admin.auth.vo.*;
 import cn.iocoder.yudao.module.system.convert.auth.AuthConvert;
 import cn.iocoder.yudao.module.system.dal.dataobject.oauth2.OAuth2AccessTokenDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.user.AdminUserDO;
+import cn.iocoder.yudao.module.system.dal.mysql.user.AdminUserMapper;
 import cn.iocoder.yudao.module.system.enums.logger.LoginLogTypeEnum;
 import cn.iocoder.yudao.module.system.enums.logger.LoginResultEnum;
 import cn.iocoder.yudao.module.system.enums.oauth2.OAuth2ClientConstants;
@@ -22,6 +24,7 @@ import cn.iocoder.yudao.module.system.service.logger.LoginLogService;
 import cn.iocoder.yudao.module.system.service.member.MemberService;
 import cn.iocoder.yudao.module.system.service.oauth2.OAuth2TokenService;
 import cn.iocoder.yudao.module.system.service.social.SocialUserService;
+import cn.iocoder.yudao.module.system.service.tenant.TenantService;
 import cn.iocoder.yudao.module.system.service.user.AdminUserService;
 import com.google.common.annotations.VisibleForTesting;
 import com.xingyuv.captcha.model.common.ResponseModel;
@@ -29,6 +32,8 @@ import com.xingyuv.captcha.model.vo.CaptchaVO;
 import com.xingyuv.captcha.service.CaptchaService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import jakarta.annotation.Resource;
@@ -64,7 +69,13 @@ public class AdminAuthServiceImpl implements AdminAuthService {
     private CaptchaService captchaService;
     @Resource
     private SmsCodeApi smsCodeApi;
-
+    @Resource
+    @Lazy // 延迟，避免循环依赖报错
+    private TenantService tenantService;
+    @Resource
+    private AdminUserMapper userMapper;
+    @Resource
+    private PasswordEncoder passwordEncoder;
     /**
      * 验证码的开关，默认为 true
      */
@@ -247,4 +258,38 @@ public class AdminAuthServiceImpl implements AdminAuthService {
         return UserTypeEnum.ADMIN;
     }
 
+
+    public AuthLoginRespVO register(AuthRegisterReqVO registerReqVO) {
+        // 校验验证码
+        AuthLoginReqVO loginReqVO = BeanUtils.toBean(registerReqVO, AuthLoginReqVO.class);
+        validateCaptcha(loginReqVO);
+        // 校验账户配合
+        tenantService.handleTenantInfo(tenant -> {
+            long count = userMapper.selectCount();
+            if (count >= tenant.getAccountCount()) {
+                throw exception(USER_COUNT_MAX, tenant.getAccountCount());
+            }
+        });
+        // 校验用户名是否已存在
+        if (userMapper.selectByUsername(registerReqVO.getUsername()) != null) {
+            throw exception(USER_USERNAME_EXISTS);
+        }
+        // 插入用户
+        AdminUserDO user = BeanUtils.toBean(registerReqVO, AdminUserDO.class);
+        user.setStatus(CommonStatusEnum.ENABLE.getStatus()); // 默认开启
+        user.setPassword(encodePassword(registerReqVO.getPassword())); // 加密密码
+        userMapper.insert(user);
+
+        return createTokenAfterLoginSuccess(user.getId(), registerReqVO.getUsername(), LoginLogTypeEnum.LOGIN_USERNAME);
+    }
+
+    /**
+     * 对密码进行加密
+     *
+     * @param password 密码
+     * @return 加密后的密码
+     */
+    private String encodePassword(String password) {
+        return passwordEncoder.encode(password);
+    }
 }
