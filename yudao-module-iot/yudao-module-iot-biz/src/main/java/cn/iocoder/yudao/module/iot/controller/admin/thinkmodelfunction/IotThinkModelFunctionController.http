@@ -1,0 +1,96 @@
+### 请求 /iot/think-model-function/create 接口 => 成功
+POST {{baseUrl}}/iot/think-model-function/create
+Content-Type: application/json
+tenant-id: {{adminTenentId}}
+Authorization: Bearer {{token}}
+
+{
+  "productKey": "123456",
+  "properties": [
+    {
+      "identifier": "CurrentTemperature",
+      "name": "当前温度",
+      "accessMode": "r",
+      "required": true,
+      "dataType": {
+        "type": "float",
+        "specs": {
+          "min": "-40",
+          "max": "120",
+          "unit": "°C",
+          "unitName": "摄氏度",
+          "step": "0.1"
+        }
+      }
+    },
+    {
+      "identifier": "CurrentHumidity",
+      "name": "当前湿度",
+      "accessMode": "r",
+      "required": true,
+      "dataType": {
+        "type": "float",
+        "specs": {
+          "min": "0",
+          "max": "100",
+          "unit": "%",
+          "unitName": "百分比",
+          "step": "0.1"
+        }
+      }
+    }
+  ],
+  "services": "{}",
+  "events": "{}"
+}
+
+### 请求 /iot/think-model-function/update 接口 => 成功
+PUT {{baseUrl}}/iot/think-model-function/update
+Content-Type: application/json
+tenant-id: {{adminTenentId}}
+Authorization: Bearer {{token}}
+
+{
+  "productKey": "123456",
+  "properties": [
+    {
+      "identifier": "CurrentTemperature",
+      "name": "当前温度",
+      "accessMode": "r",
+      "required": true,
+      "dataType": {
+        "type": "float",
+        "specs": {
+          "min": "-40",
+          "max": "130",
+          "unit": "°C",
+          "unitName": "摄氏度",
+          "step": "0.1"
+        }
+      }
+    },
+    {
+      "identifier": "CurrentHumidity",
+      "name": "当前湿度",
+      "accessMode": "r",
+      "required": true,
+      "dataType": {
+        "type": "float",
+        "specs": {
+          "min": "0",
+          "max": "100",
+          "unit": "%",
+          "unitName": "百分比",
+          "step": "0.1"
+        }
+      }
+    }
+  ],
+  "services": "{}",
+  "events": "{}"
+}
+
+### 请求 /iot/think-model-function/get 接口 => 成功
+GET {{baseUrl}}/iot/think-model-function/get?productKey=123456
+tenant-id: {{adminTenentId}}
+Authorization: Bearer {{token}}

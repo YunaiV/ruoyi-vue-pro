@@ -16,8 +16,7 @@ import java.util.Objects;
 import java.util.UUID;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.module.iot.enums.ErrorCodeConstants.PRODUCT_NOT_EXISTS;
-import static cn.iocoder.yudao.module.iot.enums.ErrorCodeConstants.PRODUCT_STATUS_NOT_DELETE;
+import static cn.iocoder.yudao.module.iot.enums.ErrorCodeConstants.*;
 
 /**
  * IoT 产品 Service 实现类
@@ -54,7 +53,7 @@ public class IotProductServiceImpl implements IotProductService {
         }
         // 2. 校验唯一性
         if (productMapper.selectByProductKey(productKey) != null) {
-            throw exception(PRODUCT_NOT_EXISTS);
+            throw exception(PRODUCT_IDENTIFICATION_EXISTS);
         }
         createReqVO.setProductKey(productKey);
     }
