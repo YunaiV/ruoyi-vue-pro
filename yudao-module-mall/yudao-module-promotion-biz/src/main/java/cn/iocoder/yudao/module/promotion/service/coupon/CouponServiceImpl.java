@@ -284,8 +284,9 @@ public class CouponServiceImpl implements CouponService {
         if (couponTemplate == null) {
             throw exception(COUPON_TEMPLATE_NOT_EXISTS);
         }
-        // 校验剩余数量
-        if (couponTemplate.getTakeCount() + userIds.size() > couponTemplate.getTotalCount()) {
+        // 校验剩余数量（仅在 CouponTakeTypeEnum.USER 用户领取时）
+        if (CouponTakeTypeEnum.isUser(couponTemplate.getTakeCount())
+                && couponTemplate.getTakeCount() + userIds.size() > couponTemplate.getTotalCount()) {
             throw exception(COUPON_TEMPLATE_NOT_ENOUGH);
         }
         // 校验"固定日期"的有效期类型是否过期
@@ -295,7 +296,7 @@ public class CouponServiceImpl implements CouponService {
             }
         }
         // 校验领取方式
-        if (ObjectUtil.notEqual(couponTemplate.getTakeType(), takeType.getValue())) {
+        if (ObjectUtil.notEqual(couponTemplate.getTakeType(), takeType.getType())) {
             throw exception(COUPON_TEMPLATE_CANNOT_TAKE);
         }
     }
