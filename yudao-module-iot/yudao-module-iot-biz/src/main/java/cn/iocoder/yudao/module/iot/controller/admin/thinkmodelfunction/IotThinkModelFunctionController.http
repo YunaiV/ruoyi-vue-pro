@@ -5,45 +5,139 @@ tenant-id: {{adminTenentId}}
 Authorization: Bearer {{token}}
 
 {
-  "productId": 1,
-  "productKey": "123456",
+  "productId": 1002,
+  "productKey": "smart-sensor-002",
   "properties": [
     {
-      "identifier": "CurrentTemperature",
-      "name": "当前温度",
+      "identifier": "Temperature",
+      "name": "温度",
       "accessMode": "r",
       "required": true,
       "dataType": {
         "type": "float",
         "specs": {
-          "min": "-40",
-          "max": "120",
-          "unit": "°C",
-          "unitName": "摄氏度",
-          "step": "0.1"
+          "min": -40.0,
+          "max": 125.0,
+          "step": 0.1,
+          "unit": "℃"
         }
-      }
+      },
+      "description": "当前温度值"
     },
     {
-      "identifier": "CurrentHumidity",
-      "name": "当前湿度",
+      "identifier": "Humidity",
+      "name": "湿度",
       "accessMode": "r",
       "required": true,
       "dataType": {
         "type": "float",
         "specs": {
-          "min": "0",
-          "max": "100",
-          "unit": "%",
-          "unitName": "百分比",
-          "step": "0.1"
+          "min": 0.0,
+          "max": 100.0,
+          "step": 0.1,
+          "unit": "%"
         }
-      }
+      },
+      "description": "当前湿度值"
+    },
+    {
+      "identifier": "GeoLocation",
+      "name": "地理位置",
+      "accessMode": "r",
+      "required": false,
+      "dataType": {
+        "type": "struct",
+        "specs": [
+          {
+            "identifier": "Longitude",
+            "name": "经度",
+            "dataType": {
+              "type": "double",
+              "specs": {
+                "min": -180.0,
+                "max": 180.0,
+                "step": 0.000001,
+                "unit": "°"
+              }
+            },
+            "description": "设备所在位置的经度"
+          },
+          {
+            "identifier": "Latitude",
+            "name": "纬度",
+            "dataType": {
+              "type": "double",
+              "specs": {
+                "min": -90.0,
+                "max": 90.0,
+                "step": 0.000001,
+                "unit": "°"
+              }
+            },
+            "description": "设备所在位置的纬度"
+          }
+        ]
+      },
+      "description": "设备的地理位置信息"
     }
   ],
-  "services": "{}",
-  "events": "{}"
+  "services": [
+    {
+      "identifier": "Reboot",
+      "name": "重启设备",
+      "callType": "async",
+      "inputData": [],
+      "description": "远程重启设备",
+      "method": "thing.service.reboot"
+    },
+    {
+      "identifier": "SetThreshold",
+      "name": "设置温度阈值",
+      "callType": "sync",
+      "inputData": [
+        {
+          "identifier": "Threshold",
+          "name": "阈值",
+          "dataType": {
+            "type": "float",
+            "specs": {
+              "min": -40.0,
+              "max": 125.0,
+              "step": 0.1,
+              "unit": "℃"
+            }
+          },
+          "description": "报警温度阈值"
+        }
+      ],
+      "description": "设置设备的温度报警阈值",
+      "method": "thing.service.setThreshold"
+    }
+  ],
+  "events": [
+    {
+      "identifier": "HighTemperatureAlert",
+      "name": "高温报警",
+      "type": "alert",
+      "outputData": [
+        {
+          "identifier": "CurrentTemperature",
+          "name": "当前温度",
+          "dataType": {
+            "type": "float",
+            "specs": {
+              "unit": "℃"
+            }
+          },
+          "description": "触发报警时的温度值"
+        }
+      ],
+      "description": "当温度超过阈值时触发高温报警事件",
+      "method": "thing.event.highTemperatureAlert"
+    }
+  ]
 }
+
 
 ### 请求 /iot/think-model-function/update 接口 => 成功
 PUT {{baseUrl}}/iot/think-model-function/update
@@ -53,45 +147,136 @@ Authorization: Bearer {{token}}
 
 {
   "id": 1,
-  "productId": 1,
-  "productKey": "123456",
+  "productId": 1001,
+  "productKey": "smart-sensor-001",
   "properties": [
     {
-      "identifier": "CurrentTemperature",
-      "name": "当前温度",
+      "identifier": "Temperature",
+      "name": "温度",
       "accessMode": "r",
       "required": true,
       "dataType": {
         "type": "float",
         "specs": {
-          "min": "-40",
-          "max": "130",
-          "unit": "°C",
-          "unitName": "摄氏度",
-          "step": "0.1"
+          "min": -40.0,
+          "max": 125.0,
+          "step": 0.1,
+          "unit": "℃"
         }
-      }
+      },
+      "description": "当前温度值"
     },
     {
-      "identifier": "CurrentHumidity",
-      "name": "当前湿度",
+      "identifier": "Humidity",
+      "name": "湿度",
       "accessMode": "r",
       "required": true,
       "dataType": {
         "type": "float",
         "specs": {
-          "min": "0",
-          "max": "100",
-          "unit": "%",
-          "unitName": "百分比",
-          "step": "0.1"
+          "min": 0.0,
+          "max": 100.0,
+          "step": 0.1,
+          "unit": "%"
         }
-      }
+      },
+      "description": "当前湿度值"
+    },
+    {
+      "identifier": "GeoLocation",
+      "name": "地理位置",
+      "accessMode": "r",
+      "required": false,
+      "dataType": {
+        "type": "struct",
+        "specs": [
+          {
+            "identifier": "Longitude",
+            "name": "经度",
+            "dataType": {
+              "type": "double",
+              "specs": {
+                "min": -180.0,
+                "max": 180.0,
+                "step": 0.000001,
+                "unit": "°"
+              }
+            },
+            "description": "设备所在位置的经度"
+          },
+          {
+            "identifier": "Latitude",
+            "name": "纬度",
+            "dataType": {
+              "type": "double",
+              "specs": {
+                "min": -90.0,
+                "max": 90.0,
+                "step": 0.000001,
+                "unit": "°"
+              }
+            },
+            "description": "设备所在位置的纬度"
+          }
+        ]
+      },
+      "description": "设备的地理位置信息"
     }
   ],
-  "services": "{}",
-  "events": "{}"
+  "services": [
+    {
+      "identifier": "Reboot",
+      "name": "重启设备",
+      "callType": "async",
+      "inputData": [],
+      "description": "远程重启设备"
+    },
+    {
+      "identifier": "SetThreshold",
+      "name": "设置温度阈值",
+      "callType": "sync",
+      "inputData": [
+        {
+          "identifier": "Threshold",
+          "name": "阈值",
+          "dataType": {
+            "type": "float",
+            "specs": {
+              "min": -40.0,
+              "max": 125.0,
+              "step": 0.1,
+              "unit": "℃"
+            }
+          },
+          "description": "报警温度阈值"
+        }
+      ],
+      "description": "设置设备的温度报警阈值"
+    }
+  ],
+  "events": [
+    {
+      "identifier": "HighTemperatureAlert",
+      "name": "高温报警",
+      "type": "alert",
+      "outputData": [
+        {
+          "identifier": "CurrentTemperature",
+          "name": "当前温度",
+          "dataType": {
+            "type": "float",
+            "specs": {
+              "unit": "℃"
+            }
+          },
+          "description": "触发报警时的温度值"
+        }
+      ],
+      "description": "当温度超过阈值时触发高温报警事件"
+    }
+  ]
 }
+
 
 ### 请求 /iot/think-model-function/get-by-product-key 接口 => 成功
 GET {{baseUrl}}/iot/think-model-function/get-by-product-key?productKey=123456
