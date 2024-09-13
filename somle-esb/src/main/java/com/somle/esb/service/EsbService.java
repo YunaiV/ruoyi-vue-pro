@@ -18,20 +18,21 @@ import com.somle.esb.converter.ErpToEccangConverter;
 import com.somle.esb.converter.ErpToKingdeeConverter;
 import com.somle.esb.job.DataJob;
 import com.somle.esb.model.Domain;
+import com.somle.esb.model.EsbMapping;
 import com.somle.esb.model.OssData;
+import com.somle.esb.repository.EsbMappingRepository;
 import com.somle.framework.common.util.general.CoreUtils;
 import com.somle.kingdee.service.KingdeeService;
 import com.somle.matomo.service.MatomoService;
-import com.somle.framework.common.util.web.WebUtils;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Example;
 import org.springframework.integration.annotation.ServiceActivator;
 import org.springframework.integration.support.MessageBuilder;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -93,6 +94,11 @@ public class EsbService {
     @Autowired
     private Scheduler scheduler;
 
+    @Autowired
+    private EsbMappingService mappingService;
+
+
+
     @PostConstruct
     public void scheduleJob() throws SchedulerException {
         JobDetail dataJobDetail = JobBuilder.newJob(DataJob.class)
@@ -110,6 +116,8 @@ public class EsbService {
         // Schedule the job using the scheduler
         scheduler.scheduleJob(dataJobDetail, dataTrigger);
     }
+
+
 
 
     
@@ -399,7 +407,34 @@ public class EsbService {
         dingTalkService.getDepartmentStream().forEach(dingTalkDepartment -> {
             log.info("begin syncing: " + dingTalkDepartment.toString());
             var erpDepartment = dingTalkToErpConverter.toErp(dingTalkDepartment);
-            deptService.createDept(erpDepartment);
+            log.info("dept to add " + erpDepartment);
+            if (erpDepartment.getId() != null) {
+                deptService.updateDept(erpDepartment);
+            } else {
+                var deptId = deptService.createDept(erpDepartment);
+                var mapping = mappingService.toMapping(dingTalkDepartment);
+                mapping
+                    .setInternalId(deptId);
+                mappingService.save(mapping);
+            }
+//            var mapping = mappingService.toMapping(dingTalkDepartment);
+//            try {
+//                mapping = mappingService.findMapping(mapping);
+//                if (mapping.getInternalId() != null) { //dept exist in erp so update
+//                    erpDepartment.setId(mapping.getInternalId());
+//                    deptService.updateDept(erpDepartment);
+//                } else {
+//                    throw new RuntimeException("internal id missing");
+//                }
+//            } catch (Exception e) { //dept not exist in erp so create
+//                log.debug("mapping not found or internal id missing");
+//                var deptId = deptService.createDept(erpDepartment);
+//                log.info("returned dept id " + deptId );
+//                mapping
+//                    .setInternalId(deptId);
+//                mappingService.save(mapping);
+//            }
+
 //        var eccangDepartment = erpToEccangConverter.toEccang(erpDepartment);
 //        EccangResponse.BizContent response = eccangService.addDepartment(eccangDepartment);
 //        log.info(response.toString());
