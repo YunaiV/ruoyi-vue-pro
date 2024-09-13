@@ -5,6 +5,7 @@ tenant-id: {{adminTenentId}}
 Authorization: Bearer {{token}}
 
 {
+  "productId": 1,
   "productKey": "123456",
   "properties": [
     {
@@ -51,6 +52,8 @@ tenant-id: {{adminTenentId}}
 Authorization: Bearer {{token}}
 
 {
+  "id": 1,
+  "productId": 1,
   "productKey": "123456",
   "properties": [
     {
@@ -90,7 +93,7 @@ Authorization: Bearer {{token}}
   "events": "{}"
 }
 
-### 请求 /iot/think-model-function/get 接口 => 成功
-GET {{baseUrl}}/iot/think-model-function/get?productKey=123456
+### 请求 /iot/think-model-function/get-by-product-key 接口 => 成功
+GET {{baseUrl}}/iot/think-model-function/get-by-product-key?productKey=123456
 tenant-id: {{adminTenentId}}
 Authorization: Bearer {{token}}

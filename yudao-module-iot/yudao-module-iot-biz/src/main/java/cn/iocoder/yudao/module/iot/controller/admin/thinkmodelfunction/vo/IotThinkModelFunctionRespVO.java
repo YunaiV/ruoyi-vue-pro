@@ -1,10 +1,12 @@
 package cn.iocoder.yudao.module.iot.controller.admin.thinkmodelfunction.vo;
 
+import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
+import com.alibaba.excel.annotation.ExcelProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.*;
+import lombok.Data;
 
 import java.time.LocalDateTime;
-import com.alibaba.excel.annotation.*;
+import java.util.List;
 
 @Schema(description = "管理后台 - IoT 产品物模型 Response VO")
 @Data
@@ -21,7 +23,7 @@ public class IotThinkModelFunctionRespVO {
 
     @Schema(description = "属性列表", requiredMode = Schema.RequiredMode.REQUIRED)
     @ExcelProperty("属性列表")
-    private String properties;
+    private List<IotThingModelProperty> properties;
 
     @Schema(description = "服务列表")
     @ExcelProperty("服务列表")

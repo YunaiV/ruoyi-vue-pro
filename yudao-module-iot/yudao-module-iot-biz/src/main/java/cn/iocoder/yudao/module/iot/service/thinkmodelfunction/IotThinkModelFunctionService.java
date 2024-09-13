@@ -27,7 +27,7 @@ public interface IotThinkModelFunctionService {
     void deleteThinkModelFunction(Long id);
 
     /**
-     * 获得IoT 产品物模型
+     * 获得IoT 产品物模型，通过产品Key
      *
      * @param productKey 产品Key
      * @return IoT 产品物模型
@@ -35,9 +35,17 @@ public interface IotThinkModelFunctionService {
     IotThinkModelFunctionDO getThinkModelFunctionByProductKey(String productKey);
 
     /**
+     * 获得IoT 产品物模型，通过产品ID
+     *
+     * @param productId 产品ID
+     * @return IoT 产品物模型
+     */
+    IotThinkModelFunctionDO getThinkModelFunctionByProductId(Long productId);
+
+    /**
      * 更新IoT 产品物模型
      *
      * @param updateReqVO 更新信息
      */
-    void updateThinkModelFunctionByProductKey(@Valid IotThinkModelFunctionSaveReqVO updateReqVO);
+    void updateThinkModelFunction(@Valid IotThinkModelFunctionSaveReqVO updateReqVO);
 }

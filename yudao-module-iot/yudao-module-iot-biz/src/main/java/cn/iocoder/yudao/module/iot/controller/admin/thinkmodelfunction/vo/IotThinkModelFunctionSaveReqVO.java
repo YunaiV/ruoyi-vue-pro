@@ -9,6 +9,13 @@ import jakarta.validation.constraints.*;
 @Data
 public class IotThinkModelFunctionSaveReqVO {
 
+    @Schema(description = "编号", example = "1")
+    private Long id;
+
+    @Schema(description = "产品ID", requiredMode = Schema.RequiredMode.REQUIRED)
+    @NotNull(message = "产品ID不能为空")
+    private Long productId;
+
     @Schema(description = "产品标识", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotEmpty(message = "产品标识不能为空")
     private String productKey;

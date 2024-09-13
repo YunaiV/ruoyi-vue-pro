@@ -17,9 +17,8 @@ public interface IotThinkModelFunctionMapper extends BaseMapperX<IotThinkModelFu
         return selectOne(new LambdaQueryWrapperX<IotThinkModelFunctionDO>().eq(IotThinkModelFunctionDO::getProductKey, productKey));
     }
 
-    default int updateByProductKey(IotThinkModelFunctionDO thinkModelFunction) {
-        return update(thinkModelFunction, new LambdaQueryWrapperX<IotThinkModelFunctionDO>()
-                .eq(IotThinkModelFunctionDO::getProductKey, thinkModelFunction.getProductKey())
-        );
+    default IotThinkModelFunctionDO selectByProductId(Long productId){
+        return selectOne(new LambdaQueryWrapperX<IotThinkModelFunctionDO>().eq(IotThinkModelFunctionDO::getProductId, productId));
     }
+
 }

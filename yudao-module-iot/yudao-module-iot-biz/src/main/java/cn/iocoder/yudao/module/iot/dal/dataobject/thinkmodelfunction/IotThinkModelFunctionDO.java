@@ -1,8 +1,10 @@
 package cn.iocoder.yudao.module.iot.dal.dataobject.thinkmodelfunction;
 
-import lombok.*;
-import com.baomidou.mybatisplus.annotation.*;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import com.baomidou.mybatisplus.annotation.KeySequence;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
+import lombok.*;
 
 /**
  * IoT 产品物模型 DO
@@ -24,18 +26,27 @@ public class IotThinkModelFunctionDO extends BaseDO {
      */
     @TableId
     private Long id;
+
+    /**
+     * 产品标识
+     */
+    private Long productId;
+
     /**
      * 产品标识
      */
     private String productKey;
+
     /**
      * 属性列表
      */
     private String properties;
+
     /**
      * 服务列表
      */
     private String services;
+
     /**
      * 事件列表
      */

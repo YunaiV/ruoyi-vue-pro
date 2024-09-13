@@ -16,4 +16,5 @@ public interface ErrorCodeConstants {
 
     // ========== IoT 产品物模型 1-050-002-000 ============
     ErrorCode THINK_MODEL_FUNCTION_NOT_EXISTS = new ErrorCode(1_050_002_000, "产品物模型不存在");
+    ErrorCode THINK_MODEL_FUNCTION_EXISTS_BY_PRODUCT_KEY = new ErrorCode(1_050_002_001, "ProductKey 对应的产品物模型已存在");
 }
