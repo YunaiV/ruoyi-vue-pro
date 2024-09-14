@@ -292,7 +292,7 @@ public class SeckillActivityServiceImpl implements SeckillActivityService {
 
     @Override
     public PageResult<SeckillActivityDO> getSeckillActivityAppPageByConfigId(AppSeckillActivityPageReqVO pageReqVO) {
-        return seckillActivityMapper.selectPage(pageReqVO, CommonStatusEnum.ENABLE.getStatus());
+        return seckillActivityMapper.selectPage(pageReqVO, CommonStatusEnum.ENABLE.getStatus(),LocalDateTime.now());
     }
 
     @Override
