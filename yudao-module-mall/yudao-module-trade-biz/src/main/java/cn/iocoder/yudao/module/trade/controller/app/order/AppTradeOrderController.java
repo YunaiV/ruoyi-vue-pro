@@ -282,7 +282,7 @@ public class AppTradeOrderController {
         return AppTradeProductSettlementRespVO.Sku.builder().
                 skuId(skuId).
                 type(PromotionTypeEnum.MEMBER_LEVEL.getType()).
-                price(price - newPrice).build();
+                price(newPrice).build();
     }
 
     /**
