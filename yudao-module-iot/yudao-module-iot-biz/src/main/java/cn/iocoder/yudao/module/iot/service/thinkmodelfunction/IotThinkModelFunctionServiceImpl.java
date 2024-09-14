@@ -96,7 +96,6 @@ public class IotThinkModelFunctionServiceImpl implements IotThinkModelFunctionSe
     }
 
     /**
-     * @ TODO 还要再优化
      * 根据属性列表，自动生成属性上报事件和属性设置、获取服务
      */
     private void generateDefaultEventsAndServices(IotThinkModelFunctionSaveReqVO reqVO, IotThinkModelFunctionDO thinkModelFunction) {
@@ -106,26 +105,64 @@ public class IotThinkModelFunctionServiceImpl implements IotThinkModelFunctionSe
             properties = new ArrayList<>();
         }
 
-        // 生成属性上报事件
-        List<ThingModelEvent> events = reqVO.getEvents() != null ? new ArrayList<>(reqVO.getEvents()) : new ArrayList<>();
-        ThingModelEvent propertyPostEvent = generatePropertyPostEvent(properties);
-        events.add(propertyPostEvent);
+        // 获取现有的事件和服务
+        List<ThingModelEvent> existingEvents = reqVO.getEvents() != null ? new ArrayList<>(reqVO.getEvents()) : new ArrayList<>();
+        List<ThingModelService> existingServices = reqVO.getServices() != null ? new ArrayList<>(reqVO.getServices()) : new ArrayList<>();
 
-        // 生成属性设置和获取服务
-        List<ThingModelService> services = reqVO.getServices() != null ? new ArrayList<>(reqVO.getServices()) : new ArrayList<>();
+        // 生成或更新属性上报事件
+        ThingModelEvent propertyPostEvent = generatePropertyPostEvent(properties);
+        updateEventInList(existingEvents, propertyPostEvent);
+
+        // 生成或更新属性设置和获取服务
         ThingModelService propertySetService = generatePropertySetService(properties);
-        if (propertySetService != null) {
-            services.add(propertySetService);
-        }
+        updateServiceInList(existingServices, propertySetService);
+
         ThingModelService propertyGetService = generatePropertyGetService(properties);
-        if (propertyGetService != null) {
-            services.add(propertyGetService);
-        }
+        updateServiceInList(existingServices, propertyGetService);
 
         // 更新 thinkModelFunction 对象的 events 和 services 字段
-        thinkModelFunction.setEvents(JSONUtil.toJsonStr(events));
-        thinkModelFunction.setServices(JSONUtil.toJsonStr(services));
+        thinkModelFunction.setEvents(JSONUtil.toJsonStr(existingEvents));
+        thinkModelFunction.setServices(JSONUtil.toJsonStr(existingServices));
     }
+
+    /**
+     * 在事件列表中更新或添加事件
+     */
+    private void updateEventInList(List<ThingModelEvent> events, ThingModelEvent newEvent) {
+        if (newEvent == null) {
+            return;
+        }
+        for (int i = 0; i < events.size(); i++) {
+            ThingModelEvent event = events.get(i);
+            if (event.getIdentifier().equals(newEvent.getIdentifier())) {
+                // 更新已有的事件
+                events.set(i, newEvent);
+                return;
+            }
+        }
+        // 如果不存在，则添加新的事件
+        events.add(newEvent);
+    }
+
+    /**
+     * 在服务列表中更新或添加服务
+     */
+    private void updateServiceInList(List<ThingModelService> services, ThingModelService newService) {
+        if (newService == null) {
+            return;
+        }
+        for (int i = 0; i < services.size(); i++) {
+            ThingModelService service = services.get(i);
+            if (service.getIdentifier().equals(newService.getIdentifier())) {
+                // 更新已有的服务
+                services.set(i, newService);
+                return;
+            }
+        }
+        // 如果不存在，则添加新的服务
+        services.add(newService);
+    }
+
 
     /**
      * 生成属性上报事件
