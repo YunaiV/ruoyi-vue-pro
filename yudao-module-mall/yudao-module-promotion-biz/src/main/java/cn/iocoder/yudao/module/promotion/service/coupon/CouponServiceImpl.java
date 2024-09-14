@@ -288,6 +288,7 @@ public class CouponServiceImpl implements CouponService {
         }
         // 校验剩余数量（仅在 CouponTakeTypeEnum.USER 用户领取时）
         if (CouponTakeTypeEnum.isUser(couponTemplate.getTakeCount())
+                && couponTemplate.getTotalCount() != null
                 && couponTemplate.getTakeCount() + userIds.size() > couponTemplate.getTotalCount()) {
             throw exception(COUPON_TEMPLATE_NOT_ENOUGH);
         }
@@ -310,7 +311,7 @@ public class CouponServiceImpl implements CouponService {
      * @param couponTemplate 优惠劵模版
      */
     private void removeTakeLimitUser(Set<Long> userIds, CouponTemplateDO couponTemplate) {
-        if (couponTemplate.getTakeLimitCount() <= 0) {
+        if (couponTemplate.getTakeLimitCount() == null || couponTemplate.getTakeLimitCount() <= 0) {
             return;
         }
         // 查询已领过券的用户
