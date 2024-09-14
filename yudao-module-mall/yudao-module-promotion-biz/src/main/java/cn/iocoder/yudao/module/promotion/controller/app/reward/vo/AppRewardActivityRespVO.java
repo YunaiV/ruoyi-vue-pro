@@ -27,7 +27,7 @@ public class AppRewardActivityRespVO {
     private Integer productScope;
 
     @Schema(description = "商品 SPU 编号的数组", example = "1,2,3")
-    private List<Long> productSpuIds;
+    private List<Long> productScopeValues;
 
     @Schema(description = "优惠规则的数组")
     private List<RewardActivityBaseVO.Rule> rules;
