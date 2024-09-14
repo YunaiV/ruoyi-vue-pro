@@ -6,6 +6,7 @@ import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.module.promotion.controller.admin.reward.vo.RewardActivityPageReqVO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.reward.RewardActivityDO;
+import cn.iocoder.yudao.module.promotion.enums.common.PromotionProductScopeEnum;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import org.apache.ibatis.annotations.Mapper;
 
@@ -65,9 +66,9 @@ public interface RewardActivityMapper extends BaseMapperX<RewardActivityDO> {
                 .eq(RewardActivityDO::getStatus,status)
                 .lt(RewardActivityDO::getStartTime, dateTime)
                 .gt(RewardActivityDO::getEndTime, dateTime)
-                .and(i -> i. eq(RewardActivityDO::getProductScope, 2).and(i1 -> i1.apply(productScopeValuesFindInSetFunc.apply(spuIds))))
-                .or(i -> i.eq(RewardActivityDO::getProductScope, 1))
-                .or(i -> i. eq(RewardActivityDO::getProductScope, 3).and(i1 -> i1.apply(productScopeValuesFindInSetFunc.apply(categoryIds))))
+                .and(i -> i. eq(RewardActivityDO::getProductScope, PromotionProductScopeEnum.SPU.getScope()).and(i1 -> i1.apply(productScopeValuesFindInSetFunc.apply(spuIds))))
+                .or(i -> i.eq(RewardActivityDO::getProductScope, PromotionProductScopeEnum.ALL.getScope()))
+                .or(i -> i. eq(RewardActivityDO::getProductScope, PromotionProductScopeEnum.CATEGORY.getScope()).and(i1 -> i1.apply(productScopeValuesFindInSetFunc.apply(categoryIds))))
                 .orderByDesc(RewardActivityDO::getId)
                 .last("limit 1")
         );
