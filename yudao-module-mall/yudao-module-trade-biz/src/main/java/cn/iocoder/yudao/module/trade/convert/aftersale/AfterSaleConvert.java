@@ -37,7 +37,7 @@ public interface AfterSaleConvert {
             @Mapping(target = "creator", ignore = true),
             @Mapping(target = "updater", ignore = true),
     })
-    AfterSaleDO convert(AppAfterSaleCreateReqVO createReqVO, TradeOrderItemDO tradeOrderItem);
+    PayRefundCreateReqDTO convert(String userIp, AfterSaleDO afterSale);
 
     @Mappings({
             @Mapping(source = "afterSale.orderId", target = "merchantOrderId"),
