@@ -7,8 +7,19 @@ import java.util.List;
 @Data
 public class ThingModelService {
 
+    /**
+     * 服务标识符
+     */
     private String identifier;
+    /**
+     * 服务名称
+     */
     private String name;
+    /**
+     * 服务描述
+     */
+    private String description;
+
     /**
      * 调用类型
      *
@@ -17,7 +28,6 @@ public class ThingModelService {
     private String callType;
     private List<ThingModelArgument> inputData;
     private List<ThingModelArgument> outputData;
-    private String description;
     private String method;
 
 }
