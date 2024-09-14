@@ -146,9 +146,9 @@ tenant-id: {{adminTenentId}}
 Authorization: Bearer {{token}}
 
 {
-  "id": 1,
-  "productId": 1001,
-  "productKey": "smart-sensor-001",
+  "id": 3,
+  "productId": 1002,
+  "productKey": "smart-sensor-002",
   "properties": [
     {
       "identifier": "Temperature",
@@ -158,8 +158,8 @@ Authorization: Bearer {{token}}
       "dataType": {
         "type": "float",
         "specs": {
-          "min": -40.0,
-          "max": 125.0,
+          "min": -100.0,
+          "max": 200.0,
           "step": 0.1,
           "unit": "℃"
         }
@@ -229,7 +229,8 @@ Authorization: Bearer {{token}}
       "name": "重启设备",
       "callType": "async",
       "inputData": [],
-      "description": "远程重启设备"
+      "description": "远程重启设备",
+      "method": "thing.service.reboot"
     },
     {
       "identifier": "SetThreshold",
@@ -251,7 +252,8 @@ Authorization: Bearer {{token}}
           "description": "报警温度阈值"
         }
       ],
-      "description": "设置设备的温度报警阈值"
+      "description": "设置设备的温度报警阈值",
+      "method": "thing.service.setThreshold"
     }
   ],
   "events": [
@@ -272,13 +274,14 @@ Authorization: Bearer {{token}}
           "description": "触发报警时的温度值"
         }
       ],
-      "description": "当温度超过阈值时触发高温报警事件"
+      "description": "当温度超过阈值时触发高温报警事件",
+      "method": "thing.event.highTemperatureAlert"
     }
   ]
 }
 
 
 ### 请求 /iot/think-model-function/get-by-product-key 接口 => 成功
-GET {{baseUrl}}/iot/think-model-function/get-by-product-key?productKey=123456
+GET {{baseUrl}}/iot/think-model-function/get-by-product-key?productKey=smart-sensor-002
 tenant-id: {{adminTenentId}}
 Authorization: Bearer {{token}}

@@ -6,6 +6,8 @@ import cn.iocoder.yudao.module.iot.controller.admin.thinkmodelfunction.vo.IotThi
 import cn.iocoder.yudao.module.iot.convert.thinkmodelfunction.IotThinkModelFunctionConvert;
 import cn.iocoder.yudao.module.iot.dal.dataobject.thinkmodelfunction.IotThinkModelFunctionDO;
 import cn.iocoder.yudao.module.iot.dal.mysql.thinkmodelfunction.IotThinkModelFunctionMapper;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -26,6 +28,8 @@ public class IotThinkModelFunctionServiceImpl implements IotThinkModelFunctionSe
 
     @Resource
     private IotThinkModelFunctionMapper thinkModelFunctionMapper;
+
+    private ObjectMapper objectMapper = new ObjectMapper();
 
     @Override
     public Long createThinkModelFunction(IotThinkModelFunctionSaveReqVO createReqVO) {
@@ -121,8 +125,12 @@ public class IotThinkModelFunctionServiceImpl implements IotThinkModelFunctionSe
         updateServiceInList(existingServices, propertyGetService);
 
         // 更新 thinkModelFunction 对象的 events 和 services 字段
-        thinkModelFunction.setEvents(JSONUtil.toJsonStr(existingEvents));
-        thinkModelFunction.setServices(JSONUtil.toJsonStr(existingServices));
+        try {
+            thinkModelFunction.setEvents(objectMapper.writeValueAsString(existingEvents));
+            thinkModelFunction.setServices(objectMapper.writeValueAsString(existingServices));
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException("序列化事件和服务时发生错误", e);
+        }
     }
 
     /**
