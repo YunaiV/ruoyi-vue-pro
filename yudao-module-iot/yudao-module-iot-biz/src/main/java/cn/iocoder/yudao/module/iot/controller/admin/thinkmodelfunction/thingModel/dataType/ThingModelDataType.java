@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.iot.controller.admin.thinkmodelfunction.thingModel;
+package cn.iocoder.yudao.module.iot.controller.admin.thinkmodelfunction.thingModel.dataType;
 
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
@@ -18,5 +18,7 @@ import lombok.Data;
         @JsonSubTypes.Type(value = ThingModelArrayType.class, name = "array")
 })
 public abstract class ThingModelDataType {
+
     private String type;
+
 }

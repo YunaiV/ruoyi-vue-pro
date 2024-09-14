@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.iot.controller.admin.thinkmodelfunction.thingModel;
+package cn.iocoder.yudao.module.iot.controller.admin.thinkmodelfunction.thingModel.dataType;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -11,8 +11,10 @@ public class ThingModelFloatType extends ThingModelDataType {
 
 @Data
 class ThingModelFloatSpecs {
+
     private Float min;
     private Float max;
     private Float step;
     private String unit;
+
 }
