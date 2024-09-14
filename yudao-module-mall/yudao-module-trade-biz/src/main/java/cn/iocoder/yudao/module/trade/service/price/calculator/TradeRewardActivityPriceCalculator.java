@@ -23,6 +23,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.filterList;
 import static cn.iocoder.yudao.module.trade.service.price.calculator.TradePriceCalculatorHelper.formatPrice;
 
@@ -47,8 +48,8 @@ public class TradeRewardActivityPriceCalculator implements TradePriceCalculator 
             return;
         }
         // 获得 SKU 对应的满减送活动
-        List<RewardActivityMatchRespDTO> rewardActivities = rewardActivityApi.getRewardActivityListByStatusAndNow(
-                CommonStatusEnum.ENABLE.getStatus(), LocalDateTime.now());
+        List<RewardActivityMatchRespDTO> rewardActivities = rewardActivityApi.getRewardActivityBySpuIdsAndStatusAndDateTimeLt(
+                convertSet(result.getItems(), TradePriceCalculateRespBO.OrderItem::getSpuId), CommonStatusEnum.ENABLE.getStatus(), LocalDateTime.now());
         if (CollUtil.isEmpty(rewardActivities)) {
             return;
         }

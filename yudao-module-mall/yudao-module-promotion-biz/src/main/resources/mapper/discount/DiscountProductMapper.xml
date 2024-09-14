@@ -16,7 +16,7 @@
                 </foreach>
             </if>
             AND pda.start_time &lt;= CURRENT_TIME AND pda.end_time &gt;= CURRENT_TIME
-            AND pda.`status` = 20
+            AND pda.`status` = 0
             AND pda.deleted != 1
         </where>
     </select>

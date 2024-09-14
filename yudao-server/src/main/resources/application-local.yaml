@@ -6,7 +6,7 @@ spring:
   # 数据源配置项
   autoconfigure:
     exclude:
-      - org.springframework.boot.autoconfigure.quartz.QuartzAutoConfiguration # 默认 local 环境，不开启 Quartz 的自动配置
+      #- org.springframework.boot.autoconfigure.quartz.QuartzAutoConfiguration # 默认 local 环境，不开启 Quartz 的自动配置
       - de.codecentric.boot.admin.server.config.AdminServerAutoConfiguration # 禁用 Spring Boot Admin 的 Server 的自动配置
       - de.codecentric.boot.admin.server.ui.config.AdminServerUiAutoConfiguration # 禁用 Spring Boot Admin 的 Server UI 的自动配置
       - de.codecentric.boot.admin.client.config.SpringBootAdminClientAutoConfiguration # 禁用 Spring Boot Admin 的 Client 的自动配置
@@ -45,7 +45,7 @@ spring:
       primary: master
       datasource:
         master:
-          url: jdbc:mysql://127.0.0.1:3306/ruoyi-vue-pro?useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true&nullCatalogMeansCurrent=true&rewriteBatchedStatements=true # MySQL Connector/J 8.X 连接的示例
+          url: jdbc:mysql://192.168.10.207:3306/specialty?useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true&nullCatalogMeansCurrent=true&rewriteBatchedStatements=true # MySQL Connector/J 8.X 连接的示例
           #          url: jdbc:mysql://127.0.0.1:3306/ruoyi-vue-pro?useSSL=true&allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai&rewriteBatchedStatements=true # MySQL Connector/J 5.X 连接的示例
           #          url: jdbc:postgresql://127.0.0.1:5432/ruoyi-vue-pro # PostgreSQL 连接的示例
           #          url: jdbc:oracle:thin:@127.0.0.1:1521:xe # Oracle 连接的示例
@@ -61,19 +61,19 @@ spring:
           #          password: SYSDBA001 # DM 连接的示例
           #          username: root # OpenGauss 连接的示例
           #          password: Yudao@2024 # OpenGauss 连接的示例
-        slave: # 模拟从库，可根据自己需要修改
-          lazy: true # 开启懒加载，保证启动速度
-          url: jdbc:mysql://127.0.0.1:3306/ruoyi-vue-pro?useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true&rewriteBatchedStatements=true&nullCatalogMeansCurrent=true
-          username: root
-          password: 123456
+#        slave: # 模拟从库，可根据自己需要修改
+#          lazy: true # 开启懒加载，保证启动速度
+#          url: jdbc:mysql://192.168.10.207:3306/ruoyi-vue-pro?useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true&rewriteBatchedStatements=true&nullCatalogMeansCurrent=true
+#          username: root
+#          password: 123456
 
   # Redis 配置。Redisson 默认的配置足够使用，一般不需要进行调优
   data:
     redis:
-      host: 127.0.0.1 # 地址
+      host: 192.168.10.207 # 地址
       port: 6379 # 端口
       database: 0 # 数据库索引
-#    password: dev # 密码，建议生产环境开启
+      password: 123456 # 密码，建议生产环境开启
 
 --- #################### 定时任务相关配置 ####################
 
@@ -200,8 +200,8 @@ wx:
 #    secret: 6f270509224a7ae1296bbf1c8cb97aed
 #    appid: wxc4598c446f8a9cb3 # 测试号（Kongdy 提供的）
 #    secret: 4a1a04e07f6a4a0751b39c3064a92c8b
-    appid: wx66186af0759f47c9 # 测试号（puhui 提供的）
-    secret: 3218bcbd112cbc614c7264ceb20144ac
+    appid: wx9a0a5b259d852380 # 测试号（puhui 提供的）
+    secret: 70e65fa9d1a4f2c4e1b2aa8751d3b75e
     config-storage:
       type: RedisTemplate # 采用 RedisTemplate 操作 Redis，会自动从 Spring 中获取
       key-prefix: wa # Redis Key 的前缀

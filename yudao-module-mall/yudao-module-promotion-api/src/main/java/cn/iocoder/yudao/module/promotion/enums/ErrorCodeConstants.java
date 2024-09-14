@@ -15,6 +15,7 @@ public interface ErrorCodeConstants {
     ErrorCode DISCOUNT_ACTIVITY_UPDATE_FAIL_STATUS_CLOSED = new ErrorCode(1_013_001_002, "限时折扣活动已关闭，不能修改");
     ErrorCode DISCOUNT_ACTIVITY_DELETE_FAIL_STATUS_NOT_CLOSED = new ErrorCode(1_013_001_003, "限时折扣活动未关闭，不能删除");
     ErrorCode DISCOUNT_ACTIVITY_CLOSE_FAIL_STATUS_CLOSED = new ErrorCode(1_013_001_004, "限时折扣活动已关闭，不能重复关闭");
+    ErrorCode DISCOUNT_ACTIVITY_TYPE_NOT_EXISTS = new ErrorCode(1_013_001_005, "限时折扣活动类型不存在");
 
     // ========== Banner 相关 1-013-002-000 ============
     ErrorCode BANNER_NOT_EXISTS = new ErrorCode(1_013_002_000, "Banner 不存在");
