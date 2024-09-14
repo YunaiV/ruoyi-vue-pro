@@ -100,15 +100,22 @@ public class AppTradeOrderController {
             skuList.forEach(sku -> {
                 //查询限时优惠价格
                 AppTradeProductSettlementRespVO.Sku skuDiscount = calculateDiscountPrice(sku.getId(), sku.getPrice());
-                if(skuDiscount != null){
-                    skus.add(skuDiscount);
-                }
 
                 //查询会员价
                 AppTradeProductSettlementRespVO.Sku skuVip = calculateVipPrice(sku.getId(), sku.getPrice(), memberLevel);
-                if(skuVip != null){
+
+                if(skuDiscount != null && skuVip != null){
+                    if(skuDiscount.getPrice() > skuVip.getPrice()){
+                        skus.add(skuDiscount);
+                    }else{
+                        skus.add(skuVip);
+                    }
+                }else if(skuDiscount != null){
+                    skus.add(skuDiscount);
+                }else if(skuVip != null){
                     skus.add(skuVip);
                 }
+
             });
             AppTradeProductSettlementRespVO.Reward reward = calculateReward(spuId);
             AppTradeProductSettlementRespVO respVO = AppTradeProductSettlementRespVO.builder().id(spuId).skus(skus).build();
