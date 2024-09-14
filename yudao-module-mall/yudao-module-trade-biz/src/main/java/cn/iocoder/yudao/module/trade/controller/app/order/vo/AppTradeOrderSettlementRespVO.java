@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.trade.controller.app.order.vo;
 
 import cn.iocoder.yudao.module.trade.controller.app.base.property.AppProductPropertyValueDetailRespVO;
+import cn.iocoder.yudao.module.trade.service.price.bo.TradePriceCalculateRespBO;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -30,6 +31,13 @@ public class AppTradeOrderSettlementRespVO {
 
     @Schema(description = "总积分", requiredMode = Schema.RequiredMode.REQUIRED, example = "10")
     private Integer totalPoint;
+
+    /**
+     * 营销活动数组
+     *
+     * 只对应 {@link TradePriceCalculateRespBO.Price#items} 商品匹配的活动
+     */
+    private List<TradePriceCalculateRespBO.Promotion> promotions;
 
     @Schema(description = "购物项")
     @Data

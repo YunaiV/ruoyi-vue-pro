@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.promotion.service.discount;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.module.promotion.api.discount.dto.DiscountProductRespDTO;
 import cn.iocoder.yudao.module.promotion.controller.admin.discount.vo.DiscountActivityCreateReqVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.discount.vo.DiscountActivityPageReqVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.discount.vo.DiscountActivityUpdateReqVO;
@@ -27,7 +28,7 @@ public interface DiscountActivityService {
      * @param skuIds SKU 编号数组
      * @return 匹配的限时折扣商品
      */
-    List<DiscountProductDO> getMatchDiscountProductList(Collection<Long> skuIds);
+    List<DiscountProductRespDTO> getMatchDiscountProductList(Collection<Long> skuIds);
 
     /**
      * 创建限时折扣活动

@@ -3,8 +3,8 @@
 <mapper namespace="cn.iocoder.yudao.module.promotion.dal.mysql.discount.DiscountProductMapper">
 
 
-    <select id="getMatchDiscountProductList"   resultType="cn.iocoder.yudao.module.promotion.dal.dataobject.discount.DiscountProductDO">
-        SELECT pdp.*
+    <select id="getMatchDiscountProductList"   resultType="cn.iocoder.yudao.module.promotion.api.discount.dto.DiscountProductRespDTO">
+        SELECT pdp.*,pda.name as activity_name
         FROM promotion_discount_product pdp
         LEFT JOIN promotion_discount_activity pda
         ON pdp.activity_id = pda.id
@@ -17,8 +17,10 @@
             </if>
             AND pda.start_time &lt;= CURRENT_TIME AND pda.end_time &gt;= CURRENT_TIME
             AND pda.`status` = 0
-            AND pda.deleted != 1
+            AND pda.deleted =0
+            AND pdp.deleted = 0
         </where>
+        ORDER BY pdp.id DESC
     </select>
 
 </mapper>

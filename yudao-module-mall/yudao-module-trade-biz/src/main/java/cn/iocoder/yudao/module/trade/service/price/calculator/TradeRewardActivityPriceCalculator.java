@@ -23,8 +23,10 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
+import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.filterList;
+import static cn.iocoder.yudao.module.promotion.enums.ErrorCodeConstants.REWARD_ACTIVITY_TYPE_NOT_EXISTS;
 import static cn.iocoder.yudao.module.trade.service.price.calculator.TradePriceCalculatorHelper.formatPrice;
 
 // TODO @puhui999：相关的单测，建议改一改
@@ -53,9 +55,10 @@ public class TradeRewardActivityPriceCalculator implements TradePriceCalculator 
         if (CollUtil.isEmpty(rewardActivities)) {
             return;
         }
-
-        // 处理每个满减送活动
-        rewardActivities.forEach(rewardActivity -> calculate(param, result, rewardActivity));
+        // 处理最新的满减送活动
+        if(!rewardActivities.isEmpty()){
+            calculate(param, result, rewardActivities.get(0));
+        }
     }
 
     private void calculate(TradePriceCalculateReqBO param, TradePriceCalculateRespBO result,
@@ -120,27 +123,24 @@ public class TradeRewardActivityPriceCalculator implements TradePriceCalculator 
     /**
      * 获得满减送的订单项（商品）列表
      *
-     * @param result         计算结果
+     * @param result 计算结果
      * @param rewardActivity 满减送活动
      * @return 订单项（商品）列表
      */
     private List<TradePriceCalculateRespBO.OrderItem> filterMatchActivityOrderItems(TradePriceCalculateRespBO result,
                                                                                     RewardActivityMatchRespDTO rewardActivity) {
-        // 情况一：全部商品都可以参与
-        if (PromotionProductScopeEnum.isAll(rewardActivity.getProductScope())) {
+        Integer productScope = rewardActivity.getProductScope();
+        if(PromotionProductScopeEnum.isAll(productScope)){
             return result.getItems();
-        }
-        // 情况二：指定商品参与
-        if (PromotionProductScopeEnum.isSpu(rewardActivity.getProductScope())) {
+        }else if (PromotionProductScopeEnum.isSpu(productScope)) {
             return filterList(result.getItems(),
                     orderItem -> CollUtil.contains(rewardActivity.getProductScopeValues(), orderItem.getSpuId()));
-        }
-        // 情况三：指定商品类型参与
-        if (PromotionProductScopeEnum.isCategory(rewardActivity.getProductScope())) {
+        }else if (PromotionProductScopeEnum.isCategory(productScope)) {
             return filterList(result.getItems(),
                     orderItem -> CollUtil.contains(rewardActivity.getProductScopeValues(), orderItem.getCategoryId()));
+        }else{
+            throw exception(REWARD_ACTIVITY_TYPE_NOT_EXISTS);
         }
-        return List.of();
     }
 
     /**
