@@ -5,6 +5,7 @@ import cn.hutool.core.map.MapUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.promotion.controller.admin.coupon.vo.coupon.CouponPageReqVO;
 import cn.iocoder.yudao.module.promotion.controller.app.coupon.vo.coupon.AppCouponMatchReqVO;
+import cn.iocoder.yudao.module.promotion.controller.app.coupon.vo.coupon.AppCouponMatchRespVO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.coupon.CouponDO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.coupon.CouponTemplateDO;
 import cn.iocoder.yudao.module.promotion.enums.coupon.CouponTakeTypeEnum;
@@ -178,7 +179,7 @@ public interface CouponService {
      * @param matchReqVO 匹配参数
      * @return 优惠券列表
      */
-    List<CouponDO> getMatchCouponList(Long userId, AppCouponMatchReqVO matchReqVO);
+    List<AppCouponMatchRespVO> getMatchCouponList(Long userId, AppCouponMatchReqVO matchReqVO);
 
     /**
      * 获取用户是否可以领取优惠券
