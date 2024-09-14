@@ -106,9 +106,9 @@ public class AppTradeOrderController {
 
                 if(skuDiscount != null && skuVip != null){
                     if(skuDiscount.getPrice() > skuVip.getPrice()){
-                        skus.add(skuDiscount);
-                    }else{
                         skus.add(skuVip);
+                    }else{
+                        skus.add(skuDiscount);
                     }
                 }else if(skuDiscount != null){
                     skus.add(skuDiscount);
@@ -335,7 +335,7 @@ public class AppTradeOrderController {
                 RewardActivityMatchRespDTO.Rule rule = rewardActivityMatchRespDTO.getRules().get(0);
                 return AppTradeProductSettlementRespVO.Reward.builder().
                         rewardActivity("满" + rule.getLimit() / 100 + (Objects.equals(rewardActivityMatchRespDTO.getConditionType(), PromotionConditionTypeEnum.PRICE.getType())?"元":"件"+"减") +rule.getDiscountPrice() / 100)
-                        .rewardId(rewardActivityMatchRespDTO.getId()).build();
+                        .id(rewardActivityMatchRespDTO.getId()).build();
             }
         }
         return null;
