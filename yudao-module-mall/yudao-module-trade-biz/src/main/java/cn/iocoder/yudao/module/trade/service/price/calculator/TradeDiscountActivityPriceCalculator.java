@@ -18,6 +18,8 @@ import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 import jakarta.annotation.Resource;
+
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
@@ -171,7 +173,8 @@ public class TradeDiscountActivityPriceCalculator implements TradePriceCalculato
         if (discountPercent == null) {
             return 0;
         }
-        Integer newPrice = price * discountPercent / 100;
+        BigDecimal divide = new BigDecimal(price).multiply(new BigDecimal(discountPercent)).divide(new BigDecimal(100));
+        Integer newPrice =  divide.intValue();
         return price - newPrice;
     }
 
