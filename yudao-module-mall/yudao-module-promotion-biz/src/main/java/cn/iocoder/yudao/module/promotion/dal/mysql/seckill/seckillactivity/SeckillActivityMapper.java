@@ -98,10 +98,9 @@ public interface SeckillActivityMapper extends BaseMapperX<SeckillActivityDO> {
      * @param dateTime 指定日期
      * @return 活动列表
      */
-    default List<SeckillActivityDO> selectListByIdsAndDateTimeLt(Collection<Long> ids, List<Long> confidIds, LocalDateTime dateTime) {
+    default List<SeckillActivityDO> selectListByIdsAndDateTimeLt(Collection<Long> ids, LocalDateTime dateTime) {
         return selectList(new LambdaQueryWrapperX<SeckillActivityDO>()
                 .in(SeckillActivityDO::getId, ids)
-                .in(SeckillActivityDO::getConfigIds,confidIds)
                 .lt(SeckillActivityDO::getStartTime, dateTime)
                 .gt(SeckillActivityDO::getEndTime, dateTime)// 开始时间 < 指定时间 < 结束时间，也就是说获取指定时间段的活动
                 .orderByDesc(SeckillActivityDO::getCreateTime));

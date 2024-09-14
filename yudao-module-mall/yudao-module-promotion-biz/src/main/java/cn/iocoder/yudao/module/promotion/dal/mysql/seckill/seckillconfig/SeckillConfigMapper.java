@@ -27,13 +27,4 @@ public interface SeckillConfigMapper extends BaseMapperX<SeckillConfigDO> {
         return selectList(SeckillConfigDO::getStatus, status);
     }
 
-    default List<SeckillConfigDO> selectListByIdsAndDateTimeLt(LocalDateTime dateTime){
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
-        String format = formatter.format(dateTime);
-        return selectList(new LambdaQueryWrapper<SeckillConfigDO>()
-                .eq(SeckillConfigDO::getStatus, CommonStatusEnum.ENABLE.getStatus())
-                .lt(SeckillConfigDO::getStartTime, format)
-                .gt(SeckillConfigDO::getEndTime, format));
-    }
-
 }
