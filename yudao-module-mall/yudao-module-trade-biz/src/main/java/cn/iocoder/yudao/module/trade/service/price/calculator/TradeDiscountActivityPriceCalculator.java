@@ -123,7 +123,7 @@ public class TradeDiscountActivityPriceCalculator implements TradePriceCalculato
                                       TradePriceCalculateRespBO.OrderItem orderItem) {
         Integer price = orderItem.getPayPrice();
         if (PromotionDiscountTypeEnum.PRICE.getType().equals(discountProduct.getDiscountType())) { // 减价
-            price -= discountProduct.getDiscountPrice() * 100 * orderItem.getCount();
+            price -= discountProduct.getDiscountPrice() * orderItem.getCount();
         } else if (PromotionDiscountTypeEnum.PERCENT.getType().equals(discountProduct.getDiscountType())) { // 打折
             price = price * discountProduct.getDiscountPercent() / 100;
         } else {
