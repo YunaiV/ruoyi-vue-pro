@@ -23,6 +23,7 @@ import cn.iocoder.yudao.module.promotion.dal.dataobject.seckill.SeckillConfigDO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.seckill.SeckillProductDO;
 import cn.iocoder.yudao.module.promotion.dal.mysql.seckill.seckillactivity.SeckillActivityMapper;
 import cn.iocoder.yudao.module.promotion.dal.mysql.seckill.seckillactivity.SeckillProductMapper;
+import cn.iocoder.yudao.module.promotion.dal.mysql.seckill.seckillconfig.SeckillConfigMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
@@ -33,6 +34,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static cn.hutool.core.collection.CollUtil.isNotEmpty;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
@@ -56,6 +58,8 @@ public class SeckillActivityServiceImpl implements SeckillActivityService {
     private SeckillActivityMapper seckillActivityMapper;
     @Resource
     private SeckillProductMapper seckillProductMapper;
+    @Resource
+    private SeckillConfigMapper seckillConfigMapper;
     @Resource
     private SeckillConfigService seckillConfigService;
     @Resource
@@ -331,9 +335,12 @@ public class SeckillActivityServiceImpl implements SeckillActivityService {
         if (CollUtil.isEmpty(spuIdAndActivityIdMaps)) {
             return Collections.emptyList();
         }
-        // 2.查询活动详情
+        // 2.查询当前时间属于哪个时间段
+        List<SeckillConfigDO> seckillConfigList= seckillConfigMapper.selectListByIdsAndDateTimeLt(dateTime);
+        List<Long> confidIds = seckillConfigList.stream().map(SeckillConfigDO::getId).collect(Collectors.toList());
+        // 3.查询活动详情
         return seckillActivityMapper.selectListByIdsAndDateTimeLt(
-                convertSet(spuIdAndActivityIdMaps, map -> MapUtil.getLong(map, "activityId")), dateTime);
+                convertSet(spuIdAndActivityIdMaps, map -> MapUtil.getLong(map, "activityId")), confidIds, dateTime);
     }
 
 }
