@@ -15,6 +15,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
 @Tag(name = "管理后台 - IoT 产品物模型")
@@ -50,23 +52,23 @@ public class IotThinkModelFunctionController {
         return success(true);
     }
 
-    @GetMapping("/get-by-product-key")
+    @GetMapping("/get")
     @Operation(summary = "获得IoT 产品物模型")
-    @Parameter(name = "productKey", description = "产品Key", required = true, example = "1024")
+    @Parameter(name = "id", description = "编号", required = true)
     @PreAuthorize("@ss.hasPermission('iot:think-model-function:query')")
-    public CommonResult<IotThinkModelFunctionRespVO> getThinkModelFunctionByProductKey(@RequestParam("productKey") String productKey) {
-        IotThinkModelFunctionDO thinkModelFunction = thinkModelFunctionService.getThinkModelFunctionByProductKey(productKey);
+    public CommonResult<IotThinkModelFunctionRespVO> getThinkModelFunction(@RequestParam("id") Long id) {
+        IotThinkModelFunctionDO thinkModelFunction = thinkModelFunctionService.getThinkModelFunction(id);
         IotThinkModelFunctionRespVO respVO = IotThinkModelFunctionConvert.INSTANCE.convert(thinkModelFunction);
         return success(respVO);
     }
 
-    @GetMapping("/get-by-product-id")
+    @GetMapping("/list-by-product-id")
     @Operation(summary = "获得IoT 产品物模型")
     @Parameter(name = "productId", description = "产品ID", required = true, example = "1024")
     @PreAuthorize("@ss.hasPermission('iot:think-model-function:query')")
-    public CommonResult<IotThinkModelFunctionRespVO> getThinkModelFunctionByProductId(@RequestParam("productId") Long productId) {
-        IotThinkModelFunctionDO thinkModelFunction = thinkModelFunctionService.getThinkModelFunctionByProductId(productId);
-        IotThinkModelFunctionRespVO respVO = IotThinkModelFunctionConvert.INSTANCE.convert(thinkModelFunction);
+    public CommonResult<List<IotThinkModelFunctionRespVO>> getThinkModelFunctionListByProductId(@RequestParam("productId") Long productId) {
+        List<IotThinkModelFunctionDO> thinkModelFunctionListByProductId = thinkModelFunctionService.getThinkModelFunctionListByProductId(productId);
+        List<IotThinkModelFunctionRespVO> respVO = IotThinkModelFunctionConvert.INSTANCE.convertList(thinkModelFunctionListByProductId);
         return success(respVO);
     }
 }

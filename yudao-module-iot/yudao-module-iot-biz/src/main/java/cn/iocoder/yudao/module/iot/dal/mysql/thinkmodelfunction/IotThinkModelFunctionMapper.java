@@ -5,6 +5,8 @@ import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.module.iot.dal.dataobject.thinkmodelfunction.IotThinkModelFunctionDO;
 import org.apache.ibatis.annotations.Mapper;
 
+import java.util.List;
+
 /**
  * IoT 产品物模型 Mapper
  *
@@ -13,12 +15,17 @@ import org.apache.ibatis.annotations.Mapper;
 @Mapper
 public interface IotThinkModelFunctionMapper extends BaseMapperX<IotThinkModelFunctionDO> {
 
-    default IotThinkModelFunctionDO selectByProductKey(String productKey) {
-        return selectOne(new LambdaQueryWrapperX<IotThinkModelFunctionDO>().eq(IotThinkModelFunctionDO::getProductKey, productKey));
+    default IotThinkModelFunctionDO selectByProductIdAndIdentifier(Long productId, String identifier) {
+        return selectOne(new LambdaQueryWrapperX<IotThinkModelFunctionDO>().eq(IotThinkModelFunctionDO::getProductId, productId)
+                .eq(IotThinkModelFunctionDO::getIdentifier, identifier));
     }
 
-    default IotThinkModelFunctionDO selectByProductId(Long productId){
-        return selectOne(new LambdaQueryWrapperX<IotThinkModelFunctionDO>().eq(IotThinkModelFunctionDO::getProductId, productId));
+    default List<IotThinkModelFunctionDO> selectListByProductId(Long productId) {
+        return selectList(new LambdaQueryWrapperX<IotThinkModelFunctionDO>().eq(IotThinkModelFunctionDO::getProductId, productId));
     }
 
+    default List<IotThinkModelFunctionDO> selectListByProductIdAndType(Long productId, Integer type) {
+        return selectList(new LambdaQueryWrapperX<IotThinkModelFunctionDO>().eq(IotThinkModelFunctionDO::getProductId, productId)
+                .eq(IotThinkModelFunctionDO::getType, type));
+    }
 }

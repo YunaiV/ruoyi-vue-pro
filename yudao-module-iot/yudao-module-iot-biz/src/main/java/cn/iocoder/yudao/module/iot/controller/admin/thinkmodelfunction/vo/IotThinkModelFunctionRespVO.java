@@ -21,20 +21,32 @@ public class IotThinkModelFunctionRespVO {
     private Long id;
 
     @Schema(description = "产品标识", requiredMode = Schema.RequiredMode.REQUIRED)
+    private Long productId;
+
+    @Schema(description = "产品标识", requiredMode = Schema.RequiredMode.REQUIRED)
     @ExcelProperty("产品标识")
     private String productKey;
 
-    @Schema(description = "属性列表", requiredMode = Schema.RequiredMode.REQUIRED)
-    @ExcelProperty("属性列表")
-    private List<ThingModelProperty> properties;
+    @Schema(description = "功能标识", requiredMode = Schema.RequiredMode.REQUIRED)
+    private String identifier;
 
-    @Schema(description = "服务列表")
-    @ExcelProperty("服务列表")
-    private List<ThingModelService> services;
+    @Schema(description = "功能名称", requiredMode = Schema.RequiredMode.REQUIRED)
+    private String name;
 
-    @Schema(description = "事件列表")
-    @ExcelProperty("事件列表")
-    private List<ThingModelEvent> events;
+    @Schema(description = "功能描述", requiredMode = Schema.RequiredMode.REQUIRED)
+    private String description;
+
+    @Schema(description = "功能类型", requiredMode = Schema.RequiredMode.REQUIRED)
+    private Integer type;
+
+    @Schema(description = "属性", requiredMode = Schema.RequiredMode.REQUIRED)
+    private ThingModelProperty property;
+
+    @Schema(description = "服务", requiredMode = Schema.RequiredMode.REQUIRED)
+    private ThingModelEvent event;
+
+    @Schema(description = "事件", requiredMode = Schema.RequiredMode.REQUIRED)
+    private ThingModelService service;
 
     @Schema(description = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED)
     @ExcelProperty("创建时间")

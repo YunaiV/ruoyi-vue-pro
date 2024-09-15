@@ -4,6 +4,8 @@ import cn.iocoder.yudao.module.iot.controller.admin.thinkmodelfunction.vo.IotThi
 import cn.iocoder.yudao.module.iot.dal.dataobject.thinkmodelfunction.IotThinkModelFunctionDO;
 import jakarta.validation.Valid;
 
+import java.util.List;
+
 /**
  * IoT 产品物模型 Service 接口
  *
@@ -19,6 +21,14 @@ public interface IotThinkModelFunctionService {
      */
     Long createThinkModelFunction(@Valid IotThinkModelFunctionSaveReqVO createReqVO);
 
+
+    /**
+     * 更新IoT 产品物模型
+     *
+     * @param updateReqVO 更新信息
+     */
+    void updateThinkModelFunction(@Valid IotThinkModelFunctionSaveReqVO updateReqVO);
+
     /**
      * 删除IoT 产品物模型
      *
@@ -27,25 +37,18 @@ public interface IotThinkModelFunctionService {
     void deleteThinkModelFunction(Long id);
 
     /**
-     * 获得IoT 产品物模型，通过产品Key
+     * 获得IoT 产品物模型
      *
-     * @param productKey 产品Key
+     * @param id 编号
      * @return IoT 产品物模型
      */
-    IotThinkModelFunctionDO getThinkModelFunctionByProductKey(String productKey);
+    IotThinkModelFunctionDO getThinkModelFunction(Long id);
 
     /**
-     * 获得IoT 产品物模型，通过产品ID
+     * 获得IoT 产品物模型列表
      *
-     * @param productId 产品ID
-     * @return IoT 产品物模型
+     * @param productId 产品编号
+     * @return IoT 产品物模型列表
      */
-    IotThinkModelFunctionDO getThinkModelFunctionByProductId(Long productId);
-
-    /**
-     * 更新IoT 产品物模型
-     *
-     * @param updateReqVO 更新信息
-     */
-    void updateThinkModelFunction(@Valid IotThinkModelFunctionSaveReqVO updateReqVO);
+    List<IotThinkModelFunctionDO> getThinkModelFunctionListByProductId(Long productId);
 }
