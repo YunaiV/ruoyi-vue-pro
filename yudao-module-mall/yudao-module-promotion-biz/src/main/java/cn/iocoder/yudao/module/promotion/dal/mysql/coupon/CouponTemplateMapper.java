@@ -70,7 +70,7 @@ public interface CouponTemplateMapper extends BaseMapperX<CouponTemplateDO> {
                             .in(CouponTemplateDO::getTakeType, canTakeTypes) // 2. 领取方式一致
                             .and(ww -> ww.gt(CouponTemplateDO::getValidEndTime, LocalDateTime.now())  // 3.1 未过期
                                     .or().eq(CouponTemplateDO::getValidityType, CouponTemplateValidityTypeEnum.TERM.getType())) // 3.2 领取之后
-                            .apply(" (take_count < total_count OR total_count = -1 or total_count is null)"); // 4. 剩余数量大于 0，或者无限领取,或者是指定发放的券
+                            .apply(" (take_count < total_count OR total_count = -1)"); // 4. 剩余数量大于 0，或者无限领取
         }
         return canTakeConsumer;
     }

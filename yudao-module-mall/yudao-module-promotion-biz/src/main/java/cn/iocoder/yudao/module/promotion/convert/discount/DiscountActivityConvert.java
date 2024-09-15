@@ -5,7 +5,6 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
 import cn.iocoder.yudao.module.product.api.spu.dto.ProductSpuRespDTO;
-import cn.iocoder.yudao.module.promotion.api.discount.dto.DiscountProductRespDTO;
 import cn.iocoder.yudao.module.promotion.controller.admin.discount.vo.*;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.discount.DiscountActivityDO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.discount.DiscountProductDO;
@@ -34,9 +33,6 @@ public interface DiscountActivityConvert {
 
     List<DiscountActivityRespVO> convertList(List<DiscountActivityDO> list);
     List<DiscountActivityBaseVO.Product> convertList2(List<DiscountProductDO> list);
-
-    List<DiscountProductRespDTO> convertList02(List<DiscountProductDO> list);
-
     PageResult<DiscountActivityRespVO> convertPage(PageResult<DiscountActivityDO> page);
 
     default PageResult<DiscountActivityRespVO> convertPage(PageResult<DiscountActivityDO> page,

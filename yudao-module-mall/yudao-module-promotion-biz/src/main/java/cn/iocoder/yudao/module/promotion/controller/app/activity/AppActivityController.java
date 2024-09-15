@@ -2,11 +2,9 @@ package cn.iocoder.yudao.module.promotion.controller.app.activity;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.map.MapUtil;
-import cn.hutool.core.util.ObjUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.module.product.api.spu.ProductSpuApi;
-import cn.iocoder.yudao.module.product.api.spu.dto.ProductSpuRespDTO;
 import cn.iocoder.yudao.module.promotion.controller.app.activity.vo.AppActivityRespVO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.bargain.BargainActivityDO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.combination.CombinationActivityDO;
@@ -151,46 +149,23 @@ public class AppActivityController {
     }
 
     private void getRewardActivityList(Collection<Long> spuIds, LocalDateTime now, List<AppActivityRespVO> activityList) {
-        // TODO @puhui999：有 3 范围，不只 spuId，还有 categoryId，全部，下次 fix
-        List<RewardActivityDO> rewardActivityList = rewardActivityService.getRewardActivityBySpuIdsAndStatusAndDateTimeLt(
+        List<RewardActivityDO> rewardActivities = rewardActivityService.getRewardActivityBySpuIdsAndStatusAndDateTimeLt(
                 spuIds, CommonStatusEnum.ENABLE.getStatus(), now);
-        if (CollUtil.isEmpty(rewardActivityList)) {
+        if (CollUtil.isEmpty(rewardActivities)) {
             return;
         }
 
-        Map<Long, Optional<RewardActivityDO>> spuIdAndActivityMap = spuIds.stream()
-                .collect(Collectors.toMap(
-                        spuId -> spuId,
-                        spuId -> rewardActivityList.stream()
-                                .filter(activity ->
-                                        ( activity.getProductScopeValues()!=null &&
-                                                (activity.getProductScopeValues().contains(spuId) ||
-                                                        activity.getProductScopeValues().contains(productSpuApi.getSpu(spuId).getCategoryId()))) ||
-                                                activity.getProductScope()==1
-                                )
-                                .max(Comparator.comparing(RewardActivityDO::getCreateTime))));
+        Map<Long, Optional<RewardActivityDO>> spuIdAndActivityMap = spuIds.stream().collect(Collectors.toMap(spuId -> spuId, spuId -> rewardActivities.stream()
+                .filter(activity -> PromotionProductScopeEnum.isAll(activity.getProductScope())
+                                || PromotionProductScopeEnum.isSpu(activity.getProductScope()) // 商品范围
+                                    && CollUtil.contains(activity.getProductScopeValues(), spuId)
+                                || PromotionProductScopeEnum.isCategory(activity.getProductScope()) // 分类范围
+                                    && CollUtil.contains(activity.getProductScopeValues(), productSpuApi.getSpu(spuId).getCategoryId()))
+                .max(Comparator.comparing(RewardActivityDO::getCreateTime))));
         for (Long supId : spuIdAndActivityMap.keySet()) {
-            if (spuIdAndActivityMap.get(supId).isEmpty()) {
-                continue;
-            }
-
-            RewardActivityDO rewardActivityDO = spuIdAndActivityMap.get(supId).get();
-            activityList.add(new AppActivityRespVO(rewardActivityDO.getId(), PromotionTypeEnum.REWARD_ACTIVITY.getType(),
-                    rewardActivityDO.getName(), supId, rewardActivityDO.getStartTime(), rewardActivityDO.getEndTime()));
-        }
-    }
-
-    private static void buildAppActivityRespVO(RewardActivityDO rewardActivity, Collection<Long> spuIds,
-                                               List<AppActivityRespVO> activityList) {
-        for (Long spuId : spuIds) {
-            // 校验商品是否已经加入过活动
-            if (anyMatch(activityList, appActivity -> ObjUtil.equal(appActivity.getId(), rewardActivity.getId()) &&
-                    ObjUtil.equal(appActivity.getSpuId(), spuId))) {
-                continue;
-            }
-            activityList.add(new AppActivityRespVO(rewardActivity.getId(),
-                    PromotionTypeEnum.REWARD_ACTIVITY.getType(), rewardActivity.getName(), spuId,
-                    rewardActivity.getStartTime(), rewardActivity.getEndTime()));
+            spuIdAndActivityMap.get(supId).ifPresent(rewardActivity -> activityList.add(
+                    new AppActivityRespVO(rewardActivity.getId(), PromotionTypeEnum.REWARD_ACTIVITY.getType(),
+                            rewardActivity.getName(), supId, rewardActivity.getStartTime(), rewardActivity.getEndTime())));
         }
     }
 

@@ -73,11 +73,10 @@ public class TradePriceCalculateRespBO {
      */
     private Long bargainActivityId;
 
-
     /**
      * 是否包邮
      */
-    private Boolean freeDelivery = false;
+    private Boolean freeDelivery;
 
     /**
      * 赠送的优惠劵

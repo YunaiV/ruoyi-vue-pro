@@ -64,15 +64,6 @@ public interface RewardActivityService {
     PageResult<RewardActivityDO> getRewardActivityPage(RewardActivityPageReqVO pageReqVO);
 
     /**
-     * 开始时间 < 指定时间 < 结束时间，也就是说获取指定时间段的活动
-     *
-     * @param status   状态
-     * @param dateTime 当前日期时间
-     * @return 满减送活动列表
-     */
-    List<RewardActivityDO> getRewardActivityListByStatusAndDateTimeLt(Integer status, LocalDateTime dateTime);
-
-    /**
      * 获取指定 spu 编号最近参加的活动，每个 spuId 只返回一条记录
      *
      * @param spuIds   SPU 编号数组
@@ -80,6 +71,8 @@ public interface RewardActivityService {
      * @param dateTime 当前日期时间
      * @return 满减送活动列表
      */
-    List<RewardActivityDO> getRewardActivityBySpuIdsAndStatusAndDateTimeLt(Collection<Long> spuIds, Integer status, LocalDateTime dateTime);
+    List<RewardActivityDO> getRewardActivityBySpuIdsAndStatusAndDateTimeLt(Collection<Long> spuIds,
+                                                                           Integer status,
+                                                                           LocalDateTime dateTime);
 
 }

@@ -2,22 +2,19 @@ package cn.iocoder.yudao.module.promotion.controller.admin.coupon.vo.template;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
-import cn.iocoder.yudao.framework.common.util.validation.ValidationUtils;
 import cn.iocoder.yudao.framework.common.validation.InEnum;
 import cn.iocoder.yudao.module.promotion.enums.common.PromotionDiscountTypeEnum;
 import cn.iocoder.yudao.module.promotion.enums.common.PromotionProductScopeEnum;
-import cn.iocoder.yudao.module.promotion.enums.coupon.CouponTakeTypeEnum;
 import cn.iocoder.yudao.module.promotion.enums.coupon.CouponTemplateValidityTypeEnum;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Data;
-import org.springframework.format.annotation.DateTimeFormat;
-
-import jakarta.validation.Validator;
 import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
+import lombok.Data;
+import org.springframework.format.annotation.DateTimeFormat;
+
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
@@ -40,11 +37,11 @@ public class CouponTemplateBaseVO {
     private String description;
 
     @Schema(description = "发行总量", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024") // -1 - 则表示不限制发放数量
-    @NotNull(message = "发行总量不能为空", groups = {User.class})
+    @NotNull(message = "发行总量不能为空")
     private Integer totalCount;
 
     @Schema(description = "每人限领个数", requiredMode = Schema.RequiredMode.REQUIRED, example = "66") // -1 - 则表示不限制
-    @NotNull(message = "每人限领个数不能为空", groups = {User.class})
+    @NotNull(message = "每人限领个数不能为空")
     private Integer takeLimitCount;
 
     @Schema(description = "领取方式", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
@@ -92,16 +89,13 @@ public class CouponTemplateBaseVO {
     private Integer discountType;
 
     @Schema(description = "折扣百分比", example = "80") //  例如说，80% 为 80
-    @NotNull(message = "折扣百分比不能为空", groups = {Percent.class})
     private Integer discountPercent;
 
     @Schema(description = "优惠金额", example = "10")
     @Min(value = 0, message = "优惠金额需要大于等于 0")
-    @NotNull(message = "优惠金额不能为空", groups = {Price.class})
     private Integer discountPrice;
 
     @Schema(description = "折扣上限", example = "100") // 单位：分，仅在 discountType 为 PERCENT 使用
-    @NotNull(message = "折扣上限不能为空", groups = {Percent.class})
     private Integer discountLimitPrice;
 
     @AssertTrue(message = "商品范围编号的数组不能为空")
@@ -158,56 +152,6 @@ public class CouponTemplateBaseVO {
     public boolean isDiscountLimitPriceValid() {
         return ObjectUtil.notEqual(discountType, PromotionDiscountTypeEnum.PERCENT.getType())
                 || discountLimitPrice != null;
-    }
-
-    //-------------------------领取方式校验start----------------------------
-
-    /**
-     * 直接领取
-     */
-    public interface User {
-    }
-
-    /**
-     * 指定发放
-     */
-    public interface Admin {
-    }
-
-    //-------------------------领取方式校验end------------------------------
-
-    //-------------------------优惠类型校验start----------------------------
-
-    /**
-     * 满减
-     */
-    public interface Price {
-    }
-
-    /**
-     * 折扣
-     */
-    public interface Percent {
-    }
-
-    //-------------------------优惠类型校验end------------------------------
-
-    public void validate(Validator validator) {
-
-        //领取方式校验
-        if (CouponTakeTypeEnum.USER.getType().equals(takeType)) {
-            ValidationUtils.validate(validator, this, User.class);
-        } else if (CouponTakeTypeEnum.ADMIN.getType().equals(takeType)) {
-            ValidationUtils.validate(validator, this, Admin.class);
-        }
-
-        //优惠类型校验
-        if (PromotionDiscountTypeEnum.PRICE.getType().equals(discountType)){
-            ValidationUtils.validate(validator, this, Price.class);
-        } else if (PromotionDiscountTypeEnum.PERCENT.getType().equals(discountType)) {
-            ValidationUtils.validate(validator, this, Percent.class);
-        }
-
     }
 
 }

@@ -14,15 +14,6 @@ import java.util.List;
 public interface RewardActivityApi {
 
     /**
-     * 获得当前时间内开启的满减送活动
-     *
-     * @param status   状态
-     * @param dateTime 当前时间，即筛选 <= dateTime 的满减送活动
-     * @return 满减送活动列表
-     */
-    List<RewardActivityMatchRespDTO> getRewardActivityListByStatusAndNow(Integer status, LocalDateTime dateTime);
-
-    /**
      * 获取指定 spu 编号最近参加的活动，每个 spuId 只返回一条记录
      *
      * @param spuIds   spu 编号
@@ -31,4 +22,5 @@ public interface RewardActivityApi {
      * @return 满减送活动列表
      */
     List<RewardActivityMatchRespDTO> getRewardActivityBySpuIdsAndStatusAndDateTimeLt(Collection<Long> spuIds, Integer status, LocalDateTime dateTime);
+
 }

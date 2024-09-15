@@ -2,7 +2,6 @@ package cn.iocoder.yudao.module.promotion.api.reward;
 
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.promotion.api.reward.dto.RewardActivityMatchRespDTO;
-import cn.iocoder.yudao.module.promotion.convert.reward.RewardActivityConvert;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.reward.RewardActivityDO;
 import cn.iocoder.yudao.module.promotion.service.reward.RewardActivityService;
 import jakarta.annotation.Resource;
@@ -26,15 +25,9 @@ public class RewardActivityApiImpl implements RewardActivityApi {
     private RewardActivityService rewardActivityService;
 
     @Override
-    public List<RewardActivityMatchRespDTO> getRewardActivityListByStatusAndNow(Integer status, LocalDateTime dateTime) {
-        List<RewardActivityDO> list = rewardActivityService.getRewardActivityListByStatusAndDateTimeLt(status, dateTime);
-        return BeanUtils.toBean(list, RewardActivityMatchRespDTO.class);
-    }
-
-    @Override
     public List<RewardActivityMatchRespDTO> getRewardActivityBySpuIdsAndStatusAndDateTimeLt(Collection<Long> spuIds, Integer status, LocalDateTime dateTime) {
-        List<RewardActivityDO> rewardActivityBySpuIdsAndStatusAndDateTimeLt = rewardActivityService.getRewardActivityBySpuIdsAndStatusAndDateTimeLt(spuIds, status, dateTime);
-        return RewardActivityConvert.INSTANCE.convertList(rewardActivityBySpuIdsAndStatusAndDateTimeLt);
+        List<RewardActivityDO> list = rewardActivityService.getRewardActivityBySpuIdsAndStatusAndDateTimeLt(spuIds, status, dateTime);
+        return BeanUtils.toBean(list, RewardActivityMatchRespDTO.class);
     }
 
 }

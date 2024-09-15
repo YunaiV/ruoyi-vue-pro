@@ -1,8 +1,8 @@
 package cn.iocoder.yudao.module.trade.service.price.calculator;
 
-import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.iocoder.yudao.framework.common.util.number.MoneyUtils;
 import cn.iocoder.yudao.module.member.api.level.MemberLevelApi;
 import cn.iocoder.yudao.module.member.api.level.dto.MemberLevelRespDTO;
 import cn.iocoder.yudao.module.member.api.user.MemberUserApi;
@@ -14,12 +14,10 @@ import cn.iocoder.yudao.module.promotion.enums.common.PromotionTypeEnum;
 import cn.iocoder.yudao.module.trade.enums.order.TradeOrderTypeEnum;
 import cn.iocoder.yudao.module.trade.service.price.bo.TradePriceCalculateReqBO;
 import cn.iocoder.yudao.module.trade.service.price.bo.TradePriceCalculateRespBO;
+import jakarta.annotation.Resource;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
-import jakarta.annotation.Resource;
-
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
@@ -29,6 +27,8 @@ import static cn.iocoder.yudao.module.trade.service.price.calculator.TradePriceC
 
 /**
  * 限时折扣的 {@link TradePriceCalculator} 实现类
+ *
+ * 由于“会员折扣”和“限时折扣”是冲突，需要选择优惠金额多的，所以也放在这里计算
  *
  * @author 芋道源码
  */
@@ -50,132 +50,89 @@ public class TradeDiscountActivityPriceCalculator implements TradePriceCalculato
             return;
         }
 
-        boolean discount;
-        boolean vip;
-
-        //----------------------------------限时折扣计算-----------------------------------------
-        // 获得 SKU 对应的限时折扣活动
+        // 1.1 获得 SKU 对应的限时折扣活动
         List<DiscountProductRespDTO> discountProducts = discountActivityApi.getMatchDiscountProductList(
                 convertSet(result.getItems(), TradePriceCalculateRespBO.OrderItem::getSkuId));
-        if (CollUtil.isEmpty(discountProducts)) {
-            discount = false;
-        }else {
-            discount = true;
-        }
         Map<Long, DiscountProductRespDTO> discountProductMap = convertMap(discountProducts, DiscountProductRespDTO::getSkuId);
-
-
-
-        //----------------------------------会员计算-----------------------------------------
-        MemberLevelRespDTO level;
-        // 获得用户的会员等级
+        // 1.2 获得会员等级
         MemberUserRespDTO user = memberUserApi.getUser(param.getUserId());
-        if (user.getLevelId() != null && user.getLevelId() > 0) {
-            level = memberLevelApi.getMemberLevel(user.getLevelId());
-            if (level != null && level.getDiscountPercent() != null) {
-                vip = true;
-            }else {
-                vip = false;
-            }
-        }else {
-            level = null;
-            vip = false;
-        }
-
+        MemberLevelRespDTO level = user != null && user.getLevelId() > 0 ? memberLevelApi.getMemberLevel(user.getLevelId()) : null;
 
         // 2. 计算每个 SKU 的优惠金额
         result.getItems().forEach(orderItem -> {
-
-            //----------------------------------限时折扣计算-----------------------------------------
-            DiscountProductRespDTO discountProduct = null;
-            Integer newDiscountPrice = 0;
-            if (discount){
-                // 2.1  计算限时折扣优惠信息
-                discountProduct = discountProductMap.get(orderItem.getSkuId());
-                if (discountProduct != null) {
-                    // 2.2 计算优惠金额
-                    Integer newPayPrice = calculatePayPrice(discountProduct, orderItem);
-                    newDiscountPrice = orderItem.getPayPrice() - newPayPrice;
-                }
+            if (!orderItem.getSelected()) {
+                return;
+            }
+            // 2.1 计算限时折扣的优惠金额
+            DiscountProductRespDTO discountProduct = discountProductMap.get(orderItem.getSkuId());
+            Integer discountPrice = calculateActivityPrice(discountProduct, orderItem);
+            // 2.2 计算 VIP 优惠金额
+            Integer vipPrice = calculateVipPrice(level, orderItem);
+            if (discountPrice <= 0 && vipPrice <= 0) {
+                return;
             }
 
-
-            //----------------------------------会员计算-----------------------------------------
-            Integer vipPrice = 0;
-            if (vip){
-                // 2.3 计算会员优惠金额
-                vipPrice = calculateVipPrice(orderItem.getPayPrice(), level.getDiscountPercent());
+            // 3. 选择优惠金额多的
+            if (discountPrice > vipPrice) {
+                TradePriceCalculatorHelper.addPromotion(result, orderItem,
+                        discountProduct.getActivityId(), discountProduct.getActivityName(), PromotionTypeEnum.DISCOUNT_ACTIVITY.getType(),
+                        StrUtil.format("限时折扣：省 {} 元", formatPrice(discountPrice)),
+                        discountPrice);
+                // 更新 SKU 优惠金额
+                orderItem.setDiscountPrice(orderItem.getDiscountPrice() + discountPrice);
+            } else {
+                assert level != null;
+                TradePriceCalculatorHelper.addPromotion(result, orderItem,
+                        level.getId(), level.getName(), PromotionTypeEnum.MEMBER_LEVEL.getType(),
+                        String.format("会员等级折扣：省 %s 元", formatPrice(vipPrice)),
+                        vipPrice);
+                // 更新 SKU 的优惠金额
+                orderItem.setVipPrice(vipPrice);
             }
 
-
-            // 2.4 记录优惠明细
-            // 注意，只有在选中的情况下，才会记录到优惠明细。否则仅仅是更新 SKU 优惠金额，用于展示
-            if (orderItem.getSelected()) {
-                if (discount && vip){
-                    if(newDiscountPrice > vipPrice){
-                        TradePriceCalculatorHelper.addPromotion(result, orderItem,
-                                discountProduct.getActivityId(), discountProduct.getActivityName(), PromotionTypeEnum.DISCOUNT_ACTIVITY.getType(),
-                                StrUtil.format("限时折扣：省 {} 元", formatPrice(newDiscountPrice)),
-                                newDiscountPrice);
-                        // 2.5 更新 SKU 优惠金额
-                        orderItem.setDiscountPrice(orderItem.getDiscountPrice() + newDiscountPrice);
-                    }else{
-                        TradePriceCalculatorHelper.addPromotion(result, orderItem,
-                                level.getId(), level.getName(), PromotionTypeEnum.MEMBER_LEVEL.getType(),
-                                String.format("会员等级折扣：省 %s 元", formatPrice(vipPrice)),
-                                vipPrice);
-                        // 2.5 更新 SKU 的优惠金额
-                        orderItem.setVipPrice(vipPrice);
-                    }
-                }else if (discount){
-                    TradePriceCalculatorHelper.addPromotion(result, orderItem,
-                            discountProduct.getActivityId(), discountProduct.getActivityName(), PromotionTypeEnum.DISCOUNT_ACTIVITY.getType(),
-                            StrUtil.format("限时折扣：省 {} 元", formatPrice(newDiscountPrice)),
-                            newDiscountPrice);
-                    // 2.5 更新 SKU 优惠金额
-                    orderItem.setDiscountPrice(orderItem.getDiscountPrice() + newDiscountPrice);
-                }else if (vip){
-                    TradePriceCalculatorHelper.addPromotion(result, orderItem,
-                            level.getId(), level.getName(), PromotionTypeEnum.MEMBER_LEVEL.getType(),
-                            String.format("会员等级折扣：省 %s 元", formatPrice(vipPrice)),
-                            vipPrice);
-                    // 2.5 更新 SKU 的优惠金额
-                    orderItem.setVipPrice(vipPrice);
-                }
-            }
-
+            // 4. 分摊优惠
             TradePriceCalculatorHelper.recountPayPrice(orderItem);
+            TradePriceCalculatorHelper.recountAllPrice(result);
         });
-        TradePriceCalculatorHelper.recountAllPrice(result);
-    }
-
-    private Integer calculatePayPrice(DiscountProductRespDTO discountProduct,
-                                      TradePriceCalculateRespBO.OrderItem orderItem) {
-        Integer price = orderItem.getPayPrice();
-        if (PromotionDiscountTypeEnum.PRICE.getType().equals(discountProduct.getDiscountType())) { // 减价
-            price -= discountProduct.getDiscountPrice() * orderItem.getCount();
-        } else if (PromotionDiscountTypeEnum.PERCENT.getType().equals(discountProduct.getDiscountType())) { // 打折
-            price = price * discountProduct.getDiscountPercent() / 100;
-        } else {
-            throw new IllegalArgumentException(String.format("优惠活动的商品(%s) 的优惠类型不正确", discountProduct));
-        }
-        return price;
     }
 
     /**
-     * 计算会员 VIP 优惠价格
+     * 计算优惠活动的价格
      *
-     * @param price 原价
-     * @param discountPercent 折扣
+     * @param discount 优惠活动
+     * @param orderItem 交易项
      * @return 优惠价格
      */
-    public Integer calculateVipPrice(Integer price, Integer discountPercent) {
-        if (discountPercent == null) {
+    private Integer calculateActivityPrice(DiscountProductRespDTO discount,
+                                           TradePriceCalculateRespBO.OrderItem orderItem) {
+        if (discount == null) {
             return 0;
         }
-        BigDecimal divide = new BigDecimal(price).multiply(new BigDecimal(discountPercent)).divide(new BigDecimal(100));
-        Integer newPrice =  divide.intValue();
-        return price - newPrice;
+        Integer newPrice = orderItem.getPayPrice();
+        if (PromotionDiscountTypeEnum.PRICE.getType().equals(discount.getDiscountType())) { // 减价
+            newPrice -= discount.getDiscountPrice() * orderItem.getCount();
+        } else if (PromotionDiscountTypeEnum.PERCENT.getType().equals(discount.getDiscountType())) { // 打折
+            newPrice = newPrice * discount.getDiscountPercent() / 100;
+        } else {
+            throw new IllegalArgumentException(String.format("优惠活动的商品(%s) 的优惠类型不正确", discount));
+        }
+        return orderItem.getPayPrice() - newPrice;
+    }
+
+    /**
+     * 计算会员 VIP 的优惠价格
+     *
+     * @param level 会员等级
+     * @param orderItem 交易项
+     * @return 优惠价格
+     */
+    public Integer calculateVipPrice(MemberLevelRespDTO level,
+                                     TradePriceCalculateRespBO.OrderItem orderItem) {
+        if (level == null || level.getDiscountPercent() == null) {
+            return 0;
+        }
+        Integer newPrice = MoneyUtils.calculateRatePrice(orderItem.getPayPrice(), level.getDiscountPercent().doubleValue());
+        return orderItem.getPayPrice() - newPrice;
     }
 
 }

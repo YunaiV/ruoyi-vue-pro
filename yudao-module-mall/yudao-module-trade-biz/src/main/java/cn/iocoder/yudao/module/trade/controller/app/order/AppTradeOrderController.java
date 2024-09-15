@@ -44,11 +44,9 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDateTime;
 import java.util.*;
 
-import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
-import static cn.iocoder.yudao.module.promotion.enums.ErrorCodeConstants.DISCOUNT_ACTIVITY_TYPE_NOT_EXISTS;
 
 @Tag(name = "用户 App - 交易订单")
 @RestController
@@ -314,7 +312,7 @@ public class AppTradeOrderController {
                 Integer newPrice = price * discountProductRespDTO.getDiscountPercent() / 100;
                 sku.setPrice(price - newPrice);
             }else{
-                throw exception(DISCOUNT_ACTIVITY_TYPE_NOT_EXISTS);
+                throw new IllegalArgumentException("限时折扣活动类型不存在");
             }
             return sku;
         }

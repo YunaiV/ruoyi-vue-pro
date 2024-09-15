@@ -23,10 +23,8 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
-import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.filterList;
-import static cn.iocoder.yudao.module.promotion.enums.ErrorCodeConstants.REWARD_ACTIVITY_TYPE_NOT_EXISTS;
 import static cn.iocoder.yudao.module.trade.service.price.calculator.TradePriceCalculatorHelper.formatPrice;
 
 // TODO @puhui999：相关的单测，建议改一改
@@ -81,8 +79,10 @@ public class TradeRewardActivityPriceCalculator implements TradePriceCalculator 
         Integer newDiscountPrice = rule.getDiscountPrice();
         // 2.2 计算分摊的优惠金额
         List<Integer> divideDiscountPrices = TradePriceCalculatorHelper.dividePrice(orderItems, newDiscountPrice);
-        //计算是否包邮
-        result.setFreeDelivery(rule.getFreeDelivery());
+        // 2.3 计算是否包邮
+        if (Boolean.TRUE.equals(rule.getFreeDelivery())) {
+            result.setFreeDelivery(true);
+        }
 
         // 3.1 记录使用的优惠劵
         result.setCouponId(param.getCouponId());
@@ -132,16 +132,17 @@ public class TradeRewardActivityPriceCalculator implements TradePriceCalculator 
     private List<TradePriceCalculateRespBO.OrderItem> filterMatchActivityOrderItems(TradePriceCalculateRespBO result,
                                                                                     RewardActivityMatchRespDTO rewardActivity) {
         Integer productScope = rewardActivity.getProductScope();
-        if(PromotionProductScopeEnum.isAll(productScope)){
+        if (PromotionProductScopeEnum.isAll(productScope)){
             return result.getItems();
-        }else if (PromotionProductScopeEnum.isSpu(productScope)) {
+        } else if (PromotionProductScopeEnum.isSpu(productScope)) {
             return filterList(result.getItems(),
                     orderItem -> CollUtil.contains(rewardActivity.getProductScopeValues(), orderItem.getSpuId()));
-        }else if (PromotionProductScopeEnum.isCategory(productScope)) {
+        } else if (PromotionProductScopeEnum.isCategory(productScope)) {
             return filterList(result.getItems(),
                     orderItem -> CollUtil.contains(rewardActivity.getProductScopeValues(), orderItem.getCategoryId()));
-        }else{
-            throw exception(REWARD_ACTIVITY_TYPE_NOT_EXISTS);
+        } else {
+            throw new IllegalArgumentException(StrUtil.format("满减送活动({})的类型({})不存在",
+                    rewardActivity.getId(), productScope));
         }
     }
 

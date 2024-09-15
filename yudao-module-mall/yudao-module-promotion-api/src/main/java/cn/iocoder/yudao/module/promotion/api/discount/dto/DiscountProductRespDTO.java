@@ -47,9 +47,11 @@ public class DiscountProductRespDTO {
      */
     private String activityName;
     /**
+     * 活动开始时间点
+     */
+    private LocalDateTime activityStartTime;
+    /**
      * 活动结束时间点
-     *
-     * 冗余 {@link DiscountActivityDO#getEndTime()}
      */
     private LocalDateTime activityEndTime;
 

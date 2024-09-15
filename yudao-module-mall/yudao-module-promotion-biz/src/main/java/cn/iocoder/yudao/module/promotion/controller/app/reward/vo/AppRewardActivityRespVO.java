@@ -20,6 +20,12 @@ public class AppRewardActivityRespVO {
     @Schema(description = "活动标题", requiredMode = Schema.RequiredMode.REQUIRED, example = "满啦满啦")
     private String name;
 
+    @Schema(description = "开始时间", requiredMode = Schema.RequiredMode.REQUIRED)
+    private LocalDateTime startTime;
+
+    @Schema(description = "结束时间", requiredMode = Schema.RequiredMode.REQUIRED)
+    private LocalDateTime endTime;
+
     @Schema(description = "条件类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     private Integer conditionType;
 
@@ -31,11 +37,5 @@ public class AppRewardActivityRespVO {
 
     @Schema(description = "优惠规则的数组")
     private List<RewardActivityBaseVO.Rule> rules;
-
-    @Schema(description = "开始时间")
-    private LocalDateTime startTime;
-
-    @Schema(description = "结束时间")
-    private LocalDateTime endTime;
 
 }

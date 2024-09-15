@@ -80,15 +80,6 @@ public interface CouponMapper extends BaseMapperX<CouponDO> {
         return convertMap(list, map -> MapUtil.getLong(map, templateIdAlias), map -> MapUtil.getInt(map, countAlias));
     }
 
-    default List<CouponDO> selectListByUserIdAndStatusAndUsePriceLeAndProductScope(
-            Long userId, Integer status) {
-        List<CouponDO> couponDOS = selectList(new LambdaQueryWrapperX<CouponDO>()
-                .eq(CouponDO::getUserId, userId)
-                .eq(CouponDO::getStatus, status)
-        );
-        return couponDOS;
-    }
-
     default List<CouponDO> selectListByStatusAndValidEndTimeLe(Integer status, LocalDateTime validEndTime) {
         return selectList(new LambdaQueryWrapperX<CouponDO>()
                 .eq(CouponDO::getStatus, status)
