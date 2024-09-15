@@ -125,7 +125,7 @@ public class TradePriceServiceImpl implements TradePriceService {
                 TradePriceCalculateRespBO.OrderItem orderItem = new TradePriceCalculateRespBO.OrderItem()
                         .setPayPrice(sku.getPrice()).setCount(1);
                 // 计算限时折扣的优惠价格
-                DiscountProductRespDTO discountProduct = skuIdAndDiscountMap.get(orderItem.getSkuId());
+                DiscountProductRespDTO discountProduct = skuIdAndDiscountMap.get(sku.getId());
                 Integer discountPrice = discountActivityPriceCalculator.calculateActivityPrice(discountProduct, orderItem);
                 // 计算 VIP 优惠金额
                 Integer vipPrice = discountActivityPriceCalculator.calculateVipPrice(level, orderItem);

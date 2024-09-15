@@ -234,7 +234,7 @@ public class RewardActivityServiceImpl implements RewardActivityService {
             activityDTO.getRules().forEach(rule -> {
                 String description = "";
                 if (PromotionConditionTypeEnum.PRICE.getType().equals(activityDTO.getConditionType())) {
-                    description += StrUtil.format("满 {} 元", rule.getLimit());
+                    description += StrUtil.format("满 {} 元", MoneyUtils.fenToYuanStr(rule.getLimit()));
                 } else {
                     description += StrUtil.format("满 {} 件", rule.getLimit());
                 }
