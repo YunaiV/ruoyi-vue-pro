@@ -189,16 +189,17 @@ public class DiscountActivityServiceImpl implements DiscountActivityService {
     }
 
     @Override
-    public List<DiscountActivityDO> getDiscountActivityBySpuIdsAndStatusAndDateTimeLt(Collection<Long> spuIds, Integer status, LocalDateTime dateTime) {
+    public List<DiscountActivityDO> getDiscountActivityListBySpuIds(Collection<Long> spuIds) {
         // 1. 查询出指定 spuId 的 spu 参加的活动最接近现在的一条记录。多个的话，一个 spuId 对应一个最近的活动编号
-        List<Map<String, Object>> spuIdAndActivityIdMaps = discountProductMapper.selectSpuIdAndActivityIdMapsBySpuIdsAndStatus(spuIds, status);
+        List<Map<String, Object>> spuIdAndActivityIdMaps = discountProductMapper.selectSpuIdAndActivityIdMapsBySpuIdsAndStatus(
+                spuIds, CommonStatusEnum.ENABLE.getStatus());
         if (CollUtil.isEmpty(spuIdAndActivityIdMaps)) {
             return Collections.emptyList();
         }
 
         // 2. 查询活动详情
         return discountActivityMapper.selectListByIdsAndDateTimeLt(
-                convertSet(spuIdAndActivityIdMaps, map -> MapUtil.getLong(map, "activityId")), dateTime);
+                convertSet(spuIdAndActivityIdMaps, map -> MapUtil.getLong(map, "activityId")), LocalDateTime.now());
     }
 
 }
