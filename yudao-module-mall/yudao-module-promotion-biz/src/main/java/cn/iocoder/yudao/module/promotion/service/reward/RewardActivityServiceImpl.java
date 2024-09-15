@@ -135,16 +135,16 @@ public class RewardActivityServiceImpl implements RewardActivityService {
             // 例如说，rewardActivity 是全部活动，结果有个 db 里的 activity 是某个分类，它也是冲突的。也就是说，当前时间段内，有且仅有只能有一个活动！
             if (PromotionProductScopeEnum.isAll(item.getProductScope()) ||
                     PromotionProductScopeEnum.isAll(rewardActivity.getProductScope())) {
-                // TODO puhui999：需要提示出来与满减送活动“xxx 活动”存在商品范围冲突；这里可能要分情况，下面需要把 activityName 传入
-                throw exception(REWARD_ACTIVITY_SCOPE_EXISTS);
+                throw exception(REWARD_ACTIVITY_SCOPE_EXISTS, item.getName(),
+                        PromotionProductScopeEnum.isAll(item.getProductScope()) ? "该活动商品范围为全部已覆盖包含本活动范围" :
+                                "本活动商品范围为全部已覆盖包含了该活动商品范围");
             }
             // 情况二：如果与该时间段内商品范围为类别的活动冲突
             if (PromotionProductScopeEnum.isCategory(item.getProductScope())) {
-                // TODO puhui999：前端我们有限制，只允许子分类么？可能要限制下，不然基于分类查询不到对应的商品。因为商品目前必须在子分类下
                 // 校验分类是否冲突
                 if (PromotionProductScopeEnum.isCategory(rewardActivity.getProductScope())) {
                     if (!intersectionDistinct(item.getProductScopeValues(), rewardActivity.getProductScopeValues()).isEmpty()) {
-                        throw exception(REWARD_ACTIVITY_SCOPE_EXISTS);
+                        throw exception(REWARD_ACTIVITY_SCOPE_EXISTS, item.getName(), "商品分类范围重叠");
                     }
                 }
                 // 校验商品分类是否冲突
@@ -152,7 +152,7 @@ public class RewardActivityServiceImpl implements RewardActivityService {
                     List<ProductSpuRespDTO> spuList = productSpuApi.getSpuList(rewardActivity.getProductScopeValues());
                     if (!intersectionDistinct(item.getProductScopeValues(),
                             convertSet(spuList, ProductSpuRespDTO::getCategoryId)).isEmpty()) {
-                        throw exception(REWARD_ACTIVITY_SCOPE_EXISTS);
+                        throw exception(REWARD_ACTIVITY_SCOPE_EXISTS, item.getName(), "该活动商品分类范围已包含本活动所选商品");
                     }
                 }
             }
@@ -161,7 +161,7 @@ public class RewardActivityServiceImpl implements RewardActivityService {
                 // 校验商品是否冲突
                 if (PromotionProductScopeEnum.isSpu(rewardActivity.getProductScope())) {
                     if (!intersectionDistinct(item.getProductScopeValues(), rewardActivity.getProductScopeValues()).isEmpty()) {
-                        throw exception(REWARD_ACTIVITY_SCOPE_EXISTS);
+                        throw exception(REWARD_ACTIVITY_SCOPE_EXISTS, item.getName(), "活动商品范围所选商品重叠");
                     }
                 }
                 // 校验商品分类是否冲突
@@ -169,7 +169,7 @@ public class RewardActivityServiceImpl implements RewardActivityService {
                     List<ProductSpuRespDTO> spuList = productSpuApi.getSpuList(item.getProductScopeValues());
                     if (!intersectionDistinct(rewardActivity.getProductScopeValues(),
                             convertSet(spuList, ProductSpuRespDTO::getCategoryId)).isEmpty()) {
-                        throw exception(REWARD_ACTIVITY_SCOPE_EXISTS);
+                        throw exception(REWARD_ACTIVITY_SCOPE_EXISTS, item.getName(), "本活动商品分类范围包含了该活动所选商品");
                     }
                 }
             }
