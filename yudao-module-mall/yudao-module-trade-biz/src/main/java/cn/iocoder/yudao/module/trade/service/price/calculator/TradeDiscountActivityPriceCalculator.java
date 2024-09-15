@@ -10,15 +10,16 @@ import cn.iocoder.yudao.module.promotion.enums.common.PromotionTypeEnum;
 import cn.iocoder.yudao.module.trade.enums.order.TradeOrderTypeEnum;
 import cn.iocoder.yudao.module.trade.service.price.bo.TradePriceCalculateReqBO;
 import cn.iocoder.yudao.module.trade.service.price.bo.TradePriceCalculateRespBO;
+import jakarta.annotation.Resource;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
-import jakarta.annotation.Resource;
 import java.util.List;
 import java.util.Map;
 
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
+import static cn.iocoder.yudao.framework.common.util.number.MoneyUtils.calculateRatePrice;
 import static cn.iocoder.yudao.module.trade.service.price.calculator.TradePriceCalculatorHelper.formatPrice;
 
 /**
@@ -41,7 +42,7 @@ public class TradeDiscountActivityPriceCalculator implements TradePriceCalculato
         }
         // 获得 SKU 对应的限时折扣活动
         List<DiscountProductRespDTO> discountProducts = discountActivityApi.getMatchDiscountProductList(
-                convertSet(result.getItems(), TradePriceCalculateRespBO.OrderItem::getSkuId));
+                convertSet(result.getItems(), TradePriceCalculateRespBO.OrderItem::getSpuId));
         if (CollUtil.isEmpty(discountProducts)) {
             return;
         }
@@ -79,7 +80,7 @@ public class TradeDiscountActivityPriceCalculator implements TradePriceCalculato
         if (PromotionDiscountTypeEnum.PRICE.getType().equals(discountProduct.getDiscountType())) { // 减价
             price -= discountProduct.getDiscountPrice() * orderItem.getCount();
         } else if (PromotionDiscountTypeEnum.PERCENT.getType().equals(discountProduct.getDiscountType())) { // 打折
-            price = price * discountProduct.getDiscountPercent() / 100;
+            price = calculateRatePrice(price, discountProduct.getDiscountPercent() / 100.0);
         } else {
             throw new IllegalArgumentException(String.format("优惠活动的商品(%s) 的优惠类型不正确", discountProduct));
         }

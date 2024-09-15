@@ -24,10 +24,10 @@ public interface DiscountActivityService {
      *
      * 注意，匹配的条件，仅仅是日期符合，并且处于开启状态
      *
-     * @param skuIds SKU 编号数组
+     * @param spuIds SKU 编号数组
      * @return 匹配的限时折扣商品
      */
-    List<DiscountProductDO> getMatchDiscountProductList(Collection<Long> skuIds);
+    List<DiscountProductDO> getMatchDiscountProductList(Collection<Long> spuIds);
 
     /**
      * 创建限时折扣活动

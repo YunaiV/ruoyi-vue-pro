@@ -2,23 +2,4 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="cn.iocoder.yudao.module.promotion.dal.mysql.discount.DiscountProductMapper">
 
-
-    <select id="getMatchDiscountProductList"   resultType="cn.iocoder.yudao.module.promotion.dal.dataobject.discount.DiscountProductDO">
-        SELECT pdp.*
-        FROM promotion_discount_product pdp
-        LEFT JOIN promotion_discount_activity pda
-        ON pdp.activity_id = pda.id
-        <where>
-            <if test="skuIds != null and skuIds.size > 0">
-                AND pdp.sku_id in
-                <foreach collection="skuIds" item="skuId" index="index" open="(" close=")" separator=",">
-                    #{skuId}
-                </foreach>
-            </if>
-            AND pda.start_time &lt;= CURRENT_TIME AND pda.end_time &gt;= CURRENT_TIME
-            AND pda.`status` = 20
-            AND pda.deleted != 1
-        </where>
-    </select>
-
 </mapper>
