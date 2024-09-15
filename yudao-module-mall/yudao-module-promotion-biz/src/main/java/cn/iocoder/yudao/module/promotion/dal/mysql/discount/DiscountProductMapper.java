@@ -27,12 +27,13 @@ public interface DiscountProductMapper extends BaseMapperX<DiscountProductDO> {
         return selectList(DiscountProductDO::getSkuId, skuIds);
     }
 
-    default List<DiscountProductDO> selectListByStatusAndDateTimeLt(Collection<Long> skuIds, Integer status, LocalDateTime dateTime) {
+    default List<DiscountProductDO> selectListBySkuIdsAndStatusAndNow(Collection<Long> skuIds, Integer status) {
+        LocalDateTime now = LocalDateTime.now();
         return selectList(new LambdaQueryWrapperX<DiscountProductDO>()
                 .in(DiscountProductDO::getSkuId, skuIds)
                 .eq(DiscountProductDO::getActivityStatus,status)
-                .lt(DiscountProductDO::getActivityStartTime, dateTime)
-                .gt(DiscountProductDO::getActivityEndTime, dateTime));
+                .lt(DiscountProductDO::getActivityStartTime, now)
+                .gt(DiscountProductDO::getActivityEndTime, now));
     }
 
     /**

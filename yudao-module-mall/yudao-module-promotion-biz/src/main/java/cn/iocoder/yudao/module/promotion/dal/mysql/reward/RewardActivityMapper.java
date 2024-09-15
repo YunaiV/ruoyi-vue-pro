@@ -30,14 +30,17 @@ public interface RewardActivityMapper extends BaseMapperX<RewardActivityDO> {
                 .orderByDesc(RewardActivityDO::getId));
     }
 
-    default List<RewardActivityDO> selectListByStatusAndDateTimeLt(Collection<Long> spuIds, Collection<Long> categoryIds, Integer status, LocalDateTime dateTime) {
+    default List<RewardActivityDO> selectListBySpuIdAndStatusAndNow(Collection<Long> spuIds,
+                                                                    Collection<Long> categoryIds,
+                                                                    Integer status) {
+        LocalDateTime now = LocalDateTime.now();
         Function<Collection<Long>, String> productScopeValuesFindInSetFunc = ids -> ids.stream()
                 .map(id -> StrUtil.format("FIND_IN_SET({}, product_scope_values) ", id))
                 .collect(Collectors.joining(" OR "));
         return selectList(new LambdaQueryWrapperX<RewardActivityDO>()
-                .eq(RewardActivityDO::getStatus,status)
-                .lt(RewardActivityDO::getStartTime, dateTime)
-                .gt(RewardActivityDO::getEndTime, dateTime)
+                .eq(RewardActivityDO::getStatus, status)
+                .lt(RewardActivityDO::getStartTime, now)
+                .gt(RewardActivityDO::getEndTime, now)
                 .and(i -> i.eq(RewardActivityDO::getProductScope, PromotionProductScopeEnum.SPU.getScope())
                             .and(i1 -> i1.apply(productScopeValuesFindInSetFunc.apply(spuIds)))
                         .or(i1 -> i1.eq(RewardActivityDO::getProductScope, PromotionProductScopeEnum.ALL.getScope()))

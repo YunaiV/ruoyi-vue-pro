@@ -13,11 +13,11 @@ import java.util.List;
 public interface DiscountActivityApi {
 
     /**
-     * 获得商品匹配的的限时折扣信息
+     * 获得 skuId 商品匹配的的限时折扣信息
      *
      * @param skuIds 商品 SKU 编号数组
      * @return 限时折扣信息
      */
-    List<DiscountProductRespDTO> getMatchDiscountProductList(Collection<Long> skuIds);
+    List<DiscountProductRespDTO> getMatchDiscountProductListBySkuIds(Collection<Long> skuIds);
 
 }

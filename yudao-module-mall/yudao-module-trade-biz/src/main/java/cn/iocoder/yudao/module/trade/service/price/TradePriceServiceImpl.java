@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.trade.service.price;
 
-import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
+import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.module.member.api.level.dto.MemberLevelRespDTO;
 import cn.iocoder.yudao.module.product.api.sku.ProductSkuApi;
 import cn.iocoder.yudao.module.product.api.sku.dto.ProductSkuRespDTO;
@@ -22,7 +22,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -110,13 +109,10 @@ public class TradePriceServiceImpl implements TradePriceService {
         MemberLevelRespDTO level = discountActivityPriceCalculator.getMemberLevel(userId);
         // 1.3 获得限时折扣活动
         Map<Long, DiscountProductRespDTO> skuIdAndDiscountMap = convertMap(
-                discountActivityApi.getMatchDiscountProductList(convertSet(allSkuList, ProductSkuRespDTO::getId)),
+                discountActivityApi.getMatchDiscountProductListBySkuIds(convertSet(allSkuList, ProductSkuRespDTO::getId)),
                 DiscountProductRespDTO::getSkuId);
         // 1.4 获得满减送活动
-        // TODO 芋艿：这里是有问题的，后面 fix
-        Map<Long, RewardActivityMatchRespDTO> rewardActivityMap = convertMap(
-                rewardActivityApi.getRewardActivityBySpuIdsAndStatusAndDateTimeLt(spuIds, CommonStatusEnum.ENABLE.getStatus(), LocalDateTime.now()),
-                RewardActivityMatchRespDTO::getId);
+       List<RewardActivityMatchRespDTO> rewardActivityMap = rewardActivityApi.getMatchRewardActivityListBySpuIds(spuIds);
 
         // 2. 价格计算
         return convertList(spuIds, spuId -> {
@@ -148,7 +144,8 @@ public class TradePriceServiceImpl implements TradePriceService {
             });
             spuVO.setSkus(skuVOList);
             // 2.2 满减送活动
-            RewardActivityMatchRespDTO rewardActivity = rewardActivityMap.get(spuId);
+            RewardActivityMatchRespDTO rewardActivity = CollUtil.findOne(rewardActivityMap,
+                    activity -> CollUtil.contains(activity.getProductScopeValues(), spuId));
             if (rewardActivity != null) {
                 spuVO.setRewardActivity(new AppTradeProductSettlementRespVO.RewardActivity().setId(rewardActivity.getId())
                         .setRuleDescriptions(convertList(rewardActivity.getRules(), RewardActivityMatchRespDTO.Rule::getDescription)));

@@ -46,8 +46,8 @@ public class DiscountActivityServiceImpl implements DiscountActivityService {
     private DiscountProductMapper discountProductMapper;
 
     @Override
-    public List<DiscountProductDO> getMatchDiscountProductList(Collection<Long> skuIds) {
-        return discountProductMapper.selectListByStatusAndDateTimeLt(skuIds, CommonStatusEnum.ENABLE.getStatus(), LocalDateTime.now());
+    public List<DiscountProductDO> getMatchDiscountProductListBySkuIds(Collection<Long> skuIds) {
+        return discountProductMapper.selectListBySkuIdsAndStatusAndNow(skuIds, CommonStatusEnum.ENABLE.getStatus());
     }
 
     @Override

@@ -24,8 +24,8 @@ public class DiscountActivityApiImpl implements DiscountActivityApi {
     private DiscountActivityService discountActivityService;
 
     @Override
-    public List<DiscountProductRespDTO> getMatchDiscountProductList(Collection<Long> skuIds) {
-        List<DiscountProductDO> list = discountActivityService.getMatchDiscountProductList(skuIds);
+    public List<DiscountProductRespDTO> getMatchDiscountProductListBySkuIds(Collection<Long> skuIds) {
+        List<DiscountProductDO> list = discountActivityService.getMatchDiscountProductListBySkuIds(skuIds);
         return BeanUtils.toBean(list, DiscountProductRespDTO.class);
     }
 

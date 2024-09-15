@@ -19,6 +19,11 @@ import java.util.Map;
 public class RewardActivityMatchRespDTO {
 
     /**
+     * 匹配的 SPU 数组
+     */
+    private List<Long> spuIds;
+
+    /**
      * 活动编号，主键自增
      */
     private Long id;

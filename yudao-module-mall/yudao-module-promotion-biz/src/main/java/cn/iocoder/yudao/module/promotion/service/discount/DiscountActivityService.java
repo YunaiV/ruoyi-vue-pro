@@ -26,7 +26,7 @@ public interface DiscountActivityService {
      * @param skuIds SKU 编号数组
      * @return 匹配的限时折扣商品
      */
-    List<DiscountProductDO> getMatchDiscountProductList(Collection<Long> skuIds);
+    List<DiscountProductDO> getMatchDiscountProductListBySkuIds(Collection<Long> skuIds);
 
     /**
      * 创建限时折扣活动

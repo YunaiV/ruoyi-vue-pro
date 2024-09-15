@@ -3,12 +3,9 @@ package cn.iocoder.yudao.module.trade.service.price.calculator;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
-import cn.iocoder.yudao.framework.common.util.number.MoneyUtils;
 import cn.iocoder.yudao.module.promotion.api.reward.RewardActivityApi;
 import cn.iocoder.yudao.module.promotion.api.reward.dto.RewardActivityMatchRespDTO;
 import cn.iocoder.yudao.module.promotion.enums.common.PromotionConditionTypeEnum;
-import cn.iocoder.yudao.module.promotion.enums.common.PromotionProductScopeEnum;
 import cn.iocoder.yudao.module.promotion.enums.common.PromotionTypeEnum;
 import cn.iocoder.yudao.module.trade.enums.order.TradeOrderTypeEnum;
 import cn.iocoder.yudao.module.trade.service.price.bo.TradePriceCalculateReqBO;
@@ -17,9 +14,6 @@ import jakarta.annotation.Resource;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
@@ -48,8 +42,8 @@ public class TradeRewardActivityPriceCalculator implements TradePriceCalculator 
             return;
         }
         // 获得 SKU 对应的满减送活动
-        List<RewardActivityMatchRespDTO> rewardActivities = rewardActivityApi.getRewardActivityBySpuIdsAndStatusAndDateTimeLt(
-                convertSet(result.getItems(), TradePriceCalculateRespBO.OrderItem::getSpuId), CommonStatusEnum.ENABLE.getStatus(), LocalDateTime.now());
+        List<RewardActivityMatchRespDTO> rewardActivities = rewardActivityApi.getMatchRewardActivityListBySpuIds(
+                convertSet(result.getItems(), TradePriceCalculateRespBO.OrderItem::getSpuId));
         if (CollUtil.isEmpty(rewardActivities)) {
             return;
         }
@@ -71,7 +65,7 @@ public class TradeRewardActivityPriceCalculator implements TradePriceCalculator 
         if (rule == null) {
             TradePriceCalculatorHelper.addNotMatchPromotion(result, orderItems,
                     rewardActivity.getId(), rewardActivity.getName(), PromotionTypeEnum.REWARD_ACTIVITY.getType(),
-                    getRewardActivityNotMeetTip(rewardActivity, orderItems));
+                    "满减送：" + rewardActivity.getRules().get(0).getDescription());
             return;
         }
 
@@ -131,19 +125,7 @@ public class TradeRewardActivityPriceCalculator implements TradePriceCalculator 
      */
     private List<TradePriceCalculateRespBO.OrderItem> filterMatchActivityOrderItems(TradePriceCalculateRespBO result,
                                                                                     RewardActivityMatchRespDTO rewardActivity) {
-        Integer productScope = rewardActivity.getProductScope();
-        if (PromotionProductScopeEnum.isAll(productScope)){
-            return result.getItems();
-        } else if (PromotionProductScopeEnum.isSpu(productScope)) {
-            return filterList(result.getItems(),
-                    orderItem -> CollUtil.contains(rewardActivity.getProductScopeValues(), orderItem.getSpuId()));
-        } else if (PromotionProductScopeEnum.isCategory(productScope)) {
-            return filterList(result.getItems(),
-                    orderItem -> CollUtil.contains(rewardActivity.getProductScopeValues(), orderItem.getCategoryId()));
-        } else {
-            throw new IllegalArgumentException(StrUtil.format("满减送活动({})的类型({})不存在",
-                    rewardActivity.getId(), productScope));
-        }
+        return filterList(result.getItems(), orderItem -> CollUtil.contains(rewardActivity.getSpuIds(), orderItem.getSpuId()));
     }
 
     /**
@@ -173,33 +155,6 @@ public class TradeRewardActivityPriceCalculator implements TradePriceCalculator 
             }
         }
         return null;
-    }
-
-    /**
-     * 获得满减送活动不匹配时的提示
-     *
-     * @param rewardActivity 满减送活动
-     * @return 提示
-     */
-    private String getRewardActivityNotMeetTip(RewardActivityMatchRespDTO rewardActivity,
-                                               List<TradePriceCalculateRespBO.OrderItem> orderItems) {
-        // 1. 计算数量和价格
-        Integer count = TradePriceCalculatorHelper.calculateTotalCount(orderItems);
-        Integer price = TradePriceCalculatorHelper.calculateTotalPayPrice(orderItems);
-        assert count != null && price != null;
-
-        // 2. 构建不满足时的提示信息：按最低档规则算
-        String meetTip = "满减送：购满 {} {}，可以减 {} 元";
-        List<RewardActivityMatchRespDTO.Rule> rules = new ArrayList<>(rewardActivity.getRules());
-        rules.sort(Comparator.comparing(RewardActivityMatchRespDTO.Rule::getLimit)); // 按优惠门槛升序
-        RewardActivityMatchRespDTO.Rule rule = rules.get(0);
-        if (PromotionConditionTypeEnum.PRICE.getType().equals(rewardActivity.getConditionType())) {
-            return StrUtil.format(meetTip, rule.getLimit(), "元", MoneyUtils.fenToYuanStr(rule.getDiscountPrice()));
-        }
-        if (PromotionConditionTypeEnum.COUNT.getType().equals(rewardActivity.getConditionType())) {
-            return StrUtil.format(meetTip, rule.getLimit(), "件", MoneyUtils.fenToYuanStr(rule.getDiscountPrice()));
-        }
-        return StrUtil.EMPTY;
     }
 
 }
