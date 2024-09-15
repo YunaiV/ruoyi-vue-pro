@@ -20,6 +20,7 @@ import java.util.Map;
 import java.util.Objects;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.module.product.dal.dataobject.category.ProductCategoryDO.CATEGORY_LEVEL;
 import static cn.iocoder.yudao.module.product.dal.dataobject.category.ProductCategoryDO.PARENT_ID_NULL;
 import static cn.iocoder.yudao.module.product.enums.ErrorCodeConstants.*;
 
@@ -118,6 +119,10 @@ public class ProductCategoryServiceImpl implements ProductCategoryService {
             }
             if (!CommonStatusEnum.ENABLE.getStatus().equals(category.getStatus())) {
                 throw exception(CATEGORY_DISABLED, category.getName());
+            }
+            // 校验层级
+            if (getCategoryLevel(id) < CATEGORY_LEVEL) {
+                throw exception(SPU_SAVE_FAIL_CATEGORY_LEVEL_ERROR);
             }
         });
     }
