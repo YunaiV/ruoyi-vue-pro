@@ -89,12 +89,4 @@ public interface DiscountActivityService {
      */
     List<DiscountProductDO> getDiscountProductsByActivityId(Collection<Long> activityIds);
 
-    /**
-     * 获取指定 SPU 编号最近参加的活动，每个 spuId 只返回一条记录
-     *
-     * @param spuIds   SPU 编号数组
-     * @return 折扣活动列表
-     */
-    List<DiscountActivityDO> getDiscountActivityListBySpuIds(Collection<Long> spuIds);
-
 }

@@ -113,14 +113,16 @@ public class ProductCategoryServiceImpl implements ProductCategoryService {
         Map<Long, ProductCategoryDO> categoryMap = CollectionUtils.convertMap(list, ProductCategoryDO::getId);
         // 校验
         ids.forEach(id -> {
+            // 校验分类是否存在
             ProductCategoryDO category = categoryMap.get(id);
             if (category == null) {
                 throw exception(CATEGORY_NOT_EXISTS);
             }
+            // 校验分类是否启用
             if (!CommonStatusEnum.ENABLE.getStatus().equals(category.getStatus())) {
                 throw exception(CATEGORY_DISABLED, category.getName());
             }
-            // 校验层级
+            // 商品分类层级校验，必须使用第二级的商品分类
             if (getCategoryLevel(id) < CATEGORY_LEVEL) {
                 throw exception(SPU_SAVE_FAIL_CATEGORY_LEVEL_ERROR);
             }

@@ -137,8 +137,8 @@ public class RewardActivityServiceImpl implements RewardActivityService {
             if (PromotionProductScopeEnum.isAll(item.getProductScope()) ||
                     PromotionProductScopeEnum.isAll(rewardActivity.getProductScope())) {
                 throw exception(REWARD_ACTIVITY_SCOPE_EXISTS, item.getName(),
-                        PromotionProductScopeEnum.isAll(item.getProductScope()) ? "该活动商品范围为全部已覆盖包含本活动范围" :
-                                "本活动商品范围为全部已覆盖包含了该活动商品范围");
+                        PromotionProductScopeEnum.isAll(item.getProductScope()) ?
+                                "该活动商品范围为全部已覆盖包含本活动范围" : "本活动商品范围为全部已覆盖包含了该活动商品范围");
             }
             // 情况二：如果与该时间段内商品范围为类别的活动冲突
             if (PromotionProductScopeEnum.isCategory(item.getProductScope())) {

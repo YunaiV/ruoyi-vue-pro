@@ -2,7 +2,6 @@ package cn.iocoder.yudao.module.trade.service.price.calculator;
 
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.iocoder.yudao.framework.common.util.number.MoneyUtils;
 import cn.iocoder.yudao.module.member.api.level.MemberLevelApi;
 import cn.iocoder.yudao.module.member.api.level.dto.MemberLevelRespDTO;
 import cn.iocoder.yudao.module.member.api.user.MemberUserApi;
@@ -23,6 +22,7 @@ import java.util.Map;
 
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
+import static cn.iocoder.yudao.framework.common.util.number.MoneyUtils.calculateRatePrice;
 import static cn.iocoder.yudao.module.trade.service.price.calculator.TradePriceCalculatorHelper.formatPrice;
 
 /**
@@ -125,7 +125,7 @@ public class TradeDiscountActivityPriceCalculator implements TradePriceCalculato
         if (PromotionDiscountTypeEnum.PRICE.getType().equals(discount.getDiscountType())) { // 减价
             newPrice -= discount.getDiscountPrice() * orderItem.getCount();
         } else if (PromotionDiscountTypeEnum.PERCENT.getType().equals(discount.getDiscountType())) { // 打折
-            newPrice = newPrice * discount.getDiscountPercent() / 100;
+            newPrice = calculateRatePrice(orderItem.getPayPrice(), discount.getDiscountPercent() / 100.0);
         } else {
             throw new IllegalArgumentException(String.format("优惠活动的商品(%s) 的优惠类型不正确", discount));
         }
@@ -144,7 +144,7 @@ public class TradeDiscountActivityPriceCalculator implements TradePriceCalculato
         if (level == null || level.getDiscountPercent() == null) {
             return 0;
         }
-        Integer newPrice = MoneyUtils.calculateRatePrice(orderItem.getPayPrice(), level.getDiscountPercent().doubleValue());
+        Integer newPrice = calculateRatePrice(orderItem.getPayPrice(), level.getDiscountPercent().doubleValue());
         return orderItem.getPayPrice() - newPrice;
     }
 
