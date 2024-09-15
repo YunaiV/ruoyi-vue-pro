@@ -12,7 +12,7 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public enum BpmTaskStatusEnum {
-
+    NOT_START(-1, "未开始"),
     RUNNING(1, "审批中"),
     APPROVE(2, "审批通过"),
     REJECT(3, "审批不通过"),
@@ -56,6 +56,10 @@ public enum BpmTaskStatusEnum {
         return ObjectUtils.equalsAny(status,
                 APPROVE.getStatus(), REJECT.getStatus(), CANCEL.getStatus(),
                 RETURN.getStatus(), APPROVING.getStatus());
+    }
+    public static boolean isEndStatusButNotApproved(Integer status) {
+        return ObjectUtils.equalsAny(status,
+                REJECT.getStatus(), CANCEL.getStatus(), RETURN.getStatus());
     }
 
 }

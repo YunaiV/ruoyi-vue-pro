@@ -7,23 +7,23 @@ import cn.hutool.core.lang.TypeReference;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.*;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
-import cn.iocoder.yudao.framework.common.util.date.DateUtils;
-import cn.iocoder.yudao.framework.common.util.spring.SpringUtils;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.simple.BpmSimpleModelNodeVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.simple.BpmSimpleModelNodeVO.RejectHandler;
-import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.instance.BpmProcessInstanceProgressRespVO.ProcessNodeProgress;
-import cn.iocoder.yudao.module.bpm.enums.definition.*;
+import cn.iocoder.yudao.module.bpm.enums.definition.BpmBoundaryEventType;
+import cn.iocoder.yudao.module.bpm.enums.definition.BpmSimpleModeConditionType;
+import cn.iocoder.yudao.module.bpm.enums.definition.BpmSimpleModelNodeType;
+import cn.iocoder.yudao.module.bpm.enums.definition.BpmUserTaskApproveMethodEnum;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnModelConstants;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.listener.BpmCopyTaskDelegate;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.simplemodel.SimpleModelConditionGroups;
-import cn.iocoder.yudao.module.bpm.service.task.BpmActivityService;
 import org.flowable.bpmn.BpmnAutoLayout;
 import org.flowable.bpmn.model.Process;
 import org.flowable.bpmn.model.*;
-import org.flowable.engine.history.HistoricActivityInstance;
-import org.flowable.engine.history.HistoricProcessInstance;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 import static cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.simple.BpmSimpleModelNodeVO.OperationButtonSetting;
 import static cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.simple.BpmSimpleModelNodeVO.TimeoutHandler;
@@ -218,7 +218,7 @@ public class SimpleModelUtils {
      *
      * @param conditionNode 条件节点
      */
-    private static String buildConditionExpression(BpmSimpleModelNodeVO conditionNode) {
+    public static String buildConditionExpression(BpmSimpleModelNodeVO conditionNode) {
         Integer conditionType = MapUtil.getInt(conditionNode.getAttributes(), CONDITION_TYPE_ATTRIBUTE);
         BpmSimpleModeConditionType conditionTypeEnum = BpmSimpleModeConditionType.valueOf(conditionType);
         String conditionExpression = null;
@@ -293,7 +293,7 @@ public class SimpleModelUtils {
         traverseNodeToBuildFlowNode(node.getChildNode(), process);
     }
 
-    private static boolean isValidNode(BpmSimpleModelNodeVO node) {
+    public static boolean isValidNode(BpmSimpleModelNodeVO node) {
         return node != null && node.getId() != null;
     }
 
@@ -633,119 +633,6 @@ public class SimpleModelUtils {
 
         // TODO @芋艿 + jason：要不要加一个终止定义？
         return endEvent;
-    }
-
-    /**
-     *  遍历简单模型, 构建节点的进度。 TODO 回退节点暂未处理
-     *
-     * @param processInstance 流程实例
-     * @param simpleModel 简单模型
-     * @param historicActivityList 流程实例的活力列表
-     * @param activityInstanceMap 流程实例的活力 Map。 key: activityId
-     * @param nodeProgresses  节点的进度列表
-     * @param returnNodePosition 回退节点的位置。 TODO 处理回退节点，还未处理。还没想好
-     */
-    public static void traverseNodeToBuildNodeProgress(HistoricProcessInstance processInstance, BpmSimpleModelNodeVO simpleModel
-            , List<HistoricActivityInstance> historicActivityList, Map<String, HistoricActivityInstance> activityInstanceMap
-            , List<ProcessNodeProgress> nodeProgresses, List<Integer> returnNodePosition) {
-        // 判断是否有效节点
-        if (!isValidNode(simpleModel)) {
-            return;
-        }
-        buildNodeProgress(processInstance, simpleModel, nodeProgresses, historicActivityList, activityInstanceMap, returnNodePosition);
-        // 如果有“子”节点，则递归处理子节点
-        // TODO @jason：需要根据条件，是否继续递归。例如说，一共有 3 个 node；第 2 个 node 审批不通过了。那么第 3 个 node 就不用了。（微信讨论下）
-        traverseNodeToBuildNodeProgress(processInstance, simpleModel.getChildNode(), historicActivityList, activityInstanceMap, nodeProgresses, returnNodePosition);
-    }
-
-    // TODO @芋艿，@jason：可重构优化的点，SimpleModelUtils 负责提供一个遍历的方法，有个 Function 进行每个节点的处理。目的是，把逻辑拿回到 Service 里面；或者说，减少 Utils 去调用 Service
-    private static void buildNodeProgress(HistoricProcessInstance processInstance, BpmSimpleModelNodeVO node, List<ProcessNodeProgress> nodeProgresses,
-                                          List<HistoricActivityInstance> historicActivityList, Map<String, HistoricActivityInstance> activityInstanceMap, List<Integer> returnNodePosition) {
-        BpmSimpleModelNodeType nodeType = BpmSimpleModelNodeType.valueOf(node.getType());
-        Assert.notNull(nodeType, "模型节点类型不支持");
-
-        ProcessNodeProgress nodeProgress = new ProcessNodeProgress();
-        nodeProgress.setNodeType(nodeType.getType());
-        nodeProgress.setName(node.getName());
-        nodeProgress.setDisplayText(node.getShowText());
-        BpmActivityService activityService = SpringUtils.getBean(BpmActivityService.class);
-        if (!activityInstanceMap.containsKey(node.getId())) { // 说明这些节点没有执行过
-            // 1. 得到流程状态
-            Integer processInstanceStatus = FlowableUtils.getProcessInstanceStatus(processInstance);
-            // 2. 设置节点状态
-            nodeProgress.setStatus(activityService.getNotRunActivityProgressStatus(processInstanceStatus));
-            // 3. 抄送节点, 审批节点设置用户列表
-            // TODO @芋艿：抄送节点，要不要跳过（不展示）
-            if (COPY_NODE.getType().equals(node.getType()) ||
-                    (APPROVE_NODE.getType().equals(node.getType()) && USER.getType().equals(node.getApproveType()))) {
-                nodeProgress.setUserList(activityService.getNotRunActivityUserList(processInstance.getId()
-                        , processInstanceStatus, node.getCandidateStrategy(), node.getCandidateParam()));
-            }
-        } else {
-            nodeProgress.setStatus(BpmProcessNodeProgressEnum.FINISHED.getStatus()); // 默认设置成结束状态
-            HistoricActivityInstance historicActivity = activityInstanceMap.get(node.getId());
-            nodeProgress.setStartTime(DateUtils.of(historicActivity.getStartTime()));
-            nodeProgress.setEndTime(DateUtils.of(historicActivity.getEndTime()));
-            nodeProgress.setId(historicActivity.getId());
-            switch (nodeType) {
-                case START_USER_NODE: { // 发起人节点
-                    nodeProgress.setDisplayText(""); // 发起人节点不需要显示 displayText
-                    // 1. 设置节点的状态
-                    nodeProgress.setStatus(activityService.getHistoricActivityProgressStatus(historicActivity, false, historicActivityList));
-                    // 2. 设置用户信息
-                    nodeProgress.setUserList(activityService.getHistoricActivityUserList(historicActivity, false, historicActivityList));
-                    break;
-                }
-                case APPROVE_NODE: { // 审批节点
-                    if (USER.getType().equals(node.getApproveType())) { // 人工审批
-                        // 1. 判断是否多人审批
-                        boolean isMultiInstance = !RANDOM.getMethod().equals(node.getApproveMethod());
-                        // 2. 设置节点的状态
-                        nodeProgress.setStatus(activityService.getHistoricActivityProgressStatus(historicActivity, isMultiInstance, historicActivityList));
-                        // 3. 设置用户信息
-                        nodeProgress.setUserList(activityService.getHistoricActivityUserList(historicActivity, isMultiInstance, historicActivityList));
-                    } else {
-                        nodeProgress.setStatus(activityService.getHistoricActivityProgressStatus(historicActivity, false, historicActivityList));
-                    }
-                    break;
-                }
-                // TODO @芋艿：抄送节点，要不要跳过（不展示）
-                case COPY_NODE: { // 抄送节点
-                    // 1. 设置节点的状态
-                    nodeProgress.setStatus(activityService.getHistoricActivityProgressStatus(historicActivity, false, historicActivityList));
-                    // 2. 设置用户信息
-                    nodeProgress.setUserList(activityService.getHistoricActivityUserList(historicActivity, false, historicActivityList));
-                    break;
-                }
-
-                default: {
-                    // TODO 其它节点类型的实现
-                }
-            }
-        }
-        // 如果是“分支”节点，
-        if (BpmSimpleModelNodeType.isBranchNode(node.getType())
-                && ArrayUtil.isNotEmpty(node.getConditionNodes())) {
-            // 网关是否执行了， 执行了。只包含运行的分支。 未执行包含所有的分支
-            final boolean executed = activityInstanceMap.containsKey(node.getId());
-            LinkedList<ProcessNodeProgress> branchNodeList = new LinkedList<>();
-            node.getConditionNodes().forEach(item -> {
-                // 如果条件节点执行了。 ACT_HI_ACTINST 表会记录
-                if (executed) {
-                    if (activityInstanceMap.containsKey(item.getId())) {
-                        List<Integer> branchReturnNodePosition = new ArrayList<>();
-                        traverseNodeToBuildNodeProgress(processInstance, item, historicActivityList, activityInstanceMap, branchNodeList, branchReturnNodePosition);
-                        // TODO 处理回退节点
-                    }
-                } else {
-                    List<Integer> branchReturnNodePosition = new ArrayList<>();
-                    traverseNodeToBuildNodeProgress(processInstance, item, historicActivityList, activityInstanceMap, branchNodeList, branchReturnNodePosition);
-                    // TODO 处理回退节点
-                }
-            });
-            nodeProgress.setBranchNodes(branchNodeList);
-        }
-        nodeProgresses.add(nodeProgress);
     }
 
 }
