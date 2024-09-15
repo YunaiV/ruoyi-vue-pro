@@ -2,7 +2,6 @@ package cn.iocoder.yudao.module.promotion.api.coupon;
 
 import cn.iocoder.yudao.module.promotion.api.coupon.dto.CouponRespDTO;
 import cn.iocoder.yudao.module.promotion.api.coupon.dto.CouponUseReqDTO;
-import cn.iocoder.yudao.module.promotion.api.coupon.dto.CouponValidReqDTO;
 import jakarta.validation.Valid;
 
 import java.util.List;
@@ -14,6 +13,15 @@ import java.util.Map;
  * @author 芋道源码
  */
 public interface CouponApi {
+
+    /**
+     * 获得用户的优惠劵列表
+     *
+     * @param userId 用户编号
+     * @param status 优惠劵状态
+     * @return 优惠劵列表
+     */
+    List<CouponRespDTO> getCouponListByUserId(Long userId, Integer status);
 
     /**
      * 使用优惠劵
@@ -28,14 +36,6 @@ public interface CouponApi {
      * @param id 优惠券编号
      */
     void returnUsedCoupon(Long id);
-
-    /**
-     * 校验优惠劵
-     *
-     * @param validReqDTO 校验请求
-     * @return 优惠劵
-     */
-    CouponRespDTO validateCoupon(@Valid CouponValidReqDTO validReqDTO);
 
     /**
      * 【管理员】给指定用户批量发送优惠券

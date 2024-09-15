@@ -21,8 +21,6 @@ public interface ErrorCodeConstants {
     ErrorCode BANNER_NOT_EXISTS = new ErrorCode(1_013_002_000, "Banner 不存在");
 
     // ========== Coupon 相关 1-013-003-000 ============
-    ErrorCode COUPON_NO_MATCH_SPU = new ErrorCode(1_013_003_000, "优惠劵没有可使用的商品！");
-    ErrorCode COUPON_NO_MATCH_MIN_PRICE = new ErrorCode(1_013_003_001, "所结算的商品中未满足使用的金额");
 
     // ========== 优惠劵模板 1-013-004-000 ==========
     ErrorCode COUPON_TEMPLATE_NOT_EXISTS = new ErrorCode(1_013_004_000, "优惠劵模板不存在");

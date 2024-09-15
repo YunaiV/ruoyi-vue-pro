@@ -12,13 +12,10 @@ import cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils;
 import cn.iocoder.yudao.module.member.api.user.MemberUserApi;
 import cn.iocoder.yudao.module.member.api.user.dto.MemberUserRespDTO;
 import cn.iocoder.yudao.module.promotion.controller.admin.coupon.vo.coupon.CouponPageReqVO;
-import cn.iocoder.yudao.module.promotion.controller.app.coupon.vo.coupon.AppCouponMatchReqVO;
-import cn.iocoder.yudao.module.promotion.controller.app.coupon.vo.coupon.AppCouponMatchRespVO;
 import cn.iocoder.yudao.module.promotion.convert.coupon.CouponConvert;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.coupon.CouponDO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.coupon.CouponTemplateDO;
 import cn.iocoder.yudao.module.promotion.dal.mysql.coupon.CouponMapper;
-import cn.iocoder.yudao.module.promotion.enums.common.PromotionProductScopeEnum;
 import cn.iocoder.yudao.module.promotion.enums.coupon.CouponStatusEnum;
 import cn.iocoder.yudao.module.promotion.enums.coupon.CouponTakeTypeEnum;
 import cn.iocoder.yudao.module.promotion.enums.coupon.CouponTemplateValidityTypeEnum;
@@ -58,18 +55,9 @@ public class CouponServiceImpl implements CouponService {
     private MemberUserApi memberUserApi;
 
     @Override
-    public CouponDO validCoupon(Long id, Long userId) {
-        CouponDO coupon = couponMapper.selectByIdAndUserId(id, userId);
-        if (coupon == null) {
-            throw exception(COUPON_NOT_EXISTS);
-        }
-        validCoupon(coupon);
-        return coupon;
-    }
-
-    @Override
-    public void validCoupon(CouponDO coupon) {
+    public void useCoupon(Long id, Long userId, Long orderId) {
         // 校验状态
+        CouponDO coupon = couponMapper.selectByIdAndUserId(id, userId);
         if (ObjectUtil.notEqual(coupon.getStatus(), CouponStatusEnum.UNUSED.getStatus())) {
             throw exception(COUPON_STATUS_NOT_UNUSED);
         }
@@ -77,12 +65,6 @@ public class CouponServiceImpl implements CouponService {
         if (!LocalDateTimeUtils.isBetween(coupon.getValidStartTime(), coupon.getValidEndTime())) {
             throw exception(COUPON_VALID_TIME_NOT_NOW);
         }
-    }
-
-    @Override
-    public void useCoupon(Long id, Long userId, Long orderId) {
-        // 校验优惠劵
-        validCoupon(id, userId);
 
         // 更新状态
         int updateCount = couponMapper.updateByIdAndStatus(id, CouponStatusEnum.UNUSED.getStatus(),
@@ -286,10 +268,8 @@ public class CouponServiceImpl implements CouponService {
         if (couponTemplate == null) {
             throw exception(COUPON_TEMPLATE_NOT_EXISTS);
         }
-        // 校验剩余数量（仅在 CouponTakeTypeEnum.USER 用户领取时）
-        if (CouponTakeTypeEnum.isUser(couponTemplate.getTakeCount())
-                && couponTemplate.getTotalCount() != null
-                && couponTemplate.getTakeCount() + userIds.size() > couponTemplate.getTotalCount()) {
+        // 校验剩余数量
+        if (couponTemplate.getTakeCount() + userIds.size() > couponTemplate.getTotalCount()) {
             throw exception(COUPON_TEMPLATE_NOT_ENOUGH);
         }
         // 校验"固定日期"的有效期类型是否过期
@@ -299,7 +279,7 @@ public class CouponServiceImpl implements CouponService {
             }
         }
         // 校验领取方式
-        if (ObjectUtil.notEqual(couponTemplate.getTakeType(), takeType.getType())) {
+        if (ObjectUtil.notEqual(couponTemplate.getTakeType(), takeType.getValue())) {
             throw exception(COUPON_TEMPLATE_CANNOT_TAKE);
         }
     }
@@ -311,7 +291,7 @@ public class CouponServiceImpl implements CouponService {
      * @param couponTemplate 优惠劵模版
      */
     private void removeTakeLimitUser(Set<Long> userIds, CouponTemplateDO couponTemplate) {
-        if (couponTemplate.getTakeLimitCount() == null || couponTemplate.getTakeLimitCount() <= 0) {
+        if (couponTemplate.getTakeLimitCount() <= 0) {
             return;
         }
         // 查询已领过券的用户
@@ -356,48 +336,6 @@ public class CouponServiceImpl implements CouponService {
             return Collections.emptyMap();
         }
         return couponMapper.selectCountByUserIdAndTemplateIdIn(userId, templateIds);
-    }
-
-    @Override
-    public List<AppCouponMatchRespVO> getMatchCouponList(Long userId, AppCouponMatchReqVO matchReqVO) {
-        List<AppCouponMatchRespVO> couponMatchist = new ArrayList<>();
-        List<CouponDO> list = couponMapper.selectListByUserIdAndStatusAndUsePriceLeAndProductScope(userId,
-                CouponStatusEnum.UNUSED.getStatus());
-        for (CouponDO couponDO : list) {
-            AppCouponMatchRespVO appCouponMatchRespVO = CouponConvert.INSTANCE.convert2(couponDO);
-            Integer productScope = appCouponMatchRespVO.getProductScope();
-            List<Long> productScopeValues = appCouponMatchRespVO.getProductScopeValues();
-            Integer usePrice = appCouponMatchRespVO.getUsePrice();
-            if(matchReqVO.getPrice() < usePrice){
-                // 价格小于等于，满足价格使用条件
-                appCouponMatchRespVO.setMatch(false);
-                appCouponMatchRespVO.setDescription("未达到使用门槛");
-            }else if(!LocalDateTimeUtils.isBetween(appCouponMatchRespVO.getValidStartTime(), appCouponMatchRespVO.getValidEndTime())) {
-                //判断时间
-                appCouponMatchRespVO.setMatch(false);
-                appCouponMatchRespVO.setDescription("使用时间未到");
-            }else if (PromotionProductScopeEnum.ALL.getScope().equals(productScope)){
-                appCouponMatchRespVO.setMatch(true);
-            }else if (PromotionProductScopeEnum.SPU.getScope().equals(productScope)){
-                boolean spu = new HashSet<>(productScopeValues).containsAll(matchReqVO.getSpuIds());
-                if(spu){
-                    appCouponMatchRespVO.setMatch(true);
-                }else {
-                    appCouponMatchRespVO.setMatch(false);
-                    appCouponMatchRespVO.setDescription("与商品不匹配");
-                }
-            }else if (PromotionProductScopeEnum.CATEGORY.getScope().equals(productScope)){
-                boolean category = new HashSet<>(productScopeValues).containsAll(matchReqVO.getCategoryIds());
-                if(category){
-                    appCouponMatchRespVO.setMatch(true);
-                }else {
-                    appCouponMatchRespVO.setMatch(false);
-                    appCouponMatchRespVO.setDescription("与商品类型不匹配");
-                }
-            }
-            couponMatchist.add(appCouponMatchRespVO);
-        }
-        return couponMatchist;
     }
 
     @Override

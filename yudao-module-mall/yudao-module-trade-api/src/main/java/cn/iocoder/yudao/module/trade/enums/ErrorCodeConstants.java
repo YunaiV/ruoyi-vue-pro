@@ -51,6 +51,7 @@ public interface ErrorCodeConstants {
     ErrorCode AFTER_SALE_REFUND_FAIL_STATUS_NOT_WAIT_REFUND = new ErrorCode(1_011_000_110, "退款失败，售后单状态不是【待退款】");
     ErrorCode AFTER_SALE_CANCEL_FAIL_STATUS_NOT_APPLY_OR_AGREE_OR_BUYER_DELIVERY =
             new ErrorCode(1_011_000_111, "取消售后单失败，售后单状态不是【待审核】或【卖家同意】或【商家待收货】");
+    ErrorCode AFTER_SALE_CREATE_FAIL_ORDER_STATUS_COMBINATION_IN_PROGRESS = new ErrorCode(1_011_000_112, "订单拼团中，无法申请售后");
 
     // ========== Cart 模块 1-011-002-000 ==========
     ErrorCode CARD_ITEM_NOT_FOUND = new ErrorCode(1_011_002_000, "购物车项不存在");
@@ -61,7 +62,7 @@ public interface ErrorCodeConstants {
     ErrorCode PRICE_CALCULATE_COUPON_NOT_MATCH_NORMAL_ORDER = new ErrorCode(1_011_003_004, "参与秒杀、拼团、砍价的营销商品，无法使用优惠劵");
     ErrorCode PRICE_CALCULATE_SECKILL_TOTAL_LIMIT_COUNT = new ErrorCode(1_011_003_005, "参与秒杀的商品，超过了秒杀总限购数量");
     ErrorCode PRICE_CALCULATE_DELIVERY_PRICE_TYPE_ILLEGAL = new ErrorCode(1_011_003_006, "计算快递运费异常，配送方式不匹配");
-    ErrorCode PRICE_CALCULATE_COUPON_PRICE_TOO_MUCH = new ErrorCode(1_011_003_007, "该优惠劵无法使用，原因：优惠金额超过订单金额");
+    ErrorCode PRICE_CALCULATE_COUPON_CAN_NOT_USE = new ErrorCode(1_011_003_007, "该优惠劵无法使用，原因：{}」");
 
     // ========== 物流 Express 模块 1-011-004-000 ==========
     ErrorCode EXPRESS_NOT_EXISTS = new ErrorCode(1_011_004_000, "快递公司不存在");

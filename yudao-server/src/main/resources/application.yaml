@@ -154,9 +154,9 @@ spring:
     embedding:
       transformer:
         onnx:
-          model-uri: http://test.yudao.iocoder.cn/model.onnx
+          model-uri: https://raw.gitcode.com/yudaocode/yudao-demo/raw/master/yudao-static/ai/model.onnx
         tokenizer:
-          uri: http://test.yudao.iocoder.cn/tokenizer.json
+          uri: https://raw.gitcode.com/yudaocode/yudao-demo/raw/master/yudao-static/ai/tokenizer.json
     qianfan: # 文心一言
       api-key: x0cuLZ7XsaTCU08vuJWO87Lg
       secret-key: R9mYF9dl9KASgi5RUq0FQt3wRisSnOcK
@@ -245,7 +245,7 @@ yudao:
   codegen:
     base-package: ${yudao.info.base-package}
     db-schemas: ${spring.datasource.dynamic.datasource.master.name}
-    front-type: 10 # 前端模版的类型，参见 CodegenFrontTypeEnum 枚举类
+    front-type: 20 # 前端模版的类型，参见 CodegenFrontTypeEnum 枚举类
   tenant: # 多租户相关配置项
     enable: true
     ignore-urls:

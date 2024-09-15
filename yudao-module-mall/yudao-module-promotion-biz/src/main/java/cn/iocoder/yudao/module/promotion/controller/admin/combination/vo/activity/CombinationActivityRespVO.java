@@ -27,4 +27,14 @@ public class CombinationActivityRespVO extends CombinationActivityBaseVO {
     @Schema(description = "拼团商品", requiredMode = Schema.RequiredMode.REQUIRED)
     private List<CombinationProductRespVO> products;
 
+    @Schema(description = "商品 SPU 名字", requiredMode = Schema.RequiredMode.REQUIRED, example = "一个白菜")
+    private String spuName; // 从 SPU 的 name 读取
+    @Schema(description = "商品图片", requiredMode = Schema.RequiredMode.REQUIRED, example = "4096")
+    private String picUrl; // 从 SPU 的 picUrl 读取
+    @Schema(description = "商品市场价，单位：分", requiredMode = Schema.RequiredMode.REQUIRED, example = "50")
+    private Integer marketPrice; // 从 SPU 的 marketPrice 读取
+
+    @Schema(description = "拼团金额，单位：分", requiredMode = Schema.RequiredMode.REQUIRED, example = "100")
+    private Integer combinationPrice; // 从 products 获取最小 price 读取
+
 }
