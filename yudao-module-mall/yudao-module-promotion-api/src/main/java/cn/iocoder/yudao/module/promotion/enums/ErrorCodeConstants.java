@@ -11,7 +11,7 @@ public interface ErrorCodeConstants {
 
     // ========== 促销活动相关 1-013-001-000 ============
     ErrorCode DISCOUNT_ACTIVITY_NOT_EXISTS = new ErrorCode(1_013_001_000, "限时折扣活动不存在");
-    ErrorCode DISCOUNT_ACTIVITY_SPU_CONFLICTS = new ErrorCode(1_013_001_001, "存在商品参加了其它限时折扣活动");
+    ErrorCode DISCOUNT_ACTIVITY_SPU_CONFLICTS = new ErrorCode(1_013_001_001, "存在商品参加了其它限时折扣活动【{}】");
     ErrorCode DISCOUNT_ACTIVITY_UPDATE_FAIL_STATUS_CLOSED = new ErrorCode(1_013_001_002, "限时折扣活动已关闭，不能修改");
     ErrorCode DISCOUNT_ACTIVITY_DELETE_FAIL_STATUS_NOT_CLOSED = new ErrorCode(1_013_001_003, "限时折扣活动未关闭，不能删除");
     ErrorCode DISCOUNT_ACTIVITY_CLOSE_FAIL_STATUS_CLOSED = new ErrorCode(1_013_001_004, "限时折扣活动已关闭，不能重复关闭");

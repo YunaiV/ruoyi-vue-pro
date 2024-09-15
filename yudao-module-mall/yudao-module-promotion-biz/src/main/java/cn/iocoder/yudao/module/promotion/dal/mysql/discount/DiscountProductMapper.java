@@ -18,9 +18,6 @@ import java.util.Map;
 @Mapper
 public interface DiscountProductMapper extends BaseMapperX<DiscountProductDO> {
 
-    default List<DiscountProductDO> selectListBySkuId(Collection<Long> skuIds) {
-        return selectList(DiscountProductDO::getSkuId, skuIds);
-    }
 
     default List<DiscountProductDO> selectListByActivityId(Long activityId) {
         return selectList(DiscountProductDO::getActivityId, activityId);
