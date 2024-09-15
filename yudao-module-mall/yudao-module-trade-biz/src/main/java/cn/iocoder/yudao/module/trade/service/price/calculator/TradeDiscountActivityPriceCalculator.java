@@ -55,8 +55,7 @@ public class TradeDiscountActivityPriceCalculator implements TradePriceCalculato
                 convertSet(result.getItems(), TradePriceCalculateRespBO.OrderItem::getSkuId));
         Map<Long, DiscountProductRespDTO> discountProductMap = convertMap(discountProducts, DiscountProductRespDTO::getSkuId);
         // 1.2 获得会员等级
-        MemberUserRespDTO user = memberUserApi.getUser(param.getUserId());
-        MemberLevelRespDTO level = user != null && user.getLevelId() > 0 ? memberLevelApi.getMemberLevel(user.getLevelId()) : null;
+        MemberLevelRespDTO level = getMemberLevel(param.getUserId());
 
         // 2. 计算每个 SKU 的优惠金额
         result.getItems().forEach(orderItem -> {
@@ -97,13 +96,27 @@ public class TradeDiscountActivityPriceCalculator implements TradePriceCalculato
     }
 
     /**
+     * 获得用户的等级
+     *
+     * @param userId 用户编号
+     * @return 用户等级
+     */
+    public MemberLevelRespDTO getMemberLevel(Long userId) {
+        MemberUserRespDTO user = memberUserApi.getUser(userId);
+        if (user == null || user.getLevelId() == null || user.getLevelId() <= 0) {
+            return null;
+        }
+        return memberLevelApi.getMemberLevel(user.getLevelId());
+    }
+
+    /**
      * 计算优惠活动的价格
      *
      * @param discount 优惠活动
      * @param orderItem 交易项
      * @return 优惠价格
      */
-    private Integer calculateActivityPrice(DiscountProductRespDTO discount,
+    public Integer calculateActivityPrice(DiscountProductRespDTO discount,
                                            TradePriceCalculateRespBO.OrderItem orderItem) {
         if (discount == null) {
             return 0;
@@ -127,7 +140,7 @@ public class TradeDiscountActivityPriceCalculator implements TradePriceCalculato
      * @return 优惠价格
      */
     public Integer calculateVipPrice(MemberLevelRespDTO level,
-                                     TradePriceCalculateRespBO.OrderItem orderItem) {
+                                      TradePriceCalculateRespBO.OrderItem orderItem) {
         if (level == null || level.getDiscountPercent() == null) {
             return 0;
         }

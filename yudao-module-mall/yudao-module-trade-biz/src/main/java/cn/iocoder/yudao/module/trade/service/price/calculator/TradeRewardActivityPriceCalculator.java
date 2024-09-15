@@ -54,7 +54,7 @@ public class TradeRewardActivityPriceCalculator implements TradePriceCalculator 
             return;
         }
         // 处理最新的满减送活动
-        if(!rewardActivities.isEmpty()){
+        if (!rewardActivities.isEmpty()) {
             calculate(param, result, rewardActivities.get(0));
         }
     }

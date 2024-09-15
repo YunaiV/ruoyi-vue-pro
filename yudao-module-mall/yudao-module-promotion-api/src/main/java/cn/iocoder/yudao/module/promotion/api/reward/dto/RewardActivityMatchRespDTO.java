@@ -100,6 +100,13 @@ public class RewardActivityMatchRespDTO {
          */
         private Map<Long, Integer> giveCouponTemplateCounts;
 
+        /**
+         * 规则描述
+         *
+         * 通过 {@link #limit}、{@link #discountPrice} 等字段进行拼接
+         */
+        private String description;
+
     }
 
 }

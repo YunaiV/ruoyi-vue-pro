@@ -1,24 +1,33 @@
 package cn.iocoder.yudao.module.trade.service.price;
 
+import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
+import cn.iocoder.yudao.module.member.api.level.dto.MemberLevelRespDTO;
 import cn.iocoder.yudao.module.product.api.sku.ProductSkuApi;
 import cn.iocoder.yudao.module.product.api.sku.dto.ProductSkuRespDTO;
 import cn.iocoder.yudao.module.product.api.spu.ProductSpuApi;
 import cn.iocoder.yudao.module.product.api.spu.dto.ProductSpuRespDTO;
+import cn.iocoder.yudao.module.promotion.api.discount.DiscountActivityApi;
+import cn.iocoder.yudao.module.promotion.api.discount.dto.DiscountProductRespDTO;
+import cn.iocoder.yudao.module.promotion.api.reward.RewardActivityApi;
+import cn.iocoder.yudao.module.promotion.api.reward.dto.RewardActivityMatchRespDTO;
+import cn.iocoder.yudao.module.promotion.enums.common.PromotionTypeEnum;
+import cn.iocoder.yudao.module.trade.controller.app.order.vo.AppTradeProductSettlementRespVO;
 import cn.iocoder.yudao.module.trade.service.price.bo.TradePriceCalculateReqBO;
 import cn.iocoder.yudao.module.trade.service.price.bo.TradePriceCalculateRespBO;
+import cn.iocoder.yudao.module.trade.service.price.calculator.TradeDiscountActivityPriceCalculator;
 import cn.iocoder.yudao.module.trade.service.price.calculator.TradePriceCalculator;
 import cn.iocoder.yudao.module.trade.service.price.calculator.TradePriceCalculatorHelper;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
-import jakarta.annotation.Resource;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
-import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
 import static cn.iocoder.yudao.module.product.enums.ErrorCodeConstants.SKU_NOT_EXISTS;
 import static cn.iocoder.yudao.module.product.enums.ErrorCodeConstants.SKU_STOCK_NOT_ENOUGH;
 import static cn.iocoder.yudao.module.trade.enums.ErrorCodeConstants.PRICE_CALCULATE_PAY_PRICE_ILLEGAL;
@@ -37,12 +46,19 @@ public class TradePriceServiceImpl implements TradePriceService {
     private ProductSkuApi productSkuApi;
     @Resource
     private ProductSpuApi productSpuApi;
+    @Resource
+    private DiscountActivityApi discountActivityApi;
+    @Resource
+    private RewardActivityApi rewardActivityApi;
 
     @Resource
     private List<TradePriceCalculator> priceCalculators;
 
+    @Resource
+    private TradeDiscountActivityPriceCalculator discountActivityPriceCalculator;
+
     @Override
-    public TradePriceCalculateRespBO calculatePrice(TradePriceCalculateReqBO calculateReqBO) {
+    public TradePriceCalculateRespBO calculateOrderPrice(TradePriceCalculateReqBO calculateReqBO) {
         // 1.1 获得商品 SKU 数组
         List<ProductSkuRespDTO> skuList = checkSkuList(calculateReqBO);
         // 1.2 获得商品 SPU 数组
@@ -83,6 +99,62 @@ public class TradePriceServiceImpl implements TradePriceService {
     private List<ProductSpuRespDTO> checkSpuList(List<ProductSkuRespDTO> skuList) {
         // 获得商品 SPU 数组
         return productSpuApi.validateSpuList(convertSet(skuList, ProductSkuRespDTO::getSpuId));
+    }
+
+    @Override
+    public List<AppTradeProductSettlementRespVO> calculateProductPrice(Long userId, List<Long> spuIds) {
+        // 1.1 获得 SPU 与 SKU 的映射
+        List<ProductSkuRespDTO> allSkuList = productSkuApi.getSkuListBySpuId(spuIds);
+        Map<Long, List<ProductSkuRespDTO>> spuIdAndSkuListMap = convertMultiMap(allSkuList, ProductSkuRespDTO::getSpuId);
+        // 1.2 获得会员等级
+        MemberLevelRespDTO level = discountActivityPriceCalculator.getMemberLevel(userId);
+        // 1.3 获得限时折扣活动
+        Map<Long, DiscountProductRespDTO> skuIdAndDiscountMap = convertMap(
+                discountActivityApi.getMatchDiscountProductList(convertSet(allSkuList, ProductSkuRespDTO::getId)),
+                DiscountProductRespDTO::getSkuId);
+        // 1.4 获得满减送活动
+        // TODO 芋艿：这里是有问题的，后面 fix
+        Map<Long, RewardActivityMatchRespDTO> rewardActivityMap = convertMap(
+                rewardActivityApi.getRewardActivityBySpuIdsAndStatusAndDateTimeLt(spuIds, CommonStatusEnum.ENABLE.getStatus(), LocalDateTime.now()),
+                RewardActivityMatchRespDTO::getId);
+
+        // 2. 价格计算
+        return convertList(spuIds, spuId -> {
+            AppTradeProductSettlementRespVO spuVO = new AppTradeProductSettlementRespVO().setSpuId(spuId);
+            // 2.1 优惠价格
+            List<ProductSkuRespDTO> skuList = spuIdAndSkuListMap.get(spuId);
+            List<AppTradeProductSettlementRespVO.Sku> skuVOList = convertList(skuList, sku -> {
+                AppTradeProductSettlementRespVO.Sku skuVO = new AppTradeProductSettlementRespVO.Sku()
+                        .setId(sku.getId()).setPayPrice(sku.getPrice());
+                TradePriceCalculateRespBO.OrderItem orderItem = new TradePriceCalculateRespBO.OrderItem()
+                        .setPayPrice(sku.getPrice()).setCount(1);
+                // 计算限时折扣的优惠价格
+                DiscountProductRespDTO discountProduct = skuIdAndDiscountMap.get(orderItem.getSkuId());
+                Integer discountPrice = discountActivityPriceCalculator.calculateActivityPrice(discountProduct, orderItem);
+                // 计算 VIP 优惠金额
+                Integer vipPrice = discountActivityPriceCalculator.calculateVipPrice(level, orderItem);
+                if (discountPrice <= 0 && vipPrice <= 0) {
+                    return skuVO;
+                }
+                // 选择一个大的优惠
+                if (discountPrice > vipPrice) {
+                    return skuVO.setPayPrice(sku.getPrice() - discountPrice)
+                            .setPromotionType(PromotionTypeEnum.DISCOUNT_ACTIVITY.getType())
+                            .setPromotionId(discountProduct.getId()).setPromotionEndTime(discountProduct.getActivityEndTime());
+                } else {
+                    return skuVO.setPayPrice(sku.getPrice() - vipPrice)
+                            .setPromotionType(PromotionTypeEnum.MEMBER_LEVEL.getType());
+                }
+            });
+            spuVO.setSkus(skuVOList);
+            // 2.2 满减送活动
+            RewardActivityMatchRespDTO rewardActivity = rewardActivityMap.get(spuId);
+            if (rewardActivity != null) {
+                spuVO.setRewardActivity(new AppTradeProductSettlementRespVO.RewardActivity().setId(rewardActivity.getId())
+                        .setRuleDescriptions(convertList(rewardActivity.getRules(), RewardActivityMatchRespDTO.Rule::getDescription)));
+            }
+            return spuVO;
+        });
     }
 
 }

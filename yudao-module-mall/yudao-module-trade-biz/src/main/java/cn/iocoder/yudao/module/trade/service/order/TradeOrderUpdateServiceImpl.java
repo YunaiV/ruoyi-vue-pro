@@ -166,7 +166,7 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
         TradePriceCalculateReqBO calculateReqBO = TradeOrderConvert.INSTANCE.convert(userId, settlementReqVO, cartList);
         calculateReqBO.getItems().forEach(item -> Assert.isTrue(item.getSelected(), // 防御性编程，保证都是选中的
                 "商品({}) 未设置为选中", item.getSkuId()));
-        return tradePriceService.calculatePrice(calculateReqBO);
+        return tradePriceService.calculateOrderPrice(calculateReqBO);
     }
 
     @Override
