@@ -110,7 +110,7 @@ public interface SeckillActivityService {
     List<SeckillActivityDO> getSeckillActivityListByConfigIdAndStatus(Long configId, Integer status);
 
     /**
-     * 通过活动时段获取秒杀活动
+     * 通过活动时段获取开始的秒杀活动
      *
      * @param pageReqVO 请求
      * @return 秒杀活动列表

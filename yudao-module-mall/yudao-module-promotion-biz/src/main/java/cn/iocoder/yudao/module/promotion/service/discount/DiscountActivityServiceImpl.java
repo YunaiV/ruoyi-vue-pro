@@ -6,6 +6,7 @@ import cn.hutool.core.map.MapUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
+import cn.iocoder.yudao.module.promotion.api.discount.dto.DiscountProductRespDTO;
 import cn.iocoder.yudao.module.promotion.controller.admin.discount.vo.DiscountActivityBaseVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.discount.vo.DiscountActivityCreateReqVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.discount.vo.DiscountActivityPageReqVO;
@@ -49,7 +50,7 @@ public class DiscountActivityServiceImpl implements DiscountActivityService {
     private DiscountProductMapper discountProductMapper;
 
     @Override
-    public List<DiscountProductDO> getMatchDiscountProductList(Collection<Long> skuIds) {
+    public List<DiscountProductRespDTO> getMatchDiscountProductList(Collection<Long> skuIds) {
         return discountProductMapper.getMatchDiscountProductList(skuIds);
     }
 
@@ -130,7 +131,7 @@ public class DiscountActivityServiceImpl implements DiscountActivityService {
         List<DiscountProductDO> list = discountProductMapper.selectListByActivityId(id);
         // TODO @zhangshuai：一般简单的 stream 方法，建议是使用 CollectionUtils，例如说这里是 convertList 对把。
         List<Long> skuIds = list.stream().map(item -> item.getSkuId()).collect(Collectors.toList());
-        List<DiscountProductDO> matchDiscountProductList = getMatchDiscountProductList(skuIds);
+        List<DiscountProductRespDTO> matchDiscountProductList = getMatchDiscountProductList(skuIds);
         if (id != null) { // 排除自己这个活动
             matchDiscountProductList.removeIf(product -> id.equals(product.getActivityId()));
         }

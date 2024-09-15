@@ -60,8 +60,8 @@ public class AppCouponController {
     @Operation(summary = "获得匹配指定商品的优惠劵列表", description = "用于下单页，展示优惠劵列表")
     public CommonResult<List<AppCouponMatchRespVO>> getMatchCouponList(AppCouponMatchReqVO matchReqVO) {
         // todo: 优化：优惠金额倒序
-        List<CouponDO> list = couponService.getMatchCouponList(getLoginUserId(), matchReqVO);
-        return success(BeanUtils.toBean(list, AppCouponMatchRespVO.class));
+        List<AppCouponMatchRespVO> list = couponService.getMatchCouponList(getLoginUserId(), matchReqVO);
+        return success(list);
     }
 
     @GetMapping("/page")

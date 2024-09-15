@@ -13,10 +13,12 @@ import cn.iocoder.yudao.module.member.api.user.MemberUserApi;
 import cn.iocoder.yudao.module.member.api.user.dto.MemberUserRespDTO;
 import cn.iocoder.yudao.module.promotion.controller.admin.coupon.vo.coupon.CouponPageReqVO;
 import cn.iocoder.yudao.module.promotion.controller.app.coupon.vo.coupon.AppCouponMatchReqVO;
+import cn.iocoder.yudao.module.promotion.controller.app.coupon.vo.coupon.AppCouponMatchRespVO;
 import cn.iocoder.yudao.module.promotion.convert.coupon.CouponConvert;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.coupon.CouponDO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.coupon.CouponTemplateDO;
 import cn.iocoder.yudao.module.promotion.dal.mysql.coupon.CouponMapper;
+import cn.iocoder.yudao.module.promotion.enums.common.PromotionProductScopeEnum;
 import cn.iocoder.yudao.module.promotion.enums.coupon.CouponStatusEnum;
 import cn.iocoder.yudao.module.promotion.enums.coupon.CouponTakeTypeEnum;
 import cn.iocoder.yudao.module.promotion.enums.coupon.CouponTemplateValidityTypeEnum;
@@ -286,6 +288,7 @@ public class CouponServiceImpl implements CouponService {
         }
         // 校验剩余数量（仅在 CouponTakeTypeEnum.USER 用户领取时）
         if (CouponTakeTypeEnum.isUser(couponTemplate.getTakeCount())
+                && couponTemplate.getTotalCount() != null
                 && couponTemplate.getTakeCount() + userIds.size() > couponTemplate.getTotalCount()) {
             throw exception(COUPON_TEMPLATE_NOT_ENOUGH);
         }
@@ -308,7 +311,7 @@ public class CouponServiceImpl implements CouponService {
      * @param couponTemplate 优惠劵模版
      */
     private void removeTakeLimitUser(Set<Long> userIds, CouponTemplateDO couponTemplate) {
-        if (couponTemplate.getTakeLimitCount() <= 0) {
+        if (couponTemplate.getTakeLimitCount() == null || couponTemplate.getTakeLimitCount() <= 0) {
             return;
         }
         // 查询已领过券的用户
@@ -356,13 +359,45 @@ public class CouponServiceImpl implements CouponService {
     }
 
     @Override
-    public List<CouponDO> getMatchCouponList(Long userId, AppCouponMatchReqVO matchReqVO) {
+    public List<AppCouponMatchRespVO> getMatchCouponList(Long userId, AppCouponMatchReqVO matchReqVO) {
+        List<AppCouponMatchRespVO> couponMatchist = new ArrayList<>();
         List<CouponDO> list = couponMapper.selectListByUserIdAndStatusAndUsePriceLeAndProductScope(userId,
-                CouponStatusEnum.UNUSED.getStatus(),
-                matchReqVO.getPrice(), matchReqVO.getSpuIds(), matchReqVO.getCategoryIds());
-        // 兜底逻辑：如果 CouponExpireJob 未执行，status 未变成 EXPIRE ，但是 validEndTime 已经过期了，需要进行过滤
-        list.removeIf(coupon -> !LocalDateTimeUtils.isBetween(coupon.getValidStartTime(), coupon.getValidEndTime()));
-        return list;
+                CouponStatusEnum.UNUSED.getStatus());
+        for (CouponDO couponDO : list) {
+            AppCouponMatchRespVO appCouponMatchRespVO = CouponConvert.INSTANCE.convert2(couponDO);
+            Integer productScope = appCouponMatchRespVO.getProductScope();
+            List<Long> productScopeValues = appCouponMatchRespVO.getProductScopeValues();
+            Integer usePrice = appCouponMatchRespVO.getUsePrice();
+            if(matchReqVO.getPrice() < usePrice){
+                // 价格小于等于，满足价格使用条件
+                appCouponMatchRespVO.setMatch(false);
+                appCouponMatchRespVO.setDescription("未达到使用门槛");
+            }else if(!LocalDateTimeUtils.isBetween(appCouponMatchRespVO.getValidStartTime(), appCouponMatchRespVO.getValidEndTime())) {
+                //判断时间
+                appCouponMatchRespVO.setMatch(false);
+                appCouponMatchRespVO.setDescription("使用时间未到");
+            }else if (PromotionProductScopeEnum.ALL.getScope().equals(productScope)){
+                appCouponMatchRespVO.setMatch(true);
+            }else if (PromotionProductScopeEnum.SPU.getScope().equals(productScope)){
+                boolean spu = new HashSet<>(productScopeValues).containsAll(matchReqVO.getSpuIds());
+                if(spu){
+                    appCouponMatchRespVO.setMatch(true);
+                }else {
+                    appCouponMatchRespVO.setMatch(false);
+                    appCouponMatchRespVO.setDescription("与商品不匹配");
+                }
+            }else if (PromotionProductScopeEnum.CATEGORY.getScope().equals(productScope)){
+                boolean category = new HashSet<>(productScopeValues).containsAll(matchReqVO.getCategoryIds());
+                if(category){
+                    appCouponMatchRespVO.setMatch(true);
+                }else {
+                    appCouponMatchRespVO.setMatch(false);
+                    appCouponMatchRespVO.setDescription("与商品类型不匹配");
+                }
+            }
+            couponMatchist.add(appCouponMatchRespVO);
+        }
+        return couponMatchist;
     }
 
     @Override

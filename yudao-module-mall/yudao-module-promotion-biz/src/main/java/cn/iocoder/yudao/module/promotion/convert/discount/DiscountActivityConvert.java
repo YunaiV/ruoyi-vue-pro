@@ -121,7 +121,10 @@ public interface DiscountActivityConvert {
     default boolean isEquals(DiscountProductDO productDO, DiscountProductDO productVO) {
         if (ObjectUtil.notEqual(productDO.getSpuId(), productVO.getSpuId())
                 || ObjectUtil.notEqual(productDO.getSkuId(), productVO.getSkuId())
-                || ObjectUtil.notEqual(productDO.getDiscountType(), productVO.getDiscountType())) {
+                || ObjectUtil.notEqual(productDO.getDiscountType(), productVO.getDiscountType())
+                || ObjectUtil.notEqual(productDO.getActivityEndTime(), productVO.getActivityEndTime())
+                || ObjectUtil.notEqual(productDO.getActivityStartTime(), productVO.getActivityStartTime())
+                || ObjectUtil.notEqual(productDO.getActivityStatus(), productVO.getActivityStatus())) {
             return false;
         }
         if (productDO.getDiscountType().equals(PromotionDiscountTypeEnum.PRICE.getType())) {

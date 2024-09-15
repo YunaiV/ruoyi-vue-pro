@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.promotion.service.reward;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
@@ -11,8 +12,10 @@ import cn.iocoder.yudao.module.promotion.controller.admin.reward.vo.RewardActivi
 import cn.iocoder.yudao.module.promotion.controller.admin.reward.vo.RewardActivityCreateReqVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.reward.vo.RewardActivityPageReqVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.reward.vo.RewardActivityUpdateReqVO;
+import cn.iocoder.yudao.module.promotion.convert.reward.RewardActivityConvert;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.reward.RewardActivityDO;
 import cn.iocoder.yudao.module.promotion.dal.mysql.reward.RewardActivityMapper;
+import cn.iocoder.yudao.module.promotion.enums.common.PromotionActivityStatusEnum;
 import cn.iocoder.yudao.module.promotion.enums.common.PromotionProductScopeEnum;
 import cn.iocoder.yudao.module.promotion.util.PromotionUtils;
 import jakarta.annotation.Resource;
@@ -20,8 +23,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import static cn.hutool.core.collection.CollUtil.intersectionDistinct;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
@@ -52,9 +58,13 @@ public class RewardActivityServiceImpl implements RewardActivityService {
         // 1.2 校验商品是否冲突
         validateRewardActivitySpuConflicts(null, createReqVO);
 
-        // 2. 插入
-        RewardActivityDO rewardActivity = BeanUtils.toBean(createReqVO, RewardActivityDO.class)
-                .setStatus(PromotionUtils.calculateActivityStatus(createReqVO.getEndTime()));
+        // 插入
+        RewardActivityDO rewardActivity = RewardActivityConvert.INSTANCE.convert(createReqVO)
+                .setStatus(
+                        PromotionUtils.calculateActivityStatus(createReqVO.getEndTime()).equals(CommonStatusEnum.DISABLE.getStatus())?
+                                PromotionActivityStatusEnum.WAIT.getStatus():
+                                PromotionActivityStatusEnum.RUN.getStatus()
+                );
         rewardActivityMapper.insert(rewardActivity);
         // 返回
         return rewardActivity.getId();
@@ -197,6 +207,21 @@ public class RewardActivityServiceImpl implements RewardActivityService {
     @Override
     public List<RewardActivityDO> getRewardActivityListByStatusAndDateTimeLt(Integer status, LocalDateTime dateTime) {
         return rewardActivityMapper.selectListByStatusAndDateTimeLt(status, dateTime);
+    }
+
+    @Override
+    public List<RewardActivityDO> getRewardActivityBySpuIdsAndStatusAndDateTimeLt(Collection<Long> spuIds, Integer status, LocalDateTime dateTime) {
+        List<ProductSpuRespDTO> spuList = productSpuApi.validateSpuList(spuIds);
+        //查询出商品的分类ids
+        List<Long> categoryIds = spuList.stream().map(ProductSpuRespDTO::getCategoryId).collect(Collectors.toList());
+        // 1. 查询出指定 spuId 的 spu 参加的活动
+        List<RewardActivityDO> rewardActivityList = rewardActivityMapper.getRewardActivityByStatusAndDateTimeLt(spuIds, categoryIds,status,dateTime);
+        if (CollUtil.isEmpty(rewardActivityList)) {
+            return Collections.emptyList();
+        }
+
+        // 2. 查询活动详情
+        return rewardActivityList;
     }
 
 }

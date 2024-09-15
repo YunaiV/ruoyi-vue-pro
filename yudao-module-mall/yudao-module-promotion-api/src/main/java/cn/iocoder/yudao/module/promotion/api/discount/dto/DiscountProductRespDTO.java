@@ -2,6 +2,8 @@ package cn.iocoder.yudao.module.promotion.api.discount.dto;
 
 import lombok.Data;
 
+import java.time.LocalDateTime;
+
 /**
  * 限时折扣活动商品 Response DTO
  *
@@ -44,5 +46,12 @@ public class DiscountProductRespDTO {
      * 活动标题
      */
     private String activityName;
+    /**
+     * 活动结束时间点
+     *
+     * 冗余 {@link DiscountActivityDO#getEndTime()}
+     */
+    private LocalDateTime activityEndTime;
+
 
 }

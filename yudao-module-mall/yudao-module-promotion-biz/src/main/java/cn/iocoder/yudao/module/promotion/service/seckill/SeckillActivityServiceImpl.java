@@ -23,6 +23,7 @@ import cn.iocoder.yudao.module.promotion.dal.dataobject.seckill.SeckillConfigDO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.seckill.SeckillProductDO;
 import cn.iocoder.yudao.module.promotion.dal.mysql.seckill.seckillactivity.SeckillActivityMapper;
 import cn.iocoder.yudao.module.promotion.dal.mysql.seckill.seckillactivity.SeckillProductMapper;
+import cn.iocoder.yudao.module.promotion.dal.mysql.seckill.seckillconfig.SeckillConfigMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
@@ -56,6 +57,8 @@ public class SeckillActivityServiceImpl implements SeckillActivityService {
     private SeckillActivityMapper seckillActivityMapper;
     @Resource
     private SeckillProductMapper seckillProductMapper;
+    @Resource
+    private SeckillConfigMapper seckillConfigMapper;
     @Resource
     private SeckillConfigService seckillConfigService;
     @Resource
@@ -289,7 +292,7 @@ public class SeckillActivityServiceImpl implements SeckillActivityService {
 
     @Override
     public PageResult<SeckillActivityDO> getSeckillActivityAppPageByConfigId(AppSeckillActivityPageReqVO pageReqVO) {
-        return seckillActivityMapper.selectPage(pageReqVO, CommonStatusEnum.ENABLE.getStatus());
+        return seckillActivityMapper.selectPage(pageReqVO, CommonStatusEnum.ENABLE.getStatus(),LocalDateTime.now());
     }
 
     @Override

@@ -24,7 +24,7 @@ public class DiscountActivityApiImpl implements DiscountActivityApi {
 
     @Override
     public List<DiscountProductRespDTO> getMatchDiscountProductList(Collection<Long> skuIds) {
-        return DiscountActivityConvert.INSTANCE.convertList02(discountActivityService.getMatchDiscountProductList(skuIds));
+        return discountActivityService.getMatchDiscountProductList(skuIds);
     }
 
 }

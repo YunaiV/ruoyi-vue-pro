@@ -4,6 +4,7 @@ import cn.iocoder.yudao.module.promotion.controller.admin.reward.vo.RewardActivi
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Schema(description = "用户 App - 满减送活动 Response VO")
@@ -26,9 +27,15 @@ public class AppRewardActivityRespVO {
     private Integer productScope;
 
     @Schema(description = "商品 SPU 编号的数组", example = "1,2,3")
-    private List<Long> productSpuIds;
+    private List<Long> productScopeValues;
 
     @Schema(description = "优惠规则的数组")
     private List<RewardActivityBaseVO.Rule> rules;
+
+    @Schema(description = "开始时间")
+    private LocalDateTime startTime;
+
+    @Schema(description = "结束时间")
+    private LocalDateTime endTime;
 
 }

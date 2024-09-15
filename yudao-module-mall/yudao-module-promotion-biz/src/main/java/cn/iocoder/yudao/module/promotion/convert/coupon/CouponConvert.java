@@ -32,6 +32,8 @@ public interface CouponConvert {
 
     CouponRespDTO convert(CouponDO bean);
 
+    AppCouponMatchRespVO convert2(CouponDO bean);
+
     default CouponDO convert(CouponTemplateDO template, Long userId) {
         CouponDO couponDO = new CouponDO()
                 .setTemplateId(template.getId())

@@ -51,7 +51,7 @@ public interface SeckillActivityMapper extends BaseMapperX<SeckillActivityDO> {
         Assert.isTrue(count > 0);
         return update(null, new LambdaUpdateWrapper<SeckillActivityDO>()
                 .eq(SeckillActivityDO::getId, id)
-                .gt(SeckillActivityDO::getStock, count)
+                .ge(SeckillActivityDO::getStock, count)
                 .setSql("stock = stock - " + count));
     }
 
@@ -69,9 +69,11 @@ public interface SeckillActivityMapper extends BaseMapperX<SeckillActivityDO> {
                 .setSql("stock = stock + " + count));
     }
 
-    default PageResult<SeckillActivityDO> selectPage(AppSeckillActivityPageReqVO pageReqVO, Integer status) {
+    default PageResult<SeckillActivityDO> selectPage(AppSeckillActivityPageReqVO pageReqVO, Integer status, LocalDateTime dateTime) {
         return selectPage(pageReqVO, new LambdaQueryWrapperX<SeckillActivityDO>()
                 .eqIfPresent(SeckillActivityDO::getStatus, status)
+                .lt(SeckillActivityDO::getStartTime, dateTime)
+                .gt(SeckillActivityDO::getEndTime, dateTime)// 开始时间 < 指定时间 < 结束时间，也就是说获取指定时间段的活动
                 .apply(ObjectUtil.isNotNull(pageReqVO.getConfigId()), "FIND_IN_SET(" + pageReqVO.getConfigId() + ",config_ids) > 0"));
     }
 

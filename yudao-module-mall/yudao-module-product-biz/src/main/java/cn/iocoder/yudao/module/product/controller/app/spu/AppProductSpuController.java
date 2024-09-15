@@ -69,8 +69,8 @@ public class AppProductSpuController {
         list.forEach(spu -> spu.setSalesCount(spu.getSalesCount() + spu.getVirtualSalesCount()));
         List<AppProductSpuRespVO> voList = BeanUtils.toBean(list, AppProductSpuRespVO.class);
         // 处理 vip 价格
-        MemberLevelRespDTO memberLevel = getMemberLevel();
-        voList.forEach(vo -> vo.setVipPrice(calculateVipPrice(vo.getPrice(), memberLevel)));
+//        MemberLevelRespDTO memberLevel = getMemberLevel();
+//        voList.forEach(vo -> vo.setVipPrice(calculateVipPrice(vo.getPrice(), memberLevel)));
         return success(voList);
     }
 
@@ -86,8 +86,8 @@ public class AppProductSpuController {
         pageResult.getList().forEach(spu -> spu.setSalesCount(spu.getSalesCount() + spu.getVirtualSalesCount()));
         PageResult<AppProductSpuRespVO> voPageResult = BeanUtils.toBean(pageResult, AppProductSpuRespVO.class);
         // 处理 vip 价格
-        MemberLevelRespDTO memberLevel = getMemberLevel();
-        voPageResult.getList().forEach(vo -> vo.setVipPrice(calculateVipPrice(vo.getPrice(), memberLevel)));
+//        MemberLevelRespDTO memberLevel = getMemberLevel();
+//        voPageResult.getList().forEach(vo -> vo.setVipPrice(calculateVipPrice(vo.getPrice(), memberLevel)));
         return success(voPageResult);
     }
 
@@ -142,7 +142,7 @@ public class AppProductSpuController {
      */
     public Integer calculateVipPrice(Integer price, MemberLevelRespDTO memberLevel) {
         if (memberLevel == null || memberLevel.getDiscountPercent() == null) {
-            return 0;
+            return null;
         }
         Integer newPrice = price * memberLevel.getDiscountPercent() / 100;
         return price - newPrice;

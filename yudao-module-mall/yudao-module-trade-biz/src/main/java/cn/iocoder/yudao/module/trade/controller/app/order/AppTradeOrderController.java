@@ -1,9 +1,23 @@
 package cn.iocoder.yudao.module.trade.controller.app.order;
 
+import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.security.core.annotations.PreAuthenticated;
+import cn.iocoder.yudao.module.member.api.level.MemberLevelApi;
+import cn.iocoder.yudao.module.member.api.level.dto.MemberLevelRespDTO;
+import cn.iocoder.yudao.module.member.api.user.MemberUserApi;
+import cn.iocoder.yudao.module.member.api.user.dto.MemberUserRespDTO;
 import cn.iocoder.yudao.module.pay.api.notify.dto.PayOrderNotifyReqDTO;
+import cn.iocoder.yudao.module.product.api.sku.ProductSkuApi;
+import cn.iocoder.yudao.module.product.api.sku.dto.ProductSkuRespDTO;
+import cn.iocoder.yudao.module.promotion.api.discount.DiscountActivityApi;
+import cn.iocoder.yudao.module.promotion.api.discount.dto.DiscountProductRespDTO;
+import cn.iocoder.yudao.module.promotion.api.reward.RewardActivityApi;
+import cn.iocoder.yudao.module.promotion.api.reward.dto.RewardActivityMatchRespDTO;
+import cn.iocoder.yudao.module.promotion.enums.common.PromotionConditionTypeEnum;
+import cn.iocoder.yudao.module.promotion.enums.common.PromotionDiscountTypeEnum;
+import cn.iocoder.yudao.module.promotion.enums.common.PromotionTypeEnum;
 import cn.iocoder.yudao.module.trade.controller.app.order.vo.*;
 import cn.iocoder.yudao.module.trade.controller.app.order.vo.item.AppTradeOrderItemCommentCreateReqVO;
 import cn.iocoder.yudao.module.trade.controller.app.order.vo.item.AppTradeOrderItemRespVO;
@@ -27,12 +41,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-import java.util.Map;
+import java.time.LocalDateTime;
+import java.util.*;
 
+import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
+import static cn.iocoder.yudao.module.promotion.enums.ErrorCodeConstants.DISCOUNT_ACTIVITY_TYPE_NOT_EXISTS;
 
 @Tag(name = "用户 App - 交易订单")
 @RestController
@@ -54,11 +70,74 @@ public class AppTradeOrderController {
     @Resource
     private TradeOrderProperties tradeOrderProperties;
 
+    @Resource
+    private MemberLevelApi memberLevelApi;
+    @Resource
+    private MemberUserApi memberUserApi;
+    @Resource
+    private DiscountActivityApi discountActivityApi;
+    @Resource
+    private RewardActivityApi rewardActivityApi;
+    @Resource
+    private ProductSkuApi productKpuApi;
+
     @GetMapping("/settlement")
     @Operation(summary = "获得订单结算信息")
     @PreAuthenticated
     public CommonResult<AppTradeOrderSettlementRespVO> settlementOrder(@Valid AppTradeOrderSettlementReqVO settlementReqVO) {
         return success(tradeOrderUpdateService.settlementOrder(getLoginUserId(), settlementReqVO));
+    }
+
+    @GetMapping("/settlementProduct")
+    @Operation(summary = "获得商品结算信息")
+    public CommonResult<List<AppTradeProductSettlementRespVO>> settlementProduct(@RequestParam("ids") Set<Long> ids) {
+        List<AppTradeProductSettlementRespVO> appTradeProductSettlementRespVOS = new ArrayList<>();
+        MemberLevelRespDTO memberLevel = getMemberLevel();
+        ids.forEach(spuId -> {
+            List<AppTradeProductSettlementRespVO.Sku> skus = new ArrayList<>();
+            List<ProductSkuRespDTO> skuList = productKpuApi.getSkuListBySpuId(Collections.singletonList(spuId));
+            //查询sku的会员和限时优惠
+            skuList.forEach(sku -> {
+                //查询限时优惠价格
+                AppTradeProductSettlementRespVO.Sku skuDiscount = calculateDiscountPrice(sku.getId(), sku.getPrice());
+
+                //查询会员价
+                AppTradeProductSettlementRespVO.Sku skuVip = calculateVipPrice(sku.getId(), sku.getPrice(), memberLevel);
+
+                if(skuDiscount != null && skuVip != null){
+                    if(skuDiscount.getPrice() > skuVip.getPrice()){
+                        skus.add(skuVip);
+                    }else{
+                        skus.add(skuDiscount);
+                    }
+                }else if(skuDiscount != null){
+                    skus.add(skuDiscount);
+                }else if(skuVip != null){
+                    skus.add(skuVip);
+                }
+
+            });
+            AppTradeProductSettlementRespVO.Reward reward = calculateReward(spuId);
+            AppTradeProductSettlementRespVO respVO = AppTradeProductSettlementRespVO.builder().id(spuId).skus(skus).build();
+            if(reward != null){
+                //创建满减活动对象
+                respVO.setReward(reward);
+            }
+            appTradeProductSettlementRespVOS.add(respVO);
+        });
+        return success(appTradeProductSettlementRespVOS);
+    }
+
+    private MemberLevelRespDTO getMemberLevel() {
+        Long userId = getLoginUserId();
+        if (userId == null) {
+            return null;
+        }
+        MemberUserRespDTO user = memberUserApi.getUser(userId);
+        if (user.getLevelId() == null || user.getLevelId() <= 0) {
+            return null;
+        }
+        return memberLevelApi.getMemberLevel(user.getLevelId());
     }
 
     @PostMapping("/create")
@@ -186,6 +265,80 @@ public class AppTradeOrderController {
     @PreAuthenticated
     public CommonResult<Long> createOrderItemComment(@RequestBody AppTradeOrderItemCommentCreateReqVO createReqVO) {
         return success(tradeOrderUpdateService.createOrderItemCommentByMember(getLoginUserId(), createReqVO));
+    }
+
+    /**
+     * 计算会员 VIP 优惠价格
+     *
+     * @param price 原价
+     * @param memberLevel 会员等级
+     * @return 优惠价格
+     */
+    public AppTradeProductSettlementRespVO.Sku calculateVipPrice(Long skuId, Integer price, MemberLevelRespDTO memberLevel) {
+        if (memberLevel == null || memberLevel.getDiscountPercent() == null) {
+            return null;
+        }
+        Integer newPrice = price * memberLevel.getDiscountPercent() / 100;
+        return AppTradeProductSettlementRespVO.Sku.builder().
+                skuId(skuId).
+                type(PromotionTypeEnum.MEMBER_LEVEL.getType()).
+                price(newPrice).build();
+    }
+
+    /**
+     * 计算限时优惠信息
+     *
+     * @param price 原价
+     * @param skuId 商品规格id
+     * @return 优惠价格
+     */
+    private AppTradeProductSettlementRespVO.Sku calculateDiscountPrice(Long skuId, Integer price) {
+        if (skuId == null) {
+            return null;
+        }
+
+        //根据商品id查询限时优惠
+        List<DiscountProductRespDTO> matchDiscountProductList = discountActivityApi.getMatchDiscountProductList(Collections.singletonList(skuId));
+        if (matchDiscountProductList != null && !matchDiscountProductList.isEmpty()) {
+            DiscountProductRespDTO discountProductRespDTO = matchDiscountProductList.get(matchDiscountProductList.size() - 1);
+            AppTradeProductSettlementRespVO.Sku sku = AppTradeProductSettlementRespVO.Sku.builder().
+                    skuId(skuId).
+                    discountId(discountProductRespDTO.getId()).
+                    type(PromotionTypeEnum.DISCOUNT_ACTIVITY.getType()).
+                    endTime(discountProductRespDTO.getActivityEndTime()).
+                    build();
+            Integer discountType = discountProductRespDTO.getDiscountType();
+            if(Objects.equals(PromotionDiscountTypeEnum.PRICE.getType(), discountType)){
+                sku.setPrice(price - discountProductRespDTO.getDiscountPrice() * 100);
+            }else if(Objects.equals(PromotionDiscountTypeEnum.PERCENT.getType(), discountType)){
+                Integer newPrice = price * discountProductRespDTO.getDiscountPercent() / 100;
+                sku.setPrice(price - newPrice);
+            }else{
+                throw exception(DISCOUNT_ACTIVITY_TYPE_NOT_EXISTS);
+            }
+            return sku;
+        }
+        return null;
+    }
+
+    /**
+     * 获取第一层满减活动
+     *
+     * @param spuId 商品规格id
+     * @return 优惠价格
+     */
+    private AppTradeProductSettlementRespVO.Reward calculateReward(Long spuId) {
+        List<RewardActivityMatchRespDTO> matchRewardActivityList = rewardActivityApi.getRewardActivityBySpuIdsAndStatusAndDateTimeLt(Collections.singletonList(spuId), CommonStatusEnum.ENABLE.getStatus(), LocalDateTime.now());
+        if(matchRewardActivityList != null && !matchRewardActivityList.isEmpty()){
+            RewardActivityMatchRespDTO rewardActivityMatchRespDTO = matchRewardActivityList.get(matchRewardActivityList.size() - 1);
+            if(rewardActivityMatchRespDTO != null){
+                RewardActivityMatchRespDTO.Rule rule = rewardActivityMatchRespDTO.getRules().get(0);
+                return AppTradeProductSettlementRespVO.Reward.builder().
+                        rewardActivity("满" + rule.getLimit() / 100 + (Objects.equals(rewardActivityMatchRespDTO.getConditionType(), PromotionConditionTypeEnum.PRICE.getType())?"元":"件"+"减") +rule.getDiscountPrice() / 100)
+                        .id(rewardActivityMatchRespDTO.getId()).build();
+            }
+        }
+        return null;
     }
 
 }
