@@ -2,7 +2,7 @@ package cn.iocoder.yudao.module.promotion.api.reward;
 
 import cn.iocoder.yudao.module.promotion.api.reward.dto.RewardActivityMatchRespDTO;
 
-import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -13,12 +13,11 @@ import java.util.List;
 public interface RewardActivityApi {
 
     /**
-     * 获得当前时间内开启的满减送活动
+     * 获得 spuId 商品匹配的的满减送活动列表
      *
-     * @param status   状态
-     * @param dateTime 当前时间，即筛选 <= dateTime 的满减送活动
+     * @param spuIds   SPU 编号
      * @return 满减送活动列表
      */
-    List<RewardActivityMatchRespDTO> getRewardActivityListByStatusAndNow(Integer status, LocalDateTime dateTime);
+    List<RewardActivityMatchRespDTO> getMatchRewardActivityListBySpuIds(Collection<Long> spuIds);
 
 }

@@ -1,13 +1,14 @@
 package cn.iocoder.yudao.module.promotion.service.reward;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.module.promotion.api.reward.dto.RewardActivityMatchRespDTO;
 import cn.iocoder.yudao.module.promotion.controller.admin.reward.vo.RewardActivityCreateReqVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.reward.vo.RewardActivityPageReqVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.reward.vo.RewardActivityUpdateReqVO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.reward.RewardActivityDO;
 import jakarta.validation.Valid;
 
-import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -63,12 +64,11 @@ public interface RewardActivityService {
     PageResult<RewardActivityDO> getRewardActivityPage(RewardActivityPageReqVO pageReqVO);
 
     /**
-     * 开始时间 < 指定时间 < 结束时间，也就是说获取指定时间段的活动
+     * 获得 spuId 商品匹配的的满减送活动列表
      *
-     * @param status   状态
-     * @param dateTime 当前日期时间
+     * @param spuIds   SPU 编号数组
      * @return 满减送活动列表
      */
-    List<RewardActivityDO> getRewardActivityListByStatusAndDateTimeLt(Integer status, LocalDateTime dateTime);
+    List<RewardActivityMatchRespDTO> getMatchRewardActivityListBySpuIds(Collection<Long> spuIds);
 
 }

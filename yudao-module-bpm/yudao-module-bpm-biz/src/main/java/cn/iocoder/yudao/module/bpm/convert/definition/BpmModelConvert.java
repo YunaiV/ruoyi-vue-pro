@@ -13,6 +13,7 @@ import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.BpmModel
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.process.BpmProcessDefinitionRespVO;
 import cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmCategoryDO;
 import cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmFormDO;
+import cn.iocoder.yudao.module.bpm.framework.flowable.core.util.BpmnModelUtils;
 import cn.iocoder.yudao.module.bpm.service.definition.dto.BpmModelMetaInfoRespDTO;
 import org.flowable.common.engine.impl.db.SuspensionState;
 import org.flowable.engine.repository.Deployment;
@@ -55,7 +56,7 @@ public interface BpmModelConvert {
         BpmModelMetaInfoRespDTO metaInfo = buildMetaInfo(model);
         BpmModelRespVO modelVO = buildModel0(model, metaInfo, null, null, null, null);
         if (ArrayUtil.isNotEmpty(bpmnBytes)) {
-            modelVO.setBpmnXml(new String(bpmnBytes));
+            modelVO.setBpmnXml(BpmnModelUtils.getBpmnXml(bpmnBytes));
         }
         return modelVO;
     }

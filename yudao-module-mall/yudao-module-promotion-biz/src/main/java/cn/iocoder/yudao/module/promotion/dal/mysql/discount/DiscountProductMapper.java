@@ -1,11 +1,12 @@
 package cn.iocoder.yudao.module.promotion.dal.mysql.discount;
 
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
+import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.discount.DiscountProductDO;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Param;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -18,20 +19,22 @@ import java.util.Map;
 @Mapper
 public interface DiscountProductMapper extends BaseMapperX<DiscountProductDO> {
 
-    default List<DiscountProductDO> selectListBySkuId(Collection<Long> skuIds) {
-        return selectList(DiscountProductDO::getSkuId, skuIds);
-    }
-
     default List<DiscountProductDO> selectListByActivityId(Long activityId) {
         return selectList(DiscountProductDO::getActivityId, activityId);
     }
 
-    default List<DiscountProductDO> selectListByActivityId(Collection<Long> activityIds) {
-        return selectList(DiscountProductDO::getActivityId, activityIds);
+    default List<DiscountProductDO> selectListBySkuIds(Collection<Long> skuIds) {
+        return selectList(DiscountProductDO::getSkuId, skuIds);
     }
 
-    // TODO @zhangshuai：逻辑里，尽量避免写 join 语句哈，你可以看看这个查询，有什么办法优化？目前的一个思路，是分 2 次查询，性能也是 ok 的
-    List<DiscountProductDO> getMatchDiscountProductList(@Param("skuIds") Collection<Long> skuIds);
+    default List<DiscountProductDO> selectListBySkuIdsAndStatusAndNow(Collection<Long> skuIds, Integer status) {
+        LocalDateTime now = LocalDateTime.now();
+        return selectList(new LambdaQueryWrapperX<DiscountProductDO>()
+                .in(DiscountProductDO::getSkuId, skuIds)
+                .eq(DiscountProductDO::getActivityStatus,status)
+                .lt(DiscountProductDO::getActivityStartTime, now)
+                .gt(DiscountProductDO::getActivityEndTime, now));
+    }
 
     /**
      * 查询出指定 spuId 的 spu 参加的活动最接近现在的一条记录。多个的话，一个 spuId 对应一个最近的活动编号

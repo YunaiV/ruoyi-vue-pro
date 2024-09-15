@@ -2,8 +2,8 @@ package cn.iocoder.yudao.module.promotion.api.combination;
 
 import cn.iocoder.yudao.module.promotion.api.combination.dto.CombinationRecordCreateReqDTO;
 import cn.iocoder.yudao.module.promotion.api.combination.dto.CombinationRecordCreateRespDTO;
+import cn.iocoder.yudao.module.promotion.api.combination.dto.CombinationRecordRespDTO;
 import cn.iocoder.yudao.module.promotion.api.combination.dto.CombinationValidateJoinRespDTO;
-
 import jakarta.validation.Valid;
 
 /**
@@ -33,13 +33,13 @@ public interface CombinationRecordApi {
     CombinationRecordCreateRespDTO createCombinationRecord(@Valid CombinationRecordCreateReqDTO reqDTO);
 
     /**
-     * 查询拼团记录是否成功
+     * 基于订单编号，查询拼团记录
      *
      * @param userId  用户编号
      * @param orderId 订单编号
-     * @return 拼团是否成功
+     * @return 拼团记录
      */
-    boolean isCombinationRecordSuccess(Long userId, Long orderId);
+    CombinationRecordRespDTO getCombinationRecordByOrderId(Long userId, Long orderId);
 
     /**
      * 【下单前】校验是否满足拼团活动条件

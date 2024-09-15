@@ -266,7 +266,7 @@ public abstract class AbstractWxPayClient extends AbstractPayClient<WxPayClientC
             String errorCode = getErrorCode(e);
             String errorMessage = getErrorMessage(e);
             return PayRefundRespDTO.failureOf(errorCode, errorMessage,
-                    reqDTO.getOutTradeNo(), e.getXmlString());
+                    reqDTO.getOutRefundNo(), e.getXmlString());
         }
     }
 

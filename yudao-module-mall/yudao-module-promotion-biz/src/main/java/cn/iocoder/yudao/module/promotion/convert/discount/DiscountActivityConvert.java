@@ -5,7 +5,6 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
 import cn.iocoder.yudao.module.product.api.spu.dto.ProductSpuRespDTO;
-import cn.iocoder.yudao.module.promotion.api.discount.dto.DiscountProductRespDTO;
 import cn.iocoder.yudao.module.promotion.controller.admin.discount.vo.*;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.discount.DiscountActivityDO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.discount.DiscountProductDO;
@@ -34,9 +33,6 @@ public interface DiscountActivityConvert {
 
     List<DiscountActivityRespVO> convertList(List<DiscountActivityDO> list);
     List<DiscountActivityBaseVO.Product> convertList2(List<DiscountProductDO> list);
-
-    List<DiscountProductRespDTO> convertList02(List<DiscountProductDO> list);
-
     PageResult<DiscountActivityRespVO> convertPage(PageResult<DiscountActivityDO> page);
 
     default PageResult<DiscountActivityRespVO> convertPage(PageResult<DiscountActivityDO> page,
@@ -121,7 +117,10 @@ public interface DiscountActivityConvert {
     default boolean isEquals(DiscountProductDO productDO, DiscountProductDO productVO) {
         if (ObjectUtil.notEqual(productDO.getSpuId(), productVO.getSpuId())
                 || ObjectUtil.notEqual(productDO.getSkuId(), productVO.getSkuId())
-                || ObjectUtil.notEqual(productDO.getDiscountType(), productVO.getDiscountType())) {
+                || ObjectUtil.notEqual(productDO.getDiscountType(), productVO.getDiscountType())
+                || ObjectUtil.notEqual(productDO.getActivityEndTime(), productVO.getActivityEndTime())
+                || ObjectUtil.notEqual(productDO.getActivityStartTime(), productVO.getActivityStartTime())
+                || ObjectUtil.notEqual(productDO.getActivityStatus(), productVO.getActivityStatus())) {
             return false;
         }
         if (productDO.getDiscountType().equals(PromotionDiscountTypeEnum.PRICE.getType())) {
