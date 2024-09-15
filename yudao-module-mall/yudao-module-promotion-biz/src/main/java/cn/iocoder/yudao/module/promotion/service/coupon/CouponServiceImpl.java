@@ -12,7 +12,6 @@ import cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils;
 import cn.iocoder.yudao.module.member.api.user.MemberUserApi;
 import cn.iocoder.yudao.module.member.api.user.dto.MemberUserRespDTO;
 import cn.iocoder.yudao.module.promotion.controller.admin.coupon.vo.coupon.CouponPageReqVO;
-import cn.iocoder.yudao.module.promotion.controller.app.coupon.vo.coupon.AppCouponMatchReqVO;
 import cn.iocoder.yudao.module.promotion.convert.coupon.CouponConvert;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.coupon.CouponDO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.coupon.CouponTemplateDO;
@@ -56,18 +55,9 @@ public class CouponServiceImpl implements CouponService {
     private MemberUserApi memberUserApi;
 
     @Override
-    public CouponDO validCoupon(Long id, Long userId) {
-        CouponDO coupon = couponMapper.selectByIdAndUserId(id, userId);
-        if (coupon == null) {
-            throw exception(COUPON_NOT_EXISTS);
-        }
-        validCoupon(coupon);
-        return coupon;
-    }
-
-    @Override
-    public void validCoupon(CouponDO coupon) {
+    public void useCoupon(Long id, Long userId, Long orderId) {
         // 校验状态
+        CouponDO coupon = couponMapper.selectByIdAndUserId(id, userId);
         if (ObjectUtil.notEqual(coupon.getStatus(), CouponStatusEnum.UNUSED.getStatus())) {
             throw exception(COUPON_STATUS_NOT_UNUSED);
         }
@@ -75,12 +65,6 @@ public class CouponServiceImpl implements CouponService {
         if (!LocalDateTimeUtils.isBetween(coupon.getValidStartTime(), coupon.getValidEndTime())) {
             throw exception(COUPON_VALID_TIME_NOT_NOW);
         }
-    }
-
-    @Override
-    public void useCoupon(Long id, Long userId, Long orderId) {
-        // 校验优惠劵
-        validCoupon(id, userId);
 
         // 更新状态
         int updateCount = couponMapper.updateByIdAndStatus(id, CouponStatusEnum.UNUSED.getStatus(),
@@ -284,9 +268,8 @@ public class CouponServiceImpl implements CouponService {
         if (couponTemplate == null) {
             throw exception(COUPON_TEMPLATE_NOT_EXISTS);
         }
-        // 校验剩余数量（仅在 CouponTakeTypeEnum.USER 用户领取时）
-        if (CouponTakeTypeEnum.isUser(couponTemplate.getTakeCount())
-                && couponTemplate.getTakeCount() + userIds.size() > couponTemplate.getTotalCount()) {
+        // 校验剩余数量
+        if (couponTemplate.getTakeCount() + userIds.size() > couponTemplate.getTotalCount()) {
             throw exception(COUPON_TEMPLATE_NOT_ENOUGH);
         }
         // 校验"固定日期"的有效期类型是否过期
@@ -353,16 +336,6 @@ public class CouponServiceImpl implements CouponService {
             return Collections.emptyMap();
         }
         return couponMapper.selectCountByUserIdAndTemplateIdIn(userId, templateIds);
-    }
-
-    @Override
-    public List<CouponDO> getMatchCouponList(Long userId, AppCouponMatchReqVO matchReqVO) {
-        List<CouponDO> list = couponMapper.selectListByUserIdAndStatusAndUsePriceLeAndProductScope(userId,
-                CouponStatusEnum.UNUSED.getStatus(),
-                matchReqVO.getPrice(), matchReqVO.getSpuIds(), matchReqVO.getCategoryIds());
-        // 兜底逻辑：如果 CouponExpireJob 未执行，status 未变成 EXPIRE ，但是 validEndTime 已经过期了，需要进行过滤
-        list.removeIf(coupon -> !LocalDateTimeUtils.isBetween(coupon.getValidStartTime(), coupon.getValidEndTime()));
-        return list;
     }
 
     @Override

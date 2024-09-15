@@ -1,31 +1,33 @@
 package cn.iocoder.yudao.module.promotion.service.reward;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.LocalDateTimeUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.number.MoneyUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.product.api.category.ProductCategoryApi;
 import cn.iocoder.yudao.module.product.api.spu.ProductSpuApi;
 import cn.iocoder.yudao.module.product.api.spu.dto.ProductSpuRespDTO;
+import cn.iocoder.yudao.module.promotion.api.reward.dto.RewardActivityMatchRespDTO;
 import cn.iocoder.yudao.module.promotion.controller.admin.reward.vo.RewardActivityBaseVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.reward.vo.RewardActivityCreateReqVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.reward.vo.RewardActivityPageReqVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.reward.vo.RewardActivityUpdateReqVO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.reward.RewardActivityDO;
 import cn.iocoder.yudao.module.promotion.dal.mysql.reward.RewardActivityMapper;
+import cn.iocoder.yudao.module.promotion.enums.common.PromotionConditionTypeEnum;
 import cn.iocoder.yudao.module.promotion.enums.common.PromotionProductScopeEnum;
-import cn.iocoder.yudao.module.promotion.util.PromotionUtils;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 import static cn.hutool.core.collection.CollUtil.intersectionDistinct;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
 import static cn.iocoder.yudao.module.promotion.enums.ErrorCodeConstants.*;
 
 /**
@@ -52,9 +54,9 @@ public class RewardActivityServiceImpl implements RewardActivityService {
         // 1.2 校验商品是否冲突
         validateRewardActivitySpuConflicts(null, createReqVO);
 
-        // 2. 插入
+        // 插入
         RewardActivityDO rewardActivity = BeanUtils.toBean(createReqVO, RewardActivityDO.class)
-                .setStatus(PromotionUtils.calculateActivityStatus(createReqVO.getEndTime()));
+                .setStatus(CommonStatusEnum.ENABLE.getStatus());
         rewardActivityMapper.insert(rewardActivity);
         // 返回
         return rewardActivity.getId();
@@ -73,8 +75,7 @@ public class RewardActivityServiceImpl implements RewardActivityService {
         validateRewardActivitySpuConflicts(updateReqVO.getId(), updateReqVO);
 
         // 2. 更新
-        RewardActivityDO updateObj = BeanUtils.toBean(updateReqVO, RewardActivityDO.class)
-                .setStatus(PromotionUtils.calculateActivityStatus(updateReqVO.getEndTime()));
+        RewardActivityDO updateObj = BeanUtils.toBean(updateReqVO, RewardActivityDO.class);
         rewardActivityMapper.updateById(updateObj);
     }
 
@@ -195,8 +196,61 @@ public class RewardActivityServiceImpl implements RewardActivityService {
     }
 
     @Override
-    public List<RewardActivityDO> getRewardActivityListByStatusAndDateTimeLt(Integer status, LocalDateTime dateTime) {
-        return rewardActivityMapper.selectListByStatusAndDateTimeLt(status, dateTime);
+    public List<RewardActivityMatchRespDTO> getMatchRewardActivityListBySpuIds(Collection<Long> spuIds) {
+        // 1. 查询商品分类
+        List<ProductSpuRespDTO> spuList = productSpuApi.getSpuList(spuIds);
+        if (CollUtil.isEmpty(spuList)) {
+            return Collections.emptyList();
+        }
+        Map<Long, ProductSpuRespDTO> spuMap = convertMap(spuList, ProductSpuRespDTO::getId);
+
+        // 2. 查询出指定 spuId 的 spu 参加的活动
+        List<RewardActivityDO> activityList = rewardActivityMapper.selectListBySpuIdAndStatusAndNow(
+                spuIds, convertSet(spuList, ProductSpuRespDTO::getCategoryId), CommonStatusEnum.ENABLE.getStatus());
+        if (CollUtil.isEmpty(activityList)) {
+            return Collections.emptyList();
+        }
+
+        // 3. 转换成 Response DTO
+        return BeanUtils.toBean(activityList, RewardActivityMatchRespDTO.class, activityDTO -> {
+            // 3.1 设置对应匹配的 spuIds
+            activityDTO.setSpuIds(new ArrayList<>());
+            for (Long spuId : spuIds) {
+                if (PromotionProductScopeEnum.isAll(activityDTO.getProductScope())) {
+                    activityDTO.getSpuIds().add(spuId);
+                } else if (PromotionProductScopeEnum.isSpu(activityDTO.getProductScope())) {
+                    if (CollUtil.contains(activityDTO.getProductScopeValues(), spuId)) {
+                        activityDTO.getSpuIds().add(spuId);
+                    }
+                } else if (PromotionProductScopeEnum.isCategory(activityDTO.getProductScope())) {
+                    ProductSpuRespDTO spu = spuMap.get(spuId);
+                    if (spu != null && CollUtil.contains(activityDTO.getProductScopeValues(), spu.getCategoryId())) {
+                        activityDTO.getSpuIds().add(spuId);
+                    }
+                }
+            }
+
+            // 3.2 设置每个 Rule 的描述
+            activityDTO.getRules().forEach(rule -> {
+                String description = "";
+                if (PromotionConditionTypeEnum.PRICE.getType().equals(activityDTO.getConditionType())) {
+                    description += StrUtil.format("满 {} 元", MoneyUtils.fenToYuanStr(rule.getLimit()));
+                } else {
+                    description += StrUtil.format("满 {} 件", rule.getLimit());
+                }
+                if (rule.getDiscountPrice() != null) {
+                    description += StrUtil.format("减 {}", MoneyUtils.fenToYuanStr(rule.getDiscountPrice()));
+                } else if (Boolean.TRUE.equals(rule.getFreeDelivery())) {
+                    description += "包邮";
+                } else if (rule.getPoint() != null && rule.getPoint() > 0) {
+                    description += StrUtil.format("增 {} 积分", rule.getPoint());
+                } else if (CollUtil.isNotEmpty(rule.getGiveCouponTemplateCounts())) {
+                    description += StrUtil.format("送 {} 张优惠券",
+                            getSumValue(rule.getGiveCouponTemplateCounts().values(), count -> count, Integer::sum));
+                }
+                rule.setDescription(description);
+            });
+        });
     }
 
 }

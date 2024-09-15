@@ -8,9 +8,8 @@ import cn.iocoder.yudao.module.promotion.controller.admin.seckill.vo.activity.Se
 import cn.iocoder.yudao.module.promotion.controller.app.seckill.vo.activity.AppSeckillActivityPageReqVO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.seckill.SeckillActivityDO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.seckill.SeckillProductDO;
-
 import jakarta.validation.Valid;
-import java.time.LocalDateTime;
+
 import java.util.Collection;
 import java.util.List;
 
@@ -98,7 +97,7 @@ public interface SeckillActivityService {
      * @param activityIds 活动编号
      * @return 活动商品列表
      */
-    List<SeckillProductDO> getSeckillProductListByActivityId(Collection<Long> activityIds);
+    List<SeckillProductDO> getSeckillProductListByActivityIds(Collection<Long> activityIds);
 
     /**
      * 通过活动时段编号获取指定 status 的秒杀活动
@@ -110,7 +109,7 @@ public interface SeckillActivityService {
     List<SeckillActivityDO> getSeckillActivityListByConfigIdAndStatus(Long configId, Integer status);
 
     /**
-     * 通过活动时段获取秒杀活动
+     * 通过活动时段获取开始的秒杀活动
      *
      * @param pageReqVO 请求
      * @return 秒杀活动列表
@@ -130,13 +129,19 @@ public interface SeckillActivityService {
     SeckillValidateJoinRespDTO validateJoinSeckill(Long activityId, Long skuId, Integer count);
 
     /**
-     * 获取指定 spu 编号最近参加的活动，每个 spuId 只返回一条记录
+     * 获得 SPU 进行中的秒杀活动
      *
-     * @param spuIds   spu 编号
-     * @param status   状态
-     * @param dateTime 日期时间
-     * @return 秒杀活动列表
+     * @param spuId SPU 编号数组
+     * @return 秒杀活动
      */
-    List<SeckillActivityDO> getSeckillActivityBySpuIdsAndStatusAndDateTimeLt(Collection<Long> spuIds, Integer status, LocalDateTime dateTime);
+    SeckillActivityDO getMatchSeckillActivityBySpuId(Long spuId);
+
+    /**
+     * 获得拼团活动列表
+     *
+     * @param ids 拼团活动编号数组
+     * @return 拼团活动的列表
+     */
+    List<SeckillActivityDO> getSeckillActivityListByIds(Collection<Long> ids);
 
 }

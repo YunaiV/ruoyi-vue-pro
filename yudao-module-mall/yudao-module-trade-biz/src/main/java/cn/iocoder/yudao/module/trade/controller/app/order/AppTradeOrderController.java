@@ -17,6 +17,7 @@ import cn.iocoder.yudao.module.trade.service.aftersale.AfterSaleService;
 import cn.iocoder.yudao.module.trade.service.delivery.DeliveryExpressService;
 import cn.iocoder.yudao.module.trade.service.order.TradeOrderQueryService;
 import cn.iocoder.yudao.module.trade.service.order.TradeOrderUpdateService;
+import cn.iocoder.yudao.module.trade.service.price.TradePriceService;
 import com.google.common.collect.Maps;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -47,9 +48,10 @@ public class AppTradeOrderController {
     private TradeOrderQueryService tradeOrderQueryService;
     @Resource
     private DeliveryExpressService deliveryExpressService;
-
     @Resource
     private AfterSaleService afterSaleService;
+    @Resource
+    private TradePriceService priceService;
 
     @Resource
     private TradeOrderProperties tradeOrderProperties;
@@ -59,6 +61,13 @@ public class AppTradeOrderController {
     @PreAuthenticated
     public CommonResult<AppTradeOrderSettlementRespVO> settlementOrder(@Valid AppTradeOrderSettlementReqVO settlementReqVO) {
         return success(tradeOrderUpdateService.settlementOrder(getLoginUserId(), settlementReqVO));
+    }
+
+    @GetMapping("/settlement-product")
+    @Operation(summary = "获得商品结算信息", description = "用于商品列表、商品详情，获得参与活动后的价格信息")
+    @Parameter(name = "spuIds", description = "商品 SPU 编号数组")
+    public CommonResult<List<AppTradeProductSettlementRespVO>> settlementProduct(@RequestParam("spuIds") List<Long> spuIds) {
+        return success(priceService.calculateProductPrice(getLoginUserId(), spuIds));
     }
 
     @PostMapping("/create")

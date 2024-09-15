@@ -144,7 +144,7 @@ public class OAuth2TokenServiceImplTest extends BaseDbAndRedisUnitTest {
         // 调用，并断言
         assertServiceException(() -> oauth2TokenService.refreshAccessToken(refreshToken, clientId),
                 new ErrorCode(401, "刷新令牌已过期"));
-        assertEquals(0, oauth2RefreshTokenMapper.selectCount());
+        assertEquals(0, oauth2AccessTokenMapper.selectCount());
     }
 
     @Test

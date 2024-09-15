@@ -11,7 +11,6 @@ import com.mzt.logapi.service.ILogRecordService;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.scheduling.annotation.Async;
 
 import java.util.List;
 
@@ -29,7 +28,6 @@ public class LogRecordServiceImpl implements ILogRecordService {
     private OperateLogApi operateLogApi;
 
     @Override
-    @Async
     public void record(LogRecord logRecord) {
         OperateLogCreateReqDTO reqDTO = new OperateLogCreateReqDTO();
         try {
@@ -42,7 +40,7 @@ public class LogRecordServiceImpl implements ILogRecordService {
             fillRequestFields(reqDTO);
 
             // 2. 异步记录日志
-            operateLogApi.createOperateLog(reqDTO);
+            operateLogApi.createOperateLogAsync(reqDTO);
         } catch (Throwable ex) {
             // 由于 @Async 异步调用，这里打印下日志，更容易跟进
             log.error("[record][url({}) log({}) 发生异常]", reqDTO.getRequestUrl(), reqDTO, ex);
