@@ -30,7 +30,7 @@ public class EmqxServiceImpl implements EmqxService {
     public void subscribe(MqttClient client) {
         try {
             // 订阅默认主题，可以根据需要修改
-            client.subscribe("$share/yudao/+/+/#", 1);
+//            client.subscribe("$share/yudao/+/+/#", 1);
             log.info("订阅默认主题成功");
         } catch (Exception e) {
             log.error("订阅默认主题失败", e);

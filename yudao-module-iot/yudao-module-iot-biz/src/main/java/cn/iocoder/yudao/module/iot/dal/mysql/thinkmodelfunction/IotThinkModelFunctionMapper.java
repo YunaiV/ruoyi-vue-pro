@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.iot.dal.mysql.thinkmodelfunction;
 
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
+import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.module.iot.dal.dataobject.thinkmodelfunction.IotThinkModelFunctionDO;
 import org.apache.ibatis.annotations.Mapper;
 
@@ -28,4 +29,9 @@ public interface IotThinkModelFunctionMapper extends BaseMapperX<IotThinkModelFu
                 IotThinkModelFunctionDO::getType, type);
     }
 
+    default List<IotThinkModelFunctionDO> selectListByProductIdAndTypes(Long productId, List<Integer> list) {
+        return selectList(new LambdaQueryWrapperX<IotThinkModelFunctionDO>()
+                .eq(IotThinkModelFunctionDO::getProductId, productId)
+                .in(IotThinkModelFunctionDO::getType, list));
+    }
 }

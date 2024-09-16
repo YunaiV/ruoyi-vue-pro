@@ -37,7 +37,7 @@ tenant-id: {{adminTenentId}}
 Authorization: Bearer {{token}}
 
 {
-  "id": 3,
+  "id": 1,
   "productId": 1001,
   "productKey": "smart-sensor-001",
   "identifier": "Temperature",
@@ -62,8 +62,13 @@ Authorization: Bearer {{token}}
   }
 }
 
+### 请求 /iot/think-model-function/delete 接口 => 成功
+DELETE {{baseUrl}}/iot/think-model-function/delete?id=1
+tenant-id: {{adminTenentId}}
+Authorization: Bearer {{token}}
+
 ### 请求 /iot/think-model-function/get 接口 => 成功
-GET {{baseUrl}}/iot/think-model-function/get?id=3
+GET {{baseUrl}}/iot/think-model-function/get?id=4
 tenant-id: {{adminTenentId}}
 Authorization: Bearer {{token}}
 
