@@ -175,9 +175,10 @@ public class IotThinkModelFunctionServiceImpl implements IotThinkModelFunctionSe
             newFunctionList.add(getServiceFunction);
         }
 
-        // 2. 获取数据库中的旧事件和服务列表
-        List<IotThinkModelFunctionDO> oldFunctionList = thinkModelFunctionMapper.selectListByProductIdAndTypes(
+        // 2. 获取数据库中的默认的旧事件和服务列表
+        List<IotThinkModelFunctionDO> oldFunctionList = thinkModelFunctionMapper.selectListByProductIdAndIdentifiersAndTypes(
                 productId,
+                Arrays.asList("post", "set", "get"),
                 Arrays.asList(IotThingModelTypeEnum.EVENT.getType(), IotThingModelTypeEnum.SERVICE.getType())
         );
 
