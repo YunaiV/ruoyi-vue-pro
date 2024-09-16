@@ -1,15 +1,22 @@
 package cn.iocoder.yudao.module.promotion.service.reward;
 
+import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.number.MoneyUtils;
 import cn.iocoder.yudao.module.promotion.api.reward.dto.RewardActivityMatchRespDTO;
 import cn.iocoder.yudao.module.promotion.controller.admin.reward.vo.RewardActivityCreateReqVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.reward.vo.RewardActivityPageReqVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.reward.vo.RewardActivityUpdateReqVO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.reward.RewardActivityDO;
+import cn.iocoder.yudao.module.promotion.enums.common.PromotionConditionTypeEnum;
 import jakarta.validation.Valid;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.getSumValue;
 
 /**
  * 满减送活动 Service 接口
@@ -70,5 +77,29 @@ public interface RewardActivityService {
      * @return 满减送活动列表
      */
     List<RewardActivityMatchRespDTO> getMatchRewardActivityListBySpuIds(Collection<Long> spuIds);
+
+    default String getRewardActivityRuleDescription(Integer conditionType, RewardActivityDO.Rule rule) {
+        String description = "";
+        if (PromotionConditionTypeEnum.PRICE.getType().equals(conditionType)) {
+            description += StrUtil.format("满 {} 元", MoneyUtils.fenToYuanStr(rule.getLimit()));
+        } else {
+            description += StrUtil.format("满 {} 件", rule.getLimit());
+        }
+        List<String> tips = new ArrayList<>(10);
+        if (rule.getDiscountPrice() != null) {
+            tips.add(StrUtil.format("减 {}", MoneyUtils.fenToYuanStr(rule.getDiscountPrice())));
+        }
+        if (Boolean.TRUE.equals(rule.getFreeDelivery())) {
+            tips.add("包邮");
+        }
+        if (rule.getPoint() != null && rule.getPoint() > 0) {
+            tips.add(StrUtil.format("送 {} 积分", rule.getPoint()));
+        }
+        if (CollUtil.isNotEmpty(rule.getGiveCouponTemplateCounts())) {
+            tips.add(StrUtil.format("送 {} 张优惠券",
+                    getSumValue(rule.getGiveCouponTemplateCounts().values(), count -> count, Integer::sum)));
+        }
+        return description + StrUtil.join("、", tips);
+    }
 
 }

@@ -121,7 +121,7 @@ public class TradePriceServiceImpl implements TradePriceService {
             List<ProductSkuRespDTO> skuList = spuIdAndSkuListMap.get(spuId);
             List<AppTradeProductSettlementRespVO.Sku> skuVOList = convertList(skuList, sku -> {
                 AppTradeProductSettlementRespVO.Sku skuVO = new AppTradeProductSettlementRespVO.Sku()
-                        .setId(sku.getId()).setPayPrice(sku.getPrice());
+                        .setId(sku.getId()).setPromotionPrice(sku.getPrice());
                 TradePriceCalculateRespBO.OrderItem orderItem = new TradePriceCalculateRespBO.OrderItem()
                         .setPayPrice(sku.getPrice()).setCount(1);
                 // 计算限时折扣的优惠价格
@@ -134,11 +134,11 @@ public class TradePriceServiceImpl implements TradePriceService {
                 }
                 // 选择一个大的优惠
                 if (discountPrice > vipPrice) {
-                    return skuVO.setPayPrice(sku.getPrice() - discountPrice)
+                    return skuVO.setPromotionPrice(sku.getPrice() - discountPrice)
                             .setPromotionType(PromotionTypeEnum.DISCOUNT_ACTIVITY.getType())
                             .setPromotionId(discountProduct.getId()).setPromotionEndTime(discountProduct.getActivityEndTime());
                 } else {
-                    return skuVO.setPayPrice(sku.getPrice() - vipPrice)
+                    return skuVO.setPromotionPrice(sku.getPrice() - vipPrice)
                             .setPromotionType(PromotionTypeEnum.MEMBER_LEVEL.getType());
                 }
             });

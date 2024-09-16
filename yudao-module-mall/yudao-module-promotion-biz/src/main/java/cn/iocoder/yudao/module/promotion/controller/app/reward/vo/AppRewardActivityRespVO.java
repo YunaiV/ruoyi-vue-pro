@@ -36,6 +36,15 @@ public class AppRewardActivityRespVO {
     private List<Long> productScopeValues;
 
     @Schema(description = "优惠规则的数组")
-    private List<RewardActivityBaseVO.Rule> rules;
+    private List<Rule> rules;
+
+    @Schema(description = "优惠规则")
+    @Data
+    public static class Rule extends RewardActivityBaseVO.Rule {
+
+        @Schema(description = "规则描述")
+        private String description; // 通过 {@link #limit}、{@link #discountPrice} 等字段进行拼接
+
+    }
 
 }

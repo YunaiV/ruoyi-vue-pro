@@ -39,11 +39,11 @@ public class AppTradeProductSettlementRespVO {
         @Schema(description = "商品 SKU 编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
         private Long id;
 
-        @Schema(description = "支付价格", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
-        private Integer payPrice; // 优惠后价格
+        @Schema(description = "优惠后价格，单位：分", requiredMode = Schema.RequiredMode.REQUIRED, example = "100")
+        private Integer promotionPrice;
 
-        @Schema(description = "营销类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
-        private Integer promotionType; // 对应 PromotionTypeEnum 枚举
+        @Schema(description = "营销类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "4")
+        private Integer promotionType; // 对应 PromotionTypeEnum 枚举，目前只有 4 和 6 两种
 
         @Schema(description = "营销编号", requiredMode = Schema.RequiredMode.REQUIRED)
         private Long promotionId; // 目前只有限时折扣活动的编号
