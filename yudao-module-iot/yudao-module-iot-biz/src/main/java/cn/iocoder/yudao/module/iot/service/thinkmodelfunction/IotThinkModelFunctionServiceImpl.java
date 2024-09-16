@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.module.iot.service.thinkmodelfunction;
 
-import cn.iocoder.yudao.framework.common.validation.Telephone;
 import cn.iocoder.yudao.module.iot.controller.admin.thinkmodelfunction.thingModel.ThingModelEvent;
 import cn.iocoder.yudao.module.iot.controller.admin.thinkmodelfunction.thingModel.ThingModelProperty;
 import cn.iocoder.yudao.module.iot.controller.admin.thinkmodelfunction.thingModel.ThingModelService;
@@ -16,7 +15,6 @@ import cn.iocoder.yudao.module.iot.enums.product.IotThingModelTypeEnum;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import java.util.ArrayList;
@@ -28,81 +26,83 @@ import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionU
 import static cn.iocoder.yudao.module.iot.enums.ErrorCodeConstants.THINK_MODEL_FUNCTION_EXISTS_BY_IDENTIFIER;
 import static cn.iocoder.yudao.module.iot.enums.ErrorCodeConstants.THINK_MODEL_FUNCTION_NOT_EXISTS;
 
-@Slf4j
+/**
+ * IoT 产品物模型 Service 实现类
+ *
+ * @author 芋道源码
+ */
 @Service
 @Validated
+@Slf4j
 public class IotThinkModelFunctionServiceImpl implements IotThinkModelFunctionService {
 
     @Resource
     private IotThinkModelFunctionMapper thinkModelFunctionMapper;
 
     @Override
+    // TODO @haohao：事务
     public Long createThinkModelFunction(IotThinkModelFunctionSaveReqVO createReqVO) {
-        // 校验功能标识符在同一产品下是否唯一
+        // 1. 校验功能标识符在同一产品下是否唯一
         validateIdentifierUnique(createReqVO.getProductId(), createReqVO.getIdentifier());
 
-        // 转换请求对象为数据对象
-        IotThinkModelFunctionDO thinkModelFunction = IotThinkModelFunctionConvert.INSTANCE.convert(createReqVO);
+        // 2. 插入数据库
+        IotThinkModelFunctionDO function = IotThinkModelFunctionConvert.INSTANCE.convert(createReqVO);
+        thinkModelFunctionMapper.insert(function);
 
-        // 插入数据库
-        thinkModelFunctionMapper.insert(thinkModelFunction);
-
-        // 如果创建的是属性，需要更新默认的事件和服务
+        // 3. 如果创建的是属性，需要更新默认的事件和服务
         if (Objects.equals(createReqVO.getType(), IotThingModelTypeEnum.PROPERTY.getType())) {
+            // TODO @haohao：最好使用 createDefaultEventsAndServices。原因是：generate 更多在目前项目里，是创建对象，不涉及到 insert db。
             generateDefaultEventsAndServices(createReqVO.getProductId(), createReqVO.getProductKey());
         }
-
-        // 返回生成的 ID
-        return thinkModelFunction.getId();
+        return function.getId();
     }
 
     private void validateIdentifierUnique(Long productId, String identifier) {
-        IotThinkModelFunctionDO existingFunction = thinkModelFunctionMapper.selectByProductIdAndIdentifier(productId, identifier);
-        if (existingFunction != null) {
+        IotThinkModelFunctionDO function = thinkModelFunctionMapper.selectByProductIdAndIdentifier(productId, identifier);
+        if (function != null) {
             throw exception(THINK_MODEL_FUNCTION_EXISTS_BY_IDENTIFIER);
         }
     }
 
     @Override
+    // TODO @haohao：事务
     public void updateThinkModelFunction(IotThinkModelFunctionSaveReqVO updateReqVO) {
-        // 校验功能是否存在
+        // 1.1 校验功能是否存在
         validateThinkModelFunctionExists(updateReqVO.getId());
-
-        // 校验功能标识符是否唯一
+        // 1.2 校验功能标识符是否唯一
         validateIdentifierUniqueForUpdate(updateReqVO.getId(), updateReqVO.getProductId(), updateReqVO.getIdentifier());
 
-        // 转换请求对象为数据对象
+        // 2. 更新数据库
         IotThinkModelFunctionDO thinkModelFunction = IotThinkModelFunctionConvert.INSTANCE.convert(updateReqVO);
-
-        // 更新数据库
         thinkModelFunctionMapper.updateById(thinkModelFunction);
 
-        // 如果更新的是属性，需要更新默认的事件和服务
+        // 3. 如果更新的是属性，需要更新默认的事件和服务
         if (Objects.equals(updateReqVO.getType(), IotThingModelTypeEnum.PROPERTY.getType())) {
             generateDefaultEventsAndServices(updateReqVO.getProductId(), updateReqVO.getProductKey());
         }
     }
 
     private void validateIdentifierUniqueForUpdate(Long id, Long productId, String identifier) {
-        IotThinkModelFunctionDO existingFunction = thinkModelFunctionMapper.selectByProductIdAndIdentifier(productId, identifier);
-        if (existingFunction != null && !existingFunction.getId().equals(id)) {
+        IotThinkModelFunctionDO function = thinkModelFunctionMapper.selectByProductIdAndIdentifier(productId, identifier);
+        // TODO !function.getId().equals(id) 使用 ObjectUtil.notEquals 。逻辑里，尽量避免 ! 取反。用不等于会比 ! 更容易理解
+        if (function != null && !function.getId().equals(id)) {
             throw exception(THINK_MODEL_FUNCTION_EXISTS_BY_IDENTIFIER);
         }
     }
 
-
     @Override
+    // TODO @haohao：事务
     public void deleteThinkModelFunction(Long id) {
-        // 校验功能是否存在
+        // 1. 校验功能是否存在
         IotThinkModelFunctionDO functionDO = thinkModelFunctionMapper.selectById(id);
         if (functionDO == null) {
             throw exception(THINK_MODEL_FUNCTION_NOT_EXISTS);
         }
 
-        // 删除功能
+        // 2. 删除功能
         thinkModelFunctionMapper.deleteById(id);
 
-        // 如果删除的是属性，需要更新默认的事件和服务
+        // 3. 如果删除的是属性，需要更新默认的事件和服务
         if (Objects.equals(functionDO.getType(), IotThingModelTypeEnum.PROPERTY.getType())) {
             generateDefaultEventsAndServices(functionDO.getProductId(), functionDO.getProductKey());
         }
@@ -159,10 +159,12 @@ public class IotThinkModelFunctionServiceImpl implements IotThinkModelFunctionSe
      * 生成属性上报事件
      */
     private ThingModelEvent generatePropertyPostEvent(List<IotThinkModelFunctionDO> propertyList) {
+        // TODO @haohao：用 CollUtil.isNotEmpty 会更容易哈
         if (propertyList == null || propertyList.isEmpty()) {
             return null;
         }
 
+        // TODO @haohao：可以考虑链式调用，简化整个方法的长度；然后，把相同类型的户型，尽量再放同一行，看起来轻松点；其它类似的，也可以试试看哈
         ThingModelEvent event = new ThingModelEvent();
         event.setIdentifier("post");
         event.setName("属性上报");
@@ -183,7 +185,6 @@ public class IotThinkModelFunctionServiceImpl implements IotThinkModelFunctionSe
             outputData.add(arg);
         }
         event.setOutputData(outputData);
-
         return event;
     }
 
@@ -222,7 +223,6 @@ public class IotThinkModelFunctionServiceImpl implements IotThinkModelFunctionSe
         service.setInputData(inputData);
         // 属性设置服务一般不需要输出参数
         service.setOutputData(new ArrayList<>());
-
         return service;
     }
 
@@ -237,6 +237,7 @@ public class IotThinkModelFunctionServiceImpl implements IotThinkModelFunctionSe
         List<ThingModelArgument> outputData = new ArrayList<>();
         for (IotThinkModelFunctionDO functionDO : propertyList) {
             ThingModelProperty property = functionDO.getProperty();
+            // TODO @haohao：r、rw 是不是枚举起来
             if ("r".equals(property.getAccessMode()) || "rw".equals(property.getAccessMode())) {
                 ThingModelArgument arg = new ThingModelArgument();
                 arg.setIdentifier(property.getIdentifier());
@@ -279,7 +280,6 @@ public class IotThinkModelFunctionServiceImpl implements IotThinkModelFunctionSe
 
         service.setInputData(Collections.singletonList(inputArg));
         service.setOutputData(outputData);
-
         return service;
     }
 
@@ -298,6 +298,7 @@ public class IotThinkModelFunctionServiceImpl implements IotThinkModelFunctionSe
         functionDO.setType(IotThingModelTypeEnum.EVENT.getType());
         functionDO.setEvent(event);
 
+        // TODO @haohao：会不会存在删除的情况哈？另外，项目里有 diffList 方法，看看是不是可以方便的，适合这个场景。具体怎么用，可以全局搜
         if (existingEvent != null) {
             // 更新事件
             functionDO.setId(existingEvent.getId());
