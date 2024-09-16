@@ -124,7 +124,6 @@ public class TradeDeliveryPriceCalculator implements TradePriceCalculator {
         TradeConfigDO config = tradeConfigService.getTradeConfig();
         return config == null
                 || Boolean.TRUE.equals(config.getDeliveryExpressFreeEnabled()) // 开启包邮
-                || result.getFreeDelivery() //满减包邮
                 || result.getPrice().getPayPrice() >= config.getDeliveryExpressFreePrice(); // 满足包邮的价格
     }
 
