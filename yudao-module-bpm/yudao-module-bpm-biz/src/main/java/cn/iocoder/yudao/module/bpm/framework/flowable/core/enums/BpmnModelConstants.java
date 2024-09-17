@@ -110,7 +110,7 @@ public interface BpmnModelConstants {
     String START_EVENT_NODE_NAME = "开始";
 
     /**
-     * 发起人节点 Id
+     * 发起人节点 ID
      */
     String START_USER_NODE_ID = "StartUserNode";
 

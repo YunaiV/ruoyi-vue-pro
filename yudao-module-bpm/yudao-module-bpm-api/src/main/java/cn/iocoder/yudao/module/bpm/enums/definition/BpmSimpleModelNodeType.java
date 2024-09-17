@@ -36,7 +36,9 @@ public enum BpmSimpleModelNodeType implements IntArrayValuable {
     ;
 
     public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(BpmSimpleModelNodeType::getType).toArray();
-    public static final String  BPMN_USER_TASK_TYPE ="userTask";
+
+    public static final String BPMN_USER_TASK_TYPE = "userTask";
+
     private final Integer type;
     private final String bpmnType;
     private final String name;
