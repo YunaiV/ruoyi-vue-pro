@@ -55,6 +55,7 @@ public class IotThinkModelFunctionServiceImpl implements IotThinkModelFunctionSe
         // 3. 如果创建的是属性，需要更新默认的事件和服务
         if (Objects.equals(createReqVO.getType(), IotThingModelTypeEnum.PROPERTY.getType())) {
             // 获取当前属性列表，并添加新插入的属性
+            // TODO @haohao：是不是插入后，查询已经包含了 function
             List<IotThinkModelFunctionDO> propertyList = thinkModelFunctionMapper
                     .selectListByProductIdAndType(createReqVO.getProductId(), IotThingModelTypeEnum.PROPERTY.getType());
             propertyList.add(function);
@@ -85,6 +86,7 @@ public class IotThinkModelFunctionServiceImpl implements IotThinkModelFunctionSe
         // 4. 如果更新的是属性，需要更新默认的事件和服务
         if (Objects.equals(updateReqVO.getType(), IotThingModelTypeEnum.PROPERTY.getType())) {
             // 获取当前属性列表，更新其中的属性
+            // TODO @haohao：是不是更新后，查询出来的，已经是最新的 thinkModelFunction
             List<IotThinkModelFunctionDO> propertyList = thinkModelFunctionMapper
                     .selectListByProductIdAndType(updateReqVO.getProductId(), IotThingModelTypeEnum.PROPERTY.getType());
             for (int i = 0; i < propertyList.size(); i++) {
@@ -119,6 +121,7 @@ public class IotThinkModelFunctionServiceImpl implements IotThinkModelFunctionSe
         // 3. 如果删除的是属性，需要更新默认的事件和服务
         if (Objects.equals(functionDO.getType(), IotThingModelTypeEnum.PROPERTY.getType())) {
             // 获取当前属性列表，移除已删除的属性
+            // TODO @haohao：是不是删除后，已经没有 id 对应的记录啦？
             List<IotThinkModelFunctionDO> propertyList = thinkModelFunctionMapper
                     .selectListByProductIdAndType(functionDO.getProductId(), IotThingModelTypeEnum.PROPERTY.getType());
             propertyList.removeIf(property -> property.getId().equals(id));
@@ -153,21 +156,18 @@ public class IotThinkModelFunctionServiceImpl implements IotThinkModelFunctionSe
     public void createDefaultEventsAndServices(Long productId, String productKey, List<IotThinkModelFunctionDO> propertyList) {
         // 1. 生成新的事件和服务列表
         List<IotThinkModelFunctionDO> newFunctionList = new ArrayList<>();
-
         // 生成属性上报事件
         ThingModelEvent propertyPostEvent = generatePropertyPostEvent(propertyList);
         if (propertyPostEvent != null) {
             IotThinkModelFunctionDO eventFunction = buildEventFunctionDO(productId, productKey, propertyPostEvent);
             newFunctionList.add(eventFunction);
         }
-
         // 生成属性设置服务
         ThingModelService propertySetService = generatePropertySetService(propertyList);
         if (propertySetService != null) {
             IotThinkModelFunctionDO setServiceFunction = buildServiceFunctionDO(productId, productKey, propertySetService);
             newFunctionList.add(setServiceFunction);
         }
-
         // 生成属性获取服务
         ThingModelService propertyGetService = generatePropertyGetService(propertyList);
         if (propertyGetService != null) {
@@ -182,19 +182,15 @@ public class IotThinkModelFunctionServiceImpl implements IotThinkModelFunctionSe
                 Arrays.asList(IotThingModelTypeEnum.EVENT.getType(), IotThingModelTypeEnum.SERVICE.getType())
         );
 
-        // 3. 使用 diffList 方法比较新旧列表
-        List<List<IotThinkModelFunctionDO>> diffResult = diffList(
-                oldFunctionList,
-                newFunctionList,
+        // 3.1 使用 diffList 方法比较新旧列表
+        List<List<IotThinkModelFunctionDO>> diffResult = diffList(oldFunctionList, newFunctionList,
+                // TODO @haohao：是不是用 id 比较相同就 ok 哈。如果可以的化，下面的 update 可以更简单
                 (oldFunc, newFunc) -> Objects.equals(oldFunc.getIdentifier(), newFunc.getIdentifier())
-                        && Objects.equals(oldFunc.getType(), newFunc.getType())
-        );
-
+                        && Objects.equals(oldFunc.getType(), newFunc.getType()));
         List<IotThinkModelFunctionDO> createList = diffResult.get(0); // 需要新增的
         List<IotThinkModelFunctionDO> updateList = diffResult.get(1); // 需要更新的
         List<IotThinkModelFunctionDO> deleteList = diffResult.get(2); // 需要删除的
-
-        // 4. 批量执行数据库操作
+        // 3.2 批量执行数据库操作
         if (CollUtil.isNotEmpty(createList)) {
             thinkModelFunctionMapper.insertBatch(createList);
         }
@@ -202,8 +198,7 @@ public class IotThinkModelFunctionServiceImpl implements IotThinkModelFunctionSe
             for (IotThinkModelFunctionDO updateFunc : updateList) {
                 // 设置 ID，以便更新
                 IotThinkModelFunctionDO oldFunc = findFunctionByIdentifierAndType(
-                        oldFunctionList, updateFunc.getIdentifier(), updateFunc.getType()
-                );
+                        oldFunctionList, updateFunc.getIdentifier(), updateFunc.getType());
                 if (oldFunc != null) {
                     updateFunc.setId(oldFunc.getId());
                     thinkModelFunctionMapper.updateById(updateFunc);
@@ -211,6 +206,7 @@ public class IotThinkModelFunctionServiceImpl implements IotThinkModelFunctionSe
             }
         }
         if (CollUtil.isNotEmpty(deleteList)) {
+            // TODO @haohao：使用 convertSet 简化。
             List<Long> idsToDelete = deleteList.stream().map(IotThinkModelFunctionDO::getId).collect(Collectors.toList());
             thinkModelFunctionMapper.deleteByIds(idsToDelete);
         }
@@ -221,6 +217,7 @@ public class IotThinkModelFunctionServiceImpl implements IotThinkModelFunctionSe
      */
     private IotThinkModelFunctionDO findFunctionByIdentifierAndType(List<IotThinkModelFunctionDO> functionList,
                                                                     String identifier, Integer type) {
+        // TODO @haohao：这个可以使用 CollUtil.findOne 简化只有一行
         return functionList.stream()
                 .filter(func -> Objects.equals(func.getIdentifier(), identifier) && Objects.equals(func.getType(), type))
                 .findFirst()
@@ -335,7 +332,9 @@ public class IotThinkModelFunctionServiceImpl implements IotThinkModelFunctionSe
         List<ThingModelArgument> outputData = new ArrayList<>();
         for (IotThinkModelFunctionDO functionDO : propertyList) {
             ThingModelProperty property = functionDO.getProperty();
-            if (IotAccessModeEnum.READ.getMode().equals(property.getAccessMode()) || IotAccessModeEnum.READ_WRITE.getMode().equals(property.getAccessMode())) {
+            // TODO @haohao：ObjectUtils.equalsAny()，进一步简化判断
+            if (IotAccessModeEnum.READ.getMode().equals(property.getAccessMode())
+                    || IotAccessModeEnum.READ_WRITE.getMode().equals(property.getAccessMode())) {
                 ThingModelArgument arg = new ThingModelArgument()
                         .setIdentifier(property.getIdentifier())
                         .setName(property.getName())
@@ -372,7 +371,6 @@ public class IotThinkModelFunctionServiceImpl implements IotThinkModelFunctionSe
         textType.setType("text");
         arraySpecs.setItem(textType);
         arrayType.setSpecs(arraySpecs);
-
         inputArg.setDataType(arrayType);
 
         service.setInputData(Collections.singletonList(inputArg));

@@ -29,10 +29,13 @@ public interface IotThinkModelFunctionMapper extends BaseMapperX<IotThinkModelFu
                 IotThinkModelFunctionDO::getType, type);
     }
 
-    default List<IotThinkModelFunctionDO> selectListByProductIdAndIdentifiersAndTypes(Long productId, List<String> list, List<Integer> list1){
+    default List<IotThinkModelFunctionDO> selectListByProductIdAndIdentifiersAndTypes(Long productId,
+                                                                                      List<String> identifiers,
+                                                                                      List<Integer> types){
         return selectList(new LambdaQueryWrapperX<IotThinkModelFunctionDO>()
                 .eq(IotThinkModelFunctionDO::getProductId, productId)
-                .in(IotThinkModelFunctionDO::getIdentifier, list)
-                .in(IotThinkModelFunctionDO::getType, list1));
+                .in(IotThinkModelFunctionDO::getIdentifier, identifiers)
+                .in(IotThinkModelFunctionDO::getType, types));
     }
+
 }

@@ -10,16 +10,12 @@ import lombok.Getter;
  */
 @AllArgsConstructor
 @Getter
-public enum IotAccessModeEnum  {
+public enum IotAccessModeEnum {
 
     READ("r"),
     WRITE("w"),
     READ_WRITE("rw");
 
     private final String mode;
-
-    public String getMode() {
-        return mode;
-    }
 
 }

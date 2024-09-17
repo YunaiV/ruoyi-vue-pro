@@ -21,4 +21,5 @@ public interface ErrorCodeConstants {
 
     // ========== IoT 设备 1-050-003-000 ============
     ErrorCode DEVICE_NOT_EXISTS = new ErrorCode(1_050_003_000, "设备不存在");
+
 }
