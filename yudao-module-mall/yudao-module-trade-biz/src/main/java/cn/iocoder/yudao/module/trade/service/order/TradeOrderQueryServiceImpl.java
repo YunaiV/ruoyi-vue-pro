@@ -23,10 +23,10 @@ import cn.iocoder.yudao.module.trade.framework.delivery.core.client.ExpressClien
 import cn.iocoder.yudao.module.trade.framework.delivery.core.client.dto.ExpressTrackQueryReqDTO;
 import cn.iocoder.yudao.module.trade.framework.delivery.core.client.dto.ExpressTrackRespDTO;
 import cn.iocoder.yudao.module.trade.service.delivery.DeliveryExpressService;
-import jakarta.annotation.Resource;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import java.util.*;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
