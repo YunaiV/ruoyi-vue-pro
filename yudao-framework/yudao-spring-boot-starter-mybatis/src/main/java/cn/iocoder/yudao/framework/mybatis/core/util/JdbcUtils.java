@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.framework.mybatis.core.util;
 
+import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
 import cn.iocoder.yudao.framework.common.util.spring.SpringUtils;
 import cn.iocoder.yudao.framework.mybatis.core.enums.DbTypeEnum;
 import com.baomidou.dynamic.datasource.DynamicRoutingDataSource;
@@ -56,6 +57,27 @@ public class JdbcUtils {
         } catch (SQLException e) {
             throw new IllegalArgumentException(e.getMessage());
         }
+    }
+
+    /**
+     * 判断 JDBC 连接是否为 SQLServer 数据库
+     *
+     * @param url JDBC 连接
+     * @return 是否为 SQLServer 数据库
+     */
+    public static boolean isSQLServer(String url) {
+        DbType dbType = getDbType(url);
+        return isSQLServer(dbType);
+    }
+
+    /**
+     * 判断 JDBC 连接是否为 SQLServer 数据库
+     *
+     * @param url JDBC 连接
+     * @return 是否为 SQLServer 数据库
+     */
+    public static boolean isSQLServer(DbType dbType) {
+        return ObjectUtils.equalsAny(dbType, DbType.SQL_SERVER, DbType.SQL_SERVER2005);
     }
 
 }
