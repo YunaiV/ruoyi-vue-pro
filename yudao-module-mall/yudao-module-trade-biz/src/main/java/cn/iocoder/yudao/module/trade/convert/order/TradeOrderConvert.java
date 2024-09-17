@@ -101,7 +101,7 @@ public interface TradeOrderConvert {
     default PayOrderCreateReqDTO convert(TradeOrderDO order, List<TradeOrderItemDO> orderItems,
                                          TradeOrderProperties orderProperties) {
         PayOrderCreateReqDTO createReqDTO = new PayOrderCreateReqDTO()
-                .setAppId(orderProperties.getAppId()).setUserIp(order.getUserIp());
+                .setAppKey(orderProperties.getPayAppKey()).setUserIp(order.getUserIp());
         // 商户相关字段
         createReqDTO.setMerchantOrderId(String.valueOf(order.getId()));
         String subject = orderItems.get(0).getSpuName();
@@ -261,7 +261,7 @@ public interface TradeOrderConvert {
     default BrokerageAddReqBO convert(MemberUserRespDTO user, TradeOrderItemDO item,
                                       ProductSpuRespDTO spu, ProductSkuRespDTO sku) {
         BrokerageAddReqBO bo = new BrokerageAddReqBO().setBizId(String.valueOf(item.getId())).setSourceUserId(item.getUserId())
-                .setBasePrice(item.getPayPrice() * item.getCount())
+                .setBasePrice(item.getPayPrice())
                 .setTitle(StrUtil.format("{}成功购买{}", user.getNickname(), item.getSpuName()))
                 .setFirstFixedPrice(0).setSecondFixedPrice(0);
         if (BooleanUtil.isTrue(spu.getSubCommissionType())) {

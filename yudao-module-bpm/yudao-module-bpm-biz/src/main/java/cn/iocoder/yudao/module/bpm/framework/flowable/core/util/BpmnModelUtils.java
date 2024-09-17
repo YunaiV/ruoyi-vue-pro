@@ -211,7 +211,14 @@ public class BpmnModelUtils {
             return null;
         }
         BpmnXMLConverter converter = new BpmnXMLConverter();
-        return new String(converter.convertToXML(model));
+        return StrUtil.utf8Str(converter.convertToXML(model));
+    }
+
+    public static String getBpmnXml(byte[] bpmnBytes) {
+        if (ArrayUtil.isEmpty(bpmnBytes)) {
+            return null;
+        }
+        return StrUtil.utf8Str(bpmnBytes);
     }
 
     // ========== 遍历相关的方法 ==========

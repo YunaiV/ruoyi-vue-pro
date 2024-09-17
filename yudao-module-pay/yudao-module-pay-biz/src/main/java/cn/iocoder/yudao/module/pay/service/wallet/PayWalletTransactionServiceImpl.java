@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.pay.service.wallet;
 
+import cn.hutool.core.util.ObjectUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.pay.controller.admin.wallet.vo.transaction.PayWalletTransactionPageReqVO;
 import cn.iocoder.yudao.module.pay.controller.app.wallet.vo.transaction.AppPayWalletTransactionPageReqVO;
@@ -11,11 +12,10 @@ import cn.iocoder.yudao.module.pay.dal.mysql.wallet.PayWalletTransactionMapper;
 import cn.iocoder.yudao.module.pay.dal.redis.no.PayNoRedisDAO;
 import cn.iocoder.yudao.module.pay.enums.wallet.PayWalletBizTypeEnum;
 import cn.iocoder.yudao.module.pay.service.wallet.bo.WalletTransactionCreateReqBO;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
-
-import jakarta.annotation.Resource;
 
 import java.time.LocalDateTime;
 
@@ -53,6 +53,16 @@ public class PayWalletTransactionServiceImpl implements PayWalletTransactionServ
 
     @Override
     public PageResult<PayWalletTransactionDO> getWalletTransactionPage(PayWalletTransactionPageReqVO pageVO) {
+        // 基于 userId + userType 查询钱包
+        if (pageVO.getWalletId() == null
+            && ObjectUtil.isAllNotEmpty(pageVO.getUserId(), pageVO.getUserType())) {
+            PayWalletDO wallet = payWalletService.getOrCreateWallet(pageVO.getUserId(), pageVO.getUserType());
+            if (wallet != null) {
+                pageVO.setWalletId(wallet.getId());
+            }
+        }
+
+        // 查询分页
         return payWalletTransactionMapper.selectPage(pageVO.getWalletId(), null, pageVO, null);
     }
 

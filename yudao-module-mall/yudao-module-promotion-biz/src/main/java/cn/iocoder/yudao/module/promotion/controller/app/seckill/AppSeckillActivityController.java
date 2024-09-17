@@ -23,6 +23,7 @@ import com.google.common.cache.LoadingCache;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.annotation.Resource;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -30,11 +31,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import jakarta.annotation.Resource;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.Collections;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
@@ -86,7 +87,7 @@ public class AppSeckillActivityController {
 
         // 2.1 查询满足当前阶段的活动
         List<SeckillActivityDO> activityList = activityService.getSeckillActivityListByConfigIdAndStatus(config.getId(), CommonStatusEnum.ENABLE.getStatus());
-        List<SeckillProductDO> productList = activityService.getSeckillProductListByActivityId(
+        List<SeckillProductDO> productList = activityService.getSeckillProductListByActivityIds(
                 convertList(activityList, SeckillActivityDO::getId));
         // 2.2 获取 spu 信息
         List<ProductSpuRespDTO> spuList = spuApi.getSpuList(convertList(activityList, SeckillActivityDO::getSpuId));
@@ -101,7 +102,7 @@ public class AppSeckillActivityController {
         if (CollUtil.isEmpty(pageResult.getList())) {
             return success(PageResult.empty(pageResult.getTotal()));
         }
-        List<SeckillProductDO> productList = activityService.getSeckillProductListByActivityId(
+        List<SeckillProductDO> productList = activityService.getSeckillProductListByActivityIds(
                 convertList(pageResult.getList(), SeckillActivityDO::getId));
 
         // 2. 拼接数据
@@ -147,6 +148,23 @@ public class AppSeckillActivityController {
         // 4. 拼接数据
         List<SeckillProductDO> productList = activityService.getSeckillProductListByActivityId(activity.getId());
         return success(SeckillActivityConvert.INSTANCE.convert3(activity, productList, startTime, endTime));
+    }
+
+    @GetMapping("/list-by-ids")
+    @Operation(summary = "获得拼团活动列表，基于活动编号数组")
+    @Parameter(name = "ids", description = "活动编号数组", required = true, example = "[1024, 1025]")
+    public CommonResult<List<AppSeckillActivityRespVO>> getCombinationActivityListByIds(@RequestParam("ids") List<Long> ids) {
+        // 1. 获得开启的活动列表
+        List<SeckillActivityDO> activityList = activityService.getSeckillActivityListByIds(ids);
+        activityList.removeIf(activity -> CommonStatusEnum.isDisable(activity.getStatus()));
+        if (CollUtil.isEmpty(activityList)) {
+            return success(Collections.emptyList());
+        }
+        // 2. 拼接返回
+        List<SeckillProductDO> productList = activityService.getSeckillProductListByActivityIds(
+                convertList(activityList, SeckillActivityDO::getId));
+        List<ProductSpuRespDTO> spuList = spuApi.getSpuList(convertList(activityList, SeckillActivityDO::getSpuId));
+        return success(SeckillActivityConvert.INSTANCE.convertAppList(activityList, productList, spuList));
     }
 
 }

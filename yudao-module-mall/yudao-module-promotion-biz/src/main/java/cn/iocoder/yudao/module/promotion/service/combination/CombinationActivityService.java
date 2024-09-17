@@ -103,14 +103,6 @@ public interface CombinationActivityService {
     /**
      * 获取正在进行的活动分页数据
      *
-     * @param count 需要的数量
-     * @return 拼团活动分页
-     */
-    List<CombinationActivityDO> getCombinationActivityListByCount(Integer count);
-
-    /**
-     * 获取正在进行的活动分页数据
-     *
      * @param pageParam 分页请求
      * @return 拼团活动分页
      */

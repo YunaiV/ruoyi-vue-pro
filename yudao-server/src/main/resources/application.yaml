@@ -147,14 +147,28 @@ spring:
 
 spring:
   ai:
+    vectorstore: # 向量存储
+      redis:
+        index: default-index
+        prefix: "default:"
+    embedding:
+      transformer:
+        onnx:
+          model-uri: https://raw.gitcode.com/yudaocode/yudao-demo/raw/master/yudao-static/ai/model.onnx
+        tokenizer:
+          uri: https://raw.gitcode.com/yudaocode/yudao-demo/raw/master/yudao-static/ai/tokenizer.json
     qianfan: # 文心一言
       api-key: x0cuLZ7XsaTCU08vuJWO87Lg
       secret-key: R9mYF9dl9KASgi5RUq0FQt3wRisSnOcK
     zhipuai: # 智谱 AI
       api-key: 32f84543e54eee31f8d56b2bd6020573.3vh9idLJZ2ZhxDEs
-    openai:
+    openai: # OpenAI 官方
       api-key: sk-yzKea6d8e8212c3bdd99f9f44ced1cae37c097e5aa3BTS7z
       base-url: https://api.gptsapi.net
+    azure: # OpenAI 微软
+      openai:
+        endpoint: https://eastusprejade.openai.azure.com
+        api-key: xxx
     ollama:
       base-url: http://127.0.0.1:11434
       chat:
@@ -231,7 +245,7 @@ yudao:
   codegen:
     base-package: ${yudao.info.base-package}
     db-schemas: ${spring.datasource.dynamic.datasource.master.name}
-    front-type: 10 # 前端模版的类型，参见 CodegenFrontTypeEnum 枚举类
+    front-type: 20 # 前端模版的类型，参见 CodegenFrontTypeEnum 枚举类
   tenant: # 多租户相关配置项
     enable: true
     ignore-urls:
@@ -287,6 +301,7 @@ yudao:
       - tmp_report_data_1
       - tmp_report_data_income
     ignore-caches:
+      - user_role_ids
       - permission_menu_ids
       - oauth_client
       - notify_template
@@ -301,7 +316,6 @@ yudao:
     end-code: 9999 # 这里配置 9999 的原因是，测试方便。
   trade:
     order:
-      app-id: 1 # 商户编号
       pay-expire-time: 2h # 支付的过期时间
       receive-expire-time: 14d # 收货的过期时间
       comment-expire-time: 7d # 评论的过期时间

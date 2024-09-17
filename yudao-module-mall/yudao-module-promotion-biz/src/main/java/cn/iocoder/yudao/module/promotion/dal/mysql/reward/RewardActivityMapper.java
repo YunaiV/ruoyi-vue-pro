@@ -30,19 +30,9 @@ public interface RewardActivityMapper extends BaseMapperX<RewardActivityDO> {
                 .orderByDesc(RewardActivityDO::getId));
     }
 
-    default List<RewardActivityDO> selectListByStatus(Collection<Integer> statuses) {
-        return selectList(RewardActivityDO::getStatus, statuses);
-    }
-
-    default List<RewardActivityDO> selectListByProductScopeAndStatus(Integer productScope, Integer status) {
-        return selectList(new LambdaQueryWrapperX<RewardActivityDO>()
-                .eq(RewardActivityDO::getProductScope, productScope)
-                .eq(RewardActivityDO::getStatus, status));
-    }
-
     default List<RewardActivityDO> selectListBySpuIdsAndStatus(Collection<Long> spuIds, Integer status) {
         Function<Collection<Long>, String> productScopeValuesFindInSetFunc = ids -> ids.stream()
-                .map(id -> StrUtil.format("FIND_IN_SET({}, product_spu_ids) ", id))
+                .map(id -> StrUtil.format("FIND_IN_SET({}, product_scope_values) ", id))
                 .collect(Collectors.joining(" OR "));
         return selectList(new QueryWrapper<RewardActivityDO>()
                 .eq("status", status)
@@ -53,16 +43,16 @@ public interface RewardActivityMapper extends BaseMapperX<RewardActivityDO> {
      * 获取指定活动编号的活动列表且
      * 开始时间和结束时间小于给定时间 dateTime 的活动列表
      *
-     * @param ids      活动编号
+     * @param status   状态
      * @param dateTime 指定日期
      * @return 活动列表
      */
-    default List<RewardActivityDO> selectListByIdsAndDateTimeLt(Collection<Long> ids, LocalDateTime dateTime) {
+    default List<RewardActivityDO> selectListByStatusAndDateTimeLt(Integer status, LocalDateTime dateTime) {
         return selectList(new LambdaQueryWrapperX<RewardActivityDO>()
-                .in(RewardActivityDO::getId, ids)
+                .eq(RewardActivityDO::getStatus, status)
                 .lt(RewardActivityDO::getStartTime, dateTime)
                 .gt(RewardActivityDO::getEndTime, dateTime)// 开始时间 < 指定时间 < 结束时间，也就是说获取指定时间段的活动
-                .orderByDesc(RewardActivityDO::getCreateTime)
+                .orderByAsc(RewardActivityDO::getStartTime)
         );
     }
 

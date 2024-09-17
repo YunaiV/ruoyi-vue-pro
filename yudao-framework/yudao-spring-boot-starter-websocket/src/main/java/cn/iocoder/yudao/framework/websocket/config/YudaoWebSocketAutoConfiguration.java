@@ -5,6 +5,7 @@ import cn.iocoder.yudao.framework.mq.redis.core.RedisMQTemplate;
 import cn.iocoder.yudao.framework.websocket.core.handler.JsonWebSocketMessageHandler;
 import cn.iocoder.yudao.framework.websocket.core.listener.WebSocketMessageListener;
 import cn.iocoder.yudao.framework.websocket.core.security.LoginUserHandshakeInterceptor;
+import cn.iocoder.yudao.framework.websocket.core.security.WebSocketAuthorizeRequestsCustomizer;
 import cn.iocoder.yudao.framework.websocket.core.sender.kafka.KafkaWebSocketMessageConsumer;
 import cn.iocoder.yudao.framework.websocket.core.sender.kafka.KafkaWebSocketMessageSender;
 import cn.iocoder.yudao.framework.websocket.core.sender.local.LocalWebSocketMessageSender;
@@ -74,6 +75,11 @@ public class YudaoWebSocketAutoConfiguration {
     @Bean
     public WebSocketSessionManager webSocketSessionManager() {
         return new WebSocketSessionManagerImpl();
+    }
+
+    @Bean
+    public WebSocketAuthorizeRequestsCustomizer webSocketAuthorizeRequestsCustomizer(WebSocketProperties webSocketProperties) {
+        return new WebSocketAuthorizeRequestsCustomizer(webSocketProperties);
     }
 
     // ==================== Sender 相关 ====================

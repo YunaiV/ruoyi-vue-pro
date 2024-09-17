@@ -65,6 +65,7 @@ public class BpmModelServiceImpl implements BpmModelService {
     @Override
     public PageResult<Model> getModelPage(BpmModelPageReqVO pageVO) {
         ModelQuery modelQuery = repositoryService.createModelQuery();
+        modelQuery.modelTenantId(FlowableUtils.getTenantId());
         if (StrUtil.isNotBlank(pageVO.getKey())) {
             modelQuery.modelKey(pageVO.getKey());
         }
@@ -80,7 +81,6 @@ public class BpmModelServiceImpl implements BpmModelService {
             return PageResult.empty(count);
         }
         List<Model> models = modelQuery
-                .modelTenantId(FlowableUtils.getTenantId())
                 .orderByCreateTime().desc()
                 .listPage(PageUtils.getStart(pageVO), pageVO.getPageSize());
         return new PageResult<>(models, count);

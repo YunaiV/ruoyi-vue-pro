@@ -30,7 +30,8 @@ public interface SmsClientFactory {
      * 创建短信 Client
      *
      * @param properties 配置对象
+     * @return 短信 Client
      */
-    void createOrUpdateSmsClient(SmsChannelProperties properties);
+    SmsClient createOrUpdateSmsClient(SmsChannelProperties properties);
 
 }

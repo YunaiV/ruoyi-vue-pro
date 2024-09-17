@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.trade.service.price.calculator;
 
 import cn.hutool.core.lang.Assert;
+import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.module.product.api.sku.dto.ProductSkuRespDTO;
 import cn.iocoder.yudao.module.product.api.spu.dto.ProductSpuRespDTO;
@@ -10,6 +11,7 @@ import cn.iocoder.yudao.module.trade.service.price.bo.TradePriceCalculateReqBO;
 import cn.iocoder.yudao.module.trade.service.price.bo.TradePriceCalculateRespBO;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -30,8 +32,7 @@ public class TradePriceCalculatorHelper {
                                                                List<ProductSpuRespDTO> spuList, List<ProductSkuRespDTO> skuList) {
         // 创建 PriceCalculateRespDTO 对象
         TradePriceCalculateRespBO result = new TradePriceCalculateRespBO();
-        result.setType(getOrderType(param));
-        result.setPromotions(new ArrayList<>());
+        result.setType(getOrderType(param)).setPromotions(new ArrayList<>()).setGiveCouponTemplateCounts(new LinkedHashMap<>());
 
         // 创建它的 OrderItem 属性
         result.setItems(new ArrayList<>(param.getItems().size()));
@@ -59,9 +60,9 @@ public class TradePriceCalculatorHelper {
                     .setWeight(sku.getWeight()).setVolume(sku.getVolume());
             // spu 信息
             orderItem.setSpuName(spu.getName()).setCategoryId(spu.getCategoryId())
-                    .setDeliveryTemplateId(spu.getDeliveryTemplateId())
+                    .setDeliveryTypes(spu.getDeliveryTypes()).setDeliveryTemplateId(spu.getDeliveryTemplateId())
                     .setGivePoint(spu.getGiveIntegral()).setUsePoint(0);
-            if (orderItem.getPicUrl() == null) {
+            if (StrUtil.isBlank(orderItem.getPicUrl())) {
                 orderItem.setPicUrl(spu.getPicUrl());
             }
         });
@@ -240,7 +241,7 @@ public class TradePriceCalculatorHelper {
      *
      * 和 {@link #dividePrice(List, Integer)} 逻辑一致，只是传入的是 TradeOrderItemDO 对象
      *
-     * @param items         订单项
+     * @param items 订单项
      * @param price 订单支付金额
      * @return 分摊金额数组，和传入的 orderItems 一一对应
      */

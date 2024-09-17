@@ -16,6 +16,7 @@
 
 package com.alibaba.cloud.ai.tongyi.chat;
 
+import cn.hutool.core.collection.ListUtil;
 import com.alibaba.cloud.ai.tongyi.common.exception.TongYiException;
 import com.alibaba.dashscope.aigc.conversation.ConversationParam;
 import com.alibaba.dashscope.aigc.generation.Generation;
@@ -207,7 +208,7 @@ public class TongYiChatModel extends
 															.getChoices()
 															.get(0)
 											));
-									return new ChatResponse(List.of(gen));
+									return new ChatResponse(ListUtil.of(gen));
 								})
 				)
 				.publishOn(Schedulers.parallel());

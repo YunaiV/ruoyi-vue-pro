@@ -18,7 +18,7 @@
 
     <name>${project.artifactId}</name>
     <description>
-        ai 模块下，接入 LLM 大模型，支持聊天、绘图、音乐、写作、思维脑图等功能。
+        ai 模块下，接入 LLM 大模型，支持聊天、绘图、音乐、写作、思维导图等功能。
         目前已接入各种模型，不限于：
           国内：通义千问、文心一言、讯飞星火、智谱 GLM、DeepSeek
           国外：OpenAI、Ollama、Midjourney、StableDiffusion、Suno
