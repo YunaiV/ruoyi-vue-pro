@@ -1,14 +1,13 @@
 package cn.iocoder.yudao.module.bpm.framework.flowable.core.behavior;
 
-import cn.iocoder.yudao.module.bpm.framework.flowable.core.util.FlowableUtils;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.candidate.BpmTaskCandidateInvoker;
+import cn.iocoder.yudao.module.bpm.framework.flowable.core.util.FlowableUtils;
 import lombok.Setter;
 import org.flowable.bpmn.model.Activity;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.impl.bpmn.behavior.AbstractBpmnActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.SequentialMultiInstanceBehavior;
 
-import java.util.LinkedHashSet;
 import java.util.Set;
 
 /**
@@ -42,8 +41,13 @@ public class BpmSequentialMultiInstanceBehavior extends SequentialMultiInstanceB
         super.collectionElementVariable = FlowableUtils.formatExecutionCollectionElementVariable(execution.getCurrentActivityId());
 
         // 第二步，获取任务的所有处理人
-        Set<Long> assigneeUserIds = new LinkedHashSet<>(taskCandidateInvoker.calculateUsers(execution)); // 保证有序！！！
-        execution.setVariable(super.collectionVariable, assigneeUserIds);
+        // 由于每次审批（会签、或签等情况）后都会执行一次，所以 variable 已经有结果，不重复计算
+        @SuppressWarnings("unchecked")
+        Set<Long> assigneeUserIds = (Set<Long>) execution.getVariable(super.collectionVariable, Set.class);
+        if (assigneeUserIds == null) {
+            assigneeUserIds = taskCandidateInvoker.calculateUsers(execution);
+            execution.setVariable(super.collectionVariable, assigneeUserIds);
+        }
         return assigneeUserIds.size();
     }
 

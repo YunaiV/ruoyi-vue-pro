@@ -48,8 +48,13 @@ public class BpmParallelMultiInstanceBehavior extends ParallelMultiInstanceBehav
         super.collectionElementVariable = FlowableUtils.formatExecutionCollectionElementVariable(execution.getCurrentActivityId());
 
         // 第二步，获取任务的所有处理人
-        Set<Long> assigneeUserIds = taskCandidateInvoker.calculateUsers(execution);
-        execution.setVariable(super.collectionVariable, assigneeUserIds);
+        // 由于每次审批（会签、或签等情况）后都会执行一次，所以 variable 已经有结果，不重复计算
+        @SuppressWarnings("unchecked")
+        Set<Long> assigneeUserIds = (Set<Long>) execution.getVariable(super.collectionVariable, Set.class);
+        if (assigneeUserIds == null) {
+            assigneeUserIds = taskCandidateInvoker.calculateUsers(execution);
+            execution.setVariable(super.collectionVariable, assigneeUserIds);
+        }
         return assigneeUserIds.size();
     }
 
