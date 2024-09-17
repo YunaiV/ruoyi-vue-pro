@@ -431,9 +431,7 @@ public class PayOrderServiceImpl implements PayOrderService {
             return;
         }
 
-        // TODO 芋艿：应该 new 出来更新
-        order.setPrice(payPrice);
-        orderMapper.updateById(order);
+        orderMapper.updateById(new PayOrderDO().setId(order.getId()).setPrice(payPrice));
     }
 
     @Override
