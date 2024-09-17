@@ -375,7 +375,7 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
 
         // 3. 记录订单日志
         TradeOrderLogUtils.setOrderInfo(order.getId(), order.getStatus(), TradeOrderStatusEnum.DELIVERED.getStatus(),
-                MapUtil.<String, Object>builder().put("expressName", express != null ? express.getName() : "")
+                MapUtil.<String, Object>builder().put("deliveryName", express != null ? express.getName() : "")
                         .put("logisticsNo", express != null ? deliveryReqVO.getLogisticsNo() : "").build());
 
         // 4.1 发送站内信
