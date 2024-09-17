@@ -180,7 +180,6 @@ public class PayWalletRechargeServiceImpl implements PayWalletRechargeService {
                 .setReason("想退钱").setPrice(walletRecharge.getPayPrice()));
 
         // 4. 更新充值记录退款单号
-        // TODO @jaosn：一般新建这种 update 对象，建议是，第一个 set id 属性，容易知道以它为更新
         walletRechargeMapper.updateById(new PayWalletRechargeDO().setPayRefundId(payRefundId)
                 .setRefundStatus(WAITING.getStatus()).setId(walletRecharge.getId()));
     }

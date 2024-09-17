@@ -121,6 +121,7 @@ public class PayWalletServiceImpl implements  PayWalletService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public PayWalletTransactionDO reduceWalletBalance(Long walletId, Long bizId,
                                                       PayWalletBizTypeEnum bizType, Integer price) {
         // 1. 获取钱包
@@ -158,6 +159,7 @@ public class PayWalletServiceImpl implements  PayWalletService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public PayWalletTransactionDO addWalletBalance(Long walletId, String bizId,
                                                    PayWalletBizTypeEnum bizType, Integer price) {
         // 1.1 获取钱包
