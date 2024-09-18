@@ -2,6 +2,8 @@ package cn.iocoder.yudao.module.iot.service.thinkmodelfunction;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
+import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
+import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
 import cn.iocoder.yudao.module.iot.controller.admin.thinkmodelfunction.thingModel.ThingModelEvent;
 import cn.iocoder.yudao.module.iot.controller.admin.thinkmodelfunction.thingModel.ThingModelProperty;
 import cn.iocoder.yudao.module.iot.controller.admin.thinkmodelfunction.thingModel.ThingModelService;
@@ -22,7 +24,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.diffList;
@@ -54,12 +55,7 @@ public class IotThinkModelFunctionServiceImpl implements IotThinkModelFunctionSe
 
         // 3. 如果创建的是属性，需要更新默认的事件和服务
         if (Objects.equals(createReqVO.getType(), IotThingModelTypeEnum.PROPERTY.getType())) {
-            // 获取当前属性列表，并添加新插入的属性
-            // TODO @haohao：是不是插入后，查询已经包含了 function
-            List<IotThinkModelFunctionDO> propertyList = thinkModelFunctionMapper
-                    .selectListByProductIdAndType(createReqVO.getProductId(), IotThingModelTypeEnum.PROPERTY.getType());
-            propertyList.add(function);
-            createDefaultEventsAndServices(createReqVO.getProductId(), createReqVO.getProductKey(), propertyList);
+            createDefaultEventsAndServices(createReqVO.getProductId(), createReqVO.getProductKey());
         }
         return function.getId();
     }
@@ -76,6 +72,7 @@ public class IotThinkModelFunctionServiceImpl implements IotThinkModelFunctionSe
     public void updateThinkModelFunction(IotThinkModelFunctionSaveReqVO updateReqVO) {
         // 1. 校验功能是否存在
         validateThinkModelFunctionExists(updateReqVO.getId());
+
         // 2. 校验功能标识符是否唯一
         validateIdentifierUniqueForUpdate(updateReqVO.getId(), updateReqVO.getProductId(), updateReqVO.getIdentifier());
 
@@ -85,17 +82,7 @@ public class IotThinkModelFunctionServiceImpl implements IotThinkModelFunctionSe
 
         // 4. 如果更新的是属性，需要更新默认的事件和服务
         if (Objects.equals(updateReqVO.getType(), IotThingModelTypeEnum.PROPERTY.getType())) {
-            // 获取当前属性列表，更新其中的属性
-            // TODO @haohao：是不是更新后，查询出来的，已经是最新的 thinkModelFunction
-            List<IotThinkModelFunctionDO> propertyList = thinkModelFunctionMapper
-                    .selectListByProductIdAndType(updateReqVO.getProductId(), IotThingModelTypeEnum.PROPERTY.getType());
-            for (int i = 0; i < propertyList.size(); i++) {
-                if (propertyList.get(i).getId().equals(thinkModelFunction.getId())) {
-                    propertyList.set(i, thinkModelFunction);
-                    break;
-                }
-            }
-            createDefaultEventsAndServices(updateReqVO.getProductId(), updateReqVO.getProductKey(), propertyList);
+            createDefaultEventsAndServices(updateReqVO.getProductId(), updateReqVO.getProductKey());
         }
     }
 
@@ -120,12 +107,7 @@ public class IotThinkModelFunctionServiceImpl implements IotThinkModelFunctionSe
 
         // 3. 如果删除的是属性，需要更新默认的事件和服务
         if (Objects.equals(functionDO.getType(), IotThingModelTypeEnum.PROPERTY.getType())) {
-            // 获取当前属性列表，移除已删除的属性
-            // TODO @haohao：是不是删除后，已经没有 id 对应的记录啦？
-            List<IotThinkModelFunctionDO> propertyList = thinkModelFunctionMapper
-                    .selectListByProductIdAndType(functionDO.getProductId(), IotThingModelTypeEnum.PROPERTY.getType());
-            propertyList.removeIf(property -> property.getId().equals(id));
-            createDefaultEventsAndServices(functionDO.getProductId(), functionDO.getProductKey(), propertyList);
+            createDefaultEventsAndServices(functionDO.getProductId(), functionDO.getProductKey());
         }
     }
 
@@ -153,8 +135,12 @@ public class IotThinkModelFunctionServiceImpl implements IotThinkModelFunctionSe
     /**
      * 创建默认的事件和服务
      */
-    public void createDefaultEventsAndServices(Long productId, String productKey, List<IotThinkModelFunctionDO> propertyList) {
-        // 1. 生成新的事件和服务列表
+    public void createDefaultEventsAndServices(Long productId, String productKey) {
+        // 1. 获取当前属性列表
+        List<IotThinkModelFunctionDO> propertyList = thinkModelFunctionMapper
+                .selectListByProductIdAndType(productId, IotThingModelTypeEnum.PROPERTY.getType());
+
+        // 2. 生成新的事件和服务列表
         List<IotThinkModelFunctionDO> newFunctionList = new ArrayList<>();
         // 生成属性上报事件
         ThingModelEvent propertyPostEvent = generatePropertyPostEvent(propertyList);
@@ -175,7 +161,7 @@ public class IotThinkModelFunctionServiceImpl implements IotThinkModelFunctionSe
             newFunctionList.add(getServiceFunction);
         }
 
-        // 2. 获取数据库中的默认的旧事件和服务列表
+        // 3. 获取数据库中的默认的旧事件和服务列表
         List<IotThinkModelFunctionDO> oldFunctionList = thinkModelFunctionMapper.selectListByProductIdAndIdentifiersAndTypes(
                 productId,
                 Arrays.asList("post", "set", "get"),
@@ -185,6 +171,7 @@ public class IotThinkModelFunctionServiceImpl implements IotThinkModelFunctionSe
         // 3.1 使用 diffList 方法比较新旧列表
         List<List<IotThinkModelFunctionDO>> diffResult = diffList(oldFunctionList, newFunctionList,
                 // TODO @haohao：是不是用 id 比较相同就 ok 哈。如果可以的化，下面的 update 可以更简单
+                // 继续使用 identifier 和 type 进行比较：这样可以准确地匹配对应的功能对象。
                 (oldFunc, newFunc) -> Objects.equals(oldFunc.getIdentifier(), newFunc.getIdentifier())
                         && Objects.equals(oldFunc.getType(), newFunc.getType()));
         List<IotThinkModelFunctionDO> createList = diffResult.get(0); // 需要新增的
@@ -206,8 +193,7 @@ public class IotThinkModelFunctionServiceImpl implements IotThinkModelFunctionSe
             }
         }
         if (CollUtil.isNotEmpty(deleteList)) {
-            // TODO @haohao：使用 convertSet 简化。
-            List<Long> idsToDelete = deleteList.stream().map(IotThinkModelFunctionDO::getId).collect(Collectors.toList());
+            Set<Long> idsToDelete = CollectionUtils.convertSet(deleteList, IotThinkModelFunctionDO::getId);
             thinkModelFunctionMapper.deleteByIds(idsToDelete);
         }
     }
@@ -217,11 +203,8 @@ public class IotThinkModelFunctionServiceImpl implements IotThinkModelFunctionSe
      */
     private IotThinkModelFunctionDO findFunctionByIdentifierAndType(List<IotThinkModelFunctionDO> functionList,
                                                                     String identifier, Integer type) {
-        // TODO @haohao：这个可以使用 CollUtil.findOne 简化只有一行
-        return functionList.stream()
-                .filter(func -> Objects.equals(func.getIdentifier(), identifier) && Objects.equals(func.getType(), type))
-                .findFirst()
-                .orElse(null);
+        return CollUtil.findOne(functionList, func ->
+                Objects.equals(func.getIdentifier(), identifier) && Objects.equals(func.getType(), type));
     }
 
     /**
@@ -332,9 +315,8 @@ public class IotThinkModelFunctionServiceImpl implements IotThinkModelFunctionSe
         List<ThingModelArgument> outputData = new ArrayList<>();
         for (IotThinkModelFunctionDO functionDO : propertyList) {
             ThingModelProperty property = functionDO.getProperty();
-            // TODO @haohao：ObjectUtils.equalsAny()，进一步简化判断
-            if (IotAccessModeEnum.READ.getMode().equals(property.getAccessMode())
-                    || IotAccessModeEnum.READ_WRITE.getMode().equals(property.getAccessMode())) {
+            if (ObjectUtils.equalsAny(property.getAccessMode(),
+                    IotAccessModeEnum.READ.getMode(), IotAccessModeEnum.READ_WRITE.getMode())) {
                 ThingModelArgument arg = new ThingModelArgument()
                         .setIdentifier(property.getIdentifier())
                         .setName(property.getName())

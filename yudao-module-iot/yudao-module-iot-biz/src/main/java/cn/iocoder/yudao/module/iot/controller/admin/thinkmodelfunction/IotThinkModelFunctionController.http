@@ -19,8 +19,8 @@ Authorization: Bearer {{token}}
     "dataType": {
       "type": "float",
       "specs": {
-        "min": -40.0,
-        "max": 125.0,
+        "min": -10.0,
+        "max": 100.0,
         "step": 0.1,
         "unit": "℃"
       }
@@ -28,6 +28,39 @@ Authorization: Bearer {{token}}
     "description": "当前温度值"
   }
 }
+
+### 请求 /iot/think-model-function/create 接口 => 成功
+POST {{baseUrl}}/iot/think-model-function/create
+Content-Type: application/json
+tenant-id: {{adminTenentId}}
+Authorization: Bearer {{token}}
+
+{
+  "productId": 1001,
+  "productKey": "smart-sensor-001",
+  "identifier": "Humidity",
+  "name": "湿度",
+  "description": "当前湿度值",
+  "type": 1,
+  "property": {
+    "identifier": "Humidity",
+    "name": "湿度",
+    "accessMode": "r",
+    "required": true,
+    "dataType": {
+      "type": "float",
+      "specs": {
+        "min": 0.0,
+        "max": 100.0,
+        "step": 0.1,
+        "unit": "%"
+      }
+    },
+    "description": "当前湿度值"
+  }
+}
+
+
 
 
 ### 请求 /iot/think-model-function/update 接口 => 成功
@@ -37,7 +70,7 @@ tenant-id: {{adminTenentId}}
 Authorization: Bearer {{token}}
 
 {
-  "id": 1,
+  "id": 11,
   "productId": 1001,
   "productKey": "smart-sensor-001",
   "identifier": "Temperature",
@@ -52,8 +85,8 @@ Authorization: Bearer {{token}}
     "dataType": {
       "type": "float",
       "specs": {
-        "min": -10.0,
-        "max": 100.0,
+        "min": -111.0,
+        "max": 222.0,
         "step": 0.1,
         "unit": "℃"
       }
@@ -63,12 +96,12 @@ Authorization: Bearer {{token}}
 }
 
 ### 请求 /iot/think-model-function/delete 接口 => 成功
-DELETE {{baseUrl}}/iot/think-model-function/delete?id=1
+DELETE {{baseUrl}}/iot/think-model-function/delete?id=7
 tenant-id: {{adminTenentId}}
 Authorization: Bearer {{token}}
 
 ### 请求 /iot/think-model-function/get 接口 => 成功
-GET {{baseUrl}}/iot/think-model-function/get?id=4
+GET {{baseUrl}}/iot/think-model-function/get?id=10
 tenant-id: {{adminTenentId}}
 Authorization: Bearer {{token}}
 
