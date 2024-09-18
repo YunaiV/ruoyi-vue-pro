@@ -4,8 +4,10 @@ import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.system.controller.admin.dept.vo.dept.DeptListReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.dept.vo.dept.DeptSaveReqVO;
+import cn.iocoder.yudao.module.system.controller.admin.user.vo.user.UserSaveReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.dept.DeptDO;
 import cn.iocoder.yudao.module.system.service.dept.DeptService;
+import com.dingtalk.api.response.OapiV2UserGetResponse;
 import com.somle.dingtalk.model.DingTalkDepartment;
 import com.somle.dingtalk.service.DingTalkService;
 import com.somle.erp.model.ErpDepartment;
@@ -80,7 +82,7 @@ public class DingTalkToErpConverter {
         // try to translate parent id
         try {
             var mapping = mappingService.toMapping(dept);
-            mapping.setExternalId(dept.getParentId());
+            mapping.setExternalId(dept.getParentId().toString());
             mapping = mappingService.findMapping(mapping);
             erpDept
                 .setParentId(mapping.getInternalId());
@@ -102,5 +104,40 @@ public class DingTalkToErpConverter {
             .setSort(1024)
             .setStatus(CommonStatusEnum.ENABLE.getStatus());
         return erpDept;
+    }
+
+    public UserSaveReqVO toErp(OapiV2UserGetResponse.UserGetResponse user) {
+        UserSaveReqVO erpUser = new UserSaveReqVO();
+        //try to translate id
+        try {
+            var mapping = mappingService.toMapping(user);
+            mapping = mappingService.findMapping(mapping);
+            erpUser
+                .setId(mapping.getInternalId());
+        } catch (Exception e) {
+            log.debug("user mapping not found");
+        }
+        //try to translate dept id
+        try {
+            var mapping = new EsbMapping();
+            mapping
+                .setType("department")
+                .setDomain("dingtalk")
+                .setExternalId(user.getDeptIdList().getFirst().toString());
+            mapping = mappingService.findMapping(mapping);
+            erpUser
+                .setDeptId(mapping.getInternalId());
+        } catch (Exception e) {
+            log.debug("dept mapping not found");
+        }
+        //translate the rest
+        erpUser
+            .setUsername(null)
+            .setMobile(user.getMobile())
+            .setEmail(user.getEmail())
+            .setNickname(user.getName())
+            .setPassword("123456")
+            .setAvatar(user.getAvatar());
+        return erpUser;
     }
 }

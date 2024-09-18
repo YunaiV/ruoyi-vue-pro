@@ -2,7 +2,7 @@
 
 spring:
   main:
-#    lazy-initialization: true # 开启懒加载，加快速度
+    lazy-initialization: true # 开启懒加载，加快速度
     banner-mode: off # 单元测试，禁用 Banner
   test:
     database:
@@ -84,7 +84,7 @@ mybatis:
 # 芋道配置项，设置当前项目所有自定义的配置
 yudao:
   info:
-    base-package: cn.iocoder.yudao.module.system.dal.mysql.dept
+    base-package: cn.iocoder.yudao.module.system
 somle:
   base-package: com.somle.*
 

@@ -1,5 +1,6 @@
 package com.somle.esb.service;
 
+import com.dingtalk.api.response.OapiV2UserGetResponse;
 import com.somle.dingtalk.model.DingTalkDepartment;
 import com.somle.esb.model.EsbMapping;
 import com.somle.esb.repository.EsbMappingRepository;
@@ -19,7 +20,15 @@ public class EsbMappingService {
         var mapping = new EsbMapping()
             .setType("department")
             .setDomain("dingtalk")
-            .setExternalId(dingTalkDepartment.getDeptId());
+            .setExternalId(dingTalkDepartment.getDeptId().toString());
+        return mapping;
+    }
+
+    public EsbMapping toMapping(OapiV2UserGetResponse.UserGetResponse dingTalkUser) {
+        var mapping = new EsbMapping()
+            .setType("user")
+            .setDomain("dingtalk")
+            .setExternalId(dingTalkUser.getUserid());
         return mapping;
     }
 

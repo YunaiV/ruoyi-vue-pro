@@ -21,11 +21,11 @@ public class DingTalkController {
         return service.getDepartmentStream().toList();
     }
 
-    @GetMapping("/saveDepartments")
-    public String uploadDepartments() {
-        service.uploadDepartmentsResursive();
-        return "success";
-    }
+//    @GetMapping("/saveDepartments")
+//    public String uploadDepartments() {
+//        service.uploadDepartmentsResursive();
+//        return "success";
+//    }
 
 
 

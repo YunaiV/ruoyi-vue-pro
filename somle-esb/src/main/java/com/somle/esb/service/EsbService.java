@@ -1,6 +1,8 @@
 package com.somle.esb.service;
 
+import cn.iocoder.yudao.module.system.controller.admin.user.vo.user.UserSaveReqVO;
 import cn.iocoder.yudao.module.system.service.dept.DeptService;
+import cn.iocoder.yudao.module.system.service.user.AdminUserService;
 import com.somle.ai.model.AiName;
 import com.somle.ai.service.AiService;
 import com.somle.amazon.service.AmazonService;
@@ -25,6 +27,7 @@ import com.somle.framework.common.util.general.CoreUtils;
 import com.somle.kingdee.service.KingdeeService;
 import com.somle.matomo.service.MatomoService;
 import jakarta.annotation.PostConstruct;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -69,6 +72,9 @@ public class EsbService {
 
     @Autowired
     DeptService deptService;
+
+    @Autowired
+    AdminUserService userService;
 
     @Autowired
     AiService aiService;
@@ -417,29 +423,32 @@ public class EsbService {
                     .setInternalId(deptId);
                 mappingService.save(mapping);
             }
-//            var mapping = mappingService.toMapping(dingTalkDepartment);
-//            try {
-//                mapping = mappingService.findMapping(mapping);
-//                if (mapping.getInternalId() != null) { //dept exist in erp so update
-//                    erpDepartment.setId(mapping.getInternalId());
-//                    deptService.updateDept(erpDepartment);
-//                } else {
-//                    throw new RuntimeException("internal id missing");
-//                }
-//            } catch (Exception e) { //dept not exist in erp so create
-//                log.debug("mapping not found or internal id missing");
-//                var deptId = deptService.createDept(erpDepartment);
-//                log.info("returned dept id " + deptId );
-//                mapping
-//                    .setInternalId(deptId);
-//                mappingService.save(mapping);
-//            }
 
 //        var eccangDepartment = erpToEccangConverter.toEccang(erpDepartment);
 //        EccangResponse.BizContent response = eccangService.addDepartment(eccangDepartment);
 //        log.info(response.toString());
 //        var kingdeeDepartment = erpToKingdeeConverter.toKingdee(erpDepartment);
 //        kingdeeService.addDepartment(kingdeeDepartment);
+        });
+    }
+
+    public void syncUsers() {
+        dingTalkService.getUserDetailStream().forEach(dingTalkUser -> {
+            log.info("begin syncing: " + dingTalkUser.toString());
+            var erpUser = dingTalkToErpConverter.toErp(dingTalkUser);
+            log.info("user to add " + erpUser);
+            if (erpUser.getId() != null) {
+                userService.updateUser(erpUser);
+            } else {
+                erpUser.setUsername("temp");
+                Long userId = userService.createUser(erpUser);
+                erpUser.setId(userId).setUsername("SM" + String.format("%06d", userId));
+                userService.updateUser(erpUser);
+                var mapping = mappingService.toMapping(dingTalkUser);
+                mapping
+                    .setInternalId(userId);
+                mappingService.save(mapping);
+            }
         });
     }
 

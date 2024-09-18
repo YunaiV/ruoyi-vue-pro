@@ -1,18 +1,27 @@
 package com.somle.dingtalk.service;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
+import com.dingtalk.api.DefaultDingTalkClient;
+import com.dingtalk.api.DingTalkClient;
+import com.dingtalk.api.request.OapiUserListidRequest;
+import com.dingtalk.api.request.OapiV2UserGetRequest;
+import com.dingtalk.api.response.OapiUserListidResponse;
+import com.dingtalk.api.response.OapiV2UserGetResponse;
 import com.somle.framework.common.util.json.JSONObject;
 import com.somle.framework.common.util.json.JsonUtils;
 import jakarta.annotation.PostConstruct;
 
+import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.integration.support.MessageBuilder;
-import org.springframework.messaging.MessageChannel;
+//import org.springframework.integration.support.MessageBuilder;
+//import org.springframework.messaging.MessageChannel;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+
 import com.somle.dingtalk.model.DingTalkDepartment;
 // import com.somle.model.DingTalkDepartmentMap.DingTalkDepartment;
 // import com.somle.model.DingTalkDepartmentMap;
@@ -32,8 +41,8 @@ public class DingTalkService {
 
 
 
-    @Autowired
-    MessageChannel departmentChannel;
+//    @Autowired
+//    MessageChannel departmentChannel;
 
     @Autowired
     DingTalkTokenRepository tokenRepository;
@@ -67,7 +76,8 @@ public class DingTalkService {
         return token;
     }
 
-    public DingTalkDepartment getDepartment(long deptId) {
+    @SneakyThrows
+    public DingTalkDepartment getDepartment(Long deptId) {
         log.info("fetching department detail for " + deptId);
         String endUrl = "/topapi/v2/department/get";
 
@@ -81,6 +91,13 @@ public class DingTalkService {
         DingTalkResponse response = WebUtils.postRequest(baseHost + endUrl, params, headers, payload, DingTalkResponse.class);
         log.debug(response.toString());
         return response.getResult(DingTalkDepartment.class);
+
+//        DingTalkClient client = new DefaultDingTalkClient("https://oapi.dingtalk.com/topapi/v2/department/get");
+//        OapiV2DepartmentGetRequest req = new OapiV2DepartmentGetRequest();
+//        req.setDeptId(deptId);
+//        req.setLanguage("zh_CN");
+//        OapiV2DepartmentGetResponse rsp = client.execute(req, token.getAccessToken());
+//        return rsp.getResult();
 
     }
 
@@ -235,13 +252,40 @@ public class DingTalkService {
 
 
 
-    public void uploadDepartmentsResursive() {
-        getDepartmentStream()
-            // .limit(4)
-            .forEach(n -> {
-                departmentChannel.send(MessageBuilder.withPayload(n).build());
-                // departmentChannel.send(MessageBuilder.withPayload(n).build());
-            });
+//    public void uploadDepartmentsResursive() {
+//        getDepartmentStream()
+//            // .limit(4)
+//            .forEach(n -> {
+//                departmentChannel.send(MessageBuilder.withPayload(n).build());
+//                // departmentChannel.send(MessageBuilder.withPayload(n).build());
+//            });
+//    }
+
+    @SneakyThrows
+    public List<String> getUserIds(Long deptId) {
+        DingTalkClient client = new DefaultDingTalkClient("https://oapi.dingtalk.com/topapi/user/listid");
+        OapiUserListidRequest req = new OapiUserListidRequest();
+        req.setDeptId(deptId);
+        OapiUserListidResponse rsp = client.execute(req, token.getAccessToken());
+        return rsp.getResult().getUseridList();
+    }
+
+    @SneakyThrows
+    public OapiV2UserGetResponse.UserGetResponse getUserDetail(String userId) {
+        DingTalkClient client = new DefaultDingTalkClient("https://oapi.dingtalk.com/topapi/v2/user/get");
+        OapiV2UserGetRequest req = new OapiV2UserGetRequest();
+        req.setUserid(userId);
+        req.setLanguage("zh_CN");
+        OapiV2UserGetResponse rsp = client.execute(req, token.getAccessToken());
+        return rsp.getResult();
+    }
+
+    public Stream<OapiV2UserGetResponse.UserGetResponse> getUserDetailStream() {
+        return getDepartmentStream()
+            .map(DingTalkDepartment::getDeptId)
+            .map(this::getUserIds)
+            .flatMap(Collection::stream)
+            .map(this::getUserDetail);
     }
 
     

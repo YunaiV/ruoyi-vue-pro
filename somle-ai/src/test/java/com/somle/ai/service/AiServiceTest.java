@@ -48,6 +48,12 @@ class AiServiceTest extends BaseSpringTest {
         log.info(result.toList().toString());
     }
 
+    @Test
+    void getCurrencies() {
+        var result = service.getCurrencies();
+        log.info(result.toList().toString());
+    }
+
 
 //    @org.junit.jupiter.api.Test
 //    void getAddresses() {

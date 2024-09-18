@@ -1,11 +1,21 @@
 package com.somle.esb.service;
 
 import cn.iocoder.yudao.framework.mybatis.config.YudaoMybatisAutoConfiguration;
+import cn.iocoder.yudao.framework.security.config.YudaoSecurityAutoConfiguration;
+import cn.iocoder.yudao.module.infra.api.config.ConfigApi;
+import cn.iocoder.yudao.module.infra.api.file.FileApi;
 import cn.iocoder.yudao.module.system.controller.admin.oauth2.vo.user.OAuth2UserInfoRespVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.dept.DeptDO;
 import cn.iocoder.yudao.module.system.dal.mysql.dept.DeptMapper;
 import cn.iocoder.yudao.module.system.service.dept.DeptService;
 import cn.iocoder.yudao.module.system.service.dept.DeptServiceImpl;
+import cn.iocoder.yudao.module.system.service.dept.PostService;
+import cn.iocoder.yudao.module.system.service.dept.PostServiceImpl;
+import cn.iocoder.yudao.module.system.service.permission.*;
+import cn.iocoder.yudao.module.system.service.tenant.TenantService;
+import cn.iocoder.yudao.module.system.service.tenant.TenantServiceImpl;
+import cn.iocoder.yudao.module.system.service.user.AdminUserService;
+import cn.iocoder.yudao.module.system.service.user.AdminUserServiceImpl;
 import com.baomidou.mybatisplus.autoconfigure.MybatisPlusAutoConfiguration;
 import com.github.yulichang.autoconfigure.MybatisPlusJoinAutoConfiguration;
 import com.somle.ai.service.AiService;
@@ -33,10 +43,12 @@ import org.quartz.SchedulerException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.autoconfigure.quartz.QuartzAutoConfiguration;
+import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Import;
 import org.springframework.messaging.MessageChannel;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.context.ApplicationContext;
 
@@ -52,11 +64,24 @@ import static org.junit.jupiter.api.Assertions.*;
     DingTalkService.class,
     KingdeeService.class,
 //    AmazonService.class,
-    DeptServiceImpl.class,
+
+
     DingTalkToErpConverter.class,
     ErpToEccangConverter.class,
     ErpToKingdeeConverter.class,
     EccangToErpConverter.class,
+
+    DeptServiceImpl.class,
+    AdminUserServiceImpl.class,
+//    PostServiceImpl.class,
+//    RoleServiceImpl.class,
+//    MenuServiceImpl.class,
+//    TenantServiceImpl.class,
+//    PermissionServiceImpl.class,
+
+    YudaoSecurityAutoConfiguration.class,
+    SecurityAutoConfiguration.class,
+
     IntegrationConfig.class,
     QuartzAutoConfiguration.class,
     // MyBatis 配置类
@@ -93,6 +118,22 @@ class EsbServiceTest extends BaseSpringTest {
 
     @Resource
     DeptMapper deptMapper;
+
+    @Resource
+    AdminUserService userService;
+
+    @MockBean
+    private PostService postService;
+    @MockBean
+    private PermissionService permissionService;
+    @Resource
+    private PasswordEncoder passwordEncoder;
+    @MockBean
+    private TenantService tenantService;
+    @MockBean
+    private FileApi fileApi;
+    @MockBean
+    private ConfigApi configApi;
 
 
     @Autowired
@@ -136,5 +177,10 @@ class EsbServiceTest extends BaseSpringTest {
     @Test
     void syncDepartments() {
         service.syncDepartments();
+    }
+
+    @Test
+    void syncUsers() {
+        service.syncUsers();
     }
 }

@@ -19,7 +19,7 @@ public class EsbMapping {
     private String domain;
     private String account;
     @Column(nullable = false)
-    private Long externalId;
+    private String externalId;
     @Column(nullable = false)
     private Long internalId;
 }

@@ -11,6 +11,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -99,6 +100,14 @@ class JsonUtilsTest {
         assertThrows(Exception.class, () -> {
             JsonUtils.parseArray("[{\"name\":}]", Person.class);
         });
+    }
+
+    @Test
+    public void parseArray_ValidStringArray_ReturnsList() throws Exception {
+        String jsonArray = "{\"name\":[\"John\", \"Jane\"]}";
+        Map<String, List<String>> result = JsonUtils.parseObject(jsonArray, Map.class);
+        assertEquals(1, result.size());
+        assertEquals("John", result.get("name").get(0));
     }
 
 //    @Test

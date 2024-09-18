@@ -14,6 +14,17 @@
 
 
     <dependencies>
+
+<!--        <dependency>-->
+<!--            <groupId>com.aliyun</groupId>-->
+<!--            <artifactId>dingtalk</artifactId>-->
+<!--        </dependency>-->
+
+        <dependency>
+            <groupId>com.aliyun</groupId>
+            <artifactId>alibaba-dingtalk-service-sdk</artifactId>
+        </dependency>
+
         <dependency>
             <groupId>com.somle</groupId>
             <artifactId>somle-common</artifactId>
@@ -36,10 +47,10 @@
             <artifactId>spring-boot-starter-data-jpa</artifactId>
         </dependency>
 
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-integration</artifactId>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>org.springframework.boot</groupId>-->
+<!--            <artifactId>spring-boot-starter-integration</artifactId>-->
+<!--        </dependency>-->
 
 
     </dependencies>

@@ -25,4 +25,5 @@ public class DingTalkResponse {
     public <T> T getResult(Class<T> objectClass) {
         return JsonUtils.parseObject(result, objectClass);
     }
+
 }
