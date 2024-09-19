@@ -2,7 +2,9 @@ package com.somle.esb.controller;
 
 import com.somle.esb.model.Domain;
 import com.somle.esb.service.EsbService;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -16,6 +18,13 @@ public class EsbController {
 
     @Autowired
     private EsbService service;
+
+
+
+    @PostMapping("/getBeans")
+    public void printAllBeans() {
+        service.printAllBeans();
+    }
 
     @PostMapping("/dataCollect")
     public String dataCollect(LocalDate scheduleDate, String database) {

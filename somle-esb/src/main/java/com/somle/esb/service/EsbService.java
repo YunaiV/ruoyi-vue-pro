@@ -29,8 +29,10 @@ import com.somle.matomo.service.MatomoService;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.Test;
 import org.quartz.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.data.domain.Example;
 import org.springframework.integration.annotation.ServiceActivator;
 import org.springframework.integration.support.MessageBuilder;
@@ -105,23 +107,38 @@ public class EsbService {
 
 
 
-    @PostConstruct
-    public void scheduleJob() throws SchedulerException {
-        JobDetail dataJobDetail = JobBuilder.newJob(DataJob.class)
-            .withIdentity("dataJob")
-            .storeDurably()  // Keeps the job even if no trigger is associated
-            .build();
+    @Autowired
+    private ApplicationContext applicationContext;
 
-        Trigger dataTrigger = TriggerBuilder.newTrigger()
-            .forJob(dataJobDetail)
-            .withIdentity("dataTrigger")
-            .withSchedule(CronScheduleBuilder.cronSchedule("0 10 1 * * ?"))
-//            .withSchedule(CronScheduleBuilder.cronSchedule("0/1 * * * * ?"))
-            .build();
 
-        // Schedule the job using the scheduler
-        scheduler.scheduleJob(dataJobDetail, dataTrigger);
+    public void printAllBeans() {
+        String[] beanNames = applicationContext.getBeanDefinitionNames();
+        System.out.println("Beans provided by Spring:");
+
+        for (String beanName : beanNames) {
+            System.out.println(beanName);
+        }
     }
+
+
+
+//    @PostConstruct
+//    public void scheduleJob() throws SchedulerException {
+//        JobDetail dataJobDetail = JobBuilder.newJob(DataJob.class)
+//            .withIdentity("dataJob")
+//            .storeDurably()  // Keeps the job even if no trigger is associated
+//            .build();
+//
+//        Trigger dataTrigger = TriggerBuilder.newTrigger()
+//            .forJob(dataJobDetail)
+//            .withIdentity("dataTrigger")
+////            .withSchedule(CronScheduleBuilder.cronSchedule("0 10 1 * * ?"))
+//            .withSchedule(CronScheduleBuilder.cronSchedule("0/1 * * * * ?"))
+//            .build();
+//
+//        // Schedule the job using the scheduler
+//        scheduler.scheduleJob(dataJobDetail, dataTrigger);
+//    }
 
 
 

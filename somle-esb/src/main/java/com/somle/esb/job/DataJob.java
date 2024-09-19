@@ -1,6 +1,7 @@
 package com.somle.esb.job;
 
 
+import cn.iocoder.yudao.framework.quartz.core.handler.JobHandler;
 import com.somle.esb.service.EsbService;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
@@ -10,16 +11,18 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalTime;
+
 @Component
-public class DataJob implements Job {
+public class DataJob implements JobHandler {
     @Autowired
     EsbService service;
 
-    private static final Logger logger = LoggerFactory.getLogger(DataJob.class);
 
     @Override
-    public void execute(JobExecutionContext context) throws JobExecutionException {
-//        System.out.println("Simple Job executed at {}");
+    public String execute(String param) throws Exception {
+//        throw new RuntimeException("this is an exception");
         service.dataCollect();
+        return "data upload success";
     }
 }
