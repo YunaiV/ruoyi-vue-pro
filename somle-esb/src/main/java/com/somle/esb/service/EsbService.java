@@ -1,39 +1,31 @@
 package com.somle.esb.service;
 
-import cn.iocoder.yudao.module.system.controller.admin.user.vo.user.UserSaveReqVO;
 import cn.iocoder.yudao.module.system.service.dept.DeptService;
 import cn.iocoder.yudao.module.system.service.user.AdminUserService;
 import com.somle.ai.model.AiName;
 import com.somle.ai.service.AiService;
 import com.somle.amazon.service.AmazonService;
-import com.somle.dingtalk.model.DingTalkDepartment;
 import com.somle.dingtalk.service.DingTalkService;
 import com.somle.eccang.model.EccangOrder;
 import com.somle.eccang.model.EccangProduct;
 import com.somle.eccang.model.EccangResponse;
 import com.somle.eccang.service.EccangService;
-import com.somle.erp.model.ErpCountrySku;
+import com.somle.erp.model.product.ErpCountrySku;
+import com.somle.erp.service.ErpProductService;
 import com.somle.erp.service.ErpService;
 import com.somle.esb.converter.DingTalkToErpConverter;
 import com.somle.esb.converter.EccangToErpConverter;
 import com.somle.esb.converter.ErpToEccangConverter;
 import com.somle.esb.converter.ErpToKingdeeConverter;
-import com.somle.esb.job.DataJob;
 import com.somle.esb.model.Domain;
-import com.somle.esb.model.EsbMapping;
 import com.somle.esb.model.OssData;
-import com.somle.esb.repository.EsbMappingRepository;
 import com.somle.framework.common.util.general.CoreUtils;
 import com.somle.kingdee.service.KingdeeService;
 import com.somle.matomo.service.MatomoService;
-import jakarta.annotation.PostConstruct;
-import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.jupiter.api.Test;
 import org.quartz.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
-import org.springframework.data.domain.Example;
 import org.springframework.integration.annotation.ServiceActivator;
 import org.springframework.integration.support.MessageBuilder;
 import org.springframework.messaging.Message;
@@ -70,7 +62,7 @@ public class EsbService {
     MatomoService matomoService;
 
     @Autowired
-    ErpService erpService;
+    ErpProductService erpProductService;
 
     @Autowired
     DeptService deptService;
@@ -393,7 +385,7 @@ public class EsbService {
     public boolean handleProducts(Message<EccangProduct> message) {
         var product = message.getPayload();
         var erpProduct = eccangToErpConverter.toEsb(product);
-        erpService.saveProduct(erpProduct);
+        erpProductService.saveProduct(erpProduct);
         var kingdeeProduct = erpToKingdeeConverter.toKingdee(erpProduct);
         kingdeeService.addProduct(kingdeeProduct);
         return true;

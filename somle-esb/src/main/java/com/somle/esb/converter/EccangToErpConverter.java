@@ -4,6 +4,8 @@ import com.somle.eccang.model.EccangOrder;
 import com.somle.eccang.model.EccangProduct;
 import com.somle.eccang.service.EccangService;
 import com.somle.erp.model.*;
+import com.somle.erp.model.product.ErpCountrySku;
+import com.somle.erp.model.product.ErpStyleSku;
 import com.somle.erp.service.ErpService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

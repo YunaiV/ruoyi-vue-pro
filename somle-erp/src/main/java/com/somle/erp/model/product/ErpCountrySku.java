@@ -1,4 +1,4 @@
-package com.somle.erp.model;
+package com.somle.erp.model.product;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -12,20 +12,17 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 
-// @AllArgsConstructor
-// @NoArgsConstructor
-// class Sku implements Serializable {
-//     protected String modelSku;
-//     protected String styleCode;
-//     protected String countryCode;
-// }
+
 
 @Entity
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-// @IdClass(Sku.class)
 public class ErpCountrySku {
+
+    @Id
+    private String countrySku;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "style_sku")
     ErpStyleSku styleSku;
@@ -37,8 +34,7 @@ public class ErpCountrySku {
     // @Id
     //@NotNull
     private String countryCode;
-    @Id
-    private String countrySku;
+
     //@NotNull
     private String logisticAttribute;
     //@NotNull

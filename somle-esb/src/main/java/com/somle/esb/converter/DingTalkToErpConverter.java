@@ -29,8 +29,6 @@ public class DingTalkToErpConverter {
     @Autowired
     DingTalkService dingTalkService;
 
-    @Autowired
-    ErpService erpService;
 
     @Autowired
     DeptService deptService;

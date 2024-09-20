@@ -1,14 +1,9 @@
 package com.somle.erp.controller;
 
 import com.somle.erp.model.ErpDepartment;
-import com.somle.erp.model.ErpStyleSku;
 import com.somle.erp.service.ErpService;
 
-import com.somle.framework.common.pojo.CommonResult;
-import com.somle.framework.common.util.json.JsonUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.web.bind.annotation.*;
 

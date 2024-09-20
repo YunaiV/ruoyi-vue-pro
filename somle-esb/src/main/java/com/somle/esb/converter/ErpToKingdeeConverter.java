@@ -3,11 +3,10 @@ package com.somle.esb.converter;
 import java.time.LocalDateTime;
 
 import cn.iocoder.yudao.module.system.controller.admin.dept.vo.dept.DeptSaveReqVO;
-import com.somle.erp.model.ErpCountrySku;
-import com.somle.erp.model.ErpStyleSku;
+import com.somle.erp.model.product.ErpCountrySku;
+import com.somle.erp.model.product.ErpStyleSku;
 import com.somle.kingdee.model.KingdeeProduct;
 import com.somle.kingdee.service.KingdeeService;
-import com.somle.erp.model.ErpDepartment;
 import com.somle.kingdee.model.KingdeeAuxInfoDetail;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

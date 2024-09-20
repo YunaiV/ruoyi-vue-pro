@@ -1,4 +1,4 @@
-package com.somle.erp.model;
+package com.somle.erp.model.product;
 
 import java.util.List;
 
