@@ -5,7 +5,9 @@ import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 // TODO @芋艿：后续再详细 review 一轮
 // TODO @芋艿：可能改成 DeliveryPickUpStoreUserDO

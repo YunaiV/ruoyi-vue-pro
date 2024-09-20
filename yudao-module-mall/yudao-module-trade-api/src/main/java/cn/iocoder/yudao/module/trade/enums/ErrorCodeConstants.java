@@ -80,6 +80,7 @@ public interface ErrorCodeConstants {
 
     // ==========  物流 PICK_UP 模块 1-011-006-000 ==========
     ErrorCode PICK_UP_STORE_NOT_EXISTS = new ErrorCode(1_011_006_000, "自提门店不存在");
+    ErrorCode PICK_UP_STORE_STAFF_NOT_EXISTS = new ErrorCode(1_011_006_000, "自提门店店员不存在");
 
     // ========== 分销用户 模块 1-011-007-000 ==========
     ErrorCode BROKERAGE_USER_NOT_EXISTS = new ErrorCode(1_011_007_000, "分销用户不存在");

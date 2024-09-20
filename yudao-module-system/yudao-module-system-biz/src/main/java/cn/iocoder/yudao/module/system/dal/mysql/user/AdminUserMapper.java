@@ -25,14 +25,18 @@ public interface AdminUserMapper extends BaseMapperX<AdminUserDO> {
         return selectOne(AdminUserDO::getMobile, mobile);
     }
 
-    default PageResult<AdminUserDO> selectPage(UserPageReqVO reqVO, Collection<Long> deptIds) {
-        return selectPage(reqVO, new LambdaQueryWrapperX<AdminUserDO>()
+    default PageResult<AdminUserDO> selectPage(UserPageReqVO reqVO, Collection<Long> deptIds,List<Long> userIds) {
+        LambdaQueryWrapperX<AdminUserDO> adminUserDOLambdaQueryWrapperX = new LambdaQueryWrapperX<AdminUserDO>()
                 .likeIfPresent(AdminUserDO::getUsername, reqVO.getUsername())
                 .likeIfPresent(AdminUserDO::getMobile, reqVO.getMobile())
                 .eqIfPresent(AdminUserDO::getStatus, reqVO.getStatus())
                 .betweenIfPresent(AdminUserDO::getCreateTime, reqVO.getCreateTime())
                 .inIfPresent(AdminUserDO::getDeptId, deptIds)
-                .orderByDesc(AdminUserDO::getId));
+                .orderByDesc(AdminUserDO::getId);
+        if(userIds != null){
+            adminUserDOLambdaQueryWrapperX.in(AdminUserDO::getId, userIds);
+        }
+        return selectPage(reqVO, adminUserDOLambdaQueryWrapperX);
     }
 
     default List<AdminUserDO> selectListByNickname(String nickname) {

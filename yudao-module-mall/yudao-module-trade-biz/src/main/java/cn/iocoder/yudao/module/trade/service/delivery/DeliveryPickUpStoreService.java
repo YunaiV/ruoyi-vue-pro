@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.trade.service.delivery;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.module.trade.controller.admin.delivery.vo.pickup.DeliveryPickUpBindStoreStaffIdReqVO;
 import cn.iocoder.yudao.module.trade.controller.admin.delivery.vo.pickup.DeliveryPickUpStoreCreateReqVO;
 import cn.iocoder.yudao.module.trade.controller.admin.delivery.vo.pickup.DeliveryPickUpStorePageReqVO;
 import cn.iocoder.yudao.module.trade.controller.admin.delivery.vo.pickup.DeliveryPickUpStoreUpdateReqVO;
@@ -67,7 +68,16 @@ public interface DeliveryPickUpStoreService {
      * 获得指定状态的自提门店列表
      *
      * @param status 状态
+     * @param storeIds 指定门店id
      * @return 自提门店列表
      */
-    List<DeliveryPickUpStoreDO> getDeliveryPickUpStoreListByStatus(Integer status);
+    List<DeliveryPickUpStoreDO> getDeliveryPickUpStoreListByStatus(Integer status, List<Long> storeIds);
+
+    /**
+     * 绑定自提店员
+     *
+     * @param bindStoreStaffIdVO 绑定数据
+     * @return
+     */
+    void bindDeliveryPickUpBindStoreStaffId(DeliveryPickUpBindStoreStaffIdReqVO bindStoreStaffIdVO);
 }
