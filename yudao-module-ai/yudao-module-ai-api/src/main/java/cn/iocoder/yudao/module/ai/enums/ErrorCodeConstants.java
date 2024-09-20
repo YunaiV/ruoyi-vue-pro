@@ -4,7 +4,7 @@ import cn.iocoder.yudao.framework.common.exception.ErrorCode;
 
 /**
  * AI 错误码枚举类
- *
+ * <p>
  * ai 系统，使用 1-040-000-000 段
  */
 public interface ErrorCodeConstants {
@@ -45,9 +45,16 @@ public interface ErrorCodeConstants {
     // ========== API 音乐 1-040-006-000 ==========
     ErrorCode MUSIC_NOT_EXISTS = new ErrorCode(1_022_006_000, "音乐不存在!");
 
-
     // ========== API 写作 1-022-007-000 ==========
     ErrorCode WRITE_NOT_EXISTS = new ErrorCode(1_022_007_000, "作文不存在!");
     ErrorCode WRITE_STREAM_ERROR = new ErrorCode(1_022_07_001, "写作生成异常!");
+
+    // ========== API 思维导图 1-040-008-000 ==========
+    ErrorCode MIND_MAP_NOT_EXISTS = new ErrorCode(1_040_008_000, "思维导图不存在!");
+
+    // ========== API 知识库 1-022-008-000 ==========
+    ErrorCode KNOWLEDGE_NOT_EXISTS = new ErrorCode(1_022_008_000, "知识库不存在!");
+    ErrorCode KNOWLEDGE_DOCUMENT_NOT_EXISTS = new ErrorCode(1_022_008_001, "文档不存在!");
+    ErrorCode KNOWLEDGE_SEGMENT_NOT_EXISTS = new ErrorCode(1_022_008_002, "段落不存在!");
 
 }

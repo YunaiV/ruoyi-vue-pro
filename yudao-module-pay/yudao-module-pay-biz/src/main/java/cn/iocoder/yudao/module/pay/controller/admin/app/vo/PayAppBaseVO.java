@@ -14,6 +14,10 @@ import jakarta.validation.constraints.*;
 @Data
 public class PayAppBaseVO {
 
+    @Schema(description = "应用标识", requiredMode = Schema.RequiredMode.REQUIRED, example = "yudao")
+    @NotEmpty(message = "应用标识不能为空")
+    private String appKey;
+
     @Schema(description = "应用名", requiredMode = Schema.RequiredMode.REQUIRED, example = "小豆")
     @NotNull(message = "应用名不能为空")
     private String name;

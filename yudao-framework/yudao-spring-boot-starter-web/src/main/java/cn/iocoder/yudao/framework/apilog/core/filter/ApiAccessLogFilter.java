@@ -9,7 +9,6 @@ import cn.hutool.core.util.BooleanUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.apilog.core.annotation.ApiAccessLog;
 import cn.iocoder.yudao.framework.apilog.core.enums.OperateTypeEnum;
-import cn.iocoder.yudao.framework.apilog.core.service.ApiAccessLogFrameworkService;
 import cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
@@ -18,6 +17,7 @@ import cn.iocoder.yudao.framework.common.util.servlet.ServletUtils;
 import cn.iocoder.yudao.framework.web.config.WebProperties;
 import cn.iocoder.yudao.framework.web.core.filter.ApiRequestFilter;
 import cn.iocoder.yudao.framework.web.core.util.WebFrameworkUtils;
+import cn.iocoder.yudao.module.infra.api.logger.ApiAccessLogApi;
 import cn.iocoder.yudao.module.infra.api.logger.dto.ApiAccessLogCreateReqDTO;
 import com.fasterxml.jackson.databind.JsonNode;
 import io.swagger.v3.oas.annotations.Operation;
@@ -36,7 +36,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.Iterator;
 import java.util.Map;
 
-import static cn.iocoder.yudao.framework.apilog.core.interceptor.ApiAccessLogInterceptor.*;
+import static cn.iocoder.yudao.framework.apilog.core.interceptor.ApiAccessLogInterceptor.ATTRIBUTE_HANDLER_METHOD;
 import static cn.iocoder.yudao.framework.common.util.json.JsonUtils.toJsonString;
 
 /**
@@ -53,12 +53,12 @@ public class ApiAccessLogFilter extends ApiRequestFilter {
 
     private final String applicationName;
 
-    private final ApiAccessLogFrameworkService apiAccessLogFrameworkService;
+    private final ApiAccessLogApi apiAccessLogApi;
 
-    public ApiAccessLogFilter(WebProperties webProperties, String applicationName, ApiAccessLogFrameworkService apiAccessLogFrameworkService) {
+    public ApiAccessLogFilter(WebProperties webProperties, String applicationName, ApiAccessLogApi apiAccessLogApi) {
         super(webProperties);
         this.applicationName = applicationName;
-        this.apiAccessLogFrameworkService = apiAccessLogFrameworkService;
+        this.apiAccessLogApi = apiAccessLogApi;
     }
 
     @Override
@@ -91,7 +91,7 @@ public class ApiAccessLogFilter extends ApiRequestFilter {
             if (!enable) {
                 return;
             }
-            apiAccessLogFrameworkService.createApiAccessLog(accessLog);
+            apiAccessLogApi.createApiAccessLogAsync(accessLog);
         } catch (Throwable th) {
             log.error("[createApiAccessLog][url({}) log({}) 发生异常]", request.getRequestURI(), toJsonString(accessLog), th);
         }

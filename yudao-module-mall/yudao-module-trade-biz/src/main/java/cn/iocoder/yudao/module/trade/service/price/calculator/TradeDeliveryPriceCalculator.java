@@ -4,6 +4,7 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
+import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.module.member.api.address.MemberAddressApi;
 import cn.iocoder.yudao.module.member.api.address.dto.MemberAddressRespDTO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.config.TradeConfigDO;
@@ -17,11 +18,11 @@ import cn.iocoder.yudao.module.trade.service.delivery.bo.DeliveryExpressTemplate
 import cn.iocoder.yudao.module.trade.service.price.bo.TradePriceCalculateReqBO;
 import cn.iocoder.yudao.module.trade.service.price.bo.TradePriceCalculateRespBO;
 import cn.iocoder.yudao.module.trade.service.price.bo.TradePriceCalculateRespBO.OrderItem;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
-import jakarta.annotation.Resource;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -55,7 +56,11 @@ public class TradeDeliveryPriceCalculator implements TradePriceCalculator {
         if (param.getDeliveryType() == null) {
             return;
         }
-        // TODO @puhui999：需要校验，是不是存在商品不能门店自提，或者不能快递发货的情况。就是说，配送方式不匹配哈
+        // 校验是不是存在商品不能门店自提，或者不能快递发货的情况。就是说，配送方式不匹配哈
+        if (CollectionUtils.anyMatch(result.getItems(), item -> !item.getDeliveryTypes().contains(param.getDeliveryType()))) {
+            throw exception(PRICE_CALCULATE_DELIVERY_PRICE_TYPE_ILLEGAL);
+        }
+
         if (DeliveryTypeEnum.PICK_UP.getType().equals(param.getDeliveryType())) {
             calculateByPickUp(param);
         } else if (DeliveryTypeEnum.EXPRESS.getType().equals(param.getDeliveryType())) {
@@ -90,7 +95,12 @@ public class TradeDeliveryPriceCalculator implements TradePriceCalculator {
             return;
         }
 
-        // 情况二：快递模版
+        // 情况二：活动包邮
+        if (Boolean.TRUE.equals(result.getFreeDelivery())) {
+            return;
+        }
+
+        // 情况三：快递模版
         // 2.1 过滤出已选中的商品 SKU
         List<OrderItem> selectedItem = filterList(result.getItems(), OrderItem::getSelected);
         Set<Long> deliveryTemplateIds = convertSet(selectedItem, OrderItem::getDeliveryTemplateId);
@@ -124,7 +134,7 @@ public class TradeDeliveryPriceCalculator implements TradePriceCalculator {
         Map<Long, List<OrderItem>> template2ItemMap = convertMultiMap(selectedSkus, OrderItem::getDeliveryTemplateId);
         // 依次计算快递运费
         for (Map.Entry<Long, List<OrderItem>> entry : template2ItemMap.entrySet()) {
-            Long templateId  = entry.getKey();
+            Long templateId = entry.getKey();
             List<OrderItem> orderItems = entry.getValue();
             DeliveryExpressTemplateRespBO templateBO = expressTemplateMap.get(templateId);
             if (templateBO == null) {
@@ -144,8 +154,8 @@ public class TradeDeliveryPriceCalculator implements TradePriceCalculator {
     /**
      * 按配送方式来计算运费
      *
-     * @param orderItems SKU 商品项目
-     * @param chargeMode  配送计费方式
+     * @param orderItems     SKU 商品项目
+     * @param chargeMode     配送计费方式
      * @param templateCharge 快递运费配置
      */
     private void calculateExpressFeeByChargeMode(List<OrderItem> orderItems, Integer chargeMode,

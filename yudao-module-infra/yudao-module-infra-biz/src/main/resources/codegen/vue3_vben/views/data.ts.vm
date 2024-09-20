@@ -42,9 +42,17 @@ export const searchFormSchema: FormSchema[] = [
 #foreach($column in $columns)
 #if ($column.listOperation)
   #set ($dictType=$column.dictType)
+  #set ($javaType = $column.javaType)
   #set ($javaField = $column.javaField)
   #set ($AttrName=$column.javaField.substring(0,1).toUpperCase() + ${column.javaField.substring(1)})
   #set ($comment=$column.columnComment)
+  #if ($javaType == "Integer" || $javaType == "Long" || $javaType == "Byte" || $javaType == "Short")
+    #set ($dictMethod = "number")
+  #elseif ($javaType == "String")
+    #set ($dictMethod = "string")
+  #elseif ($javaType == "Boolean")
+    #set ($dictMethod = "boolean")
+  #end
   {
     label: '${comment}',
     field: '${javaField}',
@@ -54,16 +62,16 @@ export const searchFormSchema: FormSchema[] = [
     component: 'Select',
     componentProps: {
       #if ("" != $dictType)## 设置了 dictType 数据字典的情况
-        options: getDictOptions(DICT_TYPE.$dictType.toUpperCase()),
+        options: getDictOptions(DICT_TYPE.$dictType.toUpperCase(), '$dictMethod'),
       #else## 未设置 dictType 数据字典的情况
         options: [],
       #end
     },
   #elseif ($column.htmlType == "radio")
-    component: 'Radio',
+    component: 'RadioButtonGroup',
     componentProps: {
       #if ("" != $dictType)## 设置了 dictType 数据字典的情况
-        options: getDictOptions(DICT_TYPE.$dictType.toUpperCase()),
+        options: getDictOptions(DICT_TYPE.$dictType.toUpperCase(), '$dictMethod'),
       #else## 未设置 dictType 数据字典的情况
         options: [],
       #end
@@ -87,9 +95,17 @@ export const createFormSchema: FormSchema[] = [
 #foreach($column in $columns)
 #if ($column.createOperation)
   #set ($dictType = $column.dictType)
+  #set ($javaType = $column.javaType)
   #set ($javaField = $column.javaField)
   #set ($AttrName = $column.javaField.substring(0,1).toUpperCase() + ${column.javaField.substring(1)})
   #set ($comment = $column.columnComment)
+  #if ($javaType == "Integer" || $javaType == "Long" || $javaType == "Byte" || $javaType == "Short")
+    #set ($dictMethod = "number")
+  #elseif ($javaType == "String")
+    #set ($dictMethod = "string")
+  #elseif ($javaType == "Boolean")
+    #set ($dictMethod = "boolean")
+  #end
 #if (!$column.primaryKey)## 忽略主键，不用在表单里
   {
     label: '${comment}',
@@ -117,7 +133,7 @@ export const createFormSchema: FormSchema[] = [
     component: 'Select',
     componentProps: {
       #if ("" != $dictType)## 有数据字典
-        options: getDictOptions(DICT_TYPE.$dictType.toUpperCase(), 'number'),
+        options: getDictOptions(DICT_TYPE.$dictType.toUpperCase(), '$dictMethod'),
       #else##没数据字典
         options:[],
       #end
@@ -126,7 +142,7 @@ export const createFormSchema: FormSchema[] = [
     component: 'Checkbox',
     componentProps: {
       #if ("" != $dictType)## 有数据字典
-        options: getDictOptions(DICT_TYPE.$dictType.toUpperCase(), 'number'),
+        options: getDictOptions(DICT_TYPE.$dictType.toUpperCase(), '$dictMethod'),
       #else##没数据字典
         options:[],
       #end
@@ -135,7 +151,7 @@ export const createFormSchema: FormSchema[] = [
     component: 'RadioButtonGroup',
     componentProps: {
       #if ("" != $dictType)## 有数据字典
-        options: getDictOptions(DICT_TYPE.$dictType.toUpperCase(), 'number'),
+        options: getDictOptions(DICT_TYPE.$dictType.toUpperCase(), '$dictMethod'),
       #else##没数据字典
         options:[],
       #end
@@ -166,9 +182,17 @@ export const updateFormSchema: FormSchema[] = [
 #foreach($column in $columns)
 #if ($column.updateOperation)
 #set ($dictType = $column.dictType)
+#set ($javaType = $column.javaType)
 #set ($javaField = $column.javaField)
 #set ($AttrName = $column.javaField.substring(0,1).toUpperCase() + ${column.javaField.substring(1)})
 #set ($comment = $column.columnComment)
+#if ($javaType == "Integer" || $javaType == "Long" || $javaType == "Byte" || $javaType == "Short")
+  #set ($dictMethod = "number")
+#elseif ($javaType == "String")
+  #set ($dictMethod = "string")
+#elseif ($javaType == "Boolean")
+  #set ($dictMethod = "boolean")
+#end
   #if (!$column.primaryKey)## 忽略主键，不用在表单里
   {
     label: '${comment}',
@@ -196,7 +220,7 @@ export const updateFormSchema: FormSchema[] = [
     component: 'Select',
     componentProps: {
       #if ("" != $dictType)## 有数据字典
-      options: getDictOptions(DICT_TYPE.$dictType.toUpperCase(), 'number'),
+      options: getDictOptions(DICT_TYPE.$dictType.toUpperCase(), '$dictMethod'),
       #else##没数据字典
       options:[],
       #end
@@ -205,7 +229,7 @@ export const updateFormSchema: FormSchema[] = [
     component: 'Checkbox',
     componentProps: {
       #if ("" != $dictType)## 有数据字典
-      options: getDictOptions(DICT_TYPE.$dictType.toUpperCase(), 'number'),
+      options: getDictOptions(DICT_TYPE.$dictType.toUpperCase(), '$dictMethod'),
       #else##没数据字典
       options:[],
       #end
@@ -214,7 +238,7 @@ export const updateFormSchema: FormSchema[] = [
     component: 'RadioButtonGroup',
     componentProps: {
       #if ("" != $dictType)## 有数据字典
-      options: getDictOptions(DICT_TYPE.$dictType.toUpperCase(), 'number'),
+      options: getDictOptions(DICT_TYPE.$dictType.toUpperCase(), '$dictMethod'),
       #else##没数据字典
       options:[],
       #end

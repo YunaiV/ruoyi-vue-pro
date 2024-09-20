@@ -23,11 +23,11 @@ import cn.iocoder.yudao.module.promotion.dal.dataobject.seckill.SeckillConfigDO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.seckill.SeckillProductDO;
 import cn.iocoder.yudao.module.promotion.dal.mysql.seckill.seckillactivity.SeckillActivityMapper;
 import cn.iocoder.yudao.module.promotion.dal.mysql.seckill.seckillactivity.SeckillProductMapper;
+import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
-import jakarta.annotation.Resource;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Collections;
@@ -276,7 +276,7 @@ public class SeckillActivityServiceImpl implements SeckillActivityService {
     }
 
     @Override
-    public List<SeckillProductDO> getSeckillProductListByActivityId(Collection<Long> activityIds) {
+    public List<SeckillProductDO> getSeckillProductListByActivityIds(Collection<Long> activityIds) {
         return seckillProductMapper.selectListByActivityId(activityIds);
     }
 
@@ -334,6 +334,11 @@ public class SeckillActivityServiceImpl implements SeckillActivityService {
         // 2.查询活动详情
         return seckillActivityMapper.selectListByIdsAndDateTimeLt(
                 convertSet(spuIdAndActivityIdMaps, map -> MapUtil.getLong(map, "activityId")), dateTime);
+    }
+
+    @Override
+    public List<SeckillActivityDO> getSeckillActivityListByIds(Collection<Long> ids) {
+        return seckillActivityMapper.selectList(SeckillActivityDO::getId, ids);
     }
 
 }
