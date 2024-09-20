@@ -21,5 +21,10 @@ public interface ErrorCodeConstants {
 
     // ========== IoT 设备 1-050-003-000 ============
     ErrorCode DEVICE_NOT_EXISTS = new ErrorCode(1_050_003_000, "设备不存在");
+    ErrorCode DEVICE_NAME_EXISTS = new ErrorCode(1_050_003_001, "设备名称在同一产品下必须唯一");
+    ErrorCode DEVICE_HAS_CHILDREN = new ErrorCode(1_050_003_002, "有子设备，不允许删除");
+    ErrorCode DEVICE_NAME_CANNOT_BE_MODIFIED = new ErrorCode(1_050_003_003, "设备名称不能修改");
+    ErrorCode DEVICE_PRODUCT_CANNOT_BE_MODIFIED = new ErrorCode(1_050_003_004, "产品不能修改");
+    ErrorCode DEVICE_INVALID_DEVICE_STATUS = new ErrorCode(1_050_003_005, "无效的设备状态");
 
 }
