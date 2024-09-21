@@ -25,7 +25,7 @@ public class PointProductSaveReqVO {
 
     @Schema(description = "可兑换数量", requiredMode = Schema.RequiredMode.REQUIRED, example = "3926")
     @NotNull(message = "可兑换数量不能为空")
-    private Integer maxCount;
+    private Integer count;
 
     @Schema(description = "兑换积分", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "兑换积分不能为空")
@@ -35,9 +35,9 @@ public class PointProductSaveReqVO {
     @NotNull(message = "兑换金额，单位：分不能为空")
     private Integer price;
 
-    @Schema(description = "兑换类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "2")
-    @NotNull(message = "兑换类型不能为空")
-    private Integer type;
+    @Schema(description = "积分商城商品库存", requiredMode = Schema.RequiredMode.REQUIRED, example = "100")
+    @NotNull(message = "积分商城商品不能为空")
+    private Integer stock;
 
     @Schema(description = "积分商城商品状态", requiredMode = Schema.RequiredMode.REQUIRED, example = "2")
     @NotNull(message = "积分商城商品状态不能为空")

@@ -29,6 +29,13 @@ public interface PointActivityService {
     void updatePointActivity(@Valid PointActivitySaveReqVO updateReqVO);
 
     /**
+     * 关闭积分商城活动
+     *
+     * @param id 编号
+     */
+    void closePointActivity(Long id);
+
+    /**
      * 删除积分商城活动
      *
      * @param id 编号

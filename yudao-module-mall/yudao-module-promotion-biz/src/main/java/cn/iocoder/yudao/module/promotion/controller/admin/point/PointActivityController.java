@@ -51,6 +51,15 @@ public class PointActivityController {
         return success(true);
     }
 
+    @PutMapping("/close")
+    @Operation(summary = "关闭积分商城活动")
+    @Parameter(name = "id", description = "编号", required = true)
+    @PreAuthorize("@ss.hasPermission('promotion:point-activity:close')")
+    public CommonResult<Boolean> closeSeckillActivity(@RequestParam("id") Long id) {
+        pointActivityService.closePointActivity(id);
+        return success(true);
+    }
+
     @DeleteMapping("/delete")
     @Operation(summary = "删除积分商城活动")
     @Parameter(name = "id", description = "编号", required = true)

@@ -45,4 +45,13 @@ public class PointActivityDO extends BaseDO {
      */
     private Integer sort;
 
+    /**
+     * 积分商城活动库存(剩余库存积分兑换时扣减)
+     */
+    private Integer stock;
+    /**
+     * 积分商城活动总库存
+     */
+    private Integer totalStock;
+
 }
