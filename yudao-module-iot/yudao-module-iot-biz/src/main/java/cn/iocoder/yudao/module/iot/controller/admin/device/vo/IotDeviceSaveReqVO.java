@@ -7,16 +7,16 @@ import lombok.Data;
 @Data
 public class IotDeviceSaveReqVO {
 
-    @Schema(description = "设备 ID，主键，自增", requiredMode = Schema.RequiredMode.REQUIRED, example = "177")
+    @Schema(description = "设备编号", example = "177")
     private Long id;
 
-    @Schema(description = "设备名称，在产品内唯一，用于标识设备", requiredMode = Schema.RequiredMode.REQUIRED, example = "王五")
+    @Schema(description = "设备名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "王五")
     private String deviceName;
 
-    @Schema(description = "设备备注名称，供用户自定义备注", example = "张三")
+    @Schema(description = "备注名称", example = "张三")
     private String nickname;
 
-    @Schema(description = "产品 ID", requiredMode = Schema.RequiredMode.REQUIRED, example = "26202")
+    @Schema(description = "产品编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "26202")
     private Long productId;
 
 }

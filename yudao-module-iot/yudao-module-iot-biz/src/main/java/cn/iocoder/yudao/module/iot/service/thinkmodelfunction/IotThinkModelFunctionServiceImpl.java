@@ -170,7 +170,6 @@ public class IotThinkModelFunctionServiceImpl implements IotThinkModelFunctionSe
 
         // 3.1 使用 diffList 方法比较新旧列表
         List<List<IotThinkModelFunctionDO>> diffResult = diffList(oldFunctionList, newFunctionList,
-                // TODO @haohao：是不是用 id 比较相同就 ok 哈。如果可以的化，下面的 update 可以更简单
                 // 继续使用 identifier 和 type 进行比较：这样可以准确地匹配对应的功能对象。
                 (oldFunc, newFunc) -> Objects.equals(oldFunc.getIdentifier(), newFunc.getIdentifier())
                         && Objects.equals(oldFunc.getType(), newFunc.getType()));
@@ -191,6 +190,7 @@ public class IotThinkModelFunctionServiceImpl implements IotThinkModelFunctionSe
                     thinkModelFunctionMapper.updateById(updateFunc);
                 }
             }
+            // TODO @haohao：seckillProductMapper.updateBatch(diffList.get(1)); 可以直接类似这么操作哇？
         }
         if (CollUtil.isNotEmpty(deleteList)) {
             Set<Long> idsToDelete = CollectionUtils.convertSet(deleteList, IotThinkModelFunctionDO::getId);

@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.iot.dal.dataobject.device;
 
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.product.IotProductDO;
+import cn.iocoder.yudao.module.iot.enums.device.IotDeviceStatusEnum;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -13,7 +14,7 @@ import java.time.LocalDateTime;
 /**
  * IoT 设备 DO
  *
- * @author 芋道源码
+ * @author haohao
  */
 @TableName("iot_device")
 @KeySequence("iot_device_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
@@ -39,33 +40,48 @@ public class IotDeviceDO extends BaseDO {
      */
     private String deviceName;
     /**
-     * 产品 ID，关联 iot_product 表的 id
+     * 设备备注名称
+     */
+    private String nickname;
+    /**
+     * 设备序列号
+     */
+    private String serialNumber;
+
+    /**
+     * 产品编号
+     *
      * 关联 {@link IotProductDO#getId()}
      */
     private Long productId;
     /**
-     * 产品 Key，关联 iot_product 表的 product_key
-     * 关联 {@link IotProductDO#getProductKey()}
+     * 产品标识
+     *
+     * 冗余 {@link IotProductDO#getProductKey()}
      */
     private String productKey;
     /**
-     * 设备类型：0 - 直连设备，1 - 网关子设备，2 - 网关设备
-     * 关联 {@link IotProductDO#getDeviceType()}
+     * 设备类型
+     *
+     * 冗余 {@link IotProductDO#getDeviceType()}
      */
     private Integer deviceType;
+
     /**
-     * 设备备注名称，供用户自定义备注
-     */
-    private String nickname;
-    /**
-     * 网关设备 ID，子设备需要关联的网关设备 ID
-     */
-    private Long gatewayId;
-    /**
-     * 设备状态：0 - 未激活，1 - 在线，2 - 离线，3 - 已禁用
-     * 关联 {@link cn.iocoder.yudao.module.iot.enums.device.IotDeviceStatusEnum}
+     * 设备状态
+     *
+     * 枚举 {@link IotDeviceStatusEnum}
      */
     private Integer status;
+    /**
+     * 网关设备编号
+     *
+     * 子设备需要关联的网关设备 ID
+     *
+     * 关联 {@link IotDeviceDO#getId()}
+     */
+    private Long gatewayId;
+
     /**
      * 设备状态最后更新时间
      */
@@ -82,6 +98,7 @@ public class IotDeviceDO extends BaseDO {
      * 设备激活时间
      */
     private LocalDateTime activeTime;
+
     /**
      * 设备的 IP 地址
      */
@@ -90,6 +107,7 @@ public class IotDeviceDO extends BaseDO {
      * 设备的固件版本
      */
     private String firmwareVersion;
+
     /**
      * 设备密钥，用于设备认证，需安全存储
      */
@@ -109,26 +127,26 @@ public class IotDeviceDO extends BaseDO {
     /**
      * 认证类型（如一机一密、动态注册）
      */
+    // TODO @haohao：是不是要枚举哈
     private String authType;
+
     /**
-     * 设备位置的纬度，范围 -90.000000 ~ 90.000000
+     * 设备位置的纬度
      */
     private BigDecimal latitude;
     /**
-     * 设备位置的经度，范围 -180.000000 ~ 180.000000
+     * 设备位置的经度
      */
     private BigDecimal longitude;
     /**
-     * 地区编码，符合国家地区编码标准，关联地区表
+     * 地区编码
+     *
+     * 关联 Area 的 id
      */
     private Integer areaId;
     /**
      * 设备详细地址
      */
     private String address;
-    /**
-     * 设备序列号
-     */
-    private String serialNumber;
 
 }

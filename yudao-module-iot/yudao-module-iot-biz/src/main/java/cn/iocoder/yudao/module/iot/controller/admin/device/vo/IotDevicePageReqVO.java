@@ -1,10 +1,15 @@
 package cn.iocoder.yudao.module.iot.controller.admin.device.vo;
 
-import lombok.*;
-import io.swagger.v3.oas.annotations.media.Schema;
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
-import java.math.BigDecimal;
+import cn.iocoder.yudao.framework.common.validation.InEnum;
+import cn.iocoder.yudao.module.iot.enums.device.IotDeviceStatusEnum;
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import org.springframework.format.annotation.DateTimeFormat;
+
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
@@ -15,28 +20,32 @@ import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_
 @ToString(callSuper = true)
 public class IotDevicePageReqVO extends PageParam {
 
-    @Schema(description = "设备唯一标识符，全局唯一，用于识别设备")
+    // TODO @芋艿：需要去掉一些多余的字段；
+
+    @Schema(description = "设备唯一标识符", example = "24602")
     private String deviceKey;
 
-    @Schema(description = "设备名称，在产品内唯一，用于标识设备", example = "王五")
+    @Schema(description = "设备名称", example = "王五")
     private String deviceName;
 
-    @Schema(description = "产品 ID，关联 iot_product 表的 id", example = "26202")
+    @Schema(description = "产品编号", example = "26202")
     private Long productId;
 
-    @Schema(description = "产品 Key，关联 iot_product 表的 product_key")
+    @Schema(description = "产品标识")
     private String productKey;
 
-    @Schema(description = "设备类型：0 - 直连设备，1 - 网关子设备，2 - 网关设备", example = "1")
+    @Schema(description = "设备类型", example = "1")
+    // TODO @haohao：需要有个设备类型的枚举
     private Integer deviceType;
 
-    @Schema(description = "设备备注名称，供用户自定义备注", example = "张三")
+    @Schema(description = "备注名称", example = "张三")
     private String nickname;
 
-    @Schema(description = "网关设备 ID，子设备需要关联的网关设备 ID", example = "16380")
+    @Schema(description = "网关设备 ID", example = "16380")
     private Long gatewayId;
 
-    @Schema(description = "设备状态：0 - 未激活，1 - 在线，2 - 离线，3 - 已禁用", example = "1")
+    @Schema(description = "设备状态", example = "1")
+    @InEnum(IotDeviceStatusEnum.class)
     private Integer status;
 
     @Schema(description = "设备状态最后更新时间")

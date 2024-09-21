@@ -37,14 +37,14 @@ public class IotDeviceController {
     private IotDeviceService deviceService;
 
     @PostMapping("/create")
-    @Operation(summary = "创建IoT 设备")
+    @Operation(summary = "创建设备")
     @PreAuthorize("@ss.hasPermission('iot:device:create')")
     public CommonResult<Long> createDevice(@Valid @RequestBody IotDeviceSaveReqVO createReqVO) {
         return success(deviceService.createDevice(createReqVO));
     }
 
     @PutMapping("/update-status")
-    @Operation(summary = "更新IoT 设备状态")
+    @Operation(summary = "更新设备状态")
     @Parameter(name = "id", description = "编号", required = true)
     @Parameter(name = "status", description = "状态", required = true, example = "1")
     @PreAuthorize("@ss.hasPermission('iot:device:update')")
@@ -55,7 +55,7 @@ public class IotDeviceController {
     }
 
     @PutMapping("/update")
-    @Operation(summary = "更新IoT 设备")
+    @Operation(summary = "更新设备")
     @PreAuthorize("@ss.hasPermission('iot:device:update')")
     public CommonResult<Boolean> updateDevice(@Valid @RequestBody IotDeviceSaveReqVO updateReqVO) {
         deviceService.updateDevice(updateReqVO);
@@ -63,7 +63,7 @@ public class IotDeviceController {
     }
 
     @DeleteMapping("/delete")
-    @Operation(summary = "删除IoT 设备")
+    @Operation(summary = "删除设备")
     @Parameter(name = "id", description = "编号", required = true)
     @PreAuthorize("@ss.hasPermission('iot:device:delete')")
     public CommonResult<Boolean> deleteDevice(@RequestParam("id") Long id) {
@@ -72,7 +72,7 @@ public class IotDeviceController {
     }
 
     @GetMapping("/get")
-    @Operation(summary = "获得IoT 设备")
+    @Operation(summary = "获得设备")
     @Parameter(name = "id", description = "编号", required = true, example = "1024")
     @PreAuthorize("@ss.hasPermission('iot:device:query')")
     public CommonResult<IotDeviceRespVO> getDevice(@RequestParam("id") Long id) {
@@ -81,7 +81,7 @@ public class IotDeviceController {
     }
 
     @GetMapping("/page")
-    @Operation(summary = "获得IoT 设备分页")
+    @Operation(summary = "获得设备分页")
     @PreAuthorize("@ss.hasPermission('iot:device:query')")
     public CommonResult<PageResult<IotDeviceRespVO>> getDevicePage(@Valid IotDevicePageReqVO pageReqVO) {
         PageResult<IotDeviceDO> pageResult = deviceService.getDevicePage(pageReqVO);
@@ -89,7 +89,7 @@ public class IotDeviceController {
     }
 
     @GetMapping("/export-excel")
-    @Operation(summary = "导出IoT 设备 Excel")
+    @Operation(summary = "导出设备 Excel")
     @PreAuthorize("@ss.hasPermission('iot:device:export')")
     @ApiAccessLog(operateType = EXPORT)
     public void exportDeviceExcel(@Valid IotDevicePageReqVO pageReqVO,

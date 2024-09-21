@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 @ExcelIgnoreUnannotated
 public class IotDeviceRespVO {
 
-    @Schema(description = "设备 ID，主键，自增", requiredMode = Schema.RequiredMode.REQUIRED, example = "177")
+    @Schema(description = "设备编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "177")
     private Long id;
 
     @Schema(description = "设备唯一标识符", requiredMode = Schema.RequiredMode.REQUIRED)
@@ -24,11 +24,11 @@ public class IotDeviceRespVO {
     @ExcelProperty("设备名称备")
     private String deviceName;
 
-    @Schema(description = "产品 ID", requiredMode = Schema.RequiredMode.REQUIRED, example = "26202")
+    @Schema(description = "产品编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "26202")
     @ExcelProperty("产品 ID")
     private Long productId;
 
-    @Schema(description = "产品 Key", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "产品标识", requiredMode = Schema.RequiredMode.REQUIRED)
     @ExcelProperty("产品 Key")
     private String productKey;
 
@@ -72,7 +72,7 @@ public class IotDeviceRespVO {
     @ExcelProperty("设备的固件版本")
     private String firmwareVersion;
 
-    @Schema(description = "设备密钥，用于设备认证，需安全存储")
+    @Schema(description = "设备密钥，用于设备认证")
     @ExcelProperty("设备密钥")
     private String deviceSecret;
 
@@ -92,16 +92,17 @@ public class IotDeviceRespVO {
     @ExcelProperty("认证类型（如一机一密、动态注册）")
     private String authType;
 
-    @Schema(description = "设备位置的纬度，范围 -90.000000 ~ 90.000000")
-    @ExcelProperty("设备位置的纬度，范围 -90.000000 ~ 90.000000")
+    // TODO @haohao：经纬度：可能 double 就够啦
+    @Schema(description = "设备位置的纬度，范围")
+    @ExcelProperty("设备位置的纬度")
     private BigDecimal latitude;
 
-    @Schema(description = "设备位置的经度，范围 -180.000000 ~ 180.000000")
-    @ExcelProperty("设备位置的经度，范围 -180.000000 ~ 180.000000")
+    @Schema(description = "设备位置的经度")
+    @ExcelProperty("设备位置的经度")
     private BigDecimal longitude;
 
-    @Schema(description = "地区编码，符合国家地区编码标准，关联地区表", example = "16995")
-    @ExcelProperty("地区编码，符合国家地区编码标准，关联地区表")
+    @Schema(description = "地区编码", example = "16995")
+    @ExcelProperty("地区编码")
     private Integer areaId;
 
     @Schema(description = "设备详细地址")

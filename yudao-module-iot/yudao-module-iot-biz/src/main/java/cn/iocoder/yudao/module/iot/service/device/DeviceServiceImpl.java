@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.iot.service.device;
 
+import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
@@ -34,6 +35,7 @@ public class DeviceServiceImpl implements IotDeviceService {
 
     @Resource
     private IotDeviceMapper deviceMapper;
+    // TODO @haohao：不直接调用 productmapper，通过 productservice；每一个模型，不直接使用对方的
     @Resource
     private IotProductMapper productMapper;
 
@@ -46,40 +48,33 @@ public class DeviceServiceImpl implements IotDeviceService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Long createDevice(IotDeviceSaveReqVO createReqVO) {
-        // 1. 转换 VO 为 DO
-        IotDeviceDO device = BeanUtils.toBean(createReqVO, IotDeviceDO.class);
-
-        // 2. 根据产品 ID 查询产品信息
+        // 1.1 校验产品是否存在
         IotProductDO product = productMapper.selectById(createReqVO.getProductId());
         if (product == null) {
             throw exception(PRODUCT_NOT_EXISTS);
         }
-        device.setProductKey(product.getProductKey());
-        device.setDeviceType(product.getDeviceType());
-
-        // 3. DeviceName 可以为空，当为空时，自动生成产品下的唯一标识符作为 DeviceName
-        if (StrUtil.isBlank(device.getDeviceName())) {
-            device.setDeviceName(generateUniqueDeviceName(createReqVO.getProductId()));
+        // 1.2 校验设备名称在同一产品下是否唯一
+        if (StrUtil.isBlank(createReqVO.getDeviceName())) {
+            createReqVO.setDeviceName(generateUniqueDeviceName(product.getProductKey()));
+        } else {
+            validateDeviceNameUnique(product.getProductKey(), createReqVO.getDeviceName());
         }
 
-        // 4. 校验设备名称在同一产品下是否唯一
-        validateDeviceNameUnique(device.getProductKey(), device.getDeviceName());
-
-        // 5. 生成并设置必要的字段
+        // 2.1 转换 VO 为 DO
+        IotDeviceDO device = BeanUtils.toBean(createReqVO, IotDeviceDO.class)
+                .setProductKey(product.getProductKey())
+                .setDeviceType(product.getDeviceType());
+        // 2.2 生成并设置必要的字段
         device.setDeviceKey(generateUniqueDeviceKey());
         device.setDeviceSecret(generateDeviceSecret());
         device.setMqttClientId(generateMqttClientId());
         device.setMqttUsername(generateMqttUsername(device.getDeviceName(), device.getProductKey()));
         device.setMqttPassword(generateMqttPassword());
-
-        // 6. 设置设备状态为未激活
+        // 2.3 设置设备状态为未激活
         device.setStatus(IotDeviceStatusEnum.INACTIVE.getStatus());
         device.setStatusLastUpdateTime(LocalDateTime.now());
-
-        // 7. 插入到数据库
+        // 2.4 插入到数据库
         deviceMapper.insert(device);
-
-        // 8. 返回生成的设备 ID
         return device.getId();
     }
 
@@ -111,7 +106,7 @@ public class DeviceServiceImpl implements IotDeviceService {
      * @return 生成的 deviceSecret
      */
     private String generateDeviceSecret() {
-        // 32 位随机字符串
+        // TODO @haohao：return IdUtil.fastSimpleUUID()
         return UUID.randomUUID().toString().replace("-", "");
     }
 
@@ -141,39 +136,25 @@ public class DeviceServiceImpl implements IotDeviceService {
      * @return 生成的 MQTT Password
      */
     private String generateMqttPassword() {
-        // 在实际应用中，建议使用更安全的方法生成 MQTT Password，如加密或哈希
+        // TODO @haohao：【后续优化】在实际应用中，建议使用更安全的方法生成 MQTT Password，如加密或哈希
         return UUID.randomUUID().toString();
     }
 
     /**
      * 生成唯一的 DeviceName
      *
-     * @param productId 产品 ID
+     * @param productKey 产品标识
      * @return 生成的唯一 DeviceName
      */
-    private String generateUniqueDeviceName(Long productId) {
-        // 实现逻辑以在产品下生成唯一的设备名称
-        String deviceName;
-        String productKey = getProductKey(productId);
-        do {
-            // 20 位随机字符串
-            deviceName = UUID.randomUUID().toString().replace("-", "").substring(0, 20);
-        } while (deviceMapper.selectByProductKeyAndDeviceName(productKey, deviceName) != null);
-        return deviceName;
-    }
-
-    /**
-     * 获取产品 Key
-     *
-     * @param productId 产品 ID
-     * @return 产品 Key
-     */
-    private String getProductKey(Long productId) {
-        IotProductDO product = productMapper.selectById(productId);
-        if (product == null) {
-            throw exception(PRODUCT_NOT_EXISTS);
+    private String generateUniqueDeviceName(String productKey) {
+        // TODO @haohao：业务逻辑里，尽量避免 while true。万一 bug = =；虽然这个不会哈。我先改了下
+        for (int i = 0; i < Short.MAX_VALUE; i++) {
+            String deviceName = IdUtil.fastSimpleUUID().substring(0, 20);
+            if (deviceMapper.selectByProductKeyAndDeviceName(productKey, deviceName) != null) {
+                return deviceName;
+            }
         }
-        return product.getProductKey();
+        throw new IllegalArgumentException("生成 DeviceName 失败");
     }
 
     @Override
@@ -183,6 +164,7 @@ public class DeviceServiceImpl implements IotDeviceService {
         IotDeviceDO existingDevice = validateDeviceExists(updateReqVO.getId());
 
         // 设备名称 和 产品 ID 不能修改
+        // TODO @haohao：这种，直接设置为 null 就不会更新了。忽略前端的传参
         if (updateReqVO.getDeviceName() != null && !updateReqVO.getDeviceName().equals(existingDevice.getDeviceName())) {
             throw exception(DEVICE_NAME_CANNOT_BE_MODIFIED);
         }
@@ -200,18 +182,14 @@ public class DeviceServiceImpl implements IotDeviceService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void deleteDevice(Long id) {
-        // 校验存在
-        IotDeviceDO iotDeviceDO = validateDeviceExists(id);
-
-        // 如果是网关设备，检查是否有子设备
-        if (iotDeviceDO.getGatewayId() != null) {
-            long childCount = deviceMapper.selectCountByGatewayId(id);
-            if (childCount > 0) {
-                throw exception(DEVICE_HAS_CHILDREN);
-            }
+        // 1.1 校验存在
+        IotDeviceDO device = validateDeviceExists(id);
+        // 1.2 如果是网关设备，检查是否有子设备
+        if (device.getGatewayId() != null && deviceMapper.selectCountByGatewayId(id) > 0) {
+            throw exception(DEVICE_HAS_CHILDREN);
         }
 
-        // 删除设备
+        // 2. 删除设备
         deviceMapper.deleteById(id);
     }
 
@@ -222,11 +200,11 @@ public class DeviceServiceImpl implements IotDeviceService {
      * @return 设备对象
      */
     private IotDeviceDO validateDeviceExists(Long id) {
-        IotDeviceDO iotDeviceDO = deviceMapper.selectById(id);
-        if (iotDeviceDO == null) {
+        IotDeviceDO device = deviceMapper.selectById(id);
+        if (device == null) {
             throw exception(DEVICE_NOT_EXISTS);
         }
-        return iotDeviceDO;
+        return device;
     }
 
     @Override
@@ -244,21 +222,20 @@ public class DeviceServiceImpl implements IotDeviceService {
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
     public void updateDeviceStatus(Long id, Integer status) {
         // 校验存在
         validateDeviceExists(id);
 
+        // TODO @haohao：这个可以直接用 swagger 注解哈
         // 校验状态是否合法
         if (!IotDeviceStatusEnum.isValidStatus(status)) {
             throw exception(DEVICE_INVALID_DEVICE_STATUS);
         }
 
         // 更新状态和更新时间
-        IotDeviceDO updateObj = new IotDeviceDO()
-                .setId(id)
-                .setStatus(status)
+        IotDeviceDO updateObj = new IotDeviceDO().setId(id).setStatus(status)
                 .setStatusLastUpdateTime(LocalDateTime.now());
         deviceMapper.updateById(updateObj);
     }
+
 }
