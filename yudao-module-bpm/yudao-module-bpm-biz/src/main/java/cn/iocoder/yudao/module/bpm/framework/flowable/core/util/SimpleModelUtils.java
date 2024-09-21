@@ -1,13 +1,12 @@
 package cn.iocoder.yudao.module.bpm.framework.flowable.core.util;
 
-import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Assert;
-import cn.hutool.core.lang.TypeReference;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.*;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.simple.BpmSimpleModelNodeVO;
+import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.simple.BpmSimpleModelNodeVO.ConditionGroups;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.simple.BpmSimpleModelNodeVO.RejectHandler;
 import cn.iocoder.yudao.module.bpm.enums.definition.BpmBoundaryEventType;
 import cn.iocoder.yudao.module.bpm.enums.definition.BpmSimpleModeConditionType;
@@ -15,7 +14,6 @@ import cn.iocoder.yudao.module.bpm.enums.definition.BpmSimpleModelNodeType;
 import cn.iocoder.yudao.module.bpm.enums.definition.BpmUserTaskApproveMethodEnum;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnModelConstants;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.listener.BpmCopyTaskDelegate;
-import cn.iocoder.yudao.module.bpm.framework.flowable.core.simplemodel.SimpleModelConditionGroups;
 import org.flowable.bpmn.BpmnAutoLayout;
 import org.flowable.bpmn.model.Process;
 import org.flowable.bpmn.model.*;
@@ -35,7 +33,6 @@ import static cn.iocoder.yudao.module.bpm.enums.definition.BpmUserTaskAssignStar
 import static cn.iocoder.yudao.module.bpm.enums.definition.BpmUserTaskTimeoutHandlerTypeEnum.REMINDER;
 import static cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmTaskCandidateStrategyEnum.START_USER;
 import static cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnModelConstants.*;
-import static cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.SimpleModelConstants.*;
 import static org.flowable.bpmn.constants.BpmnXMLConstants.*;
 
 /**
@@ -219,17 +216,12 @@ public class SimpleModelUtils {
      * @param conditionNode 条件节点
      */
     public static String buildConditionExpression(BpmSimpleModelNodeVO conditionNode) {
-        Integer conditionType = MapUtil.getInt(conditionNode.getAttributes(), CONDITION_TYPE_ATTRIBUTE);
-        BpmSimpleModeConditionType conditionTypeEnum = BpmSimpleModeConditionType.valueOf(conditionType);
+        BpmSimpleModeConditionType conditionTypeEnum = BpmSimpleModeConditionType.valueOf(conditionNode.getConditionType());
         String conditionExpression = null;
         if (conditionTypeEnum == BpmSimpleModeConditionType.EXPRESSION) {
-            conditionExpression = MapUtil.getStr(conditionNode.getAttributes(), CONDITION_EXPRESSION_ATTRIBUTE);
-        }
-        if (conditionTypeEnum == BpmSimpleModeConditionType.RULE) {
-            SimpleModelConditionGroups conditionGroups = BeanUtil.toBean(MapUtil.get(conditionNode.getAttributes(),
-                            CONDITION_GROUPS_ATTRIBUTE, new TypeReference<Map<String, Object>>() {
-                            }),
-                    SimpleModelConditionGroups.class);
+            conditionExpression = conditionNode.getConditionExpression();
+        } else if (conditionTypeEnum == BpmSimpleModeConditionType.RULE) {
+            ConditionGroups conditionGroups = conditionNode.getConditionGroups();
             if (conditionGroups != null && CollUtil.isNotEmpty(conditionGroups.getConditions())) {
                 List<String> strConditionGroups = conditionGroups.getConditions().stream().map(item -> {
                     if (CollUtil.isNotEmpty(item.getRules())) {
@@ -246,7 +238,6 @@ public class SimpleModelUtils {
                 }).toList();
                 conditionExpression = String.format("${%s}", CollUtil.join(strConditionGroups, conditionGroups.getAnd() ? " && " : " || "));
             }
-
         }
         // TODO 待增加其它类型
         return conditionExpression;
@@ -400,8 +391,7 @@ public class SimpleModelUtils {
         // TODO @jason：setName
 
         // TODO @芋艿 + jason：合并网关；是不是要有条件啥的。微信讨论
-        // @芋艿 感觉聚合网关(合并网关)还是从前端传过来好理解一点。
-        // 并行聚合网关
+        // 并行聚合网关有程序创建。前端不需要传入
         ParallelGateway joinParallelGateway = new ParallelGateway();
         joinParallelGateway.setId(node.getId() + JOIN_GATE_WAY_NODE_ID_SUFFIX);
         return CollUtil.newArrayList(parallelGateway, joinParallelGateway);
@@ -436,7 +426,7 @@ public class SimpleModelUtils {
         exclusiveGateway.setId(node.getId());
         // 寻找默认的序列流
         BpmSimpleModelNodeVO defaultSeqFlow = CollUtil.findOne(node.getConditionNodes(),
-                item -> BooleanUtil.isTrue(MapUtil.getBool(item.getAttributes(), DEFAULT_FLOW_ATTRIBUTE)));
+                item -> BooleanUtil.isTrue(item.getDefaultFlow()));
         if (defaultSeqFlow != null) {
             exclusiveGateway.setDefaultFlow(defaultSeqFlow.getId());
         }
@@ -453,8 +443,8 @@ public class SimpleModelUtils {
         if (isFork) {
             Assert.notEmpty(node.getConditionNodes(), "条件节点不能为空");
             // 寻找默认的序列流
-            BpmSimpleModelNodeVO defaultSeqFlow = CollUtil.findOne(node.getConditionNodes(),
-                    item -> BooleanUtil.isTrue(MapUtil.getBool(item.getAttributes(), DEFAULT_FLOW_ATTRIBUTE)));
+            BpmSimpleModelNodeVO defaultSeqFlow = CollUtil.findOne(
+                    node.getConditionNodes(), item -> BooleanUtil.isTrue(item.getDefaultFlow()));
             if (defaultSeqFlow != null) {
                 inclusiveGateway.setDefaultFlow(defaultSeqFlow.getId());
             }
