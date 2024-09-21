@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.framework.mybatis.core.query;
 
-import cn.hutool.core.lang.Assert;
-import cn.iocoder.yudao.framework.mybatis.core.enums.SqlConstants;
+import cn.iocoder.yudao.framework.mybatis.core.util.JdbcUtils;
+import com.baomidou.mybatisplus.annotation.DbType;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.ArrayUtils;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
@@ -147,8 +147,8 @@ public class QueryWrapperX<T> extends QueryWrapper<T> {
      * @return this
      */
     public QueryWrapperX<T> limitN(int n) {
-        Assert.notNull(SqlConstants.DB_TYPE, "获取不到数据库的类型");
-        switch (SqlConstants.DB_TYPE) {
+        DbType dbType = JdbcUtils.getDbType();
+        switch (dbType) {
             case ORACLE:
             case ORACLE_12C:
                 super.le("ROWNUM", n);
@@ -157,7 +157,7 @@ public class QueryWrapperX<T> extends QueryWrapper<T> {
             case SQL_SERVER2005:
                 super.select("TOP " + n + " *"); // 由于 SQL Server 是通过 SELECT TOP 1 实现限制一条，所以只好使用 * 查询剩余字段
                 break;
-            default:
+            default: // MySQL、PostgreSQL、DM 达梦都是采用 LIMIT 实现
                 super.last("LIMIT " + n);
         }
         return this;

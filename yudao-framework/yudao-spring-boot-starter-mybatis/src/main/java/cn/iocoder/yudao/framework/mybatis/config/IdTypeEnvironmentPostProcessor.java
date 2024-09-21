@@ -2,7 +2,6 @@ package cn.iocoder.yudao.framework.mybatis.config;
 
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.util.collection.SetUtils;
-import cn.iocoder.yudao.framework.mybatis.core.enums.SqlConstants;
 import cn.iocoder.yudao.framework.mybatis.core.util.JdbcUtils;
 import com.baomidou.mybatisplus.annotation.DbType;
 import com.baomidou.mybatisplus.annotation.IdType;
@@ -41,9 +40,6 @@ public class IdTypeEnvironmentPostProcessor implements EnvironmentPostProcessor 
         // 设置 Quartz JobStore 对应的 Driver
         // TODO 芋艿：暂时没有找到特别合适的地方，先放在这里
         setJobStoreDriverIfPresent(environment, dbType);
-
-        // 初始化 SQL 静态变量
-        SqlConstants.init(dbType);
 
         // 如果非 NONE，则不进行处理
         IdType idType = getIdType(environment);

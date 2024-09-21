@@ -39,6 +39,10 @@ public enum DbTypeEnum {
      * SQL Server
      */
     SQL_SERVER(DbType.SQL_SERVER, "Microsoft SQL Server", "CHARINDEX(',' + #{value} + ',', ',' + #{column} + ',') <> 0"),
+    /**
+     * SQL Server 2005
+     */
+    SQL_SERVER2005(DbType.SQL_SERVER2005, "Microsoft SQL Server 2005", "CHARINDEX(',' + #{value} + ',', ',' + #{column} + ',') <> 0"),
 
     /**
      * 达梦
