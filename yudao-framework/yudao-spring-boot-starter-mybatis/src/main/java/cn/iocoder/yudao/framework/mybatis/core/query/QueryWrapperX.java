@@ -157,7 +157,7 @@ public class QueryWrapperX<T> extends QueryWrapper<T> {
             case SQL_SERVER2005:
                 super.select("TOP " + n + " *"); // 由于 SQL Server 是通过 SELECT TOP 1 实现限制一条，所以只好使用 * 查询剩余字段
                 break;
-            default: // MySQL、PostgreSQL、DM 达梦都是采用 LIMIT 实现
+            default: // MySQL、PostgreSQL、DM 达梦、KingbaseES 大金都是采用 LIMIT 实现
                 super.last("LIMIT " + n);
         }
         return this;

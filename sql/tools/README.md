@@ -61,14 +61,13 @@ exit
 
 ① 下载人大金仓 Docker 镜像：
 
-> x86_64 版本: https://kingbase.oss-cn-beijing.aliyuncs.com/KESV8R3/V009R001C001B0025-安装包-docker/x86_64/kdb_x86_64_V009R001C001B0025.tar
-
-> aarch64 版本：https://kingbase.oss-cn-beijing.aliyuncs.com/KESV8R3/V009R001C001B0025-安装包-docker/aarch64/kdb_aarch64_V009R001C001B0025.tar
+* [x86_64 版本](https://kingbase.oss-cn-beijing.aliyuncs.com/KESV8R3/V009R001C001B0025-安装包-docker/x86_64/kdb_x86_64_V009R001C001B0025.tar) 【Windows 选择这个】
+* [aarch64 版本](https://kingbase.oss-cn-beijing.aliyuncs.com/KESV8R3/V009R001C001B0025-安装包-docker/aarch64/kdb_aarch64_V009R001C001B0025.tar) 【MacBook Apple Silicon 选择这个】
 
 ② 加载镜像文件，在镜像 tar 文件所在目录运行：
 
 ```Bash
-docker load -i x86_64/kdb_x86_64_V009R001C001B0025.tar
+docker load -i kdb_x86_64_V009R001C001B0025.tar
 ```
 
 ③ 在项目 `sql/tools` 目录下运行：

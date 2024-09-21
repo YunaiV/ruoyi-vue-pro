@@ -83,6 +83,7 @@ public class IdTypeEnvironmentPostProcessor implements EnvironmentPostProcessor 
                 driverClass = "org.quartz.impl.jdbcjobstore.MSSQLDelegate";
                 break;
             case DM:
+            case KINGBASE_ES:
                 driverClass = "org.quartz.impl.jdbcjobstore.StdJDBCDelegate";
                 break;
         }
