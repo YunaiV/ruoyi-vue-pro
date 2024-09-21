@@ -55,7 +55,7 @@ public class IdTypeEnvironmentPostProcessor implements EnvironmentPostProcessor 
             setIdType(environment, IdType.INPUT);
             return;
         }
-        // 情况二，自增 ID，适合 MySQL 等直接自增的数据库
+        // 情况二，自增 ID，适合 MySQL、DM 达梦等直接自增的数据库
         setIdType(environment, IdType.AUTO);
     }
 
@@ -85,6 +85,9 @@ public class IdTypeEnvironmentPostProcessor implements EnvironmentPostProcessor 
             case SQL_SERVER:
             case SQL_SERVER2005:
                 driverClass = "org.quartz.impl.jdbcjobstore.MSSQLDelegate";
+                break;
+            case DM:
+                driverClass = "org.quartz.impl.jdbcjobstore.StdJDBCDelegate";
                 break;
         }
         // 设置 driverClass 变量
