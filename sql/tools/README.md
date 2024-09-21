@@ -38,16 +38,14 @@ docker compose up -d sqlserver
 docker compose exec sqlserver bash /tmp/create_schema.sh
 ```
 
-暂不支持 MacBook Apple Silicon，因为 SQL Server 官方没有提供 Apple Silicon 版本的 Docker 镜像。
-
 ### 1.5 DM 达梦
 
-① 下载达梦 Docker 镜像：https://download.dameng.com/eco/dm8/dm8_20230808_rev197096_x86_rh6_64_single.tar
+① 下载达梦 Docker 镜像：<https://eco.dameng.com/download/> 地址，点击“Docker 镜像”选项，进行下载。
 
 ② 加载镜像文件，在镜像 tar 文件所在目录运行：
 
 ```Bash
-docker load -i dm8_20230808_rev197096_x86_rh6_64_single.tar
+docker load -i dm8_20240715_x86_rh6_rq_single.tar
 ```
 
 ③ 在项目 `sql/tools` 目录下运行：
@@ -58,10 +56,6 @@ docker compose up -d dm8
 docker compose exec dm8 bash -c '/opt/dmdbms/bin/disql SYSDBA/SYSDBA001 \`/tmp/schema.sql'
 exit
 ```
-
-**注意**: `sql/dm/ruoyi-vue-pro-dm8.sql` 文件编码必须为 `GBK` 或者 `GBK` 超集，否则会出现中文乱码。
-
-暂不支持 MacBook Apple Silicon，因为 达梦 官方没有提供 Apple Silicon 版本的 Docker 镜像。
 
 ### 1.6 KingbaseES 人大金仓
 

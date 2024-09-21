@@ -75,9 +75,8 @@ services:
 
 
     dm8:
-        # wget https://download.dameng.com/eco/dm8/dm8_20230808_rev197096_x86_rh6_64_single.tar
-        # docker load -i dm8_20230808_rev197096_x86_rh6_64_single.tar
-        image: dm8_single:dm8_20230808_rev197096_x86_rh6_64
+        # docker load -i dm8_20240715_x86_rh6_rq_single.tar
+        image: dm8_single:dm8_20240715_rev232765_x86_rh6_64
         restart: unless-stopped
         environment:
             PAGE_SIZE: 16
@@ -93,7 +92,6 @@ services:
         volumes:
             - dm8:/opt/dmdbms/data
             - ../dm/ruoyi-vue-pro-dm8.sql:/tmp/schema.sql:ro
-            # docker compose exec dm8 bash -c '/opt/dmdbms/bin/disql SYSDBA/SYSDBA001 \`/tmp/schema.sql'
 
     kingbase:
         # x86_64: https://kingbase.oss-cn-beijing.aliyuncs.com/KESV8R3/V009R001C001B0025-安装包-docker/x86_64/kdb_x86_64_V009R001C001B0025.tar
