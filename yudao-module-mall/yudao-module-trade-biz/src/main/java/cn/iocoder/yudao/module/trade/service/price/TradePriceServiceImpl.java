@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.trade.service.price;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.member.api.level.dto.MemberLevelRespDTO;
 import cn.iocoder.yudao.module.product.api.sku.ProductSkuApi;
 import cn.iocoder.yudao.module.product.api.sku.dto.ProductSkuRespDTO;
@@ -145,11 +146,8 @@ public class TradePriceServiceImpl implements TradePriceService {
             spuVO.setSkus(skuVOList);
             // 2.2 满减送活动
             RewardActivityMatchRespDTO rewardActivity = CollUtil.findOne(rewardActivityMap,
-                    activity -> CollUtil.contains(activity.getProductScopeValues(), spuId));
-            if (rewardActivity != null) {
-                spuVO.setRewardActivity(new AppTradeProductSettlementRespVO.RewardActivity().setId(rewardActivity.getId())
-                        .setRuleDescriptions(convertList(rewardActivity.getRules(), RewardActivityMatchRespDTO.Rule::getDescription)));
-            }
+                    activity -> CollUtil.contains(activity.getSpuIds(), spuId));
+            spuVO.setRewardActivity(BeanUtils.toBean(rewardActivity, AppTradeProductSettlementRespVO.RewardActivity.class));
             return spuVO;
         });
     }
