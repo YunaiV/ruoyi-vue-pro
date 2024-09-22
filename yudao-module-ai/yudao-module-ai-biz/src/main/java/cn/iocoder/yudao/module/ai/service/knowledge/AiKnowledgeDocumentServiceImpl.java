@@ -71,8 +71,8 @@ public class AiKnowledgeDocumentServiceImpl implements AiKnowledgeDocumentServic
         }
 
         // 2 构造文本分段器
-        TokenTextSplitter tokenTextSplitter = new TokenTextSplitter(createReqVO.getDefaultChunkSize(), createReqVO.getMinChunkSizeChars(), createReqVO.getMinChunkLengthToEmbed(),
-                createReqVO.getMaxNumChunks(), createReqVO.getKeepSeparator());
+        TokenTextSplitter tokenTextSplitter = new TokenTextSplitter(createReqVO.getDefaultSegmentTokens(), createReqVO.getMinSegmentWordCount(), createReqVO.getMinChunkLengthToEmbed(),
+                createReqVO.getMaxNumSegments(), createReqVO.getKeepSeparator());
         // 2.1 文档分段
         List<Document> segments = tokenTextSplitter.apply(documents);
         // 2.2 分段内容入库

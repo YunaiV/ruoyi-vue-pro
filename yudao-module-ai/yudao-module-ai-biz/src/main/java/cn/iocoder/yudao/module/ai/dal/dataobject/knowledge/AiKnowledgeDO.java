@@ -38,9 +38,11 @@ public class AiKnowledgeDO extends BaseDO {
      * 知识库描述
      */
     private String description;
-    // TODO @新：如果全部可见，需要怎么设置？
+
     /**
-     * 可见权限,只能选择哪些人可见
+     * 可见权限,选择哪些人可见
+     * <p>
+     * -1 所有人可见，其他为各自用户编号
      */
     @TableField(typeHandler = JacksonTypeHandler.class)
     private List<Long> visibilityPermissions;

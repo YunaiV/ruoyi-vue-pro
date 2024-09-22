@@ -197,7 +197,6 @@ public class AiModelFactoryImpl implements AiModelFactory {
         });
     }
 
-    // TODO @新：貌似可以创建一个大的 VectorStore。然后搜的时候，通过 Filter.Expression 过滤对应的数据。
     @Override
     public VectorStore getOrCreateVectorStore(EmbeddingModel embeddingModel, AiPlatformEnum platform, String apiKey, String url) {
         String cacheKey = buildClientCacheKey(VectorStore.class, platform, apiKey, url);

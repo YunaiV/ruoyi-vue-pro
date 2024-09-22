@@ -40,23 +40,25 @@ public class AiKnowledgeDocumentDO extends BaseDO {
      */
     private String url;
     /**
-     * token 数量
+     * 文档 token 数量
      */
     private Integer tokens;
     /**
-     * 字符数
+     * 文档字符数
      */
     private Integer wordCount;
-    // TODO @新：chunk 1）是不是 segment，这样命名保持一致会好点哈？2）Size 是不是改成 Tokens 会统一点；3）defaultChunkSize、defaultChunkSize、minChunkSizeChars、maxNumChunks 这几个字段的命名，可能要微信一起讨论下。尽量命名保持风格统一哈。
+
+
+    // ========== 自定义分段所用参数 ==========
+    // TODO @新：3）defaultChunkSize、defaultChunkSize、minChunkSizeChars、maxNumChunks 这几个字段的命名，可能要微信一起讨论下。尽量命名保持风格统一哈。
     /**
      * 每个文本块的目标 token 数
      */
-    private Integer defaultChunkSize;
-    // TODO @xin：SizeChars 和 wordCount 好像是一个意思，是不是也要统一哈。
+    private Integer defaultSegmentTokens;
     /**
      * 每个文本块的最小字符数
      */
-    private Integer minChunkSizeChars;
+    private Integer minSegmentWordCount;
     /**
      * 低于此值的块会被丢弃
      */
@@ -64,11 +66,13 @@ public class AiKnowledgeDocumentDO extends BaseDO {
     /**
      * 最大块数
      */
-    private Integer maxNumChunks;
+    private Integer maxNumSegments;
     /**
      * 分块是否保留分隔符
      */
     private Boolean keepSeparator;
+    // ===================================
+
     /**
      * 切片状态
      * <p>

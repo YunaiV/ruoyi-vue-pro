@@ -30,20 +30,17 @@ import static cn.iocoder.yudao.module.ai.enums.ErrorCodeConstants.KNOWLEDGE_NOT_
 public class AiKnowledgeServiceImpl implements AiKnowledgeService {
 
     @Resource
-    private AiChatModelService chatModalService;
-
-    @Resource
     private AiKnowledgeMapper knowledgeMapper;
+
     @Resource
     private AiChatModelService chatModelService;
     @Resource
     private AiApiKeyService apiKeyService;
-    // TODO @新：chatModelService 和 apiKeyService 可以放到 33 行的 chatModalService 后面。尽量保持，想通类型的变量在一块。例如说，Service 一块，Mapper 一块。
 
     @Override
     public Long createKnowledgeMy(AiKnowledgeCreateMyReqVO createReqVO, Long userId) {
         // 1. 校验模型配置
-        AiChatModelDO model = chatModalService.validateChatModel(createReqVO.getModelId());
+        AiChatModelDO model = chatModelService.validateChatModel(createReqVO.getModelId());
 
         // 2. 插入知识库
         AiKnowledgeDO knowledgeBase = BeanUtils.toBean(createReqVO, AiKnowledgeDO.class)
@@ -60,7 +57,7 @@ public class AiKnowledgeServiceImpl implements AiKnowledgeService {
             throw exception(KNOWLEDGE_NOT_EXISTS);
         }
         // 1.2 校验模型配置
-        AiChatModelDO model = chatModalService.validateChatModel(updateReqVO.getModelId());
+        AiChatModelDO model = chatModelService.validateChatModel(updateReqVO.getModelId());
 
         // 2. 更新知识库
         AiKnowledgeDO updateDO = BeanUtils.toBean(updateReqVO, AiKnowledgeDO.class);
@@ -83,8 +80,8 @@ public class AiKnowledgeServiceImpl implements AiKnowledgeService {
     }
 
     @Override
-    public VectorStore getVectorStoreById(Long knowledgeId) {
-        AiKnowledgeDO knowledge = validateKnowledgeExists(knowledgeId);
+    public VectorStore getVectorStoreById(Long id) {
+        AiKnowledgeDO knowledge = validateKnowledgeExists(id);
         AiChatModelDO model = chatModelService.validateChatModel(knowledge.getModelId());
         // 创建或获取 VectorStore 对象
         return apiKeyService.getOrCreateVectorStore(model.getKeyId());

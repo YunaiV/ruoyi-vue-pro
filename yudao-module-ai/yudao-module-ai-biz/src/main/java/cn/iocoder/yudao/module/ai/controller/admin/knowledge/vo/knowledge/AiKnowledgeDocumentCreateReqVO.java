@@ -23,21 +23,21 @@ public class AiKnowledgeDocumentCreateReqVO {
     @URL(message = "文档 URL 格式不正确")
     private String url;
 
-    @Schema(description = "每个文本块的目标 token 数", requiredMode = Schema.RequiredMode.REQUIRED, example = "800")
-    @NotNull(message = "每个文本块的目标 token 数不能为空")
-    private Integer defaultChunkSize;
+    @Schema(description = "每个段落的目标 token 数", requiredMode = Schema.RequiredMode.REQUIRED, example = "800")
+    @NotNull(message = "每个段落的目标 token 数不能为空")
+    private Integer defaultSegmentTokens;
 
-    @Schema(description = "每个文本块的最小字符数", requiredMode = Schema.RequiredMode.REQUIRED, example = "350")
-    @NotNull(message = "每个文本块的最小字符数不能为空")
-    private Integer minChunkSizeChars;
+    @Schema(description = "每个段落的最小字符数", requiredMode = Schema.RequiredMode.REQUIRED, example = "350")
+    @NotNull(message = "每个段落的最小字符数不能为空")
+    private Integer minSegmentWordCount;
 
-    @Schema(description = "丢弃阈值", requiredMode = Schema.RequiredMode.REQUIRED, example = "5")
+    @Schema(description = "丢弃阈值：低于此阈值的段落会被丢弃", requiredMode = Schema.RequiredMode.REQUIRED, example = "5")
     @NotNull(message = "丢弃阈值不能为空")
     private Integer minChunkLengthToEmbed;
 
-    @Schema(description = "最大块数", requiredMode = Schema.RequiredMode.REQUIRED, example = "10000")
-    @NotNull(message = "最大块数不能为空")
-    private Integer maxNumChunks;
+    @Schema(description = "最大段落数", requiredMode = Schema.RequiredMode.REQUIRED, example = "10000")
+    @NotNull(message = "最大段落数不能为空")
+    private Integer maxNumSegments;
 
     @Schema(description = "分块是否保留分隔符", requiredMode = Schema.RequiredMode.REQUIRED, example = "true")
     @NotNull(message = "分块是否保留分隔符不能为空")
