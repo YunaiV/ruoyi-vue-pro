@@ -5,6 +5,7 @@ import cn.iocoder.yudao.framework.common.util.spring.SpringUtils;
 import cn.iocoder.yudao.framework.mybatis.core.enums.DbTypeEnum;
 import com.baomidou.dynamic.datasource.DynamicRoutingDataSource;
 import com.baomidou.mybatisplus.annotation.DbType;
+import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
@@ -50,8 +51,13 @@ public class JdbcUtils {
      * @return DB 类型
      */
     public static DbType getDbType() {
-        DynamicRoutingDataSource dynamicRoutingDataSource = SpringUtils.getBean(DynamicRoutingDataSource.class);
-        DataSource dataSource = dynamicRoutingDataSource.determineDataSource();
+        DataSource dataSource;
+        try {
+            DynamicRoutingDataSource dynamicRoutingDataSource = SpringUtils.getBean(DynamicRoutingDataSource.class);
+            dataSource = dynamicRoutingDataSource.determineDataSource();
+        } catch (NoSuchBeanDefinitionException e) {
+            dataSource = SpringUtils.getBean(DataSource.class);
+        }
         try (Connection conn = dataSource.getConnection()) {
             return DbTypeEnum.find(conn.getMetaData().getDatabaseProductName());
         } catch (SQLException e) {
