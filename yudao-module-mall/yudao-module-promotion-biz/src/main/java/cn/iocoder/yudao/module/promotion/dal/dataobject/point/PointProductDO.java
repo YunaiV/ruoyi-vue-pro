@@ -42,24 +42,21 @@ public class PointProductDO extends BaseDO {
      */
     private Long skuId;
     /**
-     * 可兑换数量
+     * 可兑换次数
      */
-    private Integer maxCount;
+    private Integer count;
     /**
-     * 兑换积分
+     * 所需兑换积分
      */
     private Integer point;
     /**
-     * 兑换金额，单位：分
+     * 所需兑换金额，单位：分
      */
     private Integer price;
     /**
-     * 兑换类型
-     * 1. 积分
-     * 2. 积分 + 钱
-     * 3. 直接购买
+     * 积分商城商品库存
      */
-    private Integer type;
+    private Integer stock;
     /**
      * 积分商城商品状态
      *
