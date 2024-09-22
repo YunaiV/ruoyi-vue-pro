@@ -6,6 +6,7 @@ import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.iot.controller.admin.product.vo.IotProductPageReqVO;
 import cn.iocoder.yudao.module.iot.controller.admin.product.vo.IotProductRespVO;
 import cn.iocoder.yudao.module.iot.controller.admin.product.vo.IotProductSaveReqVO;
+import cn.iocoder.yudao.module.iot.controller.admin.product.vo.IotProductSimpleRespVO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.product.IotProductDO;
 import cn.iocoder.yudao.module.iot.service.product.IotProductService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -16,6 +17,8 @@ import jakarta.validation.Valid;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
@@ -78,6 +81,14 @@ public class IotProductController {
     public CommonResult<PageResult<IotProductRespVO>> getProductPage(@Valid IotProductPageReqVO pageReqVO) {
         PageResult<IotProductDO> pageResult = productService.getProductPage(pageReqVO);
         return success(BeanUtils.toBean(pageResult, IotProductRespVO.class));
+    }
+
+    @GetMapping("/list-all-simple")
+    @Operation(summary = "获得所有产品列表")
+    @PreAuthorize("@ss.hasPermission('iot:product:query')")
+    public CommonResult<List<IotProductSimpleRespVO>> listAllSimpleProducts() {
+        List<IotProductDO> list = productService.listAllProducts();
+        return success(BeanUtils.toBean(list, IotProductSimpleRespVO.class));
     }
 
 }

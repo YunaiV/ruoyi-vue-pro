@@ -6,6 +6,8 @@ import cn.iocoder.yudao.module.iot.controller.admin.product.vo.IotProductSaveReq
 import cn.iocoder.yudao.module.iot.dal.dataobject.product.IotProductDO;
 import jakarta.validation.Valid;
 
+import java.util.List;
+
 /**
  * IoT 产品 Service 接口
  *
@@ -58,4 +60,12 @@ public interface IotProductService {
      * @param status 状态
      */
     void updateProductStatus(Long id, Integer status);
+
+    /**
+     * 获得所有产品
+     *
+     * @return 产品列表
+     */
+    List<IotProductDO> listAllProducts();
+
 }

@@ -24,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.diffList;
@@ -176,22 +177,33 @@ public class IotThinkModelFunctionServiceImpl implements IotThinkModelFunctionSe
         List<IotThinkModelFunctionDO> createList = diffResult.get(0); // 需要新增的
         List<IotThinkModelFunctionDO> updateList = diffResult.get(1); // 需要更新的
         List<IotThinkModelFunctionDO> deleteList = diffResult.get(2); // 需要删除的
+
         // 3.2 批量执行数据库操作
+        // 新增数据库中的新事件和服务列表
         if (CollUtil.isNotEmpty(createList)) {
             thinkModelFunctionMapper.insertBatch(createList);
         }
+        // 更新数据库中的事件和服务列表
         if (CollUtil.isNotEmpty(updateList)) {
-            for (IotThinkModelFunctionDO updateFunc : updateList) {
-                // 设置 ID，以便更新
+            // 首先，为每个需要更新的对象设置其对应的 ID
+            updateList.forEach(updateFunc -> {
                 IotThinkModelFunctionDO oldFunc = findFunctionByIdentifierAndType(
                         oldFunctionList, updateFunc.getIdentifier(), updateFunc.getType());
                 if (oldFunc != null) {
                     updateFunc.setId(oldFunc.getId());
-                    thinkModelFunctionMapper.updateById(updateFunc);
                 }
+            });
+            // 过滤掉没有设置 ID 的对象
+            List<IotThinkModelFunctionDO> validUpdateList = updateList.stream()
+                    .filter(func -> func.getId() != null)
+                    .collect(Collectors.toList());
+            // 执行批量更新
+            if (CollUtil.isNotEmpty(validUpdateList)) {
+                thinkModelFunctionMapper.updateBatch(validUpdateList);
             }
-            // TODO @haohao：seckillProductMapper.updateBatch(diffList.get(1)); 可以直接类似这么操作哇？
         }
+
+        // 删除数据库中的旧事件和服务列表
         if (CollUtil.isNotEmpty(deleteList)) {
             Set<Long> idsToDelete = CollectionUtils.convertSet(deleteList, IotThinkModelFunctionDO::getId);
             thinkModelFunctionMapper.deleteByIds(idsToDelete);

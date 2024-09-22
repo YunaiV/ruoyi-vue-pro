@@ -50,34 +50,34 @@ public class IotDeviceDO extends BaseDO {
 
     /**
      * 产品编号
-     *
+     * <p>
      * 关联 {@link IotProductDO#getId()}
      */
     private Long productId;
     /**
      * 产品标识
-     *
+     * <p>
      * 冗余 {@link IotProductDO#getProductKey()}
      */
     private String productKey;
     /**
      * 设备类型
-     *
+     * <p>
      * 冗余 {@link IotProductDO#getDeviceType()}
      */
     private Integer deviceType;
 
     /**
      * 设备状态
-     *
+     * <p>
      * 枚举 {@link IotDeviceStatusEnum}
      */
     private Integer status;
     /**
      * 网关设备编号
-     *
+     * <p>
      * 子设备需要关联的网关设备 ID
-     *
+     * <p>
      * 关联 {@link IotDeviceDO#getId()}
      */
     private Long gatewayId;
@@ -140,7 +140,7 @@ public class IotDeviceDO extends BaseDO {
     private BigDecimal longitude;
     /**
      * 地区编码
-     *
+     * <p>
      * 关联 Area 的 id
      */
     private Integer areaId;

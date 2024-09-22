@@ -53,9 +53,8 @@ public interface IotDeviceService {
     /**
      * 更新设备状态
      *
-     * @param id 编号
-     * @param status 状态
+     * @param updateReqVO 更新信息
      */
-    void updateDeviceStatus(Long id, Integer status);
+    void updateDeviceStatus(IotDeviceStatusUpdateReqVO updateReqVO);
 
 }

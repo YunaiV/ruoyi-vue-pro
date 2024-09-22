@@ -6,11 +6,12 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.iot.controller.admin.device.vo.IotDevicePageReqVO;
 import cn.iocoder.yudao.module.iot.controller.admin.device.vo.IotDeviceSaveReqVO;
+import cn.iocoder.yudao.module.iot.controller.admin.device.vo.IotDeviceStatusUpdateReqVO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.product.IotProductDO;
 import cn.iocoder.yudao.module.iot.dal.mysql.device.IotDeviceMapper;
-import cn.iocoder.yudao.module.iot.dal.mysql.product.IotProductMapper;
 import cn.iocoder.yudao.module.iot.enums.device.IotDeviceStatusEnum;
+import cn.iocoder.yudao.module.iot.service.product.IotProductService;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -35,9 +36,8 @@ public class DeviceServiceImpl implements IotDeviceService {
 
     @Resource
     private IotDeviceMapper deviceMapper;
-    // TODO @haohao：不直接调用 productmapper，通过 productservice；每一个模型，不直接使用对方的
     @Resource
-    private IotProductMapper productMapper;
+    private IotProductService productService;
 
     /**
      * 创建 IoT 设备
@@ -49,7 +49,7 @@ public class DeviceServiceImpl implements IotDeviceService {
     @Transactional(rollbackFor = Exception.class)
     public Long createDevice(IotDeviceSaveReqVO createReqVO) {
         // 1.1 校验产品是否存在
-        IotProductDO product = productMapper.selectById(createReqVO.getProductId());
+        IotProductDO product = productService.getProduct(createReqVO.getProductId());
         if (product == null) {
             throw exception(PRODUCT_NOT_EXISTS);
         }
@@ -106,8 +106,7 @@ public class DeviceServiceImpl implements IotDeviceService {
      * @return 生成的 deviceSecret
      */
     private String generateDeviceSecret() {
-        // TODO @haohao：return IdUtil.fastSimpleUUID()
-        return UUID.randomUUID().toString().replace("-", "");
+        return IdUtil.fastSimpleUUID();
     }
 
     /**
@@ -147,7 +146,6 @@ public class DeviceServiceImpl implements IotDeviceService {
      * @return 生成的唯一 DeviceName
      */
     private String generateUniqueDeviceName(String productKey) {
-        // TODO @haohao：业务逻辑里，尽量避免 while true。万一 bug = =；虽然这个不会哈。我先改了下
         for (int i = 0; i < Short.MAX_VALUE; i++) {
             String deviceName = IdUtil.fastSimpleUUID().substring(0, 20);
             if (deviceMapper.selectByProductKeyAndDeviceName(productKey, deviceName) != null) {
@@ -161,16 +159,11 @@ public class DeviceServiceImpl implements IotDeviceService {
     @Transactional(rollbackFor = Exception.class)
     public void updateDevice(IotDeviceSaveReqVO updateReqVO) {
         // 校验存在
-        IotDeviceDO existingDevice = validateDeviceExists(updateReqVO.getId());
+        validateDeviceExists(updateReqVO.getId());
 
         // 设备名称 和 产品 ID 不能修改
-        // TODO @haohao：这种，直接设置为 null 就不会更新了。忽略前端的传参
-        if (updateReqVO.getDeviceName() != null && !updateReqVO.getDeviceName().equals(existingDevice.getDeviceName())) {
-            throw exception(DEVICE_NAME_CANNOT_BE_MODIFIED);
-        }
-        if (updateReqVO.getProductId() != null && !updateReqVO.getProductId().equals(existingDevice.getProductId())) {
-            throw exception(DEVICE_PRODUCT_CANNOT_BE_MODIFIED);
-        }
+        updateReqVO.setDeviceName(null);
+        updateReqVO.setProductId(null);
 
         // 更新 DO 对象
         IotDeviceDO updateObj = BeanUtils.toBean(updateReqVO, IotDeviceDO.class);
@@ -222,19 +215,12 @@ public class DeviceServiceImpl implements IotDeviceService {
     }
 
     @Override
-    public void updateDeviceStatus(Long id, Integer status) {
+    public void updateDeviceStatus(IotDeviceStatusUpdateReqVO updateReqVO) {
         // 校验存在
-        validateDeviceExists(id);
-
-        // TODO @haohao：这个可以直接用 swagger 注解哈
-        // 校验状态是否合法
-        if (!IotDeviceStatusEnum.isValidStatus(status)) {
-            throw exception(DEVICE_INVALID_DEVICE_STATUS);
-        }
+        validateDeviceExists(updateReqVO.getId());
 
         // 更新状态和更新时间
-        IotDeviceDO updateObj = new IotDeviceDO().setId(id).setStatus(status)
-                .setStatusLastUpdateTime(LocalDateTime.now());
+        IotDeviceDO updateObj = BeanUtils.toBean(updateReqVO, IotDeviceDO.class);
         deviceMapper.updateById(updateObj);
     }
 

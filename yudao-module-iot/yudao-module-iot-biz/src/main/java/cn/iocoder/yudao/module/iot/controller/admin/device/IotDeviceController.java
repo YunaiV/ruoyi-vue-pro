@@ -9,6 +9,7 @@ import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.yudao.module.iot.controller.admin.device.vo.IotDevicePageReqVO;
 import cn.iocoder.yudao.module.iot.controller.admin.device.vo.IotDeviceRespVO;
 import cn.iocoder.yudao.module.iot.controller.admin.device.vo.IotDeviceSaveReqVO;
+import cn.iocoder.yudao.module.iot.controller.admin.device.vo.IotDeviceStatusUpdateReqVO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDO;
 import cn.iocoder.yudao.module.iot.service.device.IotDeviceService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -45,12 +46,9 @@ public class IotDeviceController {
 
     @PutMapping("/update-status")
     @Operation(summary = "更新设备状态")
-    @Parameter(name = "id", description = "编号", required = true)
-    @Parameter(name = "status", description = "状态", required = true, example = "1")
     @PreAuthorize("@ss.hasPermission('iot:device:update')")
-    public CommonResult<Boolean> updateDeviceStatus(@RequestParam("id") Long id,
-                                                    @RequestParam("status") Integer status) {
-        deviceService.updateDeviceStatus(id, status);
+    public CommonResult<Boolean> updateDeviceStatus(@Valid @RequestBody IotDeviceStatusUpdateReqVO updateReqVO) {
+        deviceService.updateDeviceStatus(updateReqVO);
         return success(true);
     }
 
@@ -86,19 +84,6 @@ public class IotDeviceController {
     public CommonResult<PageResult<IotDeviceRespVO>> getDevicePage(@Valid IotDevicePageReqVO pageReqVO) {
         PageResult<IotDeviceDO> pageResult = deviceService.getDevicePage(pageReqVO);
         return success(BeanUtils.toBean(pageResult, IotDeviceRespVO.class));
-    }
-
-    @GetMapping("/export-excel")
-    @Operation(summary = "导出设备 Excel")
-    @PreAuthorize("@ss.hasPermission('iot:device:export')")
-    @ApiAccessLog(operateType = EXPORT)
-    public void exportDeviceExcel(@Valid IotDevicePageReqVO pageReqVO,
-                                  HttpServletResponse response) throws IOException {
-        pageReqVO.setPageSize(PageParam.PAGE_SIZE_NONE);
-        List<IotDeviceDO> list = deviceService.getDevicePage(pageReqVO).getList();
-        // 导出 Excel
-        ExcelUtils.write(response, "IoT 设备.xls", "数据", IotDeviceRespVO.class,
-                BeanUtils.toBean(list, IotDeviceRespVO.class));
     }
 
 }

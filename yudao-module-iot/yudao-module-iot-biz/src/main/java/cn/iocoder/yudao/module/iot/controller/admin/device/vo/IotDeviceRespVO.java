@@ -25,7 +25,7 @@ public class IotDeviceRespVO {
     private String deviceName;
 
     @Schema(description = "产品编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "26202")
-    @ExcelProperty("产品 ID")
+    @ExcelProperty("产品编号")
     private Long productId;
 
     @Schema(description = "产品标识", requiredMode = Schema.RequiredMode.REQUIRED)
@@ -41,7 +41,6 @@ public class IotDeviceRespVO {
     private String nickname;
 
     @Schema(description = "网关设备 ID", example = "16380")
-    @ExcelProperty("网关设备 ID")
     private Long gatewayId;
 
     @Schema(description = "设备状态", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
@@ -64,14 +63,6 @@ public class IotDeviceRespVO {
     @ExcelProperty("设备激活时间")
     private LocalDateTime activeTime;
 
-    @Schema(description = "设备的 IP 地址")
-    @ExcelProperty("设备的 IP 地址")
-    private String ip;
-
-    @Schema(description = "设备的固件版本")
-    @ExcelProperty("设备的固件版本")
-    private String firmwareVersion;
-
     @Schema(description = "设备密钥，用于设备认证")
     @ExcelProperty("设备密钥")
     private String deviceSecret;
@@ -91,27 +82,6 @@ public class IotDeviceRespVO {
     @Schema(description = "认证类型（如一机一密、动态注册）", example = "2")
     @ExcelProperty("认证类型（如一机一密、动态注册）")
     private String authType;
-
-    // TODO @haohao：经纬度：可能 double 就够啦
-    @Schema(description = "设备位置的纬度，范围")
-    @ExcelProperty("设备位置的纬度")
-    private BigDecimal latitude;
-
-    @Schema(description = "设备位置的经度")
-    @ExcelProperty("设备位置的经度")
-    private BigDecimal longitude;
-
-    @Schema(description = "地区编码", example = "16995")
-    @ExcelProperty("地区编码")
-    private Integer areaId;
-
-    @Schema(description = "设备详细地址")
-    @ExcelProperty("设备详细地址")
-    private String address;
-
-    @Schema(description = "设备序列号")
-    @ExcelProperty("设备序列号")
-    private String serialNumber;
 
     @Schema(description = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED)
     @ExcelProperty("创建时间")

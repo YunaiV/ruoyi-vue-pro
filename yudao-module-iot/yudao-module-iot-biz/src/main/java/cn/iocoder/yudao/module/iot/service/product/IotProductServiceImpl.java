@@ -12,6 +12,7 @@ import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -111,6 +112,11 @@ public class IotProductServiceImpl implements IotProductService {
         // 2. 更新
         IotProductDO updateObj = IotProductDO.builder().id(id).status(status).build();
         productMapper.updateById(updateObj);
+    }
+
+    @Override
+    public List<IotProductDO> listAllProducts() {
+        return productMapper.selectList();
     }
 
 }

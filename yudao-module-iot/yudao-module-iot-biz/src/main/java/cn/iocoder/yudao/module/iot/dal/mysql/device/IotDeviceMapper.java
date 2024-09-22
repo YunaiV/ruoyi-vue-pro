@@ -29,18 +29,11 @@ public interface IotDeviceMapper extends BaseMapperX<IotDeviceDO> {
                 .betweenIfPresent(IotDeviceDO::getLastOnlineTime, reqVO.getLastOnlineTime())
                 .betweenIfPresent(IotDeviceDO::getLastOfflineTime, reqVO.getLastOfflineTime())
                 .betweenIfPresent(IotDeviceDO::getActiveTime, reqVO.getActiveTime())
-                .eqIfPresent(IotDeviceDO::getIp, reqVO.getIp())
-                .eqIfPresent(IotDeviceDO::getFirmwareVersion, reqVO.getFirmwareVersion())
                 .eqIfPresent(IotDeviceDO::getDeviceSecret, reqVO.getDeviceSecret())
                 .eqIfPresent(IotDeviceDO::getMqttClientId, reqVO.getMqttClientId())
                 .likeIfPresent(IotDeviceDO::getMqttUsername, reqVO.getMqttUsername())
                 .eqIfPresent(IotDeviceDO::getMqttPassword, reqVO.getMqttPassword())
                 .eqIfPresent(IotDeviceDO::getAuthType, reqVO.getAuthType())
-                .eqIfPresent(IotDeviceDO::getLatitude, reqVO.getLatitude())
-                .eqIfPresent(IotDeviceDO::getLongitude, reqVO.getLongitude())
-                .eqIfPresent(IotDeviceDO::getAreaId, reqVO.getAreaId())
-                .eqIfPresent(IotDeviceDO::getAddress, reqVO.getAddress())
-                .eqIfPresent(IotDeviceDO::getSerialNumber, reqVO.getSerialNumber())
                 .betweenIfPresent(IotDeviceDO::getCreateTime, reqVO.getCreateTime())
                 .orderByDesc(IotDeviceDO::getId));
     }
