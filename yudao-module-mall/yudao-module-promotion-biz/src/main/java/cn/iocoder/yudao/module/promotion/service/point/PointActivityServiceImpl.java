@@ -51,12 +51,6 @@ public class PointActivityServiceImpl implements PointActivityService {
     @Resource
     private ProductSkuApi productSkuApi;
 
-    private static List<PointProductDO> buildPointProductDO(PointActivityDO pointActivity, List<PointProductSaveReqVO> products) {
-        return BeanUtils.toBean(products, PointProductDO.class, product -> {
-            product.setActivityId(pointActivity.getId()).setActivityStatus(pointActivity.getStatus());
-        });
-    }
-
     @Override
     public Long createPointActivity(PointActivitySaveReqVO createReqVO) {
         // 1.1 校验商品是否存在
@@ -72,8 +66,12 @@ public class PointActivityServiceImpl implements PointActivityService {
         pointActivityMapper.insert(pointActivity);
         // 2.2 插入积分商城活动商品
         pointProductMapper.insertBatch(buildPointProductDO(pointActivity, createReqVO.getProducts()));
-        // 返回
         return pointActivity.getId();
+    }
+
+    private static List<PointProductDO> buildPointProductDO(PointActivityDO pointActivity, List<PointProductSaveReqVO> products) {
+        return BeanUtils.toBean(products, PointProductDO.class, product ->
+                product.setActivityId(pointActivity.getId()).setActivityStatus(pointActivity.getStatus()));
     }
 
     @Override
