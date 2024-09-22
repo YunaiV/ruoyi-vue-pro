@@ -99,9 +99,11 @@ docker volume rm ruoyi-vue-pro_postgres
 
 ## 2. MySQL 转换其它数据库
 
+项目提供了 `sql/tools/convertor.py` 脚本，支持将 MySQL 转换为 Oracle、PostgreSQL、SQL Server、达梦、人大金仓、OpenGauss 等数据库的脚本。
+
 ### 2.1 实现原理
 
-通过读取 MySQL 的 `sql/mysql/ruoyi-vue-pro.sql` 数据库文件，转换成 Oracle、PostgreSQL、SQL Server、达梦、人大金仓 等数据库的脚本。
+通过读取 MySQL 的 `sql/mysql/ruoyi-vue-pro.sql` 数据库文件，转换成对应的数据库脚本。
 
 ### 2.2 使用方法
 
@@ -112,7 +114,7 @@ pip install simple-ddl-parser
 # pip3 install simple-ddl-parser
 ```
 
-② 执行如下命令打印生成 postgres 的脚本内容，其他可选参数有：`oracle`、`sqlserver`、`dm8`、`kingbase`：
+② 在 `sql/tools/` 目录下，执行如下命令打印生成 postgres 的脚本内容，其他可选参数有：`oracle`、`sqlserver`、`dm8`、`kingbase`、`opengauss`：
 
 ```Bash
 python3 convertor.py postgres
