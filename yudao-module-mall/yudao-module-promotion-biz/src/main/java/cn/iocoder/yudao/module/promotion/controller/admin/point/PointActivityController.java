@@ -1,31 +1,35 @@
 package cn.iocoder.yudao.module.promotion.controller.admin.point;
 
-import cn.iocoder.yudao.framework.apilog.core.annotation.ApiAccessLog;
+import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
-import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
-import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
+import cn.iocoder.yudao.module.product.api.spu.ProductSpuApi;
+import cn.iocoder.yudao.module.product.api.spu.dto.ProductSpuRespDTO;
 import cn.iocoder.yudao.module.promotion.controller.admin.point.vo.activity.PointActivityPageReqVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.point.vo.activity.PointActivityRespVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.point.vo.activity.PointActivitySaveReqVO;
+import cn.iocoder.yudao.module.promotion.controller.admin.point.vo.product.PointProductRespVO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.point.PointActivityDO;
+import cn.iocoder.yudao.module.promotion.dal.dataobject.point.PointProductDO;
 import cn.iocoder.yudao.module.promotion.service.point.PointActivityService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
-import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
-import static cn.iocoder.yudao.framework.apilog.core.enums.OperateTypeEnum.EXPORT;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMultiMap;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 
 @Tag(name = "管理后台 - 积分商城活动")
 @RestController
@@ -35,6 +39,8 @@ public class PointActivityController {
 
     @Resource
     private PointActivityService pointActivityService;
+    @Resource
+    private ProductSpuApi productSpuApi;
 
     @PostMapping("/create")
     @Operation(summary = "创建积分商城活动")
@@ -75,7 +81,14 @@ public class PointActivityController {
     @PreAuthorize("@ss.hasPermission('promotion:point-activity:query')")
     public CommonResult<PointActivityRespVO> getPointActivity(@RequestParam("id") Long id) {
         PointActivityDO pointActivity = pointActivityService.getPointActivity(id);
-        return success(BeanUtils.toBean(pointActivity, PointActivityRespVO.class));
+        if (pointActivity == null) {
+            return success(null);
+        }
+
+        List<PointProductDO> products = pointActivityService.getPointProductListByActivityIds(Collections.singletonList(id));
+        PointActivityRespVO respVO = BeanUtils.toBean(pointActivity, PointActivityRespVO.class);
+        respVO.setProducts(BeanUtils.toBean(products, PointProductRespVO.class));
+        return success(respVO);
     }
 
     @GetMapping("/page")
@@ -83,20 +96,24 @@ public class PointActivityController {
     @PreAuthorize("@ss.hasPermission('promotion:point-activity:query')")
     public CommonResult<PageResult<PointActivityRespVO>> getPointActivityPage(@Valid PointActivityPageReqVO pageReqVO) {
         PageResult<PointActivityDO> pageResult = pointActivityService.getPointActivityPage(pageReqVO);
-        return success(BeanUtils.toBean(pageResult, PointActivityRespVO.class));
-    }
+        if (CollUtil.isEmpty(pageResult.getList())) {
+            return success(PageResult.empty(pageResult.getTotal()));
+        }
 
-    @GetMapping("/export-excel")
-    @Operation(summary = "导出积分商城活动 Excel")
-    @PreAuthorize("@ss.hasPermission('promotion:point-activity:export')")
-    @ApiAccessLog(operateType = EXPORT)
-    public void exportPointActivityExcel(@Valid PointActivityPageReqVO pageReqVO,
-                                         HttpServletResponse response) throws IOException {
-        pageReqVO.setPageSize(PageParam.PAGE_SIZE_NONE);
-        List<PointActivityDO> list = pointActivityService.getPointActivityPage(pageReqVO).getList();
-        // 导出 Excel
-        ExcelUtils.write(response, "积分商城活动.xls", "数据", PointActivityRespVO.class,
-                BeanUtils.toBean(list, PointActivityRespVO.class));
+        // 拼接数据
+        List<PointProductDO> products = pointActivityService.getPointProductListByActivityIds(
+                convertSet(pageResult.getList(), PointActivityDO::getId));
+        Map<Long, List<PointProductDO>> productsMap = convertMultiMap(products, PointProductDO::getActivityId);
+        Map<Long, ProductSpuRespDTO> spuMap = productSpuApi.getSpusMap(
+                convertSet(pageResult.getList(), PointActivityDO::getSpuId));
+        PageResult<PointActivityRespVO> result = BeanUtils.toBean(pageResult, PointActivityRespVO.class);
+        result.getList().forEach(activity -> {
+            activity.setProducts(BeanUtils.toBean(productsMap.get(activity.getId()), PointProductRespVO.class));
+            MapUtils.findAndThen(spuMap, activity.getSpuId(),
+                    spu -> activity.setSpuName(spu.getName()).setPicUrl(spu.getPicUrl()).setMarketPrice(spu.getMarketPrice()));
+
+        });
+        return success(result);
     }
 
 }

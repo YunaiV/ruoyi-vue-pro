@@ -17,8 +17,10 @@ import cn.iocoder.yudao.module.promotion.dal.mysql.point.PointActivityMapper;
 import cn.iocoder.yudao.module.promotion.dal.mysql.point.PointProductMapper;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -51,7 +53,14 @@ public class PointActivityServiceImpl implements PointActivityService {
     @Resource
     private ProductSkuApi productSkuApi;
 
+    private static List<PointProductDO> buildPointProductDO(PointActivityDO pointActivity, List<PointProductSaveReqVO> products) {
+        return BeanUtils.toBean(products, PointProductDO.class, product ->
+                product.setSpuId(pointActivity.getSpuId()).setActivityId(pointActivity.getId())
+                        .setActivityStatus(pointActivity.getStatus()));
+    }
+
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public Long createPointActivity(PointActivitySaveReqVO createReqVO) {
         // 1.1 校验商品是否存在
         validateProductExists(createReqVO.getSpuId(), createReqVO.getProducts());
@@ -69,12 +78,8 @@ public class PointActivityServiceImpl implements PointActivityService {
         return pointActivity.getId();
     }
 
-    private static List<PointProductDO> buildPointProductDO(PointActivityDO pointActivity, List<PointProductSaveReqVO> products) {
-        return BeanUtils.toBean(products, PointProductDO.class, product ->
-                product.setActivityId(pointActivity.getId()).setActivityStatus(pointActivity.getStatus()));
-    }
-
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void updatePointActivity(PointActivitySaveReqVO updateReqVO) {
         // 1.1 校验存在
         PointActivityDO activity = validatePointActivityExists(updateReqVO.getId());
@@ -98,6 +103,7 @@ public class PointActivityServiceImpl implements PointActivityService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void closePointActivity(Long id) {
         // 校验存在
         PointActivityDO pointActivity = validatePointActivityExists(id);
@@ -143,6 +149,7 @@ public class PointActivityServiceImpl implements PointActivityService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void deletePointActivity(Long id) {
         // 校验存在
         PointActivityDO pointActivity = validatePointActivityExists(id);
@@ -225,6 +232,11 @@ public class PointActivityServiceImpl implements PointActivityService {
     @Override
     public PageResult<PointActivityDO> getPointActivityPage(PointActivityPageReqVO pageReqVO) {
         return pointActivityMapper.selectPage(pageReqVO);
+    }
+
+    @Override
+    public List<PointProductDO> getPointProductListByActivityIds(Collection<Long> activityIds) {
+        return pointProductMapper.selectListByActivityId(activityIds);
     }
 
 }

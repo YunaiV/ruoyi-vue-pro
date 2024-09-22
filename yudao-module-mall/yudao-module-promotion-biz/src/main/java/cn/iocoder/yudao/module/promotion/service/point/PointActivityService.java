@@ -4,7 +4,11 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.promotion.controller.admin.point.vo.activity.PointActivityPageReqVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.point.vo.activity.PointActivitySaveReqVO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.point.PointActivityDO;
+import cn.iocoder.yudao.module.promotion.dal.dataobject.point.PointProductDO;
 import jakarta.validation.Valid;
+
+import java.util.Collection;
+import java.util.List;
 
 /**
  * 积分商城活动 Service 接口
@@ -57,5 +61,13 @@ public interface PointActivityService {
      * @return 积分商城活动分页
      */
     PageResult<PointActivityDO> getPointActivityPage(PointActivityPageReqVO pageReqVO);
+
+    /**
+     * 获得活动商品
+     *
+     * @param activityIds 活动编号
+     * @return 获得活动商品
+     */
+    List<PointProductDO> getPointProductListByActivityIds(Collection<Long> activityIds);
 
 }
