@@ -19,10 +19,14 @@ docker compose up -d mysql
 #### 1.2 Oracle
 
 ```Bash
+## x86 版本
 docker compose up -d oracle
+
+## MacBook Apple Silicon
+docker compose up -d oracle_m1
 ```
 
-暂不支持 MacBook Apple Silicon，因为 Oracle 官方没有提供 Apple Silicon 版本的 Docker 镜像。
+> 注意：如果使用 MacBook Apple Silicon 版本，它的 ORACLE_SID 不是 XE，而是 FREE！！！
 
 ### 1.3 PostgreSQL
 
