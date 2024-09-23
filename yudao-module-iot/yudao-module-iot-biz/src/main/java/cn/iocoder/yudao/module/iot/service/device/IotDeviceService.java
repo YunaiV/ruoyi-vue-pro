@@ -57,4 +57,11 @@ public interface IotDeviceService {
      */
     void updateDeviceStatus(IotDeviceStatusUpdateReqVO updateReqVO);
 
+    /**
+     * 获得设备数量
+     *
+     * @param productId 产品编号
+     * @return 设备数量
+     */
+    Long getDeviceCount(Long productId);
 }

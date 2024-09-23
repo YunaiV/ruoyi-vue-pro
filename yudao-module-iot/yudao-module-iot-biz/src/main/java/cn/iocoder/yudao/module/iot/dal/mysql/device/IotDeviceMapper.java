@@ -47,4 +47,7 @@ public interface IotDeviceMapper extends BaseMapperX<IotDeviceDO> {
         return selectCount(IotDeviceDO::getGatewayId, id);
     }
 
+    default Long selectCountByProductId(Long productId) {
+        return selectCount(IotDeviceDO::getProductId, productId);
+    }
 }

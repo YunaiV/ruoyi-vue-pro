@@ -224,4 +224,9 @@ public class DeviceServiceImpl implements IotDeviceService {
         deviceMapper.updateById(updateObj);
     }
 
+    @Override
+    public Long getDeviceCount(Long productId) {
+        return deviceMapper.selectCountByProductId(productId);
+    }
+
 }

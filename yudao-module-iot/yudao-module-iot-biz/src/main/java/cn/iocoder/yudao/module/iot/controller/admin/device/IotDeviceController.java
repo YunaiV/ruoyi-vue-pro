@@ -1,11 +1,8 @@
 package cn.iocoder.yudao.module.iot.controller.admin.device;
 
-import cn.iocoder.yudao.framework.apilog.core.annotation.ApiAccessLog;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
-import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
-import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.yudao.module.iot.controller.admin.device.vo.IotDevicePageReqVO;
 import cn.iocoder.yudao.module.iot.controller.admin.device.vo.IotDeviceRespVO;
 import cn.iocoder.yudao.module.iot.controller.admin.device.vo.IotDeviceSaveReqVO;
@@ -16,16 +13,11 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
-import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.IOException;
-import java.util.List;
-
-import static cn.iocoder.yudao.framework.apilog.core.enums.OperateTypeEnum.EXPORT;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
 @Tag(name = "管理后台 - IoT 设备")
@@ -84,6 +76,14 @@ public class IotDeviceController {
     public CommonResult<PageResult<IotDeviceRespVO>> getDevicePage(@Valid IotDevicePageReqVO pageReqVO) {
         PageResult<IotDeviceDO> pageResult = deviceService.getDevicePage(pageReqVO);
         return success(BeanUtils.toBean(pageResult, IotDeviceRespVO.class));
+    }
+
+    @GetMapping("/count")
+    @Operation(summary = "获得设备数量")
+    @Parameter(name = "productId", description = "产品编号", example = "1")
+    @PreAuthorize("@ss.hasPermission('iot:device:query')")
+    public CommonResult<Long> getDeviceCount(@RequestParam("productId") Long productId) {
+        return success(deviceService.getDeviceCount(productId));
     }
 
 }
