@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.promotion.controller.admin.point.vo.activity;
 
-import cn.iocoder.yudao.module.promotion.controller.admin.point.vo.product.PointProductSaveReqVO;
+import cn.iocoder.yudao.module.promotion.controller.admin.point.vo.product.PointProductRespVO;
 import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
 import com.alibaba.excel.annotation.ExcelProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -39,7 +39,7 @@ public class PointActivityRespVO {
     private LocalDateTime createTime;
 
     @Schema(description = "积分商城商品", requiredMode = Schema.RequiredMode.REQUIRED)
-    private List<PointProductSaveReqVO> products;
+    private List<PointProductRespVO> products;
 
     // ========== 商品字段 ==========
 

@@ -18,10 +18,6 @@ public class PointActivitySaveReqVO {
     @NotNull(message = "积分商城活动商品不能为空")
     private Long spuId;
 
-    @Schema(description = "活动状态", requiredMode = Schema.RequiredMode.REQUIRED, example = "2")
-    @NotNull(message = "活动状态不能为空")
-    private Integer status;
-
     @Schema(description = "备注", example = "你说的对")
     private String remark;
 
