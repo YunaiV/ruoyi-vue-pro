@@ -12,7 +12,7 @@ public class PointProductRespVO {
     @Schema(description = "积分商城商品编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "31718")
     private Long id;
 
-    @Schema(description = "积分商城活动 id", requiredMode = Schema.RequiredMode.REQUIRED, example = "29388")
+    @Schema(description = "积分商城活动编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "29388")
     private Long activityId;
 
     @Schema(description = "商品 SPU 编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "8112")
