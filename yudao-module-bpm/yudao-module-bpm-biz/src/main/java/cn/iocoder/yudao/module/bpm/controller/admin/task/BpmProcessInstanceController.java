@@ -165,12 +165,12 @@ public class BpmProcessInstanceController {
         return success(processInstanceService.getProcessInstanceFormFieldsPermission(reqVO));
     }
 
-    @GetMapping("/get-progress")
-    @Operation(summary = "获得流程实例的进度")
+    @GetMapping("/get-approval-detail")
+    @Operation(summary = "获得审批详情")
     @Parameter(name = "id", description = "流程实例的编号", required = true)
     @PreAuthorize("@ss.hasPermission('bpm:process-instance:query')")
-    public CommonResult<BpmProcessInstanceProgressRespVO> getProcessInstanceProgress(@RequestParam("id") String id) {
-        return success(processInstanceService.getProcessInstanceProgress(id));
+    public CommonResult<BpmApprovalDetailRespVO> getApprovalDetail(@Valid BpmApprovalDetailReqVO reqVO) {
+        return success(processInstanceService.getApprovalDetail(getLoginUserId(), reqVO));
     }
 
 }

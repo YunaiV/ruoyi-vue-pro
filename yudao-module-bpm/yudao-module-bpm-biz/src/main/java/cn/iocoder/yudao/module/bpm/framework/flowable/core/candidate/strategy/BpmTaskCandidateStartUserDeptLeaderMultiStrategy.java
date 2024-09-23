@@ -58,7 +58,16 @@ public class BpmTaskCandidateStartUserDeptLeaderMultiStrategy extends BpmTaskCan
         // 获取发起人的 multi 部门负责人
         DeptRespDTO dept = getStartUserDept(startUserId);
         if (dept == null) {
-           return new HashSet<>();
+            return new HashSet<>();
+        }
+        return getMultiLevelDeptLeaderIds(toList(dept.getId()), Integer.valueOf(param)); // 参数是部门的层级
+    }
+
+    @Override
+    public Set<Long> calculateUsers(Long startUserId, ProcessInstance processInstance, String activityId, String param) {
+        DeptRespDTO dept = getStartUserDept(startUserId);
+        if (dept == null) {
+            return new HashSet<>();
         }
         return getMultiLevelDeptLeaderIds(toList(dept.getId()), Integer.valueOf(param)); // 参数是部门的层级
     }

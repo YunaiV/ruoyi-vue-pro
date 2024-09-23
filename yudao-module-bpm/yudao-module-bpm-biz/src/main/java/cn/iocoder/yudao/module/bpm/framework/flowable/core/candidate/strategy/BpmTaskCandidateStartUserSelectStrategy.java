@@ -50,6 +50,18 @@ public class BpmTaskCandidateStartUserSelectStrategy implements BpmTaskCandidate
     }
 
     @Override
+    public Set<Long> calculateUsers(Long startUserId, ProcessInstance processInstance, String activityId, String param) {
+        if (processInstance == null) {
+            return Collections.emptySet();
+        }
+        Map<String, List<Long>> startUserSelectAssignees = FlowableUtils.getStartUserSelectAssignees(processInstance);
+        Assert.notNull(startUserSelectAssignees, "流程实例({}) 的发起人自选审批人不能为空", processInstance.getId());
+        // 获得审批人
+        List<Long> assignees = startUserSelectAssignees.get(activityId);
+        return new LinkedHashSet<>(assignees);
+    }
+
+    @Override
     public boolean isParamRequired() {
         return false;
     }

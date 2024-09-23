@@ -6,7 +6,6 @@ import cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmTaskCandidat
 import cn.iocoder.yudao.module.system.api.dept.DeptApi;
 import cn.iocoder.yudao.module.system.api.dept.dto.DeptRespDTO;
 import jakarta.annotation.Resource;
-import org.flowable.engine.delegate.DelegateExecution;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -37,7 +36,7 @@ public class BpmTaskCandidateDeptLeaderStrategy implements BpmTaskCandidateStrat
     }
 
     @Override
-    public Set<Long> calculateUsers(DelegateExecution execution, String param) {
+    public Set<Long> calculateUsers(String param) {
         Set<Long> deptIds = StrUtils.splitToLongSet(param);
         List<DeptRespDTO> depts = deptApi.getDeptList(deptIds);
         return convertSet(depts, DeptRespDTO::getLeaderUserId);

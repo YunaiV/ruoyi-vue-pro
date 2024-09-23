@@ -6,7 +6,6 @@ import cn.iocoder.yudao.module.bpm.framework.flowable.core.candidate.BpmTaskCand
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmTaskCandidateStrategyEnum;
 import cn.iocoder.yudao.module.bpm.service.definition.BpmUserGroupService;
 import jakarta.annotation.Resource;
-import org.flowable.engine.delegate.DelegateExecution;
 import org.springframework.stereotype.Component;
 
 import java.util.Collection;
@@ -38,7 +37,7 @@ public class BpmTaskCandidateGroupStrategy implements BpmTaskCandidateStrategy {
     }
 
     @Override
-    public Set<Long> calculateUsers(DelegateExecution execution, String param) {
+    public Set<Long> calculateUsers(String param) {
         Set<Long> groupIds = StrUtils.splitToLongSet(param);
         List<BpmUserGroupDO> groups = userGroupService.getUserGroupList(groupIds);
         return convertSetByFlatMap(groups, BpmUserGroupDO::getUserIds, Collection::stream);

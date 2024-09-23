@@ -110,7 +110,7 @@ public class BpmTaskCandidateInvoker {
         // 1.3 移除发起人的用户
         removeStartUserIfSkip(execution, userIds);
 
-        // 2. 移除被禁用的用户
+        // 2. 移除被禁用的用户  TODO @芋艿 移除禁用的用户是否应该放在 1.1 之后
         removeDisableUsers(userIds);
         return userIds;
     }

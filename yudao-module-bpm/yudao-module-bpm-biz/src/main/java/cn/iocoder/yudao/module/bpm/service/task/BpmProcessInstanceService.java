@@ -94,12 +94,15 @@ public interface BpmProcessInstanceService {
 
     // TODO @芋艿：重点在 review 下
     /**
-     * 获取流程实例的进度
+     * 获取审批详情。
+     * <p>
+     * 可以是准备发起的流程, 进行中的流程, 已经结束的流程
      *
-     * @param id 流程 Id
+     * @param loginUserId  登录人的用户编号
+     * @param reqVO 请求信息
      * @return 流程实例的进度
      */
-    BpmProcessInstanceProgressRespVO getProcessInstanceProgress(String id);
+    BpmApprovalDetailRespVO getApprovalDetail(Long loginUserId, BpmApprovalDetailReqVO reqVO);
 
     // ========== Update 写入相关方法 ==========
 

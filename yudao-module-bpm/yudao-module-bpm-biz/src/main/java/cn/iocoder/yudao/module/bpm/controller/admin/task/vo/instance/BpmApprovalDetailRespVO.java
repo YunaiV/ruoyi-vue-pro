@@ -7,19 +7,19 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 
-@Schema(description = "管理后台 - 流程实例的进度 Response VO")
+@Schema(description = "管理后台 - 审批详情 Response VO")
 @Data
-public class BpmProcessInstanceProgressRespVO {
+public class BpmApprovalDetailRespVO {
 
     @Schema(description = "流程实例的状态", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     private Integer status; // 参见 BpmProcessInstanceStatusEnum 枚举
 
     @Schema(description = "审批信息列表", requiredMode = Schema.RequiredMode.REQUIRED)
-    private List<ApproveNodeInfo> approveNodes;
+    private List<ApprovalNodeInfo> approveNodes;
 
     @Schema(description = "审批节点信息")
     @Data
-    public static class ApproveNodeInfo {
+    public static class ApprovalNodeInfo {
 
         @Schema(description = "节点编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "StartUserNode")
         private String id;
@@ -39,7 +39,7 @@ public class BpmProcessInstanceProgressRespVO {
         private LocalDateTime endTime;
 
         @Schema(description = "审批节点的任务信息")
-        private List<ApproveTaskInfo> tasks;
+        private List<ApprovalTaskInfo> tasks;
 
         @Schema(description = "候选人用户列表")
         private List<User> candidateUserList; // 用于未运行任务节点
@@ -63,7 +63,7 @@ public class BpmProcessInstanceProgressRespVO {
 
     @Schema(description = "审批任务信息")
     @Data
-    public static class ApproveTaskInfo {
+    public static class ApprovalTaskInfo {
 
         @Schema(description = "任务编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
         private String id;

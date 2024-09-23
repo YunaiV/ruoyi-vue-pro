@@ -6,7 +6,6 @@ import cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmTaskCandidat
 import cn.iocoder.yudao.module.system.api.permission.PermissionApi;
 import cn.iocoder.yudao.module.system.api.permission.RoleApi;
 import jakarta.annotation.Resource;
-import org.flowable.engine.delegate.DelegateExecution;
 import org.springframework.stereotype.Component;
 
 import java.util.Set;
@@ -36,16 +35,7 @@ public class BpmTaskCandidateRoleStrategy implements BpmTaskCandidateStrategy {
     }
 
     @Override
-    public Set<Long> calculateUsers(DelegateExecution execution, String param) {
-        return calculateUsersByParam(param);
-    }
-
-    @Override
-    public Set<Long> calculateUsers(String processInstanceId, String param) {
-       return calculateUsersByParam(param);
-    }
-
-    private Set<Long> calculateUsersByParam(String param) {
+    public Set<Long> calculateUsers(String param) {
         Set<Long> roleIds = StrUtils.splitToLongSet(param);
         return permissionApi.getUserRoleIdListByRoleIds(roleIds);
     }

@@ -6,6 +6,7 @@ import cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmTaskCandidat
 import cn.iocoder.yudao.module.bpm.service.task.BpmProcessInstanceService;
 import jakarta.annotation.Resource;
 import org.flowable.engine.delegate.DelegateExecution;
+import org.flowable.engine.runtime.ProcessInstance;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
@@ -13,7 +14,7 @@ import java.util.Set;
 
 /**
  * 发起人自己 {@link BpmTaskCandidateUserStrategy} 实现类
- *
+ * <p>
  * 适合场景：用于需要发起人信息复核等场景
  *
  * @author jason
@@ -31,7 +32,8 @@ public class BpmTaskCandidateStartUserStrategy implements BpmTaskCandidateStrate
     }
 
     @Override
-    public void validateParam(String param) {}
+    public void validateParam(String param) {
+    }
 
     @Override
     public boolean isParamRequired() {
@@ -40,17 +42,13 @@ public class BpmTaskCandidateStartUserStrategy implements BpmTaskCandidateStrate
 
     @Override
     public Set<Long> calculateUsers(DelegateExecution execution, String param) {
-        return getStartUserOfProcessInstance(execution.getProcessInstanceId());
+        ProcessInstance processInstance = processInstanceService.getProcessInstance(execution.getProcessInstanceId());
+        return SetUtils.asSet(Long.valueOf(processInstance.getStartUserId()));
     }
 
     @Override
-    public Set<Long> calculateUsers(String processInstanceId, String param) {
-        return getStartUserOfProcessInstance(processInstanceId);
-    }
-
-    private Set<Long> getStartUserOfProcessInstance(String processInstanceId) {
-        String startUserId = processInstanceService.getProcessInstance(processInstanceId).getStartUserId();
-        return SetUtils.asSet(Long.valueOf(startUserId));
+    public Set<Long> calculateUsers(Long startUserId, ProcessInstance processInstance, String activityId, String param) {
+        return SetUtils.asSet(startUserId);
     }
 
 }

@@ -56,11 +56,21 @@ public class BpmTaskCandidateStartUserDeptLeaderStrategy extends BpmTaskCandidat
         ProcessInstance processInstance = processInstanceService.getProcessInstance(execution.getProcessInstanceId());
         Long startUserId = NumberUtils.parseLong(processInstance.getStartUserId());
         // 获取发起人的部门负责人
+        return getStartUserDeptLeader(startUserId, param);
+    }
+
+    @Override
+    public Set<Long> calculateUsers(Long startUserId, ProcessInstance processInstance, String activityId, String param) {
+        // 获取发起人的部门负责人
+        return getStartUserDeptLeader(startUserId, param);
+    }
+
+    private Set<Long> getStartUserDeptLeader(Long startUserId, String param) {
         DeptRespDTO dept = getStartUserDept(startUserId);
         if (dept == null) {
             return new HashSet<>();
         }
-        Long deptLeaderId =  getAssignLevelDeptLeaderId(dept, Integer.valueOf(param)); // 参数是部门的层级
+        Long deptLeaderId = getAssignLevelDeptLeaderId(dept, Integer.valueOf(param)); // 参数是部门的层级
         return deptLeaderId != null ? asSet(deptLeaderId) : new HashSet<>();
     }
 
