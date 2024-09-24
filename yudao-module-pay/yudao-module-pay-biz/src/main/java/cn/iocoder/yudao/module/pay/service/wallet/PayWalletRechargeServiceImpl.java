@@ -292,26 +292,26 @@ public class PayWalletRechargeServiceImpl implements PayWalletRechargeService {
         PayOrderDO payOrder = payOrderService.getOrder(payOrderId);
         if (payOrder == null) {
             log.error("[validatePayOrderPaid][充值订单({}) payOrder({}) 不存在，请进行处理！]",
-                    recharge, payOrderId);
+                    recharge.getId(), payOrderId);
             throw exception(PAY_ORDER_NOT_FOUND);
         }
 
         // 2.1 校验支付单已支付
         if (!PayOrderStatusEnum.isSuccess(payOrder.getStatus())) {
             log.error("[validatePayOrderPaid][充值订单({}) payOrder({}) 未支付，请进行处理！payOrder 数据是：{}]",
-                    recharge, payOrderId, toJsonString(payOrder));
+                    recharge.getId(), payOrderId, toJsonString(payOrder));
             throw exception(WALLET_RECHARGE_UPDATE_PAID_PAY_ORDER_STATUS_NOT_SUCCESS);
         }
         // 2.2 校验支付金额一致
         if (notEqual(payOrder.getPrice(), recharge.getPayPrice())) {
             log.error("[validatePayOrderPaid][充值订单({}) payOrder({}) 支付金额不匹配，请进行处理！钱包 数据是：{}，payOrder 数据是：{}]",
-                    recharge, payOrderId, toJsonString(recharge), toJsonString(payOrder));
+                    recharge.getId(), payOrderId, toJsonString(recharge), toJsonString(payOrder));
             throw exception(WALLET_RECHARGE_UPDATE_PAID_PAY_PRICE_NOT_MATCH);
         }
         // 2.3 校验支付订单的商户订单匹配
         if (notEqual(payOrder.getMerchantOrderId(), recharge.getId().toString())) {
             log.error("[validatePayOrderPaid][充值订单({}) 支付单不匹配({})，请进行处理！payOrder 数据是：{}]",
-                    recharge, payOrderId, toJsonString(payOrder));
+                    recharge.getId(), payOrderId, toJsonString(payOrder));
             throw exception(WALLET_RECHARGE_UPDATE_PAID_PAY_ORDER_ID_ERROR);
         }
         return payOrder;
