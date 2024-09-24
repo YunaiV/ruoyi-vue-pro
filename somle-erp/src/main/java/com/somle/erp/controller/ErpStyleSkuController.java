@@ -2,7 +2,6 @@ package com.somle.erp.controller;
 
 import com.somle.erp.model.product.ErpStyleSku;
 import com.somle.erp.service.ErpProductService;
-import com.somle.erp.service.ErpService;
 import com.somle.framework.common.pojo.CommonResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;

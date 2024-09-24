@@ -42,6 +42,12 @@ public class EsbController {
         return "success";
     }
 
+    @PostMapping("/syncUsers")
+    public String syncUsers() {
+        service.syncUsers();
+        return "success";
+    }
+
 
 //    @RequestMapping(value = "ip")
 //    public JSONObject getIP(HttpServletRequest request, HttpServletResponse response) {

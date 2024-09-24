@@ -3723,3 +3723,99 @@ INSERT INTO `yudao_demo03_student` (`id`, `name`, `sex`, `birthday`, `descriptio
 COMMIT;
 
 SET FOREIGN_KEY_CHECKS = 1;
+
+-- ----------------------------
+-- Somle customization
+-- ----------------------------
+
+
+
+DELIMITER $$
+
+CREATE PROCEDURE UpdateAutoIncrementForTables()
+BEGIN
+    -- Declare variables
+    DECLARE done INT DEFAULT 0;
+    DECLARE tbl_name VARCHAR(255);
+    DECLARE new_auto_increment_value INT DEFAULT 50001;
+
+    -- Declare a cursor for fetching the table names
+    DECLARE table_cursor CURSOR FOR
+    SELECT table_name
+    FROM information_schema.tables
+    WHERE table_schema = DATABASE()
+        AND (table_name LIKE 'sys_%' OR table_name LIKE 'infra_%');
+
+    -- Declare a handler for the end of the cursor
+    DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = 1;
+
+    -- Open the cursor
+    OPEN table_cursor;
+
+    -- Loop to iterate over the tables
+    read_loop: LOOP
+        -- Fetch the next table name
+        FETCH table_cursor INTO tbl_name;
+
+        -- If no more tables, exit the loop
+        IF done THEN
+            LEAVE read_loop;
+        END IF;
+
+        -- Construct and execute the ALTER TABLE statement
+        SET @query = CONCAT('ALTER TABLE ', tbl_name, ' AUTO_INCREMENT = ', new_auto_increment_value);
+    PREPARE stmt FROM @query;
+    EXECUTE stmt;
+    DEALLOCATE PREPARE stmt;
+
+    END LOOP;
+
+    -- Close the cursor
+    CLOSE table_cursor;
+END$$
+
+DELIMITER ;
+
+-- Call the procedure to update the AUTO_INCREMENT values
+CALL UpdateAutoIncrementForTables();
+
+
+-- 3. Delete the stored procedure
+DROP PROCEDURE IF EXISTS UpdateAutoIncrementForTables;
+
+INSERT INTO `ruoyi-vue-pro`.`system_tenant`
+    (`id`, `name`, `contact_user_id`, `contact_name`, `contact_mobile`, `status`, `website`, `package_id`, `expire_time`, `account_count`, `creator`, `create_time`, `updater`, `update_time`, `deleted`)
+VALUES (50001, '宁波索迈', NULL, '陶城', '13122069375', 0, 'www.somle.com', 0, '2099-02-19 17:14:16', 9999, '1', '2021-01-05 17:03:47', '1', '2023-11-06 11:41:41', b'0');
+
+INSERT INTO `ruoyi-vue-pro`.`system_users`
+    (`id`, `username`, `password`, `nickname`, `remark`, `dept_id`, `post_ids`, `email`, `mobile`, `sex`, `avatar`, `status`, `login_ip`, `login_date`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`)
+VALUES (50001, 'admin', '$2a$10$mRMIYLDtRHlf6.9ipiqH1.Z.bh/R9dO9d5iHiGYPigi6r5KOoR2Wm', '索迈管理员', '管理员', 1, '[1,2]', 'administrator@somle.com', '', 2, 'http://test.yudao.iocoder.cn/bf2002b38950c904243be7c825d3f82e29f25a44526583c3fde2ebdff3a87f75.png', 0, '0:0:0:0:0:0:0:1', '2024-07-28 11:35:00', 'admin', '2021-01-05 17:03:47', NULL, '2024-07-28 11:35:00', b'0', 50001);
+
+INSERT INTO `ruoyi-vue-pro`.`system_role`
+    (`id`, `name`, `code`, `sort`, `data_scope`, `data_scope_dept_ids`, `status`, `type`, `remark`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`)
+VALUES (50001, '超级管理员', 'super_admin', 1, 1, '', 0, 1, '超级管理员', 'admin', '2021-01-05 17:03:48', '', '2022-02-22 05:08:21', b'0', 50001);
+
+
+INSERT INTO `ruoyi-vue-pro`.`system_user_role`
+    (`id`, `user_id`, `role_id`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`)
+VALUES (50001, 50001, 50001, '', '2022-01-11 13:19:45', '', '2022-05-12 12:35:17', b'0', 50001);
+
+
+-- ----------------------------
+-- `ruoyi-vue-pro`.esb_mapping definition
+-- ----------------------------
+
+DROP TABLE IF EXISTS `esb_mapping`;
+CREATE TABLE `esb_mapping` (
+   `id` bigint NOT NULL AUTO_INCREMENT,
+   `account` varchar(255) DEFAULT NULL,
+   `domain` varchar(255) DEFAULT NULL,
+   `external_id` varchar(255) NOT NULL,
+   `internal_id` bigint DEFAULT NULL,
+   `type` varchar(255) DEFAULT NULL,
+   PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+
+
+

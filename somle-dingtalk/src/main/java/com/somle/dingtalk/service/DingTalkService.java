@@ -101,12 +101,12 @@ public class DingTalkService {
 
     }
 
-    public Stream<DingTalkDepartment> getDepartmentPath(long deptId) {
+    public Stream<DingTalkDepartment> getDepartmentPath(Long deptId) {
         DingTalkDepartment current = getDepartment(deptId);
         return Stream.concat(Stream.of(current), getDepartmentPath(current.getParentId()));
     }
 
-    public DingTalkDepartment getParent(long deptId, Integer parentLevel) {
+    public DingTalkDepartment getParent(Long deptId, Integer parentLevel) {
         List<DingTalkDepartment> path = getDepartmentPath(deptId).toList();
         return path.get(path.size() - 2);
     }
@@ -123,7 +123,7 @@ public class DingTalkService {
     // }
 
     //return dept with null level
-    public Stream<DingTalkDepartment> getOrphans(long deptId) {
+    public Stream<DingTalkDepartment> getOrphans(Long deptId) {
         log.info("fetching department child for " + deptId);
         String endUrl = "/topapi/v2/department/listsub";
 
@@ -224,7 +224,7 @@ public class DingTalkService {
         .reduce(true, (a, b) -> a && b);
     }
     
-    public Stream<DingTalkDepartment> toStream(DingTalkDepartment dept) {
+    public Stream<DingTalkDepartment> getChildStream(DingTalkDepartment dept) {
         // List<String> keys = List.of("CBD", "HCD", "EBD", "ABD", "DCD", "VC", "QC", "MC", "FC", "HC", "CC", "PC", "LC");
         List<DingTalkDepartment> childList = getChilds(dept).toList();
         if ( childList.isEmpty()) {
@@ -233,18 +233,14 @@ public class DingTalkService {
         } else {
             log.debug("non null child list");
             log.debug(childList.toString());
-            return Stream.concat(childList.stream(), childList.stream().flatMap(n -> toStream(n)));
+            return Stream.concat(childList.stream(), childList.stream().flatMap(n -> getChildStream(n)));
             // return Stream.concat(childList.stream().filter(n->! keys.stream().anyMatch(key->n.getName().startsWith(key))), childList.stream().flatMap(n -> getDepartmentsResursive(n)));
         }
     }
 
     public Stream<DingTalkDepartment> getDepartmentStream() {
-        return toStream(
-            DingTalkDepartment.builder()
-                .deptId(1l)
-                .level(0)
-                .build()
-        );
+        var topDept = getDepartment(1l).setLevel(0);
+        return Stream.concat(Stream.of(topDept), getChildStream(topDept));
     }
 
     

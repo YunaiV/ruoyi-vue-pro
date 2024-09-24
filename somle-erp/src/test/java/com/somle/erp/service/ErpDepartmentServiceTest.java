@@ -5,13 +5,13 @@ import jakarta.annotation.Resource;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@Import(ErpService.class)
-class ErpServiceTest extends BaseSpringTest {
+@Import(ErpDepartmentService.class)
+class ErpDepartmentServiceTest extends BaseSpringTest {
 
     @Resource
-    ErpService service;
+    ErpDepartmentService service;
 
     @Test
     void getParent() {

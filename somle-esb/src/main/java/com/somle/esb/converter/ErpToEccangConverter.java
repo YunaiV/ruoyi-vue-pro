@@ -7,7 +7,7 @@ import com.somle.eccang.service.EccangService;
 import com.somle.erp.model.product.ErpCountrySku;
 import com.somle.erp.model.ErpDepartment;
 import com.somle.erp.model.product.ErpStyleSku;
-import com.somle.erp.service.ErpService;
+import com.somle.erp.service.ErpDepartmentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -16,7 +16,7 @@ import java.util.List;
 @Service
 public class ErpToEccangConverter {
     @Autowired
-    ErpService erpService;
+    ErpDepartmentService erpDepartmentService;
 
     @Autowired
     EccangService eccangService;
@@ -25,7 +25,7 @@ public class ErpToEccangConverter {
         ErpStyleSku erpStyleSku = erpCountrySku.getStyleSku();
         Long deptId = erpStyleSku.getSaleDepartmentId();
         EccangProduct product = new EccangProduct();
-        List<ErpDepartment> path = erpService.getDepartmentParents(deptId).toList().reversed();
+        List<ErpDepartment> path = erpDepartmentService.getDepartmentParents(deptId).toList().reversed();
         // Integer level = path.size() - 1;
         EccangOrganization organization = eccangService.getOrganizationByNameEn(path.get(2).getId().toString());
 
@@ -90,7 +90,7 @@ public class ErpToEccangConverter {
         } catch (Exception e) {
         }
         try {
-            pid = eccangService.getCategoryByNameEn(erpService.getParent(erpDepartment, level - 1).getId().toString()).getPcId();
+            pid = eccangService.getCategoryByNameEn(erpDepartmentService.getParent(erpDepartment, level - 1).getId().toString()).getPcId();
         } catch (Exception e) {
             if (level != 1) {
                 throw new RuntimeException("pid not found for " + erpDepartment.toString() + " Detail: " + e.toString());

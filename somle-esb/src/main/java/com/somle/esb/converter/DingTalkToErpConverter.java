@@ -1,27 +1,17 @@
 package com.somle.esb.converter;
 
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
-import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
-import cn.iocoder.yudao.module.system.controller.admin.dept.vo.dept.DeptListReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.dept.vo.dept.DeptSaveReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.user.vo.user.UserSaveReqVO;
-import cn.iocoder.yudao.module.system.dal.dataobject.dept.DeptDO;
 import cn.iocoder.yudao.module.system.service.dept.DeptService;
 import com.dingtalk.api.response.OapiV2UserGetResponse;
 import com.somle.dingtalk.model.DingTalkDepartment;
 import com.somle.dingtalk.service.DingTalkService;
-import com.somle.erp.model.ErpDepartment;
-import com.somle.erp.service.ErpService;
 import com.somle.esb.model.EsbMapping;
-import com.somle.esb.repository.EsbMappingRepository;
 import com.somle.esb.service.EsbMappingService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Example;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
-import java.util.stream.Stream;
 
 @Slf4j
 @Service
@@ -77,17 +67,21 @@ public class DingTalkToErpConverter {
 
     public DeptSaveReqVO toErp(DingTalkDepartment dept) {
         DeptSaveReqVO erpDept = new DeptSaveReqVO();
-        // try to translate parent id
-        try {
-            var mapping = mappingService.toMapping(dept);
-            mapping.setExternalId(dept.getParentId().toString());
-            mapping = mappingService.findMapping(mapping);
-            erpDept
-                .setParentId(mapping.getInternalId());
-        } catch (Exception e) {
-            throw new RuntimeException("parent mapping not found");
+        // translate parent id
+        if (dept.getDeptId() == 1l) {
+            erpDept.setParentId(0l);
+        } else {
+            try {
+                var mapping = mappingService.toMapping(dept);
+                mapping.setExternalId(dept.getParentId().toString());
+                mapping = mappingService.findMapping(mapping);
+                erpDept
+                    .setParentId(mapping.getInternalId());
+            } catch (Exception e) {
+                throw new RuntimeException("parent mapping not found");
+            }
         }
-        //try to translate id
+        // translate id
         try {
             var mapping = mappingService.toMapping(dept);
             mapping = mappingService.findMapping(mapping);
