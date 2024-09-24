@@ -302,6 +302,22 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
         TradeOrderLogUtils.setUserInfo(order.getUserId(), UserTypeEnum.MEMBER.getValue());
     }
 
+    @Override
+    public void syncOrderPayStatusQuietly(Long id, Long payOrderId) {
+        PayOrderRespDTO payOrder = payOrderApi.getOrder(payOrderId);
+        if (payOrder == null) {
+            return;
+        }
+        if (!PayOrderStatusEnum.isSuccess(payOrder.getStatus())) {
+            return;
+        }
+        try {
+            getSelf().updateOrderPaid(id, payOrderId);
+        } catch (Throwable e) {
+            log.warn("[syncOrderPayStatusQuietly][id({}) payOrderId({}) 同步支付状态失败]", id, payOrderId, e);
+        }
+    }
+
     /**
      * 校验支付订单的合法性
      *
