@@ -197,6 +197,15 @@ public class LocalDateTimeUtils {
     }
 
     /**
+     * 获取昨天的开始时间
+     *
+     * @return 昨天
+     */
+    public static LocalDateTime getBeforeYesterday() {
+        return LocalDateTimeUtil.beginOfDay(LocalDateTime.now().minusDays(2));
+    }
+
+    /**
      * 获取本月的开始时间
      *
      * @return 本月
