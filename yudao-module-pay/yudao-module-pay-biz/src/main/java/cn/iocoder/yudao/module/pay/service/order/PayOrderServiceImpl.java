@@ -467,6 +467,18 @@ public class PayOrderServiceImpl implements PayOrderService {
         return count;
     }
 
+    @Override
+    public void syncOrderQuietly(Long id) {
+        // 1. 查询待支付订单
+        List<PayOrderExtensionDO> orderExtensions = orderExtensionMapper.selectListByOrderIdAndStatus(id,
+                PayOrderStatusEnum.WAITING.getStatus());
+
+        // 2. 遍历执行
+        for (PayOrderExtensionDO orderExtension : orderExtensions) {
+            syncOrder(orderExtension);
+        }
+    }
+
     /**
      * 同步单个支付拓展单
      *
