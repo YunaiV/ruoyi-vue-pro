@@ -156,7 +156,7 @@ public class EsbService {
 
     public void dataCollect(Domain domain) {
         LocalDate scheduleDate = LocalDate.now();
-        dataCollect(scheduleDate);
+        dataCollect(scheduleDate, domain);
     }
 
 

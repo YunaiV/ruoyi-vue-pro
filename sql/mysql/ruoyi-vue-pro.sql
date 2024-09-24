@@ -3789,7 +3789,8 @@ VALUES (50001, '宁波索迈', NULL, '陶城', '13122069375', 0, 'www.somle.com'
 
 INSERT INTO `ruoyi-vue-pro`.`system_users`
     (`id`, `username`, `password`, `nickname`, `remark`, `dept_id`, `post_ids`, `email`, `mobile`, `sex`, `avatar`, `status`, `login_ip`, `login_date`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`)
-VALUES (50001, 'admin', '$2a$10$mRMIYLDtRHlf6.9ipiqH1.Z.bh/R9dO9d5iHiGYPigi6r5KOoR2Wm', '索迈管理员', '管理员', 1, '[1,2]', 'administrator@somle.com', '', 2, 'http://test.yudao.iocoder.cn/bf2002b38950c904243be7c825d3f82e29f25a44526583c3fde2ebdff3a87f75.png', 0, '0:0:0:0:0:0:0:1', '2024-07-28 11:35:00', 'admin', '2021-01-05 17:03:47', NULL, '2024-07-28 11:35:00', b'0', 50001);
+VALUES (50001, 'admin', '$2a$04$QD2HyC029jyRHQuyhbTD8OuG7.seqSKL9p0lDf6r/87izz9Lt3a92', '索迈管理员', '管理员', 1, '[1,2]', 'administrator@somle.com', '', 2, 'http://test.yudao.iocoder.cn/bf2002b38950c904243be7c825d3f82e29f25a44526583c3fde2ebdff3a87f75.png', 0, '223.94.56.22', '2024-09-24 14:55:57', 'admin', '2021-01-05 17:03:47', '50001', '2024-09-24 14:57:27', b'0', 50001);
+
 
 INSERT INTO `ruoyi-vue-pro`.`system_role`
     (`id`, `name`, `code`, `sort`, `data_scope`, `data_scope_dept_ids`, `status`, `type`, `remark`, `creator`, `create_time`, `updater`, `update_time`, `deleted`, `tenant_id`)
