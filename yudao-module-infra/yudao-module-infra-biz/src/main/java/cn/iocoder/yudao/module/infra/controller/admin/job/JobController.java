@@ -84,7 +84,7 @@ public class JobController {
     @PutMapping("/trigger")
     @Operation(summary = "触发定时任务")
     @Parameter(name = "id", description = "编号", required = true, example = "1024")
-    @Parameter(name = "handlerParam", description = "参数", example = "2024-01-01")
+    @Parameter(name = "handlerParam", description = "处理器参数", example = "2024-01-01")
     @PreAuthorize("@ss.hasPermission('infra:job:trigger')")
     public CommonResult<Boolean> triggerJob(@RequestParam("id") Long id, @RequestParam(value="handlerParam", required = false) String handlerParam) throws SchedulerException {
         jobService.triggerJob(id, handlerParam);
