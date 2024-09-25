@@ -14,8 +14,8 @@ class MatomoServiceTest extends BaseMockitoUnitTest {
 
     @Test
     void getVisits() {
-        var result = service.getVisits(1, LocalDate.of(2024, 8, 01));
-        log.info(result.toString());
+        var result = service.getVisits(3, LocalDate.of(2024, 9, 24));
+        log.info(result.toList().toString());
     }
 
 

@@ -25,7 +25,7 @@ public class MatomoDataJob implements JobHandler {
     @Override
     public String execute(String param) throws Exception {
         var scheduleDate = param.isEmpty() ? LocalDate.now() : LocalDate.parse(param);
-        var dataDate = scheduleDate.minusDays(1);
+        var dataDate = scheduleDate.minusDays(2);
         IntStream.range(1, 7).boxed().forEach(idSite -> {
             OssData data = OssData.builder()
                 .database(Domain.MATOMO.getValue())
