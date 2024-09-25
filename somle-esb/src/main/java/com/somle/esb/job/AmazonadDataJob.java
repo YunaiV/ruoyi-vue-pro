@@ -13,25 +13,28 @@ import org.springframework.stereotype.Component;
 import java.time.LocalDate;
 
 @Component
-public class AmazonadDataJob implements JobHandler {
+public class AmazonadDataJob extends DataJob{
     @Autowired
     EsbService service;
 
     @Autowired
     AmazonService amazonService;
 
+    final String DATABASE = Domain.AMAZONAD.toString();
+
 
     @Override
     public String execute(String param) throws Exception {
-        var dataDate = param.isEmpty() ? LocalDateTimeUtils.getBeforeYesterday().toLocalDate() : LocalDate.parse(param);
-        amazonService.adClient.getAllAdReport(dataDate)
+        setDate(param);
+
+        amazonService.adClient.getAllAdReport(beforeYesterday)
             .forEach(page -> {
                 OssData data = OssData.builder()
-                    .database(Domain.AMAZONAD.getValue())
+                    .database(DATABASE)
                     .tableName("ad_report")
                     .syncType("inc")
                     .requestTimestamp(System.currentTimeMillis())
-                    .folderDate(dataDate)
+                    .folderDate(beforeYesterday)
                     .content(page)
                     .headers(null)
                     .build();

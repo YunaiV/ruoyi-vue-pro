@@ -1,6 +1,7 @@
 package com.somle.esb.job;
 
 
+import cn.iocoder.yudao.framework.common.util.string.StrUtils;
 import cn.iocoder.yudao.framework.quartz.core.handler.JobHandler;
 import com.somle.ai.service.AiService;
 import com.somle.esb.model.Domain;
@@ -14,19 +15,19 @@ import java.time.LocalDate;
 import java.util.stream.IntStream;
 
 @Component
-public class AiDataJob implements JobHandler {
+public class AiDataJob extends DataJob {
     @Autowired
     EsbService service;
 
     @Autowired
     AiService aiService;
 
+    final String DATABASE = Domain.ECCANG.toString();
+
 
     @Override
     public String execute(String param) throws Exception {
-        var scheduleDate = param.isEmpty() ? LocalDate.now() : LocalDate.parse(param);
-        var yesterday = scheduleDate.minusDays(1);
-        var DATABASE = Domain.ECCANG.getValue();
+        setDate(param);
         
         service.send(
             OssData.builder()

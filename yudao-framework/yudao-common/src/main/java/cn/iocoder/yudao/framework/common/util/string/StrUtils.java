@@ -16,6 +16,13 @@ import java.util.stream.Collectors;
  * @author 芋道源码
  */
 public class StrUtils {
+    public static boolean isEmpty(String str) {
+        return str != null && str.isEmpty();
+    }
+
+    public static boolean isNonEmpty(String str) {
+        return !isEmpty(str);
+    }
 
     public static String maxLength(CharSequence str, int maxLength) {
         return StrUtil.maxLength(str, maxLength - 3); // -3 的原因，是该方法会补充 ... 恰好

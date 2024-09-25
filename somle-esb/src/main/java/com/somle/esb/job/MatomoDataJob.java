@@ -14,26 +14,28 @@ import java.time.LocalDate;
 import java.util.stream.IntStream;
 
 @Component
-public class MatomoDataJob implements JobHandler {
+public class MatomoDataJob extends DataJob {
     @Autowired
     EsbService service;
 
     @Autowired
     MatomoService matomoService;
 
+    final String DATABASE = Domain.MATOMO.toString();
+
 
     @Override
     public String execute(String param) throws Exception {
-        var scheduleDate = param.isEmpty() ? LocalDate.now() : LocalDate.parse(param);
-        var dataDate = scheduleDate.minusDays(2);
+        setDate(param);
+
         IntStream.range(1, 7).boxed().forEach(idSite -> {
             OssData data = OssData.builder()
-                .database(Domain.MATOMO.getValue())
+                .database(DATABASE)
                 .tableName("visit")
                 .syncType("inc")
                 .requestTimestamp(System.currentTimeMillis())
-                .folderDate(dataDate)
-                .content(matomoService.getVisits(idSite, dataDate).toList())
+                .folderDate(beforeYesterday)
+                .content(matomoService.getVisits(idSite, beforeYesterday).toList())
                 .headers(null)
                 .build();
             service.send(data);

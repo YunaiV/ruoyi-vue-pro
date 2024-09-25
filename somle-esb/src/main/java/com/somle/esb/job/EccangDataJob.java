@@ -17,23 +17,20 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Component
-public class EccangDataJob implements JobHandler {
+public class EccangDataJob extends DataJob{
     @Autowired
     EsbService service;
 
     @Autowired
     EccangService eccangService;
 
+    final String DATABASE = Domain.ECCANG.toString();
+
 
     @Override
     public String execute(String param) throws Exception {
-        var scheduleDate = param.isEmpty() ? LocalDate.now() : LocalDate.parse(param);
-        LocalDate today = scheduleDate;
-        LocalDate yesterday = today.minusDays(1);
-        LocalDate beforeYesterday = today.minusDays(2);
-        LocalDateTime yesterdayFirstSecond = yesterday.atStartOfDay();
-        LocalDateTime yesterdayLastSecond = today.atStartOfDay().minusSeconds(1);
-        var DATABASE = Domain.ECCANG.getValue();
+        setDate(param);
+
         service.send(
             OssData.builder()
                 .database(DATABASE)
