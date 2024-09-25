@@ -2,11 +2,11 @@ package cn.iocoder.yudao.module.ai.service.knowledge;
 
 import cn.hutool.core.util.ObjUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
-import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
-import cn.iocoder.yudao.module.ai.controller.admin.knowledge.vo.knowledge.AiKnowledgeCreateMyReqVO;
-import cn.iocoder.yudao.module.ai.controller.admin.knowledge.vo.knowledge.AiKnowledgeUpdateMyReqVO;
+import cn.iocoder.yudao.module.ai.controller.admin.knowledge.vo.knowledge.AiKnowledgeCreateReqVO;
+import cn.iocoder.yudao.module.ai.controller.admin.knowledge.vo.knowledge.AiKnowledgePageReqVO;
+import cn.iocoder.yudao.module.ai.controller.admin.knowledge.vo.knowledge.AiKnowledgeUpdateReqVO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.knowledge.AiKnowledgeDO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiChatModelDO;
 import cn.iocoder.yudao.module.ai.dal.mysql.knowledge.AiKnowledgeMapper;
@@ -38,7 +38,7 @@ public class AiKnowledgeServiceImpl implements AiKnowledgeService {
     private AiApiKeyService apiKeyService;
 
     @Override
-    public Long createKnowledgeMy(AiKnowledgeCreateMyReqVO createReqVO, Long userId) {
+    public Long createKnowledge(AiKnowledgeCreateReqVO createReqVO, Long userId) {
         // 1. 校验模型配置
         AiChatModelDO model = chatModelService.validateChatModel(createReqVO.getModelId());
 
@@ -50,7 +50,7 @@ public class AiKnowledgeServiceImpl implements AiKnowledgeService {
     }
 
     @Override
-    public void updateKnowledgeMy(AiKnowledgeUpdateMyReqVO updateReqVO, Long userId) {
+    public void updateKnowledge(AiKnowledgeUpdateReqVO updateReqVO, Long userId) {
         // 1.1 校验知识库存在
         AiKnowledgeDO knowledgeBaseDO = validateKnowledgeExists(updateReqVO.getId());
         if (ObjUtil.notEqual(knowledgeBaseDO.getUserId(), userId)) {
@@ -75,8 +75,8 @@ public class AiKnowledgeServiceImpl implements AiKnowledgeService {
     }
 
     @Override
-    public PageResult<AiKnowledgeDO> getKnowledgePageMy(Long userId, PageParam pageReqVO) {
-        return knowledgeMapper.selectPageByMy(userId, pageReqVO);
+    public PageResult<AiKnowledgeDO> getKnowledgePage(Long userId, AiKnowledgePageReqVO pageReqVO) {
+        return knowledgeMapper.selectPage(userId, pageReqVO);
     }
 
     @Override

@@ -36,7 +36,7 @@ public class AiKnowledgeDocumentController {
 
     @GetMapping("/page")
     @Operation(summary = "获取文档分页")
-    public CommonResult<PageResult<AiKnowledgeDocumentRespVO>> getKnowledgeDocumentPageMy(@Valid AiKnowledgeDocumentPageReqVO pageReqVO) {
+    public CommonResult<PageResult<AiKnowledgeDocumentRespVO>> getKnowledgeDocumentPage(@Valid AiKnowledgeDocumentPageReqVO pageReqVO) {
         PageResult<AiKnowledgeDocumentDO> pageResult = documentService.getKnowledgeDocumentPage(pageReqVO);
         return success(BeanUtils.toBean(pageResult, AiKnowledgeDocumentRespVO.class));
     }
