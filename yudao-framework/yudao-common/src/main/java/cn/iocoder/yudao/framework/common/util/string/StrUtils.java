@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
  */
 public class StrUtils {
     public static boolean isEmpty(String str) {
-        return str != null && str.isEmpty();
+        return str == null || str.isEmpty();
     }
 
     public static boolean isNonEmpty(String str) {
