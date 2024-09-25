@@ -85,12 +85,12 @@ public interface BpmProcessInstanceService {
                                                                @Valid BpmProcessInstancePageReqVO pageReqVO);
 
     /**
-     * 获得流程实例表单字段权限
+     * 获得表单字段权限
      *
      * @param reqVO 请求消息
      * @return 表单字段权限
      */
-    Map<String, String> getProcessInstanceFormFieldsPermission(@Valid BpmProcessInstanceFormFieldsPermissionReqVO reqVO);
+    Map<String, String> getFormFieldsPermission(@Valid BpmFormFieldsPermissionReqVO reqVO);
 
     // TODO @芋艿：重点在 review 下
     /**
@@ -102,7 +102,7 @@ public interface BpmProcessInstanceService {
      * @param reqVO 请求信息
      * @return 流程实例的进度
      */
-    BpmApprovalDetailRespVO getApprovalDetail(Long loginUserId, BpmApprovalDetailReqVO reqVO);
+    BpmApprovalDetailRespVO getApprovalDetail(Long loginUserId, @Valid BpmApprovalDetailReqVO reqVO);
 
     // ========== Update 写入相关方法 ==========
 

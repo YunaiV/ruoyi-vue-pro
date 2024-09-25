@@ -158,11 +158,11 @@ public class BpmProcessInstanceController {
     }
 
     @GetMapping("/get-form-fields-permission")
-    @Operation(summary = "获得流程实例表单字段权限")
+    @Operation(summary = "获得表单字段权限")
     @PreAuthorize("@ss.hasPermission('bpm:process-instance:query')")
-    public CommonResult<Map<String, String>> getProcessInstanceFormFieldsPermission(
-            @Valid BpmProcessInstanceFormFieldsPermissionReqVO reqVO) {
-        return success(processInstanceService.getProcessInstanceFormFieldsPermission(reqVO));
+    public CommonResult<Map<String, String>> getFormFieldsPermission(
+            @Valid BpmFormFieldsPermissionReqVO reqVO) {
+        return success(processInstanceService.getFormFieldsPermission(reqVO));
     }
 
     @GetMapping("/get-approval-detail")
