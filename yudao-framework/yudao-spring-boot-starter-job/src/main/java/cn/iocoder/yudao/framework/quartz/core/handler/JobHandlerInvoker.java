@@ -81,7 +81,8 @@ public class JobHandlerInvoker extends QuartzJobBean {
         boolean success = exception == null;
         if (!success) {
 //            data = getRootCauseMessage(exception);
-            data = ExceptionUtil.stacktraceToString(exception).substring(0,4000);
+            var stackString = ExceptionUtil.stacktraceToString(exception);
+            data = stackString.length() > 4000? stackString.substring(0,4000) : stackString;
         }
         // 更新日志
         try {
