@@ -26,8 +26,7 @@ import java.util.Objects;
 import static cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.simple.BpmSimpleModelNodeVO.OperationButtonSetting;
 import static cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.simple.BpmSimpleModelNodeVO.TimeoutHandler;
 import static cn.iocoder.yudao.module.bpm.enums.definition.BpmSimpleModelNodeType.*;
-import static cn.iocoder.yudao.module.bpm.enums.definition.BpmUserTaskApproveMethodEnum.RANDOM;
-import static cn.iocoder.yudao.module.bpm.enums.definition.BpmUserTaskApproveMethodEnum.RATIO;
+import static cn.iocoder.yudao.module.bpm.enums.definition.BpmUserTaskApproveMethodEnum.*;
 import static cn.iocoder.yudao.module.bpm.enums.definition.BpmUserTaskApproveTypeEnum.USER;
 import static cn.iocoder.yudao.module.bpm.enums.definition.BpmUserTaskAssignStartUserHandlerTypeEnum.SKIP;
 import static cn.iocoder.yudao.module.bpm.enums.definition.BpmUserTaskTimeoutHandlerTypeEnum.REMINDER;
@@ -288,6 +287,10 @@ public class SimpleModelUtils {
         return node != null && node.getId() != null;
     }
 
+    public static boolean isSequentialApproveNode(BpmSimpleModelNodeVO node) {
+        return APPROVE_NODE.getType().equals(node.getType()) && SEQUENTIAL.getMethod().equals(node.getApproveMethod());
+    }
+
     private static List<FlowElement> buildFlowNode(BpmSimpleModelNodeVO node, BpmSimpleModelNodeType nodeType) {
         List<FlowElement> list = new ArrayList<>();
         switch (nodeType) {
@@ -523,7 +526,7 @@ public class SimpleModelUtils {
             multiInstanceCharacteristics.setCompletionCondition(ANY_OF_APPROVE_COMPLETE_EXPRESSION);
             multiInstanceCharacteristics.setSequential(false);
             userTask.setLoopCharacteristics(multiInstanceCharacteristics);
-        } else if (approveMethodEnum == BpmUserTaskApproveMethodEnum.SEQUENTIAL) {
+        } else if (approveMethodEnum == SEQUENTIAL) {
             multiInstanceCharacteristics.setCompletionCondition(ALL_APPROVE_COMPLETE_EXPRESSION);
             multiInstanceCharacteristics.setSequential(true);
             multiInstanceCharacteristics.setLoopCardinality("1");
