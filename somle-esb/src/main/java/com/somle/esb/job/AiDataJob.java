@@ -22,7 +22,7 @@ public class AiDataJob extends DataJob {
     @Autowired
     AiService aiService;
 
-    final String DATABASE = Domain.ECCANG.toString();
+    final String DATABASE = Domain.AI.toString();
 
 
     @Override
