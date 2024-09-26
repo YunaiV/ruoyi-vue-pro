@@ -32,11 +32,8 @@ public class BpmTaskCandidateStartUserDeptLeaderMultiStrategy extends BpmTaskCan
     @Lazy
     private BpmProcessInstanceService processInstanceService;
 
-    @Resource
-    private AdminUserApi adminUserApi;
-
-    public BpmTaskCandidateStartUserDeptLeaderMultiStrategy(DeptApi deptApi) {
-        super(deptApi);
+    public BpmTaskCandidateStartUserDeptLeaderMultiStrategy(AdminUserApi adminUserApi, DeptApi deptApi) {
+        super(adminUserApi, deptApi);
     }
 
     @Override
@@ -60,7 +57,9 @@ public class BpmTaskCandidateStartUserDeptLeaderMultiStrategy extends BpmTaskCan
         if (dept == null) {
             return new HashSet<>();
         }
-        return getMultiLevelDeptLeaderIds(toList(dept.getId()), Integer.valueOf(param)); // 参数是部门的层级
+        Set<Long> users = getMultiLevelDeptLeaderIds(toList(dept.getId()), Integer.valueOf(param)); // 参数是部门的层级
+        removeDisableUsers(users);
+        return users;
     }
 
     @Override
@@ -69,7 +68,9 @@ public class BpmTaskCandidateStartUserDeptLeaderMultiStrategy extends BpmTaskCan
         if (dept == null) {
             return new HashSet<>();
         }
-        return getMultiLevelDeptLeaderIds(toList(dept.getId()), Integer.valueOf(param)); // 参数是部门的层级
+        Set<Long> users =  getMultiLevelDeptLeaderIds(toList(dept.getId()), Integer.valueOf(param)); // 参数是部门的层级
+        removeDisableUsers(users);
+        return users;
     }
 
     /**

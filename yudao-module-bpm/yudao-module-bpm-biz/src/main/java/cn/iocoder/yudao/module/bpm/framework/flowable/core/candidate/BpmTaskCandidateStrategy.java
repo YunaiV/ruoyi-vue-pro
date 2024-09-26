@@ -56,7 +56,9 @@ public interface BpmTaskCandidateStrategy {
      * @return 用户编号集合
      */
     default Set<Long> calculateUsers(DelegateExecution execution, String param) {
-        return calculateUsers(param);
+        Set<Long> users = calculateUsers(param);
+        removeDisableUsers(users);
+        return users;
     }
 
 
@@ -72,8 +74,18 @@ public interface BpmTaskCandidateStrategy {
      * @return 用户编号集合
      */
     default Set<Long> calculateUsers(Long startUserId, ProcessInstance processInstance, String activityId, String param) {
-        return calculateUsers(param);
+        Set<Long> users = calculateUsers(param);
+        removeDisableUsers(users);
+        return users;
     }
+
+
+    /**
+     * 移除被禁用的用户
+     *
+     * @param users 用户 Ids
+     */
+    void removeDisableUsers(Set<Long> users);
 
     // TODO @芋艿：后续可以抽象一个 calculateUsers(String param)，默认 calculateUsers 和 calculateUsers 调用它
     // TODO @芋艿 加了， review 一下

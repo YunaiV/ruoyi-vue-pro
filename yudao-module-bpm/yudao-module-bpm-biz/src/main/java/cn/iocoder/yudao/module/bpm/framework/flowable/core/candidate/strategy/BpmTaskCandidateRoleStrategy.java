@@ -5,6 +5,7 @@ import cn.iocoder.yudao.module.bpm.framework.flowable.core.candidate.BpmTaskCand
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmTaskCandidateStrategyEnum;
 import cn.iocoder.yudao.module.system.api.permission.PermissionApi;
 import cn.iocoder.yudao.module.system.api.permission.RoleApi;
+import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Component;
 
@@ -16,12 +17,16 @@ import java.util.Set;
  * @author kyle
  */
 @Component
-public class BpmTaskCandidateRoleStrategy implements BpmTaskCandidateStrategy {
+public class BpmTaskCandidateRoleStrategy extends BpmTaskCandidateAbstractStrategy {
 
     @Resource
     private RoleApi roleApi;
     @Resource
     private PermissionApi permissionApi;
+
+    public BpmTaskCandidateRoleStrategy(AdminUserApi adminUserApi) {
+        super(adminUserApi);
+    }
 
     @Override
     public BpmTaskCandidateStrategyEnum getStrategy() {

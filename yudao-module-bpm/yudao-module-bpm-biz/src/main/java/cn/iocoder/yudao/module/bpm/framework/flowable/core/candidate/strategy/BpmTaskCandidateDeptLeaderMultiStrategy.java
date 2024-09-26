@@ -5,6 +5,7 @@ import cn.iocoder.yudao.framework.common.util.string.StrUtils;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.candidate.BpmTaskCandidateStrategy;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmTaskCandidateStrategyEnum;
 import cn.iocoder.yudao.module.system.api.dept.DeptApi;
+import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import org.springframework.stereotype.Component;
 
 import java.util.Set;
@@ -17,8 +18,8 @@ import java.util.Set;
 @Component
 public class BpmTaskCandidateDeptLeaderMultiStrategy extends BpmTaskCandidateAbstractDeptLeaderStrategy {
 
-    public BpmTaskCandidateDeptLeaderMultiStrategy(DeptApi deptApi) {
-        super(deptApi);
+    public BpmTaskCandidateDeptLeaderMultiStrategy(AdminUserApi adminUserApi, DeptApi deptApi) {
+        super(adminUserApi, deptApi);
     }
 
     @Override

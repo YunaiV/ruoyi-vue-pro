@@ -5,6 +5,7 @@ import cn.hutool.core.lang.Assert;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.candidate.BpmTaskCandidateStrategy;
 import cn.iocoder.yudao.module.system.api.dept.DeptApi;
 import cn.iocoder.yudao.module.system.api.dept.dto.DeptRespDTO;
+import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 
 import java.util.*;
 
@@ -13,11 +14,12 @@ import java.util.*;
  *
  * @author jason
  */
-public abstract class BpmTaskCandidateAbstractDeptLeaderStrategy implements BpmTaskCandidateStrategy {
+public abstract class BpmTaskCandidateAbstractDeptLeaderStrategy extends  BpmTaskCandidateAbstractStrategy {
 
     protected DeptApi deptApi;
 
-    public BpmTaskCandidateAbstractDeptLeaderStrategy(DeptApi deptApi) {
+    public BpmTaskCandidateAbstractDeptLeaderStrategy(AdminUserApi adminUserApi, DeptApi deptApi) {
+        super(adminUserApi);
         this.deptApi = deptApi;
     }
 

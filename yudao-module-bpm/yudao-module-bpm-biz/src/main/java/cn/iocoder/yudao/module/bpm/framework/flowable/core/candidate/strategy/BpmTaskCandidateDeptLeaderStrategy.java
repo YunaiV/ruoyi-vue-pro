@@ -5,7 +5,7 @@ import cn.iocoder.yudao.module.bpm.framework.flowable.core.candidate.BpmTaskCand
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmTaskCandidateStrategyEnum;
 import cn.iocoder.yudao.module.system.api.dept.DeptApi;
 import cn.iocoder.yudao.module.system.api.dept.dto.DeptRespDTO;
-import jakarta.annotation.Resource;
+import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -19,10 +19,14 @@ import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.
  * @author kyle
  */
 @Component
-public class BpmTaskCandidateDeptLeaderStrategy implements BpmTaskCandidateStrategy {
+public class BpmTaskCandidateDeptLeaderStrategy extends BpmTaskCandidateAbstractStrategy {
 
-    @Resource
-    private DeptApi deptApi;
+    private final DeptApi deptApi;
+
+    public BpmTaskCandidateDeptLeaderStrategy(AdminUserApi adminUserApi, DeptApi deptApi) {
+        super(adminUserApi);
+        this.deptApi = deptApi;
+    }
 
     @Override
     public BpmTaskCandidateStrategyEnum getStrategy() {

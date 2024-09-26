@@ -111,7 +111,7 @@ public class BpmTaskCandidateInvoker {
         removeStartUserIfSkip(execution, userIds);
 
         // 2. 移除被禁用的用户  TODO @芋艿 移除禁用的用户是否应该放在 1.1 之后
-        removeDisableUsers(userIds);
+        // removeDisableUsers(userIds);  @芋艿 把这个移到了 BpmTaskCandidateStrategy 下面。 看一下是否可以
         return userIds;
     }
 

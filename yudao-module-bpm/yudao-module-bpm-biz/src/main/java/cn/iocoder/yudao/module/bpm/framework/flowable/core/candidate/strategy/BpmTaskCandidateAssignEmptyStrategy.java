@@ -5,7 +5,6 @@ import cn.iocoder.yudao.module.bpm.framework.flowable.core.candidate.BpmTaskCand
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmTaskCandidateStrategyEnum;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.util.BpmnModelUtils;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
-import jakarta.annotation.Resource;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.springframework.stereotype.Component;
 
@@ -19,10 +18,11 @@ import java.util.Set;
  * @author kyle
  */
 @Component
-public class BpmTaskCandidateAssignEmptyStrategy implements BpmTaskCandidateStrategy {
+public class BpmTaskCandidateAssignEmptyStrategy extends BpmTaskCandidateAbstractStrategy {
 
-    @Resource
-    private AdminUserApi adminUserApi;
+    public BpmTaskCandidateAssignEmptyStrategy(AdminUserApi adminUserApi) {
+        super(adminUserApi);
+    }
 
     @Override
     public BpmTaskCandidateStrategyEnum getStrategy() {
@@ -38,7 +38,9 @@ public class BpmTaskCandidateAssignEmptyStrategy implements BpmTaskCandidateStra
         // 情况一：指定人员审批
         Integer assignEmptyHandlerType = BpmnModelUtils.parseAssignEmptyHandlerType(execution.getCurrentFlowElement());
         if (Objects.equals(assignEmptyHandlerType, BpmUserTaskAssignEmptyHandlerTypeEnum.ASSIGN_USER.getType())) {
-            return new HashSet<>(BpmnModelUtils.parseAssignEmptyHandlerUserIds(execution.getCurrentFlowElement()));
+            HashSet<Long> users = new HashSet<>(BpmnModelUtils.parseAssignEmptyHandlerUserIds(execution.getCurrentFlowElement()));
+            removeDisableUsers(users);
+            return users;
         }
 
         // 情况二：流程管理员

@@ -32,16 +32,13 @@ public class BpmTaskCandidateStartUserDeptLeaderStrategy extends BpmTaskCandidat
     @Lazy // 避免循环依赖
     private BpmProcessInstanceService processInstanceService;
 
-    @Resource
-    private AdminUserApi adminUserApi;
-
     @Override
     public BpmTaskCandidateStrategyEnum getStrategy() {
         return BpmTaskCandidateStrategyEnum.START_USER_DEPT_LEADER;
     }
 
-    public BpmTaskCandidateStartUserDeptLeaderStrategy(DeptApi deptApi) {
-        super(deptApi);
+    public BpmTaskCandidateStartUserDeptLeaderStrategy(AdminUserApi adminUserApi, DeptApi deptApi) {
+        super(adminUserApi, deptApi);
     }
 
     @Override
@@ -56,13 +53,17 @@ public class BpmTaskCandidateStartUserDeptLeaderStrategy extends BpmTaskCandidat
         ProcessInstance processInstance = processInstanceService.getProcessInstance(execution.getProcessInstanceId());
         Long startUserId = NumberUtils.parseLong(processInstance.getStartUserId());
         // 获取发起人的部门负责人
-        return getStartUserDeptLeader(startUserId, param);
+        Set<Long> users = getStartUserDeptLeader(startUserId, param);
+        removeDisableUsers(users);
+        return users;
     }
 
     @Override
     public Set<Long> calculateUsers(Long startUserId, ProcessInstance processInstance, String activityId, String param) {
         // 获取发起人的部门负责人
-        return getStartUserDeptLeader(startUserId, param);
+        Set<Long> users =  getStartUserDeptLeader(startUserId, param);
+        removeDisableUsers(users);
+        return users;
     }
 
     private Set<Long> getStartUserDeptLeader(Long startUserId, String param) {
