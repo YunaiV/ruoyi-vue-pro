@@ -42,7 +42,7 @@ import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.*;
 /**
  * Auth Service 实现类
  *
- * @author 芋道源码
+ * @author �
  */
 @Service
 @Slf4j
@@ -66,7 +66,7 @@ public class AdminAuthServiceImpl implements AdminAuthService {
     private SmsCodeApi smsCodeApi;
 
     /**
-     * 验证码的开关，默认为 true
+     * �
      */
     @Value("${yudao.captcha.enable:true}")
     private Boolean captchaEnable;
@@ -124,7 +124,7 @@ public class AdminAuthServiceImpl implements AdminAuthService {
         // 校验验证码
         smsCodeApi.useSmsCode(AuthConvert.INSTANCE.convert(reqVO, SmsSceneEnum.ADMIN_MEMBER_LOGIN.getScene(), getClientIP()));
 
-        // 获得用户信息
+        // �
         AdminUserDO user = userService.getUserByMobile(reqVO.getMobile());
         if (user == null) {
             throw exception(USER_NOT_EXISTS);
@@ -132,6 +132,35 @@ public class AdminAuthServiceImpl implements AdminAuthService {
 
         // 创建 Token 令牌，记录登录日志
         return createTokenAfterLoginSuccess(user.getId(), reqVO.getMobile(), LoginLogTypeEnum.LOGIN_MOBILE);
+    }
+
+    @Override
+    public AuthLoginRespVO emailLogin(AuthEmailLoginReqVO reqVO) {
+        // 校验邮箱和密码
+        AdminUserDO user = authenticateByEmail(reqVO.getEmail(), reqVO.getPassword());
+
+        // 创建 Token 令牌，记录登录日志
+        return createTokenAfterLoginSuccess(user.getId(), reqVO.getEmail(), LoginLogTypeEnum.LOGIN_EMAIL);
+    }
+
+    private AdminUserDO authenticateByEmail(String email, String password) {
+        final LoginLogTypeEnum logTypeEnum = LoginLogTypeEnum.LOGIN_EMAIL;
+        // 校验邮箱是否存在
+        AdminUserDO user = userService.getUserByEmail(email);
+        if (user == null) {
+            createLoginLog(null, email, logTypeEnum, LoginResultEnum.BAD_CREDENTIALS);
+            throw exception(AUTH_LOGIN_BAD_CREDENTIALS);
+        }
+        if (!userService.isPasswordMatch(password, user.getPassword())) {
+            createLoginLog(user.getId(), email, logTypeEnum, LoginResultEnum.BAD_CREDENTIALS);
+            throw exception(AUTH_LOGIN_BAD_CREDENTIALS);
+        }
+        // 校验是否禁用
+        if (CommonStatusEnum.isDisable(user.getStatus())) {
+            createLoginLog(user.getId(), email, logTypeEnum, LoginResultEnum.USER_DISABLED);
+            throw exception(AUTH_LOGIN_USER_DISABLED);
+        }
+        return user;
     }
 
     private void createLoginLog(Long userId, String username,

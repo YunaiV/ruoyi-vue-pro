@@ -92,7 +92,7 @@ public class AuthController {
     @GetMapping("/get-permission-info")
     @Operation(summary = "获取登录用户的权限信息")
     public CommonResult<AuthPermissionInfoRespVO> getPermissionInfo() {
-        // 1.1 获得用户信息
+        // 1.1 �
         AdminUserDO user = userService.getUser(getLoginUserId());
         if (user == null) {
             return success(null);
@@ -152,6 +152,15 @@ public class AuthController {
     @Operation(summary = "社交快捷登录，使用 code 授权码", description = "适合未登录的用户，但是社交账号已绑定用户")
     public CommonResult<AuthLoginRespVO> socialQuickLogin(@RequestBody @Valid AuthSocialLoginReqVO reqVO) {
         return success(authService.socialLogin(reqVO));
+    }
+
+    // ========== 邮箱登录相关 ==========
+
+    @PostMapping("/email-login")
+    @PermitAll
+    @Operation(summary = "使用邮箱和密码登录")
+    public CommonResult<AuthLoginRespVO> emailLogin(@RequestBody @Valid AuthEmailLoginReqVO reqVO) {
+        return success(authService.emailLogin(reqVO));
     }
 
 }

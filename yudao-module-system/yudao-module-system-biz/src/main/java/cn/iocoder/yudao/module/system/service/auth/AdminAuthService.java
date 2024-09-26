@@ -70,4 +70,12 @@ public interface AdminAuthService {
      */
     AuthLoginRespVO refreshToken(String refreshToken);
 
+    /**
+     * 邮箱登录
+     *
+     * @param reqVO 登录信息
+     * @return 登录结果
+     */
+    AuthLoginRespVO emailLogin(@Valid AuthEmailLoginReqVO reqVO);
+
 }

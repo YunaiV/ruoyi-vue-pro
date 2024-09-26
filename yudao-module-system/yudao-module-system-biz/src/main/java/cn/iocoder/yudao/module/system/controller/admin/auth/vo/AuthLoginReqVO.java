@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 import org.hibernate.validator.constraints.Length;
 
 import javax.validation.constraints.AssertTrue;
+import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Pattern;
 
@@ -31,6 +32,11 @@ public class AuthLoginReqVO {
     @NotEmpty(message = "密码不能为空")
     @Length(min = 4, max = 16, message = "密码长度为 4-16 位")
     private String password;
+
+    @Schema(description = "邮箱", requiredMode = Schema.RequiredMode.REQUIRED, example = "example@example.com")
+    @NotEmpty(message = "邮箱不能为空")
+    @Email(message = "邮箱格式不正确")
+    private String email;
 
     // ========== 图片验证码相关 ==========
 
