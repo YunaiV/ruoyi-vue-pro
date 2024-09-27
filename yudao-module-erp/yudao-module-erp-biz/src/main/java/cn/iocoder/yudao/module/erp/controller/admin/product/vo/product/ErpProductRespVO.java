@@ -21,6 +21,10 @@ public class ErpProductRespVO {
     @ExcelProperty("产品名称")
     private String name;
 
+    @Schema(description = "图片URL", example = "https://www.iocoder.cn")
+    @ExcelProperty("图片URL")
+    private String imageUrl;
+
     @Schema(description = "产品条码", requiredMode = Schema.RequiredMode.REQUIRED, example = "X110")
     @ExcelProperty("产品条码")
     private String barCode;

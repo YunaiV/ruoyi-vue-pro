@@ -32,13 +32,13 @@ class AiServiceTest extends BaseSpringTest {
 
     @Test
     void getNames() {
-        var result = service.getNames(LocalDate.of(2024,8,21));
+        var result = service.getNames(LocalDate.of(2024,6,19));
         log.info(result.toList().toString());
     }
 
     @Test
     void getAddresses() {
-        var result = service.getAddresses(LocalDate.of(2024,8,21));
+        var result = service.getAddresses(LocalDate.of(2024,6,19));
         log.info(result.toList().toString());
     }
 
