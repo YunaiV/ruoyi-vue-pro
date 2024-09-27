@@ -4878,6 +4878,69 @@ CREATE TABLE `esb_mapping` (
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 
+INSERT INTO system_menu
+(`name`, `permission`, `type`, `sort`, `parent_id`, `path`, `icon`, `component`, `component_name`, `status`, `visible`, `keep_alive`, `always_show`, `creator`, `create_time`, `updater`, `update_time`, `deleted`)
+VALUES ('物流管理', '', 1, 60, 2563, 'logistic', 'ep:ship', '', '', 0, b'1', b'1', b'1', '50001', '2024-09-26 16:52:53', '50001', '2024-09-26 16:53:38', b'0');
+
+SELECT @parentId := LAST_INSERT_ID();
+
+-- 菜单 SQL
+INSERT INTO system_menu(
+    name, permission, type, sort, parent_id,
+    path, icon, component, status, component_name
+)
+VALUES (
+           'ERP 海关规则管理', '', 2, 0, @parentId,
+           'custom-rule', '', 'erp/logistic/customrule/index', 0, 'ErpCustomRule'
+       );
+
+-- 按钮父菜单ID
+-- 暂时只支持 MySQL。如果你是 Oracle、PostgreSQL、SQLServer 的话，需要手动修改 @parentId 的部分的代码
+SELECT @parentId := LAST_INSERT_ID();
+
+-- 按钮 SQL
+INSERT INTO system_menu(
+    name, permission, type, sort, parent_id,
+    path, icon, component, status
+)
+VALUES (
+           'ERP 海关规则查询', 'erp:custom-rule:query', 3, 1, @parentId,
+           '', '', '', 0
+       );
+INSERT INTO system_menu(
+    name, permission, type, sort, parent_id,
+    path, icon, component, status
+)
+VALUES (
+           'ERP 海关规则创建', 'erp:custom-rule:create', 3, 2, @parentId,
+           '', '', '', 0
+       );
+INSERT INTO system_menu(
+    name, permission, type, sort, parent_id,
+    path, icon, component, status
+)
+VALUES (
+           'ERP 海关规则更新', 'erp:custom-rule:update', 3, 3, @parentId,
+           '', '', '', 0
+       );
+INSERT INTO system_menu(
+    name, permission, type, sort, parent_id,
+    path, icon, component, status
+)
+VALUES (
+           'ERP 海关规则删除', 'erp:custom-rule:delete', 3, 4, @parentId,
+           '', '', '', 0
+       );
+INSERT INTO system_menu(
+    name, permission, type, sort, parent_id,
+    path, icon, component, status
+)
+VALUES (
+           'ERP 海关规则导出', 'erp:custom-rule:export', 3, 5, @parentId,
+           '', '', '', 0
+       );
+
+
 -- 菜单 SQL
 INSERT INTO system_menu(
     name, permission, type, sort, parent_id,

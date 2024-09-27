@@ -8,6 +8,7 @@ import cn.iocoder.yudao.framework.common.exception.ErrorCode;
  * erp 系统，使用 1-030-000-000 段
  */
 public interface ErrorCodeConstants {
+    ErrorCode CUSTOM_RULE_NOT_EXISTS = new ErrorCode(99999, "ERP 海关规则不存在");
 
     // ========== ERP 供应商（1-030-100-000） ==========
     ErrorCode SUPPLIER_NOT_EXISTS = new ErrorCode(1_030_100_000, "供应商不存在");
