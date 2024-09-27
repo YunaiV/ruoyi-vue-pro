@@ -1,7 +1,9 @@
 package com.somle.amazon.service;
 
+import cn.hutool.json.JSON;
 import com.somle.amazon.model.AmazonAccount;
 import com.somle.amazon.model.AmazonShop;
+import com.somle.framework.common.util.general.CoreUtils;
 import com.somle.framework.common.util.json.JSONArray;
 import com.somle.framework.common.util.json.JSONObject;
 import com.somle.framework.common.util.json.JsonUtils;
@@ -122,31 +124,59 @@ public class AmazonAdClient {
         String reportId = null;
         while (reportId == null) {
             log.info("Creating ad report...");
-            // ResponseEntity<JSONObject> response = restTemplate.exchange(fullUrl, HttpMethod.POST, new HttpEntity<JSONObject>(payload, headers), JSONObject.class);
-            JSONObject response = WebUtils.postRequest(fullUrl, Map.of(), headers, payload, JSONObject.class);
+            var response = WebUtils.postRequest(fullUrl, Map.of(), headers, payload);
+            switch (response.code()) {
+                case 200:
+                    break;
+                case 425:
+                    throw new RuntimeException("The Request is a duplicate");
+                default:
+                    throw new RuntimeException("Unknown response code in creating report: " + response.code());
+            }
+            var responseBody = WebUtils.parseResponse(response, JSONObject.class);
             log.debug(response.toString());
-            reportId = response.getString("reportId");
+            reportId = responseBody.getString("reportId");
         }
         log.info("Got report ID");
 
         // Check report status and get document id
         String status = null;
+        String docUrl = null;
         // ResponseEntity<JSONObject> response = null;
-        JSONObject response = null;
         while (!"COMPLETED".equals(status)) {
             String reportStatusUrl = endpoint + "/reporting/reports/" + reportId;
             log.info("Checking report status...");
             // response = restTemplate.exchange(reportStatusUrl, HttpMethod.GET, new HttpEntity<>(headers), JSONObject.class);
-            response = WebUtils.getRequest(reportStatusUrl, Map.of(), headers, JSONObject.class);
-            log.debug(response.toString());
-            status = response.getString("status");
+            var response = WebUtils.getRequest(reportStatusUrl, Map.of(), headers);
+            switch (response.code()) {
+                case 200:
+                    break;
+                case 429:
+                    log.info("Received 429 Too Many Requests. Retrying...");
+                    CoreUtils.sleep(3000);
+                    continue;
+                default:
+                    throw new RuntimeException("Http error code: " + response + response.body());
+            }
+            var responseBody = WebUtils.parseResponse(response, JSONObject.class);
+            log.debug(responseBody.toString());
+            status = responseBody.getString("status");
             log.info(status);
-            if ("CANCELLED".equals(status)) {
-                log.info("No data returned, skip.");
-                return null;
+            switch (status) {
+                case "CANCELLED":
+                    log.info("No data returned.");
+                    return null;
+                case "PENDING":
+                    break;
+                case "PROCESSING":
+                    break;
+                case "COMPLETED":
+                    docUrl = responseBody.getString("url");
+                    break;
+                default:
+                    throw new RuntimeException("Unknown status code: " + status);
             }
         }
-        String docUrl = response.getString("url");
         log.info("Got doc url {}", docUrl);
 
         JSONArray contentDict = WebUtils.urlToDict(docUrl, "gzip", JSONArray.class);
