@@ -4877,6 +4877,16 @@ CREATE TABLE `esb_mapping` (
                                PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
+-- ----------------------------
+-- Somle erp customization
+-- ----------------------------
+
+ALTER TABLE erp_product
+ADD COLUMN length DECIMAL(24, 6) NULL COMMENT '基础长度（cm）',
+ADD COLUMN width DECIMAL(24, 6) NULL COMMENT '基础宽度（cm）',
+ADD COLUMN height DECIMAL(24, 6) NULL COMMENT '基础高度（cm）',
+ADD COLUMN material VARCHAR(100) NULL COMMENT '材料（中文）' CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
 
 INSERT INTO system_menu
 (`name`, `permission`, `type`, `sort`, `parent_id`, `path`, `icon`, `component`, `component_name`, `status`, `visible`, `keep_alive`, `always_show`, `creator`, `create_time`, `updater`, `update_time`, `deleted`)

@@ -53,6 +53,22 @@ public class ErpProductRespVO {
     @ExcelProperty("保质期天数")
     private Integer expiryDay;
 
+    @Schema(description = "材料（中文）")
+    @ExcelProperty("材料（中文）")
+    private String material;
+
+    @Schema(description = "基础长度（cm）")
+    @ExcelProperty("基础长度（cm）")
+    private BigDecimal length;
+
+    @Schema(description = "基础宽度（cm）")
+    @ExcelProperty("基础宽度（cm）")
+    private BigDecimal width;
+
+    @Schema(description = "基础高度（cm）")
+    @ExcelProperty("基础高度（cm）")
+    private BigDecimal height;
+
     @Schema(description = "基础重量（kg）", example = "1.00")
     @ExcelProperty("基础重量（kg）")
     private BigDecimal weight;

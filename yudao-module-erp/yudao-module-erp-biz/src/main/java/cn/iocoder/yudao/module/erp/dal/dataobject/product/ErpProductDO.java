@@ -67,6 +67,22 @@ public class ErpProductDO extends BaseDO {
      */
     private Integer expiryDay;
     /**
+     * 材料（中文）
+     */
+    private String material;
+    /**
+     * 基础长度（cm）
+     */
+    private BigDecimal length;
+    /**
+     * 基础宽度（cm）
+     */
+    private BigDecimal width;
+    /**
+     * 基础高度（cm）
+     */
+    private BigDecimal height;
+    /**
      * 基础重量（kg）
      */
     private BigDecimal weight;
