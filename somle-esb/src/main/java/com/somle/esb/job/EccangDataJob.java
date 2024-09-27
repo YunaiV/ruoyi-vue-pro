@@ -4,6 +4,7 @@ package com.somle.esb.job;
 import cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils;
 import cn.iocoder.yudao.framework.quartz.core.handler.JobHandler;
 import com.somle.amazon.service.AmazonService;
+import com.somle.eccang.model.EccangOrderVO;
 import com.somle.eccang.service.EccangService;
 import com.somle.esb.model.Domain;
 import com.somle.esb.model.OssData;
@@ -43,47 +44,62 @@ public class EccangDataJob extends DataJob{
                 .build()
         );
 
-        eccangService.getOrderPlatformShipPage(yesterdayFirstSecond, yesterdayLastSecond)
-            .forEach(page -> {
-                OssData data = OssData.builder()
-                    .database(DATABASE)
-                    .tableName("order_platform_ship")
-                    .syncType("inc")
-                    .requestTimestamp(System.currentTimeMillis())
-                    .folderDate(yesterday)
-                    .content(page)
-                    .headers(null)
-                    .build();
-                service.send(data);
-            });
+        eccangService.getOrderPages(
+            EccangOrderVO.builder()
+                .platformShipDateStart(yesterdayFirstSecond)
+                .platformShipDateEnd(yesterdayLastSecond)
+                .build()
+        )
+        .forEach(page -> {
+            OssData data = OssData.builder()
+                .database(DATABASE)
+                .tableName("order_platform_ship")
+                .syncType("inc")
+                .requestTimestamp(System.currentTimeMillis())
+                .folderDate(yesterday)
+                .content(page)
+                .headers(null)
+                .build();
+            service.send(data);
+        });
 
-        eccangService.getOrderWarehouseShipPage(yesterdayFirstSecond, yesterdayLastSecond)
-            .forEach(page -> {
-                OssData data = OssData.builder()
-                    .database(DATABASE)
-                    .tableName("order_warehouse_ship")
-                    .syncType("inc")
-                    .requestTimestamp(System.currentTimeMillis())
-                    .folderDate(yesterday)
-                    .content(page)
-                    .headers(null)
-                    .build();
-                service.send(data);
-            });
+        eccangService.getOrderPages(
+            EccangOrderVO.builder()
+                .warehouseShipDateStart(yesterdayFirstSecond)
+                .warehouseShipDateEnd(yesterdayLastSecond)
+                .build()
+        )
+        .forEach(page -> {
+            OssData data = OssData.builder()
+                .database(DATABASE)
+                .tableName("order_warehouse_ship")
+                .syncType("inc")
+                .requestTimestamp(System.currentTimeMillis())
+                .folderDate(yesterday)
+                .content(page)
+                .headers(null)
+                .build();
+            service.send(data);
+        });
 
-        eccangService.getOrderUnShipPage()
-            .forEach(page -> {
-                OssData data = OssData.builder()
-                    .database(DATABASE)
-                    .tableName("order_unship")
-                    .syncType("inc")
-                    .requestTimestamp(System.currentTimeMillis())
-                    .folderDate(yesterday)
-                    .content(page)
-                    .headers(null)
-                    .build();
-                service.send(data);
-            });
+        eccangService.getOrderPages(
+            EccangOrderVO.builder()
+                .dateCreateSysEnd(yesterdayLastSecond)
+                .status("3")
+                .build()
+        )
+        .forEach(page -> {
+            OssData data = OssData.builder()
+                .database(DATABASE)
+                .tableName("order_unship")
+                .syncType("inc")
+                .requestTimestamp(System.currentTimeMillis())
+                .folderDate(yesterday)
+                .content(page)
+                .headers(null)
+                .build();
+            service.send(data);
+        });
 
         eccangService.getInventoryBatchLog(yesterdayFirstSecond, yesterdayLastSecond)
             .forEach(page -> {

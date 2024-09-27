@@ -2,6 +2,7 @@ package com.somle.eccang.service;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -240,20 +241,7 @@ public class EccangService {
         return getOrderPages(query);
     }
 
-    public Stream<BizContent> getOrderWarehouseShipPage(LocalDateTime startTime, LocalDateTime endTime) {
-        var query = EccangOrderVO.builder()
-            .warehouseShipDateStart(startTime)
-            .warehouseShipDateEnd(endTime)
-            .build();
-        return getOrderPages(query);
-    }
 
-    public Stream<BizContent> getOrderUnShipPage() {
-        var query = EccangOrderVO.builder()
-            .status("3")
-            .build();
-        return getOrderPages(query);
-    }
 
 
     public Stream<BizContent> getOrderPages(EccangOrderVO order) {
