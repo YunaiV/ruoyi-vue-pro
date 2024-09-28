@@ -63,6 +63,14 @@ public interface PointActivityService {
     PageResult<PointActivityDO> getPointActivityPage(PointActivityPageReqVO pageReqVO);
 
     /**
+     * 获得积分商城活动列表
+     *
+     * @param ids 活动编号
+     * @return 积分商城活动列表
+     */
+    List<PointActivityDO> getPointActivityListByIds(Collection<Long> ids);
+
+    /**
      * 获得活动商品
      *
      * @param activityIds 活动编号

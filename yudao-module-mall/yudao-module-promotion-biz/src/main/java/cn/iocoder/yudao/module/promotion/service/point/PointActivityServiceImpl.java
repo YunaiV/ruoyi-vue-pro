@@ -235,6 +235,11 @@ public class PointActivityServiceImpl implements PointActivityService {
     }
 
     @Override
+    public List<PointActivityDO> getPointActivityListByIds(Collection<Long> ids) {
+        return pointActivityMapper.selectBatchIds(ids);
+    }
+
+    @Override
     public List<PointProductDO> getPointProductListByActivityIds(Collection<Long> activityIds) {
         return pointProductMapper.selectListByActivityId(activityIds);
     }

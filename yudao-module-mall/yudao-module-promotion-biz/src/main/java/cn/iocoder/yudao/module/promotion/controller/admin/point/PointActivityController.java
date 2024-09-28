@@ -28,8 +28,7 @@ import java.util.List;
 import java.util.Map;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
-import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMultiMap;
-import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
 
 @Tag(name = "管理后台 - 积分商城活动")
 @RestController
@@ -108,7 +107,10 @@ public class PointActivityController {
                 convertSet(pageResult.getList(), PointActivityDO::getSpuId));
         PageResult<PointActivityRespVO> result = BeanUtils.toBean(pageResult, PointActivityRespVO.class);
         result.getList().forEach(activity -> {
-            activity.setProducts(BeanUtils.toBean(productsMap.get(activity.getId()), PointProductRespVO.class));
+            // 设置 product 信息
+            PointProductDO minProduct = getMinPropertyObj(productsMap.get(activity.getId()), PointProductDO::getPoint);
+            assert minProduct != null;
+            activity.setPoint(minProduct.getPoint()).setPrice(minProduct.getPrice());
             MapUtils.findAndThen(spuMap, activity.getSpuId(),
                     spu -> activity.setSpuName(spu.getName()).setPicUrl(spu.getPicUrl()).setMarketPrice(spu.getMarketPrice()));
 
