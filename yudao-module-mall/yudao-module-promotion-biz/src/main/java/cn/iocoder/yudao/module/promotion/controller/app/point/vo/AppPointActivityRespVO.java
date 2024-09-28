@@ -22,13 +22,15 @@ public class AppPointActivityRespVO {
     @ExcelProperty("活动状态")
     private Integer status;
 
-    @Schema(description = "积分商城活动库存(剩余库存积分兑换时扣减)", requiredMode = Schema.RequiredMode.REQUIRED, example = "2")
-    @ExcelProperty("积分商城活动库存(剩余库存积分兑换时扣减)")
-    private Integer stock;
+    @Schema(description = "积分商城活动库存", requiredMode = Schema.RequiredMode.REQUIRED, example = "2")
+    @ExcelProperty("积分商城活动库存")
+    private Integer stock; // 剩余库存积分兑换时扣减
 
     @Schema(description = "积分商城活动总库存", requiredMode = Schema.RequiredMode.REQUIRED, example = "2")
     @ExcelProperty("积分商城活动总库存")
     private Integer totalStock;
+
+    // TODO @puhui999：只返回必要的字段，例如说 remark、sort、createTime 应该是不需要的呢。也可以看看别的也不需要哈。
 
     @Schema(description = "备注", example = "你说的对")
     @ExcelProperty("备注")

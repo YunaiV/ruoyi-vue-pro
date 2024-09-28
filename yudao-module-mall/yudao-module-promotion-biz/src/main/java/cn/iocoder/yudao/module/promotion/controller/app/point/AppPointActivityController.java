@@ -102,7 +102,7 @@ public class AppPointActivityController {
         List<AppPointActivityRespVO> result = BeanUtils.toBean(activityList, AppPointActivityRespVO.class);
         result.forEach(activity -> {
             // 设置 product 信息
-            PointProductDO minProduct = getMinPropertyObj(productsMap.get(activity.getId()), PointProductDO::getPoint);
+            PointProductDO minProduct = getMinObject(productsMap.get(activity.getId()), PointProductDO::getPoint);
             assert minProduct != null;
             activity.setPoint(minProduct.getPoint()).setPrice(minProduct.getPrice());
             findAndThen(spuMap, activity.getSpuId(),

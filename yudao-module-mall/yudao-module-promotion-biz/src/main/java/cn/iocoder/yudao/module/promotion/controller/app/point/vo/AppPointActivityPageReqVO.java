@@ -12,5 +12,4 @@ import lombok.ToString;
 @ToString(callSuper = true)
 public class AppPointActivityPageReqVO extends PageParam {
 
-
 }
