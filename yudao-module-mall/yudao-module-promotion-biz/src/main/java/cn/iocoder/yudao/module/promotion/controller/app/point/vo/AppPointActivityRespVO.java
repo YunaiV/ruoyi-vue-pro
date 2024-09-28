@@ -1,18 +1,14 @@
-package cn.iocoder.yudao.module.promotion.controller.admin.point.vo.activity;
+package cn.iocoder.yudao.module.promotion.controller.app.point.vo;
 
-import cn.iocoder.yudao.module.promotion.controller.admin.point.vo.product.PointProductRespVO;
-import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
 import com.alibaba.excel.annotation.ExcelProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
-@Schema(description = "管理后台 - 积分商城活动 Response VO")
+@Schema(description = "用户 App - 积分商城活动 Response VO")
 @Data
-@ExcelIgnoreUnannotated
-public class PointActivityRespVO {
+public class AppPointActivityRespVO {
 
     @Schema(description = "积分商城活动编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "11373")
     @ExcelProperty("积分商城活动编号")
@@ -45,9 +41,6 @@ public class PointActivityRespVO {
     @Schema(description = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED)
     @ExcelProperty("创建时间")
     private LocalDateTime createTime;
-
-    @Schema(description = "积分商城商品", requiredMode = Schema.RequiredMode.REQUIRED)
-    private List<PointProductRespVO> products;
 
     // ========== 商品字段 ==========
 

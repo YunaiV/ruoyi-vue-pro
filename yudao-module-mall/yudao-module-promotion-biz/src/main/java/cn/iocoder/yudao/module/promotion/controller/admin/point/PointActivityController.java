@@ -1,9 +1,9 @@
 package cn.iocoder.yudao.module.promotion.controller.admin.point;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.product.api.spu.ProductSpuApi;
 import cn.iocoder.yudao.module.product.api.spu.dto.ProductSpuRespDTO;
@@ -28,8 +28,8 @@ import java.util.List;
 import java.util.Map;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
-import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMultiMap;
-import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
+import static cn.iocoder.yudao.framework.common.util.collection.MapUtils.findAndThen;
 
 @Tag(name = "管理后台 - 积分商城活动")
 @RestController
@@ -101,19 +101,41 @@ public class PointActivityController {
         }
 
         // 拼接数据
+        List<PointActivityRespVO> resultList = buildPointActivityRespVOList(pageResult.getList());
+        return success(new PageResult<>(resultList, pageResult.getTotal()));
+    }
+
+    @GetMapping("/list-by-ids")
+    @Operation(summary = "获得积分商城活动列表，基于活动编号数组")
+    @Parameter(name = "ids", description = "活动编号数组", required = true, example = "[1024, 1025]")
+    public CommonResult<List<PointActivityRespVO>> getPointActivityListByIds(@RequestParam("ids") List<Long> ids) {
+        // 1. 获得开启的活动列表
+        List<PointActivityDO> activityList = pointActivityService.getPointActivityListByIds(ids);
+        activityList.removeIf(activity -> CommonStatusEnum.isDisable(activity.getStatus()));
+        if (CollUtil.isEmpty(activityList)) {
+            return success(Collections.emptyList());
+        }
+        // 2. 拼接返回
+        List<PointActivityRespVO> result = buildPointActivityRespVOList(activityList);
+        return success(result);
+    }
+
+    private List<PointActivityRespVO> buildPointActivityRespVOList(List<PointActivityDO> activityList) {
         List<PointProductDO> products = pointActivityService.getPointProductListByActivityIds(
-                convertSet(pageResult.getList(), PointActivityDO::getId));
+                convertSet(activityList, PointActivityDO::getId));
         Map<Long, List<PointProductDO>> productsMap = convertMultiMap(products, PointProductDO::getActivityId);
         Map<Long, ProductSpuRespDTO> spuMap = productSpuApi.getSpusMap(
-                convertSet(pageResult.getList(), PointActivityDO::getSpuId));
-        PageResult<PointActivityRespVO> result = BeanUtils.toBean(pageResult, PointActivityRespVO.class);
-        result.getList().forEach(activity -> {
-            activity.setProducts(BeanUtils.toBean(productsMap.get(activity.getId()), PointProductRespVO.class));
-            MapUtils.findAndThen(spuMap, activity.getSpuId(),
+                convertSet(activityList, PointActivityDO::getSpuId));
+        List<PointActivityRespVO> result = BeanUtils.toBean(activityList, PointActivityRespVO.class);
+        result.forEach(activity -> {
+            // 设置 product 信息
+            PointProductDO minProduct = getMinPropertyObj(productsMap.get(activity.getId()), PointProductDO::getPoint);
+            assert minProduct != null;
+            activity.setPoint(minProduct.getPoint()).setPrice(minProduct.getPrice());
+            findAndThen(spuMap, activity.getSpuId(),
                     spu -> activity.setSpuName(spu.getName()).setPicUrl(spu.getPicUrl()).setMarketPrice(spu.getMarketPrice()));
-
         });
-        return success(result);
+        return result;
     }
 
 }
