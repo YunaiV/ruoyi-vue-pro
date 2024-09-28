@@ -330,7 +330,7 @@ public class SeckillActivityServiceImpl implements SeckillActivityService {
 
     @Override
     public List<SeckillActivityDO> getSeckillActivityListByIds(Collection<Long> ids) {
-        return seckillActivityMapper.selectBatchIds(ids);
+        return seckillActivityMapper.selectList(SeckillActivityDO::getId, ids);
     }
 
 }

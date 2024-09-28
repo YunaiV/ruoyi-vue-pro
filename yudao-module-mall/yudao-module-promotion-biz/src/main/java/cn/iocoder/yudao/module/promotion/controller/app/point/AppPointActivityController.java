@@ -79,7 +79,7 @@ public class AppPointActivityController {
     }
 
     @GetMapping("/list-by-ids")
-    @Operation(summary = "获得拼团活动列表，基于活动编号数组")
+    @Operation(summary = "获得积分商城活动列表，基于活动编号数组")
     @Parameter(name = "ids", description = "活动编号数组", required = true, example = "[1024, 1025]")
     public CommonResult<List<AppPointActivityRespVO>> getCombinationActivityListByIds(@RequestParam("ids") List<Long> ids) {
         // 1. 获得开启的活动列表
