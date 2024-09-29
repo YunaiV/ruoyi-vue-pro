@@ -24,8 +24,7 @@
         <!-- DB 相关 -->
         <druid.version>1.2.23</druid.version>
         <mybatis.version>3.5.16</mybatis.version>
-        <mybatis-plus.version>3.5.7</mybatis-plus.version>
-        <mybatis-plus-generator.version>3.5.7</mybatis-plus-generator.version>
+        <mybatis-plus.version>3.5.8</mybatis-plus.version>
         <dynamic-datasource.version>4.3.1</dynamic-datasource.version>
         <mybatis-plus-join.version>1.4.13</mybatis-plus-join.version>
         <easy-trans.version>3.0.6</easy-trans.version>
@@ -184,7 +183,7 @@
             <dependency>
                 <groupId>com.baomidou</groupId>
                 <artifactId>mybatis-plus-generator</artifactId> <!-- 代码生成器，使用它解析表结构 -->
-                <version>${mybatis-plus-generator.version}</version>
+                <version>${mybatis-plus.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.baomidou</groupId>
