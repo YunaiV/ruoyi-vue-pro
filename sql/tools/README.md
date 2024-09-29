@@ -19,10 +19,14 @@ docker compose up -d mysql
 #### 1.2 Oracle
 
 ```Bash
+## x86 版本
 docker compose up -d oracle
+
+## MacBook Apple Silicon
+docker compose up -d oracle_m1
 ```
 
-暂不支持 MacBook Apple Silicon，因为 Oracle 官方没有提供 Apple Silicon 版本的 Docker 镜像。
+> 注意：如果使用 MacBook Apple Silicon 版本，它的 ORACLE_SID 不是 XE，而是 FREE！！！
 
 ### 1.3 PostgreSQL
 
@@ -38,16 +42,14 @@ docker compose up -d sqlserver
 docker compose exec sqlserver bash /tmp/create_schema.sh
 ```
 
-暂不支持 MacBook Apple Silicon，因为 SQL Server 官方没有提供 Apple Silicon 版本的 Docker 镜像。
-
 ### 1.5 DM 达梦
 
-① 下载达梦 Docker 镜像：https://download.dameng.com/eco/dm8/dm8_20230808_rev197096_x86_rh6_64_single.tar
+① 下载达梦 Docker 镜像：<https://eco.dameng.com/download/> 地址，点击“Docker 镜像”选项，进行下载。
 
 ② 加载镜像文件，在镜像 tar 文件所在目录运行：
 
 ```Bash
-docker load -i dm8_20230808_rev197096_x86_rh6_64_single.tar
+docker load -i dm8_20240715_x86_rh6_rq_single.tar
 ```
 
 ③ 在项目 `sql/tools` 目录下运行：
@@ -59,22 +61,17 @@ docker compose exec dm8 bash -c '/opt/dmdbms/bin/disql SYSDBA/SYSDBA001 \`/tmp/s
 exit
 ```
 
-**注意**: `sql/dm/ruoyi-vue-pro-dm8.sql` 文件编码必须为 `GBK` 或者 `GBK` 超集，否则会出现中文乱码。
-
-暂不支持 MacBook Apple Silicon，因为 达梦 官方没有提供 Apple Silicon 版本的 Docker 镜像。
-
 ### 1.6 KingbaseES 人大金仓
 
 ① 下载人大金仓 Docker 镜像：
 
-> x86_64 版本: https://kingbase.oss-cn-beijing.aliyuncs.com/KESV8R3/V009R001C001B0025-安装包-docker/x86_64/kdb_x86_64_V009R001C001B0025.tar
-
-> aarch64 版本：https://kingbase.oss-cn-beijing.aliyuncs.com/KESV8R3/V009R001C001B0025-安装包-docker/aarch64/kdb_aarch64_V009R001C001B0025.tar
+* [x86_64 版本](https://kingbase.oss-cn-beijing.aliyuncs.com/KESV8R3/V009R001C001B0025-安装包-docker/x86_64/kdb_x86_64_V009R001C001B0025.tar) 【Windows 选择这个】
+* [aarch64 版本](https://kingbase.oss-cn-beijing.aliyuncs.com/KESV8R3/V009R001C001B0025-安装包-docker/aarch64/kdb_aarch64_V009R001C001B0025.tar) 【MacBook Apple Silicon 选择这个】
 
 ② 加载镜像文件，在镜像 tar 文件所在目录运行：
 
 ```Bash
-docker load -i x86_64/kdb_x86_64_V009R001C001B0025.tar
+docker load -i kdb_x86_64_V009R001C001B0025.tar
 ```
 
 ③ 在项目 `sql/tools` 目录下运行：
@@ -106,9 +103,11 @@ docker volume rm ruoyi-vue-pro_postgres
 
 ## 2. MySQL 转换其它数据库
 
+项目提供了 `sql/tools/convertor.py` 脚本，支持将 MySQL 转换为 Oracle、PostgreSQL、SQL Server、达梦、人大金仓、OpenGauss 等数据库的脚本。
+
 ### 2.1 实现原理
 
-通过读取 MySQL 的 `sql/mysql/ruoyi-vue-pro.sql` 数据库文件，转换成 Oracle、PostgreSQL、SQL Server、达梦、人大金仓 等数据库的脚本。
+通过读取 MySQL 的 `sql/mysql/ruoyi-vue-pro.sql` 数据库文件，转换成对应的数据库脚本。
 
 ### 2.2 使用方法
 
@@ -119,7 +118,7 @@ pip install simple-ddl-parser
 # pip3 install simple-ddl-parser
 ```
 
-② 执行如下命令打印生成 postgres 的脚本内容，其他可选参数有：`oracle`、`sqlserver`、`dm8`、`kingbase`：
+② 在 `sql/tools/` 目录下，执行如下命令打印生成 postgres 的脚本内容，其他可选参数有：`oracle`、`sqlserver`、`dm8`、`kingbase`、`opengauss`：
 
 ```Bash
 python3 convertor.py postgres

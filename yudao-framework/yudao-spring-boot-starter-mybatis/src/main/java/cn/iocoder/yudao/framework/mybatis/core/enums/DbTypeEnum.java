@@ -19,9 +19,16 @@ import java.util.stream.Collectors;
 public enum DbTypeEnum {
 
     /**
+     * H2
+     *
+     * 注意：H2 不支持 find_in_set 函数
+     */
+    H2(DbType.H2, "H2", ""),
+
+    /**
      * MySQL
      */
-    MY_SQL( DbType.MYSQL, "MySQL", "FIND_IN_SET('#{value}', #{column}) <> 0"),
+    MY_SQL(DbType.MYSQL, "MySQL", "FIND_IN_SET('#{value}', #{column}) <> 0"),
 
     /**
      * Oracle
@@ -39,6 +46,10 @@ public enum DbTypeEnum {
      * SQL Server
      */
     SQL_SERVER(DbType.SQL_SERVER, "Microsoft SQL Server", "CHARINDEX(',' + #{value} + ',', ',' + #{column} + ',') <> 0"),
+    /**
+     * SQL Server 2005
+     */
+    SQL_SERVER2005(DbType.SQL_SERVER2005, "Microsoft SQL Server 2005", "CHARINDEX(',' + #{value} + ',', ',' + #{column} + ',') <> 0"),
 
     /**
      * 达梦

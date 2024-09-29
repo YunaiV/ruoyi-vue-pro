@@ -96,7 +96,6 @@ public class MyBatisUtils {
      * @return sql
      */
     public static String findInSet(String column, Object value) {
-        // 这里不用SqlConstants.DB_TYPE，因为它是使用 primary 数据源的 url 推断出来的类型
         DbType dbType = JdbcUtils.getDbType();
         return DbTypeEnum.getFindInSetTemplate(dbType)
                 .replace("#{column}", column)
