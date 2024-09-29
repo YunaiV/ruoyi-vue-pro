@@ -42,7 +42,7 @@
         <!-- 看看咋放到 bom 里 -->
         <lombok.version>1.18.34</lombok.version>
         <spring.boot.version>3.3.4</spring.boot.version>
-        <mapstruct.version>1.5.5.Final</mapstruct.version>
+        <mapstruct.version>1.6.2</mapstruct.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
