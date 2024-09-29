@@ -1,5 +1,7 @@
 package cn.iocoder.yudao.module.iot.service.thinkmodelfunction;
 
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.module.iot.controller.admin.thinkmodelfunction.vo.IotThinkModelFunctionPageReqVO;
 import cn.iocoder.yudao.module.iot.controller.admin.thinkmodelfunction.vo.IotThinkModelFunctionSaveReqVO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.thinkmodelfunction.IotThinkModelFunctionDO;
 import jakarta.validation.Valid;
@@ -51,4 +53,12 @@ public interface IotThinkModelFunctionService {
      * @return 产品物模型列表
      */
     List<IotThinkModelFunctionDO> getThinkModelFunctionListByProductId(Long productId);
+
+    /**
+     * 获得产品物模型分页
+     *
+     * @param pageReqVO 分页查询
+     * @return 产品物模型分页
+     */
+    PageResult<IotThinkModelFunctionDO> getThinkModelFunctionPage(IotThinkModelFunctionPageReqVO pageReqVO);
 }

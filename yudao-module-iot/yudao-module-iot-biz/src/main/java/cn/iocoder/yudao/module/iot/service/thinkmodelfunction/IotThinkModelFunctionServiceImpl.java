@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.iot.service.thinkmodelfunction;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
 import cn.iocoder.yudao.module.iot.controller.admin.thinkmodelfunction.thingModel.ThingModelEvent;
@@ -11,12 +12,13 @@ import cn.iocoder.yudao.module.iot.controller.admin.thinkmodelfunction.thingMode
 import cn.iocoder.yudao.module.iot.controller.admin.thinkmodelfunction.thingModel.dataType.ThingModelArraySpecs;
 import cn.iocoder.yudao.module.iot.controller.admin.thinkmodelfunction.thingModel.dataType.ThingModelArrayType;
 import cn.iocoder.yudao.module.iot.controller.admin.thinkmodelfunction.thingModel.dataType.ThingModelTextType;
+import cn.iocoder.yudao.module.iot.controller.admin.thinkmodelfunction.vo.IotThinkModelFunctionPageReqVO;
 import cn.iocoder.yudao.module.iot.controller.admin.thinkmodelfunction.vo.IotThinkModelFunctionSaveReqVO;
 import cn.iocoder.yudao.module.iot.convert.thinkmodelfunction.IotThinkModelFunctionConvert;
 import cn.iocoder.yudao.module.iot.dal.dataobject.thinkmodelfunction.IotThinkModelFunctionDO;
 import cn.iocoder.yudao.module.iot.dal.mysql.thinkmodelfunction.IotThinkModelFunctionMapper;
 import cn.iocoder.yudao.module.iot.enums.product.IotAccessModeEnum;
-import cn.iocoder.yudao.module.iot.enums.product.IotThingModelTypeEnum;
+import cn.iocoder.yudao.module.iot.enums.product.IotProductFunctionTypeEnum;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -55,7 +57,7 @@ public class IotThinkModelFunctionServiceImpl implements IotThinkModelFunctionSe
         thinkModelFunctionMapper.insert(function);
 
         // 3. 如果创建的是属性，需要更新默认的事件和服务
-        if (Objects.equals(createReqVO.getType(), IotThingModelTypeEnum.PROPERTY.getType())) {
+        if (Objects.equals(createReqVO.getType(), IotProductFunctionTypeEnum.PROPERTY.getType())) {
             createDefaultEventsAndServices(createReqVO.getProductId(), createReqVO.getProductKey());
         }
         return function.getId();
@@ -82,7 +84,7 @@ public class IotThinkModelFunctionServiceImpl implements IotThinkModelFunctionSe
         thinkModelFunctionMapper.updateById(thinkModelFunction);
 
         // 4. 如果更新的是属性，需要更新默认的事件和服务
-        if (Objects.equals(updateReqVO.getType(), IotThingModelTypeEnum.PROPERTY.getType())) {
+        if (Objects.equals(updateReqVO.getType(), IotProductFunctionTypeEnum.PROPERTY.getType())) {
             createDefaultEventsAndServices(updateReqVO.getProductId(), updateReqVO.getProductKey());
         }
     }
@@ -107,7 +109,7 @@ public class IotThinkModelFunctionServiceImpl implements IotThinkModelFunctionSe
         thinkModelFunctionMapper.deleteById(id);
 
         // 3. 如果删除的是属性，需要更新默认的事件和服务
-        if (Objects.equals(functionDO.getType(), IotThingModelTypeEnum.PROPERTY.getType())) {
+        if (Objects.equals(functionDO.getType(), IotProductFunctionTypeEnum.PROPERTY.getType())) {
             createDefaultEventsAndServices(functionDO.getProductId(), functionDO.getProductKey());
         }
     }
@@ -133,13 +135,18 @@ public class IotThinkModelFunctionServiceImpl implements IotThinkModelFunctionSe
         return thinkModelFunctionMapper.selectListByProductId(productId);
     }
 
+    @Override
+    public PageResult<IotThinkModelFunctionDO> getThinkModelFunctionPage(IotThinkModelFunctionPageReqVO pageReqVO) {
+        return thinkModelFunctionMapper.selectPage(pageReqVO);
+    }
+
     /**
      * 创建默认的事件和服务
      */
     public void createDefaultEventsAndServices(Long productId, String productKey) {
         // 1. 获取当前属性列表
         List<IotThinkModelFunctionDO> propertyList = thinkModelFunctionMapper
-                .selectListByProductIdAndType(productId, IotThingModelTypeEnum.PROPERTY.getType());
+                .selectListByProductIdAndType(productId, IotProductFunctionTypeEnum.PROPERTY.getType());
 
         // 2. 生成新的事件和服务列表
         List<IotThinkModelFunctionDO> newFunctionList = new ArrayList<>();
@@ -166,7 +173,7 @@ public class IotThinkModelFunctionServiceImpl implements IotThinkModelFunctionSe
         List<IotThinkModelFunctionDO> oldFunctionList = thinkModelFunctionMapper.selectListByProductIdAndIdentifiersAndTypes(
                 productId,
                 Arrays.asList("post", "set", "get"),
-                Arrays.asList(IotThingModelTypeEnum.EVENT.getType(), IotThingModelTypeEnum.SERVICE.getType())
+                Arrays.asList(IotProductFunctionTypeEnum.EVENT.getType(), IotProductFunctionTypeEnum.SERVICE.getType())
         );
 
         // 3.1 使用 diffList 方法比较新旧列表
@@ -229,7 +236,7 @@ public class IotThinkModelFunctionServiceImpl implements IotThinkModelFunctionSe
                 .setIdentifier(event.getIdentifier())
                 .setName(event.getName())
                 .setDescription(event.getDescription())
-                .setType(IotThingModelTypeEnum.EVENT.getType())
+                .setType(IotProductFunctionTypeEnum.EVENT.getType())
                 .setEvent(event);
     }
 
@@ -243,7 +250,7 @@ public class IotThinkModelFunctionServiceImpl implements IotThinkModelFunctionSe
                 .setIdentifier(service.getIdentifier())
                 .setName(service.getName())
                 .setDescription(service.getDescription())
-                .setType(IotThingModelTypeEnum.SERVICE.getType())
+                .setType(IotProductFunctionTypeEnum.SERVICE.getType())
                 .setService(service);
     }
 

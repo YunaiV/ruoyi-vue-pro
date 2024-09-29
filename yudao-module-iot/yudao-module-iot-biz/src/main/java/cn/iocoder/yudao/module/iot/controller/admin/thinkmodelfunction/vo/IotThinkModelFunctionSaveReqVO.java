@@ -4,7 +4,7 @@ import cn.iocoder.yudao.framework.common.validation.InEnum;
 import cn.iocoder.yudao.module.iot.controller.admin.thinkmodelfunction.thingModel.ThingModelEvent;
 import cn.iocoder.yudao.module.iot.controller.admin.thinkmodelfunction.thingModel.ThingModelProperty;
 import cn.iocoder.yudao.module.iot.controller.admin.thinkmodelfunction.thingModel.ThingModelService;
-import cn.iocoder.yudao.module.iot.enums.product.IotThingModelTypeEnum;
+import cn.iocoder.yudao.module.iot.enums.product.IotProductFunctionTypeEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -38,7 +38,7 @@ public class IotThinkModelFunctionSaveReqVO {
 
     @Schema(description = "功能类型", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "功能类型不能为空")
-    @InEnum(IotThingModelTypeEnum.class)
+    @InEnum(IotProductFunctionTypeEnum.class)
     private Integer type;
 
     @Schema(description = "属性", requiredMode = Schema.RequiredMode.REQUIRED)

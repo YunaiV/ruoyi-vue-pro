@@ -7,13 +7,13 @@ import lombok.Getter;
 import java.util.Arrays;
 
 /**
- * IOT 物模型功能类型枚举类
+ * IOT 产品功能类型枚举类
  *
  * @author ahh
  */
 @AllArgsConstructor
 @Getter
-public enum IotThingModelTypeEnum implements IntArrayValuable {
+public enum IotProductFunctionTypeEnum implements IntArrayValuable {
 
     /**
      * 属性
@@ -28,7 +28,7 @@ public enum IotThingModelTypeEnum implements IntArrayValuable {
      */
     EVENT(3, "事件");
 
-    public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(IotThingModelTypeEnum::getType).toArray();
+    public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(IotProductFunctionTypeEnum::getType).toArray();
 
     /**
      * 类型

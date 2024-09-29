@@ -1,6 +1,9 @@
 package cn.iocoder.yudao.module.iot.controller.admin.thinkmodelfunction;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
+import cn.iocoder.yudao.module.iot.controller.admin.thinkmodelfunction.vo.IotThinkModelFunctionPageReqVO;
 import cn.iocoder.yudao.module.iot.controller.admin.thinkmodelfunction.vo.IotThinkModelFunctionRespVO;
 import cn.iocoder.yudao.module.iot.controller.admin.thinkmodelfunction.vo.IotThinkModelFunctionSaveReqVO;
 import cn.iocoder.yudao.module.iot.convert.thinkmodelfunction.IotThinkModelFunctionConvert;
@@ -70,5 +73,13 @@ public class IotThinkModelFunctionController {
         List<IotThinkModelFunctionDO> thinkModelFunctionListByProductId = thinkModelFunctionService.getThinkModelFunctionListByProductId(productId);
         List<IotThinkModelFunctionRespVO> respVO = IotThinkModelFunctionConvert.INSTANCE.convertList(thinkModelFunctionListByProductId);
         return success(respVO);
+    }
+
+    @GetMapping("/page")
+    @Operation(summary = "获得IoT 产品物模型分页")
+    @PreAuthorize("@ss.hasPermission('iot:think-model-function:query')")
+    public CommonResult<PageResult<IotThinkModelFunctionRespVO>> getThinkModelFunctionPage(@Valid IotThinkModelFunctionPageReqVO pageReqVO) {
+        PageResult<IotThinkModelFunctionDO> pageResult = thinkModelFunctionService.getThinkModelFunctionPage(pageReqVO);
+        return success(BeanUtils.toBean(pageResult, IotThinkModelFunctionRespVO.class));
     }
 }

@@ -1,7 +1,9 @@
 package cn.iocoder.yudao.module.iot.dal.mysql.thinkmodelfunction;
 
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
+import cn.iocoder.yudao.module.iot.controller.admin.thinkmodelfunction.vo.IotThinkModelFunctionPageReqVO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.thinkmodelfunction.IotThinkModelFunctionDO;
 import org.apache.ibatis.annotations.Mapper;
 
@@ -14,6 +16,16 @@ import java.util.List;
  */
 @Mapper
 public interface IotThinkModelFunctionMapper extends BaseMapperX<IotThinkModelFunctionDO> {
+
+    default PageResult<IotThinkModelFunctionDO> selectPage(IotThinkModelFunctionPageReqVO reqVO) {
+        return selectPage(reqVO, new LambdaQueryWrapperX<IotThinkModelFunctionDO>()
+                .eqIfPresent(IotThinkModelFunctionDO::getIdentifier, reqVO.getIdentifier())
+                .likeIfPresent(IotThinkModelFunctionDO::getName, reqVO.getName())
+                .eqIfPresent(IotThinkModelFunctionDO::getType, reqVO.getType())
+                .eqIfPresent(IotThinkModelFunctionDO::getProductId, reqVO.getProductId())
+                .orderByDesc(IotThinkModelFunctionDO::getId));
+    }
+
 
     default IotThinkModelFunctionDO selectByProductIdAndIdentifier(Long productId, String identifier) {
         return selectOne(IotThinkModelFunctionDO::getProductId, productId,

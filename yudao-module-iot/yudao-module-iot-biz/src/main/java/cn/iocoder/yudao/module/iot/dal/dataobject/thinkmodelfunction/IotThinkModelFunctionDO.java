@@ -5,6 +5,7 @@ import cn.iocoder.yudao.module.iot.controller.admin.thinkmodelfunction.thingMode
 import cn.iocoder.yudao.module.iot.controller.admin.thinkmodelfunction.thingModel.ThingModelProperty;
 import cn.iocoder.yudao.module.iot.controller.admin.thinkmodelfunction.thingModel.ThingModelService;
 import cn.iocoder.yudao.module.iot.dal.dataobject.product.IotProductDO;
+import cn.iocoder.yudao.module.iot.enums.product.IotProductFunctionTypeEnum;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -65,7 +66,7 @@ public class IotThinkModelFunctionDO extends BaseDO {
     /**
      * 功能类型
      * <p>
-     * 枚举 {@link cn.iocoder.yudao.module.iot.enums.product.IotThingModelTypeEnum}
+     * 枚举 {@link IotProductFunctionTypeEnum}
      */
     private Integer type;
 

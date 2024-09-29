@@ -6,7 +6,7 @@ import cn.iocoder.yudao.module.iot.controller.admin.thinkmodelfunction.thingMode
 import cn.iocoder.yudao.module.iot.controller.admin.thinkmodelfunction.vo.IotThinkModelFunctionRespVO;
 import cn.iocoder.yudao.module.iot.controller.admin.thinkmodelfunction.vo.IotThinkModelFunctionSaveReqVO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.thinkmodelfunction.IotThinkModelFunctionDO;
-import cn.iocoder.yudao.module.iot.enums.product.IotThingModelTypeEnum;
+import cn.iocoder.yudao.module.iot.enums.product.IotProductFunctionTypeEnum;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
@@ -26,21 +26,21 @@ public interface IotThinkModelFunctionConvert {
     IotThinkModelFunctionDO convert(IotThinkModelFunctionSaveReqVO bean);
 
     default ThingModelProperty convertToProperty(IotThinkModelFunctionSaveReqVO bean) {
-        if (Objects.equals(bean.getType(), IotThingModelTypeEnum.PROPERTY.getType())) {
+        if (Objects.equals(bean.getType(), IotProductFunctionTypeEnum.PROPERTY.getType())) {
             return bean.getProperty();
         }
         return null;
     }
 
     default ThingModelEvent convertToEvent(IotThinkModelFunctionSaveReqVO bean) {
-        if (Objects.equals(bean.getType(), IotThingModelTypeEnum.EVENT.getType())) {
+        if (Objects.equals(bean.getType(), IotProductFunctionTypeEnum.EVENT.getType())) {
             return bean.getEvent();
         }
         return null;
     }
 
     default ThingModelService convertToService(IotThinkModelFunctionSaveReqVO bean) {
-        if (Objects.equals(bean.getType(), IotThingModelTypeEnum.SERVICE.getType())) {
+        if (Objects.equals(bean.getType(), IotProductFunctionTypeEnum.SERVICE.getType())) {
             return bean.getService();
         }
         return null;
