@@ -57,7 +57,8 @@ public class AmazonService {
     //     // shopList = shopRepository.findAll().stream().map(shop->shop.getCountryCode()).toList();
     //     shopList = shopRepository.findAll();
     // }
-    @Scheduled(fixedDelay = 1800000, initialDelay = 1000)
+//    @Scheduled(fixedDelay = 1800000, initialDelay = 1000)
+    @Scheduled(cron = "0 0,30 * * * *")
     public void refreshAuth() {
         account = accountRepository.findAll().get(0);
         for (AmazonSeller seller : account.getSellers()) {
