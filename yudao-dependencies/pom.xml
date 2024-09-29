@@ -53,7 +53,7 @@
         <mapstruct.version>1.6.2</mapstruct.version>
         <hutool-5.version>5.8.32</hutool-5.version>
         <hutool-6.version>6.0.0-M16</hutool-6.version>
-        <easyexcel.verion>3.3.4</easyexcel.verion>
+        <easyexcel.verion>4.0.3</easyexcel.verion>
         <velocity.version>2.4</velocity.version>
         <fastjson.version>1.2.83</fastjson.version>
         <guava.version>33.3.1-jre</guava.version>
@@ -67,7 +67,8 @@
         <!-- 三方云服务相关 -->
         <okio.version>3.5.0</okio.version>
         <okhttp3.version>4.11.0</okhttp3.version>
-        <commons-io.version>2.15.1</commons-io.version>
+        <commons-io.version>2.17.0</commons-io.version>
+        <commons-compress.version>1.27.1</commons-compress.version>
         <minio.version>8.5.7</minio.version>
         <justauth.version>2.0.5</justauth.version>
         <jimureport.version>1.8.1</jimureport.version>
@@ -472,6 +473,11 @@
                 <groupId>commons-io</groupId>
                 <artifactId>commons-io</artifactId>
                 <version>${commons-io.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-compress</artifactId>
+                <version>${commons-compress.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.tika</groupId>
