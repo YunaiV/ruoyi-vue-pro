@@ -41,7 +41,7 @@
         <flatten-maven-plugin.version>1.6.0</flatten-maven-plugin.version>
         <!-- 看看咋放到 bom 里 -->
         <lombok.version>1.18.34</lombok.version>
-        <spring.boot.version>3.3.1</spring.boot.version>
+        <spring.boot.version>3.3.4</spring.boot.version>
         <mapstruct.version>1.5.5.Final</mapstruct.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>

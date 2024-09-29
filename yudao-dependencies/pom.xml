@@ -17,7 +17,7 @@
         <revision>2.2.0-snapshot</revision>
         <flatten-maven-plugin.version>1.6.0</flatten-maven-plugin.version>
         <!-- 统一依赖管理 -->
-        <spring.boot.version>3.3.1</spring.boot.version>
+        <spring.boot.version>3.3.4</spring.boot.version>
         <!-- Web 相关 -->
         <springdoc.version>2.3.0</springdoc.version>
         <knife4j.version>4.5.0</knife4j.version>
@@ -39,7 +39,7 @@
         <lock4j.version>2.2.7</lock4j.version>
         <!-- 监控相关 -->
         <skywalking.version>9.0.0</skywalking.version>
-        <spring-boot-admin.version>3.3.2</spring-boot-admin.version>
+        <spring-boot-admin.version>3.3.3</spring-boot-admin.version>
         <opentracing.version>0.33.0</opentracing.version>
         <!-- Test 测试相关 -->
         <podam.version>8.0.2.RELEASE</podam.version>
