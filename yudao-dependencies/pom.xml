@@ -27,7 +27,7 @@
         <!-- DB 相关 -->
         <druid.version>1.2.23</druid.version>
         <mybatis.version>3.5.16</mybatis.version>
-        <mybatis-plus.version>3.5.8</mybatis-plus.version>
+        <mybatis-plus.version>3.5.7</mybatis-plus.version> <!-- MyBatis Plus 3.5.8 需要最低 JDK11 版本，无法升级 -->
         <dynamic-datasource.version>4.3.1</dynamic-datasource.version>
         <mybatis-plus-join.version>1.4.13</mybatis-plus-join.version>
         <easy-trans.version>3.0.6</easy-trans.version>
