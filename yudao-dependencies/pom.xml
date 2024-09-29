@@ -34,7 +34,7 @@
         <kingbase.jdbc.version>8.6.0</kingbase.jdbc.version>
         <opengauss.jdbc.version>5.0.2</opengauss.jdbc.version>
         <!-- 消息队列 -->
-        <rocketmq-spring.version>2.3.0</rocketmq-spring.version>
+        <rocketmq-spring.version>2.3.1</rocketmq-spring.version>
         <!-- 服务保障相关 -->
         <lock4j.version>2.2.7</lock4j.version>
         <!-- 监控相关 -->
