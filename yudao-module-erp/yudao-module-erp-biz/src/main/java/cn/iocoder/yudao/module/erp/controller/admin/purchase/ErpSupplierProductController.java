@@ -1,5 +1,16 @@
 package cn.iocoder.yudao.module.erp.controller.admin.purchase;
 
+import cn.hutool.core.collection.CollUtil;
+import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
+import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
+import cn.iocoder.yudao.module.erp.controller.admin.product.vo.product.ErpProductRespVO;
+import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.order.ErpPurchaseOrderRespVO;
+import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseOrderDO;
+import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseOrderItemDO;
+import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpSupplierDO;
+import cn.iocoder.yudao.module.erp.service.product.ErpProductService;
+import cn.iocoder.yudao.module.erp.service.purchase.ErpSupplierService;
+import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import org.springframework.web.bind.annotation.*;
 import jakarta.annotation.Resource;
 import org.springframework.validation.annotation.Validated;
@@ -24,6 +35,7 @@ import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
 
 import cn.iocoder.yudao.framework.apilog.core.annotation.ApiAccessLog;
 import static cn.iocoder.yudao.framework.apilog.core.enums.OperateTypeEnum.*;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
 
 import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.*;
 import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpSupplierProductDO;
@@ -37,6 +49,8 @@ public class ErpSupplierProductController {
 
     @Resource
     private ErpSupplierProductService supplierProductService;
+
+
 
     @PostMapping("/create")
     @Operation(summary = "创建ERP 供应商产品")
@@ -76,7 +90,14 @@ public class ErpSupplierProductController {
     @PreAuthorize("@ss.hasPermission('erp:supplier-product:query')")
     public CommonResult<PageResult<ErpSupplierProductRespVO>> getSupplierProductPage(@Valid ErpSupplierProductPageReqVO pageReqVO) {
         PageResult<ErpSupplierProductDO> pageResult = supplierProductService.getSupplierProductPage(pageReqVO);
-        return success(BeanUtils.toBean(pageResult, ErpSupplierProductRespVO.class));
+        return success(supplierProductService.buildSupplierProductVOPageResult(pageResult));
+    }
+
+    @GetMapping("/simple-list")
+    @Operation(summary = "获得ERP 供应商产品精简列表", description = "只包含被开启的产品，主要用于前端的下拉选项")
+    public CommonResult<List<ErpSupplierProductRespVO>> getProductSimpleList() {
+        List<ErpSupplierProductRespVO> list = supplierProductService.getSupplierProductVOListByStatus(CommonStatusEnum.ENABLE.getStatus());
+        return success(list);
     }
 
     @GetMapping("/export-excel")
@@ -86,10 +107,12 @@ public class ErpSupplierProductController {
     public void exportSupplierProductExcel(@Valid ErpSupplierProductPageReqVO pageReqVO,
               HttpServletResponse response) throws IOException {
         pageReqVO.setPageSize(PageParam.PAGE_SIZE_NONE);
-        List<ErpSupplierProductDO> list = supplierProductService.getSupplierProductPage(pageReqVO).getList();
+        List<ErpSupplierProductRespVO> list = supplierProductService.buildSupplierProductVOPageResult(supplierProductService.getSupplierProductPage(pageReqVO)).getList();
         // 导出 Excel
         ExcelUtils.write(response, "ERP 供应商产品.xls", "数据", ErpSupplierProductRespVO.class,
                         BeanUtils.toBean(list, ErpSupplierProductRespVO.class));
     }
+
+
 
 }

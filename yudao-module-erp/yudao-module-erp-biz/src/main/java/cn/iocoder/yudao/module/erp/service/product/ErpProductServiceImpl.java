@@ -42,6 +42,7 @@ public class ErpProductServiceImpl implements ErpProductService {
     @Override
     public Long createProduct(ProductSaveReqVO createReqVO) {
         // TODO 芋艿：校验分类
+        validateProductCodeUnique(createReqVO.getBarCode());
         // 插入
         ErpProductDO product = BeanUtils.toBean(createReqVO, ErpProductDO.class);
         productMapper.insert(product);
@@ -52,6 +53,7 @@ public class ErpProductServiceImpl implements ErpProductService {
     @Override
     public void updateProduct(ProductSaveReqVO updateReqVO) {
         // TODO 芋艿：校验分类
+        validateProductCodeUnique(updateReqVO.getBarCode());
         // 校验存在
         validateProductExists(updateReqVO.getId());
         // 更新
@@ -89,6 +91,15 @@ public class ErpProductServiceImpl implements ErpProductService {
     private void validateProductExists(Long id) {
         if (productMapper.selectById(id) == null) {
             throw exception(PRODUCT_NOT_EXISTS);
+        }
+    }
+
+    private void validateProductCodeUnique(String code) {
+        ErpProductDO product = productMapper.selectByCode(code);
+        if (product == null) {
+            return;
+        } else {
+            throw exception(PRODUCT_CODE_DUPLICATE);
         }
     }
 

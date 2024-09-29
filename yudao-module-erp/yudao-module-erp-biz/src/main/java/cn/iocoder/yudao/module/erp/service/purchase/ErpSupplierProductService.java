@@ -52,4 +52,7 @@ public interface ErpSupplierProductService {
      */
     PageResult<ErpSupplierProductDO> getSupplierProductPage(ErpSupplierProductPageReqVO pageReqVO);
 
+    PageResult<ErpSupplierProductRespVO> buildSupplierProductVOPageResult(PageResult<ErpSupplierProductDO> pageResult);
+
+    List<ErpSupplierProductRespVO> getSupplierProductVOListByStatus(Integer status);
 }

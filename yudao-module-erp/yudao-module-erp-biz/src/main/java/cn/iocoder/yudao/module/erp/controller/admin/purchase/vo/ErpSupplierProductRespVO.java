@@ -23,10 +23,16 @@ public class ErpSupplierProductRespVO {
     @Schema(description = "供应商编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "29689")
     @ExcelProperty("供应商编号")
     private Long supplierId;
+    @Schema(description = "供应商名称", example = "芋道")
+    @ExcelProperty("供应商名称")
+    private String supplierName;
 
     @Schema(description = "产品编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "26097")
     @ExcelProperty("产品编号")
     private Long productId;
+    @Schema(description = "产品名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "巧克力")
+    @ExcelProperty("产品名称")
+    private String productName;
 
     @Schema(description = "包装高度")
     @ExcelProperty("包装高度")

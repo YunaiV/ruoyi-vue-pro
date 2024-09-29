@@ -4,6 +4,7 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.module.erp.controller.admin.product.vo.product.ErpProductPageReqVO;
+import cn.iocoder.yudao.module.erp.dal.dataobject.product.ErpProductCategoryDO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.product.ErpProductDO;
 import org.apache.ibatis.annotations.Mapper;
 
@@ -31,6 +32,10 @@ public interface ErpProductMapper extends BaseMapperX<ErpProductDO> {
 
     default Long selectCountByUnitId(Long unitId) {
         return selectCount(ErpProductDO::getUnitId, unitId);
+    }
+
+    default ErpProductDO selectByCode(String code) {
+        return selectOne(ErpProductDO::getBarCode, code);
     }
 
     default List<ErpProductDO> selectListByStatus(Integer status) {

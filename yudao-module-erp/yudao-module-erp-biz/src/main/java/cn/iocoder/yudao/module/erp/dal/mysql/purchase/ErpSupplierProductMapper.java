@@ -5,6 +5,7 @@ import java.util.*;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
+import cn.iocoder.yudao.module.erp.dal.dataobject.product.ErpProductDO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpSupplierProductDO;
 import org.apache.ibatis.annotations.Mapper;
 import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.*;
@@ -31,5 +32,10 @@ public interface ErpSupplierProductMapper extends BaseMapperX<ErpSupplierProduct
                 .betweenIfPresent(ErpSupplierProductDO::getCreateTime, reqVO.getCreateTime())
                 .orderByDesc(ErpSupplierProductDO::getId));
     }
+
+    default ErpSupplierProductDO selectByCode(String code) {
+        return selectOne(ErpSupplierProductDO::getCode, code);
+    }
+
 
 }
