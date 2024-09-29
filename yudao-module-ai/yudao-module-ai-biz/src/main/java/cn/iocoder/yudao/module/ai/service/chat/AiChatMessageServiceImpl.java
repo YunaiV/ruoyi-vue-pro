@@ -156,11 +156,10 @@ public class AiChatMessageServiceImpl implements AiChatMessageService {
     }
 
     private List<AiKnowledgeSegmentDO> recallSegment(String content, Long knowledgeId) {
-        List<AiKnowledgeSegmentDO> segmentList = new ArrayList<>();
-        if (Objects.nonNull(knowledgeId)) {
-            segmentList = knowledgeSegmentService.similaritySearch(new AiKnowledgeSegmentSearchReqVO().setKnowledgeId(knowledgeId).setContent(content));
+        if (Objects.isNull(knowledgeId)) {
+            return Collections.emptyList();
         }
-        return segmentList;
+        return knowledgeSegmentService.similaritySearch(new AiKnowledgeSegmentSearchReqVO().setKnowledgeId(knowledgeId).setContent(content));
     }
 
     private Prompt buildPrompt(AiChatConversationDO conversation, List<AiChatMessageDO> messages,List<AiKnowledgeSegmentDO> segmentList,

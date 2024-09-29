@@ -5,6 +5,8 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
+import java.util.List;
+
 @Schema(description = "管理后台 - AI 知识库更新【我的】 Request VO")
 @Data
 public class AiKnowledgeUpdateReqVO {
@@ -21,7 +23,7 @@ public class AiKnowledgeUpdateReqVO {
     private String description;
 
     @Schema(description = "可见权限，只能选择哪些人可见", requiredMode = Schema.RequiredMode.REQUIRED, example = "1,2,3")
-    private String visibilityPermissions;
+    private List<Long> visibilityPermissions;
 
     @Schema(description = "嵌入模型编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     @NotNull(message = "嵌入模型不能为空")

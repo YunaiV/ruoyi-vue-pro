@@ -2,9 +2,13 @@ package cn.iocoder.yudao.module.ai.dal.dataobject.knowledge;
 
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import cn.iocoder.yudao.framework.mybatis.core.type.LongListTypeHandler;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
+
+import java.util.List;
 
 /**
  * AI 知识库 DO
@@ -40,7 +44,8 @@ public class AiKnowledgeDO extends BaseDO {
      * <p>
      * -1 所有人可见，其他为各自用户编号
      */
-    private String visibilityPermissions;
+    @TableField(typeHandler = LongListTypeHandler.class)
+    private List<Long> visibilityPermissions;
     /**
      * 嵌入模型编号
      */
