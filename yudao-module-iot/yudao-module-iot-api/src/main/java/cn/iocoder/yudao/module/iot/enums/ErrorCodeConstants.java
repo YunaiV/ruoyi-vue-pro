@@ -17,7 +17,9 @@ public interface ErrorCodeConstants {
     // ========== IoT 产品物模型 1-050-002-000 ============
     ErrorCode THINK_MODEL_FUNCTION_NOT_EXISTS = new ErrorCode(1_050_002_000, "产品物模型不存在");
     ErrorCode THINK_MODEL_FUNCTION_EXISTS_BY_PRODUCT_KEY = new ErrorCode(1_050_002_001, "ProductKey 对应的产品物模型已存在");
-    ErrorCode THINK_MODEL_FUNCTION_EXISTS_BY_IDENTIFIER = new ErrorCode(1_050_002_002, "产品物模型标识已存在");
+    ErrorCode THINK_MODEL_FUNCTION_IDENTIFIER_EXISTS = new ErrorCode(1_050_002_002, "存在重复的功能标识符。");
+    ErrorCode THINK_MODEL_FUNCTION_NAME_EXISTS = new ErrorCode(1_050_002_003, "存在重复的功能名称。");
+    ErrorCode THINK_MODEL_FUNCTION_IDENTIFIER_INVALID = new ErrorCode(1_050_002_003, "产品物模型标识无效");
 
     // ========== IoT 设备 1-050-003-000 ============
     ErrorCode DEVICE_NOT_EXISTS = new ErrorCode(1_050_003_000, "设备不存在");

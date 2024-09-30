@@ -30,8 +30,7 @@ import java.util.stream.Collectors;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.diffList;
-import static cn.iocoder.yudao.module.iot.enums.ErrorCodeConstants.THINK_MODEL_FUNCTION_EXISTS_BY_IDENTIFIER;
-import static cn.iocoder.yudao.module.iot.enums.ErrorCodeConstants.THINK_MODEL_FUNCTION_NOT_EXISTS;
+import static cn.iocoder.yudao.module.iot.enums.ErrorCodeConstants.*;
 
 /**
  * IoT 产品物模型 Service 实现类
@@ -52,21 +51,44 @@ public class IotThinkModelFunctionServiceImpl implements IotThinkModelFunctionSe
         // 1. 校验功能标识符在同一产品下是否唯一
         validateIdentifierUnique(createReqVO.getProductId(), createReqVO.getIdentifier());
 
-        // 2. 插入数据库
+        // 2. 功能名称在同一产品下是否唯一
+        validateNameUnique(createReqVO.getProductId(), createReqVO.getName());
+
+        // 3. 系统保留字段，不能用于标识符定义
+        validateNotDefaultEventAndService(createReqVO.getIdentifier());
+
+        // 3. 插入数据库
         IotThinkModelFunctionDO function = IotThinkModelFunctionConvert.INSTANCE.convert(createReqVO);
         thinkModelFunctionMapper.insert(function);
 
-        // 3. 如果创建的是属性，需要更新默认的事件和服务
+        // 4. 如果创建的是属性，需要更新默认的事件和服务
         if (Objects.equals(createReqVO.getType(), IotProductFunctionTypeEnum.PROPERTY.getType())) {
             createDefaultEventsAndServices(createReqVO.getProductId(), createReqVO.getProductKey());
         }
         return function.getId();
     }
 
+    private void validateNotDefaultEventAndService(String identifier) {
+        // set, get, post, property, event, time, value 是系统保留字段，不能用于标识符定义
+        if (CollUtil.containsAny(Arrays.asList("set", "get", "post", "property", "event", "time", "value"), Collections.singletonList(identifier))) {
+            throw exception(THINK_MODEL_FUNCTION_IDENTIFIER_INVALID);
+        }
+//        if (CollUtil.containsAny(Arrays.asList("post", "set", "get"), identifier)) {
+//            throw exception(THINK_MODEL_FUNCTION_IDENTIFIER_INVALID);
+//        }
+    }
+
+    private void validateNameUnique(Long productId, String name) {
+        IotThinkModelFunctionDO function = thinkModelFunctionMapper.selectByProductIdAndName(productId, name);
+        if (function != null) {
+            throw exception(THINK_MODEL_FUNCTION_NAME_EXISTS);
+        }
+    }
+
     private void validateIdentifierUnique(Long productId, String identifier) {
         IotThinkModelFunctionDO function = thinkModelFunctionMapper.selectByProductIdAndIdentifier(productId, identifier);
         if (function != null) {
-            throw exception(THINK_MODEL_FUNCTION_EXISTS_BY_IDENTIFIER);
+            throw exception(THINK_MODEL_FUNCTION_IDENTIFIER_EXISTS);
         }
     }
 
@@ -92,7 +114,7 @@ public class IotThinkModelFunctionServiceImpl implements IotThinkModelFunctionSe
     private void validateIdentifierUniqueForUpdate(Long id, Long productId, String identifier) {
         IotThinkModelFunctionDO function = thinkModelFunctionMapper.selectByProductIdAndIdentifier(productId, identifier);
         if (function != null && ObjectUtil.notEqual(function.getId(), id)) {
-            throw exception(THINK_MODEL_FUNCTION_EXISTS_BY_IDENTIFIER);
+            throw exception(THINK_MODEL_FUNCTION_IDENTIFIER_EXISTS);
         }
     }
 

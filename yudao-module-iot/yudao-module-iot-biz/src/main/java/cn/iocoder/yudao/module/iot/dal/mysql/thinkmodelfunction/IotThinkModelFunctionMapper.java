@@ -23,6 +23,7 @@ public interface IotThinkModelFunctionMapper extends BaseMapperX<IotThinkModelFu
                 .likeIfPresent(IotThinkModelFunctionDO::getName, reqVO.getName())
                 .eqIfPresent(IotThinkModelFunctionDO::getType, reqVO.getType())
                 .eqIfPresent(IotThinkModelFunctionDO::getProductId, reqVO.getProductId())
+                .notIn(IotThinkModelFunctionDO::getIdentifier, "get", "set", "post")
                 .orderByDesc(IotThinkModelFunctionDO::getId));
     }
 
@@ -50,4 +51,8 @@ public interface IotThinkModelFunctionMapper extends BaseMapperX<IotThinkModelFu
                 .in(IotThinkModelFunctionDO::getType, types));
     }
 
+    default IotThinkModelFunctionDO selectByProductIdAndName(Long productId, String name) {
+        return selectOne(IotThinkModelFunctionDO::getProductId, productId,
+                IotThinkModelFunctionDO::getName, name);
+    }
 }
