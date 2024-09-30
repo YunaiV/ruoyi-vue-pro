@@ -97,7 +97,7 @@ public class SeckillActivityServiceImpl implements SeckillActivityService {
         seckillConfigService.validateSeckillConfigExists(configIds);
 
         // 2.1 查询所有开启的秒杀活动
-        List<SeckillActivityDO> activityList = seckillActivityMapper.selectListByStatus(CommonStatusEnum.ENABLE.getStatus());
+        List<SeckillActivityDO> activityList = seckillActivityMapper.selectListBySpuIdAndStatus(spuId, CommonStatusEnum.ENABLE.getStatus());
         if (activityId != null) { // 排除自己
             activityList.removeIf(item -> ObjectUtil.equal(item.getId(), activityId));
         }
