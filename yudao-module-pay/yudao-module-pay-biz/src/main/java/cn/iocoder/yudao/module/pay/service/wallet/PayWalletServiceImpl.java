@@ -2,17 +2,20 @@ package cn.iocoder.yudao.module.pay.service.wallet;
 
 import cn.hutool.core.lang.Assert;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.date.DateUtils;
 import cn.iocoder.yudao.module.pay.controller.admin.wallet.vo.wallet.PayWalletPageReqVO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.order.PayOrderExtensionDO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.refund.PayRefundDO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.wallet.PayWalletDO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.wallet.PayWalletTransactionDO;
 import cn.iocoder.yudao.module.pay.dal.mysql.wallet.PayWalletMapper;
+import cn.iocoder.yudao.module.pay.dal.redis.wallet.PayWalletLockRedisDAO;
 import cn.iocoder.yudao.module.pay.enums.wallet.PayWalletBizTypeEnum;
 import cn.iocoder.yudao.module.pay.service.order.PayOrderService;
 import cn.iocoder.yudao.module.pay.service.refund.PayRefundService;
 import cn.iocoder.yudao.module.pay.service.wallet.bo.WalletTransactionCreateReqBO;
 import jakarta.annotation.Resource;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
@@ -32,10 +35,17 @@ import static cn.iocoder.yudao.module.pay.enums.wallet.PayWalletBizTypeEnum.PAYM
  */
 @Service
 @Slf4j
-public class PayWalletServiceImpl implements  PayWalletService {
+public class PayWalletServiceImpl implements PayWalletService {
+
+    /**
+     * 通知超时时间，单位：毫秒
+     */
+    public static final long UPDATE_TIMEOUT_MILLIS = 120 * DateUtils.SECOND_MILLIS;
 
     @Resource
     private PayWalletMapper walletMapper;
+    @Resource
+    private PayWalletLockRedisDAO lockRedisDAO;
 
     @Resource
     @Lazy // 延迟加载，避免循环依赖
@@ -122,76 +132,86 @@ public class PayWalletServiceImpl implements  PayWalletService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
+    @SneakyThrows
     public PayWalletTransactionDO reduceWalletBalance(Long walletId, Long bizId,
                                                       PayWalletBizTypeEnum bizType, Integer price) {
         // 1. 获取钱包
         PayWalletDO payWallet = getWallet(walletId);
         if (payWallet == null) {
-            log.error("[reduceWalletBalance]，用户钱包({})不存在.", walletId);
+            log.error("[reduceWalletBalance][用户钱包({})不存在]", walletId);
             throw exception(WALLET_NOT_FOUND);
         }
 
-        // 2.1 扣除余额
-        int updateCounts;
-        switch (bizType) {
-            case PAYMENT: {
-                updateCounts = walletMapper.updateWhenConsumption(payWallet.getId(), price);
-                break;
+        // 2. 加锁，更新钱包余额（目的：避免钱包流水的并发更新时，余额变化不连贯）
+        return lockRedisDAO.lock(walletId, UPDATE_TIMEOUT_MILLIS, () -> {
+            // 2. 扣除余额
+            int updateCounts;
+            switch (bizType) {
+                case PAYMENT: {
+                    updateCounts = walletMapper.updateWhenConsumption(payWallet.getId(), price);
+                    break;
+                }
+                case RECHARGE_REFUND: {
+                    updateCounts = walletMapper.updateWhenRechargeRefund(payWallet.getId(), price);
+                    break;
+                }
+                default: {
+                    // TODO 其它类型待实现
+                    throw new UnsupportedOperationException("待实现");
+                }
             }
-            case RECHARGE_REFUND: {
-                updateCounts = walletMapper.updateWhenRechargeRefund(payWallet.getId(), price);
-                break;
+            if (updateCounts == 0) {
+                throw exception(WALLET_BALANCE_NOT_ENOUGH);
             }
-            default: {
-                // TODO 其它类型待实现
-                throw new UnsupportedOperationException("待实现");
-            }
-        }
-        if (updateCounts == 0) {
-            throw exception(WALLET_BALANCE_NOT_ENOUGH);
-        }
-        // 2.2 生成钱包流水
-        Integer afterBalance = payWallet.getBalance() - price;
-        WalletTransactionCreateReqBO bo = new WalletTransactionCreateReqBO().setWalletId(payWallet.getId())
-                .setPrice(-price).setBalance(afterBalance).setBizId(String.valueOf(bizId))
-                .setBizType(bizType.getType()).setTitle(bizType.getDescription());
-        return walletTransactionService.createWalletTransaction(bo);
+
+            // 3. 生成钱包流水
+            Integer afterBalance = payWallet.getBalance() - price;
+            WalletTransactionCreateReqBO bo = new WalletTransactionCreateReqBO().setWalletId(payWallet.getId())
+                    .setPrice(-price).setBalance(afterBalance).setBizId(String.valueOf(bizId))
+                    .setBizType(bizType.getType()).setTitle(bizType.getDescription());
+            return walletTransactionService.createWalletTransaction(bo);
+        });
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
+    @SneakyThrows
     public PayWalletTransactionDO addWalletBalance(Long walletId, String bizId,
                                                    PayWalletBizTypeEnum bizType, Integer price) {
-        // 1.1 获取钱包
+        // 1. 获取钱包
         PayWalletDO payWallet = getWallet(walletId);
         if (payWallet == null) {
-            log.error("[addWalletBalance]，用户钱包({})不存在.", walletId);
+            log.error("[addWalletBalance][用户钱包({})不存在]", walletId);
             throw exception(WALLET_NOT_FOUND);
         }
-        // 1.2 更新钱包金额
-        switch (bizType) {
-            case PAYMENT_REFUND: { // 退款更新
-                walletMapper.updateWhenConsumptionRefund(payWallet.getId(), price);
-                break;
-            }
-            case RECHARGE: { // 充值更新
-                walletMapper.updateWhenRecharge(payWallet.getId(), price);
-                break;
-            }
-            case UPDATE_BALANCE: // 更新余额
-                walletMapper.updateWhenRecharge(payWallet.getId(), price);
-                break;
-            default: {
-                // TODO 其它类型待实现
-                throw new UnsupportedOperationException("待实现");
-            }
-        }
 
-        // 2. 生成钱包流水
-        WalletTransactionCreateReqBO transactionCreateReqBO = new WalletTransactionCreateReqBO()
-                .setWalletId(payWallet.getId()).setPrice(price).setBalance(payWallet.getBalance() + price)
-                .setBizId(bizId).setBizType(bizType.getType()).setTitle(bizType.getDescription());
-        return walletTransactionService.createWalletTransaction(transactionCreateReqBO);
+        // 2. 加锁，更新钱包余额（目的：避免钱包流水的并发更新时，余额变化不连贯）
+        return lockRedisDAO.lock(walletId, UPDATE_TIMEOUT_MILLIS, () -> {
+            // 2. 更新钱包金额
+            switch (bizType) {
+                case PAYMENT_REFUND: { // 退款更新
+                    walletMapper.updateWhenConsumptionRefund(payWallet.getId(), price);
+                    break;
+                }
+                case RECHARGE: { // 充值更新
+                    walletMapper.updateWhenRecharge(payWallet.getId(), price);
+                    break;
+                }
+                case UPDATE_BALANCE: // 更新余额
+                    walletMapper.updateWhenRecharge(payWallet.getId(), price);
+                    break;
+                default: {
+                    // TODO 其它类型待实现
+                    throw new UnsupportedOperationException("待实现");
+                }
+            }
+
+            // 3. 生成钱包流水
+            WalletTransactionCreateReqBO transactionCreateReqBO = new WalletTransactionCreateReqBO()
+                    .setWalletId(payWallet.getId()).setPrice(price).setBalance(payWallet.getBalance() + price)
+                    .setBizId(bizId).setBizType(bizType.getType()).setTitle(bizType.getDescription());
+            return walletTransactionService.createWalletTransaction(transactionCreateReqBO);
+        });
     }
 
     @Override

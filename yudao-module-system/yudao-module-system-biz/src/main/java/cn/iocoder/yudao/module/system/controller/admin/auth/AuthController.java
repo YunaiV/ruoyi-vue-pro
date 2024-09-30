@@ -115,6 +115,13 @@ public class AuthController {
         return success(AuthConvert.INSTANCE.convert(user, roles, menuList));
     }
 
+    @PostMapping("/register")
+    @PermitAll
+    @Operation(summary = "注册用户")
+    public CommonResult<AuthLoginRespVO> register(@RequestBody @Valid AuthRegisterReqVO registerReqVO) {
+        return success(authService.register(registerReqVO));
+    }
+
     // ========== 短信登录相关 ==========
 
     @PostMapping("/sms-login")

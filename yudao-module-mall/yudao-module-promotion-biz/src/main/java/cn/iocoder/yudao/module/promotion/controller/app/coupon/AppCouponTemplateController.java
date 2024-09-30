@@ -73,7 +73,7 @@ public class AppCouponTemplateController {
         // 1.1 处理查询条件：商品范围编号
         Long productScopeValue = getProductScopeValue(productScope, spuId);
         // 1.2 处理查询条件：领取方式 = 直接领取
-        List<Integer> canTakeTypes = singletonList(CouponTakeTypeEnum.USER.getValue());
+        List<Integer> canTakeTypes = singletonList(CouponTakeTypeEnum.USER.getType());
 
         // 2. 查询
         List<CouponTemplateDO> list = couponTemplateService.getCouponTemplateList(canTakeTypes, productScope,
@@ -105,7 +105,7 @@ public class AppCouponTemplateController {
         // 1.1 处理查询条件：商品范围编号
         Long productScopeValue = getProductScopeValue(pageReqVO.getProductScope(), pageReqVO.getSpuId());
         // 1.2 处理查询条件：领取方式 = 直接领取
-        List<Integer> canTakeTypes = singletonList(CouponTakeTypeEnum.USER.getValue());
+        List<Integer> canTakeTypes = singletonList(CouponTakeTypeEnum.USER.getType());
 
         // 2. 分页查询
         PageResult<CouponTemplateDO> pageResult = couponTemplateService.getCouponTemplatePage(

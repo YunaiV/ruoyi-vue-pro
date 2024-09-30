@@ -290,7 +290,15 @@ public class CollectionUtils {
         return valueFunc.apply(t);
     }
 
-    public static <T, V extends Comparable<? super V>> V getSumValue(List<T> from, Function<T, V> valueFunc,
+    public static <T, V extends Comparable<? super V>> T getMinObject(List<T> from, Function<T, V> valueFunc) {
+        if (CollUtil.isEmpty(from)) {
+            return null;
+        }
+        assert from.size() > 0; // 断言，避免告警
+        return from.stream().min(Comparator.comparing(valueFunc)).get();
+    }
+
+    public static <T, V extends Comparable<? super V>> V getSumValue(Collection<T> from, Function<T, V> valueFunc,
                                                                      BinaryOperator<V> accumulator) {
         return getSumValue(from, valueFunc, accumulator, null);
     }

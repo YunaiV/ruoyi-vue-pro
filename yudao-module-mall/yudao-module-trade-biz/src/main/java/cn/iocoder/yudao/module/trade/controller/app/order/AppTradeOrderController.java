@@ -17,9 +17,11 @@ import cn.iocoder.yudao.module.trade.service.aftersale.AfterSaleService;
 import cn.iocoder.yudao.module.trade.service.delivery.DeliveryExpressService;
 import cn.iocoder.yudao.module.trade.service.order.TradeOrderQueryService;
 import cn.iocoder.yudao.module.trade.service.order.TradeOrderUpdateService;
+import cn.iocoder.yudao.module.trade.service.price.TradePriceService;
 import com.google.common.collect.Maps;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
@@ -47,9 +49,10 @@ public class AppTradeOrderController {
     private TradeOrderQueryService tradeOrderQueryService;
     @Resource
     private DeliveryExpressService deliveryExpressService;
-
     @Resource
     private AfterSaleService afterSaleService;
+    @Resource
+    private TradePriceService priceService;
 
     @Resource
     private TradeOrderProperties tradeOrderProperties;
@@ -59,6 +62,13 @@ public class AppTradeOrderController {
     @PreAuthenticated
     public CommonResult<AppTradeOrderSettlementRespVO> settlementOrder(@Valid AppTradeOrderSettlementReqVO settlementReqVO) {
         return success(tradeOrderUpdateService.settlementOrder(getLoginUserId(), settlementReqVO));
+    }
+
+    @GetMapping("/settlement-product")
+    @Operation(summary = "获得商品结算信息", description = "用于商品列表、商品详情，获得参与活动后的价格信息")
+    @Parameter(name = "spuIds", description = "商品 SPU 编号数组")
+    public CommonResult<List<AppTradeProductSettlementRespVO>> settlementProduct(@RequestParam("spuIds") List<Long> spuIds) {
+        return success(priceService.calculateProductPrice(getLoginUserId(), spuIds));
     }
 
     @PostMapping("/create")
@@ -79,21 +89,32 @@ public class AppTradeOrderController {
 
     @GetMapping("/get-detail")
     @Operation(summary = "获得交易订单")
-    @Parameter(name = "id", description = "交易订单编号")
+    @Parameters({
+            @Parameter(name = "id", description = "交易订单编号"),
+            @Parameter(name = "sync", description = "是否同步支付状态", example = "true")
+    })
     @PreAuthenticated
-    public CommonResult<AppTradeOrderDetailRespVO> getOrder(@RequestParam("id") Long id) {
-        // 查询订单
+    public CommonResult<AppTradeOrderDetailRespVO> getOrderDetail(@RequestParam("id") Long id,
+                                                                  @RequestParam(value = "sync", required = false) Boolean sync) {
+        // 1.1 查询订单
         TradeOrderDO order = tradeOrderQueryService.getOrder(getLoginUserId(), id);
         if (order == null) {
             return success(null);
         }
+        // 1.2 sync 仅在等待支付
+        if (Boolean.TRUE.equals(sync)
+                && TradeOrderStatusEnum.isUnpaid(order.getStatus()) && !order.getPayStatus()) {
+            tradeOrderUpdateService.syncOrderPayStatusQuietly(order.getId(), order.getPayOrderId());
+            // 重新查询，因为同步后，可能会有变化
+            order = tradeOrderQueryService.getOrder(id);
+        }
 
-        // 查询订单项
+        // 2.1 查询订单项
         List<TradeOrderItemDO> orderItems = tradeOrderQueryService.getOrderItemListByOrderId(order.getId());
-        // 查询物流公司
+        // 2.2 查询物流公司
         DeliveryExpressDO express = order.getLogisticsId() != null && order.getLogisticsId() > 0 ?
                 deliveryExpressService.getDeliveryExpress(order.getLogisticsId()) : null;
-        // 最终组合
+        // 2.3 最终组合
         return success(TradeOrderConvert.INSTANCE.convert02(order, orderItems, tradeOrderProperties, express));
     }
 
