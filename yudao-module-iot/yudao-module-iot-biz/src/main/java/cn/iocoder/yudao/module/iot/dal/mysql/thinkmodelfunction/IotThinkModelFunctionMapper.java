@@ -27,7 +27,6 @@ public interface IotThinkModelFunctionMapper extends BaseMapperX<IotThinkModelFu
                 .orderByDesc(IotThinkModelFunctionDO::getId));
     }
 
-
     default IotThinkModelFunctionDO selectByProductIdAndIdentifier(Long productId, String identifier) {
         return selectOne(IotThinkModelFunctionDO::getProductId, productId,
                 IotThinkModelFunctionDO::getIdentifier, identifier);
@@ -55,4 +54,5 @@ public interface IotThinkModelFunctionMapper extends BaseMapperX<IotThinkModelFu
         return selectOne(IotThinkModelFunctionDO::getProductId, productId,
                 IotThinkModelFunctionDO::getName, name);
     }
+
 }

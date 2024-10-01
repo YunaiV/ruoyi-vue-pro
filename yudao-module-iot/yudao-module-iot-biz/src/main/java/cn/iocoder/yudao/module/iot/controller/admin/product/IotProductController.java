@@ -83,11 +83,12 @@ public class IotProductController {
         return success(BeanUtils.toBean(pageResult, IotProductRespVO.class));
     }
 
+    // TODO @haohao：改成 simple-list 哈
     @GetMapping("/list-all-simple")
     @Operation(summary = "获得所有产品列表")
     @PreAuthorize("@ss.hasPermission('iot:product:query')")
     public CommonResult<List<IotProductSimpleRespVO>> listAllSimpleProducts() {
-        List<IotProductDO> list = productService.listAllProducts();
+        List<IotProductDO> list = productService.getProductList();
         return success(BeanUtils.toBean(list, IotProductSimpleRespVO.class));
     }
 

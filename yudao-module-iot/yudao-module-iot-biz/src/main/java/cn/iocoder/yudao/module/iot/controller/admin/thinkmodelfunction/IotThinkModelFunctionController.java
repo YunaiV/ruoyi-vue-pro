@@ -32,14 +32,14 @@ public class IotThinkModelFunctionController {
     private IotThinkModelFunctionService thinkModelFunctionService;
 
     @PostMapping("/create")
-    @Operation(summary = "创建IoT 产品物模型")
+    @Operation(summary = "创建产品物模型")
     @PreAuthorize("@ss.hasPermission('iot:think-model-function:create')")
     public CommonResult<Long> createThinkModelFunction(@Valid @RequestBody IotThinkModelFunctionSaveReqVO createReqVO) {
         return success(thinkModelFunctionService.createThinkModelFunction(createReqVO));
     }
 
     @PutMapping("/update")
-    @Operation(summary = "更新IoT 产品物模型")
+    @Operation(summary = "更新产品物模型")
     @PreAuthorize("@ss.hasPermission('iot:think-model-function:update')")
     public CommonResult<Boolean> updateThinkModelFunction(@Valid @RequestBody IotThinkModelFunctionSaveReqVO updateReqVO) {
         thinkModelFunctionService.updateThinkModelFunction(updateReqVO);
@@ -47,7 +47,7 @@ public class IotThinkModelFunctionController {
     }
 
     @DeleteMapping("/delete")
-    @Operation(summary = "删除IoT 产品物模型")
+    @Operation(summary = "删除产品物模型")
     @Parameter(name = "id", description = "编号", required = true)
     @PreAuthorize("@ss.hasPermission('iot:think-model-function:delete')")
     public CommonResult<Boolean> deleteThinkModelFunction(@RequestParam("id") Long id) {
@@ -56,30 +56,29 @@ public class IotThinkModelFunctionController {
     }
 
     @GetMapping("/get")
-    @Operation(summary = "获得IoT 产品物模型")
+    @Operation(summary = "获得产品物模型")
     @Parameter(name = "id", description = "编号", required = true)
     @PreAuthorize("@ss.hasPermission('iot:think-model-function:query')")
     public CommonResult<IotThinkModelFunctionRespVO> getThinkModelFunction(@RequestParam("id") Long id) {
-        IotThinkModelFunctionDO thinkModelFunction = thinkModelFunctionService.getThinkModelFunction(id);
-        IotThinkModelFunctionRespVO respVO = IotThinkModelFunctionConvert.INSTANCE.convert(thinkModelFunction);
-        return success(respVO);
+        IotThinkModelFunctionDO function = thinkModelFunctionService.getThinkModelFunction(id);
+        return success(IotThinkModelFunctionConvert.INSTANCE.convert(function));
     }
 
     @GetMapping("/list-by-product-id")
-    @Operation(summary = "获得IoT 产品物模型")
+    @Operation(summary = "获得产品物模型")
     @Parameter(name = "productId", description = "产品ID", required = true, example = "1024")
     @PreAuthorize("@ss.hasPermission('iot:think-model-function:query')")
     public CommonResult<List<IotThinkModelFunctionRespVO>> getThinkModelFunctionListByProductId(@RequestParam("productId") Long productId) {
-        List<IotThinkModelFunctionDO> thinkModelFunctionListByProductId = thinkModelFunctionService.getThinkModelFunctionListByProductId(productId);
-        List<IotThinkModelFunctionRespVO> respVO = IotThinkModelFunctionConvert.INSTANCE.convertList(thinkModelFunctionListByProductId);
-        return success(respVO);
+        List<IotThinkModelFunctionDO> list = thinkModelFunctionService.getThinkModelFunctionListByProductId(productId);
+        return success(IotThinkModelFunctionConvert.INSTANCE.convertList(list));
     }
 
     @GetMapping("/page")
-    @Operation(summary = "获得IoT 产品物模型分页")
+    @Operation(summary = "获得产品物模型分页")
     @PreAuthorize("@ss.hasPermission('iot:think-model-function:query')")
     public CommonResult<PageResult<IotThinkModelFunctionRespVO>> getThinkModelFunctionPage(@Valid IotThinkModelFunctionPageReqVO pageReqVO) {
         PageResult<IotThinkModelFunctionDO> pageResult = thinkModelFunctionService.getThinkModelFunctionPage(pageReqVO);
         return success(BeanUtils.toBean(pageResult, IotThinkModelFunctionRespVO.class));
     }
+
 }

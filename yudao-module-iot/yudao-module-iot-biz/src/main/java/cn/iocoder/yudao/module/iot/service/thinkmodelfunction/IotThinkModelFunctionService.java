@@ -61,4 +61,5 @@ public interface IotThinkModelFunctionService {
      * @return 产品物模型分页
      */
     PageResult<IotThinkModelFunctionDO> getThinkModelFunctionPage(IotThinkModelFunctionPageReqVO pageReqVO);
+
 }

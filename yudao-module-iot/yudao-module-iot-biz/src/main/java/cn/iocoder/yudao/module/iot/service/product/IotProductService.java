@@ -66,6 +66,6 @@ public interface IotProductService {
      *
      * @return 产品列表
      */
-    List<IotProductDO> listAllProducts();
+    List<IotProductDO> getProductList();
 
 }

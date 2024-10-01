@@ -115,7 +115,7 @@ public class IotProductServiceImpl implements IotProductService {
     }
 
     @Override
-    public List<IotProductDO> listAllProducts() {
+    public List<IotProductDO> getProductList() {
         return productMapper.selectList();
     }
 

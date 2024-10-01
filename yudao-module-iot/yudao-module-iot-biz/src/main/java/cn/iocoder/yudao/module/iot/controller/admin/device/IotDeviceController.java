@@ -83,7 +83,7 @@ public class IotDeviceController {
     @Parameter(name = "productId", description = "产品编号", example = "1")
     @PreAuthorize("@ss.hasPermission('iot:device:query')")
     public CommonResult<Long> getDeviceCount(@RequestParam("productId") Long productId) {
-        return success(deviceService.getDeviceCount(productId));
+        return success(deviceService.getDeviceCountByProductId(productId));
     }
 
 }

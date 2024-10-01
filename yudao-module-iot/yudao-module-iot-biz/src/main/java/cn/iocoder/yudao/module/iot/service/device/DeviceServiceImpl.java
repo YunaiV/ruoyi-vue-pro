@@ -158,17 +158,12 @@ public class DeviceServiceImpl implements IotDeviceService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void updateDevice(IotDeviceSaveReqVO updateReqVO) {
-        // 校验存在
+        // 1. 校验存在
         validateDeviceExists(updateReqVO.getId());
 
-        // 设备名称 和 产品 ID 不能修改
-        updateReqVO.setDeviceName(null);
-        updateReqVO.setProductId(null);
-
-        // 更新 DO 对象
-        IotDeviceDO updateObj = BeanUtils.toBean(updateReqVO, IotDeviceDO.class);
-
-        // 更新到数据库
+        // 2. 更新到数据库
+        IotDeviceDO updateObj = BeanUtils.toBean(updateReqVO, IotDeviceDO.class)
+                .setDeviceName(null).setProductId(null); // 设备名称 和 产品 ID 不能修改
         deviceMapper.updateById(updateObj);
     }
 
@@ -225,7 +220,7 @@ public class DeviceServiceImpl implements IotDeviceService {
     }
 
     @Override
-    public Long getDeviceCount(Long productId) {
+    public Long getDeviceCountByProductId(Long productId) {
         return deviceMapper.selectCountByProductId(productId);
     }
 
