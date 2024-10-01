@@ -98,7 +98,7 @@ public class BrokerageWithdrawServiceImpl implements BrokerageWithdrawService {
             // 3.1 通过时佣金转余额
             if (BrokerageWithdrawTypeEnum.WALLET.getType().equals(withdraw.getType())) {
                 // todo 疯狂：
-            }else if (BrokerageWithdrawTypeEnum.WECHAT.getType().equals(withdraw.getType())){
+            }else if (BrokerageWithdrawTypeEnum.ALIPAY_SMALL.getType().equals(withdraw.getType())){
                 //获取openid
                 SocialUserRespDTO socialUser = socialUserApi.getSocialUserByUserId(UserTypeEnum.MEMBER.getValue(), withdraw.getUserId(), SocialTypeEnum.WECHAT_MINI_APP.getType());
                 // 微信提现
