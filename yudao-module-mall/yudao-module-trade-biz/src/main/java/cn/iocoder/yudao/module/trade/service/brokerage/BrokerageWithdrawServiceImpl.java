@@ -4,20 +4,29 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.ObjectUtil;
+import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.number.MoneyUtils;
+import cn.iocoder.yudao.module.pay.api.transfer.PayTransferApi;
+import cn.iocoder.yudao.module.pay.api.transfer.dto.PayTransferCreateReqDTO;
+import cn.iocoder.yudao.module.pay.enums.transfer.PayTransferTypeEnum;
 import cn.iocoder.yudao.module.system.api.notify.NotifyMessageSendApi;
 import cn.iocoder.yudao.module.system.api.notify.dto.NotifySendSingleToUserReqDTO;
+import cn.iocoder.yudao.module.system.api.social.SocialUserApi;
+import cn.iocoder.yudao.module.system.api.social.dto.SocialUserRespDTO;
+import cn.iocoder.yudao.module.system.enums.social.SocialTypeEnum;
 import cn.iocoder.yudao.module.trade.controller.admin.brokerage.vo.withdraw.BrokerageWithdrawPageReqVO;
 import cn.iocoder.yudao.module.trade.controller.app.brokerage.vo.withdraw.AppBrokerageWithdrawCreateReqVO;
 import cn.iocoder.yudao.module.trade.convert.brokerage.BrokerageWithdrawConvert;
 import cn.iocoder.yudao.module.trade.dal.dataobject.brokerage.BrokerageWithdrawDO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.config.TradeConfigDO;
 import cn.iocoder.yudao.module.trade.dal.mysql.brokerage.BrokerageWithdrawMapper;
+import cn.iocoder.yudao.module.trade.dal.redis.no.TradeNoRedisDAO;
 import cn.iocoder.yudao.module.trade.enums.MessageTemplateConstants;
 import cn.iocoder.yudao.module.trade.enums.brokerage.BrokerageRecordBizTypeEnum;
 import cn.iocoder.yudao.module.trade.enums.brokerage.BrokerageWithdrawStatusEnum;
 import cn.iocoder.yudao.module.trade.enums.brokerage.BrokerageWithdrawTypeEnum;
+import cn.iocoder.yudao.module.trade.framework.order.config.TradeOrderProperties;
 import cn.iocoder.yudao.module.trade.service.brokerage.bo.BrokerageWithdrawSummaryRespBO;
 import cn.iocoder.yudao.module.trade.service.config.TradeConfigService;
 import org.springframework.stereotype.Service;
@@ -27,12 +36,10 @@ import org.springframework.validation.annotation.Validated;
 import jakarta.annotation.Resource;
 import jakarta.validation.Validator;
 import java.time.LocalDateTime;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.module.trade.dal.redis.no.TradeNoRedisDAO.TRADE_ORDER_NO_PREFIX;
 import static cn.iocoder.yudao.module.trade.enums.ErrorCodeConstants.*;
 
 /**
@@ -46,6 +53,8 @@ public class BrokerageWithdrawServiceImpl implements BrokerageWithdrawService {
 
     @Resource
     private BrokerageWithdrawMapper brokerageWithdrawMapper;
+    @Resource
+    private TradeNoRedisDAO tradeNoRedisDAO;
 
     @Resource
     private BrokerageRecordService brokerageRecordService;
@@ -54,15 +63,23 @@ public class BrokerageWithdrawServiceImpl implements BrokerageWithdrawService {
 
     @Resource
     private NotifyMessageSendApi notifyMessageSendApi;
+    @Resource
+    private PayTransferApi payTransferApi;
+    @Resource
+    private SocialUserApi socialUserApi;
 
     @Resource
     private Validator validator;
 
+    @Resource
+    private TradeOrderProperties tradeOrderProperties;
+
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void auditBrokerageWithdraw(Integer id, BrokerageWithdrawStatusEnum status, String auditReason) {
+    public void auditBrokerageWithdraw(Integer id, BrokerageWithdrawStatusEnum status, String auditReason, String userIp) {
         // 1.1 校验存在
         BrokerageWithdrawDO withdraw = validateBrokerageWithdrawExists(id);
+
         // 1.2 校验状态为审核中
         if (ObjectUtil.notEqual(BrokerageWithdrawStatusEnum.AUDITING.getStatus(), withdraw.getStatus())) {
             throw exception(BROKERAGE_WITHDRAW_STATUS_NOT_AUDITING);
@@ -81,6 +98,12 @@ public class BrokerageWithdrawServiceImpl implements BrokerageWithdrawService {
             // 3.1 通过时佣金转余额
             if (BrokerageWithdrawTypeEnum.WALLET.getType().equals(withdraw.getType())) {
                 // todo 疯狂：
+            }else if (BrokerageWithdrawTypeEnum.WECHAT.getType().equals(withdraw.getType())){
+                //获取openid
+                SocialUserRespDTO socialUser = socialUserApi.getSocialUserByUserId(UserTypeEnum.MEMBER.getValue(), withdraw.getUserId(), SocialTypeEnum.WECHAT_MINI_APP.getType());
+                // 微信提现
+                PayTransferCreateReqDTO payTransferCreateReqDTO = getPayTransferCreateReqDTO(userIp, withdraw, socialUser);
+                payTransferApi.createTransfer(payTransferCreateReqDTO);
             }
             // TODO 疯狂：调用转账接口
         } else if (BrokerageWithdrawStatusEnum.AUDIT_FAIL.equals(status)) {
@@ -100,6 +123,19 @@ public class BrokerageWithdrawServiceImpl implements BrokerageWithdrawService {
                 .build();
         notifyMessageSendApi.sendSingleMessageToMember(new NotifySendSingleToUserReqDTO()
                 .setUserId(withdraw.getUserId()).setTemplateCode(templateCode).setTemplateParams(templateParams));
+    }
+
+    private PayTransferCreateReqDTO getPayTransferCreateReqDTO(String userIp, BrokerageWithdrawDO withdraw, SocialUserRespDTO socialUser) {
+        PayTransferCreateReqDTO payTransferCreateReqDTO = new PayTransferCreateReqDTO();
+        payTransferCreateReqDTO.setAppKey(tradeOrderProperties.getPayAppKey());
+        payTransferCreateReqDTO.setChannelCode("wx_lite");
+        payTransferCreateReqDTO.setUserIp(userIp);
+        payTransferCreateReqDTO.setType(PayTransferTypeEnum.WX_BALANCE.getType());
+        payTransferCreateReqDTO.setMerchantTransferId(withdraw.getId().toString());
+        payTransferCreateReqDTO.setPrice(withdraw.getPrice());
+        payTransferCreateReqDTO.setSubject("佣金提现");
+        payTransferCreateReqDTO.setOpenid(socialUser.getOpenid());
+        return payTransferCreateReqDTO;
     }
 
     private BrokerageWithdrawDO validateBrokerageWithdrawExists(Integer id) {

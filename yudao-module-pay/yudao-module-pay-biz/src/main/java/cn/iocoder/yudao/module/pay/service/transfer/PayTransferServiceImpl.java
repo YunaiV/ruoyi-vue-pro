@@ -96,13 +96,15 @@ public class PayTransferServiceImpl implements PayTransferService {
             transfer = INSTANCE.convert(reqDTO)
                     .setChannelId(channel.getId())
                     .setNo(no).setStatus(WAITING.getStatus())
-                    .setNotifyUrl(payApp.getTransferNotifyUrl());
+                    .setNotifyUrl(payApp.getTransferNotifyUrl())
+                    .setAppId(channel.getAppId());
             transferMapper.insert(transfer);
         }
         try {
             // 3. 调用三方渠道发起转账
             PayTransferUnifiedReqDTO transferUnifiedReq = INSTANCE.convert2(transfer)
                     .setOutTransferNo(transfer.getNo());
+            transferUnifiedReq.setNotifyUrl(payApp.getTransferNotifyUrl());
             PayTransferRespDTO unifiedTransferResp = client.unifiedTransfer(transferUnifiedReq);
             // 4. 通知转账结果
             getSelf().notifyTransfer(channel, unifiedTransferResp);

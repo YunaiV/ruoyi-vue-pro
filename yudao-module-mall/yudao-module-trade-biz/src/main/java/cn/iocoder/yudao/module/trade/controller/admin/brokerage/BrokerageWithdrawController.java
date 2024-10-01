@@ -24,6 +24,7 @@ import java.util.Map;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
+import static cn.iocoder.yudao.framework.common.util.servlet.ServletUtils.getClientIP;
 
 @Tag(name = "管理后台 - 佣金提现")
 @RestController
@@ -41,7 +42,7 @@ public class BrokerageWithdrawController {
     @Operation(summary = "通过申请")
     @PreAuthorize("@ss.hasPermission('trade:brokerage-withdraw:audit')")
     public CommonResult<Boolean> approveBrokerageWithdraw(@RequestParam("id") Integer id) {
-        brokerageWithdrawService.auditBrokerageWithdraw(id, BrokerageWithdrawStatusEnum.AUDIT_SUCCESS, "");
+        brokerageWithdrawService.auditBrokerageWithdraw(id, BrokerageWithdrawStatusEnum.AUDIT_SUCCESS, "", getClientIP());
         return success(true);
     }
 
@@ -49,7 +50,7 @@ public class BrokerageWithdrawController {
     @Operation(summary = "驳回申请")
     @PreAuthorize("@ss.hasPermission('trade:brokerage-withdraw:audit')")
     public CommonResult<Boolean> rejectBrokerageWithdraw(@Valid @RequestBody BrokerageWithdrawRejectReqVO reqVO) {
-        brokerageWithdrawService.auditBrokerageWithdraw(reqVO.getId(), BrokerageWithdrawStatusEnum.AUDIT_FAIL, reqVO.getAuditReason());
+        brokerageWithdrawService.auditBrokerageWithdraw(reqVO.getId(), BrokerageWithdrawStatusEnum.AUDIT_FAIL, reqVO.getAuditReason(), getClientIP());
         return success(true);
     }
 

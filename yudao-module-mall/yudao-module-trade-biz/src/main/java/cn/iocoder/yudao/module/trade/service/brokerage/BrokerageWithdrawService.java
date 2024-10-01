@@ -28,7 +28,7 @@ public interface BrokerageWithdrawService {
      * @param status      审核状态
      * @param auditReason 驳回原因
      */
-    void auditBrokerageWithdraw(Integer id, BrokerageWithdrawStatusEnum status, String auditReason);
+    void auditBrokerageWithdraw(Integer id, BrokerageWithdrawStatusEnum status, String auditReason, String userIp);
 
     /**
      * 获得佣金提现

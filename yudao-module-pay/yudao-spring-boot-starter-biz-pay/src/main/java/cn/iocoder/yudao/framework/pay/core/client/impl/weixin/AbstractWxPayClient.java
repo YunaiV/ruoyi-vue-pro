@@ -17,20 +17,27 @@ import cn.iocoder.yudao.framework.pay.core.client.dto.transfer.PayTransferUnifie
 import cn.iocoder.yudao.framework.pay.core.client.impl.AbstractPayClient;
 import cn.iocoder.yudao.framework.pay.core.enums.order.PayOrderStatusRespEnum;
 import cn.iocoder.yudao.framework.pay.core.enums.transfer.PayTransferTypeEnum;
+import com.binarywang.spring.starter.wxjava.miniapp.properties.WxMaProperties;
 import com.github.binarywang.wxpay.bean.notify.WxPayNotifyV3Result;
 import com.github.binarywang.wxpay.bean.notify.WxPayOrderNotifyResult;
 import com.github.binarywang.wxpay.bean.notify.WxPayRefundNotifyResult;
 import com.github.binarywang.wxpay.bean.notify.WxPayRefundNotifyV3Result;
 import com.github.binarywang.wxpay.bean.request.*;
 import com.github.binarywang.wxpay.bean.result.*;
+import com.github.binarywang.wxpay.bean.transfer.TransferBatchesRequest;
+import com.github.binarywang.wxpay.bean.transfer.TransferBatchesResult;
 import com.github.binarywang.wxpay.config.WxPayConfig;
 import com.github.binarywang.wxpay.exception.WxPayException;
+import com.github.binarywang.wxpay.service.TransferService;
 import com.github.binarywang.wxpay.service.WxPayService;
 import com.github.binarywang.wxpay.service.impl.WxPayServiceImpl;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -426,8 +433,26 @@ public abstract class AbstractWxPayClient extends AbstractPayClient<WxPayClientC
     }
 
     @Override
-    protected PayTransferRespDTO doUnifiedTransfer(PayTransferUnifiedReqDTO reqDTO) {
-       throw new UnsupportedOperationException("待实现");
+    protected PayTransferRespDTO doUnifiedTransfer(PayTransferUnifiedReqDTO reqDTO) throws WxPayException {
+        TransferService transferService = client.getTransferService();
+        List<TransferBatchesRequest.TransferDetail> transferDetailList = new ArrayList<>();
+        transferDetailList.add(TransferBatchesRequest.TransferDetail.newBuilder()
+                .outDetailNo(reqDTO.getOutTransferNo())
+                .transferAmount(reqDTO.getPrice())
+                .transferRemark(reqDTO.getSubject())
+                .openid(reqDTO.getOpenid())
+                .build());
+        TransferBatchesRequest transferBatches = TransferBatchesRequest.newBuilder()
+                .appid(this.config.getAppId())
+                .outBatchNo(reqDTO.getOutTransferNo())
+                .batchName(reqDTO.getSubject())
+                .batchRemark(reqDTO.getSubject())
+                .totalAmount(reqDTO.getPrice())
+                .totalNum(1)
+                .transferDetailList(transferDetailList).build();
+        transferBatches.setNotifyUrl(reqDTO.getNotifyUrl());
+        TransferBatchesResult transferBatchesResult = transferService.transferBatches(transferBatches);
+        return PayTransferRespDTO.waitingOf(reqDTO.getOutTransferNo(), transferBatchesResult.getBatchId() ,transferBatchesResult);
     }
 
     @Override
