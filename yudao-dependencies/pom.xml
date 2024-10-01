@@ -64,6 +64,7 @@
         <ip2region.version>2.7.0</ip2region.version>
         <bizlog-sdk.version>3.0.6</bizlog-sdk.version>
         <netty.version>4.1.113.Final</netty.version>
+        <mqtt.version>1.2.5</mqtt.version>
         <!-- 三方云服务相关 -->
         <okio.version>3.5.0</okio.version>
         <okhttp3.version>4.11.0</okhttp3.version>
@@ -595,6 +596,13 @@
                         <artifactId>druid</artifactId>
                     </exclusion>
                 </exclusions>
+            </dependency>
+
+            <!-- MQTT -->
+            <dependency>
+                <groupId>org.eclipse.paho</groupId>
+                <artifactId>org.eclipse.paho.client.mqttv3</artifactId>
+                <version>${mqtt.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
