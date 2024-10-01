@@ -79,7 +79,7 @@ public class JdbcUtils {
     /**
      * 判断 JDBC 连接是否为 SQLServer 数据库
      *
-     * @param url JDBC 连接
+     * @param dbType DB 类型
      * @return 是否为 SQLServer 数据库
      */
     public static boolean isSQLServer(DbType dbType) {
