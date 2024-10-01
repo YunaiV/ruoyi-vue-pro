@@ -13,6 +13,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
+import jakarta.annotation.security.PermitAll;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -40,6 +41,7 @@ public class AppActivityController {
     @GetMapping("/list-by-spu-id")
     @Operation(summary = "获得单个商品，进行中的拼团、秒杀、砍价活动信息", description = "每种活动，只返回一个")
     @Parameter(name = "spuId", description = "商品编号", required = true)
+    @PermitAll
     public CommonResult<List<AppActivityRespVO>> getActivityListBySpuId(@RequestParam("spuId") Long spuId) {
         List<AppActivityRespVO> activityVOList = new ArrayList<>();
         // 1. 拼团活动

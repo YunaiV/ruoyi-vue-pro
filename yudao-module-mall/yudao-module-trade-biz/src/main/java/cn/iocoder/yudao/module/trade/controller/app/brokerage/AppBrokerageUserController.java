@@ -3,7 +3,6 @@ package cn.iocoder.yudao.module.trade.controller.app.brokerage;
 import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.security.core.annotations.PreAuthenticated;
 import cn.iocoder.yudao.module.member.api.user.MemberUserApi;
 import cn.iocoder.yudao.module.member.api.user.dto.MemberUserRespDTO;
 import cn.iocoder.yudao.module.trade.controller.app.brokerage.vo.user.*;
@@ -55,7 +54,6 @@ public class AppBrokerageUserController {
 
     @GetMapping("/get")
     @Operation(summary = "获得个人分销信息")
-    @PreAuthenticated
     public CommonResult<AppBrokerageUserRespVO> getBrokerageUser() {
         Optional<BrokerageUserDO> user = Optional.ofNullable(brokerageUserService.getOrCreateBrokerageUser(getLoginUserId()));
         // 返回数据
@@ -68,14 +66,12 @@ public class AppBrokerageUserController {
 
     @PutMapping("/bind")
     @Operation(summary = "绑定推广员")
-    @PreAuthenticated
     public CommonResult<Boolean> bindBrokerageUser(@Valid @RequestBody AppBrokerageUserBindReqVO reqVO) {
         return success(brokerageUserService.bindBrokerageUser(getLoginUserId(), reqVO.getBindUserId()));
     }
 
     @GetMapping("/get-summary")
     @Operation(summary = "获得个人分销统计")
-    @PreAuthenticated
     public CommonResult<AppBrokerageUserMySummaryRespVO> getBrokerageUserSummary() {
         // 查询当前登录用户信息
         Long userId = getLoginUserId();
@@ -101,7 +97,6 @@ public class AppBrokerageUserController {
 
     @GetMapping("/rank-page-by-user-count")
     @Operation(summary = "获得分销用户排行分页（基于用户量）")
-    @PreAuthenticated
     public CommonResult<PageResult<AppBrokerageUserRankByUserCountRespVO>> getBrokerageUserRankPageByUserCount(AppBrokerageUserRankPageReqVO pageReqVO) {
         // 分页查询
         PageResult<AppBrokerageUserRankByUserCountRespVO> pageResult = brokerageUserService.getBrokerageUserRankPageByUserCount(pageReqVO);
@@ -112,7 +107,6 @@ public class AppBrokerageUserController {
 
     @GetMapping("/rank-page-by-price")
     @Operation(summary = "获得分销用户排行分页（基于佣金）")
-    @PreAuthenticated
     public CommonResult<PageResult<AppBrokerageUserRankByPriceRespVO>> getBrokerageUserChildSummaryPageByPrice(AppBrokerageUserRankPageReqVO pageReqVO) {
         // 分页查询
         PageResult<AppBrokerageUserRankByPriceRespVO> pageResult = brokerageRecordService.getBrokerageUserChildSummaryPageByPrice(pageReqVO);
@@ -123,7 +117,6 @@ public class AppBrokerageUserController {
 
     @GetMapping("/child-summary-page")
     @Operation(summary = "获得下级分销统计分页")
-    @PreAuthenticated
     public CommonResult<PageResult<AppBrokerageUserChildSummaryRespVO>> getBrokerageUserChildSummaryPage(
             AppBrokerageUserChildSummaryPageReqVO pageReqVO) {
         PageResult<AppBrokerageUserChildSummaryRespVO> pageResult = brokerageUserService.getBrokerageUserChildSummaryPage(pageReqVO, getLoginUserId());
@@ -133,7 +126,6 @@ public class AppBrokerageUserController {
     @GetMapping("/get-rank-by-price")
     @Operation(summary = "获得分销用户排行（基于佣金）")
     @Parameter(name = "times", description = "时间段", required = true)
-    @PreAuthenticated
     public CommonResult<Integer> getRankByPrice(
             @RequestParam("times") @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND) LocalDateTime[] times) {
         return success(brokerageRecordService.getUserRankByPrice(getLoginUserId(), times));

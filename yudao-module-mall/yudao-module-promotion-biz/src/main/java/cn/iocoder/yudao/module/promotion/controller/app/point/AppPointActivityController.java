@@ -19,6 +19,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
+import jakarta.annotation.security.PermitAll;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -47,6 +48,7 @@ public class AppPointActivityController {
 
     @GetMapping("/page")
     @Operation(summary = "获得积分商城活动分页")
+    @PermitAll
     public CommonResult<PageResult<AppPointActivityRespVO>> getPointActivityPage(AppPointActivityPageReqVO pageReqVO) {
         // 1. 查询满足当前阶段的活动
         PageResult<PointActivityDO> pageResult = pointActivityService.getPointActivityPage(
@@ -63,6 +65,7 @@ public class AppPointActivityController {
     @GetMapping("/get-detail")
     @Operation(summary = "获得积分商城活动明细")
     @Parameter(name = "id", description = "活动编号", required = true, example = "1024")
+    @PermitAll
     public CommonResult<AppPointActivityDetailRespVO> getPointActivity(@RequestParam("id") Long id) {
         // 1. 获取活动
         PointActivityDO activity = pointActivityService.getPointActivity(id);
@@ -81,6 +84,7 @@ public class AppPointActivityController {
     @GetMapping("/list-by-ids")
     @Operation(summary = "获得积分商城活动列表，基于活动编号数组")
     @Parameter(name = "ids", description = "活动编号数组", required = true, example = "[1024, 1025]")
+    @PermitAll
     public CommonResult<List<AppPointActivityRespVO>> getCombinationActivityListByIds(@RequestParam("ids") List<Long> ids) {
         // 1. 获得开启的活动列表
         List<PointActivityDO> activityList = pointActivityService.getPointActivityListByIds(ids);

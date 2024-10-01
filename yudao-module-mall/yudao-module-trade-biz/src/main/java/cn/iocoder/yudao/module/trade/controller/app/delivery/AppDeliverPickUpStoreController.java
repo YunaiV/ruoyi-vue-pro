@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.annotation.security.PermitAll;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -36,6 +37,7 @@ public class AppDeliverPickUpStoreController {
             @Parameter(name = "latitude", description = "精度", example = "110"),
             @Parameter(name = "longitude", description = "纬度", example = "120")
     })
+    @PermitAll
     public CommonResult<List<AppDeliveryPickUpStoreRespVO>> getDeliveryPickUpStoreList(
             @RequestParam(value = "latitude", required = false) Double latitude,
             @RequestParam(value = "longitude", required = false) Double longitude) {
@@ -47,6 +49,7 @@ public class AppDeliverPickUpStoreController {
     @GetMapping("/get")
     @Operation(summary = "获得自提门店")
     @Parameter(name = "id", description = "门店编号")
+    @PermitAll
     public CommonResult<AppDeliveryPickUpStoreRespVO> getOrder(@RequestParam("id") Long id) {
         DeliveryPickUpStoreDO store = deliveryPickUpStoreService.getDeliveryPickUpStore(id);
         return success(DeliveryPickUpStoreConvert.INSTANCE.convert03(store));
