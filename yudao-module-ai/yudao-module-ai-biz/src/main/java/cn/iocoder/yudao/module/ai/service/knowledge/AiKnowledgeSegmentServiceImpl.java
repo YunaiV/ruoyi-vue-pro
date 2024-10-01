@@ -90,7 +90,7 @@ public class AiKnowledgeSegmentServiceImpl implements AiKnowledgeSegmentService 
         } else {
             // 2.2 禁用删除向量
             vectorStore.delete(List.of(oldKnowledgeSegment.getVectorId()));
-            knowledgeSegment.setVectorId(null);
+            knowledgeSegment.setVectorId("");
         }
         // 3 更新段落状态
         segmentMapper.updateById(knowledgeSegment);
@@ -114,7 +114,7 @@ public class AiKnowledgeSegmentServiceImpl implements AiKnowledgeSegmentService 
             return ListUtil.empty();
         }
         // 3.2 段落召回
-        return segmentMapper.selectList(CollUtil.getFieldValues(documentList, "id", String.class));
+        return segmentMapper.selectListByVectorIds(CollUtil.getFieldValues(documentList, "id", String.class));
     }
 
     /**

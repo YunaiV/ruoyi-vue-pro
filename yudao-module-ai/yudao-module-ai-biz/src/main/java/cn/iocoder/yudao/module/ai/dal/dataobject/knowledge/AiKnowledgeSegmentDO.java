@@ -2,8 +2,6 @@ package cn.iocoder.yudao.module.ai.dal.dataobject.knowledge;
 
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
-import com.baomidou.mybatisplus.annotation.FieldStrategy;
-import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
@@ -27,7 +25,6 @@ public class AiKnowledgeSegmentDO extends BaseDO {
     /**
      * 向量库的编号
      */
-    @TableField(updateStrategy = FieldStrategy.ALWAYS) // TODO @新：尽量规避要这个注解。万一后面加个 status 单独更新，可能会踩坑。
     private String vectorId;
     /**
      * 知识库编号

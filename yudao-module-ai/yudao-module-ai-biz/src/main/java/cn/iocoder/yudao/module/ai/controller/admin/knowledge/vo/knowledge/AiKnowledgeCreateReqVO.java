@@ -7,9 +7,9 @@ import lombok.Data;
 
 import java.util.List;
 
-@Schema(description = "管理后台 - AI 知识库创建【我的】 Request VO")
+@Schema(description = "管理后台 - AI 知识库创建 Request VO")
 @Data
-public class AiKnowledgeCreateMyReqVO {
+public class AiKnowledgeCreateReqVO {
 
     @Schema(description = "知识库名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "ruoyi-vue-pro 用户指南")
     @NotBlank(message = "知识库名称不能为空")
@@ -18,7 +18,7 @@ public class AiKnowledgeCreateMyReqVO {
     @Schema(description = "知识库描述", requiredMode = Schema.RequiredMode.REQUIRED, example = "存储 ruoyi-vue-pro 操作文档")
     private String description;
 
-    @Schema(description = "可见权限，只能选择哪些人可见", requiredMode = Schema.RequiredMode.REQUIRED, example = "[1]")
+    @Schema(description = "可见权限，只能选择哪些人可见", requiredMode = Schema.RequiredMode.REQUIRED, example = "[1,2,3]")
     private List<Long> visibilityPermissions;
 
     @Schema(description = "嵌入模型编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
