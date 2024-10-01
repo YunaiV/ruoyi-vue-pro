@@ -209,6 +209,13 @@ public class AdminAuthServiceImplTest extends BaseDbUnitTest {
         String mobile = randomString();
         String code = randomString();
         AuthSmsLoginReqVO reqVO = new AuthSmsLoginReqVO(mobile, code);
+        // mock 方法（验证码）
+        doNothing().when(smsCodeApi).useSmsCode((argThat(smsCodeUseReqDTO -> {
+            assertEquals(mobile, smsCodeUseReqDTO.getMobile());
+            assertEquals(code, smsCodeUseReqDTO.getCode());
+            assertEquals(SmsSceneEnum.ADMIN_MEMBER_LOGIN.getScene(), smsCodeUseReqDTO.getScene());
+            return true;
+        })));
         // mock 方法（用户信息）
         AdminUserDO user = randomPojo(AdminUserDO.class, o -> o.setId(1L));
         when(userService.getUserByMobile(eq(mobile))).thenReturn(user);
