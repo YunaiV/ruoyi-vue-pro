@@ -4,7 +4,6 @@ import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
-import cn.iocoder.yudao.framework.security.core.annotations.PreAuthenticated;
 import cn.iocoder.yudao.module.promotion.controller.admin.kefu.vo.message.KeFuMessageRespVO;
 import cn.iocoder.yudao.module.promotion.controller.app.kefu.vo.message.AppKeFuMessagePageReqVO;
 import cn.iocoder.yudao.module.promotion.controller.app.kefu.vo.message.AppKeFuMessageSendReqVO;
@@ -32,7 +31,6 @@ public class AppKeFuMessageController {
 
     @PostMapping("/send")
     @Operation(summary = "发送客服消息")
-    @PreAuthenticated
     public CommonResult<Long> sendKefuMessage(@Valid @RequestBody AppKeFuMessageSendReqVO sendReqVO) {
         sendReqVO.setSenderId(getLoginUserId()).setSenderType(UserTypeEnum.MEMBER.getValue()); // 设置用户编号和类型
         return success(kefuMessageService.sendKefuMessage(sendReqVO));
@@ -41,7 +39,6 @@ public class AppKeFuMessageController {
     @PutMapping("/update-read-status")
     @Operation(summary = "更新客服消息已读状态")
     @Parameter(name = "conversationId", description = "会话编号", required = true)
-    @PreAuthenticated
     public CommonResult<Boolean> updateKefuMessageReadStatus(@RequestParam("conversationId") Long conversationId) {
         kefuMessageService.updateKeFuMessageReadStatus(conversationId, getLoginUserId(), UserTypeEnum.MEMBER.getValue());
         return success(true);
@@ -49,7 +46,6 @@ public class AppKeFuMessageController {
 
     @GetMapping("/page")
     @Operation(summary = "获得客服消息分页")
-    @PreAuthenticated
     public CommonResult<PageResult<KeFuMessageRespVO>> getKefuMessagePage(@Valid AppKeFuMessagePageReqVO pageReqVO) {
         PageResult<KeFuMessageDO> pageResult = kefuMessageService.getKeFuMessagePage(pageReqVO, getLoginUserId());
         return success(BeanUtils.toBean(pageResult, KeFuMessageRespVO.class));

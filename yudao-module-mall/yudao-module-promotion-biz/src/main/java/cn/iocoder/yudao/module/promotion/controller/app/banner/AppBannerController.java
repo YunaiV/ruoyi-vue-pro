@@ -8,6 +8,7 @@ import cn.iocoder.yudao.module.promotion.service.banner.BannerService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.annotation.security.PermitAll;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -28,6 +29,7 @@ public class AppBannerController {
     @GetMapping("/list")
     @Operation(summary = "获得 banner 列表")
     @Parameter(name = "position", description = "Banner position", example = "1")
+    @PermitAll
     public CommonResult<List<AppBannerRespVO>> getBannerList(@RequestParam("position") Integer position) {
         List<BannerDO> bannerList = bannerService.getBannerListByPosition(position);
         return success(BannerConvert.INSTANCE.convertList01(bannerList));
@@ -36,6 +38,7 @@ public class AppBannerController {
     @PutMapping("/add-browse-count")
     @Operation(summary = "增加 Banner 点击量")
     @Parameter(name = "id", description = "Banner 编号", example = "1024")
+    @PermitAll
     public CommonResult<Boolean> addBrowseCount(@RequestParam("id") Long id) {
         bannerService.addBannerBrowseCount(id);
         return success(true);

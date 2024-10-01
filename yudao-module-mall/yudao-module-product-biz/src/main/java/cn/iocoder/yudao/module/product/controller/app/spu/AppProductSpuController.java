@@ -17,6 +17,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
+import jakarta.annotation.security.PermitAll;
 import jakarta.validation.Valid;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -50,6 +51,7 @@ public class AppProductSpuController {
     @GetMapping("/list-by-ids")
     @Operation(summary = "获得商品 SPU 列表")
     @Parameter(name = "ids", description = "编号列表", required = true)
+    @PermitAll
     public CommonResult<List<AppProductSpuRespVO>> getSpuList(@RequestParam("ids") Set<Long> ids) {
         List<ProductSpuDO> list = productSpuService.getSpuList(ids);
         if (CollUtil.isEmpty(list)) {
@@ -64,6 +66,7 @@ public class AppProductSpuController {
 
     @GetMapping("/page")
     @Operation(summary = "获得商品 SPU 分页")
+    @PermitAll
     public CommonResult<PageResult<AppProductSpuRespVO>> getSpuPage(@Valid AppProductSpuPageReqVO pageVO) {
         PageResult<ProductSpuDO> pageResult = productSpuService.getSpuPage(pageVO);
         if (CollUtil.isEmpty(pageResult.getList())) {
@@ -79,6 +82,7 @@ public class AppProductSpuController {
     @GetMapping("/get-detail")
     @Operation(summary = "获得商品 SPU 明细")
     @Parameter(name = "id", description = "编号", required = true)
+    @PermitAll
     public CommonResult<AppProductSpuDetailRespVO> getSpuDetail(@RequestParam("id") Long id) {
         // 获得商品 SPU
         ProductSpuDO spu = productSpuService.getSpu(id);

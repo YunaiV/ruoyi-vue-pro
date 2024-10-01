@@ -1,7 +1,6 @@
 package cn.iocoder.yudao.module.member.controller.app.user;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
-import cn.iocoder.yudao.framework.security.core.annotations.PreAuthenticated;
 import cn.iocoder.yudao.module.member.controller.app.user.vo.*;
 import cn.iocoder.yudao.module.member.convert.user.MemberUserConvert;
 import cn.iocoder.yudao.module.member.dal.dataobject.level.MemberLevelDO;
@@ -10,12 +9,12 @@ import cn.iocoder.yudao.module.member.service.level.MemberLevelService;
 import cn.iocoder.yudao.module.member.service.user.MemberUserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.annotation.Resource;
+import jakarta.annotation.security.PermitAll;
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-
-import jakarta.annotation.Resource;
-import jakarta.validation.Valid;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
@@ -34,7 +33,6 @@ public class AppMemberUserController {
 
     @GetMapping("/get")
     @Operation(summary = "获得基本信息")
-    @PreAuthenticated
     public CommonResult<AppMemberUserInfoRespVO> getUserInfo() {
         MemberUserDO user = userService.getUser(getLoginUserId());
         MemberLevelDO level = levelService.getLevel(user.getLevelId());
@@ -43,7 +41,6 @@ public class AppMemberUserController {
 
     @PutMapping("/update")
     @Operation(summary = "修改基本信息")
-    @PreAuthenticated
     public CommonResult<Boolean> updateUser(@RequestBody @Valid AppMemberUserUpdateReqVO reqVO) {
         userService.updateUser(getLoginUserId(), reqVO);
         return success(true);
@@ -51,7 +48,6 @@ public class AppMemberUserController {
 
     @PutMapping("/update-mobile")
     @Operation(summary = "修改用户手机")
-    @PreAuthenticated
     public CommonResult<Boolean> updateUserMobile(@RequestBody @Valid AppMemberUserUpdateMobileReqVO reqVO) {
         userService.updateUserMobile(getLoginUserId(), reqVO);
         return success(true);
@@ -59,7 +55,6 @@ public class AppMemberUserController {
 
     @PutMapping("/update-mobile-by-weixin")
     @Operation(summary = "基于微信小程序的授权码，修改用户手机")
-    @PreAuthenticated
     public CommonResult<Boolean> updateUserMobileByWeixin(@RequestBody @Valid AppMemberUserUpdateMobileByWeixinReqVO reqVO) {
         userService.updateUserMobileByWeixin(getLoginUserId(), reqVO);
         return success(true);
@@ -67,7 +62,6 @@ public class AppMemberUserController {
 
     @PutMapping("/update-password")
     @Operation(summary = "修改用户密码", description = "用户修改密码时使用")
-    @PreAuthenticated
     public CommonResult<Boolean> updateUserPassword(@RequestBody @Valid AppMemberUserUpdatePasswordReqVO reqVO) {
         userService.updateUserPassword(getLoginUserId(), reqVO);
         return success(true);
@@ -75,6 +69,7 @@ public class AppMemberUserController {
 
     @PutMapping("/reset-password")
     @Operation(summary = "重置密码", description = "用户忘记密码时使用")
+    @PermitAll
     public CommonResult<Boolean> resetUserPassword(@RequestBody @Valid AppMemberUserResetPasswordReqVO reqVO) {
         userService.resetUserPassword(reqVO);
         return success(true);

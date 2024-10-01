@@ -138,8 +138,6 @@ public class YudaoWebSecurityConfigurerAdapter {
                     .requestMatchers(HttpMethod.PATCH, permitAllUrls.get(HttpMethod.PATCH).toArray(new String[0])).permitAll()
                     // 1.2 基于 yudao.security.permit-all-urls 无需认证
                     .requestMatchers(securityProperties.getPermitAllUrls().toArray(new String[0])).permitAll()
-                    // 1.3 设置 App API 无需认证
-                    .requestMatchers(buildAppApi("/**")).permitAll()
                 )
                 // ②：每个项目的自定义规则
                 .authorizeHttpRequests(c -> authorizeRequestsCustomizers.forEach(customizer -> customizer.customize(c)))
