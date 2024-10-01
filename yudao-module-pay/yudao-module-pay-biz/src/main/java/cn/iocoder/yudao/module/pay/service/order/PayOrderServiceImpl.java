@@ -163,7 +163,14 @@ public class PayOrderServiceImpl implements PayOrderService {
 
         // 4. 如果调用直接支付成功，则直接更新支付单状态为成功。例如说：付款码支付，免密支付时，就直接验证支付成功
         if (unifiedOrderResp != null) {
-            getSelf().notifyOrder(channel, unifiedOrderResp);
+            try {
+                getSelf().notifyOrder(channel, unifiedOrderResp);
+            } catch (Exception e) {
+                // 兼容 https://gitee.com/zhijiantianya/yudao-cloud/issues/I8SM9H 场景
+                // 支付宝或微信扫码之后时，由于 PayClient 是直接返回支付成功，而支付也会有回调，导致存在并发更新问题，此时一般是可以 try catch 直接忽略
+                log.warn("[submitOrder][order({}) channel({}) 支付结果({}) 通知时发生异常，可能是并发问题]",
+                        order, channel, unifiedOrderResp, e);
+            }
             // 如有渠道错误码，则抛出业务异常，提示用户
             if (StrUtil.isNotEmpty(unifiedOrderResp.getChannelErrorCode())) {
                 throw exception(PAY_ORDER_SUBMIT_CHANNEL_ERROR, unifiedOrderResp.getChannelErrorCode(),
@@ -458,6 +465,18 @@ public class PayOrderServiceImpl implements PayOrderService {
             count += syncOrder(orderExtension) ? 1 : 0;
         }
         return count;
+    }
+
+    @Override
+    public void syncOrderQuietly(Long id) {
+        // 1. 查询待支付订单
+        List<PayOrderExtensionDO> orderExtensions = orderExtensionMapper.selectListByOrderIdAndStatus(id,
+                PayOrderStatusEnum.WAITING.getStatus());
+
+        // 2. 遍历执行
+        for (PayOrderExtensionDO orderExtension : orderExtensions) {
+            syncOrder(orderExtension);
+        }
     }
 
     /**

@@ -87,8 +87,6 @@ public class PayWalletTransactionServiceImpl implements PayWalletTransactionServ
     @Override
     public AppPayWalletTransactionSummaryRespVO getWalletTransactionSummary(Long userId, Integer userType, LocalDateTime[] createTime) {
         PayWalletDO wallet = payWalletService.getOrCreateWallet(userId, userType);
-        AppPayWalletTransactionSummaryRespVO summary = new AppPayWalletTransactionSummaryRespVO()
-                .setTotalExpense(1).setTotalIncome(100);
         return new AppPayWalletTransactionSummaryRespVO()
                 .setTotalExpense(payWalletTransactionMapper.selectPriceSum(wallet.getId(), TYPE_EXPENSE, createTime))
                 .setTotalIncome(payWalletTransactionMapper.selectPriceSum(wallet.getId(), TYPE_INCOME, createTime));

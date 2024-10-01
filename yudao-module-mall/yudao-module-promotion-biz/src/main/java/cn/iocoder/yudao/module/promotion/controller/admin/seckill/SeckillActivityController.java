@@ -102,7 +102,7 @@ public class SeckillActivityController {
     @GetMapping("/list-by-ids")
     @Operation(summary = "获得秒杀活动列表，基于活动编号数组")
     @Parameter(name = "ids", description = "活动编号数组", required = true, example = "[1024, 1025]")
-    public CommonResult<List<SeckillActivityRespVO>> getCombinationActivityListByIds(@RequestParam("ids") List<Long> ids) {
+    public CommonResult<List<SeckillActivityRespVO>> getSeckillActivityListByIds(@RequestParam("ids") List<Long> ids) {
         // 1. 获得开启的活动列表
         List<SeckillActivityDO> activityList = seckillActivityService.getSeckillActivityListByIds(ids);
         activityList.removeIf(activity -> CommonStatusEnum.isDisable(activity.getStatus()));

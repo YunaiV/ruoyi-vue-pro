@@ -88,6 +88,7 @@ public class RewardActivityBaseVO {
             return point == null || point >= 0;
         }
 
+
     }
 
     @AssertTrue(message = "商品范围编号的数组不能为空")

@@ -4,6 +4,7 @@ import cn.iocoder.yudao.module.promotion.controller.admin.reward.vo.RewardActivi
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Schema(description = "用户 App - 满减送活动 Response VO")
@@ -19,6 +20,12 @@ public class AppRewardActivityRespVO {
     @Schema(description = "活动标题", requiredMode = Schema.RequiredMode.REQUIRED, example = "满啦满啦")
     private String name;
 
+    @Schema(description = "开始时间", requiredMode = Schema.RequiredMode.REQUIRED)
+    private LocalDateTime startTime;
+
+    @Schema(description = "结束时间", requiredMode = Schema.RequiredMode.REQUIRED)
+    private LocalDateTime endTime;
+
     @Schema(description = "条件类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     private Integer conditionType;
 
@@ -26,9 +33,18 @@ public class AppRewardActivityRespVO {
     private Integer productScope;
 
     @Schema(description = "商品 SPU 编号的数组", example = "1,2,3")
-    private List<Long> productSpuIds;
+    private List<Long> productScopeValues;
 
     @Schema(description = "优惠规则的数组")
-    private List<RewardActivityBaseVO.Rule> rules;
+    private List<Rule> rules;
+
+    @Schema(description = "优惠规则")
+    @Data
+    public static class Rule extends RewardActivityBaseVO.Rule {
+
+        @Schema(description = "规则描述")
+        private String description; // 通过 {@link #limit}、{@link #discountPrice} 等字段进行拼接
+
+    }
 
 }

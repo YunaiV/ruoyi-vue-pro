@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.pay.service.wallet;
 
 import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.hutool.core.lang.Assert;
+import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
@@ -113,16 +114,28 @@ public class PayWalletRechargeServiceImpl implements PayWalletRechargeService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void updateWalletRechargerPaid(Long id, Long payOrderId) {
-        // 1.1 获取钱包充值记录
-        PayWalletRechargeDO walletRecharge = walletRechargeMapper.selectById(id);
-        if (walletRecharge == null) {
-            log.error("[updateWalletRechargerPaid][钱包充值记录不存在，钱包充值记录 id({})]", id);
+        // 1.1 校验钱包充值是否存在
+        PayWalletRechargeDO recharge = walletRechargeMapper.selectById(id);
+        if (recharge == null) {
+            log.error("[updateWalletRechargerPaid][recharge({}) payOrder({}) 不存在充值订单，请进行处理！]", id, payOrderId);
             throw exception(WALLET_RECHARGE_NOT_FOUND);
         }
         // 1.2 校验钱包充值是否可以支付
-        PayOrderDO payOrderDO = validateWalletRechargerCanPaid(walletRecharge, payOrderId);
+        if (recharge.getPayStatus()) {
+            // 特殊：如果订单已支付，且支付单号相同，直接返回，说明重复回调
+            if (ObjectUtil.equals(recharge.getPayOrderId(), payOrderId)) {
+                log.warn("[updateWalletRechargerPaid][recharge({}) 已支付，且支付单号相同({})，直接返回]", recharge, payOrderId);
+                return;
+            }
+            // 异常：支付单号不同，说明支付单号错误
+            log.error("[updateWalletRechargerPaid][recharge({}) 已支付，但是支付单号不同({})，请进行处理！]", recharge, payOrderId);
+            throw exception(WALLET_RECHARGE_UPDATE_PAID_PAY_ORDER_ID_ERROR);
+        }
 
-        // 2. 更新钱包充值的支付状态
+        // 2. 校验支付订单的合法性
+        PayOrderDO payOrderDO = validatePayOrderPaid(recharge, payOrderId);
+
+        // 3. 更新钱包充值的支付状态
         int updateCount = walletRechargeMapper.updateByIdAndPaid(id, false,
                 new PayWalletRechargeDO().setId(id).setPayStatus(true).setPayTime(LocalDateTime.now())
                         .setPayChannelCode(payOrderDO.getChannelCode()));
@@ -130,14 +143,14 @@ public class PayWalletRechargeServiceImpl implements PayWalletRechargeService {
             throw exception(WALLET_RECHARGE_UPDATE_PAID_STATUS_NOT_UNPAID);
         }
 
-        // 3. 更新钱包余额
+        // 4. 更新钱包余额
         // TODO @jason：这样的话，未来提现会不会把充值的，也提现走哈。类似先充 100，送 110；然后提现 110；
         // TODO 需要钱包中加个可提现余额
-        payWalletService.addWalletBalance(walletRecharge.getWalletId(), String.valueOf(id),
-                PayWalletBizTypeEnum.RECHARGE, walletRecharge.getTotalPrice());
+        payWalletService.addWalletBalance(recharge.getWalletId(), String.valueOf(id),
+                PayWalletBizTypeEnum.RECHARGE, recharge.getTotalPrice());
 
-        // 4. 发送订阅消息
-        getSelf().sendWalletRechargerPaidMessage(payOrderId, walletRecharge);
+        // 5. 发送订阅消息
+        getSelf().sendWalletRechargerPaidMessage(payOrderId, recharge);
     }
 
     @Async
@@ -266,43 +279,38 @@ public class PayWalletRechargeServiceImpl implements PayWalletRechargeService {
         return wallet;
     }
 
-    private PayOrderDO validateWalletRechargerCanPaid(PayWalletRechargeDO walletRecharge, Long payOrderId) {
-        // 1.1 校验充值记录的支付状态
-        if (walletRecharge.getPayStatus()) {
-            log.error("[validateWalletRechargerCanPaid][钱包({}) 不处于未支付状态!  钱包数据是：{}]",
-                    walletRecharge.getId(), toJsonString(walletRecharge));
-            throw exception(WALLET_RECHARGE_UPDATE_PAID_STATUS_NOT_UNPAID);
-        }
-        // 1.2 校验支付订单匹配
-        if (notEqual(walletRecharge.getPayOrderId(), payOrderId)) { // 支付单号
-            log.error("[validateWalletRechargerCanPaid][钱包({}) 支付单不匹配({})，请进行处理！ 钱包数据是：{}]",
-                    walletRecharge.getId(), payOrderId, toJsonString(walletRecharge));
-            throw exception(WALLET_RECHARGE_UPDATE_PAID_PAY_ORDER_ID_ERROR);
-        }
-
-        // 2.1 校验支付单是否存在
+    /**
+     * 校验支付订单的合法性
+     *
+     * @param recharge 充值订单
+     * @param payOrderId 支付订单编号
+     * @return 支付订单
+     */
+    private PayOrderDO validatePayOrderPaid(PayWalletRechargeDO recharge, Long payOrderId) {
+        // 1. 校验支付单是否存在
         PayOrderDO payOrder = payOrderService.getOrder(payOrderId);
         if (payOrder == null) {
-            log.error("[validateWalletRechargerCanPaid][钱包({}) payOrder({}) 不存在，请进行处理！]",
-                    walletRecharge.getId(), payOrderId);
+            log.error("[validatePayOrderPaid][充值订单({}) payOrder({}) 不存在，请进行处理！]",
+                    recharge.getId(), payOrderId);
             throw exception(PAY_ORDER_NOT_FOUND);
         }
-        // 2.2 校验支付单已支付
+
+        // 2.1 校验支付单已支付
         if (!PayOrderStatusEnum.isSuccess(payOrder.getStatus())) {
-            log.error("[validateWalletRechargerCanPaid][钱包({}) payOrder({}) 未支付，请进行处理！payOrder 数据是：{}]",
-                    walletRecharge.getId(), payOrderId, toJsonString(payOrder));
+            log.error("[validatePayOrderPaid][充值订单({}) payOrder({}) 未支付，请进行处理！payOrder 数据是：{}]",
+                    recharge.getId(), payOrderId, toJsonString(payOrder));
             throw exception(WALLET_RECHARGE_UPDATE_PAID_PAY_ORDER_STATUS_NOT_SUCCESS);
         }
-        // 2.3 校验支付金额一致
-        if (notEqual(payOrder.getPrice(), walletRecharge.getPayPrice())) {
-            log.error("[validateDemoOrderCanPaid][钱包({}) payOrder({}) 支付金额不匹配，请进行处理！钱包 数据是：{}，payOrder 数据是：{}]",
-                    walletRecharge.getId(), payOrderId, toJsonString(walletRecharge), toJsonString(payOrder));
+        // 2.2 校验支付金额一致
+        if (notEqual(payOrder.getPrice(), recharge.getPayPrice())) {
+            log.error("[validatePayOrderPaid][充值订单({}) payOrder({}) 支付金额不匹配，请进行处理！钱包 数据是：{}，payOrder 数据是：{}]",
+                    recharge.getId(), payOrderId, toJsonString(recharge), toJsonString(payOrder));
             throw exception(WALLET_RECHARGE_UPDATE_PAID_PAY_PRICE_NOT_MATCH);
         }
-        // 2.4 校验支付订单的商户订单匹配
-        if (notEqual(payOrder.getMerchantOrderId(), walletRecharge.getId().toString())) {
-            log.error("[validateDemoOrderCanPaid][钱包({}) 支付单不匹配({})，请进行处理！payOrder 数据是：{}]",
-                    walletRecharge.getId(), payOrderId, toJsonString(payOrder));
+        // 2.3 校验支付订单的商户订单匹配
+        if (notEqual(payOrder.getMerchantOrderId(), recharge.getId().toString())) {
+            log.error("[validatePayOrderPaid][充值订单({}) 支付单不匹配({})，请进行处理！payOrder 数据是：{}]",
+                    recharge.getId(), payOrderId, toJsonString(payOrder));
             throw exception(WALLET_RECHARGE_UPDATE_PAID_PAY_ORDER_ID_ERROR);
         }
         return payOrder;
