@@ -11,8 +11,8 @@ import cn.iocoder.yudao.module.system.controller.admin.user.vo.user.UserImportRe
 import cn.iocoder.yudao.module.system.controller.admin.user.vo.user.UserPageReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.user.vo.user.UserSaveReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.user.AdminUserDO;
-import jakarta.validation.Valid;
 
+import javax.validation.Valid;
 import java.io.InputStream;
 import java.util.Collection;
 import java.util.HashMap;
