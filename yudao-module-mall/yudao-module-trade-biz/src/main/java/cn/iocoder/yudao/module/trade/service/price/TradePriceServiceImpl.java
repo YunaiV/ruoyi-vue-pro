@@ -97,7 +97,6 @@ public class TradePriceServiceImpl implements TradePriceService {
     }
 
     private List<ProductSpuRespDTO> checkSpuList(List<ProductSkuRespDTO> skuList) {
-        // 获得商品 SPU 数组
         return productSpuApi.validateSpuList(convertSet(skuList, ProductSkuRespDTO::getSpuId));
     }
 
