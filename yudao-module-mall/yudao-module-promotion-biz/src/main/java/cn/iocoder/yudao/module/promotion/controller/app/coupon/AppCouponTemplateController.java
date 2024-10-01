@@ -139,7 +139,7 @@ public class AppCouponTemplateController {
             ProductSpuRespDTO spu = productSpuApi.getSpu(spuId);
             return spu != null ? spu.getCategoryId() : null;
         }
-        // 商品卷：直接返回
+        // 商品劵：直接返回
         return spuId;
     }
 
