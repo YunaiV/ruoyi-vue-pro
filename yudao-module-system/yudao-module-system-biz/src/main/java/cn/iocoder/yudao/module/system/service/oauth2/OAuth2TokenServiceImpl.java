@@ -9,8 +9,10 @@ import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.date.DateUtils;
+import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.security.core.LoginUser;
 import cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder;
+import cn.iocoder.yudao.framework.tenant.core.util.TenantUtils;
 import cn.iocoder.yudao.module.system.controller.admin.oauth2.vo.token.OAuth2AccessTokenPageReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.oauth2.OAuth2AccessTokenDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.oauth2.OAuth2ClientDO;
@@ -105,10 +107,21 @@ public class OAuth2TokenServiceImpl implements OAuth2TokenService {
             return accessTokenDO;
         }
 
-        // 获取不到，从 MySQL 中获取
+        // 获取不到，从 MySQL 中获取访问令牌
         accessTokenDO = oauth2AccessTokenMapper.selectByAccessToken(accessToken);
+        if (accessTokenDO != null && DateUtils.isExpired(accessTokenDO.getExpiresTime())) {
+            accessTokenDO = null;
+        }
+        // 特殊：从 MySQL 中获取刷新令牌。原因：解决部分场景不方便刷新访问令牌场景
+        // 例如说，积木报表只允许传递 token，不允许传递 refresh_token，导致无法刷新访问令牌
+        // 再例如说，前端 WebSocket 的 token 直接跟在 url 上，无法传递 refresh_token
+        OAuth2RefreshTokenDO refreshTokenDO = oauth2RefreshTokenMapper.selectByRefreshToken(accessToken);
+        if (refreshTokenDO != null && !DateUtils.isExpired(refreshTokenDO.getExpiresTime())) {
+            accessTokenDO = convertToAccessToken(refreshTokenDO);
+        }
+
         // 如果在 MySQL 存在，则往 Redis 中写入
-        if (accessTokenDO != null && !DateUtils.isExpired(accessTokenDO.getExpiresTime())) {
+        if (accessTokenDO != null) {
             oauth2AccessTokenRedisDAO.set(accessTokenDO);
         }
         return accessTokenDO;
@@ -167,6 +180,14 @@ public class OAuth2TokenServiceImpl implements OAuth2TokenService {
                 .setExpiresTime(LocalDateTime.now().plusSeconds(clientDO.getRefreshTokenValiditySeconds()));
         oauth2RefreshTokenMapper.insert(refreshToken);
         return refreshToken;
+    }
+
+    private OAuth2AccessTokenDO convertToAccessToken(OAuth2RefreshTokenDO refreshTokenDO) {
+        OAuth2AccessTokenDO accessTokenDO = BeanUtils.toBean(refreshTokenDO, OAuth2AccessTokenDO.class)
+                .setAccessToken(refreshTokenDO.getRefreshToken());
+        TenantUtils.execute(refreshTokenDO.getTenantId(),
+                        () -> accessTokenDO.setUserInfo(buildUserInfo(refreshTokenDO.getUserId(), refreshTokenDO.getUserType())));
+        return accessTokenDO;
     }
 
     /**
