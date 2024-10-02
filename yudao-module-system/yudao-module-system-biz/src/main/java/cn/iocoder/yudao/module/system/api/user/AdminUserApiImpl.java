@@ -12,10 +12,7 @@ import cn.iocoder.yudao.module.system.service.user.AdminUserService;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 
@@ -41,21 +38,13 @@ public class AdminUserApiImpl implements AdminUserApi {
     @Override
     public List<AdminUserRespDTO> getUserListBySubordinate(Long id) {
         // 1.1 获取用户负责的部门
-        AdminUserDO user = userService.getUser(id);
-        if (user == null) {
+        List<DeptDO> depts = deptService.getDeptListByLeaderUserId(id);
+        if (CollUtil.isEmpty(depts)) {
             return Collections.emptyList();
         }
-        ArrayList<Long> deptIds = new ArrayList<>();
-        DeptDO dept = deptService.getDept(user.getDeptId());
-        if (dept == null) {
-            return Collections.emptyList();
-        }
-        if (ObjUtil.notEqual(dept.getLeaderUserId(), id)) { // 校验为负责人
-            return Collections.emptyList();
-        }
-        deptIds.add(dept.getId());
         // 1.2 获取所有子部门
-        List<DeptDO> childDeptList = deptService.getChildDeptList(dept.getId());
+        Set<Long> deptIds = convertSet(depts, DeptDO::getId);
+        List<DeptDO> childDeptList = deptService.getChildDeptList(deptIds);
         if (CollUtil.isNotEmpty(childDeptList)) {
             deptIds.addAll(convertSet(childDeptList, DeptDO::getId));
         }
