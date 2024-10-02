@@ -89,7 +89,7 @@ public class BpmProcessInstanceCopyServiceImpl implements BpmProcessInstanceCopy
 
     @Override
     public Set<Long> getCopyUserIds(String processInstanceId, String activityId) {
-        return CollectionUtils.convertSet(processInstanceCopyMapper.selectListByProcessIstanceIdAndActivityId(processInstanceId, activityId),
+        return CollectionUtils.convertSet(processInstanceCopyMapper.selectListByProcessInstanceIdAndActivityId(processInstanceId, activityId),
                 BpmProcessInstanceCopyDO::getUserId);
     }
 

@@ -57,7 +57,6 @@ public class BpmProcessInstanceCopyDO extends BaseDO {
     private String activityId;
     /**
      * 任务主键
-     * // @芋艿  这个 taskId 是不是可以去掉了；TODO 可能要留着，因为得知道是来自哪个 task 的抄送
      * 关联 Task 的 id 属性
      */
     private String taskId;
