@@ -10,9 +10,6 @@ import cn.iocoder.yudao.module.crm.enums.common.CrmSceneTypeEnum;
 import cn.iocoder.yudao.module.crm.util.CrmPermissionUtils;
 import org.apache.ibatis.annotations.Mapper;
 
-import java.util.Collection;
-import java.util.List;
-
 /**
  * 线索 Mapper
  *
@@ -38,15 +35,6 @@ public interface CrmClueMapper extends BaseMapperX<CrmClueDO> {
                 .eqIfPresent(CrmClueDO::getFollowUpStatus, pageReqVO.getFollowUpStatus())
                 .orderByDesc(CrmClueDO::getId);
         return selectJoinPage(pageReqVO, CrmClueDO.class, query);
-    }
-
-    default List<CrmClueDO> selectBatchIds(Collection<Long> ids, Long userId) {
-        MPJLambdaWrapperX<CrmClueDO> query = new MPJLambdaWrapperX<>();
-        // 拼接数据权限的查询条件
-        CrmPermissionUtils.appendPermissionCondition(query, CrmBizTypeEnum.CRM_CLUE.getType(), ids, userId);
-        query.selectAll(CrmClueDO.class).in(CrmClueDO::getId, ids).orderByDesc(CrmClueDO::getId);
-        // 拼接自身的查询条件
-        return selectJoinList(CrmClueDO.class, query);
     }
 
     default Long selectCountByFollow(Long userId) {

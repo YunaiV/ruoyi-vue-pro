@@ -15,7 +15,6 @@ import cn.iocoder.yudao.module.crm.util.CrmPermissionUtils;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.time.LocalDateTime;
-import java.util.Collection;
 import java.util.List;
 
 /**
@@ -75,15 +74,6 @@ public interface CrmContractMapper extends BaseMapperX<CrmContractDO> {
                     .lt(CrmContractDO::getEndTime, endOfToday);
         }
         return selectJoinPage(pageReqVO, CrmContractDO.class, query);
-    }
-
-    default List<CrmContractDO> selectBatchIds(Collection<Long> ids, Long userId) {
-        MPJLambdaWrapperX<CrmContractDO> query = new MPJLambdaWrapperX<>();
-        // 构建数据权限连表条件
-        CrmPermissionUtils.appendPermissionCondition(query, CrmBizTypeEnum.CRM_CONTRACT.getType(), ids, userId);
-        // 拼接自身的查询条件
-        query.selectAll(CrmContractDO.class).in(CrmContractDO::getId, ids).orderByDesc(CrmContractDO::getId);
-        return selectJoinList(CrmContractDO.class, query);
     }
 
     default Long selectCountByContactId(Long contactId) {

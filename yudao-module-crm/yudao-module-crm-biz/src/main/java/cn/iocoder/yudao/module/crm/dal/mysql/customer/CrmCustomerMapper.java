@@ -20,7 +20,6 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 import java.time.LocalDateTime;
-import java.util.Collection;
 import java.util.List;
 
 /**
@@ -83,15 +82,6 @@ public interface CrmCustomerMapper extends BaseMapperX<CrmCustomerDO> {
             }
         }
         return selectJoinPage(pageReqVO, CrmCustomerDO.class, query);
-    }
-
-    default List<CrmCustomerDO> selectBatchIds(Collection<Long> ids, Long ownerUserId) {
-        MPJLambdaWrapperX<CrmCustomerDO> query = new MPJLambdaWrapperX<>();
-        // 拼接数据权限的查询条件
-        CrmPermissionUtils.appendPermissionCondition(query, CrmBizTypeEnum.CRM_CUSTOMER.getType(), ids, ownerUserId);
-        // 拼接自身的查询条件
-        query.selectAll(CrmCustomerDO.class).in(CrmCustomerDO::getId, ids).orderByDesc(CrmCustomerDO::getId);
-        return selectJoinList(CrmCustomerDO.class, query);
     }
 
     default CrmCustomerDO selectByCustomerName(String name) {

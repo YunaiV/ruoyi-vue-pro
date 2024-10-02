@@ -59,15 +59,6 @@ public interface CrmReceivableMapper extends BaseMapperX<CrmReceivableDO> {
         return selectJoinPage(pageReqVO, CrmReceivableDO.class, query);
     }
 
-    default List<CrmReceivableDO> selectBatchIds(Collection<Long> ids, Long userId) {
-        MPJLambdaWrapperX<CrmReceivableDO> query = new MPJLambdaWrapperX<>();
-        // 拼接数据权限的查询条件
-        CrmPermissionUtils.appendPermissionCondition(query, CrmBizTypeEnum.CRM_RECEIVABLE.getType(), ids, userId);
-        // 拼接自身的查询条件
-        query.selectAll(CrmReceivableDO.class).in(CrmReceivableDO::getId, ids).orderByDesc(CrmReceivableDO::getId);
-        return selectJoinList(CrmReceivableDO.class, query);
-    }
-
     default Long selectCountByAudit(Long userId) {
         MPJLambdaWrapperX<CrmReceivableDO> query = new MPJLambdaWrapperX<>();
         // 我负责的 + 非公海
