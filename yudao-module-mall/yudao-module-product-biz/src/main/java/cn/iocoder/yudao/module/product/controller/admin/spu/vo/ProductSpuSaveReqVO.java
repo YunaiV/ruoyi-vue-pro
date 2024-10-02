@@ -51,6 +51,10 @@ public class ProductSpuSaveReqVO {
     @NotNull(message = "商品排序字段不能为空")
     private Integer sort;
 
+    @Schema(description = "商品状态", requiredMode = Schema.RequiredMode.REQUIRED, example = "0")
+    @NotNull(message = "商品状态字段不能为空")
+    private Integer status;
+
     // ========== SKU 相关字段 =========
 
     @Schema(description = "规格类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "true")
