@@ -158,10 +158,11 @@ public class OAuth2TokenServiceImplTest extends BaseDbAndRedisUnitTest {
                 .setAccessTokenValiditySeconds(30);
         when(oauth2ClientService.validOAuthClientFromCache(eq(clientId))).thenReturn(clientDO);
         // mock 数据（访问令牌）
-        OAuth2RefreshTokenDO refreshTokenDO = randomPojo(OAuth2RefreshTokenDO.class)
-                .setRefreshToken(refreshToken).setClientId(clientId)
-                .setExpiresTime(LocalDateTime.now().plusDays(1))
-                .setUserType(UserTypeEnum.ADMIN.getValue());
+        OAuth2RefreshTokenDO refreshTokenDO = randomPojo(OAuth2RefreshTokenDO.class, o ->
+                o.setRefreshToken(refreshToken).setClientId(clientId)
+                        .setExpiresTime(LocalDateTime.now().plusDays(1))
+                        .setUserType(UserTypeEnum.ADMIN.getValue())
+                        .setTenantId(TenantContextHolder.getTenantId()));
         oauth2RefreshTokenMapper.insert(refreshTokenDO);
         // mock 数据（访问令牌）
         OAuth2AccessTokenDO accessTokenDO = randomPojo(OAuth2AccessTokenDO.class).setRefreshToken(refreshToken)

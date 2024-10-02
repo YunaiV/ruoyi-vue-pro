@@ -109,19 +109,18 @@ public class OAuth2TokenServiceImpl implements OAuth2TokenService {
 
         // 获取不到，从 MySQL 中获取访问令牌
         accessTokenDO = oauth2AccessTokenMapper.selectByAccessToken(accessToken);
-        if (accessTokenDO != null && DateUtils.isExpired(accessTokenDO.getExpiresTime())) {
-            accessTokenDO = null;
-        }
-        // 特殊：从 MySQL 中获取刷新令牌。原因：解决部分场景不方便刷新访问令牌场景
-        // 例如说，积木报表只允许传递 token，不允许传递 refresh_token，导致无法刷新访问令牌
-        // 再例如说，前端 WebSocket 的 token 直接跟在 url 上，无法传递 refresh_token
-        OAuth2RefreshTokenDO refreshTokenDO = oauth2RefreshTokenMapper.selectByRefreshToken(accessToken);
-        if (refreshTokenDO != null && !DateUtils.isExpired(refreshTokenDO.getExpiresTime())) {
-            accessTokenDO = convertToAccessToken(refreshTokenDO);
+        if (accessTokenDO == null) {
+            // 特殊：从 MySQL 中获取刷新令牌。原因：解决部分场景不方便刷新访问令牌场景
+            // 例如说，积木报表只允许传递 token，不允许传递 refresh_token，导致无法刷新访问令牌
+            // 再例如说，前端 WebSocket 的 token 直接跟在 url 上，无法传递 refresh_token
+            OAuth2RefreshTokenDO refreshTokenDO = oauth2RefreshTokenMapper.selectByRefreshToken(accessToken);
+            if (refreshTokenDO != null && !DateUtils.isExpired(refreshTokenDO.getExpiresTime())) {
+                accessTokenDO = convertToAccessToken(refreshTokenDO);
+            }
         }
 
         // 如果在 MySQL 存在，则往 Redis 中写入
-        if (accessTokenDO != null) {
+        if (accessTokenDO != null && !DateUtils.isExpired(accessTokenDO.getExpiresTime())) {
             oauth2AccessTokenRedisDAO.set(accessTokenDO);
         }
         return accessTokenDO;
