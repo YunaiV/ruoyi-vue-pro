@@ -48,7 +48,7 @@ public interface CrmReceivableMapper extends BaseMapperX<CrmReceivableDO> {
         MPJLambdaWrapperX<CrmReceivableDO> query = new MPJLambdaWrapperX<>();
         // 拼接数据权限的查询条件
         CrmPermissionUtils.appendPermissionCondition(query, CrmBizTypeEnum.CRM_RECEIVABLE.getType(),
-                CrmReceivableDO::getId, userId, pageReqVO.getSceneType(), Boolean.FALSE);
+                CrmReceivableDO::getId, userId, pageReqVO.getSceneType());
         // 拼接自身的查询条件
         query.selectAll(CrmReceivableDO.class)
                 .eqIfPresent(CrmReceivableDO::getNo, pageReqVO.getNo())
@@ -72,7 +72,7 @@ public interface CrmReceivableMapper extends BaseMapperX<CrmReceivableDO> {
         MPJLambdaWrapperX<CrmReceivableDO> query = new MPJLambdaWrapperX<>();
         // 我负责的 + 非公海
         CrmPermissionUtils.appendPermissionCondition(query, CrmBizTypeEnum.CRM_RECEIVABLE.getType(),
-                CrmReceivableDO::getId, userId, CrmSceneTypeEnum.OWNER.getType(), Boolean.FALSE);
+                CrmReceivableDO::getId, userId, CrmSceneTypeEnum.OWNER.getType());
         // 未审核
         query.eq(CrmContractDO::getAuditStatus, CrmAuditStatusEnum.PROCESS.getStatus());
         return selectCount(query);
