@@ -11,6 +11,7 @@ import com.somle.framework.common.util.web.WebUtils;
 
 import lombok.AllArgsConstructor;
 import lombok.Setter;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.transaction.annotation.Transactional;
@@ -86,6 +87,7 @@ public class AmazonAdClient {
         return getReport(shop, params, dataDate);
     }
 
+
     @Transactional(readOnly = true)
     public JSONArray getReport(AmazonShop shop, JSONObject payload, LocalDate dataDate) {
         shop = getShop(shop.getCountry().getCode());
@@ -130,6 +132,10 @@ public class AmazonAdClient {
                     break;
                 case 425:
                     throw new RuntimeException("The Request is a duplicate");
+                case 429:
+                    log.info("Received 429 Too Many Requests. Retrying...");
+                    CoreUtils.sleep(3000);
+                    continue;
                 default:
                     throw new RuntimeException("Unknown response code in creating report: " + response.code());
             }

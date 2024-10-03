@@ -4,6 +4,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Map;
 import java.util.concurrent.Callable;
@@ -12,6 +13,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.zip.GZIPInputStream;
 
 import com.somle.framework.common.util.json.JsonUtils;
+import lombok.SneakyThrows;
 import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.springframework.retry.support.RetryTemplate;
 import org.springframework.stereotype.Component;
@@ -134,24 +136,19 @@ public class WebUtils {
         return sendRequest("POST", url, queryParams, headers, payload);
     }
 
+    @SneakyThrows
     public static <T> T urlToDict(String urlString, String compression, Class<T> objectClass) {
-        try {
-            URL url = new URL(urlString);
-            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-            connection.setRequestMethod("GET");
-            connection.setRequestProperty("Accept-Encoding", compression);
-            InputStream inputStream = connection.getInputStream();
-            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-            GZIPInputStream gzipInputStream = new GZIPInputStream(inputStream);
-            IOUtils.copy(gzipInputStream, byteArrayOutputStream);
-            byte[] decompressedData = byteArrayOutputStream.toByteArray();
-            String jsonString = new String(decompressedData);
-            log.debug(jsonString);
-            return JsonUtils.parseObject(jsonString, objectClass);
-        } catch (Exception e) {
-            log.error(compression);
-            throw new RuntimeException(e);
-        }
+        URL url = new URL(urlString);
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        connection.setRequestMethod("GET");
+        connection.setRequestProperty("Accept-Encoding", compression);
+        InputStream inputStream = connection.getInputStream();
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        GZIPInputStream gzipInputStream = new GZIPInputStream(inputStream);
+        IOUtils.copy(gzipInputStream, byteArrayOutputStream);
+        String jsonString = byteArrayOutputStream.toString();
+        log.debug(jsonString);
+        return JsonUtils.parseObject(jsonString, objectClass);
     }
 
     public static <T> T parallelRun(int parallelism, Callable<T> codeBlock) {
@@ -160,6 +157,8 @@ public class WebUtils {
         customThreadPool.shutdown();
         return result;
     }
+
+    // TODO: a general method to handle http exception (429, timeout etc)
 
 
 }

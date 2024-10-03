@@ -20,6 +20,8 @@ import org.springframework.web.client.HttpClientErrorException;
 
 import jakarta.persistence.*;
 
+import java.io.IOException;
+import java.net.http.HttpConnectTimeoutException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Map;
@@ -184,8 +186,7 @@ public class AmazonSpClient {
 
         // Use util to process the document URL
         result = WebUtils.urlToDict(docUrl, "gzip", JSONObject.class);
-        // requestDict = {'headers': headers, 'body': payload};
-        // return requestDict, contentDict;
+
 
         return result;
         
