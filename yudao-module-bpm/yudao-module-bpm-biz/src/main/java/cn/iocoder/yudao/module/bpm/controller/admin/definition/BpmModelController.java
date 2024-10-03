@@ -15,6 +15,8 @@ import cn.iocoder.yudao.module.bpm.service.definition.BpmCategoryService;
 import cn.iocoder.yudao.module.bpm.service.definition.BpmFormService;
 import cn.iocoder.yudao.module.bpm.service.definition.BpmModelService;
 import cn.iocoder.yudao.module.bpm.service.definition.BpmProcessDefinitionService;
+import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
+import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -31,6 +33,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Stream;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
@@ -50,6 +53,9 @@ public class BpmModelController {
     private BpmCategoryService categoryService;
     @Resource
     private BpmProcessDefinitionService processDefinitionService;
+
+    @Resource
+    private AdminUserApi adminUserApi;
 
     @GetMapping("/page")
     @Operation(summary = "获得模型分页")
@@ -76,7 +82,14 @@ public class BpmModelController {
         // 获得 ProcessDefinition Map
         List<ProcessDefinition> processDefinitions = processDefinitionService.getProcessDefinitionListByDeploymentIds(deploymentIds);
         Map<String, ProcessDefinition> processDefinitionMap = convertMap(processDefinitions, ProcessDefinition::getDeploymentId);
-        return success(BpmModelConvert.INSTANCE.buildModelPage(pageResult, formMap, categoryMap, deploymentMap, processDefinitionMap));
+        // 获得 User Map
+        Set<Long> userIds = CollectionUtils.convertSetByFlatMap(pageResult.getList(), model -> {
+            BpmModelMetaInfoVO metaInfo = JsonUtils.parseObject(model.getMetaInfo(), BpmModelMetaInfoVO.class);
+            return metaInfo != null ? metaInfo.getStartUserIds().stream() : Stream.empty();
+        });
+        Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(userIds);
+        return success(BpmModelConvert.INSTANCE.buildModelPage(pageResult,
+                formMap, categoryMap, deploymentMap, processDefinitionMap, userMap));
     }
 
     @GetMapping("/get")

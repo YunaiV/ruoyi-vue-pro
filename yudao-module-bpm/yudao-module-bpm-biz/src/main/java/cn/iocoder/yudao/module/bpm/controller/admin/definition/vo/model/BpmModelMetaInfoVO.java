@@ -9,6 +9,8 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import org.hibernate.validator.constraints.URL;
 
+import java.util.List;
+
 /**
  * BPM 流程 MetaInfo Response DTO
  * 主要用于 { Model#setMetaInfo(String)} 的存储
@@ -49,5 +51,12 @@ public class BpmModelMetaInfoVO {
     @Schema(description = "是否可见", requiredMode = Schema.RequiredMode.REQUIRED, example = "true")
     @NotNull(message = "是否可见不能为空")
     private Boolean visible;
+
+    @Schema(description = "可发起用户编号数组", example = "[1,2,3]")
+    private List<Long> startUserIds;
+
+    @Schema(description = "可管理用户编号数组", requiredMode = Schema.RequiredMode.REQUIRED, example = "[2,4,6]")
+    @NotEmpty(message = "可管理用户编号数组不能为空")
+    private List<Long> managerUserIds;
 
 }

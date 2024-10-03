@@ -47,6 +47,7 @@ public class BpmApprovalDetailRespVO {
 
     }
 
+    // TODO @jason：可以替换成 UserSimpleBaseVO。简化下
     @Schema(description = "用户信息")
     @Data
     public static class User {

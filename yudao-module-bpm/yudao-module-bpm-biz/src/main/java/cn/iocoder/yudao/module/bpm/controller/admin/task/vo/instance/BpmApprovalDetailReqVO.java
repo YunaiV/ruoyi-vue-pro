@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.AssertTrue;
 import lombok.Data;
 
+// TODO @jason：这个可以简化下，使用 @RequestParam。嘿嘿，主要 VO 项不要太多
 @Schema(description = "管理后台 - 审批详情 Request VO")
 @Data
 public class BpmApprovalDetailReqVO {
