@@ -34,6 +34,7 @@ import java.util.Map;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
+import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
 
 @Tag(name = "管理后台 - 流程定义")
 @RestController
@@ -87,9 +88,12 @@ public class BpmProcessDefinitionController {
         // 1.2 移除不可见的流程定义
         Map<String, BpmProcessDefinitionInfoDO> processDefinitionMap = processDefinitionService.getProcessDefinitionInfoMap(
                 convertSet(list, ProcessDefinition::getId));
+        Long userId = getLoginUserId();
         list.removeIf(processDefinition -> {
             BpmProcessDefinitionInfoDO processDefinitionInfo = processDefinitionMap.get(processDefinition.getId());
-            return processDefinitionInfo != null && Boolean.FALSE.equals(processDefinitionInfo.getVisible());
+            return processDefinitionInfo == null // 不存在
+                    || Boolean.FALSE.equals(processDefinitionInfo.getVisible()) // visible 不可见
+                    || !processDefinitionService.canUserStartProcessDefinition(processDefinitionInfo, userId); // 无权限发起
         });
 
         // 2. 拼接 VO 返回

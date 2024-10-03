@@ -86,6 +86,19 @@ public class BpmProcessDefinitionServiceImpl implements BpmProcessDefinitionServ
     }
 
     @Override
+    public boolean canUserStartProcessDefinition(BpmProcessDefinitionInfoDO processDefinition, Long userId) {
+        if (processDefinition == null) {
+            return false;
+        }
+        // 为空，则所有人都可以发起
+        if (CollUtil.isEmpty(processDefinition.getStartUserIds())) {
+            return true;
+        }
+        // 不为空，则需要存在里面
+        return processDefinition.getStartUserIds().contains(userId);
+    }
+
+    @Override
     public List<Deployment> getDeploymentList(Set<String> ids) {
         if (CollUtil.isEmpty(ids)) {
             return emptyList();

@@ -136,6 +136,15 @@ public interface BpmProcessDefinitionService {
     ProcessDefinition getActiveProcessDefinition(String key);
 
     /**
+     * 判断用户是否可以使用该流程定义，进行流程的发起
+     *
+     * @param processDefinition 流程定义
+     * @param userId 用户编号
+     * @return 是否可以发起流程
+     */
+    boolean canUserStartProcessDefinition(BpmProcessDefinitionInfoDO processDefinition, Long userId);
+
+    /**
      * 获得 ids 对应的 Deployment Map
      *
      * @param ids 部署编号的数组
