@@ -18,6 +18,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
+import jakarta.annotation.security.PermitAll;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -44,6 +45,7 @@ public class AppCombinationActivityController {
 
     @GetMapping("/page")
     @Operation(summary = "获得拼团活动分页")
+    @PermitAll
     public CommonResult<PageResult<AppCombinationActivityRespVO>> getCombinationActivityPage(PageParam pageParam) {
         PageResult<CombinationActivityDO> pageResult = activityService.getCombinationActivityPage(pageParam);
         if (CollUtil.isEmpty(pageResult.getList())) {
@@ -59,6 +61,7 @@ public class AppCombinationActivityController {
     @GetMapping("/list-by-ids")
     @Operation(summary = "获得拼团活动列表，基于活动编号数组")
     @Parameter(name = "ids", description = "活动编号数组", required = true, example = "[1024, 1025]")
+    @PermitAll
     public CommonResult<List<AppCombinationActivityRespVO>> getCombinationActivityListByIds(@RequestParam("ids") List<Long> ids) {
         // 1. 获得开启的活动列表
         List<CombinationActivityDO> activityList = activityService.getCombinationActivityListByIds(ids);
@@ -76,6 +79,7 @@ public class AppCombinationActivityController {
     @GetMapping("/get-detail")
     @Operation(summary = "获得拼团活动明细")
     @Parameter(name = "id", description = "活动编号", required = true, example = "1024")
+    @PermitAll
     public CommonResult<AppCombinationActivityDetailRespVO> getCombinationActivityDetail(@RequestParam("id") Long id) {
         // 1. 获取活动
         CombinationActivityDO activity = activityService.getCombinationActivity(id);

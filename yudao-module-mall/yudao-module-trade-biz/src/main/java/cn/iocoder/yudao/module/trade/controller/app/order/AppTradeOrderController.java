@@ -2,7 +2,6 @@ package cn.iocoder.yudao.module.trade.controller.app.order;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.security.core.annotations.PreAuthenticated;
 import cn.iocoder.yudao.module.pay.api.notify.dto.PayOrderNotifyReqDTO;
 import cn.iocoder.yudao.module.trade.controller.app.order.vo.*;
 import cn.iocoder.yudao.module.trade.controller.app.order.vo.item.AppTradeOrderItemCommentCreateReqVO;
@@ -17,11 +16,14 @@ import cn.iocoder.yudao.module.trade.service.aftersale.AfterSaleService;
 import cn.iocoder.yudao.module.trade.service.delivery.DeliveryExpressService;
 import cn.iocoder.yudao.module.trade.service.order.TradeOrderQueryService;
 import cn.iocoder.yudao.module.trade.service.order.TradeOrderUpdateService;
+import cn.iocoder.yudao.module.trade.service.price.TradePriceService;
 import com.google.common.collect.Maps;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
+import jakarta.annotation.security.PermitAll;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
@@ -47,23 +49,30 @@ public class AppTradeOrderController {
     private TradeOrderQueryService tradeOrderQueryService;
     @Resource
     private DeliveryExpressService deliveryExpressService;
-
     @Resource
     private AfterSaleService afterSaleService;
+    @Resource
+    private TradePriceService priceService;
 
     @Resource
     private TradeOrderProperties tradeOrderProperties;
 
     @GetMapping("/settlement")
     @Operation(summary = "获得订单结算信息")
-    @PreAuthenticated
     public CommonResult<AppTradeOrderSettlementRespVO> settlementOrder(@Valid AppTradeOrderSettlementReqVO settlementReqVO) {
         return success(tradeOrderUpdateService.settlementOrder(getLoginUserId(), settlementReqVO));
     }
 
+    @GetMapping("/settlement-product")
+    @Operation(summary = "获得商品结算信息", description = "用于商品列表、商品详情，获得参与活动后的价格信息")
+    @Parameter(name = "spuIds", description = "商品 SPU 编号数组")
+    @PermitAll
+    public CommonResult<List<AppTradeProductSettlementRespVO>> settlementProduct(@RequestParam("spuIds") List<Long> spuIds) {
+        return success(priceService.calculateProductPrice(getLoginUserId(), spuIds));
+    }
+
     @PostMapping("/create")
     @Operation(summary = "创建订单")
-    @PreAuthenticated
     public CommonResult<AppTradeOrderCreateRespVO> createOrder(@Valid @RequestBody AppTradeOrderCreateReqVO createReqVO) {
         TradeOrderDO order = tradeOrderUpdateService.createOrder(getLoginUserId(), createReqVO);
         return success(new AppTradeOrderCreateRespVO().setId(order.getId()).setPayOrderId(order.getPayOrderId()));
@@ -79,28 +88,37 @@ public class AppTradeOrderController {
 
     @GetMapping("/get-detail")
     @Operation(summary = "获得交易订单")
-    @Parameter(name = "id", description = "交易订单编号")
-    @PreAuthenticated
-    public CommonResult<AppTradeOrderDetailRespVO> getOrder(@RequestParam("id") Long id) {
-        // 查询订单
+    @Parameters({
+            @Parameter(name = "id", description = "交易订单编号"),
+            @Parameter(name = "sync", description = "是否同步支付状态", example = "true")
+    })
+    public CommonResult<AppTradeOrderDetailRespVO> getOrderDetail(@RequestParam("id") Long id,
+                                                                  @RequestParam(value = "sync", required = false) Boolean sync) {
+        // 1.1 查询订单
         TradeOrderDO order = tradeOrderQueryService.getOrder(getLoginUserId(), id);
         if (order == null) {
             return success(null);
         }
+        // 1.2 sync 仅在等待支付
+        if (Boolean.TRUE.equals(sync)
+                && TradeOrderStatusEnum.isUnpaid(order.getStatus()) && !order.getPayStatus()) {
+            tradeOrderUpdateService.syncOrderPayStatusQuietly(order.getId(), order.getPayOrderId());
+            // 重新查询，因为同步后，可能会有变化
+            order = tradeOrderQueryService.getOrder(id);
+        }
 
-        // 查询订单项
+        // 2.1 查询订单项
         List<TradeOrderItemDO> orderItems = tradeOrderQueryService.getOrderItemListByOrderId(order.getId());
-        // 查询物流公司
+        // 2.2 查询物流公司
         DeliveryExpressDO express = order.getLogisticsId() != null && order.getLogisticsId() > 0 ?
                 deliveryExpressService.getDeliveryExpress(order.getLogisticsId()) : null;
-        // 最终组合
+        // 2.3 最终组合
         return success(TradeOrderConvert.INSTANCE.convert02(order, orderItems, tradeOrderProperties, express));
     }
 
     @GetMapping("/get-express-track-list")
     @Operation(summary = "获得交易订单的物流轨迹")
     @Parameter(name = "id", description = "交易订单编号")
-    @PreAuthenticated
     public CommonResult<List<AppOrderExpressTrackRespDTO>> getOrderExpressTrackList(@RequestParam("id") Long id) {
         return success(TradeOrderConvert.INSTANCE.convertList02(
                 tradeOrderQueryService.getExpressTrackList(id, getLoginUserId())));
@@ -108,7 +126,6 @@ public class AppTradeOrderController {
 
     @GetMapping("/page")
     @Operation(summary = "获得交易订单分页")
-    @PreAuthenticated
     public CommonResult<PageResult<AppTradeOrderPageItemRespVO>> getOrderPage(AppTradeOrderPageReqVO reqVO) {
         // 查询订单
         PageResult<TradeOrderDO> pageResult = tradeOrderQueryService.getOrderPage(getLoginUserId(), reqVO);
@@ -121,7 +138,6 @@ public class AppTradeOrderController {
 
     @GetMapping("/get-count")
     @Operation(summary = "获得交易订单数量")
-    @PreAuthenticated
     public CommonResult<Map<String, Long>> getOrderCount() {
         Map<String, Long> orderCount = Maps.newLinkedHashMapWithExpectedSize(5);
         // 全部
@@ -146,7 +162,6 @@ public class AppTradeOrderController {
     @PutMapping("/receive")
     @Operation(summary = "确认交易订单收货")
     @Parameter(name = "id", description = "交易订单编号")
-    @PreAuthenticated
     public CommonResult<Boolean> receiveOrder(@RequestParam("id") Long id) {
         tradeOrderUpdateService.receiveOrderByMember(getLoginUserId(), id);
         return success(true);
@@ -155,7 +170,6 @@ public class AppTradeOrderController {
     @DeleteMapping("/cancel")
     @Operation(summary = "取消交易订单")
     @Parameter(name = "id", description = "交易订单编号")
-    @PreAuthenticated
     public CommonResult<Boolean> cancelOrder(@RequestParam("id") Long id) {
         tradeOrderUpdateService.cancelOrderByMember(getLoginUserId(), id);
         return success(true);
@@ -164,7 +178,6 @@ public class AppTradeOrderController {
     @DeleteMapping("/delete")
     @Operation(summary = "删除交易订单")
     @Parameter(name = "id", description = "交易订单编号")
-    @PreAuthenticated
     public CommonResult<Boolean> deleteOrder(@RequestParam("id") Long id) {
         tradeOrderUpdateService.deleteOrder(getLoginUserId(), id);
         return success(true);
@@ -175,7 +188,6 @@ public class AppTradeOrderController {
     @GetMapping("/item/get")
     @Operation(summary = "获得交易订单项")
     @Parameter(name = "id", description = "交易订单项编号")
-    @PreAuthenticated
     public CommonResult<AppTradeOrderItemRespVO> getOrderItem(@RequestParam("id") Long id) {
         TradeOrderItemDO item = tradeOrderQueryService.getOrderItem(getLoginUserId(), id);
         return success(TradeOrderConvert.INSTANCE.convert03(item));
@@ -183,7 +195,6 @@ public class AppTradeOrderController {
 
     @PostMapping("/item/create-comment")
     @Operation(summary = "创建交易订单项的评价")
-    @PreAuthenticated
     public CommonResult<Long> createOrderItemComment(@RequestBody AppTradeOrderItemCommentCreateReqVO createReqVO) {
         return success(tradeOrderUpdateService.createOrderItemCommentByMember(getLoginUserId(), createReqVO));
     }

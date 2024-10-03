@@ -5,7 +5,6 @@ import cn.hutool.core.lang.Assert;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.security.core.annotations.PreAuthenticated;
 import cn.iocoder.yudao.module.member.api.user.MemberUserApi;
 import cn.iocoder.yudao.module.member.api.user.dto.MemberUserRespDTO;
 import cn.iocoder.yudao.module.product.api.spu.ProductSpuApi;
@@ -27,10 +26,11 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.annotation.Resource;
+import jakarta.annotation.security.PermitAll;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import jakarta.annotation.Resource;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -61,6 +61,7 @@ public class AppBargainRecordController {
 
     @GetMapping("/get-summary")
     @Operation(summary = "获得砍价记录的概要信息", description = "用于小程序首页")
+    @PermitAll
     public CommonResult<AppBargainRecordSummaryRespVO> getBargainRecordSummary() {
         // 砍价成功的用户数量
         Integer successUserCount = bargainRecordService.getBargainRecordUserCount(
@@ -86,6 +87,7 @@ public class AppBargainRecordController {
             @Parameter(name = "id", description = "砍价记录编号", example = "111"), // 场景一：查看指定的砍价记录
             @Parameter(name = "activityId", description = "砍价活动编号", example = "222") // 场景二：查看指定的砍价活动
     })
+    @PermitAll
     public CommonResult<AppBargainRecordDetailRespVO> getBargainRecordDetail(
             @RequestParam(value = "id", required = false) Long id,
             @RequestParam(value = "activityId", required = false) Long activityId) {
@@ -153,7 +155,6 @@ public class AppBargainRecordController {
 
     @PostMapping("/create")
     @Operation(summary = "创建砍价记录", description = "参与砍价活动")
-    @PreAuthenticated
     public CommonResult<Long> createBargainRecord(@RequestBody AppBargainRecordCreateReqVO reqVO) {
         Long recordId = bargainRecordService.createBargainRecord(getLoginUserId(), reqVO);
         return success(recordId);

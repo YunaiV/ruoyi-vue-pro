@@ -1,8 +1,6 @@
 package cn.iocoder.yudao.module.promotion.service.seckill;
 
-import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.CollectionUtil;
-import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
@@ -30,7 +28,6 @@ import org.springframework.validation.annotation.Validated;
 
 import java.time.LocalDateTime;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -56,8 +53,10 @@ public class SeckillActivityServiceImpl implements SeckillActivityService {
     private SeckillActivityMapper seckillActivityMapper;
     @Resource
     private SeckillProductMapper seckillProductMapper;
+
     @Resource
     private SeckillConfigService seckillConfigService;
+
     @Resource
     private ProductSpuApi productSpuApi;
     @Resource
@@ -98,7 +97,7 @@ public class SeckillActivityServiceImpl implements SeckillActivityService {
         seckillConfigService.validateSeckillConfigExists(configIds);
 
         // 2.1 查询所有开启的秒杀活动
-        List<SeckillActivityDO> activityList = seckillActivityMapper.selectListByStatus(CommonStatusEnum.ENABLE.getStatus());
+        List<SeckillActivityDO> activityList = seckillActivityMapper.selectListBySpuIdAndStatus(spuId, CommonStatusEnum.ENABLE.getStatus());
         if (activityId != null) { // 排除自己
             activityList.removeIf(item -> ObjectUtil.equal(item.getId(), activityId));
         }
@@ -219,7 +218,7 @@ public class SeckillActivityServiceImpl implements SeckillActivityService {
             seckillProductMapper.updateBatch(diffList.get(1));
         }
         if (isNotEmpty(diffList.get(2))) {
-            seckillProductMapper.deleteBatchIds(convertList(diffList.get(2), SeckillProductDO::getId));
+            seckillProductMapper.deleteByIds(convertList(diffList.get(2), SeckillProductDO::getId));
         }
     }
 
@@ -249,7 +248,7 @@ public class SeckillActivityServiceImpl implements SeckillActivityService {
         seckillActivityMapper.deleteById(id);
         // 删除活动商品
         List<SeckillProductDO> products = seckillProductMapper.selectListByActivityId(id);
-        seckillProductMapper.deleteBatchIds(convertSet(products, SeckillProductDO::getId));
+        seckillProductMapper.deleteByIds(convertSet(products, SeckillProductDO::getId));
     }
 
     private SeckillActivityDO validateSeckillActivityExists(Long id) {
@@ -289,7 +288,7 @@ public class SeckillActivityServiceImpl implements SeckillActivityService {
 
     @Override
     public PageResult<SeckillActivityDO> getSeckillActivityAppPageByConfigId(AppSeckillActivityPageReqVO pageReqVO) {
-        return seckillActivityMapper.selectPage(pageReqVO, CommonStatusEnum.ENABLE.getStatus());
+        return seckillActivityMapper.selectPage(pageReqVO, CommonStatusEnum.ENABLE.getStatus(), LocalDateTime.now());
     }
 
     @Override
@@ -325,15 +324,8 @@ public class SeckillActivityServiceImpl implements SeckillActivityService {
     }
 
     @Override
-    public List<SeckillActivityDO> getSeckillActivityBySpuIdsAndStatusAndDateTimeLt(Collection<Long> spuIds, Integer status, LocalDateTime dateTime) {
-        // 1.查询出指定 spuId 的 spu 参加的活动最接近现在的一条记录。多个的话，一个 spuId 对应一个最近的活动编号
-        List<Map<String, Object>> spuIdAndActivityIdMaps = seckillActivityMapper.selectSpuIdAndActivityIdMapsBySpuIdsAndStatus(spuIds, status);
-        if (CollUtil.isEmpty(spuIdAndActivityIdMaps)) {
-            return Collections.emptyList();
-        }
-        // 2.查询活动详情
-        return seckillActivityMapper.selectListByIdsAndDateTimeLt(
-                convertSet(spuIdAndActivityIdMaps, map -> MapUtil.getLong(map, "activityId")), dateTime);
+    public SeckillActivityDO getMatchSeckillActivityBySpuId(Long spuId) {
+        return seckillActivityMapper.selectBySpuIdAndStatusAndNow(spuId, CommonStatusEnum.ENABLE.getStatus());
     }
 
     @Override

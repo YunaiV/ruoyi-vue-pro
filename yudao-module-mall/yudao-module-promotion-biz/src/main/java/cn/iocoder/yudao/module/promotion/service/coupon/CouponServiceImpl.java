@@ -279,7 +279,7 @@ public class CouponServiceImpl implements CouponService {
             }
         }
         // 校验领取方式
-        if (ObjectUtil.notEqual(couponTemplate.getTakeType(), takeType.getValue())) {
+        if (ObjectUtil.notEqual(couponTemplate.getTakeType(), takeType.getType())) {
             throw exception(COUPON_TEMPLATE_CANNOT_TAKE);
         }
     }

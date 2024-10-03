@@ -194,3 +194,22 @@ justauth:
     type: REDIS
     prefix: 'social_auth_state:' # 缓存前缀，目前只对 Redis 缓存生效，默认 JUSTAUTH::STATE::
     timeout: 24h # 超时时长，目前只对 Redis 缓存生效，默认 3 分钟
+
+
+--- #################### iot相关配置 TODO 芋艿：再瞅瞅 ####################
+iot:
+  emq:
+    # 账号
+    username: anhaohao
+    # 密码
+    password: ahh@123456
+    # 主机地址
+    hostUrl: tcp://chaojiniu.top:1883
+    # 客户端Id，不能相同，采用随机数 ${random.value}
+    client-id: ${random.int}
+    # 默认主题
+    default-topic: test
+    # 保持连接
+    keepalive: 60
+    # 清除会话(设置为false,断开连接，重连后使用原来的会话 保留订阅的主题，能接收离线期间的消息)
+    clearSession: true
