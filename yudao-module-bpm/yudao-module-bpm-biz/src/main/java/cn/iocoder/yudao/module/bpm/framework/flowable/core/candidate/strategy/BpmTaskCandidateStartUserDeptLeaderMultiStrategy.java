@@ -58,6 +58,7 @@ public class BpmTaskCandidateStartUserDeptLeaderMultiStrategy extends BpmTaskCan
             return new HashSet<>();
         }
         Set<Long> users = getMultiLevelDeptLeaderIds(toList(dept.getId()), Integer.valueOf(param)); // 参数是部门的层级
+        // TODO @jason：这里 removeDisableUsers 的原因是啥呀？
         removeDisableUsers(users);
         return users;
     }

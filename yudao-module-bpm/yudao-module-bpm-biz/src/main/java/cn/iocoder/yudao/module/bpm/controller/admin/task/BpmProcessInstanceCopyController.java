@@ -11,7 +11,6 @@ import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.instance.BpmProcessI
 import cn.iocoder.yudao.module.bpm.dal.dataobject.task.BpmProcessInstanceCopyDO;
 import cn.iocoder.yudao.module.bpm.service.task.BpmProcessInstanceCopyService;
 import cn.iocoder.yudao.module.bpm.service.task.BpmProcessInstanceService;
-import cn.iocoder.yudao.module.bpm.service.task.BpmTaskService;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import io.swagger.v3.oas.annotations.Operation;
@@ -43,8 +42,6 @@ public class BpmProcessInstanceCopyController {
     private BpmProcessInstanceCopyService processInstanceCopyService;
     @Resource
     private BpmProcessInstanceService processInstanceService;
-    @Resource
-    private BpmTaskService taskService;
 
     @Resource
     private AdminUserApi adminUserApi;
@@ -60,9 +57,7 @@ public class BpmProcessInstanceCopyController {
             return success(new PageResult<>(pageResult.getTotal()));
         }
 
-        // 拼接返回 TODO @芋艿。这个 taskName 查询是不是可以不用。 保存的时候 taskName 已经存了, review 一下。 不知道有什么特殊场景
-//      Map<String, String> taskNameMap = taskService.getTaskNameByTaskIds(
-//                convertSet(pageResult.getList(), BpmProcessInstanceCopyDO::getTaskId));
+        // 拼接返回
         Map<String, HistoricProcessInstance> processInstanceMap = processInstanceService.getHistoricProcessInstanceMap(
                 convertSet(pageResult.getList(), BpmProcessInstanceCopyDO::getProcessInstanceId));
         Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(convertListByFlatMap(pageResult.getList(),
@@ -70,7 +65,6 @@ public class BpmProcessInstanceCopyController {
         return success(BeanUtils.toBean(pageResult, BpmProcessInstanceCopyRespVO.class, copyVO -> {
             MapUtils.findAndThen(userMap, Long.valueOf(copyVO.getCreator()), user -> copyVO.setCreatorName(user.getNickname()));
             MapUtils.findAndThen(userMap, copyVO.getStartUserId(), user -> copyVO.setStartUserName(user.getNickname()));
-//            MapUtils.findAndThen(taskNameMap, copyVO.getTaskId(), copyVO::setTaskName);
             MapUtils.findAndThen(processInstanceMap, copyVO.getProcessInstanceId(),
                     processInstance -> copyVO.setProcessInstanceStartTime(DateUtils.of(processInstance.getStartTime())));
         }));

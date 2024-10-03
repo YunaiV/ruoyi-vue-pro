@@ -61,7 +61,6 @@ public interface BpmTaskCandidateStrategy {
         return users;
     }
 
-
     /**
      * 基于流程实例，获得任务的候选用户们
      * <p>
@@ -79,15 +78,11 @@ public interface BpmTaskCandidateStrategy {
         return users;
     }
 
-
     /**
      * 移除被禁用的用户
      *
      * @param users 用户 Ids
      */
     void removeDisableUsers(Set<Long> users);
-
-    // TODO @芋艿：后续可以抽象一个 calculateUsers(String param)，默认 calculateUsers 和 calculateUsers 调用它
-    // TODO @芋艿 加了， review 一下
 
 }

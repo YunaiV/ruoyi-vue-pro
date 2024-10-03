@@ -38,7 +38,7 @@ public class BpmTaskCandidateAssignEmptyStrategy extends BpmTaskCandidateAbstrac
         // 情况一：指定人员审批
         Integer assignEmptyHandlerType = BpmnModelUtils.parseAssignEmptyHandlerType(execution.getCurrentFlowElement());
         if (Objects.equals(assignEmptyHandlerType, BpmUserTaskAssignEmptyHandlerTypeEnum.ASSIGN_USER.getType())) {
-            HashSet<Long> users = new HashSet<>(BpmnModelUtils.parseAssignEmptyHandlerUserIds(execution.getCurrentFlowElement()));
+            Set<Long> users = new HashSet<>(BpmnModelUtils.parseAssignEmptyHandlerUserIds(execution.getCurrentFlowElement()));
             removeDisableUsers(users);
             return users;
         }

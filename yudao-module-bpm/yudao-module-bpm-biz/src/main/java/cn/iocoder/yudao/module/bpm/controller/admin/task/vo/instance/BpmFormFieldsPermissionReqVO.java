@@ -6,9 +6,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.AssertTrue;
 import lombok.Data;
 
-/**
- * @author jason
- */
 @Schema(description = "管理后台 - 表单字段权限 Request VO")
 @Data
 public class BpmFormFieldsPermissionReqVO {

@@ -102,16 +102,19 @@ public class BpmTaskCandidateInvoker {
         String param = BpmnModelUtils.parseCandidateParam(execution.getCurrentFlowElement());
         // 1.1 计算任务的候选人
         Set<Long> userIds = getCandidateStrategy(strategy).calculateUsers(execution, param);
-        // 1.2 候选人为空时，根据“审批人为空”的配置补充
+        removeDisableUsers(userIds);
+        // 1.2 移除被禁用的用户
+        removeDisableUsers(userIds);
+
+        // 2. 候选人为空时，根据“审批人为空”的配置补充
         if (CollUtil.isEmpty(userIds)) {
             userIds = getCandidateStrategy(BpmTaskCandidateStrategyEnum.ASSIGN_EMPTY.getStrategy())
                     .calculateUsers(execution, param);
+            // ASSIGN_EMPTY 策略，不需要移除被禁用的用户。原因是，再移除，可能会出现更没审批人了！！！
         }
-        // 1.3 移除发起人的用户
-        removeStartUserIfSkip(execution, userIds);
 
-        // 2. 移除被禁用的用户  TODO @芋艿 移除禁用的用户是否应该放在 1.1 之后
-        // removeDisableUsers(userIds);  @芋艿 把这个移到了 BpmTaskCandidateStrategy 下面。 看一下是否可以
+        // 3. 移除发起人的用户
+        removeStartUserIfSkip(execution, userIds);
         return userIds;
     }
 

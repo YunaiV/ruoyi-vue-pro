@@ -27,9 +27,9 @@ public class AlreadyRunApproveNodeRespBO {
     private Set<String> runNodeIds;
 
     /**
-     * 正在运行的节点的审批信息 ( key: activityId. value: 审批信息 )
+     * 正在运行的节点的审批信息（key: activityId, value: 审批信息）
      * <p>
-     * 用于依次审批。 需要加上候选人信息
+     * 用于依次审批，需要加上候选人信息
      */
     private Map<String, ApprovalNodeInfo> runningApprovalNodes;
 

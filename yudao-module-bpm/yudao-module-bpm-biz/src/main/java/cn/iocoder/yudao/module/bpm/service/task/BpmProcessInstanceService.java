@@ -96,7 +96,7 @@ public interface BpmProcessInstanceService {
     /**
      * 获取审批详情。
      * <p>
-     * 可以是准备发起的流程, 进行中的流程, 已经结束的流程
+     * 可以是准备发起的流程、进行中的流程、已经结束的流程
      *
      * @param loginUserId  登录人的用户编号
      * @param reqVO 请求信息

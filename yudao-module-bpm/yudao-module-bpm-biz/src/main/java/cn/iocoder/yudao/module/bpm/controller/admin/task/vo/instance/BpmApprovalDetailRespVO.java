@@ -42,6 +42,7 @@ public class BpmApprovalDetailRespVO {
         private List<ApprovalTaskInfo> tasks;
 
         @Schema(description = "候选人用户列表")
+        // TODO @jason：candidateUserList => candidateUsers，保持和 tasks 的命名风格一致哈
         private List<User> candidateUserList; // 用于未运行任务节点
 
     }
