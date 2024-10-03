@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.bpm.service.definition;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
@@ -109,9 +110,9 @@ public class BpmModelServiceImpl implements BpmModelService {
 
     @Override
     @Transactional(rollbackFor = Exception.class) // 因为进行多个操作，所以开启事务
-    public void updateModel(@Valid BpmModelSaveReqVO updateReqVO) {
+    public void updateModel(Long userId, @Valid BpmModelSaveReqVO updateReqVO) {
         // 1. 校验流程模型存在
-        Model model = validateModelExists(updateReqVO.getId());
+        Model model = validateModelManager(updateReqVO.getId(), userId);
 
         // 修改流程定义
         BpmModelConvert.INSTANCE.copyToModel(model, updateReqVO);
@@ -127,19 +128,32 @@ public class BpmModelServiceImpl implements BpmModelService {
         return model;
     }
 
-//    // 更新 BPMN XML
-//    saveModelBpmnXml(model.getId(), updateReqVO.getBpmnXml());
+    /**
+     * 校验是否有流程模型的管理权限
+     *
+     * @param id     流程模型编号
+     * @param userId 用户编号
+     * @return 流程模型
+     */
+    private Model validateModelManager(String id, Long userId) {
+        Model model = validateModelExists(id);
+        BpmModelMetaInfoVO metaInfo = BpmModelConvert.INSTANCE.parseMetaInfo(model);
+        if (metaInfo == null || !CollUtil.contains(metaInfo.getManagerUserIds(), userId)) {
+            throw exception(MODEL_UPDATE_FAIL_NOT_MANAGER);
+        }
+        return model;
+    }
 
     @Override
     @Transactional(rollbackFor = Exception.class) // 因为进行多个操作，所以开启事务
-    public void deployModel(String id) {
+    public void deployModel(Long userId, String id) {
         // 1.1 校验流程模型存在
-        Model model = validateModelExists(id);
+        Model model = validateModelManager(id, userId);
         // 1.2 校验流程图
         byte[] bpmnBytes = getModelBpmnXML(model.getId());
         validateBpmnXml(bpmnBytes);
         // 1.3 校验表单已配
-        BpmModelMetaInfoVO metaInfo = JsonUtils.parseObject(model.getMetaInfo(), BpmModelMetaInfoVO.class);
+        BpmModelMetaInfoVO metaInfo = BpmModelConvert.INSTANCE.parseMetaInfo(model);
         BpmFormDO form = validateFormConfig(metaInfo);
         // 1.4 校验任务分配规则已配置
         taskCandidateInvoker.validateBpmnConfig(bpmnBytes);
@@ -179,9 +193,9 @@ public class BpmModelServiceImpl implements BpmModelService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void deleteModel(String id) {
+    public void deleteModel(Long userId, String id) {
         // 校验流程模型存在
-        Model model = validateModelExists(id);
+        Model model = validateModelManager(id, userId);
 
         // 执行删除
         repositoryService.deleteModel(id);
@@ -190,9 +204,9 @@ public class BpmModelServiceImpl implements BpmModelService {
     }
 
     @Override
-    public void updateModelState(String id, Integer state) {
+    public void updateModelState(Long userId, String id, Integer state) {
         // 1.1 校验流程模型存在
-        Model model = validateModelExists(id);
+        Model model = validateModelManager(id, userId);
         // 1.2 校验流程定义存在
         ProcessDefinition definition = processDefinitionService.getProcessDefinitionByDeploymentId(model.getDeploymentId());
         if (definition == null) {
@@ -217,9 +231,9 @@ public class BpmModelServiceImpl implements BpmModelService {
     }
 
     @Override
-    public void updateSimpleModel(BpmSimpleModelUpdateReqVO reqVO) {
+    public void updateSimpleModel(Long userId, BpmSimpleModelUpdateReqVO reqVO) {
         // 1. 校验流程模型存在
-        Model model = validateModelExists(reqVO.getId());
+        Model model = validateModelManager(reqVO.getId(), userId);
 
         // 2.1 JSON 转换成 bpmnModel
         BpmnModel bpmnModel = SimpleModelUtils.buildBpmnModel(model.getKey(), model.getName(), reqVO.getSimpleModel());

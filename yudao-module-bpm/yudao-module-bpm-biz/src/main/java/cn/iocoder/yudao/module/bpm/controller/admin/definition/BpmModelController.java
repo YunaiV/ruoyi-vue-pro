@@ -4,7 +4,6 @@ import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
-import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.*;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.simple.BpmSimpleModelNodeVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.simple.BpmSimpleModelUpdateReqVO;
@@ -36,8 +35,8 @@ import java.util.Set;
 import java.util.stream.Stream;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
-import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
-import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
+import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
 
 @Tag(name = "管理后台 - 流程模型")
 @RestController
@@ -68,7 +67,7 @@ public class BpmModelController {
         // 拼接数据
         // 获得 Form 表单
         Set<Long> formIds = convertSet(pageResult.getList(), model -> {
-            BpmModelMetaInfoVO metaInfo = JsonUtils.parseObject(model.getMetaInfo(), BpmModelMetaInfoVO.class);
+            BpmModelMetaInfoVO metaInfo = BpmModelConvert.INSTANCE.parseMetaInfo(model);
             return metaInfo != null ? metaInfo.getFormId() : null;
         });
         Map<Long, BpmFormDO> formMap = formService.getFormMap(formIds);
@@ -83,8 +82,8 @@ public class BpmModelController {
         List<ProcessDefinition> processDefinitions = processDefinitionService.getProcessDefinitionListByDeploymentIds(deploymentIds);
         Map<String, ProcessDefinition> processDefinitionMap = convertMap(processDefinitions, ProcessDefinition::getDeploymentId);
         // 获得 User Map
-        Set<Long> userIds = CollectionUtils.convertSetByFlatMap(pageResult.getList(), model -> {
-            BpmModelMetaInfoVO metaInfo = JsonUtils.parseObject(model.getMetaInfo(), BpmModelMetaInfoVO.class);
+        Set<Long> userIds = convertSetByFlatMap(pageResult.getList(), model -> {
+            BpmModelMetaInfoVO metaInfo = BpmModelConvert.INSTANCE.parseMetaInfo(model);
             return metaInfo != null ? metaInfo.getStartUserIds().stream() : Stream.empty();
         });
         Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(userIds);
@@ -116,7 +115,7 @@ public class BpmModelController {
     @Operation(summary = "修改模型")
     @PreAuthorize("@ss.hasPermission('bpm:model:update')")
     public CommonResult<Boolean> updateModel(@Valid @RequestBody BpmModelSaveReqVO modelVO) {
-        modelService.updateModel(modelVO);
+        modelService.updateModel(getLoginUserId(), modelVO);
         return success(true);
     }
 
@@ -125,7 +124,7 @@ public class BpmModelController {
     @Parameter(name = "id", description = "编号", required = true, example = "1024")
     @PreAuthorize("@ss.hasPermission('bpm:model:deploy')")
     public CommonResult<Boolean> deployModel(@RequestParam("id") String id) {
-        modelService.deployModel(id);
+        modelService.deployModel(getLoginUserId(), id);
         return success(true);
     }
 
@@ -133,7 +132,7 @@ public class BpmModelController {
     @Operation(summary = "修改模型的状态", description = "实际更新的部署的流程定义的状态")
     @PreAuthorize("@ss.hasPermission('bpm:model:update')")
     public CommonResult<Boolean> updateModelState(@Valid @RequestBody BpmModelUpdateStateReqVO reqVO) {
-        modelService.updateModelState(reqVO.getId(), reqVO.getState());
+        modelService.updateModelState(getLoginUserId(), reqVO.getId(), reqVO.getState());
         return success(true);
     }
 
@@ -150,7 +149,7 @@ public class BpmModelController {
     @Parameter(name = "id", description = "编号", required = true, example = "1024")
     @PreAuthorize("@ss.hasPermission('bpm:model:delete')")
     public CommonResult<Boolean> deleteModel(@RequestParam("id") String id) {
-        modelService.deleteModel(id);
+        modelService.deleteModel(getLoginUserId(), id);
         return success(true);
     }
 
@@ -167,7 +166,7 @@ public class BpmModelController {
     @Operation(summary = "保存仿钉钉流程设计模型")
     @PreAuthorize("@ss.hasPermission('bpm:model:update')")
     public CommonResult<Boolean> updateSimpleModel(@Valid @RequestBody BpmSimpleModelUpdateReqVO reqVO) {
-        modelService.updateSimpleModel(reqVO);
+        modelService.updateSimpleModel(getLoginUserId(), reqVO);
         return success(Boolean.TRUE);
     }
 

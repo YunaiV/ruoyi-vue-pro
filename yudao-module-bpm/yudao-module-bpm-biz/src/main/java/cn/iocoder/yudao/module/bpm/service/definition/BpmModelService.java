@@ -59,31 +59,35 @@ public interface BpmModelService {
     /**
      * 修改流程模型
      *
+     * @param userId 用户编号
      * @param updateReqVO 更新信息
      */
-    void updateModel(@Valid BpmModelSaveReqVO updateReqVO);
+    void updateModel(Long userId, @Valid BpmModelSaveReqVO updateReqVO);
 
     /**
      * 将流程模型，部署成一个流程定义
      *
+     * @param userId 用户编号
      * @param id 编号
      */
-    void deployModel(String id);
+    void deployModel(Long userId, String id);
 
     /**
      * 删除模型
      *
+     * @param userId  用户编号
      * @param id 编号
      */
-    void deleteModel(String id);
+    void deleteModel(Long userId, String id);
 
     /**
      * 修改模型的状态，实际更新的部署的流程定义的状态
      *
+     * @param userId 用户编号
      * @param id    编号
      * @param state 状态
      */
-    void updateModelState(String id, Integer state);
+    void updateModelState(Long userId, String id, Integer state);
 
     /**
      * 获得流程定义编号对应的 BPMN Model
@@ -106,10 +110,9 @@ public interface BpmModelService {
     /**
      * 更新仿钉钉流程设计模型
      *
+     * @param userId 用户编号
      * @param reqVO 请求信息
      */
-    void updateSimpleModel(@Valid BpmSimpleModelUpdateReqVO reqVO);
-
-    // TODO @jason：另外个问题，因为是存储到 modelExtra 里，那需要 deploy 存储出快照。和 bpmn xml 一样。目前我想到的，就是存储到 BpmProcessDefinitionInfoDO 加一个 simple_model 字段，text 类型。可以看看还有啥方案？【重要】
+    void updateSimpleModel(Long userId, @Valid BpmSimpleModelUpdateReqVO reqVO);
 
 }

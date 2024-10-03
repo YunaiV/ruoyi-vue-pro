@@ -42,7 +42,7 @@ public interface BpmModelConvert {
                                                       Map<String, ProcessDefinition> processDefinitionMap,
                                                       Map<Long, AdminUserRespDTO> userMap) {
         List<BpmModelRespVO> list = convertList(pageResult.getList(), model -> {
-            BpmModelMetaInfoVO metaInfo = buildMetaInfo(model);
+            BpmModelMetaInfoVO metaInfo = parseMetaInfo(model);
             BpmFormDO form = metaInfo != null ? formMap.get(metaInfo.getFormId()) : null;
             BpmCategoryDO category = categoryMap.get(model.getCategory());
             Deployment deployment = model.getDeploymentId() != null ? deploymentMap.get(model.getDeploymentId()) : null;
@@ -55,7 +55,7 @@ public interface BpmModelConvert {
 
     default BpmModelRespVO buildModel(Model model,
                                      byte[] bpmnBytes) {
-        BpmModelMetaInfoVO metaInfo = buildMetaInfo(model);
+        BpmModelMetaInfoVO metaInfo = parseMetaInfo(model);
         BpmModelRespVO modelVO = buildModel0(model, metaInfo, null, null, null, null, null);
         if (ArrayUtil.isNotEmpty(bpmnBytes)) {
             modelVO.setBpmnXml(BpmnModelUtils.getBpmnXml(bpmnBytes));
@@ -100,7 +100,7 @@ public interface BpmModelConvert {
         model.setMetaInfo(JsonUtils.toJsonString(BeanUtils.toBean(reqVO, BpmModelMetaInfoVO.class)));
     }
 
-    default BpmModelMetaInfoVO buildMetaInfo(Model model) {
+    default BpmModelMetaInfoVO parseMetaInfo(Model model) {
         return JsonUtils.parseObject(model.getMetaInfo(), BpmModelMetaInfoVO.class);
     }
 
