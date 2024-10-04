@@ -26,9 +26,9 @@ public class PointActivityRespVO {
     @ExcelProperty("活动状态")
     private Integer status;
 
-    @Schema(description = "积分商城活动库存(剩余库存积分兑换时扣减)", requiredMode = Schema.RequiredMode.REQUIRED, example = "2")
-    @ExcelProperty("积分商城活动库存(剩余库存积分兑换时扣减)")
-    private Integer stock;
+    @Schema(description = "积分商城活动库存", requiredMode = Schema.RequiredMode.REQUIRED, example = "2")
+    @ExcelProperty("积分商城活动库存")
+    private Integer stock; // 剩余库存积分兑换时扣减
 
     @Schema(description = "积分商城活动总库存", requiredMode = Schema.RequiredMode.REQUIRED, example = "2")
     @ExcelProperty("积分商城活动总库存")
