@@ -23,10 +23,10 @@ import cn.iocoder.yudao.module.trade.framework.delivery.core.client.ExpressClien
 import cn.iocoder.yudao.module.trade.framework.delivery.core.client.dto.ExpressTrackQueryReqDTO;
 import cn.iocoder.yudao.module.trade.framework.delivery.core.client.dto.ExpressTrackRespDTO;
 import cn.iocoder.yudao.module.trade.service.delivery.DeliveryExpressService;
+import jakarta.annotation.Resource;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
-import jakarta.annotation.Resource;
 import java.util.*;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
@@ -174,7 +174,7 @@ public class TradeOrderQueryServiceImpl implements TradeOrderQueryService {
     }
 
     @Override
-    public int getSeckillProductCount(Long userId, Long activityId) {
+    public int getActivityProductCount(Long userId, Long activityId) {
         // 获得订单列表
         List<TradeOrderDO> orders = tradeOrderMapper.selectListByUserIdAndSeckillActivityId(userId, activityId);
         orders.removeIf(order -> TradeOrderStatusEnum.isCanceled(order.getStatus())); // 过滤掉【已取消】的订单

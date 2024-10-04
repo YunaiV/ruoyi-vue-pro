@@ -8,6 +8,7 @@ import cn.iocoder.yudao.module.product.api.sku.ProductSkuApi;
 import cn.iocoder.yudao.module.product.api.sku.dto.ProductSkuRespDTO;
 import cn.iocoder.yudao.module.product.api.spu.ProductSpuApi;
 import cn.iocoder.yudao.module.product.api.spu.dto.ProductSpuRespDTO;
+import cn.iocoder.yudao.module.promotion.api.point.dto.PointValidateJoinRespDTO;
 import cn.iocoder.yudao.module.promotion.controller.admin.point.vo.activity.PointActivityPageReqVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.point.vo.activity.PointActivitySaveReqVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.point.vo.product.PointProductSaveReqVO;
@@ -242,6 +243,30 @@ public class PointActivityServiceImpl implements PointActivityService {
     @Override
     public List<PointProductDO> getPointProductListByActivityIds(Collection<Long> activityIds) {
         return pointProductMapper.selectListByActivityId(activityIds);
+    }
+
+    @Override
+    public PointValidateJoinRespDTO validateJoinPointActivity(Long activityId, Long skuId, Integer count) {
+        // 1. 校验积分商城活动是否存在
+        PointActivityDO activity = validatePointActivityExists(activityId);
+        if (CommonStatusEnum.isDisable(activity.getStatus())) {
+            throw exception(POINT_ACTIVITY_JOIN_ACTIVITY_STATUS_CLOSED);
+        }
+
+        // 2.1 校验积分商城商品是否存在
+        PointProductDO product = pointProductMapper.selectListByActivityIdAndSkuId(activityId, skuId);
+        if (product == null) {
+            throw exception(POINT_ACTIVITY_JOIN_ACTIVITY_PRODUCT_NOT_EXISTS);
+        }
+        // 2.2 超过单次购买限制
+        if (count > product.getCount()) {
+            throw exception(POINT_ACTIVITY_JOIN_ACTIVITY_SINGLE_LIMIT_COUNT_EXCEED);
+        }
+        // 2.2 校验库存是否充足
+        if (count > product.getStock()) {
+            throw exception(POINT_ACTIVITY_UPDATE_STOCK_FAIL);
+        }
+        return BeanUtils.toBean(product, PointValidateJoinRespDTO.class);
     }
 
 }

@@ -29,4 +29,9 @@ public interface PointProductMapper extends BaseMapperX<PointProductDO> {
                 .eq(PointProductDO::getActivityId, pointProductDO.getActivityId()));
     }
 
+    default PointProductDO selectListByActivityIdAndSkuId(Long activityId, Long skuId) {
+        return selectOne(PointProductDO::getActivityId, activityId,
+                PointProductDO::getSkuId, skuId);
+    }
+
 }

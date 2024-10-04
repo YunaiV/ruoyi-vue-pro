@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.promotion.service.point;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.module.promotion.api.point.dto.PointValidateJoinRespDTO;
 import cn.iocoder.yudao.module.promotion.controller.admin.point.vo.activity.PointActivityPageReqVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.point.vo.activity.PointActivitySaveReqVO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.point.PointActivityDO;
@@ -77,5 +78,17 @@ public interface PointActivityService {
      * @return 获得活动商品
      */
     List<PointProductDO> getPointProductListByActivityIds(Collection<Long> activityIds);
+
+    /**
+     * 【下单前】校验是否参与积分商城活动
+     *
+     * 如果校验失败，则抛出业务异常
+     *
+     * @param activityId 活动编号
+     * @param skuId      SKU 编号
+     * @param count      数量
+     * @return 积分商城商品信息
+     */
+    PointValidateJoinRespDTO validateJoinPointActivity(Long activityId, Long skuId, Integer count);
 
 }
