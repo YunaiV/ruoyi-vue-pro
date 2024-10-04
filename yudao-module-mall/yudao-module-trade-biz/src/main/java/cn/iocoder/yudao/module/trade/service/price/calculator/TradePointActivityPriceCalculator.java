@@ -3,6 +3,8 @@ package cn.iocoder.yudao.module.trade.service.price.calculator;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.iocoder.yudao.module.member.api.user.MemberUserApi;
+import cn.iocoder.yudao.module.member.api.user.dto.MemberUserRespDTO;
 import cn.iocoder.yudao.module.promotion.api.point.PointActivityApi;
 import cn.iocoder.yudao.module.promotion.api.point.dto.PointValidateJoinRespDTO;
 import cn.iocoder.yudao.module.promotion.enums.common.PromotionTypeEnum;
@@ -30,14 +32,24 @@ public class TradePointActivityPriceCalculator implements TradePriceCalculator {
 
     @Resource
     private PointActivityApi pointActivityApi;
+    @Resource
+    private MemberUserApi memberUserApi;
 
     @Resource
     private TradeOrderQueryService tradeOrderQueryService;
 
     @Override
     public void calculate(TradePriceCalculateReqBO param, TradePriceCalculateRespBO result) {
-        // 1. 判断订单类型是否为积分商城活动
+        // 1.1 判断订单类型是否为积分商城活动
         if (ObjectUtil.notEqual(result.getType(), TradeOrderTypeEnum.POINT.getType())) {
+            return;
+        }
+        // 1.2 初始化积分
+        MemberUserRespDTO user = memberUserApi.getUser(param.getUserId());
+        result.setTotalPoint(user.getPoint()).setUsePoint(0);
+
+        // 1.3 校验用户积分余额
+        if (user.getPoint() == null || user.getPoint() <= 0) {
             return;
         }
 
@@ -49,12 +61,10 @@ public class TradePointActivityPriceCalculator implements TradePriceCalculator {
                 orderItem.getSkuId(), orderItem.getCount());
 
         // 3.1 记录优惠明细
-        int discountPrice = 0;
+        int discountPrice = orderItem.getPayPrice(); // 情况一：单使用积分兑换
         Assert.isTrue(activity.getPoint() >= 1, "积分商城商品兑换积分必须大于 1");
-        // 情况一：单使用积分兑换
-        if (activity.getPrice() == null || activity.getPrice() == 0) {
-            discountPrice = orderItem.getPayPrice();
-        } else { // 情况二：积分 + 金额
+        result.setUsePoint(activity.getPoint());
+        if (activity.getPrice() != null && activity.getPrice() > 0) { // 情况二：积分 + 金额
             discountPrice = orderItem.getPayPrice() - activity.getPrice() * orderItem.getCount();
         }
         TradePriceCalculatorHelper.addPromotion(result, orderItem,

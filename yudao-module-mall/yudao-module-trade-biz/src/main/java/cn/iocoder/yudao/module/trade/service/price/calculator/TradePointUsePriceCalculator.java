@@ -1,12 +1,14 @@
 package cn.iocoder.yudao.module.trade.service.price.calculator;
 
 import cn.hutool.core.util.BooleanUtil;
+import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.module.member.api.config.MemberConfigApi;
 import cn.iocoder.yudao.module.member.api.config.dto.MemberConfigRespDTO;
 import cn.iocoder.yudao.module.member.api.user.MemberUserApi;
 import cn.iocoder.yudao.module.member.api.user.dto.MemberUserRespDTO;
 import cn.iocoder.yudao.module.promotion.enums.common.PromotionTypeEnum;
+import cn.iocoder.yudao.module.trade.enums.order.TradeOrderTypeEnum;
 import cn.iocoder.yudao.module.trade.service.price.bo.TradePriceCalculateReqBO;
 import cn.iocoder.yudao.module.trade.service.price.bo.TradePriceCalculateRespBO;
 import jakarta.annotation.Resource;
@@ -37,6 +39,10 @@ public class TradePointUsePriceCalculator implements TradePriceCalculator {
 
     @Override
     public void calculate(TradePriceCalculateReqBO param, TradePriceCalculateRespBO result) {
+        // 判断订单类型是否不为积分商城活动
+        if (ObjectUtil.equal(result.getType(), TradeOrderTypeEnum.POINT.getType())) {
+            return;
+        }
         // 0. 初始化积分
         MemberUserRespDTO user = memberUserApi.getUser(param.getUserId());
         result.setTotalPoint(user.getPoint()).setUsePoint(0);
