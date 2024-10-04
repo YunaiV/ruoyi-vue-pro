@@ -1,12 +1,12 @@
 package cn.iocoder.yudao.module.ai.controller.admin.knowledge;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
-import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
-import cn.iocoder.yudao.module.ai.controller.admin.knowledge.vo.knowledge.AiKnowledgeCreateMyReqVO;
+import cn.iocoder.yudao.module.ai.controller.admin.knowledge.vo.knowledge.AiKnowledgeCreateReqVO;
+import cn.iocoder.yudao.module.ai.controller.admin.knowledge.vo.knowledge.AiKnowledgePageReqVO;
 import cn.iocoder.yudao.module.ai.controller.admin.knowledge.vo.knowledge.AiKnowledgeRespVO;
-import cn.iocoder.yudao.module.ai.controller.admin.knowledge.vo.knowledge.AiKnowledgeUpdateMyReqVO;
+import cn.iocoder.yudao.module.ai.controller.admin.knowledge.vo.knowledge.AiKnowledgeUpdateReqVO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.knowledge.AiKnowledgeDO;
 import cn.iocoder.yudao.module.ai.service.knowledge.AiKnowledgeService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -28,24 +28,23 @@ public class AiKnowledgeController {
     @Resource
     private AiKnowledgeService knowledgeService;
 
-    @GetMapping("/my-page")
-    @Operation(summary = "获取【我的】知识库分页")
-    public CommonResult<PageResult<AiKnowledgeRespVO>> getKnowledgePageMy(@Validated PageParam pageReqVO) {
-        PageResult<AiKnowledgeDO> pageResult = knowledgeService.getKnowledgePageMy(getLoginUserId(), pageReqVO);
+    @GetMapping("/page")
+    @Operation(summary = "获取知识库分页")
+    public CommonResult<PageResult<AiKnowledgeRespVO>> getKnowledgePage(@Valid AiKnowledgePageReqVO pageReqVO) {
+        PageResult<AiKnowledgeDO> pageResult = knowledgeService.getKnowledgePage(getLoginUserId(), pageReqVO);
         return success(BeanUtils.toBean(pageResult, AiKnowledgeRespVO.class));
     }
 
-    @PostMapping("/create-my")
-    @Operation(summary = "创建【我的】知识库")
-    public CommonResult<Long> createKnowledgeMy(@RequestBody @Valid AiKnowledgeCreateMyReqVO createReqVO) {
-        return success(knowledgeService.createKnowledgeMy(createReqVO, getLoginUserId()));
+    @PostMapping("/create")
+    @Operation(summary = "创建知识库")
+    public CommonResult<Long> createKnowledge(@RequestBody @Valid AiKnowledgeCreateReqVO createReqVO) {
+        return success(knowledgeService.createKnowledge(createReqVO, getLoginUserId()));
     }
 
-    @PutMapping("/update-my")
-    @Operation(summary = "更新【我的】知识库")
-    public CommonResult<Boolean> updateKnowledgeMy(@RequestBody @Valid AiKnowledgeUpdateMyReqVO updateReqVO) {
-        knowledgeService.updateKnowledgeMy(updateReqVO, getLoginUserId());
+    @PutMapping("/update")
+    @Operation(summary = "更新知识库")
+    public CommonResult<Boolean> updateKnowledge(@RequestBody @Valid AiKnowledgeUpdateReqVO updateReqVO) {
+        knowledgeService.updateKnowledge(updateReqVO, getLoginUserId());
         return success(true);
     }
-
 }

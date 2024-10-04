@@ -15,7 +15,6 @@ import cn.iocoder.yudao.module.crm.util.CrmPermissionUtils;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.time.LocalDateTime;
-import java.util.Collection;
 import java.util.List;
 
 /**
@@ -54,7 +53,7 @@ public interface CrmContractMapper extends BaseMapperX<CrmContractDO> {
         MPJLambdaWrapperX<CrmContractDO> query = new MPJLambdaWrapperX<>();
         // 拼接数据权限的查询条件
         CrmPermissionUtils.appendPermissionCondition(query, CrmBizTypeEnum.CRM_CONTRACT.getType(),
-                CrmContractDO::getId, userId, pageReqVO.getSceneType(), Boolean.FALSE);
+                CrmContractDO::getId, userId, pageReqVO.getSceneType());
         // 拼接自身的查询条件
         query.selectAll(CrmContractDO.class)
                 .likeIfPresent(CrmContractDO::getNo, pageReqVO.getNo())
@@ -77,15 +76,6 @@ public interface CrmContractMapper extends BaseMapperX<CrmContractDO> {
         return selectJoinPage(pageReqVO, CrmContractDO.class, query);
     }
 
-    default List<CrmContractDO> selectBatchIds(Collection<Long> ids, Long userId) {
-        MPJLambdaWrapperX<CrmContractDO> query = new MPJLambdaWrapperX<>();
-        // 构建数据权限连表条件
-        CrmPermissionUtils.appendPermissionCondition(query, CrmBizTypeEnum.CRM_CONTRACT.getType(), ids, userId);
-        // 拼接自身的查询条件
-        query.selectAll(CrmContractDO.class).in(CrmContractDO::getId, ids).orderByDesc(CrmContractDO::getId);
-        return selectJoinList(CrmContractDO.class, query);
-    }
-
     default Long selectCountByContactId(Long contactId) {
         return selectCount(CrmContractDO::getSignContactId, contactId);
     }
@@ -98,7 +88,7 @@ public interface CrmContractMapper extends BaseMapperX<CrmContractDO> {
         MPJLambdaWrapperX<CrmContractDO> query = new MPJLambdaWrapperX<>();
         // 我负责的 + 非公海
         CrmPermissionUtils.appendPermissionCondition(query, CrmBizTypeEnum.CRM_CONTRACT.getType(),
-                CrmContractDO::getId, userId, CrmSceneTypeEnum.OWNER.getType(), Boolean.FALSE);
+                CrmContractDO::getId, userId, CrmSceneTypeEnum.OWNER.getType());
         // 未审核
         query.eq(CrmContractDO::getAuditStatus, CrmAuditStatusEnum.PROCESS.getStatus());
         return selectCount(query);
@@ -108,7 +98,7 @@ public interface CrmContractMapper extends BaseMapperX<CrmContractDO> {
         MPJLambdaWrapperX<CrmContractDO> query = new MPJLambdaWrapperX<>();
         // 我负责的 + 非公海
         CrmPermissionUtils.appendPermissionCondition(query, CrmBizTypeEnum.CRM_CONTRACT.getType(),
-                CrmContractDO::getId, userId, CrmSceneTypeEnum.OWNER.getType(), Boolean.FALSE);
+                CrmContractDO::getId, userId, CrmSceneTypeEnum.OWNER.getType());
         // 即将到期
         LocalDateTime beginOfToday = LocalDateTimeUtil.beginOfDay(LocalDateTime.now());
         LocalDateTime endOfToday = LocalDateTimeUtil.endOfDay(LocalDateTime.now());

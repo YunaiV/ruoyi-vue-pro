@@ -48,10 +48,15 @@ public class BpmProcessInstanceCopyDO extends BaseDO {
      * 冗余 ProcessInstance 的 category 字段
      */
     private String category;
-
+    /**
+     * 流程活动编号
+     * <p/>
+     * 对应 BPMN XML 节点编号，用于查询抄送节点的表单字段权限
+     * 这里冗余的原因：如果是钉钉易搭的抄送节点 (ServiceTask)，使用 taskId 可能查不到对应的 activityId
+     */
+    private String activityId;
     /**
      * 任务主键
-     *
      * 关联 Task 的 id 属性
      */
     private String taskId;

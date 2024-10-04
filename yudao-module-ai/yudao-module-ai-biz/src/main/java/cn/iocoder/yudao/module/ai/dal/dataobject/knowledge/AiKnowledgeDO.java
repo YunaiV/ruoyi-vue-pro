@@ -2,10 +2,10 @@ package cn.iocoder.yudao.module.ai.dal.dataobject.knowledge;
 
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import cn.iocoder.yudao.framework.mybatis.core.type.LongListTypeHandler;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import lombok.Data;
 
 import java.util.List;
@@ -38,11 +38,13 @@ public class AiKnowledgeDO extends BaseDO {
      * 知识库描述
      */
     private String description;
-    // TODO @新：如果全部可见，需要怎么设置？
+
     /**
-     * 可见权限,只能选择哪些人可见
+     * 可见权限,选择哪些人可见
+     * <p>
+     * -1 所有人可见，其他为各自用户编号
      */
-    @TableField(typeHandler = JacksonTypeHandler.class)
+    @TableField(typeHandler = LongListTypeHandler.class)
     private List<Long> visibilityPermissions;
     /**
      * 嵌入模型编号
@@ -52,10 +54,21 @@ public class AiKnowledgeDO extends BaseDO {
      * 模型标识
      */
     private String model;
+
+    /**
+     * topK
+     */
+    private Integer topK;
+    /**
+     * 相似度阈值
+     */
+    private Double similarityThreshold;
+
     /**
      * 状态
      * <p>
      * 枚举 {@link CommonStatusEnum}
      */
     private Integer status;
+
 }

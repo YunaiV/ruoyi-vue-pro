@@ -1,5 +1,7 @@
 package cn.iocoder.yudao.module.bpm.framework.flowable.core.behavior;
 
+import cn.hutool.core.collection.CollUtil;
+import cn.iocoder.yudao.framework.common.util.collection.SetUtils;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.candidate.BpmTaskCandidateInvoker;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.util.FlowableUtils;
 import lombok.Setter;
@@ -41,12 +43,17 @@ public class BpmSequentialMultiInstanceBehavior extends SequentialMultiInstanceB
         super.collectionElementVariable = FlowableUtils.formatExecutionCollectionElementVariable(execution.getCurrentActivityId());
 
         // 第二步，获取任务的所有处理人
-        // 由于每次审批（会签、或签等情况）后都会执行一次，所以 variable 已经有结果，不重复计算
         @SuppressWarnings("unchecked")
         Set<Long> assigneeUserIds = (Set<Long>) execution.getVariable(super.collectionVariable, Set.class);
         if (assigneeUserIds == null) {
             assigneeUserIds = taskCandidateInvoker.calculateUsers(execution);
             execution.setVariable(super.collectionVariable, assigneeUserIds);
+            if (CollUtil.isEmpty(assigneeUserIds)) {
+                // 特殊：如果没有处理人的情况下，至少有一个 null 空元素，避免自动通过！
+                // 这样，保证在 BpmUserTaskActivityBehavior 至少创建出一个 Task 任务
+                // 用途：1）审批人为空时；2）审批类型为自动通过、自动拒绝时
+                assigneeUserIds = SetUtils.asSet((Long) null);
+            }
         }
         return assigneeUserIds.size();
     }

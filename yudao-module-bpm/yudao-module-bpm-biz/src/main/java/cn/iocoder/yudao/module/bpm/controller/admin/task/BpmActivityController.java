@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.bpm.controller.admin.task;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.activity.BpmActivityRespVO;
+import cn.iocoder.yudao.module.bpm.convert.task.BpmActivityConvert;
 import cn.iocoder.yudao.module.bpm.service.task.BpmActivityService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -34,6 +35,6 @@ public class BpmActivityController {
     @PreAuthorize("@ss.hasPermission('bpm:task:query')")
     public CommonResult<List<BpmActivityRespVO>> getActivityList(
             @RequestParam("processInstanceId") String processInstanceId) {
-        return success(activityService.getActivityListByProcessInstanceId(processInstanceId));
+        return success(BpmActivityConvert.INSTANCE.convertList(activityService.getActivityListByProcessInstanceId(processInstanceId)));
     }
 }

@@ -5,10 +5,9 @@ import cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmUserGroupDO;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.candidate.BpmTaskCandidateStrategy;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmTaskCandidateStrategyEnum;
 import cn.iocoder.yudao.module.bpm.service.definition.BpmUserGroupService;
-import org.flowable.engine.delegate.DelegateExecution;
+import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.Resource;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
@@ -21,10 +20,14 @@ import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.
  * @author kyle
  */
 @Component
-public class BpmTaskCandidateGroupStrategy implements BpmTaskCandidateStrategy {
+public class BpmTaskCandidateGroupStrategy extends BpmTaskCandidateAbstractStrategy {
 
-    @Resource
-    private BpmUserGroupService userGroupService;
+    private final BpmUserGroupService userGroupService;
+
+    public BpmTaskCandidateGroupStrategy(AdminUserApi adminUserApi, BpmUserGroupService userGroupService) {
+        super(adminUserApi);
+        this.userGroupService = userGroupService;
+    }
 
     @Override
     public BpmTaskCandidateStrategyEnum getStrategy() {
@@ -38,7 +41,7 @@ public class BpmTaskCandidateGroupStrategy implements BpmTaskCandidateStrategy {
     }
 
     @Override
-    public Set<Long> calculateUsers(DelegateExecution execution, String param) {
+    public Set<Long> calculateUsers(String param) {
         Set<Long> groupIds = StrUtils.splitToLongSet(param);
         List<BpmUserGroupDO> groups = userGroupService.getUserGroupList(groupIds);
         return convertSetByFlatMap(groups, BpmUserGroupDO::getUserIds, Collection::stream);
