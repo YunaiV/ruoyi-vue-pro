@@ -69,7 +69,8 @@ public class TradePriceServiceImpl implements TradePriceService {
                 .buildCalculateResp(calculateReqBO, spuList, skuList);
         priceCalculators.forEach(calculator -> calculator.calculate(calculateReqBO, calculateRespBO));
         // 2.2  如果最终支付金额小于等于 0，则抛出业务异常
-        if (calculateReqBO.getPointActivityId() == null && calculateRespBO.getPrice().getPayPrice() <= 0) {
+        if (calculateReqBO.getPointActivityId() == null // 积分订单，允许支付金额为 0
+                && calculateRespBO.getPrice().getPayPrice() <= 0) {
             log.error("[calculatePrice][价格计算不正确，请求 calculateReqDTO({})，结果 priceCalculate({})]",
                     calculateReqBO, calculateRespBO);
             throw exception(PRICE_CALCULATE_PAY_PRICE_ILLEGAL);

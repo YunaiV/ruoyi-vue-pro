@@ -116,7 +116,7 @@ public interface TradeOrderQueryService {
      * @param activityId 活动编号
      * @return 秒杀商品数量
      */
-    int getActivityProductCount(Long userId, Long activityId);
+    int getSeckillProductCount(Long userId, Long activityId);
 
     // =================== Order Item ===================
 

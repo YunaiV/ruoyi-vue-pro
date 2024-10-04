@@ -84,7 +84,7 @@ public class TradePointActivityPriceCalculator implements TradePriceCalculator {
         // 1. 校验是否可以参与积分商城活动
         PointValidateJoinRespDTO pointValidateJoinRespDTO = pointActivityApi.validateJoinPointActivity(activityId, skuId, count);
         // 2. 校验总限购数量，目前只有 trade 有具体下单的数据，需要交给 trade 价格计算使用
-        int activityProductCount = tradeOrderQueryService.getActivityProductCount(userId, activityId);
+        int activityProductCount = tradeOrderQueryService.getSeckillProductCount(userId, activityId);
         if (activityProductCount + count > pointValidateJoinRespDTO.getCount()) {
             throw exception(PRICE_CALCULATE_POINT_TOTAL_LIMIT_COUNT);
         }

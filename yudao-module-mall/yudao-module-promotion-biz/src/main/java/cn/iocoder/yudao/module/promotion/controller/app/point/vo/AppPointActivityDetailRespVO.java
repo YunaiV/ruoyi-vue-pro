@@ -30,7 +30,7 @@ public class AppPointActivityDetailRespVO {
     @Schema(description = "商品信息数组", requiredMode = Schema.RequiredMode.REQUIRED)
     private List<Product> products;
 
-    //======================= 显示所需兑换积分最少的 sku 信息 =======================
+    //======================= 显示所需兑换积分最少的 SKU 信息 =======================
 
     @Schema(description = "兑换积分", requiredMode = Schema.RequiredMode.REQUIRED)
     private Integer point;

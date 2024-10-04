@@ -174,7 +174,7 @@ public class TradeOrderQueryServiceImpl implements TradeOrderQueryService {
     }
 
     @Override
-    public int getActivityProductCount(Long userId, Long activityId) {
+    public int getSeckillProductCount(Long userId, Long activityId) {
         // 获得订单列表
         List<TradeOrderDO> orders = tradeOrderMapper.selectListByUserIdAndSeckillActivityId(userId, activityId);
         orders.removeIf(order -> TradeOrderStatusEnum.isCanceled(order.getStatus())); // 过滤掉【已取消】的订单

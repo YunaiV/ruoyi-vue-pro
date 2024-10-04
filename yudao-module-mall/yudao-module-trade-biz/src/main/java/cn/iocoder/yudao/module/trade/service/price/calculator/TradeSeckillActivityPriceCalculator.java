@@ -60,7 +60,7 @@ public class TradeSeckillActivityPriceCalculator implements TradePriceCalculator
         // 1. 校验是否可以参与秒杀
         SeckillValidateJoinRespDTO seckillActivity = seckillActivityApi.validateJoinSeckill(activityId, skuId, count);
         // 2. 校验总限购数量，目前只有 trade 有具体下单的数据，需要交给 trade 价格计算使用
-        int seckillProductCount = tradeOrderQueryService.getActivityProductCount(userId, activityId);
+        int seckillProductCount = tradeOrderQueryService.getSeckillProductCount(userId, activityId);
         if (seckillProductCount + count > seckillActivity.getTotalLimitCount()) {
             throw exception(PRICE_CALCULATE_SECKILL_TOTAL_LIMIT_COUNT);
         }
