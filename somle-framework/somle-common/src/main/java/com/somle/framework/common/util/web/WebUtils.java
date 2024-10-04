@@ -15,6 +15,7 @@ import java.util.zip.GZIPInputStream;
 import com.somle.framework.common.util.json.JsonUtils;
 import lombok.SneakyThrows;
 import org.apache.tomcat.util.http.fileupload.IOUtils;
+import org.springframework.retry.RetryCallback;
 import org.springframework.retry.support.RetryTemplate;
 import org.springframework.stereotype.Component;
 
@@ -38,11 +39,7 @@ public class WebUtils {
         .readTimeout(30, TimeUnit.SECONDS)
         .build();
 
-    public static final RetryTemplate retryTemplate = RetryTemplate.builder()
-        .maxAttempts(3)
-        .fixedBackoff(2000) // 2000 ms between retries
-        .retryOn(RuntimeException.class) // specify the exception to retry on
-        .build();
+
 
 
 

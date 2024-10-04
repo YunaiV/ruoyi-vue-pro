@@ -153,7 +153,7 @@ public class AmazonAdClient {
             String reportStatusUrl = endpoint + "/reporting/reports/" + reportId;
             log.info("Checking report status...");
             // response = restTemplate.exchange(reportStatusUrl, HttpMethod.GET, new HttpEntity<>(headers), JSONObject.class);
-            var response = WebUtils.getRequest(reportStatusUrl, Map.of(), headers);
+            var response = CoreUtils.retry(ctx-> WebUtils.getRequest(reportStatusUrl, Map.of(), headers));
             switch (response.code()) {
                 case 200:
                     break;
