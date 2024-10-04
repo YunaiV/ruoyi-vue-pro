@@ -2,11 +2,8 @@ package cn.iocoder.yudao.module.bpm.service.task;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.bpm.api.task.dto.BpmProcessInstanceCreateReqDTO;
-import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.instance.BpmProcessInstanceCancelReqVO;
-import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.instance.BpmProcessInstanceCreateReqVO;
-import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.instance.BpmProcessInstancePageReqVO;
+import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.instance.*;
 import jakarta.validation.Valid;
-import org.flowable.engine.delegate.event.FlowableCancelledEvent;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.runtime.ProcessInstance;
 
@@ -22,6 +19,8 @@ import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.
  * @author 芋道源码
  */
 public interface BpmProcessInstanceService {
+
+    // ========== Query 查询相关方法 ==========
 
     /**
      * 获得流程实例
@@ -86,6 +85,28 @@ public interface BpmProcessInstanceService {
                                                                @Valid BpmProcessInstancePageReqVO pageReqVO);
 
     /**
+     * 获得表单字段权限
+     *
+     * @param reqVO 请求消息
+     * @return 表单字段权限
+     */
+    Map<String, String> getFormFieldsPermission(@Valid BpmFormFieldsPermissionReqVO reqVO);
+
+    // TODO @芋艿：重点在 review 下
+    /**
+     * 获取审批详情。
+     * <p>
+     * 可以是准备发起的流程、进行中的流程、已经结束的流程
+     *
+     * @param loginUserId  登录人的用户编号
+     * @param reqVO 请求信息
+     * @return 流程实例的进度
+     */
+    BpmApprovalDetailRespVO getApprovalDetail(Long loginUserId, @Valid BpmApprovalDetailReqVO reqVO);
+
+    // ========== Update 写入相关方法 ==========
+
+    /**
      * 创建流程实例（提供给前端）
      *
      * @param userId      用户编号
@@ -114,31 +135,27 @@ public interface BpmProcessInstanceService {
     /**
      * 管理员取消流程实例
      *
-     * @param userId           用户编号
+     * @param userId      用户编号
      * @param cancelReqVO 取消信息
      */
     void cancelProcessInstanceByAdmin(Long userId, BpmProcessInstanceCancelReqVO cancelReqVO);
 
     /**
-     * 更新 ProcessInstance 拓展记录为取消
+     * 更新 ProcessInstance 为不通过
      *
-     * @param event 流程取消事件
+     * @param processInstance 流程实例
+     * @param reason          理由。例如说，审批不通过时，需要传递该值
      */
-    void updateProcessInstanceWhenCancel(FlowableCancelledEvent event);
+    void updateProcessInstanceReject(ProcessInstance processInstance, String reason);
+
+    // ========== Event 事件相关方法 ==========
 
     /**
-     * 更新 ProcessInstance 拓展记录为完成
+     * 处理 ProcessInstance 完成事件，例如说：审批通过、不通过、取消
      *
      * @param instance 流程任务
      */
-    void updateProcessInstanceWhenApprove(ProcessInstance instance);
+    void processProcessInstanceCompleted(ProcessInstance instance);
 
-    /**
-     * 更新 ProcessInstance 拓展记录为不通过
-     *
-     * @param id     流程编号
-     * @param reason 理由。例如说，审批不通过时，需要传递该值
-     */
-    void updateProcessInstanceReject(String id, String reason);
 
 }

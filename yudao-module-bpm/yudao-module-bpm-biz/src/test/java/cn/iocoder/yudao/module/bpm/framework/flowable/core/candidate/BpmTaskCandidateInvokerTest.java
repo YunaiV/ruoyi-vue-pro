@@ -10,8 +10,8 @@ import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import org.flowable.bpmn.model.UserTask;
 import org.flowable.engine.delegate.DelegateExecution;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 
@@ -34,15 +34,23 @@ import static org.mockito.Mockito.when;
  */
 public class BpmTaskCandidateInvokerTest extends BaseMockitoUnitTest {
 
-    @InjectMocks
     private BpmTaskCandidateInvoker taskCandidateInvoker;
 
     @Mock
     private AdminUserApi adminUserApi;
+
     @Spy
-    private BpmTaskCandidateStrategy strategy = new BpmTaskCandidateUserStrategy();
+    private BpmTaskCandidateStrategy strategy ;
+
     @Spy
-    private List<BpmTaskCandidateStrategy> strategyList = Collections.singletonList(strategy);
+    private List<BpmTaskCandidateStrategy> strategyList ;
+
+    @BeforeEach
+    public void setUp() {
+        strategy = new BpmTaskCandidateUserStrategy(adminUserApi); // 创建strategy实例
+        strategyList = Collections.singletonList(strategy); // 创建strategyList
+        taskCandidateInvoker = new BpmTaskCandidateInvoker(strategyList, adminUserApi);
+    }
 
     @Test
     public void testCalculateUsers() {

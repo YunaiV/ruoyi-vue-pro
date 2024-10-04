@@ -1,9 +1,13 @@
 package cn.iocoder.yudao.module.bpm.framework.flowable.core.util;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.util.number.NumberUtils;
+import cn.iocoder.yudao.framework.common.util.string.StrUtils;
+import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.task.BpmTaskRespVO;
+import cn.iocoder.yudao.module.bpm.enums.definition.BpmUserTaskRejectHandlerType;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnModelConstants;
 import org.flowable.bpmn.converter.BpmnXMLConverter;
 import org.flowable.bpmn.model.Process;
@@ -12,19 +16,111 @@ import org.flowable.common.engine.impl.util.io.BytesStreamSource;
 
 import java.util.*;
 
+import static cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnModelConstants.*;
+import static org.flowable.bpmn.constants.BpmnXMLConstants.FLOWABLE_EXTENSIONS_NAMESPACE;
+
 /**
  * 流程模型转操作工具类
  */
 public class BpmnModelUtils {
 
     public static Integer parseCandidateStrategy(FlowElement userTask) {
-        return NumberUtils.parseInt(userTask.getAttributeValue(
+        Integer candidateStrategy = NumberUtils.parseInt(userTask.getAttributeValue(
                 BpmnModelConstants.NAMESPACE, BpmnModelConstants.USER_TASK_CANDIDATE_STRATEGY));
+        // TODO @芋艿 尝试从 ExtensionElement 取. 后续相关扩展是否都可以 存 extensionElement。 如表单权限。 按钮权限
+        if (candidateStrategy == null) {
+            ExtensionElement element = CollUtil.getFirst(userTask.getExtensionElements().get(BpmnModelConstants.USER_TASK_CANDIDATE_STRATEGY));
+            candidateStrategy = element != null ? NumberUtils.parseInt(element.getElementText()) : null;
+        }
+        return candidateStrategy;
     }
 
     public static String parseCandidateParam(FlowElement userTask) {
-        return userTask.getAttributeValue(
+        String candidateParam = userTask.getAttributeValue(
                 BpmnModelConstants.NAMESPACE, BpmnModelConstants.USER_TASK_CANDIDATE_PARAM);
+        if (candidateParam == null) {
+            ExtensionElement element = CollUtil.getFirst(userTask.getExtensionElements().get(BpmnModelConstants.USER_TASK_CANDIDATE_PARAM));
+            candidateParam = element != null ? element.getElementText() : null;
+        }
+        return candidateParam;
+    }
+
+    public static Integer parseApproveType(FlowElement userTask) {
+        return NumberUtils.parseInt(parseExtensionElement(userTask, BpmnModelConstants.USER_TASK_APPROVE_TYPE));
+    }
+
+    public static BpmUserTaskRejectHandlerType parseRejectHandlerType(FlowElement userTask) {
+        Integer rejectHandlerType = NumberUtils.parseInt(parseExtensionElement(userTask, USER_TASK_REJECT_HANDLER_TYPE));
+        return BpmUserTaskRejectHandlerType.typeOf(rejectHandlerType);
+    }
+
+    public static String parseReturnTaskId(FlowElement flowElement) {
+        return parseExtensionElement(flowElement, USER_TASK_REJECT_RETURN_TASK_ID);
+    }
+
+    public static Integer parseAssignStartUserHandlerType(FlowElement userTask) {
+        return NumberUtils.parseInt(parseExtensionElement(userTask, USER_TASK_ASSIGN_START_USER_HANDLER_TYPE));
+    }
+
+    public static Integer parseAssignEmptyHandlerType(FlowElement userTask) {
+        return NumberUtils.parseInt(parseExtensionElement(userTask, USER_TASK_ASSIGN_EMPTY_HANDLER_TYPE));
+    }
+
+    public static List<Long> parseAssignEmptyHandlerUserIds(FlowElement userTask) {
+        return StrUtils.splitToLong(parseExtensionElement(userTask, USER_TASK_ASSIGN_USER_IDS), ",");
+    }
+
+    public static String parseExtensionElement(FlowElement flowElement, String elementName) {
+        if (flowElement == null) {
+            return null;
+        }
+        ExtensionElement element = CollUtil.getFirst(flowElement.getExtensionElements().get(elementName));
+        return element != null ? element.getElementText() : null;
+    }
+
+    public static Map<String, String> parseFormFieldsPermission(BpmnModel bpmnModel, String flowElementId) {
+        if (bpmnModel == null || StrUtil.isEmpty(flowElementId)) {
+            return null;
+        }
+        FlowElement flowElement = getFlowElementById(bpmnModel, flowElementId);
+        if (flowElement == null) {
+            return null;
+        }
+        List<ExtensionElement> extensionElements = flowElement.getExtensionElements().get(FORM_FIELD_PERMISSION_ELEMENT);
+        if (CollUtil.isEmpty(extensionElements)) {
+            return null;
+        }
+        Map<String, String> fieldsPermission = MapUtil.newHashMap();
+        extensionElements.forEach(element -> {
+            String field = element.getAttributeValue(FLOWABLE_EXTENSIONS_NAMESPACE, FORM_FIELD_PERMISSION_ELEMENT_FIELD_ATTRIBUTE);
+            String permission = element.getAttributeValue(FLOWABLE_EXTENSIONS_NAMESPACE, FORM_FIELD_PERMISSION_ELEMENT_PERMISSION_ATTRIBUTE);
+            if (StrUtil.isNotEmpty(field) && StrUtil.isNotEmpty(permission)) {
+                fieldsPermission.put(field, permission);
+            }
+        });
+        return fieldsPermission;
+    }
+
+    public static Map<Integer, BpmTaskRespVO.OperationButtonSetting> parseButtonsSetting(BpmnModel bpmnModel, String flowElementId) {
+        FlowElement flowElement = getFlowElementById(bpmnModel, flowElementId);
+        if (flowElement == null) {
+            return null;
+        }
+        List<ExtensionElement> extensionElements = flowElement.getExtensionElements().get(BUTTON_SETTING_ELEMENT);
+        if (CollUtil.isEmpty(extensionElements)) {
+            return null;
+        }
+        Map<Integer, BpmTaskRespVO.OperationButtonSetting> buttonSettings = MapUtil.newHashMap(16);
+        extensionElements.forEach(element -> {
+            String id = element.getAttributeValue(FLOWABLE_EXTENSIONS_NAMESPACE, BUTTON_SETTING_ELEMENT_ID_ATTRIBUTE);
+            String displayName = element.getAttributeValue(FLOWABLE_EXTENSIONS_NAMESPACE, BUTTON_SETTING_ELEMENT_DISPLAY_NAME_ATTRIBUTE);
+            String enable = element.getAttributeValue(FLOWABLE_EXTENSIONS_NAMESPACE, BUTTON_SETTING_ELEMENT_ENABLE_ATTRIBUTE);
+            if (StrUtil.isNotEmpty(id)) {
+                BpmTaskRespVO.OperationButtonSetting setting = new BpmTaskRespVO.OperationButtonSetting();
+                buttonSettings.put(Integer.valueOf(id), setting.setDisplayName(displayName).setEnable(Boolean.parseBoolean(enable)));
+            }
+        });
+        return buttonSettings;
     }
 
     /**
@@ -93,6 +189,12 @@ public class BpmnModelUtils {
         }
         // 从 flowElementList 找
         return (StartEvent) CollUtil.findOne(process.getFlowElements(), flowElement -> flowElement instanceof StartEvent);
+    }
+
+    public static EndEvent getEndEvent(BpmnModel model) {
+        Process process = model.getMainProcess();
+        // 从 flowElementList 找 endEvent. TODO 多个 EndEvent 会有问题
+        return (EndEvent) CollUtil.findOne(process.getFlowElements(), flowElement -> flowElement instanceof EndEvent);
     }
 
     public static BpmnModel getBpmnModel(byte[] bpmnBytes) {
@@ -334,4 +436,11 @@ public class BpmnModelUtils {
         return userTaskList;
     }
 
+    public static String parseBoundaryEventExtensionElement(BoundaryEvent boundaryEvent, String customElement) {
+        if (boundaryEvent == null) {
+            return null;
+        }
+        ExtensionElement extensionElement = CollUtil.getFirst(boundaryEvent.getExtensionElements().get(customElement));
+        return Optional.ofNullable(extensionElement).map(ExtensionElement::getElementText).orElse(null);
+    }
 }

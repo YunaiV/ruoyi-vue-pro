@@ -1,14 +1,12 @@
 package cn.iocoder.yudao.module.bpm.service.task;
 
-import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.activity.BpmActivityRespVO;
-import cn.iocoder.yudao.module.bpm.convert.task.BpmActivityConvert;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.flowable.engine.HistoryService;
 import org.flowable.engine.history.HistoricActivityInstance;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
-import jakarta.annotation.Resource;
 import java.util.List;
 
 
@@ -26,10 +24,9 @@ public class BpmActivityServiceImpl implements BpmActivityService {
     private HistoryService historyService;
 
     @Override
-    public List<BpmActivityRespVO> getActivityListByProcessInstanceId(String processInstanceId) {
-        List<HistoricActivityInstance> activityList = historyService.createHistoricActivityInstanceQuery()
-                .processInstanceId(processInstanceId).list();
-        return BpmActivityConvert.INSTANCE.convertList(activityList);
+    public List<HistoricActivityInstance> getActivityListByProcessInstanceId(String processInstanceId) {
+        return historyService.createHistoricActivityInstanceQuery().processInstanceId(processInstanceId)
+                .orderByHistoricActivityInstanceStartTime().asc().list();
     }
 
     @Override
