@@ -23,4 +23,14 @@ public class PointActivityApiImpl implements PointActivityApi {
         return pointActivityService.validateJoinPointActivity(activityId, skuId, count);
     }
 
+    @Override
+    public void updatePointStockDecr(Long id, Long skuId, Integer count) {
+        pointActivityService.updatePointStockDecr(id, skuId, count);
+    }
+
+    @Override
+    public void updatePointStockIncr(Long id, Long skuId, Integer count) {
+        pointActivityService.updatePointStockIncr(id, skuId, count);
+    }
+
 }

@@ -55,4 +55,8 @@ public enum TradeOrderTypeEnum implements IntArrayValuable {
         return ObjectUtil.equal(type, COMBINATION.getType());
     }
 
+    public static boolean isPoint(Integer type) {
+        return ObjectUtil.equal(type, POINT.getType());
+    }
+
 }

@@ -63,15 +63,18 @@ public class TradePointActivityPriceCalculator implements TradePriceCalculator {
         // 3.1 记录优惠明细
         int discountPrice = orderItem.getPayPrice(); // 情况一：单使用积分兑换
         Assert.isTrue(activity.getPoint() >= 1, "积分商城商品兑换积分必须大于 1");
-        result.setUsePoint(activity.getPoint());
+        result.setUsePoint(activity.getPoint() * orderItem.getCount());
+        orderItem.setUsePoint(activity.getPoint() * orderItem.getCount());
         if (activity.getPrice() != null && activity.getPrice() > 0) { // 情况二：积分 + 金额
             discountPrice = orderItem.getPayPrice() - activity.getPrice() * orderItem.getCount();
         }
+        // 3.2 记录优惠明细
         TradePriceCalculatorHelper.addPromotion(result, orderItem,
                 param.getPointActivityId(), "积分商城活动", PromotionTypeEnum.POINT.getType(),
                 StrUtil.format("积分商城活动：省 {} 元", TradePriceCalculatorHelper.formatPrice(discountPrice)),
                 discountPrice);
-        // 3.2 更新 SKU 优惠金额
+
+        // 3.3 更新 SKU 优惠金额
         orderItem.setDiscountPrice(orderItem.getDiscountPrice() + discountPrice);
         TradePriceCalculatorHelper.recountPayPrice(orderItem);
         TradePriceCalculatorHelper.recountAllPrice(result);

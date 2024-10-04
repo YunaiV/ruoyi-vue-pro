@@ -105,6 +105,43 @@ public class PointActivityServiceImpl implements PointActivityService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
+    public void updatePointStockDecr(Long id, Long skuId, Integer count) {
+        // 1.1 校验活动库存是否充足
+        PointActivityDO activity = validatePointActivityExists(id);
+        if (count > activity.getStock()) {
+            throw exception(POINT_ACTIVITY_UPDATE_STOCK_FAIL);
+        }
+        // 1.2 校验商品库存是否充足
+        PointProductDO product = pointProductMapper.selectListByActivityIdAndSkuId(id, skuId);
+        if (product == null || count > product.getStock()) {
+            throw exception(POINT_ACTIVITY_UPDATE_STOCK_FAIL);
+        }
+
+        // 2.1 更新活动商品库存
+        int updateCount = pointProductMapper.updateStockDecr(product.getId(), count);
+        if (updateCount == 0) {
+            throw exception(POINT_ACTIVITY_UPDATE_STOCK_FAIL);
+        }
+
+        // 2.2 更新活动库存
+        updateCount = pointActivityMapper.updateStockDecr(id, count);
+        if (updateCount == 0) {
+            throw exception(POINT_ACTIVITY_UPDATE_STOCK_FAIL);
+        }
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void updatePointStockIncr(Long id, Long skuId, Integer count) {
+        PointProductDO product = pointProductMapper.selectListByActivityIdAndSkuId(id, skuId);
+        // 更新活动商品库存
+        pointProductMapper.updateStockIncr(product.getId(), count);
+        // 更新活动库存
+        pointActivityMapper.updateStockIncr(id, count);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
     public void closePointActivity(Long id) {
         // 校验存在
         PointActivityDO pointActivity = validatePointActivityExists(id);

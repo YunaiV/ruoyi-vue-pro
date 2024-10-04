@@ -21,5 +21,22 @@ public interface PointActivityApi {
      */
     PointValidateJoinRespDTO validateJoinPointActivity(Long activityId, Long skuId, Integer count);
 
+    /**
+     * 更新积分商城商品库存（减少）
+     *
+     * @param id    活动编号
+     * @param skuId sku 编号
+     * @param count 数量(正数)
+     */
+    void updatePointStockDecr(Long id, Long skuId, Integer count);
+
+    /**
+     * 更新积分商城商品库存（增加）
+     *
+     * @param id    活动编号
+     * @param skuId sku 编号
+     * @param count 数量(正数)
+     */
+    void updatePointStockIncr(Long id, Long skuId, Integer count);
 
 }
