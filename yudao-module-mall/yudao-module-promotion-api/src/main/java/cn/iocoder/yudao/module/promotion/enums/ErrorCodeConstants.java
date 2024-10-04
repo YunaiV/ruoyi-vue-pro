@@ -50,6 +50,10 @@ public interface ErrorCodeConstants {
     ErrorCode POINT_ACTIVITY_UPDATE_FAIL_STATUS_CLOSED = new ErrorCode(1_013_007_002, "积分商城活动已关闭，不能修改");
     ErrorCode POINT_ACTIVITY_DELETE_FAIL_STATUS_NOT_CLOSED_OR_END = new ErrorCode(1_013_007_003, "积分商城活动未关闭或未结束，不能删除");
     ErrorCode POINT_ACTIVITY_CLOSE_FAIL_STATUS_CLOSED = new ErrorCode(1_013_007_004, "积分商城活动已关闭，不能重复关闭");
+    ErrorCode POINT_ACTIVITY_JOIN_ACTIVITY_STATUS_CLOSED = new ErrorCode(1_013_007_005, "积分商品兑换失败，原因：积分商城活动已关闭");
+    ErrorCode POINT_ACTIVITY_JOIN_ACTIVITY_SINGLE_LIMIT_COUNT_EXCEED = new ErrorCode(1_013_007_006, "积分商品兑换失败，原因：单次限购超出");
+    ErrorCode POINT_ACTIVITY_JOIN_ACTIVITY_PRODUCT_NOT_EXISTS = new ErrorCode(1_013_007_007, "积分商品兑换失败，原因：商品不存在");
+    ErrorCode POINT_ACTIVITY_UPDATE_STOCK_FAIL = new ErrorCode(1_013_007_008, "积分商品兑换失败，原因：积分商品库存不足");
 
     // ========== 秒杀活动 1-013-008-000 ==========
     ErrorCode SECKILL_ACTIVITY_NOT_EXISTS = new ErrorCode(1_013_008_000, "秒杀活动不存在");

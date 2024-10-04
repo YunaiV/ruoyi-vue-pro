@@ -42,9 +42,9 @@ public interface TradeOrderQueryService {
     /**
      * 获得指定用户，指定活动，指定状态的交易订单
      *
-     * @param userId     用户编号
+     * @param userId                用户编号
      * @param combinationActivityId 活动编号
-     * @param status     订单状态
+     * @param status                订单状态
      * @return 交易订单
      */
     TradeOrderDO getOrderByUserIdAndStatusAndCombination(Long userId, Long combinationActivityId, Integer status);
@@ -116,7 +116,7 @@ public interface TradeOrderQueryService {
      * @param activityId 活动编号
      * @return 秒杀商品数量
      */
-    int getSeckillProductCount(Long userId, Long activityId);
+    int getActivityProductCount(Long userId, Long activityId);
 
     // =================== Order Item ===================
 
