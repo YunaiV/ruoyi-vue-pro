@@ -19,12 +19,12 @@ import cn.iocoder.yudao.module.iot.dal.dataobject.thinkmodelfunction.IotThinkMod
 import cn.iocoder.yudao.module.iot.dal.mysql.thinkmodelfunction.IotThinkModelFunctionMapper;
 import cn.iocoder.yudao.module.iot.enums.product.IotAccessModeEnum;
 import cn.iocoder.yudao.module.iot.enums.product.IotProductFunctionTypeEnum;
-import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
+import javax.annotation.Resource;
 import java.util.*;
 import java.util.stream.Collectors;
 

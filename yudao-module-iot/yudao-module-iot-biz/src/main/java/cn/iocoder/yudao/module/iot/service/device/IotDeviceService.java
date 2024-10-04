@@ -1,9 +1,12 @@
 package cn.iocoder.yudao.module.iot.service.device;
 
-import jakarta.validation.*;
-import cn.iocoder.yudao.module.iot.controller.admin.device.vo.*;
-import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.module.iot.controller.admin.device.vo.IotDevicePageReqVO;
+import cn.iocoder.yudao.module.iot.controller.admin.device.vo.IotDeviceSaveReqVO;
+import cn.iocoder.yudao.module.iot.controller.admin.device.vo.IotDeviceStatusUpdateReqVO;
+import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDO;
+
+import javax.validation.Valid;
 
 /**
  * IoT 设备 Service 接口

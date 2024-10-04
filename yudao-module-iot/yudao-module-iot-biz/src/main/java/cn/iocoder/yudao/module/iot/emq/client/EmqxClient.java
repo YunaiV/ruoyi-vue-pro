@@ -2,7 +2,6 @@ package cn.iocoder.yudao.module.iot.emq.client;
 
 import cn.iocoder.yudao.module.iot.emq.callback.EmqxCallback;
 import cn.iocoder.yudao.module.iot.emq.config.MqttConfig;
-import jakarta.annotation.Resource;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.paho.client.mqttv3.MqttClient;
@@ -11,6 +10,8 @@ import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 import org.springframework.stereotype.Component;
+
+import javax.annotation.Resource;
 
 /**
  * MQTT客户端类，负责建立与MQTT服务器的连接，提供发布消息和订阅主题的功能

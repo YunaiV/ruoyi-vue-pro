@@ -3,8 +3,9 @@ package cn.iocoder.yudao.module.bpm.controller.admin.task.vo.instance;
 import cn.hutool.core.util.StrUtil;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.AssertTrue;
 import lombok.Data;
+
+import javax.validation.constraints.AssertTrue;
 
 @Schema(description = "管理后台 - 表单字段权限 Request VO")
 @Data

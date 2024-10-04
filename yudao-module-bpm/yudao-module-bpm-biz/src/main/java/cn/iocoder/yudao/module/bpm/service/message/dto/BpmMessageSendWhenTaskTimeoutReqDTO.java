@@ -1,8 +1,9 @@
 package cn.iocoder.yudao.module.bpm.service.message.dto;
 
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
 import lombok.Data;
+
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 
 /**
  * BPM 发送任务审批超时 Request DTO
