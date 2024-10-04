@@ -21,6 +21,7 @@ import org.flowable.engine.repository.ProcessDefinition;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -101,7 +102,17 @@ public interface BpmModelConvert {
     }
 
     default BpmModelMetaInfoVO parseMetaInfo(Model model) {
-        return JsonUtils.parseObject(model.getMetaInfo(), BpmModelMetaInfoVO.class);
+        BpmModelMetaInfoVO vo = JsonUtils.parseObject(model.getMetaInfo(), BpmModelMetaInfoVO.class);
+        if (vo == null) {
+            return null;
+        }
+        if (vo.getManagerUserIds() == null) {
+            vo.setManagerUserIds(Collections.emptyList());
+        }
+        if (vo.getStartUserIds() == null) {
+            vo.setStartUserIds(Collections.emptyList());
+        }
+        return vo;
     }
 
 }
