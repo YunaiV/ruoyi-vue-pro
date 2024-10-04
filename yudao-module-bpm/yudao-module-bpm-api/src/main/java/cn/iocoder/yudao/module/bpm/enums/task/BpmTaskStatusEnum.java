@@ -58,9 +58,5 @@ public enum BpmTaskStatusEnum {
                 APPROVE.getStatus(), REJECT.getStatus(), CANCEL.getStatus(),
                 RETURN.getStatus(), APPROVING.getStatus());
     }
-    public static boolean isEndStatusButNotApproved(Integer status) {
-        return ObjectUtils.equalsAny(status,
-                REJECT.getStatus(), CANCEL.getStatus(), RETURN.getStatus());
-    }
 
 }
