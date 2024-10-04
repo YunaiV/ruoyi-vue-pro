@@ -16,6 +16,7 @@ public interface TradePriceCalculator {
     int ORDER_SECKILL_ACTIVITY = 8;
     int ORDER_BARGAIN_ACTIVITY = 8;
     int ORDER_COMBINATION_ACTIVITY = 8;
+    int ORDER_POINT_ACTIVITY = 8;
 
     int ORDER_DISCOUNT_ACTIVITY = 10;
     int ORDER_REWARD_ACTIVITY = 20;

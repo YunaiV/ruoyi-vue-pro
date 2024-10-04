@@ -160,7 +160,7 @@ public class SeckillActivityServiceImpl implements SeckillActivityService {
     public void updateSeckillStockDecr(Long id, Long skuId, Integer count) {
         // 1.1 校验活动库存是否充足
         SeckillActivityDO seckillActivity = validateSeckillActivityExists(id);
-        if (count > seckillActivity.getTotalStock()) {
+        if (count > seckillActivity.getStock()) {
             throw exception(SECKILL_ACTIVITY_UPDATE_STOCK_FAIL);
         }
         // 1.2 校验商品库存是否充足
