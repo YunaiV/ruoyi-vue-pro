@@ -14,14 +14,11 @@ import cn.iocoder.yudao.framework.pay.core.client.dto.refund.PayRefundRespDTO;
 import cn.iocoder.yudao.framework.pay.core.client.dto.refund.PayRefundUnifiedReqDTO;
 import cn.iocoder.yudao.framework.pay.core.client.dto.transfer.PayTransferRespDTO;
 import cn.iocoder.yudao.framework.pay.core.client.dto.transfer.PayTransferUnifiedReqDTO;
+import cn.iocoder.yudao.framework.pay.core.client.dto.transfer.WxPayTransferPartnerNotifyV3Result;
 import cn.iocoder.yudao.framework.pay.core.client.impl.AbstractPayClient;
 import cn.iocoder.yudao.framework.pay.core.enums.order.PayOrderStatusRespEnum;
 import cn.iocoder.yudao.framework.pay.core.enums.transfer.PayTransferTypeEnum;
-import com.binarywang.spring.starter.wxjava.miniapp.properties.WxMaProperties;
-import com.github.binarywang.wxpay.bean.notify.WxPayNotifyV3Result;
-import com.github.binarywang.wxpay.bean.notify.WxPayOrderNotifyResult;
-import com.github.binarywang.wxpay.bean.notify.WxPayRefundNotifyResult;
-import com.github.binarywang.wxpay.bean.notify.WxPayRefundNotifyV3Result;
+import com.github.binarywang.wxpay.bean.notify.*;
 import com.github.binarywang.wxpay.bean.request.*;
 import com.github.binarywang.wxpay.bean.result.*;
 import com.github.binarywang.wxpay.bean.transfer.TransferBatchesRequest;
@@ -31,7 +28,6 @@ import com.github.binarywang.wxpay.exception.WxPayException;
 import com.github.binarywang.wxpay.service.TransferService;
 import com.github.binarywang.wxpay.service.WxPayService;
 import com.github.binarywang.wxpay.service.impl.WxPayServiceImpl;
-import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 
 import java.time.LocalDateTime;
@@ -356,6 +352,29 @@ public abstract class AbstractWxPayClient extends AbstractPayClient<WxPayClientC
     }
 
     @Override
+    public PayTransferRespDTO doParseTransferNotify(Map<String, String> params, String body) throws WxPayException {
+        switch (config.getApiVersion()) {
+            case API_VERSION_V3:
+                return parseTransferNotifyV3(body);
+            default:
+                throw new IllegalArgumentException(String.format("未知的 API 版本(%s)", config.getApiVersion()));
+        }
+    }
+
+    private PayTransferRespDTO parseTransferNotifyV3(String body) throws WxPayException {
+        WxPayTransferPartnerNotifyV3Result response = client.baseParseOrderNotifyV3Result(body, null, WxPayTransferPartnerNotifyV3Result.class, WxPayTransferPartnerNotifyV3Result.TransferNotifyResult.class);
+        WxPayTransferPartnerNotifyV3Result.TransferNotifyResult result = response.getResult();
+        // 2. 构建结果
+        if (Objects.equals("FINISHED", result.getBatchStatus())) {
+            if(result.getFailNum() <= 0){
+                return PayTransferRespDTO.successOf(result.getBatchId(), parseDateV3(result.getUpdateTime()),
+                        result.getOutBatchNo(), response);
+            }
+        }
+        return PayTransferRespDTO.closedOf(result.getBatchStatus(), result.getCloseReason(), result.getOutBatchNo(), response);
+    }
+
+    @Override
     protected PayRefundRespDTO doGetRefund(String outTradeNo, String outRefundNo) throws WxPayException {
         try {
             switch (config.getApiVersion()) {
@@ -452,7 +471,7 @@ public abstract class AbstractWxPayClient extends AbstractPayClient<WxPayClientC
                 .transferDetailList(transferDetailList).build();
         transferBatches.setNotifyUrl(reqDTO.getNotifyUrl());
         TransferBatchesResult transferBatchesResult = transferService.transferBatches(transferBatches);
-        return PayTransferRespDTO.waitingOf(reqDTO.getOutTransferNo(), transferBatchesResult.getBatchId() ,transferBatchesResult);
+        return PayTransferRespDTO.dealingOf(transferBatchesResult.getBatchId(), reqDTO.getOutTransferNo(), transferBatchesResult);
     }
 
     @Override

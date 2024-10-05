@@ -9,6 +9,8 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.number.MoneyUtils;
 import cn.iocoder.yudao.module.pay.api.transfer.PayTransferApi;
 import cn.iocoder.yudao.module.pay.api.transfer.dto.PayTransferCreateReqDTO;
+import cn.iocoder.yudao.module.pay.api.transfer.dto.PayTransferRespDTO;
+import cn.iocoder.yudao.module.pay.enums.transfer.PayTransferStatusEnum;
 import cn.iocoder.yudao.module.pay.enums.transfer.PayTransferTypeEnum;
 import cn.iocoder.yudao.module.system.api.notify.NotifyMessageSendApi;
 import cn.iocoder.yudao.module.system.api.notify.dto.NotifySendSingleToUserReqDTO;
@@ -39,7 +41,6 @@ import java.time.LocalDateTime;
 import java.util.*;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.module.trade.dal.redis.no.TradeNoRedisDAO.TRADE_ORDER_NO_PREFIX;
 import static cn.iocoder.yudao.module.trade.enums.ErrorCodeConstants.*;
 
 /**
@@ -76,7 +77,7 @@ public class BrokerageWithdrawServiceImpl implements BrokerageWithdrawService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void auditBrokerageWithdraw(Integer id, BrokerageWithdrawStatusEnum status, String auditReason, String userIp) {
+    public void auditBrokerageWithdraw(Long id, BrokerageWithdrawStatusEnum status, String auditReason, String userIp) {
         // 1.1 校验存在
         BrokerageWithdrawDO withdraw = validateBrokerageWithdrawExists(id);
 
@@ -105,7 +106,6 @@ public class BrokerageWithdrawServiceImpl implements BrokerageWithdrawService {
                 PayTransferCreateReqDTO payTransferCreateReqDTO = getPayTransferCreateReqDTO(userIp, withdraw, socialUser);
                 payTransferApi.createTransfer(payTransferCreateReqDTO);
             }
-            // TODO 疯狂：调用转账接口
         } else if (BrokerageWithdrawStatusEnum.AUDIT_FAIL.equals(status)) {
             templateCode = MessageTemplateConstants.SMS_BROKERAGE_WITHDRAW_AUDIT_REJECT;
             // 3.2 驳回时需要退还用户佣金
@@ -116,13 +116,13 @@ public class BrokerageWithdrawServiceImpl implements BrokerageWithdrawService {
         }
 
         // 4. 通知用户
-        Map<String, Object> templateParams = MapUtil.<String, Object>builder()
-                .put("createTime", LocalDateTimeUtil.formatNormal(withdraw.getCreateTime()))
-                .put("price", MoneyUtils.fenToYuanStr(withdraw.getPrice()))
-                .put("reason", auditReason)
-                .build();
-        notifyMessageSendApi.sendSingleMessageToMember(new NotifySendSingleToUserReqDTO()
-                .setUserId(withdraw.getUserId()).setTemplateCode(templateCode).setTemplateParams(templateParams));
+//        Map<String, Object> templateParams = MapUtil.<String, Object>builder()
+//                .put("createTime", LocalDateTimeUtil.formatNormal(withdraw.getCreateTime()))
+//                .put("price", MoneyUtils.fenToYuanStr(withdraw.getPrice()))
+//                .put("reason", auditReason)
+//                .build();
+//        notifyMessageSendApi.sendSingleMessageToMember(new NotifySendSingleToUserReqDTO()
+//                .setUserId(withdraw.getUserId()).setTemplateCode(templateCode).setTemplateParams(templateParams));
     }
 
     private PayTransferCreateReqDTO getPayTransferCreateReqDTO(String userIp, BrokerageWithdrawDO withdraw, SocialUserRespDTO socialUser) {
@@ -138,7 +138,7 @@ public class BrokerageWithdrawServiceImpl implements BrokerageWithdrawService {
         return payTransferCreateReqDTO;
     }
 
-    private BrokerageWithdrawDO validateBrokerageWithdrawExists(Integer id) {
+    private BrokerageWithdrawDO validateBrokerageWithdrawExists(Long id) {
         BrokerageWithdrawDO withdraw = brokerageWithdrawMapper.selectById(id);
         if (withdraw == null) {
             throw exception(BROKERAGE_WITHDRAW_NOT_EXISTS);
@@ -147,7 +147,7 @@ public class BrokerageWithdrawServiceImpl implements BrokerageWithdrawService {
     }
 
     @Override
-    public BrokerageWithdrawDO getBrokerageWithdraw(Integer id) {
+    public BrokerageWithdrawDO getBrokerageWithdraw(Long id) {
         return brokerageWithdrawMapper.selectById(id);
     }
 
@@ -184,6 +184,23 @@ public class BrokerageWithdrawServiceImpl implements BrokerageWithdrawService {
             return Collections.emptyList();
         }
         return brokerageWithdrawMapper.selectCountAndSumPriceByUserIdAndStatus(userIds, status.getStatus());
+    }
+
+    @Override
+    public void updateTransfer(Long id, Long payTransferId) {
+        BrokerageWithdrawDO withdraw = validateBrokerageWithdrawExists(id);
+        PayTransferRespDTO transfer = payTransferApi.getTransfer(payTransferId);
+        if(PayTransferStatusEnum.isSuccess(transfer.getStatus())){
+            withdraw.setStatus(BrokerageWithdrawStatusEnum.WITHDRAW_SUCCESS.getStatus());
+        }else if(PayTransferStatusEnum.isPendingStatus(transfer.getStatus())){
+            withdraw.setStatus(BrokerageWithdrawStatusEnum.AUDIT_SUCCESS.getStatus());
+        }else{
+            withdraw.setStatus(BrokerageWithdrawStatusEnum.WITHDRAW_FAIL.getStatus());
+            // 3.2 驳回时需要退还用户佣金
+            brokerageRecordService.addBrokerage(withdraw.getUserId(), BrokerageRecordBizTypeEnum.WITHDRAW_REJECT,
+                    String.valueOf(withdraw.getId()), withdraw.getPrice(), BrokerageRecordBizTypeEnum.WITHDRAW_REJECT.getTitle());
+        }
+        brokerageWithdrawMapper.updateById(withdraw);
     }
 
     /**

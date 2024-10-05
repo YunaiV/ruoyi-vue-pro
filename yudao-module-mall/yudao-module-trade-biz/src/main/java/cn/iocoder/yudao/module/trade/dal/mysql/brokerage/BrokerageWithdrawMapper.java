@@ -35,7 +35,7 @@ public interface BrokerageWithdrawMapper extends BaseMapperX<BrokerageWithdrawDO
                 .orderByAsc(BrokerageWithdrawDO::getStatus).orderByDesc(BrokerageWithdrawDO::getId));
     }
 
-    default int updateByIdAndStatus(Integer id, Integer status, BrokerageWithdrawDO updateObj) {
+    default int updateByIdAndStatus(Long id, Integer status, BrokerageWithdrawDO updateObj) {
         return update(updateObj, new LambdaUpdateWrapper<BrokerageWithdrawDO>()
                 .eq(BrokerageWithdrawDO::getId, id)
                 .eq(BrokerageWithdrawDO::getStatus, status));

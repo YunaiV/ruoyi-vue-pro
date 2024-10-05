@@ -45,7 +45,7 @@ public class BrokerageWithdrawController {
     @PutMapping("/approve")
     @Operation(summary = "通过申请")
     @PreAuthorize("@ss.hasPermission('trade:brokerage-withdraw:audit')")
-    public CommonResult<Boolean> approveBrokerageWithdraw(@RequestParam("id") Integer id) {
+    public CommonResult<Boolean> approveBrokerageWithdraw(@RequestParam("id") Long id) {
         brokerageWithdrawService.auditBrokerageWithdraw(id, BrokerageWithdrawStatusEnum.AUDIT_SUCCESS, "", getClientIP());
         return success(true);
     }
@@ -62,7 +62,7 @@ public class BrokerageWithdrawController {
     @Operation(summary = "获得佣金提现")
     @Parameter(name = "id", description = "编号", required = true, example = "1024")
     @PreAuthorize("@ss.hasPermission('trade:brokerage-withdraw:query')")
-    public CommonResult<BrokerageWithdrawRespVO> getBrokerageWithdraw(@RequestParam("id") Integer id) {
+    public CommonResult<BrokerageWithdrawRespVO> getBrokerageWithdraw(@RequestParam("id") Long id) {
         BrokerageWithdrawDO brokerageWithdraw = brokerageWithdrawService.getBrokerageWithdraw(id);
         return success(BrokerageWithdrawConvert.INSTANCE.convert(brokerageWithdraw));
     }
@@ -87,6 +87,7 @@ public class BrokerageWithdrawController {
         // 目前业务逻辑，不需要做任何事情
         // 当然，退款会有小概率会失败的情况，可以监控失败状态，进行告警
         log.info("[updateAfterRefund][notifyReqDTO({})]", notifyReqDTO);
+        brokerageWithdrawService.updateTransfer(Long.parseLong(notifyReqDTO.getMerchantTransferId()), notifyReqDTO.getPayTransferId());
         return success(true);
     }
 
