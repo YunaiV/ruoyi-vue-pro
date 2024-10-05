@@ -28,7 +28,7 @@ import java.util.stream.Stream;
 @Setter
 public class AmazonAdClient {
 
-    private AmazonAccount account;
+    private volatile AmazonAccount account;
 
 
     public Stream<AmazonShop> getShops() {
