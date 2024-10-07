@@ -43,10 +43,10 @@
             <artifactId>spring-boot-starter-test</artifactId>
         </dependency>
 
-<!--        <dependency>-->
-<!--            <groupId>com.h2database</groupId> &lt;!&ndash; 单元测试，我们采用 H2 作为数据库 &ndash;&gt;-->
-<!--            <artifactId>h2</artifactId>-->
-<!--        </dependency>-->
+        <dependency>
+            <groupId>com.h2database</groupId> <!-- 单元测试，我们采用 H2 作为数据库 -->
+            <artifactId>h2</artifactId>
+        </dependency>
 
 <!--        <dependency>-->
 <!--            <groupId>com.github.fppt</groupId> &lt;!&ndash; 单元测试，我们采用内嵌的 Redis 数据库 &ndash;&gt;-->

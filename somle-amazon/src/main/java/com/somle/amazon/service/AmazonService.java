@@ -20,7 +20,7 @@ import java.util.Map;
 @Service
 public class AmazonService {
 
-    private AmazonAccount account;
+    public AmazonAccount account;
 
     public String authUrl = "https://api.amazon.com/auth/o2/token";
 
@@ -46,7 +46,7 @@ public class AmazonService {
 
     @PostConstruct
     public void init() {
-        account = accountRepository.findAll().get(0);
+        account = accountRepository.findAll().getFirst();
         spClient = new AmazonSpClient(account);
         adClient = new AmazonAdClient(account);
     }
@@ -60,7 +60,7 @@ public class AmazonService {
 //    @Scheduled(fixedDelay = 1800000, initialDelay = 1000)
     @Scheduled(cron = "0 0,30 * * * *")
     public void refreshAuth() {
-        account = accountRepository.findAll().get(0);
+//        var account = accountRepository.findAll().getFirst();
         for (AmazonSeller seller : account.getSellers()) {
             seller.setSpAccessToken(
                 refreshAccessToken(
@@ -79,8 +79,8 @@ public class AmazonService {
             );
         }
         accountRepository.save(account);
-        spClient.setAccount(account);
-        adClient.setAccount(account);
+//        spClient.setAccount(account);
+//        adClient.setAccount(account);
     }
 
     public String refreshAccessToken(String clientId, String clientSecret, String refreshToken) {

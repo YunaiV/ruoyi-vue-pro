@@ -14,7 +14,10 @@ import lombok.Setter;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
+import okhttp3.Response;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.net.SocketTimeoutException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -28,7 +31,7 @@ import java.util.stream.Stream;
 @Setter
 public class AmazonAdClient {
 
-    private volatile AmazonAccount account;
+    public AmazonAccount account;
 
 
     public Stream<AmazonShop> getShops() {
@@ -39,11 +42,23 @@ public class AmazonAdClient {
         return getShops().filter(shop->shop.getCountry().getCode().equals(countryCode)).findFirst().get();
     }
 
-    public Stream<JSONArray> getAllAdReport(LocalDate dataDate) {
-//        return getShops().map(shop->getAdReport(shop, dataDate));
-        return WebUtils.parallelRun(12, ()->
-            getShops().parallel().map(shop->getAdReport(shop, dataDate))
+    private Map<String, String> generateHeaders(AmazonShop shop) {
+        String contentType = "application/vnd.createasyncreportrequest.v3+json";
+        Map<String, String> headers = Map.of(
+            "Amazon-Advertising-API-Scope", shop.getProfileId(),
+            "Amazon-Advertising-API-ClientId", shop.getSeller().getAccount().getAdClientId(),
+            "Authorization", shop.getSeller().getAdAccessToken(),
+            "Content-Type", contentType,
+            "Accept", contentType
         );
+        return headers;
+    }
+
+    public Stream<JSONArray> getAllAdReport(LocalDate dataDate) {
+        return getShops().map(shop->getAdReport(shop, dataDate));
+//        return WebUtils.parallelRun(12, ()->
+//            getShops().parallel().map(shop->getAdReport(shop, dataDate))
+//        );
     }
 
     public JSONArray getAdReport(String countryCode, LocalDate dataDate) {
@@ -90,43 +105,21 @@ public class AmazonAdClient {
 
     @Transactional(readOnly = true)
     public JSONArray getReport(AmazonShop shop, JSONObject payload, LocalDate dataDate) {
-        shop = getShop(shop.getCountry().getCode());
-        var seller = shop.getSeller();
-        var region = seller.getRegion();
-        // log.debug(shop.getProfileId());
-        // log.debug(seller.getAdAccessToken());
-        // log.debug(adClientId);
         JSONObject updateDict = JsonUtils.newObject();
         updateDict.put("startDate", dataDate.toString());
         updateDict.put("endDate", dataDate.toString());
         payload.putAll(updateDict);
 
         String partialUrl = "/reporting/reports";
-        String endpoint = region.getAdEndPoint();
+        String endpoint = shop.getSeller().getRegion().getAdEndPoint();
         String fullUrl = endpoint + partialUrl;
-
-        log.debug("profileId: " + shop.getProfileId());
-        log.debug("adClientId " + account.getAdClientId());
-        log.debug("Auth " + seller.getAdAccessToken());
-
-        String contentType = "application/vnd.createasyncreportrequest.v3+json";
-        Map<String, String> headers = Map.of(
-            "Amazon-Advertising-API-Scope", shop.getProfileId(),
-            "Amazon-Advertising-API-ClientId", account.getAdClientId(),
-            "Authorization", seller.getAdAccessToken(),
-            "Content-Type", contentType,
-            "Accept", contentType
-        );
-
-
-
 
 
         // Create report
         String reportId = null;
         while (reportId == null) {
             log.info("Creating ad report...");
-            var response = WebUtils.postRequest(fullUrl, Map.of(), headers, payload);
+            var response = WebUtils.postRequest(fullUrl, Map.of(), generateHeaders(shop), payload);
             switch (response.code()) {
                 case 200:
                     break;
@@ -140,7 +133,6 @@ public class AmazonAdClient {
                     throw new RuntimeException("Unknown response code in creating report: " + response.code());
             }
             var responseBody = WebUtils.parseResponse(response, JSONObject.class);
-            log.debug(response.toString());
             reportId = responseBody.getString("reportId");
         }
         log.info("Got report ID");
@@ -150,10 +142,10 @@ public class AmazonAdClient {
         String docUrl = null;
         // ResponseEntity<JSONObject> response = null;
         while (!"COMPLETED".equals(status)) {
+            CoreUtils.sleep(1000);
             String reportStatusUrl = endpoint + "/reporting/reports/" + reportId;
             log.info("Checking report status...");
-            // response = restTemplate.exchange(reportStatusUrl, HttpMethod.GET, new HttpEntity<>(headers), JSONObject.class);
-            var response = CoreUtils.retry(ctx-> WebUtils.getRequest(reportStatusUrl, Map.of(), headers));
+            var response = WebUtils.getRequest(reportStatusUrl, Map.of(), generateHeaders(shop));
             switch (response.code()) {
                 case 200:
                     break;

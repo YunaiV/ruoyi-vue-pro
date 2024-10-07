@@ -51,6 +51,7 @@ public class WebUtils {
         return urlBuilder.build().toString();
     }
 
+    @SneakyThrows
     public static Response sendRequest(String requestMethod, String url, Map<String, String> queryParams, Map<String, String> headers, Object payload) {
         log.debug("method: " + requestMethod);
         log.debug("url: " + url);
@@ -88,24 +89,14 @@ public class WebUtils {
                 break;
         }
 
-        Response response;
-        try {
-            response = client.newCall(request).execute();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-
-        return response;
+        return client.newCall(request).execute();
 
     }
 
+    @SneakyThrows
     public static String getBodyString(Response response) {
-        String responseString;
-        try {
-            responseString = response.body().string();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        assert response.body() != null;
+        String responseString = response.body().string();
         log.debug("response: " + responseString);
         return responseString;
     }
@@ -148,12 +139,12 @@ public class WebUtils {
         return JsonUtils.parseObject(jsonString, objectClass);
     }
 
-    public static <T> T parallelRun(int parallelism, Callable<T> codeBlock) {
-        ForkJoinPool customThreadPool = new ForkJoinPool(parallelism);
-        var result = customThreadPool.submit(codeBlock).join();
-        customThreadPool.shutdown();
-        return result;
-    }
+//    public static <T> T parallelRun(int parallelism, Callable<T> codeBlock) {
+//        ForkJoinPool customThreadPool = new ForkJoinPool(parallelism);
+//        var result = customThreadPool.submit(codeBlock).join();
+//        customThreadPool.shutdown();
+//        return result;
+//    }
 
     // TODO: a general method to handle http exception (429, timeout etc)
 
