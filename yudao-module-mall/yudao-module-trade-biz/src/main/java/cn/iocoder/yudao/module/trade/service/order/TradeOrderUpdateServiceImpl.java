@@ -245,7 +245,10 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
         }
 
         // 3. 生成预支付
-        createPayOrder(order, orderItems);
+        // 特殊情况：积分兑换时，可能支付金额为零
+        if (order.getPayPrice() > 0) {
+            createPayOrder(order, orderItems);
+        }
 
         // 4. 插入订单日志
         TradeOrderLogUtils.setOrderInfo(order.getId(), null, order.getStatus());

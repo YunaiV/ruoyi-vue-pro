@@ -76,8 +76,11 @@ public class AppPointActivityController {
 
         // 2. 拼接数据
         List<PointProductDO> products = pointActivityService.getPointProductListByActivityIds(Collections.singletonList(id));
-        AppPointActivityDetailRespVO respVO = BeanUtils.toBean(activity, AppPointActivityDetailRespVO.class);
-        respVO.setProducts(BeanUtils.toBean(products, AppPointActivityDetailRespVO.Product.class));
+        PointProductDO minProduct = getMinObject(products, PointProductDO::getPoint);
+        assert minProduct != null;
+        AppPointActivityDetailRespVO respVO = BeanUtils.toBean(activity, AppPointActivityDetailRespVO.class)
+                .setProducts(BeanUtils.toBean(products, AppPointActivityDetailRespVO.Product.class))
+                .setPoint(minProduct.getPoint()).setPrice(minProduct.getPrice());
         return success(respVO);
     }
 
