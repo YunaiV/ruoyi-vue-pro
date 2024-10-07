@@ -10,8 +10,12 @@ import cn.iocoder.yudao.framework.common.util.number.MoneyUtils;
 import cn.iocoder.yudao.module.pay.api.transfer.PayTransferApi;
 import cn.iocoder.yudao.module.pay.api.transfer.dto.PayTransferCreateReqDTO;
 import cn.iocoder.yudao.module.pay.api.transfer.dto.PayTransferRespDTO;
+import cn.iocoder.yudao.module.pay.api.wallet.PayWalletApi;
+import cn.iocoder.yudao.module.pay.api.wallet.dto.PayWalletCreateReqDto;
+import cn.iocoder.yudao.module.pay.api.wallet.dto.PayWalletRespDTO;
 import cn.iocoder.yudao.module.pay.enums.transfer.PayTransferStatusEnum;
 import cn.iocoder.yudao.module.pay.enums.transfer.PayTransferTypeEnum;
+import cn.iocoder.yudao.module.pay.enums.wallet.PayWalletBizTypeEnum;
 import cn.iocoder.yudao.module.system.api.notify.NotifyMessageSendApi;
 import cn.iocoder.yudao.module.system.api.notify.dto.NotifySendSingleToUserReqDTO;
 import cn.iocoder.yudao.module.system.api.social.SocialUserApi;
@@ -68,6 +72,8 @@ public class BrokerageWithdrawServiceImpl implements BrokerageWithdrawService {
     private PayTransferApi payTransferApi;
     @Resource
     private SocialUserApi socialUserApi;
+    @Resource
+    private PayWalletApi payWalletApi;
 
     @Resource
     private Validator validator;
@@ -98,7 +104,18 @@ public class BrokerageWithdrawServiceImpl implements BrokerageWithdrawService {
             templateCode = MessageTemplateConstants.SMS_BROKERAGE_WITHDRAW_AUDIT_APPROVE;
             // 3.1 通过时佣金转余额
             if (BrokerageWithdrawTypeEnum.WALLET.getType().equals(withdraw.getType())) {
-                // todo 疯狂：
+                PayWalletRespDTO wallet = payWalletApi.getWalletByUserId(withdraw.getUserId());
+                payWalletApi.addWallet(new PayWalletCreateReqDto()
+                        .setWalletId(wallet.getId())
+                        .setBizType(PayWalletBizTypeEnum.WITHDRAW)
+                        .setBizId(withdraw.getId().toString())
+                        .setPrice(withdraw.getPrice())
+                        .setTitle("分佣提现"));
+                rows = brokerageWithdrawMapper.updateByIdAndStatus(id, BrokerageWithdrawStatusEnum.AUDIT_SUCCESS.getStatus(),
+                        new BrokerageWithdrawDO().setStatus(BrokerageWithdrawStatusEnum.WITHDRAW_SUCCESS.getStatus()).setAuditReason(auditReason).setAuditTime(LocalDateTime.now()));
+                if (rows == 0) {
+                    throw exception(BROKERAGE_WITHDRAW_STATUS_NOT_AUDITING);
+                }
             }else if (BrokerageWithdrawTypeEnum.ALIPAY_SMALL.getType().equals(withdraw.getType())){
                 //获取openid
                 SocialUserRespDTO socialUser = socialUserApi.getSocialUserByUserId(UserTypeEnum.MEMBER.getValue(), withdraw.getUserId(), SocialTypeEnum.WECHAT_MINI_APP.getType());

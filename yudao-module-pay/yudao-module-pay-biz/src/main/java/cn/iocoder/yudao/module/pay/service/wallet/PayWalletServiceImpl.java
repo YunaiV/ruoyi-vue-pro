@@ -200,6 +200,9 @@ public class PayWalletServiceImpl implements PayWalletService {
                 case UPDATE_BALANCE: // 更新余额
                     walletMapper.updateWhenRecharge(payWallet.getId(), price);
                     break;
+                case WITHDRAW:
+                    walletMapper.updateWhenRecharge(payWallet.getId(), price);
+                    break;
                 default: {
                     // TODO 其它类型待实现
                     throw new UnsupportedOperationException("待实现");
