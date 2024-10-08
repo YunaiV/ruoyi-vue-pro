@@ -23,7 +23,7 @@ public enum Domain {
     }
 
     // Method to get the string value
-    public String getValue() {
+    public String toString() {
         return value;
     }
 

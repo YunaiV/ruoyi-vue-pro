@@ -98,21 +98,6 @@ public class AiService {
         return Stream.concat(Stream.of(response), moreResponse);
     }
 
-//    public Stream<AiResponse> getAllReponses(String url) {
-//        return Stream.iterate(
-//            getReponses(url), Objects::nonNull,
-//            page -> {
-//                var next = page.getNext();
-//                if (next != null) {
-//                    log.debug("have next");
-//                    return getReponses(next);
-//                } else {
-//                    log.debug("no next page");
-//                    return null;
-//                }
-//            }
-//        );
-//    }
 
     public Stream<ErpCountry> getCountries() {
         String endUrl = "/api/countriesiso/";

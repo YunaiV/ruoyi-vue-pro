@@ -26,19 +26,25 @@ public class EsbController {
         service.printAllBeans();
     }
 
-    @PostMapping("/dataCollect")
-    public String dataCollect(LocalDate scheduleDate, String database) {
-        if (database == null) {
-            service.dataCollect(scheduleDate);
-        } else {
-            service.dataCollect(scheduleDate, Domain.fromString(database));
-        }
-        return "success";
-    }
+//    @PostMapping("/dataCollect")
+//    public String dataCollect(LocalDate scheduleDate, String database) {
+//        if (database == null) {
+//            service.dataCollect(scheduleDate);
+//        } else {
+//            service.dataCollect(scheduleDate, Domain.fromString(database));
+//        }
+//        return "success";
+//    }
 
     @PostMapping("/syncDepartments")
     public String syncDepartments() {
         service.syncDepartments();
+        return "success";
+    }
+
+    @PostMapping("/syncUsers")
+    public String syncUsers() {
+        service.syncUsers();
         return "success";
     }
 

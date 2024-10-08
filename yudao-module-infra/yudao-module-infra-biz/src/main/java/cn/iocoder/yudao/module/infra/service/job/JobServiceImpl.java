@@ -135,6 +135,15 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
+    public void triggerJob(Long id, String param) throws SchedulerException {
+        // 校验存在
+        JobDO job = validateJobExists(id);
+
+        // 触发 Quartz 中的 Job
+        schedulerManager.triggerJob(job.getId(), job.getHandlerName(), param);
+    }
+
+    @Override
     @Transactional(rollbackFor = Exception.class)
     public void syncJob() throws SchedulerException {
         // 1. 查询 Job 配置

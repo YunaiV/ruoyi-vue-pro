@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.framework.quartz.core.handler;
 
 import cn.hutool.core.date.LocalDateTimeUtil;
+import cn.hutool.core.exceptions.ExceptionUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.thread.ThreadUtil;
 import cn.iocoder.yudao.framework.quartz.core.enums.JobDataKeyEnum;
@@ -79,7 +80,9 @@ public class JobHandlerInvoker extends QuartzJobBean {
         // 处理是否成功
         boolean success = exception == null;
         if (!success) {
-            data = getRootCauseMessage(exception);
+//            data = getRootCauseMessage(exception);
+            var stackString = ExceptionUtil.stacktraceToString(exception);
+            data = stackString.length() > 4000? stackString.substring(0,4000) : stackString;
         }
         // 更新日志
         try {

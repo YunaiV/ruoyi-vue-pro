@@ -6,7 +6,7 @@ import com.somle.eccang.service.EccangService;
 import com.somle.erp.model.*;
 import com.somle.erp.model.product.ErpCountrySku;
 import com.somle.erp.model.product.ErpStyleSku;
-import com.somle.erp.service.ErpService;
+import com.somle.erp.service.ErpDepartmentService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -18,7 +18,7 @@ import java.util.stream.Stream;
 @Service
 public class EccangToErpConverter {
     @Autowired
-    ErpService esbService;
+    ErpDepartmentService esbService;
 
     @Autowired
     EccangService eccangService;

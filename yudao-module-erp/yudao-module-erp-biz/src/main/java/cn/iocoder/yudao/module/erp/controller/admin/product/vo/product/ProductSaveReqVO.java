@@ -18,6 +18,9 @@ public class ProductSaveReqVO {
     @NotEmpty(message = "产品名称不能为空")
     private String name;
 
+    @Schema(description = "图片URL", example = "https://www.iocoder.cn")
+    private String imageUrl;
+
     @Schema(description = "产品条码", requiredMode = Schema.RequiredMode.REQUIRED, example = "X110")
     @NotEmpty(message = "产品条码不能为空")
     private String barCode;
@@ -42,6 +45,18 @@ public class ProductSaveReqVO {
 
     @Schema(description = "保质期天数", example = "10")
     private Integer expiryDay;
+
+    @Schema(description = "材料（中文）")
+    private String material;
+
+    @Schema(description = "基础长度（cm）")
+    private BigDecimal length;
+
+    @Schema(description = "基础宽度（cm）")
+    private BigDecimal width;
+
+    @Schema(description = "基础高度（cm）")
+    private BigDecimal height;
 
     @Schema(description = "基础重量（kg）", example = "1.00")
     private BigDecimal weight;

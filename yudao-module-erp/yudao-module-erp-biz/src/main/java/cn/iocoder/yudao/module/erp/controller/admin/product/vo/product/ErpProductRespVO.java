@@ -21,6 +21,10 @@ public class ErpProductRespVO {
     @ExcelProperty("产品名称")
     private String name;
 
+    @Schema(description = "图片URL", example = "https://www.iocoder.cn")
+    @ExcelProperty("图片URL")
+    private String imageUrl;
+
     @Schema(description = "产品条码", requiredMode = Schema.RequiredMode.REQUIRED, example = "X110")
     @ExcelProperty("产品条码")
     private String barCode;
@@ -52,6 +56,22 @@ public class ErpProductRespVO {
     @Schema(description = "保质期天数", example = "10")
     @ExcelProperty("保质期天数")
     private Integer expiryDay;
+
+    @Schema(description = "材料（中文）")
+    @ExcelProperty("材料（中文）")
+    private String material;
+
+    @Schema(description = "基础长度（cm）")
+    @ExcelProperty("基础长度（cm）")
+    private BigDecimal length;
+
+    @Schema(description = "基础宽度（cm）")
+    @ExcelProperty("基础宽度（cm）")
+    private BigDecimal width;
+
+    @Schema(description = "基础高度（cm）")
+    @ExcelProperty("基础高度（cm）")
+    private BigDecimal height;
 
     @Schema(description = "基础重量（kg）", example = "1.00")
     @ExcelProperty("基础重量（kg）")

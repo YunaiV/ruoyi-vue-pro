@@ -1,7 +1,7 @@
 package com.somle.erp.controller;
 
 import com.somle.erp.model.ErpDepartment;
-import com.somle.erp.service.ErpService;
+import com.somle.erp.service.ErpDepartmentService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.MessageChannel;
@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 public class ErpController {
 
     @Autowired
-    ErpService erpService;
+    ErpDepartmentService erpDepartmentService;
 
     @Autowired
     private MessageChannel productChannel;
@@ -54,7 +54,7 @@ public class ErpController {
 
     @GetMapping("/departmentTree")
     public ErpDepartment getEsbDepartmentTree() {
-        return erpService.getEsbDepartmentTree(53111133l);
+        return erpDepartmentService.getEsbDepartmentTree(53111133l);
     }
 
 

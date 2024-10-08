@@ -2,6 +2,7 @@ package com.somle.eccang.service;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -9,6 +10,7 @@ import java.util.Map;
 import java.util.stream.Stream;
 
 import com.somle.eccang.model.*;
+import com.somle.framework.common.util.general.CoreUtils;
 import com.somle.framework.common.util.json.JsonUtils;
 import com.somle.framework.common.util.json.JSONObject;
 
@@ -103,7 +105,7 @@ public class EccangService {
     private EccangResponse getResponse(Object payload, String endpoint){
         String url = "http://openapi-web.eccang.com/openApi/api/unity";
 
-        EccangResponse responseFinal = WebUtils.retryTemplate.execute(ctx -> {
+        EccangResponse responseFinal = CoreUtils.retry(ctx -> {
             JSONObject requestBody = requestBody(payload, endpoint);
             EccangResponse eccangResponse = limiter.executeWithLimiter(()->{
                 var response = WebUtils.postRequest(url, Map.of(), Map.of(), requestBody);
@@ -240,20 +242,7 @@ public class EccangService {
         return getOrderPages(query);
     }
 
-    public Stream<BizContent> getOrderWarehouseShipPage(LocalDateTime startTime, LocalDateTime endTime) {
-        var query = EccangOrderVO.builder()
-            .warehouseShipDateStart(startTime)
-            .warehouseShipDateEnd(endTime)
-            .build();
-        return getOrderPages(query);
-    }
 
-    public Stream<BizContent> getOrderUnShipPage() {
-        var query = EccangOrderVO.builder()
-            .status("3")
-            .build();
-        return getOrderPages(query);
-    }
 
 
     public Stream<BizContent> getOrderPages(EccangOrderVO order) {

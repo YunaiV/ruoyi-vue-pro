@@ -12,14 +12,12 @@ import com.somle.eccang.model.EccangResponse;
 import com.somle.eccang.service.EccangService;
 import com.somle.erp.model.product.ErpCountrySku;
 import com.somle.erp.service.ErpProductService;
-import com.somle.erp.service.ErpService;
 import com.somle.esb.converter.DingTalkToErpConverter;
 import com.somle.esb.converter.EccangToErpConverter;
 import com.somle.esb.converter.ErpToEccangConverter;
 import com.somle.esb.converter.ErpToKingdeeConverter;
 import com.somle.esb.model.Domain;
 import com.somle.esb.model.OssData;
-import com.somle.framework.common.util.general.CoreUtils;
 import com.somle.kingdee.service.KingdeeService;
 import com.somle.matomo.service.MatomoService;
 import lombok.extern.slf4j.Slf4j;
@@ -35,7 +33,6 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Arrays;
-import java.util.stream.IntStream;
 
 @Slf4j
 @Service
@@ -114,253 +111,8 @@ public class EsbService {
 
 
 
-//    @PostConstruct
-//    public void scheduleJob() throws SchedulerException {
-//        JobDetail dataJobDetail = JobBuilder.newJob(DataJob.class)
-//            .withIdentity("dataJob")
-//            .storeDurably()  // Keeps the job even if no trigger is associated
-//            .build();
-//
-//        Trigger dataTrigger = TriggerBuilder.newTrigger()
-//            .forJob(dataJobDetail)
-//            .withIdentity("dataTrigger")
-////            .withSchedule(CronScheduleBuilder.cronSchedule("0 10 1 * * ?"))
-//            .withSchedule(CronScheduleBuilder.cronSchedule("0/1 * * * * ?"))
-//            .build();
-//
-//        // Schedule the job using the scheduler
-//        scheduler.scheduleJob(dataJobDetail, dataTrigger);
-//    }
-
-
-
-
-    
-    // @PostConstruct
-    // public void init() {
-    // }
-
-    // @EventListener(ApplicationReadyEvent.class)
-    // @Transactional(readOnly = true)
-    // public void test() {
-    //     EsbCountrySku x = countrySkuRepository.findAll().get(0);
-    //     log.debug(x.getStyleSku().toString());
-    // }
-
-//    @Scheduled(cron = "0 10 1 * * *") // Executes at 1:10 AM every day
-//    @Scheduled(fixedDelay = 999999999, initialDelay = 5000)
-    public void dataCollect() {
-        LocalDate scheduleDate = LocalDate.now();
-        dataCollect(scheduleDate);
-    }
-
-    public void dataCollect(Domain domain) {
-        LocalDate scheduleDate = LocalDate.now();
-        dataCollect(scheduleDate);
-    }
-
-
-    public void dataCollect(LocalDate startScheduleDate, LocalDate endScheduleDate) {
-        LocalDate scheduleDate = startScheduleDate;
-        while (! scheduleDate.isAfter(endScheduleDate)) {
-            dataCollect(scheduleDate);
-            scheduleDate = scheduleDate.plusDays(1);
-        }
-    }
-
-    public void dataCollect(LocalDate startScheduleDate, LocalDate endScheduleDate, Domain domain) {
-        LocalDate scheduleDate = startScheduleDate;
-        while (! scheduleDate.isAfter(endScheduleDate)) {
-            dataCollect(scheduleDate, domain);
-            scheduleDate = scheduleDate.plusDays(1);
-        }
-    }
-
-    public void dataCollect(LocalDate scheduleDate) {
-        Arrays.stream(Domain.values()).forEach(domain->{dataCollect(scheduleDate, domain);});
-    }
-
-
-    public void dataCollect(LocalDate scheduleDate, Domain domain) {
-        LocalDate today = scheduleDate;
-        LocalDate yesterday = today.minusDays(1);
-        LocalDate beforeYesterday = today.minusDays(2);
-        LocalDateTime yesterdayFirstSecond = yesterday.atStartOfDay();
-        LocalDateTime yesterdayLastSecond = today.atStartOfDay().minusSeconds(1);
-
-        switch (domain) {
-            case AI:
-                dataChannel.send(org.springframework.messaging.support.MessageBuilder.withPayload(
-                    OssData.builder()
-                        .database(domain.getValue())
-                        .tableName("country")
-                        .syncType("full")
-                        .requestTimestamp(System.currentTimeMillis())
-                        .folderDate(LocalDate.now())
-                        .content(aiService.getCountries().toList())
-                        .headers(null)
-                        .build()
-                ).build());
-
-                dataChannel.send(org.springframework.messaging.support.MessageBuilder.withPayload(
-                    OssData.builder()
-                        .database(domain.getValue())
-                        .tableName("currency")
-                        .syncType("full")
-                        .requestTimestamp(System.currentTimeMillis())
-                        .folderDate(LocalDate.now())
-                        .content(aiService.getCurrencies().toList())
-                        .headers(null)
-                        .build()
-                ).build());
-
-                dataChannel.send(org.springframework.messaging.support.MessageBuilder.withPayload(
-                    OssData.builder()
-                        .database(domain.getValue())
-                        .tableName("person")
-                        .syncType("inc")
-                        .requestTimestamp(System.currentTimeMillis())
-                        .folderDate(yesterday)
-                        .content(aiService.getNames(yesterday).toList())
-                        .headers(null)
-                        .build()
-                ).build());
-
-                dataChannel.send(org.springframework.messaging.support.MessageBuilder.withPayload(
-                    OssData.builder()
-                        .database(domain.getValue())
-                        .tableName("address")
-                        .syncType("inc")
-                        .requestTimestamp(System.currentTimeMillis())
-                        .folderDate(yesterday)
-                        .content(aiService.getAddresses(yesterday).toList())
-                        .headers(null)
-                        .build()
-                ).build());
-
-                break;
-
-            case ECCANG:
-                dataChannel.send(MessageBuilder.withPayload(
-                    OssData.builder()
-                        .database(domain.getValue())
-                        .tableName("warehouse")
-                        .syncType("full")
-                        .requestTimestamp(System.currentTimeMillis())
-                        .folderDate(today)
-                        .content(eccangService.getWarehouseList())
-                        .headers(null)
-                        .build()
-                ).build());
-
-                eccangService.getOrderPlatformShipPage(yesterdayFirstSecond, yesterdayLastSecond)
-                    .forEach(page -> {
-                        OssData data = OssData.builder()
-                            .database(domain.getValue())
-                            .tableName("order_platform_ship")
-                            .syncType("inc")
-                            .requestTimestamp(System.currentTimeMillis())
-                            .folderDate(yesterday)
-                            .content(page)
-                            .headers(null)
-                            .build();
-                        dataChannel.send(MessageBuilder.withPayload(data).build());
-                    });
-
-                eccangService.getOrderWarehouseShipPage(yesterdayFirstSecond, yesterdayLastSecond)
-                    .forEach(page -> {
-                        OssData data = OssData.builder()
-                            .database(domain.getValue())
-                            .tableName("order_warehouse_ship")
-                            .syncType("inc")
-                            .requestTimestamp(System.currentTimeMillis())
-                            .folderDate(yesterday)
-                            .content(page)
-                            .headers(null)
-                            .build();
-                        dataChannel.send(MessageBuilder.withPayload(data).build());
-                    });
-
-                eccangService.getOrderUnShipPage()
-                    .forEach(page -> {
-                        OssData data = OssData.builder()
-                            .database(domain.getValue())
-                            .tableName("order_unship")
-                            .syncType("inc")
-                            .requestTimestamp(System.currentTimeMillis())
-                            .folderDate(yesterday)
-                            .content(page)
-                            .headers(null)
-                            .build();
-                        dataChannel.send(MessageBuilder.withPayload(data).build());
-                    });
-
-                eccangService.getInventoryBatchLog(yesterdayFirstSecond, yesterdayLastSecond)
-                    .forEach(page -> {
-                        CoreUtils.sleep(2000);
-                        OssData data = OssData.builder()
-                            .database(domain.getValue())
-                            .tableName("stock_log")
-                            .syncType("inc")
-                            .requestTimestamp(System.currentTimeMillis())
-                            .folderDate(yesterday)
-                            .content(page)
-                            .headers(null)
-                            .build();
-                        dataChannel.send(MessageBuilder.withPayload(data).build());
-                    });
-
-                break;
-
-            case MATOMO:
-                IntStream.range(1, 7).boxed().forEach(idSite -> {
-                    OssData data = OssData.builder()
-                        .database(domain.getValue())
-                        .tableName("visit")
-                        .syncType("inc")
-                        .requestTimestamp(System.currentTimeMillis())
-                        .folderDate(yesterday)
-                        .content(matomoService.getVisits(idSite, yesterday).toList())
-                        .headers(null)
-                        .build();
-                    dataChannel.send(org.springframework.messaging.support.MessageBuilder.withPayload(data).build());
-                });
-
-                break;
-
-            case AMAZONAD:
-                amazonService.adClient.getAllAdReport(beforeYesterday)
-                    .forEach(page -> {
-                        OssData data = OssData.builder()
-                            .database(domain.getValue())
-                            .tableName("ad_report")
-                            .syncType("inc")
-                            .requestTimestamp(System.currentTimeMillis())
-                            .folderDate(beforeYesterday)
-                            .content(page)
-                            .headers(null)
-                            .build();
-                        dataChannel.send(MessageBuilder.withPayload(data).build());
-                    });
-                break;
-
-            case AMAZONSP:
-                amazonService.spClient.getAllAsinReport(beforeYesterday).parallel()
-                    .forEach(page -> {
-                        OssData data = OssData.builder()
-                            .database(domain.getValue())
-                            .tableName("asin_report")
-                            .syncType("inc")
-                            .requestTimestamp(System.currentTimeMillis())
-                            .folderDate(beforeYesterday)
-                            .content(page)
-                            .headers(null)
-                            .build();
-                        dataChannel.send(MessageBuilder.withPayload(data).build());
-                    });
-                break;
-
-        }
+    public void send(OssData data) {
+        dataChannel.send(MessageBuilder.withPayload(data).build());
     }
 
 

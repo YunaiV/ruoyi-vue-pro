@@ -33,6 +33,10 @@ public class ErpProductDO extends BaseDO {
      */
     private String name;
     /**
+     * 图片URL
+     */
+    private String imageUrl;
+    /**
      * 产品条码
      */
     private String barCode;
@@ -66,6 +70,22 @@ public class ErpProductDO extends BaseDO {
      * 保质期天数
      */
     private Integer expiryDay;
+    /**
+     * 材料（中文）
+     */
+    private String material;
+    /**
+     * 基础长度（cm）
+     */
+    private BigDecimal length;
+    /**
+     * 基础宽度（cm）
+     */
+    private BigDecimal width;
+    /**
+     * 基础高度（cm）
+     */
+    private BigDecimal height;
     /**
      * 基础重量（kg）
      */

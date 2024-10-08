@@ -1,18 +1,9 @@
 package com.somle.erp.service;
 
-import com.somle.erp.model.product.ErpCountrySku;
 import com.somle.erp.model.ErpDepartment;
-import com.somle.erp.model.product.ErpStyleSku;
-import com.somle.erp.repository.ErpCountrySkuRepository;
 import com.somle.erp.repository.ErpDepartmentRepository;
-import com.somle.erp.repository.ErpStyleSkuRepository;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Example;
-import org.springframework.data.domain.ExampleMatcher;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -20,7 +11,7 @@ import java.util.stream.Stream;
 
 @Slf4j
 @Service
-public class ErpService {
+public class ErpDepartmentService {
 
 //    @Autowired
 //    MessageChannel productChannel;

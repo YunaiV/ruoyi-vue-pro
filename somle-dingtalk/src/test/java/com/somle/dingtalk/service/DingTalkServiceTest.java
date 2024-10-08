@@ -29,6 +29,11 @@ class DingTalkServiceTest extends BaseSpringTest {
         }
     }
 
+    @Test
+    void getDepartment() {
+        System.out.println(service.getDepartment(1l));
+    }
+
 
     @Test
     void getUserIds() {

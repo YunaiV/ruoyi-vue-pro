@@ -14,13 +14,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.Map;
 
 @Slf4j
 @Service
 public class AmazonService {
 
-    private AmazonAccount account;
+    public AmazonAccount account;
 
     public String authUrl = "https://api.amazon.com/auth/o2/token";
 
@@ -46,7 +47,7 @@ public class AmazonService {
 
     @PostConstruct
     public void init() {
-        account = accountRepository.findAll().get(0);
+        account = accountRepository.findAll().getFirst();
         spClient = new AmazonSpClient(account);
         adClient = new AmazonAdClient(account);
     }
@@ -57,10 +58,12 @@ public class AmazonService {
     //     // shopList = shopRepository.findAll().stream().map(shop->shop.getCountryCode()).toList();
     //     shopList = shopRepository.findAll();
     // }
-    @Scheduled(fixedDelay = 1800000, initialDelay = 1000)
+//    @Scheduled(fixedDelay = 1800000, initialDelay = 1000)
+    @Scheduled(cron = "0 0,30 * * * *")
     public void refreshAuth() {
-        account = accountRepository.findAll().get(0);
+//        var account = accountRepository.findAll().getFirst();
         for (AmazonSeller seller : account.getSellers()) {
+            seller.setSpExpireTime(LocalDateTime.now().plusSeconds(3600));
             seller.setSpAccessToken(
                 refreshAccessToken(
                     account.getSpClientId(),
@@ -69,6 +72,7 @@ public class AmazonService {
                 )
             );
 
+            seller.setAdExpireTime(LocalDateTime.now().plusSeconds(3600));
             seller.setAdAccessToken(
                 refreshAccessToken(
                     account.getAdClientId(),
@@ -78,8 +82,6 @@ public class AmazonService {
             );
         }
         accountRepository.save(account);
-        spClient.setAccount(account);
-        adClient.setAccount(account);
     }
 
     public String refreshAccessToken(String clientId, String clientSecret, String refreshToken) {

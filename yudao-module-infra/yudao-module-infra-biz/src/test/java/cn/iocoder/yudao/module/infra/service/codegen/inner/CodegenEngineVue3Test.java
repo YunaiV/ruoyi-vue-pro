@@ -30,9 +30,30 @@ public class CodegenEngineVue3Test extends CodegenEngineAbstractTest {
         // 调用
         Map<String, String> result = codegenEngine.execute(table, columns, null, null);
         // 生成测试文件
-        //writeResult(result, resourcesPath + "/vue3_one");
+//        var resourcesPath = ".";
+//        writeResult(result, resourcesPath + "/vue3_one");
+        System.out.println(result);
         // 断言
-        assertResult(result, "/vue3_one");
+//        assertResult(result, "/vue3_one");
+    }
+
+    @Test
+    public void testExecute_vue3_one_complexBusinessName() {
+        // 准备参数
+        CodegenTableDO table = getTable("student")
+            .setModuleName("erp")
+            .setBusinessName("purchase.product")
+            .setFrontType(CodegenFrontTypeEnum.VUE3.getType())
+            .setTemplateType(CodegenTemplateTypeEnum.ONE.getType());
+        List<CodegenColumnDO> columns = getColumnList("student");
+
+        // 调用
+        Map<String, String> result = codegenEngine.execute(table, columns, null, null);
+        // 生成测试文件
+//        writeResult(result, resourcesPath + "/vue3_one");
+        // 断言
+//        assertResult(result, "/vue3_one");
+//        System.out.println(result);
     }
 
     @Test

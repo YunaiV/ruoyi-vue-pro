@@ -4,6 +4,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Map;
 import java.util.concurrent.Callable;
@@ -12,7 +13,9 @@ import java.util.concurrent.TimeUnit;
 import java.util.zip.GZIPInputStream;
 
 import com.somle.framework.common.util.json.JsonUtils;
+import lombok.SneakyThrows;
 import org.apache.tomcat.util.http.fileupload.IOUtils;
+import org.springframework.retry.RetryCallback;
 import org.springframework.retry.support.RetryTemplate;
 import org.springframework.stereotype.Component;
 
@@ -36,11 +39,7 @@ public class WebUtils {
         .readTimeout(30, TimeUnit.SECONDS)
         .build();
 
-    public static final RetryTemplate retryTemplate = RetryTemplate.builder()
-        .maxAttempts(3)
-        .fixedBackoff(2000) // 2000 ms between retries
-        .retryOn(RuntimeException.class) // specify the exception to retry on
-        .build();
+
 
 
 
@@ -52,6 +51,7 @@ public class WebUtils {
         return urlBuilder.build().toString();
     }
 
+    @SneakyThrows
     public static Response sendRequest(String requestMethod, String url, Map<String, String> queryParams, Map<String, String> headers, Object payload) {
         log.debug("method: " + requestMethod);
         log.debug("url: " + url);
@@ -89,24 +89,14 @@ public class WebUtils {
                 break;
         }
 
-        Response response;
-        try {
-            response = client.newCall(request).execute();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-
-        return response;
+        return client.newCall(request).execute();
 
     }
 
+    @SneakyThrows
     public static String getBodyString(Response response) {
-        String responseString;
-        try {
-            responseString = response.body().string();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        assert response.body() != null;
+        String responseString = response.body().string();
         log.debug("response: " + responseString);
         return responseString;
     }
@@ -134,32 +124,29 @@ public class WebUtils {
         return sendRequest("POST", url, queryParams, headers, payload);
     }
 
+    @SneakyThrows
     public static <T> T urlToDict(String urlString, String compression, Class<T> objectClass) {
-        try {
-            URL url = new URL(urlString);
-            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-            connection.setRequestMethod("GET");
-            connection.setRequestProperty("Accept-Encoding", compression);
-            InputStream inputStream = connection.getInputStream();
-            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-            GZIPInputStream gzipInputStream = new GZIPInputStream(inputStream);
-            IOUtils.copy(gzipInputStream, byteArrayOutputStream);
-            byte[] decompressedData = byteArrayOutputStream.toByteArray();
-            String jsonString = new String(decompressedData);
-            log.debug(jsonString);
-            return JsonUtils.parseObject(jsonString, objectClass);
-        } catch (Exception e) {
-            log.error(compression);
-            throw new RuntimeException(e);
-        }
+        URL url = new URL(urlString);
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        connection.setRequestMethod("GET");
+        connection.setRequestProperty("Accept-Encoding", compression);
+        InputStream inputStream = connection.getInputStream();
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        GZIPInputStream gzipInputStream = new GZIPInputStream(inputStream);
+        IOUtils.copy(gzipInputStream, byteArrayOutputStream);
+        String jsonString = byteArrayOutputStream.toString();
+        log.debug(jsonString);
+        return JsonUtils.parseObject(jsonString, objectClass);
     }
 
-    public static <T> T parallelRun(int parallelism, Callable<T> codeBlock) {
-        ForkJoinPool customThreadPool = new ForkJoinPool(parallelism);
-        var result = customThreadPool.submit(codeBlock).join();
-        customThreadPool.shutdown();
-        return result;
-    }
+//    public static <T> T parallelRun(int parallelism, Callable<T> codeBlock) {
+//        ForkJoinPool customThreadPool = new ForkJoinPool(parallelism);
+//        var result = customThreadPool.submit(codeBlock).join();
+//        customThreadPool.shutdown();
+//        return result;
+//    }
+
+    // TODO: a general method to handle http exception (429, timeout etc)
 
 
 }

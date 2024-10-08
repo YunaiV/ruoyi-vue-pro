@@ -94,7 +94,7 @@ public class CodegenEngine {
             .build();
 
     /**
-     * 后端的配置模版
+     * 前端的配置模版
      *
      * key1：UI 模版的类型 {@link CodegenFrontTypeEnum#getType()}
      * key2：模板在 resources 的地址
@@ -225,7 +225,16 @@ public class CodegenEngine {
 
         // 2. 执行生成
         Map<String, String> result = Maps.newLinkedHashMapWithExpectedSize(templates.size()); // 有序
+        var businessNameDot = table.getBusinessName();
+        var businessNameSlash = table.getBusinessName().replaceAll("\\.", "/");
         templates.forEach((vmPath, filePath) -> {
+            table.setBusinessName(businessNameSlash);
+            if (isBackTemplate(vmPath)) {
+                table.setBusinessName(businessNameDot);
+            }
+            if (isXmlTemplate(vmPath)) {
+                return;
+            }
             // 2.1 特殊：主子表专属逻辑
             if (isSubTemplate(vmPath)) {
                 generateSubCode(table, subTables, result, vmPath, filePath, bindingMap);
@@ -285,6 +294,14 @@ public class CodegenEngine {
         }
         bindingMap.remove("subIndex");
     }
+
+//    private void generateSqlCode(Map<String, String> result, String vmPath,
+//                              String filePath, Map<String, Object> bindingMap) {
+//        var businessNameOriginal = ((CodegenTableDO) bindingMap.get("table")).getBusinessName();
+//        var businessNameOriginal
+//
+//
+//    }
 
     /**
      * 格式化生成后的代码
@@ -416,14 +433,14 @@ public class CodegenEngine {
         // table 包含的字段
         CodegenTableDO table = (CodegenTableDO) bindingMap.get("table");
         filePath = StrUtil.replace(filePath, "${table.moduleName}", table.getModuleName());
-        filePath = StrUtil.replace(filePath, "${table.businessName}", table.getBusinessName());
+        filePath = StrUtil.replace(filePath, "${table.businessName}", table.getBusinessName().replaceAll("\\.", "/"));
         filePath = StrUtil.replace(filePath, "${table.className}", table.getClassName());
         // 特殊：主子表专属逻辑
         Integer subIndex = (Integer) bindingMap.get("subIndex");
         if (subIndex != null) {
             CodegenTableDO subTable = ((List<CodegenTableDO>) bindingMap.get("subTables")).get(subIndex);
             filePath = StrUtil.replace(filePath, "${subTable.moduleName}", subTable.getModuleName());
-            filePath = StrUtil.replace(filePath, "${subTable.businessName}", subTable.getBusinessName());
+            filePath = StrUtil.replace(filePath, "${subTable.businessName}", subTable.getBusinessName().replaceAll("\\.", "/"));
             filePath = StrUtil.replace(filePath, "${subTable.className}", subTable.getClassName());
             filePath = StrUtil.replace(filePath, "${subSimpleClassName}",
                     ((List<String>) bindingMap.get("subSimpleClassNames")).get(subIndex));
@@ -501,6 +518,22 @@ public class CodegenEngine {
 
     private static boolean isListReqVOTemplate(String path) {
         return path.contains("listReqVO");
+    }
+
+    private static boolean isXmlTemplate(String path) {
+        return path.contains("mapper.xml");
+    }
+
+    private static boolean isFrontTemplate(String path) {
+        return path.startsWith("codegen/vue");
+    }
+
+    private static boolean isBackTemplate(String path) {
+        return path.startsWith("codegen/java/");
+    }
+
+    private static boolean isSqlTemplate(String path) {
+        return path.startsWith("codegen/sql/");
     }
 
 }

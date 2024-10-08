@@ -1,3 +1,5 @@
+
+
 spring:
   main:
     lazy-initialization: true # 开启懒加载，加快速度
@@ -23,7 +25,6 @@ spring:
 logging:
   level:
     com.somle: DEBUG
-
 --- #################### 数据库相关配置 ####################
 
 spring:

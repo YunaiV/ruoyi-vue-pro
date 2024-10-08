@@ -20,6 +20,8 @@ import org.springframework.web.client.HttpClientErrorException;
 
 import jakarta.persistence.*;
 
+import java.io.IOException;
+import java.net.http.HttpConnectTimeoutException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Map;
@@ -124,49 +126,37 @@ public class AmazonSpClient {
         String reportStatusUrl = endPoint + "/reports/2021-06-30/reports/" + reportId;
         String docId = null;
         while (!"DONE".equals(status)) {
-            try {
-                log.info("requesting for document id");
-                // ResponseEntity<JSONObject> response = restTemplate.exchange(reportStatusUrl, HttpMethod.GET, new HttpEntity<>(headers), JSONObject.class);
-                // JSONObject responseBody = response.getBody();
-                var response = WebUtils.getRequest(reportStatusUrl, Map.of(), headers);
+            log.info("requesting for document id");
+            // ResponseEntity<JSONObject> response = restTemplate.exchange(reportStatusUrl, HttpMethod.GET, new HttpEntity<>(headers), JSONObject.class);
+            // JSONObject responseBody = response.getBody();
+            var response = WebUtils.getRequest(reportStatusUrl, Map.of(), headers);
 
-                switch (response.code()) {
-                    case 200:
-                        break;
-                    case 429:
-                        log.info("Received 429 Too Many Requests. Retrying...");
-                        CoreUtils.sleep(3000);
-                        continue;
-                    default:
-                        throw new RuntimeException("Http error code: " + response.toString() + response.body().string());
-                }
-                var responseBody = WebUtils.parseResponse(response, JSONObject.class);
-                status = responseBody.getString("processingStatus");
-                log.info(status);
-                switch (status) {
-                    case "CANCELLED":
-                        result.put("Message", "No data returned, get report fail.");
-                        return result;
-                    case "IN_QUEUE":
-                        break;
-                    case "IN_PROGRESS":
-                        break;
-                    case "DONE":
-                        docId = responseBody.getString("reportDocumentId");
-                        break;
-                    default:
-                        throw new RuntimeException("Unknown status code: " + status);
-                }
-//            } catch (HttpClientErrorException.TooManyRequests e) {
-//                log.info("Received 429 Too Many Requests. Retrying...");
-//                try {
-//                    Thread.sleep(3000); // Sleep for 3000 miliseconds before retrying
-//                } catch (InterruptedException ie) {
-//                    log.info("Thread interrupted, restoring");
-//                    Thread.currentThread().interrupt(); // Restore interrupted status
-//                }
-            } catch (Exception e) {
-                throw new RuntimeException(e);
+            switch (response.code()) {
+                case 200:
+                    break;
+                case 429:
+                    log.info("Received 429 Too Many Requests. Retrying...");
+                    CoreUtils.sleep(3000);
+                    continue;
+                default:
+                    throw new RuntimeException("Http error code: " + response + response.body());
+            }
+            var responseBody = WebUtils.parseResponse(response, JSONObject.class);
+            status = responseBody.getString("processingStatus");
+            log.info(status);
+            switch (status) {
+                case "CANCELLED":
+                    result.put("Message", "No data returned, get report fail.");
+                    return result;
+                case "IN_QUEUE":
+                    break;
+                case "IN_PROGRESS":
+                    break;
+                case "DONE":
+                    docId = responseBody.getString("reportDocumentId");
+                    break;
+                default:
+                    throw new RuntimeException("Unknown status code: " + status);
             }
 
         }
@@ -196,8 +186,7 @@ public class AmazonSpClient {
 
         // Use util to process the document URL
         result = WebUtils.urlToDict(docUrl, "gzip", JSONObject.class);
-        // requestDict = {'headers': headers, 'body': payload};
-        // return requestDict, contentDict;
+
 
         return result;
         
