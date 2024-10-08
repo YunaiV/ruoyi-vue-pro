@@ -102,8 +102,7 @@ public class BpmTaskCandidateInvoker {
         String param = BpmnModelUtils.parseCandidateParam(execution.getCurrentFlowElement());
         // 1.1 计算任务的候选人
         Set<Long> userIds = getCandidateStrategy(strategy).calculateUsers(execution, param);
-        removeDisableUsers(userIds);
-        // 1.2 移除被禁用的用户
+        // 1.2 移除被禁用的用户 TODO @芋艿 在 calculateUsers 方法中默认已经移除了被禁用的用户, 这里还需要移除被禁用的用户吗?
         removeDisableUsers(userIds);
 
         // 2. 候选人为空时，根据“审批人为空”的配置补充
