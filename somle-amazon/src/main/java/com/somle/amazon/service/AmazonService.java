@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.Map;
 
 @Slf4j
@@ -62,6 +63,7 @@ public class AmazonService {
     public void refreshAuth() {
 //        var account = accountRepository.findAll().getFirst();
         for (AmazonSeller seller : account.getSellers()) {
+            seller.setSpExpireTime(LocalDateTime.now().plusSeconds(3600));
             seller.setSpAccessToken(
                 refreshAccessToken(
                     account.getSpClientId(),
@@ -70,6 +72,7 @@ public class AmazonService {
                 )
             );
 
+            seller.setAdExpireTime(LocalDateTime.now().plusSeconds(3600));
             seller.setAdAccessToken(
                 refreshAccessToken(
                     account.getAdClientId(),
@@ -79,8 +82,6 @@ public class AmazonService {
             );
         }
         accountRepository.save(account);
-//        spClient.setAccount(account);
-//        adClient.setAccount(account);
     }
 
     public String refreshAccessToken(String clientId, String clientSecret, String refreshToken) {

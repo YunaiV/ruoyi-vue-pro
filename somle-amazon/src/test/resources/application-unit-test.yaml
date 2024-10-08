@@ -19,7 +19,8 @@ spring:
 #        hbm2ddl:
 #          import_files: ""
     hibernate:
-      ddl-auto: update
+      ddl-auto: none
+#      ddl-auto: create
 #      ddl-auto: create-drop
       # format_sql: true
     # show-sql: true

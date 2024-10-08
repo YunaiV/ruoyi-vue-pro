@@ -145,10 +145,13 @@ public class AmazonAdClient {
             CoreUtils.sleep(1000);
             String reportStatusUrl = endpoint + "/reporting/reports/" + reportId;
             log.info("Checking report status...");
+            var tokenExpireTime = shop.getSeller().getAdExpireTime();
             var response = WebUtils.getRequest(reportStatusUrl, Map.of(), generateHeaders(shop));
             switch (response.code()) {
                 case 200:
                     break;
+                case 401:
+                    throw new RuntimeException("Unauthorized error, token expired at " +  tokenExpireTime);
                 case 429:
                     log.info("Received 429 Too Many Requests. Retrying...");
                     CoreUtils.sleep(3000);
