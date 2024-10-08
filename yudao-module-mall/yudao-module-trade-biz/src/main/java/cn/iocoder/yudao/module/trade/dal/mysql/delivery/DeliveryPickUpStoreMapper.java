@@ -28,6 +28,10 @@ public interface DeliveryPickUpStoreMapper extends BaseMapperX<DeliveryPickUpSto
                 .inIfPresent(DeliveryPickUpStoreDO::getId, storeIds));
     }
 
+    default List<DeliveryPickUpStoreDO> selectStaffByUserId(Long userId){
+        return selectList(new LambdaQueryWrapperX<DeliveryPickUpStoreDO>()
+                .and(userId != null, w -> w.apply("FIND_IN_SET({0}, staff_ids)", userId)));
+    }
 }
 
 

@@ -7,6 +7,7 @@ import cn.iocoder.yudao.module.system.controller.admin.user.vo.user.UserPageReqV
 import cn.iocoder.yudao.module.system.dal.dataobject.user.AdminUserDO;
 import org.apache.ibatis.annotations.Mapper;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -34,6 +35,9 @@ public interface AdminUserMapper extends BaseMapperX<AdminUserDO> {
                 .inIfPresent(AdminUserDO::getDeptId, deptIds)
                 .orderByDesc(AdminUserDO::getId);
         if(userIds != null){
+            if(userIds.isEmpty()){
+                return new PageResult<AdminUserDO>().setList(new ArrayList<>()).setTotal(0L);
+            }
             adminUserDOLambdaQueryWrapperX.in(AdminUserDO::getId, userIds);
         }
         return selectPage(reqVO, adminUserDOLambdaQueryWrapperX);

@@ -3,14 +3,10 @@ package cn.iocoder.yudao.module.trade.controller.admin.delivery;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.security.core.LoginUser;
-import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import cn.iocoder.yudao.module.trade.controller.admin.delivery.vo.pickup.*;
 import cn.iocoder.yudao.module.trade.convert.delivery.DeliveryPickUpStoreConvert;
 import cn.iocoder.yudao.module.trade.dal.dataobject.delivery.DeliveryPickUpStoreDO;
-import cn.iocoder.yudao.module.trade.dal.dataobject.delivery.DeliveryPickUpStoreStaffDO;
 import cn.iocoder.yudao.module.trade.service.delivery.DeliveryPickUpStoreService;
-import cn.iocoder.yudao.module.trade.service.delivery.DeliveryPickUpStoreStaffService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -26,9 +22,7 @@ import java.util.Collection;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
-import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUser;
 import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
-import static java.util.stream.Collectors.toList;
 
 @Tag(name = "管理后台 - 自提门店")
 @RestController
@@ -38,9 +32,6 @@ public class DeliveryPickUpStoreController {
 
     @Resource
     private DeliveryPickUpStoreService deliveryPickUpStoreService;
-
-    @Resource
-    private DeliveryPickUpStoreStaffService deliveryPickUpStoreStaffService;
 
     @PostMapping("/create")
     @Operation(summary = "创建自提门店")
@@ -78,8 +69,8 @@ public class DeliveryPickUpStoreController {
     @GetMapping("/list-all-simple")
     @Operation(summary = "获得自提门店精简信息列表")
     public CommonResult<List<DeliveryPickUpStoreSimpleRespVO>> getSimpleDeliveryPickUpStoreList() {
-        List<DeliveryPickUpStoreStaffDO> storeStaffDOS = deliveryPickUpStoreStaffService.selectStaffByUserId(getLoginUserId());
-        List<Long> storeIds = storeStaffDOS.stream().map(DeliveryPickUpStoreStaffDO::getStoreId).toList();
+        List<DeliveryPickUpStoreDO> storeStaffDOS = deliveryPickUpStoreService.selectStaffByUserId(getLoginUserId());
+        List<Long> storeIds = storeStaffDOS.stream().map(DeliveryPickUpStoreDO::getId).toList();
         if(!storeIds.isEmpty()){
             List<DeliveryPickUpStoreDO> list = deliveryPickUpStoreService.getDeliveryPickUpStoreListByStatus(
                     CommonStatusEnum.ENABLE.getStatus(), storeIds);
@@ -120,8 +111,7 @@ public class DeliveryPickUpStoreController {
     @Parameter(name = "id", description = "编号", required = true, example = "1024")
     @PreAuthorize("@ss.hasPermission('trade:delivery:pick-up-store:query')")
     public CommonResult<DeliveryPickUpBindStoreStaffIdReqsVO> getDeliveryPickUpStoreStaff(@RequestParam("id") Long id) {
-        DeliveryPickUpStoreDO deliveryPickUpStore = deliveryPickUpStoreService.getDeliveryPickUpStore(id);
-        return success(deliveryPickUpStoreStaffService.getDeliveryPickUpStoreStaff(deliveryPickUpStore.getId(),deliveryPickUpStore.getName()));
+        return success(deliveryPickUpStoreService.getDeliveryPickUpStoreStaff(id));
     }
 
 
