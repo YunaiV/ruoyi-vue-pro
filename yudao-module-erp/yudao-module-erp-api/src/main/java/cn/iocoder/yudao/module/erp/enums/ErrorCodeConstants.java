@@ -6,6 +6,7 @@ import cn.iocoder.yudao.framework.common.exception.ErrorCode;
  * ERP 错误码枚举类
  * <p>
  * erp 系统，使用 1-030-000-000 段
+ * @author Administrator
  */
 public interface ErrorCodeConstants {
     ErrorCode CUSTOM_RULE_NOT_EXISTS = new ErrorCode(99999, "ERP 海关规则不存在");
@@ -26,7 +27,7 @@ public interface ErrorCodeConstants {
     ErrorCode PURCHASE_ORDER_NOT_APPROVE = new ErrorCode(1_030_101_006, "采购订单未审核，无法操作");
     ErrorCode PURCHASE_ORDER_ITEM_IN_FAIL_PRODUCT_EXCEED = new ErrorCode(1_030_101_007, "采购订单项({})超过最大允许入库数量({})");
     ErrorCode PURCHASE_ORDER_PROCESS_FAIL_EXISTS_IN = new ErrorCode(1_030_101_008, "反审核失败，已存在对应的采购入库单");
-ErrorCode PURCHASE_ORDER_ITEM_RETURN_FAIL_IN_EXCEED = new ErrorCode(1_030_101_009, "采购订单项({})超过最大允许退货数量({})");
+    ErrorCode PURCHASE_ORDER_ITEM_RETURN_FAIL_IN_EXCEED = new ErrorCode(1_030_101_009, "采购订单项({})超过最大允许退货数量({})");
     ErrorCode PURCHASE_ORDER_PROCESS_FAIL_EXISTS_RETURN = new ErrorCode(1_030_101_010, "反审核失败，已存在对应的采购退货单");
 
     // ========== ERP 采购入库（1-030-102-000） ==========
@@ -168,5 +169,9 @@ ErrorCode PURCHASE_ORDER_ITEM_RETURN_FAIL_IN_EXCEED = new ErrorCode(1_030_101_00
     ErrorCode FINANCE_RECEIPT_APPROVE_FAIL = new ErrorCode(1_030_602_003, "审核失败，只有未审核的收款单才能审核");
     ErrorCode FINANCE_RECEIPT_NO_EXISTS = new ErrorCode(1_030_602_004, "生成收款单号失败，请重新提交");
     ErrorCode FINANCE_RECEIPT_UPDATE_FAIL_APPROVE = new ErrorCode(1_030_602_005, "收款单({})已审核，无法修改");
+
+
+    // ========== ERP 产品要货单 1-030-603-000 ==========
+    ErrorCode PURCHASE_REQUEST_NOT_EXISTS = new ErrorCode(1_030_603_000, "ERP产品要货单不存在");
 
 }

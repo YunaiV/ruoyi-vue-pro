@@ -46,7 +46,7 @@ public class AiService {
         AiResponse response = WebUtils.postRequest(baseUrl + endUrl, Map.of(), headers, address, AiResponse.class);
 
     }
-    
+
 
     public Stream<AiName> getNames(LocalDate dataDate) {
         return getNew("/api/persons/", dataDate, AiName.class);

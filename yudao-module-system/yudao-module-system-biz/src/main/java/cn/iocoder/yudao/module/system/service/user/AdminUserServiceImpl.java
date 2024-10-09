@@ -322,7 +322,8 @@ public class AdminUserServiceImpl implements AdminUserService {
             return Collections.emptySet();
         }
         Set<Long> deptIds = convertSet(deptService.getChildDeptList(deptId), DeptDO::getId);
-        deptIds.add(deptId); // 包括自身
+        // 包括自身
+        deptIds.add(deptId);
         return deptIds;
     }
 

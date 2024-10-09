@@ -15,6 +15,7 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
 import okhttp3.Response;
+import org.junit.jupiter.params.shadow.com.univocity.parsers.annotations.Validate;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.net.SocketTimeoutException;
