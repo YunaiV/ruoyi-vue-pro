@@ -11,6 +11,7 @@ import com.somle.erp.service.ErpDepartmentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -25,7 +26,8 @@ public class ErpToEccangConverter {
         ErpStyleSku erpStyleSku = erpCountrySku.getStyleSku();
         Long deptId = erpStyleSku.getSaleDepartmentId();
         EccangProduct product = new EccangProduct();
-        List<ErpDepartment> path = erpDepartmentService.getDepartmentParents(deptId).toList().reversed();
+        List<ErpDepartment> path = erpDepartmentService.getDepartmentParents(deptId).toList();
+        Collections.reverse(path);
         // Integer level = path.size() - 1;
         EccangOrganization organization = eccangService.getOrganizationByNameEn(path.get(2).getId().toString());
 

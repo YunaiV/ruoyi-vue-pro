@@ -76,7 +76,7 @@ public class ErpDepartmentService {
 //        if (parentLevel >= depart.getLevel()) {
 //            throw new RuntimeException("parent level " + parentLevel + "should be lower than current level " + depart.getLevel());
 //        }
-//        var parent = departmentRepository.findByParentId(depart.getParentId()).getFirst();
+//        var parent = departmentRepository.findByParentId(depart.getParentId()).get(0);
 //        return parent.getLevel() == parentLevel ? parent : getParent(parent, parentLevel)
         return getParent(depart.getId(), parentLevel);
     }

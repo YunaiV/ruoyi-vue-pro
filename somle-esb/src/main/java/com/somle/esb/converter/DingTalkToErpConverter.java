@@ -115,7 +115,7 @@ public class DingTalkToErpConverter {
             mapping
                 .setType("department")
                 .setDomain("dingtalk")
-                .setExternalId(user.getDeptIdList().getFirst().toString());
+                .setExternalId(user.getDeptIdList().get(0).toString());
             mapping = mappingService.findMapping(mapping);
             erpUser
                 .setDeptId(mapping.getInternalId());

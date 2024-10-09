@@ -48,37 +48,37 @@ class AmazonServiceTest extends BaseSpringTest {
     @Test
     void concurency1() {
         log.info(amazonService.adClient.getShops().findFirst().get().getSeller().getAdAccessToken());
-        log.info(amazonService.adClient.account.getSellers().getFirst().getAdAccessToken());
+        log.info(amazonService.adClient.account.getSellers().get(0).getAdAccessToken());
         updateAccount1();
         log.info(amazonService.adClient.getShops().findFirst().get().getSeller().getAdAccessToken());
-        log.info(amazonService.adClient.account.getSellers().getFirst().getAdAccessToken());
+        log.info(amazonService.adClient.account.getSellers().get(0).getAdAccessToken());
     }
 
     void updateAccount1() {
-        var account = accountRepository.findAll().getFirst();
+        var account = accountRepository.findAll().get(0);
 //        log.info(String.valueOf(account.getSellers().size()));
         for (AmazonSeller seller : account.getSellers()) {
             seller.setAdAccessToken("updatedToken");
         }
         accountRepository.save(account);
-        amazonService.adClient.account = accountRepository.findAll().getFirst();
+        amazonService.adClient.account = accountRepository.findAll().get(0);
     }
 
     @Test
     void concurency2() {
         var shop = amazonService.adClient.getShops().findFirst().get();
         log.info(shop.getSeller().getAdAccessToken());
-        log.info(amazonService.adClient.account.getSellers().getFirst().getAdAccessToken());
+        log.info(amazonService.adClient.account.getSellers().get(0).getAdAccessToken());
         updateAccount2();
         log.info(shop.getSeller().getAdAccessToken());
-        log.info(amazonService.adClient.account.getSellers().getFirst().getAdAccessToken());
+        log.info(amazonService.adClient.account.getSellers().get(0).getAdAccessToken());
     }
 
     @Test
     void concurency3() throws InterruptedException {
         var shop = amazonService.adClient.getShops().findFirst().get();
         log.info(shop.getSeller().getAdAccessToken());
-        log.info(amazonService.adClient.account.getSellers().getFirst().getAdAccessToken());
+        log.info(amazonService.adClient.account.getSellers().get(0).getAdAccessToken());
         Thread t = new Thread(()->{
             Integer count = 0;
             while (!shop.getSeller().getAdAccessToken().equals("updatedToken")) {
@@ -90,7 +90,7 @@ class AmazonServiceTest extends BaseSpringTest {
         CoreUtils.sleep(1000);
         updateAccount2();
         log.info(shop.getSeller().getAdAccessToken());
-        log.info(amazonService.adClient.account.getSellers().getFirst().getAdAccessToken());
+        log.info(amazonService.adClient.account.getSellers().get(0).getAdAccessToken());
         t.join();
     }
 
@@ -98,7 +98,7 @@ class AmazonServiceTest extends BaseSpringTest {
     void concurency4() throws InterruptedException {
         var shop = amazonService.adClient.getShops().findFirst().get();
         log.info(shop.getSeller().getAdAccessToken());
-        log.info(amazonService.adClient.account.getSellers().getFirst().getAdAccessToken());
+        log.info(amazonService.adClient.account.getSellers().get(0).getAdAccessToken());
         Thread t = new Thread(()->{
             int i = 0;
             while (true) {
@@ -106,7 +106,7 @@ class AmazonServiceTest extends BaseSpringTest {
                 amazonService.refreshAuth();
                 log.info("loop " + String.valueOf(i));
                 log.info(shop.getSeller().getAdAccessToken());
-                log.info(amazonService.adClient.account.getSellers().getFirst().getAdAccessToken());
+                log.info(amazonService.adClient.account.getSellers().get(0).getAdAccessToken());
             }
         });
         t.start();

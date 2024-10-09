@@ -47,7 +47,7 @@ public class AmazonService {
 
     @PostConstruct
     public void init() {
-        account = accountRepository.findAll().getFirst();
+        account = accountRepository.findAll().get(0);
         spClient = new AmazonSpClient(account);
         adClient = new AmazonAdClient(account);
     }
@@ -61,7 +61,7 @@ public class AmazonService {
 //    @Scheduled(fixedDelay = 1800000, initialDelay = 1000)
     @Scheduled(cron = "0 0,30 * * * *")
     public void refreshAuth() {
-//        var account = accountRepository.findAll().getFirst();
+//        var account = accountRepository.findAll().get(0);
         for (AmazonSeller seller : account.getSellers()) {
             seller.setSpExpireTime(LocalDateTime.now().plusSeconds(3600));
             seller.setSpAccessToken(
