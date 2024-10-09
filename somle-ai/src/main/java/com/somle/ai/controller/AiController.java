@@ -27,16 +27,14 @@ public class AiController {
 
     @GetMapping("/getCountries")
     @ResponseBody
-    public List<ErpCountry> getCountries(
-    ) {
+    public List<ErpCountry> getCountries() {
         return aiService.getCountries().toList();
     }
 
+
     @GetMapping("/getNames")
     @ResponseBody
-    public List<AiName> getNames(
-        @RequestParam String dataDate
-    ) {
+    public List<AiName> getNames(@RequestParam String dataDate) {
         return aiService.getNames(LocalDate.parse(dataDate)).toList();
     }
 
