@@ -1,11 +1,9 @@
 package cn.iocoder.yudao.module.erp.dal.dataobject.purchase;
 
 import lombok.*;
-import java.util.*;
+
 import java.time.LocalDateTime;
-import java.time.LocalDateTime;
-import java.time.LocalDateTime;
-import java.time.LocalDateTime;
+
 import com.baomidou.mybatisplus.annotation.*;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 
@@ -22,7 +20,7 @@ import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class PurchaseRequestDO extends BaseDO {
+public class ErpPurchaseRequestDO extends BaseDO {
 
     /**
      * id
@@ -32,7 +30,7 @@ public class PurchaseRequestDO extends BaseDO {
     /**
      * 单据编号
      */
-    private String serial;
+    private String no;
     /**
      * 当日申请排序编号
      */
@@ -40,7 +38,7 @@ public class PurchaseRequestDO extends BaseDO {
     /**
      * 申请人
      */
-    private String applicant;
+    private Long applicant;
     /**
      * 申请部门
      */
@@ -48,11 +46,11 @@ public class PurchaseRequestDO extends BaseDO {
     /**
      * 单据日期
      */
-    private LocalDateTime date;
+    private LocalDateTime requestTime;
     /**
      * 审核状态(0:待审核，1:审核通过，2:审核未通过)
      */
-    private Integer applicationStatus;
+    private Integer status;
     /**
      * 关闭状态（0已关闭，1已开启）
      */

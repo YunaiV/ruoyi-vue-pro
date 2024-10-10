@@ -1,7 +1,6 @@
 package cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.request;
 
 import lombok.*;
-import java.util.*;
 import io.swagger.v3.oas.annotations.media.Schema;
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -13,10 +12,10 @@ import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public class PurchaseRequestPageReqVO extends PageParam {
+public class ErpPurchaseRequestPageReqVO extends PageParam {
 
     @Schema(description = "单据编号")
-    private String serial;
+    private String no;
 
     @Schema(description = "当日申请排序编号")
     private Integer num;
@@ -29,10 +28,10 @@ public class PurchaseRequestPageReqVO extends PageParam {
 
     @Schema(description = "单据日期")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
-    private LocalDateTime[] date;
+    private LocalDateTime[] requestTime;
 
     @Schema(description = "审核状态(0:待审核，1:审核通过，2:审核未通过)", example = "2")
-    private Integer applicationStatus;
+    private Integer status;
 
     @Schema(description = "关闭状态（0已关闭，1已开启）", example = "1")
     private Integer offStatus;

@@ -114,9 +114,9 @@ public class CodegenBuilder {
         // 第一步，_ 前缀的前面，作为 module 名字；第二步，moduleName 必须小写；
         table.setModuleName(subBefore(tableName, '_', false).toLowerCase());
         // 第一步，第一个 _ 前缀的后面，作为 module 名字; 第二步，可能存在多个 _ 的情况，转换成驼峰; 第三步，businessName 必须小写；
-        table.setBusinessName(toCamelCase(subAfter(tableName, '_', false)).toLowerCase());
+        table.setBusinessName(subAfter(tableName, '_', false).replaceAll("_",".").toLowerCase());
         // 驼峰 + 首字母大写；第一步，第一个 _ 前缀的后面，作为 class 名字；第二步，驼峰命名
-        table.setClassName(upperFirst(toCamelCase(subAfter(tableName, '_', false))));
+        table.setClassName(upperFirst(toCamelCase(tableName)));
         // 去除结尾的表，作为类描述
         table.setClassComment(StrUtil.removeSuffixIgnoreCase(table.getTableComment(), "表"));
         table.setTemplateType(CodegenTemplateTypeEnum.ONE.getType());
@@ -133,9 +133,12 @@ public class CodegenBuilder {
                 column.setJavaType(Integer.class.getSimpleName());
             }
             // 初始化 Column 列的默认字段
-            processColumnOperation(column); // 处理 CRUD 相关的字段的默认值
-            processColumnUI(column); // 处理 UI 相关的字段的默认值
-            processColumnExample(column); // 处理字段的 swagger example 示例
+            // 处理 CRUD 相关的字段的默认值
+            processColumnOperation(column);
+            // 处理 UI 相关的字段的默认值
+            processColumnUI(column);
+            // 处理字段的 swagger example 示例
+            processColumnExample(column);
         }
         return columns;
     }

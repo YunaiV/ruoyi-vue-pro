@@ -296,23 +296,16 @@ public class LocalDateTimeUtils {
         // 1. 找到枚举
         DateIntervalEnum intervalEnum = DateIntervalEnum.valueOf(interval);
         Assert.notNull(intervalEnum, "interval({}} 找不到对应的枚举", interval);
-
         // 2. 循环，生成时间范围
-        switch (intervalEnum) {
-            case DAY:
-                return LocalDateTimeUtil.format(startTime, DatePattern.NORM_DATE_PATTERN);
-            case WEEK:
-                return LocalDateTimeUtil.format(startTime, DatePattern.NORM_DATE_PATTERN)
-                        + StrUtil.format("(第 {} 周)", LocalDateTimeUtil.weekOfYear(startTime));
-            case MONTH:
-                return LocalDateTimeUtil.format(startTime, DatePattern.NORM_MONTH_PATTERN);
-            case QUARTER:
-                return StrUtil.format("{}-Q{}", startTime.getYear(), getQuarterOfYear(startTime));
-            case YEAR:
-                return LocalDateTimeUtil.format(startTime, DatePattern.NORM_YEAR_PATTERN);
-            default:
-                throw new IllegalArgumentException("Invalid interval: " + interval);
-        }
+        return switch (intervalEnum) {
+            case DAY -> LocalDateTimeUtil.format(startTime, DatePattern.NORM_DATE_PATTERN);
+            case WEEK -> LocalDateTimeUtil.format(startTime, DatePattern.NORM_DATE_PATTERN)
+                    + StrUtil.format("(第 {} 周)", LocalDateTimeUtil.weekOfYear(startTime));
+            case MONTH -> LocalDateTimeUtil.format(startTime, DatePattern.NORM_MONTH_PATTERN);
+            case QUARTER -> StrUtil.format("{}-Q{}", startTime.getYear(), getQuarterOfYear(startTime));
+            case YEAR -> LocalDateTimeUtil.format(startTime, DatePattern.NORM_YEAR_PATTERN);
+            default -> throw new IllegalArgumentException("Invalid interval: " + interval);
+        };
     }
 
 }

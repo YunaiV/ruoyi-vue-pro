@@ -171,7 +171,11 @@ public interface ErrorCodeConstants {
     ErrorCode FINANCE_RECEIPT_UPDATE_FAIL_APPROVE = new ErrorCode(1_030_602_005, "收款单({})已审核，无法修改");
 
 
-    // ========== ERP 产品要货单 1-030-603-000 ==========
-    ErrorCode PURCHASE_REQUEST_NOT_EXISTS = new ErrorCode(1_030_603_000, "ERP产品要货单不存在");
-
+    // ========== ERP 采购申请单 1-030-603-000 ==========
+    ErrorCode PURCHASE_REQUEST_NOT_EXISTS = new ErrorCode(1_030_603_000, "采购申请单不存在");
+    ErrorCode PURCHASE_REQUEST_SERIAL_NUM_OVERFLOW = new ErrorCode(1_030_603_001, "今日单据编号已超过最大值999999");
+    //该申请单已审核，无法修改
+    ErrorCode PURCHASE_REQUEST_UPDATE_FAIL_APPROVE = new ErrorCode(1_030_603_002, "采购申请单({})已审核，无法修改");
+    //该申请单已审核，无法删除
+    ErrorCode PURCHASE_REQUEST_DELETE_FAIL_APPROVE = new ErrorCode(1_030_603_003, "采购申请单({})已审核，无法删除");
 }

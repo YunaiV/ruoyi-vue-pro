@@ -23,9 +23,33 @@ public class DateUtils {
      */
     public static final long SECOND_MILLIS = 1000;
 
+    public static final String FORMAT_YEAR = "yyyyMMdd";
+
     public static final String FORMAT_YEAR_MONTH_DAY = "yyyy-MM-dd";
 
     public static final String FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND = "yyyy-MM-dd HH:mm:ss";
+    /**
+    * @Author Wqh
+    * @Description 将LocalDate转成String类型字符串，格式为yyyyMMdd
+    * @Date 14:34 2024/10/10
+    * @Param [date]
+    * @return java.lang.String
+    **/
+
+    public static String formatLocalDate(LocalDate date) {
+        return LocalDateTimeUtil.format(date, FORMAT_YEAR);
+    }
+
+    /**
+    * @Author Wqh
+    * @Description 将localDateTime转成string类型字符串，格式为yyyy-MM-dd HH:mm:ss
+    * @Date 10:12 2024/10/10
+    * @Param [date]
+    * @return java.lang.String
+    **/
+    public static String formatLocalDateTime(LocalDateTime date) {
+        return LocalDateTimeUtil.format(date, FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND);
+    }
 
     /**
      * 将 LocalDateTime 转换成 Date

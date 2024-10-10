@@ -1,16 +1,19 @@
 package cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.request;
 
+import cn.iocoder.yudao.framework.excel.core.annotations.DictFormat;
+import cn.iocoder.yudao.module.erp.enums.DictTypeConstants;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
-import java.util.*;
-import org.springframework.format.annotation.DateTimeFormat;
 import java.time.LocalDateTime;
+import java.util.List;
+
 import com.alibaba.excel.annotation.*;
 
 @Schema(description = "管理后台 - ERP采购申请单 Response VO")
 @Data
 @ExcelIgnoreUnannotated
-public class PurchaseRequestRespVO {
+public class ErpPurchaseRequestRespVO {
 
     @Schema(description = "id", requiredMode = Schema.RequiredMode.REQUIRED, example = "32561")
     @ExcelProperty("id")
@@ -18,7 +21,7 @@ public class PurchaseRequestRespVO {
 
     @Schema(description = "单据编号", requiredMode = Schema.RequiredMode.REQUIRED)
     @ExcelProperty("单据编号")
-    private String serial;
+    private String no;
 
     @Schema(description = "当日申请排序编号", requiredMode = Schema.RequiredMode.REQUIRED)
     @ExcelProperty("当日申请排序编号")
@@ -34,11 +37,12 @@ public class PurchaseRequestRespVO {
 
     @Schema(description = "单据日期", requiredMode = Schema.RequiredMode.REQUIRED)
     @ExcelProperty("单据日期")
-    private LocalDateTime date;
+    private LocalDateTime requestTime;
 
     @Schema(description = "审核状态(0:待审核，1:审核通过，2:审核未通过)", example = "2")
     @ExcelProperty("审核状态(0:待审核，1:审核通过，2:审核未通过)")
-    private Integer applicationStatus;
+    @DictFormat(DictTypeConstants.PURCHASE_REQUEST_APPLICATION_STATUS)
+    private Integer status;
 
     @Schema(description = "关闭状态（0已关闭，1已开启）", example = "1")
     @ExcelProperty("关闭状态（0已关闭，1已开启）")
@@ -60,4 +64,29 @@ public class PurchaseRequestRespVO {
     @ExcelProperty("创建时间")
     private LocalDateTime createTime;
 
+    @Schema(description = "采购订单项列表", requiredMode = Schema.RequiredMode.REQUIRED)
+    private List<Item> items;
+
+    @Data
+    public static class Item {
+
+        @Schema(description = "订单项编号", example = "11756")
+        private Long id;
+
+        @Schema(description = "产品编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "3113")
+        private Long productId;
+
+        @Schema(description = "产品数量", requiredMode = Schema.RequiredMode.REQUIRED, example = "100")
+        @NotNull(message = "产品数量不能为空")
+        private Integer count;
+
+        // ========== 关联字段 ==========
+
+        @Schema(description = "产品名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "巧克力")
+        private String productName;
+        @Schema(description = "产品条码", requiredMode = Schema.RequiredMode.REQUIRED, example = "A9985")
+        private String productBarCode;
+        @Schema(description = "产品单位名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "盒")
+        private String productUnitName;
+    }
 }

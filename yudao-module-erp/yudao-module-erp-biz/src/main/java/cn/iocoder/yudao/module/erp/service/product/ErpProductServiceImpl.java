@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.erp.service.product;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.ObjUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
@@ -41,8 +42,8 @@ public class ErpProductServiceImpl implements ErpProductService {
 
     @Override
     public Long createProduct(ProductSaveReqVO createReqVO) {
-        // TODO 芋艿：校验分类
-        validateProductCodeUnique(createReqVO.getBarCode());
+        //校验是否存在相同的产品编码
+        validateProductCodeUnique(null,createReqVO.getBarCode());
         // 插入
         ErpProductDO product = BeanUtils.toBean(createReqVO, ErpProductDO.class);
         productMapper.insert(product);
@@ -52,8 +53,8 @@ public class ErpProductServiceImpl implements ErpProductService {
 
     @Override
     public void updateProduct(ProductSaveReqVO updateReqVO) {
-        // TODO 芋艿：校验分类
-        validateProductCodeUnique(updateReqVO.getBarCode());
+        //校验相同的id下是否存在相同的产品编码
+        validateProductCodeUnique(updateReqVO.getId(),updateReqVO.getBarCode());
         // 校验存在
         validateProductExists(updateReqVO.getId());
         // 更新
@@ -94,12 +95,17 @@ public class ErpProductServiceImpl implements ErpProductService {
         }
     }
 
-    private void validateProductCodeUnique(String code) {
+    private void validateProductCodeUnique(Long id, String code) {
         ErpProductDO product = productMapper.selectByCode(code);
-        if (product == null) {
+        if (ObjUtil.isEmpty(product)){
             return;
-        } else {
+        }
+        // 如果 id 为空，说明不用比较是否为相同 id 的字典类型
+        if (id == null){
             throw exception(PRODUCT_CODE_DUPLICATE);
+        }
+        if (!product.getId().equals(id)) {
+            throw exception(PRODUCT_UNIT_NAME_DUPLICATE);
         }
     }
 

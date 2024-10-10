@@ -38,4 +38,20 @@ public interface GlobalErrorCodeConstants {
 
     ErrorCode UNKNOWN = new ErrorCode(999, "未知错误");
 
+
+    // ========== 数据库操作错误段 ==========
+    ErrorCode DB_INSERT_ERROR = new ErrorCode(1000, "数据库新增失败");
+    ErrorCode DB_UPDATE_ERROR = new ErrorCode(1001, "数据库更新失败");
+    ErrorCode DB_DELETE_ERROR = new ErrorCode(1002, "数据库删除失败");
+    ErrorCode DB_SELECT_ERROR = new ErrorCode(1003, "数据库查询失败");
+    ErrorCode DB_BATCH_INSERT_ERROR = new ErrorCode(1004, "数据库批量新增失败");
+    ErrorCode DB_BATCH_UPDATE_ERROR = new ErrorCode(1005, "数据库批量更新失败");
+    ErrorCode DB_BATCH_DELETE_ERROR = new ErrorCode(1006, "数据库批量删除失败");
+    ErrorCode DB_NOT_EXISTS = new ErrorCode(1007, "所查询的id信息不存在");
+
+
+    // ========== 文件错误段 ==========
+    ErrorCode FILE_NOT_EXISTS = new ErrorCode(1100, "文件不存在");
+
+
 }

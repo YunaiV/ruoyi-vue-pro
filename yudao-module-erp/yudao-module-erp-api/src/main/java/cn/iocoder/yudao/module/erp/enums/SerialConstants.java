@@ -6,5 +6,7 @@ package cn.iocoder.yudao.module.erp.enums;
 * @Date 11:40 2024/10/9
 **/
 public interface SerialConstants {
+    //采购申请前缀
+    String PURCHASE_REQUEST_PREFIX = "CGSQ";
 
 }
