@@ -74,4 +74,9 @@ public class BpmProcessInstanceCopyDO extends BaseDO {
      */
     private Long userId;
 
+    /**
+     * 抄送意见
+     */
+    private String reason;
+
 }

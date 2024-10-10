@@ -354,7 +354,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
 
         // 2. 抄送用户
         if (CollUtil.isNotEmpty(reqVO.getCopyUserIds())) {
-            processInstanceCopyService.createProcessInstanceCopy(reqVO.getCopyUserIds(), reqVO.getId());
+            processInstanceCopyService.createProcessInstanceCopy(reqVO.getCopyUserIds(), null, reqVO.getId());
         }
 
         // 情况一：被委派的任务，不调用 complete 去完成任务
@@ -866,6 +866,11 @@ public class BpmTaskServiceImpl implements BpmTaskService {
 
         // 4. 处理当前任务的父任务
         handleParentTaskIfSign(task.getParentTaskId());
+    }
+
+    @Override
+    public void copyTask(Long userId, BpmTaskCopyReqVO reqVO) {
+        processInstanceCopyService.createProcessInstanceCopy(reqVO.getCopyUserIds(), reqVO.getReason(), reqVO.getId());
     }
 
     /**
