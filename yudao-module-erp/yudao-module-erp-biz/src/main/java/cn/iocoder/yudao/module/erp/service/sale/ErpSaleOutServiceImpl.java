@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.erp.service.sale;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
+import cn.iocoder.yudao.framework.common.exception.util.ThrowUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.number.MoneyUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
@@ -83,10 +84,8 @@ public class ErpSaleOutServiceImpl implements ErpSaleOutService {
             adminUserApi.validateUser(createReqVO.getSaleUserId());
         }
         // 1.5 生成出库单号，并校验唯一性
-        String no = noRedisDAO.generate(ErpNoRedisDAO.SALE_OUT_NO_PREFIX);
-        if (saleOutMapper.selectByNo(no) != null) {
-            throw exception(SALE_OUT_NO_EXISTS);
-        }
+        String no = noRedisDAO.generate(ErpNoRedisDAO.SALE_OUT_NO_PREFIX, SALE_OUT_NO_OUT_OF_BOUNDS);
+        ThrowUtil.ifThrow(saleOutMapper.selectByNo(no) != null ,SALE_OUT_NO_EXISTS);
 
         // 2.1 插入出库
         ErpSaleOutDO saleOut = BeanUtils.toBean(createReqVO, ErpSaleOutDO.class, in -> in

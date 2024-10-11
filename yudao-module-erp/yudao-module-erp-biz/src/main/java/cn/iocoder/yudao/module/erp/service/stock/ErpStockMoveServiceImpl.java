@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.erp.service.stock;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.iocoder.yudao.framework.common.exception.util.ThrowUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.number.MoneyUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
@@ -64,10 +65,8 @@ public class ErpStockMoveServiceImpl implements ErpStockMoveService {
         // 1.1 校验出库项的有效性
         List<ErpStockMoveItemDO> stockMoveItems = validateStockMoveItems(createReqVO.getItems());
         // 1.2 生成调拨单号，并校验唯一性
-        String no = noRedisDAO.generate(ErpNoRedisDAO.STOCK_MOVE_NO_PREFIX);
-        if (stockMoveMapper.selectByNo(no) != null) {
-            throw exception(STOCK_MOVE_NO_EXISTS);
-        }
+        String no = noRedisDAO.generate(ErpNoRedisDAO.STOCK_MOVE_NO_PREFIX, STOCK_MOVE_NO_OUT_OF_BOUNDS);
+        ThrowUtil.ifThrow(stockMoveMapper.selectByNo(no) != null ,STOCK_MOVE_NO_EXISTS);
 
         // 2.1 插入出库单
         ErpStockMoveDO stockMove = BeanUtils.toBean(createReqVO, ErpStockMoveDO.class, in -> in

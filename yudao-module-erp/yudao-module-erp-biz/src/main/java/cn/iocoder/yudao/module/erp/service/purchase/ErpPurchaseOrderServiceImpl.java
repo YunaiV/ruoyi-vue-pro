@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.erp.service.purchase;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
+import cn.iocoder.yudao.framework.common.exception.util.ThrowUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.number.MoneyUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
@@ -22,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -69,11 +71,8 @@ public class ErpPurchaseOrderServiceImpl implements ErpPurchaseOrderService {
             accountService.validateAccount(createReqVO.getAccountId());
         }
         // 1.4 生成订单号，并校验唯一性
-        String no = noRedisDAO.generate(ErpNoRedisDAO.PURCHASE_ORDER_NO_PREFIX);
-        if (purchaseOrderMapper.selectByNo(no) != null) {
-            throw exception(PURCHASE_ORDER_NO_EXISTS);
-        }
-
+        String no = noRedisDAO.generate(ErpNoRedisDAO.PURCHASE_ORDER_NO_PREFIX, PURCHASE_ORDER_NO_OUT_OF_BOUNDS);
+        ThrowUtil.ifThrow(purchaseOrderMapper.selectByNo(no) != null ,PURCHASE_ORDER_NO_EXISTS);
         // 2.1 插入订单
         ErpPurchaseOrderDO purchaseOrder = BeanUtils.toBean(createReqVO, ErpPurchaseOrderDO.class, in -> in
                 .setNo(no).setStatus(ErpAuditStatus.PROCESS.getStatus()));

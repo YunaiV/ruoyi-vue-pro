@@ -23,4 +23,8 @@ public interface ErpPurchaseRequestItemsMapper extends BaseMapperX<ErpPurchaseRe
     default int deleteByRequestId(Long requestId) {
         return delete(ErpPurchaseRequestItemsDO::getRequestId, requestId);
     }
+
+    default List<ErpPurchaseRequestItemsDO> selectListByRequestIds(Collection<Long> requestIds) {
+        return selectList(ErpPurchaseRequestItemsDO::getRequestId, requestIds);
+    }
 }

@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.erp.service.finance;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.ObjectUtil;
+import cn.iocoder.yudao.framework.common.exception.util.ThrowUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
@@ -83,10 +84,8 @@ public class ErpFinancePaymentServiceImpl implements ErpFinancePaymentService {
             adminUserApi.validateUser(createReqVO.getFinanceUserId());
         }
         // 1.5 生成付款单号，并校验唯一性
-        String no = noRedisDAO.generate(ErpNoRedisDAO.FINANCE_PAYMENT_NO_PREFIX);
-        if (financePaymentMapper.selectByNo(no) != null) {
-            throw exception(FINANCE_PAYMENT_NO_EXISTS);
-        }
+        String no = noRedisDAO.generate(ErpNoRedisDAO.FINANCE_PAYMENT_NO_PREFIX, FINANCE_PAYMENT_NO_OUT_OF_BOUNDS);
+        ThrowUtil.ifThrow(financePaymentMapper.selectByNo(no) != null ,FINANCE_PAYMENT_NO_EXISTS);
 
         // 2.1 插入付款单
         ErpFinancePaymentDO payment = BeanUtils.toBean(createReqVO, ErpFinancePaymentDO.class, in -> in

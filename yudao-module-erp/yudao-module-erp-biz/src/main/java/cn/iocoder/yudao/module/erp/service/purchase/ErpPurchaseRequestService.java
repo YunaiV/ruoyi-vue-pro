@@ -7,7 +7,9 @@ import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseRequestIte
 import jakarta.validation.*;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 /**
  * ERP采购申请单 Service 接口
@@ -61,4 +63,20 @@ public interface ErpPurchaseRequestService {
      * @return 采购申请单项列表
      */
     List<ErpPurchaseRequestItemsDO> getPurchaseRequestItemListByOrderId(Long requestId);
+
+    /**
+     * 更新采购申请单状态
+     *
+     * @param id 采购申请单id
+     * @param status 状态
+     */
+    void updatePurchaseRequestStatus(Long id, Integer status);
+
+    /**
+     * 获得采购订单项 List
+     *
+     * @param requestIds 采购订单编号数组
+     * @return 采购订单项 List
+     */
+    List<ErpPurchaseRequestItemsDO> getPurchaseRequestItemListByOrderIds(Collection<Long> requestIds);
 }

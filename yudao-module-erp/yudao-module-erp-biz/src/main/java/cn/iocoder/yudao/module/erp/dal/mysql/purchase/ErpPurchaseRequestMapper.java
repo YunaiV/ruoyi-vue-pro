@@ -5,7 +5,9 @@ import cn.iocoder.yudao.framework.common.util.date.DateUtils;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.request.ErpPurchaseRequestPageReqVO;
+import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseOrderDO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseRequestDO;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.time.LocalDate;
@@ -23,7 +25,6 @@ public interface ErpPurchaseRequestMapper extends BaseMapperX<ErpPurchaseRequest
     default PageResult<ErpPurchaseRequestDO> selectPage(ErpPurchaseRequestPageReqVO reqVO) {
         return selectPage(reqVO, new LambdaQueryWrapperX<ErpPurchaseRequestDO>()
                 .eqIfPresent(ErpPurchaseRequestDO::getNo, reqVO.getNo())
-                .eqIfPresent(ErpPurchaseRequestDO::getNum, reqVO.getNum())
                 .eqIfPresent(ErpPurchaseRequestDO::getApplicant, reqVO.getApplicant())
                 .eqIfPresent(ErpPurchaseRequestDO::getApplicationDept, reqVO.getApplicationDept())
                 .betweenIfPresent(ErpPurchaseRequestDO::getRequestTime, reqVO.getRequestTime())
@@ -35,21 +36,13 @@ public interface ErpPurchaseRequestMapper extends BaseMapperX<ErpPurchaseRequest
                 .betweenIfPresent(ErpPurchaseRequestDO::getCreateTime, reqVO.getCreateTime())
                 .orderByDesc(ErpPurchaseRequestDO::getId));
     }
-    /**
-    * @Author Wqh
-    * @Description 获取单据日期数据库中编号最大的数字
-    * @Date 10:26 2024/10/10
-    * @Param [minDateTime, maxDateTime]
-    * @return java.lang.Integer
-    **/
-    default Integer getMaxSerialNum(LocalDateTime minDateTime, LocalDateTime maxDateTime){
-        //获取该单据日期里数据库中编号最大的数字
-        ErpPurchaseRequestDO erpPurchaseRequestDO = selectOne(new LambdaQueryWrapperX<ErpPurchaseRequestDO>()
-                .select(ErpPurchaseRequestDO::getNum)
-                .ge(ErpPurchaseRequestDO::getRequestTime, DateUtils.formatLocalDateTime(minDateTime))
-                .le(ErpPurchaseRequestDO::getRequestTime, DateUtils.formatLocalDateTime(maxDateTime))
-                .orderByDesc(ErpPurchaseRequestDO::getNum)
-                .last("limit 1"));
-        return erpPurchaseRequestDO == null ? 0 : erpPurchaseRequestDO.getNum();
+
+    default ErpPurchaseRequestDO selectByNo(String no) {
+        return selectOne(ErpPurchaseRequestDO::getNo, no);
+    }
+
+    default int updateByIdAndStatus(Long id, Integer status, ErpPurchaseRequestDO updateObj) {
+        return update(updateObj, new LambdaUpdateWrapper<ErpPurchaseRequestDO>()
+                .eq(ErpPurchaseRequestDO::getId, id).eq(ErpPurchaseRequestDO::getStatus, status));
     }
 }

@@ -23,13 +23,12 @@ public class ErpPurchaseRequestRespVO {
     @ExcelProperty("单据编号")
     private String no;
 
-    @Schema(description = "当日申请排序编号", requiredMode = Schema.RequiredMode.REQUIRED)
-    @ExcelProperty("当日申请排序编号")
-    private Integer num;
-
     @Schema(description = "申请人", requiredMode = Schema.RequiredMode.REQUIRED)
     @ExcelProperty("申请人")
     private String applicant;
+
+    @Schema(description = "申请人名称", example = "芋道")
+    private String applicantName;
 
     @Schema(description = "申请部门")
     @ExcelProperty("申请部门")
@@ -66,6 +65,14 @@ public class ErpPurchaseRequestRespVO {
 
     @Schema(description = "采购订单项列表", requiredMode = Schema.RequiredMode.REQUIRED)
     private List<Item> items;
+
+    @Schema(description = "产品信息", requiredMode = Schema.RequiredMode.REQUIRED)
+    @ExcelProperty("产品信息")
+    private String productNames;
+
+    @Schema(description = "产品总数", requiredMode = Schema.RequiredMode.REQUIRED, example = "100")
+    @ExcelProperty("产品总数")
+    private Integer totalCount;
 
     @Data
     public static class Item {

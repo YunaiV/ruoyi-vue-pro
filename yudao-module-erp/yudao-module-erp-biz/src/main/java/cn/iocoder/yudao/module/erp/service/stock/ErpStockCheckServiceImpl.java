@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.erp.service.stock;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.iocoder.yudao.framework.common.exception.util.ThrowUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.number.MoneyUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
@@ -63,10 +64,8 @@ public class ErpStockCheckServiceImpl implements ErpStockCheckService {
         // 1.1 校验盘点项的有效性
         List<ErpStockCheckItemDO> stockCheckItems = validateStockCheckItems(createReqVO.getItems());
         // 1.2 生成盘点单号，并校验唯一性
-        String no = noRedisDAO.generate(ErpNoRedisDAO.STOCK_CHECK_NO_PREFIX);
-        if (stockCheckMapper.selectByNo(no) != null) {
-            throw exception(STOCK_CHECK_NO_EXISTS);
-        }
+        String no = noRedisDAO.generate(ErpNoRedisDAO.STOCK_CHECK_NO_PREFIX, STOCK_CHECK_NO_OUT_OF_BOUNDS);
+        ThrowUtil.ifThrow(stockCheckMapper.selectByNo(no) != null ,STOCK_CHECK_NO_EXISTS);
 
         // 2.1 插入盘点单
         ErpStockCheckDO stockCheck = BeanUtils.toBean(createReqVO, ErpStockCheckDO.class, in -> in

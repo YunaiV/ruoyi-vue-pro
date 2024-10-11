@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.erp.service.sale;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
+import cn.iocoder.yudao.framework.common.exception.util.ThrowUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.number.MoneyUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
@@ -77,10 +78,8 @@ public class ErpSaleOrderServiceImpl implements ErpSaleOrderService {
             adminUserApi.validateUser(createReqVO.getSaleUserId());
         }
         // 1.5 生成订单号，并校验唯一性
-        String no = noRedisDAO.generate(ErpNoRedisDAO.SALE_ORDER_NO_PREFIX);
-        if (saleOrderMapper.selectByNo(no) != null) {
-            throw exception(SALE_ORDER_NO_EXISTS);
-        }
+        String no = noRedisDAO.generate(ErpNoRedisDAO.SALE_ORDER_NO_PREFIX, SALE_ORDER_NO_OUT_OF_BOUNDS);
+        ThrowUtil.ifThrow(saleOrderMapper.selectByNo(no) != null ,SALE_ORDER_NO_EXISTS);
 
         // 2.1 插入订单
         ErpSaleOrderDO saleOrder = BeanUtils.toBean(createReqVO, ErpSaleOrderDO.class, in -> in

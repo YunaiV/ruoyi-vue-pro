@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.erp.service.purchase;
 
+import cn.iocoder.yudao.module.erp.dal.redis.no.ErpNoRedisDAO;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -41,6 +42,9 @@ public class ErpSupplierProductServiceImplTest extends BaseDbUnitTest {
 
     @Resource
     private ErpSupplierProductMapper supplierProductMapper;
+
+    @Resource
+    private ErpNoRedisDAO erpNoRedisDAO;
 
     @Test
     public void testCreateSupplierProduct_success() {

@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.erp.service.stock;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.iocoder.yudao.framework.common.exception.util.ThrowUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.number.MoneyUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
@@ -67,10 +68,8 @@ public class ErpStockInServiceImpl implements ErpStockInService {
         // 1.2 校验供应商
         supplierService.validateSupplier(createReqVO.getSupplierId());
         // 1.3 生成入库单号，并校验唯一性
-        String no = noRedisDAO.generate(ErpNoRedisDAO.STOCK_IN_NO_PREFIX);
-        if (stockInMapper.selectByNo(no) != null) {
-            throw exception(STOCK_IN_NO_EXISTS);
-        }
+        String no = noRedisDAO.generate(ErpNoRedisDAO.STOCK_IN_NO_PREFIX, STOCK_IN_NO_OUT_OF_BOUNDS);
+        ThrowUtil.ifThrow(stockInMapper.selectByNo(no) != null ,STOCK_IN_NO_EXISTS);
 
         // 2.1 插入入库单
         ErpStockInDO stockIn = BeanUtils.toBean(createReqVO, ErpStockInDO.class, in -> in

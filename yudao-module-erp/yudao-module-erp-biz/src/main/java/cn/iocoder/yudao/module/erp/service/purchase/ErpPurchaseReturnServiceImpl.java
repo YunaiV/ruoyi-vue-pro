@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.erp.service.purchase;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
+import cn.iocoder.yudao.framework.common.exception.util.ThrowUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.number.MoneyUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
@@ -75,10 +76,8 @@ public class ErpPurchaseReturnServiceImpl implements ErpPurchaseReturnService {
         // 1.3 校验结算账户
         accountService.validateAccount(createReqVO.getAccountId());
         // 1.4 生成退货单号，并校验唯一性
-        String no = noRedisDAO.generate(ErpNoRedisDAO.PURCHASE_RETURN_NO_PREFIX);
-        if (purchaseReturnMapper.selectByNo(no) != null) {
-            throw exception(PURCHASE_RETURN_NO_EXISTS);
-        }
+        String no = noRedisDAO.generate(ErpNoRedisDAO.PURCHASE_RETURN_NO_PREFIX, PURCHASE_RETURN_NO_OUT_OF_BOUNDS);
+        ThrowUtil.ifThrow(purchaseReturnMapper.selectByNo(no) != null ,PURCHASE_RETURN_NO_EXISTS);
 
         // 2.1 插入退货
         ErpPurchaseReturnDO purchaseReturn = BeanUtils.toBean(createReqVO, ErpPurchaseReturnDO.class, in -> in

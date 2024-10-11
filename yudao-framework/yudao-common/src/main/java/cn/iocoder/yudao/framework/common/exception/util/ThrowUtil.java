@@ -49,6 +49,12 @@ public class ThrowUtil {
         }
     }
 
+    public static void ifGreater(Long no, long l, ErrorCode message) {
+        if (no > l) {
+            throw exception(message);
+        }
+    }
+
 
     /*public static void ifNullThrow(Object data, String code) {
         if (Objects.isNull(data)) {
