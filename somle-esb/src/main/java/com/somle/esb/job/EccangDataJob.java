@@ -101,6 +101,18 @@ public class EccangDataJob extends DataJob{
             service.send(data);
         });
 
+        service.send(
+                OssData.builder()
+                        .database(DATABASE)
+                        .tableName("stock")
+                        .syncType("full")
+                        .requestTimestamp(System.currentTimeMillis())
+                        .folderDate(today)
+                        .content(eccangService.getInventory())
+                        .headers(null)
+                        .build()
+        );
+
         eccangService.getInventoryBatchLog(yesterdayFirstSecond, yesterdayLastSecond)
             .forEach(page -> {
                 CoreUtils.sleep(2000);

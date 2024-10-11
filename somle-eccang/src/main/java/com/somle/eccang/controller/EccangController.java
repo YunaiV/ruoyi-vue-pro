@@ -16,6 +16,12 @@ public class EccangController {
     @Autowired 
     EccangService eccangService;
 
+    @GetMapping("/getInventory")
+    public List<BizContent> getInventory(
+    ) {
+        return eccangService.getInventory().toList();
+    }
+
     @GetMapping("/getInventoryBatchLog")
     public List<BizContent> getInventoryBatchLog( 
         @RequestParam String startTime,

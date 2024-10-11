@@ -35,7 +35,7 @@ public interface ErpPurchaseInItemMapper extends BaseMapperX<ErpPurchaseInItemDO
     }
 
     /**
-     * 基于采购订单编号，查询每个采购订单项的入库数量之和
+     * 基于采购入库单编号，查询每个采购订单项的入库数量之和
      *
      * @param inIds 入库订单项编号数组
      * @return key：采购订单项编号；value：入库数量之和
