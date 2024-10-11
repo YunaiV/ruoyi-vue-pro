@@ -264,7 +264,10 @@ public class EccangService {
         return post("getWmsProductList", product, EccangProduct.class).get(0);
     }
 
-
+    public Stream<BizContent> getInventory() {
+        var payload = JsonUtils.newObject();
+        return getAllBiz(payload, "getProductInventory");
+    }
 
 
     public Stream<BizContent> getInventoryBatchLog(LocalDateTime startTime, LocalDateTime endTime) {
