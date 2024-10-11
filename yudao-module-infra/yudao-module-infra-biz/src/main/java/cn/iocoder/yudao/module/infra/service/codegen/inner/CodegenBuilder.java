@@ -113,9 +113,9 @@ public class CodegenBuilder {
         String tableName = table.getTableName().toLowerCase();
         // 第一步，_ 前缀的前面，作为 module 名字；第二步，moduleName 必须小写；
         table.setModuleName(subBefore(tableName, '_', false).toLowerCase());
-        // 第一步，第一个 _ 前缀的后面，作为 module 名字; 第二步，可能存在多个 _ 的情况，转换成驼峰; 第三步，businessName 必须小写；
+        //  第一步，可能存在多个 _ 的情况，转换成驼峰； 第二步，将所有的 _ 转化为 . ； 第三步，businessName 必须小写；
         table.setBusinessName(subAfter(tableName, '_', false).replaceAll("_",".").toLowerCase());
-        // 驼峰 + 首字母大写；第一步，第一个 _ 前缀的后面，作为 class 名字；第二步，驼峰命名
+        // 驼峰 + 首字母大写；
         table.setClassName(upperFirst(toCamelCase(tableName)));
         // 去除结尾的表，作为类描述
         table.setClassComment(StrUtil.removeSuffixIgnoreCase(table.getTableComment(), "表"));

@@ -46,7 +46,7 @@ public class ErpPurchaseRequestServiceImpl implements ErpPurchaseRequestService 
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Long createPurchaseRequest(ErpPurchaseRequestSaveReqVO createReqVO) {
+    public synchronized Long createPurchaseRequest(ErpPurchaseRequestSaveReqVO createReqVO) {
         //获取单据日期
         LocalDateTime date = createReqVO.getRequestTime();
         //转化为LocalDate

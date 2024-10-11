@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.framework.common.util.date;
 
+import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.date.LocalDateTimeUtil;
 
 import java.time.*;
@@ -23,11 +24,12 @@ public class DateUtils {
      */
     public static final long SECOND_MILLIS = 1000;
 
-    public static final String FORMAT_YEAR = "yyyyMMdd";
+    public static final String PURE_DATE_PATTERN = "yyyyMMdd";
 
     public static final String FORMAT_YEAR_MONTH_DAY = "yyyy-MM-dd";
 
     public static final String FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND = "yyyy-MM-dd HH:mm:ss";
+
     /**
     * @Author Wqh
     * @Description 将LocalDate转成String类型字符串，格式为yyyyMMdd
@@ -35,9 +37,8 @@ public class DateUtils {
     * @Param [date]
     * @return java.lang.String
     **/
-
     public static String formatLocalDate(LocalDate date) {
-        return LocalDateTimeUtil.format(date, FORMAT_YEAR);
+        return LocalDateTimeUtil.format(date, PURE_DATE_PATTERN);
     }
 
     /**
