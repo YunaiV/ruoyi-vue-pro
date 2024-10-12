@@ -104,6 +104,14 @@ public interface BpmProcessInstanceService {
      */
     BpmApprovalDetailRespVO getApprovalDetail(Long loginUserId, @Valid BpmApprovalDetailReqVO reqVO);
 
+    /**
+     * 获取流程实例的 BPMN 模型视图
+     *
+     * @param id 流程实例的编号
+     * @return BPMN 模型视图
+     */
+    BpmProcessInstanceBpmnModelViewRespVO getProcessInstanceBpmnModelView(String id);
+
     // ========== Update 写入相关方法 ==========
 
     /**
@@ -156,6 +164,5 @@ public interface BpmProcessInstanceService {
      * @param instance 流程任务
      */
     void processProcessInstanceCompleted(ProcessInstance instance);
-
 
 }

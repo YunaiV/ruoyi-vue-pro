@@ -170,16 +170,16 @@ public class BpmTaskServiceImpl implements BpmTaskService {
     }
 
     @Override
-    public List<HistoricTaskInstance> getTaskListByProcessInstanceId(String processInstanceId) {
-        List<HistoricTaskInstance> tasks = historyService.createHistoricTaskInstanceQuery()
+    public List<HistoricTaskInstance> getTaskListByProcessInstanceId(String processInstanceId, Boolean asc) {
+        HistoricTaskInstanceQuery query = historyService.createHistoricTaskInstanceQuery()
                 .includeTaskLocalVariables()
-                .processInstanceId(processInstanceId)
-                .orderByHistoricTaskInstanceStartTime().desc() // 创建时间倒序
-                .list();
-        if (CollUtil.isEmpty(tasks)) {
-            return Collections.emptyList();
+                .processInstanceId(processInstanceId);
+        if (Boolean.TRUE.equals(asc)) {
+            query.orderByHistoricTaskInstanceStartTime().asc();
+        } else {
+            query.orderByHistoricTaskInstanceStartTime().desc();
         }
-        return tasks;
+        return query.list();
     }
 
     /**

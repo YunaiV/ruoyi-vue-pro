@@ -45,6 +45,10 @@ public enum BpmTaskStatusEnum {
      */
     private final String name;
 
+    public static boolean isRejectStatus(Integer status) {
+        return REJECT.getStatus().equals(status);
+    }
+
     /**
      * 判断该状态是否已经处于 End 最终状态
      * <p>

@@ -73,9 +73,10 @@ public interface BpmTaskService {
      * 获得指定流程实例的流程任务列表，包括所有状态的
      *
      * @param processInstanceId 流程实例的编号
+     * @param asc 是否升序
      * @return 流程任务列表
      */
-    List<HistoricTaskInstance> getTaskListByProcessInstanceId(String processInstanceId);
+    List<HistoricTaskInstance> getTaskListByProcessInstanceId(String processInstanceId, Boolean asc);
 
     /**
      * 获取任务

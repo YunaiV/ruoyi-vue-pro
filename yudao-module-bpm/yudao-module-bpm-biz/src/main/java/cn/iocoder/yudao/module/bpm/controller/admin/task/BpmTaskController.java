@@ -121,7 +121,7 @@ public class BpmTaskController {
     @PreAuthorize("@ss.hasPermission('bpm:task:query')")
     public CommonResult<List<BpmTaskRespVO>> getTaskListByProcessInstanceId(
             @RequestParam("processInstanceId") String processInstanceId) {
-        List<HistoricTaskInstance> taskList = taskService.getTaskListByProcessInstanceId(processInstanceId);
+        List<HistoricTaskInstance> taskList = taskService.getTaskListByProcessInstanceId(processInstanceId, true);
         if (CollUtil.isEmpty(taskList)) {
             return success(Collections.emptyList());
         }

@@ -38,6 +38,10 @@ public enum BpmProcessInstanceStatusEnum implements IntArrayValuable {
         return ARRAYS;
     }
 
+    public static boolean isRejectStatus(Integer status) {
+        return REJECT.getStatus().equals(status);
+    }
+
     public static boolean isProcessEndStatus(Integer status) {
         return ObjectUtils.equalsAny(status,
                 APPROVE.getStatus(), REJECT.getStatus(), CANCEL.getStatus());

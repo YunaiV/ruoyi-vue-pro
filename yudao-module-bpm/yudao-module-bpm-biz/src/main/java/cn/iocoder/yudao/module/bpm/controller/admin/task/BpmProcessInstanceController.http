@@ -1,0 +1,5 @@
+### 请求 /bpm/process-instance/get-bpmn 接口 => 成功
+GET {{baseUrl}}/bpm/process-instance/get-bpmn-model-view?id=1d5fb5a6-85f8-11ef-b717-7e93075f94e3
+Content-Type: application/json
+tenant-id: 1
+Authorization: Bearer {{token}}
