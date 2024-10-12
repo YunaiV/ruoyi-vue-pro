@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.bpm.controller.admin.task.vo.instance;
 
+import cn.iocoder.yudao.module.bpm.controller.admin.base.user.UserSimpleBaseVO;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
@@ -42,24 +43,7 @@ public class BpmApprovalDetailRespVO {
         private List<ApprovalTaskInfo> tasks;
 
         @Schema(description = "候选人用户列表")
-        // TODO @jason：candidateUserList => candidateUsers，保持和 tasks 的命名风格一致哈
-        private List<User> candidateUserList; // 用于未运行任务节点
-
-    }
-
-    // TODO @jason：可以替换成 UserSimpleBaseVO。简化下
-    @Schema(description = "用户信息")
-    @Data
-    public static class User {
-
-        @Schema(description = "用户编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
-        private Long id;
-
-        @Schema(description = "用户昵称", requiredMode = Schema.RequiredMode.REQUIRED, example = "芋艿")
-        private String nickname;
-
-        @Schema(description = "用户头像", example = "https://www.iocoder.cn/1.png")
-        private String avatar;
+        private List<UserSimpleBaseVO> candidateUsers; // 用于未运行任务节点
 
     }
 
@@ -71,10 +55,10 @@ public class BpmApprovalDetailRespVO {
         private String id;
 
         @Schema(description = "任务所属人", example = "1024")
-        private User ownerUser;
+        private UserSimpleBaseVO ownerUser;
 
         @Schema(description = "任务分配人", example = "2048")
-        private User assigneeUser;
+        private UserSimpleBaseVO assigneeUser;
 
         @Schema(description = "任务状态", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
         private Integer status;  // 参见 BpmTaskStatusEnum 枚举

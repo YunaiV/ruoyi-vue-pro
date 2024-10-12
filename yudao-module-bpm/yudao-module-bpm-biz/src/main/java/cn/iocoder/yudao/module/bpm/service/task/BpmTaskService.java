@@ -202,6 +202,14 @@ public interface BpmTaskService {
      */
     void deleteSignTask(Long userId, BpmTaskSignDeleteReqVO reqVO);
 
+    /**
+     * 抄送任务
+     *
+     * @param userId 用户编号
+     * @param reqVO  通过请求
+     */
+    void copyTask(Long userId, @Valid BpmTaskCopyReqVO reqVO);
+
     // ========== Event 事件相关方法 ==========
 
     /**

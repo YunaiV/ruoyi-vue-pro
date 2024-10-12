@@ -19,9 +19,9 @@ public class BpmProcessInstanceCopyRespVO {
 
     @Schema(description = "流程实例编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "A233")
     private String processInstanceId;
-    @Schema(description = "流程实例的名称")
+    @Schema(description = "流程实例的名称",requiredMode = Schema.RequiredMode.REQUIRED, example = "测试")
     private String processInstanceName;
-    @Schema(description = "流程实例的发起时间")
+    @Schema(description = "流程实例的发起时间",requiredMode = Schema.RequiredMode.REQUIRED)
     private LocalDateTime processInstanceStartTime;
 
     @Schema(description = "抄送的节点的活动编号")
@@ -31,12 +31,14 @@ public class BpmProcessInstanceCopyRespVO {
     @Schema(description = "发起抄送的任务名称")
     private String taskName;
 
-    @Schema(description = "抄送人")
+    @Schema(description = "抄送人", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     private String creator;
     @Schema(description = "抄送人昵称")
     private String creatorName;
+    @Schema(description = "抄送人意见")
+    private String reason;
 
-    @Schema(description = "抄送时间")
+    @Schema(description = "抄送时间", requiredMode = Schema.RequiredMode.REQUIRED)
     private LocalDateTime createTime;
 
 }

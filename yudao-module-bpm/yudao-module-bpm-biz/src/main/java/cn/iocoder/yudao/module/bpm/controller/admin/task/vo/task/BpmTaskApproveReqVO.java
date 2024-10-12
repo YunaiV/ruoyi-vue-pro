@@ -19,7 +19,7 @@ public class BpmTaskApproveReqVO {
     @NotEmpty(message = "审批意见不能为空")
     private String reason;
 
-    @Schema(description = "抄送的用户编号数组", requiredMode = Schema.RequiredMode.REQUIRED, example = "1,2")
+    @Schema(description = "抄送的用户编号数组", example = "1,2")
     private Collection<Long> copyUserIds;
 
     @Schema(description = "变量实例（动态表单）", requiredMode = Schema.RequiredMode.REQUIRED)

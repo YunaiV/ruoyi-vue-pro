@@ -59,6 +59,8 @@ public class BpmTaskCandidateStartUserDeptLeaderMultiStrategy extends BpmTaskCan
         }
         Set<Long> users = getMultiLevelDeptLeaderIds(toList(dept.getId()), Integer.valueOf(param)); // 参数是部门的层级
         // TODO @jason：这里 removeDisableUsers 的原因是啥呀？
+        // TODO @芋艿 calculateUsers(execution, param)  calculateUsers(startUserId, processInstance, activityId, param) 现在这两个方法, 默认都移除了被禁用的用户
+        // TODO @芋艿 因为被禁用的用户是不能审批任务。 在这里移除是不是好一点。 代码可以重用。
         removeDisableUsers(users);
         return users;
     }
