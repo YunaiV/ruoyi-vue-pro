@@ -45,6 +45,63 @@ public class EccangDataJob extends DataJob{
         );
 
         eccangService.getOrderPages(
+                EccangOrderVO.builder()
+                    .dateCreateSysStart(yesterdayFirstSecond)
+                    .dateCreateSysEnd(yesterdayLastSecond)
+                    .build()
+            )
+            .forEach(page -> {
+                OssData data = OssData.builder()
+                    .database(DATABASE)
+                    .tableName("order_sys_create")
+                    .syncType("inc")
+                    .requestTimestamp(System.currentTimeMillis())
+                    .folderDate(yesterday)
+                    .content(page)
+                    .headers(null)
+                    .build();
+                service.send(data);
+            });
+
+        eccangService.getOrderPages(
+                EccangOrderVO.builder()
+                    .platformPaidDateStart(yesterdayFirstSecond)
+                    .platformPaidDateEnd(yesterdayLastSecond)
+                    .build()
+            )
+            .forEach(page -> {
+                OssData data = OssData.builder()
+                    .database(DATABASE)
+                    .tableName("order_platform_pay")
+                    .syncType("inc")
+                    .requestTimestamp(System.currentTimeMillis())
+                    .folderDate(yesterday)
+                    .content(page)
+                    .headers(null)
+                    .build();
+                service.send(data);
+            });
+
+        eccangService.getOrderPages(
+                EccangOrderVO.builder()
+                    .warehouseShipDateStart(yesterdayFirstSecond)
+                    .warehouseShipDateEnd(yesterdayLastSecond)
+                    .build()
+            )
+            .forEach(page -> {
+                OssData data = OssData.builder()
+                    .database(DATABASE)
+                    .tableName("order_warehouse_ship")
+                    .syncType("inc")
+                    .requestTimestamp(System.currentTimeMillis())
+                    .folderDate(yesterday)
+                    .content(page)
+                    .headers(null)
+                    .build();
+                service.send(data);
+            });
+
+        eccangService.getOrderPages(
             EccangOrderVO.builder()
                 .platformShipDateStart(yesterdayFirstSecond)
                 .platformShipDateEnd(yesterdayLastSecond)
@@ -63,24 +120,7 @@ public class EccangDataJob extends DataJob{
             service.send(data);
         });
 
-        eccangService.getOrderPages(
-            EccangOrderVO.builder()
-                .warehouseShipDateStart(yesterdayFirstSecond)
-                .warehouseShipDateEnd(yesterdayLastSecond)
-                .build()
-        )
-        .forEach(page -> {
-            OssData data = OssData.builder()
-                .database(DATABASE)
-                .tableName("order_warehouse_ship")
-                .syncType("inc")
-                .requestTimestamp(System.currentTimeMillis())
-                .folderDate(yesterday)
-                .content(page)
-                .headers(null)
-                .build();
-            service.send(data);
-        });
+
 
         eccangService.getOrderPages(
             EccangOrderVO.builder()
