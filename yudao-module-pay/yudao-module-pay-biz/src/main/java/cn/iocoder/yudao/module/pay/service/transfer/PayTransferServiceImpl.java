@@ -29,7 +29,6 @@ import jakarta.annotation.Resource;
 import jakarta.validation.Validator;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -171,8 +170,7 @@ public class PayTransferServiceImpl implements PayTransferService {
 
     private void notifyTransferInProgress(PayChannelDO channel, PayTransferRespDTO notify) {
         // 1.校验
-        PayTransferDO transfer = transferMapper.selectByAppIdAndNo(
-                channel.getAppId(), notify.getOutTransferNo());
+        PayTransferDO transfer = transferMapper.selectByAppIdAndNo(channel.getAppId(), notify.getOutTransferNo());
         if (transfer == null) {
             throw exception(PAY_TRANSFER_NOT_FOUND);
         }
@@ -195,8 +193,7 @@ public class PayTransferServiceImpl implements PayTransferService {
 
     private void notifyTransferSuccess(PayChannelDO channel, PayTransferRespDTO notify) {
         // 1.校验
-        PayTransferDO transfer = transferMapper.selectByAppIdAndNo(
-                channel.getAppId(), notify.getOutTransferNo());
+        PayTransferDO transfer = transferMapper.selectByAppIdAndNo(channel.getAppId(), notify.getOutTransferNo());
         if (transfer == null) {
             throw exception(PAY_TRANSFER_NOT_FOUND);
         }
@@ -225,8 +222,7 @@ public class PayTransferServiceImpl implements PayTransferService {
 
     private void notifyTransferClosed(PayChannelDO channel, PayTransferRespDTO notify) {
         // 1.校验
-        PayTransferDO transfer = transferMapper.selectByAppIdAndNo(
-                channel.getAppId(), notify.getOutTransferNo());
+        PayTransferDO transfer = transferMapper.selectByAppIdAndNo(channel.getAppId(), notify.getOutTransferNo());
         if (transfer == null) {
             throw exception(PAY_TRANSFER_NOT_FOUND);
         }

@@ -106,4 +106,5 @@ public interface PayClient {
      * @return 转账信息
      */
     PayTransferRespDTO parseTransferNotify(Map<String, String> params, String body);
+
 }

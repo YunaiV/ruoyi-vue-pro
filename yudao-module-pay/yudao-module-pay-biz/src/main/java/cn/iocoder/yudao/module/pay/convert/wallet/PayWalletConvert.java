@@ -1,8 +1,6 @@
 package cn.iocoder.yudao.module.pay.convert.wallet;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.pay.api.wallet.dto.PayWalletCreateReqDto;
-import cn.iocoder.yudao.module.pay.api.wallet.dto.PayWalletRespDTO;
 import cn.iocoder.yudao.module.pay.controller.admin.wallet.vo.wallet.PayWalletRespVO;
 import cn.iocoder.yudao.module.pay.controller.app.wallet.vo.wallet.AppPayWalletRespVO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.wallet.PayWalletDO;
@@ -19,7 +17,5 @@ public interface PayWalletConvert {
     PayWalletRespVO convert02(PayWalletDO bean);
 
     PageResult<PayWalletRespVO> convertPage(PageResult<PayWalletDO> page);
-
-    PayWalletRespDTO convert03(PayWalletDO orCreateWallet);
 
 }

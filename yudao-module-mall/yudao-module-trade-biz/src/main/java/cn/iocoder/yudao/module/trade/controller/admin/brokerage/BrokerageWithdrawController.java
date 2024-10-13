@@ -46,7 +46,8 @@ public class BrokerageWithdrawController {
     @Operation(summary = "通过申请")
     @PreAuthorize("@ss.hasPermission('trade:brokerage-withdraw:audit')")
     public CommonResult<Boolean> approveBrokerageWithdraw(@RequestParam("id") Long id) {
-        brokerageWithdrawService.auditBrokerageWithdraw(id, BrokerageWithdrawStatusEnum.AUDIT_SUCCESS, "", getClientIP());
+        brokerageWithdrawService.auditBrokerageWithdraw(id,
+                BrokerageWithdrawStatusEnum.AUDIT_SUCCESS, "", getClientIP());
         return success(true);
     }
 
@@ -54,7 +55,8 @@ public class BrokerageWithdrawController {
     @Operation(summary = "驳回申请")
     @PreAuthorize("@ss.hasPermission('trade:brokerage-withdraw:audit')")
     public CommonResult<Boolean> rejectBrokerageWithdraw(@Valid @RequestBody BrokerageWithdrawRejectReqVO reqVO) {
-        brokerageWithdrawService.auditBrokerageWithdraw(reqVO.getId(), BrokerageWithdrawStatusEnum.AUDIT_FAIL, reqVO.getAuditReason(), getClientIP());
+        brokerageWithdrawService.auditBrokerageWithdraw(reqVO.getId(),
+                BrokerageWithdrawStatusEnum.AUDIT_FAIL, reqVO.getAuditReason(), getClientIP());
         return success(true);
     }
 
@@ -80,14 +82,14 @@ public class BrokerageWithdrawController {
         return success(BrokerageWithdrawConvert.INSTANCE.convertPage(pageResult, userMap));
     }
 
+    // TODO @luchi：update-transferred，url 改成这个。和 update-paid 、update-refunded 保持一致
     @PostMapping("/update-transfer")
     @Operation(summary = "更新转账订单为转账成功") // 由 pay-module 支付服务，进行回调，可见 PayNotifyJob
     @PermitAll // 无需登录，安全由 PayDemoOrderService 内部校验实现
-    public CommonResult<Boolean> updateAfterRefund(@RequestBody PayTransferNotifyReqDTO notifyReqDTO) {
-        // 目前业务逻辑，不需要做任何事情
-        // 当然，退款会有小概率会失败的情况，可以监控失败状态，进行告警
+    public CommonResult<Boolean> updateBrokerageWithdrawTransferred(@RequestBody PayTransferNotifyReqDTO notifyReqDTO) {
         log.info("[updateAfterRefund][notifyReqDTO({})]", notifyReqDTO);
-        brokerageWithdrawService.updateTransfer(Long.parseLong(notifyReqDTO.getMerchantTransferId()), notifyReqDTO.getPayTransferId());
+        brokerageWithdrawService.updateBrokerageWithdrawTransferred(
+                Long.parseLong(notifyReqDTO.getMerchantTransferId()), notifyReqDTO.getPayTransferId());
         return success(true);
     }
 

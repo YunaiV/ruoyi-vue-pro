@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 
+// TODO @luchi：这个可以复用 wxjava 里的类么？
 @NoArgsConstructor
 public class WxPayTransferPartnerNotifyV3Result implements Serializable, WxPayBaseNotifyV3Result<WxPayTransferPartnerNotifyV3Result.TransferNotifyResult> {
 

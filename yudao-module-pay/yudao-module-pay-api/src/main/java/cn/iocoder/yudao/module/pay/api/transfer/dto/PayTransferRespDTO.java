@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.pay.api.transfer.dto;
 
+import cn.iocoder.yudao.module.pay.enums.transfer.PayTransferStatusEnum;
 import lombok.Data;
 
 @Data
@@ -12,7 +13,6 @@ public class PayTransferRespDTO {
 
     /**
      * 转账单号
-     *
      */
     private String no;
 
@@ -24,9 +24,8 @@ public class PayTransferRespDTO {
     /**
      * 转账状态
      *
-     * 枚举 {@link PayTransferStatusRespEnum}
+     * 枚举 {@link PayTransferStatusEnum}
      */
     private Integer status;
-
 
 }

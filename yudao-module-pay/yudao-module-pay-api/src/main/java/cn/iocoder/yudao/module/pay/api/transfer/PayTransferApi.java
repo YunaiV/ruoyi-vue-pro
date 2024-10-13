@@ -21,9 +21,11 @@ public interface PayTransferApi {
     Long createTransfer(@Valid PayTransferCreateReqDTO reqDTO);
 
     /**
-     * 获取转账单详细
+     * 获得转账单
+     *
      * @param id 转账单编号
-     * @return 转账单详细
+     * @return 转账单
      */
     PayTransferRespDTO getTransfer(Long id);
+
 }

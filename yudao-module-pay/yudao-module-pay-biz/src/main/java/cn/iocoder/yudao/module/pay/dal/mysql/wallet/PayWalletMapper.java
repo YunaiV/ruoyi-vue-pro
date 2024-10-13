@@ -114,7 +114,6 @@ public interface PayWalletMapper extends BaseMapperX<PayWalletDO> {
         return update(null, lambdaUpdateWrapper);
     }
 
-
 }
 
 

@@ -17,9 +17,9 @@ public enum BrokerageWithdrawTypeEnum implements IntArrayValuable {
 
     WALLET(1, "钱包"),
     BANK(2, "银行卡"),
-    WECHAT(3, "微信"),
+    WECHAT(3, "微信"), // 手动打款
     ALIPAY(4, "支付宝"),
-    ALIPAY_SMALL(5, "微信零钱"),
+    WECHAT_API(5, "微信零钱"), // 自动打款，通过微信转账 API
     ;
 
     public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(BrokerageWithdrawTypeEnum::getType).toArray();

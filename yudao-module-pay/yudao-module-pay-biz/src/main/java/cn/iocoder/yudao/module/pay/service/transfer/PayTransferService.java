@@ -63,4 +63,5 @@ public interface PayTransferService {
      * @param notify     通知
      */
     void notifyTransfer(Long channelId, PayTransferRespDTO notify);
+
 }

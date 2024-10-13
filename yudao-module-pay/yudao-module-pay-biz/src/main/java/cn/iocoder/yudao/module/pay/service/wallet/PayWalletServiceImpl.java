@@ -200,6 +200,7 @@ public class PayWalletServiceImpl implements PayWalletService {
                 case UPDATE_BALANCE: // 更新余额
                     walletMapper.updateWhenRecharge(payWallet.getId(), price);
                     break;
+                // TODO @luchi：1）不能使用 updateWhenRecharge，它是充值哈。应该增加余额就 ok 了。。ps：顺便帮我把 UPDATE_BALANCE 也改改哈；2）其实不用 WITHDRAW 枚举，复用 UPDATE_BALANCE 就好了。
                 case WITHDRAW:
                     walletMapper.updateWhenRecharge(payWallet.getId(), price);
                     break;

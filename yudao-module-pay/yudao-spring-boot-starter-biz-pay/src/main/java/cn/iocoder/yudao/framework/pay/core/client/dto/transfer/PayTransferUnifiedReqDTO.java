@@ -84,4 +84,5 @@ public class PayTransferUnifiedReqDTO {
     @NotEmpty(message = "转账结果的回调地址不能为空")
     @URL(message = "转账结果的 notify 回调地址必须是 URL 格式")
     private String notifyUrl;
+
 }

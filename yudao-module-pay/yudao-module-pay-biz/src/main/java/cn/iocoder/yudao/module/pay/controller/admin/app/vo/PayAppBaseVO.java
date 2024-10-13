@@ -40,8 +40,7 @@ public class PayAppBaseVO {
     @URL(message = "退款结果的回调地址必须为 URL 格式")
     private String refundNotifyUrl;
 
-    @Schema(description = "转账结果的回调地址", requiredMode = Schema.RequiredMode.REQUIRED, example = "http://127.0.0.1:48080/refund-callback")
-    @NotNull(message = "转账结果的回调地址不能为空")
+    @Schema(description = "转账结果的回调地址", example = "http://127.0.0.1:48080/transfer-callback")
     @URL(message = "转账结果的回调地址必须为 URL 格式")
     private String transferNotifyUrl;
 

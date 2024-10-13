@@ -69,7 +69,7 @@ public class PayNotifyController {
         // 1. 校验支付渠道是否存在
         PayClient payClient = channelService.getPayClient(channelId);
         if (payClient == null) {
-            log.error("[notifyCallback][渠道编号({}) 找不到对应的支付客户端]", channelId);
+            log.error("[notifyOrder][渠道编号({}) 找不到对应的支付客户端]", channelId);
             throw exception(CHANNEL_NOT_FOUND);
         }
 
@@ -83,13 +83,13 @@ public class PayNotifyController {
     @Operation(summary = "支付渠道的统一【退款】回调")
     @PermitAll
     public String notifyRefund(@PathVariable("channelId") Long channelId,
-                              @RequestParam(required = false) Map<String, String> params,
-                              @RequestBody(required = false) String body) {
+                               @RequestParam(required = false) Map<String, String> params,
+                               @RequestBody(required = false) String body) {
         log.info("[notifyRefund][channelId({}) 回调数据({}/{})]", channelId, params, body);
         // 1. 校验支付渠道是否存在
         PayClient payClient = channelService.getPayClient(channelId);
         if (payClient == null) {
-            log.error("[notifyCallback][渠道编号({}) 找不到对应的支付客户端]", channelId);
+            log.error("[notifyRefund][渠道编号({}) 找不到对应的支付客户端]", channelId);
             throw exception(CHANNEL_NOT_FOUND);
         }
 
@@ -103,13 +103,13 @@ public class PayNotifyController {
     @Operation(summary = "支付渠道的统一【转账】回调")
     @PermitAll
     public String notifyTransfer(@PathVariable("channelId") Long channelId,
-                               @RequestParam(required = false) Map<String, String> params,
-                               @RequestBody(required = false) String body) {
-        log.info("[notifyRefund][channelId({}) 回调数据({}/{})]", channelId, params, body);
+                                 @RequestParam(required = false) Map<String, String> params,
+                                 @RequestBody(required = false) String body) {
+        log.info("[notifyTransfer][channelId({}) 回调数据({}/{})]", channelId, params, body);
         // 1. 校验支付渠道是否存在
         PayClient payClient = channelService.getPayClient(channelId);
         if (payClient == null) {
-            log.error("[notifyCallback][渠道编号({}) 找不到对应的支付客户端]", channelId);
+            log.error("[notifyTransfer][渠道编号({}) 找不到对应的支付客户端]", channelId);
             throw exception(CHANNEL_NOT_FOUND);
         }
 
