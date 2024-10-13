@@ -1,9 +1,13 @@
 package cn.iocoder.yudao.module.bpm.dal.dataobject.task;
 
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * 流程抄送 DO
@@ -12,6 +16,7 @@ import lombok.*;
  * @since 2024-01-22
  */
 @TableName(value = "bpm_process_instance_copy", autoResultMap = true)
+@KeySequence("bpm_process_instance_copy_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
 @Data
 @Builder
 @NoArgsConstructor
