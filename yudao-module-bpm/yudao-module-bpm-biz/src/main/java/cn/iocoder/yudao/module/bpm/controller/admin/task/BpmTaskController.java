@@ -30,10 +30,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Stream;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
@@ -75,6 +72,15 @@ public class BpmTaskController {
         Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(
                 convertSet(processInstanceMap.values(), instance -> Long.valueOf(instance.getStartUserId())));
         return success(BpmTaskConvert.INSTANCE.buildTodoTaskPage(pageResult, processInstanceMap, userMap));
+    }
+
+    @GetMapping("my-todo")
+    @Operation(summary = "获取我的待办任务,取第一条")
+    @Parameter(name = "processInstanceId", description = "流程实例的编号", required = true)
+    @PreAuthorize("@ss.hasPermission('bpm:task:query')")
+    public CommonResult<BpmTaskRespVO> getMyTodoTask(@RequestParam("processInstanceId") String processInstanceId) {
+        List<BpmTaskRespVO> taskList = taskService.getTodoTask(getLoginUserId(), processInstanceId);
+        return success(findFirst(taskList, Objects::nonNull));
     }
 
     @GetMapping("done-page")

@@ -33,6 +33,15 @@ public interface BpmTaskService {
     PageResult<Task> getTaskTodoPage(Long userId, BpmTaskPageReqVO pageReqVO);
 
     /**
+     * 获得待办任务列表
+     *
+     * @param userId 用户编号
+     * @param processInstanceId 流程实例编号
+     * @return 流程任务列表
+     */
+    List<BpmTaskRespVO> getTodoTask(Long userId, String processInstanceId);
+
+    /**
      * 获得已办的流程任务分页
      *
      * @param userId    用户编号
