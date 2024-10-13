@@ -73,7 +73,7 @@
         <minio.version>8.5.7</minio.version>
         <justauth.version>2.0.5</justauth.version>
         <jimureport.version>1.8.1</jimureport.version>
-        <weixin-java.version>4.6.5.B</weixin-java.version>
+        <weixin-java.version>4.6.0</weixin-java.version>
     </properties>
 
     <dependencyManagement>
