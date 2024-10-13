@@ -54,6 +54,14 @@ public interface DeliveryPickUpStoreService {
     List<DeliveryPickUpStoreDO> getDeliveryPickUpStoreList(Collection<Long> ids);
 
     /**
+     * 获得指定状态的自提门店列表
+     *
+     * @param status 状态
+     * @return 自提门店列表
+     */
+    List<DeliveryPickUpStoreDO> getDeliveryPickUpStoreListByStatus(Integer status);
+
+    /**
      * 获得自提门店分页
      *
      * @param pageReqVO 分页查询
@@ -62,33 +70,10 @@ public interface DeliveryPickUpStoreService {
     PageResult<DeliveryPickUpStoreDO> getDeliveryPickUpStorePage(DeliveryPickUpStorePageReqVO pageReqVO);
 
     /**
-     * 获得指定状态的自提门店列表
-     *
-     * @param status 状态
-     * @param storeIds 指定门店id
-     * @return 自提门店列表
-     */
-    List<DeliveryPickUpStoreDO> getDeliveryPickUpStoreListByStatus(Integer status, List<Long> storeIds);
-
-    /**
      * 绑定自提店员
      *
-     * @param bindStoreStaffIdVO 绑定数据
-     * @return
+     * @param bindReqVO 绑定数据
      */
-    void bindDeliveryPickUpBindStoreStaffId(DeliveryPickUpBindStoreStaffIdReqVO bindStoreStaffIdVO);
+    void bindDeliveryPickUpStore(DeliveryPickUpBindReqVO bindReqVO);
 
-    /**
-     * 根据门店id获取自提店员
-     * @param id 门店id
-     * @return 自提店员
-     */
-    DeliveryPickUpBindStoreStaffIdReqsVO getDeliveryPickUpStoreStaff(Long id);
-
-    /**
-     * 根据用户id查询自提门店店员信息
-     * @param userId 用户id
-     * @return 自提门店店员信息
-     */
-    List<DeliveryPickUpStoreDO> selectStaffByUserId(Long userId);
 }
