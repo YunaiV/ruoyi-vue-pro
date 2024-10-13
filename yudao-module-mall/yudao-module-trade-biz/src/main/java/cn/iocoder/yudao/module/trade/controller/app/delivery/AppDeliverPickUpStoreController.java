@@ -40,7 +40,7 @@ public class AppDeliverPickUpStoreController {
             @RequestParam(value = "latitude", required = false) Double latitude,
             @RequestParam(value = "longitude", required = false) Double longitude) {
         List<DeliveryPickUpStoreDO> list = deliveryPickUpStoreService.getDeliveryPickUpStoreListByStatus(
-                CommonStatusEnum.ENABLE.getStatus());
+                CommonStatusEnum.ENABLE.getStatus(), null);
         return success(DeliveryPickUpStoreConvert.INSTANCE.convertList(list, latitude, longitude));
     }
 

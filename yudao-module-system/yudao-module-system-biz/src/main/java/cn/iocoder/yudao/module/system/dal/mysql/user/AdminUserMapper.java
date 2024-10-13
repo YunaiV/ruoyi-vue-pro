@@ -7,6 +7,7 @@ import cn.iocoder.yudao.module.system.controller.admin.user.vo.user.UserPageReqV
 import cn.iocoder.yudao.module.system.dal.dataobject.user.AdminUserDO;
 import org.apache.ibatis.annotations.Mapper;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -25,14 +26,21 @@ public interface AdminUserMapper extends BaseMapperX<AdminUserDO> {
         return selectOne(AdminUserDO::getMobile, mobile);
     }
 
-    default PageResult<AdminUserDO> selectPage(UserPageReqVO reqVO, Collection<Long> deptIds) {
-        return selectPage(reqVO, new LambdaQueryWrapperX<AdminUserDO>()
+    default PageResult<AdminUserDO> selectPage(UserPageReqVO reqVO, Collection<Long> deptIds,List<Long> userIds) {
+        LambdaQueryWrapperX<AdminUserDO> adminUserDOLambdaQueryWrapperX = new LambdaQueryWrapperX<AdminUserDO>()
                 .likeIfPresent(AdminUserDO::getUsername, reqVO.getUsername())
                 .likeIfPresent(AdminUserDO::getMobile, reqVO.getMobile())
                 .eqIfPresent(AdminUserDO::getStatus, reqVO.getStatus())
                 .betweenIfPresent(AdminUserDO::getCreateTime, reqVO.getCreateTime())
                 .inIfPresent(AdminUserDO::getDeptId, deptIds)
-                .orderByDesc(AdminUserDO::getId));
+                .orderByDesc(AdminUserDO::getId);
+        if(userIds != null){
+            if(userIds.isEmpty()){
+                return new PageResult<AdminUserDO>().setList(new ArrayList<>()).setTotal(0L);
+            }
+            adminUserDOLambdaQueryWrapperX.in(AdminUserDO::getId, userIds);
+        }
+        return selectPage(reqVO, adminUserDOLambdaQueryWrapperX);
     }
 
     default List<AdminUserDO> selectListByNickname(String nickname) {

@@ -16,10 +16,13 @@ import org.springframework.web.bind.annotation.*;
 
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
+
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
+import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
 
 @Tag(name = "管理后台 - 自提门店")
 @RestController
@@ -66,9 +69,16 @@ public class DeliveryPickUpStoreController {
     @GetMapping("/list-all-simple")
     @Operation(summary = "获得自提门店精简信息列表")
     public CommonResult<List<DeliveryPickUpStoreSimpleRespVO>> getSimpleDeliveryPickUpStoreList() {
-        List<DeliveryPickUpStoreDO> list = deliveryPickUpStoreService.getDeliveryPickUpStoreListByStatus(
-                CommonStatusEnum.ENABLE.getStatus());
-        return success(DeliveryPickUpStoreConvert.INSTANCE.convertList1(list));
+        List<DeliveryPickUpStoreDO> storeStaffDOS = deliveryPickUpStoreService.selectStaffByUserId(getLoginUserId());
+        List<Long> storeIds = storeStaffDOS.stream().map(DeliveryPickUpStoreDO::getId).toList();
+        if(!storeIds.isEmpty()){
+            List<DeliveryPickUpStoreDO> list = deliveryPickUpStoreService.getDeliveryPickUpStoreListByStatus(
+                    CommonStatusEnum.ENABLE.getStatus(), storeIds);
+            return success(DeliveryPickUpStoreConvert.INSTANCE.convertList1(list));
+        }else{
+            return success(new ArrayList<>());
+        }
+
     }
 
     @GetMapping("/list")
@@ -87,5 +97,22 @@ public class DeliveryPickUpStoreController {
         PageResult<DeliveryPickUpStoreDO> pageResult = deliveryPickUpStoreService.getDeliveryPickUpStorePage(pageVO);
         return success(DeliveryPickUpStoreConvert.INSTANCE.convertPage(pageResult));
     }
+
+    @PostMapping("/bind")
+    @Operation(summary = "绑定自提店员")
+    @PreAuthorize("@ss.hasPermission('trade:delivery:pick-up-store:create')")
+    public CommonResult<Boolean> bindDeliveryPickUpBindStoreStaffId(@Valid @RequestBody DeliveryPickUpBindStoreStaffIdReqVO bindStoreStaffIdVO) {
+        deliveryPickUpStoreService.bindDeliveryPickUpBindStoreStaffId(bindStoreStaffIdVO);
+        return success(true);
+    }
+
+    @GetMapping("/get-store-staff")
+    @Operation(summary = "查询门店绑定情况")
+    @Parameter(name = "id", description = "编号", required = true, example = "1024")
+    @PreAuthorize("@ss.hasPermission('trade:delivery:pick-up-store:query')")
+    public CommonResult<DeliveryPickUpBindStoreStaffIdReqsVO> getDeliveryPickUpStoreStaff(@RequestParam("id") Long id) {
+        return success(deliveryPickUpStoreService.getDeliveryPickUpStoreStaff(id));
+    }
+
 
 }

@@ -2,19 +2,23 @@ package cn.iocoder.yudao.module.trade.dal.dataobject.delivery;
 
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import cn.iocoder.yudao.framework.mybatis.core.type.LongListTypeHandler;
 import com.baomidou.mybatisplus.annotation.KeySequence;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import lombok.Data;
 
 import java.time.LocalTime;
+import java.util.List;
 
 /**
  * 自提门店 DO
  *
  * @author jason
  */
-@TableName(value ="trade_delivery_pick_up_store")
+@TableName(value ="trade_delivery_pick_up_store", autoResultMap = true)
 @KeySequence("trade_delivery_pick_up_store_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
 @Data
 public class DeliveryPickUpStoreDO extends BaseDO {
@@ -73,6 +77,11 @@ public class DeliveryPickUpStoreDO extends BaseDO {
      * 经度
      */
     private Double longitude;
+    /**
+     * 店员id列表
+     */
+    @TableField(typeHandler = LongListTypeHandler.class)
+    private List<Long> staffIds;
 
     /**
      * 门店状态

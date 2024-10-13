@@ -1,9 +1,9 @@
 package cn.iocoder.yudao.module.trade.service.delivery;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.trade.controller.admin.delivery.vo.pickup.DeliveryPickUpStoreCreateReqVO;
-import cn.iocoder.yudao.module.trade.controller.admin.delivery.vo.pickup.DeliveryPickUpStorePageReqVO;
-import cn.iocoder.yudao.module.trade.controller.admin.delivery.vo.pickup.DeliveryPickUpStoreUpdateReqVO;
+import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
+import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
+import cn.iocoder.yudao.module.trade.controller.admin.delivery.vo.pickup.*;
 import cn.iocoder.yudao.module.trade.convert.delivery.DeliveryPickUpStoreConvert;
 import cn.iocoder.yudao.module.trade.dal.dataobject.delivery.DeliveryPickUpStoreDO;
 import cn.iocoder.yudao.module.trade.dal.mysql.delivery.DeliveryPickUpStoreMapper;
@@ -28,6 +28,9 @@ public class DeliveryPickUpStoreServiceImpl implements DeliveryPickUpStoreServic
 
     @Resource
     private DeliveryPickUpStoreMapper deliveryPickUpStoreMapper;
+
+    @Resource
+    private AdminUserApi adminUserApi;
 
     @Override
     public Long createDeliveryPickUpStore(DeliveryPickUpStoreCreateReqVO createReqVO) {
@@ -77,8 +80,29 @@ public class DeliveryPickUpStoreServiceImpl implements DeliveryPickUpStoreServic
     }
 
     @Override
-    public List<DeliveryPickUpStoreDO> getDeliveryPickUpStoreListByStatus(Integer status) {
-        return deliveryPickUpStoreMapper.selectListByStatus(status);
+    public List<DeliveryPickUpStoreDO> getDeliveryPickUpStoreListByStatus(Integer status, List<Long> storeIds) {
+        return deliveryPickUpStoreMapper.selectListByStatus(status, storeIds);
+    }
+
+    @Override
+    public void bindDeliveryPickUpBindStoreStaffId(DeliveryPickUpBindStoreStaffIdReqVO bindStoreStaffIdVO) {
+        DeliveryPickUpStoreDO deliveryPickUpStoreDO = deliveryPickUpStoreMapper.selectById(bindStoreStaffIdVO.getId());
+        deliveryPickUpStoreDO.setStaffIds(bindStoreStaffIdVO.getStoreStaffIds());
+        deliveryPickUpStoreMapper.updateById(deliveryPickUpStoreDO);
+    }
+
+    @Override
+    public DeliveryPickUpBindStoreStaffIdReqsVO getDeliveryPickUpStoreStaff(Long id) {
+        DeliveryPickUpStoreDO store = deliveryPickUpStoreMapper.selectById(id);
+        List<Long> adminUserIds = store.getStaffIds();
+        //2 查询绑定用户信息
+        List<AdminUserRespDTO> storeStaffs = adminUserApi.getUserList(adminUserIds);
+        return DeliveryPickUpBindStoreStaffIdReqsVO.builder().storeStaffs(storeStaffs).name(store.getName()).id(id).build();
+    }
+
+    @Override
+    public List<DeliveryPickUpStoreDO> selectStaffByUserId(Long userId) {
+        return deliveryPickUpStoreMapper.selectStaffByUserId(userId);
     }
 
 }

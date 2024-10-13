@@ -22,10 +22,16 @@ public interface DeliveryPickUpStoreMapper extends BaseMapperX<DeliveryPickUpSto
                 .orderByDesc(DeliveryPickUpStoreDO::getId));
     }
 
-    default List<DeliveryPickUpStoreDO> selectListByStatus(Integer status) {
-        return selectList(DeliveryPickUpStoreDO::getStatus, status);
+    default List<DeliveryPickUpStoreDO> selectListByStatus(Integer status, List<Long> storeIds) {
+        return selectList(new LambdaQueryWrapperX<DeliveryPickUpStoreDO>()
+                .eq(DeliveryPickUpStoreDO::getStatus, status)
+                .inIfPresent(DeliveryPickUpStoreDO::getId, storeIds));
     }
 
+    default List<DeliveryPickUpStoreDO> selectStaffByUserId(Long userId){
+        return selectList(new LambdaQueryWrapperX<DeliveryPickUpStoreDO>()
+                .and(userId != null, w -> w.apply("FIND_IN_SET({0}, staff_ids)", userId)));
+    }
 }
 
 
