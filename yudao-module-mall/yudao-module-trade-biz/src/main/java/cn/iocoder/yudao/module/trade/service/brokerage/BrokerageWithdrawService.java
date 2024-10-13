@@ -28,7 +28,7 @@ public interface BrokerageWithdrawService {
      * @param status      审核状态
      * @param auditReason 驳回原因
      */
-    void auditBrokerageWithdraw(Integer id, BrokerageWithdrawStatusEnum status, String auditReason);
+    void auditBrokerageWithdraw(Long id, BrokerageWithdrawStatusEnum status, String auditReason, String userIp);
 
     /**
      * 获得佣金提现
@@ -36,7 +36,7 @@ public interface BrokerageWithdrawService {
      * @param id 编号
      * @return 佣金提现
      */
-    BrokerageWithdrawDO getBrokerageWithdraw(Integer id);
+    BrokerageWithdrawDO getBrokerageWithdraw(Long id);
 
     /**
      * 获得佣金提现分页
@@ -77,4 +77,10 @@ public interface BrokerageWithdrawService {
         return convertMap(getWithdrawSummaryListByUserId(userIds, status), BrokerageWithdrawSummaryRespBO::getUserId);
     }
 
+    /**
+     *
+     * @param merchantTransferId 提现编号
+     * @param payTransferId 转账订单编号
+     */
+    void updateTransfer(Long merchantTransferId, Long payTransferId);
 }

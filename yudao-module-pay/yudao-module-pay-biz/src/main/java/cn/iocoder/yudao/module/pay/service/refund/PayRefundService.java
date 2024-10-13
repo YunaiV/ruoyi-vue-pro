@@ -78,5 +78,4 @@ public interface PayRefundService {
      * @return 同步到状态的退款数量，包括退款成功、退款失败
      */
     int syncRefund();
-
 }

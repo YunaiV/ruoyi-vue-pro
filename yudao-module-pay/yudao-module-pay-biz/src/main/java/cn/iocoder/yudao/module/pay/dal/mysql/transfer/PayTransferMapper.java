@@ -4,6 +4,7 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.module.pay.controller.admin.transfer.vo.PayTransferPageReqVO;
+import cn.iocoder.yudao.module.pay.dal.dataobject.refund.PayRefundDO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.transfer.PayTransferDO;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import org.apache.ibatis.annotations.Mapper;
@@ -43,6 +44,12 @@ public interface PayTransferMapper extends BaseMapperX<PayTransferDO> {
 
     default List<PayTransferDO> selectListByStatus(Integer status){
         return selectList(PayTransferDO::getStatus, status);
+    }
+
+    default PayTransferDO selectByAppIdAndNo(Long appId, String no){
+        return selectOne(new LambdaQueryWrapperX<PayTransferDO>()
+                .eq(PayTransferDO::getAppId, appId)
+                .eq(PayTransferDO::getNo, no));
     }
 }
 

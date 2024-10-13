@@ -19,7 +19,8 @@ public enum PayWalletBizTypeEnum implements IntArrayValuable {
     RECHARGE_REFUND(2, "充值退款"),
     PAYMENT(3, "支付"),
     PAYMENT_REFUND(4, "支付退款"),
-    UPDATE_BALANCE(5, "更新余额");
+    UPDATE_BALANCE(5, "更新余额"),
+    WITHDRAW(6, "分佣提现");
 
     /**
      * 业务分类
@@ -36,4 +37,5 @@ public enum PayWalletBizTypeEnum implements IntArrayValuable {
     public int[] array() {
          return ARRAYS;
     }
+
 }

@@ -9,6 +9,8 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
+import org.hibernate.validator.constraints.URL;
+
 import java.util.Map;
 
 import static cn.iocoder.yudao.framework.pay.core.enums.transfer.PayTransferTypeEnum.*;
@@ -75,4 +77,11 @@ public class PayTransferUnifiedReqDTO {
      * 支付渠道的额外参数
      */
     private Map<String, String> channelExtras;
+
+    /**
+     * 转账结果的 notify 回调地址
+     */
+    @NotEmpty(message = "转账结果的回调地址不能为空")
+    @URL(message = "转账结果的 notify 回调地址必须是 URL 格式")
+    private String notifyUrl;
 }
