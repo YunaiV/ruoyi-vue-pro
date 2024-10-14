@@ -124,8 +124,13 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         return new PageResult<>(tasks, count);
     }
 
+    // TODO 1： @jason：这个，赞要不要放到 BpmApprovalDetailRespVO 里？然后 BpmApprovalDetailRespVO 返回流程实例的信息 processInstance、待审批的信息 todoTask、approveNodes 审批信息列表、以及 getFormFieldsPermission 也融合进去；
+    // 类似我们现在新的 get-bpmn-model-view，就是给 bpmn xml 高亮用的。那 get-approval-detail 就是给审批第一个 tab 用的，基本信息 + 按钮 + 流程预测
+
+    // TODO 2：是不是只返回一个 Task。按道理说，只会有一个审批？
     @Override
     public List<BpmTaskRespVO> getTodoTask(Long userId, String processInstanceId) {
+        // TODO 芋艿：暂未 review，后续再瞅瞅。先沟通完整体设计。
         TaskQuery taskQuery = taskService.createTaskQuery()
                 .active()
                 .processInstanceId(processInstanceId)
