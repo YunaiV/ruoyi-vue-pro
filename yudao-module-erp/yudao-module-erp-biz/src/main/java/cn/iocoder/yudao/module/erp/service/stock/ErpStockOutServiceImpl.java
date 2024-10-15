@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.erp.service.stock;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.iocoder.yudao.framework.common.exception.util.ThrowUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.number.MoneyUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
@@ -68,10 +69,8 @@ public class ErpStockOutServiceImpl implements ErpStockOutService {
         // 1.2 校验客户
         customerService.validateCustomer(createReqVO.getCustomerId());
         // 1.3 生成出库单号，并校验唯一性
-        String no = noRedisDAO.generate(ErpNoRedisDAO.STOCK_OUT_NO_PREFIX);
-        if (stockOutMapper.selectByNo(no) != null) {
-            throw exception(STOCK_OUT_NO_EXISTS);
-        }
+        String no = noRedisDAO.generate(ErpNoRedisDAO.STOCK_OUT_NO_PREFIX, STOCK_OUT_NO_OUT_OF_BOUNDS);
+        ThrowUtil.ifThrow(stockOutMapper.selectByNo(no) != null ,STOCK_OUT_NO_EXISTS);
 
         // 2.1 插入出库单
         ErpStockOutDO stockOut = BeanUtils.toBean(createReqVO, ErpStockOutDO.class, in -> in

@@ -32,13 +32,9 @@ public class ErpPurchaseRequestDO extends BaseDO {
      */
     private String no;
     /**
-     * 当日申请排序编号
-     */
-    private Integer num;
-    /**
      * 申请人
      */
-    private Long applicant;
+    private String applicant;
     /**
      * 申请部门
      */

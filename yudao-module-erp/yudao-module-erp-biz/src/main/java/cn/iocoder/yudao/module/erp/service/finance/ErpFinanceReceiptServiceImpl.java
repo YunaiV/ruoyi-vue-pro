@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.erp.service.finance;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.ObjectUtil;
+import cn.iocoder.yudao.framework.common.exception.util.ThrowUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
@@ -83,10 +84,8 @@ public class ErpFinanceReceiptServiceImpl implements ErpFinanceReceiptService {
             adminUserApi.validateUser(createReqVO.getFinanceUserId());
         }
         // 1.5 生成收款单号，并校验唯一性
-        String no = noRedisDAO.generate(ErpNoRedisDAO.FINANCE_RECEIPT_NO_PREFIX);
-        if (financeReceiptMapper.selectByNo(no) != null) {
-            throw exception(FINANCE_RECEIPT_NO_EXISTS);
-        }
+        String no = noRedisDAO.generate(ErpNoRedisDAO.FINANCE_RECEIPT_NO_PREFIX, FINANCE_RECEIPT_NO_OUT_OF_BOUNDS);
+        ThrowUtil.ifThrow(financeReceiptMapper.selectByNo(no) != null ,FINANCE_RECEIPT_NO_EXISTS);
 
         // 2.1 插入收款单
         ErpFinanceReceiptDO receipt = BeanUtils.toBean(createReqVO, ErpFinanceReceiptDO.class, in -> in

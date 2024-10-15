@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.erp.service.purchase;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
+import cn.iocoder.yudao.framework.common.exception.util.ThrowUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.number.MoneyUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
@@ -79,10 +80,8 @@ public class ErpPurchaseInServiceImpl implements ErpPurchaseInService {
         // 1.3 校验结算账户
         accountService.validateAccount(createReqVO.getAccountId());
         // 1.4 生成入库单号，并校验唯一性
-        String no = noRedisDAO.generate(ErpNoRedisDAO.PURCHASE_IN_NO_PREFIX);
-        if (purchaseInMapper.selectByNo(no) != null) {
-            throw exception(PURCHASE_IN_NO_EXISTS);
-        }
+        String no = noRedisDAO.generate(ErpNoRedisDAO.PURCHASE_IN_NO_PREFIX, PURCHASE_IN_NO_OUT_OF_BOUNDS);
+        ThrowUtil.ifThrow(purchaseInMapper.selectByNo(no) != null ,PURCHASE_IN_NO_EXISTS);
 
         // 2.1 插入入库
         ErpPurchaseInDO purchaseIn = BeanUtils.toBean(createReqVO, ErpPurchaseInDO.class, in -> in

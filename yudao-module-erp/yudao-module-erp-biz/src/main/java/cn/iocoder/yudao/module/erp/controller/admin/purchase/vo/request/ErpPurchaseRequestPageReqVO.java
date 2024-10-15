@@ -17,9 +17,6 @@ public class ErpPurchaseRequestPageReqVO extends PageParam {
     @Schema(description = "单据编号")
     private String no;
 
-    @Schema(description = "当日申请排序编号")
-    private Integer num;
-
     @Schema(description = "申请人")
     private String applicant;
 

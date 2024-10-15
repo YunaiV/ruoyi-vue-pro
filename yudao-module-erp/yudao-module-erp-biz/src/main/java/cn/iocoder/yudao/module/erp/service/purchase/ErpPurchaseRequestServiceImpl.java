@@ -9,10 +9,9 @@ import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseRequestDO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseRequestItemsDO;
 import cn.iocoder.yudao.module.erp.dal.mysql.purchase.ErpPurchaseRequestItemsMapper;
 import cn.iocoder.yudao.module.erp.dal.mysql.purchase.ErpPurchaseRequestMapper;
+import cn.iocoder.yudao.module.erp.dal.redis.no.ErpNoRedisDAO;
 import cn.iocoder.yudao.module.erp.enums.ErpAuditStatus;
-import cn.iocoder.yudao.module.erp.enums.SerialConstants;
 import cn.iocoder.yudao.module.erp.service.product.ErpProductService;
-import cn.iocoder.yudao.module.erp.util.SerialGeneratorUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,13 +20,12 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import static cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants.DB_BATCH_INSERT_ERROR;
 import static cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants.DB_INSERT_ERROR;
-import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
-import static cn.iocoder.yudao.framework.common.util.date.DateUtils.formatLocalDate;
 import static cn.iocoder.yudao.module.erp.enums.ErrorCodeConstants.*;
 
 /**
@@ -42,32 +40,24 @@ public class ErpPurchaseRequestServiceImpl implements ErpPurchaseRequestService 
     private final ErpPurchaseRequestMapper erpPurchaseRequestMapper;
     private final ErpPurchaseRequestItemsMapper erpPurchaseRequestItemsMapper;
     private final ErpProductService productService;
+    private final ErpNoRedisDAO noRedisDAO;
 
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public synchronized Long createPurchaseRequest(ErpPurchaseRequestSaveReqVO createReqVO) {
+    public Long createPurchaseRequest(ErpPurchaseRequestSaveReqVO createReqVO) {
         //获取单据日期
         LocalDateTime date = createReqVO.getRequestTime();
         //转化为LocalDate
         LocalDate dateTime = date.toLocalDate();
-        //获取当日最大时间和最小时间
-        LocalDateTime minTime = LocalDateTime.of(dateTime, LocalTime.MIN);
-        LocalDateTime maxTime = LocalDateTime.of(dateTime, LocalTime.MAX);
-        //获取当日最大的编号数字
-        Integer maxSerialNum = erpPurchaseRequestMapper.getMaxSerialNum(minTime, maxTime);
-        //生成新的序列数字,并且+1
-        int newSerialNum = maxSerialNum + 1;
-        //如果数值大于999999，返回错误 --->> {今日单据编号已超过最大值999999}
-        ThrowUtil.ifThrow(newSerialNum > 999999,PURCHASE_REQUEST_SERIAL_NUM_OVERFLOW);
-        //将数字转为字符串，并且不足6位的前面自动填充为0
-        String serialNumStr = String.format("%06d", newSerialNum);
         //生成单据编号
-        String generateSerial = SerialGeneratorUtil.generateSerial(SerialConstants.PURCHASE_REQUEST_PREFIX, formatLocalDate(dateTime),serialNumStr);
+        String no = noRedisDAO.generate(ErpNoRedisDAO.PURCHASE_REQUEST_NO_PREFIX, PURCHASE_REQUEST_NO_OUT_OF_BOUNDS);
+        //校验编号no是否在数据库中重复
+        ThrowUtil.ifThrow(erpPurchaseRequestMapper.selectByNo(no) != null ,PURCHASE_REQUEST_NO_EXISTS);
+        //bean拷贝
         ErpPurchaseRequestDO purchaseRequest = BeanUtils.toBean(createReqVO, ErpPurchaseRequestDO.class);
-        //为单据编号和今日最大数赋值
-        purchaseRequest.setNo(generateSerial);
-        purchaseRequest.setNum(newSerialNum);
+        //为单据编号赋值
+        purchaseRequest.setNo(no);
         //校验产品是否存在
         List<ErpPurchaseRequestItemsDO> itemsDOList = validatePurchaseRequestItems(createReqVO.getItems());
         // 插入主表的申请单数据
@@ -126,6 +116,28 @@ public class ErpPurchaseRequestServiceImpl implements ErpPurchaseRequestService 
 
     @Override
     @Transactional(rollbackFor = Exception.class)
+    public void updatePurchaseRequestStatus(Long id, Integer status) {
+        boolean approve = ErpAuditStatus.APPROVE.getStatus().equals(status);
+        // 1.1 校验存在
+        ErpPurchaseRequestDO erpPurchaseRequest = validatePurchaseRequestExists(id);
+        // 1.2 校验状态
+        ThrowUtil.ifThrow(erpPurchaseRequest.getStatus().equals(status),approve ? PURCHASE_REQUEST_APPROVE_FAIL : PURCHASE_REQUEST_PROCESS_FAIL);
+        // 2. 更新状态
+        int updateCount = erpPurchaseRequestMapper.updateByIdAndStatus(id, erpPurchaseRequest.getStatus(),
+                new ErpPurchaseRequestDO().setStatus(status));
+        ThrowUtil.ifThrow(updateCount <= 0 , approve ? PURCHASE_REQUEST_APPROVE_FAIL : PURCHASE_REQUEST_PROCESS_FAIL);
+    }
+
+    @Override
+    public List<ErpPurchaseRequestItemsDO> getPurchaseRequestItemListByOrderIds(Collection<Long> requestIds) {
+        if (CollUtil.isEmpty(requestIds)) {
+            return Collections.emptyList();
+        }
+        return erpPurchaseRequestItemsMapper.selectListByRequestIds(requestIds);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
     public void deletePurchaseRequest(List<Long> ids) {
         // 1. 校验不处于已审批
         List<ErpPurchaseRequestDO> purchaseRequestDOs = erpPurchaseRequestMapper.selectBatchIds(ids);
@@ -150,9 +162,7 @@ public class ErpPurchaseRequestServiceImpl implements ErpPurchaseRequestService 
 
     private ErpPurchaseRequestDO validatePurchaseRequestExists(Long id) {
         ErpPurchaseRequestDO erpPurchaseRequestDO = erpPurchaseRequestMapper.selectById(id);
-        if (erpPurchaseRequestDO == null) {
-            throw exception(PURCHASE_REQUEST_NOT_EXISTS);
-        }
+        ThrowUtil.ifThrow(erpPurchaseRequestDO == null,PURCHASE_REQUEST_NOT_EXISTS);
         return erpPurchaseRequestDO;
     }
 
