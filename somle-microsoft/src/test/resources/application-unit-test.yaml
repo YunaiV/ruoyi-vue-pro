@@ -13,22 +13,22 @@ logging:
 
 spring:
   # 数据源配置项
-  datasource:
-    url: jdbc:mysql://192.168.10.131:3306/ruoyi-vue-pro?serverTimezone=GMT%2B8&useSSL=false&characterEncoding=utf-8
-    driverClassName: com.mysql.cj.jdbc.Driver
-    username: it003
-    password: asivJssflioKK
+#  datasource:
+#    url: jdbc:mysql://192.168.10.131:3306/ruoyi-vue-pro?serverTimezone=GMT%2B8&useSSL=false&characterEncoding=utf-8
+#    driverClassName: com.mysql.cj.jdbc.Driver
+#    username: it003
+#    password: asivJssflioKK
 #  sql:
 #    init:
 #      schema-locations: classpath:/sql/create_tables.sql
 
   # Redis 配置。Redisson 默认的配置足够使用，一般不需要进行调优
-  data:
-    redis:
-      host: 127.0.0.1 # 地址
-      port: 16379 # 端口（单元测试，使用 16379 端口）
-      database: 0 # 数据库索引
-      password: uniplore
+#  data:
+#    redis:
+#      host: 127.0.0.1 # 地址
+#      port: 16379 # 端口（单元测试，使用 16379 端口）
+#      database: 0 # 数据库索引
+#      password: uniplore
 
 #mybatis:
 #  lazy-initialization: true # 单元测试，设置 MyBatis Mapper 延迟加载，加速每个单元测试
