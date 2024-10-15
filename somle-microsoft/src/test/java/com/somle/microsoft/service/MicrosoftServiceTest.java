@@ -14,7 +14,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @Slf4j
 @Import(MicrosoftService.class)
-class AiServiceTest extends BaseSpringTest {
+class MicrosoftServiceTest extends BaseSpringTest {
 
     @Resource
     MicrosoftService service;
@@ -24,7 +24,7 @@ class AiServiceTest extends BaseSpringTest {
 
 
     @Test
-    void getNames() {
+    void getToken() {
         var result = service.getPasswordToken();
         log.info(result);
     }

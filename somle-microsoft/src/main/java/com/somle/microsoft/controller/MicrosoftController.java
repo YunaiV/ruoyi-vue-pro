@@ -10,17 +10,17 @@ import org.springframework.web.bind.annotation.*;
 
 
 @RestController
-@RequestMapping("/api/ai")
+@RequestMapping("/admin-api/microsoft")
 public class MicrosoftController {
     @Autowired
     private MicrosoftService service;
 
 
 
-//    @GetMapping("/getNames")
-//    @ResponseBody
-//    public List<AiName> getNames(@RequestParam String dataDate) {
-//        return aiService.getNames(LocalDate.parse(dataDate)).toList();
-//    }
+    @GetMapping("/getPasswordToken")
+    @ResponseBody
+    public String getPasswordToken() {
+        return service.getPasswordToken();
+    }
 
 }
