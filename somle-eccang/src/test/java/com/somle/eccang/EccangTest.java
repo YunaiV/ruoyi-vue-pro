@@ -63,6 +63,12 @@ public class EccangTest extends BaseSpringTest {
     }
 
     @Test
+    void getInventory() {
+        var result = service.getInventory();
+        log.info(result.toString());
+    }
+
+    @Test
     void getInventoryBatchLog() {
         var date = LocalDate.of(2024,8,6);
         var time1 = LocalTime.of(0,0,0);
