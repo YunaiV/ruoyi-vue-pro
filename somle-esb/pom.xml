@@ -74,6 +74,7 @@
             <artifactId>somle-eccang</artifactId>
             <version>${revision}</version>
         </dependency>
+
         <dependency>
             <groupId>com.somle</groupId>
             <artifactId>somle-microsoft</artifactId>
