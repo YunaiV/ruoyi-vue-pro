@@ -11,14 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
-public class EccangOrderSysCreateDataJob extends DataJob{
-    @Autowired
-    EsbService service;
-
-    @Autowired
-    EccangService eccangService;
-
-    final String DATABASE = Domain.ECCANG.toString();
+public class EccangOrderSysCreateDataJob extends EccangDataJob{
 
 
     @Override
