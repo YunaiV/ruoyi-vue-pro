@@ -33,13 +33,13 @@ public interface BpmTaskService {
     PageResult<Task> getTaskTodoPage(Long userId, BpmTaskPageReqVO pageReqVO);
 
     /**
-     * 获得待办任务列表
+     * 获得用户的待办任务， 多条待办任务按时间顺序返回第一条
      *
      * @param userId 用户编号
      * @param processInstanceId 流程实例编号
-     * @return 流程任务列表
+     * @return 待办任务
      */
-    List<BpmTaskRespVO> getTodoTask(Long userId, String processInstanceId);
+    BpmTaskRespVO getTodoTask(Long userId, String processInstanceId);
 
     /**
      * 获得已办的流程任务分页
@@ -82,7 +82,7 @@ public interface BpmTaskService {
      * 获得指定流程实例的流程任务列表，包括所有状态的
      *
      * @param processInstanceId 流程实例的编号
-     * @param asc 是否升序
+     * @param asc               是否升序
      * @return 流程任务列表
      */
     List<HistoricTaskInstance> getTaskListByProcessInstanceId(String processInstanceId, Boolean asc);
@@ -115,8 +115,8 @@ public interface BpmTaskService {
      * 根据条件查询正在进行中的任务
      *
      * @param processInstanceId 流程实例编号，不允许为空
-     * @param assigned 是否分配了审批人，允许空
-     * @param taskDefineKey 任务定义 Key，允许空
+     * @param assigned          是否分配了审批人，允许空
+     * @param taskDefineKey     任务定义 Key，允许空
      */
     List<Task> getRunningTaskListByProcessInstanceId(String processInstanceId,
                                                      Boolean assigned,
@@ -223,10 +223,10 @@ public interface BpmTaskService {
 
     /**
      * 处理 Task 创建事件，目前是
-     *
+     * <p>
      * 1. 更新它的状态为审批中
      * 2. 处理自动通过的情况，例如说：1）无审批人时，是否自动通过、不通过；2）非【人工审核】时，是否自动通过、不通过
-     *
+     * <p>
      * 注意：它的触发时机，晚于 {@link #processTaskAssigned(Task)} 之后
      *
      * @param task 任务实体
@@ -251,8 +251,8 @@ public interface BpmTaskService {
      * 处理 Task 审批超时事件，可能会处理多个当前审批中的任务
      *
      * @param processInstanceId 流程示例编号
-     * @param taskDefineKey 任务 Key
-     * @param handlerType 处理类型，参见 {@link BpmUserTaskTimeoutHandlerTypeEnum}
+     * @param taskDefineKey     任务 Key
+     * @param handlerType       处理类型，参见 {@link BpmUserTaskTimeoutHandlerTypeEnum}
      */
     void processTaskTimeout(String processInstanceId, String taskDefineKey, Integer handlerType);
 

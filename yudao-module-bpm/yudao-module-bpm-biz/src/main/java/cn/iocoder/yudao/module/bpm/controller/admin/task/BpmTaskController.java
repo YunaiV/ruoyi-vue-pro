@@ -79,8 +79,7 @@ public class BpmTaskController {
     @Parameter(name = "processInstanceId", description = "流程实例的编号", required = true)
     @PreAuthorize("@ss.hasPermission('bpm:task:query')")
     public CommonResult<BpmTaskRespVO> getMyTodoTask(@RequestParam("processInstanceId") String processInstanceId) {
-        List<BpmTaskRespVO> taskList = taskService.getTodoTask(getLoginUserId(), processInstanceId);
-        return success(findFirst(taskList, Objects::nonNull));
+        return success(taskService.getTodoTask(getLoginUserId(), processInstanceId));
     }
 
     @GetMapping("done-page")

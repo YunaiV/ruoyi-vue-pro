@@ -5,7 +5,6 @@ import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.*;
 import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.date.DateUtils;
 import cn.iocoder.yudao.framework.common.util.number.NumberUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
@@ -127,10 +126,12 @@ public class BpmTaskServiceImpl implements BpmTaskService {
     // TODO 1： @jason：这个，赞要不要放到 BpmApprovalDetailRespVO 里？然后 BpmApprovalDetailRespVO 返回流程实例的信息 processInstance、待审批的信息 todoTask、approveNodes 审批信息列表、以及 getFormFieldsPermission 也融合进去；
     // 类似我们现在新的 get-bpmn-model-view，就是给 bpmn xml 高亮用的。那 get-approval-detail 就是给审批第一个 tab 用的，基本信息 + 按钮 + 流程预测
 
-    // TODO 2：是不是只返回一个 Task。按道理说，只会有一个审批？
     @Override
-    public List<BpmTaskRespVO> getTodoTask(Long userId, String processInstanceId) {
+    public BpmTaskRespVO getTodoTask(Long userId, String processInstanceId) {
         // TODO 芋艿：暂未 review，后续再瞅瞅。先沟通完整体设计。
+        if (processInstanceId == null) {
+            return null;
+        }
         TaskQuery taskQuery = taskService.createTaskQuery()
                 .active()
                 .processInstanceId(processInstanceId)
@@ -153,7 +154,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(userIds);
         Map<Long, DeptRespDTO> deptMap = deptApi.getDeptMap(
                 convertSet(userMap.values(), AdminUserRespDTO::getDeptId));
-        return CollectionUtils.convertList(todoList, task -> {
+        List<BpmTaskRespVO> taskList = convertList(todoList, task -> {
             // 找到分配给当前用户，或者当前用户加签的任务（为了减签）
             if (!userId.equals(NumberUtil.parseLong(task.getAssignee(), null)) &&
                     (!userId.equals(NumberUtil.parseLong(task.getOwner(), null)) || BpmTaskSignTypeEnum.of(task.getScopeType()) == null)) {
@@ -173,22 +174,23 @@ public class BpmTaskServiceImpl implements BpmTaskService {
                 List<Task> childTasks = childrenTaskMap.get(task.getId());
                 if (CollUtil.isNotEmpty(childTasks)) {
                     taskVO.setChildren(
-                        CollectionUtils.convertList(childTasks, childTask -> {
-                            BpmTaskRespVO childTaskVO = BeanUtils.toBean(task, BpmTaskRespVO.class);
-                            childTaskVO.setStatus(FlowableUtils.getTaskStatus(task));
-                            AdminUserRespDTO assignUser = userMap.get(NumberUtils.parseLong(childTask.getAssignee()));
-                            if (assignUser != null) {
-                                childTaskVO.setAssigneeUser(BeanUtils.toBean(assignUser, BpmProcessInstanceRespVO.User.class));
-                                findAndThen(deptMap, assignUser.getDeptId(), dept -> childTaskVO.getAssigneeUser().setDeptName(dept.getName()));
-                            }
-                            return childTaskVO;
-                        })
+                            convertList(childTasks, childTask -> {
+                                BpmTaskRespVO childTaskVO = BeanUtils.toBean(task, BpmTaskRespVO.class);
+                                childTaskVO.setStatus(FlowableUtils.getTaskStatus(task));
+                                AdminUserRespDTO assignUser = userMap.get(NumberUtils.parseLong(childTask.getAssignee()));
+                                if (assignUser != null) {
+                                    childTaskVO.setAssigneeUser(BeanUtils.toBean(assignUser, BpmProcessInstanceRespVO.User.class));
+                                    findAndThen(deptMap, assignUser.getDeptId(), dept -> childTaskVO.getAssigneeUser().setDeptName(dept.getName()));
+                                }
+                                return childTaskVO;
+                            })
                     );
                 }
 
             }
             return taskVO;
         });
+        return findFirst(taskList, Objects::nonNull);
     }
 
     @Override

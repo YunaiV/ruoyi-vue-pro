@@ -1,11 +1,14 @@
 package cn.iocoder.yudao.module.bpm.controller.admin.task.vo.instance;
 
 import cn.iocoder.yudao.module.bpm.controller.admin.base.user.UserSimpleBaseVO;
+import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.process.BpmProcessDefinitionRespVO;
+import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.task.BpmTaskRespVO;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 
 @Schema(description = "管理后台 - 审批详情 Response VO")
@@ -17,6 +20,22 @@ public class BpmApprovalDetailRespVO {
 
     @Schema(description = "审批信息列表", requiredMode = Schema.RequiredMode.REQUIRED)
     private List<ApprovalNodeInfo> approveNodes;
+
+    @Schema(description = "表单字段权限")
+    private Map<String, String> formFieldsPermission;
+
+    @Schema(description = "待办任务")
+    private BpmTaskRespVO todoTask;
+
+    /**
+     * 所属流程定义信息
+     */
+    private BpmProcessDefinitionRespVO processDefinition;
+
+    /**
+     * 所属流程实例信息
+     */
+    private BpmProcessInstanceRespVO processInstance;
 
     @Schema(description = "审批节点信息")
     @Data

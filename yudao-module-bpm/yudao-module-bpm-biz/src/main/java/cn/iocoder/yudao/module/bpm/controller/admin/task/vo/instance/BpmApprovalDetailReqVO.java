@@ -17,6 +17,12 @@ public class BpmApprovalDetailReqVO {
     @Schema(description = "流程实例的编号", example = "1024")
     private String processInstanceId;
 
+    @Schema(description = "流程活动编号",  example = "StartUserNode")
+    private String activityId; // 对应 BPMN XML 节点 Id
+
+    @Schema(description = "流程任务编号", example = "95f2f08b-621b-11ef-bf39-00ff4722db8b")
+    private String taskId; // UserTask 对应的Id
+
     @AssertTrue(message = "流程定义的编号和流程实例的编号不能同时为空")
     @JsonIgnore
     public boolean isValidProcessParam() {

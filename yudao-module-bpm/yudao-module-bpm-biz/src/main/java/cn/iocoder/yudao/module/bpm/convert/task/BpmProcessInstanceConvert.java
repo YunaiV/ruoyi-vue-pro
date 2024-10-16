@@ -75,7 +75,6 @@ public interface BpmProcessInstanceConvert {
     default BpmProcessInstanceRespVO buildProcessInstance(HistoricProcessInstance processInstance,
                                                           ProcessDefinition processDefinition,
                                                           BpmProcessDefinitionInfoDO processDefinitionExt,
-                                                          String bpmnXml,
                                                           AdminUserRespDTO startUser,
                                                           DeptRespDTO dept) {
         BpmProcessInstanceRespVO respVO = BeanUtils.toBean(processInstance, BpmProcessInstanceRespVO.class);
@@ -84,7 +83,6 @@ public interface BpmProcessInstanceConvert {
         // definition
         respVO.setProcessDefinition(BeanUtils.toBean(processDefinition, BpmProcessDefinitionRespVO.class));
         copyTo(processDefinitionExt, respVO.getProcessDefinition());
-        respVO.getProcessDefinition().setBpmnXml(bpmnXml);
         // user
         if (startUser != null) {
             respVO.setStartUser(BeanUtils.toBean(startUser, BpmProcessInstanceRespVO.User.class));

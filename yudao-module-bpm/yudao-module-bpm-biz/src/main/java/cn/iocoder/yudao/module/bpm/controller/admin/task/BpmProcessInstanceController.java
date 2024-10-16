@@ -8,7 +8,6 @@ import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.instance.*;
 import cn.iocoder.yudao.module.bpm.convert.task.BpmProcessInstanceConvert;
 import cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmCategoryDO;
 import cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmProcessDefinitionInfoDO;
-import cn.iocoder.yudao.module.bpm.framework.flowable.core.util.BpmnModelUtils;
 import cn.iocoder.yudao.module.bpm.service.definition.BpmCategoryService;
 import cn.iocoder.yudao.module.bpm.service.definition.BpmProcessDefinitionService;
 import cn.iocoder.yudao.module.bpm.service.task.BpmProcessInstanceService;
@@ -128,15 +127,13 @@ public class BpmProcessInstanceController {
                 processInstance.getProcessDefinitionId());
         BpmProcessDefinitionInfoDO processDefinitionInfo = processDefinitionService.getProcessDefinitionInfo(
                 processInstance.getProcessDefinitionId());
-        String bpmnXml = BpmnModelUtils.getBpmnXml(
-                processDefinitionService.getProcessDefinitionBpmnModel(processInstance.getProcessDefinitionId()));
         AdminUserRespDTO startUser = adminUserApi.getUser(NumberUtils.parseLong(processInstance.getStartUserId()));
         DeptRespDTO dept = null;
         if (startUser != null && startUser.getDeptId() != null) {
             dept = deptApi.getDept(startUser.getDeptId());
         }
         return success(BpmProcessInstanceConvert.INSTANCE.buildProcessInstance(processInstance,
-                processDefinition, processDefinitionInfo, bpmnXml, startUser, dept));
+                processDefinition, processDefinitionInfo, startUser, dept));
     }
 
     @DeleteMapping("/cancel-by-start-user")
@@ -155,14 +152,6 @@ public class BpmProcessInstanceController {
             @Valid @RequestBody BpmProcessInstanceCancelReqVO cancelReqVO) {
         processInstanceService.cancelProcessInstanceByAdmin(getLoginUserId(), cancelReqVO);
         return success(true);
-    }
-
-    @GetMapping("/get-form-fields-permission")
-    @Operation(summary = "获得表单字段权限")
-    @PreAuthorize("@ss.hasPermission('bpm:process-instance:query')")
-    public CommonResult<Map<String, String>> getFormFieldsPermission(
-            @Valid BpmFormFieldsPermissionReqVO reqVO) {
-        return success(processInstanceService.getFormFieldsPermission(reqVO));
     }
 
     @GetMapping("/get-approval-detail")
