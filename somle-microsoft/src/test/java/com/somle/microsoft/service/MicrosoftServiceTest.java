@@ -1,6 +1,7 @@
 package com.somle.microsoft.service;
 
 import com.somle.framework.test.core.ut.BaseSpringTest;
+import com.somle.microsoft.model.PowerbiReportReqVO;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
@@ -27,6 +28,17 @@ class MicrosoftServiceTest extends BaseSpringTest {
     void getToken() {
         var result = service.getPasswordToken();
         log.info(result);
+    }
+
+    @Test
+    void getEmbedReport() {
+        var result = service.getEmbedReport(
+            PowerbiReportReqVO.builder()
+                .groupId("992affd7-1e95-4213-bb80-758a9d1dbe86")
+                .reportId("e5e3fbe6-bd1b-479a-b417-fac868bcbd4a")
+                .build()
+        );
+        log.info(result.toString());
     }
 
 

@@ -4,6 +4,9 @@ package com.somle.microsoft.controller;
 import java.time.LocalDate;
 import java.util.List;
 
+import com.somle.framework.common.pojo.CommonResult;
+import com.somle.microsoft.model.PowerbiReportReqVO;
+import com.somle.microsoft.model.PowerbiReportRespVO;
 import com.somle.microsoft.service.MicrosoftService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -17,10 +20,10 @@ public class MicrosoftController {
 
 
 
-    @GetMapping("/getPasswordToken")
+    @GetMapping("/getEmbedReport")
     @ResponseBody
-    public String getPasswordToken() {
-        return service.getPasswordToken();
+    public CommonResult<PowerbiReportRespVO> getEmbedReport(PowerbiReportReqVO param) {
+        return CommonResult.success(service.getEmbedReport(param));
     }
 
 }
