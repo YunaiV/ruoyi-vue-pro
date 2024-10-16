@@ -134,8 +134,10 @@ public class EccangService {
                 throw new RuntimeException("Eccang return invalid response: " + response.getErrors().toString());
             case "300":
                 throw new RuntimeException("Error message from eccang: " + response.getErrors().toString());
+            case "429":
+                throw new RuntimeException("Too many requests");
             default:
-                throw new RuntimeException("Error message from eccang: " + response.getErrors().toString());
+                throw new RuntimeException("Unknown response code from eccang: " + response.getCode() + " " + response);
         }
     }
 

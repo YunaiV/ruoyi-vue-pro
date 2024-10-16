@@ -83,10 +83,7 @@ public class AiService {
     }
 
     public <T> Stream<T> getResults(String url, Class<T> objectclass) {
-        return getReponses(url).flatMap(n->{
-            log.info(n.toString());
-            return n.getResults(objectclass);
-        });
+        return getReponses(url).flatMap(n-> n.getResults(objectclass));
     }
 
     public Stream<AiResponse> getReponses(String url) {
