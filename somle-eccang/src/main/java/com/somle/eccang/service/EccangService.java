@@ -106,18 +106,16 @@ public class EccangService {
         String url = "http://openapi-web.eccang.com/openApi/api/unity";
 
         EccangResponse responseFinal = CoreUtils.retry(ctx -> {
-            JSONObject requestBody = requestBody(payload, endpoint);
-            EccangResponse eccangResponse = limiter.executeWithLimiter(()->{
-                var response = WebUtils.postRequest(url, Map.of(), Map.of(), requestBody);
-                switch (response.code()) {
-                    case 200:
-                        log.info(response.toString());
-                        return WebUtils.parseResponse(response, EccangResponse.class);
-                    default:
-                        throw new RuntimeException("Error in network " + response.toString());
-                }
-            });
-            return eccangResponse;
+            // 限流器限制在生成签名前，防止签名过期
+            JSONObject requestBody = limiter.executeWithLimiter(()->requestBody(payload, endpoint));
+            var response = WebUtils.postRequest(url, Map.of(), Map.of(), requestBody);
+            switch (response.code()) {
+                case 200:
+                    log.info(response.toString());
+                    return WebUtils.parseResponse(response, EccangResponse.class);
+                default:
+                    throw new RuntimeException("Unknown response code " + response.toString());
+            }
         });
 
         return responseFinal;
@@ -130,6 +128,8 @@ public class EccangService {
         switch (response.getCode()) {
             case "200":
                 return response.getBizContent();
+            case "saas.api.error.code.0049":
+                throw new RuntimeException("签名过期：时间戳必须在一分钟以内，超出1分钟则过期失效，且只能用一次。 时间戳重新生成后，需要重新生成签名");
             case "common.error.code.9999":
                 throw new RuntimeException("Eccang return invalid response: " + response.getErrors().toString());
             case "300":
