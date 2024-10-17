@@ -28,11 +28,9 @@ public enum BpmSimpleModelNodeType implements IntArrayValuable {
 
     // 50 ~ 条件分支
     CONDITION_NODE(50, "sequenceFlow", "条件节点"), // 用于构建流转条件的表达式
-    CONDITION_BRANCH_NODE(51, " “parallelGateway”", "条件分支节点"), // TODO @jason：是不是改成叫 条件分支？
-    PARALLEL_BRANCH_NODE(52, "exclusiveGateway", "并行分支节点"), // TODO @jason：是不是一个 并行分支 ？就可以啦？ 后面是否去掉并行网关。只用包容网关
+    CONDITION_BRANCH_NODE(51, "parallelGateway", "条件分支节点"),
+    PARALLEL_BRANCH_NODE(52, "exclusiveGateway", "并行分支节点"),
     INCLUSIVE_BRANCH_NODE(53, "inclusiveGateway", "包容分支节点"),
-    // TODO @jason：建议整合 join，最终只有 条件分支、并行分支、包容分支，三种~
-    // TODO @芋艿。 感觉还是分开好理解一点,也好处理一点。前端结构中把聚合节点显示并传过来。
     ;
 
     public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(BpmSimpleModelNodeType::getType).toArray();

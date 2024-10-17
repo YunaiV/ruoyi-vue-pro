@@ -35,7 +35,7 @@ import static cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnMode
 import static org.flowable.bpmn.constants.BpmnXMLConstants.*;
 
 /**
- * 仿钉钉快搭模型相关的工具方法
+ * 仿钉钉/飞书的模型相关的工具方法
  *
  * @author jason
  */
@@ -47,24 +47,7 @@ public class SimpleModelUtils {
     public static final String JOIN_GATE_WAY_NODE_ID_SUFFIX = "_join";
 
     /**
-     * 所有审批人同意的表达式
-     */
-    public static final String ALL_APPROVE_COMPLETE_EXPRESSION = "${ nrOfCompletedInstances >= nrOfInstances }";
-
-    /**
-     * 任一一名审批人同意的表达式
-     */
-    public static final String ANY_OF_APPROVE_COMPLETE_EXPRESSION = "${ nrOfCompletedInstances > 0 }";
-
-    /**
-     * 按通过比例完成表达式
-     */
-    public static final String APPROVE_BY_RATIO_COMPLETE_EXPRESSION = "${ nrOfCompletedInstances/nrOfInstances >= %s}";
-
-    // TODO @yunai：注释需要完善下；
-
-    /**
-     * 仿钉钉流程设计模型数据结构(json) 转换成 Bpmn Model (待完善）
+     * 仿钉钉流程设计模型数据结构(json) 转换成 Bpmn Model
      *
      * @param processId       流程标识
      * @param processName     流程名称
@@ -72,20 +55,19 @@ public class SimpleModelUtils {
      * @return Bpmn Model
      */
     public static BpmnModel buildBpmnModel(String processId, String processName, BpmSimpleModelNodeVO simpleModelNode) {
+        // 1. 创建 BpmnModel
         BpmnModel bpmnModel = new BpmnModel();
-        // 不加这个 解析 Message 会报 NPE 异常 .
-        bpmnModel.setTargetNamespace(BPMN2_NAMESPACE); // TODO @jason：待定：是不是搞个自定义的 namespace；
-        // TODO 芋艿：后续在 review
-
+        bpmnModel.setTargetNamespace(BPMN2_NAMESPACE); // 设置命名空间。不加这个，解析 Message 会报 NPE 异常
+        // 创建 Process 对象
         Process process = new Process();
         process.setId(processId);
         process.setName(processName);
-        process.setExecutable(Boolean.TRUE); // TODO @jason：这个是必须设置的么？
+        process.setExecutable(Boolean.TRUE);
         bpmnModel.addProcess(process);
 
-        // TODO 芋艿：这里可能纠结下，到底前端传递，还是后端创建出来。
-        // 目前前端的第一个节点是“发起人节点”。这里构建一个 StartNode，用于创建 Bpmn 的 StartEvent 节点
-        BpmSimpleModelNodeVO startNode = buildStartSimpleModelNode();
+        // 2.1 创建 StartNode 节点
+        // 原因是：目前前端的第一个节点是“发起人节点”，所以这里构建一个 StartNode，用于创建 Bpmn 的 StartEvent 节点
+        BpmSimpleModelNodeVO startNode = buildStartNode();
         startNode.setChildNode(simpleModelNode);
         // 从 前端模型数据结构 SimpleModel 构建 FlowNode 并添加到 Main Process
         traverseNodeToBuildFlowNode(startNode, process);
@@ -99,12 +81,8 @@ public class SimpleModelUtils {
         return bpmnModel;
     }
 
-    private static BpmSimpleModelNodeVO buildStartSimpleModelNode() {
-        BpmSimpleModelNodeVO startNode = new BpmSimpleModelNodeVO();
-        startNode.setId(START_EVENT_NODE_ID);
-        startNode.setName(START_EVENT_NODE_NAME);
-        startNode.setType(START_NODE.getType());
-        return startNode;
+    private static BpmSimpleModelNodeVO buildStartNode() {
+        return new BpmSimpleModelNodeVO().setId(START_EVENT_NODE_ID).setName(START_EVENT_NODE_NAME).setType(START_NODE.getType());
     }
 
     // TODO @芋艿：在优化下这个注释
@@ -329,7 +307,6 @@ public class SimpleModelUtils {
                 list.addAll(parallelGateways);
                 break;
             }
-
             case INCLUSIVE_BRANCH_NODE: {
                 // TODO jason 待实现
                 break;
@@ -512,29 +489,29 @@ public class SimpleModelUtils {
 
     private static void processMultiInstanceLoopCharacteristics(Integer approveMethod, Integer approveRatio, UserTask userTask) {
         BpmUserTaskApproveMethodEnum approveMethodEnum = BpmUserTaskApproveMethodEnum.valueOf(approveMethod);
-        // TODO @jason：这种枚举，最终不要去掉哈 BpmUserTaskApproveMethodEnum。因为容易不经意重叠
-        if (approveMethodEnum == null || approveMethodEnum == RANDOM) {
+        Assert.notNull(approveMethodEnum, "审批方式({})不能为空", approveMethodEnum);
+        // 添加审批方式的扩展属性
+        addExtensionElement(userTask, BpmnModelConstants.USER_TASK_APPROVE_METHOD, approveMethod.toString());
+        if (approveMethodEnum == RANDOM) {
+            // 随机审批，不需要设置多实例属性
             return;
         }
-        // 添加审批方式的扩展属性
-        addExtensionElement(userTask, BpmnModelConstants.USER_TASK_APPROVE_METHOD,
-                approveMethod == null ? null : approveMethod.toString());
+
+        // 处理多实例审批方式
         MultiInstanceLoopCharacteristics multiInstanceCharacteristics = new MultiInstanceLoopCharacteristics();
-        // 设置 collectionVariable。本系统用不到。仅仅为了 Flowable 校验不报错。
+        // 设置 collectionVariable。本系统用不到，仅仅为了 Flowable 校验不报错
         multiInstanceCharacteristics.setInputDataItem("${coll_userList}");
         if (approveMethodEnum == BpmUserTaskApproveMethodEnum.ANY) {
-            multiInstanceCharacteristics.setCompletionCondition(ANY_OF_APPROVE_COMPLETE_EXPRESSION);
+            multiInstanceCharacteristics.setCompletionCondition(approveMethodEnum.getCompletionCondition());
             multiInstanceCharacteristics.setSequential(false);
-            userTask.setLoopCharacteristics(multiInstanceCharacteristics);
         } else if (approveMethodEnum == SEQUENTIAL) {
-            multiInstanceCharacteristics.setCompletionCondition(ALL_APPROVE_COMPLETE_EXPRESSION);
+            multiInstanceCharacteristics.setCompletionCondition(approveMethodEnum.getCompletionCondition());
             multiInstanceCharacteristics.setSequential(true);
             multiInstanceCharacteristics.setLoopCardinality("1");
-            userTask.setLoopCharacteristics(multiInstanceCharacteristics);
         } else if (approveMethodEnum == RATIO) {
             Assert.notNull(approveRatio, "通过比例不能为空");
             multiInstanceCharacteristics.setCompletionCondition(
-                    String.format(APPROVE_BY_RATIO_COMPLETE_EXPRESSION, String.format("%.2f", approveRatio / (double) 100)));
+                    String.format(approveMethodEnum.getCompletionCondition(), String.format("%.2f", approveRatio / 100D)));
             multiInstanceCharacteristics.setSequential(false);
         }
         userTask.setLoopCharacteristics(multiInstanceCharacteristics);
