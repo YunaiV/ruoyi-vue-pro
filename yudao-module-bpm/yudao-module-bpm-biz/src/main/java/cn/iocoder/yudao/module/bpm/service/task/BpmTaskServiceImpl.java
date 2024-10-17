@@ -123,29 +123,28 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         return new PageResult<>(tasks, count);
     }
 
-    // TODO 1： @jason：这个，赞要不要放到 BpmApprovalDetailRespVO 里？然后 BpmApprovalDetailRespVO 返回流程实例的信息 processInstance、待审批的信息 todoTask、approveNodes 审批信息列表、以及 getFormFieldsPermission 也融合进去；
-    // 类似我们现在新的 get-bpmn-model-view，就是给 bpmn xml 高亮用的。那 get-approval-detail 就是给审批第一个 tab 用的，基本信息 + 按钮 + 流程预测
-
     @Override
-    public BpmTaskRespVO getTodoTask(Long userId, String processInstanceId) {
-        // TODO 芋艿：暂未 review，后续再瞅瞅。先沟通完整体设计。
+    public BpmTaskRespVO getFirstTodoTask(Long userId, String processInstanceId) {
         if (processInstanceId == null) {
             return null;
         }
+        // 1.1 查询任务
         TaskQuery taskQuery = taskService.createTaskQuery()
                 .active()
                 .processInstanceId(processInstanceId)
                 .includeTaskLocalVariables()
                 .includeProcessVariables()
                 .orderByTaskCreateTime().asc(); // 按创建时间升序
-        HistoricProcessInstance processInstance = processInstanceService.getHistoricProcessInstance(processInstanceId);
-        BpmnModel bpmnModel = bpmProcessDefinitionService.getProcessDefinitionBpmnModel(processInstance.getProcessDefinitionId());
         List<Task> todoList = taskQuery.list();
-        // 找到子任务。用于减签
+        if (CollUtil.isEmpty(todoList)) {
+            return null;
+        }
+        // 1.2 构建子任务 Map，用于减签。key：parentTaskId
         Map<String, List<Task>> childrenTaskMap = convertMultiMap(
                 filterList(todoList, r -> StrUtil.isNotEmpty(r.getParentTaskId())),
                 Task::getParentTaskId);
-        // 获取用户信息
+
+        // 2.1 获取用户信息
         Set<Long> userIds = CollUtil.newHashSet();
         todoList.forEach(task -> {
             CollUtil.addIfAbsent(userIds, NumberUtils.parseLong((task.getAssignee())));
@@ -154,8 +153,13 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(userIds);
         Map<Long, DeptRespDTO> deptMap = deptApi.getDeptMap(
                 convertSet(userMap.values(), AdminUserRespDTO::getDeptId));
+        // 2.2 构建 Task 列表的返回信息
+        HistoricProcessInstance processInstance = processInstanceService.getHistoricProcessInstance(processInstanceId);
+        BpmnModel bpmnModel = bpmProcessDefinitionService.getProcessDefinitionBpmnModel(processInstance.getProcessDefinitionId());
         List<BpmTaskRespVO> taskList = convertList(todoList, task -> {
             // 找到分配给当前用户，或者当前用户加签的任务（为了减签）
+            // TODO @jason：1）可以抽个小方法，判断是否是当前用户的任务；2）尽量不做取反，而是通过 ObjUtil.notEquals 。
+            //  TODO 3）(!userId.equals(NumberUtil.parseLong(task.getOwner(), null)) || BpmTaskSignTypeEnum.of(task.getScopeType()) == null) 这个判断的目的是啥？
             if (!userId.equals(NumberUtil.parseLong(task.getAssignee(), null)) &&
                     (!userId.equals(NumberUtil.parseLong(task.getOwner(), null)) || BpmTaskSignTypeEnum.of(task.getScopeType()) == null)) {
                 return null;
@@ -169,8 +173,11 @@ public class BpmTaskServiceImpl implements BpmTaskService {
                 findAndThen(deptMap, ownerUser.getDeptId(), dept -> taskVO.getOwnerUser().setDeptName(dept.getName()));
             }
             // 当前用户加签的任务. 找到它的子任务 (为了减签)
+            // TODO @json：这里最好也抽个小方法，userId.equals(NumberUtil.parseLong(task.getOwner(), null))
+            //                    && BpmTaskSignTypeEnum.of(task.getScopeType()) != null
             if (userId.equals(NumberUtil.parseLong(task.getOwner(), null))
                     && BpmTaskSignTypeEnum.of(task.getScopeType()) != null) {
+                // TODO @jason：170 到 173，和 181 到 192 这段拼接的逻辑，可以拿到 convert 里面。这样，这块 Service 更聚焦。
                 List<Task> childTasks = childrenTaskMap.get(task.getId());
                 if (CollUtil.isNotEmpty(childTasks)) {
                     taskVO.setChildren(

@@ -74,12 +74,13 @@ public class BpmTaskController {
         return success(BpmTaskConvert.INSTANCE.buildTodoTaskPage(pageResult, processInstanceMap, userMap));
     }
 
+    // TODO @jason：这个接口还要哇？
     @GetMapping("my-todo")
     @Operation(summary = "获取我的待办任务,取第一条")
     @Parameter(name = "processInstanceId", description = "流程实例的编号", required = true)
     @PreAuthorize("@ss.hasPermission('bpm:task:query')")
     public CommonResult<BpmTaskRespVO> getMyTodoTask(@RequestParam("processInstanceId") String processInstanceId) {
-        return success(taskService.getTodoTask(getLoginUserId(), processInstanceId));
+        return success(taskService.getFirstTodoTask(getLoginUserId(), processInstanceId));
     }
 
     @GetMapping("done-page")

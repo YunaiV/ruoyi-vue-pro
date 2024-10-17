@@ -33,13 +33,13 @@ public interface BpmTaskService {
     PageResult<Task> getTaskTodoPage(Long userId, BpmTaskPageReqVO pageReqVO);
 
     /**
-     * 获得用户的待办任务， 多条待办任务按时间顺序返回第一条
+     * 获得用户在指定流程下，收个需要处理（待办）的任务
      *
      * @param userId 用户编号
      * @param processInstanceId 流程实例编号
      * @return 待办任务
      */
-    BpmTaskRespVO getTodoTask(Long userId, String processInstanceId);
+    BpmTaskRespVO getFirstTodoTask(Long userId, String processInstanceId);
 
     /**
      * 获得已办的流程任务分页
