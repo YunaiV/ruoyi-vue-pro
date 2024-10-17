@@ -37,7 +37,7 @@ public class MyBatisUtils {
         // 排序字段
         if (!CollectionUtil.isEmpty(sortingFields)) {
             page.addOrder(sortingFields.stream().map(sortingField -> SortingField.ORDER_ASC.equals(sortingField.getOrder()) ?
-                            OrderItem.asc(sortingField.getField()) : OrderItem.desc(sortingField.getField()))
+                            OrderItem.asc(StrUtil.toUnderlineCase(sortingField.getField())) : OrderItem.desc(StrUtil.toUnderlineCase(sortingField.getField())))
                     .collect(Collectors.toList()));
         }
         return page;
