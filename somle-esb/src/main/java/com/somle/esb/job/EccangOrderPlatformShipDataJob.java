@@ -13,11 +13,12 @@ public class EccangOrderPlatformShipDataJob extends EccangDataJob{
     public String execute(String param) throws Exception {
         setDate(param);
 
-        eccangService.getOrderPages(
+        eccangService.getOrderPlusArchivePages(
                         EccangOrderVO.builder()
                                 .platformShipDateStart(yesterdayFirstSecond)
                                 .platformShipDateEnd(yesterdayLastSecond)
-                                .build()
+                                .build(),
+                        String.valueOf(yesterday.getYear())
                 )
                 .forEach(page -> {
                     OssData data = OssData.builder()

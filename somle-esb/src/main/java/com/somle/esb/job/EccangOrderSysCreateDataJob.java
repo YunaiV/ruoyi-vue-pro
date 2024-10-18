@@ -18,11 +18,12 @@ public class EccangOrderSysCreateDataJob extends EccangDataJob{
     public String execute(String param) throws Exception {
         setDate(param);
 
-        eccangService.getOrderPages(
+        eccangService.getOrderPlusArchivePages(
                 EccangOrderVO.builder()
                     .dateCreateSysStart(yesterdayFirstSecond)
                     .dateCreateSysEnd(yesterdayLastSecond)
-                    .build()
+                    .build(),
+                String.valueOf(yesterday.getYear())
             )
             .forEach(page -> {
                 OssData data = OssData.builder()

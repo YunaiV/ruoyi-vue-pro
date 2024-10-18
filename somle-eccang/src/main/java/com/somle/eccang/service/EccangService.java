@@ -14,6 +14,7 @@ import com.somle.framework.common.util.general.CoreUtils;
 import com.somle.framework.common.util.json.JsonUtils;
 import com.somle.framework.common.util.json.JSONObject;
 
+import com.somle.framework.common.util.object.ObjectUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.integration.support.MessageBuilder;
 import org.springframework.messaging.MessageChannel;
@@ -244,15 +245,28 @@ public class EccangService {
         return getOrderPages(query);
     }
 
+    public Stream<BizContent> getOrderPlusArchivePages(EccangOrderVO orderParams, String year) {
+        return Stream.concat(getOrderPages(orderParams), getOrderArchivePages(orderParams, year));
+    }
 
 
+    public Stream<BizContent> getOrderArchivePages(EccangOrderVO orderParams, String year) {
+        JSONObject params = JsonUtils.newObject();
+        params.put("get_detail", "1");
+        params.put("get_address", "1");
+        params.put("year", year);
 
-    public Stream<BizContent> getOrderPages(EccangOrderVO order) {
+        params.put("condition", orderParams);
+        return getAllBiz(params, "getOrderList");
+    }
+
+
+    public Stream<BizContent> getOrderPages(EccangOrderVO orderParams) {
         JSONObject params = JsonUtils.newObject();
         params.put("get_detail", "1");
         params.put("get_address", "1");
 
-        params.put("condition", order);
+        params.put("condition", orderParams);
         return getAllBiz(params, "getOrderList");
     }
 
