@@ -17,9 +17,9 @@ import java.util.Arrays;
 public enum BpmUserTaskApproveMethodEnum implements IntArrayValuable {
 
     RANDOM(1, "随机挑选一人审批", null),
-    RATIO(2, "多人会签(按通过比例)", "${ nrOfCompletedInstances >= nrOfInstances }"), // 会签（按通过比例）
+    RATIO(2, "多人会签(按通过比例)", "${ nrOfCompletedInstances/nrOfInstances >= %s}"), // 会签（按通过比例）
     ANY(3, "多人或签(一人通过或拒绝)", "${ nrOfCompletedInstances > 0 }"), // 或签（通过只需一人，拒绝只需一人）
-    SEQUENTIAL(4, "依次审批", "${ nrOfCompletedInstances/nrOfInstances >= %s}"); // 依次审批
+    SEQUENTIAL(4, "依次审批", "${ nrOfCompletedInstances >= nrOfInstances }"); // 依次审批
 
     /**
      * 审批方式

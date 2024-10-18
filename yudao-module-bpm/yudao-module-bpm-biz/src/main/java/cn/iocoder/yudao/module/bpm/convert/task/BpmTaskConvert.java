@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.bpm.convert.task;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
@@ -101,21 +102,13 @@ public interface BpmTaskConvert {
                         .setFormFields(form.getFields()).setFormVariables(FlowableUtils.getTaskFormVariable(task));
             }
             // 用户信息
-            AdminUserRespDTO assignUser = userMap.get(NumberUtils.parseLong(task.getAssignee()));
-            if (assignUser != null) {
-                taskVO.setAssigneeUser(BeanUtils.toBean(assignUser, BpmProcessInstanceRespVO.User.class));
-                findAndThen(deptMap, assignUser.getDeptId(), dept -> taskVO.getAssigneeUser().setDeptName(dept.getName()));
-            }
-            AdminUserRespDTO ownerUser = userMap.get(NumberUtils.parseLong(task.getOwner()));
-            if (ownerUser != null) {
-                taskVO.setOwnerUser(BeanUtils.toBean(ownerUser, BpmProcessInstanceRespVO.User.class));
-                findAndThen(deptMap, ownerUser.getDeptId(), dept -> taskVO.getOwnerUser().setDeptName(dept.getName()));
-            }
-            if (BpmTaskStatusEnum.RUNNING.getStatus().equals(taskStatus)){
+            buildTaskAssignee(taskVO, task.getAssignee(), userMap, deptMap);
+            buildTaskOwner(taskVO, task.getOwner(), userMap, deptMap);
+            if (BpmTaskStatusEnum.RUNNING.getStatus().equals(taskStatus)) {
                 // 操作按钮设置
                 taskVO.setButtonsSetting(BpmnModelUtils.parseButtonsSetting(bpmnModel, task.getTaskDefinitionKey()));
             }
-           return taskVO;
+            return taskVO;
         });
 
         // 拼接父子关系
@@ -156,6 +149,41 @@ public interface BpmTaskConvert {
                 .setStartUserNickname(startUser.getNickname()).setTaskId(task.getId()).setTaskName(task.getName())
                 .setAssigneeUserId(NumberUtils.parseLong(task.getAssignee()));
         return reqDTO;
+    }
+
+    default void buildTaskOwner(BpmTaskRespVO task, String taskOwner,
+                                Map<Long, AdminUserRespDTO> userMap,
+                                Map<Long, DeptRespDTO> deptMap) {
+        AdminUserRespDTO ownerUser = userMap.get(NumberUtils.parseLong(taskOwner));
+        if (ownerUser != null) {
+            task.setOwnerUser(BeanUtils.toBean(ownerUser, BpmProcessInstanceRespVO.User.class));
+            findAndThen(deptMap, ownerUser.getDeptId(), dept -> task.getOwnerUser().setDeptName(dept.getName()));
+        }
+    }
+
+    default void buildTaskChildren(BpmTaskRespVO task, Map<String, List<Task>> childrenTaskMap,
+                                   Map<Long, AdminUserRespDTO> userMap, Map<Long, DeptRespDTO> deptMap) {
+        List<Task> childTasks = childrenTaskMap.get(task.getId());
+        if (CollUtil.isNotEmpty(childTasks)) {
+            task.setChildren(
+                    convertList(childTasks, childTask -> {
+                        BpmTaskRespVO childTaskVO = BeanUtils.toBean(childTask, BpmTaskRespVO.class);
+                        childTaskVO.setStatus(FlowableUtils.getTaskStatus(childTask));
+                        buildTaskAssignee(childTaskVO, childTask.getAssignee(), userMap, deptMap);
+                        return childTaskVO;
+                    })
+            );
+        }
+    }
+
+    default void buildTaskAssignee(BpmTaskRespVO task, String taskAssignee,
+                                   Map<Long, AdminUserRespDTO> userMap,
+                                   Map<Long, DeptRespDTO> deptMap) {
+        AdminUserRespDTO assignUser = userMap.get(NumberUtils.parseLong(taskAssignee));
+        if (assignUser != null) {
+            task.setAssigneeUser(BeanUtils.toBean(assignUser, BpmProcessInstanceRespVO.User.class));
+            findAndThen(deptMap, assignUser.getDeptId(), dept -> task.getAssigneeUser().setDeptName(dept.getName()));
+        }
     }
 
     /**

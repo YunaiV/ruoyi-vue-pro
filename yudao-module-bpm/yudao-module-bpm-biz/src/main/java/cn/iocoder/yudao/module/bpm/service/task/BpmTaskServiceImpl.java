@@ -11,7 +11,6 @@ import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
 import cn.iocoder.yudao.framework.common.util.object.PageUtils;
 import cn.iocoder.yudao.framework.web.core.util.WebFrameworkUtils;
-import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.instance.BpmProcessInstanceRespVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.task.*;
 import cn.iocoder.yudao.module.bpm.convert.task.BpmTaskConvert;
 import cn.iocoder.yudao.module.bpm.enums.definition.*;
@@ -60,7 +59,6 @@ import java.util.stream.Stream;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
-import static cn.iocoder.yudao.framework.common.util.collection.MapUtils.findAndThen;
 import static cn.iocoder.yudao.module.bpm.enums.ErrorCodeConstants.*;
 import static cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnVariableConstants.PROCESS_INSTANCE_VARIABLE_RETURN_FLAG;
 
@@ -158,46 +156,38 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         BpmnModel bpmnModel = bpmProcessDefinitionService.getProcessDefinitionBpmnModel(processInstance.getProcessDefinitionId());
         List<BpmTaskRespVO> taskList = convertList(todoList, task -> {
             // 找到分配给当前用户，或者当前用户加签的任务（为了减签）
-            // TODO @jason：1）可以抽个小方法，判断是否是当前用户的任务；2）尽量不做取反，而是通过 ObjUtil.notEquals 。
             //  TODO 3）(!userId.equals(NumberUtil.parseLong(task.getOwner(), null)) || BpmTaskSignTypeEnum.of(task.getScopeType()) == null) 这个判断的目的是啥？
-            if (!userId.equals(NumberUtil.parseLong(task.getAssignee(), null)) &&
-                    (!userId.equals(NumberUtil.parseLong(task.getOwner(), null)) || BpmTaskSignTypeEnum.of(task.getScopeType()) == null)) {
+            // @芋艿 !isAddSignTask(userId, task) 该判断的目的被用户加签的任务。该用户可以进行减签操作
+            if (!isAssignUserTask(userId, task) && !isAddSignTask(userId, task)) {
                 return null;
             }
             BpmTaskRespVO taskVO = BeanUtils.toBean(task, BpmTaskRespVO.class);
             taskVO.setStatus(FlowableUtils.getTaskStatus(task)).setReason(FlowableUtils.getTaskReason(task));
             taskVO.setButtonsSetting(BpmnModelUtils.parseButtonsSetting(bpmnModel, task.getTaskDefinitionKey()));
-            AdminUserRespDTO ownerUser = userMap.get(NumberUtils.parseLong(task.getOwner()));
-            if (ownerUser != null) {
-                taskVO.setOwnerUser(BeanUtils.toBean(ownerUser, BpmProcessInstanceRespVO.User.class));
-                findAndThen(deptMap, ownerUser.getDeptId(), dept -> taskVO.getOwnerUser().setDeptName(dept.getName()));
-            }
-            // 当前用户加签的任务. 找到它的子任务 (为了减签)
-            // TODO @json：这里最好也抽个小方法，userId.equals(NumberUtil.parseLong(task.getOwner(), null))
-            //                    && BpmTaskSignTypeEnum.of(task.getScopeType()) != null
-            if (userId.equals(NumberUtil.parseLong(task.getOwner(), null))
-                    && BpmTaskSignTypeEnum.of(task.getScopeType()) != null) {
-                // TODO @jason：170 到 173，和 181 到 192 这段拼接的逻辑，可以拿到 convert 里面。这样，这块 Service 更聚焦。
-                List<Task> childTasks = childrenTaskMap.get(task.getId());
-                if (CollUtil.isNotEmpty(childTasks)) {
-                    taskVO.setChildren(
-                            convertList(childTasks, childTask -> {
-                                BpmTaskRespVO childTaskVO = BeanUtils.toBean(task, BpmTaskRespVO.class);
-                                childTaskVO.setStatus(FlowableUtils.getTaskStatus(task));
-                                AdminUserRespDTO assignUser = userMap.get(NumberUtils.parseLong(childTask.getAssignee()));
-                                if (assignUser != null) {
-                                    childTaskVO.setAssigneeUser(BeanUtils.toBean(assignUser, BpmProcessInstanceRespVO.User.class));
-                                    findAndThen(deptMap, assignUser.getDeptId(), dept -> childTaskVO.getAssigneeUser().setDeptName(dept.getName()));
-                                }
-                                return childTaskVO;
-                            })
-                    );
-                }
+            BpmTaskConvert.INSTANCE.buildTaskOwner(taskVO, task.getOwner(), userMap, deptMap);
+            // 如果是被加签的任务. 找到它的子任务 (为了减签)
+            if (isAddSignTask(userId, task)) {
+                BpmTaskConvert.INSTANCE.buildTaskChildren(taskVO, childrenTaskMap, userMap, deptMap);
 
             }
             return taskVO;
         });
         return findFirst(taskList, Objects::nonNull);
+    }
+
+    /**
+     * 判断是否为被分配给用户的任务
+     */
+    private boolean isAssignUserTask(Long userId, Task task) {
+        return ObjectUtil.equal(userId, NumberUtil.parseLong(task.getAssignee(), null));
+    }
+
+    /**
+     * 判断是否为被用户加签的任务
+     */
+    private boolean isAddSignTask(Long userId, Task task) {
+        return userId.equals(NumberUtil.parseLong(task.getOwner(), null))
+                && BpmTaskSignTypeEnum.of(task.getScopeType()) != null;
     }
 
     @Override
