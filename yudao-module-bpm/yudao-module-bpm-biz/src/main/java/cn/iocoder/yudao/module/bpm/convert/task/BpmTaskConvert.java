@@ -2,7 +2,6 @@ package cn.iocoder.yudao.module.bpm.convert.task;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.map.MapUtil;
-import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.number.NumberUtils;
@@ -10,13 +9,10 @@ import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.instance.BpmProcessInstanceRespVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.task.BpmTaskRespVO;
 import cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmFormDO;
-import cn.iocoder.yudao.module.bpm.enums.task.BpmTaskStatusEnum;
-import cn.iocoder.yudao.module.bpm.framework.flowable.core.util.BpmnModelUtils;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.util.FlowableUtils;
 import cn.iocoder.yudao.module.bpm.service.message.dto.BpmMessageSendWhenTaskCreatedReqDTO;
 import cn.iocoder.yudao.module.system.api.dept.dto.DeptRespDTO;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
-import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.task.api.Task;
@@ -29,7 +25,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
 import static cn.iocoder.yudao.framework.common.util.collection.MapUtils.findAndThen;
 
 /**
@@ -85,9 +81,8 @@ public interface BpmTaskConvert {
                                                                  HistoricProcessInstance processInstance,
                                                                  Map<Long, BpmFormDO> formMap,
                                                                  Map<Long, AdminUserRespDTO> userMap,
-                                                                 Map<Long, DeptRespDTO> deptMap,
-                                                                 BpmnModel bpmnModel) {
-        List<BpmTaskRespVO> taskVOList = CollectionUtils.convertList(taskList, task -> {
+                                                                 Map<Long, DeptRespDTO> deptMap) {
+        return CollectionUtils.convertList(taskList, task -> {
             BpmTaskRespVO taskVO = BeanUtils.toBean(task, BpmTaskRespVO.class);
             Integer taskStatus = FlowableUtils.getTaskStatus(task);
             taskVO.setStatus(taskStatus).setReason(FlowableUtils.getTaskReason(task));
@@ -104,21 +99,8 @@ public interface BpmTaskConvert {
             // 用户信息
             buildTaskAssignee(taskVO, task.getAssignee(), userMap, deptMap);
             buildTaskOwner(taskVO, task.getOwner(), userMap, deptMap);
-            if (BpmTaskStatusEnum.RUNNING.getStatus().equals(taskStatus)) {
-                // 操作按钮设置
-                taskVO.setButtonsSetting(BpmnModelUtils.parseButtonsSetting(bpmnModel, task.getTaskDefinitionKey()));
-            }
             return taskVO;
         });
-
-        // 拼接父子关系
-        Map<String, List<BpmTaskRespVO>> childrenTaskMap = convertMultiMap(
-                filterList(taskVOList, r -> StrUtil.isNotEmpty(r.getParentTaskId())),
-                BpmTaskRespVO::getParentTaskId);
-        for (BpmTaskRespVO taskVO : taskVOList) {
-            taskVO.setChildren(childrenTaskMap.get(taskVO.getId()));
-        }
-        return filterList(taskVOList, r -> StrUtil.isEmpty(r.getParentTaskId()));
     }
 
     default List<BpmTaskRespVO> buildTaskListByParentTaskId(List<Task> taskList,
