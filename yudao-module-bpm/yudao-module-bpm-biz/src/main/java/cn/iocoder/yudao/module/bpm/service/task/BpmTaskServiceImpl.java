@@ -426,11 +426,6 @@ public class BpmTaskServiceImpl implements BpmTaskService {
             throw exception(PROCESS_INSTANCE_NOT_EXISTS);
         }
 
-        // 2. 抄送用户
-        if (CollUtil.isNotEmpty(reqVO.getCopyUserIds())) {
-            processInstanceCopyService.createProcessInstanceCopy(reqVO.getCopyUserIds(), null, reqVO.getId());
-        }
-
         // 情况一：被委派的任务，不调用 complete 去完成任务
         if (DelegationState.PENDING.equals(task.getDelegationState())) {
             approveDelegateTask(reqVO, task);
@@ -444,12 +439,12 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         }
 
         // 情况三：审批普通的任务。大多数情况下，都是这样
-        // 3.1 更新 task 状态、原因
+        // 2.1 更新 task 状态、原因
         updateTaskStatusAndReason(task.getId(), BpmTaskStatusEnum.APPROVE.getStatus(), reqVO.getReason());
-        // 3.2 添加评论
+        // 2.2 添加评论
         taskService.addComment(task.getId(), task.getProcessInstanceId(), BpmCommentTypeEnum.APPROVE.getType(),
                 BpmCommentTypeEnum.APPROVE.formatComment(reqVO.getReason()));
-        // 3.3 调用 BPM complete 去完成任务
+        // 2.3 调用 BPM complete 去完成任务
         // 其中，variables 是存储动态表单到 local 任务级别。过滤一下，避免 ProcessInstance 系统级的变量被占用
         if (CollUtil.isNotEmpty(reqVO.getVariables())) {
             Map<String, Object> variables = FlowableUtils.filterTaskFormVariable(reqVO.getVariables());
