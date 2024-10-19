@@ -52,7 +52,7 @@ public interface BpmnModelConstants {
      */
     String USER_TASK_REJECT_HANDLER_TYPE = "rejectHandlerType";
     /**
-     * BPMN ExtensionElement 的扩展属性，用于标记用户任务拒绝后的回退的任务 Id
+     * BPMN ExtensionElement 的扩展属性，用于标记用户任务拒绝后的退回的任务 Id
      */
     String USER_TASK_REJECT_RETURN_TASK_ID = "rejectReturnTaskId";
 

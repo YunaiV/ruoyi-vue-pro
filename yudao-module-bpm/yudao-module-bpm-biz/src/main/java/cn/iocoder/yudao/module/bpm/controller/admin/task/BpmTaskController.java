@@ -158,7 +158,7 @@ public class BpmTaskController {
     }
 
     @GetMapping("/list-by-return")
-    @Operation(summary = "获取所有可回退的节点", description = "用于【流程详情】的【回退】按钮")
+    @Operation(summary = "获取所有可退回的节点", description = "用于【流程详情】的【退回】按钮")
     @Parameter(name = "taskId", description = "当前任务ID", required = true)
     @PreAuthorize("@ss.hasPermission('bpm:task:update')")
     public CommonResult<List<BpmTaskRespVO>> getTaskListByReturn(@RequestParam("id") String id) {
@@ -168,7 +168,7 @@ public class BpmTaskController {
     }
 
     @PutMapping("/return")
-    @Operation(summary = "回退任务", description = "用于【流程详情】的【回退】按钮")
+    @Operation(summary = "退回任务", description = "用于【流程详情】的【退回】按钮")
     @PreAuthorize("@ss.hasPermission('bpm:task:update')")
     public CommonResult<Boolean> returnTask(@Valid @RequestBody BpmTaskReturnReqVO reqVO) {
         taskService.returnTask(getLoginUserId(), reqVO);

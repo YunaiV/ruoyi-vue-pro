@@ -123,10 +123,10 @@ public interface BpmTaskService {
                                                      String taskDefineKey);
 
     /**
-     * 获取当前任务的可回退的 UserTask 集合
+     * 获取当前任务的可退回的 UserTask 集合
      *
      * @param id 当前的任务 ID
-     * @return 可以回退的节点列表
+     * @return 可以退回的节点列表
      */
     List<UserTask> getUserTaskListByReturn(String id);
 
@@ -180,10 +180,10 @@ public interface BpmTaskService {
     void moveTaskToEnd(String processInstanceId);
 
     /**
-     * 将任务回退到指定的 targetDefinitionKey 位置
+     * 将任务退回到指定的 targetDefinitionKey 位置
      *
      * @param userId 用户编号
-     * @param reqVO  回退的任务key和当前所在的任务ID
+     * @param reqVO  退回的任务key和当前所在的任务ID
      */
     void returnTask(Long userId, BpmTaskReturnReqVO reqVO);
 

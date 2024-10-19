@@ -328,7 +328,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         if (CollUtil.isEmpty(previousUserList)) {
             return Collections.emptyList();
         }
-        // 2.2 过滤：只有串行可到达的节点，才可以回退。类似非串行、子流程无法退回
+        // 2.2 过滤：只有串行可到达的节点，才可以退回。类似非串行、子流程无法退回
         previousUserList.removeIf(userTask -> !BpmnModelUtils.isSequentialReachable(source, userTask, null));
         return previousUserList;
     }
@@ -588,7 +588,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         BpmUserTaskRejectHandlerType userTaskRejectHandlerType = BpmnModelUtils.parseRejectHandlerType(userTaskElement);
         if (userTaskRejectHandlerType == BpmUserTaskRejectHandlerType.RETURN_USER_TASK) {
             String returnTaskId = BpmnModelUtils.parseReturnTaskId(userTaskElement);
-            Assert.notNull(returnTaskId, "回退的节点不能为空");
+            Assert.notNull(returnTaskId, "退回的节点不能为空");
             returnTask(userId, new BpmTaskReturnReqVO().setId(task.getId())
                     .setTargetTaskDefinitionKey(returnTaskId).setReason(reqVO.getReason()));
             return;
@@ -632,12 +632,12 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         FlowElement targetElement = validateTargetTaskCanReturn(task.getTaskDefinitionKey(),
                 reqVO.getTargetTaskDefinitionKey(), task.getProcessDefinitionId());
 
-        // 2. 调用 Flowable 框架的回退逻辑
+        // 2. 调用 Flowable 框架的退回逻辑
         returnTask(task, targetElement, reqVO);
     }
 
     /**
-     * 回退流程节点时，校验目标任务节点是否可回退
+     * 退回流程节点时，校验目标任务节点是否可退回
      *
      * @param sourceKey           当前任务节点 Key
      * @param targetKey           目标任务节点 key
@@ -655,7 +655,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
             throw exception(TASK_TARGET_NODE_NOT_EXISTS);
         }
 
-        // 2.2 只有串行可到达的节点，才可以回退。类似非串行、子流程无法退回
+        // 2.2 只有串行可到达的节点，才可以退回。类似非串行、子流程无法退回
         if (!BpmnModelUtils.isSequentialReachable(source, target, null)) {
             throw exception(TASK_RETURN_FAIL_SOURCE_TARGET_ERROR);
         }
@@ -663,10 +663,10 @@ public class BpmTaskServiceImpl implements BpmTaskService {
     }
 
     /**
-     * 执行回退逻辑
+     * 执行退回逻辑
      *
-     * @param currentTask   当前回退的任务
-     * @param targetElement 需要回退到的目标任务
+     * @param currentTask   当前退回的任务
+     * @param targetElement 需要退回到的目标任务
      * @param reqVO         前端参数封装
      */
     public void returnTask(Task currentTask, FlowElement targetElement, BpmTaskReturnReqVO reqVO) {
@@ -679,9 +679,9 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         List<UserTask> returnUserTaskList = BpmnModelUtils.iteratorFindChildUserTasks(targetElement, runTaskKeyList, null, null);
         List<String> returnTaskKeyList = convertList(returnUserTaskList, UserTask::getId);
 
-        // 2. 给当前要被回退的 task 数组，设置回退意见
+        // 2. 给当前要被退回的 task 数组，设置退回意见
         taskList.forEach(task -> {
-            // 需要排除掉，不需要设置回退意见的任务
+            // 需要排除掉，不需要设置退回意见的任务
             if (!returnTaskKeyList.contains(task.getTaskDefinitionKey())) {
                 return;
             }
@@ -1061,7 +1061,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
                 }
                 // 审批人与提交人为同一人时，根据 BpmUserTaskAssignStartUserHandlerTypeEnum 策略进行处理
                 if (StrUtil.equals(task.getAssignee(), processInstance.getStartUserId())) {
-                    // 判断是否为回退或者驳回：如果是回退或者驳回不走这个策略
+                    // 判断是否为退回或者驳回：如果是退回或者驳回不走这个策略
                     // TODO 芋艿：【优化】未来有没更好的判断方式？！另外，还要考虑清理机制。就是说，下次处理了之后，就移除这个标识
                     Boolean returnTaskFlag = runtimeService.getVariable(processInstance.getProcessInstanceId(),
                             String.format(PROCESS_INSTANCE_VARIABLE_RETURN_FLAG, task.getTaskDefinitionKey()), Boolean.class);
