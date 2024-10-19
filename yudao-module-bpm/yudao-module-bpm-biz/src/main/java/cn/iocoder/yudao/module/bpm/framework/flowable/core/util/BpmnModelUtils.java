@@ -4,11 +4,14 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.number.NumberUtils;
 import cn.iocoder.yudao.framework.common.util.string.StrUtils;
+import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.simple.BpmSimpleModelNodeVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.task.BpmTaskRespVO;
 import cn.iocoder.yudao.module.bpm.enums.definition.BpmUserTaskRejectHandlerType;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnModelConstants;
+import com.google.common.collect.Maps;
 import org.flowable.bpmn.converter.BpmnXMLConverter;
 import org.flowable.bpmn.model.Process;
 import org.flowable.bpmn.model.*;
@@ -18,12 +21,67 @@ import java.util.*;
 
 import static cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnModelConstants.*;
 import static org.flowable.bpmn.constants.BpmnXMLConstants.FLOWABLE_EXTENSIONS_NAMESPACE;
+import static org.flowable.bpmn.constants.BpmnXMLConstants.FLOWABLE_EXTENSIONS_PREFIX;
 
 /**
  * 流程模型转操作工具类
  */
 public class BpmnModelUtils {
 
+    public static void addExtensionElement(FlowElement element, String name, String value) {
+        if (value == null) {
+            return;
+        }
+        ExtensionElement extensionElement = new ExtensionElement();
+        extensionElement.setNamespace(FLOWABLE_EXTENSIONS_NAMESPACE);
+        extensionElement.setNamespacePrefix(FLOWABLE_EXTENSIONS_PREFIX);
+        extensionElement.setElementText(value);
+        extensionElement.setName(name);
+        element.addExtensionElement(extensionElement);
+    }
+
+    public static void addExtensionElement(FlowElement element, String name, Integer value) {
+        if (value == null) {
+            return;
+        }
+        addExtensionElement(element, name, String.valueOf(value));
+    }
+
+    public static void addExtensionElement(FlowElement element, String name, Map<String, String> attributes) {
+        if (attributes == null) {
+            return;
+        }
+        ExtensionElement extensionElement = new ExtensionElement();
+        extensionElement.setNamespace(FLOWABLE_EXTENSIONS_NAMESPACE);
+        extensionElement.setNamespacePrefix(FLOWABLE_EXTENSIONS_PREFIX);
+        extensionElement.setName(name);
+        attributes.forEach((key, value) -> {
+            ExtensionAttribute extensionAttribute = new ExtensionAttribute(key, value);
+            extensionAttribute.setNamespace(FLOWABLE_EXTENSIONS_NAMESPACE);
+            extensionElement.addAttribute(extensionAttribute);
+        });
+        element.addExtensionElement(extensionElement);
+    }
+
+    /**
+     * 给节点添加候选人元素
+     *
+     * @param candidateStrategy 候选人策略
+     * @param candidateParam 候选人参数，允许空
+     * @param flowElement 节点
+     */
+    public static void addCandidateElements(Integer candidateStrategy, String candidateParam, FlowElement flowElement) {
+        addExtensionElement(flowElement, BpmnModelConstants.USER_TASK_CANDIDATE_STRATEGY,
+                candidateStrategy == null ? null : candidateStrategy.toString());
+        addExtensionElement(flowElement, BpmnModelConstants.USER_TASK_CANDIDATE_PARAM, candidateParam);
+    }
+
+    /**
+     * 解析候选人策略
+     *
+     * @param userTask 节点
+     * @return 候选人策略
+     */
     public static Integer parseCandidateStrategy(FlowElement userTask) {
         Integer candidateStrategy = NumberUtils.parseInt(userTask.getAttributeValue(
                 BpmnModelConstants.NAMESPACE, BpmnModelConstants.USER_TASK_CANDIDATE_STRATEGY));
@@ -49,6 +107,14 @@ public class BpmnModelUtils {
         return NumberUtils.parseInt(parseExtensionElement(userTask, BpmnModelConstants.USER_TASK_APPROVE_TYPE));
     }
 
+    public static void addTaskRejectElements(BpmSimpleModelNodeVO.RejectHandler rejectHandler, UserTask userTask) {
+        if (rejectHandler == null) {
+            return;
+        }
+        addExtensionElement(userTask, USER_TASK_REJECT_HANDLER_TYPE, StrUtil.toStringOrNull(rejectHandler.getType()));
+        addExtensionElement(userTask, USER_TASK_REJECT_RETURN_TASK_ID, rejectHandler.getReturnNodeId());
+    }
+
     public static BpmUserTaskRejectHandlerType parseRejectHandlerType(FlowElement userTask) {
         Integer rejectHandlerType = NumberUtils.parseInt(parseExtensionElement(userTask, USER_TASK_REJECT_HANDLER_TYPE));
         return BpmUserTaskRejectHandlerType.typeOf(rejectHandlerType);
@@ -56,6 +122,21 @@ public class BpmnModelUtils {
 
     public static String parseReturnTaskId(FlowElement flowElement) {
         return parseExtensionElement(flowElement, USER_TASK_REJECT_RETURN_TASK_ID);
+    }
+
+    public static void addAssignStartUserHandlerType(Integer assignStartUserHandlerType, UserTask userTask) {
+        if (assignStartUserHandlerType == null) {
+            return;
+        }
+        addExtensionElement(userTask, USER_TASK_ASSIGN_START_USER_HANDLER_TYPE, assignStartUserHandlerType.toString());
+    }
+
+    public static void addAssignEmptyHandlerType(BpmSimpleModelNodeVO.AssignEmptyHandler emptyHandler, UserTask userTask) {
+        if (emptyHandler == null) {
+            return;
+        }
+        addExtensionElement(userTask, USER_TASK_ASSIGN_EMPTY_HANDLER_TYPE, StrUtil.toStringOrNull(emptyHandler.getType()));
+        addExtensionElement(userTask, USER_TASK_ASSIGN_USER_IDS, StrUtil.join(",", emptyHandler.getUserIds()));
     }
 
     public static Integer parseAssignStartUserHandlerType(FlowElement userTask) {
@@ -78,6 +159,25 @@ public class BpmnModelUtils {
         return element != null ? element.getElementText() : null;
     }
 
+    /**
+     * 给节点添加表单字段权限元素
+     *
+     * @param fieldsPermissions 表单字段权限
+     * @param flowElement 节点
+     */
+    public static void addFormFieldsPermission(List<Map<String, String>> fieldsPermissions, FlowElement flowElement) {
+        if (CollUtil.isNotEmpty(fieldsPermissions)) {
+            fieldsPermissions.forEach(item -> addExtensionElement(flowElement, FORM_FIELD_PERMISSION_ELEMENT, item));
+        }
+    }
+
+    /**
+     * 解析表单字段权限
+     *
+     * @param bpmnModel bpmnModel 对象
+     * @param flowElementId 元素 ID
+     * @return 表单字段权限
+     */
     public static Map<String, String> parseFormFieldsPermission(BpmnModel bpmnModel, String flowElementId) {
         if (bpmnModel == null || StrUtil.isEmpty(flowElementId)) {
             return null;
@@ -99,6 +199,22 @@ public class BpmnModelUtils {
             }
         });
         return fieldsPermission;
+    }
+
+    /**
+     * 给节点添加操作按钮设置元素
+     */
+    public static void addButtonsSetting(List<BpmSimpleModelNodeVO.OperationButtonSetting> buttonsSetting, UserTask userTask) {
+        if (CollUtil.isNotEmpty(buttonsSetting)) {
+            List<Map<String, String>> list = CollectionUtils.convertList(buttonsSetting, item -> {
+                Map<String, String> settingMap = Maps.newHashMapWithExpectedSize(3);
+                settingMap.put(BUTTON_SETTING_ELEMENT_ID_ATTRIBUTE, String.valueOf(item.getId()));
+                settingMap.put(BUTTON_SETTING_ELEMENT_DISPLAY_NAME_ATTRIBUTE, item.getDisplayName());
+                settingMap.put(BUTTON_SETTING_ELEMENT_ENABLE_ATTRIBUTE, String.valueOf(item.getEnable()));
+                return settingMap;
+            });
+            list.forEach(item -> addExtensionElement(userTask, BUTTON_SETTING_ELEMENT, item));
+        }
     }
 
     public static Map<Integer, BpmTaskRespVO.OperationButtonSetting> parseButtonsSetting(BpmnModel bpmnModel, String flowElementId) {
@@ -193,7 +309,7 @@ public class BpmnModelUtils {
 
     public static EndEvent getEndEvent(BpmnModel model) {
         Process process = model.getMainProcess();
-        // 从 flowElementList 找 endEvent. TODO 多个 EndEvent 会有问题
+        // 从 flowElementList 找 endEvent
         return (EndEvent) CollUtil.findOne(process.getFlowElements(), flowElement -> flowElement instanceof EndEvent);
     }
 
@@ -315,7 +431,6 @@ public class BpmnModelUtils {
         }
         return userTaskList;
     }
-
 
     /**
      * 迭代从后向前扫描，判断目标节点相对于当前节点是否是串行

@@ -10,6 +10,8 @@ import lombok.Data;
 @Data
 public class BpmApprovalDetailReqVO {
 
+    // TODO @jason：这里要不注释说明下，什么情况下，使用 processDefinitionId、processInstanceId、activityId、taskId。
+
     @Schema(description = "流程定义的编号", example = "1024")
     private String processDefinitionId; // 发起流程的时候传流程定义 Id
 

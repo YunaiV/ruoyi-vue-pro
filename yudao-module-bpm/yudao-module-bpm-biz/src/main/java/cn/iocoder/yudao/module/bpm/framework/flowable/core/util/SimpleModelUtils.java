@@ -7,32 +7,24 @@ import cn.hutool.core.util.*;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.simple.BpmSimpleModelNodeVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.simple.BpmSimpleModelNodeVO.ConditionGroups;
-import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.simple.BpmSimpleModelNodeVO.RejectHandler;
-import cn.iocoder.yudao.module.bpm.enums.definition.BpmBoundaryEventType;
-import cn.iocoder.yudao.module.bpm.enums.definition.BpmSimpleModeConditionType;
-import cn.iocoder.yudao.module.bpm.enums.definition.BpmSimpleModelNodeType;
-import cn.iocoder.yudao.module.bpm.enums.definition.BpmUserTaskApproveMethodEnum;
+import cn.iocoder.yudao.module.bpm.enums.definition.*;
+import cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmTaskCandidateStrategyEnum;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnModelConstants;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.listener.BpmCopyTaskDelegate;
 import org.flowable.bpmn.BpmnAutoLayout;
+import org.flowable.bpmn.constants.BpmnXMLConstants;
 import org.flowable.bpmn.model.Process;
 import org.flowable.bpmn.model.*;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
-import static cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.simple.BpmSimpleModelNodeVO.OperationButtonSetting;
 import static cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.simple.BpmSimpleModelNodeVO.TimeoutHandler;
 import static cn.iocoder.yudao.module.bpm.enums.definition.BpmSimpleModelNodeType.*;
-import static cn.iocoder.yudao.module.bpm.enums.definition.BpmUserTaskApproveMethodEnum.*;
 import static cn.iocoder.yudao.module.bpm.enums.definition.BpmUserTaskApproveTypeEnum.USER;
-import static cn.iocoder.yudao.module.bpm.enums.definition.BpmUserTaskAssignStartUserHandlerTypeEnum.SKIP;
 import static cn.iocoder.yudao.module.bpm.enums.definition.BpmUserTaskTimeoutHandlerTypeEnum.REMINDER;
-import static cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmTaskCandidateStrategyEnum.START_USER;
 import static cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnModelConstants.*;
-import static org.flowable.bpmn.constants.BpmnXMLConstants.*;
+import static cn.iocoder.yudao.module.bpm.framework.flowable.core.util.BpmnModelUtils.*;
+import static java.util.Arrays.asList;
 
 /**
  * 仿钉钉/飞书的模型相关的工具方法
@@ -46,8 +38,17 @@ public class SimpleModelUtils {
      */
     public static final String JOIN_GATE_WAY_NODE_ID_SUFFIX = "_join";
 
+    private static final Map<BpmSimpleModelNodeType, NodeConvert> NODE_CONVERTS = MapUtil.newHashMap();
+
+    static {
+        List<NodeConvert> converts = asList(new StartNodeConvert(), new EndNodeConvert(),
+                new StartUserNodeConvert(), new ApproveNodeConvert(), new CopyNodeConvert(),
+                new ConditionBranchNodeConvert(), new ParallelBranchNodeConvert());
+        converts.forEach(convert -> NODE_CONVERTS.put(convert.getType(), convert));
+    }
+
     /**
-     * 仿钉钉流程设计模型数据结构(json) 转换成 Bpmn Model
+     * 仿钉钉流程设计模型数据结构（json）转换成 Bpmn Model
      *
      * @param processId       流程标识
      * @param processName     流程名称
@@ -57,7 +58,7 @@ public class SimpleModelUtils {
     public static BpmnModel buildBpmnModel(String processId, String processName, BpmSimpleModelNodeVO simpleModelNode) {
         // 1. 创建 BpmnModel
         BpmnModel bpmnModel = new BpmnModel();
-        bpmnModel.setTargetNamespace(BPMN2_NAMESPACE); // 设置命名空间。不加这个，解析 Message 会报 NPE 异常
+        bpmnModel.setTargetNamespace(BpmnXMLConstants.BPMN2_NAMESPACE); // 设置命名空间。不加这个，解析 Message 会报 NPE 异常
         // 创建 Process 对象
         Process process = new Process();
         process.setId(processId);
@@ -69,20 +70,45 @@ public class SimpleModelUtils {
         // 原因是：目前前端的第一个节点是“发起人节点”，所以这里构建一个 StartNode，用于创建 Bpmn 的 StartEvent 节点
         BpmSimpleModelNodeVO startNode = buildStartNode();
         startNode.setChildNode(simpleModelNode);
-        // 从 前端模型数据结构 SimpleModel 构建 FlowNode 并添加到 Main Process
+        // 2.2 将前端传递的 simpleModelNode 数据结构（json），转换成从 BPMN FlowNode 元素，并添加到 Main Process 中
         traverseNodeToBuildFlowNode(startNode, process);
-        // 找到 end event
-        EndEvent endEvent = (EndEvent) CollUtil.findOne(process.getFlowElements(), item -> item instanceof EndEvent);
 
-        // 构建并添加节点之间的连线 Sequence Flow
+        // 3. 构建并添加节点之间的连线 Sequence Flow
+        EndEvent endEvent = BpmnModelUtils.getEndEvent(bpmnModel);
         traverseNodeToBuildSequenceFlow(process, startNode, endEvent.getId());
-        // 自动布局
+
+        // 3. 自动布局
         new BpmnAutoLayout(bpmnModel).execute();
         return bpmnModel;
     }
 
     private static BpmSimpleModelNodeVO buildStartNode() {
         return new BpmSimpleModelNodeVO().setId(START_EVENT_NODE_ID).setName(START_EVENT_NODE_NAME).setType(START_NODE.getType());
+    }
+
+    private static void traverseNodeToBuildFlowNode(BpmSimpleModelNodeVO node, Process process) {
+        // 1. 判断是否有效节点
+        if (!isValidNode(node)) {
+            return;
+        }
+        BpmSimpleModelNodeType nodeType = BpmSimpleModelNodeType.valueOf(node.getType());
+        Assert.notNull(nodeType, "模型节点类型({})不支持", node.getType());
+
+        // 2. 处理当前节点
+        NodeConvert nodeConvert = NODE_CONVERTS.get(nodeType);
+        Assert.notNull(nodeConvert, "模型节点类型的转换器({})不存在", node.getType());
+        List<? extends FlowElement> flowElements = nodeConvert.convertList(node);
+        flowElements.forEach(process::addFlowElement);
+
+        // 如果不是网关类型的接口， 并且chileNode为空退出
+        // 如果是“分支”节点，则递归处理条件
+        if (BpmSimpleModelNodeType.isBranchNode(node.getType())
+                && ArrayUtil.isNotEmpty(node.getConditionNodes())) {
+            node.getConditionNodes().forEach(item -> traverseNodeToBuildFlowNode(item.getChildNode(), process));
+        }
+
+        // 如果有“子”节点，则递归处理子节点
+        traverseNodeToBuildFlowNode(node.getChildNode(), process);
     }
 
     // TODO @芋艿：在优化下这个注释
@@ -94,7 +120,7 @@ public class SimpleModelUtils {
         // 1.2 END_NODE 直接返回
         BpmSimpleModelNodeType nodeType = BpmSimpleModelNodeType.valueOf(node.getType());
         Assert.notNull(nodeType, "模型节点类型不支持");
-        if (nodeType == END_NODE) {
+        if (nodeType == BpmSimpleModelNodeType.END_NODE) {
             return;
         }
         // 2.1 情况一：普通节点
@@ -238,179 +264,13 @@ public class SimpleModelUtils {
         return sequenceFlow;
     }
 
-    // TODO @芋艿 改成了 traverseNodeToBuildFlowNode， 连线的叫 traverseNodeToBuildSequenceFlow
-    private static void traverseNodeToBuildFlowNode(BpmSimpleModelNodeVO node, Process process) {
-        // 判断是否有效节点
-        if (!isValidNode(node)) {
-            return;
-        }
-        BpmSimpleModelNodeType nodeType = BpmSimpleModelNodeType.valueOf(node.getType());
-        Assert.notNull(nodeType, "模型节点类型不支持");
-
-        List<FlowElement> flowElements = buildFlowNode(node, nodeType);
-        flowElements.forEach(process::addFlowElement);
-
-        // 如果不是网关类型的接口， 并且chileNode为空退出
-        // 如果是“分支”节点，则递归处理条件
-        if (BpmSimpleModelNodeType.isBranchNode(node.getType())
-                && ArrayUtil.isNotEmpty(node.getConditionNodes())) {
-            node.getConditionNodes().forEach(item -> traverseNodeToBuildFlowNode(item.getChildNode(), process));
-        }
-
-        // 如果有“子”节点，则递归处理子节点
-        traverseNodeToBuildFlowNode(node.getChildNode(), process);
-    }
-
     public static boolean isValidNode(BpmSimpleModelNodeVO node) {
         return node != null && node.getId() != null;
     }
 
     public static boolean isSequentialApproveNode(BpmSimpleModelNodeVO node) {
-        return APPROVE_NODE.getType().equals(node.getType()) && SEQUENTIAL.getMethod().equals(node.getApproveMethod());
-    }
-
-    private static List<FlowElement> buildFlowNode(BpmSimpleModelNodeVO node, BpmSimpleModelNodeType nodeType) {
-        List<FlowElement> list = new ArrayList<>();
-        switch (nodeType) {
-            case START_NODE: { // 开始节点
-                StartEvent startEvent = convertStartNode(node);
-                list.add(startEvent);
-                break;
-            }
-            case END_NODE: { // 结束节点
-                EndEvent endEvent = convertEndNode(node);
-                list.add(endEvent);
-                break;
-            }
-            case START_USER_NODE: { // 发起人节点
-                UserTask userTask = convertStartUserNode(node);
-                list.add(userTask);
-                break;
-            }
-            case APPROVE_NODE: { // 审批节点
-                List<FlowElement> flowElements = convertApproveNode(node);
-                list.addAll(flowElements);
-                break;
-            }
-            case COPY_NODE: { // 抄送节点
-                ServiceTask serviceTask = convertCopyNode(node);
-                list.add(serviceTask);
-                break;
-            }
-            case CONDITION_BRANCH_NODE: {
-                ExclusiveGateway exclusiveGateway = convertConditionBranchNode(node);
-                list.add(exclusiveGateway);
-                break;
-            }
-            case PARALLEL_BRANCH_NODE: {
-                List<ParallelGateway> parallelGateways = convertParallelBranchNode(node);
-                list.addAll(parallelGateways);
-                break;
-            }
-            case INCLUSIVE_BRANCH_NODE: {
-                // TODO jason 待实现
-                break;
-            }
-            default: {
-                // TODO 其它节点类型的实现
-            }
-        }
-        return list;
-    }
-
-    private static UserTask convertStartUserNode(BpmSimpleModelNodeVO node) {
-        return buildBpmnStartUserTask(node);
-    }
-
-    private static List<FlowElement> convertApproveNode(BpmSimpleModelNodeVO node) {
-        List<FlowElement> flowElements = new ArrayList<>();
-        UserTask userTask = buildBpmnUserTask(node);
-        flowElements.add(userTask);
-
-        // 添加用户任务的 Timer Boundary Event, 用于任务的审批超时处理
-        if (node.getTimeoutHandler() != null && node.getTimeoutHandler().getEnable()) {
-            BoundaryEvent boundaryEvent = buildUserTaskTimeoutBoundaryEvent(userTask, node.getTimeoutHandler());
-            flowElements.add(boundaryEvent);
-        }
-        return flowElements;
-    }
-
-    /**
-     * 添加 UserTask 用户的审批超时 BoundaryEvent 事件
-     *
-     * @param userTask       审批任务
-     * @param timeoutHandler 超时处理器
-     * @return BoundaryEvent 超时事件
-     */
-    private static BoundaryEvent buildUserTaskTimeoutBoundaryEvent(UserTask userTask, TimeoutHandler timeoutHandler) {
-        // 1.1 定时器边界事件
-        BoundaryEvent boundaryEvent = new BoundaryEvent();
-        boundaryEvent.setId("Event-" + IdUtil.fastUUID());
-        boundaryEvent.setCancelActivity(false); // 设置关联的任务为不会被中断
-        boundaryEvent.setAttachedToRef(userTask);
-        // 1.2 定义超时时间、最大提醒次数
-        TimerEventDefinition eventDefinition = new TimerEventDefinition();
-        eventDefinition.setTimeDuration(timeoutHandler.getTimeDuration());
-        if (Objects.equals(REMINDER.getType(), timeoutHandler.getType()) &&
-                timeoutHandler.getMaxRemindCount() != null && timeoutHandler.getMaxRemindCount() > 1) {
-            eventDefinition.setTimeCycle(String.format("R%d/%s",
-                    timeoutHandler.getMaxRemindCount(), timeoutHandler.getTimeDuration()));
-        }
-        boundaryEvent.addEventDefinition(eventDefinition);
-
-        // 2.1 添加定时器边界事件类型
-        addExtensionElement(boundaryEvent, BOUNDARY_EVENT_TYPE, BpmBoundaryEventType.USER_TASK_TIMEOUT.getType().toString());
-        // 2.2 添加超时执行动作元素
-        addExtensionElement(boundaryEvent, USER_TASK_TIMEOUT_HANDLER_TYPE, StrUtil.toStringOrNull(timeoutHandler.getType()));
-        return boundaryEvent;
-    }
-
-    private static List<ParallelGateway> convertParallelBranchNode(BpmSimpleModelNodeVO node) {
-        ParallelGateway parallelGateway = new ParallelGateway();
-        parallelGateway.setId(node.getId());
-        // TODO @jason：setName
-
-        // TODO @芋艿 + jason：合并网关；是不是要有条件啥的。微信讨论
-        // 并行聚合网关有程序创建。前端不需要传入
-        ParallelGateway joinParallelGateway = new ParallelGateway();
-        joinParallelGateway.setId(node.getId() + JOIN_GATE_WAY_NODE_ID_SUFFIX);
-        return CollUtil.newArrayList(parallelGateway, joinParallelGateway);
-    }
-
-    private static ServiceTask convertCopyNode(BpmSimpleModelNodeVO node) {
-        ServiceTask serviceTask = new ServiceTask();
-        serviceTask.setId(node.getId());
-        serviceTask.setName(node.getName());
-        serviceTask.setImplementationType(ImplementationType.IMPLEMENTATION_TYPE_DELEGATEEXPRESSION);
-        serviceTask.setImplementation("${" + BpmCopyTaskDelegate.BEAN_NAME + "}");
-
-        // 添加抄送候选人元素
-        addCandidateElements(node.getCandidateStrategy(), node.getCandidateParam(), serviceTask);
-        // 添加表单字段权限属性元素
-        addFormFieldsPermission(node.getFieldsPermission(), serviceTask);
-        return serviceTask;
-    }
-
-    /**
-     * 给节点添加候选人元素
-     */
-    private static void addCandidateElements(Integer candidateStrategy, String candidateParam, FlowElement flowElement) {
-        addExtensionElement(flowElement, BpmnModelConstants.USER_TASK_CANDIDATE_STRATEGY,
-                candidateStrategy == null ? null : candidateStrategy.toString());
-        addExtensionElement(flowElement, BpmnModelConstants.USER_TASK_CANDIDATE_PARAM, candidateParam);
-    }
-
-    private static ExclusiveGateway convertConditionBranchNode(BpmSimpleModelNodeVO node) {
-        Assert.notEmpty(node.getConditionNodes(), "条件分支节点不能为空");
-        ExclusiveGateway exclusiveGateway = new ExclusiveGateway();
-        exclusiveGateway.setId(node.getId());
-        // 寻找默认的序列流
-        BpmSimpleModelNodeVO defaultSeqFlow = CollUtil.findOne(node.getConditionNodes(),
-                item -> BooleanUtil.isTrue(item.getDefaultFlow()));
-        if (defaultSeqFlow != null) {
-            exclusiveGateway.setDefaultFlow(defaultSeqFlow.getId());
-        }
-        return exclusiveGateway;
+        return APPROVE_NODE.getType().equals(node.getType())
+                && BpmUserTaskApproveMethodEnum.SEQUENTIAL.getMethod().equals(node.getApproveMethod());
     }
 
     private static InclusiveGateway convertInclusiveBranchNode(BpmSimpleModelNodeVO node, Boolean isFork) {
@@ -418,7 +278,6 @@ public class SimpleModelUtils {
         inclusiveGateway.setId(node.getId());
         // TODO @jason：这里是不是 setName 哈；
 
-        // TODO @芋艿 + jason：是不是搞个合并网关；这里微信讨论下，有点奇怪；
         // @芋艿 isFork 为 false 就是合并网关。由前端传入。这个前端暂时还未实现
         if (isFork) {
             Assert.notEmpty(node.getConditionNodes(), "条件节点不能为空");
@@ -432,177 +291,268 @@ public class SimpleModelUtils {
         return inclusiveGateway;
     }
 
-    private static UserTask buildBpmnUserTask(BpmSimpleModelNodeVO node) {
-        UserTask userTask = new UserTask();
-        userTask.setId(node.getId());
-        userTask.setName(node.getName());
+    // ========== 各种 convert 节点的方法: BpmSimpleModelNodeVO => BPMN FlowElement ==========
 
-        // 如果不是审批人节点，则直接返回
-        addExtensionElement(userTask, USER_TASK_APPROVE_TYPE, StrUtil.toStringOrNull(node.getApproveType()));
-        if (ObjectUtil.notEqual(node.getApproveType(), USER.getType())) {
+    private interface NodeConvert {
+
+        default List<? extends FlowElement> convertList(BpmSimpleModelNodeVO node) {
+            return Collections.singletonList(convert(node));
+        }
+
+        default FlowElement convert(BpmSimpleModelNodeVO node) {
+            throw new UnsupportedOperationException("请实现该方法");
+        }
+
+        BpmSimpleModelNodeType getType();
+
+    }
+
+    private static class StartNodeConvert implements NodeConvert {
+
+        @Override
+        public StartEvent convert(BpmSimpleModelNodeVO node) {
+            StartEvent startEvent = new StartEvent();
+            startEvent.setId(node.getId());
+            startEvent.setName(node.getName());
+            return startEvent;
+        }
+
+        @Override
+        public BpmSimpleModelNodeType getType() {
+            return BpmSimpleModelNodeType.START_NODE;
+        }
+
+    }
+
+    private static class EndNodeConvert implements NodeConvert {
+
+        @Override
+        public EndEvent convert(BpmSimpleModelNodeVO node) {
+            EndEvent endEvent = new EndEvent();
+            endEvent.setId(node.getId());
+            endEvent.setName(node.getName());
+            // TODO @芋艿 + jason：要不要加一个终止定义？
+            return endEvent;
+        }
+
+        @Override
+        public BpmSimpleModelNodeType getType() {
+            return BpmSimpleModelNodeType.END_NODE;
+        }
+
+    }
+
+    private static class StartUserNodeConvert implements NodeConvert {
+
+        @Override
+        public UserTask convert(BpmSimpleModelNodeVO node) {
+            UserTask userTask = new UserTask();
+            userTask.setId(node.getId());
+            userTask.setName(node.getName());
+
+            // 人工审批
+            addExtensionElement(userTask, BpmnModelConstants.USER_TASK_APPROVE_TYPE, BpmUserTaskApproveTypeEnum.USER.getType());
+            // 候选人策略为发起人自己
+            addCandidateElements(BpmTaskCandidateStrategyEnum.START_USER.getStrategy(), null, userTask);
+            // 添加表单字段权限属性元素
+            addFormFieldsPermission(node.getFieldsPermission(), userTask);
+            // 添加操作按钮配置属性元素
+            addButtonsSetting(node.getButtonsSetting(), userTask);
+            // 使用自动通过策略
+            // TODO @芋艿 复用了SKIP， 是否需要新加一个策略；TODO @芋艿：【回复】是不是应该类似飞书，搞个草稿状态。待定；还有一种策略，不标记自动通过，而是首次发起后，第一个节点，自动通过；
+            addAssignStartUserHandlerType(BpmUserTaskAssignStartUserHandlerTypeEnum.SKIP.getType(), userTask);
             return userTask;
         }
 
-        // 添加候选人元素
-        addCandidateElements(node.getCandidateStrategy(), node.getCandidateParam(), userTask);
-        // 添加表单字段权限属性元素
-        addFormFieldsPermission(node.getFieldsPermission(), userTask);
-        // 添加操作按钮配置属性元素
-        addButtonsSetting(node.getButtonsSetting(), userTask);
-        // 处理多实例（审批方式）
-        processMultiInstanceLoopCharacteristics(node.getApproveMethod(), node.getApproveRatio(), userTask);
-        // 添加任务被拒绝的处理元素
-        addTaskRejectElements(node.getRejectHandler(), userTask);
-        // 添加用户任务的审批人与发起人相同时的处理元素
-        addAssignStartUserHandlerType(node.getAssignStartUserHandlerType(), userTask);
-        // 添加用户任务的空处理元素
-        addAssignEmptyHandlerType(node.getAssignEmptyHandler(), userTask);
-        //  设置审批任务的截止时间
-        if (node.getTimeoutHandler() != null && node.getTimeoutHandler().getEnable()) {
-            userTask.setDueDate(node.getTimeoutHandler().getTimeDuration());
-        }
-        return userTask;
-    }
-
-    private static void addTaskRejectElements(RejectHandler rejectHandler, UserTask userTask) {
-        if (rejectHandler == null) {
-            return;
-        }
-        addExtensionElement(userTask, USER_TASK_REJECT_HANDLER_TYPE, StrUtil.toStringOrNull(rejectHandler.getType()));
-        addExtensionElement(userTask, USER_TASK_REJECT_RETURN_TASK_ID, rejectHandler.getReturnNodeId());
-    }
-
-    private static void addAssignStartUserHandlerType(Integer assignStartUserHandlerType, UserTask userTask) {
-        if (assignStartUserHandlerType == null) {
-            return;
-        }
-        addExtensionElement(userTask, USER_TASK_ASSIGN_START_USER_HANDLER_TYPE, assignStartUserHandlerType.toString());
-    }
-
-    private static void addAssignEmptyHandlerType(BpmSimpleModelNodeVO.AssignEmptyHandler emptyHandler, UserTask userTask) {
-        if (emptyHandler == null) {
-            return;
-        }
-        addExtensionElement(userTask, USER_TASK_ASSIGN_EMPTY_HANDLER_TYPE, StrUtil.toStringOrNull(emptyHandler.getType()));
-        addExtensionElement(userTask, USER_TASK_ASSIGN_USER_IDS, StrUtil.join(",", emptyHandler.getUserIds()));
-    }
-
-    private static void processMultiInstanceLoopCharacteristics(Integer approveMethod, Integer approveRatio, UserTask userTask) {
-        BpmUserTaskApproveMethodEnum approveMethodEnum = BpmUserTaskApproveMethodEnum.valueOf(approveMethod);
-        Assert.notNull(approveMethodEnum, "审批方式({})不能为空", approveMethodEnum);
-        // 添加审批方式的扩展属性
-        addExtensionElement(userTask, BpmnModelConstants.USER_TASK_APPROVE_METHOD, approveMethod.toString());
-        if (approveMethodEnum == RANDOM) {
-            // 随机审批，不需要设置多实例属性
-            return;
+        @Override
+        public BpmSimpleModelNodeType getType() {
+            return BpmSimpleModelNodeType.START_USER_NODE;
         }
 
-        // 处理多实例审批方式
-        MultiInstanceLoopCharacteristics multiInstanceCharacteristics = new MultiInstanceLoopCharacteristics();
-        // 设置 collectionVariable。本系统用不到，仅仅为了 Flowable 校验不报错
-        multiInstanceCharacteristics.setInputDataItem("${coll_userList}");
-        if (approveMethodEnum == BpmUserTaskApproveMethodEnum.ANY) {
-            multiInstanceCharacteristics.setCompletionCondition(approveMethodEnum.getCompletionCondition());
-            multiInstanceCharacteristics.setSequential(false);
-        } else if (approveMethodEnum == SEQUENTIAL) {
-            multiInstanceCharacteristics.setCompletionCondition(approveMethodEnum.getCompletionCondition());
-            multiInstanceCharacteristics.setSequential(true);
-            multiInstanceCharacteristics.setLoopCardinality("1");
-        } else if (approveMethodEnum == RATIO) {
-            Assert.notNull(approveRatio, "通过比例不能为空");
-            multiInstanceCharacteristics.setCompletionCondition(
-                    String.format(approveMethodEnum.getCompletionCondition(), String.format("%.2f", approveRatio / 100D)));
-            multiInstanceCharacteristics.setSequential(false);
+    }
+
+    private static class ApproveNodeConvert implements NodeConvert {
+
+        @Override
+        public List<FlowElement> convertList(BpmSimpleModelNodeVO node) {
+            List<FlowElement> flowElements = new ArrayList<>(2);
+            // 1. 构建用户任务
+            UserTask userTask = buildBpmnUserTask(node);
+            flowElements.add(userTask);
+
+            // 2. 添加用户任务的 Timer Boundary Event, 用于任务的审批超时处理
+            if (node.getTimeoutHandler() != null && node.getTimeoutHandler().getEnable()) {
+                BoundaryEvent boundaryEvent = buildUserTaskTimeoutBoundaryEvent(userTask, node.getTimeoutHandler());
+                flowElements.add(boundaryEvent);
+            }
+            return flowElements;
         }
-        userTask.setLoopCharacteristics(multiInstanceCharacteristics);
-    }
 
-    /**
-     * 给节点添加操作按钮设置元素
-     */
-    private static void addButtonsSetting(List<OperationButtonSetting> buttonsSetting, UserTask userTask) {
-        if (CollUtil.isNotEmpty(buttonsSetting)) {
-            List<Map<String, String>> list = CollectionUtils.convertList(buttonsSetting, item -> {
-                Map<String, String> settingMap = MapUtil.newHashMap(16);
-                settingMap.put(BUTTON_SETTING_ELEMENT_ID_ATTRIBUTE, String.valueOf(item.getId()));
-                settingMap.put(BUTTON_SETTING_ELEMENT_DISPLAY_NAME_ATTRIBUTE, item.getDisplayName());
-                settingMap.put(BUTTON_SETTING_ELEMENT_ENABLE_ATTRIBUTE, String.valueOf(item.getEnable()));
-                return settingMap;
-            });
-            list.forEach(item -> addExtensionElement(userTask, BUTTON_SETTING_ELEMENT, item));
+        @Override
+        public BpmSimpleModelNodeType getType() {
+            return BpmSimpleModelNodeType.APPROVE_NODE;
         }
-    }
 
-    /**
-     * 给节点添加表单字段权限元素
-     */
-    private static void addFormFieldsPermission(List<Map<String, String>> fieldsPermissions, FlowElement flowElement) {
-        if (CollUtil.isNotEmpty(fieldsPermissions)) {
-            fieldsPermissions.forEach(item -> addExtensionElement(flowElement, FORM_FIELD_PERMISSION_ELEMENT, item));
+        /**
+         * 添加 UserTask 用户的审批超时 BoundaryEvent 事件
+         *
+         * @param userTask       审批任务
+         * @param timeoutHandler 超时处理器
+         * @return BoundaryEvent 超时事件
+         */
+        private BoundaryEvent buildUserTaskTimeoutBoundaryEvent(UserTask userTask, TimeoutHandler timeoutHandler) {
+            // 1.1 定时器边界事件
+            BoundaryEvent boundaryEvent = new BoundaryEvent();
+            boundaryEvent.setId("Event-" + IdUtil.fastUUID());
+            boundaryEvent.setCancelActivity(false); // 设置关联的任务为不会被中断
+            boundaryEvent.setAttachedToRef(userTask);
+            // 1.2 定义超时时间、最大提醒次数
+            TimerEventDefinition eventDefinition = new TimerEventDefinition();
+            eventDefinition.setTimeDuration(timeoutHandler.getTimeDuration());
+            if (Objects.equals(REMINDER.getType(), timeoutHandler.getType()) &&
+                    timeoutHandler.getMaxRemindCount() != null && timeoutHandler.getMaxRemindCount() > 1) {
+                eventDefinition.setTimeCycle(String.format("R%d/%s",
+                        timeoutHandler.getMaxRemindCount(), timeoutHandler.getTimeDuration()));
+            }
+            boundaryEvent.addEventDefinition(eventDefinition);
+
+            // 2.1 添加定时器边界事件类型
+            addExtensionElement(boundaryEvent, BOUNDARY_EVENT_TYPE, BpmBoundaryEventType.USER_TASK_TIMEOUT.getType().toString());
+            // 2.2 添加超时执行动作元素
+            addExtensionElement(boundaryEvent, USER_TASK_TIMEOUT_HANDLER_TYPE, StrUtil.toStringOrNull(timeoutHandler.getType()));
+            return boundaryEvent;
         }
-    }
 
-    private static void addExtensionElement(FlowElement element, String name, Map<String, String> attributes) {
-        if (attributes == null) {
-            return;
+        private UserTask buildBpmnUserTask(BpmSimpleModelNodeVO node) {
+            UserTask userTask = new UserTask();
+            userTask.setId(node.getId());
+            userTask.setName(node.getName());
+
+            // 如果不是审批人节点，则直接返回
+            addExtensionElement(userTask, USER_TASK_APPROVE_TYPE, StrUtil.toStringOrNull(node.getApproveType()));
+            if (ObjectUtil.notEqual(node.getApproveType(), USER.getType())) {
+                return userTask;
+            }
+
+            // 添加候选人元素
+            addCandidateElements(node.getCandidateStrategy(), node.getCandidateParam(), userTask);
+            // 添加表单字段权限属性元素
+            addFormFieldsPermission(node.getFieldsPermission(), userTask);
+            // 添加操作按钮配置属性元素
+            addButtonsSetting(node.getButtonsSetting(), userTask);
+            // 处理多实例（审批方式）
+            processMultiInstanceLoopCharacteristics(node.getApproveMethod(), node.getApproveRatio(), userTask);
+            // 添加任务被拒绝的处理元素
+            addTaskRejectElements(node.getRejectHandler(), userTask);
+            // 添加用户任务的审批人与发起人相同时的处理元素
+            addAssignStartUserHandlerType(node.getAssignStartUserHandlerType(), userTask);
+            // 添加用户任务的空处理元素
+            addAssignEmptyHandlerType(node.getAssignEmptyHandler(), userTask);
+            //  设置审批任务的截止时间
+            if (node.getTimeoutHandler() != null && node.getTimeoutHandler().getEnable()) {
+                userTask.setDueDate(node.getTimeoutHandler().getTimeDuration());
+            }
+            return userTask;
         }
-        ExtensionElement extensionElement = new ExtensionElement();
-        extensionElement.setNamespace(FLOWABLE_EXTENSIONS_NAMESPACE);
-        extensionElement.setNamespacePrefix(FLOWABLE_EXTENSIONS_PREFIX);
-        extensionElement.setName(name);
-        attributes.forEach((key, value) -> {
-            ExtensionAttribute extensionAttribute = new ExtensionAttribute(key, value);
-            extensionAttribute.setNamespace(FLOWABLE_EXTENSIONS_NAMESPACE);
-            extensionElement.addAttribute(extensionAttribute);
-        });
-        element.addExtensionElement(extensionElement);
-    }
 
-    private static void addExtensionElement(FlowElement element, String name, String value) {
-        if (value == null) {
-            return;
+        private void processMultiInstanceLoopCharacteristics(Integer approveMethod, Integer approveRatio, UserTask userTask) {
+            BpmUserTaskApproveMethodEnum approveMethodEnum = BpmUserTaskApproveMethodEnum.valueOf(approveMethod);
+            Assert.notNull(approveMethodEnum, "审批方式({})不能为空", approveMethodEnum);
+            // 添加审批方式的扩展属性
+            addExtensionElement(userTask, BpmnModelConstants.USER_TASK_APPROVE_METHOD, approveMethod.toString());
+            if (approveMethodEnum == BpmUserTaskApproveMethodEnum.RANDOM) {
+                // 随机审批，不需要设置多实例属性
+                return;
+            }
+
+            // 处理多实例审批方式
+            MultiInstanceLoopCharacteristics multiInstanceCharacteristics = new MultiInstanceLoopCharacteristics();
+            // 设置 collectionVariable。本系统用不到，仅仅为了 Flowable 校验不报错
+            multiInstanceCharacteristics.setInputDataItem("${coll_userList}");
+            if (approveMethodEnum == BpmUserTaskApproveMethodEnum.ANY) {
+                multiInstanceCharacteristics.setCompletionCondition(approveMethodEnum.getCompletionCondition());
+                multiInstanceCharacteristics.setSequential(false);
+            } else if (approveMethodEnum == BpmUserTaskApproveMethodEnum.SEQUENTIAL) {
+                multiInstanceCharacteristics.setCompletionCondition(approveMethodEnum.getCompletionCondition());
+                multiInstanceCharacteristics.setSequential(true);
+                multiInstanceCharacteristics.setLoopCardinality("1");
+            } else if (approveMethodEnum == BpmUserTaskApproveMethodEnum.RATIO) {
+                Assert.notNull(approveRatio, "通过比例不能为空");
+                multiInstanceCharacteristics.setCompletionCondition(
+                        String.format(approveMethodEnum.getCompletionCondition(), String.format("%.2f", approveRatio / 100D)));
+                multiInstanceCharacteristics.setSequential(false);
+            }
+            userTask.setLoopCharacteristics(multiInstanceCharacteristics);
         }
-        ExtensionElement extensionElement = new ExtensionElement();
-        extensionElement.setNamespace(FLOWABLE_EXTENSIONS_NAMESPACE);
-        extensionElement.setNamespacePrefix(FLOWABLE_EXTENSIONS_PREFIX);
-        extensionElement.setElementText(value);
-        extensionElement.setName(name);
-        element.addExtensionElement(extensionElement);
+
     }
 
-    // ========== 各种 build 节点的方法 ==========
+    private static class CopyNodeConvert implements NodeConvert {
 
-    private static StartEvent convertStartNode(BpmSimpleModelNodeVO node) {
-        StartEvent startEvent = new StartEvent();
-        startEvent.setId(node.getId());
-        startEvent.setName(node.getName());
-        return startEvent;
+        @Override
+        public ServiceTask convert(BpmSimpleModelNodeVO node) {
+            ServiceTask serviceTask = new ServiceTask();
+            serviceTask.setId(node.getId());
+            serviceTask.setName(node.getName());
+            serviceTask.setImplementationType(ImplementationType.IMPLEMENTATION_TYPE_DELEGATEEXPRESSION);
+            serviceTask.setImplementation("${" + BpmCopyTaskDelegate.BEAN_NAME + "}");
+
+            // 添加抄送候选人元素
+            addCandidateElements(node.getCandidateStrategy(), node.getCandidateParam(), serviceTask);
+            // 添加表单字段权限属性元素
+            addFormFieldsPermission(node.getFieldsPermission(), serviceTask);
+            return serviceTask;
+        }
+
+        @Override
+        public BpmSimpleModelNodeType getType() {
+            return BpmSimpleModelNodeType.COPY_NODE;
+        }
+
     }
 
-    private static UserTask buildBpmnStartUserTask(BpmSimpleModelNodeVO node) {
-        UserTask userTask = new UserTask();
-        userTask.setId(node.getId());
-        userTask.setName(node.getName());
-        // 人工审批
-        addExtensionElement(userTask, USER_TASK_APPROVE_TYPE, USER.getType().toString());
-        // 候选人策略为发起人自己
-        addCandidateElements(START_USER.getStrategy(), null, userTask);
-        // 添加表单字段权限属性元素
-        addFormFieldsPermission(node.getFieldsPermission(), userTask);
-        // 添加操作按钮配置属性元素
-        addButtonsSetting(node.getButtonsSetting(), userTask);
-        // 使用自动通过策略 TODO @芋艿 复用了SKIP， 是否需要新加一个策略；TODO @芋艿：【回复】是不是应该类似飞书，搞个草稿状态。待定；还有一种策略，不标记自动通过，而是首次发起后，第一个节点，自动通过；
-        addAssignStartUserHandlerType(SKIP.getType(), userTask);
-        return userTask;
+    private static class ConditionBranchNodeConvert implements NodeConvert {
+
+        @Override
+        public ExclusiveGateway convert(BpmSimpleModelNodeVO node) {
+            ExclusiveGateway exclusiveGateway = new ExclusiveGateway();
+            exclusiveGateway.setId(node.getId());
+            // TODO @jason：setName
+
+            // 设置默认的序列流（条件）
+            BpmSimpleModelNodeVO defaultSeqFlow = CollUtil.findOne(node.getConditionNodes(),
+                    item -> BooleanUtil.isTrue(item.getDefaultFlow()));
+            Assert.notNull(defaultSeqFlow, "条件分支节点({})的默认序列流不能为空", node.getId());
+            exclusiveGateway.setDefaultFlow(defaultSeqFlow.getId());
+            return exclusiveGateway;
+        }
+
+        @Override
+        public BpmSimpleModelNodeType getType() {
+            return BpmSimpleModelNodeType.CONDITION_BRANCH_NODE;
+        }
+
     }
 
-    private static EndEvent convertEndNode(BpmSimpleModelNodeVO node) {
-        EndEvent endEvent = new EndEvent();
-        endEvent.setId(node.getId());
-        endEvent.setName(node.getName());
+    private static class ParallelBranchNodeConvert implements NodeConvert {
 
-        // TODO @芋艿 + jason：要不要加一个终止定义？
-        return endEvent;
+        @Override
+        public List<ParallelGateway> convertList(BpmSimpleModelNodeVO node) {
+            ParallelGateway parallelGateway = new ParallelGateway();
+            parallelGateway.setId(node.getId());
+            // TODO @jason：setName
+
+            // 并行聚合网关由程序创建，前端不需要传入
+            ParallelGateway joinParallelGateway = new ParallelGateway();
+            joinParallelGateway.setId(node.getId() + JOIN_GATE_WAY_NODE_ID_SUFFIX);
+            return CollUtil.newArrayList(parallelGateway, joinParallelGateway);
+        }
+
+        @Override
+        public BpmSimpleModelNodeType getType() {
+            return BpmSimpleModelNodeType.PARALLEL_BRANCH_NODE;
+        }
+
     }
 
 }
