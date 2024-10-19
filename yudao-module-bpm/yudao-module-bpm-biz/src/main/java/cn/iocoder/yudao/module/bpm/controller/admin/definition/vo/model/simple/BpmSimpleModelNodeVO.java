@@ -3,7 +3,6 @@ package cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.simple;
 import cn.iocoder.yudao.framework.common.validation.InEnum;
 import cn.iocoder.yudao.module.bpm.enums.definition.*;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmTaskCandidateStrategyEnum;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
@@ -79,12 +78,6 @@ public class BpmSimpleModelNodeVO {
     @Schema(description = "操作按钮设置", example = "[]")
     private List<OperationButtonSetting> buttonsSetting;  // 用于审批节点
 
-    // TODO @jason：看看是不是可以简化；@芋艿： 暂时先放着。不知道后面是否会用到
-    /**
-     * 附加节点 Id, 该节点不从前端传入。 由程序生成. 由于当个节点无法完成功能。 需要附加节点来完成。
-     */
-    @JsonIgnore
-    private String attachNodeId;
     /**
      * 审批节点拒绝处理
      */

@@ -68,7 +68,7 @@ public class SimpleModelUtils {
         EndEvent endEvent = BpmnModelUtils.getEndEvent(bpmnModel);
         traverseNodeToBuildSequenceFlow(process, startNode, endEvent.getId());
 
-        // 3. 自动布局
+        // 4. 自动布局
         new BpmnAutoLayout(bpmnModel).execute();
         return bpmnModel;
     }
@@ -146,30 +146,16 @@ public class SimpleModelUtils {
      */
     private static void traverseNormalNodeToBuildSequenceFlow(Process process, BpmSimpleModelNodeVO node, String targetNodeId) {
         BpmSimpleModelNodeVO childNode = node.getChildNode();
+        boolean isChildNodeValid = isValidNode(childNode);
         // 情况一：有“子”节点，则建立连线
-        if (isValidNode(childNode)) {
-            // TODO @jason：attachNodeId 是不是可以删除啦
-            if (StrUtil.isNotEmpty(node.getAttachNodeId())) {
-                // 2.1.1.2 如果有附加节点. 需要先建立和附加节点的连线。再建立附加节点和目标节点的连线
-                List<SequenceFlow> sequenceFlows = buildAttachNodeSequenceFlow(node.getId(), node.getAttachNodeId(), childNode.getId());
-                sequenceFlows.forEach(process::addFlowElement);
-            } else {
-                SequenceFlow sequenceFlow = buildBpmnSequenceFlow(node.getId(), childNode.getId());
-                process.addFlowElement(sequenceFlow);
-            }
+        // 情况二：没有“子节点”，则直接跟 targetNodeId 建立连线。例如说，结束节点、条件分支（分支节点的孩子节点或聚合节点）的最后一个节点
+        String finalTargetNodeId = isChildNodeValid? childNode.getId() : targetNodeId;
+        SequenceFlow sequenceFlow = buildBpmnSequenceFlow(node.getId(), finalTargetNodeId);
+        process.addFlowElement(sequenceFlow);
 
-            // 因为有子节点，递归调用后续子节点
+        // 因为有子节点，递归调用后续子节点
+        if (isChildNodeValid) {
             traverseNodeToBuildSequenceFlow(process, childNode, targetNodeId);
-        } else {
-            // 情况二：没有“子节点”，则直接跟 targetNodeId 建立连线。例如说，结束节点、条件分支（分支节点的孩子节点或聚合节点）的最后一个节点
-            // TODO @jason：attachNodeId 是不是可以删除啦
-            if (StrUtil.isNotEmpty(node.getAttachNodeId())) {
-                List<SequenceFlow> sequenceFlows = buildAttachNodeSequenceFlow(node.getId(), node.getAttachNodeId(), targetNodeId);
-                sequenceFlows.forEach(process::addFlowElement);
-            } else {
-                SequenceFlow sequenceFlow = buildBpmnSequenceFlow(node.getId(), targetNodeId);
-                process.addFlowElement(sequenceFlow);
-            }
         }
     }
 
@@ -228,19 +214,6 @@ public class SimpleModelUtils {
 
         // 5. 递归调用后续节点 继续递归。例如说，建立 D->E 的连线
         traverseNodeToBuildSequenceFlow(process, childNode, targetNodeId);
-    }
-
-    /**
-     * 构建有附加节点的连线
-     *
-     * @param nodeId       当前节点 Id
-     * @param attachNodeId 附属节点 Id
-     * @param targetNodeId 目标节点 Id
-     */
-    private static List<SequenceFlow> buildAttachNodeSequenceFlow(String nodeId, String attachNodeId, String targetNodeId) {
-        SequenceFlow sequenceFlow = buildBpmnSequenceFlow(nodeId, attachNodeId, null, null, null);
-        SequenceFlow attachSequenceFlow = buildBpmnSequenceFlow(attachNodeId, targetNodeId, null, null, null);
-        return CollUtil.newArrayList(sequenceFlow, attachSequenceFlow);
     }
 
     private static SequenceFlow buildBpmnSequenceFlow(String sourceId, String targetId) {
