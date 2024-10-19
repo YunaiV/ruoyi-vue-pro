@@ -25,6 +25,9 @@ import static java.util.Arrays.asList;
 /**
  * 仿钉钉/飞书的模型相关的工具方法
  *
+ * 1. 核心的逻辑实现，可见 {@link #buildBpmnModel(String, String, BpmSimpleModelNodeVO)} 方法
+ * 2. 所有的 BpmSimpleModelNodeVO 转换成 BPMN FlowNode 元素，可见 {@link NodeConvert} 实现类
+ *
  * @author jason
  */
 public class SimpleModelUtils {
@@ -40,6 +43,11 @@ public class SimpleModelUtils {
 
     /**
      * 仿钉钉流程设计模型数据结构（json）转换成 Bpmn Model
+     *
+     * 整体逻辑如下：
+     * 1. 创建：BpmnModel、Process 对象
+     * 2. 转换：将 BpmSimpleModelNodeVO 转换成 BPMN FlowNode 元素
+     * 3. 连接：构建并添加节点之间的连线 Sequence Flow
      *
      * @param processId       流程标识
      * @param processName     流程名称

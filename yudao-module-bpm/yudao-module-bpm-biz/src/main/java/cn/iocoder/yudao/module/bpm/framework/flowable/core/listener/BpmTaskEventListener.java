@@ -87,6 +87,7 @@ public class BpmTaskEventListener extends AbstractFlowableEngineEventListener {
     }
 
     @Override
+    @SuppressWarnings("PatternVariableCanBeUsed")
     protected void timerFired(FlowableEngineEntityEvent event) {
         // 1.1 只处理 BoundaryEvent 边界计时时间
         String processDefinitionId = event.getProcessDefinitionId();

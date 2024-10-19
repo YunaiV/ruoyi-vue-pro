@@ -9,6 +9,9 @@ import cn.iocoder.yudao.framework.common.util.number.NumberUtils;
 import cn.iocoder.yudao.framework.common.util.string.StrUtils;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.simple.BpmSimpleModelNodeVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.task.BpmTaskRespVO;
+import cn.iocoder.yudao.module.bpm.enums.definition.BpmUserTaskApproveTypeEnum;
+import cn.iocoder.yudao.module.bpm.enums.definition.BpmUserTaskAssignEmptyHandlerTypeEnum;
+import cn.iocoder.yudao.module.bpm.enums.definition.BpmUserTaskAssignStartUserHandlerTypeEnum;
 import cn.iocoder.yudao.module.bpm.enums.definition.BpmUserTaskRejectHandlerType;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnModelConstants;
 import com.google.common.collect.Maps;
@@ -24,9 +27,17 @@ import static org.flowable.bpmn.constants.BpmnXMLConstants.FLOWABLE_EXTENSIONS_N
 import static org.flowable.bpmn.constants.BpmnXMLConstants.FLOWABLE_EXTENSIONS_PREFIX;
 
 /**
- * 流程模型转操作工具类
+ * BPMN Model 操作工具类。目前分成三部分：
+ *
+ * 1. BPMN 修改 + 解析元素相关的方法
+ * 2. BPM 简单查找相关的方法
+ * 3. BPM 复杂遍历相关的方法
+ *
+ * @author 芋道源码
  */
 public class BpmnModelUtils {
+
+    // ========== BPMN 修改 + 解析元素相关的方法 ==========
 
     public static void addExtensionElement(FlowElement element, String name, String value) {
         if (value == null) {
@@ -64,6 +75,21 @@ public class BpmnModelUtils {
     }
 
     /**
+     * 解析扩展元素
+     *
+     * @param flowElement 节点
+     * @param elementName 元素名称
+     * @return 扩展元素
+     */
+    public static String parseExtensionElement(FlowElement flowElement, String elementName) {
+        if (flowElement == null) {
+            return null;
+        }
+        ExtensionElement element = CollUtil.getFirst(flowElement.getExtensionElements().get(elementName));
+        return element != null ? element.getElementText() : null;
+    }
+
+    /**
      * 给节点添加候选人元素
      *
      * @param candidateStrategy 候选人策略
@@ -79,7 +105,7 @@ public class BpmnModelUtils {
     /**
      * 解析候选人策略
      *
-     * @param userTask 节点
+     * @param userTask 任务节点
      * @return 候选人策略
      */
     public static Integer parseCandidateStrategy(FlowElement userTask) {
@@ -93,6 +119,12 @@ public class BpmnModelUtils {
         return candidateStrategy;
     }
 
+    /**
+     * 解析候选人参数
+     *
+     * @param userTask 任务节点
+     * @return 候选人参数
+     */
     public static String parseCandidateParam(FlowElement userTask) {
         String candidateParam = userTask.getAttributeValue(
                 BpmnModelConstants.NAMESPACE, BpmnModelConstants.USER_TASK_CANDIDATE_PARAM);
@@ -103,10 +135,23 @@ public class BpmnModelUtils {
         return candidateParam;
     }
 
+    /**
+     * 解析审批类型
+     *
+     * @see BpmUserTaskApproveTypeEnum
+     * @param userTask 任务节点
+     * @return 审批类型
+     */
     public static Integer parseApproveType(FlowElement userTask) {
         return NumberUtils.parseInt(parseExtensionElement(userTask, BpmnModelConstants.USER_TASK_APPROVE_TYPE));
     }
 
+    /**
+     * 添加任务拒绝处理元素
+     *
+     * @param rejectHandler 任务拒绝处理
+     * @param userTask 任务节点
+     */
     public static void addTaskRejectElements(BpmSimpleModelNodeVO.RejectHandler rejectHandler, UserTask userTask) {
         if (rejectHandler == null) {
             return;
@@ -115,15 +160,34 @@ public class BpmnModelUtils {
         addExtensionElement(userTask, USER_TASK_REJECT_RETURN_TASK_ID, rejectHandler.getReturnNodeId());
     }
 
+    /**
+     * 解析任务拒绝处理类型
+     *
+     * @param userTask 任务节点
+     * @return 任务拒绝处理类型
+     */
     public static BpmUserTaskRejectHandlerType parseRejectHandlerType(FlowElement userTask) {
         Integer rejectHandlerType = NumberUtils.parseInt(parseExtensionElement(userTask, USER_TASK_REJECT_HANDLER_TYPE));
         return BpmUserTaskRejectHandlerType.typeOf(rejectHandlerType);
     }
 
+    /**
+     * 解析任务拒绝返回任务节点 ID
+     *
+     * @param flowElement 任务节点
+     * @return 任务拒绝返回任务节点 ID
+     */
     public static String parseReturnTaskId(FlowElement flowElement) {
         return parseExtensionElement(flowElement, USER_TASK_REJECT_RETURN_TASK_ID);
     }
 
+    /**
+     * 给节点添加用户任务的审批人与发起人相同时，处理类型枚举
+     *
+     * @see BpmUserTaskAssignStartUserHandlerTypeEnum
+     * @param assignStartUserHandlerType 发起人处理类型
+     * @param userTask 任务节点
+     */
     public static void addAssignStartUserHandlerType(Integer assignStartUserHandlerType, UserTask userTask) {
         if (assignStartUserHandlerType == null) {
             return;
@@ -131,6 +195,13 @@ public class BpmnModelUtils {
         addExtensionElement(userTask, USER_TASK_ASSIGN_START_USER_HANDLER_TYPE, assignStartUserHandlerType.toString());
     }
 
+    /**
+     * 给节点添加用户任务的审批人为空时，处理类型枚举
+     *
+     * @see BpmUserTaskAssignEmptyHandlerTypeEnum
+     * @param emptyHandler 空处理
+     * @param userTask 任务节点
+     */
     public static void addAssignEmptyHandlerType(BpmSimpleModelNodeVO.AssignEmptyHandler emptyHandler, UserTask userTask) {
         if (emptyHandler == null) {
             return;
@@ -139,24 +210,34 @@ public class BpmnModelUtils {
         addExtensionElement(userTask, USER_TASK_ASSIGN_USER_IDS, StrUtil.join(",", emptyHandler.getUserIds()));
     }
 
+    /**
+     * 解析用户任务的审批人与发起人相同时，处理类型枚举
+     *
+     * @param userTask 任务节点
+     * @return 处理类型枚举
+     */
     public static Integer parseAssignStartUserHandlerType(FlowElement userTask) {
         return NumberUtils.parseInt(parseExtensionElement(userTask, USER_TASK_ASSIGN_START_USER_HANDLER_TYPE));
     }
 
+    /**
+     * 解析用户任务的审批人为空时，处理类型枚举
+     *
+     * @param userTask 任务节点
+     * @return 处理类型枚举
+     */
     public static Integer parseAssignEmptyHandlerType(FlowElement userTask) {
         return NumberUtils.parseInt(parseExtensionElement(userTask, USER_TASK_ASSIGN_EMPTY_HANDLER_TYPE));
     }
 
+    /**
+     * 解析用户任务的审批人为空时，处理用户 ID 数组
+     *
+     * @param userTask 任务节点
+     * @return 处理用户 ID 数组
+     */
     public static List<Long> parseAssignEmptyHandlerUserIds(FlowElement userTask) {
         return StrUtils.splitToLong(parseExtensionElement(userTask, USER_TASK_ASSIGN_USER_IDS), ",");
-    }
-
-    public static String parseExtensionElement(FlowElement flowElement, String elementName) {
-        if (flowElement == null) {
-            return null;
-        }
-        ExtensionElement element = CollUtil.getFirst(flowElement.getExtensionElements().get(elementName));
-        return element != null ? element.getElementText() : null;
     }
 
     /**
@@ -217,6 +298,13 @@ public class BpmnModelUtils {
         }
     }
 
+    /**
+     * 解析操作按钮设置
+     *
+     * @param bpmnModel bpmnModel 对象
+     * @param flowElementId 元素 ID
+     * @return 操作按钮设置
+     */
     public static Map<Integer, BpmTaskRespVO.OperationButtonSetting> parseButtonsSetting(BpmnModel bpmnModel, String flowElementId) {
         FlowElement flowElement = getFlowElementById(bpmnModel, flowElementId);
         if (flowElement == null) {
@@ -226,7 +314,7 @@ public class BpmnModelUtils {
         if (CollUtil.isEmpty(extensionElements)) {
             return null;
         }
-        Map<Integer, BpmTaskRespVO.OperationButtonSetting> buttonSettings = MapUtil.newHashMap(16);
+        Map<Integer, BpmTaskRespVO.OperationButtonSetting> buttonSettings = Maps.newHashMapWithExpectedSize(extensionElements.size());
         extensionElements.forEach(element -> {
             String id = element.getAttributeValue(FLOWABLE_EXTENSIONS_NAMESPACE, BUTTON_SETTING_ELEMENT_ID_ATTRIBUTE);
             String displayName = element.getAttributeValue(FLOWABLE_EXTENSIONS_NAMESPACE, BUTTON_SETTING_ELEMENT_DISPLAY_NAME_ATTRIBUTE);
@@ -238,6 +326,23 @@ public class BpmnModelUtils {
         });
         return buttonSettings;
     }
+
+    /**
+     * 解析边界事件扩展元素
+     *
+     * @param boundaryEvent 边界事件
+     * @param customElement 元素
+     * @return 扩展元素
+     */
+    public static String parseBoundaryEventExtensionElement(BoundaryEvent boundaryEvent, String customElement) {
+        if (boundaryEvent == null) {
+            return null;
+        }
+        ExtensionElement extensionElement = CollUtil.getFirst(boundaryEvent.getExtensionElements().get(customElement));
+        return Optional.ofNullable(extensionElement).map(ExtensionElement::getElementText).orElse(null);
+    }
+
+    // ========== BPM 简单查找相关的方法 ==========
 
     /**
      * 根据节点，获取入口连线
@@ -284,15 +389,14 @@ public class BpmnModelUtils {
      * @param clazz 指定元素。例如说，{@link UserTask}、{@link Gateway} 等等
      * @return 元素们
      */
+    @SuppressWarnings("unchecked")
     public static <T extends FlowElement> List<T> getBpmnModelElements(BpmnModel model, Class<T> clazz) {
         List<T> result = new ArrayList<>();
-        model.getProcesses().forEach(process -> {
-            process.getFlowElements().forEach(flowElement -> {
-                if (flowElement.getClass().isAssignableFrom(clazz)) {
-                    result.add((T) flowElement);
-                }
-            });
-        });
+        model.getProcesses().forEach(process -> process.getFlowElements().forEach(flowElement -> {
+            if (flowElement.getClass().isAssignableFrom(clazz)) {
+                result.add((T) flowElement);
+            }
+        }));
         return result;
     }
 
@@ -337,7 +441,7 @@ public class BpmnModelUtils {
         return StrUtil.utf8Str(bpmnBytes);
     }
 
-    // ========== 遍历相关的方法 ==========
+    // ========== BPMN 复杂遍历相关的方法 ==========
 
     /**
      * 找到 source 节点之前的所有用户任务节点
@@ -441,6 +545,7 @@ public class BpmnModelUtils {
      * @param visitedElements 已经经过的连线的 ID，用于判断线路是否重复
      * @return 结果
      */
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public static boolean isSequentialReachable(FlowElement source, FlowElement target, Set<String> visitedElements) {
         visitedElements = visitedElements == null ? new HashSet<>() : visitedElements;
         // 不能是开始事件和子流程
@@ -551,11 +656,4 @@ public class BpmnModelUtils {
         return userTaskList;
     }
 
-    public static String parseBoundaryEventExtensionElement(BoundaryEvent boundaryEvent, String customElement) {
-        if (boundaryEvent == null) {
-            return null;
-        }
-        ExtensionElement extensionElement = CollUtil.getFirst(boundaryEvent.getExtensionElements().get(customElement));
-        return Optional.ofNullable(extensionElement).map(ExtensionElement::getElementText).orElse(null);
-    }
 }
