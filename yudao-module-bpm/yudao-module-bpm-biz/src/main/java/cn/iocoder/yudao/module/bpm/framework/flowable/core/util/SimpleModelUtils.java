@@ -24,7 +24,7 @@ import static java.util.Arrays.asList;
 
 /**
  * 仿钉钉/飞书的模型相关的工具方法
- *
+ * <p>
  * 1. 核心的逻辑实现，可见 {@link #buildBpmnModel(String, String, BpmSimpleModelNodeVO)} 方法
  * 2. 所有的 BpmSimpleModelNodeVO 转换成 BPMN FlowNode 元素，可见 {@link NodeConvert} 实现类
  *
@@ -37,13 +37,13 @@ public class SimpleModelUtils {
     static {
         List<NodeConvert> converts = asList(new StartNodeConvert(), new EndNodeConvert(),
                 new StartUserNodeConvert(), new ApproveNodeConvert(), new CopyNodeConvert(),
-                new ConditionBranchNodeConvert(), new ParallelBranchNodeConvert());
+                new ConditionBranchNodeConvert(), new ParallelBranchNodeConvert(), new InclusiveBranchNodeConvert());
         converts.forEach(convert -> NODE_CONVERTS.put(convert.getType(), convert));
     }
 
     /**
      * 仿钉钉流程设计模型数据结构（json）转换成 Bpmn Model
-     *
+     * <p>
      * 整体逻辑如下：
      * 1. 创建：BpmnModel、Process 对象
      * 2. 转换：将 BpmSimpleModelNodeVO 转换成 BPMN FlowNode 元素
@@ -184,12 +184,10 @@ public class SimpleModelUtils {
         if (nodeType == BpmSimpleModelNodeType.CONDITION_BRANCH_NODE) { // 条件分支
             // 分两种情况 1. 分支节点有孩子节点为孩子节点 Id 2. 分支节点孩子为无效节点时 (分支嵌套且为分支最后一个节点) 为分支终点节点 ID
             branchEndNodeId = isValidNode(childNode) ? childNode.getId() : targetNodeId;
-        } else if (nodeType == BpmSimpleModelNodeType.PARALLEL_BRANCH_NODE) {  // 并行分支
+        } else if (nodeType == BpmSimpleModelNodeType.PARALLEL_BRANCH_NODE
+                || nodeType == BpmSimpleModelNodeType.INCLUSIVE_BRANCH_NODE) {  // 并行分支或包容分支
             // 分支节点：分支终点节点 Id 为程序创建的网关集合节点。目前不会从前端传入。
-            branchEndNodeId = ParallelBranchNodeConvert.buildJoinId(node.getId());
-        } else if (nodeType == BpmSimpleModelNodeType.INCLUSIVE_BRANCH_NODE) {
-            // TODO @jason：包容网关待实现
-            throw new UnsupportedOperationException("未支持！！");
+            branchEndNodeId = buildGatewayJoinId(node.getId());
         }
         Assert.notEmpty(branchEndNodeId, "分支终点节点 Id 不能为空");
 
@@ -213,8 +211,8 @@ public class SimpleModelUtils {
             }
         }
 
-        // 4. 如果是并行分支，由于是程序创建的聚合网关，需要手工创建聚合网关和下一个节点的连线
-        if (nodeType == BpmSimpleModelNodeType.PARALLEL_BRANCH_NODE) {
+        // 4. 如果是并行分支，包容分支，由于是程序创建的聚合网关，需要手工创建聚合网关和下一个节点的连线
+        if (nodeType == BpmSimpleModelNodeType.PARALLEL_BRANCH_NODE || nodeType == BpmSimpleModelNodeType.INCLUSIVE_BRANCH_NODE ) {
             String nextNodeId = isValidNode(childNode) ? childNode.getId() : targetNodeId;
             SequenceFlow sequenceFlow = buildBpmnSequenceFlow(branchEndNodeId, nextNodeId);
             process.addFlowElement(sequenceFlow);
@@ -255,25 +253,6 @@ public class SimpleModelUtils {
     public static boolean isSequentialApproveNode(BpmSimpleModelNodeVO node) {
         return BpmSimpleModelNodeType.APPROVE_NODE.getType().equals(node.getType())
                 && BpmUserTaskApproveMethodEnum.SEQUENTIAL.getMethod().equals(node.getApproveMethod());
-    }
-
-    // TODO @jason：这个方法，是不是要对接 Inclusive 包容分支哈
-    private static InclusiveGateway convertInclusiveBranchNode(BpmSimpleModelNodeVO node, Boolean isFork) {
-        InclusiveGateway inclusiveGateway = new InclusiveGateway();
-        inclusiveGateway.setId(node.getId());
-        // TODO @jason：这里是不是 setName 哈；
-
-        // @芋艿 isFork 为 false 就是合并网关。由前端传入。这个前端暂时还未实现
-        if (isFork) {
-            Assert.notEmpty(node.getConditionNodes(), "条件节点不能为空");
-            // 寻找默认的序列流
-            BpmSimpleModelNodeVO defaultSeqFlow = CollUtil.findOne(
-                    node.getConditionNodes(), item -> BooleanUtil.isTrue(item.getDefaultFlow()));
-            if (defaultSeqFlow != null) {
-                inclusiveGateway.setDefaultFlow(defaultSeqFlow.getId());
-            }
-        }
-        return inclusiveGateway;
     }
 
     // ========== 各种 convert 节点的方法: BpmSimpleModelNodeVO => BPMN FlowElement ==========
@@ -530,7 +509,7 @@ public class SimpleModelUtils {
 
             // 并行聚合网关由程序创建，前端不需要传入
             ParallelGateway joinParallelGateway = new ParallelGateway();
-            joinParallelGateway.setId(buildJoinId(node.getId()));
+            joinParallelGateway.setId(buildGatewayJoinId(node.getId()));
             // TODO @jason：setName
             return CollUtil.newArrayList(parallelGateway, joinParallelGateway);
         }
@@ -540,10 +519,37 @@ public class SimpleModelUtils {
             return BpmSimpleModelNodeType.PARALLEL_BRANCH_NODE;
         }
 
-        public static String buildJoinId(String id) {
-            return id + "_join";
+    }
+
+    private static class InclusiveBranchNodeConvert implements NodeConvert {
+
+        @Override
+        public List<InclusiveGateway> convertList(BpmSimpleModelNodeVO node) {
+            InclusiveGateway inclusiveGateway = new InclusiveGateway();
+            inclusiveGateway.setId(node.getId());
+            // 设置默认的序列流（条件）
+            BpmSimpleModelNodeVO defaultSeqFlow = CollUtil.findOne(node.getConditionNodes(),
+                    item -> BooleanUtil.isTrue(item.getDefaultFlow()));
+            Assert.notNull(defaultSeqFlow, "包容分支节点({})的默认序列流不能为空", node.getId());
+            inclusiveGateway.setDefaultFlow(defaultSeqFlow.getId());
+            // TODO @jason：setName
+
+            // 并行聚合网关由程序创建，前端不需要传入
+            InclusiveGateway joinInclusiveGateway = new InclusiveGateway();
+            joinInclusiveGateway.setId(buildGatewayJoinId(node.getId()));
+            // TODO @jason：setName
+            return CollUtil.newArrayList(inclusiveGateway, joinInclusiveGateway);
         }
 
+        @Override
+        public BpmSimpleModelNodeType getType() {
+            return BpmSimpleModelNodeType.INCLUSIVE_BRANCH_NODE;
+        }
+
+    }
+
+    public static String buildGatewayJoinId(String id) {
+        return id + "_join";
     }
 
     public static class ConditionNodeConvert implements NodeConvert {
