@@ -156,9 +156,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         BpmnModel bpmnModel = bpmProcessDefinitionService.getProcessDefinitionBpmnModel(processInstance.getProcessDefinitionId());
         List<BpmTaskRespVO> taskList = convertList(todoList, task -> {
             // 找到分配给当前用户，或者当前用户加签的任务（为了减签）
-            //  TODO 3）(!userId.equals(NumberUtil.parseLong(task.getOwner(), null)) || BpmTaskSignTypeEnum.of(task.getScopeType()) == null) 这个判断的目的是啥？
-            // @芋艿 !isAddSignTask(userId, task) 该判断的目的被用户加签的任务。该用户可以进行减签操作
-            if (!isAssignUserTask(userId, task) && !isAddSignTask(userId, task)) {
+            if (!isAssignUserTask(userId, task) && !isAddSignUserTask(userId, task)) {
                 return null;
             }
             BpmTaskRespVO taskVO = BeanUtils.toBean(task, BpmTaskRespVO.class);
@@ -166,9 +164,10 @@ public class BpmTaskServiceImpl implements BpmTaskService {
             taskVO.setButtonsSetting(BpmnModelUtils.parseButtonsSetting(bpmnModel, task.getTaskDefinitionKey()));
             BpmTaskConvert.INSTANCE.buildTaskOwner(taskVO, task.getOwner(), userMap, deptMap);
             // 如果是被加签的任务. 找到它的子任务 (为了减签)
-            if (isAddSignTask(userId, task)) {
+            // TODO @jason：如果是向后加签，这个判断有问题哈。因为向后加签后，当前任务，assignee 还是没变。可以简单点，直接拿子任务哈。另外，需要考虑子任务的子任务。
+            if (isAddSignUserTask(userId, task)) {
+                // TODO @jason：这里其实可以考虑，在 157 到 173 把所有需要的数据都拿到，然后交给 BpmTaskConvert.INSTANCE 转换出 taskVO。这样，service 只保留一些逻辑性强的东西，类似 status、buttonsetting，都拿到 convert 里去。
                 BpmTaskConvert.INSTANCE.buildTaskChildren(taskVO, childrenTaskMap, userMap, deptMap);
-
             }
             return taskVO;
         });
@@ -176,16 +175,24 @@ public class BpmTaskServiceImpl implements BpmTaskService {
     }
 
     /**
-     * 判断是否为被分配给用户的任务
+     * 判断指定用户，是否是当前任务的分配人
+     *
+     * @param userId 用户编号
+     * @param task 任务
+     * @return 是否
      */
     private boolean isAssignUserTask(Long userId, Task task) {
         return ObjectUtil.equal(userId, NumberUtil.parseLong(task.getAssignee(), null));
     }
 
     /**
-     * 判断是否为被用户加签的任务
+     * 判断指定用户，是否是当前任务的加签人
+     *
+     * @param userId 用户编号
+     * @param task 任务
+     * @return 是否
      */
-    private boolean isAddSignTask(Long userId, Task task) {
+    private boolean isAddSignUserTask(Long userId, Task task) {
         return userId.equals(NumberUtil.parseLong(task.getOwner(), null))
                 && BpmTaskSignTypeEnum.of(task.getScopeType()) != null;
     }
@@ -994,8 +1001,13 @@ public class BpmTaskServiceImpl implements BpmTaskService {
                 if (ObjectUtil.notEqual(transactionStatus, TransactionSynchronization.STATUS_COMMITTED)) {
                     return;
                 }
+                // TODO 芋艿：可以后续优化成 getSelf();
                 // 特殊情况一：【人工审核】审批人为空，根据配置是否要自动通过、自动拒绝
                 if (ObjectUtil.equal(approveType, BpmUserTaskApproveTypeEnum.USER.getType())) {
+                    // 如果有审批人、或者拥有人，则说明不满足情况一，不自动通过、不自动拒绝
+                    if (!ObjectUtil.isAllEmpty(task.getAssignee(), task.getOwner())) {
+                        return;
+                    }
                     if (ObjectUtil.equal(assignEmptyHandlerType, BpmUserTaskAssignEmptyHandlerTypeEnum.APPROVE.getType())) {
                         SpringUtil.getBean(BpmTaskService.class).approveTask(null, new BpmTaskApproveReqVO()
                                 .setId(task.getId()).setReason(BpmReasonEnum.ASSIGN_EMPTY_APPROVE.getReason()));
