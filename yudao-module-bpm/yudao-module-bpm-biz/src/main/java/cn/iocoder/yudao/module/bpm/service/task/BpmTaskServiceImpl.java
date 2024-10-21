@@ -7,7 +7,6 @@ import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.date.DateUtils;
 import cn.iocoder.yudao.framework.common.util.number.NumberUtils;
-import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
 import cn.iocoder.yudao.framework.common.util.object.PageUtils;
 import cn.iocoder.yudao.framework.web.core.util.WebFrameworkUtils;
@@ -151,50 +150,15 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(userIds);
         Map<Long, DeptRespDTO> deptMap = deptApi.getDeptMap(
                 convertSet(userMap.values(), AdminUserRespDTO::getDeptId));
-        // 2.2 构建 Task 列表的返回信息
+
+        // 2.2 构建用户待办 Task 列表
         HistoricProcessInstance processInstance = processInstanceService.getHistoricProcessInstance(processInstanceId);
         BpmnModel bpmnModel = bpmProcessDefinitionService.getProcessDefinitionBpmnModel(processInstance.getProcessDefinitionId());
-        List<BpmTaskRespVO> taskList = convertList(todoList, task -> {
-            // 找到分配给当前用户，或者当前用户加签的任务（为了减签）
-            if (!isAssignUserTask(userId, task) && !isAddSignUserTask(userId, task)) {
-                return null;
-            }
-            BpmTaskRespVO taskVO = BeanUtils.toBean(task, BpmTaskRespVO.class);
-            taskVO.setStatus(FlowableUtils.getTaskStatus(task)).setReason(FlowableUtils.getTaskReason(task));
-            taskVO.setButtonsSetting(BpmnModelUtils.parseButtonsSetting(bpmnModel, task.getTaskDefinitionKey()));
-            BpmTaskConvert.INSTANCE.buildTaskOwner(taskVO, task.getOwner(), userMap, deptMap);
-            // 如果是被加签的任务. 找到它的子任务 (为了减签)
-            // TODO @jason：如果是向后加签，这个判断有问题哈。因为向后加签后，当前任务，assignee 还是没变。可以简单点，直接拿子任务哈。另外，需要考虑子任务的子任务。
-            if (isAddSignUserTask(userId, task)) {
-                // TODO @jason：这里其实可以考虑，在 157 到 173 把所有需要的数据都拿到，然后交给 BpmTaskConvert.INSTANCE 转换出 taskVO。这样，service 只保留一些逻辑性强的东西，类似 status、buttonsetting，都拿到 convert 里去。
-                BpmTaskConvert.INSTANCE.buildTaskChildren(taskVO, childrenTaskMap, userMap, deptMap);
-            }
-            return taskVO;
-        });
-        return findFirst(taskList, Objects::nonNull);
-    }
+        List<BpmTaskRespVO> todoTasks = BpmTaskConvert.INSTANCE.buildTodoTaskListByUserId(userId, todoList, childrenTaskMap,
+                bpmnModel, userMap, deptMap);
 
-    /**
-     * 判断指定用户，是否是当前任务的分配人
-     *
-     * @param userId 用户编号
-     * @param task 任务
-     * @return 是否
-     */
-    private boolean isAssignUserTask(Long userId, Task task) {
-        return ObjectUtil.equal(userId, NumberUtil.parseLong(task.getAssignee(), null));
-    }
-
-    /**
-     * 判断指定用户，是否是当前任务的加签人
-     *
-     * @param userId 用户编号
-     * @param task 任务
-     * @return 是否
-     */
-    private boolean isAddSignUserTask(Long userId, Task task) {
-        return userId.equals(NumberUtil.parseLong(task.getOwner(), null))
-                && BpmTaskSignTypeEnum.of(task.getScopeType()) != null;
+        // 2.3 找到首个任务
+        return findFirst(todoTasks, Objects::nonNull);
     }
 
     @Override

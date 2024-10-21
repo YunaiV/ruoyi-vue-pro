@@ -1,5 +1,7 @@
 package cn.iocoder.yudao.module.bpm.framework.flowable.core.util;
 
+import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder;
 import cn.iocoder.yudao.framework.tenant.core.util.TenantUtils;
@@ -13,6 +15,7 @@ import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.runtime.ProcessInstance;
+import org.flowable.task.api.Task;
 import org.flowable.task.api.TaskInfo;
 
 import java.util.HashMap;
@@ -177,6 +180,40 @@ public class FlowableUtils {
         taskLocalVariables.remove(BpmnVariableConstants.TASK_VARIABLE_STATUS);
         taskLocalVariables.remove(BpmnVariableConstants.TASK_VARIABLE_REASON);
         return taskLocalVariables;
+    }
+
+    /**
+     * 判断指定用户，是否是当前任务的分配人
+     *
+     * @param userId 用户编号
+     * @param task   任务
+     * @return 是否
+     */
+    public static boolean isAssignUserTask(Long userId, Task task) {
+        return ObjectUtil.equal(userId, NumberUtil.parseLong(task.getAssignee(), null));
+    }
+
+    /**
+     * 判断指定用户，是否是当前任务的拥有人
+     *
+     * @param userId 用户编号
+     * @param task   任务
+     * @return 是否
+     */
+    public static boolean isOwnerUserTask(Long userId, Task task) {
+        return ObjectUtil.equal(userId, NumberUtil.parseLong(task.getOwner(), null));
+    }
+
+    /**
+     * 判断指定用户，是否是当前任务的加签人
+     * @param userId 用户 Id
+     * @param task 任务
+     * @param  childrenTaskMap 子任务集合
+     * @return 是否
+     */
+    public static boolean isAddSignUserTask(Long userId, Task task, Map<String, List<Task>> childrenTaskMap) {
+        return (isAssignUserTask(userId, task) || isOwnerUserTask(userId, task))
+                && CollUtil.isNotEmpty(childrenTaskMap.get(task.getId()));
     }
 
     // ========== Expression 相关的工具方法 ==========
