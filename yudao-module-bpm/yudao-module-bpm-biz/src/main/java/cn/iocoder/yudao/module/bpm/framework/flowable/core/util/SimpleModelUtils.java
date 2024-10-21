@@ -211,8 +211,9 @@ public class SimpleModelUtils {
             }
         }
 
-        // 4. 如果是并行分支，包容分支，由于是程序创建的聚合网关，需要手工创建聚合网关和下一个节点的连线
-        if (nodeType == BpmSimpleModelNodeType.PARALLEL_BRANCH_NODE || nodeType == BpmSimpleModelNodeType.INCLUSIVE_BRANCH_NODE ) {
+        // 4. 如果是并行分支、包容分支，由于是程序创建的聚合网关，需要手工创建聚合网关和下一个节点的连线
+        if (nodeType == BpmSimpleModelNodeType.PARALLEL_BRANCH_NODE
+                || nodeType == BpmSimpleModelNodeType.INCLUSIVE_BRANCH_NODE ) {
             String nextNodeId = isValidNode(childNode) ? childNode.getId() : targetNodeId;
             SequenceFlow sequenceFlow = buildBpmnSequenceFlow(branchEndNodeId, nextNodeId);
             process.addFlowElement(sequenceFlow);
@@ -548,10 +549,6 @@ public class SimpleModelUtils {
 
     }
 
-    public static String buildGatewayJoinId(String id) {
-        return id + "_join";
-    }
-
     public static class ConditionNodeConvert implements NodeConvert {
 
         @Override
@@ -605,6 +602,10 @@ public class SimpleModelUtils {
             return null;
         }
 
+    }
+
+    private static String buildGatewayJoinId(String id) {
+        return id + "_join";
     }
 
 }
