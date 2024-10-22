@@ -87,17 +87,17 @@ public class EccangTest extends BaseSpringTest {
 
     @Test
     public void getOrder() {
-        var date = LocalDate.of(2024,8,6);
+        var date = LocalDate.of(2023,12,10);
         var time1 = LocalTime.of(0,0,0);
         var time2 = LocalTime.of(23,59,59);
         var datetime1 = LocalDateTime.of(date,time1);
         var datetime2 = LocalDateTime.of(date,time2);
-        var result = service.getOrderPages(
+        var result = service.getOrderPlusArchivePages(
             EccangOrderVO.builder()
-                .warehouseShipDateStart(datetime1)
-                .warehouseShipDateEnd(datetime2)
-                .platform("walmart")
-            .build()
+                .platformPaidDateStart(datetime1)
+                .platformPaidDateEnd(datetime2)
+            .build(),
+            "2023"
         );
         log.info(result.toList().toString());
     }

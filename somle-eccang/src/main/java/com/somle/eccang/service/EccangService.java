@@ -131,6 +131,8 @@ public class EccangService {
                 return response.getBizContent();
             case "saas.api.error.code.0049":
                 throw new RuntimeException("签名过期：时间戳必须在一分钟以内，超出1分钟则过期失效，且只能用一次。 时间戳重新生成后，需要重新生成签名");
+            case "saas.api.error.code.0082":
+                throw new RuntimeException("Eccang error, full response: " + response);
             case "common.error.code.9999":
                 throw new RuntimeException("Eccang return invalid response: " + response.getErrors().toString());
             case "300":
@@ -138,7 +140,7 @@ public class EccangService {
             case "429":
                 throw new RuntimeException("Too many requests");
             default:
-                throw new RuntimeException("Unknown response code from eccang: " + response.getCode() + " " + response);
+                throw new RuntimeException("Unknown eccang-specific response code: " + response.getCode() + " " + response);
         }
     }
 
