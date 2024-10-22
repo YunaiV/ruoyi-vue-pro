@@ -18,18 +18,13 @@ import cn.iocoder.yudao.module.bpm.enums.definition.BpmUserTaskRejectHandlerType
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnModelConstants;
 import com.google.common.collect.Maps;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.converter.BpmnXMLConverter;
 import org.flowable.bpmn.model.Process;
 import org.flowable.bpmn.model.*;
 import org.flowable.common.engine.api.FlowableException;
-import org.flowable.common.engine.api.variable.VariableContainer;
 import org.flowable.common.engine.impl.util.io.BytesStreamSource;
 import org.flowable.engine.ManagementService;
 
-import javax.script.ScriptEngine;
-import javax.script.ScriptEngineManager;
-import javax.script.ScriptException;
 import java.util.*;
 
 import static cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnModelConstants.*;
@@ -40,8 +35,9 @@ import static org.flowable.bpmn.constants.BpmnXMLConstants.FLOWABLE_EXTENSIONS_P
  * BPMN Model 操作工具类。目前分成三部分：
  *
  * 1. BPMN 修改 + 解析元素相关的方法
- * 2. BPM 简单查找相关的方法
- * 3. BPM 复杂遍历相关的方法
+ * 2. BPMN 简单查找相关的方法
+ * 3. BPMN 复杂遍历相关的方法
+ * 4. BPMN 流程预测相关的方法
  *
  * @author 芋道源码
  */
@@ -667,142 +663,115 @@ public class BpmnModelUtils {
         return userTaskList;
     }
 
-    // TODO FROM 欢欢
+    // ========== BPMN 流程预测相关的方法 ==========
 
-    public static void simulateProcess(BpmnModel bpmnModel, Map<String, Object> variables, List<FlowElement> flowElementList,
-                                       VariableContainer variableContainer) {
-        List<StartEvent> startEvents = bpmnModel.getMainProcess().findFlowElementsOfType(StartEvent.class);
-        //只处理一个开始节点的情况
-        simulateNextFlowElements(startEvents.get(0), variables, flowElementList, variableContainer);
+    /**
+     * 流程预测，返回 StartEvent、UserTask、ServiceTask、EndEvent 节点元素，最终是 List 串行结果
+     *
+     * @param bpmnModel BPMN 图
+     * @param variables 变量
+     * @return 节点元素数组
+     */
+    public static List<FlowElement> simulateProcess(BpmnModel bpmnModel, Map<String, Object> variables) {
+        List<FlowElement> resultElements = new ArrayList<>();
+        Set<FlowElement> visitElements = new HashSet<>();
+
+        // 从 StartEvent 开始遍历
+        StartEvent startEvent = getStartEvent(bpmnModel);
+        simulateNextFlowElements(startEvent, variables, resultElements, visitElements);
+
+        // 将 EndEvent 放在末尾。原因是，DFS 遍历，可能 EndEvent 在 resultElements 中
+        List<FlowElement> endEvents = CollUtil.removeWithAddIf(resultElements,
+                flowElement -> flowElement instanceof EndEvent);
+        resultElements.addAll(endEvents);
+        return resultElements;
     }
 
-    private static void simulateNextFlowElements(FlowElement flowElement, Map<String, Object> variables, List<FlowElement> flowElementList,
-                                                 VariableContainer variableContainer) {
-        if (flowElement instanceof StartEvent) {
-            StartEvent startEvent = (StartEvent) flowElement;
-            flowElementList.add(startEvent);
-            List<SequenceFlow> outgoingFlows = startEvent.getOutgoingFlows();
-            for (SequenceFlow flow : outgoingFlows) {
-                FlowElement targetFlowElement = flow.getTargetFlowElement();
-                simulateNextFlowElements(targetFlowElement, variables, flowElementList, variableContainer);
-            }
-        } else if (flowElement instanceof UserTask) {
-            UserTask userTask = (UserTask) flowElement;
-            flowElementList.add(userTask);
-            List<SequenceFlow> outgoingFlows = userTask.getOutgoingFlows();
-            for (SequenceFlow flow : outgoingFlows) {
-                FlowElement targetFlowElement = flow.getTargetFlowElement();
-                simulateNextFlowElements(targetFlowElement, variables, flowElementList, variableContainer);
-            }
-        } else if (flowElement instanceof ServiceTask) { // TODO 芋艿：待测试
-            ServiceTask serviceTask = (ServiceTask) flowElement;
-            flowElementList.add(serviceTask);
-            List<SequenceFlow> outgoingFlows = serviceTask.getOutgoingFlows();
-            for (SequenceFlow flow : outgoingFlows) {
-                FlowElement targetFlowElement = flow.getTargetFlowElement();
-                simulateNextFlowElements(targetFlowElement, variables, flowElementList, variableContainer);
-            }
-        } else if (flowElement instanceof ExclusiveGateway) {
-            Gateway gateway = (Gateway) flowElement;
-            boolean found = false;
-            for (SequenceFlow flow : gateway.getOutgoingFlows()) {
-                if (ObjUtil.equal(gateway.getDefaultFlow(), flow.getId())) {
-                    continue;
-                }
-                if (evalConditionExpress(variableContainer, flow.getConditionExpression())) {
-                    FlowElement targetFlowElement = flow.getTargetFlowElement();
-                    simulateNextFlowElements(targetFlowElement, variables, flowElementList, variableContainer);
-                    found = true;
-                    break;
-                }
-            }
-            if (!found) {
-                SequenceFlow targetFlowElement = CollUtil.findOne(gateway.getOutgoingFlows(),
-                        c -> ObjUtil.equal(gateway.getDefaultFlow(), c.getId()));
-                if (targetFlowElement == null && gateway.getOutgoingFlows().size() == 1) {
-                    targetFlowElement = gateway.getOutgoingFlows().get(0);
-                }
-                if (targetFlowElement != null && targetFlowElement.getTargetFlowElement() != null) {
-                    simulateNextFlowElements(targetFlowElement.getTargetFlowElement(), variables, flowElementList, variableContainer);
-                }
-            }
-        } else if (flowElement instanceof InclusiveGateway) {
-            Gateway gateway = (Gateway) flowElement;
-            boolean found = false;
-            for (SequenceFlow flow : gateway.getOutgoingFlows()) {
-                if (ObjUtil.equal(gateway.getDefaultFlow(), flow.getId())) {
-                    continue;
-                }
-                if (evalConditionExpress(variableContainer, flow.getConditionExpression())) {
-                    FlowElement targetFlowElement = flow.getTargetFlowElement();
-                    simulateNextFlowElements(targetFlowElement, variables, flowElementList, variableContainer);
-                    found = true;
-                }
-            }
-            if (!found) {
-                SequenceFlow targetFlowElement = CollUtil.findOne(gateway.getOutgoingFlows(),
-                        c -> ObjUtil.equal(gateway.getDefaultFlow(), c.getId()));
-                if (targetFlowElement == null && gateway.getOutgoingFlows().size() == 1) {
-                    targetFlowElement = gateway.getOutgoingFlows().get(0);
-                }
-                if (targetFlowElement != null && targetFlowElement.getTargetFlowElement() != null) {
-                    simulateNextFlowElements(targetFlowElement.getTargetFlowElement(), variables, flowElementList, variableContainer);
-                }
-            }
-        } else if (flowElement instanceof ParallelGateway) {
-            Gateway gateway = (Gateway) flowElement;
-            for (SequenceFlow flow : gateway.getOutgoingFlows()) {
-                FlowElement targetFlowElement = flow.getTargetFlowElement();
-                simulateNextFlowElements(targetFlowElement, variables, flowElementList, variableContainer);
-            }
-        } else if (flowElement instanceof EndEvent) {
-            EndEvent endEvent = (EndEvent) flowElement;
-            flowElementList.add(endEvent);
+    @SuppressWarnings("PatternVariableCanBeUsed")
+    private static void simulateNextFlowElements(FlowElement currentElement, Map<String, Object> variables,
+                                                 List<FlowElement> resultElements, Set<FlowElement> visitElements) {
+        // 如果为空，或者已经遍历过，则直接结束
+        if (currentElement == null) {
+            return;
         }
-    }
-
-    private static boolean evaluateCondition(SequenceFlow flow, Map<String, Object> variables) {
-        String conditionExpression = flow.getConditionExpression();
-        if (StringUtils.isEmpty(conditionExpression)) {
-            return false;
+        if (visitElements.contains(currentElement)) {
+            return;
         }
-        try {
-            //兼容UEL和JS语法
-            if (conditionExpression.startsWith("${") && conditionExpression.endsWith("}")) {
-                conditionExpression = conditionExpression.substring(2, conditionExpression.length() - 1);
-            }
-            return evaluateExpression(conditionExpression, variables);
-        } catch (ScriptException e) {
-            e.printStackTrace();
-        }
-        return false;
-    }
+        visitElements.add(currentElement);
 
-    public static boolean evaluateExpression(String expression, Map<String, Object> variables) throws ScriptException {
-        ScriptEngineManager engineManager = new ScriptEngineManager();
-        ScriptEngine engine = engineManager.getEngineByName("JavaScript");
-
-        // 设置变量
-        for (Map.Entry<String, Object> entry : variables.entrySet()) {
-            engine.put(entry.getKey(), entry.getValue());
+        // 情况：StartEvent/EndEvent/UserTask/ServiceTask
+        if (currentElement instanceof StartEvent
+            || currentElement instanceof EndEvent
+            || currentElement instanceof UserTask
+            || currentElement instanceof ServiceTask) {
+            // 添加元素
+            FlowNode startEvent = (FlowNode) currentElement;
+            resultElements.add(startEvent);
+            // 遍历子节点
+            startEvent.getOutgoingFlows().forEach(
+                    nextElement -> simulateNextFlowElements(nextElement.getTargetFlowElement(), variables, resultElements, visitElements));
+            return;
         }
 
-        // 评估表达式
-        Object result = engine.eval(expression);
-        if (result instanceof Boolean) {
-            return (Boolean) result;
-        } else {
-            throw new ScriptException("Expression does not evaluate to boolean");
+        // 情况：ExclusiveGateway 排它，只有一个满足条件的。如果没有，就走默认的
+        if (currentElement instanceof ExclusiveGateway) {
+            // 查找满足条件的 SequenceFlow 路径
+            Gateway gateway = (Gateway) currentElement;
+            SequenceFlow matchSequenceFlow = CollUtil.findOne(gateway.getOutgoingFlows(),
+                    flow -> ObjUtil.notEqual(gateway.getDefaultFlow(), flow.getId())
+                            && evalConditionExpress(variables, flow.getConditionExpression()));
+            if (matchSequenceFlow == null) {
+                matchSequenceFlow = CollUtil.findOne(gateway.getOutgoingFlows(),
+                        flow -> ObjUtil.notEqual(gateway.getDefaultFlow(), flow.getId()));
+                // 特殊：没有默认的情况下，并且只有 1 个条件，则认为它是默认的
+                if (matchSequenceFlow == null && gateway.getOutgoingFlows().size() == 1) {
+                    matchSequenceFlow = gateway.getOutgoingFlows().get(0);
+                }
+            }
+            // 遍历满足条件的 SequenceFlow 路径
+            if (matchSequenceFlow != null) {
+                simulateNextFlowElements(matchSequenceFlow.getTargetFlowElement(), variables, resultElements, visitElements);
+            }
+            return;
+        }
+
+        // 情况：InclusiveGateway 包容，多个满足条件的。如果没有，就走默认的
+        if (currentElement instanceof InclusiveGateway) {
+            // 查找满足条件的 SequenceFlow 路径
+            Gateway gateway = (Gateway) currentElement;
+            Collection<SequenceFlow> matchSequenceFlows = CollUtil.filterNew(gateway.getOutgoingFlows(),
+                    flow -> ObjUtil.notEqual(gateway.getDefaultFlow(), flow.getId())
+                            && evalConditionExpress(variables, flow.getConditionExpression()));
+            if (CollUtil.isEmpty(matchSequenceFlows)) {
+                matchSequenceFlows = CollUtil.filterNew(gateway.getOutgoingFlows(),
+                        flow -> ObjUtil.notEqual(gateway.getDefaultFlow(), flow.getId()));
+                // 特殊：没有默认的情况下，并且只有 1 个条件，则认为它是默认的
+                if (CollUtil.isEmpty(matchSequenceFlows) && gateway.getOutgoingFlows().size() == 1) {
+                    matchSequenceFlows = gateway.getOutgoingFlows();
+                }
+            }
+            // 遍历满足条件的 SequenceFlow 路径
+            matchSequenceFlows.forEach(
+                    flow -> simulateNextFlowElements(flow.getTargetFlowElement(), variables, resultElements, visitElements));
+        }
+
+        if (currentElement instanceof ParallelGateway) {
+            Gateway gateway = (Gateway) currentElement;
+            // 遍历子节点
+            gateway.getOutgoingFlows().forEach(
+                    nextElement -> simulateNextFlowElements(nextElement.getTargetFlowElement(), variables, resultElements, visitElements));
+            return;
         }
     }
 
     /**
-     * 计算条件表达式的值
+     * 计算条件表达式是否为 true 满足条件
      *
-     * @param variableContainer 流程实例
-     * @param express         条件表达式
+     * @param variables 流程实例
+     * @param express 条件表达式
+     * @return 是否满足条件
      */
-    private static Boolean evalConditionExpress(VariableContainer variableContainer, String express) {
+    private static boolean evalConditionExpress(Map<String, Object> variables, String express) {
         ManagementService managementService = SpringUtil.getBean(ManagementService.class);
         if (express == null) {
             return Boolean.FALSE;
@@ -810,7 +779,7 @@ public class BpmnModelUtils {
         // TODO @jason：疑问，为啥这里要在 managementService 里执行哈？
         Object result = managementService.executeCommand(context -> {
             try {
-                return FlowableUtils.getExpressionValue(variableContainer, express);
+                return FlowableUtils.getExpressionValue(variables, express);
             } catch (FlowableException ex) {
                 log.error("[evalConditionExpress][条件表达式({}) 解析报错", express, ex);
                 return Boolean.FALSE;

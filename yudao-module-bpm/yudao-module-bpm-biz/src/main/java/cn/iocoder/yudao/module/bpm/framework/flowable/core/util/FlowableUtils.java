@@ -10,6 +10,7 @@ import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.common.engine.api.variable.VariableContainer;
 import org.flowable.common.engine.impl.el.ExpressionManager;
 import org.flowable.common.engine.impl.identity.Authentication;
+import org.flowable.common.engine.impl.variable.MapDelegateVariableContainer;
 import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
@@ -225,6 +226,12 @@ public class FlowableUtils {
         assert expressionManager != null;
         Expression expression = expressionManager.createExpression(expressionString);
         return expression.getValue(variableContainer);
+    }
+
+    public static Object getExpressionValue(Map<String, Object> variable, String expressionString) {
+        VariableContainer variableContainer = new MapDelegateVariableContainer(variable,
+                VariableContainer.empty());
+        return getExpressionValue(variableContainer, expressionString);
     }
 
 }
