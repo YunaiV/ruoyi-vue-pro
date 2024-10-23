@@ -608,4 +608,78 @@ public class SimpleModelUtils {
         return id + "_join";
     }
 
+    // ========== SIMPLE 流程预测相关的方法 ==========
+
+    public static List<BpmSimpleModelNodeVO> simulateProcess(BpmSimpleModelNodeVO rootNode, Map<String, Object> variables) {
+        List<BpmSimpleModelNodeVO> resultNodes = new ArrayList<>();
+
+        // 从头开始遍历
+        simulateNextNode(rootNode, variables, resultNodes);
+        return resultNodes;
+    }
+
+    private static void simulateNextNode(BpmSimpleModelNodeVO currentNode, Map<String, Object> variables,
+                                  List<BpmSimpleModelNodeVO> resultNodes) {
+        // 如果不合法（包括为空），则直接结束
+        if (!isValidNode(currentNode)) {
+            return;
+        }
+        BpmSimpleModelNodeType nodeType = BpmSimpleModelNodeType.valueOf(currentNode.getType());
+        Assert.notNull(nodeType, "模型节点类型不支持");
+
+        // 情况：START_NODE/START_USER_NODE/APPROVE_NODE/END_NODE
+        if (nodeType == BpmSimpleModelNodeType.START_NODE
+            || nodeType == BpmSimpleModelNodeType.START_USER_NODE
+            || nodeType == BpmSimpleModelNodeType.APPROVE_NODE
+            || nodeType == BpmSimpleModelNodeType.END_NODE) {
+            // 添加元素
+            resultNodes.add(currentNode);
+        }
+
+        // 情况：CONDITION_BRANCH_NODE 排它，只有一个满足条件的。如果没有，就走默认的
+        if (nodeType == BpmSimpleModelNodeType.CONDITION_BRANCH_NODE) {
+            // 查找满足条件的 BpmSimpleModelNodeVO 节点
+            BpmSimpleModelNodeVO matchConditionNode = CollUtil.findOne(currentNode.getConditionNodes(),
+                    conditionNode -> BooleanUtil.isFalse(currentNode.getDefaultFlow())
+                        && evalConditionExpress(variables, conditionNode));
+            if (matchConditionNode == null) {
+                matchConditionNode = CollUtil.findOne(currentNode.getConditionNodes(),
+                        conditionNode -> BooleanUtil.isTrue(conditionNode.getDefaultFlow()));
+            }
+            Assert.notNull(matchConditionNode, "找不到条件节点({})", currentNode);
+            // 遍历满足条件的 BpmSimpleModelNodeVO 节点
+            simulateNextNode(matchConditionNode.getChildNode(), variables, resultNodes);
+        }
+
+        // 情况：INCLUSIVE_BRANCH_NODE 包容，多个满足条件的。如果没有，就走默认的
+        if (nodeType == BpmSimpleModelNodeType.INCLUSIVE_BRANCH_NODE) {
+            // 查找满足条件的 BpmSimpleModelNodeVO 节点
+            Collection<BpmSimpleModelNodeVO> matchConditionNodes = CollUtil.filterNew(currentNode.getConditionNodes(),
+                    conditionNode -> BooleanUtil.isFalse(currentNode.getDefaultFlow())
+                            && evalConditionExpress(variables, conditionNode));
+            if (CollUtil.isEmpty(matchConditionNodes)) {
+                matchConditionNodes = CollUtil.filterNew(currentNode.getConditionNodes(),
+                        conditionNode -> BooleanUtil.isTrue(conditionNode.getDefaultFlow()));
+            }
+            Assert.isTrue(!matchConditionNodes.isEmpty(), "找不到条件节点({})", currentNode);
+            // 遍历满足条件的 BpmSimpleModelNodeVO 节点
+            matchConditionNodes.forEach(matchConditionNode ->
+                    simulateNextNode(matchConditionNode.getChildNode(), variables, resultNodes));
+        }
+
+        // 情况：PARALLEL_BRANCH_NODE 并行，都满足，都走
+        if (nodeType == BpmSimpleModelNodeType.PARALLEL_BRANCH_NODE) {
+            // 遍历所有 BpmSimpleModelNodeVO 节点
+            currentNode.getConditionNodes().forEach(matchConditionNode ->
+                    simulateNextNode(matchConditionNode.getChildNode(), variables, resultNodes));
+        }
+
+        // 遍历子节点
+        simulateNextNode(currentNode.getChildNode(), variables, resultNodes);
+    }
+
+    public static boolean evalConditionExpress(Map<String, Object> variables, BpmSimpleModelNodeVO conditionNode) {
+        return BpmnModelUtils.evalConditionExpress(variables, ConditionNodeConvert.buildConditionExpression(conditionNode));
+    }
+
 }

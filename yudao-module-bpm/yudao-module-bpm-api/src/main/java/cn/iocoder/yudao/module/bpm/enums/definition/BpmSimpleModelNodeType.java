@@ -28,8 +28,8 @@ public enum BpmSimpleModelNodeType implements IntArrayValuable {
 
     // 50 ~ 条件分支
     CONDITION_NODE(50, "sequenceFlow", "条件节点"), // 用于构建流转条件的表达式
-    CONDITION_BRANCH_NODE(51, "parallelGateway", "条件分支节点"),
-    PARALLEL_BRANCH_NODE(52, "exclusiveGateway", "并行分支节点"),
+    CONDITION_BRANCH_NODE(51, "exclusiveGateway", "条件分支节点"),
+    PARALLEL_BRANCH_NODE(52, "parallelGateway", "并行分支节点"),
     INCLUSIVE_BRANCH_NODE(53, "inclusiveGateway", "包容分支节点"),
     ;
 

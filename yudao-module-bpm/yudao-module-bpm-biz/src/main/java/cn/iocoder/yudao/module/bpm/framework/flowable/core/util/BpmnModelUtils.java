@@ -705,10 +705,10 @@ public class BpmnModelUtils {
             || currentElement instanceof UserTask
             || currentElement instanceof ServiceTask) {
             // 添加元素
-            FlowNode startEvent = (FlowNode) currentElement;
-            resultElements.add(startEvent);
+            FlowNode flowNode = (FlowNode) currentElement;
+            resultElements.add(flowNode);
             // 遍历子节点
-            startEvent.getOutgoingFlows().forEach(
+            flowNode.getOutgoingFlows().forEach(
                     nextElement -> simulateNextFlowElements(nextElement.getTargetFlowElement(), variables, resultElements, visitElements));
             return;
         }
@@ -755,6 +755,7 @@ public class BpmnModelUtils {
                     flow -> simulateNextFlowElements(flow.getTargetFlowElement(), variables, resultElements, visitElements));
         }
 
+        // 情况：ParallelGateway 并行，都满足，都走
         if (currentElement instanceof ParallelGateway) {
             Gateway gateway = (Gateway) currentElement;
             // 遍历子节点
@@ -771,7 +772,7 @@ public class BpmnModelUtils {
      * @param express 条件表达式
      * @return 是否满足条件
      */
-    private static boolean evalConditionExpress(Map<String, Object> variables, String express) {
+    public static boolean evalConditionExpress(Map<String, Object> variables, String express) {
         ManagementService managementService = SpringUtil.getBean(ManagementService.class);
         if (express == null) {
             return Boolean.FALSE;
