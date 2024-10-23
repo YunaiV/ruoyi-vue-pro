@@ -19,10 +19,10 @@ public class EccangOrderPlatformPayDataJob extends EccangDataJob{
 
         eccangService.getOrderPlusArchivePages(
                 EccangOrderVO.builder()
-                    .platformPaidDateStart(yesterdayFirstSecond)
-                    .platformPaidDateEnd(yesterdayLastSecond)
+                    .platformPaidDateStart(beforeYesterdayFirstSecond)
+                    .platformPaidDateEnd(beforeYesterdayLastSecond)
                     .build(),
-                String.valueOf(yesterday.getYear())
+                String.valueOf(beforeYesterday.getYear())
             )
             .forEach(page -> {
                 OssData data = OssData.builder()
@@ -30,7 +30,7 @@ public class EccangOrderPlatformPayDataJob extends EccangDataJob{
                     .tableName("order_platform_pay")
                     .syncType("inc")
                     .requestTimestamp(System.currentTimeMillis())
-                    .folderDate(yesterday)
+                    .folderDate(beforeYesterday)
                     .content(page)
                     .headers(null)
                     .build();

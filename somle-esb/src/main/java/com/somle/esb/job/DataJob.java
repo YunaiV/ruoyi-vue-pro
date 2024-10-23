@@ -25,12 +25,16 @@ public class DataJob implements JobHandler {
     LocalDate beforeYesterday;
     LocalDateTime yesterdayFirstSecond;
     LocalDateTime yesterdayLastSecond;
+    LocalDateTime beforeYesterdayFirstSecond;
+    LocalDateTime beforeYesterdayLastSecond;
 
     void setDate(String param) {
         scheduleDate = StrUtils.isEmpty(param) ? LocalDate.now() : LocalDate.parse(param);
         today = scheduleDate;
         yesterday = scheduleDate.minusDays(1);
         beforeYesterday = scheduleDate.minusDays(2);
+        beforeYesterdayFirstSecond = beforeYesterday.atStartOfDay();
+        beforeYesterdayLastSecond = beforeYesterday.atStartOfDay().minusSeconds(1);
         yesterdayFirstSecond = yesterday.atStartOfDay();
         yesterdayLastSecond = today.atStartOfDay().minusSeconds(1);
     }
