@@ -788,4 +788,14 @@ public class BpmnModelUtils {
         return Boolean.TRUE.equals(result);
     }
 
+    @SuppressWarnings("PatternVariableCanBeUsed")
+    public static boolean isSequentialUserTask(FlowElement flowElement) {
+        if (!(flowElement instanceof UserTask)) {
+            return false;
+        }
+        UserTask userTask = (UserTask) flowElement;
+        MultiInstanceLoopCharacteristics loopCharacteristics = userTask.getLoopCharacteristics();
+        return loopCharacteristics != null && loopCharacteristics.isSequential();
+    }
+
 }
