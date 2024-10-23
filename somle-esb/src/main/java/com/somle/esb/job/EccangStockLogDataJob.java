@@ -12,14 +12,14 @@ public class EccangStockLogDataJob extends EccangDataJob{
     public String execute(String param) throws Exception {
         setDate(param);
 
-        eccangService.getInventoryBatchLog(yesterdayFirstSecond, yesterdayLastSecond)
+        eccangService.getInventoryBatchLog(beforeYesterdayFirstSecond, beforeYesterdayLastSecond)
                 .forEach(page -> {
                     OssData data = OssData.builder()
                             .database(DATABASE)
                             .tableName("stock_log")
                             .syncType("inc")
                             .requestTimestamp(System.currentTimeMillis())
-                            .folderDate(yesterday)
+                            .folderDate(beforeYesterday)
                             .content(page)
                             .headers(null)
                             .build();

@@ -1,6 +1,8 @@
 package cn.iocoder.yudao.module.erp.dal.dataobject.logistic.customrule;
 
 import lombok.*;
+
+import java.math.BigDecimal;
 import java.util.*;
 import java.time.LocalDateTime;
 import java.time.LocalDateTime;
@@ -58,7 +60,7 @@ public class ErpCustomRuleDO extends BaseDO {
     /**
      * 税率
      */
-    private Integer taxRate;
+    private BigDecimal taxRate;
     /**
      * hs编码
      */

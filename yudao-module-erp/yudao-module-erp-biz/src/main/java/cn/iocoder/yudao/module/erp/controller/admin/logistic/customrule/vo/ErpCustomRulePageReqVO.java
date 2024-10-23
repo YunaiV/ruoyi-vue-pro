@@ -1,6 +1,8 @@
 package cn.iocoder.yudao.module.erp.controller.admin.logistic.customrule.vo;
 
 import lombok.*;
+
+import java.math.BigDecimal;
 import java.util.*;
 import io.swagger.v3.oas.annotations.media.Schema;
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
@@ -37,7 +39,7 @@ public class ErpCustomRulePageReqVO extends PageParam {
     private String declaredValueCurrencyCode;
 
     @Schema(description = "税率")
-    private Integer taxRate;
+    private BigDecimal taxRate;
 
     @Schema(description = "hs编码")
     private String hscode;

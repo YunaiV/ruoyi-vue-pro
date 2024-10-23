@@ -15,10 +15,10 @@ public class EccangOrderWarehouseShipDataJob extends EccangDataJob{
 
         eccangService.getOrderPlusArchivePages(
                         EccangOrderVO.builder()
-                                .warehouseShipDateStart(yesterdayFirstSecond)
-                                .warehouseShipDateEnd(yesterdayLastSecond)
+                                .warehouseShipDateStart(beforeYesterdayFirstSecond)
+                                .warehouseShipDateEnd(beforeYesterdayLastSecond)
                                 .build(),
-                        String.valueOf(yesterday.getYear())
+                        String.valueOf(beforeYesterday.getYear())
                 )
                 .forEach(page -> {
                     OssData data = OssData.builder()
@@ -26,7 +26,7 @@ public class EccangOrderWarehouseShipDataJob extends EccangDataJob{
                             .tableName("order_warehouse_ship")
                             .syncType("inc")
                             .requestTimestamp(System.currentTimeMillis())
-                            .folderDate(yesterday)
+                            .folderDate(beforeYesterday)
                             .content(page)
                             .headers(null)
                             .build();

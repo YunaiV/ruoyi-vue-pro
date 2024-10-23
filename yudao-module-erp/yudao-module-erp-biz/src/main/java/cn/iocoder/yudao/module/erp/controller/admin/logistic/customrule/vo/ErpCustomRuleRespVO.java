@@ -6,6 +6,8 @@ import com.fhs.core.trans.constant.TransType;
 import com.fhs.core.trans.vo.VO;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
+
+import java.math.BigDecimal;
 import java.util.*;
 import org.springframework.format.annotation.DateTimeFormat;
 import java.time.LocalDateTime;
@@ -58,7 +60,7 @@ public class ErpCustomRuleRespVO implements VO {
 
     @Schema(description = "税率")
     @ExcelProperty("税率")
-    private Integer taxRate;
+    private BigDecimal taxRate;
 
     @Schema(description = "hs编码")
     @ExcelProperty("hs编码")

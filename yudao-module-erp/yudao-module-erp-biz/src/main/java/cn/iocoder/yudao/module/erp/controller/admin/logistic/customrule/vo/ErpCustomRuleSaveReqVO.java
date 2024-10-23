@@ -2,8 +2,11 @@ package cn.iocoder.yudao.module.erp.controller.admin.logistic.customrule.vo;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
+
+import java.math.BigDecimal;
 import java.util.*;
 import jakarta.validation.constraints.*;
+import org.hibernate.validator.constraints.Length;
 
 @Schema(description = "管理后台 - ERP 海关规则新增/修改 Request VO")
 @Data
@@ -14,6 +17,7 @@ public class ErpCustomRuleSaveReqVO {
 
     @Schema(description = "国家编码", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotEmpty(message = "国家编码不能为空")
+    @Length(max = 2)
     private String countryCode;
 
     @Schema(description = "类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "报关")
@@ -37,7 +41,7 @@ public class ErpCustomRuleSaveReqVO {
     private String declaredValueCurrencyCode;
 
     @Schema(description = "税率")
-    private Integer taxRate;
+    private BigDecimal taxRate;
 
     @Schema(description = "hs编码")
     private String hscode;

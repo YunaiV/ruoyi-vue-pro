@@ -20,10 +20,10 @@ public class EccangOrderSysCreateDataJob extends EccangDataJob{
 
         eccangService.getOrderPlusArchivePages(
                 EccangOrderVO.builder()
-                    .dateCreateSysStart(yesterdayFirstSecond)
-                    .dateCreateSysEnd(yesterdayLastSecond)
+                    .dateCreateSysStart(beforeYesterdayFirstSecond)
+                    .dateCreateSysEnd(beforeYesterdayLastSecond)
                     .build(),
-                String.valueOf(yesterday.getYear())
+                String.valueOf(beforeYesterday.getYear())
             )
             .forEach(page -> {
                 OssData data = OssData.builder()
@@ -31,7 +31,7 @@ public class EccangOrderSysCreateDataJob extends EccangDataJob{
                     .tableName("order_sys_create")
                     .syncType("inc")
                     .requestTimestamp(System.currentTimeMillis())
-                    .folderDate(yesterday)
+                    .folderDate(beforeYesterday)
                     .content(page)
                     .headers(null)
                     .build();
