@@ -4,13 +4,6 @@ import lombok.Data;
 
 import java.util.Set;
 
-/**
- * @ClassDescription: 查询所需入参对象
- * @ClassName: SelectDto
- * @Author: fxlinks
- * @Date: 2022-01-07 14:12:26
- * @Version 1.0
- */
 @Data
 public class SelectDto {
 

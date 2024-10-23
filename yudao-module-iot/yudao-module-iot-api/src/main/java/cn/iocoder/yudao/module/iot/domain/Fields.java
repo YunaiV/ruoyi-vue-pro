@@ -2,13 +2,6 @@ package cn.iocoder.yudao.module.iot.domain;
 
 import lombok.Data;
 
-/**
- * @ClassDescription: 建表的字段实体类
- * @ClassName: Fields
- * @Author: fxlinks
- * @Date: 2021-12-28 09:09:04
- * @Version 1.0
- */
 @Data
 public class Fields {
     private static final long serialVersionUID = 1L;

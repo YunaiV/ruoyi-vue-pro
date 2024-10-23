@@ -4,13 +4,6 @@ import lombok.Data;
 
 import java.util.List;
 
-/**
- * @ClassDescription: 创建超级表需要的入参的实体类
- * @ClassName: SuperTableDto
- * @Author: fxlinks
- * @Date: 2021-12-28 15:03:45
- * @Version 1.0
- */
 @Data
 public class SuperTableDto extends BaseEntity {
 
