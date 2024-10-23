@@ -1,5 +1,9 @@
 package cn.iocoder.yudao.module.erp.controller.admin.logistic.customrule.vo;
 
+import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpSupplierProductDO;
+import com.fhs.core.trans.anno.Trans;
+import com.fhs.core.trans.constant.TransType;
+import com.fhs.core.trans.vo.VO;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 import java.util.*;
@@ -7,10 +11,13 @@ import org.springframework.format.annotation.DateTimeFormat;
 import java.time.LocalDateTime;
 import com.alibaba.excel.annotation.*;
 
+/**
+ * @author Administrator
+ */
 @Schema(description = "管理后台 - ERP 海关规则 Response VO")
 @Data
 @ExcelIgnoreUnannotated
-public class ErpCustomRuleRespVO {
+public class ErpCustomRuleRespVO implements VO {
 
     @Schema(description = "产品编号", requiredMode = Schema.RequiredMode.REQUIRED)
     @ExcelProperty("产品编号")
@@ -26,7 +33,12 @@ public class ErpCustomRuleRespVO {
 
     @Schema(description = "供应商产品编号", requiredMode = Schema.RequiredMode.REQUIRED)
     @ExcelProperty("供应商产品编号")
+    @Trans(type = TransType.SIMPLE, target = ErpSupplierProductDO.class,fields = "code",ref = "supplierProductCode")
     private Long supplierProductId;
+
+    @Schema(description = "供应商产品编号")
+    @ExcelProperty("供应商产品编号")
+    private String supplierProductCode;
 
     @Schema(description = "申报品名（英文）")
     @ExcelProperty("申报品名（英文）")
