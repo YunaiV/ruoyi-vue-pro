@@ -1,0 +1,324 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="cn.iocoder.yudao.module.iot.dal.tdengine.TdEngineMapper">
+
+    <update id="createDatabase" parameterType="String">
+        create database if not exists #{dataBaseName}
+    </update>
+
+    <update id="createSuperTable">
+        create table if not exists #{dataBaseName}.#{superTableName}
+        <foreach item="item" collection="schemaFields" separator=","
+                 open="(" close=")" index="">
+            <if test="item.fieldName != null || item.fieldName != ''">
+                ${item.fieldName}
+            </if>
+            <if test="item.dataType != null || item.dataType != ''">
+                <choose>
+                    <when test="item.dataType == 'timestamp'">
+                        timestamp
+                    </when>
+                    <when test="item.dataType == 'tinyint'">
+                        tinyint
+                    </when>
+                    <when test="item.dataType == 'smallint'">
+                        smallint
+                    </when>
+                    <when test="item.dataType == 'int'">
+                        int
+                    </when>
+                    <when test="item.dataType == 'bigint'">
+                        bigint
+                    </when>
+                    <when test="item.dataType == 'float'">
+                        float
+                    </when>
+                    <when test="item.dataType == 'double'">
+                        double
+                    </when>
+                    <when test="item.dataType == 'binary'">
+                        binary
+                    </when>
+                    <when test="item.dataType == 'nchar'">
+                        nchar
+                    </when>
+                    <when test="item.dataType == 'bool'">
+                        bool
+                    </when>
+                    <when test="item.dataType == 'json'">
+                        json
+                    </when>
+                </choose>
+            </if>
+            <if test="item.size != null">
+                (#{item.size})
+            </if>
+        </foreach>
+        tags
+        <!--tdEngine不支持动态tags里的数据类型，只能使用choose标签比对-->
+        <foreach item="item" collection="tagsFields" separator=","
+                 open="(" close=")" index="">
+            <if test="item.fieldName != null || item.fieldName != ''">
+                ${item.fieldName}
+            </if>
+            <if test="item.dataType != null || item.dataType != ''">
+                <choose>
+                    <when test="item.dataType == 'timestamp'">
+                        timestamp
+                    </when>
+                    <when test="item.dataType == 'tinyint'">
+                        tinyint
+                    </when>
+                    <when test="item.dataType == 'smallint'">
+                        smallint
+                    </when>
+                    <when test="item.dataType == 'int'">
+                        int
+                    </when>
+                    <when test="item.dataType == 'bigint'">
+                        bigint
+                    </when>
+                    <when test="item.dataType == 'float'">
+                        float
+                    </when>
+                    <when test="item.dataType == 'double'">
+                        double
+                    </when>
+                    <when test="item.dataType == 'binary'">
+                        binary
+                    </when>
+                    <when test="item.dataType == 'nchar'">
+                        nchar
+                    </when>
+                    <when test="item.dataType == 'bool'">
+                        bool
+                    </when>
+                    <when test="item.dataType == 'json'">
+                        json
+                    </when>
+                </choose>
+            </if>
+            <if test="item.size != null">
+                (#{item.size})
+            </if>
+        </foreach>
+    </update>
+
+    <update id="createTable">
+        create table
+        if not exists #{dataBaseName}.#{tableName}
+        using #{dataBaseName}.#{superTableName}
+        tags
+        <foreach item="item" collection="tagsFieldValues" separator=","
+                 open="(" close=")" index="">
+            #{item.fieldValue}
+        </foreach>
+    </update>
+
+    <insert id="insertData">
+        insert into #{dataBaseName}.#{tableName}
+        <foreach item="item" collection="schemaFieldValues" separator=","
+                 open="(" close=")" index="">
+            #{item.fieldName}
+        </foreach>
+        using #{dataBaseName}.#{superTableName}
+        tags
+        <foreach item="item" collection="tagsFieldValues" separator=","
+                 open="(" close=")" index="">
+            #{item.fieldValue}
+        </foreach>
+        values
+        <foreach item="item" collection="schemaFieldValues" separator=","
+                 open="(" close=")" index="">
+            #{item.fieldValue}
+        </foreach>
+    </insert>
+
+
+    <select id="selectByTimestamp" parameterType="cn.iocoder.yudao.module.iot.domain.SelectDto"
+            resultType="Map">
+        select * from #{dataBaseName}.#{tableName}
+        <!--查询这里不能使用#{}占位符的方式，使用这种方式，tdEngine不识别为列名，只能使用${}占位的方式-->
+        <!--因为tdEngine引擎一次只执行一条sql，所以有效预防了sql的注入，且该服务该接口为内部调用，所以可以使用${}-->
+        where ${fieldName}
+        between #{startTime} and #{endTime}
+    </select>
+
+    <update id="addColumnForSuperTable">
+        ALTER
+        STABLE
+        #{superTableName}
+        ADD
+        COLUMN
+        <if test="fieldsVo.fieldName != null || fieldsVo.fieldName != ''">
+            #{fieldsVo.fieldName}
+        </if>
+        <if test="fieldsVo.dataType != null || fieldsVo.dataType != ''">
+            <choose>
+                <when test="fieldsVo.dataType == 'timestamp'">
+                    timestamp
+                </when>
+                <when test="fieldsVo.dataType == 'tinyint'">
+                    tinyint
+                </when>
+                <when test="fieldsVo.dataType == 'smallint'">
+                    smallint
+                </when>
+                <when test="fieldsVo.dataType == 'int'">
+                    int
+                </when>
+                <when test="fieldsVo.dataType == 'bigint'">
+                    bigint
+                </when>
+                <when test="fieldsVo.dataType == 'float'">
+                    float
+                </when>
+                <when test="fieldsVo.dataType == 'double'">
+                    double
+                </when>
+                <when test="fieldsVo.dataType == 'binary'">
+                    binary
+                </when>
+                <when test="fieldsVo.dataType == 'nchar'">
+                    nchar
+                </when>
+                <when test="fieldsVo.dataType == 'bool'">
+                    bool
+                </when>
+                <when test="fieldsVo.dataType == 'json'">
+                    json
+                </when>
+            </choose>
+        </if>
+        <if test="fieldsVo.size != null">
+            (
+            #{fieldsVo.size}
+            )
+        </if>
+    </update>
+
+    <update id="dropColumnForSuperTable">
+        ALTER
+        STABLE
+        #{superTableName}
+        DROP
+        COLUMN
+        <if test="fieldsVo.fieldName != null || fieldsVo.fieldName != ''">
+            #{fieldsVo.fieldName}
+        </if>
+    </update>
+
+    <update id="addTagForSuperTable">
+        ALTER
+        STABLE
+        #{superTableName}
+        ADD
+        TAG
+        <if test="fieldsVo.fieldName != null || fieldsVo.fieldName != ''">
+            #{fieldsVo.fieldName}
+        </if>
+        <if test="fieldsVo.dataType != null || fieldsVo.dataType != ''">
+            <choose>
+                <when test="fieldsVo.dataType == 'timestamp'">
+                    timestamp
+                </when>
+                <when test="fieldsVo.dataType == 'tinyint'">
+                    tinyint
+                </when>
+                <when test="fieldsVo.dataType == 'smallint'">
+                    smallint
+                </when>
+                <when test="fieldsVo.dataType == 'int'">
+                    int
+                </when>
+                <when test="fieldsVo.dataType == 'bigint'">
+                    bigint
+                </when>
+                <when test="fieldsVo.dataType == 'float'">
+                    float
+                </when>
+                <when test="fieldsVo.dataType == 'double'">
+                    double
+                </when>
+                <when test="fieldsVo.dataType == 'binary'">
+                    binary
+                </when>
+                <when test="fieldsVo.dataType == 'nchar'">
+                    nchar
+                </when>
+                <when test="fieldsVo.dataType == 'bool'">
+                    bool
+                </when>
+                <when test="fieldsVo.dataType == 'json'">
+                    json
+                </when>
+            </choose>
+        </if>
+        <if test="fieldsVo.size != null">
+            (
+            #{fieldsVo.size}
+            )
+        </if>
+    </update>
+
+    <update id="dropTagForSuperTable">
+        ALTER
+        STABLE
+        #{superTableName}
+        DROP
+        TAG
+        <if test="fieldsVo.fieldName != null || fieldsVo.fieldName != ''">
+            #{fieldsVo.fieldName}
+        </if>
+    </update>
+
+    <select id="getCountByTimestamp" parameterType="cn.iocoder.yudao.module.iot.domain.SelectDto"
+            resultType="java.util.Map">
+        SELECT count(0) AS count
+        FROM #{dataBaseName}.#{tableName} WHERE ${fieldName} BETWEEN #{startTime} AND #{endTime}
+    </select>
+
+    <select id="checkTableExists" resultType="java.lang.Integer">
+        SELECT COUNT(0)
+        FROM information_schema.ins_tables
+        WHERE db_name = #{dataBaseName}
+          AND table_name = #{tableName}
+    </select>
+
+    <select id="getLastData" resultType="java.util.Map">
+        select last(time), *
+        from #{tableName}
+        where device_id = #{deviceId}
+    </select>
+
+    <select id="getLastDataByTags" parameterType="cn.iocoder.yudao.module.iot.domain.TagsSelectDao"
+            resultType="Map">
+        select last(*)
+        from #{dataBaseName}.#{stableName} group by ${tagsName}
+    </select>
+
+    <select id="getHistoryData" resultType="java.util.Map"
+            parameterType="cn.iocoder.yudao.module.iot.domain.visual.SelectVisualDto">
+        SELECT #{fieldName}, ts
+        FROM #{dataBaseName}.#{tableName} WHERE ts BETWEEN #{startTime} AND #{endTime}
+        LIMIT #{num}
+    </select>
+    <select id="getRealtimeData" resultType="java.util.Map"
+            parameterType="cn.iocoder.yudao.module.iot.domain.visual.SelectVisualDto">
+        SELECT #{fieldName}, ts
+        FROM #{dataBaseName}.#{tableName} LIMIT #{num}
+    </select>
+    <select id="getAggregateData" resultType="java.util.Map"
+            parameterType="cn.iocoder.yudao.module.iot.domain.visual.SelectVisualDto">
+        SELECT #{aggregate}(${fieldName})
+        FROM #{dataBaseName}.#{tableName} WHERE ts BETWEEN #{startTime} AND #{endTime} interval (${interval})
+        LIMIT #{num}
+    </select>
+
+
+    <insert id="createSuperTableDevice">
+        ${sql}
+    </insert>
+
+</mapper>

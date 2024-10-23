@@ -33,6 +33,7 @@
         <dm8.jdbc.version>8.1.3.62</dm8.jdbc.version>
         <kingbase.jdbc.version>8.6.0</kingbase.jdbc.version>
         <opengauss.jdbc.version>5.0.2</opengauss.jdbc.version>
+        <taos.version>3.3.3</taos.version>
         <!-- 消息队列 -->
         <rocketmq-spring.version>2.3.0</rocketmq-spring.version>
         <!-- 服务保障相关 -->
@@ -251,6 +252,12 @@
                 <groupId>cn.com.kingbase</groupId>
                 <artifactId>kingbase8</artifactId>
                 <version>${kingbase.jdbc.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.taosdata.jdbc</groupId>
+                <artifactId>taos-jdbcdriver</artifactId>
+                <version>${taos.version}</version>
             </dependency>
 
             <!-- Job 定时任务相关 -->

@@ -62,4 +62,10 @@ public interface IotThinkModelFunctionService {
      */
     PageResult<IotThinkModelFunctionDO> getThinkModelFunctionPage(IotThinkModelFunctionPageReqVO pageReqVO);
 
+    /**
+     * 创建超级表数据模型
+     *
+     * @param productId 产品编号
+     */
+    void createSuperTableDataModel(Long productId);
 }

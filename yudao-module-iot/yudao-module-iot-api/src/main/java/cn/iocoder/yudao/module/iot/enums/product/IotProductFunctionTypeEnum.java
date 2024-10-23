@@ -30,6 +30,15 @@ public enum IotProductFunctionTypeEnum implements IntArrayValuable {
      */
     private final String description;
 
+    public static IotProductFunctionTypeEnum valueOf(Integer type) {
+        for (IotProductFunctionTypeEnum value : values()) {
+            if (value.getType().equals(type)) {
+                return value;
+            }
+        }
+        return null;
+    }
+
     @Override
     public int[] array() {
         return ARRAYS;

@@ -15,10 +15,13 @@ import cn.iocoder.yudao.module.iot.controller.admin.thinkmodelfunction.thingMode
 import cn.iocoder.yudao.module.iot.controller.admin.thinkmodelfunction.vo.IotThinkModelFunctionPageReqVO;
 import cn.iocoder.yudao.module.iot.controller.admin.thinkmodelfunction.vo.IotThinkModelFunctionSaveReqVO;
 import cn.iocoder.yudao.module.iot.convert.thinkmodelfunction.IotThinkModelFunctionConvert;
+import cn.iocoder.yudao.module.iot.dal.dataobject.product.IotProductDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.thinkmodelfunction.IotThinkModelFunctionDO;
 import cn.iocoder.yudao.module.iot.dal.mysql.thinkmodelfunction.IotThinkModelFunctionMapper;
 import cn.iocoder.yudao.module.iot.enums.product.IotAccessModeEnum;
 import cn.iocoder.yudao.module.iot.enums.product.IotProductFunctionTypeEnum;
+import cn.iocoder.yudao.module.iot.service.product.IotProductService;
+import cn.iocoder.yudao.module.iot.service.tdengine.IotDbStructureDataService;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -44,6 +47,11 @@ public class IotThinkModelFunctionServiceImpl implements IotThinkModelFunctionSe
 
     @Resource
     private IotThinkModelFunctionMapper thinkModelFunctionMapper;
+
+    @Resource
+    private IotProductService productService;
+    @Resource
+    private IotDbStructureDataService dbStructureDataService;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -160,6 +168,16 @@ public class IotThinkModelFunctionServiceImpl implements IotThinkModelFunctionSe
     @Override
     public PageResult<IotThinkModelFunctionDO> getThinkModelFunctionPage(IotThinkModelFunctionPageReqVO pageReqVO) {
         return thinkModelFunctionMapper.selectPage(pageReqVO);
+    }
+
+    @Override
+    public void createSuperTableDataModel(Long productId) {
+        // 1. 查询产品
+        IotProductDO product = productService.getProduct(productId);
+        // 2. 查询产品的物模型功能列表
+        List<IotThinkModelFunctionDO> functionList = thinkModelFunctionMapper.selectListByProductId(productId);
+        // 3. 生成 TDengine 的数据模型
+        dbStructureDataService.createSuperTableDataModel(product, functionList);
     }
 
     /**
