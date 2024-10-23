@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.util.TreeMap;
 
 import com.somle.framework.test.core.ut.BaseSpringTest;
+import com.somle.kingdee.util.SignatureUtils;
 import jakarta.annotation.Resource;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.binary.Hex;
@@ -42,7 +43,7 @@ public class KingdeeServiceTest extends BaseSpringTest {
             "x-api-timestamp:1670305063559\n";
 
         // Act
-        String actualOutput = KingdeeClient.getApiString(reqMtd, endUrl, params, nonce, timestamp);
+        String actualOutput = SignatureUtils.getApiString(reqMtd, endUrl, params, nonce, timestamp);
 
         // Assert
         assertEquals(expectedOutput, actualOutput);
@@ -61,7 +62,7 @@ public class KingdeeServiceTest extends BaseSpringTest {
         String expectedOutput2 = "OTFiZTliNDFiMjNkYTI3YzVhNzg4MDI4ZGU3MWY1ZTA5ZTk1NjVlNGM1YTI1ZjIxY2Y5YTA3ZGY2OGI1MGQ1MQ==";
 
         // Act
-        String actualOutput1 = Hex.encodeHexString(KingdeeClient.hmac256(clientSecret, apiString));
+        String actualOutput1 = Hex.encodeHexString(SignatureUtils.hmac256(clientSecret, apiString));
         String actualOutput2 = Base64.encodeBase64String(actualOutput1.getBytes());
 
         // Assert

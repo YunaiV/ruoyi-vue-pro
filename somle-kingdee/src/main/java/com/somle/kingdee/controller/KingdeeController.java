@@ -47,6 +47,23 @@ public class KingdeeController {
         private List<KingdeeToken> data;
     }
 
+    @GetMapping("/getAppToken")
+    public Object getAppToken() {
+        return kingdeeClient.getAppToken1(kingdeeClient.getToken());
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
     @PostMapping("/refreshAuth")
     @ResponseBody
     public void refreshAuth(
@@ -54,45 +71,13 @@ public class KingdeeController {
         kingdeeService.refreshAuths();
     }
 
-    // @PostMapping("/updateToken")
-    // @ResponseBody
-    // public JSONObject updateToken(
-    //     @RequestBody KingdeeRequest body
-    // ) {  
-    //     log.debug(body.toString());
-    //     String message = "Failed";
-    //     String errorCode = "1";
-    //     JSONObject response = JsonUtils.newObject();
-        
-    //     Map<String, String> data = new HashMap<>();
-        
-    //     if (kingdeeClient.saveAppTokenList(body.data)) {
-    //         message = "Succeed";
-    //         errorCode = "0";
-    //     }
 
-    //     response.put("errcode", errorCode);
-    //     response.put("description", message);
-
-    //     data.put("status", errorCode);
-    //     data.put("msg", message);
-    //     data.put("type", "app_authorize");
-        
-    //     response.put("data", data);
-        
-    //     return response;
-    // }
 
     @PostMapping("/broadcast")
     @ResponseBody
     public void broadcast(
         @RequestBody KingdeeRequest body
-    ) {  
-
-        // OkHttpClient client = new OkHttpClient();
-        // RequestBody requestBody = RequestBody.create(MediaType.parse("application/json"), JSON.toJSONString(body));
-        // client.newCall(new Request.Builder().post(body));
-
+    ) {
 
         RestTemplate restTemplate = new RestTemplate();
         String[] urlList = {
@@ -160,11 +145,4 @@ public class KingdeeController {
         return kingdeeClient.post(endpoint, payload);
     }
 
-    // @PostMapping("/addProduct")
-    // @ResponseBody
-    // public JSONObject addProduct(
-    //     // JSONObject product
-    // ) {
-    //     return kingdeeClient.addProduct();
-    // }
 }
