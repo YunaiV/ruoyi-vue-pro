@@ -3,7 +3,6 @@ package cn.iocoder.yudao.module.iot.controller.admin.thinkmodelfunction.thingMod
 import lombok.*;
 
 import java.util.List;
-import java.util.Map;
 
 @Data
 @Builder

@@ -6,6 +6,9 @@ import lombok.NoArgsConstructor;
 
 import java.util.List;
 
+/**
+ * TdResponse 类用于处理 TDengine 的响应
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -21,6 +24,6 @@ public class TdResponse {
     private String desc;
 
     //[["time","TIMESTAMP",8,""],["powerstate","TINYINT",1,""],["brightness","INT",4,""],["deviceid","NCHAR",32,"TAG"]]
-    private List data;
+    private List<Object[]> data;
 
 }

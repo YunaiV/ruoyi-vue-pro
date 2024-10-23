@@ -4,6 +4,9 @@ import lombok.Data;
 
 import java.util.List;
 
+/**
+ * TableData 类用于存储和操作 TDengine 表数据
+ */
 @Data
 public class TableData {
 

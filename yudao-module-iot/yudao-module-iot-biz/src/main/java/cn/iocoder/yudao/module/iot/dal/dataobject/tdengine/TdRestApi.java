@@ -7,6 +7,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+/**
+ * TdRestApi 类用于处理 TDengine 的 REST API 请求
+ */
 @Slf4j
 @Service
 public class TdRestApi {

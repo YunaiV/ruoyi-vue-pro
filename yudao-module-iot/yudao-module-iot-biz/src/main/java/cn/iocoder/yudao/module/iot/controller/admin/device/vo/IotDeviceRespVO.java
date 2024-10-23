@@ -5,7 +5,6 @@ import com.alibaba.excel.annotation.ExcelProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Schema(description = "管理后台 - IoT 设备 Response VO")
