@@ -34,7 +34,7 @@ public class DataJob implements JobHandler {
         yesterday = scheduleDate.minusDays(1);
         beforeYesterday = scheduleDate.minusDays(2);
         beforeYesterdayFirstSecond = beforeYesterday.atStartOfDay();
-        beforeYesterdayLastSecond = beforeYesterday.atStartOfDay().minusSeconds(1);
+        beforeYesterdayLastSecond = yesterday.atStartOfDay().minusSeconds(1);
         yesterdayFirstSecond = yesterday.atStartOfDay();
         yesterdayLastSecond = today.atStartOfDay().minusSeconds(1);
     }
