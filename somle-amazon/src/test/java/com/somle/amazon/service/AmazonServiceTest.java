@@ -41,9 +41,14 @@ class AmazonServiceTest extends BaseSpringTest {
 
     @Test
     void getAdReport() {
-        var report = amazonService.adClient.getAdReport("UK", LocalDate.of(2024,8,10));
+        var shop = amazonService.shopRepository.findByCountryCode("DE");
+        var reportId = amazonService.adClient.createAdReport(shop, LocalDate.of(2024,8,25));
+        log.info(reportId.toString());
+
+        var report = amazonService.adClient.getReport(shop, reportId);
         log.info(report.toString());
     }
+
 
     @Test
     void concurency1() {

@@ -14,14 +14,4 @@ import com.somle.amazon.service.AmazonService;
 public class AmazonAdController {
     @Autowired
     private AmazonService service;
-
-    @GetMapping("/getAdReport")
-    @ResponseBody
-    public JSONArray getAdReport(
-        @RequestParam String countryCode,
-        @RequestParam LocalDate dataDate
-    ) {
-    
-        return service.adClient.getAdReport(countryCode, dataDate);
-    }
 }

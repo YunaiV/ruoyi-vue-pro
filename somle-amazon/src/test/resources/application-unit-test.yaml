@@ -33,10 +33,10 @@ logging:
 spring:
   # 数据源配置项
   datasource:
-    url: jdbc:mysql://localhost:3306/ruoyi-vue-pro?serverTimezone=GMT%2B8&useSSL=false&characterEncoding=utf-8
+    url: jdbc:mysql://192.168.10.151:3306/ruoyi-vue-pro?serverTimezone=GMT%2B8&useSSL=false&characterEncoding=utf-8
     driverClassName: com.mysql.cj.jdbc.Driver
-    username: root
-    password: 'YMCA@1978'
+    username: it003
+    password: asivJssflioKK
 #  datasource:
 #    name: ruoyi-vue-pro
 #    url: jdbc:h2:mem:testdb;MODE=MYSQL;DATABASE_TO_UPPER=false;NON_KEYWORDS=value; # MODE 使用 MySQL 模式；DATABASE_TO_UPPER 配置表和字段使用小写

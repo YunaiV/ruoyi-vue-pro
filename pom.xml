@@ -37,6 +37,7 @@
         <module>somle-ai</module>
         <module>somle-matomo</module>
         <module>somle-microsoft</module>
+        <module>somle-wangdian</module>
 
     </modules>
 
