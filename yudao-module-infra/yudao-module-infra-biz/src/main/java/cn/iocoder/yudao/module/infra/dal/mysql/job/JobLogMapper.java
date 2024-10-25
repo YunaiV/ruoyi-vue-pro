@@ -22,11 +22,13 @@ public interface JobLogMapper extends BaseMapperX<JobLogDO> {
     default PageResult<JobLogDO> selectPage(JobLogPageReqVO reqVO) {
         return selectPage(reqVO, new LambdaQueryWrapperX<JobLogDO>()
                 .eqIfPresent(JobLogDO::getJobId, reqVO.getJobId())
+                .eqIfPresent(JobLogDO::getHandlerParam,reqVO.getHandlerParam())
                 .likeIfPresent(JobLogDO::getHandlerName, reqVO.getHandlerName())
                 .geIfPresent(JobLogDO::getBeginTime, reqVO.getBeginTime())
                 .leIfPresent(JobLogDO::getEndTime, reqVO.getEndTime())
                 .eqIfPresent(JobLogDO::getStatus, reqVO.getStatus())
-                .orderByDesc(JobLogDO::getId) // ID 倒序
+                // ID 倒序
+                .orderByDesc(JobLogDO::getId)
         );
     }
 

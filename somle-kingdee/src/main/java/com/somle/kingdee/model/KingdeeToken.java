@@ -42,7 +42,7 @@ public class KingdeeToken {
     private String accountName;
     private String domain;
     private String instanceId;
-    private long instanceExpiresTime;
+    private String instanceExpiresTime;
     private String isRetainData;
     private String trialOrderId;
 

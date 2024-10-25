@@ -13,17 +13,24 @@ import org.quartz.JobExecutionException;
 import org.quartz.PersistJobDataAfterExecution;
 import org.springframework.context.ApplicationContext;
 import org.springframework.scheduling.quartz.QuartzJobBean;
-
 import jakarta.annotation.Resource;
-import java.time.LocalDateTime;
 
-import static cn.hutool.core.exceptions.ExceptionUtil.getRootCauseMessage;
+import java.time.LocalDateTime;
 
 /**
  * 基础 Job 调用者，负责调用 {@link JobHandler#execute(String)} 执行任务
- *
+ *@DisallowConcurrentExecution 禁止并发执行多个相同定义的JobDetail, 这个注解是加在Job类上的, 但意思并不是不能同时执行多个Job,
+ * 而是不能并发执行同一个Job Definition(由JobDetail定义),但是可以同时执行多个不同的JobDetail, 也就是说一个JobKey对应的JobDetail实例不会进行并发执行，
+ * 举例说明,我们有一个Job类,叫做QuartzJob,QuartzJob1，QuartzJob2他们都是实现了Job接口,并在这些类上加了这个注解@DisallowConcurrentExecution,
+ * 然后在这个Job上定义了很多个JobDetail, QuartzJobJobDetail,QuartzJob1JobDetail,QuartzJob2JobDetail，那么当scheduler启动时,
+ * 不会并发执行多个QuartzJobJobDetail或者QuartzJob1JobDetail以及QuartzJob2JobDetail，而是QuartzJob类下QuartzJobJobDetail的任务调度同步执行，
+ * 其它几个(QuartzJob1JobDetail,QuartzJob2JobDetail的任务调度下的)一样，但是可以同时执行QuartzJobJobDetail,QuartzJob1JobDetail,QuartzJob2JobDetail
+ * @PersistJobDataAfterExecution 同样, 也是加在Job上,表示当正常执行完Job后, JobDataMap中的数据应该被改动, 以被下一次调用时用。
+ * （注意：@PersistJobDataAfterExecution是持久化JobDetail中的JobDataMap，对Trigger中的JobDataMap无效）
+ * 当使用@PersistJobDataAfterExecution 注解时, 为了避免并发时, 存储数据造成混乱, 强烈建议把@DisallowConcurrentExecution注解也加上。
  * @author 芋道源码
  */
+
 @DisallowConcurrentExecution
 @PersistJobDataAfterExecution
 @Slf4j

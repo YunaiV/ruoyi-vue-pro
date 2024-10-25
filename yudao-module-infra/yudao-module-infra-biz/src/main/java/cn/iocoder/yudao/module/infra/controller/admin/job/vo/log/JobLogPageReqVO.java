@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.infra.controller.admin.job.vo.log;
 
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
+import com.alibaba.excel.annotation.ExcelProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -22,6 +23,9 @@ public class JobLogPageReqVO extends PageParam {
 
     @Schema(description = "处理器的名字，模糊匹配")
     private String handlerName;
+
+    @ExcelProperty("处理器的参数")
+    private String handlerParam;
 
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
     @Schema(description = "开始执行时间")
