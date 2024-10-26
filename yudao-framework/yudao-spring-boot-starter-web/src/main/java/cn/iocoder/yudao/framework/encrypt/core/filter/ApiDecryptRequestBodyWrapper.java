@@ -7,7 +7,7 @@ import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants;
 import cn.iocoder.yudao.framework.common.util.servlet.ServletUtils;
 import cn.iocoder.yudao.framework.encrypt.config.EncryptProperties;
-import cn.iocoder.yudao.framework.encrypt.core.utils.EncryptUtils;
+import cn.iocoder.yudao.framework.encrypt.core.util.EncryptUtils;
 import jakarta.servlet.ReadListener;
 import jakarta.servlet.ServletInputStream;
 import jakarta.servlet.http.HttpServletRequest;

@@ -7,7 +7,7 @@ import cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstant
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.encrypt.config.EncryptProperties;
 import cn.iocoder.yudao.framework.encrypt.core.annotation.ApiEncrypt;
-import cn.iocoder.yudao.framework.encrypt.core.utils.EncryptUtils;
+import cn.iocoder.yudao.framework.encrypt.core.util.EncryptUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.MethodParameter;
 import org.springframework.http.MediaType;

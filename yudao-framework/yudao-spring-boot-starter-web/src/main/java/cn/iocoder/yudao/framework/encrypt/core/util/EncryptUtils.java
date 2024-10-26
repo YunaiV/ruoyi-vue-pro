@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.framework.encrypt.core.utils;
+package cn.iocoder.yudao.framework.encrypt.core.util;
 
 import cn.hutool.crypto.SecureUtil;
 import cn.hutool.crypto.asymmetric.KeyType;
