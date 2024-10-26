@@ -20,6 +20,7 @@ import cn.iocoder.yudao.module.iot.dal.dataobject.thinkmodelfunction.IotThinkMod
 import cn.iocoder.yudao.module.iot.dal.mysql.thinkmodelfunction.IotThinkModelFunctionMapper;
 import cn.iocoder.yudao.module.iot.enums.product.IotAccessModeEnum;
 import cn.iocoder.yudao.module.iot.enums.product.IotProductFunctionTypeEnum;
+import cn.iocoder.yudao.module.iot.enums.product.IotProductStatusEnum;
 import cn.iocoder.yudao.module.iot.service.product.IotProductService;
 import cn.iocoder.yudao.module.iot.service.tdengine.IotDbStructureDataService;
 import jakarta.annotation.Resource;
@@ -65,15 +66,25 @@ public class IotThinkModelFunctionServiceImpl implements IotThinkModelFunctionSe
         // 3. 系统保留字段，不能用于标识符定义
         validateNotDefaultEventAndService(createReqVO.getIdentifier());
 
-        // 3. 插入数据库
+        // 4. 校验产品状态，发布状态下，不允许新增功能
+        validateProductStatus(createReqVO.getProductId());
+
+        // 5. 插入数据库
         IotThinkModelFunctionDO function = IotThinkModelFunctionConvert.INSTANCE.convert(createReqVO);
         thinkModelFunctionMapper.insert(function);
 
-        // 4. 如果创建的是属性，需要更新默认的事件和服务
+        // 6. 如果创建的是属性，需要更新默认的事件和服务
         if (Objects.equals(createReqVO.getType(), IotProductFunctionTypeEnum.PROPERTY.getType())) {
             createDefaultEventsAndServices(createReqVO.getProductId(), createReqVO.getProductKey());
         }
         return function.getId();
+    }
+
+    private void validateProductStatus(Long createReqVO) {
+        IotProductDO product = productService.getProduct(createReqVO);
+        if (Objects.equals(product.getStatus(), IotProductStatusEnum.PUBLISHED.getType())) {
+            throw exception(PRODUCT_STATUS_NOT_ALLOW_FUNCTION);
+        }
     }
 
     private void validateNotDefaultEventAndService(String identifier) {
@@ -109,11 +120,14 @@ public class IotThinkModelFunctionServiceImpl implements IotThinkModelFunctionSe
         // 2. 校验功能标识符是否唯一
         validateIdentifierUniqueForUpdate(updateReqVO.getId(), updateReqVO.getProductId(), updateReqVO.getIdentifier());
 
-        // 3. 更新数据库
+        // 3. 校验产品状态，发布状态下，不允许操作功能
+        validateProductStatus(updateReqVO.getProductId());
+
+        // 4. 更新数据库
         IotThinkModelFunctionDO thinkModelFunction = IotThinkModelFunctionConvert.INSTANCE.convert(updateReqVO);
         thinkModelFunctionMapper.updateById(thinkModelFunction);
 
-        // 4. 如果更新的是属性，需要更新默认的事件和服务
+        // 5. 如果更新的是属性，需要更新默认的事件和服务
         if (Objects.equals(updateReqVO.getType(), IotProductFunctionTypeEnum.PROPERTY.getType())) {
             createDefaultEventsAndServices(updateReqVO.getProductId(), updateReqVO.getProductKey());
         }
@@ -134,6 +148,9 @@ public class IotThinkModelFunctionServiceImpl implements IotThinkModelFunctionSe
         if (functionDO == null) {
             throw exception(THINK_MODEL_FUNCTION_NOT_EXISTS);
         }
+
+        // 3. 校验产品状态，发布状态下，不允许操作功能
+        validateProductStatus(functionDO.getProductId());
 
         // 2. 删除功能
         thinkModelFunctionMapper.deleteById(id);
