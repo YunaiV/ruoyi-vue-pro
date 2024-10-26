@@ -30,7 +30,6 @@ import java.util.Map;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
 import static cn.iocoder.yudao.framework.common.util.collection.MapUtils.findAndThen;
 import static cn.iocoder.yudao.module.bpm.framework.flowable.core.util.FlowableUtils.isAddSignUserTask;
-import static cn.iocoder.yudao.module.bpm.framework.flowable.core.util.FlowableUtils.isAssignUserTask;
 
 /**
  * Bpm 任务 Convert
@@ -134,7 +133,8 @@ public interface BpmTaskConvert {
                                                           Map<Long, DeptRespDTO> deptMap) {
        return convertList(todoTaskList, task -> {
            // 找到分配给当前用户，或者当前用户加签的任务（为了减签）
-           if (!isAssignUserTask(userId, task) && !isAddSignUserTask(userId, task, childrenTaskMap)) {
+           if (!FlowableUtils.isAssignUserTask(userId, task)
+                   && !FlowableUtils.isAddSignUserTask(userId, task, childrenTaskMap)) {
                return null;
            }
            BpmTaskRespVO taskVO = BeanUtils.toBean(task, BpmTaskRespVO.class);

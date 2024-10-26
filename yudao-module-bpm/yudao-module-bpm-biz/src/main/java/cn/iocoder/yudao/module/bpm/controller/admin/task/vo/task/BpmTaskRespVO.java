@@ -55,7 +55,7 @@ public class BpmTaskRespVO {
     @Schema(description = "父任务编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     private String parentTaskId;
     @Schema(description = "子任务列表（由加签生成）", requiredMode = Schema.RequiredMode.REQUIRED, example = "childrenTask")
-    private List<BpmTaskRespVO> children;
+    private List<BpmTaskRespVO> children; // 由加签生成，包含多层子任务
 
     @Schema(description = "表单编号", example = "1024")
     private Long formId;

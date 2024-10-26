@@ -132,6 +132,15 @@ public interface BpmTaskService {
     List<UserTask> getUserTaskListByReturn(String id);
 
     /**
+     * 获取指定任务的子任务列表（多层）
+     *
+     * @param parentTaskId 父任务 ID
+     * @param tasks 任务列表
+     * @return 子任务列表
+     */
+    List<HistoricTaskInstance> getAllChildrenTaskListByParentTaskId(String parentTaskId, List<HistoricTaskInstance> tasks);
+
+    /**
      * 获取指定任务的子任务列表
      *
      * @param parentTaskId 父任务ID

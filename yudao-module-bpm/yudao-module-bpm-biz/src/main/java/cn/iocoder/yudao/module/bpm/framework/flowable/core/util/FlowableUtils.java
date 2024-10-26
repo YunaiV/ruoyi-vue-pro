@@ -201,7 +201,8 @@ public class FlowableUtils {
      * @return 是否
      */
     public static boolean isAssignUserTask(Long userId, Task task) {
-        return ObjectUtil.equal(userId, NumberUtil.parseLong(task.getAssignee(), null));
+        Long assignee = NumberUtil.parseLong(task.getAssignee(), null);
+        return ObjectUtil.equal(userId, assignee);
     }
 
     /**
@@ -212,11 +213,13 @@ public class FlowableUtils {
      * @return 是否
      */
     public static boolean isOwnerUserTask(Long userId, Task task) {
-        return ObjectUtil.equal(userId, NumberUtil.parseLong(task.getOwner(), null));
+        Long assignee = NumberUtil.parseLong(task.getAssignee(), null);
+        return ObjectUtil.equal(userId, assignee);
     }
 
     /**
      * 判断指定用户，是否是当前任务的加签人
+     *
      * @param userId 用户 Id
      * @param task 任务
      * @param  childrenTaskMap 子任务集合
