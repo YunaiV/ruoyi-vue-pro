@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.iot.dal.tdengine;
 
+import cn.iocoder.yudao.module.iot.dal.dataobject.tdengine.TdFieldDO;
 import cn.iocoder.yudao.module.iot.domain.FieldsVo;
 import cn.iocoder.yudao.module.iot.domain.SelectDto;
 import cn.iocoder.yudao.module.iot.domain.TableDto;
@@ -17,12 +18,73 @@ import java.util.Map;
 @DS("tdengine")
 public interface TdEngineMapper {
 
+    /**
+     * 创建数据库
+     *
+     * @param dataBaseName 数据库名称
+     */
+    @InterceptorIgnore(tenantLine = "true")
     void createDatabase(@Param("dataBaseName") String dataBaseName);
 
-    void createSuperTable(@Param("schemaFields") List<FieldsVo> schemaFields,
-                          @Param("tagsFields") List<FieldsVo> tagsFields,
+    /**
+     * 创建超级表
+     *
+     * @param schemaFields   schema字段
+     * @param tagsFields     tags字段
+     * @param dataBaseName   数据库名称
+     * @param superTableName 超级表名称
+     */
+    @InterceptorIgnore(tenantLine = "true")
+    void createSuperTable(@Param("schemaFields") List<TdFieldDO> schemaFields,
+                          @Param("tagsFields") List<TdFieldDO> tagsFields,
                           @Param("dataBaseName") String dataBaseName,
                           @Param("superTableName") String superTableName);
+
+    /**
+     * 查看超级表 - 显示当前数据库下的所有超级表信息
+     * SQL：SHOW STABLES [LIKE tb_name_wildcard];
+     *
+     * @param dataBaseName   数据库名称
+     * @param superTableName 超级表名称
+     */
+    @InterceptorIgnore(tenantLine = "true")
+    List<Map<String, Object>> showSuperTables(@Param("dataBaseName") String dataBaseName,
+                                              @Param("superTableName") String superTableName);
+
+    /**
+     * 查看超级表 - 获取超级表的结构信息
+     * SQL：DESCRIBE [db_name.]stb_name;
+     * <p>
+     * * @param dataBaseName 数据库名称
+     * * @param superTableName 超级表名称
+     */
+    @InterceptorIgnore(tenantLine = "true")
+    List<Map<String, Object>> describeSuperTable(@Param("dataBaseName") String dataBaseName,
+                                                 @Param("superTableName") String superTableName);
+
+    /**
+     * 为超级表添加列
+     *
+     * @param dataBaseName   数据库名称
+     * @param superTableName 超级表名称
+     * @param field          字段信息
+     */
+    @InterceptorIgnore(tenantLine = "true")
+    void addColumnForSuperTable(@Param("dataBaseName") String dataBaseName,
+                                @Param("superTableName") String superTableName,
+                                @Param("field") TdFieldDO field);
+
+    /**
+     * 为超级表删除列
+     *
+     * @param dataBaseName   数据库名称
+     * @param superTableName 超级表名称
+     * @param field          字段信息
+     */
+    @InterceptorIgnore(tenantLine = "true")
+    void dropColumnForSuperTable(@Param("dataBaseName") String dataBaseName,
+                                 @Param("superTableName") String superTableName,
+                                 @Param("field") TdFieldDO field);
 
     void createTable(TableDto tableDto);
 
@@ -30,11 +92,6 @@ public interface TdEngineMapper {
 
     List<Map<String, Object>> selectByTimestamp(SelectDto selectDto);
 
-    void addColumnForSuperTable(@Param("superTableName") String superTableName,
-                                @Param("fieldsVo") FieldsVo fieldsVo);
-
-    void dropColumnForSuperTable(@Param("superTableName") String superTableName,
-                                 @Param("fieldsVo") FieldsVo fieldsVo);
 
     void addTagForSuperTable(@Param("superTableName") String superTableName,
                              @Param("fieldsVo") FieldsVo fieldsVo);
@@ -43,14 +100,6 @@ public interface TdEngineMapper {
                               @Param("fieldsVo") FieldsVo fieldsVo);
 
     Map<String, Long> getCountByTimestamp(SelectDto selectDto);
-
-    /**
-     * 检查表是否存在
-     *
-     * @param dataBaseName 数据库名称
-     * @param tableName    表名称
-     */
-    Integer checkTableExists(@Param("dataBaseName") String dataBaseName, @Param("tableName") String tableName);
 
     Map<String, Object> getLastData(SelectDto selectDto);
 
@@ -62,13 +111,5 @@ public interface TdEngineMapper {
 
     List<Map<String, Object>> getLastDataByTags(TagsSelectDao tagsSelectDao);
 
-    /**
-     * 创建超级表
-     *
-     * @param sql sql
-     * @return 返回值
-     */
-    @InterceptorIgnore(tenantLine = "true")
-    Integer createSuperTableDevice(String sql);
 
 }

@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.iot.service.tdengine;
 
-import cn.iocoder.yudao.module.iot.domain.FieldsVo;
+import cn.iocoder.yudao.module.iot.dal.dataobject.tdengine.TdFieldDO;
 import cn.iocoder.yudao.module.iot.domain.SelectDto;
 import cn.iocoder.yudao.module.iot.domain.TableDto;
 import cn.iocoder.yudao.module.iot.domain.TagsSelectDao;
@@ -27,12 +27,44 @@ public interface TdEngineService {
      *
      * @param schemaFields   schema字段
      * @param tagsFields     tags字段
-     * @param dataBaseName   数据库名称
      * @param superTableName 超级表名称
-     * @throws Exception 异常
      */
-    void createSuperTable(List<FieldsVo> schemaFields, List<FieldsVo> tagsFields, String dataBaseName,
-                          String superTableName) throws Exception;
+    void createSuperTable(List<TdFieldDO> schemaFields, List<TdFieldDO> tagsFields, String dataBaseName, String superTableName);
+
+    /**
+     * 检查超级表是否存在
+     */
+    Integer checkSuperTableExists(String dataBaseName, String superTableName);
+
+
+    /**
+     * 获取超级表的结构信息
+     */
+    List<Map<String, Object>> describeSuperTable(String dataBaseName, String superTableName);
+
+    /**
+     * 为超级表添加列
+     *
+     * @param dataBaseName 数据库名称
+     * @param superTableName 超级表名称
+     * @param fieldsVo       字段信息
+     */
+    void addColumnForSuperTable(String dataBaseName,String superTableName, List<TdFieldDO> fieldsVo);
+
+    /**
+     * 为超级表删除列
+     *
+     * @param dataBaseName 数据库名称
+     * @param superTableName 超级表名称
+     * @param fieldsVo       字段信息
+     */
+    void dropColumnForSuperTable(String dataBaseName,String superTableName, List<TdFieldDO> fieldsVo);
+
+    /**
+     * 为超级表添加tag
+     */
+    Long getCountByTimesTamp(SelectDto selectDto) throws Exception;
+
 
     /**
      * 创建表
@@ -58,37 +90,6 @@ public interface TdEngineService {
      * @throws Exception 异常
      */
     List<Map<String, Object>> selectByTimesTamp(SelectDto selectDto) throws Exception;
-
-    /**
-     * 为超级表添加列
-     *
-     * @param superTableName 超级表名称
-     * @param fieldsVo       字段信息
-     * @throws Exception 异常
-     */
-    void addColumnForSuperTable(String superTableName, FieldsVo fieldsVo) throws Exception;
-
-    /**
-     * 为超级表删除列
-     *
-     * @param superTableName 超级表名称
-     * @param fieldsVo       字段信息
-     * @throws Exception 异常
-     */
-    void dropColumnForSuperTable(String superTableName, FieldsVo fieldsVo) throws Exception;
-
-    /**
-     * 为超级表添加tag
-     */
-    Long getCountByTimesTamp(SelectDto selectDto) throws Exception;
-
-    /**
-     * 检查表是否存在
-     *
-     * @return 1存在 0不存在
-     * @throws Exception 异常
-     */
-    Integer checkTableExists(SelectDto selectDto) throws Exception;
 
     /**
      * 初始化超级表
@@ -138,4 +139,6 @@ public interface TdEngineService {
      * @return 数据
      */
     List<Map<String, Object>> getAggregateData(SelectVisualDto selectVisualDto);
+
+
 }

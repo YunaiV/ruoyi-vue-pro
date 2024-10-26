@@ -8,7 +8,7 @@
     </update>
 
     <update id="createSuperTable">
-        create table if not exists #{dataBaseName}.#{superTableName}
+        CREATE STABLE IF NOT EXISTS ${dataBaseName}.${superTableName}
         <foreach item="item" collection="schemaFields" separator=","
                  open="(" close=")" index="">
             <if test="item.fieldName != null || item.fieldName != ''">
@@ -16,46 +16,48 @@
             </if>
             <if test="item.dataType != null || item.dataType != ''">
                 <choose>
-                    <when test="item.dataType == 'timestamp'">
-                        timestamp
+                    <when test="item.dataType == 'TIMESTAMP'">
+                        TIMESTAMP
                     </when>
-                    <when test="item.dataType == 'tinyint'">
-                        tinyint
+                    <when test="item.dataType == 'TINYINT'">
+                        TINYINT
                     </when>
-                    <when test="item.dataType == 'smallint'">
-                        smallint
+                    <when test="item.dataType == 'SMALLINT'">
+                        SMALLINT
                     </when>
-                    <when test="item.dataType == 'int'">
-                        int
+                    <when test="item.dataType == 'INT'">
+                        INT
                     </when>
-                    <when test="item.dataType == 'bigint'">
-                        bigint
+                    <when test="item.dataType == 'BIGINT'">
+                        BIGINT
                     </when>
-                    <when test="item.dataType == 'float'">
-                        float
+                    <when test="item.dataType == 'FLOAT'">
+                        FLOAT
                     </when>
-                    <when test="item.dataType == 'double'">
-                        double
+                    <when test="item.dataType == 'DOUBLE'">
+                        DOUBLE
                     </when>
-                    <when test="item.dataType == 'binary'">
-                        binary
+                    <when test="item.dataType == 'BINARY'">
+                        BINARY
                     </when>
-                    <when test="item.dataType == 'nchar'">
-                        nchar
+                    <when test="item.dataType == 'NCHAR'">
+                        NCHAR
                     </when>
-                    <when test="item.dataType == 'bool'">
-                        bool
+                    <when test="item.dataType == 'BOOL'">
+                        BOOL
                     </when>
-                    <when test="item.dataType == 'json'">
-                        json
+                    <when test="item.dataType == 'JSON'">
+                        JSON
                     </when>
                 </choose>
             </if>
-            <if test="item.size != null">
-                (#{item.size})
+            <if test="item.dataLength > 0">
+                (
+                ${item.dataLength}
+                )
             </if>
         </foreach>
-        tags
+        TAGS
         <!--tdEngine不支持动态tags里的数据类型，只能使用choose标签比对-->
         <foreach item="item" collection="tagsFields" separator=","
                  open="(" close=")" index="">
@@ -64,43 +66,45 @@
             </if>
             <if test="item.dataType != null || item.dataType != ''">
                 <choose>
-                    <when test="item.dataType == 'timestamp'">
-                        timestamp
+                    <when test="item.dataType == 'TIMESTAMP'">
+                        TIMESTAMP
                     </when>
-                    <when test="item.dataType == 'tinyint'">
-                        tinyint
+                    <when test="item.dataType == 'TINYINT'">
+                        TINYINT
                     </when>
-                    <when test="item.dataType == 'smallint'">
-                        smallint
+                    <when test="item.dataType == 'SMALLINT'">
+                        SMALLINT
                     </when>
-                    <when test="item.dataType == 'int'">
-                        int
+                    <when test="item.dataType == 'INT'">
+                        INT
                     </when>
-                    <when test="item.dataType == 'bigint'">
-                        bigint
+                    <when test="item.dataType == 'BIGINT'">
+                        BIGINT
                     </when>
-                    <when test="item.dataType == 'float'">
-                        float
+                    <when test="item.dataType == 'FLOAT'">
+                        FLOAT
                     </when>
-                    <when test="item.dataType == 'double'">
-                        double
+                    <when test="item.dataType == 'DOUBLE'">
+                        DOUBLE
                     </when>
-                    <when test="item.dataType == 'binary'">
-                        binary
+                    <when test="item.dataType == 'BINARY'">
+                        BINARY
                     </when>
-                    <when test="item.dataType == 'nchar'">
-                        nchar
+                    <when test="item.dataType == 'NCHAR'">
+                        NCHAR
                     </when>
-                    <when test="item.dataType == 'bool'">
-                        bool
+                    <when test="item.dataType == 'BOOL'">
+                        BOOL
                     </when>
-                    <when test="item.dataType == 'json'">
-                        json
+                    <when test="item.dataType == 'JSON'">
+                        JSON
                     </when>
                 </choose>
             </if>
-            <if test="item.size != null">
-                (#{item.size})
+            <if test="item.dataLength > 0">
+                (
+                ${item.dataLength}
+                )
             </if>
         </foreach>
     </update>
@@ -135,7 +139,6 @@
         </foreach>
     </insert>
 
-
     <select id="selectByTimestamp" parameterType="cn.iocoder.yudao.module.iot.domain.SelectDto"
             resultType="Map">
         select * from #{dataBaseName}.#{tableName}
@@ -146,66 +149,58 @@
     </select>
 
     <update id="addColumnForSuperTable">
-        ALTER
-        STABLE
-        #{superTableName}
-        ADD
-        COLUMN
-        <if test="fieldsVo.fieldName != null || fieldsVo.fieldName != ''">
-            #{fieldsVo.fieldName}
+        ALTER STABLE ${dataBaseName}.${superTableName} ADD COLUMN
+        <if test="field.fieldName != null || field.fieldName != ''">
+            #{field.fieldName}
         </if>
-        <if test="fieldsVo.dataType != null || fieldsVo.dataType != ''">
+        <if test="field.dataType != null || field.dataType != ''">
             <choose>
-                <when test="fieldsVo.dataType == 'timestamp'">
-                    timestamp
+                <when test="field.dataType == 'TIMESTAMP'">
+                    TIMESTAMP
                 </when>
-                <when test="fieldsVo.dataType == 'tinyint'">
-                    tinyint
+                <when test="field.dataType == 'TINYINT'">
+                    TINYINT
                 </when>
-                <when test="fieldsVo.dataType == 'smallint'">
-                    smallint
+                <when test="field.dataType == 'SMALLINT'">
+                    SMALLINT
                 </when>
-                <when test="fieldsVo.dataType == 'int'">
-                    int
+                <when test="field.dataType == 'INT'">
+                    INT
                 </when>
-                <when test="fieldsVo.dataType == 'bigint'">
-                    bigint
+                <when test="field.dataType == 'BIGINT'">
+                    BIGINT
                 </when>
-                <when test="fieldsVo.dataType == 'float'">
-                    float
+                <when test="field.dataType == 'FLOAT'">
+                    FLOAT
                 </when>
-                <when test="fieldsVo.dataType == 'double'">
-                    double
+                <when test="field.dataType == 'DOUBLE'">
+                    DOUBLE
                 </when>
-                <when test="fieldsVo.dataType == 'binary'">
-                    binary
+                <when test="field.dataType == 'BINARY'">
+                    BINARY
                 </when>
-                <when test="fieldsVo.dataType == 'nchar'">
-                    nchar
+                <when test="field.dataType == 'NCHAR'">
+                    NCHAR
                 </when>
-                <when test="fieldsVo.dataType == 'bool'">
-                    bool
+                <when test="field.dataType == 'BOOL'">
+                    BOOL
                 </when>
-                <when test="fieldsVo.dataType == 'json'">
-                    json
+                <when test="field.dataType == 'JSON'">
+                    JSON
                 </when>
             </choose>
         </if>
-        <if test="fieldsVo.size != null">
+        <if test="field.dataLength > 0">
             (
-            #{fieldsVo.size}
+            #{field.dataLength}
             )
         </if>
     </update>
 
     <update id="dropColumnForSuperTable">
-        ALTER
-        STABLE
-        #{superTableName}
-        DROP
-        COLUMN
-        <if test="fieldsVo.fieldName != null || fieldsVo.fieldName != ''">
-            #{fieldsVo.fieldName}
+        ALTER STABLE ${dataBaseName}.${superTableName} DROP COLUMN
+        <if test="field.fieldName != null || field.fieldName != ''">
+            #{field.fieldName}
         </if>
     </update>
 
@@ -215,49 +210,49 @@
         #{superTableName}
         ADD
         TAG
-        <if test="fieldsVo.fieldName != null || fieldsVo.fieldName != ''">
-            #{fieldsVo.fieldName}
+        <if test="field.fieldName != null || fieldDO.fieldName != ''">
+            #{fieldDO.fieldName}
         </if>
-        <if test="fieldsVo.dataType != null || fieldsVo.dataType != ''">
+        <if test="fieldDO.dataType != null || fieldDO.dataType != ''">
             <choose>
-                <when test="fieldsVo.dataType == 'timestamp'">
+                <when test="fieldDO.dataType == 'timestamp'">
                     timestamp
                 </when>
-                <when test="fieldsVo.dataType == 'tinyint'">
+                <when test="fieldDO.dataType == 'tinyint'">
                     tinyint
                 </when>
-                <when test="fieldsVo.dataType == 'smallint'">
+                <when test="fieldDO.dataType == 'smallint'">
                     smallint
                 </when>
-                <when test="fieldsVo.dataType == 'int'">
+                <when test="fieldDO.dataType == 'int'">
                     int
                 </when>
-                <when test="fieldsVo.dataType == 'bigint'">
+                <when test="fieldDO.dataType == 'bigint'">
                     bigint
                 </when>
-                <when test="fieldsVo.dataType == 'float'">
+                <when test="fieldDO.dataType == 'float'">
                     float
                 </when>
-                <when test="fieldsVo.dataType == 'double'">
+                <when test="fieldDO.dataType == 'double'">
                     double
                 </when>
-                <when test="fieldsVo.dataType == 'binary'">
+                <when test="fieldDO.dataType == 'binary'">
                     binary
                 </when>
-                <when test="fieldsVo.dataType == 'nchar'">
+                <when test="fieldDO.dataType == 'nchar'">
                     nchar
                 </when>
-                <when test="fieldsVo.dataType == 'bool'">
+                <when test="fieldDO.dataType == 'bool'">
                     bool
                 </when>
-                <when test="fieldsVo.dataType == 'json'">
+                <when test="fieldDO.dataType == 'json'">
                     json
                 </when>
             </choose>
         </if>
-        <if test="fieldsVo.size != null">
+        <if test="fieldDO.dataLength > 0">
             (
-            #{fieldsVo.size}
+            #{fieldDO.dataLength}
             )
         </if>
     </update>
@@ -279,11 +274,8 @@
         FROM #{dataBaseName}.#{tableName} WHERE ${fieldName} BETWEEN #{startTime} AND #{endTime}
     </select>
 
-    <select id="checkTableExists" resultType="java.lang.Integer">
-        SELECT COUNT(0)
-        FROM information_schema.ins_tables
-        WHERE db_name = #{dataBaseName}
-          AND table_name = #{tableName}
+    <select id="showSuperTables" resultType="java.util.Map">
+        SHOW ${dataBaseName}.STABLES LIKE '${superTableName}'
     </select>
 
     <select id="getLastData" resultType="java.util.Map">
@@ -304,11 +296,13 @@
         FROM #{dataBaseName}.#{tableName} WHERE ts BETWEEN #{startTime} AND #{endTime}
         LIMIT #{num}
     </select>
+
     <select id="getRealtimeData" resultType="java.util.Map"
             parameterType="cn.iocoder.yudao.module.iot.domain.visual.SelectVisualDto">
         SELECT #{fieldName}, ts
         FROM #{dataBaseName}.#{tableName} LIMIT #{num}
     </select>
+
     <select id="getAggregateData" resultType="java.util.Map"
             parameterType="cn.iocoder.yudao.module.iot.domain.visual.SelectVisualDto">
         SELECT #{aggregate}(${fieldName})
@@ -316,9 +310,8 @@
         LIMIT #{num}
     </select>
 
-
-    <insert id="createSuperTableDevice">
-        ${sql}
-    </insert>
+    <select id="describeSuperTable" resultType="java.util.Map">
+        DESCRIBE ${dataBaseName}.${superTableName}
+    </select>
 
 </mapper>

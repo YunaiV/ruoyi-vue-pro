@@ -14,23 +14,23 @@ import org.springframework.stereotype.Service;
 @Service
 public class TdRestApi {
 
-    @Value("${spring.datasource.dynamic.datasource.master.url}")
+    @Value("${spring.datasource.dynamic.datasource.tdengine.url}")
     private String url;
 
-    @Value("${spring.datasource.dynamic.datasource.master.username}")
+    @Value("${spring.datasource.dynamic.datasource.tdengine.username}")
     private String username;
 
-    @Value("${spring.datasource.dynamic.datasource.master.password}")
+    @Value("${spring.datasource.dynamic.datasource.tdengine.password}")
     private String password;
 
+    /**
+     * 获取 REST API URL
+     */
     private String getRestApiUrl() {
-        //jdbc:TAOS-RS://127.0.0.1:6041/iotkit?xxxx
-        String restUrl = url.replace("jdbc:TAOS-RS://" , "")
-                .replaceAll("\\?.*" , "");
-        // /rest/sql/iotkit
+        String restUrl = url.replace("jdbc:TAOS-RS://", "")
+                .replaceAll("\\?.*", "");
         int idx = restUrl.lastIndexOf("/");
-        //127.0.0.1:6041/rest/sql/iotkit
-        return String.format("%s/rest/sql/%s" , restUrl.substring(0, idx), restUrl.substring(idx + 1));
+        return String.format("%s/rest/sql/%s", restUrl.substring(0, idx), restUrl.substring(idx + 1));
     }
 
 
@@ -48,11 +48,10 @@ public class TdRestApi {
      * 执行sql
      */
     public TdResponse execSql(String sql) {
-        log.info("exec td sql:{}" , sql);
+        log.info("exec td sql:{}", sql);
         HttpRequest request = newApiRequest(sql);
         HttpResponse response = request.execute();
         return JSONUtil.toBean(response.body(), TdResponse.class);
     }
-
 
 }

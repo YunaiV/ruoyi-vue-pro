@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.iot.dal.dataobject.tdengine;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -10,20 +11,21 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class TdField {
+@Builder
+public class TdFieldDO {
 
     /**
      * 字段名称
      */
-    private String name;
+    private String fieldName;
 
     /**
      * 字段类型
      */
-    private String type;
+    private String dataType;
 
     /**
      * 字段长度
      */
-    private int length;
+    private Integer dataLength = 0;
 }

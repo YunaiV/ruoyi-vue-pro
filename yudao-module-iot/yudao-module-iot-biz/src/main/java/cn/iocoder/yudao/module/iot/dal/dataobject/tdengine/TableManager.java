@@ -45,7 +45,7 @@ public class TableManager {
     /**
      * 获取创建表sql
      */
-    public static String getCreateSTableSql(String tbName, List<TdField> fields, TdField... tags) {
+    public static String getCreateSTableSql(String tbName, List<TdFieldDO> fields, TdFieldDO... tags) {
         if (fields.isEmpty()) {
             return null;
         }
@@ -53,7 +53,7 @@ public class TableManager {
         // 生成字段片段
         StringBuilder sbField = new StringBuilder("time TIMESTAMP,");
 
-        for (TdField field : fields) {
+        for (TdFieldDO field : fields) {
             sbField.append(FieldParser.getFieldDefine(field));
             sbField.append(",");
         }
@@ -63,7 +63,7 @@ public class TableManager {
 
         // 生成tag
         StringBuilder sbTag = new StringBuilder();
-        for (TdField tag : tags) {
+        for (TdFieldDO tag : tags) {
             sbTag.append(FieldParser.getFieldDefine(tag))
                     .append(",");
         }
@@ -76,7 +76,7 @@ public class TableManager {
     /**
      * 获取创建普通表sql
      */
-    public static String getCreateCTableSql(String tbName, List<TdField> fields) {
+    public static String getCreateCTableSql(String tbName, List<TdFieldDO> fields) {
         if (fields.size() == 0) {
             return null;
         }
@@ -84,7 +84,7 @@ public class TableManager {
         //生成字段片段
         StringBuilder sbField = new StringBuilder("time timestamp,");
 
-        for (TdField field : fields) {
+        for (TdFieldDO field : fields) {
             sbField.append(FieldParser.getFieldDefine(field));
             sbField.append(",");
         }
@@ -116,9 +116,9 @@ public class TableManager {
     /**
      * 获取添加字段sql
      */
-    public static String getAddSTableColumnSql(String tbName, List<TdField> fields) {
+    public static String getAddSTableColumnSql(String tbName, List<TdFieldDO> fields) {
         StringBuilder sbAdd = new StringBuilder();
-        for (TdField field : fields) {
+        for (TdFieldDO field : fields) {
             sbAdd.append(String.format(ALTER_STABLE_ADD_COL_TPL,
                     tbName,
                     FieldParser.getFieldDefine(field)
@@ -130,9 +130,9 @@ public class TableManager {
     /**
      * 获取修改字段sql
      */
-    public static String getModifySTableColumnSql(String tbName, List<TdField> fields) {
+    public static String getModifySTableColumnSql(String tbName, List<TdFieldDO> fields) {
         StringBuilder sbModify = new StringBuilder();
-        for (TdField field : fields) {
+        for (TdFieldDO field : fields) {
             sbModify.append(String.format(ALTER_STABLE_MODIFY_COL_TPL,
                     tbName,
                     FieldParser.getFieldDefine(field)
@@ -144,12 +144,12 @@ public class TableManager {
     /**
      * 获取删除字段sql
      */
-    public static String getDropSTableColumnSql(String tbName, List<TdField> fields) {
+    public static String getDropSTableColumnSql(String tbName, List<TdFieldDO> fields) {
         StringBuilder sbDrop = new StringBuilder();
-        for (TdField field : fields) {
+        for (TdFieldDO field : fields) {
             sbDrop.append(String.format(ALTER_STABLE_DROP_COL_TPL,
                     tbName,
-                    field.getName()
+                    field.getFieldName()
             ));
         }
         return sbDrop.toString();

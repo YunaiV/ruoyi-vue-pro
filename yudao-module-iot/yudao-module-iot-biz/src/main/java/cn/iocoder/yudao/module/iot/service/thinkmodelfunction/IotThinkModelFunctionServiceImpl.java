@@ -174,8 +174,10 @@ public class IotThinkModelFunctionServiceImpl implements IotThinkModelFunctionSe
     public void createSuperTableDataModel(Long productId) {
         // 1. 查询产品
         IotProductDO product = productService.getProduct(productId);
+
         // 2. 查询产品的物模型功能列表
         List<IotThinkModelFunctionDO> functionList = thinkModelFunctionMapper.selectListByProductId(productId);
+
         // 3. 生成 TDengine 的数据模型
         dbStructureDataService.createSuperTableDataModel(product, functionList);
     }

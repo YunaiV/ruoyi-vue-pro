@@ -1,19 +1,22 @@
 package cn.iocoder.yudao.module.iot.service.tdengine;
 
-import cn.hutool.json.JSONUtil;
+import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.module.iot.controller.admin.thinkmodelfunction.thingModel.ThingModelProperty;
 import cn.iocoder.yudao.module.iot.controller.admin.thinkmodelfunction.thingModel.ThingModelRespVO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.product.IotProductDO;
-import cn.iocoder.yudao.module.iot.dal.dataobject.tdengine.*;
+import cn.iocoder.yudao.module.iot.dal.dataobject.tdengine.FieldParser;
+import cn.iocoder.yudao.module.iot.dal.dataobject.tdengine.TdFieldDO;
+import cn.iocoder.yudao.module.iot.dal.dataobject.tdengine.TdRestApi;
 import cn.iocoder.yudao.module.iot.dal.dataobject.thinkmodelfunction.IotThinkModelFunctionDO;
-import cn.iocoder.yudao.module.iot.dal.tdengine.TdEngineMapper;
 import cn.iocoder.yudao.module.iot.enums.product.IotProductFunctionTypeEnum;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -22,147 +25,206 @@ import java.util.stream.Collectors;
 public class IotDbStructureDataServiceImpl implements IotDbStructureDataService {
 
     @Resource
-    private TdEngineMapper tdEngineMapper;
+    private TdEngineService tdEngineService;
 
     @Resource
     private TdRestApi tdRestApi;
 
+    @Value("${spring.datasource.dynamic.datasource.tdengine.url}")
+    private String url;
+
     @Override
     public void createSuperTable(ThingModelRespVO thingModel, Integer deviceType) {
-        // 获取物模型中的属性定义
-        List<TdField> fields = FieldParser.parse(thingModel);
-        String tbName = getProductPropertySTableName(deviceType, thingModel.getProductKey());
+        // 1. 解析物模型，获得字段列表
+        List<TdFieldDO> schemaFields = new ArrayList<>();
+        schemaFields.add(TdFieldDO.builder().
+                fieldName("time").
+                dataType("TIMESTAMP").
+                build());
+        schemaFields.addAll(FieldParser.parse(thingModel));
 
-        // 生成创建超级表的 SQL
-        String sql = TableManager.getCreateSTableSql(tbName, fields, new TdField("device_id", "NCHAR", 64));
-        if (sql == null) {
-            log.warn("生成的 SQL 为空，无法创建超级表");
-            return;
-        }
-        log.info("执行 SQL: {}", sql);
+        // 3. 设置超级表的标签
+        List<TdFieldDO> tagsFields = new ArrayList<>();
+        tagsFields.add(TdFieldDO.builder().
+                fieldName("product_key").
+                dataType("NCHAR").
+                dataLength(64).
+                build());
+        tagsFields.add(TdFieldDO.builder().
+                fieldName("device_key").
+                dataType("NCHAR").
+                dataLength(64).
+                build());
+        tagsFields.add(TdFieldDO.builder().
+                fieldName("device_name").
+                dataType("NCHAR").
+                dataLength(64).
+                build());
+        // 年
+        tagsFields.add(TdFieldDO.builder().
+                fieldName("year").
+                dataType("INT").
+                build());
+        // 月
+        tagsFields.add(TdFieldDO.builder().
+                fieldName("month").
+                dataType("INT").
+                build());
+        // 日
+        tagsFields.add(TdFieldDO.builder().
+                fieldName("day").
+                dataType("INT").
+                build());
+        // 时
+        tagsFields.add(TdFieldDO.builder().
+                fieldName("hour").
+                dataType("INT").
+                build());
 
-        // 执行 SQL 创建超级表
-        tdEngineMapper.createSuperTableDevice(sql);
+
+        // 4. 获取超级表的名称
+        String superTableName = getProductPropertySTableName(deviceType, thingModel.getProductKey());
+
+        // 5. 创建超级表
+        String dataBaseName = url.substring(url.lastIndexOf("/") + 1);
+        tdEngineService.createSuperTable(schemaFields, tagsFields, dataBaseName, superTableName);
     }
 
     @Override
     public void updateSuperTable(ThingModelRespVO thingModel, Integer deviceType) {
         try {
-            // 获取旧字段信息
             String tbName = getProductPropertySTableName(deviceType, thingModel.getProductKey());
-            String sql = TableManager.getDescTableSql(tbName);
-            TdResponse response = tdRestApi.execSql(sql);
-            if (response.getCode() != TdResponse.CODE_SUCCESS) {
-                throw new RuntimeException("获取表描述错误: " + JSONUtil.toJsonStr(response));
-            }
+            List<TdFieldDO> oldFields = getTableFields(tbName);
+            List<TdFieldDO> newFields = FieldParser.parse(thingModel);
 
-            List<TdField> oldFields = FieldParser.parse(response.getData());
-            List<TdField> newFields = FieldParser.parse(thingModel);
-
-            // 找出新增的字段
-            List<TdField> addFields = newFields.stream()
-                    .filter(f -> oldFields.stream().noneMatch(old -> old.getName().equals(f.getName())))
-                    .collect(Collectors.toList());
-            if (!addFields.isEmpty()) {
-                sql = TableManager.getAddSTableColumnSql(tbName, addFields);
-                response = tdRestApi.execSql(sql);
-                if (response.getCode() != TdResponse.CODE_SUCCESS) {
-                    throw new RuntimeException("添加表字段错误: " + JSONUtil.toJsonStr(response));
-                }
-            }
-
-            // 找出修改的字段
-            List<TdField> modifyFields = newFields.stream()
-                    .filter(f -> oldFields.stream().anyMatch(old ->
-                            old.getName().equals(f.getName()) &&
-                                    (!old.getType().equals(f.getType()) || old.getLength() != f.getLength())))
-                    .collect(Collectors.toList());
-            if (!modifyFields.isEmpty()) {
-                sql = TableManager.getModifySTableColumnSql(tbName, modifyFields);
-                response = tdRestApi.execSql(sql);
-                if (response.getCode() != TdResponse.CODE_SUCCESS) {
-                    throw new RuntimeException("修改表字段错误: " + JSONUtil.toJsonStr(response));
-                }
-            }
-
-            // 找出删除的字段
-            List<TdField> dropFields = oldFields.stream()
-                    .filter(f -> !"time".equals(f.getName()) && !"device_id".equals(f.getName()) &&
-                            newFields.stream().noneMatch(n -> n.getName().equals(f.getName())))
-                    .collect(Collectors.toList());
-            if (!dropFields.isEmpty()) {
-                sql = TableManager.getDropSTableColumnSql(tbName, dropFields);
-                response = tdRestApi.execSql(sql);
-                if (response.getCode() != TdResponse.CODE_SUCCESS) {
-                    throw new RuntimeException("删除表字段错误: " + JSONUtil.toJsonStr(response));
-                }
-            }
+            updateTableFields(tbName, oldFields, newFields);
         } catch (Throwable e) {
             log.error("更新物模型超级表失败", e);
         }
     }
 
+    // 获取表字段
+    private List<TdFieldDO> getTableFields(String tableName) {
+        List<TdFieldDO> fields = new ArrayList<>();
+        // 获取超级表的描述信息
+        List<Map<String, Object>> maps = tdEngineService.describeSuperTable(url.substring(url.lastIndexOf("/") + 1), tableName);
+        if (maps != null) {
+            // 过滤掉 note 字段为 TAG 的记录
+            maps = maps.stream().filter(map -> !"TAG".equals(map.get("note"))).toList();
+            // 过滤掉 time 字段
+            maps = maps.stream().filter(map -> !"time".equals(map.get("field"))).toList();
+            // 解析字段信息
+            fields = FieldParser.parse(maps.stream()
+                    .map(map -> List.of(map.get("field"), map.get("type"), map.get("length")))
+                    .collect(Collectors.toList()));
+        }
+        return fields;
+    }
+
+    // 更新表字段
+    private void updateTableFields(String tableName, List<TdFieldDO> oldFields, List<TdFieldDO> newFields) {
+        // 获取新增字段
+        List<TdFieldDO> addFields = getAddFields(oldFields, newFields);
+        // 获取修改字段
+        List<TdFieldDO> modifyFields = getModifyFields(oldFields, newFields);
+        // 获取删除字段
+        List<TdFieldDO> dropFields = getDropFields(oldFields, newFields);
+
+        String dataBaseName = url.substring(url.lastIndexOf("/") + 1);
+        // 添加新增字段
+        if (CollUtil.isNotEmpty(addFields)) {
+            tdEngineService.addColumnForSuperTable(dataBaseName,tableName, addFields);
+        }
+        // 删除旧字段
+        if (CollUtil.isNotEmpty(dropFields)) {
+            tdEngineService.dropColumnForSuperTable(dataBaseName,tableName, dropFields);
+        }
+        // 修改字段（先删除再添加）
+        if (CollUtil.isNotEmpty(modifyFields)) {
+            tdEngineService.dropColumnForSuperTable(dataBaseName,tableName, modifyFields);
+            tdEngineService.addColumnForSuperTable(dataBaseName,tableName, modifyFields);
+        }
+    }
+
+    // 获取新增字段
+    private List<TdFieldDO> getAddFields(List<TdFieldDO> oldFields, List<TdFieldDO> newFields) {
+        return newFields.stream()
+                .filter(f -> oldFields.stream().noneMatch(old -> old.getFieldName().equals(f.getFieldName())))
+                .collect(Collectors.toList());
+    }
+
+    // 获取修改字段
+    private List<TdFieldDO> getModifyFields(List<TdFieldDO> oldFields, List<TdFieldDO> newFields) {
+        return newFields.stream()
+                .filter(f -> oldFields.stream().anyMatch(old ->
+                        old.getFieldName().equals(f.getFieldName()) &&
+                                (!old.getDataType().equals(f.getDataType()) || !Objects.equals(old.getDataLength(), f.getDataLength()))))
+                .collect(Collectors.toList());
+    }
+
+    // 获取删除字段
+    private List<TdFieldDO> getDropFields(List<TdFieldDO> oldFields, List<TdFieldDO> newFields) {
+        return oldFields.stream()
+                .filter(f -> !"time".equals(f.getFieldName()) && !"device_id".equals(f.getFieldName()) &&
+                        newFields.stream().noneMatch(n -> n.getFieldName().equals(f.getFieldName())))
+                .collect(Collectors.toList());
+    }
+
     @Override
     public void createSuperTableDataModel(IotProductDO product, List<IotThinkModelFunctionDO> functionList) {
-        // 1. 生成 ThingModelRespVO
-        ThingModelRespVO thingModel = new ThingModelRespVO();
-        thingModel.setId(product.getId());
-        thingModel.setProductKey(product.getProductKey());
+        ThingModelRespVO thingModel = buildThingModel(product, functionList);
 
-        // 1.1 设置属性、服务和事件
-        ThingModelRespVO.Model model = new ThingModelRespVO.Model();
-        List<ThingModelProperty> properties = new ArrayList<>();
-
-        // 1.2 遍历功能列表并分类
-        for (IotThinkModelFunctionDO function : functionList) {
-            if (Objects.requireNonNull(IotProductFunctionTypeEnum.valueOf(function.getType())) == IotProductFunctionTypeEnum.PROPERTY) {
-                ThingModelProperty property = new ThingModelProperty();
-                property.setIdentifier(function.getIdentifier());
-                property.setName(function.getName());
-                property.setDescription(function.getDescription());
-                property.setDataType(function.getProperty().getDataType());
-                properties.add(property);
-            }
-        }
-
-        // 1.3 判断属性列表是否为空
-        if (properties.isEmpty()) {
+        if (thingModel.getModel().getProperties().isEmpty()) {
             log.warn("物模型属性列表为空，不创建超级表");
             return;
         }
 
-        model.setProperties(properties);
-        thingModel.setModel(model);
+        String superTableName = getProductPropertySTableName(product.getDeviceType(), product.getProductKey());
+        String dataBaseName = url.substring(url.lastIndexOf("/") + 1);
+        Integer tableExists = tdEngineService.checkSuperTableExists(dataBaseName, superTableName);
 
-        // 2. 判断是否已经创建,如果已经创建则进行更新
-        String tbName = getProductPropertySTableName(product.getDeviceType(), product.getProductKey());
-        Integer iot = tdEngineMapper.checkTableExists("ruoyi_vue_pro", tbName);
-        if (iot != null && iot > 0) {
-            // 3. 更新
+        if (tableExists != null && tableExists > 0) {
             updateSuperTable(thingModel, product.getDeviceType());
         } else {
-            // 4. 创建
             createSuperTable(thingModel, product.getDeviceType());
         }
     }
 
-    /**
-     * 根据产品key获取产品属性超级表名
-     */
-    static String getProductPropertySTableName(Integer deviceType, String productKey) {
-        if (deviceType == 1) {
-            return String.format("gateway_sub_" + productKey).toLowerCase();
-        } else if (deviceType == 2) {
-            return String.format("gateway_" + productKey).toLowerCase();
-        } else {
-            return String.format("device_" + productKey).toLowerCase();
-        }
+    private ThingModelRespVO buildThingModel(IotProductDO product, List<IotThinkModelFunctionDO> functionList) {
+        ThingModelRespVO thingModel = new ThingModelRespVO();
+        thingModel.setId(product.getId());
+        thingModel.setProductKey(product.getProductKey());
+
+        ThingModelRespVO.Model model = new ThingModelRespVO.Model();
+        List<ThingModelProperty> properties = functionList.stream()
+                .filter(function -> IotProductFunctionTypeEnum.PROPERTY.equals(IotProductFunctionTypeEnum.valueOf(function.getType())))
+                .map(this::buildThingModelProperty)
+                .collect(Collectors.toList());
+
+        model.setProperties(properties);
+        thingModel.setModel(model);
+
+        return thingModel;
     }
 
-    /**
-     * 根据deviceId获取设备属性表名
-     */
+    private ThingModelProperty buildThingModelProperty(IotThinkModelFunctionDO function) {
+        ThingModelProperty property = new ThingModelProperty();
+        property.setIdentifier(function.getIdentifier());
+        property.setName(function.getName());
+        property.setDescription(function.getDescription());
+        property.setDataType(function.getProperty().getDataType());
+        return property;
+    }
+
+    static String getProductPropertySTableName(Integer deviceType, String productKey) {
+        return switch (deviceType) {
+            case 1 -> String.format("gateway_sub_%s", productKey).toLowerCase();
+            case 2 -> String.format("gateway_%s", productKey).toLowerCase();
+            default -> String.format("device_%s", productKey).toLowerCase();
+        };
+    }
+
     static String getDevicePropertyTableName(String deviceType, String productKey, String deviceKey) {
-        return String.format(deviceType + "_" + productKey + "_" + deviceKey).toLowerCase();
+        return String.format("%s_%s_%s", deviceType, productKey, deviceKey).toLowerCase();
     }
 }
