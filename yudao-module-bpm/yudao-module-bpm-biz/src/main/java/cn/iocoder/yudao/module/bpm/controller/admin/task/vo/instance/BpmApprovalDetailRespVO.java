@@ -19,8 +19,8 @@ public class BpmApprovalDetailRespVO {
     @Schema(description = "流程实例的状态", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     private Integer status; // 参见 BpmProcessInstanceStatusEnum 枚举
 
-    @Schema(description = "审批信息列表", requiredMode = Schema.RequiredMode.REQUIRED)
-    private List<NodeInfo> approveNodes;
+    @Schema(description = "活动节点列表", requiredMode = Schema.RequiredMode.REQUIRED)
+    private List<ActivityNode> activityNodes;
 
     @Schema(description = "表单字段权限")
     private Map<String, String> formFieldsPermission;
@@ -38,9 +38,9 @@ public class BpmApprovalDetailRespVO {
      */
     private BpmProcessInstanceRespVO processInstance;
 
-    @Schema(description = "审批节点信息")
+    @Schema(description = "活动节点信息")
     @Data
-    public static class NodeInfo {
+    public static class ActivityNode {
 
         @Schema(description = "节点编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "StartUserNode")
         private String id;
@@ -60,7 +60,7 @@ public class BpmApprovalDetailRespVO {
         private LocalDateTime endTime;
 
         @Schema(description = "审批节点的任务信息")
-        private List<ApprovalTaskInfo> tasks;
+        private List<ActivityNodeTask> tasks;
 
         @Schema(description = "候选人用户 ID 列表", requiredMode = Schema.RequiredMode.NOT_REQUIRED, example = "1818")
         @JsonIgnore // 不返回，只是方便后续读取，赋值给 candidateUsers
@@ -71,9 +71,9 @@ public class BpmApprovalDetailRespVO {
 
     }
 
-    @Schema(description = "审批任务信息")
+    @Schema(description = "活动节点的任务信息")
     @Data
-    public static class ApprovalTaskInfo {
+    public static class ActivityNodeTask {
 
         @Schema(description = "任务编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
         private String id;

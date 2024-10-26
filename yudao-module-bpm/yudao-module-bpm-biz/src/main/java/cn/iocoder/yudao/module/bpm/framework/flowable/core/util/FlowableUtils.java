@@ -99,6 +99,16 @@ public class FlowableUtils {
     }
 
     /**
+     * 获得流程实例的审批原因
+     *
+     * @param processInstance 流程实例
+     * @return 审批原因
+     */
+    public static String getProcessInstanceReason(HistoricProcessInstance processInstance) {
+        return (String) processInstance.getProcessVariables().get(BpmnVariableConstants.PROCESS_INSTANCE_VARIABLE_REASON);
+    }
+
+    /**
      * 获得流程实例的表单
      *
      * @param processInstance 流程实例
