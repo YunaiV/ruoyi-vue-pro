@@ -15,11 +15,11 @@ public class BpmApprovalDetailReqVO {
     @Schema(description = "流程定义的编号", example = "1024")
     private String processDefinitionId; // 使用场景：发起流程时，传流程定义 ID
 
+    @Schema(description = "流程变量")
+    private Map<String, Object> processVariables; // 使用场景：同 processDefinitionId，用于流程预测
+
     @Schema(description = "流程实例的编号", example = "1024")
     private String processInstanceId;  // 使用场景：流程已发起时候传流程实例 ID
-
-    @Schema(description = "流程变量")
-    private Map<String, Object> processVariable; // 使用场景：同 processDefinitionId，用于流程预测
 
     // TODO @芋艿：如果未来 BPMN 增加流程图，它没有发起人节点，会有问题。
     @Schema(description = "流程活动编号", example = "StartUserNode")

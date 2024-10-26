@@ -20,7 +20,7 @@ public class BpmApprovalDetailRespVO {
     private Integer status; // 参见 BpmProcessInstanceStatusEnum 枚举
 
     @Schema(description = "审批信息列表", requiredMode = Schema.RequiredMode.REQUIRED)
-    private List<ApprovalNodeInfo> approveNodes;
+    private List<NodeInfo> approveNodes;
 
     @Schema(description = "表单字段权限")
     private Map<String, String> formFieldsPermission;
@@ -40,7 +40,7 @@ public class BpmApprovalDetailRespVO {
 
     @Schema(description = "审批节点信息")
     @Data
-    public static class ApprovalNodeInfo {
+    public static class NodeInfo {
 
         @Schema(description = "节点编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "StartUserNode")
         private String id;
@@ -62,8 +62,12 @@ public class BpmApprovalDetailRespVO {
         @Schema(description = "审批节点的任务信息")
         private List<ApprovalTaskInfo> tasks;
 
+        @Schema(description = "候选人用户 ID 列表", requiredMode = Schema.RequiredMode.NOT_REQUIRED, example = "1818")
+        @JsonIgnore // 不返回，只是方便后续读取，赋值给 candidateUsers
+        private List<Long> candidateUserIds;
+
         @Schema(description = "候选人用户列表")
-        private List<UserSimpleBaseVO> candidateUsers; // 用于未运行任务节点
+        private List<UserSimpleBaseVO> candidateUsers; // 只包含未生成 ApprovalTaskInfo 的用户列表
 
     }
 

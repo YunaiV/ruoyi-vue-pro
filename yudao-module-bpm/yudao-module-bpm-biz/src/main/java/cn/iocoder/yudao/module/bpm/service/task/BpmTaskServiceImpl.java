@@ -39,6 +39,7 @@ import org.flowable.engine.HistoryService;
 import org.flowable.engine.ManagementService;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.TaskService;
+import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.task.api.DelegationState;
@@ -377,12 +378,14 @@ public class BpmTaskServiceImpl implements BpmTaskService {
     }
 
     @Override
-    public Map<String, String> getTaskNameByTaskIds(Collection<String> taskIds) {
-        if (CollUtil.isEmpty(taskIds)) {
-            return Collections.emptyMap();
-        }
-        List<Task> tasks = taskService.createTaskQuery().taskIds(taskIds).list();
-        return convertMap(tasks, Task::getId, Task::getName);
+    public List<HistoricActivityInstance> getActivityListByProcessInstanceId(String processInstanceId) {
+        return historyService.createHistoricActivityInstanceQuery().processInstanceId(processInstanceId)
+                .orderByHistoricActivityInstanceStartTime().asc().list();
+    }
+
+    @Override
+    public List<HistoricActivityInstance> getHistoricActivityListByExecutionId(String executionId) {
+        return historyService.createHistoricActivityInstanceQuery().executionId(executionId).list();
     }
 
     // ========== Update 写入相关方法 ==========
