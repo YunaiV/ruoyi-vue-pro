@@ -6,6 +6,7 @@ import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
 import cn.iocoder.yudao.framework.common.util.number.NumberUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.process.BpmProcessDefinitionRespVO;
+import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.instance.BpmApprovalDetailRespVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.instance.BpmProcessInstanceBpmnModelViewRespVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.instance.BpmProcessInstanceRespVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.task.BpmTaskRespVO;
@@ -159,6 +160,14 @@ public interface BpmProcessInstanceConvert {
             userVO.setDeptName(dept.getName());
         }
         return userVO;
+    }
+
+    default BpmApprovalDetailRespVO.ApprovalTaskInfo buildApprovalTaskInfo(HistoricTaskInstance task) {
+        if (task == null) {
+            return null;
+        }
+        return BeanUtils.toBean(task, BpmApprovalDetailRespVO.ApprovalTaskInfo.class)
+                .setStatus(FlowableUtils.getTaskStatus(task)).setReason(FlowableUtils.getTaskReason(task));
     }
 
 }

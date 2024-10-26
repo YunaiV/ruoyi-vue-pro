@@ -104,10 +104,20 @@ public class FlowableUtils {
      * @param processInstance 流程实例
      * @return 表单
      */
+    public static Map<String, Object> getProcessInstanceFormVariable(ProcessInstance processInstance) {
+        Map<String, Object> processVariables = new HashMap<>(processInstance.getProcessVariables());
+        return filterProcessInstanceFormVariable(processVariables);
+    }
+
+    /**
+     * 获得流程实例的表单
+     *
+     * @param processInstance 流程实例
+     * @return 表单
+     */
     public static Map<String, Object> getProcessInstanceFormVariable(HistoricProcessInstance processInstance) {
-        Map<String, Object> formVariables = new HashMap<>(processInstance.getProcessVariables());
-        filterProcessInstanceFormVariable(formVariables);
-        return formVariables;
+        Map<String, Object> processVariables = new HashMap<>(processInstance.getProcessVariables());
+        return filterProcessInstanceFormVariable(processVariables);
     }
 
     /**
