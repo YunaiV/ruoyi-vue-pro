@@ -64,4 +64,13 @@ public interface IotDeviceService {
      * @return 设备数量
      */
     Long getDeviceCountByProductId(Long productId);
+
+    /**
+     * 根据产品 key 和设备名称，获得设备信息
+     *
+     * @param productKey 产品 key
+     * @param deviceName 设备名称
+     * @return 设备信息
+     */
+    IotDeviceDO getDeviceByProductKeyAndDeviceName(String productKey, String deviceName);
 }

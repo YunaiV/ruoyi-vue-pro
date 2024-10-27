@@ -2,9 +2,10 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="cn.iocoder.yudao.module.iot.dal.tdengine.TdEngineMapper">
+    <!-- TODO 对 $ 符号有安全要求的话，后期改为接口方式 -->
 
     <update id="createDatabase" parameterType="String">
-        create database if not exists #{dataBaseName}
+        CREATE DATABASE IF NOT EXISTS ${dataBaseName}
     </update>
 
     <update id="createSuperTable">
@@ -271,7 +272,8 @@
     <select id="getCountByTimestamp" parameterType="cn.iocoder.yudao.module.iot.domain.SelectDto"
             resultType="java.util.Map">
         SELECT count(0) AS count
-        FROM #{dataBaseName}.#{tableName} WHERE ${fieldName} BETWEEN #{startTime} AND #{endTime}
+        FROM #{dataBaseName}.#{tableName}
+        WHERE ${fieldName} BETWEEN #{startTime} AND #{endTime}
     </select>
 
     <select id="showSuperTables" resultType="java.util.Map">
@@ -287,26 +289,30 @@
     <select id="getLastDataByTags" parameterType="cn.iocoder.yudao.module.iot.domain.TagsSelectDao"
             resultType="Map">
         select last(*)
-        from #{dataBaseName}.#{stableName} group by ${tagsName}
+        from #{dataBaseName}.#{stableName}
+        group by ${tagsName}
     </select>
 
     <select id="getHistoryData" resultType="java.util.Map"
             parameterType="cn.iocoder.yudao.module.iot.domain.visual.SelectVisualDto">
         SELECT #{fieldName}, ts
-        FROM #{dataBaseName}.#{tableName} WHERE ts BETWEEN #{startTime} AND #{endTime}
+        FROM #{dataBaseName}.#{tableName}
+        WHERE ts BETWEEN #{startTime} AND #{endTime}
         LIMIT #{num}
     </select>
 
     <select id="getRealtimeData" resultType="java.util.Map"
             parameterType="cn.iocoder.yudao.module.iot.domain.visual.SelectVisualDto">
         SELECT #{fieldName}, ts
-        FROM #{dataBaseName}.#{tableName} LIMIT #{num}
+        FROM #{dataBaseName}.#{tableName}
+        LIMIT #{num}
     </select>
 
     <select id="getAggregateData" resultType="java.util.Map"
             parameterType="cn.iocoder.yudao.module.iot.domain.visual.SelectVisualDto">
         SELECT #{aggregate}(${fieldName})
-        FROM #{dataBaseName}.#{tableName} WHERE ts BETWEEN #{startTime} AND #{endTime} interval (${interval})
+        FROM #{dataBaseName}.#{tableName}
+        WHERE ts BETWEEN #{startTime} AND #{endTime} interval (${interval})
         LIMIT #{num}
     </select>
 

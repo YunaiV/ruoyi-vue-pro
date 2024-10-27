@@ -12,7 +12,7 @@ import java.util.Map;
 /**
  * TdEngineService
  */
-public interface TdEngineService {
+public interface IotTdEngineService {
 
     /**
      * 创建数据库
@@ -45,20 +45,20 @@ public interface TdEngineService {
     /**
      * 为超级表添加列
      *
-     * @param dataBaseName 数据库名称
+     * @param dataBaseName   数据库名称
      * @param superTableName 超级表名称
      * @param fieldsVo       字段信息
      */
-    void addColumnForSuperTable(String dataBaseName,String superTableName, List<TdFieldDO> fieldsVo);
+    void addColumnForSuperTable(String dataBaseName, String superTableName, List<TdFieldDO> fieldsVo);
 
     /**
      * 为超级表删除列
      *
-     * @param dataBaseName 数据库名称
+     * @param dataBaseName   数据库名称
      * @param superTableName 超级表名称
      * @param fieldsVo       字段信息
      */
-    void dropColumnForSuperTable(String dataBaseName,String superTableName, List<TdFieldDO> fieldsVo);
+    void dropColumnForSuperTable(String dataBaseName, String superTableName, List<TdFieldDO> fieldsVo);
 
     /**
      * 为超级表添加tag

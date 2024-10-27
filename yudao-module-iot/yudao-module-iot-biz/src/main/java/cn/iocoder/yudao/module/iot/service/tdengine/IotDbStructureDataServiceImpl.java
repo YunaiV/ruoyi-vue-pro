@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
 public class IotDbStructureDataServiceImpl implements IotDbStructureDataService {
 
     @Resource
-    private TdEngineService tdEngineService;
+    private IotTdEngineService iotTdEngineService;
 
     @Resource
     private TdRestApi tdRestApi;
@@ -87,7 +87,7 @@ public class IotDbStructureDataServiceImpl implements IotDbStructureDataService 
 
         // 5. 创建超级表
         String dataBaseName = url.substring(url.lastIndexOf("/") + 1);
-        tdEngineService.createSuperTable(schemaFields, tagsFields, dataBaseName, superTableName);
+        iotTdEngineService.createSuperTable(schemaFields, tagsFields, dataBaseName, superTableName);
     }
 
     @Override
@@ -107,7 +107,7 @@ public class IotDbStructureDataServiceImpl implements IotDbStructureDataService 
     private List<TdFieldDO> getTableFields(String tableName) {
         List<TdFieldDO> fields = new ArrayList<>();
         // 获取超级表的描述信息
-        List<Map<String, Object>> maps = tdEngineService.describeSuperTable(url.substring(url.lastIndexOf("/") + 1), tableName);
+        List<Map<String, Object>> maps = iotTdEngineService.describeSuperTable(url.substring(url.lastIndexOf("/") + 1), tableName);
         if (maps != null) {
             // 过滤掉 note 字段为 TAG 的记录
             maps = maps.stream().filter(map -> !"TAG".equals(map.get("note"))).toList();
@@ -133,16 +133,16 @@ public class IotDbStructureDataServiceImpl implements IotDbStructureDataService 
         String dataBaseName = url.substring(url.lastIndexOf("/") + 1);
         // 添加新增字段
         if (CollUtil.isNotEmpty(addFields)) {
-            tdEngineService.addColumnForSuperTable(dataBaseName,tableName, addFields);
+            iotTdEngineService.addColumnForSuperTable(dataBaseName, tableName, addFields);
         }
         // 删除旧字段
         if (CollUtil.isNotEmpty(dropFields)) {
-            tdEngineService.dropColumnForSuperTable(dataBaseName,tableName, dropFields);
+            iotTdEngineService.dropColumnForSuperTable(dataBaseName, tableName, dropFields);
         }
         // 修改字段（先删除再添加）
         if (CollUtil.isNotEmpty(modifyFields)) {
-            tdEngineService.dropColumnForSuperTable(dataBaseName,tableName, modifyFields);
-            tdEngineService.addColumnForSuperTable(dataBaseName,tableName, modifyFields);
+            iotTdEngineService.dropColumnForSuperTable(dataBaseName, tableName, modifyFields);
+            iotTdEngineService.addColumnForSuperTable(dataBaseName, tableName, modifyFields);
         }
     }
 
@@ -181,7 +181,7 @@ public class IotDbStructureDataServiceImpl implements IotDbStructureDataService 
 
         String superTableName = getProductPropertySTableName(product.getDeviceType(), product.getProductKey());
         String dataBaseName = url.substring(url.lastIndexOf("/") + 1);
-        Integer tableExists = tdEngineService.checkSuperTableExists(dataBaseName, superTableName);
+        Integer tableExists = iotTdEngineService.checkSuperTableExists(dataBaseName, superTableName);
 
         if (tableExists != null && tableExists > 0) {
             updateSuperTable(thingModel, product.getDeviceType());

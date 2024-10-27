@@ -1,5 +1,8 @@
 package cn.iocoder.yudao.module.iot.emq.service;
 
+import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
+import cn.iocoder.yudao.module.iot.service.device.IotDeviceDataService;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
@@ -16,13 +19,20 @@ import org.springframework.stereotype.Service;
 @Service
 public class EmqxServiceImpl implements EmqxService {
 
+    @Resource
+    private IotDeviceDataService iotDeviceDataService;
+
     // TODO 多线程处理消息
     @Override
     public void subscribeCallback(String topic, MqttMessage mqttMessage) {
         log.info("收到消息，主题: {}, 内容: {}", topic, new String(mqttMessage.getPayload()));
         // 根据不同的主题，处理不同的业务逻辑
         if (topic.contains("/property/post")) {
-            // 设备上报数据
+            // 设备上报数据 topic /sys/f13f57c63e9/dianbiao1/thing/event/property/post
+            String productKey = topic.split("/")[2];
+            String deviceName = topic.split("/")[3];
+            String message = new String(mqttMessage.getPayload());
+            iotDeviceDataService.saveDeviceData(productKey, deviceName, message);
         }
     }
 
@@ -30,7 +40,7 @@ public class EmqxServiceImpl implements EmqxService {
     public void subscribe(MqttClient client) {
         try {
             // 订阅默认主题，可以根据需要修改
-//            client.subscribe("$share/yudao/+/+/#", 1);
+            client.subscribe("/sys/+/+/#", 1);
             log.info("订阅默认主题成功");
         } catch (Exception e) {
             log.error("订阅默认主题失败", e);

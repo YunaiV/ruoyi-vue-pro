@@ -15,7 +15,7 @@ import java.util.Map;
 
 @Service
 @Slf4j
-public class TdEngineServiceImpl implements TdEngineService {
+public class IotTdEngineServiceImpl implements IotTdEngineService {
 
     @Resource
     private TdEngineMapper tdEngineMapper;

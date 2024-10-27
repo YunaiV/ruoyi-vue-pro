@@ -4,6 +4,7 @@ import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
+import cn.iocoder.yudao.framework.tenant.core.aop.TenantIgnore;
 import cn.iocoder.yudao.module.iot.controller.admin.device.vo.IotDevicePageReqVO;
 import cn.iocoder.yudao.module.iot.controller.admin.device.vo.IotDeviceSaveReqVO;
 import cn.iocoder.yudao.module.iot.controller.admin.device.vo.IotDeviceStatusUpdateReqVO;
@@ -32,7 +33,7 @@ import static cn.iocoder.yudao.module.iot.enums.ErrorCodeConstants.*;
 @Service
 @Validated
 @Slf4j
-public class DeviceServiceImpl implements IotDeviceService {
+public class IotDeviceServiceImpl implements IotDeviceService {
 
     @Resource
     private IotDeviceMapper deviceMapper;
@@ -222,6 +223,12 @@ public class DeviceServiceImpl implements IotDeviceService {
     @Override
     public Long getDeviceCountByProductId(Long productId) {
         return deviceMapper.selectCountByProductId(productId);
+    }
+
+    @Override
+    @TenantIgnore
+    public IotDeviceDO getDeviceByProductKeyAndDeviceName(String productKey, String deviceName) {
+        return deviceMapper.selectByProductKeyAndDeviceName(productKey, deviceName);
     }
 
 }
