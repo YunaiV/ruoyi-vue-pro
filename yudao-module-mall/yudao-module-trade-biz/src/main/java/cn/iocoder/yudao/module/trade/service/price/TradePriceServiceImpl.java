@@ -122,7 +122,7 @@ public class TradePriceServiceImpl implements TradePriceService {
             List<ProductSkuRespDTO> skuList = spuIdAndSkuListMap.get(spuId);
             List<AppTradeProductSettlementRespVO.Sku> skuVOList = convertList(skuList, sku -> {
                 AppTradeProductSettlementRespVO.Sku skuVO = new AppTradeProductSettlementRespVO.Sku()
-                        .setId(sku.getId()).setPromotionPrice(sku.getPrice());
+                        .setId(sku.getId());
                 TradePriceCalculateRespBO.OrderItem orderItem = new TradePriceCalculateRespBO.OrderItem()
                         .setPayPrice(sku.getPrice()).setCount(1);
                 // 计算限时折扣的优惠价格
