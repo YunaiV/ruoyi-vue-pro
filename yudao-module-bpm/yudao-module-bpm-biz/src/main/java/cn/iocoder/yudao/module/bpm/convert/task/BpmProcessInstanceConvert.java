@@ -4,6 +4,7 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
+import cn.iocoder.yudao.framework.common.util.collection.SetUtils;
 import cn.iocoder.yudao.framework.common.util.number.NumberUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.bpm.controller.admin.base.user.UserSimpleBaseVO;
@@ -198,6 +199,16 @@ public interface BpmProcessInstanceConvert {
             CollUtil.addAll(userIds, convertSet(activityNode.getTasks(), BpmApprovalDetailRespVO.ActivityNodeTask::getOwner));
             CollUtil.addAll(userIds, activityNode.getCandidateUserIds());
         }
+        return userIds;
+    }
+
+    default Set<Long> parseUserIds02(HistoricProcessInstance processInstance,
+                                     List<HistoricTaskInstance> tasks) {
+        Set<Long> userIds = SetUtils.asSet(Long.valueOf(processInstance.getStartUserId()));
+        tasks.forEach(task -> {
+            CollUtil.addIfAbsent(userIds, NumberUtils.parseLong((task.getAssignee())));
+            CollUtil.addIfAbsent(userIds, NumberUtils.parseLong((task.getOwner())));
+        });
         return userIds;
     }
 
