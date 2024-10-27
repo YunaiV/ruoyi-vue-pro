@@ -30,6 +30,11 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = true)
 public class CouponTemplateDO extends BaseDO {
 
+    /**
+     * 不限制领取数量
+     */
+    public static final Integer TIME_LIMIT_COUNT_MAX = -1;
+
     // ========== 基本信息 BEGIN ==========
     /**
      * 模板编号，自增唯一
