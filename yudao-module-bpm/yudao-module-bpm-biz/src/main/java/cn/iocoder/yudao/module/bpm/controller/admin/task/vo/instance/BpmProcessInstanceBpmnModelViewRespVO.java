@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.bpm.controller.admin.task.vo.instance;
 
+import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.simple.BpmSimpleModelNodeVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.task.BpmTaskRespVO;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
@@ -21,6 +22,9 @@ public class BpmProcessInstanceBpmnModelViewRespVO {
 
     @Schema(description = "BPMN XML", requiredMode = Schema.RequiredMode.REQUIRED)
     private String bpmnXml;
+
+    @Schema(description = "SIMPLE 模型")
+    private BpmSimpleModelNodeVO simpleModel;
 
     // ========== 进度信息 ==========
 
