@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.bpm.controller.admin.task.vo.task;
 
-import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.instance.BpmProcessInstanceRespVO;
+import cn.iocoder.yudao.module.bpm.controller.admin.base.user.UserSimpleBaseVO;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
@@ -36,11 +36,11 @@ public class BpmTaskRespVO {
     /**
      * 负责人的用户信息
      */
-    private BpmProcessInstanceRespVO.User ownerUser;
+    private UserSimpleBaseVO ownerUser;
     /**
      * 审核的用户信息
      */
-    private BpmProcessInstanceRespVO.User assigneeUser;
+    private UserSimpleBaseVO assigneeUser;
 
     @Schema(description = "任务定义的标识", requiredMode = Schema.RequiredMode.REQUIRED, example = "Activity_one")
     private String taskDefinitionKey;
@@ -55,7 +55,7 @@ public class BpmTaskRespVO {
     @Schema(description = "父任务编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     private String parentTaskId;
     @Schema(description = "子任务列表（由加签生成）", requiredMode = Schema.RequiredMode.REQUIRED, example = "childrenTask")
-    private List<BpmTaskRespVO> children;
+    private List<BpmTaskRespVO> children; // 由加签生成，包含多层子任务
 
     @Schema(description = "表单编号", example = "1024")
     private Long formId;
@@ -89,7 +89,7 @@ public class BpmTaskRespVO {
         /**
          * 发起人的用户信息
          */
-        private BpmProcessInstanceRespVO.User startUser;
+        private UserSimpleBaseVO startUser;
 
     }
 

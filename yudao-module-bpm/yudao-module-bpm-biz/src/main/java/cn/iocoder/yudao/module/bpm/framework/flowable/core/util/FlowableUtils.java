@@ -99,15 +99,35 @@ public class FlowableUtils {
     }
 
     /**
+     * 获得流程实例的审批原因
+     *
+     * @param processInstance 流程实例
+     * @return 审批原因
+     */
+    public static String getProcessInstanceReason(HistoricProcessInstance processInstance) {
+        return (String) processInstance.getProcessVariables().get(BpmnVariableConstants.PROCESS_INSTANCE_VARIABLE_REASON);
+    }
+
+    /**
+     * 获得流程实例的表单
+     *
+     * @param processInstance 流程实例
+     * @return 表单
+     */
+    public static Map<String, Object> getProcessInstanceFormVariable(ProcessInstance processInstance) {
+        Map<String, Object> processVariables = new HashMap<>(processInstance.getProcessVariables());
+        return filterProcessInstanceFormVariable(processVariables);
+    }
+
+    /**
      * 获得流程实例的表单
      *
      * @param processInstance 流程实例
      * @return 表单
      */
     public static Map<String, Object> getProcessInstanceFormVariable(HistoricProcessInstance processInstance) {
-        Map<String, Object> formVariables = new HashMap<>(processInstance.getProcessVariables());
-        filterProcessInstanceFormVariable(formVariables);
-        return formVariables;
+        Map<String, Object> processVariables = new HashMap<>(processInstance.getProcessVariables());
+        return filterProcessInstanceFormVariable(processVariables);
     }
 
     /**
@@ -191,7 +211,8 @@ public class FlowableUtils {
      * @return 是否
      */
     public static boolean isAssignUserTask(Long userId, Task task) {
-        return ObjectUtil.equal(userId, NumberUtil.parseLong(task.getAssignee(), null));
+        Long assignee = NumberUtil.parseLong(task.getAssignee(), null);
+        return ObjectUtil.equal(userId, assignee);
     }
 
     /**
@@ -202,11 +223,13 @@ public class FlowableUtils {
      * @return 是否
      */
     public static boolean isOwnerUserTask(Long userId, Task task) {
-        return ObjectUtil.equal(userId, NumberUtil.parseLong(task.getOwner(), null));
+        Long assignee = NumberUtil.parseLong(task.getAssignee(), null);
+        return ObjectUtil.equal(userId, assignee);
     }
 
     /**
      * 判断指定用户，是否是当前任务的加签人
+     *
      * @param userId 用户 Id
      * @param task 任务
      * @param  childrenTaskMap 子任务集合

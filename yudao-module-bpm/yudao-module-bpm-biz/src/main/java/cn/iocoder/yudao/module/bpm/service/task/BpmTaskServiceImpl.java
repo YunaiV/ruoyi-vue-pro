@@ -39,6 +39,7 @@ import org.flowable.engine.HistoryService;
 import org.flowable.engine.ManagementService;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.TaskService;
+import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.task.api.DelegationState;
@@ -305,6 +306,38 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         return previousUserList;
     }
 
+    @Override
+    public List<HistoricTaskInstance> getAllChildrenTaskListByParentTaskId(String parentTaskId, List<HistoricTaskInstance> tasks) {
+        if (CollUtil.isEmpty(tasks)) {
+            return Collections.emptyList();
+        }
+        Map<String, List<HistoricTaskInstance>> parentTaskMap = convertMultiMap(
+                filterList(tasks, task -> StrUtil.isNotEmpty(task.getParentTaskId())), HistoricTaskInstance::getParentTaskId);
+        if (CollUtil.isEmpty(parentTaskMap)) {
+            return Collections.emptyList();
+        }
+
+        List<HistoricTaskInstance> result = new ArrayList<>();
+        // 1. 递归获取子级
+        Stack<String> stack = new Stack<>();
+        stack.push(parentTaskId);
+        // 2. 递归遍历
+        for (int i = 0; i < Short.MAX_VALUE; i++) {
+            if (stack.isEmpty()) {
+                break;
+            }
+            // 2.1 获取子任务们
+            String taskId = stack.pop();
+            List<HistoricTaskInstance> childTaskList = filterList(tasks, task -> StrUtil.equals(task.getParentTaskId(), taskId));
+            // 2.2 如果非空，则添加到 stack 进一步递归
+            if (CollUtil.isNotEmpty(childTaskList)) {
+                stack.addAll(convertList(childTaskList, HistoricTaskInstance::getId));
+                result.addAll(childTaskList);
+            }
+        }
+        return result;
+    }
+
     /**
      * 获得所有子任务列表
      *
@@ -377,12 +410,14 @@ public class BpmTaskServiceImpl implements BpmTaskService {
     }
 
     @Override
-    public Map<String, String> getTaskNameByTaskIds(Collection<String> taskIds) {
-        if (CollUtil.isEmpty(taskIds)) {
-            return Collections.emptyMap();
-        }
-        List<Task> tasks = taskService.createTaskQuery().taskIds(taskIds).list();
-        return convertMap(tasks, Task::getId, Task::getName);
+    public List<HistoricActivityInstance> getActivityListByProcessInstanceId(String processInstanceId) {
+        return historyService.createHistoricActivityInstanceQuery().processInstanceId(processInstanceId)
+                .orderByHistoricActivityInstanceStartTime().asc().list();
+    }
+
+    @Override
+    public List<HistoricActivityInstance> getHistoricActivityListByExecutionId(String executionId) {
+        return historyService.createHistoricActivityInstanceQuery().executionId(executionId).list();
     }
 
     // ========== Update 写入相关方法 ==========

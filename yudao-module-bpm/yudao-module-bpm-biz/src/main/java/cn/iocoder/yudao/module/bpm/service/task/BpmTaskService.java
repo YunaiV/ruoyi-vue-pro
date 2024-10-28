@@ -6,6 +6,7 @@ import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.task.*;
 import cn.iocoder.yudao.module.bpm.enums.definition.BpmUserTaskTimeoutHandlerTypeEnum;
 import jakarta.validation.Valid;
 import org.flowable.bpmn.model.UserTask;
+import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.history.HistoricTaskInstance;
 
@@ -131,6 +132,15 @@ public interface BpmTaskService {
     List<UserTask> getUserTaskListByReturn(String id);
 
     /**
+     * 获取指定任务的子任务列表（多层）
+     *
+     * @param parentTaskId 父任务 ID
+     * @param tasks 任务列表
+     * @return 子任务列表
+     */
+    List<HistoricTaskInstance> getAllChildrenTaskListByParentTaskId(String parentTaskId, List<HistoricTaskInstance> tasks);
+
+    /**
      * 获取指定任务的子任务列表
      *
      * @param parentTaskId 父任务ID
@@ -139,12 +149,20 @@ public interface BpmTaskService {
     List<Task> getTaskListByParentTaskId(String parentTaskId);
 
     /**
-     * 通过任务 ID，查询任务名 Map
+     * 获得指定流程实例的活动实例列表
      *
-     * @param taskIds 任务 ID
-     * @return 任务 ID 与名字的 Map
+     * @param processInstanceId 流程实例的编号
+     * @return 活动实例列表
      */
-    Map<String, String> getTaskNameByTaskIds(Collection<String> taskIds);
+    List<HistoricActivityInstance> getActivityListByProcessInstanceId(String processInstanceId);
+
+    /**
+     * 获得执行编号对应的活动实例
+     *
+     * @param executionId 执行编号
+     * @return 活动实例
+     */
+    List<HistoricActivityInstance> getHistoricActivityListByExecutionId(String executionId);
 
     // ========== Update 写入相关方法 ==========
 
