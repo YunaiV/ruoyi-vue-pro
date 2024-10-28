@@ -8,6 +8,7 @@ import jakarta.validation.Valid;
 import org.flowable.bpmn.model.UserTask;
 import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.task.api.Task;
+import org.flowable.task.api.TaskInfo;
 import org.flowable.task.api.history.HistoricTaskInstance;
 
 import java.util.Collection;
@@ -138,7 +139,7 @@ public interface BpmTaskService {
      * @param tasks 任务列表
      * @return 子任务列表
      */
-    List<HistoricTaskInstance> getAllChildrenTaskListByParentTaskId(String parentTaskId, List<HistoricTaskInstance> tasks);
+    <T extends TaskInfo> List<T> getAllChildrenTaskListByParentTaskId(String parentTaskId, List<T> tasks);
 
     /**
      * 获取指定任务的子任务列表

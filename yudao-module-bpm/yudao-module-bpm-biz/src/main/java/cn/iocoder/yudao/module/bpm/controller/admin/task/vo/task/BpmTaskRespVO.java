@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.bpm.controller.admin.task.vo.task;
 
 import cn.iocoder.yudao.module.bpm.controller.admin.base.user.UserSimpleBaseVO;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
@@ -33,10 +34,17 @@ public class BpmTaskRespVO {
     @Schema(description = "审批理由", requiredMode = Schema.RequiredMode.REQUIRED, example = "2")
     private String reason;
 
+    @Schema(description = "任务负责人编号", requiredMode = Schema.RequiredMode.NOT_REQUIRED, example = "2048")
+    @JsonIgnore // 不返回，只是方便后续读取，赋值给 ownerUser
+    private Long owner;
     /**
      * 负责人的用户信息
      */
     private UserSimpleBaseVO ownerUser;
+
+    @Schema(description = "任务分配人编号", requiredMode = Schema.RequiredMode.NOT_REQUIRED, example = "2048")
+    @JsonIgnore // 不返回，只是方便后续读取，赋值给 assigneeUser
+    private Long assignee;
     /**
      * 审核的用户信息
      */

@@ -9,12 +9,10 @@ import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.bpm.controller.admin.base.user.UserSimpleBaseVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.task.BpmTaskRespVO;
 import cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmFormDO;
-import cn.iocoder.yudao.module.bpm.framework.flowable.core.util.BpmnModelUtils;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.util.FlowableUtils;
 import cn.iocoder.yudao.module.bpm.service.message.dto.BpmMessageSendWhenTaskCreatedReqDTO;
 import cn.iocoder.yudao.module.system.api.dept.dto.DeptRespDTO;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
-import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.task.api.Task;
@@ -29,7 +27,6 @@ import java.util.Map;
 
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
 import static cn.iocoder.yudao.framework.common.util.collection.MapUtils.findAndThen;
-import static cn.iocoder.yudao.module.bpm.framework.flowable.core.util.FlowableUtils.isAddSignUserTask;
 
 /**
  * Bpm 任务 Convert
@@ -126,29 +123,13 @@ public interface BpmTaskConvert {
         }));
     }
 
-    default List<BpmTaskRespVO> buildTodoTaskListByUserId(Long userId, List<Task> todoTaskList,
-                                                          Map<String, List<Task>> childrenTaskMap,
-                                                          BpmnModel bpmnModel,
-                                                          Map<Long, AdminUserRespDTO> userMap,
-                                                          Map<Long, DeptRespDTO> deptMap) {
-       return convertList(todoTaskList, task -> {
-           // 找到分配给当前用户，或者当前用户加签的任务（为了减签）
-           if (!FlowableUtils.isAssignUserTask(userId, task)
-                   && !FlowableUtils.isAddSignUserTask(userId, task, childrenTaskMap)) {
-               return null;
-           }
-           BpmTaskRespVO taskVO = BeanUtils.toBean(task, BpmTaskRespVO.class);
-           taskVO.setStatus(FlowableUtils.getTaskStatus(task)).setReason(FlowableUtils.getTaskReason(task));
-           taskVO.setButtonsSetting(BpmnModelUtils.parseButtonsSetting(bpmnModel, task.getTaskDefinitionKey()));
-           buildTaskOwner(taskVO, task.getOwner(), userMap, deptMap);
-           buildTaskAssignee(taskVO, task.getAssignee(), userMap, deptMap);
-           // 如果是被加签的任务. 找到它的子任务 (为了减签)
-           // TODO @jason：如果是向后加签，这个判断有问题哈。因为向后加签后，当前任务，assignee 还是没变。可以简单点，直接拿子任务哈。另外，需要考虑子任务的子任务。
-           if (isAddSignUserTask(userId, task, childrenTaskMap)) {
-               buildTaskChildren(taskVO, childrenTaskMap, userMap, deptMap);
-           }
-           return taskVO;
-       });
+    default BpmTaskRespVO buildTodoTask(Task todoTask, List<Task> childrenTasks,
+                                              Map<Integer, BpmTaskRespVO.OperationButtonSetting> buttonsSetting) {
+        return BeanUtils.toBean(todoTask, BpmTaskRespVO.class)
+                .setStatus(FlowableUtils.getTaskStatus(todoTask)).setReason(FlowableUtils.getTaskReason(todoTask))
+                .setButtonsSetting(buttonsSetting)
+                .setChildren(convertList(childrenTasks, childTask -> BeanUtils.toBean(childTask, BpmTaskRespVO.class)
+                        .setStatus(FlowableUtils.getTaskStatus(childTask))));
     }
 
     default BpmMessageSendWhenTaskCreatedReqDTO convert(ProcessInstance processInstance, AdminUserRespDTO startUser,
