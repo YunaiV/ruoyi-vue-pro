@@ -27,19 +27,6 @@ public class AmazonspDataJob extends DataJob{
     public String execute(String param) throws Exception {
         setDate(param);
 
-        amazonService.spClient.getAllAsinReport(beforeYesterday).parallel()
-            .forEach(page -> {
-                OssData data = OssData.builder()
-                    .database(DATABASE)
-                    .tableName("asin_report")
-                    .syncType("inc")
-                    .requestTimestamp(System.currentTimeMillis())
-                    .folderDate(beforeYesterday)
-                    .content(page)
-                    .headers(null)
-                    .build();
-                service.send(data);
-            });
-        return "data upload success";
+        throw new Exception("template data job do not execute");
     }
 }

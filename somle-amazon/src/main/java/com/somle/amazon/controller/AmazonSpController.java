@@ -14,14 +14,4 @@ import com.somle.amazon.service.AmazonService;
 public class AmazonSpController {
     @Autowired
     private AmazonService service;
-
-    @GetMapping("/getAsinReport")
-    @ResponseBody
-    public JSONObject getAsinReport(
-        @RequestParam String countryCode,
-        @RequestParam LocalDate dataDate
-    ) {
-    
-        return service.spClient.getAsinReport(countryCode, dataDate);
-    }
 }

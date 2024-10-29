@@ -3,9 +3,11 @@ package com.somle.framework.common.util.web;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Field;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ForkJoinPool;
@@ -52,19 +54,34 @@ public class WebUtils {
     }
 
     @SneakyThrows
-    public static Response sendRequest(String requestMethod, String url, Map<String, String> queryParams, Map<String, String> headers, Object payload) {
+    public static String urlWithParams(String url, Object pojo) {
+        HttpUrl.Builder urlBuilder = HttpUrl.parse(url).newBuilder();
+        for (Field field : pojo.getClass().getDeclaredFields()) {
+            field.setAccessible(true);
+            Object value = field.get(pojo);
+            if (value instanceof List) {
+                for (Object item : (List<?>) value) {
+                    urlBuilder.addQueryParameter(field.getName(), item.toString());
+                }
+            } else {
+                if (value != null) {
+                    urlBuilder.addQueryParameter(field.getName(), value.toString());
+                }
+            }
+        }
+        return urlBuilder.build().toString();
+    }
+
+    @SneakyThrows
+    public static Response sendRequest(String requestMethod, String url, Object queryParams, Map<String, String> headers, Object payload) {
         log.debug("method: " + requestMethod);
         log.debug("url: " + url);
-        // HttpUrl.Builder urlBuilder = HttpUrl.parse(url).newBuilder();
-        // for (Map.Entry<String, String> queryParam : queryParams.entrySet()) {
-        //     urlBuilder.addQueryParameter(queryParam.getKey(), queryParam.getValue());
-        // }
-        // log.debug("params: " + queryParams.toString());
-
-        // String fullUrl = urlBuilder
-        //     .build()
-        //     .toString();
-        String fullUrl = urlWithParams(url, queryParams);
+        String fullUrl = null;
+        if (queryParams instanceof Map) {
+            fullUrl = urlWithParams(url, (Map) queryParams);
+        } else {
+            fullUrl = urlWithParams(url, queryParams);
+        }
         log.debug("full url: " + fullUrl);
 
         String bodyString = JsonUtils.toJsonString(payload);
@@ -106,37 +123,39 @@ public class WebUtils {
     }
 
 
-    public static <T> T getRequest(String url, Map<String, String> queryParams, Map<String, String> headers, Class<T> responseClass) {
+    public static <T> T getRequest(String url, Object queryParams, Map<String, String> headers, Class<T> responseClass) {
         var response = sendRequest("GET", url, queryParams, headers, null);
         return parseResponse(response, responseClass);
     }
 
-    public static <T> T postRequest(String url, Map<String, String> queryParams, Map<String, String> headers, Object payload, Class<T> responseClass) {
+    public static <T> T postRequest(String url, Object queryParams, Map<String, String> headers, Object payload, Class<T> responseClass) {
         var response =  sendRequest("POST", url, queryParams, headers, payload);
         return parseResponse(response, responseClass);
     }
 
-    public static Response getRequest(String url, Map<String, String> queryParams, Map<String, String> headers) {
+    public static Response getRequest(String url, Object queryParams, Map<String, String> headers) {
         return sendRequest("GET", url, queryParams, headers, null);
     }
 
-    public static Response postRequest(String url, Map<String, String> queryParams, Map<String, String> headers, Object payload) {
+    public static Response postRequest(String url, Object queryParams, Map<String, String> headers, Object payload) {
         return sendRequest("POST", url, queryParams, headers, payload);
     }
 
+
     @SneakyThrows
-    public static <T> T urlToDict(String urlString, String compression, Class<T> objectClass) {
+    public static String urlToString(String urlString, String compression) {
         URL url = new URL(urlString);
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setRequestMethod("GET");
-        connection.setRequestProperty("Accept-Encoding", compression);
+        // Choose input stream based on compression type
         InputStream inputStream = connection.getInputStream();
+        if ("gzip".equalsIgnoreCase(compression)) {
+            inputStream = new GZIPInputStream(inputStream);
+        }
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        GZIPInputStream gzipInputStream = new GZIPInputStream(inputStream);
-        IOUtils.copy(gzipInputStream, byteArrayOutputStream);
+        IOUtils.copy(inputStream, byteArrayOutputStream);
         String jsonString = byteArrayOutputStream.toString();
-        log.debug(jsonString);
-        return JsonUtils.parseObject(jsonString, objectClass);
+        return jsonString;
     }
 
 //    public static <T> T parallelRun(int parallelism, Callable<T> codeBlock) {

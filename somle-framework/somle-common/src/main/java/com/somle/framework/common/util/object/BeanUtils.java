@@ -1,8 +1,14 @@
 package com.somle.framework.common.util.object;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.lang.Editor;
+import cn.hutool.core.util.ArrayUtil;
 
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.function.Consumer;
 
 /**
@@ -25,5 +31,15 @@ public class BeanUtils {
             peek.accept(target);
         }
         return target;
+    }
+
+    public static Map<String, String> beanToStringMap(Object bean, String... properties) {
+        var map = BeanUtil.beanToMap(bean, properties);
+        Map<String, String> stringMap = new LinkedHashMap<>();
+        for (Map.Entry<String, Object> entry : map.entrySet()) {
+            if (entry.getValue() != null) {
+                stringMap.put(entry.getKey(), String.valueOf(entry.getValue()));}
+        }
+        return stringMap;
     }
 }

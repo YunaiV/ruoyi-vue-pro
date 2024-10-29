@@ -61,6 +61,8 @@ public class AmazonAdClient {
                 shop->shop,
                 shop->createAdReport(shop, dataDate)
         ));
+        // usually take more than 5 mins
+        CoreUtils.sleep(300000);
         return reportIdMap.entrySet().stream().map(entry->getReport(entry.getKey(), entry.getValue()));
     }
 
@@ -162,7 +164,7 @@ public class AmazonAdClient {
         String docUrl = null;
         // ResponseEntity<JSONObject> response = null;
         while (!"COMPLETED".equals(status)) {
-            CoreUtils.sleep(1000);
+            CoreUtils.sleep(5000);
             String reportStatusUrl = endpoint + "/reporting/reports/" + reportId;
             log.info("Checking report status...");
             var tokenExpireTime = shop.getSeller().getAdExpireTime();
@@ -171,10 +173,10 @@ public class AmazonAdClient {
                 case 200:
                     break;
                 case 401:
-                    throw new RuntimeException("Unauthorized error, token expired at " +  tokenExpireTime);
+                    throw new RuntimeException("Failed for shop " + shop.getCountry() + " Unauthorized error, token expired at " +  tokenExpireTime);
                 case 429:
                     log.info("Received 429 Too Many Requests. Retrying...");
-                    CoreUtils.sleep(3000);
+                    CoreUtils.sleep(10000);
                     continue;
                 default:
                     throw new RuntimeException("Http error code: " + response + response.body());
@@ -200,9 +202,9 @@ public class AmazonAdClient {
         }
         log.info("Got doc url {}", docUrl);
 
-        JSONArray contentDict = WebUtils.urlToDict(docUrl, "gzip", JSONArray.class);
+        var contentString = WebUtils.urlToString(docUrl, "gzip");
 
-        return contentDict;
+        return JsonUtils.parseObject(contentString, JSONArray.class);
     }
 
 

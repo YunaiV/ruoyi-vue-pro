@@ -35,7 +35,8 @@ class AmazonServiceTest extends BaseSpringTest {
 
     @Test
     void getAsinReport() {
-        var report = amazonService.spClient.getAsinReport("UK", LocalDate.of(2024,8,10));
+        var shop = amazonService.shopRepository.findByCountryCode("UK");
+        var report = amazonService.spClient.getAsinReport(shop, LocalDate.of(2024,8,10));
         log.info(report.toString());
     }
 
@@ -46,6 +47,13 @@ class AmazonServiceTest extends BaseSpringTest {
         log.info(reportId.toString());
 
         var report = amazonService.adClient.getReport(shop, reportId);
+        log.info(report.toString());
+    }
+
+    @Test
+    void getAllAdReport() {
+
+        var report = amazonService.adClient.getAllAdReport(LocalDate.of(2024,10,23)).toList();
         log.info(report.toString());
     }
 
