@@ -40,10 +40,10 @@ import org.flowable.engine.ManagementService;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.TaskService;
 import org.flowable.engine.history.HistoricActivityInstance;
-import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.task.api.DelegationState;
 import org.flowable.task.api.Task;
+import org.flowable.task.api.TaskInfo;
 import org.flowable.task.api.TaskQuery;
 import org.flowable.task.api.history.HistoricTaskInstance;
 import org.flowable.task.api.history.HistoricTaskInstanceQuery;
@@ -121,46 +121,39 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         return new PageResult<>(tasks, count);
     }
 
-    // TODO @芋艿：可以进一步简化
     @Override
     public BpmTaskRespVO getFirstTodoTask(Long userId, String processInstanceId) {
         if (processInstanceId == null) {
             return null;
         }
-        // 1.1 查询任务
-        TaskQuery taskQuery = taskService.createTaskQuery()
+        // 1. 查询所有任务
+        List<Task> tasks = taskService.createTaskQuery()
                 .active()
                 .processInstanceId(processInstanceId)
                 .includeTaskLocalVariables()
                 .includeProcessVariables()
-                .orderByTaskCreateTime().asc(); // 按创建时间升序
-        List<Task> todoList = taskQuery.list();
-        if (CollUtil.isEmpty(todoList)) {
+                .orderByTaskCreateTime().asc() // 按创建时间升序
+                .list();
+        if (CollUtil.isEmpty(tasks)) {
             return null;
         }
-        // 1.2 构建子任务 Map，用于减签。key：parentTaskId
-        Map<String, List<Task>> childrenTaskMap = convertMultiMap(
-                filterList(todoList, r -> StrUtil.isNotEmpty(r.getParentTaskId())),
-                Task::getParentTaskId);
 
-        // 2.1 获取用户信息
-        Set<Long> userIds = CollUtil.newHashSet();
-        todoList.forEach(task -> {
-            CollUtil.addIfAbsent(userIds, NumberUtils.parseLong((task.getAssignee())));
-            CollUtil.addIfAbsent(userIds, NumberUtils.parseLong((task.getOwner())));
+        // 2.1 查询我的首个任务
+        Task todoTask = CollUtil.findOne(tasks, task -> {
+            return isAssignUserTask(userId, task) // 当前用户为审批人
+                    || isAddSignUserTask(userId, task); // 当前用户为价钱人（为了减签）
         });
-        Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(userIds);
-        Map<Long, DeptRespDTO> deptMap = deptApi.getDeptMap(
-                convertSet(userMap.values(), AdminUserRespDTO::getDeptId));
+        if (todoTask == null) {
+            return null;
+        }
+        // 2.2 查询该任务的子任务
+        List<Task> childrenTasks = getAllChildrenTaskListByParentTaskId(todoTask.getId(), tasks);
 
-        // 2.2 构建用户待办 Task 列表
-        HistoricProcessInstance processInstance = processInstanceService.getHistoricProcessInstance(processInstanceId);
-        BpmnModel bpmnModel = bpmProcessDefinitionService.getProcessDefinitionBpmnModel(processInstance.getProcessDefinitionId());
-        List<BpmTaskRespVO> todoTasks = BpmTaskConvert.INSTANCE.buildTodoTaskListByUserId(userId, todoList, childrenTaskMap,
-                bpmnModel, userMap, deptMap);
-
-        // 2.3 找到首个任务
-        return findFirst(todoTasks, Objects::nonNull);
+        // 3. 转换返回
+        BpmnModel bpmnModel = bpmProcessDefinitionService.getProcessDefinitionBpmnModel(todoTask.getProcessDefinitionId());
+        Map<Integer, BpmTaskRespVO.OperationButtonSetting> buttonsSetting = BpmnModelUtils.parseButtonsSetting(
+                bpmnModel, todoTask.getTaskDefinitionKey());
+        return BpmTaskConvert.INSTANCE.buildTodoTask(todoTask, childrenTasks, buttonsSetting);
     }
 
     @Override
@@ -307,17 +300,17 @@ public class BpmTaskServiceImpl implements BpmTaskService {
     }
 
     @Override
-    public List<HistoricTaskInstance> getAllChildrenTaskListByParentTaskId(String parentTaskId, List<HistoricTaskInstance> tasks) {
+    public <T extends TaskInfo> List<T> getAllChildrenTaskListByParentTaskId(String parentTaskId, List<T> tasks) {
         if (CollUtil.isEmpty(tasks)) {
             return Collections.emptyList();
         }
-        Map<String, List<HistoricTaskInstance>> parentTaskMap = convertMultiMap(
-                filterList(tasks, task -> StrUtil.isNotEmpty(task.getParentTaskId())), HistoricTaskInstance::getParentTaskId);
+        Map<String, List<T>> parentTaskMap = convertMultiMap(
+                filterList(tasks, task -> StrUtil.isNotEmpty(task.getParentTaskId())), TaskInfo::getParentTaskId);
         if (CollUtil.isEmpty(parentTaskMap)) {
             return Collections.emptyList();
         }
 
-        List<HistoricTaskInstance> result = new ArrayList<>();
+        List<T> result = new ArrayList<>();
         // 1. 递归获取子级
         Stack<String> stack = new Stack<>();
         stack.push(parentTaskId);
@@ -328,10 +321,10 @@ public class BpmTaskServiceImpl implements BpmTaskService {
             }
             // 2.1 获取子任务们
             String taskId = stack.pop();
-            List<HistoricTaskInstance> childTaskList = filterList(tasks, task -> StrUtil.equals(task.getParentTaskId(), taskId));
+            List<T> childTaskList = filterList(tasks, task -> StrUtil.equals(task.getParentTaskId(), taskId));
             // 2.2 如果非空，则添加到 stack 进一步递归
             if (CollUtil.isNotEmpty(childTaskList)) {
-                stack.addAll(convertList(childTaskList, HistoricTaskInstance::getId));
+                stack.addAll(convertList(childTaskList, TaskInfo::getId));
                 result.addAll(childTaskList);
             }
         }
@@ -418,6 +411,42 @@ public class BpmTaskServiceImpl implements BpmTaskService {
     @Override
     public List<HistoricActivityInstance> getHistoricActivityListByExecutionId(String executionId) {
         return historyService.createHistoricActivityInstanceQuery().executionId(executionId).list();
+    }
+
+    /**
+     * 判断指定用户，是否是当前任务的审批人
+     *
+     * @param userId 用户编号
+     * @param task   任务
+     * @return 是否
+     */
+    private boolean isAssignUserTask(Long userId, Task task) {
+        Long assignee = NumberUtil.parseLong(task.getAssignee(), null);
+        return ObjectUtil.equals(userId, assignee);
+    }
+
+    /**
+     * 判断指定用户，是否是当前任务的拥有人
+     *
+     * @param userId 用户编号
+     * @param task   任务
+     * @return 是否
+     */
+    private boolean isOwnerUserTask(Long userId, Task task) {
+        Long assignee = NumberUtil.parseLong(task.getOwner(), null);
+        return ObjectUtil.equal(userId, assignee);
+    }
+
+    /**
+     * 判断指定用户，是否是当前任务的加签人
+     *
+     * @param userId 用户 Id
+     * @param task 任务
+     * @return 是否
+     */
+    private boolean isAddSignUserTask(Long userId, Task task) {
+        return (isAssignUserTask(userId, task) || isOwnerUserTask(userId, task))
+                && BpmTaskSignTypeEnum.of(task.getScopeType()) != null;
     }
 
     // ========== Update 写入相关方法 ==========

@@ -192,7 +192,8 @@ public interface BpmProcessInstanceConvert {
     }
 
     default Set<Long> parseUserIds(HistoricProcessInstance processInstance,
-                                   List<BpmApprovalDetailRespVO.ActivityNode> activityNodes) {
+                                   List<BpmApprovalDetailRespVO.ActivityNode> activityNodes,
+                                   BpmTaskRespVO todoTask) {
         Set<Long> userIds = new HashSet<>();
         if (processInstance != null) {
             userIds.add(NumberUtils.parseLong(processInstance.getStartUserId()));
@@ -201,6 +202,14 @@ public interface BpmProcessInstanceConvert {
             CollUtil.addAll(userIds, convertSet(activityNode.getTasks(), BpmApprovalDetailRespVO.ActivityNodeTask::getAssignee));
             CollUtil.addAll(userIds, convertSet(activityNode.getTasks(), BpmApprovalDetailRespVO.ActivityNodeTask::getOwner));
             CollUtil.addAll(userIds, activityNode.getCandidateUserIds());
+        }
+        if (todoTask != null) {
+            CollUtil.addIfAbsent(userIds, todoTask.getAssignee());
+            CollUtil.addIfAbsent(userIds, todoTask.getOwner());
+            if (CollUtil.isNotEmpty(todoTask.getChildren())) {
+                CollUtil.addAll(userIds, convertSet(todoTask.getChildren(), BpmTaskRespVO::getAssignee));
+                CollUtil.addAll(userIds, convertSet(todoTask.getChildren(), BpmTaskRespVO::getOwner));
+            }
         }
         return userIds;
     }
@@ -225,7 +234,7 @@ public interface BpmProcessInstanceConvert {
                                                         Map<String, String> formFieldsPermission,
                                                         Map<Long, AdminUserRespDTO> userMap,
                                                         Map<Long, DeptRespDTO> deptMap) {
-        // 1. 流程实例
+        // 1.1 流程实例
         BpmProcessInstanceRespVO processInstanceResp = null;
         if (processInstance != null) {
             AdminUserRespDTO startUser = userMap.get(NumberUtils.parseLong(processInstance.getStartUserId()));
@@ -233,12 +242,12 @@ public interface BpmProcessInstanceConvert {
             processInstanceResp = buildProcessInstance(processInstance, null, null, startUser, dept);
         }
 
-        // 2. 流程定义
+        // 1.2 流程定义
         List<UserTask> userTaskList = BpmTaskCandidateStartUserSelectStrategy.getStartUserSelectUserTaskList(bpmnModel);
         BpmProcessDefinitionRespVO definitionResp = BpmProcessDefinitionConvert.INSTANCE.buildProcessDefinition(
                 processDefinition, null, processDefinitionInfo, null, null, bpmnModel, userTaskList);
 
-        // 3. 流程节点
+        // 1.3 流程节点
         activityNodes.forEach(approveNode -> {
             if (approveNode.getTasks() != null) {
                 approveNode.getTasks().forEach(task -> {
@@ -249,7 +258,19 @@ public interface BpmProcessInstanceConvert {
             approveNode.setCandidateUsers(convertList(approveNode.getCandidateUserIds(), userId -> buildUser(userId, userMap, deptMap)));
         });
 
-        // 4. 拼接起来
+        // 1.4 待办任务
+        if (todoTask != null) {
+            todoTask.setAssigneeUser(buildUser(todoTask.getAssignee(), userMap, deptMap));
+            todoTask.setOwnerUser(buildUser(todoTask.getOwner(), userMap, deptMap));
+            if (CollUtil.isNotEmpty(todoTask.getChildren())) {
+                todoTask.getChildren().forEach(childTask -> {
+                    childTask.setAssigneeUser(buildUser(childTask.getAssignee(), userMap, deptMap));
+                    childTask.setOwnerUser(buildUser(childTask.getOwner(), userMap, deptMap));
+                });
+            }
+        }
+
+        // 2. 拼接起来
         return new BpmApprovalDetailRespVO().setStatus(processInstanceStatus)
                 .setProcessDefinition(definitionResp)
                 .setProcessInstance(processInstanceResp)
