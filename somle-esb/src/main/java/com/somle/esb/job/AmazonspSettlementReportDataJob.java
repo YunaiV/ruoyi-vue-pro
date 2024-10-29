@@ -1,12 +1,12 @@
 package com.somle.esb.job;
 
 
-import com.somle.amazon.service.AmazonService;
-import com.somle.esb.model.Domain;
+import com.somle.amazon.controller.vo.AmazonSpReportReqVO;
+import com.somle.amazon.model.enums.ProcessingStatuses;
 import com.somle.esb.model.OssData;
-import com.somle.esb.service.EsbService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
 
 @Component
 public class AmazonspSettlementReportDataJob extends AmazonspDataJob {
@@ -16,15 +16,26 @@ public class AmazonspSettlementReportDataJob extends AmazonspDataJob {
     public String execute(String param) throws Exception {
         setDate(param);
 
-        amazonService.spClient.getAllSettlementReport(beforeYesterday).parallel()
-            .forEach(page -> {
+        var vo = AmazonSpReportReqVO.builder()
+                .reportTypes(List.of("GET_V2_SETTLEMENT_REPORT_DATA_FLAT_FILE"))
+                .processingStatuses(List.of(ProcessingStatuses.DONE))
+                .createdSince(beforeYesterdayFirstSecond)
+                .createdUntil(beforeYesterdayLastSecond)
+                .pageSize(100)
+                .build();
+
+        amazonService.account.getSellers().stream()
+            .flatMap(seller ->
+                amazonService.spClient.getReportStream(seller, vo, null)
+            )
+            .forEach(report -> {
                 OssData data = OssData.builder()
                     .database(DATABASE)
                     .tableName("settlement_report")
                     .syncType("inc")
                     .requestTimestamp(System.currentTimeMillis())
                     .folderDate(beforeYesterday)
-                    .content(page)
+                    .content(report)
                     .headers(null)
                     .build();
                 service.send(data);

@@ -1,27 +1,21 @@
 package com.somle.amazon.service;
 
-import com.somle.amazon.controller.vo.AmazonSpReportVO;
-import com.somle.amazon.model.AmazonAccount;
-import com.somle.amazon.model.AmazonErrorList;
-import com.somle.amazon.model.AmazonShop;
+import com.somle.amazon.controller.vo.AmazonSpReportReqVO;
+import com.somle.amazon.controller.vo.AmazonSpReportSaveVO;
+import com.somle.amazon.model.*;
 //import com.somle.amazon.repository.AmazonSellerRepository;
-import com.somle.amazon.model.AmazonSpReport;
-import com.somle.amazon.model.enums.ProcessingStatuses;
 import com.somle.framework.common.util.general.CoreUtils;
 import com.somle.framework.common.util.json.JSONObject;
 import com.somle.framework.common.util.json.JsonUtils;
-import com.somle.framework.common.util.object.BeanUtils;
 import com.somle.framework.common.util.web.WebUtils;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.Setter;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.HttpClientErrorException;
-
-import jakarta.persistence.*;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -52,56 +46,36 @@ public class AmazonSpClient {
         return getShops().filter(shop->shop.getCountry().getCode().equals(countryCode)).findFirst().get();
     }
 
-    @Transactional(readOnly = true)
-    public Stream<String> getAllSettlementReport(LocalDate dataDate) {
-        return getShops().map(shop->getSettlementReport(shop, dataDate));
-    }
+//    @Transactional(readOnly = true)
+//    public Stream<String> getAllSettlementReport(LocalDate dataDate) {
+//        return getShops().map(shop->getSettlementReport(shop, dataDate));
+//    }
+//
+//    @Transactional(readOnly = true)
+//    public String getSettlementReport(AmazonShop shop, LocalDate dataDate) {
+//        var vo = AmazonSpReportVO.builder()
+//                .reportTypes(List.of("GET_V2_SETTLEMENT_REPORT_DATA_FLAT_FILE"))
+//                .processingStatuses(List.of(ProcessingStatuses.DONE))
+//                .pageSize(1)
+//                .build();
+//        var report = getReports(shop.getSeller(), vo).get(0);
+//        return getReport(shop, report.getReportId(), null);
+//    }
+
+
+//    @Transactional(readOnly = true)
+//    public List<AmazonSpReport> getReports(AmazonSpReportVO vo) {
+//        return getReports()
+//    }
 
     @Transactional(readOnly = true)
-    public String getSettlementReport(AmazonShop shop, LocalDate dataDate) {
-        var vo = AmazonSpReportVO.builder()
-                .reportTypes(List.of("GET_V2_SETTLEMENT_REPORT_DATA_FLAT_FILE"))
-                .processingStatuses(List.of(ProcessingStatuses.DONE))
-                .pageSize(1)
-                .build();
-        var report = getReports(shop, vo).get(0);
-        return getReport(shop, report.getReportId(), null);
-    }
-
-    @Transactional(readOnly = true)
-    public Stream<JSONObject> getAllAsinReport(LocalDate dataDate) {
-        return getShops().map(shop->getAsinReport(shop, dataDate));
-    }
-
-    @Transactional(readOnly = true)
-    public JSONObject getAsinReport(AmazonShop shop, LocalDate dataDate) {
-        JSONObject options = JsonUtils.newObject();
-        
-        // Add reportType
-        options.put("reportType", "GET_SALES_AND_TRAFFIC_REPORT");
-
-        // Add marketplaceIds
-        options.put("marketplaceIds", new String[] {shop.getCountry().getMarketplaceId()});
-
-        // Create and add reportOptions
-        // Create and add reportOptions
-        JSONObject reportOptions = JsonUtils.newObject();
-        reportOptions.put("asinGranularity", "CHILD");
-        reportOptions.put("dateGranularity", "DAY");
-        options.put("reportOptions", reportOptions);
-        return createAndGetReport(shop, options, dataDate);
-    }
-
-    @Transactional(readOnly = true)
-    public List<AmazonSpReport> getReports(AmazonShop shop, AmazonSpReportVO vo) {
-        vo.setMarketplaceIds(List.of(shop.getCountry().getMarketplaceId()));
-        var countryCode = shop.getCountry().getCode();
+    public List<AmazonSpReport> getReports(AmazonSeller seller, AmazonSpReportReqVO vo) {
         log.info("get reports");
 
-        String endPoint = getShop(countryCode).getCountry().getRegion().getSpEndPoint();
+        String endPoint = seller.getRegion().getSpEndPoint();
         String partialUrl = "/reports/2021-06-30/reports";
         String fullUrl = endPoint + partialUrl;
-        var headers = Map.of("x-amz-access-token", getShop(countryCode).getSeller().getSpAccessToken());
+        var headers = Map.of("x-amz-access-token", seller.getSpAccessToken());
         var response = WebUtils.getRequest(fullUrl, vo, headers);
         var reportsString = WebUtils.parseResponse(response, JSONObject.class).get("reports");
         var reportList = JsonUtils.parseArray(reportsString, AmazonSpReport.class);
@@ -109,14 +83,18 @@ public class AmazonSpClient {
     }
 
     @Transactional(readOnly = true)
-    public String getReport(AmazonShop shop, String reportId, String compression) {
-        var countryCode = shop.getCountry().getCode();
+    public Stream<String> getReportStream(AmazonSeller seller, AmazonSpReportReqVO vo, String compression) {
+        return getReports(seller, vo).stream().map(report -> getReport(seller, report.getReportId(), compression));
+    }
+
+    @Transactional(readOnly = true)
+    public String getReport(AmazonSeller seller, String reportId, String compression) {
         log.info("get report");
         int RETENTION_DAYS = 720;
         DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
-        String endPoint = getShop(countryCode).getCountry().getRegion().getSpEndPoint();
-        var headers = Map.of("x-amz-access-token", getShop(countryCode).getSeller().getSpAccessToken());
+        String endPoint = seller.getRegion().getSpEndPoint();
+        var headers = Map.of("x-amz-access-token", seller.getSpAccessToken());
         String result = null;
 
         // Check report status and get document ID
@@ -189,25 +167,21 @@ public class AmazonSpClient {
         return result;
     }
 
+    @SneakyThrows
     @Transactional(readOnly = true)
-    public String createReport(AmazonShop shop, JSONObject payload, LocalDate dataDate) {
-        var countryCode = shop.getCountry().getCode();
+    public String createReport(AmazonSeller seller, AmazonSpReportSaveVO vo) {
         log.info("get report");
-        DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
-        String endPoint = getShop(countryCode).getCountry().getRegion().getSpEndPoint();
+        String endPoint = seller.getRegion().getSpEndPoint();
         String partialUrl = "/reports/2021-06-30/reports";
         String fullUrl = endPoint + partialUrl;
-        var headers = Map.of("x-amz-access-token", getShop(countryCode).getSeller().getSpAccessToken());
-        JSONObject result = JsonUtils.newObject();
-        payload.put("dataStartTime", dataDate.format(DATE_FORMAT));
-        payload.put("dataEndTime", dataDate.format(DATE_FORMAT));
+        var headers = Map.of("x-amz-access-token", seller.getSpAccessToken());
 
         // Create report
         String reportId = null;
         while (reportId == null) {
             log.info("creating report");
-            var response = WebUtils.postRequest(fullUrl, Map.of(), headers, payload);
+            var response = WebUtils.postRequest(fullUrl, Map.of(), headers, vo);
             switch (response.code()) {
                 case 202:
                     var report = WebUtils.parseResponse(response, AmazonSpReport.class);
@@ -225,7 +199,7 @@ public class AmazonSpClient {
                     log.error(error.toString());
                     throw new RuntimeException("Error creating report");
                 default:
-                    throw new RuntimeException("Unknown response code: " + response.code());
+                    throw new RuntimeException("Unknown response code: " + response.code() + "Detail: " + response.body().string());
             }
         }
         log.info("Got report ID: {}", reportId);
@@ -233,9 +207,9 @@ public class AmazonSpClient {
     }
 
     @Transactional(readOnly = true)
-    public JSONObject createAndGetReport(AmazonShop shop, JSONObject payload, LocalDate dataDate) {
-        String reportId = createReport(shop, payload, dataDate);
-        var reportString = getReport(shop, reportId, "gzip");
+    public JSONObject createAndGetReport(AmazonSeller seller, AmazonSpReportSaveVO vo) {
+        String reportId = createReport(seller, vo);
+        var reportString = getReport(seller, reportId, "gzip");
         return JsonUtils.parseObject(reportString, JSONObject.class);
     }
 }

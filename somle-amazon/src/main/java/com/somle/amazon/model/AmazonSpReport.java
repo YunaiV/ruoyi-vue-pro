@@ -20,5 +20,4 @@ public class AmazonSpReport {
     private String processingStatus;
     private List<String> marketplaceIds;
     private String reportDocumentId;
-    private String url;
 }

@@ -33,12 +33,7 @@ class AmazonServiceTest extends BaseSpringTest {
         amazonService.refreshAuth();
     }
 
-    @Test
-    void getAsinReport() {
-        var shop = amazonService.shopRepository.findByCountryCode("UK");
-        var report = amazonService.spClient.getAsinReport(shop, LocalDate.of(2024,8,10));
-        log.info(report.toString());
-    }
+
 
     @Test
     void getAdReport() {

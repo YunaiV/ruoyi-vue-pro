@@ -9,7 +9,7 @@ import java.util.List;
 
 @Data
 @Builder
-public class AmazonSpReportVO {
+public class AmazonSpReportReqVO {
     private List<String> reportTypes; // Optional: Min count 1, Max count 10
     private List<ProcessingStatuses> processingStatuses; // Optional: Min count 1
     private List<String> marketplaceIds; // Optional: Min count 1, Max count 10
