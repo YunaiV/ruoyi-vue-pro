@@ -1,5 +1,6 @@
 package com.somle.amazon.service;
 
+import com.somle.amazon.controller.vo.AmazonSpOrderReqVO;
 import com.somle.amazon.controller.vo.AmazonSpReportReqVO;
 import com.somle.amazon.controller.vo.AmazonSpReportSaveVO;
 import com.somle.amazon.model.*;
@@ -18,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.HttpClientErrorException;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
@@ -46,27 +48,21 @@ public class AmazonSpClient {
         return getShops().filter(shop->shop.getCountry().getCode().equals(countryCode)).findFirst().get();
     }
 
-//    @Transactional(readOnly = true)
-//    public Stream<String> getAllSettlementReport(LocalDate dataDate) {
-//        return getShops().map(shop->getSettlementReport(shop, dataDate));
-//    }
-//
-//    @Transactional(readOnly = true)
-//    public String getSettlementReport(AmazonShop shop, LocalDate dataDate) {
-//        var vo = AmazonSpReportVO.builder()
-//                .reportTypes(List.of("GET_V2_SETTLEMENT_REPORT_DATA_FLAT_FILE"))
-//                .processingStatuses(List.of(ProcessingStatuses.DONE))
-//                .pageSize(1)
-//                .build();
-//        var report = getReports(shop.getSeller(), vo).get(0);
-//        return getReport(shop, report.getReportId(), null);
-//    }
+    @SneakyThrows
+    @Transactional(readOnly = true)
+    public String getOrder(AmazonSeller seller, AmazonSpOrderReqVO vo) {
+        log.info("get orders");
 
-
-//    @Transactional(readOnly = true)
-//    public List<AmazonSpReport> getReports(AmazonSpReportVO vo) {
-//        return getReports()
-//    }
+        String endPoint = seller.getRegion().getSpEndPoint();
+        String partialUrl = "/orders/v0/orders";
+        String fullUrl = endPoint + partialUrl;
+        var headers = Map.of("x-amz-access-token", seller.getSpAccessToken());
+        var response = WebUtils.getRequest(fullUrl, vo, headers);
+//        var reportsString = WebUtils.parseResponse(response, JSONObject.class).get("payload").get("orders");
+//        var reportList = JsonUtils.parseArray(reportsString, AmazonSpReport.class);
+//        return reportList;
+        return response.body().string();
+    }
 
     @Transactional(readOnly = true)
     public List<AmazonSpReport> getReports(AmazonSeller seller, AmazonSpReportReqVO vo) {

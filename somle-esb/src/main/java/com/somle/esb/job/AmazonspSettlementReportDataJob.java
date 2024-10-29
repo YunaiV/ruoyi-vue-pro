@@ -2,7 +2,8 @@ package com.somle.esb.job;
 
 
 import com.somle.amazon.controller.vo.AmazonSpReportReqVO;
-import com.somle.amazon.model.enums.ProcessingStatuses;
+import com.somle.amazon.controller.vo.AmazonSpReportReqVO.ProcessingStatuses;
+
 import com.somle.esb.model.OssData;
 import org.springframework.stereotype.Component;
 

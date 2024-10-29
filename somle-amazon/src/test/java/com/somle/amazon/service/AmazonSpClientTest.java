@@ -1,8 +1,9 @@
 package com.somle.amazon.service;
 
+import com.somle.amazon.controller.vo.AmazonSpOrderReqVO;
 import com.somle.amazon.controller.vo.AmazonSpReportReqVO;
 import com.somle.amazon.controller.vo.AmazonSpReportSaveVO;
-import com.somle.amazon.model.enums.ProcessingStatuses;
+import com.somle.amazon.controller.vo.AmazonSpReportReqVO.ProcessingStatuses;
 import com.somle.amazon.repository.AmazonAccountRepository;
 import com.somle.framework.test.core.ut.BaseSpringTest;
 import jakarta.annotation.Resource;
@@ -11,6 +12,7 @@ import org.junit.jupiter.api.*;
 import org.springframework.context.annotation.Import;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 
@@ -31,6 +33,19 @@ class AmazonSpClientTest extends BaseSpringTest {
 //        var report = amazonService.spClient.getSettlementReport(shop LocalDate.of(2024,8,10));
 //        log.info(report.toString());
 //    }
+
+    @Test
+    void getOrders() {
+        var shop = amazonService.shopRepository.findByCountryCode("UK");
+        var vo = AmazonSpOrderReqVO.builder()
+                .CreatedAfter(LocalDateTime.of(2024,10,23,0,0))
+                .CreatedBefore(LocalDateTime.of(2024,10,24,0,0))
+                .MarketplaceIds(List.of(shop.getCountry().getMarketplaceId()))
+                .build();
+        log.info(vo.toString());
+        var report = amazonService.spClient.getOrder(shop.getSeller(), vo);
+        log.info(report.toString());
+    }
 
 
     @Test

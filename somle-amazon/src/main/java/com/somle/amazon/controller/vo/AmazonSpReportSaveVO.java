@@ -1,6 +1,6 @@
 package com.somle.amazon.controller.vo;
 
-import com.somle.amazon.model.enums.ProcessingStatuses;
+
 import lombok.Builder;
 import lombok.Data;
 
