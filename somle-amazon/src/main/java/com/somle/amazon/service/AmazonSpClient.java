@@ -203,10 +203,10 @@ public class AmazonSpClient {
     }
 
     @Transactional(readOnly = true)
-    public JSONObject createAndGetReport(AmazonSeller seller, AmazonSpReportSaveVO vo) {
+    public String createAndGetReport(AmazonSeller seller, AmazonSpReportSaveVO vo, String compression) {
         String reportId = createReport(seller, vo);
-        var reportString = getReport(seller, reportId, "gzip");
-        return JsonUtils.parseObject(reportString, JSONObject.class);
+        var reportString = getReport(seller, reportId, compression);
+        return reportString;
     }
 }
 
