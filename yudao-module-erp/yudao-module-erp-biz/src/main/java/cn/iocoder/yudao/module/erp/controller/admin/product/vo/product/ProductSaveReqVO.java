@@ -18,6 +18,10 @@ public class ProductSaveReqVO {
     @NotEmpty(message = "产品名称不能为空")
     private String name;
 
+    @Schema(description = "部门id", example = "23043")
+    @NotNull(message = "部门id不能为空")
+    private Long deptId;
+
     @Schema(description = "图片URL", example = "https://www.iocoder.cn")
     private String imageUrl;
 

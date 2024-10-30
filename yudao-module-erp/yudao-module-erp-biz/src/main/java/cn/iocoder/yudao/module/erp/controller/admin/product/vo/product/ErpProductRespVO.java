@@ -2,6 +2,9 @@ package cn.iocoder.yudao.module.erp.controller.admin.product.vo.product;
 
 import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
 import com.alibaba.excel.annotation.ExcelProperty;
+import com.fhs.core.trans.anno.Trans;
+import com.fhs.core.trans.constant.TransType;
+import com.fhs.core.trans.vo.VO;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
@@ -11,7 +14,7 @@ import java.time.LocalDateTime;
 @Schema(description = "管理后台 - ERP 产品 Response VO")
 @Data
 @ExcelIgnoreUnannotated
-public class ErpProductRespVO {
+public class ErpProductRespVO implements VO {
 
     @Schema(description = "产品编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "15672")
     @ExcelProperty("产品编号")
@@ -20,6 +23,13 @@ public class ErpProductRespVO {
     @Schema(description = "产品名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "李四")
     @ExcelProperty("产品名称")
     private String name;
+
+    @Schema(description = "部门id", example = "23043")
+    @Trans(type = TransType.SIMPLE, targetClassName = "cn.iocoder.yudao.module.system.dal.dataobject.dept.DeptDO", fields = "name", ref = "deptName")
+    private Long deptId;
+
+    @Schema(description = "部门名称", example = "李四")
+    private String deptName;
 
     @Schema(description = "图片URL", example = "https://www.iocoder.cn")
     @ExcelProperty("图片URL")
