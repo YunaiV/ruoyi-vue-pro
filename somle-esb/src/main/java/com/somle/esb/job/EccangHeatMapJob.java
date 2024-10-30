@@ -1,6 +1,7 @@
 package com.somle.esb.job;
 
 
+import cn.iocoder.yudao.framework.quartz.core.handler.JobHandler;
 import com.somle.ai.service.AiService;
 import com.somle.eccang.model.EccangOrderVO;
 import com.somle.eccang.service.EccangService;
@@ -16,10 +17,13 @@ import java.time.LocalDate;
 import java.util.List;
 
 @Component
-public class EccangHeatMapDataJob extends EccangDataJob {
+public class EccangHeatMapJob implements JobHandler {
 
     @Autowired
     MessageChannel saleChannel;
+
+    @Autowired
+    EccangService eccangService;
 
     @Override
     public String execute(String param) throws Exception {
@@ -29,7 +33,7 @@ public class EccangHeatMapDataJob extends EccangDataJob {
         eccangService.getOrderPages(vo)
             .forEach(order->{
                 saleChannel.send(MessageBuilder.withPayload(order).build());
-            });;
+            });
 
 
         return "data upload success";
