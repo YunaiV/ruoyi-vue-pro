@@ -74,6 +74,7 @@ public class Limiter {
     // Method to start the timer for scheduled decrement
     private void startTimer() {
         timer = new Timer(true);
+        // decrease counter with a period of {{deduct}} ms
         timer.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
