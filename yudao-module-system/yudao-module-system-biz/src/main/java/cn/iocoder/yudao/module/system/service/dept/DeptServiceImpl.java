@@ -228,4 +228,29 @@ public class DeptServiceImpl implements DeptService {
         });
     }
 
+    @Override
+    public Integer getDeptLevel(Long id) {
+        // 校验自己存在
+        validateDeptExists(id);
+        return getParentList(new ArrayList<>(),id);
+    }
+
+    @Override
+    public String getParentNameById(Long id) {
+        // 校验自己存在
+        validateDeptExists(id);
+        DeptDO deptDO = deptMapper.selectById(id);
+        return deptMapper.selectById(deptDO.getParentId()).getName();
+    }
+
+    private Integer getParentList(List<DeptDO> deptList,Long id){
+        DeptDO deptDO = deptMapper.selectById(id);
+        deptList.add(deptDO);
+        //判断是否是顶级部门
+        if (DeptDO.PARENT_ID_ROOT.equals(deptDO.getParentId())){
+            return deptList.size();
+        }
+        //根据父id获取
+        return getParentList(deptList,deptDO.getParentId());
+    }
 }

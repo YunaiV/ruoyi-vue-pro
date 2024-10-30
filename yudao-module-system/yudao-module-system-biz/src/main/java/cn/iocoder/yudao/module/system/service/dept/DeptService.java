@@ -99,4 +99,19 @@ public interface DeptService {
      */
     void validateDeptList(Collection<Long> ids);
 
+    /**
+     * 获得指定部门的级别
+     *
+     * @param id,parentId 部门编号
+     * @return 级别
+     */
+    Integer getDeptLevel(Long id);
+
+    /**
+     * 获得指定部门的父级名称
+     *
+     * @param id 部门编号
+     * @return 父级名称
+     */
+    String getParentNameById(Long id);
 }

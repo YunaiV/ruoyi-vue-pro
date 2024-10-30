@@ -58,4 +58,22 @@ public interface DeptApi {
      */
     List<DeptRespDTO> getChildDeptList(Long id);
 
+    /**
+    * 根据部门id来获取该部门属于第几层级
+     *
+    * @Param 部门id
+    * @return 层级
+    **/
+    Integer getDeptLevel(Long id);
+
+
+    /**
+     * 根据部门id来获取该部门父亲部门的名称
+     *
+     * @Param 部门id
+     * @return 服部门名称
+     **/
+    String getParentNameById(Long id);
+
+
 }

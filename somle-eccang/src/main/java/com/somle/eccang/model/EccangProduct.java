@@ -1,8 +1,11 @@
 package com.somle.eccang.model;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import com.somle.framework.common.deserializer.CustomListDeserializer;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -35,6 +38,7 @@ public class EccangProduct {
     private String defaultSupplierCode;
     private Float productPrice;
     private Float referenceUnitPrice;
+    @JsonDeserialize(using = CustomListDeserializer.class)
     private List<String> refUrl;
 
     private Integer productCategoryId1;
@@ -123,6 +127,7 @@ public class EccangProduct {
     private String pdProductCoustomsAttribute;
     private String pdDeclarationStatement;
 
+    @JsonIgnore
     public String getProductCategoryName() {
         return Stream.of(procutCategoryName3, procutCategoryName2, procutCategoryName1)
             .filter(o -> o != null)

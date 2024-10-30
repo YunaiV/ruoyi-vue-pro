@@ -6,6 +6,7 @@ import com.somle.ai.model.AiName;
 import com.somle.ai.service.AiService;
 import com.somle.amazon.service.AmazonService;
 import com.somle.dingtalk.service.DingTalkService;
+import com.somle.eccang.model.EccangCategory;
 import com.somle.eccang.model.EccangOrder;
 import com.somle.eccang.model.EccangProduct;
 import com.somle.eccang.model.EccangResponse;
@@ -18,6 +19,7 @@ import com.somle.esb.converter.ErpToEccangConverter;
 import com.somle.esb.converter.ErpToKingdeeConverter;
 import com.somle.esb.model.Domain;
 import com.somle.esb.model.OssData;
+import com.somle.kingdee.model.KingdeeProduct;
 import com.somle.kingdee.service.KingdeeService;
 import com.somle.matomo.service.MatomoService;
 import lombok.extern.slf4j.Slf4j;
@@ -33,6 +35,8 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
 
 @Slf4j
 @Service
@@ -133,6 +137,26 @@ public class EsbService {
         log.info(response.toString());
     }
 
+
+    @ServiceActivator(inputChannel = "productChannel")
+    public void handleProduct() {
+        List<EccangProduct> eccangProducts = erpToEccangConverter.toEccang();
+        for (EccangProduct eccangProduct : eccangProducts){
+            eccangProduct.setActionType("ADD");
+            try {
+                eccangService.getProduct(eccangProduct.getProductSku());
+                eccangProduct.setActionType("EDIT");
+            } catch (Exception e) {
+                log.info("sku not exist, adding new");
+                log.debug(e.toString());
+                e.printStackTrace();
+            }
+            log.debug(eccangProduct.toString());
+            EccangResponse.BizContent response = eccangService.addProduct(eccangProduct);
+            log.info(response.toString());
+        }
+    }
+
     @ServiceActivator(inputChannel = "productChannel")
     public boolean handleProducts(Message<EccangProduct> message) {
         var product = message.getPayload();
@@ -140,6 +164,15 @@ public class EsbService {
         erpProductService.saveProduct(erpProduct);
         var kingdeeProduct = erpToKingdeeConverter.toKingdee(erpProduct);
         kingdeeService.addProduct(kingdeeProduct);
+        return true;
+    }
+
+    @ServiceActivator(inputChannel = "productChannel")
+    public boolean handleProducts() {
+        List<KingdeeProduct> kingdee = erpToKingdeeConverter.toKingdee();
+        for (KingdeeProduct kingdeeProduct : kingdee){
+            kingdeeService.addProduct(kingdeeProduct);
+        }
         return true;
     }
 
@@ -168,23 +201,28 @@ public class EsbService {
 //        var kingdeeDepartment = erpToKingdeeConverter.toKingdee(erpDepartment);
 //        kingdeeService.addDepartment(kingdeeDepartment);
 //    }
-
-
     public void syncDepartments() {
         dingTalkService.getDepartmentStream().forEach(dingTalkDepartment -> {
             log.info("begin syncing: " + dingTalkDepartment.toString());
             var erpDepartment = dingTalkToErpConverter.toErp(dingTalkDepartment);
             log.info("dept to add " + erpDepartment);
-            if (erpDepartment.getId() != null) {
+            Long deptId = erpDepartment.getId();
+            if (deptId != null) {
                 deptService.updateDept(erpDepartment);
             } else {
-                var deptId = deptService.createDept(erpDepartment);
+                deptId = deptService.createDept(erpDepartment);
                 var mapping = mappingService.toMapping(dingTalkDepartment);
                 mapping
                     .setInternalId(deptId);
                 mappingService.save(mapping);
             }
-
+            //获取部门名称
+            String name = erpDepartment.getName();
+            if (!Objects.equals(name, "宁波索迈")){
+                EccangCategory eccang = erpToEccangConverter.toEccang(String.valueOf(deptId));
+                EccangResponse.BizContent response = eccangService.addDepartment(eccang);
+                log.info(response.toString());
+            }
 //        var eccangDepartment = erpToEccangConverter.toEccang(erpDepartment);
 //        EccangResponse.BizContent response = eccangService.addDepartment(eccangDepartment);
 //        log.info(response.toString());

@@ -1,16 +1,25 @@
 package com.somle.esb.controller;
 
+import cn.iocoder.yudao.framework.common.pojo.CommonResult;
+import cn.iocoder.yudao.module.system.api.dept.DeptApi;
+import com.somle.eccang.model.EccangCategory;
+import com.somle.eccang.model.EccangResponse;
+import com.somle.eccang.service.EccangService;
+import com.somle.esb.converter.ErpToEccangConverter;
 import com.somle.esb.model.Domain;
 import com.somle.esb.service.EsbService;
+import io.swagger.v3.oas.annotations.Operation;
+import jakarta.annotation.Resource;
+import jakarta.validation.Valid;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+
+import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
 @RestController
 @RequestMapping("/api/esb")
@@ -19,12 +28,30 @@ public class EsbController {
     @Autowired
     private EsbService service;
 
+  /*  @GetMapping("/syncErpDept")
+    @Operation(summary = "将erp部门信息同步到eccang")
+    public CommonResult<Long> createProductCategory(@Valid @RequestBody ErpProductCategorySaveReqVO createReqVO) {
+        return success(productCategoryService.createProductCategory(createReqVO));
+    }*/@Resource
+    ErpToEccangConverter erpToEccangConverter;
+    @Resource
+    EccangService eccangService;
+    @Resource
+    EsbService esbService;
+    @GetMapping("/a")
+    public void a() {
+        //EccangCategory eccang = erpToEccangConverter.toEccang("50034");
+        //EccangResponse.BizContent response = eccangService.addDepartment(eccang);
+        esbService.handleProduct();
+    }
 
 
     @PostMapping("/getBeans")
     public void printAllBeans() {
         service.printAllBeans();
     }
+
+
 
 //    @PostMapping("/dataCollect")
 //    public String dataCollect(LocalDate scheduleDate, String database) {
@@ -46,6 +73,12 @@ public class EsbController {
     public String syncUsers() {
         service.syncUsers();
         return "success";
+    }
+    @Autowired
+    ErpToEccangConverter converter;
+    @GetMapping("/aaaa")
+    public Object aaaa() {
+        return converter.toEccang();
     }
 
 

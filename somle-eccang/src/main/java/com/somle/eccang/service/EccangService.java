@@ -127,7 +127,12 @@ public class EccangService {
 
     private BizContent getBiz(Object payload, String endpoint) {
         EccangResponse response = getResponse(payload, endpoint);
-        switch (response.getCode()) {
+        //判断resp的code是否为null，为null则返回message直接作为异常信息
+        String code = response.getCode();
+        if (code == null){
+            throw new RuntimeException(response.getMessage());
+        }
+        switch (code) {
             case "200":
                 return response.getBizContent();
             case "saas.api.error.code.0049":
@@ -325,6 +330,10 @@ public class EccangService {
         return list("categotyList", EccangCategory.class);
     }
 
+    public EccangCategory getCategoryByName(String name) {
+        return getCategories().filter(n->n.getPcName().equals(name)).findFirst().get();
+    }
+
     public EccangCategory getCategoryByNameEn(String nameEn) {
         return getCategories().filter(n->n.getPcNameEn().equals(nameEn)).findFirst().get();
     }
@@ -335,7 +344,7 @@ public class EccangService {
 
     public EccangOrganization getOrganizationByNameEn(String nameEn) {
         log.debug("searching organization with name_en " + nameEn);
-        return getOrganizations().filter(n->n.getNameEn().equals(nameEn)).findFirst().get();
+        return getOrganizations().filter(n->n.getName().equals(nameEn)).findFirst().get();
     }
 
     public Stream<EccangProduct> getProducts() {

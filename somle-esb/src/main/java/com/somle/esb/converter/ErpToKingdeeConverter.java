@@ -1,10 +1,14 @@
 package com.somle.esb.converter;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 import cn.iocoder.yudao.module.system.controller.admin.dept.vo.dept.DeptSaveReqVO;
+import com.somle.erp.model.ErpProduct;
 import com.somle.erp.model.product.ErpCountrySku;
 import com.somle.erp.model.product.ErpStyleSku;
+import com.somle.erp.repository.ErpProductRepository;
 import com.somle.kingdee.model.KingdeeProduct;
 import com.somle.kingdee.service.KingdeeService;
 import com.somle.kingdee.model.KingdeeAuxInfoDetail;
@@ -20,6 +24,9 @@ public class ErpToKingdeeConverter {
 
     @Autowired
     KingdeeService kingdeeService;
+
+    @Autowired
+    private ErpProductRepository erpProductRepository;
 
     public KingdeeProduct toKingdee(ErpCountrySku erpCountrySku) {
         ErpStyleSku erpStyleSku = erpCountrySku.getStyleSku();
@@ -66,6 +73,33 @@ public class ErpToKingdeeConverter {
 //        }
 
         return product;
+
+    }
+
+    public List<KingdeeProduct> toKingdee() {
+        List<ErpProduct> allProducts = erpProductRepository.findAllProducts();
+        List<KingdeeProduct> kingdeeProducts = new ArrayList<>();
+        for (ErpProduct product : allProducts){
+            KingdeeProduct kingdeeProduct = new KingdeeProduct();
+            kingdeeProduct.setCheckType("1"); //普通
+            kingdeeProduct.setName(product.getProductTitle());
+            kingdeeProduct.setNumber(product.getProductSku());
+            kingdeeProduct.setBarcode(product.getBarCode());
+            kingdeeProduct.setProducingPace(product.getPdOverseaTypeEn()); //报关品名
+            kingdeeProduct.setHelpCode(product.getHsCode()); //HS编码
+            kingdeeProduct.setCostMethod("2"); //加权平均
+            kingdeeProduct.setGrossWeight(String.valueOf(product.getProductWeight()));
+            kingdeeProduct.setLength(String.valueOf(product.getProductLength()));
+            kingdeeProduct.setWide(String.valueOf(product.getProductWidth()));
+            kingdeeProduct.setHigh(String.valueOf(product.getProductHeight()));
+            kingdeeProduct.setSaleDepartmentId(Long.valueOf(product.getUserOrganizationId()));
+            kingdeeProduct.setDeclaredTypeZh(product.getPdOverseaTypeCn());
+            //将报关规则的id存到这里面去
+            kingdeeProduct.setMaxInventoryQty(product.getRuleId());
+            kingdeeProducts.add(kingdeeProduct);
+        }
+
+        return kingdeeProducts;
 
     }
 
