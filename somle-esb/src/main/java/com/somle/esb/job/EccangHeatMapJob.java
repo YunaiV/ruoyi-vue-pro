@@ -31,7 +31,7 @@ public class EccangHeatMapJob implements JobHandler {
         var vo = EccangOrderVO.builder()
             .productSkuList(List.of(param))
             .build();
-        for (var order : eccangService.getOrderPages(vo).toList()) {
+        for (var order : eccangService.getOrder(vo).toList()) {
             count++;
             saleChannel.send(MessageBuilder.withPayload(order).build());
         }

@@ -235,17 +235,17 @@ public class EccangService {
     }
 
     public Stream<EccangOrder> getOrderShip(LocalDateTime startTime, LocalDateTime endTime) {
-        return getOrderPlatformShipPage(startTime, endTime)
-            .map(n->n.getData(EccangOrder.class))
-            .flatMap(n->n.stream());
+        var vo = EccangOrderVO.builder()
+                .platformShipDateStart(startTime)
+                .platformShipDateEnd(endTime)
+                .build();
+        return getOrder(vo);
     }
 
-    public Stream<BizContent> getOrderPlatformShipPage(LocalDateTime startTime, LocalDateTime endTime) {
-        var query = EccangOrderVO.builder()
-            .platformShipDateStart(startTime)
-            .platformShipDateEnd(endTime)
-            .build();
-        return getOrderPages(query);
+    public Stream<EccangOrder> getOrder(EccangOrderVO vo) {
+        return getOrderPages(vo)
+                .map(n->n.getData(EccangOrder.class))
+                .flatMap(n->n.stream());
     }
 
     public Stream<BizContent> getOrderPlusArchivePages(EccangOrderVO orderParams, String year) {
