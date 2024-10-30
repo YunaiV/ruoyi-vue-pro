@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.system.service.dept;
 
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
@@ -7,6 +8,8 @@ import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.datapermission.core.annotation.DataPermission;
 import cn.iocoder.yudao.module.system.controller.admin.dept.vo.dept.DeptListReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.dept.vo.dept.DeptSaveReqVO;
+import cn.iocoder.yudao.module.system.controller.admin.dept.vo.dept.DeptTreeRespVO;
+import cn.iocoder.yudao.module.system.convert.dept.DeptConvert;
 import cn.iocoder.yudao.module.system.dal.dataobject.dept.DeptDO;
 import cn.iocoder.yudao.module.system.dal.mysql.dept.DeptMapper;
 import cn.iocoder.yudao.module.system.dal.redis.RedisKeyConstants;
@@ -19,6 +22,7 @@ import org.springframework.validation.annotation.Validated;
 
 import jakarta.annotation.Resource;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
@@ -36,6 +40,9 @@ public class DeptServiceImpl implements DeptService {
 
     @Resource
     private DeptMapper deptMapper;
+
+    @Resource
+    private DeptConvert deptConvert;
 
     @Override
     @CacheEvict(cacheNames = RedisKeyConstants.DEPT_CHILDREN_ID_LIST,
@@ -228,4 +235,37 @@ public class DeptServiceImpl implements DeptService {
         });
     }
 
+    @Override
+    public Integer getDeptLevel(Long id) {
+        // 校验自己存在
+        validateDeptExists(id);
+        return getParentList(new ArrayList<>(),id);
+    }
+
+    @Override
+    public List<DeptTreeRespVO> getTreeDeptList() {
+        //获取所有部门
+        List<DeptDO> deptDOList = deptMapper.selectList();
+        //过滤出二级部门
+        List<DeptDO> secondLevelDept = deptDOList.stream().filter(deptDO -> getDeptLevel(deptDO.getId()) == 2).toList();
+        List<DeptTreeRespVO> deptTreeRespVos = deptConvert.convertList(secondLevelDept);
+        for (DeptTreeRespVO deptTreeRespVO : deptTreeRespVos){
+            //获取所有子部门
+            List<DeptDO> childDeptList = getChildDeptList(deptTreeRespVO.getId());
+            List<DeptTreeRespVO> childDeptListTree = deptConvert.convertList(childDeptList);
+            deptTreeRespVO.setChildren(childDeptListTree);
+        }
+        return deptTreeRespVos;
+    }
+
+    private Integer getParentList(List<DeptDO> deptList,Long id){
+        DeptDO deptDO = deptMapper.selectById(id);
+        deptList.add(deptDO);
+        //判断是否是顶级部门
+        if (DeptDO.PARENT_ID_ROOT.equals(deptDO.getParentId())){
+            return deptList.size();
+        }
+        //根据父id获取
+        return getParentList(deptList,deptDO.getParentId());
+    }
 }

@@ -6,7 +6,11 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 import java.math.BigDecimal;
+import java.util.List;
 
+/**
+ * @author Administrator
+ */
 @Schema(description = "管理后台 - ERP 产品新增/修改 Request VO")
 @Data
 public class ProductSaveReqVO {
@@ -17,6 +21,10 @@ public class ProductSaveReqVO {
     @Schema(description = "产品名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "李四")
     @NotEmpty(message = "产品名称不能为空")
     private String name;
+
+    @Schema(description = "部门id", example = "23043")
+    @NotNull(message = "部门id不能为空")
+    private Long deptId;
 
     @Schema(description = "图片URL", example = "https://www.iocoder.cn")
     private String imageUrl;

@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.erp.service.product;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
+import cn.iocoder.yudao.framework.common.exception.util.ThrowUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
@@ -13,7 +14,9 @@ import cn.iocoder.yudao.module.erp.dal.dataobject.product.ErpProductCategoryDO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.product.ErpProductDO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.product.ErpProductUnitDO;
 import cn.iocoder.yudao.module.erp.dal.mysql.product.ErpProductMapper;
+import cn.iocoder.yudao.module.system.api.dept.DeptApi;
 import jakarta.annotation.Resource;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
@@ -30,25 +33,45 @@ import static cn.iocoder.yudao.module.erp.enums.ErrorCodeConstants.*;
  */
 @Service
 @Validated
+@RequiredArgsConstructor
 public class ErpProductServiceImpl implements ErpProductService {
 
-    @Resource
-    private ErpProductMapper productMapper;
+    private final ErpProductMapper productMapper;
 
-    @Resource
-    private ErpProductCategoryService productCategoryService;
-    @Resource
-    private ErpProductUnitService productUnitService;
+    private final ErpProductCategoryService productCategoryService;
+
+    private final ErpProductUnitService productUnitService;
+
+    private final DeptApi deptApi;
 
     @Override
     public Long createProduct(ProductSaveReqVO createReqVO) {
         //校验是否存在相同的产品编码
         validateProductCodeUnique(null,createReqVO.getBarCode());
+        //获取部门id
+        Long deptId = createReqVO.getDeptId();
+        //校验部门id的合法性
+        validateDept(deptId);
         // 插入
         ErpProductDO product = BeanUtils.toBean(createReqVO, ErpProductDO.class);
         productMapper.insert(product);
         // 返回
         return product.getId();
+    }
+
+    /**
+    * @Author Wqh
+    * @Description 校验部门的合法性
+     {当前只允许二级部门和三级部门上传}
+    * @Date 14:51 2024/10/30
+    * @Param [deptId]
+    **/
+    private void validateDept(Long deptId) {
+        List<Integer> levels = Arrays.asList(2, 3);
+        //获取部门等级
+        Integer level = deptApi.getDeptLevel(deptId);
+        //判断登记是否符合要求
+        ThrowUtil.ifThrow(!levels.contains(level), DEPT_LEVEL_NOT_MATCH);
     }
 
     @Override
@@ -57,6 +80,8 @@ public class ErpProductServiceImpl implements ErpProductService {
         validateProductCodeUnique(updateReqVO.getId(),updateReqVO.getBarCode());
         // 校验存在
         validateProductExists(updateReqVO.getId());
+        Long deptId = updateReqVO.getDeptId();
+        this.validateDept(deptId);
         // 更新
         ErpProductDO updateObj = BeanUtils.toBean(updateReqVO, ErpProductDO.class);
         productMapper.updateById(updateObj);

@@ -33,6 +33,10 @@ public class ErpProductDO extends BaseDO {
      */
     private String name;
     /**
+     * 部门id
+     */
+    private Long deptId;
+    /**
      * 图片URL
      */
     private String imageUrl;
