@@ -6,7 +6,11 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 import java.math.BigDecimal;
+import java.util.List;
 
+/**
+ * @author Administrator
+ */
 @Schema(description = "管理后台 - ERP 产品新增/修改 Request VO")
 @Data
 public class ProductSaveReqVO {

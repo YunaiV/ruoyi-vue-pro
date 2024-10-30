@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.system.service.dept;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.module.system.controller.admin.dept.vo.dept.DeptListReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.dept.vo.dept.DeptSaveReqVO;
+import cn.iocoder.yudao.module.system.controller.admin.dept.vo.dept.DeptTreeRespVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.dept.DeptDO;
 
 import java.util.Collection;
@@ -98,5 +99,22 @@ public interface DeptService {
      * @param ids 角色编号数组
      */
     void validateDeptList(Collection<Long> ids);
+
+    /**
+     * 获得指定部门的级别
+     *
+     * @param id,parentId 部门编号
+     * @return 级别
+     */
+    Integer getDeptLevel(Long id);
+
+    /**
+    * @Author Wqh
+    * @Description 获得二级部门和一级部门（构建树结构）
+    * @Date 15:26 2024/10/30
+    * @Param []
+    * @return java.util.List<cn.iocoder.yudao.module.system.controller.admin.dept.vo.dept.DeptTreeRespVO>
+    **/
+    List<DeptTreeRespVO> getTreeDeptList();
 
 }
