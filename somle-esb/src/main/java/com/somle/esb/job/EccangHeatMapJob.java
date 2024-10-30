@@ -27,15 +27,16 @@ public class EccangHeatMapJob implements JobHandler {
 
     @Override
     public String execute(String param) throws Exception {
+        var count = 0;
         var vo = EccangOrderVO.builder()
             .productSkuList(List.of(param))
             .build();
-        eccangService.getOrderPages(vo)
-            .forEach(order->{
-                saleChannel.send(MessageBuilder.withPayload(order).build());
-            });
+        for (var order : eccangService.getOrderPages(vo).toList()) {
+            count++;
+            saleChannel.send(MessageBuilder.withPayload(order).build());
+        }
 
 
-        return "data upload success";
+        return "sent count: " + count;
     }
 }

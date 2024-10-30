@@ -4,7 +4,10 @@ import com.somle.amazon.controller.vo.AmazonSpOrderReqVO;
 import com.somle.amazon.controller.vo.AmazonSpReportReqVO;
 import com.somle.amazon.controller.vo.AmazonSpReportSaveVO;
 import com.somle.amazon.controller.vo.AmazonSpReportReqVO.ProcessingStatuses;
+import com.somle.amazon.model.AmazonSpReport;
 import com.somle.amazon.repository.AmazonAccountRepository;
+import com.somle.framework.common.util.json.JSONObject;
+import com.somle.framework.common.util.json.JsonUtils;
 import com.somle.framework.test.core.ut.BaseSpringTest;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
@@ -60,7 +63,8 @@ class AmazonSpClientTest extends BaseSpringTest {
                 .marketplaceIds(List.of(shop.getCountry().getMarketplaceId()))
                 .reportOptions(options)
                 .build();
-        var report = amazonService.spClient.createAndGetReport(shop.getSeller(), vo);
+        var reportString = amazonService.spClient.createAndGetReport(shop.getSeller(), vo, "gzip");
+        var report = JsonUtils.parseObject(reportString, JSONObject.class);
         log.info(report.toString());
     }
 

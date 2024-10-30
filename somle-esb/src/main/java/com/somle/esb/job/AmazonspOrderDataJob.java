@@ -5,6 +5,8 @@ import com.somle.amazon.controller.vo.AmazonSpOrderReqVO;
 import com.somle.amazon.controller.vo.AmazonSpReportReqVO;
 import com.somle.amazon.controller.vo.AmazonSpReportReqVO.ProcessingStatuses;
 import com.somle.esb.model.OssData;
+import com.somle.framework.common.util.json.JSONObject;
+import com.somle.framework.common.util.json.JsonUtils;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -24,7 +26,8 @@ public class AmazonspOrderDataJob extends AmazonspDataJob {
                             .CreatedBefore(beforeYesterdayLastSecond)
                             .MarketplaceIds(List.of(shop.getCountry().getMarketplaceId()))
                             .build();
-                    var report = amazonService.spClient.getOrder(shop.getSeller(), vo);
+                    var reportString = amazonService.spClient.getOrder(shop.getSeller(), vo);
+                    var report = JsonUtils.parseObject(reportString, JSONObject.class);
                     var data = OssData.builder()
                             .database(DATABASE)
                             .tableName("order")

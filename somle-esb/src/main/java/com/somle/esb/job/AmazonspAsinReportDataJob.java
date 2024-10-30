@@ -32,16 +32,18 @@ public class AmazonspAsinReportDataJob extends AmazonspDataJob {
                     .marketplaceIds(List.of(shop.getCountry().getMarketplaceId()))
                     .reportOptions(options)
                     .build();
-            return amazonService.spClient.createAndGetReport(shop.getSeller(), vo);
+            var reportString = amazonService.spClient.createAndGetReport(shop.getSeller(), vo, "gzip");
+            var report = JsonUtils.parseObject(reportString, JSONObject.class);
+            return report;
         })
-        .forEach(page -> {
+        .forEach(report -> {
             OssData data = OssData.builder()
                 .database(DATABASE)
                 .tableName("asin_report")
                 .syncType("inc")
                 .requestTimestamp(System.currentTimeMillis())
                 .folderDate(dataDate)
-                .content(page)
+                .content(report)
                 .headers(null)
                 .build();
             service.send(data);
