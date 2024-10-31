@@ -100,9 +100,9 @@ public class BpmTaskCandidateInvoker {
             return new HashSet<>();
         }
 
+        // 1.1 计算任务的候选人
         Integer strategy = BpmnModelUtils.parseCandidateStrategy(flowElement);
         String param = BpmnModelUtils.parseCandidateParam(flowElement);
-        // 1.1 计算任务的候选人
         Set<Long> userIds = getCandidateStrategy(strategy).calculateUsersByTask(execution, param);
         // 1.2 移除被禁用的用户
         removeDisableUsers(userIds);
@@ -133,9 +133,9 @@ public class BpmTaskCandidateInvoker {
             return new HashSet<>();
         }
 
+        // 1.1 计算任务的候选人
         Integer strategy = BpmnModelUtils.parseCandidateStrategy(flowElement);
         String param = BpmnModelUtils.parseCandidateParam(flowElement);
-        // 1.1 计算任务的候选人
         Set<Long> userIds = getCandidateStrategy(strategy).calculateUsersByActivity(bpmnModel, activityId, param,
                 startUserId, processDefinitionId, processVariables);
         // 1.2 移除被禁用的用户
@@ -161,7 +161,7 @@ public class BpmTaskCandidateInvoker {
         Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(assigneeUserIds);
         assigneeUserIds.removeIf(id -> {
             AdminUserRespDTO user = userMap.get(id);
-            return user == null || !CommonStatusEnum.ENABLE.getStatus().equals(user.getStatus());
+            return user == null || CommonStatusEnum.isDisable(user.getStatus());
         });
     }
 
