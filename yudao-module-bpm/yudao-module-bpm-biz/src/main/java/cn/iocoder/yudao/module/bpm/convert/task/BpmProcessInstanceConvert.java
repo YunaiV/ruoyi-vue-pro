@@ -7,6 +7,7 @@ import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
 import cn.iocoder.yudao.framework.common.util.collection.SetUtils;
 import cn.iocoder.yudao.framework.common.util.number.NumberUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
+import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.simple.BpmSimpleModelNodeVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.base.user.UserSimpleBaseVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.process.BpmProcessDefinitionRespVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.instance.BpmApprovalDetailRespVO;
@@ -128,6 +129,7 @@ public interface BpmProcessInstanceConvert {
     default BpmProcessInstanceBpmnModelViewRespVO buildProcessInstanceBpmnModelView(HistoricProcessInstance processInstance,
                                                                                     List<HistoricTaskInstance> taskInstances,
                                                                                     BpmnModel bpmnModel,
+                                                                                    BpmSimpleModelNodeVO simpleModel,
                                                                                     Set<String> unfinishedTaskActivityIds,
                                                                                     Set<String> finishedTaskActivityIds,
                                                                                     Set<String> finishedSequenceFlowActivityIds,
@@ -144,6 +146,7 @@ public interface BpmProcessInstanceConvert {
                 .setAssigneeUser(buildUser(task.getAssignee(), userMap, deptMap))
                 .setOwnerUser(buildUser(task.getOwner(), userMap, deptMap))));
         respVO.setBpmnXml(BpmnModelUtils.getBpmnXml(bpmnModel));
+        respVO.setSimpleModel(simpleModel);
         // 进度信息
         respVO.setUnfinishedTaskActivityIds(unfinishedTaskActivityIds)
                 .setFinishedTaskActivityIds(finishedTaskActivityIds)

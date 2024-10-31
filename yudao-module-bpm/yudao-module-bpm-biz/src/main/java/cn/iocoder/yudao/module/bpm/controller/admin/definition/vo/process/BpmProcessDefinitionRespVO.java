@@ -33,6 +33,9 @@ public class BpmProcessDefinitionRespVO {
     @Schema(description = "流程分类名字", example = "请假")
     private String categoryName;
 
+    @Schema(description = "流程模型的类型", example = "10")
+    private Integer modelType;
+
     @Schema(description = "表单类型-参见 bpm_model_form_type 数据字典", example = "1")
     private Integer formType;
     @Schema(description = "表单编号-在表单类型为 {@link BpmModelFormTypeEnum#CUSTOM} 时，必须非空", example = "1024")
