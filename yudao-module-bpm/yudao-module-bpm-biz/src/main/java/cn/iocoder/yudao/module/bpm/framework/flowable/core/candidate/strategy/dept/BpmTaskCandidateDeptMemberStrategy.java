@@ -1,11 +1,12 @@
-package cn.iocoder.yudao.module.bpm.framework.flowable.core.candidate.strategy;
+package cn.iocoder.yudao.module.bpm.framework.flowable.core.candidate.strategy.dept;
 
 import cn.iocoder.yudao.framework.common.util.string.StrUtils;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.candidate.BpmTaskCandidateStrategy;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmTaskCandidateStrategyEnum;
-import cn.iocoder.yudao.module.system.api.dept.PostApi;
+import cn.iocoder.yudao.module.system.api.dept.DeptApi;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
+import jakarta.annotation.Resource;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -14,35 +15,33 @@ import java.util.Set;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 
 /**
- * 岗位 {@link BpmTaskCandidateStrategy} 实现类
+ * 部门的成员 {@link BpmTaskCandidateStrategy} 实现类
  *
  * @author kyle
  */
 @Component
-public class BpmTaskCandidatePostStrategy extends BpmTaskCandidateAbstractStrategy {
+public class BpmTaskCandidateDeptMemberStrategy implements BpmTaskCandidateStrategy {
 
-    private final PostApi postApi;
-
-    public BpmTaskCandidatePostStrategy(AdminUserApi adminUserApi, PostApi postApi) {
-        super(adminUserApi);
-        this.postApi = postApi;
-    }
+    @Resource
+    private DeptApi deptApi;
+    @Resource
+    private AdminUserApi adminUserApi;
 
     @Override
     public BpmTaskCandidateStrategyEnum getStrategy() {
-        return BpmTaskCandidateStrategyEnum.POST;
+        return BpmTaskCandidateStrategyEnum.DEPT_MEMBER;
     }
 
     @Override
     public void validateParam(String param) {
-        Set<Long> postIds = StrUtils.splitToLongSet(param);
-        postApi.validPostList(postIds);
+        Set<Long> deptIds = StrUtils.splitToLongSet(param);
+        deptApi.validateDeptList(deptIds);
     }
 
     @Override
     public Set<Long> calculateUsers(String param) {
-        Set<Long> postIds = StrUtils.splitToLongSet(param);
-        List<AdminUserRespDTO> users = adminUserApi.getUserListByPostIds(postIds);
+        Set<Long> deptIds = StrUtils.splitToLongSet(param);
+        List<AdminUserRespDTO> users = adminUserApi.getUserListByDeptIds(deptIds);
         return convertSet(users, AdminUserRespDTO::getId);
     }
 

@@ -1,10 +1,10 @@
 package cn.iocoder.yudao.module.bpm.framework.flowable.core.candidate;
 
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmTaskCandidateStrategyEnum;
+import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.engine.delegate.DelegateExecution;
-import org.flowable.engine.runtime.ProcessInstance;
 
-import java.util.Collections;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -42,47 +42,44 @@ public interface BpmTaskCandidateStrategy {
     /**
      * 基于候选人参数，获得任务的候选用户们
      *
+     * 注意：实现 calculateUsers 系列方法时，有两种选择：
+     * 1. 只重写 calculateUsers 默认方法
+     * 2. 都重写 calculateUsersByTask 和 calculateUsersByActivity 两个方法
+     *
      * @param param 执行任务
      * @return 用户编号集合
      */
     default Set<Long> calculateUsers(String param) {
-        return Collections.emptySet();
+        throw new UnsupportedOperationException("该分配方法未实现，请检查！");
     }
 
     /**
-     * 基于执行任务，获得任务的候选用户们
+     * 基于【执行任务】，获得任务的候选用户们
      *
      * @param execution 执行任务
      * @return 用户编号集合
      */
-    default Set<Long> calculateUsers(DelegateExecution execution, String param) {
-        Set<Long> users = calculateUsers(param);
-        removeDisableUsers(users);
-        return users;
+    default Set<Long> calculateUsersByTask(DelegateExecution execution, String param) {
+        return calculateUsers(param);
     }
 
     /**
-     * 基于流程实例，获得任务的候选用户们
+     * 基于【流程活动】，获得任务的候选用户们
      * <p>
      * 目的：用于获取未执行节点的候选用户们
      *
-     * @param startUserId  流程发起人编号
-     * @param processInstance 流程实例编号
-     * @param activityId 活动 Id (对应 Bpmn XML id)
+     * @param bpmnModel 流程图
+     * @param activityId 活动 ID (对应 Bpmn XML id)
      * @param param     节点的参数
+     * @param startUserId  流程发起人编号
+     * @param processDefinitionId 流程定义编号
+     * @param processVariables 流程变量
      * @return 用户编号集合
      */
-    default Set<Long> calculateUsers(Long startUserId, ProcessInstance processInstance, String activityId, String param) {
-        Set<Long> users = calculateUsers(param);
-        removeDisableUsers(users);
-        return users;
+    @SuppressWarnings("unused")
+    default Set<Long> calculateUsersByActivity(BpmnModel bpmnModel, String activityId, String param,
+                                               Long startUserId, String processDefinitionId, Map<String, Object> processVariables) {
+        return calculateUsers(param);
     }
-
-    /**
-     * 移除被禁用的用户
-     *
-     * @param users 用户 Ids
-     */
-    void removeDisableUsers(Set<Long> users);
 
 }

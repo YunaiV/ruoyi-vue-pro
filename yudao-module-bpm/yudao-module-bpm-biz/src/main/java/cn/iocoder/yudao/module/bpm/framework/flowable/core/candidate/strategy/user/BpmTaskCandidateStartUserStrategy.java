@@ -1,15 +1,17 @@
-package cn.iocoder.yudao.module.bpm.framework.flowable.core.candidate.strategy;
+package cn.iocoder.yudao.module.bpm.framework.flowable.core.candidate.strategy.user;
 
 import cn.iocoder.yudao.framework.common.util.collection.SetUtils;
+import cn.iocoder.yudao.module.bpm.framework.flowable.core.candidate.BpmTaskCandidateStrategy;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmTaskCandidateStrategyEnum;
 import cn.iocoder.yudao.module.bpm.service.task.BpmProcessInstanceService;
-import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import jakarta.annotation.Resource;
+import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -20,15 +22,11 @@ import java.util.Set;
  * @author jason
  */
 @Component
-public class BpmTaskCandidateStartUserStrategy extends BpmTaskCandidateAbstractStrategy {
+public class BpmTaskCandidateStartUserStrategy implements BpmTaskCandidateStrategy {
 
     @Resource
     @Lazy // 延迟加载，避免循环依赖
     private BpmProcessInstanceService processInstanceService;
-
-    public BpmTaskCandidateStartUserStrategy(AdminUserApi adminUserApi) {
-        super(adminUserApi);
-    }
 
     @Override
     public BpmTaskCandidateStrategyEnum getStrategy() {
@@ -45,18 +43,15 @@ public class BpmTaskCandidateStartUserStrategy extends BpmTaskCandidateAbstractS
     }
 
     @Override
-    public Set<Long> calculateUsers(DelegateExecution execution, String param) {
+    public Set<Long> calculateUsersByTask(DelegateExecution execution, String param) {
         ProcessInstance processInstance = processInstanceService.getProcessInstance(execution.getProcessInstanceId());
-        Set<Long> users =  SetUtils.asSet(Long.valueOf(processInstance.getStartUserId()));
-        removeDisableUsers(users);
-        return users;
+        return SetUtils.asSet(Long.valueOf(processInstance.getStartUserId()));
     }
 
     @Override
-    public Set<Long> calculateUsers(Long startUserId, ProcessInstance processInstance, String activityId, String param) {
-        Set<Long> users = SetUtils.asSet(startUserId);
-        removeDisableUsers(users);
-        return users;
+    public Set<Long> calculateUsersByActivity(BpmnModel bpmnModel, String activityId, String param,
+                                              Long startUserId, String processDefinitionId, Map<String, Object> processVariables) {
+        return SetUtils.asSet(startUserId);
     }
 
 }

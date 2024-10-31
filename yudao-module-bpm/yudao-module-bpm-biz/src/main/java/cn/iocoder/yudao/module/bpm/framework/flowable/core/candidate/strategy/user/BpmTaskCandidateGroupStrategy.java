@@ -1,11 +1,11 @@
-package cn.iocoder.yudao.module.bpm.framework.flowable.core.candidate.strategy;
+package cn.iocoder.yudao.module.bpm.framework.flowable.core.candidate.strategy.user;
 
 import cn.iocoder.yudao.framework.common.util.string.StrUtils;
 import cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmUserGroupDO;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.candidate.BpmTaskCandidateStrategy;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmTaskCandidateStrategyEnum;
 import cn.iocoder.yudao.module.bpm.service.definition.BpmUserGroupService;
-import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
+import jakarta.annotation.Resource;
 import org.springframework.stereotype.Component;
 
 import java.util.Collection;
@@ -20,14 +20,10 @@ import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.
  * @author kyle
  */
 @Component
-public class BpmTaskCandidateGroupStrategy extends BpmTaskCandidateAbstractStrategy {
+public class BpmTaskCandidateGroupStrategy implements BpmTaskCandidateStrategy {
 
-    private final BpmUserGroupService userGroupService;
-
-    public BpmTaskCandidateGroupStrategy(AdminUserApi adminUserApi, BpmUserGroupService userGroupService) {
-        super(adminUserApi);
-        this.userGroupService = userGroupService;
-    }
+    @Resource
+    private BpmUserGroupService userGroupService;
 
     @Override
     public BpmTaskCandidateStrategyEnum getStrategy() {
@@ -37,7 +33,7 @@ public class BpmTaskCandidateGroupStrategy extends BpmTaskCandidateAbstractStrat
     @Override
     public void validateParam(String param) {
         Set<Long> groupIds = StrUtils.splitToLongSet(param);
-        userGroupService.getUserGroupList(groupIds);
+        userGroupService.validUserGroups(groupIds);
     }
 
     @Override

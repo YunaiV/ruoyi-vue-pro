@@ -9,7 +9,7 @@ import cn.iocoder.yudao.module.bpm.convert.definition.BpmProcessDefinitionConver
 import cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmCategoryDO;
 import cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmFormDO;
 import cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmProcessDefinitionInfoDO;
-import cn.iocoder.yudao.module.bpm.framework.flowable.core.candidate.strategy.BpmTaskCandidateStartUserSelectStrategy;
+import cn.iocoder.yudao.module.bpm.framework.flowable.core.candidate.strategy.dept.BpmTaskCandidateStartUserSelectStrategy;
 import cn.iocoder.yudao.module.bpm.service.definition.BpmCategoryService;
 import cn.iocoder.yudao.module.bpm.service.definition.BpmFormService;
 import cn.iocoder.yudao.module.bpm.service.definition.BpmProcessDefinitionService;

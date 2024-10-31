@@ -53,7 +53,7 @@ public class BpmParallelMultiInstanceBehavior extends ParallelMultiInstanceBehav
         @SuppressWarnings("unchecked")
         Set<Long> assigneeUserIds = (Set<Long>) execution.getVariable(super.collectionVariable, Set.class);
         if (assigneeUserIds == null) {
-            assigneeUserIds = taskCandidateInvoker.calculateUsers(execution);
+            assigneeUserIds = taskCandidateInvoker.calculateUsersByTask(execution);
             execution.setVariable(super.collectionVariable, assigneeUserIds);
             if (CollUtil.isEmpty(assigneeUserIds)) {
                 // 特殊：如果没有处理人的情况下，至少有一个 null 空元素，避免自动通过！

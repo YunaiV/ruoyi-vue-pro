@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.bpm.framework.flowable.core.candidate.strategy;
+package cn.iocoder.yudao.module.bpm.framework.flowable.core.candidate.strategy.user;
 
 import cn.iocoder.yudao.framework.test.core.ut.BaseMockitoUnitTest;
 import org.junit.jupiter.api.Test;
@@ -15,14 +15,15 @@ public class BpmTaskCandidateUserStrategyTest extends BaseMockitoUnitTest {
     private BpmTaskCandidateUserStrategy strategy;
 
     @Test
-    public void testCalculateUsers() {
+    public void test() {
         // 准备参数
         String param = "1,2";
 
         // 调用
-        Set<Long> results = strategy.calculateUsers(null, param);
+        Set<Long> userIds = strategy.calculateUsersByTask(null, param);
         // 断言
-        assertEquals(asSet(1L, 2L), results);
+        assertEquals(asSet(1L, 2L), userIds);
     }
+
 
 }

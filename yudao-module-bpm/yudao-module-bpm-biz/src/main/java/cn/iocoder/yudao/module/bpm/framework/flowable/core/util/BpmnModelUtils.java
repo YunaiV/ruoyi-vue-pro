@@ -5,7 +5,6 @@ import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.number.NumberUtils;
 import cn.iocoder.yudao.framework.common.util.string.StrUtils;
@@ -23,7 +22,6 @@ import org.flowable.bpmn.model.Process;
 import org.flowable.bpmn.model.*;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.impl.util.io.BytesStreamSource;
-import org.flowable.engine.ManagementService;
 
 import java.util.*;
 
@@ -773,20 +771,16 @@ public class BpmnModelUtils {
      * @return 是否满足条件
      */
     public static boolean evalConditionExpress(Map<String, Object> variables, String express) {
-        ManagementService managementService = SpringUtil.getBean(ManagementService.class);
         if (express == null) {
             return Boolean.FALSE;
         }
-        // TODO @jason：疑问，为啥这里要在 managementService 里执行哈？
-        Object result = managementService.executeCommand(context -> {
-            try {
-                return FlowableUtils.getExpressionValue(variables, express);
-            } catch (FlowableException ex) {
-                log.error("[evalConditionExpress][条件表达式({}) 解析报错", express, ex);
-                return Boolean.FALSE;
-            }
-        });
-        return Boolean.TRUE.equals(result);
+        try {
+            Object result = FlowableUtils.getExpressionValue(variables, express);
+            return Boolean.TRUE.equals(result);
+        } catch (FlowableException ex) {
+            log.error("[evalConditionExpress][条件表达式({}) 变量({}) 解析报错", express, variables, ex);
+            return Boolean.FALSE;
+        }
     }
 
     @SuppressWarnings("PatternVariableCanBeUsed")

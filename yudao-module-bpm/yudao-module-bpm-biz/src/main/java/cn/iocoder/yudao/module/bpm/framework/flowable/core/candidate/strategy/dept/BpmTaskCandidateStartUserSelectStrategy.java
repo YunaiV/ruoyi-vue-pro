@@ -1,12 +1,13 @@
-package cn.iocoder.yudao.module.bpm.framework.flowable.core.candidate.strategy;
+package cn.iocoder.yudao.module.bpm.framework.flowable.core.candidate.strategy.dept;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Assert;
+import cn.iocoder.yudao.module.bpm.framework.flowable.core.candidate.strategy.user.BpmTaskCandidateUserStrategy;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmTaskCandidateStrategyEnum;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.util.BpmnModelUtils;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.util.FlowableUtils;
 import cn.iocoder.yudao.module.bpm.service.task.BpmProcessInstanceService;
-import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
+import com.google.common.collect.Sets;
 import jakarta.annotation.Resource;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.UserTask;
@@ -23,15 +24,11 @@ import java.util.*;
  * @author 芋道源码
  */
 @Component
-public class BpmTaskCandidateStartUserSelectStrategy extends BpmTaskCandidateAbstractStrategy {
+public class BpmTaskCandidateStartUserSelectStrategy extends AbstractBpmTaskCandidateDeptLeaderStrategy {
 
     @Resource
     @Lazy // 延迟加载，避免循环依赖
     private BpmProcessInstanceService processInstanceService;
-
-    public BpmTaskCandidateStartUserSelectStrategy(AdminUserApi adminUserApi) {
-        super(adminUserApi);
-    }
 
     @Override
     public BpmTaskCandidateStrategyEnum getStrategy() {
@@ -42,7 +39,12 @@ public class BpmTaskCandidateStartUserSelectStrategy extends BpmTaskCandidateAbs
     public void validateParam(String param) {}
 
     @Override
-    public Set<Long> calculateUsers(DelegateExecution execution, String param) {
+    public boolean isParamRequired() {
+        return false;
+    }
+
+    @Override
+    public LinkedHashSet<Long> calculateUsersByTask(DelegateExecution execution, String param) {
         ProcessInstance processInstance = processInstanceService.getProcessInstance(execution.getProcessInstanceId());
         Assert.notNull(processInstance, "流程实例({})不能为空", execution.getProcessInstanceId());
         Map<String, List<Long>> startUserSelectAssignees = FlowableUtils.getStartUserSelectAssignees(processInstance);
@@ -50,28 +52,22 @@ public class BpmTaskCandidateStartUserSelectStrategy extends BpmTaskCandidateAbs
                 execution.getProcessInstanceId());
         // 获得审批人
         List<Long> assignees = startUserSelectAssignees.get(execution.getCurrentActivityId());
-        Set<Long> users = new LinkedHashSet<>(assignees);
-        removeDisableUsers(users);
-        return users;
+        return new LinkedHashSet<>(assignees);
     }
 
     @Override
-    public Set<Long> calculateUsers(Long startUserId, ProcessInstance processInstance, String activityId, String param) {
-        if (processInstance == null) {
-            return Collections.emptySet();
+    public LinkedHashSet<Long> calculateUsersByActivity(BpmnModel bpmnModel, String activityId, String param,
+                                                        Long startUserId, String processDefinitionId, Map<String, Object> processVariables) {
+        if (processVariables == null) {
+            return Sets.newLinkedHashSet();
         }
-        Map<String, List<Long>> startUserSelectAssignees = FlowableUtils.getStartUserSelectAssignees(processInstance);
-        Assert.notNull(startUserSelectAssignees, "流程实例({}) 的发起人自选审批人不能为空", processInstance.getId());
+        Map<String, List<Long>> startUserSelectAssignees = FlowableUtils.getStartUserSelectAssignees(processVariables);
+        if (startUserSelectAssignees == null) {
+            return Sets.newLinkedHashSet();
+        }
         // 获得审批人
         List<Long> assignees = startUserSelectAssignees.get(activityId);
-        Set<Long> users = new LinkedHashSet<>(assignees);
-        removeDisableUsers(users);
-        return users;
-    }
-
-    @Override
-    public boolean isParamRequired() {
-        return false;
+        return new LinkedHashSet<>(assignees);
     }
 
     /**

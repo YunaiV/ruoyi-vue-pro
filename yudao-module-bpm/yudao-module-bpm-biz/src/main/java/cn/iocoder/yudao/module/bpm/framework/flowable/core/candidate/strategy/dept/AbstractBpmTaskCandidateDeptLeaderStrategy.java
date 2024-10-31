@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.bpm.framework.flowable.core.candidate.strategy;
+package cn.iocoder.yudao.module.bpm.framework.flowable.core.candidate.strategy.dept;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Assert;
@@ -6,6 +6,8 @@ import cn.iocoder.yudao.module.bpm.framework.flowable.core.candidate.BpmTaskCand
 import cn.iocoder.yudao.module.system.api.dept.DeptApi;
 import cn.iocoder.yudao.module.system.api.dept.dto.DeptRespDTO;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
+import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
+import jakarta.annotation.Resource;
 
 import java.util.*;
 
@@ -14,14 +16,12 @@ import java.util.*;
  *
  * @author jason
  */
-public abstract class BpmTaskCandidateAbstractDeptLeaderStrategy extends  BpmTaskCandidateAbstractStrategy {
+public abstract class AbstractBpmTaskCandidateDeptLeaderStrategy implements BpmTaskCandidateStrategy {
 
+    @Resource
     protected DeptApi deptApi;
-
-    public BpmTaskCandidateAbstractDeptLeaderStrategy(AdminUserApi adminUserApi, DeptApi deptApi) {
-        super(adminUserApi);
-        this.deptApi = deptApi;
-    }
+    @Resource
+    protected AdminUserApi adminUserApi;
 
     /**
      * 获得指定层级的部门负责人，只有第 level 的负责人
@@ -73,6 +73,19 @@ public abstract class BpmTaskCandidateAbstractDeptLeaderStrategy extends  BpmTas
             }
         }
         return deptLeaderIds;
+    }
+
+    /**
+     * 获取发起人的部门
+     *
+     * @param startUserId 发起人 Id
+     */
+    protected DeptRespDTO getStartUserDept(Long startUserId) {
+        AdminUserRespDTO startUser = adminUserApi.getUser(startUserId);
+        if (startUser.getDeptId() == null) { // 找不到部门
+            return null;
+        }
+        return deptApi.getDept(startUser.getDeptId());
     }
 
 }

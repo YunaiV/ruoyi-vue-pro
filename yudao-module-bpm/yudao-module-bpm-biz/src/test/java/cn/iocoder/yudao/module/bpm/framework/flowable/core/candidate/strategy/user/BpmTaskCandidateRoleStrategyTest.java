@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.bpm.framework.flowable.core.candidate.strategy;
+package cn.iocoder.yudao.module.bpm.framework.flowable.core.candidate.strategy.user;
 
 import cn.iocoder.yudao.framework.test.core.ut.BaseMockitoUnitTest;
 import cn.iocoder.yudao.module.system.api.permission.PermissionApi;
@@ -33,9 +33,9 @@ public class BpmTaskCandidateRoleStrategyTest extends BaseMockitoUnitTest {
             .thenReturn(asSet(11L, 22L));
 
         // 调用
-        Set<Long> results = strategy.calculateUsers(null, param);
+        Set<Long> userIds = strategy.calculateUsersByTask(null, param);
         // 断言
-        assertEquals(asSet(11L, 22L), results);
+        assertEquals(asSet(11L, 22L), userIds);
     }
 
 }

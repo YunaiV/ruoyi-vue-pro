@@ -3,7 +3,7 @@ package cn.iocoder.yudao.module.bpm.framework.flowable.core.candidate;
 import cn.hutool.core.map.MapUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.test.core.ut.BaseMockitoUnitTest;
-import cn.iocoder.yudao.module.bpm.framework.flowable.core.candidate.strategy.BpmTaskCandidateUserStrategy;
+import cn.iocoder.yudao.module.bpm.framework.flowable.core.candidate.strategy.user.BpmTaskCandidateUserStrategy;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmTaskCandidateStrategyEnum;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnModelConstants;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
@@ -47,13 +47,13 @@ public class BpmTaskCandidateInvokerTest extends BaseMockitoUnitTest {
 
     @BeforeEach
     public void setUp() {
-        strategy = new BpmTaskCandidateUserStrategy(adminUserApi); // 创建strategy实例
+        strategy = new BpmTaskCandidateUserStrategy(); // 创建strategy实例
         strategyList = Collections.singletonList(strategy); // 创建strategyList
         taskCandidateInvoker = new BpmTaskCandidateInvoker(strategyList, adminUserApi);
     }
 
     @Test
-    public void testCalculateUsers() {
+    public void testCalculateUsersByTask() {
         // 准备参数
         String param = "1,2";
         DelegateExecution execution = mock(DelegateExecution.class);
@@ -74,7 +74,7 @@ public class BpmTaskCandidateInvokerTest extends BaseMockitoUnitTest {
         when(adminUserApi.getUserMap(eq(asSet(1L, 2L)))).thenReturn(userMap);
 
         // 调用
-        Set<Long> results = taskCandidateInvoker.calculateUsers(execution);
+        Set<Long> results = taskCandidateInvoker.calculateUsersByTask(execution);
         // 断言
         assertEquals(asSet(1L, 2L), results);
     }
