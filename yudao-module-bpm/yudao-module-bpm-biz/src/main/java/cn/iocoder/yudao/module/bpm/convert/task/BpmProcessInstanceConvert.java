@@ -88,8 +88,8 @@ public interface BpmProcessInstanceConvert {
                                                           AdminUserRespDTO startUser,
                                                           DeptRespDTO dept) {
         BpmProcessInstanceRespVO respVO = BeanUtils.toBean(processInstance, BpmProcessInstanceRespVO.class);
-        respVO.setStatus(FlowableUtils.getProcessInstanceStatus(processInstance));
-        respVO.setFormVariables(FlowableUtils.getProcessInstanceFormVariable(processInstance));
+        respVO.setStatus(FlowableUtils.getProcessInstanceStatus(processInstance))
+                .setFormVariables(FlowableUtils.getProcessInstanceFormVariable(processInstance));
         // definition
         respVO.setProcessDefinition(BeanUtils.toBean(processDefinition, BpmProcessDefinitionRespVO.class));
         copyTo(processDefinitionInfo, respVO.getProcessDefinition());

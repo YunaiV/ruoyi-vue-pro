@@ -33,8 +33,8 @@ public class BpmProcessDefinitionRespVO {
     @Schema(description = "流程分类名字", example = "请假")
     private String categoryName;
 
-    @Schema(description = "流程模型的类型", example = "10")
-    private Integer modelType;
+    @Schema(description = "流程模型的类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "10")
+    private Integer modelType; // 参见 BpmModelTypeEnum 枚举类
 
     @Schema(description = "表单类型-参见 bpm_model_form_type 数据字典", example = "1")
     private Integer formType;
