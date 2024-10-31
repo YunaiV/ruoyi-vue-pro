@@ -20,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 import java.util.UUID;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
@@ -213,10 +214,30 @@ public class IotDeviceServiceImpl implements IotDeviceService {
     @Override
     public void updateDeviceStatus(IotDeviceStatusUpdateReqVO updateReqVO) {
         // 校验存在
-        validateDeviceExists(updateReqVO.getId());
+        IotDeviceDO iotDeviceDO = validateDeviceExists(updateReqVO.getId());
 
         // 更新状态和更新时间
         IotDeviceDO updateObj = BeanUtils.toBean(updateReqVO, IotDeviceDO.class);
+
+        // 以前是未激活，现在是上线，设置设备激活时间
+        if (Objects.equals(iotDeviceDO.getStatus(), IotDeviceStatusEnum.INACTIVE.getStatus())
+                && Objects.equals(updateObj.getStatus(), IotDeviceStatusEnum.ONLINE.getStatus())) {
+            updateObj.setActiveTime(LocalDateTime.now());
+        }
+
+        // 如果是上线，设置上线时间
+        if (Objects.equals(updateObj.getStatus(), IotDeviceStatusEnum.ONLINE.getStatus())) {
+            updateObj.setLastOnlineTime(LocalDateTime.now());
+        }
+
+        // 如果是离线，设置离线时间
+        if (Objects.equals(updateObj.getStatus(), IotDeviceStatusEnum.OFFLINE.getStatus())) {
+            updateObj.setLastOfflineTime(LocalDateTime.now());
+        }
+
+        // 设置状态更新时间
+        updateObj.setStatusLastUpdateTime(LocalDateTime.now());
+
         deviceMapper.updateById(updateObj);
     }
 

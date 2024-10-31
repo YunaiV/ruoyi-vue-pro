@@ -6,6 +6,7 @@ import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 // TODO @芋艿：在瞅瞅
@@ -24,6 +25,7 @@ public class EmqxServiceImpl implements EmqxService {
 
     // TODO 多线程处理消息
     @Override
+    @Async
     public void subscribeCallback(String topic, MqttMessage mqttMessage) {
         log.info("收到消息，主题: {}, 内容: {}", topic, new String(mqttMessage.getPayload()));
         // 根据不同的主题，处理不同的业务逻辑

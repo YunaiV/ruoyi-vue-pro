@@ -34,6 +34,6 @@ public class IotDeviceDataServiceImpl implements IotDeviceDataService {
                 .deviceName(deviceName)
                 .deviceKey(device.getDeviceKey())
                 .build();
-        thingModelMessageService.saveThingModelMessage(thingModelMessage);
+        thingModelMessageService.saveThingModelMessage(device,thingModelMessage);
     }
 }

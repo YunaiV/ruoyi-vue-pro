@@ -1,9 +1,9 @@
 package cn.iocoder.yudao.module.iot.dal.tdengine;
 
+import cn.iocoder.yudao.module.iot.dal.dataobject.tdengine.TableDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.tdengine.TdFieldDO;
 import cn.iocoder.yudao.module.iot.domain.FieldsVo;
 import cn.iocoder.yudao.module.iot.domain.SelectDto;
-import cn.iocoder.yudao.module.iot.domain.TableDto;
 import cn.iocoder.yudao.module.iot.domain.TagsSelectDao;
 import cn.iocoder.yudao.module.iot.domain.visual.SelectVisualDto;
 import com.baomidou.dynamic.datasource.annotation.DS;
@@ -86,9 +86,20 @@ public interface TdEngineMapper {
                                  @Param("superTableName") String superTableName,
                                  @Param("field") TdFieldDO field);
 
-    void createTable(TableDto tableDto);
+    /**
+     * 创建表 - 创建超级表的子表
+     * @param tableDO 表信息
+     */
+    @InterceptorIgnore(tenantLine = "true")
+    void createTable(TableDO tableDO);
 
-    void insertData(TableDto tableDto);
+    /**
+     * 插入数据 - 指定列插入数据
+     *
+     * @param tableDto 数据
+     */
+    @InterceptorIgnore(tenantLine = "true")
+    void insertData(TableDO tableDto);
 
     List<Map<String, Object>> selectByTimestamp(SelectDto selectDto);
 

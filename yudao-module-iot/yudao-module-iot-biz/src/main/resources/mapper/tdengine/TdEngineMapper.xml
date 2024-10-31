@@ -110,30 +110,27 @@
         </foreach>
     </update>
 
+    <!--    CREATE TABLE [IF NOT EXISTS] tb_name USING stb_name TAGS (tag_value1, ...);-->
     <update id="createTable">
-        create table
-        if not exists #{dataBaseName}.#{tableName}
-        using #{dataBaseName}.#{superTableName}
-        tags
-        <foreach item="item" collection="tagsFieldValues" separator=","
-                 open="(" close=")" index="">
+        CREATE TABLE IF NOT EXISTS ${dataBaseName}.${tableName}
+        USING ${dataBaseName}.${superTableName}
+        <foreach item="item" collection="tagsFieldValues" separator="," open="(" close=")">
+            ${item.fieldName}
+        </foreach>
+        TAGS
+        <foreach item="item" collection="tagsFieldValues" separator="," open="(" close=")">
             #{item.fieldValue}
         </foreach>
     </update>
 
+    <!--    insert into d1004 (ts, voltage, phase) values("2018-10-04 14:38:06", 223, 0.29) -->
     <insert id="insertData">
-        insert into #{dataBaseName}.#{tableName}
+        INSERT INTO ${dataBaseName}.${tableName}
         <foreach item="item" collection="schemaFieldValues" separator=","
                  open="(" close=")" index="">
-            #{item.fieldName}
+            ${item.fieldName}
         </foreach>
-        using #{dataBaseName}.#{superTableName}
-        tags
-        <foreach item="item" collection="tagsFieldValues" separator=","
-                 open="(" close=")" index="">
-            #{item.fieldValue}
-        </foreach>
-        values
+        VALUES
         <foreach item="item" collection="schemaFieldValues" separator=","
                  open="(" close=")" index="">
             #{item.fieldValue}

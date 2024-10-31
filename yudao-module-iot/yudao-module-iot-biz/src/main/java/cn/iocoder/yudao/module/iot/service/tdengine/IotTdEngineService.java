@@ -1,8 +1,8 @@
 package cn.iocoder.yudao.module.iot.service.tdengine;
 
+import cn.iocoder.yudao.module.iot.dal.dataobject.tdengine.TableDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.tdengine.TdFieldDO;
 import cn.iocoder.yudao.module.iot.domain.SelectDto;
-import cn.iocoder.yudao.module.iot.domain.TableDto;
 import cn.iocoder.yudao.module.iot.domain.TagsSelectDao;
 import cn.iocoder.yudao.module.iot.domain.visual.SelectVisualDto;
 
@@ -70,17 +70,15 @@ public interface IotTdEngineService {
      * 创建表
      *
      * @param tableDto 表信息
-     * @throws Exception 异常
      */
-    void createTable(TableDto tableDto) throws Exception;
+    void createTable(TableDO tableDto);
 
     /**
      * 插入数据
      *
      * @param tableDto 表信息
-     * @throws Exception 异常
      */
-    void insertData(TableDto tableDto) throws Exception;
+    void insertData(TableDO tableDto);
 
     /**
      * 根据时间戳查询数据

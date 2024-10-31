@@ -60,27 +60,10 @@ public class IotDbStructureDataServiceImpl implements IotDbStructureDataService 
                 dataType("NCHAR").
                 dataLength(64).
                 build());
-        // 年
         tagsFields.add(TdFieldDO.builder().
-                fieldName("year").
+                fieldName("device_type").
                 dataType("INT").
                 build());
-        // 月
-        tagsFields.add(TdFieldDO.builder().
-                fieldName("month").
-                dataType("INT").
-                build());
-        // 日
-        tagsFields.add(TdFieldDO.builder().
-                fieldName("day").
-                dataType("INT").
-                build());
-        // 时
-        tagsFields.add(TdFieldDO.builder().
-                fieldName("hour").
-                dataType("INT").
-                build());
-
 
         // 4. 获取超级表的名称
         String superTableName = getProductPropertySTableName(deviceType, thingModel.getProductKey());

@@ -16,16 +16,21 @@ public class TableData {
     private List<String> schemaFieldList;
 
     /**
-     * 超级表标签字段的值
-     * 值需要与创建超级表时标签字段的数据类型对应上
-     */
-    private List<Object> tagsValueList;
-
-    /**
      * 超级表普通列字段的值
      * 值需要与创建超级表时普通列字段的数据类型对应上
      */
     private List<Object> schemaValueList;
+
+    /**
+     * 超级表标签字段的名称
+     */
+    private List<String> tagsFieldList;
+
+    /**
+     * 超级表标签字段的值
+     * 值需要与创建超级表时标签字段的数据类型对应上
+     */
+    private List<Object> tagsValueList;
 
     /**
      * 表名称

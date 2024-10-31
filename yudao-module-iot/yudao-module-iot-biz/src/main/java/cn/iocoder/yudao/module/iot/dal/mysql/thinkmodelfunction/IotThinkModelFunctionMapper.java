@@ -55,4 +55,7 @@ public interface IotThinkModelFunctionMapper extends BaseMapperX<IotThinkModelFu
                 IotThinkModelFunctionDO::getName, name);
     }
 
+    default List<IotThinkModelFunctionDO> selectListByProductKey(String productKey){
+        return selectList(IotThinkModelFunctionDO::getProductKey, productKey);
+    }
 }

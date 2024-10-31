@@ -199,6 +199,11 @@ public class IotThinkModelFunctionServiceImpl implements IotThinkModelFunctionSe
         dbStructureDataService.createSuperTableDataModel(product, functionList);
     }
 
+    @Override
+    public List<IotThinkModelFunctionDO> getThinkModelFunctionListByProductKey(String productKey) {
+        return thinkModelFunctionMapper.selectListByProductKey(productKey);
+    }
+
     /**
      * 创建默认的事件和服务
      */

@@ -1,9 +1,9 @@
 package cn.iocoder.yudao.module.iot.service.tdengine;
 
+import cn.iocoder.yudao.module.iot.dal.dataobject.tdengine.TableDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.tdengine.TdFieldDO;
 import cn.iocoder.yudao.module.iot.dal.tdengine.TdEngineMapper;
 import cn.iocoder.yudao.module.iot.domain.SelectDto;
-import cn.iocoder.yudao.module.iot.domain.TableDto;
 import cn.iocoder.yudao.module.iot.domain.TagsSelectDao;
 import cn.iocoder.yudao.module.iot.domain.visual.SelectVisualDto;
 import jakarta.annotation.Resource;
@@ -31,12 +31,12 @@ public class IotTdEngineServiceImpl implements IotTdEngineService {
     }
 
     @Override
-    public void createTable(TableDto tableDto) {
+    public void createTable(TableDO tableDto) {
         tdEngineMapper.createTable(tableDto);
     }
 
     @Override
-    public void insertData(TableDto tableDto) {
+    public void insertData(TableDO tableDto) {
         tdEngineMapper.insertData(tableDto);
     }
 
