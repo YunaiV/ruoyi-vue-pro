@@ -89,7 +89,7 @@ public class UserController {
 
     @GetMapping("/page")
     @Operation(summary = "获得用户分页列表")
-    @PreAuthorize("@ss.hasPermission('system:user:list')")
+    @PreAuthorize("@ss.hasPermission('system:user:query')")
     public CommonResult<PageResult<UserRespVO>> getUserPage(@Valid UserPageReqVO pageReqVO) {
         // 获得用户分页列表
         PageResult<AdminUserDO> pageResult = userService.getUserPage(pageReqVO);
