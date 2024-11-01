@@ -43,8 +43,6 @@ public class WebUtils {
 
 
 
-
-
     public static String urlWithParams(String url, Map<String,String> queryParams) {
         HttpUrl.Builder urlBuilder = HttpUrl.parse(url).newBuilder();
         for (Map.Entry<String, String> queryParam : queryParams.entrySet()) {

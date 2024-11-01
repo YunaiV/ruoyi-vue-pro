@@ -5,6 +5,8 @@ spring:
   test:
     database:
       replace: none
+
+
 logging:
   level:
     com.somle: DEBUG
@@ -13,14 +15,19 @@ logging:
 
 spring:
   # 数据源配置项
-#  datasource:
-#    url: jdbc:mysql://192.168.10.131:3306/ruoyi-vue-pro?serverTimezone=GMT%2B8&useSSL=false&characterEncoding=utf-8
-#    driverClassName: com.mysql.cj.jdbc.Driver
-#    username: it003
-#    password: asivJssflioKK
+  datasource:
+    url: jdbc:mysql://192.168.10.151:3306/ruoyi-vue-pro?serverTimezone=GMT%2B8&useSSL=false&characterEncoding=utf-8
+    driverClassName: com.mysql.cj.jdbc.Driver
+    username: it003
+    password: asivJssflioKK
 #  sql:
 #    init:
 #      schema-locations: classpath:/sql/create_tables.sql
+  jpa:
+    hibernate:
+      #      ddl-auto: none
+      ddl-auto: update
+  #      ddl-auto: create-drop
 
   # Redis 配置。Redisson 默认的配置足够使用，一般不需要进行调优
 #  data:
@@ -50,4 +57,4 @@ spring:
 #  info:
 #    base-package: cn.iocoder.yudao.module
 somle:
-  base-package: com.somle.ai
+  base-package: com.somle.microsoft

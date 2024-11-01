@@ -1,6 +1,8 @@
 package com.somle.microsoft.service;
 
+import com.somle.framework.test.core.ut.BaseDbUnitTest;
 import com.somle.framework.test.core.ut.BaseSpringTest;
+import com.somle.microsoft.model.PowerbiAccount;
 import com.somle.microsoft.model.PowerbiReportReqVO;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
@@ -15,7 +17,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @Slf4j
 @Import(MicrosoftService.class)
-class MicrosoftServiceTest extends BaseSpringTest {
+class MicrosoftServiceTest extends BaseDbUnitTest {
 
     @Resource
     MicrosoftService service;
@@ -26,8 +28,7 @@ class MicrosoftServiceTest extends BaseSpringTest {
 
     @Test
     void getToken() {
-        var result = service.getPasswordToken();
-        log.info(result);
+        service.getPasswordToken();
     }
 
     @Test
