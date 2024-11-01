@@ -1,0 +1,9 @@
+query {
+  identity {
+    username,
+    email,
+    applications {
+      name
+    }
+  }
+}

@@ -39,6 +39,7 @@
         <module>somle-microsoft</module>
         <module>somle-wangdian</module>
         <module>somle-shopify</module>
+        <module>somle-wayfair</module>
 
     </modules>
 

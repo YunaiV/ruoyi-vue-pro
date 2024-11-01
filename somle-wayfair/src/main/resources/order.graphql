@@ -1,0 +1,36 @@
+query getDropshipPurchaseOrders {
+    getDropshipPurchaseOrders(
+        limit: 10,
+        hasResponse: false,
+        sortOrder: DESC
+    ) {
+        poNumber,
+        poDate,
+        estimatedShipDate,
+        customerName,
+        customerAddress1,
+        customerAddress2,
+        customerCity,
+        customerState,
+        customerPostalCode,
+        orderType,
+        shippingInfo {
+          shipSpeed,
+          carrierCode
+        },
+        packingSlipUrl,
+        warehouse {
+          id,
+          name
+        },
+        products {
+            partNumber,
+            quantity,
+            price,
+            event {
+              startDate,
+              endDate
+            }
+        },
+    }
+}
