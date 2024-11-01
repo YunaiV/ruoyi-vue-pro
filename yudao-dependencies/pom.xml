@@ -77,11 +77,13 @@
         <jimureport.version>1.7.8</jimureport.version>
         <xercesImpl.version>2.12.2</xercesImpl.version>
         <weixin-java.version>4.6.0</weixin-java.version>
-<!--        <dingtalk.version>2.1.42</dingtalk.version>-->
+        <dingtalk.version>2.0.0</dingtalk.version>
     </properties>
 
     <dependencyManagement>
         <dependencies>
+            <!--索迈相关-->
+
 <!--            <dependency>-->
 <!--                <groupId>com.aliyun</groupId>-->
 <!--                <artifactId>dingtalk</artifactId>-->
@@ -91,7 +93,7 @@
             <dependency>
                 <groupId>com.aliyun</groupId>
                 <artifactId>alibaba-dingtalk-service-sdk</artifactId>
-                <version>2.0.0</version>
+                <version>${dingtalk.version}</version>
             </dependency>
 
 

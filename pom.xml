@@ -38,6 +38,7 @@
         <module>somle-matomo</module>
         <module>somle-microsoft</module>
         <module>somle-wangdian</module>
+        <module>somle-shopify</module>
 
     </modules>
 
