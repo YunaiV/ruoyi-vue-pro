@@ -41,7 +41,7 @@ public class EccangController {
 
     @GetMapping("/getOrder")
     public List<BizContent> getOrder(
-        @RequestParam EccangOrderVO order
+        EccangOrderVO order
     ) {
         return eccangService.getOrderPages(order).toList();
     }
