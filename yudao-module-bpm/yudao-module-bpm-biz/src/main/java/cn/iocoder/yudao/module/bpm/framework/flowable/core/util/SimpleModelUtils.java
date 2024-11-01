@@ -641,7 +641,7 @@ public class SimpleModelUtils {
         if (nodeType == BpmSimpleModelNodeType.CONDITION_BRANCH_NODE) {
             // 查找满足条件的 BpmSimpleModelNodeVO 节点
             BpmSimpleModelNodeVO matchConditionNode = CollUtil.findOne(currentNode.getConditionNodes(),
-                    conditionNode -> BooleanUtil.isFalse(currentNode.getDefaultFlow())
+                    conditionNode -> !BooleanUtil.isTrue(conditionNode.getDefaultFlow())
                         && evalConditionExpress(variables, conditionNode));
             if (matchConditionNode == null) {
                 matchConditionNode = CollUtil.findOne(currentNode.getConditionNodes(),
@@ -656,7 +656,7 @@ public class SimpleModelUtils {
         if (nodeType == BpmSimpleModelNodeType.INCLUSIVE_BRANCH_NODE) {
             // 查找满足条件的 BpmSimpleModelNodeVO 节点
             Collection<BpmSimpleModelNodeVO> matchConditionNodes = CollUtil.filterNew(currentNode.getConditionNodes(),
-                    conditionNode -> BooleanUtil.isFalse(currentNode.getDefaultFlow())
+                    conditionNode -> !BooleanUtil.isTrue(conditionNode.getDefaultFlow())
                             && evalConditionExpress(variables, conditionNode));
             if (CollUtil.isEmpty(matchConditionNodes)) {
                 matchConditionNodes = CollUtil.filterNew(currentNode.getConditionNodes(),

@@ -141,7 +141,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         // 2.1 查询我的首个任务
         Task todoTask = CollUtil.findOne(tasks, task -> {
             return isAssignUserTask(userId, task) // 当前用户为审批人
-                    || isAddSignUserTask(userId, task); // 当前用户为价钱人（为了减签）
+                    || isAddSignUserTask(userId, task); // 当前用户为加签人（为了减签）
         });
         if (todoTask == null) {
             return null;
