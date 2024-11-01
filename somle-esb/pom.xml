@@ -80,6 +80,12 @@
             <artifactId>somle-microsoft</artifactId>
             <version>${revision}</version>
         </dependency>
+
+        <dependency>
+            <groupId>com.somle</groupId>
+            <artifactId>somle-shopify</artifactId>
+            <version>${revision}</version>
+        </dependency>
     </dependencies>
 
     

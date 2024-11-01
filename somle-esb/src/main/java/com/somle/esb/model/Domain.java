@@ -8,7 +8,8 @@ public enum Domain {
     AI("ai"),
     ERP("erp"),
     MATOMO("matomo"),
-    DINGTALK("dingtalk");
+    DINGTALK("dingtalk"),
+    SHOPIFY("shopify");
 
     private final String value;
 
