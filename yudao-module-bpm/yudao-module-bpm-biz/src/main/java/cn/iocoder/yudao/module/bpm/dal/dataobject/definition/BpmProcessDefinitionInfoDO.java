@@ -121,6 +121,10 @@ public class BpmProcessDefinitionInfoDO extends BaseDO {
      * 目的：如果 false 不可见，则不展示在“发起流程”的列表里
      */
     private Boolean visible;
+    /**
+     * 排序值
+     */
+    private Long sort;
 
     /**
      * 可发起用户编号数组

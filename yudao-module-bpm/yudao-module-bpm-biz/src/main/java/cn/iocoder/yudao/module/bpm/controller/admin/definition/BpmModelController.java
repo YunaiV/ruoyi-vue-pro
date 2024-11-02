@@ -26,7 +26,10 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Stream;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
@@ -106,11 +109,20 @@ public class BpmModelController {
         return success(modelService.createModel(createRetVO));
     }
 
+
     @PutMapping("/update")
     @Operation(summary = "修改模型")
     @PreAuthorize("@ss.hasPermission('bpm:model:update')")
     public CommonResult<Boolean> updateModel(@Valid @RequestBody BpmModelSaveReqVO modelVO) {
         modelService.updateModel(getLoginUserId(), modelVO);
+        return success(true);
+    }
+
+    @PutMapping("/update-sort-batch")
+    @Operation(summary = "批量修改模型排序")
+    @Parameter(name = "ids", description = "编号数组", required = true, example = "1,2,3")
+    public CommonResult<Boolean> updateModelSortBatch(@RequestParam("ids") List<String> ids) {
+        modelService.updateModelSortBatch(getLoginUserId(), ids);
         return success(true);
     }
 

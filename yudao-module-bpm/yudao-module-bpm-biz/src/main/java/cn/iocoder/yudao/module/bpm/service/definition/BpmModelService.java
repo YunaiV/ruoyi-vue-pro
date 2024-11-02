@@ -65,6 +65,14 @@ public interface BpmModelService {
     void updateModel(Long userId, @Valid BpmModelSaveReqVO updateReqVO);
 
     /**
+     * 批量更新模型排序
+     *
+     * @param userId 用户编号
+     * @param ids 编号列表
+     */
+    void updateModelSortBatch(Long userId, List<String> ids);
+
+    /**
      * 将流程模型，部署成一个流程定义
      *
      * @param userId 用户编号

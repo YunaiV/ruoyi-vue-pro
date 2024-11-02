@@ -32,9 +32,11 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
 import static cn.iocoder.yudao.module.bpm.enums.ErrorCodeConstants.*;
 
 /**
@@ -102,6 +104,34 @@ public class BpmModelServiceImpl implements BpmModelService {
         repositoryService.saveModel(model);
     }
 
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void updateModelSortBatch(Long userId, List<String> ids) {
+        // 1.1 校验流程模型存在
+        List<Model> models = repositoryService.createModelQuery()
+                .modelTenantId(FlowableUtils.getTenantId()).list();
+        models.removeIf(model ->!ids.contains(model.getId()));
+        if (ids.size() != models.size()) {
+            throw exception(MODEL_NOT_EXISTS);
+        }
+        Map<String, Model> modelMap = convertMap(models, Model::getId);
+        // 1.2 校验是否为管理员
+        ids.forEach(id -> validateModelManager(id, userId));
+
+        // 保存排序
+        long sort = System.currentTimeMillis(); // 使用时间戳 - i 作为排序
+        for (int i = ids.size() - 1; i > 0; i--) {
+            Model model = modelMap.get(ids.get(i));
+            // 更新模型
+            BpmModelMetaInfoVO metaInfo = BpmModelConvert.INSTANCE.parseMetaInfo(model).setSort(sort);
+            model.setMetaInfo(JsonUtils.toJsonString(metaInfo));
+            repositoryService.saveModel(model);
+            // 更新排序
+            processDefinitionService.updateProcessDefinitionSortByModelId(model.getId(), sort);
+            sort--;
+        }
+    }
+
     private Model validateModelExists(String id) {
         Model model = repositoryService.getModel(id);
         if (model == null) {
@@ -121,7 +151,7 @@ public class BpmModelServiceImpl implements BpmModelService {
         Model model = validateModelExists(id);
         BpmModelMetaInfoVO metaInfo = BpmModelConvert.INSTANCE.parseMetaInfo(model);
         if (metaInfo == null || !CollUtil.contains(metaInfo.getManagerUserIds(), userId)) {
-            throw exception(MODEL_UPDATE_FAIL_NOT_MANAGER);
+            throw exception(MODEL_UPDATE_FAIL_NOT_MANAGER, model.getName());
         }
         return model;
     }

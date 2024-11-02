@@ -83,7 +83,7 @@ public interface BpmCategoryService {
     List<BpmCategoryDO> getCategoryListByStatus(Integer status);
 
     /**
-     * 更新流程分类的排序：每个分类的 sort 值，从 0 开始递增
+     * 批量更新流程分类的排序：每个分类的 sort 值，从 0 开始递增
      *
      * @param ids 分类编号列表
      */

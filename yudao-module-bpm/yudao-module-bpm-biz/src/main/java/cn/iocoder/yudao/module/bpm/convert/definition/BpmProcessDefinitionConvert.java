@@ -20,6 +20,7 @@ import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.factory.Mappers;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
@@ -47,7 +48,7 @@ public interface BpmProcessDefinitionConvert {
                                                                         Map<String, BpmProcessDefinitionInfoDO> processDefinitionInfoMap,
                                                                         Map<Long, BpmFormDO> formMap,
                                                                         Map<String, BpmCategoryDO> categoryMap) {
-        return CollectionUtils.convertList(list, definition -> {
+        List<BpmProcessDefinitionRespVO> result = CollectionUtils.convertList(list, definition -> {
             Deployment deployment = MapUtil.get(deploymentMap, definition.getDeploymentId(), Deployment.class);
             BpmProcessDefinitionInfoDO processDefinitionInfo = MapUtil.get(processDefinitionInfoMap, definition.getId(), BpmProcessDefinitionInfoDO.class);
             BpmFormDO form = null;
@@ -57,6 +58,9 @@ public interface BpmProcessDefinitionConvert {
             BpmCategoryDO category = MapUtil.get(categoryMap, definition.getCategory(), BpmCategoryDO.class);
             return buildProcessDefinition(definition, deployment, processDefinitionInfo, form, category, null, null);
         });
+        // 排序
+        result.sort(Comparator.comparing(BpmProcessDefinitionRespVO::getSort));
+        return result;
     }
 
     default BpmProcessDefinitionRespVO buildProcessDefinition(ProcessDefinition definition,
