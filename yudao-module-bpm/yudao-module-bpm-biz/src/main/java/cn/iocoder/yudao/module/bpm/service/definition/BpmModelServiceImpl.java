@@ -3,12 +3,9 @@ package cn.iocoder.yudao.module.bpm.service.definition;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
-import cn.iocoder.yudao.framework.common.util.object.PageUtils;
 import cn.iocoder.yudao.framework.common.util.validation.ValidationUtils;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.BpmModelMetaInfoVO;
-import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.BpmModelPageReqVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.BpmModelSaveReqVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.simple.BpmSimpleModelNodeVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.simple.BpmSimpleModelUpdateReqVO;
@@ -41,8 +38,7 @@ import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionU
 import static cn.iocoder.yudao.module.bpm.enums.ErrorCodeConstants.*;
 
 /**
- * Flowable流程模型实现
- * 主要进行 Flowable {@link Model} 的维护
+ * 流程模型实现：主要进行 Flowable {@link Model} 的维护
  *
  * @author yunlongn
  * @author 芋道源码
@@ -64,27 +60,12 @@ public class BpmModelServiceImpl implements BpmModelService {
     private BpmTaskCandidateInvoker taskCandidateInvoker;
 
     @Override
-    public PageResult<Model> getModelPage(BpmModelPageReqVO pageVO) {
+    public List<Model> getModelList(String name) {
         ModelQuery modelQuery = repositoryService.createModelQuery();
-        modelQuery.modelTenantId(FlowableUtils.getTenantId());
-        if (StrUtil.isNotBlank(pageVO.getKey())) {
-            modelQuery.modelKey(pageVO.getKey());
+        if (StrUtil.isNotEmpty(name)) {
+            modelQuery.modelNameLike(name);
         }
-        if (StrUtil.isNotBlank(pageVO.getName())) {
-            modelQuery.modelNameLike("%" + pageVO.getName() + "%"); // 模糊匹配
-        }
-        if (StrUtil.isNotBlank(pageVO.getCategory())) {
-            modelQuery.modelCategory(pageVO.getCategory());
-        }
-        // 执行查询
-        long count = modelQuery.count();
-        if (count == 0) {
-            return PageResult.empty(count);
-        }
-        List<Model> models = modelQuery
-                .orderByCreateTime().desc()
-                .listPage(PageUtils.getStart(pageVO), pageVO.getPageSize());
-        return new PageResult<>(models, count);
+        return modelQuery.list();
     }
 
     @Override
@@ -100,6 +81,7 @@ public class BpmModelServiceImpl implements BpmModelService {
         }
 
         // 2.1 创建流程定义
+        createReqVO.setSort(System.currentTimeMillis()); // 使用当前时间，作为排序
         Model model = repositoryService.newModel();
         BpmModelConvert.INSTANCE.copyToModel(model, createReqVO);
         model.setTenantId(FlowableUtils.getTenantId());
