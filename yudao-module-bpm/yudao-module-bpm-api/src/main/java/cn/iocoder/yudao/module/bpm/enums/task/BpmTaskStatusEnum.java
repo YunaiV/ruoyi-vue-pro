@@ -21,7 +21,6 @@ public enum BpmTaskStatusEnum {
     CANCEL(4, "已取消"),
 
     RETURN(5, "已退回"),
-    DELEGATE(6, "委派中"),
 
     /**
      * 使用场景：

@@ -9,6 +9,7 @@ import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.bpm.controller.admin.base.user.UserSimpleBaseVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.task.BpmTaskRespVO;
 import cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmFormDO;
+import cn.iocoder.yudao.module.bpm.enums.task.BpmTaskStatusEnum;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.util.FlowableUtils;
 import cn.iocoder.yudao.module.bpm.service.message.dto.BpmMessageSendWhenTaskCreatedReqDTO;
 import cn.iocoder.yudao.module.system.api.dept.dto.DeptRespDTO;
@@ -78,18 +79,17 @@ public interface BpmTaskConvert {
     }
 
     default List<BpmTaskRespVO> buildTaskListByProcessInstanceId(List<HistoricTaskInstance> taskList,
-                                                                 HistoricProcessInstance processInstance,
                                                                  Map<Long, BpmFormDO> formMap,
                                                                  Map<Long, AdminUserRespDTO> userMap,
                                                                  Map<Long, DeptRespDTO> deptMap) {
         return CollectionUtils.convertList(taskList, task -> {
+            // 特殊：已取消的任务，不返回
             BpmTaskRespVO taskVO = BeanUtils.toBean(task, BpmTaskRespVO.class);
             Integer taskStatus = FlowableUtils.getTaskStatus(task);
+            if (BpmTaskStatusEnum.isCancelStatus(taskStatus)) {
+                return null;
+            }
             taskVO.setStatus(taskStatus).setReason(FlowableUtils.getTaskReason(task));
-            // 流程实例
-            AdminUserRespDTO startUser = userMap.get(NumberUtils.parseLong(processInstance.getStartUserId()));
-            taskVO.setProcessInstance(BeanUtils.toBean(processInstance, BpmTaskRespVO.ProcessInstance.class));
-            taskVO.getProcessInstance().setStartUser(BeanUtils.toBean(startUser, UserSimpleBaseVO.class));
             // 表单信息
             BpmFormDO form = MapUtil.get(formMap, NumberUtils.parseLong(task.getFormKey()), BpmFormDO.class);
             if (form != null) {

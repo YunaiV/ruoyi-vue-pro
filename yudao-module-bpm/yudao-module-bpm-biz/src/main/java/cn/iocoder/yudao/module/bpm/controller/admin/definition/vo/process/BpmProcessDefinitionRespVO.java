@@ -62,6 +62,9 @@ public class BpmProcessDefinitionRespVO {
     @Schema(description = "BPMN XML")
     private String bpmnXml; // 需要从对应的 BpmnModel 读取，非必须返回
 
+    @Schema(description = "流程定义排序", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
+    private Long sort;
+
     @Schema(description = "发起用户需要选择审批人的任务数组")
     private List<UserTask> startUserSelectTasks; // 需要从对应的 BpmnModel 读取，非必须返回
 

@@ -2,8 +2,6 @@ package cn.iocoder.yudao.module.bpm.controller.admin.definition;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.*;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.simple.BpmSimpleModelNodeVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.simple.BpmSimpleModelUpdateReqVO;
@@ -28,7 +26,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashSet;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -56,38 +54,38 @@ public class BpmModelController {
     @Resource
     private AdminUserApi adminUserApi;
 
-    @GetMapping("/page")
+    @GetMapping("/list")
     @Operation(summary = "获得模型分页")
-    public CommonResult<PageResult<BpmModelRespVO>> getModelPage(BpmModelPageReqVO pageVO) {
-        PageResult<Model> pageResult = modelService.getModelPage(pageVO);
-        if (CollUtil.isEmpty(pageResult.getList())) {
-            return success(PageResult.empty(pageResult.getTotal()));
+    @Parameter(name = "name", description = "模型名称", example = "芋艿")
+    public CommonResult<List<BpmModelRespVO>> getModelPage(@RequestParam(value = "name", required = false) String name) {
+        List<Model> list = modelService.getModelList(name);
+        if (CollUtil.isEmpty(list)) {
+            return success(Collections.emptyList());
         }
 
-        // 拼接数据
         // 获得 Form 表单
-        Set<Long> formIds = convertSet(pageResult.getList(), model -> {
+        Set<Long> formIds = convertSet(list, model -> {
             BpmModelMetaInfoVO metaInfo = BpmModelConvert.INSTANCE.parseMetaInfo(model);
             return metaInfo != null ? metaInfo.getFormId() : null;
         });
         Map<Long, BpmFormDO> formMap = formService.getFormMap(formIds);
         // 获得 Category Map
         Map<String, BpmCategoryDO> categoryMap = categoryService.getCategoryMap(
-                convertSet(pageResult.getList(), Model::getCategory));
+                convertSet(list, Model::getCategory));
         // 获得 Deployment Map
-        Set<String> deploymentIds = new HashSet<>();
-        pageResult.getList().forEach(model -> CollectionUtils.addIfNotNull(deploymentIds, model.getDeploymentId()));
-        Map<String, Deployment> deploymentMap = processDefinitionService.getDeploymentMap(deploymentIds);
+        Map<String, Deployment> deploymentMap = processDefinitionService.getDeploymentMap(
+                convertSet(list, Model::getDeploymentId));
         // 获得 ProcessDefinition Map
-        List<ProcessDefinition> processDefinitions = processDefinitionService.getProcessDefinitionListByDeploymentIds(deploymentIds);
+        List<ProcessDefinition> processDefinitions = processDefinitionService.getProcessDefinitionListByDeploymentIds(
+                deploymentMap.keySet());
         Map<String, ProcessDefinition> processDefinitionMap = convertMap(processDefinitions, ProcessDefinition::getDeploymentId);
         // 获得 User Map
-        Set<Long> userIds = convertSetByFlatMap(pageResult.getList(), model -> {
+        Set<Long> userIds = convertSetByFlatMap(list, model -> {
             BpmModelMetaInfoVO metaInfo = BpmModelConvert.INSTANCE.parseMetaInfo(model);
             return metaInfo != null ? metaInfo.getStartUserIds().stream() : Stream.empty();
         });
         Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(userIds);
-        return success(BpmModelConvert.INSTANCE.buildModelPage(pageResult,
+        return success(BpmModelConvert.INSTANCE.buildModelList(list,
                 formMap, categoryMap, deploymentMap, processDefinitionMap, userMap));
     }
 
@@ -111,11 +109,20 @@ public class BpmModelController {
         return success(modelService.createModel(createRetVO));
     }
 
+
     @PutMapping("/update")
     @Operation(summary = "修改模型")
     @PreAuthorize("@ss.hasPermission('bpm:model:update')")
     public CommonResult<Boolean> updateModel(@Valid @RequestBody BpmModelSaveReqVO modelVO) {
         modelService.updateModel(getLoginUserId(), modelVO);
+        return success(true);
+    }
+
+    @PutMapping("/update-sort-batch")
+    @Operation(summary = "批量修改模型排序")
+    @Parameter(name = "ids", description = "编号数组", required = true, example = "1,2,3")
+    public CommonResult<Boolean> updateModelSortBatch(@RequestParam("ids") List<String> ids) {
+        modelService.updateModelSortBatch(getLoginUserId(), ids);
         return success(true);
     }
 

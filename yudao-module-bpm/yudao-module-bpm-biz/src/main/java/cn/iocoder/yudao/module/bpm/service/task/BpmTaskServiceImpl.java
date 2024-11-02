@@ -764,9 +764,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         taskService.setOwner(taskId, task.getAssignee());
         // 3.2 执行委派，将任务委派给 delegateUser
         taskService.delegateTask(taskId, reqVO.getDelegateUserId().toString());
-        // 3.3 更新 task 状态。
-        // 为什么不更新原因？因为原因目前主要给审批通过、不通过时使用
-        updateTaskStatus(taskId, BpmTaskStatusEnum.DELEGATE.getStatus());
+        // 补充说明：委托不单独设置状态。如果需要，可通过 Task 的 DelegationState 字段，判断是否为 DelegationState.PENDING 委托中
     }
 
     @Override

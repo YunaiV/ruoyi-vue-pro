@@ -173,6 +173,11 @@ public class BpmProcessDefinitionServiceImpl implements BpmProcessDefinitionServ
     }
 
     @Override
+    public void updateProcessDefinitionSortByModelId(String modelId, Long sort) {
+        processDefinitionMapper.updateByModelId(modelId, new BpmProcessDefinitionInfoDO().setSort(sort));
+    }
+
+    @Override
     public BpmnModel getProcessDefinitionBpmnModel(String id) {
         return repositoryService.getBpmnModel(id);
     }

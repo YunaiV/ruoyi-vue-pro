@@ -123,18 +123,15 @@ public class BpmTaskController {
         }
 
         // 拼接数据
-        HistoricProcessInstance processInstance = processInstanceService.getHistoricProcessInstance(processInstanceId);
-        // 获得 User 和 Dept Map
         Set<Long> userIds = convertSetByFlatMap(taskList, task ->
                 Stream.of(NumberUtils.parseLong(task.getAssignee()), NumberUtils.parseLong(task.getOwner())));
-        userIds.add(NumberUtils.parseLong(processInstance.getStartUserId()));
         Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(userIds);
         Map<Long, DeptRespDTO> deptMap = deptApi.getDeptMap(
                 convertSet(userMap.values(), AdminUserRespDTO::getDeptId));
         // 获得 Form Map
         Map<Long, BpmFormDO> formMap = formService.getFormMap(
                 convertSet(taskList, task -> NumberUtils.parseLong(task.getFormKey())));
-        return success(BpmTaskConvert.INSTANCE.buildTaskListByProcessInstanceId(taskList, processInstance,
+        return success(BpmTaskConvert.INSTANCE.buildTaskListByProcessInstanceId(taskList,
                 formMap, userMap, deptMap));
     }
 
