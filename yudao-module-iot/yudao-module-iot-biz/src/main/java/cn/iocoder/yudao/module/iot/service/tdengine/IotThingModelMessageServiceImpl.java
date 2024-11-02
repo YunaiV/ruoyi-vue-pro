@@ -1,13 +1,16 @@
 package cn.iocoder.yudao.module.iot.service.tdengine;
 
+import cn.hutool.core.date.DateUtil;
 import cn.iocoder.yudao.framework.tenant.core.aop.TenantIgnore;
-import cn.iocoder.yudao.module.iot.controller.admin.device.vo.IotDeviceStatusUpdateReqVO;
+import cn.iocoder.yudao.module.iot.controller.admin.device.vo.device.IotDeviceStatusUpdateReqVO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDO;
+import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDataDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.tdengine.FieldParser;
 import cn.iocoder.yudao.module.iot.dal.dataobject.tdengine.TableDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.tdengine.TdFieldDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.tdengine.ThingModelMessage;
 import cn.iocoder.yudao.module.iot.dal.dataobject.thinkmodelfunction.IotThinkModelFunctionDO;
+import cn.iocoder.yudao.module.iot.dal.redis.deviceData.DeviceDataRedisDAO;
 import cn.iocoder.yudao.module.iot.enums.device.IotDeviceStatusEnum;
 import cn.iocoder.yudao.module.iot.enums.product.IotProductFunctionTypeEnum;
 import cn.iocoder.yudao.module.iot.service.device.IotDeviceService;
@@ -17,9 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -36,11 +37,14 @@ public class IotThingModelMessageServiceImpl implements IotThingModelMessageServ
     @Resource
     private IotTdEngineService iotTdEngineService;
 
+    @Resource
+    private DeviceDataRedisDAO deviceDataRedisDAO;
+
     @Override
     @TenantIgnore
     public void saveThingModelMessage(IotDeviceDO device, ThingModelMessage thingModelMessage) {
         // 判断设备状态，如果为未激活状态，创建数据表
-        if (device.getStatus().equals(0)) {
+        if (IotDeviceStatusEnum.INACTIVE.getStatus().equals(device.getStatus())) {
             // 创建设备数据表
             createDeviceTable(device.getDeviceType(), device.getProductKey(), device.getDeviceName(), device.getDeviceKey());
             // 更新设备状态
@@ -50,53 +54,99 @@ public class IotThingModelMessageServiceImpl implements IotThingModelMessageServ
             iotDeviceService.updateDeviceStatus(updateReqVO);
         }
 
-        // 1. 获取设备属性
+        // 获取设备属性
         Map<String, Object> params = thingModelMessage.dataToMap();
 
-        // 2. 物模型校验，过滤非物模型属性
-        List<IotThinkModelFunctionDO> thinkModelFunctionListByProductKey = iotThinkModelFunctionService.getThinkModelFunctionListByProductKey(thingModelMessage.getProductKey());
+        // 物模型校验，过滤非物模型属性
+        List<IotThinkModelFunctionDO> functionList = iotThinkModelFunctionService
+                .getThinkModelFunctionListByProductKey(thingModelMessage.getProductKey())
+                .stream()
+                .filter(function -> IotProductFunctionTypeEnum.PROPERTY.getType().equals(function.getType()))
+                .toList();
 
-        // 2.1 筛选是属性 IotProductFunctionTypeEnum
-        thinkModelFunctionListByProductKey.removeIf(iotThinkModelFunctionDO -> !iotThinkModelFunctionDO.getType().equals(IotProductFunctionTypeEnum.PROPERTY.getType()));
-        if (thinkModelFunctionListByProductKey.isEmpty()) {
+        if (functionList.isEmpty()) {
             return;
         }
-        // 2.2 获取属性名称
-        Map<String, String> thingModelProperties = thinkModelFunctionListByProductKey.stream().collect(Collectors.toMap(IotThinkModelFunctionDO::getIdentifier, IotThinkModelFunctionDO::getName));
 
-        // 4. 保存属性记录
+        // 获取属性标识符集合
+        Set<String> propertyIdentifiers = functionList.stream()
+                .map(IotThinkModelFunctionDO::getIdentifier)
+                .collect(Collectors.toSet());
+
+        Map<String, IotThinkModelFunctionDO> functionMap = functionList.stream()
+                .collect(Collectors.toMap(IotThinkModelFunctionDO::getIdentifier, function -> function));
+
+        // 过滤并收集有效的属性字段
         List<TdFieldDO> schemaFieldValues = new ArrayList<>();
-
-        // 1. 设置字段名
         schemaFieldValues.add(new TdFieldDO("time", thingModelMessage.getTime()));
-
-        // 2. 遍历新属性
         params.forEach((key, val) -> {
-            if (thingModelProperties.containsKey(key)) {
+            if (propertyIdentifiers.contains(key)) {
                 schemaFieldValues.add(new TdFieldDO(key.toLowerCase(), val));
+                // 缓存设备属性
+                setDeviceDataCache(device, functionMap.get(key), val, thingModelMessage.getTime());
             }
         });
+        if (schemaFieldValues.size() == 1) {
+            return;
+        }
 
-        // 3. 保存设备属性
+        // 构建并保存设备属性
         TableDO tableData = new TableDO();
-        tableData.setDataBaseName(url.substring(url.lastIndexOf("/") + 1));
+        tableData.setDataBaseName(getDatabaseName());
         tableData.setSuperTableName(getProductPropertySTableName(device.getDeviceType(), device.getProductKey()));
-        tableData.setTableName("device_" + device.getProductKey().toLowerCase() + "_" + device.getDeviceName().toLowerCase());
+        tableData.setTableName(getDeviceTableName(device.getProductKey(), device.getDeviceName()));
         tableData.setSchemaFieldValues(schemaFieldValues);
 
-        // 4. 保存数据
         iotTdEngineService.insertData(tableData);
     }
 
+    /**
+     * 缓存设备属性
+     *
+     * @param device                  设备信息
+     * @param iotThinkModelFunctionDO 物模型属性
+     * @param val                     属性值
+     * @param time                    时间
+     */
+    private void setDeviceDataCache(IotDeviceDO device, IotThinkModelFunctionDO iotThinkModelFunctionDO, Object val, Long time) {
+        IotDeviceDataDO deviceData = IotDeviceDataDO.builder()
+                .productKey(device.getProductKey())
+                .deviceName(device.getDeviceName())
+                .identifier(iotThinkModelFunctionDO.getIdentifier())
+                .value(val != null ? val.toString() : null)
+                .updateTime(DateUtil.toLocalDateTime(new Date(time)))
+                .deviceId(device.getId())
+                .thinkModelFunctionId(iotThinkModelFunctionDO.getId())
+                .name(iotThinkModelFunctionDO.getName())
+                .dataType(iotThinkModelFunctionDO.getProperty().getDataType().getType())
+                .build();
+        deviceDataRedisDAO.set(deviceData);
+    }
+
+    /**
+     * 创建设备数据表
+     *
+     * @param deviceType 设备类型
+     * @param productKey 产品 Key
+     * @param deviceName 设备名称
+     * @param deviceKey  设备 Key
+     */
     private void createDeviceTable(Integer deviceType, String productKey, String deviceName, String deviceKey) {
+        String superTableName = getProductPropertySTableName(deviceType, productKey);
+        String dataBaseName = getDatabaseName();
+
+        List<Map<String, Object>> maps = iotTdEngineService.describeSuperTable(dataBaseName, superTableName);
         List<TdFieldDO> tagsFieldValues = new ArrayList<>();
-        String SuperTableName = getProductPropertySTableName(deviceType, productKey);
-        List<Map<String, Object>> maps = iotTdEngineService.describeSuperTable(url.substring(url.lastIndexOf("/") + 1), SuperTableName);
+
         if (maps != null) {
-            List<Map<String, Object>> taggedNotesList = maps.stream().filter(map -> "TAG".equals(map.get("note"))).toList();
+            List<Map<String, Object>> taggedNotesList = maps.stream()
+                    .filter(map -> "TAG".equals(map.get("note")))
+                    .toList();
+
             tagsFieldValues = FieldParser.parse(taggedNotesList.stream()
                     .map(map -> List.of(map.get("field"), map.get("type"), map.get("length")))
                     .collect(Collectors.toList()));
+
             for (TdFieldDO tagsFieldValue : tagsFieldValues) {
                 switch (tagsFieldValue.getFieldName()) {
                     case "product_key" -> tagsFieldValue.setFieldValue(productKey);
@@ -107,21 +157,49 @@ public class IotThingModelMessageServiceImpl implements IotThingModelMessageServ
             }
         }
 
-        // 1. 创建设备数据表
-        String tableName = "device_" + productKey.toLowerCase() + "_" + deviceName.toLowerCase();
+        // 创建设备数据表
+        String tableName = getDeviceTableName(productKey, deviceName);
         TableDO tableDto = new TableDO();
-        tableDto.setDataBaseName(url.substring(url.lastIndexOf("/") + 1));
-        tableDto.setSuperTableName(SuperTableName);
+        tableDto.setDataBaseName(dataBaseName);
+        tableDto.setSuperTableName(superTableName);
         tableDto.setTableName(tableName);
         tableDto.setTagsFieldValues(tagsFieldValues);
+
         iotTdEngineService.createTable(tableDto);
     }
 
-    static String getProductPropertySTableName(Integer deviceType, String productKey) {
+    /**
+     * 获取数据库名称
+     *
+     * @return 数据库名称
+     */
+    private String getDatabaseName() {
+        return url.substring(url.lastIndexOf("/") + 1);
+    }
+
+    /**
+     * 获取产品属性表名
+     *
+     * @param deviceType 设备类型
+     * @param productKey 产品 Key
+     * @return 产品属性表名
+     */
+    private static String getProductPropertySTableName(Integer deviceType, String productKey) {
         return switch (deviceType) {
             case 1 -> String.format("gateway_sub_%s", productKey).toLowerCase();
             case 2 -> String.format("gateway_%s", productKey).toLowerCase();
             default -> String.format("device_%s", productKey).toLowerCase();
         };
+    }
+
+    /**
+     * 获取设备表名
+     *
+     * @param productKey 产品 Key
+     * @param deviceName 设备名称
+     * @return 设备表名
+     */
+    private static String getDeviceTableName(String productKey, String deviceName) {
+        return String.format("device_%s_%s", productKey.toLowerCase(), deviceName.toLowerCase());
     }
 }

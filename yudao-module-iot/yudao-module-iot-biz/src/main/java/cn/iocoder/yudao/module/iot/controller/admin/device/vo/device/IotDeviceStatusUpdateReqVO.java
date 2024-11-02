@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.iot.controller.admin.device.vo;
+package cn.iocoder.yudao.module.iot.controller.admin.device.vo.device;
 
 import cn.iocoder.yudao.framework.common.validation.InEnum;
 import cn.iocoder.yudao.module.iot.enums.device.IotDeviceStatusEnum;

@@ -3,7 +3,7 @@ package cn.iocoder.yudao.module.iot.dal.mysql.device;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
-import cn.iocoder.yudao.module.iot.controller.admin.device.vo.IotDevicePageReqVO;
+import cn.iocoder.yudao.module.iot.controller.admin.device.vo.device.IotDevicePageReqVO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDO;
 import org.apache.ibatis.annotations.Mapper;
 
