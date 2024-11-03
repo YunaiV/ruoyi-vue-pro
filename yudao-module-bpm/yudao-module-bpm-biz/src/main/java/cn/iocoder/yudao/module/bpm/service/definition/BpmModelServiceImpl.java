@@ -170,10 +170,10 @@ public class BpmModelServiceImpl implements BpmModelService {
         // 1.4 校验任务分配规则已配置
         taskCandidateInvoker.validateBpmnConfig(bpmnBytes);
         // 1.5 获取仿钉钉流程设计器模型数据
-        byte[] simpleBytes = getModelSimpleJson(model.getId());
+        String simpleJson = getModelSimpleJson(model.getId());
 
         // 2.1 创建流程定义
-        String definitionId = processDefinitionService.createProcessDefinition(model, metaInfo, bpmnBytes, simpleBytes, form);
+        String definitionId = processDefinitionService.createProcessDefinition(model, metaInfo, bpmnBytes, simpleJson, form);
 
         // 2.2 将老的流程定义进行挂起。也就是说，只有最新部署的流程定义，才可以发起任务。
         updateProcessDefinitionSuspended(model.getDeploymentId());
@@ -238,8 +238,8 @@ public class BpmModelServiceImpl implements BpmModelService {
     public BpmSimpleModelNodeVO getSimpleModel(String modelId) {
         Model model = validateModelExists(modelId);
         // 通过 ACT_RE_MODEL 表 EDITOR_SOURCE_EXTRA_VALUE_ID_ ，获取仿钉钉快搭模型的 JSON 数据
-        byte[] jsonBytes = getModelSimpleJson(model.getId());
-        return JsonUtils.parseObject(jsonBytes, BpmSimpleModelNodeVO.class);
+        String json = getModelSimpleJson(model.getId());
+        return JsonUtils.parseObject(json, BpmSimpleModelNodeVO.class);
     }
 
     @Override
@@ -252,7 +252,7 @@ public class BpmModelServiceImpl implements BpmModelService {
         // 2.2 保存 Bpmn XML
         updateModelBpmnXml(model.getId(), BpmnModelUtils.getBpmnXml(bpmnModel));
         // 2.3 保存 JSON 数据
-        saveModelSimpleJson(model.getId(), JsonUtils.toJsonByte(reqVO.getSimpleModel()));
+        updateModelSimpleJson(model.getId(), reqVO.getSimpleModel());
     }
 
     /**
@@ -291,15 +291,21 @@ public class BpmModelServiceImpl implements BpmModelService {
         repositoryService.addModelEditorSource(id, StrUtil.utf8Bytes(bpmnXml));
     }
 
-    private byte[] getModelSimpleJson(String id) {
-        return repositoryService.getModelEditorSourceExtra(id);
+    @SuppressWarnings("JavaExistingMethodCanBeUsed")
+    private String getModelSimpleJson(String id) {
+        byte[] bytes = repositoryService.getModelEditorSourceExtra(id);
+        if (ArrayUtil.isEmpty(bytes)) {
+            return null;
+        }
+        return StrUtil.utf8Str(bytes);
     }
 
-    private void saveModelSimpleJson(String id, byte[] jsonBytes) {
-        if (ArrayUtil.isEmpty(jsonBytes)) {
+    private void updateModelSimpleJson(String id, BpmSimpleModelNodeVO node) {
+        if (node == null) {
             return;
         }
-        repositoryService.addModelEditorSourceExtra(id, jsonBytes);
+        byte[] bytes = JsonUtils.toJsonByte(node);
+        repositoryService.addModelEditorSourceExtra(id, bytes);
     }
 
     /**

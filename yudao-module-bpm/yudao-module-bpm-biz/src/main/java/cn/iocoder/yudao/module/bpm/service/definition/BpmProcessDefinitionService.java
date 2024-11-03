@@ -48,12 +48,12 @@ public interface BpmProcessDefinitionService {
      * @param model 流程模型
      * @param modelMetaInfo 流程模型元信息
      * @param bpmnBytes BPMN XML 字节数组
-     * @param simpleBytes SIMPLE Model JSON 字节数组
+     * @param simpleJson SIMPLE Model JSON
      * @param form 表单
      * @return 流程编号
      */
     String createProcessDefinition(Model model, BpmModelMetaInfoVO modelMetaInfo,
-                                   byte[] bpmnBytes, byte[] simpleBytes, BpmFormDO form);
+                                   byte[] bpmnBytes, String simpleJson, BpmFormDO form);
 
     /**
      * 更新流程定义状态
