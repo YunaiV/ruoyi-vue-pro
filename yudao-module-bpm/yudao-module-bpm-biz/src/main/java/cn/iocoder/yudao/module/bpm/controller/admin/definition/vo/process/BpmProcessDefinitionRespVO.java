@@ -62,6 +62,9 @@ public class BpmProcessDefinitionRespVO {
     @Schema(description = "BPMN XML")
     private String bpmnXml; // 需要从对应的 BpmnModel 读取，非必须返回
 
+    @Schema(description = "SIMPLE 设计器模型数据 json 格式")
+    private String simpleModel; // 非必须返回
+
     @Schema(description = "流程定义排序", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     private Long sort;
 
