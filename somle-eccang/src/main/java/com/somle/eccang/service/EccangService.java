@@ -16,6 +16,7 @@ import com.somle.framework.common.util.json.JsonUtils;
 import com.somle.framework.common.util.json.JSONObject;
 
 import com.somle.framework.common.util.object.ObjectUtils;
+import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.integration.support.MessageBuilder;
 import org.springframework.messaging.MessageChannel;
@@ -103,6 +104,7 @@ public class EccangService {
     }
 
     // core network io
+    @SneakyThrows
     @Retryable(value = RuntimeException.class)
     private EccangResponse getResponse(Object payload, String endpoint){
         String url = "http://openapi-web.eccang.com/openApi/api/unity";
@@ -113,8 +115,9 @@ public class EccangService {
             var response = WebUtils.postRequest(url, Map.of(), Map.of(), requestBody);
             switch (response.code()) {
                 case 200:
-                    log.info(response.toString());
-                    return WebUtils.parseResponse(response, EccangResponse.class);
+                    var responseBody = response.body().string();
+                    log.info(responseBody);
+                    return JsonUtils.parseObject(responseBody, EccangResponse.class);
                 default:
                     throw new RuntimeException("Unknown response code " + response.toString());
             }
@@ -137,7 +140,7 @@ public class EccangService {
             case "common.error.code.9999":
                 throw new RuntimeException("Eccang return invalid response: " + response.getErrors().toString());
             case "300":
-                throw new RuntimeException("Error message from eccang: " + response.getErrors().toString());
+                throw new RuntimeException("Error message from eccang: " + response.toString());
             case "429":
                 throw new RuntimeException("Too many requests");
             default:
