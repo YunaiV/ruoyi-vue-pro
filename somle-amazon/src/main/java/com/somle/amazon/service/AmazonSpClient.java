@@ -5,6 +5,7 @@ import com.somle.amazon.controller.vo.AmazonSpReportReqVO;
 import com.somle.amazon.controller.vo.AmazonSpReportSaveVO;
 import com.somle.amazon.model.*;
 //import com.somle.amazon.repository.AmazonSellerRepository;
+import com.somle.framework.common.util.date.LocalDateTimeUtils;
 import com.somle.framework.common.util.general.CoreUtils;
 import com.somle.framework.common.util.json.JSONObject;
 import com.somle.framework.common.util.json.JsonUtils;
@@ -48,9 +49,11 @@ public class AmazonSpClient {
         return getShops().filter(shop->shop.getCountry().getCode().equals(countryCode)).findFirst().get();
     }
 
+
+
     @SneakyThrows
     @Transactional(readOnly = true)
-    public String getOrder(AmazonSeller seller, AmazonSpOrderReqVO vo) {
+    public JSONObject getOrder(AmazonSeller seller, AmazonSpOrderReqVO vo) {
         log.info("get orders");
 
         String endPoint = seller.getRegion().getSpEndPoint();
@@ -61,7 +64,8 @@ public class AmazonSpClient {
 //        var reportsString = WebUtils.parseResponse(response, JSONObject.class).get("payload").get("orders");
 //        var reportList = JsonUtils.parseArray(reportsString, AmazonSpReport.class);
 //        return reportList;
-        return response.body().string();
+        var bodyString = response.body().string();
+        return JsonUtils.parseObject(bodyString, JSONObject.class);
     }
 
     @Transactional(readOnly = true)
