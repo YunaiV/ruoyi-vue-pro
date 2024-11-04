@@ -2,6 +2,9 @@ package com.somle.esb.controller;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.module.system.api.dept.DeptApi;
+import cn.iocoder.yudao.module.system.controller.admin.dept.vo.dept.DeptSaveReqVO;
+import cn.iocoder.yudao.module.system.dal.dataobject.dept.DeptDO;
+import cn.iocoder.yudao.module.system.service.dept.DeptService;
 import com.somle.eccang.model.EccangCategory;
 import com.somle.eccang.model.EccangResponse;
 import com.somle.eccang.service.EccangService;
@@ -28,24 +31,6 @@ public class EsbController {
     @Autowired
     private EsbService service;
 
-  /*  @GetMapping("/syncErpDept")
-    @Operation(summary = "将erp部门信息同步到eccang")
-    public CommonResult<Long> createProductCategory(@Valid @RequestBody ErpProductCategorySaveReqVO createReqVO) {
-        return success(productCategoryService.createProductCategory(createReqVO));
-    }*/@Resource
-    ErpToEccangConverter erpToEccangConverter;
-    @Resource
-    EccangService eccangService;
-    @Resource
-    EsbService esbService;
-    @GetMapping("/a")
-    public void a() {
-        //EccangCategory eccang = erpToEccangConverter.toEccang("50034");
-        //EccangResponse.BizContent response = eccangService.addDepartment(eccang);
-        esbService.handleProduct();
-    }
-
-
     @PostMapping("/getBeans")
     public void printAllBeans() {
         service.printAllBeans();
@@ -63,9 +48,11 @@ public class EsbController {
 //        return "success";
 //    }
 
+    @Resource
+    private DeptService deptService;
     @PostMapping("/syncDepartments")
     public String syncDepartments() {
-        service.syncDepartments();
+        service.syncEccangDepartments();
         return "success";
     }
 
@@ -73,12 +60,6 @@ public class EsbController {
     public String syncUsers() {
         service.syncUsers();
         return "success";
-    }
-    @Autowired
-    ErpToEccangConverter converter;
-    @GetMapping("/aaaa")
-    public Object aaaa() {
-        return converter.toEccang();
     }
 
 

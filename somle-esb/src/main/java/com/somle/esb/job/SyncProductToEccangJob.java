@@ -6,22 +6,20 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
- * @className: syncDepartmentsJob
+ * @className: SyncProductToEccangJob
  * @author: Wqh
- * @date: 2024/10/29 17:24
+ * @date: 2024/10/31 13:58
  * @Version: 1.0
  * @description:
  */
 @Slf4j
 @Component
-public class syncDepartmentsJob extends DataJob{
+public class SyncProductToEccangJob extends DataJob{
     @Autowired
     EsbService service;
-
-
     @Override
     public String execute(String param) throws Exception {
-        service.syncDepartments();
-        return "sync users success";
+        service.handleProduct();
+        return "sync success";
     }
 }

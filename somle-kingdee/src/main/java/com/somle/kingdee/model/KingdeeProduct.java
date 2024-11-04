@@ -104,8 +104,8 @@ public class KingdeeProduct {
     // private Float wide;
 
     // custom
-    private Long saleDepartmentId;
-    private String declaredTypeZh;
+    //private Long saleDepartmentId;
+    //private String declaredTypeZh;
 }
 
 @Data

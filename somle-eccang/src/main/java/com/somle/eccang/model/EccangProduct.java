@@ -126,6 +126,8 @@ public class EccangProduct {
     private String useEn;
     private String pdProductCoustomsAttribute;
     private String pdDeclarationStatement;
+    //产品箱规
+    private List<Object> boxArr;
 
     @JsonIgnore
     public String getProductCategoryName() {

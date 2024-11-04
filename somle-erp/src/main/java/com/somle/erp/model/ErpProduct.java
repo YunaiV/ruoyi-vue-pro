@@ -36,6 +36,10 @@ public class ErpProduct {
     @Transient
     private String productTitleEn;
 
+    /**
+     * 国家编码
+     */
+    private String countryCode;
 
     /**
     * 图片地址（当前只有一张）
@@ -182,4 +186,14 @@ public class ErpProduct {
      * 条形码
      */
     private String barCode;
+
+    /**
+    * 产品部门名称  ======>>>>>  对应eccang的品类
+    **/
+    private String productDeptName;
+
+    /**
+     * 产品部门名id
+     **/
+    private Long productDeptId;
 }

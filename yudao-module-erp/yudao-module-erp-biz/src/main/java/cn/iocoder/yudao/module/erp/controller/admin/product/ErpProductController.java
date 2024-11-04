@@ -12,6 +12,7 @@ import cn.iocoder.yudao.module.erp.controller.admin.product.vo.product.ErpProduc
 import cn.iocoder.yudao.module.erp.controller.admin.product.vo.product.ProductSaveReqVO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.product.ErpProductDO;
 import cn.iocoder.yudao.module.erp.service.product.ErpProductService;
+import cn.iocoder.yudao.module.system.service.dept.DeptService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -29,6 +30,9 @@ import static cn.iocoder.yudao.framework.apilog.core.enums.OperateTypeEnum.EXPOR
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
 
+/**
+ * @author Administrator
+ */
 @Tag(name = "管理后台 - ERP 产品")
 @RestController
 @RequestMapping("/erp/product")

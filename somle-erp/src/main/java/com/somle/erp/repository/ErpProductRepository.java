@@ -44,14 +44,18 @@ public interface ErpProductRepository extends JpaRepository<ErpProduct, Long> {
             "\ta.declared_type AS pd_oversea_type_cn,\n" +
             "\ta.declared_type_en AS pd_oversea_type_en,\n" +
             "\ta.tax_rate AS fbo_tax_rate,\n" +
+            "\ta.country_code AS country_code,\n" +
             "\te.`name` AS user_organization_id,\n" +
-            "\tc.bar_code \n" +
+            "\tc.bar_code,\n" +
+            "\tf.`name` AS product_dept_name,\n" +
+            "\tc.dept_id AS product_dept_id \n" +
             "FROM\n" +
             "\terp_custom_rule a\n" +
             "\tLEFT JOIN ( SELECT * FROM erp_supplier_product WHERE deleted = 0 ) b ON a.supplier_product_id = b.id\n" +
             "\tLEFT JOIN ( SELECT * FROM erp_product WHERE deleted = 0 ) c ON b.product_id = c.id\n" +
-            "\tLEFT JOIN ( SELECT * FROM system_users WHERE deleted = 0 ) d ON c.creator = d.id \n" +
-            "\tLEFT JOIN ( SELECT * FROM system_dept WHERE deleted = 0 ) e ON d.dept_id = a.id\n" +
+            "\tLEFT JOIN ( SELECT * FROM system_users WHERE deleted = 0 ) d ON c.creator = d.id\n" +
+            "\tLEFT JOIN ( SELECT * FROM system_dept WHERE deleted = 0 ) e ON d.dept_id = e.id\n" +
+            "\tLEFT JOIN ( SELECT * FROM system_dept WHERE deleted = 0 ) f ON c.dept_id = f.id \n" +
             "WHERE\n" +
             "\ta.deleted = 0", nativeQuery = true)
     List<ErpProduct> findAllProducts();

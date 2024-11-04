@@ -1,5 +1,6 @@
 package com.somle.esb.service;
 
+import cn.hutool.core.util.ObjUtil;
 import cn.iocoder.yudao.module.system.service.dept.DeptService;
 import cn.iocoder.yudao.module.system.service.user.AdminUserService;
 import com.somle.ai.model.AiName;
@@ -17,7 +18,6 @@ import com.somle.esb.converter.DingTalkToErpConverter;
 import com.somle.esb.converter.EccangToErpConverter;
 import com.somle.esb.converter.ErpToEccangConverter;
 import com.somle.esb.converter.ErpToKingdeeConverter;
-import com.somle.esb.model.Domain;
 import com.somle.esb.model.OssData;
 import com.somle.kingdee.model.KingdeeProduct;
 import com.somle.kingdee.service.KingdeeService;
@@ -32,8 +32,6 @@ import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
@@ -124,37 +122,13 @@ public class EsbService {
     public void handleProduct(Message<ErpCountrySku> message) {
         EccangProduct product = erpToEccangConverter.toEccang(message.getPayload());
         product.setActionType("ADD");
-        try {
-            eccangService.getProduct(product.getProductSku());
+        EccangProduct eccangServiceProduct = eccangService.getProduct(product.getProductSku());
+        if (ObjUtil.isNotEmpty(eccangServiceProduct)){
             product.setActionType("EDIT");
-        } catch (Exception e) {
-            log.info("sku not exist, adding new");
-            log.debug(e.toString());
-            e.printStackTrace();
         }
         log.debug(product.toString());
         EccangResponse.BizContent response = eccangService.addProduct(product);
         log.info(response.toString());
-    }
-
-
-    @ServiceActivator(inputChannel = "productChannel")
-    public void handleProduct() {
-        List<EccangProduct> eccangProducts = erpToEccangConverter.toEccang();
-        for (EccangProduct eccangProduct : eccangProducts){
-            eccangProduct.setActionType("ADD");
-            try {
-                eccangService.getProduct(eccangProduct.getProductSku());
-                eccangProduct.setActionType("EDIT");
-            } catch (Exception e) {
-                log.info("sku not exist, adding new");
-                log.debug(e.toString());
-                e.printStackTrace();
-            }
-            log.debug(eccangProduct.toString());
-            EccangResponse.BizContent response = eccangService.addProduct(eccangProduct);
-            log.info(response.toString());
-        }
     }
 
     @ServiceActivator(inputChannel = "productChannel")
@@ -167,13 +141,28 @@ public class EsbService {
         return true;
     }
 
-    @ServiceActivator(inputChannel = "productChannel")
-    public boolean handleProducts() {
+    public void handleProduct() {
+        List<EccangProduct> eccangProducts = erpToEccangConverter.toEccang();
+        for (EccangProduct eccangProduct : eccangProducts){
+            eccangProduct.setActionType("ADD");
+            EccangProduct eccangServiceProduct = eccangService.getProduct(eccangProduct.getProductSku());
+            //根据sku从eccang中获取产品，如果产品不为空，则表示已存在，操作则变为修改
+            if (ObjUtil.isNotEmpty(eccangServiceProduct)){
+                eccangProduct.setActionType("EDIT");
+                //如果是修改就要上传默认采购单价
+                //TODO 后续有变更，请修改
+                eccangProduct.setProductPurchaseValue(0.001F);
+            }
+            log.debug(eccangProduct.toString());
+            eccangService.addBatchProduct(List.of(eccangProduct));
+        }
+    }
+
+    public void handleProducts() {
         List<KingdeeProduct> kingdee = erpToKingdeeConverter.toKingdee();
         for (KingdeeProduct kingdeeProduct : kingdee){
             kingdeeService.addProduct(kingdeeProduct);
         }
-        return true;
     }
 
     @ServiceActivator(inputChannel = "saleChannel")
@@ -201,7 +190,7 @@ public class EsbService {
 //        var kingdeeDepartment = erpToKingdeeConverter.toKingdee(erpDepartment);
 //        kingdeeService.addDepartment(kingdeeDepartment);
 //    }
-    public void syncDepartments() {
+    public void syncEccangDepartments() {
         dingTalkService.getDepartmentStream().forEach(dingTalkDepartment -> {
             log.info("begin syncing: " + dingTalkDepartment.toString());
             var erpDepartment = dingTalkToErpConverter.toErp(dingTalkDepartment);
@@ -214,6 +203,36 @@ public class EsbService {
                 var mapping = mappingService.toMapping(dingTalkDepartment);
                 mapping
                     .setInternalId(deptId);
+                mappingService.save(mapping);
+            }
+            //获取部门名称
+            String name = erpDepartment.getName();
+            if (!Objects.equals(name, "宁波索迈")){
+                EccangCategory eccang = erpToEccangConverter.toEccang(String.valueOf(deptId));
+                EccangResponse.BizContent response = eccangService.addDepartment(eccang);
+                log.info(response.toString());
+            }
+//        var eccangDepartment = erpToEccangConverter.toEccang(erpDepartment);
+//        EccangResponse.BizContent response = eccangService.addDepartment(eccangDepartment);
+//        log.info(response.toString());
+//        var kingdeeDepartment = erpToKingdeeConverter.toKingdee(erpDepartment);
+//        kingdeeService.addDepartment(kingdeeDepartment);
+        });
+    }
+
+    public void syncKingDeeDepartments() {
+        dingTalkService.getDepartmentStream().forEach(dingTalkDepartment -> {
+            log.info("begin syncing: " + dingTalkDepartment.toString());
+            var erpDepartment = dingTalkToErpConverter.toErp(dingTalkDepartment);
+            log.info("dept to add " + erpDepartment);
+            Long deptId = erpDepartment.getId();
+            if (deptId != null) {
+                deptService.updateDept(erpDepartment);
+            } else {
+                deptId = deptService.createDept(erpDepartment);
+                var mapping = mappingService.toMapping(dingTalkDepartment);
+                mapping
+                        .setInternalId(deptId);
                 mappingService.save(mapping);
             }
             //获取部门名称

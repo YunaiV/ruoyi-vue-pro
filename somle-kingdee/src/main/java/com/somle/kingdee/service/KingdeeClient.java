@@ -2,13 +2,7 @@ package com.somle.kingdee.service;
 
 import com.somle.framework.common.util.json.JSONObject;
 import com.somle.framework.common.util.json.JsonUtils;
-import com.somle.kingdee.model.KingdeeAuxInfoDetail;
-import com.somle.kingdee.model.KingdeeAuxInfoTypeDetail;
-import com.somle.kingdee.model.KingdeeCustomField;
-import com.somle.kingdee.model.KingdeeProduct;
-import com.somle.kingdee.model.KingdeeResponse;
-import com.somle.kingdee.model.KingdeeToken;
-import com.somle.kingdee.model.KingdeeUnit;
+import com.somle.kingdee.model.*;
 import com.somle.framework.common.util.web.WebUtils;
 import jakarta.annotation.Resource;
 import lombok.Data;
@@ -155,20 +149,18 @@ public class KingdeeClient {
         product.setVolumeUnitId(getMeasureUnitByNumber("立方厘米").getId());
         product.setWeightUnitId(getMeasureUnitByNumber("kg").getId());
         product.setBaseUnitId(getMeasureUnitByNumber("套").getId());
-        product.setCustomField(
-            getCustomFieldByDisplayName("bd_material", "部门"),
+        /*product.setCustomField(
+            getCustomFieldByDisplayName("bd_material", "部门")
             getAuxInfoByNumber(product.getSaleDepartmentId().toString()).getId()
-        );
-        try {
+        );*/
+        /*try {
             product.setCustomField(getCustomFieldByDisplayName("bd_material", "报关品名"), product.getDeclaredTypeZh());
         } catch (Exception e) {
             log.debug("custom field 报关品名 skipped for " + token.getAccountName());
-        }
-
+        }*/
         log.debug("adding product");
         String endUrl = "/jdy/v2/bd/material";
         TreeMap<String, String>  params = new TreeMap<>();
-
         KingdeeResponse response = postResponse(endUrl, params, product);
         return response;
     }
@@ -258,7 +250,11 @@ public class KingdeeClient {
         } else {
             response = WebUtils.getRequest(BASE_HOST + endUrl, params, headers, KingdeeResponse.class);
         }
-
+        //判断resp的code是否为0，如果不为0，抛出异常，并且异常为信息为description
+        String errcode = response.getErrcode();
+        if (!Objects.equals(errcode, "0")){
+            throw new RuntimeException(response.getDescription());
+        }
         return response;
     }
 
@@ -269,5 +265,4 @@ public class KingdeeClient {
     private KingdeeResponse postResponse(String endUrl, TreeMap<String, String>  params, Object payload) {
         return fetchResponse("POST", endUrl, params, payload);
     }
-
 }

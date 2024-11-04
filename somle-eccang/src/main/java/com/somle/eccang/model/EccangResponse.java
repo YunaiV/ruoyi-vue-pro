@@ -1,26 +1,28 @@
 package com.somle.eccang.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.somle.framework.common.util.json.JSONArray;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.somle.framework.common.util.json.JsonUtils;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.List;
 import java.util.Objects;
 
 
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class EccangResponse {
     private String code;
     private String message;
+    private String requestId;
     private long timestamp;
     private String version;
     private String nonceStr;
@@ -34,6 +36,10 @@ public class EccangResponse {
     public static class EccangError {
         private String errorMsg;
         private String errorCode;
+    }
+
+    public String getBizContentString() {
+        return bizContent;
     }
 
     public BizContent getBizContent() {

@@ -5,6 +5,7 @@ import cn.hutool.core.util.ObjectUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.datapermission.core.annotation.DataPermission;
+import cn.iocoder.yudao.module.system.api.dept.dto.DeptLevelDTO;
 import cn.iocoder.yudao.module.system.controller.admin.dept.vo.dept.DeptListReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.dept.vo.dept.DeptSaveReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.dept.DeptDO;
@@ -232,7 +233,7 @@ public class DeptServiceImpl implements DeptService {
     public Integer getDeptLevel(Long id) {
         // 校验自己存在
         validateDeptExists(id);
-        return getParentList(new ArrayList<>(),id);
+        return getParentList(new TreeSet<>(),id, 0).size();
     }
 
     @Override
@@ -243,14 +244,20 @@ public class DeptServiceImpl implements DeptService {
         return deptMapper.selectById(deptDO.getParentId()).getName();
     }
 
-    private Integer getParentList(List<DeptDO> deptList,Long id){
+    @Override
+    public TreeSet<DeptLevelDTO> getDeptTreeLevel(Long id) {
+        return getParentList(new TreeSet<>(),id, 0);
+    }
+
+    private TreeSet<DeptLevelDTO> getParentList(TreeSet<DeptLevelDTO> deptList,Long id,Integer level){
         DeptDO deptDO = deptMapper.selectById(id);
-        deptList.add(deptDO);
+        DeptLevelDTO dto = new DeptLevelDTO(deptDO.getId(),deptDO.getName(),level++);
+        deptList.add(dto);
         //判断是否是顶级部门
         if (DeptDO.PARENT_ID_ROOT.equals(deptDO.getParentId())){
-            return deptList.size();
+            return deptList;
         }
         //根据父id获取
-        return getParentList(deptList,deptDO.getParentId());
+        return getParentList(deptList,deptDO.getParentId(),level);
     }
 }

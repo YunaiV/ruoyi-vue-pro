@@ -1,5 +1,6 @@
 package com.somle.eccang.service;
 
+import java.io.IOException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.time.LocalDate;
@@ -7,15 +8,19 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 import cn.hutool.core.collection.BoundedPriorityQueue;
+import cn.hutool.core.collection.CollUtil;
 import com.somle.eccang.model.*;
 import com.somle.framework.common.util.general.CoreUtils;
 import com.somle.framework.common.util.json.JsonUtils;
 import com.somle.framework.common.util.json.JSONObject;
 
 import com.somle.framework.common.util.object.ObjectUtils;
+import okhttp3.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.integration.support.MessageBuilder;
 import org.springframework.messaging.MessageChannel;
@@ -104,25 +109,21 @@ public class EccangService {
 
     // core network io
     @Retryable(value = RuntimeException.class)
-    private EccangResponse getResponse(Object payload, String endpoint){
+    private EccangResponse getResponse(Object payload, String endpoint) {
         String url = "http://openapi-web.eccang.com/openApi/api/unity";
-
         EccangResponse responseFinal = CoreUtils.retry(ctx -> {
             // 限流器限制在生成签名前，防止签名过期
             JSONObject requestBody = limiter.executeWithLimiter(()->requestBody(payload, endpoint));
-            var response = WebUtils.postRequest(url, Map.of(), Map.of(), requestBody);
+            Response response = WebUtils.postRequest(url, Map.of(), Map.of(), requestBody);
             switch (response.code()) {
                 case 200:
                     log.info(response.toString());
                     return WebUtils.parseResponse(response, EccangResponse.class);
                 default:
-                    throw new RuntimeException("Unknown response code " + response.toString());
+                    throw new RuntimeException("Unknown response code " + response);
             }
         });
-
         return responseFinal;
-
-
     }
 
     private BizContent getBiz(Object payload, String endpoint) {
@@ -146,7 +147,7 @@ public class EccangService {
             case "429":
                 throw new RuntimeException("Too many requests");
             default:
-                throw new RuntimeException("Unknown eccang-specific response code: " + response.getCode() + " " + response);
+                throw new RuntimeException("Unknown eccang-specific response code: " + response.getCode() + " " + "message: " + response.getMessage());
         }
     }
 
@@ -199,6 +200,7 @@ public class EccangService {
     public BizContent post(String endpoint, Object payload) {
         return getBiz(payload, endpoint);
     }
+
 
     public <T> List<T> post(String endpoint, Object payload, Class<T> objectClass) {
         return getBiz(payload, endpoint).getData(objectClass);
@@ -285,7 +287,11 @@ public class EccangService {
         // String response = post("getWmsProductList", product, String.class).get(0);
         // log.debug(response);
         // return JsonUtils.parseObject(response, EccangProduct.class);
-        return post("getWmsProductList", product, EccangProduct.class).get(0);
+        List<EccangProduct> getWmsProductList = post("getWmsProductList", product, EccangProduct.class);
+        if (CollUtil.isNotEmpty(getWmsProductList)){
+            return getWmsProductList.get(0);
+        }
+        return null;
     }
 
     public Stream<BizContent> getInventory() {
@@ -326,6 +332,18 @@ public class EccangService {
         return post("syncProduct", product);
     }
 
+    public BizContent addProductBoxes(EccangProductBoxes boxes) {
+        return post("syncProductBoxes", boxes);
+    }
+
+    public void addBatchProduct(List<EccangProduct> products) {
+        EccangResponse syncBatchProduct = getResponse(products, "syncBatchProduct");
+        String code = syncBatchProduct.getCode();
+        if (!Objects.equals(code,"200")){
+            throw new RuntimeException("批量添加商品失败,原因："+ syncBatchProduct.getBizContentString());
+        }
+    }
+
     public Stream<EccangCategory> getCategories() {
         return list("categotyList", EccangCategory.class);
     }
@@ -344,7 +362,11 @@ public class EccangService {
 
     public EccangOrganization getOrganizationByNameEn(String nameEn) {
         log.debug("searching organization with name_en " + nameEn);
-        return getOrganizations().filter(n->n.getName().equals(nameEn)).findFirst().get();
+        Optional<EccangOrganization> first = getOrganizations().filter(n -> n.getName().equals(nameEn)).findFirst();
+        if (first.isPresent()){
+            return first.get();
+        }
+        throw new RuntimeException("您传入的部门信息不存在于eccang信息库中");
     }
 
     public Stream<EccangProduct> getProducts() {

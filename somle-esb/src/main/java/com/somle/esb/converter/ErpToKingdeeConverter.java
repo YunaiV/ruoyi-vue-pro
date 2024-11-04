@@ -4,11 +4,15 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import cn.hutool.core.text.StrPool;
 import cn.iocoder.yudao.module.system.controller.admin.dept.vo.dept.DeptSaveReqVO;
+import cn.iocoder.yudao.module.system.dal.dataobject.dept.DeptDO;
+import cn.iocoder.yudao.module.system.service.dept.DeptService;
 import com.somle.erp.model.ErpProduct;
 import com.somle.erp.model.product.ErpCountrySku;
 import com.somle.erp.model.product.ErpStyleSku;
 import com.somle.erp.repository.ErpProductRepository;
+import com.somle.kingdee.model.KingdeeDepartment;
 import com.somle.kingdee.model.KingdeeProduct;
 import com.somle.kingdee.service.KingdeeService;
 import com.somle.kingdee.model.KingdeeAuxInfoDetail;
@@ -27,6 +31,9 @@ public class ErpToKingdeeConverter {
 
     @Autowired
     private ErpProductRepository erpProductRepository;
+
+    @Autowired
+    private DeptService deptService;
 
     public KingdeeProduct toKingdee(ErpCountrySku erpCountrySku) {
         ErpStyleSku erpStyleSku = erpCountrySku.getStyleSku();
@@ -50,8 +57,8 @@ public class ErpToKingdeeConverter {
         product.setWide(String.valueOf(erpStyleSku.getWidth()));
         product.setHigh(String.valueOf(erpStyleSku.getHeight()));
 
-        product.setSaleDepartmentId(erpStyleSku.getSaleDepartmentId());
-        product.setDeclaredTypeZh(erpCountrySku.getDeclaredTypeZh());
+        //product.setSaleDepartmentId(erpStyleSku.getSaleDepartmentId());
+        //product.setDeclaredTypeZh(erpCountrySku.getDeclaredTypeZh());
 
         // product.setIsFloat(true);
         // product.setGrossWeight(product.getPackageWeight());
@@ -82,18 +89,18 @@ public class ErpToKingdeeConverter {
         for (ErpProduct product : allProducts){
             KingdeeProduct kingdeeProduct = new KingdeeProduct();
             kingdeeProduct.setCheckType("1"); //普通
-            kingdeeProduct.setName(product.getProductTitle());
+            kingdeeProduct.setName(product.getProductTitle() + StrPool.DASHED + product.getCountryCode());
             kingdeeProduct.setNumber(product.getProductSku());
             kingdeeProduct.setBarcode(product.getBarCode());
-            kingdeeProduct.setProducingPace(product.getPdOverseaTypeEn()); //报关品名
+            kingdeeProduct.setProducingPace(product.getPdOverseaTypeCn()); //报关品名
             kingdeeProduct.setHelpCode(product.getHsCode()); //HS编码
             kingdeeProduct.setCostMethod("2"); //加权平均
-            kingdeeProduct.setGrossWeight(String.valueOf(product.getProductWeight()));
-            kingdeeProduct.setLength(String.valueOf(product.getProductLength()));
-            kingdeeProduct.setWide(String.valueOf(product.getProductWidth()));
-            kingdeeProduct.setHigh(String.valueOf(product.getProductHeight()));
-            kingdeeProduct.setSaleDepartmentId(Long.valueOf(product.getUserOrganizationId()));
-            kingdeeProduct.setDeclaredTypeZh(product.getPdOverseaTypeCn());
+            kingdeeProduct.setGrossWeight(String.valueOf(product.getPdNetWeight()));
+            kingdeeProduct.setLength(String.valueOf(product.getPdNetLength()));
+            kingdeeProduct.setWide(String.valueOf(product.getPdNetWidth()));
+            kingdeeProduct.setHigh(String.valueOf(product.getPdNetHeight()));
+            //kingdeeProduct.setSaleDepartmentId(50007L);
+            //kingdeeProduct.setDeclaredTypeZh(product.getPdOverseaTypeCn());
             //将报关规则的id存到这里面去
             kingdeeProduct.setMaxInventoryQty(product.getRuleId());
             kingdeeProducts.add(kingdeeProduct);
@@ -101,6 +108,18 @@ public class ErpToKingdeeConverter {
 
         return kingdeeProducts;
 
+    }
+
+    public KingdeeDepartment toKingdee(String deptId) {
+        //这里erp的部门id对应金蝶的部门number
+        //从erp中获取部门信息
+        DeptDO dept = deptService.getDept(Long.valueOf(deptId));
+        KingdeeDepartment department = new KingdeeDepartment();
+        department.setName(dept.getName());
+        department.setNumber(deptId);
+        department.setParentOrgId(String.valueOf(dept.getParentId()));
+        //kingdeeService.getDepartmentDetail(deptId);
+        return department;
     }
 
     public KingdeeAuxInfoDetail toKingdee(DeptSaveReqVO erpDepartment) {
