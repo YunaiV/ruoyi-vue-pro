@@ -1,12 +1,11 @@
 package com.somle.esb.converter;
 
 import cn.hutool.core.collection.CollectionUtil;
-import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.ReflectUtil;
 import cn.iocoder.yudao.framework.common.exception.util.ThrowUtil;
-import cn.iocoder.yudao.module.system.api.dept.dto.DeptLevelDTO;
-import cn.iocoder.yudao.module.system.dal.dataobject.dept.DeptDO;
-import cn.iocoder.yudao.module.system.service.dept.DeptService;
+import cn.iocoder.yudao.module.system.api.dept.DeptApi;
+import cn.iocoder.yudao.module.system.api.dept.dto.DeptLevelRespDTO;
+import cn.iocoder.yudao.module.system.api.dept.dto.DeptRespDTO;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.somle.eccang.model.*;
 import com.somle.eccang.service.EccangService;
@@ -37,7 +36,7 @@ public class ErpToEccangConverter {
     private ErpProductRepository erpProductRepository;
 
     @Autowired
-    DeptService deptService;
+    private DeptApi deptApi;
 
     public EccangProduct toEccang(ErpCountrySku erpCountrySku) {
         ErpStyleSku erpStyleSku = erpCountrySku.getStyleSku();
@@ -101,7 +100,7 @@ public class ErpToEccangConverter {
         List<ErpProduct> allProducts = erpProductRepository.findAllProducts();
         List<EccangProduct> allEccangProducts = new ArrayList<>();
         for (ErpProduct product : allProducts){
-            //编辑箱规
+            /*//编辑箱规
             EccangProductBoxes box = new EccangProductBoxes();
             //箱规的中文名称和英文名称都根据sku来
             box.setBoxName(product.getProductSku()+"-"+ LocalDateTime.now());
@@ -120,9 +119,9 @@ public class ErpToEccangConverter {
             //获取boxId
             String boxId = data.get("box_id").asText();
             Map<String,Object> boxArr = new HashMap<>();
-            boxArr.put("box_id",Integer.valueOf(boxId));
+            boxArr.put("box_id",3);
             boxArr.put("box_quantity",1);
-            boxArr.put("warehouse_id",0);
+            boxArr.put("warehouse_id",0);*/
             //boxArr.put("box_id",boxId);
             EccangOrganization organization = eccangService.getOrganizationByNameEn(product.getUserOrganizationId());
             EccangProduct eccangProduct = new EccangProduct();
@@ -133,12 +132,12 @@ public class ErpToEccangConverter {
             eccangProduct.setProductDeclaredValue(99999.9F);
             eccangProduct.setLogisticAttribute("1");
             eccangProduct.setProductImgUrlList(Collections.singletonList(product.getImageUrl()));
-            eccangProduct.setBoxArr(List.of(boxArr));
+            //eccangProduct.setBoxArr(List.of(boxArr));
             eccangProduct.setDefaultSupplierCode("默认供应商");
             eccangProduct.setUserOrganizationId(organization.getId());
 
             //获取产品部门的源关系
-            TreeSet<DeptLevelDTO> deptTreeLevel = deptService.getDeptTreeLevel(product.getProductDeptId());
+            TreeSet<DeptLevelRespDTO> deptTreeLevel = deptApi.getDeptTreeLevel(product.getProductDeptId());
             //判断集合是否为空、0、大于3
             if (CollectionUtil.isEmpty(deptTreeLevel) || deptTreeLevel.size() >3){
                 throw new RuntimeException("品类部门信息异常，请联系管理员，检查erp中产品资料库中的部门信息");
@@ -147,13 +146,13 @@ public class ErpToEccangConverter {
             deptTreeLevel.pollFirst();
             //设置品类
             int index = 1;
-            for (DeptLevelDTO deptLevelDTO : deptTreeLevel){
+            for (DeptLevelRespDTO deptLevelRespDTO : deptTreeLevel){
                 //根据循环分别设置到procutCategoryNameEn和procutCategoryName
                 //通过反射获取属性名，并设置值
                 Field procutCategoryNameField = ReflectUtil.getField(EccangProduct.class, "procutCategoryName"+ index);
-                ReflectUtil.setFieldValue(eccangProduct,procutCategoryNameField,deptLevelDTO.getDeptName());
+                ReflectUtil.setFieldValue(eccangProduct,procutCategoryNameField, deptLevelRespDTO.getDeptName());
                 Field procutCategoryNameEnField = ReflectUtil.getField(EccangProduct.class, "procutCategoryNameEn"+ index);
-                ReflectUtil.setFieldValue(eccangProduct,procutCategoryNameEnField,deptLevelDTO.getDeptName());
+                ReflectUtil.setFieldValue(eccangProduct,procutCategoryNameEnField, deptLevelRespDTO.getDeptName());
                 index += 1;
             }
 
@@ -164,7 +163,7 @@ public class ErpToEccangConverter {
 
     public EccangCategory toEccang(String deptId) {
         //从erp中获取部门信息
-        DeptDO dept = deptService.getDept(Long.valueOf(deptId));
+        DeptRespDTO dept = deptApi.getDept(Long.valueOf(deptId));
         //获取部门名称
         String deptName = dept.getName();
         String actionType = "ADD";
@@ -178,13 +177,13 @@ public class ErpToEccangConverter {
         }
         try {
             //获取父级名称
-            String parentName = deptService.getParentNameById(Long.valueOf(deptId));
+            String parentName = deptApi.getParentNameById(Long.valueOf(deptId));
             pid = eccangService.getCategoryByName(parentName).getPcId();
         } catch (Exception e) {
             //由于未找到父id，它自己就是顶级层级
             pid = 0;
         }
-        Integer deptLevel = deptService.getDeptLevel(Long.valueOf(deptId));
+        Integer deptLevel = deptApi.getDeptLevel(Long.valueOf(deptId));
         --deptLevel;
         //如果层级为0，则忽略并抛出异常通知操作人员
         ThrowUtil.ifThrow(Objects.equals(deptLevel, 0), DEPT_LEVEL_ERROR);

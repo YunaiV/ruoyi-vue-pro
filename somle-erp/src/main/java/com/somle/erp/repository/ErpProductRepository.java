@@ -22,7 +22,15 @@ public interface ErpProductRepository extends JpaRepository<ErpProduct, Long> {
             "CASE\n" +
             "\t\t\n" +
             "\t\tWHEN a.country_code = 'CN' THEN\n" +
-            "\t\tb.`code` ELSE CONCAT( b.`code`, \"-\", a.country_code ) \n" +
+            "\t\tCONCAT( b.`code`, \"-\", 'CHN' ) \n" +
+            "\t\tWHEN a.country_code = 'US' THEN\n" +
+            "\t\tCONCAT( b.`code`, \"-\", 'USA' ) \n" +
+            "\t\tWHEN a.country_code = 'IN' THEN\n" +
+            "\t\tCONCAT( b.`code`, \"-\", 'IND' ) \n" +
+            "\t\tWHEN a.country_code = 'UK' THEN\n" +
+            "\t\tCONCAT( b.`code`, \"-\", 'EU' ) \n" +
+            "\t\tWHEN a.country_code = 'SA' THEN\n" +
+            "\t\tCONCAT( b.`code`, \"-\", 'KSA' ) ELSE CONCAT( b.`code`, \"-\", a.country_code ) \n" +
             "\tEND AS product_sku,\n" +
             "\tc.`name` AS product_title,\n" +
             "\tc.image_url,\n" +

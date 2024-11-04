@@ -1,28 +1,9 @@
 package com.somle.esb.controller;
 
-import cn.iocoder.yudao.framework.common.pojo.CommonResult;
-import cn.iocoder.yudao.module.system.api.dept.DeptApi;
-import cn.iocoder.yudao.module.system.controller.admin.dept.vo.dept.DeptSaveReqVO;
-import cn.iocoder.yudao.module.system.dal.dataobject.dept.DeptDO;
-import cn.iocoder.yudao.module.system.service.dept.DeptService;
-import com.somle.eccang.model.EccangCategory;
-import com.somle.eccang.model.EccangResponse;
-import com.somle.eccang.service.EccangService;
-import com.somle.esb.converter.ErpToEccangConverter;
-import com.somle.esb.model.Domain;
 import com.somle.esb.service.EsbService;
-import io.swagger.v3.oas.annotations.Operation;
-import jakarta.annotation.Resource;
-import jakarta.validation.Valid;
-import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDate;
-
-import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
 @RestController
 @RequestMapping("/api/esb")
@@ -48,11 +29,10 @@ public class EsbController {
 //        return "success";
 //    }
 
-    @Resource
-    private DeptService deptService;
+
     @PostMapping("/syncDepartments")
     public String syncDepartments() {
-        service.syncEccangDepartments();
+        service.handleProduct();
         return "success";
     }
 

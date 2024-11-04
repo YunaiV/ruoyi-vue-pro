@@ -281,8 +281,9 @@ public class EccangService {
     }
 
     public EccangProduct getProduct(String sku) {
+        //需要返回箱规信息
         EccangProduct product = EccangProduct.builder()
-            .productSku(sku)
+            .productSku(sku).getProductBox(1)
             .build();
         // String response = post("getWmsProductList", product, String.class).get(0);
         // log.debug(response);

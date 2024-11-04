@@ -3,7 +3,9 @@ package cn.iocoder.yudao.module.system.api.user;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjUtil;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
+import cn.iocoder.yudao.module.system.api.user.dto.AdminUserReqDTO;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
+import cn.iocoder.yudao.module.system.controller.admin.user.vo.user.UserSaveReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.dept.DeptDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.user.AdminUserDO;
 import cn.iocoder.yudao.module.system.service.dept.DeptService;
@@ -49,7 +51,8 @@ public class AdminUserApiImpl implements AdminUserApi {
         if (dept == null) {
             return Collections.emptyList();
         }
-        if (ObjUtil.notEqual(dept.getLeaderUserId(), id)) { // 校验为负责人
+        // 校验为负责人
+        if (ObjUtil.notEqual(dept.getLeaderUserId(), id)) {
             return Collections.emptyList();
         }
         deptIds.add(dept.getId());
@@ -61,7 +64,8 @@ public class AdminUserApiImpl implements AdminUserApi {
 
         // 2. 获取部门对应的用户信息
         List<AdminUserDO> users = userService.getUserListByDeptIds(deptIds);
-        users.removeIf(item -> ObjUtil.equal(item.getId(), id)); // 排除自己
+        // 排除自己
+        users.removeIf(item -> ObjUtil.equal(item.getId(), id));
         return BeanUtils.toBean(users, AdminUserRespDTO.class);
     }
 
@@ -86,6 +90,18 @@ public class AdminUserApiImpl implements AdminUserApi {
     @Override
     public void validateUserList(Collection<Long> ids) {
         userService.validateUserList(ids);
+    }
+
+    @Override
+    public void updateUser(AdminUserReqDTO erpUser) {
+        UserSaveReqVO saveReqVO = BeanUtils.toBean(erpUser, UserSaveReqVO.class);
+        userService.updateUser(saveReqVO);
+    }
+
+    @Override
+    public Long createUser(AdminUserReqDTO erpUser) {
+        UserSaveReqVO saveReqVO = BeanUtils.toBean(erpUser, UserSaveReqVO.class);
+        return userService.createUser(saveReqVO);
     }
 
 }

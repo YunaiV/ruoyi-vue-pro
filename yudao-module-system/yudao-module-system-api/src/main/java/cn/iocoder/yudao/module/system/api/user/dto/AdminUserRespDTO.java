@@ -18,6 +18,18 @@ public class AdminUserRespDTO {
      */
     private Long id;
     /**
+     * 密码
+     */
+    private String password;
+    /**
+     * 用户账号
+     */
+    private String username;
+    /**
+     * 用户邮箱
+     */
+    private String email;
+    /**
      * 用户昵称
      */
     private String nickname;

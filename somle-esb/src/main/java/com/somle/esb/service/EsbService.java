@@ -1,8 +1,10 @@
 package com.somle.esb.service;
 
 import cn.hutool.core.util.ObjUtil;
-import cn.iocoder.yudao.module.system.service.dept.DeptService;
-import cn.iocoder.yudao.module.system.service.user.AdminUserService;
+import cn.iocoder.yudao.module.system.api.dept.DeptApi;
+import cn.iocoder.yudao.module.system.api.dept.dto.DeptReqDTO;
+import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
+import cn.iocoder.yudao.module.system.api.user.dto.AdminUserReqDTO;
 import com.somle.ai.model.AiName;
 import com.somle.ai.service.AiService;
 import com.somle.amazon.service.AmazonService;
@@ -19,6 +21,7 @@ import com.somle.esb.converter.EccangToErpConverter;
 import com.somle.esb.converter.ErpToEccangConverter;
 import com.somle.esb.converter.ErpToKingdeeConverter;
 import com.somle.esb.model.OssData;
+import com.somle.kingdee.model.KingdeeAuxInfoDetail;
 import com.somle.kingdee.model.KingdeeProduct;
 import com.somle.kingdee.service.KingdeeService;
 import com.somle.matomo.service.MatomoService;
@@ -34,6 +37,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 @Slf4j
@@ -64,10 +68,10 @@ public class EsbService {
     ErpProductService erpProductService;
 
     @Autowired
-    DeptService deptService;
+    private DeptApi deptApi;
 
     @Autowired
-    AdminUserService userService;
+    private AdminUserApi adminUserApi;
 
     @Autowired
     AiService aiService;
@@ -193,13 +197,13 @@ public class EsbService {
     public void syncEccangDepartments() {
         dingTalkService.getDepartmentStream().forEach(dingTalkDepartment -> {
             log.info("begin syncing: " + dingTalkDepartment.toString());
-            var erpDepartment = dingTalkToErpConverter.toErp(dingTalkDepartment);
+            DeptReqDTO erpDepartment = dingTalkToErpConverter.toErp(dingTalkDepartment);
             log.info("dept to add " + erpDepartment);
             Long deptId = erpDepartment.getId();
             if (deptId != null) {
-                deptService.updateDept(erpDepartment);
+                deptApi.updateDept(erpDepartment);
             } else {
-                deptId = deptService.createDept(erpDepartment);
+                deptId = deptApi.createDept(erpDepartment);
                 var mapping = mappingService.toMapping(dingTalkDepartment);
                 mapping
                     .setInternalId(deptId);
@@ -223,45 +227,34 @@ public class EsbService {
     public void syncKingDeeDepartments() {
         dingTalkService.getDepartmentStream().forEach(dingTalkDepartment -> {
             log.info("begin syncing: " + dingTalkDepartment.toString());
-            var erpDepartment = dingTalkToErpConverter.toErp(dingTalkDepartment);
+            DeptReqDTO erpDepartment = dingTalkToErpConverter.toErp(dingTalkDepartment);
             log.info("dept to add " + erpDepartment);
             Long deptId = erpDepartment.getId();
             if (deptId != null) {
-                deptService.updateDept(erpDepartment);
+                deptApi.updateDept(erpDepartment);
             } else {
-                deptId = deptService.createDept(erpDepartment);
+                deptId = deptApi.createDept(erpDepartment);
                 var mapping = mappingService.toMapping(dingTalkDepartment);
                 mapping
                         .setInternalId(deptId);
                 mappingService.save(mapping);
             }
-            //获取部门名称
-            String name = erpDepartment.getName();
-            if (!Objects.equals(name, "宁波索迈")){
-                EccangCategory eccang = erpToEccangConverter.toEccang(String.valueOf(deptId));
-                EccangResponse.BizContent response = eccangService.addDepartment(eccang);
-                log.info(response.toString());
-            }
-//        var eccangDepartment = erpToEccangConverter.toEccang(erpDepartment);
-//        EccangResponse.BizContent response = eccangService.addDepartment(eccangDepartment);
-//        log.info(response.toString());
-//        var kingdeeDepartment = erpToKingdeeConverter.toKingdee(erpDepartment);
-//        kingdeeService.addDepartment(kingdeeDepartment);
+
         });
     }
 
     public void syncUsers() {
         dingTalkService.getUserDetailStream().forEach(dingTalkUser -> {
             log.info("begin syncing: " + dingTalkUser.toString());
-            var erpUser = dingTalkToErpConverter.toErp(dingTalkUser);
+            AdminUserReqDTO erpUser = dingTalkToErpConverter.toErp(dingTalkUser);
             log.info("user to add " + erpUser);
             if (erpUser.getId() != null) {
-                userService.updateUser(erpUser);
+                adminUserApi.updateUser(erpUser);
             } else {
                 erpUser.setUsername("temp");
-                Long userId = userService.createUser(erpUser);
+                Long userId = adminUserApi.createUser(erpUser);
                 erpUser.setId(userId).setUsername("SM" + String.format("%06d", userId));
-                userService.updateUser(erpUser);
+                adminUserApi.updateUser(erpUser);
                 var mapping = mappingService.toMapping(dingTalkUser);
                 mapping
                     .setInternalId(userId);

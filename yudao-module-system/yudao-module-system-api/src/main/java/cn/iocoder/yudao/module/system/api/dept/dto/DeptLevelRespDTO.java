@@ -10,7 +10,7 @@ import lombok.Data;
  * @description:
  */
 @Data
-public class DeptLevelDTO implements Comparable<DeptLevelDTO>{
+public class DeptLevelRespDTO implements Comparable<DeptLevelRespDTO>{
     // 部门编号
     private Long deptId;
     // 部门名称
@@ -18,7 +18,7 @@ public class DeptLevelDTO implements Comparable<DeptLevelDTO>{
     // 部门等级
     private Integer level;
 
-    public DeptLevelDTO(Long deptId, String deptName,Integer level) {
+    public DeptLevelRespDTO(Long deptId, String deptName, Integer level) {
         this.deptId = deptId;
         this.deptName = deptName;
         this.level = level;
@@ -26,7 +26,7 @@ public class DeptLevelDTO implements Comparable<DeptLevelDTO>{
 
 
     @Override
-    public int compareTo(DeptLevelDTO o) {
+    public int compareTo(DeptLevelRespDTO o) {
         return Integer.compare(o.level,this.level);
     }
 }

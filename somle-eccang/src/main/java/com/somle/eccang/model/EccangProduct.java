@@ -12,6 +12,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Stream;
 
 
@@ -126,8 +127,12 @@ public class EccangProduct {
     private String useEn;
     private String pdProductCoustomsAttribute;
     private String pdDeclarationStatement;
+    //查询的时候是否返回箱规
+    private Integer getProductBox;
     //产品箱规
-    private List<Object> boxArr;
+    private List<Map<String,Object>> boxArr;
+    //返回时候的箱规信息
+    private List<Map<String,Object>> productBox;
 
     @JsonIgnore
     public String getProductCategoryName() {

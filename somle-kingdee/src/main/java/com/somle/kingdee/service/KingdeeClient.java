@@ -149,15 +149,15 @@ public class KingdeeClient {
         product.setVolumeUnitId(getMeasureUnitByNumber("立方厘米").getId());
         product.setWeightUnitId(getMeasureUnitByNumber("kg").getId());
         product.setBaseUnitId(getMeasureUnitByNumber("套").getId());
-        /*product.setCustomField(
-            getCustomFieldByDisplayName("bd_material", "部门")
+        product.setCustomField(
+            getCustomFieldByDisplayName("bd_material", "部门"),
             getAuxInfoByNumber(product.getSaleDepartmentId().toString()).getId()
-        );*/
-        /*try {
+        );
+        try {
             product.setCustomField(getCustomFieldByDisplayName("bd_material", "报关品名"), product.getDeclaredTypeZh());
         } catch (Exception e) {
             log.debug("custom field 报关品名 skipped for " + token.getAccountName());
-        }*/
+        }
         log.debug("adding product");
         String endUrl = "/jdy/v2/bd/material";
         TreeMap<String, String>  params = new TreeMap<>();
@@ -171,6 +171,12 @@ public class KingdeeClient {
             String id = getAuxInfoByNumber(department.getNumber()).getId();
             department.setId(id);
         } catch (Exception e) {
+            //判断是否存在相同的辅助资料名称
+            try {
+                String id = getAuxInfoByName(department.getName()).getId();
+                department.setId(id);
+            } catch (Exception e1) {
+            }
         }
         department.setGroupId(groupId);
         KingdeeResponse response = postResponse("/jdy/v2/bd/aux_info",  new TreeMap<>(), department);
@@ -203,10 +209,26 @@ public class KingdeeClient {
         TreeMap<String, String>  params = new TreeMap<>();
         params.put("number", number);
         KingdeeResponse response = getResponse(endUrl, params);
+        Optional<KingdeeAuxInfoDetail> first = response.getData().getJSONArray("rows").stream()
+                .map(n -> JsonUtils.parseObject(n.toString(), KingdeeAuxInfoDetail.class))
+                .filter(n -> n.getNumber().equals(number))
+                .findFirst();
+        if (first.isPresent()){
+            return first.get();
+        }
+        throw new RuntimeException("您传入的辅助资料信息不存在于kingdee信息库中，请确保erp中的id和辅助资料中的编码一致");
+    }
+
+    public KingdeeAuxInfoDetail getAuxInfoByName(String name) {
+        log.debug("fetching aux info");
+        String endUrl = "/jdy/v2/bd/aux_info";
+        TreeMap<String, String>  params = new TreeMap<>();
+        params.put("name", name);
+        KingdeeResponse response = getResponse(endUrl, params);
         return response.getData().getJSONArray("rows").stream()
-            .map(n->JsonUtils.parseObject(n.toString(), KingdeeAuxInfoDetail.class))
-            .filter(n->n.getNumber().equals(number))
-            .findFirst().get();
+                .map(n->JsonUtils.parseObject(n.toString(), KingdeeAuxInfoDetail.class))
+                .filter(n->n.getName().equals(name))
+                .findFirst().get();
     }
 
     public KingdeeAuxInfoTypeDetail getAuxInfoTypeByNumber(String number) {

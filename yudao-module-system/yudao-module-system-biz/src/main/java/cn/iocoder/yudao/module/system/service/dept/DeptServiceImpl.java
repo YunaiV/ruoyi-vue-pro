@@ -5,7 +5,7 @@ import cn.hutool.core.util.ObjectUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.datapermission.core.annotation.DataPermission;
-import cn.iocoder.yudao.module.system.api.dept.dto.DeptLevelDTO;
+import cn.iocoder.yudao.module.system.api.dept.dto.DeptLevelRespDTO;
 import cn.iocoder.yudao.module.system.controller.admin.dept.vo.dept.DeptListReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.dept.vo.dept.DeptSaveReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.dept.DeptDO;
@@ -188,7 +188,8 @@ public class DeptServiceImpl implements DeptService {
         List<DeptDO> children = new LinkedList<>();
         // 遍历每一层
         Collection<Long> parentIds = Collections.singleton(id);
-        for (int i = 0; i < Short.MAX_VALUE; i++) { // 使用 Short.MAX_VALUE 避免 bug 场景下，存在死循环
+        // 使用 Short.MAX_VALUE 避免 bug 场景下，存在死循环
+        for (int i = 0; i < Short.MAX_VALUE; i++) {
             // 查询当前层，所有的子部门
             List<DeptDO> depts = deptMapper.selectListByParentId(parentIds);
             // 1. 如果没有子部门，则结束遍历
@@ -245,13 +246,13 @@ public class DeptServiceImpl implements DeptService {
     }
 
     @Override
-    public TreeSet<DeptLevelDTO> getDeptTreeLevel(Long id) {
+    public TreeSet<DeptLevelRespDTO> getDeptTreeLevel(Long id) {
         return getParentList(new TreeSet<>(),id, 0);
     }
 
-    private TreeSet<DeptLevelDTO> getParentList(TreeSet<DeptLevelDTO> deptList,Long id,Integer level){
+    private TreeSet<DeptLevelRespDTO> getParentList(TreeSet<DeptLevelRespDTO> deptList, Long id, Integer level){
         DeptDO deptDO = deptMapper.selectById(id);
-        DeptLevelDTO dto = new DeptLevelDTO(deptDO.getId(),deptDO.getName(),level++);
+        DeptLevelRespDTO dto = new DeptLevelRespDTO(deptDO.getId(),deptDO.getName(),level++);
         deptList.add(dto);
         //判断是否是顶级部门
         if (DeptDO.PARENT_ID_ROOT.equals(deptDO.getParentId())){

@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.system.api.user;
 
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
+import cn.iocoder.yudao.module.system.api.user.dto.AdminUserReqDTO;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 
 import java.util.Collection;
@@ -86,4 +87,20 @@ public interface AdminUserApi {
      */
     void validateUserList(Collection<Long> ids);
 
+    /**
+    * @Author Wqh
+    * @Description 修改用户
+    * @Date 14:52 2024/11/4
+    * @Param [erpUser]
+     **/
+    void updateUser(AdminUserReqDTO erpUser);
+
+    /**
+    * @Author Wqh
+    * @Description 新增用户
+    * @Date 14:52 2024/11/4
+    * @Param [erpUser]
+    * @return java.lang.Long
+    **/
+    Long createUser(AdminUserReqDTO erpUser);
 }

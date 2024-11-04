@@ -1,8 +1,7 @@
 package cn.iocoder.yudao.module.system.service.dept;
 
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
-import cn.iocoder.yudao.module.system.api.dept.dto.DeptLevelDTO;
-import cn.iocoder.yudao.module.system.api.dept.dto.DeptRespDTO;
+import cn.iocoder.yudao.module.system.api.dept.dto.DeptLevelRespDTO;
 import cn.iocoder.yudao.module.system.controller.admin.dept.vo.dept.DeptListReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.dept.vo.dept.DeptSaveReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.dept.DeptDO;
@@ -115,9 +114,11 @@ public interface DeptService {
     String getParentNameById(Long id);
 
     /**
-    * 根据部门id溯源部门名称
-    * @Param id 部门编号
-    * @return
+    * @Author Wqh
+    * @Description 根据部门id溯源部门名称
+    * @Date 14:25 2024/11/4
+    * @Param [id]
+    * @return java.util.TreeSet<cn.iocoder.yudao.module.system.api.dept.dto.DeptLevelDTO>
     **/
-    TreeSet<DeptLevelDTO> getDeptTreeLevel(Long id);
+    TreeSet<DeptLevelRespDTO> getDeptTreeLevel(Long id);
 }
