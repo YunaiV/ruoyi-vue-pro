@@ -70,9 +70,9 @@ class AmazonSpClientTest extends BaseSpringTest {
 
     @Test
     void getReports() {
-        var shop = amazonService.shopRepository.findByCountryCode("MX");
+        var shop = amazonService.shopRepository.findByCountryCode("US");
         var vo = AmazonSpReportReqVO.builder()
-                .reportTypes(List.of("GET_V2_SETTLEMENT_REPORT_DATA_FLAT_FILE"))
+                .reportTypes(List.of("GET_FLAT_FILE_RETURNS_DATA_BY_RETURN_DATE"))
                 .processingStatuses(List.of(ProcessingStatuses.DONE))
                 .pageSize(100)
                 .build();
@@ -80,6 +80,18 @@ class AmazonSpClientTest extends BaseSpringTest {
         for (var report : reports) {
             log.info(report.toString());
         }
+    }
+
+    @Test
+    void getReport() {
+        var shop = amazonService.shopRepository.findByCountryCode("US");
+        var vo = AmazonSpReportReqVO.builder()
+                .reportTypes(List.of("GET_FLAT_FILE_RETURNS_DATA_BY_RETURN_DATE"))
+                .processingStatuses(List.of(ProcessingStatuses.DONE))
+                .pageSize(100)
+                .build();
+        var report = amazonService.spClient.getReports(shop.getSeller(), vo).get(0);
+        log.info(amazonService.spClient.getReport(shop.getSeller(),report.getReportId(),null));
     }
 
 
