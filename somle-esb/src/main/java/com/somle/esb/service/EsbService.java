@@ -16,7 +16,6 @@ import com.somle.esb.converter.DingTalkToErpConverter;
 import com.somle.esb.converter.EccangToErpConverter;
 import com.somle.esb.converter.ErpToEccangConverter;
 import com.somle.esb.converter.ErpToKingdeeConverter;
-import com.somle.esb.model.Domain;
 import com.somle.esb.model.OssData;
 import com.somle.kingdee.service.KingdeeService;
 import com.somle.matomo.service.MatomoService;
@@ -29,10 +28,6 @@ import org.springframework.integration.support.MessageBuilder;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.stereotype.Service;
-
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.Arrays;
 
 @Slf4j
 @Service
@@ -129,7 +124,7 @@ public class EsbService {
             e.printStackTrace();
         }
         log.debug(product.toString());
-        EccangResponse.BizContent response = eccangService.addProduct(product);
+        EccangResponse.EccangPage response = eccangService.addProduct(product);
         log.info(response.toString());
     }
 

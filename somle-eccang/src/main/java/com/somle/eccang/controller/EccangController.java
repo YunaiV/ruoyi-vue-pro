@@ -2,7 +2,7 @@ package com.somle.eccang.controller;
 
 import com.somle.eccang.model.EccangOrder;
 import com.somle.eccang.model.EccangOrderVO;
-import com.somle.eccang.model.EccangResponse.BizContent;
+import com.somle.eccang.model.EccangResponse.EccangPage;
 import com.somle.eccang.model.EccangProduct;
 import com.somle.eccang.service.EccangService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,13 +18,13 @@ public class EccangController {
     EccangService eccangService;
 
     @GetMapping("/getInventory")
-    public List<BizContent> getInventory(
+    public List<EccangPage> getInventory(
     ) {
         return eccangService.getInventory().toList();
     }
 
     @GetMapping("/getInventoryBatchLog")
-    public List<BizContent> getInventoryBatchLog( 
+    public List<EccangPage> getInventoryBatchLog(
         @RequestParam String startTime,
         @RequestParam String endTime
     ) {
@@ -40,7 +40,7 @@ public class EccangController {
     }
 
     @GetMapping("/getOrder")
-    public List<BizContent> getOrder(
+    public List<EccangPage> getOrder(
         EccangOrderVO order
     ) {
         return eccangService.getOrderPages(order).toList();
@@ -55,7 +55,7 @@ public class EccangController {
 
 
     @GetMapping("/list")
-    public BizContent list(
+    public EccangPage list(
         @RequestParam String endpoint
     ) {
         return eccangService.list(endpoint);
@@ -70,7 +70,7 @@ public class EccangController {
     // }
 
     @GetMapping("/post")
-    public BizContent post(
+    public EccangPage post(
         @RequestParam String endpoint,
         @RequestBody Object payload
     ) {
