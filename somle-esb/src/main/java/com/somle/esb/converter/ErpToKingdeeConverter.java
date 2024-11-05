@@ -5,12 +5,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import cn.hutool.core.text.StrPool;
+import cn.iocoder.yudao.module.erp.api.product.dto.ErpProductDTO;
 import cn.iocoder.yudao.module.system.api.dept.DeptApi;
 import cn.iocoder.yudao.module.system.api.dept.dto.DeptRespDTO;
-import com.somle.erp.model.ErpProduct;
 import com.somle.erp.model.product.ErpCountrySku;
 import com.somle.erp.model.product.ErpStyleSku;
-import com.somle.erp.repository.ErpProductRepository;
 import com.somle.kingdee.model.KingdeeProduct;
 import com.somle.kingdee.service.KingdeeService;
 import com.somle.kingdee.model.KingdeeAuxInfoDetail;
@@ -26,9 +25,6 @@ public class ErpToKingdeeConverter {
 
     @Autowired
     KingdeeService kingdeeService;
-
-    @Autowired
-    private ErpProductRepository erpProductRepository;
 
     @Autowired
     private DeptApi deptApi;
@@ -81,10 +77,9 @@ public class ErpToKingdeeConverter {
 
     }
 
-    public List<KingdeeProduct> toKingdee() {
-        List<ErpProduct> allProducts = erpProductRepository.findAllProducts();
+    public List<KingdeeProduct> toKingdee(List<ErpProductDTO> allProducts) {
         List<KingdeeProduct> kingdeeProducts = new ArrayList<>();
-        for (ErpProduct product : allProducts){
+        for (ErpProductDTO product : allProducts){
             KingdeeProduct kingdeeProduct = new KingdeeProduct();
             //普通
             kingdeeProduct.setCheckType("1");
@@ -104,7 +99,9 @@ public class ErpToKingdeeConverter {
             kingdeeProduct.setLength(String.valueOf(pdNetLength));
             kingdeeProduct.setWide(String.valueOf(pdNetWidth));
             kingdeeProduct.setHigh(String.valueOf(pdNetHeight));
-            kingdeeProduct.setVolume(String.valueOf(pdNetLength * pdNetWidth * pdNetHeight));
+            if (pdNetLength != null && pdNetWidth != null && pdNetHeight != null){
+                kingdeeProduct.setVolume(String.valueOf(pdNetLength * pdNetWidth * pdNetHeight));
+            }
             //部门id，映射到金蝶自定义字段中
             //在金蝶中辅助资料对应的就是erp中的部门，非树形结构，在辅助资料中，由一个辅助分类是部门/报关品名（部门公司）
             kingdeeProduct.setSaleDepartmentId(product.getProductDeptId());

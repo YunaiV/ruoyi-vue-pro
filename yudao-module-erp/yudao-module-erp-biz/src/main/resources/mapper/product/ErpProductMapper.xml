@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.iocoder.yudao.module.erp.dal.mysql.product.ErpProductMapper">
+
+    <select id="selectProductAllInfoListById"
+            resultType="cn.iocoder.yudao.module.erp.api.product.dto.ErpProductDTO">
+        SELECT
+            c.id AS rule_id,
+            CASE
+
+                WHEN c.country_code = 'CN' THEN
+                    CONCAT( b.`code`, "-", 'CHN' )
+                WHEN c.country_code = 'US' THEN
+                    CONCAT( b.`code`, "-", 'USA' )
+                WHEN c.country_code = 'IN' THEN
+                    CONCAT( b.`code`, "-", 'IND' )
+                WHEN c.country_code = 'UK' THEN
+                    CONCAT( b.`code`, "-", 'EU' )
+                WHEN c.country_code = 'SA' THEN
+                    CONCAT( b.`code`, "-", 'KSA' ) ELSE CONCAT( b.`code`, "-", c.country_code )
+                END AS product_sku,
+            a.`name` AS product_title,
+            a.image_url,
+            b.package_weight AS pd_net_weight,
+            b.package_length AS pd_net_length,
+            b.package_width AS pd_net_width,
+            b.package_height AS pd_net_height,
+            a.width AS product_weight,
+            a.length AS product_length,
+            a.width AS product_width,
+            a.height AS product_height,
+            a.material AS product_material,
+            a.purchase_price AS product_purchase_value,
+            b.purchase_price_currency_code AS currency_code,
+            c.logistic_attribute AS logistic_attribute,
+            c.hscode AS hs_code,
+            c.declared_value AS product_declared_value,
+            c.declared_value_currency_code AS pd_declare_currency_code,
+            c.declared_type AS pd_oversea_type_cn,
+            c.declared_type_en AS pd_oversea_type_en,
+            c.tax_rate AS fbo_tax_rate,
+            c.country_code AS country_code,
+            a.bar_code,
+            a.dept_id AS product_dept_id,
+            e.`name` AS user_organization_id,
+            f.`name` AS product_dept_name
+        FROM
+            erp_product a
+                LEFT JOIN ( SELECT * FROM erp_supplier_product WHERE deleted = 0 AND tenant_id = 50001 ) b ON a.id = b.product_id
+                LEFT JOIN ( SELECT * FROM erp_custom_rule WHERE deleted = 0 AND tenant_id = 50001 ) c ON b.id = c.supplier_product_id
+                LEFT JOIN ( SELECT * FROM system_users WHERE deleted = 0 AND tenant_id = 50001 ) d ON a.creator = d.id
+                LEFT JOIN ( SELECT * FROM system_dept WHERE deleted = 0 AND tenant_id = 50001 ) e ON d.dept_id = e.id
+                LEFT JOIN ( SELECT * FROM system_dept WHERE deleted = 0 AND tenant_id = 50001 ) f ON a.dept_id = f.id
+        WHERE a.deleted = 0 AND a.tenant_id = 50001 AND a.id = #{id}
+    </select>
+    <select id="selectProductAllInfoListBySupplierId"
+            resultType="cn.iocoder.yudao.module.erp.api.product.dto.ErpProductDTO">
+        SELECT
+            c.id AS rule_id,
+            CASE
+
+                WHEN c.country_code = 'CN' THEN
+                    CONCAT( a.`code`, "-", 'CHN' )
+                WHEN c.country_code = 'US' THEN
+                    CONCAT( a.`code`, "-", 'USA' )
+                WHEN c.country_code = 'IN' THEN
+                    CONCAT( a.`code`, "-", 'IND' )
+                WHEN c.country_code = 'UK' THEN
+                    CONCAT( a.`code`, "-", 'EU' )
+                WHEN c.country_code = 'SA' THEN
+                    CONCAT( a.`code`, "-", 'KSA' ) ELSE CONCAT( a.`code`, "-", c.country_code )
+                END AS product_sku,
+            b.`name` AS product_title,
+            b.image_url,
+            b.width AS product_weight,
+            b.length AS product_length,
+            b.width AS product_width,
+            b.height AS product_height,
+            b.material AS product_material,
+            b.purchase_price AS product_purchase_value,
+            b.bar_code,
+            b.dept_id AS product_dept_id,
+            a.package_weight AS pd_net_weight,
+            a.package_length AS pd_net_length,
+            a.package_width AS pd_net_width,
+            a.package_height AS pd_net_height,
+            a.purchase_price_currency_code AS currency_code,
+            c.logistic_attribute AS logistic_attribute,
+            c.hscode AS hs_code,
+            c.declared_value AS product_declared_value,
+            c.declared_value_currency_code AS pd_declare_currency_code,
+            c.declared_type AS pd_oversea_type_cn,
+            c.declared_type_en AS pd_oversea_type_en,
+            c.tax_rate AS fbo_tax_rate,
+            c.country_code AS country_code,
+            e.`name` AS user_organization_id,
+            f.`name` AS product_dept_name
+        FROM
+            erp_supplier_product a
+                LEFT JOIN ( SELECT * FROM erp_product WHERE deleted = 0 AND tenant_id = 50001 ) b ON a.product_id = b.id
+                LEFT JOIN ( SELECT * FROM erp_custom_rule WHERE deleted = 0 AND tenant_id = 50001 ) c ON a.id = c.supplier_product_id
+                LEFT JOIN ( SELECT * FROM system_users WHERE deleted = 0 AND tenant_id = 50001 ) d ON b.creator = d.id
+                LEFT JOIN ( SELECT * FROM system_dept WHERE deleted = 0 AND tenant_id = 50001 ) e ON d.dept_id = e.id
+                LEFT JOIN ( SELECT * FROM system_dept WHERE deleted = 0 AND tenant_id = 50001 ) f ON b.dept_id = f.id
+        WHERE a.deleted = 0 AND a.tenant_id = 50001 AND a.id = #{id}
+    </select>
+    <select id="selectProductAllInfoListByCustomRuleId"
+            resultType="cn.iocoder.yudao.module.erp.api.product.dto.ErpProductDTO">
+        SELECT
+            a.id AS rule_id,
+            CASE
+
+                WHEN a.country_code = 'CN' THEN
+                    CONCAT( b.`code`, "-", 'CHN' )
+                WHEN a.country_code = 'US' THEN
+                    CONCAT( b.`code`, "-", 'USA' )
+                WHEN a.country_code = 'IN' THEN
+                    CONCAT( b.`code`, "-", 'IND' )
+                WHEN a.country_code = 'UK' THEN
+                    CONCAT( b.`code`, "-", 'EU' )
+                WHEN a.country_code = 'SA' THEN
+                    CONCAT( b.`code`, "-", 'KSA' ) ELSE CONCAT( b.`code`, "-", a.country_code )
+                END AS product_sku,
+            c.`name` AS product_title,
+            c.image_url,
+            b.package_weight AS pd_net_weight,
+            b.package_length AS pd_net_length,
+            b.package_width AS pd_net_width,
+            b.package_height AS pd_net_height,
+            c.width AS product_weight,
+            c.length AS product_length,
+            c.width AS product_width,
+            c.height AS product_height,
+            c.material AS product_material,
+            c.purchase_price AS product_purchase_value,
+            c.bar_code,
+            c.dept_id AS product_dept_id,
+            b.purchase_price_currency_code AS currency_code,
+            a.logistic_attribute AS logistic_attribute,
+            a.hscode AS hs_code,
+            a.declared_value AS product_declared_value,
+            a.declared_value_currency_code AS pd_declare_currency_code,
+            a.declared_type AS pd_oversea_type_cn,
+            a.declared_type_en AS pd_oversea_type_en,
+            a.tax_rate AS fbo_tax_rate,
+            a.country_code AS country_code,
+            e.`name` AS user_organization_id,
+            f.`name` AS product_dept_name
+        FROM
+            erp_custom_rule a
+                LEFT JOIN ( SELECT * FROM erp_supplier_product WHERE deleted = 0 AND tenant_id = 50001 ) b ON a.supplier_product_id = b.id
+                LEFT JOIN ( SELECT * FROM erp_product WHERE deleted = 0 AND tenant_id = 50001 ) c ON b.product_id = c.id
+                LEFT JOIN ( SELECT * FROM system_users WHERE deleted = 0 AND tenant_id = 50001 ) d ON c.creator = d.id
+                LEFT JOIN ( SELECT * FROM system_dept WHERE deleted = 0 AND tenant_id = 50001 ) e ON d.dept_id = e.id
+                LEFT JOIN ( SELECT * FROM system_dept WHERE deleted = 0 AND tenant_id = 50001 ) f ON c.dept_id = f.id
+        WHERE a.deleted = 0 AND a.tenant_id = 50001 AND a.id = #{id}
+    </select>
+</mapper>

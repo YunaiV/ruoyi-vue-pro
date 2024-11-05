@@ -1,6 +1,7 @@
 package com.somle.esb.service;
 
 import cn.hutool.core.util.ObjUtil;
+import cn.iocoder.yudao.module.erp.api.product.dto.ErpProductDTO;
 import cn.iocoder.yudao.module.system.api.dept.DeptApi;
 import cn.iocoder.yudao.module.system.api.dept.dto.DeptReqDTO;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
@@ -21,8 +22,6 @@ import com.somle.esb.converter.EccangToErpConverter;
 import com.somle.esb.converter.ErpToEccangConverter;
 import com.somle.esb.converter.ErpToKingdeeConverter;
 import com.somle.esb.model.OssData;
-import com.somle.kingdee.model.KingdeeAuxInfoDetail;
-import com.somle.kingdee.model.KingdeeProduct;
 import com.somle.kingdee.service.KingdeeService;
 import com.somle.matomo.service.MatomoService;
 import lombok.extern.slf4j.Slf4j;
@@ -35,9 +34,7 @@ import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.stereotype.Service;
 
-import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 
 @Slf4j
@@ -145,8 +142,17 @@ public class EsbService {
         return true;
     }
 
-    public void handleProduct() {
-        List<EccangProduct> eccangProducts = erpToEccangConverter.toEccang();
+    /**
+    * @Author Wqh
+    * @Description 上传eccang信息
+    * @Date 11:18 2024/11/5
+    * @Param [message]
+    * @return void
+    **/
+    @ServiceActivator(inputChannel = "syncExternalDataChannel")
+    public void handleProductsToEccang(Message<List<ErpProductDTO>> message) {
+        /*
+        List<EccangProduct> eccangProducts = erpToEccangConverter.toEccang(message.getPayload());
         for (EccangProduct eccangProduct : eccangProducts){
             eccangProduct.setActionType("ADD");
             EccangProduct eccangServiceProduct = eccangService.getProduct(eccangProduct.getProductSku());
@@ -159,14 +165,22 @@ public class EsbService {
             }
             log.debug(eccangProduct.toString());
             eccangService.addBatchProduct(List.of(eccangProduct));
-        }
+        }*/
     }
 
-    public void handleProducts() {
-        List<KingdeeProduct> kingdee = erpToKingdeeConverter.toKingdee();
+    /**
+     * @Author Wqh
+     * @Description 上传金蝶信息
+     * @Date 11:18 2024/11/5
+     * @Param [message]
+     * @return void
+     **/
+    @ServiceActivator(inputChannel = "syncExternalDataChannel")
+    public void handleProductsToKingdee(Message<List<ErpProductDTO>> message) {
+       /* List<KingdeeProduct> kingdee = erpToKingdeeConverter.toKingdee(message.getPayload());
         for (KingdeeProduct kingdeeProduct : kingdee){
             kingdeeService.addProduct(kingdeeProduct);
-        }
+        }*/
     }
 
     @ServiceActivator(inputChannel = "saleChannel")

@@ -3,24 +3,21 @@ package com.somle.esb.converter;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ReflectUtil;
 import cn.iocoder.yudao.framework.common.exception.util.ThrowUtil;
+import cn.iocoder.yudao.module.erp.api.product.dto.ErpProductDTO;
 import cn.iocoder.yudao.module.system.api.dept.DeptApi;
 import cn.iocoder.yudao.module.system.api.dept.dto.DeptLevelRespDTO;
 import cn.iocoder.yudao.module.system.api.dept.dto.DeptRespDTO;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.somle.eccang.model.*;
 import com.somle.eccang.service.EccangService;
-import com.somle.erp.model.ErpProduct;
 import com.somle.erp.model.product.ErpCountrySku;
 import com.somle.erp.model.ErpDepartment;
 import com.somle.erp.model.product.ErpStyleSku;
-import com.somle.erp.repository.ErpProductRepository;
 import com.somle.erp.service.ErpDepartmentService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.lang.reflect.Field;
-import java.time.LocalDateTime;
 import java.util.*;
 
 import static com.somle.esb.enums.ErrorCodeConstants.DEPT_LEVEL_ERROR;
@@ -32,8 +29,6 @@ public class ErpToEccangConverter {
 
     @Autowired
     EccangService eccangService;
-    @Autowired
-    private ErpProductRepository erpProductRepository;
 
     @Autowired
     private DeptApi deptApi;
@@ -96,10 +91,9 @@ public class ErpToEccangConverter {
         return product;
     }
 
-    public List<EccangProduct> toEccang(){
-        List<ErpProduct> allProducts = erpProductRepository.findAllProducts();
+    public List<EccangProduct> toEccang(List<ErpProductDTO> allProducts){
         List<EccangProduct> allEccangProducts = new ArrayList<>();
-        for (ErpProduct product : allProducts){
+        for (ErpProductDTO product : allProducts){
             /*//编辑箱规
             EccangProductBoxes box = new EccangProductBoxes();
             //箱规的中文名称和英文名称都根据sku来

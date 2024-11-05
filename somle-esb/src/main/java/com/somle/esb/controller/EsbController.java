@@ -1,8 +1,12 @@
 package com.somle.esb.controller;
 
+import cn.iocoder.yudao.module.erp.api.product.dto.ErpProductDTO;
 import com.somle.esb.service.EsbService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.integration.support.MessageBuilder;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 
 @RestController
@@ -30,15 +34,12 @@ public class EsbController {
 //    }
 
 
-    @PostMapping("/syncDepartments")
-    public String syncDepartments() {
-        service.handleProduct();
-        return "success";
-    }
 
     @PostMapping("/syncUsers")
     public String syncUsers() {
-        service.syncUsers();
+        /*ErpProductDTO a = new ErpProductDTO();
+        a.setProductDeptId(50007L);
+        service.handleProductsToKingdee(MessageBuilder.withPayload(List.of(a)).build());*/
         return "success";
     }
 

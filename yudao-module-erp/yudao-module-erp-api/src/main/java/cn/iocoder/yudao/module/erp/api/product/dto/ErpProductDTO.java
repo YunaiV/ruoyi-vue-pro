@@ -1,24 +1,19 @@
-package com.somle.erp.model;
+package cn.iocoder.yudao.module.erp.api.product.dto;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Transient;
 import lombok.Data;
 
 /**
- * @className: ErpProduct
+ * @className: ErpProductDTO
  * @author: Wqh
- * @date: 2024/10/28 14:01
+ * @date: 2024/11/5 10:37
  * @Version: 1.0
  * @description:
  */
-@Entity
 @Data
-public class ErpProduct {
+public class ErpProductDTO {
     /**
      * 海关规则id  =====>>>> 映射到pd_declaration_statement
      */
-    @Id
     private String ruleId;
     /**
      * 产品SKU: 供应商产品编码-国家代码
@@ -33,7 +28,6 @@ public class ErpProduct {
     /**
      * 产品名称英文名
      */
-    @Transient
     private String productTitleEn;
 
     /**
@@ -42,8 +36,8 @@ public class ErpProduct {
     private String countryCode;
 
     /**
-    * 图片地址（当前只有一张）
-    **/
+     * 图片地址（当前只有一张）
+     **/
     private String imageUrl;
 
     /**
@@ -99,7 +93,6 @@ public class ErpProduct {
     /**
      * 材料（英文）
      */
-    @Transient
     private String materialEn;
 
     /**
@@ -115,13 +108,11 @@ public class ErpProduct {
     /**
      * 默认供应商代码
      */
-    @Transient
     private String defaultSupplierCode;
 
     /**
      * 产品销售状态
      */
-    @Transient
     private Integer saleStatus;
 
     /**
@@ -162,19 +153,16 @@ public class ErpProduct {
     /**
      * 一级品类名称
      */
-    @Transient
     private Integer productCategoryId1;
 
     /**
      * 二级品类名称
      */
-    @Transient
     private Integer productCategoryId2;
 
     /**
      * 三级品类名称
      */
-    @Transient
     private Integer productCategoryId3;
 
     /**
@@ -188,8 +176,8 @@ public class ErpProduct {
     private String barCode;
 
     /**
-    * 产品部门名称  ======>>>>>  对应eccang的品类
-    **/
+     * 产品部门名称  ======>>>>>  对应eccang的品类
+     **/
     private String productDeptName;
 
     /**

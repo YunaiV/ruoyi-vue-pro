@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.erp.controller.admin.logistic.customrule;
 
+import cn.iocoder.yudao.module.erp.aop.SynExternalData;
 import org.springframework.web.bind.annotation.*;
 import jakarta.annotation.Resource;
 import org.springframework.validation.annotation.Validated;
@@ -24,6 +25,8 @@ import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
 
 import cn.iocoder.yudao.framework.apilog.core.annotation.ApiAccessLog;
 import static cn.iocoder.yudao.framework.apilog.core.enums.OperateTypeEnum.*;
+import static cn.iocoder.yudao.module.erp.aop.SynExternalDataAspect.ERP_CUSTOM_RULE;
+import static cn.iocoder.yudao.module.erp.aop.SynExternalDataAspect.ERP_SUPPLIER_PRODUCT;
 
 import cn.iocoder.yudao.module.erp.controller.admin.logistic.customrule.vo.*;
 import cn.iocoder.yudao.module.erp.dal.dataobject.logistic.customrule.ErpCustomRuleDO;
@@ -41,6 +44,7 @@ public class ErpCustomRuleController {
     @PostMapping("/create")
     @Operation(summary = "创建ERP 海关规则")
     @PreAuthorize("@ss.hasPermission('erp:custom-rule:create')")
+    @SynExternalData(table = ERP_CUSTOM_RULE)
     public CommonResult<Long> createCustomRule(@Valid @RequestBody ErpCustomRuleSaveReqVO createReqVO) {
         return success(customRuleService.createCustomRule(createReqVO));
     }
@@ -48,6 +52,7 @@ public class ErpCustomRuleController {
     @PutMapping("/update")
     @Operation(summary = "更新ERP 海关规则")
     @PreAuthorize("@ss.hasPermission('erp:custom-rule:update')")
+    @SynExternalData(table = ERP_CUSTOM_RULE, inClazz = ErpCustomRuleSaveReqVO.class)
     public CommonResult<Boolean> updateCustomRule(@Valid @RequestBody ErpCustomRuleSaveReqVO updateReqVO) {
         customRuleService.updateCustomRule(updateReqVO);
         return success(true);

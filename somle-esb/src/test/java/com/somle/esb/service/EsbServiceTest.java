@@ -5,13 +5,6 @@ import cn.iocoder.yudao.framework.mybatis.config.YudaoMybatisAutoConfiguration;
 import cn.iocoder.yudao.framework.security.config.YudaoSecurityAutoConfiguration;
 import cn.iocoder.yudao.module.infra.api.config.ConfigApi;
 import cn.iocoder.yudao.module.infra.api.file.FileApi;
-import cn.iocoder.yudao.module.system.dal.mysql.dept.DeptMapper;
-import cn.iocoder.yudao.module.system.service.dept.DeptServiceImpl;
-import cn.iocoder.yudao.module.system.service.dept.PostService;
-import cn.iocoder.yudao.module.system.service.permission.PermissionService;
-import cn.iocoder.yudao.module.system.service.tenant.TenantService;
-import cn.iocoder.yudao.module.system.service.user.AdminUserService;
-import cn.iocoder.yudao.module.system.service.user.AdminUserServiceImpl;
 import com.baomidou.mybatisplus.autoconfigure.MybatisPlusAutoConfiguration;
 import com.github.yulichang.autoconfigure.MybatisPlusJoinAutoConfiguration;
 import com.somle.ai.service.AiService;
@@ -54,8 +47,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
         ErpToKingdeeConverter.class,
         EccangToErpConverter.class,
 
-        DeptServiceImpl.class,
-        AdminUserServiceImpl.class,
+
 //    PostServiceImpl.class,
 //    RoleServiceImpl.class,
 //    MenuServiceImpl.class,
@@ -94,27 +86,16 @@ class EsbServiceTest extends BaseDbUnitTest {
     @MockBean
     AiService aiService;
 
-    @Resource
-    DeptMapper deptMapper;
 
-    @Resource
-    AdminUserService userService;
 
-    @MockBean
-    private PostService postService;
-    @MockBean
-    private PermissionService permissionService;
+
     @Resource
     private PasswordEncoder passwordEncoder;
-    @MockBean
-    private TenantService tenantService;
+
     @MockBean
     private FileApi fileApi;
     @MockBean
     private ConfigApi configApi;
 
-    @Test
-    public void test() {
-        esbService.handleProduct();
-    }
+
 }
