@@ -21,10 +21,10 @@ public interface KeFuMessageMapper extends BaseMapperX<KeFuMessageDO> {
 
     /**
      * 获得消息列表
-     * 第一次查询时不带时间，默认查询最新的十条消息
-     * 第二次查询带时间查询历史消息
+     * 1. 第一次查询时，不带时间，默认查询最新的十条消息
+     * 2. 第二次查询时，带时间，查询历史消息
      *
-     * @param reqVO 请求
+     * @param reqVO 列表请求
      * @return 消息列表
      */
     default List<KeFuMessageDO> selectList(KeFuMessageListReqVO reqVO) {
@@ -32,7 +32,7 @@ public interface KeFuMessageMapper extends BaseMapperX<KeFuMessageDO> {
                 .eqIfPresent(KeFuMessageDO::getConversationId, reqVO.getConversationId())
                 .ltIfPresent(KeFuMessageDO::getCreateTime, reqVO.getCreateTime())
                 .orderByDesc(KeFuMessageDO::getCreateTime)
-                .last("limit 10"));
+                .last("limit 10")); // TODO @puhui999：使用 limitN 哈。然后 10 通过 reqVO 传递。
     }
 
     default List<KeFuMessageDO> selectListByConversationIdAndUserTypeAndReadStatus(Long conversationId, Integer userType,

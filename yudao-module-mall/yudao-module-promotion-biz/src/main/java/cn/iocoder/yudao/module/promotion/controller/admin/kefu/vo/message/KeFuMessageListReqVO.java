@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
-@Schema(description = "管理后台 - 客服消息 Request VO")
+@Schema(description = "管理后台 - 客服消息列表 Request VO")
 @Data
 public class KeFuMessageListReqVO {
 
