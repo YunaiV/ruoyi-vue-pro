@@ -2,7 +2,6 @@ package cn.iocoder.yudao.module.promotion.controller.app.kefu;
 
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.security.core.annotations.PreAuthenticated;
 import cn.iocoder.yudao.module.promotion.controller.admin.kefu.vo.message.KeFuMessageRespVO;
@@ -17,6 +16,8 @@ import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
@@ -47,11 +48,11 @@ public class AppKeFuMessageController {
         return success(true);
     }
 
-    @GetMapping("/page")
-    @Operation(summary = "获得客服消息分页")
+    @GetMapping("/list")
+    @Operation(summary = "获得客服消息列表")
     @PreAuthenticated
-    public CommonResult<PageResult<KeFuMessageRespVO>> getKefuMessagePage(@Valid AppKeFuMessagePageReqVO pageReqVO) {
-        PageResult<KeFuMessageDO> pageResult = kefuMessageService.getKeFuMessagePage(pageReqVO, getLoginUserId());
+    public CommonResult<List<KeFuMessageRespVO>> getKefuMessageList(@Valid AppKeFuMessagePageReqVO pageReqVO) {
+        List<KeFuMessageDO> pageResult = kefuMessageService.getKeFuMessageList(pageReqVO, getLoginUserId());
         return success(BeanUtils.toBean(pageResult, KeFuMessageRespVO.class));
     }
 
