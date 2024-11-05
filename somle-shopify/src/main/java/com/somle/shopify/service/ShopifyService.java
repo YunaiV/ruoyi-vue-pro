@@ -16,7 +16,6 @@ public class ShopifyService {
 
     @PostConstruct
     public void init() {
-        log.info(tokenRepository.findAll().get(0).getAccessToken());
         client = new ShopifyClient(tokenRepository.findAll().get(0));
     }
 }

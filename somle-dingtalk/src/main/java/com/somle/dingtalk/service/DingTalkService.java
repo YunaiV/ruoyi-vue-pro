@@ -51,7 +51,6 @@ public class DingTalkService {
     @PostConstruct
     private void init() {
         token = refreshAuth();
-        log.debug("token set");
     }
 
 
@@ -65,7 +64,6 @@ public class DingTalkService {
     // }
 
     public DingTalkToken refreshAuth() {
-        log.info("fetching access token");
         String url = host + "/v1.0/oauth2/accessToken";
         var payload = JsonUtils.newObject();
         DingTalkToken token = tokenRepository.findAll().get(0);
