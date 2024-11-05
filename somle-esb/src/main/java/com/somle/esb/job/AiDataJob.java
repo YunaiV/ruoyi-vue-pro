@@ -28,54 +28,7 @@ public class AiDataJob extends DataJob {
     @Override
     public String execute(String param) throws Exception {
         setDate(param);
-        
-        service.send(
-            OssData.builder()
-                .database(DATABASE)
-                .tableName("country")
-                .syncType("full")
-                .requestTimestamp(System.currentTimeMillis())
-                .folderDate(LocalDate.now())
-                .content(aiService.getCountries().toList())
-                .headers(null)
-                .build()
-        );
 
-        service.send(
-            OssData.builder()
-                .database(DATABASE)
-                .tableName("currency")
-                .syncType("full")
-                .requestTimestamp(System.currentTimeMillis())
-                .folderDate(LocalDate.now())
-                .content(aiService.getCurrencies().toList())
-                .headers(null)
-                .build()
-        );
-
-        service.send(
-            OssData.builder()
-                .database(DATABASE)
-                .tableName("person")
-                .syncType("inc")
-                .requestTimestamp(System.currentTimeMillis())
-                .folderDate(yesterday)
-                .content(aiService.getNames(yesterday).toList())
-                .headers(null)
-                .build()
-        );
-
-        service.send(
-            OssData.builder()
-                .database(DATABASE)
-                .tableName("address")
-                .syncType("inc")
-                .requestTimestamp(System.currentTimeMillis())
-                .folderDate(yesterday)
-                .content(aiService.getAddresses(yesterday).toList())
-                .headers(null)
-                .build()
-        );
-        return "data upload success";
+        throw new Exception("template data job do not execute");
     }
 }
