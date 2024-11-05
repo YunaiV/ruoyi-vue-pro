@@ -9,7 +9,9 @@ public enum Domain {
     ERP("erp"),
     MATOMO("matomo"),
     DINGTALK("dingtalk"),
-    SHOPIFY("shopify");
+    SHOPIFY("shopify"),
+    WANGDIAN("wangdian");
+
 
     private final String value;
 

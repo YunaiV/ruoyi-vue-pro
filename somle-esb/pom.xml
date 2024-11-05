@@ -59,11 +59,13 @@
             <artifactId>somle-matomo</artifactId>
             <version>${revision}</version>
         </dependency>
+
         <dependency>
             <groupId>com.somle</groupId>
             <artifactId>somle-dingtalk</artifactId>
             <version>${revision}</version>
         </dependency>
+
         <dependency>
             <groupId>com.somle</groupId>
             <artifactId>somle-kingdee</artifactId>
@@ -86,6 +88,13 @@
             <artifactId>somle-shopify</artifactId>
             <version>${revision}</version>
         </dependency>
+
+        <dependency>
+            <groupId>com.somle</groupId>
+            <artifactId>somle-wangdian</artifactId>
+            <version>${revision}</version>
+        </dependency>
+
     </dependencies>
 
     
