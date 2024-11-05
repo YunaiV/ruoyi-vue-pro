@@ -87,6 +87,7 @@ public class AmazonSpClient {
         return getReports(seller, vo).stream().map(report -> getReport(seller, report.getReportId(), compression));
     }
 
+    @SneakyThrows
     @Transactional(readOnly = true)
     public String getReport(AmazonSeller seller, String reportId, String compression) {
         log.info("get report");
@@ -141,20 +142,17 @@ public class AmazonSpClient {
         String docUrl = null;
         String documentUrl = endPoint + "/reports/2021-06-30/documents/" + docId;
         while (docUrl == null) {
-            try {
-                // ResponseEntity<JSONObject> response = restTemplate.exchange(documentUrl, HttpMethod.GET, new HttpEntity<>(headers), JSONObject.class);
-                // JSONObject responseBody = response.getBody();
-                JSONObject response = WebUtils.getRequest(documentUrl, Map.of(), headers, JSONObject.class);
-                JSONObject responseBody = response;
-                docUrl = responseBody.getString("url");
-            } catch (HttpClientErrorException.TooManyRequests e) {
-                log.info("Received 429 Too Many Requests. Retrying...");
-                try {
-                    Thread.sleep(3000); // Sleep for 3000 miliseconds before retrying
-                } catch (InterruptedException ie) {
-                    log.info("Thread interrupted, restoring");
-                    Thread.currentThread().interrupt(); // Restore interrupted status
-                }
+            var response = WebUtils.getRequest(documentUrl, Map.of(), headers);
+            switch (response.code()) {
+                case 200:
+                    JSONObject responseBody = JsonUtils.parseObject(response.body().string(), JSONObject.class);
+                    docUrl = responseBody.getString("url");
+                case 429:
+                    log.info("Received 429 Too Many Requests. Retrying...");
+                    CoreUtils.sleep(3000);
+                    continue;
+                default:
+                    throw new RuntimeException("Unknown reponse code: " + response + response.body());
             }
         }
 
@@ -196,8 +194,11 @@ public class AmazonSpClient {
                         default:
                             break;
                     }
-                    log.error(error.toString());
-                    throw new RuntimeException("Error creating report");
+                    throw new RuntimeException("Error creating report: " + error);
+                case 429:
+                    log.info("Received 429 Too Many Requests. Retrying...");
+                    CoreUtils.sleep(3000);
+                    continue;
                 default:
                     throw new RuntimeException("Unknown response code: " + response.code() + "Detail: " + response.body().string());
             }
