@@ -13,8 +13,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class WangdianToken {
-    private String sid = "smst2";
+    private String sid;
     @Id
-    private String appkey = "smst2-ot";
-	private String appsecret = "1b5f382668b9b1c74b3ef8e3e4403315";
+    private String appkey;
+	private String appsecret;
 }
