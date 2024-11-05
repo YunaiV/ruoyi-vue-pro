@@ -4,6 +4,8 @@ kingdee:
   outerInstanceIds:
     - 94464631434776576
 
+debug: false
+
 --- #################### 数据库相关配置 ####################
 
 spring:

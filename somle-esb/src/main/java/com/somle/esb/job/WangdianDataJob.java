@@ -3,7 +3,7 @@ package com.somle.esb.job;
 
 import com.somle.esb.model.Domain;
 import com.somle.esb.service.EsbService;
-import com.wangdian.service.WangdianService;
+import com.somle.wangdian.service.WangdianService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -15,7 +15,7 @@ public class WangdianDataJob extends DataJob{
     @Autowired
     WangdianService wangdianService;
 
-    final String DATABASE = Domain.ECCANG.toString();
+    final String DATABASE = Domain.WANGDIAN.toString();
 
 
     @Override
