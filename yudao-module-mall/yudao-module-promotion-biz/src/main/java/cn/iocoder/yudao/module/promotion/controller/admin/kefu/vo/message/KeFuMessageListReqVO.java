@@ -25,6 +25,7 @@ public class KeFuMessageListReqVO {
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
     private LocalDateTime createTime;
 
+    // TODO @puhui999：这种一般建议叫 limit。不用 pageSize 哈
     @Schema(description = "每页条数，最大值为 100", requiredMode = Schema.RequiredMode.REQUIRED, example = "10")
     @NotNull(message = "每页条数不能为空")
     @Min(value = 1, message = "每页条数最小值为 1")

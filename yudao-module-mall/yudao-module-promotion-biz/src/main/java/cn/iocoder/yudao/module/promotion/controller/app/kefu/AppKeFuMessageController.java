@@ -36,6 +36,7 @@ public class AppKeFuMessageController {
 
     @Resource
     private KeFuMessageService kefuMessageService;
+    
     @Resource
     private AdminUserApi adminUserApi;
 
