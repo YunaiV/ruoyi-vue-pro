@@ -88,6 +88,7 @@ public interface TdEngineMapper {
 
     /**
      * 创建表 - 创建超级表的子表
+     *
      * @param tableDO 表信息
      */
     @InterceptorIgnore(tenantLine = "true")
@@ -114,6 +115,7 @@ public interface TdEngineMapper {
 
     Map<String, Object> getLastData(SelectDto selectDto);
 
+    @InterceptorIgnore(tenantLine = "true")
     List<Map<String, Object>> getHistoryData(SelectVisualDto selectVisualDto);
 
     List<Map<String, Object>> getRealtimeData(SelectVisualDto selectVisualDto);
@@ -122,5 +124,6 @@ public interface TdEngineMapper {
 
     List<Map<String, Object>> getLastDataByTags(TagsSelectDao tagsSelectDao);
 
-
+    @InterceptorIgnore(tenantLine = "true")
+    Long getHistoryCount(SelectVisualDto selectVisualDto);
 }

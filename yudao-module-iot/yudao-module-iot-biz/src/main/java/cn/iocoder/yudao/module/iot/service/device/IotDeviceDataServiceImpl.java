@@ -1,26 +1,37 @@
 package cn.iocoder.yudao.module.iot.service.device;
 
+import cn.hutool.core.date.DateUtil;
 import cn.hutool.json.JSONObject;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.iot.controller.admin.device.vo.deviceData.IotDeviceDataReqVO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDataDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.tdengine.ThingModelMessage;
 import cn.iocoder.yudao.module.iot.dal.dataobject.thinkmodelfunction.IotThinkModelFunctionDO;
 import cn.iocoder.yudao.module.iot.dal.redis.deviceData.DeviceDataRedisDAO;
+import cn.iocoder.yudao.module.iot.dal.tdengine.TdEngineMapper;
+import cn.iocoder.yudao.module.iot.domain.visual.SelectVisualDto;
 import cn.iocoder.yudao.module.iot.enums.product.IotProductFunctionTypeEnum;
 import cn.iocoder.yudao.module.iot.service.tdengine.IotThingModelMessageService;
 import cn.iocoder.yudao.module.iot.service.thinkmodelfunction.IotThinkModelFunctionService;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @Service
 public class IotDeviceDataServiceImpl implements IotDeviceDataService {
+
+    @Value("${spring.datasource.dynamic.datasource.tdengine.url}")
+    private String url;
 
     @Resource
     private IotDeviceService deviceService;
@@ -31,6 +42,9 @@ public class IotDeviceDataServiceImpl implements IotDeviceDataService {
 
     @Resource
     private DeviceDataRedisDAO deviceDataRedisDAO;
+
+    @Resource
+    private TdEngineMapper tdEngineMapper;
 
     @Override
     public void saveDeviceData(String productKey, String deviceName, String message) {
@@ -90,5 +104,34 @@ public class IotDeviceDataServiceImpl implements IotDeviceDataService {
             list.add(deviceData);
         });
         return list;
+    }
+
+    @Override
+    public PageResult<Map<String, Object>> getDevicePropertiesHistoryData(IotDeviceDataReqVO deviceDataReqVO) {
+        PageResult<Map<String, Object>> pageResult = new PageResult<>();
+        // 1. 获取设备信息
+        IotDeviceDO device = deviceService.getDevice(deviceDataReqVO.getDeviceId());
+        // 2. 获取设备属性历史数据
+        SelectVisualDto selectVisualDto = new SelectVisualDto();
+        selectVisualDto.setDataBaseName(getDatabaseName());
+        selectVisualDto.setTableName(getDeviceTableName(device.getProductKey(), device.getDeviceName()));
+        selectVisualDto.setFieldName(deviceDataReqVO.getIdentifier());
+        selectVisualDto.setStartTime(DateUtil.date(deviceDataReqVO.getTimes()[0].atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()).getTime());
+        selectVisualDto.setEndTime(DateUtil.date(deviceDataReqVO.getTimes()[1].atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()).getTime());
+        Map<String, Object> params = new HashMap<>();
+        params.put("rows", deviceDataReqVO.getPageSize());
+        params.put("page", (deviceDataReqVO.getPageNo() - 1) * deviceDataReqVO.getPageSize());
+        selectVisualDto.setParams(params);
+        pageResult.setList(tdEngineMapper.getHistoryData(selectVisualDto));
+        pageResult.setTotal(tdEngineMapper.getHistoryCount(selectVisualDto));
+        return pageResult;
+    }
+
+    private String getDatabaseName() {
+        return url.substring(url.lastIndexOf("/") + 1);
+    }
+
+    private static String getDeviceTableName(String productKey, String deviceName) {
+        return String.format("device_%s_%s", productKey.toLowerCase(), deviceName.toLowerCase());
     }
 }

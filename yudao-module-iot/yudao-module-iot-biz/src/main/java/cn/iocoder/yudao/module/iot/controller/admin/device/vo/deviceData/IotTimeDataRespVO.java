@@ -1,16 +1,14 @@
-package cn.iocoder.yudao.module.iot.dal.dataobject.tdengine;
+package cn.iocoder.yudao.module.iot.controller.admin.device.vo.deviceData;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-/**
- * 统计的时间数据
- */
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class TimeData {
+public class IotTimeDataRespVO {
 
     /**
      * 时间

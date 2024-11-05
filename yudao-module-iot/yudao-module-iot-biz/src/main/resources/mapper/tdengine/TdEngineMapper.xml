@@ -292,17 +292,18 @@
 
     <select id="getHistoryData" resultType="java.util.Map"
             parameterType="cn.iocoder.yudao.module.iot.domain.visual.SelectVisualDto">
-        SELECT #{fieldName}, ts
-        FROM #{dataBaseName}.#{tableName}
-        WHERE ts BETWEEN #{startTime} AND #{endTime}
-        LIMIT #{num}
+        SELECT ${fieldName} as data, time
+        FROM ${dataBaseName}.${tableName}
+        WHERE time BETWEEN #{startTime} AND #{endTime}
+          AND ${fieldName} IS NOT NULL
+        ORDER BY time DESC
+        LIMIT #{params.rows} offset #{params.page}
     </select>
 
     <select id="getRealtimeData" resultType="java.util.Map"
             parameterType="cn.iocoder.yudao.module.iot.domain.visual.SelectVisualDto">
-        SELECT #{fieldName}, ts
+        SELECT #{fieldName}, time
         FROM #{dataBaseName}.#{tableName}
-        LIMIT #{num}
     </select>
 
     <select id="getAggregateData" resultType="java.util.Map"
@@ -315,6 +316,12 @@
 
     <select id="describeSuperTable" resultType="java.util.Map">
         DESCRIBE ${dataBaseName}.${superTableName}
+    </select>
+    <select id="getHistoryCount" resultType="java.lang.Long">
+        SELECT count(time)
+        FROM ${dataBaseName}.${tableName}
+        WHERE time BETWEEN #{startTime} AND #{endTime}
+          AND ${fieldName} IS NOT NULL
     </select>
 
 </mapper>

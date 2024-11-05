@@ -1,10 +1,12 @@
 package cn.iocoder.yudao.module.iot.service.device;
 
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.iot.controller.admin.device.vo.deviceData.IotDeviceDataReqVO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDataDO;
 import jakarta.validation.Valid;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * IoT 设备数据 Service 接口
@@ -30,4 +32,12 @@ public interface IotDeviceDataService {
      * @return 设备属性最新数据
      */
     List<IotDeviceDataDO> getDevicePropertiesLatestData(@Valid IotDeviceDataReqVO deviceId);
+
+    /**
+     * 获得设备属性历史数据
+     *
+     * @param deviceDataReqVO 设备属性历史数据 Request VO
+     * @return 设备属性历史数据
+     */
+    PageResult<Map<String, Object>> getDevicePropertiesHistoryData(@Valid IotDeviceDataReqVO deviceDataReqVO);
 }

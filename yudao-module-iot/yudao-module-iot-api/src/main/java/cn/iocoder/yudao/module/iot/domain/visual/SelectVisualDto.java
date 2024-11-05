@@ -4,24 +4,24 @@ import lombok.Data;
 
 import java.util.Map;
 
-/**
- * @ClassDescription: 查询可视化所需入参对象
- * @ClassName: SelectDto
- * @Author: andyz
- * @Date: 2022-07-29 14:12:26
- * @Version 1.0
- */
 @Data
 public class SelectVisualDto {
 
-//    @NotBlank(message = "invalid operation: tableName can not be empty")
+    /**
+     * 数据库名称
+     */
     private String dataBaseName;
 
-//    @NotBlank(message = "invalid operation: tableName can not be empty")
+    /**
+     * 表名
+     */
     private String tableName;
 
-//    @NotBlank(message = "invalid operation: fieldName can not be empty") //属性
+    /**
+     * 属性
+     */
     private String fieldName;
+
     /**
      * 查询类型，0历史数据，1实时数据，2聚合数据
      */
@@ -39,10 +39,15 @@ public class SelectVisualDto {
      * 比如1s,1m,1h,1d代表1秒，1分钟，1小时，1天
      */
     private String interval;
-    //    @NotNull(message = "invalid operation: startTime can not be null")
+
+    /**
+     * 开始时间
+     */
     private Long startTime;
 
-    //    @NotNull(message = "invalid operation: endTime can not be null")
+    /**
+     * 结束时间
+     */
     private Long endTime;
 
     /**
