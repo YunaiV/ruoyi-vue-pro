@@ -227,7 +227,7 @@ public class EsbService {
             String name = erpDepartment.getName();
             if (!Objects.equals(name, "宁波索迈")){
                 EccangCategory eccang = erpToEccangConverter.toEccang(String.valueOf(deptId));
-                EccangResponse.BizContent response = eccangService.addDepartment(eccang);
+                EccangResponse.EccangPage response = eccangService.addDepartment(eccang);
                 log.info(response.toString());
             }
 //        var eccangDepartment = erpToEccangConverter.toEccang(erpDepartment);

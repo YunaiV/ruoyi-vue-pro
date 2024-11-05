@@ -340,7 +340,7 @@ public class EccangService {
         return post("syncProduct", product);
     }
 
-    public BizContent addProductBoxes(EccangProductBoxes boxes) {
+    public EccangPage addProductBoxes(EccangProductBoxes boxes) {
         return post("syncProductBoxes", boxes);
     }
 
