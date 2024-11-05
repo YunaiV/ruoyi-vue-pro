@@ -4,8 +4,6 @@ import com.alibaba.excel.annotation.ExcelProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
-import java.time.LocalDateTime;
-
 @Schema(description = "用户 App - 积分商城活动 Response VO")
 @Data
 public class AppPointActivityRespVO {
@@ -29,20 +27,6 @@ public class AppPointActivityRespVO {
     @Schema(description = "积分商城活动总库存", requiredMode = Schema.RequiredMode.REQUIRED, example = "2")
     @ExcelProperty("积分商城活动总库存")
     private Integer totalStock;
-
-    // TODO @puhui999：只返回必要的字段，例如说 remark、sort、createTime 应该是不需要的呢。也可以看看别的也不需要哈。
-
-    @Schema(description = "备注", example = "你说的对")
-    @ExcelProperty("备注")
-    private String remark;
-
-    @Schema(description = "排序", requiredMode = Schema.RequiredMode.REQUIRED)
-    @ExcelProperty("排序")
-    private Integer sort;
-
-    @Schema(description = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED)
-    @ExcelProperty("创建时间")
-    private LocalDateTime createTime;
 
     // ========== 商品字段 ==========
 

@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.promotion.dal.mysql.kefu;
 
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
-import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
+import cn.iocoder.yudao.framework.mybatis.core.query.QueryWrapperX;
 import cn.iocoder.yudao.module.promotion.controller.admin.kefu.vo.message.KeFuMessageListReqVO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.kefu.KeFuMessageDO;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -28,11 +28,11 @@ public interface KeFuMessageMapper extends BaseMapperX<KeFuMessageDO> {
      * @return 消息列表
      */
     default List<KeFuMessageDO> selectList(KeFuMessageListReqVO reqVO) {
-        return selectList(new LambdaQueryWrapperX<KeFuMessageDO>()
-                .eqIfPresent(KeFuMessageDO::getConversationId, reqVO.getConversationId())
-                .ltIfPresent(KeFuMessageDO::getCreateTime, reqVO.getCreateTime())
-                .orderByDesc(KeFuMessageDO::getCreateTime)
-                .last("limit 10")); // TODO @puhui999：使用 limitN 哈。然后 10 通过 reqVO 传递。
+        return selectList(new QueryWrapperX<KeFuMessageDO>()
+                .eqIfPresent("conversation_id", reqVO.getConversationId())
+                .ltIfPresent("create_time", reqVO.getCreateTime())
+                .orderByDesc("create_time")
+                .limitN(reqVO.getPageSize()));
     }
 
     default List<KeFuMessageDO> selectListByConversationIdAndUserTypeAndReadStatus(Long conversationId, Integer userType,
