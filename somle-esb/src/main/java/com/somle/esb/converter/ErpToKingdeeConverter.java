@@ -1,8 +1,13 @@
 package com.somle.esb.converter;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
-import cn.iocoder.yudao.module.system.controller.admin.dept.vo.dept.DeptSaveReqVO;
+import cn.hutool.core.text.StrPool;
+import cn.iocoder.yudao.module.erp.api.product.dto.ErpProductDTO;
+import cn.iocoder.yudao.module.system.api.dept.DeptApi;
+import cn.iocoder.yudao.module.system.api.dept.dto.DeptRespDTO;
 import com.somle.erp.model.product.ErpCountrySku;
 import com.somle.erp.model.product.ErpStyleSku;
 import com.somle.kingdee.model.KingdeeProduct;
@@ -20,6 +25,9 @@ public class ErpToKingdeeConverter {
 
     @Autowired
     KingdeeService kingdeeService;
+
+    @Autowired
+    private DeptApi deptApi;
 
     public KingdeeProduct toKingdee(ErpCountrySku erpCountrySku) {
         ErpStyleSku erpStyleSku = erpCountrySku.getStyleSku();
@@ -43,8 +51,8 @@ public class ErpToKingdeeConverter {
         product.setWide(String.valueOf(erpStyleSku.getWidth()));
         product.setHigh(String.valueOf(erpStyleSku.getHeight()));
 
-        product.setSaleDepartmentId(erpStyleSku.getSaleDepartmentId());
-        product.setDeclaredTypeZh(erpCountrySku.getDeclaredTypeZh());
+        //product.setSaleDepartmentId(erpStyleSku.getSaleDepartmentId());
+        //product.setDeclaredTypeZh(erpCountrySku.getDeclaredTypeZh());
 
         // product.setIsFloat(true);
         // product.setGrossWeight(product.getPackageWeight());
@@ -69,7 +77,56 @@ public class ErpToKingdeeConverter {
 
     }
 
-    public KingdeeAuxInfoDetail toKingdee(DeptSaveReqVO erpDepartment) {
+    public List<KingdeeProduct> toKingdee(List<ErpProductDTO> allProducts) {
+        List<KingdeeProduct> kingdeeProducts = new ArrayList<>();
+        for (ErpProductDTO product : allProducts){
+            KingdeeProduct kingdeeProduct = new KingdeeProduct();
+            //普通
+            kingdeeProduct.setCheckType("1");
+            kingdeeProduct.setName(product.getProductTitle() + StrPool.DASHED + product.getCountryCode());
+            kingdeeProduct.setNumber(product.getProductSku());
+            kingdeeProduct.setBarcode(product.getBarCode());
+            //报关品名
+            kingdeeProduct.setProducingPace(product.getPdOverseaTypeCn());
+            //HS编码
+            kingdeeProduct.setHelpCode(product.getHsCode());
+            //加权平均
+            kingdeeProduct.setCostMethod("2");
+            kingdeeProduct.setGrossWeight(String.valueOf(product.getPdNetWeight()));
+            Float pdNetLength = product.getPdNetLength();
+            Float pdNetWidth = product.getPdNetWidth();
+            Float pdNetHeight = product.getPdNetHeight();
+            kingdeeProduct.setLength(String.valueOf(pdNetLength));
+            kingdeeProduct.setWide(String.valueOf(pdNetWidth));
+            kingdeeProduct.setHigh(String.valueOf(pdNetHeight));
+            if (pdNetLength != null && pdNetWidth != null && pdNetHeight != null){
+                kingdeeProduct.setVolume(String.valueOf(pdNetLength * pdNetWidth * pdNetHeight));
+            }
+            //部门id，映射到金蝶自定义字段中
+            //在金蝶中辅助资料对应的就是erp中的部门，非树形结构，在辅助资料中，由一个辅助分类是部门/报关品名（部门公司）
+            kingdeeProduct.setSaleDepartmentId(product.getProductDeptId());
+            kingdeeProduct.setDeclaredTypeZh(product.getPdOverseaTypeCn());
+            //将报关规则的id存到这里面去
+            kingdeeProduct.setMaxInventoryQty(product.getRuleId());
+            kingdeeProducts.add(kingdeeProduct);
+        }
+
+        return kingdeeProducts;
+
+    }
+
+    public KingdeeAuxInfoDetail toKingdee(String deptId) {
+        //这里erp的部门id对应金蝶的部门number
+        //从erp中获取部门信息
+        DeptRespDTO dept = deptApi.getDept(Long.valueOf(deptId));
+        KingdeeAuxInfoDetail department = new KingdeeAuxInfoDetail();
+        department.setName(dept.getName());
+        department.setNumber(deptId);
+        department.setRemark(LocalDateTime.now().toString());
+        return department;
+    }
+
+    public KingdeeAuxInfoDetail toKingdee(DeptRespDTO erpDepartment) {
         // Map<String, String> departmentMap = new HashMap<>();
         // departmentMap.put("ABD美视区1组", "ABD0101");
         // departmentMap.put("ABD美视区2组", "ABD0102");

@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.erp.service.purchase;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.ObjUtil;
 import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
 import cn.iocoder.yudao.module.erp.controller.admin.product.vo.product.ErpProductRespVO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.product.ErpProductCategoryDO;
@@ -43,7 +44,7 @@ public class ErpSupplierProductServiceImpl implements ErpSupplierProductService 
 
     @Override
     public Long createSupplierProduct(ErpSupplierProductSaveReqVO createReqVO) {
-        validateSupplierProductCodeUnique(createReqVO.getCode());
+        validateSupplierProductCodeUnique(null,createReqVO.getCode());
         // 插入
         ErpSupplierProductDO supplierProduct = BeanUtils.toBean(createReqVO, ErpSupplierProductDO.class);
         supplierProductMapper.insert(supplierProduct);
@@ -53,7 +54,7 @@ public class ErpSupplierProductServiceImpl implements ErpSupplierProductService 
 
     @Override
     public void updateSupplierProduct(ErpSupplierProductSaveReqVO updateReqVO) {
-        validateSupplierProductCodeUnique(updateReqVO.getCode());
+        validateSupplierProductCodeUnique(updateReqVO.getId(),updateReqVO.getCode());
         // 校验存在
         validateSupplierProductExists(updateReqVO.getId());
         // 更新
@@ -75,12 +76,17 @@ public class ErpSupplierProductServiceImpl implements ErpSupplierProductService 
         }
     }
 
-    private void validateSupplierProductCodeUnique(String code) {
+    private void validateSupplierProductCodeUnique(Long id,String code) {
         ErpSupplierProductDO supplierProduct = supplierProductMapper.selectByCode(code);
         if (supplierProduct == null) {
             return;
-        } else {
-            throw exception(SUPPLIER_PRODUCT_CODE_DUPLICATE);
+        }
+        // 如果 id 为空，说明不用比较是否为相同 id 的字典类型
+        if (id == null){
+            throw exception(PRODUCT_CODE_DUPLICATE);
+        }
+        if (!supplierProduct.getId().equals(id)) {
+            throw exception(PRODUCT_UNIT_NAME_DUPLICATE);
         }
     }
 

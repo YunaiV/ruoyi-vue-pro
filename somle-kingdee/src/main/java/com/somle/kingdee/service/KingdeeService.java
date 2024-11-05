@@ -10,10 +10,7 @@ import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.core.annotation.Order;
 import org.springframework.dao.DataAccessException;
-import org.springframework.integration.annotation.ServiceActivator;
-import org.springframework.messaging.Message;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -63,7 +60,6 @@ public class KingdeeService {
             log.info("tokens saved successfully");
             success = true;
         } catch (DataAccessException e) {
-            System.out.println("Save failed: " + e.getMessage());
             // Handle exception as needed
         }
         return success;
@@ -78,4 +74,5 @@ public class KingdeeService {
     public void addProduct(KingdeeProduct product) {
         clientList.parallelStream().forEach(n->n.addProduct(product));
     }
+
 }

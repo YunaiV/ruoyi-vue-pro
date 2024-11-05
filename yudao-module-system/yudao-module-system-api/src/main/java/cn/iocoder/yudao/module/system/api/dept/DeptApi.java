@@ -1,11 +1,14 @@
 package cn.iocoder.yudao.module.system.api.dept;
 
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
+import cn.iocoder.yudao.module.system.api.dept.dto.DeptLevelRespDTO;
+import cn.iocoder.yudao.module.system.api.dept.dto.DeptReqDTO;
 import cn.iocoder.yudao.module.system.api.dept.dto.DeptRespDTO;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeSet;
 
 /**
  * 部门 API 接口
@@ -59,11 +62,45 @@ public interface DeptApi {
     List<DeptRespDTO> getChildDeptList(Long id);
 
     /**
-     * 根据部门id来获取该部门属于第几层级
+    * 根据部门id来获取该部门属于第几层级
      *
-     * @Param 部门id
-     * @return 层级
-     **/
+    * @Param 部门id
+    * @return 层级
+    **/
     Integer getDeptLevel(Long id);
 
+
+    /**
+     * 根据部门id来获取该部门父亲部门的名称
+     *
+     * @Param 部门id
+     * @return 服部门名称
+     **/
+    String getParentNameById(Long id);
+
+
+    /**
+    * @Author Wqh
+    * @Description 获取产品部门的源关系
+    * @Date 14:24 2024/11/4
+    * @Param [productDeptId]
+    * @return java.util.TreeSet<cn.iocoder.yudao.module.system.api.dept.dto.DeptLevelDTO>
+    **/
+    TreeSet<DeptLevelRespDTO> getDeptTreeLevel(Long productDeptId);
+
+    /**
+    * @Author Wqh
+    * @Description 修改部门
+    * @Date 14:36 2024/11/4
+    * @Param [erpDepartment]
+     **/
+    void updateDept(DeptReqDTO erpDepartment);
+
+    /**
+     * @Author Wqh
+     * @Description 新增部门
+     * @Date 14:36 2024/11/4
+     * @Param [erpDepartment]
+     **/
+    Long createDept(DeptReqDTO erpDepartment);
 }

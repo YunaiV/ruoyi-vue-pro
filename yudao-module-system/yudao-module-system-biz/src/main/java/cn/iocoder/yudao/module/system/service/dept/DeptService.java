@@ -1,15 +1,14 @@
 package cn.iocoder.yudao.module.system.service.dept;
 
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
+import cn.iocoder.yudao.module.system.api.dept.dto.DeptLevelRespDTO;
 import cn.iocoder.yudao.module.system.controller.admin.dept.vo.dept.DeptListReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.dept.vo.dept.DeptSaveReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.dept.vo.dept.DeptTreeRespVO;
+import cn.iocoder.yudao.module.system.controller.admin.dept.vo.dept.DeptTreeRespVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.dept.DeptDO;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * 部门 Service 接口
@@ -109,12 +108,28 @@ public interface DeptService {
     Integer getDeptLevel(Long id);
 
     /**
-    * @Author Wqh
-    * @Description 获得二级部门和一级部门（构建树结构）
-    * @Date 15:26 2024/10/30
-    * @Param []
-    * @return java.util.List<cn.iocoder.yudao.module.system.controller.admin.dept.vo.dept.DeptTreeRespVO>
-    **/
-    List<DeptTreeRespVO> getTreeDeptList();
+     * 获得指定部门
+     *
+     * @param id 部门编号
+     * @return 父级名称
+     */
+    String getParentNameById(Long id);
 
+    /**
+    * @Author Wqh
+    * @Description 根据部门id溯源部门名称
+    * @Date 14:25 2024/11/4
+    * @Param [id]
+    * @return java.util.TreeSet<cn.iocoder.yudao.module.system.api.dept.dto.DeptLevelDTO>
+    **/
+    TreeSet<DeptLevelRespDTO> getDeptTreeLevel(Long id);
+
+    /**
+     * @Author Wqh
+     * @Description 获得二级部门和一级部门（构建树结构）
+     * @Date 15:26 2024/10/30
+     * @Param []
+     * @return java.util.List<cn.iocoder.yudao.module.system.controller.admin.dept.vo.dept.DeptTreeRespVO>
+     **/
+    List<DeptTreeRespVO> getTreeDeptList();
 }

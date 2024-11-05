@@ -1,18 +1,26 @@
 package com.somle.esb.converter;
 
-import com.somle.eccang.model.EccangCategory;
-import com.somle.eccang.model.EccangOrganization;
-import com.somle.eccang.model.EccangProduct;
+import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.util.ReflectUtil;
+import cn.iocoder.yudao.framework.common.exception.util.ThrowUtil;
+import cn.iocoder.yudao.module.erp.api.product.dto.ErpProductDTO;
+import cn.iocoder.yudao.module.system.api.dept.DeptApi;
+import cn.iocoder.yudao.module.system.api.dept.dto.DeptLevelRespDTO;
+import cn.iocoder.yudao.module.system.api.dept.dto.DeptRespDTO;
+import com.somle.eccang.model.*;
 import com.somle.eccang.service.EccangService;
 import com.somle.erp.model.product.ErpCountrySku;
 import com.somle.erp.model.ErpDepartment;
 import com.somle.erp.model.product.ErpStyleSku;
 import com.somle.erp.service.ErpDepartmentService;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
-import java.util.List;
+import java.lang.reflect.Field;
+import java.util.*;
+
+import static com.somle.esb.enums.ErrorCodeConstants.DEPT_LEVEL_ERROR;
 
 @Service
 public class ErpToEccangConverter {
@@ -21,6 +29,9 @@ public class ErpToEccangConverter {
 
     @Autowired
     EccangService eccangService;
+
+    @Autowired
+    private DeptApi deptApi;
 
     public EccangProduct toEccang(ErpCountrySku erpCountrySku) {
         ErpStyleSku erpStyleSku = erpCountrySku.getStyleSku();
@@ -80,31 +91,105 @@ public class ErpToEccangConverter {
         return product;
     }
 
-    public EccangCategory toEccang(ErpDepartment erpDepartment) {
+    public List<EccangProduct> toEccang(List<ErpProductDTO> allProducts){
+        List<EccangProduct> allEccangProducts = new ArrayList<>();
+        for (ErpProductDTO product : allProducts){
+            /*//编辑箱规
+            EccangProductBoxes box = new EccangProductBoxes();
+            //箱规的中文名称和英文名称都根据sku来
+            box.setBoxName(product.getProductSku()+"-"+ LocalDateTime.now());
+            box.setBoxNameEn(product.getProductSku());
+            //箱规的长宽重，就是产品包装长宽高重
+            box.setBoxLength(String.valueOf(product.getPdNetLength()));
+            box.setBoxWidth(String.valueOf(product.getPdNetWidth()));
+            box.setBoxHeight(String.valueOf(product.getPdNetHeight()));
+            box.setBoxWeight("0.001");
+            //以及均为默认值
+            box.setSmCode("0");
+            box.setBoxStatus(1);
+            //新增
+            EccangResponse.BizContent bizContent = eccangService.addProductBoxes(box);
+            JsonNode data = bizContent.getData();
+            //获取boxId
+            String boxId = data.get("box_id").asText();
+            Map<String,Object> boxArr = new HashMap<>();
+            boxArr.put("box_id",3);
+            boxArr.put("box_quantity",1);
+            boxArr.put("warehouse_id",0);*/
+            //boxArr.put("box_id",boxId);
+            EccangOrganization organization = eccangService.getOrganizationByNameEn(product.getUserOrganizationId());
+            EccangProduct eccangProduct = new EccangProduct();
+            BeanUtils.copyProperties(product,eccangProduct);
+            eccangProduct.setPdDeclarationStatement(product.getRuleId());
+            eccangProduct.setProductTitleEn(product.getProductSku());
+            eccangProduct.setPdDeclareCurrencyCode("USD");
+            eccangProduct.setProductDeclaredValue(99999.9F);
+            eccangProduct.setLogisticAttribute("1");
+            eccangProduct.setProductImgUrlList(Collections.singletonList(product.getImageUrl()));
+            //eccangProduct.setBoxArr(List.of(boxArr));
+            eccangProduct.setDefaultSupplierCode("默认供应商");
+            eccangProduct.setUserOrganizationId(organization.getId());
+
+            //获取产品部门的源关系
+            TreeSet<DeptLevelRespDTO> deptTreeLevel = deptApi.getDeptTreeLevel(product.getProductDeptId());
+            //判断集合是否为空、0、大于3
+            if (CollectionUtil.isEmpty(deptTreeLevel) || deptTreeLevel.size() >3){
+                throw new RuntimeException("品类部门信息异常，请联系管理员，检查erp中产品资料库中的部门信息");
+            }
+            //移除第一个元素
+            deptTreeLevel.pollFirst();
+            //设置品类
+            int index = 1;
+            for (DeptLevelRespDTO deptLevelRespDTO : deptTreeLevel){
+                //根据循环分别设置到procutCategoryNameEn和procutCategoryName
+                //通过反射获取属性名，并设置值
+                Field procutCategoryNameField = ReflectUtil.getField(EccangProduct.class, "procutCategoryName"+ index);
+                ReflectUtil.setFieldValue(eccangProduct,procutCategoryNameField, deptLevelRespDTO.getDeptName());
+                Field procutCategoryNameEnField = ReflectUtil.getField(EccangProduct.class, "procutCategoryNameEn"+ index);
+                ReflectUtil.setFieldValue(eccangProduct,procutCategoryNameEnField, deptLevelRespDTO.getDeptName());
+                index += 1;
+            }
+
+            allEccangProducts.add(eccangProduct);
+        }
+        return allEccangProducts;
+    }
+
+    public EccangCategory toEccang(String deptId) {
+        //从erp中获取部门信息
+        DeptRespDTO dept = deptApi.getDept(Long.valueOf(deptId));
+        //获取部门名称
+        String deptName = dept.getName();
         String actionType = "ADD";
         Integer id = null;
-        Integer pid = null;
-        Integer level = erpDepartment.getLevel();
-        level = level > 3 ? 3 : level;
+        Integer pid;
         try {
-            id = eccangService.getCategoryByNameEn(erpDepartment.getId().toString()).getPcId();
+            EccangCategory category = eccangService.getCategoryByName(deptName);
+            id = category.getPcId();
             actionType = "EDIT";
         } catch (Exception e) {
         }
         try {
-            pid = eccangService.getCategoryByNameEn(erpDepartmentService.getParent(erpDepartment, level - 1).getId().toString()).getPcId();
+            //获取父级名称
+            String parentName = deptApi.getParentNameById(Long.valueOf(deptId));
+            pid = eccangService.getCategoryByName(parentName).getPcId();
         } catch (Exception e) {
-            if (level != 1) {
-                throw new RuntimeException("pid not found for " + erpDepartment.toString() + " Detail: " + e.toString());
-            }
+            //由于未找到父id，它自己就是顶级层级
+            pid = 0;
         }
+        Integer deptLevel = deptApi.getDeptLevel(Long.valueOf(deptId));
+        --deptLevel;
+        //如果层级为0，则忽略并抛出异常通知操作人员
+        ThrowUtil.ifThrow(Objects.equals(deptLevel, 0), DEPT_LEVEL_ERROR);
+        //当层级大于3，则自动修正为3
+        deptLevel = deptLevel > 3 ? 3 : deptLevel;
         return EccangCategory.builder()
             .actionType(actionType)
             .pcId(id)
-            .pcName(erpDepartment.getNameZh())
-            .pcNameEn(String.valueOf(erpDepartment.getId()))
+            .pcName(deptName)
+            .pcNameEn(deptId)
             .pcPid(pid)
-            .pcLevel(level)
+            .pcLevel(deptLevel)
             .build();
     }
 }

@@ -1,16 +1,13 @@
 package com.somle.esb.controller;
 
-import com.somle.esb.model.Domain;
+import cn.iocoder.yudao.module.erp.api.product.dto.ErpProductDTO;
 import com.somle.esb.service.EsbService;
-import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.integration.support.MessageBuilder;
+import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDate;
+import java.util.List;
+
 
 @RestController
 @RequestMapping("/api/esb")
@@ -19,12 +16,12 @@ public class EsbController {
     @Autowired
     private EsbService service;
 
-
-
     @PostMapping("/getBeans")
     public void printAllBeans() {
         service.printAllBeans();
     }
+
+
 
 //    @PostMapping("/dataCollect")
 //    public String dataCollect(LocalDate scheduleDate, String database) {
@@ -36,15 +33,13 @@ public class EsbController {
 //        return "success";
 //    }
 
-    @PostMapping("/syncDepartments")
-    public String syncDepartments() {
-        service.syncDepartments();
-        return "success";
-    }
+
 
     @PostMapping("/syncUsers")
     public String syncUsers() {
-        service.syncUsers();
+        /*ErpProductDTO a = new ErpProductDTO();
+        a.setProductDeptId(50007L);
+        service.handleProductsToKingdee(MessageBuilder.withPayload(List.of(a)).build());*/
         return "success";
     }
 
