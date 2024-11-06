@@ -22,6 +22,7 @@ import com.somle.esb.converter.EccangToErpConverter;
 import com.somle.esb.converter.ErpToEccangConverter;
 import com.somle.esb.converter.ErpToKingdeeConverter;
 import com.somle.esb.model.OssData;
+import com.somle.kingdee.model.supplier.KingdeeSupplier;
 import com.somle.kingdee.service.KingdeeService;
 import com.somle.matomo.service.MatomoService;
 import lombok.extern.slf4j.Slf4j;
@@ -34,6 +35,7 @@ import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -144,13 +146,13 @@ public class EsbService {
 
     /**
     * @Author Wqh
-    * @Description 上传eccang信息
+    * @Description 上传eccang产品信息
     * @Date 11:18 2024/11/5
     * @Param [message]
     * @return void
     **/
     @ServiceActivator(inputChannel = "syncExternalDataChannel")
-    public void handleProductsToEccang(Message<List<ErpProductDTO>> message) {
+    public void syncProductsToEccang(Message<List<ErpProductDTO>> message) {
         /*
         List<EccangProduct> eccangProducts = erpToEccangConverter.toEccang(message.getPayload());
         for (EccangProduct eccangProduct : eccangProducts){
@@ -170,17 +172,32 @@ public class EsbService {
 
     /**
      * @Author Wqh
-     * @Description 上传金蝶信息
+     * @Description 上传金蝶产品信息
      * @Date 11:18 2024/11/5
      * @Param [message]
      * @return void
      **/
     @ServiceActivator(inputChannel = "syncExternalDataChannel")
-    public void handleProductsToKingdee(Message<List<ErpProductDTO>> message) {
+    public void syncProductsToKingdee(Message<List<ErpProductDTO>> message) {
        /* List<KingdeeProduct> kingdee = erpToKingdeeConverter.toKingdee(message.getPayload());
         for (KingdeeProduct kingdeeProduct : kingdee){
             kingdeeService.addProduct(kingdeeProduct);
         }*/
+    }
+
+    /**
+    * @Author Wqh
+    * @Description 上传金蝶供应商信息
+    * @Date 9:45 2024/11/6
+    * @Param []
+    * @return void
+    **/
+    public void syncSupplierToKingdee() {
+        //List<KingdeeSupplier> kingdeeSuppliers = erpToKingdeeConverter.toKingdee(message.getPayload());
+        List<KingdeeSupplier> kingdeeSuppliers = new ArrayList<>();
+        for (KingdeeSupplier kingdeeProduct : kingdeeSuppliers){
+            kingdeeService.addSupplier(kingdeeProduct);
+        }
     }
 
     @ServiceActivator(inputChannel = "saleChannel")

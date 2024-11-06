@@ -61,7 +61,7 @@ public class SynExternalDataAspect {
                 if (arg.getClass().equals(inClazz)){
                     //通过反射来获取arg中的id属性值
                     Field id = arg.getClass().getDeclaredField("id");
-                    //获取id的值
+                    //获取入参中的id值
                     id.setAccessible(true);
                     idValue = (Long)id.get(arg);
                 }
@@ -69,7 +69,7 @@ public class SynExternalDataAspect {
         }
         //执行目标方法
         Object result = joinPoint.proceed();
-        //修改方法
+        //当idValue不为null，则说明该请求为新增请求，反之则为修改请求
         if (idValue == null){
             //获取返参中的id
             if (ObjUtil.isNotEmpty(result) && result instanceof CommonResult){

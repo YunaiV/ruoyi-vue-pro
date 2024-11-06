@@ -4,7 +4,7 @@ import com.somle.framework.common.util.json.JSONObject;
 import com.somle.framework.common.util.json.JsonUtils;
 import com.somle.kingdee.model.*;
 import com.somle.framework.common.util.web.WebUtils;
-import jakarta.annotation.Resource;
+import com.somle.kingdee.model.supplier.KingdeeSupplier;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpEntity;
@@ -162,6 +162,13 @@ public class KingdeeClient {
         String endUrl = "/jdy/v2/bd/material";
         TreeMap<String, String>  params = new TreeMap<>();
         KingdeeResponse response = postResponse(endUrl, params, product);
+        return response;
+    }
+
+    public KingdeeResponse addSupplier(KingdeeSupplier kingdeeSupplier) {
+        String endUrl = "/jdy/v2/bd/supplier";
+        TreeMap<String, String>  params = new TreeMap<>();
+        KingdeeResponse response = postResponse(endUrl, params, kingdeeSupplier);
         return response;
     }
 
