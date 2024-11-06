@@ -6,11 +6,14 @@ import java.util.List;
 
 import cn.hutool.core.text.StrPool;
 import cn.iocoder.yudao.module.erp.api.product.dto.ErpProductDTO;
+import cn.iocoder.yudao.module.erp.api.supplier.dto.ErpSupplierDTO;
 import cn.iocoder.yudao.module.system.api.dept.DeptApi;
 import cn.iocoder.yudao.module.system.api.dept.dto.DeptRespDTO;
 import com.somle.erp.model.product.ErpCountrySku;
 import com.somle.erp.model.product.ErpStyleSku;
 import com.somle.kingdee.model.KingdeeProduct;
+import com.somle.kingdee.model.supplier.KingdeeSupplier;
+import com.somle.kingdee.model.supplier.SupplierBomentity;
 import com.somle.kingdee.service.KingdeeService;
 import com.somle.kingdee.model.KingdeeAuxInfoDetail;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -113,6 +116,24 @@ public class ErpToKingdeeConverter {
 
         return kingdeeProducts;
 
+    }
+
+    public KingdeeSupplier toKingdee(ErpSupplierDTO erpSupplierDTO) {
+        KingdeeSupplier kingdeeSupplier = new KingdeeSupplier();
+        kingdeeSupplier.setName(erpSupplierDTO.getName());
+        kingdeeSupplier.setAccountOpenAddr(erpSupplierDTO.getBankAddress());
+        kingdeeSupplier.setBank(erpSupplierDTO.getBankName());
+        kingdeeSupplier.setBankAccount(erpSupplierDTO.getBankAccount());
+        kingdeeSupplier.setRemark(erpSupplierDTO.getRemark());
+        kingdeeSupplier.setRate(String.valueOf(erpSupplierDTO.getTaxPercent()));
+        kingdeeSupplier.setTaxpayerNo(erpSupplierDTO.getTaxNo());
+        List<SupplierBomentity> bomEntityList = new ArrayList<>();
+        SupplierBomentity bomEntity = new SupplierBomentity();
+        bomEntity.setContactPerson(erpSupplierDTO.getContact());
+        bomEntity.setMobile(erpSupplierDTO.getMobile());
+        bomEntity.setEmail(erpSupplierDTO.getEmail());
+        kingdeeSupplier.setBomEntity(bomEntityList);
+        return kingdeeSupplier;
     }
 
     public KingdeeAuxInfoDetail toKingdee(String deptId) {

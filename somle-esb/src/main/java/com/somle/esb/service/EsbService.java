@@ -2,6 +2,7 @@ package com.somle.esb.service;
 
 import cn.hutool.core.util.ObjUtil;
 import cn.iocoder.yudao.module.erp.api.product.dto.ErpProductDTO;
+import cn.iocoder.yudao.module.erp.api.supplier.dto.ErpSupplierDTO;
 import cn.iocoder.yudao.module.system.api.dept.DeptApi;
 import cn.iocoder.yudao.module.system.api.dept.dto.DeptReqDTO;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
@@ -192,12 +193,9 @@ public class EsbService {
     * @Param []
     * @return void
     **/
-    public void syncSupplierToKingdee() {
-        //List<KingdeeSupplier> kingdeeSuppliers = erpToKingdeeConverter.toKingdee(message.getPayload());
-        List<KingdeeSupplier> kingdeeSuppliers = new ArrayList<>();
-        for (KingdeeSupplier kingdeeProduct : kingdeeSuppliers){
-            kingdeeService.addSupplier(kingdeeProduct);
-        }
+    public void syncSupplierToKingdee(ErpSupplierDTO erpSupplierDTO) {
+        KingdeeSupplier kingdeeProduct = erpToKingdeeConverter.toKingdee(erpSupplierDTO);
+        kingdeeService.addSupplier(kingdeeProduct);
     }
 
     @ServiceActivator(inputChannel = "saleChannel")

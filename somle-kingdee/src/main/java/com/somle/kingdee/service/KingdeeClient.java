@@ -166,9 +166,23 @@ public class KingdeeClient {
     }
 
     public KingdeeResponse addSupplier(KingdeeSupplier kingdeeSupplier) {
+        try {
+            String id = getSupplier(kingdeeSupplier.getNumber()).getData().getString("id");
+            kingdeeSupplier.setId(id);
+        } catch (Exception e) {
+            log.debug("id not found for " + kingdeeSupplier.getNumber() + "adding new");
+        }
         String endUrl = "/jdy/v2/bd/supplier";
         TreeMap<String, String>  params = new TreeMap<>();
         KingdeeResponse response = postResponse(endUrl, params, kingdeeSupplier);
+        return response;
+    }
+
+    public KingdeeResponse getSupplier(String number) {
+        String endUrl = "/jdy/v2/bd/supplier";
+        TreeMap<String, String> params = new TreeMap<>();
+        params.put("number", number);
+        KingdeeResponse response = getResponse(endUrl, params);
         return response;
     }
 
