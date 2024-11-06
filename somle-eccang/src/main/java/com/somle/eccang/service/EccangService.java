@@ -1,9 +1,11 @@
 package com.somle.eccang.service;
 
+import java.net.SocketTimeoutException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
@@ -15,9 +17,16 @@ import com.somle.framework.common.util.json.JSONObject;
 
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.integration.support.MessageBuilder;
 import org.springframework.messaging.MessageChannel;
+import org.springframework.retry.RetryPolicy;
+import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
+import org.springframework.retry.backoff.ExponentialBackOffPolicy;
+import org.springframework.retry.policy.ExceptionClassifierRetryPolicy;
+import org.springframework.retry.policy.SimpleRetryPolicy;
+import org.springframework.retry.support.RetryTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -28,6 +37,7 @@ import com.somle.framework.common.util.web.WebUtils;
 
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.client.HttpClientErrorException;
 
 @Slf4j
 @Service
@@ -102,21 +112,36 @@ public class EccangService {
 
     // core network io
     @SneakyThrows
-    @Retryable(value = RuntimeException.class)
     private EccangResponse getResponse(Object payload, String endpoint){
+        var retryPolicy = new ExceptionClassifierRetryPolicy();
+        retryPolicy.setPolicyMap(Map.of(
+            HttpClientErrorException.TooManyRequests.class, new SimpleRetryPolicy(10),
+            SocketTimeoutException.class, new SimpleRetryPolicy(10)
+        ));
+
+        var exponentialBackOffPolicy = new ExponentialBackOffPolicy();
+        exponentialBackOffPolicy.setInitialInterval(2000);
+        exponentialBackOffPolicy.setMultiplier(2);
+        exponentialBackOffPolicy.setMaxInterval(180000);
+
+        var retryTemplate = new RetryTemplate();
+        retryTemplate.setRetryPolicy(retryPolicy);
+        retryTemplate.setBackOffPolicy(exponentialBackOffPolicy);
+
         String url = "http://openapi-web.eccang.com/openApi/api/unity";
 
-        EccangResponse responseFinal = CoreUtils.retry(ctx -> {
-            // 限流器限制在生成签名前，防止签名过期
-            JSONObject requestBody = limiter.executeWithLimiter(()->requestBody(payload, endpoint));
+
+        EccangResponse responseFinal = retryTemplate.execute(ctx -> {
+            var requestBody = requestBody(payload, endpoint);
             var response = WebUtils.postRequest(url, Map.of(), Map.of(), requestBody);
             switch (response.code()) {
                 case 200:
                     var responseBody = response.body().string();
-                    log.info(responseBody);
-                    return JsonUtils.parseObject(responseBody, EccangResponse.class);
+                    var responseOriginal = JsonUtils.parseObject(responseBody, EccangResponse.class);
+                    validateResponse(responseOriginal);
+                    return responseOriginal;
                 default:
-                    throw new RuntimeException("Unknown response code " + response.toString());
+                    throw new RuntimeException("Unknown response code " + response);
             }
         });
 
@@ -129,6 +154,7 @@ public class EccangService {
         switch (response.getCode()) {
             case "200":
                 return;
+            // 请检查requestBody生成时间和实际请求发送时间是否相隔太久
             case "saas.api.error.code.0049":
                 throw new RuntimeException("签名过期：时间戳必须在一分钟以内，超出1分钟则过期失效，且只能用一次。 时间戳重新生成后，需要重新生成签名");
             case "saas.api.error.code.0082":
@@ -138,7 +164,7 @@ public class EccangService {
             case "300":
                 throw new RuntimeException("Error message from eccang: " + response.getBizContentList(EccangResponse.EccangError.class));
             case "429":
-                throw new RuntimeException("Too many requests");
+                throw new HttpClientErrorException(HttpStatus.TOO_MANY_REQUESTS, "Too many requests, please try again later.");
             default:
                 throw new RuntimeException("Unknown eccang-specific response code: " + response.getCode() + " " + response);
         }
@@ -146,7 +172,6 @@ public class EccangService {
 
     private EccangPage getPage(Object payload, String endpoint) {
         EccangResponse response = getResponse(payload, endpoint);
-        validateResponse(response);
         return response.getBizContent(EccangPage.class);
     }
 

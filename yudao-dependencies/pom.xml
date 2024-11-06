@@ -78,6 +78,9 @@
         <xercesImpl.version>2.12.2</xercesImpl.version>
         <weixin-java.version>4.6.0</weixin-java.version>
         <dingtalk.version>2.0.0</dingtalk.version>
+<!--        <guava.version>33.3.1-jre</guava.version>-->
+        <bucket4j.version>8.10.1</bucket4j.version>
+
     </properties>
 
     <dependencyManagement>
@@ -88,6 +91,18 @@
 <!--                <groupId>com.aliyun</groupId>-->
 <!--                <artifactId>dingtalk</artifactId>-->
 <!--                <version>${dingtalk.version}</version>-->
+<!--            </dependency>-->
+
+            <dependency>
+                <groupId>com.bucket4j</groupId>
+                <artifactId>bucket4j-core</artifactId>
+                <version>${bucket4j.version}</version>
+            </dependency>
+
+<!--            <dependency>-->
+<!--                <groupId>com.google.guava</groupId>-->
+<!--                <artifactId>guava</artifactId>-->
+<!--                <version>${guava.version}</version>-->
 <!--            </dependency>-->
 
             <dependency>

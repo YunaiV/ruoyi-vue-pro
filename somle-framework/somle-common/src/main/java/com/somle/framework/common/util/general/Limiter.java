@@ -1,10 +1,14 @@
 package com.somle.framework.common.util.general;
 
+import io.github.bucket4j.Bandwidth;
+import io.github.bucket4j.Bucket;
+import io.github.bucket4j.Refill;
 import lombok.*;
 
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.function.Supplier;
+import java.time.Duration;
 
 
 @Data
@@ -17,11 +21,14 @@ public class Limiter {
     private Integer deduct;
     private Timer timer;
 
+    private Bucket bucket = null;
+
     // Constructor to set custom limit and calculate deduct value
     public Limiter(Integer limit) {
         this.limit = limit;
         this.deduct = calculateDeduct(limit);
-        startTimer();
+        Bandwidth bandwidth = Bandwidth.classic(30, Refill.greedy(30, Duration.ofMinutes(1)));
+        this.bucket = Bucket.builder().addLimit(bandwidth).build();
     }
 
     // Method to calculate deduct value based on the limit
@@ -31,43 +38,28 @@ public class Limiter {
         return 60000 / limit;
     }
 
-    // Method to increment the counter by 1
-    public synchronized void incrementCounter() {
-        counter++;
-        notifyAll();  // Notify waiting threads after incrementing
-    }
 
-    // Method to check if counter exceeds limit
-    public synchronized boolean isLimitExceeded() {
-        return counter > limit;
-    }
 
     // Method to wait until counter is below the limit
-    public synchronized void waitForCounterBelowLimit() {
-        while (counter >= limit) {
-            try {
-                wait();  // Wait until counter is below limit
-            } catch (InterruptedException e) {
-                // Restore the interrupted status
-                Thread.currentThread().interrupt();
-                return;  // Exit the method if interrupted
-            }
-        }
+    public synchronized void tryAcquire() {
+        bucket.tryConsume(1);
     }
 
     // Method to wrap a code block and return the result
     public <T> T executeWithLimiter(Supplier<T> codeBlock) {
-        waitForCounterBelowLimit();
-//        log.debug(counter.toString());
-        incrementCounter();
+        tryAcquire();
         return codeBlock.get();
+    }
+
+    // Method to increment the counter by 1
+    public synchronized void incrementCounter() {
+        counter++;
     }
 
     // Method that decreases the counter by 1 every calculated interval
     private synchronized void decrementCounter() {
         if (counter > 0) {
             counter--;
-            notifyAll();  // Notify waiting threads after decrementing
         }
     }
 
