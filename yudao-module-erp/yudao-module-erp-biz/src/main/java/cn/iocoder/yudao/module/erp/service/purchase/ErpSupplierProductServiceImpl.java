@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.erp.service.purchase;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjUtil;
 import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
+import cn.iocoder.yudao.module.erp.aop.SynExternalData;
 import cn.iocoder.yudao.module.erp.controller.admin.product.vo.product.ErpProductRespVO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.product.ErpProductCategoryDO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.product.ErpProductDO;
@@ -23,6 +24,7 @@ import cn.iocoder.yudao.module.erp.dal.mysql.purchase.ErpSupplierProductMapper;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
+import static cn.iocoder.yudao.module.erp.aop.SynExternalDataAspect.ERP_SUPPLIER_PRODUCT;
 import static cn.iocoder.yudao.module.erp.enums.ErrorCodeConstants.*;
 
 /**
@@ -53,6 +55,7 @@ public class ErpSupplierProductServiceImpl implements ErpSupplierProductService 
     }
 
     @Override
+    @SynExternalData(table = ERP_SUPPLIER_PRODUCT,inClazz = ErpSupplierProductSaveReqVO.class)
     public void updateSupplierProduct(ErpSupplierProductSaveReqVO updateReqVO) {
         validateSupplierProductCodeUnique(updateReqVO.getId(),updateReqVO.getCode());
         // 校验存在

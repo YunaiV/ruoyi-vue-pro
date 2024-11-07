@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.erp.service.logistic.customrule;
 
+import cn.iocoder.yudao.module.erp.aop.SynExternalData;
 import org.springframework.stereotype.Service;
 import jakarta.annotation.Resource;
 import org.springframework.validation.annotation.Validated;
@@ -15,6 +16,7 @@ import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.erp.dal.mysql.logistic.customrule.ErpCustomRuleMapper;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.module.erp.aop.SynExternalDataAspect.ERP_CUSTOM_RULE;
 import static cn.iocoder.yudao.module.erp.enums.ErrorCodeConstants.*;
 
 /**
@@ -30,6 +32,7 @@ public class ErpCustomRuleServiceImpl implements ErpCustomRuleService {
     private ErpCustomRuleMapper customRuleMapper;
 
     @Override
+    @SynExternalData(table = ERP_CUSTOM_RULE)
     public Long createCustomRule(ErpCustomRuleSaveReqVO createReqVO) {
         // 插入
         ErpCustomRuleDO customRule = BeanUtils.toBean(createReqVO, ErpCustomRuleDO.class);
@@ -39,6 +42,7 @@ public class ErpCustomRuleServiceImpl implements ErpCustomRuleService {
     }
 
     @Override
+    @SynExternalData(table = ERP_CUSTOM_RULE, inClazz = ErpCustomRuleSaveReqVO.class)
     public void updateCustomRule(ErpCustomRuleSaveReqVO updateReqVO) {
         // 校验存在
         validateCustomRuleExists(updateReqVO.getId());

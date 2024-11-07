@@ -7,6 +7,7 @@ import cn.iocoder.yudao.framework.common.exception.util.ThrowUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
+import cn.iocoder.yudao.module.erp.aop.SynExternalData;
 import cn.iocoder.yudao.module.erp.controller.admin.product.vo.product.ErpProductPageReqVO;
 import cn.iocoder.yudao.module.erp.controller.admin.product.vo.product.ErpProductRespVO;
 import cn.iocoder.yudao.module.erp.controller.admin.product.vo.product.ProductSaveReqVO;
@@ -24,6 +25,7 @@ import java.util.*;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
+import static cn.iocoder.yudao.module.erp.aop.SynExternalDataAspect.ERP_PRODUCT;
 import static cn.iocoder.yudao.module.erp.enums.ErrorCodeConstants.*;
 
 /**
@@ -75,6 +77,7 @@ public class ErpProductServiceImpl implements ErpProductService {
     }
 
     @Override
+    @SynExternalData(table = ERP_PRODUCT,inClazz = ProductSaveReqVO.class)
     public void updateProduct(ProductSaveReqVO updateReqVO) {
         //校验相同的id下是否存在相同的产品编码
         validateProductCodeUnique(updateReqVO.getId(),updateReqVO.getBarCode());

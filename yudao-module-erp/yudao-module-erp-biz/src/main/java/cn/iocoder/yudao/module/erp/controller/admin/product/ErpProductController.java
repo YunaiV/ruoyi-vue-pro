@@ -7,7 +7,6 @@ import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
-import cn.iocoder.yudao.module.erp.aop.SynExternalData;
 import cn.iocoder.yudao.module.erp.controller.admin.product.vo.product.ErpProductPageReqVO;
 import cn.iocoder.yudao.module.erp.controller.admin.product.vo.product.ErpProductRespVO;
 import cn.iocoder.yudao.module.erp.controller.admin.product.vo.product.ProductSaveReqVO;
@@ -57,7 +56,6 @@ public class ErpProductController {
     @PutMapping("/update")
     @Operation(summary = "更新产品")
     @PreAuthorize("@ss.hasPermission('erp:product:update')")
-    @SynExternalData(table = ERP_PRODUCT,inClazz = ProductSaveReqVO.class)
     public CommonResult<Boolean> updateProduct(@Valid @RequestBody ProductSaveReqVO updateReqVO) {
         productService.updateProduct(updateReqVO);
         return success(true);
