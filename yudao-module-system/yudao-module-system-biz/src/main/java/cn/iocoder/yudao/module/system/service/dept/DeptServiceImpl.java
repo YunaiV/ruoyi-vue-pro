@@ -42,8 +42,7 @@ public class DeptServiceImpl implements DeptService {
     @Resource
     private DeptMapper deptMapper;
 
-    @Resource
-    private DeptConvert deptConvert;
+    private DeptConvert deptConvert = DeptConvert.INSTANCE;
 
     @Override
     @CacheEvict(cacheNames = RedisKeyConstants.DEPT_CHILDREN_ID_LIST,

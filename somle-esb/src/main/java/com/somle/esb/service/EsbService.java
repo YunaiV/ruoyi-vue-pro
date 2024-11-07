@@ -23,6 +23,7 @@ import com.somle.esb.converter.EccangToErpConverter;
 import com.somle.esb.converter.ErpToEccangConverter;
 import com.somle.esb.converter.ErpToKingdeeConverter;
 import com.somle.esb.model.OssData;
+import com.somle.kingdee.model.KingdeeProduct;
 import com.somle.kingdee.model.supplier.KingdeeSupplier;
 import com.somle.kingdee.service.KingdeeService;
 import com.somle.matomo.service.MatomoService;
@@ -179,10 +180,10 @@ public class EsbService {
      **/
     @ServiceActivator(inputChannel = "syncExternalDataChannel")
     public void syncProductsToKingdee(Message<List<ErpProductDTO>> message) {
-       /* List<KingdeeProduct> kingdee = erpToKingdeeConverter.toKingdee(message.getPayload());
+        List<KingdeeProduct> kingdee = erpToKingdeeConverter.toKingdee(message.getPayload());
         for (KingdeeProduct kingdeeProduct : kingdee){
             kingdeeService.addProduct(kingdeeProduct);
-        }*/
+        }
     }
 
     /**

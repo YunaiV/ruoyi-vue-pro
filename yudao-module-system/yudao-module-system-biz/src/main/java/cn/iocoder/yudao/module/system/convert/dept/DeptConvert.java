@@ -15,7 +15,7 @@ import java.util.List;
 /**
  * @author Administrator
  */
-@Mapper(componentModel = "spring")
+@Mapper
 public interface DeptConvert {
 
     DeptConvert INSTANCE = Mappers.getMapper(DeptConvert.class);
