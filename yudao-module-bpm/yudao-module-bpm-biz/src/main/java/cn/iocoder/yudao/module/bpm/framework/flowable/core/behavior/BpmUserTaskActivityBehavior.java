@@ -1,7 +1,6 @@
 package cn.iocoder.yudao.module.bpm.framework.flowable.core.behavior;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.RandomUtil;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.candidate.BpmTaskCandidateInvoker;
 import lombok.Setter;
@@ -14,6 +13,7 @@ import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.util.TaskHelper;
 import org.flowable.task.service.TaskService;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Set;
@@ -36,14 +36,16 @@ public class BpmUserTaskActivityBehavior extends UserTaskActivityBehavior {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     protected void handleAssignments(TaskService taskService, String assignee, String owner,
         List<String> candidateUsers, List<String> candidateGroups, TaskEntity task, ExpressionManager expressionManager,
         DelegateExecution execution, ProcessEngineConfigurationImpl processEngineConfiguration) {
         // 第一步，获得任务的候选用户
         Long assigneeUserId = calculateTaskCandidateUsers(execution);
-        Assert.notNull(assigneeUserId, "任务处理人不能为空");
         // 第二步，设置作为负责人
-        TaskHelper.changeTaskAssignee(task, String.valueOf(assigneeUserId));
+        if (assigneeUserId != null) {
+            TaskHelper.changeTaskAssignee(task, String.valueOf(assigneeUserId));
+        }
     }
 
     private Long calculateTaskCandidateUsers(DelegateExecution execution) {
@@ -56,6 +58,9 @@ public class BpmUserTaskActivityBehavior extends UserTaskActivityBehavior {
         // 情况二，如果非多实例的任务，则计算任务处理人
         // 第一步，先计算可处理该任务的处理人们
         Set<Long> candidateUserIds = taskCandidateInvoker.calculateUsers(execution);
+        if (CollUtil.isEmpty(candidateUserIds)) {
+            return null;
+        }
         // 第二步，后随机选择一个任务的处理人
         // 疑问：为什么一定要选择一个任务处理人？
         // 解答：项目对 bpm 的任务是责任到人，所以每个任务有且仅有一个处理人。

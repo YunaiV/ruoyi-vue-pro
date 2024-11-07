@@ -31,6 +31,16 @@ public enum PayOrderStatusEnum implements IntArrayValuable {
     }
 
     /**
+     * 判断是否等待支付
+     *
+     * @param status 状态
+     * @return 是否等待支付
+     */
+    public static boolean isWaiting(Integer status) {
+        return Objects.equals(status, WAITING.getStatus());
+    }
+
+    /**
      * 判断是否支付成功
      *
      * @param status 状态

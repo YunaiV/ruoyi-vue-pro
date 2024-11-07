@@ -1,22 +1,30 @@
 package cn.iocoder.yudao.module.system.service.social;
 
 import cn.binarywang.wx.miniapp.api.WxMaService;
+import cn.binarywang.wx.miniapp.api.WxMaSubscribeService;
 import cn.binarywang.wx.miniapp.api.impl.WxMaServiceImpl;
 import cn.binarywang.wx.miniapp.bean.WxMaPhoneNumberInfo;
+import cn.binarywang.wx.miniapp.bean.WxMaSubscribeMessage;
 import cn.binarywang.wx.miniapp.config.impl.WxMaRedisBetterConfigImpl;
+import cn.binarywang.wx.miniapp.constant.WxMaConstants;
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.ReflectUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
+import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.cache.CacheUtils;
 import cn.iocoder.yudao.framework.common.util.http.HttpUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
+import cn.iocoder.yudao.module.system.api.social.dto.SocialWxQrcodeReqDTO;
+import cn.iocoder.yudao.module.system.api.social.dto.SocialWxaSubscribeMessageSendReqDTO;
 import cn.iocoder.yudao.module.system.controller.admin.socail.vo.client.SocialClientPageReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.socail.vo.client.SocialClientSaveReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.social.SocialClientDO;
 import cn.iocoder.yudao.module.system.dal.mysql.social.SocialClientMapper;
+import cn.iocoder.yudao.module.system.dal.redis.RedisKeyConstants;
 import cn.iocoder.yudao.module.system.enums.social.SocialTypeEnum;
 import com.binarywang.spring.starter.wxjava.miniapp.properties.WxMaProperties;
 import com.binarywang.spring.starter.wxjava.mp.properties.WxMpProperties;
@@ -34,18 +42,24 @@ import jakarta.annotation.Resource;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import me.chanjar.weixin.common.bean.WxJsapiSignature;
+import me.chanjar.weixin.common.bean.subscribemsg.TemplateInfo;
 import me.chanjar.weixin.common.error.WxErrorException;
 import me.chanjar.weixin.common.redis.RedisTemplateWxRedisOps;
 import me.chanjar.weixin.mp.api.WxMpService;
 import me.chanjar.weixin.mp.api.impl.WxMpServiceImpl;
 import me.chanjar.weixin.mp.config.impl.WxMpRedisConfigImpl;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
+import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.framework.common.util.collection.MapUtils.findAndThen;
 import static cn.iocoder.yudao.framework.common.util.json.JsonUtils.toJsonString;
 import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.*;
 
@@ -57,6 +71,25 @@ import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.*;
 @Service
 @Slf4j
 public class SocialClientServiceImpl implements SocialClientService {
+
+    /**
+     * 小程序码要打开的小程序版本
+     *
+     * 1. release：正式版
+     * 2. trial：体验版
+     * 3. developer：开发版
+     */
+    @Value("${yudao.wxa-code.env-version:release}")
+    public String envVersion;
+    /**
+     * 订阅消息跳转小程序类型
+     *
+     * 1. developer：开发版
+     * 2. trial：体验版
+     * 3. formal：正式版
+     */
+    @Value("${yudao.wxa-subscribe-message.miniprogram-state:formal}")
+    public String miniprogramState;
 
     @Resource
     private AuthRequestFactory authRequestFactory;
@@ -139,7 +172,7 @@ public class SocialClientServiceImpl implements SocialClientService {
      * 构建 AuthRequest 对象，支持多租户配置
      *
      * @param socialType 社交类型
-     * @param userType 用户类型
+     * @param userType   用户类型
      * @return AuthRequest 对象
      */
     @VisibleForTesting
@@ -196,7 +229,7 @@ public class SocialClientServiceImpl implements SocialClientService {
     /**
      * 创建 clientId + clientSecret 对应的 WxMpService 对象
      *
-     * @param clientId 微信公众号 appId
+     * @param clientId     微信公众号 appId
      * @param clientSecret 微信公众号 secret
      * @return WxMpService 对象
      */
@@ -227,6 +260,73 @@ public class SocialClientServiceImpl implements SocialClientService {
         }
     }
 
+    @Override
+    public byte[] getWxaQrcode(SocialWxQrcodeReqDTO reqVO) {
+        WxMaService service = getWxMaService(UserTypeEnum.MEMBER.getValue());
+        try {
+            return service.getQrcodeService().createWxaCodeUnlimitBytes(
+                    ObjUtil.defaultIfEmpty(reqVO.getScene(), SocialWxQrcodeReqDTO.SCENE),
+                    reqVO.getPath(),
+                    ObjUtil.defaultIfNull(reqVO.getCheckPath(), SocialWxQrcodeReqDTO.CHECK_PATH),
+                    envVersion,
+                    ObjUtil.defaultIfNull(reqVO.getWidth(), SocialWxQrcodeReqDTO.WIDTH),
+                    ObjUtil.defaultIfNull(reqVO.getAutoColor(), SocialWxQrcodeReqDTO.AUTO_COLOR),
+                    null,
+                    ObjUtil.defaultIfNull(reqVO.getHyaline(), SocialWxQrcodeReqDTO.HYALINE));
+        } catch (WxErrorException e) {
+            log.error("[getWxQrcode][reqVO({}) 获得小程序码失败]", reqVO, e);
+            throw exception(SOCIAL_CLIENT_WEIXIN_MINI_APP_QRCODE_ERROR);
+        }
+    }
+
+    @Override
+    @Cacheable(cacheNames = RedisKeyConstants.WXA_SUBSCRIBE_TEMPLATE, key = "#userType",
+            unless = "#result == null")
+    public List<TemplateInfo> getSubscribeTemplateList(Integer userType) {
+        WxMaService service = getWxMaService(userType);
+        try {
+            WxMaSubscribeService subscribeService = service.getSubscribeService();
+            return subscribeService.getTemplateList();
+        } catch (WxErrorException e) {
+            log.error("[getSubscribeTemplate][userType({}) 获得小程序订阅消息模版]", userType, e);
+            throw exception(SOCIAL_CLIENT_WEIXIN_MINI_APP_SUBSCRIBE_TEMPLATE_ERROR);
+        }
+    }
+
+    @Override
+    public void sendSubscribeMessage(SocialWxaSubscribeMessageSendReqDTO reqDTO, String templateId, String openId) {
+        WxMaService service = getWxMaService(reqDTO.getUserType());
+        try {
+            WxMaSubscribeService subscribeService = service.getSubscribeService();
+            subscribeService.sendSubscribeMsg(buildMessageSendReqDTO(reqDTO, templateId, openId));
+        } catch (WxErrorException e) {
+            log.error("[sendSubscribeMessage][reqVO({}) templateId({}) openId({}) 发送小程序订阅消息失败]", reqDTO, templateId, openId, e);
+            throw exception(SOCIAL_CLIENT_WEIXIN_MINI_APP_SUBSCRIBE_MESSAGE_ERROR);
+        }
+    }
+
+    /**
+     * 构建发送消息请求参数
+     *
+     * @param reqDTO     请求
+     * @param templateId 模版编号
+     * @param openId     会员 openId
+     * @return 微信小程序订阅消息请求参数
+     */
+    private WxMaSubscribeMessage buildMessageSendReqDTO(SocialWxaSubscribeMessageSendReqDTO reqDTO,
+                                                        String templateId, String openId) {
+        // 设置订阅消息基本参数
+        WxMaSubscribeMessage subscribeMessage = new WxMaSubscribeMessage().setLang(WxMaConstants.MiniProgramLang.ZH_CN)
+                .setMiniprogramState(miniprogramState).setTemplateId(templateId).setToUser(openId).setPage(reqDTO.getPage());
+        // 设置具体消息参数
+        Map<String, String> messages = reqDTO.getMessages();
+        if (CollUtil.isNotEmpty(messages)) {
+            reqDTO.getMessages().keySet().forEach(key -> findAndThen(messages, key, value ->
+                    subscribeMessage.addData(new WxMaSubscribeMessage.MsgData(key, value))));
+        }
+        return subscribeMessage;
+    }
+
     /**
      * 获得 clientId + clientSecret 对应的 WxMpService 对象
      *
@@ -248,7 +348,7 @@ public class SocialClientServiceImpl implements SocialClientService {
     /**
      * 创建 clientId + clientSecret 对应的 WxMaService 对象
      *
-     * @param clientId 微信小程序 appId
+     * @param clientId     微信小程序 appId
      * @param clientSecret 微信小程序 secret
      * @return WxMaService 对象
      */
@@ -310,8 +410,8 @@ public class SocialClientServiceImpl implements SocialClientService {
      *
      * 原因是，不同端（userType）选择某个社交登录（socialType）时，需要通过 {@link #buildAuthRequest(Integer, Integer)} 构建对应的请求
      *
-     * @param id 编号
-     * @param userType 用户类型
+     * @param id         编号
+     * @param userType   用户类型
      * @param socialType 社交类型
      */
     private void validateSocialClientUnique(Long id, Integer userType, Integer socialType) {

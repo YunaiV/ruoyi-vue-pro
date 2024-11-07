@@ -23,10 +23,10 @@ import cn.iocoder.yudao.module.trade.framework.delivery.core.client.ExpressClien
 import cn.iocoder.yudao.module.trade.framework.delivery.core.client.dto.ExpressTrackQueryReqDTO;
 import cn.iocoder.yudao.module.trade.framework.delivery.core.client.dto.ExpressTrackRespDTO;
 import cn.iocoder.yudao.module.trade.service.delivery.DeliveryExpressService;
+import jakarta.annotation.Resource;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
-import jakarta.annotation.Resource;
 import java.util.*;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
@@ -206,7 +206,7 @@ public class TradeOrderQueryServiceImpl implements TradeOrderQueryService {
 
     /**
      * 查询物流轨迹
-     *
+     * <p>
      * 缓存的目的：考虑及时性要求不高，但是每次调用需要钱
      *
      * @param code           快递公司编码
@@ -215,13 +215,11 @@ public class TradeOrderQueryServiceImpl implements TradeOrderQueryService {
      * @return 物流轨迹
      */
     @Cacheable(cacheNames = RedisKeyConstants.EXPRESS_TRACK, key = "#code + '-' + #logisticsNo + '-' + #receiverMobile",
-            condition = "#result != null")
+            unless = "#result == null")
     public List<ExpressTrackRespDTO> getExpressTrackList(String code, String logisticsNo, String receiverMobile) {
-        return expressClientFactory.getDefaultExpressClient().getExpressTrackList(
-                new ExpressTrackQueryReqDTO().setExpressCode(code).setLogisticsNo(logisticsNo)
-                        .setPhone(receiverMobile));
+        return expressClientFactory.getDefaultExpressClient().getExpressTrackList(new ExpressTrackQueryReqDTO()
+                .setExpressCode(code).setLogisticsNo(logisticsNo).setPhone(receiverMobile));
     }
-
 
     // =================== Order Item ===================
 

@@ -9,8 +9,10 @@ import cn.iocoder.yudao.module.crm.dal.dataobject.permission.CrmPermissionDO;
 import cn.iocoder.yudao.module.crm.enums.common.CrmBizTypeEnum;
 import cn.iocoder.yudao.module.crm.enums.permission.CrmPermissionLevelEnum;
 import cn.iocoder.yudao.module.crm.framework.permission.core.annotations.CrmPermission;
-import cn.iocoder.yudao.module.crm.util.CrmPermissionUtils;
 import cn.iocoder.yudao.module.crm.service.permission.CrmPermissionService;
+import cn.iocoder.yudao.module.crm.util.CrmPermissionUtils;
+import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
+import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.JoinPoint;
@@ -37,6 +39,9 @@ public class CrmPermissionAspect {
 
     @Resource
     private CrmPermissionService crmPermissionService;
+
+    @Resource
+    private AdminUserApi adminUserApi;
 
     @Before("@annotation(crmPermission)")
     public void doBefore(JoinPoint joinPoint, CrmPermission crmPermission) {
@@ -65,46 +70,73 @@ public class CrmPermissionAspect {
         if (CrmPermissionUtils.isCrmAdmin()) {
             return;
         }
-        // 1.1 没有数据权限的情况
+        // 特殊：没有数据权限的情况，针对 READ 的特殊处理
         if (CollUtil.isEmpty(bizPermissions)) {
-            // 公海数据如果没有团队成员大家也因该有读权限才对
+            // 1.1 公海数据，如果没有团队成员，大家也应该有 READ 权限才对
             if (CrmPermissionLevelEnum.isRead(permissionLevel)) {
                 return;
             }
             // 没有数据权限的情况下超出了读权限直接报错，避免后面校验空指针
             throw exception(CRM_PERMISSION_DENIED, CrmBizTypeEnum.getNameByType(bizType));
         } else { // 1.2 有数据权限但是没有负责人的情况
-            if (!anyMatch(bizPermissions, item -> CrmPermissionLevelEnum.isOwner(item.getLevel()))) {
-                if (CrmPermissionLevelEnum.isRead(permissionLevel)) {
-                    return;
-                }
+            if (!anyMatch(bizPermissions, item -> CrmPermissionLevelEnum.isOwner(item.getLevel()))
+                && CrmPermissionLevelEnum.isRead(permissionLevel)) {
+                return;
             }
         }
 
-        // 2.1 情况一：如果自己是负责人，则默认有所有权限
-        CrmPermissionDO userPermission = CollUtil.findOne(bizPermissions, permission -> ObjUtil.equal(permission.getUserId(), getUserId()));
+        // 2. 只考虑自的身权限
+        Long userId = getUserId();
+        CrmPermissionDO userPermission = CollUtil.findOne(bizPermissions, permission -> ObjUtil.equal(permission.getUserId(), userId));
         if (userPermission != null) {
-            if (CrmPermissionLevelEnum.isOwner(userPermission.getLevel())) {
+            if (isUserPermissionValid(userPermission, permissionLevel)) {
                 return;
             }
-            // 2.2 情况二：校验自己是否有读权限
-            if (CrmPermissionLevelEnum.isRead(permissionLevel)) {
-                if (CrmPermissionLevelEnum.isRead(userPermission.getLevel()) // 校验当前用户是否有读权限
-                        || CrmPermissionLevelEnum.isWrite(userPermission.getLevel())) { // 校验当前用户是否有写权限
-                    return;
-                }
-            }
-            // 2.3 情况三：校验自己是否有写权限
-            if (CrmPermissionLevelEnum.isWrite(permissionLevel)) {
-                if (CrmPermissionLevelEnum.isWrite(userPermission.getLevel())) { // 校验当前用户是否有写权限
-                    return;
-                }
+        }
+
+        // 3. 考虑下级的权限
+        List<AdminUserRespDTO> subordinateUserIds = adminUserApi.getUserListBySubordinate(userId);
+        for (Long subordinateUserId : convertSet(subordinateUserIds, AdminUserRespDTO::getId)) {
+            CrmPermissionDO subordinatePermission = CollUtil.findOne(bizPermissions,
+                    permission -> ObjUtil.equal(permission.getUserId(), subordinateUserId));
+            if (subordinatePermission != null && isUserPermissionValid(subordinatePermission, permissionLevel)) {
+                return;
             }
         }
-        // 2.4 没有权限，抛出异常
+
+        // 4. 没有权限，抛出异常
         log.info("[doBefore][userId({}) 要求权限({}) 实际权限({}) 数据校验错误]", // 打个 info 日志，方便后续排查问题、审计
-                getUserId(), permissionLevel, toJsonString(userPermission));
+                userId, permissionLevel, toJsonString(userPermission));
         throw exception(CRM_PERMISSION_DENIED, CrmBizTypeEnum.getNameByType(bizType));
+    }
+
+    /**
+     * 校验用户权限是否有效
+     *
+     * @param userPermission   用户拥有的权限
+     * @param permissionLevel  需要的权限级别
+     * @return 是否有效
+     */
+    @SuppressWarnings("RedundantIfStatement")
+    private boolean isUserPermissionValid(CrmPermissionDO userPermission, Integer permissionLevel) {
+        // 2.1 情况一：如果自己是负责人，则默认有所有权限
+        if (CrmPermissionLevelEnum.isOwner(userPermission.getLevel())) {
+            return true;
+        }
+        // 2.2 情况二：校验自己是否有读权限
+        if (CrmPermissionLevelEnum.isRead(permissionLevel)) {
+            if (CrmPermissionLevelEnum.isRead(userPermission.getLevel()) // 校验当前用户是否有读权限
+                    || CrmPermissionLevelEnum.isWrite(userPermission.getLevel())) { // 校验当前用户是否有写权限
+                return true;
+            }
+        }
+        // 2.3 情况三：校验自己是否有写权限
+        if (CrmPermissionLevelEnum.isWrite(permissionLevel)) {
+            if (CrmPermissionLevelEnum.isWrite(userPermission.getLevel())) { // 校验当前用户是否有写权限
+                return true;
+            }
+        }
+        return false;
     }
 
     /**

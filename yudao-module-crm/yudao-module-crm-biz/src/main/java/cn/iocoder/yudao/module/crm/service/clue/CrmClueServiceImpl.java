@@ -1,7 +1,6 @@
 package cn.iocoder.yudao.module.crm.service.clue;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.lang.Assert;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
@@ -32,7 +31,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import java.time.LocalDateTime;
-import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 
@@ -218,14 +216,6 @@ public class CrmClueServiceImpl implements CrmClueService {
     @CrmPermission(bizType = CrmBizTypeEnum.CRM_CLUE, bizId = "#id", level = CrmPermissionLevelEnum.READ)
     public CrmClueDO getClue(Long id) {
         return clueMapper.selectById(id);
-    }
-
-    @Override
-    public List<CrmClueDO> getClueList(Collection<Long> ids, Long userId) {
-        if (CollUtil.isEmpty(ids)) {
-            return ListUtil.empty();
-        }
-        return clueMapper.selectBatchIds(ids, userId);
     }
 
     @Override

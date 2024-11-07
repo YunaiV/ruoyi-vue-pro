@@ -28,13 +28,13 @@ public interface TradeOrderApi {
      */
     TradeOrderRespDTO getOrder(Long id);
 
-    // TODO 芋艿：需要优化下；
     /**
      * 取消支付订单
      *
-     * @param userId  用户编号
+     * @param userId 用户编号
      * @param orderId 订单编号
+     * @param cancelType 取消类型
      */
-    void cancelPaidOrder(Long userId, Long orderId);
+    void cancelPaidOrder(Long userId, Long orderId, Integer cancelType);
 
 }

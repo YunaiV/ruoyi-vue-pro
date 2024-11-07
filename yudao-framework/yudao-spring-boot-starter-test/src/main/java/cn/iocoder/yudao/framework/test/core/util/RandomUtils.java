@@ -103,6 +103,10 @@ public class RandomUtils {
         return randomString() + "@qq.com";
     }
 
+    public static String randomMobile() {
+        return "13800138" + RandomUtil.randomNumbers(3);
+    }
+
     public static String randomURL() {
         return "https://www.iocoder.cn/" + randomString();
     }
@@ -130,6 +134,11 @@ public class RandomUtils {
     @SafeVarargs
     public static <T> List<T> randomPojoList(Class<T> clazz, Consumer<T>... consumers) {
         int size = RandomUtil.randomInt(1, RANDOM_COLLECTION_LENGTH);
+        return randomPojoList(clazz, size, consumers);
+    }
+
+    @SafeVarargs
+    public static <T> List<T> randomPojoList(Class<T> clazz, int size, Consumer<T>... consumers) {
         return Stream.iterate(0, i -> i).limit(size).map(o -> randomPojo(clazz, consumers))
                 .collect(Collectors.toList());
     }

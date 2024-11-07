@@ -2,6 +2,7 @@ package cn.iocoder.yudao.framework.tenant.core.job;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.exceptions.ExceptionUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.tenant.core.service.TenantFrameworkService;
 import cn.iocoder.yudao.framework.tenant.core.util.TenantUtils;
@@ -44,8 +45,10 @@ public class TenantJobAspect {
             // TODO 芋艿：先通过 parallel 实现并行；1）多个租户，是一条执行日志；2）异常的情况
             TenantUtils.execute(tenantId, () -> {
                 try {
-                    joinPoint.proceed();
+                    Object result = joinPoint.proceed();
+                    results.put(tenantId, StrUtil.toStringOrNull(result));
                 } catch (Throwable e) {
+                    log.error("[execute][租户({}) 执行 Job 发生异常", tenantId, e);
                     results.put(tenantId, ExceptionUtil.getRootCauseMessage(e));
                 }
             });

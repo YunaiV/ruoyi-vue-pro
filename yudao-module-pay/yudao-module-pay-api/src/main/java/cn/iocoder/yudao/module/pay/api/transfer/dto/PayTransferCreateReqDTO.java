@@ -2,12 +2,12 @@ package cn.iocoder.yudao.module.pay.api.transfer.dto;
 
 import cn.iocoder.yudao.framework.common.validation.InEnum;
 import cn.iocoder.yudao.module.pay.enums.transfer.PayTransferTypeEnum;
-import lombok.Data;
-
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
+import lombok.Data;
+
 import java.util.Map;
 
 /**
@@ -19,10 +19,10 @@ import java.util.Map;
 public class PayTransferCreateReqDTO {
 
     /**
-     * 应用编号
+     * 应用标识
      */
-    @NotNull(message = "应用编号不能为空")
-    private Long appId;
+    @NotNull(message = "应用标识不能为空")
+    private String appKey;
 
     @NotEmpty(message = "转账渠道不能为空")
     private String channelCode;

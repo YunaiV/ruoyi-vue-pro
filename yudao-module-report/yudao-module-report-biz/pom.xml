@@ -62,12 +62,7 @@
         <!-- 积木报表-->
         <dependency>
             <groupId>org.jeecgframework.jimureport</groupId>
-            <artifactId>jimureport-spring-boot3-starter</artifactId>
-        </dependency>
-        <!-- 单独依赖升级版本，解决低版本validator失败问题 -->
-        <dependency>
-            <groupId>xerces</groupId>
-            <artifactId>xercesImpl</artifactId>
+            <artifactId>jimureport-spring-boot3-starter-fastjson2</artifactId>
         </dependency>
 
         <dependency>

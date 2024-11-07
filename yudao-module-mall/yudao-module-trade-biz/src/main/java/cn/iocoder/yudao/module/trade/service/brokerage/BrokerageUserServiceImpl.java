@@ -4,6 +4,7 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.BooleanUtil;
+import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils;
@@ -25,10 +26,10 @@ import cn.iocoder.yudao.module.trade.enums.brokerage.BrokerageRecordBizTypeEnum;
 import cn.iocoder.yudao.module.trade.enums.brokerage.BrokerageRecordStatusEnum;
 import cn.iocoder.yudao.module.trade.service.config.TradeConfigService;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
-import jakarta.annotation.Resource;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -57,11 +58,6 @@ public class BrokerageUserServiceImpl implements BrokerageUserService {
     @Override
     public BrokerageUserDO getBrokerageUser(Long id) {
         return brokerageUserMapper.selectById(id);
-    }
-
-    @Override
-    public List<BrokerageUserDO> getBrokerageUserList(Collection<Long> ids) {
-        return brokerageUserMapper.selectBatchIds(ids);
     }
 
     @Override
@@ -128,6 +124,19 @@ public class BrokerageUserServiceImpl implements BrokerageUserService {
     }
 
     @Override
+    public BrokerageUserDO getOrCreateBrokerageUser(Long id) {
+        BrokerageUserDO brokerageUser = brokerageUserMapper.selectById(id);
+        // 特殊：人人分销的情况下，如果分销人为空则创建分销人
+        if (brokerageUser == null && ObjUtil.equal(BrokerageEnabledConditionEnum.ALL.getCondition(),
+                tradeConfigService.getTradeConfig().getBrokerageEnabledCondition())) {
+            brokerageUser = new BrokerageUserDO().setId(id).setBrokerageEnabled(true).setBrokeragePrice(0)
+                    .setBrokerageTime(LocalDateTime.now()).setFrozenPrice(0);
+            brokerageUserMapper.insert(brokerageUser);
+        }
+        return brokerageUser;
+    }
+
+    @Override
     public boolean updateUserPrice(Long id, Integer price) {
         if (price > 0) {
             brokerageUserMapper.updatePriceIncr(id, price);
@@ -183,8 +192,9 @@ public class BrokerageUserServiceImpl implements BrokerageUserService {
             Integer enabledCondition = tradeConfigService.getTradeConfig().getBrokerageEnabledCondition();
             if (BrokerageEnabledConditionEnum.ALL.getCondition().equals(enabledCondition)) { // 人人分销：用户默认就有分销资格
                 brokerageUser.setBrokerageEnabled(true).setBrokerageTime(LocalDateTime.now());
+            } else {
+                brokerageUser.setBrokerageEnabled(false).setBrokerageTime(LocalDateTime.now());
             }
-            brokerageUser.setBindUserId(bindUserId).setBindUserTime(LocalDateTime.now());
             brokerageUserMapper.insert(fillBindUserData(bindUserId, brokerageUser));
         } else {
             brokerageUserMapper.updateById(fillBindUserData(bindUserId, new BrokerageUserDO().setId(userId)));
@@ -258,11 +268,6 @@ public class BrokerageUserServiceImpl implements BrokerageUserService {
             return false;
         }
 
-        // 校验分佣模式：仅可后台手动设置推广员
-        if (BrokerageEnabledConditionEnum.ADMIN.getCondition().equals(tradeConfig.getBrokerageEnabledCondition())) {
-            throw exception(BROKERAGE_BIND_CONDITION_ADMIN);
-        }
-
         // 校验分销关系绑定模式
         if (BrokerageBindModeEnum.REGISTER.getMode().equals(tradeConfig.getBrokerageBindMode())) {
             // 判断是否为新用户：注册时间在 30 秒内的，都算新用户
@@ -290,22 +295,27 @@ public class BrokerageUserServiceImpl implements BrokerageUserService {
      */
     private boolean isNewRegisterUser(Long userId) {
         MemberUserRespDTO user = memberUserApi.getUser(userId);
-        return user != null && LocalDateTimeUtils.beforeNow(user.getCreateTime().plusSeconds(30));
+        return user != null && LocalDateTimeUtils.afterNow(user.getCreateTime().plusSeconds(30));
     }
 
     private void validateCanBindUser(BrokerageUserDO user, Long bindUserId) {
-        // 校验要绑定的用户有无推广资格
-        BrokerageUserDO bindUser = brokerageUserMapper.selectById(bindUserId);
+        // 1.1 校验推广人是否存在
+        MemberUserRespDTO bindUserInfo = memberUserApi.getUser(bindUserId);
+        if (bindUserInfo == null) {
+            throw exception(BROKERAGE_USER_NOT_EXISTS);
+        }
+        // 1.2 校验要绑定的用户有无推广资格
+        BrokerageUserDO bindUser = getOrCreateBrokerageUser(bindUserId);
         if (bindUser == null || BooleanUtil.isFalse(bindUser.getBrokerageEnabled())) {
             throw exception(BROKERAGE_BIND_USER_NOT_ENABLED);
         }
 
-        // 校验绑定自己
+        // 2. 校验绑定自己
         if (Objects.equals(user.getId(), bindUserId)) {
             throw exception(BROKERAGE_BIND_SELF);
         }
 
-        // 下级不能绑定自己的上级
+        // 3. 下级不能绑定自己的上级
         for (int i = 0; i <= Short.MAX_VALUE; i++) {
             if (Objects.equals(bindUser.getBindUserId(), user.getId())) {
                 throw exception(BROKERAGE_BIND_LOOP);

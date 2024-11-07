@@ -23,7 +23,7 @@ CREATE TABLE IF NOT EXISTS "${table.tableName.toLowerCase()}" (
     "${column.columnName}" ${dataType} DEFAULT '',
     #elseif (${column.columnName} == 'deleted')
     "deleted" bit NOT NULL DEFAULT FALSE,
-    #elseif (${column.columnName} == 'tenantId')
+    #elseif (${column.columnName} == 'tenant_id')
     "tenant_id" bigint NOT NULL DEFAULT 0,
     #else
     "${column.columnName.toLowerCase()}" ${dataType}#if (${column.nullable} == false) NOT NULL#end,

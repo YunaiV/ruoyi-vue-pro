@@ -6,9 +6,9 @@ import cn.iocoder.yudao.module.system.enums.DictTypeConstants;
 import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
 import com.alibaba.excel.annotation.ExcelProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
-import jakarta.validation.constraints.NotBlank;
 import java.time.LocalDateTime;
 import java.util.Set;
 
@@ -46,7 +46,8 @@ public class RoleRespVO {
     private String remark;
 
     @Schema(description = "数据范围，参见 DataScopeEnum 枚举类", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
-    @ExcelProperty("数据范围")
+    @ExcelProperty(value = "数据范围", converter = DictConvert.class)
+    @DictFormat(DictTypeConstants.DATA_SCOPE)
     private Integer dataScope;
 
     @Schema(description = "数据范围(指定部门数组)", example = "1")

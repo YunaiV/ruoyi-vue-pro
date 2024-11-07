@@ -47,7 +47,8 @@ public interface BpmProcessInstanceConvert {
             BpmProcessInstanceRespVO respVO = vpPageResult.getList().get(i);
             respVO.setStatus(FlowableUtils.getProcessInstanceStatus(pageResult.getList().get(i)));
             MapUtils.findAndThen(processDefinitionMap, respVO.getProcessDefinitionId(),
-                    processDefinition -> respVO.setCategory(processDefinition.getCategory()));
+                    processDefinition -> respVO.setCategory(processDefinition.getCategory())
+                            .setProcessDefinition(BeanUtils.toBean(processDefinition, BpmProcessDefinitionRespVO.class)));
             MapUtils.findAndThen(categoryMap, respVO.getCategory(), category -> respVO.setCategoryName(category.getName()));
             respVO.setTasks(BeanUtils.toBean(taskMap.get(respVO.getId()), BpmProcessInstanceRespVO.Task.class));
             // user
@@ -87,11 +88,6 @@ public interface BpmProcessInstanceConvert {
 
     @Mapping(source = "from.id", target = "to.id", ignore = true)
     void copyTo(BpmProcessDefinitionInfoDO from, @MappingTarget BpmProcessDefinitionRespVO to);
-
-    default BpmProcessInstanceStatusEvent buildProcessInstanceStatusEvent(Object source, HistoricProcessInstance instance, Integer status) {
-        return new BpmProcessInstanceStatusEvent(source).setId(instance.getId()).setStatus(status)
-                .setProcessDefinitionKey(instance.getProcessDefinitionKey()).setBusinessKey(instance.getBusinessKey());
-    }
 
     default BpmProcessInstanceStatusEvent buildProcessInstanceStatusEvent(Object source, ProcessInstance instance, Integer status) {;
         return new BpmProcessInstanceStatusEvent(source).setId(instance.getId()).setStatus(status)

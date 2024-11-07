@@ -9,7 +9,6 @@ import cn.iocoder.yudao.module.system.dal.dataobject.logger.OperateLogDO;
 import cn.iocoder.yudao.module.system.service.logger.OperateLogService;
 import com.fhs.core.trans.anno.TransMethodResult;
 import jakarta.annotation.Resource;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
@@ -26,15 +25,14 @@ public class OperateLogApiImpl implements OperateLogApi {
     private OperateLogService operateLogService;
 
     @Override
-    @Async
     public void createOperateLog(OperateLogCreateReqDTO createReqDTO) {
         operateLogService.createOperateLog(createReqDTO);
     }
 
     @Override
     @TransMethodResult
-    public PageResult<OperateLogRespDTO> getOperateLogPage(OperateLogPageReqDTO pageReqVO) {
-        PageResult<OperateLogDO> operateLogPage = operateLogService.getOperateLogPage(pageReqVO);
+    public PageResult<OperateLogRespDTO> getOperateLogPage(OperateLogPageReqDTO pageReqDTO) {
+        PageResult<OperateLogDO> operateLogPage = operateLogService.getOperateLogPage(pageReqDTO);
         return BeanUtils.toBean(operateLogPage, OperateLogRespDTO.class);
     }
 
