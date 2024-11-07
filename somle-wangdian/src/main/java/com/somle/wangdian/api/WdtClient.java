@@ -9,7 +9,6 @@ import java.util.Arrays;
 import java.util.Map;
 
 import com.somle.wangdian.utils.WebUtils;
-import lombok.SneakyThrows;
 
 public class WdtClient {
 	
@@ -117,8 +116,8 @@ public class WdtClient {
 	}
 
 
-	@SneakyThrows
-	public String execute(String relativeUrl, Map<String, String> params) {
+
+	public String execute(String relativeUrl, Map<String, String> params) throws IOException {
 		
 		params.put("appkey", this.appkey);
 		params.put("sid", this.sid);

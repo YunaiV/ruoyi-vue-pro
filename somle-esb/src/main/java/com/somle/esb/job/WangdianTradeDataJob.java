@@ -8,6 +8,7 @@ import com.somle.framework.common.util.json.JsonUtils;
 import lombok.SneakyThrows;
 import org.springframework.stereotype.Component;
 
+import java.io.IOException;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
@@ -17,6 +18,7 @@ public class WangdianTradeDataJob extends WangdianDataJob{
 
 
     @Override
+
     public String execute(String param) throws Exception {
         setDate(param);
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
@@ -28,7 +30,12 @@ public class WangdianTradeDataJob extends WangdianDataJob{
             params.put("page_size", "50");
             params.put("page_no", "0");
 
-            var responseString = wangdianService.client.execute("trade_query.php", params);
+            String responseString = null;
+            try {
+                responseString = wangdianService.client.execute("trade_query.php", params);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
             var result = JsonUtils.parseObject(responseString, JSONObject.class);
 
             var data = OssData.builder()
