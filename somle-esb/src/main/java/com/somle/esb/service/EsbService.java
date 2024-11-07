@@ -154,7 +154,6 @@ public class EsbService {
     **/
     @ServiceActivator(inputChannel = "syncExternalDataChannel")
     public void syncProductsToEccang(Message<List<ErpProductDTO>> message) {
-        /*
         List<EccangProduct> eccangProducts = erpToEccangConverter.toEccang(message.getPayload());
         for (EccangProduct eccangProduct : eccangProducts){
             eccangProduct.setActionType("ADD");
@@ -168,7 +167,7 @@ public class EsbService {
             }
             log.debug(eccangProduct.toString());
             eccangService.addBatchProduct(List.of(eccangProduct));
-        }*/
+        }
     }
 
     /**
