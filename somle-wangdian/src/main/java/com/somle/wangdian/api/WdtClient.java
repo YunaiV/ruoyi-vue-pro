@@ -9,6 +9,7 @@ import java.util.Arrays;
 import java.util.Map;
 
 import com.somle.wangdian.utils.WebUtils;
+import lombok.SneakyThrows;
 
 public class WdtClient {
 	
@@ -114,8 +115,10 @@ public class WdtClient {
 		// 第四步：把二进制转化为大写的十六进制
 		return byte2hex(bytes);
 	}
-	
-	public String execute(String relativeUrl, Map<String, String> params) throws IOException {
+
+
+	@SneakyThrows
+	public String execute(String relativeUrl, Map<String, String> params) {
 		
 		params.put("appkey", this.appkey);
 		params.put("sid", this.sid);

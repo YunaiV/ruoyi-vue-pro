@@ -7,6 +7,8 @@ import java.time.*;
 import java.time.format.DateTimeParseException;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalAdjusters;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * 时间工具类，用于 {@link LocalDateTime}
@@ -292,6 +294,21 @@ public class LocalDateTimeUtils {
 
     public static LocalDateTime leap (LocalDateTime systemTime, ZoneId to) {
         return toZoned(systemTime).withZoneSameInstant(to).toLocalDateTime();
+    }
+
+    public static Map<LocalDateTime, LocalDateTime> splitIntoHourlyBlocks(LocalDateTime start, LocalDateTime end) {
+        Map<LocalDateTime, LocalDateTime> timeBlocks = new LinkedHashMap<>();
+
+        LocalDateTime currentStart = start;
+        while (currentStart.isBefore(end)) {
+            LocalDateTime nextHour = currentStart.truncatedTo(ChronoUnit.HOURS).plusHours(1);
+            LocalDateTime blockEnd = nextHour.isBefore(end) ? nextHour.minusSeconds(1) : end;
+
+            timeBlocks.put(currentStart, blockEnd);
+            currentStart = nextHour;
+        }
+
+        return timeBlocks;
     }
 
 }
