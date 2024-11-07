@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <groupId>cn.iocoder.boot</groupId>
+        <artifactId>yudao-module-ai</artifactId>
+        <version>${revision}</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>yudao-spring-boot-starter-ai</artifactId>
+    <packaging>jar</packaging>
+
+    <name>${project.artifactId}</name>
+    <description>AI 大模型拓展，接入国内外大模型</description>
+    <properties>
+        <spring-ai.groupId>group.springframework.ai</spring-ai.groupId>
+        <spring-ai.version>1.1.0</spring-ai.version>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>${spring-ai.groupId}</groupId>
+            <artifactId>spring-ai-zhipuai-spring-boot-starter</artifactId>
+            <version>${spring-ai.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${spring-ai.groupId}</groupId>
+            <artifactId>spring-ai-openai-spring-boot-starter</artifactId>
+            <version>${spring-ai.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${spring-ai.groupId}</groupId>
+            <artifactId>spring-ai-azure-openai-spring-boot-starter</artifactId>
+            <version>${spring-ai.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${spring-ai.groupId}</groupId>
+            <artifactId>spring-ai-ollama-spring-boot-starter</artifactId>
+            <version>${spring-ai.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${spring-ai.groupId}</groupId>
+            <artifactId>spring-ai-stability-ai-spring-boot-starter</artifactId>
+            <version>${spring-ai.version}</version>
+        </dependency>
+
+        <!-- 向量化，基于 Redis 存储，Tika 解析内容 -->
+
+        <!-- 暂不做经济型，先注释 TODO 经济型是啥呀？ -->
+        <!--        <dependency>-->
+        <!--            <groupId>${spring-ai.groupId}</groupId>-->
+        <!--            <artifactId>spring-ai-transformers-spring-boot-starter</artifactId>-->
+        <!--            <version>${spring-ai.version}</version>-->
+        <!--        </dependency>-->
+        <dependency>
+            <groupId>${spring-ai.groupId}</groupId>
+            <artifactId>spring-ai-tika-document-reader</artifactId>
+            <version>${spring-ai.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${spring-ai.groupId}</groupId>
+            <artifactId>spring-ai-redis-store</artifactId>
+            <version>${spring-ai.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>cn.iocoder.boot</groupId>
+            <artifactId>yudao-spring-boot-starter-redis</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>cn.iocoder.boot</groupId>
+            <artifactId>yudao-common</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>${spring-ai.groupId}</groupId>
+            <artifactId>spring-ai-qianfan-spring-boot-starter</artifactId>
+            <version>${spring-ai.version}</version>
+        </dependency>
+
+        <!-- 阿里云 通义千问 -->
+        <!-- TODO 芋艿：等 spring cloud alibaba ai 发布最新的时候，可以替换掉这个依赖，并且删除我们直接 cv 的代码 -->
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>dashscope-sdk-java</artifactId>
+            <version>2.14.0</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-simple</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <!-- Test 测试相关 -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+</project>

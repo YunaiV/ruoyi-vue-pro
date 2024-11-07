@@ -7,6 +7,7 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.ArrayUtils;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
+import cn.iocoder.yudao.module.infra.api.config.ConfigApi;
 import cn.iocoder.yudao.module.infra.api.file.FileApi;
 import cn.iocoder.yudao.module.system.controller.admin.user.vo.profile.UserProfileUpdatePasswordReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.user.vo.profile.UserProfileUpdateReqVO;
@@ -23,6 +24,7 @@ import cn.iocoder.yudao.module.system.service.dept.DeptService;
 import cn.iocoder.yudao.module.system.service.dept.PostService;
 import cn.iocoder.yudao.module.system.service.permission.PermissionService;
 import cn.iocoder.yudao.module.system.service.tenant.TenantService;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.stubbing.Answer;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -46,6 +48,7 @@ import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEq
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServiceException;
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.*;
 import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.*;
+import static cn.iocoder.yudao.module.system.service.user.AdminUserServiceImpl.USER_INIT_PASSWORD_KEY;
 import static java.util.Collections.singleton;
 import static java.util.Collections.singletonList;
 import static org.assertj.core.util.Lists.newArrayList;
@@ -76,6 +79,14 @@ public class AdminUserServiceImplTest extends BaseDbUnitTest {
     private TenantService tenantService;
     @MockBean
     private FileApi fileApi;
+    @MockBean
+    private ConfigApi configApi;
+
+    @BeforeEach
+    public void before() {
+        // mock 初始化密码
+        when(configApi.getConfigValueByKey(USER_INIT_PASSWORD_KEY)).thenReturn("yudaoyuanma");
+    }
 
     @Test
     public void testCreatUser_success() {
@@ -419,6 +430,8 @@ public class AdminUserServiceImplTest extends BaseDbUnitTest {
     public void testImportUserList_01() {
         // 准备参数
         UserImportExcelVO importUser = randomPojo(UserImportExcelVO.class, o -> {
+            o.setEmail(randomEmail());
+            o.setMobile(randomMobile());
         });
         // mock 方法，模拟失败
         doThrow(new ServiceException(DEPT_NOT_FOUND)).when(deptService).validateDeptList(any());
@@ -441,6 +454,8 @@ public class AdminUserServiceImplTest extends BaseDbUnitTest {
         UserImportExcelVO importUser = randomPojo(UserImportExcelVO.class, o -> {
             o.setStatus(randomEle(CommonStatusEnum.values()).getStatus()); // 保证 status 的范围
             o.setSex(randomEle(SexEnum.values()).getSex()); // 保证 sex 的范围
+            o.setEmail(randomEmail());
+            o.setMobile(randomMobile());
         });
         // mock deptService 的方法
         DeptDO dept = randomPojo(DeptDO.class, o -> {
@@ -475,6 +490,8 @@ public class AdminUserServiceImplTest extends BaseDbUnitTest {
             o.setStatus(randomEle(CommonStatusEnum.values()).getStatus()); // 保证 status 的范围
             o.setSex(randomEle(SexEnum.values()).getSex()); // 保证 sex 的范围
             o.setUsername(dbUser.getUsername());
+            o.setEmail(randomEmail());
+            o.setMobile(randomMobile());
         });
         // mock deptService 的方法
         DeptDO dept = randomPojo(DeptDO.class, o -> {
@@ -505,6 +522,8 @@ public class AdminUserServiceImplTest extends BaseDbUnitTest {
             o.setStatus(randomEle(CommonStatusEnum.values()).getStatus()); // 保证 status 的范围
             o.setSex(randomEle(SexEnum.values()).getSex()); // 保证 sex 的范围
             o.setUsername(dbUser.getUsername());
+            o.setEmail(randomEmail());
+            o.setMobile(randomMobile());
         });
         // mock deptService 的方法
         DeptDO dept = randomPojo(DeptDO.class, o -> {

@@ -2,7 +2,6 @@ package cn.iocoder.yudao.framework.excel.core.handler;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Assert;
-import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.spring.SpringUtil;
@@ -55,12 +54,6 @@ public class SelectSheetWriteHandler implements SheetWriteHandler {
     private final Map<Integer, List<String>> selectMap = new HashMap<>();
 
     public SelectSheetWriteHandler(Class<?> head) {
-        // 加载下拉数据获取接口
-        Map<String, ExcelColumnSelectFunction> beansMap = SpringUtil.getBeanFactory().getBeansOfType(ExcelColumnSelectFunction.class);
-        if (MapUtil.isEmpty(beansMap)) {
-            return;
-        }
-
         // 解析下拉数据
         int colIndex = 0;
         for (Field field : head.getDeclaredFields()) {

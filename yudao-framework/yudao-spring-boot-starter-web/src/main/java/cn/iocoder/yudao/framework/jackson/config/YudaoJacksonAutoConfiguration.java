@@ -2,9 +2,9 @@ package cn.iocoder.yudao.framework.jackson.config;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
-import cn.iocoder.yudao.framework.jackson.core.databind.NumberSerializer;
-import cn.iocoder.yudao.framework.jackson.core.databind.TimestampLocalDateTimeDeserializer;
-import cn.iocoder.yudao.framework.jackson.core.databind.TimestampLocalDateTimeSerializer;
+import cn.iocoder.yudao.framework.common.util.json.databind.NumberSerializer;
+import cn.iocoder.yudao.framework.common.util.json.databind.TimestampLocalDateTimeDeserializer;
+import cn.iocoder.yudao.framework.common.util.json.databind.TimestampLocalDateTimeSerializer;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;

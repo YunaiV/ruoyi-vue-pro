@@ -12,13 +12,12 @@ import java.util.List;
  */
 public interface RewardActivityApi {
 
-
     /**
-     * 基于指定的 SPU 编号数组，获得它们匹配的满减送活动
+     * 获得 spuId 商品匹配的的满减送活动列表
      *
-     * @param spuIds SPU 编号数组
+     * @param spuIds   SPU 编号
      * @return 满减送活动列表
      */
-    List<RewardActivityMatchRespDTO> getMatchRewardActivityList(Collection<Long> spuIds);
+    List<RewardActivityMatchRespDTO> getMatchRewardActivityListBySpuIds(Collection<Long> spuIds);
 
 }

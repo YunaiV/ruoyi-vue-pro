@@ -1,9 +1,12 @@
 package cn.iocoder.yudao.framework.ip.core;
 
 import cn.iocoder.yudao.framework.ip.core.enums.AreaTypeEnum;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import java.util.List;
 
@@ -17,6 +20,7 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@ToString(exclude = {"parent"}) // 参见 https://gitee.com/yudaocode/yudao-cloud-mini/pulls/2 原因
 public class Area {
 
     /**
@@ -46,10 +50,12 @@ public class Area {
     /**
      * 父节点
      */
+    @JsonManagedReference
     private Area parent;
     /**
      * 子节点
      */
+    @JsonBackReference
     private List<Area> children;
 
 }

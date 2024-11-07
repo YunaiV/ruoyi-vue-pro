@@ -34,6 +34,7 @@ import java.util.Map;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
+import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
 
 @Tag(name = "管理后台 - 流程定义")
 @RestController
@@ -77,17 +78,25 @@ public class BpmProcessDefinitionController {
     @GetMapping ("/list")
     @Operation(summary = "获得流程定义列表")
     @Parameter(name = "suspensionState", description = "挂起状态", required = true, example = "1") // 参见 Flowable SuspensionState 枚举
-    @PreAuthorize("@ss.hasPermission('bpm:process-definition:query')")
     public CommonResult<List<BpmProcessDefinitionRespVO>> getProcessDefinitionList(
             @RequestParam("suspensionState") Integer suspensionState) {
+        // 1.1 获得开启的流程定义
         List<ProcessDefinition> list = processDefinitionService.getProcessDefinitionListBySuspensionState(suspensionState);
         if (CollUtil.isEmpty(list)) {
             return success(Collections.emptyList());
         }
-
-        // 获得 BpmProcessDefinitionInfoDO Map
+        // 1.2 移除不可见的流程定义
         Map<String, BpmProcessDefinitionInfoDO> processDefinitionMap = processDefinitionService.getProcessDefinitionInfoMap(
                 convertSet(list, ProcessDefinition::getId));
+        Long userId = getLoginUserId();
+        list.removeIf(processDefinition -> {
+            BpmProcessDefinitionInfoDO processDefinitionInfo = processDefinitionMap.get(processDefinition.getId());
+            return processDefinitionInfo == null // 不存在
+                    || Boolean.FALSE.equals(processDefinitionInfo.getVisible()) // visible 不可见
+                    || !processDefinitionService.canUserStartProcessDefinition(processDefinitionInfo, userId); // 无权限发起
+        });
+
+        // 2. 拼接 VO 返回
         return success(BpmProcessDefinitionConvert.INSTANCE.buildProcessDefinitionList(
                 list, null, processDefinitionMap, null, null));
     }
@@ -96,7 +105,6 @@ public class BpmProcessDefinitionController {
     @Operation(summary = "获得流程定义")
     @Parameter(name = "id", description = "流程编号", required = true, example = "1024")
     @Parameter(name = "key", description = "流程定义标识", required = true, example = "1024")
-    @PreAuthorize("@ss.hasPermission('bpm:process-definition:query')")
     public CommonResult<BpmProcessDefinitionRespVO> getProcessDefinition(
             @RequestParam(value = "id", required = false) String id,
             @RequestParam(value = "key", required = false) String key) {
@@ -105,10 +113,11 @@ public class BpmProcessDefinitionController {
         if (processDefinition == null) {
             return success(null);
         }
+        BpmProcessDefinitionInfoDO processDefinitionInfo = processDefinitionService.getProcessDefinitionInfo(processDefinition.getId());
         BpmnModel bpmnModel = processDefinitionService.getProcessDefinitionBpmnModel(processDefinition.getId());
         List<UserTask> userTaskList = BpmTaskCandidateStartUserSelectStrategy.getStartUserSelectUserTaskList(bpmnModel);
         return success(BpmProcessDefinitionConvert.INSTANCE.buildProcessDefinition(
-                processDefinition, null, null, null, null, bpmnModel, userTaskList));
+                processDefinition, null, processDefinitionInfo, null, null, bpmnModel, userTaskList));
     }
 
 }

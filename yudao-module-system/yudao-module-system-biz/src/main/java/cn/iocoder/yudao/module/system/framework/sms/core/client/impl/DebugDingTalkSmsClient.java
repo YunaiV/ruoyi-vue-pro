@@ -37,10 +37,6 @@ public class DebugDingTalkSmsClient extends AbstractSmsClient {
     }
 
     @Override
-    protected void doInit() {
-    }
-
-    @Override
     public SmsSendRespDTO sendSms(Long sendLogId, String mobile,
                                   String apiTemplateId, List<KeyValue<String, Object>> templateParams) throws Throwable {
         // 构建请求

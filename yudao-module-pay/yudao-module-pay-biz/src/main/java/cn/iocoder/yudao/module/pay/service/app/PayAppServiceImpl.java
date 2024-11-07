@@ -11,11 +11,11 @@ import cn.iocoder.yudao.module.pay.dal.mysql.app.PayAppMapper;
 import cn.iocoder.yudao.module.pay.enums.ErrorCodeConstants;
 import cn.iocoder.yudao.module.pay.service.order.PayOrderService;
 import cn.iocoder.yudao.module.pay.service.refund.PayRefundService;
+import jakarta.annotation.Resource;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
-import jakarta.annotation.Resource;
 import java.util.Collection;
 import java.util.List;
 
@@ -43,6 +43,9 @@ public class PayAppServiceImpl implements PayAppService {
 
     @Override
     public Long createApp(PayAppCreateReqVO createReqVO) {
+        // 验证 appKey 是否重复
+        validateAppKeyUnique(null, createReqVO.getAppKey());
+
         // 插入
         PayAppDO app = PayAppConvert.INSTANCE.convert(createReqVO);
         appMapper.insert(app);
@@ -54,9 +57,26 @@ public class PayAppServiceImpl implements PayAppService {
     public void updateApp(PayAppUpdateReqVO updateReqVO) {
         // 校验存在
         validateAppExists(updateReqVO.getId());
+        // 验证 appKey 是否重复
+        validateAppKeyUnique(updateReqVO.getId(), updateReqVO.getAppKey());
+
         // 更新
         PayAppDO updateObj = PayAppConvert.INSTANCE.convert(updateReqVO);
         appMapper.updateById(updateObj);
+    }
+
+    void validateAppKeyUnique(Long id, String appKey) {
+        PayAppDO app = appMapper.selectByAppKey(appKey);
+        if (app == null) {
+            return;
+        }
+        // 如果 id 为空，说明不用比较是否为相同 appKey 的应用
+        if (id == null) {
+            throw exception(APP_KEY_EXISTS);
+        }
+        if (!app.getId().equals(id)) {
+            throw exception(APP_KEY_EXISTS);
+        }
     }
 
     @Override
@@ -101,7 +121,7 @@ public class PayAppServiceImpl implements PayAppService {
 
     @Override
     public List<PayAppDO> getAppList() {
-         return appMapper.selectList();
+        return appMapper.selectList();
     }
 
     @Override
@@ -110,14 +130,30 @@ public class PayAppServiceImpl implements PayAppService {
     }
 
     @Override
-    public PayAppDO validPayApp(Long id) {
-        PayAppDO app = appMapper.selectById(id);
+    public PayAppDO validPayApp(Long appId) {
+        PayAppDO app = appMapper.selectById(appId);
+        return validatePayApp(app);
+    }
+
+    @Override
+    public PayAppDO validPayApp(String appKey) {
+        PayAppDO app = appMapper.selectByAppKey(appKey);
+        return validatePayApp(app);
+    }
+
+    /**
+     * 校验支付应用实体的有效性：存在 + 开启
+     *
+     * @param app 待校验的支付应用实体
+     * @return 校验通过的支付应用实体
+     */
+    private PayAppDO validatePayApp(PayAppDO app) {
         // 校验是否存在
         if (app == null) {
             throw exception(ErrorCodeConstants.APP_NOT_FOUND);
         }
         // 校验是否禁用
-        if (CommonStatusEnum.DISABLE.getStatus().equals(app.getStatus())) {
+        if (CommonStatusEnum.isDisable(app.getStatus())) {
             throw exception(ErrorCodeConstants.APP_IS_DISABLE);
         }
         return app;

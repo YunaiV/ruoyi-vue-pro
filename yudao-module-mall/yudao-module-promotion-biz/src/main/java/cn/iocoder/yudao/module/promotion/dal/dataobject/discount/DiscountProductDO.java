@@ -67,9 +67,15 @@ public class DiscountProductDO extends BaseDO {
     private Integer discountPrice;
 
     /**
+     * 活动标题
+     *
+     * 冗余 {@link DiscountActivityDO#getName()}
+     */
+    private String activityName;
+    /**
      * 活动状态
      *
-     * 关联 {@link DiscountActivityDO#getStatus()}
+     * 冗余 {@link DiscountActivityDO#getStatus()}
      */
     private Integer activityStatus;
     /**

@@ -9,12 +9,12 @@ import cn.iocoder.yudao.module.promotion.enums.coupon.CouponTemplateValidityType
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Data;
-import org.springframework.format.annotation.DateTimeFormat;
-
 import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
+import lombok.Data;
+import org.springframework.format.annotation.DateTimeFormat;
+
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
@@ -32,6 +32,9 @@ public class CouponTemplateBaseVO {
     @Schema(description = "优惠劵名", requiredMode = Schema.RequiredMode.REQUIRED, example = "春节送送送")
     @NotNull(message = "优惠劵名不能为空")
     private String name;
+
+    @Schema(description = "优惠券说明", example = "优惠券使用说明")
+    private String description;
 
     @Schema(description = "发行总量", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024") // -1 - 则表示不限制发放数量
     @NotNull(message = "发行总量不能为空")

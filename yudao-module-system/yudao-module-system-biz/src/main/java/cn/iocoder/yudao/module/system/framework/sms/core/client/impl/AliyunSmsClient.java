@@ -1,35 +1,33 @@
 package cn.iocoder.yudao.module.system.framework.sms.core.client.impl;
 
+import cn.hutool.core.date.format.FastDateFormat;
 import cn.hutool.core.lang.Assert;
+import cn.hutool.core.util.IdUtil;
+import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.crypto.SecureUtil;
+import cn.hutool.crypto.digest.DigestUtil;
+import cn.hutool.json.JSONArray;
+import cn.hutool.json.JSONObject;
+import cn.hutool.json.JSONUtil;
 import cn.iocoder.yudao.framework.common.core.KeyValue;
 import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
+import cn.iocoder.yudao.framework.common.util.http.HttpUtils;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.module.system.framework.sms.core.client.dto.SmsReceiveRespDTO;
 import cn.iocoder.yudao.module.system.framework.sms.core.client.dto.SmsSendRespDTO;
 import cn.iocoder.yudao.module.system.framework.sms.core.client.dto.SmsTemplateRespDTO;
 import cn.iocoder.yudao.module.system.framework.sms.core.enums.SmsTemplateAuditStatusEnum;
 import cn.iocoder.yudao.module.system.framework.sms.core.property.SmsChannelProperties;
-import com.aliyuncs.DefaultAcsClient;
-import com.aliyuncs.IAcsClient;
-import com.aliyuncs.dysmsapi.model.v20170525.QuerySmsTemplateRequest;
-import com.aliyuncs.dysmsapi.model.v20170525.QuerySmsTemplateResponse;
-import com.aliyuncs.dysmsapi.model.v20170525.SendSmsRequest;
-import com.aliyuncs.dysmsapi.model.v20170525.SendSmsResponse;
-import com.aliyuncs.profile.DefaultProfile;
-import com.aliyuncs.profile.IClientProfile;
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.annotations.VisibleForTesting;
-import lombok.Data;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Objects;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
-import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
-import static cn.iocoder.yudao.framework.common.util.date.DateUtils.TIME_ZONE_DEFAULT;
 
 /**
  * 阿里短信客户端的实现类
@@ -40,20 +38,11 @@ import static cn.iocoder.yudao.framework.common.util.date.DateUtils.TIME_ZONE_DE
 @Slf4j
 public class AliyunSmsClient extends AbstractSmsClient {
 
-    /**
-     * 调用成功 code
-     */
-    public static final String API_CODE_SUCCESS = "OK";
+    private static final String URL = "https://dysmsapi.aliyuncs.com";
+    private static final String HOST = "dysmsapi.aliyuncs.com";
+    private static final String VERSION = "2017-05-25";
 
-    /**
-     * REGION, 使用杭州
-     */
-    private static final String ENDPOINT = "cn-hangzhou";
-
-    /**
-     * 阿里云客户端
-     */
-    private volatile IAcsClient client;
+    private static final String RESPONSE_CODE_SUCCESS = "OK";
 
     public AliyunSmsClient(SmsChannelProperties properties) {
         super(properties);
@@ -62,48 +51,65 @@ public class AliyunSmsClient extends AbstractSmsClient {
     }
 
     @Override
-    protected void doInit() {
-        IClientProfile profile = DefaultProfile.getProfile(ENDPOINT, properties.getApiKey(), properties.getApiSecret());
-        client = new DefaultAcsClient(profile);
-    }
-
-    @Override
     public SmsSendRespDTO sendSms(Long sendLogId, String mobile, String apiTemplateId,
                                   List<KeyValue<String, Object>> templateParams) throws Throwable {
-        // 构建请求
-        SendSmsRequest request = new SendSmsRequest();
-        request.setPhoneNumbers(mobile);
-        request.setSignName(properties.getSignature());
-        request.setTemplateCode(apiTemplateId);
-        request.setTemplateParam(JsonUtils.toJsonString(MapUtils.convertMap(templateParams)));
-        request.setOutId(String.valueOf(sendLogId));
-        // 执行请求
-        SendSmsResponse response = client.getAcsResponse(request);
-        return new SmsSendRespDTO().setSuccess(Objects.equals(response.getCode(), API_CODE_SUCCESS)).setSerialNo(response.getBizId())
-                .setApiRequestId(response.getRequestId()).setApiCode(response.getCode()).setApiMsg(response.getMessage());
+        Assert.notBlank(properties.getSignature(), "短信签名不能为空");
+        // 1. 执行请求
+        // 参考链接 https://api.aliyun.com/document/Dysmsapi/2017-05-25/SendSms
+        TreeMap<String, Object> queryParam = new TreeMap<>();
+        queryParam.put("PhoneNumbers", mobile);
+        queryParam.put("SignName", properties.getSignature());
+        queryParam.put("TemplateCode", apiTemplateId);
+        queryParam.put("TemplateParam", JsonUtils.toJsonString(MapUtils.convertMap(templateParams)));
+        queryParam.put("OutId", sendLogId);
+        JSONObject response = request("SendSms", queryParam);
+
+        // 2. 解析请求
+        return new SmsSendRespDTO()
+                .setSuccess(Objects.equals(response.getStr("Code"), RESPONSE_CODE_SUCCESS))
+                .setSerialNo(response.getStr("BizId"))
+                .setApiRequestId(response.getStr("RequestId"))
+                .setApiCode(response.getStr("Code"))
+                .setApiMsg(response.getStr("Message"));
     }
 
     @Override
     public List<SmsReceiveRespDTO> parseSmsReceiveStatus(String text) {
-        List<SmsReceiveStatus> statuses = JsonUtils.parseArray(text, SmsReceiveStatus.class);
-        return convertList(statuses, status -> new SmsReceiveRespDTO().setSuccess(status.getSuccess())
-                .setErrorCode(status.getErrCode()).setErrorMsg(status.getErrMsg())
-                .setMobile(status.getPhoneNumber()).setReceiveTime(status.getReportTime())
-                .setSerialNo(status.getBizId()).setLogId(Long.valueOf(status.getOutId())));
+        JSONArray statuses = JSONUtil.parseArray(text);
+        // 字段参考 https://help.aliyun.com/zh/sms/developer-reference/smsreport-2
+        return convertList(statuses, status -> {
+            JSONObject statusObj = (JSONObject) status;
+            return new SmsReceiveRespDTO()
+                    .setSuccess(statusObj.getBool("success")) // 是否接收成功
+                    .setErrorCode(statusObj.getStr("err_code")) // 状态报告编码
+                    .setErrorMsg(statusObj.getStr("err_msg")) // 状态报告说明
+                    .setMobile(statusObj.getStr("phone_number")) // 手机号
+                    .setReceiveTime(statusObj.getLocalDateTime("report_time", null)) // 状态报告时间
+                    .setSerialNo(statusObj.getStr("biz_id")) // 发送序列号
+                    .setLogId(statusObj.getLong("out_id")); // 用户序列号
+        });
     }
 
     @Override
     public SmsTemplateRespDTO getSmsTemplate(String apiTemplateId) throws Throwable {
-        // 构建请求
-        QuerySmsTemplateRequest request = new QuerySmsTemplateRequest();
-        request.setTemplateCode(apiTemplateId);
-        // 执行请求
-        QuerySmsTemplateResponse response = client.getAcsResponse(request);
-        if (response.getTemplateStatus() == null) {
+        // 1. 执行请求
+        // 参考链接 https://api.aliyun.com/document/Dysmsapi/2017-05-25/QuerySmsTemplate
+        TreeMap<String, Object> queryParam = new TreeMap<>();
+        queryParam.put("TemplateCode", apiTemplateId);
+        JSONObject response = request("QuerySmsTemplate", queryParam);
+
+        // 2.1 请求失败
+        String code = response.getStr("Code");
+        if (ObjectUtil.notEqual(code, RESPONSE_CODE_SUCCESS)) {
+            log.error("[getSmsTemplate][模版编号({}) 响应不正确({})]", apiTemplateId, response);
             return null;
         }
-        return new SmsTemplateRespDTO().setId(response.getTemplateCode()).setContent(response.getTemplateContent())
-                .setAuditStatus(convertSmsTemplateAuditStatus(response.getTemplateStatus())).setAuditReason(response.getReason());
+        // 2.2 请求成功
+        return new SmsTemplateRespDTO()
+                .setId(response.getStr("TemplateCode"))
+                .setContent(response.getStr("TemplateContent"))
+                .setAuditStatus(convertSmsTemplateAuditStatus(response.getInt("TemplateStatus")))
+                .setAuditReason(response.getStr("Reason"));
     }
 
     @VisibleForTesting
@@ -117,66 +123,71 @@ public class AliyunSmsClient extends AbstractSmsClient {
     }
 
     /**
-     * 短信接收状态
+     * 请求阿里云短信
      *
-     * 参见 <a href="https://help.aliyun.com/document_detail/101867.html">文档</a>
-     *
-     * @author 芋道源码
+     * @see <a href="https://help.aliyun.com/zh/sdk/product-overview/v3-request-structure-and-signature">V3 版本请求体&签名机制</>
+     * @param apiName 请求的 API 名称
+     * @param queryParams 请求参数
+     * @return 请求结果
      */
-    @Data
-    public static class SmsReceiveStatus {
+    private JSONObject request(String apiName, TreeMap<String, Object> queryParams) {
+        // 1. 请求参数
+        String queryString = queryParams.entrySet().stream()
+                .map(entry -> percentCode(entry.getKey()) + "=" + percentCode(String.valueOf(entry.getValue())))
+                .collect(Collectors.joining("&"));
 
-        /**
-         * 手机号
-         */
-        @JsonProperty("phone_number")
-        private String phoneNumber;
-        /**
-         * 发送时间
-         */
-        @JsonProperty("send_time")
-        @JsonFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND, timezone = TIME_ZONE_DEFAULT)
-        private LocalDateTime sendTime;
-        /**
-         * 状态报告时间
-         */
-        @JsonProperty("report_time")
-        @JsonFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND, timezone = TIME_ZONE_DEFAULT)
-        private LocalDateTime reportTime;
-        /**
-         * 是否接收成功
-         */
-        private Boolean success;
-        /**
-         * 状态报告说明
-         */
-        @JsonProperty("err_msg")
-        private String errMsg;
-        /**
-         * 状态报告编码
-         */
-        @JsonProperty("err_code")
-        private String errCode;
-        /**
-         * 发送序列号
-         */
-        @JsonProperty("biz_id")
-        private String bizId;
-        /**
-         * 用户序列号
-         *
-         * 这里我们传递的是 SysSmsLogDO 的日志编号
-         */
-        @JsonProperty("out_id")
-        private String outId;
-        /**
-         * 短信长度，例如说 1、2、3
-         *
-         * 140 字节算一条短信，短信长度超过 140 字节时会拆分成多条短信发送
-         */
-        @JsonProperty("sms_size")
-        private Integer smsSize;
+        // 2.1 请求 Header
+        TreeMap<String, String> headers = new TreeMap<>();
+        headers.put("host", HOST);
+        headers.put("x-acs-version", VERSION);
+        headers.put("x-acs-action", apiName);
+        headers.put("x-acs-date", FastDateFormat.getInstance("yyyy-MM-dd'T'HH:mm:ss'Z'", TimeZone.getTimeZone("GMT")).format(new Date()));
+        headers.put("x-acs-signature-nonce", IdUtil.randomUUID());
 
+        // 2.2 构建签名 Header
+        StringBuilder canonicalHeaders = new StringBuilder(); // 构造请求头，多个规范化消息头，按照消息头名称（小写）的字符代码顺序以升序排列后拼接在一起
+        StringBuilder signedHeadersBuilder = new StringBuilder(); // 已签名消息头列表，多个请求头名称（小写）按首字母升序排列并以英文分号（;）分隔
+        headers.entrySet().stream().filter(entry -> entry.getKey().toLowerCase().startsWith("x-acs-")
+                        || entry.getKey().equalsIgnoreCase("host")
+                        || entry.getKey().equalsIgnoreCase("content-type"))
+                .sorted(Map.Entry.comparingByKey()).forEach(entry -> {
+                    String lowerKey = entry.getKey().toLowerCase();
+                    canonicalHeaders.append(lowerKey).append(":").append(String.valueOf(entry.getValue()).trim()).append("\n");
+                    signedHeadersBuilder.append(lowerKey).append(";");
+                });
+        String signedHeaders = signedHeadersBuilder.substring(0, signedHeadersBuilder.length() - 1);
+
+        // 3. 请求 Body
+        String requestBody = ""; // 短信 API 为 RPC 接口，query parameters 在 uri 中拼接，因此 request body 如果没有特殊要求，设置为空。
+        String hashedRequestBody = DigestUtil.sha256Hex(requestBody);
+
+        // 4. 构建 Authorization 签名
+        String canonicalRequest = "POST" + "\n" + "/" + "\n" + queryString + "\n"
+                + canonicalHeaders + "\n" + signedHeaders + "\n" + hashedRequestBody;
+        String hashedCanonicalRequest = DigestUtil.sha256Hex(canonicalRequest);
+        String stringToSign = "ACS3-HMAC-SHA256" + "\n" + hashedCanonicalRequest;
+        String signature = SecureUtil.hmacSha256(properties.getApiSecret()).digestHex(stringToSign); // 计算签名
+        headers.put("Authorization", "ACS3-HMAC-SHA256" + " " + "Credential=" + properties.getApiKey()
+                + ", " + "SignedHeaders=" + signedHeaders + ", " + "Signature=" + signature);
+
+        // 5. 发起请求
+        String responseBody = HttpUtils.post(URL + "?" + queryString, headers, requestBody);
+        return JSONUtil.parseObj(responseBody);
+    }
+
+    /**
+     * 对指定的字符串进行 URL 编码，并对特定的字符进行替换，以符合URL编码规范
+     *
+     * @param str 需要进行 URL 编码的字符串
+     * @return 编码后的字符串
+     */
+    @SneakyThrows
+    private static String percentCode(String str) {
+        Assert.notNull(str, "str 不能为空");
+        return URLEncoder.encode(str, StandardCharsets.UTF_8.name())
+                .replace("+", "%20") // 加号 "+" 被替换为 "%20"
+                .replace("*", "%2A") // 星号 "*" 被替换为 "%2A"
+                .replace("%7E", "~"); // 波浪号 "%7E" 被替换为 "~"
     }
 
 }

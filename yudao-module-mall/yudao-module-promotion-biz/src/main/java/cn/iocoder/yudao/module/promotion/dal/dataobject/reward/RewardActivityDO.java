@@ -1,22 +1,22 @@
 package cn.iocoder.yudao.module.promotion.dal.dataobject.reward;
 
-import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
+import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.framework.mybatis.core.type.LongListTypeHandler;
-import cn.iocoder.yudao.module.promotion.enums.common.PromotionActivityStatusEnum;
 import cn.iocoder.yudao.module.promotion.enums.common.PromotionConditionTypeEnum;
 import cn.iocoder.yudao.module.promotion.enums.common.PromotionProductScopeEnum;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.baomidou.mybatisplus.extension.handlers.AbstractJsonTypeHandler;
+import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 满减送活动 DO
@@ -41,7 +41,7 @@ public class RewardActivityDO extends BaseDO {
     /**
      * 状态
      *
-     * 枚举 {@link PromotionActivityStatusEnum}
+     * 枚举 {@link CommonStatusEnum}
      */
     private Integer status;
     /**
@@ -72,11 +72,11 @@ public class RewardActivityDO extends BaseDO {
      * 商品 SPU 编号的数组
      */
     @TableField(typeHandler = LongListTypeHandler.class)
-    private List<Long> productSpuIds;
+    private List<Long> productScopeValues;
     /**
      * 优惠规则的数组
      */
-    @TableField(typeHandler = RuleTypeHandler.class)
+    @TableField(typeHandler = JacksonTypeHandler.class)
     private List<Rule> rules;
 
     /**
@@ -105,28 +105,14 @@ public class RewardActivityDO extends BaseDO {
          */
         private Integer point;
         /**
-         * 赠送的优惠劵编号的数组
+         * 赠送的优惠劵
+         *
+         * key: 优惠劵模版编号
+         * value：对应的优惠券数量
+         *
+         * 目的：用于订单支付后赠送优惠券
          */
-        private List<Long> couponIds;
-        /**
-         * 赠送的优惠券数量的数组
-         */
-        private List<Integer> couponCounts;
-
-    }
-
-    // TODO @芋艿：可以找一些新的思路
-    public static class RuleTypeHandler extends AbstractJsonTypeHandler<List<Rule>> {
-
-        @Override
-        protected List<Rule> parse(String json) {
-            return JsonUtils.parseArray(json, Rule.class);
-        }
-
-        @Override
-        protected String toJson(List<Rule> obj) {
-            return JsonUtils.toJsonString(obj);
-        }
+        private Map<Long, Integer> giveCouponTemplateCounts;
 
     }
 

@@ -140,24 +140,6 @@ public interface CombinationRecordService {
                                                               @Nullable Long headId);
 
     /**
-     * 获取拼团记录
-     *
-     * @param userId 用户编号
-     * @param id     拼团记录编号
-     * @return 拼团记录
-     */
-    CombinationRecordDO getCombinationRecordByIdAndUser(Long userId, Long id);
-
-    /**
-     * 取消拼团
-     *
-     * @param userId 用户编号
-     * @param id     拼团记录编号
-     * @param headId 团长编号
-     */
-    void cancelCombinationRecord(Long userId, Long id, Long headId);
-
-    /**
      * 处理过期拼团
      *
      * @return key 过期拼团数量, value 虚拟成团数量

@@ -26,12 +26,12 @@ import cn.iocoder.yudao.module.pay.service.app.PayAppService;
 import cn.iocoder.yudao.module.pay.service.channel.PayChannelService;
 import cn.iocoder.yudao.module.pay.service.notify.PayNotifyService;
 import cn.iocoder.yudao.module.pay.service.order.PayOrderService;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
-import jakarta.annotation.Resource;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
@@ -93,9 +93,9 @@ public class PayRefundServiceImpl implements PayRefundService {
     @Override
     public Long createPayRefund(PayRefundCreateReqDTO reqDTO) {
         // 1.1 校验 App
-        PayAppDO app = appService.validPayApp(reqDTO.getAppId());
+        PayAppDO app = appService.validPayApp(reqDTO.getAppKey());
         // 1.2 校验支付订单
-        PayOrderDO order = validatePayOrderCanRefund(reqDTO);
+        PayOrderDO order = validatePayOrderCanRefund(reqDTO, app.getId());
         // 1.3 校验支付渠道是否有效
         PayChannelDO channel = channelService.validPayChannel(order.getChannelId());
         PayClient client = channelService.getPayClient(channel.getId());
@@ -113,7 +113,7 @@ public class PayRefundServiceImpl implements PayRefundService {
         // 2.1 插入退款单
         String no = noRedisDAO.generate(payProperties.getRefundNoPrefix());
         refund = PayRefundConvert.INSTANCE.convert(reqDTO)
-                .setNo(no).setOrderId(order.getId()).setOrderNo(order.getNo())
+                .setNo(no).setAppId(app.getId()).setOrderId(order.getId()).setOrderNo(order.getNo())
                 .setChannelId(order.getChannelId()).setChannelCode(order.getChannelCode())
                 // 商户相关的字段
                 .setNotifyUrl(app.getRefundNotifyUrl())
@@ -153,8 +153,8 @@ public class PayRefundServiceImpl implements PayRefundService {
      * @param reqDTO 退款申请信息
      * @return 支付订单
      */
-    private PayOrderDO validatePayOrderCanRefund(PayRefundCreateReqDTO reqDTO) {
-        PayOrderDO order = orderService.getOrder(reqDTO.getAppId(), reqDTO.getMerchantOrderId());
+    private PayOrderDO validatePayOrderCanRefund(PayRefundCreateReqDTO reqDTO, Long appId) {
+        PayOrderDO order = orderService.getOrder(appId, reqDTO.getMerchantOrderId());
         if (order == null) {
             throw exception(PAY_ORDER_NOT_FOUND);
         }
@@ -164,11 +164,11 @@ public class PayRefundServiceImpl implements PayRefundService {
         }
 
         // 校验金额，退款金额不能大于原定的金额
-        if (reqDTO.getPrice() + order.getRefundPrice() > order.getPrice()){
+        if (reqDTO.getPrice() + order.getRefundPrice() > order.getPrice()) {
             throw exception(REFUND_PRICE_EXCEED);
         }
         // 是否有退款中的订单
-        if (refundMapper.selectCountByAppIdAndOrderId(reqDTO.getAppId(), order.getId(),
+        if (refundMapper.selectCountByAppIdAndOrderId(appId, order.getId(),
                 PayRefundStatusEnum.WAITING.getStatus()) > 0) {
             throw exception(REFUND_HAS_REFUNDING);
         }
@@ -197,9 +197,10 @@ public class PayRefundServiceImpl implements PayRefundService {
      * 通知并更新订单的退款结果
      *
      * @param channel 支付渠道
-     * @param notify 通知
+     * @param notify  通知
      */
-    @Transactional(rollbackFor = Exception.class)  // 注意，如果是方法内调用该方法，需要通过 getSelf().notifyRefund(channel, notify) 调用，否则事务不生效
+    // 注意，如果是方法内调用该方法，需要通过 getSelf().notifyRefund(channel, notify) 调用，否则事务不生效
+    @Transactional(rollbackFor = Exception.class)
     public void notifyRefund(PayChannelDO channel, PayRefundRespDTO notify) {
         // 情况一：退款成功
         if (PayRefundStatusRespEnum.isSuccess(notify.getStatus())) {

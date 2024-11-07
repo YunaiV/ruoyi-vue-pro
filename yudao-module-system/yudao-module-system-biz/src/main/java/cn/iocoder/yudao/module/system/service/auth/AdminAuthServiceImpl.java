@@ -27,12 +27,12 @@ import com.google.common.annotations.VisibleForTesting;
 import com.xingyuv.captcha.model.common.ResponseModel;
 import com.xingyuv.captcha.model.vo.CaptchaVO;
 import com.xingyuv.captcha.service.CaptchaService;
+import jakarta.annotation.Resource;
+import jakarta.validation.Validator;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import jakarta.annotation.Resource;
-import jakarta.validation.Validator;
 import java.util.Objects;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
@@ -245,6 +245,35 @@ public class AdminAuthServiceImpl implements AdminAuthService {
 
     private UserTypeEnum getUserType() {
         return UserTypeEnum.ADMIN;
+    }
+
+    @Override
+    public AuthLoginRespVO register(AuthRegisterReqVO registerReqVO) {
+        // 1. 校验验证码
+        validateCaptcha(registerReqVO);
+
+        // 2. 校验用户名是否已存在
+        Long userId = userService.registerUser(registerReqVO);
+
+        // 3. 创建 Token 令牌，记录登录日志
+        return createTokenAfterLoginSuccess(userId, registerReqVO.getUsername(), LoginLogTypeEnum.LOGIN_USERNAME);
+    }
+
+    @VisibleForTesting
+    void validateCaptcha(AuthRegisterReqVO reqVO) {
+        // 如果验证码关闭，则不进行校验
+        if (!captchaEnable) {
+            return;
+        }
+        // 校验验证码
+        ValidationUtils.validate(validator, reqVO, AuthLoginReqVO.CodeEnableGroup.class);
+        CaptchaVO captchaVO = new CaptchaVO();
+        captchaVO.setCaptchaVerification(reqVO.getCaptchaVerification());
+        ResponseModel response = captchaService.verification(captchaVO);
+        // 验证不通过
+        if (!response.isSuccess()) {
+            throw exception(AUTH_REGISTER_CAPTCHA_CODE_ERROR, response.getRepMsg());
+        }
     }
 
 }

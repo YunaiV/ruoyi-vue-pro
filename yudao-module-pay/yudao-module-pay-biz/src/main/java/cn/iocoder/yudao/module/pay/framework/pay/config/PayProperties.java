@@ -15,6 +15,8 @@ public class PayProperties {
     private static final String ORDER_NO_PREFIX = "P";
     private static final String REFUND_NO_PREFIX = "R";
 
+    private static final String WALLET_PAY_APP_KEY_DEFAULT = "wallet";
+
     /**
      * 支付回调地址
      *
@@ -48,5 +50,11 @@ public class PayProperties {
      */
     @NotEmpty(message = "退款订单 no 的前缀不能为空")
     private String refundNoPrefix = REFUND_NO_PREFIX;
+
+    /**
+     * 钱包支付应用 AppKey
+     */
+    @NotEmpty(message = "钱包支付应用 AppKey 不能为空")
+    private String walletPayAppKey = WALLET_PAY_APP_KEY_DEFAULT;
 
 }

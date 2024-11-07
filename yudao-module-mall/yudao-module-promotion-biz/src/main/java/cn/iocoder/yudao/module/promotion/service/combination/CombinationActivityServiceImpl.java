@@ -1,7 +1,6 @@
 package cn.iocoder.yudao.module.promotion.service.combination;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
@@ -20,19 +19,18 @@ import cn.iocoder.yudao.module.promotion.dal.dataobject.combination.CombinationA
 import cn.iocoder.yudao.module.promotion.dal.dataobject.combination.CombinationProductDO;
 import cn.iocoder.yudao.module.promotion.dal.mysql.combination.CombinationActivityMapper;
 import cn.iocoder.yudao.module.promotion.dal.mysql.combination.CombinationProductMapper;
+import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
-import jakarta.annotation.Resource;
-import java.time.LocalDateTime;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.filterList;
 import static cn.iocoder.yudao.module.product.enums.ErrorCodeConstants.SKU_NOT_EXISTS;
 import static cn.iocoder.yudao.module.product.enums.ErrorCodeConstants.SPU_NOT_EXISTS;
 import static cn.iocoder.yudao.module.promotion.enums.ErrorCodeConstants.*;
@@ -178,7 +176,7 @@ public class CombinationActivityServiceImpl implements CombinationActivityServic
             combinationProductMapper.updateBatch(diffList.get(1));
         }
         if (CollUtil.isNotEmpty(diffList.get(2))) {
-            combinationProductMapper.deleteBatchIds(CollectionUtils.convertList(diffList.get(2), CombinationProductDO::getId));
+            combinationProductMapper.deleteByIds(CollectionUtils.convertList(diffList.get(2), CombinationProductDO::getId));
         }
     }
 
@@ -226,11 +224,6 @@ public class CombinationActivityServiceImpl implements CombinationActivityServic
     }
 
     @Override
-    public List<CombinationActivityDO> getCombinationActivityListByCount(Integer count) {
-        return combinationActivityMapper.selectListByStatus(CommonStatusEnum.ENABLE.getStatus(), count);
-    }
-
-    @Override
     public PageResult<CombinationActivityDO> getCombinationActivityPage(PageParam pageParam) {
         return combinationActivityMapper.selectPage(pageParam, CommonStatusEnum.ENABLE.getStatus());
     }
@@ -243,15 +236,8 @@ public class CombinationActivityServiceImpl implements CombinationActivityServic
     }
 
     @Override
-    public List<CombinationActivityDO> getCombinationActivityBySpuIdsAndStatusAndDateTimeLt(Collection<Long> spuIds, Integer status, LocalDateTime dateTime) {
-        // 1.查询出指定 spuId 的 spu 参加的活动最接近现在的一条记录。多个的话，一个 spuId 对应一个最近的活动编号
-        List<Map<String, Object>> spuIdAndActivityIdMaps = combinationActivityMapper.selectSpuIdAndActivityIdMapsBySpuIdsAndStatus(spuIds, status);
-        if (CollUtil.isEmpty(spuIdAndActivityIdMaps)) {
-            return Collections.emptyList();
-        }
-        // 2.查询活动详情
-        return combinationActivityMapper.selectListByIdsAndDateTimeLt(
-                convertSet(spuIdAndActivityIdMaps, map -> MapUtil.getLong(map, "activityId")), dateTime);
+    public CombinationActivityDO getMatchCombinationActivityBySpuId(Long spuId) {
+        return combinationActivityMapper.selectBySpuIdAndStatusAndNow(spuId, CommonStatusEnum.ENABLE.getStatus());
     }
 
 }

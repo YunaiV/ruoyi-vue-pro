@@ -3,7 +3,6 @@ package cn.iocoder.yudao.module.promotion.controller.app.coupon.vo.coupon;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
-import jakarta.validation.constraints.Min;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -42,7 +41,6 @@ public class AppCouponRespVO {
     private Integer discountPercent;
 
     @Schema(description = "优惠金额", example = "10")
-    @Min(value = 0, message = "优惠金额需要大于等于 0")
     private Integer discountPrice;
 
     @Schema(description = "折扣上限", example = "100") // 单位：分，仅在 discountType 为 PERCENT 使用

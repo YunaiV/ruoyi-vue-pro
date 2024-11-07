@@ -75,12 +75,11 @@
           <el-checkbox
             v-for="dict in $dictMethod(DICT_TYPE.$dictType.toUpperCase())"
             :key="dict.value"
-            :label="dict.value"
-          >
-            {{ dict.label }}
-          </el-checkbox>
+            :label="dict.label"
+            :value="dict.value"
+          />
                 #else##没数据字典
-          <el-checkbox>请选择字典生成</el-checkbox>
+          <el-checkbox label="请选择字典生成" />
                 #end
         </el-checkbox-group>
       </el-form-item>
@@ -96,7 +95,7 @@
             {{ dict.label }}
           </el-radio>
                 #else##没数据字典
-          <el-radio label="1">请选择字典生成</el-radio>
+          <el-radio value="1">请选择字典生成</el-radio>
                 #end
         </el-radio-group>
       </el-form-item>

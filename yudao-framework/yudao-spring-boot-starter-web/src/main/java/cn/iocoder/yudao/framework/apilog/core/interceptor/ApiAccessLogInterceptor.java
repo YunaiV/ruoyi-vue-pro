@@ -1,6 +1,8 @@
 package cn.iocoder.yudao.framework.apilog.core.interceptor;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.io.resource.ResourceUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.util.servlet.ServletUtils;
 import cn.iocoder.yudao.framework.common.util.spring.SpringUtils;
@@ -11,7 +13,11 @@ import org.springframework.util.StopWatch;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
 
+import java.lang.reflect.Method;
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.stream.IntStream;
 
 /**
  * API 访问日志 Interceptor
@@ -49,6 +55,8 @@ public class ApiAccessLogInterceptor implements HandlerInterceptor {
             StopWatch stopWatch = new StopWatch();
             stopWatch.start();
             request.setAttribute(ATTRIBUTE_STOP_WATCH, stopWatch);
+            // 打印 Controller 路径
+            printHandlerMethodPosition(handlerMethod);
         }
         return true;
     }
@@ -61,6 +69,34 @@ public class ApiAccessLogInterceptor implements HandlerInterceptor {
             stopWatch.stop();
             log.info("[afterCompletion][完成请求 URL({}) 耗时({} ms)]",
                     request.getRequestURI(), stopWatch.getTotalTimeMillis());
+        }
+    }
+
+    /**
+     * 打印 Controller 方法路径
+     */
+    private void printHandlerMethodPosition(HandlerMethod handlerMethod) {
+        if (handlerMethod == null) {
+            return;
+        }
+        Method method = handlerMethod.getMethod();
+        Class<?> clazz = method.getDeclaringClass();
+        try {
+            // 获取 method 的 lineNumber
+            List<String> clazzContents = FileUtil.readUtf8Lines(
+                    ResourceUtil.getResource(null, clazz).getPath().replace("/target/classes/", "/src/main/java/")
+                            + clazz.getSimpleName() + ".java");
+            Optional<Integer> lineNumber = IntStream.range(0, clazzContents.size())
+                    .filter(i -> clazzContents.get(i).contains(" " + method.getName() + "(")) // 简单匹配，不考虑方法重名
+                    .mapToObj(i -> i + 1) // 行号从 1 开始
+                    .findFirst();
+            if (!lineNumber.isPresent()) {
+                return;
+            }
+            // 打印结果
+            System.out.printf("\tController 方法路径：%s(%s.java:%d)\n", clazz.getName(), clazz.getSimpleName(), lineNumber.get());
+        } catch (Exception ignore) {
+            // 忽略异常。原因：仅仅打印，非重要逻辑
         }
     }
 

@@ -24,6 +24,8 @@ public class BpmProcessInstanceCopyRespVO {
     @Schema(description = "流程实例的发起时间")
     private LocalDateTime processInstanceStartTime;
 
+    @Schema(description = "抄送的节点的活动编号")
+    private String activityId;
     @Schema(description = "发起抄送的任务编号")
     private String taskId;
     @Schema(description = "发起抄送的任务名称")

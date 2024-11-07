@@ -69,7 +69,7 @@ public class ApiSignatureAspect {
 
         // 3. 将 nonce 记入缓存，防止重复使用（重点二：此处需要将 ttl 设定为允许 timestamp 时间差的值 x 2 ）
         String nonce = request.getHeader(signature.nonce());
-        signatureRedisDAO.setNonce(nonce, signature.timeout() * 2, signature.timeUnit());
+        signatureRedisDAO.setNonce(appId, nonce, signature.timeout() * 2, signature.timeUnit());
         return true;
     }
 
@@ -113,7 +113,7 @@ public class ApiSignatureAspect {
         }
 
         // 3. 检查 nonce 是否存在，有且仅能使用一次
-        return signatureRedisDAO.getNonce(nonce) == null;
+        return signatureRedisDAO.getNonce(appId, nonce) == null;
     }
 
     /**
@@ -166,4 +166,3 @@ public class ApiSignatureAspect {
     }
 
 }
-

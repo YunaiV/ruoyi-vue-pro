@@ -37,6 +37,7 @@ public class S3FileClient extends AbstractFileClient<S3FileClientConfig> {
                 .region(buildRegion()) // Region
                 .credentials(config.getAccessKey(), config.getAccessSecret()) // 认证密钥
                 .build();
+        enableVirtualStyleEndpoint();
     }
 
     /**
@@ -84,6 +85,17 @@ public class S3FileClient extends AbstractFileClient<S3FileClientConfig> {
                     .replaceAll("." + S3FileClientConfig.ENDPOINT_TENCENT, ""); // 去除 Endpoint
         }
         return null;
+    }
+
+    /**
+     * 开启 VirtualStyle 模式
+     */
+    private void enableVirtualStyleEndpoint() {
+        if (StrUtil.containsAny(config.getEndpoint(),
+                S3FileClientConfig.ENDPOINT_TENCENT, // 腾讯云 https://cloud.tencent.com/document/product/436/41284
+                S3FileClientConfig.ENDPOINT_VOLCES)) { // 火山云 https://www.volcengine.com/docs/6349/1288493
+            client.enableVirtualStyleEndpoint();
+        }
     }
 
     @Override

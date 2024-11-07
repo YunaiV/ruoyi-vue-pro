@@ -5,6 +5,7 @@ import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -42,6 +43,10 @@ public class LoginUser {
      * 授权范围
      */
     private List<String> scopes;
+    /**
+     * 过期时间
+     */
+    private LocalDateTime expiresTime;
 
     // ========== 上下文 ==========
     /**

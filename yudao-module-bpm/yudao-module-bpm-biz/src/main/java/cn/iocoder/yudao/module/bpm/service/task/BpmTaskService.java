@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.bpm.service.task;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.task.*;
+import cn.iocoder.yudao.module.bpm.enums.definition.BpmUserTaskTimeoutHandlerTypeEnum;
 import jakarta.validation.Valid;
 import org.flowable.bpmn.model.UserTask;
 import org.flowable.task.api.Task;
@@ -19,6 +20,8 @@ import java.util.Map;
  * @author 芋道源码
  */
 public interface BpmTaskService {
+
+    // ========== Query 查询相关方法 ==========
 
     /**
      * 获得待办的流程任务分页
@@ -75,6 +78,67 @@ public interface BpmTaskService {
     List<HistoricTaskInstance> getTaskListByProcessInstanceId(String processInstanceId);
 
     /**
+     * 获取任务
+     *
+     * @param id 任务编号
+     * @return 任务
+     */
+    Task getTask(String id);
+
+    /**
+     * 获取历史任务
+     *
+     * @param id 任务编号
+     * @return 历史任务
+     */
+    HistoricTaskInstance getHistoricTask(String id);
+
+    /**
+     * 获取历史任务列表
+     *
+     * @param taskIds 任务编号集合
+     * @return 历史任务列表
+     */
+    List<HistoricTaskInstance> getHistoricTasks(Collection<String> taskIds);
+
+    /**
+     * 根据条件查询正在进行中的任务
+     *
+     * @param processInstanceId 流程实例编号，不允许为空
+     * @param assigned 是否分配了审批人，允许空
+     * @param taskDefineKey 任务定义 Key，允许空
+     */
+    List<Task> getRunningTaskListByProcessInstanceId(String processInstanceId,
+                                                     Boolean assigned,
+                                                     String taskDefineKey);
+
+    /**
+     * 获取当前任务的可回退的 UserTask 集合
+     *
+     * @param id 当前的任务 ID
+     * @return 可以回退的节点列表
+     */
+    List<UserTask> getUserTaskListByReturn(String id);
+
+    /**
+     * 获取指定任务的子任务列表
+     *
+     * @param parentTaskId 父任务ID
+     * @return 子任务列表
+     */
+    List<Task> getTaskListByParentTaskId(String parentTaskId);
+
+    /**
+     * 通过任务 ID，查询任务名 Map
+     *
+     * @param taskIds 任务 ID
+     * @return 任务 ID 与名字的 Map
+     */
+    Map<String, String> getTaskNameByTaskIds(Collection<String> taskIds);
+
+    // ========== Update 写入相关方法 ==========
+
+    /**
      * 通过任务
      *
      * @param userId 用户编号
@@ -99,41 +163,11 @@ public interface BpmTaskService {
     void transferTask(Long userId, BpmTaskTransferReqVO reqVO);
 
     /**
-     * 更新 Task 状态，在创建时
+     * 将指定流程实例的、进行中的流程任务，移动到结束节点
      *
-     * @param task 任务实体
+     * @param processInstanceId 流程编号
      */
-    void updateTaskStatusWhenCreated(Task task);
-
-    /**
-     * 更新 Task 状态，在取消时
-     *
-     * @param taskId 任务的编号
-     */
-    void updateTaskStatusWhenCanceled(String taskId);
-
-    /**
-     * 更新 Task 拓展记录，并发送通知
-     *
-     * @param task 任务实体
-     */
-    void updateTaskExtAssign(Task task);
-
-    /**
-     * 获取任务
-     *
-     * @param id 任务编号
-     * @return 任务
-     */
-    Task getTask(String id);
-
-    /**
-     * 获取当前任务的可回退的 UserTask 集合
-     *
-     * @param id 当前的任务 ID
-     * @return 可以回退的节点列表
-     */
-    List<UserTask> getUserTaskListByReturn(String id);
+    void moveTaskToEnd(String processInstanceId);
 
     /**
      * 将任务回退到指定的 targetDefinitionKey 位置
@@ -167,20 +201,41 @@ public interface BpmTaskService {
      */
     void deleteSignTask(Long userId, BpmTaskSignDeleteReqVO reqVO);
 
-    /**
-     * 获取指定任务的子任务列表
-     *
-     * @param parentTaskId 父任务ID
-     * @return 子任务列表
-     */
-    List<Task> getTaskListByParentTaskId(String parentTaskId);
+    // ========== Event 事件相关方法 ==========
 
     /**
-     * 通过任务 ID，查询任务名 Map
+     * 处理 Task 创建事件，目前是
      *
-     * @param taskIds 任务 ID
-     * @return 任务 ID 与名字的 Map
+     * 1. 更新它的状态为审批中
+     * 2. 处理自动通过的情况，例如说：1）无审批人时，是否自动通过、不通过；2）非【人工审核】时，是否自动通过、不通过
+     *
+     * 注意：它的触发时机，晚于 {@link #processTaskAssigned(Task)} 之后
+     *
+     * @param task 任务实体
      */
-    Map<String, String> getTaskNameByTaskIds(Collection<String> taskIds);
+    void processTaskCreated(Task task);
+
+    /**
+     * 处理 Task 取消事件，目前是更新它的状态为已取消
+     *
+     * @param taskId 任务的编号
+     */
+    void processTaskCanceled(String taskId);
+
+    /**
+     * 处理 Task 设置审批人事件，目前是发送审批消息
+     *
+     * @param task 任务实体
+     */
+    void processTaskAssigned(Task task);
+
+    /**
+     * 处理 Task 审批超时事件，可能会处理多个当前审批中的任务
+     *
+     * @param processInstanceId 流程示例编号
+     * @param taskDefineKey 任务 Key
+     * @param handlerType 处理类型，参见 {@link BpmUserTaskTimeoutHandlerTypeEnum}
+     */
+    void processTaskTimeout(String processInstanceId, String taskDefineKey, Integer handlerType);
 
 }

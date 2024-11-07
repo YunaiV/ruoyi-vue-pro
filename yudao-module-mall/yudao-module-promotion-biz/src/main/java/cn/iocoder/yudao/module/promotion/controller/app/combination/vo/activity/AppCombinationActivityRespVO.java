@@ -19,15 +19,14 @@ public class AppCombinationActivityRespVO {
     @Schema(description = "商品 SPU 编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "2048")
     private Long spuId;
 
+    @Schema(description = "商品 SPU 名字", requiredMode = Schema.RequiredMode.REQUIRED, example = "一个白菜")
+    private String spuName; // 从 SPU 的 name 读取
     @Schema(description = "商品图片", requiredMode = Schema.RequiredMode.REQUIRED, example = "4096")
-    // 从 SPU 的 picUrl 读取
-    private String picUrl;
-
+    private String picUrl; // 从 SPU 的 picUrl 读取
     @Schema(description = "商品市场价，单位：分", requiredMode = Schema.RequiredMode.REQUIRED, example = "50")
-    // 从 SPU 的 marketPrice 读取
-    private Integer marketPrice;
+    private Integer marketPrice; // 从 SPU 的 marketPrice 读取
 
     @Schema(description = "拼团金额，单位：分", requiredMode = Schema.RequiredMode.REQUIRED, example = "100")
-    private Integer combinationPrice;
+    private Integer combinationPrice; // 从 products 获取最小 price 读取
 
 }

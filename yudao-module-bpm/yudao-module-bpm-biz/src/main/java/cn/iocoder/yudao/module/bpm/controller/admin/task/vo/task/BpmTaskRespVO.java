@@ -61,12 +61,17 @@ public class BpmTaskRespVO {
     private Long formId;
     @Schema(description = "表单名字", example = "请假表单")
     private String formName;
-    @Schema(description = "表单的配置-JSON 字符串")
+    @Schema(description = "表单的配置，JSON 字符串")
     private String formConf;
     @Schema(description = "表单项的数组")
     private List<String> formFields;
     @Schema(description = "提交的表单值", requiredMode = Schema.RequiredMode.REQUIRED)
     private Map<String, Object> formVariables;
+    // @芋艿 都改成了 fieldsPermission。 buttonsSetting。和 BpmSimpleModelNodeVO 统一
+    @Schema(description = "表单字段权限值")
+    private Map<String, String> fieldsPermission;
+    @Schema(description = "操作按钮设置值")
+    private Map<Integer, OperationButtonSetting> buttonsSetting;
 
     @Data
     @Schema(description = "流程实例")
@@ -89,6 +94,17 @@ public class BpmTaskRespVO {
          */
         private BpmProcessInstanceRespVO.User startUser;
 
+    }
+
+    @Data
+    @Schema(description = "操作按钮设置")
+    public static class OperationButtonSetting {
+
+        @Schema(description = "显示名称", example = "审批")
+        private String displayName;
+
+        @Schema(description = "是否启用", example = "true")
+        private Boolean enable;
     }
 
 }

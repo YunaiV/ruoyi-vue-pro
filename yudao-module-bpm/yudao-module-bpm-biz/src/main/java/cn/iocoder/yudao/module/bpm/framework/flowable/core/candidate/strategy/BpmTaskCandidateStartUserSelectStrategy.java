@@ -2,11 +2,11 @@ package cn.iocoder.yudao.module.bpm.framework.flowable.core.candidate.strategy;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Assert;
-import cn.iocoder.yudao.module.bpm.framework.flowable.core.candidate.BpmTaskCandidateStrategy;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmTaskCandidateStrategyEnum;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.util.BpmnModelUtils;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.util.FlowableUtils;
 import cn.iocoder.yudao.module.bpm.service.task.BpmProcessInstanceService;
+import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import jakarta.annotation.Resource;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.UserTask;
@@ -23,11 +23,15 @@ import java.util.*;
  * @author 芋道源码
  */
 @Component
-public class BpmTaskCandidateStartUserSelectStrategy implements BpmTaskCandidateStrategy {
+public class BpmTaskCandidateStartUserSelectStrategy extends BpmTaskCandidateAbstractStrategy {
 
     @Resource
     @Lazy // 延迟加载，避免循环依赖
     private BpmProcessInstanceService processInstanceService;
+
+    public BpmTaskCandidateStartUserSelectStrategy(AdminUserApi adminUserApi) {
+        super(adminUserApi);
+    }
 
     @Override
     public BpmTaskCandidateStrategyEnum getStrategy() {
@@ -46,7 +50,23 @@ public class BpmTaskCandidateStartUserSelectStrategy implements BpmTaskCandidate
                 execution.getProcessInstanceId());
         // 获得审批人
         List<Long> assignees = startUserSelectAssignees.get(execution.getCurrentActivityId());
-        return new LinkedHashSet<>(assignees);
+        Set<Long> users = new LinkedHashSet<>(assignees);
+        removeDisableUsers(users);
+        return users;
+    }
+
+    @Override
+    public Set<Long> calculateUsers(Long startUserId, ProcessInstance processInstance, String activityId, String param) {
+        if (processInstance == null) {
+            return Collections.emptySet();
+        }
+        Map<String, List<Long>> startUserSelectAssignees = FlowableUtils.getStartUserSelectAssignees(processInstance);
+        Assert.notNull(startUserSelectAssignees, "流程实例({}) 的发起人自选审批人不能为空", processInstance.getId());
+        // 获得审批人
+        List<Long> assignees = startUserSelectAssignees.get(activityId);
+        Set<Long> users = new LinkedHashSet<>(assignees);
+        removeDisableUsers(users);
+        return users;
     }
 
     @Override

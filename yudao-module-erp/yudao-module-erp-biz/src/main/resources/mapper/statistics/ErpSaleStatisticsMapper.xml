@@ -10,6 +10,7 @@
                <if test="endTime != null">
                    AND out_time &lt; #{endTime}
                </if>
+               AND tenant_id = ${@cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder@getRequiredTenantId()}
                AND deleted = 0) -
             (SELECT IFNULL(SUM(total_price), 0)
                 FROM erp_sale_return
@@ -17,6 +18,7 @@
                 <if test="endTime != null">
                     AND return_time &lt; #{endTime}
                 </if>
+                AND tenant_id = ${@cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder@getRequiredTenantId()}
                 AND deleted = 0)
     </select>
 

@@ -13,11 +13,10 @@ public interface DictTypeConstants {
     // ========== SYSTEM 模块 ==========
 
     String USER_SEX = "system_user_sex"; // 用户性别
+    String DATA_SCOPE = "system_data_scope"; // 数据范围
 
     String LOGIN_TYPE = "system_login_type"; // 登录日志的类型
     String LOGIN_RESULT = "system_login_result"; // 登录结果
-
-    String ERROR_CODE_TYPE = "system_error_code_type"; // 错误码的类型枚举
 
     String SMS_CHANNEL_CODE = "system_sms_channel_code"; // 短信渠道编码
     String SMS_TEMPLATE_TYPE = "system_sms_template_type"; // 短信模板类型
