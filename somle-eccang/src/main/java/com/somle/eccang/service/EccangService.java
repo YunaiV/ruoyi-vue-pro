@@ -140,6 +140,8 @@ public class EccangService {
                     var responseOriginal = JsonUtils.parseObject(responseBody, EccangResponse.class);
                     validateResponse(responseOriginal);
                     return responseOriginal;
+                case 429:
+                    throw new HttpClientErrorException(HttpStatus.TOO_MANY_REQUESTS, "Too many requests, please try again later.");
                 default:
                     throw new RuntimeException("Unknown response code " + response);
             }
