@@ -97,7 +97,7 @@ public class EccangTest extends BaseSpringTest {
                 .platformPaidDateStart(datetime1)
                 .platformPaidDateEnd(datetime2)
             .build(),
-            "2023"
+            2023
         );
         log.info(result.toList().toString());
     }

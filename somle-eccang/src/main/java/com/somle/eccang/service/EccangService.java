@@ -4,26 +4,22 @@ import java.net.SocketTimeoutException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.time.LocalDateTime;
+import java.time.Year;
 import java.time.format.DateTimeFormatter;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import com.somle.eccang.model.*;
-import com.somle.framework.common.util.general.CoreUtils;
 import com.somle.framework.common.util.json.JsonUtils;
 import com.somle.framework.common.util.json.JSONObject;
 
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.integration.support.MessageBuilder;
 import org.springframework.messaging.MessageChannel;
-import org.springframework.retry.RetryPolicy;
-import org.springframework.retry.annotation.Backoff;
-import org.springframework.retry.annotation.Retryable;
 import org.springframework.retry.backoff.ExponentialBackOffPolicy;
 import org.springframework.retry.policy.ExceptionClassifierRetryPolicy;
 import org.springframework.retry.policy.SimpleRetryPolicy;
@@ -258,35 +254,42 @@ public class EccangService {
 
     @Scheduled(cron = "0 0 * * * *") // Executes every hour
     // @Scheduled(fixedDelay = 999999999, initialDelay = 1000)
-    public void uploadOrderShip() {
+    public void uploadRealtimeOrder() {
         LocalDateTime endTime = LocalDateTime.now();
-        LocalDateTime starTime = endTime.minusHours(3);
-        getOrderShip(starTime, endTime)
+        LocalDateTime startTime = endTime.minusHours(3);
+        var vo = EccangOrderVO.builder()
+            .platformShipDateStart(startTime)
+            .platformShipDateEnd(endTime)
+            .build();
+        getOrderUnarchive(vo)
             .forEach(order->{
                 saleChannel.send(MessageBuilder.withPayload(order).build());
             });
     }
 
-    public Stream<EccangOrder> getOrderShip(LocalDateTime startTime, LocalDateTime endTime) {
-        var vo = EccangOrderVO.builder()
-                .platformShipDateStart(startTime)
-                .platformShipDateEnd(endTime)
-                .build();
-        return getOrder(vo);
-    }
-
-    public Stream<EccangOrder> getOrder(EccangOrderVO vo) {
-        return getOrderPages(vo)
+    public Stream<EccangOrder> getOrderUnarchive(EccangOrderVO vo) {
+        return getOrderUnarchivePages(vo)
                 .map(n->n.getData(EccangOrder.class))
                 .flatMap(n->n.stream());
     }
 
-    public Stream<EccangPage> getOrderPlusArchivePages(EccangOrderVO orderParams, String year) {
-        return Stream.concat(getOrderPages(orderParams), getOrderArchivePages(orderParams, year));
+    public Stream<EccangOrder> getOrderPlusArchiveSince(EccangOrderVO vo, Integer startYear) {
+        int currentYear = Year.now().getValue();
+
+        return IntStream.rangeClosed(startYear, currentYear).boxed()
+            .flatMap(year->
+                getOrderPlusArchivePages(vo, year)
+                    .map(n->n.getData(EccangOrder.class))
+                    .flatMap(n->n.stream())
+            );
+    }
+
+    public Stream<EccangPage> getOrderPlusArchivePages(EccangOrderVO orderParams, Integer year) {
+        return Stream.concat(getOrderUnarchivePages(orderParams), getOrderArchivePages(orderParams, year));
     }
 
 
-    public Stream<EccangPage> getOrderArchivePages(EccangOrderVO orderParams, String year) {
+    public Stream<EccangPage> getOrderArchivePages(EccangOrderVO orderParams, Integer year) {
         JSONObject params = JsonUtils.newObject();
         params.put("get_detail", "1");
         params.put("get_address", "1");
@@ -297,7 +300,7 @@ public class EccangService {
     }
 
 
-    public Stream<EccangPage> getOrderPages(EccangOrderVO orderParams) {
+    public Stream<EccangPage> getOrderUnarchivePages(EccangOrderVO orderParams) {
         JSONObject params = JsonUtils.newObject();
         params.put("get_detail", "1");
         params.put("get_address", "1");

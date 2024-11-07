@@ -6,6 +6,7 @@ import com.somle.eccang.model.EccangResponse.EccangPage;
 import com.somle.eccang.model.EccangProduct;
 import com.somle.eccang.service.EccangService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.integration.support.MessageBuilder;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
@@ -36,14 +37,18 @@ public class EccangController {
             @RequestParam String startTime,
             @RequestParam String endTime
     ) {
-        return eccangService.getOrderShip(LocalDateTime.parse(startTime), LocalDateTime.parse(endTime)).toList();
+        var vo = EccangOrderVO.builder()
+                .platformShipDateStart(LocalDateTime.parse(startTime))
+                .platformShipDateEnd(LocalDateTime.parse(endTime))
+                .build();
+        return eccangService.getOrderUnarchive(vo).toList();
     }
 
     @GetMapping("/getOrder")
     public List<EccangPage> getOrder(
         EccangOrderVO order
     ) {
-        return eccangService.getOrderPages(order).toList();
+        return eccangService.getOrderUnarchivePages(order).toList();
     }
 
     @GetMapping("/getProducts")

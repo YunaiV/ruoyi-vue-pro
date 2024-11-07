@@ -13,7 +13,7 @@ public class EccangOrderUnshipDataJob extends EccangDataJob{
     public String execute(String param) throws Exception {
         setDate(param);
 
-        eccangService.getOrderPages(
+        eccangService.getOrderUnarchivePages(
                         EccangOrderVO.builder()
                                 .dateCreateSysEnd(yesterdayLastSecond)
                                 .status("3")

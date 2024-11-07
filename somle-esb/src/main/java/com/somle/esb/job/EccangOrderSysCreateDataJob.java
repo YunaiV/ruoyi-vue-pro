@@ -23,7 +23,7 @@ public class EccangOrderSysCreateDataJob extends EccangDataJob{
                     .dateCreateSysStart(beforeYesterdayFirstSecond)
                     .dateCreateSysEnd(beforeYesterdayLastSecond)
                     .build(),
-                String.valueOf(beforeYesterday.getYear())
+                beforeYesterday.getYear()
             )
             .forEach(page -> {
                 OssData data = OssData.builder()
