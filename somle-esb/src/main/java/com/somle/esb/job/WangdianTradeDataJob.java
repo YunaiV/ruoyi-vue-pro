@@ -34,6 +34,6 @@ public class WangdianTradeDataJob extends WangdianDataJob{
                 .build();
         service.send(data);
 
-        throw new Exception("data upload success");
+        return "data upload success";
     }
 }
