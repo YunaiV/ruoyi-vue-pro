@@ -17,6 +17,7 @@ import com.somle.framework.common.util.json.JSONObject;
 
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.integration.support.MessageBuilder;
 import org.springframework.messaging.MessageChannel;
@@ -115,7 +116,7 @@ public class EccangService {
     private EccangResponse getResponse(Object payload, String endpoint){
         var retryPolicy = new ExceptionClassifierRetryPolicy();
         retryPolicy.setPolicyMap(Map.of(
-            HttpClientErrorException.TooManyRequests.class, new SimpleRetryPolicy(10),
+            HttpClientErrorException.class, new SimpleRetryPolicy(10),
             SocketTimeoutException.class, new SimpleRetryPolicy(10)
         ));
 
