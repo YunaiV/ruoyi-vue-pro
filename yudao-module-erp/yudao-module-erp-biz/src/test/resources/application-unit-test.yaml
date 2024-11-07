@@ -33,10 +33,10 @@ logging:
 spring:
   # 数据源配置项
   datasource:
-    url: jdbc:mysql://localhost:3306/ruoyi-vue-pro?serverTimezone=GMT%2B8&useSSL=false&characterEncoding=utf-8
+    url: jdbc:mysql://192.168.10.151:3306/ruoyi-vue-test?serverTimezone=GMT%2B8&useSSL=false&characterEncoding=utf-8
     driverClassName: com.mysql.cj.jdbc.Driver
-    username: root
-    password: 'YMCA@1978'
+    username: it003
+    password: asivJssflioKK
 #  datasource:
 #    name: ruoyi-vue-pro
 #    url: jdbc:h2:mem:testdb;MODE=MYSQL;DATABASE_TO_UPPER=false;NON_KEYWORDS=value; # MODE 使用 MySQL 模式；DATABASE_TO_UPPER 配置表和字段使用小写
@@ -46,9 +46,9 @@ spring:
 #    druid:
 #      async-init: true # 单元测试，异步初始化 Druid 连接池，提升启动速度
 #      initial-size: 1 # 单元测试，配置为 1，提升启动速度
-  sql:
-    init:
-      schema-locations: classpath:/sql/create_tables.sql
+#  sql:
+#    init:
+#      schema-locations: classpath:/sql/create_tables.sql
 
   # Redis 配置。Redisson 默认的配置足够使用，一般不需要进行调优
   data:
@@ -73,8 +73,8 @@ spring:
 --- #################### 芋道相关配置 ####################
 
 # 芋道配置项，设置当前项目所有自定义的配置
-#yudao:
-#  info:
-#    base-package: cn.iocoder.yudao.module
+yudao:
+  info:
+    base-package: cn.iocoder.yudao.module
 somle:
   base-package: com.somle.amazon

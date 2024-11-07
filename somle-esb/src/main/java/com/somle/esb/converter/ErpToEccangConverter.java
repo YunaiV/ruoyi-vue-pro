@@ -24,8 +24,8 @@ import static com.somle.esb.enums.ErrorCodeConstants.DEPT_LEVEL_ERROR;
 
 @Service
 public class ErpToEccangConverter {
-    @Autowired
-    ErpDepartmentService erpDepartmentService;
+//    @Autowired
+//    ErpDepartmentService erpDepartmentService;
 
     @Autowired
     EccangService eccangService;
@@ -33,63 +33,63 @@ public class ErpToEccangConverter {
     @Autowired
     private DeptApi deptApi;
 
-    public EccangProduct toEccang(ErpCountrySku erpCountrySku) {
-        ErpStyleSku erpStyleSku = erpCountrySku.getStyleSku();
-        Long deptId = erpStyleSku.getSaleDepartmentId();
-        EccangProduct product = new EccangProduct();
-        List<ErpDepartment> path = erpDepartmentService.getDepartmentParents(deptId).toList();
-        Collections.reverse(path);
-        // Integer level = path.size() - 1;
-        EccangOrganization organization = eccangService.getOrganizationByNameEn(path.get(2).getId().toString());
-
-        product.setProductSku(erpCountrySku.getCountrySku());
-        product.setProductTitle(erpStyleSku.getNameZh());
-        product.setProductTitleEn(erpStyleSku.getNameEn());
-
-        product.setProductImgUrlList(erpStyleSku.getImageUrlList());
-
-        product.setPdNetWeight(erpStyleSku.getWeight());
-        product.setPdNetLength(erpStyleSku.getLength());
-        product.setPdNetWeight(erpStyleSku.getWidth());
-        product.setPdNetHeight(erpStyleSku.getHeight());
-        product.setProductWeight(erpStyleSku.getPackageWeight());
-        product.setProductLength(erpStyleSku.getPackageLength());
-        product.setProductWidth(erpStyleSku.getPackageWidth());
-        product.setProductHeight(erpStyleSku.getPackageHeight());
-        product.setProductMaterial(erpStyleSku.getMaterialZh());
-        product.setMaterialEn(erpStyleSku.getMaterialEn());
-
-
-        product.setProductPurchaseValue(erpStyleSku.getPurchasePrice());
-        product.setCurrencyCode(erpStyleSku.getPurchasePriceCurrencyCode());
-        product.setDefaultSupplierCode(erpStyleSku.getDefaultSupplierCode());
-
-        product.setSaleStatus(erpStyleSku.getSaleStatus());
-
-        product.setLogisticAttribute(erpCountrySku.getLogisticAttribute());
-        product.setHsCode(erpCountrySku.getHscode());
-        product.setProductDeclaredValue(erpCountrySku.getDeclaredValue());
-        product.setPdDeclareCurrencyCode(erpCountrySku.getDeclaredValueCurrencyCode());
-        product.setPdOverseaTypeCn(erpCountrySku.getDeclaredTypeZh());
-        product.setPdOverseaTypeEn(erpCountrySku.getDeclaredTypeEn());
-        product.setFboTaxRate(erpCountrySku.getExportCustomTaxRate());
-        product.setPdDeclarationStatement(erpCountrySku.getImportCustomTaxRate().toString());
-
-
-
-        try {
-            EccangCategory category1 = eccangService.getCategoryByNameEn(path.get(1).getId().toString());
-            product.setProductCategoryId1(category1.getPcId());
-            EccangCategory category2 = eccangService.getCategoryByNameEn(path.get(2).getId().toString());
-            product.setProductCategoryId2(category2.getPcId());
-            EccangCategory category3 = eccangService.getCategoryByNameEn(deptId.toString());
-            product.setProductCategoryId3(category3.getPcId());
-        } catch (Exception e) {
-        }
-
-        product.setUserOrganizationId(organization.getId());
-        return product;
-    }
+//    public EccangProduct toEccang(ErpCountrySku erpCountrySku) {
+//        ErpStyleSku erpStyleSku = erpCountrySku.getStyleSku();
+//        Long deptId = erpStyleSku.getSaleDepartmentId();
+//        EccangProduct product = new EccangProduct();
+//        List<ErpDepartment> path = erpDepartmentService.getDepartmentParents(deptId).toList();
+//        Collections.reverse(path);
+//        // Integer level = path.size() - 1;
+//        EccangOrganization organization = eccangService.getOrganizationByNameEn(path.get(2).getId().toString());
+//
+//        product.setProductSku(erpCountrySku.getCountrySku());
+//        product.setProductTitle(erpStyleSku.getNameZh());
+//        product.setProductTitleEn(erpStyleSku.getNameEn());
+//
+//        product.setProductImgUrlList(erpStyleSku.getImageUrlList());
+//
+//        product.setPdNetWeight(erpStyleSku.getWeight());
+//        product.setPdNetLength(erpStyleSku.getLength());
+//        product.setPdNetWeight(erpStyleSku.getWidth());
+//        product.setPdNetHeight(erpStyleSku.getHeight());
+//        product.setProductWeight(erpStyleSku.getPackageWeight());
+//        product.setProductLength(erpStyleSku.getPackageLength());
+//        product.setProductWidth(erpStyleSku.getPackageWidth());
+//        product.setProductHeight(erpStyleSku.getPackageHeight());
+//        product.setProductMaterial(erpStyleSku.getMaterialZh());
+//        product.setMaterialEn(erpStyleSku.getMaterialEn());
+//
+//
+//        product.setProductPurchaseValue(erpStyleSku.getPurchasePrice());
+//        product.setCurrencyCode(erpStyleSku.getPurchasePriceCurrencyCode());
+//        product.setDefaultSupplierCode(erpStyleSku.getDefaultSupplierCode());
+//
+//        product.setSaleStatus(erpStyleSku.getSaleStatus());
+//
+//        product.setLogisticAttribute(erpCountrySku.getLogisticAttribute());
+//        product.setHsCode(erpCountrySku.getHscode());
+//        product.setProductDeclaredValue(erpCountrySku.getDeclaredValue());
+//        product.setPdDeclareCurrencyCode(erpCountrySku.getDeclaredValueCurrencyCode());
+//        product.setPdOverseaTypeCn(erpCountrySku.getDeclaredTypeZh());
+//        product.setPdOverseaTypeEn(erpCountrySku.getDeclaredTypeEn());
+//        product.setFboTaxRate(erpCountrySku.getExportCustomTaxRate());
+//        product.setPdDeclarationStatement(erpCountrySku.getImportCustomTaxRate().toString());
+//
+//
+//
+//        try {
+//            EccangCategory category1 = eccangService.getCategoryByNameEn(path.get(1).getId().toString());
+//            product.setProductCategoryId1(category1.getPcId());
+//            EccangCategory category2 = eccangService.getCategoryByNameEn(path.get(2).getId().toString());
+//            product.setProductCategoryId2(category2.getPcId());
+//            EccangCategory category3 = eccangService.getCategoryByNameEn(deptId.toString());
+//            product.setProductCategoryId3(category3.getPcId());
+//        } catch (Exception e) {
+//        }
+//
+//        product.setUserOrganizationId(organization.getId());
+//        return product;
+//    }
 
     public List<EccangProduct> toEccang(List<ErpProductDTO> allProducts){
         List<EccangProduct> allEccangProducts = new ArrayList<>();

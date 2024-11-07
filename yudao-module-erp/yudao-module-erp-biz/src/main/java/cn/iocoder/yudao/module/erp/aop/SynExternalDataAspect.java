@@ -89,7 +89,9 @@ public class SynExternalDataAspect {
         products = products.stream().filter(product -> ObjUtil.isNotEmpty(product.getRuleId())).toList();
         //数据同步
         if (CollUtil.isNotEmpty(products)){
+            log.info("send begin");
             messageChannel.send(MessageBuilder.withPayload(products).build());
+            log.info("send end");
         }
         return result;
     }

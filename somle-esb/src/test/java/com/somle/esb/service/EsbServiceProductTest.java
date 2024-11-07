@@ -1,9 +1,15 @@
 package com.somle.esb.service;
 
 
+import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.mybatis.config.YudaoMybatisAutoConfiguration;
 import cn.iocoder.yudao.framework.security.config.YudaoSecurityAutoConfiguration;
 import cn.iocoder.yudao.module.erp.api.product.dto.ErpProductDTO;
+import cn.iocoder.yudao.module.erp.controller.admin.logistic.customrule.vo.ErpCustomRuleSaveReqVO;
+import cn.iocoder.yudao.module.erp.dal.dataobject.logistic.customrule.ErpCustomRuleDO;
+import cn.iocoder.yudao.module.erp.dal.mysql.logistic.customrule.ErpCustomRuleMapper;
+import cn.iocoder.yudao.module.erp.service.logistic.customrule.ErpCustomRuleService;
+import cn.iocoder.yudao.module.erp.service.logistic.customrule.ErpCustomRuleServiceImpl;
 import cn.iocoder.yudao.module.infra.api.config.ConfigApi;
 import cn.iocoder.yudao.module.infra.api.file.FileApi;
 import cn.iocoder.yudao.module.system.api.dept.DeptApi;
@@ -24,20 +30,25 @@ import com.somle.esb.converter.DingTalkToErpConverter;
 import com.somle.esb.converter.EccangToErpConverter;
 import com.somle.esb.converter.ErpToEccangConverter;
 import com.somle.esb.converter.ErpToKingdeeConverter;
+import com.somle.framework.test.core.ut.BaseDbUnitTest;
 import com.somle.framework.test.core.ut.BaseSpringTest;
 import com.somle.kingdee.service.KingdeeService;
 import com.somle.matomo.service.MatomoService;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
+import org.mybatis.spring.annotation.MapperScans;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.autoconfigure.quartz.QuartzAutoConfiguration;
 import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.context.annotation.Import;
 import org.springframework.integration.support.MessageBuilder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.test.annotation.Commit;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Slf4j
@@ -47,6 +58,8 @@ import java.util.List;
     EccangService.class,
     KingdeeService.class,
     AmazonService.class,
+
+    ErpCustomRuleServiceImpl.class,
 
 
 
@@ -69,7 +82,7 @@ import java.util.List;
     YudaoMybatisAutoConfiguration.class, //Enable DefaultDBFieldHandler
     MybatisPlusAutoConfiguration.class, // MyBatis 的自动配置类
     MybatisPlusJoinAutoConfiguration.class})
-class EsbServiceProductTest extends BaseSpringTest {
+class EsbServiceProductTest extends BaseDbUnitTest {
     @Resource
     private EsbService esbService;
 
@@ -79,7 +92,7 @@ class EsbServiceProductTest extends BaseSpringTest {
     KingdeeService kingdeeService;
 
     @Resource
-    private DeptApi deptApi;
+    DeptApi deptApi;
 
     @MockBean
     AmazonService amazonService;
@@ -92,14 +105,16 @@ class EsbServiceProductTest extends BaseSpringTest {
     @MockBean
     DingTalkToErpConverter dingTalkToErpConverter;
 
+    @Resource
+    ErpCustomRuleService erpCustomRuleService;
+
+    @Resource
+    ErpCustomRuleMapper erpCustomRuleMapper;
+
 
 //    @Resource
 //    private DeptConvert deptConvert;
 
-    @MockBean
-    ErpProductService erpProductService;
-    @MockBean
-    ErpDepartmentService erpDepartmentService;
 
     @MockBean
     AdminUserApi adminUserApi;
@@ -165,5 +180,38 @@ class EsbServiceProductTest extends BaseSpringTest {
 //        esbService.syncProductsToKingdee(MessageBuilder.withPayload(List.of(product)).build());
     }
 
+    @Test
+    @Commit
+    public void test3() {
+        ErpCustomRuleSaveReqVO erpCustomRuleSaveReqVO = new ErpCustomRuleSaveReqVO();
+//        erpCustomRuleSaveReqVO.setId(15675L);
+        erpCustomRuleSaveReqVO.setCountryCode("US");
+        erpCustomRuleSaveReqVO.setType("报关");
+        erpCustomRuleSaveReqVO.setSupplierProductId(67890L);
+        erpCustomRuleSaveReqVO.setDeclaredTypeEn("Electronic Component");
+        erpCustomRuleSaveReqVO.setDeclaredType("电子元件");
+        erpCustomRuleSaveReqVO.setDeclaredValue(150.75);
+        erpCustomRuleSaveReqVO.setDeclaredValueCurrencyCode("USD");
+        erpCustomRuleSaveReqVO.setTaxRate(new BigDecimal("0.18"));
+        erpCustomRuleSaveReqVO.setHscode("85423190");
+        erpCustomRuleSaveReqVO.setLogisticAttribute("Fragile");
+
+        ErpCustomRuleDO customRule = BeanUtils.toBean(erpCustomRuleSaveReqVO, ErpCustomRuleDO.class);
+        log.info(erpCustomRuleMapper.selectList().toString());
+        erpCustomRuleService.createCustomRule(erpCustomRuleSaveReqVO);
+        log.info(erpCustomRuleMapper.selectList().toString());
+
+    }
+
+    @Test
+    public void test4() {
+        log.info(erpCustomRuleMapper.selectList().toString());
+    }
+
+    @Test
+    public void test5() {
+        log.info(erpCustomRuleMapper.selectList().toString());
+
+    }
 
 }

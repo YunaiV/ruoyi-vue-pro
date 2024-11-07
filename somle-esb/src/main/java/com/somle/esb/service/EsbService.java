@@ -17,7 +17,6 @@ import com.somle.eccang.model.EccangProduct;
 import com.somle.eccang.model.EccangResponse;
 import com.somle.eccang.service.EccangService;
 import com.somle.erp.model.product.ErpCountrySku;
-import com.somle.erp.service.ErpProductService;
 import com.somle.esb.converter.DingTalkToErpConverter;
 import com.somle.esb.converter.EccangToErpConverter;
 import com.somle.esb.converter.ErpToEccangConverter;
@@ -65,8 +64,6 @@ public class EsbService {
     @Autowired
     MatomoService matomoService;
 
-    @Autowired
-    ErpProductService erpProductService;
 
     @Autowired
     private DeptApi deptApi;
@@ -123,28 +120,28 @@ public class EsbService {
     }
 
 
-    @ServiceActivator(inputChannel = "productChannel")
-    public void handleProduct(Message<ErpCountrySku> message) {
-        EccangProduct product = erpToEccangConverter.toEccang(message.getPayload());
-        product.setActionType("ADD");
-        EccangProduct eccangServiceProduct = eccangService.getProduct(product.getProductSku());
-        if (ObjUtil.isNotEmpty(eccangServiceProduct)){
-            product.setActionType("EDIT");
-        }
-        log.debug(product.toString());
-        EccangResponse.EccangPage response = eccangService.addProduct(product);
-        log.info(response.toString());
-    }
+//    @ServiceActivator(inputChannel = "productChannel")
+//    public void handleProduct(Message<ErpCountrySku> message) {
+//        EccangProduct product = erpToEccangConverter.toEccang(message.getPayload());
+//        product.setActionType("ADD");
+//        EccangProduct eccangServiceProduct = eccangService.getProduct(product.getProductSku());
+//        if (ObjUtil.isNotEmpty(eccangServiceProduct)){
+//            product.setActionType("EDIT");
+//        }
+//        log.debug(product.toString());
+//        EccangResponse.EccangPage response = eccangService.addProduct(product);
+//        log.info(response.toString());
+//    }
 
-    @ServiceActivator(inputChannel = "productChannel")
-    public boolean handleProducts(Message<EccangProduct> message) {
-        var product = message.getPayload();
-        var erpProduct = eccangToErpConverter.toEsb(product);
-        erpProductService.saveProduct(erpProduct);
-        var kingdeeProduct = erpToKingdeeConverter.toKingdee(erpProduct);
-        kingdeeService.addProduct(kingdeeProduct);
-        return true;
-    }
+//    @ServiceActivator(inputChannel = "productChannel")
+//    public boolean handleProducts(Message<EccangProduct> message) {
+//        var product = message.getPayload();
+//        var erpProduct = eccangToErpConverter.toEsb(product);
+//        erpProductService.saveProduct(erpProduct);
+//        var kingdeeProduct = erpToKingdeeConverter.toKingdee(erpProduct);
+//        kingdeeService.addProduct(kingdeeProduct);
+//        return true;
+//    }
 
     /**
     * @Author Wqh
@@ -155,6 +152,7 @@ public class EsbService {
     **/
     @ServiceActivator(inputChannel = "syncExternalDataChannel")
     public void syncProductsToEccang(Message<List<ErpProductDTO>> message) {
+        log.info("syncProductsToEccang");
         List<EccangProduct> eccangProducts = erpToEccangConverter.toEccang(message.getPayload());
         for (EccangProduct eccangProduct : eccangProducts){
             eccangProduct.setActionType("ADD");
@@ -169,6 +167,7 @@ public class EsbService {
             log.debug(eccangProduct.toString());
             eccangService.addBatchProduct(List.of(eccangProduct));
         }
+        log.info("syncProductsToEccang end");
     }
 
     /**
@@ -180,10 +179,12 @@ public class EsbService {
      **/
     @ServiceActivator(inputChannel = "syncExternalDataChannel")
     public void syncProductsToKingdee(Message<List<ErpProductDTO>> message) {
+        log.info("syncProductsToKingdee");
         List<KingdeeProduct> kingdee = erpToKingdeeConverter.toKingdee(message.getPayload());
         for (KingdeeProduct kingdeeProduct : kingdee){
             kingdeeService.addProduct(kingdeeProduct);
         }
+        log.info("syncProductsToKingdee end");
     }
 
     /**

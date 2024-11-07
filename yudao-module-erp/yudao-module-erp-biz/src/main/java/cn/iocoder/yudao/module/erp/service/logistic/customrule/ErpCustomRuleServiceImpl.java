@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.erp.service.logistic.customrule;
 
 import cn.iocoder.yudao.module.erp.aop.SynExternalData;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import jakarta.annotation.Resource;
 import org.springframework.validation.annotation.Validated;
@@ -24,6 +25,7 @@ import static cn.iocoder.yudao.module.erp.enums.ErrorCodeConstants.*;
  *
  * @author 索迈管理员
  */
+@Slf4j
 @Service
 @Validated
 public class ErpCustomRuleServiceImpl implements ErpCustomRuleService {
@@ -34,9 +36,12 @@ public class ErpCustomRuleServiceImpl implements ErpCustomRuleService {
     @Override
     @SynExternalData(table = ERP_CUSTOM_RULE)
     public Long createCustomRule(ErpCustomRuleSaveReqVO createReqVO) {
+        log.info("create custom rule");
         // 插入
         ErpCustomRuleDO customRule = BeanUtils.toBean(createReqVO, ErpCustomRuleDO.class);
+        log.info(customRuleMapper.selectList().toString());
         customRuleMapper.insert(customRule);
+        log.info(customRuleMapper.selectList().toString());
         // 返回
         return customRule.getId();
     }
