@@ -22,7 +22,7 @@ import cn.iocoder.yudao.module.iot.enums.product.IotAccessModeEnum;
 import cn.iocoder.yudao.module.iot.enums.product.IotProductFunctionTypeEnum;
 import cn.iocoder.yudao.module.iot.enums.product.IotProductStatusEnum;
 import cn.iocoder.yudao.module.iot.service.product.IotProductService;
-import cn.iocoder.yudao.module.iot.service.tdengine.IotDbStructureDataService;
+import cn.iocoder.yudao.module.iot.service.tdengine.IotSuperTableService;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -52,7 +52,7 @@ public class IotThinkModelFunctionServiceImpl implements IotThinkModelFunctionSe
     @Resource
     private IotProductService productService;
     @Resource
-    private IotDbStructureDataService dbStructureDataService;
+    private IotSuperTableService dbStructureDataService;
 
     @Override
     @Transactional(rollbackFor = Exception.class)

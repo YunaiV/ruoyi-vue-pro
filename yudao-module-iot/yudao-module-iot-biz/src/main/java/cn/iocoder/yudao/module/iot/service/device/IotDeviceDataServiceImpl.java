@@ -6,13 +6,13 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.iot.controller.admin.device.vo.deviceData.IotDeviceDataReqVO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDataDO;
+import cn.iocoder.yudao.module.iot.dal.dataobject.tdengine.SelectVisualDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.tdengine.ThingModelMessage;
 import cn.iocoder.yudao.module.iot.dal.dataobject.thinkmodelfunction.IotThinkModelFunctionDO;
 import cn.iocoder.yudao.module.iot.dal.redis.deviceData.DeviceDataRedisDAO;
-import cn.iocoder.yudao.module.iot.dal.tdengine.TdEngineMapper;
-import cn.iocoder.yudao.module.iot.domain.visual.SelectVisualDto;
 import cn.iocoder.yudao.module.iot.enums.product.IotProductFunctionTypeEnum;
 import cn.iocoder.yudao.module.iot.service.tdengine.IotThingModelMessageService;
+import cn.iocoder.yudao.module.iot.service.tdengine.TdEngineQueryService;
 import cn.iocoder.yudao.module.iot.service.thinkmodelfunction.IotThinkModelFunctionService;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
@@ -39,12 +39,11 @@ public class IotDeviceDataServiceImpl implements IotDeviceDataService {
     private IotThingModelMessageService thingModelMessageService;
     @Resource
     private IotThinkModelFunctionService thinkModelFunctionService;
+    @Resource
+    private TdEngineQueryService tdEngineQueryService;
 
     @Resource
     private DeviceDataRedisDAO deviceDataRedisDAO;
-
-    @Resource
-    private TdEngineMapper tdEngineMapper;
 
     @Override
     public void saveDeviceData(String productKey, String deviceName, String message) {
@@ -112,18 +111,18 @@ public class IotDeviceDataServiceImpl implements IotDeviceDataService {
         // 1. 获取设备信息
         IotDeviceDO device = deviceService.getDevice(deviceDataReqVO.getDeviceId());
         // 2. 获取设备属性历史数据
-        SelectVisualDto selectVisualDto = new SelectVisualDto();
-        selectVisualDto.setDataBaseName(getDatabaseName());
-        selectVisualDto.setTableName(getDeviceTableName(device.getProductKey(), device.getDeviceName()));
-        selectVisualDto.setFieldName(deviceDataReqVO.getIdentifier());
-        selectVisualDto.setStartTime(DateUtil.date(deviceDataReqVO.getTimes()[0].atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()).getTime());
-        selectVisualDto.setEndTime(DateUtil.date(deviceDataReqVO.getTimes()[1].atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()).getTime());
+        SelectVisualDO selectVisualDO = new SelectVisualDO();
+        selectVisualDO.setDataBaseName(getDatabaseName());
+        selectVisualDO.setTableName(getDeviceTableName(device.getProductKey(), device.getDeviceName()));
+        selectVisualDO.setFieldName(deviceDataReqVO.getIdentifier());
+        selectVisualDO.setStartTime(DateUtil.date(deviceDataReqVO.getTimes()[0].atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()).getTime());
+        selectVisualDO.setEndTime(DateUtil.date(deviceDataReqVO.getTimes()[1].atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()).getTime());
         Map<String, Object> params = new HashMap<>();
         params.put("rows", deviceDataReqVO.getPageSize());
         params.put("page", (deviceDataReqVO.getPageNo() - 1) * deviceDataReqVO.getPageSize());
-        selectVisualDto.setParams(params);
-        pageResult.setList(tdEngineMapper.getHistoryData(selectVisualDto));
-        pageResult.setTotal(tdEngineMapper.getHistoryCount(selectVisualDto));
+        selectVisualDO.setParams(params);
+        pageResult.setList(tdEngineQueryService.getHistoryData(selectVisualDO));
+        pageResult.setTotal(tdEngineQueryService.getHistoryCount(selectVisualDO));
         return pageResult;
     }
 

@@ -6,8 +6,8 @@ import cn.iocoder.yudao.module.iot.controller.admin.device.vo.device.IotDeviceSt
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDataDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.tdengine.FieldParser;
-import cn.iocoder.yudao.module.iot.dal.dataobject.tdengine.TableDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.tdengine.TdFieldDO;
+import cn.iocoder.yudao.module.iot.dal.dataobject.tdengine.TdTableDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.tdengine.ThingModelMessage;
 import cn.iocoder.yudao.module.iot.dal.dataobject.thinkmodelfunction.IotThinkModelFunctionDO;
 import cn.iocoder.yudao.module.iot.dal.redis.deviceData.DeviceDataRedisDAO;
@@ -23,6 +23,9 @@ import org.springframework.stereotype.Service;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * 物模型消息 Service 实现类
+ */
 @Slf4j
 @Service
 public class IotThingModelMessageServiceImpl implements IotThingModelMessageService {
@@ -35,7 +38,11 @@ public class IotThingModelMessageServiceImpl implements IotThingModelMessageServ
     @Resource
     private IotDeviceService iotDeviceService;
     @Resource
-    private IotTdEngineService iotTdEngineService;
+    private TdEngineTableService tdEngineTableService;
+    @Resource
+    private TdEngineSuperTableService tdEngineSuperTableService;
+    @Resource
+    private TdEngineDataWriterService tdEngineDataWriterService;
 
     @Resource
     private DeviceDataRedisDAO deviceDataRedisDAO;
@@ -90,14 +97,11 @@ public class IotThingModelMessageServiceImpl implements IotThingModelMessageServ
             return;
         }
 
-        // 构建并保存设备属性
-        TableDO tableData = new TableDO();
-        tableData.setDataBaseName(getDatabaseName());
-        tableData.setSuperTableName(getProductPropertySTableName(device.getDeviceType(), device.getProductKey()));
-        tableData.setTableName(getDeviceTableName(device.getProductKey(), device.getDeviceName()));
-        tableData.setSchemaFieldValues(schemaFieldValues);
-
-        iotTdEngineService.insertData(tableData);
+        // 构建并保存设备属性数据
+        tdEngineDataWriterService.insertData(TdTableDO.builder().build()
+                .setDataBaseName(getDatabaseName())
+                .setTableName(getDeviceTableName(device.getProductKey(), device.getDeviceName()))
+                .setColumns(schemaFieldValues));
     }
 
     /**
@@ -135,7 +139,7 @@ public class IotThingModelMessageServiceImpl implements IotThingModelMessageServ
         String superTableName = getProductPropertySTableName(deviceType, productKey);
         String dataBaseName = getDatabaseName();
 
-        List<Map<String, Object>> maps = iotTdEngineService.describeSuperTable(dataBaseName, superTableName);
+        List<Map<String, Object>> maps = tdEngineSuperTableService.describeSuperTable(new TdTableDO(dataBaseName, superTableName));
         List<TdFieldDO> tagsFieldValues = new ArrayList<>();
 
         if (maps != null) {
@@ -159,13 +163,11 @@ public class IotThingModelMessageServiceImpl implements IotThingModelMessageServ
 
         // 创建设备数据表
         String tableName = getDeviceTableName(productKey, deviceName);
-        TableDO tableDto = new TableDO();
-        tableDto.setDataBaseName(dataBaseName);
-        tableDto.setSuperTableName(superTableName);
-        tableDto.setTableName(tableName);
-        tableDto.setTagsFieldValues(tagsFieldValues);
-
-        iotTdEngineService.createTable(tableDto);
+        tdEngineTableService.createTable(TdTableDO.builder().build()
+                .setDataBaseName(dataBaseName)
+                .setSuperTableName(superTableName)
+                .setTableName(tableName)
+                .setTags(tagsFieldValues));
     }
 
     /**

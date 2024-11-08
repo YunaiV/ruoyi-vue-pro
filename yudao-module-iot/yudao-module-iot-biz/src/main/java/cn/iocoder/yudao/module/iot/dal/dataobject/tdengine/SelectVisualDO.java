@@ -1,11 +1,11 @@
-package cn.iocoder.yudao.module.iot.domain.visual;
+package cn.iocoder.yudao.module.iot.dal.dataobject.tdengine;
 
 import lombok.Data;
 
 import java.util.Map;
 
 @Data
-public class SelectVisualDto {
+public class SelectVisualDO {
 
     /**
      * 数据库名称

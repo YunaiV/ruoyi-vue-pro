@@ -20,11 +20,6 @@ public class TdFieldDO {
     private String fieldName;
 
     /**
-     * 字段值
-     */
-    private Object fieldValue;
-
-    /**
      * 字段类型
      */
     private String dataType;
@@ -33,6 +28,11 @@ public class TdFieldDO {
      * 字段长度
      */
     private Integer dataLength = 0;
+
+    /**
+     * 字段值
+     */
+    private Object fieldValue;
 
     public TdFieldDO(String fieldName, String dataType, Integer dataLength) {
         this.fieldName = fieldName;

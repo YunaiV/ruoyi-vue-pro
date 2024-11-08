@@ -75,5 +75,5 @@ public interface IotThinkModelFunctionService {
      * @param productKey 产品 Key
      * @return 产品物模型列表
      */
-    List<IotThinkModelFunctionDO>  getThinkModelFunctionListByProductKey(String productKey);
+    List<IotThinkModelFunctionDO> getThinkModelFunctionListByProductKey(String productKey);
 }

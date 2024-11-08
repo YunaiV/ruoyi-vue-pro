@@ -1,26 +1,15 @@
 package cn.iocoder.yudao.module.iot.service.tdengine;
 
 
-import cn.iocoder.yudao.module.iot.controller.admin.thinkmodelfunction.thingModel.ThingModelRespVO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.product.IotProductDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.thinkmodelfunction.IotThinkModelFunctionDO;
 
 import java.util.List;
 
 /**
- * 数据结构接口
+ * IoT 超级表服务，负责根据物模型创建和更新超级表，以及创建超级表的子表等操作。
  */
-public interface IotDbStructureDataService {
-
-    /**
-     * 创建物模型定义
-     */
-    void createSuperTable(ThingModelRespVO thingModel, Integer deviceType);
-
-    /**
-     * 更新物模型定义
-     */
-    void updateSuperTable(ThingModelRespVO thingModel, Integer deviceType);
+public interface IotSuperTableService {
 
     /**
      * 创建超级表数据模型

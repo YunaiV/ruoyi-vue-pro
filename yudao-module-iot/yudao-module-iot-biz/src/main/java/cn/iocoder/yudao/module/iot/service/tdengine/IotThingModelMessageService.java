@@ -11,8 +11,8 @@ public interface IotThingModelMessageService {
     /**
      * 保存物模型消息
      *
-     * @param device 设备
+     * @param device            设备
      * @param thingModelMessage 物模型消息
      */
-    void saveThingModelMessage(IotDeviceDO device,ThingModelMessage thingModelMessage);
+    void saveThingModelMessage(IotDeviceDO device, ThingModelMessage thingModelMessage);
 }

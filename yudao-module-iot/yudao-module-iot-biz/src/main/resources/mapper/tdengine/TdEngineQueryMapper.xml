@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="cn.iocoder.yudao.module.iot.dal.tdengine.TdEngineQueryMapper">
+
+    <!-- 根据时间戳查询数据 -->
+    <select id="selectByTimestamp" parameterType="cn.iocoder.yudao.module.iot.dal.dataobject.tdengine.SelectDO"
+            resultType="Map">
+        SELECT * FROM ${dataBaseName}.${tableName}
+        WHERE ${fieldName} BETWEEN #{startTime} AND #{endTime}
+    </select>
+
+    <!-- 获取时间范围内的数据条数 -->
+    <select id="getCountByTimestamp" parameterType="cn.iocoder.yudao.module.iot.dal.dataobject.tdengine.SelectDO"
+            resultType="java.util.Map">
+        SELECT COUNT(0) AS count
+        FROM ${dataBaseName}.${tableName}
+        WHERE ${fieldName} BETWEEN #{startTime} AND #{endTime}
+    </select>
+
+    <!-- 获取最新数据 -->
+    <select id="getLastData" resultType="java.util.Map">
+        SELECT LAST(time), *
+        FROM ${tableName}
+        WHERE device_id = #{deviceId}
+    </select>
+
+    <!-- 根据标签获取最新数据 -->
+    <select id="getLastDataByTags" parameterType="cn.iocoder.yudao.module.iot.dal.dataobject.tdengine.TagsSelectDO"
+            resultType="Map">
+        SELECT LAST(*)
+        FROM ${dataBaseName}.${stableName}
+        GROUP BY ${tagsName}
+    </select>
+
+    <!-- 获取历史数据 -->
+    <select id="getHistoryData" resultType="java.util.Map"
+            parameterType="cn.iocoder.yudao.module.iot.dal.dataobject.tdengine.SelectVisualDO">
+        SELECT ${fieldName} AS data, time
+        FROM ${dataBaseName}.${tableName}
+        WHERE time BETWEEN #{startTime} AND #{endTime}
+          AND ${fieldName} IS NOT NULL
+        ORDER BY time DESC
+        LIMIT #{params.rows} OFFSET #{params.page}
+    </select>
+
+    <!-- 获取实时数据 -->
+    <select id="getRealtimeData" resultType="java.util.Map"
+            parameterType="cn.iocoder.yudao.module.iot.dal.dataobject.tdengine.SelectVisualDO">
+        SELECT ${fieldName}, time
+        FROM ${dataBaseName}.${tableName}
+    </select>
+
+    <!-- 获取聚合数据 -->
+    <select id="getAggregateData" resultType="java.util.Map"
+            parameterType="cn.iocoder.yudao.module.iot.dal.dataobject.tdengine.SelectVisualDO">
+        SELECT ${aggregate}(${fieldName})
+        FROM ${dataBaseName}.${tableName}
+        WHERE ts BETWEEN #{startTime} AND #{endTime} INTERVAL (${interval})
+        LIMIT #{num}
+    </select>
+
+    <!-- 获取历史数据条数 -->
+    <select id="getHistoryCount" resultType="java.lang.Long">
+        SELECT COUNT(time)
+        FROM ${dataBaseName}.${tableName}
+        WHERE time BETWEEN #{startTime} AND #{endTime}
+          AND ${fieldName} IS NOT NULL
+    </select>
+
+</mapper>
