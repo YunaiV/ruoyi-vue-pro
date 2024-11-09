@@ -25,6 +25,7 @@ public interface TdEngineQueryMapper {
      */
     List<Map<String, Object>> selectByTimestamp(SelectDO selectDO);
 
+    // TODO @haohao：最好方法的命名，和数据库操作的保持一直。get => select。然后 selectList or selectOne
     /**
      * 根据时间戳获取数据条数
      *

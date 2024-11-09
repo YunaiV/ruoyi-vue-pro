@@ -31,6 +31,7 @@ public class EmqxServiceImpl implements EmqxService {
         // 根据不同的主题，处理不同的业务逻辑
         if (topic.contains("/property/post")) {
             // 设备上报数据 topic /sys/f13f57c63e9/dianbiao1/thing/event/property/post
+            // TODO @hao：这块未来可能，搞个 IotTopicUrls 之类？把拼接和解析的逻辑，收敛
             String productKey = topic.split("/")[2];
             String deviceName = topic.split("/")[3];
             String message = new String(mqttMessage.getPayload());
@@ -48,4 +49,5 @@ public class EmqxServiceImpl implements EmqxService {
             log.error("订阅默认主题失败", e);
         }
     }
+
 }

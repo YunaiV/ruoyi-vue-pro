@@ -213,31 +213,30 @@ public class IotDeviceServiceImpl implements IotDeviceService {
 
     @Override
     public void updateDeviceStatus(IotDeviceStatusUpdateReqVO updateReqVO) {
-        // 校验存在
+        // 1. 校验存在
+        // TODO @haohao：这里的 iotDeviceDO =>  device。一个是去掉 iot，一个是去掉 DO 后缀。这样，简洁一点。
         IotDeviceDO iotDeviceDO = validateDeviceExists(updateReqVO.getId());
 
-        // 更新状态和更新时间
+        // 2.1 更新状态和更新时间
         IotDeviceDO updateObj = BeanUtils.toBean(updateReqVO, IotDeviceDO.class);
-
-        // 以前是未激活，现在是上线，设置设备激活时间
+        // TODO @haohao：下面几个状态的处理，可以考虑 if else if。这样，看起来会有层次感哈
+        // 2.2.1 以前是未激活，现在是上线，设置设备激活时间
+        // TODO @haohao：这里可以使用 ObjectUtils.equalsAny 类似这种哈。
         if (Objects.equals(iotDeviceDO.getStatus(), IotDeviceStatusEnum.INACTIVE.getStatus())
                 && Objects.equals(updateObj.getStatus(), IotDeviceStatusEnum.ONLINE.getStatus())) {
             updateObj.setActiveTime(LocalDateTime.now());
         }
-
-        // 如果是上线，设置上线时间
+        // 2.2.2 如果是上线，设置上线时间
         if (Objects.equals(updateObj.getStatus(), IotDeviceStatusEnum.ONLINE.getStatus())) {
             updateObj.setLastOnlineTime(LocalDateTime.now());
         }
-
-        // 如果是离线，设置离线时间
+        // 2.2.3 如果是离线，设置离线时间
         if (Objects.equals(updateObj.getStatus(), IotDeviceStatusEnum.OFFLINE.getStatus())) {
             updateObj.setLastOfflineTime(LocalDateTime.now());
         }
-
-        // 设置状态更新时间
+        // 2.3 设置状态更新时间
         updateObj.setStatusLastUpdateTime(LocalDateTime.now());
-
+        // 2.4 更新到数据库
         deviceMapper.updateById(updateObj);
     }
 

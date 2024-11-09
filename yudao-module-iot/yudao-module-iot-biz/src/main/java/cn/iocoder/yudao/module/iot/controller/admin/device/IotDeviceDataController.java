@@ -31,6 +31,7 @@ public class IotDeviceDataController {
     @Resource
     private IotDeviceDataService deviceDataService;
 
+    // TODO @haohao：是不是叫 get-latest 就好了。因为 data 已经在 url 里了哈
     @GetMapping("/latest-data")
     @Operation(summary = "获取设备属性最新数据")
     public CommonResult<List<IotDeviceDataRespVO>> getDevicePropertiesLatestData(@Valid IotDeviceDataReqVO deviceDataReqVO) {
@@ -38,6 +39,7 @@ public class IotDeviceDataController {
         return success(BeanUtils.toBean(list, IotDeviceDataRespVO.class));
     }
 
+    // TODO @haohao：是不是叫 /history-data => page
     @GetMapping("/history-data")
     @Operation(summary = "获取设备属性历史数据")
     public CommonResult<PageResult<IotTimeDataRespVO>> getDevicePropertiesHistoryData(@Valid IotDeviceDataReqVO deviceDataReqVO) {

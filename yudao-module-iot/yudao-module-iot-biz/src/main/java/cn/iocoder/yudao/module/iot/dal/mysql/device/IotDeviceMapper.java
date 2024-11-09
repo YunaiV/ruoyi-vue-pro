@@ -15,6 +15,7 @@ import org.apache.ibatis.annotations.Mapper;
 @Mapper
 public interface IotDeviceMapper extends BaseMapperX<IotDeviceDO> {
 
+    // TODO @haohao：可能多余的查询条件，要去掉哈
     default PageResult<IotDeviceDO> selectPage(IotDevicePageReqVO reqVO) {
         return selectPage(reqVO, new LambdaQueryWrapperX<IotDeviceDO>()
                 .eqIfPresent(IotDeviceDO::getDeviceKey, reqVO.getDeviceKey())

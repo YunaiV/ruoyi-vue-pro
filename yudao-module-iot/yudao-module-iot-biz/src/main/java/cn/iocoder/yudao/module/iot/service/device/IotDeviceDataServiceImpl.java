@@ -133,4 +133,5 @@ public class IotDeviceDataServiceImpl implements IotDeviceDataService {
     private static String getDeviceTableName(String productKey, String deviceName) {
         return String.format("device_%s_%s", productKey.toLowerCase(), deviceName.toLowerCase());
     }
+
 }

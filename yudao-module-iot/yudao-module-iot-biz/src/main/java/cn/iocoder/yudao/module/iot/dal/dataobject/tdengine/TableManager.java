@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.iot.dal.dataobject.tdengine;
 
 import java.util.List;
 
+// TODO @haohao：这个还有用哇？
 /**
  * TableManager 类用于管理 TDengine 表的创建、删除和结构信息获取
  */

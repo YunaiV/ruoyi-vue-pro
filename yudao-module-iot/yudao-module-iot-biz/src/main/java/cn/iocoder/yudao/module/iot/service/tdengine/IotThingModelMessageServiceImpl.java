@@ -47,6 +47,7 @@ public class IotThingModelMessageServiceImpl implements IotThingModelMessageServ
     @Resource
     private DeviceDataRedisDAO deviceDataRedisDAO;
 
+    // TODO @haohao：这个方法，可以考虑加下 1. 2. 3. 更有层次感
     @Override
     @TenantIgnore
     public void saveThingModelMessage(IotDeviceDO device, ThingModelMessage thingModelMessage) {
@@ -55,12 +56,14 @@ public class IotThingModelMessageServiceImpl implements IotThingModelMessageServ
             // 创建设备数据表
             createDeviceTable(device.getDeviceType(), device.getProductKey(), device.getDeviceName(), device.getDeviceKey());
             // 更新设备状态
+            // TODO @haohao：下面可以考虑，链式调用。iotDeviceService.updateDeviceStatus(new IotDeviceStatusUpdateReqVO().setid().setstatus())
             IotDeviceStatusUpdateReqVO updateReqVO = new IotDeviceStatusUpdateReqVO();
             updateReqVO.setId(device.getId());
             updateReqVO.setStatus(IotDeviceStatusEnum.ONLINE.getStatus());
             iotDeviceService.updateDeviceStatus(updateReqVO);
         }
 
+        // TODO @haohao：这个变量，可以和 “过滤并收集有效的属性字段” 那块，因为关联度高一点。
         // 获取设备属性
         Map<String, Object> params = thingModelMessage.dataToMap();
 
@@ -70,12 +73,12 @@ public class IotThingModelMessageServiceImpl implements IotThingModelMessageServ
                 .stream()
                 .filter(function -> IotProductFunctionTypeEnum.PROPERTY.getType().equals(function.getType()))
                 .toList();
-
         if (functionList.isEmpty()) {
             return;
         }
 
         // 获取属性标识符集合
+        // TODO @haohao：这个变量，可以和 “过滤并收集有效的属性字段” 那块，因为关联度高一点。另外，可以使用 CollectionUtils。convertSet
         Set<String> propertyIdentifiers = functionList.stream()
                 .map(IotThinkModelFunctionDO::getIdentifier)
                 .collect(Collectors.toSet());
@@ -90,9 +93,11 @@ public class IotThingModelMessageServiceImpl implements IotThingModelMessageServ
             if (propertyIdentifiers.contains(key)) {
                 schemaFieldValues.add(new TdFieldDO(key.toLowerCase(), val));
                 // 缓存设备属性
+                // TODO @haohao：这个缓存的写入，可以使用的时候 cache 么？被动读
                 setDeviceDataCache(device, functionMap.get(key), val, thingModelMessage.getTime());
             }
         });
+        // TODO @haohao：疑问，为什么 1 不继续哈？
         if (schemaFieldValues.size() == 1) {
             return;
         }
@@ -127,6 +132,7 @@ public class IotThingModelMessageServiceImpl implements IotThingModelMessageServ
         deviceDataRedisDAO.set(deviceData);
     }
 
+    // TODO @haohao：实现没问题哈。这个方法的空行有点多，逻辑分块上没这么明显。看看能不能改下。
     /**
      * 创建设备数据表
      *
@@ -143,6 +149,8 @@ public class IotThingModelMessageServiceImpl implements IotThingModelMessageServ
         List<TdFieldDO> tagsFieldValues = new ArrayList<>();
 
         if (maps != null) {
+            // TODO @haohao：一些字符串，是不是可以枚举起来哈。
+            // TODO @haohao：这种过滤的，常用的，可以考虑用 CollectionUtils.filterList。一些常用的 stream 操作，适合封装哈
             List<Map<String, Object>> taggedNotesList = maps.stream()
                     .filter(map -> "TAG".equals(map.get("note")))
                     .toList();
@@ -176,6 +184,7 @@ public class IotThingModelMessageServiceImpl implements IotThingModelMessageServ
      * @return 数据库名称
      */
     private String getDatabaseName() {
+        // TODO @haohao：可以使用 StrUtil.subAftetLast 这种方法
         return url.substring(url.lastIndexOf("/") + 1);
     }
 
@@ -187,6 +196,7 @@ public class IotThingModelMessageServiceImpl implements IotThingModelMessageServ
      * @return 产品属性表名
      */
     private static String getProductPropertySTableName(Integer deviceType, String productKey) {
+        // TODO @haohao：枚举下，会好点哈。
         return switch (deviceType) {
             case 1 -> String.format("gateway_sub_%s", productKey).toLowerCase();
             case 2 -> String.format("gateway_%s", productKey).toLowerCase();
@@ -204,4 +214,5 @@ public class IotThingModelMessageServiceImpl implements IotThingModelMessageServ
     private static String getDeviceTableName(String productKey, String deviceName) {
         return String.format("device_%s_%s", productKey.toLowerCase(), deviceName.toLowerCase());
     }
+
 }

@@ -3,12 +3,15 @@ package cn.iocoder.yudao.module.iot.dal.dataobject.tdengine;
 import lombok.Data;
 
 import java.util.Set;
+
+// TODO @haohao：类似这个，其实可以参考 mybatis plus，querywrapper，搞个 TdEngineQueryWrapper。这样看起来会更好懂。
 /**
  * 查询DO
  */
 @Data
 public class SelectDO {
 
+    // TODO @haoha：database 是个单词
     /**
      * 数据库名称
      */
@@ -39,6 +42,7 @@ public class SelectDO {
      */
     private String type;
 
+    // TODO @haohao：这个字段，是啥哈？
     /**
      * 查询条件
      */

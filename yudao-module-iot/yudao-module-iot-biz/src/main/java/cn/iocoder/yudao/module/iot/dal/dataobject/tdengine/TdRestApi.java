@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+// TODO @haohao：有部分非实体的部分，是不是可以搞到 iot 的 framework 包下，搞个 tdengine 包，作为框架级的封装，放在 dataobject，感觉不是很合理哈。【可以微信讨论下】
 /**
  * TdRestApi 类用于处理 TDengine 的 REST API 请求
  */

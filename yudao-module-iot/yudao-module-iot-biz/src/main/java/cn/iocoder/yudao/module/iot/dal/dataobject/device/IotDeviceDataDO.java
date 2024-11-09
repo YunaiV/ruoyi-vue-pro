@@ -23,6 +23,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class IotDeviceDataDO {
 
+    // TODO @haohao：每个字段的关联关系，可以 @ 下哈。
     /**
      * 设备编号
      */

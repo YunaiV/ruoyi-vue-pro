@@ -21,6 +21,7 @@ public class TdTableDO {
      */
     private String dataBaseName;
 
+    // TODO @haohao：superTableName 和 tableName 是不是合并。因为每个 mapper 操作的时候，有且只会使用到其中一个。
     /**
      * 超级表名称
      */

@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.annotation.InterceptorIgnore;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+// TODO @haohao：InterceptorIgnore 忽略租户，可以在每个方法上，添加 @TenantIgnore 哈。
 /**
  * TD 引擎的数据库 Mapper
  */
