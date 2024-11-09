@@ -1,18 +1,20 @@
 package cn.iocoder.yudao.module.iot.service.device;
 
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONObject;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.iot.controller.admin.device.vo.deviceData.IotDeviceDataReqVO;
+import cn.iocoder.yudao.module.iot.controller.admin.device.vo.deviceData.IotDeviceDataPageReqVO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDataDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.tdengine.SelectVisualDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.tdengine.ThingModelMessage;
 import cn.iocoder.yudao.module.iot.dal.dataobject.thinkmodelfunction.IotThinkModelFunctionDO;
 import cn.iocoder.yudao.module.iot.dal.redis.deviceData.DeviceDataRedisDAO;
+import cn.iocoder.yudao.module.iot.dal.tdengine.TdEngineDMLMapper;
+import cn.iocoder.yudao.module.iot.enums.IotConstants;
 import cn.iocoder.yudao.module.iot.enums.product.IotProductFunctionTypeEnum;
 import cn.iocoder.yudao.module.iot.service.tdengine.IotThingModelMessageService;
-import cn.iocoder.yudao.module.iot.service.tdengine.TdEngineQueryService;
 import cn.iocoder.yudao.module.iot.service.thinkmodelfunction.IotThinkModelFunctionService;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
@@ -40,7 +42,7 @@ public class IotDeviceDataServiceImpl implements IotDeviceDataService {
     @Resource
     private IotThinkModelFunctionService thinkModelFunctionService;
     @Resource
-    private TdEngineQueryService tdEngineQueryService;
+    private TdEngineDMLMapper tdEngineDMLMapper;
 
     @Resource
     private DeviceDataRedisDAO deviceDataRedisDAO;
@@ -66,7 +68,7 @@ public class IotDeviceDataServiceImpl implements IotDeviceDataService {
     }
 
     @Override
-    public List<IotDeviceDataDO> getDevicePropertiesLatestData(@Valid IotDeviceDataReqVO deviceDataReqVO) {
+    public List<IotDeviceDataDO> getLatestDeviceProperties(@Valid IotDeviceDataPageReqVO deviceDataReqVO) {
         List<IotDeviceDataDO> list = new ArrayList<>();
         // 1. 获取设备信息
         IotDeviceDO device = deviceService.getDevice(deviceDataReqVO.getDeviceId());
@@ -106,7 +108,7 @@ public class IotDeviceDataServiceImpl implements IotDeviceDataService {
     }
 
     @Override
-    public PageResult<Map<String, Object>> getDevicePropertiesHistoryData(IotDeviceDataReqVO deviceDataReqVO) {
+    public PageResult<Map<String, Object>> getHistoryDeviceProperties(IotDeviceDataPageReqVO deviceDataReqVO) {
         PageResult<Map<String, Object>> pageResult = new PageResult<>();
         // 1. 获取设备信息
         IotDeviceDO device = deviceService.getDevice(deviceDataReqVO.getDeviceId());
@@ -121,17 +123,17 @@ public class IotDeviceDataServiceImpl implements IotDeviceDataService {
         params.put("rows", deviceDataReqVO.getPageSize());
         params.put("page", (deviceDataReqVO.getPageNo() - 1) * deviceDataReqVO.getPageSize());
         selectVisualDO.setParams(params);
-        pageResult.setList(tdEngineQueryService.getHistoryData(selectVisualDO));
-        pageResult.setTotal(tdEngineQueryService.getHistoryCount(selectVisualDO));
+        pageResult.setList(tdEngineDMLMapper.selectHistoryDataList(selectVisualDO));
+        pageResult.setTotal(tdEngineDMLMapper.selectHistoryCount(selectVisualDO));
         return pageResult;
     }
 
     private String getDatabaseName() {
-        return url.substring(url.lastIndexOf("/") + 1);
+        return StrUtil.subAfter(url, "/", true);
     }
 
     private static String getDeviceTableName(String productKey, String deviceName) {
-        return String.format("device_%s_%s", productKey.toLowerCase(), deviceName.toLowerCase());
+        return  String.format(IotConstants.DEVICE_TABLE_NAME_FORMAT, productKey, deviceName);
     }
 
 }

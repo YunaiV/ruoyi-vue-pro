@@ -3,7 +3,7 @@ package cn.iocoder.yudao.module.iot.controller.admin.device;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
-import cn.iocoder.yudao.module.iot.controller.admin.device.vo.deviceData.IotDeviceDataReqVO;
+import cn.iocoder.yudao.module.iot.controller.admin.device.vo.deviceData.IotDeviceDataPageReqVO;
 import cn.iocoder.yudao.module.iot.controller.admin.device.vo.deviceData.IotDeviceDataRespVO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDataDO;
 import cn.iocoder.yudao.module.iot.controller.admin.device.vo.deviceData.IotTimeDataRespVO;
@@ -31,19 +31,17 @@ public class IotDeviceDataController {
     @Resource
     private IotDeviceDataService deviceDataService;
 
-    // TODO @haohao：是不是叫 get-latest 就好了。因为 data 已经在 url 里了哈
-    @GetMapping("/latest-data")
+    @GetMapping("/latest")
     @Operation(summary = "获取设备属性最新数据")
-    public CommonResult<List<IotDeviceDataRespVO>> getDevicePropertiesLatestData(@Valid IotDeviceDataReqVO deviceDataReqVO) {
-        List<IotDeviceDataDO> list = deviceDataService.getDevicePropertiesLatestData(deviceDataReqVO);
+    public CommonResult<List<IotDeviceDataRespVO>> getLatestDeviceProperties(@Valid IotDeviceDataPageReqVO deviceDataReqVO) {
+        List<IotDeviceDataDO> list = deviceDataService.getLatestDeviceProperties(deviceDataReqVO);
         return success(BeanUtils.toBean(list, IotDeviceDataRespVO.class));
     }
 
-    // TODO @haohao：是不是叫 /history-data => page
-    @GetMapping("/history-data")
+    @GetMapping("/history")
     @Operation(summary = "获取设备属性历史数据")
-    public CommonResult<PageResult<IotTimeDataRespVO>> getDevicePropertiesHistoryData(@Valid IotDeviceDataReqVO deviceDataReqVO) {
-        PageResult<Map<String, Object>> list = deviceDataService.getDevicePropertiesHistoryData(deviceDataReqVO);
+    public CommonResult<PageResult<IotTimeDataRespVO>> getHistoryDeviceProperties(@Valid IotDeviceDataPageReqVO deviceDataReqVO) {
+        PageResult<Map<String, Object>> list = deviceDataService.getHistoryDeviceProperties(deviceDataReqVO);
         return success(BeanUtils.toBean(list, IotTimeDataRespVO.class));
     }
 

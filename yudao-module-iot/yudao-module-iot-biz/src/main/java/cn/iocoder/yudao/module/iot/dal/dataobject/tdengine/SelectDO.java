@@ -42,12 +42,6 @@ public class SelectDO {
      */
     private String type;
 
-    // TODO @haohao：这个字段，是啥哈？
-    /**
-     * 查询条件
-     */
-    private Set<Integer> orgIds;
-
     /**
      * 设备ID
      */

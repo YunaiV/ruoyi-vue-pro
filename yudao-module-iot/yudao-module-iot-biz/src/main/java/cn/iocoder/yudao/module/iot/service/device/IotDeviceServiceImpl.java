@@ -19,7 +19,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
+import java.security.SecureRandom;
 import java.time.LocalDateTime;
+import java.util.Base64;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -137,9 +139,12 @@ public class IotDeviceServiceImpl implements IotDeviceService {
      * @return 生成的 MQTT Password
      */
     private String generateMqttPassword() {
-        // TODO @haohao：【后续优化】在实际应用中，建议使用更安全的方法生成 MQTT Password，如加密或哈希
-        return UUID.randomUUID().toString();
+        SecureRandom secureRandom = new SecureRandom();
+        byte[] passwordBytes = new byte[32]; // 256 位的随机数
+        secureRandom.nextBytes(passwordBytes);
+        return Base64.getUrlEncoder().withoutPadding().encodeToString(passwordBytes);
     }
+
 
     /**
      * 生成唯一的 DeviceName
@@ -214,30 +219,28 @@ public class IotDeviceServiceImpl implements IotDeviceService {
     @Override
     public void updateDeviceStatus(IotDeviceStatusUpdateReqVO updateReqVO) {
         // 1. 校验存在
-        // TODO @haohao：这里的 iotDeviceDO =>  device。一个是去掉 iot，一个是去掉 DO 后缀。这样，简洁一点。
-        IotDeviceDO iotDeviceDO = validateDeviceExists(updateReqVO.getId());
+        IotDeviceDO device = validateDeviceExists(updateReqVO.getId());
 
         // 2.1 更新状态和更新时间
-        IotDeviceDO updateObj = BeanUtils.toBean(updateReqVO, IotDeviceDO.class);
-        // TODO @haohao：下面几个状态的处理，可以考虑 if else if。这样，看起来会有层次感哈
-        // 2.2.1 以前是未激活，现在是上线，设置设备激活时间
-        // TODO @haohao：这里可以使用 ObjectUtils.equalsAny 类似这种哈。
-        if (Objects.equals(iotDeviceDO.getStatus(), IotDeviceStatusEnum.INACTIVE.getStatus())
-                && Objects.equals(updateObj.getStatus(), IotDeviceStatusEnum.ONLINE.getStatus())) {
-            updateObj.setActiveTime(LocalDateTime.now());
+        IotDeviceDO updateDevice = BeanUtils.toBean(updateReqVO, IotDeviceDO.class);
+        // 2.2 更新状态相关时间
+        if (Objects.equals(device.getStatus(), IotDeviceStatusEnum.INACTIVE.getStatus())
+                && Objects.equals(updateDevice.getStatus(), IotDeviceStatusEnum.ONLINE.getStatus())) {
+            // 从未激活到在线，设置激活时间和最后上线时间
+            updateDevice.setActiveTime(LocalDateTime.now());
+            updateDevice.setLastOnlineTime(LocalDateTime.now());
+        } else if (Objects.equals(updateDevice.getStatus(), IotDeviceStatusEnum.ONLINE.getStatus())) {
+            // 如果是上线，设置最后上线时间
+            updateDevice.setLastOnlineTime(LocalDateTime.now());
+        } else if (Objects.equals(updateDevice.getStatus(), IotDeviceStatusEnum.OFFLINE.getStatus())) {
+            // 如果是离线，设置最后离线时间
+            updateDevice.setLastOfflineTime(LocalDateTime.now());
         }
-        // 2.2.2 如果是上线，设置上线时间
-        if (Objects.equals(updateObj.getStatus(), IotDeviceStatusEnum.ONLINE.getStatus())) {
-            updateObj.setLastOnlineTime(LocalDateTime.now());
-        }
-        // 2.2.3 如果是离线，设置离线时间
-        if (Objects.equals(updateObj.getStatus(), IotDeviceStatusEnum.OFFLINE.getStatus())) {
-            updateObj.setLastOfflineTime(LocalDateTime.now());
-        }
+
         // 2.3 设置状态更新时间
-        updateObj.setStatusLastUpdateTime(LocalDateTime.now());
+        updateDevice.setStatusLastUpdateTime(LocalDateTime.now());
         // 2.4 更新到数据库
-        deviceMapper.updateById(updateObj);
+        deviceMapper.updateById(updateDevice);
     }
 
     @Override

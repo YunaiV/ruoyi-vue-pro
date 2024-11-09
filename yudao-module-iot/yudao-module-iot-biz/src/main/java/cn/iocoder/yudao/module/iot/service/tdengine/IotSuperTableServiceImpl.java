@@ -9,6 +9,8 @@ import cn.iocoder.yudao.module.iot.dal.dataobject.tdengine.FieldParser;
 import cn.iocoder.yudao.module.iot.dal.dataobject.tdengine.TdFieldDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.tdengine.TdTableDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.thinkmodelfunction.IotThinkModelFunctionDO;
+import cn.iocoder.yudao.module.iot.dal.tdengine.TdEngineDDLMapper;
+import cn.iocoder.yudao.module.iot.dal.tdengine.TdEngineDMLMapper;
 import cn.iocoder.yudao.module.iot.enums.product.IotProductFunctionTypeEnum;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
@@ -26,7 +28,7 @@ import java.util.stream.Collectors;
 public class IotSuperTableServiceImpl implements IotSuperTableService {
 
     @Resource
-    private TdEngineSuperTableService tdEngineSuperTableService;
+    private TdEngineDDLMapper tdEngineDDLMapper;
 
     @Value("${spring.datasource.dynamic.datasource.tdengine.url}")
     private String url;
@@ -42,9 +44,10 @@ public class IotSuperTableServiceImpl implements IotSuperTableService {
 
         String superTableName = getSuperTableName(product.getDeviceType(), product.getProductKey());
         String databaseName = getDatabaseName();
-        Integer tableExists = tdEngineSuperTableService.checkSuperTableExists(new TdTableDO(databaseName, superTableName));
 
-        if (tableExists != null && tableExists > 0) {
+        List<Map<String, Object>> results = tdEngineDDLMapper.showSuperTables(new TdTableDO(databaseName, superTableName));
+        int tableExists = results == null || results.isEmpty() ? 0 : results.size();
+        if (tableExists > 0) {
             updateSuperTable(thingModel, product.getDeviceType());
         } else {
             createSuperTable(thingModel, product.getDeviceType());
@@ -76,7 +79,7 @@ public class IotSuperTableServiceImpl implements IotSuperTableService {
         String databaseName = getDatabaseName();
 
         // 创建超级表
-        tdEngineSuperTableService.createSuperTable(new TdTableDO(databaseName, superTableName, schemaFields, tagsFields));
+        tdEngineDDLMapper.createSuperTable(new TdTableDO(databaseName, superTableName, schemaFields, tagsFields));
     }
 
     /**
@@ -98,7 +101,7 @@ public class IotSuperTableServiceImpl implements IotSuperTableService {
      * 获取表的字段信息
      */
     private List<TdFieldDO> getTableFields(String tableName) {
-        List<Map<String, Object>> tableDescription = tdEngineSuperTableService.describeSuperTable(new TdTableDO(getDatabaseName(), tableName));
+        List<Map<String, Object>> tableDescription = tdEngineDDLMapper.describeSuperTable(new TdTableDO(getDatabaseName(), tableName));
         if (CollUtil.isEmpty(tableDescription)) {
             return Collections.emptyList();
         }
@@ -127,32 +130,38 @@ public class IotSuperTableServiceImpl implements IotSuperTableService {
 
         // 添加新增字段
         if (CollUtil.isNotEmpty(addFields)) {
-            tdEngineSuperTableService.addColumnsForSuperTable(TdTableDO.builder()
-                    .dataBaseName(databaseName)
-                    .superTableName(tableName)
-                    .columns(addFields)
-                    .build());
+            for (TdFieldDO addField : addFields) {
+                tdEngineDDLMapper.addColumnForSuperTable(TdTableDO.builder()
+                        .dataBaseName(databaseName)
+                        .superTableName(tableName)
+                        .column(addField)
+                        .build());
+            }
         }
         // 删除旧字段
         if (CollUtil.isNotEmpty(dropFields)) {
-            tdEngineSuperTableService.dropColumnsForSuperTable(TdTableDO.builder()
-                    .dataBaseName(databaseName)
-                    .superTableName(tableName)
-                    .columns(dropFields)
-                    .build());
+            for (TdFieldDO dropField : dropFields) {
+                tdEngineDDLMapper.dropColumnForSuperTable(TdTableDO.builder()
+                        .dataBaseName(databaseName)
+                        .superTableName(tableName)
+                        .column(dropField)
+                        .build());
+            }
         }
         // 修改字段（先删除再添加）
         if (CollUtil.isNotEmpty(modifyFields)) {
-            tdEngineSuperTableService.dropColumnsForSuperTable(TdTableDO.builder()
-                    .dataBaseName(databaseName)
-                    .superTableName(tableName)
-                    .columns(modifyFields)
-                    .build());
-            tdEngineSuperTableService.addColumnsForSuperTable(TdTableDO.builder()
-                    .dataBaseName(databaseName)
-                    .superTableName(tableName)
-                    .columns(addFields)
-                    .build());
+            for (TdFieldDO modifyField : modifyFields) {
+                tdEngineDDLMapper.dropColumnForSuperTable(TdTableDO.builder()
+                        .dataBaseName(databaseName)
+                        .superTableName(tableName)
+                        .column(modifyField)
+                        .build());
+                tdEngineDDLMapper.addColumnForSuperTable(TdTableDO.builder()
+                        .dataBaseName(databaseName)
+                        .superTableName(tableName)
+                        .column(modifyField)
+                        .build());
+            }
         }
     }
 

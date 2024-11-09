@@ -1,15 +1,12 @@
 package cn.iocoder.yudao.module.iot.dal.dataobject.device;
 
 import cn.iocoder.yudao.module.iot.dal.dataobject.product.IotProductDO;
-import cn.iocoder.yudao.module.iot.enums.device.IotDeviceStatusEnum;
-import com.baomidou.mybatisplus.annotation.TableId;
-import io.swagger.v3.oas.annotations.media.Schema;
+import cn.iocoder.yudao.module.iot.dal.dataobject.thinkmodelfunction.IotThinkModelFunctionDO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 /**
@@ -23,39 +20,52 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class IotDeviceDataDO {
 
-    // TODO @haohao：每个字段的关联关系，可以 @ 下哈。
     /**
      * 设备编号
+     * <p>
+     * 关联 {@link IotDeviceDO#getId()}
      */
     private Long deviceId;
 
     /**
      * 物模型编号
+     * <p>
+     * 关联 {@link IotThinkModelFunctionDO#getId()}
      */
     private Long thinkModelFunctionId;
 
     /**
      * 产品标识
+     * <p>
+     * 关联 {@link IotProductDO#getProductKey()}
      */
     private String productKey;
 
     /**
      * 设备名称
+     * <p>
+     * 冗余 {@link IotDeviceDO#getDeviceName()}
      */
     private String deviceName;
 
     /**
      * 属性标识符
+     * <p>
+     * 关联 {@link IotThinkModelFunctionDO#getIdentifier()}
      */
     private String identifier;
 
     /**
      * 属性名称
+     * <p>
+     * 关联 {@link IotThinkModelFunctionDO#getName()}
      */
     private String name;
 
     /**
      * 数据类型
+     * <p>
+     * 关联 {@link IotThinkModelFunctionDO#getProperty()#getDataType()}
      */
     private String dataType;
 

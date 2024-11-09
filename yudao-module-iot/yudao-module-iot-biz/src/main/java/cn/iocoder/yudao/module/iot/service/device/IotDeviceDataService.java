@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.iot.service.device;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.iot.controller.admin.device.vo.deviceData.IotDeviceDataReqVO;
+import cn.iocoder.yudao.module.iot.controller.admin.device.vo.deviceData.IotDeviceDataPageReqVO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDataDO;
 import jakarta.validation.Valid;
 
@@ -31,7 +31,7 @@ public interface IotDeviceDataService {
      * @param deviceId 设备编号
      * @return 设备属性最新数据
      */
-    List<IotDeviceDataDO> getDevicePropertiesLatestData(@Valid IotDeviceDataReqVO deviceId);
+    List<IotDeviceDataDO> getLatestDeviceProperties(@Valid IotDeviceDataPageReqVO deviceId);
 
     /**
      * 获得设备属性历史数据
@@ -39,5 +39,5 @@ public interface IotDeviceDataService {
      * @param deviceDataReqVO 设备属性历史数据 Request VO
      * @return 设备属性历史数据
      */
-    PageResult<Map<String, Object>> getDevicePropertiesHistoryData(@Valid IotDeviceDataReqVO deviceDataReqVO);
+    PageResult<Map<String, Object>> getHistoryDeviceProperties(@Valid IotDeviceDataPageReqVO deviceDataReqVO);
 }

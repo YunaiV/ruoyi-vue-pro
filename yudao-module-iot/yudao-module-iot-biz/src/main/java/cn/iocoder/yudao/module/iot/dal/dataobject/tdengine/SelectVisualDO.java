@@ -27,14 +27,17 @@ public class SelectVisualDO {
      * 查询类型，0历史数据，1实时数据，2聚合数据
      */
     private int type;
+
     /**
      * 查询的数据量
      */
     private int num;
+
     /**
      * 聚合函数
      */
     private String aggregate;
+
     /**
      * 统计间隔数字+s/m/h/d
      * 比如1s,1m,1h,1d代表1秒，1分钟，1小时，1天

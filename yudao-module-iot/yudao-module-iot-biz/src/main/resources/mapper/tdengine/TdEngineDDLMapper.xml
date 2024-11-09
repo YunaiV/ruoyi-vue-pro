@@ -2,7 +2,12 @@
 <!DOCTYPE mapper
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="cn.iocoder.yudao.module.iot.dal.tdengine.TdEngineSuperTableMapper">
+<mapper namespace="cn.iocoder.yudao.module.iot.dal.tdengine.TdEngineDDLMapper">
+
+    <!-- 创建数据库 -->
+    <update id="createDatabase" parameterType="String">
+        CREATE DATABASE IF NOT EXISTS ${dataBaseName}
+    </update>
 
     <!-- 创建超级表 -->
     <update id="createSuperTable">
@@ -66,6 +71,31 @@
     <!-- 为超级表删除标签 -->
     <update id="dropTagForSuperTable">
         ALTER STABLE ${dataBaseName}.${superTableName} DROP TAG ${tag.fieldName}
+    </update>
+
+    <!-- 创建子表 -->
+    <update id="createTable">
+        CREATE TABLE IF NOT EXISTS ${dataBaseName}.${tableName}
+        USING ${dataBaseName}.${superTableName}
+        TAGS
+        <foreach item="item" collection="tags" separator=","
+                 open="(" close=")">
+            #{item.fieldValue}
+        </foreach>
+    </update>
+
+    <!-- 创建子表，带有 TAGS -->
+    <update id="createTableWithTags">
+        CREATE TABLE IF NOT EXISTS ${dataBaseName}.${tableName}
+        USING ${dataBaseName}.${superTableName}
+        <foreach item="item" collection="tags" separator="," open="(" close=")">
+            #{item.fieldName}
+        </foreach>
+        TAGS
+        <foreach item="item" collection="tags" separator=","
+                 open="(" close=")">
+            #{item.fieldValue}
+        </foreach>
     </update>
 
 </mapper>
