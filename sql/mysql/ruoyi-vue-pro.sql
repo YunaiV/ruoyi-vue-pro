@@ -64,7 +64,7 @@ DROP TABLE IF EXISTS `infra_api_error_log`;
 CREATE TABLE `infra_api_error_log`  (
   `id` bigint NOT NULL AUTO_INCREMENT COMMENT '编号',
   `trace_id` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '链路追踪编号',
-  `user_id` int NOT NULL DEFAULT 0 COMMENT '用户编号',
+  `user_id` bigint NOT NULL DEFAULT 0 COMMENT '用户编号',
   `user_type` tinyint NOT NULL DEFAULT 0 COMMENT '用户类型',
   `application_name` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '应用名',
   `request_method` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '请求方法名',
