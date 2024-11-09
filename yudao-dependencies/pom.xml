@@ -66,11 +66,9 @@
         <netty.version>4.1.113.Final</netty.version>
         <mqtt.version>1.2.5</mqtt.version>
         <!-- 三方云服务相关 -->
-        <okio.version>3.5.0</okio.version>
-        <okhttp3.version>4.11.0</okhttp3.version>
         <commons-io.version>2.17.0</commons-io.version>
         <commons-compress.version>1.27.1</commons-compress.version>
-        <minio.version>8.5.7</minio.version>
+        <aws-java-sdk-s3.version>1.12.777</aws-java-sdk-s3.version>
         <justauth.version>2.0.5</justauth.version>
         <jimureport.version>1.8.1</jimureport.version>
         <weixin-java.version>4.6.0</weixin-java.version>
@@ -542,19 +540,9 @@
 
             <!-- 三方云服务相关 -->
             <dependency>
-                <groupId>com.squareup.okio</groupId>
-                <artifactId>okio</artifactId>
-                <version>${okio.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.squareup.okhttp3</groupId>
-                <artifactId>okhttp</artifactId>
-                <version>${okhttp3.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>io.minio</groupId>
-                <artifactId>minio</artifactId>
-                <version>${minio.version}</version>
+                <groupId>com.amazonaws</groupId>
+                <artifactId>aws-java-sdk-s3</artifactId>
+                <version>${aws-java-sdk-s3.version}</version>
             </dependency>
 
             <dependency>
