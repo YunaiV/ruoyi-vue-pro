@@ -24,6 +24,8 @@ import com.github.binarywang.wxpay.bean.notify.WxPayRefundNotifyResult;
 import com.github.binarywang.wxpay.bean.notify.WxPayRefundNotifyV3Result;
 import com.github.binarywang.wxpay.bean.request.*;
 import com.github.binarywang.wxpay.bean.result.*;
+import com.github.binarywang.wxpay.bean.transfer.QueryTransferBatchesRequest;
+import com.github.binarywang.wxpay.bean.transfer.QueryTransferBatchesResult;
 import com.github.binarywang.wxpay.bean.transfer.TransferBatchesRequest;
 import com.github.binarywang.wxpay.bean.transfer.TransferBatchesResult;
 import com.github.binarywang.wxpay.config.WxPayConfig;
@@ -484,9 +486,28 @@ public abstract class AbstractWxPayClient extends AbstractPayClient<WxPayClientC
     }
 
     @Override
-    protected PayTransferRespDTO doGetTransfer(String outTradeNo, PayTransferTypeEnum type) {
-        // TODO luchi：这个最好实现下。因为可能要主动轮询转账结果
-        throw new UnsupportedOperationException("待实现");
+    protected PayTransferRespDTO doGetTransfer(String outTradeNo, PayTransferTypeEnum type) throws WxPayException {
+        QueryTransferBatchesRequest request = QueryTransferBatchesRequest.newBuilder()
+                .outBatchNo(outTradeNo).needQueryDetail(true).offset(0).limit(20).detailStatus("ALL")
+                .build();
+        QueryTransferBatchesResult response = client.getTransferService().transferBatchesOutBatchNo(request);
+        QueryTransferBatchesResult.TransferBatch transferBatch = response.getTransferBatch();
+        if (Objects.equals("FINISHED", transferBatch.getBatchStatus())) {
+            // 明细中全部成功则成功，任一失败则失败
+            if (response.getTransferDetailList().stream().allMatch(detail -> Objects.equals("SUCCESS", detail.getDetailStatus()))) {
+                return PayTransferRespDTO.successOf(transferBatch.getBatchId(), parseDateV3(transferBatch.getUpdateTime()),
+                        transferBatch.getOutBatchNo(), response);
+            }
+            if (response.getTransferDetailList().stream().anyMatch(detail -> Objects.equals("FAIL", detail.getDetailStatus()))) {
+                return PayTransferRespDTO.closedOf(transferBatch.getBatchStatus(), transferBatch.getCloseReason(),
+                        transferBatch.getOutBatchNo(), response);
+            }
+        }
+        if (Objects.equals("CLOSED", transferBatch.getBatchStatus())) {
+            return PayTransferRespDTO.closedOf(transferBatch.getBatchStatus(), transferBatch.getCloseReason(),
+                    transferBatch.getOutBatchNo(), response);
+        }
+        return PayTransferRespDTO.dealingOf(transferBatch.getBatchId(), transferBatch.getOutBatchNo(), response);
     }
 
     // ========== 各种工具方法 ==========
