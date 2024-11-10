@@ -26,4 +26,11 @@ public class AppProductBrowseHistoryRespVO {
     @Schema(description = "商品单价", example = "100")
     private Integer price;
 
+    @Schema(description = "商品销量", example = "100")
+    private Integer salesCount;
+
+    @Schema(description = "库存", example = "100")
+    private Integer stock;
+
+
 }

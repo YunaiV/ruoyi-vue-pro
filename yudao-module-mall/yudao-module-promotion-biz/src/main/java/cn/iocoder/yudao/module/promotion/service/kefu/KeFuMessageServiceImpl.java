@@ -112,9 +112,9 @@ public class KeFuMessageServiceImpl implements KeFuMessageService {
         // 2.3 发送消息通知会员，管理员已读 -> 会员更新发送的消息状态
         KeFuMessageDO keFuMessage = getFirst(filterList(messageList, message -> UserTypeEnum.MEMBER.getValue().equals(message.getSenderType())));
         assert keFuMessage != null; // 断言避免警告
-        getSelf().sendAsyncMessageToMember(keFuMessage.getSenderId(), KEFU_MESSAGE_ADMIN_READ, conversation);
+        getSelf().sendAsyncMessageToMember(keFuMessage.getSenderId(), KEFU_MESSAGE_ADMIN_READ, conversation.getId());
         // 2.4 通知所有管理员消息已读
-        getSelf().sendAsyncMessageToAdmin(KEFU_MESSAGE_ADMIN_READ, conversation);
+        getSelf().sendAsyncMessageToAdmin(KEFU_MESSAGE_ADMIN_READ, conversation.getId());
     }
 
     private void validateReceiverExist(Long receiverId, Integer receiverType) {
