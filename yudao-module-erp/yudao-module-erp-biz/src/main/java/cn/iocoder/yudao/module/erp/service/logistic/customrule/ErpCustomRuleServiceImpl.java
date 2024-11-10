@@ -39,9 +39,8 @@ public class ErpCustomRuleServiceImpl implements ErpCustomRuleService {
         log.info("create custom rule");
         // 插入
         ErpCustomRuleDO customRule = BeanUtils.toBean(createReqVO, ErpCustomRuleDO.class);
-        log.info(customRuleMapper.selectList().toString());
         customRuleMapper.insert(customRule);
-        log.info(customRuleMapper.selectList().toString());
+        log.info("create custom rule success");
         // 返回
         return customRule.getId();
     }

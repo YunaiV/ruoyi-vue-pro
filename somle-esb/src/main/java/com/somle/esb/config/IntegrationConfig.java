@@ -49,9 +49,4 @@ public class IntegrationConfig {
     public MessageChannel departmentChannel() {
         return new PublishSubscribeChannel();
     }
-
-    @Bean
-    public MessageChannel syncExternalDataChannel() {
-        return new PublishSubscribeChannel();
-    }
 }

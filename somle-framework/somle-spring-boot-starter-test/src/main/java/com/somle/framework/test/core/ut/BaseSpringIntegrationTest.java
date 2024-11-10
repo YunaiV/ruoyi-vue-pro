@@ -9,6 +9,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.AutoConfigureDataJpa;
 import org.springframework.boot.test.autoconfigure.orm.jpa.AutoConfigureTestEntityManager;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.integration.config.EnableIntegration;
 import org.springframework.integration.config.EnableIntegrationManagement;
@@ -78,6 +79,7 @@ public class BaseSpringIntegrationTest {
 //    @ImportAutoConfiguration
     @EnableIntegration
 //    @EnableIntegrationManagement
+    @EnableAspectJAutoProxy
     public static class Application {
     }
 

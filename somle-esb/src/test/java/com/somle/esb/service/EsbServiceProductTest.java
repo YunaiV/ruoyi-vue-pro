@@ -4,6 +4,7 @@ package com.somle.esb.service;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.mybatis.config.YudaoMybatisAutoConfiguration;
 import cn.iocoder.yudao.framework.security.config.YudaoSecurityAutoConfiguration;
+import cn.iocoder.yudao.module.erp.aop.SynExternalDataAspect;
 import cn.iocoder.yudao.module.erp.api.product.dto.ErpProductDTO;
 import cn.iocoder.yudao.module.erp.controller.admin.logistic.customrule.vo.ErpCustomRuleSaveReqVO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.logistic.customrule.ErpCustomRuleDO;
@@ -31,6 +32,7 @@ import com.somle.esb.converter.EccangToErpConverter;
 import com.somle.esb.converter.ErpToEccangConverter;
 import com.somle.esb.converter.ErpToKingdeeConverter;
 import com.somle.framework.test.core.ut.BaseDbUnitTest;
+import com.somle.framework.test.core.ut.BaseSpringIntegrationTest;
 import com.somle.framework.test.core.ut.BaseSpringTest;
 import com.somle.kingdee.service.KingdeeService;
 import com.somle.matomo.service.MatomoService;
@@ -42,9 +44,11 @@ import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.autoconfigure.quartz.QuartzAutoConfiguration;
 import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.context.annotation.Import;
 import org.springframework.integration.support.MessageBuilder;
+import org.springframework.messaging.MessageChannel;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.annotation.Commit;
 
@@ -72,17 +76,20 @@ import java.util.List;
     DeptApiImpl.class,
     DeptServiceImpl.class,
 
+    SynExternalDataAspect.class,
 
-    YudaoSecurityAutoConfiguration.class,
-    SecurityAutoConfiguration.class,
+
+//    YudaoSecurityAutoConfiguration.class,
+//    SecurityAutoConfiguration.class,
     IntegrationConfig.class,
+
     QuartzAutoConfiguration.class,
     // MyBatis 配置类
     DataSourceAutoConfiguration.class,
     YudaoMybatisAutoConfiguration.class, //Enable DefaultDBFieldHandler
     MybatisPlusAutoConfiguration.class, // MyBatis 的自动配置类
     MybatisPlusJoinAutoConfiguration.class})
-class EsbServiceProductTest extends BaseDbUnitTest {
+class EsbServiceProductTest extends BaseSpringIntegrationTest {
     @Resource
     private EsbService esbService;
 
@@ -90,6 +97,9 @@ class EsbServiceProductTest extends BaseDbUnitTest {
     ErpToEccangConverter erpToEccangConverter;
     @Resource
     KingdeeService kingdeeService;
+
+    @Resource
+    MessageChannel productChannel;
 
     @Resource
     DeptApi deptApi;
@@ -136,7 +146,7 @@ class EsbServiceProductTest extends BaseDbUnitTest {
     }
 
     @Test
-    public void test() {
+    public void syncProductsTest() {
         ErpProductDTO product = new ErpProductDTO();
         product.setRuleId("R12345");
         product.setProductSku("SUP123-US");
@@ -182,12 +192,12 @@ class EsbServiceProductTest extends BaseDbUnitTest {
 
     @Test
     @Commit
-    public void test3() {
+    public void aopTest() {
+        printAllBeans();
         ErpCustomRuleSaveReqVO erpCustomRuleSaveReqVO = new ErpCustomRuleSaveReqVO();
-//        erpCustomRuleSaveReqVO.setId(15675L);
-        erpCustomRuleSaveReqVO.setCountryCode("US");
-        erpCustomRuleSaveReqVO.setType("报关");
-        erpCustomRuleSaveReqVO.setSupplierProductId(67890L);
+        erpCustomRuleSaveReqVO.setCountryCode("MX");
+        erpCustomRuleSaveReqVO.setType("import");
+        erpCustomRuleSaveReqVO.setSupplierProductId(1L);
         erpCustomRuleSaveReqVO.setDeclaredTypeEn("Electronic Component");
         erpCustomRuleSaveReqVO.setDeclaredType("电子元件");
         erpCustomRuleSaveReqVO.setDeclaredValue(150.75);
@@ -196,7 +206,7 @@ class EsbServiceProductTest extends BaseDbUnitTest {
         erpCustomRuleSaveReqVO.setHscode("85423190");
         erpCustomRuleSaveReqVO.setLogisticAttribute("Fragile");
 
-        ErpCustomRuleDO customRule = BeanUtils.toBean(erpCustomRuleSaveReqVO, ErpCustomRuleDO.class);
+//        ErpCustomRuleDO customRule = BeanUtils.toBean(erpCustomRuleSaveReqVO, ErpCustomRuleDO.class);
         log.info(erpCustomRuleMapper.selectList().toString());
         erpCustomRuleService.createCustomRule(erpCustomRuleSaveReqVO);
         log.info(erpCustomRuleMapper.selectList().toString());

@@ -150,7 +150,7 @@ public class EsbService {
     * @Param [message]
     * @return void
     **/
-    @ServiceActivator(inputChannel = "syncExternalDataChannel")
+    @ServiceActivator(inputChannel = "productChannel")
     public void syncProductsToEccang(Message<List<ErpProductDTO>> message) {
         log.info("syncProductsToEccang");
         List<EccangProduct> eccangProducts = erpToEccangConverter.toEccang(message.getPayload());
@@ -177,7 +177,7 @@ public class EsbService {
      * @Param [message]
      * @return void
      **/
-    @ServiceActivator(inputChannel = "syncExternalDataChannel")
+//    @ServiceActivator(inputChannel = "productChannel")
     public void syncProductsToKingdee(Message<List<ErpProductDTO>> message) {
         log.info("syncProductsToKingdee");
         List<KingdeeProduct> kingdee = erpToKingdeeConverter.toKingdee(message.getPayload());

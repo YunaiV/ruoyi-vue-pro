@@ -153,6 +153,6 @@
                 LEFT JOIN ( SELECT * FROM system_users WHERE deleted = 0 AND tenant_id = 50001 ) d ON c.creator = d.id
                 LEFT JOIN ( SELECT * FROM system_dept WHERE deleted = 0 AND tenant_id = 50001 ) e ON d.dept_id = e.id
                 LEFT JOIN ( SELECT * FROM system_dept WHERE deleted = 0 AND tenant_id = 50001 ) f ON c.dept_id = f.id
-        WHERE a.deleted = 0 AND a.tenant_id = 50001 AND a.id = #{id}
+        WHERE a.deleted = 0 AND a.tenant_id = 0 AND a.id = #{id}
     </select>
 </mapper>

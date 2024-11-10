@@ -43,8 +43,7 @@ public class SynExternalDataAspect {
     public static final String ERP_SUPPLIER_PRODUCT = "erp_supplier_product";
     private final ErpProductMapper erpProductMapper;
     @Autowired
-    @Qualifier("syncExternalDataChannel")
-    private MessageChannel messageChannel;
+    private MessageChannel productChannel;
 
     @Around(value = "@annotation(synExternalData)")
     @SneakyThrows
@@ -72,8 +71,8 @@ public class SynExternalDataAspect {
         //当idValue不为null，则说明该请求为新增请求，反之则为修改请求
         if (idValue == null){
             //获取返参中的id
-            if (ObjUtil.isNotEmpty(result) && result instanceof CommonResult){
-                idValue = (Long) ((CommonResult<?>) result).getData();
+            if (ObjUtil.isNotEmpty(result)){
+                idValue = (Long) result;
             }
         }
         //判断id是否为null，为null则存在异常
@@ -90,7 +89,7 @@ public class SynExternalDataAspect {
         //数据同步
         if (CollUtil.isNotEmpty(products)){
             log.info("send begin");
-            messageChannel.send(MessageBuilder.withPayload(products).build());
+            productChannel.send(MessageBuilder.withPayload(products).build());
             log.info("send end");
         }
         return result;
