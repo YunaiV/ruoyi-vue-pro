@@ -31,6 +31,11 @@ public class KeFuConversationServiceImpl implements KeFuConversationService {
     private KeFuConversationMapper conversationMapper;
 
     @Override
+    public KeFuConversationDO getConversation(Long id) {
+        return conversationMapper.selectById(id);
+    }
+
+    @Override
     public void deleteKefuConversation(Long id) {
         // 校验存在
         validateKefuConversationExists(id);
