@@ -18,6 +18,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import org.flowable.bpmn.model.BpmnModel;
+import org.flowable.bpmn.model.Task;
 import org.flowable.bpmn.model.UserTask;
 import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.repository.ProcessDefinition;
@@ -115,9 +116,8 @@ public class BpmProcessDefinitionController {
         }
         BpmProcessDefinitionInfoDO processDefinitionInfo = processDefinitionService.getProcessDefinitionInfo(processDefinition.getId());
         BpmnModel bpmnModel = processDefinitionService.getProcessDefinitionBpmnModel(processDefinition.getId());
-        List<UserTask> userTaskList = BpmTaskCandidateStartUserSelectStrategy.getStartUserSelectUserTaskList(bpmnModel);
         return success(BpmProcessDefinitionConvert.INSTANCE.buildProcessDefinition(
-                processDefinition, null, processDefinitionInfo, null, null, bpmnModel, userTaskList));
+                processDefinition, null, processDefinitionInfo, null, null, bpmnModel));
     }
 
 }

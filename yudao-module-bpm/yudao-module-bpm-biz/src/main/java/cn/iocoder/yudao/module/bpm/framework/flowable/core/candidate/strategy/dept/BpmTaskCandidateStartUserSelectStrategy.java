@@ -10,13 +10,16 @@ import cn.iocoder.yudao.module.bpm.service.task.BpmProcessInstanceService;
 import com.google.common.collect.Sets;
 import jakarta.annotation.Resource;
 import org.flowable.bpmn.model.BpmnModel;
-import org.flowable.bpmn.model.UserTask;
+import org.flowable.bpmn.model.Task;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
-import java.util.*;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 /**
  * 发起人自选 {@link BpmTaskCandidateUserStrategy} 实现类
@@ -71,22 +74,22 @@ public class BpmTaskCandidateStartUserSelectStrategy extends AbstractBpmTaskCand
     }
 
     /**
-     * 获得发起人自选审批人的 UserTask 列表
+     * 获得发起人自选审批人或抄送人的 Task 列表
      *
      * @param bpmnModel BPMN 模型
-     * @return UserTask 列表
+     * @return Task 列表
      */
-    public static List<UserTask> getStartUserSelectUserTaskList(BpmnModel bpmnModel) {
+    public static <T extends Task> List<T> getStartUserSelectUserTaskList(BpmnModel bpmnModel, Class<T> TaskClass ) {
         if (bpmnModel == null) {
             return null;
         }
-        List<UserTask> userTaskList = BpmnModelUtils.getBpmnModelElements(bpmnModel, UserTask.class);
-        if (CollUtil.isEmpty(userTaskList)) {
+        List<T> tasks = BpmnModelUtils.getBpmnModelElements(bpmnModel, TaskClass);
+        if (CollUtil.isEmpty(tasks)) {
             return null;
         }
-        userTaskList.removeIf(userTask -> !Objects.equals(BpmnModelUtils.parseCandidateStrategy(userTask),
+        tasks.removeIf(serviceTask -> !Objects.equals(BpmnModelUtils.parseCandidateStrategy(serviceTask),
                 BpmTaskCandidateStrategyEnum.START_USER_SELECT.getStrategy()));
-        return userTaskList;
+        return tasks;
     }
 
 }

@@ -54,6 +54,9 @@ public class BpmApprovalDetailRespVO {
         @Schema(description = "节点状态", requiredMode = Schema.RequiredMode.REQUIRED, example = "0")
         private Integer status; // 参见 BpmTaskStatusEnum 枚举
 
+        @Schema(description = "候选人策略", example = "35")
+        private Integer candidateStrategy; // 用于审批，抄送节点
+
         @Schema(description = "节点的开始时间")
         private LocalDateTime startTime;
         @Schema(description = "节点的结束时间")

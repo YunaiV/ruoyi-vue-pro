@@ -628,10 +628,11 @@ public class SimpleModelUtils {
         BpmSimpleModelNodeType nodeType = BpmSimpleModelNodeType.valueOf(currentNode.getType());
         Assert.notNull(nodeType, "模型节点类型不支持");
 
-        // 情况：START_NODE/START_USER_NODE/APPROVE_NODE/END_NODE
+        // 情况：START_NODE/START_USER_NODE/APPROVE_NODE/COPY_NODE/END_NODE
         if (nodeType == BpmSimpleModelNodeType.START_NODE
             || nodeType == BpmSimpleModelNodeType.START_USER_NODE
             || nodeType == BpmSimpleModelNodeType.APPROVE_NODE
+            || nodeType == BpmSimpleModelNodeType.COPY_NODE
             || nodeType == BpmSimpleModelNodeType.END_NODE) {
             // 添加元素
             resultNodes.add(currentNode);

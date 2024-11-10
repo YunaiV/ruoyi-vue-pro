@@ -26,7 +26,6 @@ import cn.iocoder.yudao.module.bpm.service.message.dto.BpmMessageSendWhenProcess
 import cn.iocoder.yudao.module.system.api.dept.dto.DeptRespDTO;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import org.flowable.bpmn.model.BpmnModel;
-import org.flowable.bpmn.model.UserTask;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.ProcessInstance;
@@ -243,9 +242,8 @@ public interface BpmProcessInstanceConvert {
         }
 
         // 1.2 流程定义
-        List<UserTask> userTaskList = BpmTaskCandidateStartUserSelectStrategy.getStartUserSelectUserTaskList(bpmnModel);
         BpmProcessDefinitionRespVO definitionResp = BpmProcessDefinitionConvert.INSTANCE.buildProcessDefinition(
-                processDefinition, null, processDefinitionInfo, null, null, bpmnModel, userTaskList);
+                processDefinition, null, processDefinitionInfo, null, null, bpmnModel);
 
         // 1.3 流程节点
         activityNodes.forEach(approveNode -> {
