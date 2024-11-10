@@ -54,9 +54,6 @@ public class BpmApprovalDetailRespVO {
         @Schema(description = "节点状态", requiredMode = Schema.RequiredMode.REQUIRED, example = "0")
         private Integer status; // 参见 BpmTaskStatusEnum 枚举
 
-        @Schema(description = "候选人策略", example = "35")
-        private Integer candidateStrategy; // 用于审批，抄送节点
-
         @Schema(description = "节点的开始时间")
         private LocalDateTime startTime;
         @Schema(description = "节点的结束时间")
@@ -64,6 +61,9 @@ public class BpmApprovalDetailRespVO {
 
         @Schema(description = "审批节点的任务信息")
         private List<ActivityNodeTask> tasks;
+
+        @Schema(description = "候选人策略", example = "35")
+        private Integer candidateStrategy; // 参见 BpmTaskCandidateStrategyEnum 枚举。主要用于发起时，审批节点、抄送节点自选
 
         @Schema(description = "候选人用户 ID 列表", requiredMode = Schema.RequiredMode.NOT_REQUIRED, example = "1818")
         @JsonIgnore // 不返回，只是方便后续读取，赋值给 candidateUsers

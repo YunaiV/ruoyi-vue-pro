@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.bpm.framework.flowable.core.candidate.strategy.d
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Assert;
+import cn.hutool.core.util.ObjectUtil;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.candidate.strategy.user.BpmTaskCandidateUserStrategy;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmTaskCandidateStrategyEnum;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.util.BpmnModelUtils;
@@ -10,16 +11,15 @@ import cn.iocoder.yudao.module.bpm.service.task.BpmProcessInstanceService;
 import com.google.common.collect.Sets;
 import jakarta.annotation.Resource;
 import org.flowable.bpmn.model.BpmnModel;
+import org.flowable.bpmn.model.ServiceTask;
 import org.flowable.bpmn.model.Task;
+import org.flowable.bpmn.model.UserTask;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * 发起人自选 {@link BpmTaskCandidateUserStrategy} 实现类
@@ -79,15 +79,17 @@ public class BpmTaskCandidateStartUserSelectStrategy extends AbstractBpmTaskCand
      * @param bpmnModel BPMN 模型
      * @return Task 列表
      */
-    public static <T extends Task> List<T> getStartUserSelectUserTaskList(BpmnModel bpmnModel, Class<T> TaskClass ) {
+    public static List<Task> getStartUserSelectTaskList(BpmnModel bpmnModel) {
         if (bpmnModel == null) {
-            return null;
+            return Collections.emptyList();
         }
-        List<T> tasks = BpmnModelUtils.getBpmnModelElements(bpmnModel, TaskClass);
+        List<Task> tasks = new ArrayList<>();
+        tasks.addAll(BpmnModelUtils.getBpmnModelElements(bpmnModel, UserTask.class));
+        tasks.addAll(BpmnModelUtils.getBpmnModelElements(bpmnModel, ServiceTask.class));
         if (CollUtil.isEmpty(tasks)) {
-            return null;
+            return Collections.emptyList();
         }
-        tasks.removeIf(serviceTask -> !Objects.equals(BpmnModelUtils.parseCandidateStrategy(serviceTask),
+        tasks.removeIf(task -> ObjectUtil.notEqual(BpmnModelUtils.parseCandidateStrategy(task),
                 BpmTaskCandidateStrategyEnum.START_USER_SELECT.getStrategy()));
         return tasks;
     }
