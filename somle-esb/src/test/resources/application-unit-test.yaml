@@ -1,21 +1,27 @@
 #debug: true
 
+
 spring:
   main:
-    lazy-initialization: true # 开启懒加载，加快速度
+#    lazy-initialization: true # 如果开启懒加载，会导致ServiceActivator不能自动订阅inputChannel
     banner-mode: off # 单元测试，禁用 Banner
   test:
     database:
       replace: none
+
 logging:
   level:
     com.somle: DEBUG
     cn.iocoder: DEBUG
-    cn.iocoder.yudao.module.system.service.dept: DEBUG
     org.quartz: DEBUG
     org.springframework.scheduling.quartz: DEBUG
     com.baomidou.mybatisplus: DEBUG
     jdbc.sqlonly: DEBUG
+    org:
+      springframework:
+        integration:
+          config:
+            MessagingAnnotationBeanPostProcessor: DEBUG
   quartz:
     auto-startup: true
 
@@ -64,7 +70,7 @@ spring:
       database: 0 # 数据库索引
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: none
 
 mybatis:
   lazy-initialization: true # 单元测试，设置 MyBatis Mapper 延迟加载，加速每个单元测试
