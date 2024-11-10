@@ -48,11 +48,9 @@ public interface BpmModelConvert {
             BpmFormDO form = metaInfo != null ? formMap.get(metaInfo.getFormId()) : null;
             BpmCategoryDO category = categoryMap.get(model.getCategory());
             Deployment deployment = model.getDeploymentId() != null ? deploymentMap.get(model.getDeploymentId()) : null;
-            ProcessDefinition processDefinition = model.getDeploymentId() != null
-                    ? processDefinitionMap.get(model.getDeploymentId())
-                    : null;
-            List<AdminUserRespDTO> startUsers = metaInfo != null ? convertList(metaInfo.getStartUserIds(), userMap::get)
-                    : null;
+            ProcessDefinition processDefinition = model.getDeploymentId() != null ?
+                    processDefinitionMap.get(model.getDeploymentId()) : null;
+            List<AdminUserRespDTO> startUsers = metaInfo != null ? convertList(metaInfo.getStartUserIds(), userMap::get) : null;
             return buildModel0(model, metaInfo, form, category, deployment, processDefinition, startUsers);
         });
         // 排序
@@ -60,8 +58,7 @@ public interface BpmModelConvert {
         return result;
     }
 
-    default BpmModelRespVO buildModel(Model model,
-            byte[] bpmnBytes) {
+    default BpmModelRespVO buildModel(Model model, byte[] bpmnBytes) {
         BpmModelMetaInfoVO metaInfo = parseMetaInfo(model);
         BpmModelRespVO modelVO = buildModel0(model, metaInfo, null, null, null, null, null);
         if (ArrayUtil.isNotEmpty(bpmnBytes)) {
@@ -71,9 +68,9 @@ public interface BpmModelConvert {
     }
 
     default BpmModelRespVO buildModel0(Model model,
-            BpmModelMetaInfoVO metaInfo, BpmFormDO form, BpmCategoryDO category,
-            Deployment deployment, ProcessDefinition processDefinition,
-            List<AdminUserRespDTO> startUsers) {
+                                       BpmModelMetaInfoVO metaInfo, BpmFormDO form, BpmCategoryDO category,
+                                       Deployment deployment, ProcessDefinition processDefinition,
+                                       List<AdminUserRespDTO> startUsers) {
         BpmModelRespVO modelRespVO = new BpmModelRespVO().setId(model.getId()).setName(model.getName())
                 .setKey(model.getKey()).setCategory(model.getCategory())
                 .setCreateTime(DateUtils.of(model.getCreateTime()));
@@ -89,9 +86,8 @@ public interface BpmModelConvert {
         // ProcessDefinition
         if (processDefinition != null) {
             modelRespVO.setProcessDefinition(BeanUtils.toBean(processDefinition, BpmProcessDefinitionRespVO.class));
-            modelRespVO.getProcessDefinition()
-                    .setSuspensionState(processDefinition.isSuspended() ? SuspensionState.SUSPENDED.getStateCode()
-                            : SuspensionState.ACTIVE.getStateCode());
+            modelRespVO.getProcessDefinition().setSuspensionState(processDefinition.isSuspended() ?
+                    SuspensionState.SUSPENDED.getStateCode() : SuspensionState.ACTIVE.getStateCode());
             if (deployment != null) {
                 modelRespVO.getProcessDefinition().setDeploymentTime(DateUtils.of(deployment.getDeploymentTime()));
             }
