@@ -3,6 +3,7 @@ package com.somle.esb.config;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.task.SimpleAsyncTaskExecutor;
 import org.springframework.integration.annotation.BridgeTo;
 import org.springframework.integration.annotation.Poller;
 import org.springframework.integration.annotation.ServiceActivator;
@@ -42,7 +43,7 @@ public class IntegrationConfig {
 
     @Bean
     public MessageChannel productChannel() {
-        return new PublishSubscribeChannel();
+        return new PublishSubscribeChannel(new SimpleAsyncTaskExecutor());
     }
 
     @Bean

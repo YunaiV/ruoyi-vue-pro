@@ -36,7 +36,10 @@ class IntegrationConfigTest extends BaseSpringIntegrationTest {
     @Test
     void testSend() {
         // Send test message
-        testChannel.send(MessageBuilder.withPayload("hello").build());
+        testChannel.send(MessageBuilder
+                .withPayload(1)
+                .setHeader("type", "integer")
+                .build());
     }
 
 
