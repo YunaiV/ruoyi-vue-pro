@@ -1,31 +1,35 @@
 package cn.iocoder.yudao.module.erp.service.purchase;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.util.ObjUtil;
+import cn.hutool.core.text.StrPool;
+import cn.iocoder.yudao.framework.common.exception.util.ThrowUtil;
 import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
-import cn.iocoder.yudao.module.erp.aop.SynExternalData;
+import cn.iocoder.yudao.module.erp.api.product.dto.ErpProductDTO;
 import cn.iocoder.yudao.module.erp.controller.admin.product.vo.product.ErpProductRespVO;
-import cn.iocoder.yudao.module.erp.dal.dataobject.product.ErpProductCategoryDO;
-import cn.iocoder.yudao.module.erp.dal.dataobject.product.ErpProductDO;
-import cn.iocoder.yudao.module.erp.dal.dataobject.product.ErpProductUnitDO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpSupplierDO;
 import cn.iocoder.yudao.module.erp.service.product.ErpProductService;
+import cn.iocoder.yudao.module.erp.template.SynExternalDataTemplate;
+import cn.iocoder.yudao.module.system.api.dept.DeptApi;
+import cn.iocoder.yudao.module.system.api.dept.dto.DeptRespDTO;
+import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
+import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
+import lombok.RequiredArgsConstructor;
+import org.springframework.messaging.MessageChannel;
+import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.stereotype.Service;
 import jakarta.annotation.Resource;
 import org.springframework.validation.annotation.Validated;
-
 import java.util.*;
 import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.*;
 import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpSupplierProductDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
-
 import cn.iocoder.yudao.module.erp.dal.mysql.purchase.ErpSupplierProductMapper;
-
+import static cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants.DB_UPDATE_ERROR;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
-import static cn.iocoder.yudao.module.erp.aop.SynExternalDataAspect.ERP_SUPPLIER_PRODUCT;
 import static cn.iocoder.yudao.module.erp.enums.ErrorCodeConstants.*;
+import static cn.iocoder.yudao.module.erp.util.ConstantConvertUtils.getProductStatus;
 
 /**
  * ERP 供应商产品 Service 实现类
@@ -34,15 +38,12 @@ import static cn.iocoder.yudao.module.erp.enums.ErrorCodeConstants.*;
  */
 @Service
 @Validated
+@RequiredArgsConstructor
 public class ErpSupplierProductServiceImpl implements ErpSupplierProductService {
-
-    @Resource
-    private ErpSupplierProductMapper supplierProductMapper;
-
-    @Resource
-    private ErpProductService productService;
-    @Resource
-    private ErpSupplierService supplierService;
+    private final ErpSupplierProductMapper supplierProductMapper;
+    private final ErpProductService productService;
+    private final ErpSupplierService supplierService;
+    private final SynExternalDataTemplate synExternalDataTemplate;
 
     @Override
     public Long createSupplierProduct(ErpSupplierProductSaveReqVO createReqVO) {
@@ -55,14 +56,16 @@ public class ErpSupplierProductServiceImpl implements ErpSupplierProductService 
     }
 
     @Override
-    @SynExternalData(table = ERP_SUPPLIER_PRODUCT,inClazz = ErpSupplierProductSaveReqVO.class)
     public void updateSupplierProduct(ErpSupplierProductSaveReqVO updateReqVO) {
-        validateSupplierProductCodeUnique(updateReqVO.getId(),updateReqVO.getCode());
+        Long id = updateReqVO.getId();
+        validateSupplierProductCodeUnique(id,updateReqVO.getCode());
         // 校验存在
-        validateSupplierProductExists(updateReqVO.getId());
+        validateSupplierProductExists(id);
         // 更新
         ErpSupplierProductDO updateObj = BeanUtils.toBean(updateReqVO, ErpSupplierProductDO.class);
-        supplierProductMapper.updateById(updateObj);
+        ThrowUtil.ifSqlThrow(supplierProductMapper.updateById(updateObj),DB_UPDATE_ERROR);
+        //同步数据
+        synExternalDataTemplate.synProductData(supplierProductMapper.selectProductAllInfoListBySupplierId(id));
     }
 
     @Override

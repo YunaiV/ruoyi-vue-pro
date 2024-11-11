@@ -1,5 +1,7 @@
 package cn.iocoder.yudao.module.erp.api.product.dto;
 
+import com.fhs.core.trans.anno.Trans;
+import com.fhs.core.trans.constant.TransType;
 import lombok.Data;
 
 /**
@@ -15,6 +17,10 @@ public class ErpProductDTO {
      * 海关规则id  =====>>>> 映射到pd_declaration_statement
      */
     private String ruleId;
+    /**
+     * 供应商产品编码
+     */
+    private String supplierProductCode;
     /**
      * 产品SKU: 供应商产品编码-国家代码
      */
@@ -176,12 +182,16 @@ public class ErpProductDTO {
     private String barCode;
 
     /**
-     * 产品部门名称  ======>>>>>  对应eccang的品类
-     **/
-    private String productDeptName;
-
-    /**
      * 产品部门名id
      **/
     private Long productDeptId;
+    /**
+     * 产品部门名称  ======>>>>>  对应eccang的品类
+     **/
+    private String productDeptName;
+    /**
+     * 产品创建人
+     **/
+    private String creator;
+
 }

@@ -117,7 +117,7 @@ public class ErpToEccangConverter {
             boxArr.put("box_quantity",1);
             boxArr.put("warehouse_id",0);*/
             //boxArr.put("box_id",boxId);
-            EccangOrganization organization = eccangService.getOrganizationByNameEn(product.getUserOrganizationId());
+            //EccangOrganization organization = eccangService.getOrganizationByNameEn(product.getUserOrganizationId());
             EccangProduct eccangProduct = new EccangProduct();
             BeanUtils.copyProperties(product,eccangProduct);
             eccangProduct.setPdDeclarationStatement(product.getRuleId());
@@ -128,7 +128,7 @@ public class ErpToEccangConverter {
             eccangProduct.setProductImgUrlList(Collections.singletonList(product.getImageUrl()));
             //eccangProduct.setBoxArr(List.of(boxArr));
             eccangProduct.setDefaultSupplierCode("默认供应商");
-            eccangProduct.setUserOrganizationId(organization.getId());
+            eccangProduct.setUserOrganizationId(50007);
 
             //获取产品部门的源关系
             TreeSet<DeptLevelRespDTO> deptTreeLevel = deptApi.getDeptTreeLevel(product.getProductDeptId());

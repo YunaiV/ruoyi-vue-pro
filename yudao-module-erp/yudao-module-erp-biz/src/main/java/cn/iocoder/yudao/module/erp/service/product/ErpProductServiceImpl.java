@@ -1,13 +1,14 @@
 package cn.iocoder.yudao.module.erp.service.product;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.text.StrPool;
 import cn.hutool.core.util.ObjUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.exception.util.ThrowUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
-import cn.iocoder.yudao.module.erp.aop.SynExternalData;
+import cn.iocoder.yudao.module.erp.api.product.dto.ErpProductDTO;
 import cn.iocoder.yudao.module.erp.controller.admin.product.vo.product.ErpProductPageReqVO;
 import cn.iocoder.yudao.module.erp.controller.admin.product.vo.product.ErpProductRespVO;
 import cn.iocoder.yudao.module.erp.controller.admin.product.vo.product.ProductSaveReqVO;
@@ -15,18 +16,23 @@ import cn.iocoder.yudao.module.erp.dal.dataobject.product.ErpProductCategoryDO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.product.ErpProductDO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.product.ErpProductUnitDO;
 import cn.iocoder.yudao.module.erp.dal.mysql.product.ErpProductMapper;
+import cn.iocoder.yudao.module.erp.template.SynExternalDataTemplate;
 import cn.iocoder.yudao.module.system.api.dept.DeptApi;
+import cn.iocoder.yudao.module.system.api.dept.dto.DeptRespDTO;
+import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
+import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import jakarta.annotation.Resource;
 import lombok.RequiredArgsConstructor;
+import org.springframework.messaging.MessageChannel;
+import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
-
 import java.util.*;
-
+import static cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants.DB_UPDATE_ERROR;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
-import static cn.iocoder.yudao.module.erp.aop.SynExternalDataAspect.ERP_PRODUCT;
 import static cn.iocoder.yudao.module.erp.enums.ErrorCodeConstants.*;
+import static cn.iocoder.yudao.module.erp.util.ConstantConvertUtils.getProductStatus;
 
 /**
  * ERP 产品 Service 实现类
@@ -37,14 +43,14 @@ import static cn.iocoder.yudao.module.erp.enums.ErrorCodeConstants.*;
 @Validated
 @RequiredArgsConstructor
 public class ErpProductServiceImpl implements ErpProductService {
-
     private final ErpProductMapper productMapper;
-
     private final ErpProductCategoryService productCategoryService;
-
     private final ErpProductUnitService productUnitService;
-
     private final DeptApi deptApi;
+    private final SynExternalDataTemplate synExternalDataTemplate;
+
+
+
 
     @Override
     public Long createProduct(ProductSaveReqVO createReqVO) {
@@ -77,17 +83,19 @@ public class ErpProductServiceImpl implements ErpProductService {
     }
 
     @Override
-    @SynExternalData(table = ERP_PRODUCT,inClazz = ProductSaveReqVO.class)
     public void updateProduct(ProductSaveReqVO updateReqVO) {
+        Long id = updateReqVO.getId();
         //校验相同的id下是否存在相同的产品编码
-        validateProductCodeUnique(updateReqVO.getId(),updateReqVO.getBarCode());
+        validateProductCodeUnique(id,updateReqVO.getBarCode());
         // 校验存在
-        validateProductExists(updateReqVO.getId());
+        validateProductExists(id);
         Long deptId = updateReqVO.getDeptId();
         this.validateDept(deptId);
         // 更新
         ErpProductDO updateObj = BeanUtils.toBean(updateReqVO, ErpProductDO.class);
-        productMapper.updateById(updateObj);
+        ThrowUtil.ifSqlThrow(productMapper.updateById(updateObj),DB_UPDATE_ERROR);
+        //同步数据
+        synExternalDataTemplate.synProductData(productMapper.selectProductAllInfoListById(id));
     }
 
     @Override

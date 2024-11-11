@@ -55,6 +55,12 @@ public class ThrowUtil {
         }
     }
 
+    public static void ifSqlThrow(int i, ErrorCode dbUpdateError) {
+        if (i <= 0) {
+            throw exception(dbUpdateError);
+        }
+    }
+
 
     /*public static void ifNullThrow(Object data, String code) {
         if (Objects.isNull(data)) {
