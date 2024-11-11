@@ -19,9 +19,6 @@ public class KingdeeResponse {
     private String description;
     private String errcode;
 
-    public JSONObject getData() {
-        return JsonUtils.toJSONObject(data);
-    }
 
     public <T> T getData(Class<T> objectClass) {
         return JsonUtils.parseObject(data, objectClass);

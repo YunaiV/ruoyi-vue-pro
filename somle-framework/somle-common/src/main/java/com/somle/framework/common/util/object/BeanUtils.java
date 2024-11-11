@@ -33,7 +33,7 @@ public class BeanUtils {
         return target;
     }
 
-    public static Map<String, String> beanToStringMap(Object bean, String... properties) {
+    public static Map<String, String> toStringMap(Object bean, String... properties) {
         var map = BeanUtil.beanToMap(bean, properties);
         Map<String, String> stringMap = new LinkedHashMap<>();
         for (Map.Entry<String, Object> entry : map.entrySet()) {
