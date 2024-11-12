@@ -23,8 +23,8 @@ import cn.iocoder.yudao.module.erp.controller.admin.logistic.customrule.vo.*;
 public interface ErpCustomRuleMapper extends BaseMapperX<ErpCustomRuleDO> {
     default MPJLambdaWrapper<ErpCustomRuleDO> getWrapper() {
         return new MPJLambdaWrapperX<ErpCustomRuleDO>()
-                .selectAs(ErpCustomRuleDO::getId, ErpCustomRuleDTO::getCustomRuleId)
-                .select(ErpCustomRuleDO::getCountryCode,
+                .select(ErpCustomRuleDO::getId,
+                        ErpCustomRuleDO::getCountryCode,
                         ErpCustomRuleDO::getLogisticAttribute,
                         ErpCustomRuleDO::getHscode,
                         ErpCustomRuleDO::getDeclaredValue,
@@ -40,16 +40,15 @@ public interface ErpCustomRuleMapper extends BaseMapperX<ErpCustomRuleDO> {
                         ErpSupplierProductDO::getPackageHeight,
                         ErpSupplierProductDO::getPurchasePriceCurrencyCode)
                 .leftJoin(ErpProductDO.class, ErpProductDO::getId, ErpSupplierProductDO::getProductId)
-                .select(
-                        ErpProductDO::getName,
-                        ErpProductDO::getImageUrl,
-                        ErpProductDO::getWeight,
-                        ErpProductDO::getLength,
-                        ErpProductDO::getWidth,
-                        ErpProductDO::getHeight,
-                        ErpProductDO::getMaterial,
-                        ErpProductDO::getBarCode,
-                        ErpProductDO::getCreator)
+                .selectAs(ErpProductDO::getName, ErpCustomRuleDTO::getProductName)
+                .selectAs(ErpProductDO::getImageUrl, ErpCustomRuleDTO::getProductImageUrl)
+                .selectAs(ErpProductDO::getWeight, ErpCustomRuleDTO::getProductWeight)
+                .selectAs(ErpProductDO::getLength, ErpCustomRuleDTO::getProductLength)
+                .selectAs(ErpProductDO::getWidth, ErpCustomRuleDTO::getProductWidth)
+                .selectAs(ErpProductDO::getHeight, ErpCustomRuleDTO::getProductHeight)
+                .selectAs(ErpProductDO::getMaterial, ErpCustomRuleDTO::getProductMaterial)
+                .selectAs(ErpProductDO::getCreator, ErpCustomRuleDTO::getProductCreatorId)
+                .select(ErpProductDO::getBarCode)
                 .selectAs(ErpProductDO::getDeptId, ErpCustomRuleDTO::getProductDeptId);
     }
 

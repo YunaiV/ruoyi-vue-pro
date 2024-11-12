@@ -1,12 +1,17 @@
 package com.somle.esb.converter;
 
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ReflectUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.exception.util.ThrowUtil;
+import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
 import cn.iocoder.yudao.module.erp.api.product.dto.ErpCustomRuleDTO;
 import cn.iocoder.yudao.module.system.api.dept.DeptApi;
 import cn.iocoder.yudao.module.system.api.dept.dto.DeptLevelRespDTO;
 import cn.iocoder.yudao.module.system.api.dept.dto.DeptRespDTO;
+import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
+import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import com.somle.eccang.model.*;
 import com.somle.eccang.service.EccangService;
 import org.springframework.beans.BeanUtils;
@@ -16,7 +21,9 @@ import org.springframework.stereotype.Service;
 import java.lang.reflect.Field;
 import java.util.*;
 
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 import static com.somle.esb.enums.ErrorCodeConstants.DEPT_LEVEL_ERROR;
+import static com.somle.esb.util.ConstantConvertUtils.getProductStatus;
 
 @Service
 public class ErpToEccangConverter {
@@ -28,6 +35,8 @@ public class ErpToEccangConverter {
 
     @Autowired
     private DeptApi deptApi;
+    @Autowired
+    private AdminUserApi userApi;
 
 //    public EccangProduct toEccang(ErpCountrySku erpCountrySku) {
 //        ErpStyleSku erpStyleSku = erpCountrySku.getStyleSku();
@@ -88,6 +97,8 @@ public class ErpToEccangConverter {
 //    }
 
     public List<EccangProduct> toEccang(List<ErpCustomRuleDTO> allProducts){
+        //获取创建人用户信息
+        Map<Long, AdminUserRespDTO> userMap = userApi.getUserMap(convertSet(allProducts, i -> Long.parseLong(i.getProductCreatorId())));
         List<EccangProduct> allEccangProducts = new ArrayList<>();
         for (ErpCustomRuleDTO product : allProducts){
             /*//编辑箱规
@@ -115,17 +126,23 @@ public class ErpToEccangConverter {
             //boxArr.put("box_id",boxId);
             //EccangOrganization organization = eccangService.getOrganizationByNameEn(product.getUserOrganizationId());
             EccangProduct eccangProduct = new EccangProduct();
-            BeanUtils.copyProperties(product,eccangProduct);
-            eccangProduct.setPdDeclarationStatement(product.getCustomRuleId());
-            eccangProduct.setProductTitleEn(product.getProductSku());
+            eccangProduct.setPdDeclarationStatement(product.getId());
+            eccangProduct.setProductTitle(product.getProductName());
+            eccangProduct.setPdOverseaTypeEn(product.getDeclaredTypeEn());
+            //如果有供应商产品编码和国家代码都不为空的时候才去设置SKU
+            if (StrUtil.isNotBlank(product.getSupplierProductCode()) && StrUtil.isNotBlank(product.getCountryCode())) {
+                eccangProduct.setProductTitleEn(product.getSupplierProductCode() + "-" + getProductStatus(product.getCountryCode()));
+                eccangProduct.setProductSku(product.getSupplierProductCode() + "-" + getProductStatus(product.getCountryCode()));
+            }
             eccangProduct.setPdDeclareCurrencyCode("USD");
             eccangProduct.setProductDeclaredValue(99999.9F);
             eccangProduct.setLogisticAttribute("1");
-            eccangProduct.setProductImgUrlList(Collections.singletonList(product.getImageUrl()));
+            eccangProduct.setProductImgUrlList(Collections.singletonList(product.getProductImageUrl()));
             //eccangProduct.setBoxArr(List.of(boxArr));
             eccangProduct.setDefaultSupplierCode("默认供应商");
-            eccangProduct.setUserOrganizationId(50007);
-
+            //设置产品创建人部门名称
+            MapUtils.findAndThen(userMap, Long.parseLong(product.getProductCreatorId()),
+                    user -> eccangProduct.setUserOrganizationId(Math.toIntExact(user.getDeptId())));
             //获取产品部门的源关系
             TreeSet<DeptLevelRespDTO> deptTreeLevel = deptApi.getDeptTreeLevel(product.getProductDeptId());
             //判断集合是否为空、0、大于3

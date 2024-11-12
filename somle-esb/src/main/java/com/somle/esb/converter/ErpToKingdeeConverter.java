@@ -3,12 +3,16 @@ package com.somle.esb.converter;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import cn.hutool.core.text.StrPool;
+import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.module.erp.api.product.dto.ErpCustomRuleDTO;
 import cn.iocoder.yudao.module.erp.api.supplier.dto.ErpSupplierDTO;
 import cn.iocoder.yudao.module.system.api.dept.DeptApi;
 import cn.iocoder.yudao.module.system.api.dept.dto.DeptRespDTO;
+import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
+import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import com.somle.erp.model.product.ErpCountrySku;
 import com.somle.erp.model.product.ErpStyleSku;
 import com.somle.kingdee.model.KingdeeProduct;
@@ -21,6 +25,9 @@ import org.springframework.stereotype.Service;
 
 
 import lombok.extern.slf4j.Slf4j;
+
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
+import static com.somle.esb.util.ConstantConvertUtils.getProductStatus;
 
 @Slf4j
 @Service
@@ -86,8 +93,11 @@ public class ErpToKingdeeConverter {
             KingdeeProduct kingdeeProduct = new KingdeeProduct();
             //普通
             kingdeeProduct.setCheckType("1");
-            kingdeeProduct.setName(product.getName() + StrPool.DASHED + product.getCountryCode());
-            kingdeeProduct.setNumber(product.getProductSku());
+            kingdeeProduct.setName(product.getProductName() + StrPool.DASHED + product.getCountryCode());
+            //如果有供应商产品编码和国家代码都不为空的时候才去设置SKU
+            if (StrUtil.isNotBlank(product.getSupplierProductCode()) && StrUtil.isNotBlank(product.getCountryCode())) {
+                kingdeeProduct.setNumber(product.getSupplierProductCode() + "-" + getProductStatus(product.getCountryCode()));
+            }
             kingdeeProduct.setBarcode(product.getBarCode());
             //报关品名
             kingdeeProduct.setProducingPace(product.getDeclaredType());
@@ -110,7 +120,7 @@ public class ErpToKingdeeConverter {
             kingdeeProduct.setSaleDepartmentId(product.getProductDeptId());
             kingdeeProduct.setDeclaredTypeZh(product.getDeclaredType());
             //将报关规则的id存到这里面去
-            kingdeeProduct.setMaxInventoryQty(product.getCustomRuleId());
+            kingdeeProduct.setMaxInventoryQty(product.getId());
             kingdeeProducts.add(kingdeeProduct);
         }
 

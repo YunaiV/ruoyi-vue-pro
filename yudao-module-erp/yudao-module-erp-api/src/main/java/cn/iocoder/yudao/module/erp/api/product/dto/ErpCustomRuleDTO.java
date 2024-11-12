@@ -14,20 +14,17 @@ public class ErpCustomRuleDTO {
     /**
      * 海关规则id  =====>>>> 映射到pd_declaration_statement
      */
-    private String customRuleId;
+    private String id;
     /**
      * 供应商产品编码
      */
     private String supplierProductCode;
-    /**
-     * 产品SKU: 供应商产品编码-国家代码
-     */
-    private String productSku;
+
 
     /**
      * 产品名称
      */
-    private String name;
+    private String productName;
 
     /**
      * 国家编码
@@ -37,12 +34,7 @@ public class ErpCustomRuleDTO {
     /**
      * 图片地址（当前只有一张）
      **/
-    private String imageUrl;
-
-    /**
-     * 产品图片集合
-     */
-    //private String productImgUrlList;
+    private String productImageUrl;
 
     /**
      * 重量
@@ -72,22 +64,22 @@ public class ErpCustomRuleDTO {
     /**
      * 基础长度
      */
-    private Float length;
+    private Float productLength;
 
     /**
      * 基础宽度
      */
-    private Float width;
+    private Float productWidth;
 
     /**
      * 基础高度
      */
-    private Float height;
+    private Float productHeight;
 
     /**
      * 材料
      */
-    private String material;
+    private String productMaterial;
 
     /**
      * 采购货币币种
@@ -130,11 +122,6 @@ public class ErpCustomRuleDTO {
     private Float taxRate;
 
     /**
-     * 从数据库查询出来的是部门的名称，最后在上传eccang的时候转换成了eccang的组织id
-     */
-    private String creatorDeptName;
-
-    /**
      * 条形码
      */
     private String barCode;
@@ -143,13 +130,10 @@ public class ErpCustomRuleDTO {
      * 产品部门名id
      **/
     private Long productDeptId;
-    /**
-     * 产品部门名称  ======>>>>>  对应eccang的品类
-     **/
-    private String productDeptName;
+
     /**
      * 产品创建人
      **/
-    private String creator;
+    private String productCreatorId;
 
 }

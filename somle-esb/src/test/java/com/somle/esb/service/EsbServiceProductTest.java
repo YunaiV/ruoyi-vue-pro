@@ -2,12 +2,12 @@ package com.somle.esb.service;
 
 
 import cn.iocoder.yudao.framework.mybatis.config.YudaoMybatisAutoConfiguration;
-import cn.iocoder.yudao.module.erp.aop.SynExternalDataAspect;
 import cn.iocoder.yudao.module.erp.api.product.dto.ErpCustomRuleDTO;
 import cn.iocoder.yudao.module.erp.controller.admin.logistic.customrule.vo.ErpCustomRuleSaveReqVO;
 import cn.iocoder.yudao.module.erp.dal.mysql.logistic.customrule.ErpCustomRuleMapper;
 import cn.iocoder.yudao.module.erp.service.logistic.customrule.ErpCustomRuleService;
 import cn.iocoder.yudao.module.erp.service.logistic.customrule.ErpCustomRuleServiceImpl;
+import cn.iocoder.yudao.module.erp.template.SynExternalDataTemplate;
 import cn.iocoder.yudao.module.infra.api.config.ConfigApi;
 import cn.iocoder.yudao.module.infra.api.file.FileApi;
 import cn.iocoder.yudao.module.system.api.dept.DeptApi;
@@ -60,12 +60,10 @@ import java.util.List;
     ErpToKingdeeConverter.class,
     EccangToErpConverter.class,
 
-
+        SynExternalDataTemplate.class,
 
     DeptApiImpl.class,
     DeptServiceImpl.class,
-
-    SynExternalDataAspect.class,
 
 
 //    YudaoSecurityAutoConfiguration.class,
@@ -111,8 +109,8 @@ class EsbServiceProductTest extends BaseSpringIntegrationTest {
     ErpCustomRuleMapper erpCustomRuleMapper;
 
 
-//    @Resource
-//    private DeptConvert deptConvert;
+    @Resource
+    private SynExternalDataTemplate synExternalDataTemplate;
 
 
     @MockBean
@@ -137,11 +135,9 @@ class EsbServiceProductTest extends BaseSpringIntegrationTest {
     @Test
     public void syncProductsTest() {
         ErpCustomRuleDTO product = new ErpCustomRuleDTO();
-        product.setCustomRuleId("R12345");
-        product.setProductSku("SUP123-US");
-        product.setName("Wireless Headphones");
-        product.setProductTitleEn("Wireless Headphones");
-        product.setCountryCode("US");
+        product.setId("R12345");
+        product.setProductName("Wireless Headphones");
+        product.setCountryCode("XXX");
 //        product.setImageUrl("https://example.com/images/product1.jpg");
 
         product.setPackageWeight(1.2f);
@@ -149,15 +145,11 @@ class EsbServiceProductTest extends BaseSpringIntegrationTest {
         product.setPackageWidth(10.3f);
         product.setPackageHeight(5.1f);
         product.setProductWeight(1.5f);
-        product.setLength(16.0f);
-        product.setWidth(11.0f);
-        product.setHeight(6.0f);
-        product.setMaterial("Plastic and Metal");
-        product.setMaterialEn("Plastic and Metal");
-        product.setProductPurchaseValue(45.99f);
+        product.setProductLength(16.0f);
+        product.setProductWidth(11.0f);
+        product.setProductHeight(6.0f);
+        product.setProductMaterial("Plastic and Metal");
         product.setPurchasePriceCurrencyCode("USD");
-        product.setDefaultSupplierCode("SUP123");
-        product.setSaleStatus(1);
         product.setLogisticAttribute("Fragile");
         product.setHscode("85076000");
         product.setDeclaredValue(50.0f);
@@ -165,13 +157,13 @@ class EsbServiceProductTest extends BaseSpringIntegrationTest {
         product.setDeclaredType("无线耳机");
         product.setDeclaredTypeEn("Wireless Headphones");
         product.setTaxRate(0.12f);
+        product.setProductCreatorId("50325");
+        product.setSupplierProductCode("DDDDDDD");
 
         //product.setProductCategoryId1(50002);
         //product.setProductCategoryId2(50007);
 //        product.setProductCategoryId3(103);
-        product.setCreatorDeptName("EBD办公事业部");
         product.setBarCode("1234567890123");
-        product.setProductDeptName("Electronics");
         product.setProductDeptId(50007L);
 
         esbService.syncProductsToEccang(MessageBuilder.withPayload(List.of(product)).build());
