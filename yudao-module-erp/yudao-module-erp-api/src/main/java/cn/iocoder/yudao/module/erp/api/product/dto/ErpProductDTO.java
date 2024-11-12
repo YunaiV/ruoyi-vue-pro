@@ -1,7 +1,5 @@
 package cn.iocoder.yudao.module.erp.api.product.dto;
 
-import com.fhs.core.trans.anno.Trans;
-import com.fhs.core.trans.constant.TransType;
 import lombok.Data;
 
 /**
@@ -16,7 +14,7 @@ public class ErpProductDTO {
     /**
      * 海关规则id  =====>>>> 映射到pd_declaration_statement
      */
-    private String ruleId;
+    private String customRuleId;
     /**
      * 供应商产品编码
      */
@@ -29,12 +27,7 @@ public class ErpProductDTO {
     /**
      * 产品名称
      */
-    private String productTitle;
-
-    /**
-     * 产品名称英文名
-     */
-    private String productTitleEn;
+    private String name;
 
     /**
      * 国家编码
@@ -54,22 +47,22 @@ public class ErpProductDTO {
     /**
      * 重量
      */
-    private Float pdNetWeight;
+    private Float packageWeight;
 
     /**
      * 长
      */
-    private Float pdNetLength;
+    private Float packageLength;
 
     /**
      * 宽
      */
-    private Float pdNetWidth;
+    private Float packageWidth;
 
     /**
      * 高
      */
-    private Float pdNetHeight;
+    private Float packageHeight;
 
     /**
      * 净重
@@ -79,47 +72,27 @@ public class ErpProductDTO {
     /**
      * 基础长度
      */
-    private Float productLength;
+    private Float length;
 
     /**
      * 基础宽度
      */
-    private Float productWidth;
+    private Float width;
 
     /**
      * 基础高度
      */
-    private Float productHeight;
+    private Float height;
 
     /**
      * 材料
      */
-    private String productMaterial;
-
-    /**
-     * 材料（英文）
-     */
-    private String materialEn;
-
-    /**
-     * 默认采购单价
-     */
-    private Float productPurchaseValue;
+    private String material;
 
     /**
      * 采购货币币种
      */
-    private String currencyCode;
-
-    /**
-     * 默认供应商代码
-     */
-    private String defaultSupplierCode;
-
-    /**
-     * 产品销售状态
-     */
-    private Integer saleStatus;
+    private String purchasePriceCurrencyCode;
 
     /**
      * 产品物流属性
@@ -129,52 +102,37 @@ public class ErpProductDTO {
     /**
      * 海关编码
      */
-    private String hsCode;
+    private String hscode;
 
     /**
      * 申报价值
      */
-    private Float productDeclaredValue;
+    private Float declaredValue;
 
     /**
      * 申报币种
      */
-    private String pdDeclareCurrencyCode;
+    private String declaredValueCurrencyCode;
 
     /**
      * 申报品名CN
      */
-    private String pdOverseaTypeCn;
+    private String declaredType;
 
     /**
      * 申报品名EN
      */
-    private String pdOverseaTypeEn;
+    private String declaredTypeEn;
 
     /**
      * 清关税率
      */
-    private Float fboTaxRate;
+    private Float taxRate;
 
     /**
-     * 一级品类名称
+     * 从数据库查询出来的是部门的名称，最后在上传eccang的时候转换成了eccang的组织id
      */
-    private Integer productCategoryId1;
-
-    /**
-     * 二级品类名称
-     */
-    private Integer productCategoryId2;
-
-    /**
-     * 三级品类名称
-     */
-    private Integer productCategoryId3;
-
-    /**
-     * 产品创建人的部门id{从数据库查询出来的是部门的名称，最后在上传eccang的时候转换成了eccang的组织id}
-     */
-    private String userOrganizationId;
+    private String creatorDeptName;
 
     /**
      * 条形码

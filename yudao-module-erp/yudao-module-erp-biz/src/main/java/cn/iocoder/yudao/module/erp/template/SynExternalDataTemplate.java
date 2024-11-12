@@ -1,7 +1,6 @@
 package cn.iocoder.yudao.module.erp.template;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.text.StrPool;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
@@ -59,7 +58,7 @@ public class SynExternalDataTemplate {
             //设置产品创建人部门名称
             MapUtils.findAndThen(userMap, Long.parseLong(product.getCreator()),
                     user -> MapUtils.findAndThen(creatorDeptMap, user.getDeptId(),
-                            dept -> product.setUserOrganizationId(dept.getName())));
+                            dept -> product.setCreatorDeptName(dept.getName())));
             //如果有供应商产品编码和国家代码都不为空的时候才去设置SKU
             if (StrUtil.isNotBlank(product.getSupplierProductCode()) && StrUtil.isNotBlank(product.getCountryCode())) {
                 product.setProductSku(product.getSupplierProductCode() + "-" + getProductStatus(product.getCountryCode()));

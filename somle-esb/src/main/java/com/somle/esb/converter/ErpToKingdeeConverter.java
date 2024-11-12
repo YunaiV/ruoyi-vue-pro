@@ -86,19 +86,19 @@ public class ErpToKingdeeConverter {
             KingdeeProduct kingdeeProduct = new KingdeeProduct();
             //普通
             kingdeeProduct.setCheckType("1");
-            kingdeeProduct.setName(product.getProductTitle() + StrPool.DASHED + product.getCountryCode());
+            kingdeeProduct.setName(product.getName() + StrPool.DASHED + product.getCountryCode());
             kingdeeProduct.setNumber(product.getProductSku());
             kingdeeProduct.setBarcode(product.getBarCode());
             //报关品名
-            kingdeeProduct.setProducingPace(product.getPdOverseaTypeCn());
+            kingdeeProduct.setProducingPace(product.getDeclaredType());
             //HS编码
-            kingdeeProduct.setHelpCode(product.getHsCode());
+            kingdeeProduct.setHelpCode(product.getHscode());
             //加权平均
             kingdeeProduct.setCostMethod("2");
-            kingdeeProduct.setGrossWeight(String.valueOf(product.getPdNetWeight()));
-            Float pdNetLength = product.getPdNetLength();
-            Float pdNetWidth = product.getPdNetWidth();
-            Float pdNetHeight = product.getPdNetHeight();
+            kingdeeProduct.setGrossWeight(String.valueOf(product.getPackageWeight()));
+            Float pdNetLength = product.getPackageLength();
+            Float pdNetWidth = product.getPackageWidth();
+            Float pdNetHeight = product.getPackageHeight();
             kingdeeProduct.setLength(String.valueOf(pdNetLength));
             kingdeeProduct.setWide(String.valueOf(pdNetWidth));
             kingdeeProduct.setHigh(String.valueOf(pdNetHeight));
@@ -108,9 +108,9 @@ public class ErpToKingdeeConverter {
             //部门id，映射到金蝶自定义字段中
             //在金蝶中辅助资料对应的就是erp中的部门，非树形结构，在辅助资料中，由一个辅助分类是部门/报关品名（部门公司）
             kingdeeProduct.setSaleDepartmentId(product.getProductDeptId());
-            kingdeeProduct.setDeclaredTypeZh(product.getPdOverseaTypeCn());
+            kingdeeProduct.setDeclaredTypeZh(product.getDeclaredType());
             //将报关规则的id存到这里面去
-            kingdeeProduct.setMaxInventoryQty(product.getRuleId());
+            kingdeeProduct.setMaxInventoryQty(product.getCustomRuleId());
             kingdeeProducts.add(kingdeeProduct);
         }
 

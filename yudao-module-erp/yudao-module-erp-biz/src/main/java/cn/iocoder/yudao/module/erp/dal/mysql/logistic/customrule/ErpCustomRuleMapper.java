@@ -10,6 +10,7 @@ import cn.iocoder.yudao.module.erp.api.product.dto.ErpProductDTO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.logistic.customrule.ErpCustomRuleDO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.product.ErpProductDO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpSupplierProductDO;
+import jakarta.validation.constraints.NotNull;
 import org.apache.ibatis.annotations.Mapper;
 import cn.iocoder.yudao.module.erp.controller.admin.logistic.customrule.vo.*;
 
@@ -43,35 +44,36 @@ public interface ErpCustomRuleMapper extends BaseMapperX<ErpCustomRuleDO> {
      * @Param [id]
      * @return java.util.List<cn.iocoder.yudao.module.erp.api.product.dto.ErpProductDTO>
      **/
-    default List<ErpProductDTO> selectProductAllInfoListByCustomRuleId(Long id){
+    default List<ErpProductDTO> selectProductAllInfoListByCustomRuleId(@NotNull(message = "海关规则id不能为空")Long id){
         MPJLambdaWrapperX<ErpCustomRuleDO> wrapper = new MPJLambdaWrapperX<>();
-        wrapper.selectAs(ErpCustomRuleDO::getId, ErpProductDTO::getRuleId)
-                .selectAs(ErpCustomRuleDO::getCountryCode, ErpProductDTO::getCountryCode)
-                .select(ErpCustomRuleDO::getLogisticAttribute)
-                .selectAs(ErpCustomRuleDO::getHscode, ErpProductDTO::getHsCode)
-                .selectAs(ErpCustomRuleDO::getDeclaredValue, ErpProductDTO::getProductDeclaredValue)
-                .selectAs(ErpCustomRuleDO::getDeclaredValueCurrencyCode, ErpProductDTO::getPdDeclareCurrencyCode)
-                .selectAs(ErpCustomRuleDO::getDeclaredType, ErpProductDTO::getPdOverseaTypeCn)
-                .selectAs(ErpCustomRuleDO::getDeclaredTypeEn, ErpProductDTO::getPdOverseaTypeEn)
-                .selectAs(ErpCustomRuleDO::getTaxRate, ErpProductDTO::getFboTaxRate)
+        wrapper.selectAs(ErpCustomRuleDO::getId, ErpProductDTO::getCustomRuleId)
+                .select( ErpCustomRuleDO::getCountryCode,
+                        ErpCustomRuleDO::getLogisticAttribute,
+                        ErpCustomRuleDO::getHscode,
+                        ErpCustomRuleDO::getDeclaredValue,
+                        ErpCustomRuleDO::getDeclaredValueCurrencyCode,
+                        ErpCustomRuleDO::getDeclaredType,
+                        ErpCustomRuleDO::getDeclaredTypeEn,
+                        ErpCustomRuleDO::getTaxRate)
                 .leftJoin(ErpSupplierProductDO.class, ErpSupplierProductDO::getId, ErpCustomRuleDO::getSupplierProductId)
                 .selectAs(ErpSupplierProductDO::getCode, ErpProductDTO::getSupplierProductCode)
-                .selectAs(ErpSupplierProductDO::getPackageWeight, ErpProductDTO::getPdNetWeight)
-                .selectAs(ErpSupplierProductDO::getPackageLength, ErpProductDTO::getPdNetLength)
-                .selectAs(ErpSupplierProductDO::getPackageWidth, ErpProductDTO::getPdNetWidth)
-                .selectAs(ErpSupplierProductDO::getPackageHeight, ErpProductDTO::getPdNetHeight)
-                .selectAs(ErpSupplierProductDO::getPurchasePriceCurrencyCode, ErpProductDTO::getCurrencyCode)
+                .select( ErpSupplierProductDO::getPackageWeight,
+                        ErpSupplierProductDO::getPackageLength,
+                        ErpSupplierProductDO::getPackageWidth,
+                        ErpSupplierProductDO::getPackageHeight,
+                        ErpSupplierProductDO::getPurchasePriceCurrencyCode)
                 .leftJoin(ErpProductDO.class, ErpProductDO::getId, ErpSupplierProductDO::getProductId)
-                .selectAs(ErpProductDO::getName, ErpProductDTO::getProductTitle)
-                .select(ErpProductDO::getImageUrl)
-                .selectAs(ErpProductDO::getWeight, ErpProductDTO::getProductWeight)
-                .selectAs(ErpProductDO::getLength, ErpProductDTO::getProductLength)
-                .selectAs(ErpProductDO::getWidth, ErpProductDTO::getProductWidth)
-                .selectAs(ErpProductDO::getHeight, ErpProductDTO::getProductHeight)
-                .selectAs(ErpProductDO::getMaterial, ErpProductDTO::getProductMaterial)
-                .select(ErpProductDO::getBarCode)
+                .select(
+                        ErpProductDO::getName,
+                        ErpProductDO::getImageUrl,
+                        ErpProductDO::getWeight,
+                        ErpProductDO::getLength,
+                        ErpProductDO::getWidth,
+                        ErpProductDO::getHeight,
+                        ErpProductDO::getMaterial,
+                        ErpProductDO::getBarCode,
+                        ErpProductDO::getCreator)
                 .selectAs(ErpProductDO::getDeptId, ErpProductDTO::getProductDeptId)
-                .select(ErpProductDO::getCreator)
                 .eq(ErpCustomRuleDO::getId, id);
         return selectJoinList(ErpProductDTO.class, wrapper);
     }
