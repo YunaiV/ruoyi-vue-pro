@@ -62,7 +62,7 @@ public class SynExternalDataTemplate {
                             dept -> product.setUserOrganizationId(dept.getName())));
             //如果有供应商产品编码和国家代码都不为空的时候才去设置SKU
             if (StrUtil.isNotBlank(product.getSupplierProductCode()) && StrUtil.isNotBlank(product.getCountryCode())) {
-                product.setProductSku(product.getSupplierProductCode() + StrPool.DASHED + getProductStatus(product.getCountryCode()));
+                product.setProductSku(product.getSupplierProductCode() + "-" + getProductStatus(product.getCountryCode()));
             }
         });
         //同步产品信息
