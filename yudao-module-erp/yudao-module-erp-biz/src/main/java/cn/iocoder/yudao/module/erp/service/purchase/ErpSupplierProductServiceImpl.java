@@ -1,23 +1,15 @@
 package cn.iocoder.yudao.module.erp.service.purchase;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.text.StrPool;
 import cn.iocoder.yudao.framework.common.exception.util.ThrowUtil;
 import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
-import cn.iocoder.yudao.module.erp.api.product.dto.ErpProductDTO;
 import cn.iocoder.yudao.module.erp.controller.admin.product.vo.product.ErpProductRespVO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpSupplierDO;
+import cn.iocoder.yudao.module.erp.dal.mysql.logistic.customrule.ErpCustomRuleMapper;
 import cn.iocoder.yudao.module.erp.service.product.ErpProductService;
 import cn.iocoder.yudao.module.erp.template.SynExternalDataTemplate;
-import cn.iocoder.yudao.module.system.api.dept.DeptApi;
-import cn.iocoder.yudao.module.system.api.dept.dto.DeptRespDTO;
-import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
-import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import lombok.RequiredArgsConstructor;
-import org.springframework.messaging.MessageChannel;
-import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.stereotype.Service;
-import jakarta.annotation.Resource;
 import org.springframework.validation.annotation.Validated;
 import java.util.*;
 import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.*;
@@ -29,7 +21,6 @@ import static cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeC
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 import static cn.iocoder.yudao.module.erp.enums.ErrorCodeConstants.*;
-import static cn.iocoder.yudao.module.erp.util.ConstantConvertUtils.getProductStatus;
 
 /**
  * ERP 供应商产品 Service 实现类
@@ -44,6 +35,7 @@ public class ErpSupplierProductServiceImpl implements ErpSupplierProductService 
     private final ErpProductService productService;
     private final ErpSupplierService supplierService;
     private final SynExternalDataTemplate synExternalDataTemplate;
+    private final ErpCustomRuleMapper customRuleMapper;
 
     @Override
     public Long createSupplierProduct(ErpSupplierProductSaveReqVO createReqVO) {
@@ -65,7 +57,7 @@ public class ErpSupplierProductServiceImpl implements ErpSupplierProductService 
         ErpSupplierProductDO updateObj = BeanUtils.toBean(updateReqVO, ErpSupplierProductDO.class);
         ThrowUtil.ifSqlThrow(supplierProductMapper.updateById(updateObj),DB_UPDATE_ERROR);
         //同步数据
-        synExternalDataTemplate.synProductData(supplierProductMapper.selectProductAllInfoListBySupplierId(id));
+        synExternalDataTemplate.synProductData(customRuleMapper.selectProductAllInfoListBySupplierId(id));
     }
 
     @Override

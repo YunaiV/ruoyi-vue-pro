@@ -1,7 +1,7 @@
 package com.somle.esb.service;
 
 import cn.hutool.core.util.ObjUtil;
-import cn.iocoder.yudao.module.erp.api.product.dto.ErpProductDTO;
+import cn.iocoder.yudao.module.erp.api.product.dto.ErpCustomRuleDTO;
 import cn.iocoder.yudao.module.erp.api.supplier.dto.ErpSupplierDTO;
 import cn.iocoder.yudao.module.system.api.dept.DeptApi;
 import cn.iocoder.yudao.module.system.api.dept.dto.DeptReqDTO;
@@ -16,7 +16,6 @@ import com.somle.eccang.model.EccangOrder;
 import com.somle.eccang.model.EccangProduct;
 import com.somle.eccang.model.EccangResponse;
 import com.somle.eccang.service.EccangService;
-import com.somle.erp.model.product.ErpCountrySku;
 import com.somle.esb.converter.DingTalkToErpConverter;
 import com.somle.esb.converter.EccangToErpConverter;
 import com.somle.esb.converter.ErpToEccangConverter;
@@ -36,7 +35,6 @@ import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -151,7 +149,7 @@ public class EsbService {
     * @return void
     **/
     @ServiceActivator(inputChannel = "productChannel")
-    public void syncProductsToEccang(Message<List<ErpProductDTO>> message) {
+    public void syncProductsToEccang(Message<List<ErpCustomRuleDTO>> message) {
         log.info("syncProductsToEccang");
         List<EccangProduct> eccangProducts = erpToEccangConverter.toEccang(message.getPayload());
         for (EccangProduct eccangProduct : eccangProducts){
@@ -178,7 +176,7 @@ public class EsbService {
      * @return void
      **/
 //    @ServiceActivator(inputChannel = "productChannel")
-    public void syncProductsToKingdee(Message<List<ErpProductDTO>> message) {
+    public void syncProductsToKingdee(Message<List<ErpCustomRuleDTO>> message) {
         log.info("syncProductsToKingdee");
         List<KingdeeProduct> kingdee = erpToKingdeeConverter.toKingdee(message.getPayload());
         for (KingdeeProduct kingdeeProduct : kingdee){

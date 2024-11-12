@@ -3,7 +3,7 @@ package com.somle.esb.converter;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ReflectUtil;
 import cn.iocoder.yudao.framework.common.exception.util.ThrowUtil;
-import cn.iocoder.yudao.module.erp.api.product.dto.ErpProductDTO;
+import cn.iocoder.yudao.module.erp.api.product.dto.ErpCustomRuleDTO;
 import cn.iocoder.yudao.module.system.api.dept.DeptApi;
 import cn.iocoder.yudao.module.system.api.dept.dto.DeptLevelRespDTO;
 import cn.iocoder.yudao.module.system.api.dept.dto.DeptRespDTO;
@@ -87,9 +87,9 @@ public class ErpToEccangConverter {
 //        return product;
 //    }
 
-    public List<EccangProduct> toEccang(List<ErpProductDTO> allProducts){
+    public List<EccangProduct> toEccang(List<ErpCustomRuleDTO> allProducts){
         List<EccangProduct> allEccangProducts = new ArrayList<>();
-        for (ErpProductDTO product : allProducts){
+        for (ErpCustomRuleDTO product : allProducts){
             /*//编辑箱规
             EccangProductBoxes box = new EccangProductBoxes();
             //箱规的中文名称和英文名称都根据sku来

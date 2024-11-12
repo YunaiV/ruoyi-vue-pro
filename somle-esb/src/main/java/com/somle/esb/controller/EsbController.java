@@ -1,12 +1,8 @@
 package com.somle.esb.controller;
 
-import cn.iocoder.yudao.module.erp.api.product.dto.ErpProductDTO;
 import com.somle.esb.service.EsbService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.integration.support.MessageBuilder;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 
 @RestController

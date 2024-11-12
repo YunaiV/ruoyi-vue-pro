@@ -10,7 +10,7 @@ import lombok.Data;
  * @description:
  */
 @Data
-public class ErpProductDTO {
+public class ErpCustomRuleDTO {
     /**
      * 海关规则id  =====>>>> 映射到pd_declaration_statement
      */

@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import cn.hutool.core.text.StrPool;
-import cn.iocoder.yudao.module.erp.api.product.dto.ErpProductDTO;
+import cn.iocoder.yudao.module.erp.api.product.dto.ErpCustomRuleDTO;
 import cn.iocoder.yudao.module.erp.api.supplier.dto.ErpSupplierDTO;
 import cn.iocoder.yudao.module.system.api.dept.DeptApi;
 import cn.iocoder.yudao.module.system.api.dept.dto.DeptRespDTO;
@@ -80,9 +80,9 @@ public class ErpToKingdeeConverter {
 
     }
 
-    public List<KingdeeProduct> toKingdee(List<ErpProductDTO> allProducts) {
+    public List<KingdeeProduct> toKingdee(List<ErpCustomRuleDTO> allProducts) {
         List<KingdeeProduct> kingdeeProducts = new ArrayList<>();
-        for (ErpProductDTO product : allProducts){
+        for (ErpCustomRuleDTO product : allProducts){
             KingdeeProduct kingdeeProduct = new KingdeeProduct();
             //普通
             kingdeeProduct.setCheckType("1");

@@ -2,9 +2,10 @@ package cn.iocoder.yudao.module.erp.template;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.iocoder.yudao.framework.common.exception.util.ThrowUtil;
 import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
-import cn.iocoder.yudao.module.erp.api.product.dto.ErpProductDTO;
+import cn.iocoder.yudao.module.erp.api.product.dto.ErpCustomRuleDTO;
 import cn.iocoder.yudao.module.system.api.dept.DeptApi;
 import cn.iocoder.yudao.module.system.api.dept.dto.DeptRespDTO;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
@@ -19,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
+import static cn.iocoder.yudao.module.erp.enums.ErrorCodeConstants.CUSTOM_RULE_PART_NULL;
 import static cn.iocoder.yudao.module.erp.util.ConstantConvertUtils.getProductStatus;
 
 /**
@@ -44,14 +46,19 @@ public class SynExternalDataTemplate {
     * @Param [erpProductDtos]
     * @return void
     **/
-    public void synProductData(List<ErpProductDTO> erpProductDtos) {
+    public void synProductData(List<ErpCustomRuleDTO> erpCustomRuleDtos) {
+        //判断数据是否存在不包含name和supplierProductCode
+        //如果存在name或supplierProductCode为空的数据，则该数据一定是在海关规则管理模块中出现的非法数据，请检查海关规则模块
+        ThrowUtil.ifThrow(CollUtil.isEmpty(erpCustomRuleDtos) || erpCustomRuleDtos
+                .stream()
+                .anyMatch(i -> StrUtil.isBlank(i.getName()) || StrUtil.isBlank(i.getSupplierProductCode())), CUSTOM_RULE_PART_NULL);
         //获取产品部门信息
-        Map<Long, DeptRespDTO> productDeptMap = deptApi.getDeptMap(convertSet(erpProductDtos, ErpProductDTO::getProductDeptId));
+        Map<Long, DeptRespDTO> productDeptMap = deptApi.getDeptMap(convertSet(erpCustomRuleDtos, ErpCustomRuleDTO::getProductDeptId));
         //获取创建人用户信息
-        Map<Long, AdminUserRespDTO> userMap = userApi.getUserMap(convertSet(erpProductDtos, i -> Long.parseLong(i.getCreator())));
+        Map<Long, AdminUserRespDTO> userMap = userApi.getUserMap(convertSet(erpCustomRuleDtos, i -> Long.parseLong(i.getCreator())));
         //获取创建人部门信息
         Map<Long, DeptRespDTO> creatorDeptMap = deptApi.getDeptMap(convertSet(userMap.values(), AdminUserRespDTO::getDeptId));
-        List<ErpProductDTO> productDtos = BeanUtils.toBean(erpProductDtos, ErpProductDTO.class, product -> {
+        List<ErpCustomRuleDTO> productDtos = BeanUtils.toBean(erpCustomRuleDtos, ErpCustomRuleDTO.class, product -> {
             //设置产品部门名称
             MapUtils.findAndThen(productDeptMap, product.getProductDeptId(),
                     dept -> product.setProductDeptName(dept.getName()));

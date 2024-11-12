@@ -3,7 +3,7 @@ package com.somle.esb.service;
 
 import cn.iocoder.yudao.framework.mybatis.config.YudaoMybatisAutoConfiguration;
 import cn.iocoder.yudao.module.erp.aop.SynExternalDataAspect;
-import cn.iocoder.yudao.module.erp.api.product.dto.ErpProductDTO;
+import cn.iocoder.yudao.module.erp.api.product.dto.ErpCustomRuleDTO;
 import cn.iocoder.yudao.module.erp.controller.admin.logistic.customrule.vo.ErpCustomRuleSaveReqVO;
 import cn.iocoder.yudao.module.erp.dal.mysql.logistic.customrule.ErpCustomRuleMapper;
 import cn.iocoder.yudao.module.erp.service.logistic.customrule.ErpCustomRuleService;
@@ -136,7 +136,7 @@ class EsbServiceProductTest extends BaseSpringIntegrationTest {
 
     @Test
     public void syncProductsTest() {
-        ErpProductDTO product = new ErpProductDTO();
+        ErpCustomRuleDTO product = new ErpCustomRuleDTO();
         product.setCustomRuleId("R12345");
         product.setProductSku("SUP123-US");
         product.setName("Wireless Headphones");

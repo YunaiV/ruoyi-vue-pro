@@ -3,32 +3,18 @@ package com.somle.esb.service;
 
 import cn.iocoder.yudao.framework.mybatis.config.YudaoMybatisAutoConfiguration;
 import cn.iocoder.yudao.framework.security.config.YudaoSecurityAutoConfiguration;
-import cn.iocoder.yudao.module.erp.api.product.dto.ErpProductDTO;
 import cn.iocoder.yudao.module.infra.api.config.ConfigApi;
 import cn.iocoder.yudao.module.infra.api.file.FileApi;
 import cn.iocoder.yudao.module.system.api.dept.DeptApi;
 import cn.iocoder.yudao.module.system.api.dept.DeptApiImpl;
-import cn.iocoder.yudao.module.system.api.permission.PermissionApiImpl;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
-import cn.iocoder.yudao.module.system.api.user.AdminUserApiImpl;
 import cn.iocoder.yudao.module.system.convert.dept.DeptConvert;
-import cn.iocoder.yudao.module.system.convert.dept.DeptConvertImpl;
-import cn.iocoder.yudao.module.system.service.dept.DeptService;
 import cn.iocoder.yudao.module.system.service.dept.DeptServiceImpl;
-import cn.iocoder.yudao.module.system.service.dept.PostServiceImpl;
-import cn.iocoder.yudao.module.system.service.permission.MenuServiceImpl;
-import cn.iocoder.yudao.module.system.service.permission.PermissionServiceImpl;
-import cn.iocoder.yudao.module.system.service.permission.RoleServiceImpl;
-import cn.iocoder.yudao.module.system.service.tenant.TenantServiceImpl;
 
-import cn.iocoder.yudao.module.system.service.user.AdminUserService;
-import cn.iocoder.yudao.module.system.service.user.AdminUserServiceImpl;
 import com.baomidou.mybatisplus.autoconfigure.MybatisPlusAutoConfiguration;
 import com.github.yulichang.autoconfigure.MybatisPlusJoinAutoConfiguration;
 import com.somle.framework.test.core.ut.BaseSpringTest;
-import com.somle.framework.test.core.ut.BaseSpringUnitTest;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.integration.support.MessageBuilder;
 import com.somle.ai.service.AiService;
 import com.somle.amazon.service.AmazonService;
 import com.somle.dingtalk.service.DingTalkService;
@@ -40,21 +26,16 @@ import com.somle.esb.converter.DingTalkToErpConverter;
 import com.somle.esb.converter.EccangToErpConverter;
 import com.somle.esb.converter.ErpToEccangConverter;
 import com.somle.esb.converter.ErpToKingdeeConverter;
-import com.somle.framework.test.core.ut.BaseDbUnitTest;
 import com.somle.kingdee.service.KingdeeService;
 import com.somle.matomo.service.MatomoService;
 import jakarta.annotation.Resource;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.autoconfigure.quartz.QuartzAutoConfiguration;
 import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
-import org.springframework.messaging.MessageChannel;
 import org.springframework.security.crypto.password.PasswordEncoder;
-
-import java.util.List;
 
 @Slf4j
 @Import({
