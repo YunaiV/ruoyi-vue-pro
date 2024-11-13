@@ -47,21 +47,6 @@ public class KingdeeController {
         private List<KingdeeToken> data;
     }
 
-    @GetMapping("/getAppToken")
-    public Object getAppToken() {
-        return kingdeeClient.getAppToken1(kingdeeClient.getToken());
-    }
-
-
-
-
-
-
-
-
-
-
-
 
 
     @PostMapping("/refreshAuth")
@@ -93,56 +78,6 @@ public class KingdeeController {
                 throw new RuntimeException(e);
             }
         }
-    }
-
-
-    @GetMapping("/getSupplier")
-    @ResponseBody
-    public KingdeeResponse getSupplier(
-    ) {
-        return kingdeeClient.getSupplier();
-    }
-
-    @GetMapping("/getVoucher")
-    @ResponseBody
-    public KingdeeResponse getVoucher(
-        @RequestParam String date
-    ) {
-        return kingdeeClient.getVoucher(LocalDate.parse(date));
-    }
-
-    @GetMapping("/getVoucherDetail")
-    @ResponseBody
-    public KingdeeResponse getVoucherDetail(
-        @RequestParam String id
-    ) {
-        return kingdeeClient.getVoucherDetail(id);
-    }
-
-    @GetMapping("/getCustomField")
-    @ResponseBody
-    public Stream<KingdeeCustomField> getCustomField(
-        @RequestParam String entity_number
-    ) {
-        return kingdeeClient.getCustomField(entity_number);
-    }
-
-    @GetMapping("/list")
-    @ResponseBody
-    public List<KingdeeResponse> list(
-        @RequestParam String endpoint
-    ) {
-        return kingdeeClient.list(endpoint).toList();
-    }
-
-    @PostMapping("/post")
-    @ResponseBody
-    public KingdeeResponse post(
-        @RequestParam String endpoint,
-        @RequestBody JSONObject payload
-    ) {
-        log.debug("delegate to service");
-        return kingdeeClient.post(endpoint, payload);
     }
 
 }

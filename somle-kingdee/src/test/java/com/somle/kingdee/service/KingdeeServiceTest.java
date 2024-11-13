@@ -5,15 +5,17 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.util.TreeMap;
 
 import com.somle.framework.test.core.ut.BaseSpringTest;
+import com.somle.kingdee.model.KingdeePurRequestReqVO;
 import com.somle.kingdee.util.SignatureUtils;
 import jakarta.annotation.Resource;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.binary.Hex;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
 
-//import org.mockito.MockitoAnnotations;
+@Slf4j
 @Import(KingdeeService.class)
 public class KingdeeServiceTest extends BaseSpringTest {
     @Resource
@@ -89,5 +91,33 @@ public class KingdeeServiceTest extends BaseSpringTest {
     @Test
     void refreshAuth() {
         service.refreshAuths();
+    }
+
+    @Test
+    public void testGetAuxInfoType() {
+        var client = service.getClientList().get(0);
+        var vo = new KingdeePurRequestReqVO();
+        log.info(client.getAuxInfoTypeByNumber("BM").toString());
+    }
+
+
+
+    @Test
+    public void testGetPurRequest() {
+        var client = service.getClientList().get(0);
+        var vo = new KingdeePurRequestReqVO();
+        log.info(client.getPurRequest(vo).toList().toString());
+    }
+
+    @Test
+    public void testGetCustomField() {
+        var client = service.getClientList().get(0);
+        log.info(client.getCustomField("bd_material").toString());
+    }
+
+    @Test
+    public void testGetCustomFieldByDisplayName() {
+        var client = service.getClientList().get(0);
+        log.info(client.getCustomFieldByDisplayName("bd_material", "部门").toString());
     }
 }
