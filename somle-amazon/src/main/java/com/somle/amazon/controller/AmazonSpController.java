@@ -23,6 +23,7 @@ public class AmazonSpController {
     @Autowired
     private AmazonService service;
 
+    @GetMapping("orders")
     public List<JSONObject> getOrders(LocalDateTime startTime, LocalDateTime endTime) {
         return service.spClient.getShops().map(shop -> {
             var vo = AmazonSpOrderReqVO.builder()
