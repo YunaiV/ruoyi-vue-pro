@@ -148,7 +148,7 @@ public class KingdeeClient {
 
     public KingdeeResponse addSupplier(KingdeeSupplier kingdeeSupplier) {
         try {
-            String id = getSupplier(kingdeeSupplier.getNumber()).getData().getString("id");
+            String id = getSupplier(kingdeeSupplier.getNumber()).getData(JSONObject.class).getString("id");
             kingdeeSupplier.setId(id);
         } catch (Exception e) {
             log.debug("id not found for " + kingdeeSupplier.getNumber() + "adding new");
@@ -211,7 +211,7 @@ public class KingdeeClient {
         TreeMap<String, String>  params = new TreeMap<>();
         params.put("number", number);
         KingdeeResponse response = getResponse(endUrl, params);
-        Optional<KingdeeAuxInfoDetail> first = response.getData(KingdeePage.class).getRowsList(KingdeeAuxInfo.class).stream()
+        Optional<KingdeeAuxInfo> first = response.getData(KingdeePage.class).getRowsList(KingdeeAuxInfo.class).stream()
                 .filter(n->n.getNumber().equals(number))
                 .findFirst();
         if (first.isPresent()){
@@ -226,7 +226,7 @@ public class KingdeeClient {
         TreeMap<String, String>  params = new TreeMap<>();
         params.put("name", name);
         KingdeeResponse response = getResponse(endUrl, params);
-        return response.getData().getJSONArray("rows").stream()
+        return response.getData(KingdeePage.class).getRowsList(KingdeeAuxInfo.class).stream()
                 .map(n->JsonUtils.parseObject(n.toString(), KingdeeAuxInfoDetail.class))
                 .filter(n->n.getName().equals(name))
                 .findFirst().get();
@@ -299,6 +299,14 @@ public class KingdeeClient {
 
     private KingdeeResponse postResponse(String endUrl, TreeMap<String, String>  params, Object payload) {
         return fetchResponse("POST", endUrl, params, payload);
+    }
+
+    private KingdeeResponse getResponse(String endUrl, Object params) {
+        return fetchResponse("GET", endUrl, new TreeMap<>(BeanUtils.toStringMap(params)), null);
+    }
+
+    private KingdeeResponse postResponse(String endUrl, Object params, Object payload) {
+        return fetchResponse("POST", endUrl, new TreeMap<>(BeanUtils.toStringMap(params)), payload);
     }
 
 }
