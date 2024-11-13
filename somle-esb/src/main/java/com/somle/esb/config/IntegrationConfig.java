@@ -1,5 +1,6 @@
 package com.somle.esb.config;
 
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -22,14 +23,6 @@ public class IntegrationConfig {
     public MessageChannel testChannel() {
         return new PublishSubscribeChannel();
     }
-    
-
-    // @Bean
-    // public IntegrationFlow saleToData() {
-    //     return IntegrationFlows.from(saleChannel())
-    //             .channel(dataChannel())
-    //             .get();
-    // }
 
     @Bean
     public MessageChannel dataChannel() {
@@ -49,5 +42,13 @@ public class IntegrationConfig {
     @Bean
     public MessageChannel departmentChannel() {
         return new PublishSubscribeChannel();
+    }
+
+    @Bean
+    public IntegrationFlow erpRouter() {
+        return IntegrationFlow
+                .from("erpProductChannel") // Incoming messages from erpProductChannel
+                .channel(productChannel()) // Route to productChannel
+                .get();
     }
 }

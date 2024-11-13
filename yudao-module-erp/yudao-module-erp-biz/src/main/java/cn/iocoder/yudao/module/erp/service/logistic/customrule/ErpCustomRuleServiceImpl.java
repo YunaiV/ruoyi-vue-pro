@@ -1,9 +1,11 @@
 package cn.iocoder.yudao.module.erp.service.logistic.customrule;
 
 import cn.iocoder.yudao.framework.common.exception.util.ThrowUtil;
-import cn.iocoder.yudao.module.erp.template.SynExternalDataTemplate;
+import jakarta.annotation.Resource;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.messaging.MessageChannel;
+import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 import cn.iocoder.yudao.module.erp.controller.admin.logistic.customrule.vo.*;
@@ -26,8 +28,10 @@ import static cn.iocoder.yudao.module.erp.enums.ErrorCodeConstants.*;
 @Validated
 @RequiredArgsConstructor
 public class ErpCustomRuleServiceImpl implements ErpCustomRuleService {
+    @Resource
+    private MessageChannel productChannel;
+
     private final ErpCustomRuleMapper customRuleMapper;
-    private final SynExternalDataTemplate synExternalDataTemplate;
 
 
     @Override
@@ -38,7 +42,8 @@ public class ErpCustomRuleServiceImpl implements ErpCustomRuleService {
         ThrowUtil.ifSqlThrow(customRuleMapper.insert(customRule),DB_INSERT_ERROR);
         Long id = customRule.getId();
         //同步数据
-        synExternalDataTemplate.synProductData(customRuleMapper.selectProductAllInfoListByCustomRuleId(id));
+        var dtos = customRuleMapper.selectProductAllInfoListByCustomRuleId(id);
+        productChannel.send(MessageBuilder.withPayload(dtos).build());
         // 返回
         return id;
     }
@@ -52,8 +57,8 @@ public class ErpCustomRuleServiceImpl implements ErpCustomRuleService {
         ErpCustomRuleDO updateObj = BeanUtils.toBean(updateReqVO, ErpCustomRuleDO.class);
         ThrowUtil.ifSqlThrow(customRuleMapper.updateById(updateObj),DB_UPDATE_ERROR);
         //同步数据
-        synExternalDataTemplate.synProductData(customRuleMapper.selectProductAllInfoListByCustomRuleId(id));
-
+        var dtos = customRuleMapper.selectProductAllInfoListByCustomRuleId(id);
+        productChannel.send(MessageBuilder.withPayload(dtos).build());
     }
 
     @Override

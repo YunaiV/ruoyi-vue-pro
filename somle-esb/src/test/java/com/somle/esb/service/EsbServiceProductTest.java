@@ -7,7 +7,6 @@ import cn.iocoder.yudao.module.erp.controller.admin.logistic.customrule.vo.ErpCu
 import cn.iocoder.yudao.module.erp.dal.mysql.logistic.customrule.ErpCustomRuleMapper;
 import cn.iocoder.yudao.module.erp.service.logistic.customrule.ErpCustomRuleService;
 import cn.iocoder.yudao.module.erp.service.logistic.customrule.ErpCustomRuleServiceImpl;
-import cn.iocoder.yudao.module.erp.template.SynExternalDataTemplate;
 import cn.iocoder.yudao.module.infra.api.config.ConfigApi;
 import cn.iocoder.yudao.module.infra.api.file.FileApi;
 import cn.iocoder.yudao.module.system.api.dept.DeptApi;
@@ -26,6 +25,7 @@ import com.somle.esb.converter.DingTalkToErpConverter;
 import com.somle.esb.converter.EccangToErpConverter;
 import com.somle.esb.converter.ErpToEccangConverter;
 import com.somle.esb.converter.ErpToKingdeeConverter;
+import com.somle.framework.common.util.general.CoreUtils;
 import com.somle.framework.test.core.ut.BaseSpringIntegrationTest;
 import com.somle.kingdee.service.KingdeeService;
 import com.somle.matomo.service.MatomoService;
@@ -59,8 +59,6 @@ import java.util.List;
     ErpToEccangConverter.class,
     ErpToKingdeeConverter.class,
     EccangToErpConverter.class,
-
-        SynExternalDataTemplate.class,
 
     DeptApiImpl.class,
     DeptServiceImpl.class,
@@ -107,10 +105,6 @@ class EsbServiceProductTest extends BaseSpringIntegrationTest {
 
     @Resource
     ErpCustomRuleMapper erpCustomRuleMapper;
-
-
-    @Resource
-    private SynExternalDataTemplate synExternalDataTemplate;
 
 
     @MockBean
@@ -176,7 +170,7 @@ class EsbServiceProductTest extends BaseSpringIntegrationTest {
     public void aopTest() {
         printAllBeans();
         ErpCustomRuleSaveReqVO erpCustomRuleSaveReqVO = new ErpCustomRuleSaveReqVO();
-        erpCustomRuleSaveReqVO.setCountryCode("MX");
+        erpCustomRuleSaveReqVO.setCountryCode("YY");
         erpCustomRuleSaveReqVO.setType("import");
         erpCustomRuleSaveReqVO.setSupplierProductId(1L);
         erpCustomRuleSaveReqVO.setDeclaredTypeEn("Electronic Component");
@@ -191,6 +185,9 @@ class EsbServiceProductTest extends BaseSpringIntegrationTest {
         log.info(erpCustomRuleMapper.selectList().toString());
         erpCustomRuleService.createCustomRule(erpCustomRuleSaveReqVO);
         log.info(erpCustomRuleMapper.selectList().toString());
+
+        // wait for sub threads to finish
+        CoreUtils.sleep(20000);
 
     }
 

@@ -15,9 +15,12 @@ import cn.iocoder.yudao.module.erp.dal.dataobject.product.ErpProductDO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.product.ErpProductUnitDO;
 import cn.iocoder.yudao.module.erp.dal.mysql.logistic.customrule.ErpCustomRuleMapper;
 import cn.iocoder.yudao.module.erp.dal.mysql.product.ErpProductMapper;
-import cn.iocoder.yudao.module.erp.template.SynExternalDataTemplate;
 import cn.iocoder.yudao.module.system.api.dept.DeptApi;
+import jakarta.annotation.Resource;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.MessageChannel;
+import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 import java.util.*;
@@ -35,11 +38,12 @@ import static cn.iocoder.yudao.module.erp.enums.ErrorCodeConstants.*;
 @Validated
 @RequiredArgsConstructor
 public class ErpProductServiceImpl implements ErpProductService {
+    @Resource
+    MessageChannel erpProductChannel;
     private final ErpProductMapper productMapper;
     private final ErpProductCategoryService productCategoryService;
     private final ErpProductUnitService productUnitService;
     private final DeptApi deptApi;
-    private final SynExternalDataTemplate synExternalDataTemplate;
     private final ErpCustomRuleMapper customRuleMapper;
 
 
@@ -88,7 +92,8 @@ public class ErpProductServiceImpl implements ErpProductService {
         ErpProductDO updateObj = BeanUtils.toBean(updateReqVO, ErpProductDO.class);
         ThrowUtil.ifSqlThrow(productMapper.updateById(updateObj),DB_UPDATE_ERROR);
         //同步数据
-        synExternalDataTemplate.synProductData(customRuleMapper.selectProductAllInfoListById(id));
+        var dtos = customRuleMapper.selectProductAllInfoListByCustomRuleId(id);
+        erpProductChannel.send(MessageBuilder.withPayload(dtos).build());
     }
 
     @Override
