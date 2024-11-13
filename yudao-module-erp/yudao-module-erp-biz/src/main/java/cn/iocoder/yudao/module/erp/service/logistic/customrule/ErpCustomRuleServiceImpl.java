@@ -1,19 +1,20 @@
 package cn.iocoder.yudao.module.erp.service.logistic.customrule;
 
-import org.springframework.stereotype.Service;
+import cn.iocoder.yudao.framework.common.exception.util.ThrowUtil;
 import jakarta.annotation.Resource;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.messaging.MessageChannel;
+import org.springframework.messaging.support.MessageBuilder;
+import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.util.*;
 import cn.iocoder.yudao.module.erp.controller.admin.logistic.customrule.vo.*;
 import cn.iocoder.yudao.module.erp.dal.dataobject.logistic.customrule.ErpCustomRuleDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
-
 import cn.iocoder.yudao.module.erp.dal.mysql.logistic.customrule.ErpCustomRuleMapper;
-
+import static cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants.DB_INSERT_ERROR;
+import static cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants.DB_UPDATE_ERROR;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.erp.enums.ErrorCodeConstants.*;
 
@@ -22,29 +23,42 @@ import static cn.iocoder.yudao.module.erp.enums.ErrorCodeConstants.*;
  *
  * @author 索迈管理员
  */
+@Slf4j
 @Service
 @Validated
+@RequiredArgsConstructor
 public class ErpCustomRuleServiceImpl implements ErpCustomRuleService {
-
     @Resource
-    private ErpCustomRuleMapper customRuleMapper;
+    private MessageChannel productChannel;
+
+    private final ErpCustomRuleMapper customRuleMapper;
+
 
     @Override
     public Long createCustomRule(ErpCustomRuleSaveReqVO createReqVO) {
+        log.info("create custom rule");
         // 插入
         ErpCustomRuleDO customRule = BeanUtils.toBean(createReqVO, ErpCustomRuleDO.class);
-        customRuleMapper.insert(customRule);
+        ThrowUtil.ifSqlThrow(customRuleMapper.insert(customRule),DB_INSERT_ERROR);
+        Long id = customRule.getId();
+        //同步数据
+        var dtos = customRuleMapper.selectProductAllInfoListByCustomRuleId(id);
+        productChannel.send(MessageBuilder.withPayload(dtos).build());
         // 返回
-        return customRule.getId();
+        return id;
     }
 
     @Override
     public void updateCustomRule(ErpCustomRuleSaveReqVO updateReqVO) {
+        Long id = updateReqVO.getId();
         // 校验存在
-        validateCustomRuleExists(updateReqVO.getId());
+        validateCustomRuleExists(id);
         // 更新
         ErpCustomRuleDO updateObj = BeanUtils.toBean(updateReqVO, ErpCustomRuleDO.class);
-        customRuleMapper.updateById(updateObj);
+        ThrowUtil.ifSqlThrow(customRuleMapper.updateById(updateObj),DB_UPDATE_ERROR);
+        //同步数据
+        var dtos = customRuleMapper.selectProductAllInfoListByCustomRuleId(id);
+        productChannel.send(MessageBuilder.withPayload(dtos).build());
     }
 
     @Override

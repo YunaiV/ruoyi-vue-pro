@@ -13,15 +13,18 @@ import cn.iocoder.yudao.module.erp.controller.admin.product.vo.product.ProductSa
 import cn.iocoder.yudao.module.erp.dal.dataobject.product.ErpProductCategoryDO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.product.ErpProductDO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.product.ErpProductUnitDO;
+import cn.iocoder.yudao.module.erp.dal.mysql.logistic.customrule.ErpCustomRuleMapper;
 import cn.iocoder.yudao.module.erp.dal.mysql.product.ErpProductMapper;
 import cn.iocoder.yudao.module.system.api.dept.DeptApi;
 import jakarta.annotation.Resource;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.MessageChannel;
+import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
-
 import java.util.*;
-
+import static cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants.DB_UPDATE_ERROR;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
 import static cn.iocoder.yudao.module.erp.enums.ErrorCodeConstants.*;
@@ -35,14 +38,16 @@ import static cn.iocoder.yudao.module.erp.enums.ErrorCodeConstants.*;
 @Validated
 @RequiredArgsConstructor
 public class ErpProductServiceImpl implements ErpProductService {
-
+    @Resource
+    MessageChannel erpProductChannel;
     private final ErpProductMapper productMapper;
-
     private final ErpProductCategoryService productCategoryService;
-
     private final ErpProductUnitService productUnitService;
-
     private final DeptApi deptApi;
+    private final ErpCustomRuleMapper customRuleMapper;
+
+
+
 
     @Override
     public Long createProduct(ProductSaveReqVO createReqVO) {
@@ -76,15 +81,19 @@ public class ErpProductServiceImpl implements ErpProductService {
 
     @Override
     public void updateProduct(ProductSaveReqVO updateReqVO) {
+        Long id = updateReqVO.getId();
         //校验相同的id下是否存在相同的产品编码
-        validateProductCodeUnique(updateReqVO.getId(),updateReqVO.getBarCode());
+        validateProductCodeUnique(id,updateReqVO.getBarCode());
         // 校验存在
-        validateProductExists(updateReqVO.getId());
+        validateProductExists(id);
         Long deptId = updateReqVO.getDeptId();
         this.validateDept(deptId);
         // 更新
         ErpProductDO updateObj = BeanUtils.toBean(updateReqVO, ErpProductDO.class);
-        productMapper.updateById(updateObj);
+        ThrowUtil.ifSqlThrow(productMapper.updateById(updateObj),DB_UPDATE_ERROR);
+        //同步数据
+        var dtos = customRuleMapper.selectProductAllInfoListByCustomRuleId(id);
+        erpProductChannel.send(MessageBuilder.withPayload(dtos).build());
     }
 
     @Override

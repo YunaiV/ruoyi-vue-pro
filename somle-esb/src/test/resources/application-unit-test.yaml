@@ -1,21 +1,27 @@
 #debug: true
 
+
 spring:
   main:
-    lazy-initialization: true # 开启懒加载，加快速度
+#    lazy-initialization: true # 如果开启懒加载，会导致ServiceActivator不能自动订阅inputChannel
     banner-mode: off # 单元测试，禁用 Banner
   test:
     database:
       replace: none
+
 logging:
   level:
     com.somle: DEBUG
     cn.iocoder: DEBUG
-    cn.iocoder.yudao.module.system.service.dept: DEBUG
     org.quartz: DEBUG
     org.springframework.scheduling.quartz: DEBUG
     com.baomidou.mybatisplus: DEBUG
     jdbc.sqlonly: DEBUG
+    org:
+      springframework:
+        integration:
+          config:
+            MessagingAnnotationBeanPostProcessor: DEBUG
   quartz:
     auto-startup: true
 
@@ -48,7 +54,7 @@ mybatis-plus:
 spring:
   # 数据源配置项
   datasource:
-    url: jdbc:mysql://192.168.10.151:3306/ruoyi-vue-pro?serverTimezone=GMT%2B8&useSSL=false&characterEncoding=utf-8
+    url: jdbc:mysql://192.168.10.151:3306/ruoyi-vue-test?serverTimezone=GMT%2B8&useSSL=false&characterEncoding=utf-8
     driverClassName: com.mysql.cj.jdbc.Driver
     username: it003
     password: asivJssflioKK
@@ -64,7 +70,7 @@ spring:
       database: 0 # 数据库索引
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: none
 
 mybatis:
   lazy-initialization: true # 单元测试，设置 MyBatis Mapper 延迟加载，加速每个单元测试
@@ -84,7 +90,7 @@ mybatis:
 # 芋道配置项，设置当前项目所有自定义的配置
 yudao:
   info:
-    base-package: cn.iocoder.yudao.module.system
+    base-package: cn.iocoder.yudao.module
 somle:
   base-package: com.somle.*
 

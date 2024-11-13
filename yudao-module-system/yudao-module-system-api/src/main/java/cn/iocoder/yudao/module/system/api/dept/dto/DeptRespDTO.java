@@ -33,5 +33,9 @@ public class DeptRespDTO {
      * 枚举 {@link CommonStatusEnum}
      */
     private Integer status;
+    /**
+     * 显示顺序
+     */
+    private Integer sort;
 
 }

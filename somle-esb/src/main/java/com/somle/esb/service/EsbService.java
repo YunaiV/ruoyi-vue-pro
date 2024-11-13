@@ -1,22 +1,28 @@
 package com.somle.esb.service;
 
-import cn.iocoder.yudao.module.system.service.dept.DeptService;
-import cn.iocoder.yudao.module.system.service.user.AdminUserService;
+import cn.hutool.core.util.ObjUtil;
+import cn.iocoder.yudao.module.erp.api.product.dto.ErpCustomRuleDTO;
+import cn.iocoder.yudao.module.erp.api.supplier.dto.ErpSupplierDTO;
+import cn.iocoder.yudao.module.system.api.dept.DeptApi;
+import cn.iocoder.yudao.module.system.api.dept.dto.DeptReqDTO;
+import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
+import cn.iocoder.yudao.module.system.api.user.dto.AdminUserReqDTO;
 import com.somle.ai.model.AiName;
 import com.somle.ai.service.AiService;
 import com.somle.amazon.service.AmazonService;
 import com.somle.dingtalk.service.DingTalkService;
+import com.somle.eccang.model.EccangCategory;
 import com.somle.eccang.model.EccangOrder;
 import com.somle.eccang.model.EccangProduct;
 import com.somle.eccang.model.EccangResponse;
 import com.somle.eccang.service.EccangService;
-import com.somle.erp.model.product.ErpCountrySku;
-import com.somle.erp.service.ErpProductService;
 import com.somle.esb.converter.DingTalkToErpConverter;
 import com.somle.esb.converter.EccangToErpConverter;
 import com.somle.esb.converter.ErpToEccangConverter;
 import com.somle.esb.converter.ErpToKingdeeConverter;
 import com.somle.esb.model.OssData;
+import com.somle.kingdee.model.KingdeeProduct;
+import com.somle.kingdee.model.supplier.KingdeeSupplier;
 import com.somle.kingdee.service.KingdeeService;
 import com.somle.matomo.service.MatomoService;
 import lombok.extern.slf4j.Slf4j;
@@ -28,6 +34,9 @@ import org.springframework.integration.support.MessageBuilder;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.Objects;
 
 @Slf4j
 @Service
@@ -53,14 +62,12 @@ public class EsbService {
     @Autowired
     MatomoService matomoService;
 
-    @Autowired
-    ErpProductService erpProductService;
 
     @Autowired
-    DeptService deptService;
+    private DeptApi deptApi;
 
     @Autowired
-    AdminUserService userService;
+    private AdminUserApi adminUserApi;
 
     @Autowired
     AiService aiService;
@@ -111,31 +118,83 @@ public class EsbService {
     }
 
 
+//    @ServiceActivator(inputChannel = "productChannel")
+//    public void handleProduct(Message<ErpCountrySku> message) {
+//        EccangProduct product = erpToEccangConverter.toEccang(message.getPayload());
+//        product.setActionType("ADD");
+//        EccangProduct eccangServiceProduct = eccangService.getProduct(product.getProductSku());
+//        if (ObjUtil.isNotEmpty(eccangServiceProduct)){
+//            product.setActionType("EDIT");
+//        }
+//        log.debug(product.toString());
+//        EccangResponse.EccangPage response = eccangService.addProduct(product);
+//        log.info(response.toString());
+//    }
+
+//    @ServiceActivator(inputChannel = "productChannel")
+//    public boolean handleProducts(Message<EccangProduct> message) {
+//        var product = message.getPayload();
+//        var erpProduct = eccangToErpConverter.toEsb(product);
+//        erpProductService.saveProduct(erpProduct);
+//        var kingdeeProduct = erpToKingdeeConverter.toKingdee(erpProduct);
+//        kingdeeService.addProduct(kingdeeProduct);
+//        return true;
+//    }
+
+    /**
+    * @Author Wqh
+    * @Description 上传eccang产品信息
+    * @Date 11:18 2024/11/5
+    * @Param [message]
+    * @return void
+    **/
     @ServiceActivator(inputChannel = "productChannel")
-    public void handleProduct(Message<ErpCountrySku> message) {
-        EccangProduct product = erpToEccangConverter.toEccang(message.getPayload());
-        product.setActionType("ADD");
-        try {
-            eccangService.getProduct(product.getProductSku());
-            product.setActionType("EDIT");
-        } catch (Exception e) {
-            log.info("sku not exist, adding new");
-            log.debug(e.toString());
-            e.printStackTrace();
+    public void syncProductsToEccang(Message<List<ErpCustomRuleDTO>> message) {
+        log.info("syncProductsToEccang");
+        List<EccangProduct> eccangProducts = erpToEccangConverter.toEccang(message.getPayload());
+        for (EccangProduct eccangProduct : eccangProducts){
+            eccangProduct.setActionType("ADD");
+            EccangProduct eccangServiceProduct = eccangService.getProduct(eccangProduct.getProductSku());
+            //根据sku从eccang中获取产品，如果产品不为空，则表示已存在，操作则变为修改
+            if (ObjUtil.isNotEmpty(eccangServiceProduct)){
+                eccangProduct.setActionType("EDIT");
+                //如果是修改就要上传默认采购单价
+                //TODO 后续有变更，请修改
+                eccangProduct.setProductPurchaseValue(0.001F);
+            }
+            log.debug(eccangProduct.toString());
+            eccangService.addBatchProduct(List.of(eccangProduct));
         }
-        log.debug(product.toString());
-        EccangResponse.EccangPage response = eccangService.addProduct(product);
-        log.info(response.toString());
+        log.info("syncProductsToEccang end");
     }
 
+    /**
+     * @Author Wqh
+     * @Description 上传金蝶产品信息
+     * @Date 11:18 2024/11/5
+     * @Param [message]
+     * @return void
+     **/
     @ServiceActivator(inputChannel = "productChannel")
-    public boolean handleProducts(Message<EccangProduct> message) {
-        var product = message.getPayload();
-        var erpProduct = eccangToErpConverter.toEsb(product);
-        erpProductService.saveProduct(erpProduct);
-        var kingdeeProduct = erpToKingdeeConverter.toKingdee(erpProduct);
-        kingdeeService.addProduct(kingdeeProduct);
-        return true;
+    public void syncProductsToKingdee(Message<List<ErpCustomRuleDTO>> message) {
+        log.info("syncProductsToKingdee");
+        List<KingdeeProduct> kingdee = erpToKingdeeConverter.toKingdee(message.getPayload());
+        for (KingdeeProduct kingdeeProduct : kingdee){
+            kingdeeService.addProduct(kingdeeProduct);
+        }
+        log.info("syncProductsToKingdee end");
+    }
+
+    /**
+    * @Author Wqh
+    * @Description 上传金蝶供应商信息
+    * @Date 9:45 2024/11/6
+    * @Param []
+    * @return void
+    **/
+    public void syncSupplierToKingdee(ErpSupplierDTO erpSupplierDTO) {
+        KingdeeSupplier kingdeeProduct = erpToKingdeeConverter.toKingdee(erpSupplierDTO);
+        kingdeeService.addSupplier(kingdeeProduct);
     }
 
     @ServiceActivator(inputChannel = "saleChannel")
@@ -163,23 +222,28 @@ public class EsbService {
 //        var kingdeeDepartment = erpToKingdeeConverter.toKingdee(erpDepartment);
 //        kingdeeService.addDepartment(kingdeeDepartment);
 //    }
-
-
-    public void syncDepartments() {
+    public void syncEccangDepartments() {
         dingTalkService.getDepartmentStream().forEach(dingTalkDepartment -> {
             log.info("begin syncing: " + dingTalkDepartment.toString());
-            var erpDepartment = dingTalkToErpConverter.toErp(dingTalkDepartment);
+            DeptReqDTO erpDepartment = dingTalkToErpConverter.toErp(dingTalkDepartment);
             log.info("dept to add " + erpDepartment);
-            if (erpDepartment.getId() != null) {
-                deptService.updateDept(erpDepartment);
+            Long deptId = erpDepartment.getId();
+            if (deptId != null) {
+                deptApi.updateDept(erpDepartment);
             } else {
-                var deptId = deptService.createDept(erpDepartment);
+                deptId = deptApi.createDept(erpDepartment);
                 var mapping = mappingService.toMapping(dingTalkDepartment);
                 mapping
                     .setInternalId(deptId);
                 mappingService.save(mapping);
             }
-
+            //获取部门名称
+            String name = erpDepartment.getName();
+            if (!Objects.equals(name, "宁波索迈")){
+                EccangCategory eccang = erpToEccangConverter.toEccang(String.valueOf(deptId));
+                EccangResponse.EccangPage response = eccangService.addDepartment(eccang);
+                log.info(response.toString());
+            }
 //        var eccangDepartment = erpToEccangConverter.toEccang(erpDepartment);
 //        EccangResponse.BizContent response = eccangService.addDepartment(eccangDepartment);
 //        log.info(response.toString());
@@ -188,18 +252,37 @@ public class EsbService {
         });
     }
 
+    public void syncKingDeeDepartments() {
+        dingTalkService.getDepartmentStream().forEach(dingTalkDepartment -> {
+            log.info("begin syncing: " + dingTalkDepartment.toString());
+            DeptReqDTO erpDepartment = dingTalkToErpConverter.toErp(dingTalkDepartment);
+            log.info("dept to add " + erpDepartment);
+            Long deptId = erpDepartment.getId();
+            if (deptId != null) {
+                deptApi.updateDept(erpDepartment);
+            } else {
+                deptId = deptApi.createDept(erpDepartment);
+                var mapping = mappingService.toMapping(dingTalkDepartment);
+                mapping
+                        .setInternalId(deptId);
+                mappingService.save(mapping);
+            }
+
+        });
+    }
+
     public void syncUsers() {
         dingTalkService.getUserDetailStream().forEach(dingTalkUser -> {
             log.info("begin syncing: " + dingTalkUser.toString());
-            var erpUser = dingTalkToErpConverter.toErp(dingTalkUser);
+            AdminUserReqDTO erpUser = dingTalkToErpConverter.toErp(dingTalkUser);
             log.info("user to add " + erpUser);
             if (erpUser.getId() != null) {
-                userService.updateUser(erpUser);
+                adminUserApi.updateUser(erpUser);
             } else {
                 erpUser.setUsername("temp");
-                Long userId = userService.createUser(erpUser);
+                Long userId = adminUserApi.createUser(erpUser);
                 erpUser.setId(userId).setUsername("SM" + String.format("%06d", userId));
-                userService.updateUser(erpUser);
+                adminUserApi.updateUser(erpUser);
                 var mapping = mappingService.toMapping(dingTalkUser);
                 mapping
                     .setInternalId(userId);

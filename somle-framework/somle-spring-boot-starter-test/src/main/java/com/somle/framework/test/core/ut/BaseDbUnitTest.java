@@ -10,7 +10,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.transaction.annotation.Transactional;
 
-
+// Use this test for jpa access
 @DataJpaTest
 @ContextConfiguration(classes = {BaseDbUnitTest.Application.class})
 @ActiveProfiles("unit-test")
