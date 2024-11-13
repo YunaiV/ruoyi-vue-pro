@@ -4,24 +4,20 @@ package com.somle.walmart.service;
 import com.somle.framework.common.util.io.IoUtils;
 import com.somle.framework.common.util.json.JSONObject;
 import com.somle.framework.common.util.json.JsonUtils;
+import com.somle.framework.common.util.web.WebUtils;
+import com.somle.walmart.model.WalmartOrderReqVO;
 import com.somle.walmart.model.WalmartToken;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.*;
 import org.apache.tomcat.util.codec.binary.Base64;
-import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.io.*;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.zip.GZIPInputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -74,11 +70,12 @@ public class WalmartClient {
     }
 
     @SneakyThrows
-    public JSONObject getOrders() {
+    public JSONObject getOrders(WalmartOrderReqVO vo) {
         OkHttpClient client = new OkHttpClient().newBuilder()
                 .build();
+        var url = WebUtils.urlWithParams("https://marketplace.walmartapis.com/v3/orders", vo);
         Request request = new Request.Builder()
-                .url("https://marketplace.walmartapis.com/v3/orders")
+                .url(url)
                 .method("GET", null)
                 .addHeader("WM_QOS.CORRELATION_ID", "b3261d2d-028a-4ef7-8602-633c23200af6")
                 .addHeader("WM_SVC.NAME", "Walmart Marketplace")
@@ -116,7 +113,7 @@ public class WalmartClient {
     }
 
     @SneakyThrows
-    public String getAvailableReconFile(String date) {
+    public String getReconFile(String date) {
         OkHttpClient client = new OkHttpClient().newBuilder()
                 .build();
         HttpUrl url = new HttpUrl.Builder()
@@ -164,9 +161,9 @@ public class WalmartClient {
         return result;
     }
 
-    public String getAvailableReconFile(LocalDate date) {
+    public String getReconFile(LocalDate date) {
         var formatter = DateTimeFormatter.ofPattern("MMddyyyy");
-        return getAvailableReconFile(date.format(formatter));
+        return getReconFile(date.format(formatter));
     }
 
     @SneakyThrows

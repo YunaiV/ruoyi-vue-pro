@@ -125,6 +125,12 @@
             <version>${revision}</version>
         </dependency>
 
+        <dependency>
+            <groupId>com.somle</groupId>
+            <artifactId>somle-walmart</artifactId>
+            <version>${revision}</version>
+        </dependency>
+
     </dependencies>
 
     

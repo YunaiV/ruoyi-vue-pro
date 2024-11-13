@@ -10,7 +10,8 @@ public enum Domain {
     MATOMO("matomo"),
     DINGTALK("dingtalk"),
     SHOPIFY("shopify"),
-    WANGDIAN("wangdian");
+    WANGDIAN("wangdian"),
+    WALMART("walmart");
 
 
     private final String value;
