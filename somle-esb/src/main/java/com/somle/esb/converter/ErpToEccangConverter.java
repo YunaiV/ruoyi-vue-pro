@@ -151,6 +151,7 @@ public class ErpToEccangConverter {
             eccangProduct.setHsCode(product.getHscode());
             eccangProduct.setDefaultSupplierCode("默认供应商");
             //eccangProduct.setLogisticAttribute(product.getLogisticAttribute());直接设置会提示[{"errorCode":"10001","errorMsg":"产品【DDDDDDD-XXX】产品物流属性ID在系统中未找到"}]
+            //TODO 当前大部分产品无需商检，目前暂且设置为1，待确认
             eccangProduct.setLogisticAttribute("1");
             eccangProduct.setProductDeclaredValue(product.getDeclaredValue());
             eccangProduct.setPdOverseaTypeEn(product.getDeclaredTypeEn());
