@@ -7,15 +7,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
- * @className: SyncDepartmentsToKingdeeJob
+ * @className: syncDepartmentsJob
  * @author: Wqh
- * @date: 2024/11/4 11:21
+ * @date: 2024/10/29 17:24
  * @Version: 1.0
  * @description:
  */
 @Slf4j
 @Component
-public class SyncDepartmentsToKingdeeJob extends DataJob{
+public class SyncDepartmentsJob extends DataJob{
     @Autowired
     EsbService service;
 
@@ -25,6 +25,7 @@ public class SyncDepartmentsToKingdeeJob extends DataJob{
     @TenantIgnore
     public String execute(String param) throws Exception {
         service.syncKingDeeDepartments();
+        service.syncEccangDepartments();
         return "sync success";
     }
 }
