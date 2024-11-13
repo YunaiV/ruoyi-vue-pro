@@ -128,18 +128,32 @@ public class ErpToEccangConverter {
             EccangProduct eccangProduct = new EccangProduct();
             eccangProduct.setPdDeclarationStatement(product.getId());
             eccangProduct.setProductTitle(product.getProductName());
-            eccangProduct.setPdOverseaTypeEn(product.getDeclaredTypeEn());
             //如果有供应商产品编码和国家代码都不为空的时候才去设置SKU
             if (StrUtil.isNotBlank(product.getSupplierProductCode()) && StrUtil.isNotBlank(product.getCountryCode())) {
                 eccangProduct.setProductTitleEn(product.getSupplierProductCode() + "-" + getProductStatus(product.getCountryCode()));
                 eccangProduct.setProductSku(product.getSupplierProductCode() + "-" + getProductStatus(product.getCountryCode()));
             }
-            eccangProduct.setPdDeclareCurrencyCode("USD");
-            eccangProduct.setProductDeclaredValue(99999.9F);
-            eccangProduct.setLogisticAttribute("1");
+            eccangProduct.setProductWeight(product.getProductWeight());
+            eccangProduct.setProductWidth(product.getProductWidth());
+            eccangProduct.setProductLength(product.getProductLength());
+            eccangProduct.setProductHeight(product.getProductHeight());
+            eccangProduct.setProductMaterial(product.getProductMaterial());
+            eccangProduct.setPdNetWeight(product.getPackageWeight());
+            eccangProduct.setPdNetLength(product.getPackageLength());
+            eccangProduct.setPdNetWidth(product.getPackageWidth());
+            eccangProduct.setPdNetHeight(product.getPackageHeight());
+            eccangProduct.setCurrencyCode(product.getPurchasePriceCurrencyCode());
+            eccangProduct.setProductPurchaseValue(product.getProductPurchaseValue());
+            eccangProduct.setFboTaxRate(product.getTaxRate());
+            eccangProduct.setPdOverseaTypeCn(product.getDeclaredType());
+            eccangProduct.setPdDeclareCurrencyCode(product.getDeclaredValueCurrencyCode());
             eccangProduct.setProductImgUrlList(Collections.singletonList(product.getProductImageUrl()));
-            //eccangProduct.setBoxArr(List.of(boxArr));
+            eccangProduct.setHsCode(product.getHscode());
             eccangProduct.setDefaultSupplierCode("默认供应商");
+            //eccangProduct.setLogisticAttribute(product.getLogisticAttribute());直接设置会提示[{"errorCode":"10001","errorMsg":"产品【DDDDDDD-XXX】产品物流属性ID在系统中未找到"}]
+            eccangProduct.setLogisticAttribute("1");
+            eccangProduct.setProductDeclaredValue(product.getDeclaredValue());
+            eccangProduct.setPdOverseaTypeEn(product.getDeclaredTypeEn());
             //设置产品创建人部门名称
             MapUtils.findAndThen(userMap, Long.parseLong(product.getProductCreatorId()),
                     user -> eccangProduct.setUserOrganizationId(Math.toIntExact(user.getDeptId())));
