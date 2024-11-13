@@ -8,9 +8,12 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 // if use inner property to store node, then ObjectMapper.writeValueAsString(JSONObject) will be wrong
 public class JSONObject extends ObjectNode{
@@ -45,8 +48,22 @@ public class JSONObject extends ObjectNode{
         return this.get(fieldName).asText();
     }
 
+    public List<String> getStringList(String fieldName) {
+        return StreamSupport.stream(this.get(fieldName).spliterator(), false)
+                .filter(JsonNode::isTextual) // Ensure the element is a text node
+                .map(JsonNode::asText) // Extract text value
+                .collect(Collectors.toList()); // Collect into a list
+    }
+
     public Integer getInteger(String fieldName) {
         return this.get(fieldName).asInt();
+    }
+
+    public List<Integer> getIntegerList(String fieldName) {
+        return StreamSupport.stream(this.get(fieldName).spliterator(), false)
+                .filter(JsonNode::isInt) // Ensure the element is a text node
+                .map(JsonNode::asInt) // Extract text value
+                .collect(Collectors.toList()); // Collect into a list
     }
 
     public JSONArray getJSONArray(String fieldName) {
