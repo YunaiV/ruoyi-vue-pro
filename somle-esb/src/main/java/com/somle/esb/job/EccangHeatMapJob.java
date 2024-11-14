@@ -7,6 +7,7 @@ import com.somle.eccang.service.EccangService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.integration.support.MessageBuilder;
 import org.springframework.messaging.MessageChannel;
+import org.springframework.messaging.MessageHandlingException;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -28,7 +29,12 @@ public class EccangHeatMapJob implements JobHandler {
             .build();
         for (var order : eccangService.getOrderPlusArchiveSince(vo,2022).toList()) {
             count++;
-            saleChannel.send(MessageBuilder.withPayload(order).build());
+            try {
+                saleChannel.send(MessageBuilder.withPayload(order).build());
+            } catch (MessageHandlingException e) {
+                Throwable rootCause = e.getCause();
+                throw new RuntimeException(rootCause);
+            }
         }
 
 
