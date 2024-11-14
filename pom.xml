@@ -41,6 +41,7 @@
         <module>somle-shopify</module>
         <module>somle-wayfair</module>
         <module>somle-walmart</module>
+        <module>somle-jingdong</module>
 
     </modules>
 
