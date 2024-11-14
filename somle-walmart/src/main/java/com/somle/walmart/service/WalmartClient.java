@@ -12,7 +12,6 @@ import lombok.extern.slf4j.Slf4j;
 import okhttp3.*;
 import org.apache.tomcat.util.codec.binary.Base64;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Service;
 
 import java.io.*;
 import java.time.LocalDate;
@@ -22,16 +21,17 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 @Slf4j
-public class WalmartClient {
+public abstract class WalmartClient {
 
 
-    private WalmartToken token;
+    WalmartToken token;
 
     private String accessToken;
 
     public WalmartClient(WalmartToken token) {
         this.token = token;
         this.accessToken = getAccessToken();
+        log.info(token.getSvcName());
     }
 
     /**
@@ -42,22 +42,44 @@ public class WalmartClient {
         return "Basic " + Base64.encodeBase64String(str.getBytes());
     }
 
+    Headers commonHeaders() {
+        return new Headers.Builder()
+                .add("WM_QOS.CORRELATION_ID", "b3261d2d-028a-4ef7-8602-633c23200af6")
+                .add("WM_SVC.NAME", token.getSvcName())
+                .add("Accept", "application/json")
+                .build();
+
+    }
+
+    Headers normalHeaders() {
+        return commonHeaders().newBuilder()
+                .add("WM_SEC.ACCESS_TOKEN", getAccessToken())
+                .build();
+    }
+
+    abstract Headers headers();
+
+    abstract HttpUrl url(String endpoint);
+
+
     @SneakyThrows
     public String getAccessToken() {
         OkHttpClient client = new OkHttpClient().newBuilder()
                 .build();
         MediaType mediaType = MediaType.parse("application/x-www-form-urlencoded");
         RequestBody body = RequestBody.create(mediaType, "grant_type=client_credentials");
+        var url = url("v3/token");
         Request request = new Request.Builder()
-                .url("https://marketplace.walmartapis.com/v3/token")
+                .url(url)
                 .method("POST", body)
+                .headers(commonHeaders())
                 .addHeader("Authorization", getAuthorization(token))
-                .addHeader("WM_QOS.CORRELATION_ID", "b3261d2d-028a-4ef7-8602-633c23200af6")
-                .addHeader("WM_SVC.NAME", "Walmart Marketplace")
-                .addHeader("Accept", "application/json")
                 .build();
+
+        log.info(request.toString());
         Response response = client.newCall(request).execute();
         var bodyString = response.body().string();
+        log.info(bodyString);
         var result = JsonUtils.parseObject(bodyString, JSONObject.class);
         return result.getString("access_token");
     }
@@ -72,14 +94,12 @@ public class WalmartClient {
     public JSONObject getOrders(WalmartOrderReqVO vo) {
         OkHttpClient client = new OkHttpClient().newBuilder()
                 .build();
-        var url = WebUtils.urlWithParams("https://marketplace.walmartapis.com/v3/orders", vo);
+        var url = url("v3/orders");
+        var headers = WebUtils.merge(headers(), WebUtils.toHeaders(vo));
         Request request = new Request.Builder()
                 .url(url)
                 .method("GET", null)
-                .addHeader("WM_QOS.CORRELATION_ID", "b3261d2d-028a-4ef7-8602-633c23200af6")
-                .addHeader("WM_SVC.NAME", "Walmart Marketplace")
-                .addHeader("WM_SEC.ACCESS_TOKEN", accessToken)
-                .addHeader("Accept", "application/json")
+                .headers(headers)
                 .build();
         Response response = client.newCall(request).execute();
         var bodyString = response.body().string();
@@ -91,19 +111,13 @@ public class WalmartClient {
     public List<String> getAvailableReconFileDates() {
         OkHttpClient client = new OkHttpClient().newBuilder()
                 .build();
-        HttpUrl url = new HttpUrl.Builder()
-                .scheme("https") // or "http"
-                .host("marketplace.walmartapis.com")
-                .addPathSegments("v3/report/reconreport/availableReconFiles") // e.g., "/api"
+        var url = url("v3/report/reconreport/availableReconFiles").newBuilder()
                 .addQueryParameter("reportVersion", "v1")
                 .build();
         Request request = new Request.Builder()
                 .url(url)
                 .method("GET", null)
-                .addHeader("WM_QOS.CORRELATION_ID", "b3261d2d-028a-4ef7-8602-633c23200af6")
-                .addHeader("WM_SVC.NAME", "Walmart Marketplace")
-                .addHeader("WM_SEC.ACCESS_TOKEN", accessToken)
-                .addHeader("Accept", "application/json")
+                .headers(headers())
                 .build();
         Response response = client.newCall(request).execute();
         var bodyString = response.body().string();
@@ -115,19 +129,14 @@ public class WalmartClient {
     public String getReconFile(String date) {
         OkHttpClient client = new OkHttpClient().newBuilder()
                 .build();
-        HttpUrl url = new HttpUrl.Builder()
-                .scheme("https") // or "http"
-                .host("marketplace.walmartapis.com")
-                .addPathSegments("v3/report/reconreport/reconFile") // e.g., "/api"
+        var url = url("v3/report/reconreport/availableReconFiles").newBuilder()
                 .addQueryParameter("reportVersion", "v1")
                 .addQueryParameter("reportDate", date)
                 .build();
         Request request = new Request.Builder()
                 .url(url)
                 .method("GET", null)
-                .addHeader("WM_QOS.CORRELATION_ID", "b3261d2d-028a-4ef7-8602-633c23200af6")
-                .addHeader("WM_SVC.NAME", "Walmart Marketplace")
-                .addHeader("WM_SEC.ACCESS_TOKEN", accessToken)
+                .headers(headers())
                 .addHeader("Accept", "application/octet-stream")
                 .build();
         Response response = client.newCall(request).execute();
@@ -137,12 +146,12 @@ public class WalmartClient {
         }
 
         // Get the Content-Disposition header
-        String contentDisposition = response.header("Content-Disposition");
-        if (contentDisposition == null || !contentDisposition.contains("filename=")) {
-            throw new IOException("Filename not found in Content-Disposition header");
-        }
-
-        String zipFileName = contentDisposition.split("filename=")[1];
+//        String contentDisposition = response.header("Content-Disposition");
+//        if (contentDisposition == null || !contentDisposition.contains("filename=")) {
+//            throw new IOException("Filename not found in Content-Disposition header");
+//        }
+//
+//        String zipFileName = contentDisposition.split("filename=")[1];
 //        log.info("zip file name: " + zipFileName);
 
         // Save the response body as a zip file
@@ -169,20 +178,15 @@ public class WalmartClient {
     public JSONObject getPaymentStatement() {
         OkHttpClient client = new OkHttpClient().newBuilder()
                 .build();
+        var url = url("v3/report/payment/statement");
         Request request = new Request.Builder()
-                .url("https://marketplace.walmartapis.com/v3/report/payment/statement")
+                .url(url)
                 .method("GET", null)
-                .addHeader("WM_QOS.CORRELATION_ID", "b3261d2d-028a-4ef7-8602-633c23200af6")
-                .addHeader("WM_SVC.NAME", "Walmart Marketplace")
-                .addHeader("WM_SEC.ACCESS_TOKEN", accessToken)
-                .addHeader("Accept", "application/json")
+                .headers(headers())
                 .build();
         Response response = client.newCall(request).execute();
         var bodyString = response.body().string();
         var result = JsonUtils.parseObject(bodyString, JSONObject.class);
         return result;
     }
-
-
-
 }

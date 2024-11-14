@@ -16,6 +16,7 @@ import java.util.zip.GZIPInputStream;
 
 import com.somle.framework.common.util.json.JsonUtils;
 import lombok.SneakyThrows;
+import okhttp3.*;
 import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.springframework.retry.RetryCallback;
 import org.springframework.retry.support.RetryTemplate;
@@ -26,12 +27,6 @@ import org.springframework.stereotype.Component;
 //import com.alibaba.fastjson2.JSONObject;
 
 import lombok.extern.slf4j.Slf4j;
-import okhttp3.HttpUrl;
-import okhttp3.MediaType;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.RequestBody;
-import okhttp3.Response;
 
 @Component
 @Slf4j
@@ -68,6 +63,43 @@ public class WebUtils {
             }
         }
         return urlBuilder.build().toString();
+    }
+
+    @SneakyThrows
+    public static Headers toHeaders(Object pojo) {
+        var headersBuilder = new Headers.Builder();
+        for (Field field : pojo.getClass().getDeclaredFields()) {
+            field.setAccessible(true);
+            Object value = field.get(pojo);
+            if (value instanceof List) {
+                for (Object item : (List<?>) value) {
+                    headersBuilder.add(field.getName(), item.toString());
+                }
+            } else {
+                if (value != null) {
+                    headersBuilder.add(field.getName(), value.toString());
+                }
+            }
+        }
+        return headersBuilder.build();
+    }
+
+
+    public static Headers merge(Headers headers1, Headers headers2) {
+        Headers.Builder builder = new Headers.Builder();
+
+        // Add headers from the first Headers object
+        for (String name : headers1.names()) {
+            builder.add(name, headers1.get(name));
+        }
+
+        // Add headers from the second Headers object, potentially overriding duplicates
+        for (String name : headers2.names()) {
+//            builder.removeAll(name); // Remove duplicates to keep the second headers' values
+            builder.add(name, headers2.get(name));
+        }
+
+        return builder.build();
     }
 
     @SneakyThrows

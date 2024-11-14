@@ -8,7 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-// https://developer.walmart.com/api/us/mp/auth
+
 @Slf4j
 @Service
 public class WalmartService {
@@ -22,7 +22,11 @@ public class WalmartService {
     @PostConstruct
     public void init() {
         var token = tokenRepository.findAll().get(0);
-        client = new WalmartClient(token);
+        if (token.getSvcName().equals("Walmart Marketplace")) {
+            client = new WalmartMarketplaceClient(token);
+        } else {
+            client = new WalmartDsvClient(token, "752076");
+        }
     }
 
 

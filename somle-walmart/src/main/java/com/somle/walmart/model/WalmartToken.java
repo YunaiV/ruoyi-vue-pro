@@ -16,4 +16,7 @@ public class WalmartToken {
     @Id
     private String clientId;
     private String clientSecret;
+    private String svcName;
+    private String consumerChannelType;
+
 }
