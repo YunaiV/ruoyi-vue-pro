@@ -361,10 +361,14 @@ public class EccangService {
 
 
     public EccangPage addDepartment(EccangCategory department) {
-        log.info("adding department: " + department.toString());
-        var result = post("editCategory", department);
-        log.debug(result.toString());
-        return result;
+        try {
+            log.info("adding department: " + department.toString());
+            var result = post("editCategory", department);
+            log.debug(result.toString());
+            return result;
+        } catch (Exception e) {
+            throw new RuntimeException("同步" + department.getPcName() + "时出现异常：" + e.getMessage());
+        }
     }
 
     public EccangPage addProduct(EccangProduct product) {
