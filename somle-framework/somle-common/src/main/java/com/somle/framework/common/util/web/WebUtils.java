@@ -7,6 +7,7 @@ import java.lang.reflect.Field;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
@@ -15,6 +16,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.zip.GZIPInputStream;
 
 import com.somle.framework.common.util.json.JsonUtils;
+import com.somle.framework.common.util.object.BeanUtils;
 import lombok.SneakyThrows;
 import okhttp3.*;
 import org.apache.tomcat.util.http.fileupload.IOUtils;
@@ -48,21 +50,8 @@ public class WebUtils {
 
     @SneakyThrows
     public static String urlWithParams(String url, Object pojo) {
-        HttpUrl.Builder urlBuilder = HttpUrl.parse(url).newBuilder();
-        for (Field field : pojo.getClass().getDeclaredFields()) {
-            field.setAccessible(true);
-            Object value = field.get(pojo);
-            if (value instanceof List) {
-                for (Object item : (List<?>) value) {
-                    urlBuilder.addQueryParameter(field.getName(), item.toString());
-                }
-            } else {
-                if (value != null) {
-                    urlBuilder.addQueryParameter(field.getName(), value.toString());
-                }
-            }
-        }
-        return urlBuilder.build().toString();
+        Map<String, String> queryParams = BeanUtils.toStringMap(pojo);
+        return urlWithParams(url, queryParams);
     }
 
     @SneakyThrows

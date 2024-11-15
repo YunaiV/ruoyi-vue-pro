@@ -15,6 +15,7 @@ public class AiCountryDataJob extends AiDataJob {
         setDate(param);
 
 
+
         service.send(
                 OssData.builder()
                         .database(DATABASE)
@@ -22,7 +23,7 @@ public class AiCountryDataJob extends AiDataJob {
                         .syncType("full")
                         .requestTimestamp(System.currentTimeMillis())
                         .folderDate(LocalDate.now())
-                        .content(aiService.getCountries().toList())
+                        .content(aiService.getCountries())
                         .headers(null)
                         .build()
         );

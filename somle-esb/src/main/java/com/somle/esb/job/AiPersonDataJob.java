@@ -1,14 +1,10 @@
 package com.somle.esb.job;
 
 
-import com.somle.ai.service.AiService;
-import com.somle.esb.model.Domain;
 import com.somle.esb.model.OssData;
-import com.somle.esb.service.EsbService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.time.LocalDate;
+import java.util.stream.Stream;
 
 @Component
 public class AiPersonDataJob extends AiDataJob {
@@ -19,17 +15,28 @@ public class AiPersonDataJob extends AiDataJob {
         setDate(param);
 
 
-        service.send(
-                OssData.builder()
-                        .database(DATABASE)
-                        .tableName("person")
-                        .syncType("inc")
-                        .requestTimestamp(System.currentTimeMillis())
-                        .folderDate(yesterday)
-                        .content(aiService.getNames(yesterday).toList())
-                        .headers(null)
-                        .build()
+        var createVO = aiService.newCreateVO(yesterday);
+        var updateVO = aiService.newUpdateVO(yesterday);
+
+        var newContent = Stream.concat(
+            aiService.getPersons(createVO),
+            aiService.getPersons(updateVO)
         );
+
+        newContent.forEach(response ->
+            service.send(
+                OssData.builder()
+                    .database(DATABASE)
+                    .tableName("person")
+                    .syncType("inc")
+                    .requestTimestamp(System.currentTimeMillis())
+                    .folderDate(yesterday)
+                    .content(response)
+                    .headers(null)
+                    .build()
+            )
+        );
+
         return "data upload success";
 
     }

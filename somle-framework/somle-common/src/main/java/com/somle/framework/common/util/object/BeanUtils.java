@@ -36,9 +36,11 @@ public class BeanUtils {
     public static Map<String, String> toStringMap(Object bean, String... properties) {
         var map = BeanUtil.beanToMap(bean, properties);
         Map<String, String> stringMap = new LinkedHashMap<>();
-        for (Map.Entry<String, Object> entry : map.entrySet()) {
-            if (entry.getValue() != null) {
-                stringMap.put(entry.getKey(), String.valueOf(entry.getValue()));}
+        if (map != null) {
+            for (Map.Entry<String, Object> entry : map.entrySet()) {
+                if (entry.getValue() != null) {
+                    stringMap.put(entry.getKey(), String.valueOf(entry.getValue()));}
+            }
         }
         return stringMap;
     }

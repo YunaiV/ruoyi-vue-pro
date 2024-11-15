@@ -1,10 +1,8 @@
 package com.somle.ai.service;
 
 import com.somle.ai.model.AiName;
+import com.somle.ai.model.AiReqVO;
 import com.somle.ai.model.AiResponse;
-import com.somle.erp.model.ErpAddress;
-import com.somle.erp.model.ErpCountry;
-import com.somle.erp.model.ErpCurrency;
 import com.somle.framework.common.util.web.WebUtils;
 
 import lombok.extern.slf4j.Slf4j;
@@ -14,7 +12,6 @@ import org.springframework.messaging.MessageChannel;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.stream.Stream;
 
@@ -29,6 +26,27 @@ public class AiService {
     private final Map<String, String> headers = Map.of(
         "Authorization", "Token 4b9a81992261ad3f01aecd4608beb1e9c9828865"
     );
+    private final Integer pageSize = 100;
+
+    public AiReqVO newCreateVO(LocalDate date) {
+        var firstSecond = date.atStartOfDay();
+        var lastSecond = date.plusDays(1).atStartOfDay().minusSeconds(1);
+        return AiReqVO.builder()
+            .createTimeAfter(firstSecond)
+            .createTimeBefore(lastSecond)
+            .limit(pageSize)
+            .build();
+    }
+
+    public AiReqVO newUpdateVO(LocalDate date) {
+        var firstSecond = date.atStartOfDay();
+        var lastSecond = date.plusDays(1).atStartOfDay().minusSeconds(1);
+        return AiReqVO.builder()
+            .updateTimeAfter(firstSecond)
+            .updateTimeBefore(lastSecond)
+            .limit(pageSize)
+            .build();
+    }
 
 
 
@@ -48,65 +66,67 @@ public class AiService {
     }
 
 
-    public Stream<AiName> getNames(LocalDate dataDate) {
-        return getNew("/api/persons/", dataDate, AiName.class);
+    public Stream<AiResponse> getPersons(AiReqVO vo) {
+        return getReponses("/api/persons/", vo);
     }
 
-    public Stream<ErpAddress> getAddresses(LocalDate dataDate) {
-        return getNew("/api/locationsdtl/", dataDate, ErpAddress.class);
+    public Stream<AiResponse> getAddresses(AiReqVO vo) {
+        return getReponses("/api/locationsdtl/", vo);
     }
 
-    public <T> Stream<T> getNew(String endUrl, LocalDate dataDate, Class<T> objectclass) {
-        LocalDateTime today = dataDate.atStartOfDay();
-        LocalDateTime tomorrow = today.plusDays(1);
-
-        Map<String, String> paramsAdded = Map.of(
-            "create_time_after", today.toString(),
-            "create_time_before", tomorrow.toString(),
-            "limit", "100"
-
-        );
-
-        String urlAdded = WebUtils.urlWithParams(baseUrl + endUrl, paramsAdded);
-
-        Map<String, String> paramsUpdated = Map.of(
-            "create_time_before", today.toString(),
-            "update_time_after", today.toString(),
-            "update_time_before", tomorrow.toString(),
-            "limit", "100"
-
-        );
-
-        String urlUpdated = WebUtils.urlWithParams(baseUrl + endUrl, paramsUpdated);
-
-        return Stream.concat(getResults(urlAdded, objectclass), getResults(urlUpdated, objectclass));
+    public AiResponse getCountries() {
+        return getReponse("/api/countriesiso/");
     }
 
-    public <T> Stream<T> getResults(String url, Class<T> objectclass) {
-        return getReponses(url).flatMap(n-> n.getResults(objectclass));
+    public AiResponse getCurrencies() {
+        return getReponse("/api/currency/");
     }
 
-    public Stream<AiResponse> getReponses(String url) {
+//    public <T> Stream<T> getNew(String endUrl, LocalDate dataDate, Class<T> objectclass) {
+//        LocalDateTime today = dataDate.atStartOfDay();
+//        LocalDateTime tomorrow = today.plusDays(1);
+//
+//        Map<String, String> paramsAdded = Map.of(
+//            "create_time_after", today.toString(),
+//            "create_time_before", tomorrow.toString(),
+//            "limit", "100"
+//
+//        );
+//
+//        String urlAdded = WebUtils.urlWithParams(baseUrl + endUrl, paramsAdded);
+//
+//        Map<String, String> paramsUpdated = Map.of(
+//            "create_time_before", today.toString(),
+//            "update_time_after", today.toString(),
+//            "update_time_before", tomorrow.toString(),
+//            "limit", "100"
+//
+//        );
+//
+//        String urlUpdated = WebUtils.urlWithParams(baseUrl + endUrl, paramsUpdated);
+//
+//        return Stream.concat(getResults(urlAdded, objectclass), getResults(urlUpdated, objectclass));
+//    }
+
+//    public <T> Stream<T> getResults(String url, Class<T> objectclass) {
+//        return getReponses(url).flatMap(n-> n.getResults(objectclass));
+//    }
+
+    public Stream<AiResponse> getReponsesFromUrl(String url) {
         log.debug("fetching from url: " + url);
         AiResponse response = WebUtils.getRequest(url, Map.of(), headers, AiResponse.class);
 
         log.debug("next url is: " + response.getNext());
-        Stream<AiResponse> moreResponse = response.getNext() == null ? Stream.empty() : getReponses(response.getNext());
+        Stream<AiResponse> moreResponse = response.getNext() == null ? Stream.empty() : getReponsesFromUrl(response.getNext());
         return Stream.concat(Stream.of(response), moreResponse);
     }
 
-
-    public Stream<ErpCountry> getCountries() {
-        String endUrl = "/api/countriesiso/";
-//        String response = WebUtils.getRequest(baseUrl + endUrl, Map.of(), headers, String.class);
-//        return JsonUtils.parseArray(response, ErpCountry.class).stream();
-        return getResults(baseUrl + endUrl, ErpCountry.class);
+    public AiResponse getReponse(String endpoint) {
+        return getReponsesFromUrl(baseUrl + endpoint).findFirst().get();
     }
 
-    public Stream<ErpCurrency> getCurrencies() {
-        String endUrl = "/api/currency/";
-//        String response = WebUtils.getRequest(baseUrl + endUrl, Map.of(), headers, String.class);
-//        return JsonUtils.parseArray(response, ErpCurrency.class).stream();
-        return getResults(baseUrl + endUrl, ErpCurrency.class);
+    public Stream<AiResponse> getReponses(String endpoint, Object vo) {
+        var url = WebUtils.urlWithParams(baseUrl + endpoint, vo);
+        return getReponsesFromUrl(url);
     }
 }

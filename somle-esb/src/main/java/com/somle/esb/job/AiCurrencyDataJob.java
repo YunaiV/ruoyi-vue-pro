@@ -21,7 +21,7 @@ public class AiCurrencyDataJob extends AiDataJob {
                         .syncType("full")
                         .requestTimestamp(System.currentTimeMillis())
                         .folderDate(LocalDate.now())
-                        .content(aiService.getCurrencies().toList())
+                        .content(aiService.getCurrencies())
                         .headers(null)
                         .build()
         );
