@@ -54,6 +54,7 @@ public class MatomoService {
         var url = WebUtils.urlWithParams(baseUrl, tokenVO);
         url = WebUtils.urlWithParams(url, methodVO);
         url = WebUtils.urlWithParams(url, vo);
+        log.info("url:{}", url);
         var request = new Request.Builder()
             .url(url)
             .method("GET", null)

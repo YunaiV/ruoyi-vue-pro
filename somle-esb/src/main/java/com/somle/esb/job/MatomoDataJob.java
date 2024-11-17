@@ -6,6 +6,7 @@ import cn.iocoder.yudao.framework.quartz.core.handler.JobHandler;
 import com.somle.esb.model.Domain;
 import com.somle.esb.model.OssData;
 import com.somle.esb.service.EsbService;
+import com.somle.framework.common.util.collection.PageUtils;
 import com.somle.matomo.model.MatomoMethodVO;
 import com.somle.matomo.model.MatomoVisitReqVO;
 import com.somle.matomo.service.MatomoService;
@@ -38,7 +39,7 @@ public class MatomoDataJob extends DataJob {
                 .method("Live.getLastVisitsDetails")
                 .build();
 
-            var vo = MatomoVisitReqVO.builder()
+            var reqVO = MatomoVisitReqVO.builder()
                 .idSite(String.valueOf(idSite))
                 .format("json")
                 .period("day")
@@ -47,18 +48,27 @@ public class MatomoDataJob extends DataJob {
                 .filterOffset(0)
                 .build();
 
-            var responseString = matomoService.getResponse(methodVO, vo);
+            var results = PageUtils.getAllPages(
+                matomoService.getResponse(methodVO, reqVO),
+                response -> response.equals("[]"),
+                response -> {
+                    reqVO.setFilterOffset(reqVO.getFilterOffset() + reqVO.getFilterLimit());
+                    return matomoService.getResponse(methodVO, reqVO);
+                }
+            );
 
-            OssData data = OssData.builder()
-                .database(DATABASE)
-                .tableName("visit")
-                .syncType("inc")
-                .requestTimestamp(System.currentTimeMillis())
-                .folderDate(beforeYesterday)
-                .content(responseString)
-                .headers(null)
-                .build();
-            service.send(data);
+            results.forEach(result->{
+                OssData data = OssData.builder()
+                    .database(DATABASE)
+                    .tableName("visit")
+                    .syncType("inc")
+                    .requestTimestamp(System.currentTimeMillis())
+                    .folderDate(beforeYesterday)
+                    .content(result)
+                    .headers(null)
+                    .build();
+                service.send(data);
+            });
         });
         return "data upload success";
     }
