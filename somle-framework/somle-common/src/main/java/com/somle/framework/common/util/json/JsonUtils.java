@@ -18,8 +18,7 @@ import org.springframework.context.annotation.Configuration;
 
 import java.io.IOException;
 import java.lang.reflect.Array;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 @Slf4j
 public class JsonUtils {
@@ -68,6 +67,18 @@ public class JsonUtils {
     //convert pojo to json
     public static JSONObject toJSONObject(Object object) {
         return new JSONObject(objectMapper.valueToTree(object));
+    }
+
+    @SneakyThrows
+    public static Map<String, String> toStringMap(JSONObject json) {
+        Map<String, String> map = new HashMap<>();
+
+        Iterator<Map.Entry<String, JsonNode>> fields = json.fields();
+        while (fields.hasNext()) {
+            Map.Entry<String, JsonNode> field = fields.next();
+            map.put(field.getKey(), field.getValue().asText());
+        }
+        return map;
     }
 
     //convert json node to pojo

@@ -3,6 +3,7 @@ package com.somle.matomo.controller;
 
 
 import com.somle.matomo.model.MatomoVisit;
+import com.somle.matomo.model.MatomoVisitReqVO;
 import com.somle.matomo.service.MatomoService;
 
 import lombok.extern.slf4j.Slf4j;
@@ -23,10 +24,9 @@ public class MatomoController {
     @GetMapping("/getVisits")
     @ResponseBody
     public List<MatomoVisit> getVisits(
-        @RequestParam Integer idSite,
-        @RequestParam String date
+        MatomoVisitReqVO vo
     ) {
-        return matomoService.getVisits(idSite, LocalDate.parse(date)).toList();
+        return matomoService.getVisits(vo).toList();
     }
 
     

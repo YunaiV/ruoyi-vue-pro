@@ -15,6 +15,7 @@ import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.TimeUnit;
 import java.util.zip.GZIPInputStream;
 
+import com.somle.framework.common.util.json.JSONObject;
 import com.somle.framework.common.util.json.JsonUtils;
 import com.somle.framework.common.util.object.BeanUtils;
 import lombok.SneakyThrows;
@@ -48,29 +49,41 @@ public class WebUtils {
         return urlBuilder.build().toString();
     }
 
-    @SneakyThrows
-    public static String urlWithParams(String url, Object pojo) {
-        Map<String, String> queryParams = BeanUtils.toStringMap(pojo);
+    public static String urlWithParams(String url, JSONObject json) {
+        Map<String, String> queryParams = JsonUtils.toStringMap(json);
         return urlWithParams(url, queryParams);
     }
 
-    @SneakyThrows
-    public static Headers toHeaders(Object pojo) {
+    // TODO: Depreciated
+    /**
+     * use pojo's json format to make queryparams
+     */
+    public static String urlWithParams(String url, Object pojo) {
+        var json = JsonUtils.toJSONObject(pojo);
+        return urlWithParams(url, json);
+    }
+
+
+    public static Headers toHeaders(Map<String,String> headerMap) {
         var headersBuilder = new Headers.Builder();
-        for (Field field : pojo.getClass().getDeclaredFields()) {
-            field.setAccessible(true);
-            Object value = field.get(pojo);
-            if (value instanceof List) {
-                for (Object item : (List<?>) value) {
-                    headersBuilder.add(field.getName(), item.toString());
-                }
-            } else {
-                if (value != null) {
-                    headersBuilder.add(field.getName(), value.toString());
-                }
-            }
+        for (Map.Entry<String, String> entry : headerMap.entrySet()) {
+            headersBuilder.add(entry.getKey(), entry.getValue());
         }
         return headersBuilder.build();
+    }
+
+    public static Headers toHeaders(JSONObject json) {
+        Map<String, String> headerMap = JsonUtils.toStringMap(json);
+        return toHeaders(headerMap);
+    }
+
+    // TODO: Depreciated
+    /*
+     * use pojo's json format to make headers
+     */
+    public static Headers toHeaders(Object pojo) {
+        var json = JsonUtils.toJSONObject(pojo);
+        return toHeaders(json);
     }
 
 
