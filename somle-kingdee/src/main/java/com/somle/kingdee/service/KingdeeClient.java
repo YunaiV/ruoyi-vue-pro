@@ -266,6 +266,13 @@ public class KingdeeClient {
         return response.getData(KingdeePage.class).getRowsList(KingdeePurRequest.class).stream();
     }
 
+    public Stream<KingdeePurRequest> getPurOrder(KingdeePurOrderReqVO vo) {
+        log.debug("fetching purchase order");
+        String endUrl = "/jdy/v2/scm/pur_order";
+        KingdeeResponse response = getResponse(endUrl, vo);
+        return response.getData(KingdeePage.class).getRowsList(KingdeePurRequest.class).stream();
+    }
+
 
 
 
@@ -292,21 +299,21 @@ public class KingdeeClient {
         }
     }
 
-    private KingdeeResponse getResponse(String endUrl, TreeMap<String, String>  params) {
+    public KingdeeResponse getResponse(String endUrl, TreeMap<String, String>  params) {
         return fetchResponse("GET", endUrl, params, null);
 
     }
 
-    private KingdeeResponse postResponse(String endUrl, TreeMap<String, String>  params, Object payload) {
+    public KingdeeResponse postResponse(String endUrl, TreeMap<String, String>  params, Object payload) {
         return fetchResponse("POST", endUrl, params, payload);
     }
 
-    private KingdeeResponse getResponse(String endUrl, Object params) {
-        return fetchResponse("GET", endUrl, new TreeMap<>(BeanUtils.toStringMap(params)), null);
+    public KingdeeResponse getResponse(String endUrl, Object params) {
+        return fetchResponse("GET", endUrl, new TreeMap<>(JsonUtils.toStringMap(params)), null);
     }
 
-    private KingdeeResponse postResponse(String endUrl, Object params, Object payload) {
-        return fetchResponse("POST", endUrl, new TreeMap<>(BeanUtils.toStringMap(params)), payload);
+    public KingdeeResponse postResponse(String endUrl, Object params, Object payload) {
+        return fetchResponse("POST", endUrl, new TreeMap<>(JsonUtils.toStringMap(params)), payload);
     }
 
 }

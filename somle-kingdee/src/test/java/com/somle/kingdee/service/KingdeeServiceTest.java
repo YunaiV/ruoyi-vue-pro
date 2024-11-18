@@ -2,9 +2,14 @@ package com.somle.kingdee.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.TreeMap;
 
+import com.somle.framework.common.util.json.JsonUtils;
 import com.somle.framework.test.core.ut.BaseSpringTest;
+import com.somle.kingdee.model.KingdeePurOrderReqVO;
 import com.somle.kingdee.model.KingdeePurRequestReqVO;
 import com.somle.kingdee.util.SignatureUtils;
 import jakarta.annotation.Resource;
@@ -107,6 +112,19 @@ public class KingdeeServiceTest extends BaseSpringTest {
         var client = service.getClientList().get(0);
         var vo = new KingdeePurRequestReqVO();
         log.info(client.getPurRequest(vo).toList().toString());
+    }
+
+    @Test
+    public void testGetPurOrder() {
+        var start = LocalDateTime.of(2024,1,1,0,0,0).atZone(ZoneId.systemDefault()).toInstant();
+        var end = LocalDateTime.of(2024,11,1,0,0,0).atZone(ZoneId.systemDefault()).toInstant();
+        var client = service.getClientList().get(0);
+        var vo = KingdeePurOrderReqVO.builder()
+            .createStartTime(Timestamp.from(start))
+            .createEndTime(Timestamp.from(end))
+            .build();
+        log.info(JsonUtils.toJSONObject(vo).toString());
+        log.info(client.getPurOrder(vo).toList().toString());
     }
 
     @Test
