@@ -24,14 +24,9 @@ public class AmazonSpController {
     private AmazonService service;
 
     @GetMapping("orders")
-    public List<JSONObject> getOrders(LocalDateTime startTime, LocalDateTime endTime) {
-        return service.spClient.getShops().map(shop -> {
-            var vo = AmazonSpOrderReqVO.builder()
-                    .MarketplaceIds(List.of(shop.getCountry().getMarketplaceId()))
-                    .CreatedAfter(shop.getCountry().localTime(startTime))
-                    .CreatedBefore(shop.getCountry().localTime(endTime))
-                    .build();
-            return service.spClient.getOrder(shop.getSeller(), vo);
-        }).toList();
+    public List<JSONObject> getOrders(AmazonSpOrderReqVO reqVO) {
+        return service.spClient.getShops().map(shop ->
+            service.spClient.getOrder(shop.getSeller(), reqVO)
+        ).toList();
     }
 }
