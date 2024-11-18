@@ -30,6 +30,7 @@ public enum BpmTaskCandidateStrategyEnum implements IntArrayValuable {
     START_USER_DEPT_LEADER_MULTI(38, "发起人连续多级部门的负责人"),
     USER_GROUP(40, "用户组"),
     USER_FIELD_ON_FORM(50, "表单内用户字段"),
+    DEPT_LEADER_ON_FORM(51, "表单内部分负责人"),
     EXPRESSION(60, "流程表达式"), // 表达式 ExpressionManager
     ASSIGN_EMPTY(1, "审批人为空"),
     ;
