@@ -1,6 +1,7 @@
 package com.somle.framework.common.util.json;
 
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -10,6 +11,8 @@ import lombok.NoArgsConstructor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.sql.Timestamp;
+import java.time.*;
 import java.util.List;
 import java.util.Map;
 
@@ -22,6 +25,18 @@ class JsonUtilsTest {
     public static class Person {
         private String name;
     }
+
+    @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class Birthday {
+        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyyMMdd")
+        private LocalDateTime dateTime;
+
+        @JsonFormat(shape = JsonFormat.Shape.NUMBER)
+        private Timestamp timeStamp;
+    }
+
 
 
     @Test
@@ -108,6 +123,15 @@ class JsonUtilsTest {
         Map<String, List<String>> result = JsonUtils.parseObject(jsonArray, Map.class);
         assertEquals(1, result.size());
         assertEquals("John", result.get("name").get(0));
+    }
+
+    @Test
+    public void serializeTime() throws Exception {
+        var dateTime = LocalDateTime.of(2024,12,31,23,59);
+        var instant = dateTime.atZone(ZoneId.systemDefault()).toInstant();
+
+        var birthday = new Birthday(dateTime,  Timestamp.from(instant));
+        assertEquals("{\"dateTime\":\"20241231\",\"timeStamp\":1735660740000}", JsonUtils.toJsonString(birthday));
     }
 
 //    @Test

@@ -3,6 +3,7 @@ package com.somle.framework.common.util.date;
 import cn.hutool.core.date.DatePattern;
 import cn.hutool.core.date.LocalDateTimeUtil;
 
+import java.sql.Timestamp;
 import java.time.*;
 import java.time.format.DateTimeParseException;
 import java.time.temporal.ChronoUnit;
@@ -287,14 +288,21 @@ public class LocalDateTimeUtils {
         return a.isAfter(b) ? a : b;
     }
 
+
     public static ZonedDateTime toZoned (LocalDateTime a) {
         return a.atZone(ZoneId.systemDefault());
+    }
+
+    public static Timestamp toTimestamp (LocalDateTime a) {
+        return Timestamp.from(a.atZone(ZoneId.systemDefault()).toInstant());
     }
 
 
     public static LocalDateTime leap (LocalDateTime systemTime, ZoneId to) {
         return toZoned(systemTime).withZoneSameInstant(to).toLocalDateTime();
     }
+
+
 
     public static Map<LocalDateTime, LocalDateTime> splitIntoHourlyBlocks(LocalDateTime start, LocalDateTime end) {
         Map<LocalDateTime, LocalDateTime> timeBlocks = new LinkedHashMap<>();

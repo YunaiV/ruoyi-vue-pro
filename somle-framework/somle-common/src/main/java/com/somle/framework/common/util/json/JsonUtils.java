@@ -69,6 +69,8 @@ public class JsonUtils {
         return new JSONObject(objectMapper.valueToTree(object));
     }
 
+
+
     @SneakyThrows
     public static Map<String, String> toStringMap(JSONObject json) {
         Map<String, String> map = new HashMap<>();
@@ -79,6 +81,10 @@ public class JsonUtils {
             map.put(field.getKey(), field.getValue().asText());
         }
         return map;
+    }
+
+    public static Map<String, String> toStringMap(Object pojo) {
+        return toStringMap(toJSONObject(pojo));
     }
 
     //convert json node to pojo
