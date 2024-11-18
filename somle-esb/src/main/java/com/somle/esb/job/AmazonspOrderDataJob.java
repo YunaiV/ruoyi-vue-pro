@@ -30,7 +30,7 @@ public class AmazonspOrderDataJob extends AmazonspDataJob {
                     var report = JsonUtils.parseObject(reportString, JSONObject.class);
                     var data = OssData.builder()
                             .database(DATABASE)
-                            .tableName("order")
+                            .tableName("order_create")
                             .syncType("inc")
                             .requestTimestamp(System.currentTimeMillis())
                             .folderDate(beforeYesterday)
