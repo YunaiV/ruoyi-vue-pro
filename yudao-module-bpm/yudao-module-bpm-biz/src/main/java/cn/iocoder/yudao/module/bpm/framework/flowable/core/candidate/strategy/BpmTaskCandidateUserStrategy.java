@@ -1,13 +1,13 @@
 package cn.iocoder.yudao.module.bpm.framework.flowable.core.candidate.strategy;
 
+import cn.hutool.core.text.StrPool;
 import cn.iocoder.yudao.framework.common.util.string.StrUtils;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.candidate.BpmTaskCandidateStrategy;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmTaskCandidateStrategyEnum;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
-import jakarta.annotation.Resource;
-import org.flowable.engine.delegate.DelegateExecution;
 import org.springframework.stereotype.Component;
 
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 /**
@@ -16,10 +16,11 @@ import java.util.Set;
  * @author kyle
  */
 @Component
-public class BpmTaskCandidateUserStrategy implements BpmTaskCandidateStrategy {
+public class BpmTaskCandidateUserStrategy extends BpmTaskCandidateAbstractStrategy {
 
-    @Resource
-    private AdminUserApi adminUserApi;
+    public BpmTaskCandidateUserStrategy(AdminUserApi adminUserApi) {
+        super(adminUserApi);
+    }
 
     @Override
     public BpmTaskCandidateStrategyEnum getStrategy() {
@@ -32,8 +33,8 @@ public class BpmTaskCandidateUserStrategy implements BpmTaskCandidateStrategy {
     }
 
     @Override
-    public Set<Long> calculateUsers(DelegateExecution execution, String param) {
-        return StrUtils.splitToLongSet(param);
+    public Set<Long> calculateUsers(String param) {
+        return new LinkedHashSet<>(StrUtils.splitToLong(param, StrPool.COMMA));
     }
 
 }

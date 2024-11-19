@@ -12,6 +12,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.annotation.security.PermitAll;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -38,6 +39,7 @@ public class AppArticleController {
             @Parameter(name = "recommendHot", description = "是否热门", example = "false"), // 场景一：查看指定的文章
             @Parameter(name = "recommendBanner", description = "是否轮播图", example = "false") // 场景二：查看指定的文章
     })
+    @PermitAll
     public CommonResult<List<AppArticleRespVO>> getArticleList(
             @RequestParam(value = "recommendHot", required = false) Boolean recommendHot,
             @RequestParam(value = "recommendBanner", required = false) Boolean recommendBanner) {
@@ -47,6 +49,7 @@ public class AppArticleController {
 
     @RequestMapping("/page")
     @Operation(summary = "获得文章详情分页")
+    @PermitAll
     public CommonResult<PageResult<AppArticleRespVO>> getArticlePage(AppArticlePageReqVO pageReqVO) {
         return success(ArticleConvert.INSTANCE.convertPage02(articleService.getArticlePage(pageReqVO)));
     }
@@ -57,6 +60,7 @@ public class AppArticleController {
             @Parameter(name = "id", description = "文章编号", example = "1024"),
             @Parameter(name = "title", description = "文章标题", example = "1024"),
     })
+    @PermitAll
     public CommonResult<AppArticleRespVO> getArticle(@RequestParam(value = "id", required = false) Long id,
                                                      @RequestParam(value = "title", required = false) String title) {
         ArticleDO article = id != null ? articleService.getArticle(id)
@@ -67,6 +71,7 @@ public class AppArticleController {
     @PutMapping("/add-browse-count")
     @Operation(summary = "增加文章浏览量")
     @Parameter(name = "id", description = "文章编号", example = "1024")
+    @PermitAll
     public CommonResult<Boolean> addBrowseCount(@RequestParam("id") Long id) {
         articleService.addArticleBrowseCount(id);
         return success(true);

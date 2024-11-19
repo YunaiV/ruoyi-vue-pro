@@ -97,7 +97,7 @@ public class SeckillActivityServiceImpl implements SeckillActivityService {
         seckillConfigService.validateSeckillConfigExists(configIds);
 
         // 2.1 查询所有开启的秒杀活动
-        List<SeckillActivityDO> activityList = seckillActivityMapper.selectListByStatus(CommonStatusEnum.ENABLE.getStatus());
+        List<SeckillActivityDO> activityList = seckillActivityMapper.selectListBySpuIdAndStatus(spuId, CommonStatusEnum.ENABLE.getStatus());
         if (activityId != null) { // 排除自己
             activityList.removeIf(item -> ObjectUtil.equal(item.getId(), activityId));
         }
@@ -317,7 +317,7 @@ public class SeckillActivityServiceImpl implements SeckillActivityService {
             throw exception(SECKILL_JOIN_ACTIVITY_PRODUCT_NOT_EXISTS);
         }
         // 2.2 校验库存是否充足
-        if (count > product.getStock()) {
+        if (count >= product.getStock()) {
             throw exception(SECKILL_ACTIVITY_UPDATE_STOCK_FAIL);
         }
         return SeckillActivityConvert.INSTANCE.convert02(activity, product);

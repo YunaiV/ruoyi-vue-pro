@@ -2,7 +2,6 @@ package cn.iocoder.yudao.module.pay.controller.app.wallet;
 
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
-import cn.iocoder.yudao.framework.security.core.annotations.PreAuthenticated;
 import cn.iocoder.yudao.module.pay.controller.app.wallet.vo.wallet.AppPayWalletRespVO;
 import cn.iocoder.yudao.module.pay.convert.wallet.PayWalletConvert;
 import cn.iocoder.yudao.module.pay.dal.dataobject.wallet.PayWalletDO;
@@ -35,7 +34,6 @@ public class AppPayWalletController {
 
     @GetMapping("/get")
     @Operation(summary = "获取钱包")
-    @PreAuthenticated
     public CommonResult<AppPayWalletRespVO> getPayWallet() {
         PayWalletDO wallet = payWalletService.getOrCreateWallet(getLoginUserId(), UserTypeEnum.MEMBER.getValue());
         return success(PayWalletConvert.INSTANCE.convert(wallet));

@@ -8,6 +8,7 @@ import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.task.*;
 import cn.iocoder.yudao.module.bpm.convert.task.BpmTaskConvert;
 import cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmFormDO;
 import cn.iocoder.yudao.module.bpm.service.definition.BpmFormService;
+import cn.iocoder.yudao.module.bpm.service.definition.BpmProcessDefinitionService;
 import cn.iocoder.yudao.module.bpm.service.task.BpmProcessInstanceService;
 import cn.iocoder.yudao.module.bpm.service.task.BpmTaskService;
 import cn.iocoder.yudao.module.system.api.dept.DeptApi;
@@ -19,6 +20,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
+import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.UserTask;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.runtime.ProcessInstance;
@@ -50,6 +52,8 @@ public class BpmTaskController {
     private BpmProcessInstanceService processInstanceService;
     @Resource
     private BpmFormService formService;
+    @Resource
+    private BpmProcessDefinitionService bpmProcessDefinitionService;
 
     @Resource
     private AdminUserApi adminUserApi;
@@ -134,8 +138,10 @@ public class BpmTaskController {
         // 获得 Form Map
         Map<Long, BpmFormDO> formMap = formService.getFormMap(
                 convertSet(taskList, task -> NumberUtils.parseLong(task.getFormKey())));
+        // 获得 BpmnModel
+        BpmnModel bpmnModel = bpmProcessDefinitionService.getProcessDefinitionBpmnModel(processInstance.getProcessDefinitionId());
         return success(BpmTaskConvert.INSTANCE.buildTaskListByProcessInstanceId(taskList, processInstance,
-                formMap, userMap, deptMap));
+                formMap, userMap, deptMap, bpmnModel));
     }
 
     @PutMapping("/approve")

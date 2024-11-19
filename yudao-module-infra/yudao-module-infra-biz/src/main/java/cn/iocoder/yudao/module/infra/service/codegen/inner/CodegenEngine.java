@@ -398,6 +398,11 @@ public class CodegenEngine {
         Map<String, String> templates = new LinkedHashMap<>();
         templates.putAll(SERVER_TEMPLATES);
         templates.putAll(FRONT_TEMPLATES.row(frontType));
+        // 如果禁用单元测试，则移除对应的模版
+        if (Boolean.FALSE.equals(codegenProperties.getUnitTestEnable())) {
+            templates.remove(javaTemplatePath("test/serviceTest"));
+            templates.remove("codegen/sql/h2.vm");
+        }
         return templates;
     }
 

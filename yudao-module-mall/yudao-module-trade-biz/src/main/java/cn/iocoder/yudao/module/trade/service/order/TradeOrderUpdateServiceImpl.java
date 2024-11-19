@@ -4,6 +4,7 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.map.MapUtil;
+import cn.hutool.core.net.NetUtil;
 import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.RandomUtil;
@@ -392,7 +393,7 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
 
         // 3. 记录订单日志
         TradeOrderLogUtils.setOrderInfo(order.getId(), order.getStatus(), TradeOrderStatusEnum.DELIVERED.getStatus(),
-                MapUtil.<String, Object>builder().put("expressName", express != null ? express.getName() : "")
+                MapUtil.<String, Object>builder().put("deliveryName", express != null ? express.getName() : "")
                         .put("logisticsNo", express != null ? deliveryReqVO.getLogisticsNo() : "").build());
 
         // 4.1 发送站内信
@@ -898,8 +899,8 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
         if (!order.getPayStatus()) {
             throw exception(ORDER_CANCEL_PAID_FAIL, "已支付");
         }
-        // 1.3 校验订单是否已退款
-        if (ObjUtil.equal(TradeOrderRefundStatusEnum.NONE.getStatus(), order.getRefundStatus())) {
+        // 1.3 校验订单是否未退款
+        if (ObjUtil.notEqual(TradeOrderRefundStatusEnum.NONE.getStatus(), order.getRefundStatus())) {
             throw exception(ORDER_CANCEL_PAID_FAIL, "未退款");
         }
 
@@ -907,7 +908,8 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
         cancelOrder0(order, TradeOrderCancelTypeEnum.COMBINATION_CLOSE);
         // 2.2 创建退款单
         payRefundApi.createRefund(new PayRefundCreateReqDTO()
-                .setAppKey(tradeOrderProperties.getPayAppKey()).setUserIp(getClientIP()) // 支付应用
+                .setAppKey(tradeOrderProperties.getPayAppKey())  // 支付应用
+                .setUserIp(NetUtil.getLocalhostStr()) // 使用本机 IP，因为是服务器发起退款的
                 .setMerchantOrderId(String.valueOf(order.getId())) // 支付单号
                 .setMerchantRefundId(String.valueOf(order.getId()))
                 .setReason(TradeOrderCancelTypeEnum.COMBINATION_CLOSE.getName()).setPrice(order.getPayPrice())); // 价格信息

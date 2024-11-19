@@ -55,5 +55,4 @@ public class DiscountProductRespDTO {
      */
     private LocalDateTime activityEndTime;
 
-
 }

@@ -6,8 +6,6 @@ import cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmTaskCandidat
 import cn.iocoder.yudao.module.system.api.dept.DeptApi;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
-import jakarta.annotation.Resource;
-import org.flowable.engine.delegate.DelegateExecution;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -21,12 +19,14 @@ import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.
  * @author kyle
  */
 @Component
-public class BpmTaskCandidateDeptMemberStrategy implements BpmTaskCandidateStrategy {
+public class BpmTaskCandidateDeptMemberStrategy extends BpmTaskCandidateAbstractStrategy {
 
-    @Resource
-    private DeptApi deptApi;
-    @Resource
-    private AdminUserApi adminUserApi;
+    private final DeptApi deptApi;
+
+    public BpmTaskCandidateDeptMemberStrategy(AdminUserApi adminUserApi, DeptApi deptApi) {
+        super(adminUserApi);
+        this.deptApi = deptApi;
+    }
 
     @Override
     public BpmTaskCandidateStrategyEnum getStrategy() {
@@ -40,7 +40,7 @@ public class BpmTaskCandidateDeptMemberStrategy implements BpmTaskCandidateStrat
     }
 
     @Override
-    public Set<Long> calculateUsers(DelegateExecution execution, String param) {
+    public Set<Long> calculateUsers(String param) {
         Set<Long> deptIds = StrUtils.splitToLongSet(param);
         List<AdminUserRespDTO> users = adminUserApi.getUserListByDeptIds(deptIds);
         return convertSet(users, AdminUserRespDTO::getId);

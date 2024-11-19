@@ -31,9 +31,9 @@ public interface SeckillActivityMapper extends BaseMapperX<SeckillActivityDO> {
                 .orderByDesc(SeckillActivityDO::getId));
     }
 
-    default List<SeckillActivityDO> selectListByStatus(Integer status) {
-        return selectList(new LambdaQueryWrapperX<SeckillActivityDO>()
-                .eqIfPresent(SeckillActivityDO::getStatus, status));
+    default List<SeckillActivityDO> selectListBySpuIdAndStatus(Long spuId, Integer status) {
+        return selectList(SeckillActivityDO::getSpuId, spuId,
+                SeckillActivityDO::getStatus, status);
     }
 
     /**

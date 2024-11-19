@@ -131,7 +131,7 @@ public class CombinationRecordServiceImpl implements CombinationRecordService {
             throw exception(COMBINATION_JOIN_ACTIVITY_PRODUCT_NOT_EXISTS);
         }
         // 4.3 校验库存是否充足
-        if (count > sku.getStock()) {
+        if (count >= sku.getStock()) {
             throw exception(COMBINATION_ACTIVITY_UPDATE_STOCK_FAIL);
         }
 
