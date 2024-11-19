@@ -50,7 +50,7 @@ public class MatomoDataJob extends DataJob {
 
             var results = PageUtils.getAllPages(
                 matomoService.getResponse(methodVO, reqVO),
-                response -> response.equals("[]"),
+                response -> response.isEmpty(),
                 response -> {
                     reqVO.setFilterOffset(reqVO.getFilterOffset() + reqVO.getFilterLimit());
                     return matomoService.getResponse(methodVO, reqVO);

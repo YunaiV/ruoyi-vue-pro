@@ -1,5 +1,7 @@
 package com.somle.matomo.service;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.somle.framework.common.util.json.JSONObject;
 import com.somle.framework.common.util.json.JsonUtils;
 import com.somle.matomo.model.MatomoMethodVO;
 import com.somle.matomo.model.MatomoTokenVO;
@@ -44,7 +46,7 @@ public class MatomoService {
     }
 
     @SneakyThrows
-    public String getResponse(MatomoMethodVO methodVO, Object vo) {
+    public JsonNode getResponse(MatomoMethodVO methodVO, Object vo) {
         var tokenVO = MatomoTokenVO.builder()
             .tokenAuth(token)
             .build();
@@ -61,8 +63,9 @@ public class MatomoService {
             .build();
         var response = client.newCall(request).execute();
         var responseString = response.body().string();
+        var result = JsonUtils.parseJson(responseString);
 
-        return responseString;
+        return result;
     }
     
 }

@@ -35,7 +35,7 @@ class MatomoServiceTest extends BaseMockitoUnitTest {
 
         var results = PageUtils.getAllPages(
             service.getResponse(methodVO, reqVO),
-            response -> response.equals("[]"),
+            response -> response.isEmpty(),
             response -> {
                 reqVO.setFilterOffset(reqVO.getFilterOffset() + reqVO.getFilterLimit());
                 return service.getResponse(methodVO, reqVO);
@@ -45,6 +45,4 @@ class MatomoServiceTest extends BaseMockitoUnitTest {
         log.info(resultList.toString());
         log.info("results count: " + resultList.size());
     }
-
-
 }
