@@ -1,8 +1,9 @@
-package cn.iocoder.yudao.module.bpm.framework.flowable.core.candidate.strategy.user;
+package cn.iocoder.yudao.module.bpm.framework.flowable.core.candidate.strategy.form;
 
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.lang.Assert;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.candidate.BpmTaskCandidateStrategy;
+import cn.iocoder.yudao.module.bpm.framework.flowable.core.candidate.strategy.user.BpmTaskCandidateUserStrategy;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmTaskCandidateStrategyEnum;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.engine.delegate.DelegateExecution;
@@ -17,11 +18,11 @@ import java.util.Set;
  * @author jason
  */
 @Component
-public class BpmTaskCandidateUserFieldOnFormStrategy implements BpmTaskCandidateStrategy {
+public class BpmTaskCandidateFormUserStrategy implements BpmTaskCandidateStrategy {
 
     @Override
     public BpmTaskCandidateStrategyEnum getStrategy() {
-        return BpmTaskCandidateStrategyEnum.USER_FIELD_ON_FORM;
+        return BpmTaskCandidateStrategyEnum.FORM_USER;
     }
 
     @Override

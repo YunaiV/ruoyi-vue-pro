@@ -1,8 +1,9 @@
-package cn.iocoder.yudao.module.bpm.framework.flowable.core.candidate.strategy.dept;
+package cn.iocoder.yudao.module.bpm.framework.flowable.core.candidate.strategy.form;
 
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.lang.Assert;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.candidate.BpmTaskCandidateStrategy;
+import cn.iocoder.yudao.module.bpm.framework.flowable.core.candidate.strategy.dept.AbstractBpmTaskCandidateDeptLeaderStrategy;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmTaskCandidateStrategyEnum;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.engine.delegate.DelegateExecution;
@@ -17,10 +18,11 @@ import java.util.Set;
  * @author jason
  */
 @Component
-public class BpmTaskCandidateDeptLeaderOnFormStrategy extends AbstractBpmTaskCandidateDeptLeaderStrategy {
+public class BpmTaskCandidateFormSDeptLeaderStrategy extends AbstractBpmTaskCandidateDeptLeaderStrategy {
+
     @Override
     public BpmTaskCandidateStrategyEnum getStrategy() {
-        return BpmTaskCandidateStrategyEnum.DEPT_LEADER_ON_FORM;
+        return BpmTaskCandidateStrategyEnum.FORM_DEPT_LEADER;
     }
 
     @Override
@@ -50,4 +52,5 @@ public class BpmTaskCandidateDeptLeaderOnFormStrategy extends AbstractBpmTaskCan
         int level = Integer.parseInt(params[1]);
         return super.getMultiLevelDeptLeaderIds(Convert.toList(Long.class, result), level);
     }
+
 }
