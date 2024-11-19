@@ -105,6 +105,15 @@ class JsonUtilsTest {
         assertEquals("John", result.get(0).getName());
     }
 
+
+    @Test
+    public void parseArray_ValidJsonArray_ReturnsJSON() throws Exception {
+        String jsonArray = "[{\"name\":\"John\"}, {\"name\":\"Jane\"}]";
+        JSONObject result = JsonUtils.parseObject(jsonArray, JSONObject.class);
+        assertEquals(2, result.size());
+        assertEquals("John", result.get(0).get("name"));
+    }
+
     @Test
     public void parseArray_EmptyJsonArray_ReturnsEmptyList() {
         assertTrue(JsonUtils.parseArray("", Person.class).isEmpty());

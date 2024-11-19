@@ -87,6 +87,12 @@ public class JsonUtils {
         return toStringMap(toJSONObject(pojo));
     }
 
+    //convert text to JsonNode
+    @SneakyThrows
+    public static JsonNode parseJson(String text) {
+        return objectMapper.readTree(text);
+    }
+
     //convert json node to pojo
     @SneakyThrows
     public static <T> T parseObject(JsonNode node, Class<T> clazz) {
