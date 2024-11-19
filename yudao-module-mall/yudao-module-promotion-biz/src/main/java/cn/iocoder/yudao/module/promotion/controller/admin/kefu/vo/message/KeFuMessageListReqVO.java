@@ -15,7 +15,7 @@ import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_
 @Data
 public class KeFuMessageListReqVO {
 
-    private static final Integer PAGE_SIZE = 10;
+    private static final Integer LIMIT = 10;
 
     @Schema(description = "会话编号", example = "12580")
     @NotNull(message = "会话编号不能为空")
@@ -25,11 +25,10 @@ public class KeFuMessageListReqVO {
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
     private LocalDateTime createTime;
 
-    // TODO @puhui999：这种一般建议叫 limit。不用 pageSize 哈
-    @Schema(description = "每页条数，最大值为 100", requiredMode = Schema.RequiredMode.REQUIRED, example = "10")
-    @NotNull(message = "每页条数不能为空")
-    @Min(value = 1, message = "每页条数最小值为 1")
-    @Max(value = 100, message = "每页条数最大值为 100")
-    private Integer pageSize = PAGE_SIZE;
+    @Schema(description = "每次查询条数，最大值为 100", requiredMode = Schema.RequiredMode.REQUIRED, example = "10")
+    @NotNull(message = "每次查询条数不能为空")
+    @Min(value = 1, message = "每次查询条数最小值为 1")
+    @Max(value = 100, message = "每次查询最大值为 100")
+    private Integer limit = LIMIT;
 
 }

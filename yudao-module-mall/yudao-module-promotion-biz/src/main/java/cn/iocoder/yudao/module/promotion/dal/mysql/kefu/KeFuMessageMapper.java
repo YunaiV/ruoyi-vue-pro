@@ -32,7 +32,7 @@ public interface KeFuMessageMapper extends BaseMapperX<KeFuMessageDO> {
                 .eqIfPresent("conversation_id", reqVO.getConversationId())
                 .ltIfPresent("create_time", reqVO.getCreateTime())
                 .orderByDesc("create_time")
-                .limitN(reqVO.getPageSize()));
+                .limitN(reqVO.getLimit()));
     }
 
     default List<KeFuMessageDO> selectListByConversationIdAndUserTypeAndReadStatus(Long conversationId, Integer userType,
