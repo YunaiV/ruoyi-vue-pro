@@ -22,9 +22,9 @@ public class AmazonspOrderDataJob extends AmazonspDataJob {
         amazonService.spClient.getShops()
                 .forEach(shop -> {
                     var vo = AmazonSpOrderReqVO.builder()
-                            .CreatedAfter(beforeYesterdayFirstSecond)
-                            .CreatedBefore(beforeYesterdayLastSecond)
-                            .MarketplaceIds(List.of(shop.getCountry().getMarketplaceId()))
+                            .createdAfter(beforeYesterdayFirstSecond)
+                            .createdBefore(beforeYesterdayLastSecond)
+                            .marketplaceIds(List.of(shop.getCountry().getMarketplaceId()))
                             .build();
                     var reportString = amazonService.spClient.getOrder(shop.getSeller(), vo);
                     var report = JsonUtils.parseObject(reportString, JSONObject.class);

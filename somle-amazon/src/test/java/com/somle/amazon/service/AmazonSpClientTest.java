@@ -4,18 +4,20 @@ import com.somle.amazon.controller.vo.AmazonSpOrderReqVO;
 import com.somle.amazon.controller.vo.AmazonSpReportReqVO;
 import com.somle.amazon.controller.vo.AmazonSpReportSaveVO;
 import com.somle.amazon.controller.vo.AmazonSpReportReqVO.ProcessingStatuses;
-import com.somle.amazon.model.AmazonSpReport;
 import com.somle.amazon.repository.AmazonAccountRepository;
+import com.somle.framework.common.util.date.LocalDateTimeUtils;
 import com.somle.framework.common.util.json.JSONObject;
 import com.somle.framework.common.util.json.JsonUtils;
+import com.somle.framework.common.util.web.WebUtils;
 import com.somle.framework.test.core.ut.BaseSpringTest;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.*;
 import org.springframework.context.annotation.Import;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 
@@ -38,16 +40,38 @@ class AmazonSpClientTest extends BaseSpringTest {
 //    }
 
     @Test
+    void refreshToken() {
+        amazonService.refreshAuth();
+    }
+
+
+    @Test
     void getOrders() {
         var shop = amazonService.shopRepository.findByCountryCode("UK");
         var vo = AmazonSpOrderReqVO.builder()
-                .CreatedAfter(LocalDateTime.of(2024,10,23,0,0))
-                .CreatedBefore(LocalDateTime.of(2024,10,24,0,0))
-                .MarketplaceIds(List.of(shop.getCountry().getMarketplaceId()))
+                .createdAfter(LocalDateTime.of(2024,10,23,0,0))
+                .createdBefore(LocalDateTime.of(2024,10,24,0,0))
+                .marketplaceIds(List.of(shop.getCountry().getMarketplaceId()))
                 .build();
-        log.info(vo.toString());
+        // assert url equals "https://sellingpartnerapi-eu.amazon.com/orders/v0/orders?CreatedAfter=2024-10-23T00%3A00%3A00&CreatedBefore=2024-10-24T00%3A00%3A00&MarketplaceIds=A1F83G8C2ARO7P"
         var report = amazonService.spClient.getOrder(shop.getSeller(), vo);
         log.info(report.toString());
+    }
+
+    @Test
+    void getOrders2() {
+        var results = amazonService.spClient.getShops().map(shop -> {
+            var startTime = LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS).minusMinutes(60);
+            startTime = LocalDateTimeUtils.leap(startTime, ZoneId.of("UTC"));
+            var vo = AmazonSpOrderReqVO.builder()
+                .marketplaceIds(List.of(shop.getCountry().getMarketplaceId()))
+                .createdAfter(startTime)
+                .build();
+            var result = amazonService.spClient.getOrder(shop.getSeller(), vo);
+            log.info(shop.getCountry().getCode());
+            log.info(result.toString());
+            return result;
+        }).toList();
     }
 
 

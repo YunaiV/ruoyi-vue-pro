@@ -1,15 +1,9 @@
 package com.somle.amazon.controller;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
 import java.util.List;
-import java.util.stream.Stream;
 
 import com.somle.amazon.controller.vo.AmazonSpOrderReqVO;
-import com.somle.amazon.model.AmazonSeller;
-import com.somle.framework.common.util.date.LocalDateTimeUtils;
 import com.somle.framework.common.util.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -24,12 +18,11 @@ public class AmazonSpController {
     private AmazonService service;
 
     @GetMapping("orders")
-    public List<JSONObject> getOrders(LocalDateTime startTime, LocalDateTime endTime) {
+    public List<JSONObject> getOrders(LocalDateTime startTime) {
         return service.spClient.getShops().map(shop -> {
             var vo = AmazonSpOrderReqVO.builder()
-                .MarketplaceIds(List.of(shop.getCountry().getMarketplaceId()))
-                .CreatedAfter(shop.getCountry().localTime(startTime))
-                .CreatedBefore(shop.getCountry().localTime(endTime))
+                .marketplaceIds(List.of(shop.getCountry().getMarketplaceId()))
+                .createdBefore(shop.getCountry().localTime(startTime))
                 .build();
             return service.spClient.getOrder(shop.getSeller(), vo);
         }).toList();

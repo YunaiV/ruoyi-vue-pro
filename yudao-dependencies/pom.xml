@@ -77,9 +77,11 @@
         <jimureport.version>1.7.8</jimureport.version>
         <xercesImpl.version>2.12.2</xercesImpl.version>
         <weixin-java.version>4.6.0</weixin-java.version>
+
         <dingtalk.version>2.0.0</dingtalk.version>
 <!--        <guava.version>33.3.1-jre</guava.version>-->
         <bucket4j.version>8.10.1</bucket4j.version>
+        <commons-collection4.version>4.4</commons-collection4.version>
 
     </properties>
 
@@ -104,6 +106,12 @@
 <!--                <artifactId>guava</artifactId>-->
 <!--                <version>${guava.version}</version>-->
 <!--            </dependency>-->
+
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-collections4</artifactId>
+                <version>${commons-collection4.version}</version> <!-- Use the latest version -->
+            </dependency>
 
             <dependency>
                 <groupId>com.aliyun</groupId>
