@@ -74,7 +74,7 @@ public class DingTalkService {
         return token;
     }
 
-    @SneakyThrows
+
     public DingTalkDepartment getDepartment(Long deptId) {
         log.info("fetching department detail for " + deptId);
         String endUrl = "/topapi/v2/department/get";
@@ -86,9 +86,18 @@ public class DingTalkService {
         );
         var payload = JsonUtils.newObject();
         payload.put("dept_id", deptId);
-        DingTalkResponse response = WebUtils.postRequest(baseHost + endUrl, params, headers, payload, DingTalkResponse.class);
-        log.debug(response.toString());
-        return response.getResult(DingTalkDepartment.class);
+        try {
+            DingTalkResponse response = WebUtils.postRequest(baseHost + endUrl, params, headers, payload, DingTalkResponse.class);
+            // 检查响应是否为空
+            if (response == null || response.getResult(DingTalkDepartment.class) == null) {
+                throw new RuntimeException("获取部门id为" + deptId + "信息时，DingTalk返回空响应");
+            }
+            log.debug(response.toString());
+            // 返回部门详情
+            return response.getResult(DingTalkDepartment.class);
+        } catch (Exception e) {
+            throw new RuntimeException("获取部门id为" + deptId + "信息失败", e);
+        }
 
 //        DingTalkClient client = new DefaultDingTalkClient("https://oapi.dingtalk.com/topapi/v2/department/get");
 //        OapiV2DepartmentGetRequest req = new OapiV2DepartmentGetRequest();
@@ -237,7 +246,7 @@ public class DingTalkService {
     }
 
     public Stream<DingTalkDepartment> getDepartmentStream() {
-        var topDept = getDepartment(1l).setLevel(0);
+        var topDept = getDepartment(1L).setLevel(0);
         return Stream.concat(Stream.of(topDept), getChildStream(topDept));
     }
 
