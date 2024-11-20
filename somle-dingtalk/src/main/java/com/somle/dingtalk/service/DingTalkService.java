@@ -3,6 +3,7 @@ package com.somle.dingtalk.service;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Stream;
 
 import com.dingtalk.api.DefaultDingTalkClient;
@@ -92,6 +93,9 @@ public class DingTalkService {
             if (response == null || response.getResult(DingTalkDepartment.class) == null) {
                 throw new RuntimeException("获取部门id为" + deptId + "信息时，DingTalk返回空响应");
             }
+            if (!Objects.equals(response.getErrcode(),0)){
+                throw new RuntimeException("获取部门id为" + deptId + "信息时，DingTalk返回异常：" + response.getErrmsg());
+            }
             log.debug(response.toString());
             // 返回部门详情
             return response.getResult(DingTalkDepartment.class);
@@ -105,6 +109,9 @@ public class DingTalkService {
 //        req.setLanguage("zh_CN");
 //        OapiV2DepartmentGetResponse rsp = client.execute(req, token.getAccessToken());
 //        return rsp.getResult();
+
+    }
+    private void validateResponse(DingTalkResponse response){
 
     }
 
