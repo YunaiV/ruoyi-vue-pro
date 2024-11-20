@@ -37,6 +37,13 @@ class JsonUtilsTest {
         private Timestamp timeStamp;
     }
 
+    @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class People {
+        private List<Person> list;
+    }
+
 
 
     @Test
@@ -132,6 +139,15 @@ class JsonUtilsTest {
         Map<String, List<String>> result = JsonUtils.parseObject(jsonArray, Map.class);
         assertEquals(1, result.size());
         assertEquals("John", result.get("name").get(0));
+    }
+
+    @Test
+    public void toStringMap_ValidPOJO() throws Exception {
+        People people = new People(List.of(new Person("John"), new Person("Jane")));
+        Map<String, String> result = JsonUtils.toStringMap(people);
+        assertEquals(1, result.size());
+        assertEquals("{list=[{\"name\":\"John\"},{\"name\":\"Jane\"}]}", result.toString());
+        assertEquals("[{\"name\":\"John\"},{\"name\":\"Jane\"}]", result.get("list"));
     }
 
     @Test

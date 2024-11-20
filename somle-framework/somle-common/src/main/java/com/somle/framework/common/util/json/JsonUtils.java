@@ -5,8 +5,6 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.somle.framework.common.util.json.JSONObject;
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -14,11 +12,11 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Configuration;
+import org.apache.commons.collections4.MultiValuedMap;
+import org.apache.commons.collections4.multimap.ArrayListValuedHashMap;
 
-import java.io.IOException;
-import java.lang.reflect.Array;
 import java.util.*;
+import java.util.stream.StreamSupport;
 
 @Slf4j
 public class JsonUtils {
@@ -85,6 +83,28 @@ public class JsonUtils {
 
     public static Map<String, String> toStringMap(Object pojo) {
         return toStringMap(toJSONObject(pojo));
+    }
+
+
+    public static MultiValuedMap<String, String> toMultiStringMap(JSONObject json) {
+        MultiValuedMap<String, String> multiMap = new ArrayListValuedHashMap<>();
+
+        json.fields().forEachRemaining(entry -> {
+            String key = entry.getKey();
+            JsonNode value = entry.getValue();
+
+            if (value.isArray()) {
+                value.forEach(arrayElement -> multiMap.put(key, arrayElement.asText()));
+            } else {
+                multiMap.put(key, value.asText());
+            }
+        });
+
+        return multiMap;
+    }
+
+    public static MultiValuedMap<String, String> toMultiStringMap(Object pojo) {
+        return toMultiStringMap(toJSONObject(pojo));
     }
 
     //convert text to JsonNode

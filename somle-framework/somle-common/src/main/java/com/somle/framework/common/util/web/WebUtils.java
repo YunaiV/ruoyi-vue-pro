@@ -20,6 +20,7 @@ import com.somle.framework.common.util.json.JsonUtils;
 import com.somle.framework.common.util.object.BeanUtils;
 import lombok.SneakyThrows;
 import okhttp3.*;
+import org.apache.commons.collections4.MultiValuedMap;
 import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.springframework.retry.RetryCallback;
 import org.springframework.retry.support.RetryTemplate;
@@ -41,16 +42,16 @@ public class WebUtils {
 
 
 
-    public static String urlWithParams(String url, Map<String,String> queryParams) {
+    public static String urlWithParams(String url, MultiValuedMap<String,String> queryParams) {
         HttpUrl.Builder urlBuilder = HttpUrl.parse(url).newBuilder();
-        for (Map.Entry<String, String> queryParam : queryParams.entrySet()) {
+        for (Map.Entry<String, String> queryParam : queryParams.entries()) {
             urlBuilder.addQueryParameter(queryParam.getKey(), queryParam.getValue());
         }
-        return urlBuilder.build().toString();
+        return urlBuilder.build().url().toString();
     }
 
     public static String urlWithParams(String url, JSONObject json) {
-        Map<String, String> queryParams = JsonUtils.toStringMap(json);
+        MultiValuedMap<String, String> queryParams = JsonUtils.toMultiStringMap(json);
         return urlWithParams(url, queryParams);
     }
 
@@ -64,16 +65,16 @@ public class WebUtils {
     }
 
 
-    public static Headers toHeaders(Map<String,String> headerMap) {
+    public static Headers toHeaders(MultiValuedMap<String,String> headerMap) {
         var headersBuilder = new Headers.Builder();
-        for (Map.Entry<String, String> entry : headerMap.entrySet()) {
+        for (Map.Entry<String, String> entry : headerMap.entries()) {
             headersBuilder.add(entry.getKey(), entry.getValue());
         }
         return headersBuilder.build();
     }
 
     public static Headers toHeaders(JSONObject json) {
-        Map<String, String> headerMap = JsonUtils.toStringMap(json);
+        MultiValuedMap<String, String> headerMap = JsonUtils.toMultiStringMap(json);
         return toHeaders(headerMap);
     }
 
