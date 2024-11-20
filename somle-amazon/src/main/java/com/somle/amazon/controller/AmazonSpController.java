@@ -22,7 +22,7 @@ public class AmazonSpController {
         return service.spClient.getShops().map(shop -> {
             var vo = AmazonSpOrderReqVO.builder()
                 .marketplaceIds(List.of(shop.getCountry().getMarketplaceId()))
-                .createdBefore(shop.getCountry().localTime(startTime))
+                .createdAfter(shop.getCountry().localTime(startTime))
                 .build();
             return service.spClient.getOrder(shop.getSeller(), vo);
         }).toList();
