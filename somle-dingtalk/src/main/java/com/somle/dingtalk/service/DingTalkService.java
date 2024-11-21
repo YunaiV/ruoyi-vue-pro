@@ -90,7 +90,7 @@ public class DingTalkService {
         try {
             DingTalkResponse response = WebUtils.postRequest(baseHost + endUrl, params, headers, payload, DingTalkResponse.class);
             // 检查响应
-            validateResponse(response,deptId);
+            validateResponse(response);
             // 返回部门详情
             return response.getResult(DingTalkDepartment.class);
         } catch (Exception e) {
@@ -105,13 +105,16 @@ public class DingTalkService {
 //        return rsp.getResult();
 
     }
-    private void validateResponse(DingTalkResponse response,Long deptId){
+    private void validateResponse(DingTalkResponse response){
         // 检查响应是否为空
-        if (response == null || response.getResult(DingTalkDepartment.class) == null) {
-            throw new RuntimeException("获取部门id为" + deptId + "信息时，DingTalk返回空响应");
+        if (response == null) {
+            throw new RuntimeException("DingTalk返回空响应");
+        }
+        if (response.getResult() == null){
+            throw new RuntimeException("DingTalk返回空结果");
         }
         if (!Objects.equals(response.getErrcode(),0)){
-            throw new RuntimeException("获取部门id为" + deptId + "信息时，DingTalk返回异常：" + response.getErrmsg());
+            throw new RuntimeException("DingTalk返回异常：" + response.getErrmsg());
         }
         log.debug(response.toString());
     }
