@@ -8,7 +8,10 @@ import java.security.MessageDigest;
 import java.util.Arrays;
 import java.util.Map;
 
+import com.somle.framework.common.util.json.JSONObject;
+import com.somle.framework.common.util.json.JsonUtils;
 import com.somle.wangdian.utils.WebUtils;
+import lombok.SneakyThrows;
 
 public class WdtClient {
 	
@@ -129,16 +132,12 @@ public class WdtClient {
 		
 	}
 
-//	@SneakyThrows
-//	public <T> T execute(Class<?> clazz, Map<String, String> params) {
-//
-//		params.put("appkey", this.appkey);
-//		params.put("sid", this.sid);
-//		params.put("timestamp", Long.toString(System.currentTimeMillis()/1000));
-//
-//		params.put("sign", signRequest(params, this.appsecret));
-//
-//		return WebUtils.doPost(this.baseUrl + relativeUrl, params, "UTF-8", connectTimeout, readTimeout, null);
-//
-//	}
+	@SneakyThrows
+	public JSONObject execute(String relativeUrl, Object reqVO) {
+
+		var responseString = execute(relativeUrl, JsonUtils.toStringMap(reqVO));
+
+		return JsonUtils.parseObject(responseString, JSONObject.class);
+
+	}
 }

@@ -2,9 +2,11 @@ package com.somle.esb.job;
 
 
 import com.somle.esb.model.OssData;
+import com.somle.framework.common.util.collection.PageUtils;
 import com.somle.framework.common.util.date.LocalDateTimeUtils;
 import com.somle.framework.common.util.json.JSONObject;
 import com.somle.framework.common.util.json.JsonUtils;
+import com.somle.wangdian.model.WangdianTradeReqVO;
 import lombok.SneakyThrows;
 import org.springframework.stereotype.Component;
 
@@ -21,33 +23,36 @@ public class WangdianTradeDataJob extends WangdianDataJob{
 
     public String execute(String param) throws Exception {
         setDate(param);
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
         LocalDateTimeUtils.splitIntoHourlyBlocks(yesterdayFirstSecond, yesterdayLastSecond).entrySet().stream().forEach(entry -> {
-            Map<String, String> params = new HashMap<String, String>();
-            params.put("start_time", entry.getKey().format(formatter));
-            params.put("end_time", entry.getValue().format(formatter));
-            params.put("page_size", "50");
-            params.put("page_no", "0");
+            var reqVO = WangdianTradeReqVO.builder()
+                .startTime(entry.getKey())
+                .endTime(entry.getValue())
+                .pageSize(100)
+                .pageNo(0)
+                .build();
 
-            String responseString = null;
-            try {
-                responseString = wangdianService.client.execute("trade_query.php", params);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-            var result = JsonUtils.parseObject(responseString, JSONObject.class);
-
-            var data = OssData.builder()
+            PageUtils.getAllPages(
+                wangdianService.client.execute("trade_query.php", reqVO),
+                response -> false,
+                respoonse ->{
+                    reqVO.setPageNo(reqVO.getPageNo() + 1);
+                    return wangdianService.client.execute("trade_query.php", reqVO);
+                }
+            ).forEach(page ->{
+                var data = OssData.builder()
                     .database(DATABASE)
                     .tableName("trade")
                     .syncType("inc")
                     .requestTimestamp(System.currentTimeMillis())
                     .folderDate(yesterday)
-                    .content(result)
+                    .content(page)
                     .headers(null)
                     .build();
-            service.send(data);
+                service.send(data);
+            });
+
+
         });
 
 
