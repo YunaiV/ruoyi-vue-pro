@@ -3,6 +3,7 @@ package cn.iocoder.yudao.framework.common.util.collection;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ArrayUtil;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import com.google.common.collect.ImmutableMap;
 
 import java.util.*;
@@ -71,6 +72,13 @@ public class CollectionUtils {
             return new ArrayList<>();
         }
         return from.stream().filter(filter).map(func).filter(Objects::nonNull).collect(Collectors.toList());
+    }
+
+    public static <T, U> PageResult<U> convertPage(PageResult<T> from, Function<T, U> func) {
+        if (ArrayUtil.isEmpty(from)) {
+            return new PageResult<>(from.getTotal());
+        }
+        return new PageResult<>(convertList(from.getList(), func), from.getTotal());
     }
 
     public static <T, U> List<U> convertListByFlatMap(Collection<T> from,
@@ -324,7 +332,7 @@ public class CollectionUtils {
     }
 
     public static <T> List<T> newArrayList(List<List<T>> list) {
-        return list.stream().flatMap(Collection::stream).collect(Collectors.toList());
+        return list.stream().filter(Objects::nonNull).flatMap(Collection::stream).collect(Collectors.toList());
     }
 
 }

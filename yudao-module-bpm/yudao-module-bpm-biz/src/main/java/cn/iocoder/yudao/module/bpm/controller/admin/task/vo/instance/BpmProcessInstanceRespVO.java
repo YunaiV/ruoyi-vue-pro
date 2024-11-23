@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.bpm.controller.admin.task.vo.instance;
 
+import cn.iocoder.yudao.module.bpm.controller.admin.base.user.UserSimpleBaseVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.process.BpmProcessDefinitionRespVO;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
@@ -44,7 +45,7 @@ public class BpmProcessInstanceRespVO {
     /**
      * 发起流程的用户
      */
-    private User startUser;
+    private UserSimpleBaseVO startUser;
 
     @Schema(description = "流程定义的编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "2048")
     private String processDefinitionId;
@@ -57,22 +58,6 @@ public class BpmProcessInstanceRespVO {
      * 当前审批中的任务
      */
     private List<Task> tasks; // 仅在流程实例分页才返回
-
-    @Schema(description = "用户信息")
-    @Data
-    public static class User {
-
-        @Schema(description = "用户编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
-        private Long id;
-        @Schema(description = "用户昵称", requiredMode = Schema.RequiredMode.REQUIRED, example = "芋艿")
-        private String nickname;
-
-        @Schema(description = "部门编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
-        private Long deptId;
-        @Schema(description = "部门名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "研发部")
-        private String deptName;
-
-    }
 
     @Schema(description = "流程任务")
     @Data

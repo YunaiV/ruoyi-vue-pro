@@ -4,6 +4,8 @@ import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import org.flowable.bpmn.model.FlowNode;
+import org.flowable.task.api.history.HistoricTaskInstance;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -54,23 +56,25 @@ public class BpmProcessInstanceCopyDO extends BaseDO {
      */
     private String category;
     /**
-     * 流程活动编号
+     * 流程活动的编号
      * <p/>
-     * 对应 BPMN XML 节点编号，用于查询抄送节点的表单字段权限
-     * 这里冗余的原因：如果是钉钉易搭的抄送节点 (ServiceTask)，使用 taskId 可能查不到对应的 activityId
+     *
+     * 冗余 {@link FlowNode#getId()}，对应 BPMN XML 节点编号
+     * 原因：用于查询抄送节点的表单字段权限。因为仿钉钉/飞书的抄送节点 (ServiceTask)，没有 taskId，只有 activityId
      */
     private String activityId;
     /**
-     * 任务主键
-     * 关联 Task 的 id 属性
+     * 流程活动的名字
+     *
+     * 冗余 {@link FlowNode#getName()}
+     */
+    private String activityName;
+    /**
+     * 流程活动的编号
+     *
+     * 关联 {@link HistoricTaskInstance#getId()}
      */
     private String taskId;
-    /**
-     * 任务名称
-     *
-     * 冗余 Task 的 name 属性
-     */
-    private String taskName;
 
     /**
      * 用户编号（被抄送的用户编号）
@@ -78,5 +82,10 @@ public class BpmProcessInstanceCopyDO extends BaseDO {
      * 关联 system_users 的 id 属性
      */
     private Long userId;
+
+    /**
+     * 抄送意见
+     */
+    private String reason;
 
 }

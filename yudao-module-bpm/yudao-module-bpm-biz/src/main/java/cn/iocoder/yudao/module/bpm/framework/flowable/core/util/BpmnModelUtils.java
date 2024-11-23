@@ -3,27 +3,116 @@ package cn.iocoder.yudao.module.bpm.framework.flowable.core.util;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.ArrayUtil;
+import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.number.NumberUtils;
 import cn.iocoder.yudao.framework.common.util.string.StrUtils;
+import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.simple.BpmSimpleModelNodeVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.task.BpmTaskRespVO;
+import cn.iocoder.yudao.module.bpm.enums.definition.BpmUserTaskApproveTypeEnum;
+import cn.iocoder.yudao.module.bpm.enums.definition.BpmUserTaskAssignEmptyHandlerTypeEnum;
+import cn.iocoder.yudao.module.bpm.enums.definition.BpmUserTaskAssignStartUserHandlerTypeEnum;
 import cn.iocoder.yudao.module.bpm.enums.definition.BpmUserTaskRejectHandlerType;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnModelConstants;
+import com.google.common.collect.Maps;
+import lombok.extern.slf4j.Slf4j;
 import org.flowable.bpmn.converter.BpmnXMLConverter;
 import org.flowable.bpmn.model.Process;
 import org.flowable.bpmn.model.*;
+import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.impl.util.io.BytesStreamSource;
 
 import java.util.*;
 
 import static cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnModelConstants.*;
 import static org.flowable.bpmn.constants.BpmnXMLConstants.FLOWABLE_EXTENSIONS_NAMESPACE;
+import static org.flowable.bpmn.constants.BpmnXMLConstants.FLOWABLE_EXTENSIONS_PREFIX;
 
 /**
- * 流程模型转操作工具类
+ * BPMN Model 操作工具类。目前分成三部分：
+ *
+ * 1. BPMN 修改 + 解析元素相关的方法
+ * 2. BPMN 简单查找相关的方法
+ * 3. BPMN 复杂遍历相关的方法
+ * 4. BPMN 流程预测相关的方法
+ *
+ * @author 芋道源码
  */
+@Slf4j
 public class BpmnModelUtils {
 
+    // ========== BPMN 修改 + 解析元素相关的方法 ==========
+
+    public static void addExtensionElement(FlowElement element, String name, String value) {
+        if (value == null) {
+            return;
+        }
+        ExtensionElement extensionElement = new ExtensionElement();
+        extensionElement.setNamespace(FLOWABLE_EXTENSIONS_NAMESPACE);
+        extensionElement.setNamespacePrefix(FLOWABLE_EXTENSIONS_PREFIX);
+        extensionElement.setElementText(value);
+        extensionElement.setName(name);
+        element.addExtensionElement(extensionElement);
+    }
+
+    public static void addExtensionElement(FlowElement element, String name, Integer value) {
+        if (value == null) {
+            return;
+        }
+        addExtensionElement(element, name, String.valueOf(value));
+    }
+
+    public static void addExtensionElement(FlowElement element, String name, Map<String, String> attributes) {
+        if (attributes == null) {
+            return;
+        }
+        ExtensionElement extensionElement = new ExtensionElement();
+        extensionElement.setNamespace(FLOWABLE_EXTENSIONS_NAMESPACE);
+        extensionElement.setNamespacePrefix(FLOWABLE_EXTENSIONS_PREFIX);
+        extensionElement.setName(name);
+        attributes.forEach((key, value) -> {
+            ExtensionAttribute extensionAttribute = new ExtensionAttribute(key, value);
+            extensionAttribute.setNamespace(FLOWABLE_EXTENSIONS_NAMESPACE);
+            extensionElement.addAttribute(extensionAttribute);
+        });
+        element.addExtensionElement(extensionElement);
+    }
+
+    /**
+     * 解析扩展元素
+     *
+     * @param flowElement 节点
+     * @param elementName 元素名称
+     * @return 扩展元素
+     */
+    public static String parseExtensionElement(FlowElement flowElement, String elementName) {
+        if (flowElement == null) {
+            return null;
+        }
+        ExtensionElement element = CollUtil.getFirst(flowElement.getExtensionElements().get(elementName));
+        return element != null ? element.getElementText() : null;
+    }
+
+    /**
+     * 给节点添加候选人元素
+     *
+     * @param candidateStrategy 候选人策略
+     * @param candidateParam 候选人参数，允许空
+     * @param flowElement 节点
+     */
+    public static void addCandidateElements(Integer candidateStrategy, String candidateParam, FlowElement flowElement) {
+        addExtensionElement(flowElement, BpmnModelConstants.USER_TASK_CANDIDATE_STRATEGY,
+                candidateStrategy == null ? null : candidateStrategy.toString());
+        addExtensionElement(flowElement, BpmnModelConstants.USER_TASK_CANDIDATE_PARAM, candidateParam);
+    }
+
+    /**
+     * 解析候选人策略
+     *
+     * @param userTask 任务节点
+     * @return 候选人策略
+     */
     public static Integer parseCandidateStrategy(FlowElement userTask) {
         Integer candidateStrategy = NumberUtils.parseInt(userTask.getAttributeValue(
                 BpmnModelConstants.NAMESPACE, BpmnModelConstants.USER_TASK_CANDIDATE_STRATEGY));
@@ -35,6 +124,12 @@ public class BpmnModelUtils {
         return candidateStrategy;
     }
 
+    /**
+     * 解析候选人参数
+     *
+     * @param userTask 任务节点
+     * @return 候选人参数
+     */
     public static String parseCandidateParam(FlowElement userTask) {
         String candidateParam = userTask.getAttributeValue(
                 BpmnModelConstants.NAMESPACE, BpmnModelConstants.USER_TASK_CANDIDATE_PARAM);
@@ -45,39 +140,130 @@ public class BpmnModelUtils {
         return candidateParam;
     }
 
+    /**
+     * 解析审批类型
+     *
+     * @see BpmUserTaskApproveTypeEnum
+     * @param userTask 任务节点
+     * @return 审批类型
+     */
     public static Integer parseApproveType(FlowElement userTask) {
         return NumberUtils.parseInt(parseExtensionElement(userTask, BpmnModelConstants.USER_TASK_APPROVE_TYPE));
     }
 
+    /**
+     * 添加任务拒绝处理元素
+     *
+     * @param rejectHandler 任务拒绝处理
+     * @param userTask 任务节点
+     */
+    public static void addTaskRejectElements(BpmSimpleModelNodeVO.RejectHandler rejectHandler, UserTask userTask) {
+        if (rejectHandler == null) {
+            return;
+        }
+        addExtensionElement(userTask, USER_TASK_REJECT_HANDLER_TYPE, StrUtil.toStringOrNull(rejectHandler.getType()));
+        addExtensionElement(userTask, USER_TASK_REJECT_RETURN_TASK_ID, rejectHandler.getReturnNodeId());
+    }
+
+    /**
+     * 解析任务拒绝处理类型
+     *
+     * @param userTask 任务节点
+     * @return 任务拒绝处理类型
+     */
     public static BpmUserTaskRejectHandlerType parseRejectHandlerType(FlowElement userTask) {
         Integer rejectHandlerType = NumberUtils.parseInt(parseExtensionElement(userTask, USER_TASK_REJECT_HANDLER_TYPE));
         return BpmUserTaskRejectHandlerType.typeOf(rejectHandlerType);
     }
 
+    /**
+     * 解析任务拒绝返回任务节点 ID
+     *
+     * @param flowElement 任务节点
+     * @return 任务拒绝返回任务节点 ID
+     */
     public static String parseReturnTaskId(FlowElement flowElement) {
         return parseExtensionElement(flowElement, USER_TASK_REJECT_RETURN_TASK_ID);
     }
 
+    /**
+     * 给节点添加用户任务的审批人与发起人相同时，处理类型枚举
+     *
+     * @see BpmUserTaskAssignStartUserHandlerTypeEnum
+     * @param assignStartUserHandlerType 发起人处理类型
+     * @param userTask 任务节点
+     */
+    public static void addAssignStartUserHandlerType(Integer assignStartUserHandlerType, UserTask userTask) {
+        if (assignStartUserHandlerType == null) {
+            return;
+        }
+        addExtensionElement(userTask, USER_TASK_ASSIGN_START_USER_HANDLER_TYPE, assignStartUserHandlerType.toString());
+    }
+
+    /**
+     * 给节点添加用户任务的审批人为空时，处理类型枚举
+     *
+     * @see BpmUserTaskAssignEmptyHandlerTypeEnum
+     * @param emptyHandler 空处理
+     * @param userTask 任务节点
+     */
+    public static void addAssignEmptyHandlerType(BpmSimpleModelNodeVO.AssignEmptyHandler emptyHandler, UserTask userTask) {
+        if (emptyHandler == null) {
+            return;
+        }
+        addExtensionElement(userTask, USER_TASK_ASSIGN_EMPTY_HANDLER_TYPE, StrUtil.toStringOrNull(emptyHandler.getType()));
+        addExtensionElement(userTask, USER_TASK_ASSIGN_USER_IDS, StrUtil.join(",", emptyHandler.getUserIds()));
+    }
+
+    /**
+     * 解析用户任务的审批人与发起人相同时，处理类型枚举
+     *
+     * @param userTask 任务节点
+     * @return 处理类型枚举
+     */
     public static Integer parseAssignStartUserHandlerType(FlowElement userTask) {
         return NumberUtils.parseInt(parseExtensionElement(userTask, USER_TASK_ASSIGN_START_USER_HANDLER_TYPE));
     }
 
+    /**
+     * 解析用户任务的审批人为空时，处理类型枚举
+     *
+     * @param userTask 任务节点
+     * @return 处理类型枚举
+     */
     public static Integer parseAssignEmptyHandlerType(FlowElement userTask) {
         return NumberUtils.parseInt(parseExtensionElement(userTask, USER_TASK_ASSIGN_EMPTY_HANDLER_TYPE));
     }
 
+    /**
+     * 解析用户任务的审批人为空时，处理用户 ID 数组
+     *
+     * @param userTask 任务节点
+     * @return 处理用户 ID 数组
+     */
     public static List<Long> parseAssignEmptyHandlerUserIds(FlowElement userTask) {
         return StrUtils.splitToLong(parseExtensionElement(userTask, USER_TASK_ASSIGN_USER_IDS), ",");
     }
 
-    public static String parseExtensionElement(FlowElement flowElement, String elementName) {
-        if (flowElement == null) {
-            return null;
+    /**
+     * 给节点添加表单字段权限元素
+     *
+     * @param fieldsPermissions 表单字段权限
+     * @param flowElement 节点
+     */
+    public static void addFormFieldsPermission(List<Map<String, String>> fieldsPermissions, FlowElement flowElement) {
+        if (CollUtil.isNotEmpty(fieldsPermissions)) {
+            fieldsPermissions.forEach(item -> addExtensionElement(flowElement, FORM_FIELD_PERMISSION_ELEMENT, item));
         }
-        ExtensionElement element = CollUtil.getFirst(flowElement.getExtensionElements().get(elementName));
-        return element != null ? element.getElementText() : null;
     }
 
+    /**
+     * 解析表单字段权限
+     *
+     * @param bpmnModel bpmnModel 对象
+     * @param flowElementId 元素 ID
+     * @return 表单字段权限
+     */
     public static Map<String, String> parseFormFieldsPermission(BpmnModel bpmnModel, String flowElementId) {
         if (bpmnModel == null || StrUtil.isEmpty(flowElementId)) {
             return null;
@@ -101,6 +287,29 @@ public class BpmnModelUtils {
         return fieldsPermission;
     }
 
+    /**
+     * 给节点添加操作按钮设置元素
+     */
+    public static void addButtonsSetting(List<BpmSimpleModelNodeVO.OperationButtonSetting> buttonsSetting, UserTask userTask) {
+        if (CollUtil.isNotEmpty(buttonsSetting)) {
+            List<Map<String, String>> list = CollectionUtils.convertList(buttonsSetting, item -> {
+                Map<String, String> settingMap = Maps.newHashMapWithExpectedSize(3);
+                settingMap.put(BUTTON_SETTING_ELEMENT_ID_ATTRIBUTE, String.valueOf(item.getId()));
+                settingMap.put(BUTTON_SETTING_ELEMENT_DISPLAY_NAME_ATTRIBUTE, item.getDisplayName());
+                settingMap.put(BUTTON_SETTING_ELEMENT_ENABLE_ATTRIBUTE, String.valueOf(item.getEnable()));
+                return settingMap;
+            });
+            list.forEach(item -> addExtensionElement(userTask, BUTTON_SETTING_ELEMENT, item));
+        }
+    }
+
+    /**
+     * 解析操作按钮设置
+     *
+     * @param bpmnModel bpmnModel 对象
+     * @param flowElementId 元素 ID
+     * @return 操作按钮设置
+     */
     public static Map<Integer, BpmTaskRespVO.OperationButtonSetting> parseButtonsSetting(BpmnModel bpmnModel, String flowElementId) {
         FlowElement flowElement = getFlowElementById(bpmnModel, flowElementId);
         if (flowElement == null) {
@@ -110,7 +319,7 @@ public class BpmnModelUtils {
         if (CollUtil.isEmpty(extensionElements)) {
             return null;
         }
-        Map<Integer, BpmTaskRespVO.OperationButtonSetting> buttonSettings = MapUtil.newHashMap(16);
+        Map<Integer, BpmTaskRespVO.OperationButtonSetting> buttonSettings = Maps.newHashMapWithExpectedSize(extensionElements.size());
         extensionElements.forEach(element -> {
             String id = element.getAttributeValue(FLOWABLE_EXTENSIONS_NAMESPACE, BUTTON_SETTING_ELEMENT_ID_ATTRIBUTE);
             String displayName = element.getAttributeValue(FLOWABLE_EXTENSIONS_NAMESPACE, BUTTON_SETTING_ELEMENT_DISPLAY_NAME_ATTRIBUTE);
@@ -122,6 +331,23 @@ public class BpmnModelUtils {
         });
         return buttonSettings;
     }
+
+    /**
+     * 解析边界事件扩展元素
+     *
+     * @param boundaryEvent 边界事件
+     * @param customElement 元素
+     * @return 扩展元素
+     */
+    public static String parseBoundaryEventExtensionElement(BoundaryEvent boundaryEvent, String customElement) {
+        if (boundaryEvent == null) {
+            return null;
+        }
+        ExtensionElement extensionElement = CollUtil.getFirst(boundaryEvent.getExtensionElements().get(customElement));
+        return Optional.ofNullable(extensionElement).map(ExtensionElement::getElementText).orElse(null);
+    }
+
+    // ========== BPM 简单查找相关的方法 ==========
 
     /**
      * 根据节点，获取入口连线
@@ -168,15 +394,14 @@ public class BpmnModelUtils {
      * @param clazz 指定元素。例如说，{@link UserTask}、{@link Gateway} 等等
      * @return 元素们
      */
+    @SuppressWarnings("unchecked")
     public static <T extends FlowElement> List<T> getBpmnModelElements(BpmnModel model, Class<T> clazz) {
         List<T> result = new ArrayList<>();
-        model.getProcesses().forEach(process -> {
-            process.getFlowElements().forEach(flowElement -> {
-                if (flowElement.getClass().isAssignableFrom(clazz)) {
-                    result.add((T) flowElement);
-                }
-            });
-        });
+        model.getProcesses().forEach(process -> process.getFlowElements().forEach(flowElement -> {
+            if (flowElement.getClass().isAssignableFrom(clazz)) {
+                result.add((T) flowElement);
+            }
+        }));
         return result;
     }
 
@@ -193,7 +418,7 @@ public class BpmnModelUtils {
 
     public static EndEvent getEndEvent(BpmnModel model) {
         Process process = model.getMainProcess();
-        // 从 flowElementList 找 endEvent. TODO 多个 EndEvent 会有问题
+        // 从 flowElementList 找 endEvent
         return (EndEvent) CollUtil.findOne(process.getFlowElements(), flowElement -> flowElement instanceof EndEvent);
     }
 
@@ -221,7 +446,7 @@ public class BpmnModelUtils {
         return StrUtil.utf8Str(bpmnBytes);
     }
 
-    // ========== 遍历相关的方法 ==========
+    // ========== BPMN 复杂遍历相关的方法 ==========
 
     /**
      * 找到 source 节点之前的所有用户任务节点
@@ -316,16 +541,16 @@ public class BpmnModelUtils {
         return userTaskList;
     }
 
-
     /**
      * 迭代从后向前扫描，判断目标节点相对于当前节点是否是串行
-     * 不存在直接回退到子流程中的情况，但存在从子流程出去到父流程情况
+     * 不存在直接退回到子流程中的情况，但存在从子流程出去到父流程情况
      *
      * @param source          起始节点
      * @param target          目标节点
      * @param visitedElements 已经经过的连线的 ID，用于判断线路是否重复
      * @return 结果
      */
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public static boolean isSequentialReachable(FlowElement source, FlowElement target, Set<String> visitedElements) {
         visitedElements = visitedElements == null ? new HashSet<>() : visitedElements;
         // 不能是开始事件和子流程
@@ -436,11 +661,136 @@ public class BpmnModelUtils {
         return userTaskList;
     }
 
-    public static String parseBoundaryEventExtensionElement(BoundaryEvent boundaryEvent, String customElement) {
-        if (boundaryEvent == null) {
-            return null;
-        }
-        ExtensionElement extensionElement = CollUtil.getFirst(boundaryEvent.getExtensionElements().get(customElement));
-        return Optional.ofNullable(extensionElement).map(ExtensionElement::getElementText).orElse(null);
+    // ========== BPMN 流程预测相关的方法 ==========
+
+    /**
+     * 流程预测，返回 StartEvent、UserTask、ServiceTask、EndEvent 节点元素，最终是 List 串行结果
+     *
+     * @param bpmnModel BPMN 图
+     * @param variables 变量
+     * @return 节点元素数组
+     */
+    public static List<FlowElement> simulateProcess(BpmnModel bpmnModel, Map<String, Object> variables) {
+        List<FlowElement> resultElements = new ArrayList<>();
+        Set<FlowElement> visitElements = new HashSet<>();
+
+        // 从 StartEvent 开始遍历
+        StartEvent startEvent = getStartEvent(bpmnModel);
+        simulateNextFlowElements(startEvent, variables, resultElements, visitElements);
+
+        // 将 EndEvent 放在末尾。原因是，DFS 遍历，可能 EndEvent 在 resultElements 中
+        List<FlowElement> endEvents = CollUtil.removeWithAddIf(resultElements,
+                flowElement -> flowElement instanceof EndEvent);
+        resultElements.addAll(endEvents);
+        return resultElements;
     }
+
+    @SuppressWarnings("PatternVariableCanBeUsed")
+    private static void simulateNextFlowElements(FlowElement currentElement, Map<String, Object> variables,
+                                                 List<FlowElement> resultElements, Set<FlowElement> visitElements) {
+        // 如果为空，或者已经遍历过，则直接结束
+        if (currentElement == null) {
+            return;
+        }
+        if (visitElements.contains(currentElement)) {
+            return;
+        }
+        visitElements.add(currentElement);
+
+        // 情况：StartEvent/EndEvent/UserTask/ServiceTask
+        if (currentElement instanceof StartEvent
+            || currentElement instanceof EndEvent
+            || currentElement instanceof UserTask
+            || currentElement instanceof ServiceTask) {
+            // 添加元素
+            FlowNode flowNode = (FlowNode) currentElement;
+            resultElements.add(flowNode);
+            // 遍历子节点
+            flowNode.getOutgoingFlows().forEach(
+                    nextElement -> simulateNextFlowElements(nextElement.getTargetFlowElement(), variables, resultElements, visitElements));
+            return;
+        }
+
+        // 情况：ExclusiveGateway 排它，只有一个满足条件的。如果没有，就走默认的
+        if (currentElement instanceof ExclusiveGateway) {
+            // 查找满足条件的 SequenceFlow 路径
+            Gateway gateway = (Gateway) currentElement;
+            SequenceFlow matchSequenceFlow = CollUtil.findOne(gateway.getOutgoingFlows(),
+                    flow -> ObjUtil.notEqual(gateway.getDefaultFlow(), flow.getId())
+                            && evalConditionExpress(variables, flow.getConditionExpression()));
+            if (matchSequenceFlow == null) {
+                matchSequenceFlow = CollUtil.findOne(gateway.getOutgoingFlows(),
+                        flow -> ObjUtil.notEqual(gateway.getDefaultFlow(), flow.getId()));
+                // 特殊：没有默认的情况下，并且只有 1 个条件，则认为它是默认的
+                if (matchSequenceFlow == null && gateway.getOutgoingFlows().size() == 1) {
+                    matchSequenceFlow = gateway.getOutgoingFlows().get(0);
+                }
+            }
+            // 遍历满足条件的 SequenceFlow 路径
+            if (matchSequenceFlow != null) {
+                simulateNextFlowElements(matchSequenceFlow.getTargetFlowElement(), variables, resultElements, visitElements);
+            }
+            return;
+        }
+
+        // 情况：InclusiveGateway 包容，多个满足条件的。如果没有，就走默认的
+        if (currentElement instanceof InclusiveGateway) {
+            // 查找满足条件的 SequenceFlow 路径
+            Gateway gateway = (Gateway) currentElement;
+            Collection<SequenceFlow> matchSequenceFlows = CollUtil.filterNew(gateway.getOutgoingFlows(),
+                    flow -> ObjUtil.notEqual(gateway.getDefaultFlow(), flow.getId())
+                            && evalConditionExpress(variables, flow.getConditionExpression()));
+            if (CollUtil.isEmpty(matchSequenceFlows)) {
+                matchSequenceFlows = CollUtil.filterNew(gateway.getOutgoingFlows(),
+                        flow -> ObjUtil.notEqual(gateway.getDefaultFlow(), flow.getId()));
+                // 特殊：没有默认的情况下，并且只有 1 个条件，则认为它是默认的
+                if (CollUtil.isEmpty(matchSequenceFlows) && gateway.getOutgoingFlows().size() == 1) {
+                    matchSequenceFlows = gateway.getOutgoingFlows();
+                }
+            }
+            // 遍历满足条件的 SequenceFlow 路径
+            matchSequenceFlows.forEach(
+                    flow -> simulateNextFlowElements(flow.getTargetFlowElement(), variables, resultElements, visitElements));
+        }
+
+        // 情况：ParallelGateway 并行，都满足，都走
+        if (currentElement instanceof ParallelGateway) {
+            Gateway gateway = (Gateway) currentElement;
+            // 遍历子节点
+            gateway.getOutgoingFlows().forEach(
+                    nextElement -> simulateNextFlowElements(nextElement.getTargetFlowElement(), variables, resultElements, visitElements));
+            return;
+        }
+    }
+
+    /**
+     * 计算条件表达式是否为 true 满足条件
+     *
+     * @param variables 流程实例
+     * @param express 条件表达式
+     * @return 是否满足条件
+     */
+    public static boolean evalConditionExpress(Map<String, Object> variables, String express) {
+        if (express == null) {
+            return Boolean.FALSE;
+        }
+        try {
+            Object result = FlowableUtils.getExpressionValue(variables, express);
+            return Boolean.TRUE.equals(result);
+        } catch (FlowableException ex) {
+            log.error("[evalConditionExpress][条件表达式({}) 变量({}) 解析报错", express, variables, ex);
+            return Boolean.FALSE;
+        }
+    }
+
+    @SuppressWarnings("PatternVariableCanBeUsed")
+    public static boolean isSequentialUserTask(FlowElement flowElement) {
+        if (!(flowElement instanceof UserTask)) {
+            return false;
+        }
+        UserTask userTask = (UserTask) flowElement;
+        MultiInstanceLoopCharacteristics loopCharacteristics = userTask.getLoopCharacteristics();
+        return loopCharacteristics != null && loopCharacteristics.isSequential();
+    }
+
 }

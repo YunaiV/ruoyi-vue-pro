@@ -1,0 +1,16 @@
+### 请求 /bpm/process-instance/get-bpmn 接口 => 成功
+GET {{baseUrl}}/bpm/process-instance/get-bpmn-model-view?id=1d5fb5a6-85f8-11ef-b717-7e93075f94e3
+Content-Type: application/json
+tenant-id: 1
+Authorization: Bearer {{token}}
+
+### 请求 /bpm/process-instance/get-bpmn 接口 => 失败
+#GET {{baseUrl}}/bpm/process-instance/get-approval-detail?processInstanceId=1d5fb5a6-85f8-11ef-b717-7e93075f94e3
+#GET {{baseUrl}}/bpm/process-instance/get-approval-detail?processInstanceId=3ee5c5ba-904a-11ef-a76e-b2ed5d6ef911
+#GET {{baseUrl}}/bpm/process-instance/get-approval-detail?processInstanceId=f630dfa2-8f92-11ef-947c-ba5e239a6eb4
+#GET {{baseUrl}}/bpm/process-instance/get-approval-detail?processInstanceId=9de8bdbf-9133-11ef-ae97-eaf49df1f932
+#GET {{baseUrl}}/bpm/process-instance/get-approval-detail?processInstanceId=dd2188eb-9394-11ef-a039-7a9ac3d9eb6b
+GET {{baseUrl}}/bpm/process-instance/get-approval-detail?processDefinitionId=test-auto:1:c70a799a-9394-11ef-a039-7a9ac3d9eb6b
+Content-Type: application/json
+tenant-id: 1
+Authorization: Bearer {{token}}

@@ -2,7 +2,6 @@ package cn.iocoder.yudao.module.bpm.service.task;
 
 import cn.hutool.core.util.ObjectUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.instance.BpmProcessInstanceCopyPageReqVO;
 import cn.iocoder.yudao.module.bpm.dal.dataobject.task.BpmProcessInstanceCopyDO;
 import cn.iocoder.yudao.module.bpm.dal.mysql.task.BpmProcessInstanceCopyMapper;
@@ -19,7 +18,6 @@ import org.springframework.validation.annotation.Validated;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
@@ -49,17 +47,19 @@ public class BpmProcessInstanceCopyServiceImpl implements BpmProcessInstanceCopy
     private BpmProcessDefinitionService processDefinitionService;
 
     @Override
-    public void createProcessInstanceCopy(Collection<Long> userIds, String taskId) {
+    public void createProcessInstanceCopy(Collection<Long> userIds, String reason, String taskId) {
         Task task = taskService.getTask(taskId);
         if (ObjectUtil.isNull(task)) {
             throw exception(ErrorCodeConstants.TASK_NOT_EXISTS);
         }
-        String processInstanceId = task.getProcessInstanceId();
-        createProcessInstanceCopy(userIds, processInstanceId, task.getTaskDefinitionKey(), task.getId(), task.getName());
+        // 执行抄送
+        createProcessInstanceCopy(userIds, reason,
+                task.getProcessInstanceId(), task.getTaskDefinitionKey(), task.getId(), task.getName());
     }
 
     @Override
-    public void createProcessInstanceCopy(Collection<Long> userIds, String processInstanceId, String activityId, String taskId, String taskName) {
+    public void createProcessInstanceCopy(Collection<Long> userIds, String reason, String processInstanceId,
+                                          String activityId, String activityName, String taskId) {
         // 1.1 校验流程实例存在
         ProcessInstance processInstance = processInstanceService.getProcessInstance(processInstanceId);
         if (processInstance == null) {
@@ -74,10 +74,10 @@ public class BpmProcessInstanceCopyServiceImpl implements BpmProcessInstanceCopy
 
         // 2. 创建抄送流程
         List<BpmProcessInstanceCopyDO> copyList = convertList(userIds, userId -> new BpmProcessInstanceCopyDO()
-                .setUserId(userId).setStartUserId(Long.valueOf(processInstance.getStartUserId()))
+                .setUserId(userId).setReason(reason).setStartUserId(Long.valueOf(processInstance.getStartUserId()))
                 .setProcessInstanceId(processInstanceId).setProcessInstanceName(processInstance.getName())
-                .setCategory(processDefinition.getCategory()).setActivityId(activityId)
-                .setTaskId(taskId).setTaskName(taskName));
+                .setCategory(processDefinition.getCategory()).setTaskId(taskId)
+                .setActivityId(activityId).setActivityName(activityName));
         processInstanceCopyMapper.insertBatch(copyList);
     }
 
@@ -85,12 +85,6 @@ public class BpmProcessInstanceCopyServiceImpl implements BpmProcessInstanceCopy
     public PageResult<BpmProcessInstanceCopyDO> getProcessInstanceCopyPage(Long userId,
                                                                            BpmProcessInstanceCopyPageReqVO pageReqVO) {
         return processInstanceCopyMapper.selectPage(userId, pageReqVO);
-    }
-
-    @Override
-    public Set<Long> getCopyUserIds(String processInstanceId, String activityId) {
-        return CollectionUtils.convertSet(processInstanceCopyMapper.selectListByProcessInstanceIdAndActivityId(processInstanceId, activityId),
-                BpmProcessInstanceCopyDO::getUserId);
     }
 
 }

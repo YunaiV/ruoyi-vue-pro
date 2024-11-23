@@ -6,7 +6,9 @@ import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.task.*;
 import cn.iocoder.yudao.module.bpm.enums.definition.BpmUserTaskTimeoutHandlerTypeEnum;
 import jakarta.validation.Valid;
 import org.flowable.bpmn.model.UserTask;
+import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.task.api.Task;
+import org.flowable.task.api.TaskInfo;
 import org.flowable.task.api.history.HistoricTaskInstance;
 
 import java.util.Collection;
@@ -31,6 +33,15 @@ public interface BpmTaskService {
      * @return 流程任务分页
      */
     PageResult<Task> getTaskTodoPage(Long userId, BpmTaskPageReqVO pageReqVO);
+
+    /**
+     * 获得用户在指定流程下，首个需要处理（待办）的任务
+     *
+     * @param userId 用户编号
+     * @param processInstanceId 流程实例编号
+     * @return 待办任务
+     */
+    BpmTaskRespVO getFirstTodoTask(Long userId, String processInstanceId);
 
     /**
      * 获得已办的流程任务分页
@@ -73,9 +84,10 @@ public interface BpmTaskService {
      * 获得指定流程实例的流程任务列表，包括所有状态的
      *
      * @param processInstanceId 流程实例的编号
+     * @param asc               是否升序
      * @return 流程任务列表
      */
-    List<HistoricTaskInstance> getTaskListByProcessInstanceId(String processInstanceId);
+    List<HistoricTaskInstance> getTaskListByProcessInstanceId(String processInstanceId, Boolean asc);
 
     /**
      * 获取任务
@@ -105,20 +117,29 @@ public interface BpmTaskService {
      * 根据条件查询正在进行中的任务
      *
      * @param processInstanceId 流程实例编号，不允许为空
-     * @param assigned 是否分配了审批人，允许空
-     * @param taskDefineKey 任务定义 Key，允许空
+     * @param assigned          是否分配了审批人，允许空
+     * @param taskDefineKey     任务定义 Key，允许空
      */
     List<Task> getRunningTaskListByProcessInstanceId(String processInstanceId,
                                                      Boolean assigned,
                                                      String taskDefineKey);
 
     /**
-     * 获取当前任务的可回退的 UserTask 集合
+     * 获取当前任务的可退回的 UserTask 集合
      *
      * @param id 当前的任务 ID
-     * @return 可以回退的节点列表
+     * @return 可以退回的节点列表
      */
     List<UserTask> getUserTaskListByReturn(String id);
+
+    /**
+     * 获取指定任务的子任务列表（多层）
+     *
+     * @param parentTaskId 父任务 ID
+     * @param tasks 任务列表
+     * @return 子任务列表
+     */
+    <T extends TaskInfo> List<T> getAllChildrenTaskListByParentTaskId(String parentTaskId, List<T> tasks);
 
     /**
      * 获取指定任务的子任务列表
@@ -129,12 +150,20 @@ public interface BpmTaskService {
     List<Task> getTaskListByParentTaskId(String parentTaskId);
 
     /**
-     * 通过任务 ID，查询任务名 Map
+     * 获得指定流程实例的活动实例列表
      *
-     * @param taskIds 任务 ID
-     * @return 任务 ID 与名字的 Map
+     * @param processInstanceId 流程实例的编号
+     * @return 活动实例列表
      */
-    Map<String, String> getTaskNameByTaskIds(Collection<String> taskIds);
+    List<HistoricActivityInstance> getActivityListByProcessInstanceId(String processInstanceId);
+
+    /**
+     * 获得执行编号对应的活动实例
+     *
+     * @param executionId 执行编号
+     * @return 活动实例
+     */
+    List<HistoricActivityInstance> getHistoricActivityListByExecutionId(String executionId);
 
     // ========== Update 写入相关方法 ==========
 
@@ -170,10 +199,10 @@ public interface BpmTaskService {
     void moveTaskToEnd(String processInstanceId);
 
     /**
-     * 将任务回退到指定的 targetDefinitionKey 位置
+     * 将任务退回到指定的 targetDefinitionKey 位置
      *
      * @param userId 用户编号
-     * @param reqVO  回退的任务key和当前所在的任务ID
+     * @param reqVO  退回的任务key和当前所在的任务ID
      */
     void returnTask(Long userId, BpmTaskReturnReqVO reqVO);
 
@@ -201,14 +230,22 @@ public interface BpmTaskService {
      */
     void deleteSignTask(Long userId, BpmTaskSignDeleteReqVO reqVO);
 
+    /**
+     * 抄送任务
+     *
+     * @param userId 用户编号
+     * @param reqVO  通过请求
+     */
+    void copyTask(Long userId, @Valid BpmTaskCopyReqVO reqVO);
+
     // ========== Event 事件相关方法 ==========
 
     /**
      * 处理 Task 创建事件，目前是
-     *
+     * <p>
      * 1. 更新它的状态为审批中
      * 2. 处理自动通过的情况，例如说：1）无审批人时，是否自动通过、不通过；2）非【人工审核】时，是否自动通过、不通过
-     *
+     * <p>
      * 注意：它的触发时机，晚于 {@link #processTaskAssigned(Task)} 之后
      *
      * @param task 任务实体
@@ -233,8 +270,8 @@ public interface BpmTaskService {
      * 处理 Task 审批超时事件，可能会处理多个当前审批中的任务
      *
      * @param processInstanceId 流程示例编号
-     * @param taskDefineKey 任务 Key
-     * @param handlerType 处理类型，参见 {@link BpmUserTaskTimeoutHandlerTypeEnum}
+     * @param taskDefineKey     任务 Key
+     * @param handlerType       处理类型，参见 {@link BpmUserTaskTimeoutHandlerTypeEnum}
      */
     void processTaskTimeout(String processInstanceId, String taskDefineKey, Integer handlerType);
 
