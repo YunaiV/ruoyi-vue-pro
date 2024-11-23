@@ -20,12 +20,12 @@ public class AmazonSpController {
 
     @GetMapping("orders")
     public List<AmazonSpOrderRespVO> getOrders(LocalDateTime startTime) {
-        return service.spClient.getShops().map(shop -> {
+        return service.spClient.getShops().flatMap(shop -> {
             var vo = AmazonSpOrderReqVO.builder()
                 .marketplaceIds(List.of(shop.getCountry().getMarketplaceId()))
                 .createdAfter(shop.getCountry().localTime(startTime))
                 .build();
-            return service.spClient.getOrder(shop.getSeller(), vo);
+            return service.spClient.streamOrder(shop.getSeller(), vo);
         }).toList();
     }
 }

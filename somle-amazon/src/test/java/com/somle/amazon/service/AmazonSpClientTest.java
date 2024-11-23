@@ -46,7 +46,7 @@ class AmazonSpClientTest extends BaseSpringTest {
 
 
     @Test
-    void getOrders() {
+    void getOrder() {
         var shop = amazonService.shopRepository.findByCountryCode("UK");
         var vo = AmazonSpOrderReqVO.builder()
                 .createdAfter(LocalDateTime.of(2024,10,23,0,0))
@@ -59,7 +59,7 @@ class AmazonSpClientTest extends BaseSpringTest {
     }
 
     @Test
-    void getOrders2() {
+    void getOrder2() {
         var results = amazonService.spClient.getShops().map(shop -> {
             var startTime = LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS).minusMinutes(60);
             startTime = LocalDateTimeUtils.leap(startTime, ZoneId.of("UTC"));
@@ -72,6 +72,19 @@ class AmazonSpClientTest extends BaseSpringTest {
             log.info(result.toString());
             return result;
         }).toList();
+    }
+
+    @Test
+    void streamOrder() {
+        var shop = amazonService.shopRepository.findByCountryCode("UK");
+        var vo = AmazonSpOrderReqVO.builder()
+            .createdAfter(LocalDateTime.of(2024,10,23,0,0))
+            .createdBefore(LocalDateTime.of(2024,10,24,0,0))
+            .marketplaceIds(List.of(shop.getCountry().getMarketplaceId()))
+            .build();
+        // assert url equals "https://sellingpartnerapi-eu.amazon.com/orders/v0/orders?CreatedAfter=2024-10-23T00%3A00%3A00&CreatedBefore=2024-10-24T00%3A00%3A00&MarketplaceIds=A1F83G8C2ARO7P"
+        var report = amazonService.spClient.streamOrder(shop.getSeller(), vo);
+        log.info(report.toList().toString());
     }
 
 

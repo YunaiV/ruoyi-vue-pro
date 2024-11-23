@@ -10,7 +10,6 @@ import com.somle.framework.common.util.collection.PageUtils;
 import com.somle.framework.common.util.json.JSONObject;
 import com.somle.framework.common.util.json.JsonUtils;
 import com.somle.framework.common.util.object.BeanUtils;
-import com.somle.wangdian.utils.StringUtils;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -30,17 +29,7 @@ public class AmazonspOrderDataJob extends AmazonspDataJob {
                         .createdBefore(beforeYesterdayLastSecond)
                         .marketplaceIds(List.of(shop.getCountry().getMarketplaceId()))
                         .build();
-                PageUtils.getAllPages(
-                    amazonService.spClient.getOrder(shop.getSeller(), vo),
-                    page -> !StringUtils.isEmpty(page.getPayload().getNextToken()),
-                    page -> {
-                        var nextToken = page.getPayload().getNextToken();
-                        var reqVO = AmazonSpOrderReqVO.builder()
-                            .nextToken(nextToken)
-                            .build();
-                        return amazonService.spClient.getOrder(shop.getSeller(), reqVO);
-                    }
-                ).forEach(page-> {
+                amazonService.spClient.streamOrder(shop.getSeller(), vo).forEach(page-> {
                     var data = OssData.builder()
                         .database(DATABASE)
                         .tableName("order_create")

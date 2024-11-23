@@ -6,10 +6,14 @@ import com.somle.amazon.controller.vo.AmazonSpReportReqVO;
 import com.somle.amazon.controller.vo.AmazonSpReportSaveVO;
 import com.somle.amazon.model.*;
 //import com.somle.amazon.repository.AmazonSellerRepository;
+import com.somle.framework.common.util.collection.CollectionUtils;
+import com.somle.framework.common.util.collection.PageUtils;
 import com.somle.framework.common.util.date.LocalDateTimeUtils;
 import com.somle.framework.common.util.general.CoreUtils;
+
 import com.somle.framework.common.util.json.JSONObject;
 import com.somle.framework.common.util.json.JsonUtils;
+import com.somle.framework.common.util.string.StrUtils;
 import com.somle.framework.common.util.web.WebUtils;
 
 import lombok.AllArgsConstructor;
@@ -50,6 +54,12 @@ public class AmazonSpClient {
         return getShops().filter(shop->shop.getCountry().getCode().equals(countryCode)).findFirst().get();
     }
 
+    public void validateResponse(AmazonSpOrderRespVO response) {
+        if (!CollectionUtils.isEmpty(response.getErrors())) {
+            throw new RuntimeException("Amazon sp error response: " + response);
+        }
+    }
+
 
 
     @SneakyThrows
@@ -63,9 +73,27 @@ public class AmazonSpClient {
         var headers = Map.of("x-amz-access-token", seller.getSpAccessToken());
         var response = WebUtils.getRequest(fullUrl, vo, headers);
         var bodyString = response.body().string();
-        log.info("get order response: {}", bodyString);
-        return JsonUtils.parseObject(bodyString, AmazonSpOrderRespVO.class);
+        var result = JsonUtils.parseObject(bodyString, AmazonSpOrderRespVO.class);
+        validateResponse(result);
+        return result;
     }
+
+    @SneakyThrows
+    @Transactional(readOnly = true)
+    public Stream<AmazonSpOrderRespVO> streamOrder(AmazonSeller seller, AmazonSpOrderReqVO vo) {
+        return PageUtils.getAllPages(
+            getOrder(seller, vo),
+            page -> !StrUtils.isEmpty(page.getPayload().getNextToken()),
+            page -> {
+                var nextToken = page.getPayload().getNextToken();
+                var reqVO = AmazonSpOrderReqVO.builder()
+                    .nextToken(nextToken)
+                    .build();
+                return getOrder(seller, reqVO);
+            }
+        );
+    }
+
 
     @Transactional(readOnly = true)
     public List<AmazonSpReport> getReports(AmazonSeller seller, AmazonSpReportReqVO vo) {

@@ -13,7 +13,7 @@ import java.util.List;
 @Data
 public class AmazonSpOrderRespVO {
     private OrderList payload;
-    private String errors;
+    private List<Error> errors;
 
     @Data
     @JsonNaming(PropertyNamingStrategies.UpperCamelCaseStrategy.class)
@@ -23,4 +23,13 @@ public class AmazonSpOrderRespVO {
         private LocalDateTime lastUpdatedBefore;
         private LocalDateTime createdBefore;
     }
+
+    @Data
+    public static class Error {
+        private String code;
+        private String message;
+        private String details;
+    }
+
+
 }
