@@ -5,6 +5,8 @@ package com.somle.framework.common.util.collection;
  * @Author: c-tao
  * @Date: $
  */
+import lombok.AllArgsConstructor;
+
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
@@ -20,30 +22,29 @@ public class PageUtils {
      *
      * @param <T>          The type representing a page of results.
      * @param firstPage    The first page of results.
-     * @param isLastPage   A method to decide if the current page is the last page.
+     * @param haveNextPage   A method to decide if the current page is the last page.
      * @param getNextPage  A method to produce the next page given the current page.
      * @return A Stream of all pages of results.
      */
     public static <T> Stream<T> getAllPages(
         T firstPage,
-        Predicate<T> isLastPage,
+        Predicate<T> haveNextPage,
         Function<T, T> getNextPage
     ) {
-        return StreamSupport.stream(new PaginationSpliterator<>(firstPage, isLastPage, getNextPage), false);
+        return StreamSupport.stream(new PaginationSpliterator<>(firstPage, haveNextPage, getNextPage), false);
     }
 }
 
 
-
 class PaginationSpliterator<T> implements Spliterator<T> {
     private T currentPage;
-    private final Predicate<T> isLastPage;
+    private final Predicate<T> haveNextPage;
     private final Function<T, T> getNextPage;
     private boolean finished = false;
 
-    public PaginationSpliterator(T firstPage, Predicate<T> isLastPage, Function<T, T> getNextPage) {
+    public PaginationSpliterator(T firstPage, Predicate<T> haveNextPage, Function<T, T> getNextPage) {
         this.currentPage = firstPage;
-        this.isLastPage = isLastPage;
+        this.haveNextPage = haveNextPage;
         this.getNextPage = getNextPage;
     }
 
@@ -53,7 +54,7 @@ class PaginationSpliterator<T> implements Spliterator<T> {
             return false;
         }
         action.accept(currentPage);
-        if (isLastPage.test(currentPage)) {
+        if (!haveNextPage.test(currentPage)) {
             finished = true;
         } else {
             currentPage = getNextPage.apply(currentPage);

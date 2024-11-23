@@ -27,7 +27,6 @@ public class WangdianTradeRespVO extends WangdianRespVO {
      * Trade Data VO
      */
     @Data
-    @Builder
     @NoArgsConstructor
     @AllArgsConstructor
     public static class TradeVO {

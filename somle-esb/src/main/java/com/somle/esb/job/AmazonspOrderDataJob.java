@@ -2,11 +2,15 @@ package com.somle.esb.job;
 
 
 import com.somle.amazon.controller.vo.AmazonSpOrderReqVO;
+import com.somle.amazon.controller.vo.AmazonSpOrderRespVO;
 import com.somle.amazon.controller.vo.AmazonSpReportReqVO;
 import com.somle.amazon.controller.vo.AmazonSpReportReqVO.ProcessingStatuses;
 import com.somle.esb.model.OssData;
+import com.somle.framework.common.util.collection.PageUtils;
 import com.somle.framework.common.util.json.JSONObject;
 import com.somle.framework.common.util.json.JsonUtils;
+import com.somle.framework.common.util.object.BeanUtils;
+import com.somle.wangdian.utils.StringUtils;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -20,25 +24,36 @@ public class AmazonspOrderDataJob extends AmazonspDataJob {
         setDate(param);
 
         amazonService.spClient.getShops()
-                .forEach(shop -> {
-                    var vo = AmazonSpOrderReqVO.builder()
-                            .createdAfter(beforeYesterdayFirstSecond)
-                            .createdBefore(beforeYesterdayLastSecond)
-                            .marketplaceIds(List.of(shop.getCountry().getMarketplaceId()))
+            .forEach(shop -> {
+                var vo = AmazonSpOrderReqVO.builder()
+                        .createdAfter(beforeYesterdayFirstSecond)
+                        .createdBefore(beforeYesterdayLastSecond)
+                        .marketplaceIds(List.of(shop.getCountry().getMarketplaceId()))
+                        .build();
+                PageUtils.getAllPages(
+                    amazonService.spClient.getOrder(shop.getSeller(), vo),
+                    page -> !StringUtils.isEmpty(page.getPayload().getNextToken()),
+                    page -> {
+                        var nextToken = page.getPayload().getNextToken();
+                        var reqVO = AmazonSpOrderReqVO.builder()
+                            .nextToken(nextToken)
                             .build();
-                    var reportString = amazonService.spClient.getOrder(shop.getSeller(), vo);
-                    var report = JsonUtils.parseObject(reportString, JSONObject.class);
+                        return amazonService.spClient.getOrder(shop.getSeller(), reqVO);
+                    }
+                ).forEach(page-> {
                     var data = OssData.builder()
-                            .database(DATABASE)
-                            .tableName("order_create")
-                            .syncType("inc")
-                            .requestTimestamp(System.currentTimeMillis())
-                            .folderDate(beforeYesterday)
-                            .content(report)
-                            .headers(null)
-                            .build();
+                        .database(DATABASE)
+                        .tableName("order_create")
+                        .syncType("inc")
+                        .requestTimestamp(System.currentTimeMillis())
+                        .folderDate(beforeYesterday)
+                        .content(page)
+                        .headers(null)
+                        .build();
                     service.send(data);
                 });
+
+            });
 
         return "data upload success";
     }

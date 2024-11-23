@@ -1,6 +1,7 @@
 package com.somle.amazon.service;
 
 import com.somle.amazon.controller.vo.AmazonSpOrderReqVO;
+import com.somle.amazon.controller.vo.AmazonSpOrderRespVO;
 import com.somle.amazon.controller.vo.AmazonSpReportReqVO;
 import com.somle.amazon.controller.vo.AmazonSpReportSaveVO;
 import com.somle.amazon.model.*;
@@ -53,7 +54,7 @@ public class AmazonSpClient {
 
     @SneakyThrows
     @Transactional(readOnly = true)
-    public JSONObject getOrder(AmazonSeller seller, AmazonSpOrderReqVO vo) {
+    public AmazonSpOrderRespVO getOrder(AmazonSeller seller, AmazonSpOrderReqVO vo) {
         log.info("get orders");
 
         String endPoint = seller.getRegion().getSpEndPoint();
@@ -61,11 +62,9 @@ public class AmazonSpClient {
         String fullUrl = endPoint + partialUrl;
         var headers = Map.of("x-amz-access-token", seller.getSpAccessToken());
         var response = WebUtils.getRequest(fullUrl, vo, headers);
-//        var reportsString = WebUtils.parseResponse(response, JSONObject.class).get("payload").get("orders");
-//        var reportList = JsonUtils.parseArray(reportsString, AmazonSpReport.class);
-//        return reportList;
         var bodyString = response.body().string();
-        return JsonUtils.parseObject(bodyString, JSONObject.class);
+        log.info("get order response: {}", bodyString);
+        return JsonUtils.parseObject(bodyString, AmazonSpOrderRespVO.class);
     }
 
     @Transactional(readOnly = true)

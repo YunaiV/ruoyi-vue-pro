@@ -35,7 +35,7 @@ class MatomoServiceTest extends BaseMockitoUnitTest {
 
         var results = PageUtils.getAllPages(
             service.getResponse(methodVO, reqVO),
-            response -> response.isEmpty(),
+            response -> !response.isEmpty(),
             response -> {
                 reqVO.setFilterOffset(reqVO.getFilterOffset() + reqVO.getFilterLimit());
                 return service.getResponse(methodVO, reqVO);

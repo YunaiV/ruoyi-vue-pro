@@ -34,7 +34,7 @@ public class WangdianTradeDataJob extends WangdianDataJob{
 
             PageUtils.getAllPages(
                 wangdianService.client.execute("trade_query.php", reqVO),
-                response -> response.getInteger("total_count").equals(0),
+                response -> !response.getInteger("total_count").equals(0),
                 respoonse ->{
                     reqVO.setPageNo(reqVO.getPageNo() + 1);
                     return wangdianService.client.execute("trade_query.php", reqVO);
