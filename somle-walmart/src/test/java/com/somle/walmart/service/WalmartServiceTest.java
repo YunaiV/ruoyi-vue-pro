@@ -16,6 +16,12 @@ class WalmartServiceTest extends BaseDbUnitTest {
     @Resource
     WalmartService service;
 
+
+    @Test
+    void getAccessToken() {
+        log.info(service.getClient().getAccessToken());
+    }
+
     @Test
     void getOrders() {
         var start = LocalDateTime.now().minusDays(1);

@@ -16,18 +16,19 @@ public class WalmartService {
     @Autowired
     private WalmartTokenRepository tokenRepository;
 
-    @Getter
+
     private WalmartClient client;
 
-    @PostConstruct
-    public void init() {
-        var token = tokenRepository.findAll().get(0);
-        if (token.getSvcName().equals("Walmart Marketplace")) {
-            client = new WalmartMarketplaceClient(token);
-        } else {
-            client = new WalmartDsvClient(token, "752076");
+    public WalmartClient getClient() {
+        if (client == null) {
+            var token = tokenRepository.findAll().get(0);
+            if (token.getSvcName().equals("Walmart Marketplace")) {
+                client = new WalmartMarketplaceClient(token);
+            } else {
+                client = new WalmartDsvClient(token, "752076");
+            }
         }
+        return client;
     }
-
 
 }
