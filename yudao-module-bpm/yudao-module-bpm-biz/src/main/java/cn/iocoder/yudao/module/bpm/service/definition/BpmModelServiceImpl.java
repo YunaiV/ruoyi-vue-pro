@@ -3,12 +3,9 @@ package cn.iocoder.yudao.module.bpm.service.definition;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
-import cn.iocoder.yudao.framework.common.util.object.PageUtils;
 import cn.iocoder.yudao.framework.common.util.validation.ValidationUtils;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.BpmModelMetaInfoVO;
-import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.BpmModelPageReqVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.BpmModelSaveReqVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.simple.BpmSimpleModelNodeVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.simple.BpmSimpleModelUpdateReqVO;
@@ -35,14 +32,15 @@ import org.springframework.validation.annotation.Validated;
 import javax.annotation.Resource;
 import javax.validation.Valid;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
 import static cn.iocoder.yudao.module.bpm.enums.ErrorCodeConstants.*;
 
 /**
- * Flowable流程模型实现
- * 主要进行 Flowable {@link Model} 的维护
+ * 流程模型实现：主要进行 Flowable {@link Model} 的维护
  *
  * @author yunlongn
  * @author 芋道源码
@@ -64,27 +62,12 @@ public class BpmModelServiceImpl implements BpmModelService {
     private BpmTaskCandidateInvoker taskCandidateInvoker;
 
     @Override
-    public PageResult<Model> getModelPage(BpmModelPageReqVO pageVO) {
+    public List<Model> getModelList(String name) {
         ModelQuery modelQuery = repositoryService.createModelQuery();
-        modelQuery.modelTenantId(FlowableUtils.getTenantId());
-        if (StrUtil.isNotBlank(pageVO.getKey())) {
-            modelQuery.modelKey(pageVO.getKey());
+        if (StrUtil.isNotEmpty(name)) {
+            modelQuery.modelNameLike(name);
         }
-        if (StrUtil.isNotBlank(pageVO.getName())) {
-            modelQuery.modelNameLike("%" + pageVO.getName() + "%"); // 模糊匹配
-        }
-        if (StrUtil.isNotBlank(pageVO.getCategory())) {
-            modelQuery.modelCategory(pageVO.getCategory());
-        }
-        // 执行查询
-        long count = modelQuery.count();
-        if (count == 0) {
-            return PageResult.empty(count);
-        }
-        List<Model> models = modelQuery
-                .orderByCreateTime().desc()
-                .listPage(PageUtils.getStart(pageVO), pageVO.getPageSize());
-        return new PageResult<>(models, count);
+        return modelQuery.list();
     }
 
     @Override
@@ -100,6 +83,7 @@ public class BpmModelServiceImpl implements BpmModelService {
         }
 
         // 2.1 创建流程定义
+        createReqVO.setSort(System.currentTimeMillis()); // 使用当前时间，作为排序
         Model model = repositoryService.newModel();
         BpmModelConvert.INSTANCE.copyToModel(model, createReqVO);
         model.setTenantId(FlowableUtils.getTenantId());
@@ -118,6 +102,34 @@ public class BpmModelServiceImpl implements BpmModelService {
         BpmModelConvert.INSTANCE.copyToModel(model, updateReqVO);
         // 更新模型
         repositoryService.saveModel(model);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void updateModelSortBatch(Long userId, List<String> ids) {
+        // 1.1 校验流程模型存在
+        List<Model> models = repositoryService.createModelQuery()
+                .modelTenantId(FlowableUtils.getTenantId()).list();
+        models.removeIf(model ->!ids.contains(model.getId()));
+        if (ids.size() != models.size()) {
+            throw exception(MODEL_NOT_EXISTS);
+        }
+        Map<String, Model> modelMap = convertMap(models, Model::getId);
+        // 1.2 校验是否为管理员
+        ids.forEach(id -> validateModelManager(id, userId));
+
+        // 保存排序
+        long sort = System.currentTimeMillis(); // 使用时间戳 - i 作为排序
+        for (int i = ids.size() - 1; i > 0; i--) {
+            Model model = modelMap.get(ids.get(i));
+            // 更新模型
+            BpmModelMetaInfoVO metaInfo = BpmModelConvert.INSTANCE.parseMetaInfo(model).setSort(sort);
+            model.setMetaInfo(JsonUtils.toJsonString(metaInfo));
+            repositoryService.saveModel(model);
+            // 更新排序
+            processDefinitionService.updateProcessDefinitionSortByModelId(model.getId(), sort);
+            sort--;
+        }
     }
 
     private Model validateModelExists(String id) {
@@ -139,7 +151,7 @@ public class BpmModelServiceImpl implements BpmModelService {
         Model model = validateModelExists(id);
         BpmModelMetaInfoVO metaInfo = BpmModelConvert.INSTANCE.parseMetaInfo(model);
         if (metaInfo == null || !CollUtil.contains(metaInfo.getManagerUserIds(), userId)) {
-            throw exception(MODEL_UPDATE_FAIL_NOT_MANAGER);
+            throw exception(MODEL_UPDATE_FAIL_NOT_MANAGER, model.getName());
         }
         return model;
     }
@@ -158,10 +170,10 @@ public class BpmModelServiceImpl implements BpmModelService {
         // 1.4 校验任务分配规则已配置
         taskCandidateInvoker.validateBpmnConfig(bpmnBytes);
         // 1.5 获取仿钉钉流程设计器模型数据
-        byte[] simpleBytes = getModelSimpleJson(model.getId());
+        String simpleJson = getModelSimpleJson(model.getId());
 
         // 2.1 创建流程定义
-        String definitionId = processDefinitionService.createProcessDefinition(model, metaInfo, bpmnBytes, simpleBytes, form);
+        String definitionId = processDefinitionService.createProcessDefinition(model, metaInfo, bpmnBytes, simpleJson, form);
 
         // 2.2 将老的流程定义进行挂起。也就是说，只有最新部署的流程定义，才可以发起任务。
         updateProcessDefinitionSuspended(model.getDeploymentId());
@@ -226,8 +238,8 @@ public class BpmModelServiceImpl implements BpmModelService {
     public BpmSimpleModelNodeVO getSimpleModel(String modelId) {
         Model model = validateModelExists(modelId);
         // 通过 ACT_RE_MODEL 表 EDITOR_SOURCE_EXTRA_VALUE_ID_ ，获取仿钉钉快搭模型的 JSON 数据
-        byte[] jsonBytes = getModelSimpleJson(model.getId());
-        return JsonUtils.parseObject(jsonBytes, BpmSimpleModelNodeVO.class);
+        String json = getModelSimpleJson(model.getId());
+        return JsonUtils.parseObject(json, BpmSimpleModelNodeVO.class);
     }
 
     @Override
@@ -240,7 +252,7 @@ public class BpmModelServiceImpl implements BpmModelService {
         // 2.2 保存 Bpmn XML
         updateModelBpmnXml(model.getId(), BpmnModelUtils.getBpmnXml(bpmnModel));
         // 2.3 保存 JSON 数据
-        saveModelSimpleJson(model.getId(), JsonUtils.toJsonByte(reqVO.getSimpleModel()));
+        updateModelSimpleJson(model.getId(), reqVO.getSimpleModel());
     }
 
     /**
@@ -279,15 +291,21 @@ public class BpmModelServiceImpl implements BpmModelService {
         repositoryService.addModelEditorSource(id, StrUtil.utf8Bytes(bpmnXml));
     }
 
-    private byte[] getModelSimpleJson(String id) {
-        return repositoryService.getModelEditorSourceExtra(id);
+    @SuppressWarnings("JavaExistingMethodCanBeUsed")
+    private String getModelSimpleJson(String id) {
+        byte[] bytes = repositoryService.getModelEditorSourceExtra(id);
+        if (ArrayUtil.isEmpty(bytes)) {
+            return null;
+        }
+        return StrUtil.utf8Str(bytes);
     }
 
-    private void saveModelSimpleJson(String id, byte[] jsonBytes) {
-        if (ArrayUtil.isEmpty(jsonBytes)) {
+    private void updateModelSimpleJson(String id, BpmSimpleModelNodeVO node) {
+        if (node == null) {
             return;
         }
-        repositoryService.addModelEditorSourceExtra(id, jsonBytes);
+        byte[] bytes = JsonUtils.toJsonByte(node);
+        repositoryService.addModelEditorSourceExtra(id, bytes);
     }
 
     /**

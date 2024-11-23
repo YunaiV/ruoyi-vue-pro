@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.bpm.enums.task;
 
+import cn.hutool.core.util.ObjUtil;
 import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -20,7 +21,6 @@ public enum BpmTaskStatusEnum {
     CANCEL(4, "已取消"),
 
     RETURN(5, "已退回"),
-    DELEGATE(6, "委派中"),
 
     /**
      * 使用场景：
@@ -45,6 +45,10 @@ public enum BpmTaskStatusEnum {
      */
     private final String name;
 
+    public static boolean isRejectStatus(Integer status) {
+        return REJECT.getStatus().equals(status);
+    }
+
     /**
      * 判断该状态是否已经处于 End 最终状态
      * <p>
@@ -57,6 +61,10 @@ public enum BpmTaskStatusEnum {
         return ObjectUtils.equalsAny(status,
                 APPROVE.getStatus(), REJECT.getStatus(), CANCEL.getStatus(),
                 RETURN.getStatus(), APPROVING.getStatus());
+    }
+
+    public static boolean isCancelStatus(Integer status) {
+        return ObjUtil.equal(status, CANCEL.getStatus());
     }
 
 }

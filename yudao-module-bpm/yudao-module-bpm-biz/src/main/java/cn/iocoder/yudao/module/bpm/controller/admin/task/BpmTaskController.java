@@ -8,7 +8,6 @@ import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.task.*;
 import cn.iocoder.yudao.module.bpm.convert.task.BpmTaskConvert;
 import cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmFormDO;
 import cn.iocoder.yudao.module.bpm.service.definition.BpmFormService;
-import cn.iocoder.yudao.module.bpm.service.definition.BpmProcessDefinitionService;
 import cn.iocoder.yudao.module.bpm.service.task.BpmProcessInstanceService;
 import cn.iocoder.yudao.module.bpm.service.task.BpmTaskService;
 import cn.iocoder.yudao.module.system.api.dept.DeptApi;
@@ -18,7 +17,8 @@ import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.flowable.bpmn.model.BpmnModel;
+import jakarta.annotation.Resource;
+import jakarta.validation.Valid;
 import org.flowable.bpmn.model.UserTask;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.runtime.ProcessInstance;
@@ -28,8 +28,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import javax.annotation.Resource;
-import javax.validation.Valid;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -52,8 +50,6 @@ public class BpmTaskController {
     private BpmProcessInstanceService processInstanceService;
     @Resource
     private BpmFormService formService;
-    @Resource
-    private BpmProcessDefinitionService bpmProcessDefinitionService;
 
     @Resource
     private AdminUserApi adminUserApi;
@@ -121,27 +117,22 @@ public class BpmTaskController {
     @PreAuthorize("@ss.hasPermission('bpm:task:query')")
     public CommonResult<List<BpmTaskRespVO>> getTaskListByProcessInstanceId(
             @RequestParam("processInstanceId") String processInstanceId) {
-        List<HistoricTaskInstance> taskList = taskService.getTaskListByProcessInstanceId(processInstanceId);
+        List<HistoricTaskInstance> taskList = taskService.getTaskListByProcessInstanceId(processInstanceId, true);
         if (CollUtil.isEmpty(taskList)) {
             return success(Collections.emptyList());
         }
 
         // 拼接数据
-        HistoricProcessInstance processInstance = processInstanceService.getHistoricProcessInstance(processInstanceId);
-        // 获得 User 和 Dept Map
         Set<Long> userIds = convertSetByFlatMap(taskList, task ->
                 Stream.of(NumberUtils.parseLong(task.getAssignee()), NumberUtils.parseLong(task.getOwner())));
-        userIds.add(NumberUtils.parseLong(processInstance.getStartUserId()));
         Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(userIds);
         Map<Long, DeptRespDTO> deptMap = deptApi.getDeptMap(
                 convertSet(userMap.values(), AdminUserRespDTO::getDeptId));
         // 获得 Form Map
         Map<Long, BpmFormDO> formMap = formService.getFormMap(
                 convertSet(taskList, task -> NumberUtils.parseLong(task.getFormKey())));
-        // 获得 BpmnModel
-        BpmnModel bpmnModel = bpmProcessDefinitionService.getProcessDefinitionBpmnModel(processInstance.getProcessDefinitionId());
-        return success(BpmTaskConvert.INSTANCE.buildTaskListByProcessInstanceId(taskList, processInstance,
-                formMap, userMap, deptMap, bpmnModel));
+        return success(BpmTaskConvert.INSTANCE.buildTaskListByProcessInstanceId(taskList,
+                formMap, userMap, deptMap));
     }
 
     @PutMapping("/approve")
@@ -161,7 +152,7 @@ public class BpmTaskController {
     }
 
     @GetMapping("/list-by-return")
-    @Operation(summary = "获取所有可回退的节点", description = "用于【流程详情】的【回退】按钮")
+    @Operation(summary = "获取所有可退回的节点", description = "用于【流程详情】的【退回】按钮")
     @Parameter(name = "taskId", description = "当前任务ID", required = true)
     @PreAuthorize("@ss.hasPermission('bpm:task:update')")
     public CommonResult<List<BpmTaskRespVO>> getTaskListByReturn(@RequestParam("id") String id) {
@@ -171,7 +162,7 @@ public class BpmTaskController {
     }
 
     @PutMapping("/return")
-    @Operation(summary = "回退任务", description = "用于【流程详情】的【回退】按钮")
+    @Operation(summary = "退回任务", description = "用于【流程详情】的【退回】按钮")
     @PreAuthorize("@ss.hasPermission('bpm:task:update')")
     public CommonResult<Boolean> returnTask(@Valid @RequestBody BpmTaskReturnReqVO reqVO) {
         taskService.returnTask(getLoginUserId(), reqVO);
@@ -207,6 +198,14 @@ public class BpmTaskController {
     @PreAuthorize("@ss.hasPermission('bpm:task:update')")
     public CommonResult<Boolean> deleteSignTask(@Valid @RequestBody BpmTaskSignDeleteReqVO reqVO) {
         taskService.deleteSignTask(getLoginUserId(), reqVO);
+        return success(true);
+    }
+
+    @PutMapping("/copy")
+    @Operation(summary = "抄送任务")
+    @PreAuthorize("@ss.hasPermission('bpm:task:update')")
+    public CommonResult<Boolean> copyTask(@Valid @RequestBody BpmTaskCopyReqVO reqVO) {
+        taskService.copyTask(getLoginUserId(), reqVO);
         return success(true);
     }
 

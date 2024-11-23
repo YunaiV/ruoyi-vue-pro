@@ -57,7 +57,7 @@ public class BpmUserTaskActivityBehavior extends UserTaskActivityBehavior {
 
         // 情况二，如果非多实例的任务，则计算任务处理人
         // 第一步，先计算可处理该任务的处理人们
-        Set<Long> candidateUserIds = taskCandidateInvoker.calculateUsers(execution);
+        Set<Long> candidateUserIds = taskCandidateInvoker.calculateUsersByTask(execution);
         if (CollUtil.isEmpty(candidateUserIds)) {
             return null;
         }

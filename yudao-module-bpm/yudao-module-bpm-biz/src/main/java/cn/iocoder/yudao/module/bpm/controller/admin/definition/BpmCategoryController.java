@@ -48,6 +48,15 @@ public class BpmCategoryController {
         return success(true);
     }
 
+    @PutMapping("/update-sort-batch")
+    @Operation(summary = "批量更新流程分类的排序")
+    @Parameter(name = "ids", description = "分类编号列表", required = true, example = "1,2,3")
+    @PreAuthorize("@ss.hasPermission('bpm:category:update')")
+    public CommonResult<Boolean> updateCategorySortBatch(@RequestParam("ids") List<Long> ids) {
+        categoryService.updateCategorySortBatch(ids);
+        return success(true);
+    }
+
     @DeleteMapping("/delete")
     @Operation(summary = "删除流程分类")
     @Parameter(name = "id", description = "编号", required = true)

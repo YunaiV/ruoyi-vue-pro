@@ -1,29 +1,28 @@
 package cn.iocoder.yudao.module.bpm.service.definition;
 
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.BpmModelPageReqVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.BpmModelSaveReqVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.simple.BpmSimpleModelNodeVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.simple.BpmSimpleModelUpdateReqVO;
+import jakarta.validation.Valid;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.engine.repository.Model;
 
-import javax.validation.Valid;
+import java.util.List;
 
 /**
- * Flowable流程模型接口
+ * 流程模型接口
  *
  * @author yunlongn
  */
 public interface BpmModelService {
 
     /**
-     * 获得流程模型分页
+     * 获得流程模型列表
      *
-     * @param pageVO 分页查询
-     * @return 流程模型分页
+     * @param name 模型名称
+     * @return 流程模型列表
      */
-    PageResult<Model> getModelPage(BpmModelPageReqVO pageVO);
+    List<Model> getModelList(String name);
 
     /**
      * 创建流程模型
@@ -64,6 +63,14 @@ public interface BpmModelService {
      * @param updateReqVO 更新信息
      */
     void updateModel(Long userId, @Valid BpmModelSaveReqVO updateReqVO);
+
+    /**
+     * 批量更新模型排序
+     *
+     * @param userId 用户编号
+     * @param ids 编号列表
+     */
+    void updateModelSortBatch(Long userId, List<String> ids);
 
     /**
      * 将流程模型，部署成一个流程定义

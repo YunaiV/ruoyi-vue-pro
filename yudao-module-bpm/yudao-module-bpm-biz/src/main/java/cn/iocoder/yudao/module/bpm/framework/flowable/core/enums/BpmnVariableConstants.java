@@ -29,7 +29,12 @@ public class BpmnVariableConstants {
      * @see ProcessInstance#getProcessVariables()
      */
     public static final String PROCESS_INSTANCE_VARIABLE_START_USER_SELECT_ASSIGNEES = "PROCESS_START_USER_SELECT_ASSIGNEES";
-
+    /**
+     * 流程实例的变量 - 发起用户 ID
+     *
+     * @see ProcessInstance#getProcessVariables()
+     */
+    public static final String PROCESS_INSTANCE_VARIABLE_START_USER_ID = "PROCESS_START_USER_ID";
     /**
      * 流程实例的变量 - 用于判断流程实例变量节点是否驳回. 格式 RETURN_FLAG_{节点 id}
      *

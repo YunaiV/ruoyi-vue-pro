@@ -12,6 +12,7 @@ import cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmProcessDefinitio
 import cn.iocoder.yudao.module.bpm.dal.mysql.definition.BpmProcessDefinitionInfoMapper;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnModelConstants;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.util.FlowableUtils;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.common.engine.impl.db.SuspensionState;
@@ -23,8 +24,6 @@ import org.flowable.engine.repository.ProcessDefinitionQuery;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
-import javax.annotation.Resource;
-import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
@@ -120,7 +119,7 @@ public class BpmProcessDefinitionServiceImpl implements BpmProcessDefinitionServ
 
     @Override
     public String createProcessDefinition(Model model, BpmModelMetaInfoVO modelMetaInfo,
-                                          byte[] bpmnBytes, byte[] simpleBytes, BpmFormDO form) {
+                                          byte[] bpmnBytes, String simpleJson, BpmFormDO form) {
         // 创建 Deployment 部署
         Deployment deploy = repositoryService.createDeployment()
                 .key(model.getKey()).name(model.getName()).category(model.getCategory())
@@ -145,8 +144,8 @@ public class BpmProcessDefinitionServiceImpl implements BpmProcessDefinitionServ
 
         // 插入拓展表
         BpmProcessDefinitionInfoDO definitionDO = BeanUtils.toBean(modelMetaInfo, BpmProcessDefinitionInfoDO.class)
-                .setModelId(model.getId()).setProcessDefinitionId(definition.getId()).setModelType(modelMetaInfo.getType())
-                .setSimpleModel(StrUtil.str(simpleBytes, StandardCharsets.UTF_8));
+                .setModelId(model.getId()).setProcessDefinitionId(definition.getId())
+                .setModelType(modelMetaInfo.getType()).setSimpleModel(simpleJson);
 
         if (form != null) {
             definitionDO.setFormFields(form.getFields()).setFormConf(form.getConf());
@@ -170,6 +169,11 @@ public class BpmProcessDefinitionServiceImpl implements BpmProcessDefinitionServ
             return;
         }
         log.error("[updateProcessDefinitionState][流程定义({}) 修改未知状态({})]", id, state);
+    }
+
+    @Override
+    public void updateProcessDefinitionSortByModelId(String modelId, Long sort) {
+        processDefinitionMapper.updateByModelId(modelId, new BpmProcessDefinitionInfoDO().setSort(sort));
     }
 
     @Override

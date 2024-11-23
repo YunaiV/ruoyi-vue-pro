@@ -15,8 +15,8 @@ import static cn.iocoder.yudao.module.bpm.framework.flowable.core.listener.BpmCo
 
 /**
  * 处理抄送用户的 {@link JavaDelegate} 的实现类
- *
- * 目前只有快搭模式的【抄送节点】使用
+ * <p>
+ * 目前只有仿钉钉/飞书模式的【抄送节点】使用
  *
  * @author jason
  */
@@ -34,14 +34,14 @@ public class BpmCopyTaskDelegate implements JavaDelegate {
     @Override
     public void execute(DelegateExecution execution) {
         // 1. 获得抄送人
-        Set<Long> userIds = taskCandidateInvoker.calculateUsers(execution);
+        Set<Long> userIds = taskCandidateInvoker.calculateUsersByTask(execution);
         if (CollUtil.isEmpty(userIds)) {
             return;
         }
         // 2. 执行抄送
         FlowElement currentFlowElement = execution.getCurrentFlowElement();
-        processInstanceCopyService.createProcessInstanceCopy(userIds, execution.getProcessInstanceId(),
-                currentFlowElement.getId(), null, currentFlowElement.getName());
+        processInstanceCopyService.createProcessInstanceCopy(userIds, null, execution.getProcessInstanceId(),
+                currentFlowElement.getId(), currentFlowElement.getName(), null);
     }
 
 }

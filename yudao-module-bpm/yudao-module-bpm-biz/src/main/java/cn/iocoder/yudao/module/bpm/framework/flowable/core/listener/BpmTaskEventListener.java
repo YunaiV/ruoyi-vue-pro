@@ -8,7 +8,6 @@ import cn.iocoder.yudao.module.bpm.enums.definition.BpmBoundaryEventType;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnModelConstants;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.util.BpmnModelUtils;
 import cn.iocoder.yudao.module.bpm.service.definition.BpmModelService;
-import cn.iocoder.yudao.module.bpm.service.task.BpmActivityService;
 import cn.iocoder.yudao.module.bpm.service.task.BpmTaskService;
 import com.google.common.collect.ImmutableSet;
 import lombok.extern.slf4j.Slf4j;
@@ -44,9 +43,6 @@ public class BpmTaskEventListener extends AbstractFlowableEngineEventListener {
     @Resource
     @Lazy // 解决循环依赖
     private BpmTaskService taskService;
-    @Resource
-    @Lazy // 解决循环依赖
-    private BpmActivityService activityService;
 
     public static final Set<FlowableEngineEventType> TASK_EVENTS = ImmutableSet.<FlowableEngineEventType>builder()
             .add(FlowableEngineEventType.TASK_CREATED)
@@ -72,7 +68,7 @@ public class BpmTaskEventListener extends AbstractFlowableEngineEventListener {
 
     @Override
     protected void activityCancelled(FlowableActivityCancelledEvent event) {
-        List<HistoricActivityInstance> activityList = activityService.getHistoricActivityListByExecutionId(event.getExecutionId());
+        List<HistoricActivityInstance> activityList = taskService.getHistoricActivityListByExecutionId(event.getExecutionId());
         if (CollUtil.isEmpty(activityList)) {
             log.error("[activityCancelled][使用 executionId({}) 查找不到对应的活动实例]", event.getExecutionId());
             return;
@@ -87,6 +83,7 @@ public class BpmTaskEventListener extends AbstractFlowableEngineEventListener {
     }
 
     @Override
+    @SuppressWarnings("PatternVariableCanBeUsed")
     protected void timerFired(FlowableEngineEntityEvent event) {
         // 1.1 只处理 BoundaryEvent 边界计时时间
         String processDefinitionId = event.getProcessDefinitionId();

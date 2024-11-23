@@ -1,7 +1,6 @@
 package cn.iocoder.yudao.module.bpm.convert.definition;
 
 import cn.hutool.core.util.ArrayUtil;
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.date.DateUtils;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
@@ -22,6 +21,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
@@ -37,25 +37,28 @@ public interface BpmModelConvert {
 
     BpmModelConvert INSTANCE = Mappers.getMapper(BpmModelConvert.class);
 
-    default PageResult<BpmModelRespVO> buildModelPage(PageResult<Model> pageResult,
-                                                      Map<Long, BpmFormDO> formMap,
-                                                      Map<String, BpmCategoryDO> categoryMap, Map<String, Deployment> deploymentMap,
-                                                      Map<String, ProcessDefinition> processDefinitionMap,
-                                                      Map<Long, AdminUserRespDTO> userMap) {
-        List<BpmModelRespVO> list = convertList(pageResult.getList(), model -> {
+    default List<BpmModelRespVO> buildModelList(List<Model> list,
+                                                Map<Long, BpmFormDO> formMap,
+                                                Map<String, BpmCategoryDO> categoryMap,
+                                                Map<String, Deployment> deploymentMap,
+                                                Map<String, ProcessDefinition> processDefinitionMap,
+                                                Map<Long, AdminUserRespDTO> userMap) {
+        List<BpmModelRespVO> result = convertList(list, model -> {
             BpmModelMetaInfoVO metaInfo = parseMetaInfo(model);
             BpmFormDO form = metaInfo != null ? formMap.get(metaInfo.getFormId()) : null;
             BpmCategoryDO category = categoryMap.get(model.getCategory());
             Deployment deployment = model.getDeploymentId() != null ? deploymentMap.get(model.getDeploymentId()) : null;
-            ProcessDefinition processDefinition = model.getDeploymentId() != null ? processDefinitionMap.get(model.getDeploymentId()) : null;
+            ProcessDefinition processDefinition = model.getDeploymentId() != null ?
+                    processDefinitionMap.get(model.getDeploymentId()) : null;
             List<AdminUserRespDTO> startUsers = metaInfo != null ? convertList(metaInfo.getStartUserIds(), userMap::get) : null;
             return buildModel0(model, metaInfo, form, category, deployment, processDefinition, startUsers);
         });
-        return new PageResult<>(list, pageResult.getTotal());
+        // 排序
+        result.sort(Comparator.comparing(BpmModelMetaInfoVO::getSort));
+        return result;
     }
 
-    default BpmModelRespVO buildModel(Model model,
-                                     byte[] bpmnBytes) {
+    default BpmModelRespVO buildModel(Model model, byte[] bpmnBytes) {
         BpmModelMetaInfoVO metaInfo = parseMetaInfo(model);
         BpmModelRespVO modelVO = buildModel0(model, metaInfo, null, null, null, null, null);
         if (ArrayUtil.isNotEmpty(bpmnBytes)) {
@@ -111,6 +114,10 @@ public interface BpmModelConvert {
         }
         if (vo.getStartUserIds() == null) {
             vo.setStartUserIds(Collections.emptyList());
+        }
+        // 如果为空，兜底处理，使用 createTime 创建时间
+        if (vo.getSort() == null) {
+            vo.setSort(model.getCreateTime().getTime());
         }
         return vo;
     }

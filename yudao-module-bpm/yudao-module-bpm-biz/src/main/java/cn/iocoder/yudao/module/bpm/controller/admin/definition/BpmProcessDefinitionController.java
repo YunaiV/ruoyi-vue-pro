@@ -9,7 +9,6 @@ import cn.iocoder.yudao.module.bpm.convert.definition.BpmProcessDefinitionConver
 import cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmCategoryDO;
 import cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmFormDO;
 import cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmProcessDefinitionInfoDO;
-import cn.iocoder.yudao.module.bpm.framework.flowable.core.candidate.strategy.BpmTaskCandidateStartUserSelectStrategy;
 import cn.iocoder.yudao.module.bpm.service.definition.BpmCategoryService;
 import cn.iocoder.yudao.module.bpm.service.definition.BpmFormService;
 import cn.iocoder.yudao.module.bpm.service.definition.BpmProcessDefinitionService;
@@ -17,7 +16,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.flowable.bpmn.model.BpmnModel;
-import org.flowable.bpmn.model.UserTask;
 import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -115,9 +113,8 @@ public class BpmProcessDefinitionController {
         }
         BpmProcessDefinitionInfoDO processDefinitionInfo = processDefinitionService.getProcessDefinitionInfo(processDefinition.getId());
         BpmnModel bpmnModel = processDefinitionService.getProcessDefinitionBpmnModel(processDefinition.getId());
-        List<UserTask> userTaskList = BpmTaskCandidateStartUserSelectStrategy.getStartUserSelectUserTaskList(bpmnModel);
         return success(BpmProcessDefinitionConvert.INSTANCE.buildProcessDefinition(
-                processDefinition, null, processDefinitionInfo, null, null, bpmnModel, userTaskList));
+                processDefinition, null, processDefinitionInfo, null, null, bpmnModel));
     }
 
 }
