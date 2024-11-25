@@ -19,12 +19,8 @@ public interface PointActivityMapper extends BaseMapperX<PointActivityDO> {
 
     default PageResult<PointActivityDO> selectPage(PointActivityPageReqVO reqVO) {
         return selectPage(reqVO, new LambdaQueryWrapperX<PointActivityDO>()
-                .eqIfPresent(PointActivityDO::getSpuId, reqVO.getSpuId())
                 .eqIfPresent(PointActivityDO::getStatus, reqVO.getStatus())
-                .eqIfPresent(PointActivityDO::getRemark, reqVO.getRemark())
-                .eqIfPresent(PointActivityDO::getSort, reqVO.getSort())
-                .betweenIfPresent(PointActivityDO::getCreateTime, reqVO.getCreateTime())
-                .orderByDesc(PointActivityDO::getId));
+                .orderByDesc(PointActivityDO::getSort));
     }
 
     /**
