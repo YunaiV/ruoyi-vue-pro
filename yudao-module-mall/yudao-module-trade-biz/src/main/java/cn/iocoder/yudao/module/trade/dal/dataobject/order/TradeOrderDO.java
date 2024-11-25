@@ -353,4 +353,11 @@ public class TradeOrderDO extends BaseDO {
      */
     private Long combinationRecordId;
 
+    /**
+     * 积分商城活动的编号
+     *
+     * 关联 PointActivityDO 的 id 字段
+     */
+    private Long pointActivityId;
+
 }

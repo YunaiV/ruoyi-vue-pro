@@ -520,8 +520,7 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
                 activityInstance -> activityInstance.getEndTime() != null
                         && ObjectUtil.equals(activityInstance.getActivityType(), BpmnXMLConstants.ELEMENT_SEQUENCE_FLOW));
         // 特殊：会签情况下，会有部分已完成（审批）、部分未完成（待审批），此时需要 finishedTaskActivityIds 移除掉
-        // unfinishedTaskActivityIds.removeAll(finishedTaskActivityIds);
-        finishedTaskActivityIds.removeAll(unfinishedTaskActivityIds);
+        unfinishedTaskActivityIds.removeAll(finishedTaskActivityIds);
         // 特殊：如果流程实例被拒绝，则需要计算是哪个活动节点。
         // 注意，只取最后一个。因为会存在多次拒绝的情况，拒绝驳回到指定节点
         Set<String> rejectTaskActivityIds = CollUtil.newHashSet();
@@ -589,6 +588,7 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
             variables = new HashMap<>();
         }
         FlowableUtils.filterProcessInstanceFormVariable(variables); // 过滤一下，避免 ProcessInstance 系统级的变量被占用
+        variables.put(BpmnVariableConstants.PROCESS_INSTANCE_VARIABLE_START_USER_ID, userId); // 设置流程变量，发起人 ID
         variables.put(BpmnVariableConstants.PROCESS_INSTANCE_VARIABLE_STATUS, // 流程实例状态：审批中
                 BpmProcessInstanceStatusEnum.RUNNING.getStatus());
         if (CollUtil.isNotEmpty(startUserSelectAssignees)) {

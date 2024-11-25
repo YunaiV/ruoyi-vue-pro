@@ -20,6 +20,7 @@ public enum TradeOrderTypeEnum implements IntArrayValuable {
     SECKILL(1, "秒杀订单"),
     BARGAIN(2, "砍价订单"),
     COMBINATION(3, "拼团订单"),
+    POINT(4, "积分商城"),
     ;
 
     public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(TradeOrderTypeEnum::getType).toArray();
@@ -52,6 +53,10 @@ public enum TradeOrderTypeEnum implements IntArrayValuable {
 
     public static boolean isCombination(Integer type) {
         return ObjectUtil.equal(type, COMBINATION.getType());
+    }
+
+    public static boolean isPoint(Integer type) {
+        return ObjectUtil.equal(type, POINT.getType());
     }
 
 }
