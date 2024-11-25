@@ -375,7 +375,7 @@ public class CombinationRecordServiceImpl implements CombinationRecordService {
             CombinationRecordDO updateRecord = new CombinationRecordDO().setId(item.getId())
                     .setStatus(status.getStatus()).setEndTime(now);
             if (CombinationRecordStatusEnum.isSuccess(status.getStatus())) { // 虚拟成团完事更改状态成功后还需要把参与人数修改为成团需要人数
-                updateRecord.setUserCount(updateRecord.getUserSize());
+                updateRecord.setUserCount(records.size());
             }
             updateRecords.add(updateRecord);
         });

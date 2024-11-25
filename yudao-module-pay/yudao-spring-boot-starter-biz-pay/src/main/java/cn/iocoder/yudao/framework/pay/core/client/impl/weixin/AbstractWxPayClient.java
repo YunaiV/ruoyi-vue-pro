@@ -14,6 +14,7 @@ import cn.iocoder.yudao.framework.pay.core.client.dto.refund.PayRefundRespDTO;
 import cn.iocoder.yudao.framework.pay.core.client.dto.refund.PayRefundUnifiedReqDTO;
 import cn.iocoder.yudao.framework.pay.core.client.dto.transfer.PayTransferRespDTO;
 import cn.iocoder.yudao.framework.pay.core.client.dto.transfer.PayTransferUnifiedReqDTO;
+import cn.iocoder.yudao.framework.pay.core.client.dto.transfer.WxPayTransferPartnerNotifyV3Result;
 import cn.iocoder.yudao.framework.pay.core.client.impl.AbstractPayClient;
 import cn.iocoder.yudao.framework.pay.core.enums.order.PayOrderStatusRespEnum;
 import cn.iocoder.yudao.framework.pay.core.enums.transfer.PayTransferTypeEnum;
@@ -23,6 +24,10 @@ import com.github.binarywang.wxpay.bean.notify.WxPayRefundNotifyResult;
 import com.github.binarywang.wxpay.bean.notify.WxPayRefundNotifyV3Result;
 import com.github.binarywang.wxpay.bean.request.*;
 import com.github.binarywang.wxpay.bean.result.*;
+import com.github.binarywang.wxpay.bean.transfer.QueryTransferBatchesRequest;
+import com.github.binarywang.wxpay.bean.transfer.QueryTransferBatchesResult;
+import com.github.binarywang.wxpay.bean.transfer.TransferBatchesRequest;
+import com.github.binarywang.wxpay.bean.transfer.TransferBatchesResult;
 import com.github.binarywang.wxpay.config.WxPayConfig;
 import com.github.binarywang.wxpay.exception.WxPayException;
 import com.github.binarywang.wxpay.service.WxPayService;
@@ -31,6 +36,8 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -350,6 +357,33 @@ public abstract class AbstractWxPayClient extends AbstractPayClient<WxPayClientC
     }
 
     @Override
+    public PayTransferRespDTO doParseTransferNotify(Map<String, String> params, String body) throws WxPayException {
+        switch (config.getApiVersion()) {
+            case API_VERSION_V3:
+                return parseTransferNotifyV3(body);
+            case API_VERSION_V2:
+                throw new UnsupportedOperationException("V2 版本暂不支持，建议使用 V3 版本");
+            default:
+                throw new IllegalArgumentException(String.format("未知的 API 版本(%s)", config.getApiVersion()));
+        }
+    }
+
+    private PayTransferRespDTO parseTransferNotifyV3(String body) throws WxPayException {
+        // 1. 解析回调
+        // TODO @luchi：这个可以复用 wxjava 里的类么？
+        WxPayTransferPartnerNotifyV3Result response = client.baseParseOrderNotifyV3Result(body, null, WxPayTransferPartnerNotifyV3Result.class, WxPayTransferPartnerNotifyV3Result.TransferNotifyResult.class);
+        WxPayTransferPartnerNotifyV3Result.TransferNotifyResult result = response.getResult();
+        // 2. 构建结果
+        if (Objects.equals("FINISHED", result.getBatchStatus())) {
+            if (result.getFailNum() <= 0) {
+                return PayTransferRespDTO.successOf(result.getBatchId(), parseDateV3(result.getUpdateTime()),
+                        result.getOutBatchNo(), response);
+            }
+        }
+        return PayTransferRespDTO.closedOf(result.getBatchStatus(), result.getCloseReason(), result.getOutBatchNo(), response);
+    }
+
+    @Override
     protected PayRefundRespDTO doGetRefund(String outTradeNo, String outRefundNo) throws WxPayException {
         try {
             switch (config.getApiVersion()) {
@@ -427,13 +461,54 @@ public abstract class AbstractWxPayClient extends AbstractPayClient<WxPayClientC
     }
 
     @Override
-    protected PayTransferRespDTO doUnifiedTransfer(PayTransferUnifiedReqDTO reqDTO) {
-       throw new UnsupportedOperationException("待实现");
+    protected PayTransferRespDTO doUnifiedTransfer(PayTransferUnifiedReqDTO reqDTO) throws WxPayException {
+        // 1. 构建 TransferBatchesRequest 请求
+        List<TransferBatchesRequest.TransferDetail> transferDetailList = Collections.singletonList(
+                TransferBatchesRequest.TransferDetail.newBuilder()
+                        .outDetailNo(reqDTO.getOutTransferNo())
+                        .transferAmount(reqDTO.getPrice())
+                        .transferRemark(reqDTO.getSubject())
+                        .openid(reqDTO.getOpenid())
+                        .build());
+        // TODO @luchi：能不能我们搞个 TransferBatchesRequestX extends TransferBatchesRequest，这样更简洁一点。
+        TransferBatchesRequest transferBatches = TransferBatchesRequest.newBuilder()
+                .appid(this.config.getAppId())
+                .outBatchNo(reqDTO.getOutTransferNo())
+                .batchName(reqDTO.getSubject())
+                .batchRemark(reqDTO.getSubject())
+                .totalAmount(reqDTO.getPrice())
+                .totalNum(transferDetailList.size())
+                .transferDetailList(transferDetailList).build()
+                .setNotifyUrl(reqDTO.getNotifyUrl());
+        // 2.1 执行请求
+        TransferBatchesResult transferBatchesResult = client.getTransferService().transferBatches(transferBatches);
+        // 2.2 创建返回结果
+        return PayTransferRespDTO.dealingOf(transferBatchesResult.getBatchId(), reqDTO.getOutTransferNo(), transferBatchesResult);
     }
 
     @Override
-    protected PayTransferRespDTO doGetTransfer(String outTradeNo, PayTransferTypeEnum type) {
-        throw new UnsupportedOperationException("待实现");
+    protected PayTransferRespDTO doGetTransfer(String outTradeNo, PayTransferTypeEnum type) throws WxPayException {
+        QueryTransferBatchesRequest request = QueryTransferBatchesRequest.newBuilder()
+                .outBatchNo(outTradeNo).needQueryDetail(true).offset(0).limit(20).detailStatus("ALL")
+                .build();
+        QueryTransferBatchesResult response = client.getTransferService().transferBatchesOutBatchNo(request);
+        QueryTransferBatchesResult.TransferBatch transferBatch = response.getTransferBatch();
+        if (Objects.equals("FINISHED", transferBatch.getBatchStatus())) {
+            // 明细中全部成功则成功，任一失败则失败
+            if (response.getTransferDetailList().stream().allMatch(detail -> Objects.equals("SUCCESS", detail.getDetailStatus()))) {
+                return PayTransferRespDTO.successOf(transferBatch.getBatchId(), parseDateV3(transferBatch.getUpdateTime()),
+                        transferBatch.getOutBatchNo(), response);
+            }
+            if (response.getTransferDetailList().stream().anyMatch(detail -> Objects.equals("FAIL", detail.getDetailStatus()))) {
+                return PayTransferRespDTO.closedOf(transferBatch.getBatchStatus(), transferBatch.getCloseReason(),
+                        transferBatch.getOutBatchNo(), response);
+            }
+        }
+        if (Objects.equals("CLOSED", transferBatch.getBatchStatus())) {
+            return PayTransferRespDTO.closedOf(transferBatch.getBatchStatus(), transferBatch.getCloseReason(),
+                    transferBatch.getOutBatchNo(), response);
+        }
+        return PayTransferRespDTO.dealingOf(transferBatch.getBatchId(), transferBatch.getOutBatchNo(), response);
     }
 
     // ========== 各种工具方法 ==========

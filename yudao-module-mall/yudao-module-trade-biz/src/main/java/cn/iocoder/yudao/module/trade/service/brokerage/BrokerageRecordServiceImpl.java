@@ -64,7 +64,7 @@ public class BrokerageRecordServiceImpl implements BrokerageRecordService {
     private ProductSkuApi productSkuApi;
 
     @Override
-    public BrokerageRecordDO getBrokerageRecord(Integer id) {
+    public BrokerageRecordDO getBrokerageRecord(Long id) {
         return brokerageRecordMapper.selectById(id);
     }
 

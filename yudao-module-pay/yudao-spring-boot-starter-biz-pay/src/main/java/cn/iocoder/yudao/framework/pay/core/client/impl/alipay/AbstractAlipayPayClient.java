@@ -325,6 +325,12 @@ public abstract class AbstractAlipayPayClient extends AbstractPayClient<AlipayPa
         }
     }
 
+    // TODO @chihuo：这里是不是也要实现，支付宝的。
+    @Override
+    protected PayTransferRespDTO doParseTransferNotify(Map<String, String> params, String body) throws Throwable {
+        throw new UnsupportedOperationException("未实现");
+    }
+
     // ========== 各种工具方法 ==========
 
     protected String formatAmount(Integer amount) {

@@ -2,7 +2,8 @@ package cn.iocoder.yudao.module.pay.api.transfer;
 
 import cn.iocoder.yudao.module.pay.api.transfer.dto.PayTransferCreateReqDTO;
 
-import javax.validation.Valid;
+import cn.iocoder.yudao.module.pay.api.transfer.dto.PayTransferRespDTO;
+import jakarta.validation.Valid;
 
 /**
  * 转账单 API 接口
@@ -18,5 +19,13 @@ public interface PayTransferApi {
      * @return 转账单编号
      */
     Long createTransfer(@Valid PayTransferCreateReqDTO reqDTO);
+
+    /**
+     * 获得转账单
+     *
+     * @param id 转账单编号
+     * @return 转账单
+     */
+    PayTransferRespDTO getTransfer(Long id);
 
 }

@@ -13,6 +13,7 @@ import javax.validation.constraints.NotNull;
 @Data
 public class PayTransferNotifyReqDTO {
 
+    // TODO 芋艿：要不要改成 orderId 待定；
     /**
      * 商户转账单号
      */
@@ -24,4 +25,5 @@ public class PayTransferNotifyReqDTO {
      */
     @NotNull(message = "转账订单编号不能为空")
     private Long payTransferId;
+
 }

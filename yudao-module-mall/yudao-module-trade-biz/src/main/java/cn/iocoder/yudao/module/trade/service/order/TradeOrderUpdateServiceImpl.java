@@ -36,6 +36,7 @@ import cn.iocoder.yudao.module.trade.controller.app.order.vo.item.AppTradeOrderI
 import cn.iocoder.yudao.module.trade.convert.order.TradeOrderConvert;
 import cn.iocoder.yudao.module.trade.dal.dataobject.cart.CartDO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.delivery.DeliveryExpressDO;
+import cn.iocoder.yudao.module.trade.dal.dataobject.delivery.DeliveryPickUpStoreDO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderDO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderItemDO;
 import cn.iocoder.yudao.module.trade.dal.mysql.order.TradeOrderItemMapper;
@@ -48,6 +49,7 @@ import cn.iocoder.yudao.module.trade.framework.order.core.annotations.TradeOrder
 import cn.iocoder.yudao.module.trade.framework.order.core.utils.TradeOrderLogUtils;
 import cn.iocoder.yudao.module.trade.service.cart.CartService;
 import cn.iocoder.yudao.module.trade.service.delivery.DeliveryExpressService;
+import cn.iocoder.yudao.module.trade.service.delivery.DeliveryPickUpStoreService;
 import cn.iocoder.yudao.module.trade.service.message.TradeMessageService;
 import cn.iocoder.yudao.module.trade.service.message.bo.TradeOrderMessageWhenDeliveryOrderReqBO;
 import cn.iocoder.yudao.module.trade.service.order.handler.TradeOrderHandler;
@@ -104,6 +106,8 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
     private DeliveryExpressService deliveryExpressService;
     @Resource
     private TradeMessageService tradeMessageService;
+    @Resource
+    private DeliveryPickUpStoreService pickUpStoreService;
 
     @Resource
     private PayOrderApi payOrderApi;
@@ -718,14 +722,14 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
 
     @Override
     @TradeOrderLog(operateType = TradeOrderOperateTypeEnum.ADMIN_PICK_UP_RECEIVE)
-    public void pickUpOrderByAdmin(Long id) {
-        getSelf().pickUpOrder(tradeOrderMapper.selectById(id));
+    public void pickUpOrderByAdmin(Long userId, Long id) {
+        getSelf().pickUpOrder(userId, tradeOrderMapper.selectById(id));
     }
 
     @Override
     @TradeOrderLog(operateType = TradeOrderOperateTypeEnum.ADMIN_PICK_UP_RECEIVE)
-    public void pickUpOrderByAdmin(String pickUpVerifyCode) {
-        getSelf().pickUpOrder(tradeOrderMapper.selectOneByPickUpVerifyCode(pickUpVerifyCode));
+    public void pickUpOrderByAdmin(Long userId, String pickUpVerifyCode) {
+        getSelf().pickUpOrder(userId, tradeOrderMapper.selectOneByPickUpVerifyCode(pickUpVerifyCode));
     }
 
     @Override
@@ -734,13 +738,19 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public void pickUpOrder(TradeOrderDO order) {
+    public void pickUpOrder(Long userId, TradeOrderDO order) {
         if (order == null) {
             throw exception(ORDER_NOT_FOUND);
         }
         if (ObjUtil.notEqual(DeliveryTypeEnum.PICK_UP.getType(), order.getDeliveryType())) {
             throw exception(ORDER_RECEIVE_FAIL_DELIVERY_TYPE_NOT_PICK_UP);
         }
+        DeliveryPickUpStoreDO deliveryPickUpStore = pickUpStoreService.getDeliveryPickUpStore(order.getPickUpStoreId());
+        if (deliveryPickUpStore == null
+            || !CollUtil.contains(deliveryPickUpStore.getVerifyUserIds(), userId)) {
+            throw exception(ORDER_PICK_UP_FAIL_NOT_VERIFY_USER);
+        }
+
         receiveOrder0(order);
     }
 
