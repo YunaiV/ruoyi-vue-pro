@@ -20,7 +20,7 @@ public enum PayWalletBizTypeEnum implements IntArrayValuable {
     PAYMENT(3, "支付"),
     PAYMENT_REFUND(4, "支付退款"),
     UPDATE_BALANCE(5, "更新余额"),
-    WITHDRAW(6, "分佣提现");
+    BROKERAGE_WITHDRAW(6, "分佣提现");
 
     /**
      * 业务分类
@@ -36,6 +36,10 @@ public enum PayWalletBizTypeEnum implements IntArrayValuable {
     @Override
     public int[] array() {
          return ARRAYS;
+    }
+
+    public static PayWalletBizTypeEnum valueOf(Integer type) {
+        return Arrays.stream(values()).filter(item -> item.getType().equals(type)).findFirst().orElse(null);
     }
 
 }

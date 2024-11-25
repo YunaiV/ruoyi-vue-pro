@@ -9,8 +9,7 @@ import cn.iocoder.yudao.module.pay.api.transfer.PayTransferApi;
 import cn.iocoder.yudao.module.pay.api.transfer.dto.PayTransferCreateReqDTO;
 import cn.iocoder.yudao.module.pay.api.transfer.dto.PayTransferRespDTO;
 import cn.iocoder.yudao.module.pay.api.wallet.PayWalletApi;
-import cn.iocoder.yudao.module.pay.api.wallet.dto.PayWalletCreateReqDto;
-import cn.iocoder.yudao.module.pay.api.wallet.dto.PayWalletRespDTO;
+import cn.iocoder.yudao.module.pay.api.wallet.dto.PayWalletAddBalanceReqDTO;
 import cn.iocoder.yudao.module.pay.enums.transfer.PayTransferStatusEnum;
 import cn.iocoder.yudao.module.pay.enums.transfer.PayTransferTypeEnum;
 import cn.iocoder.yudao.module.pay.enums.wallet.PayWalletBizTypeEnum;
@@ -24,7 +23,6 @@ import cn.iocoder.yudao.module.trade.convert.brokerage.BrokerageWithdrawConvert;
 import cn.iocoder.yudao.module.trade.dal.dataobject.brokerage.BrokerageWithdrawDO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.config.TradeConfigDO;
 import cn.iocoder.yudao.module.trade.dal.mysql.brokerage.BrokerageWithdrawMapper;
-import cn.iocoder.yudao.module.trade.enums.MessageTemplateConstants;
 import cn.iocoder.yudao.module.trade.enums.brokerage.BrokerageRecordBizTypeEnum;
 import cn.iocoder.yudao.module.trade.enums.brokerage.BrokerageWithdrawStatusEnum;
 import cn.iocoder.yudao.module.trade.enums.brokerage.BrokerageWithdrawTypeEnum;
@@ -33,6 +31,7 @@ import cn.iocoder.yudao.module.trade.service.brokerage.bo.BrokerageWithdrawSumma
 import cn.iocoder.yudao.module.trade.service.config.TradeConfigService;
 import jakarta.annotation.Resource;
 import jakarta.validation.Validator;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
@@ -43,6 +42,7 @@ import java.util.Collections;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.framework.common.util.servlet.ServletUtils.getClientIP;
 import static cn.iocoder.yudao.module.trade.enums.ErrorCodeConstants.*;
 
 /**
@@ -52,6 +52,7 @@ import static cn.iocoder.yudao.module.trade.enums.ErrorCodeConstants.*;
  */
 @Service
 @Validated
+@Slf4j
 public class BrokerageWithdrawServiceImpl implements BrokerageWithdrawService {
 
     @Resource
@@ -82,62 +83,55 @@ public class BrokerageWithdrawServiceImpl implements BrokerageWithdrawService {
     public void auditBrokerageWithdraw(Long id, BrokerageWithdrawStatusEnum status, String auditReason, String userIp) {
         // 1.1 校验存在
         BrokerageWithdrawDO withdraw = validateBrokerageWithdrawExists(id);
-
         // 1.2 校验状态为审核中
         if (ObjectUtil.notEqual(BrokerageWithdrawStatusEnum.AUDITING.getStatus(), withdraw.getStatus())) {
             throw exception(BROKERAGE_WITHDRAW_STATUS_NOT_AUDITING);
         }
 
-        // 2. 更新
+        // 2. 更新状态
         int rows = brokerageWithdrawMapper.updateByIdAndStatus(id, BrokerageWithdrawStatusEnum.AUDITING.getStatus(),
                 new BrokerageWithdrawDO().setStatus(status.getStatus()).setAuditReason(auditReason).setAuditTime(LocalDateTime.now()));
         if (rows == 0) {
             throw exception(BROKERAGE_WITHDRAW_STATUS_NOT_AUDITING);
         }
 
-        String templateCode;
+        // 3.1 审批通过的后续处理
         if (BrokerageWithdrawStatusEnum.AUDIT_SUCCESS.equals(status)) {
-            templateCode = MessageTemplateConstants.SMS_BROKERAGE_WITHDRAW_AUDIT_APPROVE;
-            // 3.1 通过时佣金转余额
-            if (BrokerageWithdrawTypeEnum.WALLET.getType().equals(withdraw.getType())) {
-                // TODO 改成直接调用 addWallet 增加余额，不用查询 wallet
-                PayWalletRespDTO wallet = payWalletApi.getWalletByUserId(withdraw.getUserId());
-                payWalletApi.addWallet(new PayWalletCreateReqDto()
-                        .setWalletId(wallet.getId())
-                        .setBizType(PayWalletBizTypeEnum.WITHDRAW)
-                        .setBizId(withdraw.getId().toString())
-                        .setPrice(withdraw.getPrice())
-                        .setTitle("分佣提现"));
-                rows = brokerageWithdrawMapper.updateByIdAndStatus(id, BrokerageWithdrawStatusEnum.AUDIT_SUCCESS.getStatus(),
-                        new BrokerageWithdrawDO().setStatus(BrokerageWithdrawStatusEnum.WITHDRAW_SUCCESS.getStatus()).setAuditReason(auditReason).setAuditTime(LocalDateTime.now()));
-                if (rows == 0) {
-                    throw exception(BROKERAGE_WITHDRAW_STATUS_NOT_AUDITING);
-                }
-            } else if (BrokerageWithdrawTypeEnum.WECHAT_API.getType().equals(withdraw.getType())) {
-                // TODO @luchi：这里，要加个转账单号的记录；另外，调用 API 转账，是立马成功，还是有延迟的哈？
-                Long payTransferId = createPayTransfer(userIp, withdraw);
-            }
+            auditBrokerageWithdrawSuccess(withdraw);
+        // 3.2 审批不通过的后续处理
         } else if (BrokerageWithdrawStatusEnum.AUDIT_FAIL.equals(status)) {
-            templateCode = MessageTemplateConstants.SMS_BROKERAGE_WITHDRAW_AUDIT_REJECT;
-            // 3.2 驳回时需要退还用户佣金
             brokerageRecordService.addBrokerage(withdraw.getUserId(), BrokerageRecordBizTypeEnum.WITHDRAW_REJECT,
                     String.valueOf(withdraw.getId()), withdraw.getPrice(), BrokerageRecordBizTypeEnum.WITHDRAW_REJECT.getTitle());
         } else {
             throw new IllegalArgumentException("不支持的提现状态：" + status);
         }
-
-        // TODO @luchi：这个通知，还是要的呀~~~
-        // 4. 通知用户
-//        Map<String, Object> templateParams = MapUtil.<String, Object>builder()
-//                .put("createTime", LocalDateTimeUtil.formatNormal(withdraw.getCreateTime()))
-//                .put("price", MoneyUtils.fenToYuanStr(withdraw.getPrice()))
-//                .put("reason", auditReason)
-//                .build();
-//        notifyMessageSendApi.sendSingleMessageToMember(new NotifySendSingleToUserReqDTO()
-//                .setUserId(withdraw.getUserId()).setTemplateCode(templateCode).setTemplateParams(templateParams));
     }
 
-    private Long createPayTransfer(String userIp, BrokerageWithdrawDO withdraw) {
+    private void auditBrokerageWithdrawSuccess(BrokerageWithdrawDO withdraw) {
+        // 1.1 钱包
+        if (BrokerageWithdrawTypeEnum.WALLET.getType().equals(withdraw.getType())) {
+            payWalletApi.addWalletBalance(new PayWalletAddBalanceReqDTO()
+                    .setUserId(withdraw.getUserId()).setUserType(UserTypeEnum.MEMBER.getValue())
+                    .setBizType(PayWalletBizTypeEnum.BROKERAGE_WITHDRAW.getType()).setBizId(withdraw.getId().toString())
+                    .setPrice(withdraw.getPrice()));
+        // 1.2 微信 API
+        } else if (BrokerageWithdrawTypeEnum.WECHAT_API.getType().equals(withdraw.getType())) {
+            // TODO @luchi：这里，要加个转账单号的记录；另外，调用 API 转账，是立马成功，还是有延迟的哈？
+            Long payTransferId = createPayTransfer(withdraw);
+        // 1.3 剩余类型，都是手动打款，所以不处理
+        } else {
+            // TODO 可优化：未来可以考虑，接入支付宝、银联等 API 转账，实现自动打款
+            log.info("[auditBrokerageWithdrawSuccess][withdraw({}) 类型({}) 手动打款，无需处理]", withdraw.getId(), withdraw.getType());
+        }
+
+        // 2. 非支付 API，则直接体现成功
+        if (!BrokerageWithdrawTypeEnum.isApi(withdraw.getType())) {
+            brokerageWithdrawMapper.updateByIdAndStatus(withdraw.getId(), BrokerageWithdrawStatusEnum.AUDIT_SUCCESS.getStatus(),
+                    new BrokerageWithdrawDO().setStatus(BrokerageWithdrawStatusEnum.WITHDRAW_SUCCESS.getStatus()));
+        }
+    }
+
+    private Long createPayTransfer(BrokerageWithdrawDO withdraw) {
         // 1.1 获取微信 openid
         SocialUserRespDTO socialUser = socialUserApi.getSocialUserByUserId(
                 UserTypeEnum.MEMBER.getValue(), withdraw.getUserId(), SocialTypeEnum.WECHAT_MINI_APP.getType());
@@ -149,7 +143,7 @@ public class BrokerageWithdrawServiceImpl implements BrokerageWithdrawService {
                 .setMerchantTransferId(withdraw.getId().toString())
                 .setPrice(withdraw.getPrice())
                 .setSubject("佣金提现")
-                .setOpenid(socialUser.getOpenid()).setUserIp(userIp);
+                .setOpenid(socialUser.getOpenid()).setUserIp(getClientIP());
         // 2. 发起请求
         return payTransferApi.createTransfer(payTransferCreateReqDTO);
     }
@@ -230,6 +224,7 @@ public class BrokerageWithdrawServiceImpl implements BrokerageWithdrawService {
         // TODO @luchi：建议参考支付那，即使成功的情况下，也要各种校验；金额是否匹配、转账单号是否匹配、是否重复调用；
         if (PayTransferStatusEnum.isSuccess(transfer.getStatus())) {
             withdraw.setStatus(BrokerageWithdrawStatusEnum.WITHDRAW_SUCCESS.getStatus());
+            // TODO @luchi：发送站内信
         } else if (PayTransferStatusEnum.isPendingStatus(transfer.getStatus())) {
             // TODO @luchi：这里，是不是不用更新哈？
             withdraw.setStatus(BrokerageWithdrawStatusEnum.AUDIT_SUCCESS.getStatus());

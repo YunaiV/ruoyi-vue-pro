@@ -1,35 +1,42 @@
 package cn.iocoder.yudao.module.pay.api.wallet.dto;
 
-import cn.iocoder.yudao.module.pay.enums.wallet.PayWalletBizTypeEnum;
+import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
+/**
+ * 钱包余额增加 Request DTO
+ *
+ * @author 芋道源码
+ */
 @Data
-public class PayWalletCreateReqDto {
+public class PayWalletAddBalanceReqDTO {
 
     /**
-     * 钱包编号
+     * 用户编号
+     *
+     * 关联 MemberUserDO 的 id 属性，或者 AdminUserDO 的 id 属性
      */
-    @NotNull(message = "钱包编号不能为空")
-    private Long walletId;
+    @NotNull(message = "用户编号不能为空")
+    private Long userId;
+    /**
+     * 用户类型
+     *
+     * 关联 {@link  UserTypeEnum}
+     */
+    @NotNull(message = "用户类型不能为空")
+    private Integer userType;
 
     /**
      * 关联业务分类
      */
     @NotNull(message = "关联业务分类不能为空")
-    private PayWalletBizTypeEnum bizType;
-
+    private Integer bizType;
     /**
      * 关联业务编号
      */
     @NotNull(message = "关联业务编号不能为空")
     private String bizId;
-
-    /**
-     * 流水说明
-     */
-    @NotNull(message = "流水说明不能为空")
-    private String title;
 
     /**
      * 交易金额，单位分

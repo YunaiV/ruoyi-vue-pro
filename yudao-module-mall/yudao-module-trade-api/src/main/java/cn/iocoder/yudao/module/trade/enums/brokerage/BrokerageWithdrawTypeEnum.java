@@ -38,4 +38,14 @@ public enum BrokerageWithdrawTypeEnum implements IntArrayValuable {
         return ARRAYS;
     }
 
+    /**
+     * 是否通过支付平台的 API 打款
+     *
+     * @param type 类型
+     * @return 是否
+     */
+    public static boolean isApi(Integer type) {
+        return WECHAT_API.getType().equals(type);
+    }
+
 }
