@@ -7,12 +7,13 @@ import cn.iocoder.yudao.module.trade.controller.admin.brokerage.vo.withdraw.Brok
 import cn.iocoder.yudao.module.trade.dal.dataobject.brokerage.BrokerageWithdrawDO;
 import cn.iocoder.yudao.module.trade.dal.mysql.brokerage.BrokerageWithdrawMapper;
 import cn.iocoder.yudao.module.trade.service.config.TradeConfigService;
-import jakarta.annotation.Resource;
-import jakarta.validation.Validator;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
+
+import javax.annotation.Resource;
+import javax.validation.Validator;
 
 import static cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils.buildBetweenTime;
 import static cn.iocoder.yudao.framework.common.util.object.ObjectUtils.cloneIgnoreId;

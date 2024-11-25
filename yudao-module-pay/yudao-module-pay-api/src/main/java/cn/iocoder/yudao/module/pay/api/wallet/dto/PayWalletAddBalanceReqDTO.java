@@ -1,8 +1,9 @@
 package cn.iocoder.yudao.module.pay.api.wallet.dto;
 
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
-import jakarta.validation.constraints.NotNull;
 import lombok.Data;
+
+import javax.validation.constraints.NotNull;
 
 /**
  * 钱包余额增加 Request DTO
