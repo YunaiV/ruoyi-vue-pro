@@ -278,8 +278,8 @@ public class BpmnModelUtils {
         }
         Map<String, String> fieldsPermission = MapUtil.newHashMap();
         extensionElements.forEach(element -> {
-            String field = element.getAttributeValue(FLOWABLE_EXTENSIONS_NAMESPACE, FORM_FIELD_PERMISSION_ELEMENT_FIELD_ATTRIBUTE);
-            String permission = element.getAttributeValue(FLOWABLE_EXTENSIONS_NAMESPACE, FORM_FIELD_PERMISSION_ELEMENT_PERMISSION_ATTRIBUTE);
+            String field = element.getAttributeValue(null, FORM_FIELD_PERMISSION_ELEMENT_FIELD_ATTRIBUTE);
+            String permission = element.getAttributeValue(null, FORM_FIELD_PERMISSION_ELEMENT_PERMISSION_ATTRIBUTE);
             if (StrUtil.isNotEmpty(field) && StrUtil.isNotEmpty(permission)) {
                 fieldsPermission.put(field, permission);
             }
