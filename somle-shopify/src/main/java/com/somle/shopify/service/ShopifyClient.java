@@ -6,13 +6,13 @@ import com.somle.framework.common.util.json.JsonUtils;
 import com.somle.framework.common.util.web.RequestX;
 import com.somle.framework.common.util.web.WebUtils;
 import com.somle.shopify.model.ShopifyToken;
+import lombok.Setter;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.OkHttpClient;
+import okhttp3.Response;
 
-import java.net.InetSocketAddress;
 import java.util.Map;
-import java.net.Proxy;
 
 // https://shopify.dev/docs/api/admin-rest/
 @Slf4j
@@ -22,9 +22,13 @@ public class ShopifyClient {
 
     private final String url;
 
+    @Setter
+    private OkHttpClient webClient;
+
     public ShopifyClient(ShopifyToken token) {
         this.token = token;
         this.url = String.format("https://%s.myshopify.com", token.getSubdomain());
+        this.webClient = new OkHttpClient();
     }
 
 
@@ -40,7 +44,7 @@ public class ShopifyClient {
             .url(url+endpoint)
             .headers(headers)
             .build();
-        var bodyString = WebUtils.sendRequest(request).body().string();
+        var bodyString = sendRequest(request).body().string();
         var result = JsonUtils.parseObject(bodyString, JSONObject.class);
         return result;
     }
@@ -57,7 +61,7 @@ public class ShopifyClient {
             .url(url+endpoint)
             .headers(headers)
             .build();
-        var bodyString = WebUtils.sendRequest(request).body().string();
+        var bodyString = sendRequest(request).body().string();
         var result = JsonUtils.parseObject(bodyString, JSONObject.class);
         return result;
     }
@@ -74,30 +78,15 @@ public class ShopifyClient {
             .url(url+endpoint)
             .headers(headers)
             .build();
-        var bodyString = WebUtils.sendRequest(request).body().string();
+        var bodyString = sendRequest(request).body().string();
         var result = JsonUtils.parseObject(bodyString, JSONObject.class);
         return result;
     }
 
-    private void getRequest(String url, Object queryParams, Map<String, String> headers) {
+    @SneakyThrows
+    private Response sendRequest(RequestX request) {
         // Define the proxy details
-        String proxyHost = "proxy.example.com";
-        int proxyPort = 8080;
-
-        // Create a Proxy instance
-        Proxy proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress(proxyHost, proxyPort));
-
-        OkHttpClient client = new OkHttpClient.Builder()
-            .proxy(proxy)
-            .proxyAuthenticator((route, response) -> {
-                String credential = okhttp3.Credentials.basic("proxyUser", "proxyPassword");
-                return response.request().newBuilder()
-                    .header("Proxy-Authorization", credential)
-                    .build();
-            })
-            .build();
-
-
+        return webClient.newCall(WebUtils.toOkHttp(request)).execute();
     }
 
 

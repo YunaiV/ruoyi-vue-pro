@@ -4,7 +4,10 @@ package com.somle.esb.service;
 import cn.iocoder.yudao.framework.mybatis.config.YudaoMybatisAutoConfiguration;
 import cn.iocoder.yudao.framework.security.config.YudaoSecurityAutoConfiguration;
 import cn.iocoder.yudao.module.infra.api.config.ConfigApi;
+import cn.iocoder.yudao.module.infra.api.config.ConfigApiImpl;
 import cn.iocoder.yudao.module.infra.api.file.FileApi;
+import cn.iocoder.yudao.module.infra.service.config.ConfigService;
+import cn.iocoder.yudao.module.infra.service.config.ConfigServiceImpl;
 import cn.iocoder.yudao.module.system.api.dept.DeptApi;
 import cn.iocoder.yudao.module.system.api.dept.DeptApiImpl;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
@@ -14,6 +17,7 @@ import cn.iocoder.yudao.module.system.service.dept.DeptServiceImpl;
 import com.baomidou.mybatisplus.autoconfigure.MybatisPlusAutoConfiguration;
 import com.github.yulichang.autoconfigure.MybatisPlusJoinAutoConfiguration;
 import com.somle.framework.test.core.ut.BaseSpringTest;
+import com.somle.shopify.service.ShopifyService;
 import lombok.extern.slf4j.Slf4j;
 import com.somle.ai.service.AiService;
 import com.somle.amazon.service.AmazonService;
@@ -45,6 +49,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 //    DingTalkService.class,
     KingdeeService.class,
     AmazonService.class,
+    ShopifyService.class,
 
 
 
@@ -64,8 +69,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 //    TenantServiceImpl.class,
 //    PermissionApiImpl.class,
 //    PermissionServiceImpl.class,
+    ConfigApiImpl.class,
+    ConfigServiceImpl.class,
 
-    YudaoSecurityAutoConfiguration.class,
+
+//    YudaoSecurityAutoConfiguration.class,
     SecurityAutoConfiguration.class,
 
     IntegrationConfig.class,
@@ -112,7 +120,7 @@ class EsbServiceTest extends BaseSpringTest {
     private PasswordEncoder passwordEncoder;
     @MockBean
     private FileApi fileApi;
-    @MockBean
+    @Resource
     private ConfigApi configApi;
 
     @Test
@@ -123,6 +131,11 @@ class EsbServiceTest extends BaseSpringTest {
     @Test
     public void test1() {
         deptApi.getDept(50007L);
+    }
+
+    @Test
+    public void test3() {
+        log.info(configApi.getConfigValueByKey("system.user.init-passwor"));
     }
 
 

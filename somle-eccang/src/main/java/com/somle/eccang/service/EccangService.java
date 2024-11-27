@@ -138,7 +138,7 @@ public class EccangService {
             var request = RequestX.builder()
                 .requestMethod(RequestX.Method.POST)
                 .url(url)
-                .payload(payload)
+                .payload(requestBody)
                 .build();
             var response = WebUtils.sendRequest(request);
             switch (response.code()) {

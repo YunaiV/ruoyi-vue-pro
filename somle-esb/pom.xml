@@ -31,6 +31,19 @@
 
         <dependency>
             <groupId>cn.iocoder.boot</groupId>
+            <artifactId>yudao-module-infra-api</artifactId>
+            <version>${revision}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>cn.iocoder.boot</groupId>
+            <artifactId>yudao-module-infra-biz</artifactId>
+            <version>${revision}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>cn.iocoder.boot</groupId>
             <artifactId>yudao-module-erp-api</artifactId>
             <version>${revision}</version>
         </dependency>

@@ -3,6 +3,7 @@ package com.somle.esb.service;
 import cn.hutool.core.util.ObjUtil;
 import cn.iocoder.yudao.module.erp.api.product.dto.ErpCustomRuleDTO;
 import cn.iocoder.yudao.module.erp.api.supplier.dto.ErpSupplierDTO;
+import cn.iocoder.yudao.module.infra.api.config.ConfigApi;
 import cn.iocoder.yudao.module.system.api.dept.DeptApi;
 import cn.iocoder.yudao.module.system.api.dept.dto.DeptReqDTO;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
@@ -25,7 +26,10 @@ import com.somle.kingdee.model.KingdeeProduct;
 import com.somle.kingdee.model.supplier.KingdeeSupplier;
 import com.somle.kingdee.service.KingdeeService;
 import com.somle.matomo.service.MatomoService;
+import com.somle.shopify.service.ShopifyService;
+import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
+import okhttp3.OkHttpClient;
 import org.quartz.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
@@ -35,6 +39,8 @@ import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.stereotype.Service;
 
+import java.net.InetSocketAddress;
+import java.net.Proxy;
 import java.util.List;
 import java.util.Objects;
 
@@ -58,16 +64,13 @@ public class EsbService {
     @Autowired
     DingTalkService dingTalkService;
 
+    @Autowired
+    ShopifyService shopifyService;
+
 
     @Autowired
     MatomoService matomoService;
 
-
-    @Autowired
-    private DeptApi deptApi;
-
-    @Autowired
-    private AdminUserApi adminUserApi;
 
     @Autowired
     AiService aiService;
@@ -98,8 +101,49 @@ public class EsbService {
 
 
 
+
+    @Autowired
+    private DeptApi deptApi;
+
+    @Autowired
+    private AdminUserApi adminUserApi;
+
+    @Autowired
+    private ConfigApi configApi;
+
+
+
     @Autowired
     private ApplicationContext applicationContext;
+
+    @PostConstruct
+    private void init() {
+        try {
+            var proxyHost = configApi.getConfigValueByKey("proxy.host");
+            var proxyPort = Integer.valueOf(configApi.getConfigValueByKey("proxy.port"));
+            var proxyUsername = configApi.getConfigValueByKey("proxy.username");
+            var proxyPassword = configApi.getConfigValueByKey("proxy.password");
+
+            // Create a Proxy instance
+            Proxy proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress(proxyHost, proxyPort));
+
+            OkHttpClient client = new OkHttpClient.Builder()
+                .proxy(proxy)
+                .proxyAuthenticator((route, response) -> {
+                    String credential = okhttp3.Credentials.basic(configApi.getConfigValueByKey("proxy.username"), configApi.getConfigValueByKey("proxy.password"));
+                    return response.request().newBuilder()
+                        .header("Proxy-Authorization", credential)
+                        .build();
+                })
+                .build();
+
+            shopifyService.client.setWebClient(client);
+            log.info("using proxy");
+        } catch (Exception e) {
+            log.error("not using proxy");
+        }
+
+    }
 
 
     public void printAllBeans() {

@@ -44,7 +44,7 @@ public class EccangTest extends BaseSpringTest {
 
     @Test
     void list() {
-        var result = service.list("getWarehouse");
+        var result = service.list("getShippingMethod");
         System.out.println(result.toString());
     }
 
