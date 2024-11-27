@@ -3,6 +3,7 @@ package com.somle.ai.service;
 import com.somle.ai.model.AiName;
 import com.somle.ai.model.AiReqVO;
 import com.somle.ai.model.AiResponse;
+import com.somle.framework.common.util.web.RequestX;
 import com.somle.framework.common.util.web.WebUtils;
 
 import lombok.extern.slf4j.Slf4j;
@@ -53,15 +54,26 @@ public class AiService {
 
     public void addName(AiName name) {
         String endUrl = "/api/persons/";
-        AiName response = WebUtils.postRequest(baseUrl + endUrl, Map.of(), headers, name, AiName.class);
+        var request = RequestX.builder()
+            .requestMethod(RequestX.Method.POST)
+            .url(baseUrl + endUrl)
+            .headers(headers)
+            .payload(name)
+            .build();
+        AiName response = WebUtils.sendRequest(request, AiName.class);
 
     }
 
 
     public void addAddress(Object address) {
         String endUrl = "/api/locationsdtl/";
-
-        AiResponse response = WebUtils.postRequest(baseUrl + endUrl, Map.of(), headers, address, AiResponse.class);
+        var request = RequestX.builder()
+            .requestMethod(RequestX.Method.POST)
+            .url(baseUrl + endUrl)
+            .headers(headers)
+            .payload(address)
+            .build();
+        AiResponse response = WebUtils.sendRequest(request, AiResponse.class);
 
     }
 
@@ -114,7 +126,12 @@ public class AiService {
 
     public Stream<AiResponse> getReponsesFromUrl(String url) {
         log.debug("fetching from url: " + url);
-        AiResponse response = WebUtils.getRequest(url, Map.of(), headers, AiResponse.class);
+        var request = RequestX.builder()
+            .requestMethod(RequestX.Method.GET)
+            .url(url)
+            .headers(headers)
+            .build();
+        AiResponse response = WebUtils.sendRequest(request, AiResponse.class);
 
         log.debug("next url is: " + response.getNext());
         Stream<AiResponse> moreResponse = response.getNext() == null ? Stream.empty() : getReponsesFromUrl(response.getNext());

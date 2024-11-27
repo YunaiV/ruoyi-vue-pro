@@ -1,12 +1,12 @@
 package com.somle.amazon.service;
 
-import cn.hutool.json.JSON;
 import com.somle.amazon.model.AmazonAccount;
 import com.somle.amazon.model.AmazonShop;
 import com.somle.framework.common.util.general.CoreUtils;
 import com.somle.framework.common.util.json.JSONArray;
 import com.somle.framework.common.util.json.JSONObject;
 import com.somle.framework.common.util.json.JsonUtils;
+import com.somle.framework.common.util.web.RequestX;
 import com.somle.framework.common.util.web.WebUtils;
 
 import lombok.AllArgsConstructor;
@@ -14,11 +14,8 @@ import lombok.Setter;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
-import okhttp3.Response;
-import org.junit.jupiter.params.shadow.com.univocity.parsers.annotations.Validate;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.net.SocketTimeoutException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -131,7 +128,13 @@ public class AmazonAdClient {
         String reportId = null;
         while (reportId == null) {
             log.info("Creating ad report...");
-            var response = WebUtils.postRequest(fullUrl, Map.of(), generateHeaders(shop), payload);
+            var request = RequestX.builder()
+                .requestMethod(RequestX.Method.POST)
+                .url(fullUrl)
+                .headers(generateHeaders(shop))
+                .payload(payload)
+                .build();
+            var response = WebUtils.sendRequest(request);
             switch (response.code()) {
                 case 200:
                     break;
@@ -168,7 +171,12 @@ public class AmazonAdClient {
             String reportStatusUrl = endpoint + "/reporting/reports/" + reportId;
             log.info("Checking report status...");
             var tokenExpireTime = shop.getSeller().getAdExpireTime();
-            var response = WebUtils.getRequest(reportStatusUrl, Map.of(), generateHeaders(shop));
+            var request = RequestX.builder()
+                .requestMethod(RequestX.Method.GET)
+                .url(reportStatusUrl)
+                .headers(generateHeaders(shop))
+                .build();
+            var response = WebUtils.sendRequest(request);
             switch (response.code()) {
                 case 200:
                     break;

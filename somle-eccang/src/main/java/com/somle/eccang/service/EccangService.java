@@ -13,15 +13,13 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import cn.hutool.core.collection.BoundedPriorityQueue;
 import cn.hutool.core.collection.CollUtil;
 import com.somle.eccang.model.*;
 import com.somle.framework.common.util.json.JsonUtils;
 import com.somle.framework.common.util.json.JSONObject;
 
+import com.somle.framework.common.util.web.RequestX;
 import lombok.SneakyThrows;
-import com.somle.framework.common.util.object.ObjectUtils;
-import okhttp3.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.integration.support.MessageBuilder;
@@ -136,7 +134,13 @@ public class EccangService {
 
         EccangResponse responseFinal = retryTemplate.execute(ctx -> {
             var requestBody = requestBody(payload, endpoint);
-            var response = WebUtils.postRequest(url, Map.of(), Map.of(), requestBody);
+
+            var request = RequestX.builder()
+                .requestMethod(RequestX.Method.POST)
+                .url(url)
+                .payload(payload)
+                .build();
+            var response = WebUtils.sendRequest(request);
             switch (response.code()) {
                 case 200:
                     var responseBody = response.body().string();

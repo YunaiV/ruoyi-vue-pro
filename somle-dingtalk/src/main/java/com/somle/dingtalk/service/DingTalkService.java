@@ -14,6 +14,7 @@ import com.dingtalk.api.response.OapiUserListidResponse;
 import com.dingtalk.api.response.OapiV2UserGetResponse;
 import com.somle.framework.common.util.json.JSONObject;
 import com.somle.framework.common.util.json.JsonUtils;
+import com.somle.framework.common.util.web.RequestX;
 import jakarta.annotation.PostConstruct;
 
 import lombok.SneakyThrows;
@@ -70,7 +71,12 @@ public class DingTalkService {
         DingTalkToken token = tokenRepository.findAll().get(0);
         payload.put("appKey", token.getAppKey());
         payload.put("appSecret", token.getAppSecret());
-        String accessToken = WebUtils.postRequest(url, Map.of(), Map.of(), payload, JSONObject.class).getString("accessToken");
+        var request = RequestX.builder()
+            .requestMethod(RequestX.Method.POST)
+            .url(url)
+            .payload(payload)
+            .build();
+        String accessToken = WebUtils.sendRequest(request, JSONObject.class).getString("accessToken");
         token.setAccessToken(accessToken);
         return token;
     }
@@ -88,7 +94,14 @@ public class DingTalkService {
         var payload = JsonUtils.newObject();
         payload.put("dept_id", deptId);
         try {
-            DingTalkResponse response = WebUtils.postRequest(baseHost + endUrl, params, headers, payload, DingTalkResponse.class);
+            var request = RequestX.builder()
+                .requestMethod(RequestX.Method.POST)
+                .url(baseHost + endUrl)
+                .queryParams(params)
+                .headers(headers)
+                .payload(payload)
+                .build();
+            DingTalkResponse response = WebUtils.sendRequest(request, DingTalkResponse.class);
             // 检查响应
             validateResponse(response);
             // 返回部门详情
@@ -152,7 +165,14 @@ public class DingTalkService {
         );
         var payload = JsonUtils.newObject();
         payload.put("dept_id", deptId);
-        DingTalkResponse response = WebUtils.postRequest(baseHost + endUrl, params, headers, payload, DingTalkResponse.class);
+        var request = RequestX.builder()
+            .requestMethod(RequestX.Method.POST)
+            .url(baseHost + endUrl)
+            .queryParams(params)
+            .headers(headers)
+            .payload(payload)
+            .build();
+        DingTalkResponse response = WebUtils.sendRequest(request, DingTalkResponse.class);
         log.debug(response.toString());
         return response.getResultList(DingTalkDepartment.class).stream();
     }
@@ -219,7 +239,14 @@ public class DingTalkService {
         );
         Map<String, String> headers = Map.of(
         );
-        DingTalkResponse response = WebUtils.postRequest(baseHost + endUrl, params, headers, dept, DingTalkResponse.class);
+        var request = RequestX.builder()
+            .requestMethod(RequestX.Method.POST)
+            .url(baseHost + endUrl)
+            .queryParams(params)
+            .headers(headers)
+            .payload(dept)
+            .build();
+        DingTalkResponse response = WebUtils.sendRequest(request, DingTalkResponse.class);
         return response;
     }
 

@@ -4,6 +4,7 @@ import com.somle.amazon.model.AmazonAccount;
 import com.somle.amazon.model.AmazonSeller;
 import com.somle.amazon.repository.AmazonAccountRepository;
 import com.somle.amazon.repository.AmazonShopRepository;
+import com.somle.framework.common.util.web.RequestX;
 import com.somle.framework.common.util.web.WebUtils;
 import com.somle.framework.common.util.json.JSONObject;
 import com.somle.framework.common.util.json.JsonUtils;
@@ -91,7 +92,12 @@ public class AmazonService {
         body.put("client_secret", clientSecret);
         body.put("refresh_token", refreshToken);
         try {
-            JSONObject response = WebUtils.postRequest(authUrl, Map.of(), Map.of(), body, JSONObject.class);
+            var request = RequestX.builder()
+                .requestMethod(RequestX.Method.POST)
+                .url(authUrl)
+                .payload(body)
+                .build();
+            JSONObject response = WebUtils.sendRequest(request, JSONObject.class);
             var accessToken = response.getString("access_token");
             return accessToken;
         } catch (Exception e) {

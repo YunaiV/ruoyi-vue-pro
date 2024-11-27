@@ -2,16 +2,12 @@ package com.somle.kingdee.service;
 
 import com.somle.framework.common.util.json.JSONObject;
 import com.somle.framework.common.util.json.JsonUtils;
-import com.somle.framework.common.util.object.BeanUtils;
+import com.somle.framework.common.util.web.RequestX;
 import com.somle.kingdee.model.*;
 import com.somle.framework.common.util.web.WebUtils;
 import com.somle.kingdee.model.supplier.KingdeeSupplier;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpMethod;
-import org.springframework.util.MultiValueMap;
-import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -57,7 +53,13 @@ public class KingdeeClient {
         params.put("app_key", appKey);
         params.put("app_signature", appSignature);
         String apiSignature = getApiSignature(reqMtd, endUrl, params, ctime);
-        KingdeeResponse response = WebUtils.getRequest(fullUrl, params,  getAuthHeaders(ctime,apiSignature), KingdeeResponse.class);
+        var request = RequestX.builder()
+            .requestMethod(RequestX.Method.GET)
+            .url(fullUrl)
+            .queryParams(params)
+            .headers(getAuthHeaders(ctime,apiSignature))
+            .build();
+        KingdeeResponse response = WebUtils.sendRequest(request, KingdeeResponse.class);
         return response.getData(JSONObject.class).getString("app-token");
     }
 
@@ -70,7 +72,13 @@ public class KingdeeClient {
         TreeMap<String, String> params = new TreeMap<>();
         params.put("outerInstanceId", outerInstanceId);
         String apiSignature = getApiSignature(reqMtd, endUrl, params, ctime);
-        KingdeeResponse response = WebUtils.postRequest(fullUrl, params,  getAuthHeaders(ctime,apiSignature), null, KingdeeResponse.class);
+        var request = RequestX.builder()
+            .requestMethod(RequestX.Method.POST)
+            .url(fullUrl)
+            .queryParams(params)
+            .headers(getAuthHeaders(ctime,apiSignature))
+            .build();
+        KingdeeResponse response = WebUtils.sendRequest(request, KingdeeResponse.class);
         return response.getDataList(KingdeeToken.class).get(0);
 
     }
@@ -283,9 +291,22 @@ public class KingdeeClient {
         Map<String, String> headers = getApiHeaders(cts, signature, token.getAppToken());
         KingdeeResponse response;
         if ("POST".equals(requestMethod)) {
-            response = WebUtils.postRequest(BASE_HOST + endUrl, params, headers, body, KingdeeResponse.class);
+            var request = RequestX.builder()
+                .requestMethod(RequestX.Method.POST)
+                .url(BASE_HOST + endUrl)
+                .queryParams(params)
+                .headers(headers)
+                .payload(body)
+                .build();
+            response = WebUtils.sendRequest(request, KingdeeResponse.class);
         } else {
-            response = WebUtils.getRequest(BASE_HOST + endUrl, params, headers, KingdeeResponse.class);
+            var request = RequestX.builder()
+                .requestMethod(RequestX.Method.GET)
+                .url(BASE_HOST + endUrl)
+                .queryParams(params)
+                .headers(headers)
+                .build();
+            response = WebUtils.sendRequest(request, KingdeeResponse.class);
         }
 
         validateResponse(response);

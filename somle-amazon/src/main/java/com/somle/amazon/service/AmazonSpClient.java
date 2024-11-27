@@ -8,12 +8,12 @@ import com.somle.amazon.model.*;
 //import com.somle.amazon.repository.AmazonSellerRepository;
 import com.somle.framework.common.util.collection.CollectionUtils;
 import com.somle.framework.common.util.collection.PageUtils;
-import com.somle.framework.common.util.date.LocalDateTimeUtils;
 import com.somle.framework.common.util.general.CoreUtils;
 
 import com.somle.framework.common.util.json.JSONObject;
 import com.somle.framework.common.util.json.JsonUtils;
 import com.somle.framework.common.util.string.StrUtils;
+import com.somle.framework.common.util.web.RequestX;
 import com.somle.framework.common.util.web.WebUtils;
 
 import lombok.AllArgsConstructor;
@@ -22,10 +22,7 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.client.HttpClientErrorException;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
@@ -71,7 +68,13 @@ public class AmazonSpClient {
         String partialUrl = "/orders/v0/orders";
         String fullUrl = endPoint + partialUrl;
         var headers = Map.of("x-amz-access-token", seller.getSpAccessToken());
-        var response = WebUtils.getRequest(fullUrl, vo, headers);
+        var request = RequestX.builder()
+            .requestMethod(RequestX.Method.GET)
+            .url(fullUrl)
+            .queryParams(vo)
+            .headers(headers)
+            .build();
+        var response = WebUtils.sendRequest(request);
         var bodyString = response.body().string();
         var result = JsonUtils.parseObject(bodyString, AmazonSpOrderRespVO.class);
         validateResponse(result);
@@ -103,7 +106,13 @@ public class AmazonSpClient {
         String partialUrl = "/reports/2021-06-30/reports";
         String fullUrl = endPoint + partialUrl;
         var headers = Map.of("x-amz-access-token", seller.getSpAccessToken());
-        var response = WebUtils.getRequest(fullUrl, vo, headers);
+        var request = RequestX.builder()
+            .requestMethod(RequestX.Method.GET)
+            .url(fullUrl)
+            .queryParams(vo)
+            .headers(headers)
+            .build();
+        var response = WebUtils.sendRequest(request);
         var reportsString = WebUtils.parseResponse(response, JSONObject.class).get("reports");
         var reportList = JsonUtils.parseArray(reportsString, AmazonSpReport.class);
         return reportList;
@@ -133,7 +142,12 @@ public class AmazonSpClient {
             log.info("requesting for document id");
             // ResponseEntity<JSONObject> response = restTemplate.exchange(reportStatusUrl, HttpMethod.GET, new HttpEntity<>(headers), JSONObject.class);
             // JSONObject responseBody = response.getBody();
-            var response = WebUtils.getRequest(reportStatusUrl, Map.of(), headers);
+            var request = RequestX.builder()
+                .requestMethod(RequestX.Method.GET)
+                .url(reportStatusUrl)
+                .headers(headers)
+                .build();
+            var response = WebUtils.sendRequest(request);
 
             switch (response.code()) {
                 case 200:
@@ -169,7 +183,12 @@ public class AmazonSpClient {
         String docUrl = null;
         String documentUrl = endPoint + "/reports/2021-06-30/documents/" + docId;
         while (docUrl == null) {
-            var response = WebUtils.getRequest(documentUrl, Map.of(), headers);
+            var request = RequestX.builder()
+                .requestMethod(RequestX.Method.GET)
+                .url(documentUrl)
+                .headers(headers)
+                .build();
+            var response = WebUtils.sendRequest(request);
             switch (response.code()) {
                 case 200:
                     JSONObject responseBody = JsonUtils.parseObject(response.body().string(), JSONObject.class);
@@ -206,7 +225,13 @@ public class AmazonSpClient {
         String reportId = null;
         while (reportId == null) {
             log.info("creating report");
-            var response = WebUtils.postRequest(fullUrl, Map.of(), headers, vo);
+            var request = RequestX.builder()
+                .requestMethod(RequestX.Method.POST)
+                .url(fullUrl)
+                .headers(headers)
+                .payload(vo)
+                .build();
+            var response = WebUtils.sendRequest(request);
             switch (response.code()) {
                 case 202:
                     var report = WebUtils.parseResponse(response, AmazonSpReport.class);

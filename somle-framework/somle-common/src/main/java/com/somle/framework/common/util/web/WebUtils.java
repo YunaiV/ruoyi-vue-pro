@@ -3,28 +3,18 @@ package com.somle.framework.common.util.web;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.reflect.Field;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.TimeUnit;
 import java.util.zip.GZIPInputStream;
 
 import com.somle.framework.common.util.json.JSONObject;
 import com.somle.framework.common.util.json.JsonUtils;
-import com.somle.framework.common.util.object.BeanUtils;
 import lombok.SneakyThrows;
 import okhttp3.*;
 import org.apache.commons.collections4.MultiValuedMap;
 import org.apache.tomcat.util.http.fileupload.IOUtils;
-import org.springframework.retry.RetryCallback;
-import org.springframework.retry.support.RetryTemplate;
-import org.springframework.stereotype.Component;
 
 //import com.alibaba.fastjson2.JSON;
 //import com.alibaba.fastjson2.JSONArray;
@@ -32,7 +22,6 @@ import org.springframework.stereotype.Component;
 
 import lombok.extern.slf4j.Slf4j;
 
-@Component
 @Slf4j
 public class WebUtils {
     private static final OkHttpClient client = new OkHttpClient().newBuilder()
@@ -105,43 +94,67 @@ public class WebUtils {
         return builder.build();
     }
 
-    @SneakyThrows
-    public static Response sendRequest(String requestMethod, String url, Object queryParams, Map<String, String> headers, Object payload) {
-        log.debug("method: " + requestMethod);
-        log.debug("url: " + url);
-        String fullUrl = null;
-        if (queryParams instanceof Map) {
-            fullUrl = urlWithParams(url, (Map) queryParams);
-        } else {
-            fullUrl = urlWithParams(url, queryParams);
+    public static Request toOkHttp(RequestX requestX) {
+        var requestMethod = requestX.getRequestMethod();
+        var url = requestX.getUrl();
+        var queryParams = requestX.getQueryParams();
+        var headers = requestX.getHeaders();
+        var payload = requestX.getPayload();
+
+        String fullUrl = url;
+        if (queryParams != null) {
+            if (queryParams instanceof Map) {
+                fullUrl = urlWithParams(url, (Map) queryParams);
+            } else {
+                fullUrl = urlWithParams(url, queryParams);
+            }
         }
+
         log.debug("full url: " + fullUrl);
+        Request.Builder requestBuilder = new Request.Builder()
+            .url(fullUrl);
+
+        if (headers != null) {
+            for (Map.Entry<String, String> header : headers.entrySet()) {
+                requestBuilder.addHeader(header.getKey(), header.getValue());
+            }
+            log.debug("headers: " + headers.toString());
+        }
 
         String bodyString = JsonUtils.toJsonString(payload);
         RequestBody body = RequestBody.create(bodyString, MediaType.parse("application/json; charset=utf-8"));
         log.debug("body: " + bodyString);
-        
-        Request.Builder requestBuilder = new Request.Builder()
-            .url(fullUrl);
-        for (Map.Entry<String, String> header : headers.entrySet()) {
-            requestBuilder.addHeader(header.getKey(), header.getValue());
-        }
-        log.debug("headers: " + headers.toString());
 
-        Request request = null;
+
+        Request request;
         switch (requestMethod) {
-            case "POST":
+            case POST:
                 request = requestBuilder.post(body).build();
                 break;
-        
+
             default:
                 request = requestBuilder.build();
                 break;
         }
 
-        return client.newCall(request).execute();
+        return request;
 
     }
+
+    @SneakyThrows
+    public static Response sendRequest(RequestX requestX) {
+        return client.newCall(toOkHttp(requestX)).execute();
+    }
+
+    @SneakyThrows
+    public static <T> T sendRequest(RequestX requestX, Class<T> responseClass) {
+        var response = client.newCall(toOkHttp(requestX)).execute();
+        return parseResponse(response, responseClass);
+    }
+
+
+
+
 
     @SneakyThrows
     public static String getBodyString(Response response) {
@@ -153,25 +166,6 @@ public class WebUtils {
 
     public static <T> T parseResponse(Response response, Class<T> responseClass) {
         return JsonUtils.parseObject(getBodyString(response), responseClass);
-    }
-
-
-    public static <T> T getRequest(String url, Object queryParams, Map<String, String> headers, Class<T> responseClass) {
-        var response = sendRequest("GET", url, queryParams, headers, null);
-        return parseResponse(response, responseClass);
-    }
-
-    public static <T> T postRequest(String url, Object queryParams, Map<String, String> headers, Object payload, Class<T> responseClass) {
-        var response =  sendRequest("POST", url, queryParams, headers, payload);
-        return parseResponse(response, responseClass);
-    }
-
-    public static Response getRequest(String url, Object queryParams, Map<String, String> headers) {
-        return sendRequest("GET", url, queryParams, headers, null);
-    }
-
-    public static Response postRequest(String url, Object queryParams, Map<String, String> headers, Object payload) {
-        return sendRequest("POST", url, queryParams, headers, payload);
     }
 
 
