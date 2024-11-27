@@ -104,16 +104,4 @@ public class SignatureUtils {
         );
     }
 
-    public static HttpHeaders getAuthHeaders1(String ctime, String apiSignature) {
-        HttpHeaders headers = new HttpHeaders();
-        headers.add("Content-Type", "application/json");
-        headers.add("X-Api-Auth-Version", "2.0");
-        headers.add("X-Api-ClientID", CLIENT_ID);
-        headers.add("X-Api-Nonce", ctime);
-        headers.add("X-Api-SignHeaders", "X-Api-TimeStamp,X-Api-Nonce");
-        headers.add("X-Api-Signature", apiSignature);
-        headers.add("X-Api-TimeStamp", ctime);
-        return headers;
-    }
-
 }

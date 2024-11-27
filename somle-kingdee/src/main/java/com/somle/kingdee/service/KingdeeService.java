@@ -46,7 +46,7 @@ public class KingdeeService {
     }
 
 
-    @Scheduled(cron = "0 0 3 * * *") // Executes at 3:00 AM every day
+    @Scheduled(cron = "0 0 * * * *")
     public boolean refreshAuths() {
         return clientList.parallelStream()
             .map(n->n.refreshAuth())
