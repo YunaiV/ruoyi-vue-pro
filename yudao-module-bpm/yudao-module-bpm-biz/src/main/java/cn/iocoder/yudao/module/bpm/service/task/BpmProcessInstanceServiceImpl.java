@@ -520,7 +520,6 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
                 activityInstance -> activityInstance.getEndTime() != null
                         && ObjectUtil.equals(activityInstance.getActivityType(), BpmnXMLConstants.ELEMENT_SEQUENCE_FLOW));
         // 特殊：会签情况下，会有部分已完成（审批）、部分未完成（待审批），此时需要 finishedTaskActivityIds 移除掉
-        // unfinishedTaskActivityIds.removeAll(finishedTaskActivityIds);
         finishedTaskActivityIds.removeAll(unfinishedTaskActivityIds);
         // 特殊：如果流程实例被拒绝，则需要计算是哪个活动节点。
         // 注意，只取最后一个。因为会存在多次拒绝的情况，拒绝驳回到指定节点

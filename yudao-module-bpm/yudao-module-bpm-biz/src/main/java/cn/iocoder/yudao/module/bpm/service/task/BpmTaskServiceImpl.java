@@ -163,7 +163,6 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         if (StrUtil.isNotBlank(todoTask.getFormKey())){
             taskForm = formService.getForm(NumberUtils.parseLong(todoTask.getFormKey()));
         }
-
         return BpmTaskConvert.INSTANCE.buildTodoTask(todoTask, childrenTasks, buttonsSetting, taskForm);
     }
 
