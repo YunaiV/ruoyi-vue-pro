@@ -31,18 +31,22 @@ public class ShopifyClient {
         this.webClient = new OkHttpClient();
     }
 
+    public Map<String, String> getHeaders() {
+        return Map.of(
+            "Content-Type", "application/json",
+            "X-Shopify-Access-Token", token.getAccessToken()
+        );
+    }
+
 
     @SneakyThrows
     public JSONObject getShop() {
         var endpoint = "/admin/api/2021-07/shop.json";
-        var headers = Map.of(
-            "Content-Type", "application/json",
-            "X-Shopify-Access-Token", token.getAccessToken()
-        );
+
         var request = RequestX.builder()
             .requestMethod(RequestX.Method.GET)
             .url(url+endpoint)
-            .headers(headers)
+            .headers(getHeaders())
             .build();
         var bodyString = sendRequest(request).body().string();
         var result = JsonUtils.parseObject(bodyString, JSONObject.class);
@@ -52,14 +56,10 @@ public class ShopifyClient {
     @SneakyThrows
     public JSONObject getOrders() {
         var endpoint = "/admin/api/2024-10/orders.json?status=any";
-        var headers = Map.of(
-                "Content-Type", "application/json",
-                "X-Shopify-Access-Token", token.getAccessToken()
-        );
         var request = RequestX.builder()
             .requestMethod(RequestX.Method.GET)
             .url(url+endpoint)
-            .headers(headers)
+            .headers(getHeaders())
             .build();
         var bodyString = sendRequest(request).body().string();
         var result = JsonUtils.parseObject(bodyString, JSONObject.class);
@@ -67,16 +67,27 @@ public class ShopifyClient {
     }
 
     @SneakyThrows
-    public JSONObject getPayouts() {
-        var endpoint = "/admin/api/2024-10/shopify_payments/payouts.json";
-        var headers = Map.of(
-                "Content-Type", "application/json",
-                "X-Shopify-Access-Token", token.getAccessToken()
-        );
+    public JSONObject getProducts() {
+        var endpoint = "/admin/api/2024-10/products.json";
         var request = RequestX.builder()
             .requestMethod(RequestX.Method.GET)
             .url(url+endpoint)
-            .headers(headers)
+            .headers(getHeaders())
+            .build();
+        var bodyString = sendRequest(request).body().string();
+        var result = JsonUtils.parseObject(bodyString, JSONObject.class);
+        return result;
+    }
+
+
+
+    @SneakyThrows
+    public JSONObject getPayouts() {
+        var endpoint = "/admin/api/2024-10/shopify_payments/payouts.json";
+        var request = RequestX.builder()
+            .requestMethod(RequestX.Method.GET)
+            .url(url+endpoint)
+            .headers(getHeaders())
             .build();
         var bodyString = sendRequest(request).body().string();
         var result = JsonUtils.parseObject(bodyString, JSONObject.class);

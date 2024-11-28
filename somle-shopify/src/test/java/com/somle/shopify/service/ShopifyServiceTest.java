@@ -17,6 +17,6 @@ class ShopifyServiceTest extends BaseDbUnitTest {
 
     @Test
     void test() {
-        log.info(service.client.getPayouts().toString());
+        log.info(service.client.getProducts().toString());
     }
 }
