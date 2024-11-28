@@ -107,7 +107,7 @@ public class DingTalkService {
             // 返回部门详情
             return response.getResult(DingTalkDepartment.class);
         } catch (Exception e) {
-            throw new RuntimeException("获取部门id为" + deptId + "信息失败", e);
+            throw new RuntimeException("获取部门id为" + deptId + "信息失败：" + e.getMessage());
         }
 
 //        DingTalkClient client = new DefaultDingTalkClient("https://oapi.dingtalk.com/topapi/v2/department/get");

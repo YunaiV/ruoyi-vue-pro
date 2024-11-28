@@ -1,11 +1,5 @@
 package cn.iocoder.yudao.module.system.api.dept.dto;
 
-import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
-import cn.iocoder.yudao.framework.common.validation.InEnum;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 /**
@@ -16,7 +10,7 @@ import lombok.Data;
  * @description:
  */
 @Data
-public class DeptReqDTO {
+public class DeptDTO {
     /*
     * 部门编号
     **/

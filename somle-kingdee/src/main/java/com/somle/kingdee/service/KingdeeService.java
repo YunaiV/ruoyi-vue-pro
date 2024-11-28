@@ -68,15 +68,15 @@ public class KingdeeService {
 
 
     public void addDepartment(KingdeeAuxInfoDetail department) {
-        clientList.parallelStream().forEach(n->n.addDepartment(department));
+        clientList.parallelStream().forEach(n-> n.addDepartment(department));
     }
 
 
     public void addProduct(KingdeeProduct product) {
-        clientList.parallelStream().forEach(n->n.addProduct(product));
+        clientList.parallelStream().forEach(n-> n.addProduct(product));
     }
 
     public void addSupplier(KingdeeSupplier kingdeeSupplier) {
-        clientList.parallelStream().forEach(n->n.addSupplier(kingdeeSupplier));
+        clientList.parallelStream().forEach(n-> n.addSupplier(kingdeeSupplier));
     }
 }

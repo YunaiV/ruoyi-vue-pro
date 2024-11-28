@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.system.service.dept;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
+import cn.iocoder.yudao.framework.common.exception.util.ThrowUtil;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.datapermission.core.annotation.DataPermission;
 import cn.iocoder.yudao.module.system.api.dept.dto.DeptLevelRespDTO;
@@ -248,11 +249,19 @@ public class DeptServiceImpl implements DeptService {
         // 校验自己存在
         validateDeptExists(id);
         DeptDO deptDO = deptMapper.selectById(id);
-        return deptMapper.selectById(deptDO.getParentId()).getName();
+        Long parentId = deptDO.getParentId();
+        //校验是否已是顶级部门
+        ThrowUtil.ifThrow(DeptDO.PARENT_ID_ROOT.equals(parentId),DEPT_IS_TOP,deptDO.getName());
+        DeptDO parentDeptDO = deptMapper.selectById(parentId);
+        //校验父级部门是否存在
+        ThrowUtil.ifEmptyThrow(parentDeptDO,DEPT_PARENT_NOT_EXITS);
+        return parentDeptDO.getName();
     }
 
     @Override
     public TreeSet<DeptLevelRespDTO> getDeptTreeLevel(Long id) {
+        // 校验自己存在
+        validateDeptExists(id);
         return getParentList(new TreeSet<>(),id, 0);
     }
 

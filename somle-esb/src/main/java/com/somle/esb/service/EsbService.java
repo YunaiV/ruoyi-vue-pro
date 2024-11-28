@@ -5,7 +5,7 @@ import cn.iocoder.yudao.module.erp.api.product.dto.ErpCustomRuleDTO;
 import cn.iocoder.yudao.module.erp.api.supplier.dto.ErpSupplierDTO;
 import cn.iocoder.yudao.module.infra.api.config.ConfigApi;
 import cn.iocoder.yudao.module.system.api.dept.DeptApi;
-import cn.iocoder.yudao.module.system.api.dept.dto.DeptReqDTO;
+import cn.iocoder.yudao.module.system.api.dept.dto.DeptDTO;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserReqDTO;
 import com.somle.ai.model.AiName;
@@ -22,6 +22,7 @@ import com.somle.esb.converter.EccangToErpConverter;
 import com.somle.esb.converter.ErpToEccangConverter;
 import com.somle.esb.converter.ErpToKingdeeConverter;
 import com.somle.esb.model.OssData;
+import com.somle.kingdee.model.KingdeeAuxInfoDetail;
 import com.somle.kingdee.model.KingdeeProduct;
 import com.somle.kingdee.model.supplier.KingdeeSupplier;
 import com.somle.kingdee.service.KingdeeService;
@@ -43,6 +44,8 @@ import java.net.InetSocketAddress;
 import java.net.Proxy;
 import java.util.List;
 import java.util.Objects;
+
+import static com.somle.esb.job.SyncDepartmentsJob.TENANT_ID_DEFAULT;
 
 @Slf4j
 @Service
@@ -266,10 +269,10 @@ public class EsbService {
 //        var kingdeeDepartment = erpToKingdeeConverter.toKingdee(erpDepartment);
 //        kingdeeService.addDepartment(kingdeeDepartment);
 //    }
-    public void syncEccangDepartments() {
+    public void syncDepartments() {
         dingTalkService.getDepartmentStream().forEach(dingTalkDepartment -> {
             log.info("begin syncing: " + dingTalkDepartment.toString());
-            DeptReqDTO erpDepartment = dingTalkToErpConverter.toErp(dingTalkDepartment);
+            DeptDTO erpDepartment = dingTalkToErpConverter.toErp(dingTalkDepartment);
             log.info("dept to add " + erpDepartment);
             Long deptId = erpDepartment.getId();
             if (deptId != null) {
@@ -281,39 +284,18 @@ public class EsbService {
                     .setInternalId(deptId);
                 mappingService.save(mapping);
             }
-            //获取部门名称
-            String name = erpDepartment.getName();
-            if (!Objects.equals(name, "宁波索迈")){
+            //同步到易仓
+            if (!Objects.equals(deptId, TENANT_ID_DEFAULT)){
                 EccangCategory eccang = erpToEccangConverter.toEccang(String.valueOf(deptId));
                 EccangResponse.EccangPage response = eccangService.addDepartment(eccang);
                 log.info(response.toString());
             }
-//        var eccangDepartment = erpToEccangConverter.toEccang(erpDepartment);
-//        EccangResponse.BizContent response = eccangService.addDepartment(eccangDepartment);
-//        log.info(response.toString());
-//        var kingdeeDepartment = erpToKingdeeConverter.toKingdee(erpDepartment);
-//        kingdeeService.addDepartment(kingdeeDepartment);
+            //同步到金蝶
+            KingdeeAuxInfoDetail kingdee = erpToKingdeeConverter.toKingdee(String.valueOf(deptId));
+            kingdeeService.addDepartment(kingdee);
         });
     }
 
-    public void syncKingDeeDepartments() {
-        dingTalkService.getDepartmentStream().forEach(dingTalkDepartment -> {
-            log.info("begin syncing: " + dingTalkDepartment.toString());
-            DeptReqDTO erpDepartment = dingTalkToErpConverter.toErp(dingTalkDepartment);
-            log.info("dept to add " + erpDepartment);
-            Long deptId = erpDepartment.getId();
-            if (deptId != null) {
-                deptApi.updateDept(erpDepartment);
-            } else {
-                deptId = deptApi.createDept(erpDepartment);
-                var mapping = mappingService.toMapping(dingTalkDepartment);
-                mapping
-                        .setInternalId(deptId);
-                mappingService.save(mapping);
-            }
-
-        });
-    }
 
     public void syncUsers() {
         dingTalkService.getUserDetailStream().forEach(dingTalkUser -> {
