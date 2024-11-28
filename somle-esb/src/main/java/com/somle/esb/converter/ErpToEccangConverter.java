@@ -1,6 +1,5 @@
 package com.somle.esb.converter;
 
-import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
@@ -14,7 +13,6 @@ import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import com.somle.eccang.model.*;
 import com.somle.eccang.service.EccangService;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -23,6 +21,7 @@ import java.util.*;
 
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 import static com.somle.esb.enums.ErrorCodeConstants.DEPT_LEVEL_ERROR;
+import static com.somle.esb.job.SyncDepartmentsJob.TENANT_ID_DEFAULT;
 import static com.somle.esb.util.ConstantConvertUtils.getProductStatus;
 
 @Service
@@ -188,36 +187,55 @@ public class ErpToEccangConverter {
         DeptRespDTO dept = deptApi.getDept(Long.valueOf(deptId));
         //获取部门名称
         String deptName = dept.getName();
+        TreeSet<DeptLevelRespDTO> deptTreeLevel = deptApi.getDeptTreeLevel(Long.valueOf(deptId));
+        int len = deptTreeLevel.size();
+        //因为erp的层级比eccang高一级，所以减1
+        int deptLevel = len - 1;
+        //如果层级为0，则忽略并抛出异常通知操作人员
+        ThrowUtil.ifThrow(deptLevel <= 0, DEPT_LEVEL_ERROR);
         String actionType = "ADD";
         Integer id = null;
-        Integer pid;
-        try {
-            EccangCategory category = eccangService.getCategoryByName(deptName);
-            id = category.getPcId();
+        Integer pid = 0;
+        //判断该品类名在易仓中是否已经存在，存在则去修改，不存在则去新增
+        EccangCategory categoryByName = eccangService.getCategoryByErpDeptId(deptId);
+        if (categoryByName != null){
+            id = categoryByName.getPcId();
             actionType = "EDIT";
-        } catch (Exception e) {
         }
-        try {
-            //获取父级名称
-            String parentName = deptApi.getParentNameById(Long.valueOf(deptId));
-            pid = eccangService.getCategoryByName(parentName).getPcId();
-        } catch (Exception e) {
-            //由于未找到父id，它自己就是顶级层级
-            pid = 0;
+        DeptLevelRespDTO parentDept = getParentName(deptLevel, deptTreeLevel);
+        Long deptParentId = parentDept.getDeptId();
+        if (!Objects.equals(deptParentId, TENANT_ID_DEFAULT)) {
+            EccangCategory category = eccangService.getCategoryByErpDeptId(String.valueOf(deptParentId));
+            if (category == null) {
+                throw new RuntimeException("父类【" + parentDept.getDeptName() + "】在易仓中不存在，请检查erp中产品资料库中的部门信息");
+            }
+            //获取父id
+            pid = category.getPcId();
         }
-        Integer deptLevel = deptApi.getDeptLevel(Long.valueOf(deptId));
-        --deptLevel;
-        //如果层级为0，则忽略并抛出异常通知操作人员
-        ThrowUtil.ifThrow(Objects.equals(deptLevel, 0), DEPT_LEVEL_ERROR);
-        //当层级大于3，则自动修正为3
-        deptLevel = deptLevel > 3 ? 3 : deptLevel;
         return EccangCategory.builder()
-            .actionType(actionType)
-            .pcId(id)
-            .pcName(deptName)
-            .pcNameEn(deptId)
-            .pcPid(pid)
-            .pcLevel(deptLevel)
-            .build();
+                .actionType(actionType)
+                .pcId(id)
+                .pcName(deptName)
+                .pcNameEn(deptId)
+                .pcPid(pid)
+                .pcLevel(Math.min(deptLevel, 3))
+                .build();
+    }
+    /**
+    * @Author Wqh
+    * @Description 获取父级名称
+    * @Date  2024/11/25
+    * @Param [deptTreeLevel]
+    **/
+        private DeptLevelRespDTO getParentName(Integer deptLevel, TreeSet<DeptLevelRespDTO> deptTreeLevel) {
+        if (deptLevel > 3) {
+            //向上找父类
+            deptTreeLevel.pollLast();
+            getParentName(--deptLevel, deptTreeLevel);
+        } else {
+            //因为erp的层级比eccang高一级，所以移除一个
+            deptTreeLevel.pollLast();
+        }
+        return deptTreeLevel.last();
     }
 }

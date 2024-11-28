@@ -392,7 +392,24 @@ public class EccangService {
     }
 
     public EccangCategory getCategoryByName(String name) {
-        return getCategories().filter(n->n.getPcName().equals(name)).findFirst().get();
+        Stream<EccangCategory> eccangCategoryStream = getCategories().filter(n -> n.getPcName().equals(name));
+        Optional<EccangCategory> first = eccangCategoryStream.findFirst();
+        return first.orElse(null);
+    }
+
+    /**
+    * @Author Wqh
+    * @Description 这里的deptId在易仓中对应的是英文品名，对应erp中的部门id
+    * @Date 9:30 2024/11/26
+    * @Param [name]
+    * @return com.somle.eccang.model.EccangCategory
+    **/
+    public EccangCategory getCategoryByErpDeptId(String deptId) {
+        List<EccangCategory> eccangCategories = getCategories().filter(n -> n.getPcNameEn().equals(deptId)).toList();
+        if (eccangCategories.size() > 1){
+            throw new RuntimeException("erp部门id在易仓中存在多个，请检查");
+        }
+        return !eccangCategories.isEmpty() ? eccangCategories.get(0) : null;
     }
 
     public EccangCategory getCategoryByNameEn(String nameEn) {
