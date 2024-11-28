@@ -2,9 +2,8 @@ package cn.iocoder.yudao.module.system.api.dept;
 
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.system.api.dept.dto.DeptLevelRespDTO;
-import cn.iocoder.yudao.module.system.api.dept.dto.DeptReqDTO;
+import cn.iocoder.yudao.module.system.api.dept.dto.DeptDTO;
 import cn.iocoder.yudao.module.system.api.dept.dto.DeptRespDTO;
-import cn.iocoder.yudao.module.system.controller.admin.dept.vo.dept.DeptRespVO;
 import cn.iocoder.yudao.module.system.controller.admin.dept.vo.dept.DeptSaveReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.dept.DeptDO;
 import cn.iocoder.yudao.module.system.service.dept.DeptService;
@@ -60,18 +59,18 @@ public class DeptApiImpl implements DeptApi {
     }
 
     @Override
-    public TreeSet<DeptLevelRespDTO> getDeptTreeLevel(Long productDeptId) {
-        return deptService.getDeptTreeLevel(productDeptId);
+    public TreeSet<DeptLevelRespDTO> getDeptTreeLevel(Long deptId) {
+        return deptService.getDeptTreeLevel(deptId);
     }
 
     @Override
-    public void updateDept(DeptReqDTO erpDepartment) {
+    public void updateDept(DeptDTO erpDepartment) {
         DeptSaveReqVO deptSaveReqVO = BeanUtils.toBean(erpDepartment, DeptSaveReqVO.class);
         deptService.updateDept(deptSaveReqVO);
     }
 
     @Override
-    public Long createDept(DeptReqDTO erpDepartment) {
+    public Long createDept(DeptDTO erpDepartment) {
         DeptSaveReqVO deptSaveReqVO = BeanUtils.toBean(erpDepartment, DeptSaveReqVO.class);
         return deptService.createDept(deptSaveReqVO);
     }

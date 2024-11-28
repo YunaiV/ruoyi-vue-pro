@@ -137,4 +137,16 @@ public class SecurityFrameworkUtils {
         return authenticationToken;
     }
 
+    public static void setLoginUser(LoginUser loginUser) {
+        // 创建 Authentication，并设置到上下文
+        Authentication authentication = buildAuthentication(loginUser);
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+    }
+
+    private static Authentication buildAuthentication(LoginUser loginUser) {
+        // 创建 UsernamePasswordAuthenticationToken 对象
+        return new UsernamePasswordAuthenticationToken(
+                loginUser, null, Collections.emptyList());
+    }
+
 }

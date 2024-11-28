@@ -19,14 +19,21 @@ import com.github.yulichang.autoconfigure.MybatisPlusJoinAutoConfiguration;
 import com.somle.ai.service.AiService;
 import com.somle.amazon.service.AmazonService;
 import com.somle.dingtalk.service.DingTalkService;
+import com.somle.eccang.model.EccangCategory;
+import com.somle.eccang.model.EccangProduct;
+import com.somle.eccang.model.EccangResponse;
 import com.somle.eccang.service.EccangService;
 import com.somle.esb.config.IntegrationConfig;
 import com.somle.esb.converter.DingTalkToErpConverter;
 import com.somle.esb.converter.EccangToErpConverter;
 import com.somle.esb.converter.ErpToEccangConverter;
 import com.somle.esb.converter.ErpToKingdeeConverter;
+import com.somle.esb.job.EccangProductDataJob;
 import com.somle.framework.common.util.general.CoreUtils;
 import com.somle.framework.test.core.ut.BaseSpringIntegrationTest;
+import com.somle.kingdee.model.KingdeeAuxInfo;
+import com.somle.kingdee.model.KingdeeAuxInfoDetail;
+import com.somle.kingdee.service.KingdeeClient;
 import com.somle.kingdee.service.KingdeeService;
 import com.somle.matomo.service.MatomoService;
 import jakarta.annotation.Resource;
@@ -42,7 +49,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.annotation.Commit;
 
 import java.math.BigDecimal;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static com.fasterxml.jackson.databind.type.LogicalType.Collection;
 
 @Slf4j
 @Import({
@@ -59,7 +70,7 @@ import java.util.List;
     ErpToEccangConverter.class,
     ErpToKingdeeConverter.class,
     EccangToErpConverter.class,
-
+        DingTalkService.class,
     DeptApiImpl.class,
     DeptServiceImpl.class,
 
@@ -67,7 +78,8 @@ import java.util.List;
 //    YudaoSecurityAutoConfiguration.class,
 //    SecurityAutoConfiguration.class,
     IntegrationConfig.class,
-
+        DingTalkToErpConverter.class,
+        EccangProductDataJob.class,
     QuartzAutoConfiguration.class,
     // MyBatis 配置类
     DataSourceAutoConfiguration.class,
@@ -77,6 +89,10 @@ import java.util.List;
 class EsbServiceProductTest extends BaseSpringIntegrationTest {
     @Resource
     private EsbService esbService;
+    @Resource
+    private EccangService eccangService;
+    @Resource
+    private EccangProductDataJob eccangProductDataJob;
 
     @Resource
     ErpToEccangConverter erpToEccangConverter;
@@ -95,9 +111,9 @@ class EsbServiceProductTest extends BaseSpringIntegrationTest {
     MatomoService matomoService;
     @MockBean
     AiService aiService;
-    @MockBean
+    @Resource
     DingTalkService dingTalkService;
-    @MockBean
+    @Resource
     DingTalkToErpConverter dingTalkToErpConverter;
 
     @Resource
@@ -200,6 +216,11 @@ class EsbServiceProductTest extends BaseSpringIntegrationTest {
     public void test5() {
         log.info(erpCustomRuleMapper.selectList().toString());
 
+    }
+
+    @Test
+    public void test6() {
+        esbService.syncDepartments();
     }
 
 }

@@ -1,5 +1,6 @@
 package com.somle.kingdee.service;
 
+import cn.hutool.core.util.ObjUtil;
 import com.somle.framework.common.util.json.JSONObject;
 import com.somle.framework.common.util.json.JsonUtils;
 import com.somle.framework.common.util.web.RequestX;
@@ -8,6 +9,11 @@ import com.somle.framework.common.util.web.WebUtils;
 import com.somle.kingdee.model.supplier.KingdeeSupplier;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -127,43 +133,46 @@ public class KingdeeClient {
     }
 
     public KingdeeResponse addProduct(KingdeeProduct product) {
-
+        KingdeeProduct kingdeeProductCopy = new KingdeeProduct();
+        BeanUtils.copyProperties(product, kingdeeProductCopy);
         try {
-            String id = getMaterial(product.getNumber()).getData(JSONObject.class).getString("id");
-            product.setId(id);
+            String id = getMaterial(kingdeeProductCopy.getNumber()).getData(JSONObject.class).getString("id");
+            kingdeeProductCopy.setId(id);
         } catch (Exception e) {
-            log.debug("id not found for " + product.getNumber() + "adding new");
+            log.debug("id not found for " + kingdeeProductCopy.getNumber() + "adding new");
         }
 
-        product.setVolumeUnitId(getMeasureUnitByNumber("立方厘米").getId());
-        product.setWeightUnitId(getMeasureUnitByNumber("kg").getId());
-        product.setBaseUnitId(getMeasureUnitByNumber("套").getId());
-        product.setCustomField(
+        kingdeeProductCopy.setVolumeUnitId(getMeasureUnitByNumber("立方厘米").getId());
+        kingdeeProductCopy.setWeightUnitId(getMeasureUnitByNumber("kg").getId());
+        kingdeeProductCopy.setBaseUnitId(getMeasureUnitByNumber("套").getId());
+        kingdeeProductCopy.setCustomField(
             getCustomFieldByDisplayName("bd_material", "部门"),
-            getAuxInfoByNumber(product.getSaleDepartmentId().toString()).getId()
+            getAuxInfoByNumber(kingdeeProductCopy.getSaleDepartmentId().toString()).getId()
         );
         try {
-            product.setCustomField(getCustomFieldByDisplayName("bd_material", "报关品名"), product.getDeclaredTypeZh());
+            kingdeeProductCopy.setCustomField(getCustomFieldByDisplayName("bd_material", "报关品名"), kingdeeProductCopy.getDeclaredTypeZh());
         } catch (Exception e) {
             log.debug("custom field 报关品名 skipped for " + token.getAccountName());
         }
         log.debug("adding product");
         String endUrl = "/jdy/v2/bd/material";
         TreeMap<String, String>  params = new TreeMap<>();
-        KingdeeResponse response = postResponse(endUrl, params, product);
+        KingdeeResponse response = postResponse(endUrl, params, kingdeeProductCopy);
         return response;
     }
 
     public KingdeeResponse addSupplier(KingdeeSupplier kingdeeSupplier) {
+        KingdeeSupplier supplierCopy = new KingdeeSupplier();
+        BeanUtils.copyProperties(kingdeeSupplier, supplierCopy);
         try {
-            String id = getSupplier(kingdeeSupplier.getNumber()).getData(JSONObject.class).getString("id");
-            kingdeeSupplier.setId(id);
+            String id = getSupplier(supplierCopy.getNumber()).getData(JSONObject.class).getString("id");
+            supplierCopy.setId(id);
         } catch (Exception e) {
-            log.debug("id not found for " + kingdeeSupplier.getNumber() + "adding new");
+            log.debug("id not found for " + supplierCopy.getNumber() + "adding new");
         }
         String endUrl = "/jdy/v2/bd/supplier";
         TreeMap<String, String>  params = new TreeMap<>();
-        KingdeeResponse response = postResponse(endUrl, params, kingdeeSupplier);
+        KingdeeResponse response = postResponse(endUrl, params, supplierCopy);
         return response;
     }
 
@@ -176,20 +185,25 @@ public class KingdeeClient {
     }
 
     public void addDepartment(KingdeeAuxInfoDetail department) {
+        //拷贝数据，避免并发下产生的线程安全问题
+        KingdeeAuxInfoDetail departmentCopy = new KingdeeAuxInfoDetail();
+        BeanUtils.copyProperties(department, departmentCopy);
+        //id不为空则为修改，反之新增
         String groupId = getAuxInfoTypeByNumber("BM").getId();
-        try {
-            String id = getAuxInfoByNumber(department.getNumber()).getId();
-            department.setId(id);
-        } catch (Exception e) {
-            //判断是否存在相同的辅助资料名称
-            try {
-                String id = getAuxInfoByName(department.getName()).getId();
-                department.setId(id);
-            } catch (Exception e1) {
+        //根据number查找金蝶辅助资料中是否存在，number对应erp中的deptId
+        KingdeeAuxInfo auxInfoByNumber = getAuxInfoByNumber(departmentCopy.getNumber());
+        if (ObjUtil.isNotEmpty(auxInfoByNumber)){
+            departmentCopy.setId(auxInfoByNumber.getId());
+        }else {
+            //不存在则根据名称去查找是否存在
+            KingdeeAuxInfo auxInfoByName = getAuxInfoByName(departmentCopy.getName());
+            if (ObjUtil.isNotEmpty(auxInfoByName)){
+                departmentCopy.setId(auxInfoByName.getId());
             }
         }
-        department.setGroupId(groupId);
-        KingdeeResponse response = postResponse("/jdy/v2/bd/aux_info",  new TreeMap<>(), department);
+        departmentCopy.setGroupId(groupId);
+
+        KingdeeResponse response = postResponse("/jdy/v2/bd/aux_info",  new TreeMap<>(), departmentCopy);
     }
 
     public Stream<KingdeeResponse> list(String endpoint) {
@@ -222,22 +236,19 @@ public class KingdeeClient {
         Optional<KingdeeAuxInfo> first = response.getData(KingdeePage.class).getRowsList(KingdeeAuxInfo.class).stream()
                 .filter(n->n.getNumber().equals(number))
                 .findFirst();
-        if (first.isPresent()){
-            return first.get();
-        }
-        throw new RuntimeException("您传入的辅助资料信息不存在于kingdee信息库中，请确保erp中的id和辅助资料中的编码一致");
+        return first.orElse(null);
     }
 
-    public KingdeeAuxInfoDetail getAuxInfoByName(String name) {
+    public KingdeeAuxInfo getAuxInfoByName(String name) {
         log.debug("fetching aux info");
         String endUrl = "/jdy/v2/bd/aux_info";
         TreeMap<String, String>  params = new TreeMap<>();
         params.put("name", name);
         KingdeeResponse response = getResponse(endUrl, params);
-        return response.getData(KingdeePage.class).getRowsList(KingdeeAuxInfo.class).stream()
-                .map(n->JsonUtils.parseObject(n.toString(), KingdeeAuxInfoDetail.class))
-                .filter(n->n.getName().equals(name))
-                .findFirst().get();
+        Optional<KingdeeAuxInfo> first = response.getData(KingdeePage.class).getRowsList(KingdeeAuxInfo.class).stream()
+                .filter(n -> n.getName().equals(name))
+                .findFirst();
+        return first.orElse(null);
     }
 
     public KingdeeAuxInfoType getAuxInfoTypeByNumber(String number) {

@@ -2,10 +2,8 @@ package com.somle.esb.converter;
 
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.module.system.api.dept.DeptApi;
-import cn.iocoder.yudao.module.system.api.dept.dto.DeptReqDTO;
-import cn.iocoder.yudao.module.system.api.dept.dto.DeptRespDTO;
+import cn.iocoder.yudao.module.system.api.dept.dto.DeptDTO;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserReqDTO;
-import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import com.dingtalk.api.response.OapiV2UserGetResponse;
 import com.somle.dingtalk.model.DingTalkDepartment;
 import com.somle.dingtalk.service.DingTalkService;
@@ -67,11 +65,11 @@ public class DingTalkToErpConverter {
 //        ));
 //    }
 
-    public DeptReqDTO toErp(DingTalkDepartment dept) {
-        DeptReqDTO erpDept = new DeptReqDTO();
+    public DeptDTO toErp(DingTalkDepartment dept) {
+        DeptDTO erpDept = new DeptDTO();
         // translate parent id
-        if (dept.getDeptId() == 1l) {
-            erpDept.setParentId(0l);
+        if (dept.getDeptId() == 1L) {
+            erpDept.setParentId(0L);
         } else {
             try {
                 var mapping = mappingService.toMapping(dept);

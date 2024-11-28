@@ -43,8 +43,14 @@ public class SignatureUtils {
     }
 
     public static String urlEncode(String str) {
+        //金蝶的编码规则不允许将空格编码为+，而是将空格编码为%20
         // log.debug(str);
-        return URLEncoder.encode(str, StandardCharsets.UTF_8);
+        String encode = URLEncoder.encode(str, StandardCharsets.UTF_8);
+        //判断空格被编码后是否为%20，如果是+，则替换为%20
+        if (encode.contains("+")){
+            encode = encode.replace("+", "%20");
+        }
+        return encode;
     }
 
     public static String getApiString(String reqMtd, String urlPath, Map<String, String> params, String nonce,
