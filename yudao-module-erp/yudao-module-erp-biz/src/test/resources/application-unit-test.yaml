@@ -33,7 +33,7 @@ logging:
 spring:
   # 数据源配置项
   datasource:
-    url: jdbc:mysql://192.168.10.151:3306/ruoyi-vue-dev-single-product?serverTimezone=GMT%2B8&useSSL=false&characterEncoding=utf-8
+    url: jdbc:mysql://192.168.10.151:3306/ruoyi-vue-test?serverTimezone=GMT%2B8&useSSL=false&characterEncoding=utf-8
     driverClassName: com.mysql.cj.jdbc.Driver
     username: it003
     password: asivJssflioKK
@@ -78,10 +78,3 @@ yudao:
     base-package: cn.iocoder.yudao.module
 somle:
   base-package: com.somle.amazon
-
-
-# MyBatis Plus 的配置项
-mybatis-plus:
-  global-config:
-    db-config:
-      id-type: AUTO # 自增 ID，适合 MySQL 等直接自增的数据库
