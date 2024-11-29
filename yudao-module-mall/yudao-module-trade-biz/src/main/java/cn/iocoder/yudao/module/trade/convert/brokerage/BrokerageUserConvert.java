@@ -59,6 +59,9 @@ public interface BrokerageUserConvert {
     }
 
     default BrokerageUserRespVO copyTo(MemberUserRespDTO source, BrokerageUserRespVO target) {
+        if (target == null) {
+            return null;
+        }
         Optional.ofNullable(source).ifPresent(
                 user -> target.setNickname(user.getNickname()).setAvatar(user.getAvatar()));
         return target;
