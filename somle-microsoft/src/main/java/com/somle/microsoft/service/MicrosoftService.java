@@ -106,17 +106,16 @@ public class MicrosoftService {
     public JSONArray getReports(String groupId) {
         OkHttpClient client = new OkHttpClient().newBuilder()
                 .build();
-        MediaType mediaType = MediaType.parse("text/plain");
-        RequestBody body = RequestBody.create(mediaType, "");
         Request request = new Request.Builder()
-                .url(String.format("https://api.powerbi.cn/v1.0/myorg/groups/%s}/reports", groupId))
-                .method("GET", body)
+                .url(String.format("https://api.powerbi.cn/v1.0/myorg/groups/%s/reports", groupId))
+                .method("GET", null)
                 .addHeader("Authorization", "Bearer " + token)
                 .build();
         Response response = client.newCall(request).execute();
 
         var jsonObject = JsonUtils.parseObject(response.body().string(), JSONObject.class);
         var value = jsonObject.getJSONArray("value");
+        log.info(value.toString());
 
         return value;
     }
