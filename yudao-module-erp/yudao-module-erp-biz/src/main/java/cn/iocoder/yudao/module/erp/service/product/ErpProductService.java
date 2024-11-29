@@ -3,7 +3,7 @@ package cn.iocoder.yudao.module.erp.service.product;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.erp.controller.admin.product.vo.product.ErpProductPageReqVO;
 import cn.iocoder.yudao.module.erp.controller.admin.product.vo.product.ErpProductRespVO;
-import cn.iocoder.yudao.module.erp.controller.admin.product.vo.product.ProductSaveReqVO;
+import cn.iocoder.yudao.module.erp.controller.admin.product.vo.product.ErpProductSaveReqVO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.product.ErpProductDO;
 import jakarta.validation.Valid;
 
@@ -26,14 +26,14 @@ public interface ErpProductService {
      * @param createReqVO 创建信息
      * @return 编号
      */
-    Long createProduct(@Valid ProductSaveReqVO createReqVO);
+    Long createProduct(@Valid ErpProductSaveReqVO createReqVO);
 
     /**
      * 更新产品
      *
      * @param updateReqVO 更新信息
      */
-    void updateProduct(@Valid ProductSaveReqVO updateReqVO);
+    void updateProduct(@Valid ErpProductSaveReqVO updateReqVO);
 
     /**
      * 删除产品

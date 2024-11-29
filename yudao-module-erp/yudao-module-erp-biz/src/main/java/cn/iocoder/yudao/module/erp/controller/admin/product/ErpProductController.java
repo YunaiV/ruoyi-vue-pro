@@ -9,7 +9,7 @@ import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.yudao.module.erp.controller.admin.product.vo.product.ErpProductPageReqVO;
 import cn.iocoder.yudao.module.erp.controller.admin.product.vo.product.ErpProductRespVO;
-import cn.iocoder.yudao.module.erp.controller.admin.product.vo.product.ProductSaveReqVO;
+import cn.iocoder.yudao.module.erp.controller.admin.product.vo.product.ErpProductSaveReqVO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.product.ErpProductDO;
 import cn.iocoder.yudao.module.erp.service.product.ErpProductService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -42,14 +42,14 @@ public class ErpProductController {
     @PostMapping("/create")
     @Operation(summary = "创建产品")
     @PreAuthorize("@ss.hasPermission('erp:product:create')")
-    public CommonResult<Long> createProduct(@Valid @RequestBody ProductSaveReqVO createReqVO) {
+    public CommonResult<Long> createProduct(@Valid @RequestBody ErpProductSaveReqVO createReqVO) {
         return success(productService.createProduct(createReqVO));
     }
 
     @PutMapping("/update")
     @Operation(summary = "更新产品")
     @PreAuthorize("@ss.hasPermission('erp:product:update')")
-    public CommonResult<Boolean> updateProduct(@Valid @RequestBody ProductSaveReqVO updateReqVO) {
+    public CommonResult<Boolean> updateProduct(@Valid @RequestBody ErpProductSaveReqVO updateReqVO) {
         productService.updateProduct(updateReqVO);
         return success(true);
     }
@@ -86,8 +86,7 @@ public class ErpProductController {
         return success(convertList(list, product -> new ErpProductRespVO().setId(product.getId())
                 .setName(product.getName()).setBarCode(product.getBarCode())
                 .setCategoryId(product.getCategoryId()).setCategoryName(product.getCategoryName())
-                .setUnitId(product.getUnitId()).setUnitName(product.getUnitName())
-                .setPurchasePrice(product.getPurchasePrice()).setSalePrice(product.getSalePrice()).setMinPrice(product.getMinPrice())));
+                .setUnitId(product.getUnitId()).setUnitName(product.getUnitName())));
     }
 
     @GetMapping("/export-excel")
