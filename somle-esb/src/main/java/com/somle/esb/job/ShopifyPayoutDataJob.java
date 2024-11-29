@@ -15,7 +15,7 @@ public class ShopifyPayoutDataJob extends ShopifyDataJob {
         var result = shopifyService.client.getPayouts();
         var data = OssData.builder()
                 .database(DATABASE)
-                .tableName("order")
+                .tableName("payout")
                 .syncType("inc")
                 .requestTimestamp(System.currentTimeMillis())
                 .folderDate(beforeYesterday)
