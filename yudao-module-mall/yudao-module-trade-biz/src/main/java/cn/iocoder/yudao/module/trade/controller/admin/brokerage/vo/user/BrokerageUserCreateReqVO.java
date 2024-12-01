@@ -15,16 +15,4 @@ public class BrokerageUserCreateReqVO {
     @Schema(description = "推广员编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "4587")
     private Long bindUserId;
 
-    @Schema(description = "推广资格", requiredMode = Schema.RequiredMode.REQUIRED)
-    @NotNull(message = "推广资格不能为空")
-    private Boolean brokerageEnabled;
-
-    @Schema(description = "可用佣金", requiredMode = Schema.RequiredMode.REQUIRED, example = "11089")
-    @NotNull(message = "可用佣金不能为空")
-    private Integer price;
-
-    @Schema(description = "冻结佣金", requiredMode = Schema.RequiredMode.REQUIRED, example = "30916")
-    @NotNull(message = "冻结佣金不能为空")
-    private Integer frozenPrice;
-
 }

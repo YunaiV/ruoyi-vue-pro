@@ -113,7 +113,6 @@ public class BrokerageUserServiceImpl implements BrokerageUserService {
         if (brokerageUserDO == null) {
             throw exception(BROKERAGE_USER_NOT_EXISTS);
         }
-
         return brokerageUserDO;
     }
 
@@ -208,18 +207,18 @@ public class BrokerageUserServiceImpl implements BrokerageUserService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Long createBrokerageUser(BrokerageUserCreateReqVO createReqVO) {
-        // 1. 校验分销用户是否已存在
+        // 1.1 校验分销用户是否已存在
         BrokerageUserDO brokerageUser = brokerageUserMapper.selectById(createReqVO.getUserId());
         if (brokerageUser != null) {
             throw exception(BROKERAGE_CREATE_USER_EXISTS);
         }
-
-        // 2.1 创建分销人
+        // 1.2 校验是否能绑定用户
         brokerageUser = BeanUtils.toBean(createReqVO, BrokerageUserDO.class).setId(createReqVO.getUserId())
-                .setBrokerageTime(LocalDateTime.now()).setBindUserId(null);
+                .setBrokerageTime(LocalDateTime.now());
+        validateCanBindUser(brokerageUser, createReqVO.getBindUserId());
+
+        // 2. 创建分销人
         brokerageUserMapper.insert(brokerageUser);
-        // 2.2 绑定推广员
-        updateBrokerageUserId(brokerageUser.getId(), createReqVO.getBindUserId());
         return brokerageUser.getId();
     }
 

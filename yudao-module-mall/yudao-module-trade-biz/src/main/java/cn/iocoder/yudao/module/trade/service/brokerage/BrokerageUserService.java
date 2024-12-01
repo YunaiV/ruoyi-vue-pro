@@ -110,7 +110,8 @@ public interface BrokerageUserService {
     boolean bindBrokerageUser(@NotNull Long userId, @NotNull Long bindUserId);
 
     /**
-     * 创建分销用户
+     * 【管理员】创建分销用户
+     *
      * @param createReqVO 请求
      * @return 编号
      */
