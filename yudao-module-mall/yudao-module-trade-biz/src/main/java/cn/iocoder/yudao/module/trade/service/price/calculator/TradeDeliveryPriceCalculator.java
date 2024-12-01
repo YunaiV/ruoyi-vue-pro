@@ -122,9 +122,13 @@ public class TradeDeliveryPriceCalculator implements TradePriceCalculator {
      */
     private boolean isGlobalExpressFree(TradePriceCalculateRespBO result) {
         TradeConfigDO config = tradeConfigService.getTradeConfig();
-        return config == null
-                || Boolean.TRUE.equals(config.getDeliveryExpressFreeEnabled()) // 开启包邮
-                || result.getPrice().getPayPrice() >= config.getDeliveryExpressFreePrice(); // 满足包邮的价格
+        // 情况一：交易中心配置不存在默认不包邮
+        if (config == null) {
+            return false;
+        }
+        // 情况二：开启了全局包邮 && 满足包邮金额
+        return Boolean.TRUE.equals(config.getDeliveryExpressFreeEnabled()) &&
+                result.getPrice().getPayPrice() >= config.getDeliveryExpressFreePrice();
     }
 
     private void calculateDeliveryPrice(List<OrderItem> selectedSkus,
