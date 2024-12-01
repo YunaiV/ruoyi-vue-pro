@@ -65,7 +65,7 @@ public class BpmModelServiceImpl implements BpmModelService {
     public List<Model> getModelList(String name) {
         ModelQuery modelQuery = repositoryService.createModelQuery();
         if (StrUtil.isNotEmpty(name)) {
-            modelQuery.modelNameLike(name);
+            modelQuery.modelNameLike("%" + name + "%");
         }
         return modelQuery.list();
     }
