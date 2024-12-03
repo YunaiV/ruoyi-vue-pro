@@ -2,6 +2,7 @@ package com.somle.eccang;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import com.somle.eccang.model.EccangOrderVO;
+import com.somle.eccang.model.EccangShippingMethod;
 import com.somle.eccang.repository.EccangTokenRepository;
 import com.somle.eccang.service.EccangService;
 import com.somle.framework.test.core.ut.BaseSpringTest;
@@ -16,6 +17,7 @@ import org.springframework.messaging.MessageChannel;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.List;
 
 
 @Slf4j
@@ -44,8 +46,8 @@ public class EccangTest extends BaseSpringTest {
 
     @Test
     void list() {
-        var result = service.list("getShippingMethod");
-        System.out.println(result.toString());
+        List<EccangShippingMethod> list = service.getShippingMethod().toList();
+        log.info(list.toString());
     }
 
     @Test
