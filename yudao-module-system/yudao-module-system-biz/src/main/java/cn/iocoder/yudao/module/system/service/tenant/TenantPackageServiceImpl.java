@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.system.service.tenant;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
@@ -10,6 +11,7 @@ import cn.iocoder.yudao.module.system.dal.dataobject.tenant.TenantDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.tenant.TenantPackageDO;
 import cn.iocoder.yudao.module.system.dal.mysql.tenant.TenantPackageMapper;
 import com.baomidou.dynamic.datasource.annotation.DSTransactional;
+import com.google.common.annotations.VisibleForTesting;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
@@ -38,6 +40,8 @@ public class TenantPackageServiceImpl implements TenantPackageService {
 
     @Override
     public Long createTenantPackage(TenantPackageSaveReqVO createReqVO) {
+        // 校验套餐名是否重复
+        validateTenantPackageNameUnique(null, createReqVO.getName());
         // 插入
         TenantPackageDO tenantPackage = BeanUtils.toBean(createReqVO, TenantPackageDO.class);
         tenantPackageMapper.insert(tenantPackage);
@@ -50,6 +54,8 @@ public class TenantPackageServiceImpl implements TenantPackageService {
     public void updateTenantPackage(TenantPackageSaveReqVO updateReqVO) {
         // 校验存在
         TenantPackageDO tenantPackage = validateTenantPackageExists(updateReqVO.getId());
+        // 校验套餐名是否重复
+        validateTenantPackageNameUnique(updateReqVO.getId(), updateReqVO.getName());
         // 更新
         TenantPackageDO updateObj = BeanUtils.toBean(updateReqVO, TenantPackageDO.class);
         tenantPackageMapper.updateById(updateObj);
@@ -109,6 +115,25 @@ public class TenantPackageServiceImpl implements TenantPackageService {
     @Override
     public List<TenantPackageDO> getTenantPackageListByStatus(Integer status) {
         return tenantPackageMapper.selectListByStatus(status);
+    }
+
+
+    @VisibleForTesting
+    void validateTenantPackageNameUnique(Long id, String name) {
+        if (StrUtil.isBlank(name)) {
+            return;
+        }
+        TenantPackageDO tenantPackage = tenantPackageMapper.selectByName(name);
+        if (tenantPackage == null) {
+            return;
+        }
+        // 如果 id 为空，说明不用比较是否为相同 id 的用户
+        if (id == null) {
+            throw exception(TENANT_PACKAGE_NAME_DUPLICATE);
+        }
+        if (!tenantPackage.getId().equals(id)) {
+            throw exception(TENANT_PACKAGE_NAME_DUPLICATE);
+        }
     }
 
 }
