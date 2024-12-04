@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/erp/tvstand")
 @Validated
-public class ErpTvStandController {
+public class ErpProductTvStandController {
     @Resource
     private ErpProductTvStandService erpProductTvStandService;
 }
