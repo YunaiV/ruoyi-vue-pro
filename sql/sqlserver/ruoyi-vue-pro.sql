@@ -3950,6 +3950,8 @@ INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon
 GO
 INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (116, N'API 接口', N'infra:swagger:list', 2, 3, 2, N'swagger', N'fa:fighter-jet', N'infra/swagger/index', N'InfraSwagger', 0, N'1', N'1', N'1', N'admin', N'2021-01-05 17:03:48', N'1', N'2024-04-23 00:01:24', N'0')
 GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (117, N'apiKey管理', N'', 2, 3, 1261, N'apikey', N'fa:key', N'system/oauth2/apikey/index', N'SystemApiKeyClient', 0, N'1', N'1', N'1', N'admin', N'2024-12-05 18:03:48', N'1', N'2024-12-05 19:00:00', N'0')
+GO
 INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (500, N'操作日志', N'', 2, 1, 108, N'operate-log', N'ep:position', N'system/operatelog/index', N'SystemOperateLog', 0, N'1', N'1', N'1', N'admin', N'2021-01-05 17:03:48', N'1', N'2024-02-29 01:09:59', N'0')
 GO
 INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (501, N'登录日志', N'', 2, 2, 108, N'login-log', N'ep:promotion', N'system/loginlog/index', N'SystemLoginLog', 0, N'1', N'1', N'1', N'admin', N'2021-01-05 17:03:48', N'1', N'2024-02-29 01:10:29', N'0')

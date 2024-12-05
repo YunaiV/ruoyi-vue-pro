@@ -158,6 +158,30 @@ public class OAuth2TokenServiceImpl implements OAuth2TokenService {
         return oauth2AccessTokenMapper.selectPage(reqVO);
     }
 
+    @Override
+    public OAuth2AccessTokenDO createApiAccessToken(Long userId, Integer userType, String clientId) {
+        // 创建访问令牌，因为该key发布下去就一直不会变，不能进行刷新因此暂时设置成refreshToken和其一致
+        String accessToken = generateAccessToken();
+        OAuth2AccessTokenDO accessTokenDO = new OAuth2AccessTokenDO().setAccessToken(accessToken)
+                .setRefreshToken(accessToken)
+                .setUserId(userId).setUserType(userType)
+                .setUserInfo(buildUserInfo(userId, userType))
+                .setClientId(clientId).setScopes(null)
+                // 默认50年后失效
+                .setExpiresTime(LocalDateTime.now().plusSeconds(1576800000));
+        accessTokenDO.setTenantId(TenantContextHolder.getTenantId()); // 手动设置租户编号，避免缓存到 Redis 的时候，无对应的租户编号
+        accessTokenDO.setCreator(String.valueOf(userId));  // 通过创建者来单独过滤出每个用户创建的apiKey
+        oauth2AccessTokenMapper.insert(accessTokenDO);
+        // 记录到 Redis 中
+        oauth2AccessTokenRedisDAO.set(accessTokenDO);
+        return accessTokenDO;
+    }
+
+    @Override
+    public PageResult<OAuth2AccessTokenDO> getApiKeyTokenPage(OAuth2AccessTokenPageReqVO reqVO) {
+        return oauth2AccessTokenMapper.selectPage(reqVO);
+    }
+
     private OAuth2AccessTokenDO createOAuth2AccessToken(OAuth2RefreshTokenDO refreshTokenDO, OAuth2ClientDO clientDO) {
         OAuth2AccessTokenDO accessTokenDO = new OAuth2AccessTokenDO().setAccessToken(generateAccessToken())
                 .setUserId(refreshTokenDO.getUserId()).setUserType(refreshTokenDO.getUserType())
