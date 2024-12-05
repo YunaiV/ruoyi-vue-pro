@@ -1,12 +1,16 @@
 package cn.iocoder.yudao.module.system.controller.admin.oauth2;
 
+import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
+import cn.iocoder.yudao.framework.security.core.LoginUser;
+import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
 import cn.iocoder.yudao.module.system.controller.admin.oauth2.vo.token.OAuth2AccessTokenPageReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.oauth2.vo.token.OAuth2AccessTokenRespVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.oauth2.OAuth2AccessTokenDO;
 import cn.iocoder.yudao.module.system.enums.logger.LoginLogTypeEnum;
+import cn.iocoder.yudao.module.system.enums.oauth2.OAuth2ClientConstants;
 import cn.iocoder.yudao.module.system.service.auth.AdminAuthService;
 import cn.iocoder.yudao.module.system.service.oauth2.OAuth2TokenService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -18,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import javax.validation.Valid;
 
+import static cn.iocoder.yudao.framework.common.pojo.CommonResult.error;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
 @Tag(name = "管理后台 - OAuth2.0 令牌")
@@ -47,4 +52,29 @@ public class OAuth2TokenController {
         return success(true);
     }
 
+    @PostMapping("/create-api-key")
+    @Operation(summary = "创建当前用户权限下的 API Key 访问令牌")
+    public CommonResult<OAuth2AccessTokenRespVO> createApiKeyToken() {
+        LoginUser user = SecurityFrameworkUtils.getLoginUser();
+        if(user == null){
+            return error(500, "非法用户，请检查");
+        }
+        long userId = user.getId();
+        OAuth2AccessTokenDO accessToken = oauth2TokenService.createApiAccessToken(userId, UserTypeEnum.ADMIN.getValue(), OAuth2ClientConstants.CLIENT_ID_API_KEY);
+        return success(BeanUtils.toBean(accessToken, OAuth2AccessTokenRespVO.class));
+    }
+
+    @GetMapping("/api-key/page")
+    @Operation(summary = "获得 API Key 访问令牌分页", description = "只返回有效期内的")
+    public CommonResult<PageResult<OAuth2AccessTokenRespVO>> getApiKeyTokenPage(@Valid OAuth2AccessTokenPageReqVO reqVO) {
+        LoginUser user = SecurityFrameworkUtils.getLoginUser();
+        if(user == null){
+            return error(500, "非法用户，请检查");
+        }
+        long userId = user.getId();
+        reqVO.setUserId(userId);
+        reqVO.setClientId(OAuth2ClientConstants.CLIENT_ID_API_KEY);
+        PageResult<OAuth2AccessTokenDO> pageResult = oauth2TokenService.getApiKeyTokenPage(reqVO);
+        return success(BeanUtils.toBean(pageResult, OAuth2AccessTokenRespVO.class));
+    }
 }
