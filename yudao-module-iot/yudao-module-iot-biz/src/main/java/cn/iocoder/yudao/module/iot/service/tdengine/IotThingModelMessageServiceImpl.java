@@ -66,8 +66,7 @@ public class IotThingModelMessageServiceImpl implements IotThingModelMessageServ
         if (IotDeviceStatusEnum.INACTIVE.getStatus().equals(device.getStatus())) {
             createDeviceTable(device.getDeviceType(), device.getProductKey(), device.getDeviceName(), device.getDeviceKey());
             iotDeviceService.updateDeviceStatus(new IotDeviceStatusUpdateReqVO()
-                    .setId(device.getId())
-                    .setStatus(IotDeviceStatusEnum.ONLINE.getStatus()));
+                    .setId(device.getId()).setStatus(IotDeviceStatusEnum.ONLINE.getStatus()));
         }
 
         // 2. 获取设备属性并进行物模型校验，过滤非物模型属性
@@ -76,7 +75,6 @@ public class IotThingModelMessageServiceImpl implements IotThingModelMessageServ
         if (functionList.isEmpty()) {
             return;
         }
-
 
         // 3. 过滤并收集有效的属性字段，缓存设备属性
         List<TdFieldDO> schemaFieldValues = filterAndCollectValidFields(params, functionList, device, thingModelMessage.getTime());
@@ -164,7 +162,6 @@ public class IotThingModelMessageServiceImpl implements IotThingModelMessageServ
         if (maps != null) {
             // 2.1 过滤出 TAG 类型的字段
             List<Map<String, Object>> taggedNotesList = CollectionUtils.filterList(maps, map -> TAG_NOTE.equals(map.get(NOTE)));
-
 
             // 2.2 解析字段信息
             tagsFieldValues = FieldParser.parse(taggedNotesList.stream()

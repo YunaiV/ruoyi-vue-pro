@@ -31,6 +31,7 @@ public class IotDeviceDataController {
     @Resource
     private IotDeviceDataService deviceDataService;
 
+    // TODO @浩浩：这里的 /latest-list，包括方法名。
     @GetMapping("/latest")
     @Operation(summary = "获取设备属性最新数据")
     public CommonResult<List<IotDeviceDataRespVO>> getLatestDeviceProperties(@Valid IotDeviceDataPageReqVO deviceDataReqVO) {
@@ -38,6 +39,7 @@ public class IotDeviceDataController {
         return success(BeanUtils.toBean(list, IotDeviceDataRespVO.class));
     }
 
+    // TODO @浩浩：这里的 /history-page 包括方法名。
     @GetMapping("/history")
     @Operation(summary = "获取设备属性历史数据")
     public CommonResult<PageResult<IotTimeDataRespVO>> getHistoryDeviceProperties(@Valid IotDeviceDataPageReqVO deviceDataReqVO) {

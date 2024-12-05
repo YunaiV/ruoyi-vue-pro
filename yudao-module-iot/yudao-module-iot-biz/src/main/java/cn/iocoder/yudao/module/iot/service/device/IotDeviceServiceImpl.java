@@ -139,12 +139,12 @@ public class IotDeviceServiceImpl implements IotDeviceService {
      * @return 生成的 MQTT Password
      */
     private String generateMqttPassword() {
+        // TODO @浩浩：这里的 StrUtil 随机字符串？
         SecureRandom secureRandom = new SecureRandom();
         byte[] passwordBytes = new byte[32]; // 256 位的随机数
         secureRandom.nextBytes(passwordBytes);
         return Base64.getUrlEncoder().withoutPadding().encodeToString(passwordBytes);
     }
-
 
     /**
      * 生成唯一的 DeviceName

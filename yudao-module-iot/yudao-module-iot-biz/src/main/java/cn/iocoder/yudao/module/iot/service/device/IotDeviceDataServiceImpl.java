@@ -133,7 +133,7 @@ public class IotDeviceDataServiceImpl implements IotDeviceDataService {
     }
 
     private static String getDeviceTableName(String productKey, String deviceName) {
-        return  String.format(IotConstants.DEVICE_TABLE_NAME_FORMAT, productKey, deviceName);
+        return String.format(IotConstants.DEVICE_TABLE_NAME_FORMAT, productKey, deviceName);
     }
 
 }
