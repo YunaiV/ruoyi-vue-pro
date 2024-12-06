@@ -437,6 +437,17 @@ public class EccangService {
         return list("getWmsProductList", EccangProduct.class);
     }
 
+    /**
+    * @Author Wqh
+    * @Description 获取运输方式
+    * @Date 15:44 2024/11/29
+    * @Param []
+    * @return java.util.stream.Stream<com.somle.eccang.model.EccangUserAccount>
+    **/
+    public Stream<EccangShippingMethod> getShippingMethod() {
+        return list("getShippingMethod", EccangShippingMethod.class);
+    }
+
 
 
     public String parseCountryCode(String code) {
