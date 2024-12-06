@@ -73,7 +73,6 @@ public class BpmnModelUtils {
         extensionElement.setName(name);
         attributes.forEach((key, value) -> {
             ExtensionAttribute extensionAttribute = new ExtensionAttribute(key, value);
-            extensionAttribute.setNamespace(FLOWABLE_EXTENSIONS_NAMESPACE);
             extensionElement.addAttribute(extensionAttribute);
         });
         element.addExtensionElement(extensionElement);
