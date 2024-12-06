@@ -88,6 +88,7 @@ public abstract class AbstractWxPayClient extends AbstractPayClient<WxPayClientC
                     throw new IllegalArgumentException(String.format("未知的 API 版本(%s)", config.getApiVersion()));
             }
         } catch (WxPayException e) {
+            log.error("[doUnifiedOrder][退款({}) 发起微信支付异常", reqDTO, e);
             String errorCode = getErrorCode(e);
             String errorMessage = getErrorMessage(e);
             return PayOrderRespDTO.closedOf(errorCode, errorMessage,

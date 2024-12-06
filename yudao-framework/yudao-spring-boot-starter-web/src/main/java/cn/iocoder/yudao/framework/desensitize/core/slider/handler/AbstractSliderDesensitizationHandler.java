@@ -17,7 +17,7 @@ public abstract class AbstractSliderDesensitizationHandler<T extends Annotation>
     public String desensitize(String origin, T annotation) {
         // 1. 判断是否禁用脱敏
         Object disable = SpringExpressionUtils.parseExpression(getDisable(annotation));
-        if (Boolean.FALSE.equals(disable)) {
+        if (Boolean.TRUE.equals(disable)) {
             return origin;
         }
 
