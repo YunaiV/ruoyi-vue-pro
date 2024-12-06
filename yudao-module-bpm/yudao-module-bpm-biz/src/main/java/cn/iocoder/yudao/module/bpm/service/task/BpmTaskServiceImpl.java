@@ -441,7 +441,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
      * 判断指定用户，是否是当前任务的加签人
      *
      * @param userId 用户 Id
-     * @param task 任务
+     * @param task   任务
      * @return 是否
      */
     private boolean isAddSignUserTask(Long userId, Task task) {
@@ -669,7 +669,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
                 reqVO.getTargetTaskDefinitionKey(), task.getProcessDefinitionId());
 
         // 2. 调用 Flowable 框架的退回逻辑
-        returnTask(task, targetElement, reqVO);
+        returnTask(userId, task, targetElement, reqVO);
     }
 
     /**
@@ -701,11 +701,12 @@ public class BpmTaskServiceImpl implements BpmTaskService {
     /**
      * 执行退回逻辑
      *
+     * @param userId        用户编号
      * @param currentTask   当前退回的任务
      * @param targetElement 需要退回到的目标任务
      * @param reqVO         前端参数封装
      */
-    public void returnTask(Task currentTask, FlowElement targetElement, BpmTaskReturnReqVO reqVO) {
+    public void returnTask(Long userId, Task currentTask, FlowElement targetElement, BpmTaskReturnReqVO reqVO) {
         // 1. 获得所有需要回撤的任务 taskDefinitionKey，用于稍后的 moveActivityIdsToSingleActivityId 回撤
         // 1.1 获取所有正常进行的任务节点 Key
         List<Task> taskList = taskService.createTaskQuery().processInstanceId(currentTask.getProcessInstanceId()).list();
@@ -721,22 +722,28 @@ public class BpmTaskServiceImpl implements BpmTaskService {
             if (!returnTaskKeyList.contains(task.getTaskDefinitionKey())) {
                 return;
             }
-            // 2.1 添加评论
-            taskService.addComment(task.getId(), currentTask.getProcessInstanceId(), BpmCommentTypeEnum.RETURN.getType(),
-                    BpmCommentTypeEnum.RETURN.formatComment(reqVO.getReason()));
-            // 2.2 更新 task 状态 + 原因
-            updateTaskStatusAndReason(task.getId(), BpmTaskStatusEnum.RETURN.getStatus(), reqVO.getReason());
+
+            if (isAssignUserTask(userId, task)) { // 判断是否分配给自己任务，因为会签任务，一个节点会有多个任务
+                // 2.1 添加评论
+                taskService.addComment(task.getId(), currentTask.getProcessInstanceId(), BpmCommentTypeEnum.RETURN.getType(),
+                        BpmCommentTypeEnum.RETURN.formatComment(reqVO.getReason()));
+                // 2.2 更新 task 状态 + 原因
+                updateTaskStatusAndReason(task.getId(), BpmTaskStatusEnum.RETURN.getStatus(), reqVO.getReason());
+            } else {
+                // 2.3 取消不是分配给自己的任务
+                processTaskCanceled(task.getId());
+            }
+
         });
 
         // 3. 设置流程变量节点驳回标记：用于驳回到节点，不执行 BpmUserTaskAssignStartUserHandlerTypeEnum 策略。导致自动通过
         runtimeService.setVariable(currentTask.getProcessInstanceId(),
                 String.format(PROCESS_INSTANCE_VARIABLE_RETURN_FLAG, reqVO.getTargetTaskDefinitionKey()), Boolean.TRUE);
-
         // 4. 执行驳回
+        List<String> runExecutionIdList = convertList(taskList, Task::getExecutionId);
         runtimeService.createChangeActivityStateBuilder()
                 .processInstanceId(currentTask.getProcessInstanceId())
-                .moveActivityIdsToSingleActivityId(returnTaskKeyList, // 当前要跳转的节点列表( 1 或多)
-                        reqVO.getTargetTaskDefinitionKey()) // targetKey 跳转到的节点(1)
+                .moveExecutionsToSingleActivityId(runExecutionIdList, reqVO.getTargetTaskDefinitionKey())
                 .changeState();
     }
 
