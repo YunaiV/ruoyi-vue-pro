@@ -1,9 +1,12 @@
 package cn.iocoder.yudao.module.iot.controller.admin.product;
 
+import cn.iocoder.yudao.framework.apilog.core.annotation.ApiAccessLog;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
+import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
+import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.yudao.module.iot.controller.admin.product.vo.product.IotProductPageReqVO;
 import cn.iocoder.yudao.module.iot.controller.admin.product.vo.product.IotProductRespVO;
 import cn.iocoder.yudao.module.iot.controller.admin.product.vo.product.IotProductSaveReqVO;
@@ -15,14 +18,17 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
+import static cn.iocoder.yudao.framework.apilog.core.enums.OperateTypeEnum.EXPORT;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
 
@@ -99,6 +105,19 @@ public class IotProductController {
             MapUtils.findAndThen(categoryMap, bean.getCategoryId(),
                     category -> bean.setCategoryName(category.getName()));
         }));
+    }
+
+    @GetMapping("/export-excel")
+    @Operation(summary = "导出产品 Excel")
+    @PreAuthorize("@ss.hasPermission('iot:product:export')")
+    @ApiAccessLog(operateType = EXPORT)
+    public void exportProductExcel(@Valid IotProductPageReqVO exportReqVO,
+                                   HttpServletResponse response) throws IOException {
+        exportReqVO.setPageSize(PageParam.PAGE_SIZE_NONE);
+        CommonResult<PageResult<IotProductRespVO>> result = getProductPage(exportReqVO);
+        // 导出 Excel
+        ExcelUtils.write(response, "产品.xls", "数据", IotProductRespVO.class,
+                result.getData().getList());
     }
 
     @GetMapping("/simple-list")
