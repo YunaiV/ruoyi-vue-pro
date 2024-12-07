@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.iot.controller.admin.product.vo;
+package cn.iocoder.yudao.module.iot.controller.admin.product.vo.product;
 
 import cn.iocoder.yudao.framework.common.validation.InEnum;
 import cn.iocoder.yudao.module.iot.enums.product.*;
@@ -14,16 +14,25 @@ public class IotProductSaveReqVO {
     @Schema(description = "产品编号", requiredMode = Schema.RequiredMode.AUTO, example = "1")
     private Long id;
 
-    @Schema(description = "产品 Key", requiredMode = Schema.RequiredMode.AUTO, example = "12345abc")
-    private String productKey;
-
-    // TODO 芋艿：品类
-
-    // TODO 芋艿：【待确定】保活时长、产品图标、产品图片
-
     @Schema(description = "产品名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "温湿度")
     @NotEmpty(message = "产品名称不能为空")
     private String name;
+
+    @Schema(description = "产品 Key", requiredMode = Schema.RequiredMode.AUTO, example = "12345abc")
+    private String productKey;
+
+    @Schema(description = "产品分类编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
+    @NotNull(message = "产品分类编号不能为空")
+    private Long categoryId;
+
+    @Schema(description = "产品图标", example = "https://iocoder.cn/1.svg")
+    private String icon;
+
+    @Schema(description = "产品图标", example = "https://iocoder.cn/1.png")
+    private String picUrl;
+
+    @Schema(description = "产品描述", example = "描述")
+    private String description;
 
     @Schema(description = "设备类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "0")
     @InEnum(value = IotProductDeviceTypeEnum.class, message = "设备类型必须是 {value}")
@@ -47,8 +56,5 @@ public class IotProductSaveReqVO {
     @InEnum(value = IotValidateTypeEnum.class, message = "数据校验级别必须是 {value}")
     @NotNull(message = "数据校验级别不能为空")
     private Integer validateType;
-
-    @Schema(description = "产品描述", example = "描述")
-    private String description;
 
 }

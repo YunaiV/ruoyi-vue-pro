@@ -22,7 +22,7 @@ import lombok.*;
 public class IotProductDO extends BaseDO {
 
     /**
-     * 产品ID
+     * 产品 ID
      */
     @TableId
     private Long id;
@@ -30,17 +30,24 @@ public class IotProductDO extends BaseDO {
      * 产品名称
      */
     private String name;
-    // TODO @haohao：这个字段，要不改成 identifier，和阿里云更统一些
     /**
      * 产品标识
      */
     private String productKey;
     /**
-     * 产品所属品类编号
+     * 产品分类编号
      * <p>
-     * TODO 外键：后续加
+     * 关联 {@link IotProductCategoryDO#getId()}
      */
     private Long categoryId;
+    /**
+     * 产品图标
+     */
+    private String icon;
+    /**
+     * 产品图片
+     */
+    private String picUrl;
     /**
      * 产品描述
      */

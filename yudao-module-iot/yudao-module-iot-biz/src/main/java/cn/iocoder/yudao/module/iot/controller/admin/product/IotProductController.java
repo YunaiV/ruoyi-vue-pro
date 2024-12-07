@@ -3,10 +3,9 @@ package cn.iocoder.yudao.module.iot.controller.admin.product;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
-import cn.iocoder.yudao.module.iot.controller.admin.product.vo.IotProductPageReqVO;
-import cn.iocoder.yudao.module.iot.controller.admin.product.vo.IotProductRespVO;
-import cn.iocoder.yudao.module.iot.controller.admin.product.vo.IotProductSaveReqVO;
-import cn.iocoder.yudao.module.iot.controller.admin.product.vo.IotProductSimpleRespVO;
+import cn.iocoder.yudao.module.iot.controller.admin.product.vo.product.IotProductPageReqVO;
+import cn.iocoder.yudao.module.iot.controller.admin.product.vo.product.IotProductRespVO;
+import cn.iocoder.yudao.module.iot.controller.admin.product.vo.product.IotProductSaveReqVO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.product.IotProductDO;
 import cn.iocoder.yudao.module.iot.service.product.IotProductService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -21,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
 
 @Tag(name = "管理后台 - IoT 产品")
 @RestController
@@ -86,9 +86,10 @@ public class IotProductController {
     @GetMapping("/simple-list")
     @Operation(summary = "获得所有产品列表")
     @PreAuthorize("@ss.hasPermission('iot:product:query')")
-    public CommonResult<List<IotProductSimpleRespVO>> getSimpleProductList() {
+    public CommonResult<List<IotProductRespVO>> getSimpleProductList() {
         List<IotProductDO> list = productService.getProductList();
-        return success(BeanUtils.toBean(list, IotProductSimpleRespVO.class));
+        return success(convertList(list, product -> // 只返回 id、name 字段
+                new IotProductRespVO().setId(product.getId()).setName(product.getName())));
     }
 
 }

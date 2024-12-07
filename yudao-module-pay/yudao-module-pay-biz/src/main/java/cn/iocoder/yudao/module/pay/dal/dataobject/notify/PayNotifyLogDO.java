@@ -44,7 +44,7 @@ public class PayNotifyLogDO extends BaseDO {
     /**
      * 支付通知状态
      *
-     * 外键 {@link PayNotifyStatusEnum}
+     * 枚举 {@link PayNotifyStatusEnum}
      */
     private Integer status;
 

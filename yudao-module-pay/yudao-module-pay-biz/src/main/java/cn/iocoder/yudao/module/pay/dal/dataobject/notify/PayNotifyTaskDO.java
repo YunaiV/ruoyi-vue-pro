@@ -52,7 +52,7 @@ public class PayNotifyTaskDO extends TenantBaseDO {
     /**
      * 通知类型
      *
-     * 外键 {@link PayNotifyTypeEnum}
+     * 枚举 {@link PayNotifyTypeEnum}
      */
     private Integer type;
     /**
@@ -73,7 +73,7 @@ public class PayNotifyTaskDO extends TenantBaseDO {
     /**
      * 通知状态
      *
-     * 外键 {@link PayNotifyStatusEnum}
+     * 枚举 {@link PayNotifyStatusEnum}
      */
     private Integer status;
     /**

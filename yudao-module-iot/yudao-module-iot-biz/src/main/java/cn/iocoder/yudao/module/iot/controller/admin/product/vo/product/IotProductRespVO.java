@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.iot.controller.admin.product.vo;
+package cn.iocoder.yudao.module.iot.controller.admin.product.vo.product;
 
 import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
 import com.alibaba.excel.annotation.ExcelProperty;
@@ -20,33 +20,22 @@ public class IotProductRespVO {
     @ExcelProperty("产品名称")
     private String name;
 
-    @Schema(description = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED)
-    @ExcelProperty("创建时间")
-    private LocalDateTime createTime;
-
     @Schema(description = "产品标识", requiredMode = Schema.RequiredMode.REQUIRED)
     @ExcelProperty("产品标识")
     private String productKey;
 
-    @Schema(description = "接入网关协议", example = "2")
-    @ExcelProperty("接入网关协议")
-    private Integer protocolType;
-
-    @Schema(description = "协议编号（脚本解析 id）", requiredMode = Schema.RequiredMode.REQUIRED, example = "13177")
-    @ExcelProperty("协议编号（脚本解析 id）")
-    private Long protocolId;
-
-    @Schema(description = "产品所属品类标识符", example = "14237")
-    @ExcelProperty("产品所属品类标识符")
+    @Schema(description = "产品分类编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     private Long categoryId;
+
+    @Schema(description = "产品图标", example = "https://iocoder.cn/1.svg")
+    private String icon;
+
+    @Schema(description = "产品图标", example = "https://iocoder.cn/1.png")
+    private String picUrl;
 
     @Schema(description = "产品描述", example = "你猜")
     @ExcelProperty("产品描述")
     private String description;
-
-    @Schema(description = "数据校验级别", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
-    @ExcelProperty("数据校验级别")
-    private Integer validateType;
 
     @Schema(description = "产品状态", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     @ExcelProperty("产品状态")
@@ -60,8 +49,24 @@ public class IotProductRespVO {
     @ExcelProperty("联网方式")
     private Integer netType;
 
+    @Schema(description = "接入网关协议", example = "2")
+    @ExcelProperty("接入网关协议")
+    private Integer protocolType;
+
+    @Schema(description = "协议编号（脚本解析 id）", requiredMode = Schema.RequiredMode.REQUIRED, example = "13177")
+    @ExcelProperty("协议编号（脚本解析 id）")
+    private Long protocolId;
+
     @Schema(description = "数据格式")
     @ExcelProperty("数据格式")
     private Integer dataFormat;
+
+    @Schema(description = "数据校验级别", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
+    @ExcelProperty("数据校验级别")
+    private Integer validateType;
+
+    @Schema(description = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED)
+    @ExcelProperty("创建时间")
+    private LocalDateTime createTime;
 
 }
