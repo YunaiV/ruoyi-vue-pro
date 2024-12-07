@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
 
-@Tag(name = "管理后台 - 签到记录")
+@Tag(name = "用户 App - 签到记录")
 @RestController
 @RequestMapping("/member/sign-in/record")
 @Validated
