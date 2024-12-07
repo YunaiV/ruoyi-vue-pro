@@ -739,27 +739,26 @@ public class BpmTaskServiceImpl implements BpmTaskService {
                 return;
             }
 
-            if (isAssignUserTask(userId, task)) { // 判断是否分配给自己任务，因为会签任务，一个节点会有多个任务
-                // 2.1 添加评论
+            // 判断是否分配给自己任务，因为会签任务，一个节点会有多个任务
+            if (isAssignUserTask(userId, task)) { // 情况一：自己的任务，进行 RETURN 标记
+                // 2.1.1 添加评论
                 taskService.addComment(task.getId(), currentTask.getProcessInstanceId(), BpmCommentTypeEnum.RETURN.getType(),
                         BpmCommentTypeEnum.RETURN.formatComment(reqVO.getReason()));
-                // 2.2 更新 task 状态 + 原因
+                // 2.1.2 更新 task 状态 + 原因
                 updateTaskStatusAndReason(task.getId(), BpmTaskStatusEnum.RETURN.getStatus(), reqVO.getReason());
-            } else {
-                // 2.3 取消不是分配给自己的任务
+            } else { // 情况二：别人的任务，进行 CANCEL 标记
                 processTaskCanceled(task.getId());
             }
-
         });
 
         // 3. 设置流程变量节点驳回标记：用于驳回到节点，不执行 BpmUserTaskAssignStartUserHandlerTypeEnum 策略。导致自动通过
         runtimeService.setVariable(currentTask.getProcessInstanceId(),
                 String.format(PROCESS_INSTANCE_VARIABLE_RETURN_FLAG, reqVO.getTargetTaskDefinitionKey()), Boolean.TRUE);
         // 4. 执行驳回
-        List<String> runExecutionIdList = convertList(taskList, Task::getExecutionId);
+        List<String> runExecutionIds = convertList(taskList, Task::getExecutionId);
         runtimeService.createChangeActivityStateBuilder()
                 .processInstanceId(currentTask.getProcessInstanceId())
-                .moveExecutionsToSingleActivityId(runExecutionIdList, reqVO.getTargetTaskDefinitionKey())
+                .moveExecutionsToSingleActivityId(runExecutionIds, reqVO.getTargetTaskDefinitionKey())
                 .changeState();
     }
 
