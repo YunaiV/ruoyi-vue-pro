@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.iot.service.product;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.iot.controller.admin.product.vo.category.IotProductCategoryPageReqVO;
@@ -10,6 +11,7 @@ import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
+import java.util.Collection;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
@@ -62,6 +64,14 @@ public class IotProductCategoryServiceImpl implements IotProductCategoryService 
     @Override
     public IotProductCategoryDO getProductCategory(Long id) {
         return productCategoryMapper.selectById(id);
+    }
+
+    @Override
+    public List<IotProductCategoryDO> getProductCategoryList(Collection<Long> ids) {
+        if (CollUtil.isEmpty(ids)) {
+            return CollUtil.newArrayList();
+        }
+        return productCategoryMapper.selectBatchIds(ids);
     }
 
     @Override

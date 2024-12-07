@@ -27,6 +27,9 @@ public class IotProductRespVO {
     @Schema(description = "产品分类编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     private Long categoryId;
 
+    @Schema(description = "产品分类名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
+    private String categoryName;
+
     @Schema(description = "产品图标", example = "https://iocoder.cn/1.svg")
     private String icon;
 

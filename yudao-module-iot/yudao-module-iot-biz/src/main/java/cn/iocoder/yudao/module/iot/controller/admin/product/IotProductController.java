@@ -2,11 +2,14 @@ package cn.iocoder.yudao.module.iot.controller.admin.product;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.iot.controller.admin.product.vo.product.IotProductPageReqVO;
 import cn.iocoder.yudao.module.iot.controller.admin.product.vo.product.IotProductRespVO;
 import cn.iocoder.yudao.module.iot.controller.admin.product.vo.product.IotProductSaveReqVO;
+import cn.iocoder.yudao.module.iot.dal.dataobject.product.IotProductCategoryDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.product.IotProductDO;
+import cn.iocoder.yudao.module.iot.service.product.IotProductCategoryService;
 import cn.iocoder.yudao.module.iot.service.product.IotProductService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -18,6 +21,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
@@ -30,6 +34,8 @@ public class IotProductController {
 
     @Resource
     private IotProductService productService;
+    @Resource
+    private IotProductCategoryService categoryService;
 
     @PostMapping("/create")
     @Operation(summary = "创建产品")
@@ -72,7 +78,13 @@ public class IotProductController {
     @PreAuthorize("@ss.hasPermission('iot:product:query')")
     public CommonResult<IotProductRespVO> getProduct(@RequestParam("id") Long id) {
         IotProductDO product = productService.getProduct(id);
-        return success(BeanUtils.toBean(product, IotProductRespVO.class));
+        // 拼接数据
+        IotProductCategoryDO category = categoryService.getProductCategory(product.getCategoryId());
+        return success(BeanUtils.toBean(product, IotProductRespVO.class, bean -> {
+            if (category != null) {
+                bean.setCategoryName(category.getName());
+            }
+        }));
     }
 
     @GetMapping("/page")
@@ -80,7 +92,13 @@ public class IotProductController {
     @PreAuthorize("@ss.hasPermission('iot:product:query')")
     public CommonResult<PageResult<IotProductRespVO>> getProductPage(@Valid IotProductPageReqVO pageReqVO) {
         PageResult<IotProductDO> pageResult = productService.getProductPage(pageReqVO);
-        return success(BeanUtils.toBean(pageResult, IotProductRespVO.class));
+        // 拼接数据
+        Map<Long, IotProductCategoryDO> categoryMap = categoryService.getProductCategoryMap(
+                convertList(pageResult.getList(), IotProductDO::getCategoryId));
+        return success(BeanUtils.toBean(pageResult, IotProductRespVO.class, bean -> {
+            MapUtils.findAndThen(categoryMap, bean.getCategoryId(),
+                    category -> bean.setCategoryName(category.getName()));
+        }));
     }
 
     @GetMapping("/simple-list")

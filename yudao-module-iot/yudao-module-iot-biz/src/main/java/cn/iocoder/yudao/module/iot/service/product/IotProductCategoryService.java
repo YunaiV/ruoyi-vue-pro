@@ -6,7 +6,11 @@ import cn.iocoder.yudao.module.iot.controller.admin.product.vo.category.IotProdu
 import cn.iocoder.yudao.module.iot.dal.dataobject.product.IotProductCategoryDO;
 import jakarta.validation.Valid;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
+
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
 
 /**
  * IoT 产品分类 Service 接口
@@ -44,6 +48,24 @@ public interface IotProductCategoryService {
      * @return 产品分类
      */
     IotProductCategoryDO getProductCategory(Long id);
+
+    /**
+     * 获得产品分类列表
+     *
+     * @param ids 编号
+     * @return 产品分类列表
+     */
+    List<IotProductCategoryDO> getProductCategoryList(Collection<Long> ids);
+
+    /**
+     * 获得产品分类 Map
+     *
+     * @param ids 编号
+     * @return 产品分类 Map
+     */
+    default Map<Long, IotProductCategoryDO> getProductCategoryMap(Collection<Long> ids) {
+        return convertMap(getProductCategoryList(ids), IotProductCategoryDO::getId);
+    }
 
     /**
      * 获得产品分类分页
