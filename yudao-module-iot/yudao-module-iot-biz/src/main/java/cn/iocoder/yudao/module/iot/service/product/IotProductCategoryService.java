@@ -6,6 +6,8 @@ import cn.iocoder.yudao.module.iot.controller.admin.product.vo.category.IotProdu
 import cn.iocoder.yudao.module.iot.dal.dataobject.product.IotProductCategoryDO;
 import jakarta.validation.Valid;
 
+import java.util.List;
+
 /**
  * IoT 产品分类 Service 接口
  *
@@ -14,7 +16,7 @@ import jakarta.validation.Valid;
 public interface IotProductCategoryService {
 
     /**
-     * 创建IoT 产品分类
+     * 创建产品分类
      *
      * @param createReqVO 创建信息
      * @return 编号
@@ -22,33 +24,41 @@ public interface IotProductCategoryService {
     Long createProductCategory(@Valid IotProductCategorySaveReqVO createReqVO);
 
     /**
-     * 更新IoT 产品分类
+     * 更新产品分类
      *
      * @param updateReqVO 更新信息
      */
     void updateProductCategory(@Valid IotProductCategorySaveReqVO updateReqVO);
 
     /**
-     * 删除IoT 产品分类
+     * 删除产品分类
      *
      * @param id 编号
      */
     void deleteProductCategory(Long id);
 
     /**
-     * 获得IoT 产品分类
+     * 获得产品分类
      *
      * @param id 编号
-     * @return IoT 产品分类
+     * @return 产品分类
      */
     IotProductCategoryDO getProductCategory(Long id);
 
     /**
-     * 获得IoT 产品分类分页
+     * 获得产品分类分页
      *
      * @param pageReqVO 分页查询
-     * @return IoT 产品分类分页
+     * @return 产品分类分页
      */
     PageResult<IotProductCategoryDO> getProductCategoryPage(IotProductCategoryPageReqVO pageReqVO);
+
+    /**
+     * 获得产品分类列表，根据状态
+     *
+     * @param status 状态
+     * @return 产品分类列表
+     */
+    List<IotProductCategoryDO> getProductCategoryListByStatus(Integer status);
 
 }

@@ -7,6 +7,8 @@ import cn.iocoder.yudao.module.iot.controller.admin.product.vo.category.IotProdu
 import cn.iocoder.yudao.module.iot.dal.dataobject.product.IotProductCategoryDO;
 import org.apache.ibatis.annotations.Mapper;
 
+import java.util.List;
+
 /**
  * IoT 产品分类 Mapper
  *
@@ -20,6 +22,10 @@ public interface IotProductCategoryMapper extends BaseMapperX<IotProductCategory
                 .likeIfPresent(IotProductCategoryDO::getName, reqVO.getName())
                 .betweenIfPresent(IotProductCategoryDO::getCreateTime, reqVO.getCreateTime())
                 .orderByDesc(IotProductCategoryDO::getId));
+    }
+
+    default List<IotProductCategoryDO> selectListByStatus(Integer status) {
+        return selectList(IotProductCategoryDO::getStatus, status);
     }
 
 }

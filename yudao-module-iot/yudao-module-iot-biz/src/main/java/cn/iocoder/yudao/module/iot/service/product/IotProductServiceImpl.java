@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.module.iot.service.product;
 
-import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.iot.controller.admin.product.vo.product.IotProductPageReqVO;
@@ -11,14 +10,12 @@ import cn.iocoder.yudao.module.iot.enums.product.IotProductStatusEnum;
 import cn.iocoder.yudao.module.iot.service.thinkmodelfunction.IotThinkModelFunctionService;
 import com.baomidou.dynamic.datasource.annotation.DSTransactional;
 import jakarta.annotation.Resource;
-
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
 import java.util.List;
 import java.util.Objects;
-import java.util.UUID;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.iot.enums.ErrorCodeConstants.*;
@@ -42,29 +39,14 @@ public class IotProductServiceImpl implements IotProductService {
     @Override
     public Long createProduct(IotProductSaveReqVO createReqVO) {
         // 1. 生成 ProductKey
-        createProductKey(createReqVO);
+        if (productMapper.selectByProductKey(createReqVO.getProductKey()) != null) {
+            throw exception(PRODUCT_KEY_EXISTS);
+        }
         // 2. 插入
-        IotProductDO product = BeanUtils.toBean(createReqVO, IotProductDO.class);
+        IotProductDO product = BeanUtils.toBean(createReqVO, IotProductDO.class)
+                .setStatus(IotProductStatusEnum.UNPUBLISHED.getStatus());
         productMapper.insert(product);
         return product.getId();
-    }
-
-    /**
-     * 创建 ProductKey
-     *
-     * @param createReqVO 创建信息
-     */
-    private void createProductKey(IotProductSaveReqVO createReqVO) {
-        String productKey = createReqVO.getProductKey();
-        // 1. productKey为空，生成随机的 11 位字符串
-        if (StrUtil.isEmpty(productKey)) {
-            productKey = UUID.randomUUID().toString().replace("-", "").substring(0, 11);
-        }
-        // 2. 校验唯一性
-        if (productMapper.selectByProductKey(productKey) != null) {
-            throw exception(PRODUCT_IDENTIFICATION_EXISTS);
-        }
-        createReqVO.setProductKey(productKey);
     }
 
     @Override
@@ -98,7 +80,7 @@ public class IotProductServiceImpl implements IotProductService {
     }
 
     private void validateProductStatus(IotProductDO iotProductDO) {
-        if (Objects.equals(iotProductDO.getStatus(), IotProductStatusEnum.PUBLISHED.getType())) {
+        if (Objects.equals(iotProductDO.getStatus(), IotProductStatusEnum.PUBLISHED.getStatus())) {
             throw exception(PRODUCT_STATUS_NOT_DELETE);
         }
     }
@@ -121,7 +103,7 @@ public class IotProductServiceImpl implements IotProductService {
         // 2. 更新
         IotProductDO updateObj = IotProductDO.builder().id(id).status(status).build();
         // 3. 产品是发布状态
-        if (Objects.equals(status, IotProductStatusEnum.PUBLISHED.getType())) {
+        if (Objects.equals(status, IotProductStatusEnum.PUBLISHED.getStatus())) {
             // 3.1 创建超级表数据模型
             thinkModelFunctionService.createSuperTableDataModel(id);
         }

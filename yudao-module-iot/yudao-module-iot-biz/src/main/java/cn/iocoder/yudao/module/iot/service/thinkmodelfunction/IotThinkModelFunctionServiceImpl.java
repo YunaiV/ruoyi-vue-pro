@@ -82,7 +82,7 @@ public class IotThinkModelFunctionServiceImpl implements IotThinkModelFunctionSe
 
     private void validateProductStatus(Long createReqVO) {
         IotProductDO product = productService.getProduct(createReqVO);
-        if (Objects.equals(product.getStatus(), IotProductStatusEnum.PUBLISHED.getType())) {
+        if (Objects.equals(product.getStatus(), IotProductStatusEnum.PUBLISHED.getStatus())) {
             throw exception(PRODUCT_STATUS_NOT_ALLOW_FUNCTION);
         }
     }

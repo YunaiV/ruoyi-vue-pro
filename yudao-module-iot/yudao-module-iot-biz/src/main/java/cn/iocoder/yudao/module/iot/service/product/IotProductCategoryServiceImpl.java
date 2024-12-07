@@ -10,6 +10,8 @@ import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
+import java.util.List;
+
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.iot.enums.ErrorCodeConstants.PRODUCT_CATEGORY_NOT_EXISTS;
 
@@ -65,6 +67,11 @@ public class IotProductCategoryServiceImpl implements IotProductCategoryService 
     @Override
     public PageResult<IotProductCategoryDO> getProductCategoryPage(IotProductCategoryPageReqVO pageReqVO) {
         return productCategoryMapper.selectPage(pageReqVO);
+    }
+
+    @Override
+    public List<IotProductCategoryDO> getProductCategoryListByStatus(Integer status) {
+        return productCategoryMapper.selectListByStatus(status);
     }
 
 }
