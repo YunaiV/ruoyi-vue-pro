@@ -14,8 +14,12 @@ public class IotProductSaveReqVO {
     @Schema(description = "产品编号", requiredMode = Schema.RequiredMode.AUTO, example = "1")
     private Long id;
 
-    @Schema(description = "产品Key", requiredMode = Schema.RequiredMode.AUTO, example = "12345abc")
+    @Schema(description = "产品 Key", requiredMode = Schema.RequiredMode.AUTO, example = "12345abc")
     private String productKey;
+
+    // TODO 芋艿：品类
+
+    // TODO 芋艿：【待确定】保活时长、产品图标、产品图片
 
     @Schema(description = "产品名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "温湿度")
     @NotEmpty(message = "产品名称不能为空")
