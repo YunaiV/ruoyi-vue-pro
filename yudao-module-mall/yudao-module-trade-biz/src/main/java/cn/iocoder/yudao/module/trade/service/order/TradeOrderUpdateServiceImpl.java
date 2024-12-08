@@ -688,8 +688,9 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
         List<TradeOrderItemDO> updateItems = new ArrayList<>();
         for (int i = 0; i < orderOrderItems.size(); i++) {
             TradeOrderItemDO item = orderOrderItems.get(i);
-            updateItems.add(new TradeOrderItemDO().setId(item.getId()).setAdjustPrice(item.getAdjustPrice() + dividePrices.get(i))
-                    .setPayPrice((item.getPayPrice() - item.getAdjustPrice()) + dividePrices.get(i)));
+            updateItems.add(new TradeOrderItemDO().setId(item.getId())
+                    .setAdjustPrice(item.getAdjustPrice() + dividePrices.get(i))
+                    .setPayPrice(item.getPayPrice() + dividePrices.get(i)));
         }
         tradeOrderItemMapper.updateBatch(updateItems);
 
