@@ -4,12 +4,11 @@ import cn.iocoder.yudao.module.member.api.level.dto.MemberLevelRespDTO;
 import cn.iocoder.yudao.module.member.convert.level.MemberLevelConvert;
 import cn.iocoder.yudao.module.member.enums.MemberExperienceBizTypeEnum;
 import cn.iocoder.yudao.module.member.service.level.MemberLevelService;
+import jakarta.annotation.Resource;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
-import jakarta.annotation.Resource;
-
-import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.member.enums.ErrorCodeConstants.EXPERIENCE_BIZ_NOT_SUPPORT;
 
 /**
@@ -17,6 +16,7 @@ import static cn.iocoder.yudao.module.member.enums.ErrorCodeConstants.EXPERIENCE
  *
  * @author owen
  */
+@Slf4j
 @Service
 @Validated
 public class MemberLevelApiImpl implements MemberLevelApi {
@@ -33,7 +33,9 @@ public class MemberLevelApiImpl implements MemberLevelApi {
     public void addExperience(Long userId, Integer experience, Integer bizType, String bizId) {
         MemberExperienceBizTypeEnum bizTypeEnum = MemberExperienceBizTypeEnum.getByType(bizType);
         if (bizTypeEnum == null) {
-            throw exception(EXPERIENCE_BIZ_NOT_SUPPORT);
+            log.error("[addExperience][userId({}) experience({}) bizType({}) bizId({}) {}]", userId, experience, bizType,
+                    bizId, EXPERIENCE_BIZ_NOT_SUPPORT);
+            return;
         }
         memberLevelService.addExperience(userId, experience, bizTypeEnum, bizId);
     }
