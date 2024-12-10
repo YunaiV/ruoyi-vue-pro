@@ -109,23 +109,23 @@ public class ErpProductDO extends BaseDO {
     /**
      * PO产品经理id
      */
-    private Long poId;
+    private Long productManagerId;
     /**
      * ID工业设计id
      */
-    private Long idId;
+    private Long industrialDesignerId;
     /**
      * RD研发工程师id
      */
-    private Long rdId;
+    private Long researchDeveloperId;
     /**
      * 维护工程师id
      */
-    private Long meId;
+    private Long maintenanceEngineerId;
     /**
      * 层板承重
      */
-    private String shelfLoadCapacity;
+    private BigDecimal shelfLoadCapacity;
     /**
      * 层板数量
      */

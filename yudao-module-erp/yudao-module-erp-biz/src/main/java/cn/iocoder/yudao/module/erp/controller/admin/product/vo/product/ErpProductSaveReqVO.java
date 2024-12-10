@@ -83,30 +83,28 @@ public class ErpProductSaveReqVO {
     private BigDecimal height;
 
     @Schema(description = "图片URL，json格式", requiredMode = Schema.RequiredMode.REQUIRED, example = "https://www.iocoder.cn")
-    @NotEmpty(message = "图片不能为空")
     private List<@Valid ImageUrlJson> imageUrl;
 
     @Schema(description = "指导价，json格式", requiredMode = Schema.RequiredMode.REQUIRED, example = "16486")
-    @NotEmpty(message = "指导价不能为空")
     private List<@Valid GuidePriceJson> guidePrice;
 
     @Schema(description = "专利")
     private String patent;
 
     @Schema(description = "PO产品经理id", example = "28770")
-    private Long poId;
+    private Long productManagerId;
 
     @Schema(description = "ID工业设计id", example = "27774")
-    private Long idId;
+    private Long industrialDesignerId;
 
     @Schema(description = "RD研发工程师id", example = "10321")
-    private Long rdId;
+    private Long researchDeveloperId;
 
     @Schema(description = "维护工程师id", example = "22163")
-    private Long meId;
+    private Long maintenanceEngineerId;
 
     @Schema(description = "层板承重")
-    private String shelfLoadCapacity;
+    private BigDecimal shelfLoadCapacity;
 
     @Schema(description = "层板数量", example = "352")
     private Integer shelvesCount;

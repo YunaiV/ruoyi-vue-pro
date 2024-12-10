@@ -114,39 +114,39 @@ public class ErpProductRespVO {
 
     @Schema(description = "PO产品经理id", example = "28770")
     @ExcelProperty("PO产品经理id")
-    private Long poId;
+    private Long productManagerId;
 
     @Schema(description = "PO产品经理名称", example = "王五")
     @ExcelProperty("PO产品经理名称")
-    private String poName;
+    private String productManagerName;
 
     @Schema(description = "ID工业设计id", example = "27774")
     @ExcelProperty("ID工业设计id")
-    private Long idId;
+    private Long industrialDesignerId;
 
     @Schema(description = "ID工业设计名称", example = "王五")
     @ExcelProperty("ID工业设计名称")
-    private String idName;
+    private String industrialDesignerName;
 
     @Schema(description = "RD研发工程师id", example = "10321")
     @ExcelProperty("RD研发工程师id")
-    private Long rdId;
+    private Long researchDeveloperId;
 
     @Schema(description = "RD研发工程师名称", example = "王五")
     @ExcelProperty("RD研发工程师名称")
-    private String rdName;
+    private String researchDeveloperName;
 
     @Schema(description = "维护工程师id", example = "22163")
     @ExcelProperty("维护工程师id")
-    private Long meId;
+    private Long maintenanceEngineerId;
 
     @Schema(description = "维护工程师名称", example = "王五")
     @ExcelProperty("维护工程师名称")
-    private String meName;
+    private String maintenanceEngineerName;
 
     @Schema(description = "层板承重")
     @ExcelProperty("层板承重")
-    private String shelfLoadCapacity;
+    private BigDecimal shelfLoadCapacity;
 
     @Schema(description = "层板数量", example = "352")
     @ExcelProperty("层板数量")

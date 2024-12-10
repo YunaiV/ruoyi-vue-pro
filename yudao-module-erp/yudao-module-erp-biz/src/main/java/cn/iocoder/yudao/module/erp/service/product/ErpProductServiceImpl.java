@@ -1,10 +1,8 @@
 package cn.iocoder.yudao.module.erp.service.product;
 
-import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjUtil;
 import cn.hutool.json.JSONUtil;
-import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.exception.util.ThrowUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
@@ -77,12 +75,16 @@ public class ErpProductServiceImpl implements ErpProductService {
         //校验产品分类是否存在
         validateProductCategory(categoryId);
         //校验人员id是否存在
-        validatePerson(createReqVO.getPoId(), createReqVO.getIdId(), createReqVO.getRdId(), createReqVO.getMeId());
+        validatePerson(createReqVO.getProductManagerId(), createReqVO.getIndustrialDesignerId(), createReqVO.getResearchDeveloperId(), createReqVO.getMaintenanceEngineerId());
         // 插入产品
         ErpProductDO product = BeanUtils.toBean(createReqVO, ErpProductDO.class);
         //将图片的实体和指导价的实体转为json字符串
-        product.setImageUrl(JSONUtil.toJsonStr(createReqVO.getImageUrl()));
-        product.setGuidePrice(JSONUtil.toJsonStr(createReqVO.getGuidePrice()));
+        if (CollUtil.isNotEmpty(createReqVO.getImageUrl())){
+            product.setImageUrl(JSONUtil.toJsonStr(createReqVO.getImageUrl()));
+        }
+        if (CollUtil.isNotEmpty(createReqVO.getGuidePrice())){
+            product.setGuidePrice(JSONUtil.toJsonStr(createReqVO.getGuidePrice()));
+        }
         ThrowUtil.ifSqlThrow(productMapper.insert(product),DB_INSERT_ERROR);
         // 返回
         return product.getId();
@@ -109,12 +111,16 @@ public class ErpProductServiceImpl implements ErpProductService {
         //校验产品分类是否存在
         validateProductCategory(categoryId);
         //校验人员id是否存在
-        validatePerson(updateReqVO.getPoId(), updateReqVO.getIdId(), updateReqVO.getRdId(), updateReqVO.getMeId());
+        validatePerson(updateReqVO.getProductManagerId(), updateReqVO.getIndustrialDesignerId(), updateReqVO.getResearchDeveloperId(), updateReqVO.getMaintenanceEngineerId());
         // 更新
         ErpProductDO updateObj = BeanUtils.toBean(updateReqVO, ErpProductDO.class);
         //将图片的实体和指导价的实体转为json字符串
-        updateObj.setImageUrl(JSONUtil.toJsonStr(updateReqVO.getImageUrl()));
-        updateObj.setGuidePrice(JSONUtil.toJsonStr(updateReqVO.getGuidePrice()));
+        if (CollUtil.isNotEmpty(updateReqVO.getImageUrl())){
+            updateObj.setImageUrl(JSONUtil.toJsonStr(updateReqVO.getImageUrl()));
+        }
+        if (CollUtil.isNotEmpty(updateReqVO.getGuidePrice())){
+            updateObj.setGuidePrice(JSONUtil.toJsonStr(updateReqVO.getGuidePrice()));
+        }
         ThrowUtil.ifSqlThrow(productMapper.updateById(updateObj),DB_UPDATE_ERROR);
         //同步数据
         var dtos = customRuleMapper.selectProductAllInfoListById(id);
@@ -146,7 +152,7 @@ public class ErpProductServiceImpl implements ErpProductService {
         return list;
     }
 
-    private void validateProductExists(Long id) {
+    public void validateProductExists(Long id) {
         if (productMapper.selectById(id) == null) {
             throw exception(PRODUCT_NOT_EXISTS);
         }
@@ -201,10 +207,10 @@ public class ErpProductServiceImpl implements ErpProductService {
         Map<Long, ErpProductUnitDO> unitMap = productUnitService.getProductUnitMap(
                 convertSet(list, ErpProductDO::getUnitId));
         Map<Long, DeptRespDTO> deptMap = deptApi.getDeptMap(convertSet(list, ErpProductDO::getDeptId));
-        Map<Long, AdminUserRespDTO> poUserMap = userApi.getUserMap(convertSet(list, ErpProductDO::getPoId));
-        Map<Long, AdminUserRespDTO> idUserMap = userApi.getUserMap(convertSet(list, ErpProductDO::getIdId));
-        Map<Long, AdminUserRespDTO> rdUserMap = userApi.getUserMap(convertSet(list, ErpProductDO::getRdId));
-        Map<Long, AdminUserRespDTO> meUserMap = userApi.getUserMap(convertSet(list, ErpProductDO::getMeId));
+        Map<Long, AdminUserRespDTO> poUserMap = userApi.getUserMap(convertSet(list, ErpProductDO::getProductManagerId));
+        Map<Long, AdminUserRespDTO> idUserMap = userApi.getUserMap(convertSet(list, ErpProductDO::getIndustrialDesignerId));
+        Map<Long, AdminUserRespDTO> rdUserMap = userApi.getUserMap(convertSet(list, ErpProductDO::getResearchDeveloperId));
+        Map<Long, AdminUserRespDTO> meUserMap = userApi.getUserMap(convertSet(list, ErpProductDO::getMaintenanceEngineerId));
         return BeanUtils.toBean(list, ErpProductRespVO.class, product -> {
             MapUtils.findAndThen(categoryMap, product.getCategoryId(),
                     category -> product.setCategoryName(category.getName()));
@@ -212,14 +218,14 @@ public class ErpProductServiceImpl implements ErpProductService {
                     unit -> product.setUnitName(unit.getName()));
             MapUtils.findAndThen(deptMap, product.getDeptId(),
                     dept -> product.setDeptName(dept.getName()));
-            MapUtils.findAndThen(poUserMap, product.getPoId(),
-                    user -> product.setPoName(user.getNickname()));
-            MapUtils.findAndThen(idUserMap, product.getIdId(),
-                    user -> product.setIdName(user.getNickname()));
-            MapUtils.findAndThen(rdUserMap, product.getRdId(),
-                    user -> product.setRdName(user.getNickname()));
-            MapUtils.findAndThen(meUserMap, product.getMeId(),
-                    user -> product.setMeName(user.getNickname()));
+            MapUtils.findAndThen(poUserMap, product.getProductManagerId(),
+                    user -> product.setProductManagerName(user.getNickname()));
+            MapUtils.findAndThen(idUserMap, product.getIndustrialDesignerId(),
+                    user -> product.setIndustrialDesignerName(user.getNickname()));
+            MapUtils.findAndThen(rdUserMap, product.getResearchDeveloperId(),
+                    user -> product.setResearchDeveloperName(user.getNickname()));
+            MapUtils.findAndThen(meUserMap, product.getMaintenanceEngineerId(),
+                    user -> product.setMaintenanceEngineerName(user.getNickname()));
         });
     }
 
