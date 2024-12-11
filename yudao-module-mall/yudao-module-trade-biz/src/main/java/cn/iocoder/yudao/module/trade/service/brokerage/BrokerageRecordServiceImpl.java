@@ -2,7 +2,10 @@ package cn.iocoder.yudao.module.trade.service.brokerage;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.ListUtil;
-import cn.hutool.core.util.*;
+import cn.hutool.core.util.ArrayUtil;
+import cn.hutool.core.util.BooleanUtil;
+import cn.hutool.core.util.ObjUtil;
+import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.number.MoneyUtils;
@@ -26,12 +29,12 @@ import cn.iocoder.yudao.module.trade.service.brokerage.bo.BrokerageAddReqBO;
 import cn.iocoder.yudao.module.trade.service.brokerage.bo.UserBrokerageSummaryRespBO;
 import cn.iocoder.yudao.module.trade.service.config.TradeConfigService;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
-import jakarta.annotation.Resource;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -79,7 +82,7 @@ public class BrokerageRecordServiceImpl implements BrokerageRecordService {
         TradeConfigDO memberConfig = tradeConfigService.getTradeConfig();
         // 0 未启用分销功能
         if (memberConfig == null || !BooleanUtil.isTrue(memberConfig.getBrokerageEnabled())) {
-            log.warn("[addBrokerage][增加佣金失败：brokerageEnabled 未配置，userId({})", userId);
+            log.error("[addBrokerage][增加佣金失败：brokerageEnabled 未配置，userId({}) bizType({}) list({})", userId, bizType, list);
             return;
         }
 
@@ -180,7 +183,10 @@ public class BrokerageRecordServiceImpl implements BrokerageRecordService {
             } else if (Objects.equals(sourceUserLevel, 2)) {
                 fixedPrice = item.getSecondFixedPrice();
             } else {
-                throw new IllegalArgumentException(StrUtil.format("用户等级({}) 不合法", sourceUserLevel));
+                log.error("[addBrokerage][user({}) list({}) brokerageFrozenDays({}) brokeragePercent({}) " +
+                                "bizType({}) 用户等级sourceUserLevel({}) 不合法]", user, list, brokerageFrozenDays,
+                        brokeragePercent, bizType, sourceUserLevel);
+                return;
             }
             int brokeragePrice = calculatePrice(item.getBasePrice(), brokeragePercent, fixedPrice);
             if (brokeragePrice <= 0) {

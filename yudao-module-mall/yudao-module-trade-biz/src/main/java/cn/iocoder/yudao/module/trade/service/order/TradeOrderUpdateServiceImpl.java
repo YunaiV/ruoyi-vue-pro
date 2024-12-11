@@ -329,7 +329,7 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
     /**
      * 校验支付订单的合法性
      *
-     * @param order 交易订单
+     * @param order      交易订单
      * @param payOrderId 支付订单编号
      * @return 支付订单
      */
@@ -747,7 +747,7 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
         }
         DeliveryPickUpStoreDO deliveryPickUpStore = pickUpStoreService.getDeliveryPickUpStore(order.getPickUpStoreId());
         if (deliveryPickUpStore == null
-            || !CollUtil.contains(deliveryPickUpStore.getVerifyUserIds(), userId)) {
+                || !CollUtil.contains(deliveryPickUpStore.getVerifyUserIds(), userId)) {
             throw exception(ORDER_PICK_UP_FAIL_NOT_VERIFY_USER);
         }
 
@@ -920,7 +920,9 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
         // 1. 检验订单存在
         TradeOrderDO order = tradeOrderMapper.selectOrderByIdAndUserId(orderId, userId);
         if (order == null) {
-            throw exception(ORDER_NOT_FOUND);
+            log.error("[updateOrderGiveCouponIds][userId({}) orderId({}) giveCouponIds({}) {}]", userId, orderId,
+                    giveCouponIds, ORDER_NOT_FOUND);
+            return;
         }
 
         // 2. 更新订单赠送的优惠券编号列表

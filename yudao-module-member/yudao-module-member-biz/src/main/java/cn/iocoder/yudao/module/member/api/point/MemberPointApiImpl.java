@@ -3,10 +3,10 @@ package cn.iocoder.yudao.module.member.api.point;
 import cn.hutool.core.lang.Assert;
 import cn.iocoder.yudao.module.member.enums.point.MemberPointBizTypeEnum;
 import cn.iocoder.yudao.module.member.service.point.MemberPointRecordService;
+import jakarta.annotation.Resource;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
-
-import jakarta.annotation.Resource;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.member.enums.ErrorCodeConstants.POINT_RECORD_BIZ_NOT_SUPPORT;
@@ -16,6 +16,7 @@ import static cn.iocoder.yudao.module.member.enums.ErrorCodeConstants.POINT_RECO
  *
  * @author owen
  */
+@Slf4j
 @Service
 @Validated
 public class MemberPointApiImpl implements MemberPointApi {
@@ -28,7 +29,9 @@ public class MemberPointApiImpl implements MemberPointApi {
         Assert.isTrue(point > 0);
         MemberPointBizTypeEnum bizTypeEnum = MemberPointBizTypeEnum.getByType(bizType);
         if (bizTypeEnum == null) {
-            throw exception(POINT_RECORD_BIZ_NOT_SUPPORT);
+            log.error("[addPoint][userId({}) point({}) bizType({}) bizId({}) {}]", userId, point, bizType, bizId,
+                    POINT_RECORD_BIZ_NOT_SUPPORT);
+            return;
         }
         memberPointRecordService.createPointRecord(userId, point, bizTypeEnum, bizId);
     }
@@ -38,7 +41,9 @@ public class MemberPointApiImpl implements MemberPointApi {
         Assert.isTrue(point > 0);
         MemberPointBizTypeEnum bizTypeEnum = MemberPointBizTypeEnum.getByType(bizType);
         if (bizTypeEnum == null) {
-            throw exception(POINT_RECORD_BIZ_NOT_SUPPORT);
+            log.error("[addPoint][userId({}) point({}) bizType({}) bizId({}) {}]", userId, point, bizType, bizId,
+                    POINT_RECORD_BIZ_NOT_SUPPORT);
+            return;
         }
         memberPointRecordService.createPointRecord(userId, -point, bizTypeEnum, bizId);
     }
