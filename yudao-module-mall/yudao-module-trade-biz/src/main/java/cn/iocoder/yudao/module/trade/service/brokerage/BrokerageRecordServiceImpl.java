@@ -2,10 +2,7 @@ package cn.iocoder.yudao.module.trade.service.brokerage;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.ListUtil;
-import cn.hutool.core.util.ArrayUtil;
-import cn.hutool.core.util.BooleanUtil;
-import cn.hutool.core.util.ObjUtil;
-import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.util.*;
 import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.number.MoneyUtils;
@@ -183,10 +180,7 @@ public class BrokerageRecordServiceImpl implements BrokerageRecordService {
             } else if (Objects.equals(sourceUserLevel, 2)) {
                 fixedPrice = item.getSecondFixedPrice();
             } else {
-                log.error("[addBrokerage][user({}) list({}) brokerageFrozenDays({}) brokeragePercent({}) " +
-                                "bizType({}) 用户等级sourceUserLevel({}) 不合法]", user, list, brokerageFrozenDays,
-                        brokeragePercent, bizType, sourceUserLevel);
-                return;
+                throw new IllegalArgumentException(StrUtil.format("用户等级({}) 不合法", sourceUserLevel));
             }
             int brokeragePrice = calculatePrice(item.getBasePrice(), brokeragePercent, fixedPrice);
             if (brokeragePrice <= 0) {

@@ -9,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
+import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.member.enums.ErrorCodeConstants.EXPERIENCE_BIZ_NOT_SUPPORT;
 
 /**
@@ -33,9 +34,7 @@ public class MemberLevelApiImpl implements MemberLevelApi {
     public void addExperience(Long userId, Integer experience, Integer bizType, String bizId) {
         MemberExperienceBizTypeEnum bizTypeEnum = MemberExperienceBizTypeEnum.getByType(bizType);
         if (bizTypeEnum == null) {
-            log.error("[addExperience][userId({}) experience({}) bizType({}) bizId({}) {}]", userId, experience, bizType,
-                    bizId, EXPERIENCE_BIZ_NOT_SUPPORT);
-            return;
+            throw exception(EXPERIENCE_BIZ_NOT_SUPPORT);
         }
         memberLevelService.addExperience(userId, experience, bizTypeEnum, bizId);
     }

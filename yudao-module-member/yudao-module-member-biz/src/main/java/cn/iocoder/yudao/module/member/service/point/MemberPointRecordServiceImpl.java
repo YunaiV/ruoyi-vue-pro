@@ -82,9 +82,7 @@ public class MemberPointRecordServiceImpl implements MemberPointRecordService {
         // 2. 更新用户积分
         boolean success = memberUserService.updateUserPoint(userId, point);
         if (!success) {
-            log.error("[createPointRecord][userId({}) point({}) bizType({}) bizId({}) {}]", userId, point, bizType, bizId,
-                    USER_POINT_NOT_ENOUGH);
-            return;
+            throw exception(USER_POINT_NOT_ENOUGH);
         }
 
         // 3. 增加积分记录

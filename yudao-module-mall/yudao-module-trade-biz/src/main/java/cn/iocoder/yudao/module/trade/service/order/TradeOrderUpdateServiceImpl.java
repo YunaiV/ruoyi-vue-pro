@@ -920,9 +920,7 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
         // 1. 检验订单存在
         TradeOrderDO order = tradeOrderMapper.selectOrderByIdAndUserId(orderId, userId);
         if (order == null) {
-            log.error("[updateOrderGiveCouponIds][userId({}) orderId({}) giveCouponIds({}) {}]", userId, orderId,
-                    giveCouponIds, ORDER_NOT_FOUND);
-            return;
+            throw exception(ORDER_NOT_FOUND);
         }
 
         // 2. 更新订单赠送的优惠券编号列表

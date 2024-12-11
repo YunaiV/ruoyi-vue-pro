@@ -41,9 +41,7 @@ public class MemberPointApiImpl implements MemberPointApi {
         Assert.isTrue(point > 0);
         MemberPointBizTypeEnum bizTypeEnum = MemberPointBizTypeEnum.getByType(bizType);
         if (bizTypeEnum == null) {
-            log.error("[addPoint][userId({}) point({}) bizType({}) bizId({}) {}]", userId, point, bizType, bizId,
-                    POINT_RECORD_BIZ_NOT_SUPPORT);
-            return;
+            throw exception(POINT_RECORD_BIZ_NOT_SUPPORT);
         }
         memberPointRecordService.createPointRecord(userId, -point, bizTypeEnum, bizId);
     }
