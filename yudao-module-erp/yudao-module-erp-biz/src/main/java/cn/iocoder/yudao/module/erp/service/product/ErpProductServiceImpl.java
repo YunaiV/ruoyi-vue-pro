@@ -15,15 +15,12 @@ import cn.iocoder.yudao.module.erp.dal.dataobject.product.ErpProductDO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.product.ErpProductUnitDO;
 import cn.iocoder.yudao.module.erp.dal.mysql.logistic.customrule.ErpCustomRuleMapper;
 import cn.iocoder.yudao.module.erp.dal.mysql.product.ErpProductMapper;
-import cn.iocoder.yudao.module.erp.dal.supporting.VirtualTableInit;
 import cn.iocoder.yudao.module.erp.service.product.tvstand.ErpProductTvStandServiceImpl;
 import cn.iocoder.yudao.module.system.api.dept.DeptApi;
 import cn.iocoder.yudao.module.system.api.dept.dto.DeptRespDTO;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import jakarta.annotation.Resource;
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationContext;
 import org.springframework.messaging.MessageChannel;
@@ -58,6 +55,8 @@ public class ErpProductServiceImpl implements ErpProductService {
     private static final ReentrantLock LOCK = new ReentrantLock();
     private final AdminUserApi userApi;
     private final ApplicationContext applicationContext;
+    // 静态代码块初始化数据
+    private static final Map<Long, Class<?>> VIRTUAL_TABLE = Map.of(87L, ErpProductTvStandServiceImpl.class);
 
 
 
@@ -82,11 +81,8 @@ public class ErpProductServiceImpl implements ErpProductService {
         validateProductCategory(categoryId);
         //校验人员id是否存在
         validatePerson(createReqVO.getProductOwnerId(), createReqVO.getIndustrialDesignerId(), createReqVO.getResearchDeveloperId(), createReqVO.getMaintenanceEngineerId());
-        //获取产品分类虚拟表
-        Class<?> aClass = VirtualTableInit.getTableMap().get(categoryId);
-        if (aClass != null){
-            extraServiceImpl(aClass,createReqVO);
-        }
+        //执行额外字段的逻辑
+        extraServiceImpl(createReqVO);
         // 插入产品
         ErpProductDO product = BeanUtils.toBean(createReqVO, ErpProductDO.class);
         //将图片的实体和指导价的实体转为json字符串
@@ -101,7 +97,12 @@ public class ErpProductServiceImpl implements ErpProductService {
         return product.getId();
     }
 
-    private void extraServiceImpl(Class<?> aClass, ErpProductSaveReqVO vo) {
+    private void extraServiceImpl(ErpProductSaveReqVO vo) {
+        Long categoryId = vo.getCategoryId();
+        Class<?> aClass = VIRTUAL_TABLE.get(categoryId);
+        if (aClass == null){
+            return;
+        }
         try {
             Object serviceImpl = applicationContext.getBean(aClass);
             if (serviceImpl instanceof ErpProductTvStandServiceImpl){
@@ -135,11 +136,8 @@ public class ErpProductServiceImpl implements ErpProductService {
         validateProductCategory(categoryId);
         //校验人员id是否存在
         validatePerson(updateReqVO.getProductOwnerId(), updateReqVO.getIndustrialDesignerId(), updateReqVO.getResearchDeveloperId(), updateReqVO.getMaintenanceEngineerId());
-        //获取产品分类虚拟表
-        Class<?> aClass = VirtualTableInit.getTableMap().get(categoryId);
-        if (aClass != null){
-            extraServiceImpl(aClass,updateReqVO);
-        }
+        //执行额外字段的逻辑
+        extraServiceImpl(updateReqVO);
         // 更新
         ErpProductDO updateObj = BeanUtils.toBean(updateReqVO, ErpProductDO.class);
         //将图片的实体和指导价的实体转为json字符串
@@ -247,7 +245,7 @@ public class ErpProductServiceImpl implements ErpProductService {
             MapUtils.findAndThen(deptMap, product.getDeptId(),
                     dept -> product.setDeptName(dept.getName()));
             MapUtils.findAndThen(poUserMap, product.getProductOwnerId(),
-                    user -> product.setProductManagerName(user.getNickname()));
+                    user -> product.setProductOwnerName(user.getNickname()));
             MapUtils.findAndThen(idUserMap, product.getIndustrialDesignerId(),
                     user -> product.setIndustrialDesignerName(user.getNickname()));
             MapUtils.findAndThen(rdUserMap, product.getResearchDeveloperId(),
