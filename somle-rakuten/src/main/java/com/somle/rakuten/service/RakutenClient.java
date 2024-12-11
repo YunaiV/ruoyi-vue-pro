@@ -1,18 +1,25 @@
 package com.somle.rakuten.service;
 
+import cn.hutool.core.codec.Base64;
+import cn.hutool.core.date.DatePattern;
+import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.date.LocalDateTimeUtil;
+import cn.hutool.http.HttpRequest;
+import cn.hutool.http.HttpResponse;
+import cn.hutool.json.JSONUtil;
 import com.somle.framework.common.util.json.JSONObject;
 import com.somle.framework.common.util.json.JsonUtils;
-import com.somle.framework.common.util.web.RequestX;
-import com.somle.framework.common.util.web.WebUtils;
+import com.somle.rakuten.enums.OrderStatusEnum;
 import com.somle.rakuten.model.polo.RakutenTokenEntity;
 import com.somle.rakuten.model.vo.OrderRequestVO;
-import lombok.Setter;
+import com.somle.rakuten.model.vo.OrderSearchRequestVO;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import okhttp3.OkHttpClient;
-import okhttp3.Response;
-import org.apache.tomcat.util.codec.binary.Base64;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -20,14 +27,11 @@ import java.util.Map;
 public class RakutenClient {
     RakutenTokenEntity entity;
     String accessToken;
-    @Setter
-    private OkHttpClient webClient;
-
+    private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DatePattern.UTC_WITH_ZONE_OFFSET_PATTERN);
 
     public RakutenClient(RakutenTokenEntity entity) {
         this.entity = entity;
         this.accessToken = getAuthorization(entity);
-        this.webClient = new OkHttpClient();
     }
 
     /**
@@ -35,39 +39,99 @@ public class RakutenClient {
      */
     private String getAuthorization(RakutenTokenEntity entity) {
         String str = entity.getServiceSecret() + ":" + entity.getLicenseKey();
-        return "ESA  " + Base64.encodeBase64String(str.getBytes());
+        //↓有个空格
+        return "ESA" + " " + Base64.encode(str.getBytes());
     }
 
 
     @SneakyThrows
-    public Object getOrders(OrderRequestVO orderRequestVO) {
-        String endpoint = "/es/2.0/order/searchOrder/";
-        String BASE_URL = "https://webservice.rms.rakuten.co.jp/";
-        RequestX request = RequestX.builder()
-                .requestMethod(RequestX.Method.POST)
-                .url(BASE_URL + endpoint)
-                .headers(getHeaders())
-                .payload(orderRequestVO)
-                .build();
-        String bodyString = sendRequest(request).body().string();
-        return JsonUtils.parseObject(bodyString, JSONObject.class);
+    public JSONObject getOrders(OrderRequestVO vo) {
+        String endpoint = "/es/2.0/order/getOrder/";
+        String BASE_URL = "https://api.rms.rakuten.co.jp";
+
+        // 发送 POST 请求
+        HttpResponse response = HttpRequest.post(BASE_URL + endpoint).headerMap(getHeaders(), true) // 设置头信息
+                .body(JSONUtil.toJsonStr(vo)) // 设置请求体
+                .timeout(2 * 1000) // 设置超时时间
+                .execute();
+
+
+        return JsonUtils.parseObject(response.body(), JSONObject.class);
     }
 
-    public Object searchOrders() {
-        //TODO 搜索时间范围内的订单号
-        return null;
+    @SneakyThrows
+    public JSONObject searchOrders(OrderSearchRequestVO vo) {
+        String endpoint = "/es/2.0/order/searchOrder/";
+        String BASE_URL = "https://api.rms.rakuten.co.jp";
+
+        //校验日期范围
+        isValidDateRange(vo.getStartDatetime().toLocalDateTime(), vo.getEndDatetime().toLocalDateTime());
+
+        // 发送 POST 请求
+        HttpResponse response = HttpRequest.post(BASE_URL + endpoint).headerMap(getHeaders(), true) // 设置头信息
+                .body(convert(vo).toString()) // 设置请求体
+                .timeout(2 * 1000) // 设置超时时间
+                .execute();
+
+        return JsonUtils.parseObject(response.body(), JSONObject.class);
     }
 
     private Map<String, String> getHeaders() {
-        Map<String, String> headers = new HashMap<String, String>();
+        Map<String, String> headers = new HashMap<>();
         headers.put("Authorization", accessToken);
         headers.put("Content-Type", "application/json; charset=utf-8");
         return headers;
     }
 
-    @SneakyThrows
-    private Response sendRequest(RequestX request) {
-        // Define the proxy details
-        return webClient.newCall(WebUtils.toOkHttp(request)).execute();
+
+    private void isValidDateRange(LocalDateTime startDatetime, LocalDateTime endDatetime) {
+        // 确保 endDatetime 大于 startDatetime
+        if (endDatetime.isBefore(startDatetime) || endDatetime.isEqual(startDatetime)) {
+            throw new IllegalArgumentException("结束时间必须大于开始时间");
+        }
+
+        // 计算日期之间的天数差
+        long days = LocalDateTimeUtil.between(startDatetime, endDatetime).toDays();
+        // 判断是否在63天内
+        if (days > 63) {
+            throw new IllegalArgumentException("日期范围超出了63天");
+        }
+        //判断开始日期是否截至今天在730日内
+        long days2 = LocalDateTimeUtil.between(startDatetime, DateUtil.toLocalDateTime(new Date())).toDays();
+        if (days2 > 730) {
+            throw new IllegalArgumentException("开始日期范围超出了730天");
+        }
+
+    }
+
+    private cn.hutool.json.JSONObject convert(OrderSearchRequestVO vo) {
+        // 将 ZonedDateTime 转换成 String 格式
+        String startDatetimeStr = vo.getStartDatetime() != null ? vo.getStartDatetime().format(formatter) : null;
+        String endDatetimeStr = vo.getEndDatetime() != null ? vo.getEndDatetime().format(formatter) : null;
+        // 创建一个临时对象来存储转换后的数据
+        cn.hutool.json.JSONObject jsonObject = JSONUtil.parseObj(vo);
+        // 手动设置日期字段为字符串格式
+        jsonObject.set("startDatetime", startDatetimeStr);
+        jsonObject.set("endDatetime", endDatetimeStr);
+        return jsonObject;
+    }
+
+    public JSONObject getEndOrderIds(OrderSearchRequestVO vo) {
+        String endpoint = "/es/2.0/order/searchOrder/";
+        String BASE_URL = "https://api.rms.rakuten.co.jp";
+        //校验日期范围
+        isValidDateRange(vo.getStartDatetime().toLocalDateTime(), vo.getEndDatetime().toLocalDateTime());
+
+        ArrayList<Integer> list = new ArrayList<>();
+        list.add(OrderStatusEnum.SHIPPED.getCode());
+        list.add(OrderStatusEnum.PAYMENT_COMPLETED.getCode());
+        vo.setOrderProgressList(list);
+        // 发送 POST 请求
+        HttpResponse response = HttpRequest.post(BASE_URL + endpoint).headerMap(getHeaders(), true) // 设置头信息
+                .body(convert(vo).toString()) // 设置请求体
+                .timeout(2 * 1000) // 设置超时时间
+                .execute();
+
+        return JsonUtils.parseObject(response.body(), JSONObject.class);
     }
 }

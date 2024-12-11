@@ -22,7 +22,8 @@ public class RakutenService {
         Optional<RakutenTokenEntity> entity = repository.findAll().stream().findFirst();
         entity.ifPresent(e -> this.client = new RakutenClient(e));
         if (entity.isEmpty()) {
-            throw new RuntimeException("RakutenTokenRepository is Empty");
+            log.warn("RakutenTokenEntity Table is Empty");
+            throw new RuntimeException("RakutenTokenEntity  is Empty");
         }
     }
 

@@ -5,5 +5,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface RakutenTokenRepository extends JpaRepository<RakutenTokenEntity, String> {
+public interface RakutenTokenRepository extends JpaRepository<RakutenTokenEntity, Integer> {
 }

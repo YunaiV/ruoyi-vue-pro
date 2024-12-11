@@ -1,10 +1,7 @@
 package com.somle.rakuten.model.polo;
 
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.*;
-import jakarta.persistence.Entity;
 
 @Entity
 @Data
@@ -12,12 +9,11 @@ import jakarta.persistence.Entity;
 @NoArgsConstructor
 @AllArgsConstructor
 public class RakutenTokenEntity {
-    @Id()
+    @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY) // 设置自增策略
-    private String clientId;
+    private Integer clientId;
     private String serviceSecret;
     private String licenseKey;
-
 
 
 }

@@ -16,17 +16,17 @@ logging:
 spring:
   # 数据源配置项
   datasource:
-    url: jdbc:mysql://localhost:13306/rouyi-vue-pro-test?serverTimezone=GMT%2B8&useSSL=false&characterEncoding=utf-8
+    url: jdbc:mysql://192.168.10.151:3306/ruoyi-vue-pro?serverTimezone=GMT%2B8&useSSL=false&characterEncoding=utf-8
     driverClassName: com.mysql.cj.jdbc.Driver
-    username: root
-    password: 123456
+    username: it003
+    password: asivJssflioKK
   #  sql:
   #    init:
   #      schema-locations: classpath:/sql/create_tables.sql
   jpa:
     hibernate:
       #      ddl-auto: none
-      ddl-auto: update
+      ddl-auto: none
   #      ddl-auto: create-drop
 
   # Redis 配置。Redisson 默认的配置足够使用，一般不需要进行调优
