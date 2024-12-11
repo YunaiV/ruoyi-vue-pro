@@ -114,7 +114,7 @@ public class ErpProductRespVO {
 
     @Schema(description = "PO产品经理id", example = "28770")
     @ExcelProperty("PO产品经理id")
-    private Long productManagerId;
+    private Long productOwnerId;
 
     @Schema(description = "PO产品经理名称", example = "王五")
     @ExcelProperty("PO产品经理名称")

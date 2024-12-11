@@ -15,12 +15,17 @@ import cn.iocoder.yudao.module.erp.dal.dataobject.product.ErpProductDO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.product.ErpProductUnitDO;
 import cn.iocoder.yudao.module.erp.dal.mysql.logistic.customrule.ErpCustomRuleMapper;
 import cn.iocoder.yudao.module.erp.dal.mysql.product.ErpProductMapper;
+import cn.iocoder.yudao.module.erp.dal.supporting.VirtualTableInit;
+import cn.iocoder.yudao.module.erp.service.product.tvstand.ErpProductTvStandServiceImpl;
 import cn.iocoder.yudao.module.system.api.dept.DeptApi;
 import cn.iocoder.yudao.module.system.api.dept.dto.DeptRespDTO;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import jakarta.annotation.Resource;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationContext;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.stereotype.Service;
@@ -52,6 +57,7 @@ public class ErpProductServiceImpl implements ErpProductService {
     private final ErpCustomRuleMapper customRuleMapper;
     private static final ReentrantLock LOCK = new ReentrantLock();
     private final AdminUserApi userApi;
+    private final ApplicationContext applicationContext;
 
 
 
@@ -75,7 +81,12 @@ public class ErpProductServiceImpl implements ErpProductService {
         //校验产品分类是否存在
         validateProductCategory(categoryId);
         //校验人员id是否存在
-        validatePerson(createReqVO.getProductManagerId(), createReqVO.getIndustrialDesignerId(), createReqVO.getResearchDeveloperId(), createReqVO.getMaintenanceEngineerId());
+        validatePerson(createReqVO.getProductOwnerId(), createReqVO.getIndustrialDesignerId(), createReqVO.getResearchDeveloperId(), createReqVO.getMaintenanceEngineerId());
+        //获取产品分类虚拟表
+        Class<?> aClass = VirtualTableInit.getTableMap().get(categoryId);
+        if (aClass != null){
+            extraServiceImpl(aClass,createReqVO);
+        }
         // 插入产品
         ErpProductDO product = BeanUtils.toBean(createReqVO, ErpProductDO.class);
         //将图片的实体和指导价的实体转为json字符串
@@ -88,6 +99,18 @@ public class ErpProductServiceImpl implements ErpProductService {
         ThrowUtil.ifSqlThrow(productMapper.insert(product),DB_INSERT_ERROR);
         // 返回
         return product.getId();
+    }
+
+    private void extraServiceImpl(Class<?> aClass, ErpProductSaveReqVO vo) {
+        try {
+            Object serviceImpl = applicationContext.getBean(aClass);
+            if (serviceImpl instanceof ErpProductTvStandServiceImpl){
+                ((ErpProductTvStandServiceImpl)serviceImpl).validationField(vo);
+            }
+            //TODO 其他类型请在此添加else if
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
@@ -111,7 +134,12 @@ public class ErpProductServiceImpl implements ErpProductService {
         //校验产品分类是否存在
         validateProductCategory(categoryId);
         //校验人员id是否存在
-        validatePerson(updateReqVO.getProductManagerId(), updateReqVO.getIndustrialDesignerId(), updateReqVO.getResearchDeveloperId(), updateReqVO.getMaintenanceEngineerId());
+        validatePerson(updateReqVO.getProductOwnerId(), updateReqVO.getIndustrialDesignerId(), updateReqVO.getResearchDeveloperId(), updateReqVO.getMaintenanceEngineerId());
+        //获取产品分类虚拟表
+        Class<?> aClass = VirtualTableInit.getTableMap().get(categoryId);
+        if (aClass != null){
+            extraServiceImpl(aClass,updateReqVO);
+        }
         // 更新
         ErpProductDO updateObj = BeanUtils.toBean(updateReqVO, ErpProductDO.class);
         //将图片的实体和指导价的实体转为json字符串
@@ -207,7 +235,7 @@ public class ErpProductServiceImpl implements ErpProductService {
         Map<Long, ErpProductUnitDO> unitMap = productUnitService.getProductUnitMap(
                 convertSet(list, ErpProductDO::getUnitId));
         Map<Long, DeptRespDTO> deptMap = deptApi.getDeptMap(convertSet(list, ErpProductDO::getDeptId));
-        Map<Long, AdminUserRespDTO> poUserMap = userApi.getUserMap(convertSet(list, ErpProductDO::getProductManagerId));
+        Map<Long, AdminUserRespDTO> poUserMap = userApi.getUserMap(convertSet(list, ErpProductDO::getProductOwnerId));
         Map<Long, AdminUserRespDTO> idUserMap = userApi.getUserMap(convertSet(list, ErpProductDO::getIndustrialDesignerId));
         Map<Long, AdminUserRespDTO> rdUserMap = userApi.getUserMap(convertSet(list, ErpProductDO::getResearchDeveloperId));
         Map<Long, AdminUserRespDTO> meUserMap = userApi.getUserMap(convertSet(list, ErpProductDO::getMaintenanceEngineerId));
@@ -218,7 +246,7 @@ public class ErpProductServiceImpl implements ErpProductService {
                     unit -> product.setUnitName(unit.getName()));
             MapUtils.findAndThen(deptMap, product.getDeptId(),
                     dept -> product.setDeptName(dept.getName()));
-            MapUtils.findAndThen(poUserMap, product.getProductManagerId(),
+            MapUtils.findAndThen(poUserMap, product.getProductOwnerId(),
                     user -> product.setProductManagerName(user.getNickname()));
             MapUtils.findAndThen(idUserMap, product.getIndustrialDesignerId(),
                     user -> product.setIndustrialDesignerName(user.getNickname()));

@@ -92,7 +92,7 @@ public class ErpProductSaveReqVO {
     private String patent;
 
     @Schema(description = "PO产品经理id", example = "28770")
-    private Long productManagerId;
+    private Long productOwnerId;
 
     @Schema(description = "ID工业设计id", example = "27774")
     private Long industrialDesignerId;

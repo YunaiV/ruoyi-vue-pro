@@ -109,7 +109,7 @@ public class ErpProductDO extends BaseDO {
     /**
      * PO产品经理id
      */
-    private Long productManagerId;
+    private Long productOwnerId;
     /**
      * ID工业设计id
      */

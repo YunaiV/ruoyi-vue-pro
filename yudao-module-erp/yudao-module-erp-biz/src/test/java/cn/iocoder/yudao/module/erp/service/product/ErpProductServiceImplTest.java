@@ -102,7 +102,7 @@ public class ErpProductServiceImplTest extends BaseDbUnitTest {
         productVO.setLength(new BigDecimal("200.0"));
         productVO.setHeight(new BigDecimal("50.0"));
         productVO.setPatent("测试专利");
-        productVO.setProductManagerId(50024L);
+        productVO.setProductOwnerId(50024L);
         productVO.setIndustrialDesignerId(50024L);
         productVO.setResearchDeveloperId(50024L);
         productVO.setMaintenanceEngineerId(50024L);
