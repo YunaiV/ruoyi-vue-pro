@@ -47,13 +47,13 @@ public class BpmSequentialMultiInstanceBehavior extends SequentialMultiInstanceB
         Set<Long> assigneeUserIds = (Set<Long>) execution.getVariable(super.collectionVariable, Set.class);
         if (assigneeUserIds == null) {
             assigneeUserIds = taskCandidateInvoker.calculateUsersByTask(execution);
-            execution.setVariable(super.collectionVariable, assigneeUserIds);
             if (CollUtil.isEmpty(assigneeUserIds)) {
                 // 特殊：如果没有处理人的情况下，至少有一个 null 空元素，避免自动通过！
                 // 这样，保证在 BpmUserTaskActivityBehavior 至少创建出一个 Task 任务
                 // 用途：1）审批人为空时；2）审批类型为自动通过、自动拒绝时
                 assigneeUserIds = SetUtils.asSet((Long) null);
             }
+            execution.setVariable(super.collectionVariable, assigneeUserIds);
         }
         return assigneeUserIds.size();
     }
