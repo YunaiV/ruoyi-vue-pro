@@ -1,9 +1,6 @@
 package com.somle.rakuten.model.pojo;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -16,7 +13,8 @@ import java.util.Date;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class RakutenTokenEntity {
+@Table(name = "rakuten_token_entity")
+public class RakutenTokenEntityDO {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY) // 设置自增策略
     private Integer clientId;

@@ -7,10 +7,10 @@ import com.somle.framework.common.util.json.JsonUtils;
 import com.somle.framework.common.util.web.RequestX;
 import com.somle.framework.common.util.web.WebUtils;
 import com.somle.rakuten.enums.RakutenOrderStatusEnum;
-import com.somle.rakuten.model.pojo.RakutenTokenEntity;
-import com.somle.rakuten.model.vo.OrderRequestVO;
-import com.somle.rakuten.model.vo.OrderSearchRequestVO;
-import com.somle.rakuten.utill.ZonedDateTimeConverter;
+import com.somle.rakuten.model.pojo.RakutenTokenEntityDO;
+import com.somle.rakuten.model.vo.RakutenOrderReqVO;
+import com.somle.rakuten.model.vo.RakutenOrderSearchReqVO;
+import com.somle.rakuten.util.ZonedDateTimeConverter;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.Response;
@@ -27,14 +27,14 @@ public class RakutenClient {
     private final String accessToken;
     private static final String BASE_URL = "https://api.rms.rakuten.co.jp";
 
-    public RakutenClient(RakutenTokenEntity entity) {
+    public RakutenClient(RakutenTokenEntityDO entity) {
         this.accessToken = generateAuthorization(entity);
     }
 
     /**
      * 对密钥进行编码
      */
-    private String generateAuthorization(RakutenTokenEntity entity) {
+    private String generateAuthorization(RakutenTokenEntityDO entity) {
         String credentials = entity.getServiceSecret() + ":" + entity.getLicenseKey();
         //↓有个空格
         return "ESA" + " " + Base64.encode(credentials.getBytes());
@@ -42,20 +42,20 @@ public class RakutenClient {
 
 
     @SneakyThrows
-    public JSONObject getOrder(OrderRequestVO vo) {
+    public JSONObject getOrder(RakutenOrderReqVO vo) {
         String endpoint = "/es/2.0/order/getOrder/";
         return sendRequestAndParse(endpoint, JsonUtils.toJsonString(vo));
     }
 
     @SneakyThrows
-    public JSONObject searchOrder(OrderSearchRequestVO vo) {
+    public JSONObject searchOrder(RakutenOrderSearchReqVO vo) {
         String endpoint = "/es/2.0/order/searchOrder/";
         isValidDateRange(vo.getStartDatetime().toLocalDateTime(), vo.getEndDatetime().toLocalDateTime());
         return sendRequestAndParse(endpoint, convertToJson(vo).toString());
     }
 
     @SneakyThrows
-    public JSONObject getEndOrderIds(OrderSearchRequestVO vo) {
+    public JSONObject getEndOrderIds(RakutenOrderSearchReqVO vo) {
         //检验日期范围
         isValidDateRange(vo.getStartDatetime().toLocalDateTime(), vo.getEndDatetime().toLocalDateTime());
         ArrayList<Integer> list = new ArrayList<>();
@@ -94,7 +94,7 @@ public class RakutenClient {
         LocalDateTimeUtils.isValidDateRange(startDatetime, ZonedDateTime.now(ZoneId.of("Asia/Tokyo")).toLocalDateTime(), 730);
     }
 
-    private JSONObject convertToJson(OrderSearchRequestVO vo) {
+    private JSONObject convertToJson(RakutenOrderSearchReqVO vo) {
         // 将 ZonedDateTime 转换成 String 格式
         String startDatetimeStr = vo.getStartDatetime() != null ? ZonedDateTimeConverter.convertToString(vo.getStartDatetime()) : null;
         String endDatetimeStr = vo.getEndDatetime() != null ? ZonedDateTimeConverter.convertToString(vo.getEndDatetime()) : null;

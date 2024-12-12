@@ -1,9 +1,9 @@
-package com.somle.rakuten.model;
+package com.somle.rakuten.model.pojo;
 
 
 import jakarta.validation.constraints.NotNull;
 
-public class SortModel {
+public class RakutenSortModel {
 
     @NotNull
     private Integer sortColumn;             // 排序字段，指定按什么字段排序（如：1: 订单日期）

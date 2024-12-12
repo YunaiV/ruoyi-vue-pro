@@ -8,14 +8,14 @@ import java.util.List;
 public enum RakutenOrderStatusEnum {
 
     // 定义订单状态及其对应的状态码和描述
-    ORDER_CONFIRM_WAIT(100, "订单确认待"),
+    ORDER_CONFIRM_WAIT(100, "订单待确认"),
     PROCESSING(200, "处理中的订单"),
     WAITING_FOR_SHIPMENT(300, "等待发货"),
-    CHANGE_CONFIRM_WAIT(400, "变更确认待"),
+    CHANGE_CONFIRM_WAIT(400, "变更待确认"),
     SHIPPED(500, "已发货"),
     PAYMENT_IN_PROCESS(600, "支付处理中"),
     PAYMENT_COMPLETED(700, "支付完成"),
-    CANCEL_CONFIRM_WAIT(800, "取消确认待"),
+    CANCEL_CONFIRM_WAIT(800, "取消待确认"),
     CANCELLED(900, "已取消");
 
     // 获取状态码

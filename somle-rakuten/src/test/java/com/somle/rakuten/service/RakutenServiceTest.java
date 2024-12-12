@@ -7,9 +7,9 @@ import cn.hutool.http.HttpResponse;
 import cn.hutool.json.JSONUtil;
 import com.somle.framework.common.util.json.JSONObject;
 import com.somle.framework.test.core.ut.BaseDbUnitTest;
-import com.somle.rakuten.model.pojo.RakutenTokenEntity;
-import com.somle.rakuten.model.vo.OrderRequestVO;
-import com.somle.rakuten.model.vo.OrderSearchRequestVO;
+import com.somle.rakuten.model.pojo.RakutenTokenEntityDO;
+import com.somle.rakuten.model.vo.RakutenOrderReqVO;
+import com.somle.rakuten.model.vo.RakutenOrderSearchReqVO;
 import com.somle.rakuten.repository.RakutenTokenRepository;
 import jakarta.annotation.Resource;
 import lombok.SneakyThrows;
@@ -39,7 +39,7 @@ class RakutenServiceTest extends BaseDbUnitTest {
         ArrayList<String> list = new ArrayList<>();
         list.add("372286-20241210-0870710097");
 
-        OrderRequestVO vo = OrderRequestVO.builder()
+        RakutenOrderReqVO vo = RakutenOrderReqVO.builder()
                 .version(8)
                 .orderNumberList(list)
                 .build();
@@ -50,7 +50,7 @@ class RakutenServiceTest extends BaseDbUnitTest {
 
     @Test
     void getRakutenToken() {
-        List<RakutenTokenEntity> all = repository.findAll();
+        List<RakutenTokenEntityDO> all = repository.findAll();
         System.out.println("all = " + all);
     }
 
@@ -58,12 +58,12 @@ class RakutenServiceTest extends BaseDbUnitTest {
     @Rollback(false)
     @Transactional
     void generateOne() {
-        List<RakutenTokenEntity> all = repository.findAll();
+        List<RakutenTokenEntityDO> all = repository.findAll();
         if ((long) all.size() == 0) {
-            RakutenTokenEntity entity = new RakutenTokenEntity();
+            RakutenTokenEntityDO entity = new RakutenTokenEntityDO();
             entity.setServiceSecret("SP372286_XUye81AijnBIAYVK");
             entity.setLicenseKey("SL372286_XhRtwKoTGQyurnBF");
-            RakutenTokenEntity save = repository.save(entity);
+            RakutenTokenEntityDO save = repository.save(entity);
             log.info("save = {}", save);
         }
         getRakutenToken();
@@ -81,8 +81,8 @@ class RakutenServiceTest extends BaseDbUnitTest {
         mapHeader.put("Authorization", "ESA U1AzNzIyODZfWFV5ZTgxQWlqbkJJQVlWSzpTTDM3MjI4Nl9YaFJ0d0tvVEdReXVybkJG");
         mapHeader.put("Content-Type", "application/json; charset=utf-8");
 
-        // 构造请求体（OrderRequestVO）
-        OrderRequestVO vo = OrderRequestVO.builder()
+        // 构造请求体（RakutenOrderRequestVO）
+        RakutenOrderReqVO vo = RakutenOrderReqVO.builder()
                 .version(8)
                 .orderNumberList(List.of("372286-20241210-0870710097"))
                 .build();
@@ -106,7 +106,7 @@ class RakutenServiceTest extends BaseDbUnitTest {
         ZonedDateTime endDatetime = LocalDateTimeUtil.parse("2024-12-01 00:00:00", "yyyy-MM-dd HH:mm:ss")
                 .atZone(ZoneId.of("Asia/Tokyo"));
 
-        OrderSearchRequestVO vo = OrderSearchRequestVO.builder()
+        RakutenOrderSearchReqVO vo = RakutenOrderSearchReqVO.builder()
                 .dateType(3)
                 .startDatetime(startDatetime)
                 .endDatetime(endDatetime)
@@ -124,7 +124,7 @@ class RakutenServiceTest extends BaseDbUnitTest {
         ZonedDateTime endDatetime = LocalDateTimeUtil.parse("2024-12-01 00:00:00", "yyyy-MM-dd HH:mm:ss")
                 .atZone(ZoneId.of("Asia/Tokyo"));
 
-        OrderSearchRequestVO vo = OrderSearchRequestVO.builder()
+        RakutenOrderSearchReqVO vo = RakutenOrderSearchReqVO.builder()
                 .dateType(3)
                 .startDatetime(startDatetime)
                 .endDatetime(endDatetime)

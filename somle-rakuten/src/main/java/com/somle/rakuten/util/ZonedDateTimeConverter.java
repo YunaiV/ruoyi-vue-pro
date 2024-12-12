@@ -1,4 +1,4 @@
-package com.somle.rakuten.utill;
+package com.somle.rakuten.util;
 
 import cn.hutool.core.date.DatePattern;
 
@@ -23,15 +23,15 @@ public class ZonedDateTimeConverter {
         return zonedDateTime.format(formatter);
     }
 
-    public static void main(String[] args) {
-        // 示例：当前时间（使用日本时间）
-        ZonedDateTime now = ZonedDateTime.now();  // 当前时区时间
-        String formattedDate = convertToString(now);
-        System.out.println("Formatted ZonedDateTime: " + formattedDate);
-
-        // 示例：指定时区（例如：Asia/Tokyo）
-        ZonedDateTime tokyoTime = ZonedDateTime.now(java.time.ZoneId.of("Asia/Tokyo"));
-        String tokyoFormattedDate = convertToString(tokyoTime);
-        System.out.println("Formatted Tokyo ZonedDateTime: " + tokyoFormattedDate);
-    }
+//    public static void main(String[] args) {
+//        // 示例：当前时间（使用日本时间）
+//        ZonedDateTime now = ZonedDateTime.now();  // 当前时区时间
+//        String formattedDate = convertToString(now);
+//        System.out.println("Formatted ZonedDateTime: " + formattedDate);
+//
+//        // 示例：指定时区（例如：Asia/Tokyo）
+//        ZonedDateTime tokyoTime = ZonedDateTime.now(java.time.ZoneId.of("Asia/Tokyo"));
+//        String tokyoFormattedDate = convertToString(tokyoTime);
+//        System.out.println("Formatted Tokyo ZonedDateTime: " + tokyoFormattedDate);
+//    }
 }

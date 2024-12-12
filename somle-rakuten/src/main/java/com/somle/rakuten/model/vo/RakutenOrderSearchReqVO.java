@@ -3,7 +3,7 @@ package com.somle.rakuten.model.vo;
 
 import cn.hutool.core.date.DatePattern;
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.somle.rakuten.model.PaginationRequestModel;
+import com.somle.rakuten.model.pojo.RakutenPaginationReqModel;
 import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Data;
@@ -14,7 +14,7 @@ import java.util.List;
 
 @Data
 @Builder
-public class OrderSearchRequestVO {
+public class RakutenOrderSearchReqVO {
 
     private List<Integer> orderProgressList;            // 订单状态列表，包含状态代码（如：100: 注单确认待、200: 处理中的订单等）
     private List<Integer> subStatusIdList;              // 子状态ID列表，多个ID可以同时指定，[-1]表示未设置子状态的订单
@@ -63,5 +63,6 @@ public class OrderSearchRequestVO {
     private Integer overseasFlag;                       // 是否为海外购物车订单，1表示是海外购物车
 
     private Integer oneDayOperationFlag;                // 是否为当天出货订单，1表示当天出货的订单
-    private PaginationRequestModel paginationRequestModel; // 分页请求模型，用于处理分页查询,不写最大1000条
+
+    private RakutenPaginationReqModel rakutenPaginationReqModel; // 分页请求模型，用于处理分页查询,不写最大1000条
 }

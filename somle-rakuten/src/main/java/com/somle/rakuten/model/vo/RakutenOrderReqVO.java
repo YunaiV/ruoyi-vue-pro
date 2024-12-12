@@ -8,7 +8,7 @@ import java.util.List;
 
 @Data
 @Builder
-public class OrderRequestVO {
+public class RakutenOrderReqVO {
 
     /**
      * 最多可以指定 100 件过去
