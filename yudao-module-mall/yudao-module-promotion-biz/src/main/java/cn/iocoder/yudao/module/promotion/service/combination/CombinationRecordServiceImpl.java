@@ -252,7 +252,19 @@ public class CombinationRecordServiceImpl implements CombinationRecordService {
 
     @Override
     public Long getCombinationRecordCount(@Nullable Integer status, @Nullable Boolean virtualGroup, @Nullable Long headId) {
-        return combinationRecordMapper.selectCountByHeadAndStatusAndVirtualGroup(status, virtualGroup, headId);
+        // virtualGroup 为 null，或者为 false 的时候，走原流程
+        if (virtualGroup == null || !virtualGroup) {
+            return combinationRecordMapper.selectCountByHeadAndStatusAndVirtualGroup(status, virtualGroup, headId);
+        }
+
+        // virtualGroup 为 true 的时候，查询虚拟成团的数量
+        List<CombinationActivityDO> activities = combinationActivityService.getByVirtualGroup();
+        if (CollUtil.isEmpty(activities)) {
+            return 0L;
+        }
+
+        List<Long> activityIds = convertList(activities, CombinationActivityDO::getId);
+        return combinationRecordMapper.selectCountByHeadAndStatusAndActivityIds(activityIds, status, headId);
     }
 
     @Override

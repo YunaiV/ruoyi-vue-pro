@@ -124,4 +124,10 @@ public interface CombinationActivityService {
      */
     CombinationActivityDO getMatchCombinationActivityBySpuId(Long spuId);
 
+    /**
+     * 查询虚拟成团的拼团活动
+     *
+     * @return 拼团活动列表
+     */
+    List<CombinationActivityDO> getByVirtualGroup();
 }
