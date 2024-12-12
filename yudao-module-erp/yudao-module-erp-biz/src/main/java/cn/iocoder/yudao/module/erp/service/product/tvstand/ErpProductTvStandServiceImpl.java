@@ -26,7 +26,7 @@ public class ErpProductTvStandServiceImpl implements ErpProductTvStandService{
     * @Param [vo]
     * @return void
     **/
-    public void validationField(ErpProductSaveReqVO vo) throws IllegalAccessException {
+    public void validationField(ErpProductSaveReqVO erpProductSaveReqVO) throws IllegalAccessException {
         // 获取 ErpProductBO 的字段
         Field[] productBoFields = ErpProductBO.class.getDeclaredFields();
         Map<String, Field> productBoFieldMap = new HashMap<>();
@@ -34,26 +34,26 @@ public class ErpProductTvStandServiceImpl implements ErpProductTvStandService{
             productBoFieldMap.put(field.getName(), field);
         }
         // 获取 ErpProductTvStandBO 的字段信息
-        Field[] boFields = ErpProductTvStandBO.class.getDeclaredFields();
-        Map<String, Field> boFieldMap = new HashMap<>();
-        for (Field field : boFields) {
-            boFieldMap.put(field.getName(), field);
+        Field[] productTvStandBoFields = ErpProductTvStandBO.class.getDeclaredFields();
+        Map<String, Field> productTvStandBoFieldMap = new HashMap<>();
+        for (Field field : productTvStandBoFields) {
+            productTvStandBoFieldMap.put(field.getName(), field);
         }
         // 获取 ErpProductSaveReqVO 的字段信息
-        Field[] voFields = ErpProductSaveReqVO.class.getDeclaredFields();
-        for (Field voField : voFields) {
-            voField.setAccessible(true);
+        Field[] productSaveReqVoFieldMap = ErpProductSaveReqVO.class.getDeclaredFields();
+        for (Field productSaveReqVoField : productSaveReqVoFieldMap) {
+            productSaveReqVoField.setAccessible(true);
             //排除共有的字段，判断voField和field是否相同
-            if (productBoFieldMap.containsKey(voField.getName())){
+            if (productBoFieldMap.containsKey(productSaveReqVoField.getName())){
                 continue;
             }
-            Field boField = boFieldMap.get(voField.getName());
+            Field productTvStandBoField = productTvStandBoFieldMap.get(productSaveReqVoField.getName());
             // 字段在 ErpProductTvStandBO 中不存在
-            if (boField == null) {
+            if (productTvStandBoField == null) {
                 //获取vo中的字段值
-                Object voFieldValue = voField.get(vo);
+                Object erpProductSaveReqVoFieldValue = productSaveReqVoField.get(erpProductSaveReqVO);
                 //如果存在字段值则抛出异常
-                ThrowUtil.ifThrow(ObjUtil.isNotEmpty(voFieldValue),PRODUCT_FIELD_NOT_MATCH);
+                ThrowUtil.ifThrow(ObjUtil.isNotEmpty(erpProductSaveReqVoFieldValue),PRODUCT_FIELD_NOT_MATCH);
             }
         }
     }

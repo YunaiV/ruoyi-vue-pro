@@ -4,7 +4,6 @@ import cn.hutool.core.util.RandomUtil;
 import cn.iocoder.yudao.module.erp.config.ErpIntegrationConfig;
 import cn.iocoder.yudao.module.erp.controller.admin.product.vo.product.ErpProductSaveReqVO;
 import cn.iocoder.yudao.module.erp.controller.admin.product.vo.product.json.GuidePriceJson;
-import cn.iocoder.yudao.module.erp.controller.admin.product.vo.product.json.ImageUrlJson;
 import cn.iocoder.yudao.module.infra.api.config.ConfigApi;
 import cn.iocoder.yudao.module.infra.api.config.ConfigApiImpl;
 import cn.iocoder.yudao.module.infra.api.file.FileApi;
@@ -121,14 +120,7 @@ public class ErpProductServiceImplTest extends BaseDbUnitTest {
                 new GuidePriceJson("测试价格1", new BigDecimal("1000.0"), 1),
                 new GuidePriceJson("测试价格2", new BigDecimal("2000.0"), 2)
         );
-        productVO.setGuidePrice(guidePriceList);
-
-        // 创建 ImageUrlJson 列表
-        List<ImageUrlJson> imageUrlList = Arrays.asList(
-                new ImageUrlJson("测试图片1", "https://www.iocoder.cn/image1.jpg", 1),
-                new ImageUrlJson("测试图片2", "https://www.iocoder.cn/image2.jpg", 2)
-        );
-        productVO.setImageUrl(imageUrlList);
+        productVO.setGuidePriceList(guidePriceList);
         return productVO;
     }
 

@@ -68,8 +68,7 @@ public class ErpProductController {
     @Parameter(name = "id", description = "编号", required = true, example = "1024")
     @PreAuthorize("@ss.hasPermission('erp:product:query')")
     public CommonResult<ErpProductRespVO> getProduct(@RequestParam("id") Long id) {
-        ErpProductDO product = productService.getProduct(id);
-        return success(BeanUtils.toBean(product, ErpProductRespVO.class));
+        return success(productService.getProduct(id));
     }
 
     @GetMapping("/page")

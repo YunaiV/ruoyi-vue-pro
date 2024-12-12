@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.erp.service.product;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
 import cn.iocoder.yudao.framework.common.exception.util.ThrowUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
@@ -10,6 +11,7 @@ import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.erp.controller.admin.product.vo.product.ErpProductPageReqVO;
 import cn.iocoder.yudao.module.erp.controller.admin.product.vo.product.ErpProductRespVO;
 import cn.iocoder.yudao.module.erp.controller.admin.product.vo.product.ErpProductSaveReqVO;
+import cn.iocoder.yudao.module.erp.controller.admin.product.vo.product.json.GuidePriceJson;
 import cn.iocoder.yudao.module.erp.dal.dataobject.product.ErpProductCategoryDO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.product.ErpProductDO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.product.ErpProductUnitDO;
@@ -20,6 +22,8 @@ import cn.iocoder.yudao.module.system.api.dept.DeptApi;
 import cn.iocoder.yudao.module.system.api.dept.dto.DeptRespDTO;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import jakarta.annotation.Resource;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationContext;
@@ -80,17 +84,17 @@ public class ErpProductServiceImpl implements ErpProductService {
         //校验产品分类是否存在
         validateProductCategory(categoryId);
         //校验人员id是否存在
-        validatePerson(createReqVO.getProductOwnerId(), createReqVO.getIndustrialDesignerId(), createReqVO.getResearchDeveloperId(), createReqVO.getMaintenanceEngineerId());
+        validatePerson(createReqVO);
         //执行额外字段的逻辑
         extraServiceImpl(createReqVO);
         // 插入产品
         ErpProductDO product = BeanUtils.toBean(createReqVO, ErpProductDO.class);
         //将图片的实体和指导价的实体转为json字符串
-        if (CollUtil.isNotEmpty(createReqVO.getImageUrl())){
-            product.setImageUrl(JSONUtil.toJsonStr(createReqVO.getImageUrl()));
+        if (CollUtil.isNotEmpty(createReqVO.getSecondaryImageUrlList())){
+            product.setSecondaryImageUrls(JSONUtil.toJsonStr(createReqVO.getSecondaryImageUrlList()));
         }
-        if (CollUtil.isNotEmpty(createReqVO.getGuidePrice())){
-            product.setGuidePrice(JSONUtil.toJsonStr(createReqVO.getGuidePrice()));
+        if (CollUtil.isNotEmpty(createReqVO.getGuidePriceList())){
+            product.setGuidePrices(JSONUtil.toJsonStr(createReqVO.getGuidePriceList()));
         }
         ThrowUtil.ifSqlThrow(productMapper.insert(product),DB_INSERT_ERROR);
         // 返回
@@ -135,17 +139,21 @@ public class ErpProductServiceImpl implements ErpProductService {
         //校验产品分类是否存在
         validateProductCategory(categoryId);
         //校验人员id是否存在
-        validatePerson(updateReqVO.getProductOwnerId(), updateReqVO.getIndustrialDesignerId(), updateReqVO.getResearchDeveloperId(), updateReqVO.getMaintenanceEngineerId());
+        validatePerson(updateReqVO);
         //执行额外字段的逻辑
         extraServiceImpl(updateReqVO);
         // 更新
         ErpProductDO updateObj = BeanUtils.toBean(updateReqVO, ErpProductDO.class);
         //将图片的实体和指导价的实体转为json字符串
-        if (CollUtil.isNotEmpty(updateReqVO.getImageUrl())){
-            updateObj.setImageUrl(JSONUtil.toJsonStr(updateReqVO.getImageUrl()));
+        if (CollUtil.isNotEmpty(updateReqVO.getSecondaryImageUrlList())){
+            updateObj.setSecondaryImageUrls(JSONUtil.toJsonStr(updateReqVO.getSecondaryImageUrlList()));
+        }else {
+            updateObj.setSecondaryImageUrls("");
         }
-        if (CollUtil.isNotEmpty(updateReqVO.getGuidePrice())){
-            updateObj.setGuidePrice(JSONUtil.toJsonStr(updateReqVO.getGuidePrice()));
+        if (CollUtil.isNotEmpty(updateReqVO.getGuidePriceList())){
+            updateObj.setGuidePrices(JSONUtil.toJsonStr(updateReqVO.getGuidePriceList()));
+        }else {
+            updateObj.setGuidePrices("");
         }
         ThrowUtil.ifSqlThrow(productMapper.updateById(updateObj),DB_UPDATE_ERROR);
         //同步数据
@@ -199,8 +207,16 @@ public class ErpProductServiceImpl implements ErpProductService {
     }
 
     @Override
-    public ErpProductDO getProduct(Long id) {
-        return productMapper.selectById(id);
+    public ErpProductRespVO getProduct(Long id) {
+        ErpProductDO erpProductDO = productMapper.selectById(id);
+        ErpProductRespVO productRespVO = BeanUtils.toBean(erpProductDO, ErpProductRespVO.class);
+        if (StrUtil.isNotBlank(erpProductDO.getGuidePrices())){
+            productRespVO.setGuidePriceList(JSONUtil.toList(erpProductDO.getGuidePrices(), GuidePriceJson.class));
+        }
+        if (StrUtil.isNotBlank(erpProductDO.getSecondaryImageUrls())){
+            productRespVO.setSecondaryImageUrlList(JSONUtil.toList(erpProductDO.getSecondaryImageUrls(), String.class));
+        }
+        return productRespVO;
     }
 
     @Override
@@ -228,6 +244,7 @@ public class ErpProductServiceImpl implements ErpProductService {
         if (CollUtil.isEmpty(list)) {
             return Collections.emptyList();
         }
+        // 初始化源列表
         Map<Long, ErpProductCategoryDO> categoryMap = productCategoryService.getProductCategoryMap(
                 convertSet(list, ErpProductDO::getCategoryId));
         Map<Long, ErpProductUnitDO> unitMap = productUnitService.getProductUnitMap(
@@ -252,6 +269,16 @@ public class ErpProductServiceImpl implements ErpProductService {
                     user -> product.setResearchDeveloperName(user.getNickname()));
             MapUtils.findAndThen(meUserMap, product.getMaintenanceEngineerId(),
                     user -> product.setMaintenanceEngineerName(user.getNickname()));
+            //将指导价转化为集合
+            list.stream()
+                    .filter(productDo -> productDo.getId().equals(product.getId()) && StrUtil.isNotBlank(productDo.getGuidePrices()))
+                    .findFirst().ifPresent(productDo ->
+                            product.setGuidePriceList(JSONUtil.toList(productDo.getGuidePrices(), GuidePriceJson.class)));
+            // 将次图转为集合
+            list.stream()
+                    .filter(productDo -> productDo.getId().equals(product.getId()) && StrUtil.isNotBlank(productDo.getSecondaryImageUrls()))
+                    .findFirst().ifPresent(productDo ->
+                            product.setSecondaryImageUrlList(JSONUtil.toList(productDo.getSecondaryImageUrls(), String.class)));
         });
     }
 
@@ -316,8 +343,14 @@ public class ErpProductServiceImpl implements ErpProductService {
      * @Date 9:18 2024/11/18
      * @Param [userIds]
      **/
-    private void validatePerson(Long ... userIds) {
-        ThrowUtil.ifThrow(Arrays.stream(userIds)
+    private void validatePerson(ErpProductSaveReqVO createReqVO) {
+        Long[] userIdArray = {
+                createReqVO.getProductOwnerId(),
+                createReqVO.getIndustrialDesignerId(),
+                createReqVO.getResearchDeveloperId(),
+                createReqVO.getMaintenanceEngineerId()
+        };
+        ThrowUtil.ifThrow(Arrays.stream(userIdArray)
                 .filter(Objects::nonNull)
                 .anyMatch(userId -> ObjUtil
                         .isEmpty(userApi.getUser(userId))), USER_NOT_EXISTS);

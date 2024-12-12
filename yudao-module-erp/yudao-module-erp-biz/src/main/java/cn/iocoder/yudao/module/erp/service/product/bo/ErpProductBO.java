@@ -83,13 +83,25 @@ public class ErpProductBO {
      */
     private BigDecimal height;
     /**
-     * 图片url
+     * 主图url
      */
-    private String imageUrl;
+    private String primaryImageUrl;
+    /**
+     * 副图urls
+     */
+    private String secondaryImageUrls;
+    /**
+     * 副图urlList
+     */
+    private String secondaryImageUrlList;
     /**
      * 指导价，json格式
      */
-    private String guidePrice;
+    private String guidePrices;
+    /**
+     * 指导价list
+     */
+    private String guidePriceList;
     /**
      * 专利
      */
@@ -97,17 +109,17 @@ public class ErpProductBO {
     /**
      * PO产品经理id
      */
-    private Long poId;
+    private Long productOwnerId;
     /**
      * ID工业设计id
      */
-    private Long idId;
+    private Long industrialDesignerId;
     /**
      * RD研发工程师id
      */
-    private Long rdId;
+    private Long researchDeveloperId;
     /**
      * 维护工程师id
      */
-    private Long meId;
+    private Long maintenanceEngineerId;
 }

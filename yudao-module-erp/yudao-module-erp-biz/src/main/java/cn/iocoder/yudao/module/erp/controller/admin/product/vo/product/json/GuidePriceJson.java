@@ -22,7 +22,7 @@ public class GuidePriceJson implements Serializable {
      * key（价格简述）
      **/
     @NotBlank(message = "价格简述不能为空")
-    private String key;
+    private String name;
     /**
      * 价格
      **/

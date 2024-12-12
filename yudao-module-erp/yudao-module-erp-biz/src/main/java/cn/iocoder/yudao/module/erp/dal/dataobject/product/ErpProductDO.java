@@ -95,13 +95,17 @@ public class ErpProductDO extends BaseDO {
      */
     private BigDecimal height;
     /**
-     * 图片url
+     * 主图url
      */
-    private String imageUrl;
+    private String primaryImageUrl;
+    /**
+     * 副图urls
+     */
+    private String secondaryImageUrls;
     /**
      * 指导价，json格式
      */
-    private String guidePrice;
+    private String guidePrices;
     /**
      * 专利
      */

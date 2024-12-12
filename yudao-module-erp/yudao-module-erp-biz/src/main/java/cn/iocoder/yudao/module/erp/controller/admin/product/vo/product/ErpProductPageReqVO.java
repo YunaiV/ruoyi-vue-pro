@@ -70,12 +70,6 @@ public class ErpProductPageReqVO extends PageParam {
     @Schema(description = "基础高度（mm）")
     private BigDecimal height;
 
-    @Schema(description = "图片url", example = "https://www.iocoder.cn")
-    private String imageUrl;
-
-    @Schema(description = "指导价，json格式", example = "19540")
-    private String guidePrice;
-
     @Schema(description = "专利")
     private String patent;
 

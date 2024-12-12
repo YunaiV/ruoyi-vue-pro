@@ -42,7 +42,7 @@ public interface ErpCustomRuleMapper extends BaseMapperX<ErpCustomRuleDO> {
                         ErpSupplierProductDO::getPurchasePriceCurrencyCode)
                 .leftJoin(ErpProductDO.class, ErpProductDO::getId, ErpSupplierProductDO::getProductId)
                 .selectAs(ErpProductDO::getName, ErpCustomRuleDTO::getProductName)
-                .selectAs(ErpProductDO::getImageUrl, ErpCustomRuleDTO::getProductImageUrl)
+                .selectAs(ErpProductDO::getPrimaryImageUrl, ErpCustomRuleDTO::getProductImageUrl)
                 .selectAs(ErpProductDO::getWeight, ErpCustomRuleDTO::getProductWeight)
                 .selectAs(ErpProductDO::getLength, ErpCustomRuleDTO::getProductLength)
                 .selectAs(ErpProductDO::getWidth, ErpCustomRuleDTO::getProductWidth)

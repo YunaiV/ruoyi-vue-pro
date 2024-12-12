@@ -1,10 +1,13 @@
 package cn.iocoder.yudao.module.erp.controller.admin.product.vo.product;
 
+import cn.iocoder.yudao.module.erp.controller.admin.product.vo.product.json.GuidePriceJson;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
+
 import com.alibaba.excel.annotation.*;
 
 @Schema(description = "管理后台 - ERP 产品 Response VO")
@@ -100,13 +103,16 @@ public class ErpProductRespVO {
     @ExcelProperty("基础高度（mm）")
     private BigDecimal height;
 
-    @Schema(description = "图片url", example = "https://www.iocoder.cn")
-    @ExcelProperty("图片url")
-    private String imageUrl;
+    @Schema(description = "主图", example = "https://www.iocoder.cn")
+    @ExcelProperty("主图")
+    private String primaryImageUrl;
+
+    @Schema(description = "副图", requiredMode = Schema.RequiredMode.REQUIRED, example = "[https://www.iocoder.cn]")
+    private List<String> secondaryImageUrlList;
 
     @Schema(description = "指导价，json格式", example = "19540")
     @ExcelProperty("指导价，json格式")
-    private String guidePrice;
+    private List<GuidePriceJson> guidePriceList;
 
     @Schema(description = "专利")
     @ExcelProperty("专利")

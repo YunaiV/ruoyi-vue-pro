@@ -1,7 +1,6 @@
 package cn.iocoder.yudao.module.erp.controller.admin.product.vo.product;
 
 import cn.iocoder.yudao.module.erp.controller.admin.product.vo.product.json.GuidePriceJson;
-import cn.iocoder.yudao.module.erp.controller.admin.product.vo.product.json.ImageUrlJson;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import lombok.*;
@@ -82,11 +81,15 @@ public class ErpProductSaveReqVO {
     @NotNull(message = "基础高度（mm）不能为空")
     private BigDecimal height;
 
-    @Schema(description = "图片URL，json格式", requiredMode = Schema.RequiredMode.REQUIRED, example = "https://www.iocoder.cn")
-    private List<@Valid ImageUrlJson> imageUrl;
+    @Schema(description = "主图", requiredMode = Schema.RequiredMode.REQUIRED, example = "https://www.iocoder.cn")
+    @NotBlank(message = "主图不能为空")
+    private String primaryImageUrl;
+
+    @Schema(description = "副图", requiredMode = Schema.RequiredMode.REQUIRED, example = "[https://www.iocoder.cn]")
+    private List<String> secondaryImageUrlList;
 
     @Schema(description = "指导价，json格式", requiredMode = Schema.RequiredMode.REQUIRED, example = "16486")
-    private List<@Valid GuidePriceJson> guidePrice;
+    private List<@Valid GuidePriceJson> guidePriceList;
 
     @Schema(description = "专利")
     private String patent;
