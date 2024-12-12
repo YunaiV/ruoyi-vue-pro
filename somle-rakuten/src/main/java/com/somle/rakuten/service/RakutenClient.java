@@ -1,8 +1,6 @@
 package com.somle.rakuten.service;
 
 import cn.hutool.core.codec.Base64;
-import cn.hutool.core.date.DatePattern;
-import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.hutool.http.HttpRequest;
 import cn.hutool.http.HttpResponse;
@@ -13,67 +11,60 @@ import com.somle.rakuten.enums.OrderStatusEnum;
 import com.somle.rakuten.model.polo.RakutenTokenEntity;
 import com.somle.rakuten.model.vo.OrderRequestVO;
 import com.somle.rakuten.model.vo.OrderSearchRequestVO;
+import com.somle.rakuten.utill.ZonedDateTimeConverter;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
 @Slf4j
 public class RakutenClient {
-    RakutenTokenEntity entity;
-    String accessToken;
-    private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DatePattern.UTC_WITH_ZONE_OFFSET_PATTERN);
+    private final String accessToken;
+    private static final String BASE_URL = "https://api.rms.rakuten.co.jp";
 
     public RakutenClient(RakutenTokenEntity entity) {
-        this.entity = entity;
-        this.accessToken = getAuthorization(entity);
+        this.accessToken = generateAuthorization(entity);
     }
 
     /**
      * 对密钥进行编码
      */
-    private String getAuthorization(RakutenTokenEntity entity) {
-        String str = entity.getServiceSecret() + ":" + entity.getLicenseKey();
+    private String generateAuthorization(RakutenTokenEntity entity) {
+        String credentials = entity.getServiceSecret() + ":" + entity.getLicenseKey();
         //↓有个空格
-        return "ESA" + " " + Base64.encode(str.getBytes());
+        return "ESA" + " " + Base64.encode(credentials.getBytes());
     }
 
 
     @SneakyThrows
     public JSONObject getOrders(OrderRequestVO vo) {
         String endpoint = "/es/2.0/order/getOrder/";
-        String BASE_URL = "https://api.rms.rakuten.co.jp";
-
-        // 发送 POST 请求
-        HttpResponse response = HttpRequest.post(BASE_URL + endpoint).headerMap(getHeaders(), true) // 设置头信息
-                .body(JSONUtil.toJsonStr(vo)) // 设置请求体
-                .timeout(2 * 1000) // 设置超时时间
-                .execute();
-
-
-        return JsonUtils.parseObject(response.body(), JSONObject.class);
+        try (HttpResponse response = sendPostRequest(endpoint, JSONUtil.toJsonStr(vo))) {
+            return JsonUtils.parseObject(response.body(), JSONObject.class);
+        }
     }
 
     @SneakyThrows
     public JSONObject searchOrders(OrderSearchRequestVO vo) {
         String endpoint = "/es/2.0/order/searchOrder/";
-        String BASE_URL = "https://api.rms.rakuten.co.jp";
-
-        //校验日期范围
+        //校验时间范围
         isValidDateRange(vo.getStartDatetime().toLocalDateTime(), vo.getEndDatetime().toLocalDateTime());
+        try (HttpResponse response = sendPostRequest(endpoint, convertToJson(vo).toString())) {
+            return JsonUtils.parseObject(response.body(), JSONObject.class);
+        }
+    }
 
-        // 发送 POST 请求
-        HttpResponse response = HttpRequest.post(BASE_URL + endpoint).headerMap(getHeaders(), true) // 设置头信息
-                .body(convert(vo).toString()) // 设置请求体
-                .timeout(2 * 1000) // 设置超时时间
+    private HttpResponse sendPostRequest(String endpoint, String requestBody) {
+        return HttpRequest.post(BASE_URL + endpoint)
+                .headerMap(getHeaders(), true)
+                .body(requestBody)
+                .timeout(2 * 1000)
                 .execute();
-
-        return JsonUtils.parseObject(response.body(), JSONObject.class);
     }
 
     private Map<String, String> getHeaders() {
@@ -96,18 +87,18 @@ public class RakutenClient {
         if (days > 63) {
             throw new IllegalArgumentException("日期范围超出了63天");
         }
-        //判断开始日期是否截至今天在730日内
-        long days2 = LocalDateTimeUtil.between(startDatetime, DateUtil.toLocalDateTime(new Date())).toDays();
+        //判断开始日期是否截至今天(日本时间)在730日内
+        long days2 = LocalDateTimeUtil.between(startDatetime, ZonedDateTime.now(ZoneId.of("Asia/Tokyo")).toLocalDateTime()).toDays();
         if (days2 > 730) {
             throw new IllegalArgumentException("开始日期范围超出了730天");
         }
 
     }
 
-    private cn.hutool.json.JSONObject convert(OrderSearchRequestVO vo) {
+    private cn.hutool.json.JSONObject convertToJson(OrderSearchRequestVO vo) {
         // 将 ZonedDateTime 转换成 String 格式
-        String startDatetimeStr = vo.getStartDatetime() != null ? vo.getStartDatetime().format(formatter) : null;
-        String endDatetimeStr = vo.getEndDatetime() != null ? vo.getEndDatetime().format(formatter) : null;
+        String startDatetimeStr = vo.getStartDatetime() != null ? ZonedDateTimeConverter.convertToString(vo.getStartDatetime()) : null;
+        String endDatetimeStr = vo.getEndDatetime() != null ? ZonedDateTimeConverter.convertToString(vo.getEndDatetime()) : null;
         // 创建一个临时对象来存储转换后的数据
         cn.hutool.json.JSONObject jsonObject = JSONUtil.parseObj(vo);
         // 手动设置日期字段为字符串格式
@@ -116,9 +107,9 @@ public class RakutenClient {
         return jsonObject;
     }
 
+    @SneakyThrows
     public JSONObject getEndOrderIds(OrderSearchRequestVO vo) {
         String endpoint = "/es/2.0/order/searchOrder/";
-        String BASE_URL = "https://api.rms.rakuten.co.jp";
         //校验日期范围
         isValidDateRange(vo.getStartDatetime().toLocalDateTime(), vo.getEndDatetime().toLocalDateTime());
 
@@ -126,12 +117,8 @@ public class RakutenClient {
         list.add(OrderStatusEnum.SHIPPED.getCode());
         list.add(OrderStatusEnum.PAYMENT_COMPLETED.getCode());
         vo.setOrderProgressList(list);
-        // 发送 POST 请求
-        HttpResponse response = HttpRequest.post(BASE_URL + endpoint).headerMap(getHeaders(), true) // 设置头信息
-                .body(convert(vo).toString()) // 设置请求体
-                .timeout(2 * 1000) // 设置超时时间
-                .execute();
-
-        return JsonUtils.parseObject(response.body(), JSONObject.class);
+        try (HttpResponse response = sendPostRequest(endpoint, convertToJson(vo).toString())) {
+            return JsonUtils.parseObject(response.body(), JSONObject.class);
+        }
     }
 }
