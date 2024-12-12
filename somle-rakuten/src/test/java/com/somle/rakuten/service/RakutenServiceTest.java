@@ -7,7 +7,7 @@ import cn.hutool.http.HttpResponse;
 import cn.hutool.json.JSONUtil;
 import com.somle.framework.common.util.json.JSONObject;
 import com.somle.framework.test.core.ut.BaseDbUnitTest;
-import com.somle.rakuten.model.polo.RakutenTokenEntity;
+import com.somle.rakuten.model.pojo.RakutenTokenEntity;
 import com.somle.rakuten.model.vo.OrderRequestVO;
 import com.somle.rakuten.model.vo.OrderSearchRequestVO;
 import com.somle.rakuten.repository.RakutenTokenRepository;
@@ -44,7 +44,7 @@ class RakutenServiceTest extends BaseDbUnitTest {
                 .orderNumberList(list)
                 .build();
 
-        JSONObject jsonObject = service.client.getOrders(vo);
+        JSONObject jsonObject = service.client.getOrder(vo);
         System.out.println(jsonObject);
     }
 
@@ -95,7 +95,6 @@ class RakutenServiceTest extends BaseDbUnitTest {
                 .execute();
 
         // 打印响应结果
-//        JSONObject jsonNodes = JsonUtils.parseObject(response.body(), JSONObject.class);
         System.out.println("response.body() = " + JSONUtil.toBean(response.body(), JSONObject.class));
     }
 
@@ -112,7 +111,7 @@ class RakutenServiceTest extends BaseDbUnitTest {
                 .startDatetime(startDatetime)
                 .endDatetime(endDatetime)
                 .build();
-        JSONObject jsonNodes = service.client.searchOrders(vo);
+        JSONObject jsonNodes = service.client.searchOrder(vo);
         System.out.println("jsonNodes = " + jsonNodes);
     }
 
@@ -130,7 +129,7 @@ class RakutenServiceTest extends BaseDbUnitTest {
                 .startDatetime(startDatetime)
                 .endDatetime(endDatetime)
                 .build();
-        JSONObject jsonNodes = service.client.searchOrders(vo);
+        JSONObject jsonNodes = service.client.searchOrder(vo);
         System.out.println("jsonNodes = " + jsonNodes);
 
     }

@@ -18,19 +18,19 @@ public class RakutenController {
      * @param orderRequestVO 订单id+version（默认8）
      * @return JSONObject 订单信息
      */
-    @PostMapping("/orders")
-    public JSONObject getOrders(@RequestBody @Valid OrderRequestVO orderRequestVO) {
-        return service.client.getOrders(orderRequestVO);
+    @PostMapping("/getOrder")
+    public JSONObject getOrder(@RequestBody @Valid OrderRequestVO orderRequestVO) {
+        return service.client.getOrder(orderRequestVO);
     }
 
     @PostMapping("/searchOrder")
     public JSONObject searchOrder(@RequestBody @Valid OrderSearchRequestVO vo) {
 
-        return service.client.searchOrders(vo);
+        return service.client.searchOrder(vo);
     }
 
-    @PostMapping("/endOrder")
-    public JSONObject endOrder(@RequestBody @Valid OrderSearchRequestVO vo) {
+    @PostMapping("/searchEndOrder")
+    public JSONObject searchEndOrder(@RequestBody @Valid OrderSearchRequestVO vo) {
         return service.client.getEndOrderIds(vo);
     }
 }

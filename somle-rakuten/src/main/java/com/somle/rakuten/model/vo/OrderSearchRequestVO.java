@@ -1,14 +1,16 @@
 package com.somle.rakuten.model.vo;
 
 
-import java.time.ZonedDateTime;
-import java.util.List;
-
+import cn.hutool.core.date.DatePattern;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.somle.rakuten.model.PaginationRequestModel;
 import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Data;
+import org.hibernate.validator.constraints.Range;
+
+import java.time.ZonedDateTime;
+import java.util.List;
 
 @Data
 @Builder
@@ -17,14 +19,16 @@ public class OrderSearchRequestVO {
     private List<Integer> orderProgressList;            // 订单状态列表，包含状态代码（如：100: 注单确认待、200: 处理中的订单等）
     private List<Integer> subStatusIdList;              // 子状态ID列表，多个ID可以同时指定，[-1]表示未设置子状态的订单
     @NotNull
+    @Range(min = 1, max = 9)
     private Integer dateType;                           // 期间搜索类型，指定是基于哪个日期字段来进行搜索（如：1: 订单日、2: 订单确认等）3：订单确认确定日 4：发货日 5：发货完成报告日 6：支付确认日
 
     @NotNull
-    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ssXXX")    // 指定日期格式：例如 2017-10-14T00:00:00+0900
+    @JsonFormat(pattern = DatePattern.UTC_WITH_ZONE_OFFSET_PATTERN)    // 指定日期格式：例如 2017-10-14T00:00:00+0900
     private ZonedDateTime startDatetime;          // 搜索开始时间，要求是过去730天内的日期  2017-10-14T00:00:00+0900
     @NotNull
-    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ssXXX")    // 指定日期格式：例如 2017-10-14T00:00:00+0900
+    @JsonFormat(pattern = DatePattern.UTC_WITH_ZONE_OFFSET_PATTERN)    // 指定日期格式：例如 2017-10-14T00:00:00+0900
     private ZonedDateTime endDatetime;                  // 搜索结束时间，起始时间的63天内  2017-10-15T23:59:59+0900
+
     private List<Integer> orderTypeList;                // 销售类型列表，指定要查询的销售方式（如：1: 普通购买、4: 定期购买等）
 
     private Integer settlementMethod;                   // 支付方式，指定订单的支付方式（如：1: 信用卡、2: 货到付款等）

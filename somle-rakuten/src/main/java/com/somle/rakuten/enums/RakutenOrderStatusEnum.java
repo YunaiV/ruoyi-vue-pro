@@ -5,7 +5,7 @@ import lombok.Getter;
 import java.util.List;
 
 @Getter
-public enum OrderStatusEnum {
+public enum RakutenOrderStatusEnum {
 
     // 定义订单状态及其对应的状态码和描述
     ORDER_CONFIRM_WAIT(100, "订单确认待"),
@@ -24,14 +24,14 @@ public enum OrderStatusEnum {
     private final String description; // 状态描述
 
     // 枚举构造函数，初始化状态码和描述
-    OrderStatusEnum(int code, String description) {
+    RakutenOrderStatusEnum(int code, String description) {
         this.code = code;
         this.description = description;
     }
 
     // 根据状态码获取对应的枚举
-    public static OrderStatusEnum fromCode(int code) {
-        for (OrderStatusEnum status : OrderStatusEnum.values()) {
+    public static RakutenOrderStatusEnum fromCode(int code) {
+        for (RakutenOrderStatusEnum status : RakutenOrderStatusEnum.values()) {
             if (status.getCode() == code) {
                 return status;
             }

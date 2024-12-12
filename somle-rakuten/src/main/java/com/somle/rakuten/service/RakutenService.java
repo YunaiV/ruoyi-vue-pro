@@ -1,6 +1,6 @@
 package com.somle.rakuten.service;
 
-import com.somle.rakuten.model.polo.RakutenTokenEntity;
+import com.somle.rakuten.model.pojo.RakutenTokenEntity;
 import com.somle.rakuten.repository.RakutenTokenRepository;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;

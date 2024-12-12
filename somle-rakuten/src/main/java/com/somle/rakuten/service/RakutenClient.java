@@ -1,19 +1,19 @@
 package com.somle.rakuten.service;
 
 import cn.hutool.core.codec.Base64;
-import cn.hutool.core.date.LocalDateTimeUtil;
-import cn.hutool.http.HttpRequest;
-import cn.hutool.http.HttpResponse;
-import cn.hutool.json.JSONUtil;
+import com.somle.framework.common.util.date.LocalDateTimeUtils;
 import com.somle.framework.common.util.json.JSONObject;
 import com.somle.framework.common.util.json.JsonUtils;
-import com.somle.rakuten.enums.OrderStatusEnum;
-import com.somle.rakuten.model.polo.RakutenTokenEntity;
+import com.somle.framework.common.util.web.RequestX;
+import com.somle.framework.common.util.web.WebUtils;
+import com.somle.rakuten.enums.RakutenOrderStatusEnum;
+import com.somle.rakuten.model.pojo.RakutenTokenEntity;
 import com.somle.rakuten.model.vo.OrderRequestVO;
 import com.somle.rakuten.model.vo.OrderSearchRequestVO;
 import com.somle.rakuten.utill.ZonedDateTimeConverter;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import okhttp3.Response;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -42,29 +42,39 @@ public class RakutenClient {
 
 
     @SneakyThrows
-    public JSONObject getOrders(OrderRequestVO vo) {
+    public JSONObject getOrder(OrderRequestVO vo) {
         String endpoint = "/es/2.0/order/getOrder/";
-        try (HttpResponse response = sendPostRequest(endpoint, JSONUtil.toJsonStr(vo))) {
-            return JsonUtils.parseObject(response.body(), JSONObject.class);
-        }
+        return sendRequestAndParse(endpoint, JsonUtils.toJsonString(vo));
     }
 
     @SneakyThrows
-    public JSONObject searchOrders(OrderSearchRequestVO vo) {
+    public JSONObject searchOrder(OrderSearchRequestVO vo) {
         String endpoint = "/es/2.0/order/searchOrder/";
-        //校验时间范围
         isValidDateRange(vo.getStartDatetime().toLocalDateTime(), vo.getEndDatetime().toLocalDateTime());
-        try (HttpResponse response = sendPostRequest(endpoint, convertToJson(vo).toString())) {
-            return JsonUtils.parseObject(response.body(), JSONObject.class);
-        }
+        return sendRequestAndParse(endpoint, convertToJson(vo).toString());
     }
 
-    private HttpResponse sendPostRequest(String endpoint, String requestBody) {
-        return HttpRequest.post(BASE_URL + endpoint)
-                .headerMap(getHeaders(), true)
-                .body(requestBody)
-                .timeout(2 * 1000)
-                .execute();
+    @SneakyThrows
+    public JSONObject getEndOrderIds(OrderSearchRequestVO vo) {
+        //检验日期范围
+        isValidDateRange(vo.getStartDatetime().toLocalDateTime(), vo.getEndDatetime().toLocalDateTime());
+        ArrayList<Integer> list = new ArrayList<>();
+        list.add(RakutenOrderStatusEnum.SHIPPED.getCode());
+        list.add(RakutenOrderStatusEnum.PAYMENT_COMPLETED.getCode());
+        vo.setOrderProgressList(list);
+
+        return sendRequestAndParse("/es/2.0/order/searchOrder/", convertToJson(vo).toString());
+
+    }
+
+    private Response sendPostRequest(String endpoint, String requestBody) {
+        var request = RequestX.builder()
+                .requestMethod(RequestX.Method.POST)
+                .url(BASE_URL + endpoint)
+                .headers(getHeaders())
+                .payload(JsonUtils.parseObject(requestBody, JSONObject.class))
+                .build();
+        return WebUtils.sendRequest(request);
     }
 
     private Map<String, String> getHeaders() {
@@ -77,48 +87,37 @@ public class RakutenClient {
 
     private void isValidDateRange(LocalDateTime startDatetime, LocalDateTime endDatetime) {
         // 确保 endDatetime 大于 startDatetime
-        if (endDatetime.isBefore(startDatetime) || endDatetime.isEqual(startDatetime)) {
-            throw new IllegalArgumentException("结束时间必须大于开始时间");
-        }
-
-        // 计算日期之间的天数差
-        long days = LocalDateTimeUtil.between(startDatetime, endDatetime).toDays();
+        LocalDateTimeUtils.isValidDateRange(startDatetime, endDatetime);
         // 判断是否在63天内
-        if (days > 63) {
-            throw new IllegalArgumentException("日期范围超出了63天");
-        }
+        LocalDateTimeUtils.isValidDateRange(startDatetime, endDatetime, 63);
         //判断开始日期是否截至今天(日本时间)在730日内
-        long days2 = LocalDateTimeUtil.between(startDatetime, ZonedDateTime.now(ZoneId.of("Asia/Tokyo")).toLocalDateTime()).toDays();
-        if (days2 > 730) {
-            throw new IllegalArgumentException("开始日期范围超出了730天");
-        }
-
+        LocalDateTimeUtils.isValidDateRange(startDatetime, ZonedDateTime.now(ZoneId.of("Asia/Tokyo")).toLocalDateTime(), 730);
     }
 
-    private cn.hutool.json.JSONObject convertToJson(OrderSearchRequestVO vo) {
+    private JSONObject convertToJson(OrderSearchRequestVO vo) {
         // 将 ZonedDateTime 转换成 String 格式
         String startDatetimeStr = vo.getStartDatetime() != null ? ZonedDateTimeConverter.convertToString(vo.getStartDatetime()) : null;
         String endDatetimeStr = vo.getEndDatetime() != null ? ZonedDateTimeConverter.convertToString(vo.getEndDatetime()) : null;
         // 创建一个临时对象来存储转换后的数据
-        cn.hutool.json.JSONObject jsonObject = JSONUtil.parseObj(vo);
+        JSONObject jsonObject = JsonUtils.toJSONObject(vo);
         // 手动设置日期字段为字符串格式
-        jsonObject.set("startDatetime", startDatetimeStr);
-        jsonObject.set("endDatetime", endDatetimeStr);
+        jsonObject.put("startDatetime", startDatetimeStr);
+        jsonObject.put("endDatetime", endDatetimeStr);
         return jsonObject;
     }
 
-    @SneakyThrows
-    public JSONObject getEndOrderIds(OrderSearchRequestVO vo) {
-        String endpoint = "/es/2.0/order/searchOrder/";
-        //校验日期范围
-        isValidDateRange(vo.getStartDatetime().toLocalDateTime(), vo.getEndDatetime().toLocalDateTime());
 
-        ArrayList<Integer> list = new ArrayList<>();
-        list.add(OrderStatusEnum.SHIPPED.getCode());
-        list.add(OrderStatusEnum.PAYMENT_COMPLETED.getCode());
-        vo.setOrderProgressList(list);
-        try (HttpResponse response = sendPostRequest(endpoint, convertToJson(vo).toString())) {
-            return JsonUtils.parseObject(response.body(), JSONObject.class);
+    private JSONObject sendRequestAndParse(String endpoint, String requestBody) {
+        try (Response response = sendPostRequest(endpoint, requestBody)) {
+            if (response.body() == null) {
+                log.error("Response body is null for endpoint: {}", endpoint);
+                throw new RuntimeException("Response body is null");
+            }
+            return JsonUtils.parseObject(response.body().string(), JSONObject.class);
+        } catch (Exception e) {
+            log.error("Error occurred while sending request to endpoint: {}", endpoint, e);
+            throw new RuntimeException("Error occurred while sending request", e);
         }
     }
+
 }
