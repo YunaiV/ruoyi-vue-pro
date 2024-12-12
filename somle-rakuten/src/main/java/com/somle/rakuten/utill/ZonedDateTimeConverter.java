@@ -1,12 +1,14 @@
 package com.somle.rakuten.utill;
 
+import cn.hutool.core.date.DatePattern;
+
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 
 public class ZonedDateTimeConverter {
 
     // 日期格式化模式，包含时区偏移
-    private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssXXX");
+    private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DatePattern.UTC_WITH_ZONE_OFFSET_PATTERN);
 
     /**
      * 将 ZonedDateTime 转换为 String
