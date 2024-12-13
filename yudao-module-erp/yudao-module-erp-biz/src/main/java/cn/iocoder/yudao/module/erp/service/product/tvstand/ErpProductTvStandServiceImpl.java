@@ -1,15 +1,15 @@
 package cn.iocoder.yudao.module.erp.service.product.tvstand;
 
-import cn.hutool.core.util.ObjUtil;
 import cn.iocoder.yudao.framework.common.exception.util.ThrowUtil;
+import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.erp.controller.admin.product.vo.product.ErpProductSaveReqVO;
+import cn.iocoder.yudao.module.erp.dal.dataobject.product.ErpProductDO;
+import cn.iocoder.yudao.module.erp.service.product.ErpProductServiceImpl;
 import cn.iocoder.yudao.module.erp.service.product.bo.ErpProductBO;
 import cn.iocoder.yudao.module.erp.service.product.tvstand.bo.ErpProductTvStandBO;
 import org.springframework.stereotype.Service;
 
-import java.lang.reflect.Field;
-import java.util.HashMap;
-import java.util.Map;
+import java.math.BigDecimal;
 
 import static cn.iocoder.yudao.module.erp.enums.ErrorCodeConstants.PRODUCT_FIELD_NOT_MATCH;
 
@@ -18,7 +18,18 @@ import static cn.iocoder.yudao.module.erp.enums.ErrorCodeConstants.PRODUCT_FIELD
  * @date: 2024/12/3 16:40
  */
 @Service
-public class ErpProductTvStandServiceImpl implements ErpProductTvStandService{
+public class ErpProductTvStandServiceImpl extends ErpProductServiceImpl implements ErpProductTvStandService {
+    @Override
+    public ErpProductBO toBO(ErpProductSaveReqVO saveReqVO) {
+        validateFields(saveReqVO);
+        return BeanUtils.toBean(saveReqVO, ErpProductTvStandBO.class);
+    }
+
+    @Override
+    public ErpProductBO toBO(ErpProductDO productDO) {
+        return BeanUtils.toBean(productDO, ErpProductTvStandBO.class);
+    }
+
     /***
     * @Author Wqh
     * @Description 校验电视机架字段是否匹配
@@ -26,35 +37,17 @@ public class ErpProductTvStandServiceImpl implements ErpProductTvStandService{
     * @Param [vo]
     * @return void
     **/
-    public void validationField(ErpProductSaveReqVO erpProductSaveReqVO) throws IllegalAccessException {
-        // 获取 ErpProductBO 的字段
-        Field[] productBoFields = ErpProductBO.class.getDeclaredFields();
-        Map<String, Field> productBoFieldMap = new HashMap<>();
-        for (Field field : productBoFields) {
-            productBoFieldMap.put(field.getName(), field);
-        }
-        // 获取 ErpProductTvStandBO 的字段信息
-        Field[] productTvStandBoFields = ErpProductTvStandBO.class.getDeclaredFields();
-        Map<String, Field> productTvStandBoFieldMap = new HashMap<>();
-        for (Field field : productTvStandBoFields) {
-            productTvStandBoFieldMap.put(field.getName(), field);
-        }
-        // 获取 ErpProductSaveReqVO 的字段信息
-        Field[] productSaveReqVoFieldMap = ErpProductSaveReqVO.class.getDeclaredFields();
-        for (Field productSaveReqVoField : productSaveReqVoFieldMap) {
-            productSaveReqVoField.setAccessible(true);
-            //排除共有的字段，判断voField和field是否相同
-            if (productBoFieldMap.containsKey(productSaveReqVoField.getName())){
-                continue;
-            }
-            Field productTvStandBoField = productTvStandBoFieldMap.get(productSaveReqVoField.getName());
-            // 字段在 ErpProductTvStandBO 中不存在
-            if (productTvStandBoField == null) {
-                //获取vo中的字段值
-                Object erpProductSaveReqVoFieldValue = productSaveReqVoField.get(erpProductSaveReqVO);
-                //如果存在字段值则抛出异常
-                ThrowUtil.ifThrow(ObjUtil.isNotEmpty(erpProductSaveReqVoFieldValue),PRODUCT_FIELD_NOT_MATCH);
-            }
-        }
+    @Override
+    public void validateFields(ErpProductSaveReqVO saveReqVO){
+        ThrowUtil.ifThrow(BeanUtils.areAllNonNullFieldsPresent(saveReqVO, ErpProductTvStandBO.class),PRODUCT_FIELD_NOT_MATCH);
     }
+
+    @Override
+    public BigDecimal getShelvesTotalLoadingCapacity(Long id) {
+        ErpProductDO productDO = productMapper.selectById(id);
+        ErpProductTvStandBO tvStandBO = (ErpProductTvStandBO) toBO(productDO);
+        return tvStandBO.getShelfLoadCapacity().multiply(BigDecimal.valueOf(tvStandBO.getShelvesCount()));
+    }
+
+
 }

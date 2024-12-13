@@ -10,15 +10,11 @@ import java.math.BigDecimal;
  * @date: 2024/12/3 16:13
  */
 @Data
-public class ErpProductTvStandBO {
-    /**
-     * 产品主信息
-     */
-    private ErpProductBO product;
+public class ErpProductTvStandBO extends ErpProductBO {
     /**
      * 层板承重
      */
-    private String shelfLoadCapacity;
+    private BigDecimal shelfLoadCapacity;
     /**
      * 层板数量
      */

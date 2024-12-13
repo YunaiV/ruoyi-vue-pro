@@ -17,16 +17,12 @@ import cn.iocoder.yudao.module.erp.dal.dataobject.product.ErpProductDO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.product.ErpProductUnitDO;
 import cn.iocoder.yudao.module.erp.dal.mysql.logistic.customrule.ErpCustomRuleMapper;
 import cn.iocoder.yudao.module.erp.dal.mysql.product.ErpProductMapper;
-import cn.iocoder.yudao.module.erp.service.product.tvstand.ErpProductTvStandServiceImpl;
+import cn.iocoder.yudao.module.erp.service.product.bo.ErpProductBO;
 import cn.iocoder.yudao.module.system.api.dept.DeptApi;
 import cn.iocoder.yudao.module.system.api.dept.dto.DeptRespDTO;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
-import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import jakarta.annotation.Resource;
-import lombok.RequiredArgsConstructor;
-import org.springframework.context.ApplicationContext;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.stereotype.Service;
@@ -45,25 +41,41 @@ import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.USER_NOT_E
  *
  * @author 芋道源码
  */
+
 @Service
 @Validated
-@RequiredArgsConstructor
 public class ErpProductServiceImpl implements ErpProductService {
+
     @Resource
     MessageChannel erpProductChannel;
-    private final ErpProductMapper productMapper;
-    private final ErpProductCategoryService productCategoryService;
-    private final ErpProductUnitService productUnitService;
-    private final DeptApi deptApi;
-    private final ErpCustomRuleMapper customRuleMapper;
-    private static final ReentrantLock LOCK = new ReentrantLock();
-    private final AdminUserApi userApi;
-    private final ApplicationContext applicationContext;
-    // 静态代码块初始化数据
-    private static final Map<Long, Class<?>> VIRTUAL_TABLE = Map.of(87L, ErpProductTvStandServiceImpl.class);
+    @Resource
+    protected ErpProductMapper productMapper;
+    @Resource
+    ErpProductCategoryService productCategoryService;
+    @Resource
+    ErpProductUnitService productUnitService;
+    @Resource
+    DeptApi deptApi;
+    @Resource
+    ErpCustomRuleMapper customRuleMapper;
+    @Resource
+    AdminUserApi userApi;
 
 
+    private final ReentrantLock LOCK = new ReentrantLock();
 
+    public ErpProductBO toBO(ErpProductSaveReqVO saveReqVO) {
+        validateFields(saveReqVO);
+        return BeanUtils.toBean(saveReqVO, ErpProductBO.class);
+    }
+
+    public ErpProductBO toBO(ErpProductDO productDO) {
+        return BeanUtils.toBean(productDO, ErpProductBO.class);
+    }
+
+    public void validateFields(ErpProductSaveReqVO saveReqVO) {
+        BeanUtils.areAllNonNullFieldsPresent(saveReqVO, ErpProductBO.class);
+    };
 
     @Override
     public Long createProduct(ErpProductSaveReqVO createReqVO) {
@@ -85,10 +97,10 @@ public class ErpProductServiceImpl implements ErpProductService {
         validateProductCategory(categoryId);
         //校验人员id是否存在
         validatePerson(createReqVO);
-        //执行额外字段的逻辑
-        extraServiceImpl(createReqVO);
+        //生产对应的BO
+        Object productBO = toBO(createReqVO);
         // 插入产品
-        ErpProductDO product = BeanUtils.toBean(createReqVO, ErpProductDO.class);
+        ErpProductDO product = BeanUtils.toBean(productBO, ErpProductDO.class);
         //将图片的实体和指导价的实体转为json字符串
         if (CollUtil.isNotEmpty(createReqVO.getSecondaryImageUrlList())){
             product.setSecondaryImageUrls(JSONUtil.toJsonStr(createReqVO.getSecondaryImageUrlList()));
@@ -101,22 +113,22 @@ public class ErpProductServiceImpl implements ErpProductService {
         return product.getId();
     }
 
-    private void extraServiceImpl(ErpProductSaveReqVO vo) {
-        Long categoryId = vo.getCategoryId();
-        Class<?> aClass = VIRTUAL_TABLE.get(categoryId);
-        if (aClass == null){
-            return;
-        }
-        try {
-            Object serviceImpl = applicationContext.getBean(aClass);
-            if (serviceImpl instanceof ErpProductTvStandServiceImpl){
-                ((ErpProductTvStandServiceImpl)serviceImpl).validationField(vo);
-            }
-            //TODO 其他类型请在此添加else if
-        } catch (IllegalAccessException e) {
-            throw new RuntimeException(e);
-        }
-    }
+//    private void extraServiceImpl(ErpProductSaveReqVO vo) {
+//        Long categoryId = vo.getCategoryId();
+//        Class<?> aClass = VIRTUAL_TABLE.get(categoryId);
+//        if (aClass == null){
+//            return;
+//        }
+//        try {
+//            Object serviceImpl = applicationContext.getBean(aClass);
+//            if (serviceImpl instanceof ErpProductTvStandServiceImpl){
+//                ((ErpProductTvStandServiceImpl)serviceImpl).validationField(vo);
+//            }
+//            //TODO 其他类型请在此添加else if
+//        } catch (IllegalAccessException e) {
+//            throw new RuntimeException(e);
+//        }
+//    }
 
     @Override
     public void updateProduct(ErpProductSaveReqVO updateReqVO) {
@@ -140,10 +152,10 @@ public class ErpProductServiceImpl implements ErpProductService {
         validateProductCategory(categoryId);
         //校验人员id是否存在
         validatePerson(updateReqVO);
-        //执行额外字段的逻辑
-        extraServiceImpl(updateReqVO);
+        //生产对应的BO
+        Object productBO = toBO(updateReqVO);
         // 更新
-        ErpProductDO updateObj = BeanUtils.toBean(updateReqVO, ErpProductDO.class);
+        ErpProductDO updateObj = BeanUtils.toBean(productBO, ErpProductDO.class);
         //将图片的实体和指导价的实体转为json字符串
         if (CollUtil.isNotEmpty(updateReqVO.getSecondaryImageUrlList())){
             updateObj.setSecondaryImageUrls(JSONUtil.toJsonStr(updateReqVO.getSecondaryImageUrlList()));

@@ -12,6 +12,7 @@ import cn.iocoder.yudao.module.erp.controller.admin.product.vo.product.ErpProduc
 import cn.iocoder.yudao.module.erp.controller.admin.product.vo.product.ErpProductSaveReqVO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.product.ErpProductDO;
 import cn.iocoder.yudao.module.erp.service.product.ErpProductService;
+import cn.iocoder.yudao.module.erp.service.product.ErpProductServiceDelegator;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -37,7 +38,7 @@ import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.
 public class ErpProductController {
 
     @Resource
-    private ErpProductService productService;
+    private ErpProductServiceDelegator productService;
 
     @PostMapping("/create")
     @Operation(summary = "创建产品")
