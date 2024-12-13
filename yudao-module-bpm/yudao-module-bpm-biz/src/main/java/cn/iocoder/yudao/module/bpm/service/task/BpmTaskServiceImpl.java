@@ -1047,10 +1047,14 @@ public class BpmTaskServiceImpl implements BpmTaskService {
             public void afterCompletion(int transactionStatus) {
                 // 特殊情况：部分情况下，TransactionSynchronizationManager 注册 afterCommit 监听时，不会被调用，但是 afterCompletion 可以
                 // 例如说：第一个 task 就是配置【自动通过】或者【自动拒绝】时
-                if (ObjectUtil.notEqual(transactionStatus, TransactionSynchronization.STATUS_COMMITTED)) {
+                if (ObjectUtil.equal(transactionStatus, TransactionSynchronization.STATUS_ROLLED_BACK)) {
                     return;
                 }
-                // TODO 芋艿：可以后续优化成 getSelf();
+                // 特殊情况：第一个 task 【自动通过】时，第二个任务创建事件时 transactionStatus 会为 STATUS_UNKNOWN，不知道啥原因
+                if (ObjectUtil.equal(transactionStatus, TransactionSynchronization.STATUS_UNKNOWN)
+                        && getTask(task.getId()) == null) {
+                    return;
+                }
                 // 特殊情况一：【人工审核】审批人为空，根据配置是否要自动通过、自动拒绝
                 if (ObjectUtil.equal(approveType, BpmUserTaskApproveTypeEnum.USER.getType())) {
                     // 如果有审批人、或者拥有人，则说明不满足情况一，不自动通过、不自动拒绝
@@ -1058,19 +1062,19 @@ public class BpmTaskServiceImpl implements BpmTaskService {
                         return;
                     }
                     if (ObjectUtil.equal(assignEmptyHandlerType, BpmUserTaskAssignEmptyHandlerTypeEnum.APPROVE.getType())) {
-                        SpringUtil.getBean(BpmTaskService.class).approveTask(null, new BpmTaskApproveReqVO()
+                        getSelf().approveTask(null, new BpmTaskApproveReqVO()
                                 .setId(task.getId()).setReason(BpmReasonEnum.ASSIGN_EMPTY_APPROVE.getReason()));
                     } else if (ObjectUtil.equal(assignEmptyHandlerType, BpmUserTaskAssignEmptyHandlerTypeEnum.REJECT.getType())) {
-                        SpringUtil.getBean(BpmTaskService.class).rejectTask(null, new BpmTaskRejectReqVO()
+                        getSelf().rejectTask(null, new BpmTaskRejectReqVO()
                                 .setId(task.getId()).setReason(BpmReasonEnum.ASSIGN_EMPTY_REJECT.getReason()));
                     }
                     // 特殊情况二：【自动审核】审批类型为自动通过、不通过
                 } else {
                     if (ObjectUtil.equal(approveType, BpmUserTaskApproveTypeEnum.AUTO_APPROVE.getType())) {
-                        SpringUtil.getBean(BpmTaskService.class).approveTask(null, new BpmTaskApproveReqVO()
+                        getSelf().approveTask(null, new BpmTaskApproveReqVO()
                                 .setId(task.getId()).setReason(BpmReasonEnum.APPROVE_TYPE_AUTO_APPROVE.getReason()));
                     } else if (ObjectUtil.equal(approveType, BpmUserTaskApproveTypeEnum.AUTO_REJECT.getType())) {
-                        SpringUtil.getBean(BpmTaskService.class).rejectTask(null, new BpmTaskRejectReqVO()
+                        getSelf().rejectTask(null, new BpmTaskRejectReqVO()
                                 .setId(task.getId()).setReason(BpmReasonEnum.APPROVE_TYPE_AUTO_REJECT.getReason()));
                     }
                 }
@@ -1108,9 +1112,19 @@ public class BpmTaskServiceImpl implements BpmTaskService {
     public void processTaskAssigned(Task task) {
         // 发送通知。在事务提交时，批量执行操作，所以直接查询会无法查询到 ProcessInstance，所以这里是通过监听事务的提交来实现。
         TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
-
+            // 特殊情况：部分情况下，TransactionSynchronizationManager 注册 afterCommit 监听时，不会被调用，但是 afterCompletion 可以
+            // 例如说：第一个 task 就是配置【自动通过】或者【自动拒绝】时
             @Override
-            public void afterCommit() {
+            public void afterCompletion(int transactionStatus) {
+                // 回滚情况，直接返回
+                if (ObjectUtil.equal(transactionStatus, TransactionSynchronization.STATUS_ROLLED_BACK)) {
+                    return;
+                }
+                // 特殊情况：第一个 task 【自动通过】时，第二个任务设置审批人时 transactionStatus 会为 STATUS_UNKNOWN，不知道啥原因
+                if (ObjectUtil.equal(transactionStatus, TransactionSynchronization.STATUS_UNKNOWN)
+                        && getTask(task.getId()) == null) {
+                    return;
+                }
                 if (StrUtil.isEmpty(task.getAssignee())) {
                     log.error("[processTaskAssigned][taskId({}) 没有分配到负责人]", task.getId());
                     return;
