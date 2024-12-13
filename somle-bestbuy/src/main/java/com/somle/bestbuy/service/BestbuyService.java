@@ -35,7 +35,7 @@ public class BestbuyService {
      */
     public JSONObject getOrders() {
         String endpoint = "api/orders";
-        return executeRequestAndParseResponse(endpoint, null, HttpMethod.GET);
+        return executeRequestAndParseResponse(endpoint, null, RequestX.Method.GET);
     }
 
     /**
@@ -47,7 +47,7 @@ public class BestbuyService {
      * @return 解析后的JSONObject
      * @throws RuntimeException 如果请求失败或响应体为空
      */
-    private JSONObject executeRequestAndParseResponse(String endpoint, String requestBody, HttpMethod httpMethod) {
+    private JSONObject executeRequestAndParseResponse(String endpoint, String requestBody, RequestX.Method httpMethod) {
         try (Response response = sendRequest(endpoint, requestBody, httpMethod)) {
             if (response.isSuccessful()) {
                 ResponseBody body = response.body();
@@ -69,16 +69,16 @@ public class BestbuyService {
      *
      * @param endpoint   请求的端点
      * @param requestBody 请求体，可以为null
-     * @param httpMethod  HTTP方法（GET, POST, PUT等）
+     * @param httpMethod  HTTP方法（GET, POST等）
      * @return HTTP响应
      */
-    private Response sendRequest(String endpoint, String requestBody, HttpMethod httpMethod) {
+    private Response sendRequest(String endpoint, String requestBody, RequestX.Method httpMethod) {
         var request = RequestX.builder()
-                .requestMethod(RequestX.Method.valueOf(httpMethod.name()))
+                .requestMethod(httpMethod)
                 .url(BASE_URL + endpoint)
                 .headers(getHeaders())
                 .build();
-        if (httpMethod == HttpMethod.POST || httpMethod == HttpMethod.PUT) {
+        if (httpMethod.equals(HttpMethod.POST)) {
             request.setPayload(JsonUtils.parseObject(requestBody, JSONObject.class));
         }
         return WebUtils.sendRequest(request);
