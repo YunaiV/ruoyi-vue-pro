@@ -242,8 +242,6 @@ public class CombinationActivityServiceImpl implements CombinationActivityServic
 
     @Override
     public List<CombinationActivityDO> getByVirtualGroup() {
-        return combinationActivityMapper.selectList(
-                CombinationActivityDO::getVirtualGroup, Boolean.TRUE
-        );
+        return combinationActivityMapper.selectByVirtualGroup();
     }
 }

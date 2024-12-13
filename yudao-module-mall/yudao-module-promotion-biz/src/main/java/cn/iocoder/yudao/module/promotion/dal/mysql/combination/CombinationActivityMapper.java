@@ -44,4 +44,9 @@ public interface CombinationActivityMapper extends BaseMapperX<CombinationActivi
                 .gt(CombinationActivityDO::getEndTime, now)); // 开始时间 < now < 结束时间，也就是说获取指定时间段的活动
     }
 
+    default List<CombinationActivityDO> selectByVirtualGroup(){
+        return selectList(
+                CombinationActivityDO::getVirtualGroup, Boolean.TRUE
+        );
+    }
 }
