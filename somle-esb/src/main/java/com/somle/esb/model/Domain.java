@@ -11,7 +11,8 @@ public enum Domain {
     DINGTALK("dingtalk"),
     SHOPIFY("shopify"),
     WANGDIAN("wangdian"),
-    WALMART("walmart");
+    WALMART("walmart"),
+    BESTBUY("bestbuy");
 
 
     private final String value;
