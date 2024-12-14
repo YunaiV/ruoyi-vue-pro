@@ -1,5 +1,7 @@
 package cn.iocoder.yudao.module.iot.controller.admin.device.vo.device;
 
+import cn.iocoder.yudao.framework.excel.core.annotations.DictFormat;
+import cn.iocoder.yudao.framework.excel.core.convert.DictConvert;
 import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
 import com.alibaba.excel.annotation.ExcelProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -7,6 +9,8 @@ import lombok.Data;
 
 import java.time.LocalDateTime;
 import java.util.Set;
+
+import static cn.iocoder.yudao.module.iot.enums.DictTypeConstants.DEVICE_STATUS;
 
 @Schema(description = "管理后台 - IoT 设备 Response VO")
 @Data
@@ -21,8 +25,20 @@ public class IotDeviceRespVO {
     private String deviceKey;
 
     @Schema(description = "设备名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "王五")
-    @ExcelProperty("设备名称备")
+    @ExcelProperty("设备名称")
     private String deviceName;
+
+    @Schema(description = "设备备注名称", example = "张三")
+    @ExcelProperty("设备备注名称")
+    private String nickname;
+
+    @Schema(description = "设备序列号", example = "1024")
+    @ExcelProperty("设备序列号")
+    private String serialNumber;
+
+    @Schema(description = "设备图片", example = "我是一名码农")
+    @ExcelProperty("设备图片")
+    private String picUrl;
 
     @Schema(description = "设备分组编号数组", example = "1,2")
     private Set<Long> groupIds;
@@ -39,15 +55,12 @@ public class IotDeviceRespVO {
     @ExcelProperty("设备类型")
     private Integer deviceType;
 
-    @Schema(description = "设备备注名称", example = "张三")
-    @ExcelProperty("设备备注名称")
-    private String nickname;
-
     @Schema(description = "网关设备 ID", example = "16380")
     private Long gatewayId;
 
     @Schema(description = "设备状态", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
-    @ExcelProperty("设备状态")
+    @ExcelProperty(value = "设备状态", converter = DictConvert.class)
+    @DictFormat(DEVICE_STATUS)
     private Integer status;
 
     @Schema(description = "设备状态最后更新时间")

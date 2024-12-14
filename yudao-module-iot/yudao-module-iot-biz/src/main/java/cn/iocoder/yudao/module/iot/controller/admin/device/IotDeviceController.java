@@ -1,8 +1,11 @@
 package cn.iocoder.yudao.module.iot.controller.admin.device;
 
+import cn.iocoder.yudao.framework.apilog.core.annotation.ApiAccessLog;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
+import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
+import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.yudao.module.iot.controller.admin.device.vo.device.IotDevicePageReqVO;
 import cn.iocoder.yudao.module.iot.controller.admin.device.vo.device.IotDeviceRespVO;
 import cn.iocoder.yudao.module.iot.controller.admin.device.vo.device.IotDeviceSaveReqVO;
@@ -13,13 +16,16 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.List;
 
+import static cn.iocoder.yudao.framework.apilog.core.enums.OperateTypeEnum.EXPORT;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
 
@@ -79,6 +85,19 @@ public class IotDeviceController {
     public CommonResult<PageResult<IotDeviceRespVO>> getDevicePage(@Valid IotDevicePageReqVO pageReqVO) {
         PageResult<IotDeviceDO> pageResult = deviceService.getDevicePage(pageReqVO);
         return success(BeanUtils.toBean(pageResult, IotDeviceRespVO.class));
+    }
+
+    @GetMapping("/export-excel")
+    @Operation(summary = "导出设备 Excel")
+    @PreAuthorize("@ss.hasPermission('iot:device:export')")
+    @ApiAccessLog(operateType = EXPORT)
+    public void exportDeviceExcel(@Valid IotDevicePageReqVO exportReqVO,
+                                  HttpServletResponse response) throws IOException {
+        exportReqVO.setPageSize(PageParam.PAGE_SIZE_NONE);
+        CommonResult<PageResult<IotDeviceRespVO>> result = getDevicePage(exportReqVO);
+        // 导出 Excel
+        ExcelUtils.write(response, "设备.xls", "数据", IotDeviceRespVO.class,
+                result.getData().getList());
     }
 
     @GetMapping("/count")
