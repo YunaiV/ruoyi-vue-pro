@@ -4,6 +4,7 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.iot.controller.admin.device.vo.device.IotDevicePageReqVO;
 import cn.iocoder.yudao.module.iot.controller.admin.device.vo.device.IotDeviceSaveReqVO;
 import cn.iocoder.yudao.module.iot.controller.admin.device.vo.device.IotDeviceStatusUpdateReqVO;
+import cn.iocoder.yudao.module.iot.controller.admin.device.vo.device.IotDeviceUpdateGroupReqVO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDO;
 import jakarta.validation.Valid;
 
@@ -32,6 +33,20 @@ public interface IotDeviceService {
      * @param updateReqVO 更新信息
      */
     void updateDevice(@Valid IotDeviceSaveReqVO updateReqVO);
+
+    /**
+     * 更新设备状态
+     *
+     * @param updateReqVO 更新信息
+     */
+    void updateDeviceStatus(IotDeviceStatusUpdateReqVO updateReqVO);
+
+    /**
+     * 更新设备分组
+     *
+     * @param updateReqVO 更新信息
+     */
+    void updateDeviceGroup(@Valid IotDeviceUpdateGroupReqVO updateReqVO);
 
     /**
      * 删除单个设备
@@ -70,13 +85,6 @@ public interface IotDeviceService {
      * @return 设备列表
      */
     List<IotDeviceDO> getDeviceList(@Nullable Integer deviceType);
-
-    /**
-     * 更新设备状态
-     *
-     * @param updateReqVO 更新信息
-     */
-    void updateDeviceStatus(IotDeviceStatusUpdateReqVO updateReqVO);
 
     /**
      * 获得设备数量

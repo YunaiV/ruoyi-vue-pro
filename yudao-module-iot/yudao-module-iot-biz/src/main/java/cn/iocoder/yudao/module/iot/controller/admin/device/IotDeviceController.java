@@ -6,10 +6,7 @@ import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
-import cn.iocoder.yudao.module.iot.controller.admin.device.vo.device.IotDevicePageReqVO;
-import cn.iocoder.yudao.module.iot.controller.admin.device.vo.device.IotDeviceRespVO;
-import cn.iocoder.yudao.module.iot.controller.admin.device.vo.device.IotDeviceSaveReqVO;
-import cn.iocoder.yudao.module.iot.controller.admin.device.vo.device.IotDeviceStatusUpdateReqVO;
+import cn.iocoder.yudao.module.iot.controller.admin.device.vo.device.*;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDO;
 import cn.iocoder.yudao.module.iot.service.device.IotDeviceService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -62,6 +59,14 @@ public class IotDeviceController {
         return success(true);
     }
 
+    @PutMapping("/update-group")
+    @Operation(summary = "更新设备分组")
+    @PreAuthorize("@ss.hasPermission('iot:device:update')")
+    public CommonResult<Boolean> updateDeviceGroup(@Valid @RequestBody IotDeviceUpdateGroupReqVO updateReqVO) {
+        deviceService.updateDeviceGroup(updateReqVO);
+        return success(true);
+    }
+
     @DeleteMapping("/delete")
     @Operation(summary = "删除单个设备")
     @Parameter(name = "id", description = "编号", required = true)
@@ -102,7 +107,7 @@ public class IotDeviceController {
     @PreAuthorize("@ss.hasPermission('iot:device:export')")
     @ApiAccessLog(operateType = EXPORT)
     public void exportDeviceExcel(@Valid IotDevicePageReqVO exportReqVO,
-                                  HttpServletResponse response) throws IOException {
+            HttpServletResponse response) throws IOException {
         exportReqVO.setPageSize(PageParam.PAGE_SIZE_NONE);
         CommonResult<PageResult<IotDeviceRespVO>> result = getDevicePage(exportReqVO);
         // 导出 Excel
@@ -125,7 +130,7 @@ public class IotDeviceController {
             @RequestParam(value = "deviceType", required = false) Integer deviceType) {
         List<IotDeviceDO> list = deviceService.getDeviceList(deviceType);
         return success(convertList(list, device -> // 只返回 id、name 字段
-                new IotDeviceRespVO().setId(device.getId()).setDeviceName(device.getDeviceName())));
+        new IotDeviceRespVO().setId(device.getId()).setDeviceName(device.getDeviceName())));
     }
 
 }

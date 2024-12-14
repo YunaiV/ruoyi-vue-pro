@@ -9,6 +9,7 @@ import cn.iocoder.yudao.framework.tenant.core.aop.TenantIgnore;
 import cn.iocoder.yudao.module.iot.controller.admin.device.vo.device.IotDevicePageReqVO;
 import cn.iocoder.yudao.module.iot.controller.admin.device.vo.device.IotDeviceSaveReqVO;
 import cn.iocoder.yudao.module.iot.controller.admin.device.vo.device.IotDeviceStatusUpdateReqVO;
+import cn.iocoder.yudao.module.iot.controller.admin.device.vo.device.IotDeviceUpdateGroupReqVO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.product.IotProductDO;
 import cn.iocoder.yudao.module.iot.dal.mysql.device.IotDeviceMapper;
@@ -29,6 +30,7 @@ import java.util.List;
 import java.util.Objects;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
 import static cn.iocoder.yudao.module.iot.enums.ErrorCodeConstants.*;
 
 /**
@@ -67,7 +69,7 @@ public class IotDeviceServiceImpl implements IotDeviceService {
         }
         // 1.4 校验父设备是否为合法网关
         if (IotProductDeviceTypeEnum.isGateway(product.getDeviceType())
-            && createReqVO.getGatewayId() != null) {
+                && createReqVO.getGatewayId() != null) {
             validateGatewayDeviceExists(createReqVO.getGatewayId());
         }
         // 1.5 校验分组存在
@@ -105,6 +107,22 @@ public class IotDeviceServiceImpl implements IotDeviceService {
         // 2. 更新到数据库
         IotDeviceDO updateObj = BeanUtils.toBean(updateReqVO, IotDeviceDO.class);
         deviceMapper.updateById(updateObj);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void updateDeviceGroup(IotDeviceUpdateGroupReqVO updateReqVO) {
+        // 1.1 校验设备存在
+        List<IotDeviceDO> devices = deviceMapper.selectBatchIds(updateReqVO.getIds());
+        if (CollUtil.isEmpty(devices)) {
+            return;
+        }
+        // 1.2 校验分组存在
+        deviceGroupService.validateDeviceGroupExists(updateReqVO.getGroupIds());
+
+        // 3. 更新设备分组
+        deviceMapper.updateBatch(convertList(devices, device -> new IotDeviceDO()
+                .setId(device.getId()).setGroupIds(updateReqVO.getGroupIds())));
     }
 
     @Override
