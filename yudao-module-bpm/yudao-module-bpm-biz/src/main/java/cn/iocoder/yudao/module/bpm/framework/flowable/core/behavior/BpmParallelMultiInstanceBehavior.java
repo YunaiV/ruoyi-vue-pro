@@ -50,7 +50,6 @@ public class BpmParallelMultiInstanceBehavior extends ParallelMultiInstanceBehav
         super.collectionElementVariable = FlowableUtils.formatExecutionCollectionElementVariable(execution.getCurrentActivityId());
 
         // 第二步，获取任务的所有处理人
-        // TODO execution.getVariable 会从整个流程实例中获取变量， 可能回退后重新进入该任务，不会重新计算 collectionVariable 的值. 是不是考虑会签结束清理这个变量
         @SuppressWarnings("unchecked")
         Set<Long> assigneeUserIds = (Set<Long>) execution.getVariable(super.collectionVariable, Set.class);
         if (assigneeUserIds == null) {

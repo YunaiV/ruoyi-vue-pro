@@ -43,6 +43,7 @@ public class BpmSequentialMultiInstanceBehavior extends SequentialMultiInstanceB
         super.collectionElementVariable = FlowableUtils.formatExecutionCollectionElementVariable(execution.getCurrentActivityId());
 
         // 第二步，获取任务的所有处理人
+        // 不使用 execution.getVariable 原因：目前依次审批任务回退后 collectionVariable 变量没有清理， 如果重新进入该任务不会重新分配审批人
         @SuppressWarnings("unchecked")
         Set<Long> assigneeUserIds = (Set<Long>) execution.getVariableLocal(super.collectionVariable, Set.class);
         if (assigneeUserIds == null) {
