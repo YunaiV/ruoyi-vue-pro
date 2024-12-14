@@ -33,4 +33,7 @@ public interface ErrorCodeConstants {
     // ========== 产品分类 1-050-004-000 ==========
     ErrorCode PRODUCT_CATEGORY_NOT_EXISTS = new ErrorCode(1_050_004_000, "产品分类不存在");
 
+    // ========== 设备分组 1-050-005-000 ==========
+    ErrorCode DEVICE_GROUP_NOT_EXISTS = new ErrorCode(1_050_005_000, "设备分组不存在");
+
 }
