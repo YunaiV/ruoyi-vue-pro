@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.iot.dal.mysql.device;
 
+import cn.hutool.core.util.ObjectUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
@@ -17,27 +18,14 @@ import java.util.List;
 @Mapper
 public interface IotDeviceMapper extends BaseMapperX<IotDeviceDO> {
 
-    // TODO @haohao：可能多余的查询条件，要去掉哈
     default PageResult<IotDeviceDO> selectPage(IotDevicePageReqVO reqVO) {
         return selectPage(reqVO, new LambdaQueryWrapperX<IotDeviceDO>()
-                .eqIfPresent(IotDeviceDO::getDeviceKey, reqVO.getDeviceKey())
                 .likeIfPresent(IotDeviceDO::getDeviceName, reqVO.getDeviceName())
                 .eqIfPresent(IotDeviceDO::getProductId, reqVO.getProductId())
-                .eqIfPresent(IotDeviceDO::getProductKey, reqVO.getProductKey())
                 .eqIfPresent(IotDeviceDO::getDeviceType, reqVO.getDeviceType())
                 .likeIfPresent(IotDeviceDO::getNickname, reqVO.getNickname())
-                .eqIfPresent(IotDeviceDO::getGatewayId, reqVO.getGatewayId())
                 .eqIfPresent(IotDeviceDO::getStatus, reqVO.getStatus())
-                .betweenIfPresent(IotDeviceDO::getStatusLastUpdateTime, reqVO.getStatusLastUpdateTime())
-                .betweenIfPresent(IotDeviceDO::getLastOnlineTime, reqVO.getLastOnlineTime())
-                .betweenIfPresent(IotDeviceDO::getLastOfflineTime, reqVO.getLastOfflineTime())
-                .betweenIfPresent(IotDeviceDO::getActiveTime, reqVO.getActiveTime())
-                .eqIfPresent(IotDeviceDO::getDeviceSecret, reqVO.getDeviceSecret())
-                .eqIfPresent(IotDeviceDO::getMqttClientId, reqVO.getMqttClientId())
-                .likeIfPresent(IotDeviceDO::getMqttUsername, reqVO.getMqttUsername())
-                .eqIfPresent(IotDeviceDO::getMqttPassword, reqVO.getMqttPassword())
-                .eqIfPresent(IotDeviceDO::getAuthType, reqVO.getAuthType())
-                .betweenIfPresent(IotDeviceDO::getCreateTime, reqVO.getCreateTime())
+                .apply(ObjectUtil.isNotNull(reqVO.getGroupId()), "FIND_IN_SET(" + reqVO.getGroupId() + ",group_ids) > 0")
                 .orderByDesc(IotDeviceDO::getId));
     }
 
