@@ -7,6 +7,8 @@ import cn.iocoder.yudao.module.iot.controller.admin.device.vo.device.IotDevicePa
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDO;
 import org.apache.ibatis.annotations.Mapper;
 
+import java.util.List;
+
 /**
  * IoT 设备 Mapper
  *
@@ -51,4 +53,13 @@ public interface IotDeviceMapper extends BaseMapperX<IotDeviceDO> {
     default Long selectCountByProductId(Long productId) {
         return selectCount(IotDeviceDO::getProductId, productId);
     }
+
+    default IotDeviceDO selectByDeviceKey(String deviceKey) {
+        return selectOne(IotDeviceDO::getDeviceKey, deviceKey);
+    }
+
+    default List<IotDeviceDO> selectList(Integer deviceType) {
+        return selectList(IotDeviceDO::getDeviceType, deviceType);
+    }
+
 }

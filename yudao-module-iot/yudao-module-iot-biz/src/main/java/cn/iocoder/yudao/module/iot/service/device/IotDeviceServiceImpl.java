@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.iot.service.device;
 
 import cn.hutool.core.util.IdUtil;
-import cn.hutool.core.util.StrUtil;
+import cn.hutool.core.util.RandomUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.tenant.core.aop.TenantIgnore;
@@ -12,18 +12,17 @@ import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.product.IotProductDO;
 import cn.iocoder.yudao.module.iot.dal.mysql.device.IotDeviceMapper;
 import cn.iocoder.yudao.module.iot.enums.device.IotDeviceStatusEnum;
+import cn.iocoder.yudao.module.iot.enums.product.IotProductDeviceTypeEnum;
 import cn.iocoder.yudao.module.iot.service.product.IotProductService;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
-import java.security.SecureRandom;
+import javax.annotation.Nullable;
 import java.time.LocalDateTime;
-import java.util.Base64;
+import java.util.List;
 import java.util.Objects;
-import java.util.UUID;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.iot.enums.ErrorCodeConstants.*;
@@ -40,142 +39,64 @@ public class IotDeviceServiceImpl implements IotDeviceService {
 
     @Resource
     private IotDeviceMapper deviceMapper;
+
     @Resource
     private IotProductService productService;
 
-    /**
-     * 创建 IoT 设备
-     *
-     * @param createReqVO 创建请求 VO
-     * @return 设备 ID
-     */
     @Override
-    @Transactional(rollbackFor = Exception.class)
     public Long createDevice(IotDeviceSaveReqVO createReqVO) {
         // 1.1 校验产品是否存在
         IotProductDO product = productService.getProduct(createReqVO.getProductId());
         if (product == null) {
             throw exception(PRODUCT_NOT_EXISTS);
         }
-        // 1.2 校验设备名称在同一产品下是否唯一
-        if (StrUtil.isBlank(createReqVO.getDeviceName())) {
-            createReqVO.setDeviceName(generateUniqueDeviceName(product.getProductKey()));
-        } else {
-            validateDeviceNameUnique(product.getProductKey(), createReqVO.getDeviceName());
+        // 1.2 校验设备标识是否唯一
+        if (deviceMapper.selectByDeviceKey(createReqVO.getDeviceKey()) != null) {
+            throw exception(DEVICE_KEY_EXISTS);
+        }
+        // 1.3 校验设备名称在同一产品下是否唯一
+        if (deviceMapper.selectByProductKeyAndDeviceName(product.getProductKey(), createReqVO.getDeviceKey()) != null) {
+            throw exception(DEVICE_NAME_EXISTS);
+        }
+        // 1.4 校验父设备是否为合法网关
+        if (IotProductDeviceTypeEnum.isGateway(product.getDeviceType())
+            && createReqVO.getGatewayId() != null) {
+            validateGatewayDeviceExists(createReqVO.getGatewayId());
         }
 
         // 2.1 转换 VO 为 DO
-        IotDeviceDO device = BeanUtils.toBean(createReqVO, IotDeviceDO.class)
-                .setProductKey(product.getProductKey())
-                .setDeviceType(product.getDeviceType());
-        // 2.2 生成并设置必要的字段
-        device.setDeviceKey(generateUniqueDeviceKey());
-        device.setDeviceSecret(generateDeviceSecret());
-        device.setMqttClientId(generateMqttClientId());
-        device.setMqttUsername(generateMqttUsername(device.getDeviceName(), device.getProductKey()));
-        device.setMqttPassword(generateMqttPassword());
-        // 2.3 设置设备状态为未激活
-        device.setStatus(IotDeviceStatusEnum.INACTIVE.getStatus());
-        device.setStatusLastUpdateTime(LocalDateTime.now());
-        // 2.4 插入到数据库
+        IotDeviceDO device = BeanUtils.toBean(createReqVO, IotDeviceDO.class, o -> {
+            o.setProductKey(product.getProductKey()).setDeviceType(product.getDeviceType());
+            // 生成并设置必要的字段
+            o.setDeviceSecret(generateDeviceSecret())
+                    .setMqttClientId(generateMqttClientId())
+                    .setMqttUsername(generateMqttUsername(o.getDeviceName(), o.getProductKey()))
+                    .setMqttPassword(generateMqttPassword());
+            // 设置设备状态为未激活
+            o.setStatus(IotDeviceStatusEnum.INACTIVE.getStatus()).setStatusLastUpdateTime(LocalDateTime.now());
+        });
+        // 2.2 插入到数据库
         deviceMapper.insert(device);
         return device.getId();
     }
 
-    /**
-     * 校验设备名称在同一产品下是否唯一
-     *
-     * @param productKey 产品 Key
-     * @param deviceName 设备名称
-     */
-    private void validateDeviceNameUnique(String productKey, String deviceName) {
-        IotDeviceDO existingDevice = deviceMapper.selectByProductKeyAndDeviceName(productKey, deviceName);
-        if (existingDevice != null) {
-            throw exception(DEVICE_NAME_EXISTS);
-        }
-    }
-
-    /**
-     * 生成唯一的 deviceKey
-     *
-     * @return 生成的 deviceKey
-     */
-    private String generateUniqueDeviceKey() {
-        return UUID.randomUUID().toString();
-    }
-
-    /**
-     * 生成 deviceSecret
-     *
-     * @return 生成的 deviceSecret
-     */
-    private String generateDeviceSecret() {
-        return IdUtil.fastSimpleUUID();
-    }
-
-    /**
-     * 生成 MQTT Client ID
-     *
-     * @return 生成的 MQTT Client ID
-     */
-    private String generateMqttClientId() {
-        return UUID.randomUUID().toString();
-    }
-
-    /**
-     * 生成 MQTT Username
-     *
-     * @param deviceName 设备名称
-     * @param productKey 产品 Key
-     * @return 生成的 MQTT Username
-     */
-    private String generateMqttUsername(String deviceName, String productKey) {
-        return deviceName + "&" + productKey;
-    }
-
-    /**
-     * 生成 MQTT Password
-     *
-     * @return 生成的 MQTT Password
-     */
-    private String generateMqttPassword() {
-        // TODO @浩浩：这里的 StrUtil 随机字符串？
-        SecureRandom secureRandom = new SecureRandom();
-        byte[] passwordBytes = new byte[32]; // 256 位的随机数
-        secureRandom.nextBytes(passwordBytes);
-        return Base64.getUrlEncoder().withoutPadding().encodeToString(passwordBytes);
-    }
-
-    /**
-     * 生成唯一的 DeviceName
-     *
-     * @param productKey 产品标识
-     * @return 生成的唯一 DeviceName
-     */
-    private String generateUniqueDeviceName(String productKey) {
-        for (int i = 0; i < Short.MAX_VALUE; i++) {
-            String deviceName = IdUtil.fastSimpleUUID().substring(0, 20);
-            if (deviceMapper.selectByProductKeyAndDeviceName(productKey, deviceName) != null) {
-                return deviceName;
-            }
-        }
-        throw new IllegalArgumentException("生成 DeviceName 失败");
-    }
-
     @Override
-    @Transactional(rollbackFor = Exception.class)
     public void updateDevice(IotDeviceSaveReqVO updateReqVO) {
-        // 1. 校验存在
-        validateDeviceExists(updateReqVO.getId());
+        updateReqVO.setDeviceKey(null).setDeviceName(null).setProductId(null); // 不允许更新
+        // 1.1 校验存在
+        IotDeviceDO device = validateDeviceExists(updateReqVO.getId());
+        // 1.2 校验父设备是否为合法网关
+        if (IotProductDeviceTypeEnum.isGateway(device.getDeviceType())
+                && updateReqVO.getGatewayId() != null) {
+            validateGatewayDeviceExists(updateReqVO.getGatewayId());
+        }
 
         // 2. 更新到数据库
-        IotDeviceDO updateObj = BeanUtils.toBean(updateReqVO, IotDeviceDO.class)
-                .setDeviceName(null).setProductId(null); // 设备名称 和 产品 ID 不能修改
+        IotDeviceDO updateObj = BeanUtils.toBean(updateReqVO, IotDeviceDO.class);
         deviceMapper.updateById(updateObj);
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
     public void deleteDevice(Long id) {
         // 1.1 校验存在
         IotDeviceDO device = validateDeviceExists(id);
@@ -202,13 +123,24 @@ public class IotDeviceServiceImpl implements IotDeviceService {
         return device;
     }
 
-    @Override
-    public IotDeviceDO getDevice(Long id) {
+    /**
+     * 校验网关设备是否存在
+     *
+     * @param id 设备 ID
+     */
+    private void validateGatewayDeviceExists(Long id) {
         IotDeviceDO device = deviceMapper.selectById(id);
         if (device == null) {
-            throw exception(DEVICE_NOT_EXISTS);
+            throw exception(DEVICE_GATEWAY_NOT_EXISTS);
         }
-        return device;
+        if (!IotProductDeviceTypeEnum.isGateway(device.getDeviceType())) {
+            throw exception(DEVICE_NOT_GATEWAY);
+        }
+    }
+
+    @Override
+    public IotDeviceDO getDevice(Long id) {
+        return deviceMapper.selectById(id);
     }
 
     @Override
@@ -217,18 +149,23 @@ public class IotDeviceServiceImpl implements IotDeviceService {
     }
 
     @Override
+    public List<IotDeviceDO> getDeviceList(@Nullable Integer deviceType) {
+        return deviceMapper.selectList(deviceType);
+    }
+
+    @Override
     public void updateDeviceStatus(IotDeviceStatusUpdateReqVO updateReqVO) {
         // 1. 校验存在
         IotDeviceDO device = validateDeviceExists(updateReqVO.getId());
 
         // 2.1 更新状态和更新时间
-        IotDeviceDO updateDevice = BeanUtils.toBean(updateReqVO, IotDeviceDO.class);
+        IotDeviceDO updateDevice = BeanUtils.toBean(updateReqVO, IotDeviceDO.class)
+                .setStatusLastUpdateTime(LocalDateTime.now());
         // 2.2 更新状态相关时间
         if (Objects.equals(device.getStatus(), IotDeviceStatusEnum.INACTIVE.getStatus())
                 && Objects.equals(updateDevice.getStatus(), IotDeviceStatusEnum.ONLINE.getStatus())) {
             // 从未激活到在线，设置激活时间和最后上线时间
-            updateDevice.setActiveTime(LocalDateTime.now());
-            updateDevice.setLastOnlineTime(LocalDateTime.now());
+            updateDevice.setActiveTime(LocalDateTime.now()).setLastOnlineTime(LocalDateTime.now());
         } else if (Objects.equals(updateDevice.getStatus(), IotDeviceStatusEnum.ONLINE.getStatus())) {
             // 如果是上线，设置最后上线时间
             updateDevice.setLastOnlineTime(LocalDateTime.now());
@@ -236,10 +173,7 @@ public class IotDeviceServiceImpl implements IotDeviceService {
             // 如果是离线，设置最后离线时间
             updateDevice.setLastOfflineTime(LocalDateTime.now());
         }
-
-        // 2.3 设置状态更新时间
-        updateDevice.setStatusLastUpdateTime(LocalDateTime.now());
-        // 2.4 更新到数据库
+        // 2.3 更新到数据库
         deviceMapper.updateById(updateDevice);
     }
 
@@ -252,6 +186,44 @@ public class IotDeviceServiceImpl implements IotDeviceService {
     @TenantIgnore
     public IotDeviceDO getDeviceByProductKeyAndDeviceName(String productKey, String deviceName) {
         return deviceMapper.selectByProductKeyAndDeviceName(productKey, deviceName);
+    }
+
+    /**
+     * 生成 deviceSecret
+     *
+     * @return 生成的 deviceSecret
+     */
+    private String generateDeviceSecret() {
+        return IdUtil.fastSimpleUUID();
+    }
+
+    /**
+     * 生成 MQTT Client ID
+     *
+     * @return 生成的 MQTT Client ID
+     */
+    private String generateMqttClientId() {
+        return IdUtil.fastSimpleUUID();
+    }
+
+    /**
+     * 生成 MQTT Username
+     *
+     * @param deviceName 设备名称
+     * @param productKey 产品 Key
+     * @return 生成的 MQTT Username
+     */
+    private String generateMqttUsername(String deviceName, String productKey) {
+        return deviceName + "&" + productKey;
+    }
+
+    /**
+     * 生成 MQTT Password
+     *
+     * @return 生成的 MQTT Password
+     */
+    private String generateMqttPassword() {
+        return RandomUtil.randomString(32);
     }
 
 }

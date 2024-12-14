@@ -18,7 +18,10 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
 
 @Tag(name = "管理后台 - IoT 设备")
 @RestController
@@ -84,6 +87,16 @@ public class IotDeviceController {
     @PreAuthorize("@ss.hasPermission('iot:device:query')")
     public CommonResult<Long> getDeviceCount(@RequestParam("productId") Long productId) {
         return success(deviceService.getDeviceCountByProductId(productId));
+    }
+
+    @GetMapping("/simple-list")
+    @Operation(summary = "获取设备的精简信息列表", description = "主要用于前端的下拉选项")
+    @Parameter(name = "deviceType", description = "设备类型", example = "1")
+    public CommonResult<List<IotDeviceRespVO>> getSimpleDeviceList(
+            @RequestParam(value = "deviceType", required = false) Integer deviceType) {
+        List<IotDeviceDO> list = deviceService.getDeviceList(deviceType);
+        return success(convertList(list, device -> // 只返回 id、name 字段
+                new IotDeviceRespVO().setId(device.getId()).setDeviceName(device.getDeviceName())));
     }
 
 }

@@ -28,7 +28,7 @@ public class IotProductSaveReqVO {
     @Schema(description = "产品图标", example = "https://iocoder.cn/1.svg")
     private String icon;
 
-    @Schema(description = "产品图标", example = "https://iocoder.cn/1.png")
+    @Schema(description = "产品图片", example = "https://iocoder.cn/1.png")
     private String picUrl;
 
     @Schema(description = "产品描述", example = "描述")

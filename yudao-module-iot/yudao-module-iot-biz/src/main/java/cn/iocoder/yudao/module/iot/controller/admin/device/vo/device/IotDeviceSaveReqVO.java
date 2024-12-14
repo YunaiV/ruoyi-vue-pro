@@ -10,13 +10,25 @@ public class IotDeviceSaveReqVO {
     @Schema(description = "设备编号", example = "177")
     private Long id;
 
+    @Schema(description = "设备编号", requiredMode = Schema.RequiredMode.AUTO, example = "177")
+    private String deviceKey;
+
     @Schema(description = "设备名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "王五")
     private String deviceName;
 
     @Schema(description = "备注名称", example = "张三")
     private String nickname;
 
+    @Schema(description = "设备序列号", example = "123456")
+    private String serialNumber;
+
+    @Schema(description = "设备图片", example = "https://iocoder.cn/1.png")
+    private String picUrl;
+
     @Schema(description = "产品编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "26202")
     private Long productId;
+
+    @Schema(description = "网关设备 ID", example = "16380")
+    private Long gatewayId;
 
 }

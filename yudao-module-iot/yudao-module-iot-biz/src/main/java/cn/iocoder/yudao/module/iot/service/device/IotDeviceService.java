@@ -1,11 +1,14 @@
 package cn.iocoder.yudao.module.iot.service.device;
 
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.iot.controller.admin.device.vo.device.IotDevicePageReqVO;
 import cn.iocoder.yudao.module.iot.controller.admin.device.vo.device.IotDeviceSaveReqVO;
 import cn.iocoder.yudao.module.iot.controller.admin.device.vo.device.IotDeviceStatusUpdateReqVO;
-import jakarta.validation.*;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDO;
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import jakarta.validation.Valid;
+
+import javax.annotation.Nullable;
+import java.util.List;
 
 /**
  * IoT 设备 Service 接口
@@ -53,6 +56,14 @@ public interface IotDeviceService {
     PageResult<IotDeviceDO> getDevicePage(IotDevicePageReqVO pageReqVO);
 
     /**
+     * 获得设备列表
+     *
+     * @param deviceType 设备类型
+     * @return 设备列表
+     */
+    List<IotDeviceDO> getDeviceList(@Nullable Integer deviceType);
+
+    /**
      * 更新设备状态
      *
      * @param updateReqVO 更新信息
@@ -75,4 +86,5 @@ public interface IotDeviceService {
      * @return 设备信息
      */
     IotDeviceDO getDeviceByProductKeyAndDeviceName(String productKey, String deviceName);
+
 }
