@@ -79,6 +79,14 @@ public interface IotDeviceService {
     Long getDeviceCountByProductId(Long productId);
 
     /**
+     * 获得设备数量
+     *
+     * @param groupId 分组编号
+     * @return 设备数量
+     */
+    Long getDeviceCountByGroupId(Long groupId);
+
+    /**
      * 根据产品 key 和设备名称，获得设备信息
      *
      * @param productKey 产品 key

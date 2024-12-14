@@ -35,5 +35,5 @@ public interface ErrorCodeConstants {
 
     // ========== 设备分组 1-050-005-000 ==========
     ErrorCode DEVICE_GROUP_NOT_EXISTS = new ErrorCode(1_050_005_000, "设备分组不存在");
-
+    ErrorCode DEVICE_GROUP_DELETE_FAIL_DEVICE_EXISTS = new ErrorCode(1_050_005_001, "设备分组下存在设备，不允许删除");
 }

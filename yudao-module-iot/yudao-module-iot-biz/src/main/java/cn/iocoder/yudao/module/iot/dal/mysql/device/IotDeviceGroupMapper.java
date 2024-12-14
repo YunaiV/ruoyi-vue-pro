@@ -7,6 +7,8 @@ import cn.iocoder.yudao.module.iot.controller.admin.device.vo.group.IotDeviceGro
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceGroupDO;
 import org.apache.ibatis.annotations.Mapper;
 
+import java.util.List;
+
 /**
  * IoT 设备分组 Mapper
  *
@@ -20,6 +22,10 @@ public interface IotDeviceGroupMapper extends BaseMapperX<IotDeviceGroupDO> {
                 .likeIfPresent(IotDeviceGroupDO::getName, reqVO.getName())
                 .betweenIfPresent(IotDeviceGroupDO::getCreateTime, reqVO.getCreateTime())
                 .orderByDesc(IotDeviceGroupDO::getId));
+    }
+
+    default List<IotDeviceGroupDO> selectListByStatus(Integer status) {
+        return selectList(IotDeviceGroupDO::getStatus, status);
     }
 
 }

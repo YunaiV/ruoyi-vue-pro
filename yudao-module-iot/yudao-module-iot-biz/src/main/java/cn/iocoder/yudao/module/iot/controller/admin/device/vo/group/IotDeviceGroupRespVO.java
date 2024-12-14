@@ -24,4 +24,7 @@ public class IotDeviceGroupRespVO {
     @Schema(description = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED)
     private LocalDateTime createTime;
 
+    @Schema(description = "设备数量", requiredMode = Schema.RequiredMode.REQUIRED, example = "10")
+    private Long deviceCount;
+
 }

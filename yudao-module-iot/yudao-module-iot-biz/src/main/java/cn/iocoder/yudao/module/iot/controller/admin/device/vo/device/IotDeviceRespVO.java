@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import java.time.LocalDateTime;
+import java.util.Set;
 
 @Schema(description = "管理后台 - IoT 设备 Response VO")
 @Data
@@ -22,6 +23,9 @@ public class IotDeviceRespVO {
     @Schema(description = "设备名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "王五")
     @ExcelProperty("设备名称备")
     private String deviceName;
+
+    @Schema(description = "设备分组编号数组", example = "1,2")
+    private Set<Long> groupIds;
 
     @Schema(description = "产品编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "26202")
     @ExcelProperty("产品编号")

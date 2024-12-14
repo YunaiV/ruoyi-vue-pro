@@ -16,6 +16,7 @@ import cn.iocoder.yudao.module.iot.enums.product.IotProductDeviceTypeEnum;
 import cn.iocoder.yudao.module.iot.service.product.IotProductService;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
@@ -42,6 +43,9 @@ public class IotDeviceServiceImpl implements IotDeviceService {
 
     @Resource
     private IotProductService productService;
+    @Resource
+    @Lazy // 延迟加载，解决循环依赖
+    private IotDeviceGroupService deviceGroupService;
 
     @Override
     public Long createDevice(IotDeviceSaveReqVO createReqVO) {
@@ -63,6 +67,8 @@ public class IotDeviceServiceImpl implements IotDeviceService {
             && createReqVO.getGatewayId() != null) {
             validateGatewayDeviceExists(createReqVO.getGatewayId());
         }
+        // 1.5 校验分组存在
+        deviceGroupService.validateDeviceGroupExists(createReqVO.getGroupIds());
 
         // 2.1 转换 VO 为 DO
         IotDeviceDO device = BeanUtils.toBean(createReqVO, IotDeviceDO.class, o -> {
@@ -90,6 +96,8 @@ public class IotDeviceServiceImpl implements IotDeviceService {
                 && updateReqVO.getGatewayId() != null) {
             validateGatewayDeviceExists(updateReqVO.getGatewayId());
         }
+        // 1.3 校验分组存在
+        deviceGroupService.validateDeviceGroupExists(updateReqVO.getGroupIds());
 
         // 2. 更新到数据库
         IotDeviceDO updateObj = BeanUtils.toBean(updateReqVO, IotDeviceDO.class);
@@ -180,6 +188,11 @@ public class IotDeviceServiceImpl implements IotDeviceService {
     @Override
     public Long getDeviceCountByProductId(Long productId) {
         return deviceMapper.selectCountByProductId(productId);
+    }
+
+    @Override
+    public Long getDeviceCountByGroupId(Long groupId) {
+        return deviceMapper.selectCountByGroupId(groupId);
     }
 
     @Override

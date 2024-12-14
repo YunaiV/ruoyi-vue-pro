@@ -50,4 +50,10 @@ public interface IotDeviceMapper extends BaseMapperX<IotDeviceDO> {
         return selectList(IotDeviceDO::getDeviceType, deviceType);
     }
 
+    default Long selectCountByGroupId(Long groupId) {
+        return selectCount(new LambdaQueryWrapperX<IotDeviceDO>()
+                .apply("FIND_IN_SET(" + groupId + ",group_ids) > 0")
+                .orderByDesc(IotDeviceDO::getId));
+    }
+
 }

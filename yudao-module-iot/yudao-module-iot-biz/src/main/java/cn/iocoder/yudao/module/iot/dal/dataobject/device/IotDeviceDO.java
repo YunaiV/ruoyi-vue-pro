@@ -57,7 +57,7 @@ public class IotDeviceDO extends BaseDO {
     /**
      * 设备分组编号集合
      *
-     * 关联 TODO 芋艿：
+     * 关联 {@link IotDeviceGroupDO#getId()}
      */
     @TableField(typeHandler = LongSetTypeHandler.class)
     private Set<Long> groupIds;

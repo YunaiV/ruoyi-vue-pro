@@ -3,6 +3,8 @@ package cn.iocoder.yudao.module.iot.controller.admin.device.vo.device;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
+import java.util.Set;
+
 @Schema(description = "管理后台 - IoT 设备新增/修改 Request VO")
 @Data
 public class IotDeviceSaveReqVO {
@@ -24,6 +26,9 @@ public class IotDeviceSaveReqVO {
 
     @Schema(description = "设备图片", example = "https://iocoder.cn/1.png")
     private String picUrl;
+
+    @Schema(description = "设备分组编号数组", example = "1,2")
+    private Set<Long> groupIds;
 
     @Schema(description = "产品编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "26202")
     private Long productId;
