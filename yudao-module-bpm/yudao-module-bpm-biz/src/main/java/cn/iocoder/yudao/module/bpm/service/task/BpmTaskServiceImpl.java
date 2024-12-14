@@ -755,6 +755,8 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         runtimeService.setVariable(currentTask.getProcessInstanceId(),
                 String.format(PROCESS_INSTANCE_VARIABLE_RETURN_FLAG, reqVO.getTargetTaskDefinitionKey()), Boolean.TRUE);
         // 4. 执行驳回
+        // 使用 moveExecutionsToSingleActivityId 替换 moveExecutionsToSingleActivityId 原因：
+        // 当多实例任务回退的时候有问题。 相关 issue: https://github.com/flowable/flowable-engine/issues/3944
         List<String> runExecutionIds = convertList(taskList, Task::getExecutionId);
         runtimeService.createChangeActivityStateBuilder()
                 .processInstanceId(currentTask.getProcessInstanceId())

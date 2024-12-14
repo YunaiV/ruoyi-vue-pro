@@ -44,7 +44,7 @@ public class BpmSequentialMultiInstanceBehavior extends SequentialMultiInstanceB
 
         // 第二步，获取任务的所有处理人
         @SuppressWarnings("unchecked")
-        Set<Long> assigneeUserIds = (Set<Long>) execution.getVariable(super.collectionVariable, Set.class);
+        Set<Long> assigneeUserIds = (Set<Long>) execution.getVariableLocal(super.collectionVariable, Set.class);
         if (assigneeUserIds == null) {
             assigneeUserIds = taskCandidateInvoker.calculateUsersByTask(execution);
             if (CollUtil.isEmpty(assigneeUserIds)) {
@@ -53,7 +53,7 @@ public class BpmSequentialMultiInstanceBehavior extends SequentialMultiInstanceB
                 // 用途：1）审批人为空时；2）审批类型为自动通过、自动拒绝时
                 assigneeUserIds = SetUtils.asSet((Long) null);
             }
-            execution.setVariable(super.collectionVariable, assigneeUserIds);
+            execution.setVariableLocal(super.collectionVariable, assigneeUserIds);
         }
         return assigneeUserIds.size();
     }
