@@ -23,6 +23,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.apilog.core.enums.OperateTypeEnum.EXPORT;
@@ -62,11 +63,20 @@ public class IotDeviceController {
     }
 
     @DeleteMapping("/delete")
-    @Operation(summary = "删除设备")
+    @Operation(summary = "删除单个设备")
     @Parameter(name = "id", description = "编号", required = true)
     @PreAuthorize("@ss.hasPermission('iot:device:delete')")
     public CommonResult<Boolean> deleteDevice(@RequestParam("id") Long id) {
         deviceService.deleteDevice(id);
+        return success(true);
+    }
+
+    @DeleteMapping("/delete-list")
+    @Operation(summary = "删除多个设备")
+    @Parameter(name = "ids", description = "编号数组", required = true)
+    @PreAuthorize("@ss.hasPermission('iot:device:delete')")
+    public CommonResult<Boolean> deleteDeviceList(@RequestParam("ids") Collection<Long> ids) {
+        deviceService.deleteDeviceList(ids);
         return success(true);
     }
 

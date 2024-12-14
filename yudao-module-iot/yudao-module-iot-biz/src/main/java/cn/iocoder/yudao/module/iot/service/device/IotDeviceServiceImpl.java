@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.iot.service.device;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.RandomUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
@@ -18,10 +19,12 @@ import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Nullable;
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 
@@ -115,6 +118,28 @@ public class IotDeviceServiceImpl implements IotDeviceService {
 
         // 2. 删除设备
         deviceMapper.deleteById(id);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void deleteDeviceList(Collection<Long> ids) {
+        // 1.1 校验存在
+        if (CollUtil.isEmpty(ids)) {
+            return;
+        }
+        List<IotDeviceDO> devices = deviceMapper.selectBatchIds(ids);
+        if (CollUtil.isEmpty(devices)) {
+            return;
+        }
+        // 1.2 校验网关设备是否存在
+        for (IotDeviceDO device : devices) {
+            if (device.getGatewayId() != null && deviceMapper.selectCountByGatewayId(device.getId()) > 0) {
+                throw exception(DEVICE_HAS_CHILDREN);
+            }
+        }
+
+        // 2. 删除设备
+        deviceMapper.deleteByIds(ids);
     }
 
     /**

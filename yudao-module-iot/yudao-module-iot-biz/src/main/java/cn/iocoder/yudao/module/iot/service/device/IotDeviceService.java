@@ -8,6 +8,7 @@ import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDO;
 import jakarta.validation.Valid;
 
 import javax.annotation.Nullable;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -33,11 +34,18 @@ public interface IotDeviceService {
     void updateDevice(@Valid IotDeviceSaveReqVO updateReqVO);
 
     /**
-     * 删除设备
+     * 删除单个设备
      *
      * @param id 编号
      */
     void deleteDevice(Long id);
+
+    /**
+     * 删除多个设备
+     *
+     * @param ids 编号数组
+     */
+    void deleteDeviceList(Collection<Long> ids);
 
     /**
      * 获得设备
