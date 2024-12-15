@@ -755,8 +755,8 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         runtimeService.setVariable(currentTask.getProcessInstanceId(),
                 String.format(PROCESS_INSTANCE_VARIABLE_RETURN_FLAG, reqVO.getTargetTaskDefinitionKey()), Boolean.TRUE);
         // 4. 执行驳回
-        // 使用 moveExecutionsToSingleActivityId 替换 moveExecutionsToSingleActivityId 原因：
-        // 当多实例任务回退的时候有问题。 相关 issue: https://github.com/flowable/flowable-engine/issues/3944
+        // 使用 moveExecutionsToSingleActivityId 替换 moveActivityIdsToSingleActivityId 原因：
+        // 当多实例任务回退的时候有问题。相关 issue: https://github.com/flowable/flowable-engine/issues/3944
         List<String> runExecutionIds = convertList(taskList, Task::getExecutionId);
         runtimeService.createChangeActivityStateBuilder()
                 .processInstanceId(currentTask.getProcessInstanceId())
@@ -1045,14 +1045,18 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         Integer assignEmptyHandlerType = BpmnModelUtils.parseAssignEmptyHandlerType(userTaskElement);
         TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
 
+            /**
+             * 特殊情况：部分情况下，TransactionSynchronizationManager 注册 afterCommit 监听时，不会被调用，但是 afterCompletion 可以
+             * 例如说：第一个 task 就是配置【自动通过】或者【自动拒绝】时
+             * 参见 <a href="https://gitee.com/zhijiantianya/yudao-cloud/issues/IB7V7Q">issue</a> 反馈
+             */
             @Override
             public void afterCompletion(int transactionStatus) {
-                // 特殊情况：部分情况下，TransactionSynchronizationManager 注册 afterCommit 监听时，不会被调用，但是 afterCompletion 可以
-                // 例如说：第一个 task 就是配置【自动通过】或者【自动拒绝】时
+                // 回滚情况，直接返回
                 if (ObjectUtil.equal(transactionStatus, TransactionSynchronization.STATUS_ROLLED_BACK)) {
                     return;
                 }
-                // 特殊情况：第一个 task 【自动通过】时，第二个任务创建事件时 transactionStatus 会为 STATUS_UNKNOWN，不知道啥原因
+                // 特殊情况：第一个 task 【自动通过】时，第二个任务设置审批人时 transactionStatus 会为 STATUS_UNKNOWN，不知道啥原因
                 if (ObjectUtil.equal(transactionStatus, TransactionSynchronization.STATUS_UNKNOWN)
                         && getTask(task.getId()) == null) {
                     return;
@@ -1114,8 +1118,12 @@ public class BpmTaskServiceImpl implements BpmTaskService {
     public void processTaskAssigned(Task task) {
         // 发送通知。在事务提交时，批量执行操作，所以直接查询会无法查询到 ProcessInstance，所以这里是通过监听事务的提交来实现。
         TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
-            // 特殊情况：部分情况下，TransactionSynchronizationManager 注册 afterCommit 监听时，不会被调用，但是 afterCompletion 可以
-            // 例如说：第一个 task 就是配置【自动通过】或者【自动拒绝】时
+
+            /**
+             * 特殊情况：部分情况下，TransactionSynchronizationManager 注册 afterCommit 监听时，不会被调用，但是 afterCompletion 可以
+             * 例如说：第一个 task 就是配置【自动通过】或者【自动拒绝】时
+             * 参见 <a href="https://gitee.com/zhijiantianya/yudao-cloud/issues/IB7V7Q">issue</a> 反馈
+             */
             @Override
             public void afterCompletion(int transactionStatus) {
                 // 回滚情况，直接返回
