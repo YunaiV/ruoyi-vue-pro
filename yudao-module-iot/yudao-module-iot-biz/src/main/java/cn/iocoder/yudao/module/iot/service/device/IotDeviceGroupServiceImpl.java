@@ -77,6 +77,11 @@ public class IotDeviceGroupServiceImpl implements IotDeviceGroupService {
     }
 
     @Override
+    public IotDeviceGroupDO getDeviceGroupByName(String name) {
+        return deviceGroupMapper.selectByName(name);
+    }
+
+    @Override
     public PageResult<IotDeviceGroupDO> getDeviceGroupPage(IotDeviceGroupPageReqVO pageReqVO) {
         return deviceGroupMapper.selectPage(pageReqVO);
     }

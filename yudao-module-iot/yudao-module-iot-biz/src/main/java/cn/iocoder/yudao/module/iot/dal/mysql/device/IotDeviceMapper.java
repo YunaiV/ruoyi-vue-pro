@@ -29,6 +29,10 @@ public interface IotDeviceMapper extends BaseMapperX<IotDeviceDO> {
                 .orderByDesc(IotDeviceDO::getId));
     }
 
+    default IotDeviceDO selectByDeviceName(String deviceName) {
+        return selectOne(IotDeviceDO::getDeviceName, deviceName);
+    }
+
     default IotDeviceDO selectByProductKeyAndDeviceName(String productKey, String deviceName) {
         return selectOne(IotDeviceDO::getProductKey, productKey,
                 IotDeviceDO::getDeviceName, deviceName);

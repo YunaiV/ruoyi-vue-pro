@@ -70,6 +70,14 @@ public interface IotDeviceGroupService {
     IotDeviceGroupDO getDeviceGroup(Long id);
 
     /**
+     * 获得设备分组
+     *
+     * @param name 名称
+     * @return 设备分组
+     */
+    IotDeviceGroupDO getDeviceGroupByName(String name);
+
+    /**
      * 获得设备分组分页
      *
      * @param pageReqVO 分页查询

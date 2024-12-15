@@ -18,8 +18,10 @@ import jakarta.validation.Valid;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
@@ -131,6 +133,30 @@ public class IotDeviceController {
         List<IotDeviceDO> list = deviceService.getDeviceList(deviceType);
         return success(convertList(list, device -> // 只返回 id、name 字段
         new IotDeviceRespVO().setId(device.getId()).setDeviceName(device.getDeviceName())));
+    }
+
+    @PostMapping("/import")
+    @Operation(summary = "导入设备")
+    @PreAuthorize("@ss.hasPermission('iot:device:import')")
+    public CommonResult<IotDeviceImportRespVO> importDevice(
+            @RequestParam("file") MultipartFile file,
+            @RequestParam(value = "updateSupport", required = false, defaultValue = "false") Boolean updateSupport)
+            throws Exception {
+        List<IotDeviceImportExcelVO> list = ExcelUtils.read(file, IotDeviceImportExcelVO.class);
+        return success(deviceService.importDevice(list, updateSupport));
+    }
+
+    @GetMapping("/get-import-template")
+    @Operation(summary = "获得导入设备模板")
+    public void importTemplate(HttpServletResponse response) throws IOException {
+        // 手动创建导出 demo
+        List<IotDeviceImportExcelVO> list = Arrays.asList(
+                IotDeviceImportExcelVO.builder().deviceName("温度传感器001").parentDeviceName("gateway110")
+                        .productKey("1de24640dfe").groupNames("灰度分组,生产分组").build(),
+                IotDeviceImportExcelVO.builder().deviceName("biubiu")
+                        .productKey("YzvHxd4r67sT4s2B").groupNames("").build());
+        // 输出
+        ExcelUtils.write(response, "设备导入模板.xls", "数据", IotDeviceImportExcelVO.class, list);
     }
 
 }

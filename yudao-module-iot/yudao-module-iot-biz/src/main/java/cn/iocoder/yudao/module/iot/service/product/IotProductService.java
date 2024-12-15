@@ -46,6 +46,22 @@ public interface IotProductService {
     IotProductDO getProduct(Long id);
 
     /**
+     * 校验产品存在
+     *
+     * @param id 编号
+     * @return 产品
+     */
+    IotProductDO validateProductExists(Long id);
+
+    /**
+     * 校验产品存在
+     *
+     * @param productKey 产品 key
+     * @return 产品
+     */
+    IotProductDO validateProductExists(String productKey);
+
+    /**
      * 获得产品分页
      *
      * @param pageReqVO 分页查询

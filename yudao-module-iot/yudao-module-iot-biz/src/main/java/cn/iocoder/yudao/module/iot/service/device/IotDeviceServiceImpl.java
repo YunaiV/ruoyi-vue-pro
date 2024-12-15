@@ -3,20 +3,22 @@ package cn.iocoder.yudao.module.iot.service.device;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.RandomUtil;
+import cn.hutool.core.util.StrUtil;
+import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
+import cn.iocoder.yudao.framework.common.util.validation.ValidationUtils;
 import cn.iocoder.yudao.framework.tenant.core.aop.TenantIgnore;
-import cn.iocoder.yudao.module.iot.controller.admin.device.vo.device.IotDevicePageReqVO;
-import cn.iocoder.yudao.module.iot.controller.admin.device.vo.device.IotDeviceSaveReqVO;
-import cn.iocoder.yudao.module.iot.controller.admin.device.vo.device.IotDeviceStatusUpdateReqVO;
-import cn.iocoder.yudao.module.iot.controller.admin.device.vo.device.IotDeviceUpdateGroupReqVO;
+import cn.iocoder.yudao.module.iot.controller.admin.device.vo.device.*;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDO;
+import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceGroupDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.product.IotProductDO;
 import cn.iocoder.yudao.module.iot.dal.mysql.device.IotDeviceMapper;
 import cn.iocoder.yudao.module.iot.enums.device.IotDeviceStatusEnum;
 import cn.iocoder.yudao.module.iot.enums.product.IotProductDeviceTypeEnum;
 import cn.iocoder.yudao.module.iot.service.product.IotProductService;
 import jakarta.annotation.Resource;
+import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
@@ -25,9 +27,7 @@ import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Nullable;
 import java.time.LocalDateTime;
-import java.util.Collection;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
@@ -245,6 +245,15 @@ public class IotDeviceServiceImpl implements IotDeviceService {
     }
 
     /**
+     * 生成 deviceKey
+     *
+     * @return 生成的 deviceKey
+     */
+    private String generateDeviceKey() {
+        return RandomUtil.randomString(16);
+    }
+
+    /**
      * 生成 deviceSecret
      *
      * @return 生成的 deviceSecret
@@ -280,6 +289,76 @@ public class IotDeviceServiceImpl implements IotDeviceService {
      */
     private String generateMqttPassword() {
         return RandomUtil.randomString(32);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class) // 添加事务，异常则回滚所有导入
+    public IotDeviceImportRespVO importDevice(List<IotDeviceImportExcelVO> importDevices, boolean updateSupport) {
+        // 1. 参数校验
+        if (CollUtil.isEmpty(importDevices)) {
+            throw exception(DEVICE_IMPORT_LIST_IS_EMPTY);
+        }
+
+        // 2. 遍历，逐个创建 or 更新
+        IotDeviceImportRespVO respVO = IotDeviceImportRespVO.builder().createDeviceNames(new ArrayList<>())
+                .updateDeviceNames(new ArrayList<>()).failureDeviceNames(new LinkedHashMap<>()).build();
+        importDevices.forEach(importDevice -> {
+            try {
+                // 2.1.1 校验字段是否符合要求
+                try {
+                    ValidationUtils.validate(importDevice);
+                } catch (ConstraintViolationException ex){
+                    respVO.getFailureDeviceNames().put(importDevice.getDeviceName(), ex.getMessage());
+                    return;
+                }
+                // 2.1.2 校验产品是否存在
+                IotProductDO product = productService.validateProductExists(importDevice.getProductKey());
+                // 2.1.3 校验父设备是否存在
+                Long gatewayId = null;
+                if (StrUtil.isNotEmpty(importDevice.getParentDeviceName())) {
+                    IotDeviceDO gatewayDevice = deviceMapper.selectByDeviceName(importDevice.getParentDeviceName());
+                    if (gatewayDevice == null) {
+                        throw exception(DEVICE_GATEWAY_NOT_EXISTS);
+                    }
+                    if (!IotProductDeviceTypeEnum.isGateway(gatewayDevice.getDeviceType())) {
+                        throw exception(DEVICE_NOT_GATEWAY);
+                    }
+                    gatewayId = gatewayDevice.getId();
+                }
+                // 2.1.4 校验设备分组是否存在
+                Set<Long> groupIds = new HashSet<>();
+                if (StrUtil.isNotEmpty(importDevice.getGroupNames())) {
+                    String[] groupNames = importDevice.getGroupNames().split(",");
+                    for (String groupName : groupNames) {
+                        IotDeviceGroupDO group = deviceGroupService.getDeviceGroupByName(groupName);
+                        if (group == null) {
+                            throw exception(DEVICE_GROUP_NOT_EXISTS);
+                        }
+                        groupIds.add(group.getId());
+                    }
+                }
+
+                // 2.2.1 判断如果不存在，在进行插入
+                IotDeviceDO existDevice = deviceMapper.selectByDeviceName(importDevice.getDeviceName());
+                if (existDevice == null) {
+                    createDevice(new IotDeviceSaveReqVO()
+                            .setDeviceName(importDevice.getDeviceName()).setDeviceKey(generateDeviceKey())
+                            .setProductId(product.getId()).setGatewayId(gatewayId).setGroupIds(groupIds));
+                    respVO.getCreateDeviceNames().add(importDevice.getDeviceName());
+                    return;
+                }
+                // 2.2.2 如果存在，判断是否允许更新
+                if (updateSupport) {
+                    throw exception(DEVICE_KEY_EXISTS);
+                }
+                updateDevice(new IotDeviceSaveReqVO().setId(existDevice.getId())
+                        .setGatewayId(gatewayId).setGroupIds(groupIds));
+                respVO.getUpdateDeviceNames().add(importDevice.getDeviceName());
+            } catch (ServiceException ex) {
+                respVO.getFailureDeviceNames().put(importDevice.getDeviceName(), ex.getMessage());
+            }
+        });
+        return respVO;
     }
 
 }

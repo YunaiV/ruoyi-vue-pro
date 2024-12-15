@@ -6,6 +6,8 @@ import cn.iocoder.yudao.module.iot.controller.admin.device.vo.device.IotDeviceSa
 import cn.iocoder.yudao.module.iot.controller.admin.device.vo.device.IotDeviceStatusUpdateReqVO;
 import cn.iocoder.yudao.module.iot.controller.admin.device.vo.device.IotDeviceUpdateGroupReqVO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDO;
+import cn.iocoder.yudao.module.iot.controller.admin.device.vo.device.IotDeviceImportRespVO;
+import cn.iocoder.yudao.module.iot.controller.admin.device.vo.device.IotDeviceImportExcelVO;
 import jakarta.validation.Valid;
 
 import javax.annotation.Nullable;
@@ -71,7 +73,7 @@ public interface IotDeviceService {
     IotDeviceDO getDevice(Long id);
 
     /**
-     * 获得设备分页
+     * ��得设备分页
      *
      * @param pageReqVO 分页查询
      * @return IoT 设备分页
@@ -110,5 +112,14 @@ public interface IotDeviceService {
      * @return 设备信息
      */
     IotDeviceDO getDeviceByProductKeyAndDeviceName(String productKey, String deviceName);
+
+    /**
+     * 导入设备
+     *
+     * @param importDevices 导入设备列表
+     * @param updateSupport 是否支持更新
+     * @return 导入结果
+     */
+    IotDeviceImportRespVO importDevice(List<IotDeviceImportExcelVO> importDevices, boolean updateSupport);
 
 }

@@ -23,7 +23,7 @@ public interface IotProductMapper extends BaseMapperX<IotProductDO> {
     }
 
     default IotProductDO selectByProductKey(String productKey) {
-        return selectOne(new LambdaQueryWrapperX<IotProductDO>().eq(IotProductDO::getProductKey, productKey));
+        return selectOne(IotProductDO::getProductKey, productKey);
     }
 
 }

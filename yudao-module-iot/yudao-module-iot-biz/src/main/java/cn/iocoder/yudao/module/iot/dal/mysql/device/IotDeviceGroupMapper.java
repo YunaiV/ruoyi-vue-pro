@@ -28,4 +28,8 @@ public interface IotDeviceGroupMapper extends BaseMapperX<IotDeviceGroupDO> {
         return selectList(IotDeviceGroupDO::getStatus, status);
     }
 
+    default IotDeviceGroupDO selectByName(String name) {
+        return selectOne(IotDeviceGroupDO::getName, name);
+    }
+
 }
