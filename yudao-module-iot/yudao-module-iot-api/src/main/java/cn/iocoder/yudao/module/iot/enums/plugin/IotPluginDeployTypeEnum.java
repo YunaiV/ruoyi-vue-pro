@@ -13,7 +13,7 @@ import java.util.Arrays;
 @Getter
 public enum IotPluginDeployTypeEnum implements IntArrayValuable {
 
-    UPLOAD(0, "上传jar"),
+    UPLOAD(0, "上传 jar"), // TODO @haohao：UPLOAD 和 ALONE 感觉有点冲突，前者是部署方式，后者是运行方式。这个后续再讨论下哈
     ALONE(1, "独立运行");
 
     public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(IotPluginDeployTypeEnum::getDeployType).toArray();

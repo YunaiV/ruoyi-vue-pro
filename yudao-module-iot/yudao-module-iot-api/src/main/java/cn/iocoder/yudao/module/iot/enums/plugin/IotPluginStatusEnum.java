@@ -42,6 +42,11 @@ public enum IotPluginStatusEnum implements IntArrayValuable {
         return null;
     }
 
+    @Override
+    public int[] array() {
+        return ARRAYS;
+    }
+
     public static boolean isValidState(Integer state) {
         return fromState(state) != null;
     }
@@ -50,8 +55,4 @@ public enum IotPluginStatusEnum implements IntArrayValuable {
         return Arrays.stream(values()).anyMatch(e -> e.getStatus().equals(status));
     }
 
-    @Override
-    public int[] array() {
-        return new int[0];
-    }
 }

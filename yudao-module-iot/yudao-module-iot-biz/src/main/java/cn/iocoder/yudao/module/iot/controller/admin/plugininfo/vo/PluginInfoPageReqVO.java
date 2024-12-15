@@ -1,5 +1,7 @@
 package cn.iocoder.yudao.module.iot.controller.admin.plugininfo.vo;
 
+import cn.iocoder.yudao.framework.common.validation.InEnum;
+import cn.iocoder.yudao.module.iot.enums.plugin.IotPluginTypeEnum;
 import lombok.*;
 import io.swagger.v3.oas.annotations.media.Schema;
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
@@ -8,13 +10,12 @@ import java.time.LocalDateTime;
 
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
+// TODO @haohao：只查询必要字段哈
 @Schema(description = "管理后台 - IoT 插件信息分页 Request VO")
 @Data
-@EqualsAndHashCode(callSuper = true)
-@ToString(callSuper = true)
 public class PluginInfoPageReqVO extends PageParam {
 
-    @Schema(description = "插件包id", example = "24627")
+    @Schema(description = "插件包 ID ", example = "24627")
     private String pluginId;
 
     @Schema(description = "插件名称", example = "赵六")
@@ -33,6 +34,7 @@ public class PluginInfoPageReqVO extends PageParam {
     private String version;
 
     @Schema(description = "插件类型", example = "2")
+    @InEnum(IotPluginTypeEnum.class)
     private Integer type;
 
     @Schema(description = "设备插件协议类型")

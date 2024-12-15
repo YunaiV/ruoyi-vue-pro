@@ -1,12 +1,12 @@
 package cn.iocoder.yudao.module.iot.dal.dataobject.plugininstance;
 
-import lombok.*;
-import java.util.*;
-import java.time.LocalDateTime;
-import java.time.LocalDateTime;
-import com.baomidou.mybatisplus.annotation.*;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import com.baomidou.mybatisplus.annotation.KeySequence;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
+import lombok.*;
 
+// TODO @haohao：一些必要的关联、枚举
 /**
  * IoT 插件实例 DO
  *
@@ -28,7 +28,7 @@ public class PluginInstanceDO extends BaseDO {
     @TableId
     private Long id;
     /**
-     * 插件主程序id
+     * 插件主程序 ID
      */
     private String mainId;
     /**
@@ -44,7 +44,7 @@ public class PluginInstanceDO extends BaseDO {
      */
     private Integer port;
     /**
-     * 心跳时间，心路时间超过30秒需要剔除
+     * 心跳时间，心路时间超过 30 秒需要剔除
      */
     private Long heartbeatAt;
 

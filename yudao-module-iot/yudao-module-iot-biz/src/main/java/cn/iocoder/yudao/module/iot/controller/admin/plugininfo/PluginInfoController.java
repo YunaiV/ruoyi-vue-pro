@@ -20,7 +20,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
-import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
 import static cn.iocoder.yudao.module.infra.enums.ErrorCodeConstants.FILE_IS_EMPTY;
 
 @Tag(name = "管理后台 - IoT 插件信息")
@@ -86,7 +85,6 @@ public class PluginInfoController {
         return success(true);
     }
 
-    // 修改插件状态
     @PutMapping("/update-status")
     @Operation(summary = "修改插件状态")
     @PreAuthorize("@ss.hasPermission('iot:plugin-info:update')")

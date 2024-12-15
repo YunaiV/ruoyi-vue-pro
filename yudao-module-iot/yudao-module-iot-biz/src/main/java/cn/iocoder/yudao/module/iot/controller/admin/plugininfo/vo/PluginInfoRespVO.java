@@ -1,22 +1,23 @@
 package cn.iocoder.yudao.module.iot.controller.admin.plugininfo.vo;
 
+import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
+import com.alibaba.excel.annotation.ExcelProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.*;
+import lombok.Data;
 
 import java.time.LocalDateTime;
-import com.alibaba.excel.annotation.*;
 
 @Schema(description = "管理后台 - IoT 插件信息 Response VO")
 @Data
 @ExcelIgnoreUnannotated
 public class PluginInfoRespVO {
 
-    @Schema(description = "主键ID", requiredMode = Schema.RequiredMode.REQUIRED, example = "11546")
-    @ExcelProperty("主键ID")
+    @Schema(description = "主键 ID", requiredMode = Schema.RequiredMode.REQUIRED, example = "11546")
+    @ExcelProperty("主键 ID")
     private Long id;
 
-    @Schema(description = "插件包id", requiredMode = Schema.RequiredMode.REQUIRED, example = "24627")
-    @ExcelProperty("插件包id")
+    @Schema(description = "插件包 ID", requiredMode = Schema.RequiredMode.REQUIRED, example = "24627")
+    @ExcelProperty("插件包 ID")
     private String pluginId;
 
     @Schema(description = "插件名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "赵六")

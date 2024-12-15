@@ -8,6 +8,7 @@ import java.time.LocalDateTime;
 
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
+// TODO @haohao：建议搞个 plugin，然后里面分 info 和 instance。另外，是不是 info => config 会好点，插件配置？
 @Schema(description = "管理后台 - IoT 插件实例分页 Request VO")
 @Data
 @EqualsAndHashCode(callSuper = true)
