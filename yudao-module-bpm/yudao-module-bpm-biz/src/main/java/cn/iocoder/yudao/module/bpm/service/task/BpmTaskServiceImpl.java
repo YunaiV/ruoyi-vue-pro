@@ -12,6 +12,7 @@ import cn.iocoder.yudao.framework.common.util.object.PageUtils;
 import cn.iocoder.yudao.framework.web.core.util.WebFrameworkUtils;
 import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.task.*;
 import cn.iocoder.yudao.module.bpm.convert.task.BpmTaskConvert;
+import cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmFormDO;
 import cn.iocoder.yudao.module.bpm.enums.definition.*;
 import cn.iocoder.yudao.module.bpm.enums.task.BpmCommentTypeEnum;
 import cn.iocoder.yudao.module.bpm.enums.task.BpmReasonEnum;
@@ -20,6 +21,7 @@ import cn.iocoder.yudao.module.bpm.enums.task.BpmTaskStatusEnum;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnVariableConstants;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.util.BpmnModelUtils;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.util.FlowableUtils;
+import cn.iocoder.yudao.module.bpm.service.definition.BpmFormService;
 import cn.iocoder.yudao.module.bpm.service.definition.BpmModelService;
 import cn.iocoder.yudao.module.bpm.service.definition.BpmProcessDefinitionService;
 import cn.iocoder.yudao.module.bpm.service.message.BpmMessageService;
@@ -91,6 +93,8 @@ public class BpmTaskServiceImpl implements BpmTaskService {
     private BpmModelService modelService;
     @Resource
     private BpmMessageService messageService;
+    @Resource
+    private BpmFormService formService;
 
     @Resource
     private AdminUserApi adminUserApi;
@@ -108,6 +112,9 @@ public class BpmTaskServiceImpl implements BpmTaskService {
                 .orderByTaskCreateTime().desc(); // 创建时间倒序
         if (StrUtil.isNotBlank(pageVO.getName())) {
             taskQuery.taskNameLike("%" + pageVO.getName() + "%");
+        }
+        if (StrUtil.isNotEmpty(pageVO.getCategory())) {
+            taskQuery.taskCategory(pageVO.getCategory());
         }
         if (ArrayUtil.isNotEmpty(pageVO.getCreateTime())) {
             taskQuery.taskCreatedAfter(DateUtils.of(pageVO.getCreateTime()[0]));
@@ -153,7 +160,13 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         BpmnModel bpmnModel = bpmProcessDefinitionService.getProcessDefinitionBpmnModel(todoTask.getProcessDefinitionId());
         Map<Integer, BpmTaskRespVO.OperationButtonSetting> buttonsSetting = BpmnModelUtils.parseButtonsSetting(
                 bpmnModel, todoTask.getTaskDefinitionKey());
-        return BpmTaskConvert.INSTANCE.buildTodoTask(todoTask, childrenTasks, buttonsSetting);
+
+        // 4. 任务表单
+        BpmFormDO taskForm = null;
+        if (StrUtil.isNotBlank(todoTask.getFormKey())){
+            taskForm = formService.getForm(NumberUtils.parseLong(todoTask.getFormKey()));
+        }
+        return BpmTaskConvert.INSTANCE.buildTodoTask(todoTask, childrenTasks, buttonsSetting, taskForm);
     }
 
     @Override
@@ -187,6 +200,9 @@ public class BpmTaskServiceImpl implements BpmTaskService {
                 .orderByHistoricTaskInstanceEndTime().desc(); // 审批时间倒序
         if (StrUtil.isNotBlank(pageVO.getName())) {
             taskQuery.taskNameLike("%" + pageVO.getName() + "%");
+        }
+        if (StrUtil.isNotEmpty(pageVO.getCategory())) {
+            taskQuery.taskCategory(pageVO.getCategory());
         }
         if (ArrayUtil.isNotEmpty(pageVO.getCreateTime())) {
             taskQuery.taskCreatedAfter(DateUtils.of(pageVO.getCreateTime()[0]));
@@ -441,7 +457,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
      * 判断指定用户，是否是当前任务的加签人
      *
      * @param userId 用户 Id
-     * @param task 任务
+     * @param task   任务
      * @return 是否
      */
     private boolean isAddSignUserTask(Long userId, Task task) {
@@ -669,7 +685,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
                 reqVO.getTargetTaskDefinitionKey(), task.getProcessDefinitionId());
 
         // 2. 调用 Flowable 框架的退回逻辑
-        returnTask(task, targetElement, reqVO);
+        returnTask(userId, task, targetElement, reqVO);
     }
 
     /**
@@ -701,11 +717,12 @@ public class BpmTaskServiceImpl implements BpmTaskService {
     /**
      * 执行退回逻辑
      *
+     * @param userId        用户编号
      * @param currentTask   当前退回的任务
      * @param targetElement 需要退回到的目标任务
      * @param reqVO         前端参数封装
      */
-    public void returnTask(Task currentTask, FlowElement targetElement, BpmTaskReturnReqVO reqVO) {
+    public void returnTask(Long userId, Task currentTask, FlowElement targetElement, BpmTaskReturnReqVO reqVO) {
         // 1. 获得所有需要回撤的任务 taskDefinitionKey，用于稍后的 moveActivityIdsToSingleActivityId 回撤
         // 1.1 获取所有正常进行的任务节点 Key
         List<Task> taskList = taskService.createTaskQuery().processInstanceId(currentTask.getProcessInstanceId()).list();
@@ -721,22 +738,29 @@ public class BpmTaskServiceImpl implements BpmTaskService {
             if (!returnTaskKeyList.contains(task.getTaskDefinitionKey())) {
                 return;
             }
-            // 2.1 添加评论
-            taskService.addComment(task.getId(), currentTask.getProcessInstanceId(), BpmCommentTypeEnum.RETURN.getType(),
-                    BpmCommentTypeEnum.RETURN.formatComment(reqVO.getReason()));
-            // 2.2 更新 task 状态 + 原因
-            updateTaskStatusAndReason(task.getId(), BpmTaskStatusEnum.RETURN.getStatus(), reqVO.getReason());
+
+            // 判断是否分配给自己任务，因为会签任务，一个节点会有多个任务
+            if (isAssignUserTask(userId, task)) { // 情况一：自己的任务，进行 RETURN 标记
+                // 2.1.1 添加评论
+                taskService.addComment(task.getId(), currentTask.getProcessInstanceId(), BpmCommentTypeEnum.RETURN.getType(),
+                        BpmCommentTypeEnum.RETURN.formatComment(reqVO.getReason()));
+                // 2.1.2 更新 task 状态 + 原因
+                updateTaskStatusAndReason(task.getId(), BpmTaskStatusEnum.RETURN.getStatus(), reqVO.getReason());
+            } else { // 情况二：别人的任务，进行 CANCEL 标记
+                processTaskCanceled(task.getId());
+            }
         });
 
         // 3. 设置流程变量节点驳回标记：用于驳回到节点，不执行 BpmUserTaskAssignStartUserHandlerTypeEnum 策略。导致自动通过
         runtimeService.setVariable(currentTask.getProcessInstanceId(),
                 String.format(PROCESS_INSTANCE_VARIABLE_RETURN_FLAG, reqVO.getTargetTaskDefinitionKey()), Boolean.TRUE);
-
         // 4. 执行驳回
+        // 使用 moveExecutionsToSingleActivityId 替换 moveActivityIdsToSingleActivityId 原因：
+        // 当多实例任务回退的时候有问题。相关 issue: https://github.com/flowable/flowable-engine/issues/3944
+        List<String> runExecutionIds = convertList(taskList, Task::getExecutionId);
         runtimeService.createChangeActivityStateBuilder()
                 .processInstanceId(currentTask.getProcessInstanceId())
-                .moveActivityIdsToSingleActivityId(returnTaskKeyList, // 当前要跳转的节点列表( 1 或多)
-                        reqVO.getTargetTaskDefinitionKey()) // targetKey 跳转到的节点(1)
+                .moveExecutionsToSingleActivityId(runExecutionIds, reqVO.getTargetTaskDefinitionKey())
                 .changeState();
     }
 
@@ -1021,14 +1045,22 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         Integer assignEmptyHandlerType = BpmnModelUtils.parseAssignEmptyHandlerType(userTaskElement);
         TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
 
+            /**
+             * 特殊情况：部分情况下，TransactionSynchronizationManager 注册 afterCommit 监听时，不会被调用，但是 afterCompletion 可以
+             * 例如说：第一个 task 就是配置【自动通过】或者【自动拒绝】时
+             * 参见 <a href="https://gitee.com/zhijiantianya/yudao-cloud/issues/IB7V7Q">issue</a> 反馈
+             */
             @Override
             public void afterCompletion(int transactionStatus) {
-                // 特殊情况：部分情况下，TransactionSynchronizationManager 注册 afterCommit 监听时，不会被调用，但是 afterCompletion 可以
-                // 例如说：第一个 task 就是配置【自动通过】或者【自动拒绝】时
-                if (ObjectUtil.notEqual(transactionStatus, TransactionSynchronization.STATUS_COMMITTED)) {
+                // 回滚情况，直接返回
+                if (ObjectUtil.equal(transactionStatus, TransactionSynchronization.STATUS_ROLLED_BACK)) {
                     return;
                 }
-                // TODO 芋艿：可以后续优化成 getSelf();
+                // 特殊情况：第一个 task 【自动通过】时，第二个任务设置审批人时 transactionStatus 会为 STATUS_UNKNOWN，不知道啥原因
+                if (ObjectUtil.equal(transactionStatus, TransactionSynchronization.STATUS_UNKNOWN)
+                        && getTask(task.getId()) == null) {
+                    return;
+                }
                 // 特殊情况一：【人工审核】审批人为空，根据配置是否要自动通过、自动拒绝
                 if (ObjectUtil.equal(approveType, BpmUserTaskApproveTypeEnum.USER.getType())) {
                     // 如果有审批人、或者拥有人，则说明不满足情况一，不自动通过、不自动拒绝
@@ -1036,19 +1068,19 @@ public class BpmTaskServiceImpl implements BpmTaskService {
                         return;
                     }
                     if (ObjectUtil.equal(assignEmptyHandlerType, BpmUserTaskAssignEmptyHandlerTypeEnum.APPROVE.getType())) {
-                        SpringUtil.getBean(BpmTaskService.class).approveTask(null, new BpmTaskApproveReqVO()
+                        getSelf().approveTask(null, new BpmTaskApproveReqVO()
                                 .setId(task.getId()).setReason(BpmReasonEnum.ASSIGN_EMPTY_APPROVE.getReason()));
                     } else if (ObjectUtil.equal(assignEmptyHandlerType, BpmUserTaskAssignEmptyHandlerTypeEnum.REJECT.getType())) {
-                        SpringUtil.getBean(BpmTaskService.class).rejectTask(null, new BpmTaskRejectReqVO()
+                        getSelf().rejectTask(null, new BpmTaskRejectReqVO()
                                 .setId(task.getId()).setReason(BpmReasonEnum.ASSIGN_EMPTY_REJECT.getReason()));
                     }
                     // 特殊情况二：【自动审核】审批类型为自动通过、不通过
                 } else {
                     if (ObjectUtil.equal(approveType, BpmUserTaskApproveTypeEnum.AUTO_APPROVE.getType())) {
-                        SpringUtil.getBean(BpmTaskService.class).approveTask(null, new BpmTaskApproveReqVO()
+                        getSelf().approveTask(null, new BpmTaskApproveReqVO()
                                 .setId(task.getId()).setReason(BpmReasonEnum.APPROVE_TYPE_AUTO_APPROVE.getReason()));
                     } else if (ObjectUtil.equal(approveType, BpmUserTaskApproveTypeEnum.AUTO_REJECT.getType())) {
-                        SpringUtil.getBean(BpmTaskService.class).rejectTask(null, new BpmTaskRejectReqVO()
+                        getSelf().rejectTask(null, new BpmTaskRejectReqVO()
                                 .setId(task.getId()).setReason(BpmReasonEnum.APPROVE_TYPE_AUTO_REJECT.getReason()));
                     }
                 }
@@ -1087,8 +1119,22 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         // 发送通知。在事务提交时，批量执行操作，所以直接查询会无法查询到 ProcessInstance，所以这里是通过监听事务的提交来实现。
         TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
 
+            /**
+             * 特殊情况：部分情况下，TransactionSynchronizationManager 注册 afterCommit 监听时，不会被调用，但是 afterCompletion 可以
+             * 例如说：第一个 task 就是配置【自动通过】或者【自动拒绝】时
+             * 参见 <a href="https://gitee.com/zhijiantianya/yudao-cloud/issues/IB7V7Q">issue</a> 反馈
+             */
             @Override
-            public void afterCommit() {
+            public void afterCompletion(int transactionStatus) {
+                // 回滚情况，直接返回
+                if (ObjectUtil.equal(transactionStatus, TransactionSynchronization.STATUS_ROLLED_BACK)) {
+                    return;
+                }
+                // 特殊情况：第一个 task 【自动通过】时，第二个任务设置审批人时 transactionStatus 会为 STATUS_UNKNOWN，不知道啥原因
+                if (ObjectUtil.equal(transactionStatus, TransactionSynchronization.STATUS_UNKNOWN)
+                        && getTask(task.getId()) == null) {
+                    return;
+                }
                 if (StrUtil.isEmpty(task.getAssignee())) {
                     log.error("[processTaskAssigned][taskId({}) 没有分配到负责人]", task.getId());
                     return;

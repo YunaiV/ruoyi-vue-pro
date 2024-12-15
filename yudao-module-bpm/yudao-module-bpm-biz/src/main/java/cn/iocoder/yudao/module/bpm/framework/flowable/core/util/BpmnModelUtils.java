@@ -73,7 +73,6 @@ public class BpmnModelUtils {
         extensionElement.setName(name);
         attributes.forEach((key, value) -> {
             ExtensionAttribute extensionAttribute = new ExtensionAttribute(key, value);
-            extensionAttribute.setNamespace(FLOWABLE_EXTENSIONS_NAMESPACE);
             extensionElement.addAttribute(extensionAttribute);
         });
         element.addExtensionElement(extensionElement);
@@ -278,8 +277,8 @@ public class BpmnModelUtils {
         }
         Map<String, String> fieldsPermission = MapUtil.newHashMap();
         extensionElements.forEach(element -> {
-            String field = element.getAttributeValue(FLOWABLE_EXTENSIONS_NAMESPACE, FORM_FIELD_PERMISSION_ELEMENT_FIELD_ATTRIBUTE);
-            String permission = element.getAttributeValue(FLOWABLE_EXTENSIONS_NAMESPACE, FORM_FIELD_PERMISSION_ELEMENT_PERMISSION_ATTRIBUTE);
+            String field = element.getAttributeValue(null, FORM_FIELD_PERMISSION_ELEMENT_FIELD_ATTRIBUTE);
+            String permission = element.getAttributeValue(null, FORM_FIELD_PERMISSION_ELEMENT_PERMISSION_ATTRIBUTE);
             if (StrUtil.isNotEmpty(field) && StrUtil.isNotEmpty(permission)) {
                 fieldsPermission.put(field, permission);
             }
@@ -321,9 +320,9 @@ public class BpmnModelUtils {
         }
         Map<Integer, BpmTaskRespVO.OperationButtonSetting> buttonSettings = Maps.newHashMapWithExpectedSize(extensionElements.size());
         extensionElements.forEach(element -> {
-            String id = element.getAttributeValue(FLOWABLE_EXTENSIONS_NAMESPACE, BUTTON_SETTING_ELEMENT_ID_ATTRIBUTE);
-            String displayName = element.getAttributeValue(FLOWABLE_EXTENSIONS_NAMESPACE, BUTTON_SETTING_ELEMENT_DISPLAY_NAME_ATTRIBUTE);
-            String enable = element.getAttributeValue(FLOWABLE_EXTENSIONS_NAMESPACE, BUTTON_SETTING_ELEMENT_ENABLE_ATTRIBUTE);
+            String id = element.getAttributeValue(null, BUTTON_SETTING_ELEMENT_ID_ATTRIBUTE);
+            String displayName = element.getAttributeValue(null, BUTTON_SETTING_ELEMENT_DISPLAY_NAME_ATTRIBUTE);
+            String enable = element.getAttributeValue(null, BUTTON_SETTING_ELEMENT_ENABLE_ATTRIBUTE);
             if (StrUtil.isNotEmpty(id)) {
                 BpmTaskRespVO.OperationButtonSetting setting = new BpmTaskRespVO.OperationButtonSetting();
                 buttonSettings.put(Integer.valueOf(id), setting.setDisplayName(displayName).setEnable(Boolean.parseBoolean(enable)));
@@ -720,7 +719,7 @@ public class BpmnModelUtils {
                             && evalConditionExpress(variables, flow.getConditionExpression()));
             if (matchSequenceFlow == null) {
                 matchSequenceFlow = CollUtil.findOne(gateway.getOutgoingFlows(),
-                        flow -> ObjUtil.notEqual(gateway.getDefaultFlow(), flow.getId()));
+                        flow -> ObjUtil.equal(gateway.getDefaultFlow(), flow.getId()));
                 // 特殊：没有默认的情况下，并且只有 1 个条件，则认为它是默认的
                 if (matchSequenceFlow == null && gateway.getOutgoingFlows().size() == 1) {
                     matchSequenceFlow = gateway.getOutgoingFlows().get(0);
@@ -742,7 +741,7 @@ public class BpmnModelUtils {
                             && evalConditionExpress(variables, flow.getConditionExpression()));
             if (CollUtil.isEmpty(matchSequenceFlows)) {
                 matchSequenceFlows = CollUtil.filterNew(gateway.getOutgoingFlows(),
-                        flow -> ObjUtil.notEqual(gateway.getDefaultFlow(), flow.getId()));
+                        flow -> ObjUtil.equal(gateway.getDefaultFlow(), flow.getId()));
                 // 特殊：没有默认的情况下，并且只有 1 个条件，则认为它是默认的
                 if (CollUtil.isEmpty(matchSequenceFlows) && gateway.getOutgoingFlows().size() == 1) {
                     matchSequenceFlows = gateway.getOutgoingFlows();
