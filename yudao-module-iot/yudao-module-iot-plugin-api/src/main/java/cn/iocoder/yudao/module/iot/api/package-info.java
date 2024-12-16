@@ -3,4 +3,4 @@
  *
  * TODO 芋艿：后续删除
  */
-package cn.iocoder.yudao.module.iot.plugin;
+package cn.iocoder.yudao.module.iot.api;

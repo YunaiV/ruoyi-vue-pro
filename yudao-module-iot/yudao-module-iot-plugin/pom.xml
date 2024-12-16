@@ -1,31 +1,149 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <parent>
-        <artifactId>yudao-module-iot</artifactId>
-        <groupId>cn.iocoder.boot</groupId>
-        <version>${revision}</version>
-    </parent>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://maven.apache.org/POM/4.0.0" xsi:schemaLocation="
+         http://maven.apache.org/POM/4.0.0
+         http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
+    <groupId>cn.iocoder.boot</groupId>
     <artifactId>yudao-module-iot-plugin</artifactId>
+    <version>0.0.1</version>
     <packaging>jar</packaging>
 
     <name>${project.artifactId}</name>
-    <description>
-        物联网 模块 - 插件
-    </description>
+    <description>物联网 模块 - 插件</description>
+
+    <properties>
+        <!-- 插件相关 -->
+        <plugin.id>iot-plugin-http</plugin.id>
+        <plugin.class>cn.iocoder.yudao.module.iot.plugin.WelcomePlugin</plugin.class>
+        <plugin.version>0.0.1</plugin.version>
+        <plugin.provider>ahh</plugin.provider>
+        <plugin.dependencies/>
+
+        <!-- Maven 相关 -->
+        <java.version>17</java.version>
+        <maven.compiler.source>${java.version}</maven.compiler.source>
+        <maven.compiler.target>${java.version}</maven.compiler.target>
+        <maven-antrun-plugin.version>1.6</maven-antrun-plugin.version>
+        <maven-assembly-plugin.version>2.3</maven-assembly-plugin.version>
+        <maven-jar-plugin.version>2.4</maven-jar-plugin.version>
+        <pf4j-spring.version>0.9.0</pf4j-spring.version>
+        <!-- 看看咋放到 bom 里 -->
+        <spring.boot.version>3.3.1</spring.boot.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
 
     <dependencies>
+        <!-- 其他依赖项 -->
         <dependency>
-            <groupId>cn.iocoder.boot</groupId>
-            <artifactId>yudao-common</artifactId>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+            <version>${spring.boot.version}</version>
+            <scope>provided</scope>
         </dependency>
-
+        <!-- PF4J Spring 集成 -->
         <dependency>
             <groupId>org.pf4j</groupId>
             <artifactId>pf4j-spring</artifactId>
+            <version>${pf4j-spring.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <!-- 项目依赖 -->
+        <dependency>
+            <groupId>cn.iocoder.boot</groupId>
+            <artifactId>yudao-module-iot-plugin-api</artifactId>
+            <version>${project.version}</version>
         </dependency>
     </dependencies>
 
+    <build>
+        <plugins>
+            <!-- DOESN'T WORK WITH MAVEN 3 (I defined the plugin metadata in properties section)
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>properties-maven-plugin</artifactId>
+                <version>1.0-alpha-2</version>
+                <executions>
+                  <execution>
+                    <phase>initialize</phase>
+                    <goals>
+                      <goal>read-project-properties</goal>
+                    </goals>
+                    <configuration>
+                      <files>
+                        <file>plugin.properties</file>
+                      </files>
+                    </configuration>
+                  </execution>
+                </executions>
+            </plugin>
+            -->
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>${maven-antrun-plugin.version}</version>
+                <executions>
+                    <execution>
+                        <id>unzip jar file</id>
+                        <phase>package</phase>
+                        <configuration>
+                            <target>
+                                <unzip src="target/${project.artifactId}-${project.version}.${project.packaging}" dest="target/plugin-classes" />
+                            </target>
+                        </configuration>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>${maven-assembly-plugin.version}</version>
+                <configuration>
+                    <descriptors>
+                        <descriptor>
+                            src/main/assembly/assembly.xml
+                        </descriptor>
+                    </descriptors>
+                    <appendAssemblyId>false</appendAssemblyId>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>make-assembly</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>attached</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>${maven-jar-plugin.version}</version>
+                <configuration>
+                    <archive>
+                        <manifestEntries>
+                            <Plugin-Id>${plugin.id}</Plugin-Id>
+                            <Plugin-Class>${plugin.class}</Plugin-Class>
+                            <Plugin-Version>${plugin.version}</Plugin-Version>
+                            <Plugin-Provider>${plugin.provider}</Plugin-Provider>
+                            <Plugin-Dependencies>${plugin.dependencies}</Plugin-Dependencies>
+                        </manifestEntries>
+                    </archive>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <artifactId>maven-deploy-plugin</artifactId>
+                <configuration>
+                    <skip>true</skip>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 </project>

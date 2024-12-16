@@ -17,13 +17,18 @@ import org.pf4j.PluginDescriptor;
 import org.pf4j.PluginState;
 import org.pf4j.PluginWrapper;
 import org.pf4j.spring.SpringPluginManager;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.iot.enums.ErrorCodeConstants.*;
@@ -46,6 +51,9 @@ public class PluginInfoServiceImpl implements PluginInfoService {
 
     @Resource
     private FileApi fileApi;
+
+    @Value("${pf4j.pluginsDir}")
+    private String pluginsDir;
 
     @Override
     public Long createPluginInfo(PluginInfoSaveReqVO createReqVO) {
@@ -132,7 +140,7 @@ public class PluginInfoServiceImpl implements PluginInfoService {
         // 4. 上传插件
         String pluginIdNew;
         try {
-            String path = fileApi.createFile(IoUtil.readBytes(file.getInputStream()));
+            String path = fileApi.createFile(pluginsDir, IoUtil.readBytes(file.getInputStream()));
             Path pluginPath = Path.of(path);
             pluginIdNew = pluginManager.loadPlugin(pluginPath);
         } catch (Exception e) {
@@ -144,10 +152,31 @@ public class PluginInfoServiceImpl implements PluginInfoService {
             throw exception(PLUGIN_INSTALL_FAILED);
         }
 
-
         // 5. 读取配置文件和脚本
         String configJson = "";
         String script = "";
+        try (JarFile jarFile = new JarFile(pluginWrapper.getPluginPath().toFile())) {
+            // 5.1 获取config文件在jar包中的路径
+            String configFile = "classes/config.json";
+            JarEntry configEntry = jarFile.getJarEntry(configFile);
+
+            if (configEntry != null) {
+                // 5.2 读取配置文件
+                configJson = IoUtil.readUtf8(jarFile.getInputStream(configEntry));
+                log.info("configJson:{}", configJson);
+            }
+
+            // 5.3 读取script.js脚本
+            String scriptFile = "classes/script.js";
+            JarEntry scriptEntity = jarFile.getJarEntry(scriptFile);
+            if (scriptEntity != null) {
+                // 5.4 读取脚本文件
+                script = IoUtil.readUtf8(jarFile.getInputStream(scriptEntity));
+                log.info("script:{}", script);
+            }
+        } catch (Exception e) {
+            throw exception(PLUGIN_INSTALL_FAILED);
+        }
 
         pluginInfoDo.setPluginId(pluginIdNew);
         pluginInfoDo.setStatus(IotPluginStatusEnum.STOPPED.getStatus());
@@ -159,48 +188,6 @@ public class PluginInfoServiceImpl implements PluginInfoService {
         pluginInfoDo.setVersion(pluginDescriptor.getVersion());
         pluginInfoDo.setDescription(pluginDescriptor.getPluginDescription());
         pluginInfoMapper.updateById(pluginInfoDo);
-
-
-        // 5. 读取配置文件和脚本
-//        String configJson = "";
-        //       String script = "";
-//        try (JarFile jarFile = new JarFile(pluginInfoUpdate.getPluginPath())) {
-//            // 5.1 获取config文件在jar包中的路径
-//            String configFile = "classes/config.json";
-//            JarEntry configEntry = jarFile.getJarEntry(configFile);
-//
-//            if (configEntry != null) {
-//                // 5.2 读取配置文件
-//                configJson = IoUtil.read(jarFile.getInputStream(configEntry), Charset.defaultCharset());
-//                log.info("configJson:{}", configJson);
-//            }
-//
-//            // 5.3 读取script.js脚本
-//            String scriptFile = "classes/script.js";
-//            JarEntry scriptEntity = jarFile.getJarEntry(scriptFile);
-//            if (scriptEntity != null) {
-//                // 5.4 读取脚本文件
-//                script = IoUtil.read(jarFile.getInputStream(scriptEntity), Charset.defaultCharset());
-//                log.info("script:{}", script);
-//            }
-//        } catch (Exception e) {
-//            throw exception(PLUGIN_INSTALL_FAILED);
-//        }
-
-
-//        PluginState pluginState = pluginInfoUpdate.getPluginState();
-//        if (pluginState == PluginState.STARTED) {
-//            pluginInfoDo.setStatus(IotPluginStatusEnum.RUNNING.getStatus());
-//        }
-//        pluginInfoDo.setPluginId(pluginInfoUpdate.getPluginId());
-//        pluginInfoDo.setFile(file.getOriginalFilename());
-//        pluginInfoDo.setConfigSchema(configJson);
-//        pluginInfoDo.setScript(script);
-//
-//        PluginDescriptor pluginDescriptor = pluginInfoUpdate.getPluginDescriptor();
-//        pluginInfoDo.setVersion(pluginDescriptor.getPluginVersion());
-//        pluginInfoDo.setDescription(pluginDescriptor.getDescription());
-//        pluginInfoMapper.updateById(pluginInfoDo);
     }
 
     @Override
@@ -213,26 +200,22 @@ public class PluginInfoServiceImpl implements PluginInfoService {
             throw exception(PLUGIN_STATUS_INVALID);
         }
 
-        // 插件包为空
-//        String pluginId = pluginInfoDo.getPluginId();
-//        if (StrUtil.isBlank(pluginId)) {
-//            throw exception(PLUGIN_INFO_NOT_EXISTS);
-//        }
-//        com.gitee.starblues.core.PluginInfo pluginInfo = pluginOperator.getPluginInfo(pluginId);
-//        if (pluginInfo != null) {
-//            if (pluginInfoDo.getStatus().equals(IotPluginStatusEnum.RUNNING.getStatus()) && pluginInfo.getPluginState() != PluginState.STARTED) {
-//                // 启动插件
-//                pluginOperator.start(pluginId);
-//            } else if (pluginInfoDo.getStatus().equals(IotPluginStatusEnum.STOPPED.getStatus()) && pluginInfo.getPluginState() == PluginState.STARTED) {
-//                // 停止插件
-//                pluginOperator.stop(pluginId);
-//            }
-//        } else {
-//            // 已经停止，未获取到插件
-//            if (IotPluginStatusEnum.STOPPED.getStatus().equals(pluginInfoDo.getStatus())) {
-//                throw exception(PLUGIN_STATUS_INVALID);
-//            }
-//        }
+        String pluginId = pluginInfoDo.getPluginId();
+        PluginWrapper plugin = pluginManager.getPlugin(pluginId);
+        if (plugin != null) {
+            if (status.equals(IotPluginStatusEnum.RUNNING.getStatus()) && plugin.getPluginState() != PluginState.STARTED) {
+                // 启动插件
+                pluginManager.startPlugin(pluginId);
+            } else if (status.equals(IotPluginStatusEnum.STOPPED.getStatus()) && plugin.getPluginState() == PluginState.STARTED) {
+                // 停止插件
+                pluginManager.stopPlugin(pluginId);
+            }
+        } else {
+            // 已经停止，未获取到插件
+            if (IotPluginStatusEnum.STOPPED.getStatus().equals(pluginInfoDo.getStatus())) {
+                throw exception(PLUGIN_STATUS_INVALID);
+            }
+        }
         pluginInfoDo.setStatus(status);
         pluginInfoMapper.updateById(pluginInfoDo);
     }
@@ -244,20 +227,13 @@ public class PluginInfoServiceImpl implements PluginInfoService {
 
     @SneakyThrows
     private void startPlugins() {
-//        while (!pluginOperator.inited()) {
-//            Thread.sleep(1000L);
-//        }
-
         for (PluginInfoDO pluginInfoDO : pluginInfoMapper.selectList()) {
             if (!IotPluginStatusEnum.RUNNING.getStatus().equals(pluginInfoDO.getStatus())) {
                 continue;
             }
             log.info("start plugin:{}", pluginInfoDO.getPluginId());
             try {
-//                com.gitee.starblues.core.PluginInfo plugin = pluginOperator.getPluginInfo(pluginInfoDO.getPluginId());
-//                if (plugin != null) {
-//                    pluginOperator.start(plugin.getPluginId());
-//                }
+                pluginManager.startPlugin(pluginInfoDO.getPluginId());
             } catch (Exception e) {
                 log.error("start plugin error", e);
             }

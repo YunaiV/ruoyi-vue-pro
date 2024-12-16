@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>cn.iocoder.boot</groupId>
+    <artifactId>yudao-module-iot-plugin-api</artifactId>
+    <version>0.0.1</version>
+    <packaging>jar</packaging>
+
+    <name>${project.artifactId}</name>
+    <description>
+        物联网 模块插件 API，暴露给其它模块调用
+    </description>
+
+    <properties>
+        <pf4j-spring.version>0.9.0</pf4j-spring.version>
+    </properties>
+
+    <dependencies>
+        <!-- PF4J Spring 集成 -->
+        <dependency>
+            <groupId>org.pf4j</groupId>
+            <artifactId>pf4j-spring</artifactId>
+            <version>${pf4j-spring.version}</version>
+            <scope>provided</scope>
+        </dependency>
+    </dependencies>
+
+</project>
