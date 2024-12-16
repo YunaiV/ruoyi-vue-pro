@@ -1,6 +1,7 @@
 package com.somle.esb.job;
 
 
+import cn.hutool.json.JSONUtil;
 import com.somle.amazon.controller.vo.AmazonSpReportReqVO;
 import com.somle.amazon.controller.vo.AmazonSpReportReqVO.ProcessingStatuses;
 import com.somle.esb.model.OssData;
@@ -9,7 +10,7 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 @Component
-public class AmazonspReturnReportDataJob extends AmazonspDataJob {
+public class AmazonspSelfDeliveryReturnReportDataJob extends AmazonspDataJob {
 
 
     @Override
@@ -31,11 +32,11 @@ public class AmazonspReturnReportDataJob extends AmazonspDataJob {
             .forEach(report -> {
                 OssData data = OssData.builder()
                     .database(DATABASE)
-                    .tableName("return_report")
+                    .tableName("self_delivery_return_report_inc")
                     .syncType("inc")
                     .requestTimestamp(System.currentTimeMillis())
                     .folderDate(beforeYesterday)
-                    .content(report)
+                    .content(JSONUtil.parseArray(report))
                     .headers(null)
                     .build();
                 service.send(data);

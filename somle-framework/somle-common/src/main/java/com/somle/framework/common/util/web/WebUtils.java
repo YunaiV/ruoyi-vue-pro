@@ -1,16 +1,21 @@
 package com.somle.framework.common.util.web;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.zip.GZIPInputStream;
 
+import cn.hutool.core.util.ObjUtil;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.somle.framework.common.util.json.JSONObject;
 import com.somle.framework.common.util.json.JsonUtils;
+import com.somle.framework.common.util.string.StrUtils;
 import lombok.SneakyThrows;
 import okhttp3.*;
 import org.apache.commons.collections4.MultiValuedMap;
@@ -21,6 +26,7 @@ import org.apache.tomcat.util.http.fileupload.IOUtils;
 //import com.alibaba.fastjson2.JSONObject;
 
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
 
 @Slf4j
 public class WebUtils {
@@ -183,6 +189,43 @@ public class WebUtils {
         IOUtils.copy(inputStream, byteArrayOutputStream);
         String jsonString = byteArrayOutputStream.toString();
         return jsonString;
+    }
+
+    @SneakyThrows
+    public static String urlToString(String urlString) {
+        URL url = new URL(urlString);
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        connection.setRequestMethod("GET");
+        // Choose input stream based on compression type
+        InputStream inputStream = connection.getInputStream();
+        List<Map<String, String>> jsonDataList = getMaps(inputStream);
+        ObjectMapper objectMapper = new ObjectMapper();
+        return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(jsonDataList);
+
+
+    }
+
+    @NotNull
+    private static List<Map<String, String>> getMaps(InputStream inputStream) throws IOException {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+        List<Map<String, String>> jsonDataList = new ArrayList<>();
+        String line;
+        String[] headers = null;
+        while ((line = reader.readLine()) != null) {
+            if (headers == null) {
+                headers = line.split("\t");
+            } else {
+                String[] values = line.split("\t");
+                Map<String, String> dataMap = new HashMap<>();
+                for (int i = 0; i < headers.length; i++) {
+                    String camelCase = StrUtils.toCamelCase(headers[i]);
+                    //判断value数组是否越界
+                    dataMap.put(camelCase, i >= values.length ? "" : values[i]);
+                }
+                jsonDataList.add(dataMap);
+            }
+        }
+        return jsonDataList;
     }
 
 //    public static <T> T parallelRun(int parallelism, Callable<T> codeBlock) {

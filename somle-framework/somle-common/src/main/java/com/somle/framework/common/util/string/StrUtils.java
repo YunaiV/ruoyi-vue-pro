@@ -84,4 +84,42 @@ public class StrUtils {
                 .collect(Collectors.joining("\n"));
     }
 
+    /**
+     * 将各种格式的字符串转换为驼峰命名
+     * user-name
+     * user.name
+     * User Name
+     * user_name
+     * 其他可能的分隔符格式（如空格、连字符、下划线等）
+     * TODO 以后遇见其他格式，在下方新增
+     * @param input 输入字符串
+     * @return 驼峰命名的字符串
+     */
+    public static String toCamelCase(String input) {
+        if (input == null || input.isEmpty()) {
+            return input;
+        }
+        // 替换所有分隔符为空格
+        String normalizedInput = input.replaceAll("[._-]", " ");
+        // 分割字符串
+        String[] words = normalizedInput.split("\\s+");
+        // 构建驼峰命名
+        StringBuilder camelCaseStr = new StringBuilder();
+        for (int i = 0; i < words.length; i++) {
+            String word = words[i];
+            if (word.isEmpty()) {
+                continue;
+            }
+            if (i == 0) {
+                // 第一个单词全部小写
+                camelCaseStr.append(word.toLowerCase());
+            } else {
+                // 后续单词首字母大写
+                camelCaseStr.append(Character.toUpperCase(word.charAt(0)))
+                        .append(word.substring(1).toLowerCase());
+            }
+        }
+        return camelCaseStr.toString();
+    }
+
 }

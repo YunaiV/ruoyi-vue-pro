@@ -205,7 +205,7 @@ public class AmazonSpClient {
         log.info("Document URL: {}", docUrl);
 
         // Use util to process the document URL
-        result = WebUtils.urlToString(docUrl, compression);
+        result = WebUtils.urlToString(docUrl);
 
 
         return result;
