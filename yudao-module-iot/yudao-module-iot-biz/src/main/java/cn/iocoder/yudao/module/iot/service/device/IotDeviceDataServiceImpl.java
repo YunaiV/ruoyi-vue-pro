@@ -7,15 +7,15 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.iot.controller.admin.device.vo.deviceData.IotDeviceDataPageReqVO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDataDO;
+import cn.iocoder.yudao.module.iot.dal.dataobject.productthingmodel.IotProductThingModelDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.tdengine.SelectVisualDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.tdengine.ThingModelMessage;
-import cn.iocoder.yudao.module.iot.dal.dataobject.thinkmodelfunction.IotThinkModelFunctionDO;
 import cn.iocoder.yudao.module.iot.dal.redis.deviceData.DeviceDataRedisDAO;
 import cn.iocoder.yudao.module.iot.dal.tdengine.TdEngineDMLMapper;
 import cn.iocoder.yudao.module.iot.enums.IotConstants;
-import cn.iocoder.yudao.module.iot.enums.product.IotProductFunctionTypeEnum;
+import cn.iocoder.yudao.module.iot.enums.thingmodel.IotProductThingModelTypeEnum;
 import cn.iocoder.yudao.module.iot.service.tdengine.IotThingModelMessageService;
-import cn.iocoder.yudao.module.iot.service.thinkmodelfunction.IotThinkModelFunctionService;
+import cn.iocoder.yudao.module.iot.service.productthingmodel.IotProductThingModelService;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
@@ -40,7 +40,7 @@ public class IotDeviceDataServiceImpl implements IotDeviceDataService {
     @Resource
     private IotThingModelMessageService thingModelMessageService;
     @Resource
-    private IotThinkModelFunctionService thinkModelFunctionService;
+    private IotProductThingModelService thinkModelFunctionService;
     @Resource
     private TdEngineDMLMapper tdEngineDMLMapper;
 
@@ -73,9 +73,9 @@ public class IotDeviceDataServiceImpl implements IotDeviceDataService {
         // 1. 获取设备信息
         IotDeviceDO device = deviceService.getDevice(deviceDataReqVO.getDeviceId());
         // 2. 获取设备属性最新数据
-        List<IotThinkModelFunctionDO> thinkModelFunctionList = thinkModelFunctionService.getThinkModelFunctionListByProductKey(device.getProductKey());
+        List<IotProductThingModelDO> thinkModelFunctionList = thinkModelFunctionService.getProductThingModelListByProductKey(device.getProductKey());
         thinkModelFunctionList = thinkModelFunctionList.stream()
-                .filter(function -> IotProductFunctionTypeEnum.PROPERTY.getType()
+                .filter(function -> IotProductThingModelTypeEnum.PROPERTY.getType()
                         .equals(function.getType())).toList();
 
         // 3. 过滤标识符和属性名称
@@ -90,6 +90,7 @@ public class IotDeviceDataServiceImpl implements IotDeviceDataService {
                     .toList();
         }
         // 4. 获取设备属性最新数据
+        // TODO @puhui999: 需要重构
         thinkModelFunctionList.forEach(function -> {
             IotDeviceDataDO deviceData = deviceDataRedisDAO.get(device.getProductKey(), device.getDeviceName(), function.getIdentifier());
             if (deviceData == null) {
@@ -100,7 +101,7 @@ public class IotDeviceDataServiceImpl implements IotDeviceDataService {
                 deviceData.setDeviceId(deviceDataReqVO.getDeviceId());
                 deviceData.setThinkModelFunctionId(function.getId());
                 deviceData.setName(function.getName());
-                deviceData.setDataType(function.getProperty().getDataType().getType());
+                //deviceData.setDataType(function.getProperty().getDataType().getDataType());
             }
             list.add(deviceData);
         });

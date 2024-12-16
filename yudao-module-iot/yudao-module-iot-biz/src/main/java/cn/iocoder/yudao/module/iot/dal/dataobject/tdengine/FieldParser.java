@@ -1,8 +1,8 @@
 package cn.iocoder.yudao.module.iot.dal.dataobject.tdengine;
 
-import cn.iocoder.yudao.module.iot.controller.admin.thinkmodelfunction.thingModel.ThingModelProperty;
-import cn.iocoder.yudao.module.iot.controller.admin.thinkmodelfunction.thingModel.ThingModelRespVO;
-import cn.iocoder.yudao.module.iot.controller.admin.thinkmodelfunction.thingModel.dataType.ThingModelDataType;
+import cn.iocoder.yudao.module.iot.controller.admin.productthingmodel.thingmodel.ThingModelProperty;
+import cn.iocoder.yudao.module.iot.controller.admin.productthingmodel.thingmodel.ThingModelRespVO;
+import cn.iocoder.yudao.module.iot.controller.admin.productthingmodel.thingmodel.dataType.ThingModelDataSpecs;
 
 import java.util.HashMap;
 import java.util.List;
@@ -36,17 +36,19 @@ public class FieldParser {
      */
     public static TdFieldDO parse(ThingModelProperty property) {
         String fieldName = property.getIdentifier().toLowerCase();
-        ThingModelDataType type = property.getDataType();
-
-        // 将物模型字段类型映射为td字段类型
-        String fType = TYPE_MAPPING.get(type.getType().toUpperCase());
-
-        // 如果字段类型为NCHAR，默认长度为64
-        int dataLength = 0;
-        if ("NCHAR".equals(fType)) {
-            dataLength = 64;
-        }
-        return new TdFieldDO(fieldName, fType, dataLength);
+        //// TODO @puhui999: 需要重构
+        //ThingModelDataSpecs type = property.getDataType();
+        //
+        //// 将物模型字段类型映射为td字段类型
+        //String fType = TYPE_MAPPING.get(type.getDataType().toUpperCase());
+        //
+        //// 如果字段类型为NCHAR，默认长度为64
+        //int dataLength = 0;
+        //if ("NCHAR".equals(fType)) {
+        //    dataLength = 64;
+        //}
+        //return new TdFieldDO(fieldName, fType, dataLength);
+        return null;
     }
 
     /**
