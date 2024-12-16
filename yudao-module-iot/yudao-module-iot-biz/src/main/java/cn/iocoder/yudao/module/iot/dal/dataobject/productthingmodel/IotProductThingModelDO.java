@@ -23,8 +23,8 @@ import lombok.NoArgsConstructor;
  *
  * @author 芋道源码
  */
-@TableName(value = "iot_think_model_function", autoResultMap = true)
-@KeySequence("iot_think_model_function_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
+@TableName(value = "iot_product_thing_model", autoResultMap = true)
+@KeySequence("iot_product_thing_model_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
 @Data
 @Builder
 @NoArgsConstructor

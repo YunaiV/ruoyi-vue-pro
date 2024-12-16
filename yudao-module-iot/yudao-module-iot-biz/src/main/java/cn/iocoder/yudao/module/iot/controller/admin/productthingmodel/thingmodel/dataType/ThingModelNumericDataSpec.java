@@ -1,6 +1,8 @@
 package cn.iocoder.yudao.module.iot.controller.admin.productthingmodel.thingmodel.dataType;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 /**
  * 物模型数据类型为数值的 DataSpec 定义
@@ -10,6 +12,8 @@ import lombok.Data;
  * @author HUIHUI
  */
 @Data
+@EqualsAndHashCode(callSuper = true)
+@JsonIgnoreProperties({"dataType"}) // 忽略子类中的 dataType 字段，从而避免重复。
 public class ThingModelNumericDataSpec extends ThingModelDataSpecs {
 
     /**

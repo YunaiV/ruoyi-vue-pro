@@ -22,7 +22,8 @@ import lombok.Data;
         @JsonSubTypes.Type(value = ThingModelDateOrTextDataSpecs.class, name = "date"),
         @JsonSubTypes.Type(value = ThingModelBoolOrEnumDataSpecs.class, name = "bool"),
         @JsonSubTypes.Type(value = ThingModelBoolOrEnumDataSpecs.class, name = "enum"),
-        @JsonSubTypes.Type(value = ThingModelArrayDataSpecs.class, name = "array")
+        @JsonSubTypes.Type(value = ThingModelArrayDataSpecs.class, name = "array"),
+        @JsonSubTypes.Type(value = ThingModelStructDataSpecs.class, name = "struct")
 })
 public abstract class ThingModelDataSpecs {
 

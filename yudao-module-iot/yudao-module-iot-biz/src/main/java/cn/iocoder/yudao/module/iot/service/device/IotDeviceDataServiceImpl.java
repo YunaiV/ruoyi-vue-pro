@@ -15,7 +15,7 @@ import cn.iocoder.yudao.module.iot.dal.tdengine.TdEngineDMLMapper;
 import cn.iocoder.yudao.module.iot.enums.IotConstants;
 import cn.iocoder.yudao.module.iot.enums.thingmodel.IotProductThingModelTypeEnum;
 import cn.iocoder.yudao.module.iot.service.tdengine.IotThingModelMessageService;
-import cn.iocoder.yudao.module.iot.service.thinkmodelfunction.IotThinkModelFunctionService;
+import cn.iocoder.yudao.module.iot.service.productthingmodel.IotProductThingModelService;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
@@ -40,7 +40,7 @@ public class IotDeviceDataServiceImpl implements IotDeviceDataService {
     @Resource
     private IotThingModelMessageService thingModelMessageService;
     @Resource
-    private IotThinkModelFunctionService thinkModelFunctionService;
+    private IotProductThingModelService thinkModelFunctionService;
     @Resource
     private TdEngineDMLMapper tdEngineDMLMapper;
 
@@ -73,7 +73,7 @@ public class IotDeviceDataServiceImpl implements IotDeviceDataService {
         // 1. 获取设备信息
         IotDeviceDO device = deviceService.getDevice(deviceDataReqVO.getDeviceId());
         // 2. 获取设备属性最新数据
-        List<IotProductThingModelDO> thinkModelFunctionList = thinkModelFunctionService.getThinkModelFunctionListByProductKey(device.getProductKey());
+        List<IotProductThingModelDO> thinkModelFunctionList = thinkModelFunctionService.getProductThingModelListByProductKey(device.getProductKey());
         thinkModelFunctionList = thinkModelFunctionList.stream()
                 .filter(function -> IotProductThingModelTypeEnum.PROPERTY.getType()
                         .equals(function.getType())).toList();

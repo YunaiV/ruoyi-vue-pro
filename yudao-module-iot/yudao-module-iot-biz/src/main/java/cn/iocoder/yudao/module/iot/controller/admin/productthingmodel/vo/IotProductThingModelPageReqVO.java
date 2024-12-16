@@ -13,7 +13,7 @@ import lombok.ToString;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public class IotThinkModelFunctionPageReqVO extends PageParam {
+public class IotProductThingModelPageReqVO extends PageParam {
 
     @Schema(description = "功能标识")
     private String identifier;

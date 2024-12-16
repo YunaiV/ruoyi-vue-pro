@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.iot.controller.admin.productthingmodel.thingmodel.dataType;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -12,6 +13,7 @@ import lombok.EqualsAndHashCode;
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
+@JsonIgnoreProperties({"dataType"}) // 忽略子类中的 dataType 字段，从而避免重复。
 public class ThingModelBoolOrEnumDataSpecs extends ThingModelDataSpecs {
 
     /**

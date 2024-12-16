@@ -12,7 +12,7 @@ import lombok.Data;
 
 @Schema(description = "管理后台 - IoT 产品物模型新增/修改 Request VO")
 @Data
-public class IotThinkModelFunctionSaveReqVO {
+public class IotProductThingModelSaveReqVO {
 
     @Schema(description = "编号", example = "1")
     private Long id;

@@ -19,7 +19,7 @@ import cn.iocoder.yudao.module.iot.enums.IotConstants;
 import cn.iocoder.yudao.module.iot.enums.device.IotDeviceStatusEnum;
 import cn.iocoder.yudao.module.iot.enums.thingmodel.IotProductThingModelTypeEnum;
 import cn.iocoder.yudao.module.iot.service.device.IotDeviceService;
-import cn.iocoder.yudao.module.iot.service.thinkmodelfunction.IotThinkModelFunctionService;
+import cn.iocoder.yudao.module.iot.service.productthingmodel.IotProductThingModelService;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -47,7 +47,7 @@ public class IotThingModelMessageServiceImpl implements IotThingModelMessageServ
     private String url;
 
     @Resource
-    private IotThinkModelFunctionService iotThinkModelFunctionService;
+    private IotProductThingModelService iotProductThingModelService;
     @Resource
     private IotDeviceService iotDeviceService;
     @Resource
@@ -91,8 +91,8 @@ public class IotThingModelMessageServiceImpl implements IotThingModelMessageServ
     }
 
     private List<IotProductThingModelDO> getValidFunctionList(String productKey) {
-        return iotThinkModelFunctionService
-                .getThinkModelFunctionListByProductKey(productKey)
+        return iotProductThingModelService
+                .getProductThingModelListByProductKey(productKey)
                 .stream()
                 .filter(function -> IotProductThingModelTypeEnum.PROPERTY.getType().equals(function.getType()))
                 .toList();

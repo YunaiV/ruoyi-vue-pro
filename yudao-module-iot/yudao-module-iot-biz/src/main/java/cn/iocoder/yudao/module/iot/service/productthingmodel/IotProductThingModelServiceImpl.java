@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.iot.service.thinkmodelfunction;
+package cn.iocoder.yudao.module.iot.service.productthingmodel;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
@@ -10,12 +10,12 @@ import cn.iocoder.yudao.module.iot.controller.admin.productthingmodel.thingmodel
 import cn.iocoder.yudao.module.iot.controller.admin.productthingmodel.thingmodel.dataType.ThingModelArgument;
 import cn.iocoder.yudao.module.iot.controller.admin.productthingmodel.thingmodel.dataType.ThingModelArrayDataSpecs;
 import cn.iocoder.yudao.module.iot.controller.admin.productthingmodel.thingmodel.dataType.ThingModelDateOrTextDataSpecs;
-import cn.iocoder.yudao.module.iot.controller.admin.productthingmodel.vo.IotThinkModelFunctionPageReqVO;
-import cn.iocoder.yudao.module.iot.controller.admin.productthingmodel.vo.IotThinkModelFunctionSaveReqVO;
-import cn.iocoder.yudao.module.iot.convert.thinkmodelfunction.IotThinkModelFunctionConvert;
+import cn.iocoder.yudao.module.iot.controller.admin.productthingmodel.vo.IotProductThingModelPageReqVO;
+import cn.iocoder.yudao.module.iot.controller.admin.productthingmodel.vo.IotProductThingModelSaveReqVO;
+import cn.iocoder.yudao.module.iot.convert.productthingmodel.IotProductThingModelConvert;
 import cn.iocoder.yudao.module.iot.dal.dataobject.product.IotProductDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.productthingmodel.IotProductThingModelDO;
-import cn.iocoder.yudao.module.iot.dal.mysql.thinkmodelfunction.IotThinkModelFunctionMapper;
+import cn.iocoder.yudao.module.iot.dal.mysql.thinkmodelfunction.IotProductThingModelMapper;
 import cn.iocoder.yudao.module.iot.enums.product.IotProductStatusEnum;
 import cn.iocoder.yudao.module.iot.enums.thingmodel.IotProductThingModelTypeEnum;
 import cn.iocoder.yudao.module.iot.service.product.IotProductService;
@@ -41,10 +41,10 @@ import static cn.iocoder.yudao.module.iot.enums.ErrorCodeConstants.*;
 @Service
 @Validated
 @Slf4j
-public class IotThinkModelFunctionServiceImpl implements IotThinkModelFunctionService {
+public class IotProductThingModelServiceImpl implements IotProductThingModelService {
 
     @Resource
-    private IotThinkModelFunctionMapper thinkModelFunctionMapper;
+    private IotProductThingModelMapper productThingModelMapper;
 
     @Resource
     private IotProductService productService;
@@ -53,7 +53,7 @@ public class IotThinkModelFunctionServiceImpl implements IotThinkModelFunctionSe
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Long createThinkModelFunction(IotThinkModelFunctionSaveReqVO createReqVO) {
+    public Long createProductThingModel(IotProductThingModelSaveReqVO createReqVO) {
         // 1. 校验功能标识符在同一产品下是否唯一
         validateIdentifierUnique(createReqVO.getProductId(), createReqVO.getIdentifier());
 
@@ -67,12 +67,12 @@ public class IotThinkModelFunctionServiceImpl implements IotThinkModelFunctionSe
         validateProductStatus(createReqVO.getProductId());
 
         // 5. 插入数据库
-        IotProductThingModelDO function = IotThinkModelFunctionConvert.INSTANCE.convert(createReqVO);
-        thinkModelFunctionMapper.insert(function);
+        IotProductThingModelDO function = IotProductThingModelConvert.INSTANCE.convert(createReqVO);
+        productThingModelMapper.insert(function);
 
         // 6. 如果创建的是属性，需要更新默认的事件和服务
         if (Objects.equals(createReqVO.getType(), IotProductThingModelTypeEnum.PROPERTY.getType())) {
-            createDefaultEventsAndServices(createReqVO.getProductId(), createReqVO.getProductKey());
+            //createDefaultEventsAndServices(createReqVO.getProductId(), createReqVO.getProductKey());
         }
         return function.getId();
     }
@@ -95,14 +95,14 @@ public class IotThinkModelFunctionServiceImpl implements IotThinkModelFunctionSe
     }
 
     private void validateNameUnique(Long productId, String name) {
-        IotProductThingModelDO function = thinkModelFunctionMapper.selectByProductIdAndName(productId, name);
+        IotProductThingModelDO function = productThingModelMapper.selectByProductIdAndName(productId, name);
         if (function != null) {
             throw exception(THINK_MODEL_FUNCTION_NAME_EXISTS);
         }
     }
 
     private void validateIdentifierUnique(Long productId, String identifier) {
-        IotProductThingModelDO function = thinkModelFunctionMapper.selectByProductIdAndIdentifier(productId, identifier);
+        IotProductThingModelDO function = productThingModelMapper.selectByProductIdAndIdentifier(productId, identifier);
         if (function != null) {
             throw exception(THINK_MODEL_FUNCTION_IDENTIFIER_EXISTS);
         }
@@ -110,9 +110,9 @@ public class IotThinkModelFunctionServiceImpl implements IotThinkModelFunctionSe
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void updateThinkModelFunction(IotThinkModelFunctionSaveReqVO updateReqVO) {
+    public void updateProductThingModel(IotProductThingModelSaveReqVO updateReqVO) {
         // 1. 校验功能是否存在
-        validateThinkModelFunctionExists(updateReqVO.getId());
+        validateproductThingModelMapperExists(updateReqVO.getId());
 
         // 2. 校验功能标识符是否唯一
         validateIdentifierUniqueForUpdate(updateReqVO.getId(), updateReqVO.getProductId(), updateReqVO.getIdentifier());
@@ -121,8 +121,8 @@ public class IotThinkModelFunctionServiceImpl implements IotThinkModelFunctionSe
         validateProductStatus(updateReqVO.getProductId());
 
         // 4. 更新数据库
-        IotProductThingModelDO thinkModelFunction = IotThinkModelFunctionConvert.INSTANCE.convert(updateReqVO);
-        thinkModelFunctionMapper.updateById(thinkModelFunction);
+        IotProductThingModelDO productThingModelDO = IotProductThingModelConvert.INSTANCE.convert(updateReqVO);
+        productThingModelMapper.updateById(productThingModelDO);
 
         // 5. 如果更新的是属性，需要更新默认的事件和服务
         if (Objects.equals(updateReqVO.getType(), IotProductThingModelTypeEnum.PROPERTY.getType())) {
@@ -131,7 +131,7 @@ public class IotThinkModelFunctionServiceImpl implements IotThinkModelFunctionSe
     }
 
     private void validateIdentifierUniqueForUpdate(Long id, Long productId, String identifier) {
-        IotProductThingModelDO function = thinkModelFunctionMapper.selectByProductIdAndIdentifier(productId, identifier);
+        IotProductThingModelDO function = productThingModelMapper.selectByProductIdAndIdentifier(productId, identifier);
         if (function != null && ObjectUtil.notEqual(function.getId(), id)) {
             throw exception(THINK_MODEL_FUNCTION_IDENTIFIER_EXISTS);
         }
@@ -139,9 +139,9 @@ public class IotThinkModelFunctionServiceImpl implements IotThinkModelFunctionSe
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void deleteThinkModelFunction(Long id) {
+    public void deleteProductThingModel(Long id) {
         // 1. 校验功能是否存在
-        IotProductThingModelDO functionDO = thinkModelFunctionMapper.selectById(id);
+        IotProductThingModelDO functionDO = productThingModelMapper.selectById(id);
         if (functionDO == null) {
             throw exception(THINK_MODEL_FUNCTION_NOT_EXISTS);
         }
@@ -150,7 +150,7 @@ public class IotThinkModelFunctionServiceImpl implements IotThinkModelFunctionSe
         validateProductStatus(functionDO.getProductId());
 
         // 2. 删除功能
-        thinkModelFunctionMapper.deleteById(id);
+        productThingModelMapper.deleteById(id);
 
         // 3. 如果删除的是属性，需要更新默认的事件和服务
         if (Objects.equals(functionDO.getType(), IotProductThingModelTypeEnum.PROPERTY.getType())) {
@@ -163,25 +163,25 @@ public class IotThinkModelFunctionServiceImpl implements IotThinkModelFunctionSe
      *
      * @param id 功能编号
      */
-    private void validateThinkModelFunctionExists(Long id) {
-        if (thinkModelFunctionMapper.selectById(id) == null) {
+    private void validateproductThingModelMapperExists(Long id) {
+        if (productThingModelMapper.selectById(id) == null) {
             throw exception(THINK_MODEL_FUNCTION_NOT_EXISTS);
         }
     }
 
     @Override
-    public IotProductThingModelDO getThinkModelFunction(Long id) {
-        return thinkModelFunctionMapper.selectById(id);
+    public IotProductThingModelDO getProductThingModel(Long id) {
+        return productThingModelMapper.selectById(id);
     }
 
     @Override
-    public List<IotProductThingModelDO> getThinkModelFunctionListByProductId(Long productId) {
-        return thinkModelFunctionMapper.selectListByProductId(productId);
+    public List<IotProductThingModelDO> getProductThingModelListByProductId(Long productId) {
+        return productThingModelMapper.selectListByProductId(productId);
     }
 
     @Override
-    public PageResult<IotProductThingModelDO> getThinkModelFunctionPage(IotThinkModelFunctionPageReqVO pageReqVO) {
-        return thinkModelFunctionMapper.selectPage(pageReqVO);
+    public PageResult<IotProductThingModelDO> getProductThingModelPage(IotProductThingModelPageReqVO pageReqVO) {
+        return productThingModelMapper.selectPage(pageReqVO);
     }
 
     @Override
@@ -190,23 +190,24 @@ public class IotThinkModelFunctionServiceImpl implements IotThinkModelFunctionSe
         IotProductDO product = productService.getProduct(productId);
 
         // 2. 查询产品的物模型功能列表
-        List<IotProductThingModelDO> functionList = thinkModelFunctionMapper.selectListByProductId(productId);
+        List<IotProductThingModelDO> functionList = productThingModelMapper.selectListByProductId(productId);
 
         // 3. 生成 TDengine 的数据模型
         dbStructureDataService.createSuperTableDataModel(product, functionList);
     }
 
     @Override
-    public List<IotProductThingModelDO> getThinkModelFunctionListByProductKey(String productKey) {
-        return thinkModelFunctionMapper.selectListByProductKey(productKey);
+    public List<IotProductThingModelDO> getProductThingModelListByProductKey(String productKey) {
+        return productThingModelMapper.selectListByProductKey(productKey);
     }
 
+    // TODO @puhui999: 需要重构
     /**
      * 创建默认的事件和服务
      */
     public void createDefaultEventsAndServices(Long productId, String productKey) {
         // 1. 获取当前属性列表
-        List<IotProductThingModelDO> propertyList = thinkModelFunctionMapper
+        List<IotProductThingModelDO> propertyList = productThingModelMapper
                 .selectListByProductIdAndType(productId, IotProductThingModelTypeEnum.PROPERTY.getType());
 
         // 2. 生成新的事件和服务列表
@@ -231,7 +232,7 @@ public class IotThinkModelFunctionServiceImpl implements IotThinkModelFunctionSe
         }
 
         // 3. 获取数据库中的默认的旧事件和服务列表
-        List<IotProductThingModelDO> oldFunctionList = thinkModelFunctionMapper.selectListByProductIdAndIdentifiersAndTypes(
+        List<IotProductThingModelDO> oldFunctionList = productThingModelMapper.selectListByProductIdAndIdentifiersAndTypes(
                 productId,
                 Arrays.asList("post", "set", "get"),
                 Arrays.asList(IotProductThingModelTypeEnum.EVENT.getType(), IotProductThingModelTypeEnum.SERVICE.getType())
@@ -249,7 +250,7 @@ public class IotThinkModelFunctionServiceImpl implements IotThinkModelFunctionSe
         // 3.2 批量执行数据库操作
         // 新增数据库中的新事件和服务列表
         if (CollUtil.isNotEmpty(createList)) {
-            thinkModelFunctionMapper.insertBatch(createList);
+            productThingModelMapper.insertBatch(createList);
         }
         // 更新数据库中的事件和服务列表
         if (CollUtil.isNotEmpty(updateList)) {
@@ -267,14 +268,14 @@ public class IotThinkModelFunctionServiceImpl implements IotThinkModelFunctionSe
                     .collect(Collectors.toList());
             // 执行批量更新
             if (CollUtil.isNotEmpty(validUpdateList)) {
-                thinkModelFunctionMapper.updateBatch(validUpdateList);
+                productThingModelMapper.updateBatch(validUpdateList);
             }
         }
 
         // 删除数据库中的旧事件和服务列表
         if (CollUtil.isNotEmpty(deleteList)) {
             Set<Long> idsToDelete = CollectionUtils.convertSet(deleteList, IotProductThingModelDO::getId);
-            thinkModelFunctionMapper.deleteByIds(idsToDelete);
+            productThingModelMapper.deleteByIds(idsToDelete);
         }
     }
 

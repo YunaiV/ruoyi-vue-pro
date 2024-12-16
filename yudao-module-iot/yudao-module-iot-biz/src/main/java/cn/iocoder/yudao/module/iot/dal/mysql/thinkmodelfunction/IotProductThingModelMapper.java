@@ -3,7 +3,7 @@ package cn.iocoder.yudao.module.iot.dal.mysql.thinkmodelfunction;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
-import cn.iocoder.yudao.module.iot.controller.admin.productthingmodel.vo.IotThinkModelFunctionPageReqVO;
+import cn.iocoder.yudao.module.iot.controller.admin.productthingmodel.vo.IotProductThingModelPageReqVO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.productthingmodel.IotProductThingModelDO;
 import org.apache.ibatis.annotations.Mapper;
 
@@ -15,9 +15,9 @@ import java.util.List;
  * @author 芋道源码
  */
 @Mapper
-public interface IotThinkModelFunctionMapper extends BaseMapperX<IotProductThingModelDO> {
+public interface IotProductThingModelMapper extends BaseMapperX<IotProductThingModelDO> {
 
-    default PageResult<IotProductThingModelDO> selectPage(IotThinkModelFunctionPageReqVO reqVO) {
+    default PageResult<IotProductThingModelDO> selectPage(IotProductThingModelPageReqVO reqVO) {
         return selectPage(reqVO, new LambdaQueryWrapperX<IotProductThingModelDO>()
                 .eqIfPresent(IotProductThingModelDO::getIdentifier, reqVO.getIdentifier())
                 .likeIfPresent(IotProductThingModelDO::getName, reqVO.getName())
