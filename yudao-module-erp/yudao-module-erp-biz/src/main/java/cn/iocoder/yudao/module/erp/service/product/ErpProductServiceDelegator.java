@@ -38,9 +38,9 @@ public class ErpProductServiceDelegator implements ErpProductService {
     }
 
     private ErpProductService getService(Long categoryId) {
-        Class<?> serviceClass = SERVICE_MAP.get(categoryId);
-        if (serviceClass == null){
-            serviceClass = ErpProductServiceImpl.class;
+        Class<?> serviceClass = ErpProductServiceImpl.class;
+        if (categoryId != null) {
+            serviceClass = SERVICE_MAP.get(categoryId);
         }
         Object serviceImpl = applicationContext.getBean(serviceClass);
         return (ErpProductService) serviceImpl;
