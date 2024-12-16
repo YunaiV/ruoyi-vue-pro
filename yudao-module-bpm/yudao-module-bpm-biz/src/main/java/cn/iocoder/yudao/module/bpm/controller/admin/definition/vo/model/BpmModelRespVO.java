@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model;
 
 import cn.iocoder.yudao.module.bpm.controller.admin.base.user.UserSimpleBaseVO;
+import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.simple.BpmSimpleModelNodeVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.process.BpmProcessDefinitionRespVO;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
@@ -35,11 +36,14 @@ public class BpmModelRespVO extends BpmModelMetaInfoVO {
     @Schema(description = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED)
     private LocalDateTime createTime;
 
-    @Schema(description = "BPMN XML", requiredMode = Schema.RequiredMode.REQUIRED)
-    private String bpmnXml;
-
     @Schema(description = "可发起的用户数组")
     private List<UserSimpleBaseVO> startUsers;
+
+    @Schema(description = "BPMN XML")
+    private String bpmnXml;
+
+    @Schema(description = "仿钉钉流程设计模型对象")
+    private BpmSimpleModelNodeVO simpleModel;
 
     /**
      * 最新部署的流程定义
