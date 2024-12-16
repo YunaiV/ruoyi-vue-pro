@@ -6,27 +6,21 @@ import cn.iocoder.yudao.module.erp.controller.admin.product.vo.product.ErpProduc
 import cn.iocoder.yudao.module.erp.controller.admin.product.vo.product.ErpProductSaveReqVO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.product.ErpProductDO;
 import cn.iocoder.yudao.module.erp.service.product.tvstand.ErpProductTvStandServiceImpl;
-import jakarta.annotation.Resource;
-import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import cn.iocoder.yudao.framework.common.util.spring.SpringUtils;
 
-import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
-import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 
 /**
  * ERP 产品 Service 实现类
  *
  * @author 芋道源码
  */
-
+@Primary
 @Service
 public class ErpProductServiceDelegator implements ErpProductService {
-
-    @Resource
-    ApplicationContext applicationContext;
 
     // 分类Id映射ProductService的实现类
     private static final Map<Long, Class<?>> SERVICE_MAP = Map.of(
@@ -40,9 +34,9 @@ public class ErpProductServiceDelegator implements ErpProductService {
     private ErpProductService getService(Long categoryId) {
         Class<?> serviceClass = ErpProductServiceImpl.class;
         if (categoryId != null) {
-            serviceClass = SERVICE_MAP.get(categoryId);
+            serviceClass = SERVICE_MAP.getOrDefault(categoryId,serviceClass);
         }
-        Object serviceImpl = applicationContext.getBean(serviceClass);
+        Object serviceImpl = SpringUtils.getBeanByExactType(serviceClass);
         return (ErpProductService) serviceImpl;
     }
 
