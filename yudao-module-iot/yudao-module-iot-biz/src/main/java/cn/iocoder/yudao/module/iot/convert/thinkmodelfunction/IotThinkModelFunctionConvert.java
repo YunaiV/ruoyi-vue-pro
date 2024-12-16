@@ -1,11 +1,11 @@
 package cn.iocoder.yudao.module.iot.convert.thinkmodelfunction;
 
-import cn.iocoder.yudao.module.iot.controller.admin.thinkmodelfunction.thingModel.ThingModelEvent;
-import cn.iocoder.yudao.module.iot.controller.admin.thinkmodelfunction.thingModel.ThingModelProperty;
-import cn.iocoder.yudao.module.iot.controller.admin.thinkmodelfunction.thingModel.ThingModelService;
-import cn.iocoder.yudao.module.iot.controller.admin.thinkmodelfunction.vo.IotThinkModelFunctionRespVO;
-import cn.iocoder.yudao.module.iot.controller.admin.thinkmodelfunction.vo.IotThinkModelFunctionSaveReqVO;
-import cn.iocoder.yudao.module.iot.dal.dataobject.thinkmodelfunction.IotThinkModelFunctionDO;
+import cn.iocoder.yudao.module.iot.controller.admin.productthingmodel.thingmodel.ThingModelEvent;
+import cn.iocoder.yudao.module.iot.controller.admin.productthingmodel.thingmodel.ThingModelProperty;
+import cn.iocoder.yudao.module.iot.controller.admin.productthingmodel.thingmodel.ThingModelService;
+import cn.iocoder.yudao.module.iot.controller.admin.productthingmodel.vo.IotThinkModelFunctionRespVO;
+import cn.iocoder.yudao.module.iot.controller.admin.productthingmodel.vo.IotThinkModelFunctionSaveReqVO;
+import cn.iocoder.yudao.module.iot.dal.dataobject.productthingmodel.IotProductThingModelDO;
 import cn.iocoder.yudao.module.iot.enums.thingmodel.IotProductThingModelTypeEnum;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -23,7 +23,7 @@ public interface IotThinkModelFunctionConvert {
     @Mapping(target = "property", expression = "java(convertToProperty(bean))")
     @Mapping(target = "event", expression = "java(convertToEvent(bean))")
     @Mapping(target = "service", expression = "java(convertToService(bean))")
-    IotThinkModelFunctionDO convert(IotThinkModelFunctionSaveReqVO bean);
+    IotProductThingModelDO convert(IotThinkModelFunctionSaveReqVO bean);
 
     default ThingModelProperty convertToProperty(IotThinkModelFunctionSaveReqVO bean) {
         if (Objects.equals(bean.getType(), IotProductThingModelTypeEnum.PROPERTY.getType())) {
@@ -50,8 +50,8 @@ public interface IotThinkModelFunctionConvert {
     @Mapping(target = "property", source = "property")
     @Mapping(target = "event", source = "event")
     @Mapping(target = "service", source = "service")
-    IotThinkModelFunctionRespVO convert(IotThinkModelFunctionDO bean);
+    IotThinkModelFunctionRespVO convert(IotProductThingModelDO bean);
 
     // 批量转换
-    List<IotThinkModelFunctionRespVO> convertList(List<IotThinkModelFunctionDO> list);
+    List<IotThinkModelFunctionRespVO> convertList(List<IotProductThingModelDO> list);
 }

@@ -1,6 +1,6 @@
-package cn.iocoder.yudao.module.iot.controller.admin.thinkmodelfunction.thingModel;
+package cn.iocoder.yudao.module.iot.controller.admin.productthingmodel.thingmodel;
 
-import cn.iocoder.yudao.module.iot.controller.admin.thinkmodelfunction.thingModel.dataType.ThingModelArgument;
+import cn.iocoder.yudao.module.iot.controller.admin.productthingmodel.thingmodel.dataType.ThingModelArgument;
 import lombok.Data;
 import java.util.List;
 

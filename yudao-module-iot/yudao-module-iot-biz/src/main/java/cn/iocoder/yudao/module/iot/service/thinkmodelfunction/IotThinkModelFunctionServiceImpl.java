@@ -4,23 +4,20 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
-import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
-import cn.iocoder.yudao.module.iot.controller.admin.thinkmodelfunction.thingModel.ThingModelEvent;
-import cn.iocoder.yudao.module.iot.controller.admin.thinkmodelfunction.thingModel.ThingModelProperty;
-import cn.iocoder.yudao.module.iot.controller.admin.thinkmodelfunction.thingModel.ThingModelService;
-import cn.iocoder.yudao.module.iot.controller.admin.thinkmodelfunction.thingModel.dataType.ThingModelArgument;
-import cn.iocoder.yudao.module.iot.controller.admin.thinkmodelfunction.thingModel.dataType.ThingModelArraySpecs;
-import cn.iocoder.yudao.module.iot.controller.admin.thinkmodelfunction.thingModel.dataType.ThingModelArrayType;
-import cn.iocoder.yudao.module.iot.controller.admin.thinkmodelfunction.thingModel.dataType.ThingModelTextType;
-import cn.iocoder.yudao.module.iot.controller.admin.thinkmodelfunction.vo.IotThinkModelFunctionPageReqVO;
-import cn.iocoder.yudao.module.iot.controller.admin.thinkmodelfunction.vo.IotThinkModelFunctionSaveReqVO;
+import cn.iocoder.yudao.module.iot.controller.admin.productthingmodel.thingmodel.ThingModelEvent;
+import cn.iocoder.yudao.module.iot.controller.admin.productthingmodel.thingmodel.ThingModelProperty;
+import cn.iocoder.yudao.module.iot.controller.admin.productthingmodel.thingmodel.ThingModelService;
+import cn.iocoder.yudao.module.iot.controller.admin.productthingmodel.thingmodel.dataType.ThingModelArgument;
+import cn.iocoder.yudao.module.iot.controller.admin.productthingmodel.thingmodel.dataType.ThingModelArrayDataSpecs;
+import cn.iocoder.yudao.module.iot.controller.admin.productthingmodel.thingmodel.dataType.ThingModelDateOrTextDataSpecs;
+import cn.iocoder.yudao.module.iot.controller.admin.productthingmodel.vo.IotThinkModelFunctionPageReqVO;
+import cn.iocoder.yudao.module.iot.controller.admin.productthingmodel.vo.IotThinkModelFunctionSaveReqVO;
 import cn.iocoder.yudao.module.iot.convert.thinkmodelfunction.IotThinkModelFunctionConvert;
 import cn.iocoder.yudao.module.iot.dal.dataobject.product.IotProductDO;
-import cn.iocoder.yudao.module.iot.dal.dataobject.thinkmodelfunction.IotThinkModelFunctionDO;
+import cn.iocoder.yudao.module.iot.dal.dataobject.productthingmodel.IotProductThingModelDO;
 import cn.iocoder.yudao.module.iot.dal.mysql.thinkmodelfunction.IotThinkModelFunctionMapper;
-import cn.iocoder.yudao.module.iot.enums.thingmodel.IotProductThingModelAccessModeEnum;
-import cn.iocoder.yudao.module.iot.enums.thingmodel.IotProductThingModelTypeEnum;
 import cn.iocoder.yudao.module.iot.enums.product.IotProductStatusEnum;
+import cn.iocoder.yudao.module.iot.enums.thingmodel.IotProductThingModelTypeEnum;
 import cn.iocoder.yudao.module.iot.service.product.IotProductService;
 import cn.iocoder.yudao.module.iot.service.tdengine.IotSuperTableService;
 import jakarta.annotation.Resource;
@@ -70,7 +67,7 @@ public class IotThinkModelFunctionServiceImpl implements IotThinkModelFunctionSe
         validateProductStatus(createReqVO.getProductId());
 
         // 5. 插入数据库
-        IotThinkModelFunctionDO function = IotThinkModelFunctionConvert.INSTANCE.convert(createReqVO);
+        IotProductThingModelDO function = IotThinkModelFunctionConvert.INSTANCE.convert(createReqVO);
         thinkModelFunctionMapper.insert(function);
 
         // 6. 如果创建的是属性，需要更新默认的事件和服务
@@ -98,14 +95,14 @@ public class IotThinkModelFunctionServiceImpl implements IotThinkModelFunctionSe
     }
 
     private void validateNameUnique(Long productId, String name) {
-        IotThinkModelFunctionDO function = thinkModelFunctionMapper.selectByProductIdAndName(productId, name);
+        IotProductThingModelDO function = thinkModelFunctionMapper.selectByProductIdAndName(productId, name);
         if (function != null) {
             throw exception(THINK_MODEL_FUNCTION_NAME_EXISTS);
         }
     }
 
     private void validateIdentifierUnique(Long productId, String identifier) {
-        IotThinkModelFunctionDO function = thinkModelFunctionMapper.selectByProductIdAndIdentifier(productId, identifier);
+        IotProductThingModelDO function = thinkModelFunctionMapper.selectByProductIdAndIdentifier(productId, identifier);
         if (function != null) {
             throw exception(THINK_MODEL_FUNCTION_IDENTIFIER_EXISTS);
         }
@@ -124,7 +121,7 @@ public class IotThinkModelFunctionServiceImpl implements IotThinkModelFunctionSe
         validateProductStatus(updateReqVO.getProductId());
 
         // 4. 更新数据库
-        IotThinkModelFunctionDO thinkModelFunction = IotThinkModelFunctionConvert.INSTANCE.convert(updateReqVO);
+        IotProductThingModelDO thinkModelFunction = IotThinkModelFunctionConvert.INSTANCE.convert(updateReqVO);
         thinkModelFunctionMapper.updateById(thinkModelFunction);
 
         // 5. 如果更新的是属性，需要更新默认的事件和服务
@@ -134,7 +131,7 @@ public class IotThinkModelFunctionServiceImpl implements IotThinkModelFunctionSe
     }
 
     private void validateIdentifierUniqueForUpdate(Long id, Long productId, String identifier) {
-        IotThinkModelFunctionDO function = thinkModelFunctionMapper.selectByProductIdAndIdentifier(productId, identifier);
+        IotProductThingModelDO function = thinkModelFunctionMapper.selectByProductIdAndIdentifier(productId, identifier);
         if (function != null && ObjectUtil.notEqual(function.getId(), id)) {
             throw exception(THINK_MODEL_FUNCTION_IDENTIFIER_EXISTS);
         }
@@ -144,7 +141,7 @@ public class IotThinkModelFunctionServiceImpl implements IotThinkModelFunctionSe
     @Transactional(rollbackFor = Exception.class)
     public void deleteThinkModelFunction(Long id) {
         // 1. 校验功能是否存在
-        IotThinkModelFunctionDO functionDO = thinkModelFunctionMapper.selectById(id);
+        IotProductThingModelDO functionDO = thinkModelFunctionMapper.selectById(id);
         if (functionDO == null) {
             throw exception(THINK_MODEL_FUNCTION_NOT_EXISTS);
         }
@@ -173,17 +170,17 @@ public class IotThinkModelFunctionServiceImpl implements IotThinkModelFunctionSe
     }
 
     @Override
-    public IotThinkModelFunctionDO getThinkModelFunction(Long id) {
+    public IotProductThingModelDO getThinkModelFunction(Long id) {
         return thinkModelFunctionMapper.selectById(id);
     }
 
     @Override
-    public List<IotThinkModelFunctionDO> getThinkModelFunctionListByProductId(Long productId) {
+    public List<IotProductThingModelDO> getThinkModelFunctionListByProductId(Long productId) {
         return thinkModelFunctionMapper.selectListByProductId(productId);
     }
 
     @Override
-    public PageResult<IotThinkModelFunctionDO> getThinkModelFunctionPage(IotThinkModelFunctionPageReqVO pageReqVO) {
+    public PageResult<IotProductThingModelDO> getThinkModelFunctionPage(IotThinkModelFunctionPageReqVO pageReqVO) {
         return thinkModelFunctionMapper.selectPage(pageReqVO);
     }
 
@@ -193,14 +190,14 @@ public class IotThinkModelFunctionServiceImpl implements IotThinkModelFunctionSe
         IotProductDO product = productService.getProduct(productId);
 
         // 2. 查询产品的物模型功能列表
-        List<IotThinkModelFunctionDO> functionList = thinkModelFunctionMapper.selectListByProductId(productId);
+        List<IotProductThingModelDO> functionList = thinkModelFunctionMapper.selectListByProductId(productId);
 
         // 3. 生成 TDengine 的数据模型
         dbStructureDataService.createSuperTableDataModel(product, functionList);
     }
 
     @Override
-    public List<IotThinkModelFunctionDO> getThinkModelFunctionListByProductKey(String productKey) {
+    public List<IotProductThingModelDO> getThinkModelFunctionListByProductKey(String productKey) {
         return thinkModelFunctionMapper.selectListByProductKey(productKey);
     }
 
@@ -209,45 +206,45 @@ public class IotThinkModelFunctionServiceImpl implements IotThinkModelFunctionSe
      */
     public void createDefaultEventsAndServices(Long productId, String productKey) {
         // 1. 获取当前属性列表
-        List<IotThinkModelFunctionDO> propertyList = thinkModelFunctionMapper
+        List<IotProductThingModelDO> propertyList = thinkModelFunctionMapper
                 .selectListByProductIdAndType(productId, IotProductThingModelTypeEnum.PROPERTY.getType());
 
         // 2. 生成新的事件和服务列表
-        List<IotThinkModelFunctionDO> newFunctionList = new ArrayList<>();
+        List<IotProductThingModelDO> newFunctionList = new ArrayList<>();
         // 生成属性上报事件
         ThingModelEvent propertyPostEvent = generatePropertyPostEvent(propertyList);
         if (propertyPostEvent != null) {
-            IotThinkModelFunctionDO eventFunction = buildEventFunctionDO(productId, productKey, propertyPostEvent);
+            IotProductThingModelDO eventFunction = buildEventFunctionDO(productId, productKey, propertyPostEvent);
             newFunctionList.add(eventFunction);
         }
         // 生成属性设置服务
         ThingModelService propertySetService = generatePropertySetService(propertyList);
         if (propertySetService != null) {
-            IotThinkModelFunctionDO setServiceFunction = buildServiceFunctionDO(productId, productKey, propertySetService);
+            IotProductThingModelDO setServiceFunction = buildServiceFunctionDO(productId, productKey, propertySetService);
             newFunctionList.add(setServiceFunction);
         }
         // 生成属性获取服务
         ThingModelService propertyGetService = generatePropertyGetService(propertyList);
         if (propertyGetService != null) {
-            IotThinkModelFunctionDO getServiceFunction = buildServiceFunctionDO(productId, productKey, propertyGetService);
+            IotProductThingModelDO getServiceFunction = buildServiceFunctionDO(productId, productKey, propertyGetService);
             newFunctionList.add(getServiceFunction);
         }
 
         // 3. 获取数据库中的默认的旧事件和服务列表
-        List<IotThinkModelFunctionDO> oldFunctionList = thinkModelFunctionMapper.selectListByProductIdAndIdentifiersAndTypes(
+        List<IotProductThingModelDO> oldFunctionList = thinkModelFunctionMapper.selectListByProductIdAndIdentifiersAndTypes(
                 productId,
                 Arrays.asList("post", "set", "get"),
                 Arrays.asList(IotProductThingModelTypeEnum.EVENT.getType(), IotProductThingModelTypeEnum.SERVICE.getType())
         );
 
         // 3.1 使用 diffList 方法比较新旧列表
-        List<List<IotThinkModelFunctionDO>> diffResult = diffList(oldFunctionList, newFunctionList,
+        List<List<IotProductThingModelDO>> diffResult = diffList(oldFunctionList, newFunctionList,
                 // 继续使用 identifier 和 type 进行比较：这样可以准确地匹配对应的功能对象。
                 (oldFunc, newFunc) -> Objects.equals(oldFunc.getIdentifier(), newFunc.getIdentifier())
                         && Objects.equals(oldFunc.getType(), newFunc.getType()));
-        List<IotThinkModelFunctionDO> createList = diffResult.get(0); // 需要新增的
-        List<IotThinkModelFunctionDO> updateList = diffResult.get(1); // 需要更新的
-        List<IotThinkModelFunctionDO> deleteList = diffResult.get(2); // 需要删除的
+        List<IotProductThingModelDO> createList = diffResult.get(0); // 需要新增的
+        List<IotProductThingModelDO> updateList = diffResult.get(1); // 需要更新的
+        List<IotProductThingModelDO> deleteList = diffResult.get(2); // 需要删除的
 
         // 3.2 批量执行数据库操作
         // 新增数据库中的新事件和服务列表
@@ -258,14 +255,14 @@ public class IotThinkModelFunctionServiceImpl implements IotThinkModelFunctionSe
         if (CollUtil.isNotEmpty(updateList)) {
             // 首先，为每个需要更新的对象设置其对应的 ID
             updateList.forEach(updateFunc -> {
-                IotThinkModelFunctionDO oldFunc = findFunctionByIdentifierAndType(
+                IotProductThingModelDO oldFunc = findFunctionByIdentifierAndType(
                         oldFunctionList, updateFunc.getIdentifier(), updateFunc.getType());
                 if (oldFunc != null) {
                     updateFunc.setId(oldFunc.getId());
                 }
             });
             // 过滤掉没有设置 ID 的对象
-            List<IotThinkModelFunctionDO> validUpdateList = updateList.stream()
+            List<IotProductThingModelDO> validUpdateList = updateList.stream()
                     .filter(func -> func.getId() != null)
                     .collect(Collectors.toList());
             // 执行批量更新
@@ -276,7 +273,7 @@ public class IotThinkModelFunctionServiceImpl implements IotThinkModelFunctionSe
 
         // 删除数据库中的旧事件和服务列表
         if (CollUtil.isNotEmpty(deleteList)) {
-            Set<Long> idsToDelete = CollectionUtils.convertSet(deleteList, IotThinkModelFunctionDO::getId);
+            Set<Long> idsToDelete = CollectionUtils.convertSet(deleteList, IotProductThingModelDO::getId);
             thinkModelFunctionMapper.deleteByIds(idsToDelete);
         }
     }
@@ -284,8 +281,8 @@ public class IotThinkModelFunctionServiceImpl implements IotThinkModelFunctionSe
     /**
      * 根据标识符和类型查找功能对象
      */
-    private IotThinkModelFunctionDO findFunctionByIdentifierAndType(List<IotThinkModelFunctionDO> functionList,
-                                                                    String identifier, Integer type) {
+    private IotProductThingModelDO findFunctionByIdentifierAndType(List<IotProductThingModelDO> functionList,
+                                                                   String identifier, Integer type) {
         return CollUtil.findOne(functionList, func ->
                 Objects.equals(func.getIdentifier(), identifier) && Objects.equals(func.getType(), type));
     }
@@ -293,8 +290,8 @@ public class IotThinkModelFunctionServiceImpl implements IotThinkModelFunctionSe
     /**
      * 构建事件功能对象
      */
-    private IotThinkModelFunctionDO buildEventFunctionDO(Long productId, String productKey, ThingModelEvent event) {
-        return new IotThinkModelFunctionDO()
+    private IotProductThingModelDO buildEventFunctionDO(Long productId, String productKey, ThingModelEvent event) {
+        return new IotProductThingModelDO()
                 .setProductId(productId)
                 .setProductKey(productKey)
                 .setIdentifier(event.getIdentifier())
@@ -307,8 +304,8 @@ public class IotThinkModelFunctionServiceImpl implements IotThinkModelFunctionSe
     /**
      * 构建服务功能对象
      */
-    private IotThinkModelFunctionDO buildServiceFunctionDO(Long productId, String productKey, ThingModelService service) {
-        return new IotThinkModelFunctionDO()
+    private IotProductThingModelDO buildServiceFunctionDO(Long productId, String productKey, ThingModelService service) {
+        return new IotProductThingModelDO()
                 .setProductId(productId)
                 .setProductKey(productKey)
                 .setIdentifier(service.getIdentifier())
@@ -321,7 +318,7 @@ public class IotThinkModelFunctionServiceImpl implements IotThinkModelFunctionSe
     /**
      * 生成属性上报事件
      */
-    private ThingModelEvent generatePropertyPostEvent(List<IotThinkModelFunctionDO> propertyList) {
+    private ThingModelEvent generatePropertyPostEvent(List<IotProductThingModelDO> propertyList) {
         if (CollUtil.isEmpty(propertyList)) {
             return null;
         }
@@ -335,12 +332,13 @@ public class IotThinkModelFunctionServiceImpl implements IotThinkModelFunctionSe
 
         // 将属性列表转换为事件的输出参数
         List<ThingModelArgument> outputData = new ArrayList<>();
-        for (IotThinkModelFunctionDO functionDO : propertyList) {
+        // TODO @puhui999: 需要重构
+        for (IotProductThingModelDO functionDO : propertyList) {
             ThingModelProperty property = functionDO.getProperty();
             ThingModelArgument arg = new ThingModelArgument()
                     .setIdentifier(property.getIdentifier())
                     .setName(property.getName())
-                    .setDataType(property.getDataType())
+                    //.setDataType(property.getDataType())
                     .setDescription(property.getDescription())
                     .setDirection("output"); // 设置为输出参数
             outputData.add(arg);
@@ -352,24 +350,24 @@ public class IotThinkModelFunctionServiceImpl implements IotThinkModelFunctionSe
     /**
      * 生成属性设置服务
      */
-    private ThingModelService generatePropertySetService(List<IotThinkModelFunctionDO> propertyList) {
+    private ThingModelService generatePropertySetService(List<IotProductThingModelDO> propertyList) {
         if (propertyList == null || propertyList.isEmpty()) {
             return null;
         }
 
         List<ThingModelArgument> inputData = new ArrayList<>();
         // TODO @puhui999: 需要重构
-        for (IotThinkModelFunctionDO functionDO : propertyList) {
+        for (IotProductThingModelDO functionDO : propertyList) {
             ThingModelProperty property = functionDO.getProperty();
-            if (IotProductThingModelAccessModeEnum.WRITE.getMode().equals(property.getAccessMode()) || IotProductThingModelAccessModeEnum.READ_WRITE.getMode().equals(property.getAccessMode())) {
-                ThingModelArgument arg = new ThingModelArgument()
-                        .setIdentifier(property.getIdentifier())
-                        .setName(property.getName())
-                        .setDataType(property.getDataType())
-                        .setDescription(property.getDescription())
-                        .setDirection("input"); // 设置为输入参数
-                inputData.add(arg);
-            }
+            //if (IotProductThingModelAccessModeEnum.WRITE.getMode().equals(property.getAccessMode()) || IotProductThingModelAccessModeEnum.READ_WRITE.getMode().equals(property.getAccessMode())) {
+            //    ThingModelArgument arg = new ThingModelArgument()
+            //            .setIdentifier(property.getIdentifier())
+            //            .setName(property.getName())
+            //            .setDataType(property.getDataType())
+            //            .setDescription(property.getDescription())
+            //            .setDirection("input"); // 设置为输入参数
+            //    inputData.add(arg);
+            //}
         }
         if (inputData.isEmpty()) {
             // 如果没有可写属性，不生成属性设置服务
@@ -391,24 +389,24 @@ public class IotThinkModelFunctionServiceImpl implements IotThinkModelFunctionSe
     /**
      * 生成属性获取服务
      */
-    private ThingModelService generatePropertyGetService(List<IotThinkModelFunctionDO> propertyList) {
+    private ThingModelService generatePropertyGetService(List<IotProductThingModelDO> propertyList) {
         if (propertyList == null || propertyList.isEmpty()) {
             return null;
         }
-
+        // TODO @puhui999: 需要重构
         List<ThingModelArgument> outputData = new ArrayList<>();
-        for (IotThinkModelFunctionDO functionDO : propertyList) {
+        for (IotProductThingModelDO functionDO : propertyList) {
             ThingModelProperty property = functionDO.getProperty();
-            if (ObjectUtils.equalsAny(property.getAccessMode(),
-                    IotProductThingModelAccessModeEnum.READ.getMode(), IotProductThingModelAccessModeEnum.READ_WRITE.getMode())) {
-                ThingModelArgument arg = new ThingModelArgument()
-                        .setIdentifier(property.getIdentifier())
-                        .setName(property.getName())
-                        .setDataType(property.getDataType())
-                        .setDescription(property.getDescription())
-                        .setDirection("output"); // 设置为输出参数
-                outputData.add(arg);
-            }
+            //if (ObjectUtils.equalsAny(property.getAccessMode(),
+            //        IotProductThingModelAccessModeEnum.READ.getMode(), IotProductThingModelAccessModeEnum.READ_WRITE.getMode())) {
+            //    ThingModelArgument arg = new ThingModelArgument()
+            //            .setIdentifier(property.getIdentifier())
+            //            .setName(property.getName())
+            //            .setDataType(property.getDataType())
+            //            .setDescription(property.getDescription())
+            //            .setDirection("output"); // 设置为输出参数
+            //    outputData.add(arg);
+            //}
         }
         if (outputData.isEmpty()) {
             // 如果没有可读属性，不生成属性获取服务
@@ -430,13 +428,13 @@ public class IotThinkModelFunctionServiceImpl implements IotThinkModelFunctionSe
                 .setDirection("input"); // 设置为输入参数
 
         // 创建数组类型，元素类型为文本类型（字符串）
-        ThingModelArrayType arrayType = new ThingModelArrayType();
+        ThingModelArrayDataSpecs arrayType = new ThingModelArrayDataSpecs();
         arrayType.setDataType("array");
-        ThingModelArraySpecs arraySpecs = new ThingModelArraySpecs();
-        ThingModelTextType textType = new ThingModelTextType();
+        //ThingModelArraySpecs arraySpecs = new ThingModelArraySpecs();
+        ThingModelDateOrTextDataSpecs textType = new ThingModelDateOrTextDataSpecs();
         textType.setDataType("text");
-        arraySpecs.setItem(textType);
-        arrayType.setSpecs(arraySpecs);
+        //arraySpecs.setItem(textType);
+        //arrayType.setSpecs(arraySpecs);
         inputArg.setDataType(arrayType);
 
         service.setInputData(Collections.singletonList(inputArg));

@@ -1,9 +1,9 @@
 package cn.iocoder.yudao.module.iot.service.thinkmodelfunction;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.iot.controller.admin.thinkmodelfunction.vo.IotThinkModelFunctionPageReqVO;
-import cn.iocoder.yudao.module.iot.controller.admin.thinkmodelfunction.vo.IotThinkModelFunctionSaveReqVO;
-import cn.iocoder.yudao.module.iot.dal.dataobject.thinkmodelfunction.IotThinkModelFunctionDO;
+import cn.iocoder.yudao.module.iot.controller.admin.productthingmodel.vo.IotThinkModelFunctionPageReqVO;
+import cn.iocoder.yudao.module.iot.controller.admin.productthingmodel.vo.IotThinkModelFunctionSaveReqVO;
+import cn.iocoder.yudao.module.iot.dal.dataobject.productthingmodel.IotProductThingModelDO;
 import jakarta.validation.Valid;
 
 import java.util.List;
@@ -44,7 +44,7 @@ public interface IotThinkModelFunctionService {
      * @param id 编号
      * @return 产品物模型
      */
-    IotThinkModelFunctionDO getThinkModelFunction(Long id);
+    IotProductThingModelDO getThinkModelFunction(Long id);
 
     /**
      * 获得产品物模型列表
@@ -52,7 +52,7 @@ public interface IotThinkModelFunctionService {
      * @param productId 产品编号
      * @return 产品物模型列表
      */
-    List<IotThinkModelFunctionDO> getThinkModelFunctionListByProductId(Long productId);
+    List<IotProductThingModelDO> getThinkModelFunctionListByProductId(Long productId);
 
     /**
      * 获得产品物模型分页
@@ -60,7 +60,7 @@ public interface IotThinkModelFunctionService {
      * @param pageReqVO 分页查询
      * @return 产品物模型分页
      */
-    PageResult<IotThinkModelFunctionDO> getThinkModelFunctionPage(IotThinkModelFunctionPageReqVO pageReqVO);
+    PageResult<IotProductThingModelDO> getThinkModelFunctionPage(IotThinkModelFunctionPageReqVO pageReqVO);
 
     /**
      * 创建超级表数据模型
@@ -75,5 +75,5 @@ public interface IotThinkModelFunctionService {
      * @param productKey 产品 Key
      * @return 产品物模型列表
      */
-    List<IotThinkModelFunctionDO> getThinkModelFunctionListByProductKey(String productKey);
+    List<IotProductThingModelDO> getThinkModelFunctionListByProductKey(String productKey);
 }

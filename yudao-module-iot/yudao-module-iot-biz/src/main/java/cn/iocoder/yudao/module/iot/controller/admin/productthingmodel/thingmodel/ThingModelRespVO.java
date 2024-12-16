@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.iot.controller.admin.thinkmodelfunction.thingModel;
+package cn.iocoder.yudao.module.iot.controller.admin.productthingmodel.thingmodel;
 
 import lombok.*;
 

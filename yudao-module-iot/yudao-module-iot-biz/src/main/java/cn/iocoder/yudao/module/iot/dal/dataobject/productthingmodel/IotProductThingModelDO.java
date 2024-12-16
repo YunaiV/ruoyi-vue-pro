@@ -1,9 +1,9 @@
-package cn.iocoder.yudao.module.iot.dal.dataobject.thinkmodelfunction;
+package cn.iocoder.yudao.module.iot.dal.dataobject.productthingmodel;
 
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
-import cn.iocoder.yudao.module.iot.controller.admin.thinkmodelfunction.thingModel.ThingModelEvent;
-import cn.iocoder.yudao.module.iot.controller.admin.thinkmodelfunction.thingModel.ThingModelProperty;
-import cn.iocoder.yudao.module.iot.controller.admin.thinkmodelfunction.thingModel.ThingModelService;
+import cn.iocoder.yudao.module.iot.controller.admin.productthingmodel.thingmodel.ThingModelEvent;
+import cn.iocoder.yudao.module.iot.controller.admin.productthingmodel.thingmodel.ThingModelProperty;
+import cn.iocoder.yudao.module.iot.controller.admin.productthingmodel.thingmodel.ThingModelService;
 import cn.iocoder.yudao.module.iot.dal.dataobject.product.IotProductDO;
 import cn.iocoder.yudao.module.iot.enums.thingmodel.IotProductThingModelTypeEnum;
 import com.baomidou.mybatisplus.annotation.KeySequence;
@@ -19,7 +19,7 @@ import lombok.NoArgsConstructor;
 /**
  * IoT 产品物模型功能 DO
  * <p>
- * 每个 {@link IotProductDO} 和 {@link IotThinkModelFunctionDO} 是“一对多”的关系，它的每个属性、事件、服务都对应一条记录
+ * 每个 {@link IotProductDO} 和 {@link IotProductThingModelDO} 是“一对多”的关系，它的每个属性、事件、服务都对应一条记录
  *
  * @author 芋道源码
  */
@@ -29,7 +29,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class IotThinkModelFunctionDO extends BaseDO {
+public class IotProductThingModelDO extends BaseDO {
 
     /**
      * 物模型功能编号

@@ -1,13 +1,13 @@
-package cn.iocoder.yudao.module.iot.controller.admin.thinkmodelfunction;
+package cn.iocoder.yudao.module.iot.controller.admin.productthingmodel;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
-import cn.iocoder.yudao.module.iot.controller.admin.thinkmodelfunction.vo.IotThinkModelFunctionPageReqVO;
-import cn.iocoder.yudao.module.iot.controller.admin.thinkmodelfunction.vo.IotThinkModelFunctionRespVO;
-import cn.iocoder.yudao.module.iot.controller.admin.thinkmodelfunction.vo.IotThinkModelFunctionSaveReqVO;
+import cn.iocoder.yudao.module.iot.controller.admin.productthingmodel.vo.IotThinkModelFunctionPageReqVO;
+import cn.iocoder.yudao.module.iot.controller.admin.productthingmodel.vo.IotThinkModelFunctionRespVO;
+import cn.iocoder.yudao.module.iot.controller.admin.productthingmodel.vo.IotThinkModelFunctionSaveReqVO;
 import cn.iocoder.yudao.module.iot.convert.thinkmodelfunction.IotThinkModelFunctionConvert;
-import cn.iocoder.yudao.module.iot.dal.dataobject.thinkmodelfunction.IotThinkModelFunctionDO;
+import cn.iocoder.yudao.module.iot.dal.dataobject.productthingmodel.IotProductThingModelDO;
 import cn.iocoder.yudao.module.iot.service.thinkmodelfunction.IotThinkModelFunctionService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -26,7 +26,7 @@ import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 @RestController
 @RequestMapping("/iot/think-model-function")
 @Validated
-public class IotThinkModelFunctionController {
+public class IotProductThingModelController {
 
     @Resource
     private IotThinkModelFunctionService thinkModelFunctionService;
@@ -60,7 +60,7 @@ public class IotThinkModelFunctionController {
     @Parameter(name = "id", description = "编号", required = true)
     @PreAuthorize("@ss.hasPermission('iot:think-model-function:query')")
     public CommonResult<IotThinkModelFunctionRespVO> getThinkModelFunction(@RequestParam("id") Long id) {
-        IotThinkModelFunctionDO function = thinkModelFunctionService.getThinkModelFunction(id);
+        IotProductThingModelDO function = thinkModelFunctionService.getThinkModelFunction(id);
         return success(IotThinkModelFunctionConvert.INSTANCE.convert(function));
     }
 
@@ -69,7 +69,7 @@ public class IotThinkModelFunctionController {
     @Parameter(name = "productId", description = "产品ID", required = true, example = "1024")
     @PreAuthorize("@ss.hasPermission('iot:think-model-function:query')")
     public CommonResult<List<IotThinkModelFunctionRespVO>> getThinkModelFunctionListByProductId(@RequestParam("productId") Long productId) {
-        List<IotThinkModelFunctionDO> list = thinkModelFunctionService.getThinkModelFunctionListByProductId(productId);
+        List<IotProductThingModelDO> list = thinkModelFunctionService.getThinkModelFunctionListByProductId(productId);
         return success(IotThinkModelFunctionConvert.INSTANCE.convertList(list));
     }
 
@@ -77,7 +77,7 @@ public class IotThinkModelFunctionController {
     @Operation(summary = "获得产品物模型分页")
     @PreAuthorize("@ss.hasPermission('iot:think-model-function:query')")
     public CommonResult<PageResult<IotThinkModelFunctionRespVO>> getThinkModelFunctionPage(@Valid IotThinkModelFunctionPageReqVO pageReqVO) {
-        PageResult<IotThinkModelFunctionDO> pageResult = thinkModelFunctionService.getThinkModelFunctionPage(pageReqVO);
+        PageResult<IotProductThingModelDO> pageResult = thinkModelFunctionService.getThinkModelFunctionPage(pageReqVO);
         return success(BeanUtils.toBean(pageResult, IotThinkModelFunctionRespVO.class));
     }
 
