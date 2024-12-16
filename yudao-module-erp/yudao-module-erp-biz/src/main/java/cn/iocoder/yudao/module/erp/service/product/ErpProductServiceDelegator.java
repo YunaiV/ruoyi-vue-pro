@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.erp.service.product;
 
+import cn.hutool.core.lang.Pair;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.erp.controller.admin.product.vo.product.ErpProductPageReqVO;
 import cn.iocoder.yudao.module.erp.controller.admin.product.vo.product.ErpProductRespVO;
@@ -8,6 +9,7 @@ import cn.iocoder.yudao.module.erp.dal.dataobject.product.ErpProductDO;
 import cn.iocoder.yudao.module.erp.service.product.tvstand.ErpProductTvStandServiceImpl;
 import jakarta.annotation.Resource;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -21,7 +23,7 @@ import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.
  *
  * @author 芋道源码
  */
-
+@Primary
 @Service
 public class ErpProductServiceDelegator implements ErpProductService {
 
@@ -29,20 +31,24 @@ public class ErpProductServiceDelegator implements ErpProductService {
     ApplicationContext applicationContext;
 
     // 分类Id映射ProductService的实现类
-    private static final Map<Long, Class<?>> SERVICE_MAP = Map.of(
-        87L, ErpProductTvStandServiceImpl.class
+    private static final Map<Long, Pair<String, Class<?>>> SERVICE_MAP = Map.of(
+        87L, new Pair<>("erpProductTvStandServiceImpl", ErpProductTvStandServiceImpl.class)
     );
+    //默认service bean的名称
+    private static final String DEFAULT_SERVICE_NAME = "erpProductServiceImpl";
 
     private ErpProductService getDefaultService() {
         return getService(null);
     }
 
     private ErpProductService getService(Long categoryId) {
-        Class<?> serviceClass = SERVICE_MAP.get(categoryId);
-        if (serviceClass == null){
-            serviceClass = ErpProductServiceImpl.class;
+        Pair<String, Class<?>> pair;
+        if (categoryId == null){
+            pair = new Pair<>(DEFAULT_SERVICE_NAME, ErpProductServiceImpl.class);
+        }else {
+            pair = SERVICE_MAP.getOrDefault(categoryId, new Pair<>(DEFAULT_SERVICE_NAME, ErpProductServiceImpl.class));
         }
-        Object serviceImpl = applicationContext.getBean(serviceClass);
+        Object serviceImpl = applicationContext.getBean(pair.getKey(), pair.getValue());
         return (ErpProductService) serviceImpl;
     }
 

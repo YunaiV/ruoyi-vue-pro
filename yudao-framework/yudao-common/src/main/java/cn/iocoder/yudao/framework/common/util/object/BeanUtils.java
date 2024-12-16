@@ -86,14 +86,14 @@ public class BeanUtils {
             try {
                 Object value = field.get(instanceA);
                 if (value != null && !classBFieldNames.contains(field.getName())) {
-                    return false; // Non-null field in A is not present in B
+                    return true; // Non-null field in A is not present in B
                 }
             } catch (IllegalAccessException e) {
                 throw new RuntimeException("Failed to access field: " + field.getName(), e);
             }
         }
 
-        return true;
+        return false;
     }
 
 }
