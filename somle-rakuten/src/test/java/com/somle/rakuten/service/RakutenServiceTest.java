@@ -16,8 +16,6 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.annotation.Rollback;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -55,8 +53,8 @@ class RakutenServiceTest extends BaseDbUnitTest {
     }
 
     @Test
-    @Rollback(false)
-    @Transactional
+//    @Rollback(false)
+//    @Transactional
     void generateOne() {
         List<RakutenTokenEntityDO> all = repository.findAll();
         if ((long) all.size() == 0) {

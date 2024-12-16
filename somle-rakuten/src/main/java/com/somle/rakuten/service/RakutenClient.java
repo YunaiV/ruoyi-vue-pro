@@ -1,6 +1,7 @@
 package com.somle.rakuten.service;
 
 import cn.hutool.core.codec.Base64;
+import cn.hutool.core.date.DateUtil;
 import com.somle.framework.common.util.date.LocalDateTimeUtils;
 import com.somle.framework.common.util.json.JSONObject;
 import com.somle.framework.common.util.json.JsonUtils;
@@ -35,6 +36,10 @@ public class RakutenClient {
      * 对密钥进行编码
      */
     private String generateAuthorization(RakutenTokenEntityDO entity) {
+        //数据库密钥过期了
+        if (entity.getExpires().before(DateUtil.date().toJdkDate())) {
+            throw new RuntimeException("Rakuten 密钥过期了");
+        }
         String credentials = entity.getServiceSecret() + ":" + entity.getLicenseKey();
         //↓有个空格
         return "ESA" + " " + Base64.encode(credentials.getBytes());

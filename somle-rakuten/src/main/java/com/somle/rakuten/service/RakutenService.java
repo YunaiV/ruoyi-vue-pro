@@ -23,13 +23,22 @@ public class RakutenService {
     public void init() {
         //暂时拿第一个
         Optional<RakutenTokenEntityDO> entity = repository.findAll().stream().findFirst();
-        entity.ifPresent(e -> this.client = new RakutenClient(e));
-        if (entity.isPresent()) {
-            this.client = new RakutenClient(entity.get());
-        } else {
-            log.warn("RakutenTokenEntity Table is Empty");
-            throw new RuntimeException("RakutenTokenEntity  is Empty");
-        }
+        entity.ifPresentOrElse(
+                //优化方向？->每次实例化时判断是否token过期，自动刷新
+                //2、维护本地map，多个client,volatile
+                e -> {
+                    if (this.client == null) {
+                        this.client = new RakutenClient(e);
+                        log.debug("RakutenClient initialized successfully.");
+                    }
+                    // 这里可以进一步扩展，例如检查 token 是否过期，如果过期可以刷新
+                },
+                () -> {
+                    log.warn("RakutenTokenEntity Table is Empty");
+                    throw new RuntimeException("RakutenTokenEntity  is Empty");
+                }
+        );
     }
 
 }
+
