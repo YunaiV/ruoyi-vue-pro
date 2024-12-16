@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 /**
- * IOT  访问方式枚举类
+ * IOT 访问方式枚举类
  *
  * @author ahh
  */

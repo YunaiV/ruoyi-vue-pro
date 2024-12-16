@@ -6,6 +6,7 @@ import lombok.Getter;
 
 import java.util.Arrays;
 
+// TODO @芋艿：纠结下，到底叫 thinkmodel 好，还是 function 好
 /**
  * IOT 产品功能（物模型）类型枚举类
  *

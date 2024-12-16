@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.iot.convert.device;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
+// TODO 是否要删除？
 @Mapper
 public interface IotDeviceDataConvert {
 

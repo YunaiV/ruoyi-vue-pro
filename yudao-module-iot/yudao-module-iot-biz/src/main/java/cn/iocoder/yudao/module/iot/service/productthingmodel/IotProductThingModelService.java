@@ -23,7 +23,6 @@ public interface IotProductThingModelService {
      */
     Long createProductThingModel(@Valid IotProductThingModelSaveReqVO createReqVO);
 
-
     /**
      * 更新产品物模型
      *

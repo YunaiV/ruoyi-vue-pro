@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.module.iot.controller.admin.productthingmodel.thingmodel.dataType;
 
-import cn.iocoder.yudao.module.iot.controller.admin.productthingmodel.thingmodel.ThingModelProperty;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
