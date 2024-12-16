@@ -124,6 +124,16 @@ public interface CombinationRecordMapper extends BaseMapperX<CombinationRecordDO
     }
 
     /**
+     * 查询虚拟成团的记录数，先按head_id分组，然后再count
+     * @return
+     */
+    default Long selectCountByVirtualGroupTrue(){
+        return selectCount(new QueryWrapper<CombinationRecordDO>()
+                .select("DISTINCT(head_id)")
+                .eq("virtual_group", true));
+    }
+
+    /**
      * 查询用户拼团记录（DISTINCT 去重），也就是说查询会员表中的用户有多少人参与过拼团活动每个人只统计一次
      *
      * @return 参加过拼团的用户数
