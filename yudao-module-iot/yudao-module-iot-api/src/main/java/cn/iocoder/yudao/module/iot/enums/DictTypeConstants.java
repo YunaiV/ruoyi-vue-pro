@@ -13,4 +13,7 @@ public class DictTypeConstants {
     public static final String PROTOCOL_TYPE = "iot_protocol_type";
     public static final String DATA_FORMAT = "iot_data_format";
     public static final String VALIDATE_TYPE = "iot_validate_type";
+
+    public static final String DEVICE_STATUS = "iot_device_status";
+
 }

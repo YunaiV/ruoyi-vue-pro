@@ -21,7 +21,7 @@ public interface IotProductCategoryMapper extends BaseMapperX<IotProductCategory
         return selectPage(reqVO, new LambdaQueryWrapperX<IotProductCategoryDO>()
                 .likeIfPresent(IotProductCategoryDO::getName, reqVO.getName())
                 .betweenIfPresent(IotProductCategoryDO::getCreateTime, reqVO.getCreateTime())
-                .orderByDesc(IotProductCategoryDO::getId));
+                .orderByAsc(IotProductCategoryDO::getSort));
     }
 
     default List<IotProductCategoryDO> selectListByStatus(Integer status) {

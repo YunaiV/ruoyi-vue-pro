@@ -1,22 +1,25 @@
 package cn.iocoder.yudao.module.iot.dal.dataobject.device;
 
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import cn.iocoder.yudao.framework.mybatis.core.type.LongSetTypeHandler;
 import cn.iocoder.yudao.module.iot.dal.dataobject.product.IotProductDO;
 import cn.iocoder.yudao.module.iot.enums.device.IotDeviceStatusEnum;
 import com.baomidou.mybatisplus.annotation.KeySequence;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Set;
 
 /**
  * IoT 设备 DO
  *
  * @author haohao
  */
-@TableName("iot_device")
+@TableName(value = "iot_device", autoResultMap = true)
 @KeySequence("iot_device_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
 @Data
 @EqualsAndHashCode(callSuper = true)
@@ -47,6 +50,17 @@ public class IotDeviceDO extends BaseDO {
      * 设备序列号
      */
     private String serialNumber;
+    /**
+     * 设备图片
+     */
+    private String picUrl;
+    /**
+     * 设备分组编号集合
+     *
+     * 关联 {@link IotDeviceGroupDO#getId()}
+     */
+    @TableField(typeHandler = LongSetTypeHandler.class)
+    private Set<Long> groupIds;
 
     /**
      * 产品编号
@@ -66,13 +80,6 @@ public class IotDeviceDO extends BaseDO {
      * 冗余 {@link IotProductDO#getDeviceType()}
      */
     private Integer deviceType;
-
-    /**
-     * 设备状态
-     * <p>
-     * 枚举 {@link IotDeviceStatusEnum}
-     */
-    private Integer status;
     /**
      * 网关设备编号
      * <p>
@@ -81,6 +88,13 @@ public class IotDeviceDO extends BaseDO {
      * 关联 {@link IotDeviceDO#getId()}
      */
     private Long gatewayId;
+
+    /**
+     * 设备状态
+     * <p>
+     * 枚举 {@link IotDeviceStatusEnum}
+     */
+    private Integer status;
 
     /**
      * 设备状态最后更新时间

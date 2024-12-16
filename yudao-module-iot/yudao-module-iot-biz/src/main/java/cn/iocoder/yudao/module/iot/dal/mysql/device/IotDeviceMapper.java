@@ -1,11 +1,14 @@
 package cn.iocoder.yudao.module.iot.dal.mysql.device;
 
+import cn.hutool.core.util.ObjectUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.module.iot.controller.admin.device.vo.device.IotDevicePageReqVO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDO;
 import org.apache.ibatis.annotations.Mapper;
+
+import java.util.List;
 
 /**
  * IoT 设备 Mapper
@@ -15,28 +18,19 @@ import org.apache.ibatis.annotations.Mapper;
 @Mapper
 public interface IotDeviceMapper extends BaseMapperX<IotDeviceDO> {
 
-    // TODO @haohao：可能多余的查询条件，要去掉哈
     default PageResult<IotDeviceDO> selectPage(IotDevicePageReqVO reqVO) {
         return selectPage(reqVO, new LambdaQueryWrapperX<IotDeviceDO>()
-                .eqIfPresent(IotDeviceDO::getDeviceKey, reqVO.getDeviceKey())
                 .likeIfPresent(IotDeviceDO::getDeviceName, reqVO.getDeviceName())
                 .eqIfPresent(IotDeviceDO::getProductId, reqVO.getProductId())
-                .eqIfPresent(IotDeviceDO::getProductKey, reqVO.getProductKey())
                 .eqIfPresent(IotDeviceDO::getDeviceType, reqVO.getDeviceType())
                 .likeIfPresent(IotDeviceDO::getNickname, reqVO.getNickname())
-                .eqIfPresent(IotDeviceDO::getGatewayId, reqVO.getGatewayId())
                 .eqIfPresent(IotDeviceDO::getStatus, reqVO.getStatus())
-                .betweenIfPresent(IotDeviceDO::getStatusLastUpdateTime, reqVO.getStatusLastUpdateTime())
-                .betweenIfPresent(IotDeviceDO::getLastOnlineTime, reqVO.getLastOnlineTime())
-                .betweenIfPresent(IotDeviceDO::getLastOfflineTime, reqVO.getLastOfflineTime())
-                .betweenIfPresent(IotDeviceDO::getActiveTime, reqVO.getActiveTime())
-                .eqIfPresent(IotDeviceDO::getDeviceSecret, reqVO.getDeviceSecret())
-                .eqIfPresent(IotDeviceDO::getMqttClientId, reqVO.getMqttClientId())
-                .likeIfPresent(IotDeviceDO::getMqttUsername, reqVO.getMqttUsername())
-                .eqIfPresent(IotDeviceDO::getMqttPassword, reqVO.getMqttPassword())
-                .eqIfPresent(IotDeviceDO::getAuthType, reqVO.getAuthType())
-                .betweenIfPresent(IotDeviceDO::getCreateTime, reqVO.getCreateTime())
+                .apply(ObjectUtil.isNotNull(reqVO.getGroupId()), "FIND_IN_SET(" + reqVO.getGroupId() + ",group_ids) > 0")
                 .orderByDesc(IotDeviceDO::getId));
+    }
+
+    default IotDeviceDO selectByDeviceName(String deviceName) {
+        return selectOne(IotDeviceDO::getDeviceName, deviceName);
     }
 
     default IotDeviceDO selectByProductKeyAndDeviceName(String productKey, String deviceName) {
@@ -51,4 +45,19 @@ public interface IotDeviceMapper extends BaseMapperX<IotDeviceDO> {
     default Long selectCountByProductId(Long productId) {
         return selectCount(IotDeviceDO::getProductId, productId);
     }
+
+    default IotDeviceDO selectByDeviceKey(String deviceKey) {
+        return selectOne(IotDeviceDO::getDeviceKey, deviceKey);
+    }
+
+    default List<IotDeviceDO> selectList(Integer deviceType) {
+        return selectList(IotDeviceDO::getDeviceType, deviceType);
+    }
+
+    default Long selectCountByGroupId(Long groupId) {
+        return selectCount(new LambdaQueryWrapperX<IotDeviceDO>()
+                .apply("FIND_IN_SET(" + groupId + ",group_ids) > 0")
+                .orderByDesc(IotDeviceDO::getId));
+    }
+
 }

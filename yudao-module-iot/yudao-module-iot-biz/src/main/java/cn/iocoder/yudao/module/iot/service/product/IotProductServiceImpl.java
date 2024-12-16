@@ -71,16 +71,26 @@ public class IotProductServiceImpl implements IotProductService {
         productMapper.deleteById(id);
     }
 
-    private IotProductDO validateProductExists(Long id) {
-        IotProductDO iotProductDO = productMapper.selectById(id);
-        if (iotProductDO == null) {
+    @Override
+    public IotProductDO validateProductExists(Long id) {
+        IotProductDO product = productMapper.selectById(id);
+        if (product == null) {
             throw exception(PRODUCT_NOT_EXISTS);
         }
-        return iotProductDO;
+        return product;
     }
 
-    private void validateProductStatus(IotProductDO iotProductDO) {
-        if (Objects.equals(iotProductDO.getStatus(), IotProductStatusEnum.PUBLISHED.getStatus())) {
+    @Override
+    public IotProductDO validateProductExists(String productKey) {
+        IotProductDO product = productMapper.selectByProductKey(productKey);
+        if (product == null) {
+            throw exception(PRODUCT_NOT_EXISTS);
+        }
+        return product;
+    }
+
+    private void validateProductStatus(IotProductDO product) {
+        if (Objects.equals(product.getStatus(), IotProductStatusEnum.PUBLISHED.getStatus())) {
             throw exception(PRODUCT_STATUS_NOT_DELETE);
         }
     }

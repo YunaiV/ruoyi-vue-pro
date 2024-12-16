@@ -15,7 +15,6 @@ import java.util.Map;
  */
 public interface IotDeviceDataService {
 
-
     /**
      * 保存设备数据
      *
