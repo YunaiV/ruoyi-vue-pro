@@ -30,11 +30,12 @@ public class Greetings {
     @Autowired
     private List<Greeting> greetings;
 
-    public void printGreetings() {
+    public Integer printGreetings() {
         System.out.printf("找到扩展点的 %d 个扩展 '%s'%n", greetings.size(), Greeting.class.getName());
         for (Greeting greeting : greetings) {
             System.out.println(">>> " + greeting.getGreeting());
         }
+        return greetings.size();
     }
 
 }

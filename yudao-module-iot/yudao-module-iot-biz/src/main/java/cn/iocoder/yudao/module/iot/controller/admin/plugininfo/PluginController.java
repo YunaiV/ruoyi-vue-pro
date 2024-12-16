@@ -123,12 +123,12 @@ public class PluginController {
     /**
      * 打印问候语
      *
-     * @return 1
+     * @return 问候语数量
      */
     @PermitAll
     @GetMapping("/printGreetings")
     public ResponseEntity<Integer> printGreetings() {
-        greetings.printGreetings();
-        return ResponseEntity.ok(1);
+        Integer count = greetings.printGreetings();
+        return ResponseEntity.ok(count);
     }
 }
