@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.iot.enums.product;
+package cn.iocoder.yudao.module.iot.enums.thingmodel;
 
 import cn.iocoder.yudao.framework.common.core.IntArrayValuable;
 import lombok.AllArgsConstructor;
@@ -13,13 +13,13 @@ import java.util.Arrays;
  */
 @AllArgsConstructor
 @Getter
-public enum IotProductFunctionTypeEnum implements IntArrayValuable {
+public enum IotProductThingModelTypeEnum implements IntArrayValuable {
 
     PROPERTY(1, "属性"),
     SERVICE(2, "服务"),
     EVENT(3, "事件");
 
-    public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(IotProductFunctionTypeEnum::getType).toArray();
+    public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(IotProductThingModelTypeEnum::getType).toArray();
 
     /**
      * 类型
@@ -30,8 +30,8 @@ public enum IotProductFunctionTypeEnum implements IntArrayValuable {
      */
     private final String description;
 
-    public static IotProductFunctionTypeEnum valueOfType(Integer type) {
-        for (IotProductFunctionTypeEnum value : values()) {
+    public static IotProductThingModelTypeEnum valueOfType(Integer type) {
+        for (IotProductThingModelTypeEnum value : values()) {
             if (value.getType().equals(type)) {
                 return value;
             }

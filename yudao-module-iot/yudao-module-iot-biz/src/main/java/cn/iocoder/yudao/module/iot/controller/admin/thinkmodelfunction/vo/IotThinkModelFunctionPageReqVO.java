@@ -2,7 +2,7 @@ package cn.iocoder.yudao.module.iot.controller.admin.thinkmodelfunction.vo;
 
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.validation.InEnum;
-import cn.iocoder.yudao.module.iot.enums.product.IotProductFunctionTypeEnum;
+import cn.iocoder.yudao.module.iot.enums.thingmodel.IotProductThingModelTypeEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
@@ -22,7 +22,7 @@ public class IotThinkModelFunctionPageReqVO extends PageParam {
     private String name;
 
     @Schema(description = "功能类型", example = "1")
-    @InEnum(IotProductFunctionTypeEnum.class)
+    @InEnum(IotProductThingModelTypeEnum.class)
     private Integer type;
 
     @Schema(description = "产品ID", requiredMode = Schema.RequiredMode.REQUIRED)

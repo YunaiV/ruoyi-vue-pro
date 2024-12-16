@@ -13,7 +13,7 @@ import cn.iocoder.yudao.module.iot.dal.dataobject.thinkmodelfunction.IotThinkMod
 import cn.iocoder.yudao.module.iot.dal.redis.deviceData.DeviceDataRedisDAO;
 import cn.iocoder.yudao.module.iot.dal.tdengine.TdEngineDMLMapper;
 import cn.iocoder.yudao.module.iot.enums.IotConstants;
-import cn.iocoder.yudao.module.iot.enums.product.IotProductFunctionTypeEnum;
+import cn.iocoder.yudao.module.iot.enums.thingmodel.IotProductThingModelTypeEnum;
 import cn.iocoder.yudao.module.iot.service.tdengine.IotThingModelMessageService;
 import cn.iocoder.yudao.module.iot.service.thinkmodelfunction.IotThinkModelFunctionService;
 import jakarta.annotation.Resource;
@@ -75,7 +75,7 @@ public class IotDeviceDataServiceImpl implements IotDeviceDataService {
         // 2. 获取设备属性最新数据
         List<IotThinkModelFunctionDO> thinkModelFunctionList = thinkModelFunctionService.getThinkModelFunctionListByProductKey(device.getProductKey());
         thinkModelFunctionList = thinkModelFunctionList.stream()
-                .filter(function -> IotProductFunctionTypeEnum.PROPERTY.getType()
+                .filter(function -> IotProductThingModelTypeEnum.PROPERTY.getType()
                         .equals(function.getType())).toList();
 
         // 3. 过滤标识符和属性名称
@@ -100,7 +100,7 @@ public class IotDeviceDataServiceImpl implements IotDeviceDataService {
                 deviceData.setDeviceId(deviceDataReqVO.getDeviceId());
                 deviceData.setThinkModelFunctionId(function.getId());
                 deviceData.setName(function.getName());
-                deviceData.setDataType(function.getProperty().getDataType().getType());
+                deviceData.setDataType(function.getProperty().getDataType().getDataType());
             }
             list.add(deviceData);
         });

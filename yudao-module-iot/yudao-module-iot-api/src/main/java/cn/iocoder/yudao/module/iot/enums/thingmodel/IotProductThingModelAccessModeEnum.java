@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.iot.enums.product;
+package cn.iocoder.yudao.module.iot.enums.thingmodel;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -10,10 +10,9 @@ import lombok.Getter;
  */
 @AllArgsConstructor
 @Getter
-public enum IotAccessModeEnum {
+public enum IotProductThingModelAccessModeEnum {
 
-    READ("r"),
-    WRITE("w"),
+    READ_ONLY("r"),
     READ_WRITE("rw");
 
     private final String mode;

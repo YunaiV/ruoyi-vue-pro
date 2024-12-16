@@ -18,8 +18,8 @@ import cn.iocoder.yudao.module.iot.convert.thinkmodelfunction.IotThinkModelFunct
 import cn.iocoder.yudao.module.iot.dal.dataobject.product.IotProductDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.thinkmodelfunction.IotThinkModelFunctionDO;
 import cn.iocoder.yudao.module.iot.dal.mysql.thinkmodelfunction.IotThinkModelFunctionMapper;
-import cn.iocoder.yudao.module.iot.enums.product.IotAccessModeEnum;
-import cn.iocoder.yudao.module.iot.enums.product.IotProductFunctionTypeEnum;
+import cn.iocoder.yudao.module.iot.enums.thingmodel.IotProductThingModelAccessModeEnum;
+import cn.iocoder.yudao.module.iot.enums.thingmodel.IotProductThingModelTypeEnum;
 import cn.iocoder.yudao.module.iot.enums.product.IotProductStatusEnum;
 import cn.iocoder.yudao.module.iot.service.product.IotProductService;
 import cn.iocoder.yudao.module.iot.service.tdengine.IotSuperTableService;
@@ -74,7 +74,7 @@ public class IotThinkModelFunctionServiceImpl implements IotThinkModelFunctionSe
         thinkModelFunctionMapper.insert(function);
 
         // 6. 如果创建的是属性，需要更新默认的事件和服务
-        if (Objects.equals(createReqVO.getType(), IotProductFunctionTypeEnum.PROPERTY.getType())) {
+        if (Objects.equals(createReqVO.getType(), IotProductThingModelTypeEnum.PROPERTY.getType())) {
             createDefaultEventsAndServices(createReqVO.getProductId(), createReqVO.getProductKey());
         }
         return function.getId();
@@ -128,7 +128,7 @@ public class IotThinkModelFunctionServiceImpl implements IotThinkModelFunctionSe
         thinkModelFunctionMapper.updateById(thinkModelFunction);
 
         // 5. 如果更新的是属性，需要更新默认的事件和服务
-        if (Objects.equals(updateReqVO.getType(), IotProductFunctionTypeEnum.PROPERTY.getType())) {
+        if (Objects.equals(updateReqVO.getType(), IotProductThingModelTypeEnum.PROPERTY.getType())) {
             createDefaultEventsAndServices(updateReqVO.getProductId(), updateReqVO.getProductKey());
         }
     }
@@ -156,7 +156,7 @@ public class IotThinkModelFunctionServiceImpl implements IotThinkModelFunctionSe
         thinkModelFunctionMapper.deleteById(id);
 
         // 3. 如果删除的是属性，需要更新默认的事件和服务
-        if (Objects.equals(functionDO.getType(), IotProductFunctionTypeEnum.PROPERTY.getType())) {
+        if (Objects.equals(functionDO.getType(), IotProductThingModelTypeEnum.PROPERTY.getType())) {
             createDefaultEventsAndServices(functionDO.getProductId(), functionDO.getProductKey());
         }
     }
@@ -210,7 +210,7 @@ public class IotThinkModelFunctionServiceImpl implements IotThinkModelFunctionSe
     public void createDefaultEventsAndServices(Long productId, String productKey) {
         // 1. 获取当前属性列表
         List<IotThinkModelFunctionDO> propertyList = thinkModelFunctionMapper
-                .selectListByProductIdAndType(productId, IotProductFunctionTypeEnum.PROPERTY.getType());
+                .selectListByProductIdAndType(productId, IotProductThingModelTypeEnum.PROPERTY.getType());
 
         // 2. 生成新的事件和服务列表
         List<IotThinkModelFunctionDO> newFunctionList = new ArrayList<>();
@@ -237,7 +237,7 @@ public class IotThinkModelFunctionServiceImpl implements IotThinkModelFunctionSe
         List<IotThinkModelFunctionDO> oldFunctionList = thinkModelFunctionMapper.selectListByProductIdAndIdentifiersAndTypes(
                 productId,
                 Arrays.asList("post", "set", "get"),
-                Arrays.asList(IotProductFunctionTypeEnum.EVENT.getType(), IotProductFunctionTypeEnum.SERVICE.getType())
+                Arrays.asList(IotProductThingModelTypeEnum.EVENT.getType(), IotProductThingModelTypeEnum.SERVICE.getType())
         );
 
         // 3.1 使用 diffList 方法比较新旧列表
@@ -300,7 +300,7 @@ public class IotThinkModelFunctionServiceImpl implements IotThinkModelFunctionSe
                 .setIdentifier(event.getIdentifier())
                 .setName(event.getName())
                 .setDescription(event.getDescription())
-                .setType(IotProductFunctionTypeEnum.EVENT.getType())
+                .setType(IotProductThingModelTypeEnum.EVENT.getType())
                 .setEvent(event);
     }
 
@@ -314,7 +314,7 @@ public class IotThinkModelFunctionServiceImpl implements IotThinkModelFunctionSe
                 .setIdentifier(service.getIdentifier())
                 .setName(service.getName())
                 .setDescription(service.getDescription())
-                .setType(IotProductFunctionTypeEnum.SERVICE.getType())
+                .setType(IotProductThingModelTypeEnum.SERVICE.getType())
                 .setService(service);
     }
 
@@ -358,9 +358,10 @@ public class IotThinkModelFunctionServiceImpl implements IotThinkModelFunctionSe
         }
 
         List<ThingModelArgument> inputData = new ArrayList<>();
+        // TODO @puhui999: 需要重构
         for (IotThinkModelFunctionDO functionDO : propertyList) {
             ThingModelProperty property = functionDO.getProperty();
-            if (IotAccessModeEnum.WRITE.getMode().equals(property.getAccessMode()) || IotAccessModeEnum.READ_WRITE.getMode().equals(property.getAccessMode())) {
+            if (IotProductThingModelAccessModeEnum.WRITE.getMode().equals(property.getAccessMode()) || IotProductThingModelAccessModeEnum.READ_WRITE.getMode().equals(property.getAccessMode())) {
                 ThingModelArgument arg = new ThingModelArgument()
                         .setIdentifier(property.getIdentifier())
                         .setName(property.getName())
@@ -399,7 +400,7 @@ public class IotThinkModelFunctionServiceImpl implements IotThinkModelFunctionSe
         for (IotThinkModelFunctionDO functionDO : propertyList) {
             ThingModelProperty property = functionDO.getProperty();
             if (ObjectUtils.equalsAny(property.getAccessMode(),
-                    IotAccessModeEnum.READ.getMode(), IotAccessModeEnum.READ_WRITE.getMode())) {
+                    IotProductThingModelAccessModeEnum.READ.getMode(), IotProductThingModelAccessModeEnum.READ_WRITE.getMode())) {
                 ThingModelArgument arg = new ThingModelArgument()
                         .setIdentifier(property.getIdentifier())
                         .setName(property.getName())
@@ -430,10 +431,10 @@ public class IotThinkModelFunctionServiceImpl implements IotThinkModelFunctionSe
 
         // 创建数组类型，元素类型为文本类型（字符串）
         ThingModelArrayType arrayType = new ThingModelArrayType();
-        arrayType.setType("array");
+        arrayType.setDataType("array");
         ThingModelArraySpecs arraySpecs = new ThingModelArraySpecs();
         ThingModelTextType textType = new ThingModelTextType();
-        textType.setType("text");
+        textType.setDataType("text");
         arraySpecs.setItem(textType);
         arrayType.setSpecs(arraySpecs);
         inputArg.setDataType(arrayType);

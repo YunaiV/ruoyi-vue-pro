@@ -10,8 +10,7 @@ import cn.iocoder.yudao.module.iot.dal.dataobject.tdengine.TdFieldDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.tdengine.TdTableDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.thinkmodelfunction.IotThinkModelFunctionDO;
 import cn.iocoder.yudao.module.iot.dal.tdengine.TdEngineDDLMapper;
-import cn.iocoder.yudao.module.iot.dal.tdengine.TdEngineDMLMapper;
-import cn.iocoder.yudao.module.iot.enums.product.IotProductFunctionTypeEnum;
+import cn.iocoder.yudao.module.iot.enums.thingmodel.IotProductThingModelTypeEnum;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -217,8 +216,8 @@ public class IotSuperTableServiceImpl implements IotSuperTableService {
         thingModel.setProductKey(product.getProductKey());
 
         List<ThingModelProperty> properties = functionList.stream()
-                .filter(function -> IotProductFunctionTypeEnum.PROPERTY.equals(
-                        IotProductFunctionTypeEnum.valueOfType(function.getType())))
+                .filter(function -> IotProductThingModelTypeEnum.PROPERTY.equals(
+                        IotProductThingModelTypeEnum.valueOfType(function.getType())))
                 .map(this::buildThingModelProperty)
                 .collect(Collectors.toList());
 

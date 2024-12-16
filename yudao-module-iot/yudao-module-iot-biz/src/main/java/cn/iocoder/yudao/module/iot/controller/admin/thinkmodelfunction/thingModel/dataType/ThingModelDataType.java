@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import lombok.Data;
 
 @Data
-@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type", visible = true)
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "dataType", visible = true)
 @JsonSubTypes({
         @JsonSubTypes.Type(value = ThingModelIntType.class, name = "int"),
         @JsonSubTypes.Type(value = ThingModelFloatType.class, name = "float"),
@@ -19,6 +19,6 @@ import lombok.Data;
 })
 public abstract class ThingModelDataType {
 
-    private String type;
+    private String dataType;
 
 }

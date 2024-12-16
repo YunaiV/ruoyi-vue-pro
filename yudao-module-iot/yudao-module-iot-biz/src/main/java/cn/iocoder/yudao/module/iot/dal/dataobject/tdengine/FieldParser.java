@@ -39,7 +39,7 @@ public class FieldParser {
         ThingModelDataType type = property.getDataType();
 
         // 将物模型字段类型映射为td字段类型
-        String fType = TYPE_MAPPING.get(type.getType().toUpperCase());
+        String fType = TYPE_MAPPING.get(type.getDataType().toUpperCase());
 
         // 如果字段类型为NCHAR，默认长度为64
         int dataLength = 0;

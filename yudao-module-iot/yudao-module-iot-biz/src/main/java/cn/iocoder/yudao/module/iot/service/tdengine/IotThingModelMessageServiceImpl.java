@@ -17,7 +17,7 @@ import cn.iocoder.yudao.module.iot.dal.tdengine.TdEngineDDLMapper;
 import cn.iocoder.yudao.module.iot.dal.tdengine.TdEngineDMLMapper;
 import cn.iocoder.yudao.module.iot.enums.IotConstants;
 import cn.iocoder.yudao.module.iot.enums.device.IotDeviceStatusEnum;
-import cn.iocoder.yudao.module.iot.enums.product.IotProductFunctionTypeEnum;
+import cn.iocoder.yudao.module.iot.enums.thingmodel.IotProductThingModelTypeEnum;
 import cn.iocoder.yudao.module.iot.service.device.IotDeviceService;
 import cn.iocoder.yudao.module.iot.service.thinkmodelfunction.IotThinkModelFunctionService;
 import jakarta.annotation.Resource;
@@ -94,7 +94,7 @@ public class IotThingModelMessageServiceImpl implements IotThingModelMessageServ
         return iotThinkModelFunctionService
                 .getThinkModelFunctionListByProductKey(productKey)
                 .stream()
-                .filter(function -> IotProductFunctionTypeEnum.PROPERTY.getType().equals(function.getType()))
+                .filter(function -> IotProductThingModelTypeEnum.PROPERTY.getType().equals(function.getType()))
                 .toList();
     }
 
@@ -138,7 +138,7 @@ public class IotThingModelMessageServiceImpl implements IotThingModelMessageServ
                 .deviceId(device.getId())
                 .thinkModelFunctionId(iotThinkModelFunctionDO.getId())
                 .name(iotThinkModelFunctionDO.getName())
-                .dataType(iotThinkModelFunctionDO.getProperty().getDataType().getType())
+                .dataType(iotThinkModelFunctionDO.getProperty().getDataType().getDataType())
                 .build();
         deviceDataRedisDAO.set(deviceData);
     }
