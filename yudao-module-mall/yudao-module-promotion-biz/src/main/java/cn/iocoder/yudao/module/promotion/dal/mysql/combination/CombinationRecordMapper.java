@@ -12,7 +12,6 @@ import cn.iocoder.yudao.module.promotion.dal.dataobject.combination.CombinationR
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import org.apache.ibatis.annotations.Mapper;
 
-import javax.validation.constraints.NotEmpty;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Collections;
@@ -121,21 +120,6 @@ public interface CombinationRecordMapper extends BaseMapperX<CombinationRecordDO
         return selectCount(new LambdaQueryWrapperX<CombinationRecordDO>()
                 .eqIfPresent(CombinationRecordDO::getStatus, status)
                 .eqIfPresent(CombinationRecordDO::getVirtualGroup, virtualGroup)
-                .eqIfPresent(CombinationRecordDO::getHeadId, headId));
-    }
-
-    /**
-     * 查询指定活动编号数组，指定状态，指定团长编号的记录数
-     *
-     * @param activityIds 活动编号数组
-     * @param status      状态
-     * @param headId      团长编号
-     * @return
-     */
-    default Long selectCountByHeadAndStatusAndActivityIds(@NotEmpty Collection<Long> activityIds, Integer status, Long headId) {
-        return selectCount(new LambdaQueryWrapperX<CombinationRecordDO>()
-                .in(CombinationRecordDO::getActivityId, activityIds)
-                .eqIfPresent(CombinationRecordDO::getStatus, status)
                 .eqIfPresent(CombinationRecordDO::getHeadId, headId));
     }
 

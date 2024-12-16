@@ -240,10 +240,4 @@ public class CombinationActivityServiceImpl implements CombinationActivityServic
         return combinationActivityMapper.selectBySpuIdAndStatusAndNow(spuId, CommonStatusEnum.ENABLE.getStatus());
     }
 
-    @Override
-    public List<CombinationActivityDO> getByVirtualGroup() {
-        return combinationActivityMapper.selectList(
-                CombinationActivityDO::getVirtualGroup, Boolean.TRUE
-        );
-    }
 }
