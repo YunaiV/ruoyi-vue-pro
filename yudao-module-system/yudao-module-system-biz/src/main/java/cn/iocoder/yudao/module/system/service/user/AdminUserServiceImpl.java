@@ -96,7 +96,7 @@ public class AdminUserServiceImpl implements AdminUserService {
         });
         // 1.2 校验正确性
         validateUserForCreateOrUpdate(null, createReqVO.getUsername(),
-                createReqVO.getMobile(), createReqVO.getEmail(), createReqVO.getDeptId(), createReqVO.getPostIds(), createReqVO.getNo());
+                createReqVO.getMobile(), createReqVO.getEmail(), createReqVO.getDeptId(), createReqVO.getPostIds(), createReqVO.getEmployeeId());
         // 2.1 插入用户
         AdminUserDO user = BeanUtils.toBean(createReqVO, AdminUserDO.class);
         // 默认禁用
@@ -124,7 +124,7 @@ public class AdminUserServiceImpl implements AdminUserService {
         updateReqVO.setPassword(null); // 特殊：此处不更新密码
         // 1. 校验正确性
         AdminUserDO oldUser = validateUserForCreateOrUpdate(updateReqVO.getId(), updateReqVO.getUsername(),
-                updateReqVO.getMobile(), updateReqVO.getEmail(), updateReqVO.getDeptId(), updateReqVO.getPostIds(), updateReqVO.getNo());
+                updateReqVO.getMobile(), updateReqVO.getEmail(), updateReqVO.getDeptId(), updateReqVO.getPostIds(), updateReqVO.getEmployeeId());
 
         // 2.1 更新用户
         AdminUserDO updateObj = BeanUtils.toBean(updateReqVO, AdminUserDO.class);
@@ -329,7 +329,7 @@ public class AdminUserServiceImpl implements AdminUserService {
     }
 
     private AdminUserDO validateUserForCreateOrUpdate(Long id, String username, String mobile, String email,
-                                               Long deptId, Set<Long> postIds, String no) {
+                                               Long deptId, Set<Long> postIds, String employeeId) {
         // 关闭数据权限，避免因为没有数据权限，查询不到数据，进而导致唯一校验不正确
         return DataPermissionUtils.executeIgnore(() -> {
             // 校验用户存在
@@ -337,7 +337,7 @@ public class AdminUserServiceImpl implements AdminUserService {
             // 校验用户名唯一
             validateUsernameUnique(id, username);
             //验证工号唯一
-            validateNoUnique(id, no);
+            validateNoUnique(id, employeeId);
             // 校验手机号唯一
             validateMobileUnique(id, mobile);
             // 校验邮箱唯一
@@ -350,11 +350,11 @@ public class AdminUserServiceImpl implements AdminUserService {
         });
     }
 
-    private void validateNoUnique(Long id, String no) {
-        if (StrUtil.isBlank(no)) {
+    private void validateNoUnique(Long id, String employeeId) {
+        if (StrUtil.isBlank(employeeId)) {
             return;
         }
-        AdminUserDO user = userMapper.selectByNo(no);
+        AdminUserDO user = userMapper.selectByNo(employeeId);
         if (user == null) {
             return;
         }
@@ -487,7 +487,7 @@ public class AdminUserServiceImpl implements AdminUserService {
             // 2.1.2 校验，判断是否有不符合的原因
             try {
                 validateUserForCreateOrUpdate(null, null, importUser.getMobile(), importUser.getEmail(),
-                        importUser.getDeptId(), null,importUser.getNo());
+                        importUser.getDeptId(), null,importUser.getEmployeeId());
             } catch (ServiceException ex) {
                 respVO.getFailureUsernames().put(importUser.getUsername(), ex.getMessage());
                 return;

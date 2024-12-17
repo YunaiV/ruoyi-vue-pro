@@ -26,7 +26,7 @@ public class UserSaveReqVO {
     @NotBlank(message = "工号不能为空")
     @Size(min = 4, max = 30, message = "工号长度为 4-30 个字符")
     @DiffLogField(name = "工号")
-    private String no;
+    private String employeeId;
 
     @Schema(description = "用户账号", requiredMode = Schema.RequiredMode.REQUIRED, example = "yudao")
     @NotBlank(message = "用户账号不能为空")

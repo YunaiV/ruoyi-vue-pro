@@ -17,7 +17,7 @@ public class AdminUserReqDTO {
     private Long id;
 
     //工号
-    private String no;
+    private String employeeId;
 
     //用户账号
     private String username;

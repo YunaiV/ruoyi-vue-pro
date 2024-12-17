@@ -22,7 +22,7 @@ public class UserRespVO{
 
     @Schema(description = "工号", requiredMode = Schema.RequiredMode.REQUIRED, example = "000000")
     @ExcelProperty("工号")
-    private String no;
+    private String employeeId;
 
     @Schema(description = "用户账号", requiredMode = Schema.RequiredMode.REQUIRED, example = "yudao")
     @ExcelProperty("用户名称")

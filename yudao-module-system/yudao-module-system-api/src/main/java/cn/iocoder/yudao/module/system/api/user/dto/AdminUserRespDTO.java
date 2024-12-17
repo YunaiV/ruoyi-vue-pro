@@ -20,7 +20,7 @@ public class AdminUserRespDTO {
     /**
      * 工号
      */
-    private String no;
+    private String employeeId;
     /**
      * 密码
      */

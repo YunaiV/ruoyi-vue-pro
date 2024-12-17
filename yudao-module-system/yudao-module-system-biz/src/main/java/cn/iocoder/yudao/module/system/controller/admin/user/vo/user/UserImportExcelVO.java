@@ -21,7 +21,7 @@ import lombok.experimental.Accessors;
 public class UserImportExcelVO {
 
     @ExcelProperty("工号")
-    private String no;
+    private String employeeId;
 
     @ExcelProperty("登录名称")
     private String username;

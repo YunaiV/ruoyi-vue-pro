@@ -37,7 +37,7 @@ public class AdminUserDO extends TenantBaseDO {
     /**
      * 工号
      */
-    private String no;
+    private String employeeId;
     /**
      * 用户账号
      */
