@@ -56,7 +56,7 @@ public interface ErpProductService {
      * @param id 编号
      * @return 产品
      */
-    ErpProductDO getProduct(Long id);
+    ErpProductRespVO getProduct(Long id);
 
     /**
      * 获得指定状态的产品 VO 列表

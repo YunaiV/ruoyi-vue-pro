@@ -1,30 +1,18 @@
-package cn.iocoder.yudao.module.erp.dal.dataobject.product;
+package cn.iocoder.yudao.module.erp.service.product.bo;
 
-import lombok.*;
+import lombok.Data;
 
 import java.math.BigDecimal;
-import com.baomidou.mybatisplus.annotation.*;
-import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 
 /**
- * ERP 产品 DO
- *
- * @author 王奇辉
+ * @author: Wqh
+ * @date: 2024/12/3 16:52
  */
-@TableName("erp_product")
-@KeySequence("erp_product_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
 @Data
-@EqualsAndHashCode(callSuper = true)
-@ToString(callSuper = true)
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
-public class ErpProductDO extends BaseDO {
-
+public class ErpProductBO {
     /**
      * 产品编号
      */
-    @TableId
     private Long id;
     /**
      * 产品名称
@@ -103,9 +91,17 @@ public class ErpProductDO extends BaseDO {
      */
     private String secondaryImageUrls;
     /**
+     * 副图urlList
+     */
+    private String secondaryImageUrlList;
+    /**
      * 指导价，json格式
      */
     private String guidePrices;
+    /**
+     * 指导价list
+     */
+    private String guidePriceList;
     /**
      * 专利
      */
@@ -126,41 +122,4 @@ public class ErpProductDO extends BaseDO {
      * 维护工程师id
      */
     private Long maintenanceEngineerId;
-    /**
-     * 层板承重
-     */
-    private BigDecimal shelfLoadCapacity;
-    /**
-     * 层板数量
-     */
-    private Integer shelvesCount;
-    /**
-     * 电视调节方式
-     */
-    private String tvAdjustmentMethod;
-    /**
-     * 层板调节方式
-     */
-    private String shelfAdjustmentMethod;
-    /**
-     * 设计说明
-     */
-    private String description;
-    /**
-     * 宽度最大值
-     */
-    private BigDecimal widthMax;
-    /**
-     * 宽度最小值
-     */
-    private BigDecimal widthMin;
-    /**
-     * 长度最大值
-     */
-    private BigDecimal lengthMax;
-    /**
-     * 长度最小值
-     */
-    private BigDecimal lengthMin;
-
 }
