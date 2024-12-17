@@ -1,6 +1,7 @@
 package com.somle.esb.service;
 
 import cn.hutool.core.util.ObjUtil;
+import cn.hutool.extra.pinyin.PinyinUtil;
 import cn.iocoder.yudao.module.erp.api.product.dto.ErpCustomRuleDTO;
 import cn.iocoder.yudao.module.erp.api.supplier.dto.ErpSupplierDTO;
 import cn.iocoder.yudao.module.infra.api.config.ConfigApi;
@@ -302,13 +303,14 @@ public class EsbService {
             log.info("begin syncing: " + dingTalkUser.toString());
             AdminUserReqDTO erpUser = dingTalkToErpConverter.toErp(dingTalkUser);
             log.info("user to add " + erpUser);
+            //获取钉钉中的昵称
+            String nickname = erpUser.getNickname();
+            //根据昵称自动生成用户名
+            erpUser.setUsername(dingTalkToErpConverter.generateUserName(nickname));
             if (erpUser.getId() != null) {
                 adminUserApi.updateUser(erpUser);
             } else {
-                erpUser.setUsername("temp");
                 Long userId = adminUserApi.createUser(erpUser);
-                erpUser.setId(userId).setUsername("SM" + String.format("%06d", userId));
-                adminUserApi.updateUser(erpUser);
                 var mapping = mappingService.toMapping(dingTalkUser);
                 mapping
                     .setInternalId(userId);
@@ -316,5 +318,4 @@ public class EsbService {
             }
         });
     }
-
 }

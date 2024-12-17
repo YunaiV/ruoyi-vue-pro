@@ -15,10 +15,7 @@ import cn.iocoder.yudao.module.infra.api.config.ConfigApi;
 import cn.iocoder.yudao.module.infra.api.file.FileApi;
 import cn.iocoder.yudao.module.system.controller.admin.user.vo.profile.UserProfileUpdatePasswordReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.user.vo.profile.UserProfileUpdateReqVO;
-import cn.iocoder.yudao.module.system.controller.admin.user.vo.user.UserImportExcelVO;
-import cn.iocoder.yudao.module.system.controller.admin.user.vo.user.UserImportRespVO;
-import cn.iocoder.yudao.module.system.controller.admin.user.vo.user.UserPageReqVO;
-import cn.iocoder.yudao.module.system.controller.admin.user.vo.user.UserSaveReqVO;
+import cn.iocoder.yudao.module.system.controller.admin.user.vo.user.*;
 import cn.iocoder.yudao.module.system.dal.dataobject.dept.DeptDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.dept.UserPostDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.user.AdminUserDO;
@@ -43,7 +40,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.io.InputStream;
 import java.time.LocalDateTime;
 import java.util.*;
-
+import java.util.concurrent.locks.ReentrantLock;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
@@ -83,6 +80,9 @@ public class AdminUserServiceImpl implements AdminUserService {
     private FileApi fileApi;
     @Resource
     private ConfigApi configApi;
+    private static final ReentrantLock LOCK = new ReentrantLock(true);
+    //工号前缀
+    private static final String EMPLOYEE_ID_PREFIX = "SM%06d";
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -101,8 +101,11 @@ public class AdminUserServiceImpl implements AdminUserService {
                 createReqVO.getMobile(), createReqVO.getEmail(), createReqVO.getDeptId(), createReqVO.getPostIds());
         // 2.1 插入用户
         AdminUserDO user = BeanUtils.toBean(createReqVO, AdminUserDO.class);
-        user.setStatus(CommonStatusEnum.ENABLE.getStatus()); // 默认开启
-        user.setPassword(encodePassword(createReqVO.getPassword())); // 加密密码
+        // 默认禁用
+        user.setStatus(CommonStatusEnum.DISABLE.getStatus());
+        // 加密密码
+        user.setPassword(encodePassword(createReqVO.getPassword()));
+        //插入用户信息
         userMapper.insert(user);
         // 2.2 插入关联岗位
         if (CollectionUtil.isNotEmpty(user.getPostIds())) {
@@ -112,21 +115,31 @@ public class AdminUserServiceImpl implements AdminUserService {
 
         // 3. 记录操作日志上下文
         LogRecordContext.putVariable("user", user);
-        return user.getId();
+        Long id = user.getId();
+        //自动生成工号
+        user.setEmployeeId(generateEmployeeId(id));
+        //修改
+        userMapper.updateById(user);
+        return id;
     }
+
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     @LogRecord(type = SYSTEM_USER_TYPE, subType = SYSTEM_USER_UPDATE_SUB_TYPE, bizNo = "{{#updateReqVO.id}}",
             success = SYSTEM_USER_UPDATE_SUCCESS)
     public void updateUser(UserSaveReqVO updateReqVO) {
-        updateReqVO.setPassword(null); // 特殊：此处不更新密码
+        // 特殊：此处不更新密码
+        updateReqVO.setPassword(null);
         // 1. 校验正确性
         AdminUserDO oldUser = validateUserForCreateOrUpdate(updateReqVO.getId(), updateReqVO.getUsername(),
                 updateReqVO.getMobile(), updateReqVO.getEmail(), updateReqVO.getDeptId(), updateReqVO.getPostIds());
-
         // 2.1 更新用户
         AdminUserDO updateObj = BeanUtils.toBean(updateReqVO, AdminUserDO.class);
+        //判断工号是否为空
+        if (StrUtil.isBlank(oldUser.getEmployeeId())){
+            updateObj.setEmployeeId(generateEmployeeId(oldUser.getId()));
+        }
         userMapper.updateById(updateObj);
         // 2.2 更新岗位
         updateUserPost(updateReqVO, updateObj);
@@ -377,6 +390,17 @@ public class AdminUserServiceImpl implements AdminUserService {
         }
     }
 
+    @Override
+    public Integer getUsernameIndex(String username){
+        try {
+            LOCK.lock();
+            List<AdminUserDO> userList = userMapper.selectLikeRightByUsername(username);
+            return userList.size();
+        } finally {
+            LOCK.unlock();
+        }
+    }
+
     @VisibleForTesting
     void validateEmailUnique(Long id, String email) {
         if (StrUtil.isBlank(email)) {
@@ -501,6 +525,14 @@ public class AdminUserServiceImpl implements AdminUserService {
      */
     private String encodePassword(String password) {
         return passwordEncoder.encode(password);
+    }
+
+    /**
+     * 自动生成工号
+     * @return java.lang.String
+     **/
+    private String generateEmployeeId(Long id) {
+        return EMPLOYEE_ID_PREFIX.formatted(id);
     }
 
 }
