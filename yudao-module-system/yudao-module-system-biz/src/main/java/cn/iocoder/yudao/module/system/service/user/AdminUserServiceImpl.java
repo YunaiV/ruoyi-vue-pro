@@ -81,6 +81,8 @@ public class AdminUserServiceImpl implements AdminUserService {
     @Resource
     private ConfigApi configApi;
     private static final ReentrantLock LOCK = new ReentrantLock(true);
+    //工号前缀
+    private static final String EMPLOYEE_ID_PREFIX = "SM%06d";
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -96,7 +98,7 @@ public class AdminUserServiceImpl implements AdminUserService {
         });
         // 1.2 校验正确性
         validateUserForCreateOrUpdate(null, createReqVO.getUsername(),
-                createReqVO.getMobile(), createReqVO.getEmail(), createReqVO.getDeptId(), createReqVO.getPostIds(), createReqVO.getEmployeeId());
+                createReqVO.getMobile(), createReqVO.getEmail(), createReqVO.getDeptId(), createReqVO.getPostIds());
         // 2.1 插入用户
         AdminUserDO user = BeanUtils.toBean(createReqVO, AdminUserDO.class);
         // 默认禁用
@@ -113,21 +115,31 @@ public class AdminUserServiceImpl implements AdminUserService {
 
         // 3. 记录操作日志上下文
         LogRecordContext.putVariable("user", user);
-        return user.getId();
+        Long id = user.getId();
+        //自动生成工号
+        user.setEmployeeId(generateEmployeeId(id));
+        //修改
+        userMapper.updateById(user);
+        return id;
     }
+
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     @LogRecord(type = SYSTEM_USER_TYPE, subType = SYSTEM_USER_UPDATE_SUB_TYPE, bizNo = "{{#updateReqVO.id}}",
             success = SYSTEM_USER_UPDATE_SUCCESS)
     public void updateUser(UserSaveReqVO updateReqVO) {
-        updateReqVO.setPassword(null); // 特殊：此处不更新密码
+        // 特殊：此处不更新密码
+        updateReqVO.setPassword(null);
         // 1. 校验正确性
         AdminUserDO oldUser = validateUserForCreateOrUpdate(updateReqVO.getId(), updateReqVO.getUsername(),
-                updateReqVO.getMobile(), updateReqVO.getEmail(), updateReqVO.getDeptId(), updateReqVO.getPostIds(), updateReqVO.getEmployeeId());
-
+                updateReqVO.getMobile(), updateReqVO.getEmail(), updateReqVO.getDeptId(), updateReqVO.getPostIds());
         // 2.1 更新用户
         AdminUserDO updateObj = BeanUtils.toBean(updateReqVO, AdminUserDO.class);
+        //判断工号是否为空
+        if (StrUtil.isBlank(oldUser.getEmployeeId())){
+            updateObj.setEmployeeId(generateEmployeeId(oldUser.getId()));
+        }
         userMapper.updateById(updateObj);
         // 2.2 更新岗位
         updateUserPost(updateReqVO, updateObj);
@@ -329,15 +341,13 @@ public class AdminUserServiceImpl implements AdminUserService {
     }
 
     private AdminUserDO validateUserForCreateOrUpdate(Long id, String username, String mobile, String email,
-                                               Long deptId, Set<Long> postIds, String employeeId) {
+                                               Long deptId, Set<Long> postIds) {
         // 关闭数据权限，避免因为没有数据权限，查询不到数据，进而导致唯一校验不正确
         return DataPermissionUtils.executeIgnore(() -> {
             // 校验用户存在
             AdminUserDO user = validateUserExists(id);
             // 校验用户名唯一
             validateUsernameUnique(id, username);
-            //验证工号唯一
-            validateNoUnique(id, employeeId);
             // 校验手机号唯一
             validateMobileUnique(id, mobile);
             // 校验邮箱唯一
@@ -348,23 +358,6 @@ public class AdminUserServiceImpl implements AdminUserService {
             postService.validatePostList(postIds);
             return user;
         });
-    }
-
-    private void validateNoUnique(Long id, String employeeId) {
-        if (StrUtil.isBlank(employeeId)) {
-            return;
-        }
-        AdminUserDO user = userMapper.selectByNo(employeeId);
-        if (user == null) {
-            return;
-        }
-        // 如果 id 为空，说明不用比较是否为相同 id 的用户
-        if (id == null) {
-            throw exception(USER_NUMBER_EXISTS);
-        }
-        if (!user.getId().equals(id)) {
-            throw exception(USER_NUMBER_EXISTS);
-        }
     }
 
     @VisibleForTesting
@@ -487,7 +480,7 @@ public class AdminUserServiceImpl implements AdminUserService {
             // 2.1.2 校验，判断是否有不符合的原因
             try {
                 validateUserForCreateOrUpdate(null, null, importUser.getMobile(), importUser.getEmail(),
-                        importUser.getDeptId(), null,importUser.getEmployeeId());
+                        importUser.getDeptId(), null);
             } catch (ServiceException ex) {
                 respVO.getFailureUsernames().put(importUser.getUsername(), ex.getMessage());
                 return;
@@ -532,6 +525,14 @@ public class AdminUserServiceImpl implements AdminUserService {
      */
     private String encodePassword(String password) {
         return passwordEncoder.encode(password);
+    }
+
+    /**
+     * 自动生成工号
+     * @return java.lang.String
+     **/
+    private String generateEmployeeId(Long id) {
+        return EMPLOYEE_ID_PREFIX.formatted(id);
     }
 
 }

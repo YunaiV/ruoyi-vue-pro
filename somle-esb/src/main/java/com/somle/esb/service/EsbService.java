@@ -308,13 +308,9 @@ public class EsbService {
             //根据昵称自动生成用户名
             erpUser.setUsername(dingTalkToErpConverter.generateUserName(nickname));
             if (erpUser.getId() != null) {
-                erpUser.setEmployeeId("SM" + String.format("%06d", erpUser.getId()));
                 adminUserApi.updateUser(erpUser);
             } else {
-                erpUser.setEmployeeId("temp");
                 Long userId = adminUserApi.createUser(erpUser);
-                erpUser.setId(userId).setEmployeeId("SM" + String.format("%06d", userId));
-                adminUserApi.updateUser(erpUser);
                 var mapping = mappingService.toMapping(dingTalkUser);
                 mapping
                     .setInternalId(userId);
