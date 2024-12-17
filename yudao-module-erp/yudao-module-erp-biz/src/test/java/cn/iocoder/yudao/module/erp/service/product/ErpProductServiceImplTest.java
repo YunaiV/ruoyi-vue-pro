@@ -166,8 +166,8 @@ public class ErpProductServiceImplTest extends BaseDbUnitTest {
         Long productId = productService.createProduct(updateReqVO);
         // 调用
         productService.deleteProduct(productId);
-       // 校验数据不存在了
-       assertNull(productMapper.selectById(productId));
+        // 校验数据不存在了
+        assertNull(productMapper.selectById(productId));
     }
 
     @Test

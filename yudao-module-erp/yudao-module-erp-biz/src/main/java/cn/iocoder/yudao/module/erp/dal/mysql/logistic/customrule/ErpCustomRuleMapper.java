@@ -34,6 +34,7 @@ public interface ErpCustomRuleMapper extends BaseMapperX<ErpCustomRuleDO> {
                         ErpCustomRuleDO::getTaxRate)
                 .leftJoin(ErpSupplierProductDO.class, ErpSupplierProductDO::getId, ErpCustomRuleDO::getSupplierProductId)
                 .selectAs(ErpSupplierProductDO::getCode, ErpCustomRuleDTO::getSupplierProductCode)
+                .selectAs(ErpSupplierProductDO::getPurchasePrice,ErpCustomRuleDTO::getProductPurchaseValue)
                 .select(ErpSupplierProductDO::getPackageWeight,
                         ErpSupplierProductDO::getPackageLength,
                         ErpSupplierProductDO::getPackageWidth,
@@ -48,7 +49,6 @@ public interface ErpCustomRuleMapper extends BaseMapperX<ErpCustomRuleDO> {
                 .selectAs(ErpProductDO::getHeight, ErpCustomRuleDTO::getProductHeight)
                 .selectAs(ErpProductDO::getMaterial, ErpCustomRuleDTO::getProductMaterial)
                 .selectAs(ErpProductDO::getCreator, ErpCustomRuleDTO::getProductCreatorId)
-                .selectAs(ErpProductDO::getPurchasePrice,ErpCustomRuleDTO::getProductPurchaseValue)
                 .select(ErpProductDO::getBarCode)
                 .selectAs(ErpProductDO::getDeptId, ErpCustomRuleDTO::getProductDeptId);
     }
