@@ -127,6 +127,14 @@
             <artifactId>yudao-spring-boot-starter-protection</artifactId>
         </dependency>
 
+        <!-- 拼音包引入，必须放在启动类下的pom.xml，放在其他位置一律报错
+        cn.hutool.extra.pinyin.PinyinException: No pinyin jar found ! Please add one of it to your project -->
+        <dependency>
+            <groupId>com.belerweb</groupId>
+                <artifactId>pinyin4j</artifactId>
+            <version>2.5.1</version>
+        </dependency>
+
     </dependencies>
 
     <build>

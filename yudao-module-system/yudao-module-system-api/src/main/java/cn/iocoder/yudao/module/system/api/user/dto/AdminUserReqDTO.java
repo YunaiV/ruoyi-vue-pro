@@ -1,11 +1,6 @@
 package cn.iocoder.yudao.module.system.api.user.dto;
 
-import cn.hutool.core.util.ObjectUtil;
-import cn.iocoder.yudao.framework.common.validation.Mobile;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import jakarta.validation.constraints.*;
 import lombok.Data;
-import org.hibernate.validator.constraints.Length;
 
 import java.util.Set;
 
@@ -20,6 +15,9 @@ import java.util.Set;
 public class AdminUserReqDTO {
     //id
     private Long id;
+
+    //工号
+    private String no;
 
     //用户账号
     private String username;

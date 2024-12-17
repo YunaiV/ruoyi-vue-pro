@@ -20,6 +20,9 @@ import lombok.experimental.Accessors;
 @Accessors(chain = false) // 设置 chain = false，避免用户导入有问题
 public class UserImportExcelVO {
 
+    @ExcelProperty("工号")
+    private String no;
+
     @ExcelProperty("登录名称")
     private String username;
 

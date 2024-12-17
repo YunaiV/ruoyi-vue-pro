@@ -21,6 +21,13 @@ public class UserSaveReqVO {
     @Schema(description = "用户编号", example = "1024")
     private Long id;
 
+    @Schema(description = "工号", requiredMode = Schema.RequiredMode.REQUIRED, example = "0001")
+    @Pattern(regexp = "^[a-zA-Z0-9]{4,30}$", message = "工号由 数字、字母 组成")
+    @NotBlank(message = "工号不能为空")
+    @Size(min = 4, max = 30, message = "工号长度为 4-30 个字符")
+    @DiffLogField(name = "工号")
+    private String no;
+
     @Schema(description = "用户账号", requiredMode = Schema.RequiredMode.REQUIRED, example = "yudao")
     @NotBlank(message = "用户账号不能为空")
     @Pattern(regexp = "^[a-zA-Z0-9]{4,30}$", message = "用户账号由 数字、字母 组成")

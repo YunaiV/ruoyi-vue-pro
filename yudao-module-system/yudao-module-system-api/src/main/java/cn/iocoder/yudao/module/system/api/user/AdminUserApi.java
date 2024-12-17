@@ -103,4 +103,13 @@ public interface AdminUserApi {
     * @return java.lang.Long
     **/
     Long createUser(AdminUserReqDTO erpUser);
+
+    /**
+    * @Author Wqh
+    * @Description 获取以相同用户名开头的用户数量
+    * @Date 14:52 2024/11/4
+    * @Param [username]
+    * @return java.lang.Integer
+    **/
+    Integer getUsernameIndex(String username);
 }

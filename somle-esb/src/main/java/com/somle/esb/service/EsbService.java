@@ -1,6 +1,7 @@
 package com.somle.esb.service;
 
 import cn.hutool.core.util.ObjUtil;
+import cn.hutool.extra.pinyin.PinyinUtil;
 import cn.iocoder.yudao.module.erp.api.product.dto.ErpCustomRuleDTO;
 import cn.iocoder.yudao.module.erp.api.supplier.dto.ErpSupplierDTO;
 import cn.iocoder.yudao.module.infra.api.config.ConfigApi;
@@ -118,6 +119,8 @@ public class EsbService {
 
     @Autowired
     private ApplicationContext applicationContext;
+    private static final String CHINESE_CHAR_PATTERN = "[\\u4E00-\\u9FA5]+";
+    private static final String ENGLISH_CHAR_PATTERN = "^[a-zA-Z\\s]+$";
 
     @PostConstruct
     private void init() {
@@ -302,12 +305,16 @@ public class EsbService {
             log.info("begin syncing: " + dingTalkUser.toString());
             AdminUserReqDTO erpUser = dingTalkToErpConverter.toErp(dingTalkUser);
             log.info("user to add " + erpUser);
+            //获取钉钉中的昵称
+            String nickname = erpUser.getNickname();
+            //根据昵称自动生成用户名
+            erpUser.setUsername(generateUserName(nickname));
             if (erpUser.getId() != null) {
                 adminUserApi.updateUser(erpUser);
             } else {
-                erpUser.setUsername("temp");
+                erpUser.setNo("temp");
                 Long userId = adminUserApi.createUser(erpUser);
-                erpUser.setId(userId).setUsername("SM" + String.format("%06d", userId));
+                erpUser.setId(userId).setNo("SM" + String.format("%06d", userId));
                 adminUserApi.updateUser(erpUser);
                 var mapping = mappingService.toMapping(dingTalkUser);
                 mapping
@@ -315,6 +322,35 @@ public class EsbService {
                 mappingService.save(mapping);
             }
         });
+    }
+
+    /**
+    * @Author Wqh
+    * @Description 自动生成用户名
+     * 中文名直接转为拼音
+     * 英文名出去空格变为小写
+     * 非法字符直接抛出异常（数字，中英结合，符号等）
+    * @Date 13:09 2024/12/9
+    * @Param [name]
+    * @return java.lang.String
+    **/
+    public String generateUserName(String nickname) {
+        String initUsername;
+        //判断是否都为中文字符
+        if(nickname.matches(CHINESE_CHAR_PATTERN)){
+            //将昵称转化为拼音获取username
+            initUsername = PinyinUtil.getPinyin(nickname).replaceAll("\\s+", "");
+        }else if (nickname.matches(ENGLISH_CHAR_PATTERN)){
+            //英文字符一律去掉空格，一律变小写
+            initUsername = nickname.toLowerCase().replaceAll("\\s+", "");
+        }else {
+            //存在特殊字符则抛出异常
+            throw new RuntimeException("昵称\""+nickname+"\"不规范，请联系管理员");
+        }
+        //获取以相同用户名开头的用户数量
+        Integer usernameIndex = adminUserApi.getUsernameIndex(nickname);
+        //自动生成用户账户
+        return usernameIndex == 0 ? initUsername : initUsername + "." + usernameIndex;
     }
 
 }

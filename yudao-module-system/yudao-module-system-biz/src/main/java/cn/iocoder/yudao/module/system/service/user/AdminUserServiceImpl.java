@@ -15,10 +15,7 @@ import cn.iocoder.yudao.module.infra.api.config.ConfigApi;
 import cn.iocoder.yudao.module.infra.api.file.FileApi;
 import cn.iocoder.yudao.module.system.controller.admin.user.vo.profile.UserProfileUpdatePasswordReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.user.vo.profile.UserProfileUpdateReqVO;
-import cn.iocoder.yudao.module.system.controller.admin.user.vo.user.UserImportExcelVO;
-import cn.iocoder.yudao.module.system.controller.admin.user.vo.user.UserImportRespVO;
-import cn.iocoder.yudao.module.system.controller.admin.user.vo.user.UserPageReqVO;
-import cn.iocoder.yudao.module.system.controller.admin.user.vo.user.UserSaveReqVO;
+import cn.iocoder.yudao.module.system.controller.admin.user.vo.user.*;
 import cn.iocoder.yudao.module.system.dal.dataobject.dept.DeptDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.dept.UserPostDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.user.AdminUserDO;
@@ -43,7 +40,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.io.InputStream;
 import java.time.LocalDateTime;
 import java.util.*;
-
+import java.util.concurrent.locks.ReentrantLock;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
@@ -83,6 +80,7 @@ public class AdminUserServiceImpl implements AdminUserService {
     private FileApi fileApi;
     @Resource
     private ConfigApi configApi;
+    private static final ReentrantLock LOCK = new ReentrantLock(true);
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -98,11 +96,14 @@ public class AdminUserServiceImpl implements AdminUserService {
         });
         // 1.2 校验正确性
         validateUserForCreateOrUpdate(null, createReqVO.getUsername(),
-                createReqVO.getMobile(), createReqVO.getEmail(), createReqVO.getDeptId(), createReqVO.getPostIds());
+                createReqVO.getMobile(), createReqVO.getEmail(), createReqVO.getDeptId(), createReqVO.getPostIds(), createReqVO.getNo());
         // 2.1 插入用户
         AdminUserDO user = BeanUtils.toBean(createReqVO, AdminUserDO.class);
-        user.setStatus(CommonStatusEnum.ENABLE.getStatus()); // 默认开启
-        user.setPassword(encodePassword(createReqVO.getPassword())); // 加密密码
+        // 默认禁用
+        user.setStatus(CommonStatusEnum.DISABLE.getStatus());
+        // 加密密码
+        user.setPassword(encodePassword(createReqVO.getPassword()));
+        //插入用户信息
         userMapper.insert(user);
         // 2.2 插入关联岗位
         if (CollectionUtil.isNotEmpty(user.getPostIds())) {
@@ -123,7 +124,7 @@ public class AdminUserServiceImpl implements AdminUserService {
         updateReqVO.setPassword(null); // 特殊：此处不更新密码
         // 1. 校验正确性
         AdminUserDO oldUser = validateUserForCreateOrUpdate(updateReqVO.getId(), updateReqVO.getUsername(),
-                updateReqVO.getMobile(), updateReqVO.getEmail(), updateReqVO.getDeptId(), updateReqVO.getPostIds());
+                updateReqVO.getMobile(), updateReqVO.getEmail(), updateReqVO.getDeptId(), updateReqVO.getPostIds(), updateReqVO.getNo());
 
         // 2.1 更新用户
         AdminUserDO updateObj = BeanUtils.toBean(updateReqVO, AdminUserDO.class);
@@ -328,13 +329,15 @@ public class AdminUserServiceImpl implements AdminUserService {
     }
 
     private AdminUserDO validateUserForCreateOrUpdate(Long id, String username, String mobile, String email,
-                                               Long deptId, Set<Long> postIds) {
+                                               Long deptId, Set<Long> postIds, String no) {
         // 关闭数据权限，避免因为没有数据权限，查询不到数据，进而导致唯一校验不正确
         return DataPermissionUtils.executeIgnore(() -> {
             // 校验用户存在
             AdminUserDO user = validateUserExists(id);
             // 校验用户名唯一
             validateUsernameUnique(id, username);
+            //验证工号唯一
+            validateNoUnique(id, no);
             // 校验手机号唯一
             validateMobileUnique(id, mobile);
             // 校验邮箱唯一
@@ -345,6 +348,23 @@ public class AdminUserServiceImpl implements AdminUserService {
             postService.validatePostList(postIds);
             return user;
         });
+    }
+
+    private void validateNoUnique(Long id, String no) {
+        if (StrUtil.isBlank(no)) {
+            return;
+        }
+        AdminUserDO user = userMapper.selectByNo(no);
+        if (user == null) {
+            return;
+        }
+        // 如果 id 为空，说明不用比较是否为相同 id 的用户
+        if (id == null) {
+            throw exception(USER_NUMBER_EXISTS);
+        }
+        if (!user.getId().equals(id)) {
+            throw exception(USER_NUMBER_EXISTS);
+        }
     }
 
     @VisibleForTesting
@@ -374,6 +394,17 @@ public class AdminUserServiceImpl implements AdminUserService {
         }
         if (!user.getId().equals(id)) {
             throw exception(USER_USERNAME_EXISTS);
+        }
+    }
+
+    @Override
+    public Integer getUsernameIndex(String username){
+        try {
+            LOCK.lock();
+            List<AdminUserDO> userList = userMapper.selectLikeRightByUsername(username);
+            return userList.size();
+        } finally {
+            LOCK.unlock();
         }
     }
 
@@ -456,7 +487,7 @@ public class AdminUserServiceImpl implements AdminUserService {
             // 2.1.2 校验，判断是否有不符合的原因
             try {
                 validateUserForCreateOrUpdate(null, null, importUser.getMobile(), importUser.getEmail(),
-                        importUser.getDeptId(), null);
+                        importUser.getDeptId(), null,importUser.getNo());
             } catch (ServiceException ex) {
                 respVO.getFailureUsernames().put(importUser.getUsername(), ex.getMessage());
                 return;
