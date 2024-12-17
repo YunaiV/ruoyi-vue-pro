@@ -12,7 +12,7 @@ public interface IotDeviceDataConvert {
 //    default  List<IotDeviceDataRespVO> convert(Map<String, Object> deviceData, IotDeviceDO device){
 //        List<IotDeviceDataRespVO> list = new ArrayList<>();
 //        deviceData.forEach((identifier, value) -> {
-////            ThingModelProperty property = ThingModelService.INSTANCE.getProperty(device.getProductId(), identifier);
+////            ThinkModelProperty property = ThinkModelService.INSTANCE.getProperty(device.getProductId(), identifier);
 ////            if (Objects.isNull(property)) {
 ////                return;
 ////            }
