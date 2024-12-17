@@ -7,6 +7,7 @@ import net.sourceforge.pinyin4j.PinyinHelper;
 import net.sourceforge.pinyin4j.format.HanyuPinyinCaseType;
 import net.sourceforge.pinyin4j.format.HanyuPinyinOutputFormat;
 import net.sourceforge.pinyin4j.format.HanyuPinyinToneType;
+import net.sourceforge.pinyin4j.format.HanyuPinyinVCharType;
 import net.sourceforge.pinyin4j.format.exception.BadHanyuPinyinOutputFormatCombination;
 
 import java.util.Arrays;
@@ -29,6 +30,8 @@ public class StrUtils {
         PINYIN_FORMAT = new HanyuPinyinOutputFormat();
         PINYIN_FORMAT.setCaseType(HanyuPinyinCaseType.LOWERCASE);
         PINYIN_FORMAT.setToneType(HanyuPinyinToneType.WITHOUT_TONE);
+        //拼音中的u输出为v 例如lv
+        PINYIN_FORMAT.setVCharType(HanyuPinyinVCharType.WITH_V);
     }
 
     public static boolean isEmpty(String str) {
