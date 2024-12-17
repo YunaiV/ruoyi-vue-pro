@@ -24,7 +24,7 @@ public class ErpProductServiceDelegator implements ErpProductService {
 
     // 分类Id映射ProductService的实现类
     private static final Map<Long, Class<?>> SERVICE_MAP = Map.of(
-        87L, ErpProductTvStandServiceImpl.class
+        1L, ErpProductTvStandServiceImpl.class
     );
 
     private ErpProductService getDefaultService() {
