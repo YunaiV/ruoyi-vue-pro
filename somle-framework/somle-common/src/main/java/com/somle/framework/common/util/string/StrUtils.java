@@ -99,27 +99,10 @@ public class StrUtils {
         if (input == null || input.isEmpty()) {
             return input;
         }
-        // 替换所有分隔符为空格
-        String normalizedInput = input.replaceAll("[._-]", " ");
-        // 分割字符串
-        String[] words = normalizedInput.split("\\s+");
-        // 构建驼峰命名
-        StringBuilder camelCaseStr = new StringBuilder();
-        for (int i = 0; i < words.length; i++) {
-            String word = words[i];
-            if (word.isEmpty()) {
-                continue;
-            }
-            if (i == 0) {
-                // 第一个单词全部小写
-                camelCaseStr.append(word.toLowerCase());
-            } else {
-                // 后续单词首字母大写
-                camelCaseStr.append(Character.toUpperCase(word.charAt(0)))
-                        .append(word.substring(1).toLowerCase());
-            }
-        }
-        return camelCaseStr.toString();
+        // 去除所有特殊字符，包括空格、连字符、下划线等
+        String cleanedInput = StrUtil.removeAll(input, "[\\s._-]");
+        // 使用 Hutool 的 toCamelCase 方法转换为驼峰命名
+        return StrUtil.toCamelCase(cleanedInput);
     }
 
 }

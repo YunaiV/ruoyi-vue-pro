@@ -9,10 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.zip.GZIPInputStream;
-
-import cn.hutool.core.util.ObjUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.somle.framework.common.util.json.JSONObject;
 import com.somle.framework.common.util.json.JsonUtils;
 import com.somle.framework.common.util.string.StrUtils;
@@ -20,11 +17,6 @@ import lombok.SneakyThrows;
 import okhttp3.*;
 import org.apache.commons.collections4.MultiValuedMap;
 import org.apache.tomcat.util.http.fileupload.IOUtils;
-
-//import com.alibaba.fastjson2.JSON;
-//import com.alibaba.fastjson2.JSONArray;
-//import com.alibaba.fastjson2.JSONObject;
-
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 
@@ -177,36 +169,34 @@ public class WebUtils {
 
     @SneakyThrows
     public static String urlToString(String urlString, String compression) {
+        InputStream inputStream = getInputStreamFromUrl(urlString, compression);
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        IOUtils.copy(inputStream, byteArrayOutputStream);
+        return byteArrayOutputStream.toString();
+    }
+
+    @SneakyThrows
+    public static String csvToJson(String urlString) {
+        InputStream inputStream = getInputStreamFromUrl(urlString, null);
+        List<Map<String, String>> jsonDataList = parseTabDelimitedStreamToMapList(inputStream);
+        ObjectMapper objectMapper = new ObjectMapper();
+        return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(jsonDataList);
+    }
+
+    @SneakyThrows
+    private static InputStream getInputStreamFromUrl(String urlString, String compression) {
         URL url = new URL(urlString);
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setRequestMethod("GET");
-        // Choose input stream based on compression type
         InputStream inputStream = connection.getInputStream();
         if ("gzip".equalsIgnoreCase(compression)) {
             inputStream = new GZIPInputStream(inputStream);
         }
-        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        IOUtils.copy(inputStream, byteArrayOutputStream);
-        String jsonString = byteArrayOutputStream.toString();
-        return jsonString;
-    }
-
-    @SneakyThrows
-    public static String urlToString(String urlString) {
-        URL url = new URL(urlString);
-        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-        connection.setRequestMethod("GET");
-        // Choose input stream based on compression type
-        InputStream inputStream = connection.getInputStream();
-        List<Map<String, String>> jsonDataList = getMaps(inputStream);
-        ObjectMapper objectMapper = new ObjectMapper();
-        return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(jsonDataList);
-
-
+        return inputStream;
     }
 
     @NotNull
-    private static List<Map<String, String>> getMaps(InputStream inputStream) throws IOException {
+    private static List<Map<String, String>> parseTabDelimitedStreamToMapList(InputStream inputStream) throws IOException {
         BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
         List<Map<String, String>> jsonDataList = new ArrayList<>();
         String line;
