@@ -19,10 +19,10 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 public class GuidePriceJson implements Serializable {
     /**
-     * key（价格简述）
+     * 国别代码
      **/
-    @NotBlank(message = "价格简述不能为空")
-    private String name;
+    @NotNull(message = "国别代码")
+    private Integer code;
     /**
      * 价格
      **/

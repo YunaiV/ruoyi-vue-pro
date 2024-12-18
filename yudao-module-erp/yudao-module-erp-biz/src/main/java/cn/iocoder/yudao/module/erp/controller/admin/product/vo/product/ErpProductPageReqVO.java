@@ -44,7 +44,7 @@ public class ErpProductPageReqVO extends PageParam {
     private String remark;
 
     @Schema(description = "基础重量（kg）")
-    private BigDecimal weight;
+    private Integer weight;
 
     @Schema(description = "系列")
     private String series;
@@ -62,13 +62,13 @@ public class ErpProductPageReqVO extends PageParam {
     private String productionNo;
 
     @Schema(description = "基础宽度（mm）")
-    private BigDecimal width;
+    private Integer width;
 
     @Schema(description = "基础长度（mm）")
-    private BigDecimal length;
+    private Integer length;
 
     @Schema(description = "基础高度（mm）")
-    private BigDecimal height;
+    private Integer height;
 
     @Schema(description = "专利")
     private String patent;

@@ -51,7 +51,7 @@ public class ErpProductSaveReqVO {
 
     @Schema(description = "基础重量（kg）", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "基础重量（kg）不能为空")
-    private BigDecimal weight;
+    private Integer weight;
 
     @Schema(description = "系列")
     private String series;
@@ -71,15 +71,15 @@ public class ErpProductSaveReqVO {
 
     @Schema(description = "基础宽度（mm）", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "基础宽度（mm）不能为空")
-    private BigDecimal width;
+    private Integer width;
 
     @Schema(description = "基础长度（mm）", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "基础长度（mm）不能为空")
-    private BigDecimal length;
+    private Integer length;
 
     @Schema(description = "基础高度（mm）", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "基础高度（mm）不能为空")
-    private BigDecimal height;
+    private Integer height;
 
     @Schema(description = "主图", requiredMode = Schema.RequiredMode.REQUIRED, example = "https://www.iocoder.cn")
     @NotBlank(message = "主图不能为空")

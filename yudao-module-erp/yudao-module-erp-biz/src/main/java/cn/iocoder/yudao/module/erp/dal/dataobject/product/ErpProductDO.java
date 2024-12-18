@@ -61,7 +61,7 @@ public class ErpProductDO extends BaseDO {
     /**
      * 基础重量（kg）
      */
-    private BigDecimal weight;
+    private Integer weight;
     /**
      * 系列
      */
@@ -85,15 +85,15 @@ public class ErpProductDO extends BaseDO {
     /**
      * 基础宽度（mm）
      */
-    private BigDecimal width;
+    private Integer width;
     /**
      * 基础长度（mm）
      */
-    private BigDecimal length;
+    private Integer length;
     /**
      * 基础高度（mm）
      */
-    private BigDecimal height;
+    private Integer height;
     /**
      * 主图url
      */

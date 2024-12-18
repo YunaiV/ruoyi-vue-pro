@@ -69,7 +69,7 @@ public class ErpProductRespVO {
 
     @Schema(description = "基础重量（kg）", requiredMode = Schema.RequiredMode.REQUIRED)
     @ExcelProperty("基础重量（kg）")
-    private BigDecimal weight;
+    private Integer weight;
 
     @Schema(description = "系列")
     @ExcelProperty("系列")
@@ -93,15 +93,15 @@ public class ErpProductRespVO {
 
     @Schema(description = "基础宽度（mm）", requiredMode = Schema.RequiredMode.REQUIRED)
     @ExcelProperty("基础宽度（mm）")
-    private BigDecimal width;
+    private Integer width;
 
     @Schema(description = "基础长度（mm）", requiredMode = Schema.RequiredMode.REQUIRED)
     @ExcelProperty("基础长度（mm）")
-    private BigDecimal length;
+    private Integer length;
 
     @Schema(description = "基础高度（mm）", requiredMode = Schema.RequiredMode.REQUIRED)
     @ExcelProperty("基础高度（mm）")
-    private BigDecimal height;
+    private Integer height;
 
     @Schema(description = "主图", example = "https://www.iocoder.cn")
     @ExcelProperty("主图")
