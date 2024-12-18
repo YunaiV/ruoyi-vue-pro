@@ -32,7 +32,7 @@ public class IotDeviceDataDO {
      * <p>
      * 关联 {@link IotProductThinkModelDO#getId()}
      */
-    private Long thinkModelFunctionId;
+    private Long thinkModelId;
 
     /**
      * 产品标识

@@ -35,19 +35,16 @@ public class FieldParser {
      */
     public static TdFieldDO parse(ThinkModelProperty property) {
         String fieldName = property.getIdentifier().toLowerCase();
-        //// TODO @puhui999: 需要重构
-        //ThinkModelDataSpecs type = property.getDataType();
-        //
-        //// 将物模型字段类型映射为td字段类型
-        //String fType = TYPE_MAPPING.get(type.getDataType().toUpperCase());
-        //
-        //// 如果字段类型为NCHAR，默认长度为64
-        //int dataLength = 0;
-        //if ("NCHAR".equals(fType)) {
-        //    dataLength = 64;
-        //}
-        //return new TdFieldDO(fieldName, fType, dataLength);
-        return null;
+
+        // 将物模型字段类型映射为td字段类型
+        String fType = TYPE_MAPPING.get(property.getDataType().toUpperCase());
+
+        // 如果字段类型为NCHAR，默认长度为64
+        int dataLength = 0;
+        if ("NCHAR".equals(fType)) {
+            dataLength = 64;
+        }
+        return new TdFieldDO(fieldName, fType, dataLength);
     }
 
     /**

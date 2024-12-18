@@ -4,6 +4,7 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
+import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
 import cn.iocoder.yudao.module.iot.controller.admin.thinkmodel.model.ThinkModelEvent;
 import cn.iocoder.yudao.module.iot.controller.admin.thinkmodel.model.ThinkModelProperty;
 import cn.iocoder.yudao.module.iot.controller.admin.thinkmodel.model.ThinkModelService;
@@ -17,6 +18,7 @@ import cn.iocoder.yudao.module.iot.dal.dataobject.product.IotProductDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.thinkmodel.IotProductThinkModelDO;
 import cn.iocoder.yudao.module.iot.dal.mysql.thinkmodel.IotProductThinkModelMapper;
 import cn.iocoder.yudao.module.iot.enums.product.IotProductStatusEnum;
+import cn.iocoder.yudao.module.iot.enums.thinkmodel.IotProductThinkModelAccessModeEnum;
 import cn.iocoder.yudao.module.iot.enums.thinkmodel.IotProductThinkModelTypeEnum;
 import cn.iocoder.yudao.module.iot.service.product.IotProductService;
 import cn.iocoder.yudao.module.iot.service.tdengine.IotSuperTableService;
@@ -72,7 +74,7 @@ public class IotProductThinkModelServiceImpl implements IotProductThinkModelServ
 
         // 6. 如果创建的是属性，需要更新默认的事件和服务
         if (Objects.equals(createReqVO.getType(), IotProductThinkModelTypeEnum.PROPERTY.getType())) {
-            //createDefaultEventsAndServices(createReqVO.getProductId(), createReqVO.getProductKey());
+            createDefaultEventsAndServices(createReqVO.getProductId(), createReqVO.getProductKey());
         }
         return function.getId();
     }
@@ -112,7 +114,7 @@ public class IotProductThinkModelServiceImpl implements IotProductThinkModelServ
     @Transactional(rollbackFor = Exception.class)
     public void updateProductThinkModel(IotProductThinkModelSaveReqVO updateReqVO) {
         // 1. 校验功能是否存在
-        validateproductThinkModelMapperExists(updateReqVO.getId());
+        validateProductThinkModelMapperExists(updateReqVO.getId());
 
         // 2. 校验功能标识符是否唯一
         validateIdentifierUniqueForUpdate(updateReqVO.getId(), updateReqVO.getProductId(), updateReqVO.getIdentifier());
@@ -163,7 +165,7 @@ public class IotProductThinkModelServiceImpl implements IotProductThinkModelServ
      *
      * @param id 功能编号
      */
-    private void validateproductThinkModelMapperExists(Long id) {
+    private void validateProductThinkModelMapperExists(Long id) {
         if (productThinkModelMapper.selectById(id) == null) {
             throw exception(THINK_MODEL_FUNCTION_NOT_EXISTS);
         }
@@ -201,7 +203,6 @@ public class IotProductThinkModelServiceImpl implements IotProductThinkModelServ
         return productThinkModelMapper.selectListByProductKey(productKey);
     }
 
-    // TODO @puhui999: 需要重构
     /**
      * 创建默认的事件和服务
      */
@@ -333,14 +334,12 @@ public class IotProductThinkModelServiceImpl implements IotProductThinkModelServ
 
         // 将属性列表转换为事件的输出参数
         List<ThinkModelArgument> outputData = new ArrayList<>();
-        // TODO @puhui999: 需要重构
-        for (IotProductThinkModelDO functionDO : propertyList) {
-            ThinkModelProperty property = functionDO.getProperty();
+        for (IotProductThinkModelDO thinkModel : propertyList) {
             ThinkModelArgument arg = new ThinkModelArgument()
-                    .setIdentifier(property.getIdentifier())
-                    .setName(property.getName())
-                    //.setDataType(property.getDataType())
-                    .setDescription(property.getDescription())
+                    .setIdentifier(thinkModel.getIdentifier())
+                    .setName(thinkModel.getName())
+                    .setProperty(thinkModel.getProperty())
+                    .setDescription(thinkModel.getDescription())
                     .setDirection("output"); // 设置为输出参数
             outputData.add(arg);
         }
@@ -357,18 +356,17 @@ public class IotProductThinkModelServiceImpl implements IotProductThinkModelServ
         }
 
         List<ThinkModelArgument> inputData = new ArrayList<>();
-        // TODO @puhui999: 需要重构
-        for (IotProductThinkModelDO functionDO : propertyList) {
-            ThinkModelProperty property = functionDO.getProperty();
-            //if (IotProductThinkModelAccessModeEnum.WRITE.getMode().equals(property.getAccessMode()) || IotProductThinkModelAccessModeEnum.READ_WRITE.getMode().equals(property.getAccessMode())) {
-            //    ThinkModelArgument arg = new ThinkModelArgument()
-            //            .setIdentifier(property.getIdentifier())
-            //            .setName(property.getName())
-            //            .setDataType(property.getDataType())
-            //            .setDescription(property.getDescription())
-            //            .setDirection("input"); // 设置为输入参数
-            //    inputData.add(arg);
-            //}
+        for (IotProductThinkModelDO thinkModel : propertyList) {
+            ThinkModelProperty property = thinkModel.getProperty();
+            if (IotProductThinkModelAccessModeEnum.READ_WRITE.getMode().equals(property.getAccessMode())) {
+                ThinkModelArgument arg = new ThinkModelArgument()
+                        .setIdentifier(property.getIdentifier())
+                        .setName(property.getName())
+                        .setProperty(property)
+                        .setDescription(property.getDescription())
+                        .setDirection("input"); // 设置为输入参数
+                inputData.add(arg);
+            }
         }
         if (inputData.isEmpty()) {
             // 如果没有可写属性，不生成属性设置服务
@@ -394,20 +392,20 @@ public class IotProductThinkModelServiceImpl implements IotProductThinkModelServ
         if (propertyList == null || propertyList.isEmpty()) {
             return null;
         }
-        // TODO @puhui999: 需要重构
+
         List<ThinkModelArgument> outputData = new ArrayList<>();
         for (IotProductThinkModelDO functionDO : propertyList) {
             ThinkModelProperty property = functionDO.getProperty();
-            //if (ObjectUtils.equalsAny(property.getAccessMode(),
-            //        IotProductThinkModelAccessModeEnum.READ.getMode(), IotProductThinkModelAccessModeEnum.READ_WRITE.getMode())) {
-            //    ThinkModelArgument arg = new ThinkModelArgument()
-            //            .setIdentifier(property.getIdentifier())
-            //            .setName(property.getName())
-            //            .setDataType(property.getDataType())
-            //            .setDescription(property.getDescription())
-            //            .setDirection("output"); // 设置为输出参数
-            //    outputData.add(arg);
-            //}
+            if (ObjectUtils.equalsAny(property.getAccessMode(),
+                    IotProductThinkModelAccessModeEnum.READ_ONLY.getMode(), IotProductThinkModelAccessModeEnum.READ_WRITE.getMode())) {
+                ThinkModelArgument arg = new ThinkModelArgument()
+                        .setIdentifier(property.getIdentifier())
+                        .setName(property.getName())
+                        .setProperty(property)
+                        .setDescription(property.getDescription())
+                        .setDirection("output"); // 设置为输出参数
+                outputData.add(arg);
+            }
         }
         if (outputData.isEmpty()) {
             // 如果没有可读属性，不生成属性获取服务
@@ -428,15 +426,16 @@ public class IotProductThinkModelServiceImpl implements IotProductThinkModelServ
                 .setDescription("需要获取的属性标识符列表")
                 .setDirection("input"); // 设置为输入参数
 
-        // 创建数组类型，元素类型为文本类型（字符串）
+        // 创建数组类型，元素类型为文本类型（字符串）TODO @puhui999: 还得研究研究
         ThinkModelArrayDataSpecs arrayType = new ThinkModelArrayDataSpecs();
         arrayType.setDataType("array");
-        //ThinkModelArraySpecs arraySpecs = new ThinkModelArraySpecs();
+        inputArg.setProperty(new ThinkModelProperty().setIdentifier(inputArg.getIdentifier()).setName(inputArg.getName())
+                .setDescription(inputArg.getDescription()).setDataSpecs(arrayType));
+
         ThinkModelDateOrTextDataSpecs textType = new ThinkModelDateOrTextDataSpecs();
         textType.setDataType("text");
-        //arraySpecs.setItem(textType);
-        //arrayType.setSpecs(arraySpecs);
-        inputArg.setDataType(arrayType);
+        inputArg.setProperty(new ThinkModelProperty().setIdentifier(inputArg.getIdentifier()).setName(inputArg.getName())
+                .setDescription(inputArg.getDescription()).setDataSpecs(textType));
 
         service.setInputData(Collections.singletonList(inputArg));
         service.setOutputData(outputData);

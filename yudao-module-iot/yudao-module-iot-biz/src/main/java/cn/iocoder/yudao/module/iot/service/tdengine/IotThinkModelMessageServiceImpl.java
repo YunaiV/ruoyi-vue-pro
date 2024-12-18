@@ -129,7 +129,6 @@ public class IotThinkModelMessageServiceImpl implements IotThinkModelMessageServ
      * @param time                    时间
      */
     private void setDeviceDataCache(IotDeviceDO device, IotProductThinkModelDO iotProductThinkModelDO, Object val, Long time) {
-        // TODO @puhui999: 需要重构
         IotDeviceDataDO deviceData = IotDeviceDataDO.builder()
                 .productKey(device.getProductKey())
                 .deviceName(device.getDeviceName())
@@ -137,9 +136,9 @@ public class IotThinkModelMessageServiceImpl implements IotThinkModelMessageServ
                 .value(val != null ? val.toString() : null)
                 .updateTime(DateUtil.toLocalDateTime(new Date(time)))
                 .deviceId(device.getId())
-                .thinkModelFunctionId(iotProductThinkModelDO.getId())
+                .thinkModelId(iotProductThinkModelDO.getId())
                 .name(iotProductThinkModelDO.getName())
-                //.dataType(iotProductThinkModelDO.getProperty().getDataType().getDataType())
+                .dataType(iotProductThinkModelDO.getProperty().getDataType())
                 .build();
         deviceDataRedisDAO.set(deviceData);
     }
