@@ -1,8 +1,7 @@
 package cn.iocoder.yudao.module.iot.dal.dataobject.tdengine;
 
-import cn.iocoder.yudao.module.iot.controller.admin.productthingmodel.thingmodel.ThingModelProperty;
-import cn.iocoder.yudao.module.iot.controller.admin.productthingmodel.thingmodel.ThingModelRespVO;
-import cn.iocoder.yudao.module.iot.controller.admin.productthingmodel.thingmodel.dataType.ThingModelDataSpecs;
+import cn.iocoder.yudao.module.iot.controller.admin.thinkmodel.model.ThinkModelProperty;
+import cn.iocoder.yudao.module.iot.controller.admin.thinkmodel.model.ThinkModelRespVO;
 
 import java.util.HashMap;
 import java.util.List;
@@ -34,21 +33,18 @@ public class FieldParser {
      * @param property 物模型属性
      * @return TdField对象
      */
-    public static TdFieldDO parse(ThingModelProperty property) {
+    public static TdFieldDO parse(ThinkModelProperty property) {
         String fieldName = property.getIdentifier().toLowerCase();
-        //// TODO @puhui999: 需要重构
-        //ThingModelDataSpecs type = property.getDataType();
-        //
-        //// 将物模型字段类型映射为td字段类型
-        //String fType = TYPE_MAPPING.get(type.getDataType().toUpperCase());
-        //
-        //// 如果字段类型为NCHAR，默认长度为64
-        //int dataLength = 0;
-        //if ("NCHAR".equals(fType)) {
-        //    dataLength = 64;
-        //}
-        //return new TdFieldDO(fieldName, fType, dataLength);
-        return null;
+
+        // 将物模型字段类型映射为td字段类型
+        String fType = TYPE_MAPPING.get(property.getDataType().toUpperCase());
+
+        // 如果字段类型为NCHAR，默认长度为64
+        int dataLength = 0;
+        if ("NCHAR".equals(fType)) {
+            dataLength = 64;
+        }
+        return new TdFieldDO(fieldName, fType, dataLength);
     }
 
     /**
@@ -57,7 +53,7 @@ public class FieldParser {
      * @param thingModel 物模型响应对象
      * @return 字段列表
      */
-    public static List<TdFieldDO> parse(ThingModelRespVO thingModel) {
+    public static List<TdFieldDO> parse(ThinkModelRespVO thingModel) {
         return thingModel.getModel().getProperties().stream()
                 .map(FieldParser::parse)
                 .collect(Collectors.toList());

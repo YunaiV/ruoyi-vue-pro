@@ -7,15 +7,15 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.iot.controller.admin.device.vo.deviceData.IotDeviceDataPageReqVO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDataDO;
-import cn.iocoder.yudao.module.iot.dal.dataobject.productthingmodel.IotProductThingModelDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.tdengine.SelectVisualDO;
-import cn.iocoder.yudao.module.iot.dal.dataobject.tdengine.ThingModelMessage;
+import cn.iocoder.yudao.module.iot.dal.dataobject.tdengine.ThinkModelMessage;
+import cn.iocoder.yudao.module.iot.dal.dataobject.thinkmodel.IotProductThinkModelDO;
 import cn.iocoder.yudao.module.iot.dal.redis.deviceData.DeviceDataRedisDAO;
 import cn.iocoder.yudao.module.iot.dal.tdengine.TdEngineDMLMapper;
 import cn.iocoder.yudao.module.iot.enums.IotConstants;
-import cn.iocoder.yudao.module.iot.enums.thingmodel.IotProductThingModelTypeEnum;
-import cn.iocoder.yudao.module.iot.service.tdengine.IotThingModelMessageService;
-import cn.iocoder.yudao.module.iot.service.productthingmodel.IotProductThingModelService;
+import cn.iocoder.yudao.module.iot.enums.thinkmodel.IotProductThinkModelTypeEnum;
+import cn.iocoder.yudao.module.iot.service.tdengine.IotThinkModelMessageService;
+import cn.iocoder.yudao.module.iot.service.thinkmodel.IotProductThinkModelService;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
@@ -28,6 +28,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.filterList;
+
 @Slf4j
 @Service
 public class IotDeviceDataServiceImpl implements IotDeviceDataService {
@@ -38,9 +40,9 @@ public class IotDeviceDataServiceImpl implements IotDeviceDataService {
     @Resource
     private IotDeviceService deviceService;
     @Resource
-    private IotThingModelMessageService thingModelMessageService;
+    private IotThinkModelMessageService thingModelMessageService;
     @Resource
-    private IotProductThingModelService thinkModelFunctionService;
+    private IotProductThinkModelService thinkModelFunctionService;
     @Resource
     private TdEngineDMLMapper tdEngineDMLMapper;
 
@@ -54,7 +56,7 @@ public class IotDeviceDataServiceImpl implements IotDeviceDataService {
         // 2. 解析消息，保存数据
         JSONObject jsonObject = new JSONObject(message);
         log.info("[saveDeviceData][productKey({}) deviceName({}) data({})]", productKey, deviceName, jsonObject);
-        ThingModelMessage thingModelMessage = ThingModelMessage.builder()
+        ThinkModelMessage thingModelMessage = ThinkModelMessage.builder()
                 .id(jsonObject.getStr("id"))
                 .sys(jsonObject.get("sys"))
                 .method(jsonObject.getStr("method"))
@@ -64,7 +66,7 @@ public class IotDeviceDataServiceImpl implements IotDeviceDataService {
                 .deviceName(deviceName)
                 .deviceKey(device.getDeviceKey())
                 .build();
-        thingModelMessageService.saveThingModelMessage(device, thingModelMessage);
+        thingModelMessageService.saveThinkModelMessage(device, thingModelMessage);
     }
 
     @Override
@@ -73,35 +75,31 @@ public class IotDeviceDataServiceImpl implements IotDeviceDataService {
         // 1. 获取设备信息
         IotDeviceDO device = deviceService.getDevice(deviceDataReqVO.getDeviceId());
         // 2. 获取设备属性最新数据
-        List<IotProductThingModelDO> thinkModelFunctionList = thinkModelFunctionService.getProductThingModelListByProductKey(device.getProductKey());
-        thinkModelFunctionList = thinkModelFunctionList.stream()
-                .filter(function -> IotProductThingModelTypeEnum.PROPERTY.getType()
-                        .equals(function.getType())).toList();
+        List<IotProductThinkModelDO> thinkModelList = thinkModelFunctionService.getProductThinkModelListByProductKey(device.getProductKey());
+        thinkModelList = filterList(thinkModelList, thinkModel -> IotProductThinkModelTypeEnum.PROPERTY.getType()
+                .equals(thinkModel.getType()));
 
         // 3. 过滤标识符和属性名称
         if (deviceDataReqVO.getIdentifier() != null) {
-            thinkModelFunctionList = thinkModelFunctionList.stream()
-                    .filter(function -> function.getIdentifier().toLowerCase().contains(deviceDataReqVO.getIdentifier().toLowerCase()))
-                    .toList();
+            thinkModelList = filterList(thinkModelList, thinkModel -> thinkModel.getIdentifier()
+                    .toLowerCase().contains(deviceDataReqVO.getIdentifier().toLowerCase()));
         }
         if (deviceDataReqVO.getName() != null) {
-            thinkModelFunctionList = thinkModelFunctionList.stream()
-                    .filter(function -> function.getName().toLowerCase().contains(deviceDataReqVO.getName().toLowerCase()))
-                    .toList();
+            thinkModelList = filterList(thinkModelList, thinkModel -> thinkModel.getName()
+                    .toLowerCase().contains(deviceDataReqVO.getName().toLowerCase()));
         }
         // 4. 获取设备属性最新数据
-        // TODO @puhui999: 需要重构
-        thinkModelFunctionList.forEach(function -> {
-            IotDeviceDataDO deviceData = deviceDataRedisDAO.get(device.getProductKey(), device.getDeviceName(), function.getIdentifier());
+        thinkModelList.forEach(thinkModel -> {
+            IotDeviceDataDO deviceData = deviceDataRedisDAO.get(device.getProductKey(), device.getDeviceName(), thinkModel.getIdentifier());
             if (deviceData == null) {
                 deviceData = new IotDeviceDataDO();
                 deviceData.setProductKey(device.getProductKey());
                 deviceData.setDeviceName(device.getDeviceName());
-                deviceData.setIdentifier(function.getIdentifier());
+                deviceData.setIdentifier(thinkModel.getIdentifier());
                 deviceData.setDeviceId(deviceDataReqVO.getDeviceId());
-                deviceData.setThinkModelFunctionId(function.getId());
-                deviceData.setName(function.getName());
-                //deviceData.setDataType(function.getProperty().getDataType().getDataType());
+                deviceData.setThinkModelId(thinkModel.getId());
+                deviceData.setName(thinkModel.getName());
+                deviceData.setDataType(thinkModel.getProperty().getDataType());
             }
             list.add(deviceData);
         });
