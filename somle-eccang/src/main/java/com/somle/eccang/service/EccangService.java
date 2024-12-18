@@ -448,6 +448,23 @@ public class EccangService {
         return list("getShippingMethod", EccangShippingMethod.class);
     }
 
+    /**
+    * @Author Wqh
+    * @Description ram管理——退款订单列表
+    * @Date 17:18 2024/12/17
+    * @Param []
+    * @return java.util.stream.Stream<com.somle.eccang.model.EccangResponse.EccangPage>
+    **/
+    public Stream<EccangPage> getRmaRefundList(LocalDateTime startTime, LocalDateTime endTime){
+        final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        final String START_TIME_ALIAS = "refund_date_form";
+        final String END_TIME_ALIAS = "refund_date_to";
+        var payload = JsonUtils.newObject();
+        payload.put(START_TIME_ALIAS, startTime.format(dateTimeFormatter));
+        payload.put(END_TIME_ALIAS, endTime.format(dateTimeFormatter));
+        return getAllPage(payload, "getRmaRefundList");
+    }
+
 
 
     public String parseCountryCode(String code) {

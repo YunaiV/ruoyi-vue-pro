@@ -2,6 +2,7 @@ package com.somle.eccang;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import com.somle.eccang.model.EccangOrderVO;
+import com.somle.eccang.model.EccangResponse;
 import com.somle.eccang.model.EccangShippingMethod;
 import com.somle.eccang.repository.EccangTokenRepository;
 import com.somle.eccang.service.EccangService;
@@ -102,5 +103,10 @@ public class EccangTest extends BaseSpringTest {
             2023
         );
         log.info(result.toList().toString());
+    }
+    @Test
+    void getRmaRefundList() {
+        List<EccangResponse.EccangPage> list = service.getRmaRefundList(LocalDateTime.now().minusDays(4), LocalDateTime.now().minusDays(3)).toList();
+        log.info(list.toString());
     }
 }
