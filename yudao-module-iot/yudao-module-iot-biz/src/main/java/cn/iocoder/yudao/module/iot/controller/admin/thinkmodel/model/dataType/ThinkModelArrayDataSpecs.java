@@ -6,6 +6,7 @@ import lombok.EqualsAndHashCode;
 
 import java.util.List;
 
+// TODO @puhui999：thingmodel 哈 = = 之前我写错单词了
 /**
  * 物模型数据类型为数组的 DataSpec 定义
  *

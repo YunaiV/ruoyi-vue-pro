@@ -6,6 +6,9 @@ import lombok.Data;
 @Data
 public class ThinkModelArgument {
 
+    public static final String DIRECTION_INPUT = "input";
+    public static final String DIRECTION_OUTPUT = "output";
+
     private String identifier;
     private String name;
     /**
