@@ -34,11 +34,9 @@ public class FieldParser {
      * @return TdField对象
      */
     public static TdFieldDO parse(ThingModelProperty property) {
+        // 将物模型字段类型映射为 td 字段类型
         String fieldName = property.getIdentifier().toLowerCase();
-
-        // 将物模型字段类型映射为td字段类型
         String fType = TYPE_MAPPING.get(property.getDataType().toUpperCase());
-
         // 如果字段类型为NCHAR，默认长度为64
         int dataLength = 0;
         if ("NCHAR".equals(fType)) {
@@ -54,6 +52,7 @@ public class FieldParser {
      * @return 字段列表
      */
     public static List<TdFieldDO> parse(ThingModelRespVO thingModel) {
+        // TODO @puhui999：是不是使用 convertList
         return thingModel.getModel().getProperties().stream()
                 .map(FieldParser::parse)
                 .collect(Collectors.toList());
@@ -66,14 +65,12 @@ public class FieldParser {
      * @return 转换后的 TDengine 字段对象列表
      */
     public static List<TdFieldDO> parse(List<List<Object>> rows) {
+        // TODO @puhui999：是不是使用 convertList
         return rows.stream().map(row -> {
             String type = row.get(1).toString().toUpperCase();
+            // TODO @puhui999："NCHAR" 最好枚举下
             int dataLength = "NCHAR".equals(type) ? Integer.parseInt(row.get(2).toString()) : -1;
-            return new TdFieldDO(
-                    row.get(0).toString(),
-                    type,
-                    dataLength
-            );
+            return new TdFieldDO(row.get(0).toString(), type, dataLength);
         }).collect(Collectors.toList());
     }
 
