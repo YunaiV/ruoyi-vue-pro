@@ -2,15 +2,15 @@ package cn.iocoder.yudao.module.iot.service.tdengine;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
-import cn.iocoder.yudao.module.iot.controller.admin.thinkmodel.model.ThinkModelProperty;
-import cn.iocoder.yudao.module.iot.controller.admin.thinkmodel.model.ThinkModelRespVO;
+import cn.iocoder.yudao.module.iot.controller.admin.thingmodel.model.ThingModelProperty;
+import cn.iocoder.yudao.module.iot.controller.admin.thingmodel.model.ThingModelRespVO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.product.IotProductDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.tdengine.FieldParser;
 import cn.iocoder.yudao.module.iot.dal.dataobject.tdengine.TdFieldDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.tdengine.TdTableDO;
-import cn.iocoder.yudao.module.iot.dal.dataobject.thinkmodel.IotProductThinkModelDO;
+import cn.iocoder.yudao.module.iot.dal.dataobject.thingmodel.IotProductThingModelDO;
 import cn.iocoder.yudao.module.iot.dal.tdengine.TdEngineDDLMapper;
-import cn.iocoder.yudao.module.iot.enums.thinkmodel.IotProductThinkModelTypeEnum;
+import cn.iocoder.yudao.module.iot.enums.thingmodel.IotProductThingModelTypeEnum;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -33,8 +33,8 @@ public class IotSuperTableServiceImpl implements IotSuperTableService {
     private String url;
 
     @Override
-    public void createSuperTableDataModel(IotProductDO product, List<IotProductThinkModelDO> functionList) {
-        ThinkModelRespVO thingModel = buildThinkModel(product, functionList);
+    public void createSuperTableDataModel(IotProductDO product, List<IotProductThingModelDO> thingModelList) {
+        ThingModelRespVO thingModel = buildThingModel(product, thingModelList);
 
         if (thingModel.getModel() == null || CollUtil.isEmpty(thingModel.getModel().getProperties())) {
             log.warn("物模型属性列表为空，不创建超级表");
@@ -56,7 +56,7 @@ public class IotSuperTableServiceImpl implements IotSuperTableService {
     /**
      * 创建超级表
      */
-    private void createSuperTable(ThinkModelRespVO thingModel, Integer deviceType) {
+    private void createSuperTable(ThingModelRespVO thingModel, Integer deviceType) {
         // 解析物模型，获取字段列表
         List<TdFieldDO> schemaFields = new ArrayList<>();
         schemaFields.add(TdFieldDO.builder()
@@ -84,7 +84,7 @@ public class IotSuperTableServiceImpl implements IotSuperTableService {
     /**
      * 更新超级表
      */
-    private void updateSuperTable(ThinkModelRespVO thingModel, Integer deviceType) {
+    private void updateSuperTable(ThingModelRespVO thingModel, Integer deviceType) {
         String superTableName = getSuperTableName(deviceType, thingModel.getProductKey());
         try {
             List<TdFieldDO> oldFields = getTableFields(superTableName);
@@ -210,18 +210,18 @@ public class IotSuperTableServiceImpl implements IotSuperTableService {
     /**
      * 构建物模型
      */
-    private ThinkModelRespVO buildThinkModel(IotProductDO product, List<IotProductThinkModelDO> functionList) {
-        ThinkModelRespVO thingModel = new ThinkModelRespVO();
+    private ThingModelRespVO buildThingModel(IotProductDO product, List<IotProductThingModelDO> thingModelList) {
+        ThingModelRespVO thingModel = new ThingModelRespVO();
         thingModel.setId(product.getId());
         thingModel.setProductKey(product.getProductKey());
 
-        List<ThinkModelProperty> properties = functionList.stream()
-                .filter(function -> IotProductThinkModelTypeEnum.PROPERTY.equals(
-                        IotProductThinkModelTypeEnum.valueOfType(function.getType())))
-                .map(this::buildThinkModelProperty)
+        List<ThingModelProperty> properties = thingModelList.stream()
+                .filter(item -> IotProductThingModelTypeEnum.PROPERTY.equals(
+                        IotProductThingModelTypeEnum.valueOfType(item.getType())))
+                .map(this::buildThingModelProperty)
                 .collect(Collectors.toList());
 
-        ThinkModelRespVO.Model model = new ThinkModelRespVO.Model();
+        ThingModelRespVO.Model model = new ThingModelRespVO.Model();
         model.setProperties(properties);
         thingModel.setModel(model);
 
@@ -231,9 +231,9 @@ public class IotSuperTableServiceImpl implements IotSuperTableService {
     /**
      * 构建物模型属性
      */
-    private ThinkModelProperty buildThinkModelProperty(IotProductThinkModelDO function) {
-        ThinkModelProperty property = BeanUtil.copyProperties(function, ThinkModelProperty.class);
-        property.setDataType(function.getProperty().getDataType());
+    private ThingModelProperty buildThingModelProperty(IotProductThingModelDO thingModel) {
+        ThingModelProperty property = BeanUtil.copyProperties(thingModel, ThingModelProperty.class);
+        property.setDataType(thingModel.getProperty().getDataType());
         return property;
     }
 
