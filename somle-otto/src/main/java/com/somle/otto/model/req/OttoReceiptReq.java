@@ -7,12 +7,12 @@ import lombok.NoArgsConstructor;
 
 import java.util.List;
 
-// 请求参数类，用于获取收据的请求
+// 收据请求类
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ReceiptReq {
+public class OttoReceiptReq {
 
     private Integer limit; // 每页返回的收据数量，必须大于等于1，默认值为128
 

@@ -11,12 +11,12 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class OttoReceiptsResp {
-    private List<OttoSalesOrder> resources;
-    private Links links;
+public class OttoCommonResp<T> {
+    public List<T> resources;
+    public List<OttoLinks> links;
 
     @Data
-    public static class Links {
+    public static class OttoLinks {
         private String href;
         private String rel;
     }

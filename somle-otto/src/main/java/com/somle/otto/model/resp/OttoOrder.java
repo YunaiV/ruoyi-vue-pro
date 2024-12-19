@@ -12,7 +12,7 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class OttoSalesOrder {
+public class OttoOrder {
     private String salesOrderId; // 销售订单ID
     private String orderNumber;   // 订单编号
     private String orderDate;     // 订单日期
@@ -23,7 +23,7 @@ public class OttoSalesOrder {
     private Address deliveryAddress; // 配送地址
     private Address invoiceAddress; // 发票地址
     private Payment payment; // 支付信息
-    private List<Link> links; // 链接列表
+    private List<Link> links; // 链接列表 下一页
 
     // 嵌套类，表示订单项
     @Data
@@ -36,6 +36,8 @@ public class OttoSalesOrder {
         private ItemValueGrossPrice itemValueGrossPrice; // 商品总价（含税）
         private Product product; // 产品信息
         private String expectedDeliveryDate; // 预计交货日期
+        private String cancellationDate; // 取消日期
+        private String cancellationReason; // 取消原因
         private String processableDate; // 可处理日期
         private boolean weeePickup; // 是否需要WEEE回收
     }

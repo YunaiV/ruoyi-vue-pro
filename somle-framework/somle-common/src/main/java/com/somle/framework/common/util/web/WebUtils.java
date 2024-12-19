@@ -1,26 +1,22 @@
 package com.somle.framework.common.util.web;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.somle.framework.common.util.json.JSONObject;
+import com.somle.framework.common.util.json.JsonUtils;
+import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
+import okhttp3.*;
+import org.apache.commons.collections4.MultiValuedMap;
+import org.apache.tomcat.util.http.fileupload.IOUtils;
+
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.zip.GZIPInputStream;
-
-import com.somle.framework.common.util.json.JSONObject;
-import com.somle.framework.common.util.json.JsonUtils;
-import lombok.SneakyThrows;
-import okhttp3.*;
-import org.apache.commons.collections4.MultiValuedMap;
-import org.apache.tomcat.util.http.fileupload.IOUtils;
-
-//import com.alibaba.fastjson2.JSON;
-//import com.alibaba.fastjson2.JSONArray;
-//import com.alibaba.fastjson2.JSONObject;
-
-import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class WebUtils {
@@ -195,4 +191,20 @@ public class WebUtils {
     // TODO: a general method to handle http exception (429, timeout etc)
 
 
+    /**
+     * 解析响应字符串为指定类型的对象
+     *
+     * @param response     响应的 JSON 字符串
+     * @param valueTypeRef 用于反序列化的目标类型的 TypeReference
+     * @param <T>          返回对象的类型
+     * @return 反序列化后的对象
+     */
+    public static <T> T parseResponse(String response, TypeReference<T> valueTypeRef) {
+        ObjectMapper objectMapper = new ObjectMapper();
+        try {
+            return objectMapper.readValue(response, valueTypeRef);
+        } catch (Exception e) {
+            throw new RuntimeException("Error parsing response", e);
+        }
+    }
 }
