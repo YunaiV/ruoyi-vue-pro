@@ -32,7 +32,7 @@ public class AmazonspSelfDeliveryReturnReportDataJob extends AmazonspDataJob {
             .forEach(report -> {
                 OssData data = OssData.builder()
                     .database(DATABASE)
-                    .tableName("self_delivery_return_report_inc")
+                    .tableName("self_delivery_return_report")
                     .syncType("inc")
                     .requestTimestamp(System.currentTimeMillis())
                     .folderDate(beforeYesterday)

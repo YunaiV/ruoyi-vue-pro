@@ -86,10 +86,10 @@ public class StrUtils {
 
     /**
      * 将各种格式的字符串转换为驼峰命名
-     * user-name
-     * user.name
-     * User Name
-     * user_name
+     * hello-world
+     * hello.world
+     * hello world
+     * hello_world
      * 其他可能的分隔符格式（如空格、连字符、下划线等）
      * TODO 以后遇见其他格式，在下方新增
      * @param input 输入字符串
@@ -99,10 +99,15 @@ public class StrUtils {
         if (input == null || input.isEmpty()) {
             return input;
         }
-        // 去除所有特殊字符，包括空格、连字符、下划线等
-        String cleanedInput = StrUtil.removeAll(input, "[\\s._-]");
+
+        // 将所有特殊字符替换为下划线
+        String replacedInput = input.replaceAll("[\\s.-]", "_");
+
+        // 将整个字符串转换为小写
+        String lowerCaseInput = replacedInput.toLowerCase();
+
         // 使用 Hutool 的 toCamelCase 方法转换为驼峰命名
-        return StrUtil.toCamelCase(cleanedInput);
+        return StrUtil.toCamelCase(lowerCaseInput);
     }
 
 }

@@ -3,22 +3,20 @@ package com.somle.framework.common.util.web;
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.zip.GZIPInputStream;
-import com.fasterxml.jackson.databind.ObjectMapper;
+
+import cn.hutool.json.JSONUtil;
+import com.somle.framework.common.util.csv.CsvUtils;
 import com.somle.framework.common.util.json.JSONObject;
 import com.somle.framework.common.util.json.JsonUtils;
-import com.somle.framework.common.util.string.StrUtils;
 import lombok.SneakyThrows;
 import okhttp3.*;
 import org.apache.commons.collections4.MultiValuedMap;
 import org.apache.tomcat.util.http.fileupload.IOUtils;
 import lombok.extern.slf4j.Slf4j;
-import org.jetbrains.annotations.NotNull;
 
 @Slf4j
 public class WebUtils {
@@ -178,9 +176,8 @@ public class WebUtils {
     @SneakyThrows
     public static String csvToJson(String urlString) {
         InputStream inputStream = getInputStreamFromUrl(urlString, null);
-        List<Map<String, String>> jsonDataList = parseTabDelimitedStreamToMapList(inputStream);
-        ObjectMapper objectMapper = new ObjectMapper();
-        return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(jsonDataList);
+        List<Map<String,String>> maps = CsvUtils.readTsvFromInputStream(inputStream);
+        return JSONUtil.toJsonStr(maps);
     }
 
     @SneakyThrows
@@ -194,30 +191,6 @@ public class WebUtils {
         }
         return inputStream;
     }
-
-    @NotNull
-    private static List<Map<String, String>> parseTabDelimitedStreamToMapList(InputStream inputStream) throws IOException {
-        BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
-        List<Map<String, String>> jsonDataList = new ArrayList<>();
-        String line;
-        String[] headers = null;
-        while ((line = reader.readLine()) != null) {
-            if (headers == null) {
-                headers = line.split("\t");
-            } else {
-                String[] values = line.split("\t");
-                Map<String, String> dataMap = new HashMap<>();
-                for (int i = 0; i < headers.length; i++) {
-                    String camelCase = StrUtils.toCamelCase(headers[i]);
-                    //判断value数组是否越界
-                    dataMap.put(camelCase, i >= values.length ? "" : values[i]);
-                }
-                jsonDataList.add(dataMap);
-            }
-        }
-        return jsonDataList;
-    }
-
 //    public static <T> T parallelRun(int parallelism, Callable<T> codeBlock) {
 //        ForkJoinPool customThreadPool = new ForkJoinPool(parallelism);
 //        var result = customThreadPool.submit(codeBlock).join();
