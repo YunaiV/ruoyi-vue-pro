@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
+// TODO @alwayssuper：是不是还没用起来哈？Producer 最好属于某个模块；
 /**
  * SimulateSend 模拟设备上报的 Producer
  *
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 public class SimulateSendProducer {
+
     @Resource
     private ApplicationContext applicationContext;
 

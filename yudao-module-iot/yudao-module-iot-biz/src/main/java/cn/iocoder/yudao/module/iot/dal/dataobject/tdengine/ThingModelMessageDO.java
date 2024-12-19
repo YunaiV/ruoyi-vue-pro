@@ -4,9 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.apache.xmlbeans.impl.xb.xsdschema.Public;
 
-
+// TODO @芋艿：纠结下字段
 /**
  * TD 物模型消息日志的数据库
  */
@@ -14,7 +13,8 @@ import org.apache.xmlbeans.impl.xb.xsdschema.Public;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ThinkModelMessageDO {
+public class ThingModelMessageDO {
+
     /**
      * 数据库名称
      */
@@ -32,7 +32,7 @@ public class ThinkModelMessageDO {
     private String tableName;
 
     /**
-     * 消息ID
+     * 消息 ID
      */
     private String id;
 
@@ -42,7 +42,9 @@ public class ThinkModelMessageDO {
     private Object sys;
 
     /**
-     * 请求方法 例如：thing.event.property.post
+     * 请求方法
+     *
+     * 例如：thing.event.property.post
      */
     private String method;
 
@@ -56,11 +58,9 @@ public class ThinkModelMessageDO {
      */
     private Long time;
 
-
     /**
      * 设备 key
      */
     private String deviceKey;
-
 
 }

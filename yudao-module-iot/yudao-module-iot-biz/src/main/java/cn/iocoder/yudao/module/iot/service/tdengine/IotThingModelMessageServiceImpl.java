@@ -58,11 +58,13 @@ public class IotThingModelMessageServiceImpl implements IotThingModelMessageServ
     @Resource
     private IotDeviceService iotDeviceService;
     @Resource
+    private IotProductService productService;
+
+    @Resource
     private TdEngineDDLMapper tdEngineDDLMapper;
     @Resource
     private TdEngineDMLMapper tdEngineDMLMapper;
-    @Resource
-    private IotProductService productService;
+
     @Resource
     private DeviceDataRedisDAO deviceDataRedisDAO;
 
@@ -119,11 +121,12 @@ public class IotThingModelMessageServiceImpl implements IotThingModelMessageServ
         IotProductDO product = productService.getProduct(productId);
 
         // 2. 获取超级表的名称和数据库名称
+        // TODO @alwayssuper：最好 databaseName、superTableName 的处理，放到 tdThinkModelMessageMapper 里。可以考虑，弄个 default 方法
         String databaseName = iotTdDatabaseUtils.getDatabaseName();
-        String superTableName = IotTdDatabaseUtils.getThinkModelMessageSuperTableName(product.getProductKey());
+        String superTableName = IotTdDatabaseUtils.getThingModelMessageSuperTableName(product.getProductKey());
 
         // 3. 创建超级表
-        tdThinkModelMessageMapper.createSuperTable(ThinkModelMessageDO.builder().build()
+        tdThinkModelMessageMapper.createSuperTable(ThingModelMessageDO.builder().build()
                 .setDataBaseName(databaseName)
                 .setSuperTableName(superTableName));
     }
@@ -238,16 +241,16 @@ public class IotThingModelMessageServiceImpl implements IotThingModelMessageServ
 
         // 1. 获取超级表的名称、数据库名称、设备日志表名称
         String databaseName = iotTdDatabaseUtils.getDatabaseName();
-        String superTableName = IotTdDatabaseUtils.getThinkModelMessageSuperTableName(productKey);
+        String superTableName = IotTdDatabaseUtils.getThingModelMessageSuperTableName(productKey);
+        // TODO @alwayssuper：最好 databaseName、superTableName、thinkModelMessageDeviceTableName 的处理，放到 tdThinkModelMessageMapper 里。可以考虑，弄个 default 方法
         String thinkModelMessageDeviceTableName = IotTdDatabaseUtils.getThinkModelMessageDeviceTableName(productKey, deviceName);
 
         // 2. 创建物模型日志设备数据表
-        tdThinkModelMessageMapper.createTableWithTag(ThinkModelMessageDO.builder().build()
+        tdThinkModelMessageMapper.createTableWithTag(ThingModelMessageDO.builder().build()
                 .setDataBaseName(databaseName)
                 .setSuperTableName(superTableName)
                 .setTableName(thinkModelMessageDeviceTableName)
                 .setDeviceKey(deviceKey));
-
     }
 
     /**

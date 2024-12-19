@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.iot.dal.tdengine;
 
 import cn.iocoder.yudao.framework.tenant.core.aop.TenantIgnore;
-import cn.iocoder.yudao.module.iot.dal.dataobject.tdengine.ThinkModelMessageDO;
+import cn.iocoder.yudao.module.iot.dal.dataobject.tdengine.ThingModelMessageDO;
 import com.baomidou.dynamic.datasource.annotation.DS;
 import org.apache.ibatis.annotations.Mapper;
 
@@ -17,12 +17,13 @@ public interface TdThinkModelMessageMapper {
      *
      */
     @TenantIgnore
-    void createSuperTable(ThinkModelMessageDO superTable);
+    void createSuperTable(ThingModelMessageDO superTable);
 
     /**
      * 创建子表
      *
      */
     @TenantIgnore
-    void createTableWithTag(ThinkModelMessageDO table);
+    void createTableWithTag(ThingModelMessageDO table);
+
 }

@@ -122,7 +122,7 @@ public class IotProductServiceImpl implements IotProductService {
             thingModelFunctionService.createSuperTableDataModel(id);
             // 3.2 创建物模型日志超级表数据模型
             thingModelMessageService.createSuperTable(id);
-        }
+        }x
         productMapper.updateById(updateObj);
     }
 

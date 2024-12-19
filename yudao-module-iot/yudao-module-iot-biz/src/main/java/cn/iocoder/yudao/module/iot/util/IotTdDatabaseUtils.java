@@ -4,8 +4,10 @@ import cn.iocoder.yudao.module.iot.enums.IotConstants;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+// TODO @芋艿：可能要思索下，有没更好的处理方式
+// TODO @芋艿：怎么改成无状态
 /**
- * TD数据库工具类
+ * TD 数据库工具类
  *
  * @author AlwaysSuper
  */
@@ -19,6 +21,7 @@ public class IotTdDatabaseUtils {
      * 获取数据库名称
      */
     public String getDatabaseName() {
+//       TODO @alwayssuper:StrUtil.subAfter("/")
         int index = url.lastIndexOf("/");
         return index != -1 ? url.substring(index + 1) : url;
     }
@@ -31,6 +34,7 @@ public class IotTdDatabaseUtils {
      * @return 产品超级表表名
      */
     public static String getProductSuperTableName(Integer deviceType, String productKey) {
+        // TODO @alwayssuper：枚举字段，不要 1、2、3；不符合预期，抛出异常
         return switch (deviceType) {
             case 1 -> String.format(IotConstants.GATEWAY_SUB_STABLE_NAME_FORMAT, productKey).toLowerCase();
             case 2 -> String.format(IotConstants.GATEWAY_STABLE_NAME_FORMAT, productKey).toLowerCase();
@@ -45,7 +49,8 @@ public class IotTdDatabaseUtils {
      * @return 物模型日志超级表表名
      *
      */
-    public static String getThinkModelMessageSuperTableName(String productKey) {
+    public static String getThingModelMessageSuperTableName(String productKey) {
+        // TODO @alwayssuper：是不是应该 + 拼接就好，不用 format
         return String.format("thing_model_message_", productKey).toLowerCase();
     }
 
@@ -57,7 +62,7 @@ public class IotTdDatabaseUtils {
      * @return 物模型日志设备表名
      */
     public static String getThinkModelMessageDeviceTableName(String productKey, String deviceName) {
-        return String.format(IotConstants.THINK_MODEL_MESSAGE_TABLE_NAME_FORMAT, productKey.toLowerCase(), deviceName.toLowerCase());
+        return String.format(IotConstants.THING_MODEL_MESSAGE_TABLE_NAME_FORMAT, productKey.toLowerCase(), deviceName.toLowerCase());
     }
 
 }
