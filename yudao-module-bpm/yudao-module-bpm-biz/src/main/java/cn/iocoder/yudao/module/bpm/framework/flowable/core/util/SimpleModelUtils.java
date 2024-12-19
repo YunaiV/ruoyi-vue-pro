@@ -83,7 +83,7 @@ public class SimpleModelUtils {
 
     private static BpmSimpleModelNodeVO buildStartNode() {
         return new BpmSimpleModelNodeVO().setId(START_EVENT_NODE_ID)
-                .setName(BpmSimpleModelNodeType.START_USER_NODE.getName())
+                .setName(BpmSimpleModelNodeType.START_NODE.getName())
                 .setType(BpmSimpleModelNodeType.START_NODE.getType());
     }
 

@@ -124,12 +124,18 @@ public interface BpmTaskConvert {
     }
 
     default BpmTaskRespVO buildTodoTask(Task todoTask, List<Task> childrenTasks,
-                                              Map<Integer, BpmTaskRespVO.OperationButtonSetting> buttonsSetting) {
-        return BeanUtils.toBean(todoTask, BpmTaskRespVO.class)
+                                        Map<Integer, BpmTaskRespVO.OperationButtonSetting> buttonsSetting,
+                                        BpmFormDO form) {
+        BpmTaskRespVO bpmTaskRespVO = BeanUtils.toBean(todoTask, BpmTaskRespVO.class)
                 .setStatus(FlowableUtils.getTaskStatus(todoTask)).setReason(FlowableUtils.getTaskReason(todoTask))
                 .setButtonsSetting(buttonsSetting)
                 .setChildren(convertList(childrenTasks, childTask -> BeanUtils.toBean(childTask, BpmTaskRespVO.class)
                         .setStatus(FlowableUtils.getTaskStatus(childTask))));
+        if (form != null) {
+            bpmTaskRespVO.setFormId(form.getId()).setFormName(form.getName())
+                    .setFormConf(form.getConf()).setFormFields(form.getFields());
+        }
+        return bpmTaskRespVO;
     }
 
     default BpmMessageSendWhenTaskCreatedReqDTO convert(ProcessInstance processInstance, AdminUserRespDTO startUser,

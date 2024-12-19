@@ -20,7 +20,7 @@ import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
-@Tag(name = "管理后台 - 售后日志")
+@Tag(name = "用户 App - 售后日志")
 @RestController
 @RequestMapping("/trade/after-sale-log")
 @Validated

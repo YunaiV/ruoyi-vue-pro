@@ -18,7 +18,7 @@ import java.util.Set;
  * @author jason
  */
 @Component
-public class BpmTaskCandidateFormSDeptLeaderStrategy extends AbstractBpmTaskCandidateDeptLeaderStrategy {
+public class BpmTaskCandidateFormDeptLeaderStrategy extends AbstractBpmTaskCandidateDeptLeaderStrategy {
 
     @Override
     public BpmTaskCandidateStrategyEnum getStrategy() {
