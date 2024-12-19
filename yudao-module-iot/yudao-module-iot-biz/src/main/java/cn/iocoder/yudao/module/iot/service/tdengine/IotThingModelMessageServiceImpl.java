@@ -14,7 +14,6 @@ import cn.iocoder.yudao.module.iot.dal.dataobject.tdengine.ThingModelMessage;
 import cn.iocoder.yudao.module.iot.dal.dataobject.thingmodel.IotProductThingModelDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.product.IotProductDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.tdengine.*;
-import cn.iocoder.yudao.module.iot.dal.dataobject.thinkmodel.IotProductThinkModelDO;
 import cn.iocoder.yudao.module.iot.dal.redis.deviceData.DeviceDataRedisDAO;
 import cn.iocoder.yudao.module.iot.dal.tdengine.TdEngineDDLMapper;
 import cn.iocoder.yudao.module.iot.dal.tdengine.TdEngineDMLMapper;
@@ -25,7 +24,6 @@ import cn.iocoder.yudao.module.iot.enums.thingmodel.IotProductThingModelTypeEnum
 import cn.iocoder.yudao.module.iot.service.device.IotDeviceService;
 import cn.iocoder.yudao.module.iot.service.thingmodel.IotProductThingModelService;
 import cn.iocoder.yudao.module.iot.service.product.IotProductService;
-import cn.iocoder.yudao.module.iot.service.thinkmodel.IotProductThinkModelService;
 import cn.iocoder.yudao.module.iot.util.IotTdDatabaseUtils;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
@@ -112,6 +110,8 @@ public class IotThingModelMessageServiceImpl implements IotThingModelMessageServ
     private List<IotProductThingModelDO> getValidThingModelList(String productKey) {
         return filterList(iotProductThingModelService.getProductThingModelListByProductKey(productKey),
                 thingModel -> IotProductThingModelTypeEnum.PROPERTY.getType().equals(thingModel.getType()));
+    }
+
     @Override
     @TenantIgnore
     public void createSuperTable(Long productId) {
@@ -128,11 +128,12 @@ public class IotThingModelMessageServiceImpl implements IotThingModelMessageServ
                 .setSuperTableName(superTableName));
     }
 
-    private List<IotProductThinkModelDO> getValidFunctionList(String productKey) {
-        return iotProductThinkModelService
-                .getProductThinkModelListByProductKey(productKey)
+    private List<IotProductThingModelDO> getValidFunctionList(String productKey) {
+        // TODO @puhui999：使用 convertList 会好点哈
+        return iotProductThingModelService
+                .getProductThingModelListByProductKey(productKey)
                 .stream()
-                .filter(function -> IotProductThinkModelTypeEnum.PROPERTY.getType().equals(function.getType()))
+                .filter(function -> IotProductThingModelTypeEnum.PROPERTY.getType().equals(function.getType()))
                 .toList();
     }
 
