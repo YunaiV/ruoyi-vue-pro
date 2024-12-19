@@ -68,7 +68,7 @@ public class OttoClient {
     @SneakyThrows
     public OttoCommonResp<Object> getSettlement(String startTime, String endTime) {
         OttoReceiptReq req = OttoReceiptReq.builder()
-                .limit(10)  // 最大128
+                .limit(128)  // 最大128
                 .from(startTime)
                 .to(endTime)
                 .receiptTypes(List.of("PURCHASE"))  // 订单完成并已支付
