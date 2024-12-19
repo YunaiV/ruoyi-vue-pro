@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.iot.dal.dataobject.tdengine;
 
-import cn.iocoder.yudao.module.iot.controller.admin.thinkmodel.model.ThinkModelProperty;
-import cn.iocoder.yudao.module.iot.controller.admin.thinkmodel.model.ThinkModelRespVO;
+import cn.iocoder.yudao.module.iot.controller.admin.thingmodel.model.ThingModelProperty;
+import cn.iocoder.yudao.module.iot.controller.admin.thingmodel.model.ThingModelRespVO;
 
 import java.util.HashMap;
 import java.util.List;
@@ -33,7 +33,7 @@ public class FieldParser {
      * @param property 物模型属性
      * @return TdField对象
      */
-    public static TdFieldDO parse(ThinkModelProperty property) {
+    public static TdFieldDO parse(ThingModelProperty property) {
         String fieldName = property.getIdentifier().toLowerCase();
 
         // 将物模型字段类型映射为td字段类型
@@ -53,7 +53,7 @@ public class FieldParser {
      * @param thingModel 物模型响应对象
      * @return 字段列表
      */
-    public static List<TdFieldDO> parse(ThinkModelRespVO thingModel) {
+    public static List<TdFieldDO> parse(ThingModelRespVO thingModel) {
         return thingModel.getModel().getProperties().stream()
                 .map(FieldParser::parse)
                 .collect(Collectors.toList());

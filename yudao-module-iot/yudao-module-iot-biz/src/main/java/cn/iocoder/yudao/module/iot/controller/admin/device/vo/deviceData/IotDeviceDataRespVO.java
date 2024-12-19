@@ -13,7 +13,7 @@ public class IotDeviceDataRespVO {
     private Long deviceId;
 
     @Schema(description = "物模型编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "21816")
-    private Long thinkModelFunctionId;
+    private Long thingModelId;
 
     @Schema(description = "产品标识", requiredMode = Schema.RequiredMode.REQUIRED)
     private String productKey;

@@ -7,7 +7,7 @@ import cn.iocoder.yudao.module.iot.controller.admin.product.vo.product.IotProduc
 import cn.iocoder.yudao.module.iot.dal.dataobject.product.IotProductDO;
 import cn.iocoder.yudao.module.iot.dal.mysql.product.IotProductMapper;
 import cn.iocoder.yudao.module.iot.enums.product.IotProductStatusEnum;
-import cn.iocoder.yudao.module.iot.service.thinkmodel.IotProductThinkModelService;
+import cn.iocoder.yudao.module.iot.service.thingmodel.IotProductThingModelService;
 import com.baomidou.dynamic.datasource.annotation.DSTransactional;
 import jakarta.annotation.Resource;
 import org.springframework.context.annotation.Lazy;
@@ -34,7 +34,7 @@ public class IotProductServiceImpl implements IotProductService {
 
     @Resource
     @Lazy
-    private IotProductThinkModelService thinkModelFunctionService;
+    private IotProductThingModelService thingModelService;
 
     @Override
     public Long createProduct(IotProductSaveReqVO createReqVO) {
@@ -115,7 +115,7 @@ public class IotProductServiceImpl implements IotProductService {
         // 3. 产品是发布状态
         if (Objects.equals(status, IotProductStatusEnum.PUBLISHED.getStatus())) {
             // 3.1 创建超级表数据模型
-            thinkModelFunctionService.createSuperTableDataModel(id);
+            thingModelService.createSuperTableDataModel(id);
         }
         productMapper.updateById(updateObj);
     }

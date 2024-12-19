@@ -2,7 +2,7 @@ package cn.iocoder.yudao.module.iot.service.tdengine;
 
 
 import cn.iocoder.yudao.module.iot.dal.dataobject.product.IotProductDO;
-import cn.iocoder.yudao.module.iot.dal.dataobject.thinkmodel.IotProductThinkModelDO;
+import cn.iocoder.yudao.module.iot.dal.dataobject.thingmodel.IotProductThingModelDO;
 
 import java.util.List;
 
@@ -14,5 +14,6 @@ public interface IotSuperTableService {
     /**
      * 创建超级表数据模型
      */
-    void createSuperTableDataModel(IotProductDO product, List<IotProductThinkModelDO> functionList);
+    void createSuperTableDataModel(IotProductDO product, List<IotProductThingModelDO> thingModelList);
+
 }
