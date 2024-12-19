@@ -1,9 +1,11 @@
 package cn.iocoder.yudao.module.iot.controller.admin.thinkmodel.model.dataType;
 
 import cn.iocoder.yudao.module.iot.controller.admin.thinkmodel.model.ThinkModelProperty;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
 
 @Data
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class ThinkModelArgument {
 
     public static final String DIRECTION_INPUT = "input";

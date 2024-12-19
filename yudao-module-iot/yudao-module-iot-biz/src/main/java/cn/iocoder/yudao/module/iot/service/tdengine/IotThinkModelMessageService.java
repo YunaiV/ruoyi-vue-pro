@@ -15,4 +15,12 @@ public interface IotThinkModelMessageService {
      * @param thingModelMessage 物模型消息
      */
     void saveThinkModelMessage(IotDeviceDO device, ThinkModelMessage thingModelMessage);
+
+    /**
+     * 创建物模型消息日志超级表
+     *
+     * @param productId 产品编号
+     */
+    void createSuperTable(Long productId);
+
 }

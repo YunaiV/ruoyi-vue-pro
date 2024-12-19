@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.iocoder.yudao.module.iot.dal.tdengine.TdThinkModelMessageMapper">
+
+
+    <!-- 创建物模型消息日志超级表 -->
+    <update id="createSuperTable">
+        CREATE STABLE ${dataBaseName}.${superTableName}(
+        ts TIMESTAMP,
+        id VARCHAR(255),
+        sys VARCHAR(2048),
+        method VARCHAR(255),
+        params VARCHAR(2048)
+        )TAGS (
+        deviceKey VARCHAR(255)
+        )
+    </update>
+
+    <!-- 创建物模型消息日志子表，带有deviceKey的TAG -->
+    <update id="createTableWithTag">
+        CREATE TABLE IF NOT EXISTS ${dataBaseName}.${tableName}
+        USING ${dataBaseName}.${superTableName}(
+            ts,
+            id ,
+            sys ,
+            method ,
+            params
+        )TAGS(
+            #{deviceKey}
+        )
+    </update>
+</mapper>

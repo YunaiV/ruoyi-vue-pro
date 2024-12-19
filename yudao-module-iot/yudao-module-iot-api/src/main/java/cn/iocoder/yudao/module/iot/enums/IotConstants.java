@@ -35,4 +35,11 @@ public interface IotConstants {
      */
     String DEVICE_STABLE_NAME_FORMAT = "device_%s";
 
+    /**
+     * 获取物模型消息记录设备名
+     * <p>
+     * 格式为 thing_model_message_{productKey}_{deviceName}
+     */
+    String THINK_MODEL_MESSAGE_TABLE_NAME_FORMAT = "thing_model_message_%s_%s";
+
 }
