@@ -7,7 +7,8 @@ import cn.iocoder.yudao.module.iot.controller.admin.product.vo.product.IotProduc
 import cn.iocoder.yudao.module.iot.dal.dataobject.product.IotProductDO;
 import cn.iocoder.yudao.module.iot.dal.mysql.product.IotProductMapper;
 import cn.iocoder.yudao.module.iot.enums.product.IotProductStatusEnum;
-import cn.iocoder.yudao.module.iot.service.thingmodel.IotProductThingModelService;
+import cn.iocoder.yudao.module.iot.service.tdengine.IotThinkModelMessageService;
+import cn.iocoder.yudao.module.iot.service.thinkmodel.IotProductThinkModelService;
 import com.baomidou.dynamic.datasource.annotation.DSTransactional;
 import jakarta.annotation.Resource;
 import org.springframework.context.annotation.Lazy;
@@ -33,8 +34,11 @@ public class IotProductServiceImpl implements IotProductService {
     private IotProductMapper productMapper;
 
     @Resource
-    @Lazy
-    private IotProductThingModelService thingModelService;
+    @Lazy // 延迟加载，解决循环依赖
+    private IotProductThinkModelService thinkModelFunctionService;
+    @Resource
+    @Lazy  // 延迟加载，解决循环依赖
+    private IotThinkModelMessageService thinkModelMessageService;
 
     @Override
     public Long createProduct(IotProductSaveReqVO createReqVO) {
@@ -114,8 +118,10 @@ public class IotProductServiceImpl implements IotProductService {
         IotProductDO updateObj = IotProductDO.builder().id(id).status(status).build();
         // 3. 产品是发布状态
         if (Objects.equals(status, IotProductStatusEnum.PUBLISHED.getStatus())) {
-            // 3.1 创建超级表数据模型
-            thingModelService.createSuperTableDataModel(id);
+            // 3.1 创建产品超级表数据模型
+            thinkModelFunctionService.createSuperTableDataModel(id);
+            // 3.2 创建物模型日志超级表数据模型
+            thinkModelMessageService.createSuperTable(id);
         }
         productMapper.updateById(updateObj);
     }

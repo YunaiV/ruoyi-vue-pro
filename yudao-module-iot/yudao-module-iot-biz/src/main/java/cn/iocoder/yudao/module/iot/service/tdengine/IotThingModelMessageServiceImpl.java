@@ -12,14 +12,21 @@ import cn.iocoder.yudao.module.iot.dal.dataobject.tdengine.TdFieldDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.tdengine.TdTableDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.tdengine.ThingModelMessage;
 import cn.iocoder.yudao.module.iot.dal.dataobject.thingmodel.IotProductThingModelDO;
+import cn.iocoder.yudao.module.iot.dal.dataobject.product.IotProductDO;
+import cn.iocoder.yudao.module.iot.dal.dataobject.tdengine.*;
+import cn.iocoder.yudao.module.iot.dal.dataobject.thinkmodel.IotProductThinkModelDO;
 import cn.iocoder.yudao.module.iot.dal.redis.deviceData.DeviceDataRedisDAO;
 import cn.iocoder.yudao.module.iot.dal.tdengine.TdEngineDDLMapper;
 import cn.iocoder.yudao.module.iot.dal.tdengine.TdEngineDMLMapper;
+import cn.iocoder.yudao.module.iot.dal.tdengine.TdThinkModelMessageMapper;
 import cn.iocoder.yudao.module.iot.enums.IotConstants;
 import cn.iocoder.yudao.module.iot.enums.device.IotDeviceStatusEnum;
 import cn.iocoder.yudao.module.iot.enums.thingmodel.IotProductThingModelTypeEnum;
 import cn.iocoder.yudao.module.iot.service.device.IotDeviceService;
 import cn.iocoder.yudao.module.iot.service.thingmodel.IotProductThingModelService;
+import cn.iocoder.yudao.module.iot.service.product.IotProductService;
+import cn.iocoder.yudao.module.iot.service.thinkmodel.IotProductThinkModelService;
+import cn.iocoder.yudao.module.iot.util.IotTdDatabaseUtils;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -56,9 +63,16 @@ public class IotThingModelMessageServiceImpl implements IotThingModelMessageServ
     private TdEngineDDLMapper tdEngineDDLMapper;
     @Resource
     private TdEngineDMLMapper tdEngineDMLMapper;
-
+    @Resource
+    private IotProductService productService;
     @Resource
     private DeviceDataRedisDAO deviceDataRedisDAO;
+
+    @Resource
+    private IotTdDatabaseUtils iotTdDatabaseUtils;
+
+    @Resource
+    private TdThinkModelMessageMapper tdThinkModelMessageMapper;
 
     // TODO @haohao：这个方法，可以考虑加下 1. 2. 3. 更有层次感
     @Override
@@ -66,9 +80,12 @@ public class IotThingModelMessageServiceImpl implements IotThingModelMessageServ
     public void saveThingModelMessage(IotDeviceDO device, ThingModelMessage thingModelMessage) {
         // 1. 判断设备状态，如果为未激活状态，创建数据表并更新设备状态
         if (IotDeviceStatusEnum.INACTIVE.getStatus().equals(device.getStatus())) {
+            // 1.1 创建设备表
             createDeviceTable(device.getDeviceType(), device.getProductKey(), device.getDeviceName(), device.getDeviceKey());
             iotDeviceService.updateDeviceStatus(new IotDeviceStatusUpdateReqVO()
                     .setId(device.getId()).setStatus(IotDeviceStatusEnum.ONLINE.getStatus()));
+            // 1.2 创建物模型日志设备表
+            createThinkModelMessageDeviceTable(device.getProductKey(), device.getDeviceName(), device.getDeviceKey());
         }
 
         // 2. 获取设备属性并进行物模型校验，过滤非物模型属性
@@ -95,6 +112,28 @@ public class IotThingModelMessageServiceImpl implements IotThingModelMessageServ
     private List<IotProductThingModelDO> getValidThingModelList(String productKey) {
         return filterList(iotProductThingModelService.getProductThingModelListByProductKey(productKey),
                 thingModel -> IotProductThingModelTypeEnum.PROPERTY.getType().equals(thingModel.getType()));
+    @Override
+    @TenantIgnore
+    public void createSuperTable(Long productId) {
+        // 1. 查询产品
+        IotProductDO product = productService.getProduct(productId);
+
+        // 2. 获取超级表的名称和数据库名称
+        String databaseName = iotTdDatabaseUtils.getDatabaseName();
+        String superTableName = IotTdDatabaseUtils.getThinkModelMessageSuperTableName(product.getProductKey());
+
+        // 3. 创建超级表
+        tdThinkModelMessageMapper.createSuperTable(ThinkModelMessageDO.builder().build()
+                .setDataBaseName(databaseName)
+                .setSuperTableName(superTableName));
+    }
+
+    private List<IotProductThinkModelDO> getValidFunctionList(String productKey) {
+        return iotProductThinkModelService
+                .getProductThinkModelListByProductKey(productKey)
+                .stream()
+                .filter(function -> IotProductThinkModelTypeEnum.PROPERTY.getType().equals(function.getType()))
+                .toList();
     }
 
     private List<TdFieldDO> filterAndCollectValidFields(Map<String, Object> params, List<IotProductThingModelDO> thingModelList, IotDeviceDO device, Long time) {
@@ -184,6 +223,30 @@ public class IotThingModelMessageServiceImpl implements IotThingModelMessageServ
                 .setSuperTableName(superTableName)
                 .setTableName(tableName)
                 .setTags(tagsFieldValues));
+    }
+
+    /**
+     * 创建物模型日志设备数据表
+     *
+     * @param productKey 产品 Key
+     * @param deviceName 设备名称
+     * @param deviceKey  设备 Key
+     *
+     */
+    private void createThinkModelMessageDeviceTable(String productKey, String deviceName, String deviceKey){
+
+        // 1. 获取超级表的名称、数据库名称、设备日志表名称
+        String databaseName = iotTdDatabaseUtils.getDatabaseName();
+        String superTableName = IotTdDatabaseUtils.getThinkModelMessageSuperTableName(productKey);
+        String thinkModelMessageDeviceTableName = IotTdDatabaseUtils.getThinkModelMessageDeviceTableName(productKey, deviceName);
+
+        // 2. 创建物模型日志设备数据表
+        tdThinkModelMessageMapper.createTableWithTag(ThinkModelMessageDO.builder().build()
+                .setDataBaseName(databaseName)
+                .setSuperTableName(superTableName)
+                .setTableName(thinkModelMessageDeviceTableName)
+                .setDeviceKey(deviceKey));
+
     }
 
     /**

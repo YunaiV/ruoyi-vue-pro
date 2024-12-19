@@ -1,10 +1,13 @@
 package cn.iocoder.yudao.module.iot.controller.admin.thingmodel.model.dataType;
 
 import cn.iocoder.yudao.module.iot.controller.admin.thingmodel.model.ThingModelProperty;
+import cn.iocoder.yudao.module.iot.controller.admin.thinkmodel.model.ThinkModelProperty;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
 
 @Data
-public class ThingModelArgument {
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class ThinkModelArgument {
 
     public static final String DIRECTION_INPUT = "input";
     public static final String DIRECTION_OUTPUT = "output";
