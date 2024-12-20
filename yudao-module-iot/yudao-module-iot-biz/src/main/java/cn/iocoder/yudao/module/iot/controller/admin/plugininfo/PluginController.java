@@ -3,7 +3,6 @@ package cn.iocoder.yudao.module.iot.controller.admin.plugininfo;
 import jakarta.annotation.Resource;
 import org.pf4j.spring.SpringPluginManager;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.ApplicationContext;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -26,11 +25,7 @@ import java.util.stream.Collectors;
 public class PluginController {
 
     @Resource
-    private ApplicationContext applicationContext;
-    @Resource
     private SpringPluginManager springPluginManager;
-    @Resource
-    private Greetings greetings;
 
     @Value("${pf4j.pluginsDir}")
     private String pluginsDir;
@@ -73,10 +68,8 @@ public class PluginController {
 
             return ResponseEntity.ok("插件上传并加载成功");
         } catch (IOException e) {
-            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("上传插件时发生错误: " + e.getMessage());
         } catch (Exception e) {
-            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("加载插件时发生错误: " + e.getMessage());
         }
     }
@@ -120,15 +113,4 @@ public class PluginController {
         return ResponseEntity.ok(plugins);
     }
 
-    /**
-     * 打印问候语
-     *
-     * @return 问候语数量
-     */
-    @PermitAll
-    @GetMapping("/printGreetings")
-    public ResponseEntity<Integer> printGreetings() {
-        Integer count = greetings.printGreetings();
-        return ResponseEntity.ok(count);
-    }
 }

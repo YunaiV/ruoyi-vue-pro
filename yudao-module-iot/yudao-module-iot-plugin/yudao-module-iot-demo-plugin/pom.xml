@@ -11,17 +11,17 @@
     <modelVersion>4.0.0</modelVersion>
     <packaging>jar</packaging>
 
-    <artifactId>yudao-module-iot-http-plugin</artifactId>
+    <artifactId>yudao-module-iot-demo-plugin</artifactId>
 
     <name>${project.artifactId}</name>
     <description>
-        物联网 插件模块 - http 插件
+        物联网 插件模块 - demo 插件
     </description>
 
     <properties>
         <!-- 插件相关 -->
-        <plugin.id>http-plugin</plugin.id>
-        <plugin.class>cn.iocoder.yudao.module.iot.plugin.HttpPlugin</plugin.class>
+        <plugin.id>demo-plugin</plugin.id>
+        <plugin.class>cn.iocoder.yudao.module.iot.plugin.DemoPlugin</plugin.class>
         <plugin.version>0.0.1</plugin.version>
         <plugin.provider>ahh</plugin.provider>
         <plugin.dependencies/>
@@ -60,8 +60,7 @@
                         <phase>package</phase>
                         <configuration>
                             <target>
-                                <unzip src="target/${project.artifactId}-${project.version}.${project.packaging}"
-                                       dest="target/plugin-classes"/>
+                                <unzip src="target/${project.artifactId}-${project.version}.${project.packaging}" dest="target/plugin-classes" />
                             </target>
                         </configuration>
                         <goals>
@@ -124,6 +123,8 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
+            <version>${spring.boot.version}</version>
+            <scope>provided</scope>
         </dependency>
         <!-- PF4J Spring 集成 -->
         <dependency>
@@ -142,11 +143,6 @@
             <artifactId>lombok</artifactId>
             <version>${lombok.version}</version>
             <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>io.netty</groupId>
-            <artifactId>netty-all</artifactId>
-            <version>4.1.63.Final</version> <!-- 版本可根据需要调整 -->
         </dependency>
     </dependencies>
 </project>
