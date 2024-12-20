@@ -5,7 +5,8 @@ import cn.iocoder.yudao.module.iot.controller.admin.thingmodel.model.ThingModelR
 
 import java.util.HashMap;
 import java.util.List;
-import java.util.stream.Collectors;
+
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
 
 /**
  * FieldParser 类用于解析和转换物模型字段到 TDengine 字段
@@ -52,10 +53,7 @@ public class FieldParser {
      * @return 字段列表
      */
     public static List<TdFieldDO> parse(ThingModelRespVO thingModel) {
-        // TODO @puhui999：是不是使用 convertList
-        return thingModel.getModel().getProperties().stream()
-                .map(FieldParser::parse)
-                .collect(Collectors.toList());
+        return convertList(thingModel.getModel().getProperties(), FieldParser::parse);
     }
 
     /**
@@ -65,13 +63,12 @@ public class FieldParser {
      * @return 转换后的 TDengine 字段对象列表
      */
     public static List<TdFieldDO> parse(List<List<Object>> rows) {
-        // TODO @puhui999：是不是使用 convertList
-        return rows.stream().map(row -> {
+        return convertList(rows, row -> {
             String type = row.get(1).toString().toUpperCase();
             // TODO @puhui999："NCHAR" 最好枚举下
             int dataLength = "NCHAR".equals(type) ? Integer.parseInt(row.get(2).toString()) : -1;
             return new TdFieldDO(row.get(0).toString(), type, dataLength);
-        }).collect(Collectors.toList());
+        });
     }
 
     /**
