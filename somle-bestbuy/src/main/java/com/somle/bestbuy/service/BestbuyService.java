@@ -29,7 +29,7 @@ public class BestbuyService {
     private BestbuyTokenRepository bestbuyTokenRepository;
 
     // 基础URL，指向Bestbuy的API端点
-    private final static String BASE_URL = "https://marketplace.bestbuy.ca/";
+    private final static String BASE_URL = "https://marketplace.bestbuy.ca";
     // 访问令牌，用于身份验证
     private String token;
 
@@ -43,7 +43,7 @@ public class BestbuyService {
      * @return 包含订单信息的JSONObject
      */
     public JSONObject getOrders() {
-        String endpoint = "api/orders";
+        String endpoint = "/api/orders";
         return executeRequestAndParseResponse(endpoint, null, RequestX.Method.GET);
     }
 
