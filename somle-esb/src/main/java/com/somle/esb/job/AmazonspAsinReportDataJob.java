@@ -6,12 +6,15 @@ import com.somle.amazon.service.AmazonService;
 import com.somle.esb.model.Domain;
 import com.somle.esb.model.OssData;
 import com.somle.esb.service.EsbService;
+import com.somle.framework.common.util.collection.MapUtils;
 import com.somle.framework.common.util.json.JSONObject;
 import com.somle.framework.common.util.json.JsonUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Component
 public class AmazonspAsinReportDataJob extends AmazonspDataJob {
@@ -32,8 +35,11 @@ public class AmazonspAsinReportDataJob extends AmazonspDataJob {
                     .marketplaceIds(List.of(shop.getCountry().getMarketplaceId()))
                     .reportOptions(options)
                     .build();
-            var reportString = amazonService.spClient.createAndGetReport(shop.getSeller(), vo, "gzip");
-            var report = JsonUtils.parseObject(reportString, JSONObject.class);
+                    List<Map<String, String>> reportMaps = amazonService.spClient.createAndGetReport(shop.getSeller(), vo, "gzip");
+                    List<Map<String, String>> report = new ArrayList<>();
+                    for (Map<String, String> map : reportMaps){
+                        report.add(MapUtils.keyConvertToCamelCase(map));
+                    }
             return report;
         })
         .forEach(report -> {
@@ -43,7 +49,7 @@ public class AmazonspAsinReportDataJob extends AmazonspDataJob {
                 .syncType("inc")
                 .requestTimestamp(System.currentTimeMillis())
                 .folderDate(dataDate)
-                .content(report)
+                .content(JsonUtils.toJSONObject(report))
                 .headers(null)
                 .build();
             service.send(data);

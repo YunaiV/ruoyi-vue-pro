@@ -174,10 +174,10 @@ public class WebUtils {
     }
 
     @SneakyThrows
-    public static String csvToJson(String urlString) {
+    public static List<Map<String,String>> csvToJson(String urlString) {
         InputStream inputStream = getInputStreamFromUrl(urlString, null);
         List<Map<String,String>> maps = CsvUtils.readTsvFromInputStream(inputStream);
-        return JSONUtil.toJsonStr(maps);
+        return maps;
     }
 
     @SneakyThrows

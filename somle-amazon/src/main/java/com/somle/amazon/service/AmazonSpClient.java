@@ -119,20 +119,19 @@ public class AmazonSpClient {
     }
 
     @Transactional(readOnly = true)
-    public Stream<String> getReportStream(AmazonSeller seller, AmazonSpReportReqVO vo, String compression) {
+    public Stream<List<Map<String,String>>> getReportStream(AmazonSeller seller, AmazonSpReportReqVO vo, String compression) {
         return getReports(seller, vo).stream().map(report -> getReport(seller, report.getReportId(), compression));
     }
 
     @SneakyThrows
     @Transactional(readOnly = true)
-    public String getReport(AmazonSeller seller, String reportId, String compression) {
+    public List<Map<String,String>> getReport(AmazonSeller seller, String reportId, String compression) {
         log.info("get report");
         int RETENTION_DAYS = 720;
         DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
         String endPoint = seller.getRegion().getSpEndPoint();
         var headers = Map.of("x-amz-access-token", seller.getSpAccessToken());
-        String result = null;
 
         // Check report status and get document ID
         String status = null;
@@ -164,8 +163,7 @@ public class AmazonSpClient {
             log.info(status);
             switch (status) {
                 case "CANCELLED":
-                    result = "No data returned, get report fail.";
-                    return result;
+                    throw new RuntimeException("No data returned, get report fail.");
                 case "IN_QUEUE":
                     break;
                 case "IN_PROGRESS":
@@ -204,11 +202,7 @@ public class AmazonSpClient {
 
         log.info("Document URL: {}", docUrl);
 
-        // Use util to process the document URL
-        result = WebUtils.csvToJson(docUrl);
-
-
-        return result;
+        return WebUtils.csvToJson(docUrl);
     }
 
     @SneakyThrows
@@ -260,10 +254,9 @@ public class AmazonSpClient {
     }
 
     @Transactional(readOnly = true)
-    public String createAndGetReport(AmazonSeller seller, AmazonSpReportSaveVO vo, String compression) {
+    public List<Map<String,String>> createAndGetReport(AmazonSeller seller, AmazonSpReportSaveVO vo, String compression) {
         String reportId = createReport(seller, vo);
-        var reportString = getReport(seller, reportId, compression);
-        return reportString;
+        return getReport(seller, reportId, compression);
     }
 }
 

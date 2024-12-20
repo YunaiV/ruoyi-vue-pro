@@ -6,9 +6,13 @@ import com.somle.amazon.controller.vo.AmazonSpReportReqVO;
 import com.somle.amazon.controller.vo.AmazonSpReportReqVO.ProcessingStatuses;
 
 import com.somle.esb.model.OssData;
+import com.somle.framework.common.util.collection.MapUtils;
+import com.somle.framework.common.util.json.JsonUtils;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Component
 public class AmazonspSettlementReportDataJob extends AmazonspDataJob {
@@ -31,13 +35,17 @@ public class AmazonspSettlementReportDataJob extends AmazonspDataJob {
                 amazonService.spClient.getReportStream(seller, vo, null)
             )
             .forEach(report -> {
+                List<Map<String, String>> result = new ArrayList<>();
+                for (Map<String, String> map : report){
+                    result.add(MapUtils.keyConvertToCamelCase(map));
+                }
                 OssData data = OssData.builder()
                     .database(DATABASE)
                     .tableName("settlement_report")
                     .syncType("inc")
                     .requestTimestamp(System.currentTimeMillis())
                     .folderDate(beforeYesterday)
-                    .content(JSONUtil.parseArray(report))
+                    .content(JsonUtils.toJSONObject(result))
                     .headers(null)
                     .build();
                 service.send(data);
