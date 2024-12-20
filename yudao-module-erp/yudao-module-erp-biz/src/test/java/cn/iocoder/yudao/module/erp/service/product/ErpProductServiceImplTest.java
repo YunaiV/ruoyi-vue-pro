@@ -91,15 +91,15 @@ public class ErpProductServiceImplTest extends BaseDbUnitTest {
         productVO.setMaterial("测试材料"+RandomUtil.randomInt(10000, 99999));
         productVO.setStatus(true);
         productVO.setRemark("这是一个测试备注"+ LocalTime.now());
-        productVO.setWeight(new BigDecimal("5.5"));
+        productVO.setWeight(1);
         productVO.setSeries("测试系列");
         productVO.setColor("红色");
         productVO.setModel("测试型号");
         //productVO.setSerial(1);
         productVO.setProductionNo("TEST-PROD-001");
-        productVO.setWidth(new BigDecimal("100.0"));
-        productVO.setLength(new BigDecimal("200.0"));
-        productVO.setHeight(new BigDecimal("50.0"));
+        productVO.setWidth(1);
+        productVO.setLength(1);
+        productVO.setHeight(1);
         productVO.setPatent("测试专利");
         productVO.setProductOwnerId(50024L);
         productVO.setIndustrialDesignerId(50024L);
@@ -117,8 +117,8 @@ public class ErpProductServiceImplTest extends BaseDbUnitTest {
 
         // 创建 GuidePriceJson 列表
         List<GuidePriceJson> guidePriceList = Arrays.asList(
-                new GuidePriceJson("测试价格1", new BigDecimal("1000.0"), 1),
-                new GuidePriceJson("测试价格2", new BigDecimal("2000.0"), 2)
+                new GuidePriceJson(1, new BigDecimal("1000.0"), 1),
+                new GuidePriceJson(1, new BigDecimal("2000.0"), 2)
         );
         productVO.setGuidePriceList(guidePriceList);
         return productVO;
