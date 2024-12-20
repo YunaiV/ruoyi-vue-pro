@@ -13,11 +13,9 @@ import cn.iocoder.yudao.module.iot.dal.dataobject.tdengine.TdTableDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.tdengine.ThingModelMessage;
 import cn.iocoder.yudao.module.iot.dal.dataobject.thingmodel.IotProductThingModelDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.product.IotProductDO;
-import cn.iocoder.yudao.module.iot.dal.dataobject.tdengine.*;
 import cn.iocoder.yudao.module.iot.dal.redis.deviceData.DeviceDataRedisDAO;
 import cn.iocoder.yudao.module.iot.dal.tdengine.TdEngineDDLMapper;
 import cn.iocoder.yudao.module.iot.dal.tdengine.TdEngineDMLMapper;
-import cn.iocoder.yudao.module.iot.dal.tdengine.TdThinkModelMessageMapper;
 import cn.iocoder.yudao.module.iot.enums.IotConstants;
 import cn.iocoder.yudao.module.iot.enums.device.IotDeviceStatusEnum;
 import cn.iocoder.yudao.module.iot.enums.thingmodel.IotProductThingModelTypeEnum;
@@ -68,11 +66,6 @@ public class IotThingModelMessageServiceImpl implements IotThingModelMessageServ
     @Resource
     private DeviceDataRedisDAO deviceDataRedisDAO;
 
-    @Resource
-    private IotTdDatabaseUtils iotTdDatabaseUtils;
-
-    @Resource
-    private TdThinkModelMessageMapper tdThinkModelMessageMapper;
 
     // TODO @haohao：这个方法，可以考虑加下 1. 2. 3. 更有层次感
     @Override
@@ -85,7 +78,7 @@ public class IotThingModelMessageServiceImpl implements IotThingModelMessageServ
             iotDeviceService.updateDeviceStatus(new IotDeviceStatusUpdateReqVO()
                     .setId(device.getId()).setStatus(IotDeviceStatusEnum.ONLINE.getStatus()));
             // 1.2 创建物模型日志设备表
-            createThinkModelMessageDeviceTable(device.getProductKey(), device.getDeviceName(), device.getDeviceKey());
+            createThingModelMessageDeviceTable(device.getProductKey(), device.getDeviceName(), device.getDeviceKey());
         }
 
         // 2. 获取设备属性并进行物模型校验，过滤非物模型属性
@@ -122,13 +115,23 @@ public class IotThingModelMessageServiceImpl implements IotThingModelMessageServ
 
         // 2. 获取超级表的名称和数据库名称
         // TODO @alwayssuper：最好 databaseName、superTableName 的处理，放到 tdThinkModelMessageMapper 里。可以考虑，弄个 default 方法
-        String databaseName = iotTdDatabaseUtils.getDatabaseName();
+        String databaseName = IotTdDatabaseUtils.getDatabaseName(url);
         String superTableName = IotTdDatabaseUtils.getThingModelMessageSuperTableName(product.getProductKey());
 
+        // 解析物模型，获取字段列表
+        List<TdFieldDO> schemaFields = List.of(
+                TdFieldDO.builder().fieldName("time").dataType("TIMESTAMP").build(),
+                TdFieldDO.builder().fieldName("id").dataType("NCHAR").dataLength(64).build(),
+                TdFieldDO.builder().fieldName("sys").dataType("NCHAR").dataLength(2048).build(),
+                TdFieldDO.builder().fieldName("method").dataType("NCHAR").dataLength(256).build(),
+                TdFieldDO.builder().fieldName("params").dataType("NCHAR").dataLength(2048).build()
+        );
+        // 设置超级表的标签
+        List<TdFieldDO> tagsFields = List.of(
+                TdFieldDO.builder().fieldName("device_key").dataType("NCHAR").dataLength(64).build()
+        );
         // 3. 创建超级表
-        tdThinkModelMessageMapper.createSuperTable(ThingModelMessageDO.builder().build()
-                .setDataBaseName(databaseName)
-                .setSuperTableName(superTableName));
+        tdEngineDDLMapper.createSuperTable(new TdTableDO(databaseName, superTableName, schemaFields, tagsFields));
     }
 
     private List<IotProductThingModelDO> getValidFunctionList(String productKey) {
@@ -237,20 +240,20 @@ public class IotThingModelMessageServiceImpl implements IotThingModelMessageServ
      * @param deviceKey  设备 Key
      *
      */
-    private void createThinkModelMessageDeviceTable(String productKey, String deviceName, String deviceKey){
+    private void createThingModelMessageDeviceTable(String productKey, String deviceName, String deviceKey){
 
         // 1. 获取超级表的名称、数据库名称、设备日志表名称
-        String databaseName = iotTdDatabaseUtils.getDatabaseName();
+        String databaseName = IotTdDatabaseUtils.getDatabaseName(url);
         String superTableName = IotTdDatabaseUtils.getThingModelMessageSuperTableName(productKey);
         // TODO @alwayssuper：最好 databaseName、superTableName、thinkModelMessageDeviceTableName 的处理，放到 tdThinkModelMessageMapper 里。可以考虑，弄个 default 方法
-        String thinkModelMessageDeviceTableName = IotTdDatabaseUtils.getThinkModelMessageDeviceTableName(productKey, deviceName);
+        String thinkModelMessageDeviceTableName = IotTdDatabaseUtils.getThingModelMessageDeviceTableName(productKey, deviceName);
 
         // 2. 创建物模型日志设备数据表
-        tdThinkModelMessageMapper.createTableWithTag(ThingModelMessageDO.builder().build()
-                .setDataBaseName(databaseName)
-                .setSuperTableName(superTableName)
-                .setTableName(thinkModelMessageDeviceTableName)
-                .setDeviceKey(deviceKey));
+//        tdThingModelMessageMapper.createTableWithTag(ThingModelMessageDO.builder().build()
+//                .setDataBaseName(databaseName)
+//                .setSuperTableName(superTableName)
+//                .setTableName(thinkModelMessageDeviceTableName)
+//                .setDeviceKey(deviceKey));
     }
 
     /**

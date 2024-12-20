@@ -14,6 +14,7 @@ public interface ErrorCodeConstants {
     ErrorCode PRODUCT_KEY_EXISTS = new ErrorCode(1_050_001_001, "产品标识已经存在");
     ErrorCode PRODUCT_STATUS_NOT_DELETE = new ErrorCode(1_050_001_002, "产品状是发布状态，不允许删除");
     ErrorCode PRODUCT_STATUS_NOT_ALLOW_THING_MODEL = new ErrorCode(1_050_001_003, "产品状是发布状态，不允许操作物模型");
+    ErrorCode PRODUCT_DEVICE_NOT_EXISTS = new ErrorCode(1_050_001_004, "产品设备类型不存在");
 
     // ========== 产品物模型 1-050-002-000 ============
     ErrorCode THING_MODEL_NOT_EXISTS = new ErrorCode(1_050_002_000, "产品物模型不存在");

@@ -1,8 +1,13 @@
 package cn.iocoder.yudao.module.iot.util;
 
+import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.module.iot.enums.IotConstants;
+import cn.iocoder.yudao.module.iot.enums.product.IotProductDeviceTypeEnum;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+
+import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.module.iot.enums.ErrorCodeConstants.PRODUCT_DEVICE_NOT_EXISTS;
 
 // TODO @芋艿：可能要思索下，有没更好的处理方式
 // TODO @芋艿：怎么改成无状态
@@ -11,19 +16,14 @@ import org.springframework.stereotype.Component;
  *
  * @author AlwaysSuper
  */
-@Component
 public class IotTdDatabaseUtils {
-
-    @Value("${spring.datasource.dynamic.datasource.tdengine.url}")
-    private String url;
 
     /**
      * 获取数据库名称
      */
-    public String getDatabaseName() {
+    public static String getDatabaseName(String url) {
 //       TODO @alwayssuper:StrUtil.subAfter("/")
-        int index = url.lastIndexOf("/");
-        return index != -1 ? url.substring(index + 1) : url;
+        return StrUtil.subAfter(url, "/", true);
     }
 
     /**
@@ -35,11 +35,19 @@ public class IotTdDatabaseUtils {
      */
     public static String getProductSuperTableName(Integer deviceType, String productKey) {
         // TODO @alwayssuper：枚举字段，不要 1、2、3；不符合预期，抛出异常
-        return switch (deviceType) {
-            case 1 -> String.format(IotConstants.GATEWAY_SUB_STABLE_NAME_FORMAT, productKey).toLowerCase();
-            case 2 -> String.format(IotConstants.GATEWAY_STABLE_NAME_FORMAT, productKey).toLowerCase();
-            default -> String.format(IotConstants.DEVICE_STABLE_NAME_FORMAT, productKey).toLowerCase();
-        };
+        if (deviceType == null) {
+            throw exception(PRODUCT_DEVICE_NOT_EXISTS);
+        }
+        if (IotProductDeviceTypeEnum.GATEWAY_SUB.getType().equals(deviceType)) {
+            return String.format(IotConstants.GATEWAY_SUB_STABLE_NAME_FORMAT, productKey).toLowerCase();
+        } else if (IotProductDeviceTypeEnum.GATEWAY.getType().equals(deviceType)) {
+            return String.format(IotConstants.GATEWAY_STABLE_NAME_FORMAT, productKey).toLowerCase();
+        } else if (IotProductDeviceTypeEnum.DIRECT.getType().equals(deviceType)){
+            return String.format(IotConstants.DEVICE_STABLE_NAME_FORMAT, productKey).toLowerCase();
+        }
+        else{
+            throw exception(PRODUCT_DEVICE_NOT_EXISTS);
+        }
     }
 
     /**
@@ -51,7 +59,7 @@ public class IotTdDatabaseUtils {
      */
     public static String getThingModelMessageSuperTableName(String productKey) {
         // TODO @alwayssuper：是不是应该 + 拼接就好，不用 format
-        return String.format("thing_model_message_", productKey).toLowerCase();
+        return "thing_model_message_" + productKey.toLowerCase();
     }
 
     /**
@@ -61,7 +69,7 @@ public class IotTdDatabaseUtils {
      * @param deviceName 设备名称
      * @return 物模型日志设备表名
      */
-    public static String getThinkModelMessageDeviceTableName(String productKey, String deviceName) {
+    public static String getThingModelMessageDeviceTableName(String productKey, String deviceName) {
         return String.format(IotConstants.THING_MODEL_MESSAGE_TABLE_NAME_FORMAT, productKey.toLowerCase(), deviceName.toLowerCase());
     }
 
