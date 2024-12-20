@@ -77,4 +77,23 @@ public interface OAuth2TokenService {
      */
     PageResult<OAuth2AccessTokenDO> getAccessTokenPage(OAuth2AccessTokenPageReqVO reqVO);
 
+    /**
+     * 创建访问令牌，但不创建刷新令牌，不单独分配权限范围，作用范围跟userId用户所分配的范围一致
+     *
+     * 参考 createAccessToken 方法
+     *
+     * @param userId 用户编号
+     * @param userType 用户类型
+     * @param clientId 客户端编号
+     * @return 访问令牌的信息
+     */
+    OAuth2AccessTokenDO createApiAccessToken(Long userId, Integer userType, String clientId);
+
+    /**
+     * 获得apiKey访问令牌分页
+     *
+     * @param reqVO 请求
+     * @return 访问令牌分页
+     */
+    PageResult<OAuth2AccessTokenDO> getApiKeyTokenPage(OAuth2AccessTokenPageReqVO reqVO);
 }
