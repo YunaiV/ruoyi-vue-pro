@@ -143,6 +143,11 @@
             <artifactId>somle-walmart</artifactId>
             <version>${revision}</version>
         </dependency>
+        <dependency>
+            <groupId>cn.iocoder.boot</groupId>
+            <artifactId>somle-bestbuy</artifactId>
+            <version>${revision}</version>
+        </dependency>
 
     </dependencies>
 
