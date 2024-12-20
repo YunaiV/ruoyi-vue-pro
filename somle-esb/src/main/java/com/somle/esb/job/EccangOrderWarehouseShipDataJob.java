@@ -6,7 +6,7 @@ import com.somle.esb.model.OssData;
 import org.springframework.stereotype.Component;
 
 @Component
-public class EccangOrderWarehouseShipDataJob extends EccangDataJob{
+public class EccangOrderWarehouseShipDataJob extends EccangDataJob {
 
 
     @Override
@@ -15,8 +15,10 @@ public class EccangOrderWarehouseShipDataJob extends EccangDataJob{
 
         eccangService.getOrderPlusArchivePages(
                         EccangOrderVO.builder()
-                                .warehouseShipDateStart(beforeYesterdayFirstSecond)
-                                .warehouseShipDateEnd(beforeYesterdayLastSecond)
+                                .condition(EccangOrderVO.Condition.builder()
+                                        .warehouseShipDateStart(beforeYesterdayFirstSecond)
+                                        .warehouseShipDateEnd(beforeYesterdayLastSecond)
+                                        .build())
                                 .build(),
                         beforeYesterday.getYear()
                 )
@@ -32,7 +34,7 @@ public class EccangOrderWarehouseShipDataJob extends EccangDataJob{
                             .build();
                     service.send(data);
                 });
-        
+
         return "data upload success";
     }
 }

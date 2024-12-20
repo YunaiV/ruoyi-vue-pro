@@ -1,6 +1,7 @@
 package com.somle.esb.job;
 
 
+import com.somle.eccang.model.EccangInventoryBatchLogVO;
 import com.somle.esb.model.OssData;
 import org.springframework.stereotype.Component;
 
@@ -11,8 +12,10 @@ public class EccangStockLogDataJob extends EccangDataJob{
     @Override
     public String execute(String param) throws Exception {
         setDate(param);
-
-        eccangService.getInventoryBatchLog(beforeYesterdayFirstSecond, beforeYesterdayLastSecond)
+        EccangInventoryBatchLogVO eccangInventoryBatchLogVO = new EccangInventoryBatchLogVO();
+        eccangInventoryBatchLogVO.setDateFrom(beforeYesterdayFirstSecond);
+        eccangInventoryBatchLogVO.setDateTo(beforeYesterdayLastSecond);
+        eccangService.getInventoryBatchLog(eccangInventoryBatchLogVO)
                 .forEach(page -> {
                     OssData data = OssData.builder()
                             .database(DATABASE)

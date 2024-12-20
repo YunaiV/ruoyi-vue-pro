@@ -1,9 +1,6 @@
 package com.somle.eccang;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import com.somle.eccang.model.EccangOrderVO;
-import com.somle.eccang.model.EccangResponse;
-import com.somle.eccang.model.EccangShippingMethod;
+import com.somle.eccang.model.*;
 import com.somle.eccang.repository.EccangTokenRepository;
 import com.somle.eccang.service.EccangService;
 import com.somle.framework.test.core.ut.BaseSpringTest;
@@ -73,13 +70,16 @@ public class EccangTest extends BaseSpringTest {
 
     @Test
     void getInventoryBatchLog() {
-        var date = LocalDate.of(2024,8,6);
+        var date = LocalDate.of(2024,12,19);
         var time1 = LocalTime.of(0,0,0);
         var time2 = LocalTime.of(23,59,59);
         var datetime1 = LocalDateTime.of(date,time1);
         var datetime2 = LocalDateTime.of(date,time2);
-        var result = service.getInventoryBatchLog(datetime1, datetime2);
-        log.info(result.toString());
+        EccangInventoryBatchLogVO vo = new EccangInventoryBatchLogVO();
+        vo.setDateFrom(datetime1);
+        vo.setDateTo(datetime2);
+        var result = service.getInventoryBatchLog(vo);
+        System.err.println(result.toList().size());
     }
 
 
@@ -95,18 +95,66 @@ public class EccangTest extends BaseSpringTest {
         var time2 = LocalTime.of(23,59,59);
         var datetime1 = LocalDateTime.of(date,time1);
         var datetime2 = LocalDateTime.of(date,time2);
-        var result = service.getOrderPlusArchivePages(
+        var result = service.getOrderArchivePages(
             EccangOrderVO.builder()
-                .platformPaidDateStart(datetime1)
-                .platformPaidDateEnd(datetime2)
+                    .condition(EccangOrderVO.Condition.builder()
+                            .platformPaidDateStart(datetime1)
+                            .platformPaidDateEnd(datetime2)
+                            .build())
+
             .build(),
             2023
         );
-        log.info(result.toList().toString());
+        log.info(String.valueOf(result.toList().size()));
     }
+
+    @Test
+    void test1() {
+        var date = LocalDate.of(2023,12,10);
+        var time1 = LocalTime.of(0,0,0);
+        var time2 = LocalTime.of(23,59,59);
+        var datetime1 = LocalDateTime.of(date,time1);
+        var datetime2 = LocalDateTime.of(date,time2);
+        var result = service.getOrderUnarchivePages(
+                EccangOrderVO.builder()
+                        .condition(EccangOrderVO.Condition.builder()
+                                .platformPaidDateStart(datetime1)
+                                .platformPaidDateEnd(datetime2)
+                                .build())
+
+                        .build()
+        );
+        log.info(String.valueOf(result.toList().size()));
+    }
+
+    @Test
+    void test2() {
+        var date = LocalDate.of(2023,12,10);
+        var time1 = LocalTime.of(0,0,0);
+        var time2 = LocalTime.of(23,59,59);
+        var datetime1 = LocalDateTime.of(date,time1);
+        var datetime2 = LocalDateTime.of(date,time2);
+        var result = service.getOrderArchivePages(
+                EccangOrderVO.builder()
+                        .condition(EccangOrderVO.Condition.builder()
+                                .platformPaidDateStart(datetime1)
+                                .platformPaidDateEnd(datetime2)
+                                .build())
+
+                        .build(),
+                2023
+        );
+        log.info(String.valueOf(result.toList().size()));
+    }
+
     @Test
     void getRmaRefundList() {
-        List<EccangResponse.EccangPage> list = service.getRmaRefundList(LocalDateTime.now().minusDays(4), LocalDateTime.now().minusDays(3)).toList();
+        EccangRmaRefundVO vo = new EccangRmaRefundVO();
+        vo.setRefundDateForm(LocalDateTime.now().minusDays(5));
+        vo.setRefundDateTo(LocalDateTime.now().minusDays(4));
+        List<EccangResponse.EccangPage> list = service.getRmaRefundList(vo).toList();
         log.info(list.toString());
     }
+
+
 }

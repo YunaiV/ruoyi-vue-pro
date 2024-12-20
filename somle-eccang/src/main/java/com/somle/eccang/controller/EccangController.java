@@ -4,9 +4,9 @@ import com.somle.eccang.model.EccangOrder;
 import com.somle.eccang.model.EccangOrderVO;
 import com.somle.eccang.model.EccangResponse.EccangPage;
 import com.somle.eccang.model.EccangProduct;
+import com.somle.eccang.model.EccangInventoryBatchLogVO;
 import com.somle.eccang.service.EccangService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.integration.support.MessageBuilder;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
@@ -29,7 +29,10 @@ public class EccangController {
         @RequestParam String startTime,
         @RequestParam String endTime
     ) {
-        return eccangService.getInventoryBatchLog(LocalDateTime.parse(startTime), LocalDateTime.parse(endTime)).toList();
+        EccangInventoryBatchLogVO vo = new EccangInventoryBatchLogVO();
+        vo.setDateFrom(LocalDateTime.parse(startTime));
+        vo.setDateTo(LocalDateTime.parse(endTime));
+        return eccangService.getInventoryBatchLog(vo).toList();
     }
 
     @GetMapping("/getOrderShip")
@@ -38,8 +41,10 @@ public class EccangController {
             @RequestParam String endTime
     ) {
         var vo = EccangOrderVO.builder()
-                .platformShipDateStart(LocalDateTime.parse(startTime))
-                .platformShipDateEnd(LocalDateTime.parse(endTime))
+                .condition(EccangOrderVO.Condition.builder()
+                        .platformShipDateStart(LocalDateTime.parse(startTime))
+                        .platformShipDateEnd(LocalDateTime.parse(endTime))
+                        .build())
                 .build();
         return eccangService.getOrderUnarchive(vo).toList();
     }

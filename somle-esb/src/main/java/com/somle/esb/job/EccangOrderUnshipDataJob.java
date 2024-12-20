@@ -6,7 +6,7 @@ import com.somle.esb.model.OssData;
 import org.springframework.stereotype.Component;
 
 @Component
-public class EccangOrderUnshipDataJob extends EccangDataJob{
+public class EccangOrderUnshipDataJob extends EccangDataJob {
 
 
     @Override
@@ -15,8 +15,10 @@ public class EccangOrderUnshipDataJob extends EccangDataJob{
 
         eccangService.getOrderUnarchivePages(
                         EccangOrderVO.builder()
-                                .dateCreateSysEnd(yesterdayLastSecond)
-                                .status("3")
+                                .condition(EccangOrderVO.Condition.builder()
+                                        .dateCreateSysEnd(yesterdayLastSecond)
+                                        .status("3")
+                                        .build())
                                 .build()
                 )
                 .forEach(page -> {
@@ -31,7 +33,7 @@ public class EccangOrderUnshipDataJob extends EccangDataJob{
                             .build();
                     service.send(data);
                 });
-        
+
         return "data upload success";
     }
 }

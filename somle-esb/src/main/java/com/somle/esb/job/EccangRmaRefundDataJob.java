@@ -1,5 +1,6 @@
 package com.somle.esb.job;
 
+import com.somle.eccang.model.EccangRmaRefundVO;
 import com.somle.esb.model.OssData;
 import org.springframework.stereotype.Component;
 
@@ -12,8 +13,10 @@ public class EccangRmaRefundDataJob extends EccangDataJob{
     @Override
     public String execute(String param) throws Exception {
         setDate(param);
-
-        eccangService.getRmaRefundList(beforeYesterdayFirstSecond, beforeYesterdayLastSecond)
+        EccangRmaRefundVO eccangRmaRefundVO = new EccangRmaRefundVO();
+        eccangRmaRefundVO.setRefundDateForm(beforeYesterdayFirstSecond);
+        eccangRmaRefundVO.setRefundDateTo(beforeYesterdayLastSecond);
+        eccangService.getRmaRefundList(eccangRmaRefundVO)
                 .forEach(page -> {
                     OssData data = OssData.builder()
                             .database(DATABASE)
