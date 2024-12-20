@@ -1,7 +1,6 @@
 package com.somle.matomo.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.somle.framework.common.util.json.JSONObject;
 import com.somle.framework.common.util.json.JsonUtils;
 import com.somle.matomo.model.MatomoMethodVO;
 import com.somle.matomo.model.MatomoTokenVO;
@@ -9,6 +8,9 @@ import com.somle.matomo.model.MatomoVisit;
 import com.somle.framework.common.util.web.WebUtils;
 
 import com.somle.matomo.model.MatomoVisitReqVO;
+import com.somle.matomo.repository.MatomoTokenRepository;
+import jakarta.annotation.PostConstruct;
+import jakarta.annotation.Resource;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
@@ -18,9 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.time.LocalDate;
 import java.util.stream.Stream;
-import java.util.stream.IntStream;
 
 @Slf4j
 @Service
@@ -29,9 +29,18 @@ public class MatomoService {
     @Autowired
     private MessageChannel dataChannel;
 
+    @Resource
+    private MatomoTokenRepository matomoTokenRepository;
 
-    private final String baseUrl = "https://fitueyes.matomo.cloud";
-    private final String token = "062183e6bd55a126e61976a97ad89b60";
+
+    private static final String BASE_URL = "https://fitueyes.matomo.cloud";
+    private String token;
+
+
+    @PostConstruct
+    public void init() {
+        token = matomoTokenRepository.findAll().get(0).getToken();
+    }
 
     public Stream<MatomoVisit> getVisits(MatomoVisitReqVO vo) {
         var methodVO = MatomoMethodVO.builder()
@@ -53,7 +62,7 @@ public class MatomoService {
 
         OkHttpClient client = new OkHttpClient().newBuilder()
             .build();
-        var url = WebUtils.urlWithParams(baseUrl, tokenVO);
+        var url = WebUtils.urlWithParams(BASE_URL, tokenVO);
         url = WebUtils.urlWithParams(url, methodVO);
         url = WebUtils.urlWithParams(url, vo);
         log.info("url:{}", url);

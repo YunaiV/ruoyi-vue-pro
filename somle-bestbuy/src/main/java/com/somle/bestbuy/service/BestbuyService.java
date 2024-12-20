@@ -1,9 +1,12 @@
 package com.somle.bestbuy.service;
 
+import com.somle.bestbuy.repository.BestbuyTokenRepository;
 import com.somle.framework.common.util.json.JSONObject;
 import com.somle.framework.common.util.json.JsonUtils;
 import com.somle.framework.common.util.web.RequestX;
 import com.somle.framework.common.util.web.WebUtils;
+import jakarta.annotation.PostConstruct;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
@@ -22,12 +25,18 @@ import java.util.Map;
 @Slf4j
 @Service
 public class BestbuyService {
+    @Resource
+    private BestbuyTokenRepository bestbuyTokenRepository;
 
     // 基础URL，指向Bestbuy的API端点
     private final static String BASE_URL = "https://marketplace.bestbuy.ca/";
     // 访问令牌，用于身份验证
-    private final static String TOKEN = "b5cc2e75-6e0f-4b13-9173-6d3fe7dd0c51";
+    private String token;
 
+    @PostConstruct
+    public void init() {
+        token = bestbuyTokenRepository.findAll().get(0).getToken();
+    }
     /**
      * 获取订单信息。
      *
@@ -91,7 +100,7 @@ public class BestbuyService {
      */
     private Map<String, String> getHeaders() {
         Map<String, String> headers = new HashMap<>();
-        headers.put("Authorization", TOKEN);
+        headers.put("Authorization", token);
         headers.put("Content-Type", "application/json");
         headers.put("Accept", "application/json");
         return headers;
