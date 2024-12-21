@@ -13,6 +13,7 @@ import org.springframework.validation.annotation.Validated;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.iot.enums.ErrorCodeConstants.PLUGIN_INSTANCE_NOT_EXISTS;
 
+// TODO @haohao：可以搞个 plugin 包，然后把 plugininfo、plugininstance
 /**
  * IoT 插件实例 Service 实现类
  *

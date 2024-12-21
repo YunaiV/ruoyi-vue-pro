@@ -21,7 +21,7 @@ public interface IotDeviceDataService {
      * @param productKey 产品 key
      * @param deviceName 设备名称
      * @param message    消息
-     *                   <p>JSON 格式，参见 <a href="https://help.aliyun.com/zh/iot/user-guide/device-properties-events-and-services?spm=a2c4g.11186623.0.0.3a3335aeUdzkz2#concept-mvc-4tw-y2b">...</a>
+     *                   <p>参见 <a href="https://help.aliyun.com/zh/iot/user-guide/device-properties-events-and-services?spm=a2c4g.11186623.0.0.3a3335aeUdzkz2#concept-mvc-4tw-y2b">JSON 格式</a>
      */
     void saveDeviceData(String productKey, String deviceName, String message);
 

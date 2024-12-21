@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.iot.api;
+package cn.iocoder.yudao.module.iot.api.device;
 
 /**
  * 设备数据 API

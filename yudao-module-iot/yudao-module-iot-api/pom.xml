@@ -22,6 +22,7 @@
             <artifactId>yudao-common</artifactId>
         </dependency>
         <!-- PF4J -->
+        <!-- TODO 芋艿：这个依赖，要不要放在 api 包 -->
         <dependency>
             <groupId>org.pf4j</groupId>
             <artifactId>pf4j-spring</artifactId>
