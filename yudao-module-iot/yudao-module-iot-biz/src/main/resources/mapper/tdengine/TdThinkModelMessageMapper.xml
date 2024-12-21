@@ -2,7 +2,7 @@
 <!DOCTYPE mapper
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="cn.iocoder.yudao.module.iot.dal.tdengine.TdThinkModelMessageMapper">
+<mapper namespace="cn.iocoder.yudao.module.iot.dal.tdengine.TdThingModelMessageMapper">
 
     <!-- 创建物模型消息日志超级表 -->
     <!-- TODO @芋艿：捉摸下字段，特别是 sys、ts 这种缩写 -->
@@ -14,7 +14,7 @@
             method VARCHAR(255),
             params VARCHAR(2048)
         )TAGS (
-            deviceKey VARCHAR(255)
+            device_key VARCHAR(255)
         )
     </update>
 
@@ -28,7 +28,7 @@
             method ,
             params
         )TAGS(
-            #{deviceKey}
+            #{device_key}
         )
     </update>
 </mapper>

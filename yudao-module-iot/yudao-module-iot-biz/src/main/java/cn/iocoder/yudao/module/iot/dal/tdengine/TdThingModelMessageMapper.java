@@ -10,7 +10,7 @@ import org.apache.ibatis.annotations.Mapper;
  */
 @Mapper
 @DS("tdengine")
-public interface TdThinkModelMessageMapper {
+public interface TdThingModelMessageMapper {
 
     /**
      * 创建物模型消息日志超级表超级表
