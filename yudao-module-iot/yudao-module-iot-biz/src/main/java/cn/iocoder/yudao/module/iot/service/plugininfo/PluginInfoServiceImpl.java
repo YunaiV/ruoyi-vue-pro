@@ -22,9 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.jar.JarEntry;
@@ -220,24 +218,24 @@ public class PluginInfoServiceImpl implements PluginInfoService {
         pluginInfoMapper.updateById(pluginInfoDo);
     }
 
-    @PostConstruct
-    public void init() {
-        Executors.newSingleThreadScheduledExecutor().schedule(this::startPlugins, 3, TimeUnit.SECONDS);
-    }
-
-    @SneakyThrows
-    private void startPlugins() {
-        for (PluginInfoDO pluginInfoDO : pluginInfoMapper.selectList()) {
-            if (!IotPluginStatusEnum.RUNNING.getStatus().equals(pluginInfoDO.getStatus())) {
-                continue;
-            }
-            log.info("start plugin:{}", pluginInfoDO.getPluginId());
-            try {
-                pluginManager.startPlugin(pluginInfoDO.getPluginId());
-            } catch (Exception e) {
-                log.error("start plugin error", e);
-            }
-        }
-    }
+//    @PostConstruct
+//    public void init() {
+//        Executors.newSingleThreadScheduledExecutor().schedule(this::startPlugins, 3, TimeUnit.SECONDS);
+//    }
+//
+//    @SneakyThrows
+//    private void startPlugins() {
+//        for (PluginInfoDO pluginInfoDO : pluginInfoMapper.selectList()) {
+//            if (!IotPluginStatusEnum.RUNNING.getStatus().equals(pluginInfoDO.getStatus())) {
+//                continue;
+//            }
+//            log.info("start plugin:{}", pluginInfoDO.getPluginId());
+//            try {
+//                pluginManager.startPlugin(pluginInfoDO.getPluginId());
+//            } catch (Exception e) {
+//                log.error("start plugin error", e);
+//            }
+//        }
+//    }
 
 }
