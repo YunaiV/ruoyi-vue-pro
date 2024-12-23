@@ -2,19 +2,29 @@
 <project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
-    <groupId>cn.iocoder.boot</groupId>
-    <artifactId>yudao-module-iot-plugin</artifactId>
-    <version>0.0.1</version>
-    <packaging>pom</packaging>
-
+<!--    <modelVersion>4.0.0</modelVersion>-->
+<!--    <groupId>cn.iocoder.boot</groupId>-->
+<!--    <artifactId>yudao-module-iot-plugin</artifactId>-->
+<!--    <version>0.0.1</version>-->
+<!--    <packaging>pom</packaging>-->
+    <parent>
+        <artifactId>yudao-module-iot</artifactId>
+        <groupId>cn.iocoder.boot</groupId>
+        <version>${revision}</version>
+    </parent>
     <modules>
+        <module>yudao-module-iot-demo-plugin</module>
         <module>yudao-module-iot-http-plugin</module>
     </modules>
 
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>yudao-module-iot-plugin</artifactId>
+    <packaging>pom</packaging>
+
     <name>${project.artifactId}</name>
     <description>
-        物联网模块 - 插件模块
+        物联网 插件 模块
     </description>
 
 </project>

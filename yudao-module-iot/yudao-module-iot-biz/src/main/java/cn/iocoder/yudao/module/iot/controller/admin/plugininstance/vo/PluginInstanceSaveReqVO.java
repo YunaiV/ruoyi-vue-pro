@@ -2,7 +2,6 @@ package cn.iocoder.yudao.module.iot.controller.admin.plugininstance.vo;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
-import java.util.*;
 import jakarta.validation.constraints.*;
 
 @Schema(description = "管理后台 - IoT 插件实例新增/修改 Request VO")

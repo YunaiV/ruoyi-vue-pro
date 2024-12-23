@@ -16,7 +16,7 @@ import java.util.Arrays;
 public enum IotProductDeviceTypeEnum implements IntArrayValuable {
 
     DIRECT(0, "直连设备"),
-    GATEWAY_CHILD(1, "网关子设备"),
+    GATEWAY_SUB(1, "网关子设备"),
     GATEWAY(2, "网关设备");
 
     /**
