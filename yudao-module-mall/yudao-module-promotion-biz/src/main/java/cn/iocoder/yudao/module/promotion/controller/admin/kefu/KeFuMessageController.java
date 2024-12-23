@@ -2,9 +2,8 @@ package cn.iocoder.yudao.module.promotion.controller.admin.kefu;
 
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
-import cn.iocoder.yudao.module.promotion.controller.admin.kefu.vo.message.KeFuMessagePageReqVO;
+import cn.iocoder.yudao.module.promotion.controller.admin.kefu.vo.message.KeFuMessageListReqVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.kefu.vo.message.KeFuMessageRespVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.kefu.vo.message.KeFuMessageSendReqVO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.kefu.KeFuMessageDO;
@@ -20,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
+import java.util.List;
 import java.util.Map;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
@@ -56,19 +56,18 @@ public class KeFuMessageController {
         return success(true);
     }
 
-    @GetMapping("/page")
-    @Operation(summary = "获得客服消息分页")
+    @GetMapping("/list")
+    @Operation(summary = "获得客服消息列表")
     @PreAuthorize("@ss.hasPermission('promotion:kefu-message:query')")
-    public CommonResult<PageResult<KeFuMessageRespVO>> getKeFuMessagePage(@Valid KeFuMessagePageReqVO pageReqVO) {
+    public CommonResult<List<KeFuMessageRespVO>> getKeFuMessageList(@Valid KeFuMessageListReqVO pageReqVO) {
         // 获得数据
-        PageResult<KeFuMessageDO> pageResult = messageService.getKeFuMessagePage(pageReqVO);
+        List<KeFuMessageDO> list = messageService.getKeFuMessageList(pageReqVO);
 
         // 拼接数据
-        PageResult<KeFuMessageRespVO> result = BeanUtils.toBean(pageResult, KeFuMessageRespVO.class);
-        Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(convertSet(filterList(result.getList(),
+        List<KeFuMessageRespVO> result = BeanUtils.toBean(list, KeFuMessageRespVO.class);
+        Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(convertSet(filterList(result,
                 item -> UserTypeEnum.ADMIN.getValue().equals(item.getSenderType())), KeFuMessageRespVO::getSenderId));
-        result.getList().forEach(item-> findAndThen(userMap, item.getSenderId(),
-                user -> item.setSenderAvatar(user.getAvatar())));
+        result.forEach(item -> findAndThen(userMap, item.getSenderId(), user -> item.setSenderAvatar(user.getAvatar())));
         return success(result);
     }
 

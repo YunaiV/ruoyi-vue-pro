@@ -125,7 +125,6 @@ public class BrokerageUserServiceImpl implements BrokerageUserService {
 
     @Override
     public BrokerageUserDO getOrCreateBrokerageUser(Long id) {
-        // TODO @芋艿：这块优化下；统一到注册时处理；
         BrokerageUserDO brokerageUser = brokerageUserMapper.selectById(id);
         // 特殊：人人分销的情况下，如果分销人为空则创建分销人
         if (brokerageUser == null && ObjUtil.equal(BrokerageEnabledConditionEnum.ALL.getCondition(),
@@ -193,6 +192,8 @@ public class BrokerageUserServiceImpl implements BrokerageUserService {
             Integer enabledCondition = tradeConfigService.getTradeConfig().getBrokerageEnabledCondition();
             if (BrokerageEnabledConditionEnum.ALL.getCondition().equals(enabledCondition)) { // 人人分销：用户默认就有分销资格
                 brokerageUser.setBrokerageEnabled(true).setBrokerageTime(LocalDateTime.now());
+            } else {
+                brokerageUser.setBrokerageEnabled(false).setBrokerageTime(LocalDateTime.now());
             }
             brokerageUserMapper.insert(fillBindUserData(bindUserId, brokerageUser));
         } else {
@@ -265,11 +266,6 @@ public class BrokerageUserServiceImpl implements BrokerageUserService {
         TradeConfigDO tradeConfig = tradeConfigService.getTradeConfig();
         if (tradeConfig == null || !BooleanUtil.isTrue(tradeConfig.getBrokerageEnabled())) {
             return false;
-        }
-
-        // 校验分佣模式：仅可后台手动设置推广员
-        if (BrokerageEnabledConditionEnum.ADMIN.getCondition().equals(tradeConfig.getBrokerageEnabledCondition())) {
-            throw exception(BROKERAGE_BIND_CONDITION_ADMIN);
         }
 
         // 校验分销关系绑定模式

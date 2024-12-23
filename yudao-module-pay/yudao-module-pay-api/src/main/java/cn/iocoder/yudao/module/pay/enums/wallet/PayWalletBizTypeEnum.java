@@ -18,9 +18,9 @@ public enum PayWalletBizTypeEnum implements IntArrayValuable {
     RECHARGE(1, "充值"),
     RECHARGE_REFUND(2, "充值退款"),
     PAYMENT(3, "支付"),
-    PAYMENT_REFUND(4, "支付退款");
-
-    // TODO 后续增加
+    PAYMENT_REFUND(4, "支付退款"),
+    UPDATE_BALANCE(5, "更新余额"),
+    BROKERAGE_WITHDRAW(6, "分佣提现");
 
     /**
      * 业务分类
@@ -37,4 +37,9 @@ public enum PayWalletBizTypeEnum implements IntArrayValuable {
     public int[] array() {
          return ARRAYS;
     }
+
+    public static PayWalletBizTypeEnum valueOf(Integer type) {
+        return Arrays.stream(values()).filter(item -> item.getType().equals(type)).findFirst().orElse(null);
+    }
+
 }

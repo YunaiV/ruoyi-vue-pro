@@ -1,11 +1,16 @@
 package cn.iocoder.yudao.module.bpm.framework.flowable.core.util;
 
+import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder;
-import cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmConstants;
+import cn.iocoder.yudao.framework.tenant.core.util.TenantUtils;
+import cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnVariableConstants;
 import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.common.engine.api.variable.VariableContainer;
 import org.flowable.common.engine.impl.el.ExpressionManager;
 import org.flowable.common.engine.impl.identity.Authentication;
+import org.flowable.common.engine.impl.variable.MapDelegateVariableContainer;
+import org.flowable.engine.ManagementService;
 import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
@@ -16,6 +21,7 @@ import org.flowable.task.api.TaskInfo;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * Flowable 相关的工具方法
@@ -37,6 +43,16 @@ public class FlowableUtils {
     public static String getTenantId() {
         Long tenantId = TenantContextHolder.getTenantId();
         return tenantId != null ? String.valueOf(tenantId) : ProcessEngineConfiguration.NO_TENANT_ID;
+    }
+
+    public static void execute(String tenantIdStr, Runnable runnable) {
+        if (ObjectUtil.isEmpty(tenantIdStr)
+                || Objects.equals(tenantIdStr, ProcessEngineConfiguration.NO_TENANT_ID)) {
+            runnable.run();
+        } else {
+            Long tenantId = Long.valueOf(tenantIdStr);
+            TenantUtils.execute(tenantId, runnable);
+        }
     }
 
     // ========== Execution 相关的工具方法 ==========
@@ -78,7 +94,28 @@ public class FlowableUtils {
      * @return 状态
      */
     private static Integer getProcessInstanceStatus(Map<String, Object> processVariables) {
-        return (Integer) processVariables.get(BpmConstants.PROCESS_INSTANCE_VARIABLE_STATUS);
+        return (Integer) processVariables.get(BpmnVariableConstants.PROCESS_INSTANCE_VARIABLE_STATUS);
+    }
+
+    /**
+     * 获得流程实例的审批原因
+     *
+     * @param processInstance 流程实例
+     * @return 审批原因
+     */
+    public static String getProcessInstanceReason(HistoricProcessInstance processInstance) {
+        return (String) processInstance.getProcessVariables().get(BpmnVariableConstants.PROCESS_INSTANCE_VARIABLE_REASON);
+    }
+
+    /**
+     * 获得流程实例的表单
+     *
+     * @param processInstance 流程实例
+     * @return 表单
+     */
+    public static Map<String, Object> getProcessInstanceFormVariable(ProcessInstance processInstance) {
+        Map<String, Object> processVariables = new HashMap<>(processInstance.getProcessVariables());
+        return filterProcessInstanceFormVariable(processVariables);
     }
 
     /**
@@ -88,9 +125,8 @@ public class FlowableUtils {
      * @return 表单
      */
     public static Map<String, Object> getProcessInstanceFormVariable(HistoricProcessInstance processInstance) {
-        Map<String, Object> formVariables = new HashMap<>(processInstance.getProcessVariables());
-        filterProcessInstanceFormVariable(formVariables);
-        return formVariables;
+        Map<String, Object> processVariables = new HashMap<>(processInstance.getProcessVariables());
+        return filterProcessInstanceFormVariable(processVariables);
     }
 
     /**
@@ -102,7 +138,7 @@ public class FlowableUtils {
      * @return 过滤后的表单
      */
     public static Map<String, Object> filterProcessInstanceFormVariable(Map<String, Object> processVariables) {
-        processVariables.remove(BpmConstants.PROCESS_INSTANCE_VARIABLE_STATUS);
+        processVariables.remove(BpmnVariableConstants.PROCESS_INSTANCE_VARIABLE_STATUS);
         return processVariables;
     }
 
@@ -112,10 +148,23 @@ public class FlowableUtils {
      * @param processInstance 流程实例
      * @return 发起用户选择的审批人 Map
      */
-    @SuppressWarnings("unchecked")
     public static Map<String, List<Long>> getStartUserSelectAssignees(ProcessInstance processInstance) {
-        return (Map<String, List<Long>>) processInstance.getProcessVariables().get(
-                BpmConstants.PROCESS_INSTANCE_VARIABLE_START_USER_SELECT_ASSIGNEES);
+        return processInstance != null ? getStartUserSelectAssignees(processInstance.getProcessVariables()) : null;
+    }
+
+    /**
+     * 获得流程实例的发起用户选择的审批人 Map
+     *
+     * @param processVariables 流程变量
+     * @return 发起用户选择的审批人 Map
+     */
+    @SuppressWarnings("unchecked")
+    public static Map<String, List<Long>> getStartUserSelectAssignees(Map<String, Object> processVariables) {
+        if (processVariables == null) {
+            return null;
+        }
+        return (Map<String, List<Long>>) processVariables.get(
+                BpmnVariableConstants.PROCESS_INSTANCE_VARIABLE_START_USER_SELECT_ASSIGNEES);
     }
 
     // ========== Task 相关的工具方法 ==========
@@ -127,7 +176,7 @@ public class FlowableUtils {
      * @return 状态
      */
     public static Integer getTaskStatus(TaskInfo task) {
-        return (Integer) task.getTaskLocalVariables().get(BpmConstants.TASK_VARIABLE_STATUS);
+        return (Integer) task.getTaskLocalVariables().get(BpmnVariableConstants.TASK_VARIABLE_STATUS);
     }
 
     /**
@@ -137,7 +186,7 @@ public class FlowableUtils {
      * @return 审批原因
      */
     public static String getTaskReason(TaskInfo task) {
-        return (String) task.getTaskLocalVariables().get(BpmConstants.TASK_VARIABLE_REASON);
+        return (String) task.getTaskLocalVariables().get(BpmnVariableConstants.TASK_VARIABLE_REASON);
     }
 
     /**
@@ -161,20 +210,37 @@ public class FlowableUtils {
      * @return 过滤后的表单
      */
     public static Map<String, Object> filterTaskFormVariable(Map<String, Object> taskLocalVariables) {
-        taskLocalVariables.remove(BpmConstants.TASK_VARIABLE_STATUS);
-        taskLocalVariables.remove(BpmConstants.TASK_VARIABLE_REASON);
+        taskLocalVariables.remove(BpmnVariableConstants.TASK_VARIABLE_STATUS);
+        taskLocalVariables.remove(BpmnVariableConstants.TASK_VARIABLE_REASON);
         return taskLocalVariables;
     }
 
     // ========== Expression 相关的工具方法 ==========
 
-    public static Object getExpressionValue(VariableContainer variableContainer, String expressionString) {
-        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration();
-        assert processEngineConfiguration != null;
+    private static Object getExpressionValue(VariableContainer variableContainer, String expressionString,
+                                             ProcessEngineConfigurationImpl processEngineConfiguration) {
+        assert processEngineConfiguration!= null;
         ExpressionManager expressionManager = processEngineConfiguration.getExpressionManager();
-        assert expressionManager != null;
+        assert expressionManager!= null;
         Expression expression = expressionManager.createExpression(expressionString);
         return expression.getValue(variableContainer);
+    }
+
+    public static Object getExpressionValue(VariableContainer variableContainer, String expressionString) {
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration();
+        if (processEngineConfiguration != null) {
+            return getExpressionValue(variableContainer, expressionString, processEngineConfiguration);
+        }
+        // 如果 ProcessEngineConfigurationImpl 获取不到，则需要通过 ManagementService 来获取
+        ManagementService managementService = SpringUtil.getBean(ManagementService.class);
+        assert managementService != null;
+        return managementService.executeCommand(context ->
+                getExpressionValue(variableContainer, expressionString, CommandContextUtil.getProcessEngineConfiguration()));
+    }
+
+    public static Object getExpressionValue(Map<String, Object> variable, String expressionString) {
+        VariableContainer variableContainer = new MapDelegateVariableContainer(variable, VariableContainer.empty());
+        return getExpressionValue(variableContainer, expressionString);
     }
 
 }

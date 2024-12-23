@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
+import javax.annotation.security.PermitAll;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
@@ -30,6 +31,7 @@ public class AppDiyPageController {
     @GetMapping("/get")
     @Operation(summary = "获得装修页面")
     @Parameter(name = "id", description = "编号", required = true, example = "1024")
+    @PermitAll
     public CommonResult<AppDiyPagePropertyRespVO> getDiyPage(@RequestParam("id") Long id) {
         DiyPageDO diyPage = diyPageService.getDiyPage(id);
         return success(BeanUtils.toBean(diyPage, AppDiyPagePropertyRespVO.class));

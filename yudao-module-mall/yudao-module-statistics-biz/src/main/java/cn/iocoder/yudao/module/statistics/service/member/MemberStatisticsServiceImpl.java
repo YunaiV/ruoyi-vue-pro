@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.statistics.service.member;
 
 import cn.hutool.core.date.LocalDateTimeUtil;
-import cn.hutool.core.util.ObjUtil;
+import cn.hutool.core.util.ObjectUtil;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.ip.core.Area;
 import cn.iocoder.yudao.framework.ip.core.enums.AreaTypeEnum;
@@ -70,9 +70,12 @@ public class MemberStatisticsServiceImpl implements MemberStatisticsService {
                 bo -> AreaUtils.getParentIdByType(bo.getAreaId(), AreaTypeEnum.PROVINCE),
                 bo -> bo,
                 (a, b) -> new MemberAreaStatisticsRespBO()
-                        .setOrderCreateUserCount(a.getOrderCreateUserCount() + b.getOrderCreateUserCount())
-                        .setOrderPayUserCount(a.getOrderPayUserCount() + b.getOrderPayUserCount())
-                        .setOrderPayPrice(ObjUtil.defaultIfNull(a.getOrderPayPrice(), 0) + ObjUtil.defaultIfNull(b.getOrderPayPrice(), 0)));
+                        .setOrderCreateUserCount(ObjectUtil.defaultIfNull(a.getOrderCreateUserCount(), 0)
+                                + ObjectUtil.defaultIfNull(b.getOrderCreateUserCount(), 0))
+                        .setOrderPayUserCount(ObjectUtil.defaultIfNull(a.getOrderPayUserCount(), 0)
+                                + ObjectUtil.defaultIfNull(b.getOrderPayUserCount(), 0))
+                        .setOrderPayPrice(ObjectUtil.defaultIfNull(a.getOrderPayPrice(), 0)
+                                + ObjectUtil.defaultIfNull(b.getOrderPayPrice(), 0)));
         // 拼接数据
         List<Area> areaList = AreaUtils.getByType(AreaTypeEnum.PROVINCE, area -> area);
         areaList.add(new Area().setId(null).setName("未知"));

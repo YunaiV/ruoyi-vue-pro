@@ -2,7 +2,6 @@ package cn.iocoder.yudao.module.trade.controller.app.brokerage;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.security.core.annotations.PreAuthenticated;
 import cn.iocoder.yudao.module.trade.controller.app.brokerage.vo.withdraw.AppBrokerageWithdrawCreateReqVO;
 import cn.iocoder.yudao.module.trade.controller.app.brokerage.vo.withdraw.AppBrokerageWithdrawPageReqVO;
 import cn.iocoder.yudao.module.trade.controller.app.brokerage.vo.withdraw.AppBrokerageWithdrawRespVO;
@@ -33,7 +32,6 @@ public class AppBrokerageWithdrawController {
 
     @GetMapping("/page")
     @Operation(summary = "获得分销提现分页")
-    @PreAuthenticated
     public CommonResult<PageResult<AppBrokerageWithdrawRespVO>> getBrokerageWithdrawPage(AppBrokerageWithdrawPageReqVO pageReqVO) {
         PageResult<BrokerageWithdrawDO> pageResult = brokerageWithdrawService.getBrokerageWithdrawPage(
                 BrokerageWithdrawConvert.INSTANCE.convert(pageReqVO, getLoginUserId()));
@@ -42,7 +40,6 @@ public class AppBrokerageWithdrawController {
 
     @PostMapping("/create")
     @Operation(summary = "创建分销提现")
-    @PreAuthenticated
     public CommonResult<Long> createBrokerageWithdraw(@RequestBody @Valid AppBrokerageWithdrawCreateReqVO createReqVO) {
         return success(brokerageWithdrawService.createBrokerageWithdraw(getLoginUserId(), createReqVO));
     }

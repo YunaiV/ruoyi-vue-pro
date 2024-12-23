@@ -10,7 +10,6 @@ import cn.iocoder.yudao.module.trade.convert.order.TradeOrderConvert;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderDO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderItemDO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderLogDO;
-import cn.iocoder.yudao.module.trade.service.aftersale.AfterSaleService;
 import cn.iocoder.yudao.module.trade.service.order.TradeOrderLogService;
 import cn.iocoder.yudao.module.trade.service.order.TradeOrderQueryService;
 import cn.iocoder.yudao.module.trade.service.order.TradeOrderUpdateService;
@@ -31,6 +30,7 @@ import java.util.Set;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
+import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
 
 @Tag(name = "管理后台 - 交易订单")
 @RestController
@@ -144,7 +144,7 @@ public class TradeOrderController {
     @Parameter(name = "id", description = "交易订单编号")
     @PreAuthorize("@ss.hasPermission('trade:order:pick-up')")
     public CommonResult<Boolean> pickUpOrderById(@RequestParam("id") Long id) {
-        tradeOrderUpdateService.pickUpOrderByAdmin(id);
+        tradeOrderUpdateService.pickUpOrderByAdmin(getLoginUserId(), id);
         return success(true);
     }
 
@@ -153,7 +153,7 @@ public class TradeOrderController {
     @Parameter(name = "pickUpVerifyCode", description = "自提核销码")
     @PreAuthorize("@ss.hasPermission('trade:order:pick-up')")
     public CommonResult<Boolean> pickUpOrderByVerifyCode(@RequestParam("pickUpVerifyCode") String pickUpVerifyCode) {
-        tradeOrderUpdateService.pickUpOrderByAdmin(pickUpVerifyCode);
+        tradeOrderUpdateService.pickUpOrderByAdmin(getLoginUserId(), pickUpVerifyCode);
         return success(true);
     }
 

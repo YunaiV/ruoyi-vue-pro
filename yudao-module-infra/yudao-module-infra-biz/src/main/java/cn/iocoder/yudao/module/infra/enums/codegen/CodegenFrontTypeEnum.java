@@ -14,7 +14,6 @@ public enum CodegenFrontTypeEnum {
 
     VUE2(10), // Vue2 Element UI 标准模版
     VUE3(20), // Vue3 Element Plus 标准模版
-    VUE3_SCHEMA(21), // Vue3 Element Plus Schema 模版
     VUE3_VBEN(30), // Vue3 VBEN 模版
     ;
 

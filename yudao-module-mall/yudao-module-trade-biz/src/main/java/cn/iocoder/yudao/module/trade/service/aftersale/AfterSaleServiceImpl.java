@@ -8,6 +8,9 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
 import cn.iocoder.yudao.module.pay.api.refund.PayRefundApi;
 import cn.iocoder.yudao.module.pay.api.refund.dto.PayRefundCreateReqDTO;
+import cn.iocoder.yudao.module.promotion.api.combination.CombinationRecordApi;
+import cn.iocoder.yudao.module.promotion.api.combination.dto.CombinationRecordRespDTO;
+import cn.iocoder.yudao.module.promotion.enums.combination.CombinationRecordStatusEnum;
 import cn.iocoder.yudao.module.trade.controller.admin.aftersale.vo.AfterSaleDisagreeReqVO;
 import cn.iocoder.yudao.module.trade.controller.admin.aftersale.vo.AfterSalePageReqVO;
 import cn.iocoder.yudao.module.trade.controller.admin.aftersale.vo.AfterSaleRefuseReqVO;
@@ -26,6 +29,7 @@ import cn.iocoder.yudao.module.trade.enums.aftersale.AfterSaleTypeEnum;
 import cn.iocoder.yudao.module.trade.enums.aftersale.AfterSaleWayEnum;
 import cn.iocoder.yudao.module.trade.enums.order.TradeOrderItemAfterSaleStatusEnum;
 import cn.iocoder.yudao.module.trade.enums.order.TradeOrderStatusEnum;
+import cn.iocoder.yudao.module.trade.enums.order.TradeOrderTypeEnum;
 import cn.iocoder.yudao.module.trade.framework.aftersale.core.annotations.AfterSaleLog;
 import cn.iocoder.yudao.module.trade.framework.aftersale.core.utils.AfterSaleLogUtils;
 import cn.iocoder.yudao.module.trade.framework.order.config.TradeOrderProperties;
@@ -71,6 +75,8 @@ public class AfterSaleServiceImpl implements AfterSaleService {
 
     @Resource
     private PayRefundApi payRefundApi;
+    @Resource
+    private CombinationRecordApi combinationRecordApi;
 
     @Resource
     private TradeOrderProperties tradeOrderProperties;
@@ -147,6 +153,14 @@ public class AfterSaleServiceImpl implements AfterSaleService {
         if (createReqVO.getWay().equals(AfterSaleWayEnum.RETURN_AND_REFUND.getWay())
                 && !TradeOrderStatusEnum.haveDelivered(order.getStatus())) {
             throw exception(AFTER_SALE_CREATE_FAIL_ORDER_STATUS_NO_DELIVERED);
+        }
+        // 如果是拼团订单，则进行中不允许售后
+        if (TradeOrderTypeEnum.isCombination(order.getType())) {
+            CombinationRecordRespDTO combinationRecord = combinationRecordApi.getCombinationRecordByOrderId(
+                    order.getUserId(), order.getId());
+            if (combinationRecord != null && CombinationRecordStatusEnum.isInProgress(combinationRecord.getStatus())) {
+                throw exception(AFTER_SALE_CREATE_FAIL_ORDER_STATUS_COMBINATION_IN_PROGRESS);
+            }
         }
         return orderItem;
     }
@@ -372,7 +386,7 @@ public class AfterSaleServiceImpl implements AfterSaleService {
             public void afterCommit() {
                 // 创建退款单
                 PayRefundCreateReqDTO createReqDTO = AfterSaleConvert.INSTANCE.convert(userIp, afterSale, tradeOrderProperties)
-                        .setReason(StrUtil.format("退款【{}】", afterSale.getSpuName()));
+                        .setReason(StrUtil.format("退款【{}】", afterSale.getSpuName()));;
                 Long payRefundId = payRefundApi.createRefund(createReqDTO);
                 // 更新售后单的退款单号
                 tradeAfterSaleMapper.updateById(new AfterSaleDO().setId(afterSale.getId()).setPayRefundId(payRefundId));

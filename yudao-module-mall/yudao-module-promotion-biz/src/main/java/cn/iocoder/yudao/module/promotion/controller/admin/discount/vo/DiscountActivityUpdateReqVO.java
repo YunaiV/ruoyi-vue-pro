@@ -25,6 +25,6 @@ public class DiscountActivityUpdateReqVO extends DiscountActivityBaseVO {
      */
     @NotEmpty(message = "商品列表不能为空")
     @Valid
-    private List<DiscountActivityCreateReqVO.Product> products;
+    private List<Product> products;
 
 }

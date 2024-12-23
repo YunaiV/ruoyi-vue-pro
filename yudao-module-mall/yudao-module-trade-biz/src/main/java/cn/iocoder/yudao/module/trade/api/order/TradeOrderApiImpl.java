@@ -36,8 +36,8 @@ public class TradeOrderApiImpl implements TradeOrderApi {
     }
 
     @Override
-    public void cancelPaidOrder(Long userId, Long orderId) {
-        tradeOrderUpdateService.cancelPaidOrder(userId, orderId);
+    public void cancelPaidOrder(Long userId, Long orderId, Integer cancelType) {
+        tradeOrderUpdateService.cancelPaidOrder(userId, orderId, cancelType);
     }
 
 }

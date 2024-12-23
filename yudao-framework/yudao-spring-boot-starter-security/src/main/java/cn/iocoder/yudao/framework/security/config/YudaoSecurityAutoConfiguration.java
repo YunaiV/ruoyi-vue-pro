@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.framework.security.config;
 
-import cn.iocoder.yudao.framework.security.core.aop.PreAuthenticatedAspect;
 import cn.iocoder.yudao.framework.security.core.context.TransmittableThreadLocalSecurityContextHolderStrategy;
 import cn.iocoder.yudao.framework.security.core.filter.TokenAuthenticationFilter;
 import cn.iocoder.yudao.framework.security.core.handler.AccessDeniedHandlerImpl;
@@ -38,14 +37,6 @@ public class YudaoSecurityAutoConfiguration {
 
     @Resource
     private SecurityProperties securityProperties;
-
-    /**
-     * 处理用户未登录拦截的切面的 Bean
-     */
-    @Bean
-    public PreAuthenticatedAspect preAuthenticatedAspect() {
-        return new PreAuthenticatedAspect();
-    }
 
     /**
      * 认证失败处理类 Bean

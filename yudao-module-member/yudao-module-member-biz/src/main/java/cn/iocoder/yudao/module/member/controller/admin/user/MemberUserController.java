@@ -76,14 +76,6 @@ public class MemberUserController {
         return success(true);
     }
 
-    @PutMapping("/update-balance")
-    @Operation(summary = "更新会员用户余额")
-    @PreAuthorize("@ss.hasPermission('member:user:update-balance')")
-    public CommonResult<Boolean> updateUserBalance(@Valid @RequestBody Long id) {
-        // todo @jason：增加一个【修改余额】
-        return success(true);
-    }
-
     @GetMapping("/get")
     @Operation(summary = "获得会员用户")
     @Parameter(name = "id", description = "编号", required = true, example = "1024")

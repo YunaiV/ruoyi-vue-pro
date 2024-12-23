@@ -14,6 +14,10 @@ import javax.validation.constraints.*;
 @Data
 public class PayAppBaseVO {
 
+    @Schema(description = "应用标识", requiredMode = Schema.RequiredMode.REQUIRED, example = "yudao")
+    @NotEmpty(message = "应用标识不能为空")
+    private String appKey;
+
     @Schema(description = "应用名", requiredMode = Schema.RequiredMode.REQUIRED, example = "小豆")
     @NotNull(message = "应用名不能为空")
     private String name;
@@ -35,5 +39,9 @@ public class PayAppBaseVO {
     @NotNull(message = "退款结果的回调地址不能为空")
     @URL(message = "退款结果的回调地址必须为 URL 格式")
     private String refundNotifyUrl;
+
+    @Schema(description = "转账结果的回调地址", example = "http://127.0.0.1:48080/transfer-callback")
+    @URL(message = "转账结果的回调地址必须为 URL 格式")
+    private String transferNotifyUrl;
 
 }

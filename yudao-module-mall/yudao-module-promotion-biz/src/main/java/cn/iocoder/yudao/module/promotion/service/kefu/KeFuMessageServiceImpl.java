@@ -2,14 +2,12 @@ package cn.iocoder.yudao.module.promotion.service.kefu;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjUtil;
-import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.infra.api.websocket.WebSocketSenderApi;
 import cn.iocoder.yudao.module.member.api.user.MemberUserApi;
-import cn.iocoder.yudao.module.promotion.controller.admin.kefu.vo.message.KeFuMessagePageReqVO;
+import cn.iocoder.yudao.module.promotion.controller.admin.kefu.vo.message.KeFuMessageListReqVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.kefu.vo.message.KeFuMessageSendReqVO;
 import cn.iocoder.yudao.module.promotion.controller.app.kefu.vo.message.AppKeFuMessagePageReqVO;
 import cn.iocoder.yudao.module.promotion.controller.app.kefu.vo.message.AppKeFuMessageSendReqVO;
@@ -23,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
+import java.util.Collections;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
@@ -113,9 +112,9 @@ public class KeFuMessageServiceImpl implements KeFuMessageService {
         // 2.3 发送消息通知会员，管理员已读 -> 会员更新发送的消息状态
         KeFuMessageDO keFuMessage = getFirst(filterList(messageList, message -> UserTypeEnum.MEMBER.getValue().equals(message.getSenderType())));
         assert keFuMessage != null; // 断言避免警告
-        getSelf().sendAsyncMessageToMember(keFuMessage.getSenderId(), KEFU_MESSAGE_ADMIN_READ, StrUtil.EMPTY);
+        getSelf().sendAsyncMessageToMember(keFuMessage.getSenderId(), KEFU_MESSAGE_ADMIN_READ, conversation.getId());
         // 2.4 通知所有管理员消息已读
-        getSelf().sendAsyncMessageToAdmin(KEFU_MESSAGE_ADMIN_READ, StrUtil.EMPTY);
+        getSelf().sendAsyncMessageToAdmin(KEFU_MESSAGE_ADMIN_READ, conversation.getId());
     }
 
     private void validateReceiverExist(Long receiverId, Integer receiverType) {
@@ -138,20 +137,20 @@ public class KeFuMessageServiceImpl implements KeFuMessageService {
     }
 
     @Override
-    public PageResult<KeFuMessageDO> getKeFuMessagePage(KeFuMessagePageReqVO pageReqVO) {
-        return keFuMessageMapper.selectPage(pageReqVO);
+    public List<KeFuMessageDO> getKeFuMessageList(KeFuMessageListReqVO pageReqVO) {
+        return keFuMessageMapper.selectList(pageReqVO);
     }
 
     @Override
-    public PageResult<KeFuMessageDO> getKeFuMessagePage(AppKeFuMessagePageReqVO pageReqVO, Long userId) {
+    public List<KeFuMessageDO> getKeFuMessageList(AppKeFuMessagePageReqVO pageReqVO, Long userId) {
         // 1. 获得客服会话
         KeFuConversationDO conversation = conversationService.getConversationByUserId(userId);
         if (conversation == null) {
-            return PageResult.empty();
+            return Collections.emptyList();
         }
         // 2. 设置会话编号
         pageReqVO.setConversationId(conversation.getId());
-        return keFuMessageMapper.selectPage(pageReqVO);
+        return keFuMessageMapper.selectList(BeanUtils.toBean(pageReqVO, KeFuMessageListReqVO.class));
     }
 
     private KeFuMessageServiceImpl getSelf() {

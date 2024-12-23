@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.module.trade.service.order;
 
-import cn.iocoder.yudao.framework.common.enums.TerminalEnum;
 import cn.iocoder.yudao.module.trade.controller.admin.order.vo.TradeOrderDeliveryReqVO;
 import cn.iocoder.yudao.module.trade.controller.admin.order.vo.TradeOrderRemarkReqVO;
 import cn.iocoder.yudao.module.trade.controller.admin.order.vo.TradeOrderUpdateAddressReqVO;
@@ -12,6 +11,7 @@ import cn.iocoder.yudao.module.trade.controller.app.order.vo.item.AppTradeOrderI
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderDO;
 
 import javax.validation.constraints.NotNull;
+import java.util.List;
 
 /**
  * 交易订单【写】Service 接口
@@ -48,6 +48,17 @@ public interface TradeOrderUpdateService {
      * @param payOrderId 支付订单编号
      */
     void updateOrderPaid(Long id, Long payOrderId);
+
+    /**
+     * 同步订单的支付状态
+     *
+     * 1. Quietly 表示，即使同步失败，也不会抛出异常
+     * 2. 什么时候回出现异常？因为是主动同步，可能和支付模块的回调通知 {@link #updateOrderPaid(Long, Long)} 存在并发冲突，导致抛出异常
+     *
+     * @param id 订单编号
+     * @param payOrderId 支付订单编号
+     */
+    void syncOrderPayStatusQuietly(Long id, Long payOrderId);
 
     /**
      * 【管理员】发货交易订单
@@ -118,16 +129,18 @@ public interface TradeOrderUpdateService {
     /**
      * 【管理员】核销订单
      *
+     * @param userId 管理员编号
      * @param id 订单编号
      */
-    void pickUpOrderByAdmin(Long id);
+    void pickUpOrderByAdmin(Long userId, Long id);
 
     /**
      * 【管理员】核销订单
      *
+     * @param userId 管理员编号
      * @param pickUpVerifyCode 自提核销码
      */
-    void pickUpOrderByAdmin(String pickUpVerifyCode);
+    void pickUpOrderByAdmin(Long userId, String pickUpVerifyCode);
 
     /**
      * 【管理员】根据自提核销码，查询订单
@@ -187,13 +200,22 @@ public interface TradeOrderUpdateService {
      */
     void updateOrderCombinationInfo(Long orderId, Long activityId, Long combinationRecordId, Long headId);
 
-    // TODO 芋艿：拼团取消，不调这个接口哈；
     /**
      * 取消支付订单
      *
-     * @param userId  用户编号
-     * @param orderId 订单编号
+     * @param userId           用户编号
+     * @param orderId          订单编号
+     * @param cancelType       取消类型
      */
-    void cancelPaidOrder(Long userId, Long orderId);
+    void cancelPaidOrder(Long userId, Long orderId, Integer cancelType);
+
+    /**
+     * 更新下单赠送的优惠券编号到订单
+     *
+     * @param userId        用户编号
+     * @param orderId       订单编号
+     * @param giveCouponIds 赠送的优惠券编号列表
+     */
+    void updateOrderGiveCouponIds(Long userId, Long orderId, List<Long> giveCouponIds);
 
 }

@@ -13,7 +13,9 @@ import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiApiKeyDO;
 import cn.iocoder.yudao.module.ai.dal.mysql.model.AiApiKeyMapper;
 import jakarta.annotation.Resource;
 import org.springframework.ai.chat.model.ChatModel;
+import org.springframework.ai.embedding.EmbeddingModel;
 import org.springframework.ai.image.ImageModel;
+import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
@@ -132,4 +134,20 @@ public class AiApiKeyServiceImpl implements AiApiKeyService {
         }
         return modelFactory.getOrCreateSunoApi(apiKey.getApiKey(), apiKey.getUrl());
     }
+
+    @Override
+    public EmbeddingModel getEmbeddingModel(Long id) {
+        AiApiKeyDO apiKey = validateApiKey(id);
+        AiPlatformEnum platform = AiPlatformEnum.validatePlatform(apiKey.getPlatform());
+        return modelFactory.getOrCreateEmbeddingModel(platform, apiKey.getApiKey(), apiKey.getUrl());
+    }
+
+    @Override
+    public VectorStore getOrCreateVectorStore(Long id) {
+        AiApiKeyDO apiKey = validateApiKey(id);
+        AiPlatformEnum platform = AiPlatformEnum.validatePlatform(apiKey.getPlatform());
+        // 创建或获取 VectorStore 对象
+        return modelFactory.getOrCreateVectorStore(getEmbeddingModel(id), platform, apiKey.getApiKey(), apiKey.getUrl());
+    }
+
 }

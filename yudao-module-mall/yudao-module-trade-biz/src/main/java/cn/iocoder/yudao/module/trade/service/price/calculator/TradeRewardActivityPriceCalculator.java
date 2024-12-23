@@ -15,10 +15,13 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.util.List;
+import java.util.Map;
 
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.filterList;
 import static cn.iocoder.yudao.module.trade.service.price.calculator.TradePriceCalculatorHelper.formatPrice;
+
+// TODO @puhui999：相关的单测，建议改一改
 
 /**
  * 满减送活动的 {@link TradePriceCalculator} 实现类
@@ -39,20 +42,21 @@ public class TradeRewardActivityPriceCalculator implements TradePriceCalculator 
             return;
         }
         // 获得 SKU 对应的满减送活动
-        List<RewardActivityMatchRespDTO> rewardActivities = rewardActivityApi.getMatchRewardActivityList(
+        List<RewardActivityMatchRespDTO> rewardActivities = rewardActivityApi.getMatchRewardActivityListBySpuIds(
                 convertSet(result.getItems(), TradePriceCalculateRespBO.OrderItem::getSpuId));
         if (CollUtil.isEmpty(rewardActivities)) {
             return;
         }
-
-        // 处理每个满减送活动
-        rewardActivities.forEach(rewardActivity -> calculate(param, result, rewardActivity));
+        // 处理最新的满减送活动
+        if (!rewardActivities.isEmpty()) {
+            calculate(param, result, rewardActivities.get(0));
+        }
     }
 
     private void calculate(TradePriceCalculateReqBO param, TradePriceCalculateRespBO result,
                            RewardActivityMatchRespDTO rewardActivity) {
         // 1.1 获得满减送的订单项（商品）列表
-        List<TradePriceCalculateRespBO.OrderItem> orderItems = filterMatchCouponOrderItems(result, rewardActivity);
+        List<TradePriceCalculateRespBO.OrderItem> orderItems = filterMatchActivityOrderItems(result, rewardActivity);
         if (CollUtil.isEmpty(orderItems)) {
             return;
         }
@@ -61,7 +65,7 @@ public class TradeRewardActivityPriceCalculator implements TradePriceCalculator 
         if (rule == null) {
             TradePriceCalculatorHelper.addNotMatchPromotion(result, orderItems,
                     rewardActivity.getId(), rewardActivity.getName(), PromotionTypeEnum.REWARD_ACTIVITY.getType(),
-                    getRewardActivityNotMeetTip(rewardActivity));
+                    "满减送：" + rewardActivity.getRules().get(0).getDescription());
             return;
         }
 
@@ -69,6 +73,10 @@ public class TradeRewardActivityPriceCalculator implements TradePriceCalculator 
         Integer newDiscountPrice = rule.getDiscountPrice();
         // 2.2 计算分摊的优惠金额
         List<Integer> divideDiscountPrices = TradePriceCalculatorHelper.dividePrice(orderItems, newDiscountPrice);
+        // 2.3 计算是否包邮
+        if (Boolean.TRUE.equals(rule.getFreeDelivery())) {
+            result.setFreeDelivery(true);
+        }
 
         // 3.1 记录使用的优惠劵
         result.setCouponId(param.getCouponId());
@@ -84,6 +92,28 @@ public class TradeRewardActivityPriceCalculator implements TradePriceCalculator 
             TradePriceCalculatorHelper.recountPayPrice(orderItem);
         }
         TradePriceCalculatorHelper.recountAllPrice(result);
+
+        // 4.1 记录赠送的积分
+        if (rule.getPoint() != null && rule.getPoint() > 0) {
+            List<Integer> dividePoints = TradePriceCalculatorHelper.dividePrice(orderItems, rule.getPoint());
+            for (int i = 0; i < orderItems.size(); i++) {
+                // 商品可能赠送了积分，所以这里要加上
+                TradePriceCalculateRespBO.OrderItem orderItem = orderItems.get(i);
+                orderItem.setGivePoint(orderItem.getGivePoint() + dividePoints.get(i));
+            }
+        }
+        // 4.2 记录订单是否包邮
+        if (Boolean.TRUE.equals(rule.getFreeDelivery())) {
+            // 只要满足一个活动包邮那么这单就包邮
+            result.setFreeDelivery(true);
+        }
+        // 4.3 记录赠送的优惠券
+        if (CollUtil.isNotEmpty(rule.getGiveCouponTemplateCounts())) {
+            for (Map.Entry<Long, Integer> entry : rule.getGiveCouponTemplateCounts().entrySet()) {
+                result.getGiveCouponTemplateCounts().put(entry.getKey(),
+                        result.getGiveCouponTemplateCounts().getOrDefault(entry.getKey(), 0) + entry.getValue());
+            }
+        }
     }
 
     /**
@@ -93,17 +123,16 @@ public class TradeRewardActivityPriceCalculator implements TradePriceCalculator 
      * @param rewardActivity 满减送活动
      * @return 订单项（商品）列表
      */
-    private List<TradePriceCalculateRespBO.OrderItem> filterMatchCouponOrderItems(TradePriceCalculateRespBO result,
-                                                                                  RewardActivityMatchRespDTO rewardActivity) {
-        return filterList(result.getItems(),
-                orderItem -> CollUtil.contains(rewardActivity.getSpuIds(), orderItem.getSpuId()));
+    private List<TradePriceCalculateRespBO.OrderItem> filterMatchActivityOrderItems(TradePriceCalculateRespBO result,
+                                                                                    RewardActivityMatchRespDTO rewardActivity) {
+        return filterList(result.getItems(), orderItem -> CollUtil.contains(rewardActivity.getSpuIds(), orderItem.getSpuId()));
     }
 
     /**
      * 获得最大匹配的满减送活动的规则
      *
      * @param rewardActivity 满减送活动
-     * @param orderItems 商品项
+     * @param orderItems     商品项
      * @return 匹配的活动规则
      */
     private RewardActivityMatchRespDTO.Rule getMaxMatchRewardActivityRule(RewardActivityMatchRespDTO rewardActivity,
@@ -126,17 +155,6 @@ public class TradeRewardActivityPriceCalculator implements TradePriceCalculator 
             }
         }
         return null;
-    }
-
-    /**
-     * 获得满减送活动部匹配时的提示
-     *
-     * @param rewardActivity 满减送活动
-     * @return 提示
-     */
-    private String getRewardActivityNotMeetTip(RewardActivityMatchRespDTO rewardActivity) {
-        // TODO 芋艿：后面再想想；应该找第一个规则，算下还差多少即可。
-        return "TODO";
     }
 
 }

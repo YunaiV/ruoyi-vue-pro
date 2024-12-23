@@ -1,9 +1,7 @@
 package cn.iocoder.yudao.module.trade.service.delivery;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.trade.controller.admin.delivery.vo.pickup.DeliveryPickUpStoreCreateReqVO;
-import cn.iocoder.yudao.module.trade.controller.admin.delivery.vo.pickup.DeliveryPickUpStorePageReqVO;
-import cn.iocoder.yudao.module.trade.controller.admin.delivery.vo.pickup.DeliveryPickUpStoreUpdateReqVO;
+import cn.iocoder.yudao.module.trade.controller.admin.delivery.vo.pickup.*;
 import cn.iocoder.yudao.module.trade.dal.dataobject.delivery.DeliveryPickUpStoreDO;
 
 import javax.validation.Valid;
@@ -56,6 +54,14 @@ public interface DeliveryPickUpStoreService {
     List<DeliveryPickUpStoreDO> getDeliveryPickUpStoreList(Collection<Long> ids);
 
     /**
+     * 获得指定状态的自提门店列表
+     *
+     * @param status 状态
+     * @return 自提门店列表
+     */
+    List<DeliveryPickUpStoreDO> getDeliveryPickUpStoreListByStatus(Integer status);
+
+    /**
      * 获得自提门店分页
      *
      * @param pageReqVO 分页查询
@@ -64,10 +70,10 @@ public interface DeliveryPickUpStoreService {
     PageResult<DeliveryPickUpStoreDO> getDeliveryPickUpStorePage(DeliveryPickUpStorePageReqVO pageReqVO);
 
     /**
-     * 获得指定状态的自提门店列表
+     * 绑定自提店员
      *
-     * @param status 状态
-     * @return 自提门店列表
+     * @param bindReqVO 绑定数据
      */
-    List<DeliveryPickUpStoreDO> getDeliveryPickUpStoreListByStatus(Integer status);
+    void bindDeliveryPickUpStore(DeliveryPickUpBindReqVO bindReqVO);
+
 }

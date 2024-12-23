@@ -4,6 +4,7 @@ import cn.iocoder.yudao.framework.common.validation.InEnum;
 import cn.iocoder.yudao.framework.pay.core.enums.transfer.PayTransferTypeEnum;
 import lombok.Data;
 import org.hibernate.validator.constraints.Length;
+import org.hibernate.validator.constraints.URL;
 
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
@@ -11,7 +12,8 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.util.Map;
 
-import static cn.iocoder.yudao.framework.pay.core.enums.transfer.PayTransferTypeEnum.*;
+import static cn.iocoder.yudao.framework.pay.core.enums.transfer.PayTransferTypeEnum.Alipay;
+import static cn.iocoder.yudao.framework.pay.core.enums.transfer.PayTransferTypeEnum.WxPay;
 
 /**
  * 统一转账 Request DTO
@@ -75,4 +77,12 @@ public class PayTransferUnifiedReqDTO {
      * 支付渠道的额外参数
      */
     private Map<String, String> channelExtras;
+
+    /**
+     * 转账结果的 notify 回调地址
+     */
+    @NotEmpty(message = "转账结果的回调地址不能为空")
+    @URL(message = "转账结果的 notify 回调地址必须是 URL 格式")
+    private String notifyUrl;
+
 }

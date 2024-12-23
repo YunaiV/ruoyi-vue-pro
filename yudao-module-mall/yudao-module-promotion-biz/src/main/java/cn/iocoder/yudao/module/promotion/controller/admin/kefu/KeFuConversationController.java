@@ -6,6 +6,7 @@ import cn.iocoder.yudao.module.member.api.user.MemberUserApi;
 import cn.iocoder.yudao.module.member.api.user.dto.MemberUserRespDTO;
 import cn.iocoder.yudao.module.promotion.controller.admin.kefu.vo.conversation.KeFuConversationRespVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.kefu.vo.conversation.KeFuConversationUpdatePinnedReqVO;
+import cn.iocoder.yudao.module.promotion.dal.dataobject.kefu.KeFuConversationDO;
 import cn.iocoder.yudao.module.promotion.service.kefu.KeFuConversationService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -33,6 +34,25 @@ public class KeFuConversationController {
     private KeFuConversationService conversationService;
     @Resource
     private MemberUserApi memberUserApi;
+
+    @GetMapping("/get")
+    @Operation(summary = "获得客服会话")
+    @Parameter(name = "id", description = "编号", required = true, example = "1024")
+    @PreAuthorize("@ss.hasPermission('promotion:kefu-conversation:query')")
+    public CommonResult<KeFuConversationRespVO> getConversation(@RequestParam("id") Long id) {
+        KeFuConversationDO conversation = conversationService.getConversation(id);
+        if (conversation == null) {
+            return success(null);
+        }
+
+        // 拼接数据
+        KeFuConversationRespVO result = BeanUtils.toBean(conversation, KeFuConversationRespVO.class);
+        MemberUserRespDTO memberUser = memberUserApi.getUser(conversation.getUserId());
+        if (memberUser != null) {
+            result.setUserAvatar(memberUser.getAvatar()).setUserNickname(memberUser.getNickname());
+        }
+        return success(result);
+    }
 
     @PutMapping("/update-conversation-pinned")
     @Operation(summary = "置顶/取消置顶客服会话")

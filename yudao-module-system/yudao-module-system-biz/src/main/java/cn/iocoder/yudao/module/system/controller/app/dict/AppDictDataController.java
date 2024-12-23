@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
+import javax.annotation.security.PermitAll;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
@@ -32,6 +33,7 @@ public class AppDictDataController {
     @GetMapping("/type")
     @Operation(summary = "根据字典类型查询字典数据信息")
     @Parameter(name = "type", description = "字典类型", required = true, example = "common_status")
+    @PermitAll
     public CommonResult<List<AppDictDataRespVO>> getDictDataListByType(@RequestParam("type") String type) {
         List<DictDataDO> list = dictDataService.getDictDataList(
                 CommonStatusEnum.ENABLE.getStatus(), type);

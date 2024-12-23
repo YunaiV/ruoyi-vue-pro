@@ -62,6 +62,10 @@ public class AppTradeOrderSettlementReqVO {
     @Schema(description = "砍价记录编号", example = "123")
     private Long bargainRecordId;
 
+    // ========== 积分商城活动相关字段 ==========
+    @Schema(description = "积分商城活动编号", example = "123")
+    private Long pointActivityId;
+
     @AssertTrue(message = "活动商品每次只能购买一种规格")
     @JsonIgnore
     public boolean isValidActivityItems() {

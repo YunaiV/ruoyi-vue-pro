@@ -4,8 +4,9 @@ import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
-import cn.iocoder.yudao.framework.security.core.annotations.PreAuthenticated;
-import cn.iocoder.yudao.module.promotion.controller.app.coupon.vo.coupon.*;
+import cn.iocoder.yudao.module.promotion.controller.app.coupon.vo.coupon.AppCouponPageReqVO;
+import cn.iocoder.yudao.module.promotion.controller.app.coupon.vo.coupon.AppCouponRespVO;
+import cn.iocoder.yudao.module.promotion.controller.app.coupon.vo.coupon.AppCouponTakeReqVO;
 import cn.iocoder.yudao.module.promotion.convert.coupon.CouponConvert;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.coupon.CouponDO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.coupon.CouponTemplateDO;
@@ -21,7 +22,6 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import javax.validation.Valid;
 import java.util.Collections;
-import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
@@ -40,7 +40,6 @@ public class AppCouponController {
     @PostMapping("/take")
     @Operation(summary = "领取优惠劵")
     @Parameter(name = "templateId", description = "优惠券模板编号", required = true, example = "1024")
-    @PreAuthenticated
     public CommonResult<Boolean> takeCoupon(@Valid @RequestBody AppCouponTakeReqVO reqVO) {
         // 1. 领取优惠劵
         Long userId = getLoginUserId();
@@ -56,17 +55,8 @@ public class AppCouponController {
         return success(canTakeAgain);
     }
 
-    @GetMapping("/match-list")
-    @Operation(summary = "获得匹配指定商品的优惠劵列表", description = "用于下单页，展示优惠劵列表")
-    public CommonResult<List<AppCouponMatchRespVO>> getMatchCouponList(AppCouponMatchReqVO matchReqVO) {
-        // todo: 优化：优惠金额倒序
-        List<CouponDO> list = couponService.getMatchCouponList(getLoginUserId(), matchReqVO);
-        return success(BeanUtils.toBean(list, AppCouponMatchRespVO.class));
-    }
-
     @GetMapping("/page")
     @Operation(summary = "我的优惠劵列表")
-    @PreAuthenticated
     public CommonResult<PageResult<AppCouponRespVO>> getCouponPage(AppCouponPageReqVO pageReqVO) {
         PageResult<CouponDO> pageResult = couponService.getCouponPage(
                 CouponConvert.INSTANCE.convert(pageReqVO, Collections.singleton(getLoginUserId())));
@@ -76,7 +66,6 @@ public class AppCouponController {
     @GetMapping("/get")
     @Operation(summary = "获得优惠劵")
     @Parameter(name = "id", description = "优惠劵编号", required = true, example = "1024")
-    @PreAuthenticated
     public CommonResult<AppCouponRespVO> getCoupon(@RequestParam("id") Long id) {
         CouponDO coupon = couponService.getCoupon(getLoginUserId(), id);
         return success(BeanUtils.toBean(coupon, AppCouponRespVO.class));
@@ -84,7 +73,6 @@ public class AppCouponController {
 
     @GetMapping(value = "/get-unused-count")
     @Operation(summary = "获得未使用的优惠劵数量")
-    @PreAuthenticated
     public CommonResult<Long> getUnusedCouponCount() {
         return success(couponService.getUnusedCouponCount(getLoginUserId()));
     }

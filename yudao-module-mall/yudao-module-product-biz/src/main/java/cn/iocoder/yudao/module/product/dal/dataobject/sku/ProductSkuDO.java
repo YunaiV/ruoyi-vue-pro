@@ -130,11 +130,5 @@ public class ProductSkuDO extends BaseDO {
 
     }
 
-    // TODO 芋艿：integral from y
-    // TODO 芋艿：pinkPrice from y
-    // TODO 芋艿：seckillPrice from y
-    // TODO 芋艿：pinkStock from y
-    // TODO 芋艿：seckillStock from y
-
 }
 

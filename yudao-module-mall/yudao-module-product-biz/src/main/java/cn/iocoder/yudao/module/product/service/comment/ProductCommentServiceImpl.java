@@ -67,7 +67,7 @@ public class ProductCommentServiceImpl implements ProductCommentService {
         // 校验 SPU
         ProductSpuDO spu = validateSpu(sku.getSpuId());
         // 校验评论
-        validateCommentExists(createReqDTO.getUserId(), createReqDTO.getOrderId());
+        validateCommentExists(createReqDTO.getUserId(), createReqDTO.getOrderItemId());
         // 获取用户详细信息
         MemberUserRespDTO user = memberUserApi.getUser(createReqDTO.getUserId());
 

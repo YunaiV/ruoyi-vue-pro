@@ -33,6 +33,9 @@ public class BpmProcessDefinitionRespVO {
     @Schema(description = "流程分类名字", example = "请假")
     private String categoryName;
 
+    @Schema(description = "流程模型的类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "10")
+    private Integer modelType; // 参见 BpmModelTypeEnum 枚举类
+
     @Schema(description = "表单类型-参见 bpm_model_form_type 数据字典", example = "1")
     private Integer formType;
     @Schema(description = "表单编号-在表单类型为 {@link BpmModelFormTypeEnum#CUSTOM} 时，必须非空", example = "1024")
@@ -59,9 +62,12 @@ public class BpmProcessDefinitionRespVO {
     @Schema(description = "BPMN XML")
     private String bpmnXml; // 需要从对应的 BpmnModel 读取，非必须返回
 
-    @Schema(description = "发起用户需要选择审批人的任务数组")
-    private List<UserTask> startUserSelectTasks; // 需要从对应的 BpmnModel 读取，非必须返回
+    @Schema(description = "SIMPLE 设计器模型数据 json 格式")
+    private String simpleModel; // 非必须返回
 
+    @Schema(description = "流程定义排序", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
+    private Long sort;
+    
     @Schema(description = "BPMN UserTask 用户任务")
     @Data
     public static class UserTask {

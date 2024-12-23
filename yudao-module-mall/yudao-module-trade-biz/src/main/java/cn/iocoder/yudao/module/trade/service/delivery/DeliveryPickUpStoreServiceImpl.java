@@ -1,6 +1,9 @@
 package cn.iocoder.yudao.module.trade.service.delivery;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
+import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
+import cn.iocoder.yudao.module.trade.controller.admin.delivery.vo.pickup.DeliveryPickUpBindReqVO;
 import cn.iocoder.yudao.module.trade.controller.admin.delivery.vo.pickup.DeliveryPickUpStoreCreateReqVO;
 import cn.iocoder.yudao.module.trade.controller.admin.delivery.vo.pickup.DeliveryPickUpStorePageReqVO;
 import cn.iocoder.yudao.module.trade.controller.admin.delivery.vo.pickup.DeliveryPickUpStoreUpdateReqVO;
@@ -29,6 +32,9 @@ public class DeliveryPickUpStoreServiceImpl implements DeliveryPickUpStoreServic
     @Resource
     private DeliveryPickUpStoreMapper deliveryPickUpStoreMapper;
 
+    @Resource
+    private AdminUserApi adminUserApi;
+
     @Override
     public Long createDeliveryPickUpStore(DeliveryPickUpStoreCreateReqVO createReqVO) {
         // 插入
@@ -56,7 +62,8 @@ public class DeliveryPickUpStoreServiceImpl implements DeliveryPickUpStoreServic
     }
 
     private void validateDeliveryPickUpStoreExists(Long id) {
-        if (deliveryPickUpStoreMapper.selectById(id) == null) {
+        DeliveryPickUpStoreDO deliveryPickUpStore = deliveryPickUpStoreMapper.selectById(id);
+        if (deliveryPickUpStore == null) {
             throw exception(PICK_UP_STORE_NOT_EXISTS);
         }
     }
@@ -72,13 +79,25 @@ public class DeliveryPickUpStoreServiceImpl implements DeliveryPickUpStoreServic
     }
 
     @Override
+    public List<DeliveryPickUpStoreDO> getDeliveryPickUpStoreListByStatus(Integer status) {
+        return deliveryPickUpStoreMapper.selectListByStatus(status);
+    }
+
+    @Override
     public PageResult<DeliveryPickUpStoreDO> getDeliveryPickUpStorePage(DeliveryPickUpStorePageReqVO pageReqVO) {
         return deliveryPickUpStoreMapper.selectPage(pageReqVO);
     }
 
     @Override
-    public List<DeliveryPickUpStoreDO> getDeliveryPickUpStoreListByStatus(Integer status) {
-        return deliveryPickUpStoreMapper.selectListByStatus(status);
+    public void bindDeliveryPickUpStore(DeliveryPickUpBindReqVO bindReqVO) {
+        // 1.1 校验门店存在
+        validateDeliveryPickUpStoreExists(bindReqVO.getId());
+        // 1.2 校验用户存在
+        adminUserApi.validateUserList(bindReqVO.getVerifyUserIds());
+
+        // 2. 更新
+        DeliveryPickUpStoreDO updateObj = BeanUtils.toBean(bindReqVO, DeliveryPickUpStoreDO.class);
+        deliveryPickUpStoreMapper.updateById(updateObj);
     }
 
 }

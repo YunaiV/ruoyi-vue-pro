@@ -84,6 +84,12 @@ public class TradePriceCalculateReqBO {
      */
     private Long bargainRecordId;
 
+    // ========== 积分商城活动相关字段 ==========
+    /**
+     * 积分商城活动编号
+     */
+    private Long pointActivityId;
+
     /**
      * 商品 SKU
      */

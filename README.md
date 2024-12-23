@@ -149,17 +149,21 @@
 
 ### 工作流程
 
-|     | 功能    | 描述                                     |
-|-----|-------|----------------------------------------|
-| 🚀  | 流程模型  | 配置工作流的流程模型，支持文件导入与在线设计流程图，提供 7 种任务分配规则 |
-| 🚀  | 流程表单  | 拖动表单元素生成相应的工作流表单，覆盖 Element UI 所有的表单组件 |
-| 🚀  | 用户分组  | 自定义用户分组，可用于工作流的审批分组                    |
-| 🚀  | 我的流程  | 查看我发起的工作流程，支持新建、取消流程等操作，高亮流程图、审批时间线    |
-| 🚀  | 待办任务  | 查看自己【未】审批的工作任务，支持通过、不通过、转发、委派、退回等操作    |
-| 🚀  | 已办任务  | 查看自己【已】审批的工作任务，未来会支持回退操作               |
-| 🚀  | OA 请假 | 作为业务自定义接入工作流的使用示例，只需创建请求对应的工作流程，即可进行审批 |
+|    | 功能    | 描述                                      |
+|----|-------|-----------------------------------------|
+| 🚀 | 流程模型  | 配置工作流的流程模型，支持 BPMN 和仿钉钉/飞书设计器           |
+| 🚀 | 流程表单  | 拖动表单元素生成相应的工作流表单，覆盖 Element UI 所有的表单组件  |
+| 🚀 | 用户分组  | 自定义用户分组，可用于工作流的审批分组                     |
+| 🚀 | 我的流程  | 查看我发起的工作流程，支持新建、取消流程等操作，高亮流程图、审批时间线     |
+| 🚀 | 待办任务  | 查看自己【未】审批的工作任务，支持通过、不通过、转派、委派、退回、加减签等操作 |
+| 🚀 | 已办任务  | 查看自己【已】审批的工作任务，支持流程预测，展示未来审批人信息         |
+| 🚀 | OA 请假 | 作为业务自定义接入工作流的使用示例，只需创建请求对应的工作流程，即可进行审批  |
 
 ![功能图](/.image/common/bpm-feature.png)
+
+| BPMN 设计器                     | 钉钉/飞书设计器                       |
+|------------------------------|--------------------------------|
+| ![](/.image/工作流设计器-bpmn.jpg) | ![](/.image/工作流设计器-simple.jpg) |
 
 ### 支付系统
 
@@ -297,7 +301,7 @@
 | [SkyWalking](https://skywalking.apache.org/)                                                | 分布式应用追踪系统        | 8.12.0         | [文档](http://www.iocoder.cn/Spring-Boot/SkyWalking/?yudao)      |
 | [Spring Boot Admin](https://github.com/codecentric/spring-boot-admin)                       | Spring Boot 监控平台 | 2.7.10         | [文档](http://www.iocoder.cn/Spring-Boot/Admin/?yudao)           |
 | [Jackson](https://github.com/FasterXML/jackson)                                             | JSON 工具库         | 2.13.5         |                                                                |
-| [MapStruct](https://mapstruct.org/)                                                         | Java Bean 转换     | 1.5.5.Final    | [文档](http://www.iocoder.cn/Spring-Boot/MapStruct/?yudao)       |
+| [MapStruct](https://mapstruct.org/)                                                         | Java Bean 转换     | 1.6.2          | [文档](http://www.iocoder.cn/Spring-Boot/MapStruct/?yudao)       |
 | [Lombok](https://projectlombok.org/)                                                        | 消除冗长的 Java 代码    | 1.18.34        | [文档](http://www.iocoder.cn/Spring-Boot/Lombok/?yudao)          |
 | [JUnit](https://junit.org/junit5/)                                                          | Java 单元测试框架      | 5.8.2          | -                                                              |
 | [Mockito](https://github.com/mockito/mockito)                                               | Java Mock 框架     | 4.8.0          | -                                                              |

@@ -19,10 +19,10 @@ import java.util.Map;
 public class PayTransferCreateReqDTO {
 
     /**
-     * 应用编号
+     * 应用标识
      */
-    @NotNull(message = "应用编号不能为空")
-    private Long appId;
+    @NotNull(message = "应用标识不能为空")
+    private String appKey;
 
     @NotEmpty(message = "转账渠道不能为空")
     private String channelCode;

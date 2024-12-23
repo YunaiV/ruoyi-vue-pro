@@ -23,6 +23,8 @@
 <!--        <module>yudao-module-mall</module>-->
 <!--        <module>yudao-module-crm</module>-->
 <!--        <module>yudao-module-erp</module>-->
+<!--        <module>yudao-module-iot</module>-->
+        <!-- AI 大模型的开启，请参考 https://doc.iocoder.cn/ai/build/ 文档，对 JDK 版本要要求！ -->
 <!--        <module>yudao-module-ai</module>-->
     </modules>
 
@@ -31,7 +33,7 @@
     <url>https://github.com/YunaiV/ruoyi-vue-pro</url>
 
     <properties>
-        <revision>2.2.0-jdk8-snapshot</revision>
+        <revision>2.3.0-jdk8-SNAPSHOT</revision>
         <!-- Maven 相关 -->
         <java.version>1.8</java.version>
         <maven.compiler.source>${java.version}</maven.compiler.source>
@@ -42,7 +44,7 @@
         <!-- 看看咋放到 bom 里 -->
         <lombok.version>1.18.34</lombok.version>
         <spring.boot.version>2.7.18</spring.boot.version>
-        <mapstruct.version>1.5.5.Final</mapstruct.version>
+        <mapstruct.version>1.6.2</mapstruct.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
@@ -108,7 +110,7 @@
                 <artifactId>flatten-maven-plugin</artifactId>
                 <version>${flatten-maven-plugin.version}</version>
                 <configuration>
-                    <flattenMode>resolveCiFriendliesOnly</flattenMode>
+                    <flattenMode>oss</flattenMode>
                     <updatePomFile>true</updatePomFile>
                 </configuration>
                 <executions>

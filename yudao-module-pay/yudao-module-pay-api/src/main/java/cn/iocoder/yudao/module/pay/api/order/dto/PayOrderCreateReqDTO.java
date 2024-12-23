@@ -18,10 +18,10 @@ public class PayOrderCreateReqDTO implements Serializable {
     public static final int SUBJECT_MAX_LENGTH = 32;
 
     /**
-     * 应用编号
+     * 应用标识
      */
-    @NotNull(message = "应用编号不能为空")
-    private Long appId;
+    @NotNull(message = "应用标识不能为空")
+    private String appKey;
     /**
      * 用户 IP
      */

@@ -9,12 +9,15 @@ import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.category.BpmCa
 import cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmCategoryDO;
 import cn.iocoder.yudao.module.bpm.dal.mysql.category.BpmCategoryMapper;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.bpm.enums.ErrorCodeConstants.*;
@@ -56,7 +59,7 @@ public class BpmCategoryServiceImpl implements BpmCategoryService {
     private void validateCategoryNameUnique(BpmCategorySaveReqVO updateReqVO) {
         BpmCategoryDO category = bpmCategoryMapper.selectByName(updateReqVO.getName());
         if (category == null
-            || ObjUtil.equal(category.getId(), updateReqVO.getId())) {
+                || ObjUtil.equal(category.getId(), updateReqVO.getId())) {
             return;
         }
         throw exception(CATEGORY_NAME_DUPLICATE, updateReqVO.getName());
@@ -65,7 +68,7 @@ public class BpmCategoryServiceImpl implements BpmCategoryService {
     private void validateCategoryCodeUnique(BpmCategorySaveReqVO updateReqVO) {
         BpmCategoryDO category = bpmCategoryMapper.selectByCode(updateReqVO.getCode());
         if (category == null
-            || ObjUtil.equal(category.getId(), updateReqVO.getId())) {
+                || ObjUtil.equal(category.getId(), updateReqVO.getId())) {
             return;
         }
         throw exception(CATEGORY_CODE_DUPLICATE, updateReqVO.getCode());
@@ -106,6 +109,22 @@ public class BpmCategoryServiceImpl implements BpmCategoryService {
     @Override
     public List<BpmCategoryDO> getCategoryListByStatus(Integer status) {
         return bpmCategoryMapper.selectListByStatus(status);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void updateCategorySortBatch(List<Long> ids) {
+        // 校验分类都存在
+        List<BpmCategoryDO> categories = bpmCategoryMapper.selectBatchIds(ids);
+        if (categories.size() != ids.size()) {
+            throw exception(CATEGORY_NOT_EXISTS);
+        }
+
+        // 批量更新排序
+        List<BpmCategoryDO> updateList = IntStream.range(0, ids.size())
+                .mapToObj(index -> new BpmCategoryDO().setId(ids.get(index)).setSort(index))
+                .collect(Collectors.toList());
+        bpmCategoryMapper.updateBatch(updateList);
     }
 
 }

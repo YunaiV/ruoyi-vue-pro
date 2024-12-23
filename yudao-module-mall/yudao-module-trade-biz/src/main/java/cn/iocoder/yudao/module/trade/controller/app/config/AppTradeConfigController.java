@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
+import javax.annotation.security.PermitAll;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
@@ -36,6 +37,7 @@ public class AppTradeConfigController {
 
     @GetMapping("/get")
     @Operation(summary = "获得交易配置")
+    @PermitAll
     public CommonResult<AppTradeConfigRespVO> getTradeConfig() {
         TradeConfigDO config = ObjUtil.defaultIfNull(tradeConfigService.getTradeConfig(), new TradeConfigDO());
         return success(TradeConfigConvert.INSTANCE.convert02(config).setTencentLbsKey(tencentLbsKey));

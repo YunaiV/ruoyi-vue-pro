@@ -1,8 +1,13 @@
 package cn.iocoder.yudao.module.trade.controller.admin.delivery;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
+import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
+import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
+import cn.iocoder.yudao.module.trade.controller.admin.base.system.user.UserSimpleBaseVO;
 import cn.iocoder.yudao.module.trade.controller.admin.delivery.vo.pickup.*;
 import cn.iocoder.yudao.module.trade.convert.delivery.DeliveryPickUpStoreConvert;
 import cn.iocoder.yudao.module.trade.dal.dataobject.delivery.DeliveryPickUpStoreDO;
@@ -29,6 +34,9 @@ public class DeliveryPickUpStoreController {
 
     @Resource
     private DeliveryPickUpStoreService deliveryPickUpStoreService;
+
+    @Resource
+    private AdminUserApi adminUserApi;
 
     @PostMapping("/create")
     @Operation(summary = "创建自提门店")
@@ -60,10 +68,16 @@ public class DeliveryPickUpStoreController {
     @PreAuthorize("@ss.hasPermission('trade:delivery:pick-up-store:query')")
     public CommonResult<DeliveryPickUpStoreRespVO> getDeliveryPickUpStore(@RequestParam("id") Long id) {
         DeliveryPickUpStoreDO deliveryPickUpStore = deliveryPickUpStoreService.getDeliveryPickUpStore(id);
-        return success(DeliveryPickUpStoreConvert.INSTANCE.convert(deliveryPickUpStore));
+        if (deliveryPickUpStore == null) {
+            return success(null);
+        }
+        List<AdminUserRespDTO> verifyUsers = CollUtil.isNotEmpty(deliveryPickUpStore.getVerifyUserIds()) ?
+                adminUserApi.getUserList(deliveryPickUpStore.getVerifyUserIds()) : null;
+        return success(BeanUtils.toBean(deliveryPickUpStore, DeliveryPickUpStoreRespVO.class)
+                .setVerifyUsers(BeanUtils.toBean(verifyUsers, UserSimpleBaseVO.class)));
     }
 
-    @GetMapping("/list-all-simple")
+    @GetMapping("/simple-list")
     @Operation(summary = "获得自提门店精简信息列表")
     public CommonResult<List<DeliveryPickUpStoreSimpleRespVO>> getSimpleDeliveryPickUpStoreList() {
         List<DeliveryPickUpStoreDO> list = deliveryPickUpStoreService.getDeliveryPickUpStoreListByStatus(
@@ -86,6 +100,14 @@ public class DeliveryPickUpStoreController {
     public CommonResult<PageResult<DeliveryPickUpStoreRespVO>> getDeliveryPickUpStorePage(@Valid DeliveryPickUpStorePageReqVO pageVO) {
         PageResult<DeliveryPickUpStoreDO> pageResult = deliveryPickUpStoreService.getDeliveryPickUpStorePage(pageVO);
         return success(DeliveryPickUpStoreConvert.INSTANCE.convertPage(pageResult));
+    }
+
+    @PostMapping("/bind")
+    @Operation(summary = "绑定自提店员")
+    @PreAuthorize("@ss.hasPermission('trade:delivery:pick-up-store:create')")
+    public CommonResult<Boolean> bindDeliveryPickUpStore(@Valid @RequestBody DeliveryPickUpBindReqVO bindReqVO) {
+        deliveryPickUpStoreService.bindDeliveryPickUpStore(bindReqVO);
+        return success(true);
     }
 
 }

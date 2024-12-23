@@ -27,8 +27,9 @@ public interface BrokerageWithdrawService {
      * @param id          佣金编号
      * @param status      审核状态
      * @param auditReason 驳回原因
+     * @param userIp 操作 IP
      */
-    void auditBrokerageWithdraw(Integer id, BrokerageWithdrawStatusEnum status, String auditReason);
+    void auditBrokerageWithdraw(Long id, BrokerageWithdrawStatusEnum status, String auditReason, String userIp);
 
     /**
      * 获得佣金提现
@@ -36,7 +37,7 @@ public interface BrokerageWithdrawService {
      * @param id 编号
      * @return 佣金提现
      */
-    BrokerageWithdrawDO getBrokerageWithdraw(Integer id);
+    BrokerageWithdrawDO getBrokerageWithdraw(Long id);
 
     /**
      * 获得佣金提现分页
@@ -54,6 +55,16 @@ public interface BrokerageWithdrawService {
      * @return 佣金提现编号
      */
     Long createBrokerageWithdraw(Long userId, AppBrokerageWithdrawCreateReqVO createReqVO);
+
+    /**
+     * 【API】更新佣金提现的转账结果
+     *
+     * 目前用于支付回调，标记提现转账结果
+     *
+     * @param id 提现编号
+     * @param payTransferId 转账订单编号
+     */
+    void updateBrokerageWithdrawTransferred(Long id, Long payTransferId);
 
     /**
      * 按照 userId，汇总每个用户的提现

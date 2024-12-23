@@ -247,4 +247,33 @@ public class AdminAuthServiceImpl implements AdminAuthService {
         return UserTypeEnum.ADMIN;
     }
 
+    @Override
+    public AuthLoginRespVO register(AuthRegisterReqVO registerReqVO) {
+        // 1. 校验验证码
+        validateCaptcha(registerReqVO);
+
+        // 2. 校验用户名是否已存在
+        Long userId = userService.registerUser(registerReqVO);
+
+        // 3. 创建 Token 令牌，记录登录日志
+        return createTokenAfterLoginSuccess(userId, registerReqVO.getUsername(), LoginLogTypeEnum.LOGIN_USERNAME);
+    }
+
+    @VisibleForTesting
+    void validateCaptcha(AuthRegisterReqVO reqVO) {
+        // 如果验证码关闭，则不进行校验
+        if (!captchaEnable) {
+            return;
+        }
+        // 校验验证码
+        ValidationUtils.validate(validator, reqVO, AuthLoginReqVO.CodeEnableGroup.class);
+        CaptchaVO captchaVO = new CaptchaVO();
+        captchaVO.setCaptchaVerification(reqVO.getCaptchaVerification());
+        ResponseModel response = captchaService.verification(captchaVO);
+        // 验证不通过
+        if (!response.isSuccess()) {
+            throw exception(AUTH_REGISTER_CAPTCHA_CODE_ERROR, response.getRepMsg());
+        }
+    }
+
 }

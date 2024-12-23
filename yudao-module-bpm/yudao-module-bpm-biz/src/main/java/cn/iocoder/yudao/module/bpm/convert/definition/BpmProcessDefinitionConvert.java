@@ -11,7 +11,6 @@ import cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmFormDO;
 import cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmProcessDefinitionInfoDO;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.util.BpmnModelUtils;
 import org.flowable.bpmn.model.BpmnModel;
-import org.flowable.bpmn.model.UserTask;
 import org.flowable.common.engine.impl.db.SuspensionState;
 import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.repository.ProcessDefinition;
@@ -20,6 +19,7 @@ import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.factory.Mappers;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
@@ -47,7 +47,7 @@ public interface BpmProcessDefinitionConvert {
                                                                         Map<String, BpmProcessDefinitionInfoDO> processDefinitionInfoMap,
                                                                         Map<Long, BpmFormDO> formMap,
                                                                         Map<String, BpmCategoryDO> categoryMap) {
-        return CollectionUtils.convertList(list, definition -> {
+        List<BpmProcessDefinitionRespVO> result = CollectionUtils.convertList(list, definition -> {
             Deployment deployment = MapUtil.get(deploymentMap, definition.getDeploymentId(), Deployment.class);
             BpmProcessDefinitionInfoDO processDefinitionInfo = MapUtil.get(processDefinitionInfoMap, definition.getId(), BpmProcessDefinitionInfoDO.class);
             BpmFormDO form = null;
@@ -55,8 +55,11 @@ public interface BpmProcessDefinitionConvert {
                 form = MapUtil.get(formMap, processDefinitionInfo.getFormId(), BpmFormDO.class);
             }
             BpmCategoryDO category = MapUtil.get(categoryMap, definition.getCategory(), BpmCategoryDO.class);
-            return buildProcessDefinition(definition, deployment, processDefinitionInfo, form, category, null, null);
+            return buildProcessDefinition(definition, deployment, processDefinitionInfo, form, category, null);
         });
+        // 排序
+        result.sort(Comparator.comparing(BpmProcessDefinitionRespVO::getSort));
+        return result;
     }
 
     default BpmProcessDefinitionRespVO buildProcessDefinition(ProcessDefinition definition,
@@ -64,8 +67,7 @@ public interface BpmProcessDefinitionConvert {
                                                               BpmProcessDefinitionInfoDO processDefinitionInfo,
                                                               BpmFormDO form,
                                                               BpmCategoryDO category,
-                                                              BpmnModel bpmnModel,
-                                                              List<UserTask> startUserSelectUserTaskList) {
+                                                              BpmnModel bpmnModel) {
         BpmProcessDefinitionRespVO respVO = BeanUtils.toBean(definition, BpmProcessDefinitionRespVO.class);
         respVO.setSuspensionState(definition.isSuspended() ? SuspensionState.SUSPENDED.getStateCode() : SuspensionState.ACTIVE.getStateCode());
         // Deployment
@@ -87,7 +89,6 @@ public interface BpmProcessDefinitionConvert {
         // BpmnModel
         if (bpmnModel != null) {
             respVO.setBpmnXml(BpmnModelUtils.getBpmnXml(bpmnModel));
-            respVO.setStartUserSelectTasks(BeanUtils.toBean(startUserSelectUserTaskList, BpmProcessDefinitionRespVO.UserTask.class));
         }
         return respVO;
     }

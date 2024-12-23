@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
+import javax.annotation.security.PermitAll;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
@@ -28,6 +29,7 @@ public class AppMemberLevelController {
 
     @GetMapping("/list")
     @Operation(summary = "获得会员等级列表")
+    @PermitAll
     public CommonResult<List<AppMemberLevelRespVO>> getLevelList() {
         List<MemberLevelDO> result = levelService.getEnableLevelList();
         return success(MemberLevelConvert.INSTANCE.convertList02(result));

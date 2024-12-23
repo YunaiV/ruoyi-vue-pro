@@ -17,7 +17,8 @@ public enum TradeOrderCancelTypeEnum implements IntArrayValuable {
 
     PAY_TIMEOUT(10, "超时未支付"),
     AFTER_SALE_CLOSE(20, "退款关闭"),
-    MEMBER_CANCEL(30, "买家取消");
+    MEMBER_CANCEL(30, "买家取消"),
+    COMBINATION_CLOSE(40, "拼团关闭");
 
     public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(TradeOrderCancelTypeEnum::getType).toArray();
 

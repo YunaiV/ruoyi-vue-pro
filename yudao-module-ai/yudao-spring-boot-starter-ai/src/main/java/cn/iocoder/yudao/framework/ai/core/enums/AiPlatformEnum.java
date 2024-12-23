@@ -22,7 +22,8 @@ public enum AiPlatformEnum {
 
     // ========== 国外平台 ==========
 
-    OPENAI("OpenAI", "OpenAI"),
+    OPENAI("OpenAI", "OpenAI"), // OpenAI 官方
+    AZURE_OPENAI("AzureOpenAI", "AzureOpenAI"), // OpenAI 微软
     OLLAMA("Ollama", "Ollama"),
 
     STABLE_DIFFUSION("StableDiffusion", "StableDiffusion"), // Stability AI

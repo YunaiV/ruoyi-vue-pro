@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.promotion.service.coupon;
 
+import cn.hutool.core.util.ObjUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.product.api.category.ProductCategoryApi;
@@ -57,8 +58,10 @@ public class CouponTemplateServiceImpl implements CouponTemplateService {
     public void updateCouponTemplate(CouponTemplateUpdateReqVO updateReqVO) {
         // 校验存在
         CouponTemplateDO couponTemplate = validateCouponTemplateExists(updateReqVO.getId());
-        // 校验发放数量不能过小
-        if (updateReqVO.getTotalCount() < couponTemplate.getTakeCount()) {
+        // 校验发放数量不能过小（仅在 CouponTakeTypeEnum.USER 用户领取时）
+        if (CouponTakeTypeEnum.isUser(couponTemplate.getTakeType())
+                && ObjUtil.notEqual(couponTemplate.getTakeLimitCount(), CouponTemplateDO.TIME_LIMIT_COUNT_MAX) // 非不限制
+                && updateReqVO.getTotalCount() < couponTemplate.getTakeCount()) {
             throw exception(COUPON_TEMPLATE_TOTAL_COUNT_TOO_SMALL, couponTemplate.getTakeCount());
         }
         // 校验商品范围
@@ -118,7 +121,7 @@ public class CouponTemplateServiceImpl implements CouponTemplateService {
 
     @Override
     public List<CouponTemplateDO> getCouponTemplateListByTakeType(CouponTakeTypeEnum takeType) {
-        return couponTemplateMapper.selectListByTakeType(takeType.getValue());
+        return couponTemplateMapper.selectListByTakeType(takeType.getType());
     }
 
     @Override

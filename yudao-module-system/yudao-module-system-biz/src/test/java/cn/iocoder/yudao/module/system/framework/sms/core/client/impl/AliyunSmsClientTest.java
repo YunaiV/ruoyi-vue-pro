@@ -39,15 +39,6 @@ public class AliyunSmsClientTest extends BaseMockitoUnitTest {
     private final AliyunSmsClient smsClient = new AliyunSmsClient(properties);
 
     @Test
-    public void testDoInit() {
-        // 准备参数
-        // mock 方法
-
-        // 调用
-        smsClient.doInit();
-    }
-
-    @Test
     public void tesSendSms_success() throws Throwable {
         try (MockedStatic<HttpUtils> httpUtilsMockedStatic = mockStatic(HttpUtils.class)) {
             // 准备参数

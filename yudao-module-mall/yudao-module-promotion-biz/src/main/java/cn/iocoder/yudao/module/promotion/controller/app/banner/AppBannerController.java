@@ -12,6 +12,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import javax.annotation.security.PermitAll;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
@@ -28,6 +29,7 @@ public class AppBannerController {
     @GetMapping("/list")
     @Operation(summary = "获得 banner 列表")
     @Parameter(name = "position", description = "Banner position", example = "1")
+    @PermitAll
     public CommonResult<List<AppBannerRespVO>> getBannerList(@RequestParam("position") Integer position) {
         List<BannerDO> bannerList = bannerService.getBannerListByPosition(position);
         return success(BannerConvert.INSTANCE.convertList01(bannerList));
@@ -36,6 +38,7 @@ public class AppBannerController {
     @PutMapping("/add-browse-count")
     @Operation(summary = "增加 Banner 点击量")
     @Parameter(name = "id", description = "Banner 编号", example = "1024")
+    @PermitAll
     public CommonResult<Boolean> addBrowseCount(@RequestParam("id") Long id) {
         bannerService.addBannerBrowseCount(id);
         return success(true);

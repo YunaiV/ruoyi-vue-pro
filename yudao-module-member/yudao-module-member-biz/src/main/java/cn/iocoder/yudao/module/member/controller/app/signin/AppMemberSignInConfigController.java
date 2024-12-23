@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
+import javax.annotation.security.PermitAll;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
@@ -29,6 +30,7 @@ public class AppMemberSignInConfigController {
 
     @GetMapping("/list")
     @Operation(summary = "获得签到规则列表")
+    @PermitAll
     public CommonResult<List<AppMemberSignInConfigRespVO>> getSignInConfigList() {
         List<MemberSignInConfigDO> pageResult = signInConfigService.getSignInConfigList(CommonStatusEnum.ENABLE.getStatus());
         return success(MemberSignInConfigConvert.INSTANCE.convertList02(pageResult));

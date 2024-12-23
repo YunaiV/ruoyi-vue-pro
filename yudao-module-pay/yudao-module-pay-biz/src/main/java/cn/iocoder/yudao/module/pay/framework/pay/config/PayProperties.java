@@ -15,6 +15,8 @@ public class PayProperties {
     private static final String ORDER_NO_PREFIX = "P";
     private static final String REFUND_NO_PREFIX = "R";
 
+    private static final String WALLET_PAY_APP_KEY_DEFAULT = "wallet";
+
     /**
      * 支付回调地址
      *
@@ -38,6 +40,15 @@ public class PayProperties {
     private String refundNotifyUrl;
 
     /**
+     * 转账回调地址
+     *
+     * 实际上，对应的 PayNotifyController 的 notifyTransfer 方法的 URL
+     *
+     * 回调顺序：支付渠道（支付宝支付、微信支付） => yudao-module-pay 的 transferNotifyUrl 地址 => 业务的 PayAppDO.transferNotifyUrl 地址
+     */
+    private String transferNotifyUrl;
+
+    /**
      * 支付订单 no 的前缀
      */
     @NotEmpty(message = "支付订单 no 的前缀不能为空")
@@ -48,5 +59,11 @@ public class PayProperties {
      */
     @NotEmpty(message = "退款订单 no 的前缀不能为空")
     private String refundNoPrefix = REFUND_NO_PREFIX;
+
+    /**
+     * 钱包支付应用 AppKey
+     */
+    @NotEmpty(message = "钱包支付应用 AppKey 不能为空")
+    private String walletPayAppKey = WALLET_PAY_APP_KEY_DEFAULT;
 
 }

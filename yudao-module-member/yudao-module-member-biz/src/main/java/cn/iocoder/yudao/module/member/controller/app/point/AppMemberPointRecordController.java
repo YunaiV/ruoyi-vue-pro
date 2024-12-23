@@ -1,13 +1,10 @@
 package cn.iocoder.yudao.module.member.controller.app.point;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
-import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
-import cn.iocoder.yudao.framework.security.core.annotations.PreAuthenticated;
 import cn.iocoder.yudao.module.member.controller.app.point.vo.AppMemberPointRecordPageReqVO;
 import cn.iocoder.yudao.module.member.controller.app.point.vo.AppMemberPointRecordRespVO;
-import cn.iocoder.yudao.module.member.convert.point.MemberPointRecordConvert;
 import cn.iocoder.yudao.module.member.dal.dataobject.point.MemberPointRecordDO;
 import cn.iocoder.yudao.module.member.service.point.MemberPointRecordService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -34,7 +31,6 @@ public class AppMemberPointRecordController {
 
     @GetMapping("/page")
     @Operation(summary = "获得用户积分记录分页")
-    @PreAuthenticated
     public CommonResult<PageResult<AppMemberPointRecordRespVO>> getPointRecordPage(
             @Valid AppMemberPointRecordPageReqVO pageReqVO) {
         PageResult<MemberPointRecordDO> pageResult = pointRecordService.getPointRecordPage(getLoginUserId(), pageReqVO);
