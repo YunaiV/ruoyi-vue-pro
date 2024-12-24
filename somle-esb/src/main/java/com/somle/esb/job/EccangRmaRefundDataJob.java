@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
  * @date: 2024/12/18 8:56
  */
 @Component
-public class EccangRmaRefundDataJob extends EccangDataJob{
+public class EccangRmaRefundDataJob extends EccangDataJob {
     @Override
     public String execute(String param) throws Exception {
         setDate(param);

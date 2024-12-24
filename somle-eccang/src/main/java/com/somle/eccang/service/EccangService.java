@@ -80,9 +80,9 @@ public class EccangService {
 
     public String concatenateParams(JSONObject postData) {
         String postDataStr = postData.entrySet().stream()
-            .map(e -> e.getKey() + "=" + e.getValue().asText())
-            .reduce((e1, e2) -> e1 + "&" + e2)
-            .orElse("") + token.getUserToken();
+                .map(e -> e.getKey() + "=" + e.getValue().asText())
+                .reduce((e1, e2) -> e1 + "&" + e2)
+                .orElse("") + token.getUserToken();
         return postDataStr;
     }
 
@@ -107,11 +107,11 @@ public class EccangService {
 
     // core network io
     @SneakyThrows
-    private EccangResponse getResponse(Object payload, String endpoint){
+    private EccangResponse getResponse(Object payload, String endpoint) {
         var retryPolicy = new ExceptionClassifierRetryPolicy();
         retryPolicy.setPolicyMap(Map.of(
-            HttpClientErrorException.class, new SimpleRetryPolicy(10),
-            SocketTimeoutException.class, new SimpleRetryPolicy(10)
+                HttpClientErrorException.class, new SimpleRetryPolicy(10),
+                SocketTimeoutException.class, new SimpleRetryPolicy(10)
         ));
 
         var exponentialBackOffPolicy = new ExponentialBackOffPolicy();
@@ -130,10 +130,10 @@ public class EccangService {
             var requestBody = requestBody(payload, endpoint);
 
             var request = RequestX.builder()
-                .requestMethod(RequestX.Method.POST)
-                .url(url)
-                .payload(requestBody)
-                .build();
+                    .requestMethod(RequestX.Method.POST)
+                    .url(url)
+                    .payload(requestBody)
+                    .build();
             var response = WebUtils.sendRequest(request);
             switch (response.code()) {
                 case 200:
@@ -150,10 +150,10 @@ public class EccangService {
         return responseFinal;
     }
 
-    private void validateResponse(EccangResponse response ) {
+    private void validateResponse(EccangResponse response) {
         //判断resp的code是否为null，为null则返回message直接作为异常信息
         String code = response.getCode();
-        if (code == null){
+        if (code == null) {
             throw new RuntimeException(response.getMessage());
         }
         switch (code) {
@@ -185,18 +185,18 @@ public class EccangService {
         payload.put("page", 1);
         payload.put("page_size", pageSize);
         return Stream.iterate(
-            getPage(payload, endpoint),
-            bizContent -> {
-                if (bizContent.hasNext()) {
-                    log.debug("have next");
-                    payload.put("page", bizContent.getPage() + 1);
-                    return getPage(payload, endpoint);
-                } else {
-                    log.debug("no next page");
-                    return null;
+                getPage(payload, endpoint),
+                bizContent -> {
+                    if (bizContent.hasNext()) {
+                        log.debug("have next");
+                        payload.put("page", bizContent.getPage() + 1);
+                        return getPage(payload, endpoint);
+                    } else {
+                        log.debug("no next page");
+                        return null;
+                    }
                 }
-            }
-        ).takeWhile(n->n!=null);
+        ).takeWhile(n -> n != null);
         // );
     }
 
@@ -207,19 +207,19 @@ public class EccangService {
     //     return getAllBiz(payload, endpoint);
     // }
 
-    public EccangPage list (String endpoint) {
+    public EccangPage list(String endpoint) {
 
         var payload = JsonUtils.newObject();
         return getPage(payload, endpoint);
     }
 
-    public <T> Stream<T> list (String endpoint, Class<T> objectClass) {
+    public <T> Stream<T> list(String endpoint, Class<T> objectClass) {
 
         var payload = JsonUtils.newObject();
         // log.debug(payload.toString());
         // getAllBiz(payload, endpoint);
         // return Stream.of();
-        return getAllPage(payload, endpoint).flatMap(n->n.getData(objectClass).stream());
+        return getAllPage(payload, endpoint).flatMap(n -> n.getData(objectClass).stream());
     }
 
 
@@ -234,10 +234,10 @@ public class EccangService {
 
     public List<String> getPlatforms() {
         return List.of(
-            "amazon", "autonomous", "bestbuy", "cdiscount", "coupong", "dsv", "ebay",
-            "eono", "esm", "home24", "homedepot", "manomano", "mediamarkt", "newegg",
-            "onbuy", "otto", "overstock", "rakuten", "shopify", "shopline", "staples",
-            "walmart", "b2c", "yahoo", "wayfairnew", "wayfair", "allegro"
+                "amazon", "autonomous", "bestbuy", "cdiscount", "coupong", "dsv", "ebay",
+                "eono", "esm", "home24", "homedepot", "manomano", "mediamarkt", "newegg",
+                "onbuy", "otto", "overstock", "rakuten", "shopify", "shopline", "staples",
+                "walmart", "b2c", "yahoo", "wayfairnew", "wayfair", "allegro"
         );
     }
 
@@ -247,10 +247,10 @@ public class EccangService {
 
 
     public Stream<EccangUserAccount> getUserAccounts() {
-        return getPlatforms().stream().flatMap(platform->getUserAccounts(platform).stream());
+        return getPlatforms().stream().flatMap(platform -> getUserAccounts(platform).stream());
     }
 
-    public List<EccangWarehouse> getWarehouseList () {
+    public List<EccangWarehouse> getWarehouseList() {
 
         JSONObject params = JsonUtils.newObject();
         return getPage(params, "getWarehouseList").getData(EccangWarehouse.class);
@@ -268,26 +268,26 @@ public class EccangService {
                         .build())
                 .build();
         getOrderUnarchive(vo)
-            .forEach(order->{
-                saleChannel.send(MessageBuilder.withPayload(order).build());
-            });
+                .forEach(order -> {
+                    saleChannel.send(MessageBuilder.withPayload(order).build());
+                });
     }
 
     public Stream<EccangOrder> getOrderUnarchive(EccangOrderVO vo) {
         return getOrderUnarchivePages(vo)
-                .map(n->n.getData(EccangOrder.class))
-                .flatMap(n->n.stream());
+                .map(n -> n.getData(EccangOrder.class))
+                .flatMap(n -> n.stream());
     }
 
     public Stream<EccangOrder> getOrderPlusArchiveSince(EccangOrderVO vo, Integer startYear) {
         int currentYear = Year.now().getValue();
 
         return IntStream.rangeClosed(startYear, currentYear).boxed()
-            .flatMap(year->
-                getOrderPlusArchivePages(vo, year)
-                    .map(n->n.getData(EccangOrder.class))
-                    .flatMap(n->n.stream())
-            );
+                .flatMap(year ->
+                        getOrderPlusArchivePages(vo, year)
+                                .map(n -> n.getData(EccangOrder.class))
+                                .flatMap(n -> n.stream())
+                );
     }
 
     public Stream<EccangPage> getOrderPlusArchivePages(EccangOrderVO orderParams, Integer year) {
@@ -310,13 +310,13 @@ public class EccangService {
     public EccangProduct getProduct(String sku) {
         //需要返回箱规信息
         EccangProduct product = EccangProduct.builder()
-            .productSku(sku).getProductBox(1)
-            .build();
+                .productSku(sku).getProductBox(1)
+                .build();
         // String response = post("getWmsProductList", product, String.class).get(0);
         // log.debug(response);
         // return JsonUtils.parseObject(response, EccangProduct.class);
         List<EccangProduct> getWmsProductList = post("getWmsProductList", product, EccangProduct.class);
-        if (CollUtil.isNotEmpty(getWmsProductList)){
+        if (CollUtil.isNotEmpty(getWmsProductList)) {
             return getWmsProductList.get(0);
         }
         return null;
@@ -358,8 +358,8 @@ public class EccangService {
     public void addBatchProduct(List<EccangProduct> products) {
         EccangResponse syncBatchProduct = getResponse(products, "syncBatchProduct");
         String code = syncBatchProduct.getCode();
-        if (!Objects.equals(code,"200")){
-            throw new RuntimeException("批量添加商品失败,原因："+ syncBatchProduct.getBizContentString());
+        if (!Objects.equals(code, "200")) {
+            throw new RuntimeException("批量添加商品失败,原因：" + syncBatchProduct.getBizContentString());
         }
     }
 
@@ -374,22 +374,22 @@ public class EccangService {
     }
 
     /**
-    * @Author Wqh
-    * @Description 这里的deptId在易仓中对应的是英文品名，对应erp中的部门id
-    * @Date 9:30 2024/11/26
-    * @Param [name]
-    * @return com.somle.eccang.model.EccangCategory
-    **/
+     * @return com.somle.eccang.model.EccangCategory
+     * @Author Wqh
+     * @Description 这里的deptId在易仓中对应的是英文品名，对应erp中的部门id
+     * @Date 9:30 2024/11/26
+     * @Param [name]
+     **/
     public EccangCategory getCategoryByErpDeptId(String deptId) {
         List<EccangCategory> eccangCategories = getCategories().filter(n -> n.getPcNameEn().equals(deptId)).toList();
-        if (eccangCategories.size() > 1){
+        if (eccangCategories.size() > 1) {
             throw new RuntimeException("erp部门id在易仓中存在多个，请检查");
         }
         return !eccangCategories.isEmpty() ? eccangCategories.get(0) : null;
     }
 
     public EccangCategory getCategoryByNameEn(String nameEn) {
-        return getCategories().filter(n->n.getPcNameEn().equals(nameEn)).findFirst().get();
+        return getCategories().filter(n -> n.getPcNameEn().equals(nameEn)).findFirst().get();
     }
 
     public Stream<EccangOrganization> getOrganizations() {
@@ -399,7 +399,7 @@ public class EccangService {
     public EccangOrganization getOrganizationByNameEn(String nameEn) {
         log.debug("searching organization with name_en " + nameEn);
         Optional<EccangOrganization> first = getOrganizations().filter(n -> n.getName().equals(nameEn)).findFirst();
-        if (first.isPresent()){
+        if (first.isPresent()) {
             return first.get();
         }
         throw new RuntimeException("您传入的部门信息不存在于eccang信息库中");
@@ -410,12 +410,12 @@ public class EccangService {
     }
 
     /**
-    * @Author Wqh
-    * @Description 获取运输方式
-    * @Date 15:44 2024/11/29
-    * @Param []
-    * @return java.util.stream.Stream<com.somle.eccang.model.EccangUserAccount>
-    **/
+     * @return java.util.stream.Stream<com.somle.eccang.model.EccangUserAccount>
+     * @Author Wqh
+     * @Description 获取运输方式
+     * @Date 15:44 2024/11/29
+     * @Param []
+     **/
     public Stream<EccangShippingMethod> getShippingMethod() {
         return list("getShippingMethod", EccangShippingMethod.class);
     }

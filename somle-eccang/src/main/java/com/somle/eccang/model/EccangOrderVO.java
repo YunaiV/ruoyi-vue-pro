@@ -37,7 +37,7 @@ public class EccangOrderVO {
     @Data
     @Builder
     @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-    public static class Condition{
+    public static class Condition {
         private List<String> referenceNoList;
         private List<String> orderCodeList;
         private List<String> warehouseOrderCodeList;

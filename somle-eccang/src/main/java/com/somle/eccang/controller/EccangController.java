@@ -15,7 +15,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/eccang")
 public class EccangController {
-    @Autowired 
+    @Autowired
     EccangService eccangService;
 
     @GetMapping("/getInventory")
@@ -26,8 +26,8 @@ public class EccangController {
 
     @GetMapping("/getInventoryBatchLog")
     public List<EccangPage> getInventoryBatchLog(
-        @RequestParam String startTime,
-        @RequestParam String endTime
+            @RequestParam String startTime,
+            @RequestParam String endTime
     ) {
         EccangInventoryBatchLogVO vo = new EccangInventoryBatchLogVO();
         vo.setDateFrom(LocalDateTime.parse(startTime));
@@ -51,7 +51,7 @@ public class EccangController {
 
     @GetMapping("/getOrder")
     public List<EccangPage> getOrder(
-        EccangOrderVO order
+            EccangOrderVO order
     ) {
         return eccangService.getOrderUnarchivePages(order).toList();
     }
@@ -63,10 +63,9 @@ public class EccangController {
     }
 
 
-
     @GetMapping("/list")
     public EccangPage list(
-        @RequestParam String endpoint
+            @RequestParam String endpoint
     ) {
         return eccangService.list(endpoint);
     }
@@ -81,8 +80,8 @@ public class EccangController {
 
     @GetMapping("/post")
     public EccangPage post(
-        @RequestParam String endpoint,
-        @RequestBody Object payload
+            @RequestParam String endpoint,
+            @RequestBody Object payload
     ) {
         return eccangService.post(endpoint, payload);
     }

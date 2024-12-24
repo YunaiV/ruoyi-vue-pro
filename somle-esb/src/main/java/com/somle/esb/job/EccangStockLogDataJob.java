@@ -6,7 +6,7 @@ import com.somle.esb.model.OssData;
 import org.springframework.stereotype.Component;
 
 @Component
-public class EccangStockLogDataJob extends EccangDataJob{
+public class EccangStockLogDataJob extends EccangDataJob {
 
 
     @Override
@@ -28,7 +28,7 @@ public class EccangStockLogDataJob extends EccangDataJob{
                             .build();
                     service.send(data);
                 });
-        
+
         return "data upload success";
     }
 }
