@@ -29,10 +29,10 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.diffList;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.filterList;
 import static cn.iocoder.yudao.module.iot.enums.ErrorCodeConstants.*;
 
 /**
@@ -261,9 +261,7 @@ public class IotProductThingModelServiceImpl implements IotProductThingModelServ
                 }
             });
             // 过滤掉没有设置 ID 的对象
-            List<IotProductThingModelDO> validUpdateList = updateList.stream()
-                    .filter(func -> func.getId() != null)
-                    .collect(Collectors.toList());
+            List<IotProductThingModelDO> validUpdateList = filterList(updateList, thingModel -> thingModel.getId() != null);
             // 执行批量更新
             if (CollUtil.isNotEmpty(validUpdateList)) {
                 productThingModelMapper.updateBatch(validUpdateList);

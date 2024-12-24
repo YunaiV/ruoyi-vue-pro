@@ -135,12 +135,8 @@ public class IotThingModelMessageServiceImpl implements IotThingModelMessageServ
     }
 
     private List<IotProductThingModelDO> getValidFunctionList(String productKey) {
-        // TODO @puhui999：使用 convertList 会好点哈
-        return iotProductThingModelService
-                .getProductThingModelListByProductKey(productKey)
-                .stream()
-                .filter(function -> IotProductThingModelTypeEnum.PROPERTY.getType().equals(function.getType()))
-                .toList();
+        return filterList(iotProductThingModelService.getProductThingModelListByProductKey(productKey),
+                thingModel -> IotProductThingModelTypeEnum.PROPERTY.getType().equals(thingModel.getType()));
     }
 
     private List<TdFieldDO> filterAndCollectValidFields(Map<String, Object> params, List<IotProductThingModelDO> thingModelList, IotDeviceDO device, Long time) {
