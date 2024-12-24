@@ -6,8 +6,5 @@ import org.springframework.stereotype.Service;
 public class Home24Service {
 
 
-    //TODO /api/invoices 获取发票
-
-
-    //TODO  /api/orders 获取订单
+    //密钥不用刷新
 }
