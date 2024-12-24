@@ -71,7 +71,7 @@ public class ErpProductServiceDelegator implements ErpProductService {
     }
 
     @Override
-    public List<ErpProductRespVO> getProductVOListByStatus(Integer status) {
+    public List<ErpProductRespVO> getProductVOListByStatus(Boolean status) {
         ErpProductService service = getDefaultService();
         return service.getProductVOListByStatus(status);
     }

@@ -34,6 +34,9 @@ public class ErpProductPageReqVO extends PageParam {
     @Schema(description = "单位编号", example = "30975")
     private Long unitId;
 
+    @Schema(description = "品牌",example = "you")
+    private String brand;
+
     @Schema(description = "材料（中文）")
     private String material;
 

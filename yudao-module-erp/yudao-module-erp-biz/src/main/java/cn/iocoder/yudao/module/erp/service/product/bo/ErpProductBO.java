@@ -39,6 +39,10 @@ public class ErpProductBO {
      */
     private String material;
     /**
+     * 品牌
+     */
+    private String brand;
+    /**
      * 产品状态（1启用，0禁用）
      */
     private Boolean status;

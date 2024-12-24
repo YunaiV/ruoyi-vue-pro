@@ -49,6 +49,9 @@ public class ErpProductSaveReqVO {
     @Schema(description = "备注", example = "你说的对")
     private String remark;
 
+    @Schema(description = "品牌",example = "you")
+    private String brand;
+
     @Schema(description = "基础重量（kg）", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "基础重量（kg）不能为空")
     private Integer weight;

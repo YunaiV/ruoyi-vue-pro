@@ -64,7 +64,7 @@ public interface ErpProductService {
      * @param status 状态
      * @return 产品 VO 列表
      */
-    List<ErpProductRespVO> getProductVOListByStatus(Integer status);
+    List<ErpProductRespVO> getProductVOListByStatus(Boolean status);
 
     /**
      * 获得产品 VO 列表

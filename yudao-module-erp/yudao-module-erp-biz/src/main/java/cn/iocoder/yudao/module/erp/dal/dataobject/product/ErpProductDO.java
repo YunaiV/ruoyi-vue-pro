@@ -63,6 +63,10 @@ public class ErpProductDO extends BaseDO {
      */
     private Integer weight;
     /**
+     * 品牌
+     */
+    private String brand;
+    /**
      * 系列
      */
     private String series;

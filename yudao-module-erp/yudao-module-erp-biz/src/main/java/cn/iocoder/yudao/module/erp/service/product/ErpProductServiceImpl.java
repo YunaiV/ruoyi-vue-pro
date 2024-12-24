@@ -216,7 +216,7 @@ public class ErpProductServiceImpl implements ErpProductService {
     }
 
     @Override
-    public List<ErpProductRespVO> getProductVOListByStatus(Integer status) {
+    public List<ErpProductRespVO> getProductVOListByStatus(Boolean status) {
         List<ErpProductDO> list = productMapper.selectListByStatus(status);
         return buildProductVOList(list);
     }

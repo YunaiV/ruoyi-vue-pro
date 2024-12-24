@@ -1,7 +1,6 @@
 package cn.iocoder.yudao.module.erp.controller.admin.product;
 
 import cn.iocoder.yudao.framework.apilog.core.annotation.ApiAccessLog;
-import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
@@ -79,7 +78,7 @@ public class ErpProductController {
     @GetMapping("/simple-list")
     @Operation(summary = "获得产品精简列表", description = "只包含被开启的产品，主要用于前端的下拉选项")
     public CommonResult<List<ErpProductRespVO>> getProductSimpleList() {
-        List<ErpProductRespVO> list = productService.getProductVOListByStatus(CommonStatusEnum.ENABLE.getStatus());
+        List<ErpProductRespVO> list = productService.getProductVOListByStatus(true);
         return success(convertList(list, product -> new ErpProductRespVO().setId(product.getId())
                 .setName(product.getName()).setBarCode(product.getBarCode())
                 .setCategoryId(product.getCategoryId()).setCategoryName(product.getCategoryName())

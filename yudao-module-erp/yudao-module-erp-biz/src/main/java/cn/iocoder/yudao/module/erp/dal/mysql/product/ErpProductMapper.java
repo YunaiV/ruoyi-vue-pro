@@ -38,7 +38,7 @@ public interface ErpProductMapper extends BaseMapperX<ErpProductDO> {
         return selectOne(ErpProductDO::getBarCode, code);
     }
 
-    default List<ErpProductDO> selectListByStatus(Integer status) {
+    default List<ErpProductDO> selectListByStatus(Boolean status) {
         return selectList(ErpProductDO::getStatus, status);
     }
 

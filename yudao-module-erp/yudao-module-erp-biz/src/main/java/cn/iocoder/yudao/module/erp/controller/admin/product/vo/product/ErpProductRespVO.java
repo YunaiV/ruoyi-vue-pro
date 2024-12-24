@@ -55,6 +55,10 @@ public class ErpProductRespVO {
     @ExcelProperty("单位名称")
     private String unitName;
 
+    @Schema(description = "品牌", requiredMode = Schema.RequiredMode.REQUIRED)
+    @ExcelProperty("品牌")
+    private String brand;
+
     @Schema(description = "材料（中文）", requiredMode = Schema.RequiredMode.REQUIRED)
     @ExcelProperty("材料（中文）")
     private String material;
