@@ -24,6 +24,13 @@ public interface IotProductThingModelService {
     Long createProductThingModel(@Valid IotProductThingModelSaveReqVO createReqVO);
 
     /**
+     * 创建超级表数据模型
+     *
+     * @param productId 产品编号
+     */
+    void createSuperTableDataModel(Long productId);
+
+    /**
      * 更新产品物模型
      *
      * @param updateReqVO 更新信息
@@ -60,13 +67,6 @@ public interface IotProductThingModelService {
      * @return 产品物模型分页
      */
     PageResult<IotProductThingModelDO> getProductThingModelPage(IotProductThingModelPageReqVO pageReqVO);
-
-    /**
-     * 创建超级表数据模型
-     *
-     * @param productId 产品编号
-     */
-    void createSuperTableDataModel(Long productId);
 
     /**
      * 获得产品物模型列表

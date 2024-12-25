@@ -34,6 +34,8 @@ public class ThingModelInputOutputParam {
     private String direction;
     /**
      * 参数的序号。从 0 开始排序，且不能重复。
+     *
+     * TODO 考虑要不要序号，感觉是要的, 先留一手看看
      */
     private Integer paraOrder;
     /**
