@@ -10,7 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
-public class EccangOrderPlatformPayDataJob extends EccangDataJob{
+public class EccangOrderPlatformPayDataJob extends EccangDataJob {
 
 
     @Override
@@ -19,8 +19,10 @@ public class EccangOrderPlatformPayDataJob extends EccangDataJob{
 
         eccangService.getOrderPlusArchivePages(
                 EccangOrderVO.builder()
-                    .platformPaidDateStart(beforeYesterdayFirstSecond)
-                    .platformPaidDateEnd(beforeYesterdayLastSecond)
+                    .condition(EccangOrderVO.Condition.builder()
+                        .platformPaidDateStart(beforeYesterdayFirstSecond)
+                        .platformPaidDateEnd(beforeYesterdayLastSecond)
+                        .build())
                     .build(),
                 beforeYesterday.getYear()
             )
@@ -37,8 +39,7 @@ public class EccangOrderPlatformPayDataJob extends EccangDataJob{
                 service.send(data);
             });
 
-        
-        
+
         return "data upload success";
     }
 }

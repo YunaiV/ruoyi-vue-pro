@@ -6,7 +6,7 @@ import com.somle.esb.model.OssData;
 import org.springframework.stereotype.Component;
 
 @Component
-public class EccangOrderPlatformShipDataJob extends EccangDataJob{
+public class EccangOrderPlatformShipDataJob extends EccangDataJob {
 
 
     @Override
@@ -14,25 +14,27 @@ public class EccangOrderPlatformShipDataJob extends EccangDataJob{
         setDate(param);
 
         eccangService.getOrderPlusArchivePages(
-                        EccangOrderVO.builder()
-                                .platformShipDateStart(beforeYesterdayFirstSecond)
-                                .platformShipDateEnd(beforeYesterdayLastSecond)
-                                .build(),
-                        beforeYesterday.getYear()
-                )
-                .forEach(page -> {
-                    OssData data = OssData.builder()
-                            .database(DATABASE)
-                            .tableName("order_platform_ship")
-                            .syncType("inc")
-                            .requestTimestamp(System.currentTimeMillis())
-                            .folderDate(beforeYesterday)
-                            .content(page)
-                            .headers(null)
-                            .build();
-                    service.send(data);
-                });
-        
+                EccangOrderVO.builder()
+                    .condition(EccangOrderVO.Condition.builder()
+                        .platformShipDateStart(beforeYesterdayFirstSecond)
+                        .platformShipDateEnd(beforeYesterdayLastSecond)
+                        .build())
+                    .build(),
+                beforeYesterday.getYear()
+            )
+            .forEach(page -> {
+                OssData data = OssData.builder()
+                    .database(DATABASE)
+                    .tableName("order_platform_ship")
+                    .syncType("inc")
+                    .requestTimestamp(System.currentTimeMillis())
+                    .folderDate(beforeYesterday)
+                    .content(page)
+                    .headers(null)
+                    .build();
+                service.send(data);
+            });
+
         return "data upload success";
     }
 }
