@@ -16,18 +16,18 @@ public class EccangStockLogDataJob extends EccangDataJob {
         eccangInventoryBatchLogVO.setDateFrom(beforeYesterdayFirstSecond);
         eccangInventoryBatchLogVO.setDateTo(beforeYesterdayLastSecond);
         eccangService.getInventoryBatchLog(eccangInventoryBatchLogVO)
-                .forEach(page -> {
-                    OssData data = OssData.builder()
-                            .database(DATABASE)
-                            .tableName("stock_log")
-                            .syncType("inc")
-                            .requestTimestamp(System.currentTimeMillis())
-                            .folderDate(beforeYesterday)
-                            .content(page)
-                            .headers(null)
-                            .build();
-                    service.send(data);
-                });
+            .forEach(page -> {
+                OssData data = OssData.builder()
+                    .database(DATABASE)
+                    .tableName("stock_log")
+                    .syncType("inc")
+                    .requestTimestamp(System.currentTimeMillis())
+                    .folderDate(beforeYesterday)
+                    .content(page)
+                    .headers(null)
+                    .build();
+                service.send(data);
+            });
 
         return "data upload success";
     }

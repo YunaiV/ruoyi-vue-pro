@@ -20,7 +20,7 @@ import java.util.List;
 
 @Slf4j
 @Import({
-        EccangService.class,
+    EccangService.class,
 })
 public class EccangTest extends BaseSpringTest {
     @Resource
@@ -96,14 +96,14 @@ public class EccangTest extends BaseSpringTest {
         var datetime1 = LocalDateTime.of(date, time1);
         var datetime2 = LocalDateTime.of(date, time2);
         var result = service.getOrderArchivePages(
-                EccangOrderVO.builder()
-                        .condition(EccangOrderVO.Condition.builder()
-                                .platformPaidDateStart(datetime1)
-                                .platformPaidDateEnd(datetime2)
-                                .build())
+            EccangOrderVO.builder()
+                .condition(EccangOrderVO.Condition.builder()
+                    .platformPaidDateStart(datetime1)
+                    .platformPaidDateEnd(datetime2)
+                    .build())
 
-                        .build(),
-                2023
+                .build(),
+            2023
         );
         log.info(String.valueOf(result.toList().size()));
     }
@@ -116,13 +116,13 @@ public class EccangTest extends BaseSpringTest {
         var datetime1 = LocalDateTime.of(date, time1);
         var datetime2 = LocalDateTime.of(date, time2);
         var result = service.getOrderUnarchivePages(
-                EccangOrderVO.builder()
-                        .condition(EccangOrderVO.Condition.builder()
-                                .platformPaidDateStart(datetime1)
-                                .platformPaidDateEnd(datetime2)
-                                .build())
+            EccangOrderVO.builder()
+                .condition(EccangOrderVO.Condition.builder()
+                    .platformPaidDateStart(datetime1)
+                    .platformPaidDateEnd(datetime2)
+                    .build())
 
-                        .build()
+                .build()
         );
         log.info(String.valueOf(result.toList().size()));
     }
@@ -135,14 +135,14 @@ public class EccangTest extends BaseSpringTest {
         var datetime1 = LocalDateTime.of(date, time1);
         var datetime2 = LocalDateTime.of(date, time2);
         var result = service.getOrderArchivePages(
-                EccangOrderVO.builder()
-                        .condition(EccangOrderVO.Condition.builder()
-                                .platformPaidDateStart(datetime1)
-                                .platformPaidDateEnd(datetime2)
-                                .build())
+            EccangOrderVO.builder()
+                .condition(EccangOrderVO.Condition.builder()
+                    .platformPaidDateStart(datetime1)
+                    .platformPaidDateEnd(datetime2)
+                    .build())
 
-                        .build(),
-                2023
+                .build(),
+            2023
         );
         log.info(String.valueOf(result.toList().size()));
     }

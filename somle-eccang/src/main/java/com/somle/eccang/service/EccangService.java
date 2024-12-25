@@ -80,9 +80,9 @@ public class EccangService {
 
     public String concatenateParams(JSONObject postData) {
         String postDataStr = postData.entrySet().stream()
-                .map(e -> e.getKey() + "=" + e.getValue().asText())
-                .reduce((e1, e2) -> e1 + "&" + e2)
-                .orElse("") + token.getUserToken();
+            .map(e -> e.getKey() + "=" + e.getValue().asText())
+            .reduce((e1, e2) -> e1 + "&" + e2)
+            .orElse("") + token.getUserToken();
         return postDataStr;
     }
 
@@ -110,8 +110,8 @@ public class EccangService {
     private EccangResponse getResponse(Object payload, String endpoint) {
         var retryPolicy = new ExceptionClassifierRetryPolicy();
         retryPolicy.setPolicyMap(Map.of(
-                HttpClientErrorException.class, new SimpleRetryPolicy(10),
-                SocketTimeoutException.class, new SimpleRetryPolicy(10)
+            HttpClientErrorException.class, new SimpleRetryPolicy(10),
+            SocketTimeoutException.class, new SimpleRetryPolicy(10)
         ));
 
         var exponentialBackOffPolicy = new ExponentialBackOffPolicy();
@@ -130,10 +130,10 @@ public class EccangService {
             var requestBody = requestBody(payload, endpoint);
 
             var request = RequestX.builder()
-                    .requestMethod(RequestX.Method.POST)
-                    .url(url)
-                    .payload(requestBody)
-                    .build();
+                .requestMethod(RequestX.Method.POST)
+                .url(url)
+                .payload(requestBody)
+                .build();
             var response = WebUtils.sendRequest(request);
             switch (response.code()) {
                 case 200:
@@ -185,17 +185,17 @@ public class EccangService {
         payload.put("page", 1);
         payload.put("page_size", pageSize);
         return Stream.iterate(
-                getPage(payload, endpoint),
-                bizContent -> {
-                    if (bizContent.hasNext()) {
-                        log.debug("have next");
-                        payload.put("page", bizContent.getPage() + 1);
-                        return getPage(payload, endpoint);
-                    } else {
-                        log.debug("no next page");
-                        return null;
-                    }
+            getPage(payload, endpoint),
+            bizContent -> {
+                if (bizContent.hasNext()) {
+                    log.debug("have next");
+                    payload.put("page", bizContent.getPage() + 1);
+                    return getPage(payload, endpoint);
+                } else {
+                    log.debug("no next page");
+                    return null;
                 }
+            }
         ).takeWhile(n -> n != null);
         // );
     }
@@ -234,10 +234,10 @@ public class EccangService {
 
     public List<String> getPlatforms() {
         return List.of(
-                "amazon", "autonomous", "bestbuy", "cdiscount", "coupong", "dsv", "ebay",
-                "eono", "esm", "home24", "homedepot", "manomano", "mediamarkt", "newegg",
-                "onbuy", "otto", "overstock", "rakuten", "shopify", "shopline", "staples",
-                "walmart", "b2c", "yahoo", "wayfairnew", "wayfair", "allegro"
+            "amazon", "autonomous", "bestbuy", "cdiscount", "coupong", "dsv", "ebay",
+            "eono", "esm", "home24", "homedepot", "manomano", "mediamarkt", "newegg",
+            "onbuy", "otto", "overstock", "rakuten", "shopify", "shopline", "staples",
+            "walmart", "b2c", "yahoo", "wayfairnew", "wayfair", "allegro"
         );
     }
 
@@ -262,32 +262,32 @@ public class EccangService {
         LocalDateTime endTime = LocalDateTime.now();
         LocalDateTime startTime = endTime.minusHours(3);
         var vo = EccangOrderVO.builder()
-                .condition(EccangOrderVO.Condition.builder()
-                        .platformPaidDateStart(startTime)
-                        .platformPaidDateEnd(endTime)
-                        .build())
-                .build();
+            .condition(EccangOrderVO.Condition.builder()
+                .platformPaidDateStart(startTime)
+                .platformPaidDateEnd(endTime)
+                .build())
+            .build();
         getOrderUnarchive(vo)
-                .forEach(order -> {
-                    saleChannel.send(MessageBuilder.withPayload(order).build());
-                });
+            .forEach(order -> {
+                saleChannel.send(MessageBuilder.withPayload(order).build());
+            });
     }
 
     public Stream<EccangOrder> getOrderUnarchive(EccangOrderVO vo) {
         return getOrderUnarchivePages(vo)
-                .map(n -> n.getData(EccangOrder.class))
-                .flatMap(n -> n.stream());
+            .map(n -> n.getData(EccangOrder.class))
+            .flatMap(n -> n.stream());
     }
 
     public Stream<EccangOrder> getOrderPlusArchiveSince(EccangOrderVO vo, Integer startYear) {
         int currentYear = Year.now().getValue();
 
         return IntStream.rangeClosed(startYear, currentYear).boxed()
-                .flatMap(year ->
-                        getOrderPlusArchivePages(vo, year)
-                                .map(n -> n.getData(EccangOrder.class))
-                                .flatMap(n -> n.stream())
-                );
+            .flatMap(year ->
+                getOrderPlusArchivePages(vo, year)
+                    .map(n -> n.getData(EccangOrder.class))
+                    .flatMap(n -> n.stream())
+            );
     }
 
     public Stream<EccangPage> getOrderPlusArchivePages(EccangOrderVO orderParams, Integer year) {
@@ -310,8 +310,8 @@ public class EccangService {
     public EccangProduct getProduct(String sku) {
         //需要返回箱规信息
         EccangProduct product = EccangProduct.builder()
-                .productSku(sku).getProductBox(1)
-                .build();
+            .productSku(sku).getProductBox(1)
+            .build();
         // String response = post("getWmsProductList", product, String.class).get(0);
         // log.debug(response);
         // return JsonUtils.parseObject(response, EccangProduct.class);

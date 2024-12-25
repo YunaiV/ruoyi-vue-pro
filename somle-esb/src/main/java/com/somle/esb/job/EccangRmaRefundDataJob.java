@@ -17,18 +17,18 @@ public class EccangRmaRefundDataJob extends EccangDataJob {
         eccangRmaRefundVO.setRefundDateForm(beforeYesterdayFirstSecond);
         eccangRmaRefundVO.setRefundDateTo(beforeYesterdayLastSecond);
         eccangService.getRmaRefundList(eccangRmaRefundVO)
-                .forEach(page -> {
-                    OssData data = OssData.builder()
-                            .database(DATABASE)
-                            .tableName("order_refund")
-                            .syncType("inc")
-                            .requestTimestamp(System.currentTimeMillis())
-                            .folderDate(beforeYesterday)
-                            .content(page)
-                            .headers(null)
-                            .build();
-                    service.send(data);
-                });
+            .forEach(page -> {
+                OssData data = OssData.builder()
+                    .database(DATABASE)
+                    .tableName("order_refund")
+                    .syncType("inc")
+                    .requestTimestamp(System.currentTimeMillis())
+                    .folderDate(beforeYesterday)
+                    .content(page)
+                    .headers(null)
+                    .build();
+                service.send(data);
+            });
 
         return "data upload success";
     }

@@ -14,25 +14,25 @@ public class EccangOrderUnshipDataJob extends EccangDataJob {
         setDate(param);
 
         eccangService.getOrderUnarchivePages(
-                        EccangOrderVO.builder()
-                                .condition(EccangOrderVO.Condition.builder()
-                                        .dateCreateSysEnd(yesterdayLastSecond)
-                                        .status("3")
-                                        .build())
-                                .build()
-                )
-                .forEach(page -> {
-                    OssData data = OssData.builder()
-                            .database(DATABASE)
-                            .tableName("order_unship")
-                            .syncType("inc")
-                            .requestTimestamp(System.currentTimeMillis())
-                            .folderDate(yesterday)
-                            .content(page)
-                            .headers(null)
-                            .build();
-                    service.send(data);
-                });
+                EccangOrderVO.builder()
+                    .condition(EccangOrderVO.Condition.builder()
+                        .dateCreateSysEnd(yesterdayLastSecond)
+                        .status("3")
+                        .build())
+                    .build()
+            )
+            .forEach(page -> {
+                OssData data = OssData.builder()
+                    .database(DATABASE)
+                    .tableName("order_unship")
+                    .syncType("inc")
+                    .requestTimestamp(System.currentTimeMillis())
+                    .folderDate(yesterday)
+                    .content(page)
+                    .headers(null)
+                    .build();
+                service.send(data);
+            });
 
         return "data upload success";
     }

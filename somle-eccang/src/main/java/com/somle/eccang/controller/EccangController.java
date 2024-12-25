@@ -26,8 +26,8 @@ public class EccangController {
 
     @GetMapping("/getInventoryBatchLog")
     public List<EccangPage> getInventoryBatchLog(
-            @RequestParam String startTime,
-            @RequestParam String endTime
+        @RequestParam String startTime,
+        @RequestParam String endTime
     ) {
         EccangInventoryBatchLogVO vo = new EccangInventoryBatchLogVO();
         vo.setDateFrom(LocalDateTime.parse(startTime));
@@ -37,21 +37,21 @@ public class EccangController {
 
     @GetMapping("/getOrderShip")
     public List<EccangOrder> getOrderShip(
-            @RequestParam String startTime,
-            @RequestParam String endTime
+        @RequestParam String startTime,
+        @RequestParam String endTime
     ) {
         var vo = EccangOrderVO.builder()
-                .condition(EccangOrderVO.Condition.builder()
-                        .platformShipDateStart(LocalDateTime.parse(startTime))
-                        .platformShipDateEnd(LocalDateTime.parse(endTime))
-                        .build())
-                .build();
+            .condition(EccangOrderVO.Condition.builder()
+                .platformShipDateStart(LocalDateTime.parse(startTime))
+                .platformShipDateEnd(LocalDateTime.parse(endTime))
+                .build())
+            .build();
         return eccangService.getOrderUnarchive(vo).toList();
     }
 
     @GetMapping("/getOrder")
     public List<EccangPage> getOrder(
-            EccangOrderVO order
+        EccangOrderVO order
     ) {
         return eccangService.getOrderUnarchivePages(order).toList();
     }
@@ -65,7 +65,7 @@ public class EccangController {
 
     @GetMapping("/list")
     public EccangPage list(
-            @RequestParam String endpoint
+        @RequestParam String endpoint
     ) {
         return eccangService.list(endpoint);
     }
@@ -80,8 +80,8 @@ public class EccangController {
 
     @GetMapping("/post")
     public EccangPage post(
-            @RequestParam String endpoint,
-            @RequestBody Object payload
+        @RequestParam String endpoint,
+        @RequestBody Object payload
     ) {
         return eccangService.post(endpoint, payload);
     }

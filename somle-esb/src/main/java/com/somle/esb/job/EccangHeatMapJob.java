@@ -25,11 +25,11 @@ public class EccangHeatMapJob implements JobHandler {
     public String execute(String param) throws Exception {
         var count = 0;
         var vo = EccangOrderVO.builder()
-                .condition(EccangOrderVO.Condition
-                        .builder()
-                        .productSkuList(List.of(param))
-                        .build())
-                .build();
+            .condition(EccangOrderVO.Condition
+                .builder()
+                .productSkuList(List.of(param))
+                .build())
+            .build();
         for (var order : eccangService.getOrderPlusArchiveSince(vo, 2022).toList()) {
             count++;
             try {
