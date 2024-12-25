@@ -286,7 +286,7 @@ public class IotProductThingModelServiceImpl implements IotProductThingModelServ
 
         // 1.2 生成属性上报事件
         return new ThingModelEvent().setIdentifier("post").setName("属性上报").setDescription("属性上报事件")
-                .setEventType(IotProductThingModelServiceEventTypeEnum.INFO.getType()).setMethod("thing.event.property.post")
+                .setType(IotProductThingModelServiceEventTypeEnum.INFO.getType()).setMethod("thing.event.property.post")
                 .setOutputParams(buildInputOutputParam(thingModelList, IotProductThingModelParamDirectionEnum.OUTPUT));
     }
 

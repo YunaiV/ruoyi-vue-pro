@@ -37,7 +37,7 @@ public class ThingModelEvent {
      *
      * 关联枚举 {@link IotProductThingModelServiceEventTypeEnum}
      */
-    private String eventType;
+    private String type;
     /**
      * 事件的输出参数
      *
