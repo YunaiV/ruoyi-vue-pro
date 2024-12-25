@@ -49,7 +49,7 @@ public class DingTalkService {
     @Autowired
     DingTalkTokenRepository tokenRepository;
 
-    @Scheduled(cron = "0 0 0 * * *") // Executes at 00:00 AM every day
+    @Scheduled(cron = "0 0 * * * ?") // Executes at the start of every hour
     @PostConstruct
     private void init() {
         token = refreshAuth();
