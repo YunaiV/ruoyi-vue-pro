@@ -3,13 +3,10 @@ package com.somle.framework.common.util.web;
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.zip.GZIPInputStream;
 
-import cn.hutool.json.JSONUtil;
-import com.somle.framework.common.util.csv.CsvUtils;
 import com.somle.framework.common.util.json.JSONObject;
 import com.somle.framework.common.util.json.JsonUtils;
 import lombok.SneakyThrows;
@@ -167,21 +164,16 @@ public class WebUtils {
 
     @SneakyThrows
     public static String urlToString(String urlString, String compression) {
-        InputStream inputStream = getInputStreamFromUrl(urlString, compression);
+        InputStream inputStream = urlToInputStream(urlString, compression);
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         IOUtils.copy(inputStream, byteArrayOutputStream);
         return byteArrayOutputStream.toString();
     }
 
-    @SneakyThrows
-    public static List<Map<String,String>> csvToJson(String urlString) {
-        InputStream inputStream = getInputStreamFromUrl(urlString, null);
-        List<Map<String,String>> maps = CsvUtils.readTsvFromInputStream(inputStream);
-        return maps;
-    }
+
 
     @SneakyThrows
-    private static InputStream getInputStreamFromUrl(String urlString, String compression) {
+    private static InputStream urlToInputStream(String urlString, String compression) {
         URL url = new URL(urlString);
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setRequestMethod("GET");
@@ -191,12 +183,7 @@ public class WebUtils {
         }
         return inputStream;
     }
-//    public static <T> T parallelRun(int parallelism, Callable<T> codeBlock) {
-//        ForkJoinPool customThreadPool = new ForkJoinPool(parallelism);
-//        var result = customThreadPool.submit(codeBlock).join();
-//        customThreadPool.shutdown();
-//        return result;
-//    }
+
 
     // TODO: a general method to handle http exception (429, timeout etc)
 

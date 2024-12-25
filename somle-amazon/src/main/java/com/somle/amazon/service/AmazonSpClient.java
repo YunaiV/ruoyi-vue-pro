@@ -119,19 +119,20 @@ public class AmazonSpClient {
     }
 
     @Transactional(readOnly = true)
-    public Stream<List<Map<String,String>>> getReportStream(AmazonSeller seller, AmazonSpReportReqVO vo, String compression) {
+    public Stream<String> getReportStream(AmazonSeller seller, AmazonSpReportReqVO vo, String compression) {
         return getReports(seller, vo).stream().map(report -> getReport(seller, report.getReportId(), compression));
     }
 
     @SneakyThrows
     @Transactional(readOnly = true)
-    public List<Map<String,String>> getReport(AmazonSeller seller, String reportId, String compression) {
+    public String getReport(AmazonSeller seller, String reportId, String compression) {
         log.info("get report");
         int RETENTION_DAYS = 720;
         DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
         String endPoint = seller.getRegion().getSpEndPoint();
         var headers = Map.of("x-amz-access-token", seller.getSpAccessToken());
+        String result = null;
 
         // Check report status and get document ID
         String status = null;
@@ -202,7 +203,11 @@ public class AmazonSpClient {
 
         log.info("Document URL: {}", docUrl);
 
-        return WebUtils.csvToJson(docUrl);
+        // Use util to process the document URL
+        result = WebUtils.urlToString(docUrl, compression);
+
+
+        return result;
     }
 
     @SneakyThrows
@@ -254,9 +259,10 @@ public class AmazonSpClient {
     }
 
     @Transactional(readOnly = true)
-    public List<Map<String,String>> createAndGetReport(AmazonSeller seller, AmazonSpReportSaveVO vo, String compression) {
+    public String createAndGetReport(AmazonSeller seller, AmazonSpReportSaveVO vo, String compression) {
         String reportId = createReport(seller, vo);
-        return getReport(seller, reportId, compression);
+        var reportString = getReport(seller, reportId, compression);
+        return reportString;
     }
 }
 

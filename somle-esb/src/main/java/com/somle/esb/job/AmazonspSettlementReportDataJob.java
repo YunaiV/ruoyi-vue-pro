@@ -35,17 +35,13 @@ public class AmazonspSettlementReportDataJob extends AmazonspDataJob {
                 amazonService.spClient.getReportStream(seller, vo, null)
             )
             .forEach(report -> {
-                List<Map<String, String>> result = new ArrayList<>();
-                for (Map<String, String> map : report){
-                    result.add(MapUtils.keyConvertToCamelCase(map));
-                }
                 OssData data = OssData.builder()
                     .database(DATABASE)
                     .tableName("settlement_report")
                     .syncType("inc")
                     .requestTimestamp(System.currentTimeMillis())
                     .folderDate(beforeYesterday)
-                    .content(JsonUtils.toJSONObject(result))
+                    .content(report)
                     .headers(null)
                     .build();
                 service.send(data);
