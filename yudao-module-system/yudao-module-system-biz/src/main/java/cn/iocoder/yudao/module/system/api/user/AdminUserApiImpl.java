@@ -104,4 +104,9 @@ public class AdminUserApiImpl implements AdminUserApi {
         return userService.createUser(saveReqVO);
     }
 
+    @Override
+    public Integer getUsernameIndex(String username) {
+        return userService.getUsernameIndex(username);
+    }
+
 }

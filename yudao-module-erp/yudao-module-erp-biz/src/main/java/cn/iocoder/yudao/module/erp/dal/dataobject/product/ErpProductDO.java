@@ -1,17 +1,15 @@
 package cn.iocoder.yudao.module.erp.dal.dataobject.product;
 
-import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
-import com.baomidou.mybatisplus.annotation.KeySequence;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
 
 import java.math.BigDecimal;
+import com.baomidou.mybatisplus.annotation.*;
+import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 
 /**
  * ERP 产品 DO
  *
- * @author 芋道源码
+ * @author 王奇辉
  */
 @TableName("erp_product")
 @KeySequence("erp_product_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
@@ -33,78 +31,140 @@ public class ErpProductDO extends BaseDO {
      */
     private String name;
     /**
+     * 产品分类编号
+     */
+    private Long categoryId;
+    /**
      * 部门id
      */
     private Long deptId;
     /**
-     * 图片URL
-     */
-    private String imageUrl;
-    /**
-     * 产品条码
+     * SKU（编码）
      */
     private String barCode;
     /**
-     * 产品分类编号
-     *
-     * 关联 {@link ErpProductCategoryDO#getId()}
-     */
-    private Long categoryId;
-    /**
      * 单位编号
-     *
-     * 关联 {@link ErpProductUnitDO#getId()}
      */
     private Long unitId;
-    /**
-     * 产品状态
-     *
-     * 枚举 {@link cn.iocoder.yudao.framework.common.enums.CommonStatusEnum}
-     */
-    private Integer status;
-    /**
-     * 产品规格
-     */
-    private String standard;
-    /**
-     * 产品备注
-     */
-    private String remark;
-    /**
-     * 保质期天数
-     */
-    private Integer expiryDay;
     /**
      * 材料（中文）
      */
     private String material;
     /**
-     * 基础长度（cm）
+     * 产品状态（1启用，0禁用）
      */
-    private BigDecimal length;
+    private Boolean status;
     /**
-     * 基础宽度（cm）
+     * 备注
      */
-    private BigDecimal width;
-    /**
-     * 基础高度（cm）
-     */
-    private BigDecimal height;
+    private String remark;
     /**
      * 基础重量（kg）
      */
-    private BigDecimal weight;
+    private Integer weight;
     /**
-     * 采购价格，单位：元
+     * 品牌
      */
-    private BigDecimal purchasePrice;
+    private String brand;
     /**
-     * 销售价格，单位：元
+     * 系列
      */
-    private BigDecimal salePrice;
+    private String series;
     /**
-     * 最低价格，单位：元
+     * 颜色
      */
-    private BigDecimal minPrice;
+    private String color;
+    /**
+     * 型号
+     */
+    private String model;
+    /**
+     * 流水号
+     */
+    private Integer serial;
+    /**
+     * 生产编号
+     */
+    private String productionNo;
+    /**
+     * 基础宽度（mm）
+     */
+    private Integer width;
+    /**
+     * 基础长度（mm）
+     */
+    private Integer length;
+    /**
+     * 基础高度（mm）
+     */
+    private Integer height;
+    /**
+     * 主图url
+     */
+    private String primaryImageUrl;
+    /**
+     * 副图urls
+     */
+    private String secondaryImageUrls;
+    /**
+     * 指导价，json格式
+     */
+    private String guidePrices;
+    /**
+     * 专利
+     */
+    private String patent;
+    /**
+     * PO产品经理id
+     */
+    private Long productOwnerId;
+    /**
+     * ID工业设计id
+     */
+    private Long industrialDesignerId;
+    /**
+     * RD研发工程师id
+     */
+    private Long researchDeveloperId;
+    /**
+     * 维护工程师id
+     */
+    private Long maintenanceEngineerId;
+    /**
+     * 层板承重
+     */
+    private BigDecimal shelfLoadCapacity;
+    /**
+     * 层板数量
+     */
+    private Integer shelvesCount;
+    /**
+     * 电视调节方式
+     */
+    private String tvAdjustmentMethod;
+    /**
+     * 层板调节方式
+     */
+    private String shelfAdjustmentMethod;
+    /**
+     * 设计说明
+     */
+    private String description;
+    /**
+     * 宽度最大值
+     */
+    private BigDecimal widthMax;
+    /**
+     * 宽度最小值
+     */
+    private BigDecimal widthMin;
+    /**
+     * 长度最大值
+     */
+    private BigDecimal lengthMax;
+    /**
+     * 长度最小值
+     */
+    private BigDecimal lengthMin;
 
 }

@@ -2,6 +2,7 @@ package cn.iocoder.yudao.framework.common.util.object;
 
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.ReflectUtil;
+import lombok.SneakyThrows;
 
 import java.lang.reflect.Field;
 import java.util.Arrays;
@@ -13,6 +14,11 @@ import java.util.function.Consumer;
  * @author 芋道源码
  */
 public class ObjectUtils {
+
+    @SneakyThrows
+    public static Field[] getFields(Class<?> beanClass){
+        return ReflectUtil.getFields(beanClass);
+    }
 
     /**
      * 复制对象

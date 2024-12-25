@@ -35,22 +35,22 @@ public class LocalDateTimeUtils {
     public static final String FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND = "yyyy-MM-dd HH:mm:ss";
 
     /**
+     * @return java.lang.String
      * @Author Wqh
      * @Description 将LocalDate转成String类型字符串，格式为yyyyMMdd
      * @Date 14:34 2024/10/10
      * @Param [date]
-     * @return java.lang.String
      **/
     public static String formatLocalDate(LocalDate date) {
         return LocalDateTimeUtil.format(date, PURE_DATE_PATTERN);
     }
 
     /**
+     * @return java.lang.String
      * @Author Wqh
      * @Description 将localDateTime转成string类型字符串，格式为yyyy-MM-dd HH:mm:ss
      * @Date 10:12 2024/10/10
      * @Param [date]
-     * @return java.lang.String
      **/
     public static String formatLocalDateTime(LocalDateTime date) {
         return LocalDateTimeUtil.format(date, FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND);
@@ -289,19 +289,18 @@ public class LocalDateTimeUtils {
     }
 
 
-    public static ZonedDateTime toZoned (LocalDateTime a) {
+    public static ZonedDateTime toZoned(LocalDateTime a) {
         return a.atZone(ZoneId.systemDefault());
     }
 
-    public static Timestamp toTimestamp (LocalDateTime a) {
+    public static Timestamp toTimestamp(LocalDateTime a) {
         return Timestamp.from(a.atZone(ZoneId.systemDefault()).toInstant());
     }
 
 
-    public static LocalDateTime leap (LocalDateTime systemTime, ZoneId to) {
+    public static LocalDateTime leap(LocalDateTime systemTime, ZoneId to) {
         return toZoned(systemTime).withZoneSameInstant(to).toLocalDateTime();
     }
-
 
 
     public static Map<LocalDateTime, LocalDateTime> splitIntoHourlyBlocks(LocalDateTime start, LocalDateTime end) {
@@ -319,4 +318,36 @@ public class LocalDateTimeUtils {
         return timeBlocks;
     }
 
+    /**
+     * 校验时间范围是否合规。
+     * 1.结束时间 > 开始时间
+     * 2.开始时间 - 结束时间 > 天数范围
+     *
+     * @param startTime 开始时间
+     * @param endTime   结束时间
+     * @param daysRange 天数范围
+     * @throws IllegalArgumentException 结束时间必须大于开始时间
+     */
+    public static void isValidDateRange(LocalDateTime startTime, LocalDateTime endTime, Integer daysRange) {
+        // 校验 startTime 和 endTime 为 null 的情况
+        if (startTime == null || endTime == null) {
+            throw new IllegalArgumentException("开始时间和结束时间不能为空");
+        }
+        // 确保 endDatetime 大于 startDatetime
+        if (endTime.isBefore(startTime) || endTime.isEqual(startTime)) {
+            throw new IllegalArgumentException("结束时间必须大于开始时间");
+        }
+        if (daysRange != null) {
+            // 计算日期之间的天数差
+            // 判断是否在天数范围内
+            if (LocalDateTimeUtil.between(startTime, endTime).toDays() > daysRange) {
+                throw new IllegalArgumentException("开始至结束日期范围超出" + daysRange + "天");
+            }
+        }
+
+    }
+
+    public static void isValidDateRange(LocalDateTime startTime, LocalDateTime endTime) {
+        LocalDateTimeUtils.isValidDateRange(startTime, endTime, null);
+    }
 }

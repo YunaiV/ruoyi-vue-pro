@@ -33,6 +33,11 @@ public class AdminUserDO extends TenantBaseDO {
      */
     @TableId
     private Long id;
+
+    /**
+     * 工号
+     */
+    private String employeeId;
     /**
      * 用户账号
      */

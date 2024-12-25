@@ -4,7 +4,10 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 
+import java.lang.reflect.Field;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.function.Consumer;
 
 /**
@@ -57,6 +60,40 @@ public class BeanUtils {
             list.forEach(peek);
         }
         return new PageResult<>(list, source.getTotal());
+    }
+
+    /**
+     *
+     * check if every non-null field of instanceA is already present in classB
+     *
+     * @param instanceA
+     * @param classB
+     * @return
+     */
+    public static boolean areAllNonNullFieldsPresent(Object instanceA, Class<?> classB) {
+        Class<?> classA = instanceA.getClass();
+        if (instanceA == null) {
+            throw new IllegalArgumentException("Instance of class A cannot be null");
+        }
+
+        Set<String> classBFieldNames = new HashSet<>();
+        for (Field field : ObjectUtils.getFields(classB)) {
+            classBFieldNames.add(field.getName());
+        }
+
+        for (Field field : ObjectUtils.getFields(classA)) {
+            field.setAccessible(true); // Allow access to private fields
+            try {
+                Object value = field.get(instanceA);
+                if (value != null && !classBFieldNames.contains(field.getName())) {
+                    return true; // Non-null field in A is not present in B
+                }
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException("Failed to access field: " + field.getName(), e);
+            }
+        }
+
+        return false;
     }
 
 }

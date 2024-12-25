@@ -43,7 +43,9 @@
         <module>somle-walmart</module>
         <module>somle-jingdong</module>
         <module>somle-manomano</module>
-
+        <module>somle-rakuten</module>
+        <module>somle-otto</module>
+        <module>somle-bestbuy</module>
     </modules>
 
     <name>${project.artifactId}</name>

@@ -48,4 +48,7 @@ public interface AdminUserMapper extends BaseMapperX<AdminUserDO> {
         return selectList(AdminUserDO::getDeptId, deptIds);
     }
 
+    default List<AdminUserDO> selectLikeRightByUsername(String username) {
+        return selectList(new LambdaQueryWrapperX<AdminUserDO>().likeRight(AdminUserDO::getUsername, username));
+    }
 }

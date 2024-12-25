@@ -3,7 +3,7 @@ package cn.iocoder.yudao.module.erp.service.product;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.erp.controller.admin.product.vo.product.ErpProductPageReqVO;
 import cn.iocoder.yudao.module.erp.controller.admin.product.vo.product.ErpProductRespVO;
-import cn.iocoder.yudao.module.erp.controller.admin.product.vo.product.ProductSaveReqVO;
+import cn.iocoder.yudao.module.erp.controller.admin.product.vo.product.ErpProductSaveReqVO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.product.ErpProductDO;
 import jakarta.validation.Valid;
 
@@ -23,17 +23,17 @@ public interface ErpProductService {
     /**
      * 创建产品
      *
-     * @param createReqVO 创建信息
+     * @param saveReqVO 创建信息
      * @return 编号
      */
-    Long createProduct(@Valid ProductSaveReqVO createReqVO);
+    Long createProduct(@Valid ErpProductSaveReqVO saveReqVO);
 
     /**
      * 更新产品
      *
      * @param updateReqVO 更新信息
      */
-    void updateProduct(@Valid ProductSaveReqVO updateReqVO);
+    void updateProduct(@Valid ErpProductSaveReqVO updateReqVO);
 
     /**
      * 删除产品
@@ -56,7 +56,7 @@ public interface ErpProductService {
      * @param id 编号
      * @return 产品
      */
-    ErpProductDO getProduct(Long id);
+    ErpProductRespVO getProduct(Long id);
 
     /**
      * 获得指定状态的产品 VO 列表
@@ -64,7 +64,7 @@ public interface ErpProductService {
      * @param status 状态
      * @return 产品 VO 列表
      */
-    List<ErpProductRespVO> getProductVOListByStatus(Integer status);
+    List<ErpProductRespVO> getProductVOListByStatus(Boolean status);
 
     /**
      * 获得产品 VO 列表

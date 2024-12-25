@@ -3,6 +3,12 @@ package com.somle.framework.common.util.string;
 import cn.hutool.core.text.StrPool;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.StrUtil;
+import net.sourceforge.pinyin4j.PinyinHelper;
+import net.sourceforge.pinyin4j.format.HanyuPinyinCaseType;
+import net.sourceforge.pinyin4j.format.HanyuPinyinOutputFormat;
+import net.sourceforge.pinyin4j.format.HanyuPinyinToneType;
+import net.sourceforge.pinyin4j.format.HanyuPinyinVCharType;
+import net.sourceforge.pinyin4j.format.exception.BadHanyuPinyinOutputFormatCombination;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -16,6 +22,18 @@ import java.util.stream.Collectors;
  * @author 芋道源码
  */
 public class StrUtils {
+    // 定义静态的 HanyuPinyinOutputFormat 变量
+    private static final HanyuPinyinOutputFormat PINYIN_FORMAT;
+
+    // 使用 static 代码块初始化静态变量.在整个类中复用，减少内存开销和提高性能。
+    static {
+        PINYIN_FORMAT = new HanyuPinyinOutputFormat();
+        PINYIN_FORMAT.setCaseType(HanyuPinyinCaseType.LOWERCASE);
+        PINYIN_FORMAT.setToneType(HanyuPinyinToneType.WITHOUT_TONE);
+        //拼音中的u输出为v 例如lv
+        PINYIN_FORMAT.setVCharType(HanyuPinyinVCharType.WITH_V);
+    }
+
     public static boolean isEmpty(String str) {
         return str == null || str.isEmpty();
     }
@@ -71,7 +89,7 @@ public class StrUtils {
     /**
      * 移除字符串中，包含指定字符串的行
      *
-     * @param content 字符串
+     * @param content  字符串
      * @param sequence 包含的字符串
      * @return 移除后的字符串
      */
@@ -82,6 +100,27 @@ public class StrUtils {
         return Arrays.stream(content.split("\n"))
                 .filter(line -> !line.contains(sequence))
                 .collect(Collectors.joining("\n"));
+    }
+
+    /**
+     * 获取汉字的全拼
+     *
+     * @param chinese 汉字字符串
+     * @return 拼音字符串
+     */
+    public static String getPinyin(String chinese) {
+        StringBuilder pinyin = new StringBuilder();
+        for (char c : chinese.toCharArray()) {
+            try {
+                String[] pinyinArray = PinyinHelper.toHanyuPinyinStringArray(c, PINYIN_FORMAT);
+                if (pinyinArray != null && pinyinArray.length > 0) {
+                    pinyin.append(pinyinArray[0]);
+                }
+            } catch (BadHanyuPinyinOutputFormatCombination e) {
+                throw new RuntimeException("将字符转换为拼音时出错: " + c, e);
+            }
+        }
+        return pinyin.toString();
     }
 
 }
