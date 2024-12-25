@@ -1,4 +1,4 @@
-package com.somle.home24.model.resp;
+package com.somle.home24.model.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
@@ -9,12 +9,13 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 import java.util.List;
 
+//发票类
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class Home24Invoice {
+public class Home24InvoiceDTO {
     private String currencyIsoCode;  // 货币ISO代码
     private LocalDateTime dateCreated;  // 发票创建时间
     private List<Detail> details;  // 发票详细信息

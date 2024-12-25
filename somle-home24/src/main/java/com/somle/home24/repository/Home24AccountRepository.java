@@ -5,5 +5,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface Home24AccountDao extends JpaRepository<Home24Account, Long> {
+public interface Home24AccountRepository extends JpaRepository<Home24Account, Long> {
 }

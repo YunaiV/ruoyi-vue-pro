@@ -6,8 +6,8 @@ import com.somle.framework.common.util.web.WebUtils;
 import com.somle.home24.model.pojo.Home24Account;
 import com.somle.home24.model.req.Home24InvoicesReq;
 import com.somle.home24.model.req.Home24OrderReq;
-import com.somle.home24.model.resp.Home24CommonRespInvoices;
-import com.somle.home24.model.resp.Home24CommonRespOrders;
+import com.somle.home24.model.resp.Home24CommonInvoicesResp;
+import com.somle.home24.model.resp.Home24CommonOrdersResp;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.Response;
@@ -18,7 +18,7 @@ import java.util.Map;
 @Slf4j
 public class Home24Client {
     private static final String BASEURL = "https://home24.mirakl.net";
-    private Home24Account account;
+    private final Home24Account account;
 
     Home24Client(Home24Account home24Account) {
         this.account = home24Account;
@@ -28,36 +28,35 @@ public class Home24Client {
         return account.getApiKey();
     }
 
-    //获取订单
-    public Home24CommonRespOrders<Object> getOrder(Home24OrderReq orderReq) {
-
-        // 初始化响应对象
-        Home24CommonRespOrders<Object> resp = null;
-        int offset = 0; // 从偏移量0开始
-        int totalCount = 0; // 总数据量
+    // 获取订单-通过offset递归http
+    public Home24CommonOrdersResp<Object> getOrder(Home24OrderReq orderReq) {
+        Home24CommonOrdersResp<Object> resp = null;
+        int offset = 0;
+        int totalCount = 0;
 
         do {
+            // 设置偏移量
             orderReq.setOffset(offset);
-            Response response = WebUtils.sendRequest(createRequest(orderReq, "/api/orders"));
-            Home24CommonRespOrders<Object> respOrders = handleResponse(response, Home24CommonRespOrders.class);
 
-            if (resp == null) {
+            // 发送请求并处理响应
+            Response response = WebUtils.sendRequest(createRequest(orderReq, "/api/orders", RequestX.Method.GET));
+            Home24CommonOrdersResp<Object> respOrders = handleResponse(response, Home24CommonOrdersResp.class);
+
+            // 如果这是第一次请求响应，初始化响应对象
+            if (resp == null && respOrders != null) {
                 resp = respOrders;
-                assert resp != null;
                 totalCount = resp.getTotal_count();
 
                 // 确保 orders 列表已经初始化
                 if (resp.getOrders() == null) {
                     resp.setOrders(new ArrayList<>()); // 初始化为空列表
                 }
-            } else {
-                // 合并订单
-                assert respOrders != null;
-                if (respOrders.getOrders() != null) {
-                    resp.getOrders()
-                            .addAll(respOrders.getOrders());
-                }
+            } else if (respOrders != null && respOrders.getOrders() != null) {
+                //合并Order
+                resp.getOrders()
+                    .addAll(respOrders.getOrders());
             }
+
 
             // 更新偏移量
             offset += orderReq.getMax();
@@ -68,35 +67,33 @@ public class Home24Client {
     }
 
 
-    //获取发票
-    public Home24CommonRespInvoices<Object> getInvoices(Home24InvoicesReq invoicesReq) {
-
-        // 初始化响应对象
-        Home24CommonRespInvoices<Object> resp = null;
-        int offset = 0; // 从偏移量0开始
-        int totalCount = 0; // 总数据量
+    // 获取发票-通过offset递归http
+    public Home24CommonInvoicesResp<Object> getInvoices(Home24InvoicesReq invoicesReq) {
+        Home24CommonInvoicesResp<Object> resp = null;
+        int offset = 0;
+        int totalCount = 0;
 
         do {
+            // 设置偏移量
             invoicesReq.setOffset(offset);
-            Response response = WebUtils.sendRequest(createRequest(invoicesReq, "/api/invoices"));
-            Home24CommonRespInvoices<Object> respInvoices = handleResponse(response, Home24CommonRespInvoices.class);
 
-            if (resp == null) {
+            // 发送请求并处理响应
+            Response response = WebUtils.sendRequest(createRequest(invoicesReq, "/api/invoices", RequestX.Method.GET));
+            Home24CommonInvoicesResp<Object> respInvoices = handleResponse(response, Home24CommonInvoicesResp.class);
+
+            // 如果这是第一次请求响应，初始化响应对象
+            if (resp == null && respInvoices != null) {
                 resp = respInvoices;
-                assert resp != null;
                 totalCount = resp.getTotal_count();
 
-                // 确保 orders 列表已经初始化
+                // 确保 invoices 列表已经初始化
                 if (resp.getInvoices() == null) {
                     resp.setInvoices(new ArrayList<>()); // 初始化为空列表
                 }
-            } else {
-                // 合并订单
-                assert respInvoices != null;
-                if (respInvoices.getInvoices() != null) {
-                    resp.getInvoices()
-                            .addAll(respInvoices.getInvoices());
-                }
+            } else if (respInvoices != null && respInvoices.getInvoices() != null) {
+                // 合并发票数据
+                resp.getInvoices()
+                    .addAll(respInvoices.getInvoices());
             }
 
             // 更新偏移量
@@ -107,6 +104,7 @@ public class Home24Client {
         return resp;
     }
 
+
     /**
      * 创建请求
      *
@@ -114,13 +112,13 @@ public class Home24Client {
      * @param endpoint 请求地址
      * @return RequestX
      */
-    private RequestX createRequest(Object req, String endpoint) {
+    private RequestX createRequest(Object req, String endpoint, RequestX.Method method) {
         return RequestX.builder()
-                .requestMethod(RequestX.Method.GET)
-                .url(BASEURL + endpoint)
-                .queryParams(req)
-                .headers(Map.of("Authorization", getAccessToken()))
-                .build();
+            .requestMethod(method)
+            .url(BASEURL + endpoint)
+            .headers(Map.of("Authorization", getAccessToken()))
+            .queryParams(req)
+            .build();
     }
 
     /**
@@ -157,14 +155,14 @@ public class Home24Client {
         }
 
         String jsonResponse = response.body()
-                .string();
+            .string();
 
         // 解析不同的响应类型
-        if (respClass == Home24CommonRespOrders.class) {
-            return (T) WebUtils.parseResponse(jsonResponse, new TypeReference<Home24CommonRespOrders<Object>>() {
+        if (respClass == Home24CommonOrdersResp.class) {
+            return (T) WebUtils.parseResponse(jsonResponse, new TypeReference<Home24CommonOrdersResp<Object>>() {
             });
-        } else if (respClass == Home24CommonRespInvoices.class) {
-            return (T) WebUtils.parseResponse(jsonResponse, new TypeReference<Home24CommonRespInvoices<Object>>() {
+        } else if (respClass == Home24CommonInvoicesResp.class) {
+            return (T) WebUtils.parseResponse(jsonResponse, new TypeReference<Home24CommonInvoicesResp<Object>>() {
             });
         } else {
             throw new IllegalArgumentException("Unknown response type: " + respClass);

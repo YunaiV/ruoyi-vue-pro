@@ -1,39 +1,39 @@
 spring:
-  main:
-    lazy-initialization: true # 开启懒加载，加快速度
-    banner-mode: off # 单元测试，禁用 Banner
-  test:
-    database:
-      replace: none
+    main:
+        lazy-initialization: true # 开启懒加载，加快速度
+        banner-mode: off # 单元测试，禁用 Banner
+    test:
+        database:
+            replace: none
 
 
 logging:
-  level:
-    com.somle: DEBUG
+    level:
+        com.somle: DEBUG
 
 --- #################### 数据库相关配置 ####################
 
 spring:
-  # 数据源配置项
-  datasource:
-    url: jdbc:mysql://192.168.10.151:3306/ruoyi-vue-test?serverTimezone=GMT%2B8&useSSL=false&characterEncoding=utf-8
-    driverClassName: com.mysql.cj.jdbc.Driver
-    username: it003
-    password: asivJssflioKK
-  #  sql:
-  #    init:
-  #      schema-locations: classpath:/sql/create_tables.sql
-  jpa:
-    hibernate:
-      #      ddl-auto: none
-      ddl-auto: update
-    show-sql: true
-    properties:
-      hibernate:
-        show_sql: true
-  #      ddl-auto: create-drop
+    # 数据源配置项
+    datasource:
+        url: jdbc:mysql://192.168.10.151:3306/ruoyi-vue-test?serverTimezone=GMT%2B8&useSSL=false&characterEncoding=utf-8
+        driverClassName: com.mysql.cj.jdbc.Driver
+        username: it003
+        password: asivJssflioKK
+    #  sql:
+    #    init:
+    #      schema-locations: classpath:/sql/create_tables.sql
+    jpa:
+        hibernate:
+            #      ddl-auto: none
+            ddl-auto: update
+        show-sql: true
+        properties:
+            hibernate:
+                show_sql: true
+    #      ddl-auto: create-drop
 
-  # Redis 配置。Redisson 默认的配置足够使用，一般不需要进行调优
+    # Redis 配置。Redisson 默认的配置足够使用，一般不需要进行调优
 #  data:
 #    redis:
 #      host: 127.0.0.1 # 地址
@@ -61,16 +61,16 @@ spring:
 #  info:
 #    base-package: cn.iocoder.yudao.module
 logging:
-  level:
-    root: INFO
-    org:
-      springframework:
-        beans:
-          factory:
-            support: DEBUG
-    com:
-      example: DEBUG
+    level:
+        root: INFO
+        org:
+            springframework:
+                beans:
+                    factory:
+                        support: DEBUG
+        com:
+            example: DEBUG
 
 
 somle:
-  base-package: com.somle.home24
+    base-package: com.somle.home24

@@ -5,7 +5,7 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-public class Home24CommonRespInvoices<T> {
+public class Home24CommonOrdersResp<T> {
     Integer total_count;
-    private List<T> invoices;
+    private List<T> orders;
 }

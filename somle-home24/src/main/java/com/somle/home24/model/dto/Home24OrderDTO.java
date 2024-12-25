@@ -1,4 +1,4 @@
-package com.somle.home24.model.resp;
+package com.somle.home24.model.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -13,7 +13,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class Home24Order {
+public class Home24OrderDTO {
 
     // 订单接受决定时间
     @JsonProperty("acceptance_decision_date")
