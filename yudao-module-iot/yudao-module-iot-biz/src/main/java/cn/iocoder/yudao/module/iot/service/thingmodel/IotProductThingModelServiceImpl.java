@@ -70,6 +70,7 @@ public class IotProductThingModelServiceImpl implements IotProductThingModelServ
         if (Objects.equals(createReqVO.getType(), IotProductThingModelTypeEnum.PROPERTY.getType())) {
             createDefaultEventsAndServices(createReqVO.getProductId(), createReqVO.getProductKey());
         }
+        // TODO @puhui999: 服务和事件的情况 method 怎么设置？在前端设置还是后端设置？
         return thingModel.getId();
     }
 

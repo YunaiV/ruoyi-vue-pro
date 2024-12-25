@@ -27,6 +27,7 @@ public class ThingModelProperty {
     /**
      * 属性描述
      */
+    // TODO @puhui999: 考虑移除
     private String description;
     /**
      * 云端可以对该属性进行的操作类型

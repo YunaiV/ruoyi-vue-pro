@@ -24,6 +24,7 @@ public class ThingModelService {
     /**
      * 服务描述
      */
+    // TODO @puhui999: 考虑移除
     private String description;
     /**
      * 是否是标准品类的必选服务。

@@ -24,6 +24,7 @@ public class ThingModelEvent {
     /**
      * 事件描述
      */
+    // TODO @puhui999: 考虑移除
     private String description;
     /**
      * 是否是标准品类的必选事件。

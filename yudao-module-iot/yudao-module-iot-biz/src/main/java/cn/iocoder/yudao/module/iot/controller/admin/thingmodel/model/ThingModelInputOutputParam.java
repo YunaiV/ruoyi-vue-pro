@@ -7,7 +7,7 @@ import lombok.Data;
 import java.util.List;
 
 /**
- * IOT 产品物模型中的服务、事件的输入输出参数
+ * IOT 产品物模型中的参数 // TODO @puhui999 考虑要不改成 ThingModelParam ？
  *
  * @author HUIHUI
  */
@@ -25,6 +25,7 @@ public class ThingModelInputOutputParam {
     /**
      * 参数描述
      */
+    // TODO @puhui999: 考虑移除
     private String description;
     /**
      * 用于区分输入或输出参数
