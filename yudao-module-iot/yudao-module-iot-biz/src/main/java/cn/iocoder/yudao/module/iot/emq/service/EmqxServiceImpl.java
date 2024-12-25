@@ -1,7 +1,6 @@
 package cn.iocoder.yudao.module.iot.emq.service;
 
-import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
-import cn.iocoder.yudao.module.iot.service.device.IotDeviceDataService;
+import cn.iocoder.yudao.module.iot.service.device.IotDevicePropertyDataService;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.paho.client.mqttv3.MqttClient;
@@ -21,7 +20,7 @@ import org.springframework.stereotype.Service;
 public class EmqxServiceImpl implements EmqxService {
 
     @Resource
-    private IotDeviceDataService iotDeviceDataService;
+    private IotDevicePropertyDataService iotDeviceDataService;
 
     // TODO 多线程处理消息
     @Override

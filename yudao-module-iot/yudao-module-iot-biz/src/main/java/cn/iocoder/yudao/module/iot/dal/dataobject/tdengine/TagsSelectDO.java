@@ -6,6 +6,7 @@ import lombok.Data;
  * tags查询DO
  */
 @Data
+@Deprecated
 public class TagsSelectDO {
 
     /**

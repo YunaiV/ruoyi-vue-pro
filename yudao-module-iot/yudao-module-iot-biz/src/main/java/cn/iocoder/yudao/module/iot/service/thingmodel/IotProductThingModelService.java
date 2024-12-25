@@ -62,13 +62,6 @@ public interface IotProductThingModelService {
     PageResult<IotProductThingModelDO> getProductThingModelPage(IotProductThingModelPageReqVO pageReqVO);
 
     /**
-     * 创建超级表数据模型
-     *
-     * @param productId 产品编号
-     */
-    void createSuperTableDataModel(Long productId);
-
-    /**
      * 获得产品物模型列表
      *
      * @param productKey 产品 Key

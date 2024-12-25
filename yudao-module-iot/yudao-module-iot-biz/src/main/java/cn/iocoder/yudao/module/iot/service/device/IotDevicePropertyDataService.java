@@ -9,11 +9,18 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * IoT 设备数据 Service 接口
+ * IoT 设备【属性】数据 Service 接口
  *
  * @author 芋道源码
  */
-public interface IotDeviceDataService {
+public interface IotDevicePropertyDataService {
+
+    /**
+     * 定义设备属性数据的结构
+     *
+     * @param productId 产品编号
+     */
+    void defineDevicePropertyData(Long productId);
 
     /**
      * 保存设备数据
@@ -40,4 +47,5 @@ public interface IotDeviceDataService {
      * @return 设备属性历史数据
      */
     PageResult<Map<String, Object>> getHistoryDeviceProperties(@Valid IotDeviceDataPageReqVO deviceDataReqVO);
+
 }

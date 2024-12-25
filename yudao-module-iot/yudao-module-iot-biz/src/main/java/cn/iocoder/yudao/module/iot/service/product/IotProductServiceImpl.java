@@ -7,6 +7,7 @@ import cn.iocoder.yudao.module.iot.controller.admin.product.vo.product.IotProduc
 import cn.iocoder.yudao.module.iot.dal.dataobject.product.IotProductDO;
 import cn.iocoder.yudao.module.iot.dal.mysql.product.IotProductMapper;
 import cn.iocoder.yudao.module.iot.enums.product.IotProductStatusEnum;
+import cn.iocoder.yudao.module.iot.service.device.IotDevicePropertyDataService;
 import cn.iocoder.yudao.module.iot.service.tdengine.IotThingModelMessageService;
 import cn.iocoder.yudao.module.iot.service.thingmodel.IotProductThingModelService;
 import com.baomidou.dynamic.datasource.annotation.DSTransactional;
@@ -39,6 +40,9 @@ public class IotProductServiceImpl implements IotProductService {
     @Resource
     @Lazy  // 延迟加载，解决循环依赖
     private IotThingModelMessageService thingModelMessageService;
+    @Resource
+    @Lazy  // 延迟加载，解决循环依赖
+    private IotDevicePropertyDataService devicePropertyDataService;
 
     @Override
     public Long createProduct(IotProductSaveReqVO createReqVO) {
@@ -119,8 +123,8 @@ public class IotProductServiceImpl implements IotProductService {
         // 3. 产品是发布状态
         if (Objects.equals(status, IotProductStatusEnum.PUBLISHED.getStatus())) {
             // 3.1 创建产品超级表数据模型
-            thingModelFunctionService.createSuperTableDataModel(id);
-            // 3.2 创建物模型日志超级表数据模型
+            devicePropertyDataService.defineDevicePropertyData(id);
+            // 3.2 创建物模型日志超级表数据模型 TODO 待定：message 要不要分；
             thingModelMessageService.createSuperTable(id);
         }
         productMapper.updateById(updateObj);

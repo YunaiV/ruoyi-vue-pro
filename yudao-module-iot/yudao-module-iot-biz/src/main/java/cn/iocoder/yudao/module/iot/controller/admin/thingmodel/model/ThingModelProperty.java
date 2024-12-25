@@ -30,7 +30,8 @@ public class ThingModelProperty {
     private String description;
     /**
      * 云端可以对该属性进行的操作类型
-     * 关联枚举 {@link IotProductThingModelAccessModeEnum}
+     *
+     * 枚举 {@link IotProductThingModelAccessModeEnum}
      */
     private String accessMode;
     /**
@@ -42,6 +43,8 @@ public class ThingModelProperty {
     private Boolean required;
     /**
      * 数据类型，与 dataSpecs 的 dataType 保持一致
+     *
+     * 枚举 {@link cn.iocoder.yudao.module.iot.enums.thingmodel.IotDataSpecsDataTypeEnum}
      */
     private String dataType;
     /**
