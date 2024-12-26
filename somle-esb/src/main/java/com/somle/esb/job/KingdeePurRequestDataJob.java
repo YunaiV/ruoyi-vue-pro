@@ -1,26 +1,24 @@
 package com.somle.esb.job;
 
-
 import com.somle.esb.model.OssData;
 import com.somle.framework.common.util.date.LocalDateTimeUtils;
-import com.somle.kingdee.model.KingdeePurOrder;
-import com.somle.kingdee.model.KingdeePurOrderReqVO;
+import com.somle.kingdee.model.KingdeePurRequest;
+import com.somle.kingdee.model.KingdeePurRequestReqVO;
 import com.somle.kingdee.service.KingdeeClient;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 
+/**
+ * @author: Wqh
+ * @date: 2024/12/25 11:04
+ */
 @Component
-public class KingdeePurOrderDataJob extends KingdeeDataJob {
-
-
+public class KingdeePurRequestDataJob extends KingdeeDataJob {
     @Override
     public String execute(String param) throws Exception {
-        // 设置日期参数
         setDate(param);
-
-        // 构建请求对象
-        var vo = KingdeePurOrderReqVO.builder()
+        var vo = KingdeePurRequestReqVO.builder()
             .createStartTime(LocalDateTimeUtils.toTimestamp(yesterdayFirstSecond))
             .createEndTime(LocalDateTimeUtils.toTimestamp(yesterdayLastSecond))
             .build();
@@ -28,33 +26,33 @@ public class KingdeePurOrderDataJob extends KingdeeDataJob {
         // 获取所有 Kingdee 客户端列表
         for (KingdeeClient client : kingdeeService.getClientList()) {
             // 获取当前客户端的采购请求列表
-            List<KingdeePurOrder> purOrders = client.getPurOrder(vo);
+            List<KingdeePurRequest> purRequests = client.getPurRequest(vo);
             // 获取当前时间戳，用于记录请求时间
             long currentTimeMillis = System.currentTimeMillis();
             // 发送采购请求数据到 OSS
             service.send(
                 OssData.builder()
                     .database(DATABASE)
-                    .tableName("pur_order")
+                    .tableName("pur_request")
                     .syncType("inc")
                     .requestTimestamp(currentTimeMillis)
                     .folderDate(yesterday)
-                    .content(purOrders)
+                    .content(purRequests)
                     .headers(null)
                     .build()
             );
 
             // 遍历每个采购请求，获取并发送详细信息
-            purOrders.forEach(purOrder -> {
+            purRequests.forEach(purRequest -> {
                 // 发送采购请求详细信息到 OSS
                 service.send(
                     OssData.builder()
                         .database(DATABASE)
-                        .tableName("pur_order_detail")
+                        .tableName("pur_request_detail")
                         .syncType("inc")
                         .requestTimestamp(currentTimeMillis)
                         .folderDate(yesterday)
-                        .content(client.getPurOrderDetail(purOrder.getBillNo()))
+                        .content(client.getPurRequestDetail(purRequest.getBillNo()))
                         .headers(null)
                         .build()
                 );

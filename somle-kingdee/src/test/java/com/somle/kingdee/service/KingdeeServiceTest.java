@@ -7,6 +7,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.TreeMap;
 
+import com.somle.framework.common.util.date.LocalDateTimeUtils;
 import com.somle.framework.common.util.json.JsonUtils;
 import com.somle.framework.test.core.ut.BaseSpringTest;
 import com.somle.kingdee.model.KingdeePurOrderReqVO;
@@ -25,7 +26,6 @@ import org.springframework.context.annotation.Import;
 public class KingdeeServiceTest extends BaseSpringTest {
     @Resource
     KingdeeService service;
-
 
 
 //    @BeforeEach
@@ -61,10 +61,10 @@ public class KingdeeServiceTest extends BaseSpringTest {
         // Arrange
         String clientSecret = "f2adcfef73369bfc4e1384677d38a0ff";
         String apiString = "GET\n" + //
-        "%2Fjdyconnector%2Fapp_management%2Fkingdee_auth_token\n" + //
-        "app_key=bVZgAZOv1&app_signature=MzZlYTk0ODk4MWZlNjdiODNmNWU4YzViNzYxNGM5MTFlOGJkN2NjMzk0MTJkZGNhZGM0NzZhN2YxZDJmOTlkZA%253D%253D\n" + //
-        "x-api-nonce:4427456950\n" + //
-        "x-api-timestamp:1670305063559\n";
+            "%2Fjdyconnector%2Fapp_management%2Fkingdee_auth_token\n" + //
+            "app_key=bVZgAZOv1&app_signature=MzZlYTk0ODk4MWZlNjdiODNmNWU4YzViNzYxNGM5MTFlOGJkN2NjMzk0MTJkZGNhZGM0NzZhN2YxZDJmOTlkZA%253D%253D\n" + //
+            "x-api-nonce:4427456950\n" + //
+            "x-api-timestamp:1670305063559\n";
         String expectedOutput1 = "91be9b41b23da27c5a788028de71f5e09e9565e4c5a25f21cf9a07df68b50d51";
         String expectedOutput2 = "OTFiZTliNDFiMjNkYTI3YzVhNzg4MDI4ZGU3MWY1ZTA5ZTk1NjVlNGM1YTI1ZjIxY2Y5YTA3ZGY2OGI1MGQ1MQ==";
 
@@ -106,25 +106,27 @@ public class KingdeeServiceTest extends BaseSpringTest {
     }
 
 
-
     @Test
     public void testGetPurRequest() {
         var client = service.getClientList().get(0);
-        var vo = new KingdeePurRequestReqVO();
-        log.info(client.getPurRequest(vo).toList().toString());
+        var vo = KingdeePurRequestReqVO.builder()
+            .createStartTime(LocalDateTimeUtils.toTimestamp(LocalDateTime.now().minusDays(1)))
+            .createEndTime(LocalDateTimeUtils.toTimestamp(LocalDateTime.now()))
+            .build();
+        log.info(JsonUtils.toJsonString(client.getPurRequest(vo)));
     }
 
     @Test
     public void testGetPurOrder() {
-        var start = LocalDateTime.of(2024,1,1,0,0,0).atZone(ZoneId.systemDefault()).toInstant();
-        var end = LocalDateTime.of(2024,11,1,0,0,0).atZone(ZoneId.systemDefault()).toInstant();
+        var start = LocalDateTime.of(2024, 10, 1, 0, 0, 0).atZone(ZoneId.systemDefault()).toInstant();
+        var end = LocalDateTime.of(2024, 11, 1, 0, 0, 0).atZone(ZoneId.systemDefault()).toInstant();
         var client = service.getClientList().get(0);
         var vo = KingdeePurOrderReqVO.builder()
             .createStartTime(Timestamp.from(start))
             .createEndTime(Timestamp.from(end))
             .build();
         log.info(JsonUtils.toJSONObject(vo).toString());
-        log.info(client.getPurOrder(vo).toList().toString());
+        log.info(client.getPurOrder(vo).get(0).toString());
     }
 
     @Test

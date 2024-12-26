@@ -10,16 +10,13 @@ import com.somle.kingdee.model.supplier.KingdeeSupplier;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpMethod;
-import org.springframework.util.MultiValueMap;
-import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.*;
 import java.util.stream.Stream;
+
 import static com.somle.kingdee.util.SignatureUtils.*;
 
 /**
@@ -63,7 +60,7 @@ public class KingdeeClient {
             .requestMethod(RequestX.Method.GET)
             .url(fullUrl)
             .queryParams(params)
-            .headers(getAuthHeaders(ctime,apiSignature))
+            .headers(getAuthHeaders(ctime, apiSignature))
             .build();
         KingdeeResponse response = WebUtils.sendRequest(request, KingdeeResponse.class);
         return response.getData(JSONObject.class).getString("app-token");
@@ -82,13 +79,12 @@ public class KingdeeClient {
             .requestMethod(RequestX.Method.POST)
             .url(fullUrl)
             .queryParams(params)
-            .headers(getAuthHeaders(ctime,apiSignature))
+            .headers(getAuthHeaders(ctime, apiSignature))
             .build();
         KingdeeResponse response = WebUtils.sendRequest(request, KingdeeResponse.class);
         return response.getDataList(KingdeeToken.class).get(0);
 
     }
-
 
 
     public KingdeeResponse getSupplier() {
@@ -111,7 +107,7 @@ public class KingdeeClient {
 
     public KingdeeResponse getVoucherDetail(String id) {
         String endUrl = "/jdy/v2/fi/voucher_detail";
-        TreeMap<String, String>  params = new TreeMap<>();
+        TreeMap<String, String> params = new TreeMap<>();
         params.put("id", id);
         KingdeeResponse response = getResponse(endUrl, params);
         return response;
@@ -119,7 +115,7 @@ public class KingdeeClient {
 
     public KingdeeUnit getMeasureUnitByNumber(String number) {
         String endUrl = "/jdy/v2/bd/measure_unit_detail";
-        TreeMap<String, String>  params = new TreeMap<>();
+        TreeMap<String, String> params = new TreeMap<>();
         params.put("number", number);
         return getResponse(endUrl, params).getData(KingdeeUnit.class);
     }
@@ -156,7 +152,7 @@ public class KingdeeClient {
         }
         log.debug("adding product");
         String endUrl = "/jdy/v2/bd/material";
-        TreeMap<String, String>  params = new TreeMap<>();
+        TreeMap<String, String> params = new TreeMap<>();
         KingdeeResponse response = postResponse(endUrl, params, kingdeeProductCopy);
         return response;
     }
@@ -171,7 +167,7 @@ public class KingdeeClient {
             log.debug("id not found for " + supplierCopy.getNumber() + "adding new");
         }
         String endUrl = "/jdy/v2/bd/supplier";
-        TreeMap<String, String>  params = new TreeMap<>();
+        TreeMap<String, String> params = new TreeMap<>();
         KingdeeResponse response = postResponse(endUrl, params, supplierCopy);
         return response;
     }
@@ -192,37 +188,37 @@ public class KingdeeClient {
         String groupId = getAuxInfoTypeByNumber("BM").getId();
         //根据number查找金蝶辅助资料中是否存在，number对应erp中的deptId
         KingdeeAuxInfo auxInfoByNumber = getAuxInfoByNumber(departmentCopy.getNumber());
-        if (ObjUtil.isNotEmpty(auxInfoByNumber)){
+        if (ObjUtil.isNotEmpty(auxInfoByNumber)) {
             departmentCopy.setId(auxInfoByNumber.getId());
-        }else {
+        } else {
             //不存在则根据名称去查找是否存在
             KingdeeAuxInfo auxInfoByName = getAuxInfoByName(departmentCopy.getName());
-            if (ObjUtil.isNotEmpty(auxInfoByName)){
+            if (ObjUtil.isNotEmpty(auxInfoByName)) {
                 departmentCopy.setId(auxInfoByName.getId());
             }
         }
         departmentCopy.setGroupId(groupId);
 
-        KingdeeResponse response = postResponse("/jdy/v2/bd/aux_info",  new TreeMap<>(), departmentCopy);
+        KingdeeResponse response = postResponse("/jdy/v2/bd/aux_info", new TreeMap<>(), departmentCopy);
     }
 
     public Stream<KingdeeResponse> list(String endpoint) {
         log.debug("kingdee listing");
         return Stream.iterate(1, n -> n + 1)
-            .map(n->{
+            .map(n -> {
                 String endUrl = endpoint;
-                TreeMap<String, String>  params = new TreeMap<>();
+                TreeMap<String, String> params = new TreeMap<>();
                 params.put("page_size", "100"); //max 100
                 params.put("page", String.valueOf(n));
                 return getResponse(endUrl, params);
             })
-            .takeWhile(n->n.getData(KingdeePage.class).getPage() <= n.getData(KingdeePage.class).getTotalPage());
+            .takeWhile(n -> n.getData(KingdeePage.class).getPage() <= n.getData(KingdeePage.class).getTotalPage());
     }
 
     public KingdeeResponse post(String endpoint, JSONObject payload) {
         log.debug("kingdee posting");
         String endUrl = endpoint;
-        TreeMap<String, String>  params = new TreeMap<>();
+        TreeMap<String, String> params = new TreeMap<>();
         KingdeeResponse response = postResponse(endUrl, params, payload);
         return response;
     }
@@ -230,42 +226,42 @@ public class KingdeeClient {
     public KingdeeAuxInfo getAuxInfoByNumber(String number) {
         log.debug("fetching aux info");
         String endUrl = "/jdy/v2/bd/aux_info";
-        TreeMap<String, String>  params = new TreeMap<>();
+        TreeMap<String, String> params = new TreeMap<>();
         params.put("number", number);
         KingdeeResponse response = getResponse(endUrl, params);
         Optional<KingdeeAuxInfo> first = response.getData(KingdeePage.class).getRowsList(KingdeeAuxInfo.class).stream()
-                .filter(n->n.getNumber().equals(number))
-                .findFirst();
+            .filter(n -> n.getNumber().equals(number))
+            .findFirst();
         return first.orElse(null);
     }
 
     public KingdeeAuxInfo getAuxInfoByName(String name) {
         log.debug("fetching aux info");
         String endUrl = "/jdy/v2/bd/aux_info";
-        TreeMap<String, String>  params = new TreeMap<>();
+        TreeMap<String, String> params = new TreeMap<>();
         params.put("name", name);
         KingdeeResponse response = getResponse(endUrl, params);
         Optional<KingdeeAuxInfo> first = response.getData(KingdeePage.class).getRowsList(KingdeeAuxInfo.class).stream()
-                .filter(n -> n.getName().equals(name))
-                .findFirst();
+            .filter(n -> n.getName().equals(name))
+            .findFirst();
         return first.orElse(null);
     }
 
     public KingdeeAuxInfoType getAuxInfoTypeByNumber(String number) {
         log.debug("fetching aux info");
         String endUrl = "/jdy/v2/bd/aux_info_type";
-        TreeMap<String, String>  params = new TreeMap<>();
+        TreeMap<String, String> params = new TreeMap<>();
         params.put("number", number);
         KingdeeResponse response = getResponse(endUrl, params);
         return response.getData(KingdeePage.class).getRowsList(KingdeeAuxInfoType.class).stream()
-            .filter(n->n.getNumber().equals(number))
+            .filter(n -> n.getNumber().equals(number))
             .findFirst().get();
     }
 
     public Stream<KingdeeCustomField> getCustomField(String entity_number) {
         log.debug("fetching custom field");
         String endUrl = "/jdy/v2/sys/custom_field";
-        TreeMap<String, String>  params = new TreeMap<>();
+        TreeMap<String, String> params = new TreeMap<>();
         params.put("entity_number", entity_number);
         KingdeeResponse response = getResponse(endUrl, params);
         var data = response.getData(KingdeeCustomFieldRespVO.class);
@@ -274,29 +270,42 @@ public class KingdeeClient {
 
     public KingdeeCustomField getCustomFieldByDisplayName(String entity_number, String displayName) {
         return getCustomField(entity_number)
-            .filter(n->n.getDisplayName().equals(displayName))
+            .filter(n -> n.getDisplayName().equals(displayName))
             .findFirst().get();
     }
 
-    public Stream<KingdeePurRequest> getPurRequest(KingdeePurRequestReqVO vo) {
+    public List<KingdeePurRequest> getPurRequest(KingdeePurRequestReqVO vo) {
         log.debug("fetching purchase request");
         String endUrl = "/jdy/v2/scm/pur_request";
         KingdeeResponse response = getResponse(endUrl, vo);
-        return response.getData(KingdeePage.class).getRowsList(KingdeePurRequest.class).stream();
+        return response.getData(KingdeePage.class).getRowsList(KingdeePurRequest.class).stream().toList();
     }
 
-    public Stream<KingdeePurRequest> getPurOrder(KingdeePurOrderReqVO vo) {
+    public List<KingdeePurOrder> getPurOrder(KingdeePurOrderReqVO vo) {
         log.debug("fetching purchase order");
         String endUrl = "/jdy/v2/scm/pur_order";
         KingdeeResponse response = getResponse(endUrl, vo);
-        return response.getData(KingdeePage.class).getRowsList(KingdeePurRequest.class).stream();
+        return response.getData(KingdeePage.class).getRowsList(KingdeePurOrder.class).stream().toList();
+    }
+
+    public KingdeePurOrderDetail getPurOrderDetail(String purOrderNumber) {
+        String endUrl = "/jdy/v2/scm/pur_order_detail";
+        TreeMap<String, String> params = new TreeMap<>();
+        params.put("number", purOrderNumber);
+        KingdeeResponse response = getResponse(endUrl, params);
+        return response.getData(KingdeePurOrderDetail.class);
+    }
+
+    public KingdeePurRequestDetail getPurRequestDetail(String purOrderNumber) {
+        String endUrl = "/jdy/v2/scm/pur_request_detail";
+        TreeMap<String, String> params = new TreeMap<>();
+        params.put("number", purOrderNumber);
+        KingdeeResponse response = getResponse(endUrl, params);
+        return response.getData(KingdeePurRequestDetail.class);
     }
 
 
-
-
-
-    private KingdeeResponse fetchResponse(String requestMethod, String endUrl, TreeMap<String, String>  params, Object body) {
+    private KingdeeResponse fetchResponse(String requestMethod, String endUrl, TreeMap<String, String> params, Object body) {
         String cts = String.valueOf(System.currentTimeMillis());
         String signature = getApiSignature(requestMethod, endUrl, params, cts);
         Map<String, String> headers = getApiHeaders(cts, signature, token.getAppToken());
@@ -331,12 +340,12 @@ public class KingdeeClient {
         }
     }
 
-    public KingdeeResponse getResponse(String endUrl, TreeMap<String, String>  params) {
+    public KingdeeResponse getResponse(String endUrl, TreeMap<String, String> params) {
         return fetchResponse("GET", endUrl, params, null);
 
     }
 
-    public KingdeeResponse postResponse(String endUrl, TreeMap<String, String>  params, Object payload) {
+    public KingdeeResponse postResponse(String endUrl, TreeMap<String, String> params, Object payload) {
         return fetchResponse("POST", endUrl, params, payload);
     }
 
