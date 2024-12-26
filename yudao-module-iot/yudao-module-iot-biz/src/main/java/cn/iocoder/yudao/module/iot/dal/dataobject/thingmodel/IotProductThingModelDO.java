@@ -16,6 +16,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+// TODO @huihui：IotProductThingModelDO => IotThingModelDO
 /**
  * IoT 产品物模型功能 DO
  * <p>

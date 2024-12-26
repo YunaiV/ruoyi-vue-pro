@@ -16,7 +16,6 @@ import cn.iocoder.yudao.module.iot.dal.mysql.thingmodel.IotProductThingModelMapp
 import cn.iocoder.yudao.module.iot.enums.product.IotProductStatusEnum;
 import cn.iocoder.yudao.module.iot.enums.thingmodel.*;
 import cn.iocoder.yudao.module.iot.service.product.IotProductService;
-import cn.iocoder.yudao.module.iot.service.tdengine.IotSuperTableService;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -44,8 +43,6 @@ public class IotProductThingModelServiceImpl implements IotProductThingModelServ
 
     @Resource
     private IotProductService productService;
-    @Resource
-    private IotSuperTableService superTableService;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -72,18 +69,6 @@ public class IotProductThingModelServiceImpl implements IotProductThingModelServ
         }
         // TODO @puhui999: 服务和事件的情况 method 怎么设置？在前端设置还是后端设置？
         return thingModel.getId();
-    }
-
-    @Override
-    public void createSuperTableDataModel(Long productId) {
-        // 1. 查询产品
-        IotProductDO product = productService.getProduct(productId);
-
-        // 2. 查询产品的物模型功能列表
-        List<IotProductThingModelDO> thingModelList = productThingModelMapper.selectListByProductId(productId);
-
-        // 3. 生成 TDengine 的数据模型
-        superTableService.createSuperTableDataModel(product, thingModelList);
     }
 
     @Override

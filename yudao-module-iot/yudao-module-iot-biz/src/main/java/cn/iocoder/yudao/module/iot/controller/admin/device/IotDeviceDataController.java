@@ -7,7 +7,7 @@ import cn.iocoder.yudao.module.iot.controller.admin.device.vo.deviceData.IotDevi
 import cn.iocoder.yudao.module.iot.controller.admin.device.vo.deviceData.IotDeviceDataRespVO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDataDO;
 import cn.iocoder.yudao.module.iot.controller.admin.device.vo.deviceData.IotTimeDataRespVO;
-import cn.iocoder.yudao.module.iot.service.device.IotDeviceDataService;
+import cn.iocoder.yudao.module.iot.service.device.IotDevicePropertyDataService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
@@ -29,7 +29,7 @@ import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 public class IotDeviceDataController {
 
     @Resource
-    private IotDeviceDataService deviceDataService;
+    private IotDevicePropertyDataService deviceDataService;
 
     // TODO @浩浩：这里的 /latest-list，包括方法名。
     @GetMapping("/latest")

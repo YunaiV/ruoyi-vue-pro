@@ -1,19 +1,27 @@
 package cn.iocoder.yudao.module.iot.service.device;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONObject;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.iot.controller.admin.device.vo.deviceData.IotDeviceDataPageReqVO;
+import cn.iocoder.yudao.module.iot.controller.admin.thingmodel.model.dataType.ThingModelDateOrTextDataSpecs;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDataDO;
+import cn.iocoder.yudao.module.iot.dal.dataobject.product.IotProductDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.tdengine.SelectVisualDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.tdengine.ThingModelMessage;
 import cn.iocoder.yudao.module.iot.dal.dataobject.thingmodel.IotProductThingModelDO;
+import cn.iocoder.yudao.module.iot.dal.tdengine.IotDevicePropertyDataMapper;
 import cn.iocoder.yudao.module.iot.dal.redis.deviceData.DeviceDataRedisDAO;
 import cn.iocoder.yudao.module.iot.dal.tdengine.TdEngineDMLMapper;
 import cn.iocoder.yudao.module.iot.enums.IotConstants;
+import cn.iocoder.yudao.module.iot.enums.thingmodel.IotDataSpecsDataTypeEnum;
 import cn.iocoder.yudao.module.iot.enums.thingmodel.IotProductThingModelTypeEnum;
+import cn.iocoder.yudao.module.iot.framework.tdengine.core.TDengineTableField;
+import cn.iocoder.yudao.module.iot.service.product.IotProductService;
 import cn.iocoder.yudao.module.iot.service.tdengine.IotThingModelMessageService;
 import cn.iocoder.yudao.module.iot.service.thingmodel.IotProductThingModelService;
 import jakarta.annotation.Resource;
@@ -28,11 +36,32 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.filterList;
 
-@Slf4j
+/**
+ * IoT 设备【属性】数据 Service 实现类
+ *
+ * @author 芋道源码
+ */
 @Service
-public class IotDeviceDataServiceImpl implements IotDeviceDataService {
+@Slf4j
+public class IotDevicePropertyDataServiceImpl implements IotDevicePropertyDataService {
+
+    /**
+     * 物模型的数据类型，与 TDengine 数据类型的映射关系
+     */
+    private static final Map<String, String> TYPE_MAPPING = MapUtil.<String, String>builder()
+            .put(IotDataSpecsDataTypeEnum.INT.getDataType(), TDengineTableField.TYPE_INT)
+            .put(IotDataSpecsDataTypeEnum.FLOAT.getDataType(), TDengineTableField.TYPE_FLOAT)
+            .put(IotDataSpecsDataTypeEnum.DOUBLE.getDataType(), TDengineTableField.TYPE_DOUBLE)
+            .put(IotDataSpecsDataTypeEnum.ENUM.getDataType(), TDengineTableField.TYPE_TINYINT) // TODO 芋艿：为什么要映射为 TINYINT 的说明？
+            .put( IotDataSpecsDataTypeEnum.BOOL.getDataType(), TDengineTableField.TYPE_TINYINT) // TODO 芋艿：为什么要映射为 TINYINT 的说明？
+            .put(IotDataSpecsDataTypeEnum.TEXT.getDataType(), TDengineTableField.TYPE_NCHAR)
+            .put(IotDataSpecsDataTypeEnum.DATE.getDataType(), TDengineTableField.TYPE_TIMESTAMP)
+            .put(IotDataSpecsDataTypeEnum.STRUCT.getDataType(), TDengineTableField.TYPE_NCHAR) // TODO 芋艿：怎么映射！！！！
+            .put(IotDataSpecsDataTypeEnum.ARRAY.getDataType(), TDengineTableField.TYPE_NCHAR) // TODO 芋艿：怎么映射！！！！
+            .build();
 
     @Value("${spring.datasource.dynamic.datasource.tdengine.url}")
     private String url;
@@ -44,10 +73,59 @@ public class IotDeviceDataServiceImpl implements IotDeviceDataService {
     @Resource
     private IotProductThingModelService thingModelService;
     @Resource
+    private IotProductService productService;
+
+    @Resource
     private TdEngineDMLMapper tdEngineDMLMapper;
 
     @Resource
     private DeviceDataRedisDAO deviceDataRedisDAO;
+
+    @Resource
+    private IotDevicePropertyDataMapper devicePropertyDataMapper;
+
+    @Override
+    public void defineDevicePropertyData(Long productId) {
+        // 1.1 查询产品和物模型
+        IotProductDO product = productService.validateProductExists(productId);
+        List<IotProductThingModelDO> thingModels = filterList(thingModelService.getProductThingModelListByProductId(productId),
+                thingModel -> IotProductThingModelTypeEnum.PROPERTY.getType().equals(thingModel.getType()));
+        // 1.2 解析 DB 里的字段
+        List<TDengineTableField> oldFields = new ArrayList<>();
+        try {
+            oldFields.addAll(devicePropertyDataMapper.getProductPropertySTableFieldList(product.getProductKey()));
+        } catch (Exception e) {
+            if (!e.getMessage().contains("Table does not exist")) {
+                throw e;
+            }
+        }
+
+        // 2.1 情况一：如果是新增的时候，需要创建表
+        List<TDengineTableField> newFields = buildTableFieldList(thingModels);
+        if (CollUtil.isEmpty(oldFields)) {
+            if (CollUtil.isEmpty(newFields)) {
+                log.info("[defineDevicePropertyData][productId({}) 没有需要定义的属性]", productId);
+                return;
+            }
+            newFields.add(0, new TDengineTableField(TDengineTableField.FIELD_TS, TDengineTableField.TYPE_TIMESTAMP));
+            devicePropertyDataMapper.createProductPropertySTable(product.getProductKey(), newFields);
+            return;
+        }
+        // 2.2 情况二：如果是修改的时候，需要更新表
+        devicePropertyDataMapper.alterProductPropertySTable(product.getProductKey(), oldFields, newFields);
+    }
+
+    private List<TDengineTableField> buildTableFieldList(List<IotProductThingModelDO> thingModels) {
+        return convertList(thingModels, thingModel -> {
+            TDengineTableField field = new TDengineTableField(
+                    StrUtil.toUnderlineCase(thingModel.getIdentifier()), // TDengine 字段默认都是小写
+                    TYPE_MAPPING.get(thingModel.getProperty().getDataType()));
+            if (thingModel.getProperty().getDataType().equals(IotDataSpecsDataTypeEnum.TEXT.getDataType())) {
+                field.setLength(((ThingModelDateOrTextDataSpecs) thingModel.getProperty().getDataSpecs()).getLength());
+            }
+            return field;
+        });
+    }
 
     @Override
     public void saveDeviceData(String productKey, String deviceName, String message) {

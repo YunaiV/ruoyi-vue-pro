@@ -12,6 +12,7 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Deprecated
 public class TdResponse {
 
     public static final int CODE_SUCCESS = 0;

@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+// TODO 芋艿：看看是不是后续简化掉。
 /**
  * TD 引擎的字段
  */
@@ -12,6 +13,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@Deprecated
 public class TdFieldDO {
 
     /**

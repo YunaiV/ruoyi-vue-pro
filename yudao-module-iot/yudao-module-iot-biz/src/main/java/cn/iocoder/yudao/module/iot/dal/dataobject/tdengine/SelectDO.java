@@ -2,13 +2,12 @@ package cn.iocoder.yudao.module.iot.dal.dataobject.tdengine;
 
 import lombok.Data;
 
-import java.util.Set;
-
 // TODO @haohao：类似这个，其实可以参考 mybatis plus，querywrapper，搞个 TdEngineQueryWrapper。这样看起来会更好懂。
 /**
  * 查询DO
  */
 @Data
+@Deprecated
 public class SelectDO {
 
     // TODO @haoha：database 是个单词

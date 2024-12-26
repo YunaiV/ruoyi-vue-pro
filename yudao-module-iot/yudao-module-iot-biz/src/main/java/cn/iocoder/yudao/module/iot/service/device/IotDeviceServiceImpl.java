@@ -9,6 +9,7 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.common.util.validation.ValidationUtils;
 import cn.iocoder.yudao.framework.tenant.core.aop.TenantIgnore;
+import cn.iocoder.yudao.framework.tenant.core.util.TenantUtils;
 import cn.iocoder.yudao.module.iot.controller.admin.device.vo.device.*;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceGroupDO;
@@ -60,9 +61,11 @@ public class IotDeviceServiceImpl implements IotDeviceService {
             throw exception(PRODUCT_NOT_EXISTS);
         }
         // 1.2 校验设备标识是否唯一
-        if (deviceMapper.selectByDeviceKey(createReqVO.getDeviceKey()) != null) {
-            throw exception(DEVICE_KEY_EXISTS);
-        }
+        TenantUtils.executeIgnore(() -> {
+            if (deviceMapper.selectByDeviceKey(createReqVO.getDeviceKey()) != null) {
+                throw exception(PRODUCT_KEY_EXISTS);
+            }
+        });
         // 1.3 校验设备名称在同一产品下是否唯一
         if (deviceMapper.selectByProductKeyAndDeviceName(product.getProductKey(), createReqVO.getDeviceKey()) != null) {
             throw exception(DEVICE_NAME_EXISTS);

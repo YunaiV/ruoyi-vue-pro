@@ -16,6 +16,7 @@ public class FieldParser {
     /**
      * 物模型到td数据类型映射
      */
+    @Deprecated
     private static final HashMap<String, String> TYPE_MAPPING = new HashMap<>() {
         {
             put("INT", "INT");
@@ -74,6 +75,7 @@ public class FieldParser {
     /**
      * 获取字段字义
      */
+    @Deprecated
     public static String getFieldDefine(TdFieldDO field) {
         return "`" + field.getFieldName() + "`" + " "
                 + (field.getDataLength() > 0 ? String.format("%s(%d)", field.getDataType(), field.getDataLength())

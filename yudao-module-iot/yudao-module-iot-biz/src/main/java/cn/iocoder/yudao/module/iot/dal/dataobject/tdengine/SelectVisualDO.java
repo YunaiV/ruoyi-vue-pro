@@ -6,6 +6,7 @@ import java.util.Map;
 
 // TODO @haohao：类似 SelectDO 的想法，只是它是返回。ps：貌似可以在 tdengine 里面，创建一个 query 包，放这种比较特殊的查询和结果对象。dataobject 更多还是实际存储的结构化的 do
 @Data
+@Deprecated
 public class SelectVisualDO {
 
     /**
