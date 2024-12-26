@@ -1,17 +1,23 @@
 package com.somle.esb.job;
 
 
+import cn.hutool.core.text.csv.CsvData;
 import com.somle.amazon.controller.vo.AmazonSpReportSaveVO;
 import com.somle.amazon.service.AmazonService;
 import com.somle.esb.model.Domain;
 import com.somle.esb.model.OssData;
 import com.somle.esb.service.EsbService;
+import com.somle.framework.common.util.collection.MapUtils;
+import com.somle.framework.common.util.csv.CsvUtils;
 import com.somle.framework.common.util.json.JSONObject;
 import com.somle.framework.common.util.json.JsonUtils;
+import com.somle.framework.common.util.string.StrUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Component
 public class AmazonspAsinReportDataJob extends AmazonspDataJob {
@@ -24,17 +30,15 @@ public class AmazonspAsinReportDataJob extends AmazonspDataJob {
 
         amazonService.spClient.getShops().map(shop-> {
             var options = AmazonSpReportSaveVO.ReportOptions.builder()
-                    .asinGranularity("CHILD")
-                    .dateGranularity("DAY")
-                    .build();
+                .asinGranularity("CHILD")
+                .dateGranularity("DAY")
+                .build();
             var vo = AmazonSpReportSaveVO.builder()
-                    .reportType("GET_SALES_AND_TRAFFIC_REPORT")
-                    .marketplaceIds(List.of(shop.getCountry().getMarketplaceId()))
-                    .reportOptions(options)
-                    .build();
-            var reportString = amazonService.spClient.createAndGetReport(shop.getSeller(), vo, "gzip");
-            var report = JsonUtils.parseObject(reportString, JSONObject.class);
-            return report;
+                .reportType("GET_SALES_AND_TRAFFIC_REPORT")
+                .marketplaceIds(List.of(shop.getCountry().getMarketplaceId()))
+                .reportOptions(options)
+                .build();
+            return amazonService.spClient.createAndGetReport(shop.getSeller(), vo, "gzip");
         })
         .forEach(report -> {
             OssData data = OssData.builder()
@@ -43,7 +47,7 @@ public class AmazonspAsinReportDataJob extends AmazonspDataJob {
                 .syncType("inc")
                 .requestTimestamp(System.currentTimeMillis())
                 .folderDate(dataDate)
-                .content(report)
+                .content(JsonUtils.toJSONObject(report))
                 .headers(null)
                 .build();
             service.send(data);

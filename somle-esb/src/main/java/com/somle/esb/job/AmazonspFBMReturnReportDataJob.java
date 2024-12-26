@@ -4,12 +4,13 @@ package com.somle.esb.job;
 import com.somle.amazon.controller.vo.AmazonSpReportReqVO;
 import com.somle.amazon.controller.vo.AmazonSpReportReqVO.ProcessingStatuses;
 import com.somle.esb.model.OssData;
+import com.somle.framework.common.util.csv.CsvUtils;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 
 @Component
-public class AmazonspReturnReportDataJob extends AmazonspDataJob {
+public class AmazonspFBMReturnReportDataJob extends AmazonspDataJob {
 
 
     @Override
@@ -29,13 +30,14 @@ public class AmazonspReturnReportDataJob extends AmazonspDataJob {
                 amazonService.spClient.getReportStream(seller, vo, null)
             )
             .forEach(report -> {
+                var csvData = CsvUtils.toMapList(report);
                 OssData data = OssData.builder()
                     .database(DATABASE)
-                    .tableName("return_report")
+                    .tableName("fbm_return_report")
                     .syncType("inc")
                     .requestTimestamp(System.currentTimeMillis())
                     .folderDate(beforeYesterday)
-                    .content(report)
+                    .content(csvData)
                     .headers(null)
                     .build();
                 service.send(data);

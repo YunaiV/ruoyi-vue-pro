@@ -1,13 +1,18 @@
 package com.somle.esb.job;
 
 
+import cn.hutool.json.JSONUtil;
 import com.somle.amazon.controller.vo.AmazonSpReportReqVO;
 import com.somle.amazon.controller.vo.AmazonSpReportReqVO.ProcessingStatuses;
 
 import com.somle.esb.model.OssData;
+import com.somle.framework.common.util.collection.MapUtils;
+import com.somle.framework.common.util.json.JsonUtils;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Component
 public class AmazonspSettlementReportDataJob extends AmazonspDataJob {

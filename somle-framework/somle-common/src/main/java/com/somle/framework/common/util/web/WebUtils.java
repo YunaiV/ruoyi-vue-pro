@@ -1,22 +1,26 @@
 package com.somle.framework.common.util.web;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.somle.framework.common.util.json.JSONObject;
-import com.somle.framework.common.util.json.JsonUtils;
-import lombok.SneakyThrows;
-import lombok.extern.slf4j.Slf4j;
-import okhttp3.*;
-import org.apache.commons.collections4.MultiValuedMap;
-import org.apache.tomcat.util.http.fileupload.IOUtils;
-
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.zip.GZIPInputStream;
+
+import com.somle.framework.common.util.json.JSONObject;
+import com.somle.framework.common.util.json.JsonUtils;
+import lombok.SneakyThrows;
+import okhttp3.*;
+import org.apache.commons.collections4.MultiValuedMap;
+import org.apache.tomcat.util.http.fileupload.IOUtils;
+
+//import com.alibaba.fastjson2.JSON;
+//import com.alibaba.fastjson2.JSONArray;
+//import com.alibaba.fastjson2.JSONObject;
+
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class WebUtils {
@@ -167,26 +171,26 @@ public class WebUtils {
 
     @SneakyThrows
     public static String urlToString(String urlString, String compression) {
+        InputStream inputStream = urlToInputStream(urlString, compression);
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        IOUtils.copy(inputStream, byteArrayOutputStream);
+        return byteArrayOutputStream.toString();
+    }
+
+
+
+    @SneakyThrows
+    private static InputStream urlToInputStream(String urlString, String compression) {
         URL url = new URL(urlString);
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setRequestMethod("GET");
-        // Choose input stream based on compression type
         InputStream inputStream = connection.getInputStream();
         if ("gzip".equalsIgnoreCase(compression)) {
             inputStream = new GZIPInputStream(inputStream);
         }
-        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        IOUtils.copy(inputStream, byteArrayOutputStream);
-        String jsonString = byteArrayOutputStream.toString();
-        return jsonString;
+        return inputStream;
     }
 
-//    public static <T> T parallelRun(int parallelism, Callable<T> codeBlock) {
-//        ForkJoinPool customThreadPool = new ForkJoinPool(parallelism);
-//        var result = customThreadPool.submit(codeBlock).join();
-//        customThreadPool.shutdown();
-//        return result;
-//    }
 
     // TODO: a general method to handle http exception (429, timeout etc)
 
