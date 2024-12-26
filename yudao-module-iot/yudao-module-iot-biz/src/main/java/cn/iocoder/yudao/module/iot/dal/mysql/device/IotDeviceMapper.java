@@ -6,6 +6,7 @@ import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.module.iot.controller.admin.device.vo.device.IotDevicePageReqVO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDO;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
@@ -47,7 +48,8 @@ public interface IotDeviceMapper extends BaseMapperX<IotDeviceDO> {
     }
 
     default IotDeviceDO selectByDeviceKey(String deviceKey) {
-        return selectOne(IotDeviceDO::getDeviceKey, deviceKey);
+        return selectOne(new LambdaQueryWrapper<IotDeviceDO>()
+                .apply("LOWER(device_key) = {0}", deviceKey.toLowerCase()));
     }
 
     default List<IotDeviceDO> selectList(Integer deviceType) {

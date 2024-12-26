@@ -5,6 +5,7 @@ import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.module.iot.controller.admin.product.vo.product.IotProductPageReqVO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.product.IotProductDO;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import org.apache.ibatis.annotations.Mapper;
 
 /**
@@ -23,7 +24,8 @@ public interface IotProductMapper extends BaseMapperX<IotProductDO> {
     }
 
     default IotProductDO selectByProductKey(String productKey) {
-        return selectOne(IotProductDO::getProductKey, productKey);
+        return selectOne(new LambdaQueryWrapper<IotProductDO>()
+                .apply("LOWER(product_key) = {0}", productKey.toLowerCase()));
     }
 
 }

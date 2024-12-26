@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.iot.service.product;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
+import cn.iocoder.yudao.framework.tenant.core.util.TenantUtils;
 import cn.iocoder.yudao.module.iot.controller.admin.product.vo.product.IotProductPageReqVO;
 import cn.iocoder.yudao.module.iot.controller.admin.product.vo.product.IotProductSaveReqVO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.product.IotProductDO;
@@ -9,7 +10,6 @@ import cn.iocoder.yudao.module.iot.dal.mysql.product.IotProductMapper;
 import cn.iocoder.yudao.module.iot.enums.product.IotProductStatusEnum;
 import cn.iocoder.yudao.module.iot.service.device.IotDevicePropertyDataService;
 import cn.iocoder.yudao.module.iot.service.tdengine.IotThingModelMessageService;
-import cn.iocoder.yudao.module.iot.service.thingmodel.IotProductThingModelService;
 import com.baomidou.dynamic.datasource.annotation.DSTransactional;
 import jakarta.annotation.Resource;
 import org.springframework.context.annotation.Lazy;
@@ -35,9 +35,6 @@ public class IotProductServiceImpl implements IotProductService {
     private IotProductMapper productMapper;
 
     @Resource
-    @Lazy // 延迟加载，解决循环依赖
-    private IotProductThingModelService thingModelFunctionService;
-    @Resource
     @Lazy  // 延迟加载，解决循环依赖
     private IotThingModelMessageService thingModelMessageService;
     @Resource
@@ -46,11 +43,14 @@ public class IotProductServiceImpl implements IotProductService {
 
     @Override
     public Long createProduct(IotProductSaveReqVO createReqVO) {
-        // 1. 生成 ProductKey
-        // TODO 芋艿：校验时，需要跨租户唯一，避免 TDEngine 无法处理；并且要忽略大小写
-        if (productMapper.selectByProductKey(createReqVO.getProductKey()) != null) {
-            throw exception(PRODUCT_KEY_EXISTS);
-        }
+        // 1. 校验 ProductKey
+        TenantUtils.executeIgnore(() -> {
+            // 为什么忽略租户？避免多个租户之间，productKey 重复，导致 TDengine 设备属性表重复
+            if (productMapper.selectByProductKey(createReqVO.getProductKey()) != null) {
+                throw exception(PRODUCT_KEY_EXISTS);
+            }
+        });
+
         // 2. 插入
         IotProductDO product = BeanUtils.toBean(createReqVO, IotProductDO.class)
                 .setStatus(IotProductStatusEnum.UNPUBLISHED.getStatus());
