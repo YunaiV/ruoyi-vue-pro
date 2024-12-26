@@ -176,7 +176,7 @@ tenant-id: {{adminTenentId}}
 Authorization: Bearer {{token}}
 
 ### 请求 /iot/product-thing-model/get 接口 => 成功
-GET {{baseUrl}}/iot/product-thing-model/get?id=40
+GET {{baseUrl}}/iot/product-thing-model/get?id=67
 tenant-id: {{adminTenentId}}
 Authorization: Bearer {{token}}
 

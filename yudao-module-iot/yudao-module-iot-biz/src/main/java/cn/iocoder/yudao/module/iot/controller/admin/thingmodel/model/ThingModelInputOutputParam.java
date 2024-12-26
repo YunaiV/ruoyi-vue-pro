@@ -23,11 +23,6 @@ public class ThingModelInputOutputParam {
      */
     private String name;
     /**
-     * 参数描述
-     */
-    // TODO @puhui999: 考虑移除
-    private String description;
-    /**
      * 用于区分输入或输出参数
      *
      * 关联枚举 {@link IotProductThingModelParamDirectionEnum}

@@ -193,17 +193,17 @@ public class IotProductThingModelServiceImpl implements IotProductThingModelServ
         // 2.1 生成属性上报事件
         ThingModelEvent propertyPostEvent = generatePropertyPostEvent(propertyList);
         if (propertyPostEvent != null) {
-            newThingModelList.add(buildEventThingModelDO(productId, productKey, propertyPostEvent));
+            newThingModelList.add(buildEventThingModelDO(productId, productKey, propertyPostEvent, "属性上报事件"));
         }
         // 2.2 生成属性设置服务
         ThingModelService propertySetService = generatePropertySetService(propertyList);
         if (propertySetService != null) {
-            newThingModelList.add(buildServiceThingModelDO(productId, productKey, propertySetService));
+            newThingModelList.add(buildServiceThingModelDO(productId, productKey, propertySetService, "属性设置服务"));
         }
         // 2.3 生成属性获取服务
         ThingModelService propertyGetService = generatePropertyGetService(propertyList);
         if (propertyGetService != null) {
-            newThingModelList.add(buildServiceThingModelDO(productId, productKey, propertyGetService));
+            newThingModelList.add(buildServiceThingModelDO(productId, productKey, propertyGetService,"属性获取服务"));
         }
 
         // 3.1 获取数据库中的默认的旧事件和服务列表
@@ -246,18 +246,20 @@ public class IotProductThingModelServiceImpl implements IotProductThingModelServ
     /**
      * 构建事件功能对象
      */
-    private IotProductThingModelDO buildEventThingModelDO(Long productId, String productKey, ThingModelEvent event) {
+    private IotProductThingModelDO buildEventThingModelDO(Long productId, String productKey, ThingModelEvent event,
+                                                          String description) {
         return new IotProductThingModelDO().setProductId(productId).setProductKey(productKey)
-                .setIdentifier(event.getIdentifier()).setName(event.getName()).setDescription(event.getDescription())
+                .setIdentifier(event.getIdentifier()).setName(event.getName()).setDescription(description)
                 .setType(IotProductThingModelTypeEnum.EVENT.getType()).setEvent(event);
     }
 
     /**
      * 构建服务功能对象
      */
-    private IotProductThingModelDO buildServiceThingModelDO(Long productId, String productKey, ThingModelService service) {
+    private IotProductThingModelDO buildServiceThingModelDO(Long productId, String productKey, ThingModelService service,
+                                                            String description) {
         return new IotProductThingModelDO().setProductId(productId).setProductKey(productKey)
-                .setIdentifier(service.getIdentifier()).setName(service.getName()).setDescription(service.getDescription())
+                .setIdentifier(service.getIdentifier()).setName(service.getName()).setDescription(description)
                 .setType(IotProductThingModelTypeEnum.SERVICE.getType()).setService(service);
     }
 
@@ -271,8 +273,8 @@ public class IotProductThingModelServiceImpl implements IotProductThingModelServ
         }
 
         // 1.2 生成属性上报事件
-        return new ThingModelEvent().setIdentifier("post").setName("属性上报").setDescription("属性上报事件")
-                .setType(IotProductThingModelServiceEventTypeEnum.INFO.getType()).setMethod("thing.event.property.post")
+        return new ThingModelEvent().setIdentifier("post").setName("属性上报").setMethod("thing.event.property.post")
+                .setType(IotProductThingModelServiceEventTypeEnum.INFO.getType())
                 .setOutputParams(buildInputOutputParam(thingModelList, IotProductThingModelParamDirectionEnum.OUTPUT));
     }
 
@@ -289,8 +291,8 @@ public class IotProductThingModelServiceImpl implements IotProductThingModelServ
         }
 
         // 2. 生成属性设置服务
-        return new ThingModelService().setIdentifier("set").setName("属性设置").setDescription("属性设置服务")
-                .setCallType(IotProductThingModelServiceCallTypeEnum.ASYNC.getType()).setMethod("thing.service.property.set")
+        return new ThingModelService().setIdentifier("set").setName("属性设置").setMethod("thing.service.property.set")
+                .setCallType(IotProductThingModelServiceCallTypeEnum.ASYNC.getType())
                 .setInputParams(buildInputOutputParam(thingModelList, IotProductThingModelParamDirectionEnum.INPUT))
                 .setOutputParams(Collections.emptyList()); // 属性设置服务一般不需要输出参数
     }
@@ -305,8 +307,8 @@ public class IotProductThingModelServiceImpl implements IotProductThingModelServ
         }
 
         // 1.2 生成属性获取服务
-        return new ThingModelService().setIdentifier("get").setName("属性获取").setDescription("属性获取服务")
-                .setCallType(IotProductThingModelServiceCallTypeEnum.ASYNC.getType()).setMethod("thing.service.property.get")
+        return new ThingModelService().setIdentifier("get").setName("属性获取").setMethod("thing.service.property.get")
+                .setCallType(IotProductThingModelServiceCallTypeEnum.ASYNC.getType())
                 .setInputParams(buildInputOutputParam(thingModelList, IotProductThingModelParamDirectionEnum.INPUT))
                 .setOutputParams(buildInputOutputParam(thingModelList, IotProductThingModelParamDirectionEnum.OUTPUT));
     }
