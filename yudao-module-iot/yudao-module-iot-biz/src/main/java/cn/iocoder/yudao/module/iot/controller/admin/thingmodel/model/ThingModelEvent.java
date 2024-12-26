@@ -22,16 +22,13 @@ public class ThingModelEvent {
      */
     private String name;
     /**
-     * 是否是标准品类的必选事件。
-     *
-     * - true：是
-     * - false：否
+     * 是否是标准品类的必选事件
      */
     private Boolean required;
     /**
      * 事件类型
      *
-     * 关联枚举 {@link IotProductThingModelServiceEventTypeEnum}
+     * 枚举 {@link IotProductThingModelServiceEventTypeEnum}
      */
     private String type;
     /**
