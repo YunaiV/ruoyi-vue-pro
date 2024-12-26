@@ -25,10 +25,6 @@ public class ThingModelProperty {
      */
     private String name;
     /**
-     * 属性描述
-     */
-    private String description;
-    /**
      * 云端可以对该属性进行的操作类型
      *
      * 枚举 {@link IotProductThingModelAccessModeEnum}
