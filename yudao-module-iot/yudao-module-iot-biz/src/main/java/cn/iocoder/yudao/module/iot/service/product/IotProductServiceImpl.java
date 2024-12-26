@@ -47,6 +47,7 @@ public class IotProductServiceImpl implements IotProductService {
     @Override
     public Long createProduct(IotProductSaveReqVO createReqVO) {
         // 1. 生成 ProductKey
+        // TODO 芋艿：校验时，需要跨租户唯一，避免 TDEngine 无法处理；并且要忽略大小写
         if (productMapper.selectByProductKey(createReqVO.getProductKey()) != null) {
             throw exception(PRODUCT_KEY_EXISTS);
         }

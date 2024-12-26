@@ -100,6 +100,7 @@ public class IotDevicePropertyDataServiceImpl implements IotDevicePropertyDataSe
             }
         }
 
+        // TODO 芋艿：建表的时候，表名要小写么？
         // 2.1 情况一：如果是新增的时候，需要创建表
         List<TDengineTableField> newFields = buildTableFieldList(thingModels);
         if (CollUtil.isEmpty(oldFields)) {

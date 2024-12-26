@@ -60,6 +60,7 @@ public class IotDeviceServiceImpl implements IotDeviceService {
             throw exception(PRODUCT_NOT_EXISTS);
         }
         // 1.2 校验设备标识是否唯一
+        // TODO 芋艿：校验时，需要跨租户唯一，避免 TDEngine 无法处理；并且要忽略大小写
         if (deviceMapper.selectByDeviceKey(createReqVO.getDeviceKey()) != null) {
             throw exception(DEVICE_KEY_EXISTS);
         }

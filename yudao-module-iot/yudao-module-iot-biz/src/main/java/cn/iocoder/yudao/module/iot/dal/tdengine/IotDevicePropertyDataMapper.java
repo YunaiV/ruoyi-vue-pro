@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.iot.dal.tdengine;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.iocoder.yudao.module.iot.framework.tdengine.core.TDengineTableField;
 import cn.iocoder.yudao.module.iot.framework.tdengine.core.annotation.TDengineDS;
@@ -7,6 +8,7 @@ import com.baomidou.mybatisplus.annotation.InterceptorIgnore;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -29,18 +31,38 @@ public interface IotDevicePropertyDataMapper {
         List<TDengineTableField> addFields = newFields.stream().filter( // 新增的字段
                         newField -> oldFields.stream().noneMatch(oldField -> oldField.getField().equals(newField.getField())))
                 .collect(Collectors.toList());
-        List<TDengineTableField> modifyFields = newFields.stream().filter( // 更新的字段
-                        newField -> oldFields.stream().anyMatch(oldField -> oldField.getField().equals(newField.getField())
-                                && (ObjectUtil.notEqual(oldField.getType(), newField.getType())
-                                    || (newField.getLength() != null && ObjectUtil.notEqual(oldField.getLength(), newField.getLength())))))
-                .collect(Collectors.toList());
         List<TDengineTableField> dropFields = oldFields.stream().filter( // 删除的字段
                         oldField -> newFields.stream().noneMatch(n -> n.getField().equals(oldField.getField())))
                 .collect(Collectors.toList());
+        List<TDengineTableField> modifyTypeFields = new ArrayList<>(); // 变更类型的字段
+        List<TDengineTableField> modifyLengthFields = new ArrayList<>(); // 变更长度的字段
+        newFields.forEach(newField -> {
+            TDengineTableField oldField = CollUtil.findOne(oldFields, field -> field.getField().equals(newField.getField()));
+            if (oldField == null) {
+                return;
+            }
+            if (ObjectUtil.notEqual(oldField.getType(), newField.getType())) {
+                modifyTypeFields.add(newField);
+                return;
+            }
+            if (newField.getLength()!= null) {
+                if (newField.getLength() > oldField.getLength()) {
+                    modifyLengthFields.add(newField);
+                } else if (newField.getLength() < oldField.getLength()) {
+                    // 特殊：TDengine 长度修改时，只允许变长，所以此时认为是修改类型
+                    modifyTypeFields.add(newField);
+                }
+            }
+        });
+
+        // 执行
         addFields.forEach(field -> alterProductPropertySTableAddField(productKey, field));
-        // TODO 芋艿：tdengine 只允许 modify 长度；如果 type 变化，只能 drop + add
-        modifyFields.forEach(field -> alterProductPropertySTableModifyField(productKey, field));
         dropFields.forEach(field -> alterProductPropertySTableDropField(productKey, field));
+        modifyLengthFields.forEach(field -> alterProductPropertySTableModifyField(productKey, field));
+        modifyTypeFields.forEach(field -> {
+            alterProductPropertySTableDropField(productKey, field);
+            alterProductPropertySTableAddField(productKey, field);
+        });
     }
 
     void alterProductPropertySTableAddField(@Param("productKey") String productKey,
