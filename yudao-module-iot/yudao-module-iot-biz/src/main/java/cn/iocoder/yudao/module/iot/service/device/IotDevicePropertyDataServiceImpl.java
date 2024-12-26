@@ -100,7 +100,6 @@ public class IotDevicePropertyDataServiceImpl implements IotDevicePropertyDataSe
             }
         }
 
-        // TODO 芋艿：建表的时候，表名要小写么？
         // 2.1 情况一：如果是新增的时候，需要创建表
         List<TDengineTableField> newFields = buildTableFieldList(thingModels);
         if (CollUtil.isEmpty(oldFields)) {
@@ -119,7 +118,7 @@ public class IotDevicePropertyDataServiceImpl implements IotDevicePropertyDataSe
     private List<TDengineTableField> buildTableFieldList(List<IotProductThingModelDO> thingModels) {
         return convertList(thingModels, thingModel -> {
             TDengineTableField field = new TDengineTableField(
-                    thingModel.getIdentifier().toLowerCase(), // TODO 芋艿：为什么要转成小写？
+                    StrUtil.toUnderlineCase(thingModel.getIdentifier()), // TDengine 字段默认都是小写
                     TYPE_MAPPING.get(thingModel.getProperty().getDataType()));
             if (thingModel.getProperty().getDataType().equals(IotDataSpecsDataTypeEnum.TEXT.getDataType())) {
                 field.setLength(((ThingModelDateOrTextDataSpecs) thingModel.getProperty().getDataSpecs()).getLength());
