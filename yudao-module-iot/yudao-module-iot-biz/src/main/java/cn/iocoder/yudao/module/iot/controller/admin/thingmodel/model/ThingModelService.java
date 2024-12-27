@@ -22,16 +22,13 @@ public class ThingModelService {
      */
     private String name;
     /**
-     * 是否是标准品类的必选服务。
-     *
-     * - true：是
-     * - false：否
+     * 是否是标准品类的必选服务
      */
     private Boolean required;
     /**
      * 调用类型
      *
-     * 关联枚举 {@link IotThingModelServiceCallTypeEnum}
+     * 枚举 {@link IotThingModelServiceCallTypeEnum}
      */
     private String callType;
     /**
