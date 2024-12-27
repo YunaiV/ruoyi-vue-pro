@@ -2,7 +2,6 @@ package cn.iocoder.yudao.module.member.service.point;
 
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.member.controller.admin.point.vo.recrod.MemberPointRecordPageReqVO;
 import cn.iocoder.yudao.module.member.controller.app.point.vo.AppMemberPointRecordPageReqVO;
@@ -11,6 +10,7 @@ import cn.iocoder.yudao.module.member.dal.dataobject.user.MemberUserDO;
 import cn.iocoder.yudao.module.member.dal.mysql.point.MemberPointRecordMapper;
 import cn.iocoder.yudao.module.member.enums.point.MemberPointBizTypeEnum;
 import cn.iocoder.yudao.module.member.service.user.MemberUserService;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
@@ -18,7 +18,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.validation.annotation.Validated;
 
-import javax.annotation.Resource;
 import java.util.List;
 import java.util.Set;
 
@@ -75,7 +74,9 @@ public class MemberPointRecordServiceImpl implements MemberPointRecordService {
         Integer userPoint = ObjectUtil.defaultIfNull(user.getPoint(), 0);
         int totalPoint = userPoint + point; // 用户变动后的积分
         if (totalPoint < 0) {
-            throw exception(USER_POINT_NOT_ENOUGH);
+            log.error("[createPointRecord][userId({}) point({}) bizType({}) bizId({}) {}]", userId, point, bizType, bizId,
+                    USER_POINT_NOT_ENOUGH);
+            return;
         }
 
         // 2. 更新用户积分

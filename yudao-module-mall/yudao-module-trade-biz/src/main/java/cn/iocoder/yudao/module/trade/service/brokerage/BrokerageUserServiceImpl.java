@@ -8,9 +8,11 @@ import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils;
+import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.mybatis.core.util.MyBatisUtils;
 import cn.iocoder.yudao.module.member.api.user.MemberUserApi;
 import cn.iocoder.yudao.module.member.api.user.dto.MemberUserRespDTO;
+import cn.iocoder.yudao.module.trade.controller.admin.brokerage.vo.user.BrokerageUserCreateReqVO;
 import cn.iocoder.yudao.module.trade.controller.admin.brokerage.vo.user.BrokerageUserPageReqVO;
 import cn.iocoder.yudao.module.trade.controller.app.brokerage.vo.user.AppBrokerageUserChildSummaryPageReqVO;
 import cn.iocoder.yudao.module.trade.controller.app.brokerage.vo.user.AppBrokerageUserChildSummaryRespVO;
@@ -27,6 +29,7 @@ import cn.iocoder.yudao.module.trade.enums.brokerage.BrokerageRecordStatusEnum;
 import cn.iocoder.yudao.module.trade.service.config.TradeConfigService;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
@@ -110,7 +113,6 @@ public class BrokerageUserServiceImpl implements BrokerageUserService {
         if (brokerageUserDO == null) {
             throw exception(BROKERAGE_USER_NOT_EXISTS);
         }
-
         return brokerageUserDO;
     }
 
@@ -200,6 +202,24 @@ public class BrokerageUserServiceImpl implements BrokerageUserService {
             brokerageUserMapper.updateById(fillBindUserData(bindUserId, new BrokerageUserDO().setId(userId)));
         }
         return true;
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public Long createBrokerageUser(BrokerageUserCreateReqVO createReqVO) {
+        // 1.1 校验分销用户是否已存在
+        BrokerageUserDO brokerageUser = brokerageUserMapper.selectById(createReqVO.getUserId());
+        if (brokerageUser != null) {
+            throw exception(BROKERAGE_CREATE_USER_EXISTS);
+        }
+        // 1.2 校验是否能绑定用户
+        brokerageUser = BeanUtils.toBean(createReqVO, BrokerageUserDO.class).setId(createReqVO.getUserId())
+                .setBrokerageTime(LocalDateTime.now());
+        validateCanBindUser(brokerageUser, createReqVO.getBindUserId());
+
+        // 2. 创建分销人
+        brokerageUserMapper.insert(brokerageUser);
+        return brokerageUser.getId();
     }
 
     /**

@@ -47,6 +47,13 @@ public class BrokerageUserController {
     @Resource
     private MemberUserApi memberUserApi;
 
+    @PostMapping("/create")
+    @Operation(summary = "创建分销用户")
+    @PreAuthorize("@ss.hasPermission('trade:brokerage-user:create')")
+    public CommonResult<Long> createBrokerageUser(@Valid @RequestBody BrokerageUserCreateReqVO createReqVO) {
+        return success(brokerageUserService.createBrokerageUser(createReqVO));
+    }
+
     @PutMapping("/update-bind-user")
     @Operation(summary = "修改推广员")
     @PreAuthorize("@ss.hasPermission('trade:brokerage-user:update-bind-user')")
