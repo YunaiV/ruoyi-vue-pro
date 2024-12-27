@@ -5,7 +5,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import lombok.*;
 import jakarta.validation.constraints.*;
-import java.math.BigDecimal;
 import java.util.List;
 
 /**
@@ -94,8 +93,11 @@ public class ErpProductSaveReqVO {
     @Schema(description = "指导价，json格式", requiredMode = Schema.RequiredMode.REQUIRED, example = "16486")
     private List<@Valid GuidePriceJson> guidePriceList;
 
-    @Schema(description = "专利")
-    private String patent;
+    @Schema(description = "专利类型")
+    private Integer patentType;
+
+    @Schema(description = "专利国别代码")
+    private List<Integer> patentCountryCodeList;
 
     @Schema(description = "PO产品经理id", example = "28770")
     private Long productOwnerId;
@@ -109,31 +111,77 @@ public class ErpProductSaveReqVO {
     @Schema(description = "维护工程师id", example = "22163")
     private Long maintenanceEngineerId;
 
-    @Schema(description = "层板承重")
-    private BigDecimal shelfLoadCapacity;
+    @Schema(description = "VESA孔距最小宽度")
+    private Integer widthMin;
 
-    @Schema(description = "层板数量", example = "352")
-    private Integer shelvesCount;
+    @Schema(description = "VESA孔距最大宽度")
+    private Integer widthMax;
 
-    @Schema(description = "电视调节方式")
-    private String tvAdjustmentMethod;
+    @Schema(description = "VESA孔距最大长度")
+    private Integer lengthMax;
 
-    @Schema(description = "层板调节方式")
-    private String shelfAdjustmentMethod;
+    @Schema(description = "VESA孔距最小长度")
+    private Integer lengthMin;
 
-    @Schema(description = "设计说明", example = "你说的对")
-    private String description;
+    @Schema(description = "电视尺寸最小值", requiredMode = Schema.RequiredMode.REQUIRED)
+    @NotNull(message = "电视尺寸最小值不能为空")
+    private Integer tvSizeMin;
 
-    @Schema(description = "宽度最大值")
-    private BigDecimal widthMax;
+    @Schema(description = "电视尺寸最大值", requiredMode = Schema.RequiredMode.REQUIRED)
+    @NotNull(message = "电视尺寸最大值不能为空")
+    private Integer tvSizeMax;
 
-    @Schema(description = "宽度最小值")
-    private BigDecimal widthMin;
+    @Schema(description = "承重")
+    private Integer loadCapacity;
 
-    @Schema(description = "长度最大值")
-    private BigDecimal lengthMax;
+    @Schema(description = "中心高度最小值（最低高度）")
+    private Integer centerHeightMin;
 
-    @Schema(description = "长度最小值")
-    private BigDecimal lengthMin;
+    @Schema(description = "中心高度最大值（最高高度）")
+    private Integer centerHeightMax;
+
+    @Schema(description = "电视旋转")
+    private String tvRotation;
+
+    @Schema(description = "电视俯仰")
+    private String tvTilt;
+
+    @Schema(description = "高度调节")
+    private String heightAdjustment;
+
+    @Schema(description = "横竖屏旋转")
+    private String horizontalScreenRotation;
+
+    @Schema(description = "电缆管理")
+    private String cableManagement;
+
+    @Schema(description = "收纳管理")
+    private String storageManagement;
+
+    @Schema(description = "调节脚垫")
+    private String adjustableFootPad;
+
+    @Schema(description = "移动功能")
+    private String mobileFunction;
+
+    @Schema(description = "其他")
+    private String otherFeatures;
+
+    @Schema(description = "适配尺寸")
+    private String adaptiveSize;
+
+    @Schema(description = "兼容方式")
+    private String compatibilityMode;
+
+    @Schema(description = "脚轮", requiredMode = Schema.RequiredMode.REQUIRED)
+    @NotNull(message = "脚轮不能为空")
+    private Boolean casters;
+
+    @Schema(description = "电子集成模块", requiredMode = Schema.RequiredMode.REQUIRED)
+    @NotNull(message = "电子集成模块不能为空")
+    private Boolean electronicIntegrationModules;
+
+    @Schema(description = "功能配件")
+    private String functionalAccessories;
 
 }

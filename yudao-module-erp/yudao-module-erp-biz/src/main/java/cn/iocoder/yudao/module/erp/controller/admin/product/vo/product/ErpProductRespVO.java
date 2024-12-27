@@ -118,9 +118,13 @@ public class ErpProductRespVO {
     @ExcelProperty("指导价，json格式")
     private List<GuidePriceJson> guidePriceList;
 
-    @Schema(description = "专利")
-    @ExcelProperty("专利")
-    private String patent;
+    @Schema(description = "专利类型", example = "19540")
+    @ExcelProperty("专利类型")
+    private Integer patentType;
+
+    @Schema(description = "专利国别代码", example = "19540")
+    @ExcelProperty("专利国别代码")
+    private List<Integer> patentCountryCodeList;
 
     @Schema(description = "PO产品经理id", example = "28770")
     @ExcelProperty("PO产品经理id")
@@ -153,41 +157,5 @@ public class ErpProductRespVO {
     @Schema(description = "维护工程师名称", example = "王五")
     @ExcelProperty("维护工程师名称")
     private String maintenanceEngineerName;
-
-    @Schema(description = "层板承重")
-    @ExcelProperty("层板承重")
-    private BigDecimal shelfLoadCapacity;
-
-    @Schema(description = "层板数量", example = "352")
-    @ExcelProperty("层板数量")
-    private Integer shelvesCount;
-
-    @Schema(description = "电视调节方式")
-    @ExcelProperty("电视调节方式")
-    private String tvAdjustmentMethod;
-
-    @Schema(description = "层板调节方式")
-    @ExcelProperty("层板调节方式")
-    private String shelfAdjustmentMethod;
-
-    @Schema(description = "设计说明", example = "你说的对")
-    @ExcelProperty("设计说明")
-    private String description;
-
-    @Schema(description = "宽度最大值")
-    @ExcelProperty("宽度最大值")
-    private BigDecimal widthMax;
-
-    @Schema(description = "宽度最小值")
-    @ExcelProperty("宽度最小值")
-    private BigDecimal widthMin;
-
-    @Schema(description = "长度最大值")
-    @ExcelProperty("长度最大值")
-    private BigDecimal lengthMax;
-
-    @Schema(description = "长度最小值")
-    @ExcelProperty("长度最小值")
-    private BigDecimal lengthMin;
 
 }

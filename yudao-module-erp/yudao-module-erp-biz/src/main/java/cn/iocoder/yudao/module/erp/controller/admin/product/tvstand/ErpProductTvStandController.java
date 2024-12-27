@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.erp.controller.admin.product.tvstand;
 
-import cn.iocoder.yudao.module.erp.service.product.tvstand.ErpProductTvStandService;
+import cn.iocoder.yudao.module.erp.service.product.landingtelevisionstand.ErpProductLandingTelevisionStandService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import org.springframework.validation.annotation.Validated;
@@ -17,5 +17,5 @@ import org.springframework.web.bind.annotation.RestController;
 @Validated
 public class ErpProductTvStandController {
     @Resource
-    private ErpProductTvStandService erpProductTvStandService;
+    private ErpProductLandingTelevisionStandService erpProductLandingTelevisionStandService;
 }

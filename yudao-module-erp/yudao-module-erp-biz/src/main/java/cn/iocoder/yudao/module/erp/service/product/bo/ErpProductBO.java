@@ -2,8 +2,6 @@ package cn.iocoder.yudao.module.erp.service.product.bo;
 
 import lombok.Data;
 
-import java.math.BigDecimal;
-
 /**
  * @author: Wqh
  * @date: 2024/12/3 16:52
@@ -19,10 +17,6 @@ public class ErpProductBO {
      */
     private String name;
     /**
-     * 产品分类编号
-     */
-    private Long categoryId;
-    /**
      * 部门id
      */
     private Long deptId;
@@ -30,6 +24,10 @@ public class ErpProductBO {
      * SKU（编码）
      */
     private String barCode;
+    /**
+     * 产品分类编号
+     */
+    private Long categoryId;
     /**
      * 单位编号
      */
@@ -39,13 +37,13 @@ public class ErpProductBO {
      */
     private String material;
     /**
-     * 品牌
-     */
-    private String brand;
-    /**
      * 产品状态（1启用，0禁用）
      */
     private Boolean status;
+    /**
+     * 品牌
+     */
+    private String brand;
     /**
      * 备注
      */
@@ -91,25 +89,21 @@ public class ErpProductBO {
      */
     private String primaryImageUrl;
     /**
-     * 副图urls
+     * 次图urls
      */
     private String secondaryImageUrls;
-    /**
-     * 副图urlList
-     */
-    private String secondaryImageUrlList;
     /**
      * 指导价，json格式
      */
     private String guidePrices;
     /**
-     * 指导价list
+     * 专利国别
      */
-    private String guidePriceList;
+    private String patentCountryCodes;
     /**
-     * 专利
+     * 专利类型
      */
-    private String patent;
+    private Integer patentType;
     /**
      * PO产品经理id
      */
@@ -126,4 +120,8 @@ public class ErpProductBO {
      * 维护工程师id
      */
     private Long maintenanceEngineerId;
+    /**
+     * 设计说明
+     */
+    private String description;
 }

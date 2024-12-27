@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.module.erp.controller.admin.product.vo.product.json;
 
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -28,9 +27,5 @@ public class GuidePriceJson implements Serializable {
      **/
     @NotNull(message = "价格不能为空")
     private BigDecimal price;
-    /**
-     * 排序
-     **/
-    private Integer sort;
 }
 

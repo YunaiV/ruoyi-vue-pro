@@ -100,7 +100,6 @@ public class ErpProductServiceImplTest extends BaseDbUnitTest {
         productVO.setWidth(1);
         productVO.setLength(1);
         productVO.setHeight(1);
-        productVO.setPatent("测试专利");
         productVO.setProductOwnerId(50024L);
         productVO.setIndustrialDesignerId(50024L);
         productVO.setResearchDeveloperId(50024L);
@@ -117,8 +116,8 @@ public class ErpProductServiceImplTest extends BaseDbUnitTest {
 
         // 创建 GuidePriceJson 列表
         List<GuidePriceJson> guidePriceList = Arrays.asList(
-                new GuidePriceJson(1, new BigDecimal("1000.0"), 1),
-                new GuidePriceJson(1, new BigDecimal("2000.0"), 2)
+                new GuidePriceJson(1, new BigDecimal("1000.0")),
+                new GuidePriceJson(1, new BigDecimal("2000.0"))
         );
         productVO.setGuidePriceList(guidePriceList);
         return productVO;

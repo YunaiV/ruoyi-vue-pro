@@ -3,7 +3,6 @@ package cn.iocoder.yudao.module.erp.controller.admin.product.vo.product;
 import lombok.*;
 import io.swagger.v3.oas.annotations.media.Schema;
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
-import java.math.BigDecimal;
 import org.springframework.format.annotation.DateTimeFormat;
 import java.time.LocalDateTime;
 
@@ -73,9 +72,6 @@ public class ErpProductPageReqVO extends PageParam {
     @Schema(description = "基础高度（mm）")
     private Integer height;
 
-    @Schema(description = "专利")
-    private String patent;
-
     @Schema(description = "PO产品经理id", example = "28770")
     private Long productOwnerId;
 
@@ -87,32 +83,5 @@ public class ErpProductPageReqVO extends PageParam {
 
     @Schema(description = "维护工程师id", example = "22163")
     private Long maintenanceEngineerId;
-
-    @Schema(description = "层板承重")
-    private BigDecimal shelfLoadCapacity;
-
-    @Schema(description = "层板数量", example = "352")
-    private Integer shelvesCount;
-
-    @Schema(description = "电视调节方式")
-    private String tvAdjustmentMethod;
-
-    @Schema(description = "层板调节方式")
-    private String shelfAdjustmentMethod;
-
-    @Schema(description = "设计说明", example = "你说的对")
-    private String description;
-
-    @Schema(description = "宽度最大值")
-    private BigDecimal widthMax;
-
-    @Schema(description = "宽度最小值")
-    private BigDecimal widthMin;
-
-    @Schema(description = "长度最大值")
-    private BigDecimal lengthMax;
-
-    @Schema(description = "长度最小值")
-    private BigDecimal lengthMin;
 
 }

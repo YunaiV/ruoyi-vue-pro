@@ -5,7 +5,7 @@ import cn.iocoder.yudao.module.erp.controller.admin.product.vo.product.ErpProduc
 import cn.iocoder.yudao.module.erp.controller.admin.product.vo.product.ErpProductRespVO;
 import cn.iocoder.yudao.module.erp.controller.admin.product.vo.product.ErpProductSaveReqVO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.product.ErpProductDO;
-import cn.iocoder.yudao.module.erp.service.product.tvstand.ErpProductTvStandServiceImpl;
+import cn.iocoder.yudao.module.erp.service.product.landingtelevisionstand.ErpProductLandingTelevisionStandServiceImpl;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
@@ -24,7 +24,7 @@ public class ErpProductServiceDelegator implements ErpProductService {
 
     // 分类Id映射ProductService的实现类
     private static final Map<Long, Class<?>> SERVICE_MAP = Map.of(
-        1L, ErpProductTvStandServiceImpl.class
+        1L, ErpProductLandingTelevisionStandServiceImpl.class
     );
 
     private ErpProductService getDefaultService() {

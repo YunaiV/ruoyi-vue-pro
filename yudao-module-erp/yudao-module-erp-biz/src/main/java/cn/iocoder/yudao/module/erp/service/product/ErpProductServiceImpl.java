@@ -108,6 +108,10 @@ public class ErpProductServiceImpl implements ErpProductService {
         if (CollUtil.isNotEmpty(createReqVO.getGuidePriceList())){
             product.setGuidePrices(JSONUtil.toJsonStr(createReqVO.getGuidePriceList()));
         }
+        //转换国别代码
+        if (CollUtil.isNotEmpty(createReqVO.getPatentCountryCodeList())){
+            product.setPatentCountryCodes(JSONUtil.toJsonStr(createReqVO.getPatentCountryCodeList()));
+        }
         ThrowUtil.ifSqlThrow(productMapper.insert(product),DB_INSERT_ERROR);
         // 返回
         return product.getId();
@@ -150,6 +154,12 @@ public class ErpProductServiceImpl implements ErpProductService {
             updateObj.setGuidePrices(JSONUtil.toJsonStr(updateReqVO.getGuidePriceList()));
         }else {
             updateObj.setGuidePrices("");
+        }
+        //转换国别代码
+        if (CollUtil.isNotEmpty(updateReqVO.getPatentCountryCodeList())){
+            updateObj.setPatentCountryCodes(JSONUtil.toJsonStr(updateReqVO.getPatentCountryCodeList()));
+        }else {
+            updateObj.setPatentCountryCodes("");
         }
         ThrowUtil.ifSqlThrow(productMapper.updateById(updateObj),DB_UPDATE_ERROR);
         //同步数据
@@ -211,6 +221,9 @@ public class ErpProductServiceImpl implements ErpProductService {
         }
         if (StrUtil.isNotBlank(erpProductDO.getSecondaryImageUrls())){
             productRespVO.setSecondaryImageUrlList(JSONUtil.toList(erpProductDO.getSecondaryImageUrls(), String.class));
+        }
+        if (StrUtil.isNotBlank(erpProductDO.getPatentCountryCodes())){
+            productRespVO.setPatentCountryCodeList(JSONUtil.toList(erpProductDO.getPatentCountryCodes(),Integer.class));
         }
         return productRespVO;
     }
