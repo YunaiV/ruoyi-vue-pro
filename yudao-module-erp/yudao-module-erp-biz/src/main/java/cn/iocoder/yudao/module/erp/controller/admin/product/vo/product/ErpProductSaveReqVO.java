@@ -124,11 +124,9 @@ public class ErpProductSaveReqVO {
     private Integer lengthMin;
 
     @Schema(description = "电视尺寸最小值", requiredMode = Schema.RequiredMode.REQUIRED)
-    @NotNull(message = "电视尺寸最小值不能为空")
     private Integer tvSizeMin;
 
     @Schema(description = "电视尺寸最大值", requiredMode = Schema.RequiredMode.REQUIRED)
-    @NotNull(message = "电视尺寸最大值不能为空")
     private Integer tvSizeMax;
 
     @Schema(description = "承重")
@@ -174,11 +172,9 @@ public class ErpProductSaveReqVO {
     private String compatibilityMode;
 
     @Schema(description = "脚轮", requiredMode = Schema.RequiredMode.REQUIRED)
-    @NotNull(message = "脚轮不能为空")
     private Boolean casters;
 
     @Schema(description = "电子集成模块", requiredMode = Schema.RequiredMode.REQUIRED)
-    @NotNull(message = "电子集成模块不能为空")
     private Boolean electronicIntegrationModules;
 
     @Schema(description = "功能配件")

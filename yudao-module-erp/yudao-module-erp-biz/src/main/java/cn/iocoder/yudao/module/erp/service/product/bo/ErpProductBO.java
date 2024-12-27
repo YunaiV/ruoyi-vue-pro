@@ -1,6 +1,10 @@
 package cn.iocoder.yudao.module.erp.service.product.bo;
 
+import cn.iocoder.yudao.module.erp.controller.admin.product.vo.product.json.GuidePriceJson;
+import jakarta.validation.Valid;
 import lombok.Data;
+
+import java.util.List;
 
 /**
  * @author: Wqh
@@ -93,6 +97,14 @@ public class ErpProductBO {
      */
     private String secondaryImageUrls;
     /**
+     * 副图urlList
+     */
+    private List<String> secondaryImageUrlList;
+    /**
+     * 指导价list
+     */
+    private List<GuidePriceJson> guidePriceList;
+    /**
      * 指导价，json格式
      */
     private String guidePrices;
@@ -100,6 +112,10 @@ public class ErpProductBO {
      * 专利国别
      */
     private String patentCountryCodes;
+    /**
+     * 专利国别list
+     */
+    private List<Integer> patentCountryCodeList;
     /**
      * 专利类型
      */

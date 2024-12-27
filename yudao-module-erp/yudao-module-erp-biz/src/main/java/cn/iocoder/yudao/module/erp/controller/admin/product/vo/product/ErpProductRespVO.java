@@ -158,4 +158,99 @@ public class ErpProductRespVO {
     @ExcelProperty("维护工程师名称")
     private String maintenanceEngineerName;
 
+    @Schema(description = "设计说明", example = "你猜")
+    @ExcelProperty("设计说明")
+    private String description;
+
+    @Schema(description = "VESA孔距最小宽度")
+    @ExcelProperty("VESA孔距最小宽度")
+    private Integer widthMin;
+
+    @Schema(description = "VESA孔距最大宽度")
+    @ExcelProperty("VESA孔距最大宽度")
+    private Integer widthMax;
+
+    @Schema(description = "VESA孔距最大长度")
+    @ExcelProperty("VESA孔距最大长度")
+    private Integer lengthMax;
+
+    @Schema(description = "VESA孔距最小长度")
+    @ExcelProperty("VESA孔距最小长度")
+    private Integer lengthMin;
+
+    @Schema(description = "电视尺寸最小值", requiredMode = Schema.RequiredMode.REQUIRED)
+    @ExcelProperty("电视尺寸最小值")
+    private Integer tvSizeMin;
+
+    @Schema(description = "电视尺寸最大值", requiredMode = Schema.RequiredMode.REQUIRED)
+    @ExcelProperty("电视尺寸最大值")
+    private Integer tvSizeMax;
+
+    @Schema(description = "承重")
+    @ExcelProperty("承重")
+    private Integer loadCapacity;
+
+    @Schema(description = "中心高度最小值（最低高度）")
+    @ExcelProperty("中心高度最小值（最低高度）")
+    private Integer centerHeightMin;
+
+    @Schema(description = "中心高度最大值（最高高度）")
+    @ExcelProperty("中心高度最大值（最高高度）")
+    private Integer centerHeightMax;
+
+    @Schema(description = "电视旋转")
+    @ExcelProperty("电视旋转")
+    private String tvRotation;
+
+    @Schema(description = "电视俯仰")
+    @ExcelProperty("电视俯仰")
+    private String tvTilt;
+
+    @Schema(description = "高度调节")
+    @ExcelProperty("高度调节")
+    private String heightAdjustment;
+
+    @Schema(description = "横竖屏旋转")
+    @ExcelProperty("横竖屏旋转")
+    private String horizontalScreenRotation;
+
+    @Schema(description = "电缆管理")
+    @ExcelProperty("电缆管理")
+    private String cableManagement;
+
+    @Schema(description = "收纳管理")
+    @ExcelProperty("收纳管理")
+    private String storageManagement;
+
+    @Schema(description = "调节脚垫")
+    @ExcelProperty("调节脚垫")
+    private String adjustableFootPad;
+
+    @Schema(description = "移动功能")
+    @ExcelProperty("移动功能")
+    private String mobileFunction;
+
+    @Schema(description = "其他")
+    @ExcelProperty("其他")
+    private String otherFeatures;
+
+    @Schema(description = "适配尺寸")
+    @ExcelProperty("适配尺寸")
+    private String adaptiveSize;
+
+    @Schema(description = "兼容方式")
+    @ExcelProperty("兼容方式")
+    private String compatibilityMode;
+
+    @Schema(description = "脚轮", requiredMode = Schema.RequiredMode.REQUIRED)
+    @ExcelProperty("脚轮")
+    private Boolean casters;
+
+    @Schema(description = "电子集成模块", requiredMode = Schema.RequiredMode.REQUIRED)
+    @ExcelProperty("电子集成模块")
+    private Boolean electronicIntegrationModules;
+
+    @Schema(description = "功能配件")
+    @ExcelProperty("功能配件")
+    private String functionalAccessories;
 }

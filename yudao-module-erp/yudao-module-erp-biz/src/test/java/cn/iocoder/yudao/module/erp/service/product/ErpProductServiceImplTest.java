@@ -104,15 +104,7 @@ public class ErpProductServiceImplTest extends BaseDbUnitTest {
         productVO.setIndustrialDesignerId(50024L);
         productVO.setResearchDeveloperId(50024L);
         productVO.setMaintenanceEngineerId(50024L);
-        productVO.setShelfLoadCapacity(new BigDecimal("100.0"));
-        productVO.setShelvesCount(5);
-        productVO.setTvAdjustmentMethod("电动");
-        productVO.setShelfAdjustmentMethod("手动");
-        productVO.setDescription("测试设计说明");
-        productVO.setWidthMax(new BigDecimal("120.0"));
-        productVO.setWidthMin(new BigDecimal("80.0"));
-        productVO.setLengthMax(new BigDecimal("250.0"));
-        productVO.setLengthMin(new BigDecimal("150.0"));
+
 
         // 创建 GuidePriceJson 列表
         List<GuidePriceJson> guidePriceList = Arrays.asList(
