@@ -6,6 +6,9 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
+/**
+ * @author Administrator
+ */
 @Schema(description = "管理后台 - ERP 产品单位分页 Request VO")
 @Data
 @EqualsAndHashCode(callSuper = true)
