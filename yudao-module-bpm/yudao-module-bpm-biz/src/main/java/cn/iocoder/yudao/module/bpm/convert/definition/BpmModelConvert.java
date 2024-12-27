@@ -8,6 +8,7 @@ import cn.iocoder.yudao.module.bpm.controller.admin.base.user.UserSimpleBaseVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.BpmModelMetaInfoVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.BpmModelRespVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.BpmModelSaveReqVO;
+import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.simple.BpmSimpleModelNodeVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.process.BpmProcessDefinitionRespVO;
 import cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmCategoryDO;
 import cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmFormDO;
@@ -58,12 +59,13 @@ public interface BpmModelConvert {
         return result;
     }
 
-    default BpmModelRespVO buildModel(Model model, byte[] bpmnBytes) {
+    default BpmModelRespVO buildModel(Model model, byte[] bpmnBytes, BpmSimpleModelNodeVO simpleModel) {
         BpmModelMetaInfoVO metaInfo = parseMetaInfo(model);
         BpmModelRespVO modelVO = buildModel0(model, metaInfo, null, null, null, null, null);
         if (ArrayUtil.isNotEmpty(bpmnBytes)) {
             modelVO.setBpmnXml(BpmnModelUtils.getBpmnXml(bpmnBytes));
         }
+        modelVO.setSimpleModel(simpleModel);
         return modelVO;
     }
 
