@@ -1,6 +1,8 @@
 package cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model;
 
+import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.simple.BpmSimpleModelNodeVO;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.Data;
 
@@ -21,5 +23,12 @@ public class BpmModelSaveReqVO extends BpmModelMetaInfoVO {
 
     @Schema(description = "流程分类", example = "1")
     private String category;
+
+    @Schema(description = "BPMN XML")
+    private String bpmnXml;
+
+    @Schema(description = "仿钉钉流程设计模型对象")
+    @Valid
+    private BpmSimpleModelNodeVO simpleModel;
 
 }
