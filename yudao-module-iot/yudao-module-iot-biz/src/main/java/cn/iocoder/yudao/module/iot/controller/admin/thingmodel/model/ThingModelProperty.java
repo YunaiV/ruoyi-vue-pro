@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.iot.controller.admin.thingmodel.model;
 
 import cn.iocoder.yudao.module.iot.controller.admin.thingmodel.model.dataType.ThingModelDataSpecs;
-import cn.iocoder.yudao.module.iot.enums.thingmodel.IotProductThingModelAccessModeEnum;
+import cn.iocoder.yudao.module.iot.enums.thingmodel.IotThingModelAccessModeEnum;
 import lombok.Data;
 
 import java.util.List;
@@ -27,7 +27,7 @@ public class ThingModelProperty {
     /**
      * 云端可以对该属性进行的操作类型
      *
-     * 枚举 {@link IotProductThingModelAccessModeEnum}
+     * 枚举 {@link IotThingModelAccessModeEnum}
      */
     private String accessMode;
     /**

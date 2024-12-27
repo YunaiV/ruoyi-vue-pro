@@ -5,7 +5,7 @@ import cn.iocoder.yudao.module.iot.controller.admin.thingmodel.model.ThingModelE
 import cn.iocoder.yudao.module.iot.controller.admin.thingmodel.model.ThingModelProperty;
 import cn.iocoder.yudao.module.iot.controller.admin.thingmodel.model.ThingModelService;
 import cn.iocoder.yudao.module.iot.dal.dataobject.product.IotProductDO;
-import cn.iocoder.yudao.module.iot.enums.thingmodel.IotProductThingModelTypeEnum;
+import cn.iocoder.yudao.module.iot.enums.thingmodel.IotThingModelTypeEnum;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -16,21 +16,20 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-// TODO @huihui：IotProductThingModelDO => IotThingModelDO
 /**
  * IoT 产品物模型功能 DO
  * <p>
- * 每个 {@link IotProductDO} 和 {@link IotProductThingModelDO} 是“一对多”的关系，它的每个属性、事件、服务都对应一条记录
+ * 每个 {@link IotProductDO} 和 {@link IotThingModelDO} 是“一对多”的关系，它的每个属性、事件、服务都对应一条记录
  *
  * @author 芋道源码
  */
-@TableName(value = "iot_product_thing_model", autoResultMap = true)
-@KeySequence("iot_product_thing_model_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
+@TableName(value = "iot_thing_model", autoResultMap = true)
+@KeySequence("iot_thing_model_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class IotProductThingModelDO extends BaseDO {
+public class IotThingModelDO extends BaseDO {
 
     /**
      * 物模型功能编号
@@ -67,7 +66,7 @@ public class IotProductThingModelDO extends BaseDO {
     /**
      * 功能类型
      * <p>
-     * 枚举 {@link IotProductThingModelTypeEnum}
+     * 枚举 {@link IotThingModelTypeEnum}
      */
     private Integer type;
 

@@ -10,7 +10,7 @@ import lombok.Getter;
  */
 @AllArgsConstructor
 @Getter
-public enum IotProductThingModelParamDirectionEnum {
+public enum IotThingModelParamDirectionEnum {
 
     INPUT("input"), // 输入参数
     OUTPUT("output"); // 输出参数

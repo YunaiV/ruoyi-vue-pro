@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.iot.controller.admin.thingmodel.model.dataType;
 
-import cn.iocoder.yudao.module.iot.enums.thingmodel.IotProductThingModelAccessModeEnum;
+import cn.iocoder.yudao.module.iot.enums.thingmodel.IotThingModelAccessModeEnum;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -27,7 +27,7 @@ public class ThingModelStructDataSpecs extends ThingModelDataSpecs {
     private String name;
     /**
      * 云端可以对该属性进行的操作类型
-     * 关联枚举 {@link IotProductThingModelAccessModeEnum}
+     * 关联枚举 {@link IotThingModelAccessModeEnum}
      */
     private String accessMode;
     /**
