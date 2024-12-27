@@ -1,7 +1,6 @@
 package cn.iocoder.yudao.module.erp.service.product.bo;
 
 import cn.iocoder.yudao.module.erp.controller.admin.product.vo.product.json.GuidePriceJson;
-import jakarta.validation.Valid;
 import lombok.Data;
 
 import java.util.List;

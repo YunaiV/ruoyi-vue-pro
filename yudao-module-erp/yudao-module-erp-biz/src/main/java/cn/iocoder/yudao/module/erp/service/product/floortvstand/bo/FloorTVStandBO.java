@@ -13,19 +13,19 @@ public class FloorTVStandBO extends ErpProductBO {
     /**
      * VESA孔距最小宽度
      */
-    private Integer widthMin;
+    private Integer vesaWidthMin;
     /**
      * VESA孔距最大宽度
      */
-    private Integer widthMax;
+    private Integer vesaWidthMax;
     /**
      * VESA孔距最大长度
      */
-    private Integer lengthMax;
+    private Integer vesaLengthMax;
     /**
      * VESA孔距最小长度
      */
-    private Integer lengthMin;
+    private Integer vesaLengthMin;
     /**
      * 电视尺寸最小值
      */

@@ -4,7 +4,6 @@ import cn.iocoder.yudao.module.erp.controller.admin.product.vo.product.json.Guid
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -164,19 +163,19 @@ public class ErpProductRespVO {
 
     @Schema(description = "VESA孔距最小宽度")
     @ExcelProperty("VESA孔距最小宽度")
-    private Integer widthMin;
+    private Integer vesaWidthMin;
 
     @Schema(description = "VESA孔距最大宽度")
     @ExcelProperty("VESA孔距最大宽度")
-    private Integer widthMax;
+    private Integer vesaWidthMax;
 
     @Schema(description = "VESA孔距最大长度")
     @ExcelProperty("VESA孔距最大长度")
-    private Integer lengthMax;
+    private Integer vesaLengthMax;
 
     @Schema(description = "VESA孔距最小长度")
     @ExcelProperty("VESA孔距最小长度")
-    private Integer lengthMin;
+    private Integer vesaLengthMin;
 
     @Schema(description = "电视尺寸最小值", requiredMode = Schema.RequiredMode.REQUIRED)
     @ExcelProperty("电视尺寸最小值")

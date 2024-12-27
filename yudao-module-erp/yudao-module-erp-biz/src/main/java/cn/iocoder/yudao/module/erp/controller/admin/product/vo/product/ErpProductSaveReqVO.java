@@ -112,16 +112,16 @@ public class ErpProductSaveReqVO {
     private Long maintenanceEngineerId;
 
     @Schema(description = "VESA孔距最小宽度")
-    private Integer widthMin;
+    private Integer vesaWidthMin;
 
     @Schema(description = "VESA孔距最大宽度")
-    private Integer widthMax;
+    private Integer vesaWidthMax;
 
     @Schema(description = "VESA孔距最大长度")
-    private Integer lengthMax;
+    private Integer vesaLengthMax;
 
     @Schema(description = "VESA孔距最小长度")
-    private Integer lengthMin;
+    private Integer vesaLengthMin;
 
     @Schema(description = "电视尺寸最小值", requiredMode = Schema.RequiredMode.REQUIRED)
     private Integer tvSizeMin;

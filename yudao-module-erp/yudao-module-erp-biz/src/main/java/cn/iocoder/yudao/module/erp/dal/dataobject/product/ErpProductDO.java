@@ -2,7 +2,6 @@ package cn.iocoder.yudao.module.erp.dal.dataobject.product;
 
 import lombok.*;
 
-import java.math.BigDecimal;
 import com.baomidou.mybatisplus.annotation.*;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 
@@ -141,19 +140,19 @@ public class ErpProductDO extends BaseDO {
     /**
      * VESA孔距最小宽度
      */
-    private Integer widthMin;
+    private Integer vesaWidthMin;
     /**
      * VESA孔距最大宽度
      */
-    private Integer widthMax;
+    private Integer vesaWidthMax;
     /**
      * VESA孔距最大长度
      */
-    private Integer lengthMax;
+    private Integer vesaLengthMax;
     /**
      * VESA孔距最小长度
      */
-    private Integer lengthMin;
+    private Integer vesaLengthMin;
     /**
      * 电视尺寸最小值
      */
