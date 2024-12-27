@@ -152,7 +152,7 @@ public class CouponServiceImpl implements CouponService {
                     findAndThen(userCouponIdsMap, userId, couponIds::addAll);
                 }
             } catch (Exception e) {
-                log.error("[takeCouponsByAdmin][coupon({}) 优惠券发放失败]", entry, e);
+                log.error("[takeCouponsByAdmin][coupon({}) 优惠券发放失败 userId({})]", entry, userId, e);
             }
         }
         return couponIds;
