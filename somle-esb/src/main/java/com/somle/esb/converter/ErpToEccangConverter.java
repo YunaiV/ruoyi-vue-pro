@@ -156,7 +156,7 @@ public class ErpToEccangConverter {
             eccangProduct.setPdOverseaTypeEn(product.getDeclaredTypeEn());
             //设置产品创建人部门名称
             MapUtils.findAndThen(userMap, Long.parseLong(product.getProductCreatorId()),
-                    user -> eccangProduct.setUserOrganizationId(Math.toIntExact(user.getDeptId())));
+                    user -> eccangProduct.setUserOrganizationId(eccangService.getOrganizationByNameEn(String.valueOf(product.getProductDeptId())).getId()));
             //获取产品部门的源关系
             TreeSet<DeptLevelRespDTO> deptTreeLevel = deptApi.getDeptTreeLevel(product.getProductDeptId());
             //判断集合是否为空、0、大于3

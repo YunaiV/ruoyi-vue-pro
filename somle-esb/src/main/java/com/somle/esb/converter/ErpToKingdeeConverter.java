@@ -93,7 +93,7 @@ public class ErpToKingdeeConverter {
             KingdeeProduct kingdeeProduct = new KingdeeProduct();
             //普通
             kingdeeProduct.setCheckType("1");
-            kingdeeProduct.setName(product.getProductName() + "-" + product.getCountryCode());
+            kingdeeProduct.setName(product.getProductName());
             //如果有供应商产品编码和国家代码都不为空的时候才去设置SKU
             if (StrUtil.isNotBlank(product.getSupplierProductCode()) && StrUtil.isNotBlank(product.getCountryCode())) {
                 kingdeeProduct.setNumber(product.getSupplierProductCode() + "-" + getProductStatus(product.getCountryCode()));

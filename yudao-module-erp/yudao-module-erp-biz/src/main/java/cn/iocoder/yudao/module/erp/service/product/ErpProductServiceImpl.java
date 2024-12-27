@@ -82,9 +82,11 @@ public class ErpProductServiceImpl implements ErpProductService {
         //TODO 暂时编号不是系统自动生成，后续添加生成规则，流水号的递增由编号来判断，编号相同流水号便自增
         //校验是否存在相同的产品编码
         validateProductCodeUnique(null, createReqVO.getBarCode());
+        //检验是否存在相同的产品名称
+        validateProductNameUnique(null, createReqVO.getName());
         //校验颜色，型号，系列是否已经有存在相同的产品
-        boolean b = validateProductColorAndSeriesAndModel(null,createReqVO.getColor(), createReqVO.getModel(), createReqVO.getSeries());
-        if (b){
+        boolean validateProductColorAndSeriesAndModel = validateProductColorAndSeriesAndModel(null,createReqVO.getColor(), createReqVO.getModel(), createReqVO.getSeries());
+        if (validateProductColorAndSeriesAndModel){
             //获取递增后流水号
             Integer serial = increaseSerial(createReqVO.getColor(), createReqVO.getModel(), createReqVO.getSeries());
             createReqVO.setSerial(serial);
@@ -125,9 +127,11 @@ public class ErpProductServiceImpl implements ErpProductService {
         validateProductExists(id);
         //校验不同的id下是否存在相同的产品编码
         validateProductCodeUnique(updateReqVO.getId(), updateReqVO.getBarCode());
+        //检验是否存在相同的产品名称
+        validateProductNameUnique(id, updateReqVO.getName());
         //校验颜色，型号，系列是否已经有存在相同的产品
-        boolean b = validateProductColorAndSeriesAndModel(id,updateReqVO.getColor(), updateReqVO.getModel(), updateReqVO.getSeries());
-        if (b){
+        boolean validateProductColorAndSeriesAndModel = validateProductColorAndSeriesAndModel(id,updateReqVO.getColor(), updateReqVO.getModel(), updateReqVO.getSeries());
+        if (validateProductColorAndSeriesAndModel){
             //获取递增后流水号
             Integer serial = increaseSerial(updateReqVO.getColor(), updateReqVO.getModel(), updateReqVO.getSeries());
             updateReqVO.setSerial(serial);
@@ -195,6 +199,20 @@ public class ErpProductServiceImpl implements ErpProductService {
     public void validateProductExists(Long id) {
         if (productMapper.selectById(id) == null) {
             throw exception(PRODUCT_NOT_EXISTS);
+        }
+    }
+
+    private void validateProductNameUnique(Long id, String name) {
+        ErpProductDO product = productMapper.selectByName(name);
+        if (ObjUtil.isEmpty(product)){
+            return;
+        }
+        // 如果 id 为空，说明不用比较是否为相同 id 的字典类型
+        if (id == null){
+            throw exception(PRODUCT_CODE_DUPLICATE);
+        }
+        if (!product.getId().equals(id)) {
+            throw exception(PRODUCT_UNIT_NAME_DUPLICATE);
         }
     }
 

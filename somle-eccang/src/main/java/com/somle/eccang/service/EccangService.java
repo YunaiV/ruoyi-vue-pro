@@ -398,7 +398,7 @@ public class EccangService {
 
     public EccangOrganization getOrganizationByNameEn(String nameEn) {
         log.debug("searching organization with name_en " + nameEn);
-        Optional<EccangOrganization> first = getOrganizations().filter(n -> n.getName().equals(nameEn)).findFirst();
+        Optional<EccangOrganization> first = getOrganizations().filter(n -> n.getNameEn().equals(nameEn)).findFirst();
         if (first.isPresent()) {
             return first.get();
         }

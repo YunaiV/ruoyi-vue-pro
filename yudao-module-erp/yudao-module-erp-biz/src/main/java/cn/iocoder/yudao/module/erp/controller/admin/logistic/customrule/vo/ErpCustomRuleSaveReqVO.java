@@ -35,9 +35,11 @@ public class ErpCustomRuleSaveReqVO {
     private String declaredType;
 
     @Schema(description = "申报金额")
+    @NotNull(message = "申报金额不能为空")
     private Double declaredValue;
 
     @Schema(description = "申报金额币种")
+    @NotEmpty(message = "申报金额币种不能为空")
     private String declaredValueCurrencyCode;
 
     @Schema(description = "税率")

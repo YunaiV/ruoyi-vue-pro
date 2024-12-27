@@ -66,4 +66,7 @@ public interface ErpProductMapper extends BaseMapperX<ErpProductDO> {
                 .eqIfPresent(ErpProductDO::getSeries, series));
     }
 
+    default ErpProductDO selectByName(String name) {
+        return selectOne(ErpProductDO::getName, name);
+    }
 }
