@@ -2,9 +2,10 @@ package cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model;
 
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.simple.BpmSimpleModelNodeVO;
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotEmpty;
 import lombok.Data;
+
+import javax.validation.Valid;
+import javax.validation.constraints.NotEmpty;
 
 @Schema(description = "管理后台 - 流程模型的保存 Request VO")
 @Data
