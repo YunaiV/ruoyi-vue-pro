@@ -121,7 +121,7 @@ public class CartServiceImpl implements CartService {
         }
 
         // 批量标记删除
-        cartMapper.deleteByIds(carts.stream().map(CartDO::getId).toList());
+        cartMapper.deleteByIds(convertSet(carts, CartDO::getId));
     }
 
     @Override
