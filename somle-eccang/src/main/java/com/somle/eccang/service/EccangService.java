@@ -134,17 +134,18 @@ public class EccangService {
                 .url(url)
                 .payload(requestBody)
                 .build();
-            var response = WebUtils.sendRequest(request);
-            switch (response.code()) {
-                case 200:
-                    var responseBody = response.body().string();
-                    var responseOriginal = JsonUtils.parseObject(responseBody, EccangResponse.class);
-                    validateResponse(responseOriginal);
-                    return responseOriginal;
-                case 429:
-                    throw new HttpClientErrorException(HttpStatus.TOO_MANY_REQUESTS, "Too many requests, please try again later.");
-                default:
-                    throw new RuntimeException("Unknown response code " + response);
+            try (var response = WebUtils.sendRequest(request)) {
+                switch (response.code()) {
+                    case 200:
+                        var responseBody = response.body().string();
+                        var responseOriginal = JsonUtils.parseObject(responseBody, EccangResponse.class);
+                        validateResponse(responseOriginal);
+                        return responseOriginal;
+                    case 429:
+                        throw new HttpClientErrorException(HttpStatus.TOO_MANY_REQUESTS, "Too many requests, please try again later.");
+                    default:
+                        throw new RuntimeException("Unknown response code " + response);
+                }
             }
         });
         return responseFinal;
