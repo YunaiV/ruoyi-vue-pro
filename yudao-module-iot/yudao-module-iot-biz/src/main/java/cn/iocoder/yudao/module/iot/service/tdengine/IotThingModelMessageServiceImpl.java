@@ -11,16 +11,16 @@ import cn.iocoder.yudao.module.iot.dal.dataobject.tdengine.FieldParser;
 import cn.iocoder.yudao.module.iot.dal.dataobject.tdengine.TdFieldDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.tdengine.TdTableDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.tdengine.ThingModelMessage;
-import cn.iocoder.yudao.module.iot.dal.dataobject.thingmodel.IotProductThingModelDO;
+import cn.iocoder.yudao.module.iot.dal.dataobject.thingmodel.IotThingModelDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.product.IotProductDO;
 import cn.iocoder.yudao.module.iot.dal.redis.deviceData.DeviceDataRedisDAO;
 import cn.iocoder.yudao.module.iot.dal.tdengine.TdEngineDDLMapper;
 import cn.iocoder.yudao.module.iot.dal.tdengine.TdEngineDMLMapper;
 import cn.iocoder.yudao.module.iot.enums.IotConstants;
 import cn.iocoder.yudao.module.iot.enums.device.IotDeviceStatusEnum;
-import cn.iocoder.yudao.module.iot.enums.thingmodel.IotProductThingModelTypeEnum;
+import cn.iocoder.yudao.module.iot.enums.thingmodel.IotThingModelTypeEnum;
 import cn.iocoder.yudao.module.iot.service.device.IotDeviceService;
-import cn.iocoder.yudao.module.iot.service.thingmodel.IotProductThingModelService;
+import cn.iocoder.yudao.module.iot.service.thingmodel.IotThingModelService;
 import cn.iocoder.yudao.module.iot.service.product.IotProductService;
 import cn.iocoder.yudao.module.iot.util.IotTdDatabaseUtils;
 import jakarta.annotation.Resource;
@@ -52,7 +52,7 @@ public class IotThingModelMessageServiceImpl implements IotThingModelMessageServ
     private String url;
 
     @Resource
-    private IotProductThingModelService iotProductThingModelService;
+    private IotThingModelService iotThingModelService;
     @Resource
     private IotDeviceService iotDeviceService;
     @Resource
@@ -83,7 +83,7 @@ public class IotThingModelMessageServiceImpl implements IotThingModelMessageServ
 
         // 2. 获取设备属性并进行物模型校验，过滤非物模型属性
         Map<String, Object> params = thingModelMessage.dataToMap();
-        List<IotProductThingModelDO> thingModelList = getValidThingModelList(thingModelMessage.getProductKey());
+        List<IotThingModelDO> thingModelList = getValidThingModelList(thingModelMessage.getProductKey());
         if (thingModelList.isEmpty()) {
             return;
         }
@@ -102,9 +102,9 @@ public class IotThingModelMessageServiceImpl implements IotThingModelMessageServ
                 .build());
     }
 
-    private List<IotProductThingModelDO> getValidThingModelList(String productKey) {
-        return filterList(iotProductThingModelService.getProductThingModelListByProductKey(productKey),
-                thingModel -> IotProductThingModelTypeEnum.PROPERTY.getType().equals(thingModel.getType()));
+    private List<IotThingModelDO> getValidThingModelList(String productKey) {
+        return filterList(iotThingModelService.getProductThingModelListByProductKey(productKey),
+                thingModel -> IotThingModelTypeEnum.PROPERTY.getType().equals(thingModel.getType()));
     }
 
     @Override
@@ -134,17 +134,17 @@ public class IotThingModelMessageServiceImpl implements IotThingModelMessageServ
         tdEngineDDLMapper.createSuperTable(new TdTableDO(databaseName, superTableName, schemaFields, tagsFields));
     }
 
-    private List<IotProductThingModelDO> getValidFunctionList(String productKey) {
-        return filterList(iotProductThingModelService.getProductThingModelListByProductKey(productKey),
-                thingModel -> IotProductThingModelTypeEnum.PROPERTY.getType().equals(thingModel.getType()));
+    private List<IotThingModelDO> getValidFunctionList(String productKey) {
+        return filterList(iotThingModelService.getProductThingModelListByProductKey(productKey),
+                thingModel -> IotThingModelTypeEnum.PROPERTY.getType().equals(thingModel.getType()));
     }
 
-    private List<TdFieldDO> filterAndCollectValidFields(Map<String, Object> params, List<IotProductThingModelDO> thingModelList, IotDeviceDO device, Long time) {
+    private List<TdFieldDO> filterAndCollectValidFields(Map<String, Object> params, List<IotThingModelDO> thingModelList, IotDeviceDO device, Long time) {
         // 1. 获取属性标识符集合
-        Set<String> propertyIdentifiers = convertSet(thingModelList, IotProductThingModelDO::getIdentifier);
+        Set<String> propertyIdentifiers = convertSet(thingModelList, IotThingModelDO::getIdentifier);
 
         // 2. 构建属性标识符和属性的映射
-        Map<String, IotProductThingModelDO> thingModelMap = convertMap(thingModelList, IotProductThingModelDO::getIdentifier);
+        Map<String, IotThingModelDO> thingModelMap = convertMap(thingModelList, IotThingModelDO::getIdentifier);
 
         // 3. 过滤并收集有效的属性字段
         List<TdFieldDO> schemaFieldValues = new ArrayList<>();
@@ -164,21 +164,21 @@ public class IotThingModelMessageServiceImpl implements IotThingModelMessageServ
      * 缓存设备属性
      *
      * @param device                 设备信息
-     * @param iotProductThingModelDO 物模型属性
+     * @param iotThingModelDO 物模型属性
      * @param val                    属性值
      * @param time                   时间
      */
-    private void setDeviceDataCache(IotDeviceDO device, IotProductThingModelDO iotProductThingModelDO, Object val, Long time) {
+    private void setDeviceDataCache(IotDeviceDO device, IotThingModelDO iotThingModelDO, Object val, Long time) {
         IotDeviceDataDO deviceData = IotDeviceDataDO.builder()
                 .productKey(device.getProductKey())
                 .deviceName(device.getDeviceName())
-                .identifier(iotProductThingModelDO.getIdentifier())
+                .identifier(iotThingModelDO.getIdentifier())
                 .value(val != null ? val.toString() : null)
                 .updateTime(DateUtil.toLocalDateTime(new Date(time)))
                 .deviceId(device.getId())
-                .thingModelId(iotProductThingModelDO.getId())
-                .name(iotProductThingModelDO.getName())
-                .dataType(iotProductThingModelDO.getProperty().getDataType())
+                .thingModelId(iotThingModelDO.getId())
+                .name(iotThingModelDO.getName())
+                .dataType(iotThingModelDO.getProperty().getDataType())
                 .build();
         deviceDataRedisDAO.set(deviceData);
     }

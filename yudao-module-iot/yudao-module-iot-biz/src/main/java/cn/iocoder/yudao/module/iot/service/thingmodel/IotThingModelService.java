@@ -1,9 +1,9 @@
 package cn.iocoder.yudao.module.iot.service.thingmodel;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.iot.controller.admin.thingmodel.vo.IotProductThingModelPageReqVO;
-import cn.iocoder.yudao.module.iot.controller.admin.thingmodel.vo.IotProductThingModelSaveReqVO;
-import cn.iocoder.yudao.module.iot.dal.dataobject.thingmodel.IotProductThingModelDO;
+import cn.iocoder.yudao.module.iot.controller.admin.thingmodel.vo.IotThingModelPageReqVO;
+import cn.iocoder.yudao.module.iot.controller.admin.thingmodel.vo.IotThingModelSaveReqVO;
+import cn.iocoder.yudao.module.iot.dal.dataobject.thingmodel.IotThingModelDO;
 import jakarta.validation.Valid;
 
 import java.util.List;
@@ -13,7 +13,7 @@ import java.util.List;
  *
  * @author 芋道源码
  */
-public interface IotProductThingModelService {
+public interface IotThingModelService {
 
     /**
      * 创建产品物模型
@@ -21,21 +21,21 @@ public interface IotProductThingModelService {
      * @param createReqVO 创建信息
      * @return 编号
      */
-    Long createProductThingModel(@Valid IotProductThingModelSaveReqVO createReqVO);
+    Long createThingModel(@Valid IotThingModelSaveReqVO createReqVO);
 
     /**
      * 更新产品物模型
      *
      * @param updateReqVO 更新信息
      */
-    void updateProductThingModel(@Valid IotProductThingModelSaveReqVO updateReqVO);
+    void updateThingModel(@Valid IotThingModelSaveReqVO updateReqVO);
 
     /**
      * 删除产品物模型
      *
      * @param id 编号
      */
-    void deleteProductThingModel(Long id);
+    void deleteThingModel(Long id);
 
     /**
      * 获得产品物模型
@@ -43,7 +43,7 @@ public interface IotProductThingModelService {
      * @param id 编号
      * @return 产品物模型
      */
-    IotProductThingModelDO getProductThingModel(Long id);
+    IotThingModelDO getThingModel(Long id);
 
     /**
      * 获得产品物模型列表
@@ -51,7 +51,7 @@ public interface IotProductThingModelService {
      * @param productId 产品编号
      * @return 产品物模型列表
      */
-    List<IotProductThingModelDO> getProductThingModelListByProductId(Long productId);
+    List<IotThingModelDO> getThingModelListByProductId(Long productId);
 
     /**
      * 获得产品物模型分页
@@ -59,7 +59,7 @@ public interface IotProductThingModelService {
      * @param pageReqVO 分页查询
      * @return 产品物模型分页
      */
-    PageResult<IotProductThingModelDO> getProductThingModelPage(IotProductThingModelPageReqVO pageReqVO);
+    PageResult<IotThingModelDO> getProductThingModelPage(IotThingModelPageReqVO pageReqVO);
 
     /**
      * 获得产品物模型列表
@@ -67,6 +67,6 @@ public interface IotProductThingModelService {
      * @param productKey 产品 Key
      * @return 产品物模型列表
      */
-    List<IotProductThingModelDO> getProductThingModelListByProductKey(String productKey);
+    List<IotThingModelDO> getProductThingModelListByProductKey(String productKey);
 
 }

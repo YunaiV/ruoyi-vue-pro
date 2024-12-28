@@ -13,13 +13,13 @@ import java.util.Arrays;
  */
 @AllArgsConstructor
 @Getter
-public enum IotProductThingModelTypeEnum implements IntArrayValuable {
+public enum IotThingModelTypeEnum implements IntArrayValuable {
 
     PROPERTY(1, "属性"),
     SERVICE(2, "服务"),
     EVENT(3, "事件");
 
-    public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(IotProductThingModelTypeEnum::getType).toArray();
+    public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(IotThingModelTypeEnum::getType).toArray();
 
     /**
      * 类型
@@ -30,8 +30,8 @@ public enum IotProductThingModelTypeEnum implements IntArrayValuable {
      */
     private final String description;
 
-    public static IotProductThingModelTypeEnum valueOfType(Integer type) {
-        for (IotProductThingModelTypeEnum value : values()) {
+    public static IotThingModelTypeEnum valueOfType(Integer type) {
+        for (IotThingModelTypeEnum value : values()) {
             if (value.getType().equals(type)) {
                 return value;
             }

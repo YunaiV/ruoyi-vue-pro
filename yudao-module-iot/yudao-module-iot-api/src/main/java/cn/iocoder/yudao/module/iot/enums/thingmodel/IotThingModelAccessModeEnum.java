@@ -10,7 +10,7 @@ import lombok.Getter;
  */
 @AllArgsConstructor
 @Getter
-public enum IotProductThingModelAccessModeEnum {
+public enum IotThingModelAccessModeEnum {
 
     READ_ONLY("r"),
     READ_WRITE("rw");

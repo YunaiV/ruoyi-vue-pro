@@ -25,8 +25,7 @@ Authorization: Bearer {{token}}
       "defaultValue": "30",
       "unit": "%",
       "unitName": "百分比"
-    },
-    "description": "当前温度值"
+    }
   }
 }
 
@@ -46,7 +45,6 @@ Authorization: Bearer {{token}}
   "property": {
     "identifier": "switch",
     "name": "开关",
-    "description": "温度计开关",
     "accessMode": "rw",
     "required": true,
     "dataType": "bool",
@@ -81,7 +79,6 @@ Authorization: Bearer {{token}}
   "property": {
     "identifier": "argb",
     "name": "温度计 argb 颜色",
-    "description": "温度计 argb 颜色",
     "accessMode": "rw",
     "required": true,
     "dataType": "array",
@@ -93,7 +90,6 @@ Authorization: Bearer {{token}}
         {
           "identifier": "switch",
           "name": "开关",
-          "description": "温度计开关",
           "accessMode": "rw",
           "required": true,
           "dataType": "struct",
@@ -126,8 +122,7 @@ Authorization: Bearer {{token}}
             "defaultValue": "30",
             "unit": "%",
             "unitName": "百分比"
-          },
-          "description": "当前温度值"
+          }
         }
       ]
     }
@@ -151,7 +146,6 @@ Authorization: Bearer {{token}}
   "property": {
     "identifier": "switch",
     "name": "开关",
-    "description": "温度计开关",
     "accessMode": "r",
     "required": true,
     "dataType": "bool",

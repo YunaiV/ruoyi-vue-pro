@@ -10,7 +10,7 @@ import lombok.Getter;
  */
 @AllArgsConstructor
 @Getter
-public enum IotProductThingModelServiceEventTypeEnum {
+public enum IotThingModelServiceEventTypeEnum {
 
     INFO("info"), // 信息
     ALERT("alert"), // 告警

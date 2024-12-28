@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.iot.controller.admin.thingmodel.model;
 
-import cn.iocoder.yudao.module.iot.enums.thingmodel.IotProductThingModelServiceEventTypeEnum;
+import cn.iocoder.yudao.module.iot.enums.thingmodel.IotThingModelServiceEventTypeEnum;
 import lombok.Data;
 
 import java.util.List;
@@ -28,7 +28,7 @@ public class ThingModelEvent {
     /**
      * 事件类型
      *
-     * 枚举 {@link IotProductThingModelServiceEventTypeEnum}
+     * 枚举 {@link IotThingModelServiceEventTypeEnum}
      */
     private String type;
     /**
@@ -36,7 +36,7 @@ public class ThingModelEvent {
      *
      * 输出参数定义事件调用后返回的结果或反馈信息，用于确认操作结果或提供额外的信息。
      */
-    private List<ThingModelInputOutputParam> outputParams;
+    private List<ThingModelParam> outputParams;
     /**
      * 标识设备需要执行的具体操作
      */

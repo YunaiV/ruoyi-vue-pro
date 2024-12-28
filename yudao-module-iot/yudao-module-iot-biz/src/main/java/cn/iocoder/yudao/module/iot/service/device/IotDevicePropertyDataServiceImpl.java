@@ -13,17 +13,17 @@ import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDataDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.product.IotProductDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.tdengine.SelectVisualDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.tdengine.ThingModelMessage;
-import cn.iocoder.yudao.module.iot.dal.dataobject.thingmodel.IotProductThingModelDO;
+import cn.iocoder.yudao.module.iot.dal.dataobject.thingmodel.IotThingModelDO;
 import cn.iocoder.yudao.module.iot.dal.tdengine.IotDevicePropertyDataMapper;
 import cn.iocoder.yudao.module.iot.dal.redis.deviceData.DeviceDataRedisDAO;
 import cn.iocoder.yudao.module.iot.dal.tdengine.TdEngineDMLMapper;
 import cn.iocoder.yudao.module.iot.enums.IotConstants;
 import cn.iocoder.yudao.module.iot.enums.thingmodel.IotDataSpecsDataTypeEnum;
-import cn.iocoder.yudao.module.iot.enums.thingmodel.IotProductThingModelTypeEnum;
+import cn.iocoder.yudao.module.iot.enums.thingmodel.IotThingModelTypeEnum;
 import cn.iocoder.yudao.module.iot.framework.tdengine.core.TDengineTableField;
 import cn.iocoder.yudao.module.iot.service.product.IotProductService;
 import cn.iocoder.yudao.module.iot.service.tdengine.IotThingModelMessageService;
-import cn.iocoder.yudao.module.iot.service.thingmodel.IotProductThingModelService;
+import cn.iocoder.yudao.module.iot.service.thingmodel.IotThingModelService;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
@@ -71,7 +71,7 @@ public class IotDevicePropertyDataServiceImpl implements IotDevicePropertyDataSe
     @Resource
     private IotThingModelMessageService thingModelMessageService;
     @Resource
-    private IotProductThingModelService thingModelService;
+    private IotThingModelService thingModelService;
     @Resource
     private IotProductService productService;
 
@@ -88,8 +88,8 @@ public class IotDevicePropertyDataServiceImpl implements IotDevicePropertyDataSe
     public void defineDevicePropertyData(Long productId) {
         // 1.1 查询产品和物模型
         IotProductDO product = productService.validateProductExists(productId);
-        List<IotProductThingModelDO> thingModels = filterList(thingModelService.getProductThingModelListByProductId(productId),
-                thingModel -> IotProductThingModelTypeEnum.PROPERTY.getType().equals(thingModel.getType()));
+        List<IotThingModelDO> thingModels = filterList(thingModelService.getThingModelListByProductId(productId),
+                thingModel -> IotThingModelTypeEnum.PROPERTY.getType().equals(thingModel.getType()));
         // 1.2 解析 DB 里的字段
         List<TDengineTableField> oldFields = new ArrayList<>();
         try {
@@ -115,7 +115,7 @@ public class IotDevicePropertyDataServiceImpl implements IotDevicePropertyDataSe
         devicePropertyDataMapper.alterProductPropertySTable(product.getProductKey(), oldFields, newFields);
     }
 
-    private List<TDengineTableField> buildTableFieldList(List<IotProductThingModelDO> thingModels) {
+    private List<TDengineTableField> buildTableFieldList(List<IotThingModelDO> thingModels) {
         return convertList(thingModels, thingModel -> {
             TDengineTableField field = new TDengineTableField(
                     StrUtil.toUnderlineCase(thingModel.getIdentifier()), // TDengine 字段默认都是小写
@@ -153,8 +153,8 @@ public class IotDevicePropertyDataServiceImpl implements IotDevicePropertyDataSe
         // 1. 获取设备信息
         IotDeviceDO device = deviceService.getDevice(deviceDataReqVO.getDeviceId());
         // 2. 获取设备属性最新数据
-        List<IotProductThingModelDO> thingModelList = thingModelService.getProductThingModelListByProductKey(device.getProductKey());
-        thingModelList = filterList(thingModelList, thingModel -> IotProductThingModelTypeEnum.PROPERTY.getType()
+        List<IotThingModelDO> thingModelList = thingModelService.getProductThingModelListByProductKey(device.getProductKey());
+        thingModelList = filterList(thingModelList, thingModel -> IotThingModelTypeEnum.PROPERTY.getType()
                 .equals(thingModel.getType()));
 
         // 3. 过滤标识符和属性名称

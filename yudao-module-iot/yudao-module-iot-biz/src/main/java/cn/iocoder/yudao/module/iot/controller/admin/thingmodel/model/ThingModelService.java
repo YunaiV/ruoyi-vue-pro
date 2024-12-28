@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.iot.controller.admin.thingmodel.model;
 
-import cn.iocoder.yudao.module.iot.enums.thingmodel.IotProductThingModelServiceCallTypeEnum;
+import cn.iocoder.yudao.module.iot.enums.thingmodel.IotThingModelServiceCallTypeEnum;
 import lombok.Data;
 
 import java.util.List;
@@ -28,7 +28,7 @@ public class ThingModelService {
     /**
      * 调用类型
      *
-     * 枚举 {@link IotProductThingModelServiceCallTypeEnum}
+     * 枚举 {@link IotThingModelServiceCallTypeEnum}
      */
     private String callType;
     /**
@@ -36,13 +36,13 @@ public class ThingModelService {
      *
      * 输入参数定义服务调用时所需提供的信息，用于控制设备行为或执行特定任务
      */
-    private List<ThingModelInputOutputParam> inputParams;
+    private List<ThingModelParam> inputParams;
     /**
      * 服务的输出参数
      *
      * 输出参数定义服务调用后返回的结果或反馈信息，用于确认操作结果或提供额外的信息。
      */
-    private List<ThingModelInputOutputParam> outputParams;
+    private List<ThingModelParam> outputParams;
     /**
      * 标识设备需要执行的具体操作
      */

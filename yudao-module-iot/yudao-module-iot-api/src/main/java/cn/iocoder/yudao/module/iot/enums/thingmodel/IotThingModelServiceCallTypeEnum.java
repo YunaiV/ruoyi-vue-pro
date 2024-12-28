@@ -10,7 +10,7 @@ import lombok.Getter;
  */
 @AllArgsConstructor
 @Getter
-public enum IotProductThingModelServiceCallTypeEnum {
+public enum IotThingModelServiceCallTypeEnum {
 
     ASYNC("async"), // 异步调用
     SYNC("sync"); // 同步调用

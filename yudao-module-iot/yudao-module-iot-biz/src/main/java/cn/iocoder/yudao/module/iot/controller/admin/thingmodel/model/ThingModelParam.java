@@ -1,18 +1,18 @@
 package cn.iocoder.yudao.module.iot.controller.admin.thingmodel.model;
 
 import cn.iocoder.yudao.module.iot.controller.admin.thingmodel.model.dataType.ThingModelDataSpecs;
-import cn.iocoder.yudao.module.iot.enums.thingmodel.IotProductThingModelParamDirectionEnum;
+import cn.iocoder.yudao.module.iot.enums.thingmodel.IotThingModelParamDirectionEnum;
 import lombok.Data;
 
 import java.util.List;
 
 /**
- * IOT 产品物模型中的参数 // TODO @puhui999 考虑要不改成 ThingModelParam ？
+ * IOT 产品物模型中的参数
  *
  * @author HUIHUI
  */
 @Data
-public class ThingModelInputOutputParam {
+public class ThingModelParam {
 
     /**
      * 参数标识符
@@ -25,7 +25,7 @@ public class ThingModelInputOutputParam {
     /**
      * 用于区分输入或输出参数
      *
-     * 关联枚举 {@link IotProductThingModelParamDirectionEnum}
+     * 关联枚举 {@link IotThingModelParamDirectionEnum}
      */
     private String direction;
     /**
