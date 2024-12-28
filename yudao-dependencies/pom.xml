@@ -22,9 +22,9 @@
         <springdoc.version>2.7.0</springdoc.version>
         <knife4j.version>4.6.0</knife4j.version>
         <!-- DB 相关 -->
-        <druid.version>1.2.23</druid.version>
-        <mybatis.version>3.5.16</mybatis.version>
-        <mybatis-plus.version>3.5.8</mybatis-plus.version>
+        <druid.version>1.2.24</druid.version>
+        <mybatis.version>3.5.17</mybatis.version>
+        <mybatis-plus.version>3.5.9</mybatis-plus.version>
         <dynamic-datasource.version>4.3.1</dynamic-datasource.version>
         <mybatis-plus-join.version>1.4.13</mybatis-plus-join.version>
         <easy-trans.version>3.0.6</easy-trans.version>
@@ -178,6 +178,11 @@
             <dependency>
                 <groupId>com.baomidou</groupId>
                 <artifactId>mybatis-plus-spring-boot3-starter</artifactId>
+                <version>${mybatis-plus.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.baomidou</groupId>
+                <artifactId>mybatis-plus-jsqlparser</artifactId>
                 <version>${mybatis-plus.version}</version>
             </dependency>
             <dependency>
