@@ -23,6 +23,7 @@ public interface IotThingModelMapper extends BaseMapperX<IotThingModelDO> {
                 .likeIfPresent(IotThingModelDO::getName, reqVO.getName())
                 .eqIfPresent(IotThingModelDO::getType, reqVO.getType())
                 .eqIfPresent(IotThingModelDO::getProductId, reqVO.getProductId())
+                // TODO @芋艿：看看要不要加枚举
                 .notIn(IotThingModelDO::getIdentifier, "get", "set", "post")
                 .orderByDesc(IotThingModelDO::getId));
     }

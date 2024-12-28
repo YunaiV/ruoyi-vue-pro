@@ -27,14 +27,12 @@ public class ThingModelStructDataSpecs extends ThingModelDataSpecs {
     private String name;
     /**
      * 云端可以对该属性进行的操作类型
-     * 关联枚举 {@link IotThingModelAccessModeEnum}
+     *
+     * 枚举 {@link IotThingModelAccessModeEnum}
      */
     private String accessMode;
     /**
-     * 是否是标准品类的必选服务。
-     *
-     * - true：是
-     * - false：否
+     * 是否是标准品类的必选服务
      */
     private Boolean required;
     /**

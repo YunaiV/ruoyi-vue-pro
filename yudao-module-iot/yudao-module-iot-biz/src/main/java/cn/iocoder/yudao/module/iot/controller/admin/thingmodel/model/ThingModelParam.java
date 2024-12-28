@@ -25,7 +25,7 @@ public class ThingModelParam {
     /**
      * 用于区分输入或输出参数
      *
-     * 关联枚举 {@link IotThingModelParamDirectionEnum}
+     * 枚举 {@link IotThingModelParamDirectionEnum}
      */
     private String direction;
     /**
