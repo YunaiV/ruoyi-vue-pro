@@ -38,7 +38,7 @@
         <lock4j.version>2.2.7</lock4j.version>
         <!-- 监控相关 -->
         <skywalking.version>9.0.0</skywalking.version>
-        <spring-boot-admin.version>3.3.3</spring-boot-admin.version>
+        <spring-boot-admin.version>3.4.1</spring-boot-admin.version>
         <opentracing.version>0.33.0</opentracing.version>
         <!-- Test 测试相关 -->
         <podam.version>8.0.2.RELEASE</podam.version>
