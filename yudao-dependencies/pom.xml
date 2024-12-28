@@ -52,7 +52,7 @@
         <!-- 工具类相关 -->
         <captcha-plus.version>1.0.10</captcha-plus.version>
         <jsoup.version>1.18.3</jsoup.version>
-        <lombok.version>1.18.34</lombok.version>
+        <lombok.version>1.18.36</lombok.version>
         <mapstruct.version>1.6.3</mapstruct.version>
         <hutool.version>5.8.35</hutool.version>
         <easyexcel.verion>4.0.3</easyexcel.verion>
