@@ -49,7 +49,7 @@
         <!-- 工具类相关 -->
         <captcha-plus.version>2.0.3</captcha-plus.version>
         <jsoup.version>1.18.3</jsoup.version>
-        <lombok.version>1.18.34</lombok.version>
+        <lombok.version>1.18.36</lombok.version>
         <mapstruct.version>1.6.3</mapstruct.version>
         <hutool-5.version>5.8.35</hutool-5.version>
         <hutool-6.version>6.0.0-M19</hutool-6.version>
