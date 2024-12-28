@@ -26,12 +26,6 @@ public interface DiscountProductMapper extends BaseMapperX<DiscountProductDO> {
         return selectList(DiscountProductDO::getActivityId, activityIds);
     }
 
-    default List<DiscountProductDO> selectListBySpuIdsAndStatus(Collection<Long> spuIds, Integer status) {
-        return selectList(new LambdaQueryWrapperX<DiscountProductDO>()
-                .in(DiscountProductDO::getSpuId, spuIds)
-                .eq(DiscountProductDO::getActivityStatus, status));
-    }
-
     default void updateByActivityId(DiscountProductDO discountProductDO) {
         update(discountProductDO, new LambdaUpdateWrapper<DiscountProductDO>()
                 .eq(DiscountProductDO::getActivityId, discountProductDO.getActivityId()));

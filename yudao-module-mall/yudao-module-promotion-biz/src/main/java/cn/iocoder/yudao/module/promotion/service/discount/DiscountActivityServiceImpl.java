@@ -220,11 +220,17 @@ public class DiscountActivityServiceImpl implements DiscountActivityService {
 
     @Override
     public List<DiscountProductDO> getDiscountProductsByActivityId(Collection<Long> activityIds) {
+        if (CollUtil.isEmpty(activityIds)) {
+            return CollUtil.newArrayList();
+        }
         return discountProductMapper.selectList(DiscountProductDO::getActivityId, activityIds);
     }
 
     @Override
     public List<DiscountProductDO> getMatchDiscountProductListBySkuIds(Collection<Long> skuIds) {
+        if (CollUtil.isEmpty(skuIds)) {
+            return CollUtil.newArrayList();
+        }
         return discountProductMapper.selectListBySkuIdsAndStatusAndNow(skuIds, CommonStatusEnum.ENABLE.getStatus());
     }
 
