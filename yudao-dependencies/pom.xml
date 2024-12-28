@@ -19,8 +19,8 @@
         <!-- 统一依赖管理 -->
         <spring.boot.version>3.4.1</spring.boot.version>
         <!-- Web 相关 -->
-        <springdoc.version>2.3.0</springdoc.version>
-        <knife4j.version>4.5.0</knife4j.version>
+        <springdoc.version>2.7.0</springdoc.version>
+        <knife4j.version>4.6.0</knife4j.version>
         <!-- DB 相关 -->
         <druid.version>1.2.23</druid.version>
         <mybatis.version>3.5.16</mybatis.version>
@@ -148,7 +148,7 @@
             </dependency>
 
             <dependency>
-                <groupId>com.github.xiaoymin</groupId>
+                <groupId>com.github.xingfudeshi</groupId> <!-- TODO 芋艿：https://github.com/xiaoymin/knife4j/issues/874 -->
                 <artifactId>knife4j-openapi3-jakarta-spring-boot-starter</artifactId>
                 <version>${knife4j.version}</version>
             </dependency>
