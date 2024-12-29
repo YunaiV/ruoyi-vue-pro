@@ -7,6 +7,8 @@ import cn.iocoder.yudao.module.iot.dal.dataobject.plugininfo.PluginInfoDO;
 import jakarta.validation.Valid;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
+
 /**
  * IoT 插件信息 Service 接口
  *
@@ -58,7 +60,7 @@ public interface PluginInfoService {
      * @param id   插件id
      * @param file 文件
      */
-    void uploadJar(Long id, MultipartFile file);
+    void uploadFile(Long id, MultipartFile file);
 
     /**
      * 更新插件的状态
@@ -67,4 +69,11 @@ public interface PluginInfoService {
      * @param status 状态
      */
     void updatePluginStatus(Long id, Integer status);
+
+    /**
+     * 获得启用的插件列表
+     *
+     * @return 插件列表-插件id
+     */
+    List<String> getEnabledPlugins();
 }

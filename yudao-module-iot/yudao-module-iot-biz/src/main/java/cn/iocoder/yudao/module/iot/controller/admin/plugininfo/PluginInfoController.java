@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.iot.controller.admin.plugininfo;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
+import cn.iocoder.yudao.module.iot.controller.admin.plugininfo.vo.PluginInfoImportReqVO;
 import cn.iocoder.yudao.module.iot.controller.admin.plugininfo.vo.PluginInfoPageReqVO;
 import cn.iocoder.yudao.module.iot.controller.admin.plugininfo.vo.PluginInfoRespVO;
 import cn.iocoder.yudao.module.iot.controller.admin.plugininfo.vo.PluginInfoSaveReqVO;
@@ -16,11 +17,8 @@ import jakarta.validation.Valid;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
-import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
-import static cn.iocoder.yudao.module.infra.enums.ErrorCodeConstants.FILE_IS_EMPTY;
 
 @Tag(name = "管理后台 - IoT 插件信息")
 @RestController
@@ -72,16 +70,10 @@ public class PluginInfoController {
         return success(BeanUtils.toBean(pageResult, PluginInfoRespVO.class));
     }
 
-    @RequestMapping(value = "/update-jar",
-            method = {RequestMethod.POST, RequestMethod.PUT}) // 解决 uni-app 不支持 Put 上传文件的问题
-    @Operation(summary = "上传Jar包")
-    public CommonResult<Boolean> uploadJar(
-            @RequestParam("id") Long id,
-            @RequestParam("jar") MultipartFile file) throws Exception {
-        if (file.isEmpty()) {
-            throw exception(FILE_IS_EMPTY);
-        }
-        pluginInfoService.uploadJar(id, file);
+    @PostMapping("/upload-file")
+    @Operation(summary = "上传插件文件")
+    public CommonResult<Boolean> uploadFile(@Valid PluginInfoImportReqVO reqVO) {
+        pluginInfoService.uploadFile(reqVO.getId(), reqVO.getFile());
         return success(true);
     }
 
