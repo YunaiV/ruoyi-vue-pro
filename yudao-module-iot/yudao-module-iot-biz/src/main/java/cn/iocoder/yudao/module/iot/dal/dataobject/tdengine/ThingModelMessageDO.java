@@ -15,10 +15,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class ThingModelMessageDO {
 
-    /**
-     * 数据库名称
-     */
-    private String dataBaseName;
+
 
     // TODO @haohao：superTableName 和 tableName 是不是合并。因为每个 mapper 操作的时候，有且只会使用到其中一个。
     /**
