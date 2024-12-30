@@ -133,14 +133,14 @@ public class ErpToEccangConverter {
                 eccangProduct.setProductSku(product.getSupplierProductCode() + "-" + getProductStatus(product.getCountryCode()));
             }
             eccangProduct.setProductWeight(product.getProductWeight());
-            eccangProduct.setProductWidth(product.getProductWidth());
-            eccangProduct.setProductLength(product.getProductLength());
-            eccangProduct.setProductHeight(product.getProductHeight());
+            eccangProduct.setProductWidth(product.getPackageWidth());
+            eccangProduct.setProductLength(product.getPackageLength());
+            eccangProduct.setProductHeight(product.getPackageHeight());
             eccangProduct.setProductMaterial(product.getProductMaterial());
             eccangProduct.setPdNetWeight(product.getPackageWeight());
-            eccangProduct.setPdNetLength(product.getPackageLength());
-            eccangProduct.setPdNetWidth(product.getPackageWidth());
-            eccangProduct.setPdNetHeight(product.getPackageHeight());
+            eccangProduct.setPdNetLength(product.getProductLength());
+            eccangProduct.setPdNetWidth(product.getProductWidth());
+            eccangProduct.setPdNetHeight(product.getProductHeight());
             eccangProduct.setCurrencyCode(product.getPurchasePriceCurrencyCode());
             eccangProduct.setProductPurchaseValue(product.getProductPurchaseValue());
             eccangProduct.setFboTaxRate(product.getTaxRate());

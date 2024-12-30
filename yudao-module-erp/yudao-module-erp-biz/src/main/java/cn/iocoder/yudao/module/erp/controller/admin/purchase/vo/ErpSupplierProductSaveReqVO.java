@@ -23,15 +23,19 @@ public class ErpSupplierProductSaveReqVO {
     @NotNull(message = "产品编号不能为空")
     private Long productId;
 
+    @NotNull(message = "包装数量不能为空")
     @Schema(description = "包装高度")
     private Double packageHeight;
 
+    @NotNull(message = "包装数量不能为空")
     @Schema(description = "包装长度")
     private Double packageLength;
 
+    @NotNull(message = "包装数量不能为空")
     @Schema(description = "包装重量")
     private Double packageWeight;
 
+    @NotNull(message = "包装数量不能为空")
     @Schema(description = "包装宽度")
     private Double packageWidth;
 
