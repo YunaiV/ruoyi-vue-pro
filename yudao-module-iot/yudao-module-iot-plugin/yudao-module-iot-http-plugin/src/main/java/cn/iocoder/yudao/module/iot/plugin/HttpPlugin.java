@@ -19,18 +19,23 @@ public class HttpPlugin extends Plugin {
 
     private static final int PORT = 8092;
 
-    private final ExecutorService executorService;
+    private ExecutorService executorService;
     private DeviceDataApi deviceDataApi;
 
     public HttpPlugin(PluginWrapper wrapper) {
         super(wrapper);
-        // 创建单线程池
+        // 初始化线程池
         this.executorService = Executors.newSingleThreadExecutor();
     }
 
     @Override
     public void start() {
         log.info("HttpPlugin.start()");
+
+        // 重新初始化线程池，确保它是活跃的
+        if (executorService.isShutdown() || executorService.isTerminated()) {
+            executorService = Executors.newSingleThreadExecutor();
+        }
 
         // 从 ServiceRegistry 中获取主程序暴露的 DeviceDataApi 接口实例
         deviceDataApi = ServiceRegistry.getService(DeviceDataApi.class);
@@ -79,7 +84,7 @@ public class HttpPlugin extends Plugin {
             future.channel().closeFuture().sync();
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            log.error("HTTP 服务启动中断", e);
+            log.warn("HTTP 服务启动被中断", e);
         } finally {
             bossGroup.shutdownGracefully();
             workerGroup.shutdownGracefully();
