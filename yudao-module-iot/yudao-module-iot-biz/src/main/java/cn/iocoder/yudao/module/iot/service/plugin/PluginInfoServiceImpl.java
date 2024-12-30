@@ -1,11 +1,11 @@
-package cn.iocoder.yudao.module.iot.service.plugininfo;
+package cn.iocoder.yudao.module.iot.service.plugin;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
-import cn.iocoder.yudao.module.iot.controller.admin.plugininfo.vo.PluginInfoPageReqVO;
-import cn.iocoder.yudao.module.iot.controller.admin.plugininfo.vo.PluginInfoSaveReqVO;
+import cn.iocoder.yudao.module.iot.controller.admin.plugin.vo.PluginInfoPageReqVO;
+import cn.iocoder.yudao.module.iot.controller.admin.plugin.vo.PluginInfoSaveReqVO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.plugininfo.PluginInfoDO;
-import cn.iocoder.yudao.module.iot.dal.mysql.plugininfo.PluginInfoMapper;
+import cn.iocoder.yudao.module.iot.dal.mysql.plugin.PluginInfoMapper;
 import cn.iocoder.yudao.module.iot.enums.plugin.IotPluginStatusEnum;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
@@ -41,7 +41,6 @@ public class PluginInfoServiceImpl implements PluginInfoService {
 
     @Resource
     private PluginInfoMapper pluginInfoMapper;
-
     @Resource
     private SpringPluginManager pluginManager;
 
@@ -94,12 +93,12 @@ public class PluginInfoServiceImpl implements PluginInfoService {
         Executors.newSingleThreadExecutor().submit(() -> {
             try {
                 TimeUnit.SECONDS.sleep(1); // 等待 1 秒，避免插件未卸载完毕
-                File file = new File(pluginsDir, pluginInfoDO.getFile());
+                File file = new File(pluginsDir, pluginInfoDO.getFileName());
                 if (file.exists() && !file.delete()) {
-                    log.error("[deletePluginInfo][删除插件文件({}) 失败]", pluginInfoDO.getFile());
+                    log.error("[deletePluginInfo][删除插件文件({}) 失败]", pluginInfoDO.getFileName());
                 }
             } catch (InterruptedException e) {
-                log.error("[deletePluginInfo][删除插件文件({}) 失败]", pluginInfoDO.getFile(), e);
+                log.error("[deletePluginInfo][删除插件文件({}) 失败]", pluginInfoDO.getFileName(), e);
             }
         });
 
@@ -213,7 +212,7 @@ public class PluginInfoServiceImpl implements PluginInfoService {
     private void updatePluginInfo(PluginInfoDO pluginInfoDo, String pluginIdNew, MultipartFile file) {
         pluginInfoDo.setPluginId(pluginIdNew);
         pluginInfoDo.setStatus(IotPluginStatusEnum.STOPPED.getStatus());
-        pluginInfoDo.setFile(file.getOriginalFilename());
+        pluginInfoDo.setFileName(file.getOriginalFilename());
         pluginInfoDo.setScript("");
 
         PluginDescriptor pluginDescriptor = pluginManager.getPlugin(pluginIdNew).getDescriptor();

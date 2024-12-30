@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.iot.controller.admin.plugininfo.vo;
+package cn.iocoder.yudao.module.iot.controller.admin.plugin.vo;
 
 import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
 import com.alibaba.excel.annotation.ExcelProperty;
@@ -34,7 +34,7 @@ public class PluginInfoRespVO {
 
     @Schema(description = "插件包文件名", requiredMode = Schema.RequiredMode.REQUIRED)
     @ExcelProperty("插件包文件名")
-    private String file;
+    private String fileName;
 
     @Schema(description = "插件版本", requiredMode = Schema.RequiredMode.REQUIRED)
     @ExcelProperty("插件版本")

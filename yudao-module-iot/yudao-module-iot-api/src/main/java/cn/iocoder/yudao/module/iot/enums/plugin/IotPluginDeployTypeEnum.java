@@ -34,12 +34,10 @@ public enum IotPluginDeployTypeEnum implements IntArrayValuable {
     }
 
     public static IotPluginDeployTypeEnum fromDeployType(Integer deployType) {
-        for (IotPluginDeployTypeEnum value : values()) {
-            if (value.getDeployType().equals(deployType)) {
-                return value;
-            }
-        }
-        return null;
+        return Arrays.stream(values())
+                .filter(value -> value.getDeployType().equals(deployType))
+                .findFirst()
+                .orElse(null);
     }
 
     public static boolean isValidDeployType(Integer deployType) {

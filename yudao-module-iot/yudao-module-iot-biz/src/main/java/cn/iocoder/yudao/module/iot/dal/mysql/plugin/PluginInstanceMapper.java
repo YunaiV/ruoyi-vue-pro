@@ -1,11 +1,11 @@
-package cn.iocoder.yudao.module.iot.dal.mysql.plugininstance;
+package cn.iocoder.yudao.module.iot.dal.mysql.plugin;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
+import cn.iocoder.yudao.module.iot.controller.admin.plugin.vo.PluginInstancePageReqVO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.plugininstance.PluginInstanceDO;
 import org.apache.ibatis.annotations.Mapper;
-import cn.iocoder.yudao.module.iot.controller.admin.plugininstance.vo.*;
 
 /**
  * IoT 插件实例 Mapper

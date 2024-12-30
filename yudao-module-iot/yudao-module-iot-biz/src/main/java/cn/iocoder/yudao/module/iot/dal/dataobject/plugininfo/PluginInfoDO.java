@@ -1,6 +1,9 @@
 package cn.iocoder.yudao.module.iot.dal.dataobject.plugininfo;
 
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import cn.iocoder.yudao.module.iot.enums.plugin.IotPluginDeployTypeEnum;
+import cn.iocoder.yudao.module.iot.enums.plugin.IotPluginStatusEnum;
+import cn.iocoder.yudao.module.iot.enums.plugin.IotPluginTypeEnum;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -27,6 +30,7 @@ public class PluginInfoDO extends BaseDO {
     @TableId
     private Long id;
     // TODO @haohao：这个是不是改成类似 key 之类的字段哈？
+    // 回复：默认是 pluginId，可以不用改
     /**
      * 插件包 ID
      */
@@ -41,22 +45,23 @@ public class PluginInfoDO extends BaseDO {
     private String description;
     /**
      * 部署方式
+     * <p>
+     * 枚举 {@link IotPluginDeployTypeEnum}
      */
-    // TODO @haohao：枚举
     private Integer deployType;
     /**
      * 插件包文件名
      */
-    // TODO @haohao：是不是叫 fileName 哈？避免后续有别的字段，类似 fileUrl？
-    private String file;
+    private String fileName;
     /**
      * 插件版本
      */
     private String version;
     /**
      * 插件类型
+     * <p>
+     * 枚举 {@link IotPluginTypeEnum}
      */
-    // TODO @haohao：枚举
     private Integer type;
     /**
      * 设备插件协议类型
@@ -64,8 +69,9 @@ public class PluginInfoDO extends BaseDO {
     private String protocol;
     /**
      * 状态
+     * <p>
+     * 枚举 {@link IotPluginStatusEnum}
      */
-    // TODO @haohao：枚举
     private Integer status;
     /**
      * 插件配置项描述信息

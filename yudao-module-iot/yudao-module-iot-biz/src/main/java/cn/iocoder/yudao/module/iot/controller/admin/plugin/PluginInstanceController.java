@@ -1,32 +1,31 @@
-package cn.iocoder.yudao.module.iot.controller.admin.plugininstance;
-
-import org.springframework.web.bind.annotation.*;
-import jakarta.annotation.Resource;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.security.access.prepost.PreAuthorize;
-import io.swagger.v3.oas.annotations.tags.Tag;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.Operation;
-
-import jakarta.validation.*;
-import jakarta.servlet.http.*;
-import java.util.*;
-import java.io.IOException;
-
-import cn.iocoder.yudao.framework.common.pojo.PageParam;
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.common.pojo.CommonResult;
-import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
-import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
-
-import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
+package cn.iocoder.yudao.module.iot.controller.admin.plugin;
 
 import cn.iocoder.yudao.framework.apilog.core.annotation.ApiAccessLog;
-import static cn.iocoder.yudao.framework.apilog.core.enums.OperateTypeEnum.*;
-
-import cn.iocoder.yudao.module.iot.controller.admin.plugininstance.vo.*;
+import cn.iocoder.yudao.framework.common.pojo.CommonResult;
+import cn.iocoder.yudao.framework.common.pojo.PageParam;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
+import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
+import cn.iocoder.yudao.module.iot.controller.admin.plugin.vo.PluginInstancePageReqVO;
+import cn.iocoder.yudao.module.iot.controller.admin.plugin.vo.PluginInstanceRespVO;
+import cn.iocoder.yudao.module.iot.controller.admin.plugin.vo.PluginInstanceSaveReqVO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.plugininstance.PluginInstanceDO;
-import cn.iocoder.yudao.module.iot.service.plugininstance.PluginInstanceService;
+import cn.iocoder.yudao.module.iot.service.plugin.PluginInstanceService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.annotation.Resource;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
+
+import java.io.IOException;
+import java.util.List;
+
+import static cn.iocoder.yudao.framework.apilog.core.enums.OperateTypeEnum.EXPORT;
+import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
 @Tag(name = "管理后台 - IoT 插件实例")
 @RestController
@@ -76,19 +75,6 @@ public class PluginInstanceController {
     public CommonResult<PageResult<PluginInstanceRespVO>> getPluginInstancePage(@Valid PluginInstancePageReqVO pageReqVO) {
         PageResult<PluginInstanceDO> pageResult = pluginInstanceService.getPluginInstancePage(pageReqVO);
         return success(BeanUtils.toBean(pageResult, PluginInstanceRespVO.class));
-    }
-
-    @GetMapping("/export-excel")
-    @Operation(summary = "导出IoT 插件实例 Excel")
-    @PreAuthorize("@ss.hasPermission('iot:plugin-instance:export')")
-    @ApiAccessLog(operateType = EXPORT)
-    public void exportPluginInstanceExcel(@Valid PluginInstancePageReqVO pageReqVO,
-              HttpServletResponse response) throws IOException {
-        pageReqVO.setPageSize(PageParam.PAGE_SIZE_NONE);
-        List<PluginInstanceDO> list = pluginInstanceService.getPluginInstancePage(pageReqVO).getList();
-        // 导出 Excel
-        ExcelUtils.write(response, "IoT 插件实例.xls", "数据", PluginInstanceRespVO.class,
-                        BeanUtils.toBean(list, PluginInstanceRespVO.class));
     }
 
 }

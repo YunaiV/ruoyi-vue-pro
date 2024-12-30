@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.iot.controller.admin.plugininfo.vo;
+package cn.iocoder.yudao.module.iot.controller.admin.plugin.vo;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;

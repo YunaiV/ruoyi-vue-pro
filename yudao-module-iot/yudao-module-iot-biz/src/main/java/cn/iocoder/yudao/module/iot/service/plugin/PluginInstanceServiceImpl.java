@@ -1,11 +1,11 @@
-package cn.iocoder.yudao.module.iot.service.plugininstance;
+package cn.iocoder.yudao.module.iot.service.plugin;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
-import cn.iocoder.yudao.module.iot.controller.admin.plugininstance.vo.PluginInstancePageReqVO;
-import cn.iocoder.yudao.module.iot.controller.admin.plugininstance.vo.PluginInstanceSaveReqVO;
+import cn.iocoder.yudao.module.iot.controller.admin.plugin.vo.PluginInstancePageReqVO;
+import cn.iocoder.yudao.module.iot.controller.admin.plugin.vo.PluginInstanceSaveReqVO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.plugininstance.PluginInstanceDO;
-import cn.iocoder.yudao.module.iot.dal.mysql.plugininstance.PluginInstanceMapper;
+import cn.iocoder.yudao.module.iot.dal.mysql.plugin.PluginInstanceMapper;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
@@ -13,7 +13,6 @@ import org.springframework.validation.annotation.Validated;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.iot.enums.ErrorCodeConstants.PLUGIN_INSTANCE_NOT_EXISTS;
 
-// TODO @haohao：可以搞个 plugin 包，然后把 plugininfo、plugininstance
 /**
  * IoT 插件实例 Service 实现类
  *

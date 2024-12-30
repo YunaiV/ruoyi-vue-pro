@@ -1,8 +1,8 @@
-package cn.iocoder.yudao.module.iot.service.plugininstance;
+package cn.iocoder.yudao.module.iot.service.plugin;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.iot.controller.admin.plugininstance.vo.PluginInstancePageReqVO;
-import cn.iocoder.yudao.module.iot.controller.admin.plugininstance.vo.PluginInstanceSaveReqVO;
+import cn.iocoder.yudao.module.iot.controller.admin.plugin.vo.PluginInstancePageReqVO;
+import cn.iocoder.yudao.module.iot.controller.admin.plugin.vo.PluginInstanceSaveReqVO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.plugininstance.PluginInstanceDO;
 import jakarta.validation.Valid;
 

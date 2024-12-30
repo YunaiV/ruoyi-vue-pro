@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.iot.controller.admin.plugininfo.vo;
+package cn.iocoder.yudao.module.iot.controller.admin.plugin.vo;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
@@ -23,7 +23,7 @@ public class PluginInfoSaveReqVO {
     private Integer deployType;
 
     @Schema(description = "插件包文件名", requiredMode = Schema.RequiredMode.REQUIRED)
-    private String file;
+    private String fileName;
 
     @Schema(description = "插件版本", requiredMode = Schema.RequiredMode.REQUIRED)
     private String version;

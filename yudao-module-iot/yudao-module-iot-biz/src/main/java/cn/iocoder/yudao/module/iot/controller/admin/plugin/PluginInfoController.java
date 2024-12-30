@@ -1,14 +1,14 @@
-package cn.iocoder.yudao.module.iot.controller.admin.plugininfo;
+package cn.iocoder.yudao.module.iot.controller.admin.plugin;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
-import cn.iocoder.yudao.module.iot.controller.admin.plugininfo.vo.PluginInfoImportReqVO;
-import cn.iocoder.yudao.module.iot.controller.admin.plugininfo.vo.PluginInfoPageReqVO;
-import cn.iocoder.yudao.module.iot.controller.admin.plugininfo.vo.PluginInfoRespVO;
-import cn.iocoder.yudao.module.iot.controller.admin.plugininfo.vo.PluginInfoSaveReqVO;
+import cn.iocoder.yudao.module.iot.controller.admin.plugin.vo.PluginInfoImportReqVO;
+import cn.iocoder.yudao.module.iot.controller.admin.plugin.vo.PluginInfoPageReqVO;
+import cn.iocoder.yudao.module.iot.controller.admin.plugin.vo.PluginInfoRespVO;
+import cn.iocoder.yudao.module.iot.controller.admin.plugin.vo.PluginInfoSaveReqVO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.plugininfo.PluginInfoDO;
-import cn.iocoder.yudao.module.iot.service.plugininfo.PluginInfoService;
+import cn.iocoder.yudao.module.iot.service.plugin.PluginInfoService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -72,6 +72,7 @@ public class PluginInfoController {
 
     @PostMapping("/upload-file")
     @Operation(summary = "上传插件文件")
+    @PreAuthorize("@ss.hasPermission('iot:plugin-info:update')")
     public CommonResult<Boolean> uploadFile(@Valid PluginInfoImportReqVO reqVO) {
         pluginInfoService.uploadFile(reqVO.getId(), reqVO.getFile());
         return success(true);

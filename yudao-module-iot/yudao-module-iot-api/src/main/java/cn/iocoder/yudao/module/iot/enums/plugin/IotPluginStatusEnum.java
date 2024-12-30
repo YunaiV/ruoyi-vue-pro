@@ -34,12 +34,10 @@ public enum IotPluginStatusEnum implements IntArrayValuable {
     }
 
     public static IotPluginStatusEnum fromState(Integer state) {
-        for (IotPluginStatusEnum value : values()) {
-            if (value.getStatus().equals(state)) {
-                return value;
-            }
-        }
-        return null;
+        return Arrays.stream(values())
+                .filter(value -> value.getStatus().equals(state))
+                .findFirst()
+                .orElse(null);
     }
 
     @Override
