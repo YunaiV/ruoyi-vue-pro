@@ -134,21 +134,22 @@ public class AmazonAdClient {
                 .headers(generateHeaders(shop))
                 .payload(payload)
                 .build();
-            var response = WebUtils.sendRequest(request);
-            switch (response.code()) {
-                case 200:
-                    break;
-                case 425:
-                    throw new RuntimeException("The Request is a duplicate");
-                case 429:
-                    log.info("Received 429 Too Many Requests. Retrying...");
-                    CoreUtils.sleep(3000);
-                    continue;
-                default:
-                    throw new RuntimeException("Unknown response code in creating report: " + response.body().string());
+            try(var response = WebUtils.sendRequest(request)){
+                switch (response.code()) {
+                    case 200:
+                        break;
+                    case 425:
+                        throw new RuntimeException("The Request is a duplicate");
+                    case 429:
+                        log.info("Received 429 Too Many Requests. Retrying...");
+                        CoreUtils.sleep(3000);
+                        continue;
+                    default:
+                        throw new RuntimeException("Unknown response code in creating report: " + response.body().string());
+                }
+                var responseBody = WebUtils.parseResponse(response, JSONObject.class);
+                reportId = responseBody.getString("reportId");
             }
-            var responseBody = WebUtils.parseResponse(response, JSONObject.class);
-            reportId = responseBody.getString("reportId");
         }
         log.info("Got report ID for shop: " + shop.getCountry().getCode());
         return reportId;
@@ -176,20 +177,22 @@ public class AmazonAdClient {
                 .url(reportStatusUrl)
                 .headers(generateHeaders(shop))
                 .build();
-            var response = WebUtils.sendRequest(request);
-            switch (response.code()) {
-                case 200:
-                    break;
-                case 401:
-                    throw new RuntimeException("Failed for shop " + shop.getCountry() + " Unauthorized error, token expired at " +  tokenExpireTime);
-                case 429:
-                    log.info("Received 429 Too Many Requests. Retrying...");
-                    CoreUtils.sleep(10000);
-                    continue;
-                default:
-                    throw new RuntimeException("Http error code: " + response + response.body());
+            JSONObject responseBody = null;
+            try(var response = WebUtils.sendRequest(request);){
+                switch (response.code()) {
+                    case 200:
+                        break;
+                    case 401:
+                        throw new RuntimeException("Failed for shop " + shop.getCountry() + " Unauthorized error, token expired at " +  tokenExpireTime);
+                    case 429:
+                        log.info("Received 429 Too Many Requests. Retrying...");
+                        CoreUtils.sleep(10000);
+                        continue;
+                    default:
+                        throw new RuntimeException("Http error code: " + response + response.body());
+                }
+                 responseBody = WebUtils.parseResponse(response, JSONObject.class);
             }
-            var responseBody = WebUtils.parseResponse(response, JSONObject.class);
             log.debug(responseBody.toString());
             status = responseBody.getString("status");
             log.info(status);
