@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.iot.framework.plugin;
 
 import cn.iocoder.yudao.module.iot.api.ServiceRegistry;
 import cn.iocoder.yudao.module.iot.api.device.DeviceDataApi;
+import cn.iocoder.yudao.module.iot.framework.plugin.listener.CustomPluginStateListener;
 import lombok.extern.slf4j.Slf4j;
 import org.pf4j.spring.SpringPluginManager;
 import org.springframework.context.annotation.Bean;
@@ -30,7 +31,9 @@ public class UnifiedConfiguration {
     @DependsOn(SERVICE_REGISTRY_INITIALIZED_MARKER)
     public SpringPluginManager pluginManager() {
         log.info("[init][实例化 SpringPluginManager]");
-        return new SpringPluginManager();
+        SpringPluginManager springPluginManager = new SpringPluginManager();
+        springPluginManager.addPluginStateListener(new CustomPluginStateListener());
+        return springPluginManager;
     }
 
 }

@@ -10,8 +10,8 @@ public class PluginInfoSaveReqVO {
     @Schema(description = "主键ID", requiredMode = Schema.RequiredMode.REQUIRED, example = "11546")
     private Long id;
 
-    @Schema(description = "插件包id", requiredMode = Schema.RequiredMode.REQUIRED, example = "24627")
-    private String pluginId;
+    @Schema(description = "插件包标识符", requiredMode = Schema.RequiredMode.REQUIRED, example = "24627")
+    private String pluginKey;
 
     @Schema(description = "插件名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "赵六")
     private String name;

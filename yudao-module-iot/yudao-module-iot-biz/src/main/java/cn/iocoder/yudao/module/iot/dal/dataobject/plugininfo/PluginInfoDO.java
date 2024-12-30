@@ -29,12 +29,10 @@ public class PluginInfoDO extends BaseDO {
      */
     @TableId
     private Long id;
-    // TODO @haohao：这个是不是改成类似 key 之类的字段哈？
-    // 回复：默认是 pluginId，可以不用改
     /**
-     * 插件包 ID
+     * 插件包标识符
      */
-    private String pluginId;
+    private String pluginKey;
     /**
      * 插件名称
      */

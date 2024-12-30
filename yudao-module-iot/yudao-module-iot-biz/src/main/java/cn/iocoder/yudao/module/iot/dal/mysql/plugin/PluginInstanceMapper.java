@@ -15,6 +15,12 @@ import org.apache.ibatis.annotations.Mapper;
 @Mapper
 public interface PluginInstanceMapper extends BaseMapperX<PluginInstanceDO> {
 
+    default PluginInstanceDO selectByMainIdAndPluginId(String mainId, Long pluginId) {
+        return selectOne(new LambdaQueryWrapperX<PluginInstanceDO>()
+                .eq(PluginInstanceDO::getMainId, mainId)
+                .eq(PluginInstanceDO::getPluginId, pluginId));
+    }
+
     default PageResult<PluginInstanceDO> selectPage(PluginInstancePageReqVO reqVO) {
         return selectPage(reqVO, new LambdaQueryWrapperX<PluginInstanceDO>()
                 .eqIfPresent(PluginInstanceDO::getMainId, reqVO.getMainId())

@@ -76,7 +76,7 @@ public class PluginInfoServiceImpl implements PluginInfoService {
         }
 
         // 卸载插件
-        PluginWrapper plugin = pluginManager.getPlugin(pluginInfoDO.getPluginId());
+        PluginWrapper plugin = pluginManager.getPlugin(pluginInfoDO.getPluginKey());
         if (plugin != null) {
             // 查询插件是否是启动状态
             if (plugin.getPluginState().equals(PluginState.STARTED)) {
@@ -127,30 +127,30 @@ public class PluginInfoServiceImpl implements PluginInfoService {
         // 1. 校验插件信息是否存在
         PluginInfoDO pluginInfoDo = validatePluginInfoExists(id);
 
-        // 2. 获取插件 ID
-        String pluginId = pluginInfoDo.getPluginId();
+        // 2. 获取插件标识
+        String pluginKey = pluginInfoDo.getPluginKey();
 
         // 3. 停止并卸载旧的插件
-        stopAndUnloadPlugin(pluginId);
+        stopAndUnloadPlugin(pluginKey);
 
         // 4. 上传新的插件文件
-        String pluginIdNew = uploadAndLoadNewPlugin(file);
+        String pluginKeyNew = uploadAndLoadNewPlugin(file);
 
         // 5. 更新插件启用状态文件
-        updatePluginStatusFile(pluginIdNew, false);
+        updatePluginStatusFile(pluginKeyNew, false);
 
         // 6. 更新插件信息
-        updatePluginInfo(pluginInfoDo, pluginIdNew, file);
+        updatePluginInfo(pluginInfoDo, pluginKeyNew, file);
     }
 
     // 停止并卸载旧的插件
-    private void stopAndUnloadPlugin(String pluginId) {
-        PluginWrapper plugin = pluginManager.getPlugin(pluginId);
+    private void stopAndUnloadPlugin(String pluginKey) {
+        PluginWrapper plugin = pluginManager.getPlugin(pluginKey);
         if (plugin != null) {
             if (plugin.getPluginState().equals(PluginState.STARTED)) {
-                pluginManager.stopPlugin(pluginId); // 停止插件
+                pluginManager.stopPlugin(pluginKey); // 停止插件
             }
-            pluginManager.unloadPlugin(pluginId); // 卸载插件
+            pluginManager.unloadPlugin(pluginKey); // 卸载插件
         }
     }
 
@@ -175,18 +175,18 @@ public class PluginInfoServiceImpl implements PluginInfoService {
     }
 
     // 更新插件状态文件
-    private void updatePluginStatusFile(String pluginIdNew, boolean isEnabled) {
+    private void updatePluginStatusFile(String pluginKeyNew, boolean isEnabled) {
         Path enabledFilePath = Paths.get(pluginsDir, "enabled.txt");
         Path disabledFilePath = Paths.get(pluginsDir, "disabled.txt");
         Path targetFilePath = isEnabled ? enabledFilePath : disabledFilePath;
         Path oppositeFilePath = isEnabled ? disabledFilePath : enabledFilePath;
 
         try {
-            PluginWrapper pluginWrapper = pluginManager.getPlugin(pluginIdNew);
+            PluginWrapper pluginWrapper = pluginManager.getPlugin(pluginKeyNew);
             if (pluginWrapper == null) {
                 throw exception(PLUGIN_INSTALL_FAILED);
             }
-            String pluginInfo = pluginIdNew + "@" + pluginWrapper.getDescriptor().getVersion();
+            String pluginInfo = pluginKeyNew + "@" + pluginWrapper.getDescriptor().getVersion();
             List<String> targetLines = Files.exists(targetFilePath) ? Files.readAllLines(targetFilePath)
                     : new ArrayList<>();
             List<String> oppositeLines = Files.exists(oppositeFilePath) ? Files.readAllLines(oppositeFilePath)
@@ -209,13 +209,13 @@ public class PluginInfoServiceImpl implements PluginInfoService {
     }
 
     // 更新插件信息
-    private void updatePluginInfo(PluginInfoDO pluginInfoDo, String pluginIdNew, MultipartFile file) {
-        pluginInfoDo.setPluginId(pluginIdNew);
+    private void updatePluginInfo(PluginInfoDO pluginInfoDo, String pluginKeyNew, MultipartFile file) {
+        pluginInfoDo.setPluginKey(pluginKeyNew);
         pluginInfoDo.setStatus(IotPluginStatusEnum.STOPPED.getStatus());
         pluginInfoDo.setFileName(file.getOriginalFilename());
         pluginInfoDo.setScript("");
 
-        PluginDescriptor pluginDescriptor = pluginManager.getPlugin(pluginIdNew).getDescriptor();
+        PluginDescriptor pluginDescriptor = pluginManager.getPlugin(pluginKeyNew).getDescriptor();
         pluginInfoDo.setConfigSchema(pluginDescriptor.getPluginDescription());
         pluginInfoDo.setVersion(pluginDescriptor.getVersion());
         pluginInfoDo.setDescription(pluginDescriptor.getPluginDescription());
@@ -232,23 +232,23 @@ public class PluginInfoServiceImpl implements PluginInfoService {
             throw exception(PLUGIN_STATUS_INVALID);
         }
 
-        // 3. 获取插件ID和插件实例
-        String pluginId = pluginInfoDo.getPluginId();
-        PluginWrapper plugin = pluginManager.getPlugin(pluginId);
+        // 3. 获取插件标识和插件实例
+        String pluginKey = pluginInfoDo.getPluginKey();
+        PluginWrapper plugin = pluginManager.getPlugin(pluginKey);
 
         // 4. 根据状态更新插件
         if (plugin != null) {
             // 4.1 如果目标状态是运行且插件未启动，则启动插件
             if (status.equals(IotPluginStatusEnum.RUNNING.getStatus())
                     && plugin.getPluginState() != PluginState.STARTED) {
-                pluginManager.startPlugin(pluginId);
-                updatePluginStatusFile(pluginId, true); // 更新插件状态文件为启用
+                pluginManager.startPlugin(pluginKey);
+                updatePluginStatusFile(pluginKey, true); // 更新插件状态文件为启用
             }
             // 4.2 如果目标状态是停止且插件已启动，则停止插件
             else if (status.equals(IotPluginStatusEnum.STOPPED.getStatus())
                     && plugin.getPluginState() == PluginState.STARTED) {
-                pluginManager.stopPlugin(pluginId);
-                updatePluginStatusFile(pluginId, false); // 更新插件状态文件为禁用
+                pluginManager.stopPlugin(pluginKey);
+                updatePluginStatusFile(pluginKey, false); // 更新插件状态文件为禁用
             }
         } else {
             // 5. 插件不存在且状态为停止，抛出异常
@@ -263,11 +263,8 @@ public class PluginInfoServiceImpl implements PluginInfoService {
     }
 
     @Override
-    public List<String> getEnabledPlugins() {
-        return pluginInfoMapper.selectList().stream()
-                .filter(pluginInfoDO -> IotPluginStatusEnum.RUNNING.getStatus().equals(pluginInfoDO.getStatus()))
-                .map(PluginInfoDO::getPluginId)
-                .toList();
+    public List<PluginInfoDO> getPluginInfoList() {
+        return pluginInfoMapper.selectList(null);
     }
 
 }

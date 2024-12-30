@@ -71,9 +71,9 @@ public interface PluginInfoService {
     void updatePluginStatus(Long id, Integer status);
 
     /**
-     * 获得启用的插件列表
+     * 获得插件信息列表
      *
-     * @return 插件列表-插件id
+     * @return 插件信息列表
      */
-    List<String> getEnabledPlugins();
+    List<PluginInfoDO> getPluginInfoList();
 }

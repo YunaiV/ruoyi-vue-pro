@@ -16,9 +16,9 @@ public class PluginInfoRespVO {
     @ExcelProperty("主键 ID")
     private Long id;
 
-    @Schema(description = "插件包 ID", requiredMode = Schema.RequiredMode.REQUIRED, example = "24627")
-    @ExcelProperty("插件包 ID")
-    private String pluginId;
+    @Schema(description = "插件包标识符", requiredMode = Schema.RequiredMode.REQUIRED, example = "24627")
+    @ExcelProperty("插件包标识符")
+    private String pluginKey;
 
     @Schema(description = "插件名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "赵六")
     @ExcelProperty("插件名称")
