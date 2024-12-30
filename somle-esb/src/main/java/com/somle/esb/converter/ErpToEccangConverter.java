@@ -132,15 +132,16 @@ public class ErpToEccangConverter {
                 eccangProduct.setProductTitleEn(product.getSupplierProductCode() + "-" + getProductStatus(product.getCountryCode()));
                 eccangProduct.setProductSku(product.getSupplierProductCode() + "-" + getProductStatus(product.getCountryCode()));
             }
-            eccangProduct.setProductWeight(product.getProductWeight());
+            eccangProduct.setProductWeight(product.getPackageWeight());
             eccangProduct.setProductWidth(product.getPackageWidth());
             eccangProduct.setProductLength(product.getPackageLength());
             eccangProduct.setProductHeight(product.getPackageHeight());
             eccangProduct.setProductMaterial(product.getProductMaterial());
-            eccangProduct.setPdNetWeight(product.getPackageWeight());
-            eccangProduct.setPdNetLength(product.getProductLength());
-            eccangProduct.setPdNetWidth(product.getProductWidth());
-            eccangProduct.setPdNetHeight(product.getProductHeight());
+            eccangProduct.setPdNetWeight(product.getProductWeight());
+            //erp是毫米，这里需要除100变换成厘米
+            eccangProduct.setPdNetLength(product.getProductLength()/100);
+            eccangProduct.setPdNetWidth(product.getProductWidth()/100);
+            eccangProduct.setPdNetHeight(product.getProductHeight()/100);
             eccangProduct.setCurrencyCode(product.getPurchasePriceCurrencyCode());
             eccangProduct.setProductPurchaseValue(product.getProductPurchaseValue());
             eccangProduct.setFboTaxRate(product.getTaxRate());
