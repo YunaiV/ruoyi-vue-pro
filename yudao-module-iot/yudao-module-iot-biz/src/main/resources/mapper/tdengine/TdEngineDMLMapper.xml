@@ -42,7 +42,7 @@
 
     <!-- 根据标签获取最新数据 -->
     <select id="selectLastDataListByTags" parameterType="cn.iocoder.yudao.module.iot.dal.dataobject.tdengine.TagsSelectDO"
-            resultType="Map">
+            resultType="java.util.Map">
         SELECT LAST(*)
         FROM ${dataBaseName}.${stableName}
         GROUP BY ${tagsName}

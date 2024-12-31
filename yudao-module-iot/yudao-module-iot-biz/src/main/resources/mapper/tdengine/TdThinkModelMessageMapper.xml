@@ -6,12 +6,13 @@
 
     <!-- 创建物模型消息日志超级表 -->
     <update id="createSuperTable">
-        CREATE STABLE thing_model_message_${superTableName}(
+        CREATE STABLE thing_model_message_${productKey}(
             ts TIMESTAMP,
             id NCHAR(64),
             sys NCHAR(2048),
             method NCHAR(255),
-            params NCHAR(2048)
+            params NCHAR(2048),
+            device_name NCHAR(64)
         )TAGS (
             device_key NCHAR(50)
         )
@@ -19,13 +20,14 @@
 
     <!-- 创建物模型消息日志子表，带有deviceKey的TAG -->
     <update id="createTableWithTag">
-        CREATE STABLE ${tableName}
-        USING thing_model_message_${superTableName}(
+        CREATE STABLE ${deviceKey}
+        USING thing_model_message_${productKey}(
             ts,
             id ,
             sys ,
             method ,
-            params
+            params ,
+            device_name
         )TAGS(
             #{device_key}
         )

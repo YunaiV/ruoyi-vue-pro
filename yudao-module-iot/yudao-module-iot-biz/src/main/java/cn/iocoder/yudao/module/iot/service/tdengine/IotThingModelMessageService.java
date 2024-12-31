@@ -16,11 +16,6 @@ public interface IotThingModelMessageService {
      */
     void saveThingModelMessage(IotDeviceDO device, ThingModelMessage thingModelMessage);
 
-    /**
-     * 创建物模型消息日志超级表
-     *
-     * @param productId 产品编号
-     */
-    void createSuperTable(Long productId);
+
 
 }

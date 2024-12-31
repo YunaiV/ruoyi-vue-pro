@@ -17,6 +17,7 @@ import cn.iocoder.yudao.module.iot.dal.dataobject.thingmodel.IotThingModelDO;
 import cn.iocoder.yudao.module.iot.dal.tdengine.IotDevicePropertyDataMapper;
 import cn.iocoder.yudao.module.iot.dal.redis.deviceData.DeviceDataRedisDAO;
 import cn.iocoder.yudao.module.iot.dal.tdengine.TdEngineDMLMapper;
+import cn.iocoder.yudao.module.iot.dal.tdengine.TdThingModelMessageMapper;
 import cn.iocoder.yudao.module.iot.enums.IotConstants;
 import cn.iocoder.yudao.module.iot.enums.thingmodel.IotDataSpecsDataTypeEnum;
 import cn.iocoder.yudao.module.iot.enums.thingmodel.IotThingModelTypeEnum;
@@ -84,6 +85,9 @@ public class IotDevicePropertyDataServiceImpl implements IotDevicePropertyDataSe
     @Resource
     private IotDevicePropertyDataMapper devicePropertyDataMapper;
 
+    @Resource
+    private TdThingModelMessageMapper tdThingModelMessageMapper;
+
     @Override
     public void defineDevicePropertyData(Long productId) {
         // 1.1 查询产品和物模型
@@ -108,7 +112,10 @@ public class IotDevicePropertyDataServiceImpl implements IotDevicePropertyDataSe
                 return;
             }
             newFields.add(0, new TDengineTableField(TDengineTableField.FIELD_TS, TDengineTableField.TYPE_TIMESTAMP));
+            // 2.1.1 创建产品超级表
             devicePropertyDataMapper.createProductPropertySTable(product.getProductKey(), newFields);
+            // 2.1.2 创建物模型日志超级表
+            tdThingModelMessageMapper.createSuperTable(product.getProductKey());
             return;
         }
         // 2.2 情况二：如果是修改的时候，需要更新表

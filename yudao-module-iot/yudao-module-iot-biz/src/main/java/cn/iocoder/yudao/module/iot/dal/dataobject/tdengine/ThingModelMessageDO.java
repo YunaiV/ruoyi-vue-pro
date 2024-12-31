@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 // TODO @芋艿：纠结下字段
+@Deprecated
 /**
  * TD 物模型消息日志的数据库
  */
@@ -17,26 +18,17 @@ public class ThingModelMessageDO {
 
 
 
-    // TODO @haohao：superTableName 和 tableName 是不是合并。因为每个 mapper 操作的时候，有且只会使用到其中一个。
-    /**
-     * 超级表名称
-     */
-    private String superTableName;
-
-    /**
-     * 表名称
-     */
-    private String tableName;
-
     /**
      * 消息 ID
      */
     private String id;
 
     /**
-     * 扩展功能的参数
+     * 系统扩展参数
+     * 
+     * 例如：设备状态、系统时间、固件版本等系统级信息
      */
-    private Object sys;
+    private Object system;
 
     /**
      * 请求方法
@@ -54,6 +46,12 @@ public class ThingModelMessageDO {
      * 属性上报时间戳
      */
     private Long time;
+
+    /**
+     * 设备信息
+     */
+    private String productKey;
+
 
     /**
      * 设备 key
