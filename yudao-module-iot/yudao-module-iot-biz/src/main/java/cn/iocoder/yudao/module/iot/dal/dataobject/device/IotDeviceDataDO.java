@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.iot.dal.dataobject.device;
 
 import cn.iocoder.yudao.module.iot.dal.dataobject.product.IotProductDO;
-import cn.iocoder.yudao.module.iot.dal.dataobject.thingmodel.IotProductThingModelDO;
+import cn.iocoder.yudao.module.iot.dal.dataobject.thingmodel.IotThingModelDO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -30,7 +30,7 @@ public class IotDeviceDataDO {
     /**
      * 物模型编号
      * <p>
-     * 关联 {@link IotProductThingModelDO#getId()}
+     * 关联 {@link IotThingModelDO#getId()}
      */
     private Long thingModelId;
 
@@ -51,21 +51,21 @@ public class IotDeviceDataDO {
     /**
      * 属性标识符
      * <p>
-     * 关联 {@link IotProductThingModelDO#getIdentifier()}
+     * 关联 {@link IotThingModelDO#getIdentifier()}
      */
     private String identifier;
 
     /**
      * 属性名称
      * <p>
-     * 关联 {@link IotProductThingModelDO#getName()}
+     * 关联 {@link IotThingModelDO#getName()}
      */
     private String name;
 
     /**
      * 数据类型
      * <p>
-     * 关联 {@link IotProductThingModelDO#getProperty()#getDataType()}
+     * 关联 {@link IotThingModelDO#getProperty()#getDataType()}
      */
     private String dataType;
 

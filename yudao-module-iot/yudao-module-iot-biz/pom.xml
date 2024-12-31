@@ -27,13 +27,6 @@
 
         <dependency>
             <groupId>cn.iocoder.boot</groupId>
-            <artifactId>yudao-module-iot-plugin-api</artifactId>
-            <version>0.0.1</version>
-            <scope>compile</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>cn.iocoder.boot</groupId>
             <artifactId>yudao-spring-boot-starter-biz-tenant</artifactId>
         </dependency>
 
@@ -81,6 +74,7 @@
         <dependency>
             <groupId>org.pf4j</groupId>
             <artifactId>pf4j-spring</artifactId>
+            <!-- TODO @芋艿：可以放到 bom 里配置 -->
             <exclusions>
                 <exclusion>
                     <groupId>org.slf4j</groupId>

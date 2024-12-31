@@ -2,7 +2,7 @@ package cn.iocoder.yudao.module.iot.plugin;
 
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
-import cn.iocoder.yudao.module.iot.api.DeviceDataApi;
+import cn.iocoder.yudao.module.iot.api.device.DeviceDataApi;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
@@ -12,12 +12,9 @@ import io.netty.util.CharsetUtil;
 
 /**
  * 基于 Netty 的 HTTP 处理器，用于接收设备上报的数据并调用主程序的 DeviceDataApi 接口进行处理。
- * <p>
- * 请求格式：
- * POST /sys/{productKey}/{deviceName}/thing/event/property/post
- * 请求体为 JSON 格式数据。
- * <p>
- * 返回结果为 JSON 格式，包含统一的 code、data、id、message、method、version 字段。
+ *
+ * 1. 请求格式：JSON 格式，地址为 POST /sys/{productKey}/{deviceName}/thing/event/property/post
+ * 2. 返回结果：JSON 格式，包含统一的 code、data、id、message、method、version 字段
  */
 public class HttpHandler extends SimpleChannelInboundHandler<FullHttpRequest> {
 
@@ -29,10 +26,9 @@ public class HttpHandler extends SimpleChannelInboundHandler<FullHttpRequest> {
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, FullHttpRequest request) {
-        String uri = request.uri();
-
         // 期望的路径格式: /sys/{productKey}/{deviceName}/thing/event/property/post
         // 使用 "/" 拆分路径
+        String uri = request.uri();
         String[] parts = uri.split("/");
 
         /*
@@ -52,25 +48,19 @@ public class HttpHandler extends SimpleChannelInboundHandler<FullHttpRequest> {
                 && "event".equals(parts[5])
                 && "property".equals(parts[6])
                 && "post".equals(parts[7]);
-
         if (!isCorrectPath) {
-            // 如果路径不匹配，返回 404 错误
             writeResponse(ctx, HttpResponseStatus.NOT_FOUND, "Not Found");
             return;
         }
-
         String productKey = parts[2];
         String deviceName = parts[3];
 
-        // 从请求中获取原始数据
+        // 从请求中获取原始数据，尝试解析请求数据为 JSON 对象
         String requestBody = request.content().toString(CharsetUtil.UTF_8);
-
-        // 尝试解析请求数据为 JSON 对象
         JSONObject jsonData;
         try {
             jsonData = JSONUtil.parseObj(requestBody);
         } catch (Exception e) {
-            // 数据不是合法的 JSON 格式，返回 400 错误
             JSONObject res = createResponseJson(
                     400,
                     new JSONObject(),
@@ -82,8 +72,6 @@ public class HttpHandler extends SimpleChannelInboundHandler<FullHttpRequest> {
             writeResponse(ctx, HttpResponseStatus.BAD_REQUEST, res.toString());
             return;
         }
-
-        // 获取请求中的 id 字段，若不存在则为 null
         String id = jsonData.getStr("id", null);
 
         try {
@@ -101,7 +89,6 @@ public class HttpHandler extends SimpleChannelInboundHandler<FullHttpRequest> {
             );
             writeResponse(ctx, HttpResponseStatus.OK, successRes.toString());
         } catch (Exception e) {
-            // 保存数据过程中出现异常，返回 500 错误
             JSONObject errorRes = createResponseJson(
                     500,
                     new JSONObject(),
@@ -128,7 +115,7 @@ public class HttpHandler extends SimpleChannelInboundHandler<FullHttpRequest> {
     private JSONObject createResponseJson(int code, JSONObject data, String id, String message, String method, String version) {
         JSONObject res = new JSONObject();
         res.set("code", code);
-        res.set("data", data != null ? data : new JSONObject()); // 确保 data 不为 null
+        res.set("data", data != null ? data : new JSONObject());
         res.set("id", id);
         res.set("message", message);
         res.set("method", method);
@@ -137,24 +124,24 @@ public class HttpHandler extends SimpleChannelInboundHandler<FullHttpRequest> {
     }
 
     /**
-     * 向客户端返回 HTTP 响应的辅助方法。
+     * 向客户端返回 HTTP 响应的辅助方法
      *
      * @param ctx     通道上下文
      * @param status  HTTP 响应状态码（网络层面的）
      * @param content 响应内容（JSON 字符串或其他文本）
      */
     private void writeResponse(ChannelHandlerContext ctx, HttpResponseStatus status, String content) {
+        // 设置响应头为 JSON 类型和正确的编码
         FullHttpResponse response = new DefaultFullHttpResponse(
                 HttpVersion.HTTP_1_1,
                 status,
                 Unpooled.copiedBuffer(content, CharsetUtil.UTF_8)
         );
-
-        // 设置响应头为 JSON 类型和正确的编码
         response.headers().set(HttpHeaderNames.CONTENT_TYPE, "application/json; charset=UTF-8");
         response.headers().set(HttpHeaderNames.CONTENT_LENGTH, response.content().readableBytes());
 
         // 发送响应并在发送完成后关闭连接
         ctx.writeAndFlush(response).addListener(ChannelFutureListener.CLOSE);
     }
+
 }

@@ -35,14 +35,11 @@ public enum IotPluginTypeEnum implements IntArrayValuable {
         return ARRAYS;
     }
 
-    // TODO @haohao：可以使用 hutool 简化
     public static IotPluginTypeEnum fromType(Integer type) {
-        for (IotPluginTypeEnum value : values()) {
-            if (value.getType().equals(type)) {
-                return value;
-            }
-        }
-        return null;
+        return Arrays.stream(values())
+                .filter(value -> value.getType().equals(type))
+                .findFirst()
+                .orElse(null);
     }
 
     public static boolean isValidType(Integer type) {

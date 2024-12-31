@@ -24,6 +24,7 @@
         <plugin.class>cn.iocoder.yudao.module.iot.plugin.HttpPlugin</plugin.class>
         <plugin.version>0.0.1</plugin.version>
         <plugin.provider>ahh</plugin.provider>
+        <plugin.description>http-plugin-0.0.1</plugin.description>
         <plugin.dependencies/>
     </properties>
 
@@ -104,6 +105,7 @@
                             <Plugin-Class>${plugin.class}</Plugin-Class>
                             <Plugin-Version>${plugin.version}</Plugin-Version>
                             <Plugin-Provider>${plugin.provider}</Plugin-Provider>
+                            <Plugin-Description>${plugin.description}</Plugin-Description>
                             <Plugin-Dependencies>${plugin.dependencies}</Plugin-Dependencies>
                         </manifestEntries>
                     </archive>

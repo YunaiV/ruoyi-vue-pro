@@ -7,6 +7,7 @@ import java.util.Map;
  * 服务注册表 - 插架模块使用，无法使用 Spring 注入
  */
 public class ServiceRegistry {
+
     private static final Map<Class<?>, Object> services = new HashMap<>();
 
     /**
@@ -31,4 +32,5 @@ public class ServiceRegistry {
     public static <T> T getService(Class<T> serviceClass) {
         return (T) services.get(serviceClass);
     }
+
 }

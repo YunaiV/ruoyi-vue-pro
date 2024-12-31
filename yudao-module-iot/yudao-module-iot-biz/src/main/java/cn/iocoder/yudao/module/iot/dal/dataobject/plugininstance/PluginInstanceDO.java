@@ -1,12 +1,13 @@
 package cn.iocoder.yudao.module.iot.dal.dataobject.plugininstance;
 
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import cn.iocoder.yudao.module.iot.dal.dataobject.plugininfo.PluginInfoDO;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
 
-// TODO @haohao：一些必要的关联、枚举
+
 /**
  * IoT 插件实例 DO
  *
@@ -33,6 +34,8 @@ public class PluginInstanceDO extends BaseDO {
     private String mainId;
     /**
      * 插件id
+     * <p>
+     * 关联 {@link PluginInfoDO#getId()}
      */
     private Long pluginId;
     /**

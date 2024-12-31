@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.iocoder.yudao.module.iot.dal.tdengine.IotDevicePropertyDataMapper">
+
+    <select id="getProductPropertySTableFieldList" resultType="cn.iocoder.yudao.module.iot.framework.tdengine.core.TDengineTableField">
+        DESCRIBE product_property_${productKey}
+    </select>
+
+    <update id="createProductPropertySTable">
+        CREATE STABLE product_property_${productKey}
+        <foreach item="field" collection="fields" separator="," open="(" close=")">
+            ${field.field} ${field.type}
+            <if test="field.length != null and field.length > 0">
+                (${field.length})
+            </if>
+        </foreach>
+        TAGS (
+            device_key NCHAR(50)
+        )
+    </update>
+
+    <update id="alterProductPropertySTableAddField">
+        ALTER STABLE product_property_${productKey}
+        ADD COLUMN ${field.field} ${field.type}
+        <if test="field.length != null and field.length > 0">
+            (${field.length})
+        </if>
+    </update>
+
+    <update id="alterProductPropertySTableModifyField">
+        ALTER STABLE product_property_${productKey}
+        MODIFY COLUMN ${field.field} ${field.type}
+        <if test="field.length != null and field.length > 0">
+            (${field.length})
+        </if>
+    </update>
+
+    <update id="alterProductPropertySTableDropField">
+        ALTER STABLE product_property_${productKey}
+        DROP COLUMN ${field.field}
+    </update>
+
+</mapper>

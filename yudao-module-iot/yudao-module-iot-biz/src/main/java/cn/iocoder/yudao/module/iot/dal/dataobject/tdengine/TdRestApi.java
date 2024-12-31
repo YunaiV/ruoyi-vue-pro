@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
  */
 @Slf4j
 @Service
+@Deprecated // TODO 芋艿：貌似没用到
 public class TdRestApi {
 
     @Value("${spring.datasource.dynamic.datasource.tdengine.url}")

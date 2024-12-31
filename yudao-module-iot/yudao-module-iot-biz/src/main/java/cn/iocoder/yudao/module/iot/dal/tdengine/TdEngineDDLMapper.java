@@ -96,7 +96,6 @@ public interface TdEngineDDLMapper {
     @TenantIgnore
     void modifyColumnWidthForSuperTable(TdTableDO superTable);
 
-
     /**
      * 修改超级表 - 为超级表添加标签
      *

@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 
 import java.util.List;
 
+@Deprecated
 /**
  * TD 引擎的数据库
  */
