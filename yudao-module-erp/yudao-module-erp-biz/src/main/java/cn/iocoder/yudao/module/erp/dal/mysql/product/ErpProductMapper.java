@@ -19,11 +19,15 @@ public interface ErpProductMapper extends BaseMapperX<ErpProductDO> {
 
     default PageResult<ErpProductDO> selectPage(ErpProductPageReqVO reqVO) {
         return selectPage(reqVO, new LambdaQueryWrapperX<ErpProductDO>()
-                .likeIfPresent(ErpProductDO::getName, reqVO.getName())
-                .eqIfPresent(ErpProductDO::getCategoryId, reqVO.getCategoryId())
-                .likeIfPresent(ErpProductDO::getBarCode, reqVO.getBarCode())
-                .betweenIfPresent(ErpProductDO::getCreateTime, reqVO.getCreateTime())
-                .orderByDesc(ErpProductDO::getId));
+            .likeIfPresent(ErpProductDO::getName, reqVO.getName())
+            .eqIfPresent(ErpProductDO::getCategoryId, reqVO.getCategoryId())
+            .likeIfPresent(ErpProductDO::getBarCode, reqVO.getBarCode())
+            .likeIfPresent(ErpProductDO::getBrand, reqVO.getBrand())
+            .eqIfPresent(ErpProductDO::getDeptId, reqVO.getDeptId())
+            .likeIfPresent(ErpProductDO::getSeries, reqVO.getSeries())
+            .eqIfPresent(ErpProductDO::getStatus, reqVO.getStatus())
+            .betweenIfPresent(ErpProductDO::getCreateTime, reqVO.getCreateTime())
+            .orderByDesc(ErpProductDO::getId));
     }
 
     default Long selectCountByCategoryId(Long categoryId) {

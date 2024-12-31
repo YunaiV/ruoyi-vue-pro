@@ -56,7 +56,7 @@ public class ErpSupplierProductRespVO {
 
     @Schema(description = "采购货币代码")
     @ExcelProperty("采购货币代码")
-    private String purchasePriceCurrencyCode;
+    private Integer purchasePriceCurrencyCode;
 
     @Schema(description = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED)
     @ExcelProperty("创建时间")

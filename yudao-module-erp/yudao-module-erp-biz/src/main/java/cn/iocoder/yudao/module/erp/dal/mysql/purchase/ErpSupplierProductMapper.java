@@ -17,7 +17,7 @@ public interface ErpSupplierProductMapper extends BaseMapperX<ErpSupplierProduct
 
     default PageResult<ErpSupplierProductDO> selectPage(ErpSupplierProductPageReqVO reqVO) {
         return selectPage(reqVO, new LambdaQueryWrapperX<ErpSupplierProductDO>()
-                .eqIfPresent(ErpSupplierProductDO::getCode, reqVO.getCode())
+                .likeIfPresent(ErpSupplierProductDO::getCode, reqVO.getCode())
                 .eqIfPresent(ErpSupplierProductDO::getSupplierId, reqVO.getSupplierId())
                 .eqIfPresent(ErpSupplierProductDO::getProductId, reqVO.getProductId())
                 .eqIfPresent(ErpSupplierProductDO::getPackageHeight, reqVO.getPackageHeight())

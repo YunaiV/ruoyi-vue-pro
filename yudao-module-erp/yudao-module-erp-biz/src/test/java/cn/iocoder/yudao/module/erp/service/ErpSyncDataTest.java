@@ -51,16 +51,15 @@ public class ErpSyncDataTest extends BaseDbUnitTest {
         // mock 数据
         ErpCustomRuleSaveReqVO erpCustomRuleSaveReqVO = new ErpCustomRuleSaveReqVO();
         erpCustomRuleSaveReqVO.setId(15675L);
-        erpCustomRuleSaveReqVO.setCountryCode("US");
+        erpCustomRuleSaveReqVO.setCountryCode(1);
         erpCustomRuleSaveReqVO.setType("报关");
         erpCustomRuleSaveReqVO.setSupplierProductId(67890L);
         erpCustomRuleSaveReqVO.setDeclaredTypeEn("Electronic Component");
         erpCustomRuleSaveReqVO.setDeclaredType("电子元件");
         erpCustomRuleSaveReqVO.setDeclaredValue(150.75);
-        erpCustomRuleSaveReqVO.setDeclaredValueCurrencyCode("USD");
+        erpCustomRuleSaveReqVO.setDeclaredValueCurrencyCode(1);
         erpCustomRuleSaveReqVO.setTaxRate(new BigDecimal("0.18"));
         erpCustomRuleSaveReqVO.setHscode("85423190");
-        erpCustomRuleSaveReqVO.setLogisticAttribute("Fragile");
 
 
         // 调用

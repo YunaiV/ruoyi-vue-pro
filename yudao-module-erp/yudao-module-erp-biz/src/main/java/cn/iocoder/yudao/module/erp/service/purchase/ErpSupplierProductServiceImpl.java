@@ -61,7 +61,7 @@ public class ErpSupplierProductServiceImpl implements ErpSupplierProductService 
         ErpSupplierProductDO updateObj = BeanUtils.toBean(updateReqVO, ErpSupplierProductDO.class);
         ThrowUtil.ifSqlThrow(supplierProductMapper.updateById(updateObj),DB_UPDATE_ERROR);
         //同步数据
-        var dtos = customRuleMapper.selectProductAllInfoListByCustomRuleId(id);
+        var dtos = customRuleMapper.selectProductAllInfoListBySupplierId(id);
         erpProductChannel.send(MessageBuilder.withPayload(dtos).build());
     }
 

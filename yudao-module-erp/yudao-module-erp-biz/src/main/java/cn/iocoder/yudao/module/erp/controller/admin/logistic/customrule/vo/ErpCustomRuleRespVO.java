@@ -27,7 +27,7 @@ public class ErpCustomRuleRespVO implements VO {
 
     @Schema(description = "国家编码", requiredMode = Schema.RequiredMode.REQUIRED)
     @ExcelProperty("国家编码")
-    private String countryCode;
+    private Integer countryCode;
 
     @Schema(description = "类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "报关")
     @ExcelProperty("类型")
@@ -56,7 +56,7 @@ public class ErpCustomRuleRespVO implements VO {
 
     @Schema(description = "申报金额币种")
     @ExcelProperty("申报金额币种")
-    private String declaredValueCurrencyCode;
+    private Integer declaredValueCurrencyCode;
 
     @Schema(description = "税率")
     @ExcelProperty("税率")
@@ -68,7 +68,7 @@ public class ErpCustomRuleRespVO implements VO {
 
     @Schema(description = "物流属性")
     @ExcelProperty("物流属性")
-    private String logisticAttribute;
+    private Integer logisticAttribute;
 
     @Schema(description = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED)
     @ExcelProperty("创建时间")

@@ -1,14 +1,18 @@
 package com.somle.esb.converter;
 
 import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.iocoder.yudao.framework.common.enums.enums.DictTypeConstants;
 import cn.iocoder.yudao.framework.common.exception.util.ThrowUtil;
 import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
 import cn.iocoder.yudao.module.erp.api.product.dto.ErpCustomRuleDTO;
 import cn.iocoder.yudao.module.system.api.dept.DeptApi;
 import cn.iocoder.yudao.module.system.api.dept.dto.DeptLevelRespDTO;
 import cn.iocoder.yudao.module.system.api.dept.dto.DeptRespDTO;
+import cn.iocoder.yudao.module.system.api.dict.DictDataApi;
+import cn.iocoder.yudao.module.system.api.dict.dto.DictDataRespDTO;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import com.somle.eccang.model.*;
@@ -36,6 +40,8 @@ public class ErpToEccangConverter {
     private DeptApi deptApi;
     @Autowired
     private AdminUserApi userApi;
+    @Autowired
+    private DictDataApi dictDataApi;
 
 //    public EccangProduct toEccang(ErpCountrySku erpCountrySku) {
 //        ErpStyleSku erpStyleSku = erpCountrySku.getStyleSku();
@@ -128,9 +134,15 @@ public class ErpToEccangConverter {
             eccangProduct.setPdDeclarationStatement(product.getId());
             eccangProduct.setProductTitle(product.getProductName());
             //如果有供应商产品编码和国家代码都不为空的时候才去设置SKU
-            if (StrUtil.isNotBlank(product.getSupplierProductCode()) && StrUtil.isNotBlank(product.getCountryCode())) {
-                eccangProduct.setProductTitleEn(product.getSupplierProductCode() + "-" + getProductStatus(product.getCountryCode()));
-                eccangProduct.setProductSku(product.getSupplierProductCode() + "-" + getProductStatus(product.getCountryCode()));
+            //获取国家代码字典value
+            Integer countryCode = product.getCountryCode();
+            if (ObjUtil.isNotEmpty(countryCode)){
+                //将字典value转换为label
+                DictDataRespDTO dictData = dictDataApi.getDictData(DictTypeConstants.COUNTRY_CODE, String.valueOf(countryCode));
+                if (StrUtil.isNotBlank(product.getSupplierProductCode())){
+                    eccangProduct.setProductTitleEn(product.getSupplierProductCode() + "-" + getProductStatus(dictData.getLabel()));
+                    eccangProduct.setProductSku(product.getSupplierProductCode() + "-" + getProductStatus(dictData.getLabel()));
+                }
             }
             eccangProduct.setProductWeight(product.getPackageWeight());
             eccangProduct.setProductWidth(product.getPackageWidth());
@@ -142,17 +154,31 @@ public class ErpToEccangConverter {
             eccangProduct.setPdNetLength(product.getProductLength()/100);
             eccangProduct.setPdNetWidth(product.getProductWidth()/100);
             eccangProduct.setPdNetHeight(product.getProductHeight()/100);
-            eccangProduct.setCurrencyCode(product.getPurchasePriceCurrencyCode());
+            //字典数据转换
+            Integer declaredValueCurrencyCode = product.getDeclaredValueCurrencyCode();
+            Integer purchasePriceCurrencyCode = product.getPurchasePriceCurrencyCode();
+            if (ObjUtil.isNotEmpty(declaredValueCurrencyCode)){
+                DictDataRespDTO dictData = dictDataApi.getDictData(DictTypeConstants.CURRENCY_CODE, String.valueOf(declaredValueCurrencyCode));
+                eccangProduct.setPdDeclareCurrencyCode(dictData.getLabel());
+            }
+            if (ObjUtil.isNotEmpty(purchasePriceCurrencyCode)){
+                DictDataRespDTO dictData = dictDataApi.getDictData(DictTypeConstants.CURRENCY_CODE, String.valueOf(purchasePriceCurrencyCode));
+                eccangProduct.setCurrencyCode(dictData.getLabel());
+            }
             eccangProduct.setProductPurchaseValue(product.getProductPurchaseValue());
             eccangProduct.setFboTaxRate(product.getTaxRate());
             eccangProduct.setPdOverseaTypeCn(product.getDeclaredType());
-            eccangProduct.setPdDeclareCurrencyCode(product.getDeclaredValueCurrencyCode());
+
             eccangProduct.setProductImgUrlList(Collections.singletonList(product.getProductImageUrl()));
             eccangProduct.setHsCode(product.getHscode());
             eccangProduct.setDefaultSupplierCode("默认供应商");
-            //eccangProduct.setLogisticAttribute(product.getLogisticAttribute());直接设置会提示[{"errorCode":"10001","errorMsg":"产品【DDDDDDD-XXX】产品物流属性ID在系统中未找到"}]
-            //TODO 当前大部分产品无需商检，目前暂且设置为1，待确认
-            eccangProduct.setLogisticAttribute("1");
+            //物流属性
+            Integer logisticAttribute = product.getLogisticAttribute();
+            if (ObjUtil.isNotEmpty(logisticAttribute)){
+                eccangProduct.setLogisticAttribute(String.valueOf(logisticAttribute));
+            }
+            //销售状态默认是在线产品,对应的no是2
+            eccangProduct.setSaleStatus(2);
             eccangProduct.setProductDeclaredValue(product.getDeclaredValue());
             eccangProduct.setPdOverseaTypeEn(product.getDeclaredTypeEn());
             //设置产品创建人部门名称

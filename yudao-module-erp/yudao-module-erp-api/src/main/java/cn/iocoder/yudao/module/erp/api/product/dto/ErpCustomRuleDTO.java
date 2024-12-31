@@ -29,7 +29,7 @@ public class ErpCustomRuleDTO {
     /**
      * 国家编码
      */
-    private String countryCode;
+    private Integer countryCode;
 
     /**
      * 图片地址（当前只有一张）
@@ -84,12 +84,12 @@ public class ErpCustomRuleDTO {
     /**
      * 采购货币币种
      */
-    private String purchasePriceCurrencyCode;
+    private Integer purchasePriceCurrencyCode;
 
     /**
      * 产品物流属性
      */
-    private String logisticAttribute;
+    private Integer logisticAttribute;
 
     /**
      * 海关编码
@@ -104,7 +104,7 @@ public class ErpCustomRuleDTO {
     /**
      * 申报币种
      */
-    private String declaredValueCurrencyCode;
+    private Integer declaredValueCurrencyCode;
 
     /**
      * 申报品名CN

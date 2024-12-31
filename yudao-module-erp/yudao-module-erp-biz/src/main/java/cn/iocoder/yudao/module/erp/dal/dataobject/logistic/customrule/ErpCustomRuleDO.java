@@ -3,9 +3,6 @@ package cn.iocoder.yudao.module.erp.dal.dataobject.logistic.customrule;
 import lombok.*;
 
 import java.math.BigDecimal;
-import java.util.*;
-import java.time.LocalDateTime;
-import java.time.LocalDateTime;
 import com.baomidou.mybatisplus.annotation.*;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 
@@ -32,7 +29,7 @@ public class ErpCustomRuleDO extends BaseDO {
     /**
      * 国家编码
      */
-    private String countryCode;
+    private Integer countryCode;
     /**
      * 类型
      */
@@ -56,7 +53,7 @@ public class ErpCustomRuleDO extends BaseDO {
     /**
      * 申报金额币种
      */
-    private String declaredValueCurrencyCode;
+    private Integer declaredValueCurrencyCode;
     /**
      * 税率
      */
@@ -68,6 +65,6 @@ public class ErpCustomRuleDO extends BaseDO {
     /**
      * 物流属性
      */
-    private String logisticAttribute;
+    private Integer logisticAttribute;
 
 }

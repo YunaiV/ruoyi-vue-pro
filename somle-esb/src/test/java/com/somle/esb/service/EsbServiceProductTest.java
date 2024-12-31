@@ -147,7 +147,7 @@ class EsbServiceProductTest extends BaseSpringIntegrationTest {
         ErpCustomRuleDTO product = new ErpCustomRuleDTO();
         product.setId("R12345");
         product.setProductName("Wireless Headphones");
-        product.setCountryCode("XXX");
+        product.setCountryCode(1);
 //        product.setImageUrl("https://example.com/images/product1.jpg");
 
         product.setPackageWeight(1.2f);
@@ -159,11 +159,11 @@ class EsbServiceProductTest extends BaseSpringIntegrationTest {
         product.setProductWidth(11.0f);
         product.setProductHeight(6.0f);
         product.setProductMaterial("Plastic and Metal");
-        product.setPurchasePriceCurrencyCode("USD");
-        product.setLogisticAttribute("Fragile");
+        product.setPurchasePriceCurrencyCode(1);
+        product.setLogisticAttribute(1);
         product.setHscode("85076000");
         product.setDeclaredValue(50.0f);
-        product.setDeclaredValueCurrencyCode("USD");
+        product.setDeclaredValueCurrencyCode(1);
         product.setDeclaredType("无线耳机");
         product.setDeclaredTypeEn("Wireless Headphones");
         product.setTaxRate(0.12f);
@@ -186,16 +186,15 @@ class EsbServiceProductTest extends BaseSpringIntegrationTest {
     public void aopTest() {
         printAllBeans();
         ErpCustomRuleSaveReqVO erpCustomRuleSaveReqVO = new ErpCustomRuleSaveReqVO();
-        erpCustomRuleSaveReqVO.setCountryCode("YY");
+        erpCustomRuleSaveReqVO.setCountryCode(1);
         erpCustomRuleSaveReqVO.setType("import");
         erpCustomRuleSaveReqVO.setSupplierProductId(1L);
         erpCustomRuleSaveReqVO.setDeclaredTypeEn("Electronic Component");
         erpCustomRuleSaveReqVO.setDeclaredType("电子元件");
         erpCustomRuleSaveReqVO.setDeclaredValue(150.75);
-        erpCustomRuleSaveReqVO.setDeclaredValueCurrencyCode("USD");
+        erpCustomRuleSaveReqVO.setDeclaredValueCurrencyCode(1);
         erpCustomRuleSaveReqVO.setTaxRate(new BigDecimal("0.18"));
         erpCustomRuleSaveReqVO.setHscode("85423190");
-        erpCustomRuleSaveReqVO.setLogisticAttribute("Fragile");
 
 //        ErpCustomRuleDO customRule = BeanUtils.toBean(erpCustomRuleSaveReqVO, ErpCustomRuleDO.class);
         log.info(erpCustomRuleMapper.selectList().toString());

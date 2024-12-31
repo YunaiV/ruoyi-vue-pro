@@ -62,6 +62,6 @@ public class ErpSupplierProductDO extends BaseDO {
     /**
      * 采购货币代码
      */
-    private String purchasePriceCurrencyCode;
+    private Integer purchasePriceCurrencyCode;
 
 }
