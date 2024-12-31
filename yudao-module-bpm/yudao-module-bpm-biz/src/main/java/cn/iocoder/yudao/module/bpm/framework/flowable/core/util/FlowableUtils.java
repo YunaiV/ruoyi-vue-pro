@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.Callable;
 
 /**
  * Flowable 相关的工具方法
@@ -38,6 +39,17 @@ public class FlowableUtils {
 
     public static void clearAuthenticatedUserId() {
         Authentication.setAuthenticatedUserId(null);
+    }
+
+    public static <V> V executeAuthenticatedUserId(Long userId, Callable<V> callable) {
+        setAuthenticatedUserId(userId);
+        try {
+            return callable.call();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        } finally {
+            clearAuthenticatedUserId();
+        }
     }
 
     public static String getTenantId() {
