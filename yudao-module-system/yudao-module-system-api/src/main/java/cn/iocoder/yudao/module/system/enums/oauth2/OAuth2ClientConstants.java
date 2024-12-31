@@ -9,4 +9,6 @@ public interface OAuth2ClientConstants {
 
     String CLIENT_ID_DEFAULT = "default";
 
+    String CLIENT_ID_API_KEY = "apiKey";
+
 }
