@@ -7,15 +7,13 @@ import cn.iocoder.yudao.framework.tenant.core.aop.TenantIgnore;
 import cn.iocoder.yudao.module.iot.controller.admin.device.vo.device.IotDeviceStatusUpdateReqVO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDataDO;
-import cn.iocoder.yudao.module.iot.dal.dataobject.tdengine.FieldParser;
-import cn.iocoder.yudao.module.iot.dal.dataobject.tdengine.TdFieldDO;
-import cn.iocoder.yudao.module.iot.dal.dataobject.tdengine.TdTableDO;
-import cn.iocoder.yudao.module.iot.dal.dataobject.tdengine.ThingModelMessage;
+import cn.iocoder.yudao.module.iot.dal.dataobject.tdengine.*;
 import cn.iocoder.yudao.module.iot.dal.dataobject.thingmodel.IotThingModelDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.product.IotProductDO;
 import cn.iocoder.yudao.module.iot.dal.redis.deviceData.DeviceDataRedisDAO;
 import cn.iocoder.yudao.module.iot.dal.tdengine.TdEngineDDLMapper;
 import cn.iocoder.yudao.module.iot.dal.tdengine.TdEngineDMLMapper;
+import cn.iocoder.yudao.module.iot.dal.tdengine.TdThingModelMessageMapper;
 import cn.iocoder.yudao.module.iot.enums.IotConstants;
 import cn.iocoder.yudao.module.iot.enums.device.IotDeviceStatusEnum;
 import cn.iocoder.yudao.module.iot.enums.thingmodel.IotThingModelTypeEnum;
@@ -64,6 +62,9 @@ public class IotThingModelMessageServiceImpl implements IotThingModelMessageServ
     private TdEngineDMLMapper tdEngineDMLMapper;
 
     @Resource
+    private TdThingModelMessageMapper tdThingModelMessageMapper;
+
+    @Resource
     private DeviceDataRedisDAO deviceDataRedisDAO;
 
 
@@ -78,7 +79,7 @@ public class IotThingModelMessageServiceImpl implements IotThingModelMessageServ
             iotDeviceService.updateDeviceStatus(new IotDeviceStatusUpdateReqVO()
                     .setId(device.getId()).setStatus(IotDeviceStatusEnum.ONLINE.getStatus()));
             // 1.2 创建物模型日志设备表
-            createThingModelMessageDeviceTable(device.getProductKey(), device.getDeviceName(), device.getDeviceKey());
+            createThingModelMessageDeviceTable(device.getProductKey(), device.getDeviceKey());
         }
 
         // 2. 获取设备属性并进行物模型校验，过滤非物模型属性
@@ -232,23 +233,16 @@ public class IotThingModelMessageServiceImpl implements IotThingModelMessageServ
      * 创建物模型日志设备数据表
      *
      * @param productKey 产品 Key
-     * @param deviceName 设备名称
      * @param deviceKey  设备 Key
      *
      */
-    private void createThingModelMessageDeviceTable(String productKey, String deviceName, String deviceKey){
+    private void createThingModelMessageDeviceTable(String productKey,  String deviceKey){
 
-        // 1. 获取超级表的名称、数据库名称、设备日志表名称
-        String databaseName = IotTdDatabaseUtils.getDatabaseName(url);
-        String superTableName = IotTdDatabaseUtils.getThingModelMessageSuperTableName(productKey);
-        // TODO @alwayssuper：最好 databaseName、superTableName、thinkModelMessageDeviceTableName 的处理，放到 tdThinkModelMessageMapper 里。可以考虑，弄个 default 方法
-        String thinkModelMessageDeviceTableName = IotTdDatabaseUtils.getThingModelMessageDeviceTableName(productKey, deviceName);
 
         // 2. 创建物模型日志设备数据表
 //        tdThingModelMessageMapper.createTableWithTag(ThingModelMessageDO.builder().build()
-//                .setDataBaseName(databaseName)
-//                .setSuperTableName(superTableName)
-//                .setTableName(thinkModelMessageDeviceTableName)
+//                .setSuperTableName(productKey)
+//                .setTableName(deviceKey)
 //                .setDeviceKey(deviceKey));
     }
 
