@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.annotation.PostConstruct;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.*;
@@ -186,20 +187,19 @@ public class PluginInfoServiceImpl implements PluginInfoService {
             if (pluginWrapper == null) {
                 throw exception(PLUGIN_INSTALL_FAILED);
             }
-            String pluginInfo = pluginKeyNew + "@" + pluginWrapper.getDescriptor().getVersion();
             List<String> targetLines = Files.exists(targetFilePath) ? Files.readAllLines(targetFilePath)
                     : new ArrayList<>();
             List<String> oppositeLines = Files.exists(oppositeFilePath) ? Files.readAllLines(oppositeFilePath)
                     : new ArrayList<>();
 
-            if (!targetLines.contains(pluginInfo)) {
-                targetLines.add(pluginInfo);
+            if (!targetLines.contains(pluginKeyNew)) {
+                targetLines.add(pluginKeyNew);
                 Files.write(targetFilePath, targetLines, StandardOpenOption.CREATE,
                         StandardOpenOption.TRUNCATE_EXISTING);
             }
 
-            if (oppositeLines.contains(pluginInfo)) {
-                oppositeLines.remove(pluginInfo);
+            if (oppositeLines.contains(pluginKeyNew)) {
+                oppositeLines.remove(pluginKeyNew);
                 Files.write(oppositeFilePath, oppositeLines, StandardOpenOption.CREATE,
                         StandardOpenOption.TRUNCATE_EXISTING);
             }
@@ -267,4 +267,8 @@ public class PluginInfoServiceImpl implements PluginInfoService {
         return pluginInfoMapper.selectList(null);
     }
 
+    @Override
+    public List<PluginInfoDO> getRunningPluginInfoList() {
+        return pluginInfoMapper.selectListByStatus(IotPluginStatusEnum.RUNNING.getStatus());
+    }
 }

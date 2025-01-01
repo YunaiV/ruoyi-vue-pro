@@ -19,7 +19,7 @@ import org.springframework.stereotype.Component;
  */
 @Slf4j
 @Data
-@Component
+//@Component
 public class EmqxClient {
 
     @Resource

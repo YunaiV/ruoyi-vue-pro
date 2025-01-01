@@ -12,8 +12,8 @@ import org.springframework.stereotype.Component;
  * @author ahh
  */
 @Data
-@Component
-@ConfigurationProperties("iot.emq")
+//@Component
+//@ConfigurationProperties("iot.emq")
 public class MqttConfig {
 
     /**

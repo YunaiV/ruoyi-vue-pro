@@ -17,7 +17,7 @@ import org.springframework.stereotype.Component;
  * @author ahh
  */
 @Slf4j
-@Component
+//@Component
 public class EmqxCallback implements MqttCallbackExtended {
 
     @Lazy
