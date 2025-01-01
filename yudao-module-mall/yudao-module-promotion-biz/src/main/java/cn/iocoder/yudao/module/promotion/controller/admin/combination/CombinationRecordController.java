@@ -63,7 +63,7 @@ public class CombinationRecordController {
         summaryVO.setSuccessCount(combinationRecordService.getCombinationRecordCount( // 获取成团记录
                 CombinationRecordStatusEnum.SUCCESS.getStatus(), null, CombinationRecordDO.HEAD_ID_GROUP));
         summaryVO.setVirtualGroupCount(combinationRecordService.getCombinationRecordCount(// 获取虚拟成团记录
-                null, Boolean.TRUE, CombinationRecordDO.HEAD_ID_GROUP));
+                null, Boolean.TRUE, null));
         return success(summaryVO);
     }
 
