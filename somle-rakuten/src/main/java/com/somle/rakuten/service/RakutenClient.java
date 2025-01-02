@@ -74,11 +74,11 @@ public class RakutenClient {
 
     private Response sendPostRequest(String endpoint, String requestBody) {
         var request = RequestX.builder()
-                .requestMethod(RequestX.Method.POST)
-                .url(BASE_URL + endpoint)
-                .headers(getHeaders())
-                .payload(JsonUtils.parseObject(requestBody, JSONObject.class))
-                .build();
+            .requestMethod(RequestX.Method.POST)
+            .url(BASE_URL + endpoint)
+            .headers(getHeaders())
+            .payload(JsonUtils.parseObject(requestBody, JSONObject.class))
+            .build();
         return WebUtils.sendRequest(request);
     }
 
@@ -124,5 +124,4 @@ public class RakutenClient {
             throw new RuntimeException("Error occurred while sending request", e);
         }
     }
-
 }

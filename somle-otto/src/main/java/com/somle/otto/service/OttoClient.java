@@ -53,8 +53,9 @@ public class OttoClient {
                 .queryParams(map)
                 .headers(Map.of("Authorization", "Bearer " + getAccessToken()))
                 .build();
-        Response response = WebUtils.sendRequest(requestX);
-        return handleResponse(response);
+        try(Response response = WebUtils.sendRequest(requestX)){
+            return handleResponse(response);
+        }
     }
 
     /**
@@ -81,8 +82,9 @@ public class OttoClient {
                 .headers(Map.of("Authorization", "Bearer " + getAccessToken()))
                 .build();
 
-        Response response = WebUtils.sendRequest(requestX);
-        return handleResponse(response);
+        try(Response response = WebUtils.sendRequest(requestX)){
+            return handleResponse(response);
+        }
     }
 
     // 根据链接获取更多结算数据
@@ -95,9 +97,10 @@ public class OttoClient {
                 .build();
 
         try {
-            Response response = WebUtils.sendRequest(requestX);
-            if (response.isSuccessful()) {
-                return parseResponse(response);
+            try(Response response = WebUtils.sendRequest(requestX)){
+                if (response.isSuccessful()) {
+                    return parseResponse(response);
+                }
             }
             log.error("Failed to fetch data from link: {}", links.getHref());
         } catch (IOException e) {

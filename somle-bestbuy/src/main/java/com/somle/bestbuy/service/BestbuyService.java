@@ -83,10 +83,10 @@ public class BestbuyService {
      */
     private Response sendRequest(String endpoint, String requestBody, RequestX.Method httpMethod) {
         var request = RequestX.builder()
-                .requestMethod(httpMethod)
-                .url(BASE_URL + endpoint)
-                .headers(getHeaders())
-                .build();
+            .requestMethod(httpMethod)
+            .url(BASE_URL + endpoint)
+            .headers(getHeaders())
+            .build();
         if (httpMethod.equals(HttpMethod.POST)) {
             request.setPayload(JsonUtils.parseObject(requestBody, JSONObject.class));
         }

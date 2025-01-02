@@ -74,11 +74,12 @@ public class AmazonSpClient {
             .queryParams(vo)
             .headers(headers)
             .build();
-        var response = WebUtils.sendRequest(request);
-        var bodyString = response.body().string();
-        var result = JsonUtils.parseObject(bodyString, AmazonSpOrderRespVO.class);
-        validateResponse(result);
-        return result;
+        try(var response = WebUtils.sendRequest(request)){
+            var bodyString = response.body().string();
+            var result = JsonUtils.parseObject(bodyString, AmazonSpOrderRespVO.class);
+            validateResponse(result);
+            return result;
+        }
     }
 
     @SneakyThrows
@@ -112,10 +113,11 @@ public class AmazonSpClient {
             .queryParams(vo)
             .headers(headers)
             .build();
-        var response = WebUtils.sendRequest(request);
-        var reportsString = WebUtils.parseResponse(response, JSONObject.class).get("reports");
-        var reportList = JsonUtils.parseArray(reportsString, AmazonSpReport.class);
-        return reportList;
+        try(var response = WebUtils.sendRequest(request)){
+            var reportsString = WebUtils.parseResponse(response, JSONObject.class).get("reports");
+            var reportList = JsonUtils.parseArray(reportsString, AmazonSpReport.class);
+            return reportList;
+        }
     }
 
     @Transactional(readOnly = true)
@@ -147,19 +149,20 @@ public class AmazonSpClient {
                 .url(reportStatusUrl)
                 .headers(headers)
                 .build();
-            var response = WebUtils.sendRequest(request);
-
-            switch (response.code()) {
-                case 200:
-                    break;
-                case 429:
-                    log.info("Received 429 Too Many Requests. Retrying...");
-                    CoreUtils.sleep(3000);
-                    continue;
-                default:
-                    throw new RuntimeException("Http error code: " + response + response.body());
+            JSONObject responseBody = null;
+            try(var response = WebUtils.sendRequest(request)){
+                switch (response.code()) {
+                    case 200:
+                        break;
+                    case 429:
+                        log.info("Received 429 Too Many Requests. Retrying...");
+                        CoreUtils.sleep(3000);
+                        continue;
+                    default:
+                        throw new RuntimeException("Http error code: " + response + response.body());
+                }
+                 responseBody = WebUtils.parseResponse(response, JSONObject.class);
             }
-            var responseBody = WebUtils.parseResponse(response, JSONObject.class);
             status = responseBody.getString("processingStatus");
             log.info(status);
             switch (status) {
@@ -187,17 +190,18 @@ public class AmazonSpClient {
                 .url(documentUrl)
                 .headers(headers)
                 .build();
-            var response = WebUtils.sendRequest(request);
-            switch (response.code()) {
-                case 200:
-                    JSONObject responseBody = JsonUtils.parseObject(response.body().string(), JSONObject.class);
-                    docUrl = responseBody.getString("url");
-                case 429:
-                    log.info("Received 429 Too Many Requests. Retrying...");
-                    CoreUtils.sleep(3000);
-                    continue;
-                default:
-                    throw new RuntimeException("Unknown reponse code: " + response + response.body());
+            try(var response = WebUtils.sendRequest(request)){
+                switch (response.code()) {
+                    case 200:
+                        JSONObject responseBody = JsonUtils.parseObject(response.body().string(), JSONObject.class);
+                        docUrl = responseBody.getString("url");
+                    case 429:
+                        log.info("Received 429 Too Many Requests. Retrying...");
+                        CoreUtils.sleep(3000);
+                        continue;
+                    default:
+                        throw new RuntimeException("Unknown reponse code: " + response + response.body());
+                }
             }
         }
 
@@ -230,28 +234,29 @@ public class AmazonSpClient {
                 .headers(headers)
                 .payload(vo)
                 .build();
-            var response = WebUtils.sendRequest(request);
-            switch (response.code()) {
-                case 202:
-                    var report = WebUtils.parseResponse(response, AmazonSpReport.class);
-                    reportId = report.getReportId();
-                    break;
-                case 403:
-                    var error = WebUtils.parseResponse(response, AmazonErrorList.class);
-                    switch (error.getErrors().get(0).getCode()) {
-                        case "Unauthorized":
-                            log.error(error.toString());
-                            throw new RuntimeException("Error unauthorized");
-                        default:
-                            break;
-                    }
-                    throw new RuntimeException("Error creating report: " + error);
-                case 429:
-                    log.info("Received 429 Too Many Requests. Retrying...");
-                    CoreUtils.sleep(3000);
-                    continue;
-                default:
-                    throw new RuntimeException("Unknown response code: " + response.code() + "Detail: " + response.body().string());
+            try(var response = WebUtils.sendRequest(request)){
+                switch (response.code()) {
+                    case 202:
+                        var report = WebUtils.parseResponse(response, AmazonSpReport.class);
+                        reportId = report.getReportId();
+                        break;
+                    case 403:
+                        var error = WebUtils.parseResponse(response, AmazonErrorList.class);
+                        switch (error.getErrors().get(0).getCode()) {
+                            case "Unauthorized":
+                                log.error(error.toString());
+                                throw new RuntimeException("Error unauthorized");
+                            default:
+                                break;
+                        }
+                        throw new RuntimeException("Error creating report: " + error);
+                    case 429:
+                        log.info("Received 429 Too Many Requests. Retrying...");
+                        CoreUtils.sleep(3000);
+                        continue;
+                    default:
+                        throw new RuntimeException("Unknown response code: " + response.code() + "Detail: " + response.body().string());
+                }
             }
         }
         log.info("Got report ID: {}", reportId);

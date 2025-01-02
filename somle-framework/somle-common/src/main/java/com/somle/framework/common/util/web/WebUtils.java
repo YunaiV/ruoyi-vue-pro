@@ -1,21 +1,26 @@
 package com.somle.framework.common.util.web;
 
-import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
-import java.util.zip.GZIPInputStream;
+import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.somle.framework.common.util.json.JSONObject;
 import com.somle.framework.common.util.json.JsonUtils;
 import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import okhttp3.*;
 import org.apache.commons.collections4.MultiValuedMap;
 import org.apache.tomcat.util.http.fileupload.IOUtils;
-import lombok.extern.slf4j.Slf4j;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.SocketTimeoutException;
+import java.net.URL;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
+import java.util.function.BiConsumer;
+import java.util.zip.GZIPInputStream;
 
 @Slf4j
 public class WebUtils {
@@ -25,8 +30,7 @@ public class WebUtils {
         .build();
 
 
-
-    public static String urlWithParams(String url, MultiValuedMap<String,String> queryParams) {
+    public static String urlWithParams(String url, MultiValuedMap<String, String> queryParams) {
         HttpUrl.Builder urlBuilder = HttpUrl.parse(url).newBuilder();
         for (Map.Entry<String, String> queryParam : queryParams.entries()) {
             urlBuilder.addQueryParameter(queryParam.getKey(), queryParam.getValue());
@@ -49,7 +53,7 @@ public class WebUtils {
     }
 
 
-    public static Headers toHeaders(MultiValuedMap<String,String> headerMap) {
+    public static Headers toHeaders(MultiValuedMap<String, String> headerMap) {
         var headersBuilder = new Headers.Builder();
         for (Map.Entry<String, String> entry : headerMap.entries()) {
             headersBuilder.add(entry.getKey(), entry.getValue());
@@ -138,23 +142,43 @@ public class WebUtils {
 
     @SneakyThrows
     public static Response sendRequest(RequestX requestX) {
-        return client.newCall(toOkHttp(requestX)).execute();
+        return client.newCall(toOkHttp(requestX))
+            .execute();
     }
 
-    @SneakyThrows
     public static <T> T sendRequest(RequestX requestX, Class<T> responseClass) {
-        var response = client.newCall(toOkHttp(requestX)).execute();
-        return parseResponse(response, responseClass);
+        // 使用try-with-resources确保response被关闭
+        try (Response response = client.newCall(toOkHttp(requestX))
+            .execute()) {
+            return parseResponse(response, responseClass);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
-
+    /**
+     * 发送一个 HTTP 请求并处理响应或异常。
+     *
+     * @param requestX 请求对象，包含了需要发送的请求的详细信息。
+     * @param callback 回调函数，用于处理响应结果或异常。
+     */
+    public static void sendRequest(RequestX requestX, BiConsumer<Response, Exception> callback) {
+        try (Response response = client.newCall(toOkHttp(requestX)).execute()) {
+            callback.accept(response, null);
+        } catch (IOException e) {
+            callback.accept(null, e);
+        }
+    }
 
 
 
     @SneakyThrows
     public static String getBodyString(Response response) {
-        assert response.body() != null;
-        String responseString = response.body().string();
+        if (response.body() == null) {
+            throw new RuntimeException("body is null");
+        }
+        String responseString = response.body()
+            .string();
         log.debug("response: " + responseString);
         return responseString;
     }
@@ -171,7 +195,6 @@ public class WebUtils {
         IOUtils.copy(inputStream, byteArrayOutputStream);
         return byteArrayOutputStream.toString();
     }
-
 
 
     @SneakyThrows
