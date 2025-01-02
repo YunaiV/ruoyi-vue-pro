@@ -4,6 +4,9 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.module.iot.dal.dataobject.plugininfo.PluginInfoDO;
+
+import java.util.List;
+
 import org.apache.ibatis.annotations.Mapper;
 import cn.iocoder.yudao.module.iot.controller.admin.plugin.vo.*;
 
@@ -20,6 +23,12 @@ public interface PluginInfoMapper extends BaseMapperX<PluginInfoDO> {
                 .likeIfPresent(PluginInfoDO::getName, reqVO.getName())
                 .eqIfPresent(PluginInfoDO::getStatus, reqVO.getStatus())
                 .orderByDesc(PluginInfoDO::getId));
+    }
+
+    default List<PluginInfoDO> selectListByStatus(Integer status) {
+        return selectList(new LambdaQueryWrapperX<PluginInfoDO>()
+                .eq(PluginInfoDO::getStatus, status)
+                .orderByAsc(PluginInfoDO::getId));
     }
 
 }

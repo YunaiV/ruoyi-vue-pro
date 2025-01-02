@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
  *
  * @author ahh
  */
-@Component
+//@Component
 public class EmqxStart implements ApplicationRunner {
 
     @Resource

@@ -16,7 +16,7 @@ import org.springframework.stereotype.Service;
  * @author ahh
  */
 @Slf4j
-@Service
+//@Service
 public class EmqxServiceImpl implements EmqxService {
 
     @Resource
