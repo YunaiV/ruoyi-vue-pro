@@ -3,7 +3,6 @@ package com.somle.rakuten.service;
 import cn.hutool.core.codec.Base64;
 import cn.hutool.core.date.DateUtil;
 import com.somle.framework.common.util.date.LocalDateTimeUtils;
-import com.somle.framework.common.util.io.SomleResponse;
 import com.somle.framework.common.util.json.JSONObject;
 import com.somle.framework.common.util.json.JsonUtils;
 import com.somle.framework.common.util.web.RequestX;
@@ -15,8 +14,8 @@ import com.somle.rakuten.model.vo.RakutenOrderSearchReqVO;
 import com.somle.rakuten.util.ZonedDateTimeConverter;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import okhttp3.Response;
 
-import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -73,18 +72,14 @@ public class RakutenClient {
 
     }
 
-    private SomleResponse<String> sendPostRequest(String endpoint, String requestBody) {
+    private Response sendPostRequest(String endpoint, String requestBody) {
         var request = RequestX.builder()
-                .requestMethod(RequestX.Method.POST)
-                .url(BASE_URL + endpoint)
-                .headers(getHeaders())
-                .payload(JsonUtils.parseObject(requestBody, JSONObject.class))
-                .build();
-        try {
-            return WebUtils.sendRequest(request, SomleResponse.ResponseType.STRING);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+            .requestMethod(RequestX.Method.POST)
+            .url(BASE_URL + endpoint)
+            .headers(getHeaders())
+            .payload(JsonUtils.parseObject(requestBody, JSONObject.class))
+            .build();
+        return WebUtils.sendRequest(request);
     }
 
     private Map<String, String> getHeaders() {
@@ -118,12 +113,15 @@ public class RakutenClient {
 
 
     private JSONObject sendRequestAndParse(String endpoint, String requestBody) {
-        SomleResponse<String> somleResponse = sendPostRequest(endpoint, requestBody);
-            if (somleResponse.getBodyData() == null) {
+        try (Response response = sendPostRequest(endpoint, requestBody)) {
+            if (response.body() == null) {
                 log.error("Response body is null for endpoint: {}", endpoint);
                 throw new RuntimeException("Response body is null");
             }
-            return JsonUtils.parseObject(somleResponse.getBodyData(), JSONObject.class);
+            return JsonUtils.parseObject(response.body().string(), JSONObject.class);
+        } catch (Exception e) {
+            log.error("Error occurred while sending request to endpoint: {}", endpoint, e);
+            throw new RuntimeException("Error occurred while sending request", e);
+        }
     }
-
 }
