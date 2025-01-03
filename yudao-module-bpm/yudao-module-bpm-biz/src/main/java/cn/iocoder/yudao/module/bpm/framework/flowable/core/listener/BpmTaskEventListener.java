@@ -100,15 +100,14 @@ public class BpmTaskEventListener extends AbstractFlowableEngineEventListener {
         BpmBoundaryEventType bpmTimerBoundaryEventType = BpmBoundaryEventType.typeOf(NumberUtils.parseInt(boundaryEventType));
 
         // 2. 处理超时
-        // 2.1 用户任务超时处理
         if (ObjectUtil.equal(bpmTimerBoundaryEventType, BpmBoundaryEventType.USER_TASK_TIMEOUT)) {
+            // 2.1 用户任务超时处理
             String timeoutHandlerType = BpmnModelUtils.parseBoundaryEventExtensionElement(boundaryEvent,
                     BpmnModelConstants.USER_TASK_TIMEOUT_HANDLER_TYPE);
             String taskKey = boundaryEvent.getAttachedToRefId();
             taskService.processTaskTimeout(event.getProcessInstanceId(), taskKey, NumberUtils.parseInt(timeoutHandlerType));
-        }
-        // 2.2 触发器超时处理
-        if (ObjectUtil.equal(bpmTimerBoundaryEventType, BpmBoundaryEventType.DELAY_TIMER_TIMEOUT)) {
+            // 2.2 触发器超时处理
+        } else if (ObjectUtil.equal(bpmTimerBoundaryEventType, BpmBoundaryEventType.DELAY_TIMER_TIMEOUT)) {
             String taskKey = boundaryEvent.getAttachedToRefId();
             taskService.processDelayTimerTimeout(event.getProcessInstanceId(), taskKey);
         }

@@ -5,6 +5,7 @@ import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder;
 import cn.iocoder.yudao.framework.tenant.core.util.TenantUtils;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnVariableConstants;
+import lombok.SneakyThrows;
 import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.common.engine.api.variable.VariableContainer;
 import org.flowable.common.engine.impl.el.ExpressionManager;
@@ -64,6 +65,17 @@ public class FlowableUtils {
         } else {
             Long tenantId = Long.valueOf(tenantIdStr);
             TenantUtils.execute(tenantId, runnable);
+        }
+    }
+
+    @SneakyThrows
+    public static <V> V execute(String tenantIdStr, Callable<V> callable) {
+        if (ObjectUtil.isEmpty(tenantIdStr)
+                || Objects.equals(tenantIdStr, ProcessEngineConfiguration.NO_TENANT_ID)) {
+            return callable.call();
+        } else {
+            Long tenantId = Long.valueOf(tenantIdStr);
+            return TenantUtils.execute(tenantId, callable);
         }
     }
 

@@ -218,6 +218,7 @@ public class BpmSimpleModelNodeVO {
 
         @Schema(description = "延迟时间类型", example = "1")
         @NotNull(message = "延迟时间类型不能为空")
+        @InEnum(BpmDelayTimerType.class)
         private Integer delayType;
 
         @Schema(description = "延迟时间表达式", example = "PT1H,2025-01-01T00:00:00")
@@ -225,5 +226,4 @@ public class BpmSimpleModelNodeVO {
         private String delayTime;
     }
 
-    // TODO @芋艿：条件；建议可以固化的一些选项；然后有个表达式兜底；要支持
 }
