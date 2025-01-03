@@ -8,10 +8,10 @@ import cn.iocoder.yudao.module.infra.api.logger.dto.ApiAccessLogCreateReqDTO;
 import cn.iocoder.yudao.module.infra.controller.admin.logger.vo.apiaccesslog.ApiAccessLogPageReqVO;
 import cn.iocoder.yudao.module.infra.dal.dataobject.logger.ApiAccessLogDO;
 import cn.iocoder.yudao.module.infra.dal.mysql.logger.ApiAccessLogMapper;
+import jakarta.annotation.Resource;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
 
-import jakarta.annotation.Resource;
 import java.time.Duration;
 import java.util.List;
 
