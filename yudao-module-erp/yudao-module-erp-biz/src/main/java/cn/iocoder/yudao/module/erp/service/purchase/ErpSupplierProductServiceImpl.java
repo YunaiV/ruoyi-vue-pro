@@ -9,7 +9,6 @@ import cn.iocoder.yudao.module.erp.dal.mysql.logistic.customrule.ErpCustomRuleMa
 import cn.iocoder.yudao.module.erp.service.product.ErpProductService;
 import jakarta.annotation.Resource;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.stereotype.Service;
@@ -35,7 +34,7 @@ import static cn.iocoder.yudao.module.erp.enums.ErrorCodeConstants.*;
 @RequiredArgsConstructor
 public class ErpSupplierProductServiceImpl implements ErpSupplierProductService {
     @Resource
-    MessageChannel erpProductChannel;
+    MessageChannel erpCustomRuleChannel;
     private final ErpSupplierProductMapper supplierProductMapper;
     private final ErpProductService productService;
     private final ErpSupplierService supplierService;
@@ -62,7 +61,7 @@ public class ErpSupplierProductServiceImpl implements ErpSupplierProductService 
         ThrowUtil.ifSqlThrow(supplierProductMapper.updateById(updateObj),DB_UPDATE_ERROR);
         //同步数据
         var dtos = customRuleMapper.selectProductAllInfoListBySupplierId(id);
-        erpProductChannel.send(MessageBuilder.withPayload(dtos).build());
+        erpCustomRuleChannel.send(MessageBuilder.withPayload(dtos).build());
     }
 
     @Override

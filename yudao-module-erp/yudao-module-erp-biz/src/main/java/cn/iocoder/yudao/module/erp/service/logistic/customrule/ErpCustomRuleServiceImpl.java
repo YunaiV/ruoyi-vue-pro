@@ -29,7 +29,7 @@ import static cn.iocoder.yudao.module.erp.enums.ErrorCodeConstants.*;
 @RequiredArgsConstructor
 public class ErpCustomRuleServiceImpl implements ErpCustomRuleService {
     @Resource
-    private MessageChannel productChannel;
+    private MessageChannel erpCustomRuleChannel;
 
     private final ErpCustomRuleMapper customRuleMapper;
 
@@ -43,7 +43,7 @@ public class ErpCustomRuleServiceImpl implements ErpCustomRuleService {
         Long id = customRule.getId();
         //同步数据
         var dtos = customRuleMapper.selectProductAllInfoListByCustomRuleId(id);
-        productChannel.send(MessageBuilder.withPayload(dtos).build());
+        erpCustomRuleChannel.send(MessageBuilder.withPayload(dtos).build());
         // 返回
         return id;
     }
@@ -58,7 +58,7 @@ public class ErpCustomRuleServiceImpl implements ErpCustomRuleService {
         ThrowUtil.ifSqlThrow(customRuleMapper.updateById(updateObj),DB_UPDATE_ERROR);
         //同步数据
         var dtos = customRuleMapper.selectProductAllInfoListByCustomRuleId(id);
-        productChannel.send(MessageBuilder.withPayload(dtos).build());
+        erpCustomRuleChannel.send(MessageBuilder.withPayload(dtos).build());
     }
 
     @Override

@@ -16,4 +16,10 @@ public class ErpIntegrationConfig {
         return new PublishSubscribeChannel(new SimpleAsyncTaskExecutor());
     }
 
+
+    @Bean
+    public MessageChannel erpCustomRuleChannel() {
+        return new PublishSubscribeChannel(new SimpleAsyncTaskExecutor());
+    }
+
 }

@@ -176,7 +176,7 @@ class EsbServiceProductTest extends BaseSpringIntegrationTest {
         product.setBarCode("1234567890123");
         product.setProductDeptId(50007L);
 
-        esbService.syncProductsToEccang(MessageBuilder.withPayload(List.of(product)).build());
+        esbService.syncCustomRuleToEccang(MessageBuilder.withPayload(List.of(product)).build());
         kingdeeService.refreshAuths();
 //        esbService.syncProductsToKingdee(MessageBuilder.withPayload(List.of(product)).build());
     }
