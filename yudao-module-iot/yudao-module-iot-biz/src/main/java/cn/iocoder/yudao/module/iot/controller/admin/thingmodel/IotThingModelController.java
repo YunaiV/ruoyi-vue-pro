@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.iot.controller.admin.thingmodel;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
+import cn.iocoder.yudao.module.iot.controller.admin.thingmodel.vo.IotThingModelListReqVO;
 import cn.iocoder.yudao.module.iot.controller.admin.thingmodel.vo.IotThingModelPageReqVO;
 import cn.iocoder.yudao.module.iot.controller.admin.thingmodel.vo.IotThingModelRespVO;
 import cn.iocoder.yudao.module.iot.controller.admin.thingmodel.vo.IotThingModelSaveReqVO;
@@ -70,6 +71,14 @@ public class IotThingModelController {
     @PreAuthorize("@ss.hasPermission('iot:thing-model:query')")
     public CommonResult<List<IotThingModelRespVO>> getThingModelListByProductId(@RequestParam("productId") Long productId) {
         List<IotThingModelDO> list = thingModelService.getThingModelListByProductId(productId);
+        return success(IotThingModelConvert.INSTANCE.convertList(list));
+    }
+
+    @GetMapping("/list")
+    @Operation(summary = "获得产品物模型列表")
+    @PreAuthorize("@ss.hasPermission('iot:thing-model:query')")
+    public CommonResult<List<IotThingModelRespVO>> getThingModelListByProductId(@Valid IotThingModelListReqVO reqVO) {
+        List<IotThingModelDO> list = thingModelService.getThingModelList(reqVO);
         return success(IotThingModelConvert.INSTANCE.convertList(list));
     }
 

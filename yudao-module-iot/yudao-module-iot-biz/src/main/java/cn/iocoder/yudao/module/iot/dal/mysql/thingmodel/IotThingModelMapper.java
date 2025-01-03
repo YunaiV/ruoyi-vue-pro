@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.iot.dal.mysql.thingmodel;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
+import cn.iocoder.yudao.module.iot.controller.admin.thingmodel.vo.IotThingModelListReqVO;
 import cn.iocoder.yudao.module.iot.controller.admin.thingmodel.vo.IotThingModelPageReqVO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.thingmodel.IotThingModelDO;
 import org.apache.ibatis.annotations.Mapper;
@@ -19,6 +20,17 @@ public interface IotThingModelMapper extends BaseMapperX<IotThingModelDO> {
 
     default PageResult<IotThingModelDO> selectPage(IotThingModelPageReqVO reqVO) {
         return selectPage(reqVO, new LambdaQueryWrapperX<IotThingModelDO>()
+                .eqIfPresent(IotThingModelDO::getIdentifier, reqVO.getIdentifier())
+                .likeIfPresent(IotThingModelDO::getName, reqVO.getName())
+                .eqIfPresent(IotThingModelDO::getType, reqVO.getType())
+                .eqIfPresent(IotThingModelDO::getProductId, reqVO.getProductId())
+                // TODO @芋艿：看看要不要加枚举
+                .notIn(IotThingModelDO::getIdentifier, "get", "set", "post")
+                .orderByDesc(IotThingModelDO::getId));
+    }
+
+    default List<IotThingModelDO> selectList(IotThingModelListReqVO reqVO) {
+        return selectList(new LambdaQueryWrapperX<IotThingModelDO>()
                 .eqIfPresent(IotThingModelDO::getIdentifier, reqVO.getIdentifier())
                 .likeIfPresent(IotThingModelDO::getName, reqVO.getName())
                 .eqIfPresent(IotThingModelDO::getType, reqVO.getType())
