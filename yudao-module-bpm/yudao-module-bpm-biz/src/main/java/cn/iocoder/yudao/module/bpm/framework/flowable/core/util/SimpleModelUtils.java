@@ -628,8 +628,7 @@ public class SimpleModelUtils {
                 TimerEventDefinition eventDefinition = new TimerEventDefinition();
                 if (node.getDelaySetting().getDelayType().equals(BpmDelayTimerType.FIXED_DATE_TIME.getType())){
                     eventDefinition.setTimeDuration(node.getDelaySetting().getDelayTime());
-                }
-                if (node.getDelaySetting().getDelayType().equals(BpmDelayTimerType.FIXED_TIME_DURATION.getType())){
+                } else if (node.getDelaySetting().getDelayType().equals(BpmDelayTimerType.FIXED_TIME_DURATION.getType())){
                     eventDefinition.setTimeDate(node.getDelaySetting().getDelayTime());
                 }
                 boundaryEvent.addEventDefinition(eventDefinition);

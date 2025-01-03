@@ -12,6 +12,7 @@ import cn.iocoder.yudao.module.bpm.enums.definition.BpmUserTaskApproveTypeEnum;
 import cn.iocoder.yudao.module.bpm.enums.definition.BpmUserTaskAssignStartUserHandlerTypeEnum;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmTaskCandidateStrategyEnum;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.util.BpmnModelUtils;
+import cn.iocoder.yudao.module.bpm.framework.flowable.core.util.FlowableUtils;
 import cn.iocoder.yudao.module.bpm.service.task.BpmProcessInstanceService;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
@@ -91,35 +92,39 @@ public class BpmTaskCandidateInvoker {
      */
     @DataPermission(enable = false) // 忽略数据权限，避免因为过滤，导致找不到候选人
     public Set<Long> calculateUsersByTask(DelegateExecution execution) {
-        // 审批类型非人工审核时，不进行计算候选人。原因是：后续会自动通过、不通过
-        FlowElement flowElement = execution.getCurrentFlowElement();
-        Integer approveType = BpmnModelUtils.parseApproveType(flowElement);
-        if (ObjectUtils.equalsAny(approveType,
-                BpmUserTaskApproveTypeEnum.AUTO_APPROVE.getType(),
-                BpmUserTaskApproveTypeEnum.AUTO_REJECT.getType())) {
-            return new HashSet<>();
-        }
+        // 注意：解决极端情况下，Flowable 异步调用，导致租户 id 丢失的情况
+        // 例如说，SIMPLE 延迟器在 trigger 的时候！！！
+        return FlowableUtils.execute(execution.getTenantId(), () -> {
+            // 审批类型非人工审核时，不进行计算候选人。原因是：后续会自动通过、不通过
+            FlowElement flowElement = execution.getCurrentFlowElement();
+            Integer approveType = BpmnModelUtils.parseApproveType(flowElement);
+            if (ObjectUtils.equalsAny(approveType,
+                    BpmUserTaskApproveTypeEnum.AUTO_APPROVE.getType(),
+                    BpmUserTaskApproveTypeEnum.AUTO_REJECT.getType())) {
+                return new HashSet<>();
+            }
 
-        // 1.1 计算任务的候选人
-        Integer strategy = BpmnModelUtils.parseCandidateStrategy(flowElement);
-        String param = BpmnModelUtils.parseCandidateParam(flowElement);
-        Set<Long> userIds = getCandidateStrategy(strategy).calculateUsersByTask(execution, param);
-        // 1.2 移除被禁用的用户
-        removeDisableUsers(userIds);
+            // 1.1 计算任务的候选人
+            Integer strategy = BpmnModelUtils.parseCandidateStrategy(flowElement);
+            String param = BpmnModelUtils.parseCandidateParam(flowElement);
+            Set<Long> userIds = getCandidateStrategy(strategy).calculateUsersByTask(execution, param);
+            // 1.2 移除被禁用的用户
+            removeDisableUsers(userIds);
 
-        // 2. 候选人为空时，根据“审批人为空”的配置补充
-        if (CollUtil.isEmpty(userIds)) {
-            userIds = getCandidateStrategy(BpmTaskCandidateStrategyEnum.ASSIGN_EMPTY.getStrategy())
-                    .calculateUsersByTask(execution, param);
-            // ASSIGN_EMPTY 策略，不需要移除被禁用的用户。原因是，再移除，可能会出现更没审批人了！！！
-        }
+            // 2. 候选人为空时，根据“审批人为空”的配置补充
+            if (CollUtil.isEmpty(userIds)) {
+                userIds = getCandidateStrategy(BpmTaskCandidateStrategyEnum.ASSIGN_EMPTY.getStrategy())
+                        .calculateUsersByTask(execution, param);
+                // ASSIGN_EMPTY 策略，不需要移除被禁用的用户。原因是，再移除，可能会出现更没审批人了！！！
+            }
 
-        // 3. 移除发起人的用户
-        ProcessInstance processInstance = SpringUtil.getBean(BpmProcessInstanceService.class)
-                .getProcessInstance(execution.getProcessInstanceId());
-        Assert.notNull(processInstance, "流程实例({}) 不存在", execution.getProcessInstanceId());
-        removeStartUserIfSkip(userIds, flowElement, Long.valueOf(processInstance.getStartUserId()));
-        return userIds;
+            // 3. 移除发起人的用户
+            ProcessInstance processInstance = SpringUtil.getBean(BpmProcessInstanceService.class)
+                    .getProcessInstance(execution.getProcessInstanceId());
+            Assert.notNull(processInstance, "流程实例({}) 不存在", execution.getProcessInstanceId());
+            removeStartUserIfSkip(userIds, flowElement, Long.valueOf(processInstance.getStartUserId()));
+            return userIds;
+        });
     }
 
     public Set<Long> calculateUsersByActivity(BpmnModel bpmnModel, String activityId,
