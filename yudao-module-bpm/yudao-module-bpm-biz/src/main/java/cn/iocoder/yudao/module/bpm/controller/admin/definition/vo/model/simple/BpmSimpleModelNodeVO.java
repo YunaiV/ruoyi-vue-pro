@@ -208,5 +208,22 @@ public class BpmSimpleModelNodeVO {
         private String rightSide;
     }
 
+    @Schema(description = "延迟器设置", example = "{}")
+    private DelaySetting delaySetting;
+
+    @Schema(description = "延迟器")
+    @Data
+    @Valid
+    public static class DelaySetting {
+
+        @Schema(description = "延迟时间类型", example = "1")
+        @NotNull(message = "延迟时间类型不能为空")
+        private Integer delayType;
+
+        @Schema(description = "延迟时间表达式", example = "PT1H,2025-01-01T00:00:00")
+        @NotEmpty(message = "延迟时间表达式不能为空")
+        private String delayTime;
+    }
+
     // TODO @芋艿：条件；建议可以固化的一些选项；然后有个表达式兜底；要支持
 }
