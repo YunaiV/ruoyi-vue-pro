@@ -98,15 +98,20 @@ public class BpmTaskEventListener extends AbstractFlowableEngineEventListener {
         String boundaryEventType = BpmnModelUtils.parseBoundaryEventExtensionElement(boundaryEvent,
                 BpmnModelConstants.BOUNDARY_EVENT_TYPE);
         BpmBoundaryEventType bpmTimerBoundaryEventType = BpmBoundaryEventType.typeOf(NumberUtils.parseInt(boundaryEventType));
-        if (ObjectUtil.notEqual(bpmTimerBoundaryEventType, BpmBoundaryEventType.USER_TASK_TIMEOUT)) {
-            return;
-        }
 
         // 2. 处理超时
-        String timeoutHandlerType = BpmnModelUtils.parseBoundaryEventExtensionElement(boundaryEvent,
-                BpmnModelConstants.USER_TASK_TIMEOUT_HANDLER_TYPE);
-        String taskKey = boundaryEvent.getAttachedToRefId();
-        taskService.processTaskTimeout(event.getProcessInstanceId(), taskKey, NumberUtils.parseInt(timeoutHandlerType));
+        // 2.1 用户任务超时处理
+        if (ObjectUtil.equal(bpmTimerBoundaryEventType, BpmBoundaryEventType.USER_TASK_TIMEOUT)) {
+            String timeoutHandlerType = BpmnModelUtils.parseBoundaryEventExtensionElement(boundaryEvent,
+                    BpmnModelConstants.USER_TASK_TIMEOUT_HANDLER_TYPE);
+            String taskKey = boundaryEvent.getAttachedToRefId();
+            taskService.processTaskTimeout(event.getProcessInstanceId(), taskKey, NumberUtils.parseInt(timeoutHandlerType));
+        }
+        // 2.2 触发器超时处理
+        if (ObjectUtil.equal(bpmTimerBoundaryEventType, BpmBoundaryEventType.DELAY_TIMER_TIMEOUT)) {
+            String taskKey = boundaryEvent.getAttachedToRefId();
+            taskService.processDelayTimerTimeout(event.getProcessInstanceId(), taskKey);
+        }
     }
 
 }

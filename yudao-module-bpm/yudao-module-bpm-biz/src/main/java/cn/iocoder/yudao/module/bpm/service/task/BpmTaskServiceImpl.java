@@ -42,6 +42,7 @@ import org.flowable.engine.ManagementService;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.TaskService;
 import org.flowable.engine.history.HistoricActivityInstance;
+import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.task.api.DelegationState;
 import org.flowable.task.api.Task;
@@ -1236,6 +1237,24 @@ public class BpmTaskServiceImpl implements BpmTaskService {
                         new BpmTaskRejectReqVO().setId(task.getId()).setReason(BpmReasonEnum.REJECT_TASK.getReason()));
             }
         }));
+    }
+
+    @Override
+    public void processDelayTimerTimeout(String processInstanceId, String taskDefineKey) {
+        Execution execution = runtimeService.createExecutionQuery()
+                .processInstanceId(processInstanceId)
+                .activityId(taskDefineKey)
+                .singleResult();
+        if (execution == null) {
+            log.error("[processDelayTimerTimeout][processInstanceId({})activityId({}) 没有找到执行活动]",
+                    processInstanceId, taskDefineKey);
+            return;
+        }
+        // 若存在直接触发接收任务，执行后续节点
+        // TODO @芋艿 这里需要帮助看一下，我不懂为啥开启了租户后就一直报错：不存在租户编号
+        FlowableUtils.execute(execution.getTenantId(), () -> {
+            runtimeService.trigger(execution.getId());
+        });
     }
 
     /**

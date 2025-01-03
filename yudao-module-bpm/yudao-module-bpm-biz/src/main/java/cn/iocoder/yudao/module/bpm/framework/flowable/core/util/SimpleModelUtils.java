@@ -37,6 +37,7 @@ public class SimpleModelUtils {
     static {
         List<NodeConvert> converts = asList(new StartNodeConvert(), new EndNodeConvert(),
                 new StartUserNodeConvert(), new ApproveNodeConvert(), new CopyNodeConvert(),
+                new DelayTimerNodeConvert(),
                 new ConditionBranchNodeConvert(), new ParallelBranchNodeConvert(), new InclusiveBranchNodeConvert());
         converts.forEach(convert -> NODE_CONVERTS.put(convert.getType(), convert));
     }
@@ -603,6 +604,45 @@ public class SimpleModelUtils {
             return null;
         }
 
+    }
+
+    public static class DelayTimerNodeConvert implements NodeConvert {
+
+        @Override
+        public List<FlowElement> convertList(BpmSimpleModelNodeVO node) {
+            List<FlowElement> flowElements = new ArrayList<>(2);
+            // 1. 构建接收任务，通过接收任务可卡住节点
+            ReceiveTask receiveTask = new ReceiveTask();
+            receiveTask.setId(node.getId());
+            receiveTask.setName(node.getName());
+            flowElements.add(receiveTask);
+
+            // 2. 添加接收任务的 Timer Boundary Event
+            if (node.getDelaySetting() != null) {
+                // 2.1 定时器边界事件
+                BoundaryEvent boundaryEvent = new BoundaryEvent();
+                boundaryEvent.setId("Event-" + IdUtil.fastUUID());
+                boundaryEvent.setCancelActivity(false);
+                boundaryEvent.setAttachedToRef(receiveTask);
+                // 2.2 定义超时时间
+                TimerEventDefinition eventDefinition = new TimerEventDefinition();
+                if (node.getDelaySetting().getDelayType().equals(BpmDelayTimerType.FIXED_DATE_TIME.getType())){
+                    eventDefinition.setTimeDuration(node.getDelaySetting().getDelayTime());
+                }
+                if (node.getDelaySetting().getDelayType().equals(BpmDelayTimerType.FIXED_TIME_DURATION.getType())){
+                    eventDefinition.setTimeDate(node.getDelaySetting().getDelayTime());
+                }
+                boundaryEvent.addEventDefinition(eventDefinition);
+                addExtensionElement(boundaryEvent, BOUNDARY_EVENT_TYPE, BpmBoundaryEventType.DELAY_TIMER_TIMEOUT.getType());
+                flowElements.add(boundaryEvent);
+            }
+            return flowElements;
+        }
+
+        @Override
+        public BpmSimpleModelNodeType getType() {
+            return BpmSimpleModelNodeType.DELAY_TIMER_NODE;
+        }
     }
 
     private static String buildGatewayJoinId(String id) {
