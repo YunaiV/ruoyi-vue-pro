@@ -25,7 +25,8 @@ public enum BpmSimpleModelNodeType implements IntArrayValuable {
     START_USER_NODE(10, "发起人", "userTask"), // 发起人节点。前端的开始节点，Id 固定
     APPROVE_NODE(11, "审批人", "userTask"),
     COPY_NODE(12, "抄送人", "serviceTask"),
-    DELAY_TIMER_NODE(13, "延迟器", "receiveTask"),
+
+    DELAY_TIMER_NODE(14, "延迟器", "receiveTask"),
 
     // 50 ~ 条件分支
     CONDITION_NODE(50, "条件", "sequenceFlow"), // 用于构建流转条件的表达式
