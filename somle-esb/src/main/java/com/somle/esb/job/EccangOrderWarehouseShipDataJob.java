@@ -20,7 +20,7 @@ public class EccangOrderWarehouseShipDataJob extends EccangDataJob {
                         .warehouseShipDateEnd(beforeYesterdayLastSecond)
                         .build())
                     .build(),
-                beforeYesterday.getYear()
+                null
             )
             .forEach(page -> {
                 OssData data = OssData.builder()

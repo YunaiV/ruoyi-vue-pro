@@ -20,7 +20,7 @@ public class EccangOrderPlatformShipDataJob extends EccangDataJob {
                         .platformShipDateEnd(beforeYesterdayLastSecond)
                         .build())
                     .build(),
-                beforeYesterday.getYear()
+                null
             )
             .forEach(page -> {
                 OssData data = OssData.builder()
