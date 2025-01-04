@@ -1192,9 +1192,11 @@ public class BpmTaskServiceImpl implements BpmTaskService {
                         }
                     }
                 }
-
-                AdminUserRespDTO startUser = adminUserApi.getUser(Long.valueOf(processInstance.getStartUserId()));
-                messageService.sendMessageWhenTaskAssigned(BpmTaskConvert.INSTANCE.convert(processInstance, startUser, task));
+                // 注意：需要基于 instance 设置租户编号，避免 Flowable 内部异步时，丢失租户编号
+                FlowableUtils.execute(processInstance.getTenantId(),()-> {
+                    AdminUserRespDTO startUser = adminUserApi.getUser(Long.valueOf(processInstance.getStartUserId()));
+                    messageService.sendMessageWhenTaskAssigned(BpmTaskConvert.INSTANCE.convert(processInstance, startUser, task));
+                });
             }
 
         });
