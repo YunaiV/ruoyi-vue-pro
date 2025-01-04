@@ -57,6 +57,17 @@
             <groupId>${spring-ai.groupId}</groupId>
             <artifactId>spring-ai-tika-document-reader</artifactId>
             <version>${spring-ai.version}</version>
+            <!-- TODO 芋艿：boot 项目里，不引入 cloud 依赖！！！另外，这样也是为了解决启动报错的问题！ -->
+            <exclusions>
+                <exclusion>
+                    <artifactId>spring-cloud-function-context</artifactId>
+                    <groupId>org.springframework.cloud</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>spring-cloud-function-core</artifactId>
+                    <groupId>org.springframework.cloud</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>${spring-ai.groupId}</groupId>
