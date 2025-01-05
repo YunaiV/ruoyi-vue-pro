@@ -13,6 +13,7 @@ import org.apache.ibatis.annotations.Param;
  * 处理 TD 中物模型消息日志的操作
  */
 @Mapper
+@Deprecated
 @TDengineDS
 @InterceptorIgnore(tenantLine = "true") // 避免 SQL 解析，因为 JSqlParser 对 TDengine 的 SQL 解析会报错
 public interface TdThingModelMessageMapper {

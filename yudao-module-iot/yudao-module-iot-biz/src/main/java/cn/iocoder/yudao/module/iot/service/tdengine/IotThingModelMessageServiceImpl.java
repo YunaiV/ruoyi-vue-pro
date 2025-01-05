@@ -78,8 +78,6 @@ public class IotThingModelMessageServiceImpl implements IotThingModelMessageServ
             createDeviceTable(device.getDeviceType(), device.getProductKey(), device.getDeviceName(), device.getDeviceKey());
             iotDeviceService.updateDeviceStatus(new IotDeviceStatusUpdateReqVO()
                     .setId(device.getId()).setStatus(IotDeviceStatusEnum.ONLINE.getStatus()));
-            // 1.2 创建物模型日志设备表
-            tdThingModelMessageMapper.createTableWithTag(device.getProductKey(), device.getDeviceKey());
         }
 
         // 2. 获取设备属性并进行物模型校验，过滤非物模型属性
@@ -231,16 +229,7 @@ public class IotThingModelMessageServiceImpl implements IotThingModelMessageServ
                 .setTags(tagsFieldValues));
     }
 
-    /**
-     * 创建物模型日志设备数据表
-     *
-     * @param productKey 产品 Key
-     * @param deviceKey  设备 Key
-     *
-     */
-    private void createThingModelMessageDeviceTable(String productKey,  String deviceKey){
-        tdThingModelMessageMapper.createTableWithTag(productKey, deviceKey);
-    }
+
 
     /**
      * 获取数据库名称
