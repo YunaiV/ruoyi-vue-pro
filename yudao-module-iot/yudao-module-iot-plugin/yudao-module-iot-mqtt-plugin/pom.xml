@@ -145,10 +145,10 @@
             <version>${lombok.version}</version>
             <scope>provided</scope>
         </dependency>
+        <!-- MQTT -->
         <dependency>
-            <groupId>io.netty</groupId>
-            <artifactId>netty-all</artifactId>
-            <version>4.1.63.Final</version> <!-- 版本可根据需要调整 -->
+            <groupId>org.eclipse.paho</groupId>
+            <artifactId>org.eclipse.paho.client.mqttv3</artifactId>
         </dependency>
     </dependencies>
 </project>

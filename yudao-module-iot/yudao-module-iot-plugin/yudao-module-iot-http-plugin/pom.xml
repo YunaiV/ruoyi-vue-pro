@@ -150,5 +150,10 @@
             <artifactId>netty-all</artifactId>
             <version>4.1.63.Final</version> <!-- 版本可根据需要调整 -->
         </dependency>
+        <!-- MQTT -->
+        <dependency>
+            <groupId>org.eclipse.paho</groupId>
+            <artifactId>org.eclipse.paho.client.mqttv3</artifactId>
+        </dependency>
     </dependencies>
 </project>
