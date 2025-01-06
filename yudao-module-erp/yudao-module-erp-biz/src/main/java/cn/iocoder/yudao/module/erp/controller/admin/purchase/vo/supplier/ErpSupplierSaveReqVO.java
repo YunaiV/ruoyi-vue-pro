@@ -9,6 +9,7 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
+import org.hibernate.validator.constraints.Length;
 
 import java.math.BigDecimal;
 
@@ -27,11 +28,11 @@ public class ErpSupplierSaveReqVO {
     private String contact;
 
     @Schema(description = "手机号码", example = "15601691300")
-    @Mobile
+    @Length(max = 30, message = "手机号码长度不能超过 30 个字符")
     private String mobile;
 
     @Schema(description = "联系电话", example = "18818288888")
-    @Telephone
+    @Length(max = 30, message = "联系电话长度不能超过 30 个字符")
     private String telephone;
 
     @Schema(description = "电子邮箱", example = "76853@qq.com")

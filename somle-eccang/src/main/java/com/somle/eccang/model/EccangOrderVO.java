@@ -23,7 +23,7 @@ public class EccangOrderVO {
     private Integer getDetail;
 
     // 是否返回订单地址数据，1:返回，0：不返回
-    private Integer getAdress;
+    private Integer getAddress;
 
     // 是否返回自定义订单类型，1:返回，0：不返回
     private Integer getCustomOrderType;

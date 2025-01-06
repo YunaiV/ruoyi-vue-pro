@@ -303,7 +303,7 @@ public class EccangService {
 
 
     public Stream<EccangPage> getOrderUnarchivePages(EccangOrderVO orderParams) {
-        orderParams.setGetAdress(1);
+        orderParams.setGetAddress(1);
         orderParams.setGetDetail(1);
         return getAllPage(JsonUtils.toJSONObject(orderParams), "getOrderList");
     }
