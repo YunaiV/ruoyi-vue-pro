@@ -8,6 +8,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 /**
  * ERP 采购订单项 DO
@@ -31,6 +32,11 @@ public class ErpPurchaseOrderItemDO extends BaseDO {
      */
     @TableId
     private Long id;
+    /**
+     * 供应商产品编码
+     */
+    private Long supplierProductId;
+    private String warehouseNo; // 仓库编号
     /**
      * 采购订单编号
      * <p>
@@ -122,5 +128,9 @@ public class ErpPurchaseOrderItemDO extends BaseDO {
     private BigDecimal returnCount;
 
 
+    // ========== 其他 ==========
+    private String xCode;
 
+    //交货日期
+    private LocalDateTime deliveryTime;
 }

@@ -122,15 +122,15 @@ public class ErpPurchaseOrderDO extends BaseDO {
     private LocalDateTime settlementDate;
 
 
-    /**
-     * 制单人，自动填充为当前操作者
-     */
-    private Long creatorId;
-
-    /**
-     * 制单时间，自动填充为当前时间
-     */
-    private LocalDateTime createTime;
+//    /**
+//     * 制单人，自动填充为当前操作者
+//     */
+//    private Long creatorId;
+//
+//    /**
+//     * 制单时间，自动填充为当前时间
+//     */
+//    private LocalDateTime createTime;
 
     /**
      * 审核人，审核时自动填充
@@ -164,4 +164,14 @@ public class ErpPurchaseOrderDO extends BaseDO {
      * 采购退货数量
      */
     private BigDecimal returnCount;
+    // ========== 其他 ==========
+    /**
+     * 验货单，JSON 格式
+     */
+    private String inspectionJson;
+
+    /**
+     * 完工单，JSON 格式
+     */
+    private String completionJson;
 }
