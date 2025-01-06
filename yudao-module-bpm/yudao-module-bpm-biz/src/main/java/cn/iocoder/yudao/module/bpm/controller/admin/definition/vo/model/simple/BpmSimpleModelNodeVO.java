@@ -226,4 +226,31 @@ public class BpmSimpleModelNodeVO {
         private String delayTime;
     }
 
+    @Schema(description = "路由分支组", example = "[]")
+    private List<RouteCondition> routeGroup;
+
+    @Schema(description = "默认分支id", example = "Flow_xxx")
+    private String defaultFlowId; // 仅用于路由分支节点 BpmSimpleModelNodeType.ROUTE_BRANCH_NODE
+
+    @Schema(description = "路由分支")
+    @Data
+    @Valid
+    public static class RouteCondition {
+
+        @Schema(description = "节点Id", example = "Activity_xxx")
+        @NotEmpty(message = "节点Id不能为空")
+        private String nodeId;
+
+        @Schema(description = "条件类型", example = "1")
+        @InEnum(BpmSimpleModeConditionType.class)
+        @NotNull(message = "条件类型不能为空")
+        private Integer conditionType;
+
+        @Schema(description = "条件表达式", example = "${day>3}")
+        private String conditionExpression;
+
+        @Schema(description = "条件组", example = "{}")
+        private ConditionGroups conditionGroups;
+    }
+
 }
