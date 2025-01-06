@@ -5,9 +5,9 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+// TODO @芋艿：要不要加个 mqtt 值了的前缀
 /**
  * MQTT RPC 请求
- *
  */
 @Data
 @Builder
@@ -23,6 +23,7 @@ public class RpcRequest {
     /**
      * 参数
      */
+    // TODO @haohao：object 对象会不会不好序列化？
     private Object[] params;
 
     /**
@@ -34,4 +35,5 @@ public class RpcRequest {
      * 回复地址
      */
     private String replyTo;
+
 }

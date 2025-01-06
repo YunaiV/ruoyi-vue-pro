@@ -28,4 +28,5 @@ public class RpcController {
     public CompletableFuture<Object> concat(@RequestParam String str1, @RequestParam String str2) throws Exception {
         return rpcClient.call("concat", new Object[]{str1, str2}, 10);
     }
+
 }

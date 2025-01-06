@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.iot.api;
 import java.util.HashMap;
 import java.util.Map;
 
+// TODO 芋艿：纠结下
 /**
  * 服务注册表 - 插架模块使用，无法使用 Spring 注入
  */

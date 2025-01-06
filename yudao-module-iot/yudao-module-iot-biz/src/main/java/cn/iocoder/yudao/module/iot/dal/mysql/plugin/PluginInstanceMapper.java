@@ -21,6 +21,7 @@ public interface PluginInstanceMapper extends BaseMapperX<PluginInstanceDO> {
                 .eq(PluginInstanceDO::getPluginId, pluginId));
     }
 
+    // TODO @haohao：这个还需要么？相关不用的 VO 可以删除
     default PageResult<PluginInstanceDO> selectPage(PluginInstancePageReqVO reqVO) {
         return selectPage(reqVO, new LambdaQueryWrapperX<PluginInstanceDO>()
                 .eqIfPresent(PluginInstanceDO::getMainId, reqVO.getMainId())

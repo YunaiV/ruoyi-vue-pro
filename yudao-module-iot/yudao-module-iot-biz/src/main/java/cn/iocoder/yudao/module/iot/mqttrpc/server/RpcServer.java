@@ -15,6 +15,8 @@ import javax.annotation.PreDestroy;
 import java.util.HashMap;
 import java.util.Map;
 
+// TODO @芋艿：server 逻辑，再瞅瞅；
+// TODO @haohao：如果只写在 iot biz 里，那么后续 server => client 貌似不方便？微信再讨论下~；
 @Service
 @Slf4j
 public class RpcServer {
@@ -90,6 +92,9 @@ public class RpcServer {
      */
     @FunctionalInterface
     public interface MethodInvoker {
+
         Object invoke(Object[] params) throws Exception;
+
     }
+
 }

@@ -7,6 +7,10 @@ import lombok.*;
 @Data
 public class PluginInfoSaveReqVO {
 
+    // TODO @haohao：新增的字段有点多，每个都需要哇？
+
+    // TODO @haohao：一些枚举字段，需要加枚举校验。例如说，deployType、status、type 等
+
     @Schema(description = "主键ID", requiredMode = Schema.RequiredMode.REQUIRED, example = "11546")
     private Long id;
 

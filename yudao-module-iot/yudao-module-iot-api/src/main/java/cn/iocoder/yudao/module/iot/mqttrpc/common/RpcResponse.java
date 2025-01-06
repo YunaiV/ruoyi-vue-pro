@@ -7,7 +7,6 @@ import lombok.NoArgsConstructor;
 
 /**
  * MQTT RPC 响应
- *
  */
 @Data
 @Builder
@@ -23,10 +22,12 @@ public class RpcResponse {
     /**
      * 结果
      */
+    // TODO @haohao：object 对象会不会不好反序列化？
     private Object result;
 
     /**
      * 错误
      */
     private String error;
+
 }

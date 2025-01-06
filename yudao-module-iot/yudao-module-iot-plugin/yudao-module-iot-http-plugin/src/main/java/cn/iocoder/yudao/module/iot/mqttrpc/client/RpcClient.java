@@ -1,17 +1,14 @@
 package cn.iocoder.yudao.module.iot.mqttrpc.client;
 
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 import cn.iocoder.yudao.module.iot.mqttrpc.common.RpcRequest;
 import cn.iocoder.yudao.module.iot.mqttrpc.common.RpcResponse;
 import cn.iocoder.yudao.module.iot.mqttrpc.common.SerializationUtils;
 import cn.iocoder.yudao.module.iot.mqttrpc.config.MqttConfig;
 import lombok.extern.slf4j.Slf4j;
-import org.eclipse.paho.client.mqttv3.*;
+import org.eclipse.paho.client.mqttv3.MqttClient;
+import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
+import org.eclipse.paho.client.mqttv3.MqttException;
+import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 import org.springframework.stereotype.Service;
 
@@ -20,6 +17,7 @@ import javax.annotation.PreDestroy;
 import java.util.UUID;
 import java.util.concurrent.*;
 
+// TODO @芋艿：需要考虑，怎么公用！
 @Service
 @Slf4j
 public class RpcClient {

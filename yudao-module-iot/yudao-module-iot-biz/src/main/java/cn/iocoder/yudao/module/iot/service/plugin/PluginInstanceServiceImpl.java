@@ -26,8 +26,9 @@ import java.util.List;
 public class PluginInstanceServiceImpl implements PluginInstanceService {
 
     /**
-     * 主程序id
+     * 主程序 ID
      */
+    // TODO @haohao：这个可以后续确认下，有没更合适的标识。例如说 mac 地址之类的
     public static final String MAIN_ID = IdUtil.fastSimpleUUID();
 
     @Resource
@@ -40,36 +41,37 @@ public class PluginInstanceServiceImpl implements PluginInstanceService {
     @Value("${server.port:48080}")
     private int port;
 
+    // TODO @haohao：建议把 PluginInfoServiceImpl 里面，和 instance 相关的逻辑拿过来，可能会更好。info 处理信息，instance 处理实例
 
+    // TODO @haohao：这个改成 reportPluginInstance 会不会更合适哈。
     @Override
     public void updatePluginInstances() {
-        // 1. 查询 pf4j 插件列表
+        // 1.1 查询 pf4j 插件列表
         List<PluginWrapper> plugins = pluginManager.getPlugins();
-
-        // 2. 查询插件信息列表
+        // 1.2 查询插件信息列表
         List<PluginInfoDO> pluginInfos = pluginInfoService.getPluginInfoList();
-
-        // 动态获取主程序的 IP 和端口
+        // 1.3 动态获取主程序的 IP 和端口
         String mainIp = getLocalIpAddress();
 
-        // 3. 遍历插件列表，并保存为插件实例
+        // 2. 遍历插件列表，并保存为插件实例
         for (PluginWrapper plugin : plugins) {
+            // 2.1 查找插件信息
             String pluginKey = plugin.getPluginId();
+            // TODO @haohao：CollUtil.findOne() 简化
             PluginInfoDO pluginInfo = pluginInfos.stream()
                     .filter(pluginInfoDO -> pluginInfoDO.getPluginKey().equals(pluginKey))
                     .findFirst()
                     .orElse(null);
-
-            // 4. 如果插件信息不存在，则跳过
             if (pluginInfo == null) {
+                // TODO @haohao：建议打个 error log
                 continue;
             }
 
-            // 5. 查询插件实例
+            // 2.2 查询插件实例
             PluginInstanceDO pluginInstance = pluginInstanceMapper.selectByMainIdAndPluginId(MAIN_ID, pluginInfo.getId());
-
-            // 6. 如果插件实例不存在，则创建
+            // 2.3.1 如果插件实例不存在，则创建
             if (pluginInstance == null) {
+                // TODO @haohao：可以链式调用；建议新建一个！
                 pluginInstance = new PluginInstanceDO();
                 pluginInstance.setPluginId(pluginInfo.getId());
                 pluginInstance.setMainId(MAIN_ID);
@@ -78,13 +80,14 @@ public class PluginInstanceServiceImpl implements PluginInstanceService {
                 pluginInstance.setHeartbeatAt(System.currentTimeMillis());
                 pluginInstanceMapper.insert(pluginInstance);
             } else {
-                // 7. 如果插件实例存在，则更新
+                // 2.3.2 如果插件实例存在，则更新
                 pluginInstance.setHeartbeatAt(System.currentTimeMillis());
                 pluginInstanceMapper.updateById(pluginInstance);
             }
         }
     }
 
+    // TODO @haohao：这个目的是，获取到第一个有效 ip 是哇？
     private String getLocalIpAddress() {
         try {
             List<String> ipList = NetUtil.localIpv4s().stream()
