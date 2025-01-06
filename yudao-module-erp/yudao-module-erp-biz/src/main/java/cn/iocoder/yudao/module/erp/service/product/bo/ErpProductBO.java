@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.erp.service.product.bo;
 import cn.iocoder.yudao.module.erp.controller.admin.product.vo.product.json.GuidePriceJson;
 import lombok.Data;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 /**
@@ -54,7 +55,7 @@ public class ErpProductBO {
     /**
      * 基础重量（kg）
      */
-    private Integer weight;
+    private BigDecimal weight;
     /**
      * 系列
      */

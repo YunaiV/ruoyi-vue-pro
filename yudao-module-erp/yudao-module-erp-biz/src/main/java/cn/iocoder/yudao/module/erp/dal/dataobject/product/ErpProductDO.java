@@ -5,6 +5,8 @@ import lombok.*;
 import com.baomidou.mybatisplus.annotation.*;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 
+import java.math.BigDecimal;
+
 /**
  * ERP 产品 DO
  *
@@ -64,7 +66,7 @@ public class ErpProductDO extends BaseDO {
     /**
      * 基础重量（kg）
      */
-    private Integer weight;
+    private BigDecimal weight;
     /**
      * 系列
      */

@@ -4,6 +4,8 @@ import lombok.*;
 import io.swagger.v3.oas.annotations.media.Schema;
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import org.springframework.format.annotation.DateTimeFormat;
+
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
@@ -46,7 +48,7 @@ public class ErpProductPageReqVO extends PageParam {
     private String remark;
 
     @Schema(description = "基础重量（kg）")
-    private Integer weight;
+    private BigDecimal weight;
 
     @Schema(description = "系列")
     private String series;

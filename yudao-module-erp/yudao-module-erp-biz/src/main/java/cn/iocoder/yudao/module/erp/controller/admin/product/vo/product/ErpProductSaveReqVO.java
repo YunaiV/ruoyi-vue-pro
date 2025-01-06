@@ -5,6 +5,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import lombok.*;
 import jakarta.validation.constraints.*;
+
+import java.math.BigDecimal;
 import java.util.List;
 
 /**
@@ -54,7 +56,7 @@ public class ErpProductSaveReqVO {
 
     @Schema(description = "基础重量（kg）", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "基础重量（kg）不能为空")
-    private Integer weight;
+    private BigDecimal weight;
 
     @Schema(description = "系列")
     private String series;

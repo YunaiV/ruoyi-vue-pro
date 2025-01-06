@@ -4,6 +4,7 @@ import cn.iocoder.yudao.module.erp.controller.admin.product.vo.product.json.Guid
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -72,7 +73,7 @@ public class ErpProductRespVO {
 
     @Schema(description = "基础重量（kg）", requiredMode = Schema.RequiredMode.REQUIRED)
     @ExcelProperty("基础重量（kg）")
-    private Integer weight;
+    private BigDecimal weight;
 
     @Schema(description = "系列")
     @ExcelProperty("系列")

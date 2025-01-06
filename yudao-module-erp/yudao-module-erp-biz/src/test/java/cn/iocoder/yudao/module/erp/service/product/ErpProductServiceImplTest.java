@@ -91,7 +91,6 @@ public class ErpProductServiceImplTest extends BaseDbUnitTest {
         productVO.setMaterial("测试材料"+RandomUtil.randomInt(10000, 99999));
         productVO.setStatus(true);
         productVO.setRemark("这是一个测试备注"+ LocalTime.now());
-        productVO.setWeight(1);
         productVO.setSeries("测试系列");
         productVO.setColor("红色");
         productVO.setModel("测试型号");
