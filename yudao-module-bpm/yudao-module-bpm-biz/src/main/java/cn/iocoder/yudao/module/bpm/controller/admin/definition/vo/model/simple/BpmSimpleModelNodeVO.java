@@ -96,6 +96,42 @@ public class BpmSimpleModelNodeVO {
      */
     private AssignEmptyHandler assignEmptyHandler;
 
+    /**
+     * 创建任务监听器
+     */
+    private ListenerHandler createTaskListener;
+
+    @Schema(description = "任务监听器")
+    @Data
+    public static class ListenerHandler {
+
+        @Schema(description = "是否开启任务监听器", example = "false")
+        private Boolean enable;
+
+        @Schema(description = "请求路径", example = "http://xxxxx")
+        private String path;
+
+        @Schema(description = "请求头", example = "[]")
+        private List<ListenerMap> header;
+
+        @Schema(description = "请求体", example = "[]")
+        private List<ListenerMap> body;
+
+        @Schema(description = "任务监听器键值对")
+        @Data
+        public static class ListenerMap {
+
+            @Schema(description = "键", example = "xxx")
+            private String key;
+
+            @Schema(description = "值类型", example = "1")
+            private Integer type;
+
+            @Schema(description = "值", example = "xxx")
+            private String value;
+        }
+    }
+
     @Schema(description = "审批节点拒绝处理策略")
     @Data
     public static class RejectHandler {

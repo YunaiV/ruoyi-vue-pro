@@ -4,6 +4,7 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.*;
+import cn.hutool.json.JSONUtil;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.simple.BpmSimpleModelNodeVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.simple.BpmSimpleModelNodeVO.ConditionGroups;
@@ -15,11 +16,14 @@ import org.flowable.bpmn.BpmnAutoLayout;
 import org.flowable.bpmn.constants.BpmnXMLConstants;
 import org.flowable.bpmn.model.Process;
 import org.flowable.bpmn.model.*;
+import org.flowable.engine.delegate.TaskListener;
 
 import java.util.*;
 
 import static cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnModelConstants.*;
 import static cn.iocoder.yudao.module.bpm.framework.flowable.core.util.BpmnModelUtils.*;
+import static cn.iocoder.yudao.module.bpm.service.task.listener.BpmUserTaskListener.DELEGATE_EXPRESSION;
+import static cn.iocoder.yudao.module.bpm.service.task.listener.BpmUserTaskListener.EXTENSION_SUFFIX;
 import static java.util.Arrays.asList;
 
 /**
@@ -419,6 +423,20 @@ public class SimpleModelUtils {
             //  设置审批任务的截止时间
             if (node.getTimeoutHandler() != null && node.getTimeoutHandler().getEnable()) {
                 userTask.setDueDate(node.getTimeoutHandler().getTimeDuration());
+            }
+            // 设置监听器
+            List<FlowableListener> flowableListeners = new ArrayList<>(3);
+            if (node.getCreateTaskListener().getEnable()) {
+                FlowableListener flowableListener = new FlowableListener();
+                flowableListener.setEvent(TaskListener.EVENTNAME_CREATE);
+                flowableListener.setImplementationType(ImplementationType.IMPLEMENTATION_TYPE_DELEGATEEXPRESSION);
+                flowableListener.setImplementation(DELEGATE_EXPRESSION);
+                addExtensionElement(userTask, "create" + EXTENSION_SUFFIX,
+                        JSONUtil.toJsonStr(node.getCreateTaskListener()));
+                flowableListeners.add(flowableListener);
+            }
+            if (!flowableListeners.isEmpty()) {
+                userTask.setTaskListeners(flowableListeners);
             }
             return userTask;
         }
