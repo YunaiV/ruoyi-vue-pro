@@ -12,8 +12,8 @@ import java.time.LocalDateTime;
 
 /**
  * ERP 采购订单 DO
- *
- * @author 芋道源码
+ * <p>
+ * 包含整个采购订单的基本信息，例如订单编号、总金额、供应商信息等。
  */
 @TableName(value = "erp_purchase_order")
 @KeySequence("erp_purchase_order_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
@@ -25,38 +25,44 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class ErpPurchaseOrderDO extends BaseDO {
 
+    // ========== 基本信息 ==========
+
     /**
-     * 编号
+     * 编号 =
+     * 采购订单号，生成是由后端直接生成，默认是自动填充的，并且格式为：前缀+日期+6为顺序号（如：XXXX-20241010-000001）
      */
     @TableId
     private Long id;
+
     /**
-     * 采购订单号
+     * 采购订单号，生成是由后端直接生成，默认是自动填充的，并且格式为：前缀+日期+6为顺序号（如：XXXX-20241010-000001）
      */
     private String no;
+
     /**
      * 采购状态
-     *
      * 枚举 {@link cn.iocoder.yudao.module.erp.enums.ErpAuditStatus}
      */
     private Integer status;
+
     /**
      * 供应商编号
-     *
      * 关联 {@link ErpSupplierDO#getId()}
      */
     private Long supplierId;
+
     /**
      * 结算账户编号
-     *
      * 关联 {@link ErpAccountDO#getId()}
      */
     private Long accountId;
+
     /**
      * 下单时间
      */
     private LocalDateTime orderTime;
 
+    // ========== 合计 ==========
     /**
      * 合计数量
      */
@@ -90,16 +96,63 @@ public class ErpPurchaseOrderDO extends BaseDO {
      * 定金金额，单位：元
      */
     private BigDecimal depositPrice;
+    // ========== 采购文件信息 ==========
 
     /**
      * 附件地址
      */
     private String fileUrl;
+
     /**
      * 备注
      */
     private String remark;
 
+
+    // ========== 时间相关字段 ==========
+
+    /**
+     * 单据日期，默认为当前日期，也可以自行选择
+     */
+    private LocalDateTime documentDate;
+
+    /**
+     * 结算日期，默认为当前日期
+     */
+    private LocalDateTime settlementDate;
+
+
+    /**
+     * 制单人，自动填充为当前操作者
+     */
+    private Long creatorId;
+
+    /**
+     * 制单时间，自动填充为当前时间
+     */
+    private LocalDateTime createTime;
+
+    /**
+     * 审核人，审核时自动填充
+     */
+    private Long auditorId;
+
+    /**
+     * 审核时间，审核时自动填充
+     */
+    private LocalDateTime auditTime;
+
+    // ========== 部门和主体信息 ==========
+
+    /**
+     * 部门，由系统中进行选择
+     */
+    private Long departmentId;
+
+    /**
+     * 采购主体，进行采购的公司主体，关联财务模块-主体管理
+     */
+    private Long purchaseEntityId;
     // ========== 采购入库 ==========
     /**
      * 采购入库数量
@@ -111,5 +164,4 @@ public class ErpPurchaseOrderDO extends BaseDO {
      * 采购退货数量
      */
     private BigDecimal returnCount;
-
 }

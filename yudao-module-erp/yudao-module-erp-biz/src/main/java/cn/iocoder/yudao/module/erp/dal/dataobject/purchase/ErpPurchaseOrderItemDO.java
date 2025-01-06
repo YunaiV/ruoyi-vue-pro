@@ -11,8 +11,10 @@ import java.math.BigDecimal;
 
 /**
  * ERP 采购订单项 DO
+ * <p>
+ * 包含采购订单的具体条目信息，例如产品、单价、数量等。
  *
- * @author 芋道源码
+ * @author wdy
  */
 @TableName("erp_purchase_order_items")
 @KeySequence("erp_purchase_order_items_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
@@ -31,48 +33,22 @@ public class ErpPurchaseOrderItemDO extends BaseDO {
     private Long id;
     /**
      * 采购订单编号
-     *
+     * <p>
      * 关联 {@link ErpPurchaseOrderDO#getId()}
      */
     private Long orderId;
     /**
      * 产品编号
-     *
+     * <p>
      * 关联 {@link ErpProductDO#getId()}
      */
     private Long productId;
     /**
      * 产品单位单位
-     *
+     * <p>
      * 冗余 {@link ErpProductDO#getUnitId()}
      */
     private Long productUnitId;
-
-    /**
-     * 产品单位单价，单位：元
-     */
-    private BigDecimal productPrice;
-    /**
-     * 数量
-     */
-    private BigDecimal count;
-    /**
-     * 总价，单位：元
-     *
-     * totalPrice = productPrice * count
-     */
-    private BigDecimal totalPrice;
-    /**
-     * 税率，百分比
-     */
-    private BigDecimal taxPercent;
-    /**
-     * 税额，单位：元
-     *
-     * taxPrice = totalPrice * taxPercent
-     */
-    private BigDecimal taxPrice;
-
     /**
      * 备注
      */
@@ -84,10 +60,67 @@ public class ErpPurchaseOrderItemDO extends BaseDO {
      */
     private BigDecimal inCount;
 
+    // ========== 合计 ==========
+
+    /**
+     * 产品单位单价，单位：元
+     */
+    private BigDecimal productPrice;
+    /**
+     * 数量
+     */
+    private BigDecimal count;
+    /**
+     * 总价，单位：元
+     * totalPrice = productPrice * count
+     */
+    private BigDecimal totalPrice;
+    /**
+     * 税率，百分比
+     */
+    private BigDecimal taxPercent;
+    /**
+     * 税额，单位：元
+     * taxPrice = totalPrice * taxPercent
+     */
+    private BigDecimal taxPrice;
+    // ========== 采购金额和数量 ==========
+
+    /**
+     * 合计产品价格，单位：元
+     */
+    private BigDecimal totalProductPrice;
+
+    /**
+     * 合计税额，单位：元
+     */
+    private BigDecimal totalTaxPrice;
+
+    /**
+     * 优惠率，百分比
+     */
+    private BigDecimal discountPercent;
+
+    /**
+     * 优惠金额，单位：元
+     */
+    private BigDecimal discountPrice;
+
+    /**
+     * 定金金额，单位：元
+     */
+    private BigDecimal depositPrice;
+
+    /**
+     * 应付款余额，查询时显示，新增时无需填写
+     */
+    private BigDecimal payableBalance;
     // ========== 采购退货（出库）） ==========
     /**
      * 采购退货数量
      */
     private BigDecimal returnCount;
+
+
 
 }
