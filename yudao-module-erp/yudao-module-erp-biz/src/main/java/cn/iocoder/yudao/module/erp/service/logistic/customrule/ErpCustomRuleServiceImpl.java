@@ -36,7 +36,8 @@ public class ErpCustomRuleServiceImpl implements ErpCustomRuleService {
 
     @Override
     public Long createCustomRule(ErpCustomRuleSaveReqVO createReqVO) {
-        log.info("create custom rule");
+        //判断国别+供应商产品编码是否重复
+        validateCountryCodeAndSupplierProductIdExist(null,createReqVO.getCountryCode(),createReqVO.getSupplierProductId());
         // 插入
         ErpCustomRuleDO customRule = BeanUtils.toBean(createReqVO, ErpCustomRuleDO.class);
         ThrowUtil.ifSqlThrow(customRuleMapper.insert(customRule),DB_INSERT_ERROR);
@@ -51,6 +52,8 @@ public class ErpCustomRuleServiceImpl implements ErpCustomRuleService {
     @Override
     public void updateCustomRule(ErpCustomRuleSaveReqVO updateReqVO) {
         Long id = updateReqVO.getId();
+        //判断国别+供应商产品编码是否重复
+        validateCountryCodeAndSupplierProductIdExist(id,updateReqVO.getCountryCode(),updateReqVO.getSupplierProductId());
         // 校验存在
         validateCustomRuleExists(id);
         // 更新
@@ -83,6 +86,20 @@ public class ErpCustomRuleServiceImpl implements ErpCustomRuleService {
     @Override
     public PageResult<ErpCustomRuleDO> getCustomRulePage(ErpCustomRulePageReqVO pageReqVO) {
         return customRuleMapper.selectPage(pageReqVO);
+    }
+
+    private void validateCountryCodeAndSupplierProductIdExist(Long id, Integer countryCode, Long supplierProductId) {
+        ErpCustomRuleDO erpCustomRuleDO = customRuleMapper.selectByCountryCodeAndSupplierProductId(countryCode, supplierProductId);
+        if (erpCustomRuleDO == null) {
+            return;
+        }
+        // 如果 id 为空，说明不用比较是否为相同 id 的字典类型
+        if (id == null) {
+            throw exception(NO_REPEAT_OF_COUNTRY_CODE_AND_SUPPLIER_PRODUCT_CODE);
+        }
+        if (!erpCustomRuleDO.getId().equals(id)) {
+            throw exception(NO_REPEAT_OF_COUNTRY_CODE_AND_SUPPLIER_PRODUCT_CODE);
+        }
     }
 
 }

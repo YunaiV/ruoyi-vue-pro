@@ -101,4 +101,10 @@ public interface ErpCustomRuleMapper extends BaseMapperX<ErpCustomRuleDO> {
     default List<ErpCustomRuleDTO> selectProductAllInfoListBySupplierId(@NotNull(message = "供应商产品id不能为空") Long id) {
         return selectJoinList(ErpCustomRuleDTO.class, getWrapper().eq(ErpSupplierProductDO::getId, id));
     }
+
+    default ErpCustomRuleDO selectByCountryCodeAndSupplierProductId(Integer countryCode, Long supplierProductId) {
+        return selectOne(new LambdaQueryWrapperX<ErpCustomRuleDO>()
+                .eq(ErpCustomRuleDO::getCountryCode, countryCode)
+                .eq(ErpCustomRuleDO::getSupplierProductId, supplierProductId));
+    }
 }
