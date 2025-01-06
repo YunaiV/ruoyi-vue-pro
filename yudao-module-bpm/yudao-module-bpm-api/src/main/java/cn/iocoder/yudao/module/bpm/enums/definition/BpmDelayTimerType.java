@@ -7,7 +7,7 @@ import lombok.Getter;
 import java.util.Arrays;
 
 /**
- * BPM 延时器类型枚举
+ * BPM 延迟器类型枚举
  *
  * @author Lesan
  */
