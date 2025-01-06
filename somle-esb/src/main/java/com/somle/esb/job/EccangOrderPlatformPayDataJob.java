@@ -20,7 +20,7 @@ public class EccangOrderPlatformPayDataJob extends EccangDataJob {
                         .platformPaidDateEnd(beforeYesterdayLastSecond)
                         .build())
                     .build(),
-                null
+                beforeYesterday.getYear()
             )
             .forEach(page -> {
                 OssData data = OssData.builder()

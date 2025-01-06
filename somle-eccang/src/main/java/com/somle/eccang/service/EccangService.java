@@ -1,24 +1,17 @@
 package com.somle.eccang.service;
 
-import java.net.SocketTimeoutException;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.time.LocalDateTime;
-import java.time.Year;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.IntStream;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.stream.Stream;
-
 import cn.hutool.core.collection.CollUtil;
 import com.somle.eccang.model.*;
-import com.somle.framework.common.util.json.JsonUtils;
+import com.somle.eccang.model.EccangResponse.EccangPage;
+import com.somle.eccang.repository.EccangTokenRepository;
+import com.somle.framework.common.util.general.Limiter;
 import com.somle.framework.common.util.json.JSONObject;
-
+import com.somle.framework.common.util.json.JsonUtils;
 import com.somle.framework.common.util.web.RequestX;
+import com.somle.framework.common.util.web.WebUtils;
+import jakarta.annotation.PostConstruct;
 import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.integration.support.MessageBuilder;
@@ -29,15 +22,19 @@ import org.springframework.retry.policy.SimpleRetryPolicy;
 import org.springframework.retry.support.RetryTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-
-import com.somle.eccang.model.EccangResponse.EccangPage;
-import com.somle.eccang.repository.EccangTokenRepository;
-import com.somle.framework.common.util.general.Limiter;
-import com.somle.framework.common.util.web.WebUtils;
-
-import jakarta.annotation.PostConstruct;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.client.HttpClientErrorException;
+
+import java.net.SocketTimeoutException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.time.LocalDateTime;
+import java.time.Year;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 @Slf4j
 @Service
@@ -168,7 +165,16 @@ public class EccangService {
             case "common.error.code.9999":
                 throw new RuntimeException("Eccang return invalid response: " + response.getBizContent(EccangResponse.EccangError.class));
             case "300":
-                throw new RuntimeException("Error message from eccang: " + response.getBizContentList(EccangResponse.EccangError.class));
+                    response.getBizContentList(EccangResponse.EccangError.class).stream()
+                        .filter(e -> "10001".equals(e.getErrorCode()))  // 过滤出 errorCode 为 "10001" 的错误
+                        .findFirst().ifPresent(e -> {
+                        // 如果找到了匹配的错误，记录日志并清空业务内容
+                        log.info("Eccang returned error code 10001: Current year data is archived, skipping...");
+                        response.setBizContent(null);  // 清空业务内容
+                    });
+                    log.warn("当前响应体不含归档数据,选择跳过,original response = {}" ,response);
+                    if (response.getBizContent() == null)return;
+                throw new RuntimeException("Error message from eccang: {}" + response.getBizContentList(EccangResponse.EccangError.class));
             case "429":
                 throw new HttpClientErrorException(HttpStatus.TOO_MANY_REQUESTS, "Too many requests, please try again later.");
             default:
@@ -189,7 +195,7 @@ public class EccangService {
             getPage(payload, endpoint),
             bizContent -> {
                 if (bizContent.hasNext()) {
-                    log.debug("have next");
+                    log.debug("have next,eccang page = {}",bizContent);
                     payload.put("page", bizContent.getPage() + 1);
                     return getPage(payload, endpoint);
                 } else {
