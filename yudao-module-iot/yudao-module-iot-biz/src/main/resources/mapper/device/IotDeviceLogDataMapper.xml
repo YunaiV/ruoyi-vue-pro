@@ -41,4 +41,38 @@
         )
     </insert>
 
+    <select id="selectPage" resultType="cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceLogDO">
+        SELECT ts, id, device_key, product_key, type, subType, content, report_time
+        FROM device_log_${reqVO.deviceKey}
+        <where>
+            <if test="reqVO.type != null and reqVO.type != ''">
+                AND type = #{reqVO.type}
+            </if>
+            <if test="reqVO.subType != null and reqVO.subType != ''">
+                AND subType = #{reqVO.subType}
+            </if>
+            <if test="reqVO.createTime != null">
+                AND ts BETWEEN #{reqVO.createTime[0]} AND #{reqVO.createTime[1]}
+            </if>
+        </where>
+        ORDER BY ts DESC
+        LIMIT #{reqVO.pageSize} OFFSET #{reqVO.pageNo}
+    </select>
+
+    <select id="selectCount" resultType="Long">
+        SELECT COUNT(*)
+        FROM device_log_${reqVO.deviceKey}
+        <where>
+            <if test="reqVO.type != null and reqVO.type != ''">
+                AND type = #{reqVO.type}
+            </if>
+            <if test="reqVO.subType != null and reqVO.subType != ''">
+                AND subType = #{reqVO.subType}
+            </if>
+            <if test="reqVO.createTime != null">
+                AND ts BETWEEN #{reqVO.createTime[0]} AND #{reqVO.createTime[1]}
+            </if>
+        </where>
+    </select>
+
 </mapper>

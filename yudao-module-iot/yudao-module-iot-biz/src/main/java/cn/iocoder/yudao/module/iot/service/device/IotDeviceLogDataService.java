@@ -1,6 +1,10 @@
 package cn.iocoder.yudao.module.iot.service.device;
 
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.iot.controller.admin.device.vo.deviceData.IotDeviceDataSimulatorSaveReqVO;
+import cn.iocoder.yudao.module.iot.controller.admin.device.vo.deviceData.IotDeviceLogPageReqVO;
+import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceLogDO;
+
 
 /**
  * IoT 设备日志数据 Service 接口
@@ -24,5 +28,13 @@ public interface IotDeviceLogDataService {
      * @param simulatorReqVO 设备日志模拟数据
      */
     void createDeviceLog(IotDeviceDataSimulatorSaveReqVO simulatorReqVO);
+
+    /**
+     * 获得设备日志分页
+     *
+     * @param pageReqVO 分页查询
+     * @return 设备日志分页
+     */
+    PageResult<IotDeviceLogDO> getDeviceLogPage(IotDeviceLogPageReqVO pageReqVO);
 
 }
