@@ -51,12 +51,12 @@ public class IotDeviceLogDO {
     /**
      * 上报时间戳
      */
-    private DateTime reportTime;
+    private Long reportTime;
 
     /**
      * 时序时间
      */
-    private DateTime ts;
+    private Long ts;
 
 
 }

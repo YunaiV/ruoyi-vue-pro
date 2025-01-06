@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 
 /**
  * IoT 设备日志数据 Service 实现了
@@ -19,6 +20,7 @@ import java.time.LocalDateTime;
  */
 @Service
 @Slf4j
+@Validated
 public class IotDeviceLogDataServiceImpl implements IotDeviceLogDataService{
 
     @Resource
@@ -38,8 +40,28 @@ public class IotDeviceLogDataServiceImpl implements IotDeviceLogDataService{
 
     @Override
     public void createDeviceLog(IotDeviceDataSimulatorSaveReqVO simulatorReqVO) {
+        //TODO:讨论一下，iotkit这块TS和上报时间都是外部传入的   但是看TDengine文档 他是建议对TS在SQL中直接NOW   咱们的TS数据获取是走哪一种
+
+        // 1. 转换请求对象为 DO
         IotDeviceLogDO iotDeviceLogDO = BeanUtils.toBean(simulatorReqVO, IotDeviceLogDO.class);
-        iotDeviceLogDO.setTs(DateTime.now());
+        
+        // 2. 处理时间字段
+        long currentTime = System.currentTimeMillis();
+        // 2.1 设置时序时间为当前时间
+        iotDeviceLogDO.setTs(currentTime);
+        
+        // 2.2 处理上报时间
+        if (simulatorReqVO.getReportTime() != null) {
+            // 将 LocalDateTime 转换为时间戳
+            iotDeviceLogDO.setReportTime(
+                simulatorReqVO.getReportTime().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()
+            );
+        } else {
+            // 如果没有上报时间，使用当前时间
+            iotDeviceLogDO.setReportTime(currentTime);
+        }
+        
+        // 3. 插入数据
         iotDeviceLogDataMapper.insert(iotDeviceLogDO);
     }
 }

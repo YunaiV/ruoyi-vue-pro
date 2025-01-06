@@ -55,7 +55,7 @@ public class IotDeviceDataController {
     @PostMapping("/simulator")
     @Operation(summary = "模拟设备")
     public CommonResult<Boolean> simulatorDevice(@Valid @RequestBody IotDeviceDataSimulatorSaveReqVO simulatorReqVO) {
-        //TODO:先生成一下日志  后续完善模拟设备代码逻辑
+        //TODO:先生成一下设备日志  后续完善模拟设备代码逻辑
         iotDeviceLogDataService.createDeviceLog(simulatorReqVO);
         return success(true);
     }

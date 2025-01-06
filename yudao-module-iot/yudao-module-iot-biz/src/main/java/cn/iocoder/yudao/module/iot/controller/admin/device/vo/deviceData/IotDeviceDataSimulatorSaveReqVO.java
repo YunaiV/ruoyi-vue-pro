@@ -4,7 +4,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.Data;
 
-
 import java.time.LocalDateTime;
 
 @Schema(description = "管理后台 - IoT 模拟设备数据 Request VO")

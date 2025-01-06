@@ -6,7 +6,7 @@
 
     <!-- 创建设备日志超级表   初始化只创建一次-->
     <update id="createDeviceLogSTable">
-        CREATE STABLE device_log(
+        CREATE STABLE device_log (
         ts TIMESTAMP,
         id NCHAR(50),
         product_key NCHAR(50),
