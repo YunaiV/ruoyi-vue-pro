@@ -29,6 +29,7 @@ import cn.iocoder.yudao.module.trade.enums.brokerage.BrokerageRecordStatusEnum;
 import cn.iocoder.yudao.module.trade.service.config.TradeConfigService;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import jakarta.annotation.Resource;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
@@ -45,6 +46,7 @@ import static cn.iocoder.yudao.module.trade.enums.ErrorCodeConstants.*;
  *
  * @author owen
  */
+@Slf4j
 @Service
 @Validated
 public class BrokerageUserServiceImpl implements BrokerageUserService {
@@ -174,34 +176,39 @@ public class BrokerageUserServiceImpl implements BrokerageUserService {
 
     @Override
     public boolean bindBrokerageUser(Long userId, Long bindUserId) {
-        // 1. 获得分销用户
-        boolean isNewBrokerageUser = false;
-        BrokerageUserDO brokerageUser = brokerageUserMapper.selectById(userId);
-        if (brokerageUser == null) { // 分销用户不存在的情况：1. 新注册；2. 旧数据；3. 分销功能关闭后又打开
-            isNewBrokerageUser = true;
-            brokerageUser = new BrokerageUserDO().setId(userId).setBrokerageEnabled(false).setBrokeragePrice(0).setFrozenPrice(0);
-        }
+        try {
+            // 1. 获得分销用户
+            boolean isNewBrokerageUser = false;
+            BrokerageUserDO brokerageUser = brokerageUserMapper.selectById(userId);
+            if (brokerageUser == null) { // 分销用户不存在的情况：1. 新注册；2. 旧数据；3. 分销功能关闭后又打开
+                isNewBrokerageUser = true;
+                brokerageUser = new BrokerageUserDO().setId(userId).setBrokerageEnabled(false).setBrokeragePrice(0).setFrozenPrice(0);
+            }
 
-        // 2.1 校验是否能绑定用户
-        boolean validated = isUserCanBind(brokerageUser);
-        if (!validated) {
+            // 2.1 校验是否能绑定用户
+            boolean validated = isUserCanBind(brokerageUser);
+            if (!validated) {
+                return false;
+            }
+            // 2.3 校验能否绑定
+            validateCanBindUser(brokerageUser, bindUserId);
+            // 2.3 绑定用户
+            if (isNewBrokerageUser) {
+                Integer enabledCondition = tradeConfigService.getTradeConfig().getBrokerageEnabledCondition();
+                if (BrokerageEnabledConditionEnum.ALL.getCondition().equals(enabledCondition)) { // 人人分销：用户默认就有分销资格
+                    brokerageUser.setBrokerageEnabled(true).setBrokerageTime(LocalDateTime.now());
+                } else {
+                    brokerageUser.setBrokerageEnabled(false).setBrokerageTime(LocalDateTime.now());
+                }
+                brokerageUserMapper.insert(fillBindUserData(bindUserId, brokerageUser));
+            } else {
+                brokerageUserMapper.updateById(fillBindUserData(bindUserId, new BrokerageUserDO().setId(userId)));
+            }
+            return true;
+        } catch (Exception e) {
+            log.error("[bindBrokerageUser][userId({}) 绑定推广员失败 bindUserId({})]", userId, bindUserId, e);
             return false;
         }
-        // 2.3 校验能否绑定
-        validateCanBindUser(brokerageUser, bindUserId);
-        // 2.3 绑定用户
-        if (isNewBrokerageUser) {
-            Integer enabledCondition = tradeConfigService.getTradeConfig().getBrokerageEnabledCondition();
-            if (BrokerageEnabledConditionEnum.ALL.getCondition().equals(enabledCondition)) { // 人人分销：用户默认就有分销资格
-                brokerageUser.setBrokerageEnabled(true).setBrokerageTime(LocalDateTime.now());
-            } else {
-                brokerageUser.setBrokerageEnabled(false).setBrokerageTime(LocalDateTime.now());
-            }
-            brokerageUserMapper.insert(fillBindUserData(bindUserId, brokerageUser));
-        } else {
-            brokerageUserMapper.updateById(fillBindUserData(bindUserId, new BrokerageUserDO().setId(userId)));
-        }
-        return true;
     }
 
     @Override
