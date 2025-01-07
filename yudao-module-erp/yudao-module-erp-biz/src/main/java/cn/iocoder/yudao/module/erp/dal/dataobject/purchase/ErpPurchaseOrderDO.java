@@ -64,7 +64,7 @@ public class ErpPurchaseOrderDO extends BaseDO {
 
     // ========== 合计 ==========
     /**
-     * 合计数量
+     * 合计数量-项目数量
      */
     private BigDecimal totalCount;
     /**
@@ -122,16 +122,6 @@ public class ErpPurchaseOrderDO extends BaseDO {
     private LocalDateTime settlementDate;
 
 
-//    /**
-//     * 制单人，自动填充为当前操作者
-//     */
-//    private Long creatorId;
-//
-//    /**
-//     * 制单时间，自动填充为当前时间
-//     */
-//    private LocalDateTime createTime;
-
     /**
      * 审核人，审核时自动填充
      */
@@ -174,4 +164,9 @@ public class ErpPurchaseOrderDO extends BaseDO {
      * 完工单，JSON 格式
      */
     private String completionJson;
+
+    private String xCode;//x码
+
+    private String containerRate;//箱率
+
 }

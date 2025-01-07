@@ -43,6 +43,13 @@ public class ErpPurchaseOrderSaveReqVO {
 
     @Schema(description = "订单清单列表")
     private List<Item> items;
+    // ========== 部门和主体信息 ==========
+
+    @Schema(description = "部门编号")
+    private Long departmentId;
+
+    @Schema(description = "采购主体编号")
+    private Long purchaseEntityId;
 
     @Data
     public static class Item {
@@ -71,6 +78,11 @@ public class ErpPurchaseOrderSaveReqVO {
         @Schema(description = "备注", example = "随便")
         private String remark;
 
+        @Schema(description = "供应商产品编号", example = "")
+        private String supplierProductCode;
+
+        @Schema(description = "产品名称")
+        private String ItemName;
     }
 
 }
