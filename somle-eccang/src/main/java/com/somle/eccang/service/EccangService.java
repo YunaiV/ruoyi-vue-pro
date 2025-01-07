@@ -1,24 +1,18 @@
 package com.somle.eccang.service;
 
-import java.net.SocketTimeoutException;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.time.LocalDateTime;
-import java.time.Year;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.IntStream;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.stream.Stream;
-
 import cn.hutool.core.collection.CollUtil;
 import com.somle.eccang.model.*;
-import com.somle.framework.common.util.json.JsonUtils;
+import com.somle.eccang.model.EccangResponse.EccangPage;
+import com.somle.eccang.model.exception.EccangResponseException;
+import com.somle.eccang.repository.EccangTokenRepository;
+import com.somle.framework.common.util.general.Limiter;
 import com.somle.framework.common.util.json.JSONObject;
-
+import com.somle.framework.common.util.json.JsonUtils;
 import com.somle.framework.common.util.web.RequestX;
+import com.somle.framework.common.util.web.WebUtils;
+import jakarta.annotation.PostConstruct;
 import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.integration.support.MessageBuilder;
@@ -29,15 +23,19 @@ import org.springframework.retry.policy.SimpleRetryPolicy;
 import org.springframework.retry.support.RetryTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-
-import com.somle.eccang.model.EccangResponse.EccangPage;
-import com.somle.eccang.repository.EccangTokenRepository;
-import com.somle.framework.common.util.general.Limiter;
-import com.somle.framework.common.util.web.WebUtils;
-
-import jakarta.annotation.PostConstruct;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.client.HttpClientErrorException;
+
+import java.net.SocketTimeoutException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.time.LocalDateTime;
+import java.time.Year;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 @Slf4j
 @Service
@@ -45,7 +43,7 @@ public class EccangService {
 
 
     private EccangToken token;
-    private int pageSize = 100;
+    private final int pageSize = 100;
     private Limiter limiter = new Limiter(20);
 
     @Autowired
@@ -168,7 +166,12 @@ public class EccangService {
             case "common.error.code.9999":
                 throw new RuntimeException("Eccang return invalid response: " + response.getBizContent(EccangResponse.EccangError.class));
             case "300":
-                throw new RuntimeException("Error message from eccang: " + response.getBizContentList(EccangResponse.EccangError.class));
+                List<EccangResponse.EccangError> errors = response.getBizContentList(EccangResponse.EccangError.class);
+                if (errors.isEmpty()) {
+                    throw new RuntimeException("response code is 300 but errors is empty,Error message from response: " + response);
+                }else {
+                    throw new EccangResponseException(errors);
+                }
             case "429":
                 throw new HttpClientErrorException(HttpStatus.TOO_MANY_REQUESTS, "Too many requests, please try again later.");
             default:
@@ -186,10 +189,10 @@ public class EccangService {
         payload.put("page", 1);
         payload.put("page_size", pageSize);
         return Stream.iterate(
-            getPage(payload, endpoint),
+            getPage(payload, endpoint), Objects::nonNull,
             bizContent -> {
                 if (bizContent.hasNext()) {
-                    log.debug("have next");
+                    log.debug("have next,当前进度：{}/{}", (bizContent.getPage() - 1) * pageSize + bizContent.getData().size(), bizContent.getTotal());
                     payload.put("page", bizContent.getPage() + 1);
                     return getPage(payload, endpoint);
                 } else {
@@ -197,7 +200,7 @@ public class EccangService {
                     return null;
                 }
             }
-        ).takeWhile(n -> n != null);
+        );
         // );
     }
 
@@ -298,7 +301,19 @@ public class EccangService {
 
     public Stream<EccangPage> getOrderArchivePages(EccangOrderVO orderParams, Integer year) {
         orderParams.setYear(year);
-        return getOrderUnarchivePages(orderParams);
+        Stream<EccangPage> stream;
+        try {
+            stream = getOrderUnarchivePages(orderParams);
+        } catch (EccangResponseException e) {
+            for (EccangResponse.EccangError eccangError : e.getEccangError()) {
+                if (eccangError.getErrorCode().equals("10001")){
+                    log.info("当前{}年不存在归档信息,跳过",year);
+                    return Stream.empty();//跳过
+                }
+            }
+            throw e;
+        }
+        return stream;
     }
 
 

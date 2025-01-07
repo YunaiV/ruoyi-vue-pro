@@ -1,28 +1,17 @@
 package com.somle.eccang.service;
 
-import com.somle.eccang.model.EccangOrderVO;
 import com.somle.eccang.model.EccangToken;
 import com.somle.eccang.repository.EccangTokenRepository;
 import com.somle.framework.common.util.json.JSONObject;
 import com.somle.framework.common.util.json.JsonUtils;
 import com.somle.framework.test.core.ut.BaseMockitoUnitTest;
-import com.somle.framework.test.core.ut.BaseSpringTest;
-import com.somle.framework.test.core.ut.BaseSpringUnitTest;
-import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
-import org.springframework.messaging.MessageChannel;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -82,4 +71,24 @@ public class EccangServiceTest extends BaseMockitoUnitTest {
 //        var actual = service.requestBody(EccangOrderVO.builder().build(), "get");
 //        assertEquals(expected, actual);
 //    }
+
+    @Test
+    void getOrderArchivePages(){
+//        EccangOrderVO.builder()
+//            .condition(EccangOrderVO.Condition.builder()
+//                .platformPaidDateStart(beforeYesterdayFirstSecond)
+//                .platformPaidDateEnd(beforeYesterdayLastSecond)
+//                .build())
+//            .build(),
+//            beforeYesterday.getYear()
+//        LocalDateTimeUtils.getToday().minusDays(3)
+//        EccangOrderVO.builder()
+//            .condition(EccangOrderVO.Condition.builder()
+//                .platformPaidDateStart()
+//                .platformPaidDateEnd(beforeYesterdayLastSecond)
+//                .build())
+//            .build(),
+//            beforeYesterday.getYear()
+//        service.getOrderPlusArchivePages()
+    }
 }
