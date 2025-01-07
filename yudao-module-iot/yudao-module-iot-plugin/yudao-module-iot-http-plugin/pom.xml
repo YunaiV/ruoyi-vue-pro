@@ -21,7 +21,7 @@
     <properties>
         <!-- 插件相关 -->
         <plugin.id>http-plugin</plugin.id>
-        <plugin.class>cn.iocoder.yudao.module.iot.plugin.HttpPlugin</plugin.class>
+        <plugin.class>cn.iocoder.yudao.module.iot.plugin.HttpVertxPlugin</plugin.class>
         <plugin.version>0.0.1</plugin.version>
         <plugin.provider>ahh</plugin.provider>
         <plugin.description>http-plugin-0.0.1</plugin.description>
@@ -30,27 +30,6 @@
 
     <build>
         <plugins>
-            <!-- DOESN'T WORK WITH MAVEN 3 (I defined the plugin metadata in properties section)
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>properties-maven-plugin</artifactId>
-                <version>1.0-alpha-2</version>
-                <executions>
-                  <execution>
-                    <phase>initialize</phase>
-                    <goals>
-                      <goal>read-project-properties</goal>
-                    </goals>
-                    <configuration>
-                      <files>
-                        <file>plugin.properties</file>
-                      </files>
-                    </configuration>
-                  </execution>
-                </executions>
-            </plugin>
-            -->
-
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-antrun-plugin</artifactId>
@@ -118,6 +97,29 @@
                     <skip>true</skip>
                 </configuration>
             </plugin>
+
+            <!--            <plugin>-->
+            <!--                <groupId>org.apache.maven.plugins</groupId>-->
+            <!--                <artifactId>maven-shade-plugin</artifactId>-->
+            <!--                <version>3.4.1</version>-->
+            <!--                <executions>-->
+            <!--                    <execution>-->
+            <!--                        <phase>package</phase>-->
+            <!--                        <goals>-->
+            <!--                            <goal>shade</goal>-->
+            <!--                        </goals>-->
+            <!--                        <configuration>-->
+            <!--                            <shadedArtifactAttached>true</shadedArtifactAttached>-->
+            <!--                            <shadedClassifierName>shaded</shadedClassifierName>-->
+            <!--                            <transformers>-->
+            <!--                                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">-->
+            <!--                                    <mainClass>cn.iocoder.yudao.module.iot.HttpPluginSpringbootApplication</mainClass>-->
+            <!--                                </transformer>-->
+            <!--                            </transformers>-->
+            <!--                        </configuration>-->
+            <!--                    </execution>-->
+            <!--                </executions>-->
+            <!--            </plugin>-->
         </plugins>
     </build>
 
@@ -145,10 +147,15 @@
             <version>${lombok.version}</version>
             <scope>provided</scope>
         </dependency>
+        <!-- Vert.x 核心依赖 -->
         <dependency>
-            <groupId>io.netty</groupId>
-            <artifactId>netty-all</artifactId>
-            <version>4.1.63.Final</version> <!-- 版本可根据需要调整 -->
+            <groupId>io.vertx</groupId>
+            <artifactId>vertx-core</artifactId>
+        </dependency>
+        <!-- Vert.x Web 模块 -->
+        <dependency>
+            <groupId>io.vertx</groupId>
+            <artifactId>vertx-web</artifactId>
         </dependency>
         <!-- MQTT -->
         <dependency>

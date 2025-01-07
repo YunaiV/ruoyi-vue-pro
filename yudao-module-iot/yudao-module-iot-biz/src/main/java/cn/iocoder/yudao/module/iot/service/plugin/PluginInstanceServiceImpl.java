@@ -196,10 +196,8 @@ public class PluginInstanceServiceImpl implements PluginInstanceService {
                 .collect(Collectors.toMap(PluginInfoDO::getPluginKey, Function.identity()));
 
         // 3. 获取本机 IP 和 MAC 地址
-        LinkedHashSet<InetAddress> localAddressList = NetUtil.localAddressList(t -> t instanceof Inet4Address);
-        LinkedHashSet<String> ipList = NetUtil.toIpList(localAddressList);
-        String ip = ipList.stream().findFirst().orElse("127.0.0.1");
-        String mac = NetUtil.getMacAddress(localAddressList.stream().findFirst().orElse(null));
+        String ip = NetUtil.getLocalhostStr();
+        String mac = NetUtil.getLocalMacAddress();
         String mainId = MAIN_ID + "-" + mac;
 
         // 4. 遍历插件列表，并保存为插件实例
