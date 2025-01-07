@@ -11,6 +11,11 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.annotation.Resource;
 import java.util.concurrent.CompletableFuture;
 
+/**
+ * 插件实例 RPC 接口
+ *
+ * @author 芋道源码
+ */
 @RestController
 @RequestMapping("/rpc")
 @RequiredArgsConstructor

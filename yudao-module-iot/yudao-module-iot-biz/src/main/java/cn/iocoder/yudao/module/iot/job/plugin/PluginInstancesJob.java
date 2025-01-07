@@ -22,7 +22,7 @@ public class PluginInstancesJob {
     @Scheduled(initialDelay = 60, fixedRate = 60, timeUnit = TimeUnit.SECONDS)
     public void updatePluginInstances() {
         TenantUtils.executeIgnore(() -> {
-            pluginInstanceService.updatePluginInstances();
+            pluginInstanceService.reportPluginInstances();
         });
     }
 

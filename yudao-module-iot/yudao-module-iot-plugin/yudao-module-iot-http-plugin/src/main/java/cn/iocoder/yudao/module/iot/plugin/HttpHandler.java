@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.iot.plugin;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import cn.iocoder.yudao.module.iot.api.device.DeviceDataApi;
+import cn.iocoder.yudao.module.iot.api.device.dto.DeviceDataCreateReqDTO;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
@@ -12,7 +13,7 @@ import io.netty.util.CharsetUtil;
 
 /**
  * 基于 Netty 的 HTTP 处理器，用于接收设备上报的数据并调用主程序的 DeviceDataApi 接口进行处理。
- *
+ * <p>
  * 1. 请求格式：JSON 格式，地址为 POST /sys/{productKey}/{deviceName}/thing/event/property/post
  * 2. 返回结果：JSON 格式，包含统一的 code、data、id、message、method、version 字段
  */
@@ -76,7 +77,12 @@ public class HttpHandler extends SimpleChannelInboundHandler<FullHttpRequest> {
 
         try {
             // 调用主程序的接口保存数据
-            deviceDataApi.saveDeviceData(productKey, deviceName, jsonData.toString());
+            DeviceDataCreateReqDTO createDTO = DeviceDataCreateReqDTO.builder()
+                    .productKey(productKey)
+                    .deviceName(deviceName)
+                    .message(jsonData.toString())
+                    .build();
+            deviceDataApi.saveDeviceData(createDTO);
 
             // 构造成功响应内容
             JSONObject successRes = createResponseJson(

@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.iot.api.device;
 
+import cn.iocoder.yudao.module.iot.api.device.dto.DeviceDataCreateReqDTO;
 import cn.iocoder.yudao.module.iot.service.device.IotDevicePropertyDataService;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
@@ -17,8 +18,8 @@ public class DeviceDataApiImpl implements DeviceDataApi {
     private IotDevicePropertyDataService deviceDataService;
 
     @Override
-    public void saveDeviceData(String productKey, String deviceName, String message) {
-        deviceDataService.saveDeviceData(productKey, deviceName, message);
+    public void saveDeviceData(DeviceDataCreateReqDTO createDTO) {
+        deviceDataService.saveDeviceData(createDTO);
     }
 
 }

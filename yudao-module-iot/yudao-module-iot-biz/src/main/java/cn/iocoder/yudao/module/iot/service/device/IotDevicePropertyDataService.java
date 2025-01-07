@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.iot.service.device;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.module.iot.api.device.dto.DeviceDataCreateReqDTO;
 import cn.iocoder.yudao.module.iot.controller.admin.device.vo.deviceData.IotDeviceDataPageReqVO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDataDO;
 import jakarta.validation.Valid;
@@ -25,12 +26,9 @@ public interface IotDevicePropertyDataService {
     /**
      * 保存设备数据
      *
-     * @param productKey 产品 key
-     * @param deviceName 设备名称
-     * @param message    消息
-     *                   <p>参见 <a href="https://help.aliyun.com/zh/iot/user-guide/device-properties-events-and-services?spm=a2c4g.11186623.0.0.3a3335aeUdzkz2#concept-mvc-4tw-y2b">JSON 格式</a>
+     * @param createDTO 设备数据
      */
-    void saveDeviceData(String productKey, String deviceName, String message);
+    void saveDeviceData(DeviceDataCreateReqDTO createDTO);
 
     /**
      * 获得设备属性最新数据

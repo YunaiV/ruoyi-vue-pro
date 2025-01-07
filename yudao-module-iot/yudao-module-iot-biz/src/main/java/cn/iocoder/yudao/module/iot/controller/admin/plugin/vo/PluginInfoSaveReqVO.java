@@ -1,7 +1,9 @@
 package cn.iocoder.yudao.module.iot.controller.admin.plugin.vo;
 
+import cn.iocoder.yudao.framework.common.validation.InEnum;
+import cn.iocoder.yudao.module.iot.enums.plugin.IotPluginStatusEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.*;
+import lombok.Data;
 
 @Schema(description = "管理后台 - IoT 插件信息新增/修改 Request VO")
 @Data
@@ -39,6 +41,7 @@ public class PluginInfoSaveReqVO {
     private String protocol;
 
     @Schema(description = "状态", requiredMode = Schema.RequiredMode.REQUIRED)
+    @InEnum(IotPluginStatusEnum.class)
     private Integer status;
 
     @Schema(description = "插件配置项描述信息")

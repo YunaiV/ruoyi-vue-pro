@@ -78,9 +78,10 @@ public interface PluginInfoService {
     List<PluginInfoDO> getPluginInfoList();
 
     /**
-     * 获得运行状态的插件信息列表
+     * 根据状态获得插件信息列表
      *
-     * @return 运行状态的插件信息列表
+     * @param status 状态
+     * @return 插件信息列表
      */
-    List<PluginInfoDO> getRunningPluginInfoList();
+    List<PluginInfoDO> getPluginInfoListByStatus(Integer status);
 }

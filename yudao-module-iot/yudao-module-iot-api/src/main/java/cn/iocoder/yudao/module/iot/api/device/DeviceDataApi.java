@@ -1,5 +1,8 @@
 package cn.iocoder.yudao.module.iot.api.device;
 
+import cn.iocoder.yudao.module.iot.api.device.dto.DeviceDataCreateReqDTO;
+import jakarta.validation.Valid;
+
 /**
  * 设备数据 API
  *
@@ -7,14 +10,11 @@ package cn.iocoder.yudao.module.iot.api.device;
  */
 public interface DeviceDataApi {
 
-    // TODO @haohao：最好搞成 dto 哈！
     /**
      * 保存设备数据
      *
-     * @param productKey 产品 key
-     * @param deviceName 设备名称
-     * @param message    消息
+     * @param createDTO 设备数据
      */
-    void saveDeviceData(String productKey, String deviceName, String message);
+    void saveDeviceData(@Valid DeviceDataCreateReqDTO createDTO);
 
 }

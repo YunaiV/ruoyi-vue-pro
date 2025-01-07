@@ -1,12 +1,12 @@
 package cn.iocoder.yudao.module.iot.emq.service;
 
+import cn.iocoder.yudao.module.iot.api.device.dto.DeviceDataCreateReqDTO;
 import cn.iocoder.yudao.module.iot.service.device.IotDevicePropertyDataService;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.springframework.scheduling.annotation.Async;
-import org.springframework.stereotype.Service;
 
 // TODO @芋艿：在瞅瞅
 
@@ -16,7 +16,7 @@ import org.springframework.stereotype.Service;
  * @author ahh
  */
 @Slf4j
-//@Service
+// @Service
 public class EmqxServiceImpl implements EmqxService {
 
     @Resource
@@ -34,7 +34,12 @@ public class EmqxServiceImpl implements EmqxService {
             String productKey = topic.split("/")[2];
             String deviceName = topic.split("/")[3];
             String message = new String(mqttMessage.getPayload());
-            iotDeviceDataService.saveDeviceData(productKey, deviceName, message);
+            DeviceDataCreateReqDTO createDTO = DeviceDataCreateReqDTO.builder()
+                    .productKey(productKey)
+                    .deviceName(deviceName)
+                    .message(message)
+                    .build();
+            iotDeviceDataService.saveDeviceData(createDTO);
         }
     }
 
