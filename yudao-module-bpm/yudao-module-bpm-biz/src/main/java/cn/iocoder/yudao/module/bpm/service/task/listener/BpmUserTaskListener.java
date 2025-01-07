@@ -46,20 +46,24 @@ public class BpmUserTaskListener implements TaskListener {
         HistoricProcessInstance processInstance = processInstanceService.getHistoricProcessInstance(delegateTask.getProcessInstanceId());
         BpmnModel bpmnModel = modelService.getBpmnModelByDefinitionId(delegateTask.getProcessDefinitionId());
         FlowElement userTaskElement = BpmnModelUtils.getFlowElementById(bpmnModel, delegateTask.getTaskDefinitionKey());
+        // TODO @lesan：可以写到 FlowableUtils 里，简化解析逻辑！
         BpmSimpleModelNodeVO.ListenerHandler listenerHandler = JSONUtil.toBean(
                 parseExtensionElement(userTaskElement, delegateTask.getEventName() + EXTENSION_SUFFIX),
                 BpmSimpleModelNodeVO.ListenerHandler.class);
-        Map<String, Object> processVariables = processInstance.getProcessVariables();
+
         // 2. 获取请求头和请求体
-        HashMap<String, String> headers = new HashMap<>();
-        HashMap<String, Object> body = new HashMap<>();
+        Map<String, Object> processVariables = processInstance.getProcessVariables();
+        Map<String, String> headers = new HashMap<>();
+        Map<String, Object> body = new HashMap<>();
         listenerHandler.getHeader().forEach(item -> {
+            // TODO @lesan：可以写个统一的方法，解析参数。然后非空，put 到 headers 或者 body 里！
             if (item.getType().equals(BpmListenerMapType.FIXED_VALUE.getType())) {
                 headers.put(item.getKey(), item.getValue());
             } else if (item.getType().equals(BpmListenerMapType.FROM_FORM.getType())) {
                 headers.put(item.getKey(), processVariables.getOrDefault(item.getValue(), "").toString());
             }
         });
+        // TODO @lesan：header 里面，需要添加下 tenant-id！
         listenerHandler.getBody().forEach(item -> {
             if (item.getType().equals(BpmListenerMapType.FIXED_VALUE.getType())) {
                 body.put(item.getKey(), item.getValue());
@@ -67,10 +71,13 @@ public class BpmUserTaskListener implements TaskListener {
                 body.put(item.getKey(), processVariables.getOrDefault(item.getValue(), ""));
             }
         });
+
         // 3. 异步发起请求
+        // TODO @lesan：最好打印下日志！
         HttpRequest.post(listenerHandler.getPath())
                 .addHeaders(headers).form(body).executeAsync();
-        // 4. 是否需要后续操作？
+
+        // 4. 是否需要后续操作？TODO 芋艿：待定！
     }
 
 }

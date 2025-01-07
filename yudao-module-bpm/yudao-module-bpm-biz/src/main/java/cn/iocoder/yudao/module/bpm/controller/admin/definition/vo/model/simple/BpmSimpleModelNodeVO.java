@@ -96,14 +96,18 @@ public class BpmSimpleModelNodeVO {
      */
     private AssignEmptyHandler assignEmptyHandler;
 
+    // TODO @lesan：建议改成 taskCreateListener;
     /**
      * 创建任务监听器
      */
     private ListenerHandler createTaskListener;
 
     @Schema(description = "任务监听器")
+    @Valid
     @Data
     public static class ListenerHandler {
+
+        // TODO @lesan：参数校验，需要加下
 
         @Schema(description = "是否开启任务监听器", example = "false")
         private Boolean enable;
@@ -117,6 +121,8 @@ public class BpmSimpleModelNodeVO {
         @Schema(description = "请求体", example = "[]")
         private List<ListenerMap> body;
 
+        // TODO @芋艿：这里后续要不要复用；
+
         @Schema(description = "任务监听器键值对")
         @Data
         public static class ListenerMap {
@@ -125,11 +131,14 @@ public class BpmSimpleModelNodeVO {
             private String key;
 
             @Schema(description = "值类型", example = "1")
+            @InEnum(BpmListenerMapType.class)
             private Integer type;
 
             @Schema(description = "值", example = "xxx")
             private String value;
+
         }
+
     }
 
     @Schema(description = "审批节点拒绝处理策略")

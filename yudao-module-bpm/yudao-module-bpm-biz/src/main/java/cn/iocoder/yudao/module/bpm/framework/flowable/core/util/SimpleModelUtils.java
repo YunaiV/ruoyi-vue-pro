@@ -431,11 +431,14 @@ public class SimpleModelUtils {
                 flowableListener.setEvent(TaskListener.EVENTNAME_CREATE);
                 flowableListener.setImplementationType(ImplementationType.IMPLEMENTATION_TYPE_DELEGATEEXPRESSION);
                 flowableListener.setImplementation(DELEGATE_EXPRESSION);
+                // TODO @lesan：可以加个 addExtensionElementJson() 方法；
+                // TODO @lesan：是不是不用带 "create" + EXTENSION_SUFFIX 这种，直接给个 "config" 就完事了！
                 addExtensionElement(userTask, "create" + EXTENSION_SUFFIX,
+                        // TODO @lesan：默认使用项目里的 JsonUtils 方法
                         JSONUtil.toJsonStr(node.getCreateTaskListener()));
                 flowableListeners.add(flowableListener);
             }
-            if (!flowableListeners.isEmpty()) {
+            if (CollUtil.isNotEmpty(flowableListeners)) {
                 userTask.setTaskListeners(flowableListeners);
             }
             return userTask;

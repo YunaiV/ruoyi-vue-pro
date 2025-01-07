@@ -6,6 +6,7 @@ import lombok.Getter;
 
 import java.util.Arrays;
 
+// TODO @芋艿：枚举值的类名，在考虑下
 /**
  * BPM 任务监听器键值对类型
  *
