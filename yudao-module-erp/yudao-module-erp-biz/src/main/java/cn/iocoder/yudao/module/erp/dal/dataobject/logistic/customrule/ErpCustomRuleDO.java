@@ -1,10 +1,12 @@
 package cn.iocoder.yudao.module.erp.dal.dataobject.logistic.customrule;
 
+import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import com.baomidou.mybatisplus.annotation.KeySequence;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
 
 import java.math.BigDecimal;
-import com.baomidou.mybatisplus.annotation.*;
-import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 
 /**
  * ERP 海关规则 DO
@@ -66,5 +68,8 @@ public class ErpCustomRuleDO extends BaseDO {
      * 物流属性
      */
     private Integer logisticAttribute;
-
+    /**
+     * 条形码
+     */
+    private String fbaBarCode;
 }

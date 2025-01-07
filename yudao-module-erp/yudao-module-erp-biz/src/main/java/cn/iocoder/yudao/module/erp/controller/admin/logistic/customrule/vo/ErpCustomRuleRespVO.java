@@ -1,17 +1,16 @@
 package cn.iocoder.yudao.module.erp.controller.admin.logistic.customrule.vo;
 
 import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpSupplierProductDO;
+import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
+import com.alibaba.excel.annotation.ExcelProperty;
 import com.fhs.core.trans.anno.Trans;
 import com.fhs.core.trans.constant.TransType;
 import com.fhs.core.trans.vo.VO;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.*;
+import lombok.Data;
 
 import java.math.BigDecimal;
-import java.util.*;
-import org.springframework.format.annotation.DateTimeFormat;
 import java.time.LocalDateTime;
-import com.alibaba.excel.annotation.*;
 
 /**
  * @author Administrator
@@ -74,4 +73,7 @@ public class ErpCustomRuleRespVO implements VO {
     @ExcelProperty("创建时间")
     private LocalDateTime createTime;
 
+    @Schema(description = "条形码")
+    @ExcelProperty("条形码")
+    private String fbaBarCode;
 }

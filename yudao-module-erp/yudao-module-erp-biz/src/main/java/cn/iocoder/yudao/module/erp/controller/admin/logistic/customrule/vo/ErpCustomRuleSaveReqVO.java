@@ -1,12 +1,11 @@
 package cn.iocoder.yudao.module.erp.controller.admin.logistic.customrule.vo;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.*;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
+import lombok.Data;
 
 import java.math.BigDecimal;
-import java.util.*;
-import jakarta.validation.constraints.*;
-import org.hibernate.validator.constraints.Length;
 
 @Schema(description = "管理后台 - ERP 海关规则新增/修改 Request VO")
 @Data
@@ -51,4 +50,6 @@ public class ErpCustomRuleSaveReqVO {
     @Schema(description = "物流属性")
     private Integer logisticAttribute;
 
+    @Schema(description = "条形码")
+    private String fbaBarCode;
 }
