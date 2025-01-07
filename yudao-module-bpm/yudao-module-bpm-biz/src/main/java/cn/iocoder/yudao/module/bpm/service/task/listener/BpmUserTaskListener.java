@@ -1,7 +1,6 @@
 package cn.iocoder.yudao.module.bpm.service.task.listener;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.lang.Assert;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.simple.BpmSimpleModelNodeVO;
 import cn.iocoder.yudao.module.bpm.enums.definition.BpmListenerMapType;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.util.BpmnModelUtils;
@@ -61,8 +60,14 @@ public class BpmUserTaskListener implements TaskListener {
         MultiValueMap<String, String> headers = new LinkedMultiValueMap<>();
         MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
         parseListenerMap(listenerHandler.getHeader(), processVariables, headers);
-        headers.add("tenant-id", delegateTask.getTenantId());
         parseListenerMap(listenerHandler.getBody(), processVariables, body);
+        // 2.1 请求头默认参数
+        headers.add("tenant-id", delegateTask.getTenantId());
+        // 2.2 请求体默认参数
+        body.add("processInstanceId", delegateTask.getProcessInstanceId());
+        body.add("assignee", delegateTask.getAssignee());
+        body.add("taskDefinitionKey", delegateTask.getTaskDefinitionKey());
+        body.add("taskId", delegateTask.getId());
 
         // 3. 异步发起请求
         HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity<>(body, headers);
