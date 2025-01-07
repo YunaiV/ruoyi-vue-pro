@@ -97,20 +97,26 @@ public class BpmSimpleModelNodeVO {
      */
     private AssignEmptyHandler assignEmptyHandler;
 
-    // TODO @lesan：建议改成 taskCreateListener;
     /**
      * 创建任务监听器
      */
-    private ListenerHandler createTaskListener;
+    private ListenerHandler taskCreateListener;
+    /**
+     * 指派任务监听器
+     */
+    private ListenerHandler taskAssignListener;
+    /**
+     * 完成任务监听器
+     */
+    private ListenerHandler taskCompleteListener;
 
     @Schema(description = "任务监听器")
     @Valid
     @Data
     public static class ListenerHandler {
 
-        // TODO @lesan：参数校验，需要加下
-
         @Schema(description = "是否开启任务监听器", example = "false")
+        @NotNull(message = "是否开启任务监听器不能为空")
         private Boolean enable;
 
         @Schema(description = "请求路径", example = "http://xxxxx")

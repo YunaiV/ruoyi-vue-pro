@@ -6,6 +6,7 @@ import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
+import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.common.util.number.NumberUtils;
 import cn.iocoder.yudao.framework.common.util.string.StrUtils;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.simple.BpmSimpleModelNodeVO;
@@ -56,6 +57,18 @@ public class BpmnModelUtils {
         element.addExtensionElement(extensionElement);
     }
 
+    public static void addExtensionElementJson(FlowElement element, String name, Object value) {
+        if (value == null) {
+            return;
+        }
+        ExtensionElement extensionElement = new ExtensionElement();
+        extensionElement.setNamespace(FLOWABLE_EXTENSIONS_NAMESPACE);
+        extensionElement.setNamespacePrefix(FLOWABLE_EXTENSIONS_PREFIX);
+        extensionElement.setElementText(JsonUtils.toJsonString(value));
+        extensionElement.setName(name);
+        element.addExtensionElement(extensionElement);
+    }
+
     public static void addExtensionElement(FlowElement element, String name, Integer value) {
         if (value == null) {
             return;
@@ -91,6 +104,33 @@ public class BpmnModelUtils {
         }
         ExtensionElement element = CollUtil.getFirst(flowElement.getExtensionElements().get(elementName));
         return element != null ? element.getElementText() : null;
+    }
+
+    public static <T> T parseExtensionElementJson(FlowElement flowElement, String elementName, Class<T> clazz) {
+        if (flowElement == null) {
+            return null;
+        }
+        ExtensionElement element = CollUtil.getFirst(flowElement.getExtensionElements().get(elementName));
+        return element != null ? JsonUtils.parseObject(element.getElementText(), clazz) : null;
+    }
+
+    /**
+     * 给节点添加Simple设计器配置Json
+     *
+     * @param userTask 节点
+     * @param node 节点对象
+     */
+    public static void addSimpleConfigInfo(FlowElement userTask, Object node) {
+        addExtensionElementJson(userTask, "config", node);
+    }
+
+    /**
+     * 解析Simple设计器配置Json
+     *
+     * @param userTask 节点
+     */
+    public static BpmSimpleModelNodeVO parseSimpleConfigInfo(FlowElement userTask) {
+        return parseExtensionElementJson(userTask, "config", BpmSimpleModelNodeVO.class);
     }
 
     /**
