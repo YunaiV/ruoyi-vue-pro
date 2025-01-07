@@ -2,10 +2,17 @@ package cn.iocoder.yudao.module.erp.service.purchase;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.exception.util.ThrowUtil;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
+import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.erp.controller.admin.product.vo.product.ErpProductRespVO;
+import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.ErpSupplierProductPageReqVO;
+import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.ErpSupplierProductRespVO;
+import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.ErpSupplierProductSaveReqVO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpSupplierDO;
+import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpSupplierProductDO;
 import cn.iocoder.yudao.module.erp.dal.mysql.logistic.customrule.ErpCustomRuleMapper;
+import cn.iocoder.yudao.module.erp.dal.mysql.purchase.ErpSupplierProductMapper;
 import cn.iocoder.yudao.module.erp.service.product.ErpProductService;
 import jakarta.annotation.Resource;
 import lombok.RequiredArgsConstructor;
@@ -13,12 +20,11 @@ import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
-import java.util.*;
-import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.*;
-import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpSupplierProductDO;
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
-import cn.iocoder.yudao.module.erp.dal.mysql.purchase.ErpSupplierProductMapper;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+
 import static cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants.DB_UPDATE_ERROR;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
@@ -105,7 +111,7 @@ public class ErpSupplierProductServiceImpl implements ErpSupplierProductService 
     @Override
     public PageResult<ErpSupplierProductRespVO> buildSupplierProductVOPageResult(PageResult<ErpSupplierProductDO> pageResult) {
         var newList = buildSupplierProductVOList(pageResult.getList());
-        return new PageResult<>(newList, (long) newList.size());
+        return new PageResult<>(newList, pageResult.getTotal());
     }
 
     private List<ErpSupplierProductRespVO> buildSupplierProductVOList(List<ErpSupplierProductDO> list) {
