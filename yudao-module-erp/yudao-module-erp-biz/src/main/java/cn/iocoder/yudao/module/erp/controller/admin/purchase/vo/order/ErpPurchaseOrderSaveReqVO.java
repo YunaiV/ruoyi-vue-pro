@@ -22,6 +22,9 @@ public class ErpPurchaseOrderSaveReqVO {
     @Schema(description = "结算账户编号", example = "31189")
     private Long accountId;
 
+    @Schema(description = "结算日期", example = "2025-1-1")
+    private LocalDateTime settlementDate;
+
     @Schema(description = "采购时间", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "采购时间不能为空")
     private LocalDateTime orderTime;

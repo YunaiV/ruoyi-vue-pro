@@ -77,6 +77,9 @@ public class ErpPurchaseOrderServiceImpl implements ErpPurchaseOrderService {
         ErpPurchaseOrderDO purchaseOrder = BeanUtils.toBean(createReqVO, ErpPurchaseOrderDO.class, in -> in
                 .setNo(no).setStatus(ErpAuditStatus.PROCESS.getStatus()));
         calculateTotalPrice(purchaseOrder, purchaseOrderItems);
+        // 2.1.1 插入单据日期+结算日期
+        purchaseOrder.setDocumentDate(LocalDateTime.now());
+        purchaseOrder.setSettlementDate(createReqVO.getSettlementDate()==null?LocalDateTime.now():createReqVO.getSettlementDate());
         purchaseOrderMapper.insert(purchaseOrder);
         // 2.2 插入订单项
         purchaseOrderItems.forEach(o -> o.setOrderId(purchaseOrder.getId()));
@@ -103,7 +106,7 @@ public class ErpPurchaseOrderServiceImpl implements ErpPurchaseOrderService {
 
         // 2.1 更新订单
         ErpPurchaseOrderDO updateObj = BeanUtils.toBean(updateReqVO, ErpPurchaseOrderDO.class);
-        calculateTotalPrice(updateObj, purchaseOrderItems);
+        calculateTotalPrice(updateObj, purchaseOrderItems);//计算item合计。
         purchaseOrderMapper.updateById(updateObj);
         // 2.2 更新订单项
         updatePurchaseOrderItemList(updateReqVO.getId(), purchaseOrderItems);
