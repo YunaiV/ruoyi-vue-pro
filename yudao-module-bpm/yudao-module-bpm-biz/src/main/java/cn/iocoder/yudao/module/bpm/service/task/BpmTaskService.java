@@ -276,7 +276,7 @@ public interface BpmTaskService {
     void processTaskTimeout(String processInstanceId, String taskDefineKey, Integer handlerType);
 
     /**
-     * 处理 延时器 超时事件
+     * 处理 延迟器 超时事件
      *
      * @param processInstanceId 流程示例编号
      * @param taskDefineKey     任务 Key
