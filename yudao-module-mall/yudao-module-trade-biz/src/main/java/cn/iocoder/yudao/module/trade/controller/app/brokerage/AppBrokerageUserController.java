@@ -84,7 +84,7 @@ public class AppBrokerageUserController {
                 BrokerageRecordBizTypeEnum.ORDER, BrokerageRecordStatusEnum.SETTLEMENT, beginTime, endTime);
         // 统计用户提现的佣金
         Integer withdrawPrice = brokerageWithdrawService.getWithdrawSummaryListByUserId(Collections.singleton(userId),
-                        BrokerageWithdrawStatusEnum.AUDIT_SUCCESS).stream()
+                        BrokerageWithdrawStatusEnum.WITHDRAW_SUCCESS).stream()
                 .findFirst().map(BrokerageWithdrawSummaryRespBO::getPrice).orElse(0);
         // 统计分销用户数量（一级）
         Long firstBrokerageUserCount = brokerageUserService.getBrokerageUserCountByBindUserId(userId, 1);
