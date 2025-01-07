@@ -39,6 +39,7 @@ public class BpmSimpleModelNodeVO {
     @Schema(description = "条件节点")
     private List<BpmSimpleModelNodeVO> conditionNodes; // 补充说明：有且仅有条件、并行、包容等分支会使用
 
+    // TODO @jason：conditionType、conditionExpression、defaultFlow、conditionGroups 搞成一个 condition 属性，会好点么？
     @Schema(description = "条件类型", example = "1")
     @InEnum(BpmSimpleModeConditionType.class)
     private Integer conditionType; // 仅用于条件节点 BpmSimpleModelNodeType.CONDITION_NODE
@@ -251,6 +252,7 @@ public class BpmSimpleModelNodeVO {
         @Schema(description = "运算符右边的值", example = "1")
         @NotEmpty(message = "运算符右边的值不能为空")
         private String rightSide;
+
     }
 
     @Schema(description = "延迟器设置", example = "{}")
@@ -269,8 +271,10 @@ public class BpmSimpleModelNodeVO {
         @Schema(description = "延迟时间表达式", example = "PT1H,2025-01-01T00:00:00")
         @NotEmpty(message = "延迟时间表达式不能为空")
         private String delayTime;
+
     }
 
+    // TODO @lesan：routeGroups
     @Schema(description = "路由分支组", example = "[]")
     private List<RouteCondition> routeGroup;
 
@@ -282,10 +286,11 @@ public class BpmSimpleModelNodeVO {
     @Valid
     public static class RouteCondition {
 
-        @Schema(description = "节点Id", example = "Activity_xxx")
-        @NotEmpty(message = "节点Id不能为空")
+        @Schema(description = "节点 Id", example = "Activity_xxx")
+        @NotEmpty(message = "节点 Id 不能为空")
         private String nodeId;
 
+        // TODO @lesan：type、expression、groups；（可以晚点改，在和 conditionType、conditionExpression、defaultFlow、conditionGroups 讨论！）
         @Schema(description = "条件类型", example = "1")
         @InEnum(BpmSimpleModeConditionType.class)
         @NotNull(message = "条件类型不能为空")
@@ -296,6 +301,7 @@ public class BpmSimpleModelNodeVO {
 
         @Schema(description = "条件组", example = "{}")
         private ConditionGroups conditionGroups;
+
     }
 
 }

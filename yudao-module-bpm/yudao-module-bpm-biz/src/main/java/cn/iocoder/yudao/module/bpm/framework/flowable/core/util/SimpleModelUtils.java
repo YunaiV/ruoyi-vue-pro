@@ -42,8 +42,7 @@ public class SimpleModelUtils {
         List<NodeConvert> converts = asList(new StartNodeConvert(), new EndNodeConvert(),
                 new StartUserNodeConvert(), new ApproveNodeConvert(), new CopyNodeConvert(),
                 new DelayTimerNodeConvert(),
-                new ConditionBranchNodeConvert(), new ParallelBranchNodeConvert(), new InclusiveBranchNodeConvert(),
-                new RouteBranchNodeConvert());
+                new ConditionBranchNodeConvert(), new ParallelBranchNodeConvert(), new InclusiveBranchNodeConvert(), new RouteBranchNodeConvert());
         converts.forEach(convert -> NODE_CONVERTS.put(convert.getType(), convert));
     }
 
@@ -185,7 +184,7 @@ public class SimpleModelUtils {
         BpmSimpleModelNodeType nodeType = BpmSimpleModelNodeType.valueOf(node.getType());
         BpmSimpleModelNodeVO childNode = node.getChildNode();
         List<BpmSimpleModelNodeVO> conditionNodes = node.getConditionNodes();
-        // TODO @芋艿 路由分支没有conditionNodes 这里注释会影响吗？
+        // TODO @芋艿 路由分支没有conditionNodes 这里注释会影响吗？@jason：一起帮忙瞅瞅！
 //        Assert.notEmpty(conditionNodes, "分支节点的条件节点不能为空");
         // 分支终点节点 ID
         String branchEndNodeId = null;
@@ -204,8 +203,8 @@ public class SimpleModelUtils {
         if (nodeType == BpmSimpleModelNodeType.ROUTE_BRANCH_NODE) {
             // 路由分支遍历
             for (BpmSimpleModelNodeVO.RouteCondition route : node.getRouteGroup()) {
-                SequenceFlow sFlow = RouteBranchNodeConvert.buildSequenceFlow(node.getId(), route);
-                process.addFlowElement(sFlow);
+                SequenceFlow sequenceFlow = RouteBranchNodeConvert.buildSequenceFlow(node.getId(), route);
+                process.addFlowElement(sequenceFlow);
             }
         } else {
             // 下面的注释，以如下情况举例子。分支 1：A->B->C->D->E，分支 2：A->D->E。其中，A 为分支节点, D 为 A 孩子节点
@@ -228,15 +227,14 @@ public class SimpleModelUtils {
             }
         }
 
-        // 4. 各分支节点所需特殊处理
+        // 4.1 如果是并行分支、包容分支，由于是程序创建的聚合网关，需要手工创建聚合网关和下一个节点的连线
         if (nodeType == BpmSimpleModelNodeType.PARALLEL_BRANCH_NODE
-                || nodeType == BpmSimpleModelNodeType.INCLUSIVE_BRANCH_NODE ) {
-            // 如果是并行分支、包容分支，由于是程序创建的聚合网关，需要手工创建聚合网关和下一个节点的连线
+                || nodeType == BpmSimpleModelNodeType.INCLUSIVE_BRANCH_NODE) {
             String nextNodeId = isValidNode(childNode) ? childNode.getId() : targetNodeId;
             SequenceFlow sequenceFlow = buildBpmnSequenceFlow(branchEndNodeId, nextNodeId);
             process.addFlowElement(sequenceFlow);
+        // 4.2 如果是路由分支，需要连接后续节点为默认路由
         } else if (nodeType == BpmSimpleModelNodeType.ROUTE_BRANCH_NODE) {
-            // 如果是路由分支，需要连接后续节点为默认路由
             SequenceFlow sequenceFlow = buildBpmnSequenceFlow(node.getId(), branchEndNodeId, node.getDefaultFlowId(),
                     null, null);
             process.addFlowElement(sequenceFlow);
@@ -617,10 +615,12 @@ public class SimpleModelUtils {
             return buildConditionExpression(node.getConditionType(), node.getConditionExpression(),
                     node.getConditionGroups());
         }
+
         public static String buildConditionExpression(BpmSimpleModelNodeVO.RouteCondition route) {
             return buildConditionExpression(route.getConditionType(), route.getConditionExpression(),
                     route.getConditionGroups());
         }
+
         public static String buildConditionExpression(Integer conditionType, String conditionExpression,
                                                       ConditionGroups conditionGroups) {
             BpmSimpleModeConditionType conditionTypeEnum = BpmSimpleModeConditionType.valueOf(conditionType);
@@ -711,6 +711,7 @@ public class SimpleModelUtils {
             String conditionExpression = ConditionNodeConvert.buildConditionExpression(route);
             return buildBpmnSequenceFlow(nodeId, route.getNodeId(), null, null, conditionExpression);
         }
+
     }
 
     private static String buildGatewayJoinId(String id) {
