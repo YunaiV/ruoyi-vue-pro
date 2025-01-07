@@ -4,7 +4,6 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.*;
-import cn.hutool.json.JSONUtil;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.simple.BpmSimpleModelNodeVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.simple.BpmSimpleModelNodeVO.ConditionGroups;
@@ -23,7 +22,6 @@ import java.util.*;
 import static cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnModelConstants.*;
 import static cn.iocoder.yudao.module.bpm.framework.flowable.core.util.BpmnModelUtils.*;
 import static cn.iocoder.yudao.module.bpm.service.task.listener.BpmUserTaskListener.DELEGATE_EXPRESSION;
-import static cn.iocoder.yudao.module.bpm.service.task.listener.BpmUserTaskListener.EXTENSION_SUFFIX;
 import static java.util.Arrays.asList;
 
 /**
@@ -442,23 +440,38 @@ public class SimpleModelUtils {
                 userTask.setDueDate(node.getTimeoutHandler().getTimeDuration());
             }
             // 设置监听器
+            addUserTaskListener(node, userTask);
+            // 设置Simple设计器节点配置
+            addSimpleConfigInfo(userTask, node);
+            return userTask;
+        }
+
+        private void addUserTaskListener(BpmSimpleModelNodeVO node, UserTask userTask) {
             List<FlowableListener> flowableListeners = new ArrayList<>(3);
-            if (node.getCreateTaskListener().getEnable()) {
+            if (node.getTaskCreateListener().getEnable()) {
                 FlowableListener flowableListener = new FlowableListener();
                 flowableListener.setEvent(TaskListener.EVENTNAME_CREATE);
                 flowableListener.setImplementationType(ImplementationType.IMPLEMENTATION_TYPE_DELEGATEEXPRESSION);
                 flowableListener.setImplementation(DELEGATE_EXPRESSION);
-                // TODO @lesan：可以加个 addExtensionElementJson() 方法；
-                // TODO @lesan：是不是不用带 "create" + EXTENSION_SUFFIX 这种，直接给个 "config" 就完事了！
-                addExtensionElement(userTask, "create" + EXTENSION_SUFFIX,
-                        // TODO @lesan：默认使用项目里的 JsonUtils 方法
-                        JSONUtil.toJsonStr(node.getCreateTaskListener()));
+                flowableListeners.add(flowableListener);
+            }
+            if (node.getTaskAssignListener().getEnable()) {
+                FlowableListener flowableListener = new FlowableListener();
+                flowableListener.setEvent(TaskListener.EVENTNAME_ASSIGNMENT);
+                flowableListener.setImplementationType(ImplementationType.IMPLEMENTATION_TYPE_DELEGATEEXPRESSION);
+                flowableListener.setImplementation(DELEGATE_EXPRESSION);
+                flowableListeners.add(flowableListener);
+            }
+            if (node.getTaskCompleteListener().getEnable()) {
+                FlowableListener flowableListener = new FlowableListener();
+                flowableListener.setEvent(TaskListener.EVENTNAME_COMPLETE);
+                flowableListener.setImplementationType(ImplementationType.IMPLEMENTATION_TYPE_DELEGATEEXPRESSION);
+                flowableListener.setImplementation(DELEGATE_EXPRESSION);
                 flowableListeners.add(flowableListener);
             }
             if (CollUtil.isNotEmpty(flowableListeners)) {
                 userTask.setTaskListeners(flowableListeners);
             }
-            return userTask;
         }
 
         private void processMultiInstanceLoopCharacteristics(Integer approveMethod, Integer approveRatio, UserTask userTask) {

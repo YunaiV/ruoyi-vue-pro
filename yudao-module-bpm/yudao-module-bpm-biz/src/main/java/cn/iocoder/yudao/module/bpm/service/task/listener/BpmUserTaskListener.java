@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.bpm.service.task.listener;
 
-import cn.hutool.http.HttpRequest;
-import cn.hutool.json.JSONUtil;
+import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.lang.Assert;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.simple.BpmSimpleModelNodeVO;
 import cn.iocoder.yudao.module.bpm.enums.definition.BpmListenerMapType;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.util.BpmnModelUtils;
@@ -14,12 +14,18 @@ import org.flowable.bpmn.model.FlowElement;
 import org.flowable.engine.delegate.TaskListener;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.task.service.delegate.DelegateTask;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.RestTemplate;
 
-import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
-import static cn.iocoder.yudao.module.bpm.framework.flowable.core.util.BpmnModelUtils.parseExtensionElement;
+import static cn.iocoder.yudao.module.bpm.framework.flowable.core.util.BpmnModelUtils.parseSimpleConfigInfo;
 
 /**
  * BPM 用户任务通用监听器
@@ -32,52 +38,62 @@ public class BpmUserTaskListener implements TaskListener {
 
     public static final String DELEGATE_EXPRESSION = "${bpmUserTaskListener}";
 
-    public static final String EXTENSION_SUFFIX = "TaskListenerMetaInfo";
-
     @Resource
     private BpmModelService modelService;
 
     @Resource
     private BpmProcessInstanceService processInstanceService;
 
+    @Resource
+    private RestTemplate restTemplate;
+
     @Override
     public void notify(DelegateTask delegateTask) {
         // 1. 获取所需基础信息
         HistoricProcessInstance processInstance = processInstanceService.getHistoricProcessInstance(delegateTask.getProcessInstanceId());
         BpmnModel bpmnModel = modelService.getBpmnModelByDefinitionId(delegateTask.getProcessDefinitionId());
-        FlowElement userTaskElement = BpmnModelUtils.getFlowElementById(bpmnModel, delegateTask.getTaskDefinitionKey());
-        // TODO @lesan：可以写到 FlowableUtils 里，简化解析逻辑！
-        BpmSimpleModelNodeVO.ListenerHandler listenerHandler = JSONUtil.toBean(
-                parseExtensionElement(userTaskElement, delegateTask.getEventName() + EXTENSION_SUFFIX),
-                BpmSimpleModelNodeVO.ListenerHandler.class);
+        FlowElement userTask = BpmnModelUtils.getFlowElementById(bpmnModel, delegateTask.getTaskDefinitionKey());
+        BpmSimpleModelNodeVO node = parseSimpleConfigInfo(userTask);
+        BpmSimpleModelNodeVO.ListenerHandler listenerHandler = getListenerHandlerByEvent(delegateTask.getEventName(), node);
 
         // 2. 获取请求头和请求体
         Map<String, Object> processVariables = processInstance.getProcessVariables();
-        Map<String, String> headers = new HashMap<>();
-        Map<String, Object> body = new HashMap<>();
-        listenerHandler.getHeader().forEach(item -> {
-            // TODO @lesan：可以写个统一的方法，解析参数。然后非空，put 到 headers 或者 body 里！
-            if (item.getType().equals(BpmListenerMapType.FIXED_VALUE.getType())) {
-                headers.put(item.getKey(), item.getValue());
-            } else if (item.getType().equals(BpmListenerMapType.FROM_FORM.getType())) {
-                headers.put(item.getKey(), processVariables.getOrDefault(item.getValue(), "").toString());
-            }
-        });
-        // TODO @lesan：header 里面，需要添加下 tenant-id！
-        listenerHandler.getBody().forEach(item -> {
-            if (item.getType().equals(BpmListenerMapType.FIXED_VALUE.getType())) {
-                body.put(item.getKey(), item.getValue());
-            } else if (item.getType().equals(BpmListenerMapType.FROM_FORM.getType())) {
-                body.put(item.getKey(), processVariables.getOrDefault(item.getValue(), ""));
-            }
-        });
+        MultiValueMap<String, String> headers = new LinkedMultiValueMap<>();
+        MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
+        parseListenerMap(listenerHandler.getHeader(), processVariables, headers);
+        headers.add("tenant-id", delegateTask.getTenantId());
+        parseListenerMap(listenerHandler.getBody(), processVariables, body);
 
         // 3. 异步发起请求
-        // TODO @lesan：最好打印下日志！
-        HttpRequest.post(listenerHandler.getPath())
-                .addHeaders(headers).form(body).executeAsync();
-
+        HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity<>(body, headers);
+        ResponseEntity<String> responseEntity = restTemplate.exchange(listenerHandler.getPath(), HttpMethod.POST,
+                requestEntity, String.class);
+        log.info("[BpmUserTaskListener][的响应结果({})]", responseEntity);
         // 4. 是否需要后续操作？TODO 芋艿：待定！
+    }
+
+    private void parseListenerMap(List<BpmSimpleModelNodeVO.ListenerHandler.ListenerMap> list,
+                                  Map<String, Object> processVariables,
+                                  MultiValueMap<String, String> to) {
+        if (CollUtil.isEmpty(list)) {
+            return;
+        }
+        list.forEach(item -> {
+            if (item.getType().equals(BpmListenerMapType.FIXED_VALUE.getType())) {
+                to.add(item.getKey(), item.getValue());
+            } else if (item.getType().equals(BpmListenerMapType.FROM_FORM.getType())) {
+                to.add(item.getKey(), processVariables.get(item.getValue()).toString());
+            }
+        });
+    }
+
+    private BpmSimpleModelNodeVO.ListenerHandler getListenerHandlerByEvent(String eventName, BpmSimpleModelNodeVO node) {
+        return switch (eventName) {
+            case TaskListener.EVENTNAME_CREATE -> node.getTaskCreateListener();
+            case TaskListener.EVENTNAME_ASSIGNMENT -> node.getTaskAssignListener();
+            case TaskListener.EVENTNAME_COMPLETE -> node.getTaskCompleteListener();
+            default -> null;
+        };
     }
 
 }
