@@ -36,24 +36,6 @@ public class BpmSimpleModelNodeVO {
     @Schema(description = "子节点")
     private BpmSimpleModelNodeVO childNode; // 补充说明：在该模型下，子节点有且仅有一个，不会有多个
 
-    @Schema(description = "条件节点")
-    private List<BpmSimpleModelNodeVO> conditionNodes; // 补充说明：有且仅有条件、并行、包容等分支会使用
-
-    // TODO @jason：conditionType、conditionExpression、defaultFlow、conditionGroups 搞成一个 condition 属性，会好点么？
-    @Schema(description = "条件类型", example = "1")
-    @InEnum(BpmSimpleModeConditionType.class)
-    private Integer conditionType; // 仅用于条件节点 BpmSimpleModelNodeType.CONDITION_NODE
-
-    @Schema(description = "条件表达式", example = "${day>3}")
-    private String conditionExpression; // 仅用于条件节点 BpmSimpleModelNodeType.CONDITION_NODE
-
-    @Schema(description = "是否默认条件", example = "true")
-    private Boolean defaultFlow; // 仅用于条件节点 BpmSimpleModelNodeType.CONDITION_NODE
-    /**
-     * 条件组
-     */
-    private ConditionGroups conditionGroups; // 仅用于条件节点 BpmSimpleModelNodeType.CONDITION_NODE
-
     @Schema(description = "候选人策略", example = "30")
     @InEnum(BpmTaskCandidateStrategyEnum.class)
     private Integer candidateStrategy; // 用于审批，抄送节点
@@ -110,6 +92,37 @@ public class BpmSimpleModelNodeVO {
      */
     private ListenerHandler taskCompleteListener;
 
+    @Schema(description = "延迟器设置", example = "{}")
+    private DelaySetting delaySetting;
+
+    @Schema(description = "条件节点")
+    private List<BpmSimpleModelNodeVO> conditionNodes; // 补充说明：有且仅有条件、并行、包容分支会使用
+
+    // TODO @jason：conditionType、conditionExpression、defaultFlow、conditionGroups 搞成一个 condition 属性，会好点么？
+    @Schema(description = "条件类型", example = "1")
+    @InEnum(BpmSimpleModeConditionType.class)
+    private Integer conditionType; // 仅用于条件节点 BpmSimpleModelNodeType.CONDITION_NODE
+
+    @Schema(description = "条件表达式", example = "${day>3}")
+    private String conditionExpression; // 仅用于条件节点 BpmSimpleModelNodeType.CONDITION_NODE
+
+    @Schema(description = "是否默认条件", example = "true")
+    private Boolean defaultFlow; // 仅用于条件节点 BpmSimpleModelNodeType.CONDITION_NODE
+    /**
+     * 条件组
+     */
+    private ConditionGroups conditionGroups; // 仅用于条件节点 BpmSimpleModelNodeType.CONDITION_NODE
+
+    // TODO @lesan：route 改成 router 会不会好点。因为触发器、延迟器，都带了类似 r
+
+    // TODO @lesan：routeGroups
+    @Schema(description = "路由分支组", example = "[]")
+    private List<RouteCondition> routeGroup;
+
+    // TODO @lesan：貌似没用？？？
+    @Schema(description = "默认分支 ID", example = "Flow_xxx")
+    private String defaultFlowId; // 仅用于路由分支节点 BpmSimpleModelNodeType.ROUTE_BRANCH_NODE
+
     @Schema(description = "任务监听器")
     @Valid
     @Data
@@ -130,16 +143,17 @@ public class BpmSimpleModelNodeVO {
 
         // TODO @芋艿：这里后续要不要复用；
 
+        // TODO @lesan：ListenerParam 更合适哈。首先它是参数配置，然后形式是键值对
         @Schema(description = "任务监听器键值对")
         @Data
         public static class ListenerMap {
 
-            @Schema(description = "键", example = "xxx")
-            private String key;
-
             @Schema(description = "值类型", example = "1")
             @InEnum(BpmListenerMapType.class)
             private Integer type;
+
+            @Schema(description = "键", example = "xxx")
+            private String key;
 
             @Schema(description = "值", example = "xxx")
             private String value;
@@ -261,9 +275,6 @@ public class BpmSimpleModelNodeVO {
 
     }
 
-    @Schema(description = "延迟器设置", example = "{}")
-    private DelaySetting delaySetting;
-
     @Schema(description = "延迟器")
     @Data
     @Valid
@@ -280,23 +291,16 @@ public class BpmSimpleModelNodeVO {
 
     }
 
-    // TODO @lesan：routeGroups
-    @Schema(description = "路由分支组", example = "[]")
-    private List<RouteCondition> routeGroup;
-
-    @Schema(description = "默认分支id", example = "Flow_xxx")
-    private String defaultFlowId; // 仅用于路由分支节点 BpmSimpleModelNodeType.ROUTE_BRANCH_NODE
-
     @Schema(description = "路由分支")
     @Data
     @Valid
     public static class RouteCondition {
 
-        @Schema(description = "节点 Id", example = "Activity_xxx")
+        @Schema(description = "节点 Id", example = "Activity_xxx") // 跳转到该节点
         @NotEmpty(message = "节点 Id 不能为空")
         private String nodeId;
 
-        // TODO @lesan：type、expression、groups；（可以晚点改，在和 conditionType、conditionExpression、defaultFlow、conditionGroups 讨论！）
+        // TODO @lesan：type、expression、groups；
         @Schema(description = "条件类型", example = "1")
         @InEnum(BpmSimpleModeConditionType.class)
         @NotNull(message = "条件类型不能为空")
