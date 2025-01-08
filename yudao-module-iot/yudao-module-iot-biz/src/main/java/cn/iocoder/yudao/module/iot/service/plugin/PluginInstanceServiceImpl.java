@@ -21,11 +21,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.Inet4Address;
-import java.net.InetAddress;
 import java.nio.file.*;
-import java.util.ArrayList;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -120,44 +116,6 @@ public class PluginInstanceServiceImpl implements PluginInstanceService {
     }
 
     @Override
-    public void updatePluginStatusFile(String pluginKeyNew, boolean isEnabled) {
-        // TODO @haohao：疑问，这里写 enabled.txt 和 disabled.txt 的目的是啥哈？
-        // pf4j 的插件状态文件，需要 2 个文件，一个 enabled.txt 一个 disabled.txt
-        Path enabledFilePath = Paths.get(pluginsDir, "enabled.txt");
-        Path disabledFilePath = Paths.get(pluginsDir, "disabled.txt");
-        Path targetFilePath = isEnabled ? enabledFilePath : disabledFilePath;
-        Path oppositeFilePath = isEnabled ? disabledFilePath : enabledFilePath;
-
-        try {
-            PluginWrapper pluginWrapper = pluginManager.getPlugin(pluginKeyNew);
-            if (pluginWrapper == null) {
-                throw exception(ErrorCodeConstants.PLUGIN_INSTALL_FAILED);
-            }
-            List<String> targetLines = Files.exists(targetFilePath) ? Files.readAllLines(targetFilePath)
-                    : new ArrayList<>();
-            List<String> oppositeLines = Files.exists(oppositeFilePath) ? Files.readAllLines(oppositeFilePath)
-                    : new ArrayList<>();
-
-            if (!targetLines.contains(pluginKeyNew)) {
-                targetLines.add(pluginKeyNew);
-                Files.write(targetFilePath, targetLines, StandardOpenOption.CREATE,
-                        StandardOpenOption.TRUNCATE_EXISTING);
-                log.info("已添加插件 {} 到 {}", pluginKeyNew, targetFilePath.getFileName());
-            }
-
-            if (oppositeLines.contains(pluginKeyNew)) {
-                oppositeLines.remove(pluginKeyNew);
-                Files.write(oppositeFilePath, oppositeLines, StandardOpenOption.CREATE,
-                        StandardOpenOption.TRUNCATE_EXISTING);
-                log.info("已从 {} 移除插件 {}", oppositeFilePath.getFileName(), pluginKeyNew);
-            }
-        } catch (IOException e) {
-            log.error("[updatePluginStatusFile][更新插件状态文件失败]", e);
-            throw exception(ErrorCodeConstants.PLUGIN_INSTALL_FAILED, e);
-        }
-    }
-
-    @Override
     public void updatePluginStatus(PluginInfoDO pluginInfoDo, Integer status) {
         String pluginKey = pluginInfoDo.getPluginKey();
         PluginWrapper plugin = pluginManager.getPlugin(pluginKey);
@@ -167,14 +125,12 @@ public class PluginInstanceServiceImpl implements PluginInstanceService {
             if (status.equals(IotPluginStatusEnum.RUNNING.getStatus())
                     && plugin.getPluginState() != PluginState.STARTED) {
                 pluginManager.startPlugin(pluginKey);
-                updatePluginStatusFile(pluginKey, true);
                 log.info("已启动插件: {}", pluginKey);
             }
             // 停止插件
             else if (status.equals(IotPluginStatusEnum.STOPPED.getStatus())
                     && plugin.getPluginState() == PluginState.STARTED) {
                 pluginManager.stopPlugin(pluginKey);
-                updatePluginStatusFile(pluginKey, false);
                 log.info("已停止插件: {}", pluginKey);
             }
         } else {
@@ -208,7 +164,7 @@ public class PluginInstanceServiceImpl implements PluginInstanceService {
             PluginInfoDO pluginInfo = pluginInfoMap.get(pluginKey);
             if (pluginInfo == null) {
                 // 4.2 插件信息不存在，记录错误并跳过
-                log.error("插件信息不存在，插件包标识符 = {}", pluginKey);
+                log.error("插件信息不存在，pluginKey = {}", pluginKey);
                 continue;
             }
 

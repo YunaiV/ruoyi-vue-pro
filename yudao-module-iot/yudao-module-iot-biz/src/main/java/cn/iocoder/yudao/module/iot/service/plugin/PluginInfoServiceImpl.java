@@ -102,7 +102,6 @@ public class PluginInfoServiceImpl implements PluginInfoService {
 
         // 3 上传新的插件文件,更新插件启用状态文件
         String pluginKeyNew = pluginInstanceService.uploadAndLoadNewPlugin(file);
-        pluginInstanceService.updatePluginStatusFile(pluginKeyNew, false);
 
         // 4. 更新插件信息
         updatePluginInfo(pluginInfoDo, pluginKeyNew, file);

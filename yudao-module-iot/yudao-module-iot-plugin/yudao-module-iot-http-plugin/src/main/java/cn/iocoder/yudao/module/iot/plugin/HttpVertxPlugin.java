@@ -5,12 +5,15 @@ import cn.iocoder.yudao.module.iot.api.device.DeviceDataApi;
 import io.vertx.core.Vertx;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.handler.BodyHandler;
-import org.pf4j.Plugin;
 import org.pf4j.PluginWrapper;
+import org.pf4j.spring.SpringPlugin;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class HttpVertxPlugin extends Plugin {
+public class HttpVertxPlugin extends SpringPlugin {
 
     private static final int PORT = 8092;
     private Vertx vertx;
@@ -66,5 +69,14 @@ public class HttpVertxPlugin extends Plugin {
                 }
             });
         }
+    }
+
+    @Override
+    protected ApplicationContext createApplicationContext() {
+        AnnotationConfigApplicationContext applicationContext = new AnnotationConfigApplicationContext();
+        applicationContext.setClassLoader(getWrapper().getPluginClassLoader());
+        applicationContext.refresh();
+
+        return applicationContext;
     }
 }

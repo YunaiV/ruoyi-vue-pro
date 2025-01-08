@@ -38,14 +38,6 @@ public interface PluginInstanceService {
     String uploadAndLoadNewPlugin(MultipartFile file);
 
     /**
-     * 更新插件状态文件
-     *
-     * @param pluginKeyNew 插件标识符
-     * @param isEnabled    是否启用
-     */
-    void updatePluginStatusFile(String pluginKeyNew, boolean isEnabled);
-
-    /**
      * 更新插件状态
      *
      * @param pluginInfoDo 插件信息
