@@ -73,6 +73,13 @@ public class ErpPurchaseOrderRespVO {
 
     @Schema(description = "创建人", example = "芋道")
     private String creator;
+
+    @Schema(description = "创建人部门编号", example = "12")
+    private Long departmentId;
+
+    @Schema(description = "创建人部门名称", example = "xx事业部")
+    private String departmentName;
+
     @Schema(description = "创建人名称", example = "芋道")
     private String creatorName;
 
@@ -89,13 +96,13 @@ public class ErpPurchaseOrderRespVO {
 
     // ========== 采购入库 ==========
 
-    @Schema(description = "采购入库数量", requiredMode = Schema.RequiredMode.REQUIRED, example = "100.00")
-    private BigDecimal inCount;
+    @Schema(description = "订单采购入库数量", requiredMode = Schema.RequiredMode.REQUIRED, example = "100.00")
+    private BigDecimal totalInCount;
 
     // ========== 采购退货（出库）） ==========
 
-    @Schema(description = "采购退货数量", requiredMode = Schema.RequiredMode.REQUIRED, example = "100.00")
-    private BigDecimal returnCount;
+    @Schema(description = "订单采购退货数量", requiredMode = Schema.RequiredMode.REQUIRED, example = "100.00")
+    private BigDecimal totalReturnCount;
 
     @Data
     public static class Item {
@@ -139,14 +146,22 @@ public class ErpPurchaseOrderRespVO {
 
         @Schema(description = "产品名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "巧克力")
         private String productName;
-        @Schema(description = "产品条码", requiredMode = Schema.RequiredMode.REQUIRED, example = "A9985")
-        private String productBarCode;
         @Schema(description = "产品单位名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "盒")
         private String productUnitName;
+        @Schema(description = "产品条码", requiredMode = Schema.RequiredMode.REQUIRED, example = "A9985")
+        private String productBarCode;
 
-        @Schema(description = "库存数量", requiredMode = Schema.RequiredMode.REQUIRED, example = "100.00")
-        private BigDecimal stockCount; // 该字段仅仅在“详情”和“编辑”时使用
-
+        // ========== 产品库存相关 ==========
+        @Schema(description = "产品存放仓库编号")
+        private Long warehouseId; // 该字段仅仅在“详情”和“编辑”时使用
+        @Schema(description = "产品存放仓库名称")
+        private String warehouseName; // 该字段仅仅在“详情”和“编辑”时使用
+//        @Schema(description = "仓位Id")
+//        private String spId;
+//        @Schema(description = "仓位名称")
+//        private String spName;
+//        @Schema(description = "仓位编码")
+//        private String spNumber;
     }
 
 }

@@ -24,44 +24,32 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ErpPurchaseOrderDO extends BaseDO {
-
     // ========== 基本信息 ==========
-
-    /**
-     * 编号 =
-     * 采购订单号，生成是由后端直接生成，默认是自动填充的，并且格式为：前缀+日期+6为顺序号（如：XXXX-20241010-000001）
-     */
     @TableId
     private Long id;
-
     /**
-     * 采购订单号，生成是由后端直接生成，默认是自动填充的，并且格式为：前缀+日期+6为顺序号（如：XXXX-20241010-000001）
+     * 采购订单号，生成是由后端直接生成，默认是自动填充的，并且格式为：前缀+日期+6为顺序号（如：pre1-20241010-000001）
      */
     private String no;
-
     /**
      * 采购状态
      * 枚举 {@link cn.iocoder.yudao.module.erp.enums.ErpAuditStatus}
      */
     private Integer status;
-
     /**
      * 供应商编号
      * 关联 {@link ErpSupplierDO#getId()}
      */
     private Long supplierId;
-
     /**
      * 结算账户编号
      * 关联 {@link ErpAccountDO#getId()}
      */
     private Long accountId;
-
     /**
      * 下单时间
      */
     private LocalDateTime orderTime;
-
     // ========== 合计 ==========
     /**
      * 合计数量-项目数量
@@ -69,11 +57,10 @@ public class ErpPurchaseOrderDO extends BaseDO {
     private BigDecimal totalCount;
     /**
      * 最终合计价格，单位：元
-     *
+     * <p>
      * totalPrice = totalProductPrice + totalTaxPrice - discountPrice
      */
     private BigDecimal totalPrice;
-
     /**
      * 合计产品价格，单位：元
      */
@@ -88,7 +75,7 @@ public class ErpPurchaseOrderDO extends BaseDO {
     private BigDecimal discountPercent;
     /**
      * 优惠金额，单位：元
-     *
+     * <p>
      * discountPrice = (totalProductPrice + totalTaxPrice) * discountPercent
      */
     private BigDecimal discountPrice;
@@ -97,76 +84,63 @@ public class ErpPurchaseOrderDO extends BaseDO {
      */
     private BigDecimal depositPrice;
     // ========== 采购文件信息 ==========
-
     /**
      * 附件地址
      */
     private String fileUrl;
-
     /**
      * 备注
      */
     private String remark;
-
-
     // ========== 时间相关字段 ==========
-
     /**
      * 单据日期，默认为当前日期，也可以自行选择
      */
     private LocalDateTime documentDate;
-
     /**
      * 结算日期，默认为当前日期
      */
     private LocalDateTime settlementDate;
-
-
     /**
      * 审核人，审核时自动填充
      */
     private Long auditorId;
-
     /**
      * 审核时间，审核时自动填充
      */
     private LocalDateTime auditTime;
-
     // ========== 部门和主体信息 ==========
-
     /**
      * 部门，由系统中进行选择
+     * <p></>
+     * 部门id
      */
     private Long departmentId;
-
     /**
      * 采购主体，进行采购的公司主体，关联财务模块-主体管理
+     * <p></>
+     * 采购主体id
      */
     private Long purchaseEntityId;
     // ========== 采购入库 ==========
     /**
      * 采购入库数量
      */
-    private BigDecimal inCount;
-
+    private BigDecimal totalInCount;
     // ========== 采购退货（出库）） ==========
     /**
      * 采购退货数量
      */
-    private BigDecimal returnCount;
+    private BigDecimal totalReturnCount;
     // ========== 其他 ==========
     /**
      * 验货单，JSON 格式
      */
     private String inspectionJson;
-
     /**
      * 完工单，JSON 格式
      */
     private String completionJson;
-
     private String xCode;//x码
-
     private String containerRate;//箱率
-
 }

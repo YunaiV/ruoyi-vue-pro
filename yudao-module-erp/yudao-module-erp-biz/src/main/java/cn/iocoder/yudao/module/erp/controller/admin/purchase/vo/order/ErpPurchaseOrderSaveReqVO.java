@@ -1,7 +1,9 @@
 package cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.order;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import lombok.Data;
 
 import java.math.BigDecimal;
@@ -17,6 +19,7 @@ public class ErpPurchaseOrderSaveReqVO {
 
     @Schema(description = "供应商编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1724")
     @NotNull(message = "供应商编号不能为空")
+//    @Pattern(regexp = "\\d+$", message = "供应商产品编号格式不正确，应该是数字")
     private Long supplierId;
 
     @Schema(description = "结算账户编号", example = "31189")
@@ -24,15 +27,18 @@ public class ErpPurchaseOrderSaveReqVO {
 
     @Schema(description = "结算日期", example = "2025-1-1")
     private LocalDateTime settlementDate;
+    @Schema(description = "交货日期", example = "2025-1-1")
+    private LocalDateTime deliveryDate;
 
     @Schema(description = "采购时间", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "采购时间不能为空")
     private LocalDateTime orderTime;
 
-    @Schema(description = "优惠率，百分比", requiredMode = Schema.RequiredMode.REQUIRED, example = "99.88")
-    private BigDecimal discountPercent;
+//    @Schema(description = "优惠率，百分比", requiredMode = Schema.RequiredMode.REQUIRED, example = "99.88")
+//    private BigDecimal discountPercent;
 
     @Schema(description = "定金金额，单位：元", example = "7127")
+    @DecimalMin(value = "0.00", message = "定金金额不能小于0")
     private BigDecimal depositPrice;
 
     @Schema(description = "附件地址", example = "https://www.iocoder.cn")
@@ -61,28 +67,54 @@ public class ErpPurchaseOrderSaveReqVO {
         @NotNull(message = "产品编号不能为空")
         private Long productId;
 
-        @Schema(description = "产品单位单位", requiredMode = Schema.RequiredMode.REQUIRED, example = "3113")
-        @NotNull(message = "产品单位单位不能为空")
+        @Schema(description = "产品单位", requiredMode = Schema.RequiredMode.REQUIRED, example = "3113")
+        @NotNull(message = "产品单位不能为空")
         private Long productUnitId;
 
         @Schema(description = "产品单价", example = "100.00")
+        @DecimalMin(value = "0.00", message = "产品单价不能小于0")
         private BigDecimal productPrice;
+
+        @Schema(description = "含税产品单价", example = "100.00")
+        @DecimalMin(value = "0.00", message = "含税产品单价不能小于0")
+        private BigDecimal totalTaxPrice;
 
         @Schema(description = "产品数量", requiredMode = Schema.RequiredMode.REQUIRED, example = "100.00")
         @NotNull(message = "产品数量不能为空")
+        @DecimalMin(value = "1", message = "产品数量必须大于0")
         private BigDecimal count;
 
-        @Schema(description = "税率，百分比", example = "99.88")
+        @Schema(description = "增值税税率，百分比", example = "99.88")
         private BigDecimal taxPercent;
 
         @Schema(description = "备注", example = "随便")
         private String remark;
 
-        @Schema(description = "供应商产品编号", example = "")
-        private String supplierProductCode;
+        @Schema(description = "供应商产品编号", example = "1007")
+        @Pattern(regexp = "\\d+$", message = "供应商产品编号格式不正确")
+        @NotNull(message = "供应商产品编号不能为空")
+        private String supplierProductId;
+
+        @Schema(description = "供应商付款条款")
+        private String supplierRule;
+//        @Schema(description = "报关品名")
+//        private String customsDeclaration;
 
         @Schema(description = "产品名称")
         private String ItemName;
+        // ========== 采购入库 ==========
+        /**
+         * 采购入库数量
+         */
+        @DecimalMin(value = "0.00", message = "采购入库数量不能小于0")
+        private BigDecimal inCount;
+
+        @Schema(description = "优惠率，百分比", requiredMode = Schema.RequiredMode.REQUIRED, example = "99.88")
+        private BigDecimal discountPercent;
+        // ========== 仓库相关 ==========
+        @Schema(description = "仓库编号", example = "3")
+        private String warehouseId; // 仓库编号
+
     }
 
 }

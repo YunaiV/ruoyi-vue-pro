@@ -26,7 +26,6 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ErpPurchaseOrderItemDO extends BaseDO {
-
     /**
      * 编号
      */
@@ -34,9 +33,16 @@ public class ErpPurchaseOrderItemDO extends BaseDO {
     private Long id;
     /**
      * 供应商产品编码
+     * <p>
+     * 关联 {@link ErpSupplierProductDO#getId()}
      */
     private Long supplierProductId;
-    private String warehouseNo; // 仓库编号
+    /**
+     * 仓库编号
+     * <p>
+     * 关联  {@link cn.iocoder.yudao.module.erp.dal.dataobject.stock.ErpWarehouseDO#getId()}
+     */
+    private Long warehouseId; // 仓库编号
     /**
      * 采购订单编号
      * <p>
@@ -59,15 +65,7 @@ public class ErpPurchaseOrderItemDO extends BaseDO {
      * 备注
      */
     private String remark;
-
-    // ========== 采购入库 ==========
-    /**
-     * 采购入库数量
-     */
-    private BigDecimal inCount;
-
     // ========== 合计 ==========
-
     /**
      * 产品单位单价，单位：元
      */
@@ -91,46 +89,44 @@ public class ErpPurchaseOrderItemDO extends BaseDO {
      */
     private BigDecimal taxPrice;
     // ========== 采购金额和数量 ==========
-
     /**
      * 合计产品价格，单位：元
      */
     private BigDecimal totalProductPrice;
-
     /**
      * 含税单价，单位：元
      */
     private BigDecimal totalTaxPrice;
-
     /**
      * 优惠率，百分比
      */
     private BigDecimal discountPercent;
-
     /**
      * 优惠金额，单位：元
      */
     private BigDecimal discountPrice;
-
     /**
      * 定金金额，单位：元
      */
     private BigDecimal depositPrice;
-
     /**
      * 应付款余额，查询时显示，新增时无需填写
      */
     private BigDecimal payableBalance;
+    // ========== 采购入库 ==========
+    /**
+     * 采购入库数量
+     */
+    private BigDecimal inCount;
     // ========== 采购退货（出库）） ==========
     /**
      * 采购退货数量
      */
     private BigDecimal returnCount;
-
-
     // ========== 其他 ==========
     private String xCode;
-
-    //交货日期
+    /**
+     * 交货日期
+     */
     private LocalDateTime deliveryTime;
 }

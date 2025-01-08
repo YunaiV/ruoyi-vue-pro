@@ -75,11 +75,12 @@ public class ErpPurchaseOrderServiceImpl implements ErpPurchaseOrderService {
         ThrowUtil.ifThrow(purchaseOrderMapper.selectByNo(no) != null ,PURCHASE_ORDER_NO_EXISTS);
         // 2.1 插入订单
         ErpPurchaseOrderDO purchaseOrder = BeanUtils.toBean(createReqVO, ErpPurchaseOrderDO.class, in -> in
-                .setNo(no).setStatus(ErpAuditStatus.PROCESS.getStatus()));
+                .setNo(no).setStatus(ErpAuditStatus.PROCESS.getStatus()));//设置审核状态
         calculateTotalPrice(purchaseOrder, purchaseOrderItems);
         // 2.1.1 插入单据日期+结算日期
         purchaseOrder.setDocumentDate(LocalDateTime.now());
         purchaseOrder.setSettlementDate(createReqVO.getSettlementDate()==null?LocalDateTime.now():createReqVO.getSettlementDate());
+
         purchaseOrderMapper.insert(purchaseOrder);
         // 2.2 插入订单项
         purchaseOrderItems.forEach(o -> o.setOrderId(purchaseOrder.getId()));
@@ -136,11 +137,11 @@ public class ErpPurchaseOrderServiceImpl implements ErpPurchaseOrderService {
             throw exception(approve ? PURCHASE_ORDER_APPROVE_FAIL : PURCHASE_ORDER_PROCESS_FAIL);
         }
         // 1.3 存在采购入单，无法反审核
-        if (!approve && purchaseOrder.getInCount().compareTo(BigDecimal.ZERO) > 0) {
+        if (!approve && purchaseOrder.getTotalInCount().compareTo(BigDecimal.ZERO) > 0) {
             throw exception(PURCHASE_ORDER_PROCESS_FAIL_EXISTS_IN);
         }
         // 1.4 存在采购退货单，无法反审核
-        if (!approve && purchaseOrder.getReturnCount().compareTo(BigDecimal.ZERO) > 0) {
+        if (!approve && purchaseOrder.getTotalReturnCount().compareTo(BigDecimal.ZERO) > 0) {
             throw exception(PURCHASE_ORDER_PROCESS_FAIL_EXISTS_RETURN);
         }
 
@@ -206,7 +207,7 @@ public class ErpPurchaseOrderServiceImpl implements ErpPurchaseOrderService {
         });
         // 2. 更新采购订单
         BigDecimal totalInCount = getSumValue(inCountMap.values(), value -> value, BigDecimal::add, BigDecimal.ZERO);
-        purchaseOrderMapper.updateById(new ErpPurchaseOrderDO().setId(id).setInCount(totalInCount));
+        purchaseOrderMapper.updateById(new ErpPurchaseOrderDO().setId(id).setTotalInCount(totalInCount));
     }
 
     @Override
@@ -226,7 +227,7 @@ public class ErpPurchaseOrderServiceImpl implements ErpPurchaseOrderService {
         });
         // 2. 更新采购订单
         BigDecimal totalReturnCount = getSumValue(returnCountMap.values(), value -> value, BigDecimal::add, BigDecimal.ZERO);
-        purchaseOrderMapper.updateById(new ErpPurchaseOrderDO().setId(orderId).setReturnCount(totalReturnCount));
+        purchaseOrderMapper.updateById(new ErpPurchaseOrderDO().setId(orderId).setTotalReturnCount(totalReturnCount));
     }
 
     @Override

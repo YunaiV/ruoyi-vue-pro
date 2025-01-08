@@ -15,10 +15,14 @@ import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.order.ErpPurchas
 import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseOrderDO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseOrderItemDO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpSupplierDO;
+import cn.iocoder.yudao.module.erp.dal.dataobject.stock.ErpWarehouseDO;
 import cn.iocoder.yudao.module.erp.service.product.ErpProductService;
 import cn.iocoder.yudao.module.erp.service.purchase.ErpPurchaseOrderService;
 import cn.iocoder.yudao.module.erp.service.purchase.ErpSupplierService;
 import cn.iocoder.yudao.module.erp.service.stock.ErpStockService;
+import cn.iocoder.yudao.module.erp.service.stock.ErpWarehouseService;
+import cn.iocoder.yudao.module.system.api.dept.DeptApi;
+import cn.iocoder.yudao.module.system.api.dept.dto.DeptRespDTO;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import io.swagger.v3.oas.annotations.Operation;
@@ -58,6 +62,13 @@ public class ErpPurchaseOrderController {
 
     @Resource
     private AdminUserApi adminUserApi;
+    @Resource
+    private DeptApi deptApi;
+    @Resource
+    private ErpWarehouseService erpWarehouseService;
+//    warehouse
+
+
 
     @PostMapping("/create")
     @Operation(summary = "创建采购订单")
@@ -107,7 +118,7 @@ public class ErpPurchaseOrderController {
         return success(BeanUtils.toBean(purchaseOrder, ErpPurchaseOrderRespVO.class, purchaseOrderVO ->
                 purchaseOrderVO.setItems(BeanUtils.toBean(purchaseOrderItemList, ErpPurchaseOrderRespVO.Item.class, item -> {
                     BigDecimal purchaseCount = stockService.getStockCount(item.getProductId());
-                    item.setStockCount(purchaseCount != null ? purchaseCount : BigDecimal.ZERO);
+                    item.setCount(purchaseCount != null ? purchaseCount : BigDecimal.ZERO);
                     MapUtils.findAndThen(productMap, item.getProductId(), product -> item.setProductName(product.getName())
                             .setProductBarCode(product.getBarCode()).setProductUnitName(product.getUnitName()));
                 }))));
@@ -150,14 +161,33 @@ public class ErpPurchaseOrderController {
         // 1.4 管理员信息
         Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(
                 convertSet(pageResult.getList(), purchaseOrder -> Long.parseLong(purchaseOrder.getCreator())));
+        // 1.5 部门信息
+        Map<Long, DeptRespDTO> deptMap = deptApi.getDeptMap(
+            convertSet(pageResult.getList(), ErpPurchaseOrderDO::getDepartmentId));
+        // 1.6 获取仓库信息
+        Map<Long, ErpWarehouseDO> warehouseMap = erpWarehouseService.getWarehouseMap(
+            convertSet(purchaseOrderItemList, ErpPurchaseOrderItemDO::getWarehouseId));
+
+
         // 2. 开始拼接
         return BeanUtils.toBean(pageResult, ErpPurchaseOrderRespVO.class, purchaseOrder -> {
             purchaseOrder.setItems(BeanUtils.toBean(purchaseOrderItemMap.get(purchaseOrder.getId()), ErpPurchaseOrderRespVO.Item.class,
-                    item -> MapUtils.findAndThen(productMap, item.getProductId(), product -> item.setProductName(product.getName())
-                            .setProductBarCode(product.getBarCode()).setProductUnitName(product.getUnitName()))));
+                    item -> {
+                        //设置产品信息
+                        MapUtils.findAndThen(productMap, item.getProductId(), product -> item.setProductName(product.getName())
+                            .setProductBarCode(product.getBarCode()).setProductUnitName(product.getUnitName()));
+                        // 设置仓库信息
+                        if (item.getWarehouseId() != null && warehouseMap.containsKey(item.getWarehouseId())) {
+                            item.setWarehouseName(warehouseMap.get(item.getWarehouseId()).getName());
+                        }
+//                        item.setWarehouseName(erpWarehouseService.getWarehouse(item.getWarehouseId()).getName());//设置仓库名称
+//                        item.setWarehouseName(erpWarehouseService.getWarehouse(item.getWarehouseId()).getName());//设置仓库名称
+
+                    } ));
             purchaseOrder.setProductNames(CollUtil.join(purchaseOrder.getItems(), "，", ErpPurchaseOrderRespVO.Item::getProductName));
             MapUtils.findAndThen(supplierMap, purchaseOrder.getSupplierId(), supplier -> purchaseOrder.setSupplierName(supplier.getName()));
             MapUtils.findAndThen(userMap, Long.parseLong(purchaseOrder.getCreator()), user -> purchaseOrder.setCreatorName(user.getNickname()));
+            MapUtils.findAndThen(deptMap, purchaseOrder.getDepartmentId(), deptRespDTO -> purchaseOrder.setDepartmentName(deptRespDTO.getName()));//部门信息
         });
     }
 
