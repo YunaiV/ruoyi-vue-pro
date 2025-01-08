@@ -94,6 +94,15 @@ public class ErpPurchaseInRespVO {
     @ExcelProperty("产品信息")
     private String productNames;
 
+    @Schema(description = "审核状态(0:待审核，1:审核通过，2:审核未通过)", example = "2")
+    private Integer inStatus;
+
+    @Schema(description = "审核状态描述", example = "2")
+    private String inStatusDesc;
+
+    @Schema(description = "对账状态(false:未对账 ，true:已对账)", example = "false")
+    private Boolean reconciliationStatus;
+
     @Data
     public static class Item {
 
@@ -109,7 +118,7 @@ public class ErpPurchaseInRespVO {
         @Schema(description = "产品编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "3113")
         private Long productId;
 
-        @Schema(description = "产品单位单位", requiredMode = Schema.RequiredMode.REQUIRED, example = "3113")
+        @Schema(description = "产品单位单位", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
         private Long productUnitId;
 
         @Schema(description = "产品单价", example = "100.00")
@@ -124,6 +133,9 @@ public class ErpPurchaseInRespVO {
 
         @Schema(description = "税额，单位：元", example = "100.00")
         private BigDecimal taxPrice;
+
+        @Schema(description = "含税单价", example = "120.00")
+        private double actTaxPrice;
 
         @Schema(description = "备注", example = "随便")
         private String remark;
@@ -140,6 +152,35 @@ public class ErpPurchaseInRespVO {
         @Schema(description = "库存数量", requiredMode = Schema.RequiredMode.REQUIRED, example = "100.00")
         private BigDecimal stockCount; // 该字段仅仅在“详情”和“编辑”时使用
 
+        // 源单行号
+        @Schema(description = "源单行号")
+        private int srcSeq;
+        // 源单类型ID
+//        private String srcBillTypeId;
+        // 源单类型名称
+        @Schema(description = "源单类型")
+        private String srcBillTypeName;
+        // 源单类型编码
+//        private String srcBillTypeNumber;
+        @Schema(description = "箱率")
+        private String containerRate;//箱率
+        //型号规格
+        @Schema(description = "型号规格-商品中带出")
+        private String typeSpecification;
+        // ========== 产品中带出 ==========
+        /**
+         * 商品体积，单位：m^3 平米
+         */
+        @Schema(description = "商品总体积,单位：m^3 平米", example = "2.5")
+        private Double totalVolume;
+        /**
+         * 商品重量，单位：kg 千克
+         */
+        @Schema(description = "商品总重量,单位：kg 千克", example = "1.2")
+        private Double totalWeight;
+
+        @Schema(description = "型号规格型号")
+        private String model;
     }
 
 }

@@ -43,7 +43,7 @@ public class ErpPurchaseOrderPageReqVO extends PageParam {
      */
     public static final Integer RETURN_STATUS_ALL = 2;
 
-    @Schema(description = "采购单编号", example = "XS001")
+    @Schema(description = "采购单编号-单据编号", example = "CGDD-20250108-000027")
     private String no;
 
     @Schema(description = "供应商编号", example = "1724")

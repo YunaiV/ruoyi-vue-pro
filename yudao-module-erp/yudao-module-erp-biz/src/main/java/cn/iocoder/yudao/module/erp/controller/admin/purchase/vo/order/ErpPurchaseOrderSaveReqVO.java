@@ -19,7 +19,6 @@ public class ErpPurchaseOrderSaveReqVO {
 
     @Schema(description = "供应商编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1724")
     @NotNull(message = "供应商编号不能为空")
-//    @Pattern(regexp = "\\d+$", message = "供应商产品编号格式不正确，应该是数字")
     private Long supplierId;
 
     @Schema(description = "结算账户编号", example = "31189")
