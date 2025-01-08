@@ -16,8 +16,6 @@ import com.somle.ai.service.AiService;
 import com.somle.amazon.service.AmazonService;
 import com.somle.dingtalk.service.DingTalkService;
 import com.somle.eccang.service.EccangService;
-import com.somle.erp.service.ErpDepartmentService;
-import com.somle.erp.service.ErpProductService;
 import com.somle.esb.config.IntegrationConfig;
 import com.somle.esb.converter.DingTalkToErpConverter;
 import com.somle.esb.converter.EccangToErpConverter;
@@ -84,10 +82,7 @@ class EsbJobTest extends BaseSpringTest {
     @Resource
     EsbService service;
 
-    @MockBean
-    ErpProductService erpProductService;
-    @MockBean
-    ErpDepartmentService erpDepartmentService;
+
     @MockBean
     EccangService eccangService;
     @MockBean

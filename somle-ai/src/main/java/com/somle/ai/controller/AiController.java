@@ -9,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import com.somle.ai.model.AiName;
-import com.somle.erp.model.ErpCountry;
 import com.somle.ai.service.AiService;
 
 @RestController

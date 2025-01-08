@@ -15,8 +15,6 @@ import cn.iocoder.yudao.module.system.api.dept.DeptApi;
 import cn.iocoder.yudao.module.system.api.dept.dto.DeptRespDTO;
 import cn.iocoder.yudao.module.system.api.dict.DictDataApi;
 import cn.iocoder.yudao.module.system.api.dict.dto.DictDataRespDTO;
-import com.somle.erp.model.product.ErpCountrySku;
-import com.somle.erp.model.product.ErpStyleSku;
 import com.somle.kingdee.model.KingdeeProduct;
 import com.somle.kingdee.model.supplier.KingdeeSupplier;
 import com.somle.kingdee.model.supplier.SupplierBomentity;
@@ -41,54 +39,6 @@ public class ErpToKingdeeConverter {
     private DeptApi deptApi;
     @Autowired
     private DictDataApi dictDataApi;
-
-    public KingdeeProduct toKingdee(ErpCountrySku erpCountrySku) {
-        ErpStyleSku erpStyleSku = erpCountrySku.getStyleSku();
-        KingdeeProduct product = new KingdeeProduct();
-//        try {
-//            String id = kingdeeService.getMaterial(esbCountrySku.getCountrySku()).getData().getString("id");
-//            product.setId(id);
-//        } catch (Exception e) {
-//            log.debug("id not found for " + esbCountrySku.getCountrySku() + "adding new");
-//        }
-        product.setCheckType("1"); //普通
-        product.setName(erpStyleSku.getNameZh());
-        product.setNumber(erpCountrySku.getCountrySku());
-        product.setBarcode(erpStyleSku.getBarcode());
-        product.setProducingPace(erpCountrySku.getDeclaredTypeZh()); //报关品名
-        product.setHelpCode(erpCountrySku.getHscode()); //HS编码
-        product.setCostMethod("2"); //加权平均
-
-        product.setGrossWeight(String.valueOf(erpStyleSku.getPackageWeight()));
-        product.setLength(String.valueOf(erpStyleSku.getLength()));
-        product.setWide(String.valueOf(erpStyleSku.getWidth()));
-        product.setHigh(String.valueOf(erpStyleSku.getHeight()));
-
-        //product.setSaleDepartmentId(erpStyleSku.getSaleDepartmentId());
-        //product.setDeclaredTypeZh(erpCountrySku.getDeclaredTypeZh());
-
-        // product.setIsFloat(true);
-        // product.setGrossWeight(product.getPackageWeight());
-        // product.setLength(product.getLength());
-        // product.setWide(product.getWidth());
-        // product.setHigh(product.getHeight());
-
-//        product.setVolumeUnitId(kingdeeService.getMeasureUnitByNumber("立方厘米").getId());
-//        product.setWeightUnitId(kingdeeService.getMeasureUnitByNumber("kg").getId());
-//        product.setBaseUnitId(kingdeeService.getMeasureUnitByNumber("套").getId());
-//        product.setCustomField(
-//            kingdeeService.getCustomFieldByDisplayName("bd_material", "部门"),
-//            kingdeeService.getAuxInfoByNumber(esbStyleSku.getSaleDepartmentId().toString()).getId()
-//        );
-//        try {
-//            product.setCustomField(kingdeeService.getCustomFieldByDisplayName("bd_material", "报关品名"), esbCountrySku.getDeclaredTypeZh());
-//        } catch (Exception e) {
-//            log.debug("custom field 报关品名 skipped for " + kingdeeService.token.getAccountName());
-//        }
-
-        return product;
-
-    }
 
     /**
      * 将ERP产品列表转换为完整的Kingdee产品列表。
