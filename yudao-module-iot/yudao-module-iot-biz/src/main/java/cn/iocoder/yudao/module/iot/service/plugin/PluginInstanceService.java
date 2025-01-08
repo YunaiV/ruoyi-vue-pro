@@ -11,7 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 public interface PluginInstanceService {
 
     /**
-     * 上报插件实例
+     * 上报插件实例（心跳）
      */
     void reportPluginInstances();
 

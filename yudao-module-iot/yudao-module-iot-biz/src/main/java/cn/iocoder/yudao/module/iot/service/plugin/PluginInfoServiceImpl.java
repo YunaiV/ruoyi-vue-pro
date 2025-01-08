@@ -100,7 +100,7 @@ public class PluginInfoServiceImpl implements PluginInfoService {
         // 2. 停止并卸载旧的插件
         pluginInstanceService.stopAndUnloadPlugin(pluginInfoDo.getPluginKey());
 
-        // 3 上传新的插件文件,更新插件启用状态文件
+        // 3 上传新的插件文件，更新插件启用状态文件
         String pluginKeyNew = pluginInstanceService.uploadAndLoadNewPlugin(file);
 
         // 4. 更新插件信息

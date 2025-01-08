@@ -41,7 +41,8 @@ import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionU
 public class PluginInstanceServiceImpl implements PluginInstanceService {
 
     // TODO @haohao：这个可以后续确认下，有没更合适的标识。例如说 mac 地址之类的
-    // 简化的UUID + mac 地址 会不会好一些，一台机子有可能会部署多个插件
+    // 简化的 UUID + mac 地址 会不会好一些，一台机子有可能会部署多个插件；
+    // 那就 mac@uuid ？
     public static final String MAIN_ID = IdUtil.fastSimpleUUID();
 
     @Resource
@@ -53,13 +54,13 @@ public class PluginInstanceServiceImpl implements PluginInstanceService {
 
     @Value("${pf4j.pluginsDir}")
     private String pluginsDir;
-
     @Value("${server.port:48080}")
     private int port;
 
     @Override
     public void stopAndUnloadPlugin(String pluginKey) {
         PluginWrapper plugin = pluginManager.getPlugin(pluginKey);
+        // TODO @haohao：改成 if return 会更简洁一点；
         if (plugin != null) {
             if (plugin.getPluginState().equals(PluginState.STARTED)) {
                 pluginManager.stopPlugin(pluginKey); // 停止插件
@@ -75,6 +76,7 @@ public class PluginInstanceServiceImpl implements PluginInstanceService {
     @Override
     public void deletePluginFile(PluginInfoDO pluginInfoDO) {
         File file = new File(pluginsDir, pluginInfoDO.getFileName());
+        // TODO @haohao：改成 if return 会更简洁一点；
         if (file.exists()) {
             try {
                 TimeUnit.SECONDS.sleep(1); // 等待 1 秒，避免插件未卸载完毕
@@ -82,9 +84,7 @@ public class PluginInstanceServiceImpl implements PluginInstanceService {
                     log.error("[deletePluginInfo][删除插件文件({}) 失败]", pluginInfoDO.getFileName());
                 }
             } catch (InterruptedException e) {
-                log.error("[deletePluginInfo][删除插件文件({}) 失败]", pluginInfoDO.getFileName(),
-                        e);
-                Thread.currentThread().interrupt(); // 恢复中断状态
+                log.error("[deletePluginInfo][删除插件文件({}) 失败]", pluginInfoDO.getFileName(), e);
             }
         }
     }
@@ -120,6 +120,7 @@ public class PluginInstanceServiceImpl implements PluginInstanceService {
         String pluginKey = pluginInfoDo.getPluginKey();
         PluginWrapper plugin = pluginManager.getPlugin(pluginKey);
 
+        // TODO @haohao：改成 if return 会更简洁一点；
         if (plugin != null) {
             // 启动插件
             if (status.equals(IotPluginStatusEnum.RUNNING.getStatus())
@@ -143,46 +144,41 @@ public class PluginInstanceServiceImpl implements PluginInstanceService {
 
     @Override
     public void reportPluginInstances() {
-        // 1. 获取 pf4j 插件列表
+        // 1.1 获取 pf4j 插件列表
         List<PluginWrapper> plugins = pluginManager.getPlugins();
 
-        // 2. 获取插件信息列表并转换为 Map 以便快速查找
+        // 1.2 获取插件信息列表并转换为 Map 以便快速查找
         List<PluginInfoDO> pluginInfos = pluginInfoMapper.selectList();
         Map<String, PluginInfoDO> pluginInfoMap = pluginInfos.stream()
                 .collect(Collectors.toMap(PluginInfoDO::getPluginKey, Function.identity()));
 
-        // 3. 获取本机 IP 和 MAC 地址
+        // 1.3 获取本机 IP 和 MAC 地址
         String ip = NetUtil.getLocalhostStr();
         String mac = NetUtil.getLocalMacAddress();
         String mainId = MAIN_ID + "-" + mac;
 
-        // 4. 遍历插件列表，并保存为插件实例
+        // 2. 遍历插件列表，并保存为插件实例
         for (PluginWrapper plugin : plugins) {
             String pluginKey = plugin.getPluginId();
 
-            // 4.1 查找插件信息
+            // 2.1 查找插件信息
             PluginInfoDO pluginInfo = pluginInfoMap.get(pluginKey);
             if (pluginInfo == null) {
-                // 4.2 插件信息不存在，记录错误并跳过
                 log.error("插件信息不存在，pluginKey = {}", pluginKey);
                 continue;
             }
 
-            // 4.3 查询插件实例
+            // 2.2 情况一：如果插件实例不存在，则创建
             PluginInstanceDO pluginInstance = pluginInstanceMapper.selectByMainIdAndPluginId(mainId,
                     pluginInfo.getId());
             if (pluginInstance == null) {
                 // 4.4 如果插件实例不存在，则创建
-                pluginInstance = PluginInstanceDO.builder()
-                        .pluginId(pluginInfo.getId())
-                        .mainId(MAIN_ID + "-" + mac)
-                        .ip(ip)
-                        .port(port)
-                        .heartbeatAt(System.currentTimeMillis())
-                        .build();
+                pluginInstance = PluginInstanceDO.builder().pluginId(pluginInfo.getId()).mainId(MAIN_ID + "-" + mac)
+                        .ip(ip).port(port).heartbeatAt(System.currentTimeMillis()).build();
                 pluginInstanceMapper.insert(pluginInstance);
             } else {
-                // 4.5 如果插件实例存在，则更新心跳时间
+                // 2.2 情况二：如果存在，则更新 heartbeatAt
+                // TODO @haohao：这里最好 new 去 update；避免并发更新（虽然目前没有）
                 pluginInstance.setHeartbeatAt(System.currentTimeMillis());
                 pluginInstanceMapper.updateById(pluginInstance);
             }
