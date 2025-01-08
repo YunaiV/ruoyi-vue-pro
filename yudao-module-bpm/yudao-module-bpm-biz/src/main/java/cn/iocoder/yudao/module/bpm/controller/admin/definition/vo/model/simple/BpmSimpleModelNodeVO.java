@@ -280,9 +280,8 @@ public class BpmSimpleModelNodeVO {
 
     }
 
-    // TODO @lesan：routeGroups
     @Schema(description = "路由分支组", example = "[]")
-    private List<RouteCondition> routeGroup;
+    private List<RouteCondition> routeGroups;
 
     @Schema(description = "默认分支id", example = "Flow_xxx")
     private String defaultFlowId; // 仅用于路由分支节点 BpmSimpleModelNodeType.ROUTE_BRANCH_NODE
