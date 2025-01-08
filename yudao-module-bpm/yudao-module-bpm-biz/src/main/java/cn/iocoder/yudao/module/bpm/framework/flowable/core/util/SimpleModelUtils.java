@@ -465,6 +465,7 @@ public class SimpleModelUtils {
                 flowableListener.setEvent(TaskListener.EVENTNAME_ASSIGNMENT);
                 flowableListener.setImplementationType(ImplementationType.IMPLEMENTATION_TYPE_DELEGATEEXPRESSION);
                 flowableListener.setImplementation(DELEGATE_EXPRESSION);
+                // TODO @lesan：可以在 BpmnModelUtils 搞个方法，类似 public static Integer parseCandidateStrategy。这样，就收敛啦！
                 FieldExtension fieldExtension = new FieldExtension();
                 fieldExtension.setFieldName("listenerConfig");
                 fieldExtension.setStringValue(JsonUtils.toJsonString(node.getTaskAssignListener()));

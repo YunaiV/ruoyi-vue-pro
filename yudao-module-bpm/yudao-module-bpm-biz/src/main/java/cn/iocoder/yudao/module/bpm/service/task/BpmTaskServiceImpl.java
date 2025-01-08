@@ -170,9 +170,8 @@ public class BpmTaskServiceImpl implements BpmTaskService {
             taskForm = formService.getForm(NumberUtils.parseLong(todoTask.getFormKey()));
         }
 
-        BpmTaskRespVO bpmTaskRespVO = BpmTaskConvert.INSTANCE.buildTodoTask(todoTask, childrenTasks, buttonsSetting, taskForm);
-        bpmTaskRespVO.setSignEnable(signEnable);
-        return bpmTaskRespVO;
+        return BpmTaskConvert.INSTANCE.buildTodoTask(todoTask, childrenTasks, buttonsSetting, taskForm)
+                .setSignEnable(signEnable);
     }
 
     @Override

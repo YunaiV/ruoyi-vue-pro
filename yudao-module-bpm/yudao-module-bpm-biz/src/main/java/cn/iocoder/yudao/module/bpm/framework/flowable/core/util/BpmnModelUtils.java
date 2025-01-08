@@ -3,11 +3,8 @@ package cn.iocoder.yudao.module.bpm.framework.flowable.core.util;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.map.MapUtil;
-import cn.hutool.core.util.ArrayUtil;
-import cn.hutool.core.util.ObjUtil;
-import cn.hutool.core.util.StrUtil;
+import cn.hutool.core.util.*;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
-import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.common.util.number.NumberUtils;
 import cn.iocoder.yudao.framework.common.util.string.StrUtils;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.simple.BpmSimpleModelNodeVO;
@@ -58,18 +55,6 @@ public class BpmnModelUtils {
         element.addExtensionElement(extensionElement);
     }
 
-    public static void addExtensionElementJson(FlowElement element, String name, Object value) {
-        if (value == null) {
-            return;
-        }
-        ExtensionElement extensionElement = new ExtensionElement();
-        extensionElement.setNamespace(FLOWABLE_EXTENSIONS_NAMESPACE);
-        extensionElement.setNamespacePrefix(FLOWABLE_EXTENSIONS_PREFIX);
-        extensionElement.setElementText(JsonUtils.toJsonString(value));
-        extensionElement.setName(name);
-        element.addExtensionElement(extensionElement);
-    }
-
     public static void addExtensionElement(FlowElement element, String name, Integer value) {
         if (value == null) {
             return;
@@ -105,14 +90,6 @@ public class BpmnModelUtils {
         }
         ExtensionElement element = CollUtil.getFirst(flowElement.getExtensionElements().get(elementName));
         return element != null ? element.getElementText() : null;
-    }
-
-    public static <T> T parseExtensionElementJson(FlowElement flowElement, String elementName, Class<T> clazz) {
-        if (flowElement == null) {
-            return null;
-        }
-        ExtensionElement element = CollUtil.getFirst(flowElement.getExtensionElements().get(elementName));
-        return element != null ? JsonUtils.parseObject(element.getElementText(), clazz) : null;
     }
 
     /**
@@ -369,6 +346,7 @@ public class BpmnModelUtils {
     }
 
     public static void addSignEnable(Boolean signEnable, FlowElement userTask) {
+        // TODO @lesan：是不是改成表达式会好点  addExtensionElement(userTask, SIGN_ENABLE, ObjUtil.isNotNull(signEnable) ? )
         if (ObjUtil.isNotNull(signEnable)) {
             addExtensionElement(userTask, SIGN_ENABLE, signEnable.toString());
         } else {

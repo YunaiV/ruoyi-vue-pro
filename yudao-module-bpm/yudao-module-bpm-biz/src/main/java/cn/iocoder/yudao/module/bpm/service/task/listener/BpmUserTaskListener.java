@@ -71,7 +71,7 @@ public class BpmUserTaskListener implements TaskListener {
             headers.add(HEADER_TENANT_ID, delegateTask.getTenantId());
         }
         // 2.2 请求体默认参数
-        // TODO @芋艿：哪些默认参数，后续再调研下；
+        // TODO @芋艿：哪些默认参数，后续再调研下；感觉可以搞个 task 字段，把整个 delegateTask 放进去；
         body.add("processInstanceId", delegateTask.getProcessInstanceId());
         body.add("assignee", delegateTask.getAssignee());
         body.add("taskDefinitionKey", delegateTask.getTaskDefinitionKey());
@@ -80,6 +80,7 @@ public class BpmUserTaskListener implements TaskListener {
         // 3. 异步发起请求
         // TODO @芋艿：确认要同步，还是异步
         HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity<>(body, headers);
+        // TODO @lesan：可能需要 try catch 哇？ RestClientException
         ResponseEntity<String> responseEntity = restTemplate.exchange(listenerHandler.getPath(), HttpMethod.POST,
                 requestEntity, String.class);
         log.info("[notify][监听器：{}，事件类型：{}，请求头：{}，请求体：{}，响应结果：{}]",
@@ -111,6 +112,7 @@ public class BpmUserTaskListener implements TaskListener {
                 .filter(item -> item.getEvent().equals(eventName))
                 .findFirst().orElse(null);
         Assert.notNull(flowableListener, "监听器({})不能为空", flowableListener);
+        // TODO @lesan：BpmnModelUtils 提供一个 BpmSimpleModelNodeVO.ListenerHandler 解析方法，尽量收敛掉。
         FieldExtension fieldExtension = flowableListener.getFieldExtensions().stream()
                 .filter(item -> item.getFieldName().equals("listenerConfig"))
                 .findFirst().orElse(null);

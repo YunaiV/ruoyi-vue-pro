@@ -119,6 +119,7 @@ public class BpmSimpleModelNodeVO {
     @Schema(description = "路由分支组", example = "[]")
     private List<RouteCondition> routerGroups;
 
+    // TODO @lesan：这个目前前端是随机生成的。可以后端来随机么？
     @Schema(description = "默认分支 ID", example = "Flow_xxx")
     private String defaultFlowId; // 仅用于路由分支节点 BpmSimpleModelNodeType.ROUTE_BRANCH_NODE
 
@@ -289,6 +290,7 @@ public class BpmSimpleModelNodeVO {
 
     }
 
+    // TODO @lesan：还有相关的也要改下哈。route 到 router
     @Schema(description = "路由分支")
     @Data
     @Valid
