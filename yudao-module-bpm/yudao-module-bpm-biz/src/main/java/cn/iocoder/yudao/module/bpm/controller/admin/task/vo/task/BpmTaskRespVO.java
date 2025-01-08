@@ -78,6 +78,9 @@ public class BpmTaskRespVO {
     @Schema(description = "操作按钮设置值")
     private Map<Integer, OperationButtonSetting> buttonsSetting;
 
+    @Schema(description = "是否需要签名")
+    private Boolean signEnable;
+
     @Data
     @Schema(description = "流程实例")
     public static class ProcessInstance {

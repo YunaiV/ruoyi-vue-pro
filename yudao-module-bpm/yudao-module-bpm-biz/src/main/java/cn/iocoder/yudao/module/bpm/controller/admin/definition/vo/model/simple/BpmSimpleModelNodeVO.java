@@ -60,6 +60,9 @@ public class BpmSimpleModelNodeVO {
     @Schema(description = "操作按钮设置", example = "[]")
     private List<OperationButtonSetting> buttonsSetting;  // 用于审批节点
 
+    @Schema(description = "是否需要签名", example = "false")
+    private Boolean signEnable;
+
     /**
      * 审批节点拒绝处理
      */
@@ -113,13 +116,9 @@ public class BpmSimpleModelNodeVO {
      */
     private ConditionGroups conditionGroups; // 仅用于条件节点 BpmSimpleModelNodeType.CONDITION_NODE
 
-    // TODO @lesan：route 改成 router 会不会好点。因为触发器、延迟器，都带了类似 r
-
-    // TODO @lesan：routeGroups
     @Schema(description = "路由分支组", example = "[]")
-    private List<RouteCondition> routeGroup;
+    private List<RouteCondition> routerGroups;
 
-    // TODO @lesan：貌似没用？？？
     @Schema(description = "默认分支 ID", example = "Flow_xxx")
     private String defaultFlowId; // 仅用于路由分支节点 BpmSimpleModelNodeType.ROUTE_BRANCH_NODE
 
@@ -136,20 +135,19 @@ public class BpmSimpleModelNodeVO {
         private String path;
 
         @Schema(description = "请求头", example = "[]")
-        private List<ListenerMap> header;
+        private List<ListenerParam> header;
 
         @Schema(description = "请求体", example = "[]")
-        private List<ListenerMap> body;
+        private List<ListenerParam> body;
 
         // TODO @芋艿：这里后续要不要复用；
 
-        // TODO @lesan：ListenerParam 更合适哈。首先它是参数配置，然后形式是键值对
         @Schema(description = "任务监听器键值对")
         @Data
-        public static class ListenerMap {
+        public static class ListenerParam {
 
             @Schema(description = "值类型", example = "1")
-            @InEnum(BpmListenerMapType.class)
+            @InEnum(BpmListenerParamTypeEnum.class)
             private Integer type;
 
             @Schema(description = "键", example = "xxx")
@@ -300,7 +298,6 @@ public class BpmSimpleModelNodeVO {
         @NotEmpty(message = "节点 Id 不能为空")
         private String nodeId;
 
-        // TODO @lesan：type、expression、groups；
         @Schema(description = "条件类型", example = "1")
         @InEnum(BpmSimpleModeConditionType.class)
         @NotNull(message = "条件类型不能为空")
