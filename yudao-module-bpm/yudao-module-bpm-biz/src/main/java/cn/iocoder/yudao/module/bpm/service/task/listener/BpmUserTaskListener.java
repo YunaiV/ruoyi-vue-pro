@@ -1,7 +1,9 @@
 package cn.iocoder.yudao.module.bpm.service.task.listener;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.StrUtil;
+import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.simple.BpmSimpleModelNodeVO;
 import cn.iocoder.yudao.module.bpm.enums.definition.BpmListenerParamTypeEnum;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.util.BpmnModelUtils;
@@ -10,7 +12,9 @@ import cn.iocoder.yudao.module.bpm.service.task.BpmProcessInstanceService;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.flowable.bpmn.model.BpmnModel;
-import org.flowable.bpmn.model.FlowElement;
+import org.flowable.bpmn.model.FieldExtension;
+import org.flowable.bpmn.model.FlowableListener;
+import org.flowable.bpmn.model.UserTask;
 import org.flowable.engine.delegate.TaskListener;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.task.service.delegate.DelegateTask;
@@ -26,7 +30,6 @@ import java.util.List;
 import java.util.Map;
 
 import static cn.iocoder.yudao.framework.web.core.util.WebFrameworkUtils.HEADER_TENANT_ID;
-import static cn.iocoder.yudao.module.bpm.framework.flowable.core.util.BpmnModelUtils.parseSimpleConfigInfo;
 
 /**
  * BPM 用户任务通用监听器
@@ -53,9 +56,9 @@ public class BpmUserTaskListener implements TaskListener {
         // 1. 获取所需基础信息
         HistoricProcessInstance processInstance = processInstanceService.getHistoricProcessInstance(delegateTask.getProcessInstanceId());
         BpmnModel bpmnModel = modelService.getBpmnModelByDefinitionId(delegateTask.getProcessDefinitionId());
-        FlowElement userTask = BpmnModelUtils.getFlowElementById(bpmnModel, delegateTask.getTaskDefinitionKey());
-        BpmSimpleModelNodeVO node = parseSimpleConfigInfo(userTask);
-        BpmSimpleModelNodeVO.ListenerHandler listenerHandler = getListenerHandlerByEvent(delegateTask.getEventName(), node);
+        UserTask userTask = (UserTask) BpmnModelUtils.getFlowElementById(bpmnModel, delegateTask.getTaskDefinitionKey());
+        BpmSimpleModelNodeVO.ListenerHandler listenerHandler = getListenerHandlerByEvent(delegateTask.getEventName(),
+                userTask.getTaskListeners());
 
         // 2. 获取请求头和请求体
         Map<String, Object> processVariables = processInstance.getProcessVariables();
@@ -79,8 +82,12 @@ public class BpmUserTaskListener implements TaskListener {
         HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity<>(body, headers);
         ResponseEntity<String> responseEntity = restTemplate.exchange(listenerHandler.getPath(), HttpMethod.POST,
                 requestEntity, String.class);
-        // TODO @lesan：日志打印，可以更全哈，例如说，请求参数、对应的 task id，哪个 listener
-        log.info("[notify][的响应结果({})]", responseEntity);
+        log.info("[notify][监听器：{}，事件类型：{}，请求头：{}，请求体：{}，响应结果：{}]",
+                DELEGATE_EXPRESSION,
+                delegateTask.getEventName(),
+                headers,
+                body,
+                responseEntity);
         // 4. 是否需要后续操作？TODO 芋艿：待定！
     }
 
@@ -99,14 +106,16 @@ public class BpmUserTaskListener implements TaskListener {
         });
     }
 
-    // TODO @lesan：改成 jdk8 写法哈。主要考虑好兼容！
-    private BpmSimpleModelNodeVO.ListenerHandler getListenerHandlerByEvent(String eventName, BpmSimpleModelNodeVO node) {
-        return switch (eventName) {
-            case TaskListener.EVENTNAME_CREATE -> node.getTaskCreateListener();
-            case TaskListener.EVENTNAME_ASSIGNMENT -> node.getTaskAssignListener();
-            case TaskListener.EVENTNAME_COMPLETE -> node.getTaskCompleteListener();
-            default -> null; // TODO @lesan：这个抛出异常，可控一点
-        };
+    private BpmSimpleModelNodeVO.ListenerHandler getListenerHandlerByEvent(String eventName, List<FlowableListener> node) {
+        FlowableListener flowableListener = node.stream()
+                .filter(item -> item.getEvent().equals(eventName))
+                .findFirst().orElse(null);
+        Assert.notNull(flowableListener, "监听器({})不能为空", flowableListener);
+        FieldExtension fieldExtension = flowableListener.getFieldExtensions().stream()
+                .filter(item -> item.getFieldName().equals("listenerConfig"))
+                .findFirst().orElse(null);
+        Assert.notNull(fieldExtension, "监听器扩展字段({})不能为空", fieldExtension);
+        return JsonUtils.parseObject(fieldExtension.getStringValue(), BpmSimpleModelNodeVO.ListenerHandler.class);
     }
 
 }

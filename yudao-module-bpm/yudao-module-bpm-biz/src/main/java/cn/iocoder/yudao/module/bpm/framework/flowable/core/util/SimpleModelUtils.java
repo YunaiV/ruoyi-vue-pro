@@ -5,6 +5,7 @@ import cn.hutool.core.lang.Assert;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.*;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
+import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.simple.BpmSimpleModelNodeVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.simple.BpmSimpleModelNodeVO.ConditionGroups;
 import cn.iocoder.yudao.module.bpm.enums.definition.*;
@@ -439,9 +440,6 @@ public class SimpleModelUtils {
             }
             // 设置监听器
             addUserTaskListener(node, userTask);
-            // 设置 Simple 设计器节点配置
-            // TODO @lesan：只设置到 flowableListener 里面，整个 node 太大了！因为很多都保存过啦。
-            addSimpleConfigInfo(userTask, node);
             return userTask;
         }
 
@@ -453,6 +451,10 @@ public class SimpleModelUtils {
                 flowableListener.setEvent(TaskListener.EVENTNAME_CREATE);
                 flowableListener.setImplementationType(ImplementationType.IMPLEMENTATION_TYPE_DELEGATEEXPRESSION);
                 flowableListener.setImplementation(DELEGATE_EXPRESSION);
+                FieldExtension fieldExtension = new FieldExtension();
+                fieldExtension.setFieldName("listenerConfig");
+                fieldExtension.setStringValue(JsonUtils.toJsonString(node.getTaskCreateListener()));
+                flowableListener.getFieldExtensions().add(fieldExtension);
                 flowableListeners.add(flowableListener);
             }
             if (node.getTaskAssignListener() != null
@@ -461,6 +463,10 @@ public class SimpleModelUtils {
                 flowableListener.setEvent(TaskListener.EVENTNAME_ASSIGNMENT);
                 flowableListener.setImplementationType(ImplementationType.IMPLEMENTATION_TYPE_DELEGATEEXPRESSION);
                 flowableListener.setImplementation(DELEGATE_EXPRESSION);
+                FieldExtension fieldExtension = new FieldExtension();
+                fieldExtension.setFieldName("listenerConfig");
+                fieldExtension.setStringValue(JsonUtils.toJsonString(node.getTaskAssignListener()));
+                flowableListener.getFieldExtensions().add(fieldExtension);
                 flowableListeners.add(flowableListener);
             }
             if (node.getTaskCompleteListener() != null
@@ -469,6 +475,10 @@ public class SimpleModelUtils {
                 flowableListener.setEvent(TaskListener.EVENTNAME_COMPLETE);
                 flowableListener.setImplementationType(ImplementationType.IMPLEMENTATION_TYPE_DELEGATEEXPRESSION);
                 flowableListener.setImplementation(DELEGATE_EXPRESSION);
+                FieldExtension fieldExtension = new FieldExtension();
+                fieldExtension.setFieldName("listenerConfig");
+                fieldExtension.setStringValue(JsonUtils.toJsonString(node.getTaskCompleteListener()));
+                flowableListener.getFieldExtensions().add(fieldExtension);
                 flowableListeners.add(flowableListener);
             }
             if (CollUtil.isNotEmpty(flowableListeners)) {

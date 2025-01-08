@@ -115,25 +115,6 @@ public class BpmnModelUtils {
     }
 
     /**
-     * 给节点添加Simple设计器配置Json
-     *
-     * @param userTask 节点
-     * @param node 节点对象
-     */
-    public static void addSimpleConfigInfo(FlowElement userTask, Object node) {
-        addExtensionElementJson(userTask, "config", node);
-    }
-
-    /**
-     * 解析Simple设计器配置Json
-     *
-     * @param userTask 节点
-     */
-    public static BpmSimpleModelNodeVO parseSimpleConfigInfo(FlowElement userTask) {
-        return parseExtensionElementJson(userTask, "config", BpmSimpleModelNodeVO.class);
-    }
-
-    /**
      * 给节点添加候选人元素
      *
      * @param candidateStrategy 候选人策略
