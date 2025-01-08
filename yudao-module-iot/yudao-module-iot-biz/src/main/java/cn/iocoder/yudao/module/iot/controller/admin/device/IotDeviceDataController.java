@@ -3,19 +3,19 @@ package cn.iocoder.yudao.module.iot.controller.admin.device;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
-import cn.iocoder.yudao.module.iot.controller.admin.device.vo.deviceData.IotDeviceDataPageReqVO;
-import cn.iocoder.yudao.module.iot.controller.admin.device.vo.deviceData.IotDeviceDataRespVO;
+import cn.iocoder.yudao.module.iot.controller.admin.device.vo.device.IotDeviceSaveReqVO;
+import cn.iocoder.yudao.module.iot.controller.admin.device.vo.deviceData.*;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDataDO;
-import cn.iocoder.yudao.module.iot.controller.admin.device.vo.deviceData.IotTimeDataRespVO;
+import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceLogDO;
+import cn.iocoder.yudao.module.iot.service.device.IotDeviceLogDataService;
 import cn.iocoder.yudao.module.iot.service.device.IotDevicePropertyDataService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
@@ -31,6 +31,12 @@ public class IotDeviceDataController {
     @Resource
     private IotDevicePropertyDataService deviceDataService;
 
+    @Resource
+    private IotDeviceLogDataService iotDeviceLogDataService;
+
+    @Resource
+    private IotDeviceLogDataService deviceLogDataService;
+
     // TODO @浩浩：这里的 /latest-list，包括方法名。
     @GetMapping("/latest")
     @Operation(summary = "获取设备属性最新数据")
@@ -45,6 +51,21 @@ public class IotDeviceDataController {
     public CommonResult<PageResult<IotTimeDataRespVO>> getHistoryDeviceProperties(@Valid IotDeviceDataPageReqVO deviceDataReqVO) {
         PageResult<Map<String, Object>> list = deviceDataService.getHistoryDeviceProperties(deviceDataReqVO);
         return success(BeanUtils.toBean(list, IotTimeDataRespVO.class));
+    }
+    // TODO:数据权限
+    @PostMapping("/simulator")
+    @Operation(summary = "模拟设备")
+    public CommonResult<Boolean> simulatorDevice(@Valid @RequestBody IotDeviceDataSimulatorSaveReqVO simulatorReqVO) {
+        //TODO:先生成一下设备日志  后续完善模拟设备代码逻辑
+        iotDeviceLogDataService.createDeviceLog(simulatorReqVO);
+        return success(true);
+    }
+    // TODO:数据权限
+    @GetMapping("/log/page")
+    @Operation(summary = "获得设备日志分页")
+    public CommonResult<PageResult<IotDeviceLogRespVO>> getDeviceLogPage(@Valid IotDeviceLogPageReqVO pageReqVO) {
+        PageResult<IotDeviceLogDO> pageResult = deviceLogDataService.getDeviceLogPage(pageReqVO);
+        return success(BeanUtils.toBean(pageResult, IotDeviceLogRespVO.class));
     }
 
 }

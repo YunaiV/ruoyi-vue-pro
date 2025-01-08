@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.iot.service.thingmodel;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.module.iot.controller.admin.thingmodel.vo.IotThingModelListReqVO;
 import cn.iocoder.yudao.module.iot.controller.admin.thingmodel.vo.IotThingModelPageReqVO;
 import cn.iocoder.yudao.module.iot.controller.admin.thingmodel.vo.IotThingModelSaveReqVO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.thingmodel.IotThingModelDO;
@@ -69,4 +70,11 @@ public interface IotThingModelService {
      */
     List<IotThingModelDO> getProductThingModelListByProductKey(String productKey);
 
+    /**
+     * 获得产品物模型列表
+     *
+     * @param reqVO 列表查询
+     * @return 产品物模型列表
+     */
+    List<IotThingModelDO> getThingModelList(IotThingModelListReqVO reqVO);
 }

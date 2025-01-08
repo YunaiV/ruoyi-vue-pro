@@ -7,6 +7,7 @@ import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.iot.controller.admin.thingmodel.model.ThingModelEvent;
 import cn.iocoder.yudao.module.iot.controller.admin.thingmodel.model.ThingModelParam;
 import cn.iocoder.yudao.module.iot.controller.admin.thingmodel.model.ThingModelService;
+import cn.iocoder.yudao.module.iot.controller.admin.thingmodel.vo.IotThingModelListReqVO;
 import cn.iocoder.yudao.module.iot.controller.admin.thingmodel.vo.IotThingModelPageReqVO;
 import cn.iocoder.yudao.module.iot.controller.admin.thingmodel.vo.IotThingModelSaveReqVO;
 import cn.iocoder.yudao.module.iot.convert.thingmodel.IotThingModelConvert;
@@ -132,6 +133,11 @@ public class IotThingModelServiceImpl implements IotThingModelService {
     @Override
     public List<IotThingModelDO> getProductThingModelListByProductKey(String productKey) {
         return thingModelMapper.selectListByProductKey(productKey);
+    }
+
+    @Override
+    public List<IotThingModelDO> getThingModelList(IotThingModelListReqVO reqVO) {
+        return thingModelMapper.selectList(reqVO);
     }
 
     /**

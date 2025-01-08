@@ -36,9 +36,6 @@ public class IotProductServiceImpl implements IotProductService {
 
     @Resource
     @Lazy  // 延迟加载，解决循环依赖
-    private IotThingModelMessageService thingModelMessageService;
-    @Resource
-    @Lazy  // 延迟加载，解决循环依赖
     private IotDevicePropertyDataService devicePropertyDataService;
 
     @Override
@@ -125,8 +122,7 @@ public class IotProductServiceImpl implements IotProductService {
         if (Objects.equals(status, IotProductStatusEnum.PUBLISHED.getStatus())) {
             // 3.1 创建产品超级表数据模型
             devicePropertyDataService.defineDevicePropertyData(id);
-            // 3.2 创建物模型日志超级表数据模型 TODO 待定：message 要不要分；
-            thingModelMessageService.createSuperTable(id);
+
         }
         productMapper.updateById(updateObj);
     }
