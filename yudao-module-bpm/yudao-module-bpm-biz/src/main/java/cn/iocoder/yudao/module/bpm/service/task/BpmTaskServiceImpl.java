@@ -64,6 +64,7 @@ import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionU
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
 import static cn.iocoder.yudao.module.bpm.enums.ErrorCodeConstants.*;
 import static cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnVariableConstants.PROCESS_INSTANCE_VARIABLE_RETURN_FLAG;
+import static cn.iocoder.yudao.module.bpm.framework.flowable.core.util.BpmnModelUtils.parseSignEnable;
 
 /**
  * 流程任务实例 Service 实现类
@@ -161,13 +162,17 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         BpmnModel bpmnModel = bpmProcessDefinitionService.getProcessDefinitionBpmnModel(todoTask.getProcessDefinitionId());
         Map<Integer, BpmTaskRespVO.OperationButtonSetting> buttonsSetting = BpmnModelUtils.parseButtonsSetting(
                 bpmnModel, todoTask.getTaskDefinitionKey());
+        Boolean signEnable = parseSignEnable(bpmnModel, todoTask.getTaskDefinitionKey());
 
         // 4. 任务表单
         BpmFormDO taskForm = null;
         if (StrUtil.isNotBlank(todoTask.getFormKey())){
             taskForm = formService.getForm(NumberUtils.parseLong(todoTask.getFormKey()));
         }
-        return BpmTaskConvert.INSTANCE.buildTodoTask(todoTask, childrenTasks, buttonsSetting, taskForm);
+
+        BpmTaskRespVO bpmTaskRespVO = BpmTaskConvert.INSTANCE.buildTodoTask(todoTask, childrenTasks, buttonsSetting, taskForm);
+        bpmTaskRespVO.setSignEnable(signEnable);
+        return bpmTaskRespVO;
     }
 
     @Override

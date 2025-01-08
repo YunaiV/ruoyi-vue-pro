@@ -60,6 +60,9 @@ public class BpmSimpleModelNodeVO {
     @Schema(description = "操作按钮设置", example = "[]")
     private List<OperationButtonSetting> buttonsSetting;  // 用于审批节点
 
+    @Schema(description = "是否需要签名", example = "false")
+    private Boolean signEnable;
+
     /**
      * 审批节点拒绝处理
      */

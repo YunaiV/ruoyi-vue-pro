@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.bpm.framework.flowable.core.util;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.convert.Convert;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.ObjUtil;
@@ -365,6 +366,26 @@ public class BpmnModelUtils {
         }
         ExtensionElement extensionElement = CollUtil.getFirst(boundaryEvent.getExtensionElements().get(customElement));
         return Optional.ofNullable(extensionElement).map(ExtensionElement::getElementText).orElse(null);
+    }
+
+    public static void addSignEnable(Boolean signEnable, FlowElement userTask) {
+        if (ObjUtil.isNotNull(signEnable)) {
+            addExtensionElement(userTask, SIGN_ENABLE, signEnable.toString());
+        } else {
+            addExtensionElement(userTask, SIGN_ENABLE, "false");
+        }
+    }
+
+    public static Boolean parseSignEnable(BpmnModel bpmnModel, String flowElementId) {
+        FlowElement flowElement = getFlowElementById(bpmnModel, flowElementId);
+        if (flowElement == null) {
+            return false;
+        }
+        List<ExtensionElement> extensionElements = flowElement.getExtensionElements().get(SIGN_ENABLE);
+        if (CollUtil.isEmpty(extensionElements)) {
+            return false;
+        }
+        return Convert.toBool(extensionElements.get(0).getElementText(), false);
     }
 
     // ========== BPM 简单查找相关的方法 ==========

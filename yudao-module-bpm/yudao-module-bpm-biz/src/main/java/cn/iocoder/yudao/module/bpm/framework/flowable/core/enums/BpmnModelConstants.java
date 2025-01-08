@@ -110,4 +110,9 @@ public interface BpmnModelConstants {
      */
     String START_USER_NODE_ID = "StartUserNode";
 
+    /**
+     * 是否需要签名
+     */
+    String SIGN_ENABLE = "signEnable";
+
 }

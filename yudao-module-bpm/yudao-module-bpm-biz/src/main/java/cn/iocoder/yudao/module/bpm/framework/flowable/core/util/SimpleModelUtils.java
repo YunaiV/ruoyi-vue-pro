@@ -440,6 +440,8 @@ public class SimpleModelUtils {
             }
             // 设置监听器
             addUserTaskListener(node, userTask);
+            // 添加是否需要签名
+            addSignEnable(node.getSignEnable(), userTask);
             return userTask;
         }
 
