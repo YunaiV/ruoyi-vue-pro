@@ -439,28 +439,32 @@ public class SimpleModelUtils {
             }
             // 设置监听器
             addUserTaskListener(node, userTask);
-            // 设置Simple设计器节点配置
+            // 设置 Simple 设计器节点配置
+            // TODO @lesan：只设置到 flowableListener 里面，整个 node 太大了！因为很多都保存过啦。
             addSimpleConfigInfo(userTask, node);
             return userTask;
         }
 
         private void addUserTaskListener(BpmSimpleModelNodeVO node, UserTask userTask) {
             List<FlowableListener> flowableListeners = new ArrayList<>(3);
-            if (node.getTaskCreateListener().getEnable()) {
+            if (node.getTaskCreateListener() != null
+                && Boolean.TRUE.equals(node.getTaskCreateListener().getEnable())) {
                 FlowableListener flowableListener = new FlowableListener();
                 flowableListener.setEvent(TaskListener.EVENTNAME_CREATE);
                 flowableListener.setImplementationType(ImplementationType.IMPLEMENTATION_TYPE_DELEGATEEXPRESSION);
                 flowableListener.setImplementation(DELEGATE_EXPRESSION);
                 flowableListeners.add(flowableListener);
             }
-            if (node.getTaskAssignListener().getEnable()) {
+            if (node.getTaskAssignListener() != null
+                && Boolean.TRUE.equals(node.getTaskAssignListener().getEnable())) {
                 FlowableListener flowableListener = new FlowableListener();
                 flowableListener.setEvent(TaskListener.EVENTNAME_ASSIGNMENT);
                 flowableListener.setImplementationType(ImplementationType.IMPLEMENTATION_TYPE_DELEGATEEXPRESSION);
                 flowableListener.setImplementation(DELEGATE_EXPRESSION);
                 flowableListeners.add(flowableListener);
             }
-            if (node.getTaskCompleteListener().getEnable()) {
+            if (node.getTaskCompleteListener() != null
+                && Boolean.TRUE.equals(node.getTaskCompleteListener().getEnable())) {
                 FlowableListener flowableListener = new FlowableListener();
                 flowableListener.setEvent(TaskListener.EVENTNAME_COMPLETE);
                 flowableListener.setImplementationType(ImplementationType.IMPLEMENTATION_TYPE_DELEGATEEXPRESSION);

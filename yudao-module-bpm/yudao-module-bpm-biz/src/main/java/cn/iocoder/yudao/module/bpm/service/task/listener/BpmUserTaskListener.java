@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.bpm.service.task.listener;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.simple.BpmSimpleModelNodeVO;
 import cn.iocoder.yudao.module.bpm.enums.definition.BpmListenerMapType;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.util.BpmnModelUtils;
@@ -24,6 +25,7 @@ import org.springframework.web.client.RestTemplate;
 import java.util.List;
 import java.util.Map;
 
+import static cn.iocoder.yudao.framework.web.core.util.WebFrameworkUtils.HEADER_TENANT_ID;
 import static cn.iocoder.yudao.module.bpm.framework.flowable.core.util.BpmnModelUtils.parseSimpleConfigInfo;
 
 /**
@@ -62,18 +64,23 @@ public class BpmUserTaskListener implements TaskListener {
         parseListenerMap(listenerHandler.getHeader(), processVariables, headers);
         parseListenerMap(listenerHandler.getBody(), processVariables, body);
         // 2.1 请求头默认参数
-        headers.add("tenant-id", delegateTask.getTenantId());
+        if (StrUtil.isNotEmpty(delegateTask.getTenantId())) {
+            headers.add(HEADER_TENANT_ID, delegateTask.getTenantId());
+        }
         // 2.2 请求体默认参数
+        // TODO @芋艿：哪些默认参数，后续再调研下；
         body.add("processInstanceId", delegateTask.getProcessInstanceId());
         body.add("assignee", delegateTask.getAssignee());
         body.add("taskDefinitionKey", delegateTask.getTaskDefinitionKey());
         body.add("taskId", delegateTask.getId());
 
         // 3. 异步发起请求
+        // TODO @芋艿：确认要同步，还是异步
         HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity<>(body, headers);
         ResponseEntity<String> responseEntity = restTemplate.exchange(listenerHandler.getPath(), HttpMethod.POST,
                 requestEntity, String.class);
-        log.info("[BpmUserTaskListener][的响应结果({})]", responseEntity);
+        // TODO @lesan：日志打印，可以更全哈，例如说，请求参数、对应的 task id，哪个 listener
+        log.info("[notify][的响应结果({})]", responseEntity);
         // 4. 是否需要后续操作？TODO 芋艿：待定！
     }
 
@@ -92,12 +99,13 @@ public class BpmUserTaskListener implements TaskListener {
         });
     }
 
+    // TODO @lesan：改成 jdk8 写法哈。主要考虑好兼容！
     private BpmSimpleModelNodeVO.ListenerHandler getListenerHandlerByEvent(String eventName, BpmSimpleModelNodeVO node) {
         return switch (eventName) {
             case TaskListener.EVENTNAME_CREATE -> node.getTaskCreateListener();
             case TaskListener.EVENTNAME_ASSIGNMENT -> node.getTaskAssignListener();
             case TaskListener.EVENTNAME_COMPLETE -> node.getTaskCompleteListener();
-            default -> null;
+            default -> null; // TODO @lesan：这个抛出异常，可控一点
         };
     }
 
