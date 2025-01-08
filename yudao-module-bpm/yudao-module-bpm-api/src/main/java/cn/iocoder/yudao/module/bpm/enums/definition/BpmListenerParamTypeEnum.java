@@ -6,7 +6,6 @@ import lombok.Getter;
 
 import java.util.Arrays;
 
-// TODO @lesan：BpmListenerParamTypeEnum
 /**
  * BPM 任务监听器键值对类型
  *
@@ -14,7 +13,7 @@ import java.util.Arrays;
  */
 @Getter
 @AllArgsConstructor
-public enum BpmListenerMapType implements IntArrayValuable {
+public enum BpmListenerParamTypeEnum implements IntArrayValuable {
 
     FIXED_VALUE(1, "固定值"),
     FROM_FORM(2, "表单");
@@ -22,7 +21,7 @@ public enum BpmListenerMapType implements IntArrayValuable {
     private final Integer type;
     private final String name;
 
-    public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(BpmListenerMapType::getType).toArray();
+    public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(BpmListenerParamTypeEnum::getType).toArray();
 
     @Override
     public int[] array() {

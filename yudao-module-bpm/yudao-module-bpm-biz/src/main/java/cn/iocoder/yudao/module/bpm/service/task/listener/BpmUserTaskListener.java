@@ -3,7 +3,7 @@ package cn.iocoder.yudao.module.bpm.service.task.listener;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.simple.BpmSimpleModelNodeVO;
-import cn.iocoder.yudao.module.bpm.enums.definition.BpmListenerMapType;
+import cn.iocoder.yudao.module.bpm.enums.definition.BpmListenerParamTypeEnum;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.util.BpmnModelUtils;
 import cn.iocoder.yudao.module.bpm.service.definition.BpmModelService;
 import cn.iocoder.yudao.module.bpm.service.task.BpmProcessInstanceService;
@@ -84,16 +84,16 @@ public class BpmUserTaskListener implements TaskListener {
         // 4. 是否需要后续操作？TODO 芋艿：待定！
     }
 
-    private void parseListenerMap(List<BpmSimpleModelNodeVO.ListenerHandler.ListenerMap> list,
+    private void parseListenerMap(List<BpmSimpleModelNodeVO.ListenerHandler.ListenerParam> list,
                                   Map<String, Object> processVariables,
                                   MultiValueMap<String, String> to) {
         if (CollUtil.isEmpty(list)) {
             return;
         }
         list.forEach(item -> {
-            if (item.getType().equals(BpmListenerMapType.FIXED_VALUE.getType())) {
+            if (item.getType().equals(BpmListenerParamTypeEnum.FIXED_VALUE.getType())) {
                 to.add(item.getKey(), item.getValue());
-            } else if (item.getType().equals(BpmListenerMapType.FROM_FORM.getType())) {
+            } else if (item.getType().equals(BpmListenerParamTypeEnum.FROM_FORM.getType())) {
                 to.add(item.getKey(), processVariables.get(item.getValue()).toString());
             }
         });

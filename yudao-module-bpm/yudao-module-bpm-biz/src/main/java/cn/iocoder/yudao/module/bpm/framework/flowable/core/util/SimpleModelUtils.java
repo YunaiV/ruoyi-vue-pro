@@ -200,7 +200,7 @@ public class SimpleModelUtils {
         // 3. 遍历分支节点
         if (nodeType == BpmSimpleModelNodeType.ROUTE_BRANCH_NODE) {
             // 路由分支遍历
-            for (BpmSimpleModelNodeVO.RouteCondition route : node.getRouteGroups()) {
+            for (BpmSimpleModelNodeVO.RouteCondition route : node.getRouterGroups()) {
                 SequenceFlow sequenceFlow = RouteBranchNodeConvert.buildSequenceFlow(node.getId(), route);
                 process.addFlowElement(sequenceFlow);
             }
