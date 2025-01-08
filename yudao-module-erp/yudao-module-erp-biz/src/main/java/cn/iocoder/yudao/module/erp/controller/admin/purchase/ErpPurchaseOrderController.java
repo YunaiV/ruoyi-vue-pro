@@ -16,6 +16,7 @@ import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseOrderDO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseOrderItemDO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpSupplierDO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.stock.ErpWarehouseDO;
+import cn.iocoder.yudao.module.erp.enums.ErpAuditStatus;
 import cn.iocoder.yudao.module.erp.service.product.ErpProductService;
 import cn.iocoder.yudao.module.erp.service.purchase.ErpPurchaseOrderService;
 import cn.iocoder.yudao.module.erp.service.purchase.ErpSupplierService;
@@ -181,10 +182,14 @@ public class ErpPurchaseOrderController {
                             item.setWarehouseName(warehouseMap.get(item.getWarehouseId()).getName());
                         }
 //                        item.setWarehouseName(erpWarehouseService.getWarehouse(item.getWarehouseId()).getName());//设置仓库名称
-//                        item.setWarehouseName(erpWarehouseService.getWarehouse(item.getWarehouseId()).getName());//设置仓库名称
 
                     } ));
             purchaseOrder.setProductNames(CollUtil.join(purchaseOrder.getItems(), "，", ErpPurchaseOrderRespVO.Item::getProductName));
+            String statusDescription = ErpAuditStatus.getDescriptionByStatus(purchaseOrder.getStatus());
+            if (statusDescription != null) {
+                purchaseOrder.setStatusDesc(statusDescription);
+            }//根据状态编号设置状态映射描述
+            purchaseOrder.setStatus(purchaseOrder.getStatus());//设置采购状态
             MapUtils.findAndThen(supplierMap, purchaseOrder.getSupplierId(), supplier -> purchaseOrder.setSupplierName(supplier.getName()));
             MapUtils.findAndThen(userMap, Long.parseLong(purchaseOrder.getCreator()), user -> purchaseOrder.setCreatorName(user.getNickname()));
             MapUtils.findAndThen(deptMap, purchaseOrder.getDepartmentId(), deptRespDTO -> purchaseOrder.setDepartmentName(deptRespDTO.getName()));//部门信息

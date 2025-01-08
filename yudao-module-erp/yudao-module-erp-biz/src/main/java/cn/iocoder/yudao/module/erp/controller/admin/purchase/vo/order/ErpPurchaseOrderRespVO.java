@@ -23,9 +23,12 @@ public class ErpPurchaseOrderRespVO {
     @ExcelProperty("采购单编号")
     private String no;
 
-    @Schema(description = "采购状态", requiredMode = Schema.RequiredMode.REQUIRED, example = "2")
-    @ExcelProperty("采购状态")
+    @Schema(description = "采购状态编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "2")
     private Integer status;
+
+    @Schema(description = "采购状态描述", example = "审核中")
+    @ExcelProperty("采购状态")
+    private String statusDesc;
 
     @Schema(description = "供应商编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1724")
     private Long supplierId;
