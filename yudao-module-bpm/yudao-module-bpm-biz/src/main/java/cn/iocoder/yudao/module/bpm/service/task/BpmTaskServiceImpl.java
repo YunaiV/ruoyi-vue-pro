@@ -482,6 +482,12 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         if (instance == null) {
             throw exception(PROCESS_INSTANCE_NOT_EXISTS);
         }
+        // 1.3 校验签名
+        BpmnModel bpmnModel = modelService.getBpmnModelByDefinitionId(task.getProcessDefinitionId());
+        Boolean signEnable = parseSignEnable(bpmnModel, task.getTaskDefinitionKey());
+        if (signEnable && StrUtil.isEmpty(reqVO.getSign())) {
+            throw exception(TASK_SIGNATURE_NOT_EXISTS);
+        }
 
         // 情况一：被委派的任务，不调用 complete 去完成任务
         if (DelegationState.PENDING.equals(task.getDelegationState())) {
@@ -496,8 +502,11 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         }
 
         // 情况三：审批普通的任务。大多数情况下，都是这样
-        // 2.1 更新 task 状态、原因
+        // 2.1 更新 task 状态、原因、签字
         updateTaskStatusAndReason(task.getId(), BpmTaskStatusEnum.APPROVE.getStatus(), reqVO.getReason());
+        if (signEnable) {
+            taskService.setVariableLocal(task.getId(), BpmnVariableConstants.TASK_VARIABLE_SIGN, reqVO.getSign());
+        }
         // 2.2 添加评论
         taskService.addComment(task.getId(), task.getProcessInstanceId(), BpmCommentTypeEnum.APPROVE.getType(),
                 BpmCommentTypeEnum.APPROVE.formatComment(reqVO.getReason()));

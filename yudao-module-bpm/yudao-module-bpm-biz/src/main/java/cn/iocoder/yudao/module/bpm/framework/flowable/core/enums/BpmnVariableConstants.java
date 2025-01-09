@@ -59,4 +59,6 @@ public class BpmnVariableConstants {
      */
     public static final String TASK_VARIABLE_REASON = "TASK_REASON";
 
+    public static final String TASK_VARIABLE_SIGN = "TASK_SIGN";
+
 }

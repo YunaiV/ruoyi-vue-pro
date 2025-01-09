@@ -18,6 +18,9 @@ public class BpmTaskApproveReqVO {
     @NotEmpty(message = "审批意见不能为空")
     private String reason;
 
+    @Schema(description = "签名", example = "http://xxx")
+    private String sign;
+
     @Schema(description = "变量实例（动态表单）", requiredMode = Schema.RequiredMode.REQUIRED)
     private Map<String, Object> variables;
 
