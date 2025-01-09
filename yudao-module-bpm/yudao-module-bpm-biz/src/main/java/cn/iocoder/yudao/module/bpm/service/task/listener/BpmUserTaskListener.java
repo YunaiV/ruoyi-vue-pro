@@ -3,7 +3,6 @@ package cn.iocoder.yudao.module.bpm.service.task.listener;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.StrUtil;
-import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.simple.BpmSimpleModelNodeVO;
 import cn.iocoder.yudao.module.bpm.enums.definition.BpmListenerParamTypeEnum;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.util.BpmnModelUtils;
@@ -12,7 +11,6 @@ import cn.iocoder.yudao.module.bpm.service.task.BpmProcessInstanceService;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.flowable.bpmn.model.BpmnModel;
-import org.flowable.bpmn.model.FieldExtension;
 import org.flowable.bpmn.model.FlowableListener;
 import org.flowable.bpmn.model.UserTask;
 import org.flowable.engine.delegate.TaskListener;
@@ -30,6 +28,7 @@ import java.util.List;
 import java.util.Map;
 
 import static cn.iocoder.yudao.framework.web.core.util.WebFrameworkUtils.HEADER_TENANT_ID;
+import static cn.iocoder.yudao.module.bpm.framework.flowable.core.util.BpmnModelUtils.parseListenerConfig;
 
 /**
  * BPM 用户任务通用监听器
@@ -112,12 +111,7 @@ public class BpmUserTaskListener implements TaskListener {
                 .filter(item -> item.getEvent().equals(eventName))
                 .findFirst().orElse(null);
         Assert.notNull(flowableListener, "监听器({})不能为空", flowableListener);
-        // TODO @lesan：BpmnModelUtils 提供一个 BpmSimpleModelNodeVO.ListenerHandler 解析方法，尽量收敛掉。
-        FieldExtension fieldExtension = flowableListener.getFieldExtensions().stream()
-                .filter(item -> item.getFieldName().equals("listenerConfig"))
-                .findFirst().orElse(null);
-        Assert.notNull(fieldExtension, "监听器扩展字段({})不能为空", fieldExtension);
-        return JsonUtils.parseObject(fieldExtension.getStringValue(), BpmSimpleModelNodeVO.ListenerHandler.class);
+        return parseListenerConfig(flowableListener);
     }
 
 }

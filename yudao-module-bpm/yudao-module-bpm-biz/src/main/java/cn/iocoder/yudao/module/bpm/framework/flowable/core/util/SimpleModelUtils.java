@@ -452,7 +452,7 @@ public class SimpleModelUtils {
                 flowableListener.setEvent(TaskListener.EVENTNAME_CREATE);
                 flowableListener.setImplementationType(ImplementationType.IMPLEMENTATION_TYPE_DELEGATEEXPRESSION);
                 flowableListener.setImplementation(DELEGATE_EXPRESSION);
-                addListenerFieldExtension(flowableListener, node.getTaskCreateListener());
+                addListenerConfig(flowableListener, node.getTaskCreateListener());
                 flowableListeners.add(flowableListener);
             }
             if (node.getTaskAssignListener() != null
@@ -461,7 +461,7 @@ public class SimpleModelUtils {
                 flowableListener.setEvent(TaskListener.EVENTNAME_ASSIGNMENT);
                 flowableListener.setImplementationType(ImplementationType.IMPLEMENTATION_TYPE_DELEGATEEXPRESSION);
                 flowableListener.setImplementation(DELEGATE_EXPRESSION);
-                addListenerFieldExtension(flowableListener, node.getTaskAssignListener());
+                addListenerConfig(flowableListener, node.getTaskAssignListener());
                 flowableListeners.add(flowableListener);
             }
             if (node.getTaskCompleteListener() != null
@@ -470,7 +470,7 @@ public class SimpleModelUtils {
                 flowableListener.setEvent(TaskListener.EVENTNAME_COMPLETE);
                 flowableListener.setImplementationType(ImplementationType.IMPLEMENTATION_TYPE_DELEGATEEXPRESSION);
                 flowableListener.setImplementation(DELEGATE_EXPRESSION);
-                addListenerFieldExtension(flowableListener, node.getTaskCompleteListener());
+                addListenerConfig(flowableListener, node.getTaskCompleteListener());
                 flowableListeners.add(flowableListener);
             }
             if (CollUtil.isNotEmpty(flowableListeners)) {

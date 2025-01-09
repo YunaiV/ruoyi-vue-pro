@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.bpm.framework.flowable.core.util;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.convert.Convert;
+import cn.hutool.core.lang.Assert;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.*;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
@@ -362,11 +363,19 @@ public class BpmnModelUtils {
         return Convert.toBool(extensionElements.get(0).getElementText(), false);
     }
 
-    public static void addListenerFieldExtension(FlowableListener flowableListener, Object obj) {
+    public static void addListenerConfig(FlowableListener flowableListener, BpmSimpleModelNodeVO.ListenerHandler handler) {
         FieldExtension fieldExtension = new FieldExtension();
         fieldExtension.setFieldName("listenerConfig");
-        fieldExtension.setStringValue(JsonUtils.toJsonString(obj));
+        fieldExtension.setStringValue(JsonUtils.toJsonString(handler));
         flowableListener.getFieldExtensions().add(fieldExtension);
+    }
+
+    public static BpmSimpleModelNodeVO.ListenerHandler parseListenerConfig(FlowableListener flowableListener) {
+        FieldExtension fieldExtension = flowableListener.getFieldExtensions().stream()
+                .filter(item -> item.getFieldName().equals("listenerConfig"))
+                .findFirst().orElse(null);
+        Assert.notNull(fieldExtension, "监听器扩展字段({})不能为空", fieldExtension);
+        return JsonUtils.parseObject(fieldExtension.getStringValue(), BpmSimpleModelNodeVO.ListenerHandler.class);
     }
 
     // ========== BPM 简单查找相关的方法 ==========
