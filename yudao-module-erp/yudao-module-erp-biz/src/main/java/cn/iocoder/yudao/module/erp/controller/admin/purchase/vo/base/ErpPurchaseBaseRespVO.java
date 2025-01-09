@@ -55,7 +55,7 @@ public class ErpPurchaseBaseRespVO {
 
     @Schema(description = "审核状态描述")
     @ExcelProperty("审核时间描述")
-    protected Integer AuditStatusDesc;
+    protected String AuditStatusDesc;
 
     // ========== 采购订单金额(钱)开始 ==========
     @Schema(description = "结算账户编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "311.89")
@@ -96,6 +96,12 @@ public class ErpPurchaseBaseRespVO {
 
     @Schema(description = "汇率,财务管理-币别维护", example = "5.8")
     private BigDecimal exchangeRate;
+
+    @Schema(description = "币别id")
+    private Long currencyId;
+
+    @Schema(description = "币别名称")
+    private Long currencyName;
     // ========== 采购订单金额(钱)结束 ==========
 
     // ========== 订单产品合计-开始 ==========
