@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.order;
 
+import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.base.ErpPurchaseBaseRespVO;
 import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
 import com.alibaba.excel.annotation.ExcelProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -13,82 +14,23 @@ import java.util.List;
 @Schema(description = "管理后台 - ERP 采购订单 Response VO")
 @Data
 @ExcelIgnoreUnannotated
-public class ErpPurchaseOrderRespVO {
-
-    @Schema(description = "编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "17386")
-    @ExcelProperty("编号")
-    private Long id;
+public class ErpPurchaseOrderBaseRespVO extends ErpPurchaseBaseRespVO {
 
     @Schema(description = "采购单编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "XS001")
     @ExcelProperty("采购单编号")
     private String no;
 
     @Schema(description = "采购状态编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "2")
+    @ExcelProperty("采购状态编号")
     private Integer status;
 
     @Schema(description = "采购状态描述", example = "审核中")
     @ExcelProperty("采购状态")
     private String statusDesc;
 
-    @Schema(description = "供应商编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1724")
-    private Long supplierId;
-    @Schema(description = "供应商名称", example = "芋道")
-    @ExcelProperty("供应商名称")
-    private String supplierName;
-
-    @Schema(description = "结算账户编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "311.89")
-    @ExcelProperty("结算账户编号")
-    private Long accountId;
-
     @Schema(description = "采购时间", requiredMode = Schema.RequiredMode.REQUIRED)
     @ExcelProperty("采购时间")
     private LocalDateTime orderTime;
-
-    @Schema(description = "合计数量", requiredMode = Schema.RequiredMode.REQUIRED, example = "15663")
-    @ExcelProperty("合计数量")
-    private BigDecimal totalCount;
-    @Schema(description = "最终合计价格", requiredMode = Schema.RequiredMode.REQUIRED, example = "24906")
-    @ExcelProperty("最终合计价格")
-    private BigDecimal totalPrice;
-
-    @Schema(description = "合计产品价格，单位：元", requiredMode = Schema.RequiredMode.REQUIRED, example = "7127")
-    private BigDecimal totalProductPrice;
-
-    @Schema(description = "合计税额，单位：元", requiredMode = Schema.RequiredMode.REQUIRED, example = "7127")
-    private BigDecimal totalTaxPrice;
-
-    @Schema(description = "优惠率，百分比", requiredMode = Schema.RequiredMode.REQUIRED, example = "99.88")
-    private BigDecimal discountPercent;
-
-    @Schema(description = "优惠金额，单位：元", requiredMode = Schema.RequiredMode.REQUIRED, example = "7127")
-    private BigDecimal discountPrice;
-
-    @Schema(description = "定金金额，单位：元", requiredMode = Schema.RequiredMode.REQUIRED, example = "7127")
-    private BigDecimal depositPrice;
-
-    @Schema(description = "附件地址", example = "https://www.iocoder.cn")
-    @ExcelProperty("附件地址")
-    private String fileUrl;
-
-    @Schema(description = "备注", example = "你猜")
-    @ExcelProperty("备注")
-    private String remark;
-
-    @Schema(description = "创建人", example = "芋道")
-    private String creator;
-
-    @Schema(description = "创建人部门编号", example = "12")
-    private Long departmentId;
-
-    @Schema(description = "创建人部门名称", example = "xx事业部")
-    private String departmentName;
-
-    @Schema(description = "创建人名称", example = "芋道")
-    private String creatorName;
-
-    @Schema(description = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED)
-    @ExcelProperty("创建时间")
-    private LocalDateTime createTime;
 
     @Schema(description = "订单项列表", requiredMode = Schema.RequiredMode.REQUIRED)
     private List<Item> items;
@@ -106,6 +48,7 @@ public class ErpPurchaseOrderRespVO {
 
     @Schema(description = "订单采购退货数量", requiredMode = Schema.RequiredMode.REQUIRED, example = "100.00")
     private BigDecimal totalReturnCount;
+
 
     @Data
     public static class Item {
@@ -131,6 +74,9 @@ public class ErpPurchaseOrderRespVO {
 
         @Schema(description = "税额，单位：元", example = "100.00")
         private BigDecimal taxPrice;
+
+        @Schema(description = "价税合计")
+        private double allAmount;
 
         @Schema(description = "备注", example = "随便")
         private String remark;
@@ -159,12 +105,23 @@ public class ErpPurchaseOrderRespVO {
         private Long warehouseId; // 该字段仅仅在“详情”和“编辑”时使用
         @Schema(description = "产品存放仓库名称")
         private String warehouseName; // 该字段仅仅在“详情”和“编辑”时使用
-//        @Schema(description = "仓位Id")
-//        private String spId;
-//        @Schema(description = "仓位名称")
-//        private String spName;
-//        @Schema(description = "仓位编码")
-//        private String spNumber;
+
+        @Schema(description = "报关品名-产品(产品的品牌)")
+        private String customsDeclaration;
+
+        @Schema(description = "源单行号")
+        private int srcSeq;
+        // 源单类型ID
+//        private String srcBillTypeId;
+
+        @Schema(description = "源单类型")
+        private String srcBillTypeName;
+
+        @Schema(description = "源单单号")
+        private int srcNo;
+
+        @Schema(description = "箱率")
+        private String containerRate;//箱率
     }
 
 }

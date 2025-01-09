@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.returns;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
@@ -41,6 +42,9 @@ public class ErpPurchaseReturnSaveReqVO {
     @Schema(description = "退货清单列表")
     private List<Item> items;
 
+    @Schema(description = "币别ID,财务管理-币别维护")
+    private Long currencyId;
+
     @Data
     public static class Item {
 
@@ -70,12 +74,15 @@ public class ErpPurchaseReturnSaveReqVO {
         @NotNull(message = "产品数量不能为空")
         private BigDecimal count;
 
-        @Schema(description = "税率，百分比", example = "99.88")
+        @Schema(description = "增值税税率，百分比", example = "99.88")
         private BigDecimal taxPercent;
 
         @Schema(description = "备注", example = "随便")
         private String remark;
 
+        @Schema(description = "含税单价", example = "100.00")
+        @DecimalMin(value = "0.00", message = "含税单价不能小于0")
+        private BigDecimal actTaxPrice;
     }
 
 }

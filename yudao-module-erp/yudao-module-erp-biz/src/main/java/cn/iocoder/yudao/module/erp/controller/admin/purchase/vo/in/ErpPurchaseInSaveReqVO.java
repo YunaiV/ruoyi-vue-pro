@@ -30,8 +30,8 @@ public class ErpPurchaseInSaveReqVO {
     @Schema(description = "币别ID,财务管理-币别维护")
     private Long currencyId;
 
-    @Schema(description = "汇率,财务管理-币别维护",example = "5.8")
-    private BigDecimal exchangeRate;
+//    @Schema(description = "汇率,财务管理-币别维护",example = "5.8")
+//    private BigDecimal exchangeRate;
 
     @Schema(description = "审核人ID")
     private String auditorId;
@@ -123,6 +123,7 @@ public class ErpPurchaseInSaveReqVO {
 
         @Schema(description = "箱率")
         private String containerRate;//箱率
+
 
     }
 

@@ -74,9 +74,9 @@ public class ErpPurchaseOrderSaveReqVO {
         @DecimalMin(value = "0.00", message = "产品单价不能小于0")
         private BigDecimal productPrice;
 
-        @Schema(description = "含税产品单价", example = "100.00")
-        @DecimalMin(value = "0.00", message = "含税产品单价不能小于0")
-        private BigDecimal totalTaxPrice;
+        @Schema(description = "含税单价", example = "100.00")
+        @DecimalMin(value = "0.00", message = "含税单价不能小于0")
+        private BigDecimal actTaxPrice;
 
         @Schema(description = "产品数量", requiredMode = Schema.RequiredMode.REQUIRED, example = "100.00")
         @NotNull(message = "产品数量不能为空")

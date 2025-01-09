@@ -10,7 +10,7 @@ import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.yudao.module.erp.controller.admin.product.vo.product.ErpProductRespVO;
 import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.order.ErpPurchaseOrderPageReqVO;
-import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.order.ErpPurchaseOrderRespVO;
+import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.order.ErpPurchaseOrderBaseRespVO;
 import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.order.ErpPurchaseOrderSaveReqVO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseOrderDO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseOrderItemDO;
@@ -108,7 +108,7 @@ public class ErpPurchaseOrderController {
     @Operation(summary = "获得采购订单")
     @Parameter(name = "id", description = "编号", required = true, example = "1024")
     @PreAuthorize("@ss.hasPermission('erp:purchase-order:query')")
-    public CommonResult<ErpPurchaseOrderRespVO> getPurchaseOrder(@RequestParam("id") Long id) {
+    public CommonResult<ErpPurchaseOrderBaseRespVO> getPurchaseOrder(@RequestParam("id") Long id) {
         ErpPurchaseOrderDO purchaseOrder = purchaseOrderService.getPurchaseOrder(id);
         if (purchaseOrder == null) {
             return success(null);
@@ -116,8 +116,8 @@ public class ErpPurchaseOrderController {
         List<ErpPurchaseOrderItemDO> purchaseOrderItemList = purchaseOrderService.getPurchaseOrderItemListByOrderId(id);
         Map<Long, ErpProductRespVO> productMap = productService.getProductVOMap(
                 convertSet(purchaseOrderItemList, ErpPurchaseOrderItemDO::getProductId));
-        return success(BeanUtils.toBean(purchaseOrder, ErpPurchaseOrderRespVO.class, purchaseOrderVO ->
-                purchaseOrderVO.setItems(BeanUtils.toBean(purchaseOrderItemList, ErpPurchaseOrderRespVO.Item.class, item -> {
+        return success(BeanUtils.toBean(purchaseOrder, ErpPurchaseOrderBaseRespVO.class, purchaseOrderVO ->
+                purchaseOrderVO.setItems(BeanUtils.toBean(purchaseOrderItemList, ErpPurchaseOrderBaseRespVO.Item.class, item -> {
                     BigDecimal purchaseCount = stockService.getStockCount(item.getProductId());
                     item.setCount(purchaseCount != null ? purchaseCount : BigDecimal.ZERO);
                     MapUtils.findAndThen(productMap, item.getProductId(), product -> item.setProductName(product.getName())
@@ -128,7 +128,7 @@ public class ErpPurchaseOrderController {
     @GetMapping("/page")
     @Operation(summary = "获得采购订单分页")
     @PreAuthorize("@ss.hasPermission('erp:purchase-order:query')")
-    public CommonResult<PageResult<ErpPurchaseOrderRespVO>> getPurchaseOrderPage(@Valid ErpPurchaseOrderPageReqVO pageReqVO) {
+    public CommonResult<PageResult<ErpPurchaseOrderBaseRespVO>> getPurchaseOrderPage(@Valid ErpPurchaseOrderPageReqVO pageReqVO) {
         PageResult<ErpPurchaseOrderDO> pageResult = purchaseOrderService.getPurchaseOrderPage(pageReqVO);
         return success(buildPurchaseOrderVOPageResult(pageResult));
     }
@@ -140,12 +140,12 @@ public class ErpPurchaseOrderController {
     public void exportPurchaseOrderExcel(@Valid ErpPurchaseOrderPageReqVO pageReqVO,
                                     HttpServletResponse response) throws IOException {
         pageReqVO.setPageSize(PageParam.PAGE_SIZE_NONE);
-        List<ErpPurchaseOrderRespVO> list = buildPurchaseOrderVOPageResult(purchaseOrderService.getPurchaseOrderPage(pageReqVO)).getList();
+        List<ErpPurchaseOrderBaseRespVO> list = buildPurchaseOrderVOPageResult(purchaseOrderService.getPurchaseOrderPage(pageReqVO)).getList();
         // 导出 Excel
-        ExcelUtils.write(response, "采购订单.xls", "数据", ErpPurchaseOrderRespVO.class, list);
+        ExcelUtils.write(response, "采购订单.xls", "数据", ErpPurchaseOrderBaseRespVO.class, list);
     }
 
-    private PageResult<ErpPurchaseOrderRespVO> buildPurchaseOrderVOPageResult(PageResult<ErpPurchaseOrderDO> pageResult) {
+    private PageResult<ErpPurchaseOrderBaseRespVO> buildPurchaseOrderVOPageResult(PageResult<ErpPurchaseOrderDO> pageResult) {
         if (CollUtil.isEmpty(pageResult.getList())) {
             return PageResult.empty(pageResult.getTotal());
         }
@@ -171,8 +171,8 @@ public class ErpPurchaseOrderController {
 
 
         // 2. 开始拼接
-        return BeanUtils.toBean(pageResult, ErpPurchaseOrderRespVO.class, purchaseOrder -> {
-            purchaseOrder.setItems(BeanUtils.toBean(purchaseOrderItemMap.get(purchaseOrder.getId()), ErpPurchaseOrderRespVO.Item.class,
+        return BeanUtils.toBean(pageResult, ErpPurchaseOrderBaseRespVO.class, purchaseOrder -> {
+            purchaseOrder.setItems(BeanUtils.toBean(purchaseOrderItemMap.get(purchaseOrder.getId()), ErpPurchaseOrderBaseRespVO.Item.class,
                     item -> {
                         //设置产品信息
                         MapUtils.findAndThen(productMap, item.getProductId(), product -> item.setProductName(product.getName())
@@ -181,15 +181,15 @@ public class ErpPurchaseOrderController {
                         // 设置仓库信息
                         MapUtils.findAndThen(warehouseMap,item.getWarehouseId(),erpWarehouseDO -> item.setWarehouseName(erpWarehouseDO.getName()));
                     } ));
-            purchaseOrder.setProductNames(CollUtil.join(purchaseOrder.getItems(), "，", ErpPurchaseOrderRespVO.Item::getProductName));
+            purchaseOrder.setProductNames(CollUtil.join(purchaseOrder.getItems(), "，", ErpPurchaseOrderBaseRespVO.Item::getProductName));
             String statusDescription = ErpAuditStatus.getDescriptionByStatus(purchaseOrder.getStatus());
             if (statusDescription != null) {
                 purchaseOrder.setStatusDesc(statusDescription);
             }//根据状态编号设置状态映射描述
             purchaseOrder.setStatus(purchaseOrder.getStatus());//设置采购状态
             MapUtils.findAndThen(supplierMap, purchaseOrder.getSupplierId(), supplier -> purchaseOrder.setSupplierName(supplier.getName()));
-            MapUtils.findAndThen(userMap, Long.parseLong(purchaseOrder.getCreator()), user -> purchaseOrder.setCreatorName(user.getNickname()));
-            MapUtils.findAndThen(deptMap, purchaseOrder.getDepartmentId(), deptRespDTO -> purchaseOrder.setDepartmentName(deptRespDTO.getName()));//部门信息
+            MapUtils.findAndThen(userMap, Long.parseLong(purchaseOrder.getCreator()), user -> purchaseOrder.setCreator(user.getNickname()));
+            MapUtils.findAndThen(deptMap, Long.parseLong(purchaseOrder.getDepartmentName()), deptRespDTO -> purchaseOrder.setDepartmentName(deptRespDTO.getName()));//部门信息
         });
     }
 

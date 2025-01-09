@@ -10,7 +10,7 @@ import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.yudao.module.erp.controller.admin.product.vo.product.ErpProductRespVO;
 import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.returns.ErpPurchaseReturnPageReqVO;
-import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.returns.ErpPurchaseReturnRespVO;
+import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.returns.ErpPurchaseReturnBaseRespVO;
 import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.returns.ErpPurchaseReturnSaveReqVO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseReturnDO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseReturnItemDO;
@@ -97,7 +97,7 @@ public class ErpPurchaseReturnController {
     @Operation(summary = "获得采购退货")
     @Parameter(name = "id", description = "编号", required = true, example = "1024")
     @PreAuthorize("@ss.hasPermission('erp:purchase-return:query')")
-    public CommonResult<ErpPurchaseReturnRespVO> getPurchaseReturn(@RequestParam("id") Long id) {
+    public CommonResult<ErpPurchaseReturnBaseRespVO> getPurchaseReturn(@RequestParam("id") Long id) {
         ErpPurchaseReturnDO purchaseReturn = purchaseReturnService.getPurchaseReturn(id);
         if (purchaseReturn == null) {
             return success(null);
@@ -105,8 +105,8 @@ public class ErpPurchaseReturnController {
         List<ErpPurchaseReturnItemDO> purchaseReturnItemList = purchaseReturnService.getPurchaseReturnItemListByReturnId(id);
         Map<Long, ErpProductRespVO> productMap = productService.getProductVOMap(
                 convertSet(purchaseReturnItemList, ErpPurchaseReturnItemDO::getProductId));
-        return success(BeanUtils.toBean(purchaseReturn, ErpPurchaseReturnRespVO.class, purchaseReturnVO ->
-                purchaseReturnVO.setItems(BeanUtils.toBean(purchaseReturnItemList, ErpPurchaseReturnRespVO.Item.class, item -> {
+        return success(BeanUtils.toBean(purchaseReturn, ErpPurchaseReturnBaseRespVO.class, purchaseReturnVO ->
+                purchaseReturnVO.setItems(BeanUtils.toBean(purchaseReturnItemList, ErpPurchaseReturnBaseRespVO.Item.class, item -> {
                     ErpStockDO stock = stockService.getStock(item.getProductId(), item.getWarehouseId());
                     item.setStockCount(stock != null ? stock.getCount() : BigDecimal.ZERO);
                     MapUtils.findAndThen(productMap, item.getProductId(), product -> item.setProductName(product.getName())
@@ -117,7 +117,7 @@ public class ErpPurchaseReturnController {
     @GetMapping("/page")
     @Operation(summary = "获得采购退货分页")
     @PreAuthorize("@ss.hasPermission('erp:purchase-return:query')")
-    public CommonResult<PageResult<ErpPurchaseReturnRespVO>> getPurchaseReturnPage(@Valid ErpPurchaseReturnPageReqVO pageReqVO) {
+    public CommonResult<PageResult<ErpPurchaseReturnBaseRespVO>> getPurchaseReturnPage(@Valid ErpPurchaseReturnPageReqVO pageReqVO) {
         PageResult<ErpPurchaseReturnDO> pageResult = purchaseReturnService.getPurchaseReturnPage(pageReqVO);
         return success(buildPurchaseReturnVOPageResult(pageResult));
     }
@@ -129,12 +129,12 @@ public class ErpPurchaseReturnController {
     public void exportPurchaseReturnExcel(@Valid ErpPurchaseReturnPageReqVO pageReqVO,
                                     HttpServletResponse response) throws IOException {
         pageReqVO.setPageSize(PageParam.PAGE_SIZE_NONE);
-        List<ErpPurchaseReturnRespVO> list = buildPurchaseReturnVOPageResult(purchaseReturnService.getPurchaseReturnPage(pageReqVO)).getList();
+        List<ErpPurchaseReturnBaseRespVO> list = buildPurchaseReturnVOPageResult(purchaseReturnService.getPurchaseReturnPage(pageReqVO)).getList();
         // 导出 Excel
-        ExcelUtils.write(response, "采购退货.xls", "数据", ErpPurchaseReturnRespVO.class, list);
+        ExcelUtils.write(response, "采购退货.xls", "数据", ErpPurchaseReturnBaseRespVO.class, list);
     }
 
-    private PageResult<ErpPurchaseReturnRespVO> buildPurchaseReturnVOPageResult(PageResult<ErpPurchaseReturnDO> pageResult) {
+    private PageResult<ErpPurchaseReturnBaseRespVO> buildPurchaseReturnVOPageResult(PageResult<ErpPurchaseReturnDO> pageResult) {
         if (CollUtil.isEmpty(pageResult.getList())) {
             return PageResult.empty(pageResult.getTotal());
         }
@@ -152,13 +152,13 @@ public class ErpPurchaseReturnController {
         Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(
                 convertSet(pageResult.getList(), purchaseReturn -> Long.parseLong(purchaseReturn.getCreator())));
         // 2. 开始拼接
-        return BeanUtils.toBean(pageResult, ErpPurchaseReturnRespVO.class, purchaseReturn -> {
-            purchaseReturn.setItems(BeanUtils.toBean(purchaseReturnItemMap.get(purchaseReturn.getId()), ErpPurchaseReturnRespVO.Item.class,
+        return BeanUtils.toBean(pageResult, ErpPurchaseReturnBaseRespVO.class, purchaseReturn -> {
+            purchaseReturn.setItems(BeanUtils.toBean(purchaseReturnItemMap.get(purchaseReturn.getId()), ErpPurchaseReturnBaseRespVO.Item.class,
                     item -> MapUtils.findAndThen(productMap, item.getProductId(), product -> item.setProductName(product.getName())
                             .setProductBarCode(product.getBarCode()).setProductUnitName(product.getUnitName()))));
-            purchaseReturn.setProductNames(CollUtil.join(purchaseReturn.getItems(), "，", ErpPurchaseReturnRespVO.Item::getProductName));
+            purchaseReturn.setProductNames(CollUtil.join(purchaseReturn.getItems(), "，", ErpPurchaseReturnBaseRespVO.Item::getProductName));
             MapUtils.findAndThen(supplierMap, purchaseReturn.getSupplierId(), supplier -> purchaseReturn.setSupplierName(supplier.getName()));
-            MapUtils.findAndThen(userMap, Long.parseLong(purchaseReturn.getCreator()), user -> purchaseReturn.setCreatorName(user.getNickname()));
+            MapUtils.findAndThen(userMap, Long.parseLong(purchaseReturn.getCreator()), user -> purchaseReturn.setCreator(user.getNickname()));
         });
     }
 
