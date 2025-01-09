@@ -22,6 +22,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
@@ -79,15 +80,23 @@ public class BpmUserTaskListener implements TaskListener {
         // 3. 异步发起请求
         // TODO @芋艿：确认要同步，还是异步
         HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity<>(body, headers);
-        // TODO @lesan：可能需要 try catch 哇？ RestClientException
-        ResponseEntity<String> responseEntity = restTemplate.exchange(listenerHandler.getPath(), HttpMethod.POST,
-                requestEntity, String.class);
-        log.info("[notify][监听器：{}，事件类型：{}，请求头：{}，请求体：{}，响应结果：{}]",
-                DELEGATE_EXPRESSION,
-                delegateTask.getEventName(),
-                headers,
-                body,
-                responseEntity);
+        try {
+            ResponseEntity<String> responseEntity = restTemplate.exchange(listenerHandler.getPath(), HttpMethod.POST,
+                    requestEntity, String.class);
+            log.info("[notify][监听器：{}，事件类型：{}，请求头：{}，请求体：{}，响应结果：{}]",
+                    DELEGATE_EXPRESSION,
+                    delegateTask.getEventName(),
+                    headers,
+                    body,
+                    responseEntity);
+        } catch (RestClientException e) {
+            log.error("[error][监听器：{}，事件类型：{}，请求头：{}，请求体：{}，请求出错：{}]",
+                    DELEGATE_EXPRESSION,
+                    delegateTask.getEventName(),
+                    headers,
+                    body,
+                    e.getMessage());
+        }
         // 4. 是否需要后续操作？TODO 芋艿：待定！
     }
 
