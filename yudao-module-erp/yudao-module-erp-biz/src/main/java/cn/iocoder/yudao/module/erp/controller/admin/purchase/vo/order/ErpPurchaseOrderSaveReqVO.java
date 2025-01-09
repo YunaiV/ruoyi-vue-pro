@@ -94,11 +94,6 @@ public class ErpPurchaseOrderSaveReqVO {
         @NotNull(message = "供应商产品编号不能为空")
         private String supplierProductId;
 
-        @Schema(description = "供应商付款条款")
-        private String supplierRule;
-//        @Schema(description = "报关品名")
-//        private String customsDeclaration;
-
         @Schema(description = "产品名称")
         private String ItemName;
         // ========== 采购入库 ==========

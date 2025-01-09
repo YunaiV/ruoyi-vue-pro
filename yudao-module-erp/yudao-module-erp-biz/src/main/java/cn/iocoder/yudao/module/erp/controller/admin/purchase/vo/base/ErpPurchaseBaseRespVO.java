@@ -10,8 +10,8 @@ import java.time.LocalDateTime;
 @Data
 public class ErpPurchaseBaseRespVO {
 
-    @Schema(description = "编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "17386")
-    @ExcelProperty("编号")
+    @Schema(description = "id", requiredMode = Schema.RequiredMode.REQUIRED, example = "17386")
+    @ExcelProperty("id")
     protected Long id;
 
     @Schema(description = "供应商编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1724")
@@ -41,6 +41,10 @@ public class ErpPurchaseBaseRespVO {
     @ExcelProperty("创建时间")
     protected LocalDateTime createTime;
 
+    @Schema(description = "审核者")
+    @ExcelProperty("审核者")
+    private String auditor;
+
     @Schema(description = "审核人名称")
     @ExcelProperty("审核人名称")
     protected String auditorName;
@@ -50,11 +54,11 @@ public class ErpPurchaseBaseRespVO {
     protected LocalDateTime auditTime;
 
     @Schema(description = "审核状态")
-    @ExcelProperty("审核时间")
+    @ExcelProperty("审核状态")
     protected Integer AuditStatus;
 
     @Schema(description = "审核状态描述")
-    @ExcelProperty("审核时间描述")
+    @ExcelProperty("审核状态描述")
     protected String AuditStatusDesc;
 
     // ========== 采购订单金额(钱)开始 ==========

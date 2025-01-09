@@ -50,6 +50,12 @@ public class ErpPurchaseOrderBaseRespVO extends ErpPurchaseBaseRespVO {
     private BigDecimal totalReturnCount;
 
 
+    @Schema(description = "供应商付款条款")
+    private String supplierRule;
+
+    @Schema(description = "交货日期", example = "2025-1-1")
+    private LocalDateTime deliveryDate;
+
     @Data
     public static class Item {
 
@@ -80,6 +86,7 @@ public class ErpPurchaseOrderBaseRespVO extends ErpPurchaseBaseRespVO {
 
         @Schema(description = "备注", example = "随便")
         private String remark;
+
 
         // ========== 采购入库 ==========
 
@@ -122,6 +129,9 @@ public class ErpPurchaseOrderBaseRespVO extends ErpPurchaseBaseRespVO {
 
         @Schema(description = "箱率")
         private String containerRate;//箱率
+
+        @Schema(description = "型号规格型号")
+        private String model;
     }
 
 }
