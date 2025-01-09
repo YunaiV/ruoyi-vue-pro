@@ -346,12 +346,7 @@ public class BpmnModelUtils {
     }
 
     public static void addSignEnable(Boolean signEnable, FlowElement userTask) {
-        // TODO @lesan：是不是改成表达式会好点  addExtensionElement(userTask, SIGN_ENABLE, ObjUtil.isNotNull(signEnable) ? )
-        if (ObjUtil.isNotNull(signEnable)) {
-            addExtensionElement(userTask, SIGN_ENABLE, signEnable.toString());
-        } else {
-            addExtensionElement(userTask, SIGN_ENABLE, "false");
-        }
+        addExtensionElement(userTask, SIGN_ENABLE, ObjUtil.isNotNull(signEnable) ? signEnable.toString() : "false");
     }
 
     public static Boolean parseSignEnable(BpmnModel bpmnModel, String flowElementId) {
