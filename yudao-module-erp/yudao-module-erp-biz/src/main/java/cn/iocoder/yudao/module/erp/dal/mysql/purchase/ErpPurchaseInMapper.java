@@ -25,7 +25,7 @@ public interface ErpPurchaseInMapper extends BaseMapperX<ErpPurchaseInDO> {
     default PageResult<ErpPurchaseInDO> selectPage(ErpPurchaseInPageReqVO reqVO) {
         MPJLambdaWrapperX<ErpPurchaseInDO> query = new MPJLambdaWrapperX<ErpPurchaseInDO>()
                 .likeIfPresent(ErpPurchaseInDO::getNo, reqVO.getNo())
-                .eqIfPresent(ErpPurchaseInDO::getSupplierId, reqVO.getSupplierId())
+//                .eqIfPresent(ErpPurchaseInDO::getSupplierId, reqVO.getSupplierId())
                 .betweenIfPresent(ErpPurchaseInDO::getInTime, reqVO.getInTime())
                 .eqIfPresent(ErpPurchaseInDO::getStatus, reqVO.getStatus())
                 .likeIfPresent(ErpPurchaseInDO::getRemark, reqVO.getRemark())

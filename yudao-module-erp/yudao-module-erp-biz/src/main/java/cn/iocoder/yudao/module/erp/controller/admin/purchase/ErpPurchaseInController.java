@@ -16,10 +16,13 @@ import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseInDO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseInItemDO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpSupplierDO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.stock.ErpStockDO;
+import cn.iocoder.yudao.module.erp.dal.dataobject.stock.ErpWarehouseDO;
+import cn.iocoder.yudao.module.erp.enums.ErpAuditStatus;
 import cn.iocoder.yudao.module.erp.service.product.ErpProductService;
 import cn.iocoder.yudao.module.erp.service.purchase.ErpPurchaseInService;
 import cn.iocoder.yudao.module.erp.service.purchase.ErpSupplierService;
 import cn.iocoder.yudao.module.erp.service.stock.ErpStockService;
+import cn.iocoder.yudao.module.erp.service.stock.ErpWarehouseService;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import io.swagger.v3.oas.annotations.Operation;
@@ -56,7 +59,8 @@ public class ErpPurchaseInController {
     private ErpProductService productService;
     @Resource
     private ErpSupplierService supplierService;
-
+    @Resource
+    private ErpWarehouseService erpWarehouseService;
     @Resource
     private AdminUserApi adminUserApi;
 
@@ -151,12 +155,33 @@ public class ErpPurchaseInController {
         // 1.4 管理员信息
         Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(
                 convertSet(pageResult.getList(), purchaseIn -> Long.parseLong(purchaseIn.getCreator())));
+        // 1.6 获取仓库信息
+        Map<Long, ErpWarehouseDO> warehouseMap = erpWarehouseService.getWarehouseMap(
+            convertSet(purchaseInItemList, ErpPurchaseInItemDO::getWarehouseId));
         // 2. 开始拼接
         return BeanUtils.toBean(pageResult, ErpPurchaseInRespVO.class, purchaseIn -> {
             purchaseIn.setItems(BeanUtils.toBean(purchaseInItemMap.get(purchaseIn.getId()), ErpPurchaseInRespVO.Item.class,
-                    item -> MapUtils.findAndThen(productMap, item.getProductId(), product -> item.setProductName(product.getName())
-                            .setProductBarCode(product.getBarCode()).setProductUnitName(product.getUnitName()))));
+                item -> {
+                    //设置产品信息-带出相关字段
+                    MapUtils.findAndThen(productMap, item.getProductId(), product -> item.setProductName(product.getName())
+                        .setProductBarCode(product.getBarCode())
+                        .setProductUnitName(product.getUnitName())//设置产品重量+体积+规格型号
+                        .setTotalVolume(product.getLength()*product.getHeight()*product.getWeight() * Double.parseDouble(String.valueOf(item.getCount())))
+                        .setTotalWeight(product.getWeight()*Double.parseDouble(String.valueOf(item.getCount())))
+                        .setModel(product.getModel())
+                        .setCustomsDeclaration(product.getBrand())//产品品牌
+                    );
+                    // 设置仓库信息
+                    MapUtils.findAndThen(warehouseMap, item.getWarehouseId(), erpWarehouseDO -> item.setWarehouseName(erpWarehouseDO.getName()));
+                }));
             purchaseIn.setProductNames(CollUtil.join(purchaseIn.getItems(), "，", ErpPurchaseInRespVO.Item::getProductName));
+            //添加入库审核状态描述
+            String statusDescription = ErpAuditStatus.getDescriptionByStatus(purchaseIn.getAuditorStatus());
+            if (statusDescription != null) {
+                purchaseIn.setAuditorStatusDesc(statusDescription);
+            }
+            //产品-带出相关字段
+
             MapUtils.findAndThen(supplierMap, purchaseIn.getSupplierId(), supplier -> purchaseIn.setSupplierName(supplier.getName()));
             MapUtils.findAndThen(userMap, Long.parseLong(purchaseIn.getCreator()), user -> purchaseIn.setCreatorName(user.getNickname()));
         });

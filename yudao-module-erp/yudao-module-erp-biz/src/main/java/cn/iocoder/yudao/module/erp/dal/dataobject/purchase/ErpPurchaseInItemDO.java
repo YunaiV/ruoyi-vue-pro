@@ -32,32 +32,27 @@ public class ErpPurchaseInItemDO extends BaseDO {
     private Long id;
     /**
      * 采购入库编号
-     *
-     * 关联 {@link ErpPurchaseInDO##getId()}
+     * 关联 {@link ErpPurchaseInDO#getId()}
      */
     private Long inId;
     /**
      * 采购订单项编号
-     *
      * 关联 {@link ErpPurchaseOrderItemDO#getId()}
      * 目的：方便更新关联的采购订单项的入库数量
      */
     private Long orderItemId;
     /**
      * 仓库编号
-     *
      * 关联 {@link ErpWarehouseDO#getId()}
      */
     private Long warehouseId;
     /**
      * 产品编号
-     *
      * 关联 {@link ErpProductDO#getId()}
      */
     private Long productId;
     /**
      * 产品单位单位
-     *
      * 冗余 {@link ErpProductDO#getUnitId()}
      */
     private Long productUnitId;
@@ -72,7 +67,6 @@ public class ErpPurchaseInItemDO extends BaseDO {
     private BigDecimal count;
     /**
      * 总价，单位：元
-     *
      * totalPrice = productPrice * count
      */
     private BigDecimal totalPrice;
@@ -82,7 +76,6 @@ public class ErpPurchaseInItemDO extends BaseDO {
     private BigDecimal taxPercent;
     /**
      * 税额，单位：元
-     *
      * taxPrice = totalPrice * taxPercent
      */
     private BigDecimal taxPrice;

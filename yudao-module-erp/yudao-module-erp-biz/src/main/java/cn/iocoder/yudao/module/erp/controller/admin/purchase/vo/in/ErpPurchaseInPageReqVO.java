@@ -40,6 +40,9 @@ public class ErpPurchaseInPageReqVO extends PageParam {
     @Schema(description = "审核时间")
     private LocalDateTime auditTime;
 
+    @Schema(description = "入库审核状态")
+    private Integer auditorStatus;
+
     @Schema(description = "入库时间")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
     private LocalDateTime[] inTime;
@@ -73,6 +76,7 @@ public class ErpPurchaseInPageReqVO extends PageParam {
 
     @Schema(description = "采购单号", example = "1")
     private String orderNo;
+
 
 
 }

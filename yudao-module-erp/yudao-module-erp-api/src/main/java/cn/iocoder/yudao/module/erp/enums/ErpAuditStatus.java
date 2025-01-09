@@ -18,6 +18,7 @@ import java.util.Map;
 @Getter
 public enum ErpAuditStatus implements IntArrayValuable {
 
+    PENDING_APPROVAL(5, "待审核"), // 待审核
     PROCESS(10, "未审核"), // 审核中
     APPROVE(20, "已审核"); // 审核通过
     private static final Map<Integer, ErpAuditStatus> STATUS_MAP = new HashMap<>();

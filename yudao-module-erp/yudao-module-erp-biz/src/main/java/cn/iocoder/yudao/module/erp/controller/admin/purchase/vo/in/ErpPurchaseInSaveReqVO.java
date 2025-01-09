@@ -39,6 +39,9 @@ public class ErpPurchaseInSaveReqVO {
     @Schema(description = "审核时间")
     private LocalDateTime auditTime;
 
+    @Schema(description = "入库审核状态")
+    private Integer auditorStatus;
+
     @Schema(description = "结算日期", example = "2025-1-1")
     private LocalDateTime settlementDate;
 
@@ -106,11 +109,21 @@ public class ErpPurchaseInSaveReqVO {
         @DecimalMin(value = "0.00", message = "含税产品单价不能小于0")
         private BigDecimal actTaxPrice;
 
-        @Schema(description = "备注", example = "随便")
+        @Schema(description = "备注", example = "商品行备注")
         private String remark;
 
         @Schema(description = "报关品名-产品")
         private String customsDeclaration;
+
+        @Schema(description = "源单行号")
+        private int srcSeq;
+
+        @Schema(description = "源单单号")
+        private int srcNo;
+
+        @Schema(description = "箱率")
+        private String containerRate;//箱率
+
     }
 
 }

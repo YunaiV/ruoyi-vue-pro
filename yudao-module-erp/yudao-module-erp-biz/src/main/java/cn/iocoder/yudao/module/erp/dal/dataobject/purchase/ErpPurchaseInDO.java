@@ -133,4 +133,13 @@ public class ErpPurchaseInDO extends BaseDO {
      */
     private String remark;
 
+    /**
+     * 对账状态(false:未对账 ，true:已对账)
+     */
+    private Boolean reconciliationStatus;
+
+    /**
+     * 入库审核状态
+     */
+    private Integer auditorStatus;
 }

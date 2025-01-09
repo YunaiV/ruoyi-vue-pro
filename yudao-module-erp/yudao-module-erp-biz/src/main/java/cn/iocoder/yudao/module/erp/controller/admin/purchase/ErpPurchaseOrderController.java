@@ -176,13 +176,10 @@ public class ErpPurchaseOrderController {
                     item -> {
                         //设置产品信息
                         MapUtils.findAndThen(productMap, item.getProductId(), product -> item.setProductName(product.getName())
-                            .setProductBarCode(product.getBarCode()).setProductUnitName(product.getUnitName()));
+                            .setProductBarCode(product.getBarCode())
+                            .setProductUnitName(product.getUnitName()));
                         // 设置仓库信息
-                        if (item.getWarehouseId() != null && warehouseMap.containsKey(item.getWarehouseId())) {
-                            item.setWarehouseName(warehouseMap.get(item.getWarehouseId()).getName());
-                        }
-//                        item.setWarehouseName(erpWarehouseService.getWarehouse(item.getWarehouseId()).getName());//设置仓库名称
-
+                        MapUtils.findAndThen(warehouseMap,item.getWarehouseId(),erpWarehouseDO -> item.setWarehouseName(erpWarehouseDO.getName()));
                     } ));
             purchaseOrder.setProductNames(CollUtil.join(purchaseOrder.getItems(), "，", ErpPurchaseOrderRespVO.Item::getProductName));
             String statusDescription = ErpAuditStatus.getDescriptionByStatus(purchaseOrder.getStatus());
