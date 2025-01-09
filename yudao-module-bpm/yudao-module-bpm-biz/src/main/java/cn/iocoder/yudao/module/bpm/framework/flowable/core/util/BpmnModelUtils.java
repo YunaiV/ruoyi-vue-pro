@@ -5,6 +5,7 @@ import cn.hutool.core.convert.Convert;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.*;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
+import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.common.util.number.NumberUtils;
 import cn.iocoder.yudao.framework.common.util.string.StrUtils;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.simple.BpmSimpleModelNodeVO;
@@ -359,6 +360,13 @@ public class BpmnModelUtils {
             return false;
         }
         return Convert.toBool(extensionElements.get(0).getElementText(), false);
+    }
+
+    public static void addListenerFieldExtension(FlowableListener flowableListener, Object obj) {
+        FieldExtension fieldExtension = new FieldExtension();
+        fieldExtension.setFieldName("listenerConfig");
+        fieldExtension.setStringValue(JsonUtils.toJsonString(obj));
+        flowableListener.getFieldExtensions().add(fieldExtension);
     }
 
     // ========== BPM 简单查找相关的方法 ==========
