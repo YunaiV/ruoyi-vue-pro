@@ -3,10 +3,10 @@ package com.somle.kingdee.service;
 
 import com.somle.kingdee.model.KingdeeAuxInfoDetail;
 import com.somle.kingdee.model.KingdeeProduct;
-import com.somle.kingdee.model.supplier.KingdeeSupplier;
 import com.somle.kingdee.model.KingdeeToken;
+import com.somle.kingdee.model.supplier.KingdeeSupplier;
 import com.somle.kingdee.repository.KingdeeTokenRepository;
-
+import jakarta.annotation.PostConstruct;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,8 +16,6 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-
-import jakarta.annotation.PostConstruct;
 
 // https://open.jdy.com/#/files/api/detail?index=2&categrayId=3cc8ee9a663e11eda5c84b5d383a2b93&id=adfe4a24712711eda0b307c6992ee459
 @Slf4j
@@ -78,5 +76,13 @@ public class KingdeeService {
 
     public void addSupplier(KingdeeSupplier kingdeeSupplier) {
         clientList.parallelStream().forEach(n-> n.addSupplier(kingdeeSupplier));
+    }
+
+    /**
+     *  获得数据库所有令牌
+     * @return List<KingdeeToken>
+     */
+    public List<KingdeeToken> listKingdeeTokens () {
+        return tokenRepository.findAll();
     }
 }
