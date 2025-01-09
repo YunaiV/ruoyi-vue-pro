@@ -11,8 +11,10 @@ public class IotDeviceLogRespVO {
 
     @Schema(description = "日志编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     private String id;
+
     @Schema(description = "产品标识", requiredMode = Schema.RequiredMode.REQUIRED, example = "product123")
     private String productKey;
+
     @Schema(description = "设备标识", requiredMode = Schema.RequiredMode.REQUIRED, example = "device123")
     private String deviceKey;
 
@@ -30,4 +32,5 @@ public class IotDeviceLogRespVO {
 
     @Schema(description = "记录时间戳", requiredMode = Schema.RequiredMode.REQUIRED)
     private LocalDateTime ts;
-} 
+
+}

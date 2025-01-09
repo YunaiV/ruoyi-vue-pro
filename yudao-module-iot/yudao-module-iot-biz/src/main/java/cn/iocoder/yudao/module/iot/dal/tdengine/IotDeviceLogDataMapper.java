@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.module.iot.dal.tdengine;
 
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.iot.controller.admin.device.vo.deviceData.IotDeviceLogPageReqVO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceLogDO;
 import cn.iocoder.yudao.module.iot.framework.tdengine.core.annotation.TDengineDS;
@@ -12,7 +11,7 @@ import java.util.List;
 
 /**
  * IOT 设备日志数据 Mapper 接口
- * 
+ *
  * 基于 TDengine 实现设备日志的存储
  */
 @Mapper
@@ -22,11 +21,12 @@ public interface IotDeviceLogDataMapper {
 
     /**
      * 创建设备日志超级表
-     * 
+     *
      * 注意：初始化时只需创建一次
      */
     void createDeviceLogSTable();
 
+    // TODO @super：是不是删除哈
     /**
      * 创建设备日志子表
      *
@@ -34,11 +34,12 @@ public interface IotDeviceLogDataMapper {
      */
     void createDeviceLogTable(@Param("deviceKey") String deviceKey);
 
+    // TODO @super：单个参数，不用加 @Param
     /**
      * 插入设备日志数据
-     * 
+     *
      * 如果子表不存在，会自动创建子表
-     * 
+     *
      * @param log 设备日志数据
      */
     void insert(@Param("log") IotDeviceLogDO log);
@@ -58,4 +59,5 @@ public interface IotDeviceLogDataMapper {
      * @return 日志总数
      */
     Long selectCount(@Param("reqVO") IotDeviceLogPageReqVO reqVO);
+
 }

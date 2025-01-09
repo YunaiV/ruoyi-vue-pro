@@ -18,7 +18,6 @@ import cn.iocoder.yudao.module.iot.dal.dataobject.thingmodel.IotThingModelDO;
 import cn.iocoder.yudao.module.iot.dal.redis.deviceData.DeviceDataRedisDAO;
 import cn.iocoder.yudao.module.iot.dal.tdengine.IotDevicePropertyDataMapper;
 import cn.iocoder.yudao.module.iot.dal.tdengine.TdEngineDMLMapper;
-import cn.iocoder.yudao.module.iot.dal.tdengine.TdThingModelMessageMapper;
 import cn.iocoder.yudao.module.iot.enums.IotConstants;
 import cn.iocoder.yudao.module.iot.enums.thingmodel.IotDataSpecsDataTypeEnum;
 import cn.iocoder.yudao.module.iot.enums.thingmodel.IotThingModelTypeEnum;
@@ -111,7 +110,6 @@ public class IotDevicePropertyDataServiceImpl implements IotDevicePropertyDataSe
                 return;
             }
             newFields.add(0, new TDengineTableField(TDengineTableField.FIELD_TS, TDengineTableField.TYPE_TIMESTAMP));
-            // 2.1.1 创建产品超级表
             devicePropertyDataMapper.createProductPropertySTable(product.getProductKey(), newFields);
             return;
         }

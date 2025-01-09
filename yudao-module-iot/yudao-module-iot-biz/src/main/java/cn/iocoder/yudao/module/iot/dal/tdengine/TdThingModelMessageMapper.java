@@ -1,10 +1,6 @@
 package cn.iocoder.yudao.module.iot.dal.tdengine;
 
-import cn.iocoder.yudao.framework.tenant.core.aop.TenantIgnore;
-import cn.iocoder.yudao.module.iot.dal.dataobject.tdengine.ThingModelMessage;
-import cn.iocoder.yudao.module.iot.dal.dataobject.tdengine.ThingModelMessageDO;
 import cn.iocoder.yudao.module.iot.framework.tdengine.core.annotation.TDengineDS;
-import com.baomidou.dynamic.datasource.annotation.DS;
 import com.baomidou.mybatisplus.annotation.InterceptorIgnore;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -13,7 +9,7 @@ import org.apache.ibatis.annotations.Param;
  * 处理 TD 中物模型消息日志的操作
  */
 @Mapper
-@Deprecated
+@Deprecated // TODO super：什么时候，删除下哈。
 @TDengineDS
 @InterceptorIgnore(tenantLine = "true") // 避免 SQL 解析，因为 JSqlParser 对 TDengine 的 SQL 解析会报错
 public interface TdThingModelMessageMapper {

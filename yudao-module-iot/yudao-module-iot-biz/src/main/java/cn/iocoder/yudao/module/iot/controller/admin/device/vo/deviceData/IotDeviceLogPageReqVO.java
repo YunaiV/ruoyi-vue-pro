@@ -18,13 +18,16 @@ public class IotDeviceLogPageReqVO extends PageParam {
     @NotEmpty(message = "设备标识不能为空")
     private String deviceKey;
 
+    // TODO @super：对应的枚举类
     @Schema(description = "消息类型", example = "property")
     private String type;
 
     @Schema(description = "标识符", example = "temperature")
+    // TODO @super：对应的枚举类
     private String subType;
 
     @Schema(description = "创建时间")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
     private LocalDateTime[] createTime;
-} 
+
+}

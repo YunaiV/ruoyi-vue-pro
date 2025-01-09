@@ -5,7 +5,6 @@ import cn.iocoder.yudao.module.iot.controller.admin.device.vo.deviceData.IotDevi
 import cn.iocoder.yudao.module.iot.controller.admin.device.vo.deviceData.IotDeviceLogPageReqVO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceLogDO;
 
-
 /**
  * IoT 设备日志数据 Service 接口
  *
@@ -15,7 +14,7 @@ public interface IotDeviceLogDataService {
 
     /**
      * 初始化 TDengine 超级表
-     * 
+     *
      *系统启动时，会自动初始化一次
      */
     void initTDengineSTable();

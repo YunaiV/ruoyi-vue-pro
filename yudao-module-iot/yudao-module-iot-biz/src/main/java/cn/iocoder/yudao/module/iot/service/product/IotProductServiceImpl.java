@@ -9,7 +9,6 @@ import cn.iocoder.yudao.module.iot.dal.dataobject.product.IotProductDO;
 import cn.iocoder.yudao.module.iot.dal.mysql.product.IotProductMapper;
 import cn.iocoder.yudao.module.iot.enums.product.IotProductStatusEnum;
 import cn.iocoder.yudao.module.iot.service.device.IotDevicePropertyDataService;
-import cn.iocoder.yudao.module.iot.service.tdengine.IotThingModelMessageService;
 import com.baomidou.dynamic.datasource.annotation.DSTransactional;
 import jakarta.annotation.Resource;
 import org.springframework.context.annotation.Lazy;
@@ -116,14 +115,15 @@ public class IotProductServiceImpl implements IotProductService {
     public void updateProductStatus(Long id, Integer status) {
         // 1. 校验存在
         validateProductExists(id);
-        // 2. 更新
-        IotProductDO updateObj = IotProductDO.builder().id(id).status(status).build();
-        // 3. 产品是发布状态
-        if (Objects.equals(status, IotProductStatusEnum.PUBLISHED.getStatus())) {
-            // 3.1 创建产品超级表数据模型
-            devicePropertyDataService.defineDevicePropertyData(id);
 
+        // 2. 产品是发布状态
+        if (Objects.equals(status, IotProductStatusEnum.PUBLISHED.getStatus())) {
+            // 创建产品超级表数据模型
+            devicePropertyDataService.defineDevicePropertyData(id);
         }
+
+        // 3. 更新
+        IotProductDO updateObj = IotProductDO.builder().id(id).status(status).build();
         productMapper.updateById(updateObj);
     }
 

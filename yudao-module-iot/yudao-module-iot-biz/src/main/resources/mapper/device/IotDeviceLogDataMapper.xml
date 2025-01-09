@@ -7,18 +7,18 @@
     <!-- 创建设备日志超级表   初始化只创建一次-->
     <update id="createDeviceLogSTable">
         CREATE STABLE device_log (
-        ts TIMESTAMP,
-        id NCHAR(50),
-        product_key NCHAR(50),
-        type NCHAR(50),
-        subType NCHAR(50),
-        content NCHAR(1024),
-        report_time TIMESTAMP
-        )TAGS (
-        device_key NCHAR(50)
-        )
+            ts TIMESTAMP,
+            id NCHAR(50),
+            product_key NCHAR(50),
+            type NCHAR(50),
+            <!-- TODO @super：下划线 sub_type -->
+            subType NCHAR(50),
+            content NCHAR(1024),
+            report_time TIMESTAMP
+            ) TAGS (
+                device_key NCHAR(50)
+            )
     </update>
-
 
     <!-- 创建设备日志子表  讨论：TDengine 在子表不存在的情况下 可在数据插入时 自动建表  要不要去掉创建子表的逻辑  由第一次插入数据时自动创建-->
     <update id="createDeviceLogTable">

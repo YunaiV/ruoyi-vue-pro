@@ -7,20 +7,20 @@ import cn.iocoder.yudao.framework.tenant.core.aop.TenantIgnore;
 import cn.iocoder.yudao.module.iot.controller.admin.device.vo.device.IotDeviceStatusUpdateReqVO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDataDO;
-import cn.iocoder.yudao.module.iot.dal.dataobject.tdengine.*;
+import cn.iocoder.yudao.module.iot.dal.dataobject.tdengine.FieldParser;
+import cn.iocoder.yudao.module.iot.dal.dataobject.tdengine.TdFieldDO;
+import cn.iocoder.yudao.module.iot.dal.dataobject.tdengine.TdTableDO;
+import cn.iocoder.yudao.module.iot.dal.dataobject.tdengine.ThingModelMessage;
 import cn.iocoder.yudao.module.iot.dal.dataobject.thingmodel.IotThingModelDO;
-import cn.iocoder.yudao.module.iot.dal.dataobject.product.IotProductDO;
 import cn.iocoder.yudao.module.iot.dal.redis.deviceData.DeviceDataRedisDAO;
 import cn.iocoder.yudao.module.iot.dal.tdengine.TdEngineDDLMapper;
 import cn.iocoder.yudao.module.iot.dal.tdengine.TdEngineDMLMapper;
-import cn.iocoder.yudao.module.iot.dal.tdengine.TdThingModelMessageMapper;
 import cn.iocoder.yudao.module.iot.enums.IotConstants;
 import cn.iocoder.yudao.module.iot.enums.device.IotDeviceStatusEnum;
 import cn.iocoder.yudao.module.iot.enums.thingmodel.IotThingModelTypeEnum;
 import cn.iocoder.yudao.module.iot.service.device.IotDeviceService;
-import cn.iocoder.yudao.module.iot.service.thingmodel.IotThingModelService;
 import cn.iocoder.yudao.module.iot.service.product.IotProductService;
-import cn.iocoder.yudao.module.iot.util.IotTdDatabaseUtils;
+import cn.iocoder.yudao.module.iot.service.thingmodel.IotThingModelService;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -62,12 +62,8 @@ public class IotThingModelMessageServiceImpl implements IotThingModelMessageServ
     private TdEngineDMLMapper tdEngineDMLMapper;
 
     @Resource
-    private TdThingModelMessageMapper tdThingModelMessageMapper;
-
-    @Resource
     private DeviceDataRedisDAO deviceDataRedisDAO;
-
-
+    
     // TODO @haohao：这个方法，可以考虑加下 1. 2. 3. 更有层次感
     @Override
     @TenantIgnore

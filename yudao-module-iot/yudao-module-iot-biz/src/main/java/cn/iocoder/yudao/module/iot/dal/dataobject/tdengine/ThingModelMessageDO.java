@@ -6,7 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 // TODO @芋艿：纠结下字段
-@Deprecated
+@Deprecated // TODO @super：看看啥时候删除下哈。
 /**
  * TD 物模型消息日志的数据库
  */
@@ -25,7 +25,7 @@ public class ThingModelMessageDO {
 
     /**
      * 系统扩展参数
-     * 
+     *
      * 例如：设备状态、系统时间、固件版本等系统级信息
      */
     private Object system;
