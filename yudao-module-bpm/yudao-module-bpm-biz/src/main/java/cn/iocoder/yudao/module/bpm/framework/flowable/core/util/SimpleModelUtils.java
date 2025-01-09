@@ -728,6 +728,7 @@ public class SimpleModelUtils {
             exclusiveGateway.setId(node.getId());
 
             // 设置默认的序列流（条件）
+            node.setDefaultFlowId("Flow_" + IdUtil.fastUUID());
             exclusiveGateway.setDefaultFlow(node.getDefaultFlowId());
             return exclusiveGateway;
         }
