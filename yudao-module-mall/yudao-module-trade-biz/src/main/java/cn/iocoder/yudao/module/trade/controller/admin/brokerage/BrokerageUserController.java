@@ -30,6 +30,7 @@ import java.util.Set;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
+import static java.util.Arrays.asList;
 
 @Tag(name = "管理后台 - 分销用户")
 @RestController
@@ -110,7 +111,7 @@ public class BrokerageUserController {
         // 合计分佣的提现
         // TODO @疯狂：如果未来支持了打款这个动作，可能 status 会不对；
         Map<Long, BrokerageWithdrawSummaryRespBO> withdrawMap = brokerageWithdrawService.getWithdrawSummaryMapByUserId(
-                userIds, BrokerageWithdrawStatusEnum.WITHDRAW_SUCCESS);
+                userIds, asList(BrokerageWithdrawStatusEnum.AUDIT_SUCCESS, BrokerageWithdrawStatusEnum.WITHDRAW_SUCCESS));
         // 拼接返回
         return success(BrokerageUserConvert.INSTANCE.convertPage(pageResult, userMap, brokerageUserCountMap,
                 brokerageOrderSummaryMap, withdrawMap));
