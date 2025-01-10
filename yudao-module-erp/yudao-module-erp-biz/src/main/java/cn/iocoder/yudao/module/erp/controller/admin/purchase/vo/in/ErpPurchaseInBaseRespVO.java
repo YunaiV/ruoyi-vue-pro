@@ -130,7 +130,7 @@ public class ErpPurchaseInBaseRespVO extends ErpPurchaseBaseRespVO {
         private int srcNo;
 
         @Schema(description = "价税合计")
-        private double allAmount;
+        private BigDecimal allAmount;
     }
 
 }

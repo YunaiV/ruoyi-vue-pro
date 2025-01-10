@@ -26,8 +26,7 @@ public class ErpPurchaseOrderSaveReqVO {
 
     @Schema(description = "结算日期", example = "2025-1-1")
     private LocalDateTime settlementDate;
-    @Schema(description = "交货日期", example = "2025-1-1")
-    private LocalDateTime deliveryDate;
+
 
     @Schema(description = "采购时间", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "采购时间不能为空")
@@ -83,7 +82,7 @@ public class ErpPurchaseOrderSaveReqVO {
         @DecimalMin(value = "1", message = "产品数量必须大于0")
         private BigDecimal count;
 
-        @Schema(description = "增值税税率，百分比", example = "99.88")
+        @Schema(description = "增值税税率，百分比", example = "0.013")
         private BigDecimal taxPercent;
 
         @Schema(description = "备注", example = "随便")
@@ -109,6 +108,8 @@ public class ErpPurchaseOrderSaveReqVO {
         @Schema(description = "仓库编号", example = "3")
         private String warehouseId; // 仓库编号
 
+        @Schema(description = "交货日期", example = "2025-1-1")
+        private LocalDateTime deliveryTime;
     }
 
 }

@@ -56,6 +56,9 @@ public class ErpPurchaseOrderBaseRespVO extends ErpPurchaseBaseRespVO {
     @Schema(description = "交货日期", example = "2025-1-1")
     private LocalDateTime deliveryDate;
 
+    @Schema(description = "结算日期")
+    private LocalDateTime settlementDate;
+
     @Data
     public static class Item {
 
@@ -82,7 +85,7 @@ public class ErpPurchaseOrderBaseRespVO extends ErpPurchaseBaseRespVO {
         private BigDecimal taxPrice;
 
         @Schema(description = "价税合计")
-        private double allAmount;
+        private BigDecimal allAmount;
 
         @Schema(description = "备注", example = "随便")
         private String remark;
@@ -118,9 +121,8 @@ public class ErpPurchaseOrderBaseRespVO extends ErpPurchaseBaseRespVO {
 
         @Schema(description = "源单行号")
         private int srcSeq;
-        // 源单类型ID
-//        private String srcBillTypeId;
 
+//        private String srcBillTypeId;// 源单类型ID
         @Schema(description = "源单类型")
         private String srcBillTypeName;
 

@@ -118,6 +118,6 @@ public class ErpPurchaseRequestRespVO {
         private BigDecimal actTaxPrice;
 
         @Schema(description = "价税合计")
-        private double allAmount;
+        private BigDecimal allAmount;
     }
 }

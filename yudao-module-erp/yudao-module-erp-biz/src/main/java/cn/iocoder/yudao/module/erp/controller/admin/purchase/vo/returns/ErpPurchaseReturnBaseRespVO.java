@@ -92,7 +92,7 @@ public class ErpPurchaseReturnBaseRespVO extends ErpPurchaseBaseRespVO {
         private BigDecimal stockCount; // 该字段仅仅在“详情”和“编辑”时使用
 
         @Schema(description = "价税合计")
-        private  double allAmount;
+        private  BigDecimal allAmount;
 
         @Schema(description = "报关品名-产品(产品的品牌)")
         private String customsDeclaration;

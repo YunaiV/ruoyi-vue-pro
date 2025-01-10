@@ -141,6 +141,8 @@ public class ErpPurchaseOrderDO extends BaseDO {
      * 完工单，JSON 格式
      */
     private String completionJson;
+
     private String xCode;//x码
+
     private String containerRate;//箱率
 }
