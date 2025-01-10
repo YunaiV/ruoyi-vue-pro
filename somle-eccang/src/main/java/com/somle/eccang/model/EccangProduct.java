@@ -61,7 +61,7 @@ public class EccangProduct {
     private Integer operationType;
     private Integer productStatus;
     private Integer saleStatus;
-    private String hsCode;
+//    private String hsCode;//暂停同步该属性
     private Float productLength;
     private Float productWidth;
     private Float productHeight;

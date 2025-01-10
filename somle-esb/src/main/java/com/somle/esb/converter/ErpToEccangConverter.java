@@ -178,7 +178,7 @@ public class ErpToEccangConverter {
         eccangProduct.setFboTaxRate(customRuleDTO.getTaxRate());
         eccangProduct.setPdOverseaTypeCn(customRuleDTO.getDeclaredType());
         eccangProduct.setProductImgUrlList(Collections.singletonList(customRuleDTO.getProductImageUrl()));
-        eccangProduct.setHsCode(customRuleDTO.getHscode());
+//        eccangProduct.setHsCode(customRuleDTO.getHscode());//暂停向eccang同步该属性
         eccangProduct.setDefaultSupplierCode("默认供应商");
         // 设置物流属性
         Integer logisticAttribute = customRuleDTO.getLogisticAttribute();
