@@ -183,10 +183,8 @@ logging:
     cn.iocoder.yudao.module.crm.dal.mysql: debug
     cn.iocoder.yudao.module.erp.dal.mysql: debug
     cn.iocoder.yudao.module.iot.dal.mysql: debug
-    cn.iocoder.yudao.module.iot.dal.tdengine: DEBUG
     cn.iocoder.yudao.module.ai.dal.mysql: debug
     org.springframework.context.support.PostProcessorRegistrationDelegate: ERROR # TODO 芋艿：先禁用，Spring Boot 3.X 存在部分错误的 WARN 提示
-    com.taosdata: DEBUG # TDengine 的日志级别
 
 debug: false
 
@@ -283,3 +281,16 @@ iot:
     # 清除会话(设置为false,断开连接，重连后使用原来的会话 保留订阅的主题，能接收离线期间的消息)
     clearSession: true
 
+# MQTT-RPC 配置
+mqtt:
+  broker: tcp://127.0.0.1:1883
+  username: root
+  password: 123456
+  clientId: mqtt-rpc-server-${random.int}
+  requestTopic: rpc/request
+  responseTopicPrefix: rpc/response/
+
+
+# 插件配置
+pf4j:
+  pluginsDir: /Users/anhaohao/code/gitee/ruoyi-vue-pro/plugins # 插件目录

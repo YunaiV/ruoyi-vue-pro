@@ -1,11 +1,17 @@
 package cn.iocoder.yudao.module.iot.controller.admin.plugin.vo;
 
+import cn.iocoder.yudao.framework.common.validation.InEnum;
+import cn.iocoder.yudao.module.iot.enums.plugin.IotPluginStatusEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.*;
+import lombok.Data;
 
 @Schema(description = "管理后台 - IoT 插件信息新增/修改 Request VO")
 @Data
 public class PluginInfoSaveReqVO {
+
+    // TODO @haohao：新增的字段有点多，每个都需要哇？
+
+    // TODO @haohao：一些枚举字段，需要加枚举校验。例如说，deployType、status、type 等
 
     @Schema(description = "主键ID", requiredMode = Schema.RequiredMode.REQUIRED, example = "11546")
     private Long id;
@@ -35,6 +41,7 @@ public class PluginInfoSaveReqVO {
     private String protocol;
 
     @Schema(description = "状态", requiredMode = Schema.RequiredMode.REQUIRED)
+    @InEnum(IotPluginStatusEnum.class)
     private Integer status;
 
     @Schema(description = "插件配置项描述信息")

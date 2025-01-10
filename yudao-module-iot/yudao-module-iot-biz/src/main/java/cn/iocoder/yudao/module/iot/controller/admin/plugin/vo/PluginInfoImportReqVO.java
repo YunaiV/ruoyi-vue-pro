@@ -9,7 +9,7 @@ import org.springframework.web.multipart.MultipartFile;
 @Data
 public class PluginInfoImportReqVO {
 
-    @Schema(description = "主键ID", requiredMode = Schema.RequiredMode.REQUIRED, example = "11546")
+    @Schema(description = "主键 ID", requiredMode = Schema.RequiredMode.REQUIRED, example = "11546")
     private Long id;
 
     @Schema(description = "插件文件", requiredMode = Schema.RequiredMode.REQUIRED)

@@ -74,6 +74,7 @@ public class IotThingModelController {
         return success(IotThingModelConvert.INSTANCE.convertList(list));
     }
 
+    // TODO @puhui @super：getThingModelListByProductId 和 getThingModelListByProductId 可以融合么？
     @GetMapping("/list")
     @Operation(summary = "获得产品物模型列表")
     @PreAuthorize("@ss.hasPermission('iot:thing-model:query')")

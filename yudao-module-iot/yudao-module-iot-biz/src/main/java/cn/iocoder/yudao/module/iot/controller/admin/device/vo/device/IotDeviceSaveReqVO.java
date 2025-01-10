@@ -14,7 +14,7 @@ public class IotDeviceSaveReqVO {
     private Long id;
 
     @Schema(description = "设备编号", requiredMode = Schema.RequiredMode.AUTO, example = "177")
-    @Size(max = 50, message = "设备编号长度不能超过50个字符")
+    @Size(max = 50, message = "设备编号长度不能超过 50 个字符")
     private String deviceKey;
 
     @Schema(description = "设备名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "王五")

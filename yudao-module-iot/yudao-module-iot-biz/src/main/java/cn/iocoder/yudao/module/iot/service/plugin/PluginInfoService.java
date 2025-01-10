@@ -4,6 +4,7 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.iot.controller.admin.plugin.vo.PluginInfoPageReqVO;
 import cn.iocoder.yudao.module.iot.controller.admin.plugin.vo.PluginInfoSaveReqVO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.plugininfo.PluginInfoDO;
+import cn.iocoder.yudao.module.iot.enums.plugin.IotPluginStatusEnum;
 import jakarta.validation.Valid;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -66,7 +67,7 @@ public interface PluginInfoService {
      * 更新插件的状态
      *
      * @param id     插件id
-     * @param status 状态
+     * @param status 状态 {@link IotPluginStatusEnum}
      */
     void updatePluginStatus(Long id, Integer status);
 
@@ -76,4 +77,12 @@ public interface PluginInfoService {
      * @return 插件信息列表
      */
     List<PluginInfoDO> getPluginInfoList();
+
+    /**
+     * 根据状态获得插件信息列表
+     *
+     * @param status 状态 {@link IotPluginStatusEnum}
+     * @return 插件信息列表
+     */
+    List<PluginInfoDO> getPluginInfoListByStatus(Integer status);
 }

@@ -6,19 +6,19 @@
 
     <!-- 创建设备日志超级表   初始化只创建一次-->
     <update id="createDeviceLogSTable">
-        CREATE STABLE device_log(
-        ts TIMESTAMP,
-        id NCHAR(50),
-        product_key NCHAR(50),
-        type NCHAR(50),
-        subType NCHAR(50),
-        content NCHAR(1024),
-        report_time TIMESTAMP
-        )TAGS (
-        device_key NCHAR(50)
-        )
+        CREATE STABLE device_log (
+            ts TIMESTAMP,
+            id NCHAR(50),
+            product_key NCHAR(50),
+            type NCHAR(50),
+            <!-- TODO @super：下划线 sub_type -->
+            subType NCHAR(50),
+            content NCHAR(1024),
+            report_time TIMESTAMP
+            ) TAGS (
+                device_key NCHAR(50)
+            )
     </update>
-
 
     <!-- 创建设备日志子表  讨论：TDengine 在子表不存在的情况下 可在数据插入时 自动建表  要不要去掉创建子表的逻辑  由第一次插入数据时自动创建-->
     <update id="createDeviceLogTable">
@@ -40,5 +40,39 @@
             #{log.reportTime}
         )
     </insert>
+
+    <select id="selectPage" resultType="cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceLogDO">
+        SELECT ts, id, device_key, product_key, type, subType, content, report_time
+        FROM device_log_${reqVO.deviceKey}
+        <where>
+            <if test="reqVO.type != null and reqVO.type != ''">
+                AND type = #{reqVO.type}
+            </if>
+            <if test="reqVO.subType != null and reqVO.subType != ''">
+                AND subType = #{reqVO.subType}
+            </if>
+            <if test="reqVO.createTime != null">
+                AND ts BETWEEN #{reqVO.createTime[0]} AND #{reqVO.createTime[1]}
+            </if>
+        </where>
+        ORDER BY ts DESC
+        LIMIT #{reqVO.pageSize} OFFSET #{reqVO.pageNo}
+    </select>
+
+    <select id="selectCount" resultType="Long">
+        SELECT COUNT(*)
+        FROM device_log_${reqVO.deviceKey}
+        <where>
+            <if test="reqVO.type != null and reqVO.type != ''">
+                AND type = #{reqVO.type}
+            </if>
+            <if test="reqVO.subType != null and reqVO.subType != ''">
+                AND subType = #{reqVO.subType}
+            </if>
+            <if test="reqVO.createTime != null">
+                AND ts BETWEEN #{reqVO.createTime[0]} AND #{reqVO.createTime[1]}
+            </if>
+        </where>
+    </select>
 
 </mapper>

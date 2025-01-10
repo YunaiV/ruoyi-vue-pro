@@ -31,7 +31,13 @@ public class UnifiedConfiguration {
     @DependsOn(SERVICE_REGISTRY_INITIALIZED_MARKER)
     public SpringPluginManager pluginManager() {
         log.info("[init][实例化 SpringPluginManager]");
-        SpringPluginManager springPluginManager = new SpringPluginManager();
+        SpringPluginManager springPluginManager = new SpringPluginManager() {
+            @Override
+            public void startPlugins() {
+                // 禁用插件启动，避免插件启动时，启动所有插件
+                log.info("[init][禁用默认启动所有插件]");
+            }
+        };
         springPluginManager.addPluginStateListener(new CustomPluginStateListener());
         return springPluginManager;
     }

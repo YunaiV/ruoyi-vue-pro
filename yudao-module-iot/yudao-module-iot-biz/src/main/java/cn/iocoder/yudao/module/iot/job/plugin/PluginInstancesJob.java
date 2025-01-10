@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.module.iot.job.plugin;
 
-
 import cn.iocoder.yudao.framework.tenant.core.util.TenantUtils;
 import cn.iocoder.yudao.module.iot.service.plugin.PluginInstanceService;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -23,7 +22,8 @@ public class PluginInstancesJob {
     @Scheduled(initialDelay = 60, fixedRate = 60, timeUnit = TimeUnit.SECONDS)
     public void updatePluginInstances() {
         TenantUtils.executeIgnore(() -> {
-            pluginInstanceService.updatePluginInstances();
+            pluginInstanceService.reportPluginInstances();
         });
     }
+
 }

@@ -1,15 +1,18 @@
 package cn.iocoder.yudao.module.iot.dal.tdengine;
 
+import cn.iocoder.yudao.module.iot.controller.admin.device.vo.deviceData.IotDeviceLogPageReqVO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceLogDO;
 import cn.iocoder.yudao.module.iot.framework.tdengine.core.annotation.TDengineDS;
 import com.baomidou.mybatisplus.annotation.InterceptorIgnore;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.List;
+
 /**
- * IoT 设备日志 Mapper
+ * IOT 设备日志数据 Mapper 接口
  *
- * @author alwayssuper
+ * 基于 TDengine 实现设备日志的存储
  */
 @Mapper
 @TDengineDS
@@ -18,22 +21,58 @@ public interface IotDeviceLogDataMapper {
 
     /**
      * 创建设备日志超级表
+<<<<<<< HEAD
      * 初始化只创建一次
      */
     void createDeviceLogSTable();
 
+=======
+     *
+     * 注意：初始化时只需创建一次
+     */
+    void createDeviceLogSTable();
+
+    // TODO @super：是不是删除哈
+>>>>>>> deab8c1cc6bb7864d9c40e0c369f649f6f9bfa41
     /**
      * 创建设备日志子表
      *
      * @param deviceKey 设备标识
      */
+<<<<<<< HEAD
     void createDeviceLogTable( @Param("deviceKey") String deviceKey);
 
     /**
      * 插入设备日志数据
      *
+=======
+    void createDeviceLogTable(@Param("deviceKey") String deviceKey);
+
+    // TODO @super：单个参数，不用加 @Param
+    /**
+     * 插入设备日志数据
+     *
+     * 如果子表不存在，会自动创建子表
+     *
+>>>>>>> deab8c1cc6bb7864d9c40e0c369f649f6f9bfa41
      * @param log 设备日志数据
      */
     void insert(@Param("log") IotDeviceLogDO log);
+
+    /**
+     * 获得设备日志分页
+     *
+     * @param reqVO 分页查询条件
+     * @return 设备日志列表
+     */
+    List<IotDeviceLogDO> selectPage(@Param("reqVO") IotDeviceLogPageReqVO reqVO);
+
+    /**
+     * 获得设备日志总数
+     *
+     * @param reqVO 查询条件
+     * @return 日志总数
+     */
+    Long selectCount(@Param("reqVO") IotDeviceLogPageReqVO reqVO);
 
 }

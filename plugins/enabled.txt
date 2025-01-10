@@ -1,2 +1,0 @@
-http-plugin
-http-plugin@0.0.1

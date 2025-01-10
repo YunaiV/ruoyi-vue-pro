@@ -1,6 +1,8 @@
 package cn.iocoder.yudao.module.iot.controller.admin.plugin.vo;
 
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
+import cn.iocoder.yudao.framework.common.validation.InEnum;
+import cn.iocoder.yudao.module.iot.enums.plugin.IotPluginStatusEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
@@ -11,7 +13,8 @@ public class PluginInfoPageReqVO extends PageParam {
     @Schema(description = "插件名称", example = "http")
     private String name;
 
-    @Schema(description = "状态")
+    @Schema(description = "状态", example = "1")
+    @InEnum(IotPluginStatusEnum.class)
     private Integer status;
 
 }

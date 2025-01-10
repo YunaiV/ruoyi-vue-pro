@@ -33,19 +33,22 @@ public class PluginInstanceDO extends BaseDO {
      */
     private String mainId;
     /**
-     * 插件id
+     * 插件 ID
      * <p>
      * 关联 {@link PluginInfoDO#getId()}
      */
     private Long pluginId;
+
     /**
-     * 插件主程序所在ip
+     * 插件主程序所在 IP
      */
     private String ip;
     /**
      * 插件主程序端口
      */
     private Integer port;
+
+    // TODO @haohao：字段改成 heartbeatTime，LocalDateTime
     /**
      * 心跳时间，心路时间超过 30 秒需要剔除
      */
