@@ -23,6 +23,7 @@ import org.flowable.bpmn.model.Process;
 import org.flowable.bpmn.model.*;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.impl.util.io.BytesStreamSource;
+import org.flowable.engine.impl.el.FixedValue;
 
 import java.util.*;
 
@@ -370,12 +371,10 @@ public class BpmnModelUtils {
         flowableListener.getFieldExtensions().add(fieldExtension);
     }
 
-    public static BpmSimpleModelNodeVO.ListenerHandler parseListenerConfig(FlowableListener flowableListener) {
-        FieldExtension fieldExtension = flowableListener.getFieldExtensions().stream()
-                .filter(item -> item.getFieldName().equals("listenerConfig"))
-                .findFirst().orElse(null);
-        Assert.notNull(fieldExtension, "监听器扩展字段({})不能为空", fieldExtension);
-        return JsonUtils.parseObject(fieldExtension.getStringValue(), BpmSimpleModelNodeVO.ListenerHandler.class);
+    public static BpmSimpleModelNodeVO.ListenerHandler parseListenerConfig(FixedValue fixedValue) {
+        String expressionText = fixedValue.getExpressionText();
+        Assert.notNull(expressionText, "监听器扩展字段({})不能为空", expressionText);
+        return JsonUtils.parseObject(expressionText, BpmSimpleModelNodeVO.ListenerHandler.class);
     }
 
     // ========== BPM 简单查找相关的方法 ==========
