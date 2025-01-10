@@ -93,18 +93,6 @@ CREATE TABLE `erp_customer` (
 ) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='ERP 客户表';
 
 -- ----------------------------
--- Table structure for erp_department
--- ----------------------------
-DROP TABLE IF EXISTS `erp_department`;
-CREATE TABLE `erp_department` (
-                                  `id` bigint NOT NULL,
-                                  `name_zh` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
-                                  `parent_id` bigint NOT NULL,
-                                  `level` int DEFAULT NULL,
-                                  PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
--- ----------------------------
 -- Table structure for erp_finance_payment
 -- ----------------------------
 DROP TABLE IF EXISTS `erp_finance_payment`;
