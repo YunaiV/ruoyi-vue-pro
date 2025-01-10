@@ -1,12 +1,13 @@
 package cn.iocoder.yudao.module.erp.controller.admin.logistic.customrule.vo;
 
-import lombok.*;
+import cn.iocoder.yudao.framework.common.pojo.PageParam;
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.math.BigDecimal;
-import java.util.*;
-import io.swagger.v3.oas.annotations.media.Schema;
-import cn.iocoder.yudao.framework.common.pojo.PageParam;
-import org.springframework.format.annotation.DateTimeFormat;
 import java.time.LocalDateTime;
 
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
@@ -20,8 +21,8 @@ public class ErpCustomRulePageReqVO extends PageParam {
     @Schema(description = "国家编码")
     private Integer countryCode;
 
-    @Schema(description = "类型", example = "报关")
-    private String type;
+//    @Schema(description = "类型", example = "报关")
+//    private String type;
 
     @Schema(description = "供应商产品编号")
     private Long supplierProductId;

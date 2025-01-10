@@ -28,9 +28,9 @@ public class ErpCustomRuleRespVO implements VO {
     @ExcelProperty("国家编码")
     private Integer countryCode;
 
-    @Schema(description = "类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "报关")
-    @ExcelProperty("类型")
-    private String type;
+//    @Schema(description = "类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "报关")
+//    @ExcelProperty("类型")
+//    private String type;
 
     @Schema(description = "供应商产品编号", requiredMode = Schema.RequiredMode.REQUIRED)
     @ExcelProperty("供应商产品编号")

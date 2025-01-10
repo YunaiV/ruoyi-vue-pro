@@ -1,18 +1,19 @@
 package cn.iocoder.yudao.module.erp.dal.mysql.logistic.customrule;
 
-import java.util.*;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
+import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.MPJLambdaWrapperX;
 import cn.iocoder.yudao.module.erp.api.product.dto.ErpCustomRuleDTO;
+import cn.iocoder.yudao.module.erp.controller.admin.logistic.customrule.vo.ErpCustomRulePageReqVO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.logistic.customrule.ErpCustomRuleDO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.product.ErpProductDO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpSupplierProductDO;
 import com.github.yulichang.wrapper.MPJLambdaWrapper;
 import jakarta.validation.constraints.NotNull;
 import org.apache.ibatis.annotations.Mapper;
-import cn.iocoder.yudao.module.erp.controller.admin.logistic.customrule.vo.*;
+
+import java.util.List;
 
 /**
  * ERP 海关规则 Mapper
@@ -56,7 +57,7 @@ public interface ErpCustomRuleMapper extends BaseMapperX<ErpCustomRuleDO> {
     default PageResult<ErpCustomRuleDO> selectPage(ErpCustomRulePageReqVO reqVO) {
         return selectPage(reqVO, new LambdaQueryWrapperX<ErpCustomRuleDO>()
                 .eqIfPresent(ErpCustomRuleDO::getCountryCode, reqVO.getCountryCode())
-                .eqIfPresent(ErpCustomRuleDO::getType, reqVO.getType())
+//                .eqIfPresent(ErpCustomRuleDO::getType, reqVO.getType())
                 .eqIfPresent(ErpCustomRuleDO::getSupplierProductId, reqVO.getSupplierProductId())
                 .likeIfPresent(ErpCustomRuleDO::getDeclaredTypeEn, reqVO.getDeclaredTypeEn())
                 .likeIfPresent(ErpCustomRuleDO::getDeclaredType, reqVO.getDeclaredType())
