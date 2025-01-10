@@ -148,14 +148,6 @@ public class EccangService {
                         throw new RuntimeException("Unknown response code " + response);
                 }
             }
-        }, ctx -> {
-            //达到最大重试次数。
-            log.error("All retries completed without success. Last error: ", ctx.getLastThrowable());
-            try {
-                throw ctx.getLastThrowable();
-            } catch (Throwable e) {
-                throw new RuntimeException(e);
-            }
         });
         return responseFinal;
     }
