@@ -21,32 +21,10 @@ public interface IotDeviceLogDataMapper {
 
     /**
      * 创建设备日志超级表
-<<<<<<< HEAD
      * 初始化只创建一次
      */
     void createDeviceLogSTable();
 
-=======
-     *
-     * 注意：初始化时只需创建一次
-     */
-    void createDeviceLogSTable();
-
-    // TODO @super：是不是删除哈
->>>>>>> deab8c1cc6bb7864d9c40e0c369f649f6f9bfa41
-    /**
-     * 创建设备日志子表
-     *
-     * @param deviceKey 设备标识
-     */
-<<<<<<< HEAD
-    void createDeviceLogTable( @Param("deviceKey") String deviceKey);
-
-    /**
-     * 插入设备日志数据
-     *
-=======
-    void createDeviceLogTable(@Param("deviceKey") String deviceKey);
 
     // TODO @super：单个参数，不用加 @Param
     /**
@@ -54,10 +32,9 @@ public interface IotDeviceLogDataMapper {
      *
      * 如果子表不存在，会自动创建子表
      *
->>>>>>> deab8c1cc6bb7864d9c40e0c369f649f6f9bfa41
      * @param log 设备日志数据
      */
-    void insert(@Param("log") IotDeviceLogDO log);
+    void insert(IotDeviceLogDO log);
 
     /**
      * 获得设备日志分页
@@ -65,7 +42,7 @@ public interface IotDeviceLogDataMapper {
      * @param reqVO 分页查询条件
      * @return 设备日志列表
      */
-    List<IotDeviceLogDO> selectPage(@Param("reqVO") IotDeviceLogPageReqVO reqVO);
+    List<IotDeviceLogDO> selectPage(IotDeviceLogPageReqVO reqVO);
 
     /**
      * 获得设备日志总数
@@ -73,6 +50,11 @@ public interface IotDeviceLogDataMapper {
      * @param reqVO 查询条件
      * @return 日志总数
      */
-    Long selectCount(@Param("reqVO") IotDeviceLogPageReqVO reqVO);
+    Long selectCount(IotDeviceLogPageReqVO reqVO);
 
+    /**
+     * 查询设备日志表是否存在
+     *
+     */
+    Object checkDeviceLogTableExists();
 }

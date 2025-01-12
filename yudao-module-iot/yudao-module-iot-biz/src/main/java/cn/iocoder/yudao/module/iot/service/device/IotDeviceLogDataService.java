@@ -17,7 +17,7 @@ public interface IotDeviceLogDataService {
      *
      *系统启动时，会自动初始化一次
      */
-    void initTDengineSTable();
+    void defineDeviceLog();
 
     /**
      * 插入设备日志

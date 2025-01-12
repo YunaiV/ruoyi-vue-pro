@@ -283,9 +283,9 @@ iot:
 
 # MQTT-RPC 配置
 mqtt:
-  broker: tcp://127.0.0.1:1883
-  username: root
-  password: 123456
+  broker: tcp://chaojiniu.top:1883
+  username: haohao
+  password: ahh@123456
   clientId: mqtt-rpc-server-${random.int}
   requestTopic: rpc/request
   responseTopicPrefix: rpc/response/

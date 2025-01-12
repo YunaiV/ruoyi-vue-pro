@@ -28,9 +28,24 @@ public class IotDeviceLogDataServiceImpl implements IotDeviceLogDataService{
 
     // TODO @super：方法名。defineDeviceLog。。未来，有可能别人使用别的记录日志，例如说 es 之类的。
     @Override
-    public void initTDengineSTable() {
+    public void defineDeviceLog() {
         // TODO @super：改成不存在才创建。
-        iotDeviceLogDataMapper.createDeviceLogSTable();
+//        try {
+//            // 创建超级表（使用 IF NOT EXISTS 语句避免重复创建错误）
+//            iotDeviceLogDataMapper.createDeviceLogSTable();
+//        } catch (Exception e) {
+//            if (e.getMessage().contains("already exists")) {
+//                log.info("[TDengine] 设备日志超级表已存在，跳过创建");
+//                return;
+//            }
+//            throw e;
+//        }
+        if(iotDeviceLogDataMapper.checkDeviceLogTableExists()==null){
+            log.info("[TDengine] 设备日志超级表不存在，开始创建 {}",iotDeviceLogDataMapper.checkDeviceLogTableExists());
+            iotDeviceLogDataMapper.createDeviceLogSTable();
+        }else{
+            log.info("[TDengine] 设备日志超级表已存在，跳过创建");
+        }
     }
 
     @Override
