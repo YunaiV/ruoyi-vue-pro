@@ -75,13 +75,13 @@ public class ErpToKingdeeConverter {
         KingdeeProduct kingdeeProduct = new KingdeeProduct();
         //普通
         kingdeeProduct.setCheckType("1");
-        // 如果有供应商产品编码和国家代码都不为空的时候才去设置SKU
+        // 如果有产品编码和国家代码都不为空的时候才去设置SKU
         Integer countryCode = customRuleDTO.getCountryCode();
         if (ObjUtil.isNotEmpty(countryCode)) {
             // 将字典value转换为label
             DictDataRespDTO dictData = dictDataApi.getDictData(DictTypeConstants.COUNTRY_CODE, String.valueOf(countryCode));
-            if (StrUtil.isNotBlank(customRuleDTO.getSupplierProductCode())) {
-                kingdeeProduct.setNumber(customRuleDTO.getSupplierProductCode() + "-" + getCountrySuffix(dictData.getLabel()));
+            if (StrUtil.isNotBlank(customRuleDTO.getBarCode())) {
+                kingdeeProduct.setNumber(customRuleDTO.getBarCode() + "-" + getCountrySuffix(dictData.getLabel()));
                 kingdeeProduct.setName(customRuleDTO.getProductName() + "-" + getCountrySuffix(dictData.getLabel()));
             }
         }

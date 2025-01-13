@@ -32,16 +32,18 @@ public interface ErpCustomRuleMapper extends BaseMapperX<ErpCustomRuleDO> {
                         ErpCustomRuleDO::getDeclaredValueCurrencyCode,
                         ErpCustomRuleDO::getDeclaredType,
                         ErpCustomRuleDO::getDeclaredTypeEn,
-                        ErpCustomRuleDO::getTaxRate)
-                .leftJoin(ErpSupplierProductDO.class, ErpSupplierProductDO::getId, ErpCustomRuleDO::getSupplierProductId)
-                .selectAs(ErpSupplierProductDO::getCode, ErpCustomRuleDTO::getSupplierProductCode)
-                .selectAs(ErpSupplierProductDO::getPurchasePrice,ErpCustomRuleDTO::getProductPurchaseValue)
-                .select(ErpSupplierProductDO::getPackageWeight,
-                        ErpSupplierProductDO::getPackageLength,
-                        ErpSupplierProductDO::getPackageWidth,
-                        ErpSupplierProductDO::getPackageHeight,
-                        ErpSupplierProductDO::getPurchasePriceCurrencyCode)
-                .leftJoin(ErpProductDO.class, ErpProductDO::getId, ErpSupplierProductDO::getProductId)
+                        ErpCustomRuleDO::getTaxRate,
+                        ErpCustomRuleDO::getProductId
+                    )
+//                .leftJoin(ErpSupplierProductDO.class, ErpSupplierProductDO::getId, ErpCustomRuleDO::getSupplierProductId)
+//                .selectAs(ErpSupplierProductDO::getCode, ErpCustomRuleDTO::getSupplierProductCode)
+//                .selectAs(ErpSupplierProductDO::getPurchasePrice,ErpCustomRuleDTO::getProductPurchaseValue)
+//                .select(ErpSupplierProductDO::getPackageWeight,
+//                        ErpSupplierProductDO::getPackageLength,
+//                        ErpSupplierProductDO::getPackageWidth,
+//                        ErpSupplierProductDO::getPackageHeight,
+//                        ErpSupplierProductDO::getPurchasePriceCurrencyCode)
+                .leftJoin(ErpProductDO.class, ErpProductDO::getId, ErpCustomRuleDO::getProductId)
                 .selectAs(ErpProductDO::getName, ErpCustomRuleDTO::getProductName)
                 .selectAs(ErpProductDO::getPrimaryImageUrl, ErpCustomRuleDTO::getProductImageUrl)
                 .selectAs(ErpProductDO::getWeight, ErpCustomRuleDTO::getProductWeight)
@@ -58,7 +60,7 @@ public interface ErpCustomRuleMapper extends BaseMapperX<ErpCustomRuleDO> {
         return selectPage(reqVO, new LambdaQueryWrapperX<ErpCustomRuleDO>()
                 .eqIfPresent(ErpCustomRuleDO::getCountryCode, reqVO.getCountryCode())
 //                .eqIfPresent(ErpCustomRuleDO::getType, reqVO.getType())
-                .eqIfPresent(ErpCustomRuleDO::getSupplierProductId, reqVO.getSupplierProductId())
+//                .eqIfPresent(ErpCustomRuleDO::getSupplierProductId, reqVO.getSupplierProductId())
                 .likeIfPresent(ErpCustomRuleDO::getDeclaredTypeEn, reqVO.getDeclaredTypeEn())
                 .likeIfPresent(ErpCustomRuleDO::getDeclaredType, reqVO.getDeclaredType())
                 .eqIfPresent(ErpCustomRuleDO::getDeclaredValue, reqVO.getDeclaredValue())
@@ -103,9 +105,16 @@ public interface ErpCustomRuleMapper extends BaseMapperX<ErpCustomRuleDO> {
         return selectJoinList(ErpCustomRuleDTO.class, getWrapper().eq(ErpSupplierProductDO::getId, id));
     }
 
-    default ErpCustomRuleDO selectByCountryCodeAndSupplierProductId(Integer countryCode, Long supplierProductId) {
+
+    /**
+     * 根据 城市code 和 产品id 查询entity
+     * @param countryCode 国家代码
+     * @param productId 产品id
+     * @return ErpCustomRuleDO
+     */
+    default ErpCustomRuleDO getCustomRuleByCountryCodeAndProductId(Integer countryCode, Long productId) {
         return selectOne(new LambdaQueryWrapperX<ErpCustomRuleDO>()
-                .eq(ErpCustomRuleDO::getCountryCode, countryCode)
-                .eq(ErpCustomRuleDO::getSupplierProductId, supplierProductId));
+            .eq(ErpCustomRuleDO::getCountryCode, countryCode)
+            .eq(ErpCustomRuleDO::getProductId, productId));
     }
 }

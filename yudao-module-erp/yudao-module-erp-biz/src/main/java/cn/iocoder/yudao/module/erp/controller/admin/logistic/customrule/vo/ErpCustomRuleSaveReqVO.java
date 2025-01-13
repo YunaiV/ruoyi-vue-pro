@@ -11,20 +11,17 @@ import java.math.BigDecimal;
 @Data
 public class ErpCustomRuleSaveReqVO {
 
-    @Schema(description = "产品编号", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "海关规则id", requiredMode = Schema.RequiredMode.REQUIRED)
     private Long id;
 
     @Schema(description = "国家编码", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "国家编码不能为空")
     private Integer countryCode;
 
-//    @Schema(description = "类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "报关")
-//    @NotEmpty(message = "类型不能为空")
-//    private String type;
 
-    @Schema(description = "供应商产品编号", requiredMode = Schema.RequiredMode.REQUIRED)
-    @NotNull(message = "供应商产品编号不能为空")
-    private Long supplierProductId;
+    @Schema(description = "产品id",requiredMode = Schema.RequiredMode.REQUIRED)
+    @NotNull(message = "产品id不能为空")
+    private Long productId;
 
     @Schema(description = "申报品名（英文）")
     @NotEmpty(message = "申报品名（英文）不能为空")

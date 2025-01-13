@@ -1,10 +1,7 @@
 package cn.iocoder.yudao.module.erp.controller.admin.logistic.customrule.vo;
 
-import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpSupplierProductDO;
 import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
 import com.alibaba.excel.annotation.ExcelProperty;
-import com.fhs.core.trans.anno.Trans;
-import com.fhs.core.trans.constant.TransType;
 import com.fhs.core.trans.vo.VO;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
@@ -28,18 +25,13 @@ public class ErpCustomRuleRespVO implements VO {
     @ExcelProperty("国家编码")
     private Integer countryCode;
 
-//    @Schema(description = "类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "报关")
-//    @ExcelProperty("类型")
-//    private String type;
+    @Schema(description = "产品id")
+    @ExcelProperty("产品id")
+    private Long productId;
 
-    @Schema(description = "供应商产品编号", requiredMode = Schema.RequiredMode.REQUIRED)
-    @ExcelProperty("供应商产品编号")
-    @Trans(type = TransType.SIMPLE, target = ErpSupplierProductDO.class,fields = "code",ref = "supplierProductCode")
-    private Long supplierProductId;
-
-    @Schema(description = "供应商产品编号")
-    @ExcelProperty("供应商产品编号")
-    private String supplierProductCode;
+    @Schema(description = "产品名称")
+    @ExcelProperty("产品名称")
+    private String productName;
 
     @Schema(description = "申报品名（英文）")
     @ExcelProperty("申报品名（英文）")
