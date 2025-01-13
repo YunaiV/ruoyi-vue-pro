@@ -17,6 +17,9 @@ public class ErpPurchaseOrderSaveReqVO {
     @Schema(description = "编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "17386")
     private Long id;
 
+    @Schema(description = "单据日期", example = "2024-10-12")
+    private LocalDateTime noTime;
+
     @Schema(description = "供应商编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1724")
     @NotNull(message = "供应商编号不能为空")
     private Long supplierId;
@@ -26,7 +29,6 @@ public class ErpPurchaseOrderSaveReqVO {
 
     @Schema(description = "结算日期", example = "2025-1-1")
     private LocalDateTime settlementDate;
-
 
     @Schema(description = "采购时间", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "采购时间不能为空")
@@ -58,20 +60,23 @@ public class ErpPurchaseOrderSaveReqVO {
     @Data
     public static class Item {
 
-        @Schema(description = "订单项编号", example = "11756")
+        @Schema(description = "订单项编号")
         private Long id;
 
-        @Schema(description = "产品编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "3113")
+        @Schema(description = "产品编号", requiredMode = Schema.RequiredMode.REQUIRED)
         @NotNull(message = "产品编号不能为空")
         private Long productId;
 
-        @Schema(description = "产品单位", requiredMode = Schema.RequiredMode.REQUIRED, example = "3113")
+        @Schema(description = "产品单位", requiredMode = Schema.RequiredMode.REQUIRED)
         @NotNull(message = "产品单位不能为空")
         private Long productUnitId;
 
         @Schema(description = "产品单价", example = "100.00")
         @DecimalMin(value = "0.00", message = "产品单价不能小于0")
         private BigDecimal productPrice;
+
+        @Schema(description = "币别id(财务管理-币别维护)")
+        private Long currencyId;
 
         @Schema(description = "含税单价", example = "100.00")
         @DecimalMin(value = "0.00", message = "含税单价不能小于0")
@@ -93,8 +98,6 @@ public class ErpPurchaseOrderSaveReqVO {
         @NotNull(message = "供应商产品编号不能为空")
         private String supplierProductId;
 
-        @Schema(description = "产品名称")
-        private String ItemName;
         // ========== 采购入库 ==========
         /**
          * 采购入库数量
@@ -110,6 +113,12 @@ public class ErpPurchaseOrderSaveReqVO {
 
         @Schema(description = "交货日期", example = "2025-1-1")
         private LocalDateTime deliveryTime;
+        // ========== 其他 ==========
+        @Schema(description = "x码")
+        private String xCode;
+
+        @Schema(description = "箱率")
+        private String containerRate;
     }
 
 }

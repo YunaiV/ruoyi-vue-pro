@@ -40,6 +40,7 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static cn.iocoder.yudao.framework.apilog.core.enums.OperateTypeEnum.EXPORT;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
@@ -60,15 +61,15 @@ public class ErpPurchaseOrderController {
     private ErpProductService productService;
     @Resource
     private ErpSupplierService supplierService;
+    @Resource
+    private ErpWarehouseService erpWarehouseService;
+
 
     @Resource
     private AdminUserApi adminUserApi;
     @Resource
     private DeptApi deptApi;
-    @Resource
-    private ErpWarehouseService erpWarehouseService;
 //    warehouse
-
 
 
     @PostMapping("/create")
@@ -90,7 +91,7 @@ public class ErpPurchaseOrderController {
     @Operation(summary = "更新采购订单的状态")
     @PreAuthorize("@ss.hasPermission('erp:purchase-order:update-status')")
     public CommonResult<Boolean> updatePurchaseOrderStatus(@RequestParam("id") Long id,
-                                                      @RequestParam("status") Integer status) {
+                                                           @RequestParam("status") Integer status) {
         purchaseOrderService.updatePurchaseOrderStatus(id, status);
         return success(true);
     }
@@ -115,14 +116,14 @@ public class ErpPurchaseOrderController {
         }
         List<ErpPurchaseOrderItemDO> purchaseOrderItemList = purchaseOrderService.getPurchaseOrderItemListByOrderId(id);
         Map<Long, ErpProductRespVO> productMap = productService.getProductVOMap(
-                convertSet(purchaseOrderItemList, ErpPurchaseOrderItemDO::getProductId));
+            convertSet(purchaseOrderItemList, ErpPurchaseOrderItemDO::getProductId));
         return success(BeanUtils.toBean(purchaseOrder, ErpPurchaseOrderBaseRespVO.class, purchaseOrderVO ->
-                purchaseOrderVO.setItems(BeanUtils.toBean(purchaseOrderItemList, ErpPurchaseOrderBaseRespVO.Item.class, item -> {
-                    BigDecimal purchaseCount = stockService.getStockCount(item.getProductId());
-                    item.setCount(purchaseCount != null ? purchaseCount : BigDecimal.ZERO);
-                    MapUtils.findAndThen(productMap, item.getProductId(), product -> item.setProductName(product.getName())
-                            .setProductBarCode(product.getBarCode()).setProductUnitName(product.getUnitName()));
-                }))));
+            purchaseOrderVO.setItems(BeanUtils.toBean(purchaseOrderItemList, ErpPurchaseOrderBaseRespVO.Item.class, item -> {
+                BigDecimal purchaseCount = stockService.getStockCount(item.getProductId());
+                item.setCount(purchaseCount != null ? purchaseCount : BigDecimal.ZERO);
+                MapUtils.findAndThen(productMap, item.getProductId(), product -> item.setProductName(product.getName())
+                    .setProductBarCode(product.getBarCode()).setProductUnitName(product.getUnitName()));
+            }))));
     }
 
     @GetMapping("/page")
@@ -138,7 +139,7 @@ public class ErpPurchaseOrderController {
     @PreAuthorize("@ss.hasPermission('erp:purchase-order:export')")
     @ApiAccessLog(operateType = EXPORT)
     public void exportPurchaseOrderExcel(@Valid ErpPurchaseOrderPageReqVO pageReqVO,
-                                    HttpServletResponse response) throws IOException {
+                                         HttpServletResponse response) throws IOException {
         pageReqVO.setPageSize(PageParam.PAGE_SIZE_NONE);
         List<ErpPurchaseOrderBaseRespVO> list = buildPurchaseOrderVOPageResult(purchaseOrderService.getPurchaseOrderPage(pageReqVO)).getList();
         // 导出 Excel
@@ -151,17 +152,17 @@ public class ErpPurchaseOrderController {
         }
         // 1.1 订单项
         List<ErpPurchaseOrderItemDO> purchaseOrderItemList = purchaseOrderService.getPurchaseOrderItemListByOrderIds(
-                convertSet(pageResult.getList(), ErpPurchaseOrderDO::getId));
+            convertSet(pageResult.getList(), ErpPurchaseOrderDO::getId));
         Map<Long, List<ErpPurchaseOrderItemDO>> purchaseOrderItemMap = convertMultiMap(purchaseOrderItemList, ErpPurchaseOrderItemDO::getOrderId);
         // 1.2 产品信息
         Map<Long, ErpProductRespVO> productMap = productService.getProductVOMap(
-                convertSet(purchaseOrderItemList, ErpPurchaseOrderItemDO::getProductId));
+            convertSet(purchaseOrderItemList, ErpPurchaseOrderItemDO::getProductId));
         // 1.3 供应商信息
         Map<Long, ErpSupplierDO> supplierMap = supplierService.getSupplierMap(
-                convertSet(pageResult.getList(), ErpPurchaseOrderDO::getSupplierId));
+            convertSet(pageResult.getList(), ErpPurchaseOrderDO::getSupplierId));
         // 1.4 管理员信息
         Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(
-                convertSet(pageResult.getList(), purchaseOrder -> Long.parseLong(purchaseOrder.getCreator())));
+            convertSet(pageResult.getList(), purchaseOrder -> Long.parseLong(purchaseOrder.getCreator())));
         // 1.5 部门信息
         Map<Long, DeptRespDTO> deptMap = deptApi.getDeptMap(
             convertSet(pageResult.getList(), ErpPurchaseOrderDO::getDepartmentId));
@@ -173,23 +174,26 @@ public class ErpPurchaseOrderController {
         // 2. 开始拼接
         return BeanUtils.toBean(pageResult, ErpPurchaseOrderBaseRespVO.class, purchaseOrder -> {
             purchaseOrder.setItems(BeanUtils.toBean(purchaseOrderItemMap.get(purchaseOrder.getId()), ErpPurchaseOrderBaseRespVO.Item.class,
-                    item -> {
-                        //设置产品信息
-                        MapUtils.findAndThen(productMap, item.getProductId(), product -> item.setProductName(product.getName())
-                            .setProductBarCode(product.getBarCode())
-                            .setProductUnitName(product.getUnitName()));
-                        // 设置仓库信息
-                        MapUtils.findAndThen(warehouseMap,item.getWarehouseId(),erpWarehouseDO -> item.setWarehouseName(erpWarehouseDO.getName()));
-                    } ));
-            purchaseOrder.setProductNames(CollUtil.join(purchaseOrder.getItems(), "，", ErpPurchaseOrderBaseRespVO.Item::getProductName));
-            String statusDescription = ErpAuditStatus.getDescriptionByStatus(purchaseOrder.getStatus());
-            if (statusDescription != null) {
-                purchaseOrder.setStatusDesc(statusDescription);
-            }//根据状态编号设置状态映射描述
-            purchaseOrder.setStatus(purchaseOrder.getStatus());//设置采购状态
+                item -> {
+                    //设置产品信息
+                    MapUtils.findAndThen(productMap, item.getProductId(), product -> item.setProductName(product.getName())
+                        .setProductBarCode(product.getBarCode())
+                        .setProductUnitName(product.getUnitName()));
+                    // 设置仓库信息
+                    MapUtils.findAndThen(warehouseMap, item.getWarehouseId(), erpWarehouseDO -> item.setWarehouseName(erpWarehouseDO.getName()));
+                }));
+            purchaseOrder.setProductNames(CollUtil.join(purchaseOrder.getItems(), "，", ErpPurchaseOrderBaseRespVO.Item::getProductName));//设置订单下的产品信息
+            purchaseOrder.setStatusDesc(ErpAuditStatus.getDescriptionByStatus(purchaseOrder.getStatus()));//设置采购状态
             MapUtils.findAndThen(supplierMap, purchaseOrder.getSupplierId(), supplier -> purchaseOrder.setSupplierName(supplier.getName()));
+            //设置创建人的部门name
+            MapUtils.findAndThen(deptMap, adminUserApi.getUser(Long.parseLong(purchaseOrder.getCreator())).getDeptId(), deptRespDTO -> purchaseOrder.setDepartmentName(deptRespDTO.getName()));
             MapUtils.findAndThen(userMap, Long.parseLong(purchaseOrder.getCreator()), user -> purchaseOrder.setCreator(user.getNickname()));
-            MapUtils.findAndThen(deptMap, Long.parseLong(purchaseOrder.getDepartmentName()), deptRespDTO -> purchaseOrder.setDepartmentName(deptRespDTO.getName()));//部门信息
+            //设置审核人的name
+            Optional.ofNullable(purchaseOrder.getAuditor()).ifPresent(auditor->
+                MapUtils.findAndThen(userMap,Long.parseLong(auditor),user->purchaseOrder.setAuditorName(user.getNickname()))
+            );
+            //设置币别name
+
         });
     }
 

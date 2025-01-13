@@ -20,6 +20,9 @@ public class ErpPurchaseOrderBaseRespVO extends ErpPurchaseBaseRespVO {
     @ExcelProperty("采购单编号")
     private String no;
 
+    @Schema(description = "单据日期", example = "2024-10-12")
+    private LocalDateTime noTime;
+
     @Schema(description = "采购状态编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "2")
     @ExcelProperty("采购状态编号")
     private Integer status;
@@ -49,15 +52,8 @@ public class ErpPurchaseOrderBaseRespVO extends ErpPurchaseBaseRespVO {
     @Schema(description = "订单采购退货数量", requiredMode = Schema.RequiredMode.REQUIRED, example = "100.00")
     private BigDecimal totalReturnCount;
 
-
-    @Schema(description = "供应商付款条款")
-    private String supplierRule;
-
     @Schema(description = "交货日期", example = "2025-1-1")
     private LocalDateTime deliveryDate;
-
-    @Schema(description = "结算日期")
-    private LocalDateTime settlementDate;
 
     @Data
     public static class Item {
@@ -73,6 +69,9 @@ public class ErpPurchaseOrderBaseRespVO extends ErpPurchaseBaseRespVO {
 
         @Schema(description = "产品单价", example = "100.00")
         private BigDecimal productPrice;
+
+        @Schema(description = "币别名称")
+        private Long currencyName;
 
         @Schema(description = "产品数量", requiredMode = Schema.RequiredMode.REQUIRED, example = "100.00")
         @NotNull(message = "产品数量不能为空")
@@ -90,6 +89,8 @@ public class ErpPurchaseOrderBaseRespVO extends ErpPurchaseBaseRespVO {
         @Schema(description = "备注", example = "随便")
         private String remark;
 
+        @Schema(description = "供应商付款条款")
+        private String supplierRule;
 
         // ========== 采购入库 ==========
 
@@ -128,6 +129,9 @@ public class ErpPurchaseOrderBaseRespVO extends ErpPurchaseBaseRespVO {
 
         @Schema(description = "源单单号")
         private int srcNo;
+
+        @Schema(description = "x码")
+        private String xCode;
 
         @Schema(description = "箱率")
         private String containerRate;//箱率

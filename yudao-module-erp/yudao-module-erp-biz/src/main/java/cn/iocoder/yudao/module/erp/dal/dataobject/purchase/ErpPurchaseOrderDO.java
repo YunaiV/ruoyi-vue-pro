@@ -32,6 +32,10 @@ public class ErpPurchaseOrderDO extends BaseDO {
      */
     private String no;
     /**
+     * 单据日期
+     */
+    private LocalDateTime noTime;
+    /**
      * 采购状态
      * 枚举 {@link cn.iocoder.yudao.module.erp.enums.ErpAuditStatus}
      */

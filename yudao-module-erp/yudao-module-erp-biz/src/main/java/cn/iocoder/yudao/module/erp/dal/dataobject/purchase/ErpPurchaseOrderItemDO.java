@@ -36,7 +36,7 @@ public class ErpPurchaseOrderItemDO extends BaseDO {
      * <p>
      * 关联 {@link ErpSupplierProductDO#getId()}
      */
-    private Long supplierProductId;
+//    private Long supplierProductId;
     /**
      * 仓库编号
      * <p>
