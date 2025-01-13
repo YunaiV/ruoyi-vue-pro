@@ -45,6 +45,9 @@ spring:
         test-while-idle: true
         test-on-borrow: false
         test-on-return: false
+        remove-abandoned: true # 启用废弃连接的移除功能
+        remove-abandoned-timeout: 1 # 设置废弃连接的超时阈值为 10 分钟（单位：秒）
+        log-abandoned: true # 启用废弃连接的日志记录
       primary: master
       datasource:
         master:
