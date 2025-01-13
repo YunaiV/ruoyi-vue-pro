@@ -18,6 +18,7 @@ import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import com.somle.eccang.model.*;
 import com.somle.eccang.service.EccangService;
+import com.somle.esb.enums.TenantId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -27,13 +28,11 @@ import java.util.stream.Collectors;
 
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 import static com.somle.esb.enums.ErrorCodeConstants.DEPT_LEVEL_ERROR;
-import static com.somle.esb.job.SyncDepartmentsJob.TENANT_ID_DEFAULT;
 import static com.somle.esb.util.ConstantConvertUtils.getCountrySuffix;
 
 @Service
 public class ErpToEccangConverter {
-//    @Autowired
-//    ErpDepartmentService erpDepartmentService;
+
 
     @Autowired
     EccangService eccangService;
@@ -287,7 +286,7 @@ public class ErpToEccangConverter {
         }
         DeptLevelRespDTO parentDept = getParentName(deptLevel, deptTreeLevel);
         Long deptParentId = parentDept.getDeptId();
-        if (!Objects.equals(deptParentId, TENANT_ID_DEFAULT)) {
+        if (!Objects.equals(deptParentId, TenantId.DEFAULT.getId())) {
             EccangCategory category = eccangService.getCategoryByErpDeptId(String.valueOf(deptParentId));
             if (category == null) {
                 throw new RuntimeException("父类【" + parentDept.getDeptName() + "】在易仓中不存在，请检查erp中产品资料库中的部门信息");
