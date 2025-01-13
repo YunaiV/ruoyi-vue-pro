@@ -1,5 +1,7 @@
 package cn.iocoder.yudao.module.erp.controller.admin.logistic.customrule.vo;
 
+
+import cn.iocoder.yudao.module.erp.controller.admin.product.vo.product.ErpProductRespVO;
 import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
 import com.alibaba.excel.annotation.ExcelProperty;
 import com.fhs.core.trans.vo.VO;
@@ -28,10 +30,10 @@ public class ErpCustomRuleRespVO implements VO {
     @Schema(description = "产品id")
     @ExcelProperty("产品id")
     private Long productId;
-
-    @Schema(description = "产品名称")
-    @ExcelProperty("产品名称")
-    private String productName;
+    /**
+     * 产品实体类
+     */
+    private ErpProductRespVO product;
 
     @Schema(description = "申报品名（英文）")
     @ExcelProperty("申报品名（英文）")

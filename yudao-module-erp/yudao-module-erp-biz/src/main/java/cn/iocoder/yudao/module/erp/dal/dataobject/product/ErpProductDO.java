@@ -231,5 +231,20 @@ public class ErpProductDO extends BaseDO {
      * 功能配件
      */
     private String functionalAccessories;
-
+    /**
+     * 包装高度
+     */
+    private Double packageHeight;
+    /**
+     * 包装长度
+     */
+    private Double packageLength;
+    /**
+     * 包装重量
+     */
+    private Double packageWeight;
+    /**
+     * 包装宽度
+     */
+    private Double packageWidth;
 }

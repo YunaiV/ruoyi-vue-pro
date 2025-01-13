@@ -50,7 +50,11 @@ public interface ErpCustomRuleMapper extends BaseMapperX<ErpCustomRuleDO> {
                 .selectAs(ErpProductDO::getLength, ErpCustomRuleDTO::getProductLength)
                 .selectAs(ErpProductDO::getWidth, ErpCustomRuleDTO::getProductWidth)
                 .selectAs(ErpProductDO::getHeight, ErpCustomRuleDTO::getProductHeight)
-                .selectAs(ErpProductDO::getMaterial, ErpCustomRuleDTO::getProductMaterial)
+                .selectAs(ErpProductDO::getPackageHeight, ErpCustomRuleDTO::getPackageHeight)
+                .selectAs(ErpProductDO::getPackageLength, ErpCustomRuleDTO::getPackageLength)
+                .selectAs(ErpProductDO::getPackageWeight, ErpCustomRuleDTO::getPackageWeight)
+                .selectAs(ErpProductDO::getPackageWidth, ErpCustomRuleDTO::getPackageWidth)
+            .selectAs(ErpProductDO::getMaterial, ErpCustomRuleDTO::getProductMaterial)
                 .selectAs(ErpProductDO::getCreator, ErpCustomRuleDTO::getProductCreatorId)
                 .select(ErpProductDO::getBarCode)
                 .selectAs(ErpProductDO::getDeptId, ErpCustomRuleDTO::getProductDeptId);

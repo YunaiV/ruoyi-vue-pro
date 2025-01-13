@@ -253,4 +253,21 @@ public class ErpProductRespVO {
     @Schema(description = "功能配件")
     @ExcelProperty("功能配件")
     private String functionalAccessories;
+
+    @Schema(description = "包装高度")
+    @ExcelProperty("包装高度")
+    private Double packageHeight;
+
+    @Schema(description = "包装长度")
+    @ExcelProperty("包装长度")
+    private Double packageLength;
+
+    @Schema(description = "包装重量")
+    @ExcelProperty("包装重量")
+    private Double packageWeight;
+
+    @Schema(description = "包装宽度")
+    @ExcelProperty("包装宽度")
+    private Double packageWidth;
+
 }

@@ -21,12 +21,6 @@ public class ErpCustomRulePageReqVO extends PageParam {
     @Schema(description = "国家编码")
     private Integer countryCode;
 
-//    @Schema(description = "类型", example = "报关")
-//    private String type;
-
-    @Schema(description = "供应商产品编号")
-    private Long supplierProductId;
-
     @Schema(description = "申报品名（英文）")
     private String declaredTypeEn;
 
