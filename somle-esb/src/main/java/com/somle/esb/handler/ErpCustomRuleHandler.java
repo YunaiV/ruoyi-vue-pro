@@ -1,7 +1,10 @@
 package com.somle.esb.handler;
 
 import cn.hutool.core.util.ObjUtil;
+import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
 import cn.iocoder.yudao.module.erp.api.product.dto.ErpCustomRuleDTO;
+import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.ErpSupplierProductPageReqVO;
+import cn.iocoder.yudao.module.erp.service.purchase.ErpSupplierProductService;
 import com.somle.eccang.model.EccangProduct;
 import com.somle.eccang.service.EccangService;
 import com.somle.esb.converter.ErpToEccangConverter;
@@ -14,6 +17,8 @@ import org.springframework.integration.annotation.ServiceActivator;
 import org.springframework.messaging.Message;
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.List;
 
 /**
@@ -31,6 +36,8 @@ public class ErpCustomRuleHandler {
     @Autowired
     EccangService eccangService;
 
+    @Autowired
+    ErpSupplierProductService erpSupplierProductService;
     @Autowired
     ErpToEccangConverter erpToEccangConverter;
 
@@ -59,9 +66,34 @@ public class ErpCustomRuleHandler {
                 eccangProduct.setProductPurchaseValue(0.001F);
             }
             log.debug(eccangProduct.toString());
-            eccangService.addBatchProduct(List.of(eccangProduct));
+            //用product_id在供应商产品里面查，使用查到的第一个价格
+            // 1. 设置默认值
+            eccangProduct.setCurrencyCode(
+                ObjectUtils.defaultIfNull(eccangProduct.getCurrencyCode(), "1") // 默认 CNY
+            );
+            eccangProduct.setProductPrice(
+                ObjectUtils.defaultIfNull(eccangProduct.getProductPrice(), 0f) // 默认价格为 0.0
+            );
+
+            // 2. 获取产品并处理价格
+            erpSupplierProductService.getSupplierProductPage(
+                    new ErpSupplierProductPageReqVO().setProductId(Long.valueOf(eccangProduct.getDesc()))
+                )
+                .getList().stream()
+                .findFirst()
+                .ifPresent(erpSupplierProductDO -> {
+                    // 设置货币单位
+                    eccangProduct.setCurrencyCode(
+                        String.valueOf(erpSupplierProductDO.getPurchasePriceCurrencyCode())
+                    );
+
+                    // 设置价格，并确保价格为 BigDecimal 类型，避免转换不一致
+                    BigDecimal price = BigDecimal.valueOf(erpSupplierProductDO.getPurchasePrice());
+                    eccangProduct.setProductPrice(price.setScale(2, RoundingMode.HALF_UP).floatValue());
+                });
         }
-        log.info("syncCustomRuleToEccang end");
+        eccangService.addBatchProduct(eccangProducts);
+        log.info("syncCustomRuleToEccang end countSize{{}}",eccangProducts.size());
     }
 
     /**

@@ -134,6 +134,7 @@ public class EccangProduct {
     //返回时候的箱规信息
     private List<Map<String,Object>> productBox;
 
+
     @JsonIgnore
     public String getProductCategoryName() {
         return Stream.of(procutCategoryName3, procutCategoryName2, procutCategoryName1)

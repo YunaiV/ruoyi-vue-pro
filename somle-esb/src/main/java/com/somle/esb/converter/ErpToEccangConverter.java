@@ -148,16 +148,16 @@ public class ErpToEccangConverter {
             }
         }
         // 设置货币代码
-        Integer declaredValueCurrencyCode = customRuleDTO.getDeclaredValueCurrencyCode();
-        if (ObjUtil.isNotEmpty(declaredValueCurrencyCode)) {
-            DictDataRespDTO dictData = dictDataApi.getDictData(DictTypeConstants.CURRENCY_CODE, String.valueOf(declaredValueCurrencyCode));
-            eccangProduct.setPdDeclareCurrencyCode(dictData.getLabel());
-        }
-        Integer purchasePriceCurrencyCode = customRuleDTO.getPurchasePriceCurrencyCode();
-        if (ObjUtil.isNotEmpty(purchasePriceCurrencyCode)) {
-            DictDataRespDTO dictData = dictDataApi.getDictData(DictTypeConstants.CURRENCY_CODE, String.valueOf(purchasePriceCurrencyCode));
-            eccangProduct.setCurrencyCode(dictData.getLabel());
-        }
+//        Integer declaredValueCurrencyCode = customRuleDTO.getDeclaredValueCurrencyCode();
+//        if (ObjUtil.isNotEmpty(declaredValueCurrencyCode)) {
+//            DictDataRespDTO dictData = dictDataApi.getDictData(DictTypeConstants.CURRENCY_CODE, String.valueOf(declaredValueCurrencyCode));
+//            eccangProduct.setPdDeclareCurrencyCode(dictData.getLabel());
+//        }
+//        Integer purchasePriceCurrencyCode = customRuleDTO.getPurchasePriceCurrencyCode();
+//        if (ObjUtil.isNotEmpty(purchasePriceCurrencyCode)) {
+//            DictDataRespDTO dictData = dictDataApi.getDictData(DictTypeConstants.CURRENCY_CODE, String.valueOf(purchasePriceCurrencyCode));
+//            eccangProduct.setCurrencyCode(dictData.getLabel());
+//        }
         eccangProduct.setProductDeclaredValue(customRuleDTO.getDeclaredValue());
         eccangProduct.setPdOverseaTypeEn(customRuleDTO.getDeclaredTypeEn());
 
@@ -206,7 +206,8 @@ public class ErpToEccangConverter {
             ReflectUtil.setFieldValue(eccangProduct, categoryNameEnField, deptLevelRespDTO.getDeptName());
             index += 1;
         }
-
+        //设置产品id
+        eccangProduct.setDesc(String.valueOf(customRuleDTO.getProductId()));//Desc->productId
         return eccangProduct;
     }
 

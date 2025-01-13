@@ -84,7 +84,7 @@ public class ErpCustomRuleDTO {
     /**
      * 采购货币币种
      */
-    private Integer purchasePriceCurrencyCode;
+//    private Integer purchasePriceCurrencyCode;
 
     /**
      * 产品物流属性
@@ -104,7 +104,7 @@ public class ErpCustomRuleDTO {
     /**
      * 申报币种
      */
-    private Integer declaredValueCurrencyCode;
+//    private Integer declaredValueCurrencyCode;
 
     /**
      * 申报品名CN
