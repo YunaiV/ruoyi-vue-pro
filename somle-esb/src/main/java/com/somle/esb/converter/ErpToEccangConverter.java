@@ -142,10 +142,10 @@ public class ErpToEccangConverter {
         Integer countryCode = customRuleDTO.getCountryCode();
         if (ObjUtil.isNotEmpty(countryCode)) {
             DictDataRespDTO dictData = dictDataApi.getDictData(DictTypeConstants.COUNTRY_CODE, String.valueOf(countryCode));
-            if (StrUtil.isNotBlank(customRuleDTO.getSupplierProductCode())) {
+            if (StrUtil.isNotBlank(customRuleDTO.getBarCode())) {
                 eccangProduct.setProductTitle(customRuleDTO.getProductName() + "-" + getCountrySuffix(dictData.getLabel()));
-                eccangProduct.setProductTitleEn(customRuleDTO.getSupplierProductCode() + "-" + getCountrySuffix(dictData.getLabel()));
-                eccangProduct.setProductSku(customRuleDTO.getSupplierProductCode() + "-" + getCountrySuffix(dictData.getLabel()));
+                eccangProduct.setProductTitleEn(customRuleDTO.getBarCode() + "-" + getCountrySuffix(dictData.getLabel()));
+                eccangProduct.setProductSku(customRuleDTO.getBarCode() + "-" + getCountrySuffix(dictData.getLabel()));
             }
         }
         // 设置货币代码

@@ -15,11 +15,11 @@ public class ErpCustomRuleDTO {
      * 海关规则id  =====>>>> 映射到pd_declaration_statement
      */
     private String id;
-    /**
-     * 供应商产品编码
-     */
-    private String supplierProductCode;
 
+    /**
+     * 产品id
+     */
+    private Long productId;
 
     /**
      * 产品名称
