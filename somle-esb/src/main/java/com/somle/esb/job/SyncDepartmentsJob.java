@@ -1,7 +1,8 @@
 package com.somle.esb.job;
 
 import cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder;
-import com.somle.esb.service.EsbService;
+import com.somle.esb.enums.TenantId;
+import com.somle.esb.handler.DingtalkDepartmentHandler;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -16,17 +17,15 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 public class SyncDepartmentsJob extends DataJob{
-    //默认租户id
-    public static final Long TENANT_ID_DEFAULT = 50001L;
     @Autowired
-    EsbService service;
+    DingtalkDepartmentHandler dingtalkDepartmentHandler;
 
 
     @Override
     public String execute(String param) throws Exception {
         try {
-            TenantContextHolder.setTenantId(TENANT_ID_DEFAULT);
-            service.syncDepartments();
+            TenantContextHolder.setTenantId(TenantId.DEFAULT.getId());
+            dingtalkDepartmentHandler.syncDepartments();
             return "sync success";
         } finally {
             TenantContextHolder.clear();

@@ -28,6 +28,7 @@ import com.somle.esb.converter.DingTalkToErpConverter;
 import com.somle.esb.converter.EccangToErpConverter;
 import com.somle.esb.converter.ErpToEccangConverter;
 import com.somle.esb.converter.ErpToKingdeeConverter;
+import com.somle.esb.handler.ErpCustomRuleHandler;
 import com.somle.esb.job.EccangProductDataJob;
 import com.somle.framework.common.util.general.CoreUtils;
 import com.somle.framework.test.core.ut.BaseSpringIntegrationTest;
@@ -87,6 +88,8 @@ import static com.fasterxml.jackson.databind.type.LogicalType.Collection;
     MybatisPlusAutoConfiguration.class, // MyBatis 的自动配置类
     MybatisPlusJoinAutoConfiguration.class})
 class EsbServiceProductTest extends BaseSpringIntegrationTest {
+    @Resource
+    private ErpCustomRuleHandler erpCustomRuleHandler;
     @Resource
     private EsbService esbService;
     @Resource
@@ -176,7 +179,7 @@ class EsbServiceProductTest extends BaseSpringIntegrationTest {
         product.setBarCode("1234567890123");
         product.setProductDeptId(50007L);
 
-        esbService.syncCustomRuleToEccang(MessageBuilder.withPayload(List.of(product)).build());
+        erpCustomRuleHandler.syncCustomRuleToEccang(MessageBuilder.withPayload(List.of(product)).build());
         kingdeeService.refreshAuths();
 //        esbService.syncProductsToKingdee(MessageBuilder.withPayload(List.of(product)).build());
     }
@@ -187,7 +190,6 @@ class EsbServiceProductTest extends BaseSpringIntegrationTest {
         printAllBeans();
         ErpCustomRuleSaveReqVO erpCustomRuleSaveReqVO = new ErpCustomRuleSaveReqVO();
         erpCustomRuleSaveReqVO.setCountryCode(1);
-        erpCustomRuleSaveReqVO.setType("import");
         erpCustomRuleSaveReqVO.setSupplierProductId(1L);
         erpCustomRuleSaveReqVO.setDeclaredTypeEn("Electronic Component");
         erpCustomRuleSaveReqVO.setDeclaredType("电子元件");
@@ -215,11 +217,6 @@ class EsbServiceProductTest extends BaseSpringIntegrationTest {
     public void test5() {
         log.info(erpCustomRuleMapper.selectList().toString());
 
-    }
-
-    @Test
-    public void test6() {
-        esbService.syncDepartments();
     }
 
 }

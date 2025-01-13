@@ -4,6 +4,7 @@ import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.security.core.LoginUser;
 import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
 import cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder;
+import com.somle.esb.handler.DingtalkUserHandler;
 import com.somle.esb.service.EsbService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +16,7 @@ import static com.somle.esb.job.SyncDepartmentsJob.TENANT_ID_DEFAULT;
 public class SyncUserJob extends DataJob {
     public static final Long ADMIN_USER_ID = 50001L;
     @Autowired
-    EsbService service;
+    DingtalkUserHandler dingtalkUserHandler;
 
     @Override
     public String execute(String param) throws Exception {
@@ -26,7 +27,7 @@ public class SyncUserJob extends DataJob {
         SecurityFrameworkUtils.setLoginUser(loginUser);
         try {
             TenantContextHolder.setTenantId(TENANT_ID_DEFAULT);
-            service.syncUsers();
+            dingtalkUserHandler.syncUsers();
             return "sync users success";
         } finally {
             TenantContextHolder.clear();
