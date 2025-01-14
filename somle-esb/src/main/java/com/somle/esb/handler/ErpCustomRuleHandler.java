@@ -12,6 +12,7 @@ import com.somle.esb.converter.ErpToKingdeeConverter;
 import com.somle.kingdee.model.KingdeeProduct;
 import com.somle.kingdee.service.KingdeeService;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.integration.annotation.ServiceActivator;
 import org.springframework.messaging.handler.annotation.Payload;
@@ -20,6 +21,7 @@ import org.springframework.stereotype.Component;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @Description: $
@@ -83,13 +85,16 @@ public class ErpCustomRuleHandler {
                 .findFirst()
                 .ifPresent(erpSupplierProductDO -> {
                     // 设置货币单位
-                    eccangProduct.setCurrencyCode(
-                        String.valueOf(erpSupplierProductDO.getPurchasePriceCurrencyCode())
-                    );
+                    Optional.ofNullable(erpSupplierProductDO.getPurchasePriceCurrencyCode())
+                        .map(String::valueOf) // 将 Integer 转换为字符串
+                        .filter(StringUtils::isNotBlank)
+                        .ifPresent(eccangProduct::setCurrencyCode);
 
                     // 设置价格，并确保价格为 BigDecimal 类型，避免转换不一致
-                    BigDecimal price = BigDecimal.valueOf(erpSupplierProductDO.getPurchasePrice());
-                    eccangProduct.setProductPrice(price.setScale(2, RoundingMode.HALF_UP).floatValue());
+                    Optional.ofNullable(erpSupplierProductDO.getPurchasePrice())
+                        .map(BigDecimal::valueOf)
+                        .map(price -> price.setScale(2, RoundingMode.HALF_UP).floatValue())
+                        .ifPresent(eccangProduct::setProductPrice);
                 });
         }
         eccangService.addBatchProduct(eccangProducts);
