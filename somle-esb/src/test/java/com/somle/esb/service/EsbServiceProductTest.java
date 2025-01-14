@@ -19,9 +19,6 @@ import com.github.yulichang.autoconfigure.MybatisPlusJoinAutoConfiguration;
 import com.somle.ai.service.AiService;
 import com.somle.amazon.service.AmazonService;
 import com.somle.dingtalk.service.DingTalkService;
-import com.somle.eccang.model.EccangCategory;
-import com.somle.eccang.model.EccangProduct;
-import com.somle.eccang.model.EccangResponse;
 import com.somle.eccang.service.EccangService;
 import com.somle.esb.config.IntegrationConfig;
 import com.somle.esb.converter.DingTalkToErpConverter;
@@ -32,9 +29,6 @@ import com.somle.esb.handler.ErpCustomRuleHandler;
 import com.somle.esb.job.EccangProductDataJob;
 import com.somle.framework.common.util.general.CoreUtils;
 import com.somle.framework.test.core.ut.BaseSpringIntegrationTest;
-import com.somle.kingdee.model.KingdeeAuxInfo;
-import com.somle.kingdee.model.KingdeeAuxInfoDetail;
-import com.somle.kingdee.service.KingdeeClient;
 import com.somle.kingdee.service.KingdeeService;
 import com.somle.matomo.service.MatomoService;
 import jakarta.annotation.Resource;
@@ -44,17 +38,12 @@ import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.autoconfigure.quartz.QuartzAutoConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
-import org.springframework.integration.support.MessageBuilder;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.annotation.Commit;
 
 import java.math.BigDecimal;
 import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import static com.fasterxml.jackson.databind.type.LogicalType.Collection;
 
 @Slf4j
 @Import({
@@ -162,16 +151,13 @@ class EsbServiceProductTest extends BaseSpringIntegrationTest {
         product.setProductWidth(11.0f);
         product.setProductHeight(6.0f);
         product.setProductMaterial("Plastic and Metal");
-        product.setPurchasePriceCurrencyCode(1);
         product.setLogisticAttribute(1);
         product.setHscode("85076000");
         product.setDeclaredValue(50.0f);
-        product.setDeclaredValueCurrencyCode(1);
         product.setDeclaredType("无线耳机");
         product.setDeclaredTypeEn("Wireless Headphones");
         product.setTaxRate(0.12f);
         product.setProductCreatorId("50325");
-        product.setSupplierProductCode("DDDDDDD");
 
         //product.setProductCategoryId1(50002);
         //product.setProductCategoryId2(50007);
@@ -179,7 +165,7 @@ class EsbServiceProductTest extends BaseSpringIntegrationTest {
         product.setBarCode("1234567890123");
         product.setProductDeptId(50007L);
 
-        erpCustomRuleHandler.syncCustomRuleToEccang(MessageBuilder.withPayload(List.of(product)).build());
+        erpCustomRuleHandler.syncCustomRulesToEccang(List.of(product));
         kingdeeService.refreshAuths();
 //        esbService.syncProductsToKingdee(MessageBuilder.withPayload(List.of(product)).build());
     }
@@ -190,7 +176,6 @@ class EsbServiceProductTest extends BaseSpringIntegrationTest {
         printAllBeans();
         ErpCustomRuleSaveReqVO erpCustomRuleSaveReqVO = new ErpCustomRuleSaveReqVO();
         erpCustomRuleSaveReqVO.setCountryCode(1);
-        erpCustomRuleSaveReqVO.setSupplierProductId(1L);
         erpCustomRuleSaveReqVO.setDeclaredTypeEn("Electronic Component");
         erpCustomRuleSaveReqVO.setDeclaredType("电子元件");
         erpCustomRuleSaveReqVO.setDeclaredValue(150.75);

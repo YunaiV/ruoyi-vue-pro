@@ -1,7 +1,10 @@
 package com.somle.esb.config;
 
+import cn.iocoder.yudao.module.infra.api.config.ConfigApi;
+import com.somle.dingtalk.service.DingTalkService;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
@@ -18,6 +21,11 @@ import org.springframework.messaging.MessageChannel;
 @Slf4j
 @Configuration
 public class IntegrationConfig {
+    @Resource
+    DingTalkService dingTalkService;
+
+    @Resource
+    private ConfigApi configApi;
 
     @Bean
     public MessageChannel testChannel() {
@@ -30,37 +38,16 @@ public class IntegrationConfig {
     }
 
     @Bean
-    public MessageChannel saleChannel() {
-        return new PublishSubscribeChannel();
-    }
-
-    @Bean
-    public MessageChannel productChannel() {
-        return new PublishSubscribeChannel(new SimpleAsyncTaskExecutor());
-    }
-
-    @Bean
-    public MessageChannel customRuleChannel() {
-        return new PublishSubscribeChannel(new SimpleAsyncTaskExecutor());
-    }
-
-    @Bean
-    public MessageChannel departmentChannel() {
-        return new PublishSubscribeChannel();
-    }
-
-    @Bean
-    public IntegrationFlow productRouter() {
+    public IntegrationFlow errorLoggingFlow() {
         return IntegrationFlow
-                .from("erpProductChannel") // Incoming messages from erpProductChannel
-                .channel(productChannel()) // Route to productChannel
-                .get();
-    }
-    @Bean
-    public IntegrationFlow customRuleRouter() {
-        return IntegrationFlow
-            .from("erpCustomRuleChannel")
-            .channel(customRuleChannel())
+            .from("errorChannel")
+            .handle(this::logError)
             .get();
     }
+
+    private void logError(Message<?> message) {
+        Throwable exception = (Throwable) message.getPayload();
+        dingTalkService.sendRobotMessage(exception.toString(), configApi.getConfigValueByKey("token.dingtalk.robot"));
+    }
+
 }

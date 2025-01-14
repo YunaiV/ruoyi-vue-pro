@@ -49,12 +49,8 @@ public class EccangService {
     @Autowired
     EccangTokenRepository tokenRepo;
 
-
     @Autowired
-    MessageChannel dataChannel;
-
-    @Autowired
-    MessageChannel saleChannel;
+    MessageChannel eccangSaleOutputChannel;
 
 
     @PostConstruct
@@ -278,7 +274,7 @@ public class EccangService {
             .build();
         getOrderUnarchive(vo)
             .forEach(order -> {
-                saleChannel.send(MessageBuilder.withPayload(order).build());
+                eccangSaleOutputChannel.send(MessageBuilder.withPayload(order).build());
             });
     }
 

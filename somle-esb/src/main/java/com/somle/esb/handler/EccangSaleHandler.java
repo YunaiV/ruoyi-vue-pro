@@ -25,7 +25,7 @@ public class EccangSaleHandler {
     @Autowired
     AiService aiService;
 
-    @ServiceActivator(inputChannel = "saleChannel")
+    @ServiceActivator(inputChannel = "eccangSaleOutputChannel")
     public void handleSale(Message<EccangOrder> message) {
         var eccangOrder = message.getPayload();
         var erpSale = eccangToErpConverter.toEsb(eccangOrder);

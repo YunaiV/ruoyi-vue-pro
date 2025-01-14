@@ -19,6 +19,8 @@ import com.google.common.annotations.VisibleForTesting;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.integration.support.MessageBuilder;
+import org.springframework.messaging.MessageChannel;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
@@ -41,6 +43,9 @@ import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.*;
 public class DeptServiceImpl implements DeptService {
 
     @Resource
+    private MessageChannel departmentOutputChannel;
+
+    @Resource
     private DeptMapper deptMapper;
 
     private DeptConvert deptConvert = DeptConvert.INSTANCE;
@@ -60,6 +65,9 @@ public class DeptServiceImpl implements DeptService {
         // 插入部门
         DeptDO dept = BeanUtils.toBean(createReqVO, DeptDO.class);
         deptMapper.insert(dept);
+
+        // 发送管道
+        departmentOutputChannel.send(MessageBuilder.withPayload(dept).build());
         return dept.getId();
     }
 
@@ -80,6 +88,9 @@ public class DeptServiceImpl implements DeptService {
         // 更新部门
         DeptDO updateObj = BeanUtils.toBean(updateReqVO, DeptDO.class);
         deptMapper.updateById(updateObj);
+
+        // 发送管道
+        departmentOutputChannel.send(MessageBuilder.withPayload(updateObj).build());
     }
 
 //    @Override

@@ -16,7 +16,7 @@ import java.util.List;
 public class EccangHeatMapJob implements JobHandler {
 
     @Autowired
-    MessageChannel saleChannel;
+    MessageChannel eccangSaleOutputChannel;
 
     @Autowired
     EccangService eccangService;
@@ -33,7 +33,7 @@ public class EccangHeatMapJob implements JobHandler {
         for (var order : eccangService.getOrderPlusArchiveSince(vo, 2022).toList()) {
             count++;
             try {
-                saleChannel.send(MessageBuilder.withPayload(order).build());
+                eccangSaleOutputChannel.send(MessageBuilder.withPayload(order).build());
             } catch (MessageHandlingException e) {
                 Throwable rootCause = e.getCause();
                 throw new RuntimeException(rootCause);

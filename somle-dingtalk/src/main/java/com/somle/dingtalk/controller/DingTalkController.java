@@ -14,24 +14,4 @@ import com.somle.dingtalk.service.DingTalkService;
 public class DingTalkController {
     @Autowired
     private DingTalkService service;
-
-    @GetMapping("/getDepartments")
-    public List<DingTalkDepartment> getDepartments( 
-    ) {
-        return service.getDepartmentStream().toList();
-    }
-
-//    @GetMapping("/saveDepartments")
-//    public String uploadDepartments() {
-//        service.uploadDepartmentsResursive();
-//        return "success";
-//    }
-
-
-
-    @GetMapping("/cleanDepartments")
-    public boolean cleanDepartments( 
-    ) {
-        return service.cleanDepartments();
-    }
 }

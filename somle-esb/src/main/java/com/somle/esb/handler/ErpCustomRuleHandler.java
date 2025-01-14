@@ -14,7 +14,7 @@ import com.somle.kingdee.service.KingdeeService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.integration.annotation.ServiceActivator;
-import org.springframework.messaging.Message;
+import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
@@ -51,10 +51,10 @@ public class ErpCustomRuleHandler {
      * @Param [message]
      * @return void
      **/
-    @ServiceActivator(inputChannel = "customRuleChannel")
-    public void syncCustomRuleToEccang(Message<List<ErpCustomRuleDTO>> message) {
+    @ServiceActivator(inputChannel = "erpCustomRuleChannel")
+    public void syncCustomRulesToEccang(@Payload List<ErpCustomRuleDTO> customRules) {
         log.info("syncCustomRuleToEccang");
-        List<EccangProduct> eccangProducts = erpToEccangConverter.customRuleDTOToProduct(message.getPayload());
+        List<EccangProduct> eccangProducts = erpToEccangConverter.customRuleDTOToProduct(customRules);
         for (EccangProduct eccangProduct : eccangProducts){
             eccangProduct.setActionType("ADD");
             EccangProduct eccangServiceProduct = eccangService.getProduct(eccangProduct.getProductSku());
@@ -103,10 +103,10 @@ public class ErpCustomRuleHandler {
      * @Param [message]
      * @return void
      **/
-    @ServiceActivator(inputChannel = "customRuleChannel")
-    public void syncCustomRuleToKingdee(Message<List<ErpCustomRuleDTO>> message) {
+    @ServiceActivator(inputChannel = "erpCustomRuleChannel")
+    public void syncCustomRulesToKingdee(@Payload List<ErpCustomRuleDTO> customRules) {
         log.info("syncCustomRuleToKingdee");
-        List<KingdeeProduct> kingdee = erpToKingdeeConverter.customRuleDTOToProduct(message.getPayload());
+        List<KingdeeProduct> kingdee = erpToKingdeeConverter.customRuleDTOToProduct(customRules);
         for (KingdeeProduct kingdeeProduct : kingdee){
             kingdeeService.addProduct(kingdeeProduct);
         }

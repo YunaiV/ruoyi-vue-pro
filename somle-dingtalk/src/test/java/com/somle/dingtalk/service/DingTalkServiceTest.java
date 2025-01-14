@@ -46,4 +46,10 @@ class DingTalkServiceTest extends BaseSpringTest {
         printGetters(user);
         assertEquals("丁晨", user.getName());
     }
+
+//    @Test
+//    void testRobot() {
+//        var token = "";
+//        service.sendRobotMessage("a test",token);
+//    }
 }

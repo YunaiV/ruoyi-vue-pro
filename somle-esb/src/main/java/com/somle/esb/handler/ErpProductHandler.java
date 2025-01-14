@@ -13,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.integration.annotation.ServiceActivator;
 import org.springframework.messaging.Message;
+import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -38,10 +39,10 @@ public class ErpProductHandler {
     @Autowired
     ErpToKingdeeConverter erpToKingdeeConverter;
 
-    @ServiceActivator(inputChannel = "productChannel")
-    public void syncProductsToEccang(Message<List<ErpProductDTO>> message) {
+    @ServiceActivator(inputChannel = "erpProductChannel")
+    public void syncProductsToEccang(@Payload List<ErpProductDTO> products) {
         log.info("syncProductsToEccang");
-        List<EccangProduct> eccangProducts = erpToEccangConverter.productDTOToProduct(message.getPayload());
+        List<EccangProduct> eccangProducts = erpToEccangConverter.productDTOToProduct(products);
         for (EccangProduct eccangProduct : eccangProducts){
             eccangProduct.setActionType("ADD");
             EccangProduct eccangServiceProduct = eccangService.getProduct(eccangProduct.getProductSku());
@@ -58,10 +59,10 @@ public class ErpProductHandler {
         log.info("syncProductsToEccang end");
     }
 
-    @ServiceActivator(inputChannel = "productChannel")
-    public void syncProductsToKingdee(Message<List<ErpProductDTO>> message) {
+    @ServiceActivator(inputChannel = "erpProductChannel")
+    public void syncProductsToKingdee(@Payload List<ErpProductDTO> products) {
         log.info("syncProductsToKingdee");
-        List<KingdeeProduct> kingdee = erpToKingdeeConverter.productDTOToProduct(message.getPayload());
+        List<KingdeeProduct> kingdee = erpToKingdeeConverter.productDTOToProduct(products);
         for (KingdeeProduct kingdeeProduct : kingdee){
             kingdeeService.addProduct(kingdeeProduct);
         }

@@ -18,6 +18,7 @@ import com.somle.framework.common.util.web.RequestX;
 import jakarta.annotation.PostConstruct;
 
 import lombok.SneakyThrows;
+import okhttp3.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 //import org.springframework.integration.support.MessageBuilder;
 //import org.springframework.messaging.MessageChannel;
@@ -38,8 +39,9 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 public class DingTalkService {
     private DingTalkToken token;
-    private final String host = "https://api.dingtalk.com";
-    private final String baseHost = "https://oapi.dingtalk.com";
+    private final String HOST = "https://api.dingtalk.com";
+    private final String BASE_HOST = "https://oapi.dingtalk.com";
+
 
 
 
@@ -66,7 +68,7 @@ public class DingTalkService {
     // }
 
     public DingTalkToken refreshAuth() {
-        String url = host + "/v1.0/oauth2/accessToken";
+        String url = HOST + "/v1.0/oauth2/accessToken";
         var payload = JsonUtils.newObject();
         DingTalkToken token = tokenRepository.findAll().get(0);
         payload.put("appKey", token.getAppKey());
@@ -79,6 +81,37 @@ public class DingTalkService {
         String accessToken = WebUtils.sendRequest(request, JSONObject.class).getString("accessToken");
         token.setAccessToken(accessToken);
         return token;
+    }
+
+    @SneakyThrows
+    public void sendRobotMessage(String content, String accessToken) {
+        var endpoint = "/robot/send";
+        var keyword = "ALERT";
+        // 构造消息内容
+        JSONObject json = new JSONObject();
+        json.put("msgtype", "text");
+
+        JSONObject text = new JSONObject();
+        text.put("content", keyword + "\n" + content);
+
+        json.put("text", text);
+
+        var queryParams = Map.of("access_token", accessToken);
+
+        RequestX request = RequestX.builder()
+            .requestMethod(RequestX.Method.POST)
+            .url(BASE_HOST + endpoint)
+            .queryParams(queryParams)
+            .payload(json)
+            .build();
+
+        try (Response response = WebUtils.sendRequest(request)) {
+            if (response.isSuccessful()) {
+                System.out.println("Response: " + response.body().string());
+            } else {
+                System.out.println("Failed: " + response.message());
+            }
+        }
     }
 
 
@@ -96,7 +129,7 @@ public class DingTalkService {
         try {
             var request = RequestX.builder()
                 .requestMethod(RequestX.Method.POST)
-                .url(baseHost + endUrl)
+                .url(BASE_HOST + endUrl)
                 .queryParams(params)
                 .headers(headers)
                 .payload(payload)
@@ -167,7 +200,7 @@ public class DingTalkService {
         payload.put("dept_id", deptId);
         var request = RequestX.builder()
             .requestMethod(RequestX.Method.POST)
-            .url(baseHost + endUrl)
+            .url(BASE_HOST + endUrl)
             .queryParams(params)
             .headers(headers)
             .payload(payload)
@@ -241,7 +274,7 @@ public class DingTalkService {
         );
         var request = RequestX.builder()
             .requestMethod(RequestX.Method.POST)
-            .url(baseHost + endUrl)
+            .url(BASE_HOST + endUrl)
             .queryParams(params)
             .headers(headers)
             .payload(dept)
