@@ -47,7 +47,28 @@ public class IntegrationConfig {
 
     private void logError(Message<?> message) {
         Throwable exception = (Throwable) message.getPayload();
-        dingTalkService.sendRobotMessage(exception.toString(), configApi.getConfigValueByKey("token.dingtalk.robot"));
+
+        // Extract the root cause
+        Throwable rootCause = findRootCause(exception);
+
+        // Log the payload and the root cause
+        log.error("Spring Integration error occurred. Payload: {}", message.getPayload(), rootCause);
+
+        // Send the error details via your service
+        String errorMessage = String.format(
+            "Error occurred:\nPayload: %s\nRoot Cause: %s",
+            message.getPayload(),
+            rootCause
+        );
+        dingTalkService.sendRobotMessage(errorMessage, configApi.getConfigValueByKey("token.dingtalk.robot"));
+    }
+
+    /**
+     * Finds the root cause of a Throwable.
+     */
+    private Throwable findRootCause(Throwable throwable) {
+        Throwable cause = throwable.getCause();
+        return (cause == null) ? throwable : findRootCause(cause);
     }
 
 }
