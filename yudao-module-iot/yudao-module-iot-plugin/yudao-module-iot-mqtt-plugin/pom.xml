@@ -145,10 +145,11 @@
             <version>${lombok.version}</version>
             <scope>provided</scope>
         </dependency>
-        <!-- MQTT -->
+        <!-- Vert.x MQTT -->
         <dependency>
-            <groupId>org.eclipse.paho</groupId>
-            <artifactId>org.eclipse.paho.client.mqttv3</artifactId>
+            <groupId>io.vertx</groupId>
+            <artifactId>vertx-mqtt</artifactId>
+            <version>4.5.11</version>
         </dependency>
     </dependencies>
 </project>

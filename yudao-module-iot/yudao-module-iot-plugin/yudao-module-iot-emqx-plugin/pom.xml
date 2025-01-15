@@ -11,25 +11,46 @@
     <modelVersion>4.0.0</modelVersion>
     <packaging>jar</packaging>
 
-    <artifactId>yudao-module-iot-http-plugin</artifactId>
+    <artifactId>yudao-module-iot-emqx-plugin</artifactId>
 
     <name>${project.artifactId}</name>
     <description>
-        物联网 插件模块 - http 插件
+        物联网 插件模块 - emqx 插件
     </description>
 
     <properties>
         <!-- 插件相关 -->
-        <plugin.id>http-plugin</plugin.id>
-        <plugin.class>cn.iocoder.yudao.module.iot.plugin.HttpVertxPlugin</plugin.class>
+        <plugin.id>emqx-plugin</plugin.id>
+        <plugin.class>cn.iocoder.yudao.module.iot.plugin.EmqxPlugin</plugin.class>
         <plugin.version>0.0.1</plugin.version>
         <plugin.provider>ahh</plugin.provider>
-        <plugin.description>http-plugin-0.0.1</plugin.description>
+        <plugin.description>emqx-plugin-0.0.1</plugin.description>
         <plugin.dependencies/>
     </properties>
 
     <build>
         <plugins>
+            <!-- DOESN'T WORK WITH MAVEN 3 (I defined the plugin metadata in properties section)
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>properties-maven-plugin</artifactId>
+                <version>1.0-alpha-2</version>
+                <executions>
+                  <execution>
+                    <phase>initialize</phase>
+                    <goals>
+                      <goal>read-project-properties</goal>
+                    </goals>
+                    <configuration>
+                      <files>
+                        <file>plugin.properties</file>
+                      </files>
+                    </configuration>
+                  </execution>
+                </executions>
+            </plugin>
+            -->
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-antrun-plugin</artifactId>
@@ -97,29 +118,6 @@
                     <skip>true</skip>
                 </configuration>
             </plugin>
-
-            <!--            <plugin>-->
-            <!--                <groupId>org.apache.maven.plugins</groupId>-->
-            <!--                <artifactId>maven-shade-plugin</artifactId>-->
-            <!--                <version>3.4.1</version>-->
-            <!--                <executions>-->
-            <!--                    <execution>-->
-            <!--                        <phase>package</phase>-->
-            <!--                        <goals>-->
-            <!--                            <goal>shade</goal>-->
-            <!--                        </goals>-->
-            <!--                        <configuration>-->
-            <!--                            <shadedArtifactAttached>true</shadedArtifactAttached>-->
-            <!--                            <shadedClassifierName>shaded</shadedClassifierName>-->
-            <!--                            <transformers>-->
-            <!--                                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">-->
-            <!--                                    <mainClass>cn.iocoder.yudao.module.iot.HttpPluginSpringbootApplication</mainClass>-->
-            <!--                                </transformer>-->
-            <!--                            </transformers>-->
-            <!--                        </configuration>-->
-            <!--                    </execution>-->
-            <!--                </executions>-->
-            <!--            </plugin>-->
         </plugins>
     </build>
 
@@ -147,11 +145,20 @@
             <version>${lombok.version}</version>
             <scope>provided</scope>
         </dependency>
-        <!-- Vert.x Web -->
+        <!-- Vert.x 核心依赖 -->
+        <dependency>
+            <groupId>io.vertx</groupId>
+            <artifactId>vertx-core</artifactId>
+        </dependency>
+        <!-- Vert.x Web 模块 -->
         <dependency>
             <groupId>io.vertx</groupId>
             <artifactId>vertx-web</artifactId>
-            <version>4.5.11</version>
+        </dependency>
+        <!-- MQTT -->
+        <dependency>
+            <groupId>org.eclipse.paho</groupId>
+            <artifactId>org.eclipse.paho.client.mqttv3</artifactId>
         </dependency>
     </dependencies>
 </project>
