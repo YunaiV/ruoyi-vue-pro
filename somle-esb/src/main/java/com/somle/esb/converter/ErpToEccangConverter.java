@@ -2,6 +2,7 @@ package com.somle.esb.converter;
 
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ObjUtil;
+import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.enums.enums.DictTypeConstants;
@@ -148,11 +149,12 @@ public class ErpToEccangConverter {
             }
         }
         // 设置货币代码
-//        Integer declaredValueCurrencyCode = customRuleDTO.getDeclaredValueCurrencyCode();
-//        if (ObjUtil.isNotEmpty(declaredValueCurrencyCode)) {
-//            DictDataRespDTO dictData = dictDataApi.getDictData(DictTypeConstants.CURRENCY_CODE, String.valueOf(declaredValueCurrencyCode));
-//            eccangProduct.setPdDeclareCurrencyCode(dictData.getLabel());
-//        }
+        Optional.ofNullable(customRuleDTO.getDeclaredValueCurrencyCode())
+            .map(String::valueOf)
+            .map(code -> dictDataApi.getDictData(DictTypeConstants.CURRENCY_CODE, code))
+            .filter(dictData -> ObjectUtil.isNotEmpty(dictData.getLabel()))
+            .ifPresent(dictData -> eccangProduct.setPdDeclareCurrencyCode(dictData.getLabel()));
+
 //        Integer purchasePriceCurrencyCode = customRuleDTO.getPurchasePriceCurrencyCode();
 //        if (ObjUtil.isNotEmpty(purchasePriceCurrencyCode)) {
 //            DictDataRespDTO dictData = dictDataApi.getDictData(DictTypeConstants.CURRENCY_CODE, String.valueOf(purchasePriceCurrencyCode));
@@ -173,7 +175,6 @@ public class ErpToEccangConverter {
         eccangProduct.setPdNetHeight(customRuleDTO.getProductHeight() / 100);
 
         // 设置其他产品属性
-        eccangProduct.setProductPurchaseValue(customRuleDTO.getProductPurchaseValue());
         eccangProduct.setFboTaxRate(customRuleDTO.getTaxRate());
         eccangProduct.setPdOverseaTypeCn(customRuleDTO.getDeclaredType());
         eccangProduct.setProductImgUrlList(Collections.singletonList(customRuleDTO.getProductImageUrl()));
