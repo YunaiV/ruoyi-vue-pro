@@ -73,4 +73,16 @@ public interface ErpProductMapper extends BaseMapperX<ErpProductDO> {
     default ErpProductDO selectByName(String name) {
         return selectOne(ErpProductDO::getName, name);
     }
+
+    /**
+     * 根据条码(barCode)查询出id列表
+     * @param barCode  SKU（编码
+     * @return id集合
+     */
+    default List<Long> selectIdListByBarCode(String barCode) {
+        return selectList(new LambdaQueryWrapperX<ErpProductDO>()
+                .like(ErpProductDO::getBarCode, barCode)
+                .select(ErpProductDO::getId))
+                .stream().map(ErpProductDO::getId).toList();
+    }
 }

@@ -46,4 +46,9 @@ public class ErpCustomRulePageReqVO extends PageParam {
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
     private LocalDateTime[] createTime;
 
+    @Schema(description = "FBA条形码")
+    private String fbaBarCode;
+
+    @Schema(description = "SKU（编码）")
+    private String barCode;//ERP产品的SKU编码
 }

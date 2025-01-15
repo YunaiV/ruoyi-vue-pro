@@ -82,11 +82,6 @@ public class ErpCustomRuleDTO {
     private String productMaterial;
 
     /**
-     * 采购货币币种
-     */
-//    private Integer purchasePriceCurrencyCode;
-
-    /**
      * 产品物流属性
      */
     private Integer logisticAttribute;
@@ -100,11 +95,6 @@ public class ErpCustomRuleDTO {
      * 申报价值
      */
     private Float declaredValue;
-
-    /**
-     * 申报币种
-     */
-//    private Integer declaredValueCurrencyCode;
 
     /**
      * 申报品名CN
@@ -141,4 +131,8 @@ public class ErpCustomRuleDTO {
      **/
     private String productCreatorId;
 
+    /**
+     * 条形码
+     */
+    private String fbaBarCode;
 }
