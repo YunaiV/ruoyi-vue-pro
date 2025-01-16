@@ -18,8 +18,10 @@ import jakarta.validation.Valid;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
 import java.io.IOException;
 import java.util.List;
+
 import static cn.iocoder.yudao.framework.apilog.core.enums.OperateTypeEnum.EXPORT;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
@@ -65,7 +67,11 @@ public class ErpProductController {
     @Parameter(name = "id", description = "编号", required = true, example = "1024")
     @PreAuthorize("@ss.hasPermission('erp:product:query')")
     public CommonResult<ErpProductRespVO> getProduct(@RequestParam("id") Long id) {
-        return success(productService.getProduct(id));
+        ErpProductRespVO productRespVO = productService.getProduct(id);
+        if (productRespVO == null) {
+            return success(null);
+        }
+        return success(productRespVO);
     }
 
     @GetMapping("/page")
@@ -80,9 +86,9 @@ public class ErpProductController {
     public CommonResult<List<ErpProductRespVO>> getProductSimpleList() {
         List<ErpProductRespVO> list = productService.getProductVOListByStatus(true);
         return success(convertList(list, product -> new ErpProductRespVO().setId(product.getId())
-                .setName(product.getName()).setBarCode(product.getBarCode())
-                .setCategoryId(product.getCategoryId()).setCategoryName(product.getCategoryName())
-                .setUnitId(product.getUnitId()).setUnitName(product.getUnitName())));
+            .setName(product.getName()).setBarCode(product.getBarCode())
+            .setCategoryId(product.getCategoryId()).setCategoryName(product.getCategoryName())
+            .setUnitId(product.getUnitId()).setUnitName(product.getUnitName())));
     }
 
     @GetMapping("/export-excel")
@@ -95,7 +101,7 @@ public class ErpProductController {
         PageResult<ErpProductRespVO> pageResult = productService.getProductVOPage(pageReqVO);
         // 导出 Excel
         ExcelUtils.write(response, "产品.xls", "数据", ErpProductRespVO.class,
-                pageResult.getList());
+            pageResult.getList());
     }
 
 }

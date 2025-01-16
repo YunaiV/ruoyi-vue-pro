@@ -232,19 +232,19 @@ public class ErpProductDO extends BaseDO {
      */
     private String functionalAccessories;
     /**
-     * 包装高度
+     * 包装高度（mm）
      */
-    private Double packageHeight;
+    private Integer packageHeight;
     /**
-     * 包装长度
+     * 包装长度（mm）
      */
-    private Double packageLength;
+    private Integer packageLength;
     /**
      * 包装重量
      */
-    private Double packageWeight;
+    private BigDecimal packageWeight;
     /**
-     * 包装宽度
+     * 包装宽度（mm）
      */
-    private Double packageWidth;
+    private Integer packageWidth;
 }

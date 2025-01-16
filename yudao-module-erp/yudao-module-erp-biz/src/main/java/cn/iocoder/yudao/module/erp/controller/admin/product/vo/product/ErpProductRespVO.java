@@ -254,20 +254,20 @@ public class ErpProductRespVO {
     @ExcelProperty("功能配件")
     private String functionalAccessories;
 
-    @Schema(description = "包装高度")
-    @ExcelProperty("包装高度")
-    private Double packageHeight;
-
-    @Schema(description = "包装长度")
+    @Schema(description = "包装长度（整数，没有小数点，单位mm）", example = "500")
     @ExcelProperty("包装长度")
-    private Double packageLength;
+    private Integer packageLength;
 
-    @Schema(description = "包装重量")
-    @ExcelProperty("包装重量")
-    private Double packageWeight;
-
-    @Schema(description = "包装宽度")
+    @Schema(description = "包装宽度（整数，没有小数点，单位mm）", example = "300")
     @ExcelProperty("包装宽度")
-    private Double packageWidth;
+    private Integer packageWidth;
+
+    @Schema(description = "包装高度（整数，没有小数点，单位mm）", example = "200")
+    @ExcelProperty("包装高度")
+    private Integer packageHeight;
+
+    @Schema(description = "包装重量（保留至小数点后两位，单位kg）", example = "12.50")
+    @ExcelProperty("包装重量")
+    private BigDecimal packageWeight;
 
 }

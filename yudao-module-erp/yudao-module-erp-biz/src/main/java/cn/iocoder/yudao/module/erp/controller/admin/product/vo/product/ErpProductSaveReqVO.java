@@ -183,4 +183,24 @@ public class ErpProductSaveReqVO {
     @Schema(description = "功能配件")
     private String functionalAccessories;
 
+    @Schema(description = "包装长度（整数，没有小数点，单位mm，必须为正数）", example = "500")
+    @Min(value = 1, message = "包装长度必须为正整数")
+    @Max(value = 1000000, message = "包装长度不能超过1000000mm")
+    private Integer packageLength;
+
+    @Schema(description = "包装宽度（整数，没有小数点，单位mm，必须为正数）", example = "300")
+    @Min(value = 1, message = "包装宽度必须为正整数")
+    @Max(value = 1000000, message = "包装宽度不能超过1000000mm")
+    private Integer packageWidth;
+
+    @Schema(description = "包装高度（整数，没有小数点，单位mm，必须为正数）", example = "200")
+    @Min(value = 1, message = "包装高度必须为正整数")
+    @Max(value = 1000000, message = "包装高度不能超过1000000mm")
+    private Integer packageHeight;
+
+    @Schema(description = "包装重量（保留至小数点后两位，单位kg，必须为非负数）", example = "12.50")
+    @DecimalMin(value = "0.00", message = "包装重量必须为非负数")
+    @DecimalMax(value = "10000.00", message = "包装重量不能超过10000kg")
+    @Digits(integer = 5, fraction = 2, message = "包装重量最多5位整数和2位小数")
+    private BigDecimal packageWeight;
 }
