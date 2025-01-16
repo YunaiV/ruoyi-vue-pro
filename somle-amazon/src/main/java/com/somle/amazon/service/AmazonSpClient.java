@@ -1,9 +1,6 @@
 package com.somle.amazon.service;
 
-import com.somle.amazon.controller.vo.AmazonSpOrderReqVO;
-import com.somle.amazon.controller.vo.AmazonSpOrderRespVO;
-import com.somle.amazon.controller.vo.AmazonSpReportReqVO;
-import com.somle.amazon.controller.vo.AmazonSpReportSaveVO;
+import com.somle.amazon.controller.vo.*;
 import com.somle.amazon.model.*;
 //import com.somle.amazon.repository.AmazonSellerRepository;
 import com.somle.framework.common.util.collection.CollectionUtils;
@@ -50,6 +47,31 @@ public class AmazonSpClient {
     public AmazonShop getShop(String countryCode) {
         return getShops().filter(shop->shop.getCountry().getCode().equals(countryCode)).findFirst().get();
     }
+
+    @SneakyThrows
+    @Transactional(readOnly = true)
+    public String searchListingsItems(AmazonSeller seller, AmazonSpListingReqVO reqVO) {
+        String endPoint = seller.getRegion().getSpEndPoint();
+        String partialUrl = "/listings/2021-08-01/items/" + seller.getId();
+        String fullUrl = endPoint + partialUrl;
+
+        var headers = Map.of("x-amz-access-token", seller.getSpAccessToken());
+
+        var request = RequestX.builder()
+            .requestMethod(RequestX.Method.GET)
+            .url(fullUrl)
+            .queryParams(reqVO)
+            .headers(headers)
+            .build();
+        try(var response = WebUtils.sendRequest(request)){
+            var bodyString = response.body().string();
+//            var result = JsonUtils.parseObject(bodyString, AmazonSpOrderRespVO.class);
+//            validateResponse(result);
+            return bodyString;
+        }
+    }
+
+
 
     public void validateResponse(AmazonSpOrderRespVO response) {
         if (!CollectionUtils.isEmpty(response.getErrors())) {

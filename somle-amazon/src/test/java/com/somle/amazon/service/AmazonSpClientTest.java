@@ -1,5 +1,6 @@
 package com.somle.amazon.service;
 
+import com.somle.amazon.controller.vo.AmazonSpListingReqVO;
 import com.somle.amazon.controller.vo.AmazonSpOrderReqVO;
 import com.somle.amazon.controller.vo.AmazonSpReportReqVO;
 import com.somle.amazon.controller.vo.AmazonSpReportSaveVO;
@@ -42,6 +43,18 @@ class AmazonSpClientTest extends BaseSpringTest {
     @Test
     void refreshToken() {
         amazonService.refreshAuth();
+    }
+
+    @Test
+    void getListing() {
+        var shop = amazonService.shopRepository.findByCountryCode("UK");
+        var reqVO = AmazonSpListingReqVO.builder()
+            .sellerId(shop.getSeller().getId())
+            .marketplaceIds(List.of(shop.getCountry().getMarketplaceId()))
+            .includedData(List.of(AmazonSpListingReqVO.IncludedData.OFFERS))
+            .build();
+        var listing = amazonService.spClient.searchListingsItems(shop.getSeller(), reqVO);
+        log.info(listing);
     }
 
 
