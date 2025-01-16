@@ -668,7 +668,7 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
         runtimeService.setVariable(id, BpmnVariableConstants.PROCESS_INSTANCE_VARIABLE_REASON, reason);
 
         // 2. 结束流程
-        taskService.moveTaskToEnd(id);
+        taskService.moveTaskToEnd(id, reason);
     }
 
     @Override

@@ -195,8 +195,9 @@ public interface BpmTaskService {
      * 将指定流程实例的、进行中的流程任务，移动到结束节点
      *
      * @param processInstanceId 流程编号
+     * @param reason 原因
      */
-    void moveTaskToEnd(String processInstanceId);
+    void moveTaskToEnd(String processInstanceId, String reason);
 
     /**
      * 将任务退回到指定的 targetDefinitionKey 位置

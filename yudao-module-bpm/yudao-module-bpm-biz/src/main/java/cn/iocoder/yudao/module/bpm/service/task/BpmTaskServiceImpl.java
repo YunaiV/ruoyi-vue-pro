@@ -166,7 +166,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
 
         // 4. 任务表单
         BpmFormDO taskForm = null;
-        if (StrUtil.isNotBlank(todoTask.getFormKey())){
+        if (StrUtil.isNotBlank(todoTask.getFormKey())) {
             taskForm = formService.getForm(NumberUtils.parseLong(todoTask.getFormKey()));
         }
 
@@ -652,7 +652,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         }
         // 3.2 情况二：直接结束，审批不通过
         processInstanceService.updateProcessInstanceReject(instance, reqVO.getReason()); // 标记不通过
-        moveTaskToEnd(task.getProcessInstanceId()); // 结束流程
+        moveTaskToEnd(task.getProcessInstanceId(), BpmCommentTypeEnum.REJECT.formatComment(reqVO.getReason())); // 结束流程
     }
 
     /**
@@ -823,7 +823,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
     }
 
     @Override
-    public void moveTaskToEnd(String processInstanceId) {
+    public void moveTaskToEnd(String processInstanceId, String reason) {
         List<Task> taskList = getRunningTaskListByProcessInstanceId(processInstanceId, null, null);
         if (CollUtil.isEmpty(taskList)) {
             return;
@@ -849,6 +849,13 @@ public class BpmTaskServiceImpl implements BpmTaskService {
                 .processInstanceId(processInstanceId)
                 .moveActivityIdsToSingleActivityId(activityIds, endEvent.getId())
                 .changeState();
+
+        // 3. 如果跳转到 EndEvent 流程还未结束， 执行 deleteProcessInstance 方法。
+        List<Execution> executionList = runtimeService.createExecutionQuery().processInstanceId(processInstanceId).list();
+        if (CollUtil.isNotEmpty(executionList)) {
+            log.warn("执行跳转到 EndEvent 后, 流程实例未结束。执行 [deleteProcessInstance] 方法");
+            runtimeService.deleteProcessInstance(processInstanceId, reason);
+        }
     }
 
     @Override
@@ -1197,7 +1204,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
                     }
                 }
                 // 注意：需要基于 instance 设置租户编号，避免 Flowable 内部异步时，丢失租户编号
-                FlowableUtils.execute(processInstance.getTenantId(),()-> {
+                FlowableUtils.execute(processInstance.getTenantId(), () -> {
                     AdminUserRespDTO startUser = adminUserApi.getUser(Long.valueOf(processInstance.getStartUserId()));
                     messageService.sendMessageWhenTaskAssigned(BpmTaskConvert.INSTANCE.convert(processInstance, startUser, task));
                 });
