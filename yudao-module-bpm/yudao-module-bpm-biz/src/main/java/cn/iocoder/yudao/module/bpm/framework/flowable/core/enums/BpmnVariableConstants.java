@@ -59,6 +59,7 @@ public class BpmnVariableConstants {
      */
     public static final String TASK_VARIABLE_REASON = "TASK_REASON";
 
+    // TODO @lesan：TASK_SIGN_PIC_URL 。。。虽然长一点，嘿嘿
     public static final String TASK_VARIABLE_SIGN = "TASK_SIGN";
 
 }

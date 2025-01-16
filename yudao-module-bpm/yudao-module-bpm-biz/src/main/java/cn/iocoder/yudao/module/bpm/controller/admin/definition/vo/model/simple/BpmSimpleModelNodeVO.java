@@ -119,7 +119,7 @@ public class BpmSimpleModelNodeVO {
     @Schema(description = "路由分支组", example = "[]")
     private List<RouterCondition> routerGroups;
 
-    @Schema(description = "默认分支 ID", example = "Flow_xxx")
+    @Schema(description = "默认分支 ID", example = "Flow_xxx", hidden = true) // 由后端生成，所以 hidden = true
     private String defaultFlowId; // 仅用于路由分支节点 BpmSimpleModelNodeType.ROUTER_BRANCH_NODE
 
     @Schema(description = "任务监听器")
