@@ -18,6 +18,10 @@ public class BpmTaskApproveReqVO {
     @NotEmpty(message = "审批意见不能为空")
     private String reason;
 
+    // TODO @lesan：改成 signPicUrl 会好点
+    @Schema(description = "签名", example = "https://www.iocoder.cn/sign.png")
+    private String sign;
+
     @Schema(description = "变量实例（动态表单）", requiredMode = Schema.RequiredMode.REQUIRED)
     private Map<String, Object> variables;
 
