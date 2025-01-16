@@ -9,6 +9,7 @@ import cn.iocoder.yudao.module.erp.controller.admin.product.vo.product.ErpProduc
 import cn.iocoder.yudao.module.erp.controller.admin.product.vo.product.ErpProductRespVO;
 import cn.iocoder.yudao.module.erp.controller.admin.product.vo.product.ErpProductSaveReqVO;
 import cn.iocoder.yudao.module.erp.service.product.ErpProductServiceDelegator;
+import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -37,6 +38,8 @@ public class ErpProductController {
 
     @Resource
     private ErpProductServiceDelegator productService;
+    @Resource
+    private AdminUserApi adminUserApi;
 
     @PostMapping("/create")
     @Operation(summary = "创建产品")
@@ -78,7 +81,8 @@ public class ErpProductController {
     @Operation(summary = "获得产品分页")
     @PreAuthorize("@ss.hasPermission('erp:product:query')")
     public CommonResult<PageResult<ErpProductRespVO>> getProductPage(@Valid ErpProductPageReqVO pageReqVO) {
-        return success(productService.getProductVOPage(pageReqVO));
+        PageResult<ErpProductRespVO> productVOPage = productService.getProductVOPage(pageReqVO);
+        return success(productVOPage);
     }
 
     @GetMapping("/simple-list")

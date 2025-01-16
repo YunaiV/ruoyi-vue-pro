@@ -16,18 +16,18 @@ import java.util.List;
 @Data
 public class ErpProductSaveReqVO {
 
-    @Schema(description = "产品编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "731")
+    @Schema(description = "产品编号", requiredMode = Schema.RequiredMode.REQUIRED)
     private Long id;
 
     @Schema(description = "产品名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "张三")
     @NotEmpty(message = "产品名称不能为空")
     private String name;
 
-    @Schema(description = "产品分类编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "30796")
+    @Schema(description = "产品分类编号", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "产品分类编号不能为空")
     private Long categoryId;
 
-    @Schema(description = "部门id", requiredMode = Schema.RequiredMode.REQUIRED, example = "8369")
+    @Schema(description = "部门id", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "部门id不能为空")
     private Long deptId;
 
@@ -36,7 +36,7 @@ public class ErpProductSaveReqVO {
     @Pattern(regexp = "^[a-zA-Z0-9-]+$", message = "SKU（编码）只能包含字母、数字、中划线")
     private String barCode;
 
-    @Schema(description = "单位编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "30975")
+    @Schema(description = "单位编号", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "单位编号不能为空")
     private Long unitId;
 
@@ -86,7 +86,7 @@ public class ErpProductSaveReqVO {
     @NotNull(message = "基础高度（mm）不能为空")
     private Integer height;
 
-    @Schema(description = "主图", requiredMode = Schema.RequiredMode.REQUIRED, example = "https://www.iocoder.cn")
+    @Schema(description = "主图", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotBlank(message = "主图不能为空")
     private String primaryImageUrl;
 

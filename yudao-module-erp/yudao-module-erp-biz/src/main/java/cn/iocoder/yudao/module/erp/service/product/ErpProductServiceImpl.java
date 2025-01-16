@@ -31,6 +31,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 import java.util.*;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants.*;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
@@ -292,10 +294,21 @@ public class ErpProductServiceImpl implements ErpProductService {
         Map<Long, ErpProductUnitDO> unitMap = productUnitService.getProductUnitMap(
                 convertSet(list, ErpProductDO::getUnitId));
         Map<Long, DeptRespDTO> deptMap = deptApi.getDeptMap(convertSet(list, ErpProductDO::getDeptId));
-        Map<Long, AdminUserRespDTO> poUserMap = userApi.getUserMap(convertSet(list, ErpProductDO::getProductOwnerId));
-        Map<Long, AdminUserRespDTO> idUserMap = userApi.getUserMap(convertSet(list, ErpProductDO::getIndustrialDesignerId));
-        Map<Long, AdminUserRespDTO> rdUserMap = userApi.getUserMap(convertSet(list, ErpProductDO::getResearchDeveloperId));
-        Map<Long, AdminUserRespDTO> meUserMap = userApi.getUserMap(convertSet(list, ErpProductDO::getMaintenanceEngineerId));
+        // 获取用户信息并合并调用
+        Map<Long, AdminUserRespDTO> userMaps = Stream.of(
+                convertSet(list, ErpProductDO::getProductOwnerId),
+                convertSet(list, ErpProductDO::getIndustrialDesignerId),
+                convertSet(list, ErpProductDO::getResearchDeveloperId),
+                convertSet(list, ErpProductDO::getMaintenanceEngineerId))
+            .flatMap(Set::stream)
+            .distinct()
+            .collect(Collectors.toMap(id -> id, id -> userApi.getUser(id)));
+        //创建者map
+        Map<Long, AdminUserRespDTO> createrMap = userApi.getUserMap(
+            convertSet(list, purchaseOrder -> Long.parseLong(purchaseOrder.getCreator())));
+        //更新者map
+        Map<Long, AdminUserRespDTO> updaterMap = userApi.getUserMap(
+            convertSet(list, purchaseOrder -> Long.parseLong(purchaseOrder.getUpdater())));
         return BeanUtils.toBean(list, ErpProductRespVO.class, product -> {
             MapUtils.findAndThen(categoryMap, product.getCategoryId(),
                     category -> product.setCategoryName(category.getName()));
@@ -303,14 +316,16 @@ public class ErpProductServiceImpl implements ErpProductService {
                     unit -> product.setUnitName(unit.getName()));
             MapUtils.findAndThen(deptMap, product.getDeptId(),
                     dept -> product.setDeptName(dept.getName()));
-            MapUtils.findAndThen(poUserMap, product.getProductOwnerId(),
+            MapUtils.findAndThen(userMaps, product.getProductOwnerId(),
                     user -> product.setProductOwnerName(user.getNickname()));
-            MapUtils.findAndThen(idUserMap, product.getIndustrialDesignerId(),
+            MapUtils.findAndThen(userMaps, product.getIndustrialDesignerId(),
                     user -> product.setIndustrialDesignerName(user.getNickname()));
-            MapUtils.findAndThen(rdUserMap, product.getResearchDeveloperId(),
+            MapUtils.findAndThen(userMaps, product.getResearchDeveloperId(),
                     user -> product.setResearchDeveloperName(user.getNickname()));
-            MapUtils.findAndThen(meUserMap, product.getMaintenanceEngineerId(),
+            MapUtils.findAndThen(userMaps, product.getMaintenanceEngineerId(),
                     user -> product.setMaintenanceEngineerName(user.getNickname()));
+            Optional.ofNullable(product.getCreator()).ifPresent(creator -> product.setCreator(createrMap.get(Long.parseLong(creator)).getNickname()));
+            Optional.ofNullable(product.getUpdater()).ifPresent(updater -> product.setUpdater(updaterMap.get(Long.parseLong(updater)).getNickname()));
             //将指导价转化为集合
             list.stream()
                     .filter(productDo -> productDo.getId().equals(product.getId()) && StrUtil.isNotBlank(productDo.getGuidePrices()))
