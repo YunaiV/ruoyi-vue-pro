@@ -485,7 +485,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         // 1.3 校验签名
         BpmnModel bpmnModel = modelService.getBpmnModelByDefinitionId(task.getProcessDefinitionId());
         Boolean signEnable = parseSignEnable(bpmnModel, task.getTaskDefinitionKey());
-        if (signEnable && StrUtil.isEmpty(reqVO.getSign())) {
+        if (signEnable && StrUtil.isEmpty(reqVO.getSignPicUrl())) {
             throw exception(TASK_SIGNATURE_NOT_EXISTS);
         }
 
@@ -505,7 +505,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         // 2.1 更新 task 状态、原因、签字
         updateTaskStatusAndReason(task.getId(), BpmTaskStatusEnum.APPROVE.getStatus(), reqVO.getReason());
         if (signEnable) {
-            taskService.setVariableLocal(task.getId(), BpmnVariableConstants.TASK_VARIABLE_SIGN, reqVO.getSign());
+            taskService.setVariableLocal(task.getId(), BpmnVariableConstants.TASK_SIGN_PIC_URL, reqVO.getSignPicUrl());
         }
         // 2.2 添加评论
         taskService.addComment(task.getId(), task.getProcessInstanceId(), BpmCommentTypeEnum.APPROVE.getType(),
