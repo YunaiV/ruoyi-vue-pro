@@ -11,9 +11,10 @@ import com.somle.esb.converter.ErpToEccangConverter;
 import com.somle.esb.converter.ErpToKingdeeConverter;
 import com.somle.kingdee.model.KingdeeProduct;
 import com.somle.kingdee.service.KingdeeService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Profile;
 import org.springframework.integration.annotation.ServiceActivator;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Component;
@@ -30,38 +31,32 @@ import java.util.Optional;
  */
 @Slf4j
 @Component
+@Profile("!dev & !test") // 仅在非 dev 和非 test 环境加载
+@RequiredArgsConstructor
 public class ErpCustomRuleHandler {
 
-    @Autowired
-    KingdeeService kingdeeService;
-
-    @Autowired
-    EccangService eccangService;
-
-    @Autowired
-    ErpSupplierProductService erpSupplierProductService;
-    @Autowired
-    ErpToEccangConverter erpToEccangConverter;
-
-    @Autowired
-    ErpToKingdeeConverter erpToKingdeeConverter;
+    private final KingdeeService kingdeeService;
+    private final EccangService eccangService;
+    private final ErpSupplierProductService erpSupplierProductService;
+    private final ErpToEccangConverter erpToEccangConverter;
+    private final ErpToKingdeeConverter erpToKingdeeConverter;
 
     /**
+     * @return void
      * @Author Wqh
      * @Description 上传eccang产品信息
      * @Date 11:18 2024/11/5
      * @Param [message]
-     * @return void
      **/
     @ServiceActivator(inputChannel = "erpCustomRuleChannel")
     public void syncCustomRulesToEccang(@Payload List<ErpCustomRuleDTO> customRules) {
         log.info("syncCustomRuleToEccang");
         List<EccangProduct> eccangProducts = erpToEccangConverter.customRuleDTOToProduct(customRules);
-        for (EccangProduct eccangProduct : eccangProducts){
+        for (EccangProduct eccangProduct : eccangProducts) {
             eccangProduct.setActionType("ADD");
             EccangProduct eccangServiceProduct = eccangService.getProduct(eccangProduct.getProductSku());
             //根据sku从eccang中获取产品，如果产品不为空，则表示已存在，操作则变为修改
-            if (ObjUtil.isNotEmpty(eccangServiceProduct)){
+            if (ObjUtil.isNotEmpty(eccangServiceProduct)) {
                 eccangProduct.setActionType("EDIT");
                 //如果是修改就要上传默认采购单价
                 //TODO 后续有变更，请修改
@@ -98,21 +93,21 @@ public class ErpCustomRuleHandler {
                 });
         }
         eccangService.addBatchProduct(eccangProducts);
-        log.info("syncCustomRuleToEccang end countSize{{}}",eccangProducts.size());
+        log.info("syncCustomRuleToEccang end countSize{{}}", eccangProducts.size());
     }
 
     /**
+     * @return void
      * @Author Wqh
      * @Description 上传金蝶产品信息
      * @Date 11:18 2024/11/5
      * @Param [message]
-     * @return void
      **/
     @ServiceActivator(inputChannel = "erpCustomRuleChannel")
     public void syncCustomRulesToKingdee(@Payload List<ErpCustomRuleDTO> customRules) {
         log.info("syncCustomRuleToKingdee");
         List<KingdeeProduct> kingdee = erpToKingdeeConverter.customRuleDTOToProduct(customRules);
-        for (KingdeeProduct kingdeeProduct : kingdee){
+        for (KingdeeProduct kingdeeProduct : kingdee) {
             kingdeeService.addProduct(kingdeeProduct);
         }
         log.info("syncCustomRuleToKingdee end");

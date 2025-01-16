@@ -4,8 +4,9 @@ import com.somle.ai.model.AiName;
 import com.somle.ai.service.AiService;
 import com.somle.eccang.model.EccangOrder;
 import com.somle.esb.converter.EccangToErpConverter;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Profile;
 import org.springframework.integration.annotation.ServiceActivator;
 import org.springframework.messaging.Message;
 import org.springframework.stereotype.Component;
@@ -17,13 +18,12 @@ import org.springframework.stereotype.Component;
  */
 @Slf4j
 @Component
+@Profile("!dev & !test") // 仅在非 dev 和非 test 环境加载
+@RequiredArgsConstructor
 public class EccangSaleHandler {
 
-    @Autowired
-    EccangToErpConverter eccangToErpConverter;
-
-    @Autowired
-    AiService aiService;
+    private final EccangToErpConverter eccangToErpConverter;
+    private final AiService aiService;
 
     @ServiceActivator(inputChannel = "eccangSaleOutputChannel")
     public void handleSale(Message<EccangOrder> message) {

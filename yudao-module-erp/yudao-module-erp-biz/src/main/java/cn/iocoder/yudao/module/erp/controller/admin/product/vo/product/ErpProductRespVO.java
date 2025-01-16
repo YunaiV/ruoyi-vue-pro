@@ -1,11 +1,11 @@
 package cn.iocoder.yudao.module.erp.controller.admin.product.vo.product;
 
+import cn.iocoder.yudao.module.erp.controller.admin.base.ErpBaseRespVO;
 import cn.iocoder.yudao.module.erp.controller.admin.product.vo.product.json.GuidePriceJson;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.List;
 
 import com.alibaba.excel.annotation.*;
@@ -13,7 +13,7 @@ import com.alibaba.excel.annotation.*;
 @Schema(description = "管理后台 - ERP 产品 Response VO")
 @Data
 @ExcelIgnoreUnannotated
-public class ErpProductRespVO {
+public class ErpProductRespVO extends ErpBaseRespVO {
 
     @Schema(description = "产品编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "731")
     @ExcelProperty("产品编号")
@@ -30,10 +30,6 @@ public class ErpProductRespVO {
     @Schema(description = "产品分类名称", requiredMode = Schema.RequiredMode.REQUIRED)
     @ExcelProperty("产品分类名称")
     private String categoryName;
-
-    @Schema(description = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED)
-    @ExcelProperty("创建时间")
-    private LocalDateTime createTime;
 
     @Schema(description = "部门id", requiredMode = Schema.RequiredMode.REQUIRED, example = "8369")
     @ExcelProperty("部门id")

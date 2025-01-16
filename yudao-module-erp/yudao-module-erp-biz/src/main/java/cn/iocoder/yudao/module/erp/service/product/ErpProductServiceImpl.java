@@ -97,10 +97,8 @@ public class ErpProductServiceImpl implements ErpProductService {
         }
         //校验部门id的合法性
         validateDept(createReqVO.getDeptId());
-        //获取分类id
-        Long categoryId = createReqVO.getCategoryId();
         //校验产品分类是否存在
-        validateProductCategory(categoryId);
+        validateProductCategory(createReqVO.getCategoryId());
         //校验人员id是否存在
         validatePerson(createReqVO);
         //生产对应的BO
