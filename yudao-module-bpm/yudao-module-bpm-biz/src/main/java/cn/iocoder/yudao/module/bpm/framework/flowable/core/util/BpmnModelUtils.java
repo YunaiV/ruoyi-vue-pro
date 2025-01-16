@@ -2,9 +2,11 @@ package cn.iocoder.yudao.module.bpm.framework.flowable.core.util;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.convert.Convert;
+import cn.hutool.core.lang.Assert;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.*;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
+import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.common.util.number.NumberUtils;
 import cn.iocoder.yudao.framework.common.util.string.StrUtils;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.simple.BpmSimpleModelNodeVO;
@@ -21,6 +23,7 @@ import org.flowable.bpmn.model.Process;
 import org.flowable.bpmn.model.*;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.impl.util.io.BytesStreamSource;
+import org.flowable.engine.impl.el.FixedValue;
 
 import java.util.*;
 
@@ -346,12 +349,7 @@ public class BpmnModelUtils {
     }
 
     public static void addSignEnable(Boolean signEnable, FlowElement userTask) {
-        // TODO @lesan：是不是改成表达式会好点  addExtensionElement(userTask, SIGN_ENABLE, ObjUtil.isNotNull(signEnable) ? )
-        if (ObjUtil.isNotNull(signEnable)) {
-            addExtensionElement(userTask, SIGN_ENABLE, signEnable.toString());
-        } else {
-            addExtensionElement(userTask, SIGN_ENABLE, "false");
-        }
+        addExtensionElement(userTask, SIGN_ENABLE, ObjUtil.isNotNull(signEnable) ? signEnable.toString() : "false");
     }
 
     public static Boolean parseSignEnable(BpmnModel bpmnModel, String flowElementId) {
@@ -364,6 +362,19 @@ public class BpmnModelUtils {
             return false;
         }
         return Convert.toBool(extensionElements.get(0).getElementText(), false);
+    }
+
+    public static void addListenerConfig(FlowableListener flowableListener, BpmSimpleModelNodeVO.ListenerHandler handler) {
+        FieldExtension fieldExtension = new FieldExtension();
+        fieldExtension.setFieldName("listenerConfig");
+        fieldExtension.setStringValue(JsonUtils.toJsonString(handler));
+        flowableListener.getFieldExtensions().add(fieldExtension);
+    }
+
+    public static BpmSimpleModelNodeVO.ListenerHandler parseListenerConfig(FixedValue fixedValue) {
+        String expressionText = fixedValue.getExpressionText();
+        Assert.notNull(expressionText, "监听器扩展字段({})不能为空", expressionText);
+        return JsonUtils.parseObject(expressionText, BpmSimpleModelNodeVO.ListenerHandler.class);
     }
 
     // ========== BPM 简单查找相关的方法 ==========

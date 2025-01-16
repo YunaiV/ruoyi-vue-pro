@@ -213,6 +213,10 @@ public class FlowableUtils {
         return (String) task.getTaskLocalVariables().get(BpmnVariableConstants.TASK_VARIABLE_REASON);
     }
 
+    public static String getTaskSign(TaskInfo task) {
+        return (String) task.getTaskLocalVariables().get(BpmnVariableConstants.TASK_VARIABLE_SIGN);
+    }
+
     /**
      * 获得任务的表单
      *

@@ -33,7 +33,7 @@ public enum BpmSimpleModelNodeType implements IntArrayValuable {
     CONDITION_BRANCH_NODE(51, "条件分支", "exclusiveGateway"),
     PARALLEL_BRANCH_NODE(52, "并行分支", "parallelGateway"),
     INCLUSIVE_BRANCH_NODE(53, "包容分支", "inclusiveGateway"),
-    ROUTE_BRANCH_NODE(54, "路由分支", "exclusiveGateway")
+    ROUTER_BRANCH_NODE(54, "路由分支", "exclusiveGateway")
     ;
 
     public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(BpmSimpleModelNodeType::getType).toArray();
@@ -51,7 +51,7 @@ public enum BpmSimpleModelNodeType implements IntArrayValuable {
         return Objects.equals(CONDITION_BRANCH_NODE.getType(), type)
                 || Objects.equals(PARALLEL_BRANCH_NODE.getType(), type)
                 || Objects.equals(INCLUSIVE_BRANCH_NODE.getType(), type)
-                || Objects.equals(ROUTE_BRANCH_NODE.getType(), type);
+                || Objects.equals(ROUTER_BRANCH_NODE.getType(), type);
     }
 
     public static BpmSimpleModelNodeType valueOf(Integer type) {

@@ -5,7 +5,6 @@ import cn.hutool.core.lang.Assert;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.*;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
-import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.simple.BpmSimpleModelNodeVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.simple.BpmSimpleModelNodeVO.ConditionGroups;
 import cn.iocoder.yudao.module.bpm.enums.definition.*;
@@ -188,7 +187,7 @@ public class SimpleModelUtils {
         // 分支终点节点 ID
         String branchEndNodeId = null;
         if (nodeType == BpmSimpleModelNodeType.CONDITION_BRANCH_NODE
-                || nodeType == BpmSimpleModelNodeType.ROUTE_BRANCH_NODE) { // 条件分支或路由分支
+                || nodeType == BpmSimpleModelNodeType.ROUTER_BRANCH_NODE) { // 条件分支或路由分支
             // 分两种情况 1. 分支节点有孩子节点为孩子节点 Id 2. 分支节点孩子为无效节点时 (分支嵌套且为分支最后一个节点) 为分支终点节点 ID
             branchEndNodeId = isValidNode(childNode) ? childNode.getId() : targetNodeId;
         } else if (nodeType == BpmSimpleModelNodeType.PARALLEL_BRANCH_NODE
@@ -199,10 +198,10 @@ public class SimpleModelUtils {
         Assert.notEmpty(branchEndNodeId, "分支终点节点 Id 不能为空");
 
         // 3. 遍历分支节点
-        if (nodeType == BpmSimpleModelNodeType.ROUTE_BRANCH_NODE) {
+        if (nodeType == BpmSimpleModelNodeType.ROUTER_BRANCH_NODE) {
             // 路由分支遍历
-            for (BpmSimpleModelNodeVO.RouteCondition route : node.getRouterGroups()) {
-                SequenceFlow sequenceFlow = RouteBranchNodeConvert.buildSequenceFlow(node.getId(), route);
+            for (BpmSimpleModelNodeVO.RouterCondition router : node.getRouterGroups()) {
+                SequenceFlow sequenceFlow = RouteBranchNodeConvert.buildSequenceFlow(node.getId(), router);
                 process.addFlowElement(sequenceFlow);
             }
         } else {
@@ -233,7 +232,7 @@ public class SimpleModelUtils {
             SequenceFlow sequenceFlow = buildBpmnSequenceFlow(branchEndNodeId, nextNodeId);
             process.addFlowElement(sequenceFlow);
         // 4.2 如果是路由分支，需要连接后续节点为默认路由
-        } else if (nodeType == BpmSimpleModelNodeType.ROUTE_BRANCH_NODE) {
+        } else if (nodeType == BpmSimpleModelNodeType.ROUTER_BRANCH_NODE) {
             SequenceFlow sequenceFlow = buildBpmnSequenceFlow(node.getId(), branchEndNodeId, node.getDefaultFlowId(),
                     null, null);
             process.addFlowElement(sequenceFlow);
@@ -453,10 +452,7 @@ public class SimpleModelUtils {
                 flowableListener.setEvent(TaskListener.EVENTNAME_CREATE);
                 flowableListener.setImplementationType(ImplementationType.IMPLEMENTATION_TYPE_DELEGATEEXPRESSION);
                 flowableListener.setImplementation(DELEGATE_EXPRESSION);
-                FieldExtension fieldExtension = new FieldExtension();
-                fieldExtension.setFieldName("listenerConfig");
-                fieldExtension.setStringValue(JsonUtils.toJsonString(node.getTaskCreateListener()));
-                flowableListener.getFieldExtensions().add(fieldExtension);
+                addListenerConfig(flowableListener, node.getTaskCreateListener());
                 flowableListeners.add(flowableListener);
             }
             if (node.getTaskAssignListener() != null
@@ -465,11 +461,7 @@ public class SimpleModelUtils {
                 flowableListener.setEvent(TaskListener.EVENTNAME_ASSIGNMENT);
                 flowableListener.setImplementationType(ImplementationType.IMPLEMENTATION_TYPE_DELEGATEEXPRESSION);
                 flowableListener.setImplementation(DELEGATE_EXPRESSION);
-                // TODO @lesan：可以在 BpmnModelUtils 搞个方法，类似 public static Integer parseCandidateStrategy。这样，就收敛啦！
-                FieldExtension fieldExtension = new FieldExtension();
-                fieldExtension.setFieldName("listenerConfig");
-                fieldExtension.setStringValue(JsonUtils.toJsonString(node.getTaskAssignListener()));
-                flowableListener.getFieldExtensions().add(fieldExtension);
+                addListenerConfig(flowableListener, node.getTaskAssignListener());
                 flowableListeners.add(flowableListener);
             }
             if (node.getTaskCompleteListener() != null
@@ -478,10 +470,7 @@ public class SimpleModelUtils {
                 flowableListener.setEvent(TaskListener.EVENTNAME_COMPLETE);
                 flowableListener.setImplementationType(ImplementationType.IMPLEMENTATION_TYPE_DELEGATEEXPRESSION);
                 flowableListener.setImplementation(DELEGATE_EXPRESSION);
-                FieldExtension fieldExtension = new FieldExtension();
-                fieldExtension.setFieldName("listenerConfig");
-                fieldExtension.setStringValue(JsonUtils.toJsonString(node.getTaskCompleteListener()));
-                flowableListener.getFieldExtensions().add(fieldExtension);
+                addListenerConfig(flowableListener, node.getTaskCompleteListener());
                 flowableListeners.add(flowableListener);
             }
             if (CollUtil.isNotEmpty(flowableListeners)) {
@@ -646,9 +635,9 @@ public class SimpleModelUtils {
                     node.getConditionGroups());
         }
 
-        public static String buildConditionExpression(BpmSimpleModelNodeVO.RouteCondition route) {
-            return buildConditionExpression(route.getConditionType(), route.getConditionExpression(),
-                    route.getConditionGroups());
+        public static String buildConditionExpression(BpmSimpleModelNodeVO.RouterCondition router) {
+            return buildConditionExpression(router.getConditionType(), router.getConditionExpression(),
+                    router.getConditionGroups());
         }
 
         public static String buildConditionExpression(Integer conditionType, String conditionExpression,
@@ -728,18 +717,19 @@ public class SimpleModelUtils {
             exclusiveGateway.setId(node.getId());
 
             // 设置默认的序列流（条件）
+            node.setDefaultFlowId("Flow_" + IdUtil.fastUUID());
             exclusiveGateway.setDefaultFlow(node.getDefaultFlowId());
             return exclusiveGateway;
         }
 
         @Override
         public BpmSimpleModelNodeType getType() {
-            return BpmSimpleModelNodeType.ROUTE_BRANCH_NODE;
+            return BpmSimpleModelNodeType.ROUTER_BRANCH_NODE;
         }
 
-        public static SequenceFlow buildSequenceFlow(String nodeId, BpmSimpleModelNodeVO.RouteCondition route) {
-            String conditionExpression = ConditionNodeConvert.buildConditionExpression(route);
-            return buildBpmnSequenceFlow(nodeId, route.getNodeId(), null, null, conditionExpression);
+        public static SequenceFlow buildSequenceFlow(String nodeId, BpmSimpleModelNodeVO.RouterCondition router) {
+            String conditionExpression = ConditionNodeConvert.buildConditionExpression(router);
+            return buildBpmnSequenceFlow(nodeId, router.getNodeId(), null, null, conditionExpression);
         }
 
     }
