@@ -1,10 +1,10 @@
 package com.somle.esb.converter;
 
 import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.text.CharSequenceUtil;
 import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.ReflectUtil;
-import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.enums.enums.DictTypeConstants;
 import cn.iocoder.yudao.framework.common.exception.util.ThrowUtil;
 import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
@@ -14,10 +14,10 @@ import cn.iocoder.yudao.module.system.api.dept.DeptApi;
 import cn.iocoder.yudao.module.system.api.dept.dto.DeptLevelRespDTO;
 import cn.iocoder.yudao.module.system.api.dept.dto.DeptRespDTO;
 import cn.iocoder.yudao.module.system.api.dict.DictDataApi;
-import cn.iocoder.yudao.module.system.api.dict.dto.DictDataRespDTO;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
-import com.somle.eccang.model.*;
+import com.somle.eccang.model.EccangCategory;
+import com.somle.eccang.model.EccangProduct;
 import com.somle.eccang.service.EccangService;
 import com.somle.esb.enums.TenantId;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -102,6 +102,7 @@ public class ErpToEccangConverter {
 //        product.setUserOrganizationId(organization.getId());
 //        return product;
 //    }
+
     /**
      * 将ERP产品列表转换为完整的Eccang产品列表。
      *
@@ -132,22 +133,25 @@ public class ErpToEccangConverter {
      * 将单个ERP产品转换为Eccang产品。
      *
      * @param customRuleDTO ERP产品对象
-     * @param userMap 用户信息映射
+     * @param userMap       用户信息映射
      * @return 转换后的Eccang产品对象
      */
     private EccangProduct customRuleToProduct(ErpCustomRuleDTO customRuleDTO, Map<Long, AdminUserRespDTO> userMap) {
         EccangProduct eccangProduct = new EccangProduct();
         eccangProduct.setPdDeclarationStatement(customRuleDTO.getId());
-        // 设置SKU和标题
+
         Integer countryCode = customRuleDTO.getCountryCode();
-        if (ObjUtil.isNotEmpty(countryCode)) {
-            DictDataRespDTO dictData = dictDataApi.getDictData(DictTypeConstants.COUNTRY_CODE, String.valueOf(countryCode));
-            if (StrUtil.isNotBlank(customRuleDTO.getBarCode())) {
-                eccangProduct.setProductTitle(customRuleDTO.getProductName() + "-" + getCountrySuffix(dictData.getLabel()));
-                eccangProduct.setProductTitleEn(customRuleDTO.getBarCode() + "-" + getCountrySuffix(dictData.getLabel()));
-                eccangProduct.setProductSku(customRuleDTO.getBarCode() + "-" + getCountrySuffix(dictData.getLabel()));
-            }
-        }
+        String countrySuffix = ObjectUtil.isNotEmpty(countryCode)
+            ? getCountrySuffix(dictDataApi.getDictData(DictTypeConstants.COUNTRY_CODE, String.valueOf(countryCode)).getLabel())
+            : "";
+
+        String barCode = customRuleDTO.getBarCode();
+        String productName = customRuleDTO.getProductName();
+        String suffix = countrySuffix.isEmpty() ? "" : "-" + countrySuffix;
+
+        eccangProduct.setProductTitle(productName + suffix);
+        eccangProduct.setProductTitleEn(CharSequenceUtil.isNotBlank(barCode) ? barCode + suffix : barCode);
+        eccangProduct.setProductSku(CharSequenceUtil.isNotBlank(barCode) ? barCode + suffix : barCode);
         // 设置货币代码
         Optional.ofNullable(customRuleDTO.getDeclaredValueCurrencyCode())
             .map(String::valueOf)
@@ -264,8 +268,6 @@ public class ErpToEccangConverter {
     }
 
 
-
-
     public EccangCategory toEccang(String deptId) {
         //从erp中获取部门信息
         DeptRespDTO dept = deptApi.getDept(Long.valueOf(deptId));
@@ -282,7 +284,7 @@ public class ErpToEccangConverter {
         Integer pid = 0;
         //判断该品类名在易仓中是否已经存在，存在则去修改，不存在则去新增
         EccangCategory categoryByName = eccangService.getCategoryByErpDeptId(deptId);
-        if (categoryByName != null){
+        if (categoryByName != null) {
             id = categoryByName.getPcId();
             actionType = "EDIT";
         }
@@ -297,21 +299,22 @@ public class ErpToEccangConverter {
             pid = category.getPcId();
         }
         return EccangCategory.builder()
-                .actionType(actionType)
-                .pcId(id)
-                .pcName(deptName)
-                .pcNameEn(deptId)
-                .pcPid(pid)
-                .pcLevel(Math.min(deptLevel, 3))
-                .build();
+            .actionType(actionType)
+            .pcId(id)
+            .pcName(deptName)
+            .pcNameEn(deptId)
+            .pcPid(pid)
+            .pcLevel(Math.min(deptLevel, 3))
+            .build();
     }
+
     /**
-    * @Author Wqh
-    * @Description 获取父级名称
-    * @Date  2024/11/25
-    * @Param [deptTreeLevel]
-    **/
-        private DeptLevelRespDTO getParentName(Integer deptLevel, TreeSet<DeptLevelRespDTO> deptTreeLevel) {
+     * @Author Wqh
+     * @Description 获取父级名称
+     * @Date 2024/11/25
+     * @Param [deptTreeLevel]
+     **/
+    private DeptLevelRespDTO getParentName(Integer deptLevel, TreeSet<DeptLevelRespDTO> deptTreeLevel) {
         if (deptLevel > 3) {
             //向上找父类
             deptTreeLevel.pollLast();
