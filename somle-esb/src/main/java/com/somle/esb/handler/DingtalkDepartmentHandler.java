@@ -1,5 +1,6 @@
 package com.somle.esb.handler;
 
+
 import cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder;
 import cn.iocoder.yudao.module.system.api.dept.DeptApi;
 import cn.iocoder.yudao.module.system.api.dept.dto.DeptSaveReqDTO;
@@ -7,11 +8,13 @@ import com.somle.dingtalk.model.DingTalkDepartment;
 import com.somle.esb.converter.DingTalkToErpConverter;
 import com.somle.esb.enums.TenantId;
 import com.somle.esb.service.EsbMappingService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Profile;
 import org.springframework.integration.annotation.ServiceActivator;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Component;
+
 
 
 /**
@@ -21,16 +24,13 @@ import org.springframework.stereotype.Component;
 */
 @Slf4j
 @Component
+@Profile("!dev & !test") // 仅在非 dev 和非 test 环境加载
+@RequiredArgsConstructor
 public class DingtalkDepartmentHandler {
 
-    @Autowired
-    DingTalkToErpConverter dingTalkToErpConverter;
-
-    @Autowired
-    private DeptApi deptApi;
-
-    @Autowired
-    private EsbMappingService mappingService;
+    private final DingTalkToErpConverter dingTalkToErpConverter;
+    private final DeptApi deptApi;
+    private final EsbMappingService mappingService;
 
     @ServiceActivator(inputChannel = "dingtalkDepartmentOutputChannel")
     public void handle(@Payload DingTalkDepartment dingTalkDepartment) {

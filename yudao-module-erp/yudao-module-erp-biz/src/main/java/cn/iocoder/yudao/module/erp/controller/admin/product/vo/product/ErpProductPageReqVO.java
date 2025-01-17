@@ -16,23 +16,23 @@ import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_
 @ToString(callSuper = true)
 public class ErpProductPageReqVO extends PageParam {
 
-    @Schema(description = "产品名称", example = "张三")
+    @Schema(description = "产品名称", example = "电视机")
     private String name;
 
-    @Schema(description = "产品分类编号", example = "30796")
+    @Schema(description = "产品分类编号")
     private Long categoryId;
 
-    @Schema(description = "创建时间")
+    @Schema(description = "创建时间(\"yyyy-MM-dd HH:mm:ss\")")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
     private LocalDateTime[] createTime;
 
-    @Schema(description = "部门id", example = "8369")
+    @Schema(description = "部门id")
     private Long deptId;
 
     @Schema(description = "SKU（编码）")
     private String barCode;
 
-    @Schema(description = "单位编号", example = "30975")
+    @Schema(description = "单位编号")
     private Long unitId;
 
     @Schema(description = "品牌",example = "you")
@@ -74,16 +74,16 @@ public class ErpProductPageReqVO extends PageParam {
     @Schema(description = "基础高度（mm）")
     private Integer height;
 
-    @Schema(description = "PO产品经理id", example = "28770")
+    @Schema(description = "PO产品经理id")
     private Long productOwnerId;
 
-    @Schema(description = "ID工业设计id", example = "27774")
+    @Schema(description = "ID工业设计id")
     private Long industrialDesignerId;
 
-    @Schema(description = "RD研发工程师id", example = "10321")
+    @Schema(description = "RD研发工程师id")
     private Long researchDeveloperId;
 
-    @Schema(description = "维护工程师id", example = "22163")
+    @Schema(description = "维护工程师id")
     private Long maintenanceEngineerId;
 
 }

@@ -140,4 +140,20 @@ public class ErpProductBO {
      * 设计说明
      */
     private String description;
+    /**
+     * 包装高度（mm）
+     */
+    private Integer packageHeight;
+    /**
+     * 包装长度（mm）
+     */
+    private Integer packageLength;
+    /**
+     * 包装重量
+     */
+    private BigDecimal packageWeight;
+    /**
+     * 包装宽度（mm）
+     */
+    private Integer packageWidth;
 }

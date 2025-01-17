@@ -1,9 +1,9 @@
 package cn.iocoder.yudao.module.erp.dal.dataobject.product;
 
+import cn.iocoder.yudao.framework.tenant.core.db.TenantBaseDO;
 import lombok.*;
 
 import com.baomidou.mybatisplus.annotation.*;
-import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 
 import java.math.BigDecimal;
 
@@ -20,7 +20,7 @@ import java.math.BigDecimal;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ErpProductDO extends BaseDO {
+public class ErpProductDO extends TenantBaseDO {
 
     /**
      * 产品编号
@@ -232,19 +232,19 @@ public class ErpProductDO extends BaseDO {
      */
     private String functionalAccessories;
     /**
-     * 包装高度
+     * 包装高度（mm）
      */
-    private Double packageHeight;
+    private Integer packageHeight;
     /**
-     * 包装长度
+     * 包装长度（mm）
      */
-    private Double packageLength;
+    private Integer packageLength;
     /**
      * 包装重量
      */
-    private Double packageWeight;
+    private BigDecimal packageWeight;
     /**
-     * 包装宽度
+     * 包装宽度（mm）
      */
-    private Double packageWidth;
+    private Integer packageWidth;
 }

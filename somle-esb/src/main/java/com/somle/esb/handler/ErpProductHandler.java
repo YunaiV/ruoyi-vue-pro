@@ -1,7 +1,6 @@
 package com.somle.esb.handler;
 
 import cn.hutool.core.util.ObjUtil;
-import cn.iocoder.yudao.module.erp.api.product.dto.ErpCustomRuleDTO;
 import cn.iocoder.yudao.module.erp.api.product.dto.ErpProductDTO;
 import com.somle.eccang.model.EccangProduct;
 import com.somle.eccang.service.EccangService;
@@ -9,10 +8,10 @@ import com.somle.esb.converter.ErpToEccangConverter;
 import com.somle.esb.converter.ErpToKingdeeConverter;
 import com.somle.kingdee.model.KingdeeProduct;
 import com.somle.kingdee.service.KingdeeService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Profile;
 import org.springframework.integration.annotation.ServiceActivator;
-import org.springframework.messaging.Message;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Component;
 
@@ -25,29 +24,24 @@ import java.util.List;
  */
 @Slf4j
 @Component
+@Profile("!dev & !test") // 仅在非 dev 和非 test 环境加载
+@RequiredArgsConstructor
 public class ErpProductHandler {
 
-    @Autowired
-    KingdeeService kingdeeService;
-
-    @Autowired
-    EccangService eccangService;
-
-    @Autowired
-    ErpToEccangConverter erpToEccangConverter;
-
-    @Autowired
-    ErpToKingdeeConverter erpToKingdeeConverter;
+    private final KingdeeService kingdeeService;
+    private final EccangService eccangService;
+    private final ErpToEccangConverter erpToEccangConverter;
+    private final ErpToKingdeeConverter erpToKingdeeConverter;
 
     @ServiceActivator(inputChannel = "erpProductChannel")
     public void syncProductsToEccang(@Payload List<ErpProductDTO> products) {
         log.info("syncProductsToEccang");
         List<EccangProduct> eccangProducts = erpToEccangConverter.productDTOToProduct(products);
-        for (EccangProduct eccangProduct : eccangProducts){
+        for (EccangProduct eccangProduct : eccangProducts) {
             eccangProduct.setActionType("ADD");
             EccangProduct eccangServiceProduct = eccangService.getProduct(eccangProduct.getProductSku());
             //根据sku从eccang中获取产品，如果产品不为空，则表示已存在，操作则变为修改
-            if (ObjUtil.isNotEmpty(eccangServiceProduct)){
+            if (ObjUtil.isNotEmpty(eccangServiceProduct)) {
                 eccangProduct.setActionType("EDIT");
                 //如果是修改就要上传默认采购单价
                 //TODO 后续有变更，请修改
@@ -63,7 +57,7 @@ public class ErpProductHandler {
     public void syncProductsToKingdee(@Payload List<ErpProductDTO> products) {
         log.info("syncProductsToKingdee");
         List<KingdeeProduct> kingdee = erpToKingdeeConverter.productDTOToProduct(products);
-        for (KingdeeProduct kingdeeProduct : kingdee){
+        for (KingdeeProduct kingdeeProduct : kingdee) {
             kingdeeService.addProduct(kingdeeProduct);
         }
         log.info("syncProductsToKingdee end");
