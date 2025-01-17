@@ -14,6 +14,7 @@ import cn.iocoder.yudao.module.bpm.convert.definition.BpmModelConvert;
 import cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmFormDO;
 import cn.iocoder.yudao.module.bpm.enums.definition.BpmModelFormTypeEnum;
 import cn.iocoder.yudao.module.bpm.enums.definition.BpmModelTypeEnum;
+import cn.iocoder.yudao.module.bpm.enums.task.BpmReasonEnum;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.candidate.BpmTaskCandidateInvoker;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.util.BpmnModelUtils;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.util.FlowableUtils;
@@ -25,10 +26,14 @@ import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.StartEvent;
 import org.flowable.bpmn.model.UserTask;
 import org.flowable.common.engine.impl.db.SuspensionState;
+import org.flowable.engine.HistoryService;
 import org.flowable.engine.RepositoryService;
+import org.flowable.engine.RuntimeService;
+import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.repository.Model;
 import org.flowable.engine.repository.ModelQuery;
 import org.flowable.engine.repository.ProcessDefinition;
+import org.flowable.engine.runtime.ProcessInstance;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
@@ -62,6 +67,11 @@ public class BpmModelServiceImpl implements BpmModelService {
 
     @Resource
     private BpmTaskCandidateInvoker taskCandidateInvoker;
+
+    @Resource
+    private HistoryService historyService;
+    @Resource
+    private RuntimeService runtimeService;
 
     @Override
     public List<Model> getModelList(String name) {
@@ -244,6 +254,28 @@ public class BpmModelServiceImpl implements BpmModelService {
         repositoryService.deleteModel(id);
         // 禁用流程定义
         updateProcessDefinitionSuspended(model.getDeploymentId());
+    }
+
+    @Override
+    public void cleanModel(Long userId, String id) {
+        // 1. 校验流程模型存在
+        Model model = validateModelManager(id, userId);
+
+        // 2. 清理所有流程数据
+        // TODO @芋艿：这里没有找到批量操作的方法，会不会有性能问题~
+        // 2.1 先取消所有正在运行的流程
+        List<ProcessInstance> processInstances = runtimeService.createProcessInstanceQuery()
+                .processDefinitionKey(model.getKey()).list();
+        processInstances.forEach(processInstance -> {
+            runtimeService.deleteProcessInstance(processInstance.getId(),
+                    BpmReasonEnum.CANCEL_BY_SYSTEM.getReason());
+        });
+        // 2.2 再从历史中删除所有相关的流程数据
+        List<HistoricProcessInstance> historicProcessInstances = historyService.createHistoricProcessInstanceQuery()
+                .processDefinitionKey(model.getKey()).list();
+        historicProcessInstances.forEach(historicProcessInstance -> {
+            historyService.deleteHistoricProcessInstance(historicProcessInstance.getId());
+        });
     }
 
     @Override
