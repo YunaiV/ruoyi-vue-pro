@@ -1,19 +1,21 @@
 package com.somle.esb.handler;
 
 import cn.hutool.core.util.ObjUtil;
+import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
 import cn.iocoder.yudao.module.erp.api.product.dto.ErpCustomRuleDTO;
 import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.ErpSupplierProductPageReqVO;
 import cn.iocoder.yudao.module.erp.service.purchase.ErpSupplierProductService;
+import cn.iocoder.yudao.module.system.api.dict.DictDataApi;
 import com.somle.eccang.model.EccangProduct;
 import com.somle.eccang.service.EccangService;
 import com.somle.esb.converter.ErpToEccangConverter;
 import com.somle.esb.converter.ErpToKingdeeConverter;
 import com.somle.kingdee.model.KingdeeProduct;
 import com.somle.kingdee.service.KingdeeService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.integration.annotation.ServiceActivator;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Component;
@@ -22,6 +24,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * @Description: $
@@ -30,38 +33,32 @@ import java.util.Optional;
  */
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class ErpCustomRuleHandler {
 
-    @Autowired
-    KingdeeService kingdeeService;
-
-    @Autowired
-    EccangService eccangService;
-
-    @Autowired
-    ErpSupplierProductService erpSupplierProductService;
-    @Autowired
-    ErpToEccangConverter erpToEccangConverter;
-
-    @Autowired
-    ErpToKingdeeConverter erpToKingdeeConverter;
+    private final KingdeeService kingdeeService;
+    private final EccangService eccangService;
+    private final ErpSupplierProductService erpSupplierProductService;
+    private final ErpToEccangConverter erpToEccangConverter;
+    private final ErpToKingdeeConverter erpToKingdeeConverter;
+    private final DictDataApi dictDataApi;
 
     /**
+     * @return void
      * @Author Wqh
      * @Description 上传eccang产品信息
      * @Date 11:18 2024/11/5
      * @Param [message]
-     * @return void
      **/
     @ServiceActivator(inputChannel = "erpCustomRuleChannel")
     public void syncCustomRulesToEccang(@Payload List<ErpCustomRuleDTO> customRules) {
-        log.info("syncCustomRuleToEccang");
-        List<EccangProduct> eccangProducts = erpToEccangConverter.customRuleDTOToProduct(customRules);
-        for (EccangProduct eccangProduct : eccangProducts){
+        log.info("syncCustomRuleToEccang start, sku={{}}", customRules.stream().map(ErpCustomRuleDTO::getBarCode).toList());
+        List<EccangProduct> eccangProducts = erpToEccangConverter.customRuleDTOToProduct(processCustomRules(customRules));
+        for (EccangProduct eccangProduct : eccangProducts) {
             eccangProduct.setActionType("ADD");
             EccangProduct eccangServiceProduct = eccangService.getProduct(eccangProduct.getProductSku());
             //根据sku从eccang中获取产品，如果产品不为空，则表示已存在，操作则变为修改
-            if (ObjUtil.isNotEmpty(eccangServiceProduct)){
+            if (ObjUtil.isNotEmpty(eccangServiceProduct)) {
                 eccangProduct.setActionType("EDIT");
                 //如果是修改就要上传默认采购单价
                 //TODO 后续有变更，请修改
@@ -98,24 +95,47 @@ public class ErpCustomRuleHandler {
                 });
         }
         eccangService.addBatchProduct(eccangProducts);
-        log.info("syncCustomRuleToEccang end countSize{{}}",eccangProducts.size());
+        log.info("syncCustomRuleToEccang end ,sku={{}}", eccangProducts.stream().map(EccangProduct::getProductSku).toList());
     }
 
     /**
+     * @return void
      * @Author Wqh
      * @Description 上传金蝶产品信息
      * @Date 11:18 2024/11/5
      * @Param [message]
-     * @return void
      **/
     @ServiceActivator(inputChannel = "erpCustomRuleChannel")
     public void syncCustomRulesToKingdee(@Payload List<ErpCustomRuleDTO> customRules) {
         log.info("syncCustomRuleToKingdee");
-        List<KingdeeProduct> kingdee = erpToKingdeeConverter.customRuleDTOToProduct(customRules);
-        for (KingdeeProduct kingdeeProduct : kingdee){
+        List<KingdeeProduct> kingdee = erpToKingdeeConverter.customRuleDTOToProduct(processCustomRules(customRules));
+        for (KingdeeProduct kingdeeProduct : kingdee) {
             kingdeeService.addProduct(kingdeeProduct);
         }
-        log.info("syncCustomRuleToKingdee end");
+        log.info("syncCustomRuleToKingdee end,skus={{}}}", kingdee.stream().map(KingdeeProduct::getNumber).toList());
     }
 
+
+    /**
+     * 处理自定义规则列表，复制 countryCode 为 CN 字典映射值的对象
+     *
+     * @param customRules 原始海关规则列表
+     * @return 处理后的海关规则列表 List<ErpCustomRuleDTO>
+     */
+    private List<ErpCustomRuleDTO> processCustomRules(List<ErpCustomRuleDTO> customRules) {
+        CopyOnWriteArrayList<ErpCustomRuleDTO> processedRules = new CopyOnWriteArrayList<>(customRules);
+        customRules.stream()
+            .filter(customRule -> customRule.getCountryCode() != null)
+            .forEach(customRule -> Optional.ofNullable(dictDataApi.parseDictData("country_code", "CN"))
+                .flatMap(dictDataRespDTO -> Optional.ofNullable(dictDataRespDTO.getValue()))
+                .ifPresent(value -> {
+                    Integer countryCode = Integer.valueOf(value);
+                    if (customRule.getCountryCode().equals(countryCode)) {
+                        //当前存在国家是CN的数据
+                        ErpCustomRuleDTO bean = BeanUtils.toBean(customRule, ErpCustomRuleDTO.class);
+                        processedRules.add(BeanUtils.toBean(bean.setCountryCode(null), ErpCustomRuleDTO.class));
+                    }
+                }));
+        return processedRules;
+    }
 }

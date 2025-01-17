@@ -102,11 +102,6 @@ public class ErpCustomRuleDTO {
     private String declaredType;
 
     /**
-     * 产品采购单价
-     */
-    private Float productPurchaseValue;
-
-    /**
      * 申报品名EN
      */
     private String declaredTypeEn;
@@ -135,4 +130,8 @@ public class ErpCustomRuleDTO {
      * 条形码
      */
     private String fbaBarCode;
+    /**
+     * 采购货币币种
+     */
+    private Integer declaredValueCurrencyCode;
 }
