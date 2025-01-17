@@ -191,6 +191,8 @@ public interface ErrorCodeConstants {
     ErrorCode PURCHASE_REQUEST_NOT_EXISTS = new ErrorCode(1_030_603_000, "采购申请单不存在");
     ErrorCode PURCHASE_REQUEST_UPDATE_FAIL_APPROVE = new ErrorCode(1_030_603_001, "采购申请单({})已审核，无法修改");
     ErrorCode PURCHASE_REQUEST_DELETE_FAIL_APPROVE = new ErrorCode(1_030_603_002, "采购申请单({})已审核，无法删除");
+    ErrorCode PURCHASE_REQUEST_ADD_FAIL_APPROVE = new ErrorCode(1_030_603_002, "采购申请单添加失败");
+    ErrorCode PURCHASE_REQUEST_ADD_FAIL_PRODUCT = new ErrorCode(1_030_603_002, "采购申请单的产品添加失败");
     ErrorCode PURCHASE_REQUEST_NO_OUT_OF_BOUNDS = new ErrorCode(1_030_101_003, "采购申请单号编码大于999999,生成失败");
     ErrorCode PURCHASE_REQUEST_NO_EXISTS = new ErrorCode(1_030_101_004, "生成采购申请单号失败，请重新提交");
     ErrorCode PURCHASE_REQUEST_PROCESS_FAIL = new ErrorCode(1_030_101_005, "反审核失败，只有已审核的采购申请单才能反审核");

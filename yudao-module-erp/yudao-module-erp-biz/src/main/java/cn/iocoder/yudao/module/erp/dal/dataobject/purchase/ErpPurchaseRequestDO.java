@@ -1,11 +1,12 @@
 package cn.iocoder.yudao.module.erp.dal.dataobject.purchase;
 
+import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import com.baomidou.mybatisplus.annotation.KeySequence;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
 
 import java.time.LocalDateTime;
-
-import com.baomidou.mybatisplus.annotation.*;
-import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 
 /**
  * ERP采购申请单 DO
@@ -21,7 +22,6 @@ import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ErpPurchaseRequestDO extends BaseDO {
-
     /**
      * id
      */
@@ -63,5 +63,4 @@ public class ErpPurchaseRequestDO extends BaseDO {
      * 审核时间
      */
     private LocalDateTime auditTime;
-
 }

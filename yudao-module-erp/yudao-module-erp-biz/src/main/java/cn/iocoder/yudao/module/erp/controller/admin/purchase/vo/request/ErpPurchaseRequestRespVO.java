@@ -111,7 +111,7 @@ public class ErpPurchaseRequestRespVO {
         private String inQty;
 
         @Schema(description = "参考单价")
-        private BigDecimal ReferenceUnitPrice;
+        private BigDecimal referenceUnitPrice;
 
         @Schema(description = "含税单价", example = "100.00")
         @DecimalMin(value = "0.00", message = "含税产品单价不能小于0")
