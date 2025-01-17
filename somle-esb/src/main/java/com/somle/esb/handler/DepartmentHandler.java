@@ -1,7 +1,6 @@
 package com.somle.esb.handler;
 
 import cn.iocoder.yudao.module.system.api.dept.dto.DeptRespDTO;
-import cn.iocoder.yudao.module.system.api.dept.dto.DeptSaveReqDTO;
 import com.somle.eccang.model.EccangCategory;
 import com.somle.eccang.model.EccangResponse;
 import com.somle.eccang.service.EccangService;
@@ -10,8 +9,9 @@ import com.somle.esb.converter.ErpToKingdeeConverter;
 import com.somle.esb.enums.TenantId;
 import com.somle.kingdee.model.KingdeeAuxInfoDetail;
 import com.somle.kingdee.service.KingdeeService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Profile;
 import org.springframework.integration.annotation.ServiceActivator;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Component;
@@ -26,19 +26,14 @@ import java.util.Objects;
 */
 @Slf4j
 @Component
+@Profile("!dev & !test") // 仅在非 dev 和非 test 环境加载
+@RequiredArgsConstructor
 public class DepartmentHandler {
 
-    @Autowired
-    ErpToEccangConverter erpToEccangConverter;
-
-    @Autowired
-    EccangService eccangService;
-
-    @Autowired
-    ErpToKingdeeConverter erpToKingdeeConverter;
-
-    @Autowired
-    KingdeeService kingdeeService;
+    private final ErpToEccangConverter erpToEccangConverter;
+    private final EccangService eccangService;
+    private final ErpToKingdeeConverter erpToKingdeeConverter;
+    private final KingdeeService kingdeeService;
 
     @ServiceActivator(inputChannel = "departmentOutputChannel")
     public void handle(@Payload DeptRespDTO department) {

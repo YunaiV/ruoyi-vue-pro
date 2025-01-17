@@ -1,11 +1,11 @@
 package cn.iocoder.yudao.module.erp.controller.admin.product.vo.product;
 
+import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.module.erp.controller.admin.product.vo.product.json.GuidePriceJson;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.List;
 
 import com.alibaba.excel.annotation.*;
@@ -13,7 +13,7 @@ import com.alibaba.excel.annotation.*;
 @Schema(description = "管理后台 - ERP 产品 Response VO")
 @Data
 @ExcelIgnoreUnannotated
-public class ErpProductRespVO {
+public class ErpProductRespVO extends BaseDO {
 
     @Schema(description = "产品编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "731")
     @ExcelProperty("产品编号")
@@ -30,10 +30,6 @@ public class ErpProductRespVO {
     @Schema(description = "产品分类名称", requiredMode = Schema.RequiredMode.REQUIRED)
     @ExcelProperty("产品分类名称")
     private String categoryName;
-
-    @Schema(description = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED)
-    @ExcelProperty("创建时间")
-    private LocalDateTime createTime;
 
     @Schema(description = "部门id", requiredMode = Schema.RequiredMode.REQUIRED, example = "8369")
     @ExcelProperty("部门id")
@@ -254,20 +250,20 @@ public class ErpProductRespVO {
     @ExcelProperty("功能配件")
     private String functionalAccessories;
 
-    @Schema(description = "包装高度")
-    @ExcelProperty("包装高度")
-    private Double packageHeight;
-
-    @Schema(description = "包装长度")
+    @Schema(description = "包装长度（整数，没有小数点，单位mm）", example = "500")
     @ExcelProperty("包装长度")
-    private Double packageLength;
+    private Integer packageLength;
 
-    @Schema(description = "包装重量")
-    @ExcelProperty("包装重量")
-    private Double packageWeight;
-
-    @Schema(description = "包装宽度")
+    @Schema(description = "包装宽度（整数，没有小数点，单位mm）", example = "300")
     @ExcelProperty("包装宽度")
-    private Double packageWidth;
+    private Integer packageWidth;
+
+    @Schema(description = "包装高度（整数，没有小数点，单位mm）", example = "200")
+    @ExcelProperty("包装高度")
+    private Integer packageHeight;
+
+    @Schema(description = "包装重量（保留至小数点后两位，单位kg）", example = "12.50")
+    @ExcelProperty("包装重量")
+    private BigDecimal packageWeight;
 
 }

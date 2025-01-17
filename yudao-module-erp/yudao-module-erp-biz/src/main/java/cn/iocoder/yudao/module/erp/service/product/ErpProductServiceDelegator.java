@@ -13,7 +13,6 @@ import cn.iocoder.yudao.module.erp.service.product.floortvstand.ErpProductFloorT
 import cn.iocoder.yudao.module.erp.service.product.ironfilingcabinet.ErpProductIronFilingCabinetServiceImpl;
 import cn.iocoder.yudao.module.erp.service.product.keyboardtray.ErpProductKeyboardTrayServiceImpl;
 import cn.iocoder.yudao.module.erp.service.product.mediastand.ErpProductMediaStandServiceImpl;
-import cn.iocoder.yudao.module.erp.service.product.monitorriser.ErpProductMonitorRiserService;
 import cn.iocoder.yudao.module.erp.service.product.monitorriser.ErpProductMonitorRiserServiceImpl;
 import cn.iocoder.yudao.module.erp.service.product.officedesk.ErpProductOfficeDeskServiceImpl;
 import cn.iocoder.yudao.module.erp.service.product.speakerstand.ErpProductSpeakerStandServiceImpl;

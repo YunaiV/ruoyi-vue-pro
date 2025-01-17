@@ -10,31 +10,28 @@ import com.dingtalk.api.response.OapiV2UserGetResponse;
 import com.somle.esb.converter.DingTalkToErpConverter;
 import com.somle.esb.enums.TenantId;
 import com.somle.esb.service.EsbMappingService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Profile;
 import org.springframework.integration.annotation.ServiceActivator;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Component;
 
 /**
-* @Description: $
-* @Author: c-tao
-* @Date: 2025/1/13$
-*/
+ * @Description: $
+ * @Author: c-tao
+ * @Date: 2025/1/13$
+ */
 @Slf4j
 @Component
+@Profile("!dev & !test") // 仅在非 dev 和非 test 环境加载
+@RequiredArgsConstructor
 public class DingtalkUserHandler {
 
-    @Autowired
-    DingTalkToErpConverter dingTalkToErpConverter;
-
-    @Autowired
-    private AdminUserApi adminUserApi;
-
-    @Autowired
-    private EsbMappingService mappingService;
-
     public static final Long ADMIN_USER_ID = 50001L;
+    private final DingTalkToErpConverter dingTalkToErpConverter;
+    private final AdminUserApi adminUserApi;
+    private final EsbMappingService mappingService;
 
     @ServiceActivator(inputChannel = "dingtalkUserOutputChannel")
     public void syncUser(@Payload OapiV2UserGetResponse.UserGetResponse dingTalkUser) {

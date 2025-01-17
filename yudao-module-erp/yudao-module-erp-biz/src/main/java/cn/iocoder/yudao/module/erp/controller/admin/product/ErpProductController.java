@@ -9,6 +9,7 @@ import cn.iocoder.yudao.module.erp.controller.admin.product.vo.product.ErpProduc
 import cn.iocoder.yudao.module.erp.controller.admin.product.vo.product.ErpProductRespVO;
 import cn.iocoder.yudao.module.erp.controller.admin.product.vo.product.ErpProductSaveReqVO;
 import cn.iocoder.yudao.module.erp.service.product.ErpProductServiceDelegator;
+import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -18,8 +19,10 @@ import jakarta.validation.Valid;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
 import java.io.IOException;
 import java.util.List;
+
 import static cn.iocoder.yudao.framework.apilog.core.enums.OperateTypeEnum.EXPORT;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
@@ -35,6 +38,8 @@ public class ErpProductController {
 
     @Resource
     private ErpProductServiceDelegator productService;
+    @Resource
+    private AdminUserApi adminUserApi;
 
     @PostMapping("/create")
     @Operation(summary = "创建产品")
@@ -65,14 +70,19 @@ public class ErpProductController {
     @Parameter(name = "id", description = "编号", required = true, example = "1024")
     @PreAuthorize("@ss.hasPermission('erp:product:query')")
     public CommonResult<ErpProductRespVO> getProduct(@RequestParam("id") Long id) {
-        return success(productService.getProduct(id));
+        ErpProductRespVO productRespVO = productService.getProduct(id);
+        if (productRespVO == null) {
+            return success(null);
+        }
+        return success(productRespVO);
     }
 
     @GetMapping("/page")
     @Operation(summary = "获得产品分页")
     @PreAuthorize("@ss.hasPermission('erp:product:query')")
     public CommonResult<PageResult<ErpProductRespVO>> getProductPage(@Valid ErpProductPageReqVO pageReqVO) {
-        return success(productService.getProductVOPage(pageReqVO));
+        PageResult<ErpProductRespVO> productVOPage = productService.getProductVOPage(pageReqVO);
+        return success(productVOPage);
     }
 
     @GetMapping("/simple-list")
@@ -80,9 +90,9 @@ public class ErpProductController {
     public CommonResult<List<ErpProductRespVO>> getProductSimpleList() {
         List<ErpProductRespVO> list = productService.getProductVOListByStatus(true);
         return success(convertList(list, product -> new ErpProductRespVO().setId(product.getId())
-                .setName(product.getName()).setBarCode(product.getBarCode())
-                .setCategoryId(product.getCategoryId()).setCategoryName(product.getCategoryName())
-                .setUnitId(product.getUnitId()).setUnitName(product.getUnitName())));
+            .setName(product.getName()).setBarCode(product.getBarCode())
+            .setCategoryId(product.getCategoryId()).setCategoryName(product.getCategoryName())
+            .setUnitId(product.getUnitId()).setUnitName(product.getUnitName())));
     }
 
     @GetMapping("/export-excel")
@@ -95,7 +105,7 @@ public class ErpProductController {
         PageResult<ErpProductRespVO> pageResult = productService.getProductVOPage(pageReqVO);
         // 导出 Excel
         ExcelUtils.write(response, "产品.xls", "数据", ErpProductRespVO.class,
-                pageResult.getList());
+            pageResult.getList());
     }
 
 }
