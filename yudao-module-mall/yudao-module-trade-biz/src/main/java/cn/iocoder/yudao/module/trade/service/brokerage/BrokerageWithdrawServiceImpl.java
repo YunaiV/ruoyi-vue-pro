@@ -240,12 +240,12 @@ public class BrokerageWithdrawServiceImpl implements BrokerageWithdrawService {
 
     @Override
     public List<BrokerageWithdrawSummaryRespBO> getWithdrawSummaryListByUserId(Collection<Long> userIds,
-                                                                               Collection<BrokerageWithdrawStatusEnum> status) {
-        if (CollUtil.isEmpty(userIds) || CollUtil.isEmpty(status)) {
+                                                                               Collection<BrokerageWithdrawStatusEnum> statuses) {
+        if (CollUtil.isEmpty(userIds) || CollUtil.isEmpty(statuses)) {
             return Collections.emptyList();
         }
         return brokerageWithdrawMapper.selectCountAndSumPriceByUserIdAndStatus(userIds,
-                convertSet(status, BrokerageWithdrawStatusEnum::getStatus));
+                convertSet(statuses, BrokerageWithdrawStatusEnum::getStatus));
     }
 
 }
