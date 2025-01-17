@@ -1,12 +1,7 @@
 package com.somle.esb.converter;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
-
-import cn.hutool.core.util.ObjUtil;
-import cn.hutool.core.util.StrUtil;
+import cn.hutool.core.text.CharSequenceUtil;
+import cn.hutool.core.util.ObjectUtil;
 import cn.iocoder.yudao.framework.common.enums.enums.DictTypeConstants;
 import cn.iocoder.yudao.module.erp.api.product.dto.ErpCustomRuleDTO;
 import cn.iocoder.yudao.module.erp.api.product.dto.ErpProductDTO;
@@ -15,16 +10,19 @@ import cn.iocoder.yudao.module.system.api.dept.DeptApi;
 import cn.iocoder.yudao.module.system.api.dept.dto.DeptRespDTO;
 import cn.iocoder.yudao.module.system.api.dict.DictDataApi;
 import cn.iocoder.yudao.module.system.api.dict.dto.DictDataRespDTO;
+import com.somle.kingdee.model.KingdeeAuxInfoDetail;
 import com.somle.kingdee.model.KingdeeProduct;
 import com.somle.kingdee.model.supplier.KingdeeSupplier;
 import com.somle.kingdee.model.supplier.SupplierBomentity;
 import com.somle.kingdee.service.KingdeeService;
-import com.somle.kingdee.model.KingdeeAuxInfoDetail;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-
-import lombok.extern.slf4j.Slf4j;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.somle.esb.util.ConstantConvertUtils.getCountrySuffix;
 
@@ -68,6 +66,7 @@ public class ErpToKingdeeConverter {
 
     /**
      * 将单个ERP产品转换为Kingdee产品。
+     *
      * @param customRuleDTO ERP产品对象
      * @return 转换后的Kingdee产品对象
      */
@@ -75,16 +74,28 @@ public class ErpToKingdeeConverter {
         KingdeeProduct kingdeeProduct = new KingdeeProduct();
         //普通
         kingdeeProduct.setCheckType("1");
-        // 如果有产品编码和国家代码都不为空的时候才去设置SKU
+        // 获取国家编码
         Integer countryCode = customRuleDTO.getCountryCode();
-        if (ObjUtil.isNotEmpty(countryCode)) {
-            // 将字典value转换为label
+        // 获取产品名称
+        String productName = customRuleDTO.getProductName();
+        // 获取产品条码
+        String barCode = customRuleDTO.getBarCode();
+
+        // 如果国家编码不为空，且产品条码不为空，设置SKU
+        if (ObjectUtil.isNotEmpty(countryCode)) {
             DictDataRespDTO dictData = dictDataApi.getDictData(DictTypeConstants.COUNTRY_CODE, String.valueOf(countryCode));
-            if (StrUtil.isNotBlank(customRuleDTO.getBarCode())) {
-                kingdeeProduct.setNumber(customRuleDTO.getBarCode() + "-" + getCountrySuffix(dictData.getLabel()));
-                kingdeeProduct.setName(customRuleDTO.getProductName() + "-" + getCountrySuffix(dictData.getLabel()));
+            if (CharSequenceUtil.isNotBlank(barCode)) {
+                String countrySuffix = getCountrySuffix(dictData.getLabel());
+                kingdeeProduct.setNumber(barCode + "-" + countrySuffix);
+                kingdeeProduct.setName(productName + "-" + countrySuffix);
             }
         }
+        // 如果国家编码为空，且产品名称不为空，设置SKU
+        else if (ObjectUtil.isNotEmpty(productName) && ObjectUtil.isNotEmpty(barCode)) {
+            kingdeeProduct.setNumber(barCode);
+            kingdeeProduct.setName(productName);
+        }
+
         kingdeeProduct.setBarcode(customRuleDTO.getBarCode());
         // 报关品名
         kingdeeProduct.setProducingPace(customRuleDTO.getDeclaredType());
@@ -114,6 +125,7 @@ public class ErpToKingdeeConverter {
 
     /**
      * 将单个ERP产品转换为Kingdee产品。
+     *
      * @param product ERP产品对象
      * @return 转换后的Kingdee产品对象
      */
