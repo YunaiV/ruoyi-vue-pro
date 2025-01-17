@@ -41,13 +41,14 @@ public interface BrokerageWithdrawMapper extends BaseMapperX<BrokerageWithdrawDO
                 .eq(BrokerageWithdrawDO::getStatus, status));
     }
 
-    default List<BrokerageWithdrawSummaryRespBO> selectCountAndSumPriceByUserIdAndStatus(Collection<Long> userIds, Integer status) {
+    default List<BrokerageWithdrawSummaryRespBO> selectCountAndSumPriceByUserIdAndStatus(Collection<Long> userIds,
+                                                                                         Collection<Integer> status) {
         List<Map<String, Object>> list = selectMaps(new MPJLambdaWrapper<BrokerageWithdrawDO>()
                 .select(BrokerageWithdrawDO::getUserId)
                 .selectCount(BrokerageWithdrawDO::getId, BrokerageWithdrawSummaryRespBO::getCount)
                 .selectSum(BrokerageWithdrawDO::getPrice)
                 .in(BrokerageWithdrawDO::getUserId, userIds)
-                .eq(BrokerageWithdrawDO::getStatus, status)
+                .in(BrokerageWithdrawDO::getStatus, status)
                 .groupBy(BrokerageWithdrawDO::getUserId));
         return BeanUtil.copyToList(list, BrokerageWithdrawSummaryRespBO.class);
         // selectJoinList有BUG，会与租户插件冲突：解析SQL时，发生异常 https://gitee.com/best_handsome/mybatis-plus-join/issues/I84GYW
