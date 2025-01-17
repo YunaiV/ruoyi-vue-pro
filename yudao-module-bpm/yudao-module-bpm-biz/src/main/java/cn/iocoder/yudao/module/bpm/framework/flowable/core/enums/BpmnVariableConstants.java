@@ -62,4 +62,6 @@ public class BpmnVariableConstants {
     // TODO @lesan：TASK_SIGN_PIC_URL 。。。虽然长一点，嘿嘿
     public static final String TASK_VARIABLE_SIGN = "TASK_SIGN";
 
+    public static final String PROCESS_INSTANCE_SKIP_EXPRESSION_ENABLED = "_FLOWABLE_SKIP_EXPRESSION_ENABLED";
+
 }
