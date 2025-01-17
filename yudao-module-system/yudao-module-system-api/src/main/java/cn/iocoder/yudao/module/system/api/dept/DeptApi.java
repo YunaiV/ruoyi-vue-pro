@@ -2,7 +2,7 @@ package cn.iocoder.yudao.module.system.api.dept;
 
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.module.system.api.dept.dto.DeptLevelRespDTO;
-import cn.iocoder.yudao.module.system.api.dept.dto.DeptDTO;
+import cn.iocoder.yudao.module.system.api.dept.dto.DeptSaveReqDTO;
 import cn.iocoder.yudao.module.system.api.dept.dto.DeptRespDTO;
 
 import java.util.Collection;
@@ -94,7 +94,7 @@ public interface DeptApi {
     * @Date 14:36 2024/11/4
     * @Param [erpDepartment]
      **/
-    void updateDept(DeptDTO erpDepartment);
+    void updateDept(DeptSaveReqDTO erpDepartment);
 
     /**
      * @Author Wqh
@@ -102,5 +102,5 @@ public interface DeptApi {
      * @Date 14:36 2024/11/4
      * @Param [erpDepartment]
      **/
-    Long createDept(DeptDTO erpDepartment);
+    Long createDept(DeptSaveReqDTO erpDepartment);
 }

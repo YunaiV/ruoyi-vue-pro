@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.system.service.dept;
 
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.module.system.api.dept.dto.DeptLevelRespDTO;
+import cn.iocoder.yudao.module.system.api.dept.dto.DeptSaveReqDTO;
 import cn.iocoder.yudao.module.system.controller.admin.dept.vo.dept.DeptListReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.dept.vo.dept.DeptSaveReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.dept.vo.dept.DeptTreeRespVO;
@@ -23,14 +24,14 @@ public interface DeptService {
      * @param createReqVO 部门信息
      * @return 部门编号
      */
-    Long createDept(DeptSaveReqVO createReqVO);
+    Long createDept(DeptSaveReqDTO createReqVO);
 
     /**
      * 更新部门
      *
      * @param updateReqVO 部门信息
      */
-    void updateDept(DeptSaveReqVO updateReqVO);
+    void updateDept(DeptSaveReqDTO updateReqVO);
 
     /**
      * 删除部门

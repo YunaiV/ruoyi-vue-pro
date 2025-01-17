@@ -1,10 +1,9 @@
 package cn.iocoder.yudao.module.system.api.dept;
 
-import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.system.api.dept.dto.DeptLevelRespDTO;
-import cn.iocoder.yudao.module.system.api.dept.dto.DeptDTO;
+import cn.iocoder.yudao.module.system.api.dept.dto.DeptSaveReqDTO;
 import cn.iocoder.yudao.module.system.api.dept.dto.DeptRespDTO;
-import cn.iocoder.yudao.module.system.controller.admin.dept.vo.dept.DeptSaveReqVO;
+import cn.iocoder.yudao.module.system.convert.dept.DeptConvert;
 import cn.iocoder.yudao.module.system.dal.dataobject.dept.DeptDO;
 import cn.iocoder.yudao.module.system.service.dept.DeptService;
 import org.springframework.stereotype.Service;
@@ -25,16 +24,18 @@ public class DeptApiImpl implements DeptApi {
     @Resource
     private DeptService deptService;
 
+    private DeptConvert deptConvert = DeptConvert.INSTANCE;
+
     @Override
     public DeptRespDTO getDept(Long id) {
         DeptDO dept = deptService.getDept(id);
-        return BeanUtils.toBean(dept, DeptRespDTO.class);
+        return deptConvert.toRespDTO(dept);
     }
 
     @Override
     public List<DeptRespDTO> getDeptList(Collection<Long> ids) {
         List<DeptDO> depts = deptService.getDeptList(ids);
-        return BeanUtils.toBean(depts, DeptRespDTO.class);
+        return deptConvert.toRespDTOs(depts);
     }
 
     @Override
@@ -45,7 +46,7 @@ public class DeptApiImpl implements DeptApi {
     @Override
     public List<DeptRespDTO> getChildDeptList(Long id) {
         List<DeptDO> childDeptList = deptService.getChildDeptList(id);
-        return BeanUtils.toBean(childDeptList, DeptRespDTO.class);
+        return deptConvert.toRespDTOs(childDeptList);
     }
 
     @Override
@@ -64,15 +65,13 @@ public class DeptApiImpl implements DeptApi {
     }
 
     @Override
-    public void updateDept(DeptDTO erpDepartment) {
-        DeptSaveReqVO deptSaveReqVO = BeanUtils.toBean(erpDepartment, DeptSaveReqVO.class);
-        deptService.updateDept(deptSaveReqVO);
+    public void updateDept(DeptSaveReqDTO dept) {
+        deptService.updateDept(dept);
     }
 
     @Override
-    public Long createDept(DeptDTO erpDepartment) {
-        DeptSaveReqVO deptSaveReqVO = BeanUtils.toBean(erpDepartment, DeptSaveReqVO.class);
-        return deptService.createDept(deptSaveReqVO);
+    public Long createDept(DeptSaveReqDTO dept) {
+        return deptService.createDept(dept);
     }
 
 

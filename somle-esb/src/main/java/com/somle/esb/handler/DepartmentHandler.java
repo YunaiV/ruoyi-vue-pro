@@ -1,23 +1,18 @@
 package com.somle.esb.handler;
 
-import cn.iocoder.yudao.module.system.api.dept.DeptApi;
-import cn.iocoder.yudao.module.system.api.dept.dto.DeptDTO;
-import com.somle.dingtalk.model.DingTalkDepartment;
-import com.somle.dingtalk.service.DingTalkService;
+import cn.iocoder.yudao.module.system.api.dept.dto.DeptRespDTO;
+import cn.iocoder.yudao.module.system.api.dept.dto.DeptSaveReqDTO;
 import com.somle.eccang.model.EccangCategory;
 import com.somle.eccang.model.EccangResponse;
 import com.somle.eccang.service.EccangService;
-import com.somle.esb.converter.DingTalkToErpConverter;
 import com.somle.esb.converter.ErpToEccangConverter;
 import com.somle.esb.converter.ErpToKingdeeConverter;
 import com.somle.esb.enums.TenantId;
-import com.somle.esb.service.EsbMappingService;
 import com.somle.kingdee.model.KingdeeAuxInfoDetail;
 import com.somle.kingdee.service.KingdeeService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.integration.annotation.ServiceActivator;
-import org.springframework.messaging.Message;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Component;
 
@@ -46,7 +41,7 @@ public class DepartmentHandler {
     KingdeeService kingdeeService;
 
     @ServiceActivator(inputChannel = "departmentOutputChannel")
-    public void handle(@Payload DeptDTO department) {
+    public void handle(@Payload DeptRespDTO department) {
         Long deptId = department.getId();
         //同步到易仓
         if (!Objects.equals(deptId, TenantId.DEFAULT.getId())){

@@ -10,7 +10,7 @@ import lombok.Data;
  * @description:
  */
 @Data
-public class DeptDTO {
+public class DeptSaveReqDTO {
     /*
     * 部门编号
     **/

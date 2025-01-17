@@ -5,6 +5,7 @@ import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
 import cn.iocoder.yudao.module.system.controller.admin.dept.vo.dept.DeptListReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.dept.vo.dept.DeptSaveReqVO;
+import cn.iocoder.yudao.module.system.convert.dept.DeptConvert;
 import cn.iocoder.yudao.module.system.dal.dataobject.dept.DeptDO;
 import cn.iocoder.yudao.module.system.dal.mysql.dept.DeptMapper;
 import org.junit.jupiter.api.Test;
@@ -34,6 +35,8 @@ public class DeptServiceImplTest extends BaseDbUnitTest {
     private DeptServiceImpl deptService;
     @Resource
     private DeptMapper deptMapper;
+    @Resource
+    private DeptConvert deptConvert;
 
     @Test
     public void testCreateDept() {
@@ -45,7 +48,7 @@ public class DeptServiceImplTest extends BaseDbUnitTest {
         });
 
         // 调用
-        Long deptId = deptService.createDept(reqVO);
+        Long deptId = deptService.createDept(deptConvert.toSaveReqDTO(reqVO));
         // 断言
         assertNotNull(deptId);
         // 校验记录的属性是否正确
@@ -67,7 +70,7 @@ public class DeptServiceImplTest extends BaseDbUnitTest {
         });
 
         // 调用
-        deptService.updateDept(reqVO);
+        deptService.updateDept(deptConvert.toSaveReqDTO(reqVO));
         // 校验是否更新正确
         DeptDO deptDO = deptMapper.selectById(reqVO.getId()); // 获取最新的
         assertPojoEquals(reqVO, deptDO);
