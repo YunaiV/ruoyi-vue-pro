@@ -63,4 +63,6 @@ public class BpmnVariableConstants {
      */
     public static final String TASK_SIGN_PIC_URL = "TASK_SIGN_PIC_URL";
 
+    public static final String PROCESS_INSTANCE_SKIP_EXPRESSION_ENABLED = "_FLOWABLE_SKIP_EXPRESSION_ENABLED";
+
 }
