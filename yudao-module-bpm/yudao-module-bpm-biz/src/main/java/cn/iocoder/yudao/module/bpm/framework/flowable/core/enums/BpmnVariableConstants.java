@@ -58,7 +58,9 @@ public class BpmnVariableConstants {
      * @see org.flowable.task.api.Task#getTaskLocalVariables()
      */
     public static final String TASK_VARIABLE_REASON = "TASK_REASON";
-
+    /**
+     * 任务变量 - 签名图片 URL
+     */
     public static final String TASK_SIGN_PIC_URL = "TASK_SIGN_PIC_URL";
 
 }

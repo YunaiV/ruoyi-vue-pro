@@ -859,10 +859,11 @@ public class BpmTaskServiceImpl implements BpmTaskService {
                 .moveActivityIdsToSingleActivityId(activityIds, endEvent.getId())
                 .changeState();
 
-        // 3. 如果跳转到 EndEvent 流程还未结束， 执行 deleteProcessInstance 方法。
-        List<Execution> executionList = runtimeService.createExecutionQuery().processInstanceId(processInstanceId).list();
-        if (CollUtil.isNotEmpty(executionList)) {
-            log.warn("执行跳转到 EndEvent 后, 流程实例未结束。执行 [deleteProcessInstance] 方法");
+        // 3. 特殊：如果跳转到 EndEvent 流程还未结束， 执行 deleteProcessInstance 方法
+        // TODO 芋艿：目前发现并行分支情况下，会存在这个情况，后续看看有没更好的方案；
+        List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstanceId).list();
+        if (CollUtil.isNotEmpty(executions)) {
+            log.warn("[moveTaskToEnd][执行跳转到 EndEvent 后, 流程实例未结束，强制执行 deleteProcessInstance 方法]");
             runtimeService.deleteProcessInstance(processInstanceId, reason);
         }
     }
