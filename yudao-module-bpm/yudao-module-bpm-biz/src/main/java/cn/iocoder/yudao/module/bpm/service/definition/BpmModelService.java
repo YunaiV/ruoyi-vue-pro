@@ -89,7 +89,7 @@ public interface BpmModelService {
     void deleteModel(Long userId, String id);
 
     /**
-     * 清理模型
+     * 清理模型，包括流程实例
      *
      * @param userId  用户编号
      * @param id 编号

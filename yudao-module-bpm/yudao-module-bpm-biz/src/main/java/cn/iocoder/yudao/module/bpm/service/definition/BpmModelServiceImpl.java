@@ -262,7 +262,8 @@ public class BpmModelServiceImpl implements BpmModelService {
         Model model = validateModelManager(id, userId);
 
         // 2. 清理所有流程数据
-        // TODO @芋艿：这里没有找到批量操作的方法，会不会有性能问题~
+        // TODO @芋艿：这里没有找到批量操作的方法，会不会有性能问题~；
+        // TODO @lesan：建议按照顺序？1）List<ProcessInstance> processInstances 循环处理；然后删除删除一个示实例，接着删除它的 history；
         // 2.1 先取消所有正在运行的流程
         List<ProcessInstance> processInstances = runtimeService.createProcessInstanceQuery()
                 .processDefinitionKey(model.getKey()).list();
@@ -276,6 +277,8 @@ public class BpmModelServiceImpl implements BpmModelService {
         historicProcessInstances.forEach(historicProcessInstance -> {
             historyService.deleteHistoricProcessInstance(historicProcessInstance.getId());
         });
+        // TODO @lesan：流程任务，是不是也要清理哈？
+        // TODO @lesan：抄送是不是也要清理；
     }
 
     @Override

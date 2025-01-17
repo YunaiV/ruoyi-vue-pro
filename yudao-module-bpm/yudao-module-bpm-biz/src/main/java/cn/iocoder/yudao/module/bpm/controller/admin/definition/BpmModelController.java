@@ -164,7 +164,7 @@ public class BpmModelController {
     @DeleteMapping("/clean")
     @Operation(summary = "清理模型")
     @Parameter(name = "id", description = "编号", required = true, example = "1024")
-    @PreAuthorize("@ss.hasPermission('bpm:model:delete')")
+    @PreAuthorize("@ss.hasPermission('bpm:model:clean')")
     public CommonResult<Boolean> cleanModel(@RequestParam("id") String id) {
         modelService.cleanModel(getLoginUserId(), id);
         return success(true);
