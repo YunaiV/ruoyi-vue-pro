@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.request;
 
+import cn.iocoder.yudao.module.erp.controller.admin.tools.validation;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import lombok.*;
@@ -15,6 +16,8 @@ import java.util.List;
 @Data
 public class ErpPurchaseRequestSaveReqVO {
     @Schema(description = "id")
+    @Null(groups = validation.OnCreate.class, message = "创建时，id必须为空")
+    @NotNull(groups = validation.OnUpdate.class, message = "更新时，id不能为空")
     private Long id;
 
     @Schema(description = "申请人", requiredMode = Schema.RequiredMode.REQUIRED)
@@ -28,11 +31,6 @@ public class ErpPurchaseRequestSaveReqVO {
     @Schema(description = "单据日期", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "单据日期不能为空")
     private LocalDateTime requestTime;
-
-    @Schema(description = "商品信息")
-    @NotNull(message = "商品信息不能为空")
-    @NotEmpty(message = "商品信息不能为空")
-    private List<@Valid ErpPurchaseRequestItemsSaveReqVO> items;
 
     @Schema(description = "币别id")
     private Long currencyId;
@@ -50,4 +48,8 @@ public class ErpPurchaseRequestSaveReqVO {
     @Schema(description = "收货地址")
     private String deliveryDelivery;
 
+    @Schema(description = "商品信息")
+    @NotNull(message = "商品信息不能为空")
+    @NotEmpty(message = "商品信息不能为空")
+    private List<@Valid ErpPurchaseRequestItemsSaveReqVO> items;
 }

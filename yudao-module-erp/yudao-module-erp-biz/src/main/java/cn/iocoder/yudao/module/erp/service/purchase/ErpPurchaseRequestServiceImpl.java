@@ -86,8 +86,10 @@ public class ErpPurchaseRequestServiceImpl implements ErpPurchaseRequestService 
     public void updatePurchaseRequest(ErpPurchaseRequestSaveReqVO updateReqVO) {
         // 校验存在
         ErpPurchaseRequestDO erpPurchaseRequestDO = validatePurchaseRequestExists(updateReqVO.getId());
-        //判断申请单是否应被审核
+        //判断已审核
         ThrowUtil.ifThrow(erpPurchaseRequestDO.getStatus().equals(ErpAuditStatus.APPROVE.getStatus()), PURCHASE_REQUEST_UPDATE_FAIL_APPROVE, erpPurchaseRequestDO.getNo());
+        //判断已关闭
+//        ThrowUtil.ifThrow(erpPurchaseRequestDO.getOffStatus().equals(ErpAuditStatus.CLOSE.getStatus()), PURCHASE_REQUEST_UPDATE_FAIL_CLOSE, erpPurchaseRequestDO.getNo());
         //校验产品是否存在
         List<ErpPurchaseRequestItemsDO> itemsDOList = validatePurchaseRequestItems(updateReqVO.getItems());
         // 2.1 更新订单
