@@ -19,10 +19,10 @@ public class ErpPurchaseRequestItemsSaveReqVO {
     @NotNull(message = "商品id不能为空")
     private Long productId;
 
-    @Schema(description = "申请单id", requiredMode = Schema.RequiredMode.REQUIRED)
-    @Null(groups = validation.OnCreate.class, message = "创建时，申请单id必须为空")
-    @NotNull(groups = validation.OnUpdate.class, message = "更新时，申请单id不能为空")
-    private Long requestId;
+//    @Schema(description = "申请单id", requiredMode = Schema.RequiredMode.REQUIRED)
+//    @Null(groups = validation.OnCreate.class, message = "创建时，申请单id必须为空")
+//    @NotNull(groups = validation.OnUpdate.class, message = "更新时，申请单id不能为空")
+//    private Long requestId;
 
     @Schema(description = "申请数量", requiredMode = Schema.RequiredMode.REQUIRED, example = "10")
     @NotNull(message = "申请数量不能为空")

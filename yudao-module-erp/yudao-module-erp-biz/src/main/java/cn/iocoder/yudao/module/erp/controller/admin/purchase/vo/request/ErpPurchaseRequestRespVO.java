@@ -38,22 +38,12 @@ public class ErpPurchaseRequestRespVO extends BaseVO {
     @ExcelProperty("单据日期")
     private LocalDateTime requestTime;
 
-    // ========== 状态 ==========
 
+    // ========== 审核信息 ==========
     @Schema(description = "审核状态（待审核，审核通过，审核未通过）", example = "2")
     @ExcelProperty("审核状态")
     @DictFormat(DictTypeConstants.PURCHASE_REQUEST_APPLICATION_STATUS)
     private String statusDesc;
-
-    @Schema(description = "关闭状态（已关闭，已开启）", example = "1")
-    @ExcelProperty("关闭状态")
-    private String offStatusDesc;
-
-    @Schema(description = "订购状态（部分订购，全部订购）", example = "1")
-    @ExcelProperty("订购状态")
-    private String orderStatusDesc;
-
-    // ========== 审核信息 ==========
 
     @Schema(description = "审核者")
     @ExcelProperty("审核者")
@@ -64,7 +54,6 @@ public class ErpPurchaseRequestRespVO extends BaseVO {
     private LocalDateTime auditTime;
 
     // ========== 订单项列表 ==========
-
     @Schema(description = "采购订单项列表")
     private List<Item> items;
 
@@ -75,6 +64,33 @@ public class ErpPurchaseRequestRespVO extends BaseVO {
     @Schema(description = "产品总数", example = "100")
     @ExcelProperty("产品总数")
     private Integer totalCount;
+
+    // ========== 申请单创建和更新 ==========
+    @Schema(description = "制单时间", example = "2025-01-17 10:00:00")
+    @ExcelProperty("制单时间")
+    private LocalDateTime createTime;
+
+    @Schema(description = "最后更新时间", example = "2025-01-17 10:10:00")
+    @ExcelProperty("最后更新时间")
+    private LocalDateTime updateTime;
+
+    @Schema(description = "制单人", example = "admin")
+    @ExcelProperty("制单人")
+    private String creator;
+
+    @Schema(description = "更新者", example = "admin")
+    @ExcelProperty("更新者")
+    private String updater;
+    // ========== 申请单计算 ==========
+    // ========== 状态 ==========
+    @Schema(description = "关闭状态（已关闭，已开启）", example = "1")
+    @ExcelProperty("关闭状态")
+    private String offStatusDesc;
+
+    @Schema(description = "订购状态（部分订购，全部订购）", example = "1")
+    @ExcelProperty("订购状态")
+    private String orderStatusDesc;
+
 
     @Data
     public static class Item extends BaseVO {
@@ -137,16 +153,6 @@ public class ErpPurchaseRequestRespVO extends BaseVO {
         @ExcelProperty("价税合计")
         private BigDecimal allAmount;
 
-        // ========== 其他状态信息 ==========
-
-        @Schema(description = "批准数量")
-        @ExcelProperty("批准数量")
-        private Integer approveCount;
-
-        @Schema(description = "关闭状态（已关闭，已开启）")
-        @ExcelProperty("关闭状态")
-        private String offStatusDesc;
-
         @Schema(description = "税额，单位：元")
         @ExcelProperty("税额")
         private BigDecimal taxPrice;
@@ -154,6 +160,31 @@ public class ErpPurchaseRequestRespVO extends BaseVO {
         @Schema(description = "税率，百分比")
         @ExcelProperty("税率")
         private BigDecimal taxPercent;
+
+        @Schema(description = "批准数量")
+        @ExcelProperty("批准数量")
+        private Integer approveCount;
+        // ========== 其他状态信息 ==========
+        @Schema(description = "关闭状态（已关闭，已开启）")
+        @ExcelProperty("关闭状态")
+        private String offStatusDesc;
+
+        //未订购数量
+        @Schema(description = "未订购数量", example = "100")
+        @ExcelProperty("未订购数量")
+        private Integer unOrderCount;
+        //已订购数量
+        @Schema(description = "已订购数量", example = "100")
+        @ExcelProperty("已订购数量")
+        private Integer orderCount;
+        //已入库数量
+        @Schema(description = "已入库数量", example = "100")
+        @ExcelProperty("已入库数量")
+        private Integer inCount;
+        //行采购状态
+        @Schema(description = "行采购状态")
+        @ExcelProperty("行采购状态")
+        private String orderStatus;
     }
 
 }

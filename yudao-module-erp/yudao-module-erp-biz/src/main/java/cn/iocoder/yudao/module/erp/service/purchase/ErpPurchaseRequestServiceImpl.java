@@ -14,6 +14,8 @@ import cn.iocoder.yudao.module.erp.dal.mysql.purchase.ErpPurchaseRequestMapper;
 import cn.iocoder.yudao.module.erp.dal.redis.no.ErpNoRedisDAO;
 import cn.iocoder.yudao.module.erp.enums.ErpAuditStatus;
 import cn.iocoder.yudao.module.erp.service.product.ErpProductService;
+import cn.iocoder.yudao.module.erp.service.stock.ErpWarehouseService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -38,6 +40,7 @@ import static cn.iocoder.yudao.module.erp.enums.ErrorCodeConstants.*;
 public class ErpPurchaseRequestServiceImpl implements ErpPurchaseRequestService {
     private final ErpPurchaseRequestMapper erpPurchaseRequestMapper;
     private final ErpPurchaseRequestItemsMapper erpPurchaseRequestItemsMapper;
+    private final ErpWarehouseService erpWarehouseService;
     private final ErpProductService productService;
     private final ErpNoRedisDAO noRedisDAO;
 
@@ -75,22 +78,33 @@ public class ErpPurchaseRequestServiceImpl implements ErpPurchaseRequestService 
     }
 
     private List<ErpPurchaseRequestItemsDO> validatePurchaseRequestItems(List<ErpPurchaseRequestItemsSaveReqVO> items) {
-        // 1. 校验产品存在
+        // 1. 校验产品有效性
         productService.validProductList(convertSet(items, ErpPurchaseRequestItemsSaveReqVO::getProductId));
+        // 1.1 校验仓库有效性
+        erpWarehouseService.validWarehouseList(convertSet(items, ErpPurchaseRequestItemsSaveReqVO::getWarehouseId));
         // 2. 转化为 ErpPurchaseRequestItemsDO 列表
         return convertList(items, o -> BeanUtils.toBean(o, ErpPurchaseRequestItemsDO.class));
     }
 
+
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void updatePurchaseRequest(ErpPurchaseRequestSaveReqVO updateReqVO) {
-        // 校验存在
+        //1. 校验存在
         ErpPurchaseRequestDO erpPurchaseRequestDO = validatePurchaseRequestExists(updateReqVO.getId());
-        //判断已审核
+        //1.1 判断已审核
         ThrowUtil.ifThrow(erpPurchaseRequestDO.getStatus().equals(ErpAuditStatus.APPROVE.getStatus()), PURCHASE_REQUEST_UPDATE_FAIL_APPROVE, erpPurchaseRequestDO.getNo());
-        //判断已关闭
-//        ThrowUtil.ifThrow(erpPurchaseRequestDO.getOffStatus().equals(ErpAuditStatus.CLOSE.getStatus()), PURCHASE_REQUEST_UPDATE_FAIL_CLOSE, erpPurchaseRequestDO.getNo());
-        //校验产品是否存在
+        //1.2 判断已关闭
+        ThrowUtil.ifThrow(erpPurchaseRequestDO.getOffStatus().equals(ErpAuditStatus.CLOSED.getStatus()), PURCHASE_REQUEST_CLOSED, erpPurchaseRequestDO.getNo());
+        //1.3 判断已手动关闭
+        ThrowUtil.ifThrow(erpPurchaseRequestDO.getOffStatus().equals(ErpAuditStatus.MANUAL_CLOSED.getStatus()), PURCHASE_REQUEST_MANUAL_CLOSED, erpPurchaseRequestDO.getNo());
+        //1.4 校验子单requestId是否关联主单的id
+        List<ErpPurchaseRequestItemsDO> requestItemsDOS = erpPurchaseRequestItemsMapper.findItemsGroupedByRequestId(List.of(updateReqVO.getId())).get(updateReqVO.getId());
+        for (@Valid ErpPurchaseRequestItemsSaveReqVO itemsSaveReqVO : updateReqVO.getItems()) {
+            // 判断子单requestId是否关联主单的id，抛出异常
+            ThrowUtil.ifThrow(requestItemsDOS.stream().noneMatch(itemDO -> itemDO.getId().equals(itemsSaveReqVO.getId())), PURCHASE_REQUEST_UPDATE_FAIL_REQUEST_ID, itemsSaveReqVO.getId());
+        }
+        //1.5 校验产品是否存在
         List<ErpPurchaseRequestItemsDO> itemsDOList = validatePurchaseRequestItems(updateReqVO.getItems());
         // 2.1 更新订单
         ErpPurchaseRequestDO updateObj = BeanUtils.toBean(updateReqVO, ErpPurchaseRequestDO.class);
@@ -114,7 +128,7 @@ public class ErpPurchaseRequestServiceImpl implements ErpPurchaseRequestService 
             erpPurchaseRequestItemsMapper.updateBatch(diffList.get(1));
         }
         if (CollUtil.isNotEmpty(diffList.get(2))) {
-            erpPurchaseRequestItemsMapper.deleteBatchIds(convertList(diffList.get(2), ErpPurchaseRequestItemsDO::getId));
+            erpPurchaseRequestItemsMapper.deleteByIds(convertList(diffList.get(2), ErpPurchaseRequestItemsDO::getId));
         }
     }
 
@@ -164,11 +178,13 @@ public class ErpPurchaseRequestServiceImpl implements ErpPurchaseRequestService 
         });
     }
 
-    private ErpPurchaseRequestDO validatePurchaseRequestExists(Long id) {
+    @Override
+    public ErpPurchaseRequestDO validatePurchaseRequestExists(Long id) {
         ErpPurchaseRequestDO erpPurchaseRequestDO = erpPurchaseRequestMapper.selectById(id);
         ThrowUtil.ifThrow(erpPurchaseRequestDO == null, PURCHASE_REQUEST_NOT_EXISTS);
         return erpPurchaseRequestDO;
     }
+
 
     @Override
     public ErpPurchaseRequestDO getPurchaseRequest(Long id) {

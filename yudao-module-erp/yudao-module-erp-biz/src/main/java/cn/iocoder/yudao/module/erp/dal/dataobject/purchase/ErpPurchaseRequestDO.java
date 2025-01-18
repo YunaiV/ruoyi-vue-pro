@@ -34,11 +34,11 @@ public class ErpPurchaseRequestDO extends BaseDO {
     /**
      * 申请人
      */
-    private String applicant;
+    private Long applicant;
     /**
      * 申请部门
      */
-    private String applicationDept;
+    private Long applicationDept;
     /**
      * 单据日期
      */
@@ -52,15 +52,19 @@ public class ErpPurchaseRequestDO extends BaseDO {
      */
     private Integer offStatus;
     /**
-     * 订购状态（0部分订购，1全部订购）
-     */
-    private Integer orderStatus;
-    /**
      * 审核者
      */
-    private String auditor;
+    private Long auditor;
     /**
      * 审核时间
      */
     private LocalDateTime auditTime;
+    /**
+     * 单据标签
+     */
+    private String tag;
+    /**
+     * 供应商id
+     */
+    private Long supplierId;
 }

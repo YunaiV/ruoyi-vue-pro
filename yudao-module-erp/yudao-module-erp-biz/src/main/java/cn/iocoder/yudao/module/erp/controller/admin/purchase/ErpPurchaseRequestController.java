@@ -24,9 +24,9 @@ import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -48,13 +48,16 @@ import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.
 @RestController
 @RequestMapping("/erp/purchase-request")
 @Validated
-@RequiredArgsConstructor
 public class ErpPurchaseRequestController {
 
-    private final ErpPurchaseRequestService erpPurchaseRequestService;
-    private final ErpWarehouseService erpWarehouseService;
-    private final ErpProductService productService;
-    private final AdminUserApi adminUserApi;
+    @Resource
+    private ErpPurchaseRequestService erpPurchaseRequestService;
+    @Resource
+    private ErpWarehouseService erpWarehouseService;
+    @Resource
+    private ErpProductService productService;
+    @Resource
+    private AdminUserApi adminUserApi;
 
     @PostMapping("/create")
     @Operation(summary = "创建ERP采购申请单")
@@ -141,17 +144,25 @@ public class ErpPurchaseRequestController {
         // 1.2 产品信息
         Map<Long, ErpProductRespVO> productMap = productService.getProductVOMap(
             convertSet(purchaseRequestItemList, ErpPurchaseRequestItemsDO::getProductId));
-        // 1.3 获取用户信息
-        Set<Long> userIds = pageResult.getList().stream()
-            .flatMap(purchaseRequest -> Stream.of(
-                safeParseLong(purchaseRequest.getApplicant()),
-                safeParseLong(purchaseRequest.getAuditor()),
-                safeParseLong(purchaseRequest.getCreator()),
-                safeParseLong(purchaseRequest.getUpdater())
-            ))
+        //1.3 获取用户信息
+        Set<Long> userIds = Stream.concat(
+                pageResult.getList().stream()
+                    .flatMap(purchaseRequest -> Stream.of(
+                        purchaseRequest.getApplicant(),
+                        purchaseRequest.getAuditor(),
+                        safeParseLong(purchaseRequest.getCreator()),
+                        safeParseLong(purchaseRequest.getUpdater())
+                    )),
+                purchaseRequestItemList.stream()
+                    .flatMap(purchaseRequestItem -> Stream.of(
+                        safeParseLong(purchaseRequestItem.getCreator()),
+                        safeParseLong(purchaseRequestItem.getUpdater())
+                    ))
+            )
             .distinct()
             .filter(Objects::nonNull)
             .collect(Collectors.toSet());
+        //1.3.1 获取所有用户
         Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(userIds);
         // 1.4 仓库信息
         Map<Long, ErpWarehouseDO> warehouseMap = erpWarehouseService.getWarehouseMap(
@@ -166,20 +177,23 @@ public class ErpPurchaseRequestController {
                             .setProductName(product.getName())
                             .setProductBarCode(product.getBarCode())
                             .setProductUnitName(product.getUnitName()));
-                        //仓库填充
+                        //产品仓库填充
                         MapUtils.findAndThen(warehouseMap, item.getWarehouseId(), erpWarehouseDO -> item.setWarehouseName(erpWarehouseDO.getName()));
+                        //产品创建者、更新者填充
+                        MapUtils.findAndThen(userMap, safeParseLong(item.getCreator()), user -> item.setCreator(user.getNickname()));
+                        MapUtils.findAndThen(userMap, safeParseLong(item.getUpdater()), user -> item.setUpdater(user.getNickname()));
                     }
                 )
             );
             //申请单产品名称汇总拼接
             purchaseRequest.setProductNames(CollUtil.join(purchaseRequest.getItems(), "，", ErpPurchaseRequestRespVO.Item::getProductName));
-            //订单产品总数
+            //申请单订单产品总数
             purchaseRequest.setTotalCount(CollUtil.isEmpty(purchaseRequest.getItems()) ? 0 : purchaseRequest.getItems().stream().mapToInt(ErpPurchaseRequestRespVO.Item::getCount).sum());
-            //人名拼接
-            MapUtils.findAndThen(userMap, Optional.ofNullable(purchaseRequest.getApplicant()).map(Long::parseLong).orElse(null), user -> purchaseRequest.setApplicant(user.getNickname()));
-            MapUtils.findAndThen(userMap, Optional.ofNullable(purchaseRequest.getAuditor()).map(Long::parseLong).orElse(null), user -> purchaseRequest.setAuditor(user.getNickname()));
-            MapUtils.findAndThen(userMap, Optional.ofNullable(purchaseRequest.getCreator()).map(Long::parseLong).orElse(null), user -> purchaseRequest.setCreator(user.getNickname()));
-            MapUtils.findAndThen(userMap, Optional.ofNullable(purchaseRequest.getUpdater()).map(Long::parseLong).orElse(null), user -> purchaseRequest.setUpdater(user.getNickname()));
+            //申请单 创建者、更新者、审核人、申请人填充
+            MapUtils.findAndThen(userMap, safeParseLong(purchaseRequest.getApplicant()), user -> purchaseRequest.setApplicant(user.getNickname()));
+            MapUtils.findAndThen(userMap, safeParseLong(purchaseRequest.getAuditor()), user -> purchaseRequest.setAuditor(user.getNickname()));
+            MapUtils.findAndThen(userMap, safeParseLong(purchaseRequest.getCreator()), user -> purchaseRequest.setCreator(user.getNickname()));
+            MapUtils.findAndThen(userMap, safeParseLong(purchaseRequest.getUpdater()), user -> purchaseRequest.setUpdater(user.getNickname()));
         });
     }
 

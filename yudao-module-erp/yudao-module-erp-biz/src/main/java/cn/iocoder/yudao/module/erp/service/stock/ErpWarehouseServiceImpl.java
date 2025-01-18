@@ -114,6 +114,9 @@ public class ErpWarehouseServiceImpl implements ErpWarehouseService {
 
     @Override
     public List<ErpWarehouseDO> getWarehouseList(Collection<Long> ids) {
+        if (CollUtil.isEmpty(ids)){
+            return Collections.emptyList();
+        }
         return warehouseMapper.selectBatchIds(ids);
     }
 

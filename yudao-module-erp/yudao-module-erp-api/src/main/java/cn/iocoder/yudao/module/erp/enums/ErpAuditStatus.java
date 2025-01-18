@@ -18,9 +18,13 @@ import java.util.Map;
 @Getter
 public enum ErpAuditStatus implements IntArrayValuable {
 
+    OPENED(1, "已开启"),// 已开启
     PENDING_APPROVAL(5, "待审核"), // 待审核
     PROCESS(10, "未审核"), // 审核中
-    APPROVE(20, "已审核"); // 审核通过
+    APPROVE(20, "已审核"), // 审核通过
+    CLOSED(90, "已关闭"),// 已关闭
+    MANUAL_CLOSED(91, "手动关闭"),//手动关闭
+    ;
     private static final Map<Integer, ErpAuditStatus> STATUS_MAP = new HashMap<>();
 
     static {
@@ -28,6 +32,7 @@ public enum ErpAuditStatus implements IntArrayValuable {
             STATUS_MAP.put(status.status, status);
         }
     }
+
     public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(ErpAuditStatus::getStatus).toArray();
 
     /**
@@ -43,8 +48,10 @@ public enum ErpAuditStatus implements IntArrayValuable {
     public int[] array() {
         return ARRAYS;
     }
+
     /**
      * 根据状态码获取状态枚举的描述。
+     *
      * @param status 状态码
      * @return 状态描述，如果没有找到则返回null
      */
