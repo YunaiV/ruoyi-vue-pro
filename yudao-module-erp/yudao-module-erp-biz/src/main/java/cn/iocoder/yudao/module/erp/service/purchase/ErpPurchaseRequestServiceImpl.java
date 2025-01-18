@@ -17,6 +17,7 @@ import cn.iocoder.yudao.module.erp.service.product.ErpProductService;
 import cn.iocoder.yudao.module.erp.service.stock.ErpWarehouseService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
@@ -36,7 +37,7 @@ import static cn.iocoder.yudao.module.erp.enums.ErrorCodeConstants.*;
  */
 @Service
 @Validated
-@RequiredArgsConstructor
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class ErpPurchaseRequestServiceImpl implements ErpPurchaseRequestService {
     private final ErpPurchaseRequestMapper erpPurchaseRequestMapper;
     private final ErpPurchaseRequestItemsMapper erpPurchaseRequestItemsMapper;
