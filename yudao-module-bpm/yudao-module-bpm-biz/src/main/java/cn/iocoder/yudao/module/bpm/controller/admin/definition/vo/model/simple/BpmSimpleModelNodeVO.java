@@ -63,7 +63,7 @@ public class BpmSimpleModelNodeVO {
     @Schema(description = "是否需要签名", example = "false")
     private Boolean signEnable;
 
-    @Schema(description = "审批意见", example = "false")
+    @Schema(description = "是否填写审批意见", example = "false")
     private Boolean reasonRequire;
 
     /**

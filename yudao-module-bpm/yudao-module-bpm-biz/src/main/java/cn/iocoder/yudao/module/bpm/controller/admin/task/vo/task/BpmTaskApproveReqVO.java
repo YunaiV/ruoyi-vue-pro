@@ -14,7 +14,7 @@ public class BpmTaskApproveReqVO {
     @NotEmpty(message = "任务编号不能为空")
     private String id;
 
-    @Schema(description = "审批意见", requiredMode = Schema.RequiredMode.REQUIRED, example = "不错不错！")
+    @Schema(description = "审批意见", example = "不错不错！")
     private String reason;
 
     @Schema(description = "签名", example = "https://www.iocoder.cn/sign.png")

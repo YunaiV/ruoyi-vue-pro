@@ -78,10 +78,10 @@ public class BpmTaskRespVO {
     @Schema(description = "操作按钮设置值")
     private Map<Integer, OperationButtonSetting> buttonsSetting;
 
-    @Schema(description = "是否需要签名")
+    @Schema(description = "是否需要签名", example = "false")
     private Boolean signEnable;
 
-    @Schema(description = "审批意见")
+    @Schema(description = "是否填写审批意见", example = "false")
     private Boolean reasonRequire;
 
     @Data
