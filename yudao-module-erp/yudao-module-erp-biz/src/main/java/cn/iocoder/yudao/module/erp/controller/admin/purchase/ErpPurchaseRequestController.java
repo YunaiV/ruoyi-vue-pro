@@ -19,14 +19,17 @@ import cn.iocoder.yudao.module.erp.dal.dataobject.stock.ErpWarehouseDO;
 import cn.iocoder.yudao.module.erp.service.product.ErpProductService;
 import cn.iocoder.yudao.module.erp.service.purchase.ErpPurchaseRequestService;
 import cn.iocoder.yudao.module.erp.service.stock.ErpWarehouseService;
+import cn.iocoder.yudao.module.system.api.dept.DeptApi;
+import cn.iocoder.yudao.module.system.api.dept.dto.DeptRespDTO;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -48,16 +51,14 @@ import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.
 @RestController
 @RequestMapping("/erp/purchase-request")
 @Validated
+@RequiredArgsConstructor(onConstructor_ = @Autowired)
 public class ErpPurchaseRequestController {
 
-    @Resource
-    private ErpPurchaseRequestService erpPurchaseRequestService;
-    @Resource
-    private ErpWarehouseService erpWarehouseService;
-    @Resource
-    private ErpProductService productService;
-    @Resource
-    private AdminUserApi adminUserApi;
+    private final ErpPurchaseRequestService erpPurchaseRequestService;
+    private final ErpWarehouseService erpWarehouseService;
+    private final ErpProductService productService;
+    private final AdminUserApi adminUserApi;
+    private final DeptApi deptApi;
 
     @PostMapping("/create")
     @Operation(summary = "创建ERP采购申请单")
@@ -127,10 +128,9 @@ public class ErpPurchaseRequestController {
     public void exportPurchaseRequestExcel(@Valid ErpPurchaseRequestPageReqVO pageReqVO,
                                            HttpServletResponse response) throws IOException {
         pageReqVO.setPageSize(PageParam.PAGE_SIZE_NONE);
-        List<ErpPurchaseRequestDO> list = erpPurchaseRequestService.getPurchaseRequestPage(pageReqVO).getList();
+        List<ErpPurchaseRequestRespVO> list = buildPurchaseRequestVOPageResult(erpPurchaseRequestService.getPurchaseRequestPage(pageReqVO)).getList();
         // 导出 Excel
-        ExcelUtils.write(response, "ERP采购申请单.xls", "数据", ErpPurchaseRequestRespVO.class,
-            BeanUtils.toBean(list, ErpPurchaseRequestRespVO.class));
+        ExcelUtils.write(response, "ERP采购申请单.xls", "数据", ErpPurchaseRequestRespVO.class, list);
     }
 
     private PageResult<ErpPurchaseRequestRespVO> buildPurchaseRequestVOPageResult(PageResult<ErpPurchaseRequestDO> pageResult) {
@@ -148,8 +148,8 @@ public class ErpPurchaseRequestController {
         Set<Long> userIds = Stream.concat(
                 pageResult.getList().stream()
                     .flatMap(purchaseRequest -> Stream.of(
-                        purchaseRequest.getApplicant(),
-                        purchaseRequest.getAuditor(),
+                        purchaseRequest.getApplicant(),//申请人
+                        purchaseRequest.getAuditor(),//审核者
                         safeParseLong(purchaseRequest.getCreator()),
                         safeParseLong(purchaseRequest.getUpdater())
                     )),
@@ -164,12 +164,24 @@ public class ErpPurchaseRequestController {
             .collect(Collectors.toSet());
         //1.3.1 获取所有用户
         Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(userIds);
-        // 1.4 仓库信息
+        //1.4 仓库信息
         Map<Long, ErpWarehouseDO> warehouseMap = erpWarehouseService.getWarehouseMap(
             convertSet(purchaseRequestItemList, ErpPurchaseRequestItemsDO::getWarehouseId)
         );
-        // 2. 开始拼接
+        //1.4 部门信息
+        Map<Long, DeptRespDTO> deptMap = deptApi.getDeptMap(
+            convertSet(pageResult.getList(), ErpPurchaseRequestDO::getApplicationDept)
+        );
+
+        //2 开始拼接
         return BeanUtils.toBean(pageResult, ErpPurchaseRequestRespVO.class, purchaseRequest -> {
+            //2.1 申请单填充
+            //设置人员信息
+            MapUtils.findAndThen(userMap, safeParseLong(purchaseRequest.getApplicant()), user -> purchaseRequest.setApplicant(user.getNickname()));//申请人
+            MapUtils.findAndThen(userMap, safeParseLong(purchaseRequest.getAuditor()), user -> purchaseRequest.setAuditor(user.getNickname()));//审核者
+            //设置部门信息
+            MapUtils.findAndThen(deptMap, safeParseLong(purchaseRequest.getApplicationDept()), dept -> purchaseRequest.setApplicationDept(dept.getName()));
+
             purchaseRequest.setItems(
                 BeanUtils.toBean(purchaseRequestItemMap.get(purchaseRequest.getId()), ErpPurchaseRequestRespVO.Item.class,
                     item -> {
@@ -185,11 +197,12 @@ public class ErpPurchaseRequestController {
                     }
                 )
             );
-            //申请单产品名称汇总拼接
+            //2.2 申请单-产品项
+            //产品名称汇总拼接
             purchaseRequest.setProductNames(CollUtil.join(purchaseRequest.getItems(), "，", ErpPurchaseRequestRespVO.Item::getProductName));
-            //申请单订单产品总数
+            //订单产品总数
             purchaseRequest.setTotalCount(CollUtil.isEmpty(purchaseRequest.getItems()) ? 0 : purchaseRequest.getItems().stream().mapToInt(ErpPurchaseRequestRespVO.Item::getCount).sum());
-            //申请单 创建者、更新者、审核人、申请人填充
+            //创建者、更新者、审核人、申请人填充
             MapUtils.findAndThen(userMap, safeParseLong(purchaseRequest.getApplicant()), user -> purchaseRequest.setApplicant(user.getNickname()));
             MapUtils.findAndThen(userMap, safeParseLong(purchaseRequest.getAuditor()), user -> purchaseRequest.setAuditor(user.getNickname()));
             MapUtils.findAndThen(userMap, safeParseLong(purchaseRequest.getCreator()), user -> purchaseRequest.setCreator(user.getNickname()));

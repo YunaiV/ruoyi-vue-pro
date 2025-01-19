@@ -15,6 +15,7 @@ import cn.iocoder.yudao.module.erp.dal.redis.no.ErpNoRedisDAO;
 import cn.iocoder.yudao.module.erp.enums.ErpAuditStatus;
 import cn.iocoder.yudao.module.erp.service.product.ErpProductService;
 import cn.iocoder.yudao.module.erp.service.stock.ErpWarehouseService;
+import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,6 +45,7 @@ public class ErpPurchaseRequestServiceImpl implements ErpPurchaseRequestService 
     private final ErpWarehouseService erpWarehouseService;
     private final ErpProductService productService;
     private final ErpNoRedisDAO noRedisDAO;
+    private final AdminUserApi adminUserApi;
 
 
     @Override
@@ -54,18 +56,23 @@ public class ErpPurchaseRequestServiceImpl implements ErpPurchaseRequestService 
         if (date == null) {
             createReqVO.setRequestTime(LocalDateTime.now());
         }
-        //1. 生成单据编号
+        //1.校验
+        //生成单据编号
         String no = noRedisDAO.generate(ErpNoRedisDAO.PURCHASE_REQUEST_NO_PREFIX, PURCHASE_REQUEST_NO_OUT_OF_BOUNDS);
-        //校验编号no是否在数据库中重复
+        //1.1 校验编号no是否在数据库中重复
         ThrowUtil.ifThrow(erpPurchaseRequestMapper.selectByNo(no) != null, PURCHASE_REQUEST_NO_EXISTS);
+        //1.2 校验子表合法
+        List<ErpPurchaseRequestItemsDO> itemsDOList = validatePurchaseRequestItems(createReqVO.getItems());
+        //1.3 校验部门合法
+        erpWarehouseService.validWarehouseList(Collections.singleton(createReqVO.getApplicationDept()));
+        //1.4 校验申请人合法
+        adminUserApi.validateUser(createReqVO.getApplicant());
         //bean拷贝
         ErpPurchaseRequestDO purchaseRequest = BeanUtils.toBean(createReqVO, ErpPurchaseRequestDO.class);
         //为单据编号赋值
         purchaseRequest.setNo(no);
         //为单据编号设置初始审核状态
         purchaseRequest.setStatus(ErpAuditStatus.PROCESS.getStatus());
-        //校验产品是否存在
-        List<ErpPurchaseRequestItemsDO> itemsDOList = validatePurchaseRequestItems(createReqVO.getItems());
         //2. 插入主表的申请单数据
         ThrowUtil.ifThrow(erpPurchaseRequestMapper.insert(purchaseRequest) <= 0, PURCHASE_REQUEST_ADD_FAIL_APPROVE);
         //获取主表主键id
@@ -78,7 +85,8 @@ public class ErpPurchaseRequestServiceImpl implements ErpPurchaseRequestService 
         return id;
     }
 
-    private List<ErpPurchaseRequestItemsDO> validatePurchaseRequestItems(List<ErpPurchaseRequestItemsSaveReqVO> items) {
+    @Override
+    public List<ErpPurchaseRequestItemsDO> validatePurchaseRequestItems(List<ErpPurchaseRequestItemsSaveReqVO> items) {
         // 1. 校验产品有效性
         productService.validProductList(convertSet(items, ErpPurchaseRequestItemsSaveReqVO::getProductId));
         // 1.1 校验仓库有效性
@@ -87,6 +95,11 @@ public class ErpPurchaseRequestServiceImpl implements ErpPurchaseRequestService 
         return convertList(items, o -> BeanUtils.toBean(o, ErpPurchaseRequestItemsDO.class));
     }
 
+    @Override
+    public void validatePurchaseRequestItemsMasterId(Long masterId, List<Long> ids) {
+        // 校验子单requestId是否关联主单的id
+        ThrowUtil.ifThrow(erpPurchaseRequestItemsMapper.selectListByRequestId(masterId).stream().noneMatch(i -> ids.contains(i.getId())), PURCHASE_REQUEST_UPDATE_FAIL_REQUEST_ID, masterId);
+    }
 
     @Override
     @Transactional(rollbackFor = Exception.class)

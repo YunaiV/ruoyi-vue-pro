@@ -1,10 +1,13 @@
 package cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.request;
 
 import cn.iocoder.yudao.framework.excel.core.annotations.DictFormat;
+import cn.iocoder.yudao.framework.excel.core.convert.DictConvert;
 import cn.iocoder.yudao.framework.mybatis.core.vo.BaseVO;
 import cn.iocoder.yudao.module.erp.enums.DictTypeConstants;
 import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
 import com.alibaba.excel.annotation.ExcelProperty;
+import com.alibaba.excel.annotation.write.style.ContentStyle;
+import com.alibaba.excel.enums.BooleanEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
@@ -40,10 +43,7 @@ public class ErpPurchaseRequestRespVO extends BaseVO {
 
 
     // ========== 审核信息 ==========
-    @Schema(description = "审核状态（待审核，审核通过，审核未通过）", example = "2")
-    @ExcelProperty("审核状态")
-    @DictFormat(DictTypeConstants.PURCHASE_REQUEST_APPLICATION_STATUS)
-    private String statusDesc;
+
 
     @Schema(description = "审核者")
     @ExcelProperty("审核者")
@@ -51,6 +51,7 @@ public class ErpPurchaseRequestRespVO extends BaseVO {
 
     @Schema(description = "审核时间")
     @ExcelProperty("审核时间")
+    @ContentStyle(shrinkToFit = BooleanEnum.TRUE)
     private LocalDateTime auditTime;
 
     // ========== 订单项列表 ==========
@@ -66,8 +67,9 @@ public class ErpPurchaseRequestRespVO extends BaseVO {
     private Integer totalCount;
 
     // ========== 申请单创建和更新 ==========
-    @Schema(description = "制单时间", example = "2025-01-17 10:00:00")
+    @Schema(description = "制单时间")
     @ExcelProperty("制单时间")
+    @ContentStyle(shrinkToFit = BooleanEnum.TRUE)
     private LocalDateTime createTime;
 
     @Schema(description = "最后更新时间", example = "2025-01-17 10:10:00")
@@ -83,13 +85,18 @@ public class ErpPurchaseRequestRespVO extends BaseVO {
     private String updater;
     // ========== 申请单计算 ==========
     // ========== 状态 ==========
-    @Schema(description = "关闭状态（已关闭，已开启）", example = "1")
-    @ExcelProperty("关闭状态")
-    private String offStatusDesc;
+    @Schema(description = "审核状态（待审核，审核通过，审核未通过）")
+    @ExcelProperty(value = "审核状态", converter = DictConvert.class)
+    @DictFormat(DictTypeConstants.AUDIT_STATUS)
+    private Integer status;
 
-    @Schema(description = "订购状态（部分订购，全部订购）", example = "1")
+    @Schema(description = "关闭状态（已关闭，已开启）")
+    @ExcelProperty("关闭状态")
+    private Integer offStatus;
+
+    @Schema(description = "订购状态（部分订购，全部订购）")
     @ExcelProperty("订购状态")
-    private String orderStatusDesc;
+    private Integer orderStatus;
 
 
     @Data
@@ -167,7 +174,7 @@ public class ErpPurchaseRequestRespVO extends BaseVO {
         // ========== 其他状态信息 ==========
         @Schema(description = "关闭状态（已关闭，已开启）")
         @ExcelProperty("关闭状态")
-        private String offStatusDesc;
+        private String offStatus;
 
         //未订购数量
         @Schema(description = "未订购数量", example = "100")

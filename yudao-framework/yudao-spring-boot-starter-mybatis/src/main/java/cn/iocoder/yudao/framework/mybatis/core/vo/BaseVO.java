@@ -22,13 +22,13 @@ public abstract class BaseVO implements Serializable, TransPojo {
     /**
      * 创建时间
      */
-    @Schema(description = "创建时间", example = "2025-01-17T10:00:00")
+    @Schema(description = "创建时间")
     private LocalDateTime createTime;
 
     /**
      * 最后更新时间
      */
-    @Schema(description = "最后更新时间", example = "2025-01-17T10:10:00")
+    @Schema(description = "最后更新时间")
     private LocalDateTime updateTime;
 
     /**
