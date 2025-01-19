@@ -73,12 +73,17 @@ public class ErpPurchaseRequestServiceImpl implements ErpPurchaseRequestService 
         purchaseRequest.setNo(no);
         //为单据编号设置初始审核状态
         purchaseRequest.setStatus(ErpAuditStatus.PROCESS.getStatus());
+        //设置开启状态
+        purchaseRequest.setOffStatus(ErpAuditStatus.OPENED.getStatus());
+
         //2. 插入主表的申请单数据
         ThrowUtil.ifThrow(erpPurchaseRequestMapper.insert(purchaseRequest) <= 0, PURCHASE_REQUEST_ADD_FAIL_APPROVE);
         //获取主表主键id
         Long id = purchaseRequest.getId();
         //将父id赋予子表
         itemsDOList.forEach(i -> i.setRequestId(id));
+        //设置行开启状态
+        itemsDOList.forEach(i -> i.setOffStatus(ErpAuditStatus.OPENED.getStatus()));
         //3. 批量插入子表数据
         ThrowUtil.ifThrow(!erpPurchaseRequestItemsMapper.insertBatch(itemsDOList), PURCHASE_REQUEST_ADD_FAIL_PRODUCT);
         // 返回单据id

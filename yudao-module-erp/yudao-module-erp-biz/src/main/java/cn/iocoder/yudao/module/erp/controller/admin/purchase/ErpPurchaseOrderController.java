@@ -104,6 +104,35 @@ public class ErpPurchaseOrderController {
         purchaseOrderService.deletePurchaseOrder(ids);
         return success(true);
     }
+    @PutMapping("/review")
+    @Operation(summary = "审核/反审核采购订单")
+    @Parameter(name = "id", description = "编号", required = true)
+    @PreAuthorize("@ss.hasPermission('erp:purchase-order:review')")
+    public CommonResult<Boolean> reviewPurchaseOrder(@RequestParam("id") Long id,
+                                                     @RequestParam("status") Integer status) {
+        //TODO 审核订单-审核、反审核
+//        purchaseOrderService.updatePurchaseOrderStatus(id, status);
+        return success(true);
+    }
+    @PutMapping("/status")
+    @Operation(summary = "关闭/启用申请单")
+    @Parameter(name = "id", description = "编号", required = true)
+    @PreAuthorize("@ss.hasPermission('erp:purchase-order:enable')")
+    public CommonResult<Boolean> switchPurchaseOrderStatus(@RequestParam("id") Long id,
+                                                           @RequestParam("status") Integer status) {
+        //TODO 关闭/启用申请单
+//        purchaseOrderService.updatePurchaseOrderStatus(id, status);
+        return success(true);
+    }
+    @PutMapping("/merge")
+    @Operation(summary = "合并采购订单")
+    @Parameter(name = "ids", description = "编号数组", required = true)
+    @PreAuthorize("@ss.hasPermission('erp:purchase-order:merge')")
+    public CommonResult<Long> mergePurchaseOrder(@RequestParam("ids") List<Long> ids) {
+        //TODO 合并采购订单
+//        return success(purchaseOrderService.mergePurchaseOrder(ids));
+        return null;
+    }
 
     @GetMapping("/get")
     @Operation(summary = "获得采购订单")
