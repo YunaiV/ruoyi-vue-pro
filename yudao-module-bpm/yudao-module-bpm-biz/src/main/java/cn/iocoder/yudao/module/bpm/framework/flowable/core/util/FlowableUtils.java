@@ -213,9 +213,14 @@ public class FlowableUtils {
         return (String) task.getTaskLocalVariables().get(BpmnVariableConstants.TASK_VARIABLE_REASON);
     }
 
-    // TODO @lesan：这个方法名，也改咧
-    public static String getTaskSign(TaskInfo task) {
-        return (String) task.getTaskLocalVariables().get(BpmnVariableConstants.TASK_VARIABLE_SIGN);
+    /**
+     * 获得任务的签名图片 URL
+     *
+     * @param task 任务
+     * @return 签名图片 URL
+     */
+    public static String getTaskSignPicUrl(TaskInfo task) {
+        return (String) task.getTaskLocalVariables().get(BpmnVariableConstants.TASK_SIGN_PIC_URL);
     }
 
     /**

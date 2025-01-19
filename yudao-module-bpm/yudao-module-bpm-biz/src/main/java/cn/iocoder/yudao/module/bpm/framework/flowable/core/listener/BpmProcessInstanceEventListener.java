@@ -39,10 +39,10 @@ public class BpmProcessInstanceEventListener extends AbstractFlowableEngineEvent
         processInstanceService.processProcessInstanceCompleted((ProcessInstance)event.getEntity());
     }
 
-    @Override
-    // 特殊情况：当跳转到 EndEvent 流程实例未结束, 会执行 deleteProcessInstance 方法。
+    @Override // 特殊情况：当跳转到 EndEvent 流程实例未结束, 会执行 deleteProcessInstance 方法
     protected void processCancelled(FlowableCancelledEvent event) {
         ProcessInstance processInstance = processInstanceService.getProcessInstance(event.getProcessInstanceId());
         processInstanceService.processProcessInstanceCompleted(processInstance);
     }
+
 }

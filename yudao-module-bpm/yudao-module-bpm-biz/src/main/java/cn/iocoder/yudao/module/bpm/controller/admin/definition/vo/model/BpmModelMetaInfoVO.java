@@ -62,4 +62,7 @@ public class BpmModelMetaInfoVO {
     @Schema(description = "排序", example = "1")
     private Long sort; // 创建时，后端自动生成
 
+    @Schema(description = "允许撤销审批中的申请", example = "true")
+    private Boolean allowCancelRunningProcess;
+
 }

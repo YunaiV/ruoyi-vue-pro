@@ -150,4 +150,9 @@ public class BpmProcessDefinitionInfoDO extends BaseDO {
     @TableField(typeHandler = StringListTypeHandler.class) // 为了可以使用 find_in_set 进行过滤
     private List<Long> managerUserIds;
 
+    /**
+     * 是否允许撤销审批中的申请
+     */
+    private Boolean allowCancelRunningProcess;
+
 }

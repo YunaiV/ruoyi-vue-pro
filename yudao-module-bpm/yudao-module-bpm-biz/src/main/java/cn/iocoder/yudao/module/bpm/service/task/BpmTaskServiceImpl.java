@@ -64,6 +64,7 @@ import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionU
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
 import static cn.iocoder.yudao.module.bpm.enums.ErrorCodeConstants.*;
 import static cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnVariableConstants.PROCESS_INSTANCE_VARIABLE_RETURN_FLAG;
+import static cn.iocoder.yudao.module.bpm.framework.flowable.core.util.BpmnModelUtils.parseReasonRequire;
 import static cn.iocoder.yudao.module.bpm.framework.flowable.core.util.BpmnModelUtils.parseSignEnable;
 
 /**
@@ -163,6 +164,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         Map<Integer, BpmTaskRespVO.OperationButtonSetting> buttonsSetting = BpmnModelUtils.parseButtonsSetting(
                 bpmnModel, todoTask.getTaskDefinitionKey());
         Boolean signEnable = parseSignEnable(bpmnModel, todoTask.getTaskDefinitionKey());
+        Boolean reasonRequire = parseReasonRequire(bpmnModel, todoTask.getTaskDefinitionKey());
 
         // 4. 任务表单
         BpmFormDO taskForm = null;
@@ -171,7 +173,8 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         }
 
         return BpmTaskConvert.INSTANCE.buildTodoTask(todoTask, childrenTasks, buttonsSetting, taskForm)
-                .setSignEnable(signEnable);
+                .setSignEnable(signEnable)
+                .setReasonRequire(reasonRequire);
     }
 
     @Override
@@ -485,8 +488,13 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         // 1.3 校验签名
         BpmnModel bpmnModel = modelService.getBpmnModelByDefinitionId(task.getProcessDefinitionId());
         Boolean signEnable = parseSignEnable(bpmnModel, task.getTaskDefinitionKey());
-        if (signEnable && StrUtil.isEmpty(reqVO.getSign())) {
+        if (signEnable && StrUtil.isEmpty(reqVO.getSignPicUrl())) {
             throw exception(TASK_SIGNATURE_NOT_EXISTS);
+        }
+        // 1.4 校验审批意见
+        Boolean reasonRequire = parseReasonRequire(bpmnModel, task.getTaskDefinitionKey());
+        if (reasonRequire && StrUtil.isEmpty(reqVO.getReason())) {
+            throw exception(TASK_REASON_REQUIRE);
         }
 
         // 情况一：被委派的任务，不调用 complete 去完成任务
@@ -505,7 +513,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         // 2.1 更新 task 状态、原因、签字
         updateTaskStatusAndReason(task.getId(), BpmTaskStatusEnum.APPROVE.getStatus(), reqVO.getReason());
         if (signEnable) {
-            taskService.setVariableLocal(task.getId(), BpmnVariableConstants.TASK_VARIABLE_SIGN, reqVO.getSign());
+            taskService.setVariableLocal(task.getId(), BpmnVariableConstants.TASK_SIGN_PIC_URL, reqVO.getSignPicUrl());
         }
         // 2.2 添加评论
         taskService.addComment(task.getId(), task.getProcessInstanceId(), BpmCommentTypeEnum.APPROVE.getType(),
@@ -859,10 +867,11 @@ public class BpmTaskServiceImpl implements BpmTaskService {
                 .moveActivityIdsToSingleActivityId(activityIds, endEvent.getId())
                 .changeState();
 
-        // 3. 如果跳转到 EndEvent 流程还未结束， 执行 deleteProcessInstance 方法。
-        List<Execution> executionList = runtimeService.createExecutionQuery().processInstanceId(processInstanceId).list();
-        if (CollUtil.isNotEmpty(executionList)) {
-            log.warn("执行跳转到 EndEvent 后, 流程实例未结束。执行 [deleteProcessInstance] 方法");
+        // 3. 特殊：如果跳转到 EndEvent 流程还未结束， 执行 deleteProcessInstance 方法
+        // TODO 芋艿：目前发现并行分支情况下，会存在这个情况，后续看看有没更好的方案；
+        List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstanceId).list();
+        if (CollUtil.isNotEmpty(executions)) {
+            log.warn("[moveTaskToEnd][执行跳转到 EndEvent 后, 流程实例未结束，强制执行 deleteProcessInstance 方法]");
             runtimeService.deleteProcessInstance(processInstanceId, reason);
         }
     }

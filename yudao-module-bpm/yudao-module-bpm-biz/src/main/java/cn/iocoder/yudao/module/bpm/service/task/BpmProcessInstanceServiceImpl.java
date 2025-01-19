@@ -595,6 +595,7 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
         variables.put(BpmnVariableConstants.PROCESS_INSTANCE_VARIABLE_START_USER_ID, userId); // 设置流程变量，发起人 ID
         variables.put(BpmnVariableConstants.PROCESS_INSTANCE_VARIABLE_STATUS, // 流程实例状态：审批中
                 BpmProcessInstanceStatusEnum.RUNNING.getStatus());
+        variables.put(BpmnVariableConstants.PROCESS_INSTANCE_SKIP_EXPRESSION_ENABLED, true); // 跳过表达式需要添加此变量为 true，不影响没配置 skipExpression 的节点
         if (CollUtil.isNotEmpty(startUserSelectAssignees)) {
             variables.put(BpmnVariableConstants.PROCESS_INSTANCE_VARIABLE_START_USER_SELECT_ASSIGNEES, startUserSelectAssignees);
         }
@@ -640,6 +641,13 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
         // 1.2 只能取消自己的
         if (!Objects.equals(instance.getStartUserId(), String.valueOf(userId))) {
             throw exception(PROCESS_INSTANCE_CANCEL_FAIL_NOT_SELF);
+        }
+        // 1.3 校验允许撤销审批中的申请
+        BpmProcessDefinitionInfoDO processDefinitionInfo = processDefinitionService.getProcessDefinitionInfo(instance.getProcessDefinitionId());
+        Assert.notNull(processDefinitionInfo, "流程定义({})不存在", processDefinitionInfo);
+        if (processDefinitionInfo.getAllowCancelRunningProcess() != null // 防止未配置 AllowCancelRunningProcess , 默认为可取消
+                && Boolean.FALSE.equals(processDefinitionInfo.getAllowCancelRunningProcess())) {
+            throw exception(PROCESS_INSTANCE_CANCEL_FAIL_NOT_ALLOW);
         }
 
         // 2. 取消流程
