@@ -87,4 +87,9 @@ public class BpmProcessInstanceCopyServiceImpl implements BpmProcessInstanceCopy
         return processInstanceCopyMapper.selectPage(userId, pageReqVO);
     }
 
+    @Override
+    public void deleteProcessInstanceCopy(String processInstanceId) {
+        processInstanceCopyMapper.deleteByProcessInstanceId(processInstanceId);
+    }
+
 }

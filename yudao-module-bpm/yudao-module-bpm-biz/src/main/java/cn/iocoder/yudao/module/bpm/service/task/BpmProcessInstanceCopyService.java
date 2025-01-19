@@ -50,4 +50,10 @@ public interface BpmProcessInstanceCopyService {
     PageResult<BpmProcessInstanceCopyDO> getProcessInstanceCopyPage(Long userId,
                                                                     BpmProcessInstanceCopyPageReqVO pageReqVO);
 
+    /**
+     * 删除抄送流程
+     *
+     * @param processInstanceId 流程实例id
+     */
+    void deleteProcessInstanceCopy(String processInstanceId);
 }
