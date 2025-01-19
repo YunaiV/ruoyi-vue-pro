@@ -642,6 +642,13 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
         if (!Objects.equals(instance.getStartUserId(), String.valueOf(userId))) {
             throw exception(PROCESS_INSTANCE_CANCEL_FAIL_NOT_SELF);
         }
+        // 1.3 校验允许撤销审批中的申请
+        BpmProcessDefinitionInfoDO processDefinitionInfo = processDefinitionService.getProcessDefinitionInfo(instance.getProcessDefinitionId());
+        Assert.notNull(processDefinitionInfo, "流程定义({})不存在", processDefinitionInfo);
+        if (processDefinitionInfo.getAllowCancelRunningProcess() != null // 防止未配置 AllowCancelRunningProcess , 默认为可取消
+                && !processDefinitionInfo.getAllowCancelRunningProcess()) {
+            throw exception(PROCESS_INSTANCE_CANCEL_FAIL_NOT_ALLOW);
+        }
 
         // 2. 取消流程
         updateProcessInstanceCancel(cancelReqVO.getId(),
