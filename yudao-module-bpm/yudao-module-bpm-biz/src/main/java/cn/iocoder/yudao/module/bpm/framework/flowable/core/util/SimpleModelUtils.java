@@ -441,6 +441,8 @@ public class SimpleModelUtils {
             addUserTaskListener(node, userTask);
             // 添加是否需要签名
             addSignEnable(node.getSignEnable(), userTask);
+            // 审批意见
+            addReasonRequire(node.getReasonRequire(), userTask);
             return userTask;
         }
 
