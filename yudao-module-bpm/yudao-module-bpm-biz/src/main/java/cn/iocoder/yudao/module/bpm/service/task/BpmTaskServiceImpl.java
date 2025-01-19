@@ -64,6 +64,7 @@ import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionU
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
 import static cn.iocoder.yudao.module.bpm.enums.ErrorCodeConstants.*;
 import static cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnVariableConstants.PROCESS_INSTANCE_VARIABLE_RETURN_FLAG;
+import static cn.iocoder.yudao.module.bpm.framework.flowable.core.util.BpmnModelUtils.parseReasonRequire;
 import static cn.iocoder.yudao.module.bpm.framework.flowable.core.util.BpmnModelUtils.parseSignEnable;
 
 /**
@@ -163,6 +164,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         Map<Integer, BpmTaskRespVO.OperationButtonSetting> buttonsSetting = BpmnModelUtils.parseButtonsSetting(
                 bpmnModel, todoTask.getTaskDefinitionKey());
         Boolean signEnable = parseSignEnable(bpmnModel, todoTask.getTaskDefinitionKey());
+        Boolean reasonRequire = parseReasonRequire(bpmnModel, todoTask.getTaskDefinitionKey());
 
         // 4. 任务表单
         BpmFormDO taskForm = null;
@@ -171,7 +173,8 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         }
 
         return BpmTaskConvert.INSTANCE.buildTodoTask(todoTask, childrenTasks, buttonsSetting, taskForm)
-                .setSignEnable(signEnable);
+                .setSignEnable(signEnable)
+                .setReasonRequire(reasonRequire);
     }
 
     @Override
@@ -487,6 +490,11 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         Boolean signEnable = parseSignEnable(bpmnModel, task.getTaskDefinitionKey());
         if (signEnable && StrUtil.isEmpty(reqVO.getSignPicUrl())) {
             throw exception(TASK_SIGNATURE_NOT_EXISTS);
+        }
+        // 1.4 校验审批意见
+        Boolean reasonRequire = parseReasonRequire(bpmnModel, task.getTaskDefinitionKey());
+        if (reasonRequire && StrUtil.isEmpty(reqVO.getReason())) {
+            throw exception(TASK_REASON_REQUIRE);
         }
 
         // 情况一：被委派的任务，不调用 complete 去完成任务

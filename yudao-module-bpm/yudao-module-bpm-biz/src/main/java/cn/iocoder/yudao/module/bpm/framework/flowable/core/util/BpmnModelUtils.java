@@ -365,6 +365,23 @@ public class BpmnModelUtils {
         return Convert.toBool(extensionElements.get(0).getElementText(), false);
     }
 
+    public static void addReasonRequire(Boolean reasonRequire, FlowElement userTask) {
+        addExtensionElement(userTask, REASON_REQUIRE,
+                ObjUtil.isNotNull(reasonRequire) ? reasonRequire.toString() : Boolean.FALSE.toString());
+    }
+
+    public static Boolean parseReasonRequire(BpmnModel bpmnModel, String flowElementId) {
+        FlowElement flowElement = getFlowElementById(bpmnModel, flowElementId);
+        if (flowElement == null) {
+            return false;
+        }
+        List<ExtensionElement> extensionElements = flowElement.getExtensionElements().get(REASON_REQUIRE);
+        if (CollUtil.isEmpty(extensionElements)) {
+            return false;
+        }
+        return Convert.toBool(extensionElements.get(0).getElementText(), false);
+    }
+
     public static void addListenerConfig(FlowableListener flowableListener, BpmSimpleModelNodeVO.ListenerHandler handler) {
         FieldExtension fieldExtension = new FieldExtension();
         fieldExtension.setFieldName("listenerConfig");

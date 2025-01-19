@@ -115,4 +115,9 @@ public interface BpmnModelConstants {
      */
     String SIGN_ENABLE = "signEnable";
 
+    /**
+     * 审批意见是否必填
+     */
+    String REASON_REQUIRE = "reasonRequire";
+
 }

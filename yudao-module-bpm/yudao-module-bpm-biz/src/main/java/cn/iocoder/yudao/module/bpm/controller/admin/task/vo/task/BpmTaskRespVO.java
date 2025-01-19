@@ -81,6 +81,9 @@ public class BpmTaskRespVO {
     @Schema(description = "是否需要签名")
     private Boolean signEnable;
 
+    @Schema(description = "审批意见")
+    private Boolean reasonRequire;
+
     @Data
     @Schema(description = "流程实例")
     public static class ProcessInstance {

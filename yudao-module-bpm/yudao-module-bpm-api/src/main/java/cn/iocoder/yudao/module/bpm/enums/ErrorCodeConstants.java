@@ -55,6 +55,7 @@ public interface ErrorCodeConstants {
     ErrorCode TASK_TRANSFER_FAIL_USER_NOT_EXISTS = new ErrorCode(1_009_005_014, "任务转办失败，转办人不存在");
     ErrorCode TASK_CREATE_FAIL_NO_CANDIDATE_USER = new ErrorCode(1_009_006_003, "操作失败，原因：找不到任务的审批人！");
     ErrorCode TASK_SIGNATURE_NOT_EXISTS = new ErrorCode(1_009_005_015, "签名不能为空！");
+    ErrorCode TASK_REASON_REQUIRE = new ErrorCode(1_009_005_016, "审批意见不能为空！");
 
     // ========== 动态表单模块 1-009-010-000 ==========
     ErrorCode FORM_NOT_EXISTS = new ErrorCode(1_009_010_000, "动态表单不存在");
