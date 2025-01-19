@@ -101,20 +101,10 @@ public class BpmSimpleModelNodeVO {
     @Schema(description = "条件节点")
     private List<BpmSimpleModelNodeVO> conditionNodes; // 补充说明：有且仅有条件、并行、包容分支会使用
 
-    // TODO @jason：conditionType、conditionExpression、defaultFlow、conditionGroups 搞成一个 condition 属性，会好点么？
-    @Schema(description = "条件类型", example = "1")
-    @InEnum(BpmSimpleModeConditionType.class)
-    private Integer conditionType; // 仅用于条件节点 BpmSimpleModelNodeType.CONDITION_NODE
-
-    @Schema(description = "条件表达式", example = "${day>3}")
-    private String conditionExpression; // 仅用于条件节点 BpmSimpleModelNodeType.CONDITION_NODE
-
-    @Schema(description = "是否默认条件", example = "true")
-    private Boolean defaultFlow; // 仅用于条件节点 BpmSimpleModelNodeType.CONDITION_NODE
     /**
-     * 条件组
+     * 条件节点设置
      */
-    private ConditionGroups conditionGroups; // 仅用于条件节点 BpmSimpleModelNodeType.CONDITION_NODE
+    private ConditionSetting conditionSetting; // 仅用于条件节点 BpmSimpleModelNodeType.CONDITION_NODE
 
     @Schema(description = "路由分支组", example = "[]")
     private List<RouterCondition> routerGroups;
@@ -155,9 +145,7 @@ public class BpmSimpleModelNodeVO {
 
             @Schema(description = "值", example = "xxx")
             private String value;
-
         }
-
     }
 
     @Schema(description = "审批节点拒绝处理策略")
@@ -192,7 +180,6 @@ public class BpmSimpleModelNodeVO {
 
         @Schema(description = "最大提醒次数", example = "1")
         private Integer maxRemindCount;
-
     }
 
     @Schema(description = "空处理策略")
@@ -207,7 +194,6 @@ public class BpmSimpleModelNodeVO {
 
         @Schema(description = "指定人员审批的用户编号数组", example = "1")
         private List<Long> userIds;
-
     }
 
     @Schema(description = "操作按钮设置")
@@ -224,6 +210,28 @@ public class BpmSimpleModelNodeVO {
 
         @Schema(description = "是否启用", example = "true")
         private Boolean enable;
+    }
+
+    @Schema(description = "条件设置")
+    @Data
+    @Valid
+    // 仅用于条件节点 BpmSimpleModelNodeType.CONDITION_NODE
+    public static class ConditionSetting {
+
+        @Schema(description = "条件类型", example = "1")
+        @InEnum(BpmSimpleModeConditionType.class)
+        private Integer conditionType;
+
+        @Schema(description = "条件表达式", example = "${day>3}")
+        private String conditionExpression;
+
+        @Schema(description = "是否默认条件", example = "true")
+        private Boolean defaultFlow;
+
+        /**
+         * 条件组
+         */
+        private ConditionGroups conditionGroups;
     }
 
     @Schema(description = "条件组")
@@ -270,7 +278,6 @@ public class BpmSimpleModelNodeVO {
         @Schema(description = "运算符右边的值", example = "1")
         @NotEmpty(message = "运算符右边的值不能为空")
         private String rightSide;
-
     }
 
     @Schema(description = "延迟器")
@@ -286,7 +293,6 @@ public class BpmSimpleModelNodeVO {
         @Schema(description = "延迟时间表达式", example = "PT1H,2025-01-01T00:00:00")
         @NotEmpty(message = "延迟时间表达式不能为空")
         private String delayTime;
-
     }
 
     @Schema(description = "路由分支")
@@ -308,7 +314,5 @@ public class BpmSimpleModelNodeVO {
 
         @Schema(description = "条件组", example = "{}")
         private ConditionGroups conditionGroups;
-
     }
-
 }

@@ -544,7 +544,7 @@ public class SimpleModelUtils {
 
             // 设置默认的序列流（条件）
             BpmSimpleModelNodeVO defaultSeqFlow = CollUtil.findOne(node.getConditionNodes(),
-                    item -> BooleanUtil.isTrue(item.getDefaultFlow()));
+                    item -> BooleanUtil.isTrue(item.getConditionSetting().getDefaultFlow()));
             Assert.notNull(defaultSeqFlow, "条件分支节点({})的默认序列流不能为空", node.getId());
             exclusiveGateway.setDefaultFlow(defaultSeqFlow.getId());
             return exclusiveGateway;
@@ -587,7 +587,7 @@ public class SimpleModelUtils {
             inclusiveGateway.setId(node.getId());
             // 设置默认的序列流（条件）
             BpmSimpleModelNodeVO defaultSeqFlow = CollUtil.findOne(node.getConditionNodes(),
-                    item -> BooleanUtil.isTrue(item.getDefaultFlow()));
+                    item -> BooleanUtil.isTrue(item.getConditionSetting().getDefaultFlow()));
             Assert.notNull(defaultSeqFlow, "包容分支节点({})的默认序列流不能为空", node.getId());
             inclusiveGateway.setDefaultFlow(defaultSeqFlow.getId());
             // TODO @jason：setName
@@ -631,8 +631,8 @@ public class SimpleModelUtils {
          * @param node 条件节点
          */
         public static String buildConditionExpression(BpmSimpleModelNodeVO node) {
-            return buildConditionExpression(node.getConditionType(), node.getConditionExpression(),
-                    node.getConditionGroups());
+            return buildConditionExpression(node.getConditionSetting().getConditionType(), node.getConditionSetting().getConditionExpression(),
+                    node.getConditionSetting().getConditionGroups());
         }
 
         public static String buildConditionExpression(BpmSimpleModelNodeVO.RouterCondition router) {
@@ -771,11 +771,11 @@ public class SimpleModelUtils {
         if (nodeType == BpmSimpleModelNodeType.CONDITION_BRANCH_NODE) {
             // 查找满足条件的 BpmSimpleModelNodeVO 节点
             BpmSimpleModelNodeVO matchConditionNode = CollUtil.findOne(currentNode.getConditionNodes(),
-                    conditionNode -> !BooleanUtil.isTrue(conditionNode.getDefaultFlow())
+                    conditionNode -> !BooleanUtil.isTrue(conditionNode.getConditionSetting().getDefaultFlow())
                         && evalConditionExpress(variables, conditionNode));
             if (matchConditionNode == null) {
                 matchConditionNode = CollUtil.findOne(currentNode.getConditionNodes(),
-                        conditionNode -> BooleanUtil.isTrue(conditionNode.getDefaultFlow()));
+                        conditionNode -> BooleanUtil.isTrue(conditionNode.getConditionSetting().getDefaultFlow()));
             }
             Assert.notNull(matchConditionNode, "找不到条件节点({})", currentNode);
             // 遍历满足条件的 BpmSimpleModelNodeVO 节点
@@ -786,11 +786,11 @@ public class SimpleModelUtils {
         if (nodeType == BpmSimpleModelNodeType.INCLUSIVE_BRANCH_NODE) {
             // 查找满足条件的 BpmSimpleModelNodeVO 节点
             Collection<BpmSimpleModelNodeVO> matchConditionNodes = CollUtil.filterNew(currentNode.getConditionNodes(),
-                    conditionNode -> !BooleanUtil.isTrue(conditionNode.getDefaultFlow())
+                    conditionNode -> !BooleanUtil.isTrue(conditionNode.getConditionSetting().getDefaultFlow())
                             && evalConditionExpress(variables, conditionNode));
             if (CollUtil.isEmpty(matchConditionNodes)) {
                 matchConditionNodes = CollUtil.filterNew(currentNode.getConditionNodes(),
-                        conditionNode -> BooleanUtil.isTrue(conditionNode.getDefaultFlow()));
+                        conditionNode -> BooleanUtil.isTrue(conditionNode.getConditionSetting().getDefaultFlow()));
             }
             Assert.isTrue(!matchConditionNodes.isEmpty(), "找不到条件节点({})", currentNode);
             // 遍历满足条件的 BpmSimpleModelNodeVO 节点
