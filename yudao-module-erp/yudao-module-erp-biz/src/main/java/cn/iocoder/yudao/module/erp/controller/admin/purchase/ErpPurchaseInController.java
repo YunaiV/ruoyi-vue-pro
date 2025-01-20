@@ -36,6 +36,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.List;
 import java.util.Map;
 
@@ -82,7 +83,7 @@ public class ErpPurchaseInController {
     @Operation(summary = "更新采购入库的状态")
     @PreAuthorize("@ss.hasPermission('erp:purchase-in:update-status')")
     public CommonResult<Boolean> updatePurchaseInStatus(@RequestParam("id") Long id,
-                                                      @RequestParam("status") Integer status) {
+                                                        @RequestParam("status") Integer status) {
         purchaseInService.updatePurchaseInStatus(id, status);
         return success(true);
     }
@@ -107,14 +108,14 @@ public class ErpPurchaseInController {
         }
         List<ErpPurchaseInItemDO> purchaseInItemList = purchaseInService.getPurchaseInItemListByInId(id);
         Map<Long, ErpProductRespVO> productMap = productService.getProductVOMap(
-                convertSet(purchaseInItemList, ErpPurchaseInItemDO::getProductId));
+            convertSet(purchaseInItemList, ErpPurchaseInItemDO::getProductId));
         return success(BeanUtils.toBean(purchaseIn, ErpPurchaseInBaseRespVO.class, purchaseInVO ->
-                purchaseInVO.setItems(BeanUtils.toBean(purchaseInItemList, ErpPurchaseInBaseRespVO.Item.class, item -> {
-                    ErpStockDO stock = stockService.getStock(item.getProductId(), item.getWarehouseId());
-                    item.setStockCount(stock != null ? stock.getCount() : BigDecimal.ZERO);
-                    MapUtils.findAndThen(productMap, item.getProductId(), product -> item.setProductName(product.getName())
-                            .setProductBarCode(product.getBarCode()).setProductUnitName(product.getUnitName()));
-                }))));
+            purchaseInVO.setItems(BeanUtils.toBean(purchaseInItemList, ErpPurchaseInBaseRespVO.Item.class, item -> {
+                ErpStockDO stock = stockService.getStock(item.getProductId(), item.getWarehouseId());
+                item.setStockCount(stock != null ? stock.getCount() : BigDecimal.ZERO);
+                MapUtils.findAndThen(productMap, item.getProductId(), product -> item.setProductName(product.getName())
+                    .setProductBarCode(product.getBarCode()).setProductUnitName(product.getUnitName()));
+            }))));
     }
 
     @GetMapping("/page")
@@ -130,7 +131,7 @@ public class ErpPurchaseInController {
     @PreAuthorize("@ss.hasPermission('erp:purchase-in:export')")
     @ApiAccessLog(operateType = EXPORT)
     public void exportPurchaseInExcel(@Valid ErpPurchaseInPageReqVO pageReqVO,
-                                    HttpServletResponse response) throws IOException {
+                                      HttpServletResponse response) throws IOException {
         pageReqVO.setPageSize(PageParam.PAGE_SIZE_NONE);
         List<ErpPurchaseInBaseRespVO> list = buildPurchaseInVOPageResult(purchaseInService.getPurchaseInPage(pageReqVO)).getList();
         // 导出 Excel
@@ -143,17 +144,17 @@ public class ErpPurchaseInController {
         }
         // 1.1 入库项
         List<ErpPurchaseInItemDO> purchaseInItemList = purchaseInService.getPurchaseInItemListByInIds(
-                convertSet(pageResult.getList(), ErpPurchaseInDO::getId));
+            convertSet(pageResult.getList(), ErpPurchaseInDO::getId));
         Map<Long, List<ErpPurchaseInItemDO>> purchaseInItemMap = convertMultiMap(purchaseInItemList, ErpPurchaseInItemDO::getInId);
         // 1.2 产品信息
         Map<Long, ErpProductRespVO> productMap = productService.getProductVOMap(
-                convertSet(purchaseInItemList, ErpPurchaseInItemDO::getProductId));
+            convertSet(purchaseInItemList, ErpPurchaseInItemDO::getProductId));
         // 1.3 供应商信息
         Map<Long, ErpSupplierDO> supplierMap = supplierService.getSupplierMap(
-                convertSet(pageResult.getList(), ErpPurchaseInDO::getSupplierId));
+            convertSet(pageResult.getList(), ErpPurchaseInDO::getSupplierId));
         // 1.4 管理员信息
         Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(
-                convertSet(pageResult.getList(), purchaseIn -> Long.parseLong(purchaseIn.getCreator())));
+            convertSet(pageResult.getList(), purchaseIn -> Long.parseLong(purchaseIn.getCreator())));
         // 1.6 获取仓库信息
         Map<Long, ErpWarehouseDO> warehouseMap = erpWarehouseService.getWarehouseMap(
             convertSet(purchaseInItemList, ErpPurchaseInItemDO::getWarehouseId));
@@ -165,8 +166,8 @@ public class ErpPurchaseInController {
                     MapUtils.findAndThen(productMap, item.getProductId(), product -> item.setProductName(product.getName())
                         .setProductBarCode(product.getBarCode())
                         .setProductUnitName(product.getUnitName())//设置产品重量+体积+规格型号
-                        .setTotalVolume(product.getLength()*product.getHeight()*product.getWeight() * Double.parseDouble(String.valueOf(item.getCount())))
-                        .setTotalWeight(product.getWeight()*Double.parseDouble(String.valueOf(item.getCount())))
+                        .setTotalVolume(product.getLength() * product.getHeight() * product.getWidth() * Double.parseDouble(String.valueOf(item.getCount())))//总体积
+                        .setTotalWeight(product.getWeight().setScale(2, RoundingMode.HALF_UP).longValue() * Double.parseDouble(String.valueOf(item.getCount())))//总重量
                         .setModel(product.getModel())
                         .setCustomsDeclaration(product.getBrand())//产品品牌
                     );

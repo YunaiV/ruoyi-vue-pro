@@ -52,8 +52,8 @@ public class ErpSyncDataTest extends BaseDbUnitTest {
         ErpCustomRuleSaveReqVO erpCustomRuleSaveReqVO = new ErpCustomRuleSaveReqVO();
         erpCustomRuleSaveReqVO.setId(15675L);
         erpCustomRuleSaveReqVO.setCountryCode(1);
-        erpCustomRuleSaveReqVO.setType("报关");
-        erpCustomRuleSaveReqVO.setSupplierProductId(67890L);
+//        erpCustomRuleSaveReqVO.setType("报关");
+//        erpCustomRuleSaveReqVO.setSupplierProductId(67890L);
         erpCustomRuleSaveReqVO.setDeclaredTypeEn("Electronic Component");
         erpCustomRuleSaveReqVO.setDeclaredType("电子元件");
         erpCustomRuleSaveReqVO.setDeclaredValue(150.75);
