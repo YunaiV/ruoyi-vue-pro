@@ -184,7 +184,14 @@ public class WebUtils {
     }
 
     public static <T> T parseResponse(Response response, Class<T> responseClass) {
-        return JsonUtils.parseObject(getBodyString(response), responseClass);
+        String bodyString = "";
+        try {
+            bodyString = getBodyString(response);
+            return JsonUtils.parseObject(bodyString, responseClass);
+        } catch (RuntimeException e) {
+            throw new RuntimeException("parse error in response with body: \n" + bodyString + "\ncause: ", e);
+        }
+
     }
 
 
