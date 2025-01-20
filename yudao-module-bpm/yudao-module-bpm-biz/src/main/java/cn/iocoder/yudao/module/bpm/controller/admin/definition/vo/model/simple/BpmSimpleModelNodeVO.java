@@ -110,7 +110,7 @@ public class BpmSimpleModelNodeVO {
     private ConditionSetting conditionSetting; // 仅用于条件节点 BpmSimpleModelNodeType.CONDITION_NODE
 
     @Schema(description = "路由分支组", example = "[]")
-    private List<RouterCondition> routerGroups;
+    private List<RouterSetting> routerGroups;
 
     @Schema(description = "默认分支 ID", example = "Flow_xxx", hidden = true) // 由后端生成，所以 hidden = true
     private String defaultFlowId; // 仅用于路由分支节点 BpmSimpleModelNodeType.ROUTER_BRANCH_NODE
@@ -301,7 +301,7 @@ public class BpmSimpleModelNodeVO {
     @Schema(description = "路由分支")
     @Data
     @Valid
-    public static class RouterCondition {
+    public static class RouterSetting {
 
         @Schema(description = "节点 Id", example = "Activity_xxx") // 跳转到该节点
         @NotEmpty(message = "节点 Id 不能为空")
