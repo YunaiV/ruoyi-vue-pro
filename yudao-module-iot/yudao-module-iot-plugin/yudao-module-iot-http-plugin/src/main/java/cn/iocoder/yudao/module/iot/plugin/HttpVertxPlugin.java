@@ -1,22 +1,22 @@
 package cn.iocoder.yudao.module.iot.plugin;
 
-import cn.iocoder.yudao.module.iot.api.ServiceRegistry;
+import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.module.iot.api.device.DeviceDataApi;
 import io.vertx.core.Vertx;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.handler.BodyHandler;
+import lombok.extern.slf4j.Slf4j;
 import org.pf4j.PluginWrapper;
 import org.pf4j.spring.SpringPlugin;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-
-import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class HttpVertxPlugin extends SpringPlugin {
 
     private static final int PORT = 8092;
     private Vertx vertx;
+
     private DeviceDataApi deviceDataApi;
 
     public HttpVertxPlugin(PluginWrapper wrapper) {
@@ -28,7 +28,7 @@ public class HttpVertxPlugin extends SpringPlugin {
         log.info("HttpVertxPlugin.start()");
 
         // 获取 DeviceDataApi 实例
-        deviceDataApi = ServiceRegistry.getService(DeviceDataApi.class);
+        deviceDataApi = SpringUtil.getBean(DeviceDataApi.class);
         if (deviceDataApi == null) {
             log.error("未能从 ServiceRegistry 获取 DeviceDataApi 实例，请确保主程序已正确注册！");
             return;

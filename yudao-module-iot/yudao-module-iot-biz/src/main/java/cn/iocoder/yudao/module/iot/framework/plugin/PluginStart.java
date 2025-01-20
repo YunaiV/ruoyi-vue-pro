@@ -1,22 +1,20 @@
 package cn.iocoder.yudao.module.iot.framework.plugin;
 
-import java.util.List;
-
-import javax.annotation.Resource;
-
+import cn.hutool.core.collection.CollUtil;
+import cn.iocoder.yudao.framework.tenant.core.util.TenantUtils;
+import cn.iocoder.yudao.module.iot.dal.dataobject.plugininfo.PluginInfoDO;
+import cn.iocoder.yudao.module.iot.enums.plugin.IotPluginStatusEnum;
+import cn.iocoder.yudao.module.iot.service.plugin.PluginInfoService;
+import lombok.extern.slf4j.Slf4j;
 import org.pf4j.spring.SpringPluginManager;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
 
-import lombok.extern.slf4j.Slf4j;
+import javax.annotation.Resource;
+import java.util.List;
 
-import cn.iocoder.yudao.module.iot.service.plugin.PluginInfoService;
-import cn.hutool.core.collection.CollUtil;
-import cn.iocoder.yudao.framework.tenant.core.util.TenantUtils;
-import cn.iocoder.yudao.module.iot.dal.dataobject.plugininfo.PluginInfoDO;
-import cn.iocoder.yudao.module.iot.enums.plugin.IotPluginStatusEnum;
-
+// TODO @芋艿：需要 review 下
 @Component
 @Slf4j
 public class PluginStart implements ApplicationRunner {
