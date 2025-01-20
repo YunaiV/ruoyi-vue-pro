@@ -188,7 +188,7 @@ public class WebUtils {
         try {
             bodyString = getBodyString(response);
             return JsonUtils.parseObject(bodyString, responseClass);
-        } catch (RuntimeException e) {
+        } catch (Exception e) {
             throw new RuntimeException("parse error in response with body: \n" + bodyString + "\ncause: " + e);
         }
 
