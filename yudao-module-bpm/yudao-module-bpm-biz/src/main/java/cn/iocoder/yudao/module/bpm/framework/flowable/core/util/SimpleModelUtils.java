@@ -200,7 +200,7 @@ public class SimpleModelUtils {
         // 3. 遍历分支节点
         if (nodeType == BpmSimpleModelNodeType.ROUTER_BRANCH_NODE) {
             // 路由分支遍历
-            for (BpmSimpleModelNodeVO.RouterCondition router : node.getRouterGroups()) {
+            for (BpmSimpleModelNodeVO.RouterSetting router : node.getRouterGroups()) {
                 SequenceFlow sequenceFlow = RouteBranchNodeConvert.buildSequenceFlow(node.getId(), router);
                 process.addFlowElement(sequenceFlow);
             }
@@ -637,7 +637,7 @@ public class SimpleModelUtils {
                     node.getConditionSetting().getConditionGroups());
         }
 
-        public static String buildConditionExpression(BpmSimpleModelNodeVO.RouterCondition router) {
+        public static String buildConditionExpression(BpmSimpleModelNodeVO.RouterSetting router) {
             return buildConditionExpression(router.getConditionType(), router.getConditionExpression(),
                     router.getConditionGroups());
         }
@@ -729,7 +729,7 @@ public class SimpleModelUtils {
             return BpmSimpleModelNodeType.ROUTER_BRANCH_NODE;
         }
 
-        public static SequenceFlow buildSequenceFlow(String nodeId, BpmSimpleModelNodeVO.RouterCondition router) {
+        public static SequenceFlow buildSequenceFlow(String nodeId, BpmSimpleModelNodeVO.RouterSetting router) {
             String conditionExpression = ConditionNodeConvert.buildConditionExpression(router);
             return buildBpmnSequenceFlow(nodeId, router.getNodeId(), null, null, conditionExpression);
         }
