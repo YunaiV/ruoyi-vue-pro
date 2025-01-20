@@ -233,7 +233,7 @@ public class SimpleModelUtils {
             process.addFlowElement(sequenceFlow);
         // 4.2 如果是路由分支，需要连接后续节点为默认路由
         } else if (nodeType == BpmSimpleModelNodeType.ROUTER_BRANCH_NODE) {
-            SequenceFlow sequenceFlow = buildBpmnSequenceFlow(node.getId(), branchEndNodeId, node.getDefaultFlowId(),
+            SequenceFlow sequenceFlow = buildBpmnSequenceFlow(node.getId(), branchEndNodeId, node.getRouterDefaultFlowId(),
                     null, null);
             process.addFlowElement(sequenceFlow);
         }
@@ -719,8 +719,8 @@ public class SimpleModelUtils {
             exclusiveGateway.setId(node.getId());
 
             // 设置默认的序列流（条件）
-            node.setDefaultFlowId("Flow_" + IdUtil.fastUUID());
-            exclusiveGateway.setDefaultFlow(node.getDefaultFlowId());
+            node.setRouterDefaultFlowId("Flow_" + IdUtil.fastUUID());
+            exclusiveGateway.setDefaultFlow(node.getRouterDefaultFlowId());
             return exclusiveGateway;
         }
 
