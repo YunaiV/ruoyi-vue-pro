@@ -3,7 +3,6 @@ package cn.iocoder.yudao.module.erp.dal.redis.no;
 import cn.hutool.core.date.DatePattern;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.text.StrPool;
-import cn.hutool.core.util.ObjUtil;
 import cn.iocoder.yudao.framework.common.exception.ErrorCode;
 import cn.iocoder.yudao.framework.common.exception.util.ThrowUtil;
 import cn.iocoder.yudao.module.erp.dal.redis.RedisKeyConstants;
@@ -14,7 +13,6 @@ import org.springframework.stereotype.Repository;
 import java.time.Duration;
 import java.time.LocalDateTime;
 
-import static cn.iocoder.yudao.module.erp.enums.ErrorCodeConstants.PURCHASE_REQUEST_NO_EXISTS;
 
 
 /**
@@ -89,7 +87,8 @@ public class ErpNoRedisDAO {
     /**
      * 生成序号，使用当前日期，格式为 {PREFIX} + "_" + yyyyMMdd + "_" + 6 位自增
      * 例如说：QTRK-20211009-000001 （没有中间空格）
-     *
+     *<p>
+     *     可能出现并发问题、考虑redisson解决、后续
      * @param prefix 前缀
      * @return 序号
      */

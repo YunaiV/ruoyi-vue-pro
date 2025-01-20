@@ -97,10 +97,11 @@ public class ErpPurchaseRequestController {
     @Parameter(name = "requestId", description = "申请单编号", required = true)
     @Parameter(name = "reviewed", description = "审核状态", required = true)
     @PreAuthorize("@ss.hasPermission('erp:purchase-order:review')")
-    public CommonResult<Boolean> reviewPurchaseOrder(@RequestParam("requestId") Long requestId,
+    public CommonResult<Boolean> reviewPurchaseRequest(@RequestParam("requestId") Long requestId,
                                                      @RequestParam("reviewed") Boolean reviewed) {
         //TODO 审核订单-审核、反审核
 //        purchaseOrderService.updatePurchaseOrderStatus(id, status);
+        erpPurchaseRequestService.reviewPurchaseOrder(requestId, reviewed);
         return success(true);
     }
     @PutMapping("/status")

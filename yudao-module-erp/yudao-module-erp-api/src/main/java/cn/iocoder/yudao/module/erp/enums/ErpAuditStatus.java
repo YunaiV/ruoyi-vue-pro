@@ -18,11 +18,16 @@ import java.util.Map;
 @Getter
 public enum ErpAuditStatus implements IntArrayValuable {
 
-    CLOSED(0, "已关闭"),// 已关闭
-    OPENED(1, "已开启"),// 已开启
-    MANUAL_CLOSED(91, "手动关闭"),//手动关闭
-    PROCESS(10, "未审核"), // 未审核
-    APPROVE(20, "已审核"), // 审核通过
+    CLOSED(0, "已关闭"),
+    OPENED(1, "已开启"),
+    MANUAL_CLOSED(91, "手动关闭"),
+    APPROVE(20, "已审核"),
+    PROCESS(10, "未审核"),
+    OT_ORDERED(41, "未订购"),
+    ORDERED(42, "已订购"),
+    PARTIALLY_ORDERED(43, "部分订购"),
+    ORDER_FAILED(44, "订购失败"),
+    ON_HOLD(45, "待处理"),
     ;
     private static final Map<Integer, ErpAuditStatus> STATUS_MAP = new HashMap<>();
 

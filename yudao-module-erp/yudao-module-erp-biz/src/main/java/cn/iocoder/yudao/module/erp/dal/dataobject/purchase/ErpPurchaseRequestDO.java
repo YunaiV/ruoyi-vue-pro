@@ -44,13 +44,17 @@ public class ErpPurchaseRequestDO extends BaseDO {
      */
     private LocalDateTime requestTime;
     /**
-     * 审核状态(0:待审核，1:审核通过，2:审核未通过)
+     * 审核状态
      */
     private Integer status;
     /**
-     * 关闭状态（0已关闭，1已开启）
+     * 关闭状态
      */
     private Integer offStatus;
+    /**
+     * 订购状态
+     */
+    private Integer orderStatus;
     /**
      * 审核者
      */

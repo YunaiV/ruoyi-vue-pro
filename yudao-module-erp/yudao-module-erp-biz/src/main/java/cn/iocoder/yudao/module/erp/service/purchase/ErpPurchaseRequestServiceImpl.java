@@ -67,17 +67,19 @@ public class ErpPurchaseRequestServiceImpl implements ErpPurchaseRequestService 
         //1.2 校验子表合法
         List<ErpPurchaseRequestItemsDO> itemsDOList = validatePurchaseRequestItems(createReqVO.getItems());
         //1.3 校验部门合法
-        erpWarehouseService.validWarehouseList(Collections.singleton(createReqVO.getApplicationDept()));
+        erpWarehouseService.validWarehouse(createReqVO.getApplicationDept());
         //1.4 校验申请人合法
         adminUserApi.validateUser(createReqVO.getApplicant());
         //bean拷贝
         ErpPurchaseRequestDO purchaseRequest = BeanUtils.toBean(createReqVO, ErpPurchaseRequestDO.class);
         //为单据编号赋值
         purchaseRequest.setNo(no);
-        //为单据编号设置初始审核状态
+        //审核状态
         purchaseRequest.setStatus(ErpAuditStatus.PROCESS.getStatus());
-        //设置开启状态
+        //关闭状态
         purchaseRequest.setOffStatus(ErpAuditStatus.OPENED.getStatus());
+        //订购状态
+        purchaseRequest.setOrderStatus(ErpAuditStatus.OT_ORDERED.getStatus());
 
         //2. 插入主表的申请单数据
         ThrowUtil.ifThrow(erpPurchaseRequestMapper.insert(purchaseRequest) <= 0, PURCHASE_REQUEST_ADD_FAIL_APPROVE);
@@ -186,7 +188,42 @@ public class ErpPurchaseRequestServiceImpl implements ErpPurchaseRequestService 
      */
     @Override
     public void reviewPurchaseOrder(Long requestId, Boolean reviewed) {
+        // 1. 校验采购订单是否存在
+        ErpPurchaseRequestDO erpPurchaseRequestDO = validatePurchaseRequestExists(requestId);
 
+        // 2. 判断是否需要审核
+        if (Boolean.TRUE.equals(reviewed)) {
+            // 审核操作
+            // 2.1 校验当前状态是否可以审核
+            ThrowUtil.ifThrow(erpPurchaseRequestDO.getStatus().equals(ErpAuditStatus.APPROVE.getStatus()),
+                PURCHASE_REQUEST_APPROVE_FAIL, erpPurchaseRequestDO.getNo());
+            // 2.2 更新状态为已审核
+            erpPurchaseRequestDO.setStatus(ErpAuditStatus.APPROVE.getStatus());
+
+            // 2.3 如果需要，根据业务要求更新其他状态字段（例如关闭状态、订购状态等）
+//            erpPurchaseRequestDO.setOffStatus(ErpAuditStatus.OPENED.getStatus());  // 设置为已开启，假设审核时需要开启订单
+//            erpPurchaseRequestMapper.updateById(erpPurchaseRequestDO);
+
+            // 2.4 执行其他操作，如日志记录、通知等（可以根据需求进一步补充）
+//            logAuditAction(erpPurchaseRequestDO, "审核通过");
+
+        } else {
+            // 反审核操作
+            // 3.1 校验当前状态是否可以反审核
+            ThrowUtil.ifThrow(erpPurchaseRequestDO.getStatus().equals(ErpAuditStatus.PROCESS.getStatus()),
+                PURCHASE_REQUEST_PROCESS_FAIL, erpPurchaseRequestDO.getNo());
+
+            // 3.2 更新状态为未审核
+            erpPurchaseRequestDO.setStatus(ErpAuditStatus.PROCESS.getStatus());
+
+            // 3.3 恢复关闭状态等其他字段（如果有的话）
+//            erpPurchaseRequestDO.setOffStatus(ErpAuditStatus.CLOSED.getStatus());  // 假设反审核时需要关闭订单
+//            erpPurchaseRequestMapper.updateById(erpPurchaseRequestDO);
+
+            // 3.4 执行其他操作，如日志记录、通知等（可以根据需求进一步补充）
+//            logAuditAction(erpPurchaseRequestDO, "反审核");
+
+        }
     }
 
     /**
@@ -318,8 +355,9 @@ public class ErpPurchaseRequestServiceImpl implements ErpPurchaseRequestService 
         if (CollUtil.isEmpty(purchaseRequestDOs)) {
             return;
         }
+        // 1.1 是否已审核
         purchaseRequestDOs.forEach(erpPurchaseRequestDO -> {
-            ThrowUtil.ifThrow(!erpPurchaseRequestDO.getStatus().equals(ErpAuditStatus.APPROVE.getStatus()), PURCHASE_REQUEST_DELETE_FAIL_APPROVE, erpPurchaseRequestDO.getNo());
+            ThrowUtil.ifThrow(erpPurchaseRequestDO.getStatus().equals(ErpAuditStatus.APPROVE.getStatus()), PURCHASE_REQUEST_DELETE_FAIL_APPROVE, erpPurchaseRequestDO.getNo());
         });
 
         // 2. 遍历删除，并记录操作日志
@@ -340,7 +378,6 @@ public class ErpPurchaseRequestServiceImpl implements ErpPurchaseRequestService 
         ThrowUtil.ifThrow(erpPurchaseRequestDO == null, PURCHASE_REQUEST_NOT_EXISTS);
         return erpPurchaseRequestDO;
     }
-
 
     @Override
     public ErpPurchaseRequestDO getPurchaseRequest(Long id) {

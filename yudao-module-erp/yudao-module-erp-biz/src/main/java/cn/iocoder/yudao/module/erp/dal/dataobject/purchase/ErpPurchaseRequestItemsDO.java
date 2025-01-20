@@ -52,7 +52,7 @@ public class ErpPurchaseRequestItemsDO extends BaseDO {
      */
     private BigDecimal actTaxPrice;
     /**
-     * 关闭状态（0已关闭，1已开启）
+     * 关闭状态
      */
     private Integer offStatus;
     /**
