@@ -5,11 +5,13 @@ import cn.iocoder.yudao.module.iot.api.device.DeviceDataApi;
 import cn.iocoder.yudao.module.iot.framework.plugin.listener.CustomPluginStateListener;
 import lombok.extern.slf4j.Slf4j;
 import org.pf4j.spring.SpringPluginManager;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
 
 import javax.annotation.Resource;
+import java.nio.file.Paths;
 
 @Slf4j
 @Configuration
@@ -19,6 +21,8 @@ public class UnifiedConfiguration {
 
     @Resource
     private DeviceDataApi deviceDataApi;
+    @Value("${pf4j.pluginsDir:pluginsDir}")
+    private String pluginsDir;
 
     @Bean(SERVICE_REGISTRY_INITIALIZED_MARKER)
     public Object serviceRegistryInitializedMarker() {
@@ -31,7 +35,7 @@ public class UnifiedConfiguration {
     @DependsOn(SERVICE_REGISTRY_INITIALIZED_MARKER)
     public SpringPluginManager pluginManager() {
         log.info("[init][实例化 SpringPluginManager]");
-        SpringPluginManager springPluginManager = new SpringPluginManager() {
+        SpringPluginManager springPluginManager = new SpringPluginManager(Paths.get(pluginsDir)) {
             @Override
             public void startPlugins() {
                 // 禁用插件启动，避免插件启动时，启动所有插件
