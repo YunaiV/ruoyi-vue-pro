@@ -27,13 +27,13 @@ public class ErpPurchaseRequestPageReqVO extends PageParam {
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
     private LocalDateTime[] requestTime;
 
-    @Schema(description = "审核状态(0:待审核，1:审核通过，2:审核未通过)", example = "2")
+    @Schema(description = "审核状态")
     private Integer status;
 
-    @Schema(description = "关闭状态（0已关闭，1已开启）", example = "1")
+    @Schema(description = "关闭状态")
     private Integer offStatus;
 
-    @Schema(description = "订购状态（0部分订购，1全部订购）", example = "1")
+    @Schema(description = "订购状态")
     private Integer orderStatus;
 
     @Schema(description = "审核者")

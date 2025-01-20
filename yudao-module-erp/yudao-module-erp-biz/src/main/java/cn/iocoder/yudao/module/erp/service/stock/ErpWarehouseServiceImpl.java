@@ -13,10 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
@@ -107,6 +104,16 @@ public class ErpWarehouseServiceImpl implements ErpWarehouseService {
         return list;
     }
 
+    /**
+     * 校验仓库得有效性(单个)
+     *
+     * @param id 仓库id
+     */
+    @Override
+    public void validWarehouse(Long id) {
+        validWarehouseList(Collections.singleton(id));
+    }
+
     @Override
     public List<ErpWarehouseDO> getWarehouseListByStatus(Integer status) {
         return warehouseMapper.selectListByStatus(status);
@@ -114,6 +121,9 @@ public class ErpWarehouseServiceImpl implements ErpWarehouseService {
 
     @Override
     public List<ErpWarehouseDO> getWarehouseList(Collection<Long> ids) {
+        if (CollUtil.isEmpty(ids)){
+            return Collections.emptyList();
+        }
         return warehouseMapper.selectBatchIds(ids);
     }
 

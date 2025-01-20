@@ -36,22 +36,41 @@ public class ErpPurchaseInDO extends BaseDO {
     private String no;
     /**
      * 入库状态
-     *
      * 枚举 {@link cn.iocoder.yudao.module.erp.enums.ErpAuditStatus}
      */
     private Integer status;
     /**
      * 供应商编号
-     *
      * 关联 {@link ErpSupplierDO#getId()}
      */
     private Long supplierId;
     /**
      * 结算账户编号
-     *
      * 关联 {@link ErpAccountDO#getId()}
      */
     private Long accountId;
+    /**
+     * 单据日期
+     */
+    private LocalDateTime noTime;
+    /**
+     * 币别
+     */
+    private Long currencyId;
+
+    /**
+     * 审核人ID
+     */
+    private String auditorId;
+    /**
+     * 汇率
+     */
+    private BigDecimal exchangeRate;
+
+    /**
+     * 结算日期
+     */
+    private LocalDateTime settlementDate;
     /**
      * 入库时间
      */
@@ -59,13 +78,11 @@ public class ErpPurchaseInDO extends BaseDO {
 
     /**
      * 采购订单编号
-     *
      * 关联 {@link ErpPurchaseOrderDO#getId()}
      */
     private Long orderId;
     /**
      * 采购订单号
-     *
      * 冗余 {@link ErpPurchaseOrderDO#getNo()}
      */
     private String orderNo;
@@ -76,13 +93,11 @@ public class ErpPurchaseInDO extends BaseDO {
     private BigDecimal totalCount;
     /**
      * 最终合计价格，单位：元
-     *
      * totalPrice = totalProductPrice + totalTaxPrice - discountPrice + otherPrice
      */
     private BigDecimal totalPrice;
     /**
      * 已支付金额，单位：元
-     *
      * 目的：和 {@link cn.iocoder.yudao.module.erp.dal.dataobject.finance.ErpFinancePaymentDO} 结合，记录已支付金额
      */
     private BigDecimal paymentPrice;
@@ -101,7 +116,6 @@ public class ErpPurchaseInDO extends BaseDO {
     private BigDecimal discountPercent;
     /**
      * 优惠金额，单位：元
-     *
      * discountPrice = (totalProductPrice + totalTaxPrice) * discountPercent
      */
     private BigDecimal discountPrice;
@@ -119,4 +133,13 @@ public class ErpPurchaseInDO extends BaseDO {
      */
     private String remark;
 
+    /**
+     * 对账状态(false:未对账 ，true:已对账)
+     */
+    private Boolean reconciliationStatus;
+
+    /**
+     * 入库审核状态
+     */
+    private Integer auditorStatus;
 }

@@ -2,6 +2,8 @@ package cn.iocoder.yudao.module.erp.service.purchase;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.exception.util.ThrowUtil;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.request.ErpPurchaseRequestItemsSaveReqVO;
 import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.request.ErpPurchaseRequestPageReqVO;
 import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.request.ErpPurchaseRequestSaveReqVO;
@@ -12,19 +14,23 @@ import cn.iocoder.yudao.module.erp.dal.mysql.purchase.ErpPurchaseRequestMapper;
 import cn.iocoder.yudao.module.erp.dal.redis.no.ErpNoRedisDAO;
 import cn.iocoder.yudao.module.erp.enums.ErpAuditStatus;
 import cn.iocoder.yudao.module.erp.service.product.ErpProductService;
+import cn.iocoder.yudao.module.erp.service.stock.ErpWarehouseService;
+import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
-import java.time.LocalDate;
+
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import static cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants.DB_BATCH_INSERT_ERROR;
-import static cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants.DB_INSERT_ERROR;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
 import static cn.iocoder.yudao.module.erp.enums.ErrorCodeConstants.*;
 
@@ -35,58 +41,96 @@ import static cn.iocoder.yudao.module.erp.enums.ErrorCodeConstants.*;
  */
 @Service
 @Validated
-@RequiredArgsConstructor
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class ErpPurchaseRequestServiceImpl implements ErpPurchaseRequestService {
     private final ErpPurchaseRequestMapper erpPurchaseRequestMapper;
     private final ErpPurchaseRequestItemsMapper erpPurchaseRequestItemsMapper;
+    private final ErpWarehouseService erpWarehouseService;
     private final ErpProductService productService;
     private final ErpNoRedisDAO noRedisDAO;
+    private final AdminUserApi adminUserApi;
 
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Long createPurchaseRequest(ErpPurchaseRequestSaveReqVO createReqVO) {
-        //获取单据日期
+        //获取单据日期，不为空就拿，为空就当前时间
         LocalDateTime date = createReqVO.getRequestTime();
-        //转化为LocalDate
-        LocalDate dateTime = date.toLocalDate();
+        if (date == null) {
+            createReqVO.setRequestTime(LocalDateTime.now());
+        }
+        //1.校验
         //生成单据编号
         String no = noRedisDAO.generate(ErpNoRedisDAO.PURCHASE_REQUEST_NO_PREFIX, PURCHASE_REQUEST_NO_OUT_OF_BOUNDS);
-        //校验编号no是否在数据库中重复
-        ThrowUtil.ifThrow(erpPurchaseRequestMapper.selectByNo(no) != null ,PURCHASE_REQUEST_NO_EXISTS);
+        //1.1 校验编号no是否在数据库中重复
+        ThrowUtil.ifThrow(erpPurchaseRequestMapper.selectByNo(no) != null, PURCHASE_REQUEST_NO_EXISTS);
+        //1.2 校验子表合法
+        List<ErpPurchaseRequestItemsDO> itemsDOList = validatePurchaseRequestItems(createReqVO.getItems());
+        //1.3 校验部门合法
+        erpWarehouseService.validWarehouse(createReqVO.getApplicationDept());
+        //1.4 校验申请人合法
+        adminUserApi.validateUser(createReqVO.getApplicant());
         //bean拷贝
         ErpPurchaseRequestDO purchaseRequest = BeanUtils.toBean(createReqVO, ErpPurchaseRequestDO.class);
         //为单据编号赋值
         purchaseRequest.setNo(no);
-        //校验产品是否存在
-        List<ErpPurchaseRequestItemsDO> itemsDOList = validatePurchaseRequestItems(createReqVO.getItems());
-        // 插入主表的申请单数据
-        ThrowUtil.ifThrow(erpPurchaseRequestMapper.insert(purchaseRequest)<=0,DB_INSERT_ERROR);
+        //审核状态
+        purchaseRequest.setStatus(ErpAuditStatus.PROCESS.getStatus());
+        //关闭状态
+        purchaseRequest.setOffStatus(ErpAuditStatus.OPENED.getStatus());
+        //订购状态
+        purchaseRequest.setOrderStatus(ErpAuditStatus.OT_ORDERED.getStatus());
+
+        //2. 插入主表的申请单数据
+        ThrowUtil.ifThrow(erpPurchaseRequestMapper.insert(purchaseRequest) <= 0, PURCHASE_REQUEST_ADD_FAIL_APPROVE);
         //获取主表主键id
         Long id = purchaseRequest.getId();
         //将父id赋予子表
         itemsDOList.forEach(i -> i.setRequestId(id));
-        //批量插入子表数据
-        ThrowUtil.ifThrow(!erpPurchaseRequestItemsMapper.insertBatch(itemsDOList),DB_BATCH_INSERT_ERROR);
+        //设置行开启状态
+        itemsDOList.forEach(i -> i.setOffStatus(ErpAuditStatus.OPENED.getStatus()));
+        //3. 批量插入子表数据
+        ThrowUtil.ifThrow(!erpPurchaseRequestItemsMapper.insertBatch(itemsDOList), PURCHASE_REQUEST_ADD_FAIL_PRODUCT);
         // 返回单据id
         return id;
     }
 
-    private List<ErpPurchaseRequestItemsDO> validatePurchaseRequestItems(List<ErpPurchaseRequestItemsSaveReqVO> items) {
-        // 1. 校验产品存在
+    @Override
+    public List<ErpPurchaseRequestItemsDO> validatePurchaseRequestItems(List<ErpPurchaseRequestItemsSaveReqVO> items) {
+        // 1. 校验产品有效性
         productService.validProductList(convertSet(items, ErpPurchaseRequestItemsSaveReqVO::getProductId));
+        // 1.1 校验仓库有效性
+        erpWarehouseService.validWarehouseList(convertSet(items, ErpPurchaseRequestItemsSaveReqVO::getWarehouseId));
         // 2. 转化为 ErpPurchaseRequestItemsDO 列表
         return convertList(items, o -> BeanUtils.toBean(o, ErpPurchaseRequestItemsDO.class));
     }
 
     @Override
+    public void validatePurchaseRequestItemsMasterId(Long masterId, List<Long> ids) {
+        // 验证ids在数据库中是否存在
+        ThrowUtil.ifThrow(erpPurchaseRequestItemsMapper.selectListByIds(ids).stream().noneMatch(i -> ids.contains(i.getId())), PURCHASE_REQUEST_ITEM_NOT_EXISTS, ids);
+        // 校验子单requestId是否关联主单的id
+        ThrowUtil.ifThrow(erpPurchaseRequestItemsMapper.selectListByRequestId(masterId).stream().noneMatch(i -> ids.contains(i.getId())), PURCHASE_REQUEST_UPDATE_FAIL_REQUEST_ID, masterId);
+    }
+
+    @Override
     @Transactional(rollbackFor = Exception.class)
     public void updatePurchaseRequest(ErpPurchaseRequestSaveReqVO updateReqVO) {
-        // 校验存在
+        //1. 校验存在
         ErpPurchaseRequestDO erpPurchaseRequestDO = validatePurchaseRequestExists(updateReqVO.getId());
-        //判断申请单是否应被审核
-        ThrowUtil.ifThrow(erpPurchaseRequestDO.getStatus().equals(ErpAuditStatus.APPROVE.getStatus()),PURCHASE_REQUEST_UPDATE_FAIL_APPROVE,erpPurchaseRequestDO.getNo());
-        //校验产品是否存在
+        //1.1 判断已审核
+        ThrowUtil.ifThrow(erpPurchaseRequestDO.getStatus().equals(ErpAuditStatus.APPROVE.getStatus()), PURCHASE_REQUEST_UPDATE_FAIL_APPROVE, erpPurchaseRequestDO.getNo());
+        //1.2 判断已关闭
+        ThrowUtil.ifThrow(erpPurchaseRequestDO.getOffStatus().equals(ErpAuditStatus.CLOSED.getStatus()), PURCHASE_REQUEST_CLOSED, erpPurchaseRequestDO.getNo());
+        //1.3 判断已手动关闭
+        ThrowUtil.ifThrow(erpPurchaseRequestDO.getOffStatus().equals(ErpAuditStatus.MANUAL_CLOSED.getStatus()), PURCHASE_REQUEST_MANUAL_CLOSED, erpPurchaseRequestDO.getNo());
+        //1.4 校验子单requestId是否关联主单的id
+        List<ErpPurchaseRequestItemsDO> requestItemsDOS = erpPurchaseRequestItemsMapper.findItemsGroupedByRequestId(List.of(updateReqVO.getId())).get(updateReqVO.getId());
+        for (@Valid ErpPurchaseRequestItemsSaveReqVO itemsSaveReqVO : updateReqVO.getItems()) {
+            // 判断子单requestId是否关联主单的id，抛出异常
+            ThrowUtil.ifThrow(requestItemsDOS.stream().noneMatch(itemDO -> itemDO.getId().equals(itemsSaveReqVO.getId())), PURCHASE_REQUEST_UPDATE_FAIL_REQUEST_ID, itemsSaveReqVO.getId());
+        }
+        //1.5 校验产品是否存在
         List<ErpPurchaseRequestItemsDO> itemsDOList = validatePurchaseRequestItems(updateReqVO.getItems());
         // 2.1 更新订单
         ErpPurchaseRequestDO updateObj = BeanUtils.toBean(updateReqVO, ErpPurchaseRequestDO.class);
@@ -100,7 +144,7 @@ public class ErpPurchaseRequestServiceImpl implements ErpPurchaseRequestService 
         List<ErpPurchaseRequestItemsDO> oldList = erpPurchaseRequestItemsMapper.selectListByRequestId(id);
         // id 不同，就认为是不同的记录
         List<List<ErpPurchaseRequestItemsDO>> diffList = diffList(oldList, itemsDOList,
-                (oldVal, newVal) -> oldVal.getId().equals(newVal.getId()));
+            (oldVal, newVal) -> oldVal.getId().equals(newVal.getId()));
         // 第二步，批量添加、修改、删除
         if (CollUtil.isNotEmpty(diffList.get(0))) {
             diffList.get(0).forEach(o -> o.setRequestId(id));
@@ -110,7 +154,7 @@ public class ErpPurchaseRequestServiceImpl implements ErpPurchaseRequestService 
             erpPurchaseRequestItemsMapper.updateBatch(diffList.get(1));
         }
         if (CollUtil.isNotEmpty(diffList.get(2))) {
-            erpPurchaseRequestItemsMapper.deleteBatchIds(convertList(diffList.get(2), ErpPurchaseRequestItemsDO::getId));
+            erpPurchaseRequestItemsMapper.deleteByIds(convertList(diffList.get(2), ErpPurchaseRequestItemsDO::getId));
         }
     }
 
@@ -118,14 +162,14 @@ public class ErpPurchaseRequestServiceImpl implements ErpPurchaseRequestService 
     @Transactional(rollbackFor = Exception.class)
     public void updatePurchaseRequestStatus(Long id, Integer status) {
         boolean approve = ErpAuditStatus.APPROVE.getStatus().equals(status);
-        // 1.1 校验存在
+        // 1.1 校验采购订单id存在
         ErpPurchaseRequestDO erpPurchaseRequest = validatePurchaseRequestExists(id);
         // 1.2 校验状态
-        ThrowUtil.ifThrow(erpPurchaseRequest.getStatus().equals(status),approve ? PURCHASE_REQUEST_APPROVE_FAIL : PURCHASE_REQUEST_PROCESS_FAIL);
+        ThrowUtil.ifThrow(erpPurchaseRequest.getStatus().equals(status), approve ? PURCHASE_REQUEST_APPROVE_FAIL : PURCHASE_REQUEST_PROCESS_FAIL);
         // 2. 更新状态
         int updateCount = erpPurchaseRequestMapper.updateByIdAndStatus(id, erpPurchaseRequest.getStatus(),
-                new ErpPurchaseRequestDO().setStatus(status));
-        ThrowUtil.ifThrow(updateCount <= 0 , approve ? PURCHASE_REQUEST_APPROVE_FAIL : PURCHASE_REQUEST_PROCESS_FAIL);
+            new ErpPurchaseRequestDO().setStatus(status));
+        ThrowUtil.ifThrow(updateCount <= 0, approve ? PURCHASE_REQUEST_APPROVE_FAIL : PURCHASE_REQUEST_PROCESS_FAIL);
     }
 
     @Override
@@ -136,6 +180,173 @@ public class ErpPurchaseRequestServiceImpl implements ErpPurchaseRequestService 
         return erpPurchaseRequestItemsMapper.selectListByRequestIds(requestIds);
     }
 
+    /**
+     * 审核/反审核采购订单
+     *
+     * @param requestId 采购订单id
+     * @param reviewed  审核状态
+     */
+    @Override
+    public void reviewPurchaseOrder(Long requestId, Boolean reviewed) {
+        // 1. 校验采购订单是否存在
+        ErpPurchaseRequestDO erpPurchaseRequestDO = validatePurchaseRequestExists(requestId);
+
+        // 2. 判断是否需要审核
+        if (Boolean.TRUE.equals(reviewed)) {
+            // 审核操作
+            // 2.1 校验当前状态是否可以审核
+            ThrowUtil.ifThrow(erpPurchaseRequestDO.getStatus().equals(ErpAuditStatus.APPROVE.getStatus()),
+                PURCHASE_REQUEST_APPROVE_FAIL, erpPurchaseRequestDO.getNo());
+            // 2.2 更新状态为已审核
+            erpPurchaseRequestDO.setStatus(ErpAuditStatus.APPROVE.getStatus());
+
+            // 2.3 如果需要，根据业务要求更新其他状态字段（例如关闭状态、订购状态等）
+//            erpPurchaseRequestDO.setOffStatus(ErpAuditStatus.OPENED.getStatus());  // 设置为已开启，假设审核时需要开启订单
+//            erpPurchaseRequestMapper.updateById(erpPurchaseRequestDO);
+
+            // 2.4 执行其他操作，如日志记录、通知等（可以根据需求进一步补充）
+//            logAuditAction(erpPurchaseRequestDO, "审核通过");
+
+        } else {
+            // 反审核操作
+            // 3.1 校验当前状态是否可以反审核
+            ThrowUtil.ifThrow(erpPurchaseRequestDO.getStatus().equals(ErpAuditStatus.PROCESS.getStatus()),
+                PURCHASE_REQUEST_PROCESS_FAIL, erpPurchaseRequestDO.getNo());
+
+            // 3.2 更新状态为未审核
+            erpPurchaseRequestDO.setStatus(ErpAuditStatus.PROCESS.getStatus());
+
+            // 3.3 恢复关闭状态等其他字段（如果有的话）
+//            erpPurchaseRequestDO.setOffStatus(ErpAuditStatus.CLOSED.getStatus());  // 假设反审核时需要关闭订单
+//            erpPurchaseRequestMapper.updateById(erpPurchaseRequestDO);
+
+            // 3.4 执行其他操作，如日志记录、通知等（可以根据需求进一步补充）
+//            logAuditAction(erpPurchaseRequestDO, "反审核");
+
+        }
+    }
+
+    /**
+     * 关闭/启用采购申请单子项状态
+     *
+     * @param requestId 采购订单id
+     * @param itemIds   采购订单子项id集合
+     * @param enable    是否开启（true 表示开启，false 表示关闭）
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void switchPurchaseOrderStatus(Long requestId, List<Long> itemIds, Boolean enable) {
+        // 校验采购申请单是否存在
+        ErpPurchaseRequestDO erpPurchaseRequestDO = validatePurchaseRequestExists(requestId);
+
+        // 根据 enable 参数判断是开启还是关闭状态
+        if (Boolean.TRUE.equals(enable)) {
+            // 处理启用状态
+            handleEnableStatus(requestId, itemIds, erpPurchaseRequestDO);
+        } else {
+            // 处理关闭状态
+            handleDisableStatus(requestId, itemIds, erpPurchaseRequestDO);
+        }
+    }
+
+    /**
+     * 处理启用状态的逻辑
+     *
+     * @param requestId 采购订单id
+     * @param itemIds   采购订单子项id集合
+     * @param erpPurchaseRequestDO 采购申请单对象
+     */
+    private void handleEnableStatus(Long requestId, List<Long> itemIds, ErpPurchaseRequestDO erpPurchaseRequestDO) {
+        // 1. 校验：如果采购申请单已经是开启状态，抛出异常
+        ThrowUtil.ifThrow(erpPurchaseRequestDO.getOffStatus().equals(ErpAuditStatus.OPENED.getStatus()), PURCHASE_REQUEST_OPENED, erpPurchaseRequestDO.getNo());
+
+        // 如果子项ID列表不为空，执行以下操作
+        if (itemIds != null && !itemIds.isEmpty()) {
+            // 2. 校验：验证子项ID是否合法且与父表ID关联
+            validatePurchaseRequestItemsMasterId(requestId, itemIds);
+
+            // 3. 更新子项状态为已关闭
+            updateItemStatus(itemIds, ErpAuditStatus.CLOSED);
+
+            // 4. 如果所有子项的状态都已经是已关闭，更新采购申请单状态为已开启
+            if (areAllItemsClosed(requestId, itemIds)) {
+                updatePurchaseRequestStatus(requestId, ErpAuditStatus.OPENED);
+            }
+        }
+    }
+
+    /**
+     * 处理关闭状态的逻辑
+     *
+     * @param requestId 采购订单id
+     * @param itemIds   采购订单子项id集合
+     * @param erpPurchaseRequestDO 采购申请单对象
+     */
+    private void handleDisableStatus(Long requestId, List<Long> itemIds, ErpPurchaseRequestDO erpPurchaseRequestDO) {
+        // 1. 校验：如果采购申请单状态是未审核，抛出关闭失败异常
+        ThrowUtil.ifThrow(erpPurchaseRequestDO.getStatus().equals(ErpAuditStatus.PROCESS.getStatus()), PURCHASE_REQUEST_CLOSE_FAIL, erpPurchaseRequestDO.getNo());
+
+        // 2. 校验：如果采购申请单已经是关闭状态，抛出异常
+        ThrowUtil.ifThrow(erpPurchaseRequestDO.getOffStatus().equals(ErpAuditStatus.CLOSED.getStatus()), PURCHASE_REQUEST_CLOSED, erpPurchaseRequestDO.getNo());
+
+        // 如果子项ID列表不为空，执行以下操作
+        if (itemIds != null && !itemIds.isEmpty()) {
+            // 3. 校验：验证子项ID是否合法且与父表ID关联
+            validatePurchaseRequestItemsMasterId(requestId, itemIds);
+
+            // 4. 更新子项状态为已开启
+            updateItemStatus(itemIds, ErpAuditStatus.OPENED);
+
+            // 5. 如果所有子项的状态都已经是已关闭，更新采购申请单状态为已关闭
+            if (areAllItemsClosed(requestId, itemIds)) {
+                updatePurchaseRequestStatus(requestId, ErpAuditStatus.CLOSED);
+            }
+        }
+    }
+
+    /**
+     * 批量更新采购申请单子项的状态
+     *
+     * @param itemIds 子项ID集合
+     * @param status  要更新的状态
+     */
+    private void updateItemStatus(List<Long> itemIds, ErpAuditStatus status) {
+        // 批量更新子项状态
+        List<ErpPurchaseRequestItemsDO> items = itemIds.stream()
+            .map(id -> new ErpPurchaseRequestItemsDO().setId(id).setOffStatus(status.getStatus()))
+            .toList();
+        erpPurchaseRequestItemsMapper.updateBatch(items);
+    }
+
+    /**
+     * 检查指定请求ID下，子项是否全部处于关闭状态
+     *
+     * @param requestId 采购订单id
+     * @param itemIds   采购订单子项id集合
+     * @return 是否所有子项都处于关闭状态
+     */
+    private boolean areAllItemsClosed(Long requestId, List<Long> itemIds) {
+        // 查询当前采购申请单下，所有状态为已关闭的子项数量
+        Long closedCount = erpPurchaseRequestItemsMapper.selectCount(
+            new LambdaQueryWrapper<ErpPurchaseRequestItemsDO>()
+                .eq(ErpPurchaseRequestItemsDO::getRequestId, requestId)
+                .eq(ErpPurchaseRequestItemsDO::getOffStatus, ErpAuditStatus.CLOSED.getStatus())
+        );
+        // 如果所有子项都关闭，返回 true
+        return closedCount == itemIds.size();
+    }
+
+    /**
+     * 更新采购申请单的状态
+     *
+     * @param requestId 采购订单id
+     * @param status    要更新的状态
+     */
+    private void updatePurchaseRequestStatus(Long requestId, ErpAuditStatus status) {
+        // 更新采购申请单的状态
+        erpPurchaseRequestMapper.updateById(new ErpPurchaseRequestDO().setId(requestId).setOffStatus(status.getStatus()));
+    }
+
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void deletePurchaseRequest(List<Long> ids) {
@@ -144,8 +355,9 @@ public class ErpPurchaseRequestServiceImpl implements ErpPurchaseRequestService 
         if (CollUtil.isEmpty(purchaseRequestDOs)) {
             return;
         }
+        // 1.1 是否已审核
         purchaseRequestDOs.forEach(erpPurchaseRequestDO -> {
-            ThrowUtil.ifThrow(!erpPurchaseRequestDO.getStatus().equals(ErpAuditStatus.APPROVE.getStatus()),PURCHASE_REQUEST_DELETE_FAIL_APPROVE,erpPurchaseRequestDO.getNo());
+            ThrowUtil.ifThrow(erpPurchaseRequestDO.getStatus().equals(ErpAuditStatus.APPROVE.getStatus()), PURCHASE_REQUEST_DELETE_FAIL_APPROVE, erpPurchaseRequestDO.getNo());
         });
 
         // 2. 遍历删除，并记录操作日志
@@ -160,9 +372,10 @@ public class ErpPurchaseRequestServiceImpl implements ErpPurchaseRequestService 
         });
     }
 
-    private ErpPurchaseRequestDO validatePurchaseRequestExists(Long id) {
+    @Override
+    public ErpPurchaseRequestDO validatePurchaseRequestExists(Long id) {
         ErpPurchaseRequestDO erpPurchaseRequestDO = erpPurchaseRequestMapper.selectById(id);
-        ThrowUtil.ifThrow(erpPurchaseRequestDO == null,PURCHASE_REQUEST_NOT_EXISTS);
+        ThrowUtil.ifThrow(erpPurchaseRequestDO == null, PURCHASE_REQUEST_NOT_EXISTS);
         return erpPurchaseRequestDO;
     }
 

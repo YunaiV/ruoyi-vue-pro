@@ -9,17 +9,19 @@ import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.yudao.module.erp.controller.admin.product.vo.product.ErpProductRespVO;
+import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.in.ErpPurchaseInBaseRespVO;
 import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.in.ErpPurchaseInPageReqVO;
-import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.in.ErpPurchaseInRespVO;
 import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.in.ErpPurchaseInSaveReqVO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseInDO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseInItemDO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpSupplierDO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.stock.ErpStockDO;
+import cn.iocoder.yudao.module.erp.dal.dataobject.stock.ErpWarehouseDO;
 import cn.iocoder.yudao.module.erp.service.product.ErpProductService;
 import cn.iocoder.yudao.module.erp.service.purchase.ErpPurchaseInService;
 import cn.iocoder.yudao.module.erp.service.purchase.ErpSupplierService;
 import cn.iocoder.yudao.module.erp.service.stock.ErpStockService;
+import cn.iocoder.yudao.module.erp.service.stock.ErpWarehouseService;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import io.swagger.v3.oas.annotations.Operation;
@@ -56,7 +58,8 @@ public class ErpPurchaseInController {
     private ErpProductService productService;
     @Resource
     private ErpSupplierService supplierService;
-
+    @Resource
+    private ErpWarehouseService erpWarehouseService;
     @Resource
     private AdminUserApi adminUserApi;
 
@@ -97,7 +100,7 @@ public class ErpPurchaseInController {
     @Operation(summary = "获得采购入库")
     @Parameter(name = "id", description = "编号", required = true, example = "1024")
     @PreAuthorize("@ss.hasPermission('erp:purchase-in:query')")
-    public CommonResult<ErpPurchaseInRespVO> getPurchaseIn(@RequestParam("id") Long id) {
+    public CommonResult<ErpPurchaseInBaseRespVO> getPurchaseIn(@RequestParam("id") Long id) {
         ErpPurchaseInDO purchaseIn = purchaseInService.getPurchaseIn(id);
         if (purchaseIn == null) {
             return success(null);
@@ -105,8 +108,8 @@ public class ErpPurchaseInController {
         List<ErpPurchaseInItemDO> purchaseInItemList = purchaseInService.getPurchaseInItemListByInId(id);
         Map<Long, ErpProductRespVO> productMap = productService.getProductVOMap(
                 convertSet(purchaseInItemList, ErpPurchaseInItemDO::getProductId));
-        return success(BeanUtils.toBean(purchaseIn, ErpPurchaseInRespVO.class, purchaseInVO ->
-                purchaseInVO.setItems(BeanUtils.toBean(purchaseInItemList, ErpPurchaseInRespVO.Item.class, item -> {
+        return success(BeanUtils.toBean(purchaseIn, ErpPurchaseInBaseRespVO.class, purchaseInVO ->
+                purchaseInVO.setItems(BeanUtils.toBean(purchaseInItemList, ErpPurchaseInBaseRespVO.Item.class, item -> {
                     ErpStockDO stock = stockService.getStock(item.getProductId(), item.getWarehouseId());
                     item.setStockCount(stock != null ? stock.getCount() : BigDecimal.ZERO);
                     MapUtils.findAndThen(productMap, item.getProductId(), product -> item.setProductName(product.getName())
@@ -117,7 +120,7 @@ public class ErpPurchaseInController {
     @GetMapping("/page")
     @Operation(summary = "获得采购入库分页")
     @PreAuthorize("@ss.hasPermission('erp:purchase-in:query')")
-    public CommonResult<PageResult<ErpPurchaseInRespVO>> getPurchaseInPage(@Valid ErpPurchaseInPageReqVO pageReqVO) {
+    public CommonResult<PageResult<ErpPurchaseInBaseRespVO>> getPurchaseInPage(@Valid ErpPurchaseInPageReqVO pageReqVO) {
         PageResult<ErpPurchaseInDO> pageResult = purchaseInService.getPurchaseInPage(pageReqVO);
         return success(buildPurchaseInVOPageResult(pageResult));
     }
@@ -129,12 +132,12 @@ public class ErpPurchaseInController {
     public void exportPurchaseInExcel(@Valid ErpPurchaseInPageReqVO pageReqVO,
                                     HttpServletResponse response) throws IOException {
         pageReqVO.setPageSize(PageParam.PAGE_SIZE_NONE);
-        List<ErpPurchaseInRespVO> list = buildPurchaseInVOPageResult(purchaseInService.getPurchaseInPage(pageReqVO)).getList();
+        List<ErpPurchaseInBaseRespVO> list = buildPurchaseInVOPageResult(purchaseInService.getPurchaseInPage(pageReqVO)).getList();
         // 导出 Excel
-        ExcelUtils.write(response, "采购入库.xls", "数据", ErpPurchaseInRespVO.class, list);
+        ExcelUtils.write(response, "采购入库.xls", "数据", ErpPurchaseInBaseRespVO.class, list);
     }
 
-    private PageResult<ErpPurchaseInRespVO> buildPurchaseInVOPageResult(PageResult<ErpPurchaseInDO> pageResult) {
+    private PageResult<ErpPurchaseInBaseRespVO> buildPurchaseInVOPageResult(PageResult<ErpPurchaseInDO> pageResult) {
         if (CollUtil.isEmpty(pageResult.getList())) {
             return PageResult.empty(pageResult.getTotal());
         }
@@ -151,14 +154,35 @@ public class ErpPurchaseInController {
         // 1.4 管理员信息
         Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(
                 convertSet(pageResult.getList(), purchaseIn -> Long.parseLong(purchaseIn.getCreator())));
+        // 1.6 获取仓库信息
+        Map<Long, ErpWarehouseDO> warehouseMap = erpWarehouseService.getWarehouseMap(
+            convertSet(purchaseInItemList, ErpPurchaseInItemDO::getWarehouseId));
         // 2. 开始拼接
-        return BeanUtils.toBean(pageResult, ErpPurchaseInRespVO.class, purchaseIn -> {
-            purchaseIn.setItems(BeanUtils.toBean(purchaseInItemMap.get(purchaseIn.getId()), ErpPurchaseInRespVO.Item.class,
-                    item -> MapUtils.findAndThen(productMap, item.getProductId(), product -> item.setProductName(product.getName())
-                            .setProductBarCode(product.getBarCode()).setProductUnitName(product.getUnitName()))));
-            purchaseIn.setProductNames(CollUtil.join(purchaseIn.getItems(), "，", ErpPurchaseInRespVO.Item::getProductName));
+        return BeanUtils.toBean(pageResult, ErpPurchaseInBaseRespVO.class, purchaseIn -> {
+            purchaseIn.setItems(BeanUtils.toBean(purchaseInItemMap.get(purchaseIn.getId()), ErpPurchaseInBaseRespVO.Item.class,
+                item -> {
+                    //设置产品信息-带出相关字段
+                    MapUtils.findAndThen(productMap, item.getProductId(), product -> item.setProductName(product.getName())
+                        .setProductBarCode(product.getBarCode())
+                        .setProductUnitName(product.getUnitName())//设置产品重量+体积+规格型号
+                        .setTotalVolume(product.getLength()*product.getHeight()*product.getWeight() * Double.parseDouble(String.valueOf(item.getCount())))
+                        .setTotalWeight(product.getWeight()*Double.parseDouble(String.valueOf(item.getCount())))
+                        .setModel(product.getModel())
+                        .setCustomsDeclaration(product.getBrand())//产品品牌
+                    );
+                    // 设置仓库信息
+                    MapUtils.findAndThen(warehouseMap, item.getWarehouseId(), erpWarehouseDO -> item.setWarehouseName(erpWarehouseDO.getName()));
+                }));
+//            purchaseIn.setProductNames(CollUtil.join(purchaseIn.getItems(), "，", ErpPurchaseInBaseRespVO.Item::getProductName));
+            //TODO 添加入库审核状态描述
+//            String statusDescription = ErpAuditStatus.getDescriptionByStatus(purchaseIn.getAuditorStatus());
+//            if (statusDescription != null) {
+//                purchaseIn.setAuditorStatusDesc(statusDescription);
+//            }
+            //产品-带出相关字段
+
             MapUtils.findAndThen(supplierMap, purchaseIn.getSupplierId(), supplier -> purchaseIn.setSupplierName(supplier.getName()));
-            MapUtils.findAndThen(userMap, Long.parseLong(purchaseIn.getCreator()), user -> purchaseIn.setCreatorName(user.getNickname()));
+            MapUtils.findAndThen(userMap, Long.parseLong(purchaseIn.getCreator()), user -> purchaseIn.setCreator(user.getNickname()));
         });
     }
 

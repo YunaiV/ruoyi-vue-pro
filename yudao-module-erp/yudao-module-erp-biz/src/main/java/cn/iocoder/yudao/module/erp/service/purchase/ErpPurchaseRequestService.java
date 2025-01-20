@@ -1,15 +1,15 @@
 package cn.iocoder.yudao.module.erp.service.purchase;
 
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.request.ErpPurchaseRequestItemsSaveReqVO;
 import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.request.ErpPurchaseRequestPageReqVO;
 import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.request.ErpPurchaseRequestSaveReqVO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseRequestDO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseRequestItemsDO;
-import jakarta.validation.*;
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import jakarta.validation.Valid;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 
 /**
  * ERP采购申请单 Service 接口
@@ -67,7 +67,7 @@ public interface ErpPurchaseRequestService {
     /**
      * 更新采购申请单状态
      *
-     * @param id 采购申请单id
+     * @param id     采购申请单id
      * @param status 状态
      */
     void updatePurchaseRequestStatus(Long id, Integer status);
@@ -79,4 +79,42 @@ public interface ErpPurchaseRequestService {
      * @return 采购订单项 List
      */
     List<ErpPurchaseRequestItemsDO> getPurchaseRequestItemListByOrderIds(Collection<Long> requestIds);
+    /**
+     * 审核/反审核采购订单
+     *
+     * @param requestId 采购订单id
+     * @param reviewed 审核状态
+     */
+    void reviewPurchaseOrder(Long requestId, Boolean reviewed);
+    /**
+     * 启用/关闭申请单子项，自动更新父订单状态
+     *
+     * @param requestId 采购订单id
+     * @param itemIds 采购订单子项id集合
+     * @param enable 开启/关闭
+     */
+    void switchPurchaseOrderStatus(Long requestId, List<Long> itemIds, Boolean enable);
+
+    /**
+     * 校验采购订单是否存在
+     *
+     * @param id id
+     * @return 采购订单
+     */
+    ErpPurchaseRequestDO validatePurchaseRequestExists(Long id);
+
+    /**
+     * 校验采购订单的子项目是否合法
+     * @param items 采购订单子项目集合
+     *              1、校验产品有效性 2、校验仓库有效性
+     * @Return 采购订单子项目
+     */
+     List<ErpPurchaseRequestItemsDO> validatePurchaseRequestItems(List<ErpPurchaseRequestItemsSaveReqVO> items);
+    /**
+     * 校验采购订单的子项表id否关联主表
+     * @param masterId 主表id-申请单
+     * @param itemIds itemIds 子表id集合-申请项
+     * @Return void
+     */
+    void validatePurchaseRequestItemsMasterId(Long masterId,List<Long> itemIds);
 }

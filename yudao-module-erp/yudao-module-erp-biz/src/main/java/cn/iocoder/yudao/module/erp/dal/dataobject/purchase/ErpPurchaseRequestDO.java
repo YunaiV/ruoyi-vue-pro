@@ -1,11 +1,12 @@
 package cn.iocoder.yudao.module.erp.dal.dataobject.purchase;
 
+import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import com.baomidou.mybatisplus.annotation.KeySequence;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
 
 import java.time.LocalDateTime;
-
-import com.baomidou.mybatisplus.annotation.*;
-import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 
 /**
  * ERP采购申请单 DO
@@ -21,7 +22,6 @@ import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ErpPurchaseRequestDO extends BaseDO {
-
     /**
      * id
      */
@@ -34,34 +34,41 @@ public class ErpPurchaseRequestDO extends BaseDO {
     /**
      * 申请人
      */
-    private String applicant;
+    private Long applicant;
     /**
      * 申请部门
      */
-    private String applicationDept;
+    private Long applicationDept;
     /**
      * 单据日期
      */
     private LocalDateTime requestTime;
     /**
-     * 审核状态(0:待审核，1:审核通过，2:审核未通过)
+     * 审核状态
      */
     private Integer status;
     /**
-     * 关闭状态（0已关闭，1已开启）
+     * 关闭状态
      */
     private Integer offStatus;
     /**
-     * 订购状态（0部分订购，1全部订购）
+     * 订购状态
      */
     private Integer orderStatus;
     /**
      * 审核者
      */
-    private String auditor;
+    private Long auditor;
     /**
      * 审核时间
      */
     private LocalDateTime auditTime;
-
+    /**
+     * 单据标签
+     */
+    private String tag;
+    /**
+     * 供应商id
+     */
+    private Long supplierId;
 }
