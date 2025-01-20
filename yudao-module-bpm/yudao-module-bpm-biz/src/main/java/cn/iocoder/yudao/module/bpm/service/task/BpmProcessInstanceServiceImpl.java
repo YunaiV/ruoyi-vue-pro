@@ -12,12 +12,14 @@ import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
 import cn.iocoder.yudao.framework.common.util.object.PageUtils;
 import cn.iocoder.yudao.module.bpm.api.task.dto.BpmProcessInstanceCreateReqDTO;
+import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.BpmModelMetaInfoVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.simple.BpmSimpleModelNodeVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.instance.*;
 import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.instance.BpmApprovalDetailRespVO.ActivityNodeTask;
 import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.task.BpmTaskRespVO;
 import cn.iocoder.yudao.module.bpm.convert.task.BpmProcessInstanceConvert;
 import cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmProcessDefinitionInfoDO;
+import cn.iocoder.yudao.module.bpm.dal.redis.BpmProcessIdRedisDAO;
 import cn.iocoder.yudao.module.bpm.enums.ErrorCodeConstants;
 import cn.iocoder.yudao.module.bpm.enums.definition.BpmModelTypeEnum;
 import cn.iocoder.yudao.module.bpm.enums.definition.BpmSimpleModelNodeType;
@@ -50,6 +52,7 @@ import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.history.HistoricProcessInstanceQuery;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.ProcessInstance;
+import org.flowable.engine.runtime.ProcessInstanceBuilder;
 import org.flowable.task.api.history.HistoricTaskInstance;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
@@ -108,6 +111,9 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
 
     @Resource
     private BpmTaskCandidateInvoker taskCandidateInvoker;
+
+    @Resource
+    private BpmProcessIdRedisDAO processIdRedisDAO;
 
     // ========== Query 查询相关方法 ==========
 
@@ -599,12 +605,19 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
         if (CollUtil.isNotEmpty(startUserSelectAssignees)) {
             variables.put(BpmnVariableConstants.PROCESS_INSTANCE_VARIABLE_START_USER_SELECT_ASSIGNEES, startUserSelectAssignees);
         }
-        ProcessInstance instance = runtimeService.createProcessInstanceBuilder()
+
+        // 3. 流程 Id
+        ProcessInstanceBuilder processInstanceBuilder = runtimeService.createProcessInstanceBuilder()
                 .processDefinitionId(definition.getId())
                 .businessKey(businessKey)
                 .name(definition.getName().trim())
-                .variables(variables)
-                .start();
+                .variables(variables);
+        BpmModelMetaInfoVO.ProcessIdRule processIdRule = processDefinitionInfo.getProcessIdRule();
+        if (processIdRule != null && processIdRule.getEnable()) {
+            String id = processIdRedisDAO.generate(processIdRule);
+            processInstanceBuilder.predefineProcessInstanceId(id);
+        }
+        ProcessInstance instance = processInstanceBuilder.start();
         return instance.getId();
     }
 

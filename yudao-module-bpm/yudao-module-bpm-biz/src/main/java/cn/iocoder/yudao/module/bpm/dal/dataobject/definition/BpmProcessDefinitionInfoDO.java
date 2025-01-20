@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.bpm.dal.dataobject.definition;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.framework.mybatis.core.type.LongListTypeHandler;
 import cn.iocoder.yudao.framework.mybatis.core.type.StringListTypeHandler;
+import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.BpmModelMetaInfoVO;
 import cn.iocoder.yudao.module.bpm.enums.definition.BpmModelFormTypeEnum;
 import cn.iocoder.yudao.module.bpm.enums.definition.BpmModelTypeEnum;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
@@ -154,5 +155,11 @@ public class BpmProcessDefinitionInfoDO extends BaseDO {
      * 是否允许撤销审批中的申请
      */
     private Boolean allowCancelRunningProcess;
+
+    /**
+     * 流程 Id 规则
+     */
+    @TableField(typeHandler = JacksonTypeHandler.class)
+    private BpmModelMetaInfoVO.ProcessIdRule processIdRule;
 
 }
