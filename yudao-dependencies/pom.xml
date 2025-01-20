@@ -626,6 +626,12 @@
                 <artifactId>vertx-web</artifactId>
                 <version>${vertx.version}</version>
             </dependency>
+            <!-- Vert.x MQTT 模块 -->
+            <dependency>
+                <groupId>io.vertx</groupId>
+                <artifactId>vertx-mqtt</artifactId>
+                <version>${vertx.version}</version>
+            </dependency>
 
         </dependencies>
     </dependencyManagement>
