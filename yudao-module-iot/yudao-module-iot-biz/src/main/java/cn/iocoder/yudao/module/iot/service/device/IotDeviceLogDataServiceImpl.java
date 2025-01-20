@@ -55,16 +55,18 @@ public class IotDeviceLogDataServiceImpl implements IotDeviceLogDataService{
 
         // 2. 处理时间字段
         // TODO @super：一次性的字段，不用单独给个变量
-        long currentTime = System.currentTimeMillis();
+//        long currentTime = System.currentTimeMillis();
         // 2.1 设置时序时间为当前时间
-        iotDeviceLogDO.setTs(currentTime); // TODO @super：TS在SQL中直接NOW   咱们的TS数据获取是走哪一种；走 now()
+//        iotDeviceLogDO.setTs(currentTime); // TODO @super：TS在SQL中直接NOW   咱们的TS数据获取是走哪一种；走 now()
 
         // 3. 插入数据
         // TODO @super：不要直接调用对方的 IotDeviceLogDataMapper，通过 service 哈！
+        // 讨论：艿菇  这就是iotDeviceLogDataService的Impl
         iotDeviceLogDataMapper.insert(iotDeviceLogDO);
     }
 
     // TODO @super：在 iotDeviceLogDataService 写
+    // 讨论：艿菇  这就是iotDeviceLogDataService的Impl
     @Override
     public PageResult<IotDeviceLogDO> getDeviceLogPage(IotDeviceLogPageReqVO pageReqVO) {
         // 查询数据

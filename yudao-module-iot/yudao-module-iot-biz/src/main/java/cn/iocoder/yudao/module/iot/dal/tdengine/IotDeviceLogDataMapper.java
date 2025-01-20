@@ -27,6 +27,19 @@ public interface IotDeviceLogDataMapper {
 
 
     // TODO @super：单个参数，不用加 @Param
+    //讨论：艿菇这里有些特殊情况，我也学习了一下这块知识：
+    // 如果使用的是Java 8及以上版本，并且编译器保留了参数名（通过编译器选项-parameters启用），则可以去掉@Param注解。MyBatis会自动使用参数的实际名称
+    // 但在TDengine中 @Param去掉后TDengine会报错，以下是大模型的回答：
+    // 不用加 @Param在普通的 MySQL 场景下是正确的 - 对于 MyBatis，当方法只有一个参数时，确实可以不用添加 @Param 注解。
+    //但是在 TDengine 的场景下，情况不同：
+    //TDengine 的特殊性：
+    //TDengine 使用特殊的 SQL 语法
+    //需要处理超级表(STable)和子表的概念
+    //参数绑定的方式与普通 MySQL 不同
+    //为什么这里必须要 @Param：
+    //XML 中使用了 ${log.deviceKey} 这样的参数引用方式
+    //需要在 SQL 中动态构建表名（device_log_${log.deviceKey}）
+    //没有 @Param("log") 的话，MyBatis 无法正确解析参数
     /**
      * 插入设备日志数据
      *
@@ -34,7 +47,7 @@ public interface IotDeviceLogDataMapper {
      *
      * @param log 设备日志数据
      */
-    void insert(IotDeviceLogDO log);
+    void insert(@Param("log") IotDeviceLogDO log);
 
     /**
      * 获得设备日志分页
@@ -42,7 +55,7 @@ public interface IotDeviceLogDataMapper {
      * @param reqVO 分页查询条件
      * @return 设备日志列表
      */
-    List<IotDeviceLogDO> selectPage(IotDeviceLogPageReqVO reqVO);
+    List<IotDeviceLogDO> selectPage(@Param("reqVO") IotDeviceLogPageReqVO reqVO);
 
     /**
      * 获得设备日志总数
@@ -50,7 +63,7 @@ public interface IotDeviceLogDataMapper {
      * @param reqVO 查询条件
      * @return 日志总数
      */
-    Long selectCount(IotDeviceLogPageReqVO reqVO);
+    Long selectCount(@Param("reqVO") IotDeviceLogPageReqVO reqVO);
 
     /**
      * 查询设备日志表是否存在

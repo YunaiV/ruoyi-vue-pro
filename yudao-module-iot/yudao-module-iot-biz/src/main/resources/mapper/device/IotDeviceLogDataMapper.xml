@@ -27,11 +27,11 @@
 
     <!-- 插入设备日志数据 在子表不存在的情况下 可在数据插入时 自动建表 -->
     <insert id="insert">
-        INSERT INTO device_log_${log.deviceKey} (ts, id, product_key, type, subType, content, report_time)
+        INSERT INTO device_log_${log.deviceKey} (id, product_key, type, subType, content, report_time)
         USING device_log
         TAGS ('${log.deviceKey}')
         VALUES (
-            #{log.ts},
+            NOW,
             #{log.id},
             #{log.productKey},
             #{log.type},
@@ -77,7 +77,7 @@
 
     <!-- 检查设备日志超级表是否存在 -->
     <select id="checkDeviceLogTableExists" resultType="Object">
-        SHOW TABLES LIKE 'device_log';
+        SHOW STABLES LIKE 'device_log'
     </select>
 
 </mapper>
