@@ -16,6 +16,7 @@ import cn.iocoder.yudao.module.erp.enums.ErpAuditStatus;
 import cn.iocoder.yudao.module.erp.service.product.ErpProductService;
 import cn.iocoder.yudao.module.erp.service.stock.ErpWarehouseService;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +28,8 @@ import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
 import static cn.iocoder.yudao.module.erp.enums.ErrorCodeConstants.*;
@@ -102,6 +105,8 @@ public class ErpPurchaseRequestServiceImpl implements ErpPurchaseRequestService 
 
     @Override
     public void validatePurchaseRequestItemsMasterId(Long masterId, List<Long> ids) {
+        // 验证ids在数据库中是否存在
+        ThrowUtil.ifThrow(erpPurchaseRequestItemsMapper.selectListByIds(ids).stream().noneMatch(i -> ids.contains(i.getId())), PURCHASE_REQUEST_ITEM_NOT_EXISTS, ids);
         // 校验子单requestId是否关联主单的id
         ThrowUtil.ifThrow(erpPurchaseRequestItemsMapper.selectListByRequestId(masterId).stream().noneMatch(i -> ids.contains(i.getId())), PURCHASE_REQUEST_UPDATE_FAIL_REQUEST_ID, masterId);
     }
@@ -171,6 +176,138 @@ public class ErpPurchaseRequestServiceImpl implements ErpPurchaseRequestService 
             return Collections.emptyList();
         }
         return erpPurchaseRequestItemsMapper.selectListByRequestIds(requestIds);
+    }
+
+    /**
+     * 审核/反审核采购订单
+     *
+     * @param requestId 采购订单id
+     * @param reviewed  审核状态
+     */
+    @Override
+    public void reviewPurchaseOrder(Long requestId, Boolean reviewed) {
+
+    }
+
+    /**
+     * 关闭/启用采购申请单子项状态
+     *
+     * @param requestId 采购订单id
+     * @param itemIds   采购订单子项id集合
+     * @param enable    是否开启（true 表示开启，false 表示关闭）
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void switchPurchaseOrderStatus(Long requestId, List<Long> itemIds, Boolean enable) {
+        // 校验采购申请单是否存在
+        ErpPurchaseRequestDO erpPurchaseRequestDO = validatePurchaseRequestExists(requestId);
+
+        // 根据 enable 参数判断是开启还是关闭状态
+        if (Boolean.TRUE.equals(enable)) {
+            // 处理启用状态
+            handleEnableStatus(requestId, itemIds, erpPurchaseRequestDO);
+        } else {
+            // 处理关闭状态
+            handleDisableStatus(requestId, itemIds, erpPurchaseRequestDO);
+        }
+    }
+
+    /**
+     * 处理启用状态的逻辑
+     *
+     * @param requestId 采购订单id
+     * @param itemIds   采购订单子项id集合
+     * @param erpPurchaseRequestDO 采购申请单对象
+     */
+    private void handleEnableStatus(Long requestId, List<Long> itemIds, ErpPurchaseRequestDO erpPurchaseRequestDO) {
+        // 1. 校验：如果采购申请单已经是开启状态，抛出异常
+        ThrowUtil.ifThrow(erpPurchaseRequestDO.getOffStatus().equals(ErpAuditStatus.OPENED.getStatus()), PURCHASE_REQUEST_OPENED, erpPurchaseRequestDO.getNo());
+
+        // 如果子项ID列表不为空，执行以下操作
+        if (itemIds != null && !itemIds.isEmpty()) {
+            // 2. 校验：验证子项ID是否合法且与父表ID关联
+            validatePurchaseRequestItemsMasterId(requestId, itemIds);
+
+            // 3. 更新子项状态为已关闭
+            updateItemStatus(itemIds, ErpAuditStatus.CLOSED);
+
+            // 4. 如果所有子项的状态都已经是已关闭，更新采购申请单状态为已开启
+            if (areAllItemsClosed(requestId, itemIds)) {
+                updatePurchaseRequestStatus(requestId, ErpAuditStatus.OPENED);
+            }
+        }
+    }
+
+    /**
+     * 处理关闭状态的逻辑
+     *
+     * @param requestId 采购订单id
+     * @param itemIds   采购订单子项id集合
+     * @param erpPurchaseRequestDO 采购申请单对象
+     */
+    private void handleDisableStatus(Long requestId, List<Long> itemIds, ErpPurchaseRequestDO erpPurchaseRequestDO) {
+        // 1. 校验：如果采购申请单状态是未审核，抛出关闭失败异常
+        ThrowUtil.ifThrow(erpPurchaseRequestDO.getStatus().equals(ErpAuditStatus.PROCESS.getStatus()), PURCHASE_REQUEST_CLOSE_FAIL, erpPurchaseRequestDO.getNo());
+
+        // 2. 校验：如果采购申请单已经是关闭状态，抛出异常
+        ThrowUtil.ifThrow(erpPurchaseRequestDO.getOffStatus().equals(ErpAuditStatus.CLOSED.getStatus()), PURCHASE_REQUEST_CLOSED, erpPurchaseRequestDO.getNo());
+
+        // 如果子项ID列表不为空，执行以下操作
+        if (itemIds != null && !itemIds.isEmpty()) {
+            // 3. 校验：验证子项ID是否合法且与父表ID关联
+            validatePurchaseRequestItemsMasterId(requestId, itemIds);
+
+            // 4. 更新子项状态为已开启
+            updateItemStatus(itemIds, ErpAuditStatus.OPENED);
+
+            // 5. 如果所有子项的状态都已经是已关闭，更新采购申请单状态为已关闭
+            if (areAllItemsClosed(requestId, itemIds)) {
+                updatePurchaseRequestStatus(requestId, ErpAuditStatus.CLOSED);
+            }
+        }
+    }
+
+    /**
+     * 批量更新采购申请单子项的状态
+     *
+     * @param itemIds 子项ID集合
+     * @param status  要更新的状态
+     */
+    private void updateItemStatus(List<Long> itemIds, ErpAuditStatus status) {
+        // 批量更新子项状态
+        List<ErpPurchaseRequestItemsDO> items = itemIds.stream()
+            .map(id -> new ErpPurchaseRequestItemsDO().setId(id).setOffStatus(status.getStatus()))
+            .toList();
+        erpPurchaseRequestItemsMapper.updateBatch(items);
+    }
+
+    /**
+     * 检查指定请求ID下，子项是否全部处于关闭状态
+     *
+     * @param requestId 采购订单id
+     * @param itemIds   采购订单子项id集合
+     * @return 是否所有子项都处于关闭状态
+     */
+    private boolean areAllItemsClosed(Long requestId, List<Long> itemIds) {
+        // 查询当前采购申请单下，所有状态为已关闭的子项数量
+        Long closedCount = erpPurchaseRequestItemsMapper.selectCount(
+            new LambdaQueryWrapper<ErpPurchaseRequestItemsDO>()
+                .eq(ErpPurchaseRequestItemsDO::getRequestId, requestId)
+                .eq(ErpPurchaseRequestItemsDO::getOffStatus, ErpAuditStatus.CLOSED.getStatus())
+        );
+        // 如果所有子项都关闭，返回 true
+        return closedCount == itemIds.size();
+    }
+
+    /**
+     * 更新采购申请单的状态
+     *
+     * @param requestId 采购订单id
+     * @param status    要更新的状态
+     */
+    private void updatePurchaseRequestStatus(Long requestId, ErpAuditStatus status) {
+        // 更新采购申请单的状态
+        erpPurchaseRequestMapper.updateById(new ErpPurchaseRequestDO().setId(requestId).setOffStatus(status.getStatus()));
     }
 
     @Override

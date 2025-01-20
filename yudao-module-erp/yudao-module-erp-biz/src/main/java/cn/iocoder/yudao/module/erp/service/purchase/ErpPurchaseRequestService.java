@@ -79,6 +79,21 @@ public interface ErpPurchaseRequestService {
      * @return 采购订单项 List
      */
     List<ErpPurchaseRequestItemsDO> getPurchaseRequestItemListByOrderIds(Collection<Long> requestIds);
+    /**
+     * 审核/反审核采购订单
+     *
+     * @param requestId 采购订单id
+     * @param reviewed 审核状态
+     */
+    void reviewPurchaseOrder(Long requestId, Boolean reviewed);
+    /**
+     * 启用/关闭申请单子项，自动更新父订单状态
+     *
+     * @param requestId 采购订单id
+     * @param itemIds 采购订单子项id集合
+     * @param enable 开启/关闭
+     */
+    void switchPurchaseOrderStatus(Long requestId, List<Long> itemIds, Boolean enable);
 
     /**
      * 校验采购订单是否存在

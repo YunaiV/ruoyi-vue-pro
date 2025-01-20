@@ -89,7 +89,7 @@ public class ErpPurchaseInServiceImpl implements ErpPurchaseInService {
                 .setOrderNo(purchaseOrder.getNo()).setSupplierId(purchaseOrder.getSupplierId());
         calculateTotalPrice(purchaseIn, purchaseInItems);
         // 2.1.1 设置入库单默认的审核状态-未审核。
-        purchaseIn.setAuditorStatus(ErpAuditStatus.PENDING_APPROVAL.getStatus());
+        purchaseIn.setAuditorStatus(ErpAuditStatus.PROCESS.getStatus());
         purchaseInMapper.insert(purchaseIn);
         // 2.2 插入入库项
         purchaseInItems.forEach(o -> o.setInId(purchaseIn.getId()));

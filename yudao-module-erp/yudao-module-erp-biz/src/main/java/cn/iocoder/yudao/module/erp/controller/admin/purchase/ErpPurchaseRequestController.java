@@ -92,6 +92,38 @@ public class ErpPurchaseRequestController {
         erpPurchaseRequestService.deletePurchaseRequest(ids);
         return success(true);
     }
+    @PutMapping("/review")
+    @Operation(summary = "审核/反审核采购订单")
+    @Parameter(name = "requestId", description = "申请单编号", required = true)
+    @Parameter(name = "reviewed", description = "审核状态", required = true)
+    @PreAuthorize("@ss.hasPermission('erp:purchase-order:review')")
+    public CommonResult<Boolean> reviewPurchaseOrder(@RequestParam("requestId") Long requestId,
+                                                     @RequestParam("reviewed") Boolean reviewed) {
+        //TODO 审核订单-审核、反审核
+//        purchaseOrderService.updatePurchaseOrderStatus(id, status);
+        return success(true);
+    }
+    @PutMapping("/status")
+    @Operation(summary = "关闭/启用申请单")
+    @Parameter(name = "id", description = "申请单id", required = true)
+    @Parameter(name = "enable", description = "开启、关闭", required = true)
+    @Parameter(name = "itemIds", description = "申请单商品ids", required = false)
+    @PreAuthorize("@ss.hasPermission('erp:purchase-order:enable')")
+    public CommonResult<Boolean> switchPurchaseOrderStatus(@RequestParam("requestId") Long requestId,
+                                                           @RequestParam("itemId") List<Long> itemIds,
+                                                           @RequestParam("enable") Boolean enable) {
+        erpPurchaseRequestService.switchPurchaseOrderStatus(requestId, itemIds, enable);
+        return success(true);
+    }
+    @PutMapping("/merge")
+    @Operation(summary = "合并采购订单")
+    @Parameter(name = "ids", description = "编号数组", required = true)
+    @PreAuthorize("@ss.hasPermission('erp:purchase-order:merge')")
+    public CommonResult<Long> mergePurchaseOrder(@RequestParam("ids") List<Long> ids) {
+        //TODO 合并采购订单
+//        return success(purchaseOrderService.mergePurchaseOrder(ids));
+        return null;
+    }
 
     @GetMapping("/get")
     @Operation(summary = "获得ERP采购申请单")

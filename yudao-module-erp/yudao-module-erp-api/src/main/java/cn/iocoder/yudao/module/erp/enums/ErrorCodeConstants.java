@@ -189,6 +189,7 @@ public interface ErrorCodeConstants {
 
     // ========== ERP 采购申请单 1-030-603-000 ==========
     ErrorCode PURCHASE_REQUEST_NOT_EXISTS = new ErrorCode(1_030_603_000, "采购申请单不存在");
+    ErrorCode PURCHASE_REQUEST_ITEM_NOT_EXISTS = new ErrorCode(1_030_603_000, "采购申请项({})不存在");
     ErrorCode PURCHASE_REQUEST_OPENED = new ErrorCode(1_030_603_011, "采购申请单({})已开启");
     ErrorCode PURCHASE_REQUEST_CLOSED = new ErrorCode(1_030_603_012, "采购申请单({})已关闭");
     ErrorCode PURCHASE_REQUEST_MANUAL_CLOSED = new ErrorCode(1_030_603_013, "采购申请单({})已手动关闭");
@@ -201,6 +202,7 @@ public interface ErrorCodeConstants {
     ErrorCode PURCHASE_REQUEST_NO_EXISTS = new ErrorCode(1_030_101_007, "生成采购申请单号失败，请重新提交");
     ErrorCode PURCHASE_REQUEST_PROCESS_FAIL = new ErrorCode(1_030_101_008, "反审核失败，只有已审核的采购申请单才能反审核");
     ErrorCode PURCHASE_REQUEST_APPROVE_FAIL = new ErrorCode(1_030_101_009, "审核失败，只有未审核的采购申请单才能审核");
+    ErrorCode PURCHASE_REQUEST_CLOSE_FAIL  = new ErrorCode(1_030_101_010, "未审核的采购申请单({})不能进行关闭");
 
     // ========== ERP 海关规则 1-030-604-000 ==========
     ErrorCode CUSTOM_RULE_NOT_EXISTS = new ErrorCode(1_030_604_000, "ERP 海关规则不存在");

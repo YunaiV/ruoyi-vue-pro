@@ -20,10 +20,9 @@ public enum ErpAuditStatus implements IntArrayValuable {
 
     CLOSED(0, "已关闭"),// 已关闭
     OPENED(1, "已开启"),// 已开启
-    PENDING_APPROVAL(5, "待审核"), // 待审核
-    PROCESS(10, "未审核"), // 审核中
-    APPROVE(20, "已审核"), // 审核通过
     MANUAL_CLOSED(91, "手动关闭"),//手动关闭
+    PROCESS(10, "未审核"), // 未审核
+    APPROVE(20, "已审核"), // 审核通过
     ;
     private static final Map<Integer, ErpAuditStatus> STATUS_MAP = new HashMap<>();
 
