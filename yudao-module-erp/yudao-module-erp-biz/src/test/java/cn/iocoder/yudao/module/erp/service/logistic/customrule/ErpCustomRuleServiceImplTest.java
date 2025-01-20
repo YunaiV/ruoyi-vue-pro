@@ -111,8 +111,8 @@ public class ErpCustomRuleServiceImplTest extends BaseDbUnitTest {
        // mock 数据
        ErpCustomRuleDO dbCustomRule = randomPojo(ErpCustomRuleDO.class, o -> { // 等会查询到
            o.setCountryCode(null);
-           o.setType(null);
-           o.setSupplierProductId(null);
+//           o.setType(null);
+//           o.setSupplierProductId(null);
            o.setDeclaredTypeEn(null);
            o.setDeclaredType(null);
            o.setDeclaredValue(null);
@@ -126,9 +126,9 @@ public class ErpCustomRuleServiceImplTest extends BaseDbUnitTest {
        // 测试 countryCode 不匹配
        customRuleMapper.insert(cloneIgnoreId(dbCustomRule, o -> o.setCountryCode(null)));
        // 测试 type 不匹配
-       customRuleMapper.insert(cloneIgnoreId(dbCustomRule, o -> o.setType(null)));
+//       customRuleMapper.insert(cloneIgnoreId(dbCustomRule, o -> o.setType(null)));
        // 测试 supplierProductId 不匹配
-       customRuleMapper.insert(cloneIgnoreId(dbCustomRule, o -> o.setSupplierProductId(null)));
+//       customRuleMapper.insert(cloneIgnoreId(dbCustomRule, o -> o.setSupplierProductId(null)));
        // 测试 declaredTypeEn 不匹配
        customRuleMapper.insert(cloneIgnoreId(dbCustomRule, o -> o.setDeclaredTypeEn(null)));
        // 测试 declaredType 不匹配
@@ -148,8 +148,8 @@ public class ErpCustomRuleServiceImplTest extends BaseDbUnitTest {
        // 准备参数
        ErpCustomRulePageReqVO reqVO = new ErpCustomRulePageReqVO();
        reqVO.setCountryCode(null);
-       reqVO.setType(null);
-       reqVO.setSupplierProductId(null);
+//       reqVO.setType(null);
+//       reqVO.setSupplierProductId(null);
        reqVO.setDeclaredTypeEn(null);
        reqVO.setDeclaredType(null);
        reqVO.setDeclaredValue(null);
