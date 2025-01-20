@@ -606,17 +606,18 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
             variables.put(BpmnVariableConstants.PROCESS_INSTANCE_VARIABLE_START_USER_SELECT_ASSIGNEES, startUserSelectAssignees);
         }
 
-        // 3. 流程 Id
+        // 3. 创建流程
         ProcessInstanceBuilder processInstanceBuilder = runtimeService.createProcessInstanceBuilder()
                 .processDefinitionId(definition.getId())
                 .businessKey(businessKey)
                 .name(definition.getName().trim())
                 .variables(variables);
+        // 3.1 创建流程 ID
         BpmModelMetaInfoVO.ProcessIdRule processIdRule = processDefinitionInfo.getProcessIdRule();
-        if (processIdRule != null && processIdRule.getEnable()) {
-            String id = processIdRedisDAO.generate(processIdRule);
-            processInstanceBuilder.predefineProcessInstanceId(id);
+        if (processIdRule != null && Boolean.TRUE.equals(processIdRule.getEnable())) {
+            processInstanceBuilder.predefineProcessInstanceId(processIdRedisDAO.generate(processIdRule));
         }
+        // 3.2 发起流程实例
         ProcessInstance instance = processInstanceBuilder.start();
         return instance.getId();
     }

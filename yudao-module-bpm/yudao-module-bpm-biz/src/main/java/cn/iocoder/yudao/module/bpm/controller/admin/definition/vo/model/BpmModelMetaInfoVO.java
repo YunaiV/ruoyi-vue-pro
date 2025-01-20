@@ -66,10 +66,10 @@ public class BpmModelMetaInfoVO {
     @Schema(description = "允许撤销审批中的申请", example = "true")
     private Boolean allowCancelRunningProcess;
 
-    @Schema(description = "流程 Id 规则", example = "{}")
+    @Schema(description = "流程 ID 规则", example = "{}")
     private ProcessIdRule processIdRule;
 
-    @Schema(description = "流程 Id 规则")
+    @Schema(description = "流程 ID 规则")
     @Data
     @Valid
     public static class ProcessIdRule {
@@ -78,18 +78,19 @@ public class BpmModelMetaInfoVO {
         @NotNull(message = "是否启用不能为空")
         private Boolean enable;
 
-        @Schema(description = "前缀", example = "xx")
+        @Schema(description = "前缀", example = "XX")
         private String prefix;
 
-        @Schema(description = "前缀", example = "20250120")
-        private String infix;
+        @Schema(description = "中缀", example = "20250120")
+        private String infix; // 精确到日、精确到时、精确到分、精确到秒
 
-        @Schema(description = "前缀", example = "xx")
+        @Schema(description = "后缀", example = "YY")
         private String postfix;
 
         @Schema(description = "序列长度", example = "5")
         @NotNull(message = "序列长度不能为空")
         private Integer length;
+
     }
 
 }

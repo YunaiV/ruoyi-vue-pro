@@ -157,7 +157,7 @@ public class BpmProcessDefinitionInfoDO extends BaseDO {
     private Boolean allowCancelRunningProcess;
 
     /**
-     * 流程 Id 规则
+     * 流程 ID 规则
      */
     @TableField(typeHandler = JacksonTypeHandler.class)
     private BpmModelMetaInfoVO.ProcessIdRule processIdRule;
