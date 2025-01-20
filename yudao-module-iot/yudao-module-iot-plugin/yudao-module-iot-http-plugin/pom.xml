@@ -127,7 +127,7 @@
         <!-- 其他依赖项 -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
+            <artifactId>spring-boot-starter</artifactId>
         </dependency>
         <!-- PF4J Spring 集成 -->
         <dependency>
@@ -147,20 +147,11 @@
             <version>${lombok.version}</version>
             <scope>provided</scope>
         </dependency>
-        <!-- Vert.x 核心依赖 -->
-        <dependency>
-            <groupId>io.vertx</groupId>
-            <artifactId>vertx-core</artifactId>
-        </dependency>
-        <!-- Vert.x Web 模块 -->
+        <!-- Vert.x Web -->
         <dependency>
             <groupId>io.vertx</groupId>
             <artifactId>vertx-web</artifactId>
-        </dependency>
-        <!-- MQTT -->
-        <dependency>
-            <groupId>org.eclipse.paho</groupId>
-            <artifactId>org.eclipse.paho.client.mqttv3</artifactId>
+            <version>4.5.11</version>
         </dependency>
     </dependencies>
 </project>

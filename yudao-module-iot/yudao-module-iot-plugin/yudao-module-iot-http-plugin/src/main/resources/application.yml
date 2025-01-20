@@ -1,10 +1,7 @@
-server:
-  port: 8092
-
 spring:
   application:
     name: yudao-module-iot-http-plugin
-  
+
 # MQTT-RPC 配置
 mqtt:
   broker: tcp://chaojiniu.top:1883
