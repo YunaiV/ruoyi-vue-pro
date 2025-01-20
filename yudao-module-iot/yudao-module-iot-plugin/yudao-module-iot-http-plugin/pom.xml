@@ -127,7 +127,7 @@
         <!-- 其他依赖项 -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
+            <artifactId>spring-boot-starter</artifactId>
         </dependency>
         <!-- PF4J Spring 集成 -->
         <dependency>
