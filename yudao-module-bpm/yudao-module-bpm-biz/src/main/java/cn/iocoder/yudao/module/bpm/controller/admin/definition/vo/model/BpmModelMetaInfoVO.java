@@ -4,6 +4,7 @@ import cn.iocoder.yudao.framework.common.validation.InEnum;
 import cn.iocoder.yudao.module.bpm.enums.definition.BpmModelFormTypeEnum;
 import cn.iocoder.yudao.module.bpm.enums.definition.BpmModelTypeEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
@@ -64,5 +65,31 @@ public class BpmModelMetaInfoVO {
 
     @Schema(description = "允许撤销审批中的申请", example = "true")
     private Boolean allowCancelRunningProcess;
+
+    @Schema(description = "流程 Id 规则", example = "{}")
+    private ProcessIdRule processIdRule;
+
+    @Schema(description = "流程 Id 规则")
+    @Data
+    @Valid
+    public static class ProcessIdRule {
+
+        @Schema(description = "是否启用", example = "false")
+        @NotNull(message = "是否启用不能为空")
+        private Boolean enable;
+
+        @Schema(description = "前缀", example = "xx")
+        private String prefix;
+
+        @Schema(description = "前缀", example = "20250120")
+        private String infix;
+
+        @Schema(description = "前缀", example = "xx")
+        private String postfix;
+
+        @Schema(description = "序列长度", example = "5")
+        @NotNull(message = "序列长度不能为空")
+        private Integer length;
+    }
 
 }
