@@ -2,6 +2,8 @@ package cn.iocoder.yudao.module.erp.api.product.dto;
 
 import lombok.Data;
 
+import java.math.BigDecimal;
+
 /**
  * @date: 2025/1/3 8:31
  * @Version: 1.0
@@ -41,6 +43,22 @@ public class ErpProductDTO {
      * 基础高度（mm）
      */
     private Integer height;
+    /**
+     * 包装高度（mm）
+     */
+    private Integer packageHeight;
+    /**
+     * 包装长度（mm）
+     */
+    private Integer packageLength;
+    /**
+     * 包装重量(kg)
+     */
+    private BigDecimal packageWeight;
+    /**
+     * 包装宽度（mm）
+     */
+    private Integer packageWidth;
     /**
      * 主图url
      */

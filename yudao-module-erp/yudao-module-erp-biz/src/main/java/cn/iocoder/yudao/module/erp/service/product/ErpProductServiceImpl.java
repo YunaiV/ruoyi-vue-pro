@@ -176,9 +176,9 @@ public class ErpProductServiceImpl implements ErpProductService {
             updateObj.setPatentCountryCodes("");
         }
         ThrowUtil.ifSqlThrow(productMapper.updateById(updateObj),DB_UPDATE_ERROR);
-        //同步数据,根据需求文档，新增的时候不同步产品信息(不带国别)。海关规则加CN规则的时候同步。
+        //更新产品时->覆盖n个海关规则
         var dtos = customRuleMapper.selectProductAllInfoListById(id);
-//        erpCustomRuleChannel.send(MessageBuilder.withPayload(dtos).build());
+        erpCustomRuleChannel.send(MessageBuilder.withPayload(dtos).build());
 
         //获取创建人id
         Long loginUserId = SecurityFrameworkUtils.getLoginUserId();
