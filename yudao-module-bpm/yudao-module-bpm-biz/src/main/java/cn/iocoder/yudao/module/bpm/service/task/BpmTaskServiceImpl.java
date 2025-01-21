@@ -13,6 +13,7 @@ import cn.iocoder.yudao.framework.web.core.util.WebFrameworkUtils;
 import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.task.*;
 import cn.iocoder.yudao.module.bpm.convert.task.BpmTaskConvert;
 import cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmFormDO;
+import cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmProcessDefinitionInfoDO;
 import cn.iocoder.yudao.module.bpm.enums.definition.*;
 import cn.iocoder.yudao.module.bpm.enums.task.BpmCommentTypeEnum;
 import cn.iocoder.yudao.module.bpm.enums.task.BpmReasonEnum;
@@ -33,10 +34,7 @@ import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
-import org.flowable.bpmn.model.BpmnModel;
-import org.flowable.bpmn.model.EndEvent;
-import org.flowable.bpmn.model.FlowElement;
-import org.flowable.bpmn.model.UserTask;
+import org.flowable.bpmn.model.*;
 import org.flowable.engine.HistoryService;
 import org.flowable.engine.ManagementService;
 import org.flowable.engine.RuntimeService;
@@ -1173,6 +1171,51 @@ public class BpmTaskServiceImpl implements BpmTaskService {
                 if (processInstance == null) {
                     log.error("[processTaskAssigned][taskId({}) 没有找到流程实例]", task.getId());
                     return;
+                }
+                // 自动去重 TODO @芋艿 驳回的情况得考虑一下
+                BpmProcessDefinitionInfoDO processDefinitionInfo = bpmProcessDefinitionService.getProcessDefinitionInfo(task.getProcessDefinitionId());
+                if (processDefinitionInfo == null) {
+                    log.error("[processTaskAssigned][taskId({}) 没有找到流程定义]", task.getId());
+                    return;
+                }
+                if (processDefinitionInfo.getAutoApprovalType() != null) {
+                    HistoricTaskInstanceQuery query = historyService.createHistoricTaskInstanceQuery()
+                            .processInstanceId(task.getProcessInstanceId())
+                            .taskAssignee(task.getAssignee())
+                            .taskVariableValueEquals(BpmnVariableConstants.TASK_VARIABLE_STATUS,
+                                    BpmTaskStatusEnum.APPROVE.getStatus())
+                            .finished();
+                    if (BpmAutoApproveType.APPROVE_ALL.getType().equals(processDefinitionInfo.getAutoApprovalType())){
+                        long count = query.count();
+                        if (count > 0) {
+                            // 自动通过
+                            getSelf().approveTask(Long.valueOf(task.getAssignee()), new BpmTaskApproveReqVO().setId(task.getId())
+                                    .setReason(BpmReasonEnum.APPROVE_TYPE_AUTO_APPROVE.getReason()));
+                            return;
+                        }
+                    }
+                    if (BpmAutoApproveType.APPROVE_SEQUENT.getType().equals(processDefinitionInfo.getAutoApprovalType())) {
+                        BpmnModel bpmnModel = modelService.getBpmnModelByDefinitionId(processInstance.getProcessDefinitionId());
+                        if (bpmnModel == null) {
+                            log.error("[processTaskAssigned][taskId({}) 没有找到流程模型]", task.getId());
+                            return;
+                        }
+                        FlowNode taskElement = (FlowNode) BpmnModelUtils.getFlowElementById(bpmnModel, task.getTaskDefinitionKey());
+                        List<SequenceFlow> incomingFlows = taskElement.getIncomingFlows();
+                        List<String> sourceTaskIds = new ArrayList<>();
+                        if (incomingFlows != null && !incomingFlows.isEmpty()) {
+                            incomingFlows.forEach(flow -> {
+                                sourceTaskIds.add(flow.getSourceRef());
+                            });
+                        }
+                        long count = query.taskDefinitionKeys(sourceTaskIds).count();
+                        if (count > 0) {
+                            // 自动通过
+                            getSelf().approveTask(Long.valueOf(task.getAssignee()), new BpmTaskApproveReqVO().setId(task.getId())
+                                    .setReason(BpmReasonEnum.APPROVE_TYPE_AUTO_APPROVE.getReason()));
+                            return;
+                        }
+                    }
                 }
                 // 审批人与提交人为同一人时，根据 BpmUserTaskAssignStartUserHandlerTypeEnum 策略进行处理
                 if (StrUtil.equals(task.getAssignee(), processInstance.getStartUserId())) {

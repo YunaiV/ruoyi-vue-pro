@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model;
 
 import cn.iocoder.yudao.framework.common.validation.InEnum;
+import cn.iocoder.yudao.module.bpm.enums.definition.BpmAutoApproveType;
 import cn.iocoder.yudao.module.bpm.enums.definition.BpmModelFormTypeEnum;
 import cn.iocoder.yudao.module.bpm.enums.definition.BpmModelTypeEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -68,6 +69,10 @@ public class BpmModelMetaInfoVO {
 
     @Schema(description = "流程 ID 规则", example = "{}")
     private ProcessIdRule processIdRule;
+
+    @Schema(description = "自动去重类型", example = "1")
+    @InEnum(BpmAutoApproveType.class)
+    private Integer autoApprovalType;
 
     @Schema(description = "流程 ID 规则")
     @Data
