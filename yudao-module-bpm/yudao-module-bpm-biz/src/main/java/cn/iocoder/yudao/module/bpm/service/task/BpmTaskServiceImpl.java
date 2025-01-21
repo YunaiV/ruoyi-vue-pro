@@ -1190,7 +1190,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
                         if (count > 0) {
                             // 自动通过
                             getSelf().approveTask(Long.valueOf(task.getAssignee()), new BpmTaskApproveReqVO().setId(task.getId())
-                                    .setReason(BpmReasonEnum.APPROVE_TYPE_AUTO_APPROVE.getReason()));
+                                    .setReason(BpmAutoApproveType.APPROVE_ALL.getName()));
                             return;
                         }
                     }
@@ -1212,7 +1212,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
                         if (count > 0) {
                             // 自动通过
                             getSelf().approveTask(Long.valueOf(task.getAssignee()), new BpmTaskApproveReqVO().setId(task.getId())
-                                    .setReason(BpmReasonEnum.APPROVE_TYPE_AUTO_APPROVE.getReason()));
+                                    .setReason(BpmAutoApproveType.APPROVE_SEQUENT.getName()));
                             return;
                         }
                     }
