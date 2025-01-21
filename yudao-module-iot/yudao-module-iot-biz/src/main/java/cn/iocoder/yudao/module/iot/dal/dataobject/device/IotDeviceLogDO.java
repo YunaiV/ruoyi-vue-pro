@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.iot.dal.dataobject.device;
 
+import cn.iocoder.yudao.module.iot.dal.dataobject.product.IotProductDO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -27,12 +28,16 @@ public class IotDeviceLogDO {
     // TODO @super：关联要 @下
     /**
      * 产品标识
+     * <p>
+     * 关联 {@link IotProductDO#getProductKey()}
      */
     private String productKey;
 
     // TODO @super：关联要 @下
     /**
      * 设备标识
+     * <p>
+     * 关联 {@link IotDeviceDO#getDeviceKey()}}
      */
     private String deviceKey;
 
