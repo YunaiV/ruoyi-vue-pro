@@ -8,9 +8,9 @@
         <version>${revision}</version>
     </parent>
     <modules>
-        <module>yudao-module-iot-demo-plugin</module>
-        <module>yudao-module-iot-http-plugin</module>
-        <module>yudao-module-iot-mqtt-plugin</module>
+        <module>yudao-module-iot-plugin-http</module>
+        <module>yudao-module-iot-plugin-mqtt</module>
+        <module>yudao-module-iot-plugin-emqx</module>
     </modules>
 
     <modelVersion>4.0.0</modelVersion>

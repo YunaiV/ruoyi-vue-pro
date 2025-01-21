@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.iot.service.device;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.iot.api.device.dto.DeviceDataCreateReqDTO;
+import cn.iocoder.yudao.module.iot.api.device.dto.IotDevicePropertyReportReqDTO;
 import cn.iocoder.yudao.module.iot.controller.admin.device.vo.deviceData.IotDeviceDataPageReqVO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDataDO;
 import jakarta.validation.Valid;
@@ -28,7 +28,7 @@ public interface IotDevicePropertyDataService {
      *
      * @param createDTO 设备数据
      */
-    void saveDeviceData(DeviceDataCreateReqDTO createDTO);
+    void saveDeviceData(IotDevicePropertyReportReqDTO createDTO);
 
     /**
      * 获得设备属性最新数据

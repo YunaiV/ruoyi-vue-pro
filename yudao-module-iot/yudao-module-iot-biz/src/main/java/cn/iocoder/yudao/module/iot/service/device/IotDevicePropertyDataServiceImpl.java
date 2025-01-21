@@ -6,7 +6,7 @@ import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONObject;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.iot.api.device.dto.DeviceDataCreateReqDTO;
+import cn.iocoder.yudao.module.iot.api.device.dto.IotDevicePropertyReportReqDTO;
 import cn.iocoder.yudao.module.iot.controller.admin.device.vo.deviceData.IotDeviceDataPageReqVO;
 import cn.iocoder.yudao.module.iot.controller.admin.thingmodel.model.dataType.ThingModelDateOrTextDataSpecs;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDO;
@@ -130,11 +130,12 @@ public class IotDevicePropertyDataServiceImpl implements IotDevicePropertyDataSe
     }
 
     @Override
-    public void saveDeviceData(DeviceDataCreateReqDTO createDTO) {
+    public void saveDeviceData(IotDevicePropertyReportReqDTO createDTO) {
+        // TODO 芋艿：这块需要实现
         // 1. 根据产品 key 和设备名称，获得设备信息
         IotDeviceDO device = deviceService.getDeviceByProductKeyAndDeviceName(createDTO.getProductKey(), createDTO.getDeviceName());
         // 2. 解析消息，保存数据
-        JSONObject jsonObject = new JSONObject(createDTO.getMessage());
+        JSONObject jsonObject = new JSONObject(createDTO.getParams());
         log.info("[saveDeviceData][productKey({}) deviceName({}) data({})]", createDTO.getProductKey(), createDTO.getDeviceName(), jsonObject);
         ThingModelMessage thingModelMessage = ThingModelMessage.builder()
                 .id(jsonObject.getStr("id"))
