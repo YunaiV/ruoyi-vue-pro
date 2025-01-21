@@ -5,6 +5,7 @@ import com.somle.eccang.model.*;
 import com.somle.eccang.model.EccangResponse.EccangPage;
 import com.somle.eccang.model.exception.EccangResponseException;
 import com.somle.eccang.model.req.EccangInventoryBatchReqVO;
+import com.somle.eccang.model.req.EccangRmaReturnReqVO;
 import com.somle.eccang.repository.EccangTokenRepository;
 import com.somle.framework.common.util.general.Limiter;
 import com.somle.framework.common.util.json.JSONObject;
@@ -452,6 +453,10 @@ public class EccangService {
         return getAllPage(JsonUtils.toJSONObject(eccangRmaRefundVO), "getRmaRefundList");
     }
 
+    //退件列表
+    public Stream<EccangPage> getRmaReturnList(EccangRmaReturnReqVO eccangRmaReturnReqVO){
+        return getAllPage(JsonUtils.toJSONObject(eccangRmaReturnReqVO), "getRmaReturnList");
+    }
 
     public String parseCountryCode(String code) {
         switch (code) {
