@@ -162,4 +162,9 @@ public class BpmProcessDefinitionInfoDO extends BaseDO {
     @TableField(typeHandler = JacksonTypeHandler.class)
     private BpmModelMetaInfoVO.ProcessIdRule processIdRule;
 
+    /**
+     * 自动去重类型
+     */
+    private Integer autoApprovalType;
+
 }
