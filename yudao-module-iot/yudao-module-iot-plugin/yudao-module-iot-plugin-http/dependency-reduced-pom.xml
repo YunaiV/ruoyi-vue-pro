@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <parent>
+    <artifactId>yudao-module-iot-plugin</artifactId>
+    <groupId>cn.iocoder.boot</groupId>
+    <version>2.2.0-snapshot</version>
+  </parent>
+  <modelVersion>4.0.0</modelVersion>
+  <artifactId>yudao-module-iot-plugin-http</artifactId>
+  <name>${project.artifactId}</name>
+  <version>1.0.0</version>
+  <description>物联网 插件模块 - http 插件</description>
+  <build>
+    <plugins>
+      <plugin>
+        <artifactId>maven-shade-plugin</artifactId>
+        <version>3.2.4</version>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>shade</goal>
+            </goals>
+            <configuration>
+              <transformers>
+                <transformer>
+                  <mainClass>com.example.HttpPluginSpringbootApplication</mainClass>
+                </transformer>
+              </transformers>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+  <properties>
+    <plugin.id>${project.artifactId}</plugin.id>
+    <plugin.description>${project.artifactId}-${project.version}</plugin.description>
+    <plugin.class>cn.iocoder.yudao.module.iot.config.HttpVertxPlugin</plugin.class>
+    <plugin.version>${project.version}</plugin.version>
+    <plugin.provider>yudao</plugin.provider>
+  </properties>
+</project>
