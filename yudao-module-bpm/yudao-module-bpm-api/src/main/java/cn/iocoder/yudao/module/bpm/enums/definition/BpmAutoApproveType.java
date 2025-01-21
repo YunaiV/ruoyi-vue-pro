@@ -15,6 +15,7 @@ import java.util.Arrays;
 @AllArgsConstructor
 public enum BpmAutoApproveType implements IntArrayValuable {
 
+    // TODO @lesan：0、1、/2 会不会好理解一点哈。
     NONE(1, "不自动通过"),
     APPROVE_ALL(2, "仅审批一次，后续重复的审批节点均自动通过"),
     APPROVE_SEQUENT(3, "仅针对连续审批的节点自动通过");

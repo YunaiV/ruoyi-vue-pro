@@ -1172,51 +1172,50 @@ public class BpmTaskServiceImpl implements BpmTaskService {
                     log.error("[processTaskAssigned][taskId({}) 没有找到流程实例]", task.getId());
                     return;
                 }
-                // 自动去重 TODO @芋艿 驳回的情况得考虑一下
+
+                // 自动去重，通过自动审批的方式 TODO @芋艿 驳回的情况得考虑一下；@lesan：驳回后，又自动审批么？
                 BpmProcessDefinitionInfoDO processDefinitionInfo = bpmProcessDefinitionService.getProcessDefinitionInfo(task.getProcessDefinitionId());
                 if (processDefinitionInfo == null) {
-                    log.error("[processTaskAssigned][taskId({}) 没有找到流程定义]", task.getId());
+                    log.error("[processTaskAssigned][taskId({}) 没有找到流程定义({})]", task.getId(), task.getProcessDefinitionId());
                     return;
                 }
                 if (processDefinitionInfo.getAutoApprovalType() != null) {
-                    HistoricTaskInstanceQuery query = historyService.createHistoricTaskInstanceQuery()
+                    HistoricTaskInstanceQuery sameAssigneeQuery = historyService.createHistoricTaskInstanceQuery()
                             .processInstanceId(task.getProcessInstanceId())
-                            .taskAssignee(task.getAssignee())
-                            .taskVariableValueEquals(BpmnVariableConstants.TASK_VARIABLE_STATUS,
-                                    BpmTaskStatusEnum.APPROVE.getStatus())
+                            .taskAssignee(task.getAssignee()) // 相同审批人
+                            .taskVariableValueEquals(BpmnVariableConstants.TASK_VARIABLE_STATUS, BpmTaskStatusEnum.APPROVE.getStatus())
                             .finished();
-                    if (BpmAutoApproveType.APPROVE_ALL.getType().equals(processDefinitionInfo.getAutoApprovalType())){
-                        long count = query.count();
-                        if (count > 0) {
-                            // 自动通过
-                            getSelf().approveTask(Long.valueOf(task.getAssignee()), new BpmTaskApproveReqVO().setId(task.getId())
-                                    .setReason(BpmAutoApproveType.APPROVE_ALL.getName()));
-                            return;
-                        }
+                    if (BpmAutoApproveType.APPROVE_ALL.getType().equals(processDefinitionInfo.getAutoApprovalType())
+                        && sameAssigneeQuery.count() > 0) {
+                        getSelf().approveTask(Long.valueOf(task.getAssignee()), new BpmTaskApproveReqVO().setId(task.getId())
+                                .setReason(BpmAutoApproveType.APPROVE_ALL.getName()));
+                        return;
                     }
                     if (BpmAutoApproveType.APPROVE_SEQUENT.getType().equals(processDefinitionInfo.getAutoApprovalType())) {
                         BpmnModel bpmnModel = modelService.getBpmnModelByDefinitionId(processInstance.getProcessDefinitionId());
                         if (bpmnModel == null) {
-                            log.error("[processTaskAssigned][taskId({}) 没有找到流程模型]", task.getId());
+                            log.error("[processTaskAssigned][taskId({}) 没有找到流程模型({})]", task.getId(), task.getProcessDefinitionId());
                             return;
                         }
+                        // TODO @lesan：这里的逻辑，要不在 BpmnModelUtils 抽个方法？？？尽量收敛
                         FlowNode taskElement = (FlowNode) BpmnModelUtils.getFlowElementById(bpmnModel, task.getTaskDefinitionKey());
                         List<SequenceFlow> incomingFlows = taskElement.getIncomingFlows();
                         List<String> sourceTaskIds = new ArrayList<>();
+                        // TODO @lesan：这种 CollUtil.isnotempty 简化
                         if (incomingFlows != null && !incomingFlows.isEmpty()) {
+                            // TODO @lesan：这种，idea 一般会告警，可以处理掉哈。一切警告，皆是错误
                             incomingFlows.forEach(flow -> {
                                 sourceTaskIds.add(flow.getSourceRef());
                             });
                         }
-                        long count = query.taskDefinitionKeys(sourceTaskIds).count();
-                        if (count > 0) {
-                            // 自动通过
+                        if (sameAssigneeQuery.taskDefinitionKeys(sourceTaskIds).count() > 0) {
                             getSelf().approveTask(Long.valueOf(task.getAssignee()), new BpmTaskApproveReqVO().setId(task.getId())
                                     .setReason(BpmAutoApproveType.APPROVE_SEQUENT.getName()));
                             return;
                         }
                     }
                 }
+
                 // 审批人与提交人为同一人时，根据 BpmUserTaskAssignStartUserHandlerTypeEnum 策略进行处理
                 if (StrUtil.equals(task.getAssignee(), processInstance.getStartUserId())) {
                     // 判断是否为退回或者驳回：如果是退回或者驳回不走这个策略

@@ -164,6 +164,8 @@ public class BpmProcessDefinitionInfoDO extends BaseDO {
 
     /**
      * 自动去重类型
+     *
+     * 枚举 {@link cn.iocoder.yudao.module.bpm.enums.definition.BpmAutoApproveType}
      */
     private Integer autoApprovalType;
 
