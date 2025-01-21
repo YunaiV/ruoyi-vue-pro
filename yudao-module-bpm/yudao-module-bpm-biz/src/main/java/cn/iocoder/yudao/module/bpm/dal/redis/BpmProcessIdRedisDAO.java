@@ -17,9 +17,6 @@ import java.time.LocalDateTime;
 @Repository
 public class BpmProcessIdRedisDAO {
 
-    // TODO @lesan：要枚举到 rediskeyconstants 哈
-    public static final String BPM_PROCESS_ID_PREFIX = "BPMPID";
-
     @Resource
     private StringRedisTemplate stringRedisTemplate;
 
@@ -49,7 +46,7 @@ public class BpmProcessIdRedisDAO {
 
         // 生成序号
         String noPrefix = processIdRule.getPrefix() + infix + processIdRule.getPostfix();
-        String key = BPM_PROCESS_ID_PREFIX + noPrefix;
+        String key = RedisKeyConstants.BPM_PROCESS_ID + noPrefix;
         Long no = stringRedisTemplate.opsForValue().increment(key);
         stringRedisTemplate.expire(key, Duration.ofDays(1L));
         return noPrefix + String.format("%0" + processIdRule.getLength() + "d", no);
