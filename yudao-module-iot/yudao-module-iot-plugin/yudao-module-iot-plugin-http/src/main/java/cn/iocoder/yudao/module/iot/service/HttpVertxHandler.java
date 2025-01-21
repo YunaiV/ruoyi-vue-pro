@@ -3,7 +3,7 @@ package cn.iocoder.yudao.module.iot.service;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import cn.iocoder.yudao.module.iot.api.device.DeviceDataApi;
-import cn.iocoder.yudao.module.iot.api.device.dto.DeviceDataCreateReqDTO;
+import cn.iocoder.yudao.module.iot.api.device.dto.IotDevicePropertyReportReqDTO;
 import io.vertx.core.Handler;
 import io.vertx.ext.web.RequestBody;
 import io.vertx.ext.web.RoutingContext;
@@ -46,12 +46,12 @@ public class HttpVertxHandler implements Handler<RoutingContext> {
 
         try {
             // 调用主程序的接口保存数据
-            DeviceDataCreateReqDTO createDTO = DeviceDataCreateReqDTO.builder()
+            IotDevicePropertyReportReqDTO createDTO = IotDevicePropertyReportReqDTO.builder()
                     .productKey(productKey)
                     .deviceName(deviceName)
-                    .message(jsonData.toString())
+                    .params(jsonData) // TODO 芋艿：这块要优化
                     .build();
-            deviceDataApi.saveDeviceData(createDTO);
+            deviceDataApi.reportDevicePropertyData(createDTO);
 
             // 构造成功响应内容
             JSONObject successRes = createResponseJson(
