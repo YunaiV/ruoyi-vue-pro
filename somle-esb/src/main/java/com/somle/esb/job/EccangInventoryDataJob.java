@@ -1,12 +1,11 @@
 package com.somle.esb.job;
 
 
-import com.somle.eccang.model.EccangOrderVO;
 import com.somle.esb.model.OssData;
 import org.springframework.stereotype.Component;
 
 @Component
-public class EccangStockDataJob extends EccangDataJob{
+public class EccangInventoryDataJob extends EccangDataJob{
 
 
     @Override
@@ -17,7 +16,7 @@ public class EccangStockDataJob extends EccangDataJob{
                 .forEach(page -> {
                     OssData data = OssData.builder()
                             .database(DATABASE)
-                            .tableName("stock")
+                            .tableName("inventory")
                             .syncType("full")
                             .requestTimestamp(System.currentTimeMillis())
                             .folderDate(today)

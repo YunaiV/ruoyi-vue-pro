@@ -6,7 +6,7 @@ import com.somle.esb.model.OssData;
 import org.springframework.stereotype.Component;
 
 @Component
-public class EccangStockLogDataJob extends EccangDataJob {
+public class EccangInventoryBatchLogDataJob extends EccangDataJob {
 
 
     @Override
@@ -19,7 +19,7 @@ public class EccangStockLogDataJob extends EccangDataJob {
             .forEach(page -> {
                 OssData data = OssData.builder()
                     .database(DATABASE)
-                    .tableName("stock_log")
+                    .tableName("inventory_batch_log")
                     .syncType("inc")
                     .requestTimestamp(System.currentTimeMillis())
                     .folderDate(beforeYesterday)

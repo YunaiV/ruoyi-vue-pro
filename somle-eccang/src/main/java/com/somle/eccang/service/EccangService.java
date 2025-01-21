@@ -4,6 +4,7 @@ import cn.hutool.core.collection.CollUtil;
 import com.somle.eccang.model.*;
 import com.somle.eccang.model.EccangResponse.EccangPage;
 import com.somle.eccang.model.exception.EccangResponseException;
+import com.somle.eccang.model.req.EccangInventoryBatchReqVO;
 import com.somle.eccang.repository.EccangTokenRepository;
 import com.somle.framework.common.util.general.Limiter;
 import com.somle.framework.common.util.json.JSONObject;
@@ -130,7 +131,7 @@ public class EccangService {
             // 获取当前重试次数
             int retryCount = ctx.getRetryCount();
             // 记录每次重试的日志
-            log.debug("正在请求url= {},第 {} 次重试。endpoint = {}",request.getUrl(), retryCount + 1, endpoint);
+            log.debug("正在请求url= {},第 {} 次重试。endpoint = {}", request.getUrl(), retryCount + 1, endpoint);
             try (var response = WebUtils.sendRequest(request)) {
                 switch (response.code()) {
                     case 200:
@@ -193,7 +194,7 @@ public class EccangService {
             getPage(payload, endpoint), Objects::nonNull,
             bizContent -> {
                 if (bizContent.hasNext()) {
-                    log.debug("have next,当前进度：{}/{}", (bizContent.getPage() - 1) * pageSize + bizContent.getData().size(), bizContent.getTotal());
+                    log.debug("have next,endpoint:{}当前进度：{}/{}", endpoint, (bizContent.getPage() - 1) * pageSize + bizContent.getData().size(), bizContent.getTotal());
                     payload.put("page", bizContent.getPage() + 1);
                     return getPage(payload, endpoint);
                 } else {
@@ -352,6 +353,9 @@ public class EccangService {
         return getAllPage(JsonUtils.toJSONObject(eccangInventoryBatchLogVO), "getInventoryBatchLog");
     }
 
+    public Stream<EccangPage> getInventoryBatch(EccangInventoryBatchReqVO eccangInventoryBatchVO) {
+        return getAllPage(JsonUtils.toJSONObject(eccangInventoryBatchVO), "getInventoryBatch");
+    }
 
     public EccangPage addDepartment(EccangCategory department) {
         try {
