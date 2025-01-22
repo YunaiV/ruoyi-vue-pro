@@ -150,6 +150,15 @@ public class IotDevicePropertyDataServiceImpl implements IotDevicePropertyDataSe
         thingModelMessageService.saveThingModelMessage(device, thingModelMessage);
     }
 
+    //TODO:后续捋一捋这块逻辑，先借鉴一下目前的代码
+    @Override
+    public void saveDeviceDataTest(ThingModelMessage thingModelMessage) {
+        // 1. 根据产品 key 和设备名称，获得设备信息
+        IotDeviceDO device = deviceService.getDeviceByProductKeyAndDeviceName(thingModelMessage.getProductKey(), thingModelMessage.getDeviceName());
+        // 2. 保存数据
+        thingModelMessageService.saveThingModelMessage(device, thingModelMessage);
+    }
+
     @Override
     public List<IotDeviceDataDO> getLatestDeviceProperties(@Valid IotDeviceDataPageReqVO deviceDataReqVO) {
         List<IotDeviceDataDO> list = new ArrayList<>();
