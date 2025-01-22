@@ -7,13 +7,13 @@ import lombok.Getter;
 import java.util.Arrays;
 
 /**
- * BPM 任务监听器键值对类型
+ * BPM HTTP 请求参数设置类型。用于 Simple 设计器任务监听器和触发器配置。
  *
  * @author Lesan
  */
 @Getter
 @AllArgsConstructor
-public enum BpmListenerParamTypeEnum implements IntArrayValuable {
+public enum BpmHttpRequestParamSettingType implements IntArrayValuable {
 
     FIXED_VALUE(1, "固定值"),
     FROM_FORM(2, "表单");
@@ -21,7 +21,7 @@ public enum BpmListenerParamTypeEnum implements IntArrayValuable {
     private final Integer type;
     private final String name;
 
-    public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(BpmListenerParamTypeEnum::getType).toArray();
+    public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(BpmHttpRequestParamSettingType::getType).toArray();
 
     @Override
     public int[] array() {

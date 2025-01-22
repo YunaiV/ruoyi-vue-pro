@@ -4,17 +4,16 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.map.MapUtil;
-import cn.hutool.core.util.*;
+import cn.hutool.core.util.ArrayUtil;
+import cn.hutool.core.util.ObjUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.common.util.number.NumberUtils;
 import cn.iocoder.yudao.framework.common.util.string.StrUtils;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.simple.BpmSimpleModelNodeVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.task.BpmTaskRespVO;
-import cn.iocoder.yudao.module.bpm.enums.definition.BpmUserTaskApproveTypeEnum;
-import cn.iocoder.yudao.module.bpm.enums.definition.BpmUserTaskAssignEmptyHandlerTypeEnum;
-import cn.iocoder.yudao.module.bpm.enums.definition.BpmUserTaskAssignStartUserHandlerTypeEnum;
-import cn.iocoder.yudao.module.bpm.enums.definition.BpmUserTaskRejectHandlerType;
+import cn.iocoder.yudao.module.bpm.enums.definition.*;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnModelConstants;
 import com.google.common.collect.Maps;
 import lombok.extern.slf4j.Slf4j;
@@ -393,6 +392,15 @@ public class BpmnModelUtils {
         String expressionText = fixedValue.getExpressionText();
         Assert.notNull(expressionText, "监听器扩展字段({})不能为空", expressionText);
         return JsonUtils.parseObject(expressionText, BpmSimpleModelNodeVO.ListenerHandler.class);
+    }
+
+    public static BpmTriggerType parserTriggerType(FlowElement flowElement) {
+        Integer triggerType = NumberUtils.parseInt(parseExtensionElement(flowElement, TRIGGER_TYPE));
+        return BpmTriggerType.typeOf(triggerType);
+    }
+
+    public static String parserTriggerParam(FlowElement flowElement) {
+        return parseExtensionElement(flowElement, TRIGGER_PARAM);
     }
 
     // ========== BPM 简单查找相关的方法 ==========

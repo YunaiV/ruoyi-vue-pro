@@ -27,6 +27,7 @@ public enum BpmSimpleModelNodeType implements IntArrayValuable {
     COPY_NODE(12, "抄送人", "serviceTask"),
 
     DELAY_TIMER_NODE(14, "延迟器", "receiveTask"),
+    TRIGGER_NODE(15, "触发器", "serviceTask"),
 
     // 50 ~ 条件分支
     CONDITION_NODE(50, "条件", "sequenceFlow"), // 用于构建流转条件的表达式

@@ -1,9 +1,8 @@
 package cn.iocoder.yudao.module.bpm.service.task.listener;
 
-import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.simple.BpmSimpleModelNodeVO;
-import cn.iocoder.yudao.module.bpm.enums.definition.BpmListenerParamTypeEnum;
+import cn.iocoder.yudao.module.bpm.framework.flowable.core.util.SimpleModelUtils;
 import cn.iocoder.yudao.module.bpm.service.task.BpmProcessInstanceService;
 import jakarta.annotation.Resource;
 import lombok.Setter;
@@ -22,7 +21,6 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.List;
 import java.util.Map;
 
 import static cn.iocoder.yudao.framework.web.core.util.WebFrameworkUtils.HEADER_TENANT_ID;
@@ -59,8 +57,8 @@ public class BpmUserTaskListener implements TaskListener {
         Map<String, Object> processVariables = processInstance.getProcessVariables();
         MultiValueMap<String, String> headers = new LinkedMultiValueMap<>();
         MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
-        parseListenerParam(listenerHandler.getHeader(), processVariables, headers);
-        parseListenerParam(listenerHandler.getBody(), processVariables, body);
+        SimpleModelUtils.addHttpRequestParam(headers, listenerHandler.getHeader(), processVariables);
+        SimpleModelUtils.addHttpRequestParam(body, listenerHandler.getBody(), processVariables);
         // 2.1 请求头默认参数
         if (StrUtil.isNotEmpty(delegateTask.getTenantId())) {
             headers.add(HEADER_TENANT_ID, delegateTask.getTenantId());
@@ -94,20 +92,4 @@ public class BpmUserTaskListener implements TaskListener {
         }
         // 4. 是否需要后续操作？TODO 芋艿：待定！
     }
-
-    private void parseListenerParam(List<BpmSimpleModelNodeVO.ListenerHandler.ListenerParam> list,
-                                    Map<String, Object> processVariables,
-                                    MultiValueMap<String, String> to) {
-        if (CollUtil.isEmpty(list)) {
-            return;
-        }
-        list.forEach(item -> {
-            if (item.getType().equals(BpmListenerParamTypeEnum.FIXED_VALUE.getType())) {
-                to.add(item.getKey(), item.getValue());
-            } else if (item.getType().equals(BpmListenerParamTypeEnum.FROM_FORM.getType())) {
-                to.add(item.getKey(), processVariables.get(item.getValue()).toString());
-            }
-        });
-    }
-
 }

@@ -9,6 +9,7 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
+import org.hibernate.validator.constraints.URL;
 
 import java.util.List;
 import java.util.Map;
@@ -115,6 +116,11 @@ public class BpmSimpleModelNodeVO {
     @Schema(description = "路由分支默认分支 ID", example = "Flow_xxx", hidden = true) // 由后端生成，所以 hidden = true
     private String routerDefaultFlowId; // 仅用于路由分支节点 BpmSimpleModelNodeType.ROUTER_BRANCH_NODE
 
+    /**
+     * 触发器节点设置
+     */
+    private TriggerSetting triggerSetting;
+
     @Schema(description = "任务监听器")
     @Valid
     @Data
@@ -128,27 +134,28 @@ public class BpmSimpleModelNodeVO {
         private String path;
 
         @Schema(description = "请求头", example = "[]")
-        private List<ListenerParam> header;
+        private List<HttpRequestParamSetting> header;
 
         @Schema(description = "请求体", example = "[]")
-        private List<ListenerParam> body;
+        private List<HttpRequestParamSetting> body;
+    }
 
-        // TODO @芋艿：这里后续要不要复用；
+    @Schema(description = "HTTP 请求参数设置")
+    @Data
+    public static class HttpRequestParamSetting {
 
-        @Schema(description = "任务监听器键值对")
-        @Data
-        public static class ListenerParam {
+        @Schema(description = "值类型", example = "1")
+        @InEnum(BpmHttpRequestParamSettingType.class)
+        @NotNull(message = "值类型不能为空")
+        private Integer type;
 
-            @Schema(description = "值类型", example = "1")
-            @InEnum(BpmListenerParamTypeEnum.class)
-            private Integer type;
+        @Schema(description = "键", example = "xxx")
+        @NotEmpty(message = "键不能为空")
+        private String key;
 
-            @Schema(description = "键", example = "xxx")
-            private String key;
-
-            @Schema(description = "值", example = "xxx")
-            private String value;
-        }
+        @Schema(description = "值", example = "xxx")
+        @NotEmpty(message = "值不能为空")
+        private String value;
     }
 
     @Schema(description = "审批节点拒绝处理策略")
@@ -317,5 +324,40 @@ public class BpmSimpleModelNodeVO {
 
         @Schema(description = "条件组", example = "{}")
         private ConditionGroups conditionGroups;
+    }
+
+    @Schema(description = "触发器节点配置")
+    @Data
+    @Valid
+    public static class TriggerSetting {
+
+        @Schema(description = "触发器类型", example = "1")
+        @InEnum(BpmTriggerType.class)
+        @NotNull(message = "触发器类型不能为空")
+        private Integer type;
+
+        /**
+         * http 请求触发器设置
+         */
+        @Valid
+        private HttpRequestTriggerSetting httpRequestSetting;
+
+        @Schema(description = "http 请求触发器设置", example = "{}")
+        @Data
+        public static class HttpRequestTriggerSetting {
+
+            @Schema(description = "请求路径", example = "http://127.0.0.1")
+            @NotEmpty(message = "请求 URL 不能为空")
+            @URL(message = "请求 URL 格式不正确")
+            private String url;
+
+            @Schema(description = "请求头参数设置", example = "[]")
+            @Valid
+            private List<HttpRequestParamSetting> header;
+
+            @Schema(description = "请求头参数设置", example = "[]")
+            @Valid
+            private List<HttpRequestParamSetting> body;
+        }
     }
 }
