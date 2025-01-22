@@ -62,8 +62,7 @@ import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionU
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
 import static cn.iocoder.yudao.module.bpm.enums.ErrorCodeConstants.*;
 import static cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnVariableConstants.PROCESS_INSTANCE_VARIABLE_RETURN_FLAG;
-import static cn.iocoder.yudao.module.bpm.framework.flowable.core.util.BpmnModelUtils.parseReasonRequire;
-import static cn.iocoder.yudao.module.bpm.framework.flowable.core.util.BpmnModelUtils.parseSignEnable;
+import static cn.iocoder.yudao.module.bpm.framework.flowable.core.util.BpmnModelUtils.*;
 
 /**
  * 流程任务实例 Service 实现类
@@ -1197,17 +1196,8 @@ public class BpmTaskServiceImpl implements BpmTaskService {
                             log.error("[processTaskAssigned][taskId({}) 没有找到流程模型({})]", task.getId(), task.getProcessDefinitionId());
                             return;
                         }
-                        // TODO @lesan：这里的逻辑，要不在 BpmnModelUtils 抽个方法？？？尽量收敛
-                        FlowNode taskElement = (FlowNode) BpmnModelUtils.getFlowElementById(bpmnModel, task.getTaskDefinitionKey());
-                        List<SequenceFlow> incomingFlows = taskElement.getIncomingFlows();
-                        List<String> sourceTaskIds = new ArrayList<>();
-                        // TODO @lesan：这种 CollUtil.isnotempty 简化
-                        if (incomingFlows != null && !incomingFlows.isEmpty()) {
-                            // TODO @lesan：这种，idea 一般会告警，可以处理掉哈。一切警告，皆是错误
-                            incomingFlows.forEach(flow -> {
-                                sourceTaskIds.add(flow.getSourceRef());
-                            });
-                        }
+                        List<String> sourceTaskIds = getElementIncomingFlows(getFlowElementById(bpmnModel, task.getTaskDefinitionKey()))
+                                .stream().map(SequenceFlow::getSourceRef).toList();
                         if (sameAssigneeQuery.taskDefinitionKeys(sourceTaskIds).count() > 0) {
                             getSelf().approveTask(Long.valueOf(task.getAssignee()), new BpmTaskApproveReqVO().setId(task.getId())
                                     .setReason(BpmAutoApproveType.APPROVE_SEQUENT.getName()));
