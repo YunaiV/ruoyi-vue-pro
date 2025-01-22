@@ -5,6 +5,7 @@ import org.pf4j.PluginStateEvent;
 import org.pf4j.PluginStateListener;
 import org.springframework.stereotype.Component;
 
+// TODO @芋艿：需要 review 下
 @Component
 @Slf4j
 public class CustomPluginStateListener implements PluginStateListener {

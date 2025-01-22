@@ -67,7 +67,7 @@
         <bizlog-sdk.version>3.0.6</bizlog-sdk.version>
         <mqtt.version>1.2.5</mqtt.version>
         <pf4j-spring.version>0.9.0</pf4j-spring.version>
-        <vertx.version>4.4.0</vertx.version>
+        <vertx.version>4.5.11</vertx.version>
         <!-- 三方云服务相关 -->
         <okio.version>3.5.0</okio.version>
         <okhttp3.version>4.11.0</okhttp3.version>
