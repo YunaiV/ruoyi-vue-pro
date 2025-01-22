@@ -4,6 +4,7 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.iot.controller.admin.device.vo.deviceData.IotDeviceDataSimulatorSaveReqVO;
 import cn.iocoder.yudao.module.iot.controller.admin.device.vo.deviceData.IotDeviceLogPageReqVO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceLogDO;
+import cn.iocoder.yudao.module.iot.dal.dataobject.tdengine.ThingModelMessage;
 
 /**
  * IoT 设备日志数据 Service 接口
@@ -35,5 +36,8 @@ public interface IotDeviceLogDataService {
      * @return 设备日志分页
      */
     PageResult<IotDeviceLogDO> getDeviceLogPage(IotDeviceLogPageReqVO pageReqVO);
+
+
+    void saveDeviceLog(ThingModelMessage msg);
 
 }

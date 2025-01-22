@@ -5,6 +5,7 @@ import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.iot.controller.admin.device.vo.deviceData.IotDeviceDataSimulatorSaveReqVO;
 import cn.iocoder.yudao.module.iot.controller.admin.device.vo.deviceData.IotDeviceLogPageReqVO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceLogDO;
+import cn.iocoder.yudao.module.iot.dal.dataobject.tdengine.ThingModelMessage;
 import cn.iocoder.yudao.module.iot.dal.tdengine.IotDeviceLogDataMapper;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
@@ -74,6 +75,11 @@ public class IotDeviceLogDataServiceImpl implements IotDeviceLogDataService{
         Long total = iotDeviceLogDataMapper.selectCount(pageReqVO);
         // 构造分页结果
         return new PageResult<>(list, total);
+    }
+
+    @Override
+    public void saveDeviceLog(ThingModelMessage msg) {
+
     }
 
 }
