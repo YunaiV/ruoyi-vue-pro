@@ -8,6 +8,7 @@ import cn.hutool.json.JSONObject;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.iot.api.device.dto.IotDevicePropertyReportReqDTO;
 import cn.iocoder.yudao.module.iot.controller.admin.device.vo.deviceData.IotDeviceDataPageReqVO;
+import cn.iocoder.yudao.module.iot.controller.admin.device.vo.deviceData.IotDeviceDataSimulatorSaveReqVO;
 import cn.iocoder.yudao.module.iot.controller.admin.thingmodel.model.dataType.ThingModelDateOrTextDataSpecs;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDataDO;
@@ -22,6 +23,7 @@ import cn.iocoder.yudao.module.iot.enums.IotConstants;
 import cn.iocoder.yudao.module.iot.enums.thingmodel.IotDataSpecsDataTypeEnum;
 import cn.iocoder.yudao.module.iot.enums.thingmodel.IotThingModelTypeEnum;
 import cn.iocoder.yudao.module.iot.framework.tdengine.core.TDengineTableField;
+import cn.iocoder.yudao.module.iot.mq.producer.simulatesend.SimulateSendProducer;
 import cn.iocoder.yudao.module.iot.service.product.IotProductService;
 import cn.iocoder.yudao.module.iot.service.tdengine.IotThingModelMessageService;
 import cn.iocoder.yudao.module.iot.service.thingmodel.IotThingModelService;
@@ -75,6 +77,9 @@ public class IotDevicePropertyDataServiceImpl implements IotDevicePropertyDataSe
     private IotThingModelService thingModelService;
     @Resource
     private IotProductService productService;
+
+    @Resource
+    private SimulateSendProducer simulateSendProducer;
 
     @Resource
     private TdEngineDMLMapper tdEngineDMLMapper;
@@ -157,6 +162,27 @@ public class IotDevicePropertyDataServiceImpl implements IotDevicePropertyDataSe
         IotDeviceDO device = deviceService.getDeviceByProductKeyAndDeviceName(thingModelMessage.getProductKey(), thingModelMessage.getDeviceName());
         // 2. 保存数据
         thingModelMessageService.saveThingModelMessage(device, thingModelMessage);
+    }
+
+    //TODO:  copy了saveDeviceData的逻辑，后续看看这块怎么优化
+    @Override
+    public void simulateSend(IotDevicePropertyReportReqDTO simulatorReqVO) {
+        // 1. 根据产品 key 和设备名称，获得设备信息
+        IotDeviceDO device = deviceService.getDeviceByProductKeyAndDeviceName(simulatorReqVO.getProductKey(), simulatorReqVO.getDeviceName());
+        // 2. 解析消息，保存数据
+        JSONObject jsonObject = new JSONObject(simulatorReqVO.getParams());
+        log.info("[saveDeviceData][productKey({}) deviceName({}) data({})]", simulatorReqVO.getProductKey(), simulatorReqVO.getDeviceName(), jsonObject);
+        ThingModelMessage thingModelMessage = ThingModelMessage.builder()
+                .id(jsonObject.getStr("id"))
+                .sys(jsonObject.get("sys"))
+                .method(jsonObject.getStr("method"))
+                .params(jsonObject.get("params"))
+                .time(jsonObject.getLong("time") == null ? System.currentTimeMillis() : jsonObject.getLong("time"))
+                .productKey(simulatorReqVO.getProductKey())
+                .deviceName(simulatorReqVO.getDeviceName())
+                .deviceKey(device.getDeviceKey())
+                .build();
+        simulateSendProducer.sendSimulateMessage(thingModelMessage);
     }
 
     @Override
