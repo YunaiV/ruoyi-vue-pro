@@ -170,4 +170,10 @@ public class BpmProcessDefinitionInfoDO extends BaseDO {
      */
     private Integer autoApprovalType;
 
+    /**
+     * 标题设置
+     */
+    @TableField(typeHandler = JacksonTypeHandler.class)
+    private BpmModelMetaInfoVO.CustomTitleSetting customTitleSetting;
+
 }

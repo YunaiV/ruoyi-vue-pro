@@ -50,6 +50,14 @@ public class BpmnVariableConstants {
      * @see <a href="https://blog.csdn.net/weixin_42065235/article/details/126039993">Flowable/Activiti之SkipExpression 完成自动审批</a>
      */
     public static final String PROCESS_INSTANCE_SKIP_EXPRESSION_ENABLED = "_FLOWABLE_SKIP_EXPRESSION_ENABLED";
+    /**
+     * 流程实例的变量 - 流程开始时间
+     */
+    public static final String PROCESS_START_TIME = "PROCESS_START_TIME";
+    /**
+     * 流程实例的变量 - 流程定义名称
+     */
+    public static final String PROCESS_DEFINITION_NAME = "PROCESS_DEFINITION_NAME";
 
     /**
      * 任务的变量 - 状态

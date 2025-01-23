@@ -74,6 +74,9 @@ public class BpmModelMetaInfoVO {
     @InEnum(BpmAutoApproveTypeEnum.class)
     private Integer autoApprovalType;
 
+    @Schema(description = "标题设置", example = "{}")
+    private CustomTitleSetting customTitleSetting;
+
     @Schema(description = "流程 ID 规则")
     @Data
     @Valid
@@ -95,6 +98,20 @@ public class BpmModelMetaInfoVO {
         @Schema(description = "序列长度", example = "5")
         @NotNull(message = "序列长度不能为空")
         private Integer length;
+
+    }
+
+    @Schema(description = "标题设置")
+    @Data
+    @Valid
+    public static class CustomTitleSetting {
+
+        @Schema(description = "是否自定义", example = "false")
+        @NotNull(message = "是否自定义不能为空")
+        private Boolean enable;
+
+        @Schema(description = "标题", example = "流程标题")
+        private String title;
 
     }
 
