@@ -100,7 +100,7 @@ public class PointActivityServiceImpl implements PointActivityService {
         }
         pointActivityMapper.updateById(updateObj);
         // 2.2 更新商品
-        updateSeckillProduct(updateObj, updateReqVO.getProducts());
+        updatePointProduct(updateObj, updateReqVO.getProducts());
     }
 
     @Override
@@ -157,12 +157,12 @@ public class PointActivityServiceImpl implements PointActivityService {
     }
 
     /**
-     * 更新秒杀商品
+     * 更新积分商品
      *
-     * @param activity 秒杀活动
+     * @param activity 积分活动
      * @param products 该活动的最新商品配置
      */
-    private void updateSeckillProduct(PointActivityDO activity, List<PointProductSaveReqVO> products) {
+    private void updatePointProduct(PointActivityDO activity, List<PointProductSaveReqVO> products) {
         // 第一步，对比新老数据，获得添加、修改、删除的列表
         List<PointProductDO> newList = buildPointProductDO(activity, products);
         List<PointProductDO> oldList = pointProductMapper.selectListByActivityId(activity.getId());
@@ -211,10 +211,10 @@ public class PointActivityServiceImpl implements PointActivityService {
     }
 
     /**
-     * 校验秒杀商品是否都存在
+     * 校验积分商品是否都存在
      *
      * @param spuId    商品 SPU 编号
-     * @param products 秒杀商品
+     * @param products 积分商品
      */
     private void validateProductExists(Long spuId, List<PointProductSaveReqVO> products) {
         // 1. 校验商品 spu 是否存在
