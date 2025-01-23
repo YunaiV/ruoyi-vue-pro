@@ -14,7 +14,7 @@ import java.util.Arrays;
  */
 @Getter
 @AllArgsConstructor
-public enum BpmTriggerType implements IntArrayValuable {
+public enum BpmTriggerTypeEnum implements IntArrayValuable {
 
     HTTP_REQUEST(1, "发起 HTTP 请求");
 
@@ -28,14 +28,14 @@ public enum BpmTriggerType implements IntArrayValuable {
      */
     private final String desc;
 
-    public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(BpmTriggerType::getType).toArray();
+    public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(BpmTriggerTypeEnum::getType).toArray();
 
     @Override
     public int[] array() {
         return ARRAYS;
     }
 
-    public static BpmTriggerType typeOf(Integer type) {
+    public static BpmTriggerTypeEnum typeOf(Integer type) {
         return ArrayUtil.firstMatch(item -> item.getType().equals(type), values());
     }
 }

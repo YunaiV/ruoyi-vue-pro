@@ -4,6 +4,7 @@ import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.framework.mybatis.core.type.LongListTypeHandler;
 import cn.iocoder.yudao.framework.mybatis.core.type.StringListTypeHandler;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.BpmModelMetaInfoVO;
+import cn.iocoder.yudao.module.bpm.enums.definition.BpmAutoApproveTypeEnum;
 import cn.iocoder.yudao.module.bpm.enums.definition.BpmModelFormTypeEnum;
 import cn.iocoder.yudao.module.bpm.enums.definition.BpmModelTypeEnum;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
@@ -165,7 +166,7 @@ public class BpmProcessDefinitionInfoDO extends BaseDO {
     /**
      * 自动去重类型
      *
-     * 枚举 {@link cn.iocoder.yudao.module.bpm.enums.definition.BpmAutoApproveType}
+     * 枚举 {@link BpmAutoApproveTypeEnum}
      */
     private Integer autoApprovalType;
 

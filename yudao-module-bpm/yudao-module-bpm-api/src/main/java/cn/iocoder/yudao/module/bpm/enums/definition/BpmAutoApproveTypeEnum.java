@@ -13,13 +13,13 @@ import java.util.Arrays;
  */
 @Getter
 @AllArgsConstructor
-public enum BpmAutoApproveType implements IntArrayValuable {
+public enum BpmAutoApproveTypeEnum implements IntArrayValuable {
 
     NONE(0, "不自动通过"),
     APPROVE_ALL(1, "仅审批一次，后续重复的审批节点均自动通过"),
     APPROVE_SEQUENT(2, "仅针对连续审批的节点自动通过");
 
-    public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(BpmAutoApproveType::getType).toArray();
+    public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(BpmAutoApproveTypeEnum::getType).toArray();
 
     private final Integer type;
     private final String name;

@@ -4,7 +4,7 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.util.number.NumberUtils;
-import cn.iocoder.yudao.module.bpm.enums.definition.BpmBoundaryEventType;
+import cn.iocoder.yudao.module.bpm.enums.definition.BpmBoundaryEventTypeEnum;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnModelConstants;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.util.BpmnModelUtils;
 import cn.iocoder.yudao.module.bpm.service.definition.BpmModelService;
@@ -97,17 +97,17 @@ public class BpmTaskEventListener extends AbstractFlowableEngineEventListener {
         BoundaryEvent boundaryEvent = (BoundaryEvent) element;
         String boundaryEventType = BpmnModelUtils.parseBoundaryEventExtensionElement(boundaryEvent,
                 BpmnModelConstants.BOUNDARY_EVENT_TYPE);
-        BpmBoundaryEventType bpmTimerBoundaryEventType = BpmBoundaryEventType.typeOf(NumberUtils.parseInt(boundaryEventType));
+        BpmBoundaryEventTypeEnum bpmTimerBoundaryEventType = BpmBoundaryEventTypeEnum.typeOf(NumberUtils.parseInt(boundaryEventType));
 
         // 2. 处理超时
-        if (ObjectUtil.equal(bpmTimerBoundaryEventType, BpmBoundaryEventType.USER_TASK_TIMEOUT)) {
+        if (ObjectUtil.equal(bpmTimerBoundaryEventType, BpmBoundaryEventTypeEnum.USER_TASK_TIMEOUT)) {
             // 2.1 用户任务超时处理
             String timeoutHandlerType = BpmnModelUtils.parseBoundaryEventExtensionElement(boundaryEvent,
                     BpmnModelConstants.USER_TASK_TIMEOUT_HANDLER_TYPE);
             String taskKey = boundaryEvent.getAttachedToRefId();
             taskService.processTaskTimeout(event.getProcessInstanceId(), taskKey, NumberUtils.parseInt(timeoutHandlerType));
             // 2.2 延迟器超时处理
-        } else if (ObjectUtil.equal(bpmTimerBoundaryEventType, BpmBoundaryEventType.DELAY_TIMER_TIMEOUT)) {
+        } else if (ObjectUtil.equal(bpmTimerBoundaryEventType, BpmBoundaryEventTypeEnum.DELAY_TIMER_TIMEOUT)) {
             String taskKey = boundaryEvent.getAttachedToRefId();
             taskService.processDelayTimerTimeout(event.getProcessInstanceId(), taskKey);
         }

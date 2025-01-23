@@ -13,7 +13,7 @@ import java.util.Arrays;
  */
 @Getter
 @AllArgsConstructor
-public enum BpmHttpRequestParamSettingType implements IntArrayValuable {
+public enum BpmHttpRequestParamTypeEnum implements IntArrayValuable {
 
     FIXED_VALUE(1, "固定值"),
     FROM_FORM(2, "表单");
@@ -21,7 +21,7 @@ public enum BpmHttpRequestParamSettingType implements IntArrayValuable {
     private final Integer type;
     private final String name;
 
-    public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(BpmHttpRequestParamSettingType::getType).toArray();
+    public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(BpmHttpRequestParamTypeEnum::getType).toArray();
 
     @Override
     public int[] array() {

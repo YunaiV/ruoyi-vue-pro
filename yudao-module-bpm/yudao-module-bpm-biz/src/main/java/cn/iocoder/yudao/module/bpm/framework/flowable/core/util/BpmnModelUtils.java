@@ -171,9 +171,9 @@ public class BpmnModelUtils {
      * @param userTask 任务节点
      * @return 任务拒绝处理类型
      */
-    public static BpmUserTaskRejectHandlerType parseRejectHandlerType(FlowElement userTask) {
+    public static BpmUserTaskRejectHandlerTypeEnum parseRejectHandlerType(FlowElement userTask) {
         Integer rejectHandlerType = NumberUtils.parseInt(parseExtensionElement(userTask, USER_TASK_REJECT_HANDLER_TYPE));
-        return BpmUserTaskRejectHandlerType.typeOf(rejectHandlerType);
+        return BpmUserTaskRejectHandlerTypeEnum.typeOf(rejectHandlerType);
     }
 
     /**
@@ -394,9 +394,9 @@ public class BpmnModelUtils {
         return JsonUtils.parseObject(expressionText, BpmSimpleModelNodeVO.ListenerHandler.class);
     }
 
-    public static BpmTriggerType parserTriggerType(FlowElement flowElement) {
+    public static BpmTriggerTypeEnum parserTriggerType(FlowElement flowElement) {
         Integer triggerType = NumberUtils.parseInt(parseExtensionElement(flowElement, TRIGGER_TYPE));
-        return BpmTriggerType.typeOf(triggerType);
+        return BpmTriggerTypeEnum.typeOf(triggerType);
     }
 
     public static String parserTriggerParam(FlowElement flowElement) {
@@ -834,7 +834,7 @@ public class BpmnModelUtils {
             Object result = FlowableUtils.getExpressionValue(variables, express);
             return Boolean.TRUE.equals(result);
         } catch (FlowableException ex) {
-            log.error("[evalConditionExpress][条件表达式({}) 变量({}) 解析报错", express, variables, ex);
+            log.error("[evalConditionExpress][条件表达式({}) 变量({}) 解析报错]", express, variables, ex);
             return Boolean.FALSE;
         }
     }

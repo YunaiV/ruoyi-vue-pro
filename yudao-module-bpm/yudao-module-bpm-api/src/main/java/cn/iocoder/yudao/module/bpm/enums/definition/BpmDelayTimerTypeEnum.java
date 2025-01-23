@@ -13,7 +13,7 @@ import java.util.Arrays;
  */
 @Getter
 @AllArgsConstructor
-public enum BpmDelayTimerType implements IntArrayValuable {
+public enum BpmDelayTimerTypeEnum implements IntArrayValuable {
 
     FIXED_TIME_DURATION(1, "固定时长"),
     FIXED_DATE_TIME(2, "固定日期");
@@ -21,7 +21,7 @@ public enum BpmDelayTimerType implements IntArrayValuable {
     private final Integer type;
     private final String name;
 
-    public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(BpmDelayTimerType::getType).toArray();
+    public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(BpmDelayTimerTypeEnum::getType).toArray();
 
     @Override
     public int[] array() {

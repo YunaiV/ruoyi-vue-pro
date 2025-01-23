@@ -14,7 +14,7 @@ import java.util.Arrays;
  */
 @Getter
 @AllArgsConstructor
-public enum BpmUserTaskRejectHandlerType implements IntArrayValuable {
+public enum BpmUserTaskRejectHandlerTypeEnum implements IntArrayValuable {
 
     FINISH_PROCESS_INSTANCE(1, "终止流程"),
     RETURN_USER_TASK(2, "驳回到指定任务节点");
@@ -22,9 +22,9 @@ public enum BpmUserTaskRejectHandlerType implements IntArrayValuable {
     private final Integer type;
     private final String name;
 
-    public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(BpmUserTaskRejectHandlerType::getType).toArray();
+    public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(BpmUserTaskRejectHandlerTypeEnum::getType).toArray();
 
-    public static BpmUserTaskRejectHandlerType typeOf(Integer type) {
+    public static BpmUserTaskRejectHandlerTypeEnum typeOf(Integer type) {
         return ArrayUtil.firstMatch(item -> item.getType().equals(type), values());
     }
 

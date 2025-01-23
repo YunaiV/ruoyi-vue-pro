@@ -25,7 +25,7 @@ public class BpmSimpleModelNodeVO {
 
     @Schema(description = "模型节点类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     @NotNull(message = "模型节点类型不能为空")
-    @InEnum(BpmSimpleModelNodeType.class)
+    @InEnum(BpmSimpleModelNodeTypeEnum.class)
     private Integer type;
 
     @Schema(description = "模型节点名称", example = "领导审批")
@@ -134,18 +134,19 @@ public class BpmSimpleModelNodeVO {
         private String path;
 
         @Schema(description = "请求头", example = "[]")
-        private List<HttpRequestParamSetting> header;
+        private List<HttpRequestParam> header;
 
         @Schema(description = "请求体", example = "[]")
-        private List<HttpRequestParamSetting> body;
+        private List<HttpRequestParam> body;
+
     }
 
     @Schema(description = "HTTP 请求参数设置")
     @Data
-    public static class HttpRequestParamSetting {
+    public static class HttpRequestParam {
 
         @Schema(description = "值类型", example = "1")
-        @InEnum(BpmHttpRequestParamSettingType.class)
+        @InEnum(BpmHttpRequestParamTypeEnum.class)
         @NotNull(message = "值类型不能为空")
         private Integer type;
 
@@ -163,7 +164,7 @@ public class BpmSimpleModelNodeVO {
     public static class RejectHandler {
 
         @Schema(description = "拒绝处理类型", example = "1")
-        @InEnum(BpmUserTaskRejectHandlerType.class)
+        @InEnum(BpmUserTaskRejectHandlerTypeEnum.class)
         private Integer type;
 
         @Schema(description = "任务拒绝后驳回的节点 Id", example = "Activity_1")
@@ -229,7 +230,7 @@ public class BpmSimpleModelNodeVO {
     public static class ConditionSetting {
 
         @Schema(description = "条件类型", example = "1")
-        @InEnum(BpmSimpleModeConditionType.class)
+        @InEnum(BpmSimpleModeConditionTypeEnum.class)
         private Integer conditionType;
 
         @Schema(description = "条件表达式", example = "${day>3}")
@@ -297,7 +298,7 @@ public class BpmSimpleModelNodeVO {
 
         @Schema(description = "延迟时间类型", example = "1")
         @NotNull(message = "延迟时间类型不能为空")
-        @InEnum(BpmDelayTimerType.class)
+        @InEnum(BpmDelayTimerTypeEnum.class)
         private Integer delayType;
 
         @Schema(description = "延迟时间表达式", example = "PT1H,2025-01-01T00:00:00")
@@ -315,7 +316,7 @@ public class BpmSimpleModelNodeVO {
         private String nodeId;
 
         @Schema(description = "条件类型", example = "1")
-        @InEnum(BpmSimpleModeConditionType.class)
+        @InEnum(BpmSimpleModeConditionTypeEnum.class)
         @NotNull(message = "条件类型不能为空")
         private Integer conditionType;
 
@@ -332,7 +333,7 @@ public class BpmSimpleModelNodeVO {
     public static class TriggerSetting {
 
         @Schema(description = "触发器类型", example = "1")
-        @InEnum(BpmTriggerType.class)
+        @InEnum(BpmTriggerTypeEnum.class)
         @NotNull(message = "触发器类型不能为空")
         private Integer type;
 
@@ -353,11 +354,12 @@ public class BpmSimpleModelNodeVO {
 
             @Schema(description = "请求头参数设置", example = "[]")
             @Valid
-            private List<HttpRequestParamSetting> header;
+            private List<HttpRequestParam> header;
 
             @Schema(description = "请求头参数设置", example = "[]")
             @Valid
-            private List<HttpRequestParamSetting> body;
+            private List<HttpRequestParam> body;
         }
+
     }
 }

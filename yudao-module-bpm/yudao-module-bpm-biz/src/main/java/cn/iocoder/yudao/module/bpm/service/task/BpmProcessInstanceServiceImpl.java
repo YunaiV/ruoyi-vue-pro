@@ -22,7 +22,7 @@ import cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmProcessDefinitio
 import cn.iocoder.yudao.module.bpm.dal.redis.BpmProcessIdRedisDAO;
 import cn.iocoder.yudao.module.bpm.enums.ErrorCodeConstants;
 import cn.iocoder.yudao.module.bpm.enums.definition.BpmModelTypeEnum;
-import cn.iocoder.yudao.module.bpm.enums.definition.BpmSimpleModelNodeType;
+import cn.iocoder.yudao.module.bpm.enums.definition.BpmSimpleModelNodeTypeEnum;
 import cn.iocoder.yudao.module.bpm.enums.task.BpmProcessInstanceStatusEnum;
 import cn.iocoder.yudao.module.bpm.enums.task.BpmReasonEnum;
 import cn.iocoder.yudao.module.bpm.enums.task.BpmTaskStatusEnum;
@@ -294,7 +294,7 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
             FlowElement flowNode = BpmnModelUtils.getFlowElementById(bpmnModel, task.getTaskDefinitionKey());
             ActivityNode activityNode = new ActivityNode().setId(task.getTaskDefinitionKey()).setName(task.getName())
                     .setNodeType(START_USER_NODE_ID.equals(task.getTaskDefinitionKey()) ?
-                            BpmSimpleModelNodeType.START_USER_NODE.getType() : BpmSimpleModelNodeType.APPROVE_NODE.getType())
+                            BpmSimpleModelNodeTypeEnum.START_USER_NODE.getType() : BpmSimpleModelNodeTypeEnum.APPROVE_NODE.getType())
                     .setStatus(FlowableUtils.getTaskStatus(task))
                     .setCandidateStrategy(BpmnModelUtils.parseCandidateStrategy(flowNode))
                     .setStartTime(DateUtils.of(task.getCreateTime())).setEndTime(DateUtils.of(task.getEndTime()))
@@ -316,8 +316,8 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
                 ActivityNodeTask startTask = new ActivityNodeTask().setId(BpmnModelConstants.START_USER_NODE_ID)
                         .setAssignee(startUserId).setStatus(BpmTaskStatusEnum.APPROVE.getStatus());
                 ActivityNode startNode = new ActivityNode().setId(startTask.getId())
-                        .setName(BpmSimpleModelNodeType.START_USER_NODE.getName())
-                        .setNodeType(BpmSimpleModelNodeType.START_USER_NODE.getType())
+                        .setName(BpmSimpleModelNodeTypeEnum.START_USER_NODE.getName())
+                        .setNodeType(BpmSimpleModelNodeTypeEnum.START_USER_NODE.getType())
                         .setStatus(startTask.getStatus()).setTasks(ListUtil.of(startTask))
                         .setStartTime(DateUtils.of(activity.getStartTime())).setEndTime(DateUtils.of(activity.getEndTime()));
                 approvalNodes.add(0, startNode);
@@ -330,8 +330,8 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
                     return;
                 }
                 ActivityNode endNode = new ActivityNode().setId(activity.getId())
-                        .setName(BpmSimpleModelNodeType.END_NODE.getName())
-                        .setNodeType(BpmSimpleModelNodeType.END_NODE.getType()).setStatus(processInstanceStatus)
+                        .setName(BpmSimpleModelNodeTypeEnum.END_NODE.getName())
+                        .setNodeType(BpmSimpleModelNodeTypeEnum.END_NODE.getType()).setStatus(processInstanceStatus)
                         .setStartTime(DateUtils.of(activity.getStartTime())).setEndTime(DateUtils.of(activity.getEndTime()));
                 String reason = FlowableUtils.getProcessInstanceReason(historicProcessInstance);
                 if (StrUtil.isNotEmpty(reason)) {
@@ -367,7 +367,7 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
             FlowElement flowNode = BpmnModelUtils.getFlowElementById(bpmnModel, activityId);
             HistoricActivityInstance firstActivity = CollUtil.getFirst(taskActivities); // 取第一个任务，会签/或签的任务，开始时间相同
             ActivityNode activityNode = new ActivityNode().setId(firstActivity.getActivityId()).setName(firstActivity.getActivityName())
-                    .setNodeType(BpmSimpleModelNodeType.APPROVE_NODE.getType()).setStatus(BpmTaskStatusEnum.RUNNING.getStatus())
+                    .setNodeType(BpmSimpleModelNodeTypeEnum.APPROVE_NODE.getType()).setStatus(BpmTaskStatusEnum.RUNNING.getStatus())
                     .setCandidateStrategy(BpmnModelUtils.parseCandidateStrategy(flowNode))
                     .setStartTime(DateUtils.of(CollUtil.getFirst(taskActivities).getStartTime()))
                     .setTasks(new ArrayList<>());
@@ -437,8 +437,8 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
 
         // 1. 开始节点/审批节点
         if (ObjectUtils.equalsAny(node.getType(),
-                BpmSimpleModelNodeType.START_USER_NODE.getType(),
-                BpmSimpleModelNodeType.APPROVE_NODE.getType())) {
+                BpmSimpleModelNodeTypeEnum.START_USER_NODE.getType(),
+                BpmSimpleModelNodeTypeEnum.APPROVE_NODE.getType())) {
             List<Long> candidateUserIds = getTaskCandidateUserList(bpmnModel, node.getId(),
                     startUserId, processDefinitionInfo.getProcessDefinitionId(), processVariables);
             activityNode.setCandidateUserIds(candidateUserIds);
@@ -446,13 +446,13 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
         }
 
         // 2. 结束节点
-        if (BpmSimpleModelNodeType.END_NODE.getType().equals(node.getType())) {
+        if (BpmSimpleModelNodeTypeEnum.END_NODE.getType().equals(node.getType())) {
             return activityNode;
         }
 
         // 3. 抄送节点
         if (CollUtil.isEmpty(runActivityIds) && // 流程发起时：需要展示抄送节点，用于选择抄送人
-                BpmSimpleModelNodeType.COPY_NODE.getType().equals(node.getType())) {
+                BpmSimpleModelNodeTypeEnum.COPY_NODE.getType().equals(node.getType())) {
             return activityNode;
         }
         return null;
@@ -468,23 +468,23 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
 
         // 1. 开始节点
         if (node instanceof StartEvent) {
-            return activityNode.setName(BpmSimpleModelNodeType.START_USER_NODE.getName())
-                    .setNodeType(BpmSimpleModelNodeType.START_USER_NODE.getType());
+            return activityNode.setName(BpmSimpleModelNodeTypeEnum.START_USER_NODE.getName())
+                    .setNodeType(BpmSimpleModelNodeTypeEnum.START_USER_NODE.getType());
         }
 
         // 2. 审批节点
         if (node instanceof UserTask) {
             List<Long> candidateUserIds = getTaskCandidateUserList(bpmnModel, node.getId(),
                     startUserId, processDefinitionInfo.getProcessDefinitionId(), processVariables);
-            return activityNode.setName(node.getName()).setNodeType(BpmSimpleModelNodeType.APPROVE_NODE.getType())
+            return activityNode.setName(node.getName()).setNodeType(BpmSimpleModelNodeTypeEnum.APPROVE_NODE.getType())
                     .setCandidateStrategy(BpmnModelUtils.parseCandidateStrategy(node))
                     .setCandidateUserIds(candidateUserIds);
         }
 
         // 3. 结束节点
         if (node instanceof EndEvent) {
-            return activityNode.setName(BpmSimpleModelNodeType.END_NODE.getName())
-                    .setNodeType(BpmSimpleModelNodeType.END_NODE.getType());
+            return activityNode.setName(BpmSimpleModelNodeTypeEnum.END_NODE.getName())
+                    .setNodeType(BpmSimpleModelNodeTypeEnum.END_NODE.getType());
         }
         return null;
     }

@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.bpm.framework.flowable.core.listener;
 
-import cn.iocoder.yudao.module.bpm.enums.definition.BpmTriggerType;
+import cn.iocoder.yudao.module.bpm.enums.definition.BpmTriggerTypeEnum;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.util.BpmnModelUtils;
 import cn.iocoder.yudao.module.bpm.service.task.trigger.BpmTrigger;
 import jakarta.annotation.PostConstruct;
@@ -33,7 +33,7 @@ public class BpmTriggerTaskDelegate implements JavaDelegate {
     @Resource
     private List<BpmTrigger> triggers;
 
-    private final EnumMap<BpmTriggerType, BpmTrigger> triggerMap = new EnumMap<>(BpmTriggerType.class);
+    private final EnumMap<BpmTriggerTypeEnum, BpmTrigger> triggerMap = new EnumMap<>(BpmTriggerTypeEnum.class);
 
     @PostConstruct
     private void init() {
@@ -43,12 +43,13 @@ public class BpmTriggerTaskDelegate implements JavaDelegate {
     @Override
     public void execute(DelegateExecution execution) {
         FlowElement flowElement = execution.getCurrentFlowElement();
-        BpmTriggerType bpmTriggerType = BpmnModelUtils.parserTriggerType(flowElement);
+        BpmTriggerTypeEnum bpmTriggerType = BpmnModelUtils.parserTriggerType(flowElement);
         BpmTrigger bpmTrigger = triggerMap.get(bpmTriggerType);
         if (bpmTrigger == null) {
-            log.error("[execute], FlowElement[{}], {} 找不到匹配的 BpmTrigger", execution.getCurrentActivityId(), flowElement);
+            log.error("[execute][FlowElement({}), {} 找不到匹配的触发器]", execution.getCurrentActivityId(), flowElement);
             return;
         }
         bpmTrigger.execute(execution.getProcessInstanceId(), BpmnModelUtils.parserTriggerParam(flowElement));
     }
+
 }

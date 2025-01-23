@@ -14,18 +14,18 @@ import java.util.Arrays;
  */
 @Getter
 @AllArgsConstructor
-public enum BpmSimpleModeConditionType implements IntArrayValuable {
+public enum BpmSimpleModeConditionTypeEnum implements IntArrayValuable {
 
     EXPRESSION(1, "条件表达式"),
     RULE(2, "条件规则");
 
-    public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(BpmSimpleModeConditionType::getType).toArray();
+    public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(BpmSimpleModeConditionTypeEnum::getType).toArray();
 
     private final Integer type;
 
     private final String name;
 
-    public static BpmSimpleModeConditionType valueOf(Integer type) {
+    public static BpmSimpleModeConditionTypeEnum valueOf(Integer type) {
         return ArrayUtil.firstMatch(nodeType -> nodeType.getType().equals(type), values());
     }
 

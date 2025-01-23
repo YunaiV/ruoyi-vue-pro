@@ -15,7 +15,7 @@ import java.util.Objects;
  */
 @Getter
 @AllArgsConstructor
-public enum BpmSimpleModelNodeType implements IntArrayValuable {
+public enum BpmSimpleModelNodeTypeEnum implements IntArrayValuable {
 
     // 0 ~ 1 开始和结束
     START_NODE(0, "开始", "startEvent"),
@@ -37,7 +37,7 @@ public enum BpmSimpleModelNodeType implements IntArrayValuable {
     ROUTER_BRANCH_NODE(54, "路由分支", "exclusiveGateway")
     ;
 
-    public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(BpmSimpleModelNodeType::getType).toArray();
+    public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(BpmSimpleModelNodeTypeEnum::getType).toArray();
 
     private final Integer type;
     private final String name;
@@ -55,7 +55,7 @@ public enum BpmSimpleModelNodeType implements IntArrayValuable {
                 || Objects.equals(ROUTER_BRANCH_NODE.getType(), type);
     }
 
-    public static BpmSimpleModelNodeType valueOf(Integer type) {
+    public static BpmSimpleModelNodeTypeEnum valueOf(Integer type) {
         return ArrayUtil.firstMatch(nodeType -> nodeType.getType().equals(type), values());
     }
 

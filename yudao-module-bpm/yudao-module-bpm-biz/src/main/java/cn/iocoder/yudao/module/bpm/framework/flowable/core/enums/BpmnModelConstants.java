@@ -104,7 +104,6 @@ public interface BpmnModelConstants {
      * BPMN ExtensionElement 的扩展属性，用于标记触发器的类型
      */
     String TRIGGER_TYPE = "triggerType";
-
     /**
      * BPMN ExtensionElement 的扩展属性，用于标记触发器参数
      */

@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.bpm.service.task.trigger;
 
-import cn.iocoder.yudao.module.bpm.enums.definition.BpmTriggerType;
+import cn.iocoder.yudao.module.bpm.enums.definition.BpmTriggerTypeEnum;
 
 /**
  * BPM 触发器接口
@@ -16,7 +16,7 @@ public interface BpmTrigger {
      *
      * @return 触发器类型
      */
-    BpmTriggerType getType();
+    BpmTriggerTypeEnum getType();
 
     /**
      * 触发器执行
@@ -25,4 +25,5 @@ public interface BpmTrigger {
      * @param param 触发器参数
      */
     void execute(String processInstanceId, String param);
+
 }
