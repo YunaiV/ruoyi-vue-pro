@@ -19,6 +19,7 @@ import cn.iocoder.yudao.module.bpm.framework.flowable.core.candidate.BpmTaskCand
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.util.BpmnModelUtils;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.util.FlowableUtils;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.util.SimpleModelUtils;
+import cn.iocoder.yudao.module.bpm.service.task.BpmProcessInstanceCopyService;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
@@ -29,11 +30,13 @@ import org.flowable.common.engine.impl.db.SuspensionState;
 import org.flowable.engine.HistoryService;
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.RuntimeService;
+import org.flowable.engine.TaskService;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.repository.Model;
 import org.flowable.engine.repository.ModelQuery;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.ProcessInstance;
+import org.flowable.task.api.Task;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
@@ -72,6 +75,10 @@ public class BpmModelServiceImpl implements BpmModelService {
     private HistoryService historyService;
     @Resource
     private RuntimeService runtimeService;
+    @Resource
+    private TaskService taskService;
+    @Resource
+    private BpmProcessInstanceCopyService processInstanceCopyService;
 
     @Override
     public List<Model> getModelList(String name) {
@@ -262,23 +269,28 @@ public class BpmModelServiceImpl implements BpmModelService {
         Model model = validateModelManager(id, userId);
 
         // 2. 清理所有流程数据
-        // TODO @芋艿：这里没有找到批量操作的方法，会不会有性能问题~；
-        // TODO @lesan：建议按照顺序？1）List<ProcessInstance> processInstances 循环处理；然后删除删除一个示实例，接着删除它的 history；
         // 2.1 先取消所有正在运行的流程
         List<ProcessInstance> processInstances = runtimeService.createProcessInstanceQuery()
                 .processDefinitionKey(model.getKey()).list();
         processInstances.forEach(processInstance -> {
             runtimeService.deleteProcessInstance(processInstance.getId(),
                     BpmReasonEnum.CANCEL_BY_SYSTEM.getReason());
+            historyService.deleteHistoricProcessInstance(processInstance.getId());
+            processInstanceCopyService.deleteProcessInstanceCopy(processInstance.getId());
         });
         // 2.2 再从历史中删除所有相关的流程数据
         List<HistoricProcessInstance> historicProcessInstances = historyService.createHistoricProcessInstanceQuery()
                 .processDefinitionKey(model.getKey()).list();
         historicProcessInstances.forEach(historicProcessInstance -> {
             historyService.deleteHistoricProcessInstance(historicProcessInstance.getId());
+            processInstanceCopyService.deleteProcessInstanceCopy(historicProcessInstance.getId());
         });
-        // TODO @lesan：流程任务，是不是也要清理哈？
-        // TODO @lesan：抄送是不是也要清理；
+        // 2.3 清理所有 Task
+        List<Task> tasks = taskService.createTaskQuery()
+                .processDefinitionKey(model.getKey()).list();
+        tasks.forEach(task -> {
+            taskService.deleteTask(task.getId());
+        });
     }
 
     @Override
