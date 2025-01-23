@@ -56,7 +56,7 @@ public class TradePointActivityPriceCalculator implements TradePriceCalculator {
         Assert.isTrue(param.getItems().size() == 1, "积分商城兑换商品时，只允许选择一个商品");
         // 2. 校验是否可以参与积分商城活动
         TradePriceCalculateRespBO.OrderItem orderItem = result.getItems().get(0);
-        PointValidateJoinRespDTO activity = validateJoinSeckill(
+        PointValidateJoinRespDTO activity = validateJoinPointActivity(
                 param.getUserId(), param.getPointActivityId(),
                 orderItem.getSkuId(), orderItem.getCount());
 
@@ -80,12 +80,12 @@ public class TradePointActivityPriceCalculator implements TradePriceCalculator {
         TradePriceCalculatorHelper.recountAllPrice(result);
     }
 
-    private PointValidateJoinRespDTO validateJoinSeckill(Long userId, Long activityId, Long skuId, Integer count) {
+    private PointValidateJoinRespDTO validateJoinPointActivity(Long userId, Long activityId, Long skuId, Integer count) {
         // 1. 校验是否可以参与积分商城活动
         PointValidateJoinRespDTO pointValidateJoinRespDTO = pointActivityApi.validateJoinPointActivity(activityId, skuId, count);
         // 2. 校验总限购数量，目前只有 trade 有具体下单的数据，需要交给 trade 价格计算使用
-        int activityProductCount = tradeOrderQueryService.getSeckillProductCount(userId, activityId);
-        if (activityProductCount + count > pointValidateJoinRespDTO.getCount()) {
+        int pointProductCount = tradeOrderQueryService.getActivityProductCount(userId, activityId, TradeOrderTypeEnum.POINT);
+        if (pointProductCount + count > pointValidateJoinRespDTO.getCount()) {
             throw exception(PRICE_CALCULATE_POINT_TOTAL_LIMIT_COUNT);
         }
         return pointValidateJoinRespDTO;
