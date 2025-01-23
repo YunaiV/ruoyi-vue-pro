@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.bpm.service.task;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.ListUtil;
+import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.ObjectUtil;
@@ -610,14 +611,25 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
         ProcessInstanceBuilder processInstanceBuilder = runtimeService.createProcessInstanceBuilder()
                 .processDefinitionId(definition.getId())
                 .businessKey(businessKey)
-                .name(definition.getName().trim())
                 .variables(variables);
         // 3.1 创建流程 ID
         BpmModelMetaInfoVO.ProcessIdRule processIdRule = processDefinitionInfo.getProcessIdRule();
         if (processIdRule != null && Boolean.TRUE.equals(processIdRule.getEnable())) {
             processInstanceBuilder.predefineProcessInstanceId(processIdRedisDAO.generate(processIdRule));
         }
-        // 3.2 发起流程实例
+        // 3.2 流程名称
+        BpmModelMetaInfoVO.CustomTitleSetting customTitleSetting = processDefinitionInfo.getCustomTitleSetting();
+        if (customTitleSetting != null && Boolean.TRUE.equals(customTitleSetting.getEnable())) {
+            AdminUserRespDTO user = adminUserApi.getUser(userId);
+            Map<String, Object> cloneVariables = ObjectUtil.clone(variables);
+            cloneVariables.put(BpmnVariableConstants.PROCESS_INSTANCE_VARIABLE_START_USER_ID, user.getNickname());
+            cloneVariables.put(BpmnVariableConstants.PROCESS_START_TIME, DateUtil.now());
+            cloneVariables.put(BpmnVariableConstants.PROCESS_DEFINITION_NAME, definition.getName().trim());
+            processInstanceBuilder.name(StrUtil.format(customTitleSetting.getTitle(), cloneVariables));
+        } else {
+            processInstanceBuilder.name(definition.getName().trim());
+        }
+        // 3.3 发起流程实例
         ProcessInstance instance = processInstanceBuilder.start();
         return instance.getId();
     }
