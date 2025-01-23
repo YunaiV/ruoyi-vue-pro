@@ -55,11 +55,10 @@ public class IotDeviceDataController {
     // TODO:数据权限
     @PostMapping("/simulator")
     @Operation(summary = "模拟设备")
-    public CommonResult<Boolean> simulatorDevice(@Valid @RequestBody IotDeviceDataSimulatorSaveReqVO simulcatorReqVO) {
-        //TODO:先生成一下设备日志  后续完善模拟设备代码逻辑
+    public CommonResult<Boolean> simulatorDevice(@Valid @RequestBody IotDeviceDataSimulatorSaveReqVO simulatorReqVO) {
+        //TODO:先使用 IotDeviceDataSimulatorSaveReqVO  另外content里数据类型的效验前端也没做，后端应该要要效验一下，这块后续看看怎么安排
         // TODO @super：应该 deviceDataService 里面有个 simulatorDevice，然后里面去 insert 日志！
-        IotDevicePropertyReportReqDTO simulatorReqVO = new IotDevicePropertyReportReqDTO();
-        deviceDataService.simulateSend(simulatorReqVO);
+        deviceDataService.simulatorSend(simulatorReqVO);
         return success(true);
     }
 

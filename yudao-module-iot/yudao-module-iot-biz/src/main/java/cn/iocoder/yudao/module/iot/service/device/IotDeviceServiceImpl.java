@@ -198,6 +198,11 @@ public class IotDeviceServiceImpl implements IotDeviceService {
     }
 
     @Override
+    public IotDeviceDO getDeviceByDeviceKey(String deviceKey) {
+        return deviceMapper.selectByDeviceKey(deviceKey);
+    }
+
+    @Override
     public PageResult<IotDeviceDO> getDevicePage(IotDevicePageReqVO pageReqVO) {
         return deviceMapper.selectPage(pageReqVO);
     }

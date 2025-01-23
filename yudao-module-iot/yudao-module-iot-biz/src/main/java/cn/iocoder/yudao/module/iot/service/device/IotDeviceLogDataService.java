@@ -37,7 +37,11 @@ public interface IotDeviceLogDataService {
      */
     PageResult<IotDeviceLogDO> getDeviceLogPage(IotDeviceLogPageReqVO pageReqVO);
 
-
+    /**
+     * 插入设备日志
+     *
+     * @param msg 设备数据
+     */
     void saveDeviceLog(ThingModelMessage msg);
 
 }

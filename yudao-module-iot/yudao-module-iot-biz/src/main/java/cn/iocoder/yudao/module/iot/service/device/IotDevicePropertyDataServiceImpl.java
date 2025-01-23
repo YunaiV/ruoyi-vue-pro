@@ -3,8 +3,10 @@ package cn.iocoder.yudao.module.iot.service.device;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.map.MapUtil;
+import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONObject;
+import cn.hutool.json.JSONUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.iot.api.device.dto.IotDevicePropertyReportReqDTO;
 import cn.iocoder.yudao.module.iot.controller.admin.device.vo.deviceData.IotDeviceDataPageReqVO;
@@ -39,8 +41,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.filterList;
+import static cn.iocoder.yudao.module.iot.enums.ErrorCodeConstants.DEVICE_DATA_CONTENT_JSON_PARSE_ERROR;
 
 /**
  * IoT 设备【属性】数据 Service 实现类
@@ -164,24 +168,33 @@ public class IotDevicePropertyDataServiceImpl implements IotDevicePropertyDataSe
         thingModelMessageService.saveThingModelMessage(device, thingModelMessage);
     }
 
-    //TODO:  copy了saveDeviceData的逻辑，后续看看这块怎么优化
+    //TODO:  copy 了 saveDeviceData 的逻辑，后续看看这块怎么优化
     @Override
-    public void simulateSend(IotDevicePropertyReportReqDTO simulatorReqVO) {
-        // 1. 根据产品 key 和设备名称，获得设备信息
-        IotDeviceDO device = deviceService.getDeviceByProductKeyAndDeviceName(simulatorReqVO.getProductKey(), simulatorReqVO.getDeviceName());
-        // 2. 解析消息，保存数据
-        JSONObject jsonObject = new JSONObject(simulatorReqVO.getParams());
-        log.info("[saveDeviceData][productKey({}) deviceName({}) data({})]", simulatorReqVO.getProductKey(), simulatorReqVO.getDeviceName(), jsonObject);
+    public void simulatorSend(IotDeviceDataSimulatorSaveReqVO simulatorReqVO) {
+        // 1. 根据设备 key ，获得设备信息
+        IotDeviceDO device = deviceService.getDeviceByDeviceKey(simulatorReqVO.getDeviceKey());
+
+        // 2. 解析 content 为 JSON 对象
+        JSONObject contentJson;
+        try {
+            contentJson = JSONUtil.parseObj(simulatorReqVO.getContent());
+        } catch (Exception e) {
+            throw exception(DEVICE_DATA_CONTENT_JSON_PARSE_ERROR);
+        }
+
+        // 3. 构建物模型消息
         ThingModelMessage thingModelMessage = ThingModelMessage.builder()
-                .id(jsonObject.getStr("id"))
-                .sys(jsonObject.get("sys"))
-                .method(jsonObject.getStr("method"))
-                .params(jsonObject.get("params"))
-                .time(jsonObject.getLong("time") == null ? System.currentTimeMillis() : jsonObject.getLong("time"))
+                .id(IdUtil.fastSimpleUUID()) // TODO:后续优化
+                .sys(null)// TODO:这块先写死，后续优化
+                .method("thing.event.property.post") // TODO:这块先写死，后续优化
+                .params(contentJson) // 将 content 作为 params
+                .time(simulatorReqVO.getReportTime()) // 使用上报时间
                 .productKey(simulatorReqVO.getProductKey())
-                .deviceName(simulatorReqVO.getDeviceName())
+                .deviceName(device.getDeviceName())
                 .deviceKey(device.getDeviceKey())
                 .build();
+
+        // 4. 发送模拟消息
         simulateSendProducer.sendSimulateMessage(thingModelMessage);
     }
 

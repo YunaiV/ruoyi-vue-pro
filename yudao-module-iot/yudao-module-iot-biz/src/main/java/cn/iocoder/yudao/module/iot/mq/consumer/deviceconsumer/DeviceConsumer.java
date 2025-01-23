@@ -30,7 +30,9 @@ public class DeviceConsumer {
     @Async
     public void onMessage(ThingModelMessage message) {
         log.info("[onMessage][消息内容({})]", message);
-        deviceDataService.saveDeviceDataTest(message);
+        // 设备数据记录
+//        deviceDataService.saveDeviceDataTest(message);
+        // 设备日志记录
         iotDeviceLogDataService.saveDeviceLog(message);
     }
 

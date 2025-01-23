@@ -38,7 +38,6 @@ public class IotDeviceDataSimulatorSaveReqVO {
     @NotEmpty(message = "数据内容不能为空")
     private String content;
 
-    // TODO @芋艿：需要讨论下，reportTime 到底以那个为准！
     @Schema(description = "上报时间", requiredMode = Schema.RequiredMode.REQUIRED)
     private Long reportTime;
 

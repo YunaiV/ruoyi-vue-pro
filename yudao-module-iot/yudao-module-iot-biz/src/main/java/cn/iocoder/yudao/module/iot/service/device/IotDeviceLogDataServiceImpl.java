@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.iot.service.device;
 
+import cn.hutool.json.JSONUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.iot.controller.admin.device.vo.deviceData.IotDeviceDataSimulatorSaveReqVO;
@@ -12,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -79,7 +81,19 @@ public class IotDeviceLogDataServiceImpl implements IotDeviceLogDataService{
 
     @Override
     public void saveDeviceLog(ThingModelMessage msg) {
+        // 1. 构建设备日志对象
+        IotDeviceLogDO iotDeviceLogDO = IotDeviceLogDO.builder()
+                .id(msg.getId())                     // 消息ID
+                .deviceKey(msg.getDeviceKey())       // 设备标识
+                .productKey(msg.getProductKey())     // 产品标识
+                .type(msg.getMethod())               // 消息类型，使用method作为类型
+                .subType("property")                 // TODO:这块先写死，后续优化
+                .content(JSONUtil.toJsonStr(msg))   // TODO:后续优化
+                .reportTime(msg.getTime()) // 上报时间
+                .build();
 
+        // 2. 插入设备日志
+        iotDeviceLogDataMapper.insert(iotDeviceLogDO);
     }
 
 }

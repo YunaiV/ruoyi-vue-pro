@@ -46,7 +46,7 @@ public interface IotDevicePropertyDataService {
      * @param simulatorReqVO 设备数据
      */
 
-    void simulateSend(IotDevicePropertyReportReqDTO simulatorReqVO);
+    void simulatorSend(IotDeviceDataSimulatorSaveReqVO simulatorReqVO);
 
     /**
      * 获得设备属性最新数据
