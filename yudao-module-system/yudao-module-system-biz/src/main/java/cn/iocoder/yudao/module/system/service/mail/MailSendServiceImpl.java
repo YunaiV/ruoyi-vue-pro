@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.system.service.mail;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
@@ -17,10 +18,12 @@ import org.dromara.hutool.extra.mail.*;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
+import java.util.List;
 import java.util.Map;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.*;
+import static java.util.Collections.singletonList;
 
 /**
  * 邮箱发送 Service 实现类
@@ -100,13 +103,77 @@ public class MailSendServiceImpl implements MailSendService {
     }
 
     @Override
+    public Long sendMultipleMailToAdmin(List<String> toMails, List<String> ccMails, List<String> bccMails, Long userId, String templateCode, Map<String, Object> templateParams) {
+        // 如果 mail 为空，则加载用户编号对应的邮箱
+        if (CollUtil.isEmpty(toMails)) {
+            AdminUserDO user = adminUserService.getUser(userId);
+            if (user != null) {
+                toMails = singletonList(user.getEmail());
+            }
+        }
+        // 执行发送
+        return sendMultipleMail(toMails, ccMails, bccMails, userId, UserTypeEnum.ADMIN.getValue(), templateCode, templateParams);
+    }
+
+    @Override
+    public Long sendMultipleMailToMember(List<String> toMails, List<String> ccMails, List<String> bccMails, Long userId, String templateCode, Map<String, Object> templateParams) {
+        // 如果 mail 为空，则加载用户编号对应的邮箱
+        if (CollUtil.isEmpty(toMails)) {
+            toMails = singletonList(memberService.getMemberUserEmail(userId));
+        }
+        // 执行发送
+        return sendMultipleMail(toMails, ccMails, bccMails, userId, UserTypeEnum.MEMBER.getValue(), templateCode, templateParams);
+    }
+
+    @Override
+    public Long sendMultipleMail(List<String> toMails, List<String> ccMails, List<String> bccMails, Long userId, Integer userType, String templateCode, Map<String, Object> templateParams) {
+        // 校验邮箱模版是否合法
+        MailTemplateDO template = validateMailTemplate(templateCode);
+        // 校验邮箱账号是否合法
+        MailAccountDO account = validateMailAccount(template.getAccountId());
+        // 校验邮件参数是否缺失
+        validateTemplateParams(template, templateParams);
+
+        if (CollUtil.isEmpty(toMails)) {
+            throw exception(MAIL_SEND_MAIL_NOT_EXISTS);
+        }
+        // 校验邮箱是否存在
+        for (String mail : toMails) {
+            validateMail(mail);
+        }
+        if (CollUtil.isNotEmpty(ccMails)) {
+            for (String mail : ccMails) {
+                validateMail(mail);
+            }
+        }
+        if (CollUtil.isNotEmpty(bccMails)) {
+            for (String mail : bccMails) {
+                validateMail(mail);
+            }
+        }
+
+        // 创建发送日志。如果模板被禁用，则不发送短信，只记录日志
+        Boolean isSend = CommonStatusEnum.ENABLE.getStatus().equals(template.getStatus());
+        String title = mailTemplateService.formatMailTemplateContent(template.getTitle(), templateParams);
+        String content = mailTemplateService.formatMailTemplateContent(template.getContent(), templateParams);
+        Long sendLogId = mailLogService.createMailLog(userId, userType, toMails, ccMails, bccMails,
+                account, template, content, templateParams, isSend);
+        // 发送 MQ 消息，异步执行发送短信
+        if (isSend) {
+            mailProducer.sendMailSendMessage(sendLogId, toMails, ccMails, bccMails, account.getId(),
+                    template.getNickname(), title, content);
+        }
+        return sendLogId;
+    }
+
+    @Override
     public void doSendMail(MailSendMessage message) {
         // 1. 创建发送账号
         MailAccountDO account = validateMailAccount(message.getAccountId());
         MailAccount mailAccount  = buildMailAccount(account, message.getNickname());
         // 2. 发送邮件
         try {
-            String messageId = MailUtil.send(mailAccount, message.getMail(),
+            String messageId = MailUtil.send(mailAccount, message.getToMails(), message.getCcMails(), message.getBccMails(),
                     message.getTitle(), message.getContent(), true);
             // 3. 更新结果（成功）
             mailLogService.updateMailSendResult(message.getLogId(), messageId, null);
@@ -155,7 +222,7 @@ public class MailSendServiceImpl implements MailSendService {
     }
 
     /**
-     * 校验邮件参数是否确实
+     * 校验邮件参数是否缺失
      *
      * @param template 邮箱模板
      * @param templateParams 参数列表
