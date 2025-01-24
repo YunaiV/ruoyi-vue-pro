@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.bpm.enums.definition;
 
 import cn.hutool.core.util.ArrayUtil;
-import cn.iocoder.yudao.framework.common.core.IntArrayValuable;
+import cn.iocoder.yudao.framework.common.core.ArrayValuable;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -15,7 +15,7 @@ import java.util.Objects;
  */
 @Getter
 @AllArgsConstructor
-public enum BpmSimpleModelNodeType implements IntArrayValuable {
+public enum BpmSimpleModelNodeType implements ArrayValuable<Integer> {
 
     // 0 ~ 1 开始和结束
     START_NODE(0, "开始", "startEvent"),
@@ -33,7 +33,7 @@ public enum BpmSimpleModelNodeType implements IntArrayValuable {
     INCLUSIVE_BRANCH_NODE(53, "包容分支", "inclusiveGateway"),
     ;
 
-    public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(BpmSimpleModelNodeType::getType).toArray();
+    public static final Integer[] ARRAYS = Arrays.stream(values()).map(BpmSimpleModelNodeType::getType).toArray(Integer[]::new);
 
     private final Integer type;
     private final String name;
@@ -55,7 +55,7 @@ public enum BpmSimpleModelNodeType implements IntArrayValuable {
     }
 
     @Override
-    public int[] array() {
+    public Integer[] array() {
         return ARRAYS;
     }
 

@@ -17,7 +17,7 @@ import javax.validation.constraints.NotNull;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class AuthSmsSendReqVO {
+public class AuthSmsSendReqVO extends CaptchaVerificationReqVO {
 
     @Schema(description = "手机号", requiredMode = Schema.RequiredMode.REQUIRED, example = "yudaoyuanma")
     @NotEmpty(message = "手机号不能为空")

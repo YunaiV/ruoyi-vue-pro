@@ -19,7 +19,7 @@ import javax.validation.constraints.Pattern;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class AuthLoginReqVO {
+public class AuthLoginReqVO extends CaptchaVerificationReqVO {
 
     @Schema(description = "账号", requiredMode = Schema.RequiredMode.REQUIRED, example = "yudaoyuanma")
     @NotEmpty(message = "登录账号不能为空")
@@ -32,13 +32,6 @@ public class AuthLoginReqVO {
     @Length(min = 4, max = 16, message = "密码长度为 4-16 位")
     private String password;
 
-    // ========== 图片验证码相关 ==========
-
-    @Schema(description = "验证码，验证码开启时，需要传递", requiredMode = Schema.RequiredMode.REQUIRED,
-            example = "PfcH6mgr8tpXuMWFjvW6YVaqrswIuwmWI5dsVZSg7sGpWtDCUbHuDEXl3cFB1+VvCC/rAkSwK8Fad52FSuncVg==")
-    @NotEmpty(message = "验证码不能为空", groups = CodeEnableGroup.class)
-    private String captchaVerification;
-
     // ========== 绑定社交登录时，需要传递如下参数 ==========
 
     @Schema(description = "社交平台的类型，参见 SocialTypeEnum 枚举值", requiredMode = Schema.RequiredMode.REQUIRED, example = "10")
@@ -50,11 +43,6 @@ public class AuthLoginReqVO {
 
     @Schema(description = "state", requiredMode = Schema.RequiredMode.REQUIRED, example = "9b2ffbc1-7425-4155-9894-9d5c08541d62")
     private String socialState;
-
-    /**
-     * 开启验证码的 Group
-     */
-    public interface CodeEnableGroup {}
 
     @AssertTrue(message = "授权码不能为空")
     public boolean isSocialCodeValid() {

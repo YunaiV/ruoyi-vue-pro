@@ -297,7 +297,8 @@ public class AdminAuthServiceImplTest extends BaseDbUnitTest {
     @Test
     public void testValidateCaptcha_constraintViolationException() {
         // 准备参数
-        AuthLoginReqVO reqVO = randomPojo(AuthLoginReqVO.class).setCaptchaVerification(null);
+        AuthLoginReqVO reqVO = randomPojo(AuthLoginReqVO.class);
+        reqVO.setCaptchaVerification(null);
 
         // mock 验证码打开
         ReflectUtil.setFieldValue(authService, "captchaEnable", true);

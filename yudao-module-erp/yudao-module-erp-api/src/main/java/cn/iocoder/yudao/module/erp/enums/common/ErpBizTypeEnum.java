@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.erp.enums.common;
 
-import cn.iocoder.yudao.framework.common.core.IntArrayValuable;
+import cn.iocoder.yudao.framework.common.core.ArrayValuable;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -13,7 +13,7 @@ import java.util.Arrays;
  */
 @RequiredArgsConstructor
 @Getter
-public enum ErpBizTypeEnum implements IntArrayValuable {
+public enum ErpBizTypeEnum implements ArrayValuable<Integer> {
 
     PURCHASE_ORDER(10, "采购订单"),
     PURCHASE_IN(11, "采购入库"),
@@ -24,7 +24,7 @@ public enum ErpBizTypeEnum implements IntArrayValuable {
     SALE_RETURN(22, "销售退货"),
     ;
 
-    public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(ErpBizTypeEnum::getType).toArray();
+    public static final Integer[] ARRAYS = Arrays.stream(values()).map(ErpBizTypeEnum::getType).toArray(Integer[]::new);
 
     /**
      * 类型
@@ -36,7 +36,7 @@ public enum ErpBizTypeEnum implements IntArrayValuable {
     private final String name;
 
     @Override
-    public int[] array() {
+    public Integer[] array() {
         return ARRAYS;
     }
 

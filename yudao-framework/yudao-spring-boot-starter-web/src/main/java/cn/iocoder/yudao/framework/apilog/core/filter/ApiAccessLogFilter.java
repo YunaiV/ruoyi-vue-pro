@@ -146,9 +146,11 @@ public class ApiAccessLogFilter extends ApiRequestFilter {
         if (handlerMethod != null) {
             Tag tagAnnotation = handlerMethod.getBeanType().getAnnotation(Tag.class);
             Operation operationAnnotation = handlerMethod.getMethodAnnotation(Operation.class);
-            String operateModule = accessLogAnnotation != null ? accessLogAnnotation.operateModule() :
+            String operateModule = accessLogAnnotation != null && StrUtil.isNotBlank(accessLogAnnotation.operateModule()) ?
+                    accessLogAnnotation.operateModule() :
                     tagAnnotation != null ? StrUtil.nullToDefault(tagAnnotation.name(), tagAnnotation.description()) : null;
-            String operateName = accessLogAnnotation != null ? accessLogAnnotation.operateName() :
+            String operateName = accessLogAnnotation != null && StrUtil.isNotBlank(accessLogAnnotation.operateName()) ?
+                    accessLogAnnotation.operateName() :
                     operationAnnotation != null ? operationAnnotation.summary() : null;
             OperateTypeEnum operateType = accessLogAnnotation != null && accessLogAnnotation.operateType().length > 0 ?
                     accessLogAnnotation.operateType()[0] : parseOperateLogType(request);

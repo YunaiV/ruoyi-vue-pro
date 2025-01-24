@@ -74,7 +74,7 @@ public interface BrokerageWithdrawService {
      * @return 用户提现汇总 List
      */
     List<BrokerageWithdrawSummaryRespBO> getWithdrawSummaryListByUserId(Collection<Long> userIds,
-                                                                        BrokerageWithdrawStatusEnum status);
+                                                                        Collection<BrokerageWithdrawStatusEnum> status);
 
     /**
      * 按照 userId，汇总每个用户的提现
@@ -84,7 +84,7 @@ public interface BrokerageWithdrawService {
      * @return 用户提现汇总 Map
      */
     default Map<Long, BrokerageWithdrawSummaryRespBO> getWithdrawSummaryMapByUserId(Set<Long> userIds,
-                                                                                    BrokerageWithdrawStatusEnum status) {
+                                                                                    Collection<BrokerageWithdrawStatusEnum> status) {
         return convertMap(getWithdrawSummaryListByUserId(userIds, status), BrokerageWithdrawSummaryRespBO::getUserId);
     }
 
