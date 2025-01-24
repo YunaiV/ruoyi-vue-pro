@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static com.somle.esb.util.ConstantConvertUtils.getCountrySuffix;
+import static com.somle.framework.common.util.number.LengthUtils.mmToCmAsFloat;
 
 @Slf4j
 @Service
@@ -102,10 +103,11 @@ public class ErpToKingdeeConverter {
         // HS编码
         kingdeeProduct.setHelpCode(customRuleDTO.getHscode());
         kingdeeProduct.setCostMethod("2");
+        //给金蝶-包装属性
         kingdeeProduct.setGrossWeight(String.valueOf(customRuleDTO.getPackageWeight()));
-        Float pdNetLength = customRuleDTO.getPackageLength();
-        Float pdNetWidth = customRuleDTO.getPackageWidth();
-        Float pdNetHeight = customRuleDTO.getPackageHeight();
+        Float pdNetLength = mmToCmAsFloat(customRuleDTO.getPackageLength());
+        Float pdNetWidth = mmToCmAsFloat(customRuleDTO.getPackageWidth());
+        Float pdNetHeight = mmToCmAsFloat(customRuleDTO.getPackageHeight());
         kingdeeProduct.setLength(String.valueOf(pdNetLength));
         kingdeeProduct.setWide(String.valueOf(pdNetWidth));
         kingdeeProduct.setHigh(String.valueOf(pdNetHeight));

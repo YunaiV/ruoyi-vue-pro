@@ -31,6 +31,7 @@ import java.util.stream.Collectors;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 import static com.somle.esb.enums.ErrorCodeConstants.DEPT_LEVEL_ERROR;
 import static com.somle.esb.util.ConstantConvertUtils.getCountrySuffix;
+import static com.somle.framework.common.util.number.LengthUtils.mmToCmAsFloat;
 
 @Service
 public class ErpToEccangConverter {
@@ -170,14 +171,15 @@ public class ErpToEccangConverter {
 
         // 设置产品尺寸和重量
         eccangProduct.setProductWeight(customRuleDTO.getPackageWeight());
-        eccangProduct.setProductWidth(customRuleDTO.getPackageWidth());
-        eccangProduct.setProductLength(customRuleDTO.getPackageLength());
-        eccangProduct.setProductHeight(customRuleDTO.getPackageHeight());
-        eccangProduct.setProductMaterial(customRuleDTO.getProductMaterial());
         eccangProduct.setPdNetWeight(customRuleDTO.getProductWeight());
-        eccangProduct.setPdNetLength(customRuleDTO.getProductLength() / 100);
-        eccangProduct.setPdNetWidth(customRuleDTO.getProductWidth() / 100);
-        eccangProduct.setPdNetHeight(customRuleDTO.getProductHeight() / 100);
+        eccangProduct.setProductMaterial(customRuleDTO.getProductMaterial());
+        //mm->cm
+        eccangProduct.setProductWidth(mmToCmAsFloat(customRuleDTO.getPackageWidth()));
+        eccangProduct.setProductLength(mmToCmAsFloat(customRuleDTO.getPackageLength()));
+        eccangProduct.setProductHeight(mmToCmAsFloat(customRuleDTO.getPackageHeight()));
+        eccangProduct.setPdNetLength(mmToCmAsFloat(customRuleDTO.getProductLength()));
+        eccangProduct.setPdNetWidth(mmToCmAsFloat(customRuleDTO.getProductWidth()));
+        eccangProduct.setPdNetHeight(mmToCmAsFloat(customRuleDTO.getProductHeight()));
 
         // 设置其他产品属性
         eccangProduct.setFboTaxRate(customRuleDTO.getTaxRate());
@@ -217,6 +219,7 @@ public class ErpToEccangConverter {
         return eccangProduct;
     }
 
+
     /**
      * 将单个ERP产品转换为Eccang产品。
      *
@@ -238,15 +241,16 @@ public class ErpToEccangConverter {
         // 设置产品尺寸和重量
         eccangProduct.setProductMaterial(product.getMaterial());
         eccangProduct.setPdNetWeight(Float.valueOf(product.getWeight()));
-        eccangProduct.setPdNetLength(Float.valueOf(product.getLength()) / 100);
-        eccangProduct.setPdNetWidth(Float.valueOf(product.getWidth()) / 100);
-        eccangProduct.setPdNetHeight(Float.valueOf(product.getHeight()) / 100);
         eccangProduct.setProductImgUrlList(Collections.singletonList(product.getPrimaryImageUrl()));
         eccangProduct.setDefaultSupplierCode("默认供应商");
-        //设置产品包装属性
-        eccangProduct.setProductLength(convertToCm(product.getPackageLength()));  // mm -> cm
-        eccangProduct.setProductWidth(convertToCm(product.getPackageWidth()));    // mm -> cm
-        eccangProduct.setProductHeight(convertToCm(product.getPackageHeight()));  // mm -> cm
+        //产品基础属性
+        eccangProduct.setPdNetLength(mmToCmAsFloat(Float.valueOf(product.getLength())));
+        eccangProduct.setPdNetWidth(mmToCmAsFloat(Float.valueOf(product.getWidth())));
+        eccangProduct.setPdNetHeight(mmToCmAsFloat(Float.valueOf(product.getHeight())));
+        //产品包装属性
+        eccangProduct.setProductLength(mmToCmAsFloat(product.getPackageLength()));  // mm -> cm
+        eccangProduct.setProductWidth(mmToCmAsFloat(product.getPackageWidth()));    // mm -> cm
+        eccangProduct.setProductHeight(mmToCmAsFloat(product.getPackageHeight()));  // mm -> cm
 
         eccangProduct.setProductWeight(
             product.getPackageWeight() != null
@@ -278,10 +282,7 @@ public class ErpToEccangConverter {
 
         return eccangProduct;
     }
-    // 辅助方法：转换为厘米并返回Float，避免重复代码
-    private Float convertToCm(Integer mmValue) {
-        return mmValue != null ? mmValue / 10f : null;
-    }
+
 
     public EccangCategory toEccang(String deptId) {
         //从erp中获取部门信息
