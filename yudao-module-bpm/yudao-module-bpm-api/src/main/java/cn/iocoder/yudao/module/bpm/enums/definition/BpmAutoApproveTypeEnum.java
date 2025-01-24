@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.bpm.enums.definition;
 
-import cn.iocoder.yudao.framework.common.core.IntArrayValuable;
+import cn.iocoder.yudao.framework.common.core.ArrayValuable;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -13,19 +13,19 @@ import java.util.Arrays;
  */
 @Getter
 @AllArgsConstructor
-public enum BpmAutoApproveTypeEnum implements IntArrayValuable {
+public enum BpmAutoApproveTypeEnum implements ArrayValuable<Integer> {
 
     NONE(0, "不自动通过"),
     APPROVE_ALL(1, "仅审批一次，后续重复的审批节点均自动通过"),
     APPROVE_SEQUENT(2, "仅针对连续审批的节点自动通过");
 
-    public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(BpmAutoApproveTypeEnum::getType).toArray();
+    public static final Integer[] ARRAYS = Arrays.stream(values()).map(BpmAutoApproveTypeEnum::getType).toArray(Integer[]::new);
 
     private final Integer type;
     private final String name;
 
     @Override
-    public int[] array() {
+    public Integer[] array() {
         return ARRAYS;
     }
 

@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.bpm.enums.definition;
 
-import cn.iocoder.yudao.framework.common.core.IntArrayValuable;
+import cn.iocoder.yudao.framework.common.core.ArrayValuable;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -13,7 +13,7 @@ import java.util.Arrays;
  */
 @Getter
 @AllArgsConstructor
-public enum BpmDelayTimerTypeEnum implements IntArrayValuable {
+public enum BpmDelayTimerTypeEnum implements ArrayValuable<Integer> {
 
     FIXED_TIME_DURATION(1, "固定时长"),
     FIXED_DATE_TIME(2, "固定日期");
@@ -21,10 +21,10 @@ public enum BpmDelayTimerTypeEnum implements IntArrayValuable {
     private final Integer type;
     private final String name;
 
-    public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(BpmDelayTimerTypeEnum::getType).toArray();
+    public static final Integer[] ARRAYS = Arrays.stream(values()).map(BpmDelayTimerTypeEnum::getType).toArray(Integer[]::new);
 
     @Override
-    public int[] array() {
+    public Integer[] array() {
         return ARRAYS;
     }
 
