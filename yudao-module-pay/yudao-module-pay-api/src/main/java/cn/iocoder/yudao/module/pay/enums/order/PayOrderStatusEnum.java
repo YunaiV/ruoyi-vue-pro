@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.pay.enums.order;
 
-import cn.iocoder.yudao.framework.common.core.IntArrayValuable;
+import cn.iocoder.yudao.framework.common.core.ArrayValuable;
 import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -14,7 +14,7 @@ import java.util.Objects;
  */
 @Getter
 @AllArgsConstructor
-public enum PayOrderStatusEnum implements IntArrayValuable {
+public enum PayOrderStatusEnum implements ArrayValuable<Integer> {
 
     WAITING(0, "未支付"),
     SUCCESS(10, "支付成功"),
@@ -26,8 +26,8 @@ public enum PayOrderStatusEnum implements IntArrayValuable {
     private final String name;
 
     @Override
-    public int[] array() {
-        return new int[0];
+    public Integer[] array() {
+        return new Integer[0];
     }
 
     /**

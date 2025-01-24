@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.iot.enums.device;
 
-import cn.iocoder.yudao.framework.common.core.IntArrayValuable;
+import cn.iocoder.yudao.framework.common.core.ArrayValuable;
 import lombok.Getter;
 
 import java.util.Arrays;
@@ -11,14 +11,14 @@ import java.util.Arrays;
  * @author haohao
  */
 @Getter
-public enum IotDeviceStatusEnum implements IntArrayValuable {
+public enum IotDeviceStatusEnum implements ArrayValuable<Integer> {
 
     INACTIVE(0, "未激活"),
     ONLINE(1, "在线"),
     OFFLINE(2, "离线"),
     DISABLED(3, "已禁用");
 
-    public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(IotDeviceStatusEnum::getStatus).toArray();
+    public static final Integer[] ARRAYS = Arrays.stream(values()).map(IotDeviceStatusEnum::getStatus).toArray(Integer[]::new);
 
     /**
      * 状态
@@ -48,7 +48,7 @@ public enum IotDeviceStatusEnum implements IntArrayValuable {
     }
 
     @Override
-    public int[] array() {
+    public Integer[] array() {
         return ARRAYS;
     }
 

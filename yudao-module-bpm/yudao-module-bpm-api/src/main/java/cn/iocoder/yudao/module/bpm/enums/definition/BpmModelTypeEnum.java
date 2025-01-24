@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.bpm.enums.definition;
 
-import cn.iocoder.yudao.framework.common.core.IntArrayValuable;
+import cn.iocoder.yudao.framework.common.core.ArrayValuable;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -13,18 +13,18 @@ import java.util.Arrays;
  */
 @Getter
 @AllArgsConstructor
-public enum BpmModelTypeEnum implements IntArrayValuable {
+public enum BpmModelTypeEnum implements ArrayValuable<Integer> {
 
     BPMN(10, "BPMN 设计器"), // https://bpmn.io/toolkit/bpmn-js/
     SIMPLE(20, "SIMPLE 设计器"); // 参考钉钉、飞书工作流的设计器
 
-    public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(BpmModelTypeEnum::getType).toArray();
+    public static final Integer[] ARRAYS = Arrays.stream(values()).map(BpmModelTypeEnum::getType).toArray(Integer[]::new);
 
     private final Integer type;
     private final String name;
 
     @Override
-    public int[] array() {
+    public Integer[] array() {
         return ARRAYS;
     }
 

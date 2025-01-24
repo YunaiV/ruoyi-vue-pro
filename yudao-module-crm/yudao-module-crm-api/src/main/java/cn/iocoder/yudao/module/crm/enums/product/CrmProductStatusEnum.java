@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.crm.enums.product;
 
 import cn.hutool.core.util.ObjUtil;
-import cn.iocoder.yudao.framework.common.core.IntArrayValuable;
+import cn.iocoder.yudao.framework.common.core.ArrayValuable;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -15,12 +15,12 @@ import java.util.Arrays;
  */
 @Getter
 @AllArgsConstructor
-public enum CrmProductStatusEnum implements IntArrayValuable {
+public enum CrmProductStatusEnum implements ArrayValuable<Integer> {
 
     DISABLE(0, "下架"),
     ENABLE(1, "上架");
 
-    public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(CrmProductStatusEnum::getStatus).toArray();
+    public static final Integer[] ARRAYS = Arrays.stream(values()).map(CrmProductStatusEnum::getStatus).toArray(Integer[]::new);
 
     /**
      * 状态
@@ -32,7 +32,7 @@ public enum CrmProductStatusEnum implements IntArrayValuable {
     private final String name;
 
     @Override
-    public int[] array() {
+    public Integer[] array() {
         return ARRAYS;
     }
 
