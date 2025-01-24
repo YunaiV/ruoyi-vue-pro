@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.framework.desensitize.core.slider.handler;
 
+import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.util.spring.SpringExpressionUtils;
 import cn.iocoder.yudao.framework.desensitize.core.base.handler.DesensitizationHandler;
 
@@ -47,7 +48,7 @@ public abstract class AbstractSliderDesensitizationHandler<T extends Annotation>
      * @return 构建后的替换符
      */
     private String buildReplacerByLength(String replacer, int length) {
-        return replacer.repeat(length);
+        return StrUtil.repeat(replacer, length);
     }
 
     /**
