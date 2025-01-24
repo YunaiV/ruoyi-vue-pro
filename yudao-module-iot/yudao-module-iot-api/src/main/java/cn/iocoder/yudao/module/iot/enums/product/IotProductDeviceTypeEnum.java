@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.iot.enums.product;
 
-import cn.iocoder.yudao.framework.common.core.IntArrayValuable;
+import cn.iocoder.yudao.framework.common.core.ArrayValuable;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -13,7 +13,7 @@ import java.util.Arrays;
  */
 @AllArgsConstructor
 @Getter
-public enum IotProductDeviceTypeEnum implements IntArrayValuable {
+public enum IotProductDeviceTypeEnum implements ArrayValuable<Integer> {
 
     DIRECT(0, "直连设备"),
     GATEWAY_CHILD(1, "网关子设备"),
@@ -29,10 +29,10 @@ public enum IotProductDeviceTypeEnum implements IntArrayValuable {
      */
     private final String description;
 
-    public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(IotProductDeviceTypeEnum::getType).toArray();
+    public static final Integer[] ARRAYS = Arrays.stream(values()).map(IotProductDeviceTypeEnum::getType).toArray(Integer[]::new);
 
     @Override
-    public int[] array() {
+    public Integer[] array() {
         return ARRAYS;
     }
 

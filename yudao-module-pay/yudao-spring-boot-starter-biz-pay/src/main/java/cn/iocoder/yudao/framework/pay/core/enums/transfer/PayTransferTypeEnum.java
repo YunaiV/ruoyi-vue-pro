@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.framework.pay.core.enums.transfer;
 
 import cn.hutool.core.util.ArrayUtil;
-import cn.iocoder.yudao.framework.common.core.IntArrayValuable;
+import cn.iocoder.yudao.framework.common.core.ArrayValuable;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -14,7 +14,7 @@ import java.util.Arrays;
  */
 @AllArgsConstructor
 @Getter
-public enum PayTransferTypeEnum implements IntArrayValuable {
+public enum PayTransferTypeEnum implements ArrayValuable<Integer> {
 
     ALIPAY_BALANCE(1, "支付宝余额"),
     WX_BALANCE(2, "微信余额"),
@@ -30,10 +30,10 @@ public enum PayTransferTypeEnum implements IntArrayValuable {
     private final Integer type;
     private final String name;
 
-    public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(PayTransferTypeEnum::getType).toArray();
+    public static final Integer[] ARRAYS = Arrays.stream(values()).map(PayTransferTypeEnum::getType).toArray(Integer[]::new);
 
     @Override
-    public int[] array() {
+    public Integer[] array() {
         return ARRAYS;
     }
 

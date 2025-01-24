@@ -42,6 +42,7 @@ import java.util.Collections;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 import static cn.iocoder.yudao.framework.common.util.servlet.ServletUtils.getClientIP;
 import static cn.iocoder.yudao.module.trade.enums.ErrorCodeConstants.*;
 
@@ -98,7 +99,7 @@ public class BrokerageWithdrawServiceImpl implements BrokerageWithdrawService {
         // 3.1 审批通过的后续处理
         if (BrokerageWithdrawStatusEnum.AUDIT_SUCCESS.equals(status)) {
             auditBrokerageWithdrawSuccess(withdraw);
-        // 3.2 审批不通过的后续处理
+            // 3.2 审批不通过的后续处理
         } else if (BrokerageWithdrawStatusEnum.AUDIT_FAIL.equals(status)) {
             brokerageRecordService.addBrokerage(withdraw.getUserId(), BrokerageRecordBizTypeEnum.WITHDRAW_REJECT,
                     String.valueOf(withdraw.getId()), withdraw.getPrice(), BrokerageRecordBizTypeEnum.WITHDRAW_REJECT.getTitle());
@@ -114,11 +115,11 @@ public class BrokerageWithdrawServiceImpl implements BrokerageWithdrawService {
                     .setUserId(withdraw.getUserId()).setUserType(UserTypeEnum.MEMBER.getValue())
                     .setBizType(PayWalletBizTypeEnum.BROKERAGE_WITHDRAW.getType()).setBizId(withdraw.getId().toString())
                     .setPrice(withdraw.getPrice()));
-        // 1.2 微信 API
+            // 1.2 微信 API
         } else if (BrokerageWithdrawTypeEnum.WECHAT_API.getType().equals(withdraw.getType())) {
             // TODO @luchi：这里，要加个转账单号的记录；另外，调用 API 转账，是立马成功，还是有延迟的哈？
             Long payTransferId = createPayTransfer(withdraw);
-        // 1.3 剩余类型，都是手动打款，所以不处理
+            // 1.3 剩余类型，都是手动打款，所以不处理
         } else {
             // TODO 可优化：未来可以考虑，接入支付宝、银联等 API 转账，实现自动打款
             log.info("[auditBrokerageWithdrawSuccess][withdraw({}) 类型({}) 手动打款，无需处理]", withdraw.getId(), withdraw.getType());
@@ -239,11 +240,12 @@ public class BrokerageWithdrawServiceImpl implements BrokerageWithdrawService {
 
     @Override
     public List<BrokerageWithdrawSummaryRespBO> getWithdrawSummaryListByUserId(Collection<Long> userIds,
-                                                                               BrokerageWithdrawStatusEnum status) {
-        if (CollUtil.isEmpty(userIds)) {
+                                                                               Collection<BrokerageWithdrawStatusEnum> statuses) {
+        if (CollUtil.isEmpty(userIds) || CollUtil.isEmpty(statuses)) {
             return Collections.emptyList();
         }
-        return brokerageWithdrawMapper.selectCountAndSumPriceByUserIdAndStatus(userIds, status.getStatus());
+        return brokerageWithdrawMapper.selectCountAndSumPriceByUserIdAndStatus(userIds,
+                convertSet(statuses, BrokerageWithdrawStatusEnum::getStatus));
     }
 
 }

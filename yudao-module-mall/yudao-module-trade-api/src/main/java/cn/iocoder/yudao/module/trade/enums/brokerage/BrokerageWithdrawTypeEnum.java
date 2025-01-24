@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.trade.enums.brokerage;
 
-import cn.iocoder.yudao.framework.common.core.IntArrayValuable;
+import cn.iocoder.yudao.framework.common.core.ArrayValuable;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -13,7 +13,7 @@ import java.util.Arrays;
  */
 @AllArgsConstructor
 @Getter
-public enum BrokerageWithdrawTypeEnum implements IntArrayValuable {
+public enum BrokerageWithdrawTypeEnum implements ArrayValuable<Integer> {
 
     WALLET(1, "钱包"),
     BANK(2, "银行卡"),
@@ -22,7 +22,7 @@ public enum BrokerageWithdrawTypeEnum implements IntArrayValuable {
     WECHAT_API(5, "微信零钱"), // 自动打款，通过微信转账 API
     ;
 
-    public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(BrokerageWithdrawTypeEnum::getType).toArray();
+    public static final Integer[] ARRAYS = Arrays.stream(values()).map(BrokerageWithdrawTypeEnum::getType).toArray(Integer[]::new);
 
     /**
      * 类型
@@ -34,7 +34,7 @@ public enum BrokerageWithdrawTypeEnum implements IntArrayValuable {
     private final String name;
 
     @Override
-    public int[] array() {
+    public Integer[] array() {
         return ARRAYS;
     }
 
