@@ -3,24 +3,25 @@
          xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
-        <artifactId>yudao</artifactId>
+        <artifactId>yudao-module-iot</artifactId>
         <groupId>cn.iocoder.boot</groupId>
         <version>${revision}</version>
     </parent>
     <modules>
-        <module>yudao-module-iot-api</module>
-        <module>yudao-module-iot-biz</module>
-        <module>yudao-module-iot-plugins</module>
+        <module>yudao-module-iot-plugin-common</module>
+        <module>yudao-module-iot-plugin-http</module>
+        <module>yudao-module-iot-plugin-mqtt</module>
+        <module>yudao-module-iot-plugin-emqx</module>
     </modules>
+
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>yudao-module-iot</artifactId>
+    <artifactId>yudao-module-iot-plugins</artifactId>
     <packaging>pom</packaging>
 
     <name>${project.artifactId}</name>
     <description>
-        物联网模块
-        <!-- TODO 芋艿：需要补充下说明！ -->
+        物联网 插件 模块
     </description>
 
 </project>

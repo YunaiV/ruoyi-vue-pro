@@ -1,0 +1,7 @@
+spring:
+  application:
+    name: yudao-module-iot-plugin-http
+
+iot:
+  device-data:
+    url: http://127.0.0.1:48080
