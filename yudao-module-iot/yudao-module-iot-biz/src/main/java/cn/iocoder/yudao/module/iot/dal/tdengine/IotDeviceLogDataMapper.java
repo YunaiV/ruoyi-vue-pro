@@ -68,6 +68,15 @@ public interface IotDeviceLogDataMapper {
     /**
      * 查询设备日志表是否存在
      *
+     * @return 不存在返回null
      */
-    Object checkDeviceLogTableExists();
+    Object checkDeviceLogSTableExists();
+
+    /**
+     * 检查设备日志子表是否存在
+     *
+     * @param deviceKey 设备标识
+     * @return 不存在返回null
+     */
+    Object checkDeviceLogTableExists(@Param("deviceKey") String deviceKey);
 }

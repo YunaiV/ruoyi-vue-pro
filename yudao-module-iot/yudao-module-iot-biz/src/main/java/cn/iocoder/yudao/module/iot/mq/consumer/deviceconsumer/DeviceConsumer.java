@@ -30,8 +30,10 @@ public class DeviceConsumer {
     @Async
     public void onMessage(ThingModelMessage message) {
         log.info("[onMessage][消息内容({})]", message);
+        //TODO:数据插入这块整体写的比较混乱，整体借鉴了浩浩哥之前写的逻辑，目前是通过模拟设备科插入数据了，但之前的逻辑有大量弃用的部分，后续看看怎么完善
+
         // 设备数据记录
-//        deviceDataService.saveDeviceDataTest(message);
+        deviceDataService.saveDeviceDataTest(message);
         // 设备日志记录
         iotDeviceLogDataService.saveDeviceLog(message);
     }

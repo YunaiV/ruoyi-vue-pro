@@ -244,6 +244,7 @@ public class IotDevicePropertyDataServiceImpl implements IotDevicePropertyDataSe
         SelectVisualDO selectVisualDO = new SelectVisualDO();
         selectVisualDO.setDataBaseName(getDatabaseName());
         selectVisualDO.setTableName(getDeviceTableName(device.getProductKey(), device.getDeviceName()));
+        selectVisualDO.setDeviceKey(device.getDeviceKey());
         selectVisualDO.setFieldName(deviceDataReqVO.getIdentifier());
         selectVisualDO.setStartTime(DateUtil.date(deviceDataReqVO.getTimes()[0].atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()).getTime());
         selectVisualDO.setEndTime(DateUtil.date(deviceDataReqVO.getTimes()[1].atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()).getTime());
@@ -251,8 +252,8 @@ public class IotDevicePropertyDataServiceImpl implements IotDevicePropertyDataSe
         params.put("rows", deviceDataReqVO.getPageSize());
         params.put("page", (deviceDataReqVO.getPageNo() - 1) * deviceDataReqVO.getPageSize());
         selectVisualDO.setParams(params);
-        pageResult.setList(tdEngineDMLMapper.selectHistoryDataList(selectVisualDO));
-        pageResult.setTotal(tdEngineDMLMapper.selectHistoryCount(selectVisualDO));
+        pageResult.setList(devicePropertyDataMapper.selectHistoryDataList(selectVisualDO));
+        pageResult.setTotal(devicePropertyDataMapper.selectHistoryCount(selectVisualDO));
         return pageResult;
     }
 

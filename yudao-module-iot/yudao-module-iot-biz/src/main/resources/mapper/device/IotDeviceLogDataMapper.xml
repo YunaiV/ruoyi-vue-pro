@@ -76,8 +76,14 @@
     </select>
 
     <!-- 检查设备日志超级表是否存在 -->
-    <select id="checkDeviceLogTableExists" resultType="Object">
+    <select id="checkDeviceLogSTableExists" resultType="Object">
         SHOW STABLES LIKE 'device_log'
     </select>
+
+    <!-- 检查设备日志子表是否存在 -->
+    <select id="checkDeviceLogTableExists" resultType="Object">
+        SHOW TABLES LIKE 'device_log_${deviceKey}'
+    </select>
+
 
 </mapper>

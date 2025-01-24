@@ -33,6 +33,10 @@ public class TdTableDO {
      */
     private String tableName;
 
+    private String productKey;
+
+    private String deviceKey;
+
     /**
      * COLUMN 字段
      */

@@ -43,8 +43,8 @@ public class IotDeviceLogDataServiceImpl implements IotDeviceLogDataService{
 //            }
 //            throw e;
 //        }
-        if(iotDeviceLogDataMapper.checkDeviceLogTableExists()==null){
-            log.info("[TDengine] 设备日志超级表不存在，开始创建 {}",iotDeviceLogDataMapper.checkDeviceLogTableExists());
+        if(iotDeviceLogDataMapper.checkDeviceLogSTableExists()==null){
+            log.info("[TDengine] 设备日志超级表不存在，开始创建");
             iotDeviceLogDataMapper.createDeviceLogSTable();
         }else{
             log.info("[TDengine] 设备日志超级表已存在，跳过创建");
@@ -72,6 +72,10 @@ public class IotDeviceLogDataServiceImpl implements IotDeviceLogDataService{
     // 讨论：艿菇  这就是iotDeviceLogDataService的Impl
     @Override
     public PageResult<IotDeviceLogDO> getDeviceLogPage(IotDeviceLogPageReqVO pageReqVO) {
+        // 当设备日志表未创建时，查询会出现报错
+        if(iotDeviceLogDataMapper.checkDeviceLogTableExists(pageReqVO.getDeviceKey())==null){
+            return null;
+        }
         // 查询数据
         List<IotDeviceLogDO> list = iotDeviceLogDataMapper.selectPage(pageReqVO);
         Long total = iotDeviceLogDataMapper.selectCount(pageReqVO);
