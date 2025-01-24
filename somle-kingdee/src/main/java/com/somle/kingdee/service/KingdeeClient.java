@@ -145,11 +145,8 @@ public class KingdeeClient {
             getCustomFieldByDisplayName("bd_material", "部门"),
             getAuxInfoByNumber(kingdeeProductCopy.getSaleDepartmentId().toString()).getId()
         );
-        try {
-            kingdeeProductCopy.setCustomField(getCustomFieldByDisplayName("bd_material", "报关品名"), kingdeeProductCopy.getDeclaredTypeZh());
-        } catch (Exception e) {
-            log.debug("custom field 报关品名 skipped for " + token.getAccountName());
-        }
+        setCustomFieldSafely(kingdeeProductCopy, "报关品名", kingdeeProductCopy.getDeclaredTypeZh());
+        setCustomFieldSafely(kingdeeProductCopy, "报关品名(英文)", kingdeeProductCopy.getDeclaredTypeEn());
         log.debug("adding product");
         String endUrl = "/jdy/v2/bd/material";
         TreeMap<String, String> params = new TreeMap<>();
@@ -157,6 +154,22 @@ public class KingdeeClient {
         return response;
     }
 
+    /**
+     * 根绝字段名称获取id，如果有该字段、则设置value，没有就日志记录
+     * @param kingdeeProductCopy 对象
+     * @param displayName 属性名称
+     * @param fieldValue 属性值
+     */
+    private void setCustomFieldSafely(KingdeeProduct kingdeeProductCopy, String displayName, String fieldValue) {
+        try {
+            KingdeeCustomField customField = getCustomFieldByDisplayName("bd_material", displayName);
+            if (customField != null) {
+                kingdeeProductCopy.setCustomField(customField, fieldValue);
+            }
+        } catch (Exception e) {
+            log.debug("custom field " + displayName + " skipped for " + token.getAccountName(), e);
+        }
+    }
     public KingdeeResponse addSupplier(KingdeeSupplier kingdeeSupplier) {
         KingdeeSupplier supplierCopy = new KingdeeSupplier();
         BeanUtils.copyProperties(kingdeeSupplier, supplierCopy);

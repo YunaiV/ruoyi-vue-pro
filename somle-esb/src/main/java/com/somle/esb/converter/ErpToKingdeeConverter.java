@@ -100,6 +100,7 @@ public class ErpToKingdeeConverter {
         kingdeeProduct.setBarcode(customRuleDTO.getBarCode());
         // 报关品名
         kingdeeProduct.setProducingPace(customRuleDTO.getDeclaredType());
+        kingdeeProduct.setDeclaredTypeEn(customRuleDTO.getDeclaredTypeEn());
         // HS编码
         kingdeeProduct.setHelpCode(customRuleDTO.getHscode());
         kingdeeProduct.setCostMethod("2");
