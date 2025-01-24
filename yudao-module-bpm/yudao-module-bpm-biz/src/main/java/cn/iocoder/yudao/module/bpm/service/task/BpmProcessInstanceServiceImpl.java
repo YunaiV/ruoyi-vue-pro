@@ -128,7 +128,7 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
 
     @Override
     public List<ProcessInstance> getProcessInstances(Set<String> ids) {
-        return runtimeService.createProcessInstanceQuery().processInstanceIds(ids).list();
+        return runtimeService.createProcessInstanceQuery().processInstanceIds(ids).includeProcessVariables().list();
     }
 
     @Override
@@ -138,7 +138,7 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
 
     @Override
     public List<HistoricProcessInstance> getHistoricProcessInstances(Set<String> ids) {
-        return historyService.createHistoricProcessInstanceQuery().processInstanceIds(ids).list();
+        return historyService.createHistoricProcessInstanceQuery().processInstanceIds(ids).includeProcessVariables().list();
     }
 
     @Override

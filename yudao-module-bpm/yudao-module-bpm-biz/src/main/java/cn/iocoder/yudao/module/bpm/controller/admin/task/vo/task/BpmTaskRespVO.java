@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.bpm.controller.admin.task.vo.task;
 
+import cn.iocoder.yudao.framework.common.core.KeyValue;
 import cn.iocoder.yudao.module.bpm.controller.admin.base.user.UserSimpleBaseVO;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -83,6 +84,9 @@ public class BpmTaskRespVO {
 
     @Schema(description = "是否填写审批意见", example = "false")
     private Boolean reasonRequire;
+
+    @Schema(description = "摘要", example = "[]")
+    private List<KeyValue<String, String>> summary;
 
     @Data
     @Schema(description = "流程实例")

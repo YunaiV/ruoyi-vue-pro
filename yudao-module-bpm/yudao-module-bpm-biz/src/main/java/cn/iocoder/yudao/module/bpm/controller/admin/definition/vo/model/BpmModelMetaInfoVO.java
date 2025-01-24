@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model;
 
+import cn.iocoder.yudao.framework.common.core.KeyValue;
 import cn.iocoder.yudao.framework.common.validation.InEnum;
 import cn.iocoder.yudao.module.bpm.enums.definition.BpmAutoApproveTypeEnum;
 import cn.iocoder.yudao.module.bpm.enums.definition.BpmModelFormTypeEnum;
@@ -77,6 +78,9 @@ public class BpmModelMetaInfoVO {
     @Schema(description = "标题设置", example = "{}")
     private TitleSetting titleSetting;
 
+    @Schema(description = "摘要设置", example = "{}")
+    private SummarySetting summarySetting;
+
     @Schema(description = "流程 ID 规则")
     @Data
     @Valid
@@ -112,6 +116,20 @@ public class BpmModelMetaInfoVO {
 
         @Schema(description = "标题", example = "流程标题")
         private String title;
+
+    }
+
+    @Schema(description = "摘要设置")
+    @Data
+    @Valid
+    public static class SummarySetting {
+
+        @Schema(description = "是否自定义", example = "false")
+        @NotNull(message = "是否自定义不能为空")
+        private Boolean enable;
+
+        @Schema(description = "摘要字段数组", example = "[]")
+        private List<String> summary;
 
     }
 

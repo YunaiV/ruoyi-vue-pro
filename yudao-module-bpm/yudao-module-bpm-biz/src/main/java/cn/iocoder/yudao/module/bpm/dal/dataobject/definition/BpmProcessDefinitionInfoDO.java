@@ -176,4 +176,10 @@ public class BpmProcessDefinitionInfoDO extends BaseDO {
     @TableField(typeHandler = JacksonTypeHandler.class)
     private BpmModelMetaInfoVO.TitleSetting titleSetting;
 
+    /**
+     * 摘要设置
+     */
+    @TableField(typeHandler = JacksonTypeHandler.class)
+    private BpmModelMetaInfoVO.SummarySetting summarySetting;
+
 }

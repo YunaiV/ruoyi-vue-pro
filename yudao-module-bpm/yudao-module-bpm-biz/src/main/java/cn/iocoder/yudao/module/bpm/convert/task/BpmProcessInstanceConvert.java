@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.bpm.convert.task;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.iocoder.yudao.framework.common.core.KeyValue;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
 import cn.iocoder.yudao.framework.common.util.collection.SetUtils;
@@ -58,7 +59,8 @@ public interface BpmProcessInstanceConvert {
                                                                           Map<String, BpmCategoryDO> categoryMap,
                                                                           Map<String, List<Task>> taskMap,
                                                                           Map<Long, AdminUserRespDTO> userMap,
-                                                                          Map<Long, DeptRespDTO> deptMap) {
+                                                                          Map<Long, DeptRespDTO> deptMap,
+                                                                          Map<String, BpmProcessDefinitionInfoDO> processDefinitionInfoMap) {
         PageResult<BpmProcessInstanceRespVO> vpPageResult = BeanUtils.toBean(pageResult, BpmProcessInstanceRespVO.class);
         for (int i = 0; i < pageResult.getList().size(); i++) {
             BpmProcessInstanceRespVO respVO = vpPageResult.getList().get(i);
@@ -76,6 +78,9 @@ public interface BpmProcessInstanceConvert {
                     MapUtils.findAndThen(deptMap, startUser.getDeptId(), dept -> respVO.getStartUser().setDeptName(dept.getName()));
                 }
             }
+            // 摘要
+            respVO.setSummary(FlowableUtils.getSummary(processDefinitionInfoMap.get(respVO.getProcessDefinitionId()),
+                    pageResult.getList().get(i).getProcessVariables()));
         }
         return vpPageResult;
     }
