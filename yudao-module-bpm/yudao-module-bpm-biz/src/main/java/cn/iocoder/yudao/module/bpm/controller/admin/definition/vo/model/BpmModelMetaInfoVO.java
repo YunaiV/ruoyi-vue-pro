@@ -75,7 +75,7 @@ public class BpmModelMetaInfoVO {
     private Integer autoApprovalType;
 
     @Schema(description = "标题设置", example = "{}")
-    private CustomTitleSetting customTitleSetting;
+    private TitleSetting titleSetting;
 
     @Schema(description = "流程 ID 规则")
     @Data
@@ -101,11 +101,10 @@ public class BpmModelMetaInfoVO {
 
     }
 
-    // TODO @lesan：TitleSetting 会不会更好。因为 Custom 和 Setting 有点重叠
     @Schema(description = "标题设置")
     @Data
     @Valid
-    public static class CustomTitleSetting {
+    public static class TitleSetting {
 
         @Schema(description = "是否自定义", example = "false")
         @NotNull(message = "是否自定义不能为空")
