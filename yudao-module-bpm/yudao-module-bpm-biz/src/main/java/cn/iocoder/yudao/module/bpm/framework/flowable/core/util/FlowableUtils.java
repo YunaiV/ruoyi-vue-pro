@@ -313,7 +313,6 @@ public class FlowableUtils {
                     j++;
                 }
             }
-            Collections.reverse(summaryList);
             return summaryList;
         }
         return null;
