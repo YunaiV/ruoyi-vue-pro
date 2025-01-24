@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.iot.enums.product;
 
-import cn.iocoder.yudao.framework.common.core.IntArrayValuable;
+import cn.iocoder.yudao.framework.common.core.ArrayValuable;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -13,13 +13,13 @@ import java.util.Arrays;
  */
 @AllArgsConstructor
 @Getter
-public enum IotProductFunctionTypeEnum implements IntArrayValuable {
+public enum IotProductFunctionTypeEnum implements ArrayValuable<Integer> {
 
     PROPERTY(1, "属性"),
     SERVICE(2, "服务"),
     EVENT(3, "事件");
 
-    public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(IotProductFunctionTypeEnum::getType).toArray();
+    public static final Integer[] ARRAYS = Arrays.stream(values()).map(IotProductFunctionTypeEnum::getType).toArray(Integer[]::new);
 
     /**
      * 类型
@@ -31,7 +31,7 @@ public enum IotProductFunctionTypeEnum implements IntArrayValuable {
     private final String description;
 
     @Override
-    public int[] array() {
+    public Integer[] array() {
         return ARRAYS;
     }
 

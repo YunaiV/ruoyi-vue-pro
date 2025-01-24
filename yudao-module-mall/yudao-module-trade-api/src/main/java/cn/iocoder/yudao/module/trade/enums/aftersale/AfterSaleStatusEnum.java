@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.trade.enums.aftersale;
 
-import cn.iocoder.yudao.framework.common.core.IntArrayValuable;
+import cn.iocoder.yudao.framework.common.core.ArrayValuable;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -18,7 +18,7 @@ import static cn.hutool.core.util.ArrayUtil.firstMatch;
  */
 @AllArgsConstructor
 @Getter
-public enum AfterSaleStatusEnum implements IntArrayValuable {
+public enum AfterSaleStatusEnum implements ArrayValuable<Integer> {
 
     /**
      * 【申请售后】
@@ -54,7 +54,7 @@ public enum AfterSaleStatusEnum implements IntArrayValuable {
     SELLER_REFUSE(63,"卖家拒绝收货", "商家拒绝收货"), // 有赞的状态提示：商家拒绝收货，不同意退款
     ;
 
-    public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(AfterSaleStatusEnum::getStatus).toArray();
+    public static final Integer[] ARRAYS = Arrays.stream(values()).map(AfterSaleStatusEnum::getStatus).toArray(Integer[]::new);
 
     /**
      * 进行中的售后状态
@@ -84,7 +84,7 @@ public enum AfterSaleStatusEnum implements IntArrayValuable {
     private final String content;
 
     @Override
-    public int[] array() {
+    public Integer[] array() {
         return ARRAYS;
     }
 

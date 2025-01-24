@@ -35,6 +35,7 @@ import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
+import static java.util.Arrays.asList;
 
 @Tag(name = "用户 APP - 分销用户")
 @RestController
@@ -84,7 +85,7 @@ public class AppBrokerageUserController {
                 BrokerageRecordBizTypeEnum.ORDER, BrokerageRecordStatusEnum.SETTLEMENT, beginTime, endTime);
         // 统计用户提现的佣金
         Integer withdrawPrice = brokerageWithdrawService.getWithdrawSummaryListByUserId(Collections.singleton(userId),
-                        BrokerageWithdrawStatusEnum.AUDIT_SUCCESS).stream()
+                        asList(BrokerageWithdrawStatusEnum.AUDIT_SUCCESS, BrokerageWithdrawStatusEnum.WITHDRAW_SUCCESS)).stream()
                 .findFirst().map(BrokerageWithdrawSummaryRespBO::getPrice).orElse(0);
         // 统计分销用户数量（一级）
         Long firstBrokerageUserCount = brokerageUserService.getBrokerageUserCountByBindUserId(userId, 1);

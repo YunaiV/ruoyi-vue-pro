@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.bpm.enums.definition;
 
-import cn.iocoder.yudao.framework.common.core.IntArrayValuable;
+import cn.iocoder.yudao.framework.common.core.ArrayValuable;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -13,7 +13,7 @@ import java.util.Arrays;
  */
 @RequiredArgsConstructor
 @Getter
-public enum BpmUserTaskAssignEmptyHandlerTypeEnum implements IntArrayValuable {
+public enum BpmUserTaskAssignEmptyHandlerTypeEnum implements ArrayValuable<Integer> {
 
     APPROVE(1), // 自动通过
     REJECT(2), // 自动拒绝
@@ -21,12 +21,12 @@ public enum BpmUserTaskAssignEmptyHandlerTypeEnum implements IntArrayValuable {
     ASSIGN_ADMIN(4), // 转交给流程管理员
     ;
 
-    public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(BpmUserTaskAssignEmptyHandlerTypeEnum::getType).toArray();
+    public static final Integer[] ARRAYS = Arrays.stream(values()).map(BpmUserTaskAssignEmptyHandlerTypeEnum::getType).toArray(Integer[]::new);
 
     private final Integer type;
 
     @Override
-    public int[] array() {
+    public Integer[] array() {
         return ARRAYS;
     }
 

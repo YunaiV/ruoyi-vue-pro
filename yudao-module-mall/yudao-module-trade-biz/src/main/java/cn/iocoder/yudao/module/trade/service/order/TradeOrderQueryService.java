@@ -6,6 +6,7 @@ import cn.iocoder.yudao.module.trade.controller.admin.order.vo.TradeOrderSummary
 import cn.iocoder.yudao.module.trade.controller.app.order.vo.AppTradeOrderPageReqVO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderDO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderItemDO;
+import cn.iocoder.yudao.module.trade.enums.order.TradeOrderTypeEnum;
 import cn.iocoder.yudao.module.trade.framework.delivery.core.client.dto.ExpressTrackRespDTO;
 
 import java.util.Collection;
@@ -110,13 +111,14 @@ public interface TradeOrderQueryService {
     List<ExpressTrackRespDTO> getExpressTrackList(Long id);
 
     /**
-     * 【会员】在指定秒杀活动下，用户购买的商品数量
+     * 【会员】在指定活动下，用户购买的商品数量
      *
      * @param userId     用户编号
      * @param activityId 活动编号
-     * @return 秒杀商品数量
+     * @param type       订单类型
+     * @return 活动商品数量
      */
-    int getSeckillProductCount(Long userId, Long activityId);
+    int getActivityProductCount(Long userId, Long activityId, TradeOrderTypeEnum type);
 
     // =================== Order Item ===================
 
