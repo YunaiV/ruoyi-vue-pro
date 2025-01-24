@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.bpm.enums.definition;
 
 import cn.hutool.core.util.ArrayUtil;
-import cn.iocoder.yudao.framework.common.core.IntArrayValuable;
+import cn.iocoder.yudao.framework.common.core.ArrayValuable;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -14,7 +14,7 @@ import java.util.Arrays;
  */
 @Getter
 @AllArgsConstructor
-public enum BpmUserTaskApproveMethodEnum implements IntArrayValuable {
+public enum BpmUserTaskApproveMethodEnum implements ArrayValuable<Integer> {
 
     RANDOM(1, "随机挑选一人审批"),
     RATIO(2, "多人会签(按通过比例)"), // 会签（按通过比例）
@@ -31,14 +31,14 @@ public enum BpmUserTaskApproveMethodEnum implements IntArrayValuable {
      */
     private final String name;
 
-    public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(BpmUserTaskApproveMethodEnum::getMethod).toArray();
+    public static final Integer[] ARRAYS = Arrays.stream(values()).map(BpmUserTaskApproveMethodEnum::getMethod).toArray(Integer[]::new);
 
     public static BpmUserTaskApproveMethodEnum valueOf(Integer method) {
         return ArrayUtil.firstMatch(item -> item.getMethod().equals(method), values());
     }
 
     @Override
-    public int[] array() {
+    public Integer[] array() {
         return ARRAYS;
     }
 }

@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.erp.enums;
 
-import cn.iocoder.yudao.framework.common.core.IntArrayValuable;
+import cn.iocoder.yudao.framework.common.core.ArrayValuable;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -15,12 +15,12 @@ import java.util.Arrays;
  */
 @RequiredArgsConstructor
 @Getter
-public enum ErpAuditStatus implements IntArrayValuable {
+public enum ErpAuditStatus implements ArrayValuable<Integer> {
 
     PROCESS(10, "未审核"), // 审核中
     APPROVE(20, "已审核"); // 审核通过
 
-    public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(ErpAuditStatus::getStatus).toArray();
+    public static final Integer[] ARRAYS = Arrays.stream(values()).map(ErpAuditStatus::getStatus).toArray(Integer[]::new);
 
     /**
      * 状态
@@ -32,7 +32,7 @@ public enum ErpAuditStatus implements IntArrayValuable {
     private final String name;
 
     @Override
-    public int[] array() {
+    public Integer[] array() {
         return ARRAYS;
     }
 

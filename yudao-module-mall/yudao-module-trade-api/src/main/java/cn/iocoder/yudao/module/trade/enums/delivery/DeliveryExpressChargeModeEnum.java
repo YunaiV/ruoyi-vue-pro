@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.trade.enums.delivery;
 
 import cn.hutool.core.util.ArrayUtil;
-import cn.iocoder.yudao.framework.common.core.IntArrayValuable;
+import cn.iocoder.yudao.framework.common.core.ArrayValuable;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -14,13 +14,13 @@ import java.util.Arrays;
  */
 @AllArgsConstructor
 @Getter
-public enum DeliveryExpressChargeModeEnum implements IntArrayValuable {
+public enum DeliveryExpressChargeModeEnum implements ArrayValuable<Integer> {
 
     COUNT(1, "按件"),
     WEIGHT(2,"按重量"),
     VOLUME(3, "按体积");
 
-    public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(DeliveryExpressChargeModeEnum::getType).toArray();
+    public static final Integer[] ARRAYS = Arrays.stream(values()).map(DeliveryExpressChargeModeEnum::getType).toArray(Integer[]::new);
 
     /**
      * 类型
@@ -32,7 +32,7 @@ public enum DeliveryExpressChargeModeEnum implements IntArrayValuable {
     private final String desc;
 
     @Override
-    public int[] array() {
+    public Integer[] array() {
         return ARRAYS;
     }
 

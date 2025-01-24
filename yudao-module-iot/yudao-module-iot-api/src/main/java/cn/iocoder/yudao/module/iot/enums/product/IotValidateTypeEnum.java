@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.iot.enums.product;
 
-import cn.iocoder.yudao.framework.common.core.IntArrayValuable;
+import cn.iocoder.yudao.framework.common.core.ArrayValuable;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -13,12 +13,12 @@ import java.util.Arrays;
  */
 @AllArgsConstructor
 @Getter
-public enum IotValidateTypeEnum implements IntArrayValuable {
+public enum IotValidateTypeEnum implements ArrayValuable<Integer> {
 
     WEAK(0, "弱校验"),
     NONE(1, "免校验");
 
-    public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(IotValidateTypeEnum::getType).toArray();
+    public static final Integer[] ARRAYS = Arrays.stream(values()).map(IotValidateTypeEnum::getType).toArray(Integer[]::new);
 
     /**
      * 类型
@@ -30,7 +30,7 @@ public enum IotValidateTypeEnum implements IntArrayValuable {
     private final String description;
 
     @Override
-    public int[] array() {
+    public Integer[] array() {
         return ARRAYS;
     }
 

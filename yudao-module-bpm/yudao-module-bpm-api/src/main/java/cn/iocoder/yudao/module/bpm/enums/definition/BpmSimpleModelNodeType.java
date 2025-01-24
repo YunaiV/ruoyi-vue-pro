@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.bpm.enums.definition;
 
 import cn.hutool.core.util.ArrayUtil;
-import cn.iocoder.yudao.framework.common.core.IntArrayValuable;
+import cn.iocoder.yudao.framework.common.core.ArrayValuable;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -15,7 +15,7 @@ import java.util.Objects;
  */
 @Getter
 @AllArgsConstructor
-public enum BpmSimpleModelNodeType implements IntArrayValuable {
+public enum BpmSimpleModelNodeType implements ArrayValuable<Integer> {
 
     // 0 ~ 1 开始和结束
     START_NODE(0, "startEvent", "开始节点"),
@@ -35,7 +35,7 @@ public enum BpmSimpleModelNodeType implements IntArrayValuable {
     // TODO @芋艿。 感觉还是分开好理解一点,也好处理一点。前端结构中把聚合节点显示并传过来。
     ;
 
-    public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(BpmSimpleModelNodeType::getType).toArray();
+    public static final Integer[] ARRAYS = Arrays.stream(values()).map(BpmSimpleModelNodeType::getType).toArray(Integer[]::new);
 
     public static final String BPMN_USER_TASK_TYPE = "userTask";
 
@@ -69,7 +69,7 @@ public enum BpmSimpleModelNodeType implements IntArrayValuable {
     }
 
     @Override
-    public int[] array() {
+    public Integer[] array() {
         return ARRAYS;
     }
 

@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.bpm.framework.flowable.core.enums;
 
 import cn.hutool.core.util.ArrayUtil;
-import cn.iocoder.yudao.framework.common.core.IntArrayValuable;
+import cn.iocoder.yudao.framework.common.core.ArrayValuable;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -16,7 +16,7 @@ import java.util.Arrays;
  */
 @Getter
 @AllArgsConstructor
-public enum BpmTaskCandidateStrategyEnum implements IntArrayValuable {
+public enum BpmTaskCandidateStrategyEnum implements ArrayValuable<Integer> {
 
     ROLE(10, "角色"),
     DEPT_MEMBER(20, "部门的成员"), // 包括负责人
@@ -33,7 +33,7 @@ public enum BpmTaskCandidateStrategyEnum implements IntArrayValuable {
     ASSIGN_EMPTY(1, "审批人为空"),
     ;
 
-    public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(BpmTaskCandidateStrategyEnum::getStrategy).toArray();
+    public static final Integer[] ARRAYS = Arrays.stream(values()).map(BpmTaskCandidateStrategyEnum::getStrategy).toArray(Integer[]::new);
 
     /**
      * 类型
@@ -49,7 +49,7 @@ public enum BpmTaskCandidateStrategyEnum implements IntArrayValuable {
     }
 
     @Override
-    public int[] array() {
+    public Integer[] array() {
         return ARRAYS;
     }
 
