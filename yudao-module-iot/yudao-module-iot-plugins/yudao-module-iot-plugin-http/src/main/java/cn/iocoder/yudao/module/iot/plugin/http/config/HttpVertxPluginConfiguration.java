@@ -1,16 +1,67 @@
 package cn.iocoder.yudao.module.iot.plugin.http.config;
 
-import org.pf4j.DefaultPluginManager;
-import org.pf4j.PluginWrapper;
+import cn.iocoder.yudao.module.iot.api.device.DeviceDataApi;
+import cn.iocoder.yudao.module.iot.plugin.http.service.HttpVertxHandler;
+import io.vertx.core.Vertx;
+import io.vertx.ext.web.Router;
+import io.vertx.ext.web.handler.BodyHandler;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+/**
+ * 插件与独立运行都可复用的配置类
+ */
+@Slf4j
 @Configuration
 public class HttpVertxPluginConfiguration {
 
-    @Bean(initMethod = "start")
-    public HttpVertxPlugin httpVertxPlugin() {
-        PluginWrapper pluginWrapper = new PluginWrapper(new DefaultPluginManager(), null, null, null);
-        return new HttpVertxPlugin(pluginWrapper);
+    /**
+     * 可在 application.yml 中配置，默认端口 8092
+     */
+    @Value("${plugin.http.server.port:8092}")
+    private Integer port;
+
+    /**
+     * 创建 Vert.x 实例
+     */
+    @Bean
+    public Vertx vertx() {
+        return Vertx.vertx();
     }
-} 
+
+    /**
+     * 创建路由
+     */
+    @Bean
+    public Router router(Vertx vertx, HttpVertxHandler httpVertxHandler) {
+        Router router = Router.router(vertx);
+
+        // 处理 Body
+        router.route().handler(BodyHandler.create());
+
+        // 设置路由
+        router.post("/sys/:productKey/:deviceName/thing/event/property/post")
+              .handler(httpVertxHandler);
+
+        return router;
+    }
+
+    /**
+     * 注入你的 Http 处理器 Handler，依赖 DeviceDataApi
+     */
+    @Bean
+    public HttpVertxHandler httpVertxHandler(DeviceDataApi deviceDataApi) {
+        return new HttpVertxHandler(deviceDataApi);
+    }
+
+    /**
+     * 定义一个 VertxService 来管理服务器启动逻辑
+     * 无论是独立运行还是插件方式，都可以共用此类
+     */
+    @Bean
+    public VertxService vertxService(Vertx vertx, Router router) {
+        return new VertxService(port, vertx, router);
+    }
+}
