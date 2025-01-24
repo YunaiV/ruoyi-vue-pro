@@ -20,6 +20,9 @@ public class BpmProcessInstanceRespVO {
     @Schema(description = "流程名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "芋道")
     private String name;
 
+    @Schema(description = "流程摘要")
+    private List<KeyValue<String, String>> summary; // 只有流程表单，才有摘要！
+
     @Schema(description = "流程分类", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     private String category;
     @Schema(description = "流程分类名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "请假")
@@ -59,8 +62,6 @@ public class BpmProcessInstanceRespVO {
      * 当前审批中的任务
      */
     private List<Task> tasks; // 仅在流程实例分页才返回
-
-    private List<KeyValue<String, String>> summary;
 
     @Schema(description = "流程任务")
     @Data
