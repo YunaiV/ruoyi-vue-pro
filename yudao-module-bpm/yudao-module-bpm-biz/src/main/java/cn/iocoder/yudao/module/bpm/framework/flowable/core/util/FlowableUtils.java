@@ -2,8 +2,13 @@ package cn.iocoder.yudao.module.bpm.framework.flowable.core.util;
 
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.extra.spring.SpringUtil;
+import cn.iocoder.yudao.framework.common.core.KeyValue;
+import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder;
 import cn.iocoder.yudao.framework.tenant.core.util.TenantUtils;
+import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.BpmFormFieldVO;
+import cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmProcessDefinitionInfoDO;
+import cn.iocoder.yudao.module.bpm.enums.definition.BpmModelFormTypeEnum;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnVariableConstants;
 import lombok.SneakyThrows;
 import org.flowable.common.engine.api.delegate.Expression;
@@ -19,10 +24,7 @@ import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.task.api.TaskInfo;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.concurrent.Callable;
 
 /**
@@ -275,6 +277,45 @@ public class FlowableUtils {
     public static Object getExpressionValue(Map<String, Object> variable, String expressionString) {
         VariableContainer variableContainer = new MapDelegateVariableContainer(variable, VariableContainer.empty());
         return getExpressionValue(variableContainer, expressionString);
+    }
+
+    public static List<KeyValue<String, String>> getSummary(BpmProcessDefinitionInfoDO processDefinitionInfo,
+                                                            Map<String, Object> processVariables) {
+        if (ObjectUtil.isNotNull(processDefinitionInfo)
+                && BpmModelFormTypeEnum.NORMAL.getType().equals(processDefinitionInfo.getFormType())) {
+            List<KeyValue<String, String>> summaryList = new ArrayList<>();
+            Map<String, BpmFormFieldVO> formFieldsMap = new HashMap<>();
+            processDefinitionInfo.getFormFields().forEach(formFieldStr -> {
+                BpmFormFieldVO formField = JsonUtils.parseObject(formFieldStr, BpmFormFieldVO.class);
+                if (formField != null) {
+                    formFieldsMap.put(formField.getField(), formField);
+                }
+            });
+            if (ObjectUtil.isNotNull(processDefinitionInfo.getSummarySetting())
+                    && Boolean.TRUE.equals(processDefinitionInfo.getSummarySetting().getEnable())) {
+                for (String item : processDefinitionInfo.getSummarySetting().getSummary()) {
+                    BpmFormFieldVO formField = formFieldsMap.get(item);
+                    if (formField != null) {
+                        summaryList.add(new KeyValue<>(formField.getTitle(),
+                                processVariables.getOrDefault(item, "").toString()));
+                    }
+                }
+            } else {
+                // 默认展示前三个
+                int j = 0;
+                for (Map.Entry<String, BpmFormFieldVO> entry : formFieldsMap.entrySet()) {
+                    BpmFormFieldVO formField = entry.getValue();
+                    if (j > 2) {
+                        break;
+                    }
+                    summaryList.add(new KeyValue<>(formField.getTitle(),
+                            processVariables.getOrDefault(formField.getField(), "").toString()));
+                    j++;
+                }
+            }
+            return summaryList;
+        }
+        return null;
     }
 
 }

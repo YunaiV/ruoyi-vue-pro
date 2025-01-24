@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.bpm.controller.admin.task.vo.instance;
 
+import cn.iocoder.yudao.framework.common.core.KeyValue;
 import cn.iocoder.yudao.module.bpm.controller.admin.base.user.UserSimpleBaseVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.process.BpmProcessDefinitionRespVO;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -58,6 +59,8 @@ public class BpmProcessInstanceRespVO {
      * 当前审批中的任务
      */
     private List<Task> tasks; // 仅在流程实例分页才返回
+
+    private List<KeyValue<String, String>> summary;
 
     @Schema(description = "流程任务")
     @Data
