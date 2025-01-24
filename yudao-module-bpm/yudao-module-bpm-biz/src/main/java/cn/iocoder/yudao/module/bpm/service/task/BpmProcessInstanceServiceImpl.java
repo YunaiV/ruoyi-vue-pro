@@ -621,8 +621,7 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
         BpmModelMetaInfoVO.TitleSetting titleSetting = processDefinitionInfo.getTitleSetting();
         if (titleSetting != null && Boolean.TRUE.equals(titleSetting.getEnable())) {
             AdminUserRespDTO user = adminUserApi.getUser(userId);
-            // TODO @lesan：new HashMap 会更好哈。clone 感觉反射，不一定合适。
-            Map<String, Object> cloneVariables = ObjectUtil.clone(variables);
+            Map<String, Object> cloneVariables = new HashMap<>(variables);
             cloneVariables.put(BpmnVariableConstants.PROCESS_INSTANCE_VARIABLE_START_USER_ID, user.getNickname());
             cloneVariables.put(BpmnVariableConstants.PROCESS_START_TIME, DateUtil.now());
             cloneVariables.put(BpmnVariableConstants.PROCESS_DEFINITION_NAME, definition.getName().trim());
