@@ -2,20 +2,16 @@ package cn.iocoder.yudao.module.bpm.convert.task;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.iocoder.yudao.framework.common.core.KeyValue;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
 import cn.iocoder.yudao.framework.common.util.collection.SetUtils;
-import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.common.util.number.NumberUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.bpm.controller.admin.base.user.UserSimpleBaseVO;
-import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.form.BpmFormFieldVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.simple.BpmSimpleModelNodeVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.process.BpmProcessDefinitionRespVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.instance.BpmApprovalDetailRespVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.instance.BpmProcessInstanceBpmnModelViewRespVO;
-import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.instance.BpmProcessInstanceReportPageRespVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.instance.BpmProcessInstanceRespVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.task.BpmTaskRespVO;
 import cn.iocoder.yudao.module.bpm.convert.definition.BpmProcessDefinitionConvert;
@@ -39,7 +35,10 @@ import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.factory.Mappers;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
@@ -85,41 +84,41 @@ public interface BpmProcessInstanceConvert {
         return vpPageResult;
     }
 
-    default BpmProcessInstanceReportPageRespVO buildProcessInstanceReportPage(PageResult<HistoricProcessInstance> pageResult,
-                                                                              Map<Long, AdminUserRespDTO> userMap,
-                                                                              BpmProcessDefinitionInfoDO processDefinitionInfo) {
-        PageResult<BpmProcessInstanceReportPageRespVO.BpmProcessInstanceReportRespVO> vpPageResult = BeanUtils.toBean(pageResult,
-                BpmProcessInstanceReportPageRespVO.BpmProcessInstanceReportRespVO.class);
-        // 表单列表
-        List<BpmFormFieldVO> formFieldsList = new ArrayList<>();
-        processDefinitionInfo.getFormFields().forEach(formFieldStr -> {
-            BpmFormFieldVO formField = JsonUtils.parseObject(formFieldStr, BpmFormFieldVO.class);
-            if (formField != null) {
-                formFieldsList.add(formField);
-            }
-        });
-        for (int i = 0; i < pageResult.getList().size(); i++) {
-            HistoricProcessInstance historicProcessInstance = pageResult.getList().get(i);
-            BpmProcessInstanceReportPageRespVO.BpmProcessInstanceReportRespVO respVO = vpPageResult.getList().get(i);
-            respVO.setStatus(FlowableUtils.getProcessInstanceStatus(historicProcessInstance));
-            // user
-            if (userMap != null) {
-                AdminUserRespDTO startUser = userMap.get(NumberUtils.parseLong(historicProcessInstance.getStartUserId()));
-                if (startUser != null) {
-                    respVO.setStartUser(BeanUtils.toBean(startUser, UserSimpleBaseVO.class));
-                }
-            }
-            // 表单数据
-            List<KeyValue<String, Object>> variables = new ArrayList<>();
-            formFieldsList.forEach(formField -> {
-                variables.add(new KeyValue<String, Object>()
-                        .setKey(formField.getField())
-                        .setValue(historicProcessInstance.getProcessVariables().getOrDefault(formField.getField(), "")));
-            });
-            respVO.setVariables(variables);
-        }
-        return new BpmProcessInstanceReportPageRespVO().setPageResult(vpPageResult).setFormFields(formFieldsList);
-    }
+//    default BpmProcessInstanceReportPageRespVO buildProcessInstanceReportPage(PageResult<HistoricProcessInstance> pageResult,
+//                                                                              Map<Long, AdminUserRespDTO> userMap,
+//                                                                              BpmProcessDefinitionInfoDO processDefinitionInfo) {
+//        PageResult<BpmProcessInstanceReportPageRespVO.BpmProcessInstanceReportRespVO> vpPageResult = BeanUtils.toBean(pageResult,
+//                BpmProcessInstanceReportPageRespVO.BpmProcessInstanceReportRespVO.class);
+//        // 表单列表
+//        List<BpmFormFieldVO> formFieldsList = new ArrayList<>();
+//        processDefinitionInfo.getFormFields().forEach(formFieldStr -> {
+//            BpmFormFieldVO formField = JsonUtils.parseObject(formFieldStr, BpmFormFieldVO.class);
+//            if (formField != null) {
+//                formFieldsList.add(formField);
+//            }
+//        });
+//        for (int i = 0; i < pageResult.getList().size(); i++) {
+//            HistoricProcessInstance historicProcessInstance = pageResult.getList().get(i);
+//            BpmProcessInstanceReportPageRespVO.BpmProcessInstanceReportRespVO respVO = vpPageResult.getList().get(i);
+//            respVO.setStatus(FlowableUtils.getProcessInstanceStatus(historicProcessInstance));
+//            // user
+//            if (userMap != null) {
+//                AdminUserRespDTO startUser = userMap.get(NumberUtils.parseLong(historicProcessInstance.getStartUserId()));
+//                if (startUser != null) {
+//                    respVO.setStartUser(BeanUtils.toBean(startUser, UserSimpleBaseVO.class));
+//                }
+//            }
+//            // 表单数据
+//            List<KeyValue<String, Object>> variables = new ArrayList<>();
+//            formFieldsList.forEach(formField -> {
+//                variables.add(new KeyValue<String, Object>()
+//                        .setKey(formField.getField())
+//                        .setValue(historicProcessInstance.getProcessVariables().getOrDefault(formField.getField(), "")));
+//            });
+//            respVO.setVariables(variables);
+//        }
+//        return new BpmProcessInstanceReportPageRespVO().setPageResult(vpPageResult).setFormFields(formFieldsList);
+//    }
 
     default BpmProcessInstanceRespVO buildProcessInstance(HistoricProcessInstance processInstance,
                                                           ProcessDefinition processDefinition,
