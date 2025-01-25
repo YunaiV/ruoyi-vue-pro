@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.bpm.dal.dataobject.definition;
 
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import cn.iocoder.yudao.module.bpm.enums.definition.BpmProcessListenerTypeEnum;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -42,7 +43,7 @@ public class BpmProcessListenerDO extends BaseDO {
     /**
      * 监听类型
      *
-     * 枚举 {@link cn.iocoder.yudao.module.bpm.enums.definition.BpmProcessListenerType}
+     * 枚举 {@link BpmProcessListenerTypeEnum}
      *
      * 1. execution：ExecutionListener <a href="https://tkjohn.github.io/flowable-userguide/#executionListeners">执行监听器</a>
      * 2. task：TaskListener <a href="https://tkjohn.github.io/flowable-userguide/#taskListeners">任务监听器</a>

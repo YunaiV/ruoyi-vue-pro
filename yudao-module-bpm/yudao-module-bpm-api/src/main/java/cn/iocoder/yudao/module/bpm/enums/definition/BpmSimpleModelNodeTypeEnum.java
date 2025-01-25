@@ -15,7 +15,7 @@ import java.util.Objects;
  */
 @Getter
 @AllArgsConstructor
-public enum BpmSimpleModelNodeType implements ArrayValuable<Integer> {
+public enum BpmSimpleModelNodeTypeEnum implements ArrayValuable<Integer> {
 
     // 0 ~ 1 开始和结束
     START_NODE(0, "开始", "startEvent"),
@@ -26,14 +26,18 @@ public enum BpmSimpleModelNodeType implements ArrayValuable<Integer> {
     APPROVE_NODE(11, "审批人", "userTask"),
     COPY_NODE(12, "抄送人", "serviceTask"),
 
+    DELAY_TIMER_NODE(14, "延迟器", "receiveTask"),
+    TRIGGER_NODE(15, "触发器", "serviceTask"),
+
     // 50 ~ 条件分支
     CONDITION_NODE(50, "条件", "sequenceFlow"), // 用于构建流转条件的表达式
     CONDITION_BRANCH_NODE(51, "条件分支", "exclusiveGateway"),
     PARALLEL_BRANCH_NODE(52, "并行分支", "parallelGateway"),
     INCLUSIVE_BRANCH_NODE(53, "包容分支", "inclusiveGateway"),
+    ROUTER_BRANCH_NODE(54, "路由分支", "exclusiveGateway")
     ;
 
-    public static final Integer[] ARRAYS = Arrays.stream(values()).map(BpmSimpleModelNodeType::getType).toArray(Integer[]::new);
+    public static final Integer[] ARRAYS = Arrays.stream(values()).map(BpmSimpleModelNodeTypeEnum::getType).toArray(Integer[]::new);
 
     private final Integer type;
     private final String name;
@@ -47,10 +51,11 @@ public enum BpmSimpleModelNodeType implements ArrayValuable<Integer> {
     public static boolean isBranchNode(Integer type) {
         return Objects.equals(CONDITION_BRANCH_NODE.getType(), type)
                 || Objects.equals(PARALLEL_BRANCH_NODE.getType(), type)
-                || Objects.equals(INCLUSIVE_BRANCH_NODE.getType(), type);
+                || Objects.equals(INCLUSIVE_BRANCH_NODE.getType(), type)
+                || Objects.equals(ROUTER_BRANCH_NODE.getType(), type);
     }
 
-    public static BpmSimpleModelNodeType valueOf(Integer type) {
+    public static BpmSimpleModelNodeTypeEnum valueOf(Integer type) {
         return ArrayUtil.firstMatch(nodeType -> nodeType.getType().equals(type), values());
     }
 

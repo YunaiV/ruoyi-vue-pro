@@ -4,17 +4,16 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 /**
- * BPM 流程监听器的值类型
+ * BPM 流程监听器的类型
  *
  * @author 芋道源码
  */
 @Getter
 @AllArgsConstructor
-public enum BpmProcessListenerValueType {
+public enum BpmProcessListenerTypeEnum {
 
-    CLASS("class", "Java 类"),
-    DELEGATE_EXPRESSION("delegateExpression", "代理表达式"),
-    EXPRESSION("expression", "表达式");
+    EXECUTION("execution", "执行监听器"),
+    TASK("task", "任务执行器");
 
     private final String type;
     private final String name;

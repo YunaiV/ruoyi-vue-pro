@@ -1,19 +1,19 @@
 package cn.iocoder.yudao.module.bpm.framework.flowable.core.util;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.convert.Convert;
+import cn.hutool.core.lang.Assert;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
+import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.common.util.number.NumberUtils;
 import cn.iocoder.yudao.framework.common.util.string.StrUtils;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.simple.BpmSimpleModelNodeVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.task.BpmTaskRespVO;
-import cn.iocoder.yudao.module.bpm.enums.definition.BpmUserTaskApproveTypeEnum;
-import cn.iocoder.yudao.module.bpm.enums.definition.BpmUserTaskAssignEmptyHandlerTypeEnum;
-import cn.iocoder.yudao.module.bpm.enums.definition.BpmUserTaskAssignStartUserHandlerTypeEnum;
-import cn.iocoder.yudao.module.bpm.enums.definition.BpmUserTaskRejectHandlerType;
+import cn.iocoder.yudao.module.bpm.enums.definition.*;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnModelConstants;
 import com.google.common.collect.Maps;
 import lombok.extern.slf4j.Slf4j;
@@ -22,6 +22,7 @@ import org.flowable.bpmn.model.Process;
 import org.flowable.bpmn.model.*;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.impl.util.io.BytesStreamSource;
+import org.flowable.engine.impl.el.FixedValue;
 
 import java.util.*;
 
@@ -170,9 +171,9 @@ public class BpmnModelUtils {
      * @param userTask 任务节点
      * @return 任务拒绝处理类型
      */
-    public static BpmUserTaskRejectHandlerType parseRejectHandlerType(FlowElement userTask) {
+    public static BpmUserTaskRejectHandlerTypeEnum parseRejectHandlerType(FlowElement userTask) {
         Integer rejectHandlerType = NumberUtils.parseInt(parseExtensionElement(userTask, USER_TASK_REJECT_HANDLER_TYPE));
-        return BpmUserTaskRejectHandlerType.typeOf(rejectHandlerType);
+        return BpmUserTaskRejectHandlerTypeEnum.typeOf(rejectHandlerType);
     }
 
     /**
@@ -344,6 +345,62 @@ public class BpmnModelUtils {
         }
         ExtensionElement extensionElement = CollUtil.getFirst(boundaryEvent.getExtensionElements().get(customElement));
         return Optional.ofNullable(extensionElement).map(ExtensionElement::getElementText).orElse(null);
+    }
+
+    public static void addSignEnable(Boolean signEnable, FlowElement userTask) {
+        addExtensionElement(userTask, SIGN_ENABLE,
+                ObjUtil.isNotNull(signEnable) ? signEnable.toString() : Boolean.FALSE.toString());
+    }
+
+    public static Boolean parseSignEnable(BpmnModel bpmnModel, String flowElementId) {
+        FlowElement flowElement = getFlowElementById(bpmnModel, flowElementId);
+        if (flowElement == null) {
+            return false;
+        }
+        List<ExtensionElement> extensionElements = flowElement.getExtensionElements().get(SIGN_ENABLE);
+        if (CollUtil.isEmpty(extensionElements)) {
+            return false;
+        }
+        return Convert.toBool(extensionElements.get(0).getElementText(), false);
+    }
+
+    public static void addReasonRequire(Boolean reasonRequire, FlowElement userTask) {
+        addExtensionElement(userTask, REASON_REQUIRE,
+                ObjUtil.isNotNull(reasonRequire) ? reasonRequire.toString() : Boolean.FALSE.toString());
+    }
+
+    public static Boolean parseReasonRequire(BpmnModel bpmnModel, String flowElementId) {
+        FlowElement flowElement = getFlowElementById(bpmnModel, flowElementId);
+        if (flowElement == null) {
+            return false;
+        }
+        List<ExtensionElement> extensionElements = flowElement.getExtensionElements().get(REASON_REQUIRE);
+        if (CollUtil.isEmpty(extensionElements)) {
+            return false;
+        }
+        return Convert.toBool(extensionElements.get(0).getElementText(), false);
+    }
+
+    public static void addListenerConfig(FlowableListener flowableListener, BpmSimpleModelNodeVO.ListenerHandler handler) {
+        FieldExtension fieldExtension = new FieldExtension();
+        fieldExtension.setFieldName("listenerConfig");
+        fieldExtension.setStringValue(JsonUtils.toJsonString(handler));
+        flowableListener.getFieldExtensions().add(fieldExtension);
+    }
+
+    public static BpmSimpleModelNodeVO.ListenerHandler parseListenerConfig(FixedValue fixedValue) {
+        String expressionText = fixedValue.getExpressionText();
+        Assert.notNull(expressionText, "监听器扩展字段({})不能为空", expressionText);
+        return JsonUtils.parseObject(expressionText, BpmSimpleModelNodeVO.ListenerHandler.class);
+    }
+
+    public static BpmTriggerTypeEnum parserTriggerType(FlowElement flowElement) {
+        Integer triggerType = NumberUtils.parseInt(parseExtensionElement(flowElement, TRIGGER_TYPE));
+        return BpmTriggerTypeEnum.typeOf(triggerType);
+    }
+
+    public static String parserTriggerParam(FlowElement flowElement) {
+        return parseExtensionElement(flowElement, TRIGGER_PARAM);
     }
 
     // ========== BPM 简单查找相关的方法 ==========
@@ -777,7 +834,7 @@ public class BpmnModelUtils {
             Object result = FlowableUtils.getExpressionValue(variables, express);
             return Boolean.TRUE.equals(result);
         } catch (FlowableException ex) {
-            log.error("[evalConditionExpress][条件表达式({}) 变量({}) 解析报错", express, variables, ex);
+            log.error("[evalConditionExpress][条件表达式({}) 变量({}) 解析报错]", express, variables, ex);
             return Boolean.FALSE;
         }
     }

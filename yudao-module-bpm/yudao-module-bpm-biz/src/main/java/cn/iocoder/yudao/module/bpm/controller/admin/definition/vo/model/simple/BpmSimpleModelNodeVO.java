@@ -6,6 +6,7 @@ import cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmTaskCandidat
 import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
+import org.hibernate.validator.constraints.URL;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
@@ -24,7 +25,7 @@ public class BpmSimpleModelNodeVO {
 
     @Schema(description = "模型节点类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     @NotNull(message = "模型节点类型不能为空")
-    @InEnum(BpmSimpleModelNodeType.class)
+    @InEnum(BpmSimpleModelNodeTypeEnum.class)
     private Integer type;
 
     @Schema(description = "模型节点名称", example = "领导审批")
@@ -35,23 +36,6 @@ public class BpmSimpleModelNodeVO {
 
     @Schema(description = "子节点")
     private BpmSimpleModelNodeVO childNode; // 补充说明：在该模型下，子节点有且仅有一个，不会有多个
-
-    @Schema(description = "条件节点")
-    private List<BpmSimpleModelNodeVO> conditionNodes; // 补充说明：有且仅有条件、并行、包容等分支会使用
-
-    @Schema(description = "条件类型", example = "1")
-    @InEnum(BpmSimpleModeConditionType.class)
-    private Integer conditionType; // 仅用于条件节点 BpmSimpleModelNodeType.CONDITION_NODE
-
-    @Schema(description = "条件表达式", example = "${day>3}")
-    private String conditionExpression; // 仅用于条件节点 BpmSimpleModelNodeType.CONDITION_NODE
-
-    @Schema(description = "是否默认条件", example = "true")
-    private Boolean defaultFlow; // 仅用于条件节点 BpmSimpleModelNodeType.CONDITION_NODE
-    /**
-     * 条件组
-     */
-    private ConditionGroups conditionGroups; // 仅用于条件节点 BpmSimpleModelNodeType.CONDITION_NODE
 
     @Schema(description = "候选人策略", example = "30")
     @InEnum(BpmTaskCandidateStrategyEnum.class)
@@ -77,6 +61,12 @@ public class BpmSimpleModelNodeVO {
     @Schema(description = "操作按钮设置", example = "[]")
     private List<OperationButtonSetting> buttonsSetting;  // 用于审批节点
 
+    @Schema(description = "是否需要签名", example = "false")
+    private Boolean signEnable;
+
+    @Schema(description = "是否填写审批意见", example = "false")
+    private Boolean reasonRequire;
+
     /**
      * 审批节点拒绝处理
      */
@@ -96,12 +86,85 @@ public class BpmSimpleModelNodeVO {
      */
     private AssignEmptyHandler assignEmptyHandler;
 
+    /**
+     * 创建任务监听器
+     */
+    private ListenerHandler taskCreateListener;
+    /**
+     * 指派任务监听器
+     */
+    private ListenerHandler taskAssignListener;
+    /**
+     * 完成任务监听器
+     */
+    private ListenerHandler taskCompleteListener;
+
+    @Schema(description = "延迟器设置", example = "{}")
+    private DelaySetting delaySetting;
+
+    @Schema(description = "条件节点")
+    private List<BpmSimpleModelNodeVO> conditionNodes; // 补充说明：有且仅有条件、并行、包容分支会使用
+
+    /**
+     * 条件节点设置
+     */
+    private ConditionSetting conditionSetting; // 仅用于条件节点 BpmSimpleModelNodeType.CONDITION_NODE
+
+    @Schema(description = "路由分支组", example = "[]")
+    private List<RouterSetting> routerGroups;
+
+    @Schema(description = "路由分支默认分支 ID", example = "Flow_xxx", hidden = true) // 由后端生成，所以 hidden = true
+    private String routerDefaultFlowId; // 仅用于路由分支节点 BpmSimpleModelNodeType.ROUTER_BRANCH_NODE
+
+    /**
+     * 触发器节点设置
+     */
+    private TriggerSetting triggerSetting;
+
+    @Schema(description = "任务监听器")
+    @Valid
+    @Data
+    public static class ListenerHandler {
+
+        @Schema(description = "是否开启任务监听器", example = "false")
+        @NotNull(message = "是否开启任务监听器不能为空")
+        private Boolean enable;
+
+        @Schema(description = "请求路径", example = "http://xxxxx")
+        private String path;
+
+        @Schema(description = "请求头", example = "[]")
+        private List<HttpRequestParam> header;
+
+        @Schema(description = "请求体", example = "[]")
+        private List<HttpRequestParam> body;
+
+    }
+
+    @Schema(description = "HTTP 请求参数设置")
+    @Data
+    public static class HttpRequestParam {
+
+        @Schema(description = "值类型", example = "1")
+        @InEnum(BpmHttpRequestParamTypeEnum.class)
+        @NotNull(message = "值类型不能为空")
+        private Integer type;
+
+        @Schema(description = "键", example = "xxx")
+        @NotEmpty(message = "键不能为空")
+        private String key;
+
+        @Schema(description = "值", example = "xxx")
+        @NotEmpty(message = "值不能为空")
+        private String value;
+    }
+
     @Schema(description = "审批节点拒绝处理策略")
     @Data
     public static class RejectHandler {
 
         @Schema(description = "拒绝处理类型", example = "1")
-        @InEnum(BpmUserTaskRejectHandlerType.class)
+        @InEnum(BpmUserTaskRejectHandlerTypeEnum.class)
         private Integer type;
 
         @Schema(description = "任务拒绝后驳回的节点 Id", example = "Activity_1")
@@ -128,7 +191,6 @@ public class BpmSimpleModelNodeVO {
 
         @Schema(description = "最大提醒次数", example = "1")
         private Integer maxRemindCount;
-
     }
 
     @Schema(description = "空处理策略")
@@ -143,7 +205,6 @@ public class BpmSimpleModelNodeVO {
 
         @Schema(description = "指定人员审批的用户编号数组", example = "1")
         private List<Long> userIds;
-
     }
 
     @Schema(description = "操作按钮设置")
@@ -160,6 +221,28 @@ public class BpmSimpleModelNodeVO {
 
         @Schema(description = "是否启用", example = "true")
         private Boolean enable;
+    }
+
+    @Schema(description = "条件设置")
+    @Data
+    @Valid
+    // 仅用于条件节点 BpmSimpleModelNodeType.CONDITION_NODE
+    public static class ConditionSetting {
+
+        @Schema(description = "条件类型", example = "1")
+        @InEnum(BpmSimpleModeConditionTypeEnum.class)
+        private Integer conditionType;
+
+        @Schema(description = "条件表达式", example = "${day>3}")
+        private String conditionExpression;
+
+        @Schema(description = "是否默认条件", example = "true")
+        private Boolean defaultFlow;
+
+        /**
+         * 条件组
+         */
+        private ConditionGroups conditionGroups;
     }
 
     @Schema(description = "条件组")
@@ -208,5 +291,75 @@ public class BpmSimpleModelNodeVO {
         private String rightSide;
     }
 
-    // TODO @芋艿：条件；建议可以固化的一些选项；然后有个表达式兜底；要支持
+    @Schema(description = "延迟器")
+    @Data
+    @Valid
+    public static class DelaySetting {
+
+        @Schema(description = "延迟时间类型", example = "1")
+        @NotNull(message = "延迟时间类型不能为空")
+        @InEnum(BpmDelayTimerTypeEnum.class)
+        private Integer delayType;
+
+        @Schema(description = "延迟时间表达式", example = "PT1H,2025-01-01T00:00:00")
+        @NotEmpty(message = "延迟时间表达式不能为空")
+        private String delayTime;
+    }
+
+    @Schema(description = "路由分支")
+    @Data
+    @Valid
+    public static class RouterSetting {
+
+        @Schema(description = "节点 Id", example = "Activity_xxx") // 跳转到该节点
+        @NotEmpty(message = "节点 Id 不能为空")
+        private String nodeId;
+
+        @Schema(description = "条件类型", example = "1")
+        @InEnum(BpmSimpleModeConditionTypeEnum.class)
+        @NotNull(message = "条件类型不能为空")
+        private Integer conditionType;
+
+        @Schema(description = "条件表达式", example = "${day>3}")
+        private String conditionExpression;
+
+        @Schema(description = "条件组", example = "{}")
+        private ConditionGroups conditionGroups;
+    }
+
+    @Schema(description = "触发器节点配置")
+    @Data
+    @Valid
+    public static class TriggerSetting {
+
+        @Schema(description = "触发器类型", example = "1")
+        @InEnum(BpmTriggerTypeEnum.class)
+        @NotNull(message = "触发器类型不能为空")
+        private Integer type;
+
+        /**
+         * http 请求触发器设置
+         */
+        @Valid
+        private HttpRequestTriggerSetting httpRequestSetting;
+
+        @Schema(description = "http 请求触发器设置", example = "{}")
+        @Data
+        public static class HttpRequestTriggerSetting {
+
+            @Schema(description = "请求路径", example = "http://127.0.0.1")
+            @NotEmpty(message = "请求 URL 不能为空")
+            @URL(message = "请求 URL 格式不正确")
+            private String url;
+
+            @Schema(description = "请求头参数设置", example = "[]")
+            @Valid
+            private List<HttpRequestParam> header;
+
+            @Schema(description = "请求头参数设置", example = "[]")
+            @Valid
+            private List<HttpRequestParam> body;
+        }
+
+    }
 }

@@ -43,6 +43,24 @@ public class BpmnVariableConstants {
      * @see ProcessInstance#getProcessVariables()
      */
     public static final String PROCESS_INSTANCE_VARIABLE_RETURN_FLAG = "RETURN_FLAG_%s";
+    /**
+     * 流程实例的变量 - 是否跳过表达式
+     *
+     * @see ProcessInstance#getProcessVariables()
+     * @see <a href="https://blog.csdn.net/weixin_42065235/article/details/126039993">Flowable/Activiti之SkipExpression 完成自动审批</a>
+     */
+    public static final String PROCESS_INSTANCE_SKIP_EXPRESSION_ENABLED = "_FLOWABLE_SKIP_EXPRESSION_ENABLED";
+
+    /**
+     * 流程实例的变量 - 流程开始时间
+     *
+     * 【非存储变量】用于部分需要 format 的场景，例如说：流程实例的自定义标题
+     */
+    public static final String PROCESS_START_TIME = "PROCESS_START_TIME";
+    /**
+     * 流程实例的变量 - 流程定义名称
+     */
+    public static final String PROCESS_DEFINITION_NAME = "PROCESS_DEFINITION_NAME";
 
     /**
      * 任务的变量 - 状态
@@ -58,5 +76,9 @@ public class BpmnVariableConstants {
      * @see org.flowable.task.api.Task#getTaskLocalVariables()
      */
     public static final String TASK_VARIABLE_REASON = "TASK_REASON";
+    /**
+     * 任务变量 - 签名图片 URL
+     */
+    public static final String TASK_SIGN_PIC_URL = "TASK_SIGN_PIC_URL";
 
 }

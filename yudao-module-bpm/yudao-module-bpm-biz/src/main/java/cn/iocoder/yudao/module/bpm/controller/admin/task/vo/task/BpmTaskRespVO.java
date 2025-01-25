@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.bpm.controller.admin.task.vo.task;
 
+import cn.iocoder.yudao.framework.common.core.KeyValue;
 import cn.iocoder.yudao.module.bpm.controller.admin.base.user.UserSimpleBaseVO;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -77,6 +78,16 @@ public class BpmTaskRespVO {
     private Map<String, Object> formVariables;
     @Schema(description = "操作按钮设置值")
     private Map<Integer, OperationButtonSetting> buttonsSetting;
+
+    @Schema(description = "是否需要签名", example = "false")
+    private Boolean signEnable;
+
+    @Schema(description = "是否填写审批意见", example = "false")
+    private Boolean reasonRequire;
+
+    // TODO @lesan：要不放到 processInstance 里面？因为摘要是流程实例的，不是流程任务的
+    @Schema(description = "流程摘要", example = "[]")
+    private List<KeyValue<String, String>> summary; // 只有流程表单，才有摘要！
 
     @Data
     @Schema(description = "流程实例")

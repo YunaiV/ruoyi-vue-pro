@@ -101,6 +101,15 @@ public interface BpmnModelConstants {
     String BUTTON_SETTING_ELEMENT_ENABLE_ATTRIBUTE = "enable";
 
     /**
+     * BPMN ExtensionElement 的扩展属性，用于标记触发器的类型
+     */
+    String TRIGGER_TYPE = "triggerType";
+    /**
+     * BPMN ExtensionElement 的扩展属性，用于标记触发器参数
+     */
+    String TRIGGER_PARAM = "triggerParam";
+
+    /**
      * BPMN Start Event Node Id
      */
     String START_EVENT_NODE_ID = "StartEvent";
@@ -109,5 +118,15 @@ public interface BpmnModelConstants {
      * 发起人节点 ID
      */
     String START_USER_NODE_ID = "StartUserNode";
+
+    /**
+     * 是否需要签名
+     */
+    String SIGN_ENABLE = "signEnable";
+
+    /**
+     * 审批意见是否必填
+     */
+    String REASON_REQUIRE = "reasonRequire";
 
 }

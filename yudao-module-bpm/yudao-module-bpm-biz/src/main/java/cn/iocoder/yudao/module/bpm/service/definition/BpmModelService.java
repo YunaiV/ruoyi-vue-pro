@@ -89,6 +89,14 @@ public interface BpmModelService {
     void deleteModel(Long userId, String id);
 
     /**
+     * 清理模型，包括流程实例
+     *
+     * @param userId  用户编号
+     * @param id 编号
+     */
+    void cleanModel(Long userId, String id);
+
+    /**
      * 修改模型的状态，实际更新的部署的流程定义的状态
      *
      * @param userId 用户编号

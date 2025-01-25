@@ -195,8 +195,9 @@ public interface BpmTaskService {
      * 将指定流程实例的、进行中的流程任务，移动到结束节点
      *
      * @param processInstanceId 流程编号
+     * @param reason 原因
      */
-    void moveTaskToEnd(String processInstanceId);
+    void moveTaskToEnd(String processInstanceId, String reason);
 
     /**
      * 将任务退回到指定的 targetDefinitionKey 位置
@@ -274,5 +275,13 @@ public interface BpmTaskService {
      * @param handlerType       处理类型，参见 {@link BpmUserTaskTimeoutHandlerTypeEnum}
      */
     void processTaskTimeout(String processInstanceId, String taskDefineKey, Integer handlerType);
+
+    /**
+     * 处理 延迟器 超时事件
+     *
+     * @param processInstanceId 流程示例编号
+     * @param taskDefineKey     任务 Key
+     */
+    void processDelayTimerTimeout(String processInstanceId, String taskDefineKey);
 
 }

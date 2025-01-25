@@ -1,14 +1,17 @@
 package cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model;
 
+import cn.iocoder.yudao.framework.common.core.KeyValue;
 import cn.iocoder.yudao.framework.common.validation.InEnum;
+import cn.iocoder.yudao.module.bpm.enums.definition.BpmAutoApproveTypeEnum;
 import cn.iocoder.yudao.module.bpm.enums.definition.BpmModelFormTypeEnum;
 import cn.iocoder.yudao.module.bpm.enums.definition.BpmModelTypeEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import org.hibernate.validator.constraints.URL;
 
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
 import java.util.List;
 
 /**
@@ -61,5 +64,73 @@ public class BpmModelMetaInfoVO {
 
     @Schema(description = "排序", example = "1")
     private Long sort; // 创建时，后端自动生成
+
+    @Schema(description = "允许撤销审批中的申请", example = "true")
+    private Boolean allowCancelRunningProcess;
+
+    @Schema(description = "流程 ID 规则", example = "{}")
+    private ProcessIdRule processIdRule;
+
+    @Schema(description = "自动去重类型", example = "1")
+    @InEnum(BpmAutoApproveTypeEnum.class)
+    private Integer autoApprovalType;
+
+    @Schema(description = "标题设置", example = "{}")
+    private TitleSetting titleSetting;
+
+    @Schema(description = "摘要设置", example = "{}")
+    private SummarySetting summarySetting;
+
+    @Schema(description = "流程 ID 规则")
+    @Data
+    @Valid
+    public static class ProcessIdRule {
+
+        @Schema(description = "是否启用", example = "false")
+        @NotNull(message = "是否启用不能为空")
+        private Boolean enable;
+
+        @Schema(description = "前缀", example = "XX")
+        private String prefix;
+
+        @Schema(description = "中缀", example = "20250120")
+        private String infix; // 精确到日、精确到时、精确到分、精确到秒
+
+        @Schema(description = "后缀", example = "YY")
+        private String postfix;
+
+        @Schema(description = "序列长度", example = "5")
+        @NotNull(message = "序列长度不能为空")
+        private Integer length;
+
+    }
+
+    @Schema(description = "标题设置")
+    @Data
+    @Valid
+    public static class TitleSetting {
+
+        @Schema(description = "是否自定义", example = "false")
+        @NotNull(message = "是否自定义不能为空")
+        private Boolean enable;
+
+        @Schema(description = "标题", example = "流程标题")
+        private String title;
+
+    }
+
+    @Schema(description = "摘要设置")
+    @Data
+    @Valid
+    public static class SummarySetting {
+
+        @Schema(description = "是否自定义", example = "false")
+        @NotNull(message = "是否自定义不能为空")
+        private Boolean enable;
+
+        @Schema(description = "摘要字段数组", example = "[]")
+        private List<String> summary;
+
+    }
 
 }
