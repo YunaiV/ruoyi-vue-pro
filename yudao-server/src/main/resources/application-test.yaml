@@ -45,7 +45,7 @@ spring:
       primary: master
       datasource:
         master:
-          url: jdbc:mysql://192.168.10.151:3306/ruoyi-vue-dev-purchase?useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true&nullCatalogMeansCurrent=true # MySQL Connector/J 8.X 连接的示例
+          url: jdbc:mysql://192.168.10.151:3306/ruoyi-vue-pro?useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true&nullCatalogMeansCurrent=true # MySQL Connector/J 8.X 连接的示例
           username: it003
           password: asivJssflioKK
 #        slave: # 模拟从库，可根据自己需要修改 # 模拟从库，可根据自己需要修改

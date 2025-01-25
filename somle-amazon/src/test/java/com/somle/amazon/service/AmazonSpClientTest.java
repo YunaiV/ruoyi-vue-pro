@@ -45,9 +45,23 @@ class AmazonSpClientTest extends BaseSpringTest {
         amazonService.refreshAuth();
     }
 
+//    @Test
+//    void getAccount() {
+//        var shop = amazonService.shopRepository.findByCountryCode("US");
+//        var response = amazonService.spClient.getAccount(shop.getSeller());
+//        log.info(response.toString());
+//    }
+
+    @Test
+    void getMarketplaceParticipations() {
+        var shop = amazonService.shopRepository.findByCountryCode("US");
+        var response = amazonService.spClient.getMarketplaceParticipations(shop.getSeller());
+        log.info(response.toString());
+    }
+
     @Test
     void getListing() {
-        var shop = amazonService.shopRepository.findByCountryCode("UK");
+        var shop = amazonService.shopRepository.findByCountryCode("US");
         var reqVO = AmazonSpListingReqVO.builder()
             .sellerId(shop.getSeller().getId())
             .marketplaceIds(List.of(shop.getCountry().getMarketplaceId()))

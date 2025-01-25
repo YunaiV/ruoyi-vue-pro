@@ -1,6 +1,7 @@
 package com.somle.amazon.service;
 
 import com.somle.amazon.model.AmazonAccount;
+import com.somle.amazon.model.AmazonSeller;
 import com.somle.amazon.model.AmazonShop;
 import com.somle.framework.common.util.general.CoreUtils;
 import com.somle.framework.common.util.json.JSONArray;
@@ -8,6 +9,9 @@ import com.somle.framework.common.util.json.JSONObject;
 import com.somle.framework.common.util.json.JsonUtils;
 import com.somle.framework.common.util.web.RequestX;
 import com.somle.framework.common.util.web.WebUtils;
+
+import com.fasterxml.jackson.core.type.TypeReference;
+
 
 import lombok.AllArgsConstructor;
 import lombok.Setter;
@@ -52,6 +56,52 @@ public class AmazonAdClient {
         );
         return headers;
     }
+
+    public List<JSONObject> listProfiles(AmazonSeller seller) {
+//        String contentType = "application/vnd.createasyncreportrequest.v3+json";
+        Map<String, String> headers = Map.of(
+            "Amazon-Advertising-API-ClientId", seller.getAccount().getAdClientId(),
+            "Authorization", seller.getAdAccessToken()
+        );
+        JSONObject payload = JsonUtils.newObject();
+
+        String partialUrl = "/v2/profiles";
+        String endpoint = seller.getRegion().getAdEndPoint();
+        String fullUrl = endpoint + partialUrl;
+
+        var request = RequestX.builder()
+            .requestMethod(RequestX.Method.GET)
+            .url(fullUrl)
+            .headers(headers)
+            .payload(payload)
+            .build();
+        try(var response = WebUtils.sendRequest(request)){
+            var responseBody = WebUtils.parseResponse(response, new TypeReference<List<JSONObject>>() {});
+            log.info(responseBody.toString());
+            return responseBody;
+        }
+    }
+
+    public JSONObject listPortfolios(AmazonShop shop) {
+        JSONObject payload = JsonUtils.newObject();
+
+        String partialUrl = "/v2/profiles";
+        String endpoint = shop.getSeller().getRegion().getAdEndPoint();
+        String fullUrl = endpoint + partialUrl;
+
+        var request = RequestX.builder()
+            .requestMethod(RequestX.Method.POST)
+            .url(fullUrl)
+            .headers(generateHeaders(shop))
+            .payload(payload)
+            .build();
+        try(var response = WebUtils.sendRequest(request)){
+            var responseBody = WebUtils.parseResponse(response, JSONObject.class);
+            log.info(responseBody.toString());
+            return responseBody;
+        }
+    }
+
 
     public Stream<JSONArray> getAllAdReport(LocalDate dataDate) {
         var reportIdMap = getShops().collect(Collectors.toMap(

@@ -228,10 +228,10 @@ public class WebUtils {
      * @param <T>          返回对象的类型
      * @return 反序列化后的对象
      */
-    public static <T> T parseResponse(String response, TypeReference<T> valueTypeRef) {
+    public static <T> T parseResponse(Response response, TypeReference<T> valueTypeRef) {
         ObjectMapper objectMapper = new ObjectMapper();
         try {
-            return objectMapper.readValue(response, valueTypeRef);
+            return objectMapper.readValue(getBodyString(response), valueTypeRef);
         } catch (Exception e) {
             throw new RuntimeException("Error parsing response", e);
         }

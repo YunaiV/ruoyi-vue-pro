@@ -35,6 +35,40 @@ public class AmazonSpClient {
 
     private AmazonAccount account;
 
+    private Map<String, String> generateHeaders(AmazonSeller seller) {
+        var headers = Map.of("x-amz-access-token", seller.getSpAccessToken());
+        return headers;
+    }
+
+//    @Transactional(readOnly = true)
+//    public JSONObject getAccount(AmazonSeller seller) {
+//        String endPoint = seller.getRegion().getSpEndPoint();
+//        String partialUrl = "/sellers/v1/account";
+//        String fullUrl = endPoint + partialUrl;
+//        var request = RequestX.builder()
+//            .requestMethod(RequestX.Method.GET)
+//            .url(fullUrl)
+//            .headers(generateHeaders(seller))
+//            .build();
+//        return WebUtils.sendRequest(request, JSONObject.class);
+//    }
+
+    @Transactional(readOnly = true)
+    public JSONObject getMarketplaceParticipations(AmazonSeller seller) {
+        String endPoint = seller.getRegion().getSpEndPoint();
+        String partialUrl = "/sellers/v1/marketplaceParticipations";
+        String fullUrl = endPoint + partialUrl;
+
+
+
+        var request = RequestX.builder()
+            .requestMethod(RequestX.Method.GET)
+            .url(fullUrl)
+            .headers(generateHeaders(seller))
+            .build();
+        return WebUtils.sendRequest(request, JSONObject.class);
+    }
+
 
 
 
@@ -55,13 +89,13 @@ public class AmazonSpClient {
         String partialUrl = "/listings/2021-08-01/items/" + seller.getId();
         String fullUrl = endPoint + partialUrl;
 
-        var headers = Map.of("x-amz-access-token", seller.getSpAccessToken());
+
 
         var request = RequestX.builder()
             .requestMethod(RequestX.Method.GET)
             .url(fullUrl)
             .queryParams(reqVO)
-            .headers(headers)
+            .headers(generateHeaders(seller))
             .build();
         try(var response = WebUtils.sendRequest(request)){
             var bodyString = response.body().string();
@@ -89,12 +123,11 @@ public class AmazonSpClient {
         String endPoint = seller.getRegion().getSpEndPoint();
         String partialUrl = "/orders/v0/orders";
         String fullUrl = endPoint + partialUrl;
-        var headers = Map.of("x-amz-access-token", seller.getSpAccessToken());
         var request = RequestX.builder()
             .requestMethod(RequestX.Method.GET)
             .url(fullUrl)
             .queryParams(vo)
-            .headers(headers)
+            .headers(generateHeaders(seller))
             .build();
         try(var response = WebUtils.sendRequest(request)){
             var bodyString = response.body().string();
@@ -128,12 +161,11 @@ public class AmazonSpClient {
         String endPoint = seller.getRegion().getSpEndPoint();
         String partialUrl = "/reports/2021-06-30/reports";
         String fullUrl = endPoint + partialUrl;
-        var headers = Map.of("x-amz-access-token", seller.getSpAccessToken());
         var request = RequestX.builder()
             .requestMethod(RequestX.Method.GET)
             .url(fullUrl)
             .queryParams(vo)
-            .headers(headers)
+            .headers(generateHeaders(seller))
             .build();
         try(var response = WebUtils.sendRequest(request)){
             var reportsString = WebUtils.parseResponse(response, JSONObject.class).get("reports");
@@ -155,7 +187,6 @@ public class AmazonSpClient {
         DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
         String endPoint = seller.getRegion().getSpEndPoint();
-        var headers = Map.of("x-amz-access-token", seller.getSpAccessToken());
         String result = null;
 
         // Check report status and get document ID
@@ -164,12 +195,10 @@ public class AmazonSpClient {
         String docId = null;
         while (!"DONE".equals(status)) {
             log.info("requesting for document id");
-            // ResponseEntity<JSONObject> response = restTemplate.exchange(reportStatusUrl, HttpMethod.GET, new HttpEntity<>(headers), JSONObject.class);
-            // JSONObject responseBody = response.getBody();
             var request = RequestX.builder()
                 .requestMethod(RequestX.Method.GET)
+                .headers(generateHeaders(seller))
                 .url(reportStatusUrl)
-                .headers(headers)
                 .build();
             JSONObject responseBody = null;
             try(var response = WebUtils.sendRequest(request)){
@@ -210,7 +239,7 @@ public class AmazonSpClient {
             var request = RequestX.builder()
                 .requestMethod(RequestX.Method.GET)
                 .url(documentUrl)
-                .headers(headers)
+                .headers(generateHeaders(seller))
                 .build();
             try(var response = WebUtils.sendRequest(request)){
                 switch (response.code()) {
@@ -244,7 +273,6 @@ public class AmazonSpClient {
         String endPoint = seller.getRegion().getSpEndPoint();
         String partialUrl = "/reports/2021-06-30/reports";
         String fullUrl = endPoint + partialUrl;
-        var headers = Map.of("x-amz-access-token", seller.getSpAccessToken());
 
         // Create report
         String reportId = null;
@@ -253,7 +281,7 @@ public class AmazonSpClient {
             var request = RequestX.builder()
                 .requestMethod(RequestX.Method.POST)
                 .url(fullUrl)
-                .headers(headers)
+                .headers(generateHeaders(seller))
                 .payload(vo)
                 .build();
             try(var response = WebUtils.sendRequest(request)){
