@@ -25,7 +25,6 @@ public class IotDeviceLogDO {
      */
     private String id;
 
-    // TODO @super：关联要 @下
     /**
      * 产品标识
      * <p>
@@ -33,7 +32,6 @@ public class IotDeviceLogDO {
      */
     private String productKey;
 
-    // TODO @super：关联要 @下
     /**
      * 设备标识
      * <p>

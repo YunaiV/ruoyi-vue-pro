@@ -32,7 +32,6 @@ public interface IotDevicePropertyDataService {
      */
     void saveDeviceData(IotDevicePropertyReportReqDTO createDTO);
 
-
     /**
      * 保存设备数据
      *
@@ -45,7 +44,6 @@ public interface IotDevicePropertyDataService {
      *
      * @param simulatorReqVO 设备数据
      */
-
     void simulatorSend(IotDeviceDataSimulatorSaveReqVO simulatorReqVO);
 
     /**

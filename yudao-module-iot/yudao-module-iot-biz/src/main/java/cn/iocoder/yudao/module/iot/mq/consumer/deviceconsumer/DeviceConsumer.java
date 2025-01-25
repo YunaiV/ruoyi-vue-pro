@@ -1,7 +1,6 @@
 package cn.iocoder.yudao.module.iot.mq.consumer.deviceconsumer;
 
 
-import cn.iocoder.yudao.module.iot.api.device.dto.IotDevicePropertyReportReqDTO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.tdengine.ThingModelMessage;
 import cn.iocoder.yudao.module.iot.service.device.IotDeviceLogDataService;
 import cn.iocoder.yudao.module.iot.service.device.IotDevicePropertyDataService;
@@ -20,8 +19,9 @@ import javax.annotation.Resource;
 @Component
 @Slf4j
 public class DeviceConsumer {
+
     @Resource
-    private IotDeviceLogDataService iotDeviceLogDataService;
+    private IotDeviceLogDataService deviceLogDataService;
     @Resource
     private IotDevicePropertyDataService deviceDataService;
 
@@ -35,7 +35,7 @@ public class DeviceConsumer {
         // 设备数据记录
         deviceDataService.saveDeviceDataTest(message);
         // 设备日志记录
-        iotDeviceLogDataService.saveDeviceLog(message);
+        deviceLogDataService.saveDeviceLog(message);
     }
 
 }

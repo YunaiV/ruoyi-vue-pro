@@ -10,9 +10,7 @@ import org.apache.ibatis.annotations.Param;
 import java.util.List;
 
 /**
- * IOT 设备日志数据 Mapper 接口
- *
- * 基于 TDengine 实现设备日志的存储
+ * 设备日志 {@link IotDeviceLogDO} Mapper 接口
  */
 @Mapper
 @TDengineDS
@@ -21,12 +19,11 @@ public interface IotDeviceLogDataMapper {
 
     /**
      * 创建设备日志超级表
-     * 初始化只创建一次
      */
     void createDeviceLogSTable();
 
-
     // TODO @super：单个参数，不用加 @Param
+    // TODO @芋艿：在瞅瞅
     //讨论：艿菇这里有些特殊情况，我也学习了一下这块知识：
     // 如果使用的是Java 8及以上版本，并且编译器保留了参数名（通过编译器选项-parameters启用），则可以去掉@Param注解。MyBatis会自动使用参数的实际名称
     // 但在TDengine中 @Param去掉后TDengine会报错，以下是大模型的回答：
@@ -65,18 +62,12 @@ public interface IotDeviceLogDataMapper {
      */
     Long selectCount(@Param("reqVO") IotDeviceLogPageReqVO reqVO);
 
+    // TODO @芋艿：这个方法名，后续看看叫啥好
     /**
      * 查询设备日志表是否存在
      *
-     * @return 不存在返回null
+     * @return 不存在返回 null
      */
     Object checkDeviceLogSTableExists();
 
-    /**
-     * 检查设备日志子表是否存在
-     *
-     * @param deviceKey 设备标识
-     * @return 不存在返回null
-     */
-    Object checkDeviceLogTableExists(@Param("deviceKey") String deviceKey);
 }

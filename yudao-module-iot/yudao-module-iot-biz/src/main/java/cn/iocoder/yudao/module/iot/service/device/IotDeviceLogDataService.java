@@ -16,7 +16,7 @@ public interface IotDeviceLogDataService {
     /**
      * 初始化 TDengine 超级表
      *
-     *系统启动时，会自动初始化一次
+     * 系统启动时，会自动初始化一次
      */
     void defineDeviceLog();
 
@@ -40,8 +40,8 @@ public interface IotDeviceLogDataService {
     /**
      * 插入设备日志
      *
-     * @param msg 设备数据
+     * @param message 设备数据
      */
-    void saveDeviceLog(ThingModelMessage msg);
+    void saveDeviceLog(ThingModelMessage message);
 
 }

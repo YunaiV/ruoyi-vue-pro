@@ -159,7 +159,7 @@ public class IotDevicePropertyDataServiceImpl implements IotDevicePropertyDataSe
         thingModelMessageService.saveThingModelMessage(device, thingModelMessage);
     }
 
-    //TODO:后续捋一捋这块逻辑，先借鉴一下目前的代码
+    //TODO @芋艿:后续捋一捋这块逻辑，先借鉴一下目前的代码
     @Override
     public void saveDeviceDataTest(ThingModelMessage thingModelMessage) {
         // 1. 根据产品 key 和设备名称，获得设备信息
@@ -168,7 +168,7 @@ public class IotDevicePropertyDataServiceImpl implements IotDevicePropertyDataSe
         thingModelMessageService.saveThingModelMessage(device, thingModelMessage);
     }
 
-    //TODO:  copy 了 saveDeviceData 的逻辑，后续看看这块怎么优化
+    //TODO @芋艿:copy 了 saveDeviceData 的逻辑，后续看看这块怎么优化
     @Override
     public void simulatorSend(IotDeviceDataSimulatorSaveReqVO simulatorReqVO) {
         // 1. 根据设备 key ，获得设备信息

@@ -19,7 +19,6 @@ public class IotDeviceDataSimulatorSaveReqVO {
     @NotEmpty(message = "产品标识不能为空")
     private String productKey;
 
-    // TODO @super：中文写作规范，中英文之间，要有空格。例如说，设备 ID。ps：这里应该是设备标识
     @Schema(description = "设备标识", requiredMode = Schema.RequiredMode.REQUIRED, example = "device123")
     @NotEmpty(message = "设备标识不能为空")
     private String deviceKey;
@@ -38,6 +37,7 @@ public class IotDeviceDataSimulatorSaveReqVO {
     @NotEmpty(message = "数据内容不能为空")
     private String content;
 
+    // TODO @芋艿：需要讨论下，reportTime 到底以那个为准！
     @Schema(description = "上报时间", requiredMode = Schema.RequiredMode.REQUIRED)
     private Long reportTime;
 

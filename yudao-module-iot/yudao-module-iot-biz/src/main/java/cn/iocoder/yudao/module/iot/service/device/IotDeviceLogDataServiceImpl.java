@@ -13,7 +13,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -27,28 +26,18 @@ import java.util.List;
 public class IotDeviceLogDataServiceImpl implements IotDeviceLogDataService{
 
     @Resource
-    private IotDeviceLogDataMapper iotDeviceLogDataMapper;
+    private IotDeviceLogDataMapper deviceLogDataMapper;
 
-    // TODO @super：方法名。defineDeviceLog。。未来，有可能别人使用别的记录日志，例如说 es 之类的。
     @Override
     public void defineDeviceLog() {
-        // TODO @super：改成不存在才创建。
-//        try {
-//            // 创建超级表（使用 IF NOT EXISTS 语句避免重复创建错误）
-//            iotDeviceLogDataMapper.createDeviceLogSTable();
-//        } catch (Exception e) {
-//            if (e.getMessage().contains("already exists")) {
-//                log.info("[TDengine] 设备日志超级表已存在，跳过创建");
-//                return;
-//            }
-//            throw e;
-//        }
-        if(iotDeviceLogDataMapper.checkDeviceLogSTableExists()==null){
-            log.info("[TDengine] 设备日志超级表不存在，开始创建");
-            iotDeviceLogDataMapper.createDeviceLogSTable();
-        }else{
-            log.info("[TDengine] 设备日志超级表已存在，跳过创建");
+        if (deviceLogDataMapper.checkDeviceLogSTableExists() != null) {
+            log.info("[defineDeviceLog][设备日志超级表已存在，跳过创建]");
+            return;
         }
+
+        log.info("[defineDeviceLog][设备日志超级表不存在，开始创建]");
+        deviceLogDataMapper.createDeviceLogSTable();
+        log.info("[defineDeviceLog][设备日志超级表不存在，创建完成]");
     }
 
     @Override
@@ -57,47 +46,32 @@ public class IotDeviceLogDataServiceImpl implements IotDeviceLogDataService{
         IotDeviceLogDO iotDeviceLogDO = BeanUtils.toBean(simulatorReqVO, IotDeviceLogDO.class);
 
         // 2. 处理时间字段
-        // TODO @super：一次性的字段，不用单独给个变量
-//        long currentTime = System.currentTimeMillis();
-        // 2.1 设置时序时间为当前时间
 //        iotDeviceLogDO.setTs(currentTime); // TODO @super：TS在SQL中直接NOW   咱们的TS数据获取是走哪一种；走 now()
 
         // 3. 插入数据
-        // TODO @super：不要直接调用对方的 IotDeviceLogDataMapper，通过 service 哈！
-        // 讨论：艿菇  这就是iotDeviceLogDataService的Impl
-        iotDeviceLogDataMapper.insert(iotDeviceLogDO);
+        deviceLogDataMapper.insert(iotDeviceLogDO);
     }
 
-    // TODO @super：在 iotDeviceLogDataService 写
-    // 讨论：艿菇  这就是iotDeviceLogDataService的Impl
     @Override
     public PageResult<IotDeviceLogDO> getDeviceLogPage(IotDeviceLogPageReqVO pageReqVO) {
-        // 当设备日志表未创建时，查询会出现报错
-        if(iotDeviceLogDataMapper.checkDeviceLogTableExists(pageReqVO.getDeviceKey())==null){
-            return null;
-        }
-        // 查询数据
-        List<IotDeviceLogDO> list = iotDeviceLogDataMapper.selectPage(pageReqVO);
-        Long total = iotDeviceLogDataMapper.selectCount(pageReqVO);
-        // 构造分页结果
+        // TODO @芋艿：增加一个表不存在的 try catch
+        List<IotDeviceLogDO> list = deviceLogDataMapper.selectPage(pageReqVO);
+        Long total = deviceLogDataMapper.selectCount(pageReqVO);
         return new PageResult<>(list, total);
     }
 
     @Override
-    public void saveDeviceLog(ThingModelMessage msg) {
-        // 1. 构建设备日志对象
-        IotDeviceLogDO iotDeviceLogDO = IotDeviceLogDO.builder()
-                .id(msg.getId())                     // 消息ID
-                .deviceKey(msg.getDeviceKey())       // 设备标识
-                .productKey(msg.getProductKey())     // 产品标识
-                .type(msg.getMethod())               // 消息类型，使用method作为类型
-                .subType("property")                 // TODO:这块先写死，后续优化
-                .content(JSONUtil.toJsonStr(msg))   // TODO:后续优化
-                .reportTime(msg.getTime()) // 上报时间
+    public void saveDeviceLog(ThingModelMessage message) {
+        IotDeviceLogDO log = IotDeviceLogDO.builder()
+                .id(message.getId())
+                .deviceKey(message.getDeviceKey())
+                .productKey(message.getProductKey())
+                .type(message.getMethod())               // 消息类型，使用method作为类型 TODO 芋艿：在看看
+                .subType("property")                 // TODO 芋艿:这块先写死，后续优化
+                .content(JSONUtil.toJsonStr(message))   // TODO 芋艿:后续优化
+                .reportTime(message.getTime()) // 上报时间 TODO 芋艿：在想想时间
                 .build();
-
-        // 2. 插入设备日志
-        iotDeviceLogDataMapper.insert(iotDeviceLogDO);
+        deviceLogDataMapper.insert(log);
     }
 
 }

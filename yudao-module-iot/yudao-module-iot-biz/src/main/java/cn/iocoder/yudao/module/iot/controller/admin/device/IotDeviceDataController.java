@@ -3,7 +3,6 @@ package cn.iocoder.yudao.module.iot.controller.admin.device;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
-import cn.iocoder.yudao.module.iot.api.device.dto.IotDevicePropertyReportReqDTO;
 import cn.iocoder.yudao.module.iot.controller.admin.device.vo.deviceData.*;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDataDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceLogDO;
@@ -52,7 +51,7 @@ public class IotDeviceDataController {
         return success(BeanUtils.toBean(list, IotTimeDataRespVO.class));
     }
 
-    // TODO:数据权限
+    // TODO:功能权限
     @PostMapping("/simulator")
     @Operation(summary = "模拟设备")
     public CommonResult<Boolean> simulatorDevice(@Valid @RequestBody IotDeviceDataSimulatorSaveReqVO simulatorReqVO) {
@@ -62,7 +61,7 @@ public class IotDeviceDataController {
         return success(true);
     }
 
-    // TODO:数据权限
+    // TODO:功能权限
     @GetMapping("/log/page")
     @Operation(summary = "获得设备日志分页")
     public CommonResult<PageResult<IotDeviceLogRespVO>> getDeviceLogPage(@Valid IotDeviceLogPageReqVO pageReqVO) {

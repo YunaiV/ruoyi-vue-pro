@@ -4,28 +4,20 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="cn.iocoder.yudao.module.iot.dal.tdengine.IotDeviceLogDataMapper">
 
-    <!-- 创建设备日志超级表   初始化只创建一次-->
     <update id="createDeviceLogSTable">
         CREATE STABLE IF NOT EXISTS device_log (
-            ts TIMESTAMP,
-            id NCHAR(50),
-            product_key NCHAR(50),
-            type NCHAR(50),
-            <!-- TODO @super：下划线 sub_type -->
-            sub_type NCHAR(50),
-            content NCHAR(1024),
-            report_time TIMESTAMP
+                ts TIMESTAMP,
+                id NCHAR(50),
+                product_key NCHAR(50),
+                type NCHAR(50),
+                sub_type NCHAR(50),
+                content NCHAR(1024),
+                report_time TIMESTAMP
             ) TAGS (
                 device_key NCHAR(50)
             )
     </update>
 
-    <!-- 创建设备日志子表  讨论：TDengine 在子表不存在的情况下 可在数据插入时 自动建表  要不要去掉创建子表的逻辑  由第一次插入数据时自动创建-->
-    <update id="createDeviceLogTable">
-        CREATE TABLE device_log_${deviceKey} USING device_log TAGS('${deviceKey}')
-    </update>
-
-    <!-- 插入设备日志数据 在子表不存在的情况下 可在数据插入时 自动建表 -->
     <insert id="insert">
         INSERT INTO device_log_${log.deviceKey} (ts, id, product_key, type, subType, content, report_time)
         USING device_log
@@ -42,7 +34,7 @@
     </insert>
 
     <select id="selectPage" resultType="cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceLogDO">
-        SELECT ts, id, device_key, product_key, type, subType, content, report_time
+        SELECT ts, id, device_key, product_key, type, sub_type, content, report_time
         FROM device_log_${reqVO.deviceKey}
         <where>
             <if test="reqVO.type != null and reqVO.type != ''">
@@ -75,15 +67,12 @@
         </where>
     </select>
 
-    <!-- 检查设备日志超级表是否存在 -->
     <select id="checkDeviceLogSTableExists" resultType="Object">
         SHOW STABLES LIKE 'device_log'
     </select>
 
-    <!-- 检查设备日志子表是否存在 -->
     <select id="checkDeviceLogTableExists" resultType="Object">
         SHOW TABLES LIKE 'device_log_${deviceKey}'
     </select>
-
 
 </mapper>
