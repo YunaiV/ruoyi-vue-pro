@@ -50,6 +50,12 @@ public class BpmProcessInstanceCopyDO extends BaseDO {
      */
     private String processInstanceId;
     /**
+     * 流程实例的流程定义编号
+     *
+     * 关联 ProcessInstance 的 processDefinitionId 属性
+     */
+    private String processDefinitionId;
+    /**
      * 流程分类
      *
      * 冗余 ProcessInstance 的 category 字段
