@@ -85,10 +85,6 @@ public class BpmTaskRespVO {
     @Schema(description = "是否填写审批意见", example = "false")
     private Boolean reasonRequire;
 
-    // TODO @lesan：要不放到 processInstance 里面？因为摘要是流程实例的，不是流程任务的
-    @Schema(description = "流程摘要", example = "[]")
-    private List<KeyValue<String, String>> summary; // 只有流程表单，才有摘要！
-
     @Data
     @Schema(description = "流程实例")
     public static class ProcessInstance {
@@ -104,6 +100,9 @@ public class BpmTaskRespVO {
 
         @Schema(description = "流程定义的编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "2048")
         private String processDefinitionId;
+
+        @Schema(description = "流程摘要", example = "[]")
+        private List<KeyValue<String, String>> summary; // 只有流程表单，才有摘要！
 
         /**
          * 发起人的用户信息
