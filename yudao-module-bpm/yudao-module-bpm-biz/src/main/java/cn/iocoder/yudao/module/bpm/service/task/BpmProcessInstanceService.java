@@ -84,6 +84,8 @@ public interface BpmProcessInstanceService {
     PageResult<HistoricProcessInstance> getProcessInstancePage(Long userId,
                                                                @Valid BpmProcessInstancePageReqVO pageReqVO);
 
+    PageResult<HistoricProcessInstance> getProcessInstanceReportPage(@Valid BpmProcessInstanceReportPageReqVO pageReqVO);
+
     // TODO @芋艿：重点在 review 下
     /**
      * 获取审批详情。

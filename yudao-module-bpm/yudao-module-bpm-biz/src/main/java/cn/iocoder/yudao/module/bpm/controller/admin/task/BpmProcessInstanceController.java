@@ -109,6 +109,25 @@ public class BpmProcessInstanceController {
                 processDefinitionMap, categoryMap, taskMap, userMap, deptMap, processDefinitionInfoMap));
     }
 
+    @GetMapping("/report-page")
+    @Operation(summary = "获得流程实例报表的分页列表", description = "获得流程实例报表的分页列表")
+    public CommonResult<BpmProcessInstanceReportPageRespVO> getProcessInstanceReportPage(
+            @Valid BpmProcessInstanceReportPageReqVO pageReqVO) {
+        PageResult<HistoricProcessInstance> pageResult = processInstanceService.getProcessInstanceReportPage(pageReqVO);
+        if (CollUtil.isEmpty(pageResult.getList())) {
+            return success(new BpmProcessInstanceReportPageRespVO().setPageResult(PageResult.empty(pageResult.getTotal())));
+        }
+
+        // 拼接返回
+        Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(
+                convertSet(pageResult.getList(), processInstance -> NumberUtils.parseLong(processInstance.getStartUserId())));
+        BpmProcessDefinitionInfoDO processDefinitionInfo = processDefinitionService.getProcessDefinitionInfo(
+                pageReqVO.getProcessDefinitionId()
+        );
+        return success(BpmProcessInstanceConvert.INSTANCE.buildProcessInstanceReportPage(pageResult,
+                userMap, processDefinitionInfo));
+    }
+
     @PostMapping("/create")
     @Operation(summary = "新建流程实例")
     @PreAuthorize("@ss.hasPermission('bpm:process-instance:query')")
