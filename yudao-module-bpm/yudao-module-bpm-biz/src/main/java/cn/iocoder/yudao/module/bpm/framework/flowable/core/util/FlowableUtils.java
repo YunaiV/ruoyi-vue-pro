@@ -26,6 +26,7 @@ import org.flowable.task.api.TaskInfo;
 
 import java.util.*;
 import java.util.concurrent.Callable;
+import java.util.stream.Collectors;
 
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
 
@@ -212,7 +213,8 @@ public class FlowableUtils {
                 || !BpmModelFormTypeEnum.NORMAL.getType().equals(processDefinitionInfo.getFormType())) {
             return null;
         }
-        List<KeyValue<String, String>> summaryList;
+
+        // 解析表单配置
         Map<String, BpmFormFieldVO> formFieldsMap = new HashMap<>();
         processDefinitionInfo.getFormFields().forEach(formFieldStr -> {
             BpmFormFieldVO formField = JsonUtils.parseObject(formFieldStr, BpmFormFieldVO.class);
@@ -220,10 +222,11 @@ public class FlowableUtils {
                 formFieldsMap.put(formField.getField(), formField);
             }
         });
+
+        // 情况一：当自定义了摘要
         if (ObjectUtil.isNotNull(processDefinitionInfo.getSummarySetting())
                 && Boolean.TRUE.equals(processDefinitionInfo.getSummarySetting().getEnable())) {
-            // 情况一：当自定义了摘要
-            summaryList = convertList(processDefinitionInfo.getSummarySetting().getSummary(), item -> {
+            return convertList(processDefinitionInfo.getSummarySetting().getSummary(), item -> {
                 BpmFormFieldVO formField = formFieldsMap.get(item);
                 if (formField != null) {
                     return new KeyValue<String, String>(formField.getTitle(),
@@ -231,15 +234,14 @@ public class FlowableUtils {
                 }
                 return null;
             });
-        } else {
-            // 情况二：默认摘要展示前三个表单字段
-            summaryList = new ArrayList<>(formFieldsMap.entrySet().stream()
-                    .limit(3)
-                    .map(entry -> new KeyValue<>(entry.getValue().getTitle(),
-                            processVariables.getOrDefault(entry.getValue().getField(), "").toString()))
-                    .toList());
         }
-        return summaryList;
+
+        // 情况二：默认摘要展示前三个表单字段
+        return formFieldsMap.entrySet().stream()
+                .limit(3)
+                .map(entry -> new KeyValue<>(entry.getValue().getTitle(),
+                        processVariables.getOrDefault(entry.getValue().getField(), "").toString()))
+                .collect(Collectors.toList());
     }
 
     // ========== Task 相关的工具方法 ==========

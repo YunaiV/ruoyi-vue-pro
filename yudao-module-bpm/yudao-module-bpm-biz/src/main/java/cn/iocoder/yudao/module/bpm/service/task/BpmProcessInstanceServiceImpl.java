@@ -180,43 +180,43 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
         return new PageResult<>(processInstanceList, processInstanceCount);
     }
 
-    @Override
-    public PageResult<HistoricProcessInstance> getProcessInstanceReportPage(BpmProcessInstanceReportPageReqVO pageReqVO) {
-        // 通过 BpmProcessInstanceExtDO 表，先查询到对应的分页
-        HistoricProcessInstanceQuery processInstanceQuery = historyService.createHistoricProcessInstanceQuery()
-                .includeProcessVariables()
-                .processInstanceTenantId(FlowableUtils.getTenantId())
-                .orderByProcessInstanceStartTime().desc();
-        if (pageReqVO.getStartUserId() != null) {
-            processInstanceQuery.startedBy(String.valueOf(pageReqVO.getStartUserId()));
-        }
-        if (StrUtil.isNotEmpty(pageReqVO.getName())) {
-            processInstanceQuery.processInstanceNameLike("%" + pageReqVO.getName() + "%");
-        }
-        if (StrUtil.isNotEmpty(pageReqVO.getProcessDefinitionKey())) {
-            processInstanceQuery.processDefinitionKey(pageReqVO.getProcessDefinitionKey());
-        }
-        if (pageReqVO.getStatus() != null) {
-            processInstanceQuery.variableValueEquals(BpmnVariableConstants.PROCESS_INSTANCE_VARIABLE_STATUS, pageReqVO.getStatus());
-        }
-        if (ArrayUtil.isNotEmpty(pageReqVO.getCreateTime())) {
-            processInstanceQuery.startedAfter(DateUtils.of(pageReqVO.getCreateTime()[0]));
-            processInstanceQuery.startedBefore(DateUtils.of(pageReqVO.getCreateTime()[1]));
-        }
-        if (ArrayUtil.isNotEmpty(pageReqVO.getEndTime())) {
-            processInstanceQuery.finishedAfter(DateUtils.of(pageReqVO.getEndTime()[0]));
-            processInstanceQuery.finishedBefore(DateUtils.of(pageReqVO.getEndTime()[1]));
-        }
-        // TODO 流程表单数据也要支持查询
-        // 查询数量
-        long processInstanceCount = processInstanceQuery.count();
-        if (processInstanceCount == 0) {
-            return PageResult.empty(processInstanceCount);
-        }
-        // 查询列表
-        List<HistoricProcessInstance> processInstanceList = processInstanceQuery.listPage(PageUtils.getStart(pageReqVO), pageReqVO.getPageSize());
-        return new PageResult<>(processInstanceList, processInstanceCount);
-    }
+//    @Override
+//    public PageResult<HistoricProcessInstance> getProcessInstanceReportPage(BpmProcessInstanceReportPageReqVO pageReqVO) {
+//        // 通过 BpmProcessInstanceExtDO 表，先查询到对应的分页
+//        HistoricProcessInstanceQuery processInstanceQuery = historyService.createHistoricProcessInstanceQuery()
+//                .includeProcessVariables()
+//                .processInstanceTenantId(FlowableUtils.getTenantId())
+//                .orderByProcessInstanceStartTime().desc();
+//        if (pageReqVO.getStartUserId() != null) {
+//            processInstanceQuery.startedBy(String.valueOf(pageReqVO.getStartUserId()));
+//        }
+//        if (StrUtil.isNotEmpty(pageReqVO.getName())) {
+//            processInstanceQuery.processInstanceNameLike("%" + pageReqVO.getName() + "%");
+//        }
+//        if (StrUtil.isNotEmpty(pageReqVO.getProcessDefinitionKey())) {
+//            processInstanceQuery.processDefinitionKey(pageReqVO.getProcessDefinitionKey());
+//        }
+//        if (pageReqVO.getStatus() != null) {
+//            processInstanceQuery.variableValueEquals(BpmnVariableConstants.PROCESS_INSTANCE_VARIABLE_STATUS, pageReqVO.getStatus());
+//        }
+//        if (ArrayUtil.isNotEmpty(pageReqVO.getCreateTime())) {
+//            processInstanceQuery.startedAfter(DateUtils.of(pageReqVO.getCreateTime()[0]));
+//            processInstanceQuery.startedBefore(DateUtils.of(pageReqVO.getCreateTime()[1]));
+//        }
+//        if (ArrayUtil.isNotEmpty(pageReqVO.getEndTime())) {
+//            processInstanceQuery.finishedAfter(DateUtils.of(pageReqVO.getEndTime()[0]));
+//            processInstanceQuery.finishedBefore(DateUtils.of(pageReqVO.getEndTime()[1]));
+//        }
+//        // TODO 流程表单数据也要支持查询
+//        // 查询数量
+//        long processInstanceCount = processInstanceQuery.count();
+//        if (processInstanceCount == 0) {
+//            return PageResult.empty(processInstanceCount);
+//        }
+//        // 查询列表
+//        List<HistoricProcessInstance> processInstanceList = processInstanceQuery.listPage(PageUtils.getStart(pageReqVO), pageReqVO.getPageSize());
+//        return new PageResult<>(processInstanceList, processInstanceCount);
+//    }
 
     private Map<String, String> getFormFieldsPermission(BpmnModel bpmnModel,
                                                         String activityId, String taskId) {
