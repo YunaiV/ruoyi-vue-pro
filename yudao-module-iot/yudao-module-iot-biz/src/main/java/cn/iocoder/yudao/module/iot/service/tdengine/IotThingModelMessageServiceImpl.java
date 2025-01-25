@@ -13,6 +13,7 @@ import cn.iocoder.yudao.module.iot.dal.dataobject.tdengine.TdTableDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.tdengine.ThingModelMessage;
 import cn.iocoder.yudao.module.iot.dal.dataobject.thingmodel.IotThingModelDO;
 import cn.iocoder.yudao.module.iot.dal.redis.deviceData.DeviceDataRedisDAO;
+import cn.iocoder.yudao.module.iot.dal.tdengine.IotDevicePropertyDataMapper;
 import cn.iocoder.yudao.module.iot.dal.tdengine.TdEngineDDLMapper;
 import cn.iocoder.yudao.module.iot.dal.tdengine.TdEngineDMLMapper;
 import cn.iocoder.yudao.module.iot.enums.IotConstants;
@@ -62,6 +63,9 @@ public class IotThingModelMessageServiceImpl implements IotThingModelMessageServ
     private TdEngineDMLMapper tdEngineDMLMapper;
 
     @Resource
+    private IotDevicePropertyDataMapper iotDevicePropertyDataMapper;
+
+    @Resource
     private DeviceDataRedisDAO deviceDataRedisDAO;
     
     // TODO @haohao：这个方法，可以考虑加下 1. 2. 3. 更有层次感
@@ -71,7 +75,7 @@ public class IotThingModelMessageServiceImpl implements IotThingModelMessageServ
         // 1. 判断设备状态，如果为未激活状态，创建数据表并更新设备状态
         if (IotDeviceStatusEnum.INACTIVE.getStatus().equals(device.getStatus())) {
             // 1.1 创建设备表
-            createDeviceTable(device.getDeviceType(), device.getProductKey(), device.getDeviceName(), device.getDeviceKey());
+//            createDeviceTable(device.getDeviceType(), device.getProductKey(), device.getDeviceName(), device.getDeviceKey());
             iotDeviceService.updateDeviceStatus(new IotDeviceStatusUpdateReqVO()
                     .setId(device.getId()).setStatus(IotDeviceStatusEnum.ONLINE.getStatus()));
         }
@@ -85,14 +89,20 @@ public class IotThingModelMessageServiceImpl implements IotThingModelMessageServ
 
         // 3. 过滤并收集有效的属性字段，缓存设备属性
         List<TdFieldDO> schemaFieldValues = filterAndCollectValidFields(params, thingModelList, device, thingModelMessage.getTime());
-        if (schemaFieldValues.size() == 1) { // 仅有时间字段，无需保存
+        if (schemaFieldValues.size() == 0) { // 没有字段，无需保存
             return;
         }
 
         // 4. 构建并保存设备属性数据
-        tdEngineDMLMapper.insertData(TdTableDO.builder()
-                .dataBaseName(getDatabaseName())
-                .tableName(getDeviceTableName(device.getProductKey(), device.getDeviceName()))
+//        tdEngineDMLMapper.insertData(TdTableDO.builder()
+//                .dataBaseName(getDatabaseName())
+//                .tableName(getDeviceTableName(device.getProductKey(), device.getDeviceName()))
+//                .columns(schemaFieldValues)
+//                .build());
+        // TODO:复用了旧逻辑,先过渡一下
+        iotDevicePropertyDataMapper.insertDevicePropertyData(TdTableDO.builder()
+                .productKey(device.getProductKey())
+                .deviceKey(device.getDeviceKey())
                 .columns(schemaFieldValues)
                 .build());
     }
@@ -145,7 +155,8 @@ public class IotThingModelMessageServiceImpl implements IotThingModelMessageServ
 
         // 3. 过滤并收集有效的属性字段
         List<TdFieldDO> schemaFieldValues = new ArrayList<>();
-        schemaFieldValues.add(new TdFieldDO(TIME, time));
+        //TODO:新版本是使用ts字段
+//        schemaFieldValues.add(new TdFieldDO(TIME, time));
         params.forEach((key, val) -> {
             if (propertyIdentifiers.contains(key)) {
                 schemaFieldValues.add(new TdFieldDO(key.toLowerCase(), val));

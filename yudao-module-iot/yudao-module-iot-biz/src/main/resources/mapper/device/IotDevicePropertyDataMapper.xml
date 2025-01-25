@@ -42,4 +42,46 @@
         DROP COLUMN ${field.field}
     </update>
 
+    <insert id="insertDevicePropertyData">
+        INSERT INTO device_property_${deviceKey} 
+        USING product_property_${productKey} 
+        TAGS ('${deviceKey}')
+        (ts
+        <foreach item="item" collection="columns" separator=",">
+            ,${item.fieldName}
+        </foreach>
+        ) 
+        VALUES 
+        (NOW
+        <foreach item="item" collection="columns" separator=",">
+            ,#{item.fieldValue}
+        </foreach>
+        )
+    </insert>
+
+    <!-- 描述超级表结构 -->
+    <select id="describeSuperTable" resultType="java.util.Map">
+        DESCRIBE product_property_${productKey}
+    </select>
+
+    <!-- 获取历史数据 -->
+    <select id="selectHistoryDataList" resultType="java.util.Map"
+            parameterType="cn.iocoder.yudao.module.iot.dal.dataobject.tdengine.SelectVisualDO">
+        SELECT ${fieldName} AS data, ts AS time
+        FROM device_property_${deviceKey}
+        WHERE ts BETWEEN #{startTime} AND #{endTime}
+          AND ${fieldName} IS NOT NULL
+        ORDER BY ts DESC
+        LIMIT #{params.rows} OFFSET #{params.page}
+    </select>
+
+    <!-- 统计历史数据总数 -->
+    <select id="selectHistoryCount" resultType="java.lang.Long"
+            parameterType="cn.iocoder.yudao.module.iot.dal.dataobject.tdengine.SelectVisualDO">
+        SELECT COUNT(*)
+        FROM device_property_${deviceKey}
+        WHERE ts BETWEEN #{startTime} AND #{endTime}
+          AND ${fieldName} IS NOT NULL
+    </select>
+
 </mapper>

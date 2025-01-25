@@ -25,18 +25,13 @@ public class TDengineTableInitConfiguration implements ApplicationRunner {
     public void run(ApplicationArguments args) {
         try {
             // 初始化设备日志表
-            deviceLogService.initTDengineSTable();
+            deviceLogService.defineDeviceLog();
             // TODO @super：这个日志，是不是不用打，不然重复啦！！！
-            log.info("[run]初始化 设备日志表 TDengine 表结构成功");
         } catch (Exception ex) {
             // TODO @super：初始化失败，打印 error 日志，退出系统。。不然跑起来，就初始啦！！！
-            if (ex.getMessage().contains("Table already exists")) {
-                log.info("TDengine 设备日志超级表已存在，跳过创建");
-                return;
-            } else{
-                log.error("初始化 设备日志表 TDengine  表结构失败", ex);
-            }
-            throw ex;
+            // 初始化失败时打印错误日志并退出系统
+            log.error("[TDengine] 初始化设备日志表结构失败，系统无法正常运行，即将退出", ex);
+            System.exit(1);
         }
     }
 

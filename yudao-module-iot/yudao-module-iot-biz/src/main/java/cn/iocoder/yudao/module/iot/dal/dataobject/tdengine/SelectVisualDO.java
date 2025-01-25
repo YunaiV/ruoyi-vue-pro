@@ -19,6 +19,9 @@ public class SelectVisualDO {
      */
     private String tableName;
 
+
+    private String deviceKey;
+
     /**
      * 属性
      */

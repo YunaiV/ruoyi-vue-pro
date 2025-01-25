@@ -45,7 +45,7 @@ spring:
       primary: master
       datasource:
         master:
-          url: jdbc:mysql://127.0.0.1:3306/ruoyi-vue-pro?useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true&nullCatalogMeansCurrent=true # MySQL Connector/J 8.X 连接的示例
+          url: jdbc:mysql://chaojiniu.top:23306/ruoyi-vue-pro?useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true&nullCatalogMeansCurrent=true # MySQL Connector/J 8.X 连接的示例
           #          url: jdbc:mysql://127.0.0.1:3306/ruoyi-vue-pro?useSSL=true&allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai # MySQL Connector/J 5.X 连接的示例
           #          url: jdbc:postgresql://127.0.0.1:5432/ruoyi-vue-pro # PostgreSQL 连接的示例
           #          url: jdbc:oracle:thin:@127.0.0.1:1521:xe # Oracle 连接的示例
@@ -53,8 +53,8 @@ spring:
           #          url: jdbc:dm://127.0.0.1:5236?schema=RUOYI_VUE_PRO # DM 连接的示例
           #          url: jdbc:kingbase8://127.0.0.1:54321/test  # 人大金仓 KingbaseES 连接的示例
           #          url: jdbc:postgresql://127.0.0.1:5432/postgres # OpenGauss 连接的示例
-          username: root
-          password: 123456
+          username: ruoyi-vue-pro
+          password: ruoyi-@h2ju02hebp
           #          username: sa # SQL Server 连接的示例
           #          password: Yudao@2024 # SQL Server 连接的示例
           #          username: SYSDBA # DM 连接的示例
@@ -63,12 +63,12 @@ spring:
           #          password: Yudao@2024 # OpenGauss 连接的示例
         slave: # 模拟从库，可根据自己需要修改
           lazy: true # 开启懒加载，保证启动速度
-          url: jdbc:mysql://127.0.0.1:3306/ruoyi-vue-pro?useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true&nullCatalogMeansCurrent=true
-          username: root
-          password: 123456
+          url: jdbc:mysql://chaojiniu.top:23306/ruoyi-vue-pro?useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true&nullCatalogMeansCurrent=true
+          username: ruoyi-vue-pro
+          password: ruoyi-@h2ju02hebp
         tdengine: # IOT 数据库
 #          lazy: true # 开启懒加载，保证启动速度
-          url: jdbc:TAOS-RS://127.0.0.1:6041/ruoyi_vue_pro
+          url: jdbc:TAOS-RS://chaojiniu.top:6041/ruoyi_vue_pro
           driver-class-name: com.taosdata.jdbc.rs.RestfulDriver
           username: root
           password: taosdata
@@ -78,10 +78,10 @@ spring:
   # Redis 配置。Redisson 默认的配置足够使用，一般不需要进行调优
   data:
     redis:
-      host: 400-infra.server.iocoder.cn # 地址
+      host: chaojiniu.top # 地址
       port: 6379 # 端口
-      database: 1 # 数据库索引
-  #    password: 123456 # 密码，建议生产环境开启
+      database: 15 # 数据库索引
+      password: fsknKD7UvQYZsyf2hXXn # 密码，建议生产环境开启
 
 --- #################### 定时任务相关配置 ####################
 
@@ -183,10 +183,8 @@ logging:
     cn.iocoder.yudao.module.crm.dal.mysql: debug
     cn.iocoder.yudao.module.erp.dal.mysql: debug
     cn.iocoder.yudao.module.iot.dal.mysql: debug
-    cn.iocoder.yudao.module.iot.dal.tdengine: DEBUG
     cn.iocoder.yudao.module.ai.dal.mysql: debug
     org.springframework.context.support.PostProcessorRegistrationDelegate: ERROR # TODO 芋艿：先禁用，Spring Boot 3.X 存在部分错误的 WARN 提示
-    com.taosdata: DEBUG # TDengine 的日志级别
 
 debug: false
 
@@ -269,11 +267,11 @@ justauth:
 iot:
   emq:
     # 账号
-    username: root
+    username: haohao
     # 密码
-    password: 123456
+    password: ahh@123456
     # 主机地址
-    hostUrl: tcp://127.0.0.1:1883
+    hostUrl: tcp://chaojiniu.top:1883
     # 客户端Id，不能相同，采用随机数 ${random.value}
     client-id: ${random.int}
     # 默认主题
@@ -285,9 +283,9 @@ iot:
 
 # MQTT-RPC 配置
 mqtt:
-  broker: tcp://127.0.0.1:1883
-  username: root
-  password: 123456
+  broker: tcp://chaojiniu.top:1883
+  username: haohao
+  password: ahh@123456
   clientId: mqtt-rpc-server-${random.int}
   requestTopic: rpc/request
   responseTopicPrefix: rpc/response/

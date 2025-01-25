@@ -72,6 +72,15 @@ public interface IotDeviceService {
      */
     IotDeviceDO getDevice(Long id);
 
+
+    /**
+     * 根据设备 key 获得设备
+     *
+     * @param deviceKey 编号
+     * @return IoT 设备
+     */
+    IotDeviceDO getDeviceByDeviceKey(String deviceKey);
+
     /**
      * ��得设备分页
      *

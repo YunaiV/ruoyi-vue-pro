@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.iot.mq.producer.simulatesend;
 
+import cn.iocoder.yudao.module.iot.dal.dataobject.tdengine.ThingModelMessage;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationContext;
@@ -19,4 +20,12 @@ public class SimulateSendProducer {
     @Resource
     private ApplicationContext applicationContext;
 
+    /**
+     * 发送 {@link ThingModelMessage} 消息
+     *
+     * @param thingModelMessage 物模型消息
+     */
+    public void sendSimulateMessage(ThingModelMessage thingModelMessage) {
+        applicationContext.publishEvent(thingModelMessage);
+    }
 }

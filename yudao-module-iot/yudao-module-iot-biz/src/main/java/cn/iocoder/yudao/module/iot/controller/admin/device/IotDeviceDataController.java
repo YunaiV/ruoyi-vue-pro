@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.iot.controller.admin.device;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
+import cn.iocoder.yudao.module.iot.api.device.dto.IotDevicePropertyReportReqDTO;
 import cn.iocoder.yudao.module.iot.controller.admin.device.vo.deviceData.*;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDataDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceLogDO;
@@ -55,9 +56,9 @@ public class IotDeviceDataController {
     @PostMapping("/simulator")
     @Operation(summary = "模拟设备")
     public CommonResult<Boolean> simulatorDevice(@Valid @RequestBody IotDeviceDataSimulatorSaveReqVO simulatorReqVO) {
-        //TODO:先生成一下设备日志  后续完善模拟设备代码逻辑
+        //TODO:先使用 IotDeviceDataSimulatorSaveReqVO  另外content里数据类型的效验前端也没做，后端应该要要效验一下，这块后续看看怎么安排
         // TODO @super：应该 deviceDataService 里面有个 simulatorDevice，然后里面去 insert 日志！
-        iotDeviceLogDataService.createDeviceLog(simulatorReqVO);
+        deviceDataService.simulatorSend(simulatorReqVO);
         return success(true);
     }
 

@@ -6,13 +6,13 @@
 
     <!-- 创建设备日志超级表   初始化只创建一次-->
     <update id="createDeviceLogSTable">
-        CREATE STABLE device_log (
+        CREATE STABLE IF NOT EXISTS device_log (
             ts TIMESTAMP,
             id NCHAR(50),
             product_key NCHAR(50),
             type NCHAR(50),
             <!-- TODO @super：下划线 sub_type -->
-            subType NCHAR(50),
+            sub_type NCHAR(50),
             content NCHAR(1024),
             report_time TIMESTAMP
             ) TAGS (
@@ -31,7 +31,7 @@
         USING device_log
         TAGS ('${log.deviceKey}')
         VALUES (
-            #{log.ts},
+            NOW,
             #{log.id},
             #{log.productKey},
             #{log.type},
@@ -74,5 +74,16 @@
             </if>
         </where>
     </select>
+
+    <!-- 检查设备日志超级表是否存在 -->
+    <select id="checkDeviceLogSTableExists" resultType="Object">
+        SHOW STABLES LIKE 'device_log'
+    </select>
+
+    <!-- 检查设备日志子表是否存在 -->
+    <select id="checkDeviceLogTableExists" resultType="Object">
+        SHOW TABLES LIKE 'device_log_${deviceKey}'
+    </select>
+
 
 </mapper>
