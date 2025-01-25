@@ -13,6 +13,7 @@
 
     <name>${project.artifactId}</name>
     <description>
+        <!-- TODO @芋艿：注释 -->
         物联网 插件 模块 - 通用功能
     </description>
 

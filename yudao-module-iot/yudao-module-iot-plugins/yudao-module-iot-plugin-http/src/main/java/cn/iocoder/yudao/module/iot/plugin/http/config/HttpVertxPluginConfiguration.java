@@ -17,6 +17,7 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class HttpVertxPluginConfiguration {
 
+    // TODO @haohao：这个要不要搞个配置类，更容易维护；
     /**
      * 可在 application.yml 中配置，默认端口 8092
      */
@@ -42,15 +43,13 @@ public class HttpVertxPluginConfiguration {
         router.route().handler(BodyHandler.create());
 
         // 设置路由
+        // TODO @haohao：这个后续，我们是多个 Handler ，还是一个哈？
         router.post("/sys/:productKey/:deviceName/thing/event/property/post")
               .handler(httpVertxHandler);
 
         return router;
     }
 
-    /**
-     * 注入你的 Http 处理器 Handler，依赖 DeviceDataApi
-     */
     @Bean
     public HttpVertxHandler httpVertxHandler(DeviceDataApi deviceDataApi) {
         return new HttpVertxHandler(deviceDataApi);
@@ -64,4 +63,5 @@ public class HttpVertxPluginConfiguration {
     public VertxService vertxService(Vertx vertx, Router router) {
         return new VertxService(port, vertx, router);
     }
+
 }

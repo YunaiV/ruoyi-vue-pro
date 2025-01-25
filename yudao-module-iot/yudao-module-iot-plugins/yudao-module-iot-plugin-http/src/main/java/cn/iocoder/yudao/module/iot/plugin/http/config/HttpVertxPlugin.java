@@ -21,7 +21,8 @@ public class HttpVertxPlugin extends SpringPlugin {
 
     @Override
     public void start() {
-        log.info("[HttpVertxPlugin] start ...");
+        // TODO @haohao：这种最好启动中，启动完成，成对打印日志，方便定位问题
+        log.info("[HttpVertxPlugin][start ...]");
 
         // 1. 获取插件上下文
         ApplicationContext pluginContext = getApplicationContext();
@@ -38,7 +39,7 @@ public class HttpVertxPlugin extends SpringPlugin {
 
     @Override
     public void stop() {
-        log.info("[HttpVertxPlugin] stop ...");
+        log.info("[HttpVertxPlugin][stop ...]");
         ApplicationContext pluginContext = getApplicationContext();
         if (pluginContext != null) {
             // 停止服务器

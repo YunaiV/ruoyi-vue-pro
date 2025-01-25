@@ -8,21 +8,23 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.client.RestTemplate;
 
+// TODO @haohao：这个最好是 autoconfiguration
 @Configuration
 public class DeviceDataApiInitializer {
 
+    // TODO @haohao：这个要不搞个配置类哈
     @Value("${iot.device-data.url}")
     private String deviceDataUrl;
 
     @Bean
     public RestTemplate restTemplate() {
-        // 如果你有更多的自定义需求，比如连接池、超时时间等，可以在这里设置
+        // TODO haohao：如果你有更多的自定义需求，比如连接池、超时时间等，可以在这里设置
         return new RestTemplateBuilder().build();
     }
 
+    // TODO @haohao：不存在时，才构建
     @Bean
     public DeviceDataApi deviceDataApi(RestTemplate restTemplate) {
-        // 返回我们自定义的 Client 实例
         return new DeviceDataApiClient(restTemplate, deviceDataUrl);
     }
 
