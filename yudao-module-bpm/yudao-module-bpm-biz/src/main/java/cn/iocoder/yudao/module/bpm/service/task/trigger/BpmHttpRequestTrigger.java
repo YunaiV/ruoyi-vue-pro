@@ -2,14 +2,14 @@ package cn.iocoder.yudao.module.bpm.service.task.trigger;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.hutool.json.JSONObject;
-import cn.hutool.json.JSONUtil;
 import cn.iocoder.yudao.framework.common.core.KeyValue;
+import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.simple.BpmSimpleModelNodeVO.TriggerSetting.HttpRequestTriggerSetting;
 import cn.iocoder.yudao.module.bpm.enums.definition.BpmTriggerTypeEnum;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.util.SimpleModelUtils;
 import cn.iocoder.yudao.module.bpm.service.task.BpmProcessInstanceService;
+import com.fasterxml.jackson.core.type.TypeReference;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.flowable.engine.runtime.ProcessInstance;
@@ -36,8 +36,6 @@ import static cn.iocoder.yudao.framework.web.core.util.WebFrameworkUtils.HEADER_
 @Component
 @Slf4j
 public class BpmHttpRequestTrigger implements BpmTrigger {
-
-    private static final String PARSE_RESPONSE_FIELD = "data";
 
     @Resource
     private BpmProcessInstanceService processInstanceService;
@@ -72,54 +70,53 @@ public class BpmHttpRequestTrigger implements BpmTrigger {
         // TODO @芋艿：要不要抽象一个 Http 请求的工具类，方便复用呢？
         // 3. 发起请求
         HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity<>(body, headers);
+        ResponseEntity<String> responseEntity;
         try {
-            ResponseEntity<String> responseEntity = restTemplate.exchange(setting.getUrl(), HttpMethod.POST,
+            responseEntity = restTemplate.exchange(setting.getUrl(), HttpMethod.POST,
                     requestEntity, String.class);
             log.info("[execute][HTTP 触发器，请求头：{}，请求体：{}，响应结果：{}]", headers, body, responseEntity);
-
-            // TODO @jason：建议把请求和失败，放在两个 try catch 里处理。
-            // 4. 处理请求返回
-            // TODO @jason：返回结果，要不统一用 CommonResult，符合这个规范。这样，就可以验证 code 为 0 了。必须符合这个规范~~
-            if (CollUtil.isNotEmpty(setting.getResponse()) && responseEntity.getStatusCode().is2xxSuccessful()
-                    && StrUtil.isNotEmpty(responseEntity.getBody())) {
-                // 4.1 获取需要更新的流程变量
-                Map<String, Object> updateVariables = getNeedUpdatedVariablesFromResponse(responseEntity.getBody(), setting.getResponse());
-                // 4.2 更新流程变量
-                if (CollUtil.isNotEmpty(updateVariables)) {
-                    processInstanceService.updateProcessInstanceVariables(processInstanceId, updateVariables);
-                }
-            }
         } catch (RestClientException e) {
             log.error("[execute][HTTP 触发器，请求头：{}，请求体：{}，请求出错：{}]", headers, body, e.getMessage());
+            return;
+        }
+
+        // 4.1 判断是否需要解析返回值
+        if (StrUtil.isEmpty(responseEntity.getBody()) || !responseEntity.getStatusCode().is2xxSuccessful()
+                || CollUtil.isEmpty(setting.getResponse())) {
+            return;
+        }
+        // 4.2 解析返回值, 返回值必须符合 CommonResult 规范。
+        CommonResult<Map<String, Object>> respResult = JsonUtils.parseObjectQuietly(responseEntity.getBody(),
+                new TypeReference<>() {});
+        if (respResult == null || !respResult.isSuccess()){
+            return;
+        }
+        // 4.3 获取需要更新的流程变量
+        Map<String, Object> updateVariables = getNeedUpdatedVariablesFromResponse(respResult.getData(), setting.getResponse());
+        // 4.4 更新流程变量
+        if (CollUtil.isNotEmpty(updateVariables)) {
+            processInstanceService.updateProcessInstanceVariables(processInstanceId, updateVariables);
         }
     }
 
     /**
      * 从请求返回值获取需要更新的流程变量
      *
-     * 优先从 data 字段获取，如果 data 字段不存在，从根节点获取
-     *
-     * @param responseBody     请求返回报文体
+     * @param result 请求返回结果
      * @param responseSettings 返回设置
      * @return 需要更新的流程变量
      */
-    private Map<String, Object> getNeedUpdatedVariablesFromResponse(String responseBody,
+    private Map<String, Object> getNeedUpdatedVariablesFromResponse(Map<String,Object> result,
                                                                     List<KeyValue<String, String>> responseSettings) {
         Map<String, Object> updateVariables = new HashMap<>();
-        // TODO @jason：这里 if return 更简洁一点；
-        // TODO @jason：JSONUtil => JsonUtils，尽量包一层
-        if (JSONUtil.isTypeJSONObject(responseBody)) {
-            JSONObject dataObj = null;
-            if (JSONUtil.parseObj(responseBody).getObj(PARSE_RESPONSE_FIELD) instanceof JSONObject) {
-                dataObj = (JSONObject) JSONUtil.parseObj(responseBody).getObj(PARSE_RESPONSE_FIELD);
-            }
-            JSONObject updateObj = dataObj == null ? JSONUtil.parseObj(responseBody) : dataObj;
-            responseSettings.forEach(responseSetting -> {
-                if (StrUtil.isNotEmpty(responseSetting.getKey()) && updateObj.containsKey(responseSetting.getValue())) {
-                    updateVariables.put(responseSetting.getKey(), updateObj.get(responseSetting.getValue()));
-                }
-            });
+        if (CollUtil.isEmpty(result)) {
+            return updateVariables;
         }
+        responseSettings.forEach(responseSetting -> {
+            if (StrUtil.isNotEmpty(responseSetting.getKey()) && result.containsKey(responseSetting.getValue())) {
+                updateVariables.put(responseSetting.getKey(), result.get(responseSetting.getValue()));
+            }
+        });
         return updateVariables;
     }
 
