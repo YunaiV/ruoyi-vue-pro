@@ -32,6 +32,7 @@ public enum BpmReasonEnum {
     ASSIGN_EMPTY_REJECT("审批人为空，自动不通过"),
     APPROVE_TYPE_AUTO_APPROVE("非人工审核，自动通过"),
     APPROVE_TYPE_AUTO_REJECT("非人工审核，自动不通过"),
+    CANCEL_BY_PROCESS_CLEAN("进程清理自动取消"),
     ;
 
     private final String reason;

@@ -80,6 +80,8 @@ public interface BpmProcessInstanceConvert {
             // 摘要
             respVO.setSummary(FlowableUtils.getSummary(processDefinitionInfoMap.get(respVO.getProcessDefinitionId()),
                     pageResult.getList().get(i).getProcessVariables()));
+            // 表单
+            respVO.setFormVariables(pageResult.getList().get(i).getProcessVariables());
         }
         return vpPageResult;
     }

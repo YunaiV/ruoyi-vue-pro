@@ -7,6 +7,7 @@ import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.json.JSONObject;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.date.DateUtils;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
@@ -170,6 +171,20 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
             processInstanceQuery.startedAfter(DateUtils.of(pageReqVO.getCreateTime()[0]));
             processInstanceQuery.startedBefore(DateUtils.of(pageReqVO.getCreateTime()[1]));
         }
+        if (ArrayUtil.isNotEmpty(pageReqVO.getEndTime())) {
+            processInstanceQuery.finishedAfter(DateUtils.of(pageReqVO.getEndTime()[0]));
+            processInstanceQuery.finishedBefore(DateUtils.of(pageReqVO.getEndTime()[1]));
+        }
+        // 表单字段查询
+        // TODO 应支持多种类型的查询方式，目前只有字符串全等
+        if (StrUtil.isNotEmpty(pageReqVO.getFormFieldsParams())) {
+            JSONObject formFieldsParams = new JSONObject(pageReqVO.getFormFieldsParams());
+            for (Map.Entry<String, Object> field : formFieldsParams.entrySet()) {
+                if (StrUtil.isNotEmpty(field.getValue().toString())) {
+                    processInstanceQuery.variableValueEquals(field.getKey(), field.getValue());
+                }
+            }
+        }
         // 查询数量
         long processInstanceCount = processInstanceQuery.count();
         if (processInstanceCount == 0) {
@@ -179,7 +194,6 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
         List<HistoricProcessInstance> processInstanceList = processInstanceQuery.listPage(PageUtils.getStart(pageReqVO), pageReqVO.getPageSize());
         return new PageResult<>(processInstanceList, processInstanceCount);
     }
-
 
     private Map<String, String> getFormFieldsPermission(BpmnModel bpmnModel,
                                                         String activityId, String taskId) {
