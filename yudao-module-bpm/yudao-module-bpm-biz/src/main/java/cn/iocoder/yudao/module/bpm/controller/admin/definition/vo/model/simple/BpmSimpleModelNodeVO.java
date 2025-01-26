@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.simple;
 
+import cn.iocoder.yudao.framework.common.core.KeyValue;
 import cn.iocoder.yudao.framework.common.validation.InEnum;
 import cn.iocoder.yudao.module.bpm.enums.definition.*;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmTaskCandidateStrategyEnum;
@@ -359,6 +360,14 @@ public class BpmSimpleModelNodeVO {
             @Schema(description = "请求头参数设置", example = "[]")
             @Valid
             private List<HttpRequestParam> body;
+
+            /**
+             * 请求返回处理设置。 用于修改流程表单值
+             * key: 表示要修改的流程表单字段 Id.
+             * value: 接口返回的字段名
+             */
+            @Schema(description = "请求返回处理设置", example = "[]")
+            private List<KeyValue<String,String>> response;
         }
 
     }
