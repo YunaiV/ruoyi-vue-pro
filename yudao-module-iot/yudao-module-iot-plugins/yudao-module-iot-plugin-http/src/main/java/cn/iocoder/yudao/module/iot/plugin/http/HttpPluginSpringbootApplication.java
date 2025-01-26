@@ -11,7 +11,7 @@ import org.springframework.context.ConfigurableApplicationContext;
  * 独立运行入口
  */
 @Slf4j
-@SpringBootApplication(scanBasePackages = "cn.iocoder.yudao.module.iot.plugin") // TODO @haohao：建议不扫描 cn.iocoder.yudao.module.iot.plugin；而是通过自动配置，初始化 common 的
+@SpringBootApplication
 public class HttpPluginSpringbootApplication {
 
     public static void main(String[] args) {
@@ -21,6 +21,7 @@ public class HttpPluginSpringbootApplication {
 
         // 手动获取 VertxService 并启动
         // TODO @haohao：可以放在 bean 的 init 里么？
+        // 会和插件模式冲突
         VertxService vertxService = context.getBean(VertxService.class);
         vertxService.startServer();
 

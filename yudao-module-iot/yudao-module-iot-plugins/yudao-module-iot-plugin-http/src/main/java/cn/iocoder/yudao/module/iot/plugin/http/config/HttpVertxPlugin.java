@@ -21,30 +21,41 @@ public class HttpVertxPlugin extends SpringPlugin {
 
     @Override
     public void start() {
-        // TODO @haohao：这种最好启动中，启动完成，成对打印日志，方便定位问题
-        log.info("[HttpVertxPlugin][start ...]");
+        log.info("[HttpVertxPlugin][start][begin] 开始启动 HttpVertxPlugin 插件...");
 
-        // 1. 获取插件上下文
-        ApplicationContext pluginContext = getApplicationContext();
-        if (pluginContext == null) {
-            log.error("[HttpVertxPlugin] pluginContext is null, start failed.");
-            return;
+        try {
+            // 1. 获取插件上下文
+            ApplicationContext pluginContext = getApplicationContext();
+            if (pluginContext == null) {
+                log.error("[HttpVertxPlugin][start][fail] pluginContext is null, 启动失败！");
+                return;
+            }
+
+            // 2. 启动 Vert.x
+            VertxService vertxService = pluginContext.getBean(VertxService.class);
+            vertxService.startServer();
+
+            log.info("[HttpVertxPlugin][start][end] 启动完成");
+        } catch (Exception e) {
+            log.error("[HttpVertxPlugin][start][exception] 启动过程出现异常！", e);
         }
-
-        // 2. 启动 Vertx
-        VertxService vertxService = pluginContext.getBean(VertxService.class);
-        vertxService.startServer();
     }
-
 
     @Override
     public void stop() {
-        log.info("[HttpVertxPlugin][stop ...]");
-        ApplicationContext pluginContext = getApplicationContext();
-        if (pluginContext != null) {
-            // 停止服务器
-            VertxService vertxService = pluginContext.getBean(VertxService.class);
-            vertxService.stopServer();
+        log.info("[HttpVertxPlugin][stop][begin] 开始停止 HttpVertxPlugin 插件...");
+
+        try {
+            ApplicationContext pluginContext = getApplicationContext();
+            if (pluginContext != null) {
+                // 停止服务器
+                VertxService vertxService = pluginContext.getBean(VertxService.class);
+                vertxService.stopServer();
+            }
+
+            log.info("[HttpVertxPlugin][stop][end] 停止完成");
+        } catch (Exception e) {
+            log.error("[HttpVertxPlugin][stop][exception] 停止过程出现异常！", e);
         }
     }
 
@@ -68,5 +79,4 @@ public class HttpVertxPlugin extends SpringPlugin {
 
         return pluginContext;
     }
-
 }

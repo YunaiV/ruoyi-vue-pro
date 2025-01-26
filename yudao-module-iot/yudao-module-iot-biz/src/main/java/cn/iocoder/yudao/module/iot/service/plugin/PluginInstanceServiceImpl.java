@@ -40,9 +40,7 @@ import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionU
 @Slf4j
 public class PluginInstanceServiceImpl implements PluginInstanceService {
 
-    // TODO @haohao：这个可以后续确认下，有没更合适的标识。例如说 mac 地址之类的
-    // 简化的 UUID + mac 地址 会不会好一些，一台机子有可能会部署多个插件；
-    // 那就 mac@uuid ？
+    // TODO @haohao：mac@uuid 
     public static final String MAIN_ID = IdUtil.fastSimpleUUID();
 
     @Resource
@@ -60,32 +58,31 @@ public class PluginInstanceServiceImpl implements PluginInstanceService {
     @Override
     public void stopAndUnloadPlugin(String pluginKey) {
         PluginWrapper plugin = pluginManager.getPlugin(pluginKey);
-        // TODO @haohao：改成 if return 会更简洁一点；
-        if (plugin != null) {
-            if (plugin.getPluginState().equals(PluginState.STARTED)) {
-                pluginManager.stopPlugin(pluginKey); // 停止插件
-                log.info("已停止插件: {}", pluginKey);
-            }
-            pluginManager.unloadPlugin(pluginKey); // 卸载插件
-            log.info("已卸载插件: {}", pluginKey);
-        } else {
+        if (plugin == null) {
             log.warn("插件不存在或已卸载: {}", pluginKey);
+            return;
         }
+        if (plugin.getPluginState().equals(PluginState.STARTED)) {
+            pluginManager.stopPlugin(pluginKey); // 停止插件
+            log.info("已停止插件: {}", pluginKey);
+        }
+        pluginManager.unloadPlugin(pluginKey); // 卸载插件
+        log.info("已卸载插件: {}", pluginKey);
     }
 
     @Override
     public void deletePluginFile(PluginInfoDO pluginInfoDO) {
         File file = new File(pluginsDir, pluginInfoDO.getFileName());
-        // TODO @haohao：改成 if return 会更简洁一点；
-        if (file.exists()) {
-            try {
-                TimeUnit.SECONDS.sleep(1); // 等待 1 秒，避免插件未卸载完毕
-                if (!file.delete()) {
-                    log.error("[deletePluginInfo][删除插件文件({}) 失败]", pluginInfoDO.getFileName());
-                }
-            } catch (InterruptedException e) {
-                log.error("[deletePluginInfo][删除插件文件({}) 失败]", pluginInfoDO.getFileName(), e);
+        if (!file.exists()) {
+            return;
+        }
+        try {
+            TimeUnit.SECONDS.sleep(1); // 等待 1 秒，避免插件未卸载完毕
+            if (!file.delete()) {
+                log.error("[deletePluginInfo][删除插件文件({}) 失败]", pluginInfoDO.getFileName());
             }
+        } catch (InterruptedException e) {
+            log.error("[deletePluginInfo][删除插件文件({}) 失败]", pluginInfoDO.getFileName(), e);
         }
     }
 
@@ -120,25 +117,25 @@ public class PluginInstanceServiceImpl implements PluginInstanceService {
         String pluginKey = pluginInfoDo.getPluginKey();
         PluginWrapper plugin = pluginManager.getPlugin(pluginKey);
 
-        // TODO @haohao：改成 if return 会更简洁一点；
-        if (plugin != null) {
-            // 启动插件
-            if (status.equals(IotPluginStatusEnum.RUNNING.getStatus())
-                    && plugin.getPluginState() != PluginState.STARTED) {
-                pluginManager.startPlugin(pluginKey);
-                log.info("已启动插件: {}", pluginKey);
-            }
-            // 停止插件
-            else if (status.equals(IotPluginStatusEnum.STOPPED.getStatus())
-                    && plugin.getPluginState() == PluginState.STARTED) {
-                pluginManager.stopPlugin(pluginKey);
-                log.info("已停止插件: {}", pluginKey);
-            }
-        } else {
+        if (plugin == null) {
             // 插件不存在且状态为停止，抛出异常
             if (IotPluginStatusEnum.STOPPED.getStatus().equals(pluginInfoDo.getStatus())) {
                 throw exception(ErrorCodeConstants.PLUGIN_STATUS_INVALID);
             }
+            return;
+        }
+
+        // 启动插件
+        if (status.equals(IotPluginStatusEnum.RUNNING.getStatus())
+                && plugin.getPluginState() != PluginState.STARTED) {
+            pluginManager.startPlugin(pluginKey);
+            log.info("已启动插件: {}", pluginKey);
+        }
+        // 停止插件
+        else if (status.equals(IotPluginStatusEnum.STOPPED.getStatus())
+                && plugin.getPluginState() == PluginState.STARTED) {
+            pluginManager.stopPlugin(pluginKey);
+            log.info("已停止插件: {}", pluginKey);
         }
     }
 
@@ -152,10 +149,10 @@ public class PluginInstanceServiceImpl implements PluginInstanceService {
         Map<String, PluginInfoDO> pluginInfoMap = pluginInfos.stream()
                 .collect(Collectors.toMap(PluginInfoDO::getPluginKey, Function.identity()));
 
-        // 1.3 获取本机 IP 和 MAC 地址
+        // 1.3 获取本机 IP 和 MAC 地址,mac@uuid
         String ip = NetUtil.getLocalhostStr();
         String mac = NetUtil.getLocalMacAddress();
-        String mainId = MAIN_ID + "-" + mac;
+        String mainId = mac + "@" + MAIN_ID;
 
         // 2. 遍历插件列表，并保存为插件实例
         for (PluginWrapper plugin : plugins) {
@@ -173,14 +170,21 @@ public class PluginInstanceServiceImpl implements PluginInstanceService {
                     pluginInfo.getId());
             if (pluginInstance == null) {
                 // 4.4 如果插件实例不存在，则创建
-                pluginInstance = PluginInstanceDO.builder().pluginId(pluginInfo.getId()).mainId(MAIN_ID + "-" + mac)
-                        .ip(ip).port(port).heartbeatAt(System.currentTimeMillis()).build();
+                pluginInstance = PluginInstanceDO.builder()
+                        .pluginId(pluginInfo.getId())
+                        .mainId(MAIN_ID + "-" + mac)
+                        .ip(ip)
+                        .port(port)
+                        .heartbeatAt(System.currentTimeMillis())
+                        .build();
                 pluginInstanceMapper.insert(pluginInstance);
             } else {
                 // 2.2 情况二：如果存在，则更新 heartbeatAt
-                // TODO @haohao：这里最好 new 去 update；避免并发更新（虽然目前没有）
-                pluginInstance.setHeartbeatAt(System.currentTimeMillis());
-                pluginInstanceMapper.updateById(pluginInstance);
+                PluginInstanceDO updatePluginInstance = PluginInstanceDO.builder()
+                        .id(pluginInstance.getId())
+                        .heartbeatAt(System.currentTimeMillis())
+                        .build();
+                pluginInstanceMapper.updateById(updatePluginInstance);
             }
         }
     }

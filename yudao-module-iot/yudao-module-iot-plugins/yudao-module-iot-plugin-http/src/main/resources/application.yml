@@ -5,3 +5,8 @@ spring:
 iot:
   device-data:
     url: http://127.0.0.1:48080
+
+plugin:
+  http:
+    server:
+      port: 8092
