@@ -20,8 +20,7 @@ public class HttpPluginSpringbootApplication {
         ConfigurableApplicationContext context = application.run(args);
 
         // 手动获取 VertxService 并启动
-        // TODO @haohao：可以放在 bean 的 init 里么？
-        // 会和插件模式冲突
+        // TODO @haohao：可以放在 bean 的 init 里么？回复：会和插件模式冲突 @芋艿，测试下
         VertxService vertxService = context.getBean(VertxService.class);
         vertxService.startServer();
 

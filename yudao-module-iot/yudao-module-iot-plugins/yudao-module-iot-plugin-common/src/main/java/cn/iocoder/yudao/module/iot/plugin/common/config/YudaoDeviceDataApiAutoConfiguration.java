@@ -18,7 +18,6 @@ import java.time.Duration;
 @AutoConfiguration
 public class YudaoDeviceDataApiAutoConfiguration {
 
-
     // TODO @haohao：这个要不搞个配置类哈
     @Value("${iot.device-data.url}")
     private String deviceDataUrl;
