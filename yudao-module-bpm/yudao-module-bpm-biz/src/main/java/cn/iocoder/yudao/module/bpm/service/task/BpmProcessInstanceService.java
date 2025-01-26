@@ -160,9 +160,9 @@ public interface BpmProcessInstanceService {
     /**
      * 更新 ProcessInstance 的变量
      *
-     * @param processInstanceId 流程编号
+     * @param id 流程编号
      * @param variables 流程变量
      */
-    void updateProcessInstanceVariables(String processInstanceId, Map<String, Object> variables);
+    void updateProcessInstanceVariables(String id, Map<String, Object> variables);
 
 }

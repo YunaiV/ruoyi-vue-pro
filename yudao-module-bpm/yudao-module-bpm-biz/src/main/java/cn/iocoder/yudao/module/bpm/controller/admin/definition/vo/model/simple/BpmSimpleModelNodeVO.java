@@ -158,6 +158,7 @@ public class BpmSimpleModelNodeVO {
         @Schema(description = "值", example = "xxx")
         @NotEmpty(message = "值不能为空")
         private String value;
+
     }
 
     @Schema(description = "审批节点拒绝处理策略")
@@ -362,12 +363,14 @@ public class BpmSimpleModelNodeVO {
             private List<HttpRequestParam> body;
 
             /**
-             * 请求返回处理设置。 用于修改流程表单值
-             * key: 表示要修改的流程表单字段 Id.
-             * value: 接口返回的字段名
+             * 请求返回处理设置，用于修改流程表单值
+             *
+             * key：表示要修改的流程表单字段名(name)
+             * value：接口返回的字段名
              */
             @Schema(description = "请求返回处理设置", example = "[]")
-            private List<KeyValue<String,String>> response;
+            private List<KeyValue<String, String>> response;
+
         }
 
     }

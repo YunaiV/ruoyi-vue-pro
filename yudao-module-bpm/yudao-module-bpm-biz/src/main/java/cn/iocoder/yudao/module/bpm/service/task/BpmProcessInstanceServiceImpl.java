@@ -758,7 +758,8 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
     }
 
     @Override
-    public void updateProcessInstanceVariables(String processInstanceId, Map<String, Object> variables) {
-        runtimeService.setVariables(processInstanceId, variables);
+    public void updateProcessInstanceVariables(String id, Map<String, Object> variables) {
+        runtimeService.setVariables(id, variables);
     }
+
 }
