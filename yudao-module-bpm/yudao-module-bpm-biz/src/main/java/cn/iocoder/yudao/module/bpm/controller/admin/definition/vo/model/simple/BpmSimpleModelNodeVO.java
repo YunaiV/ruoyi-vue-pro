@@ -362,6 +362,7 @@ public class BpmSimpleModelNodeVO {
             @Valid
             private List<HttpRequestParam> body;
 
+            // TODO @json：可能未来看情况，搞个 HttpResponseParam；得看看有没别的业务需要，抽象统一
             /**
              * 请求返回处理设置，用于修改流程表单值
              *
