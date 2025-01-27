@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.iot.dal.tdengine;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.tenant.core.aop.TenantIgnore;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.tdengine.SelectVisualDO;
@@ -30,8 +31,8 @@ public interface IotDevicePropertyDataMapper {
     default void alterProductPropertySTable(String productKey,
                                             List<TDengineTableField> oldFields,
                                             List<TDengineTableField> newFields) {
-        oldFields.removeIf(field -> TDengineTableField.FIELD_TS.equals(field.getField())
-                || TDengineTableField.FIELD_DEVICE_KEY.equals(field.getField()));
+        oldFields.removeIf(field -> StrUtil.equalsAny(field.getField(),
+                TDengineTableField.FIELD_TS, "device_key", "report_time"));
         List<TDengineTableField> addFields = newFields.stream().filter( // 新增的字段
                         newField -> oldFields.stream().noneMatch(oldField -> oldField.getField().equals(newField.getField())))
                 .collect(Collectors.toList());
@@ -79,7 +80,8 @@ public interface IotDevicePropertyDataMapper {
                                              @Param("field") TDengineTableField field);
 
     void insert(@Param("device") IotDeviceDO device,
-                @Param("properties") Map<String, Object> properties);
+                @Param("properties") Map<String, Object> properties,
+                @Param("reportTime") Long reportTime);
 
     // TODO @芋艿：待实现
     /**

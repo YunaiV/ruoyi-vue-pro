@@ -17,11 +17,6 @@ public class TDengineTableField {
      */
     public static final String FIELD_TS = "ts";
 
-    /**
-     * 字段名 - 我们系统定义的 device_key 字段，非 TDengine 默认字段
-     */
-    public static final String FIELD_DEVICE_KEY = "device_key";
-
     public static final String TYPE_TINYINT = "TINYINT";
     public static final String TYPE_INT = "INT";
     public static final String TYPE_FLOAT = "FLOAT";

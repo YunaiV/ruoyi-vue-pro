@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.iot.service.device.data;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONObject;
@@ -97,7 +98,6 @@ public class IotDevicePropertyServiceImpl implements IotDevicePropertyService {
                 log.info("[defineDevicePropertyData][productId({}) 没有需要定义的属性]", productId);
                 return;
             }
-            newFields.add(0, new TDengineTableField(TDengineTableField.FIELD_TS, TDengineTableField.TYPE_TIMESTAMP));
             devicePropertyDataMapper.createProductPropertySTable(product.getProductKey(), newFields);
             return;
         }
@@ -147,7 +147,8 @@ public class IotDevicePropertyServiceImpl implements IotDevicePropertyService {
         }
 
         // 3.1 保存设备属性【数据】
-        devicePropertyDataMapper.insert(device, properties);
+        devicePropertyDataMapper.insert(device, properties,
+                LocalDateTimeUtil.toEpochMilli(message.getReportTime())); // TODO @芋艿：后续要看看，查询的时候，能不能用 LocalDateTime
 
         // 3.2 保存设备属性【日志】
         deviceDataRedisDAO.set(message.getDeviceKey(), convertMap(properties.entrySet(), Map.Entry::getKey,
