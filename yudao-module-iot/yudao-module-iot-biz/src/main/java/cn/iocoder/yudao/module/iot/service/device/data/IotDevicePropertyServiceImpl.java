@@ -1,9 +1,8 @@
-package cn.iocoder.yudao.module.iot.service.device;
+package cn.iocoder.yudao.module.iot.service.device.data;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.map.MapUtil;
-import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
@@ -16,18 +15,15 @@ import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDataDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.product.IotProductDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.tdengine.SelectVisualDO;
-import cn.iocoder.yudao.module.iot.dal.dataobject.tdengine.ThingModelMessage;
 import cn.iocoder.yudao.module.iot.dal.dataobject.thingmodel.IotThingModelDO;
 import cn.iocoder.yudao.module.iot.dal.redis.deviceData.DeviceDataRedisDAO;
 import cn.iocoder.yudao.module.iot.dal.tdengine.IotDevicePropertyDataMapper;
-import cn.iocoder.yudao.module.iot.dal.tdengine.TdEngineDMLMapper;
 import cn.iocoder.yudao.module.iot.enums.IotConstants;
 import cn.iocoder.yudao.module.iot.enums.thingmodel.IotDataSpecsDataTypeEnum;
 import cn.iocoder.yudao.module.iot.enums.thingmodel.IotThingModelTypeEnum;
 import cn.iocoder.yudao.module.iot.framework.tdengine.core.TDengineTableField;
-import cn.iocoder.yudao.module.iot.mq.producer.simulatesend.SimulateSendProducer;
+import cn.iocoder.yudao.module.iot.service.device.IotDeviceService;
 import cn.iocoder.yudao.module.iot.service.product.IotProductService;
-import cn.iocoder.yudao.module.iot.service.tdengine.IotThingModelMessageService;
 import cn.iocoder.yudao.module.iot.service.thingmodel.IotThingModelService;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
@@ -53,7 +49,7 @@ import static cn.iocoder.yudao.module.iot.enums.ErrorCodeConstants.DEVICE_DATA_C
  */
 @Service
 @Slf4j
-public class IotDevicePropertyDataServiceImpl implements IotDevicePropertyDataService {
+public class IotDevicePropertyServiceImpl implements IotDevicePropertyService {
 
     /**
      * 物模型的数据类型，与 TDengine 数据类型的映射关系
@@ -76,24 +72,15 @@ public class IotDevicePropertyDataServiceImpl implements IotDevicePropertyDataSe
     @Resource
     private IotDeviceService deviceService;
     @Resource
-    private IotThingModelMessageService thingModelMessageService;
-    @Resource
     private IotThingModelService thingModelService;
     @Resource
     private IotProductService productService;
-
-    @Resource
-    private SimulateSendProducer simulateSendProducer;
-
-    @Resource
-    private TdEngineDMLMapper tdEngineDMLMapper;
 
     @Resource
     private DeviceDataRedisDAO deviceDataRedisDAO;
 
     @Resource
     private IotDevicePropertyDataMapper devicePropertyDataMapper;
-
 
     @Override
     public void defineDevicePropertyData(Long productId) {
@@ -144,28 +131,8 @@ public class IotDevicePropertyDataServiceImpl implements IotDevicePropertyDataSe
         // 1. 根据产品 key 和设备名称，获得设备信息
         IotDeviceDO device = deviceService.getDeviceByProductKeyAndDeviceName(createDTO.getProductKey(), createDTO.getDeviceName());
         // 2. 解析消息，保存数据
-        JSONObject jsonObject = new JSONObject(createDTO.getParams());
+        JSONObject jsonObject = new JSONObject(createDTO.getProperties());
         log.info("[saveDeviceData][productKey({}) deviceName({}) data({})]", createDTO.getProductKey(), createDTO.getDeviceName(), jsonObject);
-        ThingModelMessage thingModelMessage = ThingModelMessage.builder()
-                .id(jsonObject.getStr("id"))
-                .sys(jsonObject.get("sys"))
-                .method(jsonObject.getStr("method"))
-                .params(jsonObject.get("params"))
-                .time(jsonObject.getLong("time") == null ? System.currentTimeMillis() : jsonObject.getLong("time"))
-                .productKey(createDTO.getProductKey())
-                .deviceName(createDTO.getDeviceName())
-                .deviceKey(device.getDeviceKey())
-                .build();
-        thingModelMessageService.saveThingModelMessage(device, thingModelMessage);
-    }
-
-    //TODO @芋艿:后续捋一捋这块逻辑，先借鉴一下目前的代码
-    @Override
-    public void saveDeviceDataTest(ThingModelMessage thingModelMessage) {
-        // 1. 根据产品 key 和设备名称，获得设备信息
-        IotDeviceDO device = deviceService.getDeviceByProductKeyAndDeviceName(thingModelMessage.getProductKey(), thingModelMessage.getDeviceName());
-        // 2. 保存数据
-        thingModelMessageService.saveThingModelMessage(device, thingModelMessage);
     }
 
     //TODO @芋艿:copy 了 saveDeviceData 的逻辑，后续看看这块怎么优化
@@ -182,20 +149,17 @@ public class IotDevicePropertyDataServiceImpl implements IotDevicePropertyDataSe
             throw exception(DEVICE_DATA_CONTENT_JSON_PARSE_ERROR);
         }
 
+        // TODO @芋艿：后续优化
         // 3. 构建物模型消息
-        ThingModelMessage thingModelMessage = ThingModelMessage.builder()
-                .id(IdUtil.fastSimpleUUID()) // TODO:后续优化
-                .sys(null)// TODO:这块先写死，后续优化
-                .method("thing.event.property.post") // TODO:这块先写死，后续优化
-                .params(contentJson) // 将 content 作为 params
-                .time(simulatorReqVO.getReportTime()) // 使用上报时间
-                .productKey(simulatorReqVO.getProductKey())
-                .deviceName(device.getDeviceName())
-                .deviceKey(device.getDeviceKey())
-                .build();
+//        IotDeviceMessage thingModelMessage = IotDeviceMessage.builder()
+//                .params(contentJson) // 将 content 作为 params
+//                .time(simulatorReqVO.getReportTime()) // 使用上报时间
+//                .productKey(simulatorReqVO.getProductKey())
+//                .deviceName(device.getDeviceName())
+//                .build();
 
         // 4. 发送模拟消息
-        simulateSendProducer.sendSimulateMessage(thingModelMessage);
+//        simulateSendProducer.sendDeviceMessage(thingModelMessage);
     }
 
     @Override

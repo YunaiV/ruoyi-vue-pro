@@ -45,6 +45,7 @@ public class TenantUtils {
      *
      * @param tenantId 租户编号
      * @param callable 逻辑
+     * @return 结果
      */
     public static <V> V execute(Long tenantId, Callable<V> callable) {
         Long oldTenantId = TenantContextHolder.getTenantId();
@@ -73,6 +74,25 @@ public class TenantUtils {
             TenantContextHolder.setIgnore(true);
             // 执行逻辑
             runnable.run();
+        } finally {
+            TenantContextHolder.setIgnore(oldIgnore);
+        }
+    }
+
+    /**
+     * 忽略租户，执行对应的逻辑
+     *
+     * @param callable 逻辑
+     * @return 结果
+     */
+    public static <V> V executeIgnore(Callable<V> callable) {
+        Boolean oldIgnore = TenantContextHolder.isIgnore();
+        try {
+            TenantContextHolder.setIgnore(true);
+            // 执行逻辑
+            return callable.call();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         } finally {
             TenantContextHolder.setIgnore(oldIgnore);
         }

@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.iot.plugin.http.config;
 
-import cn.iocoder.yudao.module.iot.api.device.DeviceDataApi;
+import cn.iocoder.yudao.module.iot.api.device.IotDeviceUpstreamApi;
 import cn.iocoder.yudao.module.iot.plugin.http.service.HttpVertxHandler;
 import io.vertx.core.Vertx;
 import io.vertx.ext.web.Router;
@@ -61,7 +61,7 @@ public class HttpVertxPluginConfiguration {
      * @return HttpVertxHandler 实例
      */
     @Bean
-    public HttpVertxHandler httpVertxHandler(DeviceDataApi deviceDataApi) {
+    public HttpVertxHandler httpVertxHandler(IotDeviceUpstreamApi deviceDataApi) {
         return new HttpVertxHandler(deviceDataApi);
     }
 

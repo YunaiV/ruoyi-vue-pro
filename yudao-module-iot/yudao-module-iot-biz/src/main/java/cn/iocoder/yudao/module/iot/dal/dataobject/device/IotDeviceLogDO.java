@@ -1,6 +1,10 @@
 package cn.iocoder.yudao.module.iot.dal.dataobject.device;
 
+import cn.hutool.core.util.IdUtil;
 import cn.iocoder.yudao.module.iot.dal.dataobject.product.IotProductDO;
+import cn.iocoder.yudao.module.iot.enums.device.IotDeviceMessageIdentifierEnum;
+import cn.iocoder.yudao.module.iot.enums.device.IotDeviceMessageTypeEnum;
+import cn.iocoder.yudao.module.iot.mq.message.IotDeviceMessage;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -19,11 +23,19 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class IotDeviceLogDO {
 
-    // TODO @芋艿：消息 ID 的生成逻辑
     /**
-     * 消息 ID
+     * 日志编号
+     *
+     * 通过 {@link IdUtil#fastSimpleUUID()} 生成
      */
     private String id;
+
+    /**
+     * 请求编号
+     *
+     * 对应 {@link IotDeviceMessage#getRequestId()} 字段
+     */
+    private String requestId;
 
     /**
      * 产品标识
@@ -31,25 +43,31 @@ public class IotDeviceLogDO {
      * 关联 {@link IotProductDO#getProductKey()}
      */
     private String productKey;
-
+    /**
+     * 设备名称
+     *
+     * 关联 {@link IotDeviceDO#getDeviceName()}
+     */
+    private String deviceName;
     /**
      * 设备标识
      * <p>
      * 关联 {@link IotDeviceDO#getDeviceKey()}}
      */
-    private String deviceKey;
+    private String deviceKey; // 非存储字段，用于 TDengine 的 TAG
 
-    // TODO @super：枚举类
     /**
      * 日志类型
+     *
+     * 枚举 {@link IotDeviceMessageTypeEnum}
      */
     private String type;
-
-    // TODO @super：枚举类
     /**
-     * 标识符：用于标识具体的属性、事件或服务
+     * 标识符
+     *
+     * 枚举 {@link IotDeviceMessageIdentifierEnum}
      */
-    private String subType;
+    private String identifier;
 
     /**
      * 数据内容

@@ -1,99 +1,62 @@
 package cn.iocoder.yudao.module.iot.plugin.common.api;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
-import cn.iocoder.yudao.module.iot.api.device.DeviceDataApi;
+import cn.iocoder.yudao.module.iot.api.device.IotDeviceUpstreamApi;
 import cn.iocoder.yudao.module.iot.api.device.dto.IotDeviceEventReportReqDTO;
 import cn.iocoder.yudao.module.iot.api.device.dto.IotDevicePropertyReportReqDTO;
 import cn.iocoder.yudao.module.iot.api.device.dto.IotDeviceStatusUpdateReqDTO;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.client.RestTemplate;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
-/**
- * 用于通过 {@link RestTemplate} 向远程 IoT 服务发送设备数据相关的请求，
- * 包括设备状态更新、事件数据上报、属性数据上报等操作。
- */
+// TODO @haohao：类注释，写一下，比较好
+// TODO @haohao：类名要改下
 @Slf4j
-@RequiredArgsConstructor
-public class DeviceDataApiClient implements DeviceDataApi {
+public class DeviceDataApiClient implements IotDeviceUpstreamApi {
 
-    /**
-     * 用于发送 HTTP 请求的工具
-     */
+    public static final String URL_PREFIX = "/rpc-api/iot/device/upstream";
+
     private final RestTemplate restTemplate;
-
-    /**
-     * 远程 IoT 服务的基础 URL
-     * 例如：http://127.0.0.1:8080
-     */
     private final String deviceDataUrl;
+
+    // 可以通过构造器把 RestTemplate 和 baseUrl 注入进来
+    // TODO @haohao：可以用 lombok 简化
+    public DeviceDataApiClient(RestTemplate restTemplate, String deviceDataUrl) {
+        this.restTemplate = restTemplate;
+        this.deviceDataUrl = deviceDataUrl;
+    }
 
     // TODO @haohao：返回结果，不用 CommonResult 哈。
     @Override
     public CommonResult<Boolean> updateDeviceStatus(IotDeviceStatusUpdateReqDTO updateReqDTO) {
-        String url = deviceDataUrl + "/rpc-api/iot/device-data/update-status";
+        String url = deviceDataUrl + URL_PREFIX + "/update-status";
         return doPost(url, updateReqDTO, "updateDeviceStatus");
     }
 
     @Override
     public CommonResult<Boolean> reportDeviceEventData(IotDeviceEventReportReqDTO reportReqDTO) {
-        String url = deviceDataUrl + "/rpc-api/iot/device-data/report-event";
+        String url = deviceDataUrl + URL_PREFIX + "/report-event";
         return doPost(url, reportReqDTO, "reportDeviceEventData");
     }
 
     @Override
     public CommonResult<Boolean> reportDevicePropertyData(IotDevicePropertyReportReqDTO reportReqDTO) {
-        String url = deviceDataUrl + "/rpc-api/iot/device-data/report-property";
+        String url = deviceDataUrl + URL_PREFIX + "/report-property";
         return doPost(url, reportReqDTO, "reportDevicePropertyData");
     }
 
-    
+    // TODO @haohao：未来可能有 get 类型哈
     /**
-     * 发送 GET 请求
-     *
-     * @param <T>         请求体类型
-     * @param url         请求 URL
-     * @param requestBody 请求体
-     * @param actionName  操作名称
-     * @return 响应结果
-     */
-    private <T> CommonResult<Boolean> doGet(String url, T requestBody, String actionName) {
-        log.info("[{}] Sending request to URL: {}", actionName, url);
-        try {
-            CommonResult<?> response = restTemplate.getForObject(url, CommonResult.class);
-            if (response != null && response.isSuccess()) {
-                return success(true);
-            } else {
-                log.warn("[{}] Request to URL: {} failed with response: {}", actionName, url, response);
-                return CommonResult.error(500, "Request failed");
-            }
-        } catch (Exception e) {
-            log.error("[{}] Error sending request to URL: {}", actionName, url, e);
-            return CommonResult.error(400, "Request error: " + e.getMessage());
-        }
-    }
-
-    /**
-     * 发送 POST 请求
-     *
-     * @param <T>         请求体类型
-     * @param url         请求 URL
-     * @param requestBody 请求体
-     * @param actionName  操作名称
-     * @return 响应结果
+     * 将与远程服务交互的通用逻辑抽取成一个私有方法
      */
     private <T> CommonResult<Boolean> doPost(String url, T requestBody, String actionName) {
         log.info("[{}] Sending request to URL: {}", actionName, url);
         try {
-            CommonResult<?> response = restTemplate.postForObject(url, requestBody, CommonResult.class);
-            if (response != null && response.isSuccess()) {
-                return success(true);
-            } else {
-                log.warn("[{}] Request to URL: {} failed with response: {}", actionName, url, response);
-                return CommonResult.error(500, "Request failed");
-            }
+            // 这里指定返回类型为 CommonResult<?>，根据后台服务返回的实际结构做调整
+            restTemplate.postForObject(url, requestBody, CommonResult.class);
+            // TODO @haohao：check 结果，是否成功
+            return success(true);
         } catch (Exception e) {
             log.error("[{}] Error sending request to URL: {}", actionName, url, e);
             return CommonResult.error(400, "Request error: " + e.getMessage());

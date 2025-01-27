@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.iot.plugin;
 
 import cn.hutool.extra.spring.SpringUtil;
-import cn.iocoder.yudao.module.iot.api.device.DeviceDataApi;
+import cn.iocoder.yudao.module.iot.api.device.IotDeviceUpstreamApi;
 import lombok.extern.slf4j.Slf4j;
 import org.pf4j.Plugin;
 import org.pf4j.PluginWrapper;
@@ -27,7 +27,7 @@ public class EmqxPlugin extends Plugin {
             executorService = Executors.newSingleThreadExecutor();
         }
 
-        DeviceDataApi deviceDataApi = SpringUtil.getBean(DeviceDataApi.class);
+        IotDeviceUpstreamApi deviceDataApi = SpringUtil.getBean(IotDeviceUpstreamApi.class);
         if (deviceDataApi == null) {
             log.error("未能从 ServiceRegistry 获取 DeviceDataApi 实例，请确保主程序已正确注册！");
             return;

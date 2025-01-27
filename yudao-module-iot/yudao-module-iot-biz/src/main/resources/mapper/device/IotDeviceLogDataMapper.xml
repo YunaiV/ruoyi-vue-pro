@@ -9,8 +9,9 @@
                 ts TIMESTAMP,
                 id NCHAR(50),
                 product_key NCHAR(50),
+                device_name NCHAR(50),
                 type NCHAR(50),
-                sub_type NCHAR(50),
+                identifier NCHAR(255),
                 content NCHAR(1024),
                 report_time TIMESTAMP
             ) TAGS (
@@ -18,18 +19,23 @@
             )
     </update>
 
+    <select id="showDeviceLogSTable" resultType="String">
+        SHOW STABLES LIKE 'device_log'
+    </select>
+
     <insert id="insert">
-        INSERT INTO device_log_${log.deviceKey} (ts, id, product_key, type, subType, content, report_time)
+        INSERT INTO device_log_${deviceKey} (ts, id, product_key, device_name, type, identifier, content, report_time)
         USING device_log
-        TAGS ('${log.deviceKey}')
+        TAGS ('${deviceKey}')
         VALUES (
             NOW,
-            #{log.id},
-            #{log.productKey},
-            #{log.type},
-            #{log.subType},
-            #{log.content},
-            #{log.reportTime}
+            #{id},
+            #{productKey},
+            #{deviceName},
+            #{type},
+            #{identifier},
+            #{content},
+            #{reportTime}
         )
     </insert>
 
@@ -51,6 +57,7 @@
         LIMIT #{reqVO.pageSize} OFFSET #{reqVO.pageNo}
     </select>
 
+    <!-- TODO 芋艿：看看能不能复用 mybatis-plus 的 selectCount 方法 -->
     <select id="selectCount" resultType="Long">
         SELECT COUNT(*)
         FROM device_log_${reqVO.deviceKey}
@@ -65,14 +72,6 @@
                 AND ts BETWEEN #{reqVO.createTime[0]} AND #{reqVO.createTime[1]}
             </if>
         </where>
-    </select>
-
-    <select id="checkDeviceLogSTableExists" resultType="Object">
-        SHOW STABLES LIKE 'device_log'
-    </select>
-
-    <select id="checkDeviceLogTableExists" resultType="Object">
-        SHOW TABLES LIKE 'device_log_${deviceKey}'
     </select>
 
 </mapper>

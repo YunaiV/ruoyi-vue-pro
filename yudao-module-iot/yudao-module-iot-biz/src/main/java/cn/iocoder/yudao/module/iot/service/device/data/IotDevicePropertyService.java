@@ -1,11 +1,10 @@
-package cn.iocoder.yudao.module.iot.service.device;
+package cn.iocoder.yudao.module.iot.service.device.data;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.iot.api.device.dto.IotDevicePropertyReportReqDTO;
 import cn.iocoder.yudao.module.iot.controller.admin.device.vo.deviceData.IotDeviceDataPageReqVO;
 import cn.iocoder.yudao.module.iot.controller.admin.device.vo.deviceData.IotDeviceDataSimulatorSaveReqVO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDataDO;
-import cn.iocoder.yudao.module.iot.dal.dataobject.tdengine.ThingModelMessage;
 import jakarta.validation.Valid;
 
 import java.util.List;
@@ -16,7 +15,7 @@ import java.util.Map;
  *
  * @author 芋道源码
  */
-public interface IotDevicePropertyDataService {
+public interface IotDevicePropertyService {
 
     /**
      * 定义设备属性数据的结构
@@ -31,13 +30,6 @@ public interface IotDevicePropertyDataService {
      * @param createDTO 设备数据
      */
     void saveDeviceData(IotDevicePropertyReportReqDTO createDTO);
-
-    /**
-     * 保存设备数据
-     *
-     * @param thingModelMessage 设备数据
-     */
-    void saveDeviceDataTest(ThingModelMessage thingModelMessage);
 
     /**
      * 模拟设备

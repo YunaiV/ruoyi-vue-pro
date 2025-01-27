@@ -8,7 +8,7 @@ import cn.iocoder.yudao.module.iot.controller.admin.product.vo.product.IotProduc
 import cn.iocoder.yudao.module.iot.dal.dataobject.product.IotProductDO;
 import cn.iocoder.yudao.module.iot.dal.mysql.product.IotProductMapper;
 import cn.iocoder.yudao.module.iot.enums.product.IotProductStatusEnum;
-import cn.iocoder.yudao.module.iot.service.device.IotDevicePropertyDataService;
+import cn.iocoder.yudao.module.iot.service.device.data.IotDevicePropertyService;
 import com.baomidou.dynamic.datasource.annotation.DSTransactional;
 import jakarta.annotation.Resource;
 import org.springframework.context.annotation.Lazy;
@@ -35,7 +35,7 @@ public class IotProductServiceImpl implements IotProductService {
 
     @Resource
     @Lazy  // 延迟加载，解决循环依赖
-    private IotDevicePropertyDataService devicePropertyDataService;
+    private IotDevicePropertyService devicePropertyDataService;
 
     @Override
     public Long createProduct(IotProductSaveReqVO createReqVO) {

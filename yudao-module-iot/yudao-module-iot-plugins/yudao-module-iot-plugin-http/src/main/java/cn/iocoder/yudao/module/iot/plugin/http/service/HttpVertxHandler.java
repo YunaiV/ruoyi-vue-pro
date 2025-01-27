@@ -2,19 +2,21 @@ package cn.iocoder.yudao.module.iot.plugin.http.service;
 
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
-import cn.iocoder.yudao.module.iot.api.device.DeviceDataApi;
+import cn.iocoder.yudao.module.iot.api.device.IotDeviceUpstreamApi;
 import cn.iocoder.yudao.module.iot.api.device.dto.IotDevicePropertyReportReqDTO;
 import io.vertx.core.Handler;
 import io.vertx.ext.web.RequestBody;
 import io.vertx.ext.web.RoutingContext;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.Map;
+
 @Slf4j
 public class HttpVertxHandler implements Handler<RoutingContext> {
 
-    private final DeviceDataApi deviceDataApi;
+    private final IotDeviceUpstreamApi deviceDataApi;
 
-    public HttpVertxHandler(DeviceDataApi deviceDataApi) {
+    public HttpVertxHandler(IotDeviceUpstreamApi deviceDataApi) {
         this.deviceDataApi = deviceDataApi;
     }
 
@@ -23,6 +25,7 @@ public class HttpVertxHandler implements Handler<RoutingContext> {
         String productKey = ctx.pathParam("productKey");
         String deviceName = ctx.pathParam("deviceName");
 
+        // TODO @haohao：requestBody.asJsonObject() 貌似天然就是 json 对象哈？
         RequestBody requestBody = ctx.body();
         JSONObject jsonData;
         try {
@@ -43,7 +46,7 @@ public class HttpVertxHandler implements Handler<RoutingContext> {
             IotDevicePropertyReportReqDTO reportReqDTO = IotDevicePropertyReportReqDTO.builder()
                     .productKey(productKey)
                     .deviceName(deviceName)
-                    .params(jsonData)
+                    .properties((Map<String, Object>) requestBody.asJsonObject().getMap().get("properties"))
                     .build();
 
             deviceDataApi.reportDevicePropertyData(reportReqDTO);

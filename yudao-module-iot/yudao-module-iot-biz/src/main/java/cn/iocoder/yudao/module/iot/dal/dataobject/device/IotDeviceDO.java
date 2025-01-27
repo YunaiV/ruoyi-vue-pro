@@ -36,6 +36,8 @@ public class IotDeviceDO extends BaseDO {
     private Long id;
     /**
      * 设备唯一标识符，全局唯一，用于识别设备
+     *
+     * 类似阿里云 <a href="https://help.aliyun.com/zh/iot/developer-reference/api-querydeviceinfo">QueryDeviceInfo</a> 的 IotInstanceId
      */
     private String deviceKey;
     /**

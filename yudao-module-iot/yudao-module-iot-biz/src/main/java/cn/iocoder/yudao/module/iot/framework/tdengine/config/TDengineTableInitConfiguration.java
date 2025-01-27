@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.iot.framework.tdengine.config;
 
-import cn.iocoder.yudao.module.iot.service.device.IotDeviceLogDataService;
+import cn.iocoder.yudao.module.iot.service.device.data.IotDeviceLogService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.ApplicationArguments;
@@ -17,7 +17,7 @@ import org.springframework.context.annotation.Configuration;
 @RequiredArgsConstructor
 public class TDengineTableInitConfiguration implements ApplicationRunner {
 
-    private final IotDeviceLogDataService deviceLogService;
+    private final IotDeviceLogService deviceLogService;
 
     @Override
     public void run(ApplicationArguments args) {

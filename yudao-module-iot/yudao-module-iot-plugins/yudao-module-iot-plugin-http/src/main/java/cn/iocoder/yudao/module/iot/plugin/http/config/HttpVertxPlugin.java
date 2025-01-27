@@ -2,7 +2,7 @@ package cn.iocoder.yudao.module.iot.plugin.http.config;
 
 import cn.hutool.core.lang.Assert;
 import cn.hutool.extra.spring.SpringUtil;
-import cn.iocoder.yudao.module.iot.api.device.DeviceDataApi;
+import cn.iocoder.yudao.module.iot.api.device.IotDeviceUpstreamApi;
 import lombok.extern.slf4j.Slf4j;
 import org.pf4j.PluginWrapper;
 import org.pf4j.spring.SpringPlugin;
@@ -64,7 +64,7 @@ public class HttpVertxPlugin extends SpringPlugin {
             protected void prepareRefresh() {
                 // 在刷新容器前注册主程序中的 Bean
                 ConfigurableListableBeanFactory beanFactory = this.getBeanFactory();
-                DeviceDataApi deviceDataApi = SpringUtil.getBean(DeviceDataApi.class);
+                IotDeviceUpstreamApi deviceDataApi = SpringUtil.getBean(IotDeviceUpstreamApi.class);
                 beanFactory.registerSingleton("deviceDataApi", deviceDataApi);
                 super.prepareRefresh();
             }

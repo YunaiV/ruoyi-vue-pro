@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.iot.plugin.common.config;
 
-import cn.iocoder.yudao.module.iot.api.device.DeviceDataApi;
+import cn.iocoder.yudao.module.iot.api.device.IotDeviceUpstreamApi;
 import cn.iocoder.yudao.module.iot.plugin.common.api.DeviceDataApiClient;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
@@ -43,7 +43,7 @@ public class YudaoDeviceDataApiAutoConfiguration {
      * @return DeviceDataApi 实例
      */
     @Bean
-    public DeviceDataApi deviceDataApi(RestTemplate restTemplate) {
+    public IotDeviceUpstreamApi deviceDataApi(RestTemplate restTemplate) {
         return new DeviceDataApiClient(restTemplate, deviceDataUrl);
     }
 

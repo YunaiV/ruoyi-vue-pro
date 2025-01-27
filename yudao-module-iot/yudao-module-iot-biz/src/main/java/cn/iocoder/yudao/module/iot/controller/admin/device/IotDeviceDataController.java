@@ -6,8 +6,8 @@ import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.iot.controller.admin.device.vo.deviceData.*;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDataDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceLogDO;
-import cn.iocoder.yudao.module.iot.service.device.IotDeviceLogDataService;
-import cn.iocoder.yudao.module.iot.service.device.IotDevicePropertyDataService;
+import cn.iocoder.yudao.module.iot.service.device.data.IotDeviceLogService;
+import cn.iocoder.yudao.module.iot.service.device.data.IotDevicePropertyService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
@@ -27,13 +27,13 @@ import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 public class IotDeviceDataController {
 
     @Resource
-    private IotDevicePropertyDataService deviceDataService;
+    private IotDevicePropertyService deviceDataService;
 
     @Resource
-    private IotDeviceLogDataService iotDeviceLogDataService;
+    private IotDeviceLogService iotDeviceLogDataService;
 
     @Resource // TODO @super：service 之间，不用空行；原因是，这样更简洁；空行，主要是为了“间隔”，提升可读性
-    private IotDeviceLogDataService deviceLogDataService;
+    private IotDeviceLogService deviceLogDataService;
 
     // TODO @浩浩：这里的 /latest-list，包括方法名。
     @GetMapping("/latest")

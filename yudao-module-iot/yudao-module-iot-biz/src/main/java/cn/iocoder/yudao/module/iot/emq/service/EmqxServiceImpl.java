@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.iot.emq.service;
 
 import cn.iocoder.yudao.module.iot.api.device.dto.IotDevicePropertyReportReqDTO;
-import cn.iocoder.yudao.module.iot.service.device.IotDevicePropertyDataService;
+import cn.iocoder.yudao.module.iot.service.device.data.IotDevicePropertyService;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.paho.client.mqttv3.MqttClient;
@@ -20,7 +20,7 @@ import org.springframework.scheduling.annotation.Async;
 public class EmqxServiceImpl implements EmqxService {
 
     @Resource
-    private IotDevicePropertyDataService iotDeviceDataService;
+    private IotDevicePropertyService iotDeviceDataService;
 
     // TODO 多线程处理消息
     @Override
@@ -35,8 +35,8 @@ public class EmqxServiceImpl implements EmqxService {
             String deviceName = topic.split("/")[3];
             String message = new String(mqttMessage.getPayload());
             IotDevicePropertyReportReqDTO createDTO = IotDevicePropertyReportReqDTO.builder()
-                    .productKey(productKey)
-                    .deviceName(deviceName)
+//                    .productKey(productKey)
+//                    .deviceName(deviceName)
 //                    .properties(message) // TODO 芋艿：临时去掉，看看
                     .build();
             iotDeviceDataService.saveDeviceData(createDTO);
