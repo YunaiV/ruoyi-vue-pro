@@ -18,7 +18,7 @@ public enum IotProductStatusEnum implements ArrayValuable<Integer> {
     UNPUBLISHED(0, "开发中"),
     PUBLISHED(1, "已发布");
 
-    public static final Integer[] ARRAYS = Arrays.stream(values()).map(IotProductStatusEnum::getType).toArray(Integer[]::new);
+    public static final Integer[] ARRAYS = Arrays.stream(values()).map(IotProductStatusEnum::getStatus).toArray(Integer[]::new);
 
     /**
      * 类型

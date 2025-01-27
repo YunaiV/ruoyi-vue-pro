@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.iot.enums.plugin;
 
-import cn.iocoder.yudao.framework.common.core.IntArrayValuable;
+import cn.iocoder.yudao.framework.common.core.ArrayValuable;
 import lombok.Getter;
 
 import java.util.Arrays;
@@ -11,12 +11,12 @@ import java.util.Arrays;
  * @author haohao
  */
 @Getter
-public enum IotPluginDeployTypeEnum implements IntArrayValuable {
+public enum IotPluginDeployTypeEnum implements ArrayValuable<Integer> {
 
     JAR(0, "JAR 部署"),
     STANDALONE(1, "独立部署");
 
-    public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(IotPluginDeployTypeEnum::getDeployType).toArray();
+    public static final Integer[] ARRAYS = Arrays.stream(values()).map(IotPluginDeployTypeEnum::getDeployType).toArray(Integer[]::new);
 
     /**
      * 部署方式
@@ -45,7 +45,7 @@ public enum IotPluginDeployTypeEnum implements IntArrayValuable {
     }
 
     @Override
-    public int[] array() {
+    public Integer[] array() {
         return ARRAYS;
     }
 

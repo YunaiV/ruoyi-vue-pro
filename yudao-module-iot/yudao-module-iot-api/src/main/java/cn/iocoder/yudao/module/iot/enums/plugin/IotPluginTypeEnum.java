@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.iot.enums.plugin;
 
-import cn.iocoder.yudao.framework.common.core.IntArrayValuable;
+import cn.iocoder.yudao.framework.common.core.ArrayValuable;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -13,12 +13,12 @@ import java.util.Arrays;
  */
 @AllArgsConstructor
 @Getter
-public enum IotPluginTypeEnum implements IntArrayValuable {
+public enum IotPluginTypeEnum implements ArrayValuable<Integer> {
 
     NORMAL(0, "普通插件"),
     DEVICE(1, "设备插件");
 
-    public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(IotPluginTypeEnum::getType).toArray();
+    public static final Integer[] ARRAYS = Arrays.stream(values()).map(IotPluginTypeEnum::getType).toArray(Integer[]::new);
 
     /**
      * 类型
@@ -31,7 +31,7 @@ public enum IotPluginTypeEnum implements IntArrayValuable {
     private final String name;
 
     @Override
-    public int[] array() {
+    public Integer[] array() {
         return ARRAYS;
     }
 

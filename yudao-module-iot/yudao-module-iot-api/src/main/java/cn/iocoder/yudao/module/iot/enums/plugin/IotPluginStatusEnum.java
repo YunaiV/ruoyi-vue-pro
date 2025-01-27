@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.iot.enums.plugin;
 
-import cn.iocoder.yudao.framework.common.core.IntArrayValuable;
+import cn.iocoder.yudao.framework.common.core.ArrayValuable;
 import lombok.Getter;
 
 import java.util.Arrays;
@@ -11,12 +11,12 @@ import java.util.Arrays;
  * @author haohao
  */
 @Getter
-public enum IotPluginStatusEnum implements IntArrayValuable {
+public enum IotPluginStatusEnum implements ArrayValuable<Integer> {
 
     STOPPED(0, "停止"),
     RUNNING(1, "运行");
 
-    public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(IotPluginStatusEnum::getStatus).toArray();
+    public static final Integer[] ARRAYS = Arrays.stream(values()).map(IotPluginStatusEnum::getStatus).toArray(Integer[]::new);
 
     /**
      * 状态
@@ -41,7 +41,7 @@ public enum IotPluginStatusEnum implements IntArrayValuable {
     }
 
     @Override
-    public int[] array() {
+    public Integer[] array() {
         return ARRAYS;
     }
 
