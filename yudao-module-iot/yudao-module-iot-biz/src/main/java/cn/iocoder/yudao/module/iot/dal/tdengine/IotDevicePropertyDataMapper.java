@@ -4,7 +4,6 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.iocoder.yudao.framework.tenant.core.aop.TenantIgnore;
 import cn.iocoder.yudao.module.iot.dal.dataobject.tdengine.SelectVisualDO;
-import cn.iocoder.yudao.module.iot.dal.dataobject.tdengine.TdTableDO;
 import cn.iocoder.yudao.module.iot.framework.tdengine.core.TDengineTableField;
 import cn.iocoder.yudao.module.iot.framework.tdengine.core.annotation.TDengineDS;
 import com.baomidou.mybatisplus.annotation.InterceptorIgnore;
@@ -77,27 +76,6 @@ public interface IotDevicePropertyDataMapper {
 
     void alterProductPropertySTableDropField(@Param("productKey") String productKey,
                                              @Param("field") TDengineTableField field);
-
-    //TODO:先参考一下老逻辑，后续改进
-    /**
-     * 插入数据 - 指定列插入数据
-     *
-     * @param table 数据
-     *              productKey 产品 key
-     *              deviceKey 设备 key
-     *              columns 列
-     */
-    void insertDevicePropertyData(TdTableDO table);
-
-    //TODO:先参考一下老逻辑，后续改进
-    /**
-     * 查看超级表 - 获取超级表的结构信息
-     * SQL：DESCRIBE [db_name.]stb_name;
-     *
-     * @param superTable 超级表信息
-     *              productKey 产品 key
-     */
-    List<Map<String, Object>> describeSuperTable(TdTableDO superTable);
 
     /**
      * 获取历史数据列表
