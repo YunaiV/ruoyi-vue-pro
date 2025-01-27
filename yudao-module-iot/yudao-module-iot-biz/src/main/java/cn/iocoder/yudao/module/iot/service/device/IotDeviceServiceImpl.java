@@ -11,14 +11,17 @@ import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.common.util.validation.ValidationUtils;
 import cn.iocoder.yudao.framework.tenant.core.aop.TenantIgnore;
 import cn.iocoder.yudao.framework.tenant.core.util.TenantUtils;
+import cn.iocoder.yudao.module.iot.api.device.dto.IotDevicePropertyReportReqDTO;
 import cn.iocoder.yudao.module.iot.controller.admin.device.vo.device.*;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceGroupDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.product.IotProductDO;
 import cn.iocoder.yudao.module.iot.dal.mysql.device.IotDeviceMapper;
 import cn.iocoder.yudao.module.iot.dal.redis.RedisKeyConstants;
+import cn.iocoder.yudao.module.iot.enums.device.IotDeviceMessageTypeEnum;
 import cn.iocoder.yudao.module.iot.enums.device.IotDeviceStatusEnum;
 import cn.iocoder.yudao.module.iot.enums.product.IotProductDeviceTypeEnum;
+import cn.iocoder.yudao.module.iot.service.device.upstream.IotDeviceUpstreamService;
 import cn.iocoder.yudao.module.iot.service.product.IotProductService;
 import jakarta.annotation.Resource;
 import jakarta.validation.ConstraintViolationException;
@@ -56,6 +59,9 @@ public class IotDeviceServiceImpl implements IotDeviceService {
     @Resource
     @Lazy // 延迟加载，解决循环依赖
     private IotDeviceGroupService deviceGroupService;
+    @Resource
+    @Lazy // 延迟加载，解决循环依赖
+    private IotDeviceUpstreamService deviceUpstreamService;
 
     @Override
     public Long createDevice(IotDeviceSaveReqVO createReqVO) {
@@ -84,6 +90,7 @@ public class IotDeviceServiceImpl implements IotDeviceService {
 
         // 2.1 转换 VO 为 DO
         // TODO @芋艿：state 相关的参数。另外，到底叫 state，还是 status 好！
+        // TODO @芋艿：各种 mqtt 是不是可以简化！
         IotDeviceDO device = BeanUtils.toBean(createReqVO, IotDeviceDO.class, o -> {
             o.setProductKey(product.getProductKey()).setDeviceType(product.getDeviceType());
             // 生成并设置必要的字段
@@ -390,6 +397,36 @@ public class IotDeviceServiceImpl implements IotDeviceService {
             }
         });
         return respVO;
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public void simulationReportDevice(IotDeviceSimulationReportReqVO reportReqVO) {
+        // 1. 校验存在
+        IotDeviceDO device = validateDeviceExists(reportReqVO.getId());
+
+        // 2.1 情况一：属性上报
+        String requestId = IdUtil.fastSimpleUUID();
+        if (Objects.equals(reportReqVO.getType(), IotDeviceMessageTypeEnum.PROPERTY.getType())) {
+            deviceUpstreamService.reportDeviceProperty(IotDevicePropertyReportReqDTO.builder()
+                    .requestId(requestId).reportTime(LocalDateTime.now())
+                    .productKey(device.getProductKey()).deviceName(device.getDeviceName())
+                    .properties((Map<String, Object>) reportReqVO.getData()).build());
+            return;
+        }
+        // 2.2 情况二：事件上报
+        if (Objects.equals(reportReqVO.getType(), IotDeviceMessageTypeEnum.EVENT.getType())) {
+            // TODO 芋艿：待实现
+            return;
+        }
+        // 2.3 情况三：状态变更
+        if (Objects.equals(reportReqVO.getType(), IotDeviceMessageTypeEnum.STATE.getType())) {
+            // TODO 芋艿：待实现
+            updateDeviceStatus(new IotDeviceStatusUpdateReqVO().setId(device.getId())
+                    .setStatus((Integer) reportReqVO.getData()));
+            return;
+        }
+        throw new IllegalArgumentException("未知的类型：" + reportReqVO.getType());
     }
 
     private void deleteDeviceCache(IotDeviceDO device) {

@@ -49,7 +49,7 @@ public class HttpVertxHandler implements Handler<RoutingContext> {
                     .properties((Map<String, Object>) requestBody.asJsonObject().getMap().get("properties"))
                     .build();
 
-            deviceDataApi.reportDevicePropertyData(reportReqDTO);
+            deviceDataApi.reportDeviceProperty(reportReqDTO);
 
             ctx.response()
                     .setStatusCode(200)

@@ -159,4 +159,12 @@ public class IotDeviceController {
         ExcelUtils.write(response, "设备导入模板.xls", "数据", IotDeviceImportExcelVO.class, list);
     }
 
+    @PostMapping("/simulation-report")
+    @Operation(summary = "模拟设备上报")
+    @PreAuthorize("@ss.hasPermission('iot:device:simulation-report')")
+    public CommonResult<Boolean> simulationReportDevice(@Valid @RequestBody IotDeviceSimulationReportReqVO simulatorReqVO) {
+        deviceService.simulationReportDevice(simulatorReqVO);
+        return success(true);
+    }
+
 }

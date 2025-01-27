@@ -43,7 +43,7 @@ public class IotDeviceUpstreamServiceImpl implements IotDeviceUpstreamService {
     }
 
     @Override
-    public void reportDevicePropertyData(IotDevicePropertyReportReqDTO reportReqDTO) {
+    public void reportDeviceProperty(IotDevicePropertyReportReqDTO reportReqDTO) {
         // 1.1 获得设备
         log.info("[reportDevicePropertyData][上报设备属性数据: {}]", reportReqDTO);
         IotDeviceDO device = deviceService.getDeviceByProductKeyAndDeviceNameFromCache(
@@ -65,7 +65,7 @@ public class IotDeviceUpstreamServiceImpl implements IotDeviceUpstreamService {
     }
 
     @Override
-    public void reportDeviceEventData(IotDeviceEventReportReqDTO reportReqDTO) {
+    public void reportDeviceEvent(IotDeviceEventReportReqDTO reportReqDTO) {
         log.info("[reportDeviceEventData][上报设备事件数据: {}]", reportReqDTO);
 
         // TODO 芋艿：待实现

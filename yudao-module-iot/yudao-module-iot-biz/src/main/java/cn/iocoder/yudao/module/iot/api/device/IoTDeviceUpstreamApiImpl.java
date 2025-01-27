@@ -29,14 +29,14 @@ public class IoTDeviceUpstreamApiImpl implements IotDeviceUpstreamApi {
     }
 
     @Override
-    public CommonResult<Boolean> reportDevicePropertyData(IotDevicePropertyReportReqDTO reportReqDTO) {
-        deviceUpstreamService.reportDevicePropertyData(reportReqDTO);
+    public CommonResult<Boolean> reportDeviceProperty(IotDevicePropertyReportReqDTO reportReqDTO) {
+        deviceUpstreamService.reportDeviceProperty(reportReqDTO);
         return success(true);
     }
 
     @Override
-    public CommonResult<Boolean> reportDeviceEventData(IotDeviceEventReportReqDTO reportReqDTO) {
-        deviceUpstreamService.reportDeviceEventData(reportReqDTO);
+    public CommonResult<Boolean> reportDeviceEvent(IotDeviceEventReportReqDTO reportReqDTO) {
+        deviceUpstreamService.reportDeviceEvent(reportReqDTO);
         return success(true);
     }
 

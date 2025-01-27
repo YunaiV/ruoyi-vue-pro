@@ -4,8 +4,8 @@ import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.iot.controller.admin.device.vo.deviceData.*;
-import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDevicePropertyDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceLogDO;
+import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDevicePropertyDO;
 import cn.iocoder.yudao.module.iot.service.device.data.IotDeviceLogService;
 import cn.iocoder.yudao.module.iot.service.device.data.IotDevicePropertyService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -13,7 +13,9 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 import java.util.Map;
@@ -45,16 +47,6 @@ public class IotDeviceDataController {
     public CommonResult<PageResult<IotTimeDataRespVO>> getHistoryDeviceProperties(@Valid IotDeviceDataPageReqVO deviceDataReqVO) {
         PageResult<Map<String, Object>> list = deviceDataService.getHistoryDeviceProperties(deviceDataReqVO);
         return success(BeanUtils.toBean(list, IotTimeDataRespVO.class));
-    }
-
-    // TODO:功能权限
-    @PostMapping("/simulator")
-    @Operation(summary = "模拟设备")
-    public CommonResult<Boolean> simulatorDevice(@Valid @RequestBody IotDeviceDataSimulatorSaveReqVO simulatorReqVO) {
-        //TODO:先使用 IotDeviceDataSimulatorSaveReqVO  另外content里数据类型的效验前端也没做，后端应该要要效验一下，这块后续看看怎么安排
-        // TODO @super：应该 deviceDataService 里面有个 simulatorDevice，然后里面去 insert 日志！
-        deviceDataService.simulatorSend(simulatorReqVO);
-        return success(true);
     }
 
     // TODO:功能权限

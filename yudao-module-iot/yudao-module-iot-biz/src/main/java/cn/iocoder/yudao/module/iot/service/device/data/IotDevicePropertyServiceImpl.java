@@ -4,12 +4,9 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.hutool.json.JSONObject;
-import cn.hutool.json.JSONUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.tenant.core.aop.TenantIgnore;
 import cn.iocoder.yudao.module.iot.controller.admin.device.vo.deviceData.IotDeviceDataPageReqVO;
-import cn.iocoder.yudao.module.iot.controller.admin.device.vo.deviceData.IotDeviceDataSimulatorSaveReqVO;
 import cn.iocoder.yudao.module.iot.controller.admin.thingmodel.model.dataType.ThingModelDateOrTextDataSpecs;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDevicePropertyDO;
@@ -34,9 +31,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
-import static cn.iocoder.yudao.module.iot.enums.ErrorCodeConstants.DEVICE_DATA_CONTENT_JSON_PARSE_ERROR;
 
 /**
  * IoT 设备【属性】数据 Service 实现类
@@ -153,33 +148,6 @@ public class IotDevicePropertyServiceImpl implements IotDevicePropertyService {
         // 3.2 保存设备属性【日志】
         deviceDataRedisDAO.set(message.getDeviceKey(), convertMap(properties.entrySet(), Map.Entry::getKey,
                 entry -> IotDevicePropertyDO.builder().value(entry.getValue()).updateTime(message.getReportTime()).build()));
-    }
-
-    //TODO @芋艿:copy 了 saveDeviceData 的逻辑，后续看看这块怎么优化
-    @Override
-    public void simulatorSend(IotDeviceDataSimulatorSaveReqVO simulatorReqVO) {
-        // 1. 根据设备 key ，获得设备信息
-        IotDeviceDO device = deviceService.getDeviceByDeviceKey(simulatorReqVO.getDeviceKey());
-
-        // 2. 解析 content 为 JSON 对象
-        JSONObject contentJson;
-        try {
-            contentJson = JSONUtil.parseObj(simulatorReqVO.getContent());
-        } catch (Exception e) {
-            throw exception(DEVICE_DATA_CONTENT_JSON_PARSE_ERROR);
-        }
-
-        // TODO @芋艿：后续优化
-        // 3. 构建物模型消息
-//        IotDeviceMessage thingModelMessage = IotDeviceMessage.builder()
-//                .params(contentJson) // 将 content 作为 params
-//                .time(simulatorReqVO.getReportTime()) // 使用上报时间
-//                .productKey(simulatorReqVO.getProductKey())
-//                .deviceName(device.getDeviceName())
-//                .build();
-
-        // 4. 发送模拟消息
-//        simulateSendProducer.sendDeviceMessage(thingModelMessage);
     }
 
     @Override

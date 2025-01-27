@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.nio.file.Paths;
+
 // TODO @芋艿：需要 review 下
 @Slf4j
 @Configuration
@@ -19,8 +21,8 @@ public class UnifiedConfiguration {
 //    @DependsOn("deviceDataApiImpl")
     public SpringPluginManager pluginManager() {
         log.info("[init][实例化 SpringPluginManager]");
-//        SpringPluginManager springPluginManager = new SpringPluginManager(Paths.get(pluginsDir)) {
-        SpringPluginManager springPluginManager = new SpringPluginManager() {
+        SpringPluginManager springPluginManager = new SpringPluginManager(Paths.get(pluginsDir)) {
+//        SpringPluginManager springPluginManager = new SpringPluginManager() {
 
             @Override
             public void startPlugins() {

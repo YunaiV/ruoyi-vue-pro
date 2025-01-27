@@ -2,7 +2,6 @@ package cn.iocoder.yudao.module.iot.service.device.data;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.iot.controller.admin.device.vo.deviceData.IotDeviceDataPageReqVO;
-import cn.iocoder.yudao.module.iot.controller.admin.device.vo.deviceData.IotDeviceDataSimulatorSaveReqVO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDevicePropertyDO;
 import cn.iocoder.yudao.module.iot.mq.message.IotDeviceMessage;
 import jakarta.validation.Valid;
@@ -30,13 +29,6 @@ public interface IotDevicePropertyService {
      * @param message 设备消息
      */
     void saveDeviceProperty(IotDeviceMessage message);
-
-    /**
-     * 模拟设备
-     *
-     * @param simulatorReqVO 设备数据
-     */
-    void simulatorSend(IotDeviceDataSimulatorSaveReqVO simulatorReqVO);
 
     /**
      * 获得设备属性最新数据

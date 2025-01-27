@@ -25,13 +25,13 @@ public interface IotDeviceUpstreamService {
      *
      * @param reportReqDTO 上报设备属性数据 DTO
      */
-    void reportDevicePropertyData(IotDevicePropertyReportReqDTO reportReqDTO);
+    void reportDeviceProperty(IotDevicePropertyReportReqDTO reportReqDTO);
 
     /**
      * 上报设备事件数据
      *
      * @param reportReqDTO 设备事件
      */
-    void reportDeviceEventData(IotDeviceEventReportReqDTO reportReqDTO);
+    void reportDeviceEvent(IotDeviceEventReportReqDTO reportReqDTO);
 
 }

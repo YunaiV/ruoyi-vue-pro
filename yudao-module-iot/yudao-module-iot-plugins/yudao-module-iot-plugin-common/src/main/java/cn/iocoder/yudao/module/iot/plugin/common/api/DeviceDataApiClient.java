@@ -35,13 +35,13 @@ public class DeviceDataApiClient implements IotDeviceUpstreamApi {
     }
 
     @Override
-    public CommonResult<Boolean> reportDeviceEventData(IotDeviceEventReportReqDTO reportReqDTO) {
+    public CommonResult<Boolean> reportDeviceEvent(IotDeviceEventReportReqDTO reportReqDTO) {
         String url = deviceDataUrl + URL_PREFIX + "/report-event";
         return doPost(url, reportReqDTO, "reportDeviceEventData");
     }
 
     @Override
-    public CommonResult<Boolean> reportDevicePropertyData(IotDevicePropertyReportReqDTO reportReqDTO) {
+    public CommonResult<Boolean> reportDeviceProperty(IotDevicePropertyReportReqDTO reportReqDTO) {
         String url = deviceDataUrl + URL_PREFIX + "/report-property";
         return doPost(url, reportReqDTO, "reportDevicePropertyData");
     }

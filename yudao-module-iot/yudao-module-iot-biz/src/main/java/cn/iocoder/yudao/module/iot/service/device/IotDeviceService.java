@@ -1,13 +1,8 @@
 package cn.iocoder.yudao.module.iot.service.device;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.iot.controller.admin.device.vo.device.IotDevicePageReqVO;
-import cn.iocoder.yudao.module.iot.controller.admin.device.vo.device.IotDeviceSaveReqVO;
-import cn.iocoder.yudao.module.iot.controller.admin.device.vo.device.IotDeviceStatusUpdateReqVO;
-import cn.iocoder.yudao.module.iot.controller.admin.device.vo.device.IotDeviceUpdateGroupReqVO;
+import cn.iocoder.yudao.module.iot.controller.admin.device.vo.device.*;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDO;
-import cn.iocoder.yudao.module.iot.controller.admin.device.vo.device.IotDeviceImportRespVO;
-import cn.iocoder.yudao.module.iot.controller.admin.device.vo.device.IotDeviceImportExcelVO;
 import jakarta.validation.Valid;
 
 import javax.annotation.Nullable;
@@ -132,5 +127,12 @@ public interface IotDeviceService {
      * @return 导入结果
      */
     IotDeviceImportRespVO importDevice(List<IotDeviceImportExcelVO> importDevices, boolean updateSupport);
+
+    /**
+     * 模拟设备上报
+     *
+     * @param reportReqVO 上报信息
+     */
+    void simulationReportDevice(IotDeviceSimulationReportReqVO reportReqVO);
 
 }

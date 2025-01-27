@@ -35,7 +35,7 @@ public interface IotDeviceUpstreamApi {
      * @param reportReqDTO 上报设备属性数据 DTO
      */
     @PostMapping(PREFIX + "/report-property")
-    CommonResult<Boolean> reportDevicePropertyData(@Valid @RequestBody IotDevicePropertyReportReqDTO reportReqDTO);
+    CommonResult<Boolean> reportDeviceProperty(@Valid @RequestBody IotDevicePropertyReportReqDTO reportReqDTO);
 
     /**
      * 上报设备事件数据
@@ -43,6 +43,6 @@ public interface IotDeviceUpstreamApi {
      * @param reportReqDTO 设备事件
      */
     @PostMapping(PREFIX + "/report-event")
-    CommonResult<Boolean> reportDeviceEventData(@Valid @RequestBody IotDeviceEventReportReqDTO reportReqDTO);
+    CommonResult<Boolean> reportDeviceEvent(@Valid @RequestBody IotDeviceEventReportReqDTO reportReqDTO);
 
 }
