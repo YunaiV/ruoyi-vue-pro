@@ -35,4 +35,7 @@ public class UserPageReqVO extends PageParam {
     @Schema(description = "部门编号，同时筛选子部门", example = "1024")
     private Long deptId;
 
+    @Schema(description = "角色编号", example = "1024")
+    private Long roleId;
+
 }

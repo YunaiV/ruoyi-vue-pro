@@ -87,6 +87,7 @@ public interface ProductCategoryService {
      * 校验商品分类是否有效。如下情况，视为无效：
      * 1. 商品分类编号不存在
      * 2. 商品分类被禁用
+     * 3. 商品分类层级校验，必须使用第二级的商品分类及以下
      *
      * @param ids 商品分类编号数组
      */

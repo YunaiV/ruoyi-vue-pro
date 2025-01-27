@@ -2,7 +2,7 @@ package cn.iocoder.yudao.module.crm.enums.permission;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjUtil;
-import cn.iocoder.yudao.framework.common.core.IntArrayValuable;
+import cn.iocoder.yudao.framework.common.core.ArrayValuable;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -17,13 +17,13 @@ import java.util.Arrays;
  */
 @Getter
 @AllArgsConstructor
-public enum CrmPermissionLevelEnum implements IntArrayValuable {
+public enum CrmPermissionLevelEnum implements ArrayValuable<Integer> {
 
     OWNER(1, "负责人"),
     READ(2, "只读"),
     WRITE(3, "读写");
 
-    public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(CrmPermissionLevelEnum::getLevel).toArray();
+    public static final Integer[] ARRAYS = Arrays.stream(values()).map(CrmPermissionLevelEnum::getLevel).toArray(Integer[]::new);
 
     /**
      * 级别
@@ -35,7 +35,7 @@ public enum CrmPermissionLevelEnum implements IntArrayValuable {
     private final String name;
 
     @Override
-    public int[] array() {
+    public Integer[] array() {
         return ARRAYS;
     }
 

@@ -2,10 +2,10 @@ package cn.iocoder.yudao.module.promotion.api.reward;
 
 import cn.iocoder.yudao.module.promotion.api.reward.dto.RewardActivityMatchRespDTO;
 import cn.iocoder.yudao.module.promotion.service.reward.RewardActivityService;
+import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
-import jakarta.annotation.Resource;
 import java.util.Collection;
 import java.util.List;
 
@@ -22,8 +22,8 @@ public class RewardActivityApiImpl implements RewardActivityApi {
     private RewardActivityService rewardActivityService;
 
     @Override
-    public List<RewardActivityMatchRespDTO> getMatchRewardActivityList(Collection<Long> spuIds) {
-        return rewardActivityService.getMatchRewardActivityList(spuIds);
+    public List<RewardActivityMatchRespDTO> getMatchRewardActivityListBySpuIds(Collection<Long> spuIds) {
+        return rewardActivityService.getMatchRewardActivityListBySpuIds(spuIds);
     }
 
 }

@@ -58,6 +58,20 @@ services:
             - ./oracle/1_create_user.sql:/docker-entrypoint-initdb.d/1_create_user.sql:ro
             - ./oracle/2_create_schema.sh:/docker-entrypoint-initdb.d/2_create_schema.sh:ro
 
+    oracle_m1:
+      image: einslib/oracle-19c:19.3.0-ee-slim-faststart
+      restart: unless-stopped
+      environment:
+        ## 登录信息 SID: FREE user: system password: oracle
+        ORACLE_PASSWORD: oracle
+      ports:
+        - "1521:1521"
+      volumes:
+        - ../oracle/ruoyi-vue-pro.sql:/tmp/schema.sql:ro
+        # 创建app用户: ROOT/123456@//localhost/XEPDB1
+        - ./oracle/1_create_user.sql:/docker-entrypoint-initdb.d/1_create_user.sql:ro
+        - ./oracle/2_create_schema.sh:/docker-entrypoint-initdb.d/2_create_schema.sh:ro
+
     sqlserver:
         image: mcr.microsoft.com/mssql/server:2017-latest
         restart: unless-stopped
@@ -73,11 +87,9 @@ services:
             # docker compose exec sqlserver bash /tmp/create_schema.sh
             - ./sqlserver/create_schema.sh:/tmp/create_schema.sh:ro
 
-
     dm8:
-        # wget https://download.dameng.com/eco/dm8/dm8_20230808_rev197096_x86_rh6_64_single.tar
-        # docker load -i dm8_20230808_rev197096_x86_rh6_64_single.tar
-        image: dm8_single:dm8_20230808_rev197096_x86_rh6_64
+        # docker load -i dm8_20240715_x86_rh6_rq_single.tar
+        image: dm8_single:dm8_20240715_rev232765_x86_rh6_64
         restart: unless-stopped
         environment:
             PAGE_SIZE: 16
@@ -93,13 +105,10 @@ services:
         volumes:
             - dm8:/opt/dmdbms/data
             - ../dm/ruoyi-vue-pro-dm8.sql:/tmp/schema.sql:ro
-            # docker compose exec dm8 bash -c '/opt/dmdbms/bin/disql SYSDBA/SYSDBA001 \`/tmp/schema.sql'
 
     kingbase:
-        # x86_64: https://kingbase.oss-cn-beijing.aliyuncs.com/KESV8R3/V009R001C001B0025-安装包-docker/x86_64/kdb_x86_64_V009R001C001B0025.tar
-        # aarch64: https://kingbase.oss-cn-beijing.aliyuncs.com/KESV8R3/V009R001C001B0025-安装包-docker/aarch64/kdb_aarch64_V009R001C001B0025.tar
-        # docker load -i kdb_x86_64_V009R001C001B0025.tar
         image: kingbase_v009r001c001b0025_single_x86:v1
+#        image: kingbase_v009r001c001b0025_single_arm:v1
         restart: unless-stopped
         environment:
             DB_USER: root
@@ -109,7 +118,6 @@ services:
         volumes:
             - kingbase:/home/kingbase/userdata
             - ../kingbase/ruoyi-vue-pro.sql:/tmp/schema.sql:ro
-            # docker compose exec kingbase bash -c 'ksql -U $DB_USER -d test -f /tmp/schema.sql'
 
     opengauss:
         image: opengauss/opengauss:5.0.0

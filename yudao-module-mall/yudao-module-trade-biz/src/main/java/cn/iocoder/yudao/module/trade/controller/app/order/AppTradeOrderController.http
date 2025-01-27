@@ -62,3 +62,8 @@ tenant-id: {{appTenentId}}
 GET {{appApi}}/trade/order/get-express-track-list?id=70
 Authorization: Bearer {{appToken}}
 tenant-id: {{appTenentId}}
+
+### /trade-order/settlement-product 获得商品结算信息
+GET {{appApi}}/trade/order/settlement-product?spuIds=633
+Authorization: Bearer {{appToken}}
+tenant-id: {{appTenentId}}

@@ -131,7 +131,7 @@ public class CombinationRecordServiceImpl implements CombinationRecordService {
             throw exception(COMBINATION_JOIN_ACTIVITY_PRODUCT_NOT_EXISTS);
         }
         // 4.3 校验库存是否充足
-        if (count > sku.getStock()) {
+        if (count >= sku.getStock()) {
             throw exception(COMBINATION_ACTIVITY_UPDATE_STOCK_FAIL);
         }
 
@@ -375,7 +375,7 @@ public class CombinationRecordServiceImpl implements CombinationRecordService {
             CombinationRecordDO updateRecord = new CombinationRecordDO().setId(item.getId())
                     .setStatus(status.getStatus()).setEndTime(now);
             if (CombinationRecordStatusEnum.isSuccess(status.getStatus())) { // 虚拟成团完事更改状态成功后还需要把参与人数修改为成团需要人数
-                updateRecord.setUserCount(updateRecord.getUserSize());
+                updateRecord.setUserCount(records.size()).setVirtualGroup(Boolean.TRUE); // 标记为虚拟成团
             }
             updateRecords.add(updateRecord);
         });

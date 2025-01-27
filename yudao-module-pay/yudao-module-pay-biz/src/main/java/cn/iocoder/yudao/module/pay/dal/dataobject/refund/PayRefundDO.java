@@ -59,7 +59,7 @@ public class PayRefundDO extends BaseDO {
      */
     private Long channelId;
     /**
-     * 商户编码
+     * 渠道编码
      *
      * 枚举 {@link PayChannelEnum}
      */
