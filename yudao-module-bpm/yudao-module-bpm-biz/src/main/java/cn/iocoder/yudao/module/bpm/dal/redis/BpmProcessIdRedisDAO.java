@@ -29,6 +29,7 @@ public class BpmProcessIdRedisDAO {
     public String generate(BpmModelMetaInfoVO.ProcessIdRule processIdRule) {
         // 生成日期前缀
         String infix = "";
+        boolean expireEnable = true;
         switch (processIdRule.getInfix()) {
             case "DAY":
                 infix = DateUtil.format(LocalDateTime.now(), "yyyyMMDD");
@@ -42,13 +43,18 @@ public class BpmProcessIdRedisDAO {
             case "SECOND":
                 infix = DateUtil.format(LocalDateTime.now(), "yyyyMMDDHHmmss");
                 break;
+            default:
+                expireEnable = false;
+                break;
         }
 
         // 生成序号
         String noPrefix = processIdRule.getPrefix() + infix + processIdRule.getPostfix();
         String key = RedisKeyConstants.BPM_PROCESS_ID + noPrefix;
         Long no = stringRedisTemplate.opsForValue().increment(key);
-        stringRedisTemplate.expire(key, Duration.ofDays(1L));
+        if (Boolean.TRUE.equals(expireEnable)) {
+            stringRedisTemplate.expire(key, Duration.ofDays(1L));
+        }
         return noPrefix + String.format("%0" + processIdRule.getLength() + "d", no);
     }
 
