@@ -3,7 +3,6 @@ package cn.iocoder.yudao.module.iot.service.device.upstream;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
-import cn.iocoder.yudao.framework.tenant.core.util.TenantUtils;
 import cn.iocoder.yudao.module.iot.api.device.dto.IotDeviceEventReportReqDTO;
 import cn.iocoder.yudao.module.iot.api.device.dto.IotDevicePropertyReportReqDTO;
 import cn.iocoder.yudao.module.iot.api.device.dto.IotDeviceStatusUpdateReqDTO;
@@ -47,7 +46,8 @@ public class IotDeviceUpstreamServiceImpl implements IotDeviceUpstreamService {
     public void reportDevicePropertyData(IotDevicePropertyReportReqDTO reportReqDTO) {
         // 1.1 获得设备
         log.info("[reportDevicePropertyData][上报设备属性数据: {}]", reportReqDTO);
-        IotDeviceDO device = getDevice(reportReqDTO);
+        IotDeviceDO device = deviceService.getDeviceByProductKeyAndDeviceNameFromCache(
+                reportReqDTO.getProductKey(), reportReqDTO.getDeviceName());
         if (device == null) {
             log.error("[reportDevicePropertyData][设备({}/{})不存在]",
                     reportReqDTO.getProductKey(), reportReqDTO.getDeviceName());
@@ -69,11 +69,6 @@ public class IotDeviceUpstreamServiceImpl implements IotDeviceUpstreamService {
         log.info("[reportDeviceEventData][上报设备事件数据: {}]", reportReqDTO);
 
         // TODO 芋艿：待实现
-    }
-
-    private IotDeviceDO getDevice(IotDeviceUpstreamAbstractReqDTO reqDTO) {
-        return TenantUtils.executeIgnore(() -> // 需要忽略租户，因为请求时，未带租户编号
-                deviceService.getDeviceByProductKeyAndDeviceName(reqDTO.getProductKey(), reqDTO.getDeviceName()));
     }
 
     private void updateDeviceLastTime(IotDeviceDO deviceDO, IotDeviceUpstreamAbstractReqDTO reqDTO) {

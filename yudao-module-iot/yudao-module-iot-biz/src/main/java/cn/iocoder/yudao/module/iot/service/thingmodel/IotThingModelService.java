@@ -46,7 +46,6 @@ public interface IotThingModelService {
      */
     IotThingModelDO getThingModel(Long id);
 
-    // TODO @芋艿：增加缓存
     /**
      * 获得产品物模型列表
      *
@@ -56,20 +55,22 @@ public interface IotThingModelService {
     List<IotThingModelDO> getThingModelListByProductId(Long productId);
 
     /**
+     * 【缓存】获得产品物模型列表
+     *
+     * 注意：该方法会忽略租户信息，所以调用时，需要确认会不会有跨租户访问的风险！！！
+     *
+     * @param productKey 产品标识
+     * @return 产品物模型列表
+     */
+    List<IotThingModelDO> getThingModelListByProductKeyFromCache(String productKey);
+
+    /**
      * 获得产品物模型分页
      *
      * @param pageReqVO 分页查询
      * @return 产品物模型分页
      */
     PageResult<IotThingModelDO> getProductThingModelPage(IotThingModelPageReqVO pageReqVO);
-
-    /**
-     * 获得产品物模型列表
-     *
-     * @param productKey 产品 Key
-     * @return 产品物模型列表
-     */
-    List<IotThingModelDO> getProductThingModelListByProductKey(String productKey);
 
     /**
      * 获得产品物模型列表

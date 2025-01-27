@@ -118,21 +118,21 @@ public class IotDevicePropertyServiceImpl implements IotDevicePropertyService {
     }
 
     @Override
-    @TenantIgnore // TODO @芋艿：租户的缓存问题，需要考虑下。因为会存在一会又 tenantId，一会没有！
+    @TenantIgnore
     public void saveDeviceProperty(IotDeviceMessage message) {
         if (!(message.getData() instanceof Map)) {
             log.error("[saveDeviceProperty][消息内容({}) 的 data 类型不正确]", message);
             return;
         }
         // 1. 获得设备信息
-        IotDeviceDO device = deviceService.getDeviceByProductKeyAndDeviceName(message.getProductKey(), message.getDeviceName());
+        IotDeviceDO device = deviceService.getDeviceByProductKeyAndDeviceNameFromCache(message.getProductKey(), message.getDeviceName());
         if (device == null) {
             log.error("[saveDeviceProperty][消息({}) 对应的设备不存在]", message);
             return;
         }
 
         // 2. 根据物模型，拼接合法的属性
-        List<IotThingModelDO> thingModels = thingModelService.getThingModelListByProductId(device.getProductId());
+        List<IotThingModelDO> thingModels = thingModelService.getThingModelListByProductKeyFromCache(device.getProductKey());
         Map<String, Object> properties = new HashMap<>();
         ((Map<?, ?>) message.getData()).forEach((key, value) -> {
             if (CollUtil.findOne(thingModels, thingModel -> thingModel.getIdentifier().equals(key)) == null) {

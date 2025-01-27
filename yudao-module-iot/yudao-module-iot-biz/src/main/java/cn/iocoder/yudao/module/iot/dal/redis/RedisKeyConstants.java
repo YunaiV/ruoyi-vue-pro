@@ -10,7 +10,7 @@ import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDevicePropertyDO;
 public interface RedisKeyConstants {
 
     /**
-     * 设备属性数据缓存，采用 HASH 结构
+     * 设备属性的数据缓存，采用 HASH 结构
      * <p>
      * KEY 格式：device_property:{deviceKey}
      * HASH KEY：identifier 属性标识
@@ -25,5 +25,21 @@ public interface RedisKeyConstants {
      * SCORE：上报时间
      */
     String DEVICE_REPORT_TIME = "device_report_time";
+
+    /**
+     * 设备信息的数据缓存，使用 Spring Cache 操作
+     *
+     * KEY 格式：device_${productKey}_${deviceKey}
+     * VALUE 数据类型：String(JSON)
+     */
+    String DEVICE  = "device";
+
+    /**
+     * 物模型的数据缓存，使用 Spring Cache 操作
+     *
+     * KEY 格式：thing_model_${productKey}
+     * VALUE 数据类型：String 数组(JSON)，即 {@link cn.iocoder.yudao.module.iot.dal.dataobject.thingmodel.IotThingModelDO} 列表
+     */
+    String THING_MODEL_LIST = "thing_model_list";
 
 }

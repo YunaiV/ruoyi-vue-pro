@@ -2,8 +2,11 @@ package cn.iocoder.yudao.module.iot.service.thingmodel;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
+import cn.iocoder.yudao.framework.tenant.core.aop.TenantIgnore;
+import cn.iocoder.yudao.framework.tenant.core.util.TenantUtils;
 import cn.iocoder.yudao.module.iot.controller.admin.thingmodel.model.ThingModelEvent;
 import cn.iocoder.yudao.module.iot.controller.admin.thingmodel.model.ThingModelParam;
 import cn.iocoder.yudao.module.iot.controller.admin.thingmodel.model.ThingModelService;
@@ -14,11 +17,14 @@ import cn.iocoder.yudao.module.iot.convert.thingmodel.IotThingModelConvert;
 import cn.iocoder.yudao.module.iot.dal.dataobject.product.IotProductDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.thingmodel.IotThingModelDO;
 import cn.iocoder.yudao.module.iot.dal.mysql.thingmodel.IotThingModelMapper;
+import cn.iocoder.yudao.module.iot.dal.redis.RedisKeyConstants;
 import cn.iocoder.yudao.module.iot.enums.product.IotProductStatusEnum;
 import cn.iocoder.yudao.module.iot.enums.thingmodel.*;
 import cn.iocoder.yudao.module.iot.service.product.IotProductService;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
@@ -69,6 +75,9 @@ public class IotThingModelServiceImpl implements IotThingModelService {
             createDefaultEventsAndServices(createReqVO.getProductId(), createReqVO.getProductKey());
         }
         // TODO @puhui999: 服务和事件的情况 method 怎么设置？在前端设置还是后端设置？
+
+        // 7. 删除缓存
+        deleteThingModelListCache(createReqVO.getProductKey());
         return thingModel.getId();
     }
 
@@ -92,6 +101,9 @@ public class IotThingModelServiceImpl implements IotThingModelService {
         if (Objects.equals(updateReqVO.getType(), IotThingModelTypeEnum.PROPERTY.getType())) {
             createDefaultEventsAndServices(updateReqVO.getProductId(), updateReqVO.getProductKey());
         }
+
+        // 6. 删除缓存
+        deleteThingModelListCache(updateReqVO.getProductKey());
     }
 
     @Override
@@ -113,6 +125,9 @@ public class IotThingModelServiceImpl implements IotThingModelService {
         if (Objects.equals(thingModel.getType(), IotThingModelTypeEnum.PROPERTY.getType())) {
             createDefaultEventsAndServices(thingModel.getProductId(), thingModel.getProductKey());
         }
+
+        // 4. 删除缓存
+        deleteThingModelListCache(thingModel.getProductKey());
     }
 
     @Override
@@ -126,13 +141,15 @@ public class IotThingModelServiceImpl implements IotThingModelService {
     }
 
     @Override
-    public PageResult<IotThingModelDO> getProductThingModelPage(IotThingModelPageReqVO pageReqVO) {
-        return thingModelMapper.selectPage(pageReqVO);
+    @TenantIgnore
+    @Cacheable(value = RedisKeyConstants.THING_MODEL_LIST, key = "#productKey")
+    public List<IotThingModelDO> getThingModelListByProductKeyFromCache(String productKey) {
+        return thingModelMapper.selectListByProductKey(productKey);
     }
 
     @Override
-    public List<IotThingModelDO> getProductThingModelListByProductKey(String productKey) {
-        return thingModelMapper.selectListByProductKey(productKey);
+    public PageResult<IotThingModelDO> getProductThingModelPage(IotThingModelPageReqVO pageReqVO) {
+        return thingModelMapper.selectPage(pageReqVO);
     }
 
     @Override
@@ -331,6 +348,18 @@ public class IotThingModelServiceImpl implements IotThingModelService {
         return convertList(thingModels, thingModel ->
                 BeanUtils.toBean(thingModel.getProperty(), ThingModelParam.class).setParaOrder(0) // TODO @puhui999: 先搞个默认值看看怎么个事
                         .setDirection(direction.getDirection()));
+    }
+
+    private void deleteThingModelListCache(String productKey) {
+        // 保证在 @CacheEvict 之前，忽略租户
+        TenantUtils.executeIgnore(() -> getSelf().deleteThingModelListCache0(productKey));
+    }
+
+    @CacheEvict(value = RedisKeyConstants.THING_MODEL_LIST, key = "#productKey")
+    public void deleteThingModelListCache0(String productKey) {}
+
+    private IotThingModelServiceImpl getSelf() {
+        return SpringUtil.getBean(getClass());
     }
 
 }

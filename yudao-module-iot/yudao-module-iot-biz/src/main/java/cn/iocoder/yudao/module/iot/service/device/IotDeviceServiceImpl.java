@@ -4,22 +4,27 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.common.util.validation.ValidationUtils;
+import cn.iocoder.yudao.framework.tenant.core.aop.TenantIgnore;
 import cn.iocoder.yudao.framework.tenant.core.util.TenantUtils;
 import cn.iocoder.yudao.module.iot.controller.admin.device.vo.device.*;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceGroupDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.product.IotProductDO;
 import cn.iocoder.yudao.module.iot.dal.mysql.device.IotDeviceMapper;
+import cn.iocoder.yudao.module.iot.dal.redis.RedisKeyConstants;
 import cn.iocoder.yudao.module.iot.enums.device.IotDeviceStatusEnum;
 import cn.iocoder.yudao.module.iot.enums.product.IotProductDeviceTypeEnum;
 import cn.iocoder.yudao.module.iot.service.product.IotProductService;
 import jakarta.annotation.Resource;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -78,6 +83,7 @@ public class IotDeviceServiceImpl implements IotDeviceService {
         deviceGroupService.validateDeviceGroupExists(createReqVO.getGroupIds());
 
         // 2.1 转换 VO 为 DO
+        // TODO @芋艿：state 相关的参数。另外，到底叫 state，还是 status 好！
         IotDeviceDO device = BeanUtils.toBean(createReqVO, IotDeviceDO.class, o -> {
             o.setProductKey(product.getProductKey()).setDeviceType(product.getDeviceType());
             // 生成并设置必要的字段
@@ -109,6 +115,9 @@ public class IotDeviceServiceImpl implements IotDeviceService {
         // 2. 更新到数据库
         IotDeviceDO updateObj = BeanUtils.toBean(updateReqVO, IotDeviceDO.class);
         deviceMapper.updateById(updateObj);
+
+        // 3. 清空对应缓存
+        deleteDeviceCache(device);
     }
 
     @Override
@@ -125,6 +134,9 @@ public class IotDeviceServiceImpl implements IotDeviceService {
         // 3. 更新设备分组
         deviceMapper.updateBatch(convertList(devices, device -> new IotDeviceDO()
                 .setId(device.getId()).setGroupIds(updateReqVO.getGroupIds())));
+
+        // 4. 清空对应缓存
+        deleteDeviceCache(devices);
     }
 
     @Override
@@ -138,6 +150,9 @@ public class IotDeviceServiceImpl implements IotDeviceService {
 
         // 2. 删除设备
         deviceMapper.deleteById(id);
+
+        // 3. 清空对应缓存
+        deleteDeviceCache(device);
     }
 
     @Override
@@ -160,6 +175,9 @@ public class IotDeviceServiceImpl implements IotDeviceService {
 
         // 2. 删除设备
         deviceMapper.deleteByIds(ids);
+
+        // 3. 清空对应缓存
+        deleteDeviceCache(devices);
     }
 
     /**
@@ -213,6 +231,8 @@ public class IotDeviceServiceImpl implements IotDeviceService {
 
     @Override
     public void updateDeviceStatus(IotDeviceStatusUpdateReqVO updateReqVO) {
+        // TODO @芋艿：state 相关的参数。另外，到底叫 state，还是 status 好！
+        // TODO @芋艿：各种时间，需要 check 下，优化处理下！
         // 1. 校验存在
         IotDeviceDO device = validateDeviceExists(updateReqVO.getId());
 
@@ -233,6 +253,9 @@ public class IotDeviceServiceImpl implements IotDeviceService {
         }
         // 2.3 更新到数据库
         deviceMapper.updateById(updateDevice);
+
+        // 3. 清空对应缓存
+        deleteDeviceCache(device);
     }
 
     @Override
@@ -246,7 +269,9 @@ public class IotDeviceServiceImpl implements IotDeviceService {
     }
 
     @Override
-    public IotDeviceDO getDeviceByProductKeyAndDeviceName(String productKey, String deviceName) {
+    @TenantIgnore
+    @Cacheable(value = RedisKeyConstants.DEVICE, key = "#productKey + '_' + #deviceName", unless = "#result == null")
+    public IotDeviceDO getDeviceByProductKeyAndDeviceNameFromCache(String productKey, String deviceName) {
         return deviceMapper.selectByProductKeyAndDeviceName(productKey, deviceName);
     }
 
@@ -365,6 +390,22 @@ public class IotDeviceServiceImpl implements IotDeviceService {
             }
         });
         return respVO;
+    }
+
+    private void deleteDeviceCache(IotDeviceDO device) {
+        // 保证在 @CacheEvict 之前，忽略租户
+        TenantUtils.executeIgnore(() -> getSelf().deleteDeviceCache0(device));
+    }
+
+    private void deleteDeviceCache(List<IotDeviceDO> devices) {
+        devices.forEach(this::deleteDeviceCache);
+    }
+
+    @CacheEvict(value = RedisKeyConstants.DEVICE, key = "#device.productKey + '_' + #device.deviceName")
+    public void deleteDeviceCache0(IotDeviceDO device) {}
+
+    private IotDeviceServiceImpl getSelf() {
+        return SpringUtil.getBean(getClass());
     }
 
 }
