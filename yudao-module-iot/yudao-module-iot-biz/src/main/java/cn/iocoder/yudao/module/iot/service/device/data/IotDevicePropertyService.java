@@ -1,10 +1,10 @@
 package cn.iocoder.yudao.module.iot.service.device.data;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.iot.api.device.dto.IotDevicePropertyReportReqDTO;
 import cn.iocoder.yudao.module.iot.controller.admin.device.vo.deviceData.IotDeviceDataPageReqVO;
 import cn.iocoder.yudao.module.iot.controller.admin.device.vo.deviceData.IotDeviceDataSimulatorSaveReqVO;
-import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDataDO;
+import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDevicePropertyDO;
+import cn.iocoder.yudao.module.iot.mq.message.IotDeviceMessage;
 import jakarta.validation.Valid;
 
 import java.util.List;
@@ -27,9 +27,9 @@ public interface IotDevicePropertyService {
     /**
      * 保存设备数据
      *
-     * @param createDTO 设备数据
+     * @param message 设备消息
      */
-    void saveDeviceData(IotDevicePropertyReportReqDTO createDTO);
+    void saveDeviceProperty(IotDeviceMessage message);
 
     /**
      * 模拟设备
@@ -44,7 +44,7 @@ public interface IotDevicePropertyService {
      * @param deviceId 设备编号
      * @return 设备属性最新数据
      */
-    List<IotDeviceDataDO> getLatestDeviceProperties(@Valid IotDeviceDataPageReqVO deviceId);
+    List<IotDevicePropertyDO> getLatestDeviceProperties(@Valid IotDeviceDataPageReqVO deviceId);
 
     /**
      * 获得设备属性历史数据

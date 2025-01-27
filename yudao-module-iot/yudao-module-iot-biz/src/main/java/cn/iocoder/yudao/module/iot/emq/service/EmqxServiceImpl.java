@@ -39,7 +39,7 @@ public class EmqxServiceImpl implements EmqxService {
 //                    .deviceName(deviceName)
 //                    .properties(message) // TODO 芋艿：临时去掉，看看
                     .build();
-            iotDeviceDataService.saveDeviceData(createDTO);
+//            iotDeviceDataService.saveDeviceProperty(createDTO);
         }
     }
 

@@ -4,7 +4,7 @@ import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.iot.controller.admin.device.vo.deviceData.*;
-import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDataDO;
+import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDevicePropertyDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceLogDO;
 import cn.iocoder.yudao.module.iot.service.device.data.IotDeviceLogService;
 import cn.iocoder.yudao.module.iot.service.device.data.IotDevicePropertyService;
@@ -28,18 +28,14 @@ public class IotDeviceDataController {
 
     @Resource
     private IotDevicePropertyService deviceDataService;
-
     @Resource
-    private IotDeviceLogService iotDeviceLogDataService;
-
-    @Resource // TODO @super：service 之间，不用空行；原因是，这样更简洁；空行，主要是为了“间隔”，提升可读性
     private IotDeviceLogService deviceLogDataService;
 
     // TODO @浩浩：这里的 /latest-list，包括方法名。
     @GetMapping("/latest")
     @Operation(summary = "获取设备属性最新数据")
     public CommonResult<List<IotDeviceDataRespVO>> getLatestDeviceProperties(@Valid IotDeviceDataPageReqVO deviceDataReqVO) {
-        List<IotDeviceDataDO> list = deviceDataService.getLatestDeviceProperties(deviceDataReqVO);
+        List<IotDevicePropertyDO> list = deviceDataService.getLatestDeviceProperties(deviceDataReqVO);
         return success(BeanUtils.toBean(list, IotDeviceDataRespVO.class));
     }
 

@@ -113,6 +113,7 @@ public interface IotDeviceService {
      */
     Long getDeviceCountByGroupId(Long groupId);
 
+    // TODO @芋艿：增加缓存
     /**
      * 根据产品 key 和设备名称，获得设备信息
      *

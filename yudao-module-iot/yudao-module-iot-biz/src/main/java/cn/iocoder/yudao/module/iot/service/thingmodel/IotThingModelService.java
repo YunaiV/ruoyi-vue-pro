@@ -46,6 +46,7 @@ public interface IotThingModelService {
      */
     IotThingModelDO getThingModel(Long id);
 
+    // TODO @芋艿：增加缓存
     /**
      * 获得产品物模型列表
      *

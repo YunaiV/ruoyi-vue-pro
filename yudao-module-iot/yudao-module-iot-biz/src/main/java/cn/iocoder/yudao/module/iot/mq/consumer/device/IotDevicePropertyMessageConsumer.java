@@ -1,5 +1,8 @@
 package cn.iocoder.yudao.module.iot.mq.consumer.device;
 
+import cn.hutool.core.util.ObjectUtil;
+import cn.iocoder.yudao.module.iot.enums.device.IotDeviceMessageIdentifierEnum;
+import cn.iocoder.yudao.module.iot.enums.device.IotDeviceMessageTypeEnum;
 import cn.iocoder.yudao.module.iot.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.service.device.data.IotDevicePropertyService;
 import lombok.extern.slf4j.Slf4j;
@@ -24,11 +27,14 @@ public class IotDevicePropertyMessageConsumer {
     @EventListener
     @Async
     public void onMessage(IotDeviceMessage message) {
+        if (ObjectUtil.notEqual(message.getType(), IotDeviceMessageTypeEnum.PROPERTY.getType())
+                || ObjectUtil.notEqual(message.getIdentifier(), IotDeviceMessageIdentifierEnum.PROPERTY_REPORT.getIdentifier())) {
+            return;
+        }
         log.info("[onMessage][消息内容({})]", message);
 
-        // 设备日志记录
-        // TODO @芋艿：重新写下
-//        deviceLogDataService.createDeviceLog(message);
+        // 保存设备属性
+        deviceDataService.saveDeviceProperty(message);
     }
 
 }

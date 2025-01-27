@@ -77,6 +77,7 @@ public interface IotDevicePropertyDataMapper {
     void alterProductPropertySTableDropField(@Param("productKey") String productKey,
                                              @Param("field") TDengineTableField field);
 
+    // TODO @芋艿：待实现
     /**
      * 获取历史数据列表
      *

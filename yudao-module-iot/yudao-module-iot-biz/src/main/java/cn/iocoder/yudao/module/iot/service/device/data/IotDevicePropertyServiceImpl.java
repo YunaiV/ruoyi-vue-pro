@@ -1,27 +1,26 @@
 package cn.iocoder.yudao.module.iot.service.device.data;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.iot.api.device.dto.IotDevicePropertyReportReqDTO;
+import cn.iocoder.yudao.framework.tenant.core.util.TenantUtils;
 import cn.iocoder.yudao.module.iot.controller.admin.device.vo.deviceData.IotDeviceDataPageReqVO;
 import cn.iocoder.yudao.module.iot.controller.admin.device.vo.deviceData.IotDeviceDataSimulatorSaveReqVO;
 import cn.iocoder.yudao.module.iot.controller.admin.thingmodel.model.dataType.ThingModelDateOrTextDataSpecs;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDO;
-import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDataDO;
+import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDevicePropertyDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.product.IotProductDO;
-import cn.iocoder.yudao.module.iot.dal.dataobject.tdengine.SelectVisualDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.thingmodel.IotThingModelDO;
-import cn.iocoder.yudao.module.iot.dal.redis.deviceData.DeviceDataRedisDAO;
+import cn.iocoder.yudao.module.iot.dal.redis.device.DevicePropertyRedisDAO;
 import cn.iocoder.yudao.module.iot.dal.tdengine.IotDevicePropertyDataMapper;
 import cn.iocoder.yudao.module.iot.enums.IotConstants;
 import cn.iocoder.yudao.module.iot.enums.thingmodel.IotDataSpecsDataTypeEnum;
 import cn.iocoder.yudao.module.iot.enums.thingmodel.IotThingModelTypeEnum;
 import cn.iocoder.yudao.module.iot.framework.tdengine.core.TDengineTableField;
+import cn.iocoder.yudao.module.iot.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.service.device.IotDeviceService;
 import cn.iocoder.yudao.module.iot.service.product.IotProductService;
 import cn.iocoder.yudao.module.iot.service.thingmodel.IotThingModelService;
@@ -31,15 +30,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
-import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.filterList;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
 import static cn.iocoder.yudao.module.iot.enums.ErrorCodeConstants.DEVICE_DATA_CONTENT_JSON_PARSE_ERROR;
 
 /**
@@ -77,7 +74,7 @@ public class IotDevicePropertyServiceImpl implements IotDevicePropertyService {
     private IotProductService productService;
 
     @Resource
-    private DeviceDataRedisDAO deviceDataRedisDAO;
+    private DevicePropertyRedisDAO deviceDataRedisDAO;
 
     @Resource
     private IotDevicePropertyDataMapper devicePropertyDataMapper;
@@ -126,13 +123,41 @@ public class IotDevicePropertyServiceImpl implements IotDevicePropertyService {
     }
 
     @Override
-    public void saveDeviceData(IotDevicePropertyReportReqDTO createDTO) {
-        // TODO 芋艿：这块需要实现
-        // 1. 根据产品 key 和设备名称，获得设备信息
-        IotDeviceDO device = deviceService.getDeviceByProductKeyAndDeviceName(createDTO.getProductKey(), createDTO.getDeviceName());
-        // 2. 解析消息，保存数据
-        JSONObject jsonObject = new JSONObject(createDTO.getProperties());
-        log.info("[saveDeviceData][productKey({}) deviceName({}) data({})]", createDTO.getProductKey(), createDTO.getDeviceName(), jsonObject);
+    public void saveDeviceProperty(IotDeviceMessage message) {
+        if (!(message.getData() instanceof Map)) {
+            log.error("[saveDeviceProperty][消息内容({}) 的 data 类型不正确]", message);
+            return;
+        }
+        // 1. 获得设备信息
+        IotDeviceDO device = TenantUtils.executeIgnore(() ->
+                deviceService.getDeviceByProductKeyAndDeviceName(message.getProductKey(), message.getDeviceName()));
+        if (device == null) {
+            log.error("[saveDeviceProperty][消息({}) 对应的设备不存在]", message);
+            return;
+        }
+
+        // 2. 根据物模型，拼接合法的属性
+        List<IotThingModelDO> thingModels = TenantUtils.executeIgnore(() ->
+                thingModelService.getThingModelListByProductId(device.getProductId()));
+        Map<String, Object> properties = new HashMap<>();
+        ((Map<?, ?>) message.getData()).forEach((key, value) -> {
+            if (CollUtil.findOne(thingModels, thingModel -> thingModel.getIdentifier().equals(key)) == null) {
+                log.error("[saveDeviceProperty][消息({}) 的属性({}) 不存在]", message, key);
+                return;
+            }
+            properties.put((String) key, value);
+        });
+        if (CollUtil.isEmpty(properties)) {
+            log.error("[saveDeviceProperty][消息({}) 没有合法的属性]", message);
+            return;
+        }
+
+        // 3.1 保存属性【数据】
+        // TODO 芋艿，未实现
+
+        // 3.2 保存属性【日志】
+        deviceDataRedisDAO.set(message.getDeviceKey(), convertMap(properties.entrySet(), Map.Entry::getKey,
+                entry -> IotDevicePropertyDO.builder().value(entry.getValue()).updateTime(message.getReportTime()).build()));
     }
 
     //TODO @芋艿:copy 了 saveDeviceData 的逻辑，后续看看这块怎么优化
@@ -163,62 +188,64 @@ public class IotDevicePropertyServiceImpl implements IotDevicePropertyService {
     }
 
     @Override
-    public List<IotDeviceDataDO> getLatestDeviceProperties(@Valid IotDeviceDataPageReqVO deviceDataReqVO) {
-        List<IotDeviceDataDO> list = new ArrayList<>();
-        // 1. 获取设备信息
-        IotDeviceDO device = deviceService.getDevice(deviceDataReqVO.getDeviceId());
-        // 2. 获取设备属性最新数据
-        List<IotThingModelDO> thingModelList = thingModelService.getProductThingModelListByProductKey(device.getProductKey());
-        thingModelList = filterList(thingModelList, thingModel -> IotThingModelTypeEnum.PROPERTY.getType()
-                .equals(thingModel.getType()));
-
-        // 3. 过滤标识符和属性名称
-        if (deviceDataReqVO.getIdentifier() != null) {
-            thingModelList = filterList(thingModelList, thingModel -> thingModel.getIdentifier()
-                    .toLowerCase().contains(deviceDataReqVO.getIdentifier().toLowerCase()));
-        }
-        if (deviceDataReqVO.getName() != null) {
-            thingModelList = filterList(thingModelList, thingModel -> thingModel.getName()
-                    .toLowerCase().contains(deviceDataReqVO.getName().toLowerCase()));
-        }
-        // 4. 获取设备属性最新数据
-        thingModelList.forEach(thingModel -> {
-            IotDeviceDataDO deviceData = deviceDataRedisDAO.get(device.getProductKey(), device.getDeviceName(), thingModel.getIdentifier());
-            if (deviceData == null) {
-                deviceData = new IotDeviceDataDO();
-                deviceData.setProductKey(device.getProductKey());
-                deviceData.setDeviceName(device.getDeviceName());
-                deviceData.setIdentifier(thingModel.getIdentifier());
-                deviceData.setDeviceId(deviceDataReqVO.getDeviceId());
-                deviceData.setThingModelId(thingModel.getId());
-                deviceData.setName(thingModel.getName());
-                deviceData.setDataType(thingModel.getProperty().getDataType());
-            }
-            list.add(deviceData);
-        });
-        return list;
+    public List<IotDevicePropertyDO> getLatestDeviceProperties(@Valid IotDeviceDataPageReqVO deviceDataReqVO) {
+//        List<IotDevicePropertyDO> list = new ArrayList<>();
+//        // 1. 获取设备信息
+//        IotDeviceDO device = deviceService.getDevice(deviceDataReqVO.getDeviceId());
+//        // 2. 获取设备属性最新数据
+//        List<IotThingModelDO> thingModelList = thingModelService.getProductThingModelListByProductKey(device.getProductKey());
+//        thingModelList = filterList(thingModelList, thingModel -> IotThingModelTypeEnum.PROPERTY.getType()
+//                .equals(thingModel.getType()));
+//
+//        // 3. 过滤标识符和属性名称
+//        if (deviceDataReqVO.getIdentifier() != null) {
+//            thingModelList = filterList(thingModelList, thingModel -> thingModel.getIdentifier()
+//                    .toLowerCase().contains(deviceDataReqVO.getIdentifier().toLowerCase()));
+//        }
+//        if (deviceDataReqVO.getName() != null) {
+//            thingModelList = filterList(thingModelList, thingModel -> thingModel.getName()
+//                    .toLowerCase().contains(deviceDataReqVO.getName().toLowerCase()));
+//        }
+//        // 4. 获取设备属性最新数据
+//        thingModelList.forEach(thingModel -> {
+//            IotDevicePropertyDO deviceData = deviceDataRedisDAO.get(device.getProductKey(), device.getDeviceName(), thingModel.getIdentifier());
+//            if (deviceData == null) {
+//                deviceData = new IotDevicePropertyDO();
+//                deviceData.setProductKey(device.getProductKey());
+//                deviceData.setDeviceName(device.getDeviceName());
+//                deviceData.setIdentifier(thingModel.getIdentifier());
+//                deviceData.setDeviceId(deviceDataReqVO.getDeviceId());
+//                deviceData.setThingModelId(thingModel.getId());
+//                deviceData.setName(thingModel.getName());
+//                deviceData.setDataType(thingModel.getProperty().getDataType());
+//            }
+//            list.add(deviceData);
+//        });
+//        return list;
+        return null; // TODO 芋艿：晚点实现
     }
 
     @Override
     public PageResult<Map<String, Object>> getHistoryDeviceProperties(IotDeviceDataPageReqVO deviceDataReqVO) {
-        PageResult<Map<String, Object>> pageResult = new PageResult<>();
-        // 1. 获取设备信息
-        IotDeviceDO device = deviceService.getDevice(deviceDataReqVO.getDeviceId());
-        // 2. 获取设备属性历史数据
-        SelectVisualDO selectVisualDO = new SelectVisualDO();
-        selectVisualDO.setDataBaseName(getDatabaseName());
-        selectVisualDO.setTableName(getDeviceTableName(device.getProductKey(), device.getDeviceName()));
-        selectVisualDO.setDeviceKey(device.getDeviceKey());
-        selectVisualDO.setFieldName(deviceDataReqVO.getIdentifier());
-        selectVisualDO.setStartTime(DateUtil.date(deviceDataReqVO.getTimes()[0].atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()).getTime());
-        selectVisualDO.setEndTime(DateUtil.date(deviceDataReqVO.getTimes()[1].atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()).getTime());
-        Map<String, Object> params = new HashMap<>();
-        params.put("rows", deviceDataReqVO.getPageSize());
-        params.put("page", (deviceDataReqVO.getPageNo() - 1) * deviceDataReqVO.getPageSize());
-        selectVisualDO.setParams(params);
-        pageResult.setList(devicePropertyDataMapper.selectHistoryDataList(selectVisualDO));
-        pageResult.setTotal(devicePropertyDataMapper.selectHistoryCount(selectVisualDO));
-        return pageResult;
+//        PageResult<Map<String, Object>> pageResult = new PageResult<>();
+//        // 1. 获取设备信息
+//        IotDeviceDO device = deviceService.getDevice(deviceDataReqVO.getDeviceId());
+//        // 2. 获取设备属性历史数据
+//        SelectVisualDO selectVisualDO = new SelectVisualDO();
+//        selectVisualDO.setDataBaseName(getDatabaseName());
+//        selectVisualDO.setTableName(getDeviceTableName(device.getProductKey(), device.getDeviceName()));
+//        selectVisualDO.setDeviceKey(device.getDeviceKey());
+//        selectVisualDO.setFieldName(deviceDataReqVO.getIdentifier());
+//        selectVisualDO.setStartTime(DateUtil.date(deviceDataReqVO.getTimes()[0].atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()).getTime());
+//        selectVisualDO.setEndTime(DateUtil.date(deviceDataReqVO.getTimes()[1].atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()).getTime());
+//        Map<String, Object> params = new HashMap<>();
+//        params.put("rows", deviceDataReqVO.getPageSize());
+//        params.put("page", (deviceDataReqVO.getPageNo() - 1) * deviceDataReqVO.getPageSize());
+//        selectVisualDO.setParams(params);
+//        pageResult.setList(devicePropertyDataMapper.selectHistoryDataList(selectVisualDO));
+//        pageResult.setTotal(devicePropertyDataMapper.selectHistoryCount(selectVisualDO));
+//        return pageResult;
+        return null; // TODO 芋艿：晚点实现
     }
 
     private String getDatabaseName() {
