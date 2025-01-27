@@ -6,7 +6,7 @@ import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.tenant.core.util.TenantUtils;
+import cn.iocoder.yudao.framework.tenant.core.aop.TenantIgnore;
 import cn.iocoder.yudao.module.iot.controller.admin.device.vo.deviceData.IotDeviceDataPageReqVO;
 import cn.iocoder.yudao.module.iot.controller.admin.device.vo.deviceData.IotDeviceDataSimulatorSaveReqVO;
 import cn.iocoder.yudao.module.iot.controller.admin.thingmodel.model.dataType.ThingModelDateOrTextDataSpecs;
@@ -16,7 +16,6 @@ import cn.iocoder.yudao.module.iot.dal.dataobject.product.IotProductDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.thingmodel.IotThingModelDO;
 import cn.iocoder.yudao.module.iot.dal.redis.device.DevicePropertyRedisDAO;
 import cn.iocoder.yudao.module.iot.dal.tdengine.IotDevicePropertyDataMapper;
-import cn.iocoder.yudao.module.iot.enums.IotConstants;
 import cn.iocoder.yudao.module.iot.enums.thingmodel.IotDataSpecsDataTypeEnum;
 import cn.iocoder.yudao.module.iot.enums.thingmodel.IotThingModelTypeEnum;
 import cn.iocoder.yudao.module.iot.framework.tdengine.core.TDengineTableField;
@@ -27,7 +26,6 @@ import cn.iocoder.yudao.module.iot.service.thingmodel.IotThingModelService;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -62,9 +60,6 @@ public class IotDevicePropertyServiceImpl implements IotDevicePropertyService {
             .put(IotDataSpecsDataTypeEnum.STRUCT.getDataType(), TDengineTableField.TYPE_NCHAR) // TODO 芋艿：怎么映射！！！！
             .put(IotDataSpecsDataTypeEnum.ARRAY.getDataType(), TDengineTableField.TYPE_NCHAR) // TODO 芋艿：怎么映射！！！！
             .build();
-
-    @Value("${spring.datasource.dynamic.datasource.tdengine.url}")
-    private String url;
 
     @Resource
     private IotDeviceService deviceService;
@@ -123,22 +118,21 @@ public class IotDevicePropertyServiceImpl implements IotDevicePropertyService {
     }
 
     @Override
+    @TenantIgnore // TODO @芋艿：租户的缓存问题，需要考虑下。因为会存在一会又 tenantId，一会没有！
     public void saveDeviceProperty(IotDeviceMessage message) {
         if (!(message.getData() instanceof Map)) {
             log.error("[saveDeviceProperty][消息内容({}) 的 data 类型不正确]", message);
             return;
         }
         // 1. 获得设备信息
-        IotDeviceDO device = TenantUtils.executeIgnore(() ->
-                deviceService.getDeviceByProductKeyAndDeviceName(message.getProductKey(), message.getDeviceName()));
+        IotDeviceDO device = deviceService.getDeviceByProductKeyAndDeviceName(message.getProductKey(), message.getDeviceName());
         if (device == null) {
             log.error("[saveDeviceProperty][消息({}) 对应的设备不存在]", message);
             return;
         }
 
         // 2. 根据物模型，拼接合法的属性
-        List<IotThingModelDO> thingModels = TenantUtils.executeIgnore(() ->
-                thingModelService.getThingModelListByProductId(device.getProductId()));
+        List<IotThingModelDO> thingModels = thingModelService.getThingModelListByProductId(device.getProductId());
         Map<String, Object> properties = new HashMap<>();
         ((Map<?, ?>) message.getData()).forEach((key, value) -> {
             if (CollUtil.findOne(thingModels, thingModel -> thingModel.getIdentifier().equals(key)) == null) {
@@ -152,10 +146,10 @@ public class IotDevicePropertyServiceImpl implements IotDevicePropertyService {
             return;
         }
 
-        // 3.1 保存属性【数据】
-        // TODO 芋艿，未实现
+        // 3.1 保存设备属性【数据】
+        devicePropertyDataMapper.insert(device, properties);
 
-        // 3.2 保存属性【日志】
+        // 3.2 保存设备属性【日志】
         deviceDataRedisDAO.set(message.getDeviceKey(), convertMap(properties.entrySet(), Map.Entry::getKey,
                 entry -> IotDevicePropertyDO.builder().value(entry.getValue()).updateTime(message.getReportTime()).build()));
     }
@@ -248,12 +242,12 @@ public class IotDevicePropertyServiceImpl implements IotDevicePropertyService {
         return null; // TODO 芋艿：晚点实现
     }
 
-    private String getDatabaseName() {
-        return StrUtil.subAfter(url, "/", true);
-    }
-
-    private static String getDeviceTableName(String productKey, String deviceName) {
-        return String.format(IotConstants.DEVICE_TABLE_NAME_FORMAT, productKey, deviceName);
-    }
+//    private String getDatabaseName() {
+//        return StrUtil.subAfter(url, "/", true);
+//    }
+//
+//    private static String getDeviceTableName(String productKey, String deviceName) {
+//        return String.format(IotConstants.DEVICE_TABLE_NAME_FORMAT, productKey, deviceName);
+//    }
 
 }

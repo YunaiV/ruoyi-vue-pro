@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.iot.dal.tdengine;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.iocoder.yudao.framework.tenant.core.aop.TenantIgnore;
+import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.tdengine.SelectVisualDO;
 import cn.iocoder.yudao.module.iot.framework.tdengine.core.TDengineTableField;
 import cn.iocoder.yudao.module.iot.framework.tdengine.core.annotation.TDengineDS;
@@ -76,6 +77,9 @@ public interface IotDevicePropertyDataMapper {
 
     void alterProductPropertySTableDropField(@Param("productKey") String productKey,
                                              @Param("field") TDengineTableField field);
+
+    void insert(@Param("device") IotDeviceDO device,
+                @Param("properties") Map<String, Object> properties);
 
     // TODO @芋艿：待实现
     /**
