@@ -6,7 +6,7 @@ import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.tenant.core.aop.TenantIgnore;
-import cn.iocoder.yudao.module.iot.controller.admin.device.vo.data.IotDevicePropertyPageReqVO;
+import cn.iocoder.yudao.module.iot.controller.admin.device.vo.data.IotDevicePropertyHistoryPageReqVO;
 import cn.iocoder.yudao.module.iot.controller.admin.device.vo.data.IotDevicePropertyRespVO;
 import cn.iocoder.yudao.module.iot.controller.admin.thingmodel.model.dataType.ThingModelDateOrTextDataSpecs;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDO;
@@ -25,7 +25,6 @@ import cn.iocoder.yudao.module.iot.service.thingmodel.IotThingModelService;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import jakarta.annotation.Resource;
-import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -146,33 +145,38 @@ public class IotDevicePropertyServiceImpl implements IotDevicePropertyService {
 
         // 3.1 保存设备属性【数据】
         devicePropertyMapper.insert(device, properties,
-                LocalDateTimeUtil.toEpochMilli(message.getReportTime())); // TODO @芋艿：后续要看看，查询的时候，能不能用 LocalDateTime
+                LocalDateTimeUtil.toEpochMilli(message.getReportTime()));
 
         // 3.2 保存设备属性【日志】
         deviceDataRedisDAO.set(message.getDeviceKey(), convertMap(properties.entrySet(), Map.Entry::getKey,
                 entry -> IotDevicePropertyDO.builder().value(entry.getValue()).updateTime(message.getReportTime()).build()));
     }
 
-    // TODO @芋艿：需要在优化下，根据 name 之类的过滤
     @Override
-    public Map<String, IotDevicePropertyDO> getLatestDeviceProperties(@Valid IotDevicePropertyPageReqVO pageReqVO) {
+    public Map<String, IotDevicePropertyDO> getLatestDeviceProperties(Long deviceId) {
         // 获取设备信息
-        IotDeviceDO device = deviceService.validateDeviceExists(pageReqVO.getDeviceId());
+        IotDeviceDO device = deviceService.validateDeviceExists(deviceId);
 
         // 获得设备属性
         return deviceDataRedisDAO.get(device.getDeviceKey());
     }
 
     @Override
-    public PageResult<IotDevicePropertyRespVO> getHistoryDevicePropertyPage(IotDevicePropertyPageReqVO pageReqVO) {
+    public PageResult<IotDevicePropertyRespVO> getHistoryDevicePropertyPage(IotDevicePropertyHistoryPageReqVO pageReqVO) {
         // 获取设备信息
         IotDeviceDO device = deviceService.validateDeviceExists(pageReqVO.getDeviceId());
         pageReqVO.setDeviceKey(device.getDeviceKey());
 
-        // TODO @芋艿：增加一个表不存在的 try catch
-        IPage<IotDevicePropertyRespVO> page = devicePropertyMapper.selectPageByHistory(
-                new Page<>(pageReqVO.getPageNo(), pageReqVO.getPageSize()), pageReqVO);
-        return new PageResult<>(page.getRecords(), page.getTotal());
+        try {
+            IPage<IotDevicePropertyRespVO> page = devicePropertyMapper.selectPageByHistory(
+                    new Page<>(pageReqVO.getPageNo(), pageReqVO.getPageSize()), pageReqVO);
+            return new PageResult<>(page.getRecords(), page.getTotal());
+        } catch (Exception exception) {
+            if (exception.getMessage().contains("Table does not exist")) {
+                return PageResult.empty();
+            }
+            throw exception;
+        }
     }
 
 }

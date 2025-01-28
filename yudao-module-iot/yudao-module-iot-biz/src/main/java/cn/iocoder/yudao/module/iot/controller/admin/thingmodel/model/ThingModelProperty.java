@@ -31,10 +31,7 @@ public class ThingModelProperty {
      */
     private String accessMode;
     /**
-     * 是否是标准品类的必选服务。
-     *
-     * - true：是
-     * - false：否
+     * 是否是标准品类的必选服务
      */
     private Boolean required;
     /**

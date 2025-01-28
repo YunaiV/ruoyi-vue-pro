@@ -51,10 +51,16 @@ public class IotDeviceLogServiceImpl implements IotDeviceLogService {
 
     @Override
     public PageResult<IotDeviceLogDO> getDeviceLogPage(IotDeviceLogPageReqVO pageReqVO) {
-        // TODO @芋艿：增加一个表不存在的 try catch
-        IPage<IotDeviceLogDO> page = deviceLogMapper.selectPage(
-                new Page<>(pageReqVO.getPageNo(), pageReqVO.getPageSize()), pageReqVO);
-        return new PageResult<>(page.getRecords(), page.getTotal());
+        try {
+            IPage<IotDeviceLogDO> page = deviceLogMapper.selectPage(
+                    new Page<>(pageReqVO.getPageNo(), pageReqVO.getPageSize()), pageReqVO);
+            return new PageResult<>(page.getRecords(), page.getTotal());
+        } catch (Exception exception) {
+            if (exception.getMessage().contains("Table does not exist")) {
+                return PageResult.empty();
+            }
+            throw exception;
+        }
     }
 
 }

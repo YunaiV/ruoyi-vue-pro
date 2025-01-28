@@ -66,11 +66,12 @@
         DESCRIBE product_property_${productKey}
     </select>
 
-    <!-- TODO 芋艿：缺少时间范围 AND ts BETWEEN #{reqVO.startTime} AND #{reqVO.endTime} -->
     <select id="selectPageByHistory" resultType="cn.iocoder.yudao.module.iot.controller.admin.device.vo.data.IotDevicePropertyRespVO">
-        SELECT ${reqVO.identifier} AS `value`, report_time AS update_time
-        FROM device_property_${reqVO.deviceKey}
+        SELECT ${reqVO.identifier} AS `value`, ts AS update_time
+        FROM device_property_${reqVO.deviceKey}1
         WHERE ${reqVO.identifier} IS NOT NULL
+          AND ts BETWEEN ${@cn.hutool.core.date.LocalDateTimeUtil@toEpochMilli(reqVO.times[0])}
+              AND ${@cn.hutool.core.date.LocalDateTimeUtil@toEpochMilli(reqVO.times[1])}
         ORDER BY ts DESC
     </select>
 

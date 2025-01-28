@@ -3,7 +3,7 @@ package cn.iocoder.yudao.module.iot.dal.tdengine;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.iocoder.yudao.module.iot.controller.admin.device.vo.data.IotDevicePropertyPageReqVO;
+import cn.iocoder.yudao.module.iot.controller.admin.device.vo.data.IotDevicePropertyHistoryPageReqVO;
 import cn.iocoder.yudao.module.iot.controller.admin.device.vo.data.IotDevicePropertyRespVO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDO;
 import cn.iocoder.yudao.module.iot.framework.tdengine.core.TDengineTableField;
@@ -85,6 +85,6 @@ public interface IotDevicePropertyMapper {
                 @Param("reportTime") Long reportTime);
 
     IPage<IotDevicePropertyRespVO> selectPageByHistory(IPage<?> page,
-                                                       @Param("reqVO") IotDevicePropertyPageReqVO reqVO);
+                                                       @Param("reqVO") IotDevicePropertyHistoryPageReqVO reqVO);
 
 }

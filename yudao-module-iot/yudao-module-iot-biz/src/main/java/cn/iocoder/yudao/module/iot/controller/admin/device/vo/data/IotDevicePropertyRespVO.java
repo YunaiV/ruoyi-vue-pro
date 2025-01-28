@@ -14,7 +14,7 @@ public class IotDevicePropertyRespVO {
     private Object value;
 
     @Schema(description = "更新时间", requiredMode = Schema.RequiredMode.REQUIRED)
-    private Long updateTime;
+    private Long updateTime; // 由于从 TDengine 查询出来的是 Long 类型，所以这里也使用 Long 类型
 
     // ========== 基于 ThingModel 查询 ==========
 
