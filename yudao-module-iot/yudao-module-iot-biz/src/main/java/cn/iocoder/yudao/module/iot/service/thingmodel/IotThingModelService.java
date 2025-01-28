@@ -79,4 +79,5 @@ public interface IotThingModelService {
      * @return 产品物模型列表
      */
     List<IotThingModelDO> getThingModelList(IotThingModelListReqVO reqVO);
+
 }

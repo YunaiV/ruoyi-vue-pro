@@ -6,6 +6,7 @@ import lombok.Data;
 
 import java.util.List;
 
+// TODO @puhui999：必要的参数校验
 /**
  * IOT 产品物模型中的参数
  *

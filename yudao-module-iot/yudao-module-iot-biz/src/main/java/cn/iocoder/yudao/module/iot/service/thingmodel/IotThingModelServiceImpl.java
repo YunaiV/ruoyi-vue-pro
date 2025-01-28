@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.iot.service.thingmodel;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
@@ -54,29 +55,26 @@ public class IotThingModelServiceImpl implements IotThingModelService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Long createThingModel(IotThingModelSaveReqVO createReqVO) {
-        // 1. 校验功能标识符在同一产品下是否唯一
+        // 1.1 校验功能标识符在同一产品下是否唯一
         validateIdentifierUnique(createReqVO.getProductId(), createReqVO.getIdentifier());
-
-        // 2. 功能名称在同一产品下是否唯一
+        // 1.2 功能名称在同一产品下是否唯一
         validateNameUnique(createReqVO.getProductId(), createReqVO.getName());
-
-        // 3. 系统保留字段，不能用于标识符定义
+        // 1.3 系统保留字段，不能用于标识符定义
         validateNotDefaultEventAndService(createReqVO.getIdentifier());
-
-        // 4. 校验产品状态，发布状态下，不允许新增功能
+        // 1.4 校验产品状态，发布状态下，不允许新增功能
         validateProductStatus(createReqVO.getProductId());
 
-        // 5. 插入数据库
+        // 2. 插入数据库
         IotThingModelDO thingModel = IotThingModelConvert.INSTANCE.convert(createReqVO);
         thingModelMapper.insert(thingModel);
 
-        // 6. 如果创建的是属性，需要更新默认的事件和服务
+        // 3. 如果创建的是属性，需要更新默认的事件和服务
         if (Objects.equals(createReqVO.getType(), IotThingModelTypeEnum.PROPERTY.getType())) {
             createDefaultEventsAndServices(createReqVO.getProductId(), createReqVO.getProductKey());
         }
         // TODO @puhui999: 服务和事件的情况 method 怎么设置？在前端设置还是后端设置？
 
-        // 7. 删除缓存
+        // 4. 删除缓存
         deleteThingModelListCache(createReqVO.getProductKey());
         return thingModel.getId();
     }
@@ -84,38 +82,35 @@ public class IotThingModelServiceImpl implements IotThingModelService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void updateThingModel(IotThingModelSaveReqVO updateReqVO) {
-        // 1. 校验功能是否存在
+        // 1.1 校验功能是否存在
         validateProductThingModelMapperExists(updateReqVO.getId());
-
-        // 2. 校验功能标识符是否唯一
+        // 1.2 校验功能标识符是否唯一
         validateIdentifierUniqueForUpdate(updateReqVO.getId(), updateReqVO.getProductId(), updateReqVO.getIdentifier());
-
-        // 3. 校验产品状态，发布状态下，不允许操作功能
+        // 1.3 校验产品状态，发布状态下，不允许操作功能
         validateProductStatus(updateReqVO.getProductId());
 
-        // 4. 更新数据库
+        // 2. 更新数据库
         IotThingModelDO thingModel = IotThingModelConvert.INSTANCE.convert(updateReqVO);
         thingModelMapper.updateById(thingModel);
 
-        // 5. 如果更新的是属性，需要更新默认的事件和服务
+        // 3. 如果更新的是属性，需要更新默认的事件和服务
         if (Objects.equals(updateReqVO.getType(), IotThingModelTypeEnum.PROPERTY.getType())) {
             createDefaultEventsAndServices(updateReqVO.getProductId(), updateReqVO.getProductKey());
         }
 
-        // 6. 删除缓存
+        // 4. 删除缓存
         deleteThingModelListCache(updateReqVO.getProductKey());
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void deleteThingModel(Long id) {
-        // 1. 校验功能是否存在
+        // 1.1 校验功能是否存在
         IotThingModelDO thingModel = thingModelMapper.selectById(id);
         if (thingModel == null) {
             throw exception(THING_MODEL_NOT_EXISTS);
         }
-
-        // 3. 校验产品状态，发布状态下，不允许操作功能
+        // 1.2 校验产品状态，发布状态下，不允许操作功能
         validateProductStatus(thingModel.getProductId());
 
         // 2. 删除功能
@@ -168,6 +163,7 @@ public class IotThingModelServiceImpl implements IotThingModelService {
         }
     }
 
+    // TODO @puhui999：这个方法，和 validateIdentifierUnique 可以融合下
     private void validateIdentifierUniqueForUpdate(Long id, Long productId, String identifier) {
         IotThingModelDO thingModel = thingModelMapper.selectByProductIdAndIdentifier(productId, identifier);
         if (thingModel != null && ObjectUtil.notEqual(thingModel.getId(), id)) {
@@ -176,15 +172,16 @@ public class IotThingModelServiceImpl implements IotThingModelService {
     }
 
     private void validateProductStatus(Long createReqVO) {
-        IotProductDO product = productService.getProduct(createReqVO);
+        IotProductDO product = productService.validateProductExists(createReqVO);
         if (Objects.equals(product.getStatus(), IotProductStatusEnum.PUBLISHED.getStatus())) {
             throw exception(PRODUCT_STATUS_NOT_ALLOW_THING_MODEL);
         }
     }
 
+    // TODO @芋艿：在 review 下
     private void validateNotDefaultEventAndService(String identifier) {
-        // set, get, post, property, event, time, value 是系统保留字段，不能用于标识符定义
-        if (CollUtil.containsAny(Arrays.asList("set", "get", "post", "property", "event", "time", "value"), Collections.singletonList(identifier))) {
+        // 系统保留字段，不能用于标识符定义
+        if (StrUtil.equalsAny(identifier, "set", "get", "post", "property", "event", "time", "value")) {
             throw exception(THING_MODEL_IDENTIFIER_INVALID);
         }
     }
@@ -205,6 +202,9 @@ public class IotThingModelServiceImpl implements IotThingModelService {
 
     /**
      * 创建默认的事件和服务
+     *
+     * @param productId 产品编号
+     * @param productKey 产品标识
      */
     public void createDefaultEventsAndServices(Long productId, String productKey) {
         // 1. 获取当前属性列表

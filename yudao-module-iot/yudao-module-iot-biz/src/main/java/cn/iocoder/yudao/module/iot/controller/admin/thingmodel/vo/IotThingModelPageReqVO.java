@@ -9,11 +9,16 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
+// TODO @puhui999：部分字段，可以用 cursor 加上 example
 @Schema(description = "管理后台 - IoT 产品物模型分页 Request VO")
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 public class IotThingModelPageReqVO extends PageParam {
+
+    @Schema(description = "产品编号", requiredMode = Schema.RequiredMode.REQUIRED)
+    @NotNull(message = "产品编号不能为空")
+    private Long productId;
 
     @Schema(description = "功能标识")
     private String identifier;
@@ -24,9 +29,5 @@ public class IotThingModelPageReqVO extends PageParam {
     @Schema(description = "功能类型", example = "1")
     @InEnum(IotThingModelTypeEnum.class)
     private Integer type;
-
-    @Schema(description = "产品ID", requiredMode = Schema.RequiredMode.REQUIRED)
-    @NotNull(message = "产品ID不能为空")
-    private Long productId;
 
 }

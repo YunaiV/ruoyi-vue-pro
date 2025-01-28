@@ -10,6 +10,7 @@ import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
+// TODO @puhui999：部分字段，可以用 cursor 加上 example
 @Schema(description = "管理后台 - IoT 产品物模型新增/修改 Request VO")
 @Data
 public class IotThingModelSaveReqVO {

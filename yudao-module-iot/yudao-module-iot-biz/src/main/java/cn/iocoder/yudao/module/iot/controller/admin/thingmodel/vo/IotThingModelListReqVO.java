@@ -6,9 +6,14 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
-@Schema(description = "管理后台 - IoT 产品物模型List Request VO")
+// TODO @puhui999：部分字段，可以用 cursor 加上 example
+@Schema(description = "管理后台 - IoT 产品物模型 List Request VO")
 @Data
 public class IotThingModelListReqVO {
+
+    @Schema(description = "产品编号", requiredMode = Schema.RequiredMode.REQUIRED)
+    @NotNull(message = "产品编号不能为空")
+    private Long productId;
 
     @Schema(description = "功能标识")
     private String identifier;
@@ -19,9 +24,5 @@ public class IotThingModelListReqVO {
     @Schema(description = "功能类型", example = "1")
     @InEnum(IotThingModelTypeEnum.class)
     private Integer type;
-
-    @Schema(description = "产品 ID", requiredMode = Schema.RequiredMode.REQUIRED)
-    @NotNull(message = "产品 ID 不能为空")
-    private Long productId;
 
 }

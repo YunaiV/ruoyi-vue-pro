@@ -10,6 +10,7 @@ import lombok.Data;
 
 import java.time.LocalDateTime;
 
+// TODO @puhui999：部分字段，可以用 cursor 加上 example
 @Schema(description = "管理后台 - IoT 产品物模型 Response VO")
 @Data
 @ExcelIgnoreUnannotated
