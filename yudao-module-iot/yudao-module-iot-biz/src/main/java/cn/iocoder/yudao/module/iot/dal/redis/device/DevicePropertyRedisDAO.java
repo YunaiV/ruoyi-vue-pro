@@ -28,8 +28,9 @@ public class DevicePropertyRedisDAO {
         if (CollUtil.isEmpty(entries)) {
             return Collections.emptyMap();
         }
-        return convertMap(entries.values(), key -> (String) key,
-                value -> JsonUtils.parseObject((String) value, IotDevicePropertyDO.class));
+        return convertMap(entries.entrySet(),
+                entry -> (String) entry.getKey(),
+                entry -> JsonUtils.parseObject((String) entry.getValue(), IotDevicePropertyDO.class));
     }
 
     public void set(String deviceKey, Map<String, IotDevicePropertyDO> properties) {

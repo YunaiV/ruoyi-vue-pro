@@ -60,13 +60,20 @@ public interface IotDeviceService {
     void deleteDeviceList(Collection<Long> ids);
 
     /**
+     * 校验设备是否存在
+     *
+     * @param id 设备 ID
+     * @return 设备对象
+     */
+    IotDeviceDO validateDeviceExists(Long id);
+
+    /**
      * 获得设备
      *
      * @param id 编号
      * @return IoT 设备
      */
     IotDeviceDO getDevice(Long id);
-
 
     /**
      * 根据设备 key 获得设备

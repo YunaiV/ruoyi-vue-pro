@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.iot.controller.admin.device.vo.deviceData;
+package cn.iocoder.yudao.module.iot.controller.admin.device.vo.data;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
@@ -22,7 +22,7 @@ public class IotDeviceLogRespVO {
     private String type;
 
     @Schema(description = "标识符", requiredMode = Schema.RequiredMode.REQUIRED, example = "temperature")
-    private String subType;
+    private String identifier;
 
     @Schema(description = "日志内容", requiredMode = Schema.RequiredMode.REQUIRED)
     private String content;

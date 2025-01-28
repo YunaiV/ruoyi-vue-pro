@@ -6,7 +6,7 @@ import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.tenant.core.aop.TenantIgnore;
-import cn.iocoder.yudao.module.iot.controller.admin.device.vo.deviceData.IotDeviceDataPageReqVO;
+import cn.iocoder.yudao.module.iot.controller.admin.device.vo.data.IotDeviceDataPageReqVO;
 import cn.iocoder.yudao.module.iot.controller.admin.thingmodel.model.dataType.ThingModelDateOrTextDataSpecs;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDevicePropertyDO;
@@ -151,41 +151,12 @@ public class IotDevicePropertyServiceImpl implements IotDevicePropertyService {
     }
 
     @Override
-    public List<IotDevicePropertyDO> getLatestDeviceProperties(@Valid IotDeviceDataPageReqVO deviceDataReqVO) {
-//        List<IotDevicePropertyDO> list = new ArrayList<>();
-//        // 1. 获取设备信息
-//        IotDeviceDO device = deviceService.getDevice(deviceDataReqVO.getDeviceId());
-//        // 2. 获取设备属性最新数据
-//        List<IotThingModelDO> thingModelList = thingModelService.getProductThingModelListByProductKey(device.getProductKey());
-//        thingModelList = filterList(thingModelList, thingModel -> IotThingModelTypeEnum.PROPERTY.getType()
-//                .equals(thingModel.getType()));
-//
-//        // 3. 过滤标识符和属性名称
-//        if (deviceDataReqVO.getIdentifier() != null) {
-//            thingModelList = filterList(thingModelList, thingModel -> thingModel.getIdentifier()
-//                    .toLowerCase().contains(deviceDataReqVO.getIdentifier().toLowerCase()));
-//        }
-//        if (deviceDataReqVO.getName() != null) {
-//            thingModelList = filterList(thingModelList, thingModel -> thingModel.getName()
-//                    .toLowerCase().contains(deviceDataReqVO.getName().toLowerCase()));
-//        }
-//        // 4. 获取设备属性最新数据
-//        thingModelList.forEach(thingModel -> {
-//            IotDevicePropertyDO deviceData = deviceDataRedisDAO.get(device.getProductKey(), device.getDeviceName(), thingModel.getIdentifier());
-//            if (deviceData == null) {
-//                deviceData = new IotDevicePropertyDO();
-//                deviceData.setProductKey(device.getProductKey());
-//                deviceData.setDeviceName(device.getDeviceName());
-//                deviceData.setIdentifier(thingModel.getIdentifier());
-//                deviceData.setDeviceId(deviceDataReqVO.getDeviceId());
-//                deviceData.setThingModelId(thingModel.getId());
-//                deviceData.setName(thingModel.getName());
-//                deviceData.setDataType(thingModel.getProperty().getDataType());
-//            }
-//            list.add(deviceData);
-//        });
-//        return list;
-        return null; // TODO 芋艿：晚点实现
+    public Map<String, IotDevicePropertyDO> getLatestDeviceProperties(@Valid IotDeviceDataPageReqVO pageReqVO) {
+        // 获取设备信息
+        IotDeviceDO device = deviceService.validateDeviceExists(pageReqVO.getDeviceId());
+
+        // 获得设备属性
+        return deviceDataRedisDAO.get(device.getDeviceKey());
     }
 
     @Override

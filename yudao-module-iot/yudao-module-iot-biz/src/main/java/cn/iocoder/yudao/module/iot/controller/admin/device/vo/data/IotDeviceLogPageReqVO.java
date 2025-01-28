@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.iot.controller.admin.device.vo.deviceData;
+package cn.iocoder.yudao.module.iot.controller.admin.device.vo.data;
 
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import io.swagger.v3.oas.annotations.media.Schema;

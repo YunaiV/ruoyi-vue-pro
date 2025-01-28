@@ -1,12 +1,11 @@
 package cn.iocoder.yudao.module.iot.service.device.data;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.iot.controller.admin.device.vo.deviceData.IotDeviceDataPageReqVO;
+import cn.iocoder.yudao.module.iot.controller.admin.device.vo.data.IotDeviceDataPageReqVO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDevicePropertyDO;
 import cn.iocoder.yudao.module.iot.mq.message.IotDeviceMessage;
 import jakarta.validation.Valid;
 
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -36,7 +35,7 @@ public interface IotDevicePropertyService {
      * @param deviceId 设备编号
      * @return 设备属性最新数据
      */
-    List<IotDevicePropertyDO> getLatestDeviceProperties(@Valid IotDeviceDataPageReqVO deviceId);
+    Map<String, IotDevicePropertyDO> getLatestDeviceProperties(@Valid IotDeviceDataPageReqVO deviceId);
 
     /**
      * 获得设备属性历史数据

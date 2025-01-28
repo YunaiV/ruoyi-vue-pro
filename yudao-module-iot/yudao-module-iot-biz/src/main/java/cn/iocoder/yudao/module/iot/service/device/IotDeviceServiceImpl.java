@@ -187,13 +187,8 @@ public class IotDeviceServiceImpl implements IotDeviceService {
         deleteDeviceCache(devices);
     }
 
-    /**
-     * 校验设备是否存在
-     *
-     * @param id 设备 ID
-     * @return 设备对象
-     */
-    private IotDeviceDO validateDeviceExists(Long id) {
+    @Override
+    public IotDeviceDO validateDeviceExists(Long id) {
         IotDeviceDO device = deviceMapper.selectById(id);
         if (device == null) {
             throw exception(DEVICE_NOT_EXISTS);

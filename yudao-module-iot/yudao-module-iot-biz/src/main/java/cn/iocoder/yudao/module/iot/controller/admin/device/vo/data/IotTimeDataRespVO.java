@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.iot.controller.admin.device.vo.deviceData;
+package cn.iocoder.yudao.module.iot.controller.admin.device.vo.data;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
