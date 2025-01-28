@@ -13,7 +13,7 @@ import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDevicePropertyDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.product.IotProductDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.thingmodel.IotThingModelDO;
 import cn.iocoder.yudao.module.iot.dal.redis.device.DevicePropertyRedisDAO;
-import cn.iocoder.yudao.module.iot.dal.tdengine.IotDevicePropertyDataMapper;
+import cn.iocoder.yudao.module.iot.dal.tdengine.IotDevicePropertyMapper;
 import cn.iocoder.yudao.module.iot.enums.thingmodel.IotDataSpecsDataTypeEnum;
 import cn.iocoder.yudao.module.iot.enums.thingmodel.IotThingModelTypeEnum;
 import cn.iocoder.yudao.module.iot.framework.tdengine.core.TDengineTableField;
@@ -68,7 +68,7 @@ public class IotDevicePropertyServiceImpl implements IotDevicePropertyService {
     private DevicePropertyRedisDAO deviceDataRedisDAO;
 
     @Resource
-    private IotDevicePropertyDataMapper devicePropertyDataMapper;
+    private IotDevicePropertyMapper devicePropertyMapper;
 
     @Override
     public void defineDevicePropertyData(Long productId) {
@@ -79,7 +79,7 @@ public class IotDevicePropertyServiceImpl implements IotDevicePropertyService {
         // 1.2 解析 DB 里的字段
         List<TDengineTableField> oldFields = new ArrayList<>();
         try {
-            oldFields.addAll(devicePropertyDataMapper.getProductPropertySTableFieldList(product.getProductKey()));
+            oldFields.addAll(devicePropertyMapper.getProductPropertySTableFieldList(product.getProductKey()));
         } catch (Exception e) {
             if (!e.getMessage().contains("Table does not exist")) {
                 throw e;
@@ -93,11 +93,11 @@ public class IotDevicePropertyServiceImpl implements IotDevicePropertyService {
                 log.info("[defineDevicePropertyData][productId({}) 没有需要定义的属性]", productId);
                 return;
             }
-            devicePropertyDataMapper.createProductPropertySTable(product.getProductKey(), newFields);
+            devicePropertyMapper.createProductPropertySTable(product.getProductKey(), newFields);
             return;
         }
         // 2.2 情况二：如果是修改的时候，需要更新表
-        devicePropertyDataMapper.alterProductPropertySTable(product.getProductKey(), oldFields, newFields);
+        devicePropertyMapper.alterProductPropertySTable(product.getProductKey(), oldFields, newFields);
     }
 
     private List<TDengineTableField> buildTableFieldList(List<IotThingModelDO> thingModels) {
@@ -142,7 +142,7 @@ public class IotDevicePropertyServiceImpl implements IotDevicePropertyService {
         }
 
         // 3.1 保存设备属性【数据】
-        devicePropertyDataMapper.insert(device, properties,
+        devicePropertyMapper.insert(device, properties,
                 LocalDateTimeUtil.toEpochMilli(message.getReportTime())); // TODO @芋艿：后续要看看，查询的时候，能不能用 LocalDateTime
 
         // 3.2 保存设备属性【日志】

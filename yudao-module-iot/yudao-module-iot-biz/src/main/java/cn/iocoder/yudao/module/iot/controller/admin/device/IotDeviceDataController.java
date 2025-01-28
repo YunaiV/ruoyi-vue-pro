@@ -3,10 +3,10 @@ package cn.iocoder.yudao.module.iot.controller.admin.device;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
-import cn.iocoder.yudao.module.iot.controller.admin.device.vo.deviceData.*;
-import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceLogDO;
+import cn.iocoder.yudao.module.iot.controller.admin.device.vo.deviceData.IotDeviceDataPageReqVO;
+import cn.iocoder.yudao.module.iot.controller.admin.device.vo.deviceData.IotDeviceDataRespVO;
+import cn.iocoder.yudao.module.iot.controller.admin.device.vo.deviceData.IotTimeDataRespVO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDevicePropertyDO;
-import cn.iocoder.yudao.module.iot.service.device.data.IotDeviceLogService;
 import cn.iocoder.yudao.module.iot.service.device.data.IotDevicePropertyService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -30,8 +30,6 @@ public class IotDeviceDataController {
 
     @Resource
     private IotDevicePropertyService deviceDataService;
-    @Resource
-    private IotDeviceLogService deviceLogDataService;
 
     // TODO @浩浩：这里的 /latest-list，包括方法名。
     @GetMapping("/latest")
@@ -47,14 +45,6 @@ public class IotDeviceDataController {
     public CommonResult<PageResult<IotTimeDataRespVO>> getHistoryDeviceProperties(@Valid IotDeviceDataPageReqVO deviceDataReqVO) {
         PageResult<Map<String, Object>> list = deviceDataService.getHistoryDeviceProperties(deviceDataReqVO);
         return success(BeanUtils.toBean(list, IotTimeDataRespVO.class));
-    }
-
-    // TODO:功能权限
-    @GetMapping("/log/page")
-    @Operation(summary = "获得设备日志分页")
-    public CommonResult<PageResult<IotDeviceLogRespVO>> getDeviceLogPage(@Valid IotDeviceLogPageReqVO pageReqVO) {
-        PageResult<IotDeviceLogDO> pageResult = deviceLogDataService.getDeviceLogPage(pageReqVO);
-        return success(BeanUtils.toBean(pageResult, IotDeviceLogRespVO.class));
     }
 
 }

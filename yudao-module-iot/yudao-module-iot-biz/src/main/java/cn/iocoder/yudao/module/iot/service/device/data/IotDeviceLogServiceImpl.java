@@ -7,14 +7,14 @@ import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.iot.controller.admin.device.vo.deviceData.IotDeviceLogPageReqVO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceLogDO;
-import cn.iocoder.yudao.module.iot.dal.tdengine.IotDeviceLogDataMapper;
+import cn.iocoder.yudao.module.iot.dal.tdengine.IotDeviceLogMapper;
 import cn.iocoder.yudao.module.iot.mq.message.IotDeviceMessage;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
-
-import java.util.List;
 
 /**
  * IoT 设备日志数据 Service 实现类
@@ -27,17 +27,17 @@ import java.util.List;
 public class IotDeviceLogServiceImpl implements IotDeviceLogService {
 
     @Resource
-    private IotDeviceLogDataMapper deviceLogDataMapper;
+    private IotDeviceLogMapper deviceLogMapper;
 
     @Override
     public void defineDeviceLog() {
-        if (StrUtil.isNotEmpty(deviceLogDataMapper.showDeviceLogSTable())) {
+        if (StrUtil.isNotEmpty(deviceLogMapper.showDeviceLogSTable())) {
             log.info("[defineDeviceLog][设备日志超级表已存在，创建跳过]");
             return;
         }
 
         log.info("[defineDeviceLog][设备日志超级表不存在，创建开始...]");
-        deviceLogDataMapper.createDeviceLogSTable();
+        deviceLogMapper.createDeviceLogSTable();
         log.info("[defineDeviceLog][设备日志超级表不存在，创建成功]");
     }
 
@@ -46,15 +46,15 @@ public class IotDeviceLogServiceImpl implements IotDeviceLogService {
         IotDeviceLogDO log = BeanUtils.toBean(message, IotDeviceLogDO.class)
                 .setId(IdUtil.fastSimpleUUID())
                 .setContent(JsonUtils.toJsonString(message.getData()));
-        deviceLogDataMapper.insert(log);
+        deviceLogMapper.insert(log);
     }
 
     @Override
     public PageResult<IotDeviceLogDO> getDeviceLogPage(IotDeviceLogPageReqVO pageReqVO) {
         // TODO @芋艿：增加一个表不存在的 try catch
-        List<IotDeviceLogDO> list = deviceLogDataMapper.selectPage(pageReqVO);
-        Long total = deviceLogDataMapper.selectCount(pageReqVO);
-        return new PageResult<>(list, total);
+        IPage<IotDeviceLogDO> page = deviceLogMapper.selectPage(
+                new Page<>(pageReqVO.getPageNo(), pageReqVO.getPageSize()), pageReqVO);
+        return new PageResult<>(page.getRecords(), page.getTotal());
     }
 
 }

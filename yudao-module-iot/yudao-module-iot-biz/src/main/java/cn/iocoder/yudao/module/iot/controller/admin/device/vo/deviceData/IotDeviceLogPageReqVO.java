@@ -4,11 +4,6 @@ import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.Data;
-import org.springframework.format.annotation.DateTimeFormat;
-
-import java.time.LocalDateTime;
-
-import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
 @Schema(description = "管理后台 - IoT 设备日志分页查询 Request VO")
 @Data
@@ -18,16 +13,10 @@ public class IotDeviceLogPageReqVO extends PageParam {
     @NotEmpty(message = "设备标识不能为空")
     private String deviceKey;
 
-    // TODO @super：对应的枚举类
     @Schema(description = "消息类型", example = "property")
-    private String type;
+    private String type; // 参见 IotDeviceMessageTypeEnum 枚举，精准匹配
 
     @Schema(description = "标识符", example = "temperature")
-    // TODO @super：对应的枚举类
-    private String subType;
-
-    @Schema(description = "创建时间")
-    @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
-    private LocalDateTime[] createTime;
+    private String identifier; // 参见 IotDeviceMessageIdentifierEnum 枚举，模糊匹配
 
 }

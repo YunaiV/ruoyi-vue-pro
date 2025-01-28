@@ -4,10 +4,9 @@ import cn.iocoder.yudao.module.iot.controller.admin.device.vo.deviceData.IotDevi
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceLogDO;
 import cn.iocoder.yudao.module.iot.framework.tdengine.core.annotation.TDengineDS;
 import com.baomidou.mybatisplus.annotation.InterceptorIgnore;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
-
-import java.util.List;
 
 /**
  * 设备日志 {@link IotDeviceLogDO} Mapper 接口
@@ -15,7 +14,7 @@ import java.util.List;
 @Mapper
 @TDengineDS
 @InterceptorIgnore(tenantLine = "true") // 避免 SQL 解析，因为 JSqlParser 对 TDengine 的 SQL 解析会报错
-public interface IotDeviceLogDataMapper {
+public interface IotDeviceLogMapper {
 
     /**
      * 创建设备日志超级表
@@ -44,7 +43,8 @@ public interface IotDeviceLogDataMapper {
      * @param reqVO 分页查询条件
      * @return 设备日志列表
      */
-    List<IotDeviceLogDO> selectPage(@Param("reqVO") IotDeviceLogPageReqVO reqVO);
+    IPage<IotDeviceLogDO> selectPage(IPage<IotDeviceLogDO> page,
+                                    @Param("reqVO") IotDeviceLogPageReqVO reqVO);
 
     /**
      * 获得设备日志总数

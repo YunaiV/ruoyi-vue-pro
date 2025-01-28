@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
 @Mapper
 @TDengineDS
 @InterceptorIgnore(tenantLine = "true") // 避免 SQL 解析，因为 JSqlParser 对 TDengine 的 SQL 解析会报错
-public interface IotDevicePropertyDataMapper {
+public interface IotDevicePropertyMapper {
 
     List<TDengineTableField> getProductPropertySTableFieldList(@Param("productKey") String productKey);
 
