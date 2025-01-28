@@ -10,7 +10,7 @@ import lombok.Data;
 import java.time.LocalDateTime;
 import java.util.Set;
 
-import static cn.iocoder.yudao.module.iot.enums.DictTypeConstants.DEVICE_STATUS;
+import static cn.iocoder.yudao.module.iot.enums.DictTypeConstants.DEVICE_STATE;
 
 @Schema(description = "管理后台 - IoT 设备 Response VO")
 @Data
@@ -60,20 +60,16 @@ public class IotDeviceRespVO {
 
     @Schema(description = "设备状态", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     @ExcelProperty(value = "设备状态", converter = DictConvert.class)
-    @DictFormat(DEVICE_STATUS)
-    private Integer status;
-
-    @Schema(description = "设备状态最后更新时间")
-    @ExcelProperty("设备状态最后更新时间")
-    private LocalDateTime statusLastUpdateTime;
+    @DictFormat(DEVICE_STATE)
+    private Integer state;
 
     @Schema(description = "最后上线时间")
     @ExcelProperty("最后上线时间")
-    private LocalDateTime lastOnlineTime;
+    private LocalDateTime onlineTime;
 
     @Schema(description = "最后离线时间")
     @ExcelProperty("最后离线时间")
-    private LocalDateTime lastOfflineTime;
+    private LocalDateTime offlineTime;
 
     @Schema(description = "设备激活时间")
     @ExcelProperty("设备激活时间")

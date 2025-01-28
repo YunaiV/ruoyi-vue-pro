@@ -3,7 +3,7 @@ package cn.iocoder.yudao.module.iot.dal.dataobject.device;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.framework.mybatis.core.type.LongSetTypeHandler;
 import cn.iocoder.yudao.module.iot.dal.dataobject.product.IotProductDO;
-import cn.iocoder.yudao.module.iot.enums.device.IotDeviceStatusEnum;
+import cn.iocoder.yudao.module.iot.enums.device.IotDeviceStateEnum;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -94,22 +94,17 @@ public class IotDeviceDO extends BaseDO {
     /**
      * 设备状态
      * <p>
-     * 枚举 {@link IotDeviceStatusEnum}
+     * 枚举 {@link IotDeviceStateEnum}
      */
-    private Integer status;
-
-    /**
-     * 设备状态最后更新时间
-     */
-    private LocalDateTime statusLastUpdateTime;
+    private Integer state;
     /**
      * 最后上线时间
      */
-    private LocalDateTime lastOnlineTime;
+    private LocalDateTime onlineTime;
     /**
      * 最后离线时间
      */
-    private LocalDateTime lastOfflineTime;
+    private LocalDateTime offlineTime;
     /**
      * 设备激活时间
      */

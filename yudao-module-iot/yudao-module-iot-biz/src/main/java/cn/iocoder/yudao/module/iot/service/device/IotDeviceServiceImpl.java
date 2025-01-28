@@ -19,7 +19,7 @@ import cn.iocoder.yudao.module.iot.dal.dataobject.product.IotProductDO;
 import cn.iocoder.yudao.module.iot.dal.mysql.device.IotDeviceMapper;
 import cn.iocoder.yudao.module.iot.dal.redis.RedisKeyConstants;
 import cn.iocoder.yudao.module.iot.enums.device.IotDeviceMessageTypeEnum;
-import cn.iocoder.yudao.module.iot.enums.device.IotDeviceStatusEnum;
+import cn.iocoder.yudao.module.iot.enums.device.IotDeviceStateEnum;
 import cn.iocoder.yudao.module.iot.enums.product.IotProductDeviceTypeEnum;
 import cn.iocoder.yudao.module.iot.service.device.upstream.IotDeviceUpstreamService;
 import cn.iocoder.yudao.module.iot.service.product.IotProductService;
@@ -89,7 +89,6 @@ public class IotDeviceServiceImpl implements IotDeviceService {
         deviceGroupService.validateDeviceGroupExists(createReqVO.getGroupIds());
 
         // 2.1 转换 VO 为 DO
-        // TODO @芋艿：state 相关的参数。另外，到底叫 state，还是 status 好！
         // TODO @芋艿：各种 mqtt 是不是可以简化！
         IotDeviceDO device = BeanUtils.toBean(createReqVO, IotDeviceDO.class, o -> {
             o.setProductKey(product.getProductKey()).setDeviceType(product.getDeviceType());
@@ -99,7 +98,7 @@ public class IotDeviceServiceImpl implements IotDeviceService {
                     .setMqttUsername(generateMqttUsername(o.getDeviceName(), o.getProductKey()))
                     .setMqttPassword(generateMqttPassword());
             // 设置设备状态为未激活
-            o.setStatus(IotDeviceStatusEnum.INACTIVE.getStatus()).setStatusLastUpdateTime(LocalDateTime.now());
+            o.setState(IotDeviceStateEnum.INACTIVE.getState());
         });
         // 2.2 插入到数据库
         deviceMapper.insert(device);
@@ -232,29 +231,22 @@ public class IotDeviceServiceImpl implements IotDeviceService {
     }
 
     @Override
-    public void updateDeviceStatus(IotDeviceStatusUpdateReqVO updateReqVO) {
-        // TODO @芋艿：state 相关的参数。另外，到底叫 state，还是 status 好！
-        // TODO @芋艿：各种时间，需要 check 下，优化处理下！
+    public void updateDeviceState(Long id, Integer state) {
         // 1. 校验存在
-        IotDeviceDO device = validateDeviceExists(updateReqVO.getId());
+        IotDeviceDO device = validateDeviceExists(id);
 
-        // 2.1 更新状态和更新时间
-        IotDeviceDO updateDevice = BeanUtils.toBean(updateReqVO, IotDeviceDO.class)
-                .setStatusLastUpdateTime(LocalDateTime.now());
-        // 2.2 更新状态相关时间
-        if (Objects.equals(device.getStatus(), IotDeviceStatusEnum.INACTIVE.getStatus())
-                && Objects.equals(updateDevice.getStatus(), IotDeviceStatusEnum.ONLINE.getStatus())) {
-            // 从未激活到在线，设置激活时间和最后上线时间
-            updateDevice.setActiveTime(LocalDateTime.now()).setLastOnlineTime(LocalDateTime.now());
-        } else if (Objects.equals(updateDevice.getStatus(), IotDeviceStatusEnum.ONLINE.getStatus())) {
-            // 如果是上线，设置最后上线时间
-            updateDevice.setLastOnlineTime(LocalDateTime.now());
-        } else if (Objects.equals(updateDevice.getStatus(), IotDeviceStatusEnum.OFFLINE.getStatus())) {
-            // 如果是离线，设置最后离线时间
-            updateDevice.setLastOfflineTime(LocalDateTime.now());
+        // 2. 更新状态和时间
+        IotDeviceDO updateObj = new IotDeviceDO().setId(id).setState(state);
+        if (device.getOnlineTime() == null
+            && Objects.equals(state, IotDeviceStateEnum.ONLINE.getState())) {
+            updateObj.setActiveTime(LocalDateTime.now());
         }
-        // 2.3 更新到数据库
-        deviceMapper.updateById(updateDevice);
+        if (Objects.equals(state, IotDeviceStateEnum.ONLINE.getState())) {
+            updateObj.setOnlineTime(LocalDateTime.now());
+        } else if (Objects.equals(state, IotDeviceStateEnum.OFFLINE.getState())) {
+            updateObj.setOfflineTime(LocalDateTime.now());
+        }
+        deviceMapper.updateById(updateObj);
 
         // 3. 清空对应缓存
         deleteDeviceCache(device);
@@ -417,8 +409,8 @@ public class IotDeviceServiceImpl implements IotDeviceService {
         // 2.3 情况三：状态变更
         if (Objects.equals(reportReqVO.getType(), IotDeviceMessageTypeEnum.STATE.getType())) {
             // TODO 芋艿：待实现
-            updateDeviceStatus(new IotDeviceStatusUpdateReqVO().setId(device.getId())
-                    .setStatus((Integer) reportReqVO.getData()));
+//            updateDeviceState(new IotDeviceStatusUpdateReqVO().setId(device.getId())
+//                    .setStatus((Integer) reportReqVO.getData()));
             return;
         }
         throw new IllegalArgumentException("未知的类型：" + reportReqVO.getType());

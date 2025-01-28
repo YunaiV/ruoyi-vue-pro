@@ -45,14 +45,6 @@ public class IotDeviceController {
         return success(deviceService.createDevice(createReqVO));
     }
 
-    @PutMapping("/update-status")
-    @Operation(summary = "更新设备状态")
-    @PreAuthorize("@ss.hasPermission('iot:device:update')")
-    public CommonResult<Boolean> updateDeviceStatus(@Valid @RequestBody IotDeviceStatusUpdateReqVO updateReqVO) {
-        deviceService.updateDeviceStatus(updateReqVO);
-        return success(true);
-    }
-
     @PutMapping("/update")
     @Operation(summary = "更新设备")
     @PreAuthorize("@ss.hasPermission('iot:device:update')")

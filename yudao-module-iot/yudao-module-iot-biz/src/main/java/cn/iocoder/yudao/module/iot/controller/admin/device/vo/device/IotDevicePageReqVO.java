@@ -2,7 +2,7 @@ package cn.iocoder.yudao.module.iot.controller.admin.device.vo.device;
 
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.validation.InEnum;
-import cn.iocoder.yudao.module.iot.enums.device.IotDeviceStatusEnum;
+import cn.iocoder.yudao.module.iot.enums.device.IotDeviceStateEnum;
 import cn.iocoder.yudao.module.iot.enums.product.IotProductDeviceTypeEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
@@ -25,7 +25,7 @@ public class IotDevicePageReqVO extends PageParam {
     private Integer deviceType;
 
     @Schema(description = "设备状态", example = "1")
-    @InEnum(IotDeviceStatusEnum.class)
+    @InEnum(IotDeviceStateEnum.class)
     private Integer status;
 
     @Schema(description = "设备分组编号", example = "1024")
