@@ -1,13 +1,13 @@
 package cn.iocoder.yudao.module.iot.controller.admin.device;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.hutool.core.lang.Assert;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
-import cn.iocoder.yudao.module.iot.controller.admin.device.vo.data.IotDeviceDataPageReqVO;
-import cn.iocoder.yudao.module.iot.controller.admin.device.vo.data.IotDeviceDataRespVO;
-import cn.iocoder.yudao.module.iot.controller.admin.device.vo.data.IotTimeDataRespVO;
+import cn.iocoder.yudao.module.iot.controller.admin.device.vo.data.IotDevicePropertyPageReqVO;
+import cn.iocoder.yudao.module.iot.controller.admin.device.vo.data.IotDevicePropertyRespVO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDevicePropertyDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.thingmodel.IotThingModelDO;
@@ -42,9 +42,10 @@ public class IotDevicePropertyController {
     @Resource
     private IotDeviceService deviceService;
 
+    // TODO @芋艿：权限
     @GetMapping("/latest")
     @Operation(summary = "获取设备属性最新属性")
-    public CommonResult<List<IotDeviceDataRespVO>> getLatestDeviceProperties(@Valid IotDeviceDataPageReqVO pageReqVO) {
+    public CommonResult<List<IotDevicePropertyRespVO>> getLatestDeviceProperties(@Valid IotDevicePropertyPageReqVO pageReqVO) {
         Map<String, IotDevicePropertyDO> properties = devicePropertyService.getLatestDeviceProperties(pageReqVO);
 
         // 拼接数据
@@ -58,18 +59,20 @@ public class IotDevicePropertyController {
                 return null;
             }
             IotDevicePropertyDO property = entry.getValue();
-            return BeanUtils.toBean(thingModel, IotDeviceDataRespVO.class)
+            return BeanUtils.toBean(thingModel, IotDevicePropertyRespVO.class)
                     .setDataType(thingModel.getProperty().getDataType())
-                    .setValue(property.getValue()).setUpdateTime(property.getUpdateTime());
+                    .setValue(property.getValue())
+                    .setUpdateTime(LocalDateTimeUtil.toEpochMilli(property.getUpdateTime()));
         }));
     }
 
-    // TODO @浩浩：这里的 /history-page 包括方法名。
-    @GetMapping("/history")
+    // TODO @芋艿：权限
+    @GetMapping("/history-page")
     @Operation(summary = "获取设备属性历史数据")
-    public CommonResult<PageResult<IotTimeDataRespVO>> getHistoryDeviceProperties(@Valid IotDeviceDataPageReqVO pageReqVO) {
-        PageResult<Map<String, Object>> list = devicePropertyService.getHistoryDeviceProperties(pageReqVO);
-        return success(BeanUtils.toBean(list, IotTimeDataRespVO.class));
+    public CommonResult<PageResult<IotDevicePropertyRespVO>> getHistoryDevicePropertyPage(
+            @Valid IotDevicePropertyPageReqVO pageReqVO) {
+        Assert.notEmpty(pageReqVO.getIdentifier(), "标识符不能为空");
+        return success(devicePropertyService.getHistoryDevicePropertyPage(pageReqVO));
     }
 
 }

@@ -6,7 +6,8 @@ import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.tenant.core.aop.TenantIgnore;
-import cn.iocoder.yudao.module.iot.controller.admin.device.vo.data.IotDeviceDataPageReqVO;
+import cn.iocoder.yudao.module.iot.controller.admin.device.vo.data.IotDevicePropertyPageReqVO;
+import cn.iocoder.yudao.module.iot.controller.admin.device.vo.data.IotDevicePropertyRespVO;
 import cn.iocoder.yudao.module.iot.controller.admin.thingmodel.model.dataType.ThingModelDateOrTextDataSpecs;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDevicePropertyDO;
@@ -21,6 +22,8 @@ import cn.iocoder.yudao.module.iot.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.service.device.IotDeviceService;
 import cn.iocoder.yudao.module.iot.service.product.IotProductService;
 import cn.iocoder.yudao.module.iot.service.thingmodel.IotThingModelService;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
@@ -150,8 +153,9 @@ public class IotDevicePropertyServiceImpl implements IotDevicePropertyService {
                 entry -> IotDevicePropertyDO.builder().value(entry.getValue()).updateTime(message.getReportTime()).build()));
     }
 
+    // TODO @芋艿：需要在优化下，根据 name 之类的过滤
     @Override
-    public Map<String, IotDevicePropertyDO> getLatestDeviceProperties(@Valid IotDeviceDataPageReqVO pageReqVO) {
+    public Map<String, IotDevicePropertyDO> getLatestDeviceProperties(@Valid IotDevicePropertyPageReqVO pageReqVO) {
         // 获取设备信息
         IotDeviceDO device = deviceService.validateDeviceExists(pageReqVO.getDeviceId());
 
@@ -160,34 +164,15 @@ public class IotDevicePropertyServiceImpl implements IotDevicePropertyService {
     }
 
     @Override
-    public PageResult<Map<String, Object>> getHistoryDeviceProperties(IotDeviceDataPageReqVO deviceDataReqVO) {
-//        PageResult<Map<String, Object>> pageResult = new PageResult<>();
-//        // 1. 获取设备信息
-//        IotDeviceDO device = deviceService.getDevice(deviceDataReqVO.getDeviceId());
-//        // 2. 获取设备属性历史数据
-//        SelectVisualDO selectVisualDO = new SelectVisualDO();
-//        selectVisualDO.setDataBaseName(getDatabaseName());
-//        selectVisualDO.setTableName(getDeviceTableName(device.getProductKey(), device.getDeviceName()));
-//        selectVisualDO.setDeviceKey(device.getDeviceKey());
-//        selectVisualDO.setFieldName(deviceDataReqVO.getIdentifier());
-//        selectVisualDO.setStartTime(DateUtil.date(deviceDataReqVO.getTimes()[0].atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()).getTime());
-//        selectVisualDO.setEndTime(DateUtil.date(deviceDataReqVO.getTimes()[1].atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()).getTime());
-//        Map<String, Object> params = new HashMap<>();
-//        params.put("rows", deviceDataReqVO.getPageSize());
-//        params.put("page", (deviceDataReqVO.getPageNo() - 1) * deviceDataReqVO.getPageSize());
-//        selectVisualDO.setParams(params);
-//        pageResult.setList(devicePropertyDataMapper.selectHistoryDataList(selectVisualDO));
-//        pageResult.setTotal(devicePropertyDataMapper.selectHistoryCount(selectVisualDO));
-//        return pageResult;
-        return null; // TODO 芋艿：晚点实现
-    }
+    public PageResult<IotDevicePropertyRespVO> getHistoryDevicePropertyPage(IotDevicePropertyPageReqVO pageReqVO) {
+        // 获取设备信息
+        IotDeviceDO device = deviceService.validateDeviceExists(pageReqVO.getDeviceId());
+        pageReqVO.setDeviceKey(device.getDeviceKey());
 
-//    private String getDatabaseName() {
-//        return StrUtil.subAfter(url, "/", true);
-//    }
-//
-//    private static String getDeviceTableName(String productKey, String deviceName) {
-//        return String.format(IotConstants.DEVICE_TABLE_NAME_FORMAT, productKey, deviceName);
-//    }
+        // TODO @芋艿：增加一个表不存在的 try catch
+        IPage<IotDevicePropertyRespVO> page = devicePropertyMapper.selectPageByHistory(
+                new Page<>(pageReqVO.getPageNo(), pageReqVO.getPageSize()), pageReqVO);
+        return new PageResult<>(page.getRecords(), page.getTotal());
+    }
 
 }

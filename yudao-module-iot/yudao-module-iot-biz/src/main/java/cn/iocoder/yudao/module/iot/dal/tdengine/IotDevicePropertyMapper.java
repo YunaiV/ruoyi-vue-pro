@@ -3,12 +3,13 @@ package cn.iocoder.yudao.module.iot.dal.tdengine;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.iocoder.yudao.framework.tenant.core.aop.TenantIgnore;
+import cn.iocoder.yudao.module.iot.controller.admin.device.vo.data.IotDevicePropertyPageReqVO;
+import cn.iocoder.yudao.module.iot.controller.admin.device.vo.data.IotDevicePropertyRespVO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDO;
-import cn.iocoder.yudao.module.iot.dal.dataobject.tdengine.SelectVisualDO;
 import cn.iocoder.yudao.module.iot.framework.tdengine.core.TDengineTableField;
 import cn.iocoder.yudao.module.iot.framework.tdengine.core.annotation.TDengineDS;
 import com.baomidou.mybatisplus.annotation.InterceptorIgnore;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -83,23 +84,7 @@ public interface IotDevicePropertyMapper {
                 @Param("properties") Map<String, Object> properties,
                 @Param("reportTime") Long reportTime);
 
-    // TODO @芋艿：待实现
-    /**
-     * 获取历史数据列表
-     *
-     * @param selectVisualDO 查询条件
-     * @return 历史数据列表
-     */
-    @TenantIgnore
-    List<Map<String, Object>> selectHistoryDataList(SelectVisualDO selectVisualDO);
-
-    /**
-     * 获取历史数据条数
-     *
-     * @param selectVisualDO 查询条件
-     * @return 数据条数
-     */
-    @TenantIgnore
-    Long selectHistoryCount(SelectVisualDO selectVisualDO);
+    IPage<IotDevicePropertyRespVO> selectPageByHistory(IPage<?> page,
+                                                       @Param("reqVO") IotDevicePropertyPageReqVO reqVO);
 
 }

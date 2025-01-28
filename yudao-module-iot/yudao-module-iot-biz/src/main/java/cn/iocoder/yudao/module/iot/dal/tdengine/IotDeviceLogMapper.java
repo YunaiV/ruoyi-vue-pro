@@ -44,14 +44,6 @@ public interface IotDeviceLogMapper {
      * @return 设备日志列表
      */
     IPage<IotDeviceLogDO> selectPage(IPage<IotDeviceLogDO> page,
-                                    @Param("reqVO") IotDeviceLogPageReqVO reqVO);
-
-    /**
-     * 获得设备日志总数
-     *
-     * @param reqVO 查询条件
-     * @return 日志总数
-     */
-    Long selectCount(@Param("reqVO") IotDeviceLogPageReqVO reqVO);
+                                     @Param("reqVO") IotDeviceLogPageReqVO reqVO);
 
 }

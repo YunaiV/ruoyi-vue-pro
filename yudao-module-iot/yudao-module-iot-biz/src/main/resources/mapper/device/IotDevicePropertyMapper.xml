@@ -45,7 +45,6 @@
         DROP COLUMN ${field.field}
     </update>
 
-    <!-- TODO 芋艿，report_time 需要增加下 -->
     <insert id="insert">
         INSERT INTO device_property_${device.deviceKey}
         USING product_property_${device.productKey}
@@ -63,29 +62,16 @@
         )
     </insert>
 
-    <!-- 描述超级表结构 -->
     <select id="describeSuperTable" resultType="java.util.Map">
         DESCRIBE product_property_${productKey}
     </select>
 
-    <!-- 获取历史数据 -->
-    <select id="selectHistoryDataList" resultType="java.util.Map"
-            parameterType="cn.iocoder.yudao.module.iot.dal.dataobject.tdengine.SelectVisualDO">
-        SELECT ${fieldName} AS data, ts AS time
-        FROM device_property_${deviceKey}
-        WHERE ts BETWEEN #{startTime} AND #{endTime}
-          AND ${fieldName} IS NOT NULL
+    <!-- TODO 芋艿：缺少时间范围 AND ts BETWEEN #{reqVO.startTime} AND #{reqVO.endTime} -->
+    <select id="selectPageByHistory" resultType="cn.iocoder.yudao.module.iot.controller.admin.device.vo.data.IotDevicePropertyRespVO">
+        SELECT ${reqVO.identifier} AS `value`, report_time AS update_time
+        FROM device_property_${reqVO.deviceKey}
+        WHERE ${reqVO.identifier} IS NOT NULL
         ORDER BY ts DESC
-        LIMIT #{params.rows} OFFSET #{params.page}
-    </select>
-
-    <!-- 统计历史数据总数 -->
-    <select id="selectHistoryCount" resultType="java.lang.Long"
-            parameterType="cn.iocoder.yudao.module.iot.dal.dataobject.tdengine.SelectVisualDO">
-        SELECT COUNT(*)
-        FROM device_property_${deviceKey}
-        WHERE ts BETWEEN #{startTime} AND #{endTime}
-          AND ${fieldName} IS NOT NULL
     </select>
 
 </mapper>
