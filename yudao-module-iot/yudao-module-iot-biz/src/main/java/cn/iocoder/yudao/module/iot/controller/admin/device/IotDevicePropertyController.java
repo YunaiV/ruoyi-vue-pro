@@ -6,7 +6,6 @@ import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.iot.controller.admin.device.vo.data.IotDevicePropertyHistoryPageReqVO;
 import cn.iocoder.yudao.module.iot.controller.admin.device.vo.data.IotDevicePropertyRespVO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDO;
@@ -79,10 +78,8 @@ public class IotDevicePropertyController {
             }
             // 构建对象
             IotDevicePropertyDO property = entry.getValue();
-            return BeanUtils.toBean(thingModel, IotDevicePropertyRespVO.class)
-                    .setDataType(thingModel.getProperty().getDataType())
-                    .setValue(property.getValue())
-                    .setUpdateTime(LocalDateTimeUtil.toEpochMilli(property.getUpdateTime()));
+            return new IotDevicePropertyRespVO().setProperty(thingModel.getProperty())
+                    .setValue(property.getValue()).setUpdateTime(LocalDateTimeUtil.toEpochMilli(property.getUpdateTime()));
         }));
     }
 
