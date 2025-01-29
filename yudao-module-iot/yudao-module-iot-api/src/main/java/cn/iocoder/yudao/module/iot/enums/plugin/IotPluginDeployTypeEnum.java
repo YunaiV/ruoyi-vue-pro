@@ -33,15 +33,11 @@ public enum IotPluginDeployTypeEnum implements ArrayValuable<Integer> {
         this.name = name;
     }
 
-    public static IotPluginDeployTypeEnum fromDeployType(Integer deployType) {
+    public static IotPluginDeployTypeEnum valueOf(Integer deployType) {
         return Arrays.stream(values())
                 .filter(value -> value.getDeployType().equals(deployType))
                 .findFirst()
                 .orElse(null);
-    }
-
-    public static boolean isValidDeployType(Integer deployType) {
-        return fromDeployType(deployType) != null;
     }
 
     @Override

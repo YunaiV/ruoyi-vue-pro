@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.iot.service.plugin;
 
-import cn.iocoder.yudao.module.iot.dal.dataobject.plugininfo.PluginInfoDO;
+import cn.iocoder.yudao.module.iot.dal.dataobject.plugin.PluginInfoDO;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
@@ -10,6 +10,7 @@ import org.springframework.web.multipart.MultipartFile;
  */
 public interface PluginInstanceService {
 
+    // TODO @芋艿：这个是否应该放到 plugin 主动心跳，而是 server 自己心跳
     /**
      * 上报插件实例（心跳）
      */

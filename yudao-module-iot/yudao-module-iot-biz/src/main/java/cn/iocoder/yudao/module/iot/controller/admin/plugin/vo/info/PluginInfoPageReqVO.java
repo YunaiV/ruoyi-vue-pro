@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.iot.controller.admin.plugin.vo;
+package cn.iocoder.yudao.module.iot.controller.admin.plugin.vo.info;
 
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.validation.InEnum;

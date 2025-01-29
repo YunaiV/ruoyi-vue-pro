@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.iot.dal.dataobject.plugininfo;
+package cn.iocoder.yudao.module.iot.dal.dataobject.plugin;
 
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.module.iot.enums.plugin.IotPluginDeployTypeEnum;
@@ -47,6 +47,7 @@ public class PluginInfoDO extends BaseDO {
      * 枚举 {@link IotPluginDeployTypeEnum}
      */
     private Integer deployType;
+    // TODO @芋艿：如果是外置的插件，fileName 和 version 的选择~
     /**
      * 插件包文件名
      */
@@ -55,6 +56,7 @@ public class PluginInfoDO extends BaseDO {
      * 插件版本
      */
     private String version;
+    // TODO @芋艿：type 字典的定义
     /**
      * 插件类型
      * <p>
@@ -64,6 +66,7 @@ public class PluginInfoDO extends BaseDO {
     /**
      * 设备插件协议类型
      */
+    // TODO @芋艿：枚举字段
     private String protocol;
     /**
      * 状态
@@ -71,6 +74,7 @@ public class PluginInfoDO extends BaseDO {
      * 枚举 {@link IotPluginStatusEnum}
      */
     private Integer status;
+    // TODO @芋艿：configSchema、config 示例字段
     /**
      * 插件配置项描述信息
      */
@@ -79,6 +83,7 @@ public class PluginInfoDO extends BaseDO {
      * 插件配置信息
      */
     private String config;
+    // TODO @芋艿：script 后续的使用
     /**
      * 插件脚本
      */

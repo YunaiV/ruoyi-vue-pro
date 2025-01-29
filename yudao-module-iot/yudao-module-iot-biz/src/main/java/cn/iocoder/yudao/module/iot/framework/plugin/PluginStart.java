@@ -2,7 +2,7 @@ package cn.iocoder.yudao.module.iot.framework.plugin;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.tenant.core.util.TenantUtils;
-import cn.iocoder.yudao.module.iot.dal.dataobject.plugininfo.PluginInfoDO;
+import cn.iocoder.yudao.module.iot.dal.dataobject.plugin.PluginInfoDO;
 import cn.iocoder.yudao.module.iot.enums.plugin.IotPluginStatusEnum;
 import cn.iocoder.yudao.module.iot.service.plugin.PluginInfoService;
 import lombok.extern.slf4j.Slf4j;

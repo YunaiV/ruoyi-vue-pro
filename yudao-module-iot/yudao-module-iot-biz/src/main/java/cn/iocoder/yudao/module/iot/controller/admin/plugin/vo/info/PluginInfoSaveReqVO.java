@@ -1,15 +1,19 @@
-package cn.iocoder.yudao.module.iot.controller.admin.plugin.vo;
+package cn.iocoder.yudao.module.iot.controller.admin.plugin.vo.info;
 
+import cn.iocoder.yudao.framework.common.validation.InEnum;
+import cn.iocoder.yudao.module.iot.enums.plugin.IotPluginStatusEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
-import java.time.LocalDateTime;
-
-@Schema(description = "管理后台 - IoT 插件信息 Response VO")
+@Schema(description = "管理后台 - IoT 插件信息新增/修改 Request VO")
 @Data
-public class PluginInfoRespVO {
+public class PluginInfoSaveReqVO {
 
-    @Schema(description = "主键 ID", requiredMode = Schema.RequiredMode.REQUIRED, example = "11546")
+    // TODO @haohao：新增的字段有点多，每个都需要哇？
+
+    // TODO @haohao：一些枚举字段，需要加枚举校验。例如说，deployType、status、type 等
+
+    @Schema(description = "主键ID", requiredMode = Schema.RequiredMode.REQUIRED, example = "11546")
     private Long id;
 
     @Schema(description = "插件包标识符", requiredMode = Schema.RequiredMode.REQUIRED, example = "24627")
@@ -37,6 +41,7 @@ public class PluginInfoRespVO {
     private String protocol;
 
     @Schema(description = "状态", requiredMode = Schema.RequiredMode.REQUIRED)
+    @InEnum(IotPluginStatusEnum.class)
     private Integer status;
 
     @Schema(description = "插件配置项描述信息")
@@ -47,8 +52,5 @@ public class PluginInfoRespVO {
 
     @Schema(description = "插件脚本")
     private String script;
-
-    @Schema(description = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED)
-    private LocalDateTime createTime;
 
 }

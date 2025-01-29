@@ -18,7 +18,6 @@ public class UnifiedConfiguration {
     private String pluginsDir;
 
     @Bean
-//    @DependsOn("deviceDataApiImpl")
     public SpringPluginManager pluginManager() {
         log.info("[init][实例化 SpringPluginManager]");
         SpringPluginManager springPluginManager = new SpringPluginManager(Paths.get(pluginsDir)) {

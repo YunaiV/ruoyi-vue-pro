@@ -3,8 +3,8 @@ package cn.iocoder.yudao.module.iot.service.plugin;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.net.NetUtil;
 import cn.hutool.core.util.IdUtil;
-import cn.iocoder.yudao.module.iot.dal.dataobject.plugininfo.PluginInfoDO;
-import cn.iocoder.yudao.module.iot.dal.dataobject.plugininstance.PluginInstanceDO;
+import cn.iocoder.yudao.module.iot.dal.dataobject.plugin.PluginInfoDO;
+import cn.iocoder.yudao.module.iot.dal.dataobject.plugin.PluginInstanceDO;
 import cn.iocoder.yudao.module.iot.dal.mysql.plugin.PluginInfoMapper;
 import cn.iocoder.yudao.module.iot.dal.mysql.plugin.PluginInstanceMapper;
 import cn.iocoder.yudao.module.iot.enums.ErrorCodeConstants;
@@ -40,13 +40,15 @@ import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionU
 @Slf4j
 public class PluginInstanceServiceImpl implements PluginInstanceService {
 
-    // TODO @haohao：mac@uuid 
+    // TODO @haohao：mac@uuid
     public static final String MAIN_ID = IdUtil.fastSimpleUUID();
 
     @Resource
     private PluginInfoMapper pluginInfoMapper;
+
     @Resource
     private PluginInstanceMapper pluginInstanceMapper;
+
     @Resource
     private SpringPluginManager pluginManager;
 
