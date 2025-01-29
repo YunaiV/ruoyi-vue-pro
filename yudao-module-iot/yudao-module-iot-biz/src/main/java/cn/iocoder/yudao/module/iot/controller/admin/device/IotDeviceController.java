@@ -122,7 +122,7 @@ public class IotDeviceController {
     @Parameter(name = "deviceType", description = "设备类型", example = "1")
     public CommonResult<List<IotDeviceRespVO>> getSimpleDeviceList(
             @RequestParam(value = "deviceType", required = false) Integer deviceType) {
-        List<IotDeviceDO> list = deviceService.getDeviceList(deviceType);
+        List<IotDeviceDO> list = deviceService.getDeviceListByDeviceType(deviceType);
         return success(convertList(list, device -> // 只返回 id、name 字段
         new IotDeviceRespVO().setId(device.getId()).setDeviceName(device.getDeviceName())));
     }

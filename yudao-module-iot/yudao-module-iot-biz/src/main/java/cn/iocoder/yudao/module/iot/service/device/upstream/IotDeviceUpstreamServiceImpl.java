@@ -18,6 +18,7 @@ import cn.iocoder.yudao.module.iot.enums.device.IotDeviceStateEnum;
 import cn.iocoder.yudao.module.iot.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.mq.producer.device.IotDeviceProducer;
 import cn.iocoder.yudao.module.iot.service.device.IotDeviceService;
+import cn.iocoder.yudao.module.iot.service.device.data.IotDevicePropertyService;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -38,6 +39,8 @@ public class IotDeviceUpstreamServiceImpl implements IotDeviceUpstreamService {
 
     @Resource
     private IotDeviceService deviceService;
+    @Resource
+    private IotDevicePropertyService devicePropertyService;
 
     @Resource
     private IotDeviceProducer deviceProducer;
@@ -107,9 +110,11 @@ public class IotDeviceUpstreamServiceImpl implements IotDeviceUpstreamService {
         // TODO 芋艿：待实现
     }
 
-    private void updateDeviceLastTime(IotDeviceDO deviceDO, IotDeviceUpstreamAbstractReqDTO reqDTO) {
-        // TODO 芋艿：插件状态
-        // TODO 芋艿：操作时间
+    private void updateDeviceLastTime(IotDeviceDO device, IotDeviceUpstreamAbstractReqDTO reqDTO) {
+        // 1. TODO 芋艿：插件状态
+
+        // 2. 更新设备的最后时间
+        devicePropertyService.updateDeviceReportTime(device.getDeviceKey(), LocalDateTime.now());
     }
 
     private void sendDeviceMessage(IotDeviceMessage message, IotDeviceDO device) {

@@ -52,8 +52,12 @@ public interface IotDeviceMapper extends BaseMapperX<IotDeviceDO> {
                 .apply("LOWER(device_key) = {0}", deviceKey.toLowerCase()));
     }
 
-    default List<IotDeviceDO> selectList(Integer deviceType) {
+    default List<IotDeviceDO> selectListByDeviceType(Integer deviceType) {
         return selectList(IotDeviceDO::getDeviceType, deviceType);
+    }
+
+    default List<IotDeviceDO> selectListByState(Integer state) {
+        return selectList(IotDeviceDO::getState, state);
     }
 
     default Long selectCountByGroupId(Long groupId) {

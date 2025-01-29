@@ -226,8 +226,13 @@ public class IotDeviceServiceImpl implements IotDeviceService {
     }
 
     @Override
-    public List<IotDeviceDO> getDeviceList(@Nullable Integer deviceType) {
-        return deviceMapper.selectList(deviceType);
+    public List<IotDeviceDO> getDeviceListByDeviceType(@Nullable Integer deviceType) {
+        return deviceMapper.selectListByDeviceType(deviceType);
+    }
+
+    @Override
+    public List<IotDeviceDO> getDeviceListByState(Integer state) {
+        return deviceMapper.selectListByState(state);
     }
 
     @Override

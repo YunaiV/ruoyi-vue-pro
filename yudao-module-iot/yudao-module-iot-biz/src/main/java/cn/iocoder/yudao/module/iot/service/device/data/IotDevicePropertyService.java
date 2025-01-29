@@ -7,7 +7,9 @@ import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDevicePropertyDO;
 import cn.iocoder.yudao.module.iot.mq.message.IotDeviceMessage;
 import jakarta.validation.Valid;
 
+import java.time.LocalDateTime;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * IoT 设备【属性】数据 Service 接口
@@ -15,6 +17,8 @@ import java.util.Map;
  * @author 芋道源码
  */
 public interface IotDevicePropertyService {
+
+    // ========== 设备属性相关操作 ==========
 
     /**
      * 定义设备属性数据的结构
@@ -45,5 +49,23 @@ public interface IotDevicePropertyService {
      * @return 设备属性历史数据
      */
     PageResult<IotDevicePropertyRespVO> getHistoryDevicePropertyPage(@Valid IotDevicePropertyHistoryPageReqVO pageReqVO);
+
+    // ========== 设备时间相关操作 ==========
+
+    /**
+     * 获得最后上报时间小于指定时间的设备标识
+     *
+     * @param maxReportTime 最大上报时间
+     * @return 设备标识列表
+     */
+    Set<String> getDeviceKeysByReportTime(LocalDateTime maxReportTime);
+
+    /**
+     * 更新设备上报时间
+     *
+     * @param deviceKey  设备标识
+     * @param reportTime 上报时间
+     */
+    void updateDeviceReportTime(String deviceKey, LocalDateTime reportTime);
 
 }

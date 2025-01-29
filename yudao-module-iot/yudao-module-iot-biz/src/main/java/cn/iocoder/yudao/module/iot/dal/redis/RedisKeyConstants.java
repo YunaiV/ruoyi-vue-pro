@@ -24,7 +24,7 @@ public interface RedisKeyConstants {
      * KEY 格式：{deviceKey}
      * SCORE：上报时间
      */
-    String DEVICE_REPORT_TIME = "device_report_time";
+    String DEVICE_REPORT_TIMES = "device_report_times";
 
     /**
      * 设备信息的数据缓存，使用 Spring Cache 操作
@@ -32,7 +32,7 @@ public interface RedisKeyConstants {
      * KEY 格式：device_${productKey}_${deviceKey}
      * VALUE 数据类型：String(JSON)
      */
-    String DEVICE  = "device";
+    String DEVICE = "device";
 
     /**
      * 物模型的数据缓存，使用 Spring Cache 操作

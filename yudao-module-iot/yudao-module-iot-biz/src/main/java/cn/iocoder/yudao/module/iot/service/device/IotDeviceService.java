@@ -93,15 +93,23 @@ public interface IotDeviceService {
     PageResult<IotDeviceDO> getDevicePage(IotDevicePageReqVO pageReqVO);
 
     /**
-     * 获得设备列表
+     * 基于设备类型，获得设备列表
      *
      * @param deviceType 设备类型
      * @return 设备列表
      */
-    List<IotDeviceDO> getDeviceList(@Nullable Integer deviceType);
+    List<IotDeviceDO> getDeviceListByDeviceType(@Nullable Integer deviceType);
 
     /**
-     * 获得设备数量
+     * 获得状态，获得设备列表
+     *
+     * @param state 状态
+     * @return 设备列表
+     */
+    List<IotDeviceDO> getDeviceListByState(Integer state);
+
+    /**
+     * 基于产品编号，获得设备数量
      *
      * @param productId 产品编号
      * @return 设备数量

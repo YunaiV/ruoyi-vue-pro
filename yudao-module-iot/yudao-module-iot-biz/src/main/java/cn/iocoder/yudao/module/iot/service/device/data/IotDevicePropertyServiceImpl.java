@@ -14,6 +14,7 @@ import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDevicePropertyDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.product.IotProductDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.thingmodel.IotThingModelDO;
 import cn.iocoder.yudao.module.iot.dal.redis.device.DevicePropertyRedisDAO;
+import cn.iocoder.yudao.module.iot.dal.redis.device.DeviceReportTimeRedisDAO;
 import cn.iocoder.yudao.module.iot.dal.tdengine.IotDevicePropertyMapper;
 import cn.iocoder.yudao.module.iot.enums.thingmodel.IotDataSpecsDataTypeEnum;
 import cn.iocoder.yudao.module.iot.enums.thingmodel.IotThingModelTypeEnum;
@@ -28,10 +29,8 @@ import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.time.LocalDateTime;
+import java.util.*;
 
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
 
@@ -68,9 +67,13 @@ public class IotDevicePropertyServiceImpl implements IotDevicePropertyService {
 
     @Resource
     private DevicePropertyRedisDAO deviceDataRedisDAO;
+    @Resource
+    private DeviceReportTimeRedisDAO deviceReportTimeRedisDAO;
 
     @Resource
     private IotDevicePropertyMapper devicePropertyMapper;
+
+    // ========== 设备属性相关操作 ==========
 
     @Override
     public void defineDevicePropertyData(Long productId) {
@@ -177,6 +180,18 @@ public class IotDevicePropertyServiceImpl implements IotDevicePropertyService {
             }
             throw exception;
         }
+    }
+
+    // ========== 设备时间相关操作 ==========
+
+    @Override
+    public Set<String> getDeviceKeysByReportTime(LocalDateTime maxReportTime) {
+        return deviceReportTimeRedisDAO.range(maxReportTime);
+    }
+
+    @Override
+    public void updateDeviceReportTime(String deviceKey, LocalDateTime reportTime) {
+        deviceReportTimeRedisDAO.update(deviceKey, reportTime);
     }
 
 }
