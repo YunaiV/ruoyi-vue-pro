@@ -1,4 +1,4 @@
-package com.somle.amazon.model;
+package com.somle.amazon.controller.vo;
 
 import lombok.Data;
 
@@ -9,11 +9,11 @@ import lombok.Data;
  */
 
 @Data
-public class AmazonAdProfile {
-    private long profileId;
+public class AmazonAdProfileRespVO {
+    private Long profileId;
     private String countryCode;
     private String currencyCode;
-    private double dailyBudget;
+    private Double dailyBudget;
     private String timezone;
     private AccountInfo accountInfo;
 
@@ -24,5 +24,6 @@ public class AmazonAdProfile {
         private String type;
         private String name;
         private boolean validPaymentMethod;
+        private String subType;
     }
 }

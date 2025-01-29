@@ -1,11 +1,11 @@
-package com.somle.amazon.model;
+package com.somle.amazon.controller.vo;
 
 import lombok.Data;
 
 import java.util.List;
 
 @Data
-public class AmazonSpReport {
+public class AmazonSpReportRespVO {
 //    @Id
 //    @GeneratedValue(strategy = GenerationType.IDENTITY)
 //    private Long id;

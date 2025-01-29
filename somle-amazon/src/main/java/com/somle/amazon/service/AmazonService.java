@@ -1,17 +1,16 @@
 package com.somle.amazon.service;
 
 import com.somle.amazon.model.AmazonAccount;
-import com.somle.amazon.model.AmazonAuthReqVO;
-import com.somle.amazon.model.AmazonAuthRespVO;
+import com.somle.amazon.controller.vo.AmazonAuthReqVO;
+import com.somle.amazon.controller.vo.AmazonAuthRespVO;
 import com.somle.amazon.model.AmazonSeller;
 import com.somle.amazon.repository.AmazonAccountRepository;
 import com.somle.amazon.repository.AmazonShopRepository;
 import com.somle.framework.common.util.web.RequestX;
 import com.somle.framework.common.util.web.WebUtils;
-import com.somle.framework.common.util.json.JSONObject;
-import com.somle.framework.common.util.json.JsonUtils;
 
 import jakarta.annotation.PostConstruct;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -19,7 +18,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Map;
 
 @Slf4j
 @Service
@@ -27,12 +25,13 @@ public class AmazonService {
 
     public List<AmazonAccount> accounts;
 
+    public AmazonAccount account;
+
     public String authUrl = "https://api.amazon.com/auth/o2/token";
 
 
 
     public AmazonSpClient spClient;
-    public AmazonAdClient adClient;
 
 
     @Autowired
@@ -42,13 +41,16 @@ public class AmazonService {
     @Autowired
     AmazonAccountRepository accountRepository;
 
+//    @Resource
+//    AmazonAdService adService;
 
 
     @PostConstruct
     public void init() {
         accounts = accountRepository.findAll();
+        account = accounts.get(0);
         spClient = new AmazonSpClient(accounts.get(0));
-        adClient = new AmazonAdClient(accounts.get(0));
+//        adClient = new AmazonAdClient(accounts.get(0));
     }
 
 

@@ -155,7 +155,7 @@ public class AmazonSpClient {
 
 
     @Transactional(readOnly = true)
-    public List<AmazonSpReport> getReports(AmazonSeller seller, AmazonSpReportReqVO vo) {
+    public List<AmazonSpReportRespVO> getReports(AmazonSeller seller, AmazonSpReportReqVO vo) {
         log.info("get reports");
 
         String endPoint = seller.getRegion().getSpEndPoint();
@@ -169,7 +169,7 @@ public class AmazonSpClient {
             .build();
         try(var response = WebUtils.sendRequest(request)){
             var reportsString = WebUtils.parseResponse(response, JSONObject.class).get("reports");
-            var reportList = JsonUtils.parseArray(reportsString, AmazonSpReport.class);
+            var reportList = JsonUtils.parseArray(reportsString, AmazonSpReportRespVO.class);
             return reportList;
         }
     }
@@ -287,11 +287,11 @@ public class AmazonSpClient {
             try(var response = WebUtils.sendRequest(request)){
                 switch (response.code()) {
                     case 202:
-                        var report = WebUtils.parseResponse(response, AmazonSpReport.class);
+                        var report = WebUtils.parseResponse(response, AmazonSpReportRespVO.class);
                         reportId = report.getReportId();
                         break;
                     case 403:
-                        var error = WebUtils.parseResponse(response, AmazonErrorList.class);
+                        var error = WebUtils.parseResponse(response, AmazonErrorListVO.class);
                         switch (error.getErrors().get(0).getCode()) {
                             case "Unauthorized":
                                 log.error(error.toString());

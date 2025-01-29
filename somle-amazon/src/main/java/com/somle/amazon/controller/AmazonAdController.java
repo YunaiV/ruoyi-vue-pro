@@ -1,12 +1,8 @@
 package com.somle.amazon.controller;
 
-import java.time.LocalDate;
-
-import com.somle.framework.common.util.json.JSONArray;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import com.somle.amazon.service.AmazonAdClient;
 import com.somle.amazon.service.AmazonService;
 
 @RestController

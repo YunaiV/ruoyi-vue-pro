@@ -1,10 +1,10 @@
-package com.somle.amazon.model;
+package com.somle.amazon.controller.vo;
 import lombok.Data;
 
 import java.util.List;
 
 @Data
-public class AmazonErrorList {
+public class AmazonErrorListVO {
     private List<AmazonErrorDetail> errors;
 
     @Data
