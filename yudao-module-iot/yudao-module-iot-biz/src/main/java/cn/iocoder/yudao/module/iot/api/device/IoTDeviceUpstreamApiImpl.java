@@ -3,7 +3,7 @@ package cn.iocoder.yudao.module.iot.api.device;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.module.iot.api.device.dto.IotDeviceEventReportReqDTO;
 import cn.iocoder.yudao.module.iot.api.device.dto.IotDevicePropertyReportReqDTO;
-import cn.iocoder.yudao.module.iot.api.device.dto.IotDeviceStatusUpdateReqDTO;
+import cn.iocoder.yudao.module.iot.api.device.dto.IotDeviceStateUpdateReqDTO;
 import cn.iocoder.yudao.module.iot.service.device.upstream.IotDeviceUpstreamService;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RestController;
@@ -23,8 +23,8 @@ public class IoTDeviceUpstreamApiImpl implements IotDeviceUpstreamApi {
     private IotDeviceUpstreamService deviceUpstreamService;
 
     @Override
-    public CommonResult<Boolean> updateDeviceStatus(IotDeviceStatusUpdateReqDTO updateReqDTO) {
-        deviceUpstreamService.updateDeviceStatus(updateReqDTO);
+    public CommonResult<Boolean> updateDeviceState(IotDeviceStateUpdateReqDTO updateReqDTO) {
+        deviceUpstreamService.updateDeviceState(updateReqDTO);
         return success(true);
     }
 

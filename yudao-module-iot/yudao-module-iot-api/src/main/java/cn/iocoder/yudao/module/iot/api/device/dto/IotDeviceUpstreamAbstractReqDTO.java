@@ -1,9 +1,9 @@
 package cn.iocoder.yudao.module.iot.api.device.dto;
 
+import cn.iocoder.yudao.framework.common.util.json.databind.TimestampLocalDateTimeSerializer;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDateTime;
 
@@ -13,8 +13,6 @@ import java.time.LocalDateTime;
  * @author 芋道源码
  */
 @Data
-@SuperBuilder
-@NoArgsConstructor
 public abstract class IotDeviceUpstreamAbstractReqDTO {
 
     /**
@@ -41,6 +39,7 @@ public abstract class IotDeviceUpstreamAbstractReqDTO {
     /**
      * 上报时间
      */
+    @JsonSerialize(using = TimestampLocalDateTimeSerializer.class) // 解决 iot plugins 序列化 LocalDateTime 是数组，导致无法解析的问题
     private LocalDateTime reportTime;
 
 }

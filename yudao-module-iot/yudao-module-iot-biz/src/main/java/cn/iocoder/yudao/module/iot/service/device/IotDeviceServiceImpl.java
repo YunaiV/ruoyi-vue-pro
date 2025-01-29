@@ -395,10 +395,10 @@ public class IotDeviceServiceImpl implements IotDeviceService {
         // 2.1 情况一：属性上报
         String requestId = IdUtil.fastSimpleUUID();
         if (Objects.equals(reportReqVO.getType(), IotDeviceMessageTypeEnum.PROPERTY.getType())) {
-            deviceUpstreamService.reportDeviceProperty(IotDevicePropertyReportReqDTO.builder()
-                    .requestId(requestId).reportTime(LocalDateTime.now())
-                    .productKey(device.getProductKey()).deviceName(device.getDeviceName())
-                    .properties((Map<String, Object>) reportReqVO.getData()).build());
+            deviceUpstreamService.reportDeviceProperty(((IotDevicePropertyReportReqDTO)
+                    new IotDevicePropertyReportReqDTO().setRequestId(requestId).setReportTime(LocalDateTime.now())
+                            .setProductKey(device.getProductKey()).setDeviceName(device.getDeviceName()))
+                    .setProperties((Map<String, Object>) reportReqVO.getData()));
             return;
         }
         // 2.2 情况二：事件上报

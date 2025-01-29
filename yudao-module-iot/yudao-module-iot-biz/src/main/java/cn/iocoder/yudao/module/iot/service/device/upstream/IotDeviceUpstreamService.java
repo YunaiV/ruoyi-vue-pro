@@ -2,7 +2,7 @@ package cn.iocoder.yudao.module.iot.service.device.upstream;
 
 import cn.iocoder.yudao.module.iot.api.device.dto.IotDeviceEventReportReqDTO;
 import cn.iocoder.yudao.module.iot.api.device.dto.IotDevicePropertyReportReqDTO;
-import cn.iocoder.yudao.module.iot.api.device.dto.IotDeviceStatusUpdateReqDTO;
+import cn.iocoder.yudao.module.iot.api.device.dto.IotDeviceStateUpdateReqDTO;
 
 /**
  * 设备上行 Service 接口
@@ -18,7 +18,7 @@ public interface IotDeviceUpstreamService {
      *
      * @param updateReqDTO 更新设备状态 DTO
      */
-    void updateDeviceStatus(IotDeviceStatusUpdateReqDTO updateReqDTO);
+    void updateDeviceState(IotDeviceStateUpdateReqDTO updateReqDTO);
 
     /**
      * 上报设备属性数据

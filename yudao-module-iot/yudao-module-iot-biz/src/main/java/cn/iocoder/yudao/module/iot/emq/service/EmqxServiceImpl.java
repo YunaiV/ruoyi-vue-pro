@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.module.iot.emq.service;
 
-import cn.iocoder.yudao.module.iot.api.device.dto.IotDevicePropertyReportReqDTO;
 import cn.iocoder.yudao.module.iot.service.device.data.IotDevicePropertyService;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
@@ -34,11 +33,11 @@ public class EmqxServiceImpl implements EmqxService {
             String productKey = topic.split("/")[2];
             String deviceName = topic.split("/")[3];
             String message = new String(mqttMessage.getPayload());
-            IotDevicePropertyReportReqDTO createDTO = IotDevicePropertyReportReqDTO.builder()
+//            IotDevicePropertyReportReqDTO createDTO = IotDevicePropertyReportReqDTO.builder()
 //                    .productKey(productKey)
 //                    .deviceName(deviceName)
 //                    .properties(message) // TODO 芋艿：临时去掉，看看
-                    .build();
+//                    .build();
 //            iotDeviceDataService.saveDeviceProperty(createDTO);
         }
     }

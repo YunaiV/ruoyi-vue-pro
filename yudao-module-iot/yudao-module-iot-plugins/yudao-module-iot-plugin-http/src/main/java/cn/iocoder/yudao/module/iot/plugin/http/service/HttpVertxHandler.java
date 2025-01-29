@@ -1,14 +1,18 @@
 package cn.iocoder.yudao.module.iot.plugin.http.service;
 
+import cn.hutool.core.util.IdUtil;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import cn.iocoder.yudao.module.iot.api.device.IotDeviceUpstreamApi;
 import cn.iocoder.yudao.module.iot.api.device.dto.IotDevicePropertyReportReqDTO;
+import cn.iocoder.yudao.module.iot.api.device.dto.IotDeviceStateUpdateReqDTO;
+import cn.iocoder.yudao.module.iot.enums.device.IotDeviceStateEnum;
 import io.vertx.core.Handler;
 import io.vertx.ext.web.RequestBody;
 import io.vertx.ext.web.RoutingContext;
 import lombok.extern.slf4j.Slf4j;
 
+import java.time.LocalDateTime;
 import java.util.Map;
 
 @Slf4j
@@ -43,20 +47,27 @@ public class HttpVertxHandler implements Handler<RoutingContext> {
         String id = jsonData.getStr("id");
 
         try {
-            IotDevicePropertyReportReqDTO reportReqDTO = IotDevicePropertyReportReqDTO.builder()
-                    .productKey(productKey)
-                    .deviceName(deviceName)
-                    .properties((Map<String, Object>) requestBody.asJsonObject().getMap().get("properties"))
-                    .build();
+            // TODO @haohao：pluginKey 需要设置
+            // 设备上线
+            deviceDataApi.updateDeviceState(((IotDeviceStateUpdateReqDTO)
+                    new IotDeviceStateUpdateReqDTO().setRequestId(IdUtil.fastSimpleUUID())
+                            .setPluginKey("http")
+                            .setReportTime(LocalDateTime.now())
+                            .setProductKey(productKey).setDeviceName(deviceName))
+                    .setState(IotDeviceStateEnum.ONLINE.getState()));
 
-            deviceDataApi.reportDeviceProperty(reportReqDTO);
+            // 属性上报
+            deviceDataApi.reportDeviceProperty(((IotDevicePropertyReportReqDTO)
+                    new IotDevicePropertyReportReqDTO().setRequestId(IdUtil.fastSimpleUUID())
+                            .setPluginKey("http").setReportTime(LocalDateTime.now())
+                            .setProductKey(productKey).setDeviceName(deviceName))
+                    .setProperties((Map<String, Object>) requestBody.asJsonObject().getMap().get("properties")));
 
             ctx.response()
                     .setStatusCode(200)
                     .putHeader("Content-Type", "application/json; charset=UTF-8")
                     .end(createResponseJson(200, new JSONObject(), id, "success",
                             "thing.event.property.post", "1.0").toString());
-
         } catch (Exception e) {
             log.error("[HttpVertxHandler] 上报属性数据失败", e);
             ctx.response()

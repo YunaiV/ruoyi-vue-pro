@@ -12,6 +12,7 @@
     <packaging>jar</packaging>
 
     <name>${project.artifactId}</name>
+    <!-- TODO 芋艿：需要在整理下，特别是 PF4J -->
     <description>
         物联网 模块 API，暴露给其它模块调用
     </description>
@@ -40,6 +41,13 @@
                     <artifactId>slf4j-log4j12</artifactId>
                 </exclusion>
             </exclusions>
+        </dependency>
+
+        <!-- 工具类相关 -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <scope>provided</scope> <!-- 设置为 provided，只有工具类需要使用到 -->
         </dependency>
 
         <!-- 参数校验 -->

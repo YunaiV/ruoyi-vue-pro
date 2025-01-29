@@ -1,15 +1,20 @@
 package cn.iocoder.yudao.module.iot.service.device.upstream;
 
+import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.IdUtil;
+import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
+import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
+import cn.iocoder.yudao.framework.tenant.core.util.TenantUtils;
 import cn.iocoder.yudao.module.iot.api.device.dto.IotDeviceEventReportReqDTO;
 import cn.iocoder.yudao.module.iot.api.device.dto.IotDevicePropertyReportReqDTO;
-import cn.iocoder.yudao.module.iot.api.device.dto.IotDeviceStatusUpdateReqDTO;
+import cn.iocoder.yudao.module.iot.api.device.dto.IotDeviceStateUpdateReqDTO;
 import cn.iocoder.yudao.module.iot.api.device.dto.IotDeviceUpstreamAbstractReqDTO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDO;
 import cn.iocoder.yudao.module.iot.enums.device.IotDeviceMessageIdentifierEnum;
 import cn.iocoder.yudao.module.iot.enums.device.IotDeviceMessageTypeEnum;
+import cn.iocoder.yudao.module.iot.enums.device.IotDeviceStateEnum;
 import cn.iocoder.yudao.module.iot.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.mq.producer.device.IotDeviceProducer;
 import cn.iocoder.yudao.module.iot.service.device.IotDeviceService;
@@ -19,6 +24,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 /**
  * 设备上行 Service 实现类
@@ -37,9 +43,39 @@ public class IotDeviceUpstreamServiceImpl implements IotDeviceUpstreamService {
     private IotDeviceProducer deviceProducer;
 
     @Override
-    public void updateDeviceStatus(IotDeviceStatusUpdateReqDTO updateReqDTO) {
-        log.info("[updateDeviceStatus][更新设备状态: {}]", updateReqDTO);
-        // TODO 芋艿：插件状态
+    public void updateDeviceState(IotDeviceStateUpdateReqDTO updateReqDTO) {
+        Assert.isTrue(ObjectUtils.equalsAny(updateReqDTO.getState(),
+                IotDeviceStateEnum.ONLINE.getState(), IotDeviceStateEnum.OFFLINE.getState()),
+                "状态不合法");
+        // 1.1 获得设备
+        log.info("[updateDeviceState][更新设备状态: {}]", updateReqDTO);
+        IotDeviceDO device = deviceService.getDeviceByProductKeyAndDeviceNameFromCache(
+                updateReqDTO.getProductKey(), updateReqDTO.getDeviceName());
+        if (device == null) {
+            log.error("[updateDeviceState][设备({}/{}) 不存在]",
+                    updateReqDTO.getProductKey(), updateReqDTO.getDeviceName());
+            return;
+        }
+        // 1.2 记录设备的最后时间
+        updateDeviceLastTime(device, updateReqDTO);
+        // 1.3 当前状态一致，不处理
+        if (Objects.equals(device.getState(), updateReqDTO.getState())) {
+            return;
+        }
+
+        // 2. 更新设备状态
+        TenantUtils.executeIgnore(() ->
+                deviceService.updateDeviceState(device.getId(), updateReqDTO.getState()));
+
+        // 3. TODO 芋艿：子设备的关联
+
+        // 4. 发送设备消息
+        IotDeviceMessage message = BeanUtils.toBean(updateReqDTO, IotDeviceMessage.class)
+                .setType(IotDeviceMessageTypeEnum.STATE.getType())
+                .setIdentifier(ObjUtil.equals(updateReqDTO.getState(), IotDeviceStateEnum.ONLINE.getState())
+                        ? IotDeviceMessageIdentifierEnum.STATE_ONLINE.getIdentifier()
+                        : IotDeviceMessageIdentifierEnum.STATE_OFFLINE.getIdentifier());
+        sendDeviceMessage(message, device);
     }
 
     @Override

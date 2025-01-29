@@ -12,7 +12,11 @@ public enum IotDeviceMessageIdentifierEnum {
 
     PROPERTY_GET("get"),
     PROPERTY_SET("set"),
-    PROPERTY_REPORT("report");
+    PROPERTY_REPORT("report"),
+
+    STATE_ONLINE("online"),
+    STATE_OFFLINE("offline");
+
 
     /**
      * 标志符

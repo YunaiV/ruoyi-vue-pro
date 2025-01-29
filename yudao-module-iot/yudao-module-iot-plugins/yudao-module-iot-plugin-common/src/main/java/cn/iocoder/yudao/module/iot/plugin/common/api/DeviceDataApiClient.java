@@ -4,7 +4,7 @@ import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.module.iot.api.device.IotDeviceUpstreamApi;
 import cn.iocoder.yudao.module.iot.api.device.dto.IotDeviceEventReportReqDTO;
 import cn.iocoder.yudao.module.iot.api.device.dto.IotDevicePropertyReportReqDTO;
-import cn.iocoder.yudao.module.iot.api.device.dto.IotDeviceStatusUpdateReqDTO;
+import cn.iocoder.yudao.module.iot.api.device.dto.IotDeviceStateUpdateReqDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.client.RestTemplate;
 
@@ -29,9 +29,9 @@ public class DeviceDataApiClient implements IotDeviceUpstreamApi {
 
     // TODO @haohao：返回结果，不用 CommonResult 哈。
     @Override
-    public CommonResult<Boolean> updateDeviceStatus(IotDeviceStatusUpdateReqDTO updateReqDTO) {
-        String url = deviceDataUrl + URL_PREFIX + "/update-status";
-        return doPost(url, updateReqDTO, "updateDeviceStatus");
+    public CommonResult<Boolean> updateDeviceState(IotDeviceStateUpdateReqDTO updateReqDTO) {
+        String url = deviceDataUrl + URL_PREFIX + "/update-state";
+        return doPost(url, updateReqDTO, "updateDeviceState");
     }
 
     @Override

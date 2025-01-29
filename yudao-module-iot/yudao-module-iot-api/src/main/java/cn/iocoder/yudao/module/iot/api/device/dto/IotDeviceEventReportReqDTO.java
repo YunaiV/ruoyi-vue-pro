@@ -2,8 +2,6 @@ package cn.iocoder.yudao.module.iot.api.device.dto;
 
 import jakarta.validation.constraints.NotEmpty;
 import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.experimental.SuperBuilder;
 
 import java.util.Map;
 
@@ -11,8 +9,6 @@ import java.util.Map;
  * IoT 设备【事件】数据上报 Request DTO
  */
 @Data
-@SuperBuilder
-@NoArgsConstructor
 public class IotDeviceEventReportReqDTO extends IotDeviceUpstreamAbstractReqDTO {
 
     /**
