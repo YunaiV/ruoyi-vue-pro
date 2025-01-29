@@ -9,9 +9,9 @@ import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.common.util.validation.ValidationUtils;
-import cn.iocoder.yudao.framework.tenant.core.aop.TenantIgnore;
 import cn.iocoder.yudao.framework.tenant.core.util.TenantUtils;
 import cn.iocoder.yudao.module.iot.api.device.dto.IotDevicePropertyReportReqDTO;
+import cn.iocoder.yudao.module.iot.api.device.dto.IotDeviceStateUpdateReqDTO;
 import cn.iocoder.yudao.module.iot.controller.admin.device.vo.device.*;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceGroupDO;
@@ -263,9 +263,13 @@ public class IotDeviceServiceImpl implements IotDeviceService {
     }
 
     @Override
-    @TenantIgnore
-    @Cacheable(value = RedisKeyConstants.DEVICE, key = "#productKey + '_' + #deviceName", unless = "#result == null")
     public IotDeviceDO getDeviceByProductKeyAndDeviceNameFromCache(String productKey, String deviceName) {
+        // 保证在 @CacheEvict 之前，忽略租户
+        return TenantUtils.executeIgnore(() -> getSelf().getDeviceByProductKeyAndDeviceNameFromCache0(productKey, deviceName));
+    }
+
+    @Cacheable(value = RedisKeyConstants.DEVICE, key = "#productKey + '_' + #deviceName", unless = "#result == null")
+    public IotDeviceDO getDeviceByProductKeyAndDeviceNameFromCache0(String productKey, String deviceName) {
         return deviceMapper.selectByProductKeyAndDeviceName(productKey, deviceName);
     }
 
@@ -386,6 +390,7 @@ public class IotDeviceServiceImpl implements IotDeviceService {
         return respVO;
     }
 
+    // TODO @芋艿：要不改成 simulationUpstream，原因：里面不只有上报，还有更新状态，那么 upstream 更适合
     @Override
     @SuppressWarnings("unchecked")
     public void simulationReportDevice(IotDeviceSimulationReportReqVO reportReqVO) {
@@ -408,9 +413,10 @@ public class IotDeviceServiceImpl implements IotDeviceService {
         }
         // 2.3 情况三：状态变更
         if (Objects.equals(reportReqVO.getType(), IotDeviceMessageTypeEnum.STATE.getType())) {
-            // TODO 芋艿：待实现
-//            updateDeviceState(new IotDeviceStatusUpdateReqVO().setId(device.getId())
-//                    .setStatus((Integer) reportReqVO.getData()));
+            deviceUpstreamService.updateDeviceState(((IotDeviceStateUpdateReqDTO)
+                    new IotDeviceStateUpdateReqDTO().setRequestId(IdUtil.fastSimpleUUID()).setReportTime(LocalDateTime.now())
+                            .setProductKey(device.getProductKey()).setDeviceName(device.getDeviceName()))
+                    .setState((Integer) reportReqVO.getData()));
             return;
         }
         throw new IllegalArgumentException("未知的类型：" + reportReqVO.getType());

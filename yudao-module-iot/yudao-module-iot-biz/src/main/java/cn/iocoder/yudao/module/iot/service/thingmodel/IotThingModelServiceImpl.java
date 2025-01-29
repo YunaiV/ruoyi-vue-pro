@@ -6,7 +6,6 @@ import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
-import cn.iocoder.yudao.framework.tenant.core.aop.TenantIgnore;
 import cn.iocoder.yudao.framework.tenant.core.util.TenantUtils;
 import cn.iocoder.yudao.module.iot.controller.admin.thingmodel.model.ThingModelEvent;
 import cn.iocoder.yudao.module.iot.controller.admin.thingmodel.model.ThingModelParam;
@@ -136,9 +135,13 @@ public class IotThingModelServiceImpl implements IotThingModelService {
     }
 
     @Override
-    @TenantIgnore
-    @Cacheable(value = RedisKeyConstants.THING_MODEL_LIST, key = "#productKey")
     public List<IotThingModelDO> getThingModelListByProductKeyFromCache(String productKey) {
+        // 保证在 @CacheEvict 之前，忽略租户
+        return TenantUtils.executeIgnore(() -> getSelf().getThingModelListByProductKeyFromCache0(productKey));
+    }
+
+    @Cacheable(value = RedisKeyConstants.THING_MODEL_LIST, key = "#productKey")
+    public List<IotThingModelDO> getThingModelListByProductKeyFromCache0(String productKey) {
         return thingModelMapper.selectListByProductKey(productKey);
     }
 
