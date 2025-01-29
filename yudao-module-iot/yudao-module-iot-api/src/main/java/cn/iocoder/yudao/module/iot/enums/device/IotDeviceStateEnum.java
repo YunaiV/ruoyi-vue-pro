@@ -35,4 +35,8 @@ public enum IotDeviceStateEnum implements ArrayValuable<Integer> {
         return ARRAYS;
     }
 
+    public static boolean isOnline(Integer state) {
+        return ONLINE.getState().equals(state);
+    }
+
 }

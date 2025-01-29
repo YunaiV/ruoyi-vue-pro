@@ -15,7 +15,9 @@ public enum IotDeviceMessageIdentifierEnum {
     PROPERTY_REPORT("report"),
 
     STATE_ONLINE("online"),
-    STATE_OFFLINE("offline");
+    STATE_OFFLINE("offline"),
+
+    SERVICE_REPLY_SUFFIX("_reply");
 
 
     /**
