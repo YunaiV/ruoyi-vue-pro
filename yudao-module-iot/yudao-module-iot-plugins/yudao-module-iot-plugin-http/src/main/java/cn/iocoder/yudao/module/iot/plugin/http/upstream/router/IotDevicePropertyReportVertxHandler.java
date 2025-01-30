@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.iot.plugin.http.framework.upstream;
+package cn.iocoder.yudao.module.iot.plugin.http.upstream.router;
 
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.json.JSONObject;
@@ -16,11 +16,13 @@ import java.time.LocalDateTime;
 import java.util.Map;
 
 @Slf4j
-public class HttpVertxHandler implements Handler<RoutingContext> {
+public class IotDevicePropertyReportVertxHandler implements Handler<RoutingContext> {
+
+    public static final String PATH = "/sys/:productKey/:deviceName/thing/event/property/post";
 
     private final IotDeviceUpstreamApi deviceDataApi;
 
-    public HttpVertxHandler(IotDeviceUpstreamApi deviceDataApi) {
+    public IotDevicePropertyReportVertxHandler(IotDeviceUpstreamApi deviceDataApi) {
         this.deviceDataApi = deviceDataApi;
     }
 

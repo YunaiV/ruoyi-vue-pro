@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.iot.plugin.http.config;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.module.iot.api.device.IotDeviceUpstreamApi;
+import cn.iocoder.yudao.module.iot.plugin.http.upstream.IotDeviceUpstreamServer;
 import lombok.extern.slf4j.Slf4j;
 import org.pf4j.PluginWrapper;
 import org.pf4j.spring.SpringPlugin;
@@ -14,9 +15,9 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
  * 负责插件的启动和停止，与 Vert.x 的生命周期管理
  */
 @Slf4j
-public class HttpVertxPlugin extends SpringPlugin {
+public class IotHttpVertxPlugin extends SpringPlugin {
 
-    public HttpVertxPlugin(PluginWrapper wrapper) {
+    public IotHttpVertxPlugin(PluginWrapper wrapper) {
         super(wrapper);
     }
 
@@ -29,8 +30,8 @@ public class HttpVertxPlugin extends SpringPlugin {
             Assert.notNull(pluginContext, "pluginContext 不能为空");
 
             // 2. 启动 Vert.x
-            VertxService vertxService = pluginContext.getBean(VertxService.class);
-            vertxService.startServer();
+            IotDeviceUpstreamServer vertxService = pluginContext.getBean(IotDeviceUpstreamServer.class);
+            vertxService.start();
 
             log.info("[HttpVertxPlugin][HttpVertxPlugin 插件启动成功...]");
         } catch (Exception e) {
@@ -45,7 +46,7 @@ public class HttpVertxPlugin extends SpringPlugin {
             // 停止服务器
             ApplicationContext pluginContext = getApplicationContext();
             if (pluginContext != null) {
-                VertxService vertxService = pluginContext.getBean(VertxService.class);
+                IotDeviceUpstreamServer vertxService = pluginContext.getBean(IotDeviceUpstreamServer.class);
                 vertxService.stopServer();
             }
 

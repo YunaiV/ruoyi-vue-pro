@@ -22,7 +22,7 @@
     <properties>
         <!-- 插件相关 -->
         <plugin.id>${project.artifactId}</plugin.id>
-        <plugin.class>cn.iocoder.yudao.module.iot.plugin.http.config.HttpVertxPlugin</plugin.class>
+        <plugin.class>cn.iocoder.yudao.module.iot.plugin.http.config.IotHttpVertxPlugin</plugin.class>
         <plugin.version>${project.version}</plugin.version>
         <plugin.provider>yudao</plugin.provider>
         <plugin.description>${project.artifactId}-${project.version}</plugin.description>

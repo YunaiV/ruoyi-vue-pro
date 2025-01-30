@@ -1,6 +1,6 @@
-package cn.iocoder.yudao.module.iot.plugin.common.core.downstream.router;
+package cn.iocoder.yudao.module.iot.plugin.common.downstream.router;
 
-import cn.iocoder.yudao.module.iot.plugin.common.core.downstream.IotDeviceDownstreamHandler;
+import cn.iocoder.yudao.module.iot.plugin.common.downstream.IotDeviceDownstreamHandler;
 import io.vertx.core.Handler;
 import io.vertx.ext.web.RoutingContext;
 import lombok.RequiredArgsConstructor;

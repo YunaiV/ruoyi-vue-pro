@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.iot.plugin.common.core.downstream;
+package cn.iocoder.yudao.module.iot.plugin.common.downstream;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.module.iot.api.device.dto.control.downstream.IotDevicePropertyGetReqDTO;

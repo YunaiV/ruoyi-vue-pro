@@ -1,12 +1,17 @@
-package cn.iocoder.yudao.module.iot.plugin.common.core.downstream;
+package cn.iocoder.yudao.module.iot.plugin.common.downstream;
 
-import cn.iocoder.yudao.module.iot.plugin.common.core.downstream.router.IotDeviceServiceInvokeVertxHandler;
+import cn.iocoder.yudao.module.iot.plugin.common.downstream.router.IotDeviceServiceInvokeVertxHandler;
 import io.vertx.core.Vertx;
 import io.vertx.core.http.HttpServer;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.handler.BodyHandler;
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ * IoT 设备下行服务端，接收来自 server 服务器的请求，转发给 device 设备
+ *
+ * @author 芋道源码
+ */
 @Slf4j
 public class IotDeviceDownstreamServer {
 
@@ -25,6 +30,9 @@ public class IotDeviceDownstreamServer {
         this.server = vertx.createHttpServer().requestHandler(router);
     }
 
+    /**
+     * 启动 HTTP 服务器
+     */
     public void start() {
         log.info("[start][开始启动]");
         server.listen(0) // 通过 0 自动选择端口
@@ -34,6 +42,9 @@ public class IotDeviceDownstreamServer {
         log.info("[start][启动完成，端口({})]", this.server.actualPort());
     }
 
+    /**
+     * 停止所有
+     */
     public void stop() {
         log.info("[stop][开始关闭]");
         try {

@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.iot.plugin.common.core.upstream;
+package cn.iocoder.yudao.module.iot.plugin.common.upstream;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.module.iot.api.device.IotDeviceUpstreamApi;

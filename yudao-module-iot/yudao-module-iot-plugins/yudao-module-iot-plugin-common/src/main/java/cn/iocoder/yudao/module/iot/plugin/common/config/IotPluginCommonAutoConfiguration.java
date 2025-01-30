@@ -1,9 +1,9 @@
 package cn.iocoder.yudao.module.iot.plugin.common.config;
 
 import cn.iocoder.yudao.module.iot.api.device.IotDeviceUpstreamApi;
-import cn.iocoder.yudao.module.iot.plugin.common.core.downstream.IotDeviceDownstreamHandler;
-import cn.iocoder.yudao.module.iot.plugin.common.core.downstream.IotDeviceDownstreamServer;
-import cn.iocoder.yudao.module.iot.plugin.common.core.upstream.IotDeviceUpstreamClient;
+import cn.iocoder.yudao.module.iot.plugin.common.downstream.IotDeviceDownstreamHandler;
+import cn.iocoder.yudao.module.iot.plugin.common.downstream.IotDeviceDownstreamServer;
+import cn.iocoder.yudao.module.iot.plugin.common.upstream.IotDeviceUpstreamClient;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.web.client.RestTemplateBuilder;
@@ -12,14 +12,13 @@ import org.springframework.web.client.RestTemplate;
 
 import java.time.Duration;
 
-// TODO @芋艿：配置类的名字
 /**
- * 设备数据 API 初始化器
+ * IoT 插件的通用自动配置类
  *
  * @author haohao
  */
 @AutoConfiguration
-public class YudaoDeviceDataApiAutoConfiguration {
+public class IotPluginCommonAutoConfiguration {
 
     // TODO @haohao：这个要不搞个配置类哈
     @Value("${iot.device-data.url}")
